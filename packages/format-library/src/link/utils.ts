@@ -19,6 +19,7 @@ export type LinkFormatAttributes = {
 	url: string;
 	type?: string;
 	id?: string;
+	_id?: string;
 	target?: string;
 	rel?: string;
 	class?: string;
@@ -27,6 +28,7 @@ export type LinkFormatAttributes = {
 export interface LinkFormat {
 	type: 'core/link';
 	attributes: LinkFormatAttributes;
+	unregisteredAttributes?: Record< string, string >;
 }
 
 /**
@@ -122,6 +124,25 @@ export function isValidHref( href: string ): boolean {
 	return true;
 }
 
+function getRelTokens( rel?: string ): string[] {
+	// HTML space-separated tokens use ASCII whitespace.
+	return rel?.match( /[^ \t\n\f\r]+/g ) ?? [];
+}
+
+function isNofollowToken( token: string ): boolean {
+	return token.toLowerCase() === 'nofollow';
+}
+
+/**
+ * Check whether the link's rel contains the nofollow token.
+ *
+ * @param rel The link's rel attribute.
+ * @return Whether the link has the nofollow relationship.
+ */
+export function hasNofollow( rel?: string ): boolean {
+	return getRelTokens( rel ).some( isNofollowToken );
+}
+
 /**
  * Generates the format object that will be applied to the link text.
  *
@@ -132,22 +153,32 @@ export function isValidHref( href: string ): boolean {
  * @param options.opensInNewWindow Whether this link will open in a new window.
  * @param options.nofollow         Whether this link is marked as no follow relationship.
  * @param options.cssClasses       The CSS classes to apply to the link.
+ * @param currentFormat            The existing link format whose other attributes should be retained.
  * @return The final format object.
  */
-export function createLinkFormat( {
-	url,
-	type,
-	id,
-	opensInNewWindow,
-	nofollow,
-	cssClasses,
-}: LinkFormatOptions ): LinkFormat {
+export function createLinkFormat(
+	{
+		url,
+		type,
+		id,
+		opensInNewWindow,
+		nofollow,
+		cssClasses,
+	}: LinkFormatOptions,
+	currentFormat?: RichTextFormat &
+		Pick< LinkFormat, 'unregisteredAttributes' >
+): LinkFormat {
 	const format: LinkFormat = {
 		type: 'core/link',
-		attributes: {
-			url,
-		},
+		attributes: { url },
 	};
+
+	if ( currentFormat?.attributes?._id !== undefined ) {
+		format.attributes._id = currentFormat.attributes._id;
+	}
+	if ( currentFormat?.unregisteredAttributes ) {
+		format.unregisteredAttributes = currentFormat.unregisteredAttributes;
+	}
 
 	if ( type ) {
 		format.attributes.type = type;
@@ -160,10 +191,17 @@ export function createLinkFormat( {
 		format.attributes.target = '_blank';
 	}
 
-	if ( nofollow ) {
-		format.attributes.rel = format.attributes.rel
-			? format.attributes.rel + ' nofollow'
-			: 'nofollow';
+	let rel = currentFormat?.attributes?.rel;
+	if ( nofollow !== undefined && nofollow !== hasNofollow( rel ) ) {
+		const tokens = getRelTokens( rel );
+		rel = nofollow
+			? [ ...tokens, 'nofollow' ].join( ' ' )
+			: tokens
+					.filter( ( token ) => ! isNofollowToken( token ) )
+					.join( ' ' );
+	}
+	if ( rel ) {
+		format.attributes.rel = rel;
 	}
 
 	const trimmedCssClasses = cssClasses?.trim();
