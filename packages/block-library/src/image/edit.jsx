@@ -25,7 +25,9 @@ import { getDefaultLinkDestination, isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
@@ -253,7 +255,7 @@ export function ImageEdit( {
 			};
 		}
 
-		const linkDestination =
+		let linkDestination =
 			attributes.linkDestination || getDefaultLinkDestination();
 
 		// Check if the image is linked to it's media.
@@ -264,6 +266,11 @@ export function ImageEdit( {
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
 				href = media.link;
+				break;
+			case LINK_DESTINATION_CUSTOM:
+				// Replacing the image removes a custom link
+				// reset its destination to match.
+				linkDestination = LINK_DESTINATION_NONE;
 				break;
 		}
 		mediaAttributes.href = href;
