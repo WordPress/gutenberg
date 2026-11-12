@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 -   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
