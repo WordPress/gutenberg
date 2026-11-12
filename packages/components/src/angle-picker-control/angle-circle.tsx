@@ -76,7 +76,7 @@ function AngleCircle( {
 		const currentValue = Number( value );
 		const reference =
 			value !== '' && Number.isFinite( currentValue )
-				? currentValue
+				? clamp( currentValue, min, max )
 				: clamp( 0, min, max );
 		const turned = getNearestEquivalent( angle, reference );
 		dragRef.current = { angle, turned };

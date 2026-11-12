@@ -262,6 +262,22 @@ describe( 'AnglePickerControl', () => {
 		expect( reportedValues( onChange ) ).toEqual( [ -60, -60 ] );
 	} );
 
+	it( 'points a click from an out-of-range value at the nearest end', () => {
+		const onChange = vi.fn();
+		const { container } = render(
+			<StatefulPrivateAnglePickerControl
+				value={ 200 }
+				min={ 0 }
+				max={ 90 }
+				onChange={ onChange }
+			/>
+		);
+
+		turnDial( container, [ 10 ] );
+
+		expect( reportedValues( onChange ) ).toEqual( [ 10, 10 ] );
+	} );
+
 	it( 'stops at min and max on a narrow range without jumping', () => {
 		const onChange = vi.fn();
 		const { container } = render(
