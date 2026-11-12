@@ -26,5 +26,10 @@ export const ParentView = ( { item }: { item: PostWithParent } ) => {
 		return <>{ getTitleWithFallbackName( parent ) }</>;
 	}
 
+	// Several posts edited at once show nothing until a parent is picked.
+	if ( item?.parent === undefined ) {
+		return null;
+	}
+
 	return <>{ __( 'None' ) }</>;
 };

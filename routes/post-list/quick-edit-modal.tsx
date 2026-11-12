@@ -54,7 +54,14 @@ function withEditorAssets( FieldEdit: any ) {
 	};
 }
 
-const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
+const fieldsWithBulkEditSupport = [
+	'status',
+	'date',
+	'author',
+	'discussion',
+	'template',
+	'parent',
+];
 
 interface QuickEditModalProps {
 	postType: string;
@@ -77,42 +84,43 @@ export function QuickEditModal( {
 	const [ localEdits, setLocalEdits ] = useState< Record< string, any > >(
 		{}
 	);
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
-		( select ) => {
-			const store = select( coreDataStore );
-			const { getEditedEntityRecord } = store;
-
-			if ( isBulk ) {
-				return {
-					record: null,
-					hasFinishedResolution: true,
+	const { record, hasFinishedResolution, frontPageId, postsPageId } =
+		useSelect(
+			( select ) => {
+				const store = select( coreDataStore );
+				const { getEditedEntityRecord, getHomePage, getPostsPageId } =
+					unlock( store );
+				// The front page and the posts page take their template from
+				// the reading settings.
+				const pageIds = {
+					frontPageId:
+						postType === 'page' ? getHomePage()?.postId : undefined,
+					postsPageId: getPostsPageId(),
 				};
-			}
 
-			const args = [ 'postType', postType, postId[ 0 ] ] as const;
+				if ( isBulk ) {
+					return {
+						...pageIds,
+						record: null,
+						hasFinishedResolution: true,
+					};
+				}
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
+				const args = [ 'postType', postType, postId[ 0 ] ] as const;
 
-			return {
-				record: getEditedEntityRecord( ...args ),
-				hasFinishedResolution: ( store as any ).hasFinishedResolution(
-					'getEditedEntityRecord',
-					args
-				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
-			};
-		},
-		[ postType, postId, isBulk ]
-	);
+				return {
+					...pageIds,
+					record: getEditedEntityRecord( ...args ),
+					hasFinishedResolution: (
+						store as any
+					 ).hasFinishedResolution( 'getEditedEntityRecord', args ),
+				};
+			},
+			[ postType, postId, isBulk ]
+		);
+	const canSwitchTemplateOf = ( id: string ) =>
+		String( id ) !== postsPageId && String( id ) !== frontPageId;
+	const canSwitchTemplate = postId.some( canSwitchTemplateOf );
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
@@ -195,7 +203,16 @@ export function QuickEditModal( {
 
 	const onSave = async () => {
 		for ( const id of postId ) {
-			editEntityRecord( 'postType', postType, id, localEdits );
+			const edits = { ...localEdits };
+			if ( ! canSwitchTemplateOf( id ) ) {
+				delete edits.template;
+			}
+			// Picking one of the selected pages as the parent makes it the
+			// parent of the others.
+			if ( String( edits.parent ) === String( id ) ) {
+				delete edits.parent;
+			}
+			editEntityRecord( 'postType', postType, id, edits );
 		}
 
 		if ( isBulk ) {
@@ -229,7 +246,9 @@ export function QuickEditModal( {
 			<div className="dataviews-action-modal__quick-edit-content">
 				{ hasFinishedResolution && (
 					<DataForm
-						data={ { ...record, ...localEdits } }
+						// Several posts have no record: the fields still need
+						// the post type.
+						data={ { type: postType, ...record, ...localEdits } }
 						fields={ fields }
 						form={ form }
 						onChange={ onChange }
