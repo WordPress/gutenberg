@@ -29,4 +29,34 @@ test.describe( 'Validate multiple use', () => {
 			} )
 		).toBeVisible();
 	} );
+
+	test( 'should omit the Remove button when the duplicate block cannot be removed', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/more',
+		} );
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/more',
+					attributes: {
+						lock: { remove: true, move: true },
+					},
+				},
+			],
+		} );
+
+		await expect(
+			editor.canvas.getByRole( 'button', {
+				name: 'Find original',
+			} )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'button', {
+				name: 'Remove',
+			} )
+		).toBeHidden();
+	} );
 } );

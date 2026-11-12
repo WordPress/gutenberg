@@ -109,8 +109,7 @@ export default function BlockEdit( {
 				<MultipleUsageWarning
 					originalBlockClientId={ originalBlockClientId }
 					name={ name }
-					// As before, assumes the block can be removed.
-					onReplace={ props.onReplace! }
+					onReplace={ props.onReplace }
 				/>
 			) }
 		</BlockEditContextProvider>
