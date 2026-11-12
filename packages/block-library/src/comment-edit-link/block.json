@@ -12,6 +12,10 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
+		},
+		"showModerationLinks": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

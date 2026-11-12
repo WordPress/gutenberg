@@ -37,14 +37,45 @@ function render_block_core_comment_edit_link( $attributes, $content, $block ) {
 		$classes[] = 'has-link-color';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
-
-	return sprintf(
-		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
-		$wrapper_attributes,
+	$links = sprintf(
+		'<a href="%1$s" %2$s>%3$s</a>',
 		esc_url( $edit_comment_link ),
 		$link_atts,
 		esc_html__( 'Edit' )
+	);
+
+	if ( ! empty( $attributes['showModerationLinks'] ) ) {
+		$comment_id  = $block->context['commentId'];
+		$is_approved = '1' === get_comment( $comment_id )->comment_approved;
+
+		// Each action maps to the nonce action and label expected by wp-admin/comment.php.
+		$moderation_links = array(
+			$is_approved ? 'unapprovecomment' : 'approvecomment' => array( 'approve-comment_', $is_approved ? __( 'Unapprove' ) : __( 'Approve' ) ),
+			'spamcomment' => array( 'delete-comment_', _x( 'Spam', 'verb' ) ),
+		);
+
+		// Without a trash, trashing deletes permanently, which is too risky for a one-click link.
+		if ( EMPTY_TRASH_DAYS ) {
+			$moderation_links['trashcomment'] = array( 'delete-comment_', _x( 'Trash', 'verb' ) );
+		}
+
+		// Moderation actions redirect back to the current page, so they always open in the same tab.
+		foreach ( $moderation_links as $action => list( $nonce_action, $label ) ) {
+			$url    = wp_nonce_url( admin_url( "comment.php?action=$action&c=$comment_id" ), $nonce_action . $comment_id );
+			$links .= sprintf(
+				' <a href="%1$s">%2$s</a>',
+				esc_url( $url ),
+				esc_html( $label )
+			);
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
+
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		$links
 	);
 }
 
