@@ -1,12 +1,11 @@
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
-import { moreVertical, plus } from '@wordpress/icons';
+import { check, moreVertical, plus } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import DropdownMenu from '../../dropdown-menu';
 import MenuGroup from '../../menu-group';
 import MenuItem from '../../menu-item';
-import selectionStyles from '../../menu-item/selection-style.module.scss';
 import { HStack } from '../../h-stack';
 import { Heading } from '../../heading';
 import { useToolsPanelHeader } from './hook';
@@ -68,8 +67,12 @@ const DefaultControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						showSelectionIndicator
-						className={ itemClassName }
+						icon={ check }
+						iconPosition="left"
+						className={ clsx(
+							itemClassName,
+							'components-menu-item__selection-row'
+						) }
 						role="menuitemcheckbox"
 						isSelected
 						aria-disabled
@@ -108,7 +111,9 @@ const OptionalControlsGroup = ( {
 				return (
 					<MenuItem
 						key={ label }
-						showSelectionIndicator
+						className="components-menu-item__selection-row"
+						iconPosition="left"
+						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
 						label={ itemLabel }
 						onClick={ () => {
@@ -195,7 +200,7 @@ const ToolsPanelHeader = (
 					menuProps={ {
 						className: clsx(
 							dropdownMenuClassName,
-							selectionStyles.menu
+							'components-menu-item__selection-menu'
 						),
 					} }
 					toggleProps={ {

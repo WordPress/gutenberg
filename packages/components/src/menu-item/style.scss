@@ -2,6 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 @use "../utils/composite-item";
+@use "./selection";
 
 .components-menu-item__button,
 .components-menu-item__button.components-button {

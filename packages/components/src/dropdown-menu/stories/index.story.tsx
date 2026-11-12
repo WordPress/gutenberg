@@ -3,6 +3,7 @@ import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import {
 	menu,
+	check,
 	arrowUp,
 	arrowDown,
 	chevronDown,
@@ -155,8 +156,7 @@ export const SingleSelection: StoryObj< typeof DropdownMenu > = {
 
 /**
  * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
- * Set `showSelectionIndicator` to render the check from `isSelected` and keep
- * labels aligned when unchecked.
+ * This example shows how Gutenberg lays out its typography options.
  */
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
@@ -190,7 +190,9 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 										key={ option }
 										role="menuitemcheckbox"
 										isSelected={ isSelected }
-										showSelectionIndicator
+										className="components-menu-item__selection-row"
+										iconPosition="left"
+										icon={ isSelected ? check : null }
 										onClick={ () => toggleOption( option ) }
 									>
 										{ option }
@@ -242,7 +244,9 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 							<MenuItem
 								role="menuitemcheckbox"
 								isSelected={ showDetails }
-								showSelectionIndicator
+								className="components-menu-item__selection-row"
+								iconPosition="left"
+								icon={ showDetails ? check : null }
 								info="Display additional information."
 								onClick={ () =>
 									setShowDetails( ! showDetails )

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `PreferenceToggleMenuItem`: Use the built-in leading selection indicator ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
+-   `PreferenceToggleMenuItem`: Show the check before the label and reserve its space when unchecked ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
 
 ### Bug Fixes
 

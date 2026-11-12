@@ -34,14 +34,6 @@ export type MenuItemProps = Pick<
 	 */
 	isSelected?: boolean;
 	/**
-	 * Render a leading check mark for a `menuitemcheckbox` or `menuitemradio`.
-	 * The mark follows `isSelected` and reserves space when unchecked.
-	 * Supplied icons keep their position and render alongside the mark.
-	 *
-	 * @default false
-	 */
-	showSelectionIndicator?: boolean;
-	/**
 	 * If shortcut is a string, it is expecting the display text. If shortcut is an object,
 	 * it will accept the properties of `display` (string) and `ariaLabel` (string).
 	 */
