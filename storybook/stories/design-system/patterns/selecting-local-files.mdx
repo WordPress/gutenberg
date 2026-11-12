@@ -14,7 +14,7 @@ Use `FormFileUpload` from `@wordpress/components` to open the native file picker
 
 ## From a button
 
-Read the selected `File` from `event.currentTarget.files`. Keep the result visible beside the button. Once you have the file, clear the input so choosing the same file again triggers another change. Leave the previous result in place when the picker closes without a selection. If a form submits the native file input, keep its value until the form is submitted.
+Read the selected `File` from `event.currentTarget.files`. Keep the result visible beside the button. Once you have the file, clear the input so choosing the same file again triggers another change. Leave the previous result in place when the picker closes without a selection. If a form has a separate submit button, keep the selected `File` in state and pass it to the submit handler.
 
 <Canvas
 	of={ FilePickerButtonStories.ChooseFile }
