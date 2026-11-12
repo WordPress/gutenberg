@@ -166,6 +166,13 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringContainsString( '>Safe</p>', $output );
 	}
 
+	public function test_block_attributes_with_escaped_html_in_the_value_are_sanitized() {
+		$this->value = '<!-- wp:paragraph {"className":"<img src=x onerror=alert(1)>"} --><p>Safe</p><!-- /wp:paragraph -->';
+		$attributes  = $this->render_group_and_get_supplied_attributes();
+		$this->assertCount( 1, $attributes );
+		$this->assertStringNotContainsString( 'onerror', $attributes[0]['className'] ?? '' );
+	}
+
 	public function test_value_of_a_trusted_source_is_not_sanitized() {
 		$this->value = '<!-- wp:html --><svg><circle r="1"></circle></svg><!-- /wp:html -->';
 		$trusted     = array();
