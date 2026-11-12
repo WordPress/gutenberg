@@ -16,7 +16,7 @@ import { getImageEdit } from './get-image-edit';
  */
 export function getOutputSize( state: ImageEditorState ): Size | null {
 	const { image } = state;
-	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
+	if ( ! image || ! ( image.naturalWidth > 0 && image.naturalHeight > 0 ) ) {
 		return null;
 	}
 

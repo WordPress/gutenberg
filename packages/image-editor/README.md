@@ -144,6 +144,37 @@ Use it when saving. The editor stores where the image sits, how far it is zoomed
 
 The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. With exactly one axis flipped, `rotation` is 360 minus `state.rotation`, because the flip comes first. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
+### `applyImageEdit( state, edit )`
+
+The reverse of `getImageEdit`: it turns an `ImageEdit` into an editor state, so code can set the edit. It returns `{ state }`, which you store like any other change.
+
+```ts
+const result = applyImageEdit( state, {
+	rotation: 90,
+	crop: { x: 0, y: 0, width: 0.5, height: 1 },
+} );
+if ( 'state' in result ) {
+	setState( result.state );
+}
+```
+
+The edit replaces the current one. It is not merged with it. Every part is optional, and a part you leave out is reset:
+
+-   No `flip`: the image is not flipped.
+-   No `rotation`: the image is not rotated.
+-   No `crop`: the whole image is kept.
+
+So `{ rotation: 90 }` on a cropped image gives a rotated image with no crop. To keep a part, pass it again. The crop is measured on the image after the flip and rotation, so the same crop numbers frame a different part of the image once either changes.
+
+From `state`, only the image and the locked ratio are kept. The pan and zoom are worked out again: the crop is centred and zoomed in, as after a resize.
+
+If the editor cannot hold the edit exactly, it does not adjust it. It returns `{ rejected }` with one of these reasons:
+
+-   `'no-image'`: no image with a usable size has loaded.
+-   `'invalid'`: a number is not finite, or the crop is under one pixel wide or high.
+-   `'locked-ratio'`: the crop is not the shape of the locked ratio. Without the lock, the edit would apply.
+-   `'outside-image'`: the crop reaches outside the image. `{ rotation: 10 }` on its own is rejected this way, because a tilted image's bounding box has empty corners, and with no crop the whole box is kept.
+
 ### `exportImage( state, options? )`
 
 Use it when the edited image is uploaded as a new file, rather than applied to the original by a server. It loads the image in `state.image`, draws the region the crop frames with the flip, rotation and zoom applied, and resolves with a `Blob` whose dimensions are the ones `getOutputSize( state )` reports. `options.type` is the MIME type, `image/png` by default, and `options.quality` is the quality for lossy types, from 0 to 1.
