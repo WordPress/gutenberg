@@ -703,19 +703,22 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
  *
  * @return Whether the patterns are being resolved.
  */
-export const isResolvingPatterns = createRegistrySelector( ( select ) =>
-	createSelector( ( state: State ): boolean => {
-		const blockPatternsSelect = state.settings[ selectBlockPatternsKey ];
-		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
-		return (
-			( blockPatternsSelect
-				? blockPatternsSelect( select ) === undefined
-				: false ) ||
-			( reusableBlocksSelect
-				? reusableBlocksSelect( select ) === undefined
-				: false )
-		);
-	}, getAllPatternsDependants( select ) )
+export const isResolvingPatterns = createRegistrySelector(
+	( select ) =>
+		( state: State ): boolean => {
+			const blockPatternsSelect =
+				state.settings[ selectBlockPatternsKey ];
+			const reusableBlocksSelect =
+				state.settings[ reusableBlocksSelectKey ];
+			return (
+				( blockPatternsSelect
+					? blockPatternsSelect( select ) === undefined
+					: false ) ||
+				( reusableBlocksSelect
+					? reusableBlocksSelect( select ) === undefined
+					: false )
+			);
+		}
 );
 
 const EMPTY_ARRAY: never[] = [];
