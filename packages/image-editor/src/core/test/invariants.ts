@@ -376,14 +376,25 @@ describe( 'invariants across a run of edits', () => {
 				}
 
 				// Applied to a clean state, so the old view cannot carry
-				// the edit.
+				// the edit. A crop under a pixel cannot be exported, so it
+				// is rejected.
 				if ( edit ) {
 					const clean = imageEditorReducer( state, {
 						type: 'RESET',
 						payload: { aspectRatio: state.aspectRatio },
 					} );
 					const applied = applyImageEdit( clean, edit );
-					if ( 'rejected' in applied ) {
+					const size = getOutputSize( state );
+					if ( size && ( size.width < 1 || size.height < 1 ) ) {
+						if (
+							! ( 'rejected' in applied ) ||
+							applied.rejected !== 'invalid'
+						) {
+							problems.push(
+								`${ where }: a crop under a pixel is not rejected as invalid`
+							);
+						}
+					} else if ( 'rejected' in applied ) {
 						problems.push(
 							`${ where }: its own edit is rejected as ${ applied.rejected }`
 						);
