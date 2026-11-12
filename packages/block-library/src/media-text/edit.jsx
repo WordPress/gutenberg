@@ -56,8 +56,9 @@ function getImageSourceUrlBySizeSlug( image, slug ) {
 }
 
 function attributesFromMedia( {
-	attributes: { linkDestination, href },
+	attributes: { linkDestination, href, mediaSizeSlug },
 	setAttributes,
+	getSettings,
 } ) {
 	return ( media ) => {
 		if ( ! media || ! media.url ) {
@@ -94,11 +95,18 @@ function attributesFromMedia( {
 			mediaType = media.type;
 		}
 
+		let newMediaSizeSlug = mediaSizeSlug;
 		if ( mediaType === 'image' ) {
-			// Try the "large" size URL, falling back to the "full" size URL below.
-			src =
-				media.sizes?.large?.url ||
-				media.media_details?.sizes?.large?.source_url;
+			const getSizeUrl = ( slug ) =>
+				media.sizes?.[ slug ]?.url ||
+				media.media_details?.sizes?.[ slug ]?.source_url;
+			// Try the previously selected size, then the default image size,
+			// falling back to "full".
+			newMediaSizeSlug =
+				[ mediaSizeSlug, getSettings().imageDefaultSize ].find(
+					( slug ) => slug && getSizeUrl( slug )
+				) ?? DEFAULT_MEDIA_SIZE_SLUG;
+			src = getSizeUrl( newMediaSizeSlug );
 		}
 
 		let newLinkDestination = linkDestination;
@@ -133,6 +141,7 @@ function attributesFromMedia( {
 			mediaId: media.id,
 			mediaType,
 			mediaUrl: src || media.url,
+			mediaSizeSlug: newMediaSizeSlug,
 			mediaLink: media.link || undefined,
 			href: newHref,
 			linkDestination: newLinkDestination,
@@ -273,7 +282,12 @@ function MediaTextEdit( {
 
 	const [ temporaryMediaWidth, setTemporaryMediaWidth ] = useState( null );
 
-	const onSelectMedia = attributesFromMedia( { attributes, setAttributes } );
+	const { getSettings } = useSelect( blockEditorStore );
+	const onSelectMedia = attributesFromMedia( {
+		attributes,
+		setAttributes,
+		getSettings,
+	} );
 
 	const onSetHref = ( props ) => {
 		setAttributes( props );
