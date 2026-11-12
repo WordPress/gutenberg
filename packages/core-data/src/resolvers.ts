@@ -28,6 +28,87 @@ import type { Action, CoreDataThunkArgs } from './private-types';
 import type { EntityConfig, RestRecord, TransientEditConfig } from './types';
 
 /**
+ * Sequence number handed to each record request, and the highest sequence
+ * number whose response has already been written to the store, per registry
+ * and per resolution.
+ */
+let responseSequence = 0;
+const lastReceivedResponse = new WeakMap<
+	CoreDataThunkArgs[ 'registry' ],
+	Map< string, number >
+>();
+
+/**
+ * Reserves a slot in the response order for a record request that is about to
+ * be made, and returns a predicate telling whether that request's response is
+ * still the freshest one for the same resolution.
+ *
+ * `invalidateResolution` starts a second request for a record while the first
+ * one may still be in flight, and the store keeps whichever response is
+ * *delivered* last - even when its body was read from the database before the
+ * newer one.
+ *
+ * Only responses to an equivalent request are compared, so a request for a
+ * different set of `_fields` never discards another one's data.
+ *
+ * @param registry A `@wordpress/data` registry.
+ * @param orderKey Identifies the resolution the request belongs to.
+ *
+ * @return Predicate returning `false` when a newer response for the same
+ *         resolution has already been received.
+ */
+function claimResponseOrder(
+	registry: CoreDataThunkArgs[ 'registry' ],
+	orderKey: string
+): () => boolean {
+	const sequence = ++responseSequence;
+
+	return () => {
+		let received = lastReceivedResponse.get( registry );
+		if ( ! received ) {
+			received = new Map();
+			lastReceivedResponse.set( registry, received );
+		}
+
+		if ( ( received.get( orderKey ) ?? 0 ) > sequence ) {
+			return false;
+		}
+
+		received.set( orderKey, sequence );
+		return true;
+	};
+}
+
+/**
+ * Returns a key identifying a record request, regardless of the order of its
+ * query arguments and requested fields.
+ *
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key.
+ * @param query Request query.
+ *
+ * @return Response order key.
+ */
+function getResponseOrderKey(
+	kind: string,
+	name: string,
+	key: string | number,
+	query?: Query
+): string {
+	const fields = getNormalizedCommaSeparable( query?._fields ) ?? [];
+	const canonicalQuery =
+		query &&
+		Object.keys( query )
+			.sort()
+			.map( ( arg ) => [
+				arg,
+				arg === '_fields' ? [ ...fields ].sort().join() : query[ arg ],
+			] );
+	return JSON.stringify( [ kind, name, key, canonicalQuery ?? null ] );
+}
+
+/**
  * Requests authors from the REST API.
  *
  * @param query Optional object of query parameters to
@@ -127,8 +208,43 @@ export const getEntityRecord =
 				...entityConfig.baseURLParams,
 				...query,
 			} );
-			const response = await apiFetch( { path, parse: false } );
-			const record: RestRecord = await response.json();
+			const orderKey = getResponseOrderKey( kind, name, key, query );
+			// A keyless entity, such as the site settings, is stored under
+			// `undefined`.
+			const storedKey = key === '' ? undefined : key;
+			const getReceipts = () =>
+				select.getDirectReceiptCount(
+					kind,
+					name,
+					storedKey,
+					( query?.context as string | undefined ) ?? 'default'
+				);
+
+			let response;
+			let record: RestRecord;
+			let isOutdated;
+			do {
+				const isFreshestResponse = claimResponseOrder(
+					registry,
+					orderKey
+				);
+				const receiptsBefore = getReceipts();
+				response = await apiFetch( { path, parse: false } );
+				record = await response.json();
+
+				// A newer response to this request was already received.
+				if ( ! isFreshestResponse() ) {
+					return;
+				}
+
+				// The record was received directly since this request was
+				// made, so this response may be out of date and the record
+				// is requested again. A `_fields` response only updates
+				// some fields, so a direct receipt does not affect it.
+				isOutdated =
+					! query?._fields && getReceipts() !== receiptsBefore;
+			} while ( isOutdated );
+
 			const permissions = getUserPermissionsFromAllowHeader(
 				response.headers?.get( 'allow' )
 			);
@@ -257,7 +373,12 @@ export const getEntityRecord =
 			}
 
 			registry.batch( () => {
-				dispatch.receiveEntityRecords( kind, name, record, query );
+				dispatch.receiveFetchedEntityRecords(
+					kind,
+					name,
+					record,
+					query
+				);
 				dispatch.receiveUserPermissions( receiveUserPermissionArgs );
 				dispatch.finishResolutions( 'canUser', canUserResolutionsArgs );
 			} );
@@ -409,7 +530,7 @@ export const getEntityRecords =
 
 					records.push( ...pageRecords );
 					registry.batch( () => {
-						dispatch.receiveEntityRecords(
+						dispatch.receiveFetchedEntityRecords(
 							kind,
 							name,
 							records,
@@ -478,7 +599,7 @@ export const getEntityRecords =
 			}
 
 			registry.batch( () => {
-				dispatch.receiveEntityRecords(
+				dispatch.receiveFetchedEntityRecords(
 					kind,
 					name,
 					records,
