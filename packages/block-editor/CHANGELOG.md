@@ -15,6 +15,7 @@
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
 -   `resetBlocks`: Fix a crash when a controlled block with no inner blocks is reset with inner blocks ([#86387](https://github.com/WordPress/gutenberg/pull/86387)).
+-   `resetBlocks`: Keep controlled inner blocks out of their parent blocks' `getBlocks()` result ([#86740](https://github.com/WordPress/gutenberg/pull/86740)).
 -   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
