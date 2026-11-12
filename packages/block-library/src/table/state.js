@@ -148,6 +148,18 @@ export function isCellSelected( cellLocation, selection ) {
 }
 
 /**
+ * Parses a `colspan` or `rowspan` value, falling back to 1 when it's missing
+ * or invalid.
+ *
+ * @param {string|number|undefined} value The span value.
+ *
+ * @return {number} The span as a positive integer.
+ */
+function getSpan( value ) {
+	return Math.max( parseInt( value, 10 ) || 1, 1 );
+}
+
+/**
  * Calculates the effective column count in a row, accounting for colspan values.
  *
  * @param {Object} row The row object containing cells.
@@ -159,10 +171,10 @@ function getRowColumnCount( row ) {
 		return 0;
 	}
 
-	return row.cells.reduce( ( columnCount, cell ) => {
-		const colspan = cell.colspan ? parseInt( cell.colspan, 10 ) : 1;
-		return columnCount + colspan;
-	}, 0 );
+	return row.cells.reduce(
+		( columnCount, cell ) => columnCount + getSpan( cell.colspan ),
+		0
+	);
 }
 
 /**
@@ -181,8 +193,7 @@ function getCellAtColumnIndex( row, columnIndex ) {
 	let currentColumn = 0;
 
 	for ( const cell of row.cells ) {
-		const colspan = cell.colspan ? parseInt( cell.colspan, 10 ) : 1;
-		const columnEnd = currentColumn + colspan;
+		const columnEnd = currentColumn + getSpan( cell.colspan );
 
 		if ( columnIndex < columnEnd ) {
 			return cell;
