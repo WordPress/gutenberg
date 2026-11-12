@@ -23,6 +23,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Notes: Truncate a collapsed long note to the text that fits, rather than clipping it with CSS. What "Show more" hides is now out of the tab order and out of the accessibility tree, the cut is marked with an ellipsis, the toggle carries `aria-expanded` and `aria-controls`, and expanding moves the reading position to the start of the note instead of leaving it below the text ([#81459](https://github.com/WordPress/gutenberg/pull/81459)).
 
 ### Internal
 
