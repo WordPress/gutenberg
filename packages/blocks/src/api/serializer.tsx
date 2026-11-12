@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { ReactElement, ReactNode } from 'react';
 import {
 	Component,
 	cloneElement,
@@ -16,10 +9,6 @@ import { hasFilter, applyFilters } from '@wordpress/hooks';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { removep } from '@wordpress/autop';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockType,
 	getFreeformContentHandlerName,
@@ -92,7 +81,7 @@ export function getBlockProps(
 				{ ...props },
 				blockType,
 				attributes
-		  ) as Record< string, unknown > );
+			) as Record< string, unknown > );
 }
 
 /**
@@ -123,14 +112,14 @@ export function getInnerBlocksProps(
  *
  * @param blockTypeOrName Block type or name.
  * @param attributes      Block attributes.
- * @param innerBlocks     Nested blocks.
+ * @param innerBlocks     Nested blocks, or an element to render in their place.
  *
  * @return Save element or raw HTML string.
  */
 export function getSaveElement(
 	blockTypeOrName: string | BlockType,
 	attributes: Record< string, unknown >,
-	innerBlocks: Block[] = []
+	innerBlocks: Block[] | ReactElement = []
 ): unknown {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
@@ -177,7 +166,7 @@ export function getSaveElement(
 		 */
 		const props = applyFilters(
 			'blocks.getSaveContent.extraProps',
-			{ ...element.props },
+			{ ...( element.props as {} ) },
 			blockType,
 			attributes
 		);

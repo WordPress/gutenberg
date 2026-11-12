@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useRef,
@@ -14,10 +7,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useFocusableIframe, useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { SandBoxProps } from './types';
 
 type SandBoxContentProps = Omit< SandBoxProps, 'allowSameOrigin' >;
@@ -448,6 +437,17 @@ function SameOriginSandBox( {
 		// was loaded over the network, so DOM creation and mutation, script
 		// execution, etc. all work as expected.
 		contentDocument.open();
+		// Nested iframes should send this page's URL as their `Referer`, which
+		// YouTube requires. Safari sends none after `open()` until the URL is
+		// set again with `replaceState()`. Firefox throws here but already
+		// sends the referrer. See https://bugs.webkit.org/show_bug.cgi?id=169846.
+		try {
+			contentDocument.defaultView?.history.replaceState(
+				null,
+				'',
+				window.location.href
+			);
+		} catch {}
 		contentDocument.write(
 			buildSandBoxDocument( {
 				html,

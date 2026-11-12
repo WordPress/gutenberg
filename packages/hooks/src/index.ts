@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import createHooks from './createHooks';
 
 export type * from './types';

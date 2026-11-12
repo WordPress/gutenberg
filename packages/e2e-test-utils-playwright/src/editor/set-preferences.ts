@@ -1,12 +1,7 @@
-/**
- * Internal dependencies
- */
 import type { Editor } from './index';
 
 type PreferencesContext =
-	| 'core/edit-post'
-	| 'core/edit-site'
-	| 'core/customize-widgets';
+	'core/edit-post' | 'core/edit-site' | 'core/customize-widgets';
 
 /**
  * Set the preferences of the editor.

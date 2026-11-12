@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Navigator,
@@ -10,7 +7,7 @@ import {
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	FlexItem,
-	Card,
+	Card as WCCard,
 	CardHeader,
 	CardBody,
 	privateApis as componentsPrivateApis,
@@ -18,13 +15,9 @@ import {
 import { useMemo, useState } from '@wordpress/element';
 import { chevronLeft, chevronRight, Icon } from '@wordpress/icons';
 import { isRTL, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 const PREFERENCES_MENU = 'preferences-menu';
 
@@ -70,42 +63,42 @@ export default function PreferencesModalTabs( {
 	if ( isLargeViewport ) {
 		modalContent = (
 			<div className="preferences__tabs">
-				<Tabs
+				<WCTabs
 					defaultTabId={
 						activeMenu !== PREFERENCES_MENU ? activeMenu : undefined
 					}
 					onSelect={ setActiveMenu }
 					orientation="vertical"
 				>
-					<Tabs.TabList className="preferences__tabs-tablist">
+					<WCTabs.TabList className="preferences__tabs-tablist">
 						{ tabs.map( ( tab ) => (
-							<Tabs.Tab
+							<WCTabs.Tab
 								tabId={ tab.name }
 								key={ tab.name }
 								className="preferences__tabs-tab"
 							>
 								{ tab.title }
-							</Tabs.Tab>
+							</WCTabs.Tab>
 						) ) }
-					</Tabs.TabList>
+					</WCTabs.TabList>
 					{ tabs.map( ( tab ) => (
-						<Tabs.TabPanel
+						<WCTabs.TabPanel
 							tabId={ tab.name }
 							key={ tab.name }
 							className="preferences__tabs-tabpanel"
 							focusable={ false }
 						>
 							{ sectionsContentMap[ tab.name ] || null }
-						</Tabs.TabPanel>
+						</WCTabs.TabPanel>
 					) ) }
-				</Tabs>
+				</WCTabs>
 			</div>
 		);
 	} else {
 		modalContent = (
 			<Navigator initialPath="/" className="preferences__provider">
 				<Navigator.Screen path="/">
-					<Card isBorderless size="small">
+					<WCCard isBorderless size="small">
 						<CardBody>
 							<ItemGroup>
 								{ tabs.map( ( tab ) => {
@@ -136,7 +129,7 @@ export default function PreferencesModalTabs( {
 								} ) }
 							</ItemGroup>
 						</CardBody>
-					</Card>
+					</WCCard>
 				</Navigator.Screen>
 				{ sections.length &&
 					sections.map( ( section ) => {
@@ -145,7 +138,7 @@ export default function PreferencesModalTabs( {
 								key={ `${ section.name }-menu` }
 								path={ `/${ section.name }` }
 							>
-								<Card isBorderless size="large">
+								<WCCard isBorderless size="large">
 									<CardHeader
 										isBorderless={ false }
 										justify="left"
@@ -166,7 +159,7 @@ export default function PreferencesModalTabs( {
 										</WCText>
 									</CardHeader>
 									<CardBody>{ section.content }</CardBody>
-								</Card>
+								</WCCard>
 							</Navigator.Screen>
 						);
 					} ) }

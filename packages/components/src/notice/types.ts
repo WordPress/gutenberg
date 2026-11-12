@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { MouseEventHandler, ReactNode } from 'react';
 
 export type NoticeAction = {

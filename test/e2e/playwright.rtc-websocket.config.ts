@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { defineConfig, type PlaywrightTestConfig } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import baseConfig from './playwright.config';
 
 const wsPort = process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991';
@@ -44,7 +37,8 @@ const config = defineConfig( {
 	// (connection limits, wp-sync polling responses, document-size
 	// errors that surface via the polling pipeline) live under
 	// `http-only/` and are excluded here.
-	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
+	testMatch:
+		'**/specs/editor/collaboration/**/collaboration-*.spec.@(ts|mts|cts)',
 	testIgnore: [ ...testIgnore, '**/specs/editor/collaboration/http-only/**' ],
 	webServer: [
 		...baseWebServer,

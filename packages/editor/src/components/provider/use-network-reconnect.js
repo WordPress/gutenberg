@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { store as uploadStore } from '@wordpress/upload-media';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 /**

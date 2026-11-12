@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import Cropper from 'react-easy-crop';
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useImageCropper } from '../../provider';
 import type { Area, ImageCropperProps, MediaSize, Point } from '../../types';
 import { MIN_ZOOM, MAX_ZOOM } from '../../constants';

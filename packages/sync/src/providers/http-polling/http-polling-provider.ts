@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import { ObservableV2 } from 'lib0/observable';
 import { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type {
 	ConnectionStatus,
 	ProviderCreator,

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import { parseCSSUnitValue } from '../utils/unit-values';
 import type { Border } from '../border-control/types';
 import type { AnyBorder, Borders, BorderProp, BorderSide } from './types';
@@ -71,16 +64,118 @@ export const hasMixedBorders = ( borders: AnyBorder ) => {
 	);
 };
 
+/**
+ * Splits a CSS box shorthand string into parts, preserving values
+ * with parentheses like `calc()` and `var()`.
+ *
+ * @param value The shorthand string to split.
+ *
+ * @return Array of split values.
+ */
+export function splitBoxShorthand( value: string ): string[] {
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+
+	for ( const char of value.trim() ) {
+		if ( char === '(' ) {
+			depth++;
+			current += char;
+		} else if ( char === ')' ) {
+			depth = Math.max( 0, depth - 1 );
+			current += char;
+		} else if ( /\s/.test( char ) && depth === 0 ) {
+			if ( current ) {
+				parts.push( current );
+				current = '';
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if ( current ) {
+		parts.push( current );
+	}
+
+	return parts;
+}
+
+/**
+ * Unpacks a 1-to-4 value CSS box shorthand string into individual sides
+ * (top, right, bottom, left) following the CSS Box Model specification.
+ *
+ * @param value The box shorthand value (e.g. `0 0 0 2px`).
+ *
+ * @return An object containing individual side values.
+ */
+export function unpackBoxShorthand< T extends string | number | undefined >(
+	value: T
+): { top: T; right: T; bottom: T; left: T } {
+	if ( typeof value !== 'string' ) {
+		return {
+			top: value,
+			right: value,
+			bottom: value,
+			left: value,
+		};
+	}
+
+	const parts = splitBoxShorthand( value );
+
+	switch ( parts.length ) {
+		case 2: // [top/bottom, right/left]
+			return {
+				top: parts[ 0 ] as T,
+				right: parts[ 1 ] as T,
+				bottom: parts[ 0 ] as T,
+				left: parts[ 1 ] as T,
+			};
+		case 3: // [top, right/left, bottom]
+			return {
+				top: parts[ 0 ] as T,
+				right: parts[ 1 ] as T,
+				bottom: parts[ 2 ] as T,
+				left: parts[ 1 ] as T,
+			};
+		case 4: // [top, right, bottom, left]
+			return {
+				top: parts[ 0 ] as T,
+				right: parts[ 1 ] as T,
+				bottom: parts[ 2 ] as T,
+				left: parts[ 3 ] as T,
+			};
+		default:
+			return {
+				top: value,
+				right: value,
+				bottom: value,
+				left: value,
+			};
+	}
+}
+
 export const getSplitBorders = ( border?: Border ) => {
 	if ( ! border || isEmptyBorder( border ) ) {
 		return undefined;
 	}
 
+	if ( border.width === undefined ) {
+		return {
+			top: border,
+			right: border,
+			bottom: border,
+			left: border,
+		};
+	}
+
+	const unpackedWidths = unpackBoxShorthand( border.width );
+
 	return {
-		top: border,
-		right: border,
-		bottom: border,
-		left: border,
+		top: { ...border, width: unpackedWidths.top },
+		right: { ...border, width: unpackedWidths.right },
+		bottom: { ...border, width: unpackedWidths.bottom },
+		left: { ...border, width: unpackedWidths.left },
 	};
 };
 

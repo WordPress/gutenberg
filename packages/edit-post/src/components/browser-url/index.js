@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { addQueryArgs, getQueryArg } from '@wordpress/url';
 import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import useClassicRevisionRedirect from './use-classic-revision-redirect';
 

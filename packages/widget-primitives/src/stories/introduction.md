@@ -14,8 +14,8 @@ A _host_ is any context that renders widgets: a dashboard, a sidebar, a plugin p
 
 The shapes a host reads to discover and render a widget:
 
-- `WidgetType`, `WidgetName`, `WidgetIcon`
-- `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
+-   `WidgetType`, `WidgetName`, `WidgetIcon`
+-   `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`
 
 Defined here and re-exported nowhere else.
 
@@ -23,16 +23,16 @@ Defined here and re-exported nowhere else.
 
 `WidgetAttributeField< Item >` is for widget authors, not hosts. It narrows a DataViews `Field.id` to the keys of the widget's attribute object, so a typo'd field `id` is caught while authoring.
 
-It also accepts an optional `relevance` hint (`'high' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
+It also accepts an optional `relevance` hint (`'high' | 'medium' | 'low'`). The widget declares importance, not a surface. See **Anatomy** for how hosts may use it.
 
 How a widget is authored (its folder, `widget.json`, `widget.ts`, `render.tsx`) is covered in **System Architecture**.
 
 ### Discovery
 
-`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module, and returns:
+`useWidgetTypes( records )` takes host-supplied widget-module records, imports each record's metadata module when it declares one (a record without one resolves from its own fields), and returns:
 
-- `WidgetType[]`
-- `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
+-   `WidgetType[]`
+-   `isResolvingWidgetTypes`, which stays `true` before records are supplied (`null` or `undefined`) and while their metadata modules are still importing
 
 The hook reaches for no store or endpoint. The host fetches the records however it wants and passes them in.
 
@@ -42,9 +42,21 @@ The hook reaches for no store or endpoint. The host fetches the records however 
 
 See **Field Types** for the full pipeline.
 
+### Host capabilities
+
+`HostLink` is the anchor consumers mount for a link target, and the only piece of the seam most of them touch. It reads the host's `links` capability and mounts the application's own link or a plain anchor, so no consumer branches on it.
+
+`WidgetHostProvider` / `useWidgetHost`: the seam itself, through which the embedding application provides what only it knows. Every capability is optional, and an absent one degrades to the host-agnostic behavior. `links` is the first: recognition of the application's own routes plus its router's link primitive. Applications mount the provider; the hook reads the bag directly, for a capability no component covers yet.
+
+See **Widget Host** for the contract.
+
+### Widget identity
+
+`useWidgetIdentity()` is how a render reads the type's identity consistently — today the translated `title`. `<WidgetRender />` provides it from the `widgetType` it already holds. See **Widget Identity**.
+
 ### Rendering
 
-`<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract.
+`<WidgetRender />` resolves a `WidgetType.renderModule` through a host-provided `ResolveWidgetModule` and mounts the component with the `attributes` / `setAttributes` contract. It also lends the subtree the type's identity for `useWidgetIdentity`.
 
 Error handling and chrome stay with the host. Because the module is mounted lazily, the host must wrap it in a Suspense boundary.
 

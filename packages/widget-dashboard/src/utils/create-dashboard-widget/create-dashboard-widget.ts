@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
 import type { DashboardWidget, GridTilePlacement } from '../../types';
 
 const DEFAULT_PLACEMENT: GridTilePlacement = {

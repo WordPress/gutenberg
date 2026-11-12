@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -8,10 +5,6 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { throttle } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { View } from '../types';
 
 /**
@@ -25,7 +18,7 @@ import type { View } from '../types';
  */
 function captureAnchorElement(
 	container: HTMLElement,
-	anchorElementRef: React.MutableRefObject< {
+	anchorElementRef: React.RefObject< {
 		posinset: number;
 		viewportOffset: number;
 		scrollTop: number;
@@ -76,7 +69,7 @@ type UseInfiniteScrollProps = {
 		totalItems: number;
 		totalPages: number;
 	};
-	containerRef: React.MutableRefObject< HTMLDivElement | null >;
+	containerRef: React.RefObject< HTMLDivElement | null >;
 	setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 };
 

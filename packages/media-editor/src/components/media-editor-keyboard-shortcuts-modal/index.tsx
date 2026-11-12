@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Modal } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -112,6 +109,7 @@ function KeyCombinationDisplay( {
 	return (
 		<kbd
 			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+			dir="ltr"
 			aria-label={ label }
 		>
 			{ keys.map( ( key, index ) =>

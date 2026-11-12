@@ -1,41 +1,50 @@
-/**
- * WordPress dependencies
- */
 import {
 	privateApis as coreDataPrivateApis,
 	type CoreDataPrivateApis,
 	type PostEditorAwarenessState as ActiveCollaborator,
 	type SelectionEndpoint,
 } from '@wordpress/core-data';
+// prettier-ignore
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { getAvatarUrl } from './get-avatar-url';
 import {
 	useDebouncedRecompute,
 	useRequestAnimationFrameRecompute,
 } from './use-debounced-recompute';
-import { getOrderedBlockRange } from './cursor-dom-utils';
+import {
+	getNearestVisibleBlockAncestor,
+	getOrderedBlockRange,
+} from './cursor-dom-utils';
+import { resolveTargetElement } from './compute-selection';
+import { resolveStartPosition } from './resolve-start-position';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
+const { isElementVisible } = unlock( blockEditorPrivateApis );
 const { SelectionType } = unlock( coreDataPrivateApis ) as Pick<
 	CoreDataPrivateApis,
 	'SelectionType'
 >;
 
-export interface BlockHighlightData {
-	blockId: string;
+export interface BlockHighlightCollaborator {
 	clientId: number;
 	userName: string;
 	avatarUrl?: string;
 	color: string;
+}
+
+export interface BlockHighlightData {
+	blockId: string;
 	x: number;
 	y: number;
+	// The collaborators whose avatar sits above this block, in the order
+	// they joined the session. A collaborator appears on one block only:
+	// the first block of their selection.
+	collaborators: BlockHighlightCollaborator[];
 }
 
 /**
@@ -47,6 +56,11 @@ export interface BlockHighlightData {
  * @param postId              - The ID of the post.
  * @param postType            - The type of the post.
  * @param delayMs             - Milliseconds to wait before recomputing highlight positions.
+ * @param highlightTextBlocks - Whether a caret or text selection outlines every block
+ *                            it touches, and puts the collaborator's avatar above
+ *                            the first of those blocks. When false, text blocks are
+ *                            only outlined when the caret has nowhere visible to
+ *                            draw.
  * @return Highlight data for rendering and a delayed recompute function.
  */
 export function useBlockHighlighting(
@@ -54,7 +68,8 @@ export function useBlockHighlighting(
 	blockEditorDocument: Document | null,
 	postId: number | null,
 	postType: string | null,
-	delayMs: number
+	delayMs: number,
+	highlightTextBlocks: boolean
 ): {
 	highlights: BlockHighlightData[];
 	rerenderHighlightsAfterDelay: () => () => void;
@@ -100,14 +115,30 @@ export function useBlockHighlighting(
 			color: string;
 			userName: string;
 			avatarUrl: string | undefined;
-			// true for WholeBlock (always outline); false for
-			// SelectionInMultipleBlocks (outline only on non-text blocks).
+			// true: always outline. false: outline only on non-text blocks.
+			// Only a multi-block range with text block highlighting off
+			// uses false: its text blocks show selection rects alone.
 			alwaysOutline: boolean;
 		};
 
-		// Deduplicate by blockId — when multiple collaborators select the
-		// same block, only the first one gets the highlight and avatar label.
-		const seen = new Set< string >();
+		const describeCollaborator = ( userState: ActiveCollaborator ) => {
+			const userId = userState.collaboratorInfo.id ?? userState.clientId;
+			return {
+				clientId: userState.clientId,
+				userId,
+				color: getAvatarBorderColor( userId ),
+				userName: getCollaboratorDisplayName(
+					userState.collaboratorInfo
+				),
+				avatarUrl: getAvatarUrl(
+					userState.collaboratorInfo.avatar_urls
+				),
+			};
+		};
+
+		// Walk collaborators in the order they joined, so that when several
+		// of them share a block the outline color and the first avatar in
+		// the stack stay with the same person as others come and go.
 		const blocksToHighlight = userStates
 			.filter( ( userState: ActiveCollaborator ) => {
 				if ( userState.isMe ) {
@@ -116,9 +147,16 @@ export function useBlockHighlighting(
 				const selType = userState.editorState?.selection?.type;
 				return (
 					selType === SelectionType.WholeBlock ||
-					selType === SelectionType.SelectionInMultipleBlocks
+					selType === SelectionType.SelectionInMultipleBlocks ||
+					selType === SelectionType.Cursor ||
+					selType === SelectionType.SelectionInOneBlock
 				);
 			} )
+			.toSorted(
+				( a, b ) =>
+					a.collaboratorInfo.enteredAt -
+						b.collaboratorInfo.enteredAt || a.clientId - b.clientId
+			)
 			.flatMap< BlockEntry >( ( userState ) => {
 				// Cast to any: the selection union type is narrowed by the
 				// filter above, but TypeScript cannot infer that after .flatMap.
@@ -134,18 +172,84 @@ export function useBlockHighlighting(
 					if ( ! localClientId ) {
 						return [];
 					}
+
+					// The selected block may be hidden inside collapsed
+					// content (e.g. a closed core/details or an inactive
+					// core/accordion panel). Fall back to outlining the
+					// nearest *visible* ancestor instead, same as the
+					// Cursor/SelectionInOneBlock case below, so the
+					// collaborator still has a findable presence indicator
+					// rather than silently getting no highlight at all.
+					let blockId = localClientId;
+					const blockElement = getBlockElementById(
+						blockEditorDocument,
+						localClientId
+					);
+					if ( blockElement && ! isElementVisible( blockElement ) ) {
+						const container =
+							getNearestVisibleBlockAncestor( blockElement );
+						const containerId =
+							container?.getAttribute( 'data-block' );
+						if ( ! containerId ) {
+							return [];
+						}
+						blockId = containerId;
+					}
+
 					return [
 						{
-							blockId: localClientId,
-							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
-							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
-							),
-							userName: userState.collaboratorInfo.name,
-							avatarUrl: getAvatarUrl(
-								userState.collaboratorInfo.avatar_urls
-							),
+							blockId,
+							...describeCollaborator( userState ),
+							alwaysOutline: true,
+						},
+					];
+				}
+
+				if (
+					selection.type === SelectionType.Cursor ||
+					selection.type === SelectionType.SelectionInOneBlock
+				) {
+					// use-render-cursors draws these as a real caret or
+					// text selection. With text block highlighting on, the
+					// block holding that caret is outlined as well, and the
+					// collaborator's avatar moves from the caret to the
+					// block. Otherwise this hook only steps in when the
+					// target is hidden inside collapsed content (e.g. a
+					// closed core/details or an inactive core/accordion
+					// panel), where a real caret has nowhere valid to draw:
+					// the nearest *visible* ancestor block is outlined
+					// instead, so collaborators still have a findable
+					// presence indicator.
+					const resolved = resolveStartPosition(
+						selection,
+						resolveSelection
+					);
+					if ( ! resolved?.localClientId ) {
+						return [];
+					}
+					const targetElement = resolveTargetElement(
+						blockEditorDocument,
+						resolved
+					);
+					if ( ! targetElement ) {
+						return [];
+					}
+					if (
+						! highlightTextBlocks &&
+						isElementVisible( targetElement )
+					) {
+						return [];
+					}
+					const container =
+						getNearestVisibleBlockAncestor( targetElement );
+					const containerId = container?.getAttribute( 'data-block' );
+					if ( ! containerId ) {
+						return [];
+					}
+					return [
+						{
+							blockId: containerId,
+							...describeCollaborator( userState ),
 							alwaysOutline: true,
 						},
 					];
@@ -178,25 +282,14 @@ export function useBlockHighlighting(
 				}
 
 				const { firstId, lastId, middleEls, sameContainer } = range;
-				const color = getAvatarBorderColor(
-					userState.collaboratorInfo.id
-				);
-				const userName = userState.collaboratorInfo.name;
-				const avatarUrl = getAvatarUrl(
-					userState.collaboratorInfo.avatar_urls
-				);
 
 				// Both endpoints in the same container (e.g. two list-items in one list).
 				if ( sameContainer ) {
 					return [
 						{
 							blockId: firstId,
-							clientId: userState.clientId,
-							userId: userState.collaboratorInfo.id,
-							color,
-							userName,
-							avatarUrl,
-							alwaysOutline: false,
+							...describeCollaborator( userState ),
+							alwaysOutline: highlightTextBlocks,
 						},
 					];
 				}
@@ -205,24 +298,16 @@ export function useBlockHighlighting(
 					.map( ( el ) => el.getAttribute( 'data-block' ) )
 					.filter( ( id ): id is string => Boolean( id ) );
 
+				// Describe the collaborator once for the whole range.
+				const collaborator = describeCollaborator( userState );
+
 				return [ firstId, ...intermediateIds, lastId ].map(
 					( blockId ) => ( {
 						blockId,
-						clientId: userState.clientId,
-						userId: userState.collaboratorInfo.id,
-						color,
-						userName,
-						avatarUrl,
-						alwaysOutline: false,
+						...collaborator,
+						alwaysOutline: highlightTextBlocks,
 					} )
 				);
-			} )
-			.filter( ( block ) => {
-				if ( seen.has( block.blockId ) ) {
-					return false;
-				}
-				seen.add( block.blockId );
-				return true;
 			} );
 
 		// Unhighlight blocks that are no longer selected.
@@ -248,41 +333,84 @@ export function useBlockHighlighting(
 			}
 		}
 
-		// Highlight blocks and compute positions for avatar labels.
-		const results: BlockHighlightData[] = [];
-		const overlayRect = overlayElement?.getBoundingClientRect() ?? null;
+		// Highlight blocks and gather the avatars to stack above each one.
+		// Measuring forces a layout, so skip it when there is nothing to place.
+		const overlayRect =
+			( blocksToHighlight.length &&
+				overlayElement?.getBoundingClientRect() ) ||
+			null;
 
-		// Track which users already have an avatar placed, keyed by WordPress
-		// user ID. Blocks arrive in document order (top to bottom) so the first
-		// block encountered per user is always the topmost visible one.
+		// Blocks already reset and checked for visibility in this pass. A
+		// block appears once per collaborator in it; the first entry decides
+		// the outline color.
+		const visibleBlocks = new Map< string, HTMLElement >();
+		const skippedBlocks = new Set< string >();
+
+		// Track which users already have an avatar placed. Fallback collaborators
+		// use their Yjs client ID, so anonymous sessions remain distinct while
+		// multiple sessions for a named user stay grouped.
 		const usersWithAvatar = new Set< number >();
+		const avatarsByBlock = new Map<
+			string,
+			BlockHighlightCollaborator[]
+		>();
 
 		blocksToHighlight.forEach( ( block ) => {
-			const { color, blockId, userName, avatarUrl } = block;
-			const blockElement = getBlockElementById(
-				blockEditorDocument,
-				blockId
-			);
+			const { color, blockId, userName, avatarUrl, clientId } = block;
 
-			if ( ! blockElement ) {
+			if ( skippedBlocks.has( blockId ) ) {
 				return;
 			}
 
-			// Reset any stale outline class first. Without this, a block that
-			// transitions from a WholeBlock selection (always outlined) to being
-			// a text block inside a SelectionInMultipleBlocks range would keep
-			// the class indefinitely — the cleanup loop only removes blocks that
-			// leave the selection entirely.
-			blockElement.classList.remove( 'is-collaborator-selected' );
-			blockElement.style.removeProperty( '--collaborator-outline-color' );
-			currentHighlightedIds.delete( blockId );
+			let blockElement = visibleBlocks.get( blockId );
+			if ( ! blockElement ) {
+				const element = getBlockElementById(
+					blockEditorDocument,
+					blockId
+				);
+				if ( ! element ) {
+					skippedBlocks.add( blockId );
+					return;
+				}
+
+				// Reset any stale outline class first. Without this, a block
+				// that transitions from a WholeBlock selection (always
+				// outlined) to being a text block inside a
+				// SelectionInMultipleBlocks range would keep the class
+				// indefinitely — the cleanup loop only removes blocks that
+				// leave the selection entirely.
+				element.classList.remove( 'is-collaborator-selected' );
+				element.style.removeProperty( '--collaborator-outline-color' );
+				currentHighlightedIds.delete( blockId );
+
+				// The block may be hidden inside collapsed content (e.g. a
+				// closed core/details or an inactive core/accordion panel).
+				// Skip drawing a new outline or avatar for it rather than
+				// misplacing them at the collapsed wrapper's position — the
+				// reset above still runs so a block that was outlined before
+				// collapsing doesn't keep a stale outline class or dangling
+				// entry in currentHighlightedIds.
+				if ( ! isElementVisible( element ) ) {
+					skippedBlocks.add( blockId );
+					return;
+				}
+
+				visibleBlocks.set( blockId, element );
+				blockElement = element;
+			}
 
 			// WholeBlock (single block entirely selected): always outline.
-			// SelectionInMultipleBlocks: outline only on non-text blocks
-			// (image, spacer, etc.) — text blocks are highlighted via text
-			// rects from compute-selection so their content stays visible.
+			// With text block highlighting on, every block a caret or text
+			// selection touches is outlined too, including each block of a
+			// SelectionInMultipleBlocks range. With it off, such a range
+			// only outlines its non-text blocks (image, spacer, etc.): the
+			// text blocks are highlighted via text rects from
+			// compute-selection alone.
 			const isNonTextBlock = ! blockElement.innerText?.trim();
-			if ( block.alwaysOutline || isNonTextBlock ) {
+			if (
+				! currentHighlightedIds.has( blockId ) &&
+				( block.alwaysOutline || isNonTextBlock )
+			) {
 				blockElement.classList.add( 'is-collaborator-selected' );
 				blockElement.style.setProperty(
 					'--collaborator-outline-color',
@@ -293,18 +421,31 @@ export function useBlockHighlighting(
 
 			if ( overlayRect && ! usersWithAvatar.has( block.userId ) ) {
 				usersWithAvatar.add( block.userId );
+				let avatars = avatarsByBlock.get( blockId );
+				if ( ! avatars ) {
+					avatars = [];
+					avatarsByBlock.set( blockId, avatars );
+				}
+				avatars.push( { clientId, userName, avatarUrl, color } );
+			}
+		} );
+
+		const results: BlockHighlightData[] = [];
+		if ( overlayRect ) {
+			for ( const [ blockId, collaborators ] of avatarsByBlock ) {
+				const blockElement = visibleBlocks.get( blockId );
+				if ( ! blockElement ) {
+					continue;
+				}
 				const blockRect = blockElement.getBoundingClientRect();
 				results.push( {
 					blockId,
-					clientId: block.clientId,
-					userName,
-					avatarUrl,
-					color,
+					collaborators,
 					x: blockRect.left - overlayRect.left,
 					y: blockRect.top - overlayRect.top,
 				} );
 			}
-		} );
+		}
 
 		setHighlights( results );
 
@@ -326,6 +467,7 @@ export function useBlockHighlighting(
 		recomputeToken,
 		resizeToken,
 		resolveSelection,
+		highlightTextBlocks,
 	] );
 
 	return {

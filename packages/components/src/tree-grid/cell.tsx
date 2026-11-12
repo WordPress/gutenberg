@@ -1,14 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { forwardRef, useRef } from '@wordpress/element';
 import TreeGridItem from './item';
 import type { WordPressComponentProps } from '../context';
 import type { TreeGridCellProps } from './types';
+import { useValidateTreeGridStructure } from './use-validate-tree-grid-structure';
 
 function UnforwardedTreeGridCell(
 	{
@@ -18,8 +12,11 @@ function UnforwardedTreeGridCell(
 	}: WordPressComponentProps< TreeGridCellProps, 'td', false >,
 	ref: React.ForwardedRef< any >
 ) {
+	const cellRef = useRef< HTMLTableCellElement >( null );
+	useValidateTreeGridStructure( 'TreeGridCell', cellRef );
+
 	return (
-		<td { ...props } role="gridcell">
+		<td ref={ cellRef } { ...props } role="gridcell">
 			{ withoutGridItem ? (
 				<>
 					{ typeof children === 'function'

@@ -1,19 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
-import { useState, useMemo } from '@wordpress/element';
+import { useId, useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
-import { Icon, IconButton, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import {
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
+	IconButton,
+	Stack,
+} from '@wordpress/ui';
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';
 import type {
@@ -23,7 +16,8 @@ import type {
 } from '../../shared/types';
 
 const meta: Meta< typeof DashboardGrid > = {
-	title: 'Grid/DashboardGrid',
+	id: 'grid-dashboardgrid',
+	title: 'Widgets/Grid/DashboardGrid',
 	component: DashboardGrid,
 	tags: [ 'status-experimental' ],
 	args: {
@@ -35,12 +29,13 @@ const meta: Meta< typeof DashboardGrid > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 24, step: 1 },
-			description: 'Total columns in fixed mode.',
+			description:
+				'Column count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-column lower bound in pixels.',
+				'Per-column floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -291,87 +286,160 @@ export const Default: Story = {
 	},
 };
 
+function TileControls( { title }: { title: string } ) {
+	const metricId = useId();
+	return (
+		<Stack direction="column" gap="sm" align="flex-start">
+			<strong>{ title }</strong>
+			<a href="#details">Details</a>
+			<button type="button">Refresh</button>
+			<label htmlFor={ metricId }>
+				Metric{ ' ' }
+				<select id={ metricId }>
+					<option>Views</option>
+					<option>Clicks</option>
+				</select>
+			</label>
+		</Stack>
+	);
+}
+
 /**
- * Responsive grid: the column count is derived from the container
- * width using `minColumnWidth` as the lower bound per column. A
- * `ResizeObserver` recomputes the count on container resize.
+ * Tiles with their own links, buttons and form controls. The a11y addon checks that the grid does not wrap them in drag semantics. In edit mode, the first tile is pinned (`draggable: false`) and its controls keep their semantics.
  */
-export const Responsive: Story = {
+export const InteractiveContent: Story = {
 	args: {
 		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
+			{ key: 'pinned', width: 2, draggable: false },
+			{ key: 'a', width: 2 },
+			{ key: 'b', width: 2 },
 		],
-		rowHeight: 96,
-		minColumnWidth: 192,
+		columns: 6,
+		rowHeight: 160,
 		children: [
-			<Tile key="a" tone="brand">
-				width: 1
+			<Tile key="pinned" tone="neutral">
+				<TileControls title="Pinned" />
 			</Tile>,
-			<Tile key="b" tone="info">
-				width: 2
+			<Tile key="a" tone="info">
+				<TileControls title="Tile" />
 			</Tile>,
-			<Tile key="c" tone="success">
-				width: 2
-			</Tile>,
-			<Tile key="d" tone="warning">
-				width: 1
-			</Tile>,
-			<Tile key="e" tone="error">
-				width: 2
-			</Tile>,
-			<Tile key="f" tone="neutral">
-				width: 2
+			<Tile key="b" tone="success">
+				<TileControls title="Tile" />
 			</Tile>,
 		],
 	},
 };
 
 /**
- * Layered configuration: `columns` caps the count and
- * `minColumnWidth` enforces a per-tile width floor. The grid renders
- * up to `columns` columns on wide containers and reduces the count
- * on narrow ones whenever fitting all of them would push tiles
- * below `minColumnWidth`. Resize the preview to see the cap apply
- * on wide widths and the floor reduce the count on narrow widths.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the count.
+ * `minColumnWidth` alone fits as many columns of at least that width as
+ * the container allows. Together, `columns` caps what the floor fits:
+ * up to four columns here, none narrower than 240px, down to one. The
+ * layout mixes fixed, `fill`, `full` and two-row tiles so the repacking
+ * is visible at every count: a `fill` takes the free run of the row it
+ * lands in, and the tall tile's shadow shortens the runs below it. Open
+ * the story full screen and resize the browser to walk the counts.
  */
-export const Layered: Story = {
+export const Columns: Story = {
 	args: {
-		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
-		],
-		rowHeight: 96,
-		columns: 6,
+		columns: 4,
 		minColumnWidth: 240,
+		rowHeight: 96,
+		layout: [
+			{ key: 'a', width: 1 },
+			{ key: 'b', width: 'fill' },
+			{ key: 'c', width: 1, height: 2 },
+			{ key: 'd', width: 1 },
+			{ key: 'e', width: 'fill' },
+			{ key: 'f', width: 'full' },
+		],
 		children: [
 			<Tile key="a" tone="brand">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="b" tone="info">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="c" tone="success">
-				width: 2
+				1 · 2 rows
 			</Tile>,
 			<Tile key="d" tone="warning">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="e" tone="error">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="f" tone="neutral">
-				width: 2
+				full
 			</Tile>,
 		],
+	},
+};
+
+/**
+ * `columns` as a map: one column from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each column ends up; add `minColumnWidth` to lower it further.
+ */
+export const ColumnSteps: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		columns: { 0: 1, 600: 2, 960: 4 },
+		rowHeight: 96,
+		layout: [
+			{ key: 'fixed-1', width: 1, height: 1 },
+			{ key: 'fixed-2', width: 2, height: 2 },
+			{ key: 'fill-1', width: 'fill' },
+			{ key: 'fixed-3', width: 1, height: 1 },
+			{ key: 'fixed-4', width: 1, height: 2 },
+			{ key: 'fixed-5', width: 2, height: 1 },
+			{ key: 'fill-2', width: 'fill' },
+			{ key: 'full-1', width: 'full' },
+		],
+		children: [
+			<Tile key="fixed-1" tone="brand">
+				width: <strong>1</strong> · height: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-2" tone="info">
+				width: <strong>2</strong> · height: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-1" tone="info">
+				width: <strong>fill</strong>
+			</Tile>,
+			<Tile key="fixed-3" tone="success">
+				width: <strong>1</strong> · height: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-4" tone="warning">
+				width: <strong>1</strong> · height: <strong>2</strong>
+			</Tile>,
+			<Tile key="fixed-5" tone="error">
+				width: <strong>2</strong> · height: <strong>1</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="error">
+				width: <strong>fill</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral">
+				width: <strong>full</strong>
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two columns
+ * below 960px, and 240px columns fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 240,
 	},
 };
 
@@ -494,6 +562,11 @@ export const RowHeight: Story = {
  * to drop.
  */
 export const EditMode: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 12,
 		rowHeight: 80,
@@ -509,6 +582,7 @@ export const EditMode: Story = {
 				width: 1,
 				height: 1,
 				order: 1,
+				draggable: false,
 				tone: 'success',
 			},
 			{
@@ -582,7 +656,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'fill' ? undefined : 'fill',
-						  }
+							}
 						: tile
 				)
 			);
@@ -596,7 +670,7 @@ export const EditMode: Story = {
 								...tile,
 								width:
 									tile.width === 'full' ? undefined : 'full',
-						  }
+							}
 						: tile
 				)
 			);
@@ -624,6 +698,160 @@ export const EditMode: Story = {
 						}
 					>
 						{ formatTileLabel( tile ) }
+					</Tile>
+				) ),
+			// eslint-disable-next-line react-hooks/exhaustive-deps
+			[ tiles ]
+		);
+
+		return (
+			<Stack direction="row" gap="lg" align="flex-start">
+				<div style={ { width: '800px' } }>
+					<DashboardGrid
+						{ ...args }
+						layout={ layout }
+						onChangeLayout={ onChangeLayout }
+						onPreviewLayout={ setPreviewLayout }
+					>
+						{ tileElements }
+					</DashboardGrid>
+				</div>
+
+				<LayoutStatePanel
+					label={ previewLayout ? 'Staging' : 'Committed' }
+					layout={ previewLayout ?? layout }
+					tone={ previewLayout ? 'warning' : 'success' }
+				/>
+			</Stack>
+		);
+	},
+};
+
+// Human-readable summary of each constrained tile's `itemLimits` entry,
+// rendered inside the tile beside its live width label.
+const LIMIT_LABELS: Record< string, string > = {
+	floor: 'min 320 × 200 px',
+	ceiling: 'max 500 × 400 px',
+	ranged: 'min 200, max 600 wide',
+	bounded: 'min 300 × 160, max 600 × 320 px',
+};
+
+/**
+ * Per-item size limits via `itemLimits`, in pixels: a floor, a ceiling,
+ * a width range, and a tile bounded on both axes. Constrained tiles pin
+ * at their bounds while the pointer overshoots, and release commits
+ * spans inside the limits. `'full'` and `'fill'` stop at the tile's
+ * maximum span; the per-tile toggles exercise both.
+ */
+export const SizeLimits: Story = {
+	name: 'Per-Item Size Limits',
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	args: {
+		columns: 12,
+		rowHeight: 80,
+		editMode: true,
+		itemLimits: {
+			floor: { minWidth: 320, minHeight: 200 },
+			ceiling: { maxWidth: 500, maxHeight: 400 },
+			ranged: { minWidth: 200, maxWidth: 600 },
+			bounded: {
+				minWidth: 300,
+				minHeight: 160,
+				maxWidth: 600,
+				maxHeight: 320,
+			},
+		},
+	},
+	render: function SizeLimitsRender( args ) {
+		const initialLayout: ( DashboardGridLayoutItem & {
+			tone: Tone;
+		} )[] = [
+			{ key: 'floor', width: 4, height: 2, order: 1, tone: 'info' },
+			{ key: 'ceiling', width: 2, height: 2, order: 2, tone: 'warning' },
+			{ key: 'ranged', width: 3, height: 1, order: 3, tone: 'brand' },
+			{ key: 'bounded', width: 2, height: 1, order: 4, tone: 'success' },
+			{ key: 'free', width: 3, height: 1, order: 5, tone: 'neutral' },
+		];
+
+		const [ tiles, setTiles ] = useState( initialLayout );
+		const [ previewLayout, setPreviewLayout ] = useState<
+			DashboardGridLayoutItem[] | null
+		>( null );
+
+		const layout: DashboardGridLayoutItem[] = tiles.map(
+			( { tone: _tone, ...item } ) => item
+		);
+
+		const onChangeLayout = ( next: DashboardGridLayoutItem[] ) => {
+			setTiles(
+				next.map( ( item ) => {
+					const existing = tiles.find( ( t ) => t.key === item.key );
+					return {
+						...item,
+						tone: existing?.tone ?? 'neutral',
+					};
+				} )
+			);
+			setPreviewLayout( null );
+		};
+
+		const removeTile = ( key: string ) => {
+			setTiles( tiles.filter( ( tile ) => tile.key !== key ) );
+		};
+
+		const toggleFill = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'fill' ? undefined : 'fill',
+							}
+						: tile
+				)
+			);
+		};
+
+		const toggleFull = ( key: string ) => {
+			setTiles(
+				tiles.map( ( tile ) =>
+					tile.key === key
+						? {
+								...tile,
+								width:
+									tile.width === 'full' ? undefined : 'full',
+							}
+						: tile
+				)
+			);
+		};
+
+		const tileElements = useMemo(
+			() =>
+				tiles.map( ( tile ) => (
+					<Tile
+						key={ tile.key }
+						tone={ tile.tone }
+						actionableArea={
+							<TileActions
+								isFill={ tile.width === 'fill' }
+								isFull={ tile.width === 'full' }
+								onToggleFill={ () => toggleFill( tile.key ) }
+								onToggleFull={ () => toggleFull( tile.key ) }
+								onRemove={ () => removeTile( tile.key ) }
+							/>
+						}
+					>
+						<span style={ { textAlign: 'center' } }>
+							{ formatTileLabel( tile ) }
+							<br />
+							{ LIMIT_LABELS[ tile.key ] ?? 'no limits' }
+						</span>
 					</Tile>
 				) ),
 			// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -734,6 +962,11 @@ function CustomDragPreview( { children }: DragPreviewRenderProps ) {
  * respond.
  */
 export const Customization: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	args: {
 		columns: 6,
 		rowHeight: 80,
@@ -877,6 +1110,11 @@ function NumberedOverlay( { columns, isActive }: GridOverlayRenderProps ) {
  * on.
  */
 export const CustomGridOverlayStory: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	name: 'Custom Grid Overlay',
 	args: {
 		columns: 12,

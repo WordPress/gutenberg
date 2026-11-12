@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button, ExternalLink } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -13,13 +10,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
-
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
@@ -75,8 +67,7 @@ export function AiPluginCallout() {
 
 		// Reactive check: any AI provider setting has a non-empty value.
 		const siteSettings = store.getEntityRecord( 'root', 'site' ) as
-			| Record< string, string >
-			| undefined;
+			Record< string, string > | undefined;
 		const hasConnected =
 			initialHasConnectedProvider ||
 			aiProviderSettingNames.some(

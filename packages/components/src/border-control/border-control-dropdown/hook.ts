@@ -1,17 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import clsx from 'clsx';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
-
+import styles from '../style.module.scss';
 import type { DropdownProps } from '../types';
 
 export function useBorderControlDropdown(
@@ -53,31 +44,9 @@ export function useBorderControlDropdown(
 		} );
 	};
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderControlDropdown, className );
-	}, [ className, cx ] );
+	const classes = clsx( styles.dropdown, className );
 
-	const indicatorClassName = useMemo( () => {
-		return cx( styles.borderColorIndicator );
-	}, [ cx ] );
-
-	const indicatorWrapperClassName = useMemo( () => {
-		return cx( styles.colorIndicatorWrapper( border ) );
-	}, [ border, cx ] );
-
-	const popoverControlsClassName = useMemo( () => {
-		return cx( styles.borderControlPopoverControls );
-	}, [ cx ] );
-
-	const popoverContentClassName = useMemo( () => {
-		return cx( styles.borderControlPopoverContent );
-	}, [ cx ] );
-
-	const resetButtonWrapperClassName = useMemo( () => {
-		return cx( styles.resetButtonWrapper );
-	}, [ cx ] );
+	const { color: indicatorColor, style: indicatorStyle } = border || {};
 
 	return {
 		...otherProps,
@@ -86,14 +55,27 @@ export function useBorderControlDropdown(
 		colors,
 		enableAlpha,
 		enableStyle,
-		indicatorClassName,
-		indicatorWrapperClassName,
+		indicatorWrapperClassName: styles[ 'color-indicator-wrapper' ],
+		// Applied inline so CSS-wide values (e.g. `inherit`) and the `||` color
+		// fallback pass straight through to `border-style`/`border-color`. Style
+		// `none` previews as `solid`; a style without a color falls back to
+		// the neutral surface stroke token.
+		indicatorWrapperStyle: indicatorStyle
+			? {
+					borderStyle:
+						indicatorStyle === 'none' ? 'solid' : indicatorStyle,
+					borderColor:
+						indicatorColor ||
+						( indicatorStyle !== 'none'
+							? 'var(--wpds-color-stroke-surface-neutral)'
+							: undefined ),
+				}
+			: undefined,
 		onColorChange,
 		onStyleChange,
 		onReset,
-		popoverContentClassName,
-		popoverControlsClassName,
-		resetButtonWrapperClassName,
+		popoverControlsClassName: styles[ 'popover-controls' ],
+		resetButtonWrapperClassName: styles[ 'reset-button-wrapper' ],
 		__experimentalIsRenderedInSidebar,
 	};
 }

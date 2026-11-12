@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import useRefEffect from '../use-ref-effect';
 
 /**
@@ -58,6 +51,12 @@ function useConstrainedTabbing(): React.RefCallback< Element > {
 			// area, rely on native browsers behavior and let tabbing follow
 			// the native tab sequence.
 			if ( node.contains( nextElement ) ) {
+				return;
+			}
+
+			// Without a tabbable destination, native Tab would leave the area.
+			if ( ! focus.tabbable.find( node ).length ) {
+				event.preventDefault();
 				return;
 			}
 

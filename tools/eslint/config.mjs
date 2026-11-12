@@ -1,19 +1,41 @@
 import { createRequire } from 'module';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import globals from 'globals';
+import { globSync } from 'glob';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
 import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
-
+import useTypeScript from './rules/use-typescript.mjs';
+import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
+import componentsImportAliases from './components-import-aliases.mjs';
+import {
+	discoverTestFiles,
+	getVitestTestsByProject,
+} from '../../test/unit/scripts/discover-test-files.mjs';
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
-
+const gutenbergPlugin = {
+	rules: {
+		'use-typescript': useTypeScript,
+		'no-broad-component-suppression': noBroadComponentSuppression,
+	},
+};
+const gutenbergStorybookPlugin = {
+	rules: {
+		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
+	},
+};
+const vitestTestsByProject = getVitestTestsByProject(
+	discoverTestFiles( rootDir )
+);
+const vitestTestPatterns = Object.values( vitestTestsByProject ).flat();
+const vitestJsdomTestPatterns = vitestTestsByProject.jsdom;
+const vitestBrowserTestPatterns = vitestTestsByProject.browser;
 // Prefer the installed React version for linting, but fall back to the detected version.
 let reactVersion = 'detect';
 try {
@@ -22,31 +44,57 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.
  *
  * @param {Object[]} configs Flat config array.
- * @return {Object[]} The same array with plugin references deduplicated.
+ * @return {Object[]} Configs with plugin references deduplicated.
  */
 function dedupePlugins( configs ) {
 	/** @type {Record<string,Object>} */
 	const seen = Object.create( null );
-	for ( const config of configs ) {
+	return configs.map( ( config ) => {
 		if ( ! config.plugins ) {
-			continue;
+			return config;
 		}
-		for ( const name of Object.keys( config.plugins ) ) {
+		const plugins = {};
+		for ( const [ name, plugin ] of Object.entries( config.plugins ) ) {
 			if ( name in seen ) {
-				config.plugins[ name ] = seen[ name ];
+				plugins[ name ] = seen[ name ];
 			} else {
-				seen[ name ] = config.plugins[ name ];
+				seen[ name ] = plugin;
+				plugins[ name ] = plugin;
 			}
 		}
-	}
-	return configs;
+		return { ...config, plugins };
+	} );
 }
+
+/*
+ * Extension globs. Node runs `.mts` and `.cts` through type stripping, so they
+ * are linted wherever `.ts` is.
+ */
+const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
+const TS_EXT = '@([cm]ts|ts|tsx)';
+const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+const JS_EXT = '@([cm]js|js|jsx)';
+
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -55,18 +103,59 @@ function dedupePlugins( configs ) {
  */
 const developmentFiles = [
 	'**/benchmark/**/*.js',
-	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
-	'**/@(storybook|stories)/**/*.[tj]s?(x)',
+	`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+	`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
 	'packages/babel-preset-default/bin/**/*.js',
-	'packages/theme/bin/**/*.[tj]s?(x)',
+	`packages/theme/bin/**/*.${ SCRIPT_EXT }`,
 	'packages/theme/terrazzo.config.ts',
 ];
 
 // All files from packages that have types provided with TypeScript.
-const glob = require( 'glob' ).sync;
-const typedFiles = glob( 'packages/*/package.json', { cwd: rootDir } )
+const typedFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
-	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.js' ) );
+	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
+
+/*
+ * Every workspace is expected to be written in TypeScript, with the following
+ * exceptions:
+ *
+ * - Workspaces that don't have a `tsconfig.json` TypeScript configuration.
+ * - Packages published to NPM, where only the source code and tests should be
+ *   written as TypeScript so that the published code can be run in versions of
+ *   Node.js without support for TypeScript syntax.
+ */
+const { workspaces } = require( join( rootDir, 'package.json' ) );
+const typeScriptOnlyFiles = globSync(
+	workspaces
+		.filter( ( pattern ) => ! pattern.startsWith( '!' ) )
+		.map( ( pattern ) => `${ pattern }/tsconfig.json` ),
+	{ cwd: rootDir, posix: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const dir = dirname( fileName );
+		return dir.startsWith( 'packages/' )
+			? `${ dir }/@(src|test)/**/*.${ JS_EXT }`
+			: `${ dir }/**/*.${ JS_EXT }`;
+	} );
+
+// All files from bundled packages: packages not registered as WordPress
+// scripts or script modules, which plugins therefore compile into their own
+// bundles when importing them via npm.
+const bundledPackageFiles = globSync( 'packages/*/package.json', {
+	cwd: rootDir,
+	posix: true,
+} )
+	.sort()
+	.filter( ( fileName ) => {
+		const pkg = require( join( rootDir, fileName ) );
+		return ! pkg.wpScript && ! pkg.wpScriptModuleExports;
+	} )
+	.map( ( fileName ) => fileName.replace( 'package.json', '**' ) );
 
 const restrictedImports = [
 	{
@@ -91,7 +180,7 @@ const restrictedImports = [
 	{
 		name: '@emotion/css',
 		message:
-			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+			'Please use SCSS Modules for styles and `clsx` to compose class names.',
 	},
 	{
 		name: '@wordpress/edit-post',
@@ -126,6 +215,21 @@ const restrictedImports = [
 	},
 ];
 
+// Restrictions applied to every bundled package: a plugin bundling such a
+// package compiles a second copy of private-apis, which cannot unlock objects
+// locked by the WordPress copy and throws at runtime. Existing usage is
+// grandfathered in `tools/eslint/suppressions.json` and may only shrink.
+const privateApisRestrictedImport = {
+	name: '@wordpress/private-apis',
+	message:
+		'Bundled packages may be compiled into plugin bundles via npm, where a second copy of private-apis cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+const lockUnlockRestrictedPattern = {
+	group: [ '**/lock-unlock', '**/lock-unlock.*' ],
+	message:
+		'This module wraps @wordpress/private-apis, which bundled packages must not depend on: a plugin bundling this package compiles a second copy of private-apis that cannot unlock objects locked by the WordPress copy and throws at runtime.',
+};
+
 const useIsomorphicLayoutEffectRestrictedImport = {
 	name: '@wordpress/element',
 	importNames: [ 'useLayoutEffect' ],
@@ -143,8 +247,17 @@ const UI_RESTRICTED_IMPORTS = {
 			( { name } ) => name !== '@base-ui/react'
 		),
 		useIsomorphicLayoutEffectRestrictedImport,
+		// `@wordpress/ui` is a bundled package, but its overrides below would
+		// replace the bundled-packages override, so the restriction is
+		// re-applied here.
+		privateApisRestrictedImport,
 	],
-	patterns: [],
+	patterns: [ lockUnlockRestrictedPattern ],
+};
+
+const noStringLiteralIds = {
+	selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+	message: 'Do not use string literals for IDs; use useId hook instead.',
 };
 
 const restrictedSyntax = [
@@ -159,10 +272,7 @@ const restrictedSyntax = [
 			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 		message: 'Prefer page.waitForSelector instead.',
 	},
-	{
-		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message: 'Do not use string literals for IDs; use useId hook instead.',
-	},
+	noStringLiteralIds,
 	{
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
@@ -242,6 +352,11 @@ export default dedupePlugins( [
 			'example-*/',
 		],
 	},
+	/*
+	 * ESLint's default file discovery covers only `.js`, `.mjs` and `.cjs`.
+	 * Every other extension has to be named before any config below applies.
+	 */
+	{ files: [ '**/*.jsx', '**/*.mts', '**/*.cts' ] },
 
 	// Base recommended config from @wordpress/eslint-plugin.
 	...wpPlugin.configs.recommended,
@@ -250,8 +365,12 @@ export default dedupePlugins( [
 	{
 		plugins: {
 			'@eslint-community/eslint-comments': eslintCommentsPlugin,
+			gutenberg: gutenbergPlugin,
 		},
-		rules: eslintCommentsPlugin.configs.recommended.rules,
+		rules: {
+			...eslintCommentsPlugin.configs.recommended.rules,
+			'gutenberg/no-broad-component-suppression': 'error',
+		},
 	},
 
 	// Storybook recommended (array of 3).
@@ -292,6 +411,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -313,18 +433,25 @@ export default dedupePlugins( [
 			'@wordpress/use-import-as': [
 				'error',
 				{
-					'@wordpress/components': {
-						__experimentalText: 'WCText',
-						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
-						Autocomplete: 'WCAutocomplete',
-						Badge: 'WCBadge',
-						Icon: 'WCIcon',
-						Tooltip: 'WCTooltip',
-					},
+					'@wordpress/components': componentsImportAliases,
 				},
 			],
+			'@wordpress/dependency-group': [ 'error', 'never' ],
 			'import/default': 'error',
 			'import/named': 'error',
+			'import/order': [
+				'error',
+				{
+					groups: [
+						'builtin', // Node.js built-in modules
+						'external', // npm packages
+						'internal', // Aliased modules
+						[ 'parent', 'sibling', 'index' ], // Relative imports
+					],
+					'newlines-between': 'never',
+					warnOnUnassignedImports: true,
+				},
+			],
 			'no-restricted-imports': [
 				'error',
 				{
@@ -335,11 +462,9 @@ export default dedupePlugins( [
 			// @typescript-eslint/consistent-type-imports are scoped to
 			// TS files below since they require the TypeScript parser.
 			'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
-			'jsdoc/check-tag-names': [
+			'react/jsx-filename-extension': [
 				'error',
-				{
-					definedTags: [ 'jest-environment' ],
-				},
+				{ extensions: [ '.tsx' ] },
 			],
 			'react-hooks/config': [
 				'error',
@@ -359,7 +484,7 @@ export default dedupePlugins( [
 
 	// TypeScript-specific rules (require TS parser / type information).
 	{
-		files: [ '**/*.ts', '**/*.tsx' ],
+		files: [ `**/*.${ TS_EXT }` ],
 		rules: {
 			'@typescript-eslint/no-restricted-imports': [
 				'error',
@@ -404,9 +529,9 @@ export default dedupePlugins( [
 
 	// Override: Package source files — forbid raw SVG elements.
 	{
-		files: [ 'packages/**/*.js' ],
+		files: [ 'packages/**/*.{js,jsx}' ],
 		ignores: [
-			'packages/block-library/src/*/save.js',
+			'packages/block-library/src/*/save.{js,jsx}',
 			...developmentFiles,
 		],
 		rules: {
@@ -431,72 +556,197 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: React src + storybook — stylesheet and component rules.
+	// Override: TypeScript-only packages. Existing JavaScript files are
+	// suppressed, so only new ones fail.
 	{
-		files: [
-			'packages/*/src/**/*.[tj]s?(x)',
-			'routes/**/*.[tj]s?(x)',
-			'widgets/**/*.[tj]s?(x)',
-			'storybook/stories/**/*.[tj]s?(x)',
+		files: typeScriptOnlyFiles,
+		ignores: [
+			'**/fixtures/**',
+			// Editors load the ESLint config with their own Node, which
+			// may not strip types.
+			'storybook/eslint/**',
+			'tools/eslint/**',
+			// Published as plain modules through package.json exports.
+			'tools/react-18/**',
+			'tools/react-19/**',
 		],
 		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
+			'gutenberg/use-typescript': 'error',
+		},
+	},
+
+	// Override: React src + storybook — component rules.
+	{
+		files: [
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+			`storybook/stories/**/*.${ SCRIPT_EXT }`,
+		],
+		rules: {
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
 		},
 	},
 
-	// Override: Jest test files (unit tests).
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
+	// Override: React src — non-module stylesheet imports.
+	{
 		files: [
-			'packages/jest*/**/*.js',
-			'**/test/**/*.js',
-			'**/__tests__/**/*.js',
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
-		ignores: [ 'test/e2e/**/*.js', 'test/performance/**/*.js' ],
-	} ) ),
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
+		},
+	},
 
-	// Override: Test files — jest-dom, testing-library, jest recommended.
+	// Override: Vitest files — runner-neutral jest-dom and Testing Library rules.
 	{
 		...jestDomPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-		],
+		files: vitestJsdomTestPatterns,
 	},
 	{
 		...testingLibraryPlugin.configs[ 'flat/react' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-		],
+		files: vitestJsdomTestPatterns,
 	},
 	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ '**/test/**/*.[tj]s?(x)', '**/__tests__/**/*.[tj]s?(x)' ],
-		ignores: [
-			'test/e2e/**/*.[tj]s?(x)',
-			'test/performance/**/*.[tj]s?(x)',
-			'test/storybook-playwright/**/*.[tj]s?(x)',
-		],
+		...jestDomPlugin.configs[ 'flat/recommended' ],
+		files: vitestBrowserTestPatterns,
+	},
+	{
+		...testingLibraryPlugin.configs[ 'flat/react' ],
+		files: vitestBrowserTestPatterns,
+		settings: {
+			'testing-library/utils-module': 'off',
+			'testing-library/custom-renders': 'off',
+			'testing-library/custom-queries': 'off',
+		},
 		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			/*
-			 * `jsdom` is already the default test environment in `@wordpress/jest-preset-default`,
-			 * so the docblock pragma is redundant.
-			 */
-			'no-warning-comments': [
+			...testingLibraryPlugin.configs[ 'flat/react' ].rules,
+			// Browser Mode locators are the browser-native alternative to
+			// Testing Library's screen queries.
+			'testing-library/prefer-screen-queries': 'off',
+		},
+	},
+	// Preserve runner-neutral rules for test helpers and compilation fixtures.
+	...[
+		jestDomPlugin.configs[ 'flat/recommended' ],
+		testingLibraryPlugin.configs[ 'flat/react' ],
+	].map( ( config ) => ( {
+		...config,
+		files: [
+			`**/test/**/*.${ SCRIPT_EXT }`,
+			`**/__tests__/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [
+			`test/e2e/**/*.${ SCRIPT_EXT }`,
+			`test/performance/**/*.${ SCRIPT_EXT }`,
+			`test/storybook-playwright/**/*.${ SCRIPT_EXT }`,
+			...vitestTestPatterns,
+		],
+	} ) ),
+	// Use the public Vitest baseline for suites and shared unit-test helpers.
+	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+		...config,
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
+		rules: {
+			...config.rules,
+			'vitest/require-awaited-expect-poll': 'error',
+			// These checks were enabled by Jest's baseline but are not recommended
+			// Vitest rules. Keep their existing enforcement during the switch.
+			'vitest/no-alias-methods': 'error',
+			'vitest/no-done-callback': 'error',
+			'vitest/no-test-prefixes': 'error',
+			// Vitest has no no-jasmine-globals equivalent.
+			'no-restricted-globals': [
 				'error',
 				{
-					terms: [ '@jest-environment jsdom' ],
-					location: 'anywhere',
+					name: 'jasmine',
+					message: 'Use the vi and expect APIs from Vitest instead.',
+				},
+				{
+					name: 'spyOn',
+					message: 'Use vi.spyOn() from Vitest instead.',
+				},
+				{
+					name: 'spyOnProperty',
+					message:
+						'Use vi.spyOn() from Vitest with a get or set accessor instead.',
+				},
+				{
+					name: 'fail',
+					message: 'Use expect.fail() from Vitest instead.',
+				},
+				{
+					name: 'pending',
+					message:
+						'Use the Vitest test context skip() method instead.',
 				},
 			],
+		},
+	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
+		},
+	},
+	// Recognize only the assertion helpers used by these files. Avoid a global
+	// expect* wildcard, which would also accept unrelated function calls.
+	...[
+		[
+			'packages/components/src/flex/test/index.browser.test.tsx',
+			[ 'expectCustomProperty' ],
+		],
+		[
+			'packages/components/src/spacer/test/index.browser.test.tsx',
+			[ 'expectCustomProperties' ],
+		],
+		[
+			'packages/components/src/form-token-field/test/index.jsdom.test.tsx',
+			[
+				'expectTokensToBeInTheDocument',
+				'expectTokensNotToBeInTheDocument',
+				'expectEscapedProperly',
+				'expectVisibleSuggestionsToBe',
+			],
+		],
+		[
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.tsx',
+			[ 'expectPlaceholderState' ],
+		],
+		[
+			'test/unit/scripts/test/vitest-policy-rules.test.js',
+			[ 'expectValid', 'expectViolation' ],
+		],
+	].map( ( [ file, helpers ] ) => ( {
+		files: [ file ],
+		rules: {
+			'vitest/expect-expect': [
+				'error',
+				{ assertFunctionNames: [ 'expect', 'assert', ...helpers ] },
+			],
+		},
+	} ) ),
+	// This compilation fixture is transformed as source, not run as a test.
+	{
+		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
+		languageOptions: {
+			globals: {
+				describe: 'readonly',
+				test: 'readonly',
+				expect: 'readonly',
+			},
 		},
 	},
 
@@ -509,6 +759,9 @@ export default dedupePlugins( [
 	{
 		files: [ 'packages/e2e-test*/**/*.js' ],
 		ignores: [ 'packages/e2e-test-utils-playwright/**/*.js' ],
+		// Preserve the previous Jest 30 lint baseline for legacy E2E code.
+		// The repository no longer installs a Jest runner to detect it from.
+		settings: { jest: { version: 30 } },
 		rules: {
 			'jest/expect-expect': 'off',
 		},
@@ -518,24 +771,24 @@ export default dedupePlugins( [
 	...wpPlugin.configs[ 'test-playwright' ].map( ( config ) => ( {
 		...config,
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 	} ) ),
 	{
 		...tseslint.configs.base,
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 	},
 	{
 		files: [
-			'test/e2e/**/*.[tj]s',
-			'test/performance/**/*.[tj]s',
-			'packages/e2e-test-utils-playwright/**/*.[tj]s',
+			`test/e2e/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`test/performance/**/*.${ SCRIPT_EXT_NO_JSX }`,
+			`packages/e2e-test-utils-playwright/**/*.${ SCRIPT_EXT_NO_JSX }`,
 		],
 		languageOptions: {
 			parserOptions: {
@@ -616,25 +869,19 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
+	// Reject non-module stylesheet imports. The production stylesheet
+	// import rule does not apply; Storybook loads package CSS through
+	// package-styles/config.js, not the enqueue path.
 	{
-		files: [ '**/@(storybook|stories)/**/*.[tj]s?(x)' ],
+		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
+		plugins: {
+			'gutenberg-storybook': gutenbergStorybookPlugin,
+		},
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
-		},
-	},
-
-	// Override: Storybook + components — enforce JSX file extensions.
-	{
-		files: [
-			'**/@(storybook|stories)/**',
-			'packages/components/src/**/*.tsx',
-		],
-		rules: {
-			'react/jsx-filename-extension': [
-				'error',
-				{ extensions: [ '.jsx', '.tsx' ] },
-			],
+			'gutenberg-storybook/no-non-module-stylesheet-imports': 'error',
+			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
 
@@ -651,7 +898,6 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.js' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -660,15 +906,52 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use semantic WPDS design tokens directly. Keep required admin color-scheme fallbacks in SCSS.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
 				},
+			],
+		},
+	},
+
+	// Override: Block library src — no effects. Existing ones are recorded in
+	// the suppressions file until they are replaced.
+	{
+		files: [ 'packages/block-library/src/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax,
+				{
+					selector:
+						'CallExpression[callee.name=/^use(Layout|Insertion)?Effect$/]',
+					message:
+						'Avoid effects in blocks. Compute the value during render, handle it in the event that causes it, read it with a store selector, or use `useRefEffect` to subscribe to a DOM node.',
+				},
+			],
+		},
+	},
+
+	// Override: Tests and Storybook — allow literal `id` attributes.
+	// Later than the components re-spread of `restrictedSyntax`. Ignore
+	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.
+	{
+		files: [
+			`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+			`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [ 'test/e2e/**', 'test/performance/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax.filter(
+					( rule ) => rule !== noStringLiteralIds
+				),
 			],
 		},
 	},
@@ -711,15 +994,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
-		},
-	},
-
 	// Override: block-editor, components, dataviews, ui src — enforce display names.
 	{
 		files: [
@@ -735,7 +1009,7 @@ export default dedupePlugins( [
 	},
 
 	// Override: Components src — allow ariakit/framer-motion imports and
-	// prevent new Emotion usage while existing styles are migrated.
+	// prevent Emotion imports from returning after the migration.
 	{
 		files: [ 'packages/components/src/**' ],
 		rules: {
@@ -748,7 +1022,13 @@ export default dedupePlugins( [
 								name
 							) && ! name.startsWith( '@emotion/' )
 					),
-					patterns: [ '@emotion/**' ],
+					patterns: [
+						{
+							group: [ '@emotion/**' ],
+							message:
+								'Please use SCSS Modules for styles and `clsx` to compose class names.',
+						},
+					],
 				},
 			],
 		},
@@ -784,7 +1064,7 @@ export default dedupePlugins( [
 	//
 	// See: https://github.com/storybookjs/storybook/issues/32839
 	{
-		files: [ 'packages/ui/src/**/stories/*.story.@(ts|tsx)' ],
+		files: [ `packages/ui/src/**/stories/*.story.${ TS_EXT }` ],
 		rules: {
 			'no-restricted-imports': [
 				'error',
@@ -827,6 +1107,66 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
+						},
+					],
+					patterns: [
+						{
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
+							message:
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
+						},
+					],
+				},
+			],
+		},
+	},
+
+	// Override: bundled packages — restrict private-apis imports, both direct
+	// and via each package's local `lock-unlock` wrapper module.
+	// `packages/ui` is excluded because this entry would replace its more
+	// specific overrides above; it gets the same restriction through
+	// `UI_RESTRICTED_IMPORTS`. `packages/e2e-test-utils-playwright` is
+	// excluded so its own `no-restricted-imports` override above (uuid) keeps
+	// applying; as Node-only test tooling it cannot hit this hazard.
+	{
+		files: bundledPackageFiles.filter(
+			( files ) =>
+				! [
+					'packages/ui/**',
+					'packages/e2e-test-utils-playwright/**',
+				].includes( files )
+		),
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						privateApisRestrictedImport,
+					],
+					patterns: [ lockUnlockRestrictedPattern ],
+				},
+			],
+		},
+	},
+
 	// Override: edit-post, edit-site — restrict interface imports.
 	{
 		files: [ 'packages/edit-post/**', 'packages/edit-site/**' ],
@@ -849,7 +1189,7 @@ export default dedupePlugins( [
 
 	// Override: block-library save files — no i18n in save.
 	{
-		files: [ 'packages/block-library/src/*/save.[tj]s?(x)' ],
+		files: [ `packages/block-library/src/*/save.${ SCRIPT_EXT }` ],
 		rules: {
 			'@wordpress/no-i18n-in-save': 'error',
 		},
@@ -860,19 +1200,6 @@ export default dedupePlugins( [
 		files: [ 'packages/interactivity*/src/**' ],
 		rules: {
 			'react/react-in-jsx-scope': 'error',
-		},
-	},
-
-	// Override: Packages which have eliminated dependency grouping comments
-	// and explicitly prevent new additions.
-	{
-		files: [
-			'packages/design-system-mcp/**',
-			'packages/ui/**',
-			'packages/theme/**',
-		],
-		rules: {
-			'@wordpress/dependency-group': [ 'error', 'never' ],
 		},
 	},
 
@@ -887,7 +1214,11 @@ export default dedupePlugins( [
 
 	// Override: eslint-plugin and theme — disable DS token rules.
 	{
-		files: [ 'packages/eslint-plugin/**', 'packages/theme/**' ],
+		files: [
+			'packages/eslint-plugin/**',
+			'packages/theme/**',
+			'packages/theme-build-tools/**',
+		],
 		rules: {
 			'@wordpress/no-setting-ds-tokens': 'off',
 			'@wordpress/no-unknown-ds-tokens': 'off',
@@ -903,19 +1234,6 @@ export default dedupePlugins( [
 	},
 
 	// --- Merged package-level configs ---
-
-	// From packages/block-serialization-spec-parser/.eslintrc.json:
-	// Add test-unit config for shared-tests.js with jest/no-export off.
-	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
-		...config,
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	} ) ),
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			'jest/no-export': 'off',
-		},
-	},
 
 	// From packages/dependency-extraction-webpack-plugin/lib/.eslintrc.json:
 	// Add Node.js globals for the lib directory.
@@ -935,7 +1253,7 @@ export default dedupePlugins( [
 		files: [
 			'packages/block-editor/src/components/inserter/media-tab/hooks.js',
 			'packages/block-editor/src/components/use-paste-styles/index.js',
-			'packages/block-library/src/pattern/edit.js',
+			'packages/block-library/src/pattern/edit.jsx',
 			'packages/components/src/sandbox/index.tsx',
 		],
 		rules: {
@@ -958,7 +1276,7 @@ export default dedupePlugins( [
 	// Override: typings — global type declarations require `var` and define
 	// the globals that wp-global-usage warns about.
 	{
-		files: [ 'typings/**/*.d.ts' ],
+		files: [ 'tools/monorepo/typings/**/*.d.ts' ],
 		rules: {
 			'no-var': 'off',
 			'@wordpress/wp-global-usage': 'off',

@@ -1,13 +1,5 @@
 /* eslint-disable playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
-import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
+import { test, expect, Metrics } from '@wordpress/e2e-test-utils-playwright';
 import { PerfUtils } from '../fixtures';
 import { sum } from '../utils.js';
 
@@ -28,7 +20,9 @@ const results = {
 	typeWithTopToolbar: [],
 	typeContainer: [],
 	focus: [],
+	firstFocus: [],
 	selectAll: [],
+	undo: [],
 	listViewOpen: [],
 	inserterOpen: [],
 	inserterHover: [],
@@ -75,15 +69,20 @@ test.describe( 'Post Editor Performance', () => {
 
 		const samples = 10;
 		const throwaway = 1;
-		const iterations = samples + throwaway;
+		// One more load is traced and not counted, as tracing slows it down.
+		const iterations = samples + throwaway + 1;
 		for ( let i = 1; i <= iterations; i++ ) {
 			test( `Run the test (${ i } of ${ iterations })`, async ( {
 				admin,
 				perfUtils,
 				metrics,
 			} ) => {
+				const isTraced = i === iterations;
+
 				// Start tracing before navigating so the page load is captured.
-				await metrics.startTracing();
+				if ( isTraced ) {
+					await metrics.startTracing();
+				}
 
 				// Open the test draft.
 				await admin.page.goto(
@@ -99,14 +98,12 @@ test.describe( 'Post Editor Performance', () => {
 				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
 
-				// Stop tracing. Save just one representative sample.
-				await metrics.stopTracing(
-					i === Math.floor( iterations / 2 ) &&
-						'post-editor-first-block'
-				);
+				if ( isTraced ) {
+					await metrics.stopTracing( 'post-editor-first-block' );
+				}
 
 				// Save the results.
-				if ( i > throwaway ) {
+				if ( i > throwaway && ! isTraced ) {
 					Object.entries( loadingDurations ).forEach(
 						( [ metric, duration ] ) => {
 							if ( metric === 'timeSinceResponseEnd' ) {
@@ -300,10 +297,17 @@ test.describe( 'Post Editor Performance', () => {
 				name: /Block: Paragraph/i,
 			} );
 
+			// The first click also mounts the block inspector, so it costs
+			// about twice a later one and gets its own metric.
 			const samples = 10;
-			const throwaway = 1;
-			const iterations = samples + throwaway;
+			const iterations = samples + 1;
 			for ( let i = 1; i <= iterations; i++ ) {
+				const paragraph = paragraphs.nth( i );
+
+				// Scroll first, so Playwright's auto-scroll on click stays
+				// out of the trace.
+				await paragraph.scrollIntoViewIfNeeded();
+
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
 				await page.waitForTimeout( BROWSER_IDLE_WAIT );
@@ -312,7 +316,7 @@ test.describe( 'Post Editor Performance', () => {
 				await metrics.startTracing();
 
 				// Click the next paragraph.
-				await paragraphs.nth( i ).click();
+				await paragraph.click();
 
 				// Stop tracing. Save just one representative sample.
 				await metrics.stopTracing(
@@ -321,14 +325,16 @@ test.describe( 'Post Editor Performance', () => {
 
 				// Get the durations.
 				const allDurations = metrics.getSelectionEventDurations();
+				const duration = allDurations.reduce(
+					( acc, eventDurations ) => acc + sum( eventDurations ),
+					0
+				);
 
 				// Save the results.
-				if ( i > throwaway ) {
-					results.focus.push(
-						allDurations.reduce( ( acc, eventDurations ) => {
-							return acc + sum( eventDurations );
-						}, 0 )
-					);
+				if ( i === 1 ) {
+					results.firstFocus.push( duration );
+				} else {
+					results.focus.push( duration );
 				}
 			}
 		} );
@@ -390,6 +396,130 @@ test.describe( 'Post Editor Performance', () => {
 				// Save the results.
 				if ( i > throwaway ) {
 					results.selectAll.push( sum( keyDownEvents ) );
+				}
+			}
+		} );
+	} );
+
+	test.describe( 'Undoing and redoing block changes', () => {
+		let draftId = null;
+
+		test( 'Set up the test post', async ( { admin, perfUtils } ) => {
+			await admin.createNewPost();
+			await perfUtils.load1000Paragraphs();
+			draftId = await perfUtils.saveDraft();
+		} );
+
+		test( 'Run the test', async ( { admin, page, perfUtils } ) => {
+			await admin.editPost( draftId );
+			await perfUtils.disableAutosave();
+			const canvas = await perfUtils.getCanvas();
+
+			// Focus the canvas so the undo shortcuts reach the editor.
+			await canvas
+				.getByRole( 'document', { name: /Block: Paragraph/i } )
+				.first()
+				.click();
+
+			// Undo re-renders off-screen blocks in later tasks, after the key
+			// events, so this measures all main thread work until idle.
+			const session = await page.context().newCDPSession( page );
+			await session.send( 'Performance.enable' );
+			const getTaskDuration = async () => {
+				const { metrics } = await session.send(
+					'Performance.getMetrics'
+				);
+				return (
+					metrics.find( ( { name } ) => name === 'TaskDuration' )
+						.value * 1000
+				);
+			};
+
+			// Idle once three idle periods in a row have time left, so no work
+			// is left, such as blocks updating in idle time. With the caret in
+			// the canvas, the browser draws every frame, so periods are short.
+			const waitForIdle = () =>
+				page.evaluate(
+					() =>
+						new Promise( ( resolve ) => {
+							let idlePeriods = 0;
+							const check = ( deadline ) => {
+								idlePeriods =
+									deadline.timeRemaining() > 10
+										? idlePeriods + 1
+										: 0;
+								if ( idlePeriods === 3 ) {
+									resolve();
+								} else {
+									window.requestIdleCallback( check );
+								}
+							};
+							window.requestIdleCallback( check );
+						} )
+				);
+
+			// Which of the two edited paragraphs have a drop cap.
+			const getDropCaps = ( clientIds ) =>
+				page.evaluate(
+					( ids ) =>
+						ids.map(
+							( id ) =>
+								!! window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).dropCap
+						),
+					clientIds
+				);
+
+			// Each step and which paragraphs have a drop cap after it.
+			const steps = [
+				[ 'ControlOrMeta+z', [ true, false ] ],
+				[ 'ControlOrMeta+z', [ false, false ] ],
+				[ 'ControlOrMeta+Shift+z', [ true, false ] ],
+			];
+			const throwaway = 1;
+			const iterations = 4 + throwaway;
+			for ( let i = 1; i <= iterations; i++ ) {
+				// Two undo levels: a drop cap on one paragraph, then another.
+				const clientIds = await page.evaluate( ( index ) => {
+					const { select, dispatch } = window.wp.data;
+					const ids = select( 'core/block-editor' )
+						.getBlockOrder()
+						.slice( index, index + 2 );
+					for ( const id of ids ) {
+						dispatch( 'core/block-editor' ).updateBlockAttributes(
+							id,
+							{ dropCap: true }
+						);
+					}
+					return ids;
+				}, i * 2 );
+				expect( await getDropCaps( clientIds ) ).toEqual( [
+					true,
+					true,
+				] );
+				expect(
+					await page.evaluate( () =>
+						window.wp.data.select( 'core' ).hasUndo()
+					)
+				).toBe( true );
+
+				for ( const [ key, dropCaps ] of steps ) {
+					await waitForIdle();
+					const start = await getTaskDuration();
+
+					await page.keyboard.press( key );
+					await waitForIdle();
+
+					const duration = ( await getTaskDuration() ) - start;
+					expect( await getDropCaps( clientIds ) ).toEqual(
+						dropCaps
+					);
+
+					// Save the results.
+					if ( i > throwaway ) {
+						results.undo.push( duration );
+					}
 				}
 			}
 		} );

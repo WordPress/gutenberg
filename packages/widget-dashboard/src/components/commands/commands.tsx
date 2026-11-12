@@ -1,17 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	useCommands,
 	privateApis as commandsPrivateApis,
 } from '@wordpress/commands';
+import type { CommandConfig } from '@wordpress/commands';
 import { layout as layoutIcon, plus, trash } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
@@ -28,8 +22,18 @@ type CommandCallback = ( options: { close: () => void } ) => void;
  * active command context so they surface under Suggestions by default.
  */
 export function Commands() {
-	const { editMode, onEditChange, onLayoutReset } =
+	const { editMode, onEditChange, onLayoutReset, canPerform, widgetTypes } =
 		useDashboardInternalContext();
+
+	const canCustomize = canPerform( { operation: 'customize' } );
+	const canReset = canPerform( { operation: 'reset' } );
+	const canInsertAny = useMemo(
+		() =>
+			widgetTypes.some( ( widgetType ) =>
+				canPerform( { operation: 'insert', widgetType } )
+			),
+		[ widgetTypes, canPerform ]
+	);
 
 	const { setInserterOpen, setResetDialogOpen } = useDashboardUIContext();
 
@@ -66,7 +70,7 @@ export function Commands() {
 		[ onEditChange ]
 	);
 
-	const commands = useMemo(
+	const commands = useMemo< CommandConfig[] >(
 		() => [
 			{
 				name: 'core/dashboard/customize',
@@ -75,7 +79,7 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'edit' ), __( 'widgets' ), __( 'layout' ) ],
-				disabled: ! onEditChange || editMode,
+				disabled: ! onEditChange || editMode || ! canCustomize,
 				callback: customize,
 			},
 			{
@@ -85,7 +89,11 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'widgets' ), __( 'inserter' ) ],
-				disabled: ! onEditChange,
+				// Outside edit mode the command enters it first.
+				disabled:
+					! onEditChange ||
+					! canInsertAny ||
+					( ! editMode && ! canCustomize ),
 				callback: addWidgets,
 			},
 			{
@@ -95,13 +103,16 @@ export function Commands() {
 				category: 'command',
 				context: DASHBOARD_COMMAND_CONTEXT,
 				keywords: [ __( 'reset' ), __( 'default' ) ],
-				disabled: ! onLayoutReset,
+				disabled: ! onLayoutReset || ! canReset,
 				callback: resetToDefault,
 			},
 		],
 		[
 			onEditChange,
 			editMode,
+			canCustomize,
+			canReset,
+			canInsertAny,
 			customize,
 			addWidgets,
 			onLayoutReset,

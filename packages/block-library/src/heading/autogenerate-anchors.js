@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import removeAccents from 'remove-accents';
+import { cleanForSlug } from '@wordpress/url';
 
 /**
  * Object map tracking anchors.
@@ -20,6 +17,12 @@ const anchors = {};
 const getTextWithoutMarkup = ( text ) => {
 	const dummyElement = document.createElement( 'div' );
 	dummyElement.innerHTML = text;
+	// Inline math keeps its LaTeX source in a MathML annotation, which
+	// browsers don't display, so leave it out of the anchor. Leave out
+	// footnote numbers too, which aren't part of the heading text.
+	dummyElement
+		.querySelectorAll( 'annotation, sup[data-fn]' )
+		.forEach( ( element ) => element.remove() );
 	return dummyElement.innerText;
 };
 
@@ -30,18 +33,7 @@ const getTextWithoutMarkup = ( text ) => {
  *
  * @return {string} Returns the slug.
  */
-const getSlug = ( content ) => {
-	// Get the slug.
-	return (
-		removeAccents( getTextWithoutMarkup( content ) )
-			// Convert anything that's not a letter or number to a hyphen.
-			.replace( /[^\p{L}\p{N}]+/gu, '-' )
-			// Convert to lowercase
-			.toLowerCase()
-			// Remove any remaining leading or trailing hyphens.
-			.replace( /(^-+)|(-+$)/g, '' )
-	);
-};
+const getSlug = ( content ) => cleanForSlug( getTextWithoutMarkup( content ) );
 
 /**
  * Generate the anchor for a heading.

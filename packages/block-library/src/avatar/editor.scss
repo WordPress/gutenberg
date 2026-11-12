@@ -7,3 +7,7 @@
 		margin: 0 auto;
 	}
 }
+
+.wp-block-avatar__help-text {
+	grid-column: 1 / -1;
+}

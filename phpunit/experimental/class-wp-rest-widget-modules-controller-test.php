@@ -74,9 +74,25 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'icon'          => 'core/calendar',
 				'actions'       => array(
 					array(
-						'id'    => 'open-settings',
-						'label' => 'Open settings',
-						'href'  => 'options-general.php',
+						'id'        => 'open-settings',
+						'label'     => 'Open settings',
+						'href'      => 'options-general.php',
+						'icon'      => 'core/cog',
+						'relevance' => 'low',
+					),
+				),
+				'attributes'    => array(
+					array(
+						'id'        => 'location',
+						'type'      => 'location',
+						'label'     => 'Event location',
+						'relevance' => 'high',
+					),
+				),
+				'example'       => array(
+					'attributes' => array(
+						'location' => 'Lisbon',
+						'perPage'  => 5,
 					),
 				),
 				'keywords'      => array( 'alpha', 'first' ),
@@ -164,12 +180,34 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'    => 'open-settings',
-					'label' => 'Open settings',
-					'href'  => 'options-general.php',
+					'id'        => 'open-settings',
+					'label'     => 'Open settings',
+					'href'      => 'options-general.php',
+					'icon'      => 'core/cog',
+					'relevance' => 'low',
 				),
 			),
 			$data['actions']
+		);
+		$this->assertSame(
+			array(
+				array(
+					'id'        => 'location',
+					'type'      => 'location',
+					'label'     => 'Event location',
+					'relevance' => 'high',
+				),
+			),
+			$data['attributes']
+		);
+		$this->assertSame(
+			array(
+				'attributes' => array(
+					'location' => 'Lisbon',
+					'perPage'  => 5,
+				),
+			),
+			$data['example']
 		);
 		$this->assertSame( array( 'alpha', 'first' ), $data['keywords'] );
 	}
@@ -223,6 +261,8 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'help', $properties );
 		$this->assertArrayHasKey( 'icon', $properties );
 		$this->assertArrayHasKey( 'actions', $properties );
+		$this->assertArrayHasKey( 'attributes', $properties );
+		$this->assertArrayHasKey( 'example', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
@@ -233,6 +273,26 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'object', 'null' ), $properties['help']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['icon']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['actions']['type'] );
+		$this->assertSame( array( 'array', 'null' ), $properties['attributes']['type'] );
+		$this->assertSame( array( 'object', 'null' ), $properties['example']['type'] );
+		$this->assertSame( 'object', $properties['example']['properties']['attributes']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
+
+		$action_properties = $properties['actions']['items']['properties'];
+		$this->assertArrayHasKey( 'icon', $action_properties );
+		$this->assertArrayHasKey( 'relevance', $action_properties );
+		$this->assertSame(
+			array( 'high', 'medium', 'low' ),
+			$action_properties['relevance']['enum']
+		);
+
+		$attribute_properties = $properties['attributes']['items']['properties'];
+		$this->assertArrayHasKey( 'id', $attribute_properties );
+		$this->assertArrayHasKey( 'isDisabled', $attribute_properties );
+		$this->assertArrayHasKey( 'elements', $attribute_properties );
+		$this->assertSame(
+			array( 'high', 'medium', 'low' ),
+			$attribute_properties['relevance']['enum']
+		);
 	}
 }

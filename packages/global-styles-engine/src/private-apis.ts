@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	getResponsiveMediaQueries,
 	getViewportBreakpoints,
@@ -11,6 +8,7 @@ import {
 	getDuotoneStylesheet,
 	getDuotoneUnsetStylesheet,
 } from './utils/duotone';
+import { transformToStylesWithTextClipBase } from './core/render';
 import { resolveStyle } from './resolve-style';
 import { getVariationStyle } from './variation';
 import { lock } from './lock-unlock';
@@ -25,4 +23,5 @@ lock( privateApis, {
 	getDuotoneUnsetStylesheet,
 	resolveStyle,
 	getVariationStyle,
+	transformToStylesWithTextClipBase,
 } );

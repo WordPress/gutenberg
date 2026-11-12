@@ -5,6 +5,13 @@
 	"help": {
 		"content": "Recent publishing and comment activity on this site."
 	},
+	"attributes": [
+		{
+			"id": "perPage",
+			"type": "integer",
+			"label": "Items per page"
+		}
+	],
 	"category": "dashboard",
 	"presentation": "content-bleed",
 	"textdomain": "default"

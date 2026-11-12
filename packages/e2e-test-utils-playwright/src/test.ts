@@ -1,16 +1,8 @@
 // Playwright fixtures use `use()` which is not a React hook.
-
-/**
- * External dependencies
- */
 import * as path from 'path';
 import { test as base, expect, chromium } from '@playwright/test';
 import type { ConsoleMessage } from '@playwright/test';
 import getPort from 'get-port';
-
-/**
- * Internal dependencies
- */
 import {
 	Admin,
 	Editor,
@@ -115,10 +107,7 @@ function observeConsoleLogging( message: ConsoleMessage ) {
 	const logFunction =
 		type as ( typeof OBSERVED_CONSOLE_MESSAGE_TYPES )[ number ];
 
-	// Disable reason: We intentionally bubble up the console message
-	// which, unless the test explicitly anticipates the logging via
-	// @wordpress/jest-console matchers, will cause the intended test
-	// failure.
+	// Forward browser console output to the test runner for reporting.
 	// eslint-disable-next-line no-console
 	console[ logFunction ]( text );
 }

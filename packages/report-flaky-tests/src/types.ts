@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { TestCaseResult } from '@jest/test-result';
 import type { TestResult } from '@playwright/test/reporter';
 
@@ -21,8 +18,7 @@ type PlaywrightTestFlakyTestResult = BaseFlakyTestResult & {
 };
 
 export type FlakyTestResult =
-	| JestCircusFlakyTestResult
-	| PlaywrightTestFlakyTestResult;
+	JestCircusFlakyTestResult | PlaywrightTestFlakyTestResult;
 
 export type ReportedFlakyTest = {
 	testTitle: string;

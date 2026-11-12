@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Field, NormalizedRules } from '../../types';
 import type { FieldType } from '../../types/private';
 

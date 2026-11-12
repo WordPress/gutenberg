@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __unstableMotion as motion } from '@wordpress/components';
 import {
 	useThrottle,
@@ -14,10 +7,6 @@ import {
 } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import { Skeleton } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useStyle } from './hooks';
 
 const normalizedWidth = 248;

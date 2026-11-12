@@ -1,26 +1,26 @@
 import { clone, get, OKLCH, set, type PlainColorObject } from 'colorjs.io/fn';
 import {
-	assertValidSeedColor,
 	clampToGamut,
 	getContrast,
 	getColorString,
-} from './color-utils';
-import { findColorMeetingRequirements } from './find-color-with-constraints';
+	parseSeedColor,
+} from './color-utils.ts';
+import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
 	adjustContrastTarget,
 	stepsForStep,
 	solveWithBisect,
-} from './utils';
+} from './utils.ts';
 import type {
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
-} from './types';
-import { CONTRAST_EPSILON } from './constants';
+} from './types.ts';
+import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -55,7 +55,6 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: string[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -73,12 +72,19 @@ function calculateRamp( {
 			sameAsIfPossible,
 		} = config[ stepName ];
 
-		const referenceColor = calculatedColors.get( contrast.reference );
-		if ( ! referenceColor ) {
-			throw new Error(
-				`Reference color for step ${ stepName } not found: ${ contrast.reference }`
-			);
-		}
+		const referenceNames = [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		];
+		const referenceColors = referenceNames.map( ( referenceName ) => {
+			const referenceColor = calculatedColors.get( referenceName );
+			if ( ! referenceColor ) {
+				throw new Error(
+					`Reference color for step ${ stepName } not found: ${ referenceName }`
+				);
+			}
+			return referenceColor;
+		} );
 
 		// Check if we can reuse color from the `sameAsIfPossible` config option
 		if ( sameAsIfPossible ) {
@@ -89,13 +95,14 @@ function calculateRamp( {
 				);
 			}
 
-			const candidateContrast = getContrast(
-				referenceColor,
-				candidateColor
-			);
 			const adjustedTarget = adjustContrastTarget( contrast.target );
-			// If the candidate meets the contrast requirement, use it
-			if ( candidateContrast >= adjustedTarget ) {
+			const candidateMeetsTarget = referenceColors.every(
+				( referenceColor ) =>
+					getContrast( referenceColor, candidateColor ) >=
+					adjustedTarget
+			);
+			// If the candidate meets every contrast requirement, use it.
+			if ( candidateMeetsTarget ) {
 				// Store the reused color
 				calculatedColors.set( stepName, candidateColor );
 				rampResults[ stepName ] = getColorString( candidateColor );
@@ -105,7 +112,7 @@ function calculateRamp( {
 		}
 
 		function computeDirection(
-			color: string | PlainColorObject,
+			colors: readonly PlainColorObject[],
 			followDirection: FollowDirection
 		): RampDirection {
 			if ( followDirection === 'main' ) {
@@ -118,7 +125,7 @@ function calculateRamp( {
 
 			if ( followDirection === 'best' ) {
 				return computeBetterFgColorDirection(
-					color,
+					colors,
 					contrast.preferLighter
 				).better;
 			}
@@ -127,8 +134,14 @@ function calculateRamp( {
 		}
 
 		const computedDir = computeDirection(
-			referenceColor,
+			referenceColors,
 			contrast.followDirection
+		);
+		const endpoint = computedDir === 'lighter' ? WHITE : BLACK;
+		const referenceColor = referenceColors.reduce( ( tightest, current ) =>
+			getContrast( current, endpoint ) < getContrast( tightest, endpoint )
+				? current
+				: tightest
 		);
 
 		const adjustedTarget = adjustContrastTarget( contrast.target );
@@ -176,16 +189,10 @@ function calculateRamp( {
 
 		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
-
-		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
-			warnings ??= [];
-			warnings.push( stepName );
-		}
 	}
 
 	return {
 		rampResults,
-		warnings,
 		maxDeficit,
 		maxDeficitDirection,
 		maxDeficitStep,
@@ -208,13 +215,12 @@ export function buildRamp(
 		rescaleToFitContrastTargets?: boolean;
 	} = {}
 ): RampResult {
-	// Validate here: the single point where user-supplied color strings enter.
-	// Internal recursive callers pass color objects to `clampToGamut` instead.
-	assertValidSeedColor( seedArg );
+	// Parse and validate here: the single point where user-supplied color strings enter.
+	const parsedSeed = parseSeedColor( seedArg );
 
 	let seed: PlainColorObject;
 	try {
-		seed = clampToGamut( seedArg );
+		seed = clampToGamut( parsedSeed );
 	} catch ( error ) {
 		throw new Error(
 			`Invalid seed color "${ seedArg }": ${
@@ -239,20 +245,15 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const {
-		rampResults,
-		warnings,
-		maxDeficit,
-		maxDeficitDirection,
-		maxDeficitStep,
-	} = calculateRamp( {
-		seed,
-		sortedSteps,
-		config,
-		mainDir,
-		oppDir,
-		pinLightness,
-	} );
+	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
+		calculateRamp( {
+			seed,
+			sortedSteps,
+			config,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} );
 
 	let bestRamp = rampResults;
 
@@ -299,15 +300,40 @@ export function buildRamp(
 		);
 
 		// Calculate the final ramp with adjusted seed.
-		bestRamp = calculateRamp( {
+		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
 			config,
 			mainDir,
 			oppDir,
 			pinLightness,
-		} ).rampResults;
+		} );
+		bestRamp = finalResult.rampResults;
+		seed = bestSeed;
 	}
+
+	// Check emitted colors, including reused steps. Numerical search results
+	// alone cannot establish their contrast after serialization.
+	const serializedSeed = getColorString( seed );
+	const warnings = sortedSteps.filter( ( stepName ) => {
+		const { contrast } = config[ stepName ];
+		if ( contrast.ignoreWhenAdjustingSeed ) {
+			return false;
+		}
+
+		return [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		].some(
+			( referenceName ) =>
+				getContrast(
+					bestRamp[ stepName ],
+					referenceName === 'seed'
+						? serializedSeed
+						: bestRamp[ referenceName ]
+				) < contrast.target
+		);
+	} );
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
@@ -320,7 +346,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings,
+		warnings: warnings.length ? warnings : undefined,
 		direction: mainDir,
 	};
 }

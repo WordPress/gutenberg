@@ -1,20 +1,16 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import type { StoryObj, Meta } from '@storybook/react-vite';
-/**
- * Internal dependencies
- */
 import { formDecorator } from './story-utils';
 import { ValidatedContentEditableControl } from '../content-editable-control';
 
 const meta: Meta< typeof ValidatedContentEditableControl > = {
-	title: 'Components/Selection & Input/Validated Form Controls/ValidatedContentEditableControl',
+	parameters: {
+		// FIXME: Contenteditable control is unlabeled (label).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+
+	title: 'Components/@wordpress-components/Selection & Input/Validated Form Controls/ValidatedContentEditableControl',
 	id: 'components-validatedcontenteditablecontrol',
 	component: ValidatedContentEditableControl,
 	tags: [ 'status-private' ],
@@ -42,7 +38,7 @@ export const Default: StoryObj< typeof ValidatedContentEditableControl > = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

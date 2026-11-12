@@ -1,12 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { registerFormatType, unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * IDs of the visually-hidden description elements rendered into the
- * revisions canvas (see revisions-canvas.js). Diff formats reference
+ * revisions canvas (see revisions-canvas.jsx). Diff formats reference
  * these via `aria-describedby` instead of a `title` attribute, since
  * `title` is inconsistently announced by screen readers in
  * low-verbosity modes.

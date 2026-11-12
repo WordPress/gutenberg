@@ -1,109 +1,79 @@
-/**
- * Internal dependencies
- */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
-	cropperReducer,
-	areCropperStatesEqual,
-	computeInscribedRect,
-	type CropperState,
-} from '../image-editor';
+	areImageEditorStatesEqual,
+	createImageEditorState,
+	type ImageEditorState,
+} from '@wordpress/image-editor';
 import {
 	DEFAULT_CROP_OPTIONS,
-	type CropOptionsSlice,
 	type MediaEditorAction,
 	type MediaEditorState,
 } from './types';
 
 /**
- * Pure composite reducer for the media editor.
+ * Pure reducer for the media editor.
  *
- * Delegates `CROPPER`-tagged actions to the framework-agnostic
- * `cropperReducer` and owns first-class transitions for the sidebar
- * `cropOptions` slice. `RESTORE_SNAPSHOT` replaces the whole composite
- * in one transaction (used by undo/redo).
+ * The image editor works out its own next state (through the controller from
+ * `@wordpress/image-editor`) and this reducer stores it. The reducer
+ * also owns the sidebar crop options and the named edits.
  *
- * Note: this reducer carries NO history of its own. Snapshots and
- * stacks live in the `useMediaEditorState` hook that wraps it.
+ * This reducer keeps no history; `useMediaEditorState` does.
  *
- * @param state  Current composite state.
+ * @param state  Current state.
  * @param action Action to apply.
- * @return Next composite state.
+ * @return Next state.
  */
 export function mediaEditorReducer(
 	state: MediaEditorState,
 	action: MediaEditorAction
 ): MediaEditorState {
 	switch ( action.type ) {
-		case 'CROPPER': {
-			const nextCropper = cropperReducer( state.cropper, action.action );
-			if ( nextCropper === state.cropper ) {
-				return state;
-			}
-			return { ...state, cropper: nextCropper };
-		}
-		case 'SET_ASPECT_RATIO_VALUE': {
-			const { presetKey, resolved, visualSize } = action.payload;
-			// Atomically: update the preset key AND reshape the
-			// cropRect (when the ratio is non-Free and we have a
-			// visualSize). One transaction = one undo entry.
-			const shouldReshape =
-				resolved !== undefined &&
-				resolved > 0 &&
-				visualSize.width > 0 &&
-				visualSize.height > 0;
-			const nextCropOptions: CropOptionsSlice = {
-				...state.cropOptions,
-				aspectRatioValue: presetKey,
-			};
-			if ( ! shouldReshape ) {
-				if ( state.cropOptions.aspectRatioValue === presetKey ) {
+		case 'SET_IMAGE_EDITOR':
+			return action.payload === state.imageEditor
+				? state
+				: { ...state, imageEditor: action.payload };
+		case 'SET_ASPECT_RATIO_VALUE':
+			return state.cropOptions.aspectRatioValue === action.payload
+				? state
+				: {
+						...state,
+						cropOptions: {
+							...state.cropOptions,
+							aspectRatioValue: action.payload,
+						},
+					};
+		case 'SET_EDIT': {
+			const { name, value } = action.payload;
+			if ( value === undefined ) {
+				if ( ! Object.hasOwn( state.edits, name ) ) {
 					return state;
 				}
-				return { ...state, cropOptions: nextCropOptions };
+				const edits = { ...state.edits };
+				delete edits[ name ];
+				return { ...state, edits };
 			}
-			const newCropRect = computeInscribedRect( resolved, visualSize );
-			const nextCropper = cropperReducer( state.cropper, {
-				type: 'SET_CROP_RECT',
-				payload: newCropRect,
-			} );
-			return {
-				cropper: nextCropper,
-				cropOptions: nextCropOptions,
-			};
-		}
-		case 'RESET_CROP_OPTIONS': {
-			if (
-				state.cropOptions.aspectRatioValue ===
-				DEFAULT_CROP_OPTIONS.aspectRatioValue
-			) {
+			if ( fastDeepEqual( state.edits[ name ], value ) ) {
 				return state;
 			}
-			return {
-				...state,
-				cropOptions: { ...DEFAULT_CROP_OPTIONS },
-			};
+			return { ...state, edits: { ...state.edits, [ name ]: value } };
+		}
+		case 'RESET': {
+			const next = buildInitialMediaEditorState(
+				createImageEditorState( { image: state.imageEditor.image } )
+			);
+			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}
 		case 'RESTORE_SNAPSHOT':
 			return action.payload;
-		case 'VIEWPORT_ADJUST_CROP_RECT': {
-			const nextCropper = cropperReducer( state.cropper, {
-				type: 'SET_CROP_RECT',
-				payload: action.payload,
-			} );
-			if ( nextCropper === state.cropper ) {
-				return state;
-			}
-			return { ...state, cropper: nextCropper };
-		}
 	}
 }
 
 /**
- * Value-equality check for two composite states. Used by the history
- * machinery to dedup snapshots when an action turned out to be a no-op.
+ * Value-equality check for two media editor states. The history uses it
+ * to skip snapshots when an action turned out to be a no-op.
  *
- * @param a First composite state.
- * @param b Second composite state.
+ * @param a First state.
+ * @param b Second state.
  * @return Whether `a` and `b` are value-equal across all slices.
  */
 export function areMediaEditorStatesEqual(
@@ -114,24 +84,25 @@ export function areMediaEditorStatesEqual(
 		return true;
 	}
 	return (
-		areCropperStatesEqual( a.cropper, b.cropper ) &&
-		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue
+		areImageEditorStatesEqual( a.imageEditor, b.imageEditor ) &&
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
+		fastDeepEqual( a.edits, b.edits )
 	);
 }
 
 /**
- * Build the initial composite state from optional partial overrides.
+ * Build the state a session starts from: the given image editor state,
+ * default crop options, and no edits.
  *
- * @param initialCropper Initial cropper-slice fields to merge.
- * @param initialOptions Initial cropOptions-slice fields to merge.
- * @return Composite initial state.
+ * @param imageEditor The image editor state.
+ * @return Initial state.
  */
 export function buildInitialMediaEditorState(
-	initialCropper: CropperState,
-	initialOptions?: Partial< CropOptionsSlice >
+	imageEditor: ImageEditorState
 ): MediaEditorState {
 	return {
-		cropper: initialCropper,
-		cropOptions: { ...DEFAULT_CROP_OPTIONS, ...initialOptions },
+		imageEditor,
+		cropOptions: { ...DEFAULT_CROP_OPTIONS },
+		edits: {},
 	};
 }

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { isValid as isValidDate } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { getDate } from '@wordpress/date';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 import parseTime from './parse-time';
 

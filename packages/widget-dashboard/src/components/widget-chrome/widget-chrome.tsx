@@ -1,20 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useId, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { plugins } from '@wordpress/icons';
 import { Card, Icon, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { WidgetContextProvider } from '../../context/widget-context';
 import { LoadingOverlay, WidgetFrame } from '../widget-frame';
@@ -72,7 +61,10 @@ export interface WidgetChromeProps {
  * the missing and resolving states.
  */
 export const WidgetChrome = forwardRef< HTMLDivElement, WidgetChromeProps >(
-	function WidgetChrome( { widget, index, className, headerToolbar }, ref ) {
+	function UnforwardedWidgetChrome(
+		{ widget, index, className, headerToolbar },
+		ref
+	) {
 		const { widgetTypes, isResolvingWidgetTypes, editMode } =
 			useDashboardInternalContext();
 		const widgetType = widgetTypes.find( ( t ) => t.name === widget.type );

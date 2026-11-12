@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -87,7 +85,6 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -120,7 +117,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'publish' ],
 			[
-				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
+				'Publishing failed. Keep this page open and try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -129,7 +126,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'private' ],
 			[
-				'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.',
+				'Publishing failed. Keep this page open and try publishing again.',
 				defaultExpectedAction,
 			],
 		],
@@ -138,7 +135,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'draft', 'future' ],
 			[
-				'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.',
+				'Scheduling failed. Keep this page open and try scheduling again.',
 				defaultExpectedAction,
 			],
 		],
@@ -147,7 +144,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				'Updating failed. Keep this page open and try updating again.',
 				defaultExpectedAction,
 			],
 		],
@@ -156,8 +153,18 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
-				defaultExpectedAction,
+				'Auto-save failed. You can also save manually.',
+				{ id: 'editor-autosave' },
+			],
+			{ isAutosave: true },
+		],
+		[
+			'when the autosave got no response',
+			'fetch_error',
+			[ 'publish', 'publish' ],
+			[
+				'Auto-save failed because there was no response from the server. You can also save manually.',
+				{ id: 'editor-autosave' },
 			],
 			{ isAutosave: true },
 		],
@@ -169,7 +176,6 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			expectedValue,
 			options = {},
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -204,7 +210,6 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const expectedValue = [ message, { id: 'editor-trash-fail' } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(

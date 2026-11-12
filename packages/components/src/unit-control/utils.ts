@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WPUnitControlUnit } from './types';
 
 const allUnits: Record< string, WPUnitControlUnit > = {
@@ -207,6 +200,42 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
 		step: 0.1,
 	},
+	cqw: {
+		value: 'cqw',
+		label: 'cqw',
+		a11yLabel: __( 'Container width (cqw)' ),
+		step: 0.1,
+	},
+	cqh: {
+		value: 'cqh',
+		label: 'cqh',
+		a11yLabel: __( 'Container height (cqh)' ),
+		step: 0.1,
+	},
+	cqi: {
+		value: 'cqi',
+		label: 'cqi',
+		a11yLabel: __( 'Container inline size (cqi)' ),
+		step: 0.1,
+	},
+	cqb: {
+		value: 'cqb',
+		label: 'cqb',
+		a11yLabel: __( 'Container block size (cqb)' ),
+		step: 0.1,
+	},
+	cqmin: {
+		value: 'cqmin',
+		label: 'cqmin',
+		a11yLabel: __( 'Container smallest dimension (cqmin)' ),
+		step: 0.1,
+	},
+	cqmax: {
+		value: 'cqmax',
+		label: 'cqmax',
+		a11yLabel: __( 'Container largest dimension (cqmax)' ),
+		step: 0.1,
+	},
 };
 
 /**
@@ -350,18 +379,6 @@ export function getValidParsedQuantityAndUnit(
 }
 
 /**
- * Takes a unit value and finds the matching accessibility label for the
- * unit abbreviation.
- *
- * @param unit Unit value (example: `px`)
- * @return a11y label for the unit abbreviation
- */
-export function getAccessibleLabelForUnit( unit: string ): string | undefined {
-	const match = ALL_CSS_UNITS.find( ( item ) => item.value === unit );
-	return match?.a11yLabel ? match?.a11yLabel : match?.value;
-}
-
-/**
  * Filters available units based on values defined a list of allowed unit values.
  *
  * @param allowedUnitValues Collection of allowed unit value strings.
@@ -378,7 +395,7 @@ export function filterUnitsWithSettings(
 	return Array.isArray( availableUnits )
 		? availableUnits.filter( ( unit ) =>
 				allowedUnitValues.includes( unit.value )
-		  )
+			)
 		: [];
 }
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
@@ -8,10 +5,6 @@ import {
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
-
-/**
- * Internal dependencies
- */
 import useTitle from '../routes/use-title';
 import { POST_TYPE_LABELS, TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';

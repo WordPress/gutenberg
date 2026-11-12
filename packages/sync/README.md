@@ -4,7 +4,7 @@ Sync entity data between peers for real-time collaboration using [CRDT](https://
 
 This package provides the syncing layer for real-time collaboration in the WordPress editor. It is built on [Yjs](https://docs.yjs.dev/), a CRDT implementation that enables multiple users to edit shared data concurrently without conflicts.
 
-See [CODE.md](./CODE.md) for architecture details.
+See [CODE.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/sync/CODE.md) for architecture details.
 
 ## Installation
 
@@ -24,45 +24,107 @@ The Awareness protocol should not be considered a public API. It is a third-part
 
 In general, awareness for core entity types is implemented by the `core-data` package and third-party Yjs providers should not provide their own awareness implementation. However, it may be desirable for custom entities to have a custom awareness implementation.
 
-### privateApis
+### ConnectionErrorCode
 
-Private @wordpress/sync APIs.
+Error codes reported by a sync provider when its connection fails.
+
+### CRDT_DOC_META_PERSISTENCE_KEY
+
+Key of the in-memory meta entry marking a CRDT document as loaded from persistence. It is not synced or persisted.
+
+### CRDT_RECORD_MAP_KEY
+
+Root-level key for the map that holds the entity record data.
+
+### createSyncManager
+
+Creates the sync manager, which orchestrates the lifecycle of syncing entity records: it creates Yjs documents, connects to providers, creates awareness instances, and coordinates with the `core-data` store. Exported for `@wordpress/core-data`; plugins don't need it.
+
+### Delta
+
+Quill Delta implementation used to describe rich text changes.
+
+### LOCAL_EDITOR_ORIGIN
+
+Origin string for CRDT document changes originating from the local editor.
+
+### LOCAL_UNDO_IGNORED_ORIGIN
+
+Origin string for CRDT document changes that should be synced but not recorded in the undo history (e.g. status changes during publish).
+
+### retrySyncConnection
+
+Retries the HTTP polling connection now instead of waiting for the next automatic retry. Exported for `@wordpress/core-data`; plugins don't need it.
 
 ### Y
 
-Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future. However, in order to allow third-party plugins to provide their own Yjs providers / sync transport, they must import and consume **our instance** of Yjs due to this bug / feature:
+Yjs should not be considered a public API. It is a third-party library that _will_ experience breaking changes in the future.
+
+`@wordpress/sync` is a bundled package: each consumer bundles its own copy, and no `wp.sync` global or `wp-sync` script handle is exposed by WordPress. Two Yjs instances operating on the same document cause silent data corruption:
 
 <https://github.com/yjs/yjs/issues/438>
 
-In other words, external code must be able to import Yjs from the `@wordpress/sync` package in their code, e.g.:
+For that reason, sync providers registered via the `sync.providers` filter must not bundle their own copy of Yjs. Each provider creator receives the Yjs module used by the editor as the `Y` property of its options, alongside `ydoc` and `awareness`, and must operate on documents through that instance.
+
+A provider that bundles third-party code importing `yjs` directly (for example `y-websocket`) can share the editor's Yjs instance through a shim module. The shim re-exports the Yjs symbols the bundled code uses and fills them in at runtime from the `Y` option:
 
 ```ts
-import { Y } from '@wordpress/sync';
+// yjs-shim.js
+export let Doc;
+export let applyUpdate;
+export let encodeStateAsUpdate;
+export let encodeStateVector;
+
+export function setYjsModule( Y ) {
+	( { Doc, applyUpdate, encodeStateAsUpdate, encodeStateVector } = Y );
+}
 ```
 
-Additionally, this import must resolve to `wp.sync` via `DependencyExtractionWebpackPlugin`. If you are using an older version of `@wordpress/scripts` that does not treat `@wordpress/sync` as an unbundled package, then you can use Webpack externals to manually resolve the package to the global `wp.sync` variable:
+The build then aliases the `yjs` module specifier to the shim, so bundled dependencies resolve their Yjs imports to it instead of packaging a second copy. For example, with webpack:
 
 ```ts
-externals: {
-  ...existingConfig.externals,
-  // Resolve @wordpress/sync to the global `wp.sync` provided by WordPress.
-  '@wordpress/sync': 'wp.sync',
-
-  // Resolve Yjs to the global `wp.sync.Y` provided by the sync package.
-  // Since dependencies import 'yjs' directly, we need to avoid importing
-  // and packaging two different Yjs instances, which would result in this
-  // conflict:
-  //
-  // https://github.com/yjs/yjs/issues/438
-  yjs: 'wp.sync.Y',
+resolve: {
+  alias: {
+    yjs: path.resolve( __dirname, 'src/yjs-shim.js' ),
+  },
 },
 ```
+
+Finally, the provider creator initializes the shim before using any of the bundled code:
+
+```ts
+import { WebsocketProvider } from 'y-websocket';
+import { setYjsModule } from './yjs-shim';
+
+const createProvider = async ( { awareness, ydoc, Y } ) => {
+	setYjsModule( Y );
+
+	const provider = new WebsocketProvider( url, room, ydoc, { awareness } );
+	// ...
+};
+```
+
+See `packages/e2e-tests/plugins/rtc-websocket-provider` for a complete working example.
 
 ### YJS_VERSION
 
 The major version of Yjs that is bundled and exported by this package. This can be used by third-party code to ensure that they are targeting a compatible version of Yjs.
 
 <!-- END TOKEN(Autogenerated API docs) -->
+
+## Undo and redo
+
+When real-time collaboration is enabled, the undo stack for synced entities is replaced with a Yjs `UndoManager` that watches the record's CRDT document. Each user gets their own history, so undo never reverts a collaborator's change. Without real-time collaboration, `@wordpress/core-data` records every edit to an entity record in its own undo history. This difference causes some minor changes to undo behavior under real-time collaboration.
+
+The following can be undone in the single-user editor but not when the record is synced:
+
+- **Edits to properties that are not synced.** The entity's sync config decides which properties are written to the CRDT document. For posts, `core-data` syncs the content, title, excerpt, status, date, slug, author, template, featured image, sticky, format, discussion settings, taxonomy terms, and registered post meta. Other properties, such as the parent page, the page order, and the post password, are not synced. Changing one of them adds no undo step, and collaborators do not see the change until the post is saved and they load it again.
+- **Edits that were overwritten by another change.** Undo does not overwrite a newer value. If a property was changed again after your edit, undoing your edit leaves the newer value in place. This prevents undo from reverting a change that another user made after yours. When a newer value is present, that undo step is skipped, and the next undo step is run instead.
+- **Edits made before syncing stopped.** The undo history of a record lives with its CRDT document. When the record is unloaded, for example when collaboration is turned off during a session because of an incompatible meta box, the undo steps recorded for it are discarded.
+
+Entities that are not synced, such as the site settings, keep their single-user undo behavior. Their edits are undone in order with the edits to synced records.
+
+See the "Undo / redo" section of [CODE.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/sync/CODE.md) for more information about real-time collaboration `SyncUndoManager` specifics.
 
 ## Contributing to this package
 

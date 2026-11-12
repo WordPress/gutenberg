@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { dispatch, select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { registerDashboardIconResolver } from './icons';
 
 /**

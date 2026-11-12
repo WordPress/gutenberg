@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { normalizeRowColSpan } from './utils';
 
 const tableContentPasteSchema = ( { phrasingContentSchema } ) => ( {

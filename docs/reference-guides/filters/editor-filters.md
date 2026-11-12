@@ -177,7 +177,7 @@ The following filters are available to extend features in the Editor.
 
 ### `editor.PostFeaturedImage.imageSize`
 
-You can use this filter to modify the image size displayed in the Post Featured Image component. It defaults to `'post-thumbnail'` and will fail back to the `full` image size when the specified image size doesn't exist in the media object. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
+You can use this filter to modify the image size of the featured image preview in the post editor. It defaults to `'large'` and falls back to the full image size when the specified image size doesn't exist in the media object. It's modeled after the `admin_post_thumbnail_size` filter in the Classic Editor.
 
 ```js
 import { addFilter } from '@wordpress/hooks';
@@ -312,7 +312,7 @@ Opaque animated GIFs are converted client-side to a companion MP4/WebM video, an
 
 A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.
 
-The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) and gives you access to the error object.
+The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) and gives you access to the error object, along with React's error info object, whose `componentStack` property describes where in the component tree the error was thrown.
 
 You can use this action to get hold of the error object handled by the boundaries. For example, you may want to send them to an external error-tracking tool. Here's an example:
 
@@ -322,10 +322,10 @@ import { addAction } from '@wordpress/hooks';
 addAction(
 	'editor.ErrorBoundary.errorLogged',
 	'mu-plugin/error-capture-setup',
-	( error ) => {
-		// Error is the exception's error object. 
+	( error, errorInfo ) => {
+		// Error is the exception's error object.
 		// You can console.log it or send it to an external error-tracking tool.
-		console.log ( error );
+		console.log ( error, errorInfo?.componentStack );
 	}
 );
 ```

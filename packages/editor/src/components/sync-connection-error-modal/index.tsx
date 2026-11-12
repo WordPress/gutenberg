@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
@@ -8,7 +5,6 @@ import {
 	store as coreDataStore,
 	privateApis as coreDataPrivateApis,
 } from '@wordpress/core-data';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 // prettier-ignore
 import { privateApis, store as blockEditorStore } from '@wordpress/block-editor';
 import {
@@ -20,10 +16,6 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	getSyncErrorMessages,
 	PROTOCOL_MISMATCH,
@@ -180,7 +172,7 @@ export function SyncConnectionErrorModal() {
 		? () => {
 				onManualRetry();
 				retrySyncConnection();
-		  }
+			}
 		: undefined;
 
 	const messages = getSyncErrorMessages( error );

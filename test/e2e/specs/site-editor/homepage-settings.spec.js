@@ -1,9 +1,15 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Both site editors default the pages screen to the list layout, a grid
+// whose items are buttons labelled by the page title.
+const getPageRow = ( page, title ) =>
+	page.getByRole( 'row' ).filter( {
+		has: page.getByRole( 'gridcell' ).getByLabel( title ),
+	} );
+
 test.describe( 'Homepage Settings via Editor', () => {
+	let aboutId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
 		await requestUtils.createPage( {
@@ -18,11 +24,19 @@ test.describe( 'Homepage Settings via Editor', () => {
 			title: 'Draft page',
 			status: 'draft',
 		} );
+		const about = await requestUtils.createPage( {
+			title: 'About',
+			status: 'publish',
+		} );
+		aboutId = about.id;
+		await requestUtils.createPage( {
+			title: 'Contact',
+			status: 'publish',
+		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -39,12 +53,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test( 'should not show "Set as homepage" and "Set as posts page" action on pages with `draft` status', async ( {
 		page,
 	} ) => {
-		const draftPage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Draft page' );
-		const draftPageRow = page
-			.getByRole( 'row' )
-			.filter( { has: draftPage } );
+		const draftPageRow = getPageRow( page, 'Draft page' );
 		await draftPageRow.hover();
 		await draftPageRow
 			.getByRole( 'button', {
@@ -62,8 +71,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 	test( 'should show correct homepage actions based on current homepage or posts page', async ( {
 		page,
 	} ) => {
-		const homePage = page.getByRole( 'gridcell' ).getByLabel( 'Homepage' );
-		const homePageRow = page.getByRole( 'row' ).filter( { has: homePage } );
+		const homePageRow = getPageRow( page, 'Homepage' );
 		await homePageRow.click();
 		await homePageRow
 			.getByRole( 'button', {
@@ -89,12 +97,7 @@ test.describe( 'Homepage Settings via Editor', () => {
 			page.getByRole( 'menu', { name: 'Actions' } )
 		).toBeHidden();
 
-		const postsPage = page
-			.getByRole( 'gridcell' )
-			.getByLabel( 'Posts page' );
-		const postsPageRow = page
-			.getByRole( 'row' )
-			.filter( { has: postsPage } );
+		const postsPageRow = getPageRow( page, 'Posts page' );
 		await postsPageRow.click();
 		await postsPageRow
 			.getByRole( 'button', {
@@ -121,5 +124,37 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await expect(
 			page.getByRole( 'menu', { name: 'Actions' } )
 		).toBeHidden();
+	} );
+
+	test( 'should show the homepage actions again on the previous homepage', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: aboutId,
+			page_for_posts: 0,
+		} );
+		await admin.visitSiteEditor( { postType: 'page' } );
+
+		const contactPageRow = getPageRow( page, 'Contact' );
+		await contactPageRow.click();
+		await contactPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Set as homepage' } ).click();
+		await page.getByRole( 'button', { name: 'Set homepage' } ).click();
+		await expect( page.getByRole( 'dialog' ) ).toBeHidden();
+
+		// Without reloading, the previous homepage can be set as the homepage
+		// or as the posts page again.
+		const aboutPageRow = getPageRow( page, 'About' );
+		await aboutPageRow.click();
+		await aboutPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+		).toBeVisible();
 	} );
 } );

@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 export { attr, prop, text, query } from 'hpq';
-
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 export { matcher as node } from './node';
 export { matcher as children } from './children';
 
@@ -57,6 +46,6 @@ export const richText =
 		return target
 			? RichTextData.fromHTMLElement( target as HTMLElement, {
 					preserveWhiteSpace,
-			  } )
+				} )
 			: RichTextData.empty();
 	};

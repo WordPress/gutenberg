@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -11,10 +8,6 @@ import { __ } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedField } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import getHideableFields from '../../utils/get-hideable-fields';
@@ -53,7 +46,7 @@ export function PropertiesSection( {
 } ) {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
-	// Get all regular fields (non-locked) in their original order from fields prop
+	// Get all regular fields (non-locked), sorted alphabetically by label.
 	const regularFields = getHideableFields( view, fields );
 
 	if ( ! regularFields?.length ) {
@@ -151,7 +144,7 @@ export function PropertiesSection( {
 											? visibleFieldIds.filter(
 													( fieldId ) =>
 														fieldId !== field.id
-											  )
+												)
 											: [ ...visibleFieldIds, field.id ],
 									} );
 								} }

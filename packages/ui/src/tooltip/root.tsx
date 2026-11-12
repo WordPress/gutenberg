@@ -1,5 +1,6 @@
 import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import type { RootProps } from './types';
+import { DirectionProvider } from '../utils/direction-provider';
 
 /**
  * `Tooltip` is used to visually show the label of an icon button, or other such
@@ -15,7 +16,11 @@ import type { RootProps } from './types';
  * @see {@link https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-iconbutton--docs IconButton}
  */
 function Root( props: RootProps ) {
-	return <_Tooltip.Root { ...props } />;
+	return (
+		<DirectionProvider>
+			<_Tooltip.Root { ...props } />
+		</DirectionProvider>
+	);
 }
 
 export { Root };

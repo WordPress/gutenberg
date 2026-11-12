@@ -1,21 +1,15 @@
-/**
- * External dependencies
- */
-const fs = require( 'node:fs' );
-const os = require( 'node:os' );
-const path = require( 'node:path' );
-const { spawnSync } = require( 'node:child_process' );
-
-/**
- * Internal dependencies
- */
-const {
+import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import {
 	cherryPickAll,
 	cherryPickOne,
 	isGhVersionSupported,
 	parseGhVersion,
 	MINIMUM_GH_VERSION,
-} = require( '../cherry-pick.mjs' );
+} from '../cherry-pick.mjs';
 
 const LOCAL_AUTHOR = {
 	name: 'Marco Ciampini',
