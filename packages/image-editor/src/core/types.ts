@@ -1,17 +1,10 @@
 import type { mat2d } from 'gl-matrix';
 
 /**
- * A 2D camera represented as a 2×3 affine transformation matrix (`mat2d`).
- *
- * This is not a camera object with properties — it's a raw 6-element matrix
- * `[a, b, c, d, tx, ty]` that maps normalized world coordinates [0,1] to
- * screen pixels. It composes pan, rotation, flip, zoom, and contain-fit
- * into a single transform.
- *
- * Use `createCamera()` to build one from `InternalImageEditorState`, then pass it to
- * `worldToScreen()` / `screenToWorld()` for coordinate conversion.
- *
- * A 3D camera would use `mat4`; this is strictly 2D (no perspective).
+ * A 2D matrix (`mat2d`) that maps points on the image, in fractions from 0
+ * to 1, to screen pixels. It combines the pan, rotation, flip, zoom and the
+ * fit of the image in the container. Build one with `createCamera()`, and
+ * convert points with `worldToScreen()` and `screenToWorld()`.
  */
 export type Camera = mat2d;
 
@@ -54,23 +47,6 @@ export interface Flip {
 }
 
 /**
- * A JSON-serializable transform operation for the non-destructive pipeline.
- */
-export type TransformOperation =
-	/**
-	 * Place the crop box in the view the canvas shows, in fractions of
-	 * the view. Which part of the image it frames depends on the pan and
-	 * zoom.
-	 */
-	| { type: 'crop'; rect: NormalizedRect }
-	/** Rotate clockwise on screen by this many degrees, from where it is. */
-	| { type: 'rotate'; degrees: number }
-	/** Flip along this axis, or undo a flip already there. */
-	| { type: 'flip'; direction: 'horizontal' | 'vertical' }
-	/** Set the zoom level. 1 = no zoom. */
-	| { type: 'zoom'; level: number };
-
-/**
  * The state of an image editor, as consumers see it. Store it and pass it
  * back, but create it with `createImageEditorState` and change it only
  * through the controller: the stored object also carries values the
@@ -105,26 +81,20 @@ export interface ImageEditorState {
 
 /**
  * The full state the editor stores: what consumers see, plus the base
- * pan, zoom and rotation the reducer keeps for fine rotation.
+ * pan, zoom and rotation the reducer keeps for fine rotation. The fields
+ * shared with `ImageEditorState` mean the same as there.
  */
 export interface InternalImageEditorState {
-	/** The source image information. Null until an image is loaded. */
 	image: {
 		src: string;
 		naturalWidth: number;
 		naturalHeight: number;
 	} | null;
-	/**
-	 * Image pan offset in normalized coordinates. Not the crop
-	 * rectangle — that's `cropRect` below.
-	 */
 	pan: NormalizedPoint;
-	/** Zoom level. 1 = no zoom. */
 	zoom: number;
-	/** Rotation in degrees, normalized to 0-360. */
 	rotation: number;
 	/**
-	 * Base pan/zoom/rotation — the pose the user last explicitly set.
+	 * Base pan, zoom and rotation: the pose the person last set.
 	 *
 	 * During continuous fine rotation (SET_ROTATION), every tick
 	 * re-derives the transient `pan`/`zoom` from these base values
@@ -141,14 +111,8 @@ export interface InternalImageEditorState {
 	basePan: NormalizedPoint;
 	baseZoom: number;
 	baseRotation: number;
-	/** Flip state. */
 	flip: Flip;
-	/** The crop rectangle in normalized coordinates. */
 	cropRect: NormalizedRect;
-	/**
-	 * Locked width / height ratio of the crop, in source pixels.
-	 * `undefined` means free: the crop can take any shape.
-	 */
 	aspectRatio?: number;
 }
 
@@ -188,8 +152,6 @@ export type ImageEditorAction =
 	| { type: 'SET_ASPECT_RATIO'; payload: number | undefined }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
-	/** Applies a single pipeline transform via the reducer. */
-	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
 	| { type: 'RESET'; payload?: Partial< InternalImageEditorState > };
 
