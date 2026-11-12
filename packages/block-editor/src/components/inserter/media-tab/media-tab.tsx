@@ -9,7 +9,15 @@ import SourceMenu from './source-menu';
 import InserterNoResults from '../no-results';
 import type { MediaCategory, MediaType } from './types';
 
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
+const ALLOWED_MEDIA_TYPES = [
+	'image',
+	'video',
+	'audio',
+	'application',
+	'text',
+];
+// The types with a block of their own. Anything else is inserted as a file.
+const BLOCK_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 
 // The categories that together make up the media library: one per media type,
 // shown as tabs rather than as separate sources. Everything else a category
@@ -18,7 +26,7 @@ const ALLOWED_MEDIA_TYPES = [ 'image', 'video', 'audio' ];
 // set collapses into the one "Media library" source.
 // TODO: `InserterMediaCategory` has no notion of grouping, so this matches by
 // name. A `group` property on the registration API would do this properly.
-const LIBRARY_CATEGORIES = [ 'images', 'videos', 'audio' ];
+const LIBRARY_CATEGORIES = [ 'images', 'videos', 'audio', 'files' ];
 
 const LIBRARY_SOURCE = 'media-library';
 const DEFAULT_MEDIA_TYPE: MediaType = 'image';
@@ -49,7 +57,7 @@ function MediaTab( {
 			const item = media as {
 				url?: string;
 				mime_type?: string;
-				type?: MediaType;
+				type?: string;
 			};
 			if ( ! item?.url ) {
 				return;
@@ -61,13 +69,16 @@ function MediaTab( {
 					__experimentalDataViewsMediaModal?: boolean;
 				}
 			 ).__experimentalDataViewsMediaModal;
-			const mediaType =
+			const type =
 				isDataViewsModal && item.mime_type
-					? ( item.mime_type.split( '/' )[ 0 ] as MediaType )
+					? item.mime_type.split( '/' )[ 0 ]
 					: item.type;
-			if ( ! mediaType ) {
+			if ( ! type ) {
 				return;
 			}
+			const mediaType = (
+				BLOCK_MEDIA_TYPES.includes( type ) ? type : 'application'
+			) as MediaType;
 			const [ block ] = getBlockAndPreviewFromMedia(
 				{ ...item, url: item.url },
 				mediaType

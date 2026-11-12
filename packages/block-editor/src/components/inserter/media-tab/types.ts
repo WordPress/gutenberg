@@ -20,14 +20,15 @@ export type MediaCategory = InserterMediaCategory & { label: string };
  * An `InserterMediaItem` (see the `registerInserterMediaCategory` typedef in
  * the store actions). Core sources spread the attachment record in, so `date`
  * is present for them and absent for external sources, and `title` arrives as
- * the REST `{ rendered }` object rather than the plain string the interface
- * promises.
+ * the REST `{ raw, rendered }` object rather than the plain string the
+ * interface promises.
  */
 export type MediaItem = {
 	id?: number;
 	sourceId?: number | string;
-	title?: string | { rendered?: string };
+	title?: string | { raw?: string; rendered?: string };
 	url: string;
+	mime_type?: string;
 	previewUrl?: string;
 	alt?: string;
 	caption?: string;

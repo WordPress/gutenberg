@@ -1044,6 +1044,57 @@ test.describe( 'insert media from inserter', () => {
 	} );
 } );
 
+test.describe( 'insert a file from inserter', () => {
+	let uploadedFile;
+	let uploadedImage;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+		uploadedFile = await requestUtils.uploadMedia(
+			'./assets/e2e-test-document.pdf'
+		);
+		uploadedImage = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await Promise.all( [
+			requestUtils.deleteAllMedia(),
+			requestUtils.deleteAllPosts(),
+		] );
+	} );
+
+	test( 'inserts any library item as a File block', async ( {
+		admin,
+		page,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+
+		await page.getByLabel( 'Block Inserter' ).click();
+		await page.getByRole( 'tab', { name: 'Media' } ).click();
+		await page.getByRole( 'tab', { name: 'Files' } ).click();
+		// Files lists the whole library, documents and images alike.
+		await expect(
+			page.getByRole( 'button', { name: uploadedFile.title.raw } )
+		).toBeVisible();
+		await page
+			.getByRole( 'button', { name: uploadedImage.title.raw } )
+			.click();
+		// Inserted from the library as is, so it keeps the attachment's id.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/file',
+				attributes: {
+					id: uploadedImage.id,
+					href: uploadedImage.source_url,
+				},
+			},
+		] );
+	} );
+} );
+
 test.describe( 'Attached images media category', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [

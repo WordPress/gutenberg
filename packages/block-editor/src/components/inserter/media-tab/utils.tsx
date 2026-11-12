@@ -1,5 +1,7 @@
 import { createBlock } from '@wordpress/blocks';
+import { _x } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
+import { getFilename } from '@wordpress/url';
 import type { Block } from '@wordpress/blocks';
 import type { ReactElement, SyntheticEvent } from 'react';
 import FilePreview from './file-preview';
@@ -11,11 +13,31 @@ const mediaTypeTag: Partial< Record< MediaType, 'img' | 'video' > > = {
 };
 
 /**
- * A media item minus `title`, which the interface types as a required
- * string while core sources spread in the REST record's `{ raw, rendered }`
- * object and others may omit it. Neither helper here reads it.
+ * Creates a File block for media that has no block of its own, such as a PDF.
+ * Mirrors what the File block sets when a file is chosen from its placeholder.
+ *
+ * @param media The media object to create the block from.
+ * @return The File block.
  */
-type MediaItemFields = Omit< MediaItem, 'title' >;
+function createFileBlock( media: MediaItem ): Block {
+	const title =
+		typeof media.title === 'string'
+			? media.title
+			: media.title?.raw || media.title?.rendered;
+	const isPdf =
+		media.mime_type === 'application/pdf' ||
+		getFilename( media.url )?.toLowerCase().endsWith( '.pdf' );
+	return createBlock( 'core/file', {
+		id: media.id || undefined,
+		href: media.url,
+		fileName: title || getFilename( media.url ),
+		textLinkHref: media.url,
+		// `createBlock` bypasses the default variation, which is where the
+		// translated button text is set, so set it here as the transforms do.
+		downloadButtonText: _x( 'Download', 'button label' ),
+		displayPreview: isPdf || undefined,
+	} );
+}
 
 /**
  * A media item's id, used for item identity in the grid.
@@ -29,7 +51,7 @@ type MediaItemFields = Omit< MediaItem, 'title' >;
  * @param media The media object.
  * @return The id, as a string.
  */
-export function getItemId( media: MediaItemFields ): string {
+export function getItemId( media: MediaItem ): string {
 	return String( media.id ?? media.sourceId ?? media.url );
 }
 
@@ -41,7 +63,7 @@ export function getItemId( media: MediaItemFields ): string {
  * @return An array containing the block and the preview element.
  */
 export function getBlockAndPreviewFromMedia(
-	media: MediaItemFields,
+	media: MediaItem,
 	mediaType: MediaType
 ): [ Block, ReactElement ] {
 	// Add the common attributes between the different media types.
@@ -75,5 +97,9 @@ export function getBlockAndPreviewFromMedia(
 	) : (
 		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
 	);
-	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];
+	const block =
+		mediaType === 'application'
+			? createFileBlock( media )
+			: createBlock( `core/${ mediaType }`, attributes );
+	return [ block, preview ];
 }
