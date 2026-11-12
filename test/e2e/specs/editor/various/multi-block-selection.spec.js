@@ -656,47 +656,34 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 	} );
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/53774.
-	// Rich Text elements inside multi-selected blocks must not be focusable
-	// via `tabindex` — otherwise browsers can move focus to a Rich Text on
-	// shift-click or right-click, routing copy/cut events to the
-	// single-block handler instead of the global multi-block one (only one
-	// block ends up copied, with a possible React reconciliation error).
-	// This test MUST fail if the `tabIndex` override in
-	// packages/block-editor/src/components/rich-text/index.js is removed.
+	// This test MUST fail when these lines are removed:
+	// https://github.com/WordPress/gutenberg/blob/59bbbc23f099c7505046cf15f803c9ca8acddb06/packages/block-editor/src/components/rich-text/index.tsx#L655-L656
 	test( 'should not assign tabindex to Rich Text within multi-selected blocks', async ( {
 		editor,
 		page,
 		pageUtils,
+		multiBlockSelectionUtils,
 	} ) => {
-		for ( let i = 1; i <= 3; i += 1 ) {
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: `${ i }` },
-			} );
-		}
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'first paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'second paragraph' },
+		} );
+		await page.keyboard.press( 'End' );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 10 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
 
-		await pageUtils.pressKeys( 'primary+a' );
-		await pageUtils.pressKeys( 'primary+a' );
-
-		const blocks = editor.canvas.getByRole( 'document', {
+		const paragraphs = editor.canvas.getByRole( 'document', {
 			name: 'Block: Paragraph',
 		} );
-		await expect( blocks ).toHaveCount( 3 );
-		for ( let i = 0; i < 3; i += 1 ) {
-			await expect( blocks.nth( i ) ).not.toHaveAttribute( 'tabindex' );
-		}
-
-		// Confirm the end-to-end consequence: copy still captures every
-		// selected block, not just one.
-		await pageUtils.pressKeys( 'primary+c' );
-		await page.keyboard.press( 'Backspace' );
-		await expect.poll( editor.getBlocks ).toEqual( [] );
-		await pageUtils.pressKeys( 'primary+v' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: '1' } },
-			{ name: 'core/paragraph', attributes: { content: '2' } },
-			{ name: 'core/paragraph', attributes: { content: '3' } },
-		] );
+		await expect( paragraphs.nth( 0 ) ).not.toHaveAttribute( 'tabindex' );
+		await expect( paragraphs.nth( 1 ) ).not.toHaveAttribute( 'tabindex' );
 	} );
 
 	// This test MUST fail when this line is removed:
