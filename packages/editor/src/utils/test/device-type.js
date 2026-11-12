@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getAvailableDeviceTypes,
 	getCanvasWidthByDeviceType,
 	getDeviceTypeByCanvasWidth,
+	getNextDeviceType,
 } from '../device-type';
 
 describe( 'device type utilities', () => {
@@ -116,6 +118,44 @@ describe( 'device type utilities', () => {
 			'Mobile'
 		);
 		expect( getDeviceTypeByCanvasWidth( 1200, viewportSettings ) ).toBe(
+			'Desktop'
+		);
+	} );
+
+	it( 'offers every device type when using default viewport breakpoints', () => {
+		expect( getAvailableDeviceTypes() ).toEqual( [
+			'Desktop',
+			'Tablet',
+			'Mobile',
+		] );
+	} );
+
+	it( 'only offers the device types that have a viewport breakpoint', () => {
+		expect( getAvailableDeviceTypes( { mobile: '600px' } ) ).toEqual( [
+			'Desktop',
+			'Mobile',
+		] );
+	} );
+
+	it( 'cycles through the device types and wraps around', () => {
+		expect( getNextDeviceType( 'Desktop' ) ).toBe( 'Tablet' );
+		expect( getNextDeviceType( 'Tablet' ) ).toBe( 'Mobile' );
+		expect( getNextDeviceType( 'Mobile' ) ).toBe( 'Desktop' );
+	} );
+
+	it( 'skips device types without a viewport breakpoint when cycling', () => {
+		const viewportSettings = { mobile: '600px' };
+
+		expect( getNextDeviceType( 'Desktop', viewportSettings ) ).toBe(
+			'Mobile'
+		);
+		expect( getNextDeviceType( 'Mobile', viewportSettings ) ).toBe(
+			'Desktop'
+		);
+	} );
+
+	it( 'moves to Desktop from a device type that is not offered', () => {
+		expect( getNextDeviceType( 'Tablet', { mobile: '600px' } ) ).toBe(
 			'Desktop'
 		);
 	} );
