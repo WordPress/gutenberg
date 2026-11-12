@@ -275,6 +275,14 @@ describe( 'buildRamps', () => {
 			const seedChroma = get( seed, [ OKLCH, 'c' ] );
 			const seedHue = get( seed, [ OKLCH, 'h' ] );
 
+			// Both steps retain tint for all four seeds after rounding.
+			expect( get( ramp.surface1, [ OKLCH, 'c' ] ) ).toBeGreaterThan(
+				0.001
+			);
+			expect( get( ramp.stroke3, [ OKLCH, 'c' ] ) ).toBeGreaterThan(
+				0.001
+			);
+
 			for ( const step of [
 				'surface1',
 				'surface3',
@@ -306,6 +314,14 @@ describe( 'buildRamps', () => {
 			}
 		}
 	);
+
+	it( 'keeps tapered accent surfaces gray for a near-gray primary', () => {
+		const background = buildBgRamp( '#fcfcfc' );
+		const { ramp } = buildAccentRamp( '#222524', background );
+
+		expect( ramp.surface2 ).toBe( '#f8f8f8' );
+		expect( ramp.surface6 ).toBe( '#d1d1d1' );
+	} );
 
 	it( 'does not return warnings resolved by seed rescaling', () => {
 		const result = buildBgRamp( '#3876a8' );

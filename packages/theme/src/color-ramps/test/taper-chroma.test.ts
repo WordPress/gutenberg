@@ -32,7 +32,8 @@ describe( 'taperChroma', () => {
 		const getNearGrayChroma = ( chroma: number ) =>
 			getTaperedChroma(
 				{ space: OKLCH, coords: [ 0.99, chroma, 250 ], alpha: 1 },
-				0.8
+				0.8,
+				{ preserveNearGrayTint: true }
 			);
 		const chromas = [ 0.0005, 0.002, 0.0049, 0.0051 ].map(
 			getNearGrayChroma
@@ -42,7 +43,7 @@ describe( 'taperChroma', () => {
 			expect( chromas[ index ] ).toBeGreaterThan( chromas[ index - 1 ] );
 		}
 		expect( chromas[ 0 ] ).toBeGreaterThan( 0 );
-		expect( chromas[ 0 ] ).toBeLessThan( 0.0005 * 5 );
+		expect( chromas[ 0 ] ).toBeLessThan( 0.00051 );
 	} );
 
 	it.each( [ 0.0005, 0.0045, 0.005 ] )(
@@ -56,15 +57,11 @@ describe( 'taperChroma', () => {
 
 			for ( const lightness of [ 0.2, 0.5, 0.8, 0.98 ] ) {
 				const limited = getTaperedChroma( seed, lightness, {
-					nearGrayChromaRatio: 1,
-					nearGrayChroma: 0.02,
+					preserveNearGrayTint: true,
 				} );
 
 				expect( limited ).toBeGreaterThan( 0 );
 				expect( limited ).toBeLessThanOrEqual( chroma * 1.0625 );
-				expect( limited ).toBeLessThanOrEqual(
-					getTaperedChroma( seed, lightness )
-				);
 			}
 		}
 	);
@@ -78,8 +75,7 @@ describe( 'taperChroma', () => {
 		for ( const lightness of [ 0.2, 0.5, 0.8, 0.98 ] ) {
 			expect(
 				getTaperedChroma( seed, lightness, {
-					nearGrayChromaRatio: 1,
-					nearGrayChroma: 0.02,
+					preserveNearGrayTint: true,
 				} )
 			).toBe( getTaperedChroma( seed, lightness ) );
 		}
@@ -88,7 +84,8 @@ describe( 'taperChroma', () => {
 	it( 'keeps a gray seed gray', () => {
 		const result = taperChroma(
 			{ space: OKLCH, coords: [ 0.26, 0, NaN ], alpha: 1 },
-			0.3
+			0.3,
+			{ preserveNearGrayTint: true }
 		);
 
 		expect( 'c' in result ? result.c : result.coords[ 1 ] ).toBe( 0 );
