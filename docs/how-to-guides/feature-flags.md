@@ -1,3 +1,4 @@
+
 # Feature Flags
 
 'Feature flags' are variables that allow you to prevent specific code in the Gutenberg project from being shipped to WordPress core, and to run certain experimental features only in the plugin.
@@ -42,7 +43,7 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 
 During the webpack build, instances of `globalThis.IS_GUTENBERG_PLUGIN` will be replaced using webpack's [define plugin](https://webpack.js.org/plugins/define-plugin/).
 
-For example, in the following code –
+For example, in the following code:
 
 ```js
 if ( globalThis.IS_GUTENBERG_PLUGIN ) {
@@ -50,7 +51,7 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-– the variable `globalThis.IS_GUTENBERG_PLUGIN` will be replaced with the boolean `true` during the plugin-only build:
+The variable `globalThis.IS_GUTENBERG_PLUGIN` will be replaced with the boolean `true` during the plugin-only build:
 
 ```js
 if ( true ) {
@@ -74,7 +75,7 @@ if ( undefined ) {
 
 ### Dead code elimination
 
-For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can. 
+For production builds, webpack ['minifies'](https://en.wikipedia.org/wiki/Minification_(programming)) the code, removing as much unnecessary JavaScript as it can.
 
 One of the steps involves something known as 'dead code elimination'. For example, when the following code is encountered, webpack determines that the surrounding `if` statement is unnecessary:
 
