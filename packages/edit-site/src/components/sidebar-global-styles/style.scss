@@ -31,6 +31,28 @@
 	}
 }
 
+// On mobile the sidebar scrolls as a whole (`.edit-site-sidebar__screen-wrapper`)
+// instead of the navigator inside it. Any ancestor with its own overflow would
+// become the containing block of `position: sticky` elements, such as the block
+// preview, and they would never stick. Let the overflow bubble up to the
+// wrapper, which also means the screen padding scrolls with the content.
+.edit-site-layout__mobile {
+	.global-styles-ui-sidebar__navigator-provider,
+	.global-styles-ui-sidebar__navigator-screen {
+		overflow: visible;
+	}
+
+	// The page header is sticky too, so stick below it: its vertical padding,
+	// the height of its content and its bottom border.
+	.global-styles-ui__sticky-preview {
+		--hdr-pad: var(--wpds-dimension-padding-lg);
+		--hdr-size: var(--wpds-dimension-size-md);
+		--hdr-line: var(--wpds-border-width-xs);
+
+		top: calc(var(--hdr-pad) * 2 + var(--hdr-size) + var(--hdr-line));
+	}
+}
+
 .edit-site-styles__content {
 	flex-grow: 1;
 	min-height: 0;
