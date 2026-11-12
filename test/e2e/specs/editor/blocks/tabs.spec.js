@@ -360,6 +360,64 @@ test.describe( 'Tabs', () => {
 			).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 
+		test( 'moves focus between tabs with the arrow keys and leaves them to fields in a panel when the Tabs block has an anchor', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				// The anchor gives the Tabs wrapper an `id`.
+				attributes: { anchor: 'product-tabs' },
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 1' },
+								innerBlocks: [ { name: 'core/search' } ],
+							},
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 2' },
+								innerBlocks: [
+									{
+										name: 'core/paragraph',
+										attributes: { content: 'Panel 2' },
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const tab1 = page.getByRole( 'tab', { name: 'Tab 1' } );
+			const tab2 = page.getByRole( 'tab', { name: 'Tab 2' } );
+
+			await tab1.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			await expect( tab2 ).toBeFocused();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( tab1 ).toBeFocused();
+
+			// Keys pressed in a field inside a panel stay with the field.
+			const searchField = page
+				.getByRole( 'tabpanel', { name: 'Tab 1' } )
+				.getByRole( 'searchbox', { name: 'Search' } );
+			await searchField.fill( 'hello' );
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect( searchField ).toBeFocused();
+		} );
+
 		const tabsWithAnchoredTarget = {
 			name: 'core/tabs',
 			innerBlocks: [

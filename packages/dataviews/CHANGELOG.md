@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
 
 ## 22.0.0 (2026-11-04)
