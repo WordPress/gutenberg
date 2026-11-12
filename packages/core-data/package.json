@@ -63,6 +63,7 @@
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/sync": "file:../sync",
+		"@wordpress/ui": "file:../ui",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",
 		"@wordpress/warning": "file:../warning",
@@ -75,6 +76,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/dom": "^10.4.2",
+		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
 		"@types/deep-freeze": "^0.1.5",
 		"@types/node": "^24.13.3",
