@@ -54,6 +54,17 @@
 	// style, and width. Per-side values are treated as outer edges.
 	// Global Styles target cells via block.json selectors.
 	// Flat border colors always add has-border-color (style engine).
+	//
+	// Color- or style-only selections add a default solid style with no
+	// width. Without an explicit width the table would draw medium (3px)
+	// over the 1px cells, and inheriting that through thead/tbody/tr
+	// thickens the lines between rows. Match the cell default instead.
+	// Do not touch tables that already have a width so cells still inherit it.
+	table.has-border-color:not([style*="border-width"]),
+	table[style*="border-style"]:not([style*="border-width"]) {
+		border-width: 1px;
+	}
+
 	table.has-border-color {
 		thead,
 		tbody,
@@ -88,6 +99,7 @@
 	// The calendar table comes from `get_calendar()`, so the markup is fixed:
 	// one thead with a single row, one tbody, no tfoot. Avoid `> *` so the
 	// caption never picks up table edge borders.
+	/*rtl:begin:rename*/
 	$calendar-border-edges: (
 		"top": "> thead, > thead > tr, > thead > tr > *",
 		"right": "> thead, > tbody, > thead > tr, > tbody > tr, > thead > tr > :last-child, > tbody > tr > :last-child",
@@ -108,6 +120,7 @@
 			}
 		}
 	}
+	/*rtl:end:rename*/
 }
 
 // Keep the hard-coded header background color for backward compatibility.
