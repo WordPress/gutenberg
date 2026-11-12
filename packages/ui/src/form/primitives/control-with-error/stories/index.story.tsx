@@ -11,6 +11,7 @@ const meta: Meta< typeof ControlWithError > = {
 	argTypes: {
 		children: { control: false },
 		getValidityTarget: { control: false },
+		getInteractiveTarget: { control: false },
 		customValidity: { control: false },
 	},
 	decorators: [ formDecorator ],
