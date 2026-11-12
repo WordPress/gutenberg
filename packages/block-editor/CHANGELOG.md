@@ -7,6 +7,7 @@
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
 
 ### Bug Fixes
 
