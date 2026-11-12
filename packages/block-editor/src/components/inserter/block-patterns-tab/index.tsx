@@ -1,6 +1,8 @@
 import { useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
+import { Spinner } from '@wordpress/ui';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import PatternsExplorerModal from '../block-patterns-explorer';
 import MobileTabNavigation from '../mobile-tab-navigation';
@@ -8,6 +10,8 @@ import { PatternCategoryPreviews } from './pattern-category-previews';
 import { usePatternCategories } from './use-pattern-categories';
 import CategoryTabs from '../category-tabs';
 import InserterNoResults from '../no-results';
+import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import type { BlockPatternsTabProps } from '../types';
 
 function BlockPatternsTab( {
@@ -23,8 +27,20 @@ function BlockPatternsTab( {
 
 	const isMobile = useViewportMatch( 'medium', '<' );
 
+	const isResolvingPatterns = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).isResolvingPatterns(),
+		[]
+	);
+
 	if ( ! categories.length ) {
-		return <InserterNoResults />;
+		return isResolvingPatterns ? (
+			<div className="block-editor-inserter__patterns-loading">
+				<Spinner />
+			</div>
+		) : (
+			<InserterNoResults />
+		);
 	}
 
 	return (
