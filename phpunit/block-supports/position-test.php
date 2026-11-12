@@ -115,6 +115,159 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Registers a test block type with position support.
+	 *
+	 * @param string $block_name The test block name to register.
+	 */
+	private function register_position_block( $block_name ) {
+		$this->test_block_name = $block_name;
+
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'position' => true,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Tests that blocks resolving to the same position styles share a single CSS rule.
+	 *
+	 * The container class is derived from the position styles, so repeating a block
+	 * with the same position does not add a rule per instance to the style engine store.
+	 *
+	 * @covers ::gutenberg_render_position_support
+	 */
+	public function test_identical_position_styles_share_one_rule() {
+		switch_theme( 'block-theme-child-with-fluid-typography' );
+		$this->register_position_block( 'test/position-rules-are-deduplicated' );
+
+		$block = array(
+			'blockName' => $this->test_block_name,
+			'attrs'     => array(
+				'style' => array(
+					'position' => array(
+						'type' => 'sticky',
+						'top'  => '0px',
+					),
+				),
+			),
+		);
+
+		$first  = gutenberg_render_position_support( '<div>One</div>', $block );
+		$second = gutenberg_render_position_support( '<div>Two</div>', $block );
+
+		$this->assertSame(
+			1,
+			preg_match( '/class="(wp-container-[0-9a-f]{8}) is-position-sticky"/', $first, $first_match ),
+			'First block should receive a hashed position container class.'
+		);
+		$this->assertSame(
+			1,
+			preg_match( '/class="(wp-container-[0-9a-f]{8}) is-position-sticky"/', $second, $second_match ),
+			'Second block should receive a hashed position container class.'
+		);
+		$this->assertSame(
+			$first_match[1],
+			$second_match[1],
+			'Blocks with identical position styles should share a container class.'
+		);
+
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame(
+			1,
+			substr_count( $stylesheet, '.' . $first_match[1] . '{' ),
+			'Identical position styles should produce a single CSS rule.'
+		);
+	}
+
+	/**
+	 * Tests that blocks with different position styles do not share a CSS rule.
+	 *
+	 * @covers ::gutenberg_render_position_support
+	 */
+	public function test_differing_position_styles_do_not_share_a_rule() {
+		switch_theme( 'block-theme-child-with-fluid-typography' );
+		$this->register_position_block( 'test/position-rules-differ' );
+
+		$make_block = static function ( $top ) {
+			return array(
+				'blockName' => 'test/position-rules-differ',
+				'attrs'     => array(
+					'style' => array(
+						'position' => array(
+							'type' => 'sticky',
+							'top'  => $top,
+						),
+					),
+				),
+			);
+		};
+
+		$first  = gutenberg_render_position_support( '<div>One</div>', $make_block( '0px' ) );
+		$second = gutenberg_render_position_support( '<div>Two</div>', $make_block( '10px' ) );
+
+		preg_match( '/class="(wp-container-[0-9a-f]{8}) /', $first, $first_match );
+		preg_match( '/class="(wp-container-[0-9a-f]{8}) /', $second, $second_match );
+
+		$this->assertNotSame(
+			$first_match[1],
+			$second_match[1],
+			'Blocks with different position styles should not share a container class.'
+		);
+	}
+
+	/**
+	 * Tests that blocks differing only in a viewport state position do not share a CSS rule.
+	 *
+	 * @covers ::gutenberg_render_position_support
+	 */
+	public function test_differing_viewport_position_styles_do_not_share_a_rule() {
+		switch_theme( 'block-theme-child-with-fluid-typography' );
+		$this->register_position_block( 'test/position-viewport-rules-differ' );
+
+		$make_block = static function ( $tablet_top ) {
+			return array(
+				'blockName' => 'test/position-viewport-rules-differ',
+				'attrs'     => array(
+					'style' => array(
+						'position' => array(
+							'type' => 'sticky',
+							'top'  => '0px',
+						),
+						'@tablet'  => array(
+							'position' => array(
+								'top' => $tablet_top,
+							),
+						),
+					),
+				),
+			);
+		};
+
+		$first  = gutenberg_render_position_support( '<div>One</div>', $make_block( '1rem' ) );
+		$second = gutenberg_render_position_support( '<div>Two</div>', $make_block( '2rem' ) );
+
+		preg_match( '/class="(wp-container-[0-9a-f]{8}) /', $first, $first_match );
+		preg_match( '/class="(wp-container-[0-9a-f]{8}) /', $second, $second_match );
+
+		$this->assertNotSame(
+			$first_match[1],
+			$second_match[1],
+			'Blocks with different viewport position styles should not share a container class.'
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array
@@ -131,8 +284,8 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 						'top'  => '0px',
 					),
 				),
-				'expected_wrapper'  => '/^<div class="wp-container-\d+ is-position-sticky">Content<\/div>$/',
-				'expected_styles'   => '/^.wp-container-\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . '$/',
+				'expected_wrapper'  => '/^<div class="wp-container-[0-9a-f]{8} is-position-sticky">Content<\/div>$/',
+				'expected_styles'   => '/^.wp-container-[0-9a-f]{8}' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . '$/',
 			),
 			'sticky position style is not applied if theme does not support it' => array(
 				'theme_name'        => 'default',
@@ -185,8 +338,8 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_wrapper'  => '/^<div class="wp-container-\d+ is-position-sticky">Content<\/div>$/',
-				'expected_styles'   => '/^' . preg_quote( '@media (width <= 480px){.wp-container-' ) . '\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}}' ) . '$/',
+				'expected_wrapper'  => '/^<div class="wp-container-[0-9a-f]{8} is-position-sticky">Content<\/div>$/',
+				'expected_styles'   => '/^' . preg_quote( '@media (width <= 480px){.wp-container-' ) . '[0-9a-f]{8}' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}}' ) . '$/',
 			),
 			'viewport position style inherits the default state position type' => array(
 				'theme_name'        => 'block-theme-child-with-fluid-typography',
@@ -203,8 +356,8 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_wrapper'  => '/^<div class="wp-container-\d+ is-position-sticky">Content<\/div>$/',
-				'expected_styles'   => '/^' . preg_quote( '.wp-container-' ) . '\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . preg_quote( '@media (480px < width <= 782px){.wp-container-' ) . '\d+' . preg_quote( '{top:calc(2rem + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}}' ) . '$/',
+				'expected_wrapper'  => '/^<div class="wp-container-[0-9a-f]{8} is-position-sticky">Content<\/div>$/',
+				'expected_styles'   => '/^' . preg_quote( '.wp-container-' ) . '[0-9a-f]{8}' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . preg_quote( '@media (480px < width <= 782px){.wp-container-' ) . '[0-9a-f]{8}' . preg_quote( '{top:calc(2rem + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}}' ) . '$/',
 			),
 			'viewport position style is not applied if theme does not support it' => array(
 				'theme_name'        => 'default',
@@ -236,8 +389,8 @@ class WP_Block_Supports_Position_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_wrapper'  => '/^<div class="wp-container-\d+ is-position-sticky">Content<\/div>$/',
-				'expected_styles'   => '/^' . preg_quote( '.wp-container-' ) . '\d+' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . preg_quote( '@media (width <= 480px){.wp-container-' ) . '\d+' . preg_quote( '{position:static;}}' ) . '$/',
+				'expected_wrapper'  => '/^<div class="wp-container-[0-9a-f]{8} is-position-sticky">Content<\/div>$/',
+				'expected_styles'   => '/^' . preg_quote( '.wp-container-' ) . '[0-9a-f]{8}' . preg_quote( '{top:calc(0px + var(--wp-admin--admin-bar--position-offset, 0px));position:sticky;z-index:10;}' ) . preg_quote( '@media (width <= 480px){.wp-container-' ) . '[0-9a-f]{8}' . preg_quote( '{position:static;}}' ) . '$/',
 			),
 		);
 	}
