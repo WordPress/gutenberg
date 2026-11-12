@@ -280,10 +280,7 @@ function InlineUI( {
 						<Autocomplete.Empty>
 							{ __( 'No characters found.' ) }
 						</Autocomplete.Empty>
-						<Autocomplete.List
-							aria-label={ __( 'Characters' ) }
-							className="format-library-special-characters__list"
-						>
+						<Autocomplete.List aria-label={ __( 'Characters' ) }>
 							<Autocomplete.ListBody
 								className={
 									isSearching
