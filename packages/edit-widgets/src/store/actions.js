@@ -250,7 +250,7 @@ export const saveWidgetArea =
 
 			// Set __internalWidgetId on the block. This will be persisted to the
 			// store when we dispatch receiveEntityRecords( post ) below.
-			post.blocks[ position ].attributes.__internalWidgetId = widget.id;
+			block.attributes.__internalWidgetId = widget.id;
 
 			const error = registry
 				.select( coreStore )
