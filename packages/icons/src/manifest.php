@@ -5,267 +5,365 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
-	'arrow-down'          => array(
+	'align-center'             => array(
+		'label'       => _x( 'Align Center', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/align-center.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-aligncenter' ),
+	),
+	'align-left'               => array(
+		'label'       => _x( 'Align Left', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/align-left.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-alignleft' ),
+	),
+	'align-none'               => array(
+		'label'       => _x( 'Align None', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/align-none.svg',
+		'collections' => array( 'core', 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-none' ),
+	),
+	'align-right'              => array(
+		'label'       => _x( 'Align Right', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/align-right.svg',
+		'collections' => array( 'core', 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-alignright' ),
+	),
+	'archive'                  => array(
+		'label'       => _x( 'Archive', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/archive.svg',
+		'collections' => array( 'core', 'core-admin' ),
+		'keywords'    => array( _x( 'folder', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-archive' ),
+	),
+	'arrow-down'               => array(
 		'label'       => _x( 'Arrow Down', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-down.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-down-alt' ),
 	),
-	'arrow-down-left'     => array(
+	'arrow-down-left'          => array(
 		'label'       => _x( 'Arrow Down Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-down-left.svg',
 		'collections' => array( 'core' ),
 	),
-	'arrow-down-right'    => array(
+	'arrow-down-right'         => array(
 		'label'       => _x( 'Arrow Down Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-down-right.svg',
 		'collections' => array( 'core' ),
 	),
-	'arrow-left'          => array(
+	'arrow-left'               => array(
 		'label'       => _x( 'Arrow Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-left.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-left-alt' ),
 	),
-	'arrow-right'         => array(
+	'arrow-right'              => array(
 		'label'       => _x( 'Arrow Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-right.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-right-alt' ),
 	),
-	'arrow-up'            => array(
+	'arrow-up'                 => array(
 		'label'       => _x( 'Arrow Up', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-up.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-up-alt' ),
 	),
-	'arrow-up-left'       => array(
+	'arrow-up-left'            => array(
 		'label'       => _x( 'Arrow Up Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-up-left.svg',
 		'collections' => array( 'core' ),
 	),
-	'arrow-up-right'      => array(
+	'arrow-up-right'           => array(
 		'label'       => _x( 'Arrow Up Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/arrow-up-right.svg',
 		'collections' => array( 'core' ),
 	),
-	'asterisk'            => array(
+	'asterisk'                 => array(
 		'label'       => _x( 'Asterisk', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/asterisk.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'generic', 'icon keyword', 'gutenberg' ), _x( 'wildcard', 'icon keyword', 'gutenberg' ), _x( 'placeholder', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-marker' ),
 	),
-	'at-symbol'           => array(
+	'at-symbol'                => array(
 		'label'       => _x( 'At Symbol (@)', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/at-symbol.svg',
 		'collections' => array( 'core' ),
 		'keywords'    => array( _x( 'email', 'icon keyword', 'gutenberg' ) ),
 	),
-	'audio'               => array(
+	'audio'                    => array(
 		'label'       => _x( 'Audio', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/audio.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'music', 'icon keyword', 'gutenberg' ), _x( 'note', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-format-audio' ),
 	),
-	'bell'                => array(
+	'backup'                   => array(
+		'label'       => _x( 'Backup', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/backup.svg',
+		'collections' => array( 'core', 'core-admin' ),
+		'dashicons'   => array( 'dashicons-backup' ),
+	),
+	'bell'                     => array(
 		'label'       => _x( 'Bell', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/bell.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-bell' ),
 	),
-	'block-default'       => array(
+	'block-default'            => array(
 		'label'       => _x( 'Block Default', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/block-default.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-block-default' ),
 	),
-	'block-meta'          => array(
+	'block-meta'               => array(
 		'label'       => _x( 'Block Meta', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/block-meta.svg',
 		'collections' => array( 'core' ),
 	),
-	'block-table'         => array(
+	'block-table'              => array(
 		'label'       => _x( 'Block Table', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/block-table.svg',
 		'collections' => array( 'core' ),
 	),
-	'brush'               => array(
+	'brush'                    => array(
 		'label'       => _x( 'Brush', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/brush.svg',
 		'collections' => array( 'core-admin' ),
-		'dashicons'   => array( 'dashicons-admin-appearance' ),
+		'dashicons'   => array( 'dashicons-admin-appearance', 'dashicons-admin-customizer' ),
 	),
-	'calendar'            => array(
+	'button'                   => array(
+		'label'       => _x( 'Button', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/button.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-button' ),
+	),
+	'calendar'                 => array(
 		'label'       => _x( 'Calendar', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/calendar.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-calendar-alt', 'dashicons-calendar' ),
+		'dashicons'   => array( 'dashicons-calendar-alt', 'dashicons-calendar', 'dashicons-schedule' ),
 	),
-	'capture-photo'       => array(
+	'capture-photo'            => array(
 		'label'       => _x( 'Capture Photo', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/capture-photo.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-camera', 'dashicons-camera-alt' ),
 	),
-	'capture-video'       => array(
+	'capture-video'            => array(
 		'label'       => _x( 'Capture Video', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/capture-video.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-video-alt2', 'dashicons-video-alt' ),
 	),
-	'cart'                => array(
+	'cart'                     => array(
 		'label'       => _x( 'Cart', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/cart.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-cart' ),
 	),
-	'category'            => array(
+	'category'                 => array(
 		'label'       => _x( 'Category', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/category.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-category' ),
 	),
-	'caution'             => array(
+	'caution'                  => array(
 		'label'       => _x( 'Caution', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/caution.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'exclamation', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-warning' ),
 	),
-	'chart-bar'           => array(
+	'chart-bar'                => array(
 		'label'       => _x( 'Chart Bar', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chart-bar.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-chart-bar' ),
 	),
-	'check'               => array(
+	'check'                    => array(
 		'label'       => _x( 'Check', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/check.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-yes' ),
 	),
-	'chevron-down'        => array(
+	'chevron-down'             => array(
 		'label'       => _x( 'Chevron Down', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-down.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-down-alt2' ),
 	),
-	'chevron-down-small'  => array(
+	'chevron-down-small'       => array(
 		'label'       => _x( 'Chevron Down Small', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-down-small.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-down' ),
 	),
-	'chevron-left'        => array(
+	'chevron-left'             => array(
 		'label'       => _x( 'Chevron Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-left.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-collapse', 'dashicons-arrow-left-alt2' ),
 	),
-	'chevron-left-small'  => array(
+	'chevron-left-small'       => array(
 		'label'       => _x( 'Chevron Left Small', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-left-small.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-left' ),
 	),
-	'chevron-right'       => array(
+	'chevron-right'            => array(
 		'label'       => _x( 'Chevron Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-right.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-right-alt2' ),
 	),
-	'chevron-right-small' => array(
+	'chevron-right-small'      => array(
 		'label'       => _x( 'Chevron Right Small', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-right-small.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-right' ),
 	),
-	'chevron-up'          => array(
+	'chevron-up'               => array(
 		'label'       => _x( 'Chevron Up', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-up.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-arrow-up-alt2' ),
 	),
-	'chevron-up-down'     => array(
+	'chevron-up-down'          => array(
 		'label'       => _x( 'Chevron Up Down', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-up-down.svg',
-		'collections' => array( 'core' ),
+		'collections' => array( 'core', 'core-admin' ),
+		'dashicons'   => array( 'dashicons-sort' ),
 	),
-	'chevron-up-small'    => array(
+	'chevron-up-small'         => array(
 		'label'       => _x( 'Chevron Up Small', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-up-small.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-arrow-up' ),
+		'dashicons'   => array( 'dashicons-arrow-up', 'dashicons-arrow-up-duplicate' ),
 	),
-	'comment'             => array(
+	'close'                    => array(
+		'label'       => _x( 'Close', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/close.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-no' ),
+	),
+	'close-small'              => array(
+		'label'       => _x( 'Close Small', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/close-small.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-no-alt' ),
+	),
+	'cloud'                    => array(
+		'label'       => _x( 'Cloud', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/cloud.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-cloud' ),
+	),
+	'cloud-upload'             => array(
+		'label'       => _x( 'Cloud Upload', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/cloud-upload.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-cloud-upload' ),
+	),
+	'code'                     => array(
+		'label'       => _x( 'Code', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/code.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-code', 'dashicons-code-duplicate' ),
+	),
+	'cog'                      => array(
+		'label'       => _x( 'Cog', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/cog.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-admin-generic' ),
+	),
+	'columns'                  => array(
+		'label'       => _x( 'Columns', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/columns.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-columns' ),
+	),
+	'comment'                  => array(
 		'label'       => _x( 'Comment', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/comment.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-comments' ),
 	),
-	'cover'               => array(
+	'cover'                    => array(
 		'label'       => _x( 'Cover', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/cover.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-cover-image' ),
 	),
-	'create'              => array(
+	'create'                   => array(
 		'label'       => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/create.svg',
 		'collections' => array( 'core' ),
 		'keywords'    => array( _x( 'add', 'icon keyword', 'gutenberg' ), _x( 'new', 'icon keyword', 'gutenberg' ), _x( 'plus', 'icon keyword', 'gutenberg' ) ),
 	),
-	'dashboard'           => array(
+	'crop'                     => array(
+		'label'       => _x( 'Crop', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/crop.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-image-crop' ),
+	),
+	'dashboard'                => array(
 		'label'       => _x( 'Dashboard', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/dashboard.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-dashboard' ),
 	),
-	'desktop'             => array(
+	'database'                 => array(
+		'label'       => _x( 'Database', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/database.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-database' ),
+	),
+	'desktop'                  => array(
 		'label'       => _x( 'Desktop', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/desktop.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-desktop' ),
+		'dashicons'   => array( 'dashicons-desktop', 'dashicons-laptop' ),
 	),
-	'download'            => array(
+	'download'                 => array(
 		'label'       => _x( 'Download', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/download.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-download' ),
 	),
-	'drawer-left'         => array(
+	'drawer-left'              => array(
 		'label'       => _x( 'Drawer Left', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/drawer-left.svg',
 		'collections' => array( 'core' ),
 	),
-	'drawer-right'        => array(
+	'drawer-right'             => array(
 		'label'       => _x( 'Drawer Right', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/drawer-right.svg',
 		'collections' => array( 'core' ),
 	),
-	'envelope'            => array(
+	'envelope'                 => array(
 		'label'       => _x( 'Envelope', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/envelope.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'email', 'icon keyword', 'gutenberg' ), _x( 'letter', 'icon keyword', 'gutenberg' ), _x( 'post', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-email', 'dashicons-email-alt', 'dashicons-email-alt2' ),
 	),
-	'error'               => array(
+	'error'                    => array(
 		'label'       => _x( 'Error', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/error.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'alert', 'icon keyword', 'gutenberg' ), _x( 'caution', 'icon keyword', 'gutenberg' ), _x( 'exclamation', 'icon keyword', 'gutenberg' ), _x( 'warning', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-dismiss' ),
 	),
-	'external'            => array(
+	'external'                 => array(
 		'label'       => _x( 'External', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/external.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-external' ),
 	),
-	'file'                => array(
+	'file'                     => array(
 		'label'       => _x( 'File', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/file.svg',
 		'collections' => array( 'core' ),
@@ -277,329 +375,696 @@ return array(
 		'collections' => array( 'core' ),
 		'keywords'    => array( _x( 'archive', 'icon keyword', 'gutenberg' ), _x( 'directory', 'icon keyword', 'gutenberg' ) ),
 	),
-	'gallery'             => array(
+	'filter'                   => array(
+		'label'       => _x( 'Filter', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/filter.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-filter' ),
+	),
+	'flip-horizontal'          => array(
+		'label'       => _x( 'Flip Horizontal', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/flip-horizontal.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-image-flip-horizontal' ),
+	),
+	'flip-vertical'            => array(
+		'label'       => _x( 'Flip Vertical', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/flip-vertical.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-image-flip-vertical' ),
+	),
+	'format-bold'              => array(
+		'label'       => _x( 'Format Bold', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-bold.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-bold' ),
+	),
+	'format-indent'            => array(
+		'label'       => _x( 'Format Indent', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-indent.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-indent' ),
+	),
+	'format-italic'            => array(
+		'label'       => _x( 'Format Italic', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-italic.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-italic' ),
+	),
+	'format-list-bullets'      => array(
+		'label'       => _x( 'Format List Bullets', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-list-bullets.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-ul' ),
+	),
+	'format-list-numbered'     => array(
+		'label'       => _x( 'Format List Numbered', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-list-numbered.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-ol' ),
+	),
+	'format-list-numbered-rtl' => array(
+		'label'       => _x( 'Format List Numbered Rtl', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-list-numbered-rtl.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-ol-rtl' ),
+	),
+	'format-ltr'               => array(
+		'label'       => _x( 'Format LTR', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-ltr.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-ltr' ),
+	),
+	'format-outdent'           => array(
+		'label'       => _x( 'Format Outdent', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-outdent.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-outdent' ),
+	),
+	'format-rtl'               => array(
+		'label'       => _x( 'Format RTL', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-rtl.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-rtl' ),
+	),
+	'format-strikethrough'     => array(
+		'label'       => _x( 'Format Strikethrough', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-strikethrough.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-strikethrough' ),
+	),
+	'format-underline'         => array(
+		'label'       => _x( 'Format Underline', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/format-underline.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-underline' ),
+	),
+	'fullscreen'               => array(
+		'label'       => _x( 'Fullscreen', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/fullscreen.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-expand', 'dashicons-editor-distractionfree', 'dashicons-editor-fullscreen-alt' ),
+	),
+	'fullscreen-exit'          => array(
+		'label'       => _x( 'Fullscreen Exit', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/fullscreen-exit.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-contract', 'dashicons-fullscreen-exit-alt' ),
+	),
+	'gallery'                  => array(
 		'label'       => _x( 'Gallery', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/gallery.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-format-gallery' ),
+		'dashicons'   => array( 'dashicons-format-gallery', 'dashicons-images-alt', 'dashicons-images-alt2' ),
 	),
-	'group'               => array(
+	'grid'                     => array(
+		'label'       => _x( 'Grid', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/grid.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-grid-view', 'dashicons-screenoptions' ),
+	),
+	'group'                    => array(
 		'label'       => _x( 'Group', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/group.svg',
 		'collections' => array( 'core' ),
 	),
-	'heading'             => array(
+	'heading'                  => array(
 		'label'       => _x( 'Heading', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/heading.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-heading' ),
 	),
-	'help'                => array(
+	'help'                     => array(
 		'label'       => _x( 'Help', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/help.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-editor-help' ),
 	),
-	'home'                => array(
+	'home'                     => array(
 		'label'       => _x( 'Home', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/home.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-home' ),
 	),
-	'image'               => array(
+	'html'                     => array(
+		'label'       => _x( 'HTML', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/html.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-html' ),
+	),
+	'image'                    => array(
 		'label'       => _x( 'Image', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/image.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-format-image' ),
 	),
-	'info'                => array(
+	'info'                     => array(
 		'label'       => _x( 'Info', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/info.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-info', 'dashicons-info-outline' ),
 	),
-	'key'                 => array(
+	'institution'              => array(
+		'label'       => _x( 'Institution', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/institution.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-bank' ),
+	),
+	'key'                      => array(
 		'label'       => _x( 'Key', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/key.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-network' ),
 	),
-	'language'            => array(
+	'keyboard-return'          => array(
+		'label'       => _x( 'Keyboard Return', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/keyboard-return.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-break' ),
+	),
+	'language'                 => array(
 		'label'       => _x( 'Language', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/language.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-translation' ),
 	),
-	'link'                => array(
+	'layout'                   => array(
+		'label'       => _x( 'Layout', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/layout.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-layout' ),
+	),
+	'lifesaver'                => array(
+		'label'       => _x( 'Lifesaver', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/lifesaver.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'buoy', 'icon keyword', 'gutenberg' ), _x( 'ring', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-sos' ),
+	),
+	'link'                     => array(
 		'label'       => _x( 'Link', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/link.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-links', 'dashicons-format-links' ),
 	),
-	'map-marker'          => array(
+	'link-off'                 => array(
+		'label'       => _x( 'Link Off', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/link-off.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-unlink' ),
+	),
+	'list-view'                => array(
+		'label'       => _x( 'List View', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/list-view.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-list-view' ),
+	),
+	'lock'                     => array(
+		'label'       => _x( 'Lock', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/lock.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-lock' ),
+	),
+	'map-marker'               => array(
 		'label'       => _x( 'Map Marker', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/map-marker.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-location', 'dashicons-location-alt' ),
 	),
-	'media'               => array(
+	'media'                    => array(
 		'label'       => _x( 'Media', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/media.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-media' ),
 	),
-	'menu'                => array(
+	'megaphone'                => array(
+		'label'       => _x( 'Megaphone', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/megaphone.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-megaphone' ),
+	),
+	'menu'                     => array(
 		'label'       => _x( 'Menu', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/menu.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-menu-alt', 'dashicons-menu', 'dashicons-menu-alt2', 'dashicons-menu-alt3' ),
 	),
-	'mobile'              => array(
+	'mobile'                   => array(
 		'label'       => _x( 'Mobile', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/mobile.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-smartphone' ),
 	),
-	'more-horizontal'     => array(
+	'more'                     => array(
+		'label'       => _x( 'More', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/more.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-insertmore' ),
+	),
+	'more-horizontal'          => array(
 		'label'       => _x( 'More Horizontal', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/more-horizontal.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-ellipsis' ),
 	),
-	'more-vertical'       => array(
+	'more-vertical'            => array(
 		'label'       => _x( 'More Vertical', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/more-vertical.svg',
 		'collections' => array( 'core' ),
 	),
-	'next'                => array(
+	'next'                     => array(
 		'label'       => _x( 'Next', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/next.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-controls-forward' ),
 	),
-	'page'                => array(
+	'page'                     => array(
 		'label'       => _x( 'Page', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/page.svg',
 		'collections' => array( 'core-admin' ),
-		'dashicons'   => array( 'dashicons-admin-page' ),
+		'dashicons'   => array( 'dashicons-admin-page', 'dashicons-text-page' ),
 	),
-	'paragraph'           => array(
+	'paragraph'                => array(
 		'label'       => _x( 'Paragraph', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/paragraph.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-editor-paragraph' ),
 	),
-	'payment'             => array(
+	'pause'                    => array(
+		'label'       => _x( 'Pause', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/pause.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-controls-pause' ),
+	),
+	'payment'                  => array(
 		'label'       => _x( 'Payment', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/payment.svg',
 		'collections' => array( 'core', 'core-admin' ),
 	),
-	'pencil'              => array(
+	'pencil'                   => array(
 		'label'       => _x( 'Pencil', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/pencil.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'edit', 'icon keyword', 'gutenberg' ) ),
-		'dashicons'   => array( 'dashicons-edit', 'dashicons-edit-large' ),
+		'dashicons'   => array( 'dashicons-edit', 'dashicons-edit-large', 'dashicons-edit-page' ),
 	),
-	'people'              => array(
+	'people'                   => array(
 		'label'       => _x( 'People', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/people.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-users', 'dashicons-groups' ),
 	),
-	'pin'                 => array(
+	'pin'                      => array(
 		'label'       => _x( 'Pin', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/pin.svg',
 		'collections' => array( 'core-admin' ),
-		'dashicons'   => array( 'dashicons-admin-post', 'dashicons-format-standard' ),
+		'dashicons'   => array( 'dashicons-admin-post', 'dashicons-format-standard', 'dashicons-sticky' ),
 	),
-	'plugins'             => array(
+	'play'                     => array(
+		'label'       => _x( 'Play', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/play.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-controls-play' ),
+	),
+	'plugins'                  => array(
 		'label'       => _x( 'Plugins', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/plugins.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-plugins' ),
 	),
-	'plus'                => array(
+	'plus'                     => array(
 		'label'       => _x( 'Plus', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/plus.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-plus', 'dashicons-plus-alt2' ),
 	),
-	'plus-circle'         => array(
+	'plus-circle'              => array(
 		'label'       => _x( 'Plus Circle', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/plus-circle.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-plus-alt' ),
+		'dashicons'   => array( 'dashicons-plus-alt', 'dashicons-insert' ),
 	),
-	'post-comments'       => array(
+	'position-center'          => array(
+		'label'       => _x( 'Position Center', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/position-center.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-center' ),
+	),
+	'position-left'            => array(
+		'label'       => _x( 'Position Left', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/position-left.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-left' ),
+	),
+	'position-right'           => array(
+		'label'       => _x( 'Position Right', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/position-right.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-right' ),
+	),
+	'post-author'              => array(
+		'label'       => _x( 'Post Author', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/post-author.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-businessperson' ),
+	),
+	'post-comments'            => array(
 		'label'       => _x( 'Post Comments', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/post-comments.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-format-chat' ),
 	),
-	'previous'            => array(
+	'previous'                 => array(
 		'label'       => _x( 'Previous', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/previous.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-controls-back' ),
 	),
-	'published'           => array(
+	'published'                => array(
 		'label'       => _x( 'Published', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/published.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-yes-alt' ),
 	),
-	'quote'               => array(
+	'pull-left'                => array(
+		'label'       => _x( 'Pull Left', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/pull-left.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-pull-left' ),
+	),
+	'pull-right'               => array(
+		'label'       => _x( 'Pull Right', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/pull-right.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-pull-right' ),
+	),
+	'quote'                    => array(
 		'label'       => _x( 'Quote', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/quote.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-format-quote', 'dashicons-editor-quote' ),
 	),
-	'receipt'             => array(
+	'reaction'                 => array(
+		'label'       => _x( 'Reaction', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/reaction.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-smiley' ),
+	),
+	'receipt'                  => array(
 		'label'       => _x( 'Receipt', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/receipt.svg',
 		'collections' => array( 'core', 'core-admin' ),
 	),
-	'rss'                 => array(
+	'redo'                     => array(
+		'label'       => _x( 'Redo', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/redo.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-redo' ),
+	),
+	'repeat'                   => array(
+		'label'       => _x( 'Repeat', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/repeat.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-controls-repeat' ),
+	),
+	'reset'                    => array(
+		'label'       => _x( 'Reset', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/reset.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-minus' ),
+	),
+	'rotate-left'              => array(
+		'label'       => _x( 'Rotate Left', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/rotate-left.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-rotate-left', 'dashicons-image-rotate' ),
+	),
+	'rotate-right'             => array(
+		'label'       => _x( 'Rotate Right', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/rotate-right.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-image-rotate-right' ),
+	),
+	'rss'                      => array(
 		'label'       => _x( 'RSS', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/rss.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-rss' ),
 	),
-	'scheduled'           => array(
+	'scheduled'                => array(
 		'label'       => _x( 'Scheduled', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/scheduled.svg',
 		'collections' => array( 'core' ),
 	),
-	'search'              => array(
+	'search'                   => array(
 		'label'       => _x( 'Search', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/search.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-search' ),
 	),
-	'settings'            => array(
+	'seen'                     => array(
+		'label'       => _x( 'Seen', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/seen.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'eye', 'icon keyword', 'gutenberg' ), _x( 'show', 'icon keyword', 'gutenberg' ), _x( 'visible', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-visibility' ),
+	),
+	'settings'                 => array(
 		'label'       => _x( 'Settings', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/settings.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-settings' ),
 	),
-	'shadow'              => array(
+	'shadow'                   => array(
 		'label'       => _x( 'Shadow', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/shadow.svg',
 		'collections' => array( 'core' ),
 	),
-	'share'               => array(
+	'share'                    => array(
 		'label'       => _x( 'Share', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/share.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-share', 'dashicons-share1' ),
+		'dashicons'   => array( 'dashicons-share', 'dashicons-share1', 'dashicons-share-alt' ),
 	),
-	'shield'              => array(
+	'shield'                   => array(
 		'label'       => _x( 'Shield', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/shield.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-shield', 'dashicons-shield-alt' ),
+		'dashicons'   => array( 'dashicons-shield', 'dashicons-shield-alt', 'dashicons-privacy' ),
 	),
-	'shuffle'             => array(
+	'shortcode'                => array(
+		'label'       => _x( 'Shortcode', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/shortcode.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-shortcode' ),
+	),
+	'shuffle'                  => array(
 		'label'       => _x( 'Shuffle', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/shuffle.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-randomize' ),
 	),
-	'sites'               => array(
+	'sites'                    => array(
 		'label'       => _x( 'Sites', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/sites.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-multisite' ),
 	),
-	'star-empty'          => array(
+	'skip-back'                => array(
+		'label'       => _x( 'Skip Back', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/skip-back.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-controls-skipback' ),
+	),
+	'skip-forward'             => array(
+		'label'       => _x( 'Skip Forward', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/skip-forward.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-controls-skipforward' ),
+	),
+	'star-empty'               => array(
 		'label'       => _x( 'Star Empty', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/star-empty.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-star-empty' ),
 	),
-	'star-filled'         => array(
+	'star-filled'              => array(
 		'label'       => _x( 'Star Filled', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/star-filled.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'keywords'    => array( _x( 'favorite', 'icon keyword', 'gutenberg' ) ),
 		'dashicons'   => array( 'dashicons-star-filled' ),
 	),
-	'star-half'           => array(
+	'star-half'                => array(
 		'label'       => _x( 'Star Half', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/star-half.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-star-half' ),
 	),
-	'store'               => array(
+	'store'                    => array(
 		'label'       => _x( 'Store', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/store.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-store' ),
 	),
-	'styles'              => array(
+	'stretch-full-width'       => array(
+		'label'       => _x( 'Stretch Full Width', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/stretch-full-width.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-full-width' ),
+	),
+	'stretch-wide'             => array(
+		'label'       => _x( 'Stretch Wide', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/stretch-wide.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-align-wide' ),
+	),
+	'styles'                   => array(
 		'label'       => _x( 'Styles', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/styles.svg',
 		'collections' => array( 'core' ),
 	),
-	'symbol'              => array(
+	'symbol'                   => array(
 		'label'       => _x( 'Symbol', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/symbol.svg',
 		'collections' => array( 'core' ),
 	),
-	'symbol-filled'       => array(
+	'symbol-filled'            => array(
 		'label'       => _x( 'Symbol Filled', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/symbol-filled.svg',
 		'collections' => array( 'core' ),
 	),
-	'table'               => array(
+	'table'                    => array(
 		'label'       => _x( 'Table', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/table.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-editor-table' ),
 	),
-	'tablet'              => array(
+	'table-row-after'          => array(
+		'label'       => _x( 'Table Row After', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/table-row-after.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-table-row-after' ),
+	),
+	'table-row-before'         => array(
+		'label'       => _x( 'Table Row Before', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/table-row-before.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-table-row-before' ),
+	),
+	'table-row-delete'         => array(
+		'label'       => _x( 'Table Row Delete', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/table-row-delete.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-table-row-delete' ),
+	),
+	'tablet'                   => array(
 		'label'       => _x( 'Tablet', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/tablet.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-tablet' ),
 	),
-	'tag'                 => array(
+	'tag'                      => array(
 		'label'       => _x( 'Tag', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/tag.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-tag' ),
 	),
-	'tip'                 => array(
+	'text-color'               => array(
+		'label'       => _x( 'Text Color', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/text-color.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-textcolor' ),
+	),
+	'thumbs-down'              => array(
+		'label'       => _x( 'Thumbs Down', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/thumbs-down.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'dislike', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-thumbs-down' ),
+	),
+	'thumbs-up'                => array(
+		'label'       => _x( 'Thumbs Up', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/thumbs-up.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'like', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-thumbs-up' ),
+	),
+	'time'                     => array(
+		'label'       => _x( 'Time', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/time.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'clock', 'icon keyword', 'gutenberg' ), _x( 'duration', 'icon keyword', 'gutenberg' ), _x( 'hour', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-clock' ),
+	),
+	'tip'                      => array(
 		'label'       => _x( 'Tip', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/tip.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-lightbulb' ),
 	),
-	'tool'                => array(
+	'tool'                     => array(
 		'label'       => _x( 'Tool', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/tool.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-admin-tools' ),
 	),
-	'update'              => array(
+	'trash'                    => array(
+		'label'       => _x( 'Trash', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/trash.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'delete', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-trash', 'dashicons-post-trash' ),
+	),
+	'trending-up'              => array(
+		'label'       => _x( 'Trending Up', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/trending-up.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-chart-line' ),
+	),
+	'undo'                     => array(
+		'label'       => _x( 'Undo', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/undo.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-undo' ),
+	),
+	'unlock'                   => array(
+		'label'       => _x( 'Unlock', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/unlock.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-unlock' ),
+	),
+	'unseen'                   => array(
+		'label'       => _x( 'Unseen', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/unseen.svg',
+		'collections' => array( 'core-admin' ),
+		'keywords'    => array( _x( 'eye', 'icon keyword', 'gutenberg' ), _x( 'hide', 'icon keyword', 'gutenberg' ), _x( 'hidden', 'icon keyword', 'gutenberg' ) ),
+		'dashicons'   => array( 'dashicons-hidden' ),
+	),
+	'update'                   => array(
 		'label'       => _x( 'Update', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/update.svg',
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-update', 'dashicons-update-alt' ),
 	),
-	'upload'              => array(
+	'upload'                   => array(
 		'label'       => _x( 'Upload', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/upload.svg',
 		'collections' => array( 'core', 'core-admin' ),
 		'dashicons'   => array( 'dashicons-upload' ),
 	),
-	'verse'               => array(
+	'verse'                    => array(
 		'label'       => _x( 'Verse', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/verse.svg',
 		'collections' => array( 'core' ),
 	),
-	'wordpress'           => array(
+	'video'                    => array(
+		'label'       => _x( 'Video', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/video.svg',
+		'collections' => array( 'core-admin' ),
+		'dashicons'   => array( 'dashicons-editor-video', 'dashicons-format-video' ),
+	),
+	'wordpress'                => array(
 		'label'       => _x( 'WordPress', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/wordpress.svg',
 		'collections' => array( 'core-admin' ),
