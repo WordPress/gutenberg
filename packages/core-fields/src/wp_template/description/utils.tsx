@@ -1,5 +1,4 @@
 import { decodeEntities } from '@wordpress/html-entities';
-import { Text } from '@wordpress/ui';
 
 /**
  * The properties of a template the description fields read.
@@ -33,7 +32,8 @@ export const getValue = ( { item }: { item: TemplateWithDescription } ) =>
 	decodeEntities( item.description || '' );
 
 /**
- * Renders the description of a template.
+ * Renders the description of a template, as plain text that takes the
+ * typography of where it renders, like the values of other fields.
  *
  * @param props      The props.
  * @param props.item The template.
@@ -41,5 +41,5 @@ export const getValue = ( { item }: { item: TemplateWithDescription } ) =>
  */
 export const render = ( { item }: { item: TemplateWithDescription } ) => {
 	const { description } = item;
-	return description ? <Text>{ decodeEntities( description ) }</Text> : null;
+	return description ? <span>{ decodeEntities( description ) }</span> : null;
 };

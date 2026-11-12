@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.3.0",
+	"version": "24.4.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -82,7 +82,7 @@
 		"IS_GUTENBERG_PLUGIN": true
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.63.0",
+		"@playwright/test": "^1.65.0",
 		"@types/react": "^19.3.0",
 		"@types/react-dom": "^19.3.0",
 		"@wordpress/env": "file:./packages/env",
@@ -99,8 +99,7 @@
 		"lint-staged": "^16.4.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.14.1",
-		"syncpack": "^15.3.1",
-		"wait-on": "^8.0.1"
+		"syncpack": "^15.3.1"
 	},
 	"overrides": {
 		"@y/websocket-server": {
@@ -154,6 +153,7 @@
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
 		"lint:package-contents": "npm run --if-present --workspaces lint:package-contents",
 		"lint:peer-deps": "npm run --workspace @wordpress/validation-tools check-peer-dependencies --",
+		"lint:peer-ranges": "npm run --workspace @wordpress/validation-tools check-peer-version-ranges --",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
 		"lint:changelogs": "npm run --workspace @wordpress/validation-tools validate-changelogs --",
 		"lint:md:docs": "wp-scripts lint-md-docs",
@@ -177,8 +177,8 @@
 		"start": "npm run dev",
 		"prestorybook:build": "npm run build",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
-		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
+		"storybook:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook storybook:dev\"",
+		"storybook:e2e:dev": "npm run dev -- --on-ready=\"npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"storybook:e2e:build": "npm run --workspace @wordpress/storybook-playwright storybook:build",
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
 		"test": "npm run lint && npm run test:unit",
@@ -190,6 +190,7 @@
 		"test:e2e:rtc-websocket": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json",
 		"test:e2e:rtc-websocket:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json --ui",
 		"test:e2e:storybook": "npm exec --no --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
+		"test:e2e:trunk": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk --",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts",
 		"test:performance:debug": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts --debug",
@@ -218,6 +219,9 @@
 		"test:agent-evals": "npm --prefix test/ai-development run eval --",
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
+		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
+		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
+		"typecheck:php:fix": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"

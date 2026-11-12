@@ -1,22 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
 import type { StyleSettings, TypographyPanelProps } from '../types';
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path. The off path lives in
-// `typography-panel-core.jsx`.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 /**
  * Renders `TypographyPanel` with sensible defaults so tests only pass the
@@ -638,14 +626,6 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		const columnsInput = screen.getByLabelText( /columns/i );
 		expect( columnsInput ).toHaveValue( 0 );
 		expect( columnsInput ).not.toHaveAttribute( 'placeholder' );
-
-		// Both zero values are local overrides, so each control surfaces the
-		// accessible reset-to-inherited affordance.
-		expect(
-			screen.getAllByRole( 'button', {
-				name: /reset to inherited value/i,
-			} )
-		).toHaveLength( 2 );
 	} );
 } );
 
@@ -941,7 +921,52 @@ describe( 'TypographyPanel — setTextColor link sync', () => {
 	} );
 } );
 
-describe( 'TypographyPanel layout className preserved regardless of inheritance indicators', () => {
+describe( 'TypographyPanel — Reset all link color', () => {
+	it( 'clears a link color that tracks the text color', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: DUPLICATE_PALETTE_SETTINGS,
+			onChange,
+			value: {
+				color: { text: 'var:preset|color|dark-text' },
+				elements: {
+					link: { color: { text: 'var:preset|color|dark-text' } },
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
+		expect( result?.color?.text ).toBeUndefined();
+		expect( result?.elements?.link?.color?.text ).toBeUndefined();
+	} );
+
+	it( 'keeps a link color that differs from the text color', async () => {
+		const onChange = vi.fn();
+		await renderPanel( {
+			settings: DUPLICATE_PALETTE_SETTINGS,
+			onChange,
+			value: {
+				color: { text: 'var:preset|color|dark-text' },
+				elements: {
+					link: {
+						color: { text: 'var:preset|color|dark-background' },
+					},
+				},
+			},
+		} );
+
+		await activatePanelMenuItem( 'Typography options', /reset all/i );
+
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
+		expect( result?.elements?.link?.color?.text ).toBe(
+			'var:preset|color|dark-background'
+		);
+	} );
+} );
+
+describe( 'TypographyPanel layout className', () => {
 	const inheritedValue = {
 		typography: { lineHeight: '1.5', letterSpacing: '1px' },
 	};
@@ -953,9 +978,8 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		return control.closest( '.components-tools-panel-item' );
 	};
 
-	it( 'keeps the single-column layout class when showInheritanceLabelIndicators is false (regression)', async () => {
+	it( 'keeps the single-column layout class with an inherited value (regression)', async () => {
 		await renderPanel( {
-			showInheritanceLabelIndicators: false,
 			value: {},
 			inheritedValue,
 		} );
@@ -965,33 +989,6 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 
 		expect( lineHeightItem ).toHaveClass( 'single-column' );
 		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-
-		expect( lineHeightItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( letterSpacingItem ).not.toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-	} );
-
-	it( 'folds the single-column layout class together with the inherited treatment when indicators are on', async () => {
-		await renderPanel( {
-			showInheritanceLabelIndicators: true,
-			value: {},
-			inheritedValue,
-		} );
-
-		const lineHeightItem = getItem( /line height/i );
-		const letterSpacingItem = getItem( /letter spacing/i );
-
-		expect( lineHeightItem ).toHaveClass( 'single-column' );
-		expect( lineHeightItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
-		expect( letterSpacingItem ).toHaveClass( 'single-column' );
-		expect( letterSpacingItem ).toHaveClass(
-			'is-inherited-from-global-styles'
-		);
 	} );
 } );
 
@@ -1114,6 +1111,32 @@ describe( 'TypographyPanel text gradient', () => {
 		// The panel called `onChange`.
 		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.color.gradient ).toBeUndefined();
+	} );
+
+	it( 'shows the contrast warning on the gradient control when the text is a gradient', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+			contrastWarning: 'Low contrast gradient',
+		} );
+
+		expect(
+			screen.getAllByRole( 'button', { name: 'Low contrast' } )
+		).toHaveLength( 1 );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const notice = await screen.findByText( 'Low contrast gradient' );
+		// The popover fades in from opacity 0, which `toBeVisible` counts as
+		// hidden, so wait for the fade to finish.
+		await waitFor( () => expect( notice ).toBePositionedPopover() );
+		expect( notice ).toBeVisible();
 	} );
 
 	it( 'keeps the gradient control usable while a background gradient is set', async () => {

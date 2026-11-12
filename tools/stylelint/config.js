@@ -10,7 +10,6 @@ module.exports = {
 	],
 	reportNeedlessDisables: true,
 	rules: {
-		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
 		'declaration-property-value-disallowed-list': [

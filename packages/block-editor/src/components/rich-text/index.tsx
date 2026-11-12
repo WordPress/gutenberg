@@ -13,7 +13,7 @@ import {
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
@@ -34,7 +34,6 @@ import {
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
-import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import {
@@ -436,6 +435,9 @@ function RichTextWrapper(
 		]
 	);
 
+	// When the field last changed, or 0 after a format change.
+	const lastChangeRef = useRef( 0 );
+
 	const {
 		value,
 		getValue,
@@ -445,7 +447,20 @@ function RichTextWrapper(
 		[ getDomPositionKey ]: getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange: adjustedOnChange,
+		onChange( newValue: unknown, meta: { __unstableText: string } ) {
+			// Typing goes into one undo level until a second without typing or
+			// a format change, after which the next change starts a new one.
+			if ( Date.now() - lastChangeRef.current >= 1000 ) {
+				__unstableMarkLastChangeAsPersistent();
+			}
+			// The hook is untyped, and calls it with the field's kind of value.
+			( adjustedOnChange as ( ...args: unknown[] ) => void )(
+				newValue,
+				meta
+			);
+			lastChangeRef.current =
+				meta.__unstableText === value.text ? 0 : Date.now();
+		},
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -472,7 +487,7 @@ function RichTextWrapper(
 		const element = anchorRef.current;
 
 		// A pointer press outside the field makes it non editable until the
-		// release (see rich text's preventFocusCapture). Focusing it then
+		// release (see usePreventFocusCapture). Focusing it then
 		// makes the block focus handler drop the text selection.
 		if ( ! isSelected || element?.contentEditable !== 'true' ) {
 			return;
@@ -614,12 +629,6 @@ function RichTextWrapper(
 		ariaActiveDescendant,
 	] );
 
-	useMarkPersistent( {
-		html: adjustedValue,
-		value,
-		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
-	} );
-
 	const [ keyboardShortcuts ] = useState(
 		() => new Set< ( event: KeyboardEvent ) => void >()
 	);
@@ -653,7 +662,7 @@ function RichTextWrapper(
 			{ isSelected && (
 				<KeyboardShortcutContext.Provider value={ keyboardShortcuts }>
 					<InputEventContext.Provider value={ inputEvents }>
-						<Popover.__unstableSlotNameProvider value="__unstable-block-tools-after">
+						<WCPopover.__unstableSlotNameProvider value="__unstable-block-tools-after">
 							{ children &&
 								children( { value, onChange, onFocus } ) }
 
@@ -664,7 +673,7 @@ function RichTextWrapper(
 								formatTypes={ formatTypes }
 								forwardedRef={ anchorRef }
 							/>
-						</Popover.__unstableSlotNameProvider>
+						</WCPopover.__unstableSlotNameProvider>
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }
@@ -724,7 +733,9 @@ function RichTextWrapper(
 						supportsSplitting,
 					} ),
 					anchorRef,
-					setAnchorElement,
+					// Only the selected field shows the toolbar that needs the
+					// element. Storing it on mount would render every field twice.
+					isSelected && setAnchorElement,
 				] ) }
 				contentEditable={ ! shouldDisableEditing }
 				suppressContentEditableWarning

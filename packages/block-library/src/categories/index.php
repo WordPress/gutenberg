@@ -36,7 +36,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		'title_li'     => '',
 		'hide_empty'   => empty( $attributes['showEmpty'] ),
 	);
-	if ( ! empty( $attributes['showOnlyTopLevel'] ) && $attributes['showOnlyTopLevel'] ) {
+	if ( ! empty( $attributes['showOnlyTopLevel'] ) ) {
 		$args['parent'] = 0;
 	}
 
