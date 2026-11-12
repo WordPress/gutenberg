@@ -13,7 +13,7 @@
 - [Paragraph](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-paragraph/) — `core/paragraph`: Start with the basic building block of all narrative.
 - [Preformatted](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-preformatted/) — `core/preformatted`: Add text that respects your spacing and tabs, and also allows styling.
 - [Pullquote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-pullquote/) — `core/pullquote`: Give special visual emphasis to a quote from your text.
-- [Quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/) — `core/quote`: Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
+- [Quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/) — `core/quote`: Give quoted text visual emphasis.
 - [Table](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-table/) — `core/table`: Create structured content in rows and columns to display information.
 - [Poetry](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-verse/) — `core/verse`: Insert poetry. Use special spacing formats. Or quote song lyrics.
 
