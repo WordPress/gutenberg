@@ -7,8 +7,9 @@ const PATTERNS_DIR = new URL(
 );
 
 describe( 'design system patterns', () => {
-	const files = readdirSync( PATTERNS_DIR ).filter( ( file ) =>
-		file.endsWith( '.mdx' )
+	// The introduction describes patterns in general and is not a pattern.
+	const files = readdirSync( PATTERNS_DIR ).filter(
+		( file ) => file.endsWith( '.mdx' ) && file !== 'introduction.mdx'
 	);
 
 	// See the "Manifests" section of `storybook/README.md`.

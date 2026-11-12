@@ -137,8 +137,7 @@ describe( 'ci-status-check', () => {
 		vi.stubEnv( 'GITHUB_REPOSITORY', REPOSITORY );
 		vi.stubEnv( 'GITHUB_RUN_ID', RUN_ID );
 		vi.stubEnv( 'GITHUB_TOKEN', TOKEN );
-		( { main } =
-			await import( '../../../.github/workflows/scripts/ci-status-check.js' ) );
+		( { main } = await import( '../scripts/ci-status-check.mts' ) );
 	} );
 
 	beforeEach( () => {
