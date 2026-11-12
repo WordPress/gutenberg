@@ -117,6 +117,35 @@ describe( 'useTitle', () => {
 		expect( speak ).toHaveBeenCalledWith( 'About ‹ Page', 'assertive' );
 	} );
 
+	it( 'announces a canvas mode change that keeps the same title', () => {
+		navigate( '/page/12' );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'About ‹ Page' } }
+		);
+
+		navigate( '/page/12', { canvas: 'edit' } );
+		rerender( { title: 'About ‹ Page' } );
+		navigate( '/page/12' );
+		rerender( { title: 'About ‹ Page' } );
+
+		expect( speak ).toHaveBeenCalledTimes( 2 );
+		expect( speak ).toHaveBeenCalledWith( 'About ‹ Page', 'assertive' );
+	} );
+
+	it( 'does not announce a path change that keeps the same title', () => {
+		navigate( '/page/12', { canvas: 'edit' } );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'Home ‹ Template' } }
+		);
+
+		navigate( '/wp_template/home', { canvas: 'edit' } );
+		rerender( { title: 'Home ‹ Template' } );
+
+		expect( speak ).not.toHaveBeenCalled();
+	} );
+
 	it( 'shares the last announced screen between callers', () => {
 		navigate( '/page' );
 		const { rerender: rerenderLayout } = renderHook< void, Props >(

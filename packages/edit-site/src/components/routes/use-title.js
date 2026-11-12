@@ -71,16 +71,19 @@ export function useScreenTitle() {
 /**
  * Sets the document title and announces the screen to screen readers.
  *
- * The title is announced only when the screen changes: the path or the canvas
- * mode is different, and so is the title. It is not announced on first load,
- * when only the query changes (search, filters, selection), or when the title
- * changes while the screen stays the same (for example a rename).
+ * The title is announced only when the screen changes: the path and the title
+ * are both different, or the canvas mode is different. A canvas mode change
+ * is announced even when the title stays the same, because switching a single
+ * item from view to edit mode keeps the focus on the same canvas and gives no
+ * other cue. The title is not announced on first load, when only the query
+ * changes (search, filters, selection), or when the title changes while the
+ * screen stays the same (for example a rename).
  *
  * @param {string|false} [title] Title of the current screen. Nothing happens when empty.
  */
 export default function useTitle( title ) {
 	const { path, query } = useLocation();
-	const screenKey = `${ path }|${ query?.canvas ?? 'view' }`;
+	const canvas = query?.canvas ?? 'view';
 	const siteTitle = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecord( 'root', 'site' )?.title,
@@ -101,13 +104,13 @@ export default function useTitle( title ) {
 		);
 
 		const previous = lastScreen;
-		lastScreen = { key: screenKey, title };
+		lastScreen = { path, canvas, title };
 		if (
 			previous &&
-			previous.key !== screenKey &&
-			previous.title !== title
+			( previous.canvas !== canvas ||
+				( previous.path !== path && previous.title !== title ) )
 		) {
 			speak( title, 'assertive' );
 		}
-	}, [ title, siteTitle, screenKey ] );
+	}, [ title, siteTitle, path, canvas ] );
 }
