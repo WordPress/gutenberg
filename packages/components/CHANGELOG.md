@@ -26,6 +26,7 @@
 -   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
+-   Type declarations: Stop inlining React DOM attribute types into the published declarations of component hooks and polymorphic components, so they type-check with `@types/react` 18 again ([#84526](https://github.com/WordPress/gutenberg/pull/84526)).
 
 ### Internal
 
@@ -84,7 +85,6 @@
 -   `BoxControl`: Prevent the slider from saving values without a unit, such as after a reset or when switching from a preset to a custom value ([#70288](https://github.com/WordPress/gutenberg/pull/70288)).
 -   `MenuItem`: Accept the `href` prop in the types, which renders the item as a link ([#85255](https://github.com/WordPress/gutenberg/pull/85255)).
 -   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
--   Type declarations: Stop inlining React DOM attribute types into the published declarations of component hooks and polymorphic components, so they type-check with `@types/react` 18 again ([#84464](https://github.com/WordPress/gutenberg/issues/84464)).
 
 ### Internal
 

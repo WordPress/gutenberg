@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `RawHTML`: Declare the return type as `React.ReactElement`, so the published type declarations no longer inline the `div` attribute types of the `@types/react` version used at build time and type-check with `@types/react` 18 again ([#84464](https://github.com/WordPress/gutenberg/issues/84464)).
+-   `RawHTML`: Declare the return type as `React.ReactElement`, so the published type declarations no longer inline the `div` attribute types of the `@types/react` version used at build time and type-check with `@types/react` 18 again ([#84526](https://github.com/WordPress/gutenberg/pull/84526)).
 -   `createInterpolateElement`: Treat a tag named after an `Object.prototype` member as an unknown tag instead of crashing ([#86401](https://github.com/WordPress/gutenberg/pull/86401)).
 
 ## 10.1.0 (2026-11-04)
