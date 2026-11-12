@@ -1,4 +1,8 @@
-import type { ForwardedRef } from 'react';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -108,9 +112,9 @@ function UnforwardedAnglePickerControl(
  */
 export const AnglePickerControl = forwardRef(
 	UnforwardedAnglePickerControl
-) as React.ForwardRefExoticComponent<
+) as ForwardRefExoticComponent<
 	WordPressComponentProps< AnglePickerControlProps, 'div' > &
-		React.RefAttributes< any >
+		RefAttributes< any >
 >;
 AnglePickerControl.displayName = 'AnglePickerControl';
 
