@@ -10,6 +10,10 @@
 
 -   Link format: stop adding `rel="noopener"` to links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86516](https://github.com/WordPress/gutenberg/pull/86516)).
 
+### Bug Fixes
+
+-   Warn when inline text and highlight colors have low contrast ([#86710](https://github.com/WordPress/gutenberg/pull/86710)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Bug Fixes
