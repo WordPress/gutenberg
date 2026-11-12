@@ -24,6 +24,7 @@ describe( 'InlineNotices server rendering', () => {
 
 		const markup = renderNotice();
 		expect( markup ).toContain( '<strong>Updating failed.</strong>' );
+		expect( markup ).toContain( 'data-wp-ui-notice-spoken-message=""' );
 		expect( renderNotice() ).toBe( markup );
 		expect( console ).toHaveWarned();
 	} );

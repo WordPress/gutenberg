@@ -255,6 +255,9 @@ describe( 'InlineNotices', () => {
 				screen.queryByRole( 'button', { name: 'Copy error' } )
 			).not.toBeInTheDocument();
 
+			expect( speak ).not.toHaveBeenCalled();
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+
 			registry
 				.dispatch( noticesStore )
 				.createNotice( 'error', 'Updating <strong>failed</strong>.', {
@@ -268,6 +271,24 @@ describe( 'InlineNotices', () => {
 			);
 			// `__unstableHTML` is deprecated.
 			expect( console ).toHaveWarned();
+		} );
+
+		it( 'preserves line breaks and paragraph boundaries in HTML announcements', async () => {
+			const registry = await renderWithNotice( 'error' );
+			registry
+				.dispatch( noticesStore )
+				.createNotice(
+					'error',
+					'<p>Save <strong>failed</strong>.</p><p>Retry<br>later &amp; reopen.</p>',
+					{ __unstableHTML: true }
+				);
+
+			expect( console ).toHaveWarned();
+			await waitFor( () =>
+				expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+					/^Save failed\. Retry later & reopen\.$/
+				)
+			);
 		} );
 	} );
 

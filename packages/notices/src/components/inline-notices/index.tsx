@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
+import { usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Children } from '@wordpress/element';
 import { Notice } from '@wordpress/ui';
@@ -17,6 +18,7 @@ type InlineNoticesProps = {
 
 type NoticeListProps = {
 	notices: NoticeType[];
+	announceOnMount: boolean;
 	className: string;
 	onRemove?: ( id: string ) => void;
 	children?: ReactNode;
@@ -24,6 +26,7 @@ type NoticeListProps = {
 
 function NoticeList( {
 	notices,
+	announceOnMount,
 	className,
 	onRemove,
 	children,
@@ -35,6 +38,7 @@ function NoticeList( {
 				<InlineNotice
 					key={ notice.id }
 					notice={ notice }
+					announceOnMount={ announceOnMount }
 					onRemove={ () => onRemove?.( notice.id ) }
 				/>
 			) ) }
@@ -58,6 +62,7 @@ export default function InlineNotices( {
 		[ context ]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
+	const announceOnMount = usePrevious( true ) ?? false;
 	const dismissibleNotices = notices.filter(
 		( { isDismissible, type } ) => isDismissible && type === 'default'
 	);
@@ -82,6 +87,7 @@ export default function InlineNotices( {
 					{ hasPinnedNotices && (
 						<NoticeList
 							notices={ nonDismissibleNotices }
+							announceOnMount={ announceOnMount }
 							className={ clsx(
 								'components-notices__pinned',
 								pinnedNoticesClassName
@@ -91,6 +97,7 @@ export default function InlineNotices( {
 					{ hasDismissibleNotices && (
 						<NoticeList
 							notices={ dismissibleNotices }
+							announceOnMount={ announceOnMount }
 							className={ clsx(
 								'components-notices__dismissible',
 								dismissibleNoticesClassName

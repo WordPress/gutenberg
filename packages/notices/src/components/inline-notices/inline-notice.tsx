@@ -1,7 +1,8 @@
 import type { ComponentProps } from 'react';
 import { speak } from '@wordpress/a11y';
 import { Slot } from '@wordpress/components';
-import { RawHTML, useEffect, useRef, useState } from '@wordpress/element';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { RawHTML, useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
@@ -26,6 +27,7 @@ type NoticeAction = NoticeActionType & {
 
 type InlineNoticeProps = {
 	notice: NoticeType;
+	announceOnMount: boolean;
 	onRemove: () => void;
 };
 
@@ -75,6 +77,7 @@ function NoticeActionControl( {
 
 export default function InlineNotice( {
 	notice,
+	announceOnMount,
 	onRemove,
 }: InlineNoticeProps ) {
 	const {
@@ -89,27 +92,41 @@ export default function InlineNotice( {
 	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
-	const previousNoticeRef = useRef( notice );
+	const htmlDescriptionRef = useRef< HTMLSpanElement >( null );
+	const [ htmlMessage, setHtmlMessage ] = useState( '' );
+	const previousNoticeRef = useRef( announceOnMount ? undefined : notice );
+	const politeness = status === 'error' ? 'assertive' : 'polite';
 
-	useEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		const previousNotice = previousNoticeRef.current;
 		previousNoticeRef.current = notice;
 
-		// Notice.List handles new messages and urgency changes. An identical
-		// replacement needs a separate announcement without resetting controls.
-		if (
-			previousNotice !== notice &&
+		if ( previousNotice === notice ) {
+			return;
+		}
+
+		// Read the rendered description before the list observes this update.
+		// innerText preserves the breaks between lines and paragraphs.
+		const message =
 			notice.spokenMessage &&
-			previousNotice.spokenMessage === notice.spokenMessage &&
+			( htmlDescriptionRef.current?.innerText ?? notice.spokenMessage );
+		if ( notice.__unstableHTML ) {
+			setHtmlMessage( message ?? '' );
+		}
+		const previousMessage = previousNotice?.__unstableHTML
+			? htmlMessage
+			: previousNotice?.spokenMessage;
+		if (
+			message &&
+			previousNotice &&
+			previousMessage === message &&
 			( previousNotice.status === 'error' ) ===
 				( notice.status === 'error' )
 		) {
-			speak(
-				notice.spokenMessage,
-				notice.status === 'error' ? 'assertive' : 'polite'
-			);
+			// The list sees no change for an identical replacement.
+			speak( message, politeness );
 		}
-	}, [ notice ] );
+	}, [ notice, politeness, htmlMessage ] );
 
 	// Copying HTML content would put its tags on the clipboard.
 	const canCopy = !! details && ! __unstableHTML;
@@ -119,7 +136,10 @@ export default function InlineNotice( {
 		<>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			{ __unstableHTML ? (
-				<Notice.Description render={ <div /> }>
+				<Notice.Description
+					ref={ htmlDescriptionRef }
+					render={ <div /> }
+				>
 					<RawHTML>{ content }</RawHTML>
 				</Notice.Description>
 			) : (
@@ -180,11 +200,11 @@ export default function InlineNotice( {
 		</>
 	);
 
-	const politeness = status === 'error' ? 'assertive' : 'polite';
+	const listMessage = __unstableHTML ? htmlMessage : notice.spokenMessage;
 	const rootProps = {
 		intent: status,
-		spokenMessage: notice.spokenMessage ?? '',
-		politeness: notice.spokenMessage ? politeness : 'off',
+		spokenMessage: listMessage ?? '',
+		politeness: listMessage ? politeness : 'off',
 		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
 	} satisfies ComponentProps< typeof Notice.Root >;
 

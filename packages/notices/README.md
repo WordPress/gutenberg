@@ -33,7 +33,9 @@ Renders notice lists for notices with type `default`:
 
 `children` are rendered inside the dismissible list.
 
-Keep `InlineNotices` mounted when there are no notices. It uses `Notice.List` from `@wordpress/ui` to announce added and changed messages. Identical replacements use `speak()` to repeat the announcement without resetting the notice's controls or open details. Notices present when the component first mounts stay silent. Error notices are assertive; other notices are polite. Notices created with `speak: false` stay silent. Child notices built with `@wordpress/ui` also use the list's announcements, so do not announce them separately.
+Keep `InlineNotices` mounted when there are no notices. It announces added and changed messages. Replacing a notice with the same ID and message repeats the announcement and preserves focus and open details. Notices present on mount and notices created with `speak: false` stay silent. Errors are announced assertively and other notices politely.
+
+Child notices built with the same version of `@wordpress/ui` as `InlineNotices` share its `Notice.List` announcements. If your plugin bundles a different version, verify that the list announces your child notice before removing a separate `speak()` call.
 
 _Props_
 
