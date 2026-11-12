@@ -5696,6 +5696,27 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
+		// Flatten the theme & custom origins for spacingScale.
+		$scale_path    = array( 'settings', 'spacing', 'spacingScale' );
+		$spacing_scale = _wp_array_get( $output, $scale_path, null );
+		if ( is_array( $spacing_scale ) ) {
+			$flattened_scale = array();
+			if ( isset( $spacing_scale['theme'] ) && is_array( $spacing_scale['theme'] ) ) {
+				$flattened_scale = array_replace( $flattened_scale, $spacing_scale['theme'] );
+			}
+			if ( isset( $spacing_scale['custom'] ) && is_array( $spacing_scale['custom'] ) ) {
+				$flattened_scale = array_replace( $flattened_scale, $spacing_scale['custom'] );
+			}
+			if ( ! empty( $flattened_scale ) ) {
+				_wp_array_set( $output, $scale_path, $flattened_scale );
+			} else {
+				unset( $output['settings']['spacing']['spacingScale'] );
+				if ( empty( $output['settings']['spacing'] ) ) {
+					unset( $output['settings']['spacing'] );
+				}
+			}
+		}
+
 		// If all of the static::APPEARANCE_TOOLS_OPT_INS are true,
 		// this code unsets them and sets 'appearanceTools' instead.
 		foreach ( $nodes as $node ) {
