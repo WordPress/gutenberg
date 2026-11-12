@@ -1,10 +1,5 @@
-import {
-	useEffect,
-	useLayoutEffect,
-	useRef,
-	useState,
-} from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useEffect, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -28,7 +23,7 @@ export const SNAPSHOT_STATUS_SYNC_WAIT_MS = 3000;
  * Decides whether the shared (CRDT) document for a post contains everything
  * a previously captured snapshot describes.
  *
- * The decision is made at most once, shortly after mount:
+ * The decision settles at most once, and never changes after that:
  *
  * - 'present' when the shared document proves it holds everything the
  *   snapshot captured. The changes the snapshot describes are either part of
@@ -60,37 +55,18 @@ export default function useEntityContainsSnapshot( {
 	postId: number | string;
 	snapshot?: string;
 } ): SnapshotStatus {
-	const registry = useRegistry();
-
-	const [ snapshotStatus, setSnapshotStatus ] =
-		useState< SnapshotStatus >( 'pending' );
-
-	// Whether the decision is still waiting for a signal from the shared
-	// document. Only set for collaborative posts.
-	const isPendingRef = useRef( false );
-
-	// Whether the decision has waited long enough for the shared document
-	// to sync.
-	const [ hasWaitExpired, setHasWaitExpired ] = useState( false );
-
-	// Selected values used to re-run the decision effect below. The effect
-	// reads fresh store values when it runs.
-	const { syncStatus, isCollaborationEnabledForPost } = useSelect(
+	const { syncStatus, isCollaborationEnabled } = useSelect(
 		( select ) => {
 			if ( ! snapshot ) {
-				return {
-					syncStatus: undefined,
-					isCollaborationEnabledForPost: false,
-				};
+				return { syncStatus: undefined, isCollaborationEnabled: false };
 			}
 
-			const connectionStatus = unlock(
-				select( coreStore )
-			).getEntitySyncConnectionStatus( 'postType', postType, postId );
-
 			return {
-				syncStatus: connectionStatus?.status,
-				isCollaborationEnabledForPost: unlock(
+				syncStatus: unlock(
+					select( coreStore )
+				).getEntitySyncConnectionStatus( 'postType', postType, postId )
+					?.status,
+				isCollaborationEnabled: unlock(
 					select( editorStore )
 				).isCollaborationEnabledForCurrentPost(),
 			};
@@ -98,92 +74,49 @@ export default function useEntityContainsSnapshot( {
 		[ postType, postId, snapshot ]
 	);
 
-	useLayoutEffect( () => {
-		const canDefer =
-			snapshot &&
-			unlock(
-				registry.select( editorStore )
-			).isCollaborationEnabledForCurrentPost();
+	// Only a snapshot of a collaborative post can be confirmed by the shared
+	// document, so only then is it worth waiting for a sync.
+	const [ canWait ] = useState( isCollaborationEnabled );
+	const [ hasWaitExpired, setHasWaitExpired ] = useState( false );
+	const [ settledStatus, setSettledStatus ] =
+		useState< SnapshotStatus >( 'pending' );
 
-		// Without a snapshot to check, or outside real-time collaboration,
-		// the shared document can never confirm the snapshot. Fail open
-		// right away.
-		if ( ! canDefer ) {
-			setSnapshotStatus( 'missing' );
-			return;
-		}
-
-		// Defer the decision until the shared document confirms the snapshot,
-		// sync fails, or the wait deadline below expires (see the decision
-		// effect below).
-		isPendingRef.current = true;
-
-		const timeoutId = setTimeout( () => {
-			setHasWaitExpired( true );
-		}, SNAPSHOT_STATUS_SYNC_WAIT_MS );
-
-		return () => clearTimeout( timeoutId );
-
-		// The decision is initiated once, on mount.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
-
-	// Deferred snapshot status decision for collaborative posts. See the
-	// hook docblock for the full decision rules.
 	useEffect( () => {
-		if ( ! isPendingRef.current ) {
+		if ( ! canWait ) {
 			return;
 		}
-
-		const containsSnapshot = entityContainsSnapshot(
-			'postType',
-			postType,
-			postId,
-			snapshot
+		const timeoutId = setTimeout(
+			() => setHasWaitExpired( true ),
+			SNAPSHOT_STATUS_SYNC_WAIT_MS
 		);
+		return () => clearTimeout( timeoutId );
+	}, [ canWait ] );
 
-		const isCollaborationEnabled = unlock(
-			registry.select( editorStore )
-		).isCollaborationEnabledForCurrentPost();
-		const connectionStatus = unlock(
-			registry.select( coreStore )
-		).getEntitySyncConnectionStatus( 'postType', postType, postId );
+	if ( 'pending' !== settledStatus ) {
+		return settledStatus;
+	}
 
-		let nextSnapshotStatus: SnapshotStatus;
+	let status: SnapshotStatus = 'pending';
+	if ( ! canWait ) {
+		status = 'missing';
+	} else if (
+		entityContainsSnapshot( 'postType', postType, postId, snapshot )
+	) {
+		status = 'present';
+	} else if (
+		// Collaboration was disabled after mount (e.g. incompatible meta
+		// boxes were detected), the connection failed, or the document took
+		// too long to confirm the snapshot.
+		! isCollaborationEnabled ||
+		'disconnected' === syncStatus ||
+		hasWaitExpired
+	) {
+		status = 'missing';
+	}
 
-		if ( containsSnapshot ) {
-			nextSnapshotStatus = 'present';
-		} else if ( ! isCollaborationEnabled ) {
-			// Collaboration was disabled after mount (e.g. incompatible
-			// metaboxes were detected). Sync will never connect.
-			nextSnapshotStatus = 'missing';
-		} else if ( 'disconnected' === connectionStatus?.status ) {
-			// The connection failed before it was established, so the
-			// shared document may be missing the snapshotted content.
-			nextSnapshotStatus = 'missing';
-		} else if ( hasWaitExpired ) {
-			// The document did not confirm the snapshot in time. Treat the
-			// snapshotted content as missing from the shared document.
-			nextSnapshotStatus = 'missing';
-		} else {
-			// Keep waiting for a definitive signal.
-			return;
-		}
+	if ( 'pending' !== status ) {
+		setSettledStatus( status );
+	}
 
-		isPendingRef.current = false;
-		setSnapshotStatus( nextSnapshotStatus );
-
-		// The decision must run at most once. `snapshot` is stable for the
-		// lifetime of the caller; the values below only trigger
-		// re-evaluation.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		syncStatus,
-		hasWaitExpired,
-		isCollaborationEnabledForPost,
-		postType,
-		postId,
-	] );
-
-	return snapshotStatus;
+	return status;
 }
