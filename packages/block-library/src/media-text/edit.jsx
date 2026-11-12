@@ -11,6 +11,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	useSettings,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
@@ -69,6 +70,8 @@ function attributesFromMedia( {
 				mediaLink: undefined,
 				href: undefined,
 				focalPoint: undefined,
+				caption: undefined,
+				lightbox: undefined,
 				useFeaturedImage: false,
 			} );
 			return;
@@ -172,6 +175,7 @@ function MediaTextEdit( {
 	attributes,
 	isSelected,
 	setAttributes,
+	insertBlocksAfter,
 	context: { postId, postType },
 } ) {
 	const {
@@ -179,6 +183,7 @@ function MediaTextEdit( {
 		href,
 		imageFill,
 		isStackedOnMobile,
+		lightbox,
 		linkClass,
 		linkDestination,
 		linkTarget,
@@ -260,8 +265,48 @@ function MediaTextEdit( {
 			linkClass: undefined,
 			rel: undefined,
 			href: undefined,
+			lightbox: undefined,
 			useFeaturedImage: ! useFeaturedImage,
 		} );
+	};
+
+	const [ lightboxSetting ] = useSettings( 'lightbox' );
+
+	const showLightboxSetting =
+		( !! lightbox && lightbox?.enabled !== lightboxSetting?.enabled ) ||
+		lightboxSetting?.allowEditing;
+
+	const lightboxChecked =
+		!! lightbox?.enabled || ( ! lightbox && !! lightboxSetting?.enabled );
+
+	const onSetLightbox = ( enable ) => {
+		if ( enable && ! lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: true },
+			} );
+		} else if ( ! enable && lightboxSetting?.enabled ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
+	};
+
+	const resetLightbox = () => {
+		// When deleting a link while lightbox settings are enabled by default,
+		// disable the lightbox so the resulting UX does not look accidental.
+		if ( lightboxSetting?.enabled && lightboxSetting?.allowEditing ) {
+			setAttributes( {
+				lightbox: { enabled: false },
+			} );
+		} else {
+			setAttributes( {
+				lightbox: undefined,
+			} );
+		}
 	};
 
 	const refMedia = useRef();
@@ -553,6 +598,10 @@ function MediaTextEdit( {
 						linkTarget={ linkTarget }
 						linkClass={ linkClass }
 						rel={ rel }
+						showLightboxSetting={ showLightboxSetting }
+						lightboxEnabled={ lightboxChecked }
+						onSetLightbox={ onSetLightbox }
+						resetLightbox={ resetLightbox }
 					/>
 				) }
 			</BlockControls>
@@ -566,6 +615,9 @@ function MediaTextEdit( {
 					refMedia={ refMedia }
 					enableResize={ blockEditingMode === 'default' }
 					toggleUseFeaturedImage={ toggleUseFeaturedImage }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					insertBlocksAfter={ insertBlocksAfter }
 					{ ...{
 						focalPoint,
 						imageFill,

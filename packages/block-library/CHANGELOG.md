@@ -14,6 +14,7 @@
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
 -   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
+-	Media & Text: Add caption and Enlarge on click (lightbox) options for the media side, matching the Image block ([#81055](https://github.com/WordPress/gutenberg/pull/81055)).
 
 ### Bug Fixes
 
