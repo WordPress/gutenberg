@@ -133,6 +133,8 @@ jobs:
 
             - name: Build packages
               run: npm run build
+              env:
+                  WP_BUILD_CONCURRENCY: 4
 
             - name: Validate Vitest conventions and TypeScript test graph
               run: npm run test:unit:conventions

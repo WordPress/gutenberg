@@ -55,7 +55,7 @@ import {
 import { compileStylesheet, disposeSassCompiler } from './sass-compiler.mjs';
 import {
 	buildWithConcurrency,
-	getDefaultBuildConcurrency,
+	getBuildConcurrency,
 	setBuildConcurrency,
 } from './build-concurrency.mjs';
 
@@ -2991,7 +2991,7 @@ async function main() {
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
-	const buildConcurrency = getDefaultBuildConcurrency();
+	const buildConcurrency = getBuildConcurrency();
 	setBuildConcurrency( buildConcurrency );
 	console.log( `⚙️ Using build concurrency: ${ buildConcurrency }\n` );
 
