@@ -10,7 +10,7 @@ import type {
 import PreviewStyles from './preview-styles';
 import Variation from './variations/variation';
 import { GlobalStylesContext } from './context';
-import { isVariationWithProperties } from './utils';
+import { isVariationWithProperties, removeVariationCss } from './utils';
 
 interface StyleVariationsContainerProps {
 	gap?: number;
@@ -47,6 +47,11 @@ function StyleVariationsContainer( {
 	);
 
 	const themeVariations = useMemo( () => {
+		// Selecting a variation copies its custom CSS into the user's custom CSS.
+		// Remove it again so it isn't carried over to other variations, and
+		// only the CSS the user wrote themselves is preserved.
+		const allVariations = variations ?? [];
+		const userCss = removeVariationCss( userStyles?.css, allVariations );
 		const withEmptyVariation: StyleVariation[] = [
 			{
 				title: __( 'Default' ),
@@ -67,17 +72,18 @@ function StyleVariationsContainer( {
 					Object.keys( userStyles.blocks ).forEach( ( blockName ) => {
 						// First get any block specific custom CSS from the current user styles and merge with any custom CSS for
 						// that block in the variation.
-						if ( userStyles.blocks?.[ blockName ]?.css ) {
+						const userBlockCss = removeVariationCss(
+							userStyles.blocks?.[ blockName ]?.css,
+							allVariations,
+							blockName
+						);
+						if ( userBlockCss ) {
 							const variationBlockStyles =
 								blockStyles[ blockName ] || {};
 							const customCSS = {
 								css: `${
 									blockStyles[ blockName ]?.css || ''
-								} ${
-									userStyles.blocks?.[
-										blockName
-									]?.css?.trim() || ''
-								}`,
+								} ${ userBlockCss }`,
 							};
 							blockStyles[ blockName ] = {
 								...variationBlockStyles,
@@ -88,11 +94,9 @@ function StyleVariationsContainer( {
 				}
 				// Now merge any global custom CSS from current user styles with global custom CSS in the variation.
 				const css =
-					userStyles?.css || variation.styles?.css
+					userCss || variation.styles?.css
 						? {
-								css: `${ variation.styles?.css || '' } ${
-									userStyles?.css || ''
-								}`,
+								css: `${ variation.styles?.css || '' } ${ userCss }`,
 							}
 						: {};
 
@@ -113,7 +117,12 @@ function StyleVariationsContainer( {
 				};
 			} ),
 		];
-	}, [ fullStyleVariations, userStyles?.blocks, userStyles?.css ] );
+	}, [
+		variations,
+		fullStyleVariations,
+		userStyles?.blocks,
+		userStyles?.css,
+	] );
 
 	if ( ! fullStyleVariations || fullStyleVariations.length < 1 ) {
 		return null;

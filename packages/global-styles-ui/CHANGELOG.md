@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Style variations: switching back to Default no longer keeps the custom CSS (`styles.css`) of the previously selected variation.
+
 ### Enhancements
 
 -   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
