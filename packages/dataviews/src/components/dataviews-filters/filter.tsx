@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { RefObject } from 'react';
 import { Dropdown, FlexItem, Icon as WCIcon } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useRef } from '@wordpress/element';
+import { useContext, useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { Select, Stack, Tooltip } from '@wordpress/ui';
 import SearchWidget from './search-widget';
@@ -17,6 +17,7 @@ import type {
 	View,
 } from '../../types';
 import useElements from '../../hooks/use-elements';
+import DataViewsContext from '../dataviews-context';
 
 const ENTER = 'Enter';
 const SPACE = ' ';
@@ -178,6 +179,7 @@ export default function Filter( {
 	fields,
 	...commonProps
 }: FilterProps ) {
+	const { constrainFilterEditor = false } = useContext( DataViewsContext );
 	const toggleRef = useRef< HTMLDivElement >( null );
 	const { filter, view, onChangeView } = commonProps;
 	const filterInView = view.filters?.find(
@@ -274,7 +276,12 @@ export default function Filter( {
 			defaultOpen={ openedFilter === filter.field }
 			className="dataviews-filters__summary-chip-dropdown"
 			contentClassName="dataviews-filters__summary-popover"
-			popoverProps={ { placement: 'bottom-start', role: 'dialog' } }
+			popoverProps={ {
+				placement: 'bottom-start',
+				role: 'dialog',
+				resize: ! constrainFilterEditor,
+				shift: constrainFilterEditor,
+			} }
 			onClose={ () => {
 				toggleRef.current?.focus();
 			} }
@@ -374,7 +381,13 @@ export default function Filter( {
 			) }
 			renderContent={ () => {
 				return (
-					<Stack direction="column" justify="flex-start">
+					<Stack
+						direction="column"
+						justify="flex-start"
+						className={ clsx( 'dataviews-filters__editor', {
+							'is-constrained': constrainFilterEditor,
+						} ) }
+					>
 						<OperatorSelector { ...commonProps } />
 						{ commonProps.filter.hasElements ? (
 							<SearchWidget

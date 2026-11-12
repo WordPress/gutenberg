@@ -1,20 +1,21 @@
 .dataviews-view-config {
-	width: 320px;
 	container-type: inline-size;
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: var(--wpds-typography-line-height-sm);
 }
 
-.dataviews-config__popover.is-expanded .dataviews-config__popover-content-wrapper {
-	overflow-y: scroll;
-	height: 100%;
-	.dataviews-view-config {
-		width: auto;
-	}
+.dataviews-view-config__panel {
+	padding-block-start: var(--wpds-dimension-padding-xl);
 }
 
-.dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
-	text-transform: uppercase;
+.dataviews-view-config__content {
+	container-type: size;
+}
+
+.dataviews-view-config__sort-direction {
+	.components-toggle-group-control-option-base {
+		text-transform: uppercase;
+	}
 }
 
 .dataviews-settings-section__title.dataviews-settings-section__title {
@@ -78,4 +79,3 @@
 	border-radius: 50%;
 	pointer-events: none;
 }
-

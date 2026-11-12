@@ -9,6 +9,12 @@
 	padding-top: 0;
 }
 
+.dataviews-filters__editor.is-constrained {
+	max-inline-size: 100cqi;
+	max-block-size: 100cqb;
+	overflow: auto;
+}
+
 .dataviews-filters__reset-button.dataviews-filters__reset-button[aria-disabled="true"] {
 	&,
 	&:hover {
