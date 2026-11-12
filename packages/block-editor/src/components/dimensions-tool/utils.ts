@@ -1,6 +1,30 @@
 import type { DimensionsToolOption } from './types';
 
 /**
+ * Matches a number of pixels as it is typed in a field, without the unit.
+ */
+export const PIXEL_AMOUNT_REGEXP = /^\d+(?:\.\d+)?$/;
+
+/**
+ * Gets the number of pixels in a CSS length, so that it can be edited in a
+ * field that only accepts pixels.
+ *
+ * @param value CSS length, e.g. '800px'. Unitless numbers are pixels.
+ *
+ * @return The number of pixels without the unit, an empty string when there
+ *         is no value, or null when the value uses another unit.
+ */
+export function getPixelAmount( value?: string | null ): string | null {
+	if ( ! value ) {
+		return '';
+	}
+
+	const amount = value.trim().replace( /px$/, '' );
+
+	return PIXEL_AMOUNT_REGEXP.test( amount ) ? amount : null;
+}
+
+/**
  * Parses a CSS `aspect-ratio` value into a number so that values that are
  * written differently but describe the same ratio, e.g. `1` and `1/1`, can be
  * compared.

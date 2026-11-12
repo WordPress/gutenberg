@@ -976,4 +976,186 @@ describe( 'DimensionsTool', () => {
 			] );
 		} );
 	} );
+
+	describe( 'size suggestions', () => {
+		it( 'suggests fractions of the natural width', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<Example
+					onChange={ vi.fn() }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Width' } )
+			);
+
+			const options = await screen.findAllByRole( 'option' );
+
+			expect( options.map( ( option ) => option.textContent ) ).toEqual( [
+				'25%400px',
+				'50%800px',
+				'75%1200px',
+				'100%1600px',
+			] );
+			expect(
+				screen.getByRole( 'option', { name: '50%' } )
+			).toHaveAccessibleDescription( '800px' );
+		} );
+
+		it( 'sets the width to a suggested size', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render(
+				<Example
+					onChange={ onChange }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			const widthInput = screen.getByRole( 'combobox', {
+				name: 'Width',
+			} );
+
+			await user.click( widthInput );
+			await user.click(
+				await screen.findByRole( 'option', { name: '50%' } )
+			);
+
+			expect( widthInput ).toHaveValue( '800' );
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { width: '800px' } ],
+			] );
+		} );
+
+		it( 'sets the height to a suggested size with the keyboard', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render(
+				<Example
+					onChange={ onChange }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Height' } )
+			);
+			await screen.findAllByRole( 'option' );
+			await user.keyboard( '{ArrowDown}{ArrowDown}{Enter}' );
+
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { height: '500px' } ],
+			] );
+		} );
+
+		it( 'saves a typed size in pixels', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render(
+				<Example
+					onChange={ onChange }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			await user.type(
+				screen.getByRole( 'combobox', { name: 'Width' } ),
+				'64.5'
+			);
+
+			// The text is only saved while it's a size, so '64.' isn't.
+			expect( onChange.mock.calls ).toStrictEqual( [
+				[ { width: '6px' } ],
+				[ { width: '64px' } ],
+				[ { width: '64.5px' } ],
+			] );
+		} );
+
+		it( 'drops typed text that is not a size when leaving the field', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render(
+				<Example
+					initialValue={ { width: '400px' } }
+					onChange={ onChange }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			const widthInput = screen.getByRole( 'combobox', {
+				name: 'Width',
+			} );
+
+			await user.type( widthInput, 'abc' );
+			expect( widthInput ).toHaveValue( '400abc' );
+
+			await user.tab();
+			expect( widthInput ).toHaveValue( '400' );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'removes the width when the field is emptied', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			render(
+				<Example
+					initialValue={ { width: '400px' } }
+					onChange={ onChange }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			await user.clear(
+				screen.getByRole( 'combobox', { name: 'Width' } )
+			);
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange.mock.calls[ 0 ][ 0 ] ).not.toHaveProperty(
+				'width'
+			);
+		} );
+
+		it( 'keeps the unit field for a value in another unit', () => {
+			render(
+				<Example
+					initialValue={ { width: '50%' } }
+					onChange={ vi.fn() }
+					naturalWidth={ 1600 }
+					naturalHeight={ 1000 }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'combobox', { name: 'Height' } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'does not suggest sizes without the natural size', () => {
+			render( <Example onChange={ vi.fn() } naturalWidth={ 1600 } /> );
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Width' } )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Width' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
 } );
