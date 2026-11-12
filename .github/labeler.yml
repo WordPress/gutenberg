@@ -158,6 +158,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/image-cropper/**'
 
+'[Package] Image Editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/image-editor/**'
+
 '[Package] Interactivity':
     - changed-files:
           - any-glob-to-any-file: 'packages/interactivity/**'

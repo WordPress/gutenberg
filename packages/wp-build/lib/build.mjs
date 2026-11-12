@@ -22,7 +22,12 @@ import {
 	getPhpReplacements,
 	renderTemplateToString,
 } from './php-generator.mjs';
-import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import {
+	boolConfigVal,
+	getPackageInfo,
+	getPackageInfoFromFile,
+} from './package-utils.mjs';
+import { copyPackageFile, getCopyFiles } from './copy-files.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -112,20 +117,6 @@ const PAGES = WP_PLUGIN_CONFIG.pages || [];
 // declare one. Pages rendering outside the menu page callback flow must
 // enforce this themselves.
 const DEFAULT_PAGE_CAPABILITY = 'manage_options';
-
-/**
- * Interprets a configuration value as a boolean, where `"true"` and `"1"`
- * are considered true while all other values are false.
- *
- * @param {string|undefined} value The configuration value to interpret.
- * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
- */
-const boolConfigVal = ( value ) => {
-	if ( value === undefined ) {
-		return undefined;
-	}
-	return [ 'true', '1' ].includes( value.toLowerCase() );
-};
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -396,65 +387,6 @@ export default bytes;`,
  */
 function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
-}
-
-function transformPhpContent( content, transforms ) {
-	const {
-		functionPrefix = '',
-		classSuffix = '',
-		prefixFunctions = [],
-		suffixClasses = [],
-		addActionPriority,
-	} = transforms;
-
-	content = content.toString();
-
-	/*
-	 * Transforms are used to modify PHP files that are committed to version
-	 * control in their wordpress-develop state (`wp_` function prefixes, `WP_`
-	 * class prefixes, etc.). When building for WordPress Core, it's not
-	 * necessary to perform these steps.
-	 */
-	if (
-		boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
-		boolConfigVal( process.env.npm_package_config_IS_WORDPRESS_CORE )
-	) {
-		return content;
-	}
-
-	if ( prefixFunctions.length ) {
-		content = content.replace(
-			new RegExp( prefixFunctions.join( '|' ), 'g' ),
-			( match ) => `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`
-		);
-	}
-
-	if ( suffixClasses.length ) {
-		content = content.replace(
-			new RegExp( suffixClasses.join( '|' ), 'g' ),
-			( match ) => `${ match }${ classSuffix }`
-		);
-	}
-
-	if ( functionPrefix ) {
-		content = Array.from(
-			content.matchAll( /^\s*function ([^\(]+)/gm )
-		).reduce( ( result, [ , functionName ] ) => {
-			return result.replace(
-				new RegExp( functionName + '(?![a-zA-Z0-9_])', 'g' ),
-				( match ) => functionPrefix + match.replace( /^wp_/, '' )
-			);
-		}, content );
-	}
-
-	if ( addActionPriority ) {
-		content = content.replace(
-			/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-			`$1, ${ addActionPriority }`
-		);
-	}
-
-	return content;
 }
 
 /**
@@ -880,76 +812,15 @@ async function bundlePackage( packageName, options = {} ) {
 		}
 	}
 
-	if ( packageJson.wpCopyFiles ) {
-		const { files, transforms = {} } = packageJson.wpCopyFiles;
-		const packageSourceDir = path.join( packageDir, 'src' );
-		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
-
-		for ( const filePattern of files ) {
-			const matchedFiles = await glob(
-				normalizePath( path.join( packageDir, filePattern ) )
-			);
-
-			for ( const sourceFile of matchedFiles ) {
-				const relativePath = path.relative(
-					packageSourceDir,
-					sourceFile
-				);
-				const destPath = path.join( outputDir, relativePath );
-				const destDir = path.dirname( destPath );
-
-				if ( sourceFile.endsWith( '.php' ) && transforms.php ) {
-					builds.push(
-						( async () => {
-							let finalPath = destPath;
-							let finalDir = destDir;
-
-							const content = await readFile(
-								sourceFile,
-								'utf8'
-							);
-							const transformed = transformPhpContent(
-								content,
-								transforms.php
-							);
-
-							if ( transforms.php.filenameSuffix ) {
-								const ext = path.extname( destPath );
-								const base = path.basename( destPath, ext );
-								finalPath = path.join(
-									destDir,
-									`${ base }${ transforms.php.filenameSuffix }${ ext }`
-								);
-							}
-
-							// Check if we should flatten index.php files
-							if (
-								transforms.php.flattenIndexFiles &&
-								path.basename( sourceFile ) === 'index.php'
-							) {
-								// Flatten: button/index.php → button.php
-								const parentDir = path.dirname( finalPath );
-								const blockName = path.basename( parentDir );
-								finalPath = path.join(
-									path.dirname( parentDir ),
-									`${ blockName }.php`
-								);
-								finalDir = path.dirname( finalPath );
-							}
-
-							await mkdir( finalDir, { recursive: true } );
-							await writeFile( finalPath, transformed );
-						} )()
-					);
-				} else {
-					builds.push(
-						mkdir( destDir, { recursive: true } ).then( () =>
-							copyFile( sourceFile, destPath )
-						)
-					);
-				}
-			}
-		}
+	for ( const sourceFile of await getCopyFiles( packageDir, packageJson ) ) {
+		builds.push(
+			copyPackageFile(
+				sourceFile,
+				packageDir,
+				path.join( BUILD_DIR, 'scripts', packageName ),
+				packageJson
+			)
+		);
 	}
 
 	if ( builds.length === 0 ) {
@@ -2700,6 +2571,7 @@ async function watchMode() {
 	 * Rebuild a package and any affected scripts/modules.
 	 *
 	 * @param {string} packageName Package to rebuild (short name).
+	 * @return {Promise<boolean>} Whether the package itself was rebuilt.
 	 */
 	async function rebuildPackage( packageName ) {
 		try {
@@ -2756,8 +2628,10 @@ async function watchMode() {
 					);
 				}
 			}
+			return true;
 		} catch ( error ) {
 			console.log( `❌ ${ packageName } - Error: ${ error.message }` );
+			return false;
 		}
 	}
 
@@ -2779,6 +2653,58 @@ async function watchMode() {
 		}
 	}
 
+	/**
+	 * Copy a changed PHP file to the build, without rebuilding its package.
+	 *
+	 * @param {string} filename Absolute path of the PHP file.
+	 */
+	async function recopyPhpFile( filename ) {
+		const packageName = getPackageName( filename );
+		const relativePath = path.relative( PACKAGES_DIR, filename );
+		try {
+			const startTime = Date.now();
+			await copyPackageFile(
+				filename,
+				path.join( PACKAGES_DIR, packageName ),
+				path.join( BUILD_DIR, 'scripts', packageName ),
+				fullToPackageJson.get( shortToFull.get( packageName ) )
+			);
+			const copyTime = Date.now() - startTime;
+			console.log( `✅ ${ relativePath } (copied) (${ copyTime }ms)` );
+		} catch ( error ) {
+			// The file was removed since; its removal rebuilds the package.
+			if ( error.code === 'ENOENT' ) {
+				return;
+			}
+			console.log( `❌ ${ relativePath } - Error: ${ error.message }` );
+		}
+	}
+
+	/*
+	 * The PHP files each package copies to the build with `wpCopyFiles`, by
+	 * package name. Only the build's copy of such a file depends on it, so a
+	 * change to it needs the file copied again, not its package rebuilt.
+	 */
+	const copiedPhpFiles = new Map();
+
+	/**
+	 * Find the PHP files a package copies to the build with `wpCopyFiles`.
+	 *
+	 * @param {string} packageName Package name (short name).
+	 */
+	async function updateCopiedPhpFiles( packageName ) {
+		const copyFiles = await getCopyFiles(
+			path.join( PACKAGES_DIR, packageName ),
+			fullToPackageJson.get( shortToFull.get( packageName ) )
+		);
+		copiedPhpFiles.set(
+			packageName,
+			new Set( copyFiles.filter( ( file ) => file.endsWith( '.php' ) ) )
+		);
+	}
+
+	await Promise.all( PACKAGES.map( updateCopiedPhpFiles ) );
+
 	async function processNextRebuild() {
 		if ( needsRebuild.size === 0 ) {
 			isRebuilding = false;
@@ -2788,6 +2714,9 @@ async function watchMode() {
 		const itemsToRebuild = Array.from( needsRebuild );
 		needsRebuild.clear();
 
+		const phpFilesToCopy = [];
+		const rebuiltPackages = new Set();
+
 		for ( const item of itemsToRebuild ) {
 			// Check if it's a route (prefixed with 'route:')
 			if ( item.startsWith( 'route:' ) ) {
@@ -2796,8 +2725,17 @@ async function watchMode() {
 			} else if ( item.startsWith( 'widget:' ) ) {
 				const widgetDirName = item.slice( 7 ); // Remove 'widget:' prefix
 				await rebuildWidget( widgetDirName );
-			} else {
-				await rebuildPackage( item );
+			} else if ( item.startsWith( 'php:' ) ) {
+				phpFilesToCopy.push( item.slice( 4 ) ); // Remove 'php:' prefix
+			} else if ( await rebuildPackage( item ) ) {
+				rebuiltPackages.add( item );
+			}
+		}
+
+		// Copy the PHP files last, unless a rebuild of their package did.
+		for ( const file of phpFilesToCopy ) {
+			if ( ! rebuiltPackages.has( getPackageName( file ) ) ) {
+				await recopyPhpFile( file );
 			}
 		}
 
@@ -2839,7 +2777,7 @@ async function watchMode() {
 		console.error( '❌ Watcher error:', error );
 	} );
 
-	const handleFileChange = async ( filename ) => {
+	const handleFileChange = async ( filename, event ) => {
 		if ( ! isPackageSourceFile( filename ) ) {
 			return;
 		}
@@ -2849,19 +2787,47 @@ async function watchMode() {
 			return;
 		}
 
+		/*
+		 * A changed PHP file only needs copying again. An added or removed
+		 * one still rebuilds its package, which copies all of its files.
+		 */
+		const file = normalizePath( path.resolve( filename ) );
+		const item =
+			event === 'change' && copiedPhpFiles.get( packageName )?.has( file )
+				? `php:${ file }`
+				: packageName;
+
+		/*
+		 * Find the package's copied PHP files again when one may have been
+		 * added or removed. Until that finishes, a change to an added file
+		 * rebuilds the package, which copies it too.
+		 */
+		if ( event !== 'change' && file.endsWith( '.php' ) ) {
+			updateCopiedPhpFiles( packageName ).catch( ( error ) => {
+				console.log(
+					`❌ ${ packageName } - Error finding copied PHP files: ${ error.message }`
+				);
+			} );
+		}
+
+		// Queue the item, so that it is not written while a rebuild is running.
 		if ( isRebuilding ) {
-			needsRebuild.add( packageName );
+			needsRebuild.add( item );
 			return;
 		}
 
 		isRebuilding = true;
-		await rebuildPackage( packageName );
+		needsRebuild.add( item );
 		await processNextRebuild();
 	};
 
-	watcher.on( 'change', handleFileChange );
-	watcher.on( 'add', handleFileChange );
-	watcher.on( 'unlink', handleFileChange );
+	watcher.on( 'change', ( filename ) =>
+		handleFileChange( filename, 'change' )
+	);
+	watcher.on( 'add', ( filename ) => handleFileChange( filename, 'add' ) );
+	watcher.on( 'unlink', ( filename ) =>
+		handleFileChange( filename, 'unlink' )
+	);
 
 	// Watch route files if routes exist
 	if ( allRoutes.length > 0 ) {

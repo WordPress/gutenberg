@@ -4,6 +4,14 @@
 
 ### Bug Fixes
 
+-   Only render the most recently started navigation: a navigation superseded by another `navigate()` call, including one to the same URL, or by a back/forward traversal no longer renders its page, updates `state.url`, changes the session history or falls back to a full page load, and its promise resolves. Its loading animation and screen reader announcements end when the next navigation renders. An in-page link clicked during a navigation no longer sets `state.navigating` to `false` or clears `state.initiator` before that navigation renders; browsers without the Navigation API handle that click like a back/forward traversal ([#86515](https://github.com/WordPress/gutenberg/pull/86515)).
+-   Fix `data-wp-router-region` elements nested inside a `data-wp-interactive` element without a `data-wp-interactive` of their own being removed on client-side navigation; they are now updated and inherit the namespace of their nearest `data-wp-interactive` ancestor ([#86061](https://github.com/WordPress/gutenberg/pull/86061)).
+-   Run the callbacks Preact invokes directly while `navigate()` renders `attachTo` regions, such as effects, layout effects and ref callbacks, without a directive scope, so `getContext()`, `getElement()` and the derived `initiator` never read the scope of the element that called `navigate()`. Callbacks the runtime binds to their own element, like those of `data-wp-watch` and `data-wp-init`, keep that element's scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
+
+## 3.1.0 (2026-11-04)
+
+### Bug Fixes
+
 -   `navigate()` and `prefetch()`: Only read options passed as own properties of the options object. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Read the Script Module data via a `script` type selector so an element with a colliding `id` (e.g. a `<div>` in post content) cannot shadow the data script tag. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Only render fetched pages that are same-origin HTML documents, and perform a full page load for any other response. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
