@@ -1,9 +1,8 @@
-/**
- * Internal dependencies
- */
+import type { ChangeObject } from 'diff';
+import { describe, expect, it } from 'vitest';
 import { getFieldsDiffEntries } from '../';
 
-function getText( parts, type ) {
+function getText( parts: ChangeObject< string >[], type: 'added' | 'removed' ) {
 	return parts
 		.filter( ( part ) => Boolean( part[ type ] ) )
 		.map( ( part ) => part.value )
@@ -25,8 +24,8 @@ describe( 'getFieldsDiffEntries', () => {
 		);
 
 		expect( hasChangedPostFields ).toBe( true );
-		expect( getText( entries.Title, 'removed' ) ).toBe( 'Old' );
-		expect( getText( entries.Title, 'added' ) ).toBe( 'New' );
+		expect( getText( entries!.Title, 'removed' ) ).toBe( 'Old' );
+		expect( getText( entries!.Title, 'added' ) ).toBe( 'New' );
 	} );
 
 	it( 'diffs the excerpt against the previous revision', () => {
@@ -36,8 +35,8 @@ describe( 'getFieldsDiffEntries', () => {
 		);
 
 		expect( hasChangedPostFields ).toBe( true );
-		expect( getText( entries.Excerpt, 'removed' ) ).toBe( 'long' );
-		expect( getText( entries.Excerpt, 'added' ) ).toBe( 'short' );
+		expect( getText( entries!.Excerpt, 'removed' ) ).toBe( 'long' );
+		expect( getText( entries!.Excerpt, 'added' ) ).toBe( 'short' );
 	} );
 
 	it( 'omits unchanged title and excerpt rows', () => {
@@ -64,8 +63,8 @@ describe( 'getFieldsDiffEntries', () => {
 			null
 		);
 
-		expect( getText( entries.Title, 'added' ) ).toBe( 'First title' );
-		expect( getText( entries.Title, 'removed' ) ).toBe( '' );
+		expect( getText( entries!.Title, 'added' ) ).toBe( 'First title' );
+		expect( getText( entries!.Title, 'removed' ) ).toBe( '' );
 	} );
 
 	it( 'keeps non-empty meta values and skips empty ones', () => {

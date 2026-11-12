@@ -43,9 +43,9 @@ function isEmptyMeta( str ) {
  * Title and excerpt only appear when they changed. Meta fields keep their
  * existing behavior and appear when either revision has a non-empty value.
  *
- * @param {Object}      revision         The current revision record.
- * @param {Object|null} previousRevision The previous revision record.
- * @return {Object} Field diff entries and whether the title or excerpt changed.
+ * @param {?Object} revision         The current revision record.
+ * @param {?Object} previousRevision The previous revision record.
+ * @return {{ entries: ?Object<string, import('diff').ChangeObject<string>[]>, hasChangedPostFields: boolean }} Field diff entries and whether the title or excerpt changed.
  */
 export function getFieldsDiffEntries( revision, previousRevision ) {
 	if ( ! revision ) {
