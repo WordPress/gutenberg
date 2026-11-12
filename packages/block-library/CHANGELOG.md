@@ -39,7 +39,7 @@
 -   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
--   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#](https://github.com/WordPress/gutenberg/pull/)).
+-   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#86728](https://github.com/WordPress/gutenberg/pull/86728)).
 
 ## 12.1.0 (2026-11-04)
 
