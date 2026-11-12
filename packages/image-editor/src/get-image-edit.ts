@@ -1,21 +1,25 @@
-import type { ImageEditorState } from './core/types';
+import type { Flip, ImageEditorState, NormalizedRect } from './core/types';
 import { getRotatedBBox } from './core/camera';
 
 /**
- * One edit to apply to the full-size image loaded in `state.image`.
- * `mapEditToOriginal` returns them in the order to apply them.
- *
- *   - `flip`:   mirror along each axis that is `true`.
- *   - `rotate`: rotate clockwise by `angle` degrees, about the centre. The
- *     result is the bounding box of the rotated image.
- *   - `crop`:   cut out a rectangle of the image as it is **at that
- *     point**, after any `rotate` before it. Position and size are
- *     fractions (0–1) of that image's width and height, from the top-left.
+ * How the image loaded in `state.image` is edited: the flip, rotation and
+ * crop that turn it into what the person framed. Apply them in that order.
+ * A part is absent when it changes nothing.
  */
-export type OriginalImageEdit =
-	| { type: 'flip'; horizontal: boolean; vertical: boolean }
-	| { type: 'rotate'; angle: number }
-	| { type: 'crop'; x: number; y: number; width: number; height: number };
+export interface ImageEdit {
+	flip?: Flip;
+	/**
+	 * Degrees clockwise about the centre, applied after the flip. With
+	 * exactly one axis flipped this is 360 minus `state.rotation`. The
+	 * result is the bounding box of the rotated image.
+	 */
+	rotation?: number;
+	/**
+	 * The rectangle to keep, as fractions (0-1) of the rotated image's
+	 * width and height, from its top left.
+	 */
+	crop?: NormalizedRect;
+}
 
 /**
  * Tolerance (a fraction of the image) used to decide whether a crop rect
@@ -26,21 +30,15 @@ export type OriginalImageEdit =
 const CROP_TOLERANCE = 0.001;
 
 /**
- * Map the person's edit onto the full-size image loaded in `state.image`.
+ * The person's edit, described against the image loaded in `state.image`.
  *
  * The editor's state describes what the canvas shows: where the image sits
  * under the crop, how far it is zoomed, and a crop area measured against
- * the view. An image processor needs operations on the loaded image
- * instead. This returns flip, rotate and crop edits in application order.
- * The loaded image may itself be a previously edited file; "original"
- * refers to that image for this call.
+ * the view. Something that edits the image needs the edit described against
+ * the image instead.
  *
- * Emits `[flip, rotate, crop]` in that order. Identity operations are
- * pruned — an absent flip, a rotation that normalizes to 0°, and a crop
- * rect that covers (within tolerance) the full post-rotate AABB each
- * produce no edit. An empty array means no image has loaded or there is
- * no flip, rotation or crop to apply. A locked ratio can produce a crop
- * edit even before the person edits anything.
+ * A crop within `CROP_TOLERANCE` of the whole rotated image is omitted.
+ * A locked ratio can produce a crop before the person edits anything.
  *
  * Frames and math:
  *
@@ -48,7 +46,7 @@ const CROP_TOLERANCE = 0.001;
  * bounding box (the stencil-reference frame — see `createCamera` /
  * `createExportCamera`). Pan is in that frame; zoom scales the image
  * beneath a fixed stencil. Two conversions are needed to reach the frame
- * the crop edit applies against:
+ * the crop applies against:
  *
  *   1. Express the stencil rect in snap-AABB **pixels**:
  *      Image screen-normalized top-left with zoom/pan is
@@ -61,7 +59,7 @@ const CROP_TOLERANCE = 0.001;
  *      translated rect as fractions of the full AABB.
  *
  * Rotation sign: the editor composes `flip · R(θ)` on the source (see
- * `createExportCamera` — rotate then flip). The edits' `[flip, rotate]`
+ * `createExportCamera` — rotate then flip). The edit's flip-then-rotate
  * order is the opposite: `R(θ') · flip`. For both to land on the
  * same pixels we invert the rotation sign when exactly one flip axis
  * is set (`flip_h · R(θ) = R(-θ) · flip_h`). Both-or-neither flips
@@ -70,17 +68,14 @@ const CROP_TOLERANCE = 0.001;
  *
  * @param state The editor state. The edit and the loaded image's natural
  *              size are both read from it.
- * @return Ordered edits; empty when nothing changes the original or no
- *         image has loaded.
+ * @return The edit, or `null` when no image has loaded.
  */
-export function mapEditToOriginal(
-	state: ImageEditorState
-): OriginalImageEdit[] {
-	const edits: OriginalImageEdit[] = [];
+export function getImageEdit( state: ImageEditorState ): ImageEdit | null {
+	const edit: ImageEdit = {};
 	const { image } = state;
 
 	if ( ! image || image.naturalWidth === 0 || image.naturalHeight === 0 ) {
-		return edits;
+		return null;
 	}
 
 	const imageSize = {
@@ -92,20 +87,16 @@ export function mapEditToOriginal(
 	const hasFlipV = flip.vertical;
 
 	if ( hasFlipH || hasFlipV ) {
-		edits.push( {
-			type: 'flip',
-			horizontal: hasFlipH,
-			vertical: hasFlipV,
-		} );
+		edit.flip = { horizontal: hasFlipH, vertical: hasFlipV };
 	}
 
 	const rawAngle = ( ( state.rotation % 360 ) + 360 ) % 360;
-	// Invert the sign for single-axis flips so the edits' `flip → rotate`
+	// Invert the sign for single-axis flips so the edit's `flip → rotate`
 	// order matches the editor's `rotate → flip` composition.
 	const singleAxisFlip = hasFlipH !== hasFlipV;
 	const signedAngle = singleAxisFlip ? ( 360 - rawAngle ) % 360 : rawAngle;
 	if ( signedAngle !== 0 ) {
-		edits.push( { type: 'rotate', angle: signedAngle } );
+		edit.rotation = signedAngle;
 	}
 
 	const snapRotation = Math.round( state.rotation / 90 ) * 90;
@@ -149,8 +140,8 @@ export function mapEditToOriginal(
 		height >= 1 - CROP_TOLERANCE;
 
 	if ( ! coversFullFrame ) {
-		edits.push( { type: 'crop', x, y, width, height } );
+		edit.crop = { x, y, width, height };
 	}
 
-	return edits;
+	return edit;
 }

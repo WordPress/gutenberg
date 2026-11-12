@@ -13,6 +13,12 @@ export default {
 	'--wpds-border-width-md': '4px',
 	'--wpds-border-width-sm': '2px',
 	'--wpds-border-width-xs': '1px',
+	'--wpds-color-background-indicator-brand':
+		'var(--wp-admin-theme-color, #3858e9)',
+	'--wpds-color-background-indicator-error': '#9c0000',
+	'--wpds-color-background-indicator-neutral': '#1e1e1e',
+	'--wpds-color-background-indicator-success': '#005e12',
+	'--wpds-color-background-indicator-warning': '#6d4700',
 	'--wpds-color-background-interactive-brand-strong':
 		'var(--wp-admin-theme-color, #3858e9)',
 	'--wpds-color-background-interactive-brand-strong-active':
