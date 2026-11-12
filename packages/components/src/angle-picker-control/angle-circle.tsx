@@ -27,7 +27,10 @@ function AngleCircle( {
 	const previousCursorValueRef =
 		useRef< CSSStyleDeclaration[ 'cursor' ] >( undefined );
 	// Read during a drag instead of `value`, which can lag between events.
-	const dragRef = useRef< { angle: number; turned: number } >( undefined );
+	const dragStateRef = useRef< {
+		lastPointerAngle: number;
+		unclampedValue: number;
+	} >( undefined );
 	// The default range keeps reporting the raw dial angle, as it always has.
 	const isDefaultRange = min === 0 && max === 360;
 
@@ -78,9 +81,9 @@ function AngleCircle( {
 			value !== '' && Number.isFinite( currentValue )
 				? clamp( currentValue, min, max )
 				: clamp( 0, min, max );
-		const turned = getNearestEquivalent( angle, reference );
-		dragRef.current = { angle, turned };
-		onChange( clamp( turned, min, max ) );
+		const unclampedValue = getNearestEquivalent( angle, reference );
+		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
+		onChange( clamp( unclampedValue, min, max ) );
 	};
 
 	const continueTurn = ( event: UseDraggingCallbackEvent ) => {
@@ -94,17 +97,20 @@ function AngleCircle( {
 			return;
 		}
 
-		if ( dragRef.current === undefined ) {
+		if ( dragStateRef.current === undefined ) {
 			return;
 		}
 
 		// Between two events the pointer is taken to have turned the short
 		// way round, so a fast flick of more than half a turn reverses.
-		const turned =
-			dragRef.current.turned +
-			getNearestEquivalent( angle - dragRef.current.angle, 0 );
-		dragRef.current = { angle, turned };
-		onChange( clamp( turned, min, max ) );
+		const unclampedValue =
+			dragStateRef.current.unclampedValue +
+			getNearestEquivalent(
+				angle - dragStateRef.current.lastPointerAngle,
+				0
+			);
+		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
+		onChange( clamp( unclampedValue, min, max ) );
 	};
 
 	const { startDrag, isDragging } = useDragging( {
@@ -115,7 +121,7 @@ function AngleCircle( {
 		onDragMove: continueTurn,
 		onDragEnd: ( event ) => {
 			continueTurn( event );
-			dragRef.current = undefined;
+			dragStateRef.current = undefined;
 		},
 	} );
 
