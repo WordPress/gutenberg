@@ -76,6 +76,59 @@ const ControlledComboboxControl = ( {
 	);
 };
 
+describe( 'ComboboxControl popup relationship', () => {
+	it( 'only references rendered suggestions', async () => {
+		const user = userEvent.setup();
+		const props = { options: timezones, label: defaultLabelText };
+		const { rerender } = render( <ComboboxControl { ...props } /> );
+		const input = getInput( defaultLabelText );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+
+		await user.type( input, 'European' );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).toHaveAttribute(
+			'aria-controls',
+			screen.getByRole( 'listbox' ).id
+		);
+		expect( input ).toHaveAttribute(
+			'aria-activedescendant',
+			screen.getByRole( 'option', { selected: true } ).id
+		);
+
+		rerender( <ComboboxControl { ...props } isLoading /> );
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveValue( 'European' );
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+
+		rerender( <ComboboxControl { ...props } /> );
+
+		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).toHaveAttribute(
+			'aria-controls',
+			screen.getByRole( 'listbox' ).id
+		);
+		expect( input ).toHaveAttribute(
+			'aria-activedescendant',
+			screen.getByRole( 'option', { selected: true } ).id
+		);
+
+		await user.keyboard( '[Escape]' );
+
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+		expect( input ).not.toHaveAttribute( 'aria-controls' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
+		expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+	} );
+} );
+
 describe.each( [
 	[ 'uncontrolled', ComboboxControl ],
 	[ 'controlled', ControlledComboboxControl ],

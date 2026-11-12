@@ -24,6 +24,7 @@ export function UnForwardedTokenInput(
 	const [ hasFocus, setHasFocus ] = useState( false );
 
 	const size = value ? value.length + 1 : 0;
+	const suggestionsId = `components-form-token-suggestions-${ instanceId }`;
 
 	const onChangeHandler = ( event: ChangeEvent< HTMLInputElement > ) => {
 		if ( onChange ) {
@@ -62,18 +63,15 @@ export function UnForwardedTokenInput(
 			role="combobox"
 			aria-expanded={ isExpanded }
 			aria-autocomplete="list"
-			aria-owns={
-				isExpanded
-					? `components-form-token-suggestions-${ instanceId }`
-					: undefined
-			}
+			aria-controls={ isExpanded ? suggestionsId : undefined }
+			aria-owns={ isExpanded ? suggestionsId : undefined }
 			aria-activedescendant={
 				// Only add the `aria-activedescendant` attribute when:
 				// - the user is actively interacting with the input (`hasFocus`)
 				// - there is a selected suggestion (`selectedSuggestionIndex !== -1`)
 				// - the list of suggestions are rendered in the DOM (`isExpanded`)
 				hasFocus && selectedSuggestionIndex !== -1 && isExpanded
-					? `components-form-token-suggestions-${ instanceId }-${ selectedSuggestionIndex }`
+					? `${ suggestionsId }-${ selectedSuggestionIndex }`
 					: undefined
 			}
 			aria-describedby={ ariaDescribedBy }
