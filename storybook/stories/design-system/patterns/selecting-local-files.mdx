@@ -1,25 +1,20 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
-import * as InputControlStories from '../../../../packages/ui/src/form/input-control/stories/index.story';
 import * as FilePickerButtonStories from './file-picker-button.story';
 import * as FilePickerMenuStories from './file-picker-menu.story';
+import * as FilePickerDropZoneStories from './file-picker-drop-zone.story';
 import FilePickerButtonSource from './file-picker-button.tsx?raw';
 import FilePickerMenuSource from './file-picker-menu.tsx?raw';
+import FilePickerDropZoneSource from './file-picker-drop-zone.tsx?raw';
 
 <Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
 
 # Selecting local files
 
-Use a labeled file input when choosing files is part of a form. A button or menu item can also open the native picker. Keep the file input mounted until the user finishes choosing a file.
-
-## In a form
-
-Use `InputControl` with `type="file"`. Read the selected files from `event.currentTarget.files` in the `onChange` handler. Use `accept` to suggest file types and `multiple` to allow more than one file. If you provide your own label, you can use the [Input file example](?path=/story/design-system-components-form-primitives-input--file-input).
-
-<Canvas of={ InputControlStories.FileInput } />
+Use `FormFileUpload` from `@wordpress/components` to open the native file picker. It provides a button and a hidden file input, and handles browser-specific picker hints such as `accept="audio/*"`.
 
 ## From a button
 
-When the visible control should be a button, use `Button` to open a hidden `Input type="file"`. Call the input's `click()` method in the button's `onClick` handler. Read the file in the input's `onChange` handler to display its name beside the button.
+Read the selected `File` from `event.currentTarget.files`. Keep the result visible beside the button. Once you have the file, clear the input so choosing the same file again triggers another change. Leave the previous result in place when the picker closes without a selection. If a form submits the native file input, keep its value until the form is submitted.
 
 <Canvas
 	of={ FilePickerButtonStories.ChooseFile }
@@ -28,9 +23,22 @@ When the visible control should be a button, use `Button` to open a hidden `Inpu
 
 ## From a menu item
 
-Keep the hidden `Input` outside `Menu.Popup` and open it from the `Menu.Item` click handler. The popup closes when the item is activated. The input stays mounted to receive the selected file.
+Wrap the whole menu in `FormFileUpload`. Its `render` prop supplies `openFileDialog` to the menu item. The item closes the popup when activated. Both the input and the selection feedback stay mounted.
 
 <Canvas
 	of={ FilePickerMenuStories.ChooseFile }
 	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
 />
+
+## From a drop area
+
+Pair `DropZone` with a button so people can choose a file with a keyboard or a single click. Position the drop area’s container so the overlay covers that area. Send picked and dropped files through the same handler. Here the picker suggests PNG files, and the handler checks the number of files and their filename extension. Show the error beside the control and keep the last accepted file visible.
+
+<Canvas
+	of={ FilePickerDropZoneStories.ChooseFile }
+	source={ { code: FilePickerDropZoneSource, language: 'tsx', type: 'code' } }
+/>
+
+Disable the fieldset to disable the native file input as well as the button. Remove the active drop target and prevent a dropped file from navigating away from the page.
+
+<Canvas of={ FilePickerDropZoneStories.Disabled } sourceState="none" />
