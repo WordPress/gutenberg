@@ -49,7 +49,7 @@ module.exports = async function postProcessConfig(
  * @return {WPRootConfig} The config object with the root options merged together with the environment-specific options.
  */
 function mergeRootToEnvironments( config ) {
-	const testsDisabled = config.testsEnvironment === false;
+	const testsDisabled = config.testsEnvironment !== true;
 
 	// Some root-level options need to be handled early because they have a special
 	// cascade behavior that would break the normal merge. After merging we then
@@ -116,7 +116,7 @@ function mergeRootToEnvironments( config ) {
  * @return {WPRootConfig} The config after post-processing.
  */
 function appendPortToWPConfigs( config ) {
-	const testsDisabled = config.testsEnvironment === false;
+	const testsDisabled = config.testsEnvironment !== true;
 	const options = [ 'WP_TESTS_DOMAIN', 'WP_SITEURL', 'WP_HOME' ];
 
 	// We are only interested in editing the config options for environment-specific configs.
@@ -162,7 +162,7 @@ function appendPortToWPConfigs( config ) {
  * @param {WPRootConfig} config The config to process.
  */
 function validatePortUniqueness( config ) {
-	const testsDisabled = config.testsEnvironment === false;
+	const testsDisabled = config.testsEnvironment !== true;
 
 	// We're going to build a map of the environments and their port
 	// so we can accommodate root-level config options more easily.
