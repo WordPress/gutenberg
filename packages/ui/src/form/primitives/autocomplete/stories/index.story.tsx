@@ -690,13 +690,6 @@ const emojiPickerLabelStyle: CSSProperties = {
 	fontSize: 'var(--wpds-typography-font-size-xl)',
 };
 
-const emojiPickerPopoverListBodyStyle: CSSProperties = {
-	maxHeight: 240,
-	scrollbarGutter: 'stable',
-	marginInlineEnd: 'calc(-1 * var(--wpds-dimension-padding-lg))',
-	paddingInlineEnd: 'var(--wpds-dimension-padding-lg)',
-};
-
 function chunkItems< T >( items: T[], size: number ): T[][] {
 	const rows: T[][] = [];
 
@@ -857,9 +850,14 @@ export const InlineInPopover: Story = {
 								</Autocomplete.Empty>
 								<Autocomplete.List aria-label="Emojis">
 									<Autocomplete.ListBody
-										style={
-											emojiPickerPopoverListBodyStyle
-										}
+										style={ {
+											maxHeight: 240,
+											scrollbarGutter: 'stable',
+											marginInlineEnd:
+												'calc(-1 * var(--wpds-dimension-padding-lg))',
+											paddingInlineEnd:
+												'var(--wpds-dimension-padding-lg)',
+										} }
 									>
 										<Autocomplete.Collection>
 											{ (
