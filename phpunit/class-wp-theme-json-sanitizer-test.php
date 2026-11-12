@@ -97,6 +97,20 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				array( 'theme_json_unregistered_variation', array( 'styles', 'variations', 'not-a-variation' ) ),
 			),
+			'shared style variations that are not an object' => array(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array( 'variations' => 'bad' ),
+				),
+				array( 'theme_json_expected_object', array( 'styles', 'variations' ) ),
+			),
+			'registered shared style variation that is not an object' => array(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array( 'variations' => array( 'outline' => 'bad' ) ),
+				),
+				array( 'theme_json_expected_object', array( 'styles', 'variations', 'outline' ) ),
+			),
 			'scalar where an object is expected'       => array(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
