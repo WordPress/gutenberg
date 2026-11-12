@@ -33,6 +33,16 @@ export const Default: Story = {
 };
 
 /**
+ * Read the selected files from `event.currentTarget.files` in `onChange`.
+ */
+export const FileInput: Story = {
+	args: {
+		type: 'file',
+		'aria-label': 'Choose a file',
+	},
+};
+
+/**
  * The `InputLayout.Slot` component can be used to add standard padding in
  * the `prefix` or `suffix` slot.
  */

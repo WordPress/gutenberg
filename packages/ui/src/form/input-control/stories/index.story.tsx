@@ -109,6 +109,16 @@ export const Password: Story = {
 	},
 };
 
+export const FileInput: Story = {
+	args: {
+		type: 'file',
+		label: 'Images',
+		description: 'Choose one or more images.',
+		accept: 'image/*',
+		multiple: true,
+	},
+};
+
 export const Date: Story = {
 	args: {
 		...Default.args,
