@@ -2775,8 +2775,10 @@ function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 
 		// A block is a synced-pattern host when it provides the overrides context.
 		if (
-			select( blocksStore ).getBlockType( block?.name )
-				?.providesContext?.[ 'pattern/overrides' ]
+			block &&
+			select( blocksStore ).getBlockType( block.name )?.providesContext?.[
+				'pattern/overrides'
+			]
 		) {
 			syncedPatternClientIds.push( clientId );
 		}

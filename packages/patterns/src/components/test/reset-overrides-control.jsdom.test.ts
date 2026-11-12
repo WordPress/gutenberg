@@ -1,21 +1,15 @@
-/**
- * WordPress dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as blocksStore } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
+import type { DataRegistry } from '@wordpress/data';
 import { getPatternOverridesProvider } from '../reset-overrides-control';
 
 describe( 'getPatternOverridesProvider', () => {
 	it( 'returns the closest provider and its mapped attribute', () => {
-		const blockNames = {
+		const blockNames: Record< string, string > = {
 			closest: 'test/closest',
 			outer: 'test/outer',
 		};
-		const blockTypes = {
+		const blockTypes: Record< string, object > = {
 			'test/closest': {
 				providesContext: { 'pattern/overrides': 'overrides' },
 			},
@@ -23,20 +17,20 @@ describe( 'getPatternOverridesProvider', () => {
 				providesContext: { 'pattern/overrides': 'content' },
 			},
 		};
-		const select = ( store ) => {
+		// Stubs only the selectors the helper reads; any other store is `blocks`.
+		const select = ( ( store: unknown ) => {
 			if ( store === blockEditorStore ) {
 				return {
-					getBlockName: ( clientId ) => blockNames[ clientId ],
+					getBlockName: ( clientId: string ) =>
+						blockNames[ clientId ],
 					getBlockParents: () => [ 'closest', 'outer' ],
 				};
 			}
 
-			if ( store === blocksStore ) {
-				return {
-					getBlockType: ( blockName ) => blockTypes[ blockName ],
-				};
-			}
-		};
+			return {
+				getBlockType: ( blockName: string ) => blockTypes[ blockName ],
+			};
+		} ) as unknown as DataRegistry[ 'select' ];
 
 		expect( getPatternOverridesProvider( select, 'child' ) ).toEqual( {
 			clientId: 'closest',
