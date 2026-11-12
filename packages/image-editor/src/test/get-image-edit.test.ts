@@ -410,9 +410,16 @@ describe( 'getOutputSize agrees with getImageEdit', () => {
 } );
 
 describe( 'getImageEdit without a loaded image', () => {
-	it( 'returns null, whatever the edit', () => {
-		const state = makeState( { image: null, rotation: 45 } );
+	it.each( [
+		[ 'no image', null ],
+		[
+			'no usable size',
+			{ src: 'test.jpg', naturalWidth: Number.NaN, naturalHeight: 900 },
+		],
+	] )( 'returns null for %s, whatever the edit', ( _, image ) => {
+		const state = makeState( { image, rotation: 45 } );
 
 		expect( getImageEdit( state ) ).toBeNull();
+		expect( getOutputSize( state ) ).toBeNull();
 	} );
 } );
