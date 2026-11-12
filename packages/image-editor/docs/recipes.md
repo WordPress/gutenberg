@@ -2,35 +2,7 @@
 
 > **Status: experimental.** This API may change in any release.
 
-## Mount the Canvas
-
-Keep the editor's state in your own state, and pass it to `useImageEditor` with a function that stores the next one.
-
-```tsx
-import { useState } from '@wordpress/element';
-import {
-	ImageEditorCanvas,
-	createImageEditorState,
-	useImageEditor,
-} from '@wordpress/image-editor';
-
-function MyImageEditor( { src }: { src: string } ) {
-	const [ state, setState ] = useState( () => createImageEditorState() );
-	const controller = useImageEditor( { state, onChange: setState } );
-
-	return (
-		<div style={ { width: 600, height: 400 } }>
-			<ImageEditorCanvas
-				src={ src }
-				controller={ controller }
-				showGrid="interactive"
-			/>
-		</div>
-	);
-}
-```
-
-The canvas fills its parent. Always render it inside a sized container. The canvas loads the image into the state itself, through the controller.
+To mount the canvas, start from the [Quick Start](/packages/image-editor/README.md#quick-start).
 
 ## Add Controls
 
@@ -198,7 +170,7 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 ## Save the Edit
 
-The editor's state stores pan, zoom, rotation, flip and the crop area used by the canvas. `getImageEdit( state )` describes the same result against the full-size image loaded in `state.image`. The edit has an optional `flip`, `rotation` and `crop`, to apply in that order; anything absent needs nothing done. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
+`getImageEdit( state )` describes the edit against the full-size image loaded in `state.image`: an optional `flip`, `rotation` and `crop`, to apply in that order. The [README](/packages/image-editor/README.md) says what each part measures.
 
 The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
 
