@@ -39,6 +39,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 } from './constants';
 import { unlock } from '../lock-unlock';
+import { getDefaultLinkDestination } from '../image/utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { MediaControl } from '../utils/media-control';
 
@@ -108,27 +109,15 @@ function attributesFromMedia( {
 
 		// Only apply default link behavior for images (not videos).
 		if ( mediaType === 'image' ) {
-			// Check if default link setting should be used.
 			if ( ! newLinkDestination ) {
-				// Use the WordPress option to determine the proper default.
-				// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-				switch (
-					window?.wp?.media?.view?.settings?.defaultProps?.link ||
-					LINK_DESTINATION_NONE
-				) {
-					case 'file':
-					case LINK_DESTINATION_MEDIA:
-						newLinkDestination = LINK_DESTINATION_MEDIA;
-						break;
-					case 'post':
-					case LINK_DESTINATION_ATTACHMENT:
-						newLinkDestination = LINK_DESTINATION_ATTACHMENT;
-						break;
-					case LINK_DESTINATION_NONE:
-					default:
-						newLinkDestination = LINK_DESTINATION_NONE;
-						break;
-				}
+				const defaultDestination = getDefaultLinkDestination();
+				// Media & Text has no custom link destination.
+				newLinkDestination = [
+					LINK_DESTINATION_MEDIA,
+					LINK_DESTINATION_ATTACHMENT,
+				].includes( defaultDestination )
+					? defaultDestination
+					: LINK_DESTINATION_NONE;
 			}
 
 			// Set href based on linkDestination.

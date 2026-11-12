@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).
+
 ### Internal
 
 -   Widget footer: stop setting `rel="noopener noreferrer"` on actions that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86486](https://github.com/WordPress/gutenberg/pull/86486)).
