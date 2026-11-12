@@ -48,7 +48,9 @@ function BlockPatternsTab( {
 
 	if ( isLoading ) {
 		return (
-			<Spinner className="block-editor-inserter__categories-panel-spinner" />
+			<div className="block-editor-inserter__patterns-loading">
+				<Spinner />
+			</div>
 		);
 	}
 
