@@ -1407,6 +1407,31 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'resolves ref values in root color custom properties', () => {
+			const tree = {
+				styles: {
+					color: {
+						background: '#ffffff',
+						text: { ref: 'styles.color.background' },
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'body{--wp--style--root--color--background: #ffffff;--wp--style--root--color--text: #ffffff;color: #ffffff;background-color: #ffffff;}'
+			);
+		} );
+
 		it( 'should handle style variation pseudo selectors', () => {
 			const tree = {
 				styles: {

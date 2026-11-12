@@ -29,7 +29,11 @@ import { LAYOUT_DEFINITIONS } from '../utils/layout';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getResponsiveMediaQueries } from '../utils/viewport';
 import { getSetting } from '../settings/get-setting';
-import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
+import type {
+	GlobalStylesConfig,
+	GlobalStylesStyles,
+	UnresolvedValue,
+} from '../types';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -746,7 +750,13 @@ export function getStylesDeclarations(
 					: kebabCase( key );
 				declarations.push(
 					`${ cssProperty }: ${ getCSSValueFromRawStyle(
-						getValueFromObjectPath( blockStyles, pathToValue )
+						getResolvedValue(
+							getValueFromObjectPath(
+								blockStyles,
+								pathToValue
+							) as UnresolvedValue,
+							tree
+						)
 					) }`
 				);
 			}

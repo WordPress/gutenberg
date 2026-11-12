@@ -5859,6 +5859,34 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	public function test_get_stylesheet_generates_root_color_custom_properties_with_padding_aware_alignments() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'   => array(
+					'color'   => array(
+						'background' => '#ffffff',
+						'text'       => '#000000',
+					),
+					'spacing' => array(
+						'padding' => array(
+							'top'    => '10px',
+							'right'  => '12px',
+							'bottom' => '10px',
+							'left'   => '12px',
+						),
+					),
+				),
+				'settings' => array(
+					'useRootPaddingAwareAlignments' => true,
+				),
+			)
+		);
+
+		$expected = 'body{background-color: #ffffff;color: #000000;--wp--style--root--padding-top: 10px;--wp--style--root--padding-right: 12px;--wp--style--root--padding-bottom: 10px;--wp--style--root--padding-left: 12px;--wp--style--root--color--background: #ffffff;--wp--style--root--color--text: #000000;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_styles_for_block_with_padding_aware_alignments() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

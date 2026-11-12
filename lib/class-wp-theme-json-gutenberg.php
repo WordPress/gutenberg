@@ -255,7 +255,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.3.0 Added `--wp--style--root--color--background` and
-	 *              `--wp--style--root--color--text` properties.
+	 *              `--wp--style--root--color--text` properties. These only
+	 *              reflect solid colors; a root `color.gradient` is not
+	 *              exposed through `--wp--style--root--color--background`.
 	 *
 	 * @var array
 	 */
@@ -3197,7 +3199,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param array   $properties       Properties metadata.
 	 * @param array   $theme_json       Theme JSON array.
 	 * @param string  $selector         The style block selector.
-	 * @param boolean $use_root_padding Whether to add custom properties at root level.
+	 * @param boolean $use_root_padding Whether to add the root padding custom properties.
 	 * @return array Returns the modified $declarations.
 	 *
 	 * @phpstan-return list<array{ name: non-falsy-string, value: scalar }>
