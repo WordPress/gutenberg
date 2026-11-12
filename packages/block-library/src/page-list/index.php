@@ -334,7 +334,15 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
-	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
+	/*
+	 * A Page List inside a Navigation contributes items to that navigation's list; it does not
+	 * bring a list of its own. Wrapping them would place a `<ul>` among the navigation's `<li>`
+	 * children, which no `<ul>` may contain.
+	 *
+	 * `$is_nested` is not widened to cover this, because it also decides whether first-level
+	 * submenus receive the overlay colors below.
+	 */
+	$wrapper_markup = ( $is_nested || $is_navigation_child ) ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
 	$items_markup = block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids, $colors );
 
