@@ -235,7 +235,7 @@ test.describe( 'Links', () => {
 			name: 'core/paragraph',
 			attributes: {
 				content:
-					'<a href="https://wordpress.org" id="manual-link" class="button" title="Tooltip" data-pizza="Pepperoni">Custom link</a>',
+					'<a href="https://wordpress.org" id="manual-link" class="button" rel="sponsored nofollow" title="Tooltip" data-pizza="Pepperoni">Custom link</a>',
 			},
 		} );
 
@@ -255,18 +255,20 @@ test.describe( 'Links', () => {
 			'https://wordpress.org/gutenberg'
 		);
 		await expect( link ).toHaveAttribute( 'target', '_blank' );
+		await expect( link ).toHaveAttribute( 'rel', 'sponsored nofollow' );
 		await expect( link ).toHaveAttribute( 'data-pizza', 'Pepperoni' );
 		await expect( link ).toHaveAttribute( 'id', 'manual-link' );
 		await expect( link ).toHaveAttribute( 'class', 'button' );
 		await expect( link ).toHaveAttribute( 'title', 'Tooltip' );
 
-		// Clearing a managed setting must not restore its previous value.
+		// Clearing link settings should leave the unmanaged rel token alone.
 		await link.click();
 		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
 		await linkPopover.getByLabel( 'Open in new tab' ).uncheck();
+		await linkPopover.getByLabel( 'nofollow' ).uncheck();
 		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
 		await expect( link ).not.toHaveAttribute( 'target' );
-		await expect( link ).not.toHaveAttribute( 'rel' );
+		await expect( link ).toHaveAttribute( 'rel', 'sponsored' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',

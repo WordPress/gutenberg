@@ -19,6 +19,7 @@ export type LinkFormatAttributes = {
 	url: string;
 	type?: string;
 	id?: string;
+	_id?: string;
 	target?: string;
 	rel?: string;
 	class?: string;
@@ -123,6 +124,25 @@ export function isValidHref( href: string ): boolean {
 	return true;
 }
 
+function getRelTokens( rel?: string ): string[] {
+	// HTML space-separated tokens use ASCII whitespace.
+	return rel?.match( /[^ \t\n\f\r]+/g ) ?? [];
+}
+
+function isNofollowToken( token: string ): boolean {
+	return token.toLowerCase() === 'nofollow';
+}
+
+/**
+ * Check whether the link's rel contains the nofollow token.
+ *
+ * @param rel The link's rel attribute.
+ * @return Whether the link has the nofollow relationship.
+ */
+export function hasNofollow( rel?: string ): boolean {
+	return getRelTokens( rel ).some( isNofollowToken );
+}
+
 /**
  * Generates the format object that will be applied to the link text.
  *
@@ -145,24 +165,19 @@ export function createLinkFormat(
 		nofollow,
 		cssClasses,
 	}: LinkFormatOptions,
-	currentFormat?: RichTextFormat
+	currentFormat?: RichTextFormat &
+		Pick< LinkFormat, 'unregisteredAttributes' >
 ): LinkFormat {
 	const format: LinkFormat = {
-		...currentFormat,
 		type: 'core/link',
-		attributes: {
-			...currentFormat?.attributes,
-			url,
-		},
+		attributes: { url },
 	};
-	for ( const attribute of [
-		'type',
-		'id',
-		'target',
-		'rel',
-		'class',
-	] as const ) {
-		delete format.attributes[ attribute ];
+
+	if ( currentFormat?.attributes?._id !== undefined ) {
+		format.attributes._id = currentFormat.attributes._id;
+	}
+	if ( currentFormat?.unregisteredAttributes ) {
+		format.unregisteredAttributes = currentFormat.unregisteredAttributes;
 	}
 
 	if ( type ) {
@@ -176,10 +191,17 @@ export function createLinkFormat(
 		format.attributes.target = '_blank';
 	}
 
-	if ( nofollow ) {
-		format.attributes.rel = format.attributes.rel
-			? format.attributes.rel + ' nofollow'
-			: 'nofollow';
+	let rel = currentFormat?.attributes?.rel;
+	if ( nofollow !== undefined && nofollow !== hasNofollow( rel ) ) {
+		const tokens = getRelTokens( rel );
+		rel = nofollow
+			? [ ...tokens, 'nofollow' ].join( ' ' )
+			: tokens
+					.filter( ( token ) => ! isNofollowToken( token ) )
+					.join( ' ' );
+	}
+	if ( rel ) {
+		format.attributes.rel = rel;
 	}
 
 	const trimmedCssClasses = cssClasses?.trim();
