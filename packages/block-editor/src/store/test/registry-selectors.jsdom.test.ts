@@ -61,11 +61,30 @@ describe( 'selectors', () => {
 				},
 			} )
 		);
+
+		registerBlockType( 'core/test-parent', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'design',
+			title: 'Test Parent',
+			attributes: {},
+		} );
+
+		registerBlockType( 'core/test-child', {
+			apiVersion: 3,
+			save: () => null,
+			category: 'design',
+			title: 'Test Child',
+			attributes: {},
+			parent: [ 'core/test-parent' ],
+		} );
 	} );
 
 	afterEach( async () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
+		unregisterBlockType( 'core/test-parent' );
+		unregisterBlockType( 'core/test-child' );
 	} );
 
 	describe( '__experimentalGetAllowedPatterns', () => {
@@ -102,6 +121,12 @@ describe( 'selectors', () => {
 						content:
 							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
 					},
+					{
+						name: 'pattern-with-child-only-block',
+						title: 'pattern with child-only block',
+						content:
+							'<!-- wp:test-child --><!-- /wp:test-child -->',
+					},
 				],
 			} );
 			await dispatch( store ).updateBlockListSettings( 'block1', {
@@ -120,7 +145,16 @@ describe( 'selectors', () => {
 		it( 'should return all patterns for root level', () => {
 			expect(
 				select( store ).__experimentalGetAllowedPatterns( null )
-			).toHaveLength( 2 );
+			).toHaveLength( 3 );
+		} );
+		it( 'should return patterns with child-only root blocks when their parent can be inserted', () => {
+			expect(
+				select( store )
+					.__experimentalGetAllowedPatterns( null )
+					.some(
+						( { name } ) => name === 'pattern-with-child-only-block'
+					)
+			).toBe( true );
 		} );
 		it( 'should return patterns that consists of blocks allowed for the specified client ID', () => {
 			expect(
