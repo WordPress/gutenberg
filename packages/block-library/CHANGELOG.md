@@ -39,6 +39,7 @@
 -   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
+-   Audio: Let the player shrink to fit a content area narrower than 300px, so the page does not scroll horizontally on small screens or at high zoom. Left and right aligned players keep their 300px width when there is room ([#86264](https://github.com/WordPress/gutenberg/pull/86264)).
 
 ## 12.1.0 (2026-11-04)
 
