@@ -1075,10 +1075,16 @@ class WP_Theme_JSON_Gutenberg {
 		$variations     = $new_theme_json['styles']['variations'];
 
 		if ( WP_Theme_JSON_Sanitizer_Gutenberg::is_collecting() ) {
-			$registered_variations = array_merge( array(), ...array_values( $valid_variations ) );
-			foreach ( array_keys( $variations ) as $variation_name ) {
-				if ( ! in_array( $variation_name, $registered_variations, true ) ) {
-					WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+			if ( ! is_array( $variations ) ) {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_expected_object', array( 'styles', 'variations' ) );
+			} else {
+				$registered_variations = array_merge( array(), ...array_values( $valid_variations ) );
+				foreach ( $variations as $variation_name => $variation_data ) {
+					if ( ! in_array( $variation_name, $registered_variations, true ) ) {
+						WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+					} elseif ( ! is_array( $variation_data ) ) {
+						WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_expected_object', array( 'styles', 'variations', $variation_name ) );
+					}
 				}
 			}
 		}
