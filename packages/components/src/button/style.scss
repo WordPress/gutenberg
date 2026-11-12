@@ -109,7 +109,7 @@
 		&:disabled,
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
-			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			background: transparent;
 			transform: none;
 		}
@@ -246,7 +246,7 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral-disabled);
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 		}
 	}
 
