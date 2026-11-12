@@ -120,7 +120,7 @@
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
 		"webpack": "4.8.3",
-		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
+		"webpack-rtl-plugin": "https://codeload.github.com/yoavf/webpack-rtl-plugin/tar.gz/fc5a2f20dd99fde8f86f297844aefde601780fa3"
 	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
