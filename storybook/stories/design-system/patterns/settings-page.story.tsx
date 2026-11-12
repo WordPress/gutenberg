@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { AdjacentPagesExample } from './settings-page/adjacent-pages';
 import { AdjacentPagesAndSubpagesExample } from './settings-page/adjacent-pages-and-subpages';
+import { FailedSaveExample } from './settings-page/failed-save';
 import { RecordsDialogExample } from './settings-page/records-dialog';
 import { RecordsDrawerExample } from './settings-page/records-drawer';
 import { RecordsSubpageExample } from './settings-page/records-subpage';
@@ -24,6 +25,11 @@ type Story = StoryObj;
 export const Simple: Story = {
 	name: 'Simple settings page',
 	render: () => <SimpleSettingsExample />,
+};
+
+export const FailedSave: Story = {
+	name: 'Failed save',
+	render: () => <FailedSaveExample />,
 };
 
 export const Sections: Story = {

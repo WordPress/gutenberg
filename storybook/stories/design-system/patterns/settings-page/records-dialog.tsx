@@ -11,6 +11,7 @@ import {
 	useKeys,
 } from './api-keys';
 import {
+	SaveButton,
 	SettingsContent,
 	SettingsExample,
 	useOverlayContainer,
@@ -19,7 +20,7 @@ import { DiscardChangesDialog } from './unsaved-changes';
 
 /**
  * Edits one record in a dialog. People leave through Cancel, which discards
- * the draft, or Save, which applies it; there is no close button and
+ * the draft, or Save changes, which applies it; there is no close button and
  * clicking outside does nothing, so the choice is always explicit.
  */
 export function KeyDialog( {
@@ -47,10 +48,12 @@ export function KeyDialog( {
 						</Dialog.Title>
 					</Dialog.Header>
 					<Dialog.Content>
-						<KeyForm
-							data={ editor.draft }
-							onChange={ editor.onChange }
-						/>
+						<form id={ editor.formId } onSubmit={ editor.onSubmit }>
+							<KeyForm
+								data={ editor.draft }
+								onChange={ editor.onChange }
+							/>
+						</form>
 					</Dialog.Content>
 					<Dialog.Footer>
 						<Dialog.Action
@@ -60,18 +63,7 @@ export function KeyDialog( {
 						>
 							Cancel
 						</Dialog.Action>
-						<Button
-							disabled={
-								! editor.isDirty ||
-								! editor.isValid ||
-								editor.isSaving
-							}
-							loading={ editor.isSaving }
-							loadingAnnouncement="Saving"
-							onClick={ editor.save }
-						>
-							Save
-						</Button>
+						<KeySaveButton editor={ editor } />
 					</Dialog.Footer>
 				</Dialog.Popup>
 			</Dialog.Root>
@@ -81,6 +73,27 @@ export function KeyDialog( {
 				onDiscard={ editor.discard.confirm }
 			/>
 		</>
+	);
+}
+
+/**
+ * Submits a record editor. A new record has nothing to compare against, so
+ * its button stays enabled, and submitting an empty form explains what's
+ * missing.
+ */
+export function KeySaveButton( {
+	editor,
+}: {
+	editor: ReturnType< typeof useKeyEditor >;
+} ) {
+	return (
+		<SaveButton
+			form={ editor.formId }
+			hasChanges={ editor.isNew || editor.isDirty }
+			isSaving={ editor.isSaving }
+		>
+			{ editor.isNew ? 'Add API key' : 'Save changes' }
+		</SaveButton>
 	);
 }
 

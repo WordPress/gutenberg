@@ -1,4 +1,4 @@
-import type { ComponentProps, ReactElement } from 'react';
+import type { ComponentProps, FormEvent, ReactElement } from 'react';
 import type { Action, Field, View } from '@wordpress/dataviews';
 import {
 	DataForm,
@@ -6,7 +6,13 @@ import {
 	filterSortAndPaginate,
 	useFormValidity,
 } from '@wordpress/dataviews';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Badge, Card } from '@wordpress/ui';
 import { simulateRequest, useNotify } from './shared';
 
@@ -167,16 +173,22 @@ export function KeyForm( {
 
 /**
  * State for editing one record in an overlay. The overlay saves on its own:
- * its Save applies the draft, closes the overlay and confirms in a snackbar.
+ * its Save submits the form, which applies the draft, closes the overlay and
+ * confirms in a snackbar. Invalid fields stop the submission and show their
+ * errors instead.
  */
-export function useKeyEditor( onSave: ( key: ApiKey ) => void ) {
+export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// The record stays set after closing, so the overlay keeps its content
 	// while it animates out.
 	const [ record, setRecord ] = useState< ApiKey >( emptyKey );
 	const [ draft, setDraft ] = useState< ApiKey >( emptyKey );
 	const [ isSaving, setIsSaving ] = useState( false );
-	const { isValid } = useFormValidity( draft, keyFormFields, keyForm );
+	const draftRef = useRef( draft );
+	useEffect( () => {
+		draftRef.current = draft;
+	}, [ draft ] );
+	const formId = useId();
 	const notify = useNotify();
 
 	const open = ( key: ApiKey ) => {
@@ -196,6 +208,20 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => void ) {
 
 	const isDirty = JSON.stringify( draft ) !== JSON.stringify( record );
 	const [ isConfirmingDiscard, setIsConfirmingDiscard ] = useState( false );
+
+	// Reloading or closing the tab can only be guarded by the browser's own
+	// warning.
+	const shouldWarnOnUnload = isOpen && isDirty;
+	useEffect( () => {
+		if ( ! shouldWarnOnUnload ) {
+			return;
+		}
+		const onBeforeUnload = ( event: BeforeUnloadEvent ) =>
+			event.preventDefault();
+		window.addEventListener( 'beforeunload', onBeforeUnload );
+		return () =>
+			window.removeEventListener( 'beforeunload', onBeforeUnload );
+	}, [ shouldWarnOnUnload ] );
 
 	/**
 	 * Cancel is an explicit choice to discard the draft. Any other way of
@@ -226,12 +252,28 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => void ) {
 	};
 
 	const save = async () => {
+		const submitted = draft;
 		setIsSaving( true );
 		await simulateRequest();
-		onSave( draft );
+		const saved = onSave( submitted );
 		setIsSaving( false );
-		setIsOpen( false );
 		notify( 'API key saved.' );
+		// Edits made while the save was pending stay open as unsaved changes,
+		// on top of the record that was just saved.
+		const latest = draftRef.current;
+		if ( JSON.stringify( latest ) === JSON.stringify( submitted ) ) {
+			setIsOpen( false );
+		} else {
+			setRecord( saved );
+			setDraft( { ...latest, id: saved.id, prefix: saved.prefix } );
+		}
+	};
+
+	const onSubmit = ( event: FormEvent ) => {
+		event.preventDefault();
+		if ( ! isSaving ) {
+			save();
+		}
 	};
 
 	return {
@@ -241,8 +283,9 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => void ) {
 		draft,
 		onChange,
 		isDirty,
-		isValid,
 		isSaving,
+		formId,
+		onSubmit,
 		open,
 		close,
 		onOpenChange,
@@ -257,23 +300,25 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => void ) {
 export function useKeys() {
 	const [ keys, setKeys ] = useState( initialKeys );
 
-	const saveKey = ( key: ApiKey ) => {
-		setKeys( ( current ) => {
-			if ( key.id && current.some( ( { id } ) => id === key.id ) ) {
-				return current.map( ( item ) =>
-					item.id === key.id ? key : item
-				);
-			}
-			const suffix = Date.now().toString( 16 ).slice( -4 );
-			return [
-				...current,
-				{
-					...key,
-					id: `key-${ suffix }`,
-					prefix: `wp_live_${ suffix }`,
-				},
-			];
-		} );
+	/**
+	 * Applies a record and returns it as saved, with an id and key when it
+	 * is new.
+	 */
+	const saveKey = ( key: ApiKey ): ApiKey => {
+		if ( key.id ) {
+			setKeys( ( current ) =>
+				current.map( ( item ) => ( item.id === key.id ? key : item ) )
+			);
+			return key;
+		}
+		const suffix = Date.now().toString( 16 ).slice( -4 );
+		const saved = {
+			...key,
+			id: `key-${ suffix }`,
+			prefix: `wp_live_${ suffix }`,
+		};
+		setKeys( ( current ) => [ ...current, saved ] );
+		return saved;
 	};
 
 	const revokeKey = ( key: ApiKey ) => {

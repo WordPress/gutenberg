@@ -12,7 +12,7 @@ import {
 	useKeyEditor,
 	useKeys,
 } from './api-keys';
-import { AddKeyButton } from './records-dialog';
+import { AddKeyButton, KeySaveButton } from './records-dialog';
 import {
 	SettingsContent,
 	SettingsExample,
@@ -68,10 +68,12 @@ function KeyDrawer( {
 						</Drawer.Title>
 					</Drawer.Header>
 					<Drawer.Content>
-						<KeyForm
-							data={ editor.draft }
-							onChange={ editor.onChange }
-						/>
+						<form id={ editor.formId } onSubmit={ editor.onSubmit }>
+							<KeyForm
+								data={ editor.draft }
+								onChange={ editor.onChange }
+							/>
+						</form>
 					</Drawer.Content>
 					<Drawer.Footer>
 						{ ! editor.isNew && (
@@ -93,18 +95,7 @@ function KeyDrawer( {
 						>
 							Cancel
 						</Drawer.Action>
-						<Button
-							disabled={
-								! editor.isDirty ||
-								! editor.isValid ||
-								editor.isSaving
-							}
-							loading={ editor.isSaving }
-							loadingAnnouncement="Saving"
-							onClick={ editor.save }
-						>
-							Save
-						</Button>
+						<KeySaveButton editor={ editor } />
 					</Drawer.Footer>
 				</Drawer.Popup>
 			</Drawer.Root>

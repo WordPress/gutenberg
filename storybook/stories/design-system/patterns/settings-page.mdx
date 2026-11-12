@@ -2,6 +2,7 @@ import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
 import * as SettingsPageStories from './settings-page.story';
 import SimpleSource from './settings-page/simple.tsx?raw';
 import SectionsSource from './settings-page/sections.tsx?raw';
+import FailedSaveSource from './settings-page/failed-save.tsx?raw';
 import AdjacentPagesSource from './settings-page/adjacent-pages.tsx?raw';
 import SubpagesSource from './settings-page/subpages.tsx?raw';
 import AdjacentPagesAndSubpagesSource from './settings-page/adjacent-pages-and-subpages.tsx?raw';
@@ -16,6 +17,8 @@ import RecordsDrawerSource from './settings-page/records-drawer.tsx?raw';
 Templates for settings screens, composed from the admin-ui `Page`, `@wordpress/ui` components, `@wordpress/theme` tokens and DataViews. Start from the template closest to your settings, then replace the fields.
 
 These templates are starting points, not requirements. Not every settings page needs to match one exactly: adapt the structure to what your settings need, and combine or depart from the templates where that serves people better.
+
+Several of the `@wordpress/ui` components they use, including `Button`, `ButtonLink`, `Dialog`, `Drawer` and `AlertDialog`, are still marked “Use with caution”, so their APIs may change. Treat the templates as the direction settings pages are heading, not as a recommendation to migrate existing screens yet.
 
 ## Building blocks
 
@@ -41,14 +44,25 @@ Plan a settings page like a document's outline before choosing how it looks. The
 
 ## Saving
 
-These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs): edits are held in a draft until the user clicks Save. Autosave remains the preferred default when every field can be saved independently. If you adopt autosave, remove the Save button rather than mixing the two models on one page.
+These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs), the usual choice for settings: edits are held in a draft until the user clicks “Save changes”. Autosave suits pages of independent preferences that each take effect on their own. If you adopt it, remove the Save button rather than mixing the two models on one page.
 
--   **One Save per page**, in the `Page` header actions. It covers every field on that page and nothing else.
--   **Disabled when there is nothing to save**, and busy while saving.
--   **Checkboxes, not toggles, for on/off settings.** A toggle implies the change takes effect immediately, which isn't true until Save is clicked. Toggles belong on autosave surfaces.
--   **A snackbar confirms the save.** Errors belong next to the field, or in a `Notice` when a save fails or only partly succeeds.
+-   **One “Save changes” button per page**, in the `Page` header actions. It covers every field on that page and nothing else.
+-   **Disabled only when there is nothing to save**, with a “No unsaved changes” tooltip, and busy while saving.
+-   **Invalid fields don't disable Save.** The fields sit in a `<form>`, and Save submits it: invalid fields show their errors below them and the first one takes focus, and nothing is saved until they're fixed. The record editors work the same way.
+-   **Edits made while saving stay unsaved.** People can keep typing while a save is in progress. Once it finishes, anything they changed in the meantime is still an unsaved change, and a record editor stays open to hold it.
+-   **Checkboxes, not switches, for on/off settings.** A switch implies the change takes effect immediately, which isn't true until Save is clicked. Switches belong on autosave surfaces.
+-   **A snackbar confirms the save.** Errors belong next to the field, or in a `Notice` at the top of the form when a save fails or only partly succeeds.
 -   **Pages that only list records have no page-level Save.** Each record editor saves on its own, and the header holds the action that adds a record.
--   **Leaving with unsaved edits asks first.** Switching pages or following a breadcrumb holds the navigation and asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
+-   **Leaving with unsaved edits asks first.** Switching pages, following a breadcrumb or closing a record editor with Escape asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
+
+### When a save fails
+
+Keep the draft, so nothing the user entered is lost, and explain the failure in a `Notice` at the top of the form with a “Try again” action. Retrying submits the form again, so validation runs first. In this example the first save fails: change a field, click “Save changes”, then try again.
+
+<Canvas
+	of={ SettingsPageStories.FailedSave }
+	source={ { code: FailedSaveSource, language: 'tsx', type: 'code' } }
+/>
 
 ## Focus after navigation
 

@@ -3,15 +3,16 @@ import type { ComponentProps, ReactNode } from 'react';
 import { Page } from '@wordpress/admin-ui';
 import { SnackbarList } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import {
 	createContext,
 	useCallback,
 	useContext,
+	useId,
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Button, Card, Stack, Text } from '@wordpress/ui';
+import { Button, Card, Notice, Stack, Text, Tooltip } from '@wordpress/ui';
 import type { SubpageStatus } from './router';
 import styles from './style.module.css';
 import { UnsavedChangesGuard } from './unsaved-changes';
@@ -88,15 +89,17 @@ export function SettingsExample( { children }: { children: ReactNode } ) {
 /**
  * Manual save model: edits are held in a local draft and applied together
  * when the user saves. The saved value lives above the page, so it survives
- * navigating between pages.
+ * navigating between pages. A save that fails keeps the draft, so people can
+ * try again. Edits made while a save is pending stay in the draft, unsaved.
  */
 export function useManualSave< T extends object >(
 	saved: T,
-	onSave: ( data: T ) => void,
+	onSave: ( data: T ) => unknown,
 	message = 'Settings saved.'
 ) {
 	const [ data, setData ] = useState( saved );
 	const [ isSaving, setIsSaving ] = useState( false );
+	const [ hasFailed, setHasFailed ] = useState( false );
 	const notify = useNotify();
 
 	const isDirty = JSON.stringify( data ) !== JSON.stringify( saved );
@@ -107,39 +110,88 @@ export function useManualSave< T extends object >(
 
 	const save = async () => {
 		setIsSaving( true );
-		await simulateRequest();
-		onSave( data );
+		setHasFailed( false );
+		try {
+			await simulateRequest();
+			await onSave( data );
+			notify( message );
+		} catch {
+			setHasFailed( true );
+		}
 		setIsSaving( false );
-		notify( message );
 	};
 
-	return { data, onChange, isDirty, isSaving, save };
+	return { data, onChange, isDirty, isSaving, hasFailed, save };
 }
 
 /**
- * The page-level Save, placed in the `Page` header actions. It is disabled
- * while there is nothing to save and shows a busy state while saving.
+ * Submits the form it belongs to, so the form's own validation runs first:
+ * invalid fields show their errors and take focus instead of saving. It stays
+ * enabled while fields are invalid, and is only disabled while there is
+ * nothing to save, which its tooltip explains, or while saving.
  */
 export function SaveButton( {
-	isDirty,
+	form,
+	hasChanges,
 	isSaving,
-	onClick,
+	size,
+	children = 'Save changes',
 }: {
-	isDirty: boolean;
+	form: string;
+	hasChanges: boolean;
 	isSaving: boolean;
-	onClick: () => void;
+	size?: ComponentProps< typeof Button >[ 'size' ];
+	children?: ReactNode;
 } ) {
 	return (
-		<Button
-			size="compact"
-			variant="solid"
-			disabled={ ! isDirty || isSaving }
-			loading={ isSaving }
-			loadingAnnouncement="Saving"
-			onClick={ onClick }
-		>
-			Save
-		</Button>
+		<Tooltip.Root disabled={ hasChanges }>
+			<Tooltip.Trigger
+				render={
+					<Button
+						type="submit"
+						form={ form }
+						size={ size }
+						disabled={ ! hasChanges || isSaving }
+						loading={ isSaving }
+						loadingAnnouncement="Saving changes"
+					>
+						{ children }
+					</Button>
+				}
+			/>
+			<Tooltip.Popup>No unsaved changes</Tooltip.Popup>
+		</Tooltip.Root>
+	);
+}
+
+/**
+ * Explains a failed save at the top of the form and offers a retry. The list
+ * stays mounted so the notice is announced when it appears.
+ */
+export function SaveFailedNotice( {
+	hasFailed,
+	onRetry,
+}: {
+	hasFailed: boolean;
+	onRetry: () => void;
+} ) {
+	return (
+		<Notice.List className={ styles.notices }>
+			{ hasFailed && (
+				<Notice.Root intent="error">
+					<Notice.Title>Your changes couldn’t be saved.</Notice.Title>
+					<Notice.Description>
+						They’re still here. Check your connection, then try
+						again.
+					</Notice.Description>
+					<Notice.Actions>
+						<Notice.ActionButton onClick={ onRetry }>
+							Try again
+						</Notice.ActionButton>
+					</Notice.Actions>
+				</Notice.Root>
+			) }
+		</Notice.List>
 	);
 }
 
@@ -149,10 +201,11 @@ type PageHeaderProps = Omit<
 >;
 
 /**
- * A settings page (or subpage) that owns one manual-save draft, with its
- * Save in the `Page` header actions. Render it with a `key` per location,
- * so each page starts from its saved values, and inside a router, which the
- * unsaved changes guard uses to hold navigation.
+ * A settings page (or subpage) that owns one manual-save draft. Its fields
+ * sit in a form, which the Save in the `Page` header actions submits. Render
+ * it with a `key` per location, so each page starts from its saved values,
+ * and inside a router, which the unsaved changes guard uses to hold
+ * navigation.
  */
 export function SettingsFormPage< T extends object >( {
 	saved,
@@ -161,16 +214,16 @@ export function SettingsFormPage< T extends object >( {
 	...pageProps
 }: PageHeaderProps & {
 	saved: T;
-	onSave: ( data: T ) => void;
+	onSave: ( data: T ) => unknown;
 	children: ( form: {
 		data: T;
 		onChange: ( edits: Partial< T > ) => void;
 	} ) => ReactNode;
 } ) {
-	const { data, onChange, isDirty, isSaving, save } = useManualSave(
-		saved,
-		onSave
-	);
+	const { data, onChange, isDirty, isSaving, hasFailed, save } =
+		useManualSave( saved, onSave );
+	const formId = useId();
+	const formRef = useRef< HTMLFormElement >( null );
 
 	return (
 		<Page
@@ -179,15 +232,31 @@ export function SettingsFormPage< T extends object >( {
 			{ ...pageProps }
 			actions={
 				<SaveButton
-					isDirty={ isDirty }
+					form={ formId }
+					size="compact"
+					hasChanges={ isDirty }
 					isSaving={ isSaving }
-					onClick={ save }
 				/>
 			}
 		>
-			<SettingsContent>
-				{ children( { data, onChange } ) }
-			</SettingsContent>
+			<form
+				id={ formId }
+				ref={ formRef }
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					if ( isDirty && ! isSaving ) {
+						save();
+					}
+				} }
+			>
+				<SettingsContent>
+					<SaveFailedNotice
+						hasFailed={ hasFailed }
+						onRetry={ () => formRef.current?.requestSubmit() }
+					/>
+					{ children( { data, onChange } ) }
+				</SettingsContent>
+			</form>
 			<UnsavedChangesGuard isDirty={ isDirty } />
 		</Page>
 	);
@@ -298,14 +367,17 @@ export function SettingsForm< T extends object >( {
 	fields: Field< T >[];
 	onChange: ( edits: Partial< T > ) => void;
 } ) {
+	const form = {
+		layout: { type: 'regular' as const },
+		fields: fields.map( ( field ) => field.id ),
+	};
+	const { validity } = useFormValidity( data, fields, form );
 	return (
 		<DataForm< T >
 			data={ data }
 			fields={ fields }
-			form={ {
-				layout: { type: 'regular' },
-				fields: fields.map( ( field ) => field.id ),
-			} }
+			form={ form }
+			validity={ validity }
 			onChange={ ( edits ) => onChange( edits as Partial< T > ) }
 		/>
 	);

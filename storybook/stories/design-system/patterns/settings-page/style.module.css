@@ -49,6 +49,14 @@
 	margin-inline: auto;
 }
 
+/*
+ * The notice list stays mounted so it can announce a failed save. Its notices
+ * join the content stack, so the empty list adds no gap.
+ */
+.content > .notices {
+	display: contents;
+}
+
 .description {
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }

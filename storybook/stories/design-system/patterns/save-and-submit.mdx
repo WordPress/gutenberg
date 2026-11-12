@@ -49,11 +49,6 @@ When all changes are saved, the Save button is disabled and can reveal a “No u
 
 If the user navigates away with unsaved edits, prompt them to confirm before leaving so their changes aren’t lost. This guard exists **only** in the manual save model; an autosave surface never needs it.
 
--   **Only ask when something would be lost.** Prompt only while there are unsaved edits. Once the user saves, or changes a field back to its saved value, navigation is free again.
--   **Inside the app, use an `AlertDialog`.** Hold the navigation (switching between adjacent pages, following a breadcrumb or opening a record) and ask “Discard unsaved changes?” with the `irreversible` intent. Offer two choices: “Keep editing”, which cancels the navigation and is the safe default, and “Discard changes”, which continues. Don’t add a “Save and leave” option: a save can fail validation, and the dialog is the wrong place to show that.
--   **When leaving the app, rely on the browser.** Reloading, closing the tab or following an external link can only be guarded with the `beforeunload` event, which shows the browser’s own warning. Its wording can’t be customized, so don’t try to imitate it.
--   **Dialogs and drawers that hold a draft close only through their actions.** Give them a footer with Cancel and Save, and omit the close icon and closing by clicking outside, so the user always makes an explicit choice. Cancel discards the draft without asking again, because choosing it is the decision. If the user presses Escape with unsaved edits, ask with the same dialog before closing.
-
 ### Invalid fields, partial saves, and failed saves
 
 For automatic saving methods, an invalid field can require being addressed before saving, e.g. by outputting an error message right below the relevant input control. 
