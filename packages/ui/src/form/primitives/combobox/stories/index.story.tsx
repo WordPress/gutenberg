@@ -167,7 +167,14 @@ export const DetachedInline: Story = {
 			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.ListBody style={ { maxHeight: 200 } }>
+					<Combobox.ListBody
+						style={ {
+							maxHeight: 200,
+							scrollbarGutter: 'stable',
+							paddingInlineEnd:
+								'var(--wpds-dimension-padding-xs)',
+						} }
+					>
 						<Combobox.Collection>
 							{ ( item: FixtureItem ) => (
 								<Combobox.Item
