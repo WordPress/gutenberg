@@ -1,11 +1,8 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { speak } from '@wordpress/a11y';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
-
-vi.mock( import( '@wordpress/a11y' ), { spy: true } );
 
 function getInlineNoticesWrapper( container: HTMLElement ) {
 	return container.querySelector< HTMLElement >(
@@ -246,25 +243,25 @@ describe( 'InlineNotices', () => {
 				await act( async () => {
 					registry
 						.dispatch( noticesStore )
-						.createNotice( status, 'Repeated message.', {
+						.createNotice( status, 'The <title> tag is required.', {
 							id: 'editor-save',
 						} );
 				} );
 				expect( screen.getByRole( role ) ).toHaveTextContent(
-					/^Repeated message\.$/
+					/^The <title> tag is required\.$/
 				);
-				expect( speak ).not.toHaveBeenCalled();
 
 				await act( async () => {
 					registry
 						.dispatch( noticesStore )
-						.createNotice( status, 'Repeated message.', {
+						.createNotice( status, 'The <title> tag is required.', {
 							id: 'editor-save',
 						} );
 				} );
-				expect( speak ).toHaveBeenCalledExactlyOnceWith(
-					'Repeated message.',
-					status === 'error' ? 'assertive' : 'polite'
+				const region = screen.getByRole( role );
+				expect( region ).toHaveProperty(
+					'textContent',
+					'The <title> tag is required.\u00a0'
 				);
 
 				// An unrelated render must not announce the notification again.
@@ -273,7 +270,10 @@ describe( 'InlineNotices', () => {
 						<InlineNotices className="updated" />
 					</RegistryProvider>
 				);
-				expect( speak ).toHaveBeenCalledTimes( 1 );
+				expect( region ).toHaveProperty(
+					'textContent',
+					'The <title> tag is required.\u00a0'
+				);
 			}
 		);
 
@@ -307,12 +307,9 @@ describe( 'InlineNotices', () => {
 						} );
 				} );
 
-				expect( speak ).toHaveBeenCalledExactlyOnceWith(
-					'Updating failed.',
-					'assertive'
+				expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+					/^Updating failed\.$/
 				);
-				// The list must not also announce a replacement with an unchanged message.
-				expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 			}
 		);
 
@@ -335,7 +332,6 @@ describe( 'InlineNotices', () => {
 			} );
 			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
-			expect( speak ).not.toHaveBeenCalled();
 		} );
 
 		it( 'announces an urgency change through the list without an extra announcement', async () => {
@@ -358,7 +354,6 @@ describe( 'InlineNotices', () => {
 				/^Connection lost\.$/
 			);
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
-			expect( speak ).not.toHaveBeenCalled();
 		} );
 	} );
 } );

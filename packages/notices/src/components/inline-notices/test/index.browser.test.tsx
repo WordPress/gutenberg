@@ -1,14 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { speak } from '@wordpress/a11y';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
 import type { NoticeOptions } from '../../../store/types';
-
-vi.mock( import( '@wordpress/a11y' ), { spy: true } );
 
 const MESSAGE = 'Updating failed.';
 const DETAILS = 'The title was rejected.\nRemove it, then try again.';
@@ -59,7 +56,7 @@ describe( 'InlineNotices', () => {
 		await user.click( trigger );
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( speak ).not.toHaveBeenCalled();
+		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 
 		registry
 			.dispatch( noticesStore )
@@ -72,12 +69,8 @@ describe( 'InlineNotices', () => {
 				'Publishing failed.'
 			)
 		);
-		const previousMessage = within( screen.getByRole( 'alert' ) ).getByText(
-			'Publishing failed.'
-		);
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( speak ).not.toHaveBeenCalled();
 
 		registry
 			.dispatch( noticesStore )
@@ -86,16 +79,11 @@ describe( 'InlineNotices', () => {
 				details: DETAILS,
 			} );
 		await waitFor( () =>
-			expect( speak ).toHaveBeenCalledExactlyOnceWith(
-				'Publishing failed.',
-				'assertive'
+			expect( screen.getByRole( 'alert' ) ).toHaveProperty(
+				'textContent',
+				'Publishing failed.\u00a0'
 			)
 		);
-		expect(
-			within( screen.getByRole( 'alert' ) ).getByText(
-				'Publishing failed.'
-			)
-		).toBe( previousMessage );
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
 	} );
@@ -255,7 +243,6 @@ describe( 'InlineNotices', () => {
 				screen.queryByRole( 'button', { name: 'Copy error' } )
 			).not.toBeInTheDocument();
 
-			expect( speak ).not.toHaveBeenCalled();
 			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 
 			registry

@@ -1,5 +1,3 @@
-import type { ComponentProps } from 'react';
-import { speak } from '@wordpress/a11y';
 import { Slot } from '@wordpress/components';
 import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { RawHTML, useRef, useState } from '@wordpress/element';
@@ -93,47 +91,47 @@ export default function InlineNotice( {
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
 	const htmlDescriptionRef = useRef< HTMLSpanElement >( null );
-	const [ htmlMessage, setHtmlMessage ] = useState( '' );
+	const [ spokenMessage, setSpokenMessage ] = useState( '' );
 	const previousNoticeRef = useRef( announceOnMount ? undefined : notice );
-	const politeness = status === 'error' ? 'assertive' : 'polite';
 
 	useIsomorphicLayoutEffect( () => {
-		const previousNotice = previousNoticeRef.current;
-		previousNoticeRef.current = notice;
-
-		if ( previousNotice === notice ) {
+		if ( previousNoticeRef.current === notice ) {
 			return;
 		}
+		previousNoticeRef.current = notice;
 
-		// Read the rendered description before the list observes this update.
-		// innerText preserves the breaks between lines and paragraphs.
-		const message =
-			notice.spokenMessage &&
-			( htmlDescriptionRef.current?.innerText ?? notice.spokenMessage );
-		if ( notice.__unstableHTML ) {
-			setHtmlMessage( message ?? '' );
-		}
-		const previousMessage = previousNotice?.__unstableHTML
-			? htmlMessage
-			: previousNotice?.spokenMessage;
-		if (
-			message &&
-			previousNotice &&
-			previousMessage === message &&
-			( previousNotice.status === 'error' ) ===
-				( notice.status === 'error' )
-		) {
-			// The list sees no change for an identical replacement.
-			speak( message, politeness );
-		}
-	}, [ notice, politeness, htmlMessage ] );
+		// Read rendered HTML before the list observes this update. innerText
+		// preserves the breaks between lines and paragraphs.
+		const message = notice.spokenMessage
+			? ( htmlDescriptionRef.current?.innerText ?? notice.spokenMessage )
+			: '';
+		// As in @wordpress/a11y, alternate a trailing space so an identical
+		// message changes the live region without remounting the notice.
+		setSpokenMessage( ( previous ) =>
+			message && previous === message ? message + '\u00a0' : message
+		);
+	}, [ notice ] );
 
 	// Copying HTML content would put its tags on the clipboard.
 	const canCopy = !! details && ! __unstableHTML;
 	const hasActions = actions.length > 0 || !! details;
 
-	const children = (
-		<>
+	return (
+		<Collapsible.Root
+			open={ isOpen }
+			onOpenChange={ setIsOpen }
+			render={
+				<Notice.Root
+					intent={ status }
+					spokenMessage={ spokenMessage }
+					politeness={ status === 'error' ? 'assertive' : 'polite' }
+					className={ clsx(
+						'notices-inline-notices__notice',
+						`is-${ status }`
+					) }
+				/>
+			}
+		>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			{ __unstableHTML ? (
 				<Notice.Description
@@ -197,26 +195,6 @@ export default function InlineNotice( {
 					} }
 				/>
 			) }
-		</>
-	);
-
-	const listMessage = __unstableHTML ? htmlMessage : notice.spokenMessage;
-	const rootProps = {
-		intent: status,
-		spokenMessage: listMessage ?? '',
-		politeness: listMessage ? politeness : 'off',
-		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
-	} satisfies ComponentProps< typeof Notice.Root >;
-
-	// Keep the root mounted when details change so the list does not also
-	// announce an identical replacement as a newly added notice.
-	return (
-		<Collapsible.Root
-			open={ isOpen }
-			onOpenChange={ setIsOpen }
-			render={ <Notice.Root { ...rootProps } /> }
-		>
-			{ children }
 		</Collapsible.Root>
 	);
 }
