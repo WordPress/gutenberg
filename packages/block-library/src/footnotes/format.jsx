@@ -19,6 +19,29 @@ const { usesContextKey } = unlock( privateApis );
 const POST_CONTENT_BLOCK_NAME = 'core/post-content';
 const SYNCED_PATTERN_BLOCK_NAME = 'core/block';
 
+/**
+ * Finds the first footnotes block in the post content, searching breadth
+ * first. Inner blocks of synced patterns are not searched.
+ *
+ * @param {Function} getBlocks             The block editor's `getBlocks` selector.
+ * @param {string}   [postContentClientId] Client ID of the post content block, if
+ *                                         there is one.
+ * @return {?Object} The footnotes block, or `null` if there is none.
+ */
+function findFootnotesBlock( getBlocks, postContentClientId ) {
+	// When called with a post content block, getBlocks will return
+	// the block with controlled inner blocks included.
+	const queue = [ ...getBlocks( postContentClientId ) ];
+	while ( queue.length ) {
+		const block = queue.shift();
+		if ( block.name === FOOTNOTES_BLOCK_NAME ) {
+			return block;
+		}
+		queue.push( ...block.innerBlocks );
+	}
+	return null;
+}
+
 export const format = {
 	title: __( 'Footnote' ),
 	tagName: 'sup',
@@ -76,7 +99,7 @@ export const format = {
 					getBlockParentsByBlockName: _getBlockParentsByBlockName,
 					getSelectedBlockClientId: _getSelectedBlockClientId,
 					getBlockName: _getBlockName,
-					getBlocksByName: _getBlocksByName,
+					getBlocks: _getBlocks,
 					canInsertBlockType: _canInsertBlockType,
 				} = select( blockEditorStore );
 
@@ -108,7 +131,7 @@ export const format = {
 						FOOTNOTES_BLOCK_NAME,
 						rootClientId
 					) &&
-					! _getBlocksByName( FOOTNOTES_BLOCK_NAME ).length
+					! findFootnotesBlock( _getBlocks, parentPostContent[ 0 ] )
 				) {
 					return false;
 				}
@@ -168,25 +191,10 @@ export const format = {
 					POST_CONTENT_BLOCK_NAME
 				);
 
-				// When called with a post content block, getBlocks will return
-				// the block with controlled inner blocks included.
-				const blocks = parentPostContent.length
-					? getBlocks( parentPostContent[ 0 ] )
-					: getBlocks();
-
-				// BFS search to find the first footnote block.
-				let fnBlock = null;
-				{
-					const queue = [ ...blocks ];
-					while ( queue.length ) {
-						const block = queue.shift();
-						if ( block.name === 'core/footnotes' ) {
-							fnBlock = block;
-							break;
-						}
-						queue.push( ...block.innerBlocks );
-					}
-				}
+				let fnBlock = findFootnotesBlock(
+					getBlocks,
+					parentPostContent[ 0 ]
+				);
 
 				// Maybe this should all also be moved to the entity provider.
 				// When there is no footnotes block in the post, create one and
