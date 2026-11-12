@@ -1,6 +1,7 @@
 import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
 import * as SettingsPageStories from './settings-page.story';
 import SimpleSource from './settings-page/simple.tsx?raw';
+import SectionsSource from './settings-page/sections.tsx?raw';
 import AdjacentPagesSource from './settings-page/adjacent-pages.tsx?raw';
 import SubpagesSource from './settings-page/subpages.tsx?raw';
 import AdjacentPagesAndSubpagesSource from './settings-page/adjacent-pages-and-subpages.tsx?raw';
@@ -21,13 +22,22 @@ These templates are starting points, not requirements. Not every settings page n
 Every template uses the same parts:
 
 -   **`Page`** from `@wordpress/admin-ui` provides the header: a title or breadcrumbs, optional section navigation, and the actions area where Save lives.
--   **`Card`** from `@wordpress/ui` groups related settings. Give each card a short title, and a description when the title alone doesn't say what the settings affect. Cap form cards at `--wpds-dimension-surface-width-xl` so fields stay a readable length, and give tables of records `--wpds-dimension-surface-width-2xl` so their columns fit.
+-   **`Card`** from `@wordpress/ui` groups related settings. Give each card a short title, and a description when the title alone doesn't say what the settings affect. The Structure section below covers when to use one. Cap form cards at `--wpds-dimension-surface-width-xl` so fields stay a readable length, and give tables of records `--wpds-dimension-surface-width-2xl` so their columns fit.
 -   **`DataForm`** from `@wordpress/dataviews` renders the fields, so labels, descriptions, validation and spacing stay consistent.
 -   **`DataViews`** from `@wordpress/dataviews` lists records people can add and edit.
 -   **`Dialog`**, **`Drawer`** and **`AlertDialog`** from `@wordpress/ui` hold record editors and confirmations.
 -   **Snackbars** confirm saves that have no other visible effect. `SnackbarList` comes from `@wordpress/components`, since `@wordpress/ui` doesn't offer an equivalent yet.
 
 Each example's code shows its template. The helpers it imports, such as the manual-save draft, the sample fields and the in-canvas router, live alongside it in `storybook/stories/design-system/patterns/settings-page/`.
+
+## Structure
+
+Plan a settings page like a document's outline before choosing how it looks. The headings decide how assistive technology reads the page and lets people jump through it, and the same kind of content should get the same treatment wherever it appears.
+
+-   **Put each group of related fields in a card.** A card bounds a group and separates it from the groups around it. Keep the card even when a page has a single group, so every settings page reads the same way.
+-   **Title each card after its group of fields.** The page title is the `h1`, and on a page without sections the card titles are `h2`s.
+-   **Add sections when cards form larger groups.** A section heading sits on the canvas above its cards, as an `h2` with an optional description, and the cards inside it take `h3` titles. Use `Text` with `variant="heading-lg"` for the section heading. Each section gets its own heading, and a page with only a few cards needs none.
+-   **Don't skip heading levels**, and don't choose a level for its size. The level follows the structure, so a card title looks the same whether it's an `h2` or an `h3`.
 
 ## Saving
 
@@ -55,6 +65,15 @@ A single page with a few groups of settings. Use it when everything fits on one 
 <Canvas
 	of={ SettingsPageStories.Simple }
 	source={ { code: SimpleSource, language: 'tsx', type: 'code' } }
+/>
+
+## Settings page with sections
+
+A longer page whose cards fall into larger groups, here "Accepting payments" and "Payouts". Each section has an `h2` heading on the canvas, and its cards take `h3` titles. Use it when one page holds several distinct areas, but they are too closely related, or too small, to split into adjacent pages.
+
+<Canvas
+	of={ SettingsPageStories.Sections }
+	source={ { code: SectionsSource, language: 'tsx', type: 'code' } }
 />
 
 ## Adjacent pages

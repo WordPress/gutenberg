@@ -4,6 +4,7 @@ import { AdjacentPagesAndSubpagesExample } from './settings-page/adjacent-pages-
 import { RecordsDialogExample } from './settings-page/records-dialog';
 import { RecordsDrawerExample } from './settings-page/records-drawer';
 import { RecordsSubpageExample } from './settings-page/records-subpage';
+import { SectionsExample } from './settings-page/sections';
 import { SimpleSettingsExample } from './settings-page/simple';
 import { SubpagesExample } from './settings-page/subpages';
 
@@ -23,6 +24,11 @@ type Story = StoryObj;
 export const Simple: Story = {
 	name: 'Simple settings page',
 	render: () => <SimpleSettingsExample />,
+};
+
+export const Sections: Story = {
+	name: 'Settings page with sections',
+	render: () => <SectionsExample />,
 };
 
 export const AdjacentPages: Story = {

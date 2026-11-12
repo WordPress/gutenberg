@@ -217,24 +217,28 @@ export function SettingsContent( {
 }
 
 /**
- * A group of related settings in a card.
+ * A group of related settings in a card. Its title is an `h2`, or an `h3`
+ * when the card sits inside a `SettingsGroup`.
  */
 export function SettingsSection( {
 	title,
 	titleId,
+	headingLevel = 2,
 	description,
 	children,
 }: {
 	title: string;
 	titleId?: string;
+	headingLevel?: 2 | 3;
 	description?: string;
 	children: ReactNode;
 } ) {
+	const Heading = headingLevel === 3 ? 'h3' : 'h2';
 	return (
 		<Card.Root>
 			<Card.Header>
 				<Stack direction="column" gap="xs">
-					<Card.Title id={ titleId } render={ <h2 /> }>
+					<Card.Title id={ titleId } render={ <Heading /> }>
 						{ title }
 					</Card.Title>
 					{ description && (
@@ -249,6 +253,36 @@ export function SettingsSection( {
 			</Card.Header>
 			<Card.Content>{ children }</Card.Content>
 		</Card.Root>
+	);
+}
+
+/**
+ * A section of a page that holds several cards, with an `h2` heading on the
+ * canvas. The cards inside it take `h3` titles.
+ */
+export function SettingsGroup( {
+	title,
+	description,
+	children,
+}: {
+	title: string;
+	description?: string;
+	children: ReactNode;
+} ) {
+	return (
+		<Stack direction="column" gap="lg">
+			<Stack direction="column" gap="xs">
+				<Text variant="heading-lg" render={ <h2 /> }>
+					{ title }
+				</Text>
+				{ description && (
+					<Text variant="body-md" className={ styles.description }>
+						{ description }
+					</Text>
+				) }
+			</Stack>
+			{ children }
+		</Stack>
 	);
 }
 
@@ -375,6 +409,86 @@ export const paymentFields: Field< PaymentSettings >[] = [
 		label: 'Statement descriptor',
 		type: 'text',
 		description: 'Shown on customers’ bank statements.',
+	},
+];
+
+export type PaymentsAndPayoutsSettings = PaymentSettings & {
+	payoutSchedule: string;
+	minimumPayout: string;
+	notifyPayoutSent: boolean;
+	notifyPayoutFailed: boolean;
+};
+
+export const paymentsAndPayoutsSettings: PaymentsAndPayoutsSettings = {
+	...paymentSettings,
+	payoutSchedule: 'weekly',
+	minimumPayout: '50',
+	notifyPayoutSent: true,
+	notifyPayoutFailed: true,
+};
+
+export const paymentOptionFields: Field< PaymentsAndPayoutsSettings >[] = [
+	{
+		id: 'currency',
+		label: 'Currency',
+		type: 'text',
+		elements: [
+			{ value: 'usd', label: 'US dollar' },
+			{ value: 'gbp', label: 'Pound sterling' },
+			{ value: 'eur', label: 'Euro' },
+			{ value: 'jpy', label: 'Japanese yen' },
+		],
+	},
+	{
+		id: 'testMode',
+		label: 'Use test mode',
+		type: 'boolean',
+		Edit: 'checkbox',
+		description: 'Process payments without charging customers.',
+	},
+];
+
+export const bankStatementFields: Field< PaymentsAndPayoutsSettings >[] = [
+	{
+		id: 'statementDescriptor',
+		label: 'Statement descriptor',
+		type: 'text',
+		description: 'Shown on customers’ bank statements.',
+	},
+];
+
+export const payoutScheduleFields: Field< PaymentsAndPayoutsSettings >[] = [
+	{
+		id: 'payoutSchedule',
+		label: 'Pay out',
+		type: 'text',
+		Edit: 'radio',
+		elements: [
+			{ value: 'daily', label: 'Daily' },
+			{ value: 'weekly', label: 'Weekly' },
+			{ value: 'monthly', label: 'Monthly' },
+		],
+	},
+	{
+		id: 'minimumPayout',
+		label: 'Minimum payout amount',
+		type: 'text',
+		description: 'Balances below this amount roll over to the next payout.',
+	},
+];
+
+export const payoutNotificationFields: Field< PaymentsAndPayoutsSettings >[] = [
+	{
+		id: 'notifyPayoutSent',
+		label: 'Email me when a payout is sent',
+		type: 'boolean',
+		Edit: 'checkbox',
+	},
+	{
+		id: 'notifyPayoutFailed',
+		label: 'Email me when a payout fails',
+		type: 'boolean',
+		Edit: 'checkbox',
 	},
 ];
 
