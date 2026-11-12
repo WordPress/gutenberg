@@ -147,7 +147,6 @@ require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
-require __DIR__ . '/compat/wordpress-7.1/pattern-blocks.php';
 
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
@@ -156,6 +155,7 @@ require __DIR__ . '/compat/wordpress-7.2/post.php';
 
 // WordPress 7.3 compat.
 require __DIR__ . '/compat/wordpress-7.3/kses.php';
+require __DIR__ . '/compat/wordpress-7.3/pattern-blocks.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';

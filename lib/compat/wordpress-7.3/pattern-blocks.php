@@ -69,7 +69,7 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 				__( 'Block "%s" registers both a pattern and a render_callback. A pattern replaces server rendering, so the callback is ignored.', 'gutenberg' ),
 				$block_name
 			),
-			'7.1.0'
+			'7.3.0'
 		);
 	}
 
