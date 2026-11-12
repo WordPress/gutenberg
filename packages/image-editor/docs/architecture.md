@@ -8,7 +8,7 @@ How the image editor works inside, for people changing this package. To use it, 
 | --- | --- | --- |
 | Core | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
 | React | `src/react/` | The canvas (`ImageEditorCanvas`), DOM measurement, interaction hooks, overlays, stencil rendering, and the `useImageEditor` hook. |
-| Saving | `src/map-edit-to-original.ts` | Describes the flip, rotate and crop operations to apply to the full-size loaded image. |
+| Saving | `src/get-image-edit.ts`, `src/get-output-size.ts`, `src/export-image.ts` | Describe the edit against the loaded image and the size it produces, and export the edited image in the browser. |
 
 The editor keeps no undo history. History belongs to the code that uses the editor, because it covers everything that code edits, not only the crop. The consumer keeps the state: `useImageEditor( { state, onChange } )` works out each change and reports the next state, and marks changes the person did not make (an image loading, a refit after a window resize) with `isEdit: false`. The media editor does this, with its sidebar options and named edits in the same history.
 
@@ -19,7 +19,7 @@ Two types are wider inside the package than outside it:
 | Public | Internal | What the internal one adds |
 | --- | --- | --- |
 | `ImageEditorState` | `InternalImageEditorState` | The base pan, zoom and rotation the reducer keeps for fine rotation. They are on the stored object, so a state the consumer passes back carries them. |
-| `ImageEditorController` | `InternalImageEditorController` | The methods only the canvas calls (`adjustCropRectForViewport`, `settleCrop`, `setZoomAtPoint`), and `getCroppedImage`. |
+| `ImageEditorController` | `InternalImageEditorController` | The methods only the canvas calls (`adjustCropRectForViewport`, `settleCrop`, `setZoomAtPoint`). |
 
 The internal types fit where the public ones are expected, so there are only two casts: `useInternalImageEditor` treats the state it receives as the internal one, and `ImageEditorCanvas` treats its controller as the internal one.
 
@@ -37,7 +37,7 @@ The internal types fit where the public ones are expected, so there are only two
 
 ## Data Flow
 
-Every change goes through `imageEditorReducer()` in `src/core/state.ts`. The hook runs it on the state the consumer keeps (`state` and `onChange`), or on its own state in the package's tests. Containment keeps the image covering the crop rectangle. React components measure the DOM and render the resulting state.
+Every change goes through `imageEditorReducer()` in `src/core/state.ts`. The hook runs it on the state the consumer keeps (`state` and `onChange`), or on its own state in the package's tests. Containment keeps the image covering the crop area. React components measure the DOM and render the resulting state.
 
 ## Design Decisions
 
@@ -45,23 +45,19 @@ Every change goes through `imageEditorReducer()` in `src/core/state.ts`. The hoo
 
 Restriction logic projects crop corners through the camera and checks that they stay inside the image.
 
-### Rendering
-
-The render path uses focused calculations for CSS transforms, stencil placement, dimming, and grid overlays.
-
 ### State
 
-The core reducer is framework-agnostic and serializable. The React layer adds DOM measurement and gestures. Undo and redo, saving, and editor UI state belong to the code that uses the editor.
+The reducer does not use React, and the state is plain data that can be stored as JSON. The React layer adds DOM measurement and gestures.
 
 ### Viewport
 
-Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.
+Viewport pan and zoom let the person look closer at the crop area without changing the edit. They do not change the exported image and do not reach `onChange`, so they never create undo entries.
 
-## Extension Points
+## Which API to Use
 
 | Task | API |
 | --- | --- |
-| Describe the operations to apply to the loaded image when saving | `mapEditToOriginal()`. |
+| Describe the edit to apply to the loaded image when saving | `getImageEdit()`. |
 | Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
 | Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 
@@ -81,4 +77,4 @@ Useful test areas:
 -   `src/react/components/test/image-editor-canvas.browser.test.tsx` for the canvas.
 -   `src/react/components/stencils/test/rectangle-stencil.browser.test.tsx` for resize handles.
 -   `src/react/hooks/test/use-image-editor.jsdom.test.ts` for the controller, including keeping the state yourself.
--   `src/test/map-edit-to-original.test.ts` for checking the mapped edits against the preview camera on the same image.
+-   `src/test/get-image-edit.test.ts` for checking the described edit against the preview camera on the same image.

@@ -61,7 +61,7 @@
 		"@testing-library/user-event": "^14.6.8",
 		"@types/react-dom": "^19.3.0",
 		"react-dom": "^19.3.0",
-		"vitest": "^5.0.5",
+		"vitest": "^5.1.0",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
