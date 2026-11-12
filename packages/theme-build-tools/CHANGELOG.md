@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x.
 -   Update the Vite development dependency to 8.3.6 ([#86500](https://github.com/WordPress/gutenberg/pull/86500)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 

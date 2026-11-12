@@ -7,6 +7,7 @@
 
 ### Internal
 
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x.
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 27.1.0 (2026-11-04)
