@@ -150,7 +150,7 @@ The reverse of `getImageEdit`. Returns `{ state }`, to store like any other chan
 
 A part missing from `edit` means none. Only the image and locked ratio are kept from `state`. The crop is measured after the flip and rotation, so keeping the crop while changing either frames a different region. The pan and zoom are replaced: the crop is centred and zoomed in, as after a resize.
 
-An edit the editor cannot hold is rejected, not adjusted. `{ rejected }` is then `'no-image'`, `'invalid'`, `'locked-ratio'` or `'outside-image'`. `invalid` is a non-finite number or a crop under one pixel wide or high. `{ rotation: 10 }` alone is `outside-image`: a tilted image's bounds have empty corners.
+An edit the editor cannot hold is rejected, not adjusted. `{ rejected }` is then `'no-image'`, `'invalid'`, `'locked-ratio'` or `'outside-image'`. `no-image` means no image with a usable size has loaded. `invalid` is a non-finite number or a crop under one pixel wide or high. `locked-ratio` is an edit that would apply without the locked ratio, but its crop is a different shape. `outside-image` is a crop reaching outside the image; `{ rotation: 10 }` alone is one, because a tilted image's bounds have empty corners.
 
 ### `exportImage( state, options? )`
 

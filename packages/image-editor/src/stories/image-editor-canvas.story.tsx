@@ -30,6 +30,7 @@ import {
 	getImageEdit,
 	getOutputSize,
 	useImageEditor,
+	type ApplyImageEditResult,
 	type ImageEditorState,
 } from '..';
 // The debug story shows the editor's internals, so it uses them directly.
@@ -500,6 +501,17 @@ export const WithControls: Story = {
 	render: WithControlsComponent,
 };
 
+// What each rejection means, from the `ImageEditRejection` docs.
+const REJECTIONS: Record<
+	Extract< ApplyImageEditResult, { rejected: unknown } >[ 'rejected' ],
+	string
+> = {
+	'no-image': 'No image has loaded yet.',
+	invalid: 'A number is not finite, or the crop is under one pixel.',
+	'locked-ratio': 'The crop is not the shape of the locked ratio.',
+	'outside-image': 'The crop reaches outside the image.',
+};
+
 // The edit as JSON, rounded so floating-point noise does not show.
 function formatEdit( state: ImageEditorState ) {
 	return JSON.stringify( getImageEdit( state ) ?? {}, ( _key, value ) =>
@@ -530,7 +542,9 @@ const ApplyAnEditComponent = () => {
 		}
 		const result = applyImageEdit( state, edit );
 		if ( 'rejected' in result ) {
-			setMessage( `Rejected: ${ result.rejected }` );
+			setMessage(
+				`Rejected: ${ result.rejected }. ${ REJECTIONS[ result.rejected ] }`
+			);
 			return;
 		}
 		setState( result.state );
