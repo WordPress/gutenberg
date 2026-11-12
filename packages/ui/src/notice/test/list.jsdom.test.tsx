@@ -245,23 +245,19 @@ describe( 'Notice.List', () => {
 		expect( status ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces in the supplied container while a dialog hides the list', async () => {
+	it( 'announces an explicit message while a dialog hides its group', async () => {
 		const renderNotices = ( open: boolean, showError: boolean ) => (
 			<>
-				<div aria-live="polite" />
 				<Notice.List liveRegionContainer={ document.body }>
-					{ showError && (
-						<>
+					<div aria-live="polite" />
+					<div>
+						{ showError && (
 							<Message
 								politeness="assertive"
 								spokenMessage="Save failed."
 							/>
-							<Message
-								aria-hidden="true"
-								spokenMessage="Hidden notice."
-							/>
-						</>
-					) }
+						) }
+					</div>
 				</Notice.List>
 				<Dialog.Root open={ open }>
 					<Dialog.Popup>
@@ -280,8 +276,40 @@ describe( 'Notice.List', () => {
 				/^Save failed\.$/
 			)
 		);
-		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 	} );
+
+	it.each( [
+		[ 'list prop', { 'aria-hidden': true } ],
+		[ 'render prop', { render: <section aria-hidden="true" /> } ],
+	] as const )(
+		'only announces explicit, unmuted messages outside a list hidden by its %s',
+		async ( _, props ) => {
+			const list = ( show: boolean ) => (
+				<Notice.List { ...props } liveRegionContainer={ document.body }>
+					{ show && (
+						<>
+							<Message spokenMessage="Draft saved." />
+							<Message>Background description.</Message>
+							<Message
+								politeness="off"
+								spokenMessage="Muted message."
+							/>
+							<div hidden>
+								<Message spokenMessage="Hidden message." />
+							</div>
+						</>
+					) }
+				</Notice.List>
+			);
+			const { rerender } = render( list( false ) );
+			rerender( list( true ) );
+			await waitFor( () =>
+				expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+					/^Draft saved\.$/
+				)
+			);
+		}
+	);
 
 	it( 'removes dismissed announcements without repeating remaining messages', async () => {
 		const { rerender } = render( <Notice.List /> );

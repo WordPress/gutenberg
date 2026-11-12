@@ -18,11 +18,14 @@ type Announcement = {
 function isHidden( element: Element, root: Element ) {
 	for (
 		let current: Element | null = element;
-		current && current !== root;
+		current;
 		current = current.parentElement
 	) {
 		if ( current.matches( HIDDEN_CONTENT ) ) {
 			return true;
+		}
+		if ( current === root ) {
+			break;
 		}
 	}
 	return false;
@@ -77,15 +80,20 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		const [ announcements, setAnnouncements ] = useState(
 			new Map< HTMLElement, Announcement >()
 		);
-		const isListHidden = useEvent( ( list: HTMLElement ) => {
-			// A modal can apply aria-hidden directly to the list. With external
-			// live regions, only an explicit request to hide the list should
-			// suppress its announcements.
-			const ariaHidden = liveRegionContainer
-				? props[ 'aria-hidden' ]
-				: list.getAttribute( 'aria-hidden' );
-			return list.hidden || ariaHidden === true || ariaHidden === 'true';
-		} );
+		const isNoticeHidden = useEvent(
+			( notice: HTMLElement, list: HTMLElement ) => {
+				if ( ! liveRegionContainer ) {
+					return isHidden( notice, list );
+				}
+				// Explicit messages can announce outside an aria-hidden background.
+				// Text derived from a notice must still be accessible in the list.
+				const selector =
+					notice.dataset.wpUiNoticeSpokenMessage === undefined
+						? HIDDEN_CONTENT
+						: '[hidden]';
+				return !! notice.closest( selector );
+			}
+		);
 		const observerRef = useRefEffect< HTMLDivElement >(
 			( element ) => {
 				let nextId = 0;
@@ -93,16 +101,15 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				const readNotices = () =>
 					new Map(
 						Array.from(
-							isListHidden( element )
-								? []
-								: element.querySelectorAll< HTMLElement >(
-										`.${ styles.notice }`
-									)
+							element.querySelectorAll< HTMLElement >(
+								`.${ styles.notice }`
+							)
 						)
 							.filter(
 								( notice ) =>
 									notice.closest( LIST_SELECTOR ) ===
-										element && ! isHidden( notice, element )
+										element &&
+									! isNoticeHidden( notice, element )
 							)
 							.map( ( notice ) => [
 								notice,
@@ -171,7 +178,7 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				} );
 				return () => observer.disconnect();
 			},
-			[ isListHidden ]
+			[ isNoticeHidden ]
 		);
 		const mergedRef = useMergeRefs( [ ref, observerRef ] );
 

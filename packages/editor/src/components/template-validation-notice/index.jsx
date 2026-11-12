@@ -24,6 +24,7 @@ export default function TemplateValidationNotice() {
 			<Notice.Root
 				className="editor-template-validation-notice"
 				intent="warning"
+				spokenMessage={ message }
 			>
 				<Notice.Description>{ message }</Notice.Description>
 				<Notice.Actions>
