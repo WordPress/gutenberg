@@ -167,11 +167,8 @@ function ControlPoints( {
 		}
 	};
 
-	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
-	// This memoization would prevent the event listeners from being properly cleaned.
-	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
+	// Keep the cleanup for the registered listeners across rerenders during a drag.
 	const cleanEventListenersRef = useRef< () => void >( undefined );
-	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {
 		return () => {
@@ -217,13 +214,15 @@ function ControlPoints( {
 											window &&
 											window.addEventListener
 										) {
+											cleanEventListenersRef.current?.();
 											controlPointMoveStateRef.current = {
 												initialPosition,
 												index,
 												significantMoveHappened: false,
 												listenersActivated: true,
 											};
-											onStartControlPointChange();
+											cleanEventListenersRef.current =
+												cleanEventListeners;
 											window.addEventListener(
 												'mousemove',
 												onMouseMove
@@ -232,6 +231,7 @@ function ControlPoints( {
 												'mouseup',
 												cleanEventListeners
 											);
+											onStartControlPointChange();
 										}
 									} }
 									onKeyDown={ ( event ) => {
