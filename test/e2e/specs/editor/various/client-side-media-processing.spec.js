@@ -895,6 +895,58 @@ test.describe( 'Client-side media processing', () => {
 		await page.unroute( '**/wp/v2/media**' );
 	} );
 
+	test( 'deletes the attachment when finalizing the upload fails', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await page.route( '**/wp/v2/media/*/finalize*', async ( route ) => {
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'finalize_failed',
+					message: 'Finalization failed.',
+					data: { status: 500 },
+				} ),
+			} );
+		} );
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+			exact: true,
+		} );
+		const deletion = page.waitForResponse( ( response ) => {
+			const request = response.request();
+			// apiFetch sends DELETE as POST with a method override header.
+			const method =
+				request.headers()[ 'x-http-method-override' ] ??
+				request.method();
+			return (
+				method === 'DELETE' &&
+				/\/wp\/v2\/media\/\d+(\?|$)/.test( response.url() )
+			);
+		} );
+		await mediaProcessingUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			'1024x768_e2e_test_image_size.jpeg'
+		);
+
+		await expect(
+			page.locator( '.components-snackbar' ).filter( {
+				hasText: 'Could not finalize the upload.',
+			} )
+		).toBeVisible();
+		expect( ( await deletion ).ok() ).toBe( true );
+		await mediaProcessingUtils.waitForUploadQueueEmpty();
+		const media = await requestUtils.rest( { path: '/wp/v2/media' } );
+		expect( media ).toHaveLength( 0 );
+		await expect(
+			imageBlock.getByRole( 'button', { name: 'Upload', exact: true } )
+		).toBeVisible();
+	} );
+
 	test( 'surfaces an error after exhausting upload retries', async ( {
 		page,
 		editor,
