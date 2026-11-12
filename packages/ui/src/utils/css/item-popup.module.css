@@ -6,6 +6,7 @@
 			composes: dropdown-motion from "./dropdown-motion.module.css";
 
 			--wp-ui-popup-padding: var(--wpds-dimension-padding-xs);
+			--_wp-ui-popup-item-text-line-height: var(--wpds-typography-line-height-xs);
 			--_wp-ui-elevation-md:
 				0 2px 3px rgba(0, 0, 0, 0.05),
 				0 4px 5px rgba(0, 0, 0, 0.04),
@@ -68,14 +69,12 @@
 		}
 
 		/*
-		 * Slot and typography styles for a list in `.popup`'s `main` grid area.
-		 * Combobox and Autocomplete get this via `.list`. Select applies
-		 * it directly so Select.List can own overflow.
+		 * Typography styles for an item list. Combobox and Autocomplete get this
+		 * via `.list`. Select applies it directly so Select.List can own overflow.
 		 */
 		.list-chrome {
 			--_wp-ui-popup-selection-offset: 0px;
 
-			grid-area: main;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
 			line-height: var(--wpds-typography-line-height-sm);
@@ -98,15 +97,25 @@
 			grid-template-areas: "scrollable" "footer";
 		}
 
-		.list-scrollable-container {
+		.list-scroller {
 			overflow-block: auto;
 			overscroll-behavior: contain;
-			grid-area: scrollable;
 			scroll-padding-block: var(--wp-ui-popup-padding);
 
 			&:not(:empty) {
 				padding-block: var(--wp-ui-popup-padding);
 			}
+
+			/* Add the group label's min-height, so highlighted items don't scroll under a stuck label. */
+			&:has(.group-label) {
+				scroll-padding-block-start: calc(var(--wpds-dimension-size-sm) + var(--wp-ui-popup-padding, 0px));
+			}
+		}
+
+		.list-scrollable-container {
+			composes: list-scroller;
+
+			grid-area: scrollable;
 		}
 
 		.list-footer {
@@ -129,6 +138,17 @@
 			padding-inline-start: calc(var(--wp-ui-popup-padding) + var(--wpds-dimension-padding-sm) + var(--_wp-ui-popup-selection-offset));
 			padding-inline-end: calc(var(--wp-ui-popup-padding) + var(--wpds-dimension-padding-sm));
 			color: var(--wpds-color-foreground-content-neutral-weak);
+
+			/*
+			 * The negative inset cancels the scroller's block padding, so items
+			 * don't show above the label.
+			 */
+			.list-scroller & {
+				position: sticky;
+				inset-block-start: calc(-1 * var(--wp-ui-popup-padding, 0px));
+				z-index: 1;
+				background-color: var(--wpds-color-background-surface-neutral-strong);
+			}
 		}
 
 		.separator {
@@ -143,7 +163,7 @@
 			}
 		}
 
-		.item {
+		.item-layout {
 			--wp-ui-popup-item-height: var(--wpds-dimension-size-md);
 			--wp-ui-popup-item-padding-inline: var(--wpds-dimension-padding-sm);
 			--wp-ui-popup-item-padding-block: var(--wpds-dimension-padding-xs);
@@ -154,17 +174,13 @@
 			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 			min-height: var(--wp-ui-popup-item-height);
+			line-height: var(--_wp-ui-popup-item-text-line-height);
 			overflow-wrap: anywhere;
 			border-radius: var(--wpds-border-radius-sm);
-			user-select: none;
 			margin-inline: var(--wp-ui-popup-padding);
 			padding-block: var(--wp-ui-popup-item-padding-block);
 
 			padding-inline: var(--wp-ui-popup-item-padding-inline);
-
-			&:not([data-disabled]) {
-				cursor: var(--wpds-cursor-control);
-			}
 
 			&:has(> .item-icon) {
 				display: grid;
@@ -173,6 +189,16 @@
 				align-content: center;
 				/* Optically adjust the prefix icon to a more balanced position. */
 				padding-inline-start: calc(var(--wp-ui-popup-item-padding-inline) - var(--wpds-dimension-padding-xs));
+			}
+		}
+
+		.item {
+			composes: item-layout;
+
+			user-select: none;
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
 			}
 
 			&.is-size-small {
@@ -203,6 +229,13 @@
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
+				&:focus-visible {
+					--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+
+					outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+					outline-offset: 0;
+				}
+
 				@media ( forced-colors: active ) {
 					color: GrayText;
 				}
@@ -212,7 +245,9 @@
 		.item-icon {
 			display: flex;
 			align-items: center;
-			height: var(--wpds-typography-line-height-sm);
+			justify-content: center;
+			width: var(--wpds-dimension-size-2xs);
+			height: var(--_wp-ui-popup-item-text-line-height);
 			pointer-events: none;
 		}
 
@@ -230,6 +265,7 @@
 		.item-text {
 			display: flex;
 			flex-direction: column;
+			row-gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 		}
 
@@ -250,18 +286,36 @@
 			color: inherit;
 		}
 
-		.status {
-			grid-area: status;
+		.loading-indicator {
+			composes: item-layout;
+
+			font-family: var(--wpds-typography-font-family-body);
+			font-size: var(--wpds-typography-font-size-md);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
-		/* Empty shares main with the list. A VisuallyHidden child still makes
-		   Status :not(:empty). Chrome only when it would not cover the list. */
-		.empty:not(:empty) {
+		.status:has(.loading-indicator) {
+			padding-block: var(--wp-ui-popup-padding);
+		}
+
+		/*
+		 * The named grid areas exist only in `.popup`, so inline parts follow
+		 * the layout they are placed in. `:where()` keeps the specificity.
+		 * Empty shares main with the list.
+		 */
+		:where(.popup) .list-chrome,
+		:where(.popup) .empty:not(:empty) {
 			grid-area: main;
 		}
 
+		:where(.popup) .status {
+			grid-area: status;
+		}
+
+		/* A VisuallyHidden child still makes Status :not(:empty). Chrome only
+		   when it would not cover the list. */
 		.empty:not(:empty),
-		.status:not(:empty):not(:has([data-visually-hidden])) {
+		.status:not(:empty):not(:has([data-visually-hidden], .loading-indicator)) {
 			--wp-ui-popup-empty-min-height: var(--wpds-dimension-size-md);
 			--wp-ui-popup-empty-padding-inline: var(--wpds-dimension-padding-md);
 
@@ -275,5 +329,23 @@
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
+	}
+
+	@layer compositions {
+		/*
+		 * Text variants set line-height in the components layer. This composition
+		 * wins over that, including the global CSS defense bridge in wp-admin.
+		 */
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--_wp-ui-popup-item-text-line-height);
+
+			line-height: var(--_wp-ui-popup-item-text-line-height);
+		}
+
+		.loading-spinner {
+			width: var(--wpds-dimension-size-3xs);
+			height: var(--wpds-dimension-size-3xs);
+		}
 	}
 }

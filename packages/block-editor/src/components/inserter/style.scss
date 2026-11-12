@@ -119,6 +119,17 @@ $block-inserter-tabs-height: 44px;
 			width: $secondary-sidebar-width + $sidebar-width;
 		}
 	}
+
+	// Keeps the close button but hides the tab list when Blocks is the only tab.
+	&.has-single-tab {
+		.block-editor-tabbed-sidebar__tablist {
+			display: none;
+		}
+
+		.block-editor-tabbed-sidebar__tablist-and-close-button {
+			justify-content: flex-end;
+		}
+	}
 }
 
 .block-editor-inserter__inline-elements {
@@ -221,17 +232,16 @@ $block-inserter-tabs-height: 44px;
 	display: none;
 	width: $sidebar-width;
 	padding: $grid-unit-20;
+	color: $gray-900;
 	max-height: calc(100% - #{$grid-unit-40});
 	overflow-y: hidden;
 
 	@include break-medium {
-		display: block;
+		display: flex;
 	}
 
 	.block-editor-block-card {
-		padding-left: 0;
-		padding-right: 0;
-		padding-bottom: $grid-unit-05;
+		padding: 0;
 	}
 }
 
@@ -300,13 +310,9 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__preview-content {
 	background: $gray-100;
-	display: grid;
-	flex-grow: 1;
-	align-items: center;
 }
 
 .block-editor-inserter__preview-content-missing {
-	flex: 1;
 	display: flex;
 	justify-content: center;
 	align-items: center;
