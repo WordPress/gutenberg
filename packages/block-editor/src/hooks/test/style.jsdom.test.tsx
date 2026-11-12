@@ -399,6 +399,19 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'outputs no hover scale for a block without scale support', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { scale: 1.2 } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBeUndefined();
+	} );
+
 	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
 		expect(
 			getBlockStateStylesCSS(
@@ -706,6 +719,62 @@ describe( 'getResponsiveStateCSSRules', () => {
 
 		expect( rules ).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 img { rotate: 5deg !important; translate: 10% 0 !important; }}',
+		] );
+	} );
+
+	it( 'outputs a viewport scale as the individual scale property', () => {
+		registerBlockType( 'test/state-scale', {
+			apiVersion: 3,
+			title: 'State Scale',
+			category: 'design',
+			attributes: {},
+			supports: { transform: { scale: true } },
+			edit: () => null,
+			save: () => null,
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				'@mobile': {
+					transform: { rotate: '5deg', scale: '120%' },
+					elements: {
+						link: {
+							transform: { scale: 2 },
+							':hover': { transform: { scale: 2 } },
+						},
+					},
+				},
+			},
+			'test/state-scale',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-scale' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { rotate: 5deg !important; scale: 120% !important; }}',
+		] );
+	} );
+
+	it( 'outputs no viewport scale for a block without scale support', () => {
+		registerBlockType( 'test/state-no-scale', {
+			apiVersion: 3,
+			title: 'State No Scale',
+			category: 'design',
+			attributes: {},
+			supports: { transform: { rotate: true } },
+			edit: () => null,
+			save: () => null,
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { transform: { rotate: '5deg', scale: 1.2 } } },
+			'test/state-no-scale',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-no-scale' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { rotate: 5deg !important; }}',
 		] );
 	} );
 

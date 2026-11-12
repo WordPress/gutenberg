@@ -517,4 +517,99 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 			'invalid rotation'   => array( array( 'rotate' => true ), 'calc(10deg + 5deg)' ),
 		);
 	}
+
+	/**
+	 * @dataProvider data_inline_scale_styles
+	 *
+	 * @param array  $transform    Transform styles.
+	 * @param string $expected_css Expected inline CSS after the existing style.
+	 */
+	public function test_scale_is_added_to_the_wrapper_inline_style( $transform, $expected_css ) {
+		$this->register_transform_block(
+			array(
+				'rotate'    => true,
+				'translate' => true,
+				'scale'     => true,
+			)
+		);
+
+		$this->assertSame(
+			'<div class="wp-block-test-transform-block" style="color:red;' . $expected_css . '"><img src="x.png" /></div>',
+			$this->render_transformed_block( $transform )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_inline_scale_styles() {
+		return array(
+			'number'                     => array( array( 'scale' => 1.2 ), 'scale:1.2;' ),
+			'zero'                       => array( array( 'scale' => 0 ), 'scale:0;' ),
+			'percentage'                 => array( array( 'scale' => '120%' ), 'scale:120%;' ),
+			'with a rotation and offset' => array(
+				array(
+					'rotate'    => '15deg',
+					'translate' => array( 'x' => '1em' ),
+					'scale'     => '0.5',
+				),
+				'rotate:15deg;translate:1em 0;scale:0.5;',
+			),
+		);
+	}
+
+	public function test_scale_is_output_under_the_transform_feature_selector() {
+		$this->register_transform_block(
+			array( 'scale' => true ),
+			array( 'transform' => '.wp-block-test-transform-block img' )
+		);
+
+		$actual = $this->render_transformed_block( array( 'scale' => 1.5 ) );
+
+		preg_match( '/wp-transform-[a-z0-9]+/', $actual, $matches );
+		$this->assertStringContainsString( 'style="color:red"', $actual );
+		$this->assertSame(
+			'.' . $matches[0] . ' img{scale:1.5;}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * @dataProvider data_unchanged_scale_content
+	 *
+	 * @param array $supports Transform block support configuration.
+	 * @param mixed $scale    Scale value.
+	 */
+	public function test_block_content_is_unchanged_for_scale( $supports, $scale ) {
+		$this->register_transform_block( $supports );
+
+		$this->assertSame(
+			'<div class="wp-block-test-transform-block" style="color:red"><img src="x.png" /></div>',
+			$this->render_transformed_block( array( 'scale' => $scale ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_unchanged_scale_content() {
+		return array(
+			'no scale support'   => array( array( 'rotate' => true ), 1.2 ),
+			'skip serialization' => array(
+				array(
+					'scale'                           => true,
+					'__experimentalSkipSerialization' => array( 'scale' ),
+				),
+				1.2,
+			),
+			'negative'           => array( array( 'scale' => true ), -1 ),
+			'two values'         => array( array( 'scale' => true ), '1.2 1.5' ),
+			'var()'              => array( array( 'scale' => true ), 'var(--scale)' ),
+			'object'             => array( array( 'scale' => true ), array( 'x' => 1.2 ) ),
+		);
+	}
 }

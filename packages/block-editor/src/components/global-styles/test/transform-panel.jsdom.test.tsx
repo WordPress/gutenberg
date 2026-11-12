@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import TransformPanel, { getAngleInDegrees } from '../transform-panel';
+import TransformPanel, {
+	getAngleInDegrees,
+	getScaleAsNumber,
+} from '../transform-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -275,6 +278,128 @@ describe( 'TransformPanel offsets', () => {
 
 		expect( onChange ).toHaveBeenCalledWith( {
 			transform: { rotate: undefined, translate: undefined },
+		} );
+	} );
+} );
+
+describe( 'getScaleAsNumber', () => {
+	it.each( [
+		[ 1.2, 1.2 ],
+		[ '1.2', 1.2 ],
+		[ '120%', 1.2 ],
+		[ '.5', 0.5 ],
+		[ 0, 0 ],
+	] )( 'reads %s as %s', ( value, scale ) => {
+		expect( getScaleAsNumber( value ) ).toBe( scale );
+	} );
+
+	it.each( [ -1, '-1', '1.2 1.5', 'calc(1 + 1)', 'var(--x)', '2x', NaN ] )(
+		'does not read %s',
+		( value ) => {
+			expect( getScaleAsNumber( value ) ).toBeUndefined();
+		}
+	);
+} );
+
+describe( 'TransformPanel scale', () => {
+	const scaleSettings = { transform: { scale: true } };
+
+	it( 'writes the scale as a number', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'1.25'
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: 1.25 },
+		} );
+	} );
+
+	it( 'shows an inherited percentage and leaves it unchanged when the field loses focus', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				inheritedValue={ { transform: { scale: '120%' } } }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const input = screen.getByRole( 'spinbutton', { name: 'Scale' } );
+		expect( input ).toHaveValue( 1.2 );
+		await user.click( input );
+		await user.tab();
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'removes the scale when the field is cleared', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { scale: 1.5 } } }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.clear( screen.getByRole( 'spinbutton', { name: 'Scale' } ) );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: undefined },
+		} );
+	} );
+
+	it( 'never writes a negative scale', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Scale' } ),
+			'-2'
+		);
+
+		expect( onChange ).not.toHaveBeenCalledWith( {
+			transform: { scale: -2 },
+		} );
+	} );
+
+	it( 'spins an empty field from the unscaled size', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ scaleSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'spinbutton', { name: 'Scale' } ) );
+		await user.keyboard( '{ArrowUp}' );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { scale: 1.05 },
 		} );
 	} );
 } );
