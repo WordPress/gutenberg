@@ -46,6 +46,28 @@ const TestWrapper = withRegistryProvider(
 	}
 ) as ComponentType< TestWrapperProps >;
 
+const ControlledInnerBlocksTestWrapper = withRegistryProvider( ( props ) => {
+	if ( props.setRegistry ) {
+		props.setRegistry( props.registry );
+	}
+	useBlockSync( {
+		value: [
+			{
+				name: 'test/test-block',
+				clientId: props.parentClientId,
+				innerBlocks: [],
+			},
+		],
+	} );
+	useBlockSync( {
+		clientId: props.parentClientId,
+		value: props.value,
+		onChange: props.onChange,
+		onInput: props.onInput,
+	} );
+	return null;
+} );
+
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
 		// @ts-expect-error The test block needs no category.
@@ -683,5 +705,122 @@ describe( 'useBlockSync hook', () => {
 
 		// The internal IDs should be different from the external IDs (due to cloning)
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
+	} );
+
+	it( 'does not reset controlled inner blocks when receiving a new array reference that is deeply equal to the outgoing change', async () => {
+		const originalClientId = 'original-external-id';
+		const parentClientId = 'parent-controller-id';
+		const replaceInnerBlocks = vi.spyOn(
+			blockEditorActions,
+			'replaceInnerBlocks'
+		);
+		const onChange = vi.fn();
+
+		const initialBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: originalClientId,
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
+		];
+
+		let registry;
+		const setRegistry = ( reg ) => {
+			registry = reg;
+		};
+
+		const { rerender } = render(
+			<ControlledInnerBlocksTestWrapper
+				setRegistry={ setRegistry }
+				parentClientId={ parentClientId }
+				value={ initialBlocks }
+				onChange={ onChange }
+				onInput={ vi.fn() }
+			/>
+		);
+
+		// Mount calls replaceInnerBlocks once with cloned blocks.
+		expect( replaceInnerBlocks ).toHaveBeenCalledTimes( 1 );
+		const internalClientId =
+			replaceInnerBlocks.mock.calls[ 0 ][ 1 ][ 0 ].clientId;
+		replaceInnerBlocks.mockClear();
+
+		// 1. User changes attribute from foo: 1 to foo: 2.
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( internalClientId, { foo: 2 } );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					clientId: originalClientId,
+					attributes: { foo: 2 },
+				} ),
+			] ),
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+
+		// Simulate the entity reflecting the edited value (foo: 2).
+		const editedBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: originalClientId,
+				innerBlocks: [],
+				attributes: { foo: 2 },
+			},
+		];
+
+		rerender(
+			<ControlledInnerBlocksTestWrapper
+				setRegistry={ setRegistry }
+				parentClientId={ parentClientId }
+				value={ editedBlocks }
+				onChange={ onChange }
+				onInput={ vi.fn() }
+			/>
+		);
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
+
+		onChange.mockClear();
+
+		// 2. User reverts attribute back to foo: 1 (the clean revert).
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( internalClientId, { foo: 1 } );
+
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.arrayContaining( [
+				expect.objectContaining( {
+					clientId: originalClientId,
+					attributes: { foo: 1 },
+				} ),
+			] ),
+			expect.objectContaining( { selection: expect.any( Object ) } )
+		);
+
+		// 3. Core-data drops the edit and passes back the persisted record
+		// as a NEW array reference that has identical content to the initial state.
+		const cleanRevertBlocks = [
+			{
+				name: 'test/test-block',
+				clientId: originalClientId,
+				innerBlocks: [],
+				attributes: { foo: 1 },
+			},
+		];
+
+		rerender(
+			<ControlledInnerBlocksTestWrapper
+				setRegistry={ setRegistry }
+				parentClientId={ parentClientId }
+				value={ cleanRevertBlocks }
+				onChange={ onChange }
+				onInput={ vi.fn() }
+			/>
+		);
+
+		// The blocks should NOT be replaced / re-cloned.
+		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
 	} );
 } );
