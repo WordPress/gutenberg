@@ -144,6 +144,10 @@ Use it when saving. The editor stores where the image sits, how far it is zoomed
 
 The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. With exactly one axis flipped, `rotation` is 360 minus `state.rotation`, because the flip comes first. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
+### `mapImageEdit( edit, handlers )`
+
+Use it to turn an edit into a list of instructions for something that applies them one at a time, such as the WordPress media REST endpoint. `handlers` has one function for each part, `flip`, `rotation` and `crop`; each is called only when the edit has that part, and the results come back in the order the parts apply. The order matters because `rotation` is measured after the flip and `crop` after both, so instructions applied in another order frame a different part of the image.
+
 ### `exportImage( state, options? )`
 
 Use it when the edited image is uploaded as a new file, rather than applied to the original by a server. It loads the image in `state.image`, draws the region the crop frames with the flip, rotation and zoom applied, and resolves with a `Blob` whose dimensions are the ones `getOutputSize( state )` reports. `options.type` is the MIME type, `image/png` by default, and `options.quality` is the quality for lossy types, from 0 to 1.

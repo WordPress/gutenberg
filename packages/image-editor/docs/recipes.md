@@ -172,32 +172,28 @@ function ImageEditorWithHistory( { src }: { src: string } ) {
 
 `getImageEdit( state )` describes the edit against the full-size image loaded in `state.image`: an optional `flip`, `rotation` and `crop`, to apply in that order. The [README](/packages/image-editor/README.md) says what each part measures.
 
-The WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the same order, with the crop in percentages:
+For example, the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applies `modifiers` in the order they arrive, with the crop in percentages. `mapImageEdit( edit, handlers )` calls one handler for each part the edit has, in the order the parts apply, so the list comes out in the right order:
 
 ```ts
 import apiFetch from '@wordpress/api-fetch';
-import { getImageEdit } from '@wordpress/image-editor';
+import { getImageEdit, mapImageEdit } from '@wordpress/image-editor';
 
 const edit = getImageEdit( controller.state );
-const modifiers = [];
-
-if ( edit?.flip ) {
-	modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
-}
-if ( edit?.rotation !== undefined ) {
-	modifiers.push( { type: 'rotate', args: { angle: edit.rotation } } );
-}
-if ( edit?.crop ) {
-	modifiers.push( {
-		type: 'crop',
-		args: {
-			left: edit.crop.x * 100,
-			top: edit.crop.y * 100,
-			width: edit.crop.width * 100,
-			height: edit.crop.height * 100,
-		},
-	} );
-}
+const modifiers = edit
+	? mapImageEdit( edit, {
+			flip: ( flip ) => ( { type: 'flip', args: { flip } } ),
+			rotation: ( angle ) => ( { type: 'rotate', args: { angle } } ),
+			crop: ( { x, y, width, height } ) => ( {
+				type: 'crop',
+				args: {
+					left: x * 100,
+					top: y * 100,
+					width: width * 100,
+					height: height * 100,
+				},
+			} ),
+	  } )
+	: [];
 
 if ( modifiers.length ) {
 	await apiFetch( {

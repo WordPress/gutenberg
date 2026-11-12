@@ -10,6 +10,7 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 -   Allow consumers to theme the canvas through CSS custom properties ([#86340](https://github.com/WordPress/gutenberg/pull/86340)).
 -   Add `exportImage( state, options? )`, which exports the edited image as a `Blob` in the browser ([#86405](https://github.com/WordPress/gutenberg/pull/86405)).
 -   Describe the edit to apply when saving as one `ImageEdit` record, returned by `getImageEdit( state )` ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
+-   Add `mapImageEdit( edit, handlers )`, which turns each part of an `ImageEdit` into the consumer's own format in the order the parts apply ([#86704](https://github.com/WordPress/gutenberg/pull/86704)).
 
 ### Bug Fixes
 
