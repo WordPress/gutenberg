@@ -233,8 +233,8 @@ export interface BorderSettings {
 export interface GlobalStylesSettings {
 	useRootPaddingAwareAlignments?: boolean;
 	viewport?: {
-		mobile?: string;
-		tablet?: string;
+		mobile?: string | { breakpoint?: string; preview?: string };
+		tablet?: string | { breakpoint?: string; preview?: string };
 	};
 	typography?: TypographySettings;
 	layout?: LayoutSettings;

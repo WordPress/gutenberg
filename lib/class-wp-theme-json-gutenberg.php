@@ -785,6 +785,25 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns the breakpoint size of a single viewport setting.
+	 *
+	 * A viewport can be declared as a size string, or as an object with a
+	 * `breakpoint` size and an optional `preview` size.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param mixed $viewport_setting Viewport setting from theme.json.
+	 * @return mixed The breakpoint size, or null when none is declared.
+	 */
+	private static function get_viewport_breakpoint_setting( $viewport_setting ) {
+		if ( is_array( $viewport_setting ) ) {
+			return $viewport_setting['breakpoint'] ?? null;
+		}
+
+		return $viewport_setting;
+	}
+
+	/**
 	 * Sanitizes and normalizes viewport breakpoint settings.
 	 *
 	 * Keeps only supported breakpoint keys, trims valid CSS lengths, and returns
@@ -794,6 +813,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * `mobile`, it is removed.
 	 *
 	 * @since 7.1.0
+	 * @since 7.3.0 Accepts viewports declared as objects with a `breakpoint` size.
 	 *
 	 * @param mixed $viewport_settings Viewport settings from theme.json.
 	 * @return array Sanitized viewport breakpoint settings.
@@ -805,7 +825,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		$breakpoints = array();
 		foreach ( array_keys( static::DEFAULT_VIEWPORT_BREAKPOINTS ) as $breakpoint ) {
-			$value = $viewport_settings[ $breakpoint ] ?? null;
+			$value = self::get_viewport_breakpoint_setting( $viewport_settings[ $breakpoint ] ?? null );
 			$px    = self::get_viewport_breakpoint_value_in_pixels( $value );
 			if ( null !== $px ) {
 				$breakpoints[ $breakpoint ] = array(
@@ -829,6 +849,50 @@ class WP_Theme_JSON_Gutenberg {
 		if ( isset( $breakpoints['tablet'] ) && $breakpoints['mobile']['px'] < $breakpoints['tablet']['px']
 		) {
 			$sanitized['tablet'] = $breakpoints['tablet']['value'];
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitizes viewport settings, keeping valid preview sizes.
+	 *
+	 * Breakpoints are sanitized as in `sanitize_viewport_settings()`. A viewport
+	 * keeps its object form when it declares a valid `preview` size that is
+	 * larger than the previous breakpoint and not larger than its own
+	 * breakpoint. Otherwise, it is reduced to its breakpoint size.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param mixed $viewport_settings Viewport settings from theme.json.
+	 * @return array Sanitized viewport settings.
+	 */
+	private static function sanitize_viewport_settings_with_previews( $viewport_settings ) {
+		$breakpoints = self::sanitize_viewport_settings( $viewport_settings );
+
+		if ( ! is_array( $viewport_settings ) ) {
+			return $breakpoints;
+		}
+
+		$sanitized        = array();
+		$lower_breakpoint = 0;
+		foreach ( $breakpoints as $viewport => $breakpoint ) {
+			$breakpoint_px = self::get_viewport_breakpoint_value_in_pixels( $breakpoint );
+			$preview       = is_array( $viewport_settings[ $viewport ] ?? null )
+				? ( $viewport_settings[ $viewport ]['preview'] ?? null )
+				: null;
+			$preview_px    = self::get_viewport_breakpoint_value_in_pixels( $preview );
+
+			if ( null !== $preview_px && $preview_px > $lower_breakpoint && $preview_px <= $breakpoint_px ) {
+				$sanitized[ $viewport ] = array(
+					'breakpoint' => $breakpoint,
+					'preview'    => trim( $preview ),
+				);
+			} else {
+				$sanitized[ $viewport ] = $breakpoint;
+			}
+
+			$lower_breakpoint = $breakpoint_px;
 		}
 
 		return $sanitized;
@@ -1535,7 +1599,7 @@ class WP_Theme_JSON_Gutenberg {
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
 			if ( 'settings' === $subtree && array_key_exists( 'viewport', $input[ $subtree ] ) ) {
-				$result['viewport'] = self::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
+				$result['viewport'] = self::sanitize_viewport_settings_with_previews( $input[ $subtree ]['viewport'] );
 			}
 
 			if ( 'settings' === $subtree ) {
@@ -5451,7 +5515,7 @@ class WP_Theme_JSON_Gutenberg {
 		self::preserve_valid_typed_settings( $input, $output, static::VALID_SETTINGS );
 
 		if ( $allow_viewport && array_key_exists( 'viewport', $input ) ) {
-			$output['viewport'] = self::sanitize_viewport_settings( $input['viewport'] );
+			$output['viewport'] = self::sanitize_viewport_settings_with_previews( $input['viewport'] );
 		}
 
 		return $output;

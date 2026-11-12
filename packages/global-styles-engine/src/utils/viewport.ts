@@ -6,7 +6,10 @@ const DEFAULT_VIEWPORT_BREAKPOINTS = {
 };
 
 type ViewportBreakpoint = keyof typeof DEFAULT_VIEWPORT_BREAKPOINTS;
-type ViewportSettings = Partial< Record< ViewportBreakpoint, string > >;
+type ViewportSetting = string | { breakpoint?: string; preview?: string };
+type ViewportSettings = Partial<
+	Record< ViewportBreakpoint, ViewportSetting >
+>;
 type ViewportBreakpoints = Partial< Record< ViewportBreakpoint, string > >;
 
 // Matches positive CSS length values supported for viewport breakpoints, and
@@ -38,6 +41,19 @@ function isValidViewportSize( value: unknown ): value is string {
 	return (
 		typeof value === 'string' && VIEWPORT_SIZE_REGEXP.test( value.trim() )
 	);
+}
+
+// A viewport can be declared as a size, or as an object with a `breakpoint`
+// size and an optional `preview` size.
+function getViewportSettingSize(
+	setting: ViewportSetting | undefined,
+	size: 'breakpoint' | 'preview'
+): string | undefined {
+	if ( setting && typeof setting === 'object' ) {
+		return setting[ size ];
+	}
+
+	return size === 'breakpoint' ? setting : undefined;
 }
 
 /**
@@ -98,7 +114,10 @@ export function getViewportBreakpoints(
 
 	Object.keys( DEFAULT_VIEWPORT_BREAKPOINTS ).forEach( ( breakpoint ) => {
 		const key = breakpoint as ViewportBreakpoint;
-		const value = viewportSettings[ key ];
+		const value = getViewportSettingSize(
+			viewportSettings[ key ],
+			'breakpoint'
+		);
 		const px = getViewportBreakpointValueInPixels( value );
 		if ( px !== undefined && isValidViewportSize( value ) ) {
 			breakpoints[ key ] = value.trim();
@@ -124,6 +143,49 @@ export function getViewportBreakpoints(
 	}
 
 	return { mobile, tablet };
+}
+
+/**
+ * Returns the preview sizes declared for the configured viewports.
+ *
+ * A preview size is only returned when it is larger than the previous
+ * breakpoint and not larger than its own breakpoint, so a device preview always
+ * shows the styles of its viewport.
+ *
+ * @param configOrSettings Global styles config or viewport settings.
+ * @return Preview sizes keyed by viewport.
+ */
+export function getViewportPreviewSizes(
+	configOrSettings?: GlobalStylesConfig | ViewportSettings
+): ViewportBreakpoints {
+	const viewportSettings = getViewportSettings( configOrSettings );
+	const breakpoints = getViewportBreakpoints( configOrSettings );
+	const previewSizes: ViewportBreakpoints = {};
+	let lowerBreakpoint = 0;
+
+	( Object.keys( breakpoints ) as ViewportBreakpoint[] ).forEach( ( key ) => {
+		const breakpoint = getViewportBreakpointValueInPixels(
+			breakpoints[ key ]
+		)!;
+		const preview = getViewportSettingSize(
+			viewportSettings[ key ],
+			'preview'
+		);
+		const previewInPixels = getViewportBreakpointValueInPixels( preview );
+
+		if (
+			isValidViewportSize( preview ) &&
+			previewInPixels !== undefined &&
+			previewInPixels > lowerBreakpoint &&
+			previewInPixels <= breakpoint
+		) {
+			previewSizes[ key ] = preview.trim();
+		}
+
+		lowerBreakpoint = breakpoint;
+	} );
+
+	return previewSizes;
 }
 
 /**

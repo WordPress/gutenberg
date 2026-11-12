@@ -1107,6 +1107,23 @@ If only one valid breakpoint is configured, the breakpoint keeps its viewport ke
 }
 ```
 
+By default, the editor's Mobile and Tablet previews are as wide as their breakpoints. To preview a narrower canvas without changing the breakpoint, declare the viewport as an object with a `breakpoint` and a `preview` size. The preview size must be larger than the previous breakpoint and no larger than its own breakpoint, otherwise it is ignored.
+
+```json
+{
+	"version": 3,
+	"settings": {
+		"viewport": {
+			"mobile": {
+				"breakpoint": "690px",
+				"preview": "390px"
+			},
+			"tablet": "1000px"
+		}
+	}
+}
+```
+
 Responsive overrides can be placed directly on a block node:
 
 ```json

@@ -100,6 +100,41 @@ describe( 'device type utilities', () => {
 		);
 	} );
 
+	it( 'uses preview sizes for device previews without changing the breakpoints', () => {
+		const viewportSettings = {
+			mobile: { breakpoint: '690px', preview: '390px' },
+			tablet: { breakpoint: '1000px', preview: '850px' },
+		};
+
+		expect( getCanvasWidthByDeviceType( 'Mobile', viewportSettings ) ).toBe(
+			390
+		);
+		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
+			850
+		);
+
+		expect( getDeviceTypeByCanvasWidth( 690, viewportSettings ) ).toBe(
+			'Mobile'
+		);
+		expect( getDeviceTypeByCanvasWidth( 1000, viewportSettings ) ).toBe(
+			'Tablet'
+		);
+	} );
+
+	it( 'falls back to the breakpoint when the preview size is outside its range', () => {
+		const viewportSettings = {
+			mobile: { breakpoint: '690px', preview: '800px' },
+			tablet: { breakpoint: '1000px', preview: '1000px' },
+		};
+
+		expect( getCanvasWidthByDeviceType( 'Mobile', viewportSettings ) ).toBe(
+			689
+		);
+		expect( getCanvasWidthByDeviceType( 'Tablet', viewportSettings ) ).toBe(
+			999
+		);
+	} );
+
 	it( 'omits tablet when its breakpoint is not larger than mobile', () => {
 		const viewportSettings = {
 			mobile: '64rem',
