@@ -1,6 +1,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import {
@@ -15,6 +16,7 @@ import type { GridItemAttributes } from './types';
 interface AutoSpanItemState {
 	appliedRect: GridRect;
 	attributes: GridItemAttributes;
+	innerBlocks: Block[];
 	userColumnStart: number;
 	userRowStart: number;
 	extraColumnSpan: number;
@@ -22,8 +24,12 @@ interface AutoSpanItemState {
 	autoColumnSpan: number;
 	autoRowSpan: number;
 	gridWidth: number;
+	columnWidth: number;
+	rowHeight: number;
 	hasUserColumnSpanOverride: boolean;
 	hasUserRowSpanOverride: boolean;
+	preserveInitialColumnSpan: boolean;
+	preserveInitialRowSpan: boolean;
 	preserveUserResize: boolean;
 	columnSpanWasImplicit: boolean;
 	rowSpanWasImplicit: boolean;
@@ -337,7 +343,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		( select ) => select( blockEditorStore ).getBlocks( clientId ),
 		[ clientId ]
 	);
-	const { getBlockAttributes, getBlockName, getBlockOrder } =
+	const { getBlockAttributes, getBlockName, getBlockOrder, getBlocks } =
 		useSelect( blockEditorStore );
 	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -484,6 +490,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					continue;
 				}
 				const itemLayout = attributes.style?.layout ?? {};
+				const innerBlocks = getBlocks( childId );
 				let itemState = autoSpanState.items.get( childId );
 				let renderedAttributesChanged = false;
 				if ( itemState && itemState.attributes !== attributes ) {
@@ -503,6 +510,10 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 							contentAttributeKeys
 						);
 				}
+				// Descendant edits can change the content without changing this
+				// block's own attributes.
+				renderedAttributesChanged ||=
+					!! itemState && itemState.innerBlocks !== innerBlocks;
 				const canShrink = allowShrink || renderedAttributesChanged;
 				let columnSpanChanged = false;
 				let rowSpanChanged = false;
@@ -565,9 +576,19 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 							)
 						: 1
 				);
-				const gridWidthChanged =
+				const gridSizeChanged =
 					itemState &&
-					Math.abs( itemState.gridWidth - gridWidth ) > 1;
+					( Math.abs( itemState.gridWidth - gridWidth ) > 1 ||
+						Math.abs( itemState.columnWidth - columnWidth ) > 1 ||
+						Math.abs( itemState.rowHeight - rowHeight ) > 1 );
+				// Preserve the saved size until content, attributes, or cell sizes
+				// change. User overrides also survive viewport changes.
+				let preserveInitialColumnSpan =
+					itemState?.preserveInitialColumnSpan ??
+					isPositiveInteger( itemLayout.columnSpan );
+				let preserveInitialRowSpan =
+					itemState?.preserveInitialRowSpan ??
+					isPositiveInteger( itemLayout.rowSpan );
 				let hasUserColumnSpanOverride =
 					itemState?.hasUserColumnSpanOverride ?? false;
 				let hasUserRowSpanOverride =
@@ -579,19 +600,27 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				if ( renderedAttributesChanged ) {
 					hasUserColumnSpanOverride = false;
 					hasUserRowSpanOverride = false;
+				}
+				if ( renderedAttributesChanged || gridSizeChanged ) {
+					preserveInitialColumnSpan = false;
+					preserveInitialRowSpan = false;
 					preserveUserResize = false;
-				} else if ( allowShrink || gridWidthChanged ) {
+				} else if ( allowShrink ) {
 					preserveUserResize = false;
 				}
 				const preserveColumnSpan =
-					hasUserColumnSpanOverride || preserveUserResize;
+					hasUserColumnSpanOverride ||
+					preserveInitialColumnSpan ||
+					preserveUserResize;
 				const preserveRowSpan =
-					hasUserRowSpanOverride || preserveUserResize;
+					hasUserRowSpanOverride ||
+					preserveInitialRowSpan ||
+					preserveUserResize;
 				// Responsive content can adapt after an item grows, making a
 				// resize-only follow-up appear to fit in one cell. Keep the span
-				// from that content until the content or grid width changes.
+				// from that content until the content or grid size changes.
 				const autoColumnSpan =
-					itemState && ! canShrink && ! gridWidthChanged
+					itemState && ! canShrink && ! gridSizeChanged
 						? Math.max(
 								itemState.autoColumnSpan,
 								measuredAutoColumnSpan
@@ -676,7 +705,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 				const autoRowSpan =
 					itemState &&
 					! canShrink &&
-					! gridWidthChanged &&
+					! gridSizeChanged &&
 					desiredWidthRect.columnSpan ===
 						itemState.appliedRect.columnSpan
 						? Math.max( itemState.autoRowSpan, measuredAutoRowSpan )
@@ -698,6 +727,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					itemState = {
 						appliedRect: rect,
 						attributes,
+						innerBlocks,
 						userColumnStart,
 						userRowStart,
 						extraColumnSpan,
@@ -705,8 +735,19 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 						autoColumnSpan,
 						autoRowSpan,
 						gridWidth,
-						hasUserColumnSpanOverride,
-						hasUserRowSpanOverride,
+						columnWidth,
+						rowHeight,
+						// Treat saved spans smaller than their content as intentional
+						// overflow, preserving them across viewport changes too.
+						hasUserColumnSpanOverride:
+							preserveInitialColumnSpan &&
+							contentWidth >
+								rect.columnSpan * columnPitch - columnGap + 1,
+						hasUserRowSpanOverride:
+							preserveInitialRowSpan &&
+							rect.rowSpan < measuredAutoRowSpan,
+						preserveInitialColumnSpan,
+						preserveInitialRowSpan,
 						preserveUserResize,
 						columnSpanWasImplicit: ! isPositiveInteger(
 							itemLayout.columnSpan
@@ -718,14 +759,20 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 					autoSpanState.items.set( childId, itemState );
 				} else {
 					itemState.attributes = attributes;
+					itemState.innerBlocks = innerBlocks;
 					itemState.extraColumnSpan = extraColumnSpan;
 					itemState.extraRowSpan = extraRowSpan;
 					itemState.autoColumnSpan = autoColumnSpan;
 					itemState.autoRowSpan = autoRowSpan;
 					itemState.gridWidth = gridWidth;
+					itemState.columnWidth = columnWidth;
+					itemState.rowHeight = rowHeight;
 					itemState.hasUserColumnSpanOverride =
 						hasUserColumnSpanOverride;
 					itemState.hasUserRowSpanOverride = hasUserRowSpanOverride;
+					itemState.preserveInitialColumnSpan =
+						preserveInitialColumnSpan;
+					itemState.preserveInitialRowSpan = preserveInitialRowSpan;
 					itemState.preserveUserResize = preserveUserResize;
 				}
 				if ( areGridRectsEqual( desiredRect, rect ) ) {
@@ -787,10 +834,12 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		};
 
 		let frame: number | undefined;
+		let shouldAllowShrink = false;
 		/**
 		 * Schedules one overflow check for the next animation frame.
+		 *
+		 * @param allowShrink Whether the check may shrink automatic spans.
 		 */
-		let shouldAllowShrink = false;
 		const scheduleCheck = ( allowShrink = false ) => {
 			shouldAllowShrink ||= allowShrink;
 			if ( frame === undefined ) {
@@ -883,6 +932,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 		getBlockAttributes,
 		getBlockName,
 		getBlockOrder,
+		getBlocks,
 		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 	] );

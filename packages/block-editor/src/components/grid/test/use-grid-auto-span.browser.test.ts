@@ -13,7 +13,9 @@ import { renderHook } from 'vitest-browser-react';
 import { dispatch, select } from '@wordpress/data';
 import {
 	createBlock,
+	parse,
 	registerBlockType,
+	serialize,
 	unregisterBlockType,
 } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../../store';
@@ -81,7 +83,13 @@ function createItemElement( clientId: string, gridElement: HTMLElement ) {
 		const span = temporarySpan
 			? Number( temporarySpan[ 1 ] )
 			: ( attributes?.style?.layout?.[ attribute ] ?? 1 );
-		return span * 110 - 10;
+		const gridStyle = window.getComputedStyle( gridElement );
+		const trackSize = parseFloat(
+			attribute === 'columnSpan'
+				? gridStyle.gridTemplateColumns
+				: gridStyle.gridTemplateRows
+		);
+		return span * ( trackSize + 10 ) - 10;
 	};
 	const readScrollWidth = vi.fn( () =>
 		Math.max( getSize( 'grid-column', 'columnSpan' ), content.width )
@@ -89,7 +97,7 @@ function createItemElement( clientId: string, gridElement: HTMLElement ) {
 	const readScrollHeight = vi.fn( () =>
 		Math.max( getSize( 'grid-row', 'rowSpan' ), content.height )
 	);
-	// Supply fixed 100px tracks with 10px gaps so measurement counts and
+	// Use the grid's track sizes with 10px gaps so measurement counts and
 	// overflow notifications are deterministic across temporary placements.
 	Object.defineProperties( element, {
 		offsetWidth: { get: () => getSize( 'grid-column', 'columnSpan' ) },
@@ -114,6 +122,35 @@ describe( 'useGridAutoSpan', () => {
 		act( () => {
 			callbacks.forEach( ( callback ) => callback( 0 ) );
 		} );
+	};
+
+	const reloadGrid = async ( unmount: () => Promise< void > ) => {
+		const savedItems = serialize(
+			select( blockEditorStore ).getBlocks( gridClientId )
+		);
+		const gridAttributes =
+			select( blockEditorStore ).getBlockAttributes( gridClientId );
+		const content = item.content;
+		await unmount();
+
+		// Parsing saved blocks generates new client IDs, as a page reload does.
+		const children = parse( savedItems );
+		const grid = createBlock( BLOCK_NAME, gridAttributes ?? {}, children );
+		gridClientId = grid.clientId;
+		childClientId = children[ 0 ].clientId;
+		await act( async () => {
+			await dispatch( blockEditorStore ).resetBlocks( [ grid ] );
+			await dispatch( blockEditorStore ).updateBlockListSettings(
+				gridClientId,
+				{}
+			);
+		} );
+		gridElement.replaceChildren();
+		item = createItemElement( childClientId, gridElement );
+		Object.assign( item.content, content );
+		return renderHook( () =>
+			useGridAutoSpan( { clientId: gridClientId } )
+		);
 	};
 
 	beforeAll( () => {
@@ -171,7 +208,10 @@ describe( 'useGridAutoSpan', () => {
 		gridElement = document.createElement( 'div' );
 		gridElement.style.cssText =
 			'display: grid; grid-template-columns: 100px 100px 100px; grid-template-rows: 100px 100px 100px; gap: 10px;';
-		Object.defineProperty( gridElement, 'clientWidth', { value: 320 } );
+		Object.defineProperty( gridElement, 'clientWidth', {
+			value: 320,
+			configurable: true,
+		} );
 		document.body.append( gridElement );
 		item = createItemElement( childClientId, gridElement );
 		vi.mocked( useBlockElement ).mockReturnValue( gridElement );
@@ -210,6 +250,132 @@ describe( 'useGridAutoSpan', () => {
 			gridTemplateRows: '100px 100px 100px',
 			gridAutoRows: 'auto',
 		} );
+	} );
+
+	it.each( [
+		{
+			axis: 'column',
+			span: 'columnSpan',
+			dimension: 'width',
+		},
+		{
+			axis: 'row',
+			span: 'rowSpan',
+			dimension: 'height',
+		},
+	] as const )(
+		'preserves a saved $axis span when content overflows',
+		async ( { span, dimension } ) => {
+			item.content[ dimension ] = 250;
+			let { unmount } = await renderHook( () =>
+				useGridAutoSpan( { clientId: gridClientId } )
+			);
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId )?.[ span ] ).toBe( 3 );
+
+			await act( async () => {
+				await dispatch( blockEditorStore ).updateBlockAttributes(
+					childClientId,
+					{
+						style: {
+							layout: {
+								...getItemLayout( childClientId ),
+								[ span ]: 1,
+							},
+						},
+					}
+				);
+			} );
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId )?.[ span ] ).toBe( 1 );
+			const savedLayout = getItemLayout( childClientId );
+
+			const switchPreviews = async () => {
+				for ( const [ columnCount, trackSize ] of [
+					[ 1, 320 ],
+					[ 3, 100 ],
+				] ) {
+					await unmount();
+					gridElement.style.gridTemplateColumns = `repeat(${ columnCount }, ${ trackSize }px)`;
+					gridElement.style.gridTemplateRows = `repeat(3, ${ trackSize }px)`;
+					const hook = await renderHook( () =>
+						useGridAutoSpan( { clientId: gridClientId } )
+					);
+					unmount = hook.unmount;
+					flushFrame();
+					flushFrame();
+					expect( getItemLayout( childClientId ) ).toEqual(
+						savedLayout
+					);
+				}
+			};
+
+			// The same client IDs and sizing state survive preview remounts.
+			await switchPreviews();
+			const reloadedHook = await reloadGrid( unmount );
+			unmount = reloadedHook.unmount;
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId ) ).toEqual( savedLayout );
+			await switchPreviews();
+
+			// Initial resize notifications must also preserve the saved spans.
+			const resizeObserver = MockResizeObserver.instances.at( -1 )!;
+			resizeObserver.resize( gridElement );
+			resizeObserver.resize( item.element );
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId ) ).toEqual( savedLayout );
+
+			// Editing content resumes automatic sizing, including after reload.
+			await act( async () => {
+				await dispatch( blockEditorStore ).updateBlockAttributes(
+					childClientId,
+					{ content: 'Changed overflowing content' }
+				);
+			} );
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId )?.[ span ] ).toBe( 3 );
+		}
+	);
+
+	it( 'continues adjusting automatic spans after reload', async () => {
+		item.content.width = 150;
+		item.content.height = 150;
+		const { unmount } = await renderHook( () =>
+			useGridAutoSpan( { clientId: gridClientId } )
+		);
+		flushFrame();
+		flushFrame();
+		expect( getItemLayout( childClientId ) ).toMatchObject( {
+			columnSpan: 2,
+			rowSpan: 2,
+		} );
+
+		await reloadGrid( unmount );
+		flushFrame();
+		flushFrame();
+		const resizeObserver = MockResizeObserver.instances.at( -1 )!;
+		for ( const [ trackSize, gridWidth, expectedSpan ] of [
+			[ 50, 320, 3 ],
+			[ 200, 620, 1 ],
+		] ) {
+			gridElement.style.gridTemplateColumns = `repeat(3, ${ trackSize }px)`;
+			gridElement.style.gridTemplateRows = `repeat(3, ${ trackSize }px)`;
+			Object.defineProperty( gridElement, 'clientWidth', {
+				value: gridWidth,
+			} );
+			resizeObserver.resize( gridElement );
+			flushFrame();
+			flushFrame();
+			expect( getItemLayout( childClientId ) ).toMatchObject( {
+				columnSpan: expectedSpan,
+				rowSpan: expectedSpan,
+			} );
+		}
 	} );
 
 	it( 'keeps observing blocks as content and grid children change', async () => {
