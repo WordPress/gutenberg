@@ -14,7 +14,7 @@ import type { AutocompletePopupProps } from './types';
  *
  * Do not render `Autocomplete.Input` inside `Autocomplete.Popup`. For a
  * searchable picker that opens from a button, render
- * `<Autocomplete.Root inline open>` inside a `Popover` instead.
+ * `<Autocomplete.Root inline open>` inside a `Popover.Popup` instead.
  */
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
 	function UnforwardedPopup(

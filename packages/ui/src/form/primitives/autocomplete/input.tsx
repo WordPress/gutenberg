@@ -16,7 +16,7 @@ export const Input = forwardRef< HTMLInputElement, AutocompleteInputProps >(
 		const isInsidePopup = useAutocompletePopupContext();
 		if ( process.env.NODE_ENV !== 'production' && isInsidePopup ) {
 			throw new Error(
-				'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup, which is the suggestion list for an input outside it. For a searchable picker that opens from a button, render <Autocomplete.Root inline open> inside a Popover instead.'
+				'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup, which is the suggestion list for an input outside it. For a searchable picker that opens from a button, render <Autocomplete.Root inline open> inside a <Popover.Popup> instead.'
 			);
 		}
 
