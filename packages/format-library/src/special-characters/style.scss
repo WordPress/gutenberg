@@ -17,8 +17,7 @@
 
 .format-library-special-characters__results {
 	// A fixed height, so the popover keeps one size as search results change
-	// and does not jump when it opens above the text. The list fills what the
-	// empty message leaves, so the list body scrolls.
+	// and does not jump when it opens above the text.
 	display: grid;
 	grid-template-rows: auto minmax(0, 1fr);
 	height: 260px;
