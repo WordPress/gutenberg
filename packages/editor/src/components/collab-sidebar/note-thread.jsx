@@ -25,12 +25,12 @@ import {
 	useNoteDraft,
 	usePickNote,
 } from './hooks';
+import { getNoteExcerpt } from './utils/display';
 import {
 	focusNoteThread,
-	getNoteExcerpt,
-	hasFocusWithin,
+	isFocusInBlocks,
 	scrollNoteThreadIntoView,
-} from './utils';
+} from './utils/dom';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -81,7 +81,6 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 
 export function NoteThread( {
 	note,
-	anchorClientId,
 	focusThreadOrAdjacent,
 	isSelected,
 	expandReplies = false,
@@ -91,23 +90,16 @@ export function NoteThread( {
 } ) {
 	const isFloating = !! floating;
 	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
-	const { toggleBlockHighlight } = unlock( useDispatch( blockEditorStore ) );
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
-	const relatedBlockElement = useBlockElement( anchorClientId );
-	// The anchor can move to another copy while highlighted, so turning the
-	// highlight off clears every copy.
-	const setBlockHighlight = useEvent( ( isHighlighted ) => {
-		if ( isHighlighted ) {
-			toggleBlockHighlight( anchorClientId, true );
-			return;
-		}
-		for ( const clientId of note.blockClientIds ) {
-			toggleBlockHighlight( clientId, false );
-		}
-	} );
+	const relatedBlockElement = useBlockElement( note.blockClientId );
+	const setBlockHighlight = useEvent( ( isHighlighted ) =>
+		toggleBlockHighlight( note.blockClientId, isHighlighted )
+	);
 	const debouncedSetBlockHighlight = useDebounce( setBlockHighlight, 50 );
 	const floatingRef = useRef( null );
 	const isKeyboardTabbingRef = useRef( false );
@@ -171,8 +163,13 @@ export function NoteThread( {
 			setBlockHighlight( false );
 		}
 
-		// In the note's block, the caret events decide; deselecting here too would race them.
-		if ( hasFocusWithin( relatedBlockElement ) ) {
+		// In the note's blocks, the caret events decide; deselecting here too would race them.
+		if (
+			isFocusInBlocks(
+				relatedBlockElement?.ownerDocument,
+				note.blockClientIds
+			)
+		) {
 			return;
 		}
 
@@ -207,7 +204,7 @@ export function NoteThread( {
 			return;
 		}
 
-		pickNote( note.id, anchorClientId );
+		pickNote( note.id, note.blockClientId );
 		focusNoteThread( note.id, sidebarRef.current );
 	}
 
@@ -273,8 +270,8 @@ export function NoteThread( {
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
-				key={ anchorClientId }
-				clientId={ anchorClientId }
+				key={ note.blockClientId }
+				clientIds={ note.blockClientIds }
 				floating={ { y: floating.y, ref: floatingRef } }
 			/>
 		);
@@ -411,6 +408,10 @@ export function NoteThread( {
 					onClick={ ( event ) => {
 						event.stopPropagation();
 						relatedBlockElement?.focus();
+						// Another of the note's blocks can be selected, and an
+						// unselected block can't take focus while the canvas is
+						// an editing host.
+						selectBlock( note.blockClientId, true );
 					} }
 				>
 					{ __( 'Back to block' ) }

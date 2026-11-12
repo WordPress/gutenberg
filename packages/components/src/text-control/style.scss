@@ -31,7 +31,7 @@
 	padding-right: $grid-unit-15;
 
 	&::placeholder {
-		color: $components-color-dark-gray-placeholder;
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&:disabled,

@@ -52,7 +52,7 @@
 		}
 
 		.list {
-			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-sm);
+			--_wp-ui-menu-item-label-line-height: var(--wpds-typography-line-height-xs);
 
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
@@ -133,7 +133,7 @@
 
 		.item {
 			--wp-ui-menu-item-height: var(--wpds-dimension-size-md);
-			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-xs);
+			--wp-ui-menu-item-padding-block: var(--wpds-dimension-padding-sm);
 			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
 			display: grid;
@@ -147,9 +147,13 @@
 				[content-start] minmax(0, 1fr)
 				[content-end] var(--wp-ui-menu-item-padding-inline, var(--_wp-ui-menu-item-padding-inline-end))
 				[item-padding-end];
-			gap: 0;
-			/* Keep leading content at the top of the content row. */
-			align-items: start;
+			column-gap: 0;
+			row-gap: var(--wpds-dimension-gap-xs);
+			/*
+			 * Anchor the slots to the first line of the label. The row grows
+			 * around that line when a slot is taller than it.
+			 */
+			align-items: first baseline;
 			/* Center a single line without shifting wrapped content. */
 			align-content: center;
 			justify-content: stretch;
@@ -230,14 +234,45 @@
 			grid-row: 1;
 		}
 
+		/*
+		 * The slots beside the label (selection indicator, prefix, suffix,
+		 * shortcut and trailing content) share the center of the label's first
+		 * line as their vertical anchor. Each slot stacks an invisible,
+		 * zero-width line with the label's typography over its content in a
+		 * single grid cell. That line gives the slot a text baseline, so the
+		 * `first baseline` alignment of the item lines it up with the first
+		 * line of the label, whatever the size of the content. The content stays
+		 * centered in the cell, and a taller slot grows the row around the line.
+		 */
+		.item-selection-indicator,
+		.item-prefix,
+		.item-suffix,
+		.item-shortcut,
+		.item-trailing {
+			display: grid;
+			align-items: center;
+
+			&::before {
+				content: "\200b";
+				grid-area: 1 / 1;
+				font-family: var(--wpds-typography-font-family-body);
+				font-size: var(--wpds-typography-font-size-md);
+				line-height: var(--_wp-ui-menu-item-label-line-height);
+			}
+		}
+
+		.accessory-content {
+			grid-area: 1 / 1;
+			display: flex;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-xs);
+		}
+
 		.item-selection-indicator {
 			grid-column: selection-start / selection-end;
 			justify-self: center;
-			display: flex;
-			align-items: center;
-			justify-content: center;
+			justify-items: center;
 			width: var(--wp-ui-menu-selection-indicator-size);
-			height: var(--_wp-ui-menu-item-label-line-height);
 			/* Separate the indicator from the label without widening its track. */
 			margin-inline-end: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
@@ -246,6 +281,11 @@
 			&[data-unchecked] {
 				opacity: 0;
 			}
+		}
+
+		.checkbox-selection-icon,
+		.radio-selection-icon {
+			grid-area: 1 / 1;
 		}
 
 		.checkbox-selection-icon {
@@ -261,18 +301,12 @@
 
 		.item-prefix {
 			grid-column: prefix-start / prefix-end;
-			display: flex;
-			align-items: center;
 			justify-content: center;
-			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 		}
 
 		.prefix-icon {
 			flex-shrink: 0;
-			/* Center a known-size icon on a label line at the top of the row. */
-			align-self: flex-start;
-			margin-block-start: calc((var(--_wp-ui-menu-item-label-line-height) - var(--_wp-ui-menu-prefix-icon-size)) / 2);
 		}
 
 		/*
@@ -281,8 +315,8 @@
 		 */
 		.item-content {
 			grid-column: prefix-start / content-end;
-			/* Include the height of leading content when centering these slots. */
-			align-self: stretch;
+			/* Line the label up with the slots around it. */
+			align-self: first baseline;
 			/* Everything after the prefix is laid out independently per item. */
 			display: grid;
 			grid-template-columns:
@@ -291,7 +325,8 @@
 				[suffix-end shortcut-start] auto
 				[shortcut-end trailing-start] auto
 				[trailing-end];
-			align-items: center;
+			/* Anchor the suffix, shortcut and chevron to the first line of the label. */
+			align-items: first baseline;
 			box-sizing: border-box;
 			min-width: 0;
 			/* Keep clicks on presentational labels and suffixes routed to the menu item. */
@@ -309,23 +344,21 @@
 		.item-descriptions {
 			grid-row: 2;
 			grid-column: prefix-start / content-end;
+			align-self: start;
 			display: flex;
 			flex-direction: column;
+			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
-			/* For better optical alignment and spacing */
-			padding-block-end: var(--wpds-dimension-padding-xs);
 			pointer-events: none;
 		}
 
 		.item-label {
 			--_gcd-heading-color: currentColor;
-			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
 
 			grid-column: label-start / label-end;
 			min-width: 0;
 			overflow-wrap: anywhere;
 			color: inherit;
-			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 
 		.item-description {
@@ -338,10 +371,7 @@
 		/* Outrank the `Text` margin reset, whose stylesheet may load after this one. */
 		.item-content > .item-suffix {
 			grid-column: suffix-start / suffix-end;
-			display: flex;
-			align-items: center;
 			margin-inline-start: var(--wpds-dimension-gap-md);
-			gap: var(--wpds-dimension-gap-xs);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -353,8 +383,12 @@
 
 		.item-trailing {
 			grid-column: trailing-start / trailing-end;
-			display: flex;
-			align-items: center;
+			/*
+			 * A 24px chevron overflows evenly instead of growing the row.
+			 * Centering its track keeps the slot's baseline on the label line.
+			 */
+			height: var(--_wp-ui-menu-item-label-line-height);
+			align-content: center;
 			margin-inline-start: var(--wpds-dimension-gap-md);
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
@@ -396,6 +430,19 @@
 			--_gcd-heading-color: currentColor;
 
 			color: inherit;
+		}
+	}
+
+	/*
+	 * Text variants set line-height in the components layer. This composition
+	 * wins over that, including the global CSS defense bridge in wp-admin.
+	 */
+	@layer compositions {
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--_wp-ui-menu-item-label-line-height);
+
+			line-height: var(--_wp-ui-menu-item-label-line-height);
 		}
 	}
 }

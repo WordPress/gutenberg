@@ -1,5 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { openPostSummary } = require( './post-summary/utils' );
+const { openPostSummary, setPublishDate } = require( './post-summary/utils' );
 
 test.describe( 'Post visibility', () => {
 	[ 'large', 'small' ].forEach( ( viewport ) => {
@@ -47,9 +47,13 @@ test.describe( 'Post visibility', () => {
 		// Set a publish date for the next year.
 		await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 		const nextYear = new Date().getFullYear() + 1;
-		await page
-			.getByLabel( 'Date time' )
-			.fill( `${ nextYear }-03-15T10:00` );
+		await setPublishDate( page, {
+			year: nextYear,
+			month: 3,
+			day: 15,
+			hours: 10,
+			minutes: 0,
+		} );
 		await page.keyboard.press( 'Escape' );
 
 		await summary.getByRole( 'button', { name: 'Edit Status' } ).click();
