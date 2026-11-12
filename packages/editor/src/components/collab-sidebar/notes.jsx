@@ -3,7 +3,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Stack, Text } from '@wordpress/ui';
+import { Notice, Stack, Text } from '@wordpress/ui';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -18,6 +18,7 @@ import {
 	useNoteFocus,
 	usePickNote,
 } from './hooks';
+import { useNoteLock } from './use-note-lock';
 import { AddNote } from './add-note';
 import {
 	DEFAULT_NOTES_FILTERS,
@@ -40,6 +41,7 @@ export function Notes( {
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
+	const { isFullyLocked } = useNoteLock();
 
 	const { selectedBlockClientIds, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -220,6 +222,20 @@ export function Notes( {
 
 	return (
 		<>
+			{ isFullyLocked && ! isFloating && (
+				/*
+				 * Rendered outside the tree so the list keeps only treeitem
+				 * children. The floating sidebar sits over the canvas and has
+				 * no room for it, so the notice lives in "All notes" only.
+				 */
+				<Notice.Root intent="info">
+					<Notice.Description>
+						{ __(
+							'Notes are locked for this post. Existing notes are read-only.'
+						) }
+					</Notice.Description>
+				</Notice.Root>
+			) }
 			{ showNoResults && (
 				<Text
 					className="editor-collab-sidebar-panel__no-results"
