@@ -173,5 +173,8 @@
 		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
 			"npm run docs:build"
 		]
+	},
+	"overrides": {
+		"node-gyp": "12.4.0"
 	}
 }
