@@ -16,7 +16,6 @@ on:
             - '!phpunit/blocks/**'
             - 'packages/**/*.php'
             - '!packages/block-library/**'
-            - '!packages/block-serialization-default-parser/**'
             # Core copies these from the Gutenberg build (`copy:gutenberg-php`).
             - '!packages/core-actions/**'
             - '!packages/core-fields/**'

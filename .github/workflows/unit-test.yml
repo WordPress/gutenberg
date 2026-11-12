@@ -132,9 +132,19 @@ jobs:
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
+            - name: Checkout WordPress Core's block parser
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  repository: WordPress/wordpress-develop
+                  path: .cache/wordpress-develop
+                  sparse-checkout: src/wp-includes
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
             - name: Run the Vitest Node and jsdom projects
               env:
                   SHARD: ${{ matrix.shard }}
+                  WP_TESTS_DIR: ${{ github.workspace }}/.cache/wordpress-develop/tests/phpunit
                   # Keep a separate Flakiness.io history for each Node.js major.
                   FK_ENV_NODEJS: ${{ matrix.node }}
               run: |
