@@ -130,6 +130,7 @@ export function SidebarNavigationScreenWrapper( {
 	title,
 	description,
 	backPath,
+	footer,
 } ) {
 	return (
 		<SidebarNavigationScreen
@@ -143,6 +144,7 @@ export function SidebarNavigationScreenWrapper( {
 			}
 			backPath={ backPath }
 			content={ children }
+			footer={ footer }
 		/>
 	);
 }

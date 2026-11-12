@@ -577,6 +577,52 @@ function createRevisionsLoadFailedNotice( registry ) {
 }
 
 /**
+ * Open a revision of a post, waiting until that post is the one being edited.
+ *
+ * Used when navigating to another entity and opening it on a revision in one
+ * step: the editor switches posts after the navigation, and a revision can only
+ * be shown for the current post.
+ *
+ * @param {Object}        params            Revision to open.
+ * @param {string}        params.postType   Post type of the revision's post.
+ * @param {number|string} params.postId     ID of the revision's post.
+ * @param {number}        params.revisionId The revision ID to open.
+ */
+export const openRevisionOfPost =
+	( { postType, postId, revisionId } ) =>
+	( { dispatch, select } ) => {
+		if (
+			select.getCurrentPostType() === postType &&
+			String( select.getCurrentPostId() ) === String( postId )
+		) {
+			dispatch.clearPendingRevision();
+			dispatch.openRevision( revisionId );
+			return;
+		}
+		// Remember where the request came from, so a navigation that never
+		// reaches the post doesn't leave the revision queued for a later visit.
+		dispatch( {
+			type: 'SET_PENDING_REVISION',
+			pendingRevision: {
+				postType,
+				postId,
+				revisionId,
+				fromPostType: select.getCurrentPostType(),
+				fromPostId: select.getCurrentPostId(),
+			},
+		} );
+	};
+
+/**
+ * Drop a revision queued with `openRevisionOfPost` without opening it.
+ *
+ * @return {Object} Action object.
+ */
+export function clearPendingRevision() {
+	return { type: 'SET_PENDING_REVISION', pendingRevision: null };
+}
+
+/**
  * Open a revision from a shared URL and select the page that contains it.
  *
  * @param {number} revisionId The revision ID to open.

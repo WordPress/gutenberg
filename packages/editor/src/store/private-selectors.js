@@ -456,6 +456,17 @@ export function getCurrentRevisionId( state ) {
 }
 
 /**
+ * Returns the revision waiting for its post to become the current post.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null} `{ postType, postId, revisionId, fromPostType, fromPostId }`,
+ *                       or null.
+ */
+export function getPendingRevision( state ) {
+	return state.pendingRevision;
+}
+
+/**
  * Returns whether the revisions view shows the backup kept in the browser.
  *
  * @param {Object} state Global application state.

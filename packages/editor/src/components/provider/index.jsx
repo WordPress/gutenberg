@@ -27,6 +27,7 @@ import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import { useRevisionBlocks } from './use-revision-blocks';
+import { usePendingRevision } from './use-pending-revision';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
 import useNetworkReconnect from './use-network-reconnect';
@@ -418,6 +419,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Register the editor commands.
 		useCommands();
+
+		// Open a revision queued while navigating to its post.
+		usePendingRevision();
 
 		// Lock post saving when media uploads are in progress (experimental feature).
 		useUploadSaveLock();
