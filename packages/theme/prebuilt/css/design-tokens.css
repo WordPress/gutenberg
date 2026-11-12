@@ -25,8 +25,14 @@
 	--wpds-border-width-xs: 1px;
 	/* Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter). */
 	--wpds-color-background-indicator-brand: #3858e9;
+	/* Background color for indicators with an error tone and normal emphasis (eg. the filled portion of a meter). */
+	--wpds-color-background-indicator-error: #9c0000;
 	/* Background color for indicators with a neutral tone and normal emphasis (eg. the filled portion of a progressbar or meter). */
 	--wpds-color-background-indicator-neutral: #1e1e1e;
+	/* Background color for indicators with a success tone and normal emphasis (eg. the filled portion of a meter). */
+	--wpds-color-background-indicator-success: #005e12;
+	/* Background color for indicators with a warning tone and normal emphasis (eg. the filled portion of a meter). */
+	--wpds-color-background-indicator-warning: #6d4700;
 	/* Background color for interactive elements with brand tone and strong emphasis. */
 	--wpds-color-background-interactive-brand-strong: #3858e9;
 	/* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
