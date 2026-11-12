@@ -5,7 +5,6 @@ import type {
 	NormalizedPoint,
 	NormalizedRect,
 	Size,
-	TransformOperation,
 } from './types';
 import {
 	ABSOLUTE_MIN_ZOOM,
@@ -287,55 +286,6 @@ function getUnclampedPanAtRotation(
 		x: ox + cos * dx - sin * dy,
 		y: oy + sin * dx + cos * dy,
 	};
-}
-
-/**
- * Translate a pipeline transform operation into the equivalent
- * reducer action. Pipeline ops aren't 1:1 with reducer actions —
- * `rotate` is a delta here, whereas SET_ROTATION takes an absolute
- * angle — so deltas are resolved against the current state.
- *
- * Used by APPLY_OPERATION (and by the pipeline module's
- * `applyOperationToState`, which is now a thin wrapper around the
- * reducer) so that pipeline replay produces identical bounded
- * state to UI interaction or direct setters.
- *
- * @param state The current editor state.
- * @param op    The pipeline operation.
- * @return The equivalent reducer action.
- */
-function operationToAction(
-	state: InternalImageEditorState,
-	op: TransformOperation
-): ImageEditorAction {
-	switch ( op.type ) {
-		case 'crop':
-			return { type: 'SET_CROP_RECT', payload: { ...op.rect } };
-		case 'rotate': {
-			// `op.degrees` is the visual rotation the caller wants (positive
-			// = CW on screen). A single-axis flip inverts on-screen rotation
-			// relative to the rotation field, so negate the field delta in
-			// that case — this keeps `{ type: 'rotate', degrees: 90 }` a
-			// reliable "90° clockwise visually" instruction across flip
-			// states, matching the SNAP_ROTATE_90 convention.
-			const singleFlip = state.flip.horizontal !== state.flip.vertical;
-			const fieldDelta = singleFlip ? -op.degrees : op.degrees;
-			return {
-				type: 'SET_ROTATION',
-				payload: normalizeRotation( state.rotation + fieldDelta ),
-			};
-		}
-		case 'flip':
-			return {
-				type: 'SET_FLIP',
-				payload: {
-					...state.flip,
-					[ op.direction ]: ! state.flip[ op.direction ],
-				},
-			};
-		case 'zoom':
-			return { type: 'SET_ZOOM', payload: op.level };
-	}
 }
 
 /**
@@ -689,16 +639,6 @@ export function imageEditorReducer(
 				} )
 			);
 		}
-
-		case 'APPLY_OPERATION':
-			// Route through the action equivalent so a pipeline replay
-			// yields the same bounded state as the matching UI/setter
-			// path (containment, baseZoom relaxation, pan rotation
-			// around crop center, etc.).
-			return imageEditorReducer(
-				state,
-				operationToAction( state, action.payload )
-			);
 
 		case 'RESET':
 			return commitBase(

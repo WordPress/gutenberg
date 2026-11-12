@@ -54,23 +54,6 @@ export interface Flip {
 }
 
 /**
- * A JSON-serializable transform operation for the non-destructive pipeline.
- */
-export type TransformOperation =
-	/**
-	 * Place the crop box in the view the canvas shows, in fractions of
-	 * the view. Which part of the image it frames depends on the pan and
-	 * zoom.
-	 */
-	| { type: 'crop'; rect: NormalizedRect }
-	/** Rotate clockwise on screen by this many degrees, from where it is. */
-	| { type: 'rotate'; degrees: number }
-	/** Flip along this axis, or undo a flip already there. */
-	| { type: 'flip'; direction: 'horizontal' | 'vertical' }
-	/** Set the zoom level. 1 = no zoom. */
-	| { type: 'zoom'; level: number };
-
-/**
  * The state of an image editor, as consumers see it. Store it and pass it
  * back, but create it with `createImageEditorState` and change it only
  * through the controller: the stored object also carries values the
@@ -188,8 +171,6 @@ export type ImageEditorAction =
 	| { type: 'SET_ASPECT_RATIO'; payload: number | undefined }
 	/** Settle animation after resize drag, recentering the crop rect. */
 	| { type: 'SETTLE_CROP' }
-	/** Applies a single pipeline transform via the reducer. */
-	| { type: 'APPLY_OPERATION'; payload: TransformOperation }
 	/** Resets to DEFAULT_STATE, optionally merging a partial override. */
 	| { type: 'RESET'; payload?: Partial< InternalImageEditorState > };
 
