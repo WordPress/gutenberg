@@ -399,4 +399,23 @@ test.describe( 'Taxonomies', () => {
 		await expect( getTagChip( page, typedName ) ).toBeHidden();
 		await expect.poll( () => getAssignedTags( page ) ).toEqual( [ tagId ] );
 	} );
+
+	test( 'closes the tags suggestions popup when the editor canvas is clicked', async ( {
+		editor,
+		page,
+	} ) => {
+		await openTaxonomyPanel( page, 'Tags' );
+
+		const tagInput = page.getByRole( 'combobox', { name: 'Add tag' } );
+		await tagInput.fill( 'tag-' + generateRandomNumber() );
+
+		const suggestions = page.getByRole( 'listbox' );
+		await expect( suggestions ).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+
+		await expect( suggestions ).toBeHidden();
+	} );
 } );

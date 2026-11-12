@@ -422,7 +422,6 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.services.mysql ).toBeDefined();
 			expect( dockerConfig.services.wordpress ).toBeDefined();
 			expect( dockerConfig.services.cli ).toBeDefined();
-			expect( dockerConfig.services.phpmyadmin ).toBeDefined();
 
 			// Tests services should not exist.
 			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
@@ -468,6 +467,52 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeDefined();
 			expect( dockerConfig.services[ 'tests-wordpress' ] ).toBeDefined();
 			expect( dockerConfig.services[ 'tests-cli' ] ).toBeDefined();
+		} );
+	} );
+
+	describe( 'phpmyadmin', () => {
+		function buildWithPhpmyadmin( development, tests ) {
+			return buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: { ...CONFIG, phpmyadmin: development },
+					tests: { ...CONFIG, phpmyadmin: tests },
+				},
+			} );
+		}
+
+		it( 'omits the phpMyAdmin services when phpMyAdmin is not enabled', () => {
+			for ( const value of [ undefined, false ] ) {
+				const config = buildWithPhpmyadmin( value, value );
+
+				expect( config.services.phpmyadmin ).toBeUndefined();
+				expect( config.services[ 'tests-phpmyadmin' ] ).toBeUndefined();
+			}
+		} );
+
+		it( 'defines the phpMyAdmin services when both environments enable it', () => {
+			const config = buildWithPhpmyadmin( true, true );
+
+			expect( config.services.phpmyadmin.environment.PMA_HOST ).toBe(
+				'mysql'
+			);
+			expect(
+				config.services[ 'tests-phpmyadmin' ].environment.PMA_HOST
+			).toBe( 'tests-mysql' );
+		} );
+
+		it( 'defines the phpMyAdmin service only for the environment that enables it', () => {
+			const developmentOnly = buildWithPhpmyadmin( true, false );
+
+			expect( developmentOnly.services.phpmyadmin ).toBeDefined();
+			expect(
+				developmentOnly.services[ 'tests-phpmyadmin' ]
+			).toBeUndefined();
+
+			const testsOnly = buildWithPhpmyadmin( false, true );
+
+			expect( testsOnly.services.phpmyadmin ).toBeUndefined();
+			expect( testsOnly.services[ 'tests-phpmyadmin' ] ).toBeDefined();
 		} );
 	} );
 } );
