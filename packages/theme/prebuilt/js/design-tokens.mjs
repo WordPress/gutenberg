@@ -1029,6 +1029,60 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-color-background-indicator-success': {
+		$description:
+			'Background color for indicators with a success tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#005e12',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0, 0.369, 0.071 ],
+					hex: '#005e12',
+					alpha: 1,
+				},
+				css: '#005e12',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-warning': {
+		$description:
+			'Background color for indicators with a warning tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#6d4700',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.427, 0.278, 0 ],
+					hex: '#6d4700',
+					alpha: 1,
+				},
+				css: '#6d4700',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-error': {
+		$description:
+			'Background color for indicators with an error tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#9c0000',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.612, 0, 0 ],
+					hex: '#9c0000',
+					alpha: 1,
+				},
+				css: '#9c0000',
+			},
+		},
+	},
 	'--wpds-color-foreground-content-neutral': {
 		$description:
 			'Foreground color for content like text with normal emphasis.',
@@ -3032,6 +3086,9 @@ export const groups = /** @type {const} */ ( {
 						tokens: [
 							'--wpds-color-background-indicator-neutral',
 							'--wpds-color-background-indicator-brand',
+							'--wpds-color-background-indicator-success',
+							'--wpds-color-background-indicator-warning',
+							'--wpds-color-background-indicator-error',
 						],
 						groups: {},
 					},

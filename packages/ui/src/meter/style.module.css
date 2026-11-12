@@ -42,6 +42,18 @@
 			color: var(--wpds-color-background-indicator-brand);
 		}
 
+		.is-success {
+			color: var(--wpds-color-background-indicator-success);
+		}
+
+		.is-warning {
+			color: var(--wpds-color-background-indicator-warning);
+		}
+
+		.is-error {
+			color: var(--wpds-color-background-indicator-error);
+		}
+
 		@media (forced-colors: active) {
 			.indicator {
 				forced-color-adjust: none;
