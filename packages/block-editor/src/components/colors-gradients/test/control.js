@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@ariakit/test/react';
 
 /**
  * Internal dependencies
@@ -12,7 +13,7 @@ const noop = () => {};
 
 describe( 'ColorPaletteControl', () => {
 	it( 'renders tabs if it is possible to select a color and a gradient rendering a color picker at the start', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"
@@ -54,7 +55,7 @@ describe( 'ColorPaletteControl', () => {
 	} );
 
 	it( 'renders the color picker and does not render tabs if it is only possible to select a color', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"
@@ -83,7 +84,7 @@ describe( 'ColorPaletteControl', () => {
 	} );
 
 	it( 'renders the gradient picker and does not render tabs if it is only possible to select a gradient', async () => {
-		render(
+		await render(
 			<ColorGradientControl
 				label="Test Color Gradient"
 				colorValue="#f00"
