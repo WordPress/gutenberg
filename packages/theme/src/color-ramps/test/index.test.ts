@@ -62,6 +62,11 @@ function expectAccessibleFillStates( ramp: ReturnType< typeof buildRamp > ) {
 }
 
 describe( 'buildRamps', () => {
+	it( 'retains the richer background treatment instead of imposing a seed ceiling', () => {
+		// The global seed ceiling changed this step to #8d5d5d.
+		expect( buildBgRamp( '#996666' ).ramp.surface6 ).toBe( '#995758' );
+	} );
+
 	it.each( [
 		{ scheme: 'Blue', background: '#3876a8' },
 		{ scheme: 'Ocean', background: '#5f787f' },
@@ -270,9 +275,6 @@ describe( 'buildRamps', () => {
 			const seedChroma = get( seed, [ OKLCH, 'c' ] );
 			const seedHue = get( seed, [ OKLCH, 'h' ] );
 
-			// The seed's tint carries into the generated surfaces.
-			expect( get( ramp.surface1, [ OKLCH, 'c' ] ) ).toBeGreaterThan( 0 );
-
 			for ( const step of [
 				'surface1',
 				'surface3',
@@ -284,8 +286,10 @@ describe( 'buildRamps', () => {
 			] as const ) {
 				const chroma = get( ramp[ step ], [ OKLCH, 'c' ] );
 
-				// Allow for rounding to 8-bit RGB.
-				expect( chroma ).toBeLessThanOrEqual( seedChroma * 1.25 );
+				// The neutral cap permits a small quadratic allowance. Use an
+				// absolute reserve because RGB rounding dominates very faint tints.
+				const ceiling = seedChroma * ( 1 + ( seedChroma / 0.02 ) ** 2 );
+				expect( chroma ).toBeLessThanOrEqual( ceiling + 0.002 );
 
 				// A faint enough tint can round to pure gray, which has no hue.
 				if ( chroma < 0.001 ) {

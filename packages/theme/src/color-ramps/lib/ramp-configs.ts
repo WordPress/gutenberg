@@ -230,23 +230,24 @@ const BASE_RAMP_CONFIG: RampConfig = {
 	},
 };
 
-const withSeedChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
+const withNearGrayChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
 	step.taperChromaOptions
 		? {
 				...step,
 				taperChromaOptions: {
 					...step.taperChromaOptions,
-					limitToSeedChroma: true,
+					nearGrayChromaRatio: 1,
+					nearGrayChroma: 0.02,
 				},
 			}
 		: step;
 
-// Keep neutral ramps at or below the seed's chroma, independently of the
-// accent ramp's chroma treatment.
+// Carry faint tints at close to their seed chroma. The quadratic allowance
+// releases the bound for richer backgrounds; accent ramps retain their treatment.
 export const BG_RAMP_CONFIG = Object.fromEntries(
 	Object.entries( BASE_RAMP_CONFIG ).map( ( [ stepName, step ] ) => [
 		stepName,
-		withSeedChromaLimit( step ),
+		withNearGrayChromaLimit( step ),
 	] )
 ) as RampConfig;
 
