@@ -1,0 +1,32 @@
+[
+	{
+		"blockName": "core/list",
+		"attrs": {
+			"ordered": true
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li value=\"5\">Five</li>\n",
+				"innerContent": [ "\n<li value=\"5\">Five</li>\n" ]
+			},
+			{
+				"blockName": "core/list-item",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<li value=\"8\">Eight</li>\n",
+				"innerContent": [ "\n<li value=\"8\">Eight</li>\n" ]
+			}
+		],
+		"innerHTML": "\n<ol class=\"wp-block-list\">\n\n</ol>\n",
+		"innerContent": [
+			"\n<ol class=\"wp-block-list\">",
+			null,
+			"\n\n",
+			null,
+			"</ol>\n"
+		]
+	}
+]
