@@ -3,11 +3,11 @@
  * Server-rendered `@wordpress/ui` components, behind the
  * `gutenberg-ui-php-components` experiment.
  *
- * Each component renders from a small PHP template, which picks its classes as
- * the React component does, from the stylesheets listed in
- * `packages/ui/php/<name>/component.json`. The build compiles those stylesheets
- * with the same scoped class names as React. Parity tests check every
- * combination of variants against React's own render.
+ * Each component renders from markup the build generates from React's render,
+ * and uses the stylesheets listed in `packages/ui/php/<name>/component.json`.
+ * The build compiles those stylesheets with the same scoped class names as
+ * React. Parity tests check every combination of variants against React's own
+ * render.
  *
  * Only the component name and its props are a contract. The markup and class
  * names follow React, and may change between releases.
@@ -15,7 +15,7 @@
  * @package gutenberg
  */
 
-require_once __DIR__ . '/components/button.php';
+require_once __DIR__ . '/markup.php';
 require_once __DIR__ . '/preview-page.php';
 
 /**
@@ -101,7 +101,7 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	$components = gutenberg_ui_components_get_manifest();
 	$render     = '_gutenberg_ui_render_' . str_replace( '-', '_', $name );
 
-	if ( ! isset( $components[ $name ] ) || ! function_exists( $render ) ) {
+	if ( ! isset( $components[ $name ] ) || ( ! isset( $components[ $name ]['markup'] ) && ! function_exists( $render ) ) ) {
 		_doing_it_wrong(
 			__FUNCTION__,
 			/* translators: %s: Component name. */
@@ -128,6 +128,10 @@ function gutenberg_get_ui_component( $name, $props = array(), $content = null ) 
 	}
 
 	gutenberg_ui_components_enqueue_assets();
+
+	if ( isset( $component['markup'] ) ) {
+		return gutenberg_ui_components_render_markup( $component, $props, (string) $content );
+	}
 
 	return $render( $props, (string) $content );
 }
