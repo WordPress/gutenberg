@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { isBlobURL, createBlobURL } from '@wordpress/blob';
 import { createBlock, getBlockBindingsSource } from '@wordpress/blocks';
 import { Placeholder } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import {
 	BlockIcon,
 	useBlockProps,
@@ -19,7 +19,11 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
-import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import {
+	useUploadMediaFromBlobURL,
+	useResumeUploadFromMarker,
+} from '../utils/hooks';
+import { unlock } from '../lock-unlock';
 import Image from './image';
 import { getDefaultLinkDestination, isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
@@ -131,7 +135,21 @@ export function ImageEdit( {
 	} = useSelect( blockEditorStore );
 	const blockEditingMode = useBlockEditingMode();
 
+	const registry = useRegistry();
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	function setUploadIdAttribute( uploadId ) {
+		/*
+		 * The marker write must not create its own undo level; otherwise
+		 * undoing a finished upload would restore the marker instead of the
+		 * pristine block.
+		 */
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( { uploadId } );
+	}
+
 	function onUploadError( message ) {
 		/*
 		 * Upload errors explain what went wrong and what to do about it, which
@@ -143,7 +161,7 @@ export function ImageEdit( {
 			explicitDismiss: true,
 		} );
 		setTemporaryURL();
-		setAttributes( { blob: undefined } );
+		setAttributes( { blob: undefined, uploadId: undefined } );
 	}
 
 	function onFilesPreUpload( files ) {
@@ -201,7 +219,7 @@ export function ImageEdit( {
 		if ( ! media || ! media.url ) {
 			// The upload failed. Only clear the temporary blob URL, so a failed
 			// replacement leaves the current image and its details intact.
-			setAttributes( { blob: undefined } );
+			setAttributes( { blob: undefined, uploadId: undefined } );
 			setTemporaryURL();
 
 			return;
@@ -209,6 +227,21 @@ export function ImageEdit( {
 
 		if ( isBlobURL( media.url ) ) {
 			setTemporaryURL( media.url );
+
+			/*
+			 * A placeholder-initiated upload bypasses
+			 * useUploadMediaFromBlobURL, so no durable marker was written.
+			 * Adopt the queue item's marker so the upload can be reconnected
+			 * to this block after a reload. Overwrites a stale marker (e.g.
+			 * left behind by undoing a previous upload) so the block always
+			 * points at its current upload.
+			 */
+			const item = unlock(
+				registry.select( uploadStore )
+			).getItemByPreviewUrl( media.url );
+			if ( item?.uploadId && item.uploadId !== attributes.uploadId ) {
+				setUploadIdAttribute( item.uploadId );
+			}
 			return;
 		}
 
@@ -270,6 +303,7 @@ export function ImageEdit( {
 
 		setAttributes( {
 			blob: undefined,
+			uploadId: undefined,
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
@@ -297,6 +331,7 @@ export function ImageEdit( {
 		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
+				uploadId: undefined,
 				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
@@ -310,7 +345,18 @@ export function ImageEdit( {
 		allowedTypes: ALLOWED_MEDIA_TYPES,
 		onChange: onSelectImage,
 		onError: onUploadError,
+		uploadId: attributes.uploadId,
+		onUploadStart: setUploadIdAttribute,
 	} );
+
+	const resumePreviewURL = useResumeUploadFromMarker( {
+		uploadId: attributes.uploadId,
+		onChange: onSelectImage,
+		onError: onUploadError,
+	} );
+
+	// Show the recreated preview while a resumed upload is pending.
+	const previewURL = temporaryURL || resumePreviewURL;
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -338,7 +384,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL || isSideloading,
+		'is-transient': !! previewURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -433,7 +479,7 @@ export function ImageEdit( {
 		<>
 			<figure { ...blockProps }>
 				<Image
-					temporaryURL={ temporaryURL }
+					temporaryURL={ previewURL }
 					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -461,7 +507,7 @@ export function ImageEdit( {
 					handleUpload={ ( files ) => files.length === 1 }
 					value={ { id, src } }
 					mediaPreview={ mediaPreview }
-					disableMediaButtons={ temporaryURL || url }
+					disableMediaButtons={ previewURL || url }
 				/>
 			</figure>
 			{
