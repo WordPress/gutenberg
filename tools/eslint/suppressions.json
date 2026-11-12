@@ -1857,7 +1857,7 @@
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 2
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1954,6 +1954,11 @@
 	},
 	"packages/block-library/src/gallery/transforms.js": {
 		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"packages/block-library/src/gallery/use-apply-gallery-settings.ts": {
+		"no-restricted-syntax": {
 			"count": 1
 		}
 	},

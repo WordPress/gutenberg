@@ -22,7 +22,6 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEvent } from '@wordpress/compose';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
@@ -62,6 +61,7 @@ import {
 } from './constants';
 import useImageSizes from './use-image-sizes';
 import useGetMedia from './use-get-media';
+import useApplyGallerySettings from './use-apply-gallery-settings';
 import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
@@ -312,7 +312,6 @@ export default function GalleryEdit( props ) {
 		() => new Map( imageData.map( ( media ) => [ media.id, media ] ) ),
 		[ imageData ]
 	);
-	const handledImagesRef = useRef( new Set() );
 
 	const hasImages = !! innerBlockImages.length;
 
@@ -450,48 +449,11 @@ export default function GalleryEdit( props ) {
 		};
 	}
 
-	const applyGallerySettings = useEvent( ( blocks ) => {
-		const changedAttributes = Object.fromEntries(
-			blocks.map( ( block ) => [
-				block.clientId,
-				{
-					...buildImageAttributes( block.attributes ),
-					id: block.attributes.id,
-					align: undefined,
-				},
-			] )
-		);
-		__unstableMarkNextChangeAsNotPersistent();
-		updateBlockAttributes(
-			blocks.map( ( block ) => block.clientId ),
-			changedAttributes,
-			{ uniqueByBlock: true }
-		);
-	} );
-
-	// An image block uploads its own file and sets its own size and link, so
-	// the gallery settings can only be applied once the attachment loads.
-	useEffect( () => {
-		const handledImages = handledImagesRef.current;
-		const newImages = [];
-		innerBlockImages.forEach( ( block ) => {
-			if ( handledImages.has( block.clientId ) ) {
-				return;
-			}
-			if ( block.originalContent ) {
-				handledImages.add( block.clientId );
-				return;
-			}
-			if ( ! mediaById.has( block.attributes.id ) ) {
-				return;
-			}
-			handledImages.add( block.clientId );
-			newImages.push( block );
-		} );
-		if ( newImages.length > 0 ) {
-			applyGallerySettings( newImages );
-		}
-	}, [ innerBlockImages, mediaById, applyGallerySettings ] );
+	useApplyGallerySettings(
+		innerBlockImages,
+		mediaById,
+		buildImageAttributes
+	);
 
 	function isValidFileType( file ) {
 		const mediaTypeSelector = file.type;
