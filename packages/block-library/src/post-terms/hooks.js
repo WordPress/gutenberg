@@ -49,3 +49,28 @@ export function hideBlockGapOutsideFlexAndGrid(
 		select( blockEditorStore ).getBlockAttributes( clientId )?.layout?.type;
 	return [ 'flex', 'grid' ].includes( layoutType ) ? result : null;
 }
+
+/**
+ * In Flex and Grid the layout's own Justification controls where the terms sit,
+ * so the toolbar text alignment is hidden to avoid two controls for one thing.
+ * An alignment set in another layout is carried over to Justification.
+ *
+ * @param {unknown} result    Value set by an earlier filter.
+ * @param {string}  path      Setting path.
+ * @param {string}  clientId  Block client ID.
+ * @param {string}  blockName Block name.
+ * @return {unknown} The setting value, or `false` to hide the alignment control.
+ */
+export function hideTextAlignInFlexAndGrid(
+	result,
+	path,
+	clientId,
+	blockName
+) {
+	if ( blockName !== 'core/post-terms' || path !== 'typography.textAlign' ) {
+		return result;
+	}
+	const layoutType =
+		select( blockEditorStore ).getBlockAttributes( clientId )?.layout?.type;
+	return [ 'flex', 'grid' ].includes( layoutType ) ? false : result;
+}

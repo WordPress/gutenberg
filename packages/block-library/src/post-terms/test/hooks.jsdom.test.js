@@ -4,7 +4,10 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { hideBlockGapOutsideFlexAndGrid } from '../hooks';
+import {
+	hideBlockGapOutsideFlexAndGrid,
+	hideTextAlignInFlexAndGrid,
+} from '../hooks';
 import { unlock } from '../../lock-unlock';
 
 const FILTER_NAME = 'core/post-terms/test-block-gap';
@@ -88,4 +91,91 @@ describe( 'Post Terms Block spacing', () => {
 		).toBeUndefined();
 	} );
 } );
+describe( 'Post Terms text alignment', () => {
+	const ALIGN_FILTER = 'core/post-terms/test-text-align';
+
+	function getTextAlignSetting( clientId ) {
+		const [ textAlign ] = unlock(
+			select( blockEditorStore )
+		).getBlockSettings( clientId, 'typography.textAlign' );
+		return textAlign;
+	}
+
+	function setAttributes( attributes ) {
+		dispatch( blockEditorStore ).resetBlocks( [
+			{
+				clientId: 'post-terms',
+				name: 'core/post-terms',
+				attributes,
+				innerBlocks: [],
+			},
+			{
+				clientId: 'other',
+				name: 'core/other',
+				attributes,
+				innerBlocks: [],
+			},
+		] );
+	}
+
+	beforeAll( () => {
+		[ 'core/post-terms', 'core/other' ].forEach( ( name ) =>
+			registerBlockType( name, {
+				apiVersion: 3,
+				title: name,
+				attributes: {
+					layout: { type: 'object' },
+					style: { type: 'object' },
+				},
+				supports: { typography: { textAlign: true } },
+			} )
+		);
+		addFilter(
+			'blockEditor.useSetting.before',
+			ALIGN_FILTER,
+			hideTextAlignInFlexAndGrid
+		);
+	} );
+
+	afterAll( () => {
+		removeFilter( 'blockEditor.useSetting.before', ALIGN_FILTER );
+		unregisterBlockType( 'core/post-terms' );
+		unregisterBlockType( 'core/other' );
+	} );
+
+	it.each( [
+		[ 'flex', { type: 'flex' } ],
+		[ 'grid', { type: 'grid' } ],
+	] )( 'hides the alignment in %s', ( _, layout ) => {
+		setAttributes( { layout } );
+
+		expect( getTextAlignSetting( 'post-terms' ) ).toBe( false );
+	} );
+
+	it( 'hides the alignment in flex even when one is set', () => {
+		setAttributes( {
+			layout: { type: 'flex' },
+			style: { typography: { textAlign: 'right' } },
+		} );
+
+		expect( getTextAlignSetting( 'post-terms' ) ).toBe( false );
+	} );
+
+	it.each( [
+		[ 'no layout', undefined ],
+		[ 'default', { type: 'default' } ],
+		[ 'constrained', { type: 'constrained' } ],
+	] )( 'keeps the alignment with %s', ( _, layout ) => {
+		setAttributes( { layout } );
+
+		expect( getTextAlignSetting( 'post-terms' ) ).toBeUndefined();
+	} );
+
+	it( 'does not affect other blocks', () => {
+		setAttributes( { layout: { type: 'flex' } } );
+
+		expect( getTextAlignSetting( 'other' ) ).toBeUndefined();
+	} );
+} );
+
 /* eslint-enable gutenberg/use-typescript */

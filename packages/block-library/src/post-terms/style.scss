@@ -6,11 +6,8 @@
 		white-space: pre-wrap;
 	}
 
-	:where(&.is-layout-flex:not(.is-vertical).has-text-align-center) {
-		justify-content: center;
-	}
-
-	:where(&.is-layout-flex:not(.is-vertical).has-text-align-right) {
-		justify-content: flex-end;
+	// Keep each term at its own width instead of stretching it across the column.
+	:where(&.is-layout-grid) {
+		justify-items: start;
 	}
 }

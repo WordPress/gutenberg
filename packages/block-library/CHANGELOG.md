@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Terms: Show sample terms in templates, where the block has no post, so the layout, spacing and separator can be checked there ([#85840](https://github.com/WordPress/gutenberg/pull/85840)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).

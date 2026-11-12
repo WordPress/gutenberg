@@ -6,6 +6,7 @@ import {
 	useBlockDisplayInformation,
 	RichText,
 	useBlockEditContext,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import {
@@ -13,13 +14,14 @@ import {
 	TextControl,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useRef, useState } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import usePostTerms from './use-post-terms';
+import { getAlignmentUpdates, withTextAlign } from './text-align';
 
 // Allowed formats for the prefix and suffix fields.
 const ALLOWED_FORMATS = [
@@ -39,8 +41,49 @@ export default function PostTermsEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { term, separator, prefix, suffix, layout } = attributes;
+	const { term, separator, prefix, suffix, layout, style } = attributes;
 	const hasItems = [ 'flex', 'grid' ].includes( layout?.type );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+	const lastLayoutRef = useRef( {
+		type: layout?.type,
+		justifyContent: layout?.justifyContent,
+		orientation: layout?.orientation,
+	} );
+	/**
+	 * Keeps the text alignment and the Flex Justification in step when the
+	 * layout type changes. It runs whenever the layout changes, so the ref holds
+	 * the Flex values from just before a switch.
+	 */
+	const alignmentSyncRef = useRefEffect( () => {
+		const previousLayout = lastLayoutRef.current;
+		const currentLayout = {
+			type: layout?.type,
+			justifyContent: layout?.justifyContent,
+			orientation: layout?.orientation,
+		};
+		lastLayoutRef.current = currentLayout;
+		const updates = getAlignmentUpdates(
+			previousLayout,
+			currentLayout,
+			style?.typography?.textAlign,
+			isRTL()
+		);
+		if ( ! updates ) {
+			return;
+		}
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes(
+			'justifyContent' in updates
+				? { layout: { ...layout, ...updates } }
+				: { style: withTextAlign( style, updates.textAlign ) }
+		);
+	}, [
+		layout,
+		style,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 	const { __unstableLayoutClassNames: layoutClassNames } =
 		useBlockEditContext();
 	const [ isAddingPrefix, setIsAddingPrefix ] = useState( false );
@@ -89,8 +132,23 @@ export default function PostTermsEdit( {
 		term: selectedTerm,
 	} );
 	const hasPost = postId && postType;
+	/**
+	 * A template has no post, so a few sample terms stand in for the real ones.
+	 * That way the layout, spacing and separator can be checked there.
+	 */
+	const sampleTerms =
+		! hasPost && term
+			? [ __( 'Term 1' ), __( 'Term 2' ), __( 'Term 3' ) ].map(
+					( name, index ) => ( { id: index, name, link: '#' } )
+				)
+			: [];
+	const hasSampleTerms = sampleTerms.length > 0;
+	const termsToList = hasSampleTerms ? sampleTerms : postTerms;
+	const showTerms =
+		hasSampleTerms || ( hasPost && ! isLoading && hasPostTerms );
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
+		ref: alignmentSyncRef,
 		className: clsx(
 			term && `taxonomy-${ term }`,
 			layout && layoutClassNames
@@ -121,17 +179,21 @@ export default function PostTermsEdit( {
 					) }
 				</BlockControls>
 			) }
-			<InspectorControls group="advanced">
-				<TextControl
-					autoComplete="off"
-					label={ __( 'Separator' ) }
-					value={ separator || '' }
-					onChange={ ( nextValue ) => {
-						setAttributes( { separator: nextValue } );
-					} }
-					help={ __( 'Enter character(s) used to separate terms.' ) }
-				/>
-			</InspectorControls>
+			{ ! hasItems && (
+				<InspectorControls group="advanced">
+					<TextControl
+						autoComplete="off"
+						label={ __( 'Separator' ) }
+						value={ separator || '' }
+						onChange={ ( nextValue ) => {
+							setAttributes( { separator: nextValue } );
+						} }
+						help={ __(
+							'Enter character(s) used to separate terms.'
+						) }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>
 				{ isLoading && hasPost && <WCSpinner /> }
 				{ ! isLoading && showPrefix && (
@@ -150,13 +212,9 @@ export default function PostTermsEdit( {
 						tagName="span"
 					/>
 				) }
-				{ ( ! hasPost || ! term ) && (
-					<span>{ blockInformation.title }</span>
-				) }
-				{ hasPost &&
-					! isLoading &&
-					hasPostTerms &&
-					postTerms
+				{ ! term && <span>{ blockInformation.title }</span> }
+				{ showTerms &&
+					termsToList
 						.map( ( postTerm ) => (
 							<a
 								key={ postTerm.id }
