@@ -330,6 +330,7 @@ test.describe( 'Navigation block', () => {
 
 		test.afterAll( async ( { requestUtils } ) => {
 			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
 		} );
 
 		test( 'Focus management when using the navigation link appender', async ( {
