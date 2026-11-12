@@ -1,7 +1,5 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 
 /**
  * For easier testing of potential regressions, you can use a Button variant matrix
@@ -79,21 +77,18 @@
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover:not(:disabled) {
+		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background-color: var(--_wp-components-button-background-strong-active);
 			color: var(--_wp-components-button-foreground-strong-active);
 		}
 
-		&:active:not(:disabled) {
+		&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
 			background-color: var(--_wp-components-button-background-strong-active);
 			color: var(--_wp-components-button-foreground-strong-active);
 		}
 
 		&:disabled,
-		&:disabled:active:enabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
-		&[aria-disabled="true"]:active:enabled {
+		&[aria-disabled="true"] {
 			color: var(--_wp-components-button-foreground-strong-disabled);
 			background: var(--_wp-components-button-background-strong-disabled);
 		}
@@ -127,8 +122,7 @@
 		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
 
 		&:disabled,
-		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover {
+		&[aria-disabled="true"] {
 			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			background: transparent;
 			transform: none;
@@ -165,8 +159,7 @@
 		}
 
 		&:disabled:not(:focus),
-		&[aria-disabled="true"]:not(:focus),
-		&[aria-disabled="true"]:hover:not(:focus) {
+		&[aria-disabled="true"]:not(:focus) {
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 	}
@@ -376,23 +369,24 @@
 		}
 	}
 
-	// Toggled style.
+	// Keep the pressed foreground and fill together in every interaction state.
 	&.is-pressed {
 		&,
-		&:hover {
-			color: $components-color-foreground-inverted;
-			&:not(:disabled, [aria-disabled="true"]) {
-				background: $components-color-foreground;
-			}
+		&:hover,
+		&.is-busy {
+			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
 		}
 
-		&:disabled,
-		&[aria-disabled="true"] {
-			color: $gray-600;
+		&.is-secondary:not(:disabled, [aria-disabled="true"]) {
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		}
 
-			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
-				color: $components-color-foreground-inverted;
-				background: $gray-600;
+		&:is(:disabled, [aria-disabled="true"]) {
+			&,
+			&.is-busy {
+				color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
 			}
 		}
 
