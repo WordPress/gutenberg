@@ -284,6 +284,7 @@ export function AutosaveFeatureListExample( {
 	const [ failedValues, setFailedValues ] = useState<
 		Partial< Record< FeatureId, boolean > >
 	>( {} );
+	const savedValuesRef = useRef( values );
 	const timeoutsRef = useRef< Partial< Record< FeatureId, number > > >( {} );
 
 	useEffect( () => {
@@ -300,10 +301,20 @@ export function AutosaveFeatureListExample( {
 		setFailedValue( id, undefined );
 		setValues( ( current ) => ( { ...current, [ id ]: checked } ) );
 		if ( id !== failingFeature ) {
+			savedValuesRef.current = {
+				...savedValuesRef.current,
+				[ id ]: checked,
+			};
+			return;
+		}
+		if ( checked === savedValuesRef.current[ id ] ) {
 			return;
 		}
 		timeoutsRef.current[ id ] = window.setTimeout( () => {
-			setValues( ( current ) => ( { ...current, [ id ]: ! checked } ) );
+			setValues( ( current ) => ( {
+				...current,
+				[ id ]: savedValuesRef.current[ id ],
+			} ) );
 			setFailedValue( id, checked );
 		}, SAVE_DURATION );
 	}
@@ -394,8 +405,13 @@ export function UnsavedChangesOnExitExample() {
 	}, [ hasChanges ] );
 
 	function leave() {
-		setData( savedData );
+		setIsConfirmOpen( false );
 		setHasLeft( true );
+	}
+
+	function returnToSettings() {
+		setData( savedData );
+		setHasLeft( false );
 	}
 
 	if ( hasLeft ) {
@@ -403,10 +419,7 @@ export function UnsavedChangesOnExitExample() {
 			<div className={ styles.container }>
 				<Stack direction="column" gap="md" align="start">
 					<Text render={ <p /> }>You left the settings page.</Text>
-					<Button
-						variant="outline"
-						onClick={ () => setHasLeft( false ) }
-					>
+					<Button variant="outline" onClick={ returnToSettings }>
 						Return to settings
 					</Button>
 				</Stack>
