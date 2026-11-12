@@ -1,0 +1,160 @@
+# Copy this file to .helix/languages.toml and launch Helix from the repository root.
+# Requires Gutenberg's npm dependencies; PHP tools also need its Composer dependencies.
+# Optional servers can be omitted: remove their entries from language-servers below.
+# If omitting EFM, also disable auto-format for CSS, SCSS and PHP or choose another formatter.
+# Helix respects .gitignore, so node_modules is already excluded from file searches.
+
+# Requires Node.js on PATH; uses Gutenberg's installed native TypeScript, not a global copy.
+[language-server.gutenberg-typescript]
+command = "node"
+args = [
+  "tools/build-scripts/node_modules/@typescript/native/bin/tsc",
+  "--lsp",
+  "--stdio",
+]
+
+# Requires vscode-eslint-language-server on PATH.
+# Uses the ESLint workspace's dependency; wp-prettier remains the JS/TS formatter.
+[language-server.vscode-eslint-language-server]
+command = "vscode-eslint-language-server"
+args = ["--stdio"]
+
+[language-server.vscode-eslint-language-server.config]
+validate = "on"
+run = "onType"
+rulesCustomizations = []
+problems = { shortenToSingleLine = false }
+codeAction = { disableRuleComment = { enable = true, location = "separateLine" }, showDocumentation = { enable = true } }
+codeActionOnSave = { mode = "all" }
+useFlatConfig = true
+experimental = { useFlatConfig = false }
+format = false
+nodePath = "tools/eslint/node_modules"
+workingDirectory = { mode = "auto" }
+options = { applySuppressions = true, suppressionsLocation = "tools/eslint/suppressions.json" }
+
+# Requires Intelephense on PATH.
+# Keep PHP analysis aligned with Gutenberg's minimum supported PHP version.
+[language-server.intelephense]
+command = "intelephense"
+args = ["--stdio"]
+config = { intelephense = { environment = { phpVersion = "7.4.0" } } }
+
+# Requires vscode-css-language-server on PATH.
+# Supplies CSS/SCSS completions and navigation; Stylelint handles linting and formatting.
+[language-server.vscode-css-language-server]
+command = "vscode-css-language-server"
+args = ["--stdio"]
+
+# Requires efm-langserver on PATH.
+# CSS/SCSS use project-local Stylelint; PHP uses project-local PHPCS and PHPCBF.
+# PHP also requires PHP on PATH and Gutenberg's Composer dependencies.
+# EFM supplies lint diagnostics and format-on-save, not tool-specific quick fixes.
+[language-server.gutenberg-lint]
+command = "efm-langserver"
+
+[language-server.gutenberg-lint.config]
+documentFormatting = true
+rootMarkers = [".git/", ".git"]
+
+[[language-server.gutenberg-lint.config.languages.css]]
+lintCommand = './node_modules/.bin/stylelint --stdin --stdin-filename "${INPUT}" --formatter compact'
+lintStdin = true
+lintIgnoreExitCode = true
+lintAfterOpen = true
+lintSource = "stylelint"
+lintFormats = ["%f: line %l, col %c, %trror - %m", "%f: line %l, col %c, %tarning - %m"]
+# Stylelint exits 2 for remaining lint errors, even when it successfully fixes the buffer.
+formatCommand = './node_modules/.bin/stylelint --fix --stdin --stdin-filename "${INPUT}"; status=$?; [ "$status" -eq 0 ] || [ "$status" -eq 2 ]'
+formatStdin = true
+
+[[language-server.gutenberg-lint.config.languages.scss]]
+lintCommand = './node_modules/.bin/stylelint --stdin --stdin-filename "${INPUT}" --formatter compact'
+lintStdin = true
+lintIgnoreExitCode = true
+lintAfterOpen = true
+lintSource = "stylelint"
+lintFormats = ["%f: line %l, col %c, %trror - %m", "%f: line %l, col %c, %tarning - %m"]
+formatCommand = './node_modules/.bin/stylelint --fix --stdin --stdin-filename "${INPUT}"; status=$?; [ "$status" -eq 0 ] || [ "$status" -eq 2 ]'
+formatStdin = true
+
+[[language-server.gutenberg-lint.config.languages.php]]
+lintCommand = './vendor/bin/phpcs --standard=phpcs.xml.dist --no-colors --report=emacs --stdin-path="${INPUT}" -'
+lintStdin = true
+lintIgnoreExitCode = true
+lintAfterOpen = true
+lintSource = "phpcs"
+lintFormats = ["%f:%l:%c: %trror - %m", "%f:%l:%c: %tarning - %m"]
+# PHPCBF exits 1 when returning fixed content on stdin; do not hide other failures.
+formatCommand = './vendor/bin/phpcbf --standard=phpcs.xml.dist --stdin-path="${INPUT}" -; status=$?; [ "$status" -eq 0 ] || [ "$status" -eq 1 ]'
+formatStdin = true
+
+[[language]]
+name = "javascript"
+language-servers = ["gutenberg-typescript", { name = "vscode-eslint-language-server", only-features = ["diagnostics", "code-action"] }]
+auto-format = true
+formatter = { command = "sh", args = [
+  "-c",
+  'root=$(git rev-parse --show-toplevel) && exec "$root/node_modules/.bin/prettier" --stdin-filepath "$PWD/${1##*/}"',
+  "--",
+  "%{buffer_name}",
+] }
+
+[[language]]
+name = "jsx"
+language-servers = ["gutenberg-typescript", { name = "vscode-eslint-language-server", only-features = ["diagnostics", "code-action"] }]
+auto-format = true
+formatter = { command = "sh", args = [
+  "-c",
+  'root=$(git rev-parse --show-toplevel) && exec "$root/node_modules/.bin/prettier" --stdin-filepath "$PWD/${1##*/}"',
+  "--",
+  "%{buffer_name}",
+] }
+
+[[language]]
+name = "typescript"
+language-servers = ["gutenberg-typescript", { name = "vscode-eslint-language-server", only-features = ["diagnostics", "code-action"] }]
+auto-format = true
+formatter = { command = "sh", args = [
+  "-c",
+  'root=$(git rev-parse --show-toplevel) && exec "$root/node_modules/.bin/prettier" --stdin-filepath "$PWD/${1##*/}"',
+  "--",
+  "%{buffer_name}",
+] }
+
+[[language]]
+name = "tsx"
+language-servers = ["gutenberg-typescript", { name = "vscode-eslint-language-server", only-features = ["diagnostics", "code-action"] }]
+auto-format = true
+formatter = { command = "sh", args = [
+  "-c",
+  'root=$(git rev-parse --show-toplevel) && exec "$root/node_modules/.bin/prettier" --stdin-filepath "$PWD/${1##*/}"',
+  "--",
+  "%{buffer_name}",
+] }
+
+# Requires efm-langserver and npm dependencies; keeps CSS intelligence without its formatter/linter.
+[[language]]
+name = "css"
+language-servers = [
+  { name = "gutenberg-lint", only-features = ["diagnostics", "format"] },
+  { name = "vscode-css-language-server", except-features = ["diagnostics", "format"] },
+]
+auto-format = true
+
+[[language]]
+name = "scss"
+language-servers = [
+  { name = "gutenberg-lint", only-features = ["diagnostics", "format"] },
+  { name = "vscode-css-language-server", except-features = ["diagnostics", "format"] },
+]
+auto-format = true
+
+# Requires Intelephense, efm-langserver, PHP and Composer dependencies (see server definitions).
+[[language]]
+name = "php"
+language-servers = [
+  { name = "intelephense", except-features = ["format"] },
+  { name = "gutenberg-lint", only-features = ["diagnostics", "format"] },
+]
+auto-format = true
