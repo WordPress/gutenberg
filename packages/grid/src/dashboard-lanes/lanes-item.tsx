@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable';
 import clsx from 'clsx';
-import { useState, useRef } from '@wordpress/element';
+import { memo, useState, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { inertValue } from '@wordpress/react-inert-value';
 import actionableAreaStyles from '../shared/actionable-area-slot.module.css';
@@ -103,7 +103,7 @@ export type LanesItemProps = {
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 };
 
-export function LanesItem( {
+function LanesItemImpl( {
 	itemKey,
 	placementStyle,
 	disabled = false,
@@ -252,3 +252,10 @@ export function LanesItem( {
 		</div>
 	);
 }
+
+/**
+ * Memoized so a drag or resize frame re-renders only the tile whose
+ * props changed, not every tile in the surface. See the README's
+ * Performance section.
+ */
+export const LanesItem = memo( LanesItemImpl );
