@@ -1,7 +1,12 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-import { useInstanceId } from '@wordpress/compose';
-import { forwardRef, useContext, useEffect } from '@wordpress/element';
+import { useDebounce, useInstanceId } from '@wordpress/compose';
+import {
+	forwardRef,
+	useCallback,
+	useContext,
+	useEffect,
+} from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
@@ -44,14 +49,23 @@ function UnforwardedOptionAsOption(
 
 	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
 
+	const activateSelectedOption = useDebounce(
+		useCallback( () => {
+			if ( isSelected ) {
+				setActiveId?.( id );
+			}
+		}, [ id, isSelected, setActiveId ] ),
+		0
+	);
+
 	useEffect( () => {
 		if ( isSelected && ! activeId ) {
-			// The setTimeout call is necessary to make sure that this update
-			// doesn't get overridden by `Composite`'s internal logic, which picks
-			// an initial active item if one is not specifically set.
-			window.setTimeout( () => setActiveId?.( id ), 0 );
+			// Defer activation so Composite's initial active item does not
+			// override the selected option. Changes to activeId must not
+			// cancel this pending activation.
+			activateSelectedOption();
 		}
-	}, [ isSelected, setActiveId, activeId, id ] );
+	}, [ isSelected, activeId, activateSelectedOption ] );
 
 	return (
 		<Composite.Item
