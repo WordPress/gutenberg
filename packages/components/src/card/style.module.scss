@@ -88,10 +88,10 @@ $border-radius: max(0px, calc(var(--wpds-border-radius-lg) - var(--wpds-border-w
 // Override Divider's border reset, orientation-specific display and inline-size
 // regardless of stylesheet insertion order.
 .divider.divider {
+	--_wp-components-divider-border-width: var(--wpds-border-width-xs);
 	box-sizing: border-box;
 	display: block;
 	width: 100%;
-	border-width: var(--wpds-border-width-xs);
 	border-color: var(--wpds-color-stroke-surface-neutral);
 }
 
