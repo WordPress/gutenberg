@@ -206,6 +206,48 @@ function getCellAtColumnIndex( row, columnIndex ) {
 }
 
 /**
+ * Computes the logical position of every cell in a table section, taking into
+ * account columns occupied by cells spanning down from the rows above.
+ *
+ * The rowspan is clamped to the end of the section, since a cell can't span
+ * across sections.
+ *
+ * @param {Array} section The table section.
+ *
+ * @return {Array} For each row, an array with the `columnIndex`, `colspan` and
+ *                 `rowspan` of each of its cells.
+ */
+function getSectionCellPositions( section ) {
+	const occupiedColumns = section.map( () => new Set() );
+
+	return section.map( ( row, rowIndex ) => {
+		let columnIndex = 0;
+
+		return ( row.cells ?? [] ).map( ( cell ) => {
+			while ( occupiedColumns[ rowIndex ].has( columnIndex ) ) {
+				columnIndex++;
+			}
+
+			const colspan = getSpan( cell.colspan );
+			const rowspan = Math.min(
+				getSpan( cell.rowspan ),
+				section.length - rowIndex
+			);
+
+			for ( let r = rowIndex + 1; r < rowIndex + rowspan; r++ ) {
+				for ( let c = columnIndex; c < columnIndex + colspan; c++ ) {
+					occupiedColumns[ r ].add( c );
+				}
+			}
+
+			const position = { columnIndex, colspan, rowspan };
+			columnIndex += colspan;
+			return position;
+		} );
+	} );
+}
+
+/**
  * Inserts a row in the table state.
  *
  * @param {Object} state               Current table state.
@@ -226,12 +268,36 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 		return state;
 	}
 
+	const section = state[ sectionName ];
+	const positions = getSectionCellPositions( section );
+
+	// Cells in the rows above that span across the insertion point grow by
+	// one row, and the new row skips the columns they cover.
+	const coveredColumns = new Set();
+	const rowsBefore = section.slice( 0, rowIndex ).map( ( row, index ) => ( {
+		...row,
+		cells: row.cells.map( ( cell, cellIndex ) => {
+			const { columnIndex, colspan, rowspan } =
+				positions[ index ][ cellIndex ];
+
+			if ( index + rowspan <= rowIndex ) {
+				return cell;
+			}
+
+			for ( let c = columnIndex; c < columnIndex + colspan; c++ ) {
+				coveredColumns.add( c );
+			}
+
+			return { ...cell, rowspan: String( rowspan + 1 ) };
+		} ),
+	} ) );
+
 	return {
 		[ sectionName ]: [
-			...state[ sectionName ].slice( 0, rowIndex ),
+			...rowsBefore,
 			{
-				cells: Array.from( { length: cellCount } ).map(
-					( _, index ) => {
+				cells: Array.from( { length: cellCount } )
+					.map( ( _, index ) => {
 						const firstCellInColumn = getCellAtColumnIndex(
 							firstRow,
 							index
@@ -249,10 +315,10 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 							content: '',
 							tag: sectionName === 'head' ? 'th' : 'td',
 						};
-					}
-				),
+					} )
+					.filter( ( _, index ) => ! coveredColumns.has( index ) ),
 			},
-			...state[ sectionName ].slice( rowIndex ),
+			...section.slice( rowIndex ),
 		],
 	};
 }
