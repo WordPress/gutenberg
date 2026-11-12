@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -70,7 +70,7 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

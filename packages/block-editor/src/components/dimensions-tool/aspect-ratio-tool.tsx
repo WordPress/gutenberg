@@ -1,8 +1,9 @@
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
-import { findAspectRatioOption } from './utils';
+import { findAspectRatioOption, parseAspectRatio } from './utils';
 import type {
 	AspectRatioPreset,
 	AspectRatioToolProps,
@@ -60,6 +61,7 @@ export default function AspectRatioTool( {
 	];
 
 	const resolvedOptions = options ?? aspectRatioOptions;
+	const visibleOptions = resolvedOptions.filter( ( item ) => ! item.hidden );
 
 	// The value is free-form CSS, so it doesn't necessarily match an option as
 	// written, e.g. '1/1' and '1' describe the same ratio. Resolve it to the
@@ -93,9 +95,49 @@ export default function AspectRatioTool( {
 					resolvedOptions.find( ( item ) => ! item.disabled ) ??
 					null
 				}
-				items={ resolvedOptions.filter( ( item ) => ! item.hidden ) }
+				items={ visibleOptions }
 				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
-			/>
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="block-editor-dimensions-tool__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										parseAspectRatio(
+											item.value === 'custom'
+												? value
+												: item.value
+										)
+									) }
+								/>
+								<span className="block-editor-dimensions-tool__aspect-ratio-label">
+									{ item.label }
+								</span>
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ visibleOptions.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+						disabled={ item.disabled }
+					>
+						<SelectControl.ItemLabel>
+							<span className="block-editor-dimensions-tool__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										parseAspectRatio( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</ToolsPanelItem>
 	);
 }

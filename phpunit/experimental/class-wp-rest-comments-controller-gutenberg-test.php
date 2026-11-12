@@ -10,11 +10,21 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $contributor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
+	protected static $moderator_id;
 	protected static $user_ids = array();
 	protected static $post_id;
 	protected static $num_notes = 10;
 
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
+		add_role(
+			'comment_moderator',
+			'Comment Moderator',
+			array(
+				'read'              => true,
+				'moderate_comments' => true,
+			)
+		);
+
 		self::$admin_id       = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -40,6 +50,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'role' => 'author',
 			)
 		);
+		self::$moderator_id   = $factory->user->create(
+			array(
+				'role' => 'comment_moderator',
+			)
+		);
 
 		self::$user_ids = array(
 			'administrator' => self::$admin_id,
@@ -51,11 +66,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	public static function wpTearDownAfterClass() {
+		remove_role( 'comment_moderator' );
+
 		self::delete_user( self::$admin_id );
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$contributor_id );
 		self::delete_user( self::$subscriber_id );
 		self::delete_user( self::$author_id );
+		self::delete_user( self::$moderator_id );
 	}
 
 	/**
@@ -547,6 +565,45 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	public function data_reaction_raw_content_slugs() {
 		return array(
 			'curated emoji' => array( '2764' ),
+		);
+	}
+
+	/**
+	 * WordPress 7.2 sanitizes `status` to an array, so the default must still
+	 * pass the check for users who cannot edit posts.
+	 *
+	 * @see https://core.trac.wordpress.org/changeset/64494
+	 *
+	 * @dataProvider data_get_items_status_without_edit_posts
+	 *
+	 * @param string|null $role   User role, null when logged out.
+	 * @param string|null $status Status param, null for the default.
+	 * @param int         $code   Expected response status code.
+	 */
+	public function test_get_items_status_without_edit_posts( $role, $status, $code ) {
+		wp_set_current_user( $role ? self::$user_ids[ $role ] : 0 );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		if ( null !== $status ) {
+			$request->set_param( 'status', $status );
+		}
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( 200 === $code ) {
+			$this->assertSame( 200, $response->get_status() );
+		} else {
+			$this->assertErrorResponse( 'rest_forbidden_param', $response, $code );
+		}
+	}
+
+	public function data_get_items_status_without_edit_posts() {
+		return array(
+			'logged out, default status' => array( null, null, 200 ),
+			'logged out, approve'        => array( null, 'approve', 200 ),
+			'logged out, hold'           => array( null, 'hold', 401 ),
+			'subscriber, default status' => array( 'subscriber', null, 200 ),
+			'subscriber, approve'        => array( 'subscriber', 'approve', 200 ),
+			'subscriber, hold'           => array( 'subscriber', 'hold', 403 ),
 		);
 	}
 
@@ -1198,6 +1255,80 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Dispatches a request to permanently delete a comment.
+	 *
+	 * @param int $comment_id Comment ID.
+	 * @return WP_REST_Response Response object.
+	 */
+	protected function delete_comment_request( $comment_id ) {
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $comment_id );
+		$request->set_param( 'force', true );
+		return rest_get_server()->dispatch( $request );
+	}
+
+	public function test_can_delete_own_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$editor_id );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertNull( get_comment( $reaction_id ) );
+	}
+
+	/**
+	 * A reaction speaks for its author, so editing the post is not enough to
+	 * remove someone else's.
+	 */
+	public function test_cannot_delete_another_users_reaction() {
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$author_id );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ) );
+	}
+
+	/**
+	 * Reactions on a resolved thread are frozen, like adding new ones.
+	 *
+	 * @dataProvider data_resolved_thread_targets
+	 *
+	 * @param bool $on_reply Whether the reaction is on a reply rather than the root note.
+	 */
+	public function test_cannot_delete_reaction_on_resolved_thread( $on_reply ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		$target  = $note_id;
+		if ( $on_reply ) {
+			$target = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_parent'   => $note_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 0,
+					'user_id'          => self::$editor_id,
+				)
+			);
+		}
+		$reaction_id = $this->create_reaction( $post_id, $target, self::$editor_id );
+		wp_set_comment_status( $note_id, 'approve' );
+
+		wp_set_current_user( self::$editor_id );
+		$response = $this->delete_comment_request( $reaction_id );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ) );
+	}
+
+	/**
 	 * Notes remain editable - only reactions are locked down.
 	 */
 	public function test_can_still_update_note() {
@@ -1212,6 +1343,24 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 200, $response->get_status() );
+	}
+
+	/**
+	 * A user with moderate_comments but no editing capabilities cannot remove a
+	 * reaction on a post they cannot edit.
+	 */
+	public function test_moderator_cannot_delete_reaction() {
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		wp_set_current_user( self::$moderator_id );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
+		$request->set_param( 'force', true );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
+		$this->assertNotNull( get_comment( $reaction_id ), 'Reaction must still exist.' );
 	}
 
 	/**
@@ -1284,6 +1433,38 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		wp_trash_comment( $note_id );
 		$this->assertSame( 'trash', wp_get_comment_status( $reaction_id ), 'Reaction stayed approved under a trashed note.' );
+	}
+
+	/**
+	 * Akismet's spam cleanup fires `delete_comment` and `deleted_comment` with
+	 * whatever `get_comment()` returned for each row, which is null once the
+	 * row is already gone, so the cascades cannot require a `WP_Comment`.
+	 *
+	 * @dataProvider data_reaction_cascade_hooks
+	 *
+	 * @param non-falsy-string $hook The comment lifecycle action to fire.
+	 */
+	public function test_reaction_cascade_tolerates_missing_comment( string $hook ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id     = $this->create_note( $post_id, self::$editor_id );
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
+
+		do_action( $hook, (string) ( $note_id + 1000 ), null );
+
+		$this->assertSame( '1', get_comment( $reaction_id )->comment_approved, 'Reaction was touched by a cascade for a missing comment.' );
+	}
+
+	/**
+	 * Data provider for {@see self::test_reaction_cascade_tolerates_missing_comment()}.
+	 *
+	 * @return array<non-falsy-string, array{ non-falsy-string }>
+	 */
+	public function data_reaction_cascade_hooks(): array {
+		return array(
+			'delete_comment'  => array( 'delete_comment' ),
+			'trashed_comment' => array( 'trashed_comment' ),
+		);
 	}
 
 	/**

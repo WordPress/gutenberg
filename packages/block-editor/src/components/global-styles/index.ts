@@ -1,5 +1,8 @@
 export { useSettingsForBlockElement } from './hooks';
-export { getBlockElementLayers } from './inherited-value-context';
+export {
+	getBlockElementLayers,
+	getBlockTypesForElement,
+} from './inherited-value-context';
 export {
 	ToolsPanelPopoverPropsContext,
 	useToolsPanelItemPopoverProps,

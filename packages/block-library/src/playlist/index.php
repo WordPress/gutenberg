@@ -24,12 +24,13 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 	// Parse inner blocks to extract track data.
 	// This approach avoids duplicating track data in the HTML output.
-	if ( ! empty( $block->inner_blocks ) ) {
+	if ( count( $block->inner_blocks ) > 0 ) {
 		foreach ( $block->inner_blocks as $inner_block ) {
 			if ( 'core/playlist-track' === $inner_block->name ) {
 				$track_attributes = $inner_block->attributes;
 
-				if ( empty( $track_attributes['id'] ) ) {
+				// A track needs a source URL to be playable.
+				if ( empty( $track_attributes['src'] ) ) {
 					continue;
 				}
 
@@ -62,13 +63,14 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 				// Data is passed to wp_interactivity_state() which JSON-encodes it,
 				// so we use wp_strip_all_tags() instead of esc_html() to prevent
-				// HTML injection without double-encoding. URLs still use esc_url().
+				// HTML injection without double-encoding. For the same reason, URLs
+				// use sanitize_url(), as esc_url() would turn `&` into `&#038;`.
 				$tracks_data[ $track_id ] = array(
-					'url'       => esc_url( $url ),
+					'url'       => sanitize_url( $url ),
 					'title'     => wp_strip_all_tags( $title ),
 					'artist'    => wp_strip_all_tags( $artist ),
 					'album'     => wp_strip_all_tags( $album ),
-					'image'     => esc_url( $image ),
+					'image'     => sanitize_url( $image ),
 					'imageAlt'  => wp_strip_all_tags( $image_alt ),
 					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
