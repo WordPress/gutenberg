@@ -111,7 +111,7 @@ describe( 'Autocomplete', () => {
 				</Autocomplete.Root>
 			)
 		).toThrow(
-			'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup, which is the suggestion list for an input outside it. For a searchable picker that opens from a button, render <Autocomplete.Root inline open> inside a <Popover.Popup> instead.'
+			'Autocomplete.Input: Cannot be rendered inside Autocomplete.Popup, which is the suggestion list for an input outside it. For a searchable picker that opens from a button, render <Autocomplete.Root inline open> inside a standalone Popover component instead.'
 		);
 	} );
 
