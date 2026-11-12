@@ -3,6 +3,7 @@ import {
 	BlockIcon,
 	useBlockProps,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import {
@@ -11,11 +12,14 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useState, useRef, RawHTML } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { classic } from '@wordpress/icons';
+import { unlock } from '../lock-unlock';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 import ModalEdit from './modal';
+
+const { SafeRawHTML } = unlock( blockEditorPrivateApis );
 
 export default function FreeformEdit( {
 	attributes,
@@ -52,7 +56,7 @@ export default function FreeformEdit( {
 			</BlockControls>
 			<div { ...useBlockProps() }>
 				{ content ? (
-					<RawHTML>{ content }</RawHTML>
+					<SafeRawHTML html={ content } />
 				) : (
 					<Placeholder
 						icon={ <BlockIcon icon={ classic } /> }

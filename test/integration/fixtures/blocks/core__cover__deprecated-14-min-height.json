@@ -1,0 +1,39 @@
+[
+	{
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"id": 1,
+			"alt": "",
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 50,
+			"overlayColor": "base",
+			"backgroundType": "image",
+			"isDark": false,
+			"useFeaturedImage": false,
+			"tagName": "div",
+			"isUserOverlayColor": true,
+			"style": {
+				"dimensions": {
+					"minHeight": "50vh"
+				}
+			},
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
