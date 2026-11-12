@@ -90,7 +90,7 @@ export default function InlineNotice( {
 	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
-	const htmlDescriptionRef = useRef< HTMLSpanElement >( null );
+	const htmlDescriptionRef = useRef< HTMLDivElement >( null );
 	const [ spokenMessage, setSpokenMessage ] = useState( '' );
 	const previousNoticeRef = useRef( announceOnMount ? undefined : notice );
 

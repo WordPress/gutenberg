@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { usePrevious } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Children } from '@wordpress/element';
+import { Children, useState } from '@wordpress/element';
 import { Notice } from '@wordpress/ui';
 import { store as noticesStore } from '../../store';
 import type { Notice as NoticeType } from '../../store/types';
@@ -62,7 +61,11 @@ export default function InlineNotices( {
 		[ context ]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
-	const announceOnMount = usePrevious( true ) ?? false;
+	const [ noticeList, setNoticeList ] = useState< HTMLDivElement | null >(
+		null
+	);
+	// Notices already present when the live regions mount stay silent.
+	const announceOnMount = !! noticeList;
 	const dismissibleNotices = notices.filter(
 		( { isDismissible, type } ) => isDismissible && type === 'default'
 	);
@@ -76,7 +79,11 @@ export default function InlineNotices( {
 
 	return (
 		// Keep live regions mounted without adding a box to the notice layout.
-		<Notice.List style={ { display: 'contents' } }>
+		<Notice.List
+			ref={ setNoticeList }
+			liveRegionContainer={ noticeList?.ownerDocument.body }
+			style={ { display: 'contents' } }
+		>
 			{ ( hasPinnedNotices || hasDismissibleNotices ) && (
 				<div
 					className={ clsx(

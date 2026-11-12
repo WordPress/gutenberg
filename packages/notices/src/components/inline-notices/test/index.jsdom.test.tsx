@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { act, render, screen, within } from '@testing-library/react';
+import { Modal } from '@wordpress/components';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
@@ -175,6 +176,39 @@ describe( 'InlineNotices', () => {
 	} );
 
 	describe( 'announcements', () => {
+		it( 'announces a background error while a modal is open', async () => {
+			const { registry, rerender } = renderInlineNotices();
+			rerender(
+				<RegistryProvider value={ registry }>
+					<InlineNotices />
+					<Modal
+						title="Keyboard shortcuts"
+						onRequestClose={ () => {} }
+					>
+						Shortcuts
+					</Modal>
+				</RegistryProvider>
+			);
+			expect(
+				screen.getByRole( 'dialog', { name: 'Keyboard shortcuts' } )
+			).toBeInTheDocument();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice( 'Autosave failed.', {
+						actions: [ { label: 'Retry autosave', onClick() {} } ],
+					} );
+			} );
+
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Autosave failed\.$/
+			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Retry autosave' } )
+			).not.toBeInTheDocument();
+		} );
+
 		it( 'announces new notices without details or action labels', async () => {
 			const { registry } = renderInlineNotices();
 
