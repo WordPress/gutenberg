@@ -1,4 +1,7 @@
 .wp-block-tab-panel {
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
+
 	&:empty {
 		display: none !important;
 	}
