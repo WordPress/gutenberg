@@ -214,6 +214,18 @@ export function createLinkFormat(
 }
 
 /**
+ * Creates a `tel:` URL from a phone number. Keeps the `+` at the start of an
+ * international number.
+ *
+ * @param phoneNumber The phone number, for example `+44 20 7946 0958`.
+ * @return The `tel:` URL, for example `tel:+442079460958`.
+ */
+export function createPhoneNumberURL( phoneNumber: string ): string {
+	const number = phoneNumber.replace( /[-.() ]/g, '' ).replace( /^tel:/, '' );
+	return `tel:${ number }`;
+}
+
+/**
  *
  * Get the start and end boundaries of a given format from a rich text value.
  *

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { isValidHref, getFormatBoundary } from '../utils';
+import { isValidHref, createPhoneNumberURL, getFormatBoundary } from '../utils';
 
 describe( 'isValidHref', () => {
 	it( 'returns true if the href cannot be recognised as a url or an anchor link', () => {
@@ -96,6 +96,35 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( '#no-it isnt' ) ).toBe( false );
 			expect( isValidHref( '#no-it-isnt/' ) ).toBe( false );
 		} );
+	} );
+} );
+
+describe( 'createPhoneNumberURL', () => {
+	it( 'keeps the plus at the start of an international number', () => {
+		expect( createPhoneNumberURL( '+44 20 7946 0958' ) ).toBe(
+			'tel:+442079460958'
+		);
+		expect( createPhoneNumberURL( '+1 (555) 123-4567' ) ).toBe(
+			'tel:+15551234567'
+		);
+		expect( createPhoneNumberURL( '(+44) 20-7946.0958' ) ).toBe(
+			'tel:+442079460958'
+		);
+	} );
+
+	it( 'does not add a plus to a local number', () => {
+		expect( createPhoneNumberURL( '555 123 4567' ) ).toBe(
+			'tel:5551234567'
+		);
+	} );
+
+	it( 'does not add a second tel: prefix', () => {
+		expect( createPhoneNumberURL( 'tel:+15551234567' ) ).toBe(
+			'tel:+15551234567'
+		);
+		expect( createPhoneNumberURL( 'tel:5551234567' ) ).toBe(
+			'tel:5551234567'
+		);
 	} );
 } );
 

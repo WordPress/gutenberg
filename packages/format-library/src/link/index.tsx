@@ -19,7 +19,7 @@ import { link as linkIcon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import type { RichTextValue } from '@wordpress/rich-text';
 import InlineLinkUI from './inline';
-import { isValidHref } from './utils';
+import { isValidHref, createPhoneNumberURL } from './utils';
 import type { LinkFormatAttributes } from './utils';
 import type { FormatEditProps } from '../types';
 
@@ -112,7 +112,7 @@ function Edit( {
 			onChange(
 				applyFormat( value, {
 					type: name,
-					attributes: { url: `tel:${ text.replace( /\D/g, '' ) }` },
+					attributes: { url: createPhoneNumberURL( text ) },
 				} )
 			);
 		} else {
