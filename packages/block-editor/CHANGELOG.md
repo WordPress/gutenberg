@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Block Editor: Hide the Remove action on `MultipleUsageWarning` when block removal is locked, prevent cutting removal-locked blocks via keyboard shortcuts, and omit duplicate single-use (`supports.multiple = false`) blocks on paste ([#86714](https://github.com/WordPress/gutenberg/pull/86714)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
 -   DimensionsTool: Draw the aspect ratio icons with sharp outlines, matching the generic aspect ratio icon ([#86344](https://github.com/WordPress/gutenberg/pull/86344)).
