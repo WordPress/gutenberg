@@ -17,6 +17,7 @@ import {
 	setStyleForState,
 } from './block-style-state';
 import { store as blockEditorStore } from '../store';
+import { isTemplatePartEditorKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockListBlockFeatureProps,
@@ -295,6 +296,47 @@ export function resetPosition( {
 }
 
 /**
+ * Get the position options a block can choose from.
+ *
+ * @param $0                  Options.
+ * @param $0.allowFixed       Whether the block supports fixed position.
+ * @param $0.allowSticky      Whether the block supports sticky position.
+ * @param $0.isInTemplatePart Whether the block is inside a template part.
+ * @param $0.value            The block's current position type.
+ *
+ * @return The position options.
+ */
+export function getPositionOptions( {
+	allowFixed,
+	allowSticky,
+	isInTemplatePart,
+	value,
+}: {
+	allowFixed: boolean;
+	allowSticky: boolean;
+	isInTemplatePart: boolean;
+	value?: string;
+} ) {
+	const availableOptions: Array< {
+		value: string;
+		label: string;
+		description?: string;
+	} > = [ DEFAULT_OPTION ];
+	// A sticky block can only stick within its template part's wrapper,
+	// which is no taller than the block itself, so it has no effect there.
+	const canUseSticky = allowSticky && ! isInTemplatePart;
+	// Display options if they are allowed, or if a block already has a valid value set.
+	// This allows for a block to be switched off from a position type that is not allowed.
+	if ( canUseSticky || value === STICKY_OPTION.value ) {
+		availableOptions.push( STICKY_OPTION );
+	}
+	if ( allowFixed || value === FIXED_OPTION.value ) {
+		availableOptions.push( FIXED_OPTION );
+	}
+	return availableOptions;
+}
+
+/**
  * Custom hook that checks if position settings have been disabled.
  *
  * @param $0      Block props.
@@ -331,15 +373,22 @@ export function PositionPanelPure( {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 
-	const { firstParentClientId, selectedState } = useSelect(
+	const { firstParentClientId, isInTemplatePart, selectedState } = useSelect(
 		( select ) => {
-			const { getBlockParents } = select( blockEditorStore );
+			const { getBlockParents, getBlockParentsByBlockName, getSettings } =
+				select( blockEditorStore );
 			const { getSelectedBlockStyleState } = unlock(
 				select( blockEditorStore )
 			);
 			const parents = getBlockParents( clientId );
 			return {
 				firstParentClientId: parents[ parents.length - 1 ],
+				// Covers a template part edited on its own, as well as one
+				// nested in a template.
+				isInTemplatePart:
+					!! getSettings()[ isTemplatePartEditorKey ] ||
+					getBlockParentsByBlockName( clientId, 'core/template-part' )
+						.length > 0,
 				selectedState: getSelectedBlockStyleState( clientId ),
 			};
 		},
@@ -373,22 +422,16 @@ export function PositionPanelPure( {
 				)
 			: null;
 
-	const options = useMemo( () => {
-		const availableOptions: Array< {
-			value: string;
-			label: string;
-			description?: string;
-		} > = [ DEFAULT_OPTION ];
-		// Display options if they are allowed, or if a block already has a valid value set.
-		// This allows for a block to be switched off from a position type that is not allowed.
-		if ( allowSticky || value === STICKY_OPTION.value ) {
-			availableOptions.push( STICKY_OPTION );
-		}
-		if ( allowFixed || value === FIXED_OPTION.value ) {
-			availableOptions.push( FIXED_OPTION );
-		}
-		return availableOptions;
-	}, [ allowFixed, allowSticky, value ] );
+	const options = useMemo(
+		() =>
+			getPositionOptions( {
+				allowFixed,
+				allowSticky,
+				isInTemplatePart,
+				value,
+			} ),
+		[ allowFixed, allowSticky, isInTemplatePart, value ]
+	);
 
 	const onChangeType = ( next: string | null ) => {
 		// For now, use a hard-coded `0px` value for the position.
