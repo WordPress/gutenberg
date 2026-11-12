@@ -164,6 +164,19 @@ const tableWithRowspanHead = deepFreeze( {
 	],
 } );
 
+const tableWithTallRowspan = deepFreeze( {
+	body: [
+		{
+			cells: [
+				{ content: 'A', tag: 'td', rowspan: '3' },
+				{ content: 'B', tag: 'td' },
+			],
+		},
+		{ cells: [ { content: 'C', tag: 'td' } ] },
+		{ cells: [ { content: 'D', tag: 'td' } ] },
+	],
+} );
+
 describe( 'createTable', () => {
 	it( 'should create a table', () => {
 		const state = createTable( { rowCount: 2, columnCount: 2 } );
@@ -1001,6 +1014,82 @@ describe( 'deleteRow', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'decrements the rowspan of cells above that span into the deleted row', () => {
+		const state = deleteRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 1,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th' },
+					{ content: 'B', tag: 'th' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'keeps the rowspan of cells above that still span multiple rows', () => {
+		const state = deleteRow( tableWithTallRowspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'td', rowspan: '2' },
+					{ content: 'B', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'D', tag: 'td' } ] },
+		] );
+	} );
+
+	it( 'moves cells that span down from the deleted row to the next row', () => {
+		const state = deleteRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 0,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th' },
+					{ content: 'B', tag: 'th' },
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+					{ content: 'E', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'moves a cell to the next row with its remaining rowspan', () => {
+		const state = deleteRow( tableWithTallRowspan, {
+			sectionName: 'body',
+			rowIndex: 0,
+		} );
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'td', rowspan: '2' },
+					{ content: 'C', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'D', tag: 'td' } ] },
+		] );
 	} );
 } );
 
