@@ -1,5 +1,5 @@
 ---
-team: WordPress/gutenberg-components
+reviewer: WordPress/gutenberg-components
 ---
 
-Does this change add or change a public API of the design system packages `@wordpress/components`, `@wordpress/ui`, `@wordpress/theme`, `@wordpress/base-styles` or `@wordpress/icons`? A public API is a member that these packages export, such as a component, a prop, an icon, a Sass mixin or a design token. Answer no when the change only updates dependencies, tooling, tests, types or build configuration, or only changes the internal implementation or styles of a component.
+Does this change add, change or remove a contract that the design system packages `@wordpress/components`, `@wordpress/ui`, `@wordpress/theme`, `@wordpress/base-styles` or `@wordpress/icons` must keep supporting for their consumers, such as an exported component, a prop, an icon, a Sass mixin or a design token? Answer no when the change only affects internal details that consumers cannot depend on.

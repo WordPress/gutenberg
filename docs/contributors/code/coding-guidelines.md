@@ -829,10 +829,14 @@ First run `composer install` and `npm run build`, which generates PHP files that
 
 #### The baseline
 
-Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched. Regenerate the baseline in either of these ways, and commit the result:
+Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched, or its count as too high, and marks the error with 🔧. Remove the entry or lower its count in either of these ways, and commit the result:
 
--   `composer phpstan:baselines`, with PHP and Composer installed on your computer.
--   `npm run typecheck:php:baselines`, in the local environment.
+-   `composer phpstan:fix`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:fix`, in the local environment.
+
+This runs PHPStan with `--fix` over all the paths, since PHPStan reports no out-of-date entries when it analyzes only some files, and then runs the analysis again, since `--fix` reports only what it fixed. The script fails when errors remain, and also when there is nothing to fix. Both runs use `phpstan.neon.dist`, even when a local `phpstan.neon` exists, since a configuration at another rule level can report a baselined error with a different message, which would make `--fix` remove entries the default configuration still needs.
+
+Unlike regenerating the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`), `--fix` never adds an entry, so it does not record any other errors the change introduces as accepted. It also removes an `@phpstan-ignore` comment that no longer ignores anything, and fixes any other error marked with 🔧, so review the diff before committing it.
 
 #### WordPress stubs
 
