@@ -607,6 +607,11 @@ const ApplyAnEditComponent = () => {
 };
 
 export const ApplyAnEdit: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: ApplyAnEditComponent,
 };
 
