@@ -173,6 +173,9 @@ export {
 // be set from `block.json` and third-party blocks can't opt in yet. It may
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
+// A private block setting: a function that takes a block's attributes and
+// returns attributes to add when the block is inserted in the editor.
+const insertAttributesKey = Symbol( 'insertAttributes' );
 import { parseRawBlock as _parseRawBlock } from './parser';
 import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 
@@ -180,6 +183,7 @@ export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
 	editableRootKey,
+	insertAttributesKey,
 	parseRawBlock: _parseRawBlock,
 	applyBuiltInValidationFixes,
 } );
