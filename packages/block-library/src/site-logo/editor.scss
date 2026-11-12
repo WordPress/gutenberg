@@ -16,6 +16,8 @@
 
 	.custom-logo-link {
 		cursor: inherit;
+		// Block, so the image's `width: inherit` gets the resized width.
+		display: block;
 
 		&:focus {
 			box-shadow: none;

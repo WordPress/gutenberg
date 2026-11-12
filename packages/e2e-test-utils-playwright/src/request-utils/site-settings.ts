@@ -19,6 +19,7 @@ type SiteSettings = {
 	show_on_front: 'posts' | 'page';
 	page_on_front: number;
 	page_for_posts: number;
+	site_logo: number;
 };
 
 /**
