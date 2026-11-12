@@ -9,6 +9,12 @@ export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
 
 export interface ListProps extends ComponentProps< 'div' > {
 	/**
+	 * Where to render the live regions. Defaults to the list itself. Use a
+	 * container outside the app, such as its document body, for notifications
+	 * that should still be announced when a modal hides the app.
+	 */
+	liveRegionContainer?: HTMLElement | null;
+	/**
 	 * Notices to display. Keep the list mounted when there are no notices.
 	 */
 	children?: ReactNode;

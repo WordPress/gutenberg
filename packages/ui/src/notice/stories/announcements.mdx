@@ -18,6 +18,8 @@ Leave static notices without an announcement. Users can read the message and rea
 
 Keep `Notice.List` mounted, including when it is empty, and render keyed `Notice.Root` children inside it. The list stacks its children with a small gap. It announces added notices and changes to their messages, including when a new save result replaces a message under the same key. Notices present when the list mounts stay silent.
 
+By default, the live regions render inside the list. For app-wide notifications such as background save errors, pass the app’s document body to `liveRegionContainer` so a modal can hide the editor controls and still allow the announcement. The visible notices stay in the list.
+
 <Canvas of={ NoticeStories.DynamicNotices } />
 
 The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. The supplied text is preserved. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.

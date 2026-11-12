@@ -1,5 +1,5 @@
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { forwardRef, useState } from '@wordpress/element';
+import { createPortal, forwardRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ListProps, RootProps } from './types';
@@ -76,7 +76,7 @@ function readMessage( root: HTMLElement ) {
  * duplicate announcements.
  */
 export const List = forwardRef< HTMLDivElement, ListProps >(
-	function NoticeList( { children, ...props }, ref ) {
+	function NoticeList( { children, liveRegionContainer, ...props }, ref ) {
 		const [ announcements, setAnnouncements ] = useState(
 			new Map< HTMLElement, Announcement >()
 		);
@@ -163,18 +163,15 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		}, [] );
 		const mergedRef = useMergeRefs( [ ref, observerRef ] );
 
-		return (
-			<Stack
-				ref={ mergedRef }
-				direction="column"
-				gap="sm"
-				{ ...props }
-				data-wp-ui-notice-list=""
+		const liveRegions = (
+			// Modals can exempt an explicit aria-live container. The child roles
+			// set the urgency of each message.
+			<VisuallyHidden
+				aria-live={ liveRegionContainer ? 'off' : undefined }
 			>
-				<>{ children }</>
 				{ ( [ 'polite', 'assertive' ] as const ).map(
 					( politeness ) => (
-						<VisuallyHidden
+						<div
 							key={ politeness }
 							role={
 								politeness === 'polite' ? 'status' : 'alert'
@@ -194,9 +191,24 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 										</div>
 									) : null
 							) }
-						</VisuallyHidden>
+						</div>
 					)
 				) }
+			</VisuallyHidden>
+		);
+
+		return (
+			<Stack
+				ref={ mergedRef }
+				direction="column"
+				gap="sm"
+				{ ...props }
+				data-wp-ui-notice-list=""
+			>
+				<>{ children }</>
+				{ liveRegionContainer
+					? createPortal( liveRegions, liveRegionContainer )
+					: liveRegions }
 			</Stack>
 		);
 	}
