@@ -13,20 +13,21 @@ type ObjectPath = ObjectPathKey | ObjectPathKey[];
  * @param value  New value to set.
  * @return Cloned object with the new value set.
  */
-export function setImmutably(
-	object: ObjectOrArray | null | undefined,
+export function setImmutably< T extends ObjectOrArray = ObjectOrArray >(
+	object: T | null | undefined,
 	path: ObjectPath,
 	value: unknown
-): ObjectOrArray {
+): T {
 	// Normalize path
 	const pathArray: ObjectPathKey[] = Array.isArray( path )
 		? [ ...path ]
 		: [ path ];
 
 	// Shallowly clone the base of the object
-	const result: ObjectOrArray = Array.isArray( object )
-		? [ ...object ]
-		: { ...object };
+	// The clone keeps the shape of the object.
+	const result = (
+		Array.isArray( object ) ? [ ...object ] : { ...object }
+	) as T;
 
 	const leaf = pathArray.pop() as ObjectPathKey;
 

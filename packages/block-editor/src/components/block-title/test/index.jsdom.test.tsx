@@ -26,7 +26,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	return {
 		...actualImplementation,
 		// The mocks only read the block type's title.
-		isReusableBlock: ( ( { title }: { title: string } ) => {
+		isReusableBlock: ( ( { title }: { name: string; title?: string } ) => {
 			return title === 'Reusable Block';
 		} ) as typeof actualImplementation.isReusableBlock,
 		__experimentalGetBlockLabel: ( ( { title }: { title: string } ) => {
@@ -45,10 +45,7 @@ describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {
 		( useSelect as Mock ).mockImplementation( () => null );
 
-		const { container } = render(
-			// @ts-expect-error The missing `clientId` is deliberate.
-			<BlockTitle />
-		);
+		const { container } = render( <BlockTitle /> );
 
 		expect( container ).toBeEmptyDOMElement();
 	} );

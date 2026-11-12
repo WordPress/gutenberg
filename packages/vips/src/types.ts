@@ -33,6 +33,22 @@ export interface ConvertImageOptions {
 }
 
 /**
+ * Options for encoding raw pixels as a JPEG.
+ */
+export interface EncodePixelsOptions {
+	/**
+	 * Desired quality (0-1).
+	 */
+	quality?: number;
+	/**
+	 * Raw bytes of the image file the pixels were decoded from. Its EXIF
+	 * block is copied into the JPEG, with the orientation reset to 1 since
+	 * the pixels are already upright.
+	 */
+	metadataSource?: ArrayBuffer;
+}
+
+/**
  * Options for resizing an image.
  */
 export interface ResizeImageOptions {

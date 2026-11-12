@@ -49,7 +49,7 @@
 	}
 
 	&[aria-expanded="true"],
-	&:hover:not(:disabled, [aria-disabled="true"]) {
+	&:hover:not(:disabled, [aria-disabled="true"], [role^="menuitem"], [role="option"]) {
 		color: $components-color-accent;
 	}
 
@@ -362,6 +362,25 @@
 			}
 		}
 
+		// Forced colors discard the pressed colors, so fill the button with the
+		// system selection colors instead. Opting out of color adjustment removes
+		// the text backplate, which would otherwise cover the fill, but it also
+		// lets every other color rule that matches the button take effect,
+		// including those from consumers, so these rules need `!important`.
+		@media ( forced-colors: active ) {
+			forced-color-adjust: none;
+			outline-color: CanvasText !important;
+			border-color: ButtonBorder !important;
+			background: SelectedItem !important;
+			color: SelectedItemText !important;
+
+			&:disabled,
+			&[aria-disabled="true"] {
+				border-color: GrayText !important;
+				background: GrayText !important;
+				color: Canvas !important;
+			}
+		}
 	}
 
 	svg {

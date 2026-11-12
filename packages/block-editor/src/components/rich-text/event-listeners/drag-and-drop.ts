@@ -8,27 +8,16 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import type {
+	RichTextEventListener,
+	RichTextEventListenerProps,
+} from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const { ownsSelection } = unlock( richTextPrivateApis );
-
-type RichTextValue = ReturnType< typeof create >;
-
-interface Props {
-	current: {
-		getValue: () => RichTextValue;
-		onChange: ( value: RichTextValue ) => void;
-		registry: {
-			batch: ( callback: () => void ) => void;
-			dispatch: ( store: typeof blockEditorStore ) => {
-				__unstableMarkLastChangeAsPersistent: () => void;
-			};
-		};
-		[ key: string ]: unknown;
-	};
-}
 
 interface TextDrag {
 	element: HTMLElement;
@@ -109,7 +98,7 @@ export function getTextDropPoint( event: DragEvent ) {
  *
  * @param props Rich text props.
  */
-export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
+export const dragStart: RichTextEventListener = ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const defaultView = ownerDocument.defaultView!;
 
@@ -193,10 +182,10 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
  * @param event   Drop event.
  */
 export function getDropPasteProps(
-	props: Props[ 'current' ],
+	props: RichTextEventListenerProps,
 	element: HTMLElement,
 	event: DragEvent
-) {
+): RichTextEventListenerProps | undefined {
 	if ( event.defaultPrevented ) {
 		return;
 	}

@@ -1,7 +1,9 @@
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Dialog } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Dialog,
+} from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
@@ -41,6 +43,8 @@ export function WidgetInserter() {
 				size="full"
 				portal={
 					<Dialog.Portal
+						// Legacy popovers opened inside, like the DataViews view config, render below the compat overlay slot.
+						container={ document.body }
 						style={
 							{
 								'--wp-ui-dialog-z-index': 99999,

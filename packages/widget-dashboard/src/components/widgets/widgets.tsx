@@ -9,7 +9,6 @@ import type {
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
-import { useDashboardContainerColumnCount } from '../../hooks/use-dashboard-container-column-count';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -129,10 +128,6 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 			widgetTypes,
 			canPerform,
 		} = useDashboardInternalContext();
-		const { containerRef, columnCount } = useDashboardContainerColumnCount(
-			ref,
-			gridSettings.columns
-		);
 		const isMasonry = gridSettings.model === 'masonry';
 
 		const permissionsFor = useCallback< TilePermissionsFor >(
@@ -251,7 +246,8 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		const surface: React.ReactNode = isMasonry ? (
 			<DashboardLanes
 				layout={ gridLayout as DashboardLanesLayoutItem[] }
-				columns={ columnCount }
+				columns={ gridSettings.columns }
+				minColumnWidth={ gridSettings.minColumnWidth }
 				flowTolerance={ gridSettings.flowTolerance }
 				onChangeLayout={ handleMasonryChange }
 				{ ...sharedRenderProps }
@@ -261,7 +257,8 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		) : (
 			<DashboardGrid
 				layout={ gridLayout as DashboardGridLayoutItem[] }
-				columns={ columnCount }
+				columns={ gridSettings.columns }
+				minColumnWidth={ gridSettings.minColumnWidth }
 				rowHeight={ gridSettings.rowHeight }
 				onChangeLayout={ handleGridChange }
 				{ ...sharedRenderProps }
@@ -271,10 +268,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		);
 
 		return (
-			<div
-				ref={ containerRef }
-				className={ clsx( styles.grid, className ) }
-			>
+			<div ref={ ref } className={ clsx( styles.grid, className ) }>
 				{ surface }
 			</div>
 		);
