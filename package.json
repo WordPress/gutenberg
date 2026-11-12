@@ -93,7 +93,7 @@
 		"lint-staged": "7.3.0",
 		"lodash": "4.17.10",
 		"mkdirp": "0.5.1",
-		"node-sass": "4.14.1",
+		"node-sass": "npm:sass@1.32.8",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
 		"react-dom": "16.6.3",
