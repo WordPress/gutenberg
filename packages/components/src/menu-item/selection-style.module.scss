@@ -1,0 +1,65 @@
+// Selection marks reserve menu-wide space. Action prefixes indent only their row.
+.menu.menu,
+:global([role="menu"]):has(.item) {
+	--_wp-components-menu-selection-width: var(--wpds-dimension-size-2xs);
+	--_wp-components-menu-item-inset: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+
+	:global(.components-menu-item__button):not(.item),
+	:global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
+		padding-inline-start:
+			calc(var(--_wp-components-menu-item-inset) +
+			var(--_wp-components-menu-selection-width));
+	}
+
+	:global(.components-menu-group__label) {
+		padding-inline-start:
+			calc(var(--_wp-components-menu-item-inset) +
+			var(--_wp-components-menu-selection-width) +
+			var(--wpds-border-width-xs));
+	}
+}
+
+// Outrank DropdownMenu's padding defaults regardless of stylesheet order.
+.item.item:global(.components-menu-item__button.components-button) {
+	gap: 0;
+	padding-block: var(--wpds-dimension-padding-xs);
+	padding-inline-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+	padding-inline-end: var(--wpds-dimension-padding-sm);
+
+	> .indicator {
+		flex: 0 0 auto;
+		width: var(--wpds-dimension-size-2xs);
+		height: var(--wpds-dimension-size-2xs);
+		margin: 0;
+		// Match UI's optical offset without narrowing the selection slot.
+		margin-inline-start: calc(var(--wpds-dimension-gap-xs) / -2);
+		margin-inline-end: calc(var(--wpds-dimension-gap-xs) / 2);
+	}
+
+	> :global(.components-menu-items__item-icon):not(.indicator):not(:global(.has-icon-right)) {
+		margin-inline-end: var(--wpds-dimension-gap-xs);
+	}
+
+	&:has(:global(.components-menu-item__info-wrapper)) {
+		align-items: flex-start;
+
+		> .indicator {
+			// Center the selection mark on the title line.
+			translate: 0 calc((1lh - 100%) / 2);
+		}
+
+		:global(.components-menu-item__shortcut) {
+			align-self: flex-start;
+		}
+	}
+
+	// Keep the leading space for unchecked rows and actions in a selection menu.
+	&:not([aria-checked="true"]) > .indicator {
+		visibility: hidden;
+	}
+}
+
+:global(.components-dropdown-menu__menu):has(.item):has(:global(.components-menu-group)) > :global(.components-dropdown-menu__menu-item):not(:global(.is-icon-only)) {
+	margin-inline: var(--wpds-dimension-padding-sm);
+	width: calc(100% - 2 * var(--wpds-dimension-padding-sm));
+}

@@ -15,7 +15,7 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 ![MenuItemsChoice Diagram](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice-Checkbox-Keyboard-Shortcut.png)
 
 1. A checkmark icon appears next to the choice when it’s enabled, and disappears when disabled.
-2. If an item in `MenuItemsChoice` has an associated keyboard shortcut, that should be displayed to the right of the menu title, aligned to the right side of the menu item. Selected choices should not have visible shortcuts, since they are already active.
+2. An associated keyboard shortcut appears at the trailing edge of the row, aligned with the menu title.
 
 #### When to use `MenuItemsChoice`
 
@@ -24,7 +24,7 @@ Use `MenuItemsChoice` when you want users to:
 -   Select a single option from a set of choices in a menu.
 -   Expose all available options.
 
-`MenuItemsChoice` should not be used to toggle individual features on and off. For that, consider using a `FeatureToggle`.
+For independent toggles in a menu, use `MenuItem` with `role="menuitemcheckbox"`, `isSelected`, and `showSelectionIndicator`. `MenuItemsChoice` is for mutually exclusive choices and calls `onSelect` only when the choice changes.
 
 #### Defaults
 

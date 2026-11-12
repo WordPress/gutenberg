@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import {
-	check,
 	menu,
 	arrowUp,
 	arrowDown,
 	chevronDown,
 	more,
 	trash,
+	link,
 } from '@wordpress/icons';
 import { DropdownMenu } from '..';
 import MenuItem from '../../menu-item';
@@ -155,8 +155,8 @@ export const SingleSelection: StoryObj< typeof DropdownMenu > = {
 
 /**
  * Use `MenuItem` with `role="menuitemcheckbox"` for independent selections.
- * Set `isSelected` and a check icon for each selected item. Keep the popup open
- * by updating the selection without calling `onClose`.
+ * Set `showSelectionIndicator` to render the check from `isSelected` and keep
+ * labels aligned when unchecked.
  */
 export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 	parameters: {
@@ -190,7 +190,7 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 										key={ option }
 										role="menuitemcheckbox"
 										isSelected={ isSelected }
-										icon={ isSelected ? check : null }
+										showSelectionIndicator
 										onClick={ () => toggleOption( option ) }
 									>
 										{ option }
@@ -202,5 +202,129 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 				) }
 			</DropdownMenu>
 		);
+	},
+};
+
+/**
+ * Selection rows share their leading selection space with ordinary actions.
+ * Action icons keep their explicit position and indent only their own label.
+ */
+export const MixedContent: StoryObj< typeof DropdownMenu > = {
+	args: { label: 'Mixed menu', icon: more },
+	render: function Render( args ) {
+		const [ mode, setMode ] = useState( 'code' );
+		const [ showDetails, setShowDetails ] = useState( true );
+		return (
+			<DropdownMenu { ...args }>
+				{ ( { onClose } ) => (
+					<>
+						<MenuGroup label="Editor">
+							<MenuItem onClick={ onClose }>
+								Plain action
+							</MenuItem>
+							<MenuItemsChoice
+								value={ mode }
+								onSelect={ setMode }
+								choices={ [
+									{
+										value: 'visual',
+										label: 'Visual editor',
+										shortcut: 'Ctrl+V',
+									},
+									{
+										value: 'code',
+										label: 'Code editor',
+										info: 'Edit the source of your content.',
+										shortcut: 'Ctrl+C',
+									},
+								] }
+							/>
+							<MenuItem
+								role="menuitemcheckbox"
+								isSelected={ showDetails }
+								showSelectionIndicator
+								info="Display additional information."
+								onClick={ () =>
+									setShowDetails( ! showDetails )
+								}
+							>
+								Show details
+							</MenuItem>
+							<MenuItem shortcut="Ctrl+P" onClick={ onClose }>
+								Preview
+							</MenuItem>
+							<MenuItem
+								suffix={ <span>Draft</span> }
+								onClick={ onClose }
+							>
+								Save
+							</MenuItem>
+						</MenuGroup>
+						<MenuGroup label="Actions">
+							<MenuItem
+								icon={ link }
+								iconPosition="left"
+								onClick={ onClose }
+							>
+								Leading action icon
+							</MenuItem>
+							<MenuItem onClick={ onClose }>
+								Action without an icon
+							</MenuItem>
+							<MenuItem
+								icon={ trash }
+								iconPosition="right"
+								onClick={ onClose }
+							>
+								Trailing action icon
+							</MenuItem>
+						</MenuGroup>
+					</>
+				) }
+			</DropdownMenu>
+		);
+	},
+};
+
+/**
+ * Prefix icons indent only their own label. Controls without icons start at the
+ * icon column. Selection state and activation remain controlled by the caller.
+ */
+export const MixedControls: StoryObj< typeof DropdownMenu > = {
+	args: { label: 'Control options', icon: more },
+	render: function Render( args ) {
+		const [ showDetails, setShowDetails ] = useState( true );
+		return (
+			<DropdownMenu
+				{ ...args }
+				controls={ [
+					{ title: 'Move up', icon: arrowUp },
+					{ title: 'Action without an icon' },
+					{
+						title: 'Show details',
+						icon: more,
+						role: 'menuitemcheckbox',
+						isActive: showDetails,
+						onClick: () => setShowDetails( ! showDetails ),
+					},
+					{
+						title: 'Unavailable action',
+						icon: arrowDown,
+						isDisabled: true,
+					},
+				] }
+			/>
+		);
+	},
+};
+
+export const IconOnlyControls: StoryObj< typeof DropdownMenu > = {
+	args: {
+		label: 'Icon controls',
+		icon: more,
+		controls: [
+			{ title: '', label: 'Move up', icon: arrowUp },
+			{ title: '', label: 'Move down', icon: arrowDown },
+		],
 	},
 };

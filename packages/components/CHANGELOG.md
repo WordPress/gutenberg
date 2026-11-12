@@ -4,6 +4,8 @@
 
 ### Enhancements
 
+-   `MenuItem`: Add the opt-in `showSelectionIndicator` prop for leading selection marks. Existing caller-supplied selection icons remain supported; remove the supplied check and set the prop to adopt the built-in indicator ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
+-   `DropdownMenu`, `MenuItemsChoice`, `ToolsPanel`: Align leading selection marks, mixed menu rows, and description titles ([#85861](https://github.com/WordPress/gutenberg/pull/85861)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
 -   `FontSizePicker`: Use the WordPress UI select for choosing preset sizes ([#86661](https://github.com/WordPress/gutenberg/pull/86661)).
