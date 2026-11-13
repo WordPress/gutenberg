@@ -12,7 +12,7 @@ import {
 	getGradientAstWithControlPoints,
 	getStopCssColor,
 } from './utils';
-import { serializeGradient } from './serializer';
+import { serializeGradient, sortGradientColorStops } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
 	GRADIENT_OPTIONS,
@@ -20,6 +20,8 @@ import {
 } from './constants';
 import styles from './style.module.scss';
 import type {
+	ControlPoint,
+	GradientAST,
 	CustomGradientPickerProps,
 	GradientAnglePickerProps,
 	GradientTypePickerProps,
@@ -121,6 +123,18 @@ const GradientTypePicker = ( {
 	);
 };
 
+function getControlPoints( gradientAST: GradientAST ): ControlPoint[] {
+	return gradientAST.colorStops.map( ( colorStop ) => {
+		return {
+			color: getStopCssColor( colorStop ),
+			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
+			// TypeScript doesn't know that `colorStop.length` is not undefined here.
+			// @ts-expect-error `colorStop.length` is possibly `undefined`.
+			position: parseInt( colorStop.length.value ),
+		};
+	} );
+}
+
 /**
  * CustomGradientPicker is a React component that renders a UI for specifying
  * linear or radial gradients. Radial gradients are displayed in the picker as
@@ -143,15 +157,7 @@ export function CustomGradientPicker( {
 
 	// Control points color option may be hex from presets, custom colors will be rgb.
 	// The position should always be a percentage.
-	const controlPoints = gradientAST.colorStops.map( ( colorStop ) => {
-		return {
-			color: getStopCssColor( colorStop ),
-			// Although it's already been checked by `hasUnsupportedLength` in `getGradientAstWithDefault`,
-			// TypeScript doesn't know that `colorStop.length` is not undefined here.
-			// @ts-expect-error `colorStop.length` is possibly `undefined`.
-			position: parseInt( colorStop.length.value ),
-		};
-	} );
+	const controlPoints = getControlPoints( gradientAST );
 
 	return (
 		<VStack spacing={ 4 } className="components-custom-gradient-picker">
@@ -163,6 +169,25 @@ export function CustomGradientPicker( {
 				background={ background }
 				hasGradient={ hasGradient }
 				value={ controlPoints }
+				normalizeControlPoints={ ( newControlPoints ) => {
+					const nextAST = getGradientAstWithControlPoints(
+						gradientAST,
+						newControlPoints
+					);
+					const sourceStops = [ ...nextAST.colorStops ];
+					const sortedStops = sortGradientColorStops(
+						nextAST.colorStops
+					);
+					return getControlPoints( {
+						...nextAST,
+						colorStops: sortedStops,
+					} ).map( ( point, index ) => ( {
+						point,
+						sourceIndex: sourceStops.indexOf(
+							sortedStops[ index ]
+						),
+					} ) );
+				} }
 				onChange={ ( newControlPoints ) => {
 					onChange(
 						serializeGradient(

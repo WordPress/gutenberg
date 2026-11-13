@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useRef, useReducer } from '@wordpress/element';
 import type { MouseEventHandler } from 'react';
 import ControlPoints from './control-points';
+import useControlPointKeys from './use-control-point-keys';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
 import type {
@@ -72,11 +73,14 @@ export default function CustomGradientBar( {
 	hasGradient,
 	value: controlPoints,
 	onChange,
+	normalizeControlPoints,
 	disableInserter = false,
 	disableAlpha = false,
 	disablePositioning = false,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientBarProps ) {
+	const { keys: controlPointKeys, onChange: onControlPointsChange } =
+		useControlPointKeys( controlPoints, onChange, normalizeControlPoints );
 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
 
 	const [ gradientBarState, gradientBarStateDispatch ] = useReducer(
@@ -151,7 +155,7 @@ export default function CustomGradientBar( {
 							disableAlpha={ disableAlpha }
 							insertPosition={ gradientBarState.insertPosition }
 							value={ controlPoints }
-							onChange={ onChange }
+							onChange={ onControlPointsChange }
 							onOpenInserter={ () => {
 								gradientBarStateDispatch( {
 									type: 'OPEN_INSERTER',
@@ -165,6 +169,7 @@ export default function CustomGradientBar( {
 						/>
 					) }
 				<ControlPoints
+					controlPointKeys={ controlPointKeys }
 					__experimentalIsRenderedInSidebar={
 						__experimentalIsRenderedInSidebar
 					}
@@ -178,7 +183,7 @@ export default function CustomGradientBar( {
 							: undefined
 					}
 					value={ controlPoints }
-					onChange={ onChange }
+					onChange={ onControlPointsChange }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
 							type: 'START_CONTROL_CHANGE',

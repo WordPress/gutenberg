@@ -62,6 +62,23 @@ export function serializeGradientOrientation(
 	return `${ orientation.value }${ orientation.unit }`;
 }
 
+export function sortGradientColorStops(
+	colorStops: gradientParser.ColorStop[]
+) {
+	return colorStops.sort( ( colorStop1, colorStop2 ) => {
+		const getNumericStopValue = ( colorStop: gradientParser.ColorStop ) => {
+			return colorStop?.length?.value === undefined
+				? 0
+				: parseInt( colorStop.length.value );
+		};
+
+		return (
+			getNumericStopValue( colorStop1 ) -
+			getNumericStopValue( colorStop2 )
+		);
+	} );
+}
+
 export function serializeGradient( {
 	type,
 	colorInterpolation,
@@ -76,22 +93,9 @@ export function serializeGradient( {
 	]
 		.filter( Boolean )
 		.join( ' ' );
-	const serializedColorStops = colorStops
-		.sort( ( colorStop1, colorStop2 ) => {
-			const getNumericStopValue = (
-				colorStop: gradientParser.ColorStop
-			) => {
-				return colorStop?.length?.value === undefined
-					? 0
-					: parseInt( colorStop.length.value );
-			};
-
-			return (
-				getNumericStopValue( colorStop1 ) -
-				getNumericStopValue( colorStop2 )
-			);
-		} )
-		.map( serializeGradientColorStop );
+	const serializedColorStops = sortGradientColorStops( colorStops ).map(
+		serializeGradientColorStop
+	);
 	return `${ type }(${ [ serializedOrientation, ...serializedColorStops ]
 		.filter( Boolean )
 		.join( ',' ) })`;
