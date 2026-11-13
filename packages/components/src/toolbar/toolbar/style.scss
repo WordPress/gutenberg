@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "../../utils/theme-variables" as *;
 
 .components-accessible-toolbar {
 	display: inline-flex;
@@ -79,11 +80,30 @@
 			}
 
 			&::before {
-				background: var(--wpds-color-background-interactive-neutral-strong-active);
+				background: $components-color-foreground;
 			}
 
-			&:is(:disabled, [aria-disabled="true"])::before {
-				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			// The fill stays on the `::before`, which is inset from the button. A
+			// consumer that hides the `::before` has to fill the button itself, or
+			// `SelectedItemText` ends up on the toolbar's background.
+			// TODO: Add a way to opt out of the toolbar's `::before` treatment, so
+			// that consumers don't have to undo it and restore the fill themselves.
+			@media ( forced-colors: active ) {
+				background: transparent !important;
+
+				&::before {
+					background: SelectedItem;
+				}
+
+				&:disabled::before,
+				&[aria-disabled="true"]::before {
+					background: GrayText;
+				}
+
+				&:focus::before {
+					outline-color: CanvasText;
+					box-shadow: none;
+				}
 			}
 		}
 

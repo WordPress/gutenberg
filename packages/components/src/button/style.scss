@@ -1,4 +1,3 @@
-@use "sass:color";
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins";
 @use "@wordpress/base-styles/variables" as *;
@@ -12,6 +11,22 @@
  */
 
 .components-button {
+	// Share tone-dependent colors across variants. Fixed roles use WPDS tokens directly.
+	--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-brand);
+	--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-brand-active);
+	--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-brand-strong);
+	--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-brand-strong-active);
+	--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-brand-strong-disabled);
+	--_wp-components-button-background-strong: var(--wpds-color-background-interactive-brand-strong);
+	--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-brand-strong-active);
+	--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-brand-strong-disabled);
+	--_wp-components-button-background-weak: var(--wpds-color-background-interactive-neutral-weak);
+	--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-neutral-weak-active);
+	--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak-active);
+	--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-brand);
+	--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-brand-active);
+	--_wp-components-button-foreground-busy: var(--wpds-color-foreground-interactive-neutral);
+
 	// Defend against a conflicting focus ring from WordPress common.css on `a:focus`.
 	&:focus:is(a) {
 		box-shadow: none;
@@ -39,7 +54,7 @@
 	box-sizing: border-box;
 	padding: 4px 12px; // Allows 32px min-height.
 	border-radius: $radius-small;
-	color: $components-color-foreground;
+	color: var(--wpds-color-foreground-interactive-neutral);
 	// Every variant reserves a 1px border (transparent by default) so the box
 	// size stays identical whether or not a variant paints a visible border.
 	border: $border-width solid transparent;
@@ -50,7 +65,7 @@
 
 	&[aria-expanded="true"],
 	&:hover:not(:disabled, [aria-disabled="true"], [role^="menuitem"], [role="option"]) {
-		color: $components-color-accent;
+		color: var(--_wp-components-button-foreground);
 	}
 
 	/**
@@ -59,19 +74,19 @@
 
 	&.is-primary {
 		white-space: nowrap;
-		background: $components-color-accent;
-		color: $components-color-accent-inverted;
+		background: var(--_wp-components-button-background-strong);
+		color: var(--_wp-components-button-foreground-strong);
 		text-decoration: none;
 		text-shadow: none;
 
-		&:hover:not(:disabled, .is-pressed) {
-			background: $components-color-accent-darker-10;
-			color: $components-color-accent-inverted;
+		&:hover:not(:disabled) {
+			background-color: var(--_wp-components-button-background-strong-active);
+			color: var(--_wp-components-button-foreground-strong-active);
 		}
 
-		&:active:not(:disabled, .is-pressed) {
-			background: $components-color-accent-darker-20;
-			color: $components-color-accent-inverted;
+		&:active:not(:disabled) {
+			background-color: var(--_wp-components-button-background-strong-active);
+			color: var(--_wp-components-button-foreground-strong-active);
 		}
 
 		&:disabled,
@@ -79,23 +94,22 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:enabled, // This catches a situation where a Button is aria-disabled, but not disabled.
 		&[aria-disabled="true"]:active:enabled {
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color: rgba($white, 0.4);
-			background: $components-color-accent;
+			color: var(--_wp-components-button-foreground-strong-disabled);
+			background: var(--_wp-components-button-background-strong-disabled);
 		}
 
 		&.is-busy,
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
-			color: $components-color-accent-inverted;
+			color: var(--_wp-components-button-foreground-strong);
 			background-size: 100px 100%;
 			/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 			background-image: linear-gradient(
 				-45deg,
-				$components-color-accent 33%,
-				$components-color-accent-darker-20 33%,
-				$components-color-accent-darker-20 70%,
-				$components-color-accent 70%
+				var(--_wp-components-button-background-strong) 33%,
+				var(--_wp-components-button-background-strong-active) 33%,
+				var(--_wp-components-button-background-strong-active) 70%,
+				var(--_wp-components-button-background-strong) 70%
 			);
 			/* stylelint-enable */
 		}
@@ -107,10 +121,15 @@
 
 	&.is-secondary,
 	&.is-tertiary {
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-brand-weak);
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-brand-weak-active);
+		--_wp-components-button-foreground-on-active: var(--_wp-components-button-foreground-active);
+		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
+
 		&:disabled,
 		&[aria-disabled="true"],
-		&[aria-disabled="true"]:hover:where(:not(.is-pressed)) {
-			color: $gray-600;
+		&[aria-disabled="true"]:hover {
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 			background: transparent;
 			transform: none;
 		}
@@ -125,24 +144,24 @@
 			transition: border-color 0.1s linear;
 		}
 
-		border-color: $components-color-accent;
+		border-color: var(--_wp-components-button-stroke);
 		white-space: nowrap;
-		color: $components-color-accent;
-		background: transparent;
+		color: var(--_wp-components-button-foreground);
+		background: var(--_wp-components-button-background-weak);
 
-		&:active:not(:disabled, .is-pressed) {
+		&:active:not(:disabled) {
 			// Hide the border while pressed, keeping its width to avoid a size shift.
 			border-color: transparent;
 		}
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			border-color: $components-color-accent-darker-20;
-			color: $components-color-accent-darker-20;
-			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+			border-color: var(--_wp-components-button-stroke-active);
+			color: var(--_wp-components-button-foreground-active);
+			background-color: var(--_wp-components-button-background-on-active);
 		}
 
-		&:focus:not(:active, .is-pressed) {
-			border-color: $components-color-accent;
+		&:focus:not(:active) {
+			border-color: var(--_wp-components-button-stroke);
 		}
 
 		&:disabled:not(:focus),
@@ -158,16 +177,16 @@
 
 	&.is-tertiary {
 		white-space: nowrap;
-		color: $components-color-accent;
-		background: transparent;
+		color: var(--_wp-components-button-foreground);
+		background: var(--_wp-components-button-background-weak);
 
 		&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			background: color-mix(in srgb, $components-color-accent 4%, transparent);
-			color: $components-color-accent-darker-20;
+			background-color: var(--_wp-components-button-background-on-active);
+			color: var(--_wp-components-button-foreground-active);
 		}
 
 		&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
-			background: color-mix(in srgb, $components-color-accent 8%, transparent);
+			background-color: var(--_wp-components-button-background-on-active);
 		}
 
 		// Pull left if the tertiary button stands alone after a description, so as to vertically align with items above.
@@ -180,36 +199,44 @@
 	 * Destructive buttons.
 	 */
 	&.is-destructive {
-		--wp-components-color-accent: #{$alert-red};
-		--wp-components-color-accent-darker-10: #{color.adjust($alert-red, $lightness: -10%)};
-		--wp-components-color-accent-darker-20: #{color.adjust($alert-red, $lightness: -20%)};
+		--_wp-components-button-foreground: var(--wpds-color-foreground-interactive-error);
+		--_wp-components-button-foreground-active: var(--wpds-color-foreground-interactive-error-active);
+		--_wp-components-button-foreground-strong: var(--wpds-color-foreground-interactive-error-strong);
+		--_wp-components-button-foreground-strong-active: var(--wpds-color-foreground-interactive-error-strong-active);
+		--_wp-components-button-foreground-strong-disabled: var(--wpds-color-foreground-interactive-error-strong-disabled);
+		--_wp-components-button-background-strong: var(--wpds-color-background-interactive-error-strong);
+		--_wp-components-button-background-strong-active: var(--wpds-color-background-interactive-error-strong-active);
+		--_wp-components-button-background-strong-disabled: var(--wpds-color-background-interactive-error-strong-disabled);
+		--_wp-components-button-background-weak: var(--wpds-color-background-interactive-error-weak);
+		--_wp-components-button-background-weak-active: var(--wpds-color-background-interactive-error-weak-active);
+		--_wp-components-button-stroke: var(--wpds-color-stroke-interactive-error);
+		--_wp-components-button-stroke-active: var(--wpds-color-stroke-interactive-error-active);
+		--_wp-components-button-foreground-on-active: var(--_wp-components-button-foreground-active);
+		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
 
+		// The shared pressed rule owns its foreground and background.
 		// Only the default variant is styled differently from the non-destructive counterparts.
 		&:not(.is-primary):not(.is-secondary):not(.is-tertiary):not(.is-link):not(.is-pressed) {
-			color: $alert-red;
+			color: var(--_wp-components-button-foreground);
 
 			&:hover:not(:disabled, [aria-disabled="true"]) {
-				color: color.adjust($alert-red, $lightness: -20%);
+				color: var(--_wp-components-button-foreground-active);
 			}
 
 			&:active:not(:disabled, [aria-disabled="true"]) {
-				background: $gray-400;
+				background-color: var(--wpds-color-background-interactive-error-active);
+				color: var(--_wp-components-button-foreground-active);
 			}
 
 			&:disabled,
 			&[aria-disabled="true"] {
-				color: $gray-600;
+				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 			}
 		}
 
-		&.is-tertiary,
 		&.is-secondary {
-			&:hover:not(:disabled, [aria-disabled="true"], .is-pressed) {
-				background: rgba($alert-red, 0.04);
-			}
-
 			&:active:not(:disabled, [aria-disabled="true"], .is-pressed) {
-				background: rgba($alert-red, 0.08);
+				background-color: var(--_wp-components-button-background-on-active);
 			}
 		}
 	}
@@ -219,6 +246,8 @@
 	 */
 
 	&.is-link {
+		--_wp-components-button-foreground-busy: var(--_wp-components-button-foreground-active);
+
 		margin: 0;
 		padding: 0;
 		border: 0;
@@ -227,7 +256,7 @@
 		outline: none;
 		text-align: left;
 		font-weight: var(--wpds-typography-font-weight-default);
-		color: $components-color-accent;
+		color: var(--_wp-components-button-foreground);
 		text-decoration: underline;
 		text-underline-offset: 0.2em;
 		text-decoration-thickness: from-font;
@@ -247,24 +276,30 @@
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: $gray-600;
+			color: var(--wpds-color-foreground-interactive-brand-disabled);
 		}
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):active {
-		color: $components-color-foreground;
+	&:not(:disabled, [aria-disabled="true"], .is-pressed):active {
+		color: var(--_wp-components-button-foreground-on-active, var(--wpds-color-foreground-interactive-neutral-active));
 	}
 
 	&:disabled,
 	&[aria-disabled="true"] {
 		cursor: default;
-		color: $gray-600;
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	&.is-busy,
 	&.is-secondary.is-busy,
 	&.is-secondary.is-busy:disabled,
 	&.is-secondary.is-busy[aria-disabled="true"] {
+		--_wp-components-button-background-on-active: var(--_wp-components-button-background-weak);
+
+		&:not(.is-primary, .is-pressed) {
+			color: var(--_wp-components-button-foreground-busy);
+		}
+
 		@media not (prefers-reduced-motion) {
 			animation: components-button__busy-animation 2500ms infinite linear;
 		}
@@ -272,11 +307,10 @@
 		/* stylelint-disable -- Disable reason: This function call looks nicer when each argument is on its own line. */
 		background-image: linear-gradient(
 			-45deg,
-			// TODO: Prepare for theming (https://github.com/WordPress/gutenberg/pull/45466/files#r1030872724)
-			color.adjust($white, $lightness: -2%) 33%,
-			color.adjust($white, $lightness: -12%) 33%,
-			color.adjust($white, $lightness: -12%) 70%,
-			color.adjust($white, $lightness: -2%) 70%
+			var(--_wp-components-button-background-weak) 33%,
+			var(--_wp-components-button-background-weak-active) 33%,
+			var(--_wp-components-button-background-weak-active) 70%,
+			var(--_wp-components-button-background-weak) 70%
 		);
 		/* stylelint-enable */
 	}
@@ -345,28 +379,42 @@
 	// Toggled style.
 	&.is-pressed {
 		&,
-		&.is-primary.is-busy:not(:disabled, [aria-disabled="true"]),
-		&:is(:hover, :active):not(:disabled, [aria-disabled="true"]) {
-			color: var(--wpds-color-foreground-interactive-neutral-strong-active);
-		}
-
-		&:not(:disabled, [aria-disabled="true"]) {
-			background: var(--wpds-color-background-interactive-neutral-strong-active);
-
-			&.is-secondary {
-				border-color: var(--wpds-color-stroke-interactive-neutral-active);
+		&:hover {
+			color: $components-color-foreground-inverted;
+			&:not(:disabled, [aria-disabled="true"]) {
+				background: $components-color-foreground;
 			}
 		}
 
 		&:disabled,
 		&[aria-disabled="true"] {
-			color: var(--wpds-color-foreground-interactive-neutral-strong-disabled);
+			color: $gray-600;
 
 			&:not(.is-primary):not(.is-secondary):not(.is-tertiary) {
-				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+				color: $components-color-foreground-inverted;
+				background: $gray-600;
 			}
 		}
 
+		// Forced colors discard the pressed colors, so fill the button with the
+		// system selection colors instead. Opting out of color adjustment removes
+		// the text backplate, which would otherwise cover the fill, but it also
+		// lets every other color rule that matches the button take effect,
+		// including those from consumers, so these rules need `!important`.
+		@media ( forced-colors: active ) {
+			forced-color-adjust: none;
+			outline-color: CanvasText !important;
+			border-color: ButtonBorder !important;
+			background: SelectedItem !important;
+			color: SelectedItemText !important;
+
+			&:disabled,
+			&[aria-disabled="true"] {
+				border-color: GrayText !important;
+				background: GrayText !important;
+				color: Canvas !important;
+			}
+		}
 	}
 
 	svg {

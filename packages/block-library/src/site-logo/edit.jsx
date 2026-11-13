@@ -229,11 +229,7 @@ const SiteLogo = ( {
 		{
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
-				<a
-					href={ siteIconSettingsUrl }
-					target="_blank"
-					rel="noopener"
-				/>
+				<a href={ siteIconSettingsUrl } target="_blank" />
 			),
 		}
 	);
@@ -546,11 +542,9 @@ export default function LogoEdit( {
 	}
 
 	// Reset temporary url when logoUrl is available.
-	useEffect( () => {
-		if ( logoUrl && temporaryURL ) {
-			setTemporaryURL();
-		}
-	}, [ logoUrl, temporaryURL ] );
+	if ( logoUrl && temporaryURL ) {
+		setTemporaryURL();
+	}
 
 	if ( !! logoUrl || !! temporaryURL ) {
 		logoImage = (

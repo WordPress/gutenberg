@@ -88,22 +88,37 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_sanitize_block_gap_value() {
 		return array(
-			'string value'           => array( '1rem', '1rem' ),
-			'empty string'           => array( '', null ),
-			'whitespace-only string' => array( " \t\n", null ),
-			'integer zero'           => array( 0, '0' ),
-			'floating-point zero'    => array( 0.0, '0' ),
-			'non-zero integer'       => array( 1, null ),
-			'boolean value'          => array( true, null ),
-			'object value'           => array( new stdClass(), null ),
-			'nested array value'     => array(
+			'string value'                         => array( '1rem', '1rem' ),
+			'empty string'                         => array( '', null ),
+			'whitespace-only string'               => array( " \t\n", null ),
+			'integer zero'                         => array( 0, '0' ),
+			'floating-point zero'                  => array( 0.0, '0' ),
+			'non-zero integer'                     => array( 1, null ),
+			'boolean value'                        => array( true, null ),
+			'object value'                         => array( new stdClass(), null ),
+			'nested array value'                   => array(
 				array(
 					'top'  => array( '1rem' ),
 					'left' => '2rem',
 				),
 				array( 'left' => '2rem' ),
 			),
-			'empty sanitized array'  => array( array( array( '1rem' ) ), null ),
+			'empty sanitized array'                => array( array( array( '1rem' ) ), null ),
+			'valid CSS variable preset'            => array( 'var(--wp--preset--spacing--32)', 'var(--wp--preset--spacing--32)' ),
+			'valid CSS variable with hyphens'      => array( 'var(--wp--preset--spacing--sm-32)', 'var(--wp--preset--spacing--sm-32)' ),
+			'valid CSS custom property'            => array( 'var(--custom-gap)', 'var(--custom-gap)' ),
+			'malformed CSS variable injection'     => array( 'var(--wp--preset--spacing--32); background: red;', null ),
+			'malformed CSS variable with function' => array( 'var(--wp--preset--spacing--32, url(evil))', null ),
+			'nested array with CSS variable'       => array(
+				array(
+					'top'  => 'var(--wp--preset--spacing--32)',
+					'left' => '2rem',
+				),
+				array(
+					'top'  => 'var(--wp--preset--spacing--32)',
+					'left' => '2rem',
+				),
+			),
 		);
 	}
 
@@ -555,6 +570,19 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (1.2rem * (3 - 1))) /3), 1fr));container-type:inline-size;gap:2rem 1.2rem;}',
 			),
+			'grid layout uses preset CSS variable fallback when horizontal gap is missing' => array(
+				'args'            => array(
+					'selector'              => '.wp-layout',
+					'layout'                => array(
+						'type'               => 'grid',
+						'columnCount'        => 2,
+						'minimumColumnWidth' => '20rem',
+					),
+					'has_block_gap_support' => true,
+					'fallback_gap_value'    => 'var(--wp--preset--spacing--32)',
+				),
+				'expected_output' => '.wp-layout{grid-template-columns:repeat(auto-fill, minmax(max(min(20rem, 100%), (100% - (var(--wp--preset--spacing--32) * (2 - 1))) /2), 1fr));container-type:inline-size;}',
+			),
 			'grid layout preserves zero horizontal gap'    => array(
 				'args'            => array(
 					'selector'              => '.wp-layout',
@@ -741,6 +769,34 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+		);
+	}
+
+	/**
+	 * Tests that the box-sizing of a child with a fixed size in a flex layout reaches the
+	 * stylesheet, which filters every declaration through safecss_filter_attr().
+	 *
+	 * @covers ::gutenberg_add_box_sizing_to_safe_style_css
+	 */
+	public function test_fixed_flex_child_keeps_box_sizing_in_stylesheet() {
+		$child_layout_styles = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'selfStretch' => 'fixed',
+				'flexSize'    => '320px',
+			),
+			array()
+		);
+
+		$this->assertSame(
+			'.wp-container-content-test{flex-basis:320px;box-sizing:border-box;}',
+			gutenberg_style_engine_get_stylesheet_from_css_rules(
+				$child_layout_styles,
+				array(
+					'context'  => 'block-supports',
+					'prettify' => false,
+				)
+			)
 		);
 	}
 
@@ -1611,7 +1667,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));aspect-ratio:3 / 2;}',
 			$layout_styles
 		);
 	}

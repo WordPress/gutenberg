@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -122,8 +123,17 @@
 		min-width: $button-size-compact;
 		padding: 4px;
 
-		&.is-pressed:not(:disabled, [aria-disabled="true"]) {
-			background: var(--wpds-color-background-interactive-neutral-strong-active);
+		&.is-pressed {
+			background: $gray-900;
+
+			@media (forced-colors: active) {
+				background: SelectedItem !important;
+
+				&:disabled,
+				&[aria-disabled="true"] {
+					background: GrayText !important;
+				}
+			}
 		}
 
 		&:focus:not(:active) {

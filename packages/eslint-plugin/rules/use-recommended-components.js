@@ -130,6 +130,10 @@ const DENYLIST = {
 		CardMedia: 'Use `Card.FullBleed` from `@wordpress/ui` instead.',
 		CheckboxControl:
 			'Use `CheckboxControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide',
+		CustomGradientPicker:
+			'Use `GradientPicker` with `clearable={ false }` instead.',
+		CustomSelectControl:
+			'Use `SelectControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide',
 		Flex: 'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
 		FlexBlock:
 			'For use cases not covered by `Stack` from `@wordpress/ui`, write your own CSS instead.',
@@ -139,12 +143,16 @@ const DENYLIST = {
 			'Use `Switch` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-togglecontrol--migration-guide',
 		__experimentalInputControl:
 			'Use `InputControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide',
+		Menu: 'When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.',
 		Notice: 'Use `Notice` from `@wordpress/ui` instead.',
 		ProgressBar:
 			'Use `Progress` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-progressbar--migration-guide',
 		RadioControl:
 			'Use `RadioGroupControl` from `@wordpress/ui` instead. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide',
 		ResponsiveWrapper: 'Use the CSS `aspect-ratio` property instead.',
+		SelectControl:
+			'Use `SelectControl` from `@wordpress/ui` instead, or `Select` for the minimal variant. See the migration guide: https://wordpress.github.io/gutenberg/?path=/docs/components-selectcontrol--migration-guide',
+		Spinner: 'Use `Spinner` from `@wordpress/ui` instead.',
 		TabPanel: 'Use `Tabs` from `@wordpress/ui` instead.',
 		TabbableContainer:
 			'For focus trapping, consider the `useConstrainedTabbing` hook from `@wordpress/compose`.',

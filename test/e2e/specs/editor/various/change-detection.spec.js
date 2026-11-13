@@ -241,6 +241,7 @@ test.describe( 'Change detection', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' )
 				.getByText(
 					'Updating failed because you were offline. Please verify your connection and try again.'
 				)

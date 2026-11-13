@@ -315,6 +315,11 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 		return null;
 	}
 
+	// Allow valid CSS custom property references, e.g. var(--wp--preset--spacing--32).
+	if ( preg_match( '/^var\(--[a-zA-Z0-9_-]+\)$/', $gap_value ) ) {
+		return $gap_value;
+	}
+
 	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 }
 
@@ -939,7 +944,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+				/*
+				 * The aspect ratio gives empty rows a height, so cells are roughly square.
+				 * Rows still grow if their content is taller.
+				 */
+				'declarations' => array(
+					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+					'aspect-ratio'       => $column_count . ' / ' . $row_count,
+				),
 			);
 		}
 

@@ -1,7 +1,7 @@
 import {
 	Card as WCCard,
 	__experimentalConfirmDialog as ConfirmDialog,
-	Notice,
+	Notice as WCNotice,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
@@ -130,13 +130,13 @@ export default function GuidelineActionsSection( {
 				style={ { display: 'none' } }
 			/>
 			{ error && (
-				<Notice
+				<WCNotice
 					status="error"
 					onRemove={ () => setError( null ) }
 					isDismissible
 				>
 					{ error }
-				</Notice>
+				</WCNotice>
 			) }
 			<WCCard className="guidelines__actions-card">
 				{ /*

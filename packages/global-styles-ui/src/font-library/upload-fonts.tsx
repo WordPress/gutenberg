@@ -1,11 +1,11 @@
 import { Progress } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
-	Notice,
+	Notice as WCNotice,
 	FormFileUpload,
 	FlexItem,
 } from '@wordpress/components';
@@ -14,6 +14,7 @@ import type { FontFace } from '@wordpress/core-data';
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
+import type { FontEvent } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
 
@@ -98,17 +99,27 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const loadFiles = async ( files: File[] ) => {
-		const fontFacesLoaded = await Promise.all(
-			files.map( async ( fontFile: File ) => {
-				const fontFaceData = await getFontFaceMetadata( fontFile );
-				await loadFontFaceInBrowser(
-					fontFaceData,
-					fontFaceData.file,
-					'all'
-				);
-				return fontFaceData;
-			} )
-		);
+		let fontFacesLoaded;
+		try {
+			fontFacesLoaded = await Promise.all(
+				files.map( async ( fontFile: File ) => {
+					const fontFaceData = await getFontFaceMetadata( fontFile );
+					await loadFontFaceInBrowser(
+						fontFaceData,
+						fontFaceData.file,
+						'all'
+					);
+					return fontFaceData;
+				} )
+			);
+		} catch ( error ) {
+			setNotice( {
+				type: 'error',
+				message: ( error as Error ).message,
+			} );
+			setIsUploading( false );
+			return;
+		}
 		handleInstall( fontFacesLoaded );
 	};
 
@@ -131,36 +142,49 @@ function UploadFonts() {
 
 	// Create a function to read the file as array buffer
 	async function readFileAsArrayBuffer( file: File ) {
-		return new Promise( ( resolve, reject ) => {
+		return new Promise< ArrayBuffer >( ( resolve, reject ) => {
 			const reader = new window.FileReader();
 			reader.readAsArrayBuffer( file );
-			reader.onload = () => resolve( reader.result );
+			reader.onload = () => resolve( reader.result as ArrayBuffer );
 			reader.onerror = reject;
 		} );
 	}
 
+	/**
+	 * Reads the family, style, and weight metadata from an uploaded font.
+	 *
+	 * @param fontFile The font file to parse.
+	 * @return The font face metadata and the uploaded file.
+	 */
 	const getFontFaceMetadata = async ( fontFile: File ) => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
-		const fontObj: Font & {
-			onload?: ( val: { detail: { font: any } } ) => void;
-		} = new Font( 'Uploaded Font' );
+		const fontObj = new Font( 'Uploaded Font' );
 		fontObj.fromDataBuffer( buffer, fontFile.name );
 		// Assuming that fromDataBuffer triggers onload event and returning a Promise
-		const onloadEvent: { detail: { font: any } } = await new Promise(
+		const onloadEvent = await new Promise< FontEvent >(
 			( resolve ) => ( fontObj.onload = resolve )
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontName = name.get( 16 ) || name.get( 1 );
-		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
-		const fontWeight =
-			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
-		const isVariable = !! font.opentype.tables.fvar;
-		const weightAxis =
-			isVariable &&
-			font.opentype.tables.fvar.axes.find(
-				( { tag }: { tag: string } ) => tag === 'wght'
+		const fontName = name!.get( 16 ) || name!.get( 1 );
+		if ( ! fontName ) {
+			throw new Error(
+				sprintf(
+					// translators: %s: Name of the uploaded font file.
+					__(
+						"%s cannot be installed because it does not include a font family name. Try a different version of this font, for example one downloaded from the font's official source."
+					),
+					fontFile.name
+				)
 			);
+		}
+		const subfamily = name!.get( 2 ) || '';
+		const isItalic = subfamily.toLowerCase().includes( 'italic' );
+		const fontWeight =
+			font.opentype.tables[ 'OS/2' ]!.usWeightClass || 'normal';
+		const weightAxis = font.opentype.tables.fvar?.axes.find(
+			( { tag } ) => tag === 'wght'
+		);
 		const weightRange = weightAxis
 			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
 			: null;
@@ -179,9 +203,8 @@ function UploadFonts() {
 	 * @return {void}
 	 */
 	const handleInstall = async ( fontFaces: FontFace[] ) => {
-		const fontFamilies = makeFamiliesFromFaces( fontFaces );
-
 		try {
+			const fontFamilies = makeFamiliesFromFaces( fontFaces );
 			await installFonts( fontFamilies );
 			setNotice( {
 				type: 'success',
@@ -206,7 +229,7 @@ function UploadFonts() {
 			<DropZone onFilesDrop={ handleDropZone } />
 			<VStack className="font-library__local-fonts" justify="start">
 				{ notice && (
-					<Notice
+					<WCNotice
 						status={ notice.type }
 						__unstableHTML
 						onRemove={ () => setNotice( null ) }
@@ -219,7 +242,7 @@ function UploadFonts() {
 								) ) }
 							</ul>
 						) }
-					</Notice>
+					</WCNotice>
 				) }
 				{ isUploading && (
 					<FlexItem>
