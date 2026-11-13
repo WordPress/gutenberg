@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
-@use "../utils/theme-variables" as *;
 @use "../utils/composite-item";
 
 .components-menu-item__button,
@@ -47,16 +46,6 @@
 		.components-menu-item__item {
 			// Override the default right margin.
 			margin-right: 0;
-		}
-	}
-
-	&:disabled,
-	&[aria-disabled="true"] {
-		// Override the button component's tertiary background and color.
-		&.is-tertiary {
-			background: none;
-			color: $components-color-accent-darker-10;
-			opacity: 0.3;
 		}
 	}
 }
