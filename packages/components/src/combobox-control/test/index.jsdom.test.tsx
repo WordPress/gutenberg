@@ -89,6 +89,7 @@ describe( 'ComboboxControl popup relationship', () => {
 		await user.type( input, 'European' );
 
 		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
 		expect( input ).toHaveAttribute(
 			'aria-controls',
 			screen.getByRole( 'listbox' ).id
@@ -110,6 +111,7 @@ describe( 'ComboboxControl popup relationship', () => {
 		rerender( <ComboboxControl { ...props } /> );
 
 		expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( input ).not.toHaveAttribute( 'aria-owns' );
 		expect( input ).toHaveAttribute(
 			'aria-controls',
 			screen.getByRole( 'listbox' ).id

@@ -64,7 +64,6 @@ export function UnForwardedTokenInput(
 			aria-expanded={ isExpanded }
 			aria-autocomplete="list"
 			aria-controls={ isExpanded ? suggestionsId : undefined }
-			aria-owns={ isExpanded ? suggestionsId : undefined }
 			aria-activedescendant={
 				// Only add the `aria-activedescendant` attribute when:
 				// - the user is actively interacting with the input (`hasFocus`)

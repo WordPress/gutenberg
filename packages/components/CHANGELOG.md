@@ -19,7 +19,7 @@
 
 ### Bug Fixes
 
--   `ComboboxControl`, `FormTokenField`: Link inputs to their rendered suggestions popup with `aria-controls`. Keep ComboboxControl popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
+-   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
 -   `Card`: Use theme tokens for borders, corners, and spacing ([#85857](https://github.com/WordPress/gutenberg/pull/85857)).
 -   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).

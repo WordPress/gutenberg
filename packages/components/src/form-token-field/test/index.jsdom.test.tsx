@@ -2521,7 +2521,7 @@ describe( 'FormTokenField', () => {
 			expect( suggestionList ).toBeVisible();
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
 			expect( input ).toHaveAttribute(
 				'aria-controls',
 				suggestionList.id
@@ -2537,7 +2537,7 @@ describe( 'FormTokenField', () => {
 				{ name: 'Pine', selected: true }
 			);
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
 			expect( input ).toHaveAttribute(
 				'aria-controls',
 				suggestionList.id
