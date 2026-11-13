@@ -223,7 +223,8 @@ describe( 'WidgetDashboard.Policy instance operations', () => {
 	beforeEach( () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: false,
+			selectMeasureRef: () => {},
+			presentation: 'inline',
 		} );
 	} );
 

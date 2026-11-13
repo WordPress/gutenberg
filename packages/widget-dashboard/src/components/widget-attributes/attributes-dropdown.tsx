@@ -14,6 +14,7 @@ import {
 	Stack,
 	VisuallyHidden,
 } from '@wordpress/ui';
+import { withSurface } from './with-surface';
 import styles from './widget-attributes.module.css';
 import type { WidgetAttributeValues } from '../../types';
 
@@ -68,6 +69,10 @@ export function AttributesDropdown( {
 		} ),
 		[ fields ]
 	);
+	const dropdownFields = useMemo(
+		() => withSurface( fields, 'dropdown' ),
+		[ fields ]
+	);
 
 	return (
 		<Popover.Root onOpenChange={ onOpenChange }>
@@ -95,7 +100,7 @@ export function AttributesDropdown( {
 
 					<DataForm< WidgetAttributeValues >
 						data={ data }
-						fields={ fields }
+						fields={ dropdownFields }
 						form={ form }
 						onChange={ onChange }
 					/>
