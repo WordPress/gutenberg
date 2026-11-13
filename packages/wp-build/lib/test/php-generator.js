@@ -1,5 +1,49 @@
+import { mkdtemp, mkdir, rm, writeFile } from 'fs/promises';
+import { tmpdir } from 'os';
+import path from 'path';
 import { describe, expect, it } from 'vitest';
-import { renderTemplateToString as generateTemplate } from '../php-generator.mjs';
+import {
+	getPhpReplacements,
+	renderTemplateToString as generateTemplate,
+} from '../php-generator.mjs';
+
+describe( 'getPhpReplacements', () => {
+	it( 'falls back to a hash of the build when package.json has no version', async () => {
+		const rootDir = await mkdtemp( path.join( tmpdir(), 'wp-build-php-' ) );
+		await writeFile(
+			path.join( rootDir, 'package.json' ),
+			JSON.stringify( { name: 'example' } )
+		);
+		await mkdir( path.join( rootDir, 'build', 'styles' ), {
+			recursive: true,
+		} );
+		await writeFile(
+			path.join( rootDir, 'build', 'styles', 'style.css' ),
+			'a{}'
+		);
+
+		try {
+			const { '{{VERSION}}': version } = await getPhpReplacements(
+				rootDir,
+				''
+			);
+			expect( version ).toMatch( /^[0-9a-f]{20}$/ );
+
+			await writeFile(
+				path.join( rootDir, 'build', 'styles', 'style.css' ),
+				'b{}'
+			);
+			const { '{{VERSION}}': changedVersion } = await getPhpReplacements(
+				rootDir,
+				''
+			);
+			expect( changedVersion ).toMatch( /^[0-9a-f]{20}$/ );
+			expect( changedVersion ).not.toBe( version );
+		} finally {
+			await rm( rootDir, { recursive: true, force: true } );
+		}
+	} );
+} );
 
 describe( 'page-wp-admin.php template', () => {
 	it( 'retains the Core Boot compatibility class on the mount element', async () => {
