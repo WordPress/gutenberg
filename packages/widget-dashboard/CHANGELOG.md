@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Widget header: collapse focused inline controls when they no longer fit, moving focus to the "Widget controls" button, so they are no longer clipped at the tile edge.
 -   Widget header: reserve the full title width when fitting inline controls and add a buffer before expanding them to prevent flicker while resizing ([#86794](https://github.com/WordPress/gutenberg/pull/86794)).
 -   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).
 

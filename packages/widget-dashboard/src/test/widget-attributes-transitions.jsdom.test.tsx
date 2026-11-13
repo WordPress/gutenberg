@@ -284,6 +284,43 @@ describe( 'WidgetAttributes presentation transitions', () => {
 		).toHaveFocus();
 	} );
 
+	it( 'collapses focused inline controls and moves focus to the trigger', async () => {
+		const user = userEvent.setup();
+		render( <Harness /> );
+		await screen.findByTestId( 'metric' );
+
+		/* eslint-disable testing-library/no-node-access */
+		const header = document.querySelector( '.style-widget-header' )!;
+		const identity = document.querySelector( '.style-identity' )!;
+		const inline = document.querySelector( '.style-inline-controls' )!;
+		const persistent = document.querySelector(
+			'.style-persistent-controls'
+		)!;
+		/* eslint-enable testing-library/no-node-access */
+		notifyResize( persistent, 32 );
+		notifyResize( inline, 150 );
+		notifyResize( identity, 120 );
+		notifyResize( header, 600 );
+
+		await user.click( screen.getByRole( 'combobox' ) );
+		expect( screen.getByRole( 'combobox' ) ).toHaveFocus();
+
+		// Space shrinks while the inline controls have focus: they collapse
+		// instead of clipping, and focus follows to the trigger.
+		notifyResize( header, 200 );
+		const trigger = await screen.findByRole( 'button', {
+			name: 'Widget controls',
+		} );
+		await waitFor( () => expect( trigger ).toHaveFocus() );
+
+		// The focused trigger holds the collapse while space grows back.
+		notifyResize( header, 600 );
+		expect( trigger ).toBeInTheDocument();
+
+		await user.tab();
+		expect( await screen.findByRole( 'combobox' ) ).toBeInTheDocument();
+	} );
+
 	it( 'keeps the trigger focused after the visible Close action as well', async () => {
 		const user = userEvent.setup();
 		const { header } = await renderCollapsed();
