@@ -3,7 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { settings } from '@wordpress/icons';
-import Tooltip from '../tooltip';
+import { Tooltip, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
 import {
 	CUSTOM_VALUE_SETTINGS,
@@ -83,6 +83,8 @@ export default function BoxInputControl( {
 	placeholder: placeholderProp,
 	...props
 }: BoxControlInputControlProps ) {
+	useEnableWpCompatOverlaySlot();
+
 	const defaultValuesToModify = getSidesToModify( side, sides );
 
 	const handleOnFocus = ( event: React.FocusEvent< HTMLInputElement > ) => {
@@ -205,27 +207,40 @@ export default function BoxInputControl( {
 			/>
 			{ showCustomValueControl && (
 				<>
-					<Tooltip placement="top-end" text={ LABELS[ side ] }>
-						<UnitControl
-							{ ...props }
-							min={ min }
-							units={ units }
-							className={ clsx(
-								styles[ 'unit-control' ],
-								'component-box-control__unit-control'
-							) }
+					<Tooltip.Root>
+						<Tooltip.Trigger
 							id={ inputId }
-							isPressEnterToChange
-							disableUnits={ isMixed || isMixedUnit }
-							value={ usedValue }
-							onChange={ handleOnValueChange }
-							onUnitChange={ handleOnUnitChange }
-							onFocus={ handleOnFocus }
-							label={ LABELS[ side ] }
-							placeholder={ mixedPlaceholder ?? placeholderProp }
-							hideLabelFromVision
+							render={
+								<UnitControl
+									{ ...props }
+									min={ min }
+									units={ units }
+									className={ clsx(
+										styles[ 'unit-control' ],
+										'component-box-control__unit-control'
+									) }
+									isPressEnterToChange
+									disableUnits={ isMixed || isMixedUnit }
+									value={ usedValue }
+									onChange={ handleOnValueChange }
+									onUnitChange={ handleOnUnitChange }
+									onFocus={ handleOnFocus }
+									label={ LABELS[ side ] }
+									placeholder={
+										mixedPlaceholder ?? placeholderProp
+									}
+									hideLabelFromVision
+								/>
+							}
 						/>
-					</Tooltip>
+						<Tooltip.Popup
+							positioner={
+								<Tooltip.Positioner side="top" align="end" />
+							}
+						>
+							{ LABELS[ side ] }
+						</Tooltip.Popup>
+					</Tooltip.Root>
 
 					<RangeControl
 						className={ styles[ 'range-control' ] }
