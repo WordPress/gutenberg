@@ -348,12 +348,26 @@ function TableEdit( {
 			return;
 		}
 
-		const { sectionName, columnIndex } = selectedCell;
+		// Delete every logical column the selected cell covers, from the last
+		// one, so that the indexes of the remaining ones don't shift.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		let newAttributes = attributes;
+		for (
+			let index = columnIndex + colspan - 1;
+			index >= columnIndex;
+			index--
+		) {
+			newAttributes = {
+				...newAttributes,
+				...deleteColumn( newAttributes, { columnIndex: index } ),
+			};
+		}
 
 		setSelectedCell();
-		setAttributes(
-			deleteColumn( attributes, { sectionName, columnIndex } )
-		);
+		setAttributes( newAttributes );
 	}
 
 	// Clear the selected cell when the block is deselected. Only react to the

@@ -1414,6 +1414,62 @@ describe( 'deleteColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'shrinks a cell that spans across the deleted column', () => {
+		const state = deleteColumn( tableWithRowspanHead, {
+			columnIndex: 3,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{ content: 'Grouped', tag: 'th', align: 'center' },
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{ cells: [ { content: 'Sub C', tag: 'th' } ] },
+		] );
+		expect(
+			state.body[ 0 ].cells.map( ( { content } ) => content )
+		).toEqual( [ 'A1', 'B1', 'C1', 'E1' ] );
+	} );
+
+	it( 'deletes cells by logical column in rows covered by a rowspan', () => {
+		const state = deleteColumn( tableWithRowspanHead, {
+			columnIndex: 2,
+		} );
+
+		// "Sub C" is the first cell of its row, but it is in column 2.
+		expect( state.head[ 1 ] ).toEqual( {
+			cells: [ { content: 'Sub D', tag: 'th' } ],
+		} );
+		expect(
+			state.body[ 0 ].cells.map( ( { content } ) => content )
+		).toEqual( [ 'A1', 'B1', 'D1', 'E1' ] );
+	} );
+
+	it( 'removes rows left empty and shrinks the cells spanning into them', () => {
+		const state = deleteColumn(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{ content: 'A', tag: 'td', rowspan: '2' },
+							{ content: 'B', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'C', tag: 'td' } ] },
+				],
+			} ),
+			{ columnIndex: 1 }
+		);
+
+		expect( state.body ).toEqual( [
+			{ cells: [ { content: 'A', tag: 'td' } ] },
+		] );
+	} );
 } );
 
 describe( 'toggleSection', () => {

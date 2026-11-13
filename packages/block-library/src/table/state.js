@@ -179,6 +179,25 @@ function setCellRowspan( cell, rowspan ) {
 }
 
 /**
+ * Returns a copy of the cell with the given colspan, omitting the attribute
+ * when the cell no longer spans multiple columns.
+ *
+ * @param {Object} cell    The cell attributes.
+ * @param {number} colspan The new colspan.
+ *
+ * @return {Object} The updated cell attributes.
+ */
+function setCellColspan( cell, colspan ) {
+	const newCell = { ...cell };
+	if ( colspan > 1 ) {
+		newCell.colspan = String( colspan );
+	} else {
+		delete newCell.colspan;
+	}
+	return newCell;
+}
+
+/**
  * Calculates the effective column count in a row, accounting for colspan values.
  *
  * @param {Object} row The row object containing cells.
@@ -571,19 +590,44 @@ export function deleteColumn( state, { columnIndex } ) {
 				return [ sectionName, section ];
 			}
 
-			return [
-				sectionName,
-				section
-					.map( ( row ) => ( {
-						cells:
-							row.cells.length >= columnIndex
-								? row.cells.filter(
-										( cell, index ) => index !== columnIndex
-									)
-								: row.cells,
-					} ) )
-					.filter( ( row ) => row.cells.length ),
-			];
+			const positions = getSectionCellPositions( section );
+
+			// A cell spanning multiple columns shrinks by one column instead
+			// of being removed.
+			let newSection = section.map( ( row, rowIndex ) => ( {
+				...row,
+				cells: row.cells.flatMap( ( cell, cellIndex ) => {
+					const { columnIndex: start, colspan } =
+						positions[ rowIndex ][ cellIndex ];
+
+					if (
+						columnIndex < start ||
+						columnIndex >= start + colspan
+					) {
+						return [ cell ];
+					}
+
+					return colspan > 1
+						? [ setCellColspan( cell, colspan - 1 ) ]
+						: [];
+				} ),
+			} ) );
+
+			// Remove rows left empty, shrinking the cells above that span into them.
+			for (
+				let rowIndex = newSection.length - 1;
+				rowIndex >= 0;
+				rowIndex--
+			) {
+				if ( isEmptyRow( newSection[ rowIndex ] ) ) {
+					newSection = deleteRow(
+						{ [ sectionName ]: newSection },
+						{ sectionName, rowIndex }
+					)[ sectionName ];
+				}
+			}
+
+			return [ sectionName, newSection ];
 		} )
 	);
 }
