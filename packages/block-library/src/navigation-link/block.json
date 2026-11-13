@@ -67,6 +67,15 @@
 		"reusable": false,
 		"html": false,
 		"__experimentalSlashInserter": true,
+		"color": {
+			"text": true,
+			"background": true,
+			"__experimentalSkipSerialization": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
+		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
@@ -86,6 +95,9 @@
 		}
 	},
 	"selectors": {
+		"color": {
+			"background": ".wp-block-navigation-link > .wp-block-navigation-item__content"
+		},
 		"states": {
 			"-current": ".wp-block-navigation .current-menu-item"
 		}
