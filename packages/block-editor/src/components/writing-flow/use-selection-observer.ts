@@ -1,4 +1,4 @@
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import {
 	create,
@@ -107,6 +107,7 @@ function getRichTextElement( node: Node ) {
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
+	const registry = useRegistry();
 	const {
 		multiSelect,
 		selectBlock,
@@ -131,6 +132,29 @@ export default function useSelectionObserver() {
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
+
+			// Selecting another block without moving the caret (e.g. clicking
+			// a spacer, or Backspace selecting a whole block) leaves the caret
+			// behind. Remove it, so the caret is only ever in the selected block.
+			let lastSelectedClientId = getSelectedBlockClientId();
+			const unsubscribe = registry.subscribe( () => {
+				const clientId = getSelectedBlockClientId();
+				if ( clientId === lastSelectedClientId ) {
+					return;
+				}
+				lastSelectedClientId = clientId;
+				// A window has a selection.
+				const selection = defaultView!.getSelection()!;
+				const { anchorNode } = selection;
+				if (
+					clientId &&
+					anchorNode &&
+					node.contains( anchorNode ) &&
+					getBlockClientId( anchorNode ) !== clientId
+				) {
+					selection.removeAllRanges();
+				}
+			}, blockEditorStore );
 
 			function onMouseDown( event: MouseEvent ) {
 				isTripleClick = event.detail === 3;
@@ -202,13 +226,6 @@ export default function useSelectionObserver() {
 					if (
 						! isMultiSelecting() &&
 						collapsedClientId &&
-						// Only keep the wrapper editable when the collapsed
-						// selection is in the block that is actually selected.
-						// A stale native selection may linger in a previously
-						// selected editable root block (e.g. Firefox does not
-						// always move it), which must not re-enable the wrapper
-						// after another block has been selected.
-						collapsedClientId === getSelectedBlockClientId() &&
 						canHostEditableRoot( collapsedClientId )
 					) {
 						setContentEditableWrapper( node, true );
@@ -554,6 +571,7 @@ export default function useSelectionObserver() {
 				true
 			);
 			return () => {
+				unsubscribe();
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
@@ -583,6 +601,6 @@ export default function useSelectionObserver() {
 				);
 			};
 		},
-		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
+		[ multiSelect, selectBlock, selectionChange, getBlockParents, registry ]
 	);
 }
