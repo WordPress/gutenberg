@@ -2,6 +2,12 @@ import type { MouseEventHandler, ReactNode } from 'react';
 
 export type NoticeAction = {
 	/**
+	 * A stable identifier, unique among this notice's actions. Supply it when
+	 * actions can be reordered or replaced. Actions without an ID keep
+	 * positional identity. This does not set an HTML ID.
+	 */
+	id?: string;
+	/**
 	 * The label for the action button.
 	 */
 	label: string;
@@ -96,6 +102,8 @@ export type NoticeProps = {
 	/**
 	 * An array of action objects. Each member object should contain:
 	 *
+	 * - `id`: `string` (optional), a stable identifier unique within the notice.
+	 *   Supply it when actions can be reordered or replaced.
 	 * - `label`: `string` containing the text of the button/link
 	 * - `url`: `string` OR `onClick`: `( event: SyntheticEvent ) => void` to specify
 	 *    what the action does.

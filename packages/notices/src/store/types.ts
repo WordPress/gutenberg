@@ -3,6 +3,12 @@
  */
 export type NoticeAction = {
 	/**
+	 * A stable identifier, unique among this inline notice's actions. Supply it when
+	 * actions can be reordered or replaced. Actions without an ID keep
+	 * positional identity. This does not set an HTML ID.
+	 */
+	id?: string;
+	/**
 	 * Message to use as action label.
 	 */
 	label: string;
