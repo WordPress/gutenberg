@@ -1192,8 +1192,6 @@ describe( 'ColorPicker', () => {
 			await waitFor( () =>
 				expect( speak ).toHaveBeenCalledWith( 'Copied to clipboard' )
 			);
-			// The button keeps its name, so the announcement is the only
-			// change a screen reader hears.
 			expect( copyButton ).toHaveAccessibleName( 'Copy' );
 			expect( copyButton ).toHaveFocus();
 		} );
