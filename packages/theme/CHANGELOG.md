@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 
+-   `ThemeProvider`: Carry near-gray background tints into generated neutral surfaces and strokes with a smooth chroma ceiling that stays close to the seed for faint tints ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
 -   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
 
 ### Internal
