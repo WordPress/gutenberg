@@ -5,8 +5,8 @@
  * @package gutenberg
  */
 class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
-	protected static $admin_id;
-	protected static $editor_id;
+	protected static int $admin_id;
+	protected static int $editor_id;
 	protected static $contributor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
@@ -864,6 +864,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'emoji outside the curated set' => array( 'note', '1f525', true, 'rest_comment_invalid_reaction', 400 ),
 			'uppercase hex key'             => array( 'note', '1F680', true, 'rest_comment_invalid_reaction', 400 ),
 			'emoji name instead of hex'     => array( 'note', 'heart', true, 'rest_comment_invalid_reaction', 400 ),
+			'markup around a valid key'     => array( 'note', '<b>2764</b>', true, 'rest_comment_invalid_reaction', 400 ),
 			'anonymous user'                => array( 'none', '2764', false, 'rest_comment_login_required', 401 ),
 			'raw content not a key'         => array( 'note', array( 'raw' => 'invalid_emoji' ), true, 'rest_comment_invalid_reaction', 400 ),
 			'content without raw'           => array( 'note', array( 'rendered' => '2764' ), true, 'rest_comment_invalid_reaction', 400 ),
@@ -962,7 +963,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			array_filter(
 				$remaining,
 				function ( $comment ) {
-					return '2764' === wp_strip_all_tags( $comment->comment_content );
+					return '2764' === $comment->comment_content;
 				}
 			)
 		);
@@ -1071,6 +1072,55 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertArrayHasKey( 'reaction_summary', $data );
 		$this->assertSame( 1, $data['reaction_summary']['2764']['count'] );
 		$this->assertSame( 0, $data['reaction_summary']['2764']['current_user_reaction'] );
+	}
+
+	/**
+	 * A row whose content is not a reaction key, written by something other
+	 * than this controller, is left out and not counted as another emoji.
+	 *
+	 * @dataProvider data_malformed_reaction_content
+	 *
+	 * @param string $content The stored reaction content.
+	 */
+	public function test_reaction_summary_omits_malformed_reaction_content( string $content ): void {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id, '2764' );
+		$this->create_reaction( $post_id, $note_id, self::$admin_id, $content );
+
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id );
+		$request->set_param( 'context', 'edit' );
+		$data = rest_get_server()->dispatch( $request )->get_data();
+		$this->assertIsArray( $data );
+
+		$summary = $data['reaction_summary'];
+		$this->assertIsArray( $summary );
+		// PHP casts the numeric string key to an integer.
+		$this->assertSame( array( 2764 ), array_keys( $summary ) );
+		$this->assertSame(
+			array(
+				'count'                 => 1,
+				'current_user_reaction' => $reaction_id,
+			),
+			$summary['2764']
+		);
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_malformed_reaction_content(): array {
+		return array(
+			'markup around a key'        => array( '<b>2764</b>' ),
+			'not hex'                    => array( 'heart' ),
+			'uppercase hex'              => array( '1F680' ),
+			'beyond the last code point' => array( '110000' ),
+			'surrogate'                  => array( 'd83d' ),
+			'trailing separator'         => array( '1f44d-' ),
+		);
 	}
 
 	/**
