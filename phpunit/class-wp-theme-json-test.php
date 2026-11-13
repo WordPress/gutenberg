@@ -3624,6 +3624,88 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Tests that removing insecure properties keeps a single uniform scale,
+	 * and drops any other scale.
+	 *
+	 * @dataProvider data_remove_insecure_properties_scale
+	 *
+	 * @param mixed $scale    Scale to save.
+	 * @param bool  $is_kept  Whether the scale is kept.
+	 */
+	public function test_remove_insecure_properties_keeps_valid_scale( $scale, $is_kept ) {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate' => '5deg',
+								'scale'  => $scale,
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$transform = array( 'rotate' => '5deg' );
+		if ( $is_kept ) {
+			$transform['scale'] = $scale;
+		}
+		$this->assertSame( $transform, $actual['styles']['blocks']['core/heading']['transform'] );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_remove_insecure_properties_scale() {
+		return array(
+			'number'     => array( 1.2, true ),
+			'zero'       => array( 0, true ),
+			'string'     => array( '0.75', true ),
+			'percentage' => array( '120%', true ),
+			'negative'   => array( -1, false ),
+			'two values' => array( '1.2 1.5', false ),
+			'calc()'     => array( 'calc(1 + 0.2)', false ),
+			'var()'      => array( 'var(--scale)', false ),
+		);
+	}
+
+	/**
+	 * Tests that a block's scale outputs the individual `scale` property in
+	 * Global Styles.
+	 */
+	public function test_get_stylesheet_outputs_block_scale() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/heading' => array(
+							'transform' => array(
+								'rotate' => '5deg',
+								'scale'  => 1.2,
+							),
+						),
+						'core/group'   => array(
+							'transform' => array( 'scale' => 'calc(1 + 1)' ),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-heading){rotate: 5deg;scale: 1.2;}', $stylesheet );
+		$this->assertStringNotContainsString( 'calc(1 + 1)', $stylesheet );
+		$this->assertStringNotContainsString( 'transform', $stylesheet );
+	}
+
 	public function test_get_stylesheet_custom_root_selector() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

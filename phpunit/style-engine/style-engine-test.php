@@ -399,6 +399,64 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(),
 			),
 
+			'inline_valid_transform_scale_number_style'    => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => 1.2 ),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'scale:1.2;',
+					'declarations' => array(
+						'scale' => '1.2',
+					),
+				),
+			),
+
+			'inline_valid_transform_scale_percent_style'   => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => '120%' ),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'scale:120%;',
+					'declarations' => array(
+						'scale' => '120%',
+					),
+				),
+			),
+
+			'inline_negative_transform_scale_style'        => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => -1 ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_list_transform_scale_style'            => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => '1.2 1.5' ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_function_transform_scale_style'        => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => 'var(--scale)' ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_scale_style'         => array(
+				'block_styles'    => array(
+					'transform' => array( 'scale' => "1.2\n" ),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(

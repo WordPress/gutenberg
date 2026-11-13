@@ -263,7 +263,8 @@ The settings section has the following structure:
 		},
 		"transform": {
 			"rotate": true,
-			"translate": true
+			"translate": true,
+			"scale": true
 		},
 		"typography": {
 			"customFontSize": true,

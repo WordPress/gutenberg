@@ -1941,6 +1941,80 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs a scale with a rotation on the block', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: {
+								rotate: '5deg',
+								scale: 1.2,
+							},
+							'@mobile': {
+								transform: {
+									scale: '90%',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': {
+					selector: '.wp-block-heading',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-heading){rotate: 5deg;scale: 1.2;}@media (width <= 480px){:root :where(.wp-block-heading){scale: 90%;}}'
+			);
+		} );
+
+		it( 'outputs no scale that is not a single non-negative number or percentage', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/heading': {
+							transform: { scale: 'calc(1 + 1)' },
+						},
+						'core/group': {
+							transform: { scale: -1 },
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/heading': { selector: '.wp-block-heading' },
+				'core/group': { selector: '.wp-block-group' },
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).not.toContain( 'scale' );
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},

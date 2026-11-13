@@ -1518,6 +1518,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 									'transform' => array(
 										'rotate'    => '20deg',
 										'translate' => array( 'x' => '10px' ),
+										'scale'     => 2,
 									),
 								),
 							),
@@ -1533,6 +1534,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'color:#00ff00 !important;', $actual_stylesheet );
 		$this->assertStringNotContainsString( 'rotate', $actual_stylesheet );
 		$this->assertStringNotContainsString( 'translate', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'scale', $actual_stylesheet );
 	}
 
 	/**
@@ -1874,6 +1876,92 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'from Global Styles'     => array(
 				array( '@mobile' => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ) ),
 				'@media (width <= 480px){.%s{translate:3rem 1rem !important;}}',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a scale in a state outputs the individual `scale` property
+	 * only for a block that supports `transform.scale`, never for an element.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 *
+	 * @dataProvider data_scale_states
+	 *
+	 * @param string $block_name    Block name.
+	 * @param string $block_content Rendered block content.
+	 * @param array  $style         Block style attribute.
+	 * @param string $expected_css  Expected CSS, with `%s` for the state class.
+	 */
+	public function test_scale_state_generates_scale_css_for_supported_blocks_only( $block_name, $block_content, $style, $expected_css ) {
+		$this->ensure_block_registered( $block_name );
+
+		$actual = gutenberg_render_block_states_support(
+			$block_content,
+			array(
+				'blockName' => $block_name,
+				'attrs'     => array( 'style' => $style ),
+			)
+		);
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertSame( sprintf( $expected_css, $matches[0] ?? '' ), $actual_stylesheet );
+		$this->assertStringNotContainsString( 'transform', $actual_stylesheet );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_scale_states() {
+		$group = '<div class="wp-block-group"><p><a href="#">Link</a></p></div>';
+
+		return array(
+			'viewport'                     => array(
+				'core/image',
+				'<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>',
+				array(
+					'@mobile' => array(
+						'transform' => array(
+							'rotate' => '5deg',
+							'scale'  => 1.2,
+						),
+					),
+				),
+				'@media (width <= 480px){.%s{rotate:5deg !important;scale:1.2 !important;}}',
+			),
+			'viewport zero'                => array(
+				'core/group',
+				$group,
+				array( '@mobile' => array( 'transform' => array( 'scale' => 0 ) ) ),
+				'@media (width <= 480px){.%s{scale:0 !important;}}',
+			),
+			'viewport invalid'             => array(
+				'core/group',
+				$group,
+				array( '@mobile' => array( 'transform' => array( 'scale' => 'var(--x)' ) ) ),
+				'',
+			),
+			'hover, no scale support'      => array(
+				'core/button',
+				'<div class="wp-block-button"><a class="wp-block-button__link">Click</a></div>',
+				array( ':hover' => array( 'transform' => array( 'scale' => 1.2 ) ) ),
+				'',
+			),
+			'viewport element'             => array(
+				'core/group',
+				$group,
+				array( '@mobile' => array( 'elements' => array( 'link' => array( 'transform' => array( 'scale' => 2 ) ) ) ) ),
+				'',
+			),
+			'viewport element hover state' => array(
+				'core/group',
+				$group,
+				array( '@mobile' => array( 'elements' => array( 'link' => array( ':hover' => array( 'transform' => array( 'scale' => 2 ) ) ) ) ) ),
+				'',
 			),
 		);
 	}
