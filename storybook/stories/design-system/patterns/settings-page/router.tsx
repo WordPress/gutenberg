@@ -138,7 +138,7 @@ const ScreenContext = createContext< ReactNode >( null );
 
 /**
  * Moves focus to the new `Page` region when a navigation removes the focused
- * link, as `@wordpress/boot` does for admin pages. Focus would otherwise fall
+ * link, as `@wordpress/boot` will once #86701 lands. Focus would otherwise fall
  * back to the document, and screen readers wouldn't announce the new page.
  */
 function useFocusAfterNavigate() {

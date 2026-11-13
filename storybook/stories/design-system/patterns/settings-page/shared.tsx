@@ -12,7 +12,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Button, Card, Notice, Stack, Text, Tooltip } from '@wordpress/ui';
+import { Button, Card, Notice, Stack, Text } from '@wordpress/ui';
 import type { SubpageStatus } from './router';
 import styles from './style.module.css';
 import { UnsavedChangesGuard } from './unsaved-changes';
@@ -104,6 +104,11 @@ export function useManualSave< T extends object >(
 
 	const isDirty = JSON.stringify( data ) !== JSON.stringify( saved );
 
+	// Once the draft matches what's saved, there's nothing left to retry.
+	if ( hasFailed && ! isDirty ) {
+		setHasFailed( false );
+	}
+
 	const onChange = useCallback( ( edits: Partial< T > ) => {
 		setData( ( previous ) => ( { ...previous, ...edits } ) );
 	}, [] );
@@ -128,7 +133,7 @@ export function useManualSave< T extends object >(
  * Submits the form it belongs to, so the form's own validation runs first:
  * invalid fields show their errors and take focus instead of saving. It stays
  * enabled while fields are invalid, and is only disabled while there is
- * nothing to save, which its tooltip explains, or while saving.
+ * nothing to save or while saving.
  */
 export function SaveButton( {
 	form,
@@ -144,23 +149,16 @@ export function SaveButton( {
 	children?: ReactNode;
 } ) {
 	return (
-		<Tooltip.Root disabled={ hasChanges }>
-			<Tooltip.Trigger
-				render={
-					<Button
-						type="submit"
-						form={ form }
-						size={ size }
-						disabled={ ! hasChanges || isSaving }
-						loading={ isSaving }
-						loadingAnnouncement="Saving changes"
-					>
-						{ children }
-					</Button>
-				}
-			/>
-			<Tooltip.Popup>No unsaved changes</Tooltip.Popup>
-		</Tooltip.Root>
+		<Button
+			type="submit"
+			form={ form }
+			size={ size }
+			disabled={ ! hasChanges || isSaving }
+			loading={ isSaving }
+			loadingAnnouncement="Saving changes"
+		>
+			{ children }
+		</Button>
 	);
 }
 
@@ -257,7 +255,7 @@ export function SettingsFormPage< T extends object >( {
 					{ children( { data, onChange } ) }
 				</SettingsContent>
 			</form>
-			<UnsavedChangesGuard isDirty={ isDirty } />
+			<UnsavedChangesGuard isDirty={ isDirty } isSaving={ isSaving } />
 		</Page>
 	);
 }

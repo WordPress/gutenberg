@@ -47,13 +47,13 @@ Plan a settings page like a document's outline before choosing how it looks. The
 These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs), the usual choice for settings: edits are held in a draft until the user clicks “Save changes”. Autosave suits pages of independent preferences that each take effect on their own. If you adopt it, remove the Save button rather than mixing the two models on one page.
 
 -   **One “Save changes” button per page**, in the `Page` header actions. It covers every field on that page and nothing else.
--   **Disabled only when there is nothing to save**, with a “No unsaved changes” tooltip, and busy while saving.
+-   **Disabled only when there is nothing to save**, and busy while saving. Don't explain the disabled state with a tooltip: tooltips aren't available to screen readers or on touch devices.
 -   **Invalid fields don't disable Save.** The fields sit in a `<form>`, and Save submits it: invalid fields show their errors below them and the first one takes focus, and nothing is saved until they're fixed. The record editors work the same way.
 -   **Edits made while saving stay unsaved.** People can keep typing while a save is in progress. Once it finishes, anything they changed in the meantime is still an unsaved change, and a record editor stays open to hold it.
 -   **Checkboxes, not switches, for on/off settings.** A switch implies the change takes effect immediately, which isn't true until Save is clicked. Switches belong on autosave surfaces.
 -   **A snackbar confirms the save.** Errors belong next to the field, or in a `Notice` at the top of the form when a save fails or only partly succeeds.
 -   **Pages that only list records have no page-level Save.** Each record editor saves on its own, and the header holds the action that adds a record.
--   **Leaving with unsaved edits asks first.** Switching pages, following a breadcrumb or closing a record editor with Escape asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
+-   **Leaving with unsaved edits asks first.** Switching pages, following a breadcrumb or closing a record editor with Escape asks “Discard unsaved changes?”, and reloading or closing the tab shows the browser’s own warning. Navigating while a save is in progress waits for it to finish, then asks only if something changed after clicking Save. Try it in any template by changing a field, then navigating away. See [Unsaved changes on exit](?path=/docs/design-system-patterns-save-submit--docs#unsaved-changes-on-exit).
 
 ### When a save fails
 
@@ -68,9 +68,9 @@ Keep the draft, so nothing the user entered is lost, and explain the failure in 
 
 Moving between adjacent pages and subpages replaces the page, including the link that was just used. Without help, keyboard focus falls back to the start of the document and screen readers don't announce the new page.
 
-Admin pages built on `@wordpress/boot` handle this for you: when a navigation removes the focused element, focus moves to the new page's `Page` region, and screen readers announce it by name. The region takes its name from `title`, so a subpage whose breadcrumbs replace the title needs an `ariaLabel` naming the page, such as "Card payments". Don't move focus yourself on those pages. If your app routes without `@wordpress/boot`, do the same after each navigation that loses focus.
+The templates' in-canvas router handles this: when a navigation removes the focused element, focus moves to the new page's `Page` region, and screen readers announce it by name. Try it by following a breadcrumb with the keyboard. `@wordpress/boot` currently updates and announces the route title, and will move focus the same way once [#86701](https://github.com/WordPress/gutenberg/pull/86701) lands. Until then, or if your app routes without `@wordpress/boot`, move focus to the `Page` region yourself after each navigation that loses focus.
 
-The templates' in-canvas router follows the same behavior. Try it by following a breadcrumb with the keyboard.
+The region takes its name from `title`, so give it an `ariaLabel` whenever the title doesn't identify the page: on a subpage whose breadcrumbs replace the title, name it after the page, such as “Card payments”. On adjacent pages that share a title, name each one after its page, such as “Payments settings”.
 
 ## Simple settings page
 

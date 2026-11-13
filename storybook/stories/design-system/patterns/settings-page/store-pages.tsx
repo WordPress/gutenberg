@@ -29,6 +29,14 @@ export const ADJACENT_PAGES = [
 	{ label: 'Emails', href: '/emails' },
 ];
 
+// Adjacent pages share the visible "Settings" title, so each page region
+// needs its own name for screen readers to identify the destination.
+const ADJACENT_PAGE_REGION_LABELS: Record< string, string > = {
+	'/general': 'General settings',
+	'/payments': 'Payments settings',
+	'/emails': 'Email settings',
+};
+
 /**
  * The saved values for every page, held above the router so they survive
  * navigation.
@@ -86,11 +94,13 @@ export const SETTINGS_CRUMB = {
 
 /**
  * Header props for a page that sits among adjacent pages. The title names
- * the area, and the navigation shows which page is current.
+ * the area, the navigation shows which page is current, and the region's
+ * label names the page itself.
  */
 export function adjacentPageHeader( currentHref: string ): HeaderProps {
 	return {
 		title: 'Settings',
+		ariaLabel: ADJACENT_PAGE_REGION_LABELS[ currentHref ],
 		navigation: { items: ADJACENT_PAGES, currentHref },
 		components: { link: RouterNavLink },
 	};

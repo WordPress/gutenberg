@@ -52,12 +52,27 @@ export function DiscardChangesDialog( {
 
 /**
  * Guards a manual-save page: navigating away with unsaved edits asks first.
+ * Navigating during a save waits for it to settle, then asks only if the
+ * draft still differs from what was saved.
  */
-export function UnsavedChangesGuard( { isDirty }: { isDirty: boolean } ) {
-	const blocker = useNavigationBlocker( isDirty );
+export function UnsavedChangesGuard( {
+	isDirty,
+	isSaving,
+}: {
+	isDirty: boolean;
+	isSaving: boolean;
+} ) {
+	const blocker = useNavigationBlocker( isDirty || isSaving );
+	const isBlocked = blocker.status === 'blocked';
+	const shouldProceed = isBlocked && ! isSaving && ! isDirty;
+	useEffect( () => {
+		if ( shouldProceed ) {
+			blocker.proceed?.();
+		}
+	}, [ shouldProceed, blocker ] );
 	return (
 		<DiscardChangesDialog
-			open={ blocker.status === 'blocked' }
+			open={ isBlocked && ! isSaving && isDirty }
 			onKeepEditing={ () => blocker.reset?.() }
 			onDiscard={ () => blocker.proceed?.() }
 		/>
