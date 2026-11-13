@@ -2,6 +2,68 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+### Documentation
+
+-   `Page`: Add descriptions for the component and all of its props ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
+
+## 3.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+
+## 3.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.12.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+### Internal
+
+-   Export `ADMIN_THEME_COLORS` from its own module, without adding it to the package's exports, so tooling in the repository can read the bundled admin colour schemes instead of copying them ([#82425](https://github.com/WordPress/gutenberg/pull/82425)).
+
+## 2.11.0 (2026-09-23)
+
+## 2.10.0 (2026-09-10)
+
+### Internal
+
+-   Stop publishing the `src` directory to npm. The package's `exports` field only exposes the built artifacts, so the source files were unreachable by consumers and only inflated the package size ([#77285](https://github.com/WordPress/gutenberg/pull/77285)).
+
+## 2.9.0 (2026-08-26)
+
+### Bug Fixes
+
+-   `getAdminThemeColors`: Fix the primary color of the Fresh scheme ([#81618](https://github.com/WordPress/gutenberg/pull/81618)).
+-   `Page`: Truncate long titles with an ellipsis instead of overflowing the page horizontally ([#81954](https://github.com/WordPress/gutenberg/pull/81954)).
+
+### New Features
+
+-   `Page`: Add a `navigation` prop (`{ items, currentHref }`) and a `components.link` override for link-based navigation between sections, rendered in the page header ([#79746](https://github.com/WordPress/gutenberg/pull/79746)).
+
+### Internal
+
+-   Point tsconfig references at split dependencies' build projects. ([#81515](https://github.com/WordPress/gutenberg/pull/81515), [#81518](https://github.com/WordPress/gutenberg/pull/81518))
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 2.8.0 (2026-08-12)
+
 ### Bug Fixes
 
 -   `Breadcrumbs`: reset the list item margin that wp-admin's `common.css` applies, which left the trail misaligned with the rest of the page header ([#81134](https://github.com/WordPress/gutenberg/pull/81134)).

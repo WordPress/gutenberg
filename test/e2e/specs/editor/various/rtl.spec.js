@@ -148,7 +148,7 @@ test.describe( 'RTL', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await pageUtils.pressKeys( 'primary+b' );
 		await page.keyboard.type( ARABIC_ONE );

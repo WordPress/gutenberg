@@ -25,7 +25,7 @@ class Test_Widget extends WP_Widget {
 	/**
 	 * Outputs the content for the widget instance.
 	 *
-	 * @param array $args Display arguments including 'before_title', 'after_title',
+	 * @param array $args     Display arguments including 'before_title', 'after_title',
 	 *                        'before_widget', and 'after_widget'.
 	 * @param array $instance Settings for the current Block widget instance.
 	 */

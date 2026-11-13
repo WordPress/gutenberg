@@ -253,7 +253,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 		);
 
 		gutenberg_render_elements_support_styles( $block );
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertMatchesRegularExpression(
 			$expected_styles,

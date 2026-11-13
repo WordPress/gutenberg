@@ -2,6 +2,57 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching theme-aware colors for pressed header buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+
+## 7.1.0 (2026-11-04)
+
+## 7.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+
+## 6.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 6.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
+## 6.55.0 (2026-09-10)
+
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
+-   Widget areas: Use the `layout` icon instead of the default block icon ([#61028](https://github.com/WordPress/gutenberg/issues/61028)).
+
+### Bug Fixes
+
+-   `WelcomeGuide`: Keep the modal close icon white on hover now that it is stroke-based. ([#78812](https://github.com/WordPress/gutenberg/pull/78812))
+-   Prevent an error in `canInsertBlockInWidgetArea` when no widget area blocks are present.
+
+### Internal
+
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+-   Remove unused dependency `@wordpress/reusable-blocks` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 6.54.0 (2026-08-26)
+
+## 6.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Wrap the widgets editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81173](https://github.com/WordPress/gutenberg/pull/81173)).

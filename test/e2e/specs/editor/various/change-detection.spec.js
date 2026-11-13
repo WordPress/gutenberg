@@ -78,7 +78,7 @@ test.describe( 'Change detection', () => {
 
 		// Toggle post as needing review (not persisted for autosave).
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Change status:' } ).click();
+		await page.getByRole( 'button', { name: 'Edit Status' } ).click();
 		await page.getByRole( 'radio', { name: 'Pending' } ).click();
 		// Force autosave to occur immediately.
 		await Promise.all( [
@@ -167,7 +167,7 @@ test.describe( 'Change detection', () => {
 		changeDetectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -193,7 +193,7 @@ test.describe( 'Change detection', () => {
 		changeDetectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Hello World' );
 
@@ -241,6 +241,7 @@ test.describe( 'Change detection', () => {
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' )
 				.getByText(
 					'Updating failed because you were offline. Please verify your connection and try again.'
 				)
@@ -379,7 +380,7 @@ test.describe( 'Change detection', () => {
 	} ) => {
 		// Enter content.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -435,7 +436,7 @@ test.describe( 'Change detection', () => {
 
 		// Insert a paragraph.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Hello, World!' );
 
@@ -456,7 +457,7 @@ test.describe( 'Change detection', () => {
 			.click();
 		await page
 			.getByRole( 'menu', { name: 'Typography options' } )
-			.getByRole( 'menuitemcheckbox', { name: 'Show drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'drop cap, show' } )
 			.click();
 
 		await page
@@ -505,7 +506,7 @@ test.describe( 'Change detection', () => {
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello World' );
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 

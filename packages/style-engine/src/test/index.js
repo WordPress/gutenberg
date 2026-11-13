@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getCSSRules, compileCSS } from '../index';
 
 describe( 'generate', () => {
@@ -76,6 +77,7 @@ describe( 'generate', () => {
 						textShadow: '1px 1px 2px red',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
+						textWrap: 'pretty',
 					},
 					outline: {
 						offset: '2px',
@@ -89,7 +91,7 @@ describe( 'generate', () => {
 				}
 			)
 		).toEqual(
-			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-shadow: 1px 1px 2px red; text-transform: uppercase; }"
+			".some-selector { color: #cccccc; background: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(33,32,33) 42%,rgb(65,88,208) 100%); background-color: #111111; min-height: 50vh; min-width: 25vw; object-fit: cover; outline-color: red; outline-style: dashed; outline-offset: 2px; outline-width: 4px; margin-top: 11px; margin-right: 12px; margin-bottom: 13px; margin-left: 14px; padding-top: 10px; padding-bottom: 5px; font-family: 'Helvetica Neue',sans-serif; font-size: 2.2rem; font-style: italic; font-weight: 800; letter-spacing: 12px; line-height: 3.3; column-count: 2; text-decoration: line-through; text-shadow: 1px 1px 2px red; text-transform: uppercase; text-wrap: pretty; }"
 		);
 	} );
 
@@ -258,6 +260,7 @@ describe( 'getCSSRules', () => {
 						textShadow: '1px 1px 2px red',
 						letterSpacing: '12px',
 						textTransform: 'uppercase',
+						textWrap: 'pretty',
 					},
 					outline: {
 						offset: '2px',
@@ -389,6 +392,11 @@ describe( 'getCSSRules', () => {
 			},
 			{
 				selector: '.some-selector',
+				key: 'textWrap',
+				value: 'pretty',
+			},
+			{
+				selector: '.some-selector',
 				key: 'boxShadow',
 				value: '10px 10px red',
 			},
@@ -445,6 +453,78 @@ describe( 'getCSSRules', () => {
 				value: '11px',
 			},
 		] );
+	} );
+
+	it( 'should output backgroundClip rule for non-text values', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'border-box',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundClip',
+				value: 'border-box',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-text-fill-color',
+				value: 'currentColor',
+			},
+		] );
+	} );
+
+	it( 'should output backgroundClip rules with vendor prefixes for text value', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'text',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [
+			{
+				selector: '.some-selector',
+				key: 'backgroundClip',
+				value: 'text',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-background-clip',
+				value: 'text',
+			},
+			{
+				selector: '.some-selector',
+				key: '-webkit-text-fill-color',
+				value: 'transparent',
+			},
+		] );
+	} );
+
+	it( 'should not output backgroundClip rules for invalid values', () => {
+		expect(
+			getCSSRules(
+				{
+					background: {
+						backgroundClip: 'invalid-value',
+					},
+				},
+				{
+					selector: '.some-selector',
+				}
+			)
+		).toEqual( [] );
 	} );
 
 	it( 'should output background image value when that value is a string', () => {

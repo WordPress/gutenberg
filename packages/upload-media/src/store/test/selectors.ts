@@ -1,3 +1,5 @@
+import { describe, expect, it, vi } from 'vitest';
+import * as privateSelectors from '../private-selectors';
 import {
 	getItems,
 	isUploading,
@@ -6,6 +8,7 @@ import {
 } from '../selectors';
 import {
 	getActiveUploadCount,
+	getFailureCount,
 	getActiveImageProcessingCount,
 	getActiveVideoProcessingCount,
 	getFailedItems,
@@ -23,14 +26,35 @@ import {
 } from '../types';
 
 describe( 'selectors', () => {
+	describe( 'getFailureCount', () => {
+		it( 'should return the number of failed uploads', () => {
+			const state: State = {
+				queue: [],
+				queueStatus: 'active',
+				failureCount: 3,
+				blobUrls: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+			};
+
+			expect( getFailureCount( state ) ).toBe( 3 );
+		} );
+	} );
+
 	describe( 'getItems', () => {
 		it( 'should return empty array by default', () => {
 			const state: State = {
 				queue: [],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -53,9 +77,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -78,9 +105,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -105,9 +135,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -137,9 +170,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -173,9 +209,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -192,9 +231,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -220,9 +262,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -276,9 +321,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -300,9 +348,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -332,9 +383,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -361,9 +415,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'active',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -375,13 +432,15 @@ describe( 'selectors', () => {
 
 	describe( 'removed selectors', () => {
 		it( 'isUploadingToPost is no longer exported', () => {
-			const privateSelectors = require( '../private-selectors' );
-			expect( privateSelectors.isUploadingToPost ).toBeUndefined();
+			expect( privateSelectors ).not.toHaveProperty(
+				'isUploadingToPost'
+			);
 		} );
 
 		it( 'getPausedUploadForPost is no longer exported', () => {
-			const privateSelectors = require( '../private-selectors' );
-			expect( privateSelectors.getPausedUploadForPost ).toBeUndefined();
+			expect( privateSelectors ).not.toHaveProperty(
+				'getPausedUploadForPost'
+			);
 		} );
 	} );
 
@@ -429,9 +488,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 
@@ -452,9 +514,12 @@ describe( 'selectors', () => {
 					},
 				] as QueueItem[],
 				queueStatus: 'paused',
+				failureCount: 0,
 				blobUrls: {},
 				settings: {
-					mediaUpload: jest.fn(),
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
 				},
 			};
 

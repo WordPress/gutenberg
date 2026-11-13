@@ -1,12 +1,13 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import { Popover as WCPopover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
+import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
@@ -46,7 +47,7 @@ export function CollaboratorsList( {
 	};
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			placement="bottom"
 			offset={ 8 }
@@ -72,6 +73,9 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-items">
 					{ activeCollaborators.map( ( collaboratorState ) => {
 						const isCurrentUser = collaboratorState.isMe;
+						const displayName = getCollaboratorDisplayName(
+							collaboratorState.collaboratorInfo
+						);
 						return (
 							<button
 								key={ collaboratorState.clientId }
@@ -88,16 +92,15 @@ export function CollaboratorsList( {
 										collaboratorState.collaboratorInfo
 											.avatar_urls
 									) }
-									name={
-										collaboratorState.collaboratorInfo.name
-									}
+									name={ displayName }
 									borderColor={
 										isCurrentUser
 											? 'var(--wp-admin-theme-color)'
 											: getAvatarBorderColor(
 													collaboratorState
-														.collaboratorInfo.id
-											  )
+														.collaboratorInfo.id ??
+														collaboratorState.clientId
+												)
 									}
 									dimmed={ ! collaboratorState.isConnected }
 								/>
@@ -105,8 +108,7 @@ export function CollaboratorsList( {
 									<div className="editor-collaborators-presence__list-item-name">
 										{ isCurrentUser
 											? __( 'You' )
-											: collaboratorState.collaboratorInfo
-													.name }
+											: displayName }
 									</div>
 								</div>
 							</button>
@@ -114,6 +116,6 @@ export function CollaboratorsList( {
 					} ) }
 				</div>
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

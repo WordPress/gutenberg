@@ -290,12 +290,8 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	$body_content = $processor->get_updated_html();
 
 	// Adds a button alongside image in the body content.
-	$img = null;
-	preg_match( '/<img[^>]+>/', $body_content, $img );
-
 	$button =
-		$img[0]
-		. '<button
+		'<button
 			class="lightbox-trigger"
 			type="button"
 			aria-haspopup="dialog"
@@ -310,7 +306,26 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			</svg>
 		</button>';
 
-	$body_content = preg_replace( '/<img[^>]+>/', $button, $body_content );
+	$button_processor = new class( $body_content ) extends WP_HTML_Tag_Processor {
+		/**
+		 * Inserts HTML immediately after the current token.
+		 *
+		 * @since 7.1.4
+		 *
+		 * @param string $html HTML to insert.
+		 */
+		public function block_core_image_insert_after( string $html ) {
+			$this->set_bookmark( 'here' );
+			$span = $this->bookmarks['here'];
+
+			$this->lexical_updates[] = new WP_HTML_Text_Replacement( $span->start + $span->length, 0, $html );
+		}
+	};
+
+	if ( $button_processor->next_tag( 'img' ) ) {
+		$button_processor->block_core_image_insert_after( $button );
+	}
+	$body_content = $button_processor->get_updated_html();
 
 	add_action( 'wp_footer', 'block_core_image_print_lightbox_overlay' );
 
@@ -363,13 +378,13 @@ function block_core_image_print_lightbox_overlay() {
 			data-wp-on--touchstart="actions.handleTouchStart"
 			data-wp-on--touchmove="actions.handleTouchMove"
 			data-wp-on--touchend="actions.handleTouchEnd"
-			data-wp-on--click="actions.hideLightbox"
+			data-wp-on--touchcancel="actions.handleTouchCancel"
 			data-wp-on-window--resize="callbacks.setOverlayStyles"
 			data-wp-on-window--scroll="actions.handleScroll"
 			data-wp-bind--style="state.overlayStyles"
 			tabindex="-1"
 			>
-				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-close-button" data-wp-bind--aria-label="state.closeButtonAriaLabel">
+				<button type="button" style="fill:{$close_button_color}" class="wp-lightbox-close-button" data-wp-on--click="actions.hideLightbox" data-wp-bind--aria-label="state.closeButtonAriaLabel">
 					<span class="wp-lightbox-close-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$close_button_icon}</span>
 					<span class="wp-lightbox-close-text" data-wp-bind--hidden="!state.hasNavigationText">{$close_button_text}</span>
 				</button>
@@ -377,7 +392,7 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$prev_button_icon}</span>
 					<span class="wp-lightbox-navigation-text" data-wp-bind--hidden="!state.hasNavigationText">{$prev_button_text}</span>
 				</button>
-				<div class="lightbox-image-container">
+				<div class="lightbox-image-container lightbox-thumbnail-container">
 					<figure data-wp-bind--class="state.selectedImage.figureClassNames" data-wp-bind--style="state.figureStyles">
 						<img data-wp-bind--alt="state.selectedImage.alt" data-wp-bind--class="state.selectedImage.imgClassNames" data-wp-bind--style="state.imgStyles" data-wp-bind--src="state.selectedImage.currentSrc">
 					</figure>
@@ -399,7 +414,7 @@ function block_core_image_print_lightbox_overlay() {
 					<span class="wp-lightbox-navigation-icon" data-wp-bind--hidden="!state.hasNavigationIcon">{$next_button_icon}</span>
 				</button>
 				<div data-wp-text="state.ariaLabel" aria-live="polite" aria-atomic="true" class="screen-reader-text"></div>
-				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true"></div>
+				<div class="scrim" style="background-color: {$background_color}" aria-hidden="true" data-wp-on--click="actions.hideLightbox"></div>
 		</div>
 HTML;
 }

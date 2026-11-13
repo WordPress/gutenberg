@@ -25,6 +25,12 @@
 
 				width: fit-content;
 
+				/* Paint outside the list when the tabs fit. Shadows and outlines
+				 * do not contribute to the measured scrollable width. */
+				&:not(.is-scrolling) {
+					overflow: visible;
+				}
+
 				&.is-overflowing-first {
 					mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
 				}
@@ -50,54 +56,48 @@
 		}
 
 		.indicator {
-			@media not ( prefers-reduced-motion ) {
-				transition-property:
-					translate,
-					width,
-					height,
-					border-radius,
-					border-block;
+			@media not (prefers-reduced-motion) {
+				transition-property: translate, width, height;
 				transition-duration: 0.2s;
 				transition-timing-function: ease-out;
 			}
 
 			position: absolute;
 			pointer-events: none;
+			z-index: 1;
+			background-color: var(--wpds-color-foreground-interactive-neutral);
+
+			.tablist:has(
+				> .tab[aria-selected="true"]:not(
+					[data-disabled]
+				):focus-visible
+			)
+				& {
+				background-color: var(--wpds-color-foreground-interactive-neutral-active);
+			}
 
 			/* Windows high contrast mode. */
 			outline: 2px solid transparent;
 			outline-offset: -1px;
 
 			&[data-orientation="horizontal"] {
-				z-index: 1;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
+				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical properties are necessary for the indicator to work as expected. */
 				left: 0;
 				bottom: 0;
 				height: var(--wpds-border-width-focus);
 
 				width: var(--active-tab-width);
 				translate: var(--active-tab-left) 0;
-				background-color: var(--wpds-color-stroke-interactive-neutral-strong);
 			}
 
 			&[data-orientation="vertical"] {
-				z-index: 0;
-				border-radius: var(--wpds-border-radius-sm);
-				top: 0;
-				/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
-				left: 50%;
-				width: 100%;
-				height: var(--active-tab-height);
-				translate: -50% var(--active-tab-top);
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-			}
-
-			.tablist[data-select-on-move="true"]:has(:focus-visible)
-			&[data-orientation="vertical"] {
-				box-sizing: border-box;
-				border:
-					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus);
+				top: var(--wpds-dimension-padding-md);
+				inset-inline-start: 0;
+				width: var(--wpds-border-width-focus);
+				height:
+					max(0px, calc(var(--active-tab-height) - 2 *
+					var(--wpds-dimension-padding-md)));
+				translate: 0 var(--active-tab-top);
 			}
 		}
 
@@ -107,7 +107,7 @@
 			background: transparent;
 			border: none;
 			box-shadow: none;
-			outline: none; /* Focus ring applied to the ::after pseudo-element */
+			outline: none; /* Focus ring applied to pseudo-elements */
 			padding: 0;
 
 			/* Positioning */
@@ -131,40 +131,52 @@
 			font-weight: 400;
 			color: var(--wpds-color-foreground-interactive-neutral);
 
-			&[data-disabled] {
+			&:is([aria-selected="true"], [data-disabled]) {
 				cursor: default;
+			}
+
+			&[data-disabled] {
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
-				@media ( forced-colors: active ) {
+				@media (forced-colors: active) {
 					color: GrayText;
 				}
 			}
 
-			&:not([data-disabled]):is(:hover, :focus-visible) {
+			&:not([data-disabled]):is(
+				:not([aria-selected="true"]):hover,
+				:not([aria-selected="true"]):active,
+				:focus-visible
+			) {
 				color: var(--wpds-color-foreground-interactive-neutral-active);
+
+				&::after {
+					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+					opacity: 1;
+				}
 			}
 
-			/* Focus indicator. */
+			/* Interaction background and focus indicator. */
+			&::before,
 			&::after {
 				position: absolute;
 				z-index: -1;
 				pointer-events: none;
 
 				/* Outline works for Windows high contrast mode as well. */
-				outline:
-					var(--wpds-border-width-focus) solid
-					var(--wpds-color-stroke-focus);
+				outline: var(--wpds-border-width-focus) solid transparent;
 				border-radius: var(--wpds-border-radius-sm);
 
 				/* Animation */
 				opacity: 0;
 
-				@media not ( prefers-reduced-motion ) {
+				@media not (prefers-reduced-motion) {
 					transition: opacity 0.1s linear;
 				}
 			}
 
 			&:focus-visible::after {
+				outline-color: var(--wpds-color-stroke-focus);
 				opacity: 1;
 			}
 
@@ -175,7 +187,23 @@
 
 				&::after {
 					content: "";
-					inset: var(--wpds-dimension-padding-md);
+					inset-block:
+						calc(var(--wpds-dimension-padding-md) +
+						var(--wpds-dimension-padding-xs));
+					inset-inline: var(--wpds-dimension-padding-lg);
+					outline-offset: var(--wpds-dimension-padding-xs);
+				}
+
+				/* The shadow paints padding around the smaller pseudo-element
+				 * without increasing the tab's box or scrollable overflow. */
+				&:not([data-disabled]):is(
+					:not([aria-selected="true"]):hover,
+					:not([aria-selected="true"]):active,
+					:focus-visible
+				)::after {
+					box-shadow:
+						0 0 0 var(--wpds-dimension-padding-xs)
+						var(--wpds-color-background-interactive-neutral-weak-active);
 				}
 			}
 
@@ -183,23 +211,40 @@
 				padding-inline: 0;
 
 				&::after {
-					/*
-					 * Prevent clipping the focus ring at the tablist edge.
-					 * Use rounding, as the focus ring width may have sub-pixel values
-					 * depending on the screen pixel ratio.
-					 */
+					inset-inline: 0;
+				}
+			}
+
+			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
+				/* Paint the ring separately so only the background can be clipped. */
+				&::before {
+					content: "";
+					z-index: 0;
+					inset-block: var(--wpds-dimension-padding-md);
 					inset-inline: round(up, var(--wpds-border-width-focus), 1px);
+				}
+
+				&:focus-visible {
+					&::before {
+						outline-color: var(--wpds-color-stroke-focus);
+						opacity: 1;
+					}
+
+					&::after {
+						outline: none;
+					}
 				}
 			}
 
 			[data-orientation="vertical"] & {
-				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+				padding: var(--wpds-dimension-padding-md);
 				min-height: var(--wpds-dimension-size-lg);
-			}
 
-			[data-orientation="vertical"][data-select-on-move="false"] &::after {
-				content: "";
-				inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
+				&::after {
+					content: "";
+					inset: 0;
+					outline-offset: calc(-1 * var(--wpds-border-width-focus));
+				}
 			}
 		}
 
@@ -215,37 +260,6 @@
 
 			[data-orientation="vertical"] & {
 				justify-content: start;
-			}
-		}
-
-		.tab-chevron {
-			flex-shrink: 0;
-			margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
-
-			[data-orientation="horizontal"] & {
-				display: none;
-			}
-			opacity: 0;
-
-			[role="tab"]:is([aria-selected="true"], :focus-visible, :hover) & {
-				opacity: 1;
-			}
-
-			/*
-			 * The chevron is transitioned into existence when selectOnMove is enabled,
-			 * because otherwise it looks jarring, as it shows up outside of the focus
-			 * indicator that's being animated at the same time.
-			 */
-			@media not ( prefers-reduced-motion ) {
-				[data-select-on-move="true"]
-				[role="tab"]:is([aria-selected="true"])
-				& {
-					transition: opacity 0.15s 0.15s linear;
-				}
-			}
-
-			&:dir(rtl) {
-				rotate: 180deg;
 			}
 		}
 	}

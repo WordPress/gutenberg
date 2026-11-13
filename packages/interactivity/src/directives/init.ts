@@ -1,14 +1,15 @@
 import { directive } from '../hooks';
 import { useInit } from '../utils';
-import { warnUniqueIdWithTwoHyphens } from './utils/warnings';
+import { warnSuffixNotSupported } from './utils/warnings';
 
-// data-wp-init---[unique-id] — Run expression on first render.
+// data-wp-init---[unique-id] — Run on first render; suffixes are unsupported.
 directive( 'init', ( { directives: { init }, evaluate } ) => {
 	init.forEach( ( entry ) => {
-		if ( globalThis.SCRIPT_DEBUG ) {
-			if ( entry.suffix ) {
-				warnUniqueIdWithTwoHyphens( 'init', entry.suffix );
+		if ( entry.suffix !== null ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warnSuffixNotSupported( 'init', entry.suffix );
 			}
+			return;
 		}
 		// TODO: Replace with useEffect to prevent unneeded scopes.
 		useInit( () => {

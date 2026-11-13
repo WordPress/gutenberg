@@ -11,21 +11,20 @@ export interface TaperChromaOptions {
 	gamut?: ColorSpace; // target gamut (default `sRGB`)
 	alpha?: number; // base fraction of Cmax at target (default 0.62)
 	carry?: number; // seed vividness carry exponent β in [0..1] (default 0.5)
-	cUpperBound?: number; // hard search cap for C (default 0.45)
 	// Continuous taper around the seed (desaturate both sides slightly)
 	radiusLight?: number; // distance in L where kLight is reached (default 0.20)
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
 	kLight?: number; // floor multiplier near lighter side (default 0.85)
 	kDark?: number; // floor multiplier near darker side (default 0.85)
-	// Achromatic handling
-	hueFallback?: number; // degrees: if seed is achromatic and you still want color
-	achromaEpsilon?: number; // ≤ this chroma → treat as achromatic (default 0.005)
+	preserveNearGrayTint?: boolean; // keep faint background tints close to the seed chroma
 }
 
 /**
  * Given the seed and the target lightness, tapers the chroma smoothly.
  * - C_intended = Cmax(Lt,H0) * alpha * (seedRelative^carry)
  * - Continuous taper vs |Lt - Ls| to softly reduce chroma for neighbors
+ * - Background chroma capped relative to C_seed, so a near-gray seed stays near-gray
+ * - Seeds without a hue produce grayscale
  * - Downward-only clamp on C (preserve L & H)
  * @param seed
  * @param lTarget
@@ -36,68 +35,80 @@ export function taperChroma(
 	lTarget: number, // [0..1]
 	options: TaperChromaOptions = {}
 ): { l: number; c: number } | PlainColorObject {
+	return createChromaTaper( seed, options )( lTarget );
+}
+
+/**
+ * Prepare a chroma taper for repeated target-lightness calculations.
+ *
+ * @param seed    Seed color in OKLCH.
+ * @param options Chroma taper options.
+ */
+export function createChromaTaper(
+	seed: PlainColorObject,
+	options: TaperChromaOptions = {}
+): ( lTarget: number ) => { l: number; c: number } | PlainColorObject {
 	const gamut = options.gamut ?? sRGB;
 	const alpha = options.alpha ?? 0.65; // 0.7-0.8 works well for accent surface
 	const carry = options.carry ?? 0.5;
-	const cUpperBound = options.cUpperBound ?? 0.45;
 	const radiusLight = options.radiusLight ?? 0.2;
 	const radiusDark = options.radiusDark ?? 0.2;
 	const kLight = options.kLight ?? 0.85;
 	const kDark = options.kDark ?? 0.85;
-	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
-
 	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
-	let hSeed = get( seed, [ OKLCH, 'h' ] );
+	const hSeed = get( seed, [ OKLCH, 'h' ] );
 
-	const chromaIsTiny = cSeed < achromaEpsilon;
-	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
-
-	if ( chromaIsTiny || hueIsInvalid ) {
-		if ( typeof options.hueFallback === 'number' ) {
-			hSeed = normalizeHue( options.hueFallback );
-		} else {
-			// Respect achromatic intent: grayscale at target L
-			return {
-				space: OKLCH,
-				coords: [ clamp01( lTarget ), 0, 0 ],
-				alpha: 1,
-			};
-		}
+	if (
+		hSeed === null ||
+		! Number.isFinite( hSeed ) ||
+		( ! options.preserveNearGrayTint && cSeed < 0.005 )
+	) {
+		// Respect achromatic intent: grayscale at target L
+		return ( lTarget ) => ( {
+			space: OKLCH,
+			coords: [ clamp01( lTarget ), 0, 0 ],
+			alpha: 1,
+		} );
 	}
 
-	// Capacity at seed and target
+	// Capacity at seed
 	const lSeed = clamp01( get( seed, [ OKLCH, 'l' ] ) );
-	const cmaxSeed = getCachedMaxChromaAtLH( lSeed, hSeed, gamut, cUpperBound );
-	const cmaxTarget = getCachedMaxChromaAtLH(
-		clamp01( lTarget ),
-		hSeed,
-		gamut,
-		cUpperBound
-	);
+	const cmaxSeed = getMaxChromaAtLH( lSeed, hSeed, gamut );
 
 	// Seed vividness ratio (hue-fair normalization)
-	let seedRelative = 0;
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
-	seedRelative = clamp01( cSeed / denom );
+	const seedRelative = clamp01( cSeed / denom );
+	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
 
-	// Intended chroma from local capacity, tempered by seed vividness
-	const cIntendedBase = alpha * cmaxTarget;
-	const cWithCarry =
-		cIntendedBase * Math.pow( seedRelative, clamp01( carry ) );
+	// Near the lightness extremes the seed's capacity approaches zero, so even
+	// an imperceptible tint reads as vivid. Bound the carried chroma by the
+	// seed's own chroma, which also fades near-gray seeds smoothly to gray.
+	// The allowance grows quadratically, so it stops binding for tinted seeds.
+	const cCap = options.preserveNearGrayTint
+		? cSeed * ( 1 + ( cSeed / 0.02 ) ** 2 )
+		: Infinity;
 
-	// Gentle, symmetric desaturation vs distance in L
-	const t = continuousTaper( lSeed, lTarget, {
-		radiusLight,
-		radiusDark,
-		kLight,
-		kDark,
-	} );
-	const cPlanned = cWithCarry * t;
+	return ( lTarget ) => {
+		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
 
-	// Downward-only clamp (preserve L & H)
-	const lOut = clamp01( lTarget );
+		// Intended chroma from local capacity, tempered by seed vividness
+		const cIntendedBase = alpha * cmaxTarget;
+		const cWithCarry = cIntendedBase * seedCarry;
 
-	return { l: lOut, c: cPlanned };
+		// Gentle, symmetric desaturation vs distance in L
+		const t = continuousTaper( lSeed, lTarget, {
+			radiusLight,
+			radiusDark,
+			kLight,
+			kDark,
+		} );
+		const cPlanned = Math.min( cWithCarry * t, cCap );
+
+		// Downward-only clamp (preserve L & H)
+		const lOut = clamp01( lTarget );
+
+		return { l: lOut, c: cPlanned };
+	};
 }
 
 /* ---------------- helpers & caches ---------------- */
@@ -154,57 +165,19 @@ function continuousTaper(
 	return 1 - ( 1 - opts.kDark ) * w;
 }
 
-/* ---- chroma-capacity queries with small caches ---- */
+/* ---- chroma-capacity queries ---- */
 
-const maxChromaCache = new Map< string, number >();
-function keyMax( l: number, h: number, gamut: string, cap: number ): string {
-	// Quantize to keep cache compact
-	const lq = quantize( l, 0.05 );
-	const hq = quantize( normalizeHue( h ), 10 );
-	const cq = quantize( cap, 0.05 );
-	return `${ gamut }|L:${ lq }|H:${ hq }|cap:${ cq }`;
-}
-
-function quantize( x: number, step: number ): number {
-	const k = Math.round( x / step );
-	return k * step;
-}
-
-function getCachedMaxChromaAtLH(
+// Leave headroom above sRGB's maximum chroma of about 0.32.
+const MAX_CHROMA = 0.45;
+function getMaxChromaAtLH(
 	l: number,
 	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
-): number {
-	const gamut = gamutSpace.id;
-	const key = keyMax( l, h, gamut, cap );
-	const hit = maxChromaCache.get( key );
-	if ( typeof hit === 'number' ) {
-		return hit;
-	}
-
-	const computed = maxInGamutChromaAtLH( l, h, gamutSpace, cap );
-	maxChromaCache.set( key, computed );
-	return computed;
-}
-
-/**
- * Find the max in-gamut chroma at fixed (L,H) in the target gamut
- * @param l
- * @param h
- * @param gamutSpace
- * @param cap
- */
-function maxInGamutChromaAtLH(
-	l: number,
-	h: number,
-	gamutSpace: ColorSpace,
-	cap: number
+	gamutSpace: ColorSpace
 ): number {
 	// Construct a color with maximum chroma.
 	const probe: PlainColorObject = {
 		space: OKLCH,
-		coords: [ l, cap, h ],
+		coords: [ clamp01( l ), MAX_CHROMA, normalizeHue( h ) ],
 		alpha: 1,
 	};
 

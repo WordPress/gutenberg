@@ -37,7 +37,7 @@ test.describe( 'Child Blocks', () => {
 			.getByRole( 'document', {
 				name: 'Block: Child Blocks Unrestricted Parent',
 			} )
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();
@@ -75,7 +75,7 @@ test.describe( 'Child Blocks', () => {
 			.getByRole( 'document', {
 				name: 'Block: Child Blocks Restricted Parent',
 			} )
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();

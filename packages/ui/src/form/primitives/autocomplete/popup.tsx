@@ -2,22 +2,39 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
-import { ThemeProvider } from '../../../utils/theme-provider';
 import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
+import { AutocompletePopupContext } from './context';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import type { AutocompletePopupProps } from './types';
 
+/**
+ * The suggestion list for an `Autocomplete.Input` rendered outside it.
+ *
+ * Do not render `Autocomplete.Input` inside `Autocomplete.Popup`. For a
+ * searchable picker that opens from a button, render
+ * `<Autocomplete.Root inline open>` inside a standalone `Popover` component
+ * instead.
+ */
 export const Popup = forwardRef< HTMLDivElement, AutocompletePopupProps >(
-	function Popup( { className, portal, positioner, ...restProps }, ref ) {
+	function UnforwardedPopup(
+		{ className, portal, positioner, width, ...restProps },
+		ref
+	) {
 		const popupContent = (
-			<ThemeProvider>
+			<AutocompletePopupContext.Provider value>
 				<_Autocomplete.Popup
 					ref={ ref }
-					className={ clsx( itemPopupStyles.popup, className ) }
+					className={ clsx(
+						itemPopupStyles.popup,
+						itemPopupStyles[ 'fixed-width-presets' ],
+						getItemPopupWidthClassName( width ),
+						className
+					) }
 					{ ...restProps }
 				/>
-			</ThemeProvider>
+			</AutocompletePopupContext.Provider>
 		);
 
 		const positionedPopup = renderSlotWithChildren(

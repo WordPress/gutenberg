@@ -51,6 +51,10 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "left", "center", "right" ],
+		"background": {
+			"gradient": true,
+			"__experimentalSkipSerialization": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalSkipSerialization": true,
@@ -62,7 +66,6 @@
 		"interactivity": true,
 		"typography": {
 			"__experimentalSkipSerialization": true,
-			"__experimentalSelector": ".wp-block-search__label, .wp-block-search__input, .wp-block-search__button",
 			"fontSize": true,
 			"lineHeight": true,
 			"__experimentalFontFamily": true,
@@ -78,6 +81,7 @@
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
+			"style": true,
 			"width": true,
 			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
@@ -86,8 +90,17 @@
 				"width": true
 			}
 		},
+		"shadow": {
+			"__experimentalSkipSerialization": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true,
+			"__experimentalSkipSerialization": true
+		},
 		"spacing": {
-			"margin": true
+			"margin": true,
+			"padding": true
 		},
 		"html": false
 	},
@@ -95,6 +108,9 @@
 	"style": "wp-block-search",
 	"selectors": {
 		"color": ".wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input",
-		"border": ".wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper"
+		"background": ".wp-block-search .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input",
+		"border": ".wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper",
+		"shadow": ".wp-block-search.wp-block-search__button-outside .wp-block-search__input, .wp-block-search.wp-block-search__button-outside .wp-block-search__button, .wp-block-search.wp-block-search__no-button .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__input, .wp-block-search.wp-block-search__button-only .wp-block-search__button, .wp-block-search.wp-block-search__button-inside .wp-block-search__inside-wrapper",
+		"dimensions": ".wp-block-search .wp-block-search__inside-wrapper"
 	}
 }

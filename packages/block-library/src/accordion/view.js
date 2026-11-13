@@ -1,4 +1,4 @@
-import { store, getContext } from '@wordpress/interactivity';
+import { store, getContext, getElement } from '@wordpress/interactivity';
 
 // Whether the hash has been handled for the current page load.
 // This is used to prevent the hash from being handled multiple times.
@@ -41,29 +41,23 @@ const { actions } = store(
 				}
 			},
 			openPanelByHash: () => {
-				if ( hashHandled || ! window.location?.hash?.length ) {
+				if ( hashHandled ) {
 					return;
 				}
 
 				const context = getContext();
 				const { id, accordionItems, autoclose } = context;
-				const hash = decodeURIComponent(
-					window.location.hash.slice( 1 )
-				);
-				const targetElement = window.document.getElementById( hash );
+				const targetElement = document.querySelector( ':target' );
 
 				if ( ! targetElement ) {
 					return;
 				}
 
-				const panelElement = window.document.querySelector(
-					'.wp-block-accordion-panel[aria-labelledby="' + id + '"]'
-				);
+				// The Accordion Item contains both its heading and its panel, so a
+				// link to either one opens the item.
+				const { ref } = getElement();
 
-				if (
-					! panelElement ||
-					! panelElement.contains( targetElement )
-				) {
+				if ( ! ref?.contains( targetElement ) ) {
 					return;
 				}
 

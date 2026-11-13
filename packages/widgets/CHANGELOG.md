@@ -2,6 +2,40 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Legacy widget: Render nothing for an `instance` attribute whose `encoded` value is an array, rather than throwing a `TypeError` on PHP 8, and render nothing when `encoded` contains characters outside the base64 alphabet, which were previously skipped ([#86460](https://github.com/WordPress/gutenberg/pull/86460)).
+
+## 5.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   Legacy widget: Show "Select widget" in the widget type select instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+
+## 5.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Legacy widget: Migrate widget type selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+## 4.57.0 (2026-10-07)
+
+## 4.56.0 (2026-09-23)
+
+## 4.55.0 (2026-09-10)
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 4.54.0 (2026-08-26)
+
+## 4.53.0 (2026-08-12)
+
 
 ## 4.52.0 (2026-07-29)
 

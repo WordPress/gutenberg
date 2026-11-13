@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching theme-aware colors for header buttons, including the inserter and disabled pressed controls ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+
+## 6.1.0 (2026-11-04)
+
+## 6.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Keep the block selected when choosing an option in a `@wordpress/ui` overlay, such as the Legacy Widget type select ([#84628](https://github.com/WordPress/gutenberg/pull/84628)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Error boundary: Explicitly announce the error title and description, excluding action labels ([#82737](https://github.com/WordPress/gutenberg/pull/82737)).
+
+## 5.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   Open the Welcome Guide from a plain menu item instead of a preference toggle, so the Options menu no longer announces "Preference activated - Welcome Guide" ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+-   Use `aria-disabled` for the Undo and Redo buttons of the document tools so they stay focusable when there is nothing to undo or redo, and make the focus style of all the document tools buttons visible ([#82412](https://github.com/WordPress/gutenberg/pull/82412)).
+
+## 5.55.0 (2026-09-10)
+
+### Enhancements
+
+-   Error boundary: Surface debugging details ([#82099](https://github.com/WordPress/gutenberg/pull/82099)).
+
+### Internal
+
+-   Stop passing the unused `editorTool` block editor setting; the selector that read it was removed with the Write/Design tool in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+-   Remove unused dependency `@wordpress/interface` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
 ### Enhancements
 
 -   Wrap the Customizer widgets editor in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81174](https://github.com/WordPress/gutenberg/pull/81174)).

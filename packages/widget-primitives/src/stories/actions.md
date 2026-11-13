@@ -16,7 +16,7 @@ The widget names the intent and, through the key it writes, how the action is fu
 
 Every action carries an **envelope** and exactly one **fulfillment**, which says what triggering it means. The envelope is the action's identity: an `id`, a `label`, and optionally an `icon` (a registered icon name) and a `relevance` hint.
 
-The fulfillment is named by the key that carries it, not by a separate discriminator. Today the only key is `href`, so the only fulfillment is a link: triggering the action goes to a target.
+The fulfillment is named by the key that carries it, not by a separate discriminator. A declaration has one key today, `href`, so its only fulfillment is a link: triggering the action goes to a target.
 
 ```ts
 {
@@ -30,7 +30,7 @@ The fulfillment is named by the key that carries it, not by a separate discrimin
 
 Two more keys belong to the link, not to the envelope, so they only mean something alongside an `href`:
 
--   `download`: download instead of navigate; a string sets the filename.
+-   `download`: downloads instead of navigating unless `false`; a string sets the filename, `true` or `''` keeps the original.
 -   `openInNewTab`: open in a new tab.
 
 ```ts
@@ -52,7 +52,7 @@ A link fulfillment carries one obligation: **where the surface allows a link pri
 
 Its accessible role follows the surface rather than the element: mounted inside the dashboard's "More" menu, the anchor is exposed as a menu item, not as a link.
 
-Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time.
+Which link primitive is also the host's call. The widget declares _where_ to go; the host decides _how to get there_. A target inside the host's own routes can use its router's link, which is still an anchor and keeps the same behaviors; anything else is a plain anchor and a full page load. The widget cannot make that call: whether a target is reachable in-page depends on the routes the host registered, which changes per host and over time. The host supplies that recognition and its link primitive through the widget host seam, as the `links` capability.
 
 Where no link primitive fits, as in a command palette, the host mounts what the surface offers and those semantics degrade. That is a real cost of reaching beyond the widget, not an oversight.
 
@@ -60,4 +60,33 @@ Where no link primitive fits, as in a command palette, the host mounts what the 
 
 The widget lists its actions; it never specifies where they go. The host maps them to its surfaces: a dashboard might gather them in a "More" menu, a footer, or a command palette.
 
-`relevance` carries the widget's side of that decision: `'high'` marks an action worth a prominent surface, `'low'` (the default) the rest. Attributes already use the same vocabulary: the widget declares intent, and the host owns the surface.
+`relevance` carries the widget's side of that decision: `'high'` marks an action worth the most prominent surface, `'medium'` one worth persistent but compact visibility, and `'low'` (the default) the rest. Attributes use the same vocabulary: the widget declares intent, and the host owns the surface.
+
+The dashboard maps it as: `'high'` as text links in a persistent footer, `'medium'` beside them as compact icon affordances, the rest in the "More" menu. Full-bleed widgets keep every action in the menu.
+
+## Runtime actions
+
+A declaration is static: it exists before the widget mounts. A label with a count, a target that follows the instance's attributes, or a download of the rows on screen only exist afterwards. A mounted widget declares those through `useWidgetActions`.
+
+```ts
+const hosted = useWidgetActions(
+	rows.length > 0
+		? [
+				{
+					id: 'export',
+					label: __( 'Download CSV' ),
+					relevance: 'medium',
+					callback: () => downloadBlob( 'report.csv', toCsv( rows ) ),
+				},
+			]
+		: []
+);
+```
+
+A runtime action takes the same envelope and one fulfillment: `href`, or `callback`, a function the host runs. A promise it returns keeps the action pending until it settles; reporting the outcome stays the callback's.
+
+-   **Each call declares its own set.** The list replaces that call's previous one, so an action that does not apply is left out; it is compared by value and needs no memoization. Calls from several components of one widget compose, and the last declaration of an `id` wins.
+-   **A shared `id` upgrades the declared action.** The runtime action takes its place and keeps the declared `icon` and `relevance` it leaves out: a declared "Details" becomes "Review 3 items" once the counts arrive. A declared action is never withdrawn, so one that only applies sometimes is declared at runtime alone.
+-   **Placement stays the host's.** Runtime actions ride the same `relevance` scale.
+
+The hook returns `false` under a host without the `actions` capability, and the widget keeps rendering its own affordance.

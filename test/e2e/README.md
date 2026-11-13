@@ -11,3 +11,30 @@ In CI, the tests are executed across multiple shards, and [@flakiness/playwright
 ```bash
 npm run test:e2e:update-timings
 ```
+
+## Checking new tests on trunk
+
+`npm run test:e2e:trunk -- <pull request commit>` runs new or changed tests against the checked-out implementation. It expects the pull request's test files to be in place and `PLAYWRIGHT_JSON_OUTPUT_FILE` to point to the JSON report. The [trunk check workflow](../../.github/workflows/e2e-trunk-check.yml) prepares this checkout, builds it, and starts WordPress before running the command.
+
+## Site editor v2 (extensible site editor)
+
+The site editor specs also run against the extensible site editor — the
+`routes/*` + `@wordpress/boot` based rewrite behind the
+`gutenberg-extensible-site-editor` experiment — via a dedicated config:
+
+```bash
+npm run test:e2e:site-editor-v2
+```
+
+The config (`playwright.site-editor-v2.config.ts`) sets the
+`GUTENBERG_E2E_SITE_EDITOR_V2` environment variable, which makes
+`admin.visitSiteEditor()` navigate to `admin.php?page=site-editor-v2` routes
+instead of `site-editor.php`, and its global setup enables the experiment on
+the test site. Specs can read the same variable when an assertion legitimately
+differs between the two editors.
+
+Tests covering behavior that intentionally has no equivalent in the extensible
+site editor carry the `@site-editor-v1-only` tag in their title, along with a
+comment explaining the gap; the v2 config excludes them via `grepInvert`. When
+adding a site editor feature or spec, make sure it works in both editors or
+tag and document the difference explicitly.
