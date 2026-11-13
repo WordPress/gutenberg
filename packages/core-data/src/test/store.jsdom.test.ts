@@ -9,7 +9,7 @@ vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
 const apiFetchMock = triggerFetch as unknown as Mock<
-	( options: { path: string; parse?: boolean } ) => unknown
+	( options: { path: string; parse?: boolean; method?: string } ) => unknown
 >;
 
 function createTestRegistry() {
@@ -123,6 +123,22 @@ describe( 'getEntityRecord', () => {
 			title: post.title,
 		} );
 		expect( triggerFetch ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should not wait for the site entity to read a static root entity', async () => {
+		const { getEntityRecord } = registry.resolveSelect( coreDataStore );
+		apiFetchMock.mockResolvedValue( {
+			async json() {
+				return { name: 'Test' };
+			},
+		} );
+
+		await expect(
+			getEntityRecord( 'root', '__unstableBase' )
+		).resolves.toEqual( { name: 'Test' } );
+		expect( triggerFetch ).not.toHaveBeenCalledWith(
+			expect.objectContaining( { method: 'OPTIONS' } )
+		);
 	} );
 } );
 

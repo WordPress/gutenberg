@@ -57,6 +57,7 @@ describe( 'getEntityRecord', () => {
 		},
 	];
 	const registry = { batch: ( callback: () => void ) => callback() };
+	const select = { getEntityConfig: vi.fn() };
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
 	let dispatch: DispatchMock<
@@ -97,7 +98,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -133,7 +134,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -185,6 +186,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -232,6 +234,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -263,7 +266,8 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
 		};
-		const select = {
+		const selectWithSync = {
+			getEntityConfig: vi.fn(),
 			isCollaborationSupported: vi.fn( () => false ),
 		};
 
@@ -275,7 +279,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
-				select,
+				select: selectWithSync,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -283,7 +287,9 @@ describe( 'getEntityRecord', () => {
 		);
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
-		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
+		expect( selectWithSync.isCollaborationSupported ).toHaveBeenCalledTimes(
+			1
+		);
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
@@ -319,6 +325,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -364,6 +371,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -409,6 +417,7 @@ describe( 'getEntityRecord', () => {
 		// Call with a query parameter
 		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -450,6 +459,7 @@ describe( 'getEntityRecords', () => {
 		},
 	];
 	const registry = { batch: ( callback: () => void ) => callback() };
+	const select = { getEntityConfig: vi.fn() };
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
 	beforeEach( async () => {
@@ -469,7 +479,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -501,7 +511,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -535,7 +545,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -582,6 +592,7 @@ describe( 'getEntityRecords', () => {
 			_fields: Object.keys( postsWithLinks[ 0 ] ).join( ',' ),
 		} )(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect,
@@ -625,6 +636,7 @@ describe( 'getEntityRecords', () => {
 			_fields: Object.keys( postsWithoutLinks[ 0 ] ).join( ',' ),
 		} )(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect,
@@ -673,7 +685,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'attachment', {
 			per_page: -1,
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		} )( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
@@ -718,6 +730,7 @@ describe( 'getEntityRecords', () => {
 
 describe( 'taxonomy pagination', () => {
 	const registry = { batch: ( callback: () => void ) => callback() };
+	const select = { getEntityConfig: vi.fn() };
 	let dispatch: DispatchMock<
 			| 'receiveEntityRecords'
 			| '__unstableAcquireStoreLock'
@@ -765,7 +778,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		} )( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenLastCalledWith( {
 			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
@@ -804,7 +817,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		} )( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',

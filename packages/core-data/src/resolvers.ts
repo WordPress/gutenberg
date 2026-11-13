@@ -74,11 +74,17 @@ export const getEntityRecord =
 		registry,
 		resolveSelect,
 	}: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+		let entityConfig: EntityConfig | undefined = select.getEntityConfig(
+			kind,
+			name
 		);
+		if ( ! entityConfig ) {
+			const configs: Array< EntityConfig > =
+				await resolveSelect.getEntitiesConfig( kind );
+			entityConfig = configs.find(
+				( config ) => config.name === name && config.kind === kind
+			);
+		}
 		if ( ! entityConfig ) {
 			return;
 		}
@@ -308,12 +314,23 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
  */
 export const getEntityRecords =
 	( kind: string, name: string, query: Query = {} ) =>
-	async ( { dispatch, registry, resolveSelect }: CoreDataThunkArgs ) => {
-		const configs: Array< EntityConfig > =
-			await resolveSelect.getEntitiesConfig( kind );
-		const entityConfig = configs.find(
-			( config ) => config.name === name && config.kind === kind
+	async ( {
+		select,
+		dispatch,
+		registry,
+		resolveSelect,
+	}: CoreDataThunkArgs ) => {
+		let entityConfig: EntityConfig | undefined = select.getEntityConfig(
+			kind,
+			name
 		);
+		if ( ! entityConfig ) {
+			const configs: Array< EntityConfig > =
+				await resolveSelect.getEntitiesConfig( kind );
+			entityConfig = configs.find(
+				( config ) => config.name === name && config.kind === kind
+			);
+		}
 		if ( ! entityConfig ) {
 			return;
 		}
