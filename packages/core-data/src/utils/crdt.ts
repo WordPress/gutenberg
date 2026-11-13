@@ -16,7 +16,7 @@ import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
 	deserializeBlockAttributes,
-	hasStaleBlockRegistration,
+	shouldReparseBlocks,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
@@ -419,13 +419,13 @@ export function getPostChangesFromCRDTDoc(
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
 
-						// A missing block serializes back to the markup of the block
-						// it stands in for, so the content comparison below cannot
-						// tell a persisted missing block from the real block once
-						// its type is registered again (for example, after its
-						// plugin is reactivated). Check block registration first so
+						// Missing and invalid blocks serialize back to the markup
+						// they were loaded from, so the content comparison below
+						// cannot tell that the parser would now build a different
+						// block from that markup (for example, after a plugin is
+						// reactivated or updated). Check for those blocks first so
 						// the blocks are re-parsed from the content in that case.
-						if ( hasStaleBlockRegistration( blocksJson ) ) {
+						if ( shouldReparseBlocks( blocksJson ) ) {
 							return true;
 						}
 

@@ -70,6 +70,10 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 		// Mocked so tests can control what the Code Editor sync path "parses"
 		// from raw content without needing real block-type registration.
 		parse: vi.fn( () => [] ),
+		serialize: vi.fn(
+			( blocks: Parameters< typeof actual.serialize >[ 0 ] ) =>
+				`serialized-block:${ Array.isArray( blocks ) ? blocks.length : 1 }`
+		),
 		__unstableSerializeAndClean: vi.fn(
 			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
 		),
@@ -1277,7 +1281,67 @@ describe( 'crdt', () => {
 				expect( changes.blocks ).toBeDefined();
 			} );
 
-			it( 'checks the registration of inner blocks', () => {
+			it( 'returns block changes when an invalid block would parse as valid now', () => {
+				const invalidBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				invalidBlock.set( 'isValid', false );
+				setBlocksInDoc( persistedMap, [ invalidBlock ] );
+
+				// The block type, or a new deprecation, accepts the markup again.
+				( parse as Mock ).mockReturnValueOnce( [
+					{ name: 'core/paragraph', isValid: true },
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.blocks ).toBeDefined();
+				expect( parse ).toHaveBeenCalledWith( 'serialized-block:1' );
+			} );
+
+			it( 'keeps an invalid block that still does not parse as valid', () => {
+				const invalidBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				invalidBlock.set( 'isValid', false );
+				setBlocksInDoc( persistedMap, [ invalidBlock ] );
+
+				( parse as Mock ).mockReturnValueOnce( [
+					{ name: 'core/paragraph', isValid: false },
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+			} );
+
+			it( 'does not re-parse blocks that were stored as valid', () => {
+				const validBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				validBlock.set( 'isValid', true );
+				setBlocksInDoc( persistedMap, [ validBlock ] );
+				( parse as Mock ).mockClear();
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+				expect( parse ).not.toHaveBeenCalled();
+			} );
+
+			it( 'checks inner blocks too', () => {
 				setBlocksInDoc( persistedMap, [
 					createYBlock( 'core/paragraph', { content: 'Outer' }, [
 						createYBlock( 'core/missing', {
