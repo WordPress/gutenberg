@@ -570,6 +570,7 @@ describe( 'getElementCSSRules', () => {
 				},
 				heading: rotate,
 				h1: rotate,
+				h2: { transform: { translate: { x: '10px' } } },
 			},
 			'core/group',
 			'.wp-elements-1'
@@ -577,6 +578,7 @@ describe( 'getElementCSSRules', () => {
 
 		expect( css ).toContain( 'color: red;' );
 		expect( css ).not.toContain( 'rotate' );
+		expect( css ).not.toContain( 'translate' );
 	} );
 } );
 
@@ -640,7 +642,10 @@ describe( 'getResponsiveStateCSSRules', () => {
 					elements: {
 						link: {
 							color: { text: 'red' },
-							transform: { rotate: '10deg' },
+							transform: {
+								rotate: '10deg',
+								translate: { x: '10px' },
+							},
 						},
 					},
 				},
@@ -651,6 +656,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 
 		expect( rules.join( '' ) ).toContain( 'color: red' );
 		expect( rules.join( '' ) ).not.toContain( 'rotate' );
+		expect( rules.join( '' ) ).not.toContain( 'translate' );
 	} );
 
 	it( 'routes a viewport rotation through the transform feature selector', () => {
