@@ -16,6 +16,37 @@ export default meta;
 
 type Story = StoryObj< typeof Notice.Root >;
 
+export const FormattedMessage: Story = {
+	render: function FormattedMessageExample() {
+		const [ hasError, setHasError ] = useState( false );
+		return (
+			<Stack direction="column" gap="md">
+				<Button onClick={ () => setHasError( true ) }>
+					Save changes
+				</Button>
+				<Notice.List>
+					{ hasError && (
+						<Notice.Root intent="error">
+							<Notice.Title>Changes not saved</Notice.Title>
+							<Notice.Description render={ <div /> }>
+								<p>
+									Check your connection.
+									<br />
+									Try saving again.
+								</p>
+								<span aria-hidden="true">Decoration</span>
+								<span style={ { display: 'none' } }>
+									Hidden text
+								</span>
+							</Notice.Description>
+						</Notice.Root>
+					) }
+				</Notice.List>
+			</Stack>
+		);
+	},
+};
+
 export const StaticNotice: Story = {
 	render: () => (
 		<Notice.Root intent="info">

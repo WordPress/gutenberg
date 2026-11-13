@@ -8,6 +8,8 @@ import { ActionButton } from './action-button';
 import { ActionButtonLink } from './action-button-link';
 import { ActionLink } from './action-link';
 
+export { getAnnouncementText } from './get-announcement-text';
+
 export {
 	Root,
 	List,

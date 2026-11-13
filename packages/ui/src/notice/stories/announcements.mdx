@@ -22,7 +22,9 @@ By default, the live regions render inside the list. For app-wide notifications 
 
 <Canvas of={ NoticeStories.DynamicNotices } />
 
-The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. The supplied text is preserved. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with `hidden` or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+The default announcement joins the plaintext content of `Notice.Title` and `Notice.Description` with a space if the title already ends in Unicode sentence-ending punctuation, or `. ` otherwise. Paragraph and line breaks are preserved. Actions, dismiss buttons, descriptions inside `Notice.Actions`, and content hidden with HTML, CSS, or `aria-hidden="true"` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+
+<Canvas of={ AnnouncementStories.FormattedMessage } />
 
 Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
 
@@ -46,6 +48,14 @@ The list does not move focus, and notices continue to announce while focus is in
 The list renders separate, visually hidden live regions for polite and assertive messages. Keep live-region roles off the visible notices and do not also call `speak()` for the same update.
 
 ## Announce from the application
+
+If an explicit message comes from rendered content, use `Notice.getAnnouncementText(element)` to read a mounted title or description. It returns trimmed text using the same formatting and hidden-content rules as `Notice.List`. Pass only the message element, excluding actions and technical details.
+
+```js
+const message = Notice.getAnnouncementText( descriptionRef.current );
+```
+
+The reader ignores `aria-hidden` on ancestors of the supplied element so an application can prepare a message while a dialog hides its background. Choosing when and where to announce that message remains the application's responsibility.
 
 For a standalone dynamic notice, or an announcement tied to an application event rather than a change to visible text, use `speak()` from `@wordpress/a11y` in the event handler or lifecycle callback that handles the update. Pass an explicit message containing the relevant title and description. Exclude action labels and technical error details. Do not also add a live-region role to the visible notice, which could cause duplicate announcements.
 

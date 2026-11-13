@@ -37,7 +37,7 @@ src/
 
 ## Public APIs
 
-The package has a single entrypoint which exports all of the components of the package, and nothing else.
+The package has a single entrypoint which exports its components and their supporting hooks and utilities.
 
 Specifically:
 
