@@ -62,17 +62,6 @@ const NON_CONTEXTUAL_POST_TYPES = [
 ];
 
 /**
- * The blocks that hold what is being edited when a template is rendered inside
- * another one.
- *
- * The slot is the template slot block of the template around it, and the server
- * substitutes that block alone. A post title or a featured image in the
- * template around it belongs to that template, which is edited on its own
- * screen, so neither is content to edit here.
- */
-const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/template-slot' ];
-
-/**
  * Depending on the post, template and template mode,
  * returns the appropriate blocks and change handlers for the block editor provider.
  *
@@ -89,7 +78,15 @@ const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/template-slot' ];
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
-	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
+	// The rendering mode is the editor's rather than the canvas's, so it can
+	// be the one that shows the template when this canvas has none to show:
+	// a route can ask for that mode whatever its canvas resolves to, a
+	// template that stands for itself included, and the mode of the last
+	// canvas stays until this one settles its own. The post is rendered on
+	// its own then, rather than the blocks of a template that is not there,
+	// which would leave the last canvas in place.
+	const rootLevelPost =
+		mode === 'template-locked' && template ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -588,17 +585,16 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
+									{ /*
+									   Only while a template is rendered
+									   around the post: a canvas with none
+									   has nothing to lock, whatever mode
+									   the editor was left in.
+									 */ }
+									{ shouldRenderTemplate && (
 										<DisableNonPageContentBlocks
-											contentBlockTypes={
+											isTemplateInsideTemplate={
 												isTemplateInsideTemplate
-													? TEMPLATE_SLOT_BLOCK_TYPES
-													: undefined
-											}
-											templatePartEditingMode={
-												isTemplateInsideTemplate
-													? 'disabled'
-													: undefined
 											}
 										/>
 									) }

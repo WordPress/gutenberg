@@ -217,7 +217,9 @@ test.describe( 'Template rendered inside another template', () => {
 		await requestUtils.createTemplate( 'wp_template', {
 			slug: 'shell',
 			title: 'Shell',
-			content: '<!-- wp:post-title /--><!-- wp:template-slot /-->',
+			content: `<!-- wp:post-title /-->
+<!-- wp:template-slot /-->
+<!-- wp:template-slot --><!-- wp:paragraph --><p>Shell aside</p><!-- /wp:paragraph --><!-- /wp:template-slot -->`,
 		} );
 		await createTemplateInside( requestUtils, {
 			slug: 'search',
@@ -244,15 +246,22 @@ test.describe( 'Template rendered inside another template', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
 		).toBeVisible();
 
+		// A slot after the first holds what it does for that template.
+		await expect( editor.canvas.getByText( 'Shell aside' ) ).toBeVisible();
+
 		const editingModes = await page.evaluate( () => {
-			const { getBlocksByName, getBlockEditingMode } =
+			const { getBlocksByName, getBlockOrder, getBlockEditingMode } =
 				window.wp.data.select( 'core/block-editor' );
-			return Object.fromEntries(
-				[ 'core/post-title', 'core/template-slot' ].map( ( name ) => [
-					name,
-					getBlockEditingMode( getBlocksByName( name )[ 0 ] ),
-				] )
-			);
+			const [ title ] = getBlocksByName( 'core/post-title' );
+			const [ slot, otherSlot ] = getBlocksByName( 'core/template-slot' );
+			return {
+				title: getBlockEditingMode( title ),
+				slot: getBlockEditingMode( slot ),
+				otherSlot: getBlockEditingMode( otherSlot ),
+				otherSlotContent: getBlockEditingMode(
+					getBlockOrder( otherSlot )[ 0 ]
+				),
+			};
 		} );
 
 		expect( editingModes ).toEqual( {
@@ -262,9 +271,205 @@ test.describe( 'Template rendered inside another template', () => {
 			 * would rename the template being edited and change nothing on the
 			 * front end.
 			 */
-			'core/post-title': 'disabled',
-			'core/template-slot': 'contentOnly',
+			title: 'disabled',
+			slot: 'contentOnly',
+			/*
+			 * Only the first slot of a template is where the templates rendered
+			 * inside it go. What another holds belongs to the template around,
+			 * so editing it here would be lost when the template being edited is
+			 * saved.
+			 */
+			otherSlot: 'disabled',
+			otherSlotContent: 'disabled',
 		} );
+	} );
+
+	test( 'keeps what a slot of the template being edited holds', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// The layout template, created before each test, is the one around.
+		await createTemplateInside( requestUtils, {
+			slug: 'search',
+			title: 'Search',
+			content: `<!-- wp:heading --><h2 class="wp-block-heading">Results</h2><!-- /wp:heading -->
+<!-- wp:template-slot --><!-- wp:paragraph --><p>Results on their own</p><!-- /wp:paragraph --><!-- /wp:template-slot -->`,
+			template: 'layout',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//search',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			editor.canvas.getByText( 'Shared footer' )
+		).toBeVisible();
+
+		/*
+		 * A template rendered inside another can have a slot too, for the
+		 * templates rendered inside it. It is not where the template itself is
+		 * rendered, so it holds what it does when the template is edited on its
+		 * own, as a second slot on the canvas rather than a second use of a
+		 * block that can be used once.
+		 */
+		const ownSlotText = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Results on their own' } );
+		await expect( ownSlotText ).toBeVisible();
+		await expect(
+			editor.canvas.getByText( 'This block can only be used once.' )
+		).toBeHidden();
+
+		await ownSlotText.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( '!' );
+		await expect(
+			editor.canvas.getByText( 'Results on their own!' )
+		).toBeVisible();
+
+		// The front end renders it the same way.
+		await page.goto( '/?s=anything' );
+		await expect(
+			page.getByRole( 'heading', { name: 'Results' } )
+		).toBeVisible();
+		await expect( page.getByText( 'Shared footer' ) ).toBeVisible();
+		await expect( page.getByText( 'Results on their own' ) ).toBeVisible();
+		await expect( page.getByText( 'Shown on its own' ) ).toBeHidden();
+	} );
+
+	test( 'renders the template in the slot of the template around it rather than one in its template parts', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'frame-banner',
+			title: 'Frame banner',
+			content:
+				'<!-- wp:template-slot --><!-- wp:paragraph --><p>Banner of the part</p><!-- /wp:paragraph --><!-- /wp:template-slot -->',
+		} );
+		await requestUtils.createTemplate( 'wp_template', {
+			slug: 'frame',
+			title: 'Frame',
+			content: `<!-- wp:template-part {"slug":"frame-banner","theme":"emptytheme"} /-->
+<!-- wp:template-slot --><!-- wp:paragraph --><p>Frame on its own</p><!-- /wp:paragraph --><!-- /wp:template-slot -->`,
+		} );
+		await createTemplateInside( requestUtils, {
+			slug: 'search',
+			title: 'Search',
+			content:
+				'<!-- wp:heading --><h2 class="wp-block-heading">Results</h2><!-- /wp:heading -->',
+			template: 'frame',
+		} );
+
+		// The slot is looked for among the blocks of the template, which the
+		// blocks of its template parts are not, though one comes first here.
+		await page.goto( '/?s=anything' );
+		await expect(
+			page.getByRole( 'heading', { name: 'Results' } )
+		).toBeVisible();
+		await expect( page.getByText( 'Banner of the part' ) ).toBeVisible();
+		await expect( page.getByText( 'Frame on its own' ) ).toBeHidden();
+
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//search',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		await page.keyboard.press( 'Escape' );
+
+		// The canvas shows what the front end renders.
+		await expect(
+			editor.canvas.getByText( 'Banner of the part' )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toHaveText( 'Results' );
+		await expect(
+			editor.canvas.getByText( 'Frame on its own' )
+		).toBeHidden();
+	} );
+
+	test( 'offers the template slot block among the blocks of a template alone', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'frame-header',
+			title: 'Frame header',
+			content:
+				'<!-- wp:paragraph --><p>Frame header text</p><!-- /wp:paragraph -->',
+		} );
+		const { id: pageId } = await requestUtils.createPage( {
+			title: 'About us',
+			status: 'publish',
+		} );
+
+		const inserterButton = page.getByRole( 'button', {
+			name: 'Block Inserter',
+			exact: true,
+		} );
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		const templateSlotOption = blockLibrary.getByRole( 'option', {
+			name: 'Template Slot',
+			exact: true,
+		} );
+		// The embeds are listed last, so the blocks of a theme, which the slot
+		// is one of, are listed by the time an embed is.
+		const lastOption = blockLibrary.getByRole( 'option', {
+			name: 'Embed',
+			exact: true,
+		} );
+
+		// The layout template, created before each test.
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//layout',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await inserterButton.click();
+		await expect( lastOption ).toBeVisible();
+		await expect( templateSlotOption ).toBeVisible();
+
+		// A template part is not a template: a slot in one is not where the
+		// templates rendered inside the template it is part of go.
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//frame-header',
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+		await inserterButton.click();
+		await expect( lastOption ).toBeVisible();
+		await expect( templateSlotOption ).toBeHidden();
+
+		// A page is rendered inside a template, and renders none inside it.
+		await admin.visitSiteEditor( {
+			postId: pageId,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+		await inserterButton.click();
+		await expect( lastOption ).toBeVisible();
+		await expect( templateSlotOption ).toBeHidden();
 	} );
 
 	test( 'edits the template parts of the template being edited as it does on its own', async ( {
@@ -335,6 +540,20 @@ test.describe( 'Template rendered inside another template', () => {
 		).toBeVisible();
 		const onItsOwn = await getTemplatePartEditingModes();
 
+		// The panel listing the template parts of a template to edit.
+		const contentPanel = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-panel__body' )
+			.filter( {
+				has: page.getByRole( 'button', {
+					name: 'Content',
+					exact: true,
+				} ),
+			} );
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Archive sidebar' } )
+		).toBeVisible();
+
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
@@ -348,6 +567,16 @@ test.describe( 'Template rendered inside another template', () => {
 			editor.canvas.getByText( 'Archive sidebar text' )
 		).toBeVisible();
 		const insideFrame = await getTemplatePartEditingModes();
+
+		// The panel still lists the part of the template being edited, and
+		// leaves out the part of the template around it, which cannot be
+		// edited from here.
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Archive sidebar' } )
+		).toBeVisible();
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Frame header' } )
+		).toBeHidden();
 
 		// The part of the template being edited is edited as it is when that
 		// template is edited on its own, rather than locked with the template
