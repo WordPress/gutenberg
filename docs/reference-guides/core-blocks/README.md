@@ -1038,7 +1038,7 @@ Where the templates rendered inside this template go. What it holds is shown whe
 -	**Name:** [core/template-slot](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-template-slot/)
 -	**Experimental:** true
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), ~~html~~, ~~multiple~~
+-	**Supports:** align (full, wide), anchor, interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), ~~html~~
 
 ## Term Count
 

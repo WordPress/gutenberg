@@ -367,7 +367,7 @@ class Tests_Block_Template_Parent extends WP_UnitTestCase {
 		$this->assertSame(
 			'<!-- wp:template-slot --><!-- wp:paragraph --><p>Not found</p><!-- /wp:paragraph --><!-- /wp:template-slot --><!-- wp:template-slot /-->',
 			gutenberg_resolve_block_template_parents( $child->id, $child->content ),
-			'The editor lets a template have one slot, and treats the first as the slot when it has more anyway.'
+			'The first slot of a template is its slot, as in the editor, and any other keeps what it holds.'
 		);
 	}
 
