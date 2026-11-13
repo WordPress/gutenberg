@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Terms: Show sample terms in templates, where the block has no post, so the layout, spacing and separator can be checked there ([#85840](https://github.com/WordPress/gutenberg/pull/85840)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).
@@ -45,6 +46,7 @@
 
 ### Enhancements
 
+-   Post Terms: Add layout and Block spacing support. Block spacing is available with the Flex and Grid layouts. Blocks without a saved layout render as before ([#85587](https://github.com/WordPress/gutenberg/issues/85587)).
 -   Tag Cloud: Use the UI SelectControl for the Taxonomy setting ([#86198](https://github.com/WordPress/gutenberg/pull/86198)).
 -   Social Icons: Use the UI SelectControl for the Icon size setting ([#86196](https://github.com/WordPress/gutenberg/pull/86196)).
 -   File: Use the UI SelectControl for the Link to setting ([#86199](https://github.com/WordPress/gutenberg/pull/86199)).
