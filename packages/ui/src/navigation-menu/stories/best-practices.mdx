@@ -6,7 +6,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 Use `NavigationMenu` for persistent links to destinations, with optional disclosure flyouts. It follows the WAI-ARIA disclosure navigation pattern: every destination is a native link, every flyout opener is a native button, and all links and triggers stay in the normal Tab sequence.
 
-The outer `NavigationMenu.Root` renders a navigation landmark and must have a concise accessible name through `aria-label` or `aria-labelledby`. Do not include the word “navigation” in that name because screen readers already announce the landmark role.
+The outer `NavigationMenu.Root` renders a navigation landmark and must have a concise accessible name through `aria-label` or `aria-labelledby`. Do not include the word "navigation" in that name because screen readers already announce the landmark role.
 
 ```tsx
 import { NavigationMenu } from '@wordpress/ui';
@@ -63,7 +63,7 @@ Use `active` only for the one link representing the current page. It produces `a
 
 Pair each `NavigationMenu.Trigger` with one `NavigationMenu.Content` in the same `NavigationMenu.Item`. Use a nested vertical `NavigationMenu.Root` for the links inside a flyout. Nested roots render neutral containers rather than additional navigation landmarks.
 
-Use `ItemLabel` and `ItemDescription` for structured content. `prefix`, `suffix`, and `shortcut` share alignment tracks across related items. Shortcut metadata only communicates an existing shortcut; it does not install a keyboard handler.
+Use text children for a simple label, or `ItemLabel` followed by `ItemDescription` components for structured content. Use `prefix`, `suffix`, and `shortcut` for supporting content. Shortcut metadata only communicates an existing shortcut; it does not install a keyboard handler.
 
 ## Accessibility checks
 

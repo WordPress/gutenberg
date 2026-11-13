@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { forwardRef, useEffect } from '@wordpress/element';
 import resetStyles from '../utils/css/resets.module.css';
 import { useItemValidationContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ContentProps } from './types';
 
 /**

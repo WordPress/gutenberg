@@ -1,9 +1,9 @@
 import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import itemLayoutStyles from '../utils/item-layout/style.module.css';
+import itemLayoutStyles from './item-layout/style.module.css';
 import { ItemValidationProvider, useNavigationMenuContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ItemProps } from './types';
 
 /**

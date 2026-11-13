@@ -1,9 +1,9 @@
 import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { ItemChevron } from '../utils/item-layout';
+import { ItemChevron } from './item-layout';
 import { useNavigationMenuContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { IconProps } from './types';
 
 /**

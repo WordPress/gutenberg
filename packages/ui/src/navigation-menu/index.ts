@@ -3,7 +3,7 @@ import { Backdrop } from './backdrop';
 import { Content } from './content';
 import { Icon } from './icon';
 import { Item } from './item';
-import { ItemDescription, ItemLabel } from '../utils/item-layout';
+import { ItemDescription, ItemLabel } from './item-layout';
 import { Link } from './link';
 import { List } from './list';
 import { Popup } from './popup';

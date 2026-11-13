@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { expect, test } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { gotoStoryId } from '../utils';
 
 test.describe( 'NavigationMenu', () => {
@@ -203,7 +196,7 @@ test.describe( 'NavigationMenu', () => {
 		await expect( chevron ).toHaveCSS( 'rotate', '0deg' );
 	} );
 
-	test( 'opens nested flyouts with arrow keys and moves focus into each level', async ( {
+	test( 'navigates nested flyouts with Tab, Enter, and Escape', async ( {
 		page,
 	} ) => {
 		await gotoStoryId(
@@ -215,17 +208,19 @@ test.describe( 'NavigationMenu', () => {
 			name: 'Appearance',
 		} );
 		await outerTrigger.focus();
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Tab' );
 
 		await expect( outerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
 		await expect(
 			page.getByRole( 'link', { name: 'Themes', exact: true } )
 		).toBeFocused();
 
-		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Tab' );
 		const nestedTrigger = page.getByRole( 'button', { name: 'Design' } );
 		await expect( nestedTrigger ).toBeFocused();
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Tab' );
 
 		await expect( nestedTrigger ).toHaveAttribute(
 			'aria-expanded',
@@ -237,6 +232,8 @@ test.describe( 'NavigationMenu', () => {
 				description: 'Choose how the site looks.',
 			} )
 		).toBeFocused();
+		await page.keyboard.press( 'Escape' );
+		await expect( nestedTrigger ).toBeFocused();
 	} );
 
 	test( 'preserves RTL direction in portaled flyouts', async ( { page } ) => {
@@ -253,13 +250,17 @@ test.describe( 'NavigationMenu', () => {
 		await expect( chevron ).toHaveCSS( 'rotate', '180deg' );
 
 		await nestedTrigger.focus();
-		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Tab' );
 		const richLink = page.getByRole( 'link', {
 			name: 'Themes',
 			description: 'Choose how the site looks.',
 		} );
 		await expect( richLink ).toBeFocused();
 		await expect( richLink ).toHaveCSS( 'direction', 'rtl' );
+		await expect(
+			page.locator( '[data-side="inline-end"][aria-hidden="true"]' )
+		).toHaveCSS( 'rotate', '90deg' );
 
 		const prefixBox = await richLink
 			.locator( '[data-wp-ui-item-layout-prefix]' )

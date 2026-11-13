@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { useItemLayoutContext } from './context';
+import { Text } from '../../text';
 import styles from './style.module.css';
 import type { ItemLabelProps } from './types';
 
@@ -9,12 +9,12 @@ import type { ItemLabelProps } from './types';
  */
 const ItemLabel = forwardRef< HTMLSpanElement, ItemLabelProps >(
 	function ItemLayoutLabel( { className, id, ...props }, ref ) {
-		const itemLayoutContext = useItemLayoutContext();
-
 		return (
-			<span
+			<Text
 				ref={ ref }
-				id={ id ?? itemLayoutContext?.labelId }
+				variant="body-md"
+				data-wp-ui-navigation-item-label=""
+				id={ id }
 				className={ clsx( styles[ 'item-label' ], className ) }
 				{ ...props }
 			/>

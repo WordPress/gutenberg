@@ -1,4 +1,3 @@
-import { DirectionProvider } from '@base-ui/react/direction-provider';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef, useState } from '@wordpress/element';
 import { archive } from '@wordpress/icons';
@@ -13,7 +12,6 @@ import * as NavigationMenu from '../';
 const meta: Meta< typeof NavigationMenu.Root > = {
 	title: 'Design System/Components/NavigationMenu',
 	component: NavigationMenu.Root,
-	tags: [ 'manifest' ],
 	subcomponents: {
 		'NavigationMenu.List': NavigationMenu.List,
 		'NavigationMenu.Item': NavigationMenu.Item,
@@ -48,7 +46,7 @@ type Story = StoryObj< typeof NavigationMenu.Root >;
 const SHORTCUT = {
 	displayShortcut: displayShortcut.primary( 'p' ),
 	ariaKeyShortcut: ariaKeyShortcut.primary( 'p' ),
-	description: shortcutAriaLabel.primary( 'p' ),
+	label: shortcutAriaLabel.primary( 'p' ),
 };
 
 function DefaultPopup( { arrow = false }: { arrow?: boolean } ) {
@@ -108,7 +106,7 @@ export const FlatNavigation: Story = {
 		const RouterLink = forwardRef<
 			HTMLAnchorElement,
 			React.ComponentProps< 'a' >
-		>( function RouterLink( { children, ...props }, ref ) {
+		>( function UnforwardedRouterLink( { children, ...props }, ref ) {
 			return (
 				<a ref={ ref } data-router-link="true" { ...props }>
 					{ children }
@@ -233,12 +231,12 @@ function TwoLevelNavigation() {
 									</NavigationMenu.Content>
 								</NavigationMenu.Item>
 							</NavigationMenu.List>
-							<DefaultPopup />
+							<DefaultPopup arrow />
 						</NavigationMenu.Root>
 					</NavigationMenu.Content>
 				</NavigationMenu.Item>
 			</NavigationMenu.List>
-			<DefaultPopup />
+			<DefaultPopup arrow />
 		</NavigationMenu.Root>
 	);
 }
@@ -369,13 +367,8 @@ export const TallFlyoutContent: Story = {
 };
 
 export const RightToLeft: Story = {
+	globals: { direction: 'rtl' },
 	render: function Render() {
-		return (
-			<DirectionProvider direction="rtl">
-				<div dir="rtl">
-					<TwoLevelNavigation />
-				</div>
-			</DirectionProvider>
-		);
+		return <TwoLevelNavigation />;
 	},
 };

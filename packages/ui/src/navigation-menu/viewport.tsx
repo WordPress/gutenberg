@@ -2,7 +2,7 @@ import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-men
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import resetStyles from '../utils/css/resets.module.css';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ViewportProps } from './types';
 
 /**

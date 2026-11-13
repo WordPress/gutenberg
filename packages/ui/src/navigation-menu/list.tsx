@@ -2,9 +2,9 @@ import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-men
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import resetStyles from '../utils/css/resets.module.css';
-import itemLayoutStyles from '../utils/item-layout/style.module.css';
+import itemLayoutStyles from './item-layout/style.module.css';
 import { useNavigationMenuContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ListProps } from './types';
 
 /**

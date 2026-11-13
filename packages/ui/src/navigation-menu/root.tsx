@@ -3,8 +3,9 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ForwardedRef, ReactElement, RefAttributes } from 'react';
 import resetStyles from '../utils/css/resets.module.css';
+import { DirectionProvider } from '../utils/direction-provider';
 import { NavigationMenuContextProvider } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { RootProps } from './types';
 
 /**
@@ -26,26 +27,28 @@ function NavigationMenuRoot< Value = unknown >(
 	ref: ForwardedRef< HTMLElement >
 ) {
 	return (
-		<NavigationMenuContextProvider
-			isNamed={ !! ( ariaLabel || ariaLabelledBy ) }
-			orientation={ orientation }
-		>
-			<_NavigationMenu.Root< Value >
-				ref={ ref }
-				aria-label={ ariaLabel }
-				aria-labelledby={ ariaLabelledBy }
-				className={ clsx(
-					resetStyles[ 'box-sizing' ],
-					styles.root,
-					className
-				) }
-				data-orientation={ orientation }
+		<DirectionProvider>
+			<NavigationMenuContextProvider
+				isNamed={ !! ( ariaLabel || ariaLabelledBy ) }
 				orientation={ orientation }
-				{ ...props }
 			>
-				{ children }
-			</_NavigationMenu.Root>
-		</NavigationMenuContextProvider>
+				<_NavigationMenu.Root< Value >
+					ref={ ref }
+					aria-label={ ariaLabel }
+					aria-labelledby={ ariaLabelledBy }
+					className={ clsx(
+						resetStyles[ 'box-sizing' ],
+						styles.root,
+						className
+					) }
+					data-orientation={ orientation }
+					orientation={ orientation }
+					{ ...props }
+				>
+					{ children }
+				</_NavigationMenu.Root>
+			</NavigationMenuContextProvider>
+		</DirectionProvider>
 	);
 }
 

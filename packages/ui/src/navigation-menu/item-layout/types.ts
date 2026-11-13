@@ -1,21 +1,7 @@
-import type { ComponentProps, ReactNode } from 'react';
-
-export interface ItemShortcut {
-	/**
-	 * Platform-appropriate visible shortcut, for example `⌘S`.
-	 */
-	displayShortcut: string;
-
-	/**
-	 * Value applied to `aria-keyshortcuts`, for example `Meta+S`.
-	 */
-	ariaKeyShortcut: string;
-
-	/**
-	 * Human-readable shortcut description announced to assistive technology.
-	 */
-	description: string;
-}
+import type { ReactNode } from 'react';
+import type { Text } from '../../text';
+import type { ComponentProps } from '../../utils/types';
+import type { KeyboardShortcut } from '../../utils/keyboard-shortcut';
 
 export interface ItemLayoutProps {
 	/**
@@ -33,7 +19,7 @@ export interface ItemLayoutProps {
 	 *
 	 * This does not install a keyboard event handler.
 	 */
-	shortcut?: ItemShortcut;
+	shortcut?: KeyboardShortcut;
 
 	/**
 	 * Raw text or structured ItemLabel and ItemDescription children.
@@ -42,11 +28,6 @@ export interface ItemLayoutProps {
 }
 
 export interface InternalItemLayoutProps extends ItemLayoutProps {
-	/**
-	 * Selection indicator supplied by checkbox and radio items.
-	 */
-	selectionIndicator?: ReactNode;
-
 	/**
 	 * Content appended inside the label, such as a new-tab indicator.
 	 */
@@ -63,14 +44,20 @@ export interface InternalItemLayoutProps extends ItemLayoutProps {
 	shortcutDescriptionId?: string;
 }
 
-export interface ItemLabelProps extends ComponentProps< 'span' > {
+export interface ItemLabelProps extends Omit<
+	ComponentProps< typeof Text >,
+	'variant'
+> {
 	/**
 	 * The primary label for an interactive item.
 	 */
 	children?: ReactNode;
 }
 
-export interface ItemDescriptionProps extends ComponentProps< 'span' > {
+export interface ItemDescriptionProps extends Omit<
+	ComponentProps< typeof Text >,
+	'variant'
+> {
 	/**
 	 * Supplementary text displayed below an interactive item label.
 	 */

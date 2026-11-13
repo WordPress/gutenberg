@@ -5,7 +5,7 @@ import type {
 	ReactElement,
 	ReactNode,
 } from 'react';
-import type { ItemLayoutProps } from '../utils/item-layout';
+import type { ItemLayoutProps } from './item-layout';
 import type { ComponentProps } from '../utils/types';
 
 type RootBaseProps< Value > = Omit<
@@ -107,8 +107,10 @@ export type ArrowProps = ComponentProps< typeof _NavigationMenu.Arrow > & {
 
 export type BackdropProps = ComponentProps< typeof _NavigationMenu.Backdrop >;
 
-export interface PopupProps
-	extends Omit< ComponentProps< typeof _NavigationMenu.Popup >, 'children' > {
+export interface PopupProps extends Omit<
+	ComponentProps< typeof _NavigationMenu.Popup >,
+	'children'
+> {
 	/**
 	 * The viewport, optional arrow, and any advanced popup content.
 	 */

@@ -3,24 +3,19 @@
 
 	@layer utilities {
 		.alignment-group {
-			--wp-ui-item-layout-prefix-gap: 0px;
+			--_wp-ui-navigation-item-prefix-gap: 0px;
 
 			display: grid;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-item-layout-padding-inline)
-				[selection-start] var(--wp-ui-item-layout-selection-track-size)
-				[selection-end] var(--wp-ui-item-layout-selection-gap)
+				[item-padding-start] var(--_wp-ui-navigation-item-padding-inline)
 				[prefix-start] max-content
-				[prefix-end] var(--wp-ui-item-layout-prefix-gap)
+				[prefix-end] var(--_wp-ui-navigation-item-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-item-layout-padding-inline)
+				[content-end] var(--_wp-ui-navigation-item-padding-inline)
 				[item-padding-end];
 			min-width: 0;
 		}
 
-		.layout-transparent {
-			display: contents;
-		}
 
 		.alignment-wrapper {
 			grid-column: 1 / -1;
@@ -28,32 +23,27 @@
 		}
 
 		.alignment-group:has(> .item > [data-wp-ui-item-layout-prefix]),
-		.alignment-group:has(
-			> .alignment-wrapper > .item > [data-wp-ui-item-layout-prefix]
-		),
-		.alignment-group:has(
-			> .layout-transparent > .item > [data-wp-ui-item-layout-prefix]
-		) {
-			--wp-ui-item-layout-prefix-gap: var(--wpds-dimension-gap-sm);
+			.alignment-group:has(
+				> .alignment-wrapper > .item > [data-wp-ui-item-layout-prefix]
+			) {
+			--_wp-ui-navigation-item-prefix-gap: var(--wpds-dimension-gap-sm);
 		}
 
 		.item {
 			display: grid;
 			grid-column: 1 / -1;
 			grid-template-columns:
-				[item-padding-start] var(--wp-ui-item-layout-padding-inline)
-				[selection-start] var(--wp-ui-item-layout-selection-track-size)
-				[selection-end] var(--wp-ui-item-layout-selection-gap)
+				[item-padding-start] var(--_wp-ui-navigation-item-padding-inline)
 				[prefix-start] max-content
-				[prefix-end] var(--wp-ui-item-layout-prefix-gap)
+				[prefix-end] var(--_wp-ui-navigation-item-prefix-gap)
 				[content-start] minmax(0, 1fr)
-				[content-end] var(--wp-ui-item-layout-padding-inline)
+				[content-end] var(--_wp-ui-navigation-item-padding-inline)
 				[item-padding-end];
 			gap: 0;
 			align-items: center;
 			justify-content: stretch;
 			min-width: 0;
-			min-height: var(--wp-ui-item-layout-min-height);
+			min-height: var(--_wp-ui-navigation-item-min-height);
 		}
 
 		@supports ( grid-template-columns: subgrid ) {
@@ -63,28 +53,11 @@
 			}
 
 			.alignment-group > .item,
-			.alignment-group > .alignment-wrapper > .item,
-			.alignment-group > .layout-transparent > .item {
+			.alignment-group > .alignment-wrapper > .item {
 				grid-template-columns: subgrid;
 			}
 		}
 
-		.item-selection-indicator {
-			grid-column: selection-start / selection-end;
-			align-self: center;
-			justify-self: center;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			width: var(--wp-ui-item-layout-selection-size);
-			height: var(--wp-ui-item-layout-selection-size);
-			color: var(--wpds-color-foreground-content-neutral-weak);
-			pointer-events: none;
-
-			& > [data-unchecked] {
-				opacity: 0;
-			}
-		}
 
 		.item-prefix {
 			grid-column: prefix-start / prefix-end;
@@ -115,7 +88,7 @@
 			grid-column: label-start / label-end;
 			display: inline-flex;
 			flex-direction: column;
-			gap: 2px;
+			gap: var(--wpds-dimension-gap-xs);
 			min-width: 0;
 		}
 
@@ -126,7 +99,7 @@
 			white-space: nowrap;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-md);
-			line-height: var(--wpds-typography-line-height-sm);
+			line-height: var(--wpds-typography-line-height-xs);
 			font-weight: var(--wpds-typography-font-weight-default);
 			color: inherit;
 		}
@@ -162,7 +135,7 @@
 			grid-column: trailing-start / trailing-end;
 			display: flex;
 			align-items: center;
-			margin-inline-start: var(--wp-ui-item-layout-trailing-gap, var(--wpds-dimension-gap-lg));
+			margin-inline-start: var(--_wp-ui-navigation-item-trailing-gap, var(--wpds-dimension-gap-lg));
 			color: var(--wpds-color-foreground-content-neutral-weak);
 		}
 
@@ -208,4 +181,13 @@
 			}
 		}
 	}
+	@layer compositions {
+		.item-label,
+		.item-description {
+			--_gcd-p-line-height: var(--wpds-typography-line-height-xs);
+
+			line-height: var(--wpds-typography-line-height-xs);
+		}
+	}
+
 }

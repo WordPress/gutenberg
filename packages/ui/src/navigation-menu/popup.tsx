@@ -2,13 +2,12 @@ import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-men
 import { useDirection } from '@base-ui/react/direction-provider';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import popupStyles from '../utils/css/dropdown-popup.module.css';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { ThemeProvider } from '../utils/theme-provider';
 import { useNavigationMenuContext } from './context';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { PopupProps } from './types';
 
 /**
@@ -37,10 +36,10 @@ const Popup = forwardRef< HTMLElement, PopupProps >(
 					render={ render ?? <div /> }
 					dir={ direction }
 					className={ clsx(
-						popupStyles.surface,
+						styles.surface,
 						depth > 0
-							? popupStyles[ 'nested-motion' ]
-							: popupStyles[ 'root-motion' ],
+							? styles[ 'nested-motion' ]
+							: styles[ 'root-motion' ],
 						styles.popup,
 						className
 					) }

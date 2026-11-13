@@ -1,7 +1,7 @@
 import { NavigationMenu as _NavigationMenu } from '@base-ui/react/navigation-menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ArrowProps } from './types';
 
 function DefaultArrowSvg( props: React.ComponentProps< 'svg' > ) {

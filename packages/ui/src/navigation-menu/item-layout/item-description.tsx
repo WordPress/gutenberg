@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { useItemLayoutContext } from './context';
+import { Text } from '../../text';
 import styles from './style.module.css';
 import type { ItemDescriptionProps } from './types';
 
@@ -9,12 +9,11 @@ import type { ItemDescriptionProps } from './types';
  */
 const ItemDescription = forwardRef< HTMLSpanElement, ItemDescriptionProps >(
 	function ItemLayoutDescription( { className, id, ...props }, ref ) {
-		const itemLayoutContext = useItemLayoutContext();
-
 		return (
-			<span
+			<Text
 				ref={ ref }
-				id={ id ?? itemLayoutContext?.descriptionId }
+				variant="body-sm"
+				id={ id }
 				className={ clsx( styles[ 'item-description' ], className ) }
 				data-wp-ui-item-layout-muted=""
 				{ ...props }

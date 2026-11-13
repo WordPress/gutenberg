@@ -3,16 +3,11 @@ import clsx from 'clsx';
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
-import focusStyles from '../utils/css/focus.module.css';
 import resetStyles from '../utils/css/resets.module.css';
-import {
-	ItemLayout,
-	ItemLayoutContext,
-	useItemContent,
-} from '../utils/item-layout';
-import itemLayoutStyles from '../utils/item-layout/style.module.css';
+import { ItemLayout, useItemContent } from './item-layout';
+import itemLayoutStyles from './item-layout/style.module.css';
 import { useNavigationMenuContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { LinkProps } from './types';
 
 /**
@@ -52,14 +47,17 @@ const Link = forwardRef< HTMLAnchorElement, LinkProps >(
 				}
 			/>
 		) : null;
-		const { contentContextValue, itemAriaProps, shortcutDescriptionId } =
-			useItemContent( children, {
-				'aria-describedby': ariaDescribedBy,
-				'aria-keyshortcuts': ariaKeyShortcuts,
-				'aria-label': ariaLabel,
-				'aria-labelledby': ariaLabelledBy,
-				shortcut,
-			} );
+		const {
+			contentChildren: labelledChildren,
+			itemAriaProps,
+			shortcutDescriptionId,
+		} = useItemContent( children, {
+			'aria-describedby': ariaDescribedBy,
+			'aria-keyshortcuts': ariaKeyShortcuts,
+			'aria-label': ariaLabel,
+			'aria-labelledby': ariaLabelledBy,
+			shortcut,
+		} );
 
 		useEffect(
 			() => registerActiveLink( registrationId.current, active ),
@@ -78,24 +76,21 @@ const Link = forwardRef< HTMLAnchorElement, LinkProps >(
 				className={ clsx(
 					defenseStyles.a,
 					resetStyles[ 'box-sizing' ],
-					focusStyles[ 'outset-ring--focus-visible' ],
 					itemLayoutStyles.item,
 					styles.interactive,
 					styles[ `interactive--${ orientation }` ],
 					className
 				) }
 			>
-				<ItemLayoutContext.Provider value={ contentContextValue }>
-					<ItemLayout
-						labelTrailing={ externalLinkIndicator }
-						prefix={ prefix }
-						shortcut={ shortcut }
-						shortcutDescriptionId={ shortcutDescriptionId }
-						suffix={ suffix }
-					>
-						{ children }
-					</ItemLayout>
-				</ItemLayoutContext.Provider>
+				<ItemLayout
+					labelTrailing={ externalLinkIndicator }
+					prefix={ prefix }
+					shortcut={ shortcut }
+					shortcutDescriptionId={ shortcutDescriptionId }
+					suffix={ suffix }
+				>
+					{ labelledChildren }
+				</ItemLayout>
 			</_NavigationMenu.Link>
 		);
 	}
