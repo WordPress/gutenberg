@@ -112,8 +112,17 @@ function BlockSwitcherDropdownMenuContents( {
 			name
 		);
 		if ( newBlocks ) {
-			replaceBlocks( clientIds, newBlocks );
-			selectForMultipleBlocks( newBlocks );
+			const [ newBlock, ...rest ] = newBlocks;
+			// Reusing the client ID updates the block in place instead of remounting it.
+			const replacements =
+				newBlock.name === blocks[ 0 ].name
+					? [
+							{ ...newBlock, clientId: blocks[ 0 ].clientId },
+							...rest,
+						]
+					: newBlocks;
+			replaceBlocks( clientIds, replacements );
+			selectForMultipleBlocks( replacements );
 			return;
 		}
 		updateBlockAttributes( blocks[ 0 ].clientId, {
