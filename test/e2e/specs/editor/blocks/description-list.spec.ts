@@ -1,4 +1,6 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Locator, Page } from '@playwright/test';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { Editor } from '@wordpress/e2e-test-utils-playwright';
 
 const STRUCTURE_WARNING_PANEL = 'Description List structure';
 const INVALID_BOUNDARIES_WARNING =
@@ -8,7 +10,7 @@ const INVALID_START_WARNING =
 const INVALID_END_WARNING =
 	'End this list with a description. Reorder blocks or change their types.';
 
-async function expectStructureWarning( page, message ) {
+async function expectStructureWarning( page: Page, message: string ) {
 	const panel = page.getByRole( 'button', {
 		name: STRUCTURE_WARNING_PANEL,
 	} );
@@ -18,13 +20,21 @@ async function expectStructureWarning( page, message ) {
 	await expect( page.getByText( message, { exact: true } ) ).toBeVisible();
 }
 
-async function expectNoStructureWarning( page ) {
+async function expectNoStructureWarning( page: Page ) {
 	await expect(
 		page.getByRole( 'button', { name: STRUCTURE_WARNING_PANEL } )
 	).toHaveCount( 0 );
 }
 
-async function selectParentListSettings( { editor, page, child } ) {
+async function selectParentListSettings( {
+	editor,
+	page,
+	child,
+}: {
+	editor: Editor;
+	page: Page;
+	child: Locator;
+} ) {
 	await child.click();
 	await editor.clickBlockToolbarButton(
 		'Select parent block: Description List'
