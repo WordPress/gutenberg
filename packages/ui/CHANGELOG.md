@@ -9,6 +9,7 @@
 
 ### New Features
 
+-   `Notice`: Add `getAnnouncementText` and use it in `List` to preserve line breaks and omit CSS-hidden message text ([#86790](https://github.com/WordPress/gutenberg/pull/86790)).
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
