@@ -30,11 +30,8 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 
 		&.dataviews-view-table__actions-column {
 			text-align: right;
-		}
-
-		&.dataviews-view-table__actions-column--sticky {
 			position: sticky;
-			right: 0;
+			inset-inline-end: 0;
 			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 			// The masked strip at the start of the cell lets the columns
 			// scrolling under it show through, fading into the cell's own
@@ -115,7 +112,7 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 				border-top: 1px solid var(--wpds-color-stroke-surface-brand);
 			}
 
-			.dataviews-view-table__actions-column--sticky {
+			.dataviews-view-table__actions-column {
 				background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			}
 		}
@@ -135,14 +132,14 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 		tr {
 			&:focus-within,
 			&:hover {
-				.dataviews-view-table__actions-column--sticky {
+				.dataviews-view-table__actions-column {
 					background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 				}
 			}
 
 			&.is-selected,
 			&.is-selected:hover {
-				.dataviews-view-table__actions-column--sticky {
+				.dataviews-view-table__actions-column {
 					background-color: var(--wpds-color-background-interactive-brand-weak-active);
 				}
 			}
@@ -298,7 +295,7 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 	// padding, in every density.
 	td,
 	th {
-		&.dataviews-view-table__actions-column--sticky {
+		&.dataviews-view-table__actions-column {
 			padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-md));
 		}
 	}
@@ -306,7 +303,7 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 	&.has-compact-density {
 		td,
 		th {
-			&.dataviews-view-table__actions-column--sticky {
+			&.dataviews-view-table__actions-column {
 				padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
 			}
 		}
