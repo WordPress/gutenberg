@@ -74,6 +74,39 @@ test.describe( 'Table', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'saves text typed into a cell after the first click into an unselected table', async ( {
+		editor,
+		page,
+	} ) => {
+		// No block is selected after setting the content.
+		await editor.setContent(
+			'<!-- wp:table --><figure class="wp-block-table"><table><tbody><tr><td></td><td></td></tr></tbody></table></figure><!-- /wp:table -->'
+		);
+
+		// A single click into a cell should select it, so typing is saved.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Body cell text' } )
+			.first()
+			.click();
+		await page.keyboard.type( 'Typed' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/table',
+				attributes: {
+					body: [
+						{
+							cells: [
+								{ content: 'Typed', tag: 'td' },
+								{ content: '', tag: 'td' },
+							],
+						},
+					],
+				},
+			},
+		] );
+	} );
+
 	test( 'allows header and footer rows to be switched on and off', async ( {
 		editor,
 		page,
