@@ -24,6 +24,182 @@ interface UseConnectorPluginOptions {
 	initialIsConnected?: boolean;
 }
 
+interface WpUpdatesInstallPluginResponse {
+	slug: string;
+	plugin?: string;
+}
+
+interface WpUpdatesInstallPluginErrorResponse {
+	slug: string;
+	errorCode?: string;
+	errorMessage?: string;
+}
+
+interface WpUpdates {
+	installPlugin: ( args: { slug: string } ) => void;
+	maybeRequestFilesystemCredentials?: ( event: {
+		target: Element | null;
+	} ) => void;
+}
+
+type JQueryHandler = (
+	event: unknown,
+	response:
+		WpUpdatesInstallPluginResponse | WpUpdatesInstallPluginErrorResponse
+) => void;
+
+type JQueryAjaxCompleteHandler = (
+	event: unknown,
+	xhr: { status: number; responseJSON?: unknown },
+	settings: { data?: unknown }
+) => void;
+
+interface WpUpdatesGlobal {
+	wp?: {
+		updates?: WpUpdates;
+	};
+	jQuery?: ( target: Document ) => {
+		on: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
+		off: (
+			events: string,
+			handler: JQueryHandler | JQueryAjaxCompleteHandler
+		) => void;
+	};
+}
+
+/**
+ * Whether a rejected REST plugin install failed because the filesystem
+ * requires credentials (`FS_METHOD` is not `direct` and none are stored).
+ *
+ * @param error Rejection from the REST plugin endpoint.
+ */
+export function isFilesystemUnavailableError( error: unknown ): boolean {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		( error as { code?: unknown } ).code === 'fs_unavailable'
+	);
+}
+
+/**
+ * Outcome of an install routed through `wp.updates.installPlugin()`.
+ *
+ * `canceled` is a normal control-flow result (the user closed the
+ * filesystem credentials modal), not an error. Genuine install
+ * failures reject the promise instead.
+ */
+export type WpUpdatesInstallOutcome = 'installed' | 'canceled';
+
+/**
+ * Click event of the button that starts an install.
+ */
+export type InstallButtonClickEvent = { currentTarget: Element };
+
+/**
+ * Installs a plugin via `wp.updates.installPlugin()`.
+ *
+ * @param slug    Plugin slug.
+ * @param trigger Element that started the install. Focus returns to it when
+ *                the filesystem credentials modal closes.
+ */
+export function installPluginViaWpUpdates(
+	slug: string,
+	trigger?: Element | null
+): Promise< WpUpdatesInstallOutcome > {
+	return new Promise( ( resolve, reject ) => {
+		const w = window as unknown as WpUpdatesGlobal;
+		const jq = w.jQuery;
+		const updates = w.wp?.updates;
+		if ( ! jq || ! updates?.installPlugin ) {
+			reject( new Error( 'wp.updates.installPlugin is not available.' ) );
+			return;
+		}
+
+		// Handlers are registered with on()/off() (not one()) and filtered
+		// by slug. With one(), a concurrent install of a *different* plugin
+		// firing first would consume the one-shot handler and leave this
+		// promise pending forever. on() + explicit cleanup() only tears
+		// down once the matching slug's event arrives.
+		const cleanup = () => {
+			jq( document ).off( 'wp-plugin-install-success', onSuccess );
+			jq( document ).off( 'wp-plugin-install-error', onError );
+			jq( document ).off( 'credential-modal-cancel', onCancel );
+			jq( document ).off( 'ajaxComplete', onAjaxComplete );
+		};
+
+		const onSuccess: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginResponse ).slug !== slug
+			) {
+				return;
+			}
+			cleanup();
+			resolve( 'installed' );
+		};
+		const onError: JQueryHandler = ( _event, response ) => {
+			if (
+				( response as WpUpdatesInstallPluginErrorResponse ).slug !==
+				slug
+			) {
+				return;
+			}
+			cleanup();
+			const errResponse = response as WpUpdatesInstallPluginErrorResponse;
+			reject(
+				new Error( errResponse.errorMessage ?? 'Install failed.' )
+			);
+		};
+		const onCancel: JQueryHandler = () => {
+			cleanup();
+			resolve( 'canceled' );
+		};
+		// When the server returns an unexpected response (for example, an
+		// expired nonce or a PHP fatal error), none of the events above
+		// fire. Watch the install request itself so the install fails
+		// instead of staying on "Installing…".
+		const onAjaxComplete: JQueryAjaxCompleteHandler = (
+			_event,
+			xhr,
+			settings
+		) => {
+			if ( typeof settings.data !== 'string' ) {
+				return;
+			}
+			const params = new URLSearchParams( settings.data );
+			if (
+				params.get( 'action' ) !== 'install-plugin' ||
+				params.get( 'slug' ) !== slug
+			) {
+				return;
+			}
+			if (
+				xhr.status !== 200 ||
+				typeof xhr.responseJSON !== 'object' ||
+				xhr.responseJSON === null
+			) {
+				cleanup();
+				reject( new Error( 'Install failed.' ) );
+			}
+		};
+
+		jq( document ).on( 'wp-plugin-install-success', onSuccess );
+		jq( document ).on( 'wp-plugin-install-error', onError );
+		jq( document ).on( 'credential-modal-cancel', onCancel );
+		jq( document ).on( 'ajaxComplete', onAjaxComplete );
+
+		// Open the credentials modal before sending the request, as
+		// Plugins > Add Plugin does. The modal then opens without an error,
+		// and focus returns to the install button when it closes.
+		updates.maybeRequestFilesystemCredentials?.( {
+			target: trigger ?? null,
+		} );
+		updates.installPlugin( { slug } );
+	} );
+}
+
 interface UseConnectorPluginReturn {
 	pluginStatus: PluginStatus;
 	canInstallPlugins: boolean | undefined;
@@ -36,7 +212,7 @@ interface UseConnectorPluginReturn {
 	currentUsername: string;
 	hasResolvedSettings: boolean;
 	keySource: ApiKeySource;
-	handleButtonClick: () => void;
+	handleButtonClick: ( event?: InstallButtonClickEvent ) => void;
 	getButtonLabel: () => string;
 	saveApiKey: ( apiKey: string ) => Promise< void >;
 	removeApiKey: () => Promise< void >;
@@ -251,18 +427,55 @@ export function useConnectorPlugin( {
 		);
 	};
 
-	const installPlugin = async () => {
+	const installPlugin = async ( event?: InstallButtonClickEvent ) => {
 		if ( ! pluginSlug ) {
 			return;
 		}
+		// `currentTarget` is only set while the event is being handled, so
+		// read it before the first `await`.
+		const trigger = event?.currentTarget;
 		setIsBusy( true );
 		try {
-			await saveEntityRecord(
-				'root',
-				'plugin',
-				{ slug: pluginSlug, status: 'active' },
-				{ throwOnError: true }
-			);
+			try {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: pluginSlug, status: 'active' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				// The REST plugin endpoint rejects installs up front with
+				// `fs_unavailable` when FS_METHOD is not 'direct' and
+				// credentials have not been stored. Fall back to
+				// wp.updates.installPlugin() so the standard "Connection
+				// Information" modal handles credential entry, then activate
+				// via REST.
+				if ( ! isFilesystemUnavailableError( error ) ) {
+					throw error;
+				}
+				const outcome = await installPluginViaWpUpdates(
+					pluginSlug,
+					trigger
+				);
+				if ( outcome === 'canceled' ) {
+					// User closed the credentials modal; abort silently.
+					return;
+				}
+				if ( pluginBasename ) {
+					await saveEntityRecord(
+						'root',
+						'plugin',
+						{ plugin: pluginBasename, status: 'active' },
+						{ throwOnError: true }
+					);
+				}
+				// Refresh plugin entity so derived state reflects install.
+				invalidateResolution( 'getEntityRecord', [
+					'root',
+					'plugin',
+					pluginBasename,
+				] );
+			}
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the new plugin may register new settings.
 			invalidateResolution( 'getEntityRecord', [ 'root', 'site' ] );
@@ -342,12 +555,12 @@ export function useConnectorPlugin( {
 		}
 	};
 
-	const handleButtonClick = () => {
+	const handleButtonClick = ( event?: InstallButtonClickEvent ) => {
 		if ( pluginStatus === 'not-installed' ) {
 			if ( canInstallPlugins === false ) {
 				return;
 			}
-			installPlugin();
+			installPlugin( event );
 		} else if ( pluginStatus === 'inactive' ) {
 			if ( canActivatePlugins === false ) {
 				return;
