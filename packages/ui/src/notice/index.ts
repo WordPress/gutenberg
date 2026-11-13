@@ -7,6 +7,8 @@ import { CloseIconButton } from './close-icon-button';
 import { ActionButton } from './action-button';
 import { ActionLink } from './action-link';
 
+export { getAnnouncementText } from './get-announcement-text';
+
 export {
 	Root,
 	List,

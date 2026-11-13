@@ -3,6 +3,7 @@ import { createPortal, forwardRef, useRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ListProps, RootProps } from './types';
+import { getAnnouncementText } from './get-announcement-text';
 import styles from './style.module.css';
 
 const LIST_SELECTOR = '[data-wp-ui-notice-list]';
@@ -52,25 +53,7 @@ function readMessage( root: HTMLElement ) {
 					element.closest( CONTENT_BOUNDARY ) === root &&
 					! isHidden( element, root )
 			)
-			.map( ( element ) => {
-				const walker = element.ownerDocument.createTreeWalker(
-					element,
-					NodeFilter.SHOW_TEXT,
-					{
-						acceptNode( node ) {
-							return node.parentElement &&
-								isHidden( node.parentElement, root )
-								? NodeFilter.FILTER_REJECT
-								: NodeFilter.FILTER_ACCEPT;
-						},
-					}
-				);
-				let text = '';
-				while ( walker.nextNode() ) {
-					text += walker.currentNode.textContent;
-				}
-				return text.trim();
-			} )
+			.map( getAnnouncementText )
 			.filter( Boolean )
 			.join( ' ' );
 	}
@@ -203,6 +186,8 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 					characterData: true,
 					subtree: true,
 					attributeFilter: [
+						'class',
+						'style',
 						'hidden',
 						'aria-hidden',
 						'data-wp-ui-notice-politeness',

@@ -1,12 +1,7 @@
 const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
 
-/**
- * Read the rendered description of a legacy HTML notice. Browsers include
- * visible aria-hidden text in innerText, so read around those elements.
- *
- * @param element The rendered notice description.
- */
-export default function getHTMLNoticeText( element: HTMLElement ): string {
+// Read around aria-hidden descendants, which innerText includes.
+function readText( element: HTMLElement ): string {
 	if (
 		! element.querySelector( HIDDEN_CONTENT ) &&
 		element.getClientRects().length > 0 &&
@@ -33,7 +28,7 @@ export default function getHTMLNoticeText( element: HTMLElement ): string {
 				text += '\n';
 				continue;
 			}
-			const childText = getHTMLNoticeText( child );
+			const childText = readText( child );
 			const inline =
 				! display ||
 				display.startsWith( 'inline' ) ||
@@ -42,4 +37,33 @@ export default function getHTMLNoticeText( element: HTMLElement ): string {
 		}
 	}
 	return text;
+}
+
+/**
+ * Read a mounted notice title or description for an explicit spoken message.
+ * Preserves rendered line breaks, omits hidden descendants, and trims the result.
+ * Only the supplied element's contents are read. Ancestor aria-hidden is ignored
+ * so an application can prepare a message while a dialog hides its background.
+ *
+ * @param element The element containing the message, excluding actions and details.
+ * @return The text to announce.
+ */
+export function getAnnouncementText( element: HTMLElement ): string {
+	if ( element.matches( HIDDEN_CONTENT ) ) {
+		return '';
+	}
+	const view = element.ownerDocument.defaultView;
+	for (
+		let current: HTMLElement | null = element;
+		current;
+		current = current.parentElement
+	) {
+		if (
+			current.hidden ||
+			view?.getComputedStyle( current ).display === 'none'
+		) {
+			return '';
+		}
+	}
+	return readText( element ).trim();
 }
