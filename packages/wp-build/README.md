@@ -567,7 +567,7 @@ Export a `route` object with optional hooks. Each hook receives `{ params, searc
     - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
     - `null` → custom `canvas.tsx` component (if provided)
     - `undefined` or omitted → no canvas
-- **`title`** — Runs in parallel with `loader`. Returns the page's title as a string, or a promise of a string. After each navigation within the application, the title is announced to screen readers and used to update the document title. Every route should define it: without it, screen reader users do not hear that the page changed, and the browser tab keeps the title of the previous page. The initial page load keeps the title that WordPress gives the admin page.
+- **`title`** — Runs in parallel with `loader`. Returns the page's title as a string, or a promise of a string. After each navigation within the application, the title is announced to screen readers and used to update the document title. Every route should define it: without it, screen reader users do not hear that the page changed, and the browser tab keeps the title of the previous page.
 
 ```tsx
 export const route = {
