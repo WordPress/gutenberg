@@ -16,7 +16,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -30,7 +30,7 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import { getImageAttributes, isGalleryFlexLayout, isObject } from './shared';
+import { getImageAttributes, isGalleryFlexLayout } from './shared';
 import { getHrefAndDestination } from './utils';
 import { getDefaultLinkDestination } from '../image/utils';
 import Gallery from './gallery';
@@ -123,58 +123,12 @@ export default function GalleryEdit( props ) {
 		( isDynamic ? LINK_DESTINATION_NONE : getDefaultLinkDestination() );
 	const galleryAttributes = { ...attributes, linkTo };
 	const isFlexLayout = isGalleryFlexLayout( layout );
-	const previousLayoutRef = useRef( layout );
 
 	const { getBlocks } = useSelect( blockEditorStore );
-	const {
-		__unstableMarkNextChangeAsNotPersistent,
-		replaceInnerBlocks,
-		updateBlockAttributes,
-		selectBlock,
-	} = useDispatch( blockEditorStore );
+	const { replaceInnerBlocks, updateBlockAttributes, selectBlock } =
+		useDispatch( blockEditorStore );
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
-
-	useEffect( () => {
-		// Variations replace the whole layout object. Carry Grid-only settings
-		// across a layout type change so switching back restores them.
-		const previousLayout = previousLayoutRef.current;
-		previousLayoutRef.current = layout;
-
-		if (
-			! isObject( previousLayout ) ||
-			! isObject( layout ) ||
-			previousLayout.type === layout.type
-		) {
-			return;
-		}
-
-		const nextLayout = { ...layout };
-		let hasPreservedGridSetting = false;
-
-		if (
-			! Object.hasOwn( layout, 'columnCount' ) &&
-			Number.isInteger( previousLayout.columnCount ) &&
-			previousLayout.columnCount > 0
-		) {
-			nextLayout.columnCount = previousLayout.columnCount;
-			hasPreservedGridSetting = true;
-		}
-
-		if (
-			! Object.hasOwn( layout, 'minimumColumnWidth' ) &&
-			typeof previousLayout.minimumColumnWidth === 'string'
-		) {
-			nextLayout.minimumColumnWidth = previousLayout.minimumColumnWidth;
-			hasPreservedGridSetting = true;
-		}
-
-		if ( hasPreservedGridSetting ) {
-			previousLayoutRef.current = nextLayout;
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { layout: nextLayout } );
-		}
-	}, [ layout, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	const { innerBlockImages, multiGallerySelection, selectedStyleState } =
 		useSelect(
