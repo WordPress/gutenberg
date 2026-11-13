@@ -84,39 +84,60 @@ export function getPopulatedCategories(
 	return categories;
 }
 
+export function isPatternInCategory(
+	pattern: BlockPattern,
+	categoryName: string,
+	allCategories: PatternCategory[]
+): boolean {
+	if ( categoryName === allPatternsCategory.name ) {
+		return true;
+	}
+
+	if (
+		categoryName === sitePatternsCategory.name &&
+		pattern.type === INSERTER_PATTERN_TYPES.user
+	) {
+		return true;
+	}
+
+	if (
+		categoryName === starterPatternsCategory.name &&
+		pattern.blockTypes?.includes( 'core/post-content' )
+	) {
+		return true;
+	}
+
+	if ( categoryName === 'uncategorized' ) {
+		return ! hasRegisteredCategory( pattern, allCategories );
+	}
+
+	return !! pattern.categories?.includes( categoryName );
+}
+
+export function getPatternSourceType( pattern: BlockPattern ) {
+	if ( pattern.type === INSERTER_PATTERN_TYPES.user ) {
+		return INSERTER_PATTERN_TYPES.user;
+	}
+
+	if (
+		pattern.source === 'core' ||
+		pattern.source?.startsWith( 'pattern-directory' )
+	) {
+		return INSERTER_PATTERN_TYPES.directory;
+	}
+
+	return INSERTER_PATTERN_TYPES.theme;
+}
+
 export function isPatternFiltered(
 	pattern: BlockPattern,
 	sourceFilter: string,
 	syncFilter?: string,
 	authorFilter?: string
 ): boolean {
-	const isUserPattern = pattern.name.startsWith( 'core/block' );
-	const isDirectoryPattern =
-		pattern.source === 'core' ||
-		pattern.source?.startsWith( 'pattern-directory' );
-
-	// If theme source selected, filter out user created patterns and those from
-	// the core patterns directory.
 	if (
-		sourceFilter === INSERTER_PATTERN_TYPES.theme &&
-		( isUserPattern || isDirectoryPattern )
-	) {
-		return true;
-	}
-
-	// If the directory source is selected, filter out user created patterns
-	// and those bundled with the theme.
-	if (
-		sourceFilter === INSERTER_PATTERN_TYPES.directory &&
-		( isUserPattern || ! isDirectoryPattern )
-	) {
-		return true;
-	}
-
-	// If user source selected, filter out theme patterns.
-	if (
-		sourceFilter === INSERTER_PATTERN_TYPES.user &&
-		pattern.type !== INSERTER_PATTERN_TYPES.user
+		sourceFilter !== 'all' &&
+		getPatternSourceType( pattern ) !== sourceFilter
 	) {
 		return true;
 	}
@@ -140,7 +161,7 @@ export function isPatternFiltered(
 	if (
 		syncFilter === INSERTER_SYNC_TYPES.unsynced &&
 		pattern.syncStatus !== 'unsynced' &&
-		isUserPattern
+		pattern.name.startsWith( 'core/block' )
 	) {
 		return true;
 	}
