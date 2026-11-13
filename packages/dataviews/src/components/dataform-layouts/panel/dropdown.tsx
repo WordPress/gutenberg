@@ -1,14 +1,22 @@
 import {
-	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
-	Dropdown,
 	Button,
+	Popover as WCPopover,
+	SlotFillProvider,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { __, isRTL } from '@wordpress/i18n';
+import { useId, useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
-import { Stack } from '@wordpress/ui';
+import {
+	useConstrainedTabbing,
+	useFocusOnMount,
+	useMergeRefs,
+} from '@wordpress/compose';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Keep panel flyouts in the parent UI overlay's focus tree.
+	Popover,
+	Stack,
+} from '@wordpress/ui';
 import type {
 	FieldLayoutProps,
 	NormalizedForm,
@@ -20,13 +28,7 @@ import SummaryButton from './summary-button';
 import useRevealValidity from '../../../hooks/use-reveal-validity';
 import useFieldFromFormField from './utils/use-field-from-form-field';
 
-function DropdownHeader( {
-	title,
-	onClose,
-}: {
-	title?: string;
-	onClose: () => void;
-} ) {
+function DropdownHeader( { title }: { title?: string } ) {
 	return (
 		<Stack
 			direction="column"
@@ -34,20 +36,17 @@ function DropdownHeader( {
 			gap="lg"
 		>
 			<Stack direction="row" gap="sm" align="center">
-				{ title && (
-					<Heading level={ 2 } size={ 13 }>
-						{ title }
-					</Heading>
-				) }
+				<Popover.Title>{ title || __( 'Edit' ) }</Popover.Title>
 				<Spacer style={ { flex: 1 } } />
-				{ onClose && (
-					<Button
-						label={ __( 'Close' ) }
-						icon={ closeSmall }
-						onClick={ onClose }
-						size="small"
-					/>
-				) }
+				<Popover.Close
+					render={
+						<Button
+							label={ __( 'Close' ) }
+							icon={ closeSmall }
+							size="small"
+						/>
+					}
+				/>
 			</Stack>
 		</Stack>
 	);
@@ -71,29 +70,18 @@ function PanelDropdown< Item >( {
 	onChange,
 	validity,
 }: FieldLayoutProps< Item > ) {
+	const legacyPopoverSlotName = useId();
 	const [ touched, setTouched ] = useState( false );
+	const [ isOpen, setIsOpen ] = useState( false );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const initialFocusRef = useFocusOnMount( 'firstInputElement' );
+	const popupRef = useMergeRefs( [ constrainedTabbingRef, initialFocusRef ] );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
 		null
 	);
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() =>
-			( {
-				// Anchor the popover to the middle of the entire row so that it doesn't
-				// move around when the label changes.
-				anchor: popoverAnchor,
-				placement: 'left-start',
-				offset: 36,
-				shift: true,
-			} ) as const,
-		[ popoverAnchor ]
-	);
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: 'firstInputElement',
-	} );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -131,64 +119,81 @@ function PanelDropdown< Item >( {
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field-dropdown-anchor"
 		>
-			<Dropdown
-				contentClassName="dataforms-layouts-panel__field-dropdown"
-				popoverProps={ popoverProps }
-				focusOnMount={ false }
-				onToggle={ ( willOpen ) => {
+			<Popover.Root
+				open={ isOpen }
+				onOpenChange={ ( willOpen ) => {
+					setIsOpen( willOpen );
 					if ( ! willOpen ) {
 						setTouched( true );
 					}
 				} }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<SummaryButton
-						data={ data }
-						field={ field }
-						fieldLabel={ fieldLabel }
-						summaryFields={ summaryFields }
-						validity={ validity }
-						touched={ touched }
-						disabled={ isDisabled }
-						isOpen={ isOpen }
-						onClick={ onToggle }
-					/>
-				) }
-				renderContent={ ( { onClose } ) => (
-					<DropdownContentWithValidation touched={ touched }>
-						<div ref={ dialogRef } { ...dialogProps }>
-							<DropdownHeader
-								title={ fieldLabel }
-								onClose={ onClose }
-							/>
-							<DataFormLayout
-								data={ data }
-								form={ form }
-								onChange={ onChange }
-								validity={ formValidity }
-							>
-								{ (
-									FieldLayout,
-									childField,
-									childFieldValidity,
-									markWhenOptional
-								) => (
-									<FieldLayout
-										key={ childField.id }
-										data={ data }
-										field={ childField }
-										onChange={ onChange }
-										hideLabelFromVision={
-											( form?.fields ?? [] ).length < 2
-										}
-										markWhenOptional={ markWhenOptional }
-										validity={ childFieldValidity }
-									/>
-								) }
-							</DataFormLayout>
-						</div>
-					</DropdownContentWithValidation>
-				) }
-			/>
+			>
+				<SummaryButton
+					data={ data }
+					field={ field }
+					fieldLabel={ fieldLabel }
+					summaryFields={ summaryFields }
+					validity={ validity }
+					touched={ touched }
+					disabled={ isDisabled }
+					isOpen={ isOpen }
+					renderButton={ ( button ) => (
+						<Popover.Trigger render={ button } />
+					) }
+				/>
+				<Popover.Popup
+					ref={ popupRef }
+					initialFocus={ false }
+					className="dataforms-layouts-panel__field-dropdown"
+					positioner={
+						<Popover.Positioner
+							anchor={ popoverAnchor }
+							side={ isRTL() ? 'right' : 'left' }
+							align="start"
+							sideOffset={ 36 }
+						/>
+					}
+				>
+					<SlotFillProvider passthrough>
+						<WCPopover.__unstableSlotNameProvider
+							value={ legacyPopoverSlotName }
+						>
+							<DropdownContentWithValidation touched={ touched }>
+								<DropdownHeader title={ fieldLabel } />
+								<DataFormLayout
+									data={ data }
+									form={ form }
+									onChange={ onChange }
+									validity={ formValidity }
+								>
+									{ (
+										FieldLayout,
+										childField,
+										childFieldValidity,
+										markWhenOptional
+									) => (
+										<FieldLayout
+											key={ childField.id }
+											data={ data }
+											field={ childField }
+											onChange={ onChange }
+											hideLabelFromVision={
+												( form?.fields ?? [] ).length <
+												2
+											}
+											markWhenOptional={
+												markWhenOptional
+											}
+											validity={ childFieldValidity }
+										/>
+									) }
+								</DataFormLayout>
+							</DropdownContentWithValidation>
+						</WCPopover.__unstableSlotNameProvider>
+						<WCPopover.Slot name={ legacyPopoverSlotName } />
+					</SlotFillProvider>
+				</Popover.Popup>
+			</Popover.Root>
 		</div>
 	);
 }

@@ -265,7 +265,10 @@ test.describe( 'Page List', () => {
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
 					await page
-						.getByLabel( 'Parent', { exact: true } )
+						.getByRole( 'combobox', {
+							name: 'Parent',
+							exact: true,
+						} )
 						.fill( 'Sample' );
 
 					await page

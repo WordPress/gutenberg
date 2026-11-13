@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ReactElement, ReactNode } from 'react';
 import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
@@ -60,6 +61,7 @@ export default function SummaryButton< Item >( {
 	disabled,
 	isOpen,
 	onClick,
+	renderButton,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -69,7 +71,10 @@ export default function SummaryButton< Item >( {
 	touched: boolean;
 	disabled?: boolean;
 	isOpen: boolean;
-	onClick: () => void;
+	onClick?: () => void;
+	renderButton?: (
+		button: ReactElement< Record< string, unknown > >
+	) => ReactNode;
 } ) {
 	const { labelPosition, editVisibility, showPlaceholderIfEmpty } =
 		field.layout as NormalizedPanelLayout;
@@ -104,6 +109,21 @@ export default function SummaryButton< Item >( {
 				_x( 'Edit %s', 'field' ),
 				fieldLabel || ''
 			);
+
+	const button = (
+		<Button
+			className="dataforms-layouts-panel__field-trigger-icon"
+			label={ ariaLabel }
+			icon={ pencil }
+			size="small"
+			aria-expanded={ isOpen }
+			aria-haspopup="dialog"
+			aria-describedby={
+				showError ? `${ controlId } ${ errorId }` : controlId
+			}
+			onClick={ onClick }
+		/>
+	);
 
 	return (
 		<div className={ className }>
@@ -164,20 +184,7 @@ export default function SummaryButton< Item >( {
 					) )
 				) }
 			</span>
-			{ ! disabled && (
-				<Button
-					className="dataforms-layouts-panel__field-trigger-icon"
-					label={ ariaLabel }
-					icon={ pencil }
-					size="small"
-					aria-expanded={ isOpen }
-					aria-haspopup="dialog"
-					aria-describedby={
-						showError ? `${ controlId } ${ errorId }` : controlId
-					}
-					onClick={ onClick }
-				/>
-			) }
+			{ ! disabled && ( renderButton ? renderButton( button ) : button ) }
 		</div>
 	);
 }
