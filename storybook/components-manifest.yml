@@ -208,6 +208,7 @@
       - isSmall
       - isTertiary
       - label
+      - loadingAnnouncement
       - shortcut
       - showTooltip
       - size
@@ -913,6 +914,7 @@
             - isDestructive
             - isPressed
             - label
+            - loadingAnnouncement
             - shortcut
             - showTooltip
             - size
@@ -935,6 +937,7 @@
             - isDestructive
             - isPressed
             - label
+            - loadingAnnouncement
             - path
             - shortcut
             - showTooltip
