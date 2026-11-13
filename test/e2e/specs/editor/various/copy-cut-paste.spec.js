@@ -940,6 +940,80 @@ test.describe( 'Copy/cut/paste', () => {
 		] );
 	} );
 
+	test( 'should not cut removal-locked blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Locked block',
+				lock: { remove: true },
+			},
+		} );
+
+		await pageUtils.pressKeys( 'primary+x' );
+
+		await expect(
+			page.getByTestId( 'snackbar' ).filter( { hasText: 'Moved' } )
+		).toBeHidden();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Locked block',
+					lock: { remove: true },
+				},
+			},
+		] );
+	} );
+
+	test( 'should allow copying a single-use block while preventing pasting a duplicate into the same post', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/more',
+			attributes: {
+				lock: { remove: true, move: true },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Target' },
+		} );
+
+		const moreBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: More',
+		} );
+		await editor.selectBlocks( moreBlock );
+		await pageUtils.pressKeys( 'primary+c' );
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( 'Copied "More" to clipboard.' )
+		).toBeVisible();
+
+		await editor.canvas.getByText( 'Target' ).click();
+		await page.keyboard.press( 'Enter' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.getByText( '"More" can only be used once.' )
+		).toBeVisible();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/more' },
+				{ name: 'core/paragraph', attributes: { content: 'Target' } },
+				{ name: 'core/paragraph', attributes: { content: '' } },
+			] );
+	} );
+
 	test.describe( 'Bound text', () => {
 		test.beforeAll( async ( { requestUtils } ) => {
 			await requestUtils.activatePlugin(

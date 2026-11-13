@@ -15,7 +15,11 @@ import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { setClipboardBlocks, setContentEditableWrapper } from './utils';
+import {
+	preparePasteBlocks,
+	setClipboardBlocks,
+	setContentEditableWrapper,
+} from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
@@ -59,6 +63,7 @@ export default function useClipboardHandler() {
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
+		canRemoveBlocks,
 		getBlockRootClientId,
 		getBlockAttributes,
 		getSelectionStart,
@@ -188,6 +193,15 @@ export default function useClipboardHandler() {
 			if ( event.type === 'copy' || event.type === 'cut' ) {
 				event.preventDefault();
 
+				// Bail early if any selected block cannot be removed, so cut
+				// neither flashes, shows a moved notice, nor alters the clipboard.
+				if (
+					event.type === 'cut' &&
+					! canRemoveBlocks( selectedBlockClientIds )
+				) {
+					return;
+				}
+
 				if ( selectedBlockClientIds.length === 1 ) {
 					flashBlock( selectedBlockClientIds[ 0 ] );
 				}
@@ -305,14 +319,27 @@ export default function useClipboardHandler() {
 					return;
 				}
 
-				if ( isFullySelected ) {
+				function replaceSelectedWithPaste() {
+					const allowedBlocks = preparePasteBlocks(
+						blocks as Block[],
+						registry,
+						selectedBlockClientIds
+					);
+					if ( ! allowedBlocks ) {
+						event.preventDefault();
+						return;
+					}
 					replaceBlocks(
 						selectedBlockClientIds,
-						blocks,
-						blocks.length - 1,
+						allowedBlocks,
+						allowedBlocks.length - 1,
 						-1
 					);
 					event.preventDefault();
+				}
+
+				if ( isFullySelected ) {
+					replaceSelectedWithPaste();
 					return;
 				}
 
@@ -340,12 +367,12 @@ export default function useClipboardHandler() {
 						selectedBlockClientIds[ 0 ]
 					)
 				) {
-					replaceBlocks(
-						selectedBlockClientIds,
-						blocks,
-						blocks.length - 1,
-						-1
-					);
+					replaceSelectedWithPaste();
+					return;
+				}
+
+				const allowedBlocks = preparePasteBlocks( blocks, registry );
+				if ( ! allowedBlocks ) {
 					event.preventDefault();
 					return;
 				}
@@ -357,7 +384,7 @@ export default function useClipboardHandler() {
 
 				const newBlocks: Block[] = [];
 
-				for ( const block of blocks ) {
+				for ( const block of allowedBlocks ) {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
 						newBlocks.push( block );
 					} else {

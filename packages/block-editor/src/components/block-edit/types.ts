@@ -75,5 +75,5 @@ export interface BlockEditProps extends BlockEditPublicProps {
 export interface MultipleUsageWarningProps {
 	originalBlockClientId: string;
 	name: string;
-	onReplace: ( blocks: Block[] ) => void;
+	onReplace?: ( blocks: Block[] ) => void;
 }

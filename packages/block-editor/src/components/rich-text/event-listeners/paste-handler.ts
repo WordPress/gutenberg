@@ -13,6 +13,7 @@ import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
+import { preparePasteBlocks } from '../../writing-flow/utils';
 import { getDropPasteProps, isTextDrop } from './drag-and-drop';
 import type {
 	RichTextEventListener,
@@ -193,6 +194,18 @@ export function createPasteListener(
 			return;
 		}
 
+		const selectedBlockClientIds = registry
+			.select( blockEditorStore )
+			.getSelectedBlockClientIds();
+		const allowedContent = preparePasteBlocks(
+			content,
+			registry,
+			selectedBlockClientIds
+		);
+		if ( ! allowedContent ) {
+			return;
+		}
+
 		// Record an intermediate paragraph-with-URL state so a single undo
 		// after the URL → block transformation restores the pasted link.
 		if ( mode === 'BLOCKS' ) {
@@ -202,7 +215,7 @@ export function createPasteListener(
 				.__unstableMarkLastChangeAsPersistent();
 		}
 
-		onReplace( content, content.length - 1, -1 );
+		onReplace( allowedContent, allowedContent.length - 1, -1 );
 	};
 }
 

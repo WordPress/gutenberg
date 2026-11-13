@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Block Editor: Hide the Remove action on `MultipleUsageWarning` when block removal is locked, prevent cutting removal-locked blocks via keyboard shortcuts, and omit duplicate single-use (`supports.multiple = false`) blocks on paste ([#86714](https://github.com/WordPress/gutenberg/pull/86714)).
 -   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
