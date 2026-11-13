@@ -1,4 +1,4 @@
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import {
 	create,
@@ -107,7 +107,6 @@ function getRichTextElement( node: Node ) {
  * Sets a multi-selection based on the native selection across blocks.
  */
 export default function useSelectionObserver() {
-	const registry = useRegistry();
 	const {
 		multiSelect,
 		selectBlock,
@@ -122,7 +121,6 @@ export default function useSelectionObserver() {
 		isMultiSelecting,
 		getSelectionStart,
 		getSelectionEnd,
-		getSelectedBlockClientId,
 		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
@@ -132,29 +130,6 @@ export default function useSelectionObserver() {
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
-
-			// Selecting another block without moving the caret (e.g. clicking
-			// a spacer, or Backspace selecting a whole block) leaves the caret
-			// behind. Remove it, so the caret is only ever in the selected block.
-			let lastSelectedClientId = getSelectedBlockClientId();
-			const unsubscribe = registry.subscribe( () => {
-				const clientId = getSelectedBlockClientId();
-				if ( clientId === lastSelectedClientId ) {
-					return;
-				}
-				lastSelectedClientId = clientId;
-				// A window has a selection.
-				const selection = defaultView!.getSelection()!;
-				const { anchorNode } = selection;
-				if (
-					clientId &&
-					anchorNode &&
-					node.contains( anchorNode ) &&
-					getBlockClientId( anchorNode ) !== clientId
-				) {
-					selection.removeAllRanges();
-				}
-			}, blockEditorStore );
 
 			function onMouseDown( event: MouseEvent ) {
 				isTripleClick = event.detail === 3;
@@ -571,7 +546,6 @@ export default function useSelectionObserver() {
 				true
 			);
 			return () => {
-				unsubscribe();
 				ownerDocument.removeEventListener(
 					'selectionchange',
 					onSelectionChange
@@ -601,6 +575,6 @@ export default function useSelectionObserver() {
 				);
 			};
 		},
-		[ multiSelect, selectBlock, selectionChange, getBlockParents, registry ]
+		[ multiSelect, selectBlock, selectionChange, getBlockParents ]
 	);
 }
