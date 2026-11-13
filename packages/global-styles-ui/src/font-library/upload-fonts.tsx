@@ -15,6 +15,7 @@ import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
+import getWeightFromStyleName from './utils/get-weight-from-style-name';
 import { loadFontFaceInBrowser } from './utils';
 
 function UploadFonts() {
@@ -175,8 +176,19 @@ function UploadFonts() {
 		}
 		const subfamily = name.get( 2 ) || '';
 		const isItalic = subfamily.toLowerCase().includes( 'italic' );
+		/*
+		 * Prefer the weight named by the font's own style name, since
+		 * `usWeightClass` cannot always tell two faces apart: Google Fonts
+		 * reports 250 for both the Thin and the ExtraLight static instance.
+		 * The typographic subfamily (name ID 17) holds the full style name,
+		 * where the subfamily (name ID 2) is limited to Regular, Italic, Bold
+		 * and Bold Italic.
+		 */
+		const styleName = name.get( 17 ) || subfamily;
+		const usWeightClass = font.opentype.tables[ 'OS/2' ].usWeightClass;
 		const fontWeight =
-			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
+			getWeightFromStyleName( styleName ) ??
+			( usWeightClass || 'normal' );
 		const isVariable = !! font.opentype.tables.fvar;
 		const weightAxis =
 			isVariable &&
