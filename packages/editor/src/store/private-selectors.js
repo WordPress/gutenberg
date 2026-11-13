@@ -182,42 +182,59 @@ export function getEntityFields( state, ...args ) {
  * Similar to getBlocksByName in `@wordpress/block-editor`, but only returns the top-most
  * blocks that aren't descendants of the query block.
  *
- * @param {Object}       state      Global application state.
- * @param {Array|string} blockNames Block names of the blocks to retrieve.
+ * @param {Object}       state            Global application state.
+ * @param {Array|string} blockNames       Block names of the blocks to retrieve.
+ * @param {boolean}      [onlyControlled] Whether to leave out the blocks whose inner blocks are not controlled. A block that holds what is being edited only some of the time, as the template slot block does for the template rendered in it, holds it as its controlled inner blocks. Any other holds blocks of the template around what is being edited.
  *
  * @return {Array} Block client IDs.
  */
 export const getPostBlocksByName = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state, blockNames ) => {
+		( state, blockNames, onlyControlled = false ) => {
 			blockNames = Array.isArray( blockNames )
 				? blockNames
 				: [ blockNames ];
-			const { getBlocksByName, getBlockParents, getBlockName } =
-				select( blockEditorStore );
-			return getBlocksByName( blockNames ).filter( ( clientId ) =>
-				getBlockParents( clientId ).every( ( parentClientId ) => {
-					const parentBlockName = getBlockName( parentClientId );
-					return (
-						// Ignore descendents of the query block.
-						parentBlockName !== 'core/query' &&
-						// Enable only the top-most block.
-						! blockNames.includes( parentBlockName )
-					);
-				} )
+			const {
+				getBlocksByName,
+				getBlockParents,
+				getBlockName,
+				areInnerBlocksControlled,
+			} = select( blockEditorStore );
+			return getBlocksByName( blockNames ).filter(
+				( clientId ) =>
+					( ! onlyControlled ||
+						areInnerBlocksControlled( clientId ) ) &&
+					getBlockParents( clientId ).every( ( parentClientId ) => {
+						const parentBlockName = getBlockName( parentClientId );
+						return (
+							// Ignore descendents of the query block.
+							parentBlockName !== 'core/query' &&
+							// Enable only the top-most block.
+							! blockNames.includes( parentBlockName )
+						);
+					} )
 			);
 		},
-		( state, blockNames ) => {
+		( state, blockNames, onlyControlled = false ) => {
 			blockNames = Array.isArray( blockNames )
 				? blockNames
 				: [ blockNames ];
-			const { getBlocksByName, getBlockParents } =
-				select( blockEditorStore );
+			const {
+				getBlocksByName,
+				getBlockParents,
+				areInnerBlocksControlled,
+			} = select( blockEditorStore );
 			const clientIds = getBlocksByName( blockNames );
 			const parentsOfClientIds = clientIds.map( ( id ) =>
 				getBlockParents( id )
 			);
-			return [ clientIds, ...parentsOfClientIds ];
+			return [
+				clientIds,
+				...parentsOfClientIds,
+				...( onlyControlled
+					? clientIds.map( ( id ) => areInnerBlocksControlled( id ) )
+					: [] ),
+			];
 		}
 	)
 );
@@ -231,18 +248,19 @@ export const getPostBlocksByName = createRegistrySelector( ( select ) =>
  * edited, such as a template rendered inside the template around it, and is
  * edited the way it is in that template on its own.
  *
- * @param {Object}          state      Global application state.
- * @param {string|string[]} blockNames Names of the post blocks.
+ * @param {Object}          state            Global application state.
+ * @param {string|string[]} blockNames       Names of the post blocks.
+ * @param {boolean}         [onlyControlled] Whether the post blocks are only the ones whose inner blocks are controlled, see getPostBlocksByName().
  * @return {string[]} Client IDs of the template parts outside them.
  */
 export const getTemplatePartsOutsidePostBlocks = createRegistrySelector(
 	( select ) =>
 		createSelector(
-			( state, blockNames ) => {
+			( state, blockNames, onlyControlled = false ) => {
 				const { getBlocksByName, getBlockParents } =
 					select( blockEditorStore );
 				const postBlockIds = new Set(
-					getPostBlocksByName( state, blockNames )
+					getPostBlocksByName( state, blockNames, onlyControlled )
 				);
 				return getBlocksByName( 'core/template-part' ).filter(
 					( clientId ) =>
@@ -252,12 +270,12 @@ export const getTemplatePartsOutsidePostBlocks = createRegistrySelector(
 						)
 				);
 			},
-			( state, blockNames ) => {
+			( state, blockNames, onlyControlled = false ) => {
 				const { getBlocksByName, getBlockParents } =
 					select( blockEditorStore );
 				const clientIds = getBlocksByName( 'core/template-part' );
 				return [
-					getPostBlocksByName( state, blockNames ),
+					getPostBlocksByName( state, blockNames, onlyControlled ),
 					clientIds,
 					...clientIds.map( ( id ) => getBlockParents( id ) ),
 				];

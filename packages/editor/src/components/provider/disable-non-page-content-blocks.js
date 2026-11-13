@@ -5,36 +5,50 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import usePostContentBlockTypes from './use-post-content-block-types';
 
+// The block a template renders the templates inside it in.
+const TEMPLATE_SLOT_BLOCK_TYPES = [ 'core/template-slot' ];
+
 /**
  * Component that when rendered, makes it so that the site editor allows only
  * page content to be edited.
  *
- * @param {Object}   props                           Component props.
- * @param {string[]} [props.contentBlockTypes]       The blocks that hold the content being edited. Defaults to the post content blocks, which is what a page is edited through. Pass a list to edit something else through other blocks, such as a template rendered inside another, whose only slot is the post content block of the template around it. Must be a stable value.
- * @param {string}   [props.templatePartEditingMode] The editing mode of the template parts outside the content being edited. Defaults to `contentOnly`, which is how a page shows the template parts of its template. A template rendered inside another passes `disabled`: the template parts of the template around it belong to that template, which is edited on its own screen, and with the template parts of the template being edited treated as sections, a `contentOnly` one would offer to edit a section that has nothing editable in it.
+ * @param {Object}  props                            Component props.
+ * @param {boolean} [props.isTemplateInsideTemplate] Whether what is being edited is a template shown inside the template it names, rather than a page shown inside its template. The template is edited through the template slot block that renders it, where a page is edited through the post content blocks. The template parts of the template around it are disabled, where a page shows the ones of its template as `contentOnly`: they belong to that template, which is edited on its own screen, and with the template parts of the template being edited treated as sections, a `contentOnly` one would offer to edit a section that has nothing editable in it.
  */
 export default function DisableNonPageContentBlocks( {
-	contentBlockTypes,
-	templatePartEditingMode = 'contentOnly',
+	isTemplateInsideTemplate = false,
 } ) {
-	const defaultBlockTypes = usePostContentBlockTypes();
-	const postContentBlockTypes = contentBlockTypes ?? defaultBlockTypes;
+	const postContentBlockTypes = usePostContentBlockTypes();
+	const contentBlockTypes = isTemplateInsideTemplate
+		? TEMPLATE_SLOT_BLOCK_TYPES
+		: postContentBlockTypes;
+	const templatePartEditingMode = isTemplateInsideTemplate
+		? 'disabled'
+		: 'contentOnly';
 	const { contentOnlyIds, templateParts } = useSelect(
 		( select ) => {
 			const { getPostBlocksByName, getTemplatePartsOutsidePostBlocks } =
 				unlock( select( editorStore ) );
 			return {
-				contentOnlyIds: getPostBlocksByName( postContentBlockTypes ),
+				// A template can hold more than one slot, and only the one
+				// rendering the template being edited holds it, as its
+				// controlled inner blocks: any other holds blocks of the
+				// template around it, which stay locked with it.
+				contentOnlyIds: getPostBlocksByName(
+					contentBlockTypes,
+					isTemplateInsideTemplate
+				),
 				// A template part inside the content being edited, such as
 				// one in a template rendered inside the template around it,
 				// is left to the editing modes it has in that template on
 				// its own, rather than locked with the template around it.
 				templateParts: getTemplatePartsOutsidePostBlocks(
-					postContentBlockTypes
+					contentBlockTypes,
+					isTemplateInsideTemplate
 				),
 			};
 		},
-		[ postContentBlockTypes ]
+		[ contentBlockTypes, isTemplateInsideTemplate ]
 	);
 	// This is a separate `useSelect` because `templatePartChildren` is
 	// derived via flatMap, which always produces a new array. Combining it
