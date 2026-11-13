@@ -20,10 +20,11 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
-        d="M4 1.5v5"
+        d="M1.5 4.25 3.25 6 6.5 2"
         fill="none"
         stroke="currentColor"
         stroke-linecap="round"
+        stroke-linejoin="round"
       />
     </svg>
     <svg
@@ -33,12 +34,11 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
       viewBox="0 0 8 8"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <circle
-        cx="4"
-        cy="4"
+      <path
+        d="M2 2l4 4M6 2 2 6"
         fill="none"
-        r="2.5"
         stroke="currentColor"
+        stroke-linecap="round"
       />
     </svg>
     <span
