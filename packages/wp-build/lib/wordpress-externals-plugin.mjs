@@ -19,7 +19,7 @@ const GLOBAL_MODULE_PREFIX = '\0wp-global:';
  * @param {number}   length    - Hash length (default: 20)
  * @return {Promise<string>} Content hash string
  */
-async function generateContentHash(
+export async function generateContentHash(
 	filePaths,
 	algorithm = 'sha256',
 	length = 20

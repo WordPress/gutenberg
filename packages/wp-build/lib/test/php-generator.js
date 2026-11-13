@@ -37,8 +37,25 @@ describe( 'getPhpReplacements', () => {
 				rootDir,
 				''
 			);
-			expect( changedVersion ).toMatch( /^[0-9a-f]{20}$/ );
 			expect( changedVersion ).not.toBe( version );
+		} finally {
+			await rm( rootDir, { recursive: true, force: true } );
+		}
+	} );
+
+	it( 'falls back to a hash when there is no build directory yet', async () => {
+		const rootDir = await mkdtemp( path.join( tmpdir(), 'wp-build-php-' ) );
+		await writeFile(
+			path.join( rootDir, 'package.json' ),
+			JSON.stringify( { name: 'example' } )
+		);
+
+		try {
+			const { '{{VERSION}}': version } = await getPhpReplacements(
+				rootDir,
+				''
+			);
+			expect( version ).toMatch( /^[0-9a-f]{20}$/ );
 		} finally {
 			await rm( rootDir, { recursive: true, force: true } );
 		}

@@ -1,8 +1,8 @@
-import { createHash } from 'crypto';
 import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getPackageInfoFromFile } from './package-utils.mjs';
+import { generateContentHash } from './wordpress-externals-plugin.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
@@ -13,19 +13,14 @@ const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
  * @return {Promise<string>} Content hash string.
  */
 async function generateBuildHash( buildDir ) {
-	const hashBuilder = createHash( 'sha256' );
+	await mkdir( buildDir, { recursive: true } );
 	const files = (
 		await readdir( buildDir, { recursive: true, withFileTypes: true } )
 	)
 		.filter( ( file ) => file.isFile() && ! file.name.endsWith( '.php' ) )
-		.map( ( file ) => path.join( file.parentPath, file.name ) )
-		.sort();
+		.map( ( file ) => path.join( file.parentPath, file.name ) );
 
-	for ( const file of files ) {
-		hashBuilder.update( await readFile( file ) );
-	}
-
-	return hashBuilder.digest( 'hex' ).slice( 0, 20 );
+	return generateContentHash( files );
 }
 
 /**
