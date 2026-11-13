@@ -30,6 +30,7 @@ import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
 import useNetworkReconnect from './use-network-reconnect';
+import { getStartingRenderingMode, getTemplateAround } from './template-around';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -77,7 +78,15 @@ const NON_CONTEXTUAL_POST_TYPES = [
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
-	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
+	// The rendering mode is the editor's rather than the canvas's, so it can
+	// be the one that shows the template when this canvas has none to show:
+	// a route can ask for that mode whatever its canvas resolves to, a
+	// template that stands for itself included, and the mode of the last
+	// canvas stays until this one settles its own. The post is rendered on
+	// its own then, rather than the blocks of a template that is not there,
+	// which would leave the last canvas in place.
+	const rootLevelPost =
+		mode === 'template-locked' && template ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -175,8 +184,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		renderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
-		__unstableTemplate: template,
+		__unstableTemplate: _template,
 	} ) => {
+		const template = getTemplateAround( post, _template );
+		const standsForOwnTemplate = !! _template && ! template;
 		const hasTemplate = !! template;
 		const {
 			editorSettings,
@@ -206,8 +217,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
-				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+				//
+				// A canvas that stands for the template it is editing has
+				// nothing to render around it, so the mode that renders a
+				// post inside its template has nothing to show: the template
+				// is edited on its own however the preference for the post
+				// type reads, and the mode is settled rather than pending.
+				const _defaultMode = getStartingRenderingMode( {
+					renderingMode,
+					standsForOwnTemplate,
+					getPostTypeDefaultMode: () =>
+						getDefaultRenderingMode( post.type ),
+				} );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -247,7 +268,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[
+				post.type,
+				post.id,
+				hasTemplate,
+				standsForOwnTemplate,
+				renderingMode,
+			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -402,10 +429,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => updateEditorSettings( { renderingMode: undefined } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
 
-		// Synchronizes the active template with the state.
+		// Synchronizes the active template with the state. Named from the prop
+		// rather than the template to render around the post, so a canvas that
+		// stands for a template still reports which one it is editing.
 		useEffect( () => {
-			setCurrentTemplateId( template?.id );
-		}, [ template?.id, setCurrentTemplateId ] );
+			setCurrentTemplateId( _template?.id );
+		}, [ _template?.id, setCurrentTemplateId ] );
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
@@ -461,7 +490,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
+									{ /*
+									   Only while a template is rendered
+									   around the post: a canvas with none
+									   has nothing to lock, whatever mode
+									   the editor was left in.
+									 */ }
+									{ shouldRenderTemplate && (
 										<DisableNonPageContentBlocks />
 									) }
 									{ type === 'wp_navigation' && (
