@@ -26,8 +26,8 @@ const TimeZone = () => {
 			? timezone.abbr
 			: `UTC${ offsetSymbol }${ timezone.offsetFormatted }`;
 
-	// Replace underscore with space in strings like `America/Costa_Rica`.
-	const prettyTimezoneString = timezone.string.replace( '_', ' ' );
+	// Replace underscores with spaces in strings like `America/Costa_Rica`.
+	const prettyTimezoneString = timezone.string.replaceAll( '_', ' ' );
 
 	const timezoneDetail =
 		'UTC' === timezone.string
