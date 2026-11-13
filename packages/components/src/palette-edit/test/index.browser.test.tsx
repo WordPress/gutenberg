@@ -2,7 +2,7 @@ import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { useState } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
@@ -646,6 +646,7 @@ describe( 'PaletteEdit', () => {
 	} );
 
 	it( 'keeps the options menu usable above a Components modal for direct package consumers', async () => {
+		const modalRef = createRef< HTMLDivElement >();
 		const compatibilityWindow = window as typeof window & {
 			wp?: unknown;
 			__wpUiCompatOverlaySlotEnabled?: boolean;
@@ -664,7 +665,7 @@ describe( 'PaletteEdit', () => {
 
 		try {
 			await render(
-				<Modal title="Palette" onRequestClose={ noop }>
+				<Modal ref={ modalRef } title="Palette" onRequestClose={ noop }>
 					<PaletteEdit { ...defaultProps } colors={ colors } />
 				</Modal>
 			);
@@ -676,7 +677,8 @@ describe( 'PaletteEdit', () => {
 			);
 			const menu = await screen.findByRole( 'menu' );
 			const slot = getCompatibilityOverlaySlot();
-			expect( slot ).toContainElement( menu );
+			expect( slot ).toBeInTheDocument();
+			expect( modalRef.current ).toContainElement( menu );
 			await waitFor( () => expect( menu ).toBeVisible() );
 
 			await userEvent.click(
