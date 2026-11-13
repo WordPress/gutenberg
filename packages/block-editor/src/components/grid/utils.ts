@@ -205,18 +205,20 @@ export function getGridTracks(
 	const sizes = template.split( ' ' ).map( ( size ) => parseFloat( size ) );
 
 	const tracks: GridTrack[] = [];
-	for ( const [ index, size ] of sizes.entries() ) {
+	let hasNonEmptyTrack = false;
+	for ( const size of sizes ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
-		const previousSize = sizes[ index - 1 ];
-		// Empty auto-fit tracks and the gutters on either side collapse.
+		// Auto-fit gutters around collapsed tracks overlap, leaving one gap
+		// between nonempty tracks and none before or after the occupied tracks.
 		// The caller opts in because an ordinary zero-width track keeps its gaps.
 		const isGapCollapsed =
-			options.collapseEmptyTracks && ( size === 0 || previousSize === 0 );
+			options.collapseEmptyTracks && ( size === 0 || ! hasNonEmptyTrack );
 		const start = previousTrack
 			? previousTrack.end + ( isGapCollapsed ? 0 : gapInPixels )
 			: 0;
 		const end = start + size;
 		tracks.push( { start, end } );
+		hasNonEmptyTrack ||= size > 0;
 	}
 	return tracks;
 }
@@ -286,14 +288,19 @@ export function getClosestTrack(
 	position: number,
 	edge: keyof GridTrack = 'start'
 ): number {
-	return tracks.reduce(
-		( closest, track, index ) =>
-			Math.abs( track[ edge ] - position ) <
-			Math.abs( tracks[ closest ][ edge ] - position )
-				? index
-				: closest,
-		0
-	);
+	return tracks.reduce( ( closest, track, index ) => {
+		const closestTrack = tracks[ closest ];
+		const distance = Math.abs( track[ edge ] - position );
+		const closestDistance = Math.abs( closestTrack[ edge ] - position );
+		// Collapsed tracks can share an edge with an occupied track.
+		// Prefer the occupied track when both are equally close.
+		return distance < closestDistance ||
+			( distance === closestDistance &&
+				track.end > track.start &&
+				closestTrack.end === closestTrack.start )
+			? index
+			: closest;
+	}, 0 );
 }
 
 /**
