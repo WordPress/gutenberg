@@ -12,7 +12,6 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
-		"multiple": false,
 		"layout": true,
 		"spacing": {
 			"blockGap": true,

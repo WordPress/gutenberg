@@ -205,8 +205,8 @@ function gutenberg_get_block_template_parent_slug( $template ) {
  *
  * Walks the tree in document order, with the template's patterns resolved, and
  * uses the first slot it reaches, at whatever depth, keeping the blocks that
- * surround it. The editor lets a template have one slot, and treats the first
- * as the slot when one has more anyway.
+ * surround it. A template can hold more than one: the first is its slot, here
+ * and in the editor, and any other keeps what it holds.
  *
  * @param string $parent_content Serialized blocks of the template to substitute into.
  * @param string $child_content  Serialized blocks to put in the slot.
