@@ -20,15 +20,39 @@ const ajv = new Ajv( {
 	allowUnionTypes: true, // Allow anyOf without explicit type
 } );
 
-addFormats( ajv, [
-	'date-time',
-	'email',
-	'hostname',
-	'ipv4',
-	'ipv6',
-	'uri',
-	'uuid',
-] );
+addFormats( ajv, [ 'date-time', 'email', 'hostname', 'ipv4', 'ipv6', 'uuid' ] );
+
+/**
+ * Checks whether a value is an absolute URL, as the `uri` format requires.
+ *
+ * The URL parser of the platform decides, instead of the `uri` check of
+ * ajv-formats. That check follows RFC 3986 to the letter and is ASCII only, so
+ * it rejects URLs that WordPress serves and browsers open: a permalink under a
+ * permalink structure or a post type slug with non-ASCII characters, the URL of
+ * a file with a non-ASCII name, or any URL of a site whose address is an
+ * internationalized domain name saved as typed.
+ *
+ * WordPress declares `format: uri` on such values, for example the `link` of a
+ * post or a user in the output of the core abilities, and does not check that
+ * format when it validates on the server. A stricter check here would fail a
+ * call the server completed. Values that are not absolute URLs, such as an empty
+ * string or a relative URL, are still rejected.
+ *
+ * @see https://url.spec.whatwg.org/#valid-url-string
+ *
+ * @param value The string to check.
+ * @return Whether the value is an absolute URL.
+ */
+function isAbsoluteUrl( value: string ): boolean {
+	try {
+		new URL( value );
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+ajv.addFormat( 'uri', isAbsoluteUrl );
 
 /**
  * Formats AJV errors into a simple error message.
