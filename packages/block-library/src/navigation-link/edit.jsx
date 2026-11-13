@@ -94,6 +94,7 @@ export default function NavigationLinkEdit( {
 
 	const {
 		replaceBlock,
+		updateBlockAttributes,
 		__unstableMarkNextChangeAsNotPersistent,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
@@ -164,11 +165,15 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
-		useEntityBinding( {
-			clientId,
-			attributes,
-		} );
+	const {
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		entityRecord,
+		clearBinding,
+	} = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -267,12 +272,14 @@ export default function NavigationLinkEdit( {
 	 * Removes the current link if set.
 	 */
 	function removeLink() {
+		clearBinding();
 		// Reset all attributes that comprise the link.
 		// It is critical that all attributes are reset
 		// to their default values otherwise this may
 		// in advertently trigger side effects because
 		// the values will have "changed".
-		setAttributes( {
+		// Bypass the bound setter, which routes URL updates to the read-only entity source.
+		updateBlockAttributes( clientId, {
 			url: undefined,
 			label: undefined,
 			id: undefined,

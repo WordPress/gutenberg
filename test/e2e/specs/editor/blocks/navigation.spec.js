@@ -1560,6 +1560,81 @@ test.describe( 'Navigation block', () => {
 			).toBeVisible();
 		} );
 
+		for ( const isBound of [ true, false ] ) {
+			test( `keeps a custom URL after unlinking a saved ${ isBound ? 'bound' : 'unbound' } page link`, async ( {
+				admin,
+				editor,
+				navigation,
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				await admin.createNewPost();
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Bound page menu',
+					content: `<!-- wp:navigation-link ${ JSON.stringify( {
+						label: 'Test Page 1',
+						url: testPage1.link,
+						id: testPage1.id,
+						kind: 'post-type',
+						type: 'page',
+						metadata: isBound
+							? {
+									bindings: {
+										url: {
+											source: 'core/post-data',
+											args: { field: 'link' },
+										},
+									},
+								}
+							: undefined,
+					} ) } /-->`,
+				} );
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: { ref: menu.id },
+				} );
+				const pageLink = navigation
+					.getNavBlock()
+					.getByRole( 'document', {
+						name: 'Block: Page Link',
+					} )
+					.first();
+				await editor.selectBlocks( pageLink );
+				await pageUtils.pressKeys( 'primary+k' );
+				const popover = navigation.getLinkPopover();
+				await popover
+					.getByRole( 'button', { name: 'Remove link' } )
+					.click();
+				await editor.clickBlockToolbarButton( 'Link' );
+				const customUrl = 'https://example.org/replacement';
+				const input = popover.getByRole( 'combobox', {
+					name: 'Search or type URL',
+				} );
+				await input.fill( customUrl );
+				await input.press( 'Enter' );
+				await page.keyboard.press( 'Escape' );
+				await editor.selectBlocks( navigation.getNavBlock() );
+				await expect(
+					navigation.getNavBlock().getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+				).toBeVisible();
+
+				const postId = await editor.publishPost();
+				await page.reload();
+				await expect(
+					navigation.getNavBlock().getByRole( 'textbox', {
+						name: 'Navigation link text',
+					} )
+				).toBeVisible();
+				await page.goto( `/?p=${ postId }` );
+				await expect(
+					page.locator( '.wp-block-navigation' ).getByRole( 'link' )
+				).toHaveAttribute( 'href', customUrl );
+			} );
+		}
+
 		test( 'can bind to a page', async ( {
 			editor,
 			page,
