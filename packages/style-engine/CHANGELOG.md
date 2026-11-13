@@ -7,7 +7,7 @@
 -   Add a `typography.textWrap` style rule that generates `text-wrap` ([#84063](https://github.com/WordPress/gutenberg/pull/84063)).
 -   Add `transform.rotate`, which outputs the individual `rotate` property for a single angle and nothing for any other value ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `transform.translate`, which outputs the individual `translate` property from `x` and `y` lengths or percentages, with `0` for a missing axis, and nothing for any other value ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
--   Add `transform.scale`, which outputs the individual `scale` property for a single non-negative number or percentage, and nothing for any other value.
+-   Add `transform.scale`, which outputs the individual `scale` property for a single non-negative number or percentage, and nothing for any other value ([#86727](https://github.com/WordPress/gutenberg/pull/86727)).
 
 ### Bug Fixes
 
