@@ -6,7 +6,15 @@ export type GradientObject = {
 	name: string;
 	slug: string;
 };
-export type OriginObject = { name: string; gradients: GradientObject[] };
+export type OriginObject = {
+	/**
+	 * A stable identifier, unique among origins. Supply it when origins can be
+	 * reordered or removed. Origins without a slug keep positional identity.
+	 */
+	slug?: string;
+	name: string;
+	gradients: GradientObject[];
+};
 export type GradientsProp = GradientObject[] | OriginObject[];
 
 type GradientPickerBaseProps = {

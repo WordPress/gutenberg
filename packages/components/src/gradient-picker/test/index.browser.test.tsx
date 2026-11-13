@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { logged } from '@wordpress/deprecated';
@@ -23,6 +23,73 @@ beforeEach( () => {
 } );
 
 describe( 'GradientPicker', () => {
+	it( 'keeps the focused origin and current group after reordering', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const red = {
+			slug: 'red',
+			name: 'Red',
+			gradient: 'linear-gradient(red,orange)',
+		};
+		const blue = {
+			slug: 'blue',
+			name: 'Blue',
+			gradient: 'linear-gradient(blue,green)',
+		};
+		const theme = { slug: 'theme', name: 'Palette', gradients: [ red ] };
+		const custom = { slug: 'custom', name: 'Palette', gradients: [ blue ] };
+		const view = await render(
+			<GradientPicker
+				aria-label="Presets"
+				gradients={ [ theme, custom ] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomGradients
+			/>
+		);
+		await user.click(
+			screen.getByRole( 'option', { name: 'Gradient: Blue' } )
+		);
+		onChange.mockClear();
+		const updated = {
+			...blue,
+			name: 'Updated blue',
+			gradient: 'linear-gradient(cyan,green)',
+		};
+
+		await view.rerender(
+			<GradientPicker
+				aria-label="Presets"
+				gradients={ [
+					{
+						...custom,
+						name: 'Changed custom',
+						gradients: [ updated ],
+					},
+					theme,
+				] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomGradients
+			/>
+		);
+		const group = screen.getByRole( 'group', { name: 'Changed custom' } );
+		expect(
+			within( group ).getByRole( 'option', {
+				name: 'Gradient: Updated blue',
+			} )
+		).toHaveFocus();
+		await user.keyboard( '{ArrowRight}' );
+		expect(
+			screen.getByRole( 'option', { name: 'Gradient: Red' } )
+		).toHaveFocus();
+		await user.keyboard( '{ArrowLeft}{Enter}' );
+		expect( onChange ).toHaveBeenLastCalledWith(
+			updated.gradient,
+			0,
+			'blue'
+		);
+	} );
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();

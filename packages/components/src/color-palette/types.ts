@@ -10,6 +10,11 @@ export type ColorObject = {
 };
 
 export type PaletteObject = {
+	/**
+	 * A stable identifier, unique among origins. Supply it when origins can be
+	 * reordered or removed. Origins without a slug keep positional identity.
+	 */
+	slug?: string;
 	name: string;
 	colors: ColorObject[];
 };
