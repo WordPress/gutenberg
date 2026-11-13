@@ -1,38 +1,104 @@
 import {
 	Button,
-	__experimentalDropdownContentWrapper as DropdownContentWrapper,
-	Dropdown,
+	Popover as WCPopover,
+	SlotFillProvider,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
-import { memo, useContext, useMemo } from '@wordpress/element';
+import { __, _x, isRTL } from '@wordpress/i18n';
+import { memo, useContext, useMemo, useState } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
-import { useInstanceId } from '@wordpress/compose';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Prototype adoption of Drawer; verify mixed overlays before shipping.
+	Drawer,
 	SelectControl,
 	Stack,
+	Tabs,
 } from '@wordpress/ui';
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
 import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import { PropertiesSection } from './properties-section';
+import { Filters } from '../dataviews-filters';
 
-const DATAVIEWS_CONFIG_POPOVER_PROPS = {
-	className: 'dataviews-config__popover',
-	placement: 'bottom-end',
-	offset: 9,
-} as const;
+function changeViewType(
+	type: View[ 'type' ],
+	{
+		view,
+		onChangeView,
+		defaultLayouts,
+	}: React.ContextType< typeof DataViewsContext >
+) {
+	const viewWithoutLayout = { ...view };
+	if ( 'layout' in viewWithoutLayout ) {
+		delete viewWithoutLayout.layout;
+	}
+	onChangeView( {
+		...viewWithoutLayout,
+		type,
+		...defaultLayouts[ type ],
+	} as View );
+}
+
+function LayoutControl() {
+	const context = useContext( DataViewsContext );
+	const layouts = (
+		Object.keys( context.defaultLayouts ) as View[ 'type' ][]
+	 ).flatMap( ( type ) => {
+		const layout = VIEW_LAYOUTS.find( ( item ) => item.type === type );
+		return layout ? [ { value: type, label: layout.label } ] : [];
+	} );
+	if ( layouts.length <= 1 ) {
+		return null;
+	}
+	return (
+		<SelectControl
+			label={ __( 'Layout' ) }
+			value={ layouts.find(
+				( layout ) => layout.value === context.view.type
+			) }
+			items={ layouts }
+			onValueChange={ ( item ) => {
+				const layout = layouts.find(
+					( option ) => option.value === item?.value
+				);
+				if ( layout && layout.value !== context.view.type ) {
+					changeViewType( layout.value, context );
+				}
+			} }
+		/>
+	);
+}
+
+function ViewFilters() {
+	const context = useContext( DataViewsContext );
+	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
+	return (
+		<DataViewsContext.Provider
+			value={ {
+				...context,
+				openedFilter,
+				setOpenedFilter,
+				constrainFilterEditor: true,
+				onChangeView: ( view ) => {
+					context.onChangeView( view );
+					context.setIsShowingFilter( true );
+				},
+			} }
+		>
+			<Filters showEmpty />
+		</DataViewsContext.Provider>
+	);
+}
 
 export function ViewTypeMenu() {
-	const { view, onChangeView, defaultLayouts } =
-		useContext( DataViewsContext );
+	const context = useContext( DataViewsContext );
+	const { view, defaultLayouts } = context;
 	const availableLayouts = Object.keys( defaultLayouts );
 	if ( availableLayouts.length <= 1 ) {
 		return null;
@@ -61,15 +127,7 @@ export function ViewTypeMenu() {
 							case 'pickerTable':
 							case 'pickerActivity':
 							case 'activity':
-								const viewWithoutLayout = { ...view };
-								if ( 'layout' in viewWithoutLayout ) {
-									delete viewWithoutLayout.layout;
-								}
-								return onChangeView( {
-									...viewWithoutLayout,
-									type: value,
-									...defaultLayouts[ value ],
-								} as View );
+								return changeViewType( value, context );
 						}
 						warning( 'Invalid dataview' );
 					} }
@@ -275,25 +333,23 @@ function ResetViewButton() {
 }
 
 export function DataviewsViewConfigDropdown() {
-	const { view, onReset } = useContext( DataViewsContext );
-	const popoverId = useInstanceId(
-		_DataViewsViewConfig,
-		'dataviews-view-config-dropdown'
-	);
+	const { view, onReset, setOpenedFilter } = useContext( DataViewsContext );
 	const activeLayout = VIEW_LAYOUTS.find(
 		( layout ) => layout.type === view.type
 	);
 	const isModified = typeof onReset === 'function';
 	return (
-		<Dropdown
-			expandOnMobile
-			popoverProps={ {
-				...DATAVIEWS_CONFIG_POPOVER_PROPS,
-				id: popoverId,
+		<Drawer.Root
+			swipeDirection={ isRTL() ? 'left' : 'right' }
+			onOpenChange={ ( isOpen ) => {
+				if ( isOpen ) {
+					setOpenedFilter( null );
+				}
 			} }
-			renderToggle={ ( { onToggle, isOpen } ) => {
-				return (
-					<div className="dataviews-view-config__toggle-wrapper">
+		>
+			<div className="dataviews-view-config__toggle-wrapper">
+				<Drawer.Trigger
+					render={
 						<Button
 							size="compact"
 							icon={ cog }
@@ -301,59 +357,77 @@ export function DataviewsViewConfigDropdown() {
 								'View options',
 								'View is used as a noun'
 							) }
-							onClick={ onToggle }
-							aria-expanded={ isOpen ? 'true' : 'false' }
-							aria-controls={ popoverId }
 						/>
-						{ isModified && (
-							<span className="dataviews-view-config__modified-indicator" />
-						) }
-					</div>
-				);
-			} }
-			renderContent={ () => (
-				<DropdownContentWrapper
-					paddingSize="medium"
-					className="dataviews-config__popover-content-wrapper"
-				>
-					<Stack
-						direction="column"
-						className="dataviews-view-config"
-						gap="xl"
-					>
-						<Stack
-							direction="row"
-							justify="space-between"
-							align="center"
-							className="dataviews-view-config__header"
-						>
-							<Heading
-								level={ 2 }
-								className="dataviews-settings-section__title"
-							>
-								{ __( 'Appearance' ) }
-							</Heading>
+					}
+				/>
+				{ isModified && (
+					<span className="dataviews-view-config__modified-indicator" />
+				) }
+			</div>
+			<SlotFillProvider>
+				<Drawer.Popup size="large" className="dataviews-view-config">
+					<Drawer.Header>
+						<Drawer.Title>{ __( 'View settings' ) }</Drawer.Title>
+						<Stack direction="row" gap="sm" align="center">
 							<ResetViewButton />
+							<Drawer.CloseIconButton />
 						</Stack>
-						<Stack direction="column" gap="lg">
-							<Stack
-								direction="row"
-								gap="sm"
-								className="dataviews-view-config__sort-controls"
+					</Drawer.Header>
+					<Drawer.Content className="dataviews-view-config__content">
+						<Tabs.Root defaultValue="appearance">
+							<Tabs.List variant="minimal">
+								<Tabs.Tab value="appearance">
+									{ __( 'Appearance' ) }
+								</Tabs.Tab>
+								<Tabs.Tab value="properties">
+									{ __( 'Property visibility' ) }
+								</Tabs.Tab>
+								<Tabs.Tab value="filters">
+									{ __( 'Filters' ) }
+								</Tabs.Tab>
+							</Tabs.List>
+							<Tabs.Panel
+								value="appearance"
+								className="dataviews-view-config__panel"
 							>
-								<SortFieldControl />
-								<SortDirectionControl />
-							</Stack>
-							{ !! activeLayout?.viewConfigOptions && (
-								<activeLayout.viewConfigOptions />
-							) }
-							<ItemsPerPageControl />
-							<PropertiesSection />
-						</Stack>
-					</Stack>
-				</DropdownContentWrapper>
-			) }
-		/>
+								<Stack direction="column" gap="lg">
+									<LayoutControl />
+									<Stack
+										direction="row"
+										gap="sm"
+										className="dataviews-view-config__sort-controls"
+									>
+										<SortFieldControl />
+										<SortDirectionControl />
+									</Stack>
+									{ !! activeLayout?.viewConfigOptions && (
+										<activeLayout.viewConfigOptions />
+									) }
+									<ItemsPerPageControl />
+								</Stack>
+							</Tabs.Panel>
+							<Tabs.Panel
+								value="properties"
+								className="dataviews-view-config__panel"
+							>
+								<PropertiesSection
+									showLabel={ false }
+									showEmpty
+								/>
+							</Tabs.Panel>
+							<Tabs.Panel
+								value="filters"
+								className="dataviews-view-config__panel"
+							>
+								<ViewFilters />
+							</Tabs.Panel>
+						</Tabs.Root>
+						{ /* Keep legacy popovers inside the drawer's content boundary. */ }
+						<WCPopover.Slot />
+					</Drawer.Content>
+				</Drawer.Popup>
+			</SlotFillProvider>
+		</Drawer.Root>
 	);
 }
 

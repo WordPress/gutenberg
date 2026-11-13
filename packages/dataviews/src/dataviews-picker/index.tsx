@@ -140,7 +140,7 @@ type DataViewsPickerProps< Item > = {
 		 */
 		perPageSizes: number[];
 		/**
-		 * Whether the view config popover offers the "Original aspect ratio"
+		 * Whether the view settings drawer offers the "Original aspect ratio"
 		 * control for grid layouts, letting users switch item previews
 		 * between cropped (`cover`) and fitted (`contain`).
 		 */
@@ -157,7 +157,7 @@ type DataViewsPickerProps< Item > = {
 	empty?: ReactNode;
 	/**
 	 * Callback to reset the view to its initial state, wired to the
-	 * "Reset view" button in the view options popover. When provided, the
+	 * "Reset view" button in the view settings drawer. When provided, the
 	 * view options toggle also shows a "modified" indicator. Pass `false` to
 	 * render the button disabled (the view is not modified); omit the prop
 	 * to hide the button altogether (no reset support).

@@ -25,6 +25,8 @@ type DataViewsContextType< Item > = {
 	onChangeSelection: SetSelection;
 	openedFilter: string | null;
 	setOpenedFilter: ( openedFilter: string | null ) => void;
+	/** Constrain filter editors to the surrounding size-query container. */
+	constrainFilterEditor?: boolean;
 	getItemId: ( item: Item ) => string;
 	getItemLevel?: ( item: Item ) => number;
 	onClickItem?: ( item: Item ) => void;

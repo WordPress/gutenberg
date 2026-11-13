@@ -41,8 +41,10 @@ function isDefined< T >( item: T | undefined ): item is T {
 
 export function PropertiesSection( {
 	showLabel = true,
+	showEmpty = false,
 }: {
 	showLabel?: boolean;
+	showEmpty?: boolean;
 } ) {
 	const { view, fields, onChangeView } = useContext( DataViewsContext );
 
@@ -50,7 +52,7 @@ export function PropertiesSection( {
 	const regularFields = getHideableFields( view, fields );
 
 	if ( ! regularFields?.length ) {
-		return null;
+		return showEmpty ? <p>{ __( 'No properties available.' ) }</p> : null;
 	}
 	const titleField = fields.find( ( f ) => f.id === view.titleField );
 	const previewField = fields.find( ( f ) => f.id === view.mediaField );

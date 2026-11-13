@@ -16,6 +16,7 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -1353,10 +1354,9 @@ describe( 'DataViews component', () => {
 
 			const user = userEvent.setup();
 
-			// Double click to open and then close view options. This is performed
-			// instead of a direct .focus() so that effects have time to complete.
+			// Open and dismiss view settings so focus returns to the trigger.
 			await user.click( viewOptionsButton );
-			await user.click( viewOptionsButton );
+			await user.keyboard( '{Escape}' );
 
 			await user.tab();
 			expect(
@@ -1403,10 +1403,9 @@ describe( 'DataViews component', () => {
 
 			const user = userEvent.setup();
 
-			// Double click to open and then close view options. This is performed
-			// instead of a direct .focus() so that effects have time to complete.
+			// Open and dismiss view settings so focus returns to the trigger.
 			await user.click( viewOptionsButton );
-			await user.click( viewOptionsButton );
+			await user.keyboard( '{Escape}' );
 			await user.tab();
 			expect(
 				screen.getByRole( 'checkbox', { name: 'Select all' } )
@@ -1534,6 +1533,7 @@ describe( 'DataViews component', () => {
 				const control = await queryControl();
 				const user = userEvent.setup();
 				await user.click( control as HTMLElement );
+				await user.keyboard( '{Escape}' );
 				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
 			} );
 		} );

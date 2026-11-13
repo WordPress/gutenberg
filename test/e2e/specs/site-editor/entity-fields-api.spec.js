@@ -41,12 +41,18 @@ async function showFieldsInTable( page, labels ) {
 
 	if ( labels.length ) {
 		await page.getByRole( 'button', { name: 'View options' } ).click();
+		const settings = page.getByRole( 'dialog', { name: 'View settings' } );
+		await settings
+			.getByRole( 'tab', { name: 'Property visibility' } )
+			.click();
 		for ( const label of labels ) {
-			await page
+			await settings
 				.getByRole( 'button', { name: label, exact: true } )
 				.click();
 		}
-		await page.keyboard.press( 'Escape' );
+		await settings
+			.getByRole( 'button', { name: 'Close', exact: true } )
+			.click();
 	}
 
 	await expect( page.getByRole( 'table' ) ).toBeVisible();
@@ -221,9 +227,8 @@ test.describe( 'Entity fields API', () => {
 		requestUtils,
 	} ) => {
 		await admin.visitSiteEditor( { postType: 'page' } );
-		// The column is shown after the edit: a popover opened before the
-		// Quick Edit modal leaves its container hidden from assistive
-		// technology, and the form control would not be found by role.
+		// Show the column after editing so the saved REST field value is
+		// checked when it is first added to the view.
 		await showFieldsInTable( page, [] );
 		const table = page.getByRole( 'table' );
 
@@ -255,10 +260,16 @@ test.describe( 'Entity fields API', () => {
 		// The REST field carries the value in the record, where the
 		// declarative field reads it.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page
+		const settings = page.getByRole( 'dialog', { name: 'View settings' } );
+		await settings
+			.getByRole( 'tab', { name: 'Property visibility' } )
+			.click();
+		await settings
 			.getByRole( 'button', { name: 'Subtitle', exact: true } )
 			.click();
-		await page.keyboard.press( 'Escape' );
+		await settings
+			.getByRole( 'button', { name: 'Close', exact: true } )
+			.click();
 		await expect(
 			await getCell( table, shortPage, 'Subtitle' )
 		).toHaveText( 'An even shorter read' );
@@ -294,10 +305,23 @@ test.describe( 'Entity fields API', () => {
 			page.locator( '.gutenberg-test-word-count' )
 		).toHaveCount( 0 );
 		await page.getByRole( 'button', { name: 'View options' } ).click();
+		const settings = page.getByRole( 'dialog', { name: 'View settings' } );
+		await settings
+			.getByRole( 'tab', { name: 'Property visibility' } )
+			.click();
+		const properties = settings.getByRole( 'tabpanel', {
+			name: 'Property visibility',
+		} );
+		await expect( properties ).toBeVisible();
 		await expect(
-			page.getByRole( 'button', { name: 'Word count', exact: true } )
+			properties.getByRole( 'button', {
+				name: 'Word count',
+				exact: true,
+			} )
 		).toHaveCount( 0 );
-		await page.keyboard.press( 'Escape' );
+		await settings
+			.getByRole( 'button', { name: 'Close', exact: true } )
+			.click();
 	} );
 
 	test( 'loads the fields in the extensible site editor embedded in wp-admin', async ( {

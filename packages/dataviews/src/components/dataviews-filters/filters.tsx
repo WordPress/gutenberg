@@ -1,13 +1,20 @@
 import clsx from 'clsx';
 import { memo, useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
 import Filter from './filter';
 import { default as AddFilter } from './add-filter';
 import ResetFilters from './reset-filters';
 import useFilters from './use-filters';
 import DataViewsContext from '../dataviews-context';
 
-function Filters( { className }: { className?: string } ) {
+function Filters( {
+	className,
+	showEmpty = false,
+}: {
+	className?: string;
+	showEmpty?: boolean;
+} ) {
 	const { fields, view, onChangeView, openedFilter, setOpenedFilter } =
 		useContext( DataViewsContext );
 	const addFilterRef = useRef< HTMLButtonElement >( null );
@@ -23,7 +30,7 @@ function Filters( { className }: { className?: string } ) {
 		/>
 	);
 	const visibleFilters = filters.filter( ( filter ) => filter.isVisible );
-	if ( visibleFilters.length === 0 ) {
+	if ( visibleFilters.length === 0 && ! showEmpty ) {
 		return null;
 	}
 	const filterComponents = [
@@ -53,15 +60,24 @@ function Filters( { className }: { className?: string } ) {
 	);
 
 	return (
-		<Stack
-			direction="row"
-			justify="flex-start"
-			gap="sm"
-			wrap="wrap"
-			className={ clsx( 'dataviews-filters__summary', className ) }
-		>
-			{ filterComponents }
-		</Stack>
+		<>
+			{ showEmpty && visibleFilters.length === 0 && (
+				<p>
+					{ filters.length === 0
+						? __( 'No filters available.' )
+						: __( 'No filters applied.' ) }
+				</p>
+			) }
+			<Stack
+				direction="row"
+				justify="flex-start"
+				gap="sm"
+				wrap="wrap"
+				className={ clsx( 'dataviews-filters__summary', className ) }
+			>
+				{ filterComponents }
+			</Stack>
+		</>
 	);
 }
 

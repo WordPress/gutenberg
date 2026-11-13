@@ -506,7 +506,7 @@ Callback function to reset the view to its default state, or `false` to indicate
 -   Type: `function` or `false`
 -   Optional
 
-This prop controls the "Reset view" button in the view configuration dropdown:
+This prop controls the "Reset view" button in the view settings drawer:
 
 -   When `undefined` (not provided): No reset functionality is shown. Use this when view persistence is not supported.
 -   When `false`: The "Reset view" button is shown but disabled. Use this when view persistence is supported but the current view matches the default (not modified).

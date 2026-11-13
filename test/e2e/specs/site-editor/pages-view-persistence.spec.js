@@ -32,9 +32,17 @@ test.describe( 'Pages View Persistence', () => {
 			'.dataviews-view-config__modified-indicator'
 		);
 		if ( await modifiedIndicator.isVisible() ) {
-			// Open dropdown and reset
+			// Open view settings and reset.
 			await page.getByRole( 'button', { name: 'View options' } ).click();
-			await page.getByRole( 'button', { name: 'Reset view' } ).click();
+			const settings = page.getByRole( 'dialog', {
+				name: 'View settings',
+			} );
+			await settings
+				.getByRole( 'button', { name: 'Reset view' } )
+				.click();
+			await settings
+				.getByRole( 'button', { name: 'Close', exact: true } )
+				.click();
 			await expect( modifiedIndicator ).toBeHidden();
 		}
 	} );
@@ -89,11 +97,17 @@ test.describe( 'Pages View Persistence', () => {
 		// Verify modified indicator is still visible
 		await expect( modifiedIndicator ).toBeVisible();
 
-		// Open dropdown and click the Reset button
+		// Open view settings and click the Reset button.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		const resetButton = page.getByRole( 'button', { name: 'Reset view' } );
+		const settings = page.getByRole( 'dialog', { name: 'View settings' } );
+		const resetButton = settings.getByRole( 'button', {
+			name: 'Reset view',
+		} );
 		await expect( resetButton ).toBeEnabled();
 		await resetButton.click();
+		await settings
+			.getByRole( 'button', { name: 'Close', exact: true } )
+			.click();
 
 		// Verify the modified indicator is hidden after reset
 		await expect( modifiedIndicator ).toBeHidden();
