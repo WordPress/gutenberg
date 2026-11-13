@@ -79,7 +79,27 @@ export default function useMultiSelection() {
 			setContentEditableWrapper( node, true );
 
 			// A mounted element's window has a selection.
-			defaultView!.getSelection()!.removeAllRanges();
+			const selection = defaultView!.getSelection()!;
+			selection.removeAllRanges();
+
+			// Select the blocks natively too, so that the browser treats a
+			// press on them (e.g. to open the context menu) as one within
+			// the selection, and keeps it.
+			const first = ownerDocument.getElementById(
+				`block-${ multiSelectedBlockClientIds[ 0 ] }`
+			);
+			const last = ownerDocument.getElementById(
+				`block-${ multiSelectedBlockClientIds[ length - 1 ] }`
+			);
+
+			// The blocks may not be rendered yet, e.g. when dragged into
+			// another block.
+			if ( first && last ) {
+				const range = ownerDocument.createRange();
+				range.setStart( first, 0 );
+				range.setEnd( last, last.childNodes.length );
+				selection.addRange( range );
+			}
 		},
 		[
 			hasMultiSelection,

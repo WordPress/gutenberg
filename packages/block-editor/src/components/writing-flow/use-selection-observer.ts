@@ -7,7 +7,7 @@ import {
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
-import { setContentEditableWrapper } from './utils';
+import { isSelectionOfBlocks, setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -122,6 +122,8 @@ export default function useSelectionObserver() {
 		getSelectionStart,
 		getSelectionEnd,
 		getSelectedBlockClientId,
+		getMultiSelectedBlockClientIds,
+		__unstableIsFullySelected,
 		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
@@ -258,6 +260,20 @@ export default function useSelectionObserver() {
 							 )?.focus();
 						}
 					}
+					return;
+				}
+
+				// A full block selection is also selected natively (see
+				// use-multi-selection). Browsers may reshape that selection,
+				// which must not turn it into a text selection.
+				if (
+					__unstableIsFullySelected() &&
+					isSelectionOfBlocks(
+						ownerDocument,
+						selection,
+						getMultiSelectedBlockClientIds()
+					)
+				) {
 					return;
 				}
 

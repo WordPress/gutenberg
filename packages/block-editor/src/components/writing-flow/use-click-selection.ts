@@ -92,35 +92,17 @@ export default function useClickSelection() {
 			function onMouseDown( event: MouseEvent ) {
 				clickCollapseClientId = undefined;
 
-				if ( ! isSelectionEnabled() ) {
-					return;
-				}
-
-				// Mouse events reach the listener from nodes.
-				const clickedClientId = getBlockClientId(
-					event.target as Node
-				);
-
-				// A secondary press on a fully selected block opens the context
-				// menu for the selection. There is no native selection to press
-				// in, so the browser would select at the press instead.
-				if (
-					event.button === 2 &&
-					clickedClientId &&
-					__unstableIsFullySelected() &&
-					( isBlockMultiSelected( clickedClientId ) ||
-						isAncestorMultiSelected( clickedClientId ) )
-				) {
-					event.preventDefault();
-				}
-
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-				if ( event.button !== 0 ) {
+				if ( ! isSelectionEnabled() || event.button !== 0 ) {
 					return;
 				}
 
 				const startClientId = getBlockSelectionStart();
+				// Mouse events reach the listener from nodes.
+				const clickedClientId = getBlockClientId(
+					event.target as Node
+				);
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus

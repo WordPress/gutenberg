@@ -594,10 +594,18 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 	} );
 
 	test( 'should keep a full block selection on right click', async ( {
+		page,
 		editor,
 		pageUtils,
 		multiBlockSelectionUtils,
 	} ) => {
+		const isFullySelected = () =>
+			page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.__unstableIsFullySelected()
+			);
+
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'first paragraph' },
@@ -612,13 +620,16 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
+		await expect.poll( isFullySelected ).toBe( true );
 
+		// On a word, which the browser would otherwise select.
 		await editor.canvas
 			.getByText( 'first paragraph', { exact: true } )
-			.click( { button: 'right' } );
+			.click( { button: 'right', position: { x: 10, y: 10 } } );
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
+		await expect.poll( isFullySelected ).toBe( true );
 
 		// Playwright can't open the context menu, so cut with the keyboard.
 		await pageUtils.pressKeys( 'primary+x' );
