@@ -76,7 +76,7 @@ describe( 'useInlineFit', () => {
 		expect( result.current.collapsed ).toBe( false );
 	} );
 
-	it( 'holds the inline presentation while locked', () => {
+	it( 'collapses while locked once the inline controls stop fitting', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
 			( { locked }: { locked: boolean } ) => useInlineFit( { locked } ),
@@ -86,15 +86,20 @@ describe( 'useInlineFit', () => {
 		measureFields( 100 );
 		expect( result.current.collapsed ).toBe( false );
 
-		// The user starts interacting; space shrinks meanwhile.
+		// The user starts interacting; space shrinks meanwhile. Holding the
+		// inline controls would clip them, so they collapse at once.
 		rerender( { locked: true } );
 		availableSize = 80;
 		rerender( { locked: true } );
-		expect( result.current.collapsed ).toBe( false );
-
-		// The interaction ends: the pending transition applies.
-		rerender( { locked: false } );
 		expect( result.current.collapsed ).toBe( true );
+
+		// The lock now holds the collapse, even with room to expand.
+		availableSize = 200;
+		rerender( { locked: true } );
+		expect( result.current.collapsed ).toBe( true );
+
+		rerender( { locked: false } );
+		expect( result.current.collapsed ).toBe( false );
 	} );
 
 	it( 'holds the collapsed presentation while locked', () => {
