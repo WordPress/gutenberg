@@ -16,3 +16,9 @@
 .nested-no-fallback {
 	color: var(--my-custom-color, var(--wpds-color-foreground-content-neutral));
 }
+
+/* Token-like text is not a reference. */
+.quoted::before {
+	content: "var(--wpds-dimension-gap-sm, 2px)";
+	background-image: url("var(--wpds-dimension-gap-sm, 2px)");
+}
