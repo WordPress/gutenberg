@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
+	Dropdown,
 	Icon as WCIcon,
 	Notice as WCNotice,
 	Spinner as WCSpinner,
@@ -22,12 +23,14 @@ export interface UploadingFile {
 
 interface UploadStatusPopoverProps {
 	uploadingFiles: UploadingFile[];
+	useUiOverlay?: boolean;
 	onDismissError?: ( fileId: string ) => void;
 	onOpenChange?: ( open: boolean ) => void;
 }
 
 export function UploadStatusPopover( {
 	uploadingFiles,
+	useUiOverlay = true,
 	onDismissError,
 	onOpenChange,
 }: UploadStatusPopoverProps ) {
@@ -83,6 +86,73 @@ export function UploadStatusPopover( {
 		popoverHeading = __( 'Upload complete' );
 	}
 
+	const Heading = useUiOverlay ? Popover.Title : 'h3';
+	const content = (
+		<>
+			<div className="media-upload-modal__upload-status__header">
+				<Heading>{ popoverHeading }</Heading>
+			</div>
+			<ul className="media-upload-modal__upload-status__list">
+				{ uploadingFiles.map( ( file ) => (
+					<li
+						key={ file.id }
+						className="media-upload-modal__upload-status__item"
+					>
+						{ file.status === 'uploading' && <WCSpinner /> }
+						{ file.status === 'uploaded' && (
+							<WCIcon icon={ check } size={ 16 } />
+						) }
+						{ ( file.status === 'uploading' ||
+							file.status === 'uploaded' ) && (
+							<span
+								className="media-upload-modal__upload-status__filename"
+								title={ file.name }
+							>
+								{ file.name }
+							</span>
+						) }
+						{ file.status === 'error' && (
+							<WCNotice
+								status="error"
+								isDismissible={ !! onDismissError }
+								onRemove={ () => onDismissError?.( file.id ) }
+							>
+								{ file.name }: { file.error }
+							</WCNotice>
+						) }
+					</li>
+				) ) }
+			</ul>
+		</>
+	);
+	if ( ! useUiOverlay ) {
+		return (
+			<Dropdown
+				open={ isOpen }
+				onToggle={ updateIsOpen }
+				className="media-upload-modal__upload-status"
+				contentClassName="media-upload-modal__upload-status__popover"
+				popoverProps={ { placement: 'top-start' } }
+				renderToggle={ ( { onToggle } ) => (
+					<>
+						{ isUploading && <WCSpinner /> }
+						<Button
+							onClick={ onToggle }
+							className="media-upload-modal__upload-status__trigger"
+							size="compact"
+							icon={ chevronDown }
+							iconPosition="right"
+							aria-expanded={ isOpen }
+						>
+							{ buttonLabel }
+						</Button>
+					</>
+				) }
+				renderContent={ () => content }
+			/>
+		);
+	}
+
 	return (
 		<Popover.Root open={ isOpen } onOpenChange={ updateIsOpen }>
 			<div className="media-upload-modal__upload-status">
@@ -110,42 +180,7 @@ export function UploadStatusPopover( {
 					/>
 				}
 			>
-				<div className="media-upload-modal__upload-status__header">
-					<Popover.Title>{ popoverHeading }</Popover.Title>
-				</div>
-				<ul className="media-upload-modal__upload-status__list">
-					{ uploadingFiles.map( ( file ) => (
-						<li
-							key={ file.id }
-							className="media-upload-modal__upload-status__item"
-						>
-							{ file.status === 'uploading' && <WCSpinner /> }
-							{ file.status === 'uploaded' && (
-								<WCIcon icon={ check } size={ 16 } />
-							) }
-							{ ( file.status === 'uploading' ||
-								file.status === 'uploaded' ) && (
-								<span
-									className="media-upload-modal__upload-status__filename"
-									title={ file.name }
-								>
-									{ file.name }
-								</span>
-							) }
-							{ file.status === 'error' && (
-								<WCNotice
-									status="error"
-									isDismissible={ !! onDismissError }
-									onRemove={ () =>
-										onDismissError?.( file.id )
-									}
-								>
-									{ file.name }: { file.error }
-								</WCNotice>
-							) }
-						</li>
-					) ) }
-				</ul>
+				{ content }
 			</Popover.Popup>
 		</Popover.Root>
 	);

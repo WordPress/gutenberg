@@ -5,6 +5,7 @@ import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import type { DataRegistry } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
+import { supportsUiOverlays } from '../supports-ui-overlays';
 import { MediaFrameDialog } from './media-frame-dialog';
 import styles from './media-frame-dialog.module.css';
 import type {
@@ -264,6 +265,19 @@ const getAttachmentsCollection = ( ids?: number | number[] ) => {
 };
 
 class MediaUpload extends Component< MediaUploadProps > {
+	/** Subclasses must explicitly attest that their custom views support UI overlays. */
+	static get supportsUiOverlays(): boolean {
+		return supportsUiOverlays();
+	}
+
+	private get usesUiOverlay() {
+		return (
+			Object.hasOwn( this.constructor, 'supportsUiOverlays' ) &&
+			Reflect.get( this.constructor, 'supportsUiOverlays' ) === true &&
+			supportsUiOverlays()
+		);
+	}
+
 	private isUnmounting = false;
 	private coreFrame?: { frame: MediaFrame; open: () => void };
 	declare frame: MediaFrame;
@@ -436,7 +450,16 @@ class MediaUpload extends Component< MediaUploadProps > {
 		this.removeFrame();
 	}
 
+	detachUndoRedoGuard() {
+		this.frame?.modal?.el?.removeEventListener(
+			'keydown',
+			this.stopUndoRedoPropagation,
+			true
+		);
+	}
+
 	private removeFrame() {
+		this.detachUndoRedoGuard();
 		this.frame?.close();
 		this.frame?.detach();
 		this.frame?.modal?.remove();
@@ -474,6 +497,13 @@ class MediaUpload extends Component< MediaUploadProps > {
 		const { wp } = window as unknown as MediaWindow;
 		const { value } = this.props;
 		this.updateCollection();
+		if ( ! this.usesUiOverlay ) {
+			this.frame.modal?.el?.addEventListener(
+				'keydown',
+				this.stopUndoRedoPropagation,
+				true
+			);
+		}
 
 		//Handle active tab in media model on model open.
 		if ( this.props.mode ) {
@@ -510,6 +540,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 	}
 
 	onClose() {
+		this.detachUndoRedoGuard();
 		if ( this.isOpen && ! this.isUnmounting ) {
 			this.setState( { isOpen: false } );
 		}
@@ -591,6 +622,11 @@ class MediaUpload extends Component< MediaUploadProps > {
 		if ( modalClass ) {
 			this.frame.$el.addClass( modalClass );
 		}
+		if ( ! this.usesUiOverlay ) {
+			this.initializeListeners();
+			this.frame.open();
+			return;
+		}
 
 		if ( this.coreFrame?.frame !== this.frame ) {
 			const frame = this.frame;
@@ -609,7 +645,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 
 	openFrame( container: HTMLDivElement ) {
 		const { modal } = this.frame;
-		if ( ! modal ) {
+		if ( ! modal?.el ) {
 			return null;
 		}
 
@@ -617,9 +653,9 @@ class MediaUpload extends Component< MediaUploadProps > {
 		// replaces only the modal chrome around those views.
 		modal.template = () => '<div class="media-modal-content"></div>';
 		modal.el.classList.add( styles.frame );
-		modal.options.container = container;
+		modal.options = { ...modal.options, container };
 		const dialog = container.closest( '[role="dialog"]' );
-		if ( dialog?.parentElement ) {
+		if ( dialog?.parentElement && modal.focusManager ) {
 			// Keep Core's explicit focus() calls, but let Dialog own tabbing.
 			modal.focusManager.setElement( dialog.parentElement );
 			modal.focusManager.undelegateEvents();
@@ -633,14 +669,18 @@ class MediaUpload extends Component< MediaUploadProps > {
 	}
 
 	closeFrame() {
-		this.frame.escape();
+		if ( this.frame.escape ) {
+			this.frame.escape();
+		} else {
+			this.frame.close();
+		}
 	}
 
 	render(): ReactNode {
 		return (
 			<>
 				{ this.props.render( { open: this.openModal } ) }
-				{ this.frame && (
+				{ this.usesUiOverlay && this.frame && (
 					<MediaFrameDialog
 						key={ this.frame.cid }
 						onOpen={ this.openFrame }

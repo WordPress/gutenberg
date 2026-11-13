@@ -89,6 +89,7 @@ function mockRecords( records: unknown[] ) {
 
 type ModalProps = {
 	isOpen: boolean;
+	isDismissible?: boolean;
 	value?: number | number[];
 	postId?: number;
 	postType?: string;
@@ -98,6 +99,7 @@ type ModalProps = {
 function renderModal(
 	{
 		isOpen = true,
+		isDismissible = true,
 		value,
 		postId,
 		postType,
@@ -129,6 +131,7 @@ function renderModal(
 		<RegistryProvider value={ registry }>
 			<MediaUploadModal
 				isOpen={ isOpen }
+				isDismissible={ isDismissible }
 				value={ value }
 				postId={ postId }
 				postType={ postType }
@@ -151,7 +154,7 @@ function renderModal(
 		);
 	};
 
-	return { ...view, registry, rerender };
+	return { ...view, registry, rerender, onClose };
 }
 
 describe( 'MediaUploadModal', () => {
@@ -178,6 +181,17 @@ describe( 'MediaUploadModal', () => {
 			.querySelectorAll( '.components-popover__fallback-container' )
 			.forEach( ( node ) => node.remove() );
 		/* eslint-enable testing-library/no-node-access */
+	} );
+
+	it( 'keeps a non-dismissible picker open after Escape', async () => {
+		const user = userEvent.setup();
+		const { onClose } = renderModal( { isDismissible: false } );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Select Media',
+		} );
+		await user.keyboard( '{Escape}' );
+		expect( dialog ).toBeVisible();
+		expect( onClose ).not.toHaveBeenCalled();
 	} );
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {

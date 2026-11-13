@@ -77,6 +77,10 @@ function MediaUploadModalWithPostContext( props ) {
  * with the stable MediaUpload component API (render prop pattern).
  */
 class MediaUploadModalWrapper extends Component {
+	static get supportsUiOverlays() {
+		return MediaUpload.supportsUiOverlays;
+	}
+
 	constructor( props ) {
 		super( props );
 		this.state = {
