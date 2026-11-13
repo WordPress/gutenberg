@@ -89,6 +89,29 @@ describe( 'GradientPicker', () => {
 			0,
 			'blue'
 		);
+
+		onChange.mockClear();
+		await user.keyboard( '{ArrowRight}' );
+		await view.rerender(
+			<GradientPicker
+				aria-label="Presets"
+				gradients={ [ theme ] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomGradients
+			/>
+		);
+		expect(
+			within(
+				screen.getByRole( 'group', { name: 'Palette' } )
+			).getByRole( 'option', { name: 'Gradient: Red' } )
+		).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+			red.gradient,
+			0,
+			'red'
+		);
 	} );
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();

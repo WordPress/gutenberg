@@ -85,6 +85,29 @@ describe( 'ColorPalette', () => {
 		expect( screen.getByRole( 'option', { name: 'Red' } ) ).toHaveFocus();
 		await user.keyboard( '{ArrowLeft}{Enter}' );
 		expect( onChange ).toHaveBeenLastCalledWith( updated.color, 0, 'blue' );
+
+		onChange.mockClear();
+		await user.keyboard( '{ArrowRight}' );
+		await view.rerender(
+			<ColorPalette
+				aria-label="Presets"
+				colors={ [ theme ] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomColors
+			/>
+		);
+		expect(
+			within(
+				screen.getByRole( 'group', { name: 'Palette' } )
+			).getByRole( 'option', { name: 'Red' } )
+		).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+			red.color,
+			0,
+			'red'
+		);
 	} );
 	it.each( [ false, true ] )(
 		'keeps focus and current keyboard actions after reordering colors with slugs=%s',
