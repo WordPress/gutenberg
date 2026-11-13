@@ -184,7 +184,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		);
 	} );
 
-	test( 'should return focus when pressing formatting button (-firefox)', async ( {
+	test( 'should return focus when pressing formatting button', async ( {
 		page,
 		editor,
 	} ) => {
@@ -523,7 +523,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should update internal selection after fresh focus (-firefox)', async ( {
+	test( 'should update internal selection after fresh focus', async ( {
 		page,
 		editor,
 		pageUtils,
