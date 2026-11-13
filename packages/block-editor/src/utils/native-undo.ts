@@ -31,11 +31,11 @@ export function useNativeUndo() {
  * element, so the real target is resolved through the frame's focused
  * element.
  *
- * @param event Keyboard event.
+ * @param event Keyboard or input event.
  *
  * @return Whether the element relies on the browser's own undo.
  */
-export function usesNativeUndo( event: KeyboardEvent ): boolean {
+export function usesNativeUndo( event: Event ): boolean {
 	let target = event.target as Element | null | undefined;
 
 	if ( target?.nodeName === 'IFRAME' ) {

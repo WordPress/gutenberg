@@ -33,6 +33,7 @@ import {
 	DESIGN_POST_TYPES,
 } from '../../store/constants';
 import { useZoomOutModeExit } from './use-zoom-out-mode-exit';
+import { useHistoryInput } from './use-history-input';
 import { usePaddingAppender } from './use-padding-appender';
 import { useEditContentOnlySectionExit } from './use-edit-content-only-section-exit';
 import { SyncConnectionErrorModal } from '../sync-connection-error-modal';
@@ -477,6 +478,7 @@ function VisualEditor( {
 			isEnabled: renderingMode === 'template-locked',
 		} ),
 		useZoomOutModeExit(),
+		useHistoryInput(),
 		paddingAppenderRef,
 		useEditContentOnlySectionExit(),
 	] );
