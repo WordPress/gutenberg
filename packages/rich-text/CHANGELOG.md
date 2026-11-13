@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `toHTMLString`: Close non-void inline objects and preserve their children ([#85895](https://github.com/WordPress/gutenberg/pull/85895)).
+
 ## 8.1.0 (2026-11-04)
 
 ### Bug Fixes
