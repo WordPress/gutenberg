@@ -78,7 +78,15 @@ const NON_CONTEXTUAL_POST_TYPES = [
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
-	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
+	// The rendering mode is the editor's rather than the canvas's, so it can
+	// be the one that shows the template when this canvas has none to show:
+	// a route can ask for that mode whatever its canvas resolves to, a
+	// template that stands for itself included, and the mode of the last
+	// canvas stays until this one settles its own. The post is rendered on
+	// its own then, rather than the blocks of a template that is not there,
+	// which would leave the last canvas in place.
+	const rootLevelPost =
+		mode === 'template-locked' && template ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -482,7 +490,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
+									{ /*
+									   Only while a template is rendered
+									   around the post: a canvas with none
+									   has nothing to lock, whatever mode
+									   the editor was left in.
+									 */ }
+									{ shouldRenderTemplate && (
 										<DisableNonPageContentBlocks />
 									) }
 									{ type === 'wp_navigation' && (
