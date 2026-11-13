@@ -8,7 +8,12 @@ import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useMemo, useState } from '@wordpress/element';
-import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
+import {
+	store as coreStore,
+	useEntityRecords,
+	useEntityProp,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import useNavigationMenu from '../use-navigation-menu';
 
 function buildMenuLabel( title, id, status ) {
@@ -52,10 +57,18 @@ function NavigationMenuSelector( {
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
-		canUserCreateNavigationMenus,
 		canSwitchNavigationMenu,
 		isNavigationMenuMissing,
 	} = useNavigationMenu( currentMenuId );
+
+	const canUserCreateNavigationMenus = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_navigation',
+			} ),
+		[]
+	);
 
 	const [ currentTitle ] = useEntityProp(
 		'postType',
