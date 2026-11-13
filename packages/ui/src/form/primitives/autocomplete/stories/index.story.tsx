@@ -277,6 +277,9 @@ export const AsyncItems: Story = {
 
 /**
  * The suggestion list can be rendered inline by enabling `inline` and `open`.
+ * The list body's inline-end padding keeps the items clear of a classic
+ * scrollbar, and `scrollbar-gutter: stable` prevents width changes when the
+ * scrollbar appears or disappears.
  */
 export const Inline: Story = {
 	parameters: {
@@ -800,6 +803,11 @@ export const Grid: Story = {
  * popover after a pick, control `open` on `Popover.Root` and set it to `false`
  * from each item's `onClick`. To open the popover somewhere other than its
  * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
+ *
+ * If the list scrolls, set `scrollbar-gutter: stable` on `Autocomplete.ListBody`
+ * to prevent width changes when its scrollbar appears or disappears. To keep
+ * the scrollbar clear of the last column, extend the list body into the popover's
+ * padding with a negative inline-end margin and the same inline-end padding.
  */
 export const InlineInPopover: Story = {
 	parameters: {

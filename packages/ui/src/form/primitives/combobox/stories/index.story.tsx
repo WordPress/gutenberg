@@ -135,6 +135,9 @@ export const Compact: Story = {
  * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
  *
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
+ * The list body's inline-end padding keeps the items clear of a classic
+ * scrollbar, and `scrollbar-gutter: stable` prevents width changes when the
+ * scrollbar appears or disappears.
  */
 export const DetachedInline: Story = {
 	parameters: {
