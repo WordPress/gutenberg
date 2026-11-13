@@ -20,7 +20,9 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$more_text           = ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
+	// Blocks saved before `addMoreText` existed have no value and keep their link.
+	$show_more_text      = ! isset( $attributes['addMoreText'] ) || $attributes['addMoreText'];
+	$more_text           = $show_more_text && ! empty( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . wp_kses_post( $attributes['moreText'] ) . '</a>' : '';
 	$filter_excerpt_more = static function ( $more ) use ( $more_text ) {
 		return empty( $more_text ) ? $more : '';
 	};
@@ -71,10 +73,6 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 
 	$content               = '<p class="wp-block-post-excerpt__excerpt">' . $excerpt;
 	$show_more_on_new_line = ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'];
-
-	if ( isset( $attributes['addMoreText'] ) && ! $attributes['addMoreText'] ) {
-		$more_text = '';
-	}
 	if ( $show_more_on_new_line && ! empty( $more_text ) ) {
 		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} elseif ( empty( $more_text ) ) {

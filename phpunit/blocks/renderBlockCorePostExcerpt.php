@@ -238,6 +238,27 @@ class Tests_Blocks_RenderBlockCorePostExcerpt extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The more link must not render when `addMoreText` is false, even with more text set.
+	 *
+	 * @covers ::gutenberg_render_block_core_post_excerpt
+	 */
+	public function test_should_not_render_more_link_when_add_more_text_is_false() {
+		$attributes = array(
+			'moreText'      => 'Read More',
+			'addMoreText'   => false,
+			'excerptLength' => 55,
+		);
+
+		$rendered = gutenberg_render_block_core_post_excerpt( $attributes, '', $this->get_block_for_test_post() );
+
+		$this->assertStringNotContainsString(
+			'wp-block-post-excerpt__more',
+			$rendered,
+			'Failed to assert that the more link is not rendered when addMoreText is false.'
+		);
+	}
+
+	/**
 	 * Test gutenberg_render_block_core_post_excerpt() method.
 	 */
 	public function test_should_render_correct_excerpt() {

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Excerpt: Add a setting to show the “Read more” link, off for new blocks; blocks that already have link text keep it ([#38662](https://github.com/WordPress/gutenberg/pull/38662)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).

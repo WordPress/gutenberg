@@ -32,6 +32,9 @@ export default function PostExcerptEditor( props ) {
 	} = props;
 	useDeprecatedTextAlign( props );
 
+	// Blocks saved before `addMoreText` existed keep the link if they set its text.
+	const showMoreText = addMoreText ?? moreText !== undefined;
+
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const userCanEdit = useCanEditEntity( 'postType', postType, postId );
 	const [
@@ -114,7 +117,7 @@ export default function PostExcerptEditor( props ) {
 			</div>
 		);
 	}
-	const readMoreLink = addMoreText ? (
+	const readMoreLink = showMoreText ? (
 		<RichText
 			identifier="moreText"
 			className="wp-block-post-excerpt__more-link"
@@ -129,7 +132,7 @@ export default function PostExcerptEditor( props ) {
 		/>
 	) : null;
 	const excerptClassName = clsx( 'wp-block-post-excerpt__excerpt', {
-		'is-inline': ! showMoreOnNewLine,
+		'is-inline': showMoreText && ! showMoreOnNewLine,
 	} );
 
 	/**
@@ -204,7 +207,7 @@ export default function PostExcerptEditor( props ) {
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
 						setAttributes( {
-							addMoreText: false,
+							addMoreText: undefined,
 							showMoreOnNewLine: true,
 							excerptLength: 55,
 						} );
@@ -212,16 +215,19 @@ export default function PostExcerptEditor( props ) {
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
-						hasValue={ () => !! addMoreText }
-						label={ __( 'Add `read more` text' ) }
+						hasValue={ () => addMoreText !== undefined }
+						label={ __( 'Show “Read more” link' ) }
 						onDeselect={ () =>
-							setAttributes( { addMoreText: false } )
+							setAttributes( { addMoreText: undefined } )
 						}
 						isShownByDefault
 					>
 						<ToggleControl
-							label={ __( 'Add `read more` text' ) }
-							checked={ !! addMoreText }
+							label={ __( 'Show “Read more” link' ) }
+							help={ __(
+								'Use the Read More block for more design options.'
+							) }
+							checked={ showMoreText }
 							onChange={ ( newAddMoreText ) =>
 								setAttributes( {
 									addMoreText: newAddMoreText,
@@ -229,7 +235,7 @@ export default function PostExcerptEditor( props ) {
 							}
 						/>
 					</ToolsPanelItem>
-					{ !! addMoreText && (
+					{ showMoreText && (
 						<ToolsPanelItem
 							hasValue={ () => showMoreOnNewLine !== true }
 							label={ __( 'Show link on new line' ) }
@@ -271,8 +277,8 @@ export default function PostExcerptEditor( props ) {
 			</InspectorControls>
 			<div { ...blockProps }>
 				{ excerptContent }
-				{ addMoreText && ! showMoreOnNewLine && ' ' }
-				{ addMoreText && showMoreOnNewLine ? (
+				{ showMoreText && ! showMoreOnNewLine && ' ' }
+				{ showMoreText && showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
 						{ readMoreLink }
 					</p>
