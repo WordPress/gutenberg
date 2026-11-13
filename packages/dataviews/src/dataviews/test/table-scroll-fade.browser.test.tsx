@@ -250,9 +250,15 @@ describe( 'DataViews table scroll fade', () => {
 				expect(
 					getComputedStyle( firstRow, '::after' ).backgroundColor
 				).toBe( 'rgb(1, 2, 3)' );
+				// Rows without their own background fade into the one of
+				// DataViews, not into a transparent cell.
 				expect(
 					getComputedStyle( secondRow, '::after' ).backgroundColor
-				).toBe( getComputedStyle( secondRow ).backgroundColor );
+				).toBe(
+					getComputedStyle(
+						document.querySelector( '.dataviews-wrapper' )!
+					).backgroundColor
+				);
 			} finally {
 				style.remove();
 			}
