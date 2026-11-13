@@ -21,7 +21,7 @@ import type {
 import { DEFAULT_STATE } from '../constants';
 import { imageEditorReducer } from '../state';
 import { getRotatedBBox } from '../camera';
-import { mapEditToOriginal } from '../../map-edit-to-original';
+import { getImageEdit } from '../../get-image-edit';
 import { getOutputSize } from '../../get-output-size';
 
 const IMAGES = [
@@ -327,32 +327,30 @@ describe( 'invariants across a run of edits', () => {
 					}
 				}
 
-				// The edits sent for saving have to be instructions a
-				// server can carry out.
-				for ( const edit of mapEditToOriginal( state ) ) {
-					if (
-						edit.type === 'crop' &&
-						! (
-							edit.x >= -RATIO_TOLERANCE &&
-							edit.y >= -RATIO_TOLERANCE &&
-							edit.width > 0 &&
-							edit.height > 0 &&
-							edit.x + edit.width <= 1 + RATIO_TOLERANCE &&
-							edit.y + edit.height <= 1 + RATIO_TOLERANCE
-						)
-					) {
-						problems.push(
-							`${ where }: crop edit is out of bounds`
-						);
-					}
-					if (
-						edit.type === 'rotate' &&
-						! ( edit.angle >= 0 && edit.angle < 360 )
-					) {
-						problems.push(
-							`${ where }: rotate edit is ${ edit.angle }`
-						);
-					}
+				// The edit sent for saving has to be something a server
+				// can carry out.
+				const edit = getImageEdit( state );
+				const crop = edit?.crop;
+				if (
+					crop &&
+					! (
+						crop.x >= -RATIO_TOLERANCE &&
+						crop.y >= -RATIO_TOLERANCE &&
+						crop.width > 0 &&
+						crop.height > 0 &&
+						crop.x + crop.width <= 1 + RATIO_TOLERANCE &&
+						crop.y + crop.height <= 1 + RATIO_TOLERANCE
+					)
+				) {
+					problems.push( `${ where }: crop edit is out of bounds` );
+				}
+				if (
+					edit?.rotation !== undefined &&
+					! ( edit.rotation >= 0 && edit.rotation < 360 )
+				) {
+					problems.push(
+						`${ where }: rotation is ${ edit.rotation }`
+					);
 				}
 			}
 

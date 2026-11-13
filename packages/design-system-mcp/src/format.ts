@@ -80,6 +80,9 @@ export function formatComponentDetail( detail: ComponentDetail ): string {
 		lines.push( '', '## Examples', '' );
 		for ( const story of detail.stories ) {
 			lines.push( `### ${ story.name }` );
+			if ( story.description ) {
+				lines.push( '', story.description );
+			}
 			if ( story.snippet ) {
 				lines.push( '', '```tsx', story.snippet, '```' );
 			}

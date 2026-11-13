@@ -6,6 +6,15 @@
 
 -   Text color format: Replace the "Highlight" toolbar item with separate "Text color" and "Highlight color" items, each opening a single color palette ([#85296](https://github.com/WordPress/gutenberg/pull/85296)).
 
+### Enhancements
+
+-   Link format: stop adding `rel="noopener"` to links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86516](https://github.com/WordPress/gutenberg/pull/86516)).
+
+### Bug Fixes
+
+-   Link: Preserve manually added attributes, HTML IDs, and unmanaged `rel` tokens when editing an existing inline link ([#84841](https://github.com/WordPress/gutenberg/pull/84841)).
+-   Link: Keep the leading `+` of an international phone number when linking it, so `+44 20 7946 0958` links to `tel:+442079460958` instead of `tel:442079460958` ([#86754](https://github.com/WordPress/gutenberg/pull/86754)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Bug Fixes

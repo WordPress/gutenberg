@@ -1,5 +1,5 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
-import { useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { MenuContext, MenuGroupContext } from './context';
 import type { SubmenuRootProps } from './types';
 
@@ -8,9 +8,13 @@ import type { SubmenuRootProps } from './types';
  */
 function SubmenuRoot( props: SubmenuRootProps ) {
 	const submenuTriggerRef = useRef< HTMLDivElement >( null );
+	const contextValue = useMemo(
+		() => ( { isSubmenu: true, submenuTriggerRef } ),
+		[ submenuTriggerRef ]
+	);
 
 	return (
-		<MenuContext.Provider value={ { isSubmenu: true, submenuTriggerRef } }>
+		<MenuContext.Provider value={ contextValue }>
 			<MenuGroupContext.Provider value={ null }>
 				<_Menu.SubmenuRoot { ...props } />
 			</MenuGroupContext.Provider>
