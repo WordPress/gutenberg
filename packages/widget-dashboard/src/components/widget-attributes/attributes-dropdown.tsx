@@ -3,15 +3,16 @@ import type { Field, Form } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
-/* eslint-disable @wordpress/use-recommended-components -- Dashboard is still experimental. */
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	Button,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	IconButton,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Dashboard is still experimental.
 	Popover,
 	Stack,
 	VisuallyHidden,
 } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 import styles from './widget-attributes.module.css';
 import type { WidgetAttributeValues } from '../../types';
 

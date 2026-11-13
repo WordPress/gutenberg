@@ -6,7 +6,6 @@ import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockType,
-	Block,
 	BlockVariation,
 	BlockVariationScope,
 	BlockStyle,
@@ -501,7 +500,7 @@ export function hasBlockSupport(
  * @return Whether the given block is a reusable block.
  */
 export function isReusableBlock(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/block';
 }
@@ -516,7 +515,7 @@ export function isReusableBlock(
  * @return Whether the given block is a template part.
  */
 export function isTemplatePart(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/template-part';
 }

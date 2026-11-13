@@ -5,7 +5,6 @@ import { useSelect } from '@wordpress/data';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
-	// @ts-expect-error No exported types
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../lock-unlock';
@@ -74,7 +73,11 @@ export default function EditOriginalInspectorButton( {
 							__next40pxDefaultSize
 							variant="secondary"
 							onClick={ () =>
-								onNavigateToEntityRecord( { postId, postType } )
+								onNavigateToEntityRecord( {
+									// The button is disabled without an ID.
+									postId: postId as number | string,
+									postType,
+								} )
 							}
 							accessibleWhenDisabled
 							disabled={ ! postId }

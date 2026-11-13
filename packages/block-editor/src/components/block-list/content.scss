@@ -383,7 +383,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 
 	&:focus {
-		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		@include outset-ring__focus();
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
 }
 

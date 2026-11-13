@@ -3,7 +3,7 @@ import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Color } from '@wordpress/global-styles-engine';
-import type { ColorObject } from './types';
+import type { CustomColorObject } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -19,11 +19,13 @@ extend( [ namesPlugin, a11yPlugin ] );
  *                   the color object exactly as set by the theme or editor defaults is returned.
  *                   Otherwise, an object that just sets the color is defined.
  */
-export const getColorObjectByAttributeValues = (
-	colors: Color[] | undefined,
+export const getColorObjectByAttributeValues = <
+	C extends { slug?: string } = Color,
+>(
+	colors: ReadonlyArray< C > | undefined,
 	definedColor: string | null | undefined,
-	customColor: string | null | undefined
-): ColorObject => {
+	customColor?: string | null
+): C | CustomColorObject => {
 	if ( definedColor ) {
 		const colorObj = colors?.find(
 			( color ) => color.slug === definedColor
@@ -47,10 +49,12 @@ export const getColorObjectByAttributeValues = (
  * @return {?Object} Color object included in the colors array whose color property equals colorValue.
  *                   Returns undefined if no color object matches this requirement.
  */
-export const getColorObjectByColorValue = (
-	colors: Color[] | undefined,
+export const getColorObjectByColorValue = <
+	C extends { color?: string } = Color,
+>(
+	colors: ReadonlyArray< C > | undefined,
 	colorValue: string | null | undefined
-): Color | undefined => {
+): C | undefined => {
 	return colors?.find( ( color ) => color.color === colorValue );
 };
 
@@ -82,14 +86,13 @@ export function getColorClassName(
  *
  * @return String with the color value of the most readable color.
  */
-export function getMostReadableColor(
-	colors: Color[],
+export function getMostReadableColor< C extends { color: string } = Color >(
+	colors: ReadonlyArray< C >,
 	colorValue: string | null | undefined
 ): string {
 	// `colord` reads an unset value as an invalid color.
 	const colordColor = colord( colorValue as string );
-	const getColorContrast = ( { color }: Color ) =>
-		colordColor.contrast( color );
+	const getColorContrast = ( { color }: C ) => colordColor.contrast( color );
 
 	const maxContrast = Math.max( ...colors.map( getColorContrast ) );
 	// The color with the highest contrast is in the list.

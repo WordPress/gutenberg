@@ -5,6 +5,7 @@ import type {
 	ResizeDelta,
 	ResizeHandleRenderProps,
 } from '../shared/types';
+import type { ColumnSteps } from '../shared/column-policy';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 
 /**
@@ -188,7 +189,8 @@ export type GridItemProps = {
  * the grid root.
  *
  * `columns` and `minColumnWidth` compose as a layered model:
- * - `columns` alone: fixed N columns; each tile scales with the container.
+ * - `columns` alone: the count at every width, or a count per container
+ *   width when given as `ColumnSteps`; each tile scales with the container.
  * - `minColumnWidth` alone: column count derives from container width,
  *   floored by the per-tile minimum, down to 1 column.
  * - Both together: `columns` caps the count, `minColumnWidth` enforces a
@@ -295,11 +297,13 @@ export interface DashboardGridProps extends Omit<
 	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 
 	/**
-	 * Target column count, used as a cap. Defaults to six when neither
-	 * `columns` nor `minColumnWidth` is set; with `minColumnWidth` set
-	 * it can resolve lower on narrow containers.
+	 * Column count, used as a cap. A number applies at every width; a
+	 * `ColumnSteps` map applies a count from each container width up, and
+	 * an `'auto'` step lifts the cap from its width up.
+	 * Defaults to six when neither `columns` nor `minColumnWidth` is set;
+	 * with `minColumnWidth` set it can resolve lower on narrow containers.
 	 */
-	columns?: number;
+	columns?: number | ColumnSteps;
 
 	/**
 	 * Per-tile minimum width in pixels. Enables responsive mode: the

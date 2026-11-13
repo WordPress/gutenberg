@@ -6,11 +6,10 @@ module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
 	plugins: [
 		'stylelint-plugin-logical-css',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	reportNeedlessDisables: true,
 	rules: {
-		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
 		'declaration-property-value-disallowed-list': [
@@ -43,7 +42,7 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are being removed from the components package.`;
 				},
 			},
 		],

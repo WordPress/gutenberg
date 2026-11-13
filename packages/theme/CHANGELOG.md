@@ -2,6 +2,52 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead. `--wpds-color-background-thumb-neutral` will change to a light color for switch knobs in a future release ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
+### New Features
+
+-   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
+-   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+
+### Enhancements
+
+-   Check `--wpds-color-foreground-content-neutral-weak` text on `--wpds-color-background-surface-neutral-weak` and `--wpds-color-background-surface-neutral-strong` for WCAG AA contrast in the token build and `ThemeProvider` color warnings ([#86750](https://github.com/WordPress/gutenberg/pull/86750)).
+-   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
+
+### Bug Fixes
+
+-   `ThemeProvider`: Carry near-gray background tints into generated neutral surfaces and strokes with a smooth chroma ceiling that stays close to the seed for faint tints ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
+-   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
+
+### Internal
+
+-   Generate correct JavaScript and SCSS fallbacks on the first build after adding or repointing token aliases ([#86547](https://github.com/WordPress/gutenberg/pull/86547)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 4.0.0 (2026-11-04)
+
+### Breaking Changes
+
+-   Move the build and Stylelint plugins to the new `@wordpress/theme-build-tools` package; replace `@wordpress/theme/` with `@wordpress/theme-build-tools/` in their import paths ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Remove the optional `esbuild`, `lightningcss`, `postcss`, `stylelint`, and `vite` peer dependencies ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+
+### Enhancements
+
+-   `ThemeProvider`: Report final focus-ring and strong brand fill colors below 3:1 contrast against neutral and brand surfaces through `onColorWarnings` ([#85449](https://github.com/WordPress/gutenberg/pull/85449)).
+
+### Bug Fixes
+
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
+-   Update Terrazzo token-generation tools to 2.10.0 ([#85737](https://github.com/WordPress/gutenberg/pull/85737)).
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -12,6 +58,10 @@
 
 -   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 -   Export the `$description` of token groups on their `groups` nodes in `design-tokens.js`, and add descriptions for the dimension and border width groups ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
+
+### Enhancements
+
+-   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all ([#85182](https://github.com/WordPress/gutenberg/pull/85182)).
 
 ### Internal
 

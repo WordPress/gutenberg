@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/review-routing-tools",
+	"version": "0.0.0",
+	"description": "Decides who to ask for review on a pull request, using a decision model.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"GitHub Actions"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/review-routing/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/review-routing"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"type": "module",
+	"main": "src/cli.ts",
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"vitest": "^5.1.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"route": "node src/cli.ts"
+	}
+}

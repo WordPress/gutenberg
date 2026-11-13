@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.1.0 (2026-11-04)
+
 ## 3.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -15,6 +17,10 @@
 ### Bug Fixes
 
 -   Load preferences when local storage is blocked or holds invalid JSON, and ignore persisted data that is not an object ([#84375](https://github.com/WordPress/gutenberg/pull/84375)).
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85162](https://github.com/WordPress/gutenberg/pull/85162)).
 
 ## 2.57.0 (2026-10-07)
 
