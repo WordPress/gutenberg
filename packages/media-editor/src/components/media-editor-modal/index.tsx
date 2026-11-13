@@ -11,7 +11,7 @@ import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
 
-interface MediaEditorModalProps {
+export interface MediaEditorModalProps {
 	/**
 	 * Attachment fields to render in the Details tab.
 	 *

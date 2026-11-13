@@ -7,10 +7,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useCallback, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import {
-	privateApis as mediaEditorPrivateApis,
-	type Media,
-} from '@wordpress/media-editor';
+import { MediaEditor, type Media } from '@wordpress/media-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	privateApis as routePrivateApis,
@@ -28,7 +25,6 @@ import {
 import './style.scss';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const { useCanGoBack } = unlock( routePrivateApis );
 
 /**

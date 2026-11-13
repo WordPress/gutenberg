@@ -11380,16 +11380,6 @@
 			"count": 1
 		}
 	},
-	"packages/media-editor/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/media-editor/src/private-apis.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/media-fields/src/author/view.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
