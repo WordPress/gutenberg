@@ -8,8 +8,9 @@
  * @see https://ariakit.org/components/composite
  */
 import * as Ariakit from '@ariakit/react';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-import { useLayoutEffect, useMemo, forwardRef } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { CompositeContext } from './context';
 import { CompositeGroup } from './group';
@@ -78,7 +79,7 @@ export const Composite = Object.assign(
 
 		const store = storeProp ?? internalStore;
 
-		useLayoutEffect( () => {
+		useIsomorphicLayoutEffect( () => {
 			// React can move existing items without registering them again.
 			// Keep keyboard navigation in the committed DOM order.
 			store.setState( 'renderedItems', ( items ) => {
