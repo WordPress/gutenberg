@@ -64,6 +64,7 @@ jobs:
                   PR_NUMBER: ${{ github.event.number }}
                   REPO: ${{ github.repository }}
                   RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                  RULES_URL: ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/.github/review-routing
               run: |
                   # `--silent` keeps npm's own header out of the report.
                   # The tool runs in its workspace directory, so the path is
@@ -78,7 +79,7 @@ jobs:
 
                   # Lists the matched rules for the PR meta section. Empty when
                   # no rule matched, which removes the section.
-                  matches="$(jq -r '.[] | select( .requestReview ) | "- `\( .rule )`: \( .reviewers | map( "`\( . )`" ) | join( ", " ) )"' "$RUNNER_TEMP/decisions.json")"
+                  matches="$(jq -r --arg url "$RULES_URL" '.[] | select( .requestReview ) | "- [`\( .rule )`](\( $url )/\( .rule | @uri ).md): \( .reviewers | map( "`\( . )`" ) | join( ", " ) )"' "$RUNNER_TEMP/decisions.json")"
                   section=''
                   if [ -n "$matches" ]; then
                       section="$(printf 'These rules matched:\n\n%s\n\n[All scores](%s) are in the run summary.' "$matches" "$RUN_URL")"
