@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
-import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
@@ -20,6 +19,7 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	BlockSupportEditProps,
 	PositionAttributes,
 	PositionBlockStyle,
@@ -30,6 +30,10 @@ import type {
 	ResetPositionProps,
 	ResponsivePositionCSSOptions,
 } from './types';
+
+type PositionProps = BlockListBlockFeatureProps & {
+	style?: PositionBlockStyle;
+};
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -469,32 +473,33 @@ export default {
 		// The block support passes the style attribute among the props.
 		return <PositionPanelPure { ...( props as PositionPanelProps ) } />;
 	},
-	useBlockProps,
+	getBlockProps,
+	useStyles,
+	settings: [ 'position.fixed', 'position.sticky', 'viewport' ],
 	attributeKeys: [ 'style' ],
 	hasSupport( name: string ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},
 };
 
-// Used for generating the instance ID
-const POSITION_BLOCK_PROPS_REFERENCE = {};
-
-function useBlockProps( {
-	name,
-	style,
-}: BlockListBlockFeatureProps & { style?: PositionBlockStyle } ) {
+// The position styles and the class names that apply them.
+function getPositionStyles(
+	{ clientId, name, style }: PositionProps,
+	settings: BlockSupportContext[ 'settings' ]
+) {
 	const hasPositionBlockSupport = hasBlockSupport(
 		name,
 		POSITION_SUPPORT_KEY
 	);
-	const isPositionDisabled = useIsPositionDisabled( { name } );
+	// As `useIsPositionDisabled` does.
+	const isPositionDisabled =
+		! hasPositionSupport( name ) ||
+		( ! settings[ 'position.fixed' ] && ! settings[ 'position.sticky' ] );
 	const allowPositionStyles = hasPositionBlockSupport && ! isPositionDisabled;
-	const [ viewportSettings ] = useSettings( 'viewport' );
-
-	const id = useInstanceId( POSITION_BLOCK_PROPS_REFERENCE );
+	const viewportSettings = settings.viewport;
 
 	// Higher specificity to override defaults in editor UI.
-	const positionSelector = `.wp-container-${ id }.wp-container-${ id }`;
+	const positionSelector = `.wp-container-${ clientId }.wp-container-${ clientId }`;
 
 	// Get CSS string for the current position values, including any
 	// responsive viewport state values.
@@ -517,7 +522,9 @@ function useBlockProps( {
 	// class for each position type used across the default and viewport
 	// states, matching the frontend output.
 	const className = clsx(
-		allowPositionStyles && !! css ? `wp-container-${ id }` : undefined,
+		allowPositionStyles && !! css
+			? `wp-container-${ clientId }`
+			: undefined,
 		allowPositionStyles && !! css
 			? getPositionTypes( style, viewportSettings ).map(
 					( type ) => `is-position-${ type }`
@@ -525,8 +532,22 @@ function useBlockProps( {
 			: undefined
 	);
 
-	// An unset CSS string removes the override.
-	useStyleOverride( { css: css as string } );
+	return { css, className };
+}
 
-	return { className };
+function getBlockProps(
+	props: PositionProps,
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	return { className: getPositionStyles( props, settings ).className };
+}
+
+function useStyles(
+	props: PositionProps,
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+) {
+	// An unset CSS string removes the override.
+	useStyleOverride( {
+		css: getPositionStyles( props, settings ).css as string,
+	} );
 }

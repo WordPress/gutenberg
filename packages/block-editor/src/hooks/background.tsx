@@ -109,7 +109,7 @@ export function setBackgroundStyleDefaults(
 	return backgroundStylesWithDefaults;
 }
 
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	style,
 }: {
@@ -473,7 +473,7 @@ export function BackgroundImagePanel( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
 	attributeKeys: [ 'style' ],
 	hasSupport: hasBackgroundSupport,
 };

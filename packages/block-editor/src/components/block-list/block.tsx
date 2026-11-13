@@ -22,6 +22,13 @@ import type { DataRegistry } from '@wordpress/data';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
+import {
+	getBlockSupportData,
+	getBlockSupportProps,
+	getBlockSupportSettings,
+	mergeWrapperProps,
+	selectBlockSupports,
+} from './block-supports';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import SafeRawHTML from '../safe-raw-html';
@@ -44,41 +51,6 @@ import type {
 	BlockListWrapperProps,
 	UseBlockPropsProps,
 } from './types';
-
-/**
- * Merges wrapper props with special handling for classNames and styles.
- *
- * @param propsA
- * @param propsB
- *
- * @return Merged props.
- */
-function mergeWrapperProps(
-	propsA: BlockListWrapperProps | undefined,
-	propsB: BlockListWrapperProps | undefined
-): BlockListWrapperProps {
-	const newProps: BlockListWrapperProps = {
-		...propsA,
-		...propsB,
-	};
-
-	// May be set to undefined, so check if the property is set!
-	if (
-		propsA?.hasOwnProperty( 'className' ) &&
-		propsB?.hasOwnProperty( 'className' )
-	) {
-		newProps.className = clsx( propsA.className, propsB.className );
-	}
-
-	if (
-		propsA?.hasOwnProperty( 'style' ) &&
-		propsB?.hasOwnProperty( 'style' )
-	) {
-		newProps.style = { ...propsA.style, ...propsB.style };
-	}
-
-	return newProps;
-}
 
 function Block( {
 	children,
@@ -118,6 +90,7 @@ function BlockListBlock( {
 		mayDisplayParentControls,
 		isSelectionWithinCurrentSection,
 		themeSupportsLayout,
+		blockSupportProps,
 		...context
 	} = useContext( PrivateBlockContext );
 
@@ -154,6 +127,10 @@ function BlockListBlock( {
 	);
 
 	const blockType = getBlockType( name );
+
+	// The block supports' props apply after those of the filters, as when they
+	// were applied by the innermost filter.
+	wrapperProps = mergeWrapperProps( wrapperProps, blockSupportProps );
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType?.getEditWrapperProps ) {
@@ -719,6 +696,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				canMoveBlock,
 
 				getSettings,
+				getBlockSettings,
 				getEditedContentOnlySection,
 				getBlockEditingMode,
 				getBlockName,
@@ -800,6 +778,17 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				isMultiSelected,
 				blockEditingMode,
 				isEditingDisabled: blockEditingMode === 'disabled',
+				// Settings resolve for the parent, as `useSettings` did in the
+				// block supports, above the block's own edit context.
+				...selectBlockSupports(
+					blockName,
+					clientId,
+					attributes ?? {},
+					blockWithoutAttributes,
+					select,
+					( ...paths ) =>
+						getBlockSettings( rootClientId || null, ...paths )
+				),
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -905,6 +894,8 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 
 	const currentViewport = useContext( CurrentViewport );
 
+	const parentLayout = useLayout();
+
 	// Users of the editor.BlockListBlock filter used to be able to
 	// access the block prop.
 	// Ideally these blocks would rely on the clientId prop only.
@@ -973,7 +964,21 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		currentViewport
 	);
 
+	const { wrapperProps: blockSupportProps, effects: blockSupportEffects } =
+		getBlockSupportProps(
+			name,
+			clientId,
+			attributes ?? {},
+			{
+				settings: getBlockSupportSettings( selectedProps ),
+				parentLayout,
+			},
+			getBlockSupportData( selectedProps ),
+			selectedProps.blockWithoutAttributes
+		);
+
 	const privateContext = {
+		blockSupportProps,
 		isPreviewMode,
 		ghostBlock,
 		rootClientId,
@@ -1034,6 +1039,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 	// consumers might be memoized or "pure".
 	return (
 		<PrivateBlockContext.Provider value={ privateContext }>
+			{ blockSupportEffects }
 			<FilteredBlockListBlock
 				{ ...props }
 				// WARNING: all the following props are public API (through the

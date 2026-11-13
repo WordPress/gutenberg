@@ -74,7 +74,7 @@ function addSaveProps(
 	return props;
 }
 
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	fontFamily,
 }: {
@@ -85,7 +85,7 @@ function useBlockProps( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
 	hasSupport( name: string | BlockType ) {

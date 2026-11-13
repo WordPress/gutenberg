@@ -82,7 +82,7 @@ function addSaveProps(
 	return props;
 }
 
-function useBlockProps( {
+function getBlockProps( {
 	name,
 	textShadow,
 }: TextShadowAttributes & { name: string } ) {
@@ -90,7 +90,7 @@ function useBlockProps( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'textShadow' ],
 	hasSupport( name: string | BlockType ) {

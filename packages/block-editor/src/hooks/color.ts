@@ -3,7 +3,6 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import type { Block, BlockType } from '@wordpress/blocks';
 import type { Color } from '@wordpress/global-styles-engine';
-import { useMemo } from '@wordpress/element';
 import {
 	getColorClassName,
 	getColorObjectByAttributeValues,
@@ -14,9 +13,13 @@ import {
 	BACKGROUND_SUPPORT_KEY,
 	getBackgroundImageClasses,
 } from './background';
-import { useSettings } from '../components/use-settings';
 import type { PanelStyle } from '../components/global-styles/types';
-import type { BlockWrapperProps, ColorAttributes, ColorSupport } from './types';
+import type {
+	BlockSupportContext,
+	BlockWrapperProps,
+	ColorAttributes,
+	ColorSupport,
+} from './types';
 
 type BlockNameOrType = string | BlockType;
 
@@ -26,6 +29,13 @@ const getColorSupport = ( blockNameOrType: BlockNameOrType ) =>
 		ColorSupport | null | undefined;
 
 export const COLOR_SUPPORT_KEY = 'color';
+
+// The palettes, in the order a color's slug is looked up.
+const COLOR_PALETTE_SETTINGS = [
+	'color.palette.custom',
+	'color.palette.theme',
+	'color.palette.default',
+];
 
 const hasColorSupport = ( blockNameOrType: BlockNameOrType ) => {
 	const colorSupport = getColorSupport( blockNameOrType );
@@ -228,27 +238,16 @@ function getSerializedBackgroundClasses(
 	} );
 }
 
-function useBlockProps( {
-	name,
-	backgroundColor,
-	textColor,
-	gradient,
-	style,
-}: ColorAttributes & { name: string } ): BlockWrapperProps {
-	const [ userPalette, themePalette, defaultPalette ] = useSettings(
-		'color.palette.custom',
-		'color.palette.theme',
-		'color.palette.default'
-	) as Array< Color[] | undefined >;
-
-	const colors = useMemo(
-		() => [
-			...( userPalette || [] ),
-			...( themePalette || [] ),
-			...( defaultPalette || [] ),
-		],
-		[ userPalette, themePalette, defaultPalette ]
-	);
+function getBlockProps(
+	{
+		name,
+		backgroundColor,
+		textColor,
+		gradient,
+		style,
+	}: ColorAttributes & { name: string },
+	{ settings }: Pick< BlockSupportContext, 'settings' >
+): BlockWrapperProps {
 	if ( ! hasColorSupport( name ) ) {
 		return {};
 	}
@@ -260,6 +259,9 @@ function useBlockProps( {
 	if ( shouldSkipSerialization( name, COLOR_SUPPORT_KEY ) ) {
 		return backgroundClassName ? { className: backgroundClassName } : {};
 	}
+	const colors = COLOR_PALETTE_SETTINGS.flatMap(
+		( path ) => ( settings[ path ] as Color[] | undefined ) || []
+	);
 	const extraStyles: {
 		color?: string | null;
 		backgroundColor?: string | null;
@@ -305,7 +307,8 @@ function useBlockProps( {
 }
 
 export default {
-	useBlockProps,
+	getBlockProps,
+	settings: COLOR_PALETTE_SETTINGS,
 	addSaveProps,
 	attributeKeys: [ 'backgroundColor', 'textColor', 'gradient', 'style' ],
 	hasSupport: hasColorSupport,

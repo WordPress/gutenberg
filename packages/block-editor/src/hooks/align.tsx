@@ -8,8 +8,10 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
 import { BlockControls, BlockAlignmentControl } from '../components';
-import useAvailableAlignments, {
+import {
+	getAvailableAlignments,
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -21,8 +23,10 @@ import type {
 	AlignEditProps,
 	AlignSupport,
 	BlockListBlockFeatureProps,
+	BlockSupportContext,
 	BlockWrapperProps,
 } from './types';
+import type { Layout } from '../layouts/types';
 
 /**
  * An array which includes all possible valid alignments,
@@ -249,7 +253,16 @@ function BlockEditAlignmentToolbarControlsPure( {
 export default {
 	shareWithChildBlocks: true,
 	edit: BlockEditAlignmentToolbarControlsPure,
-	useBlockProps,
+	getBlockProps,
+	select: ( select: DataRegistry[ 'select' ] ) => {
+		const { alignWide, supportsLayout, __unstableIsBlockBasedTheme } =
+			select( blockEditorStore ).getSettings();
+		return {
+			wideControlsEnabled: !! alignWide,
+			themeSupportsLayout: !! supportsLayout,
+			isBlockBasedTheme: !! __unstableIsBlockBasedTheme,
+		};
+	},
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
 	hasSupport( name: string | BlockType ) {
@@ -257,13 +270,31 @@ export default {
 	},
 };
 
-function useBlockProps( { name, align }: BlockListBlockFeatureProps ) {
+function getBlockProps(
+	{
+		name,
+		align,
+		wideControlsEnabled,
+		themeSupportsLayout,
+		isBlockBasedTheme,
+	}: BlockListBlockFeatureProps,
+	{ parentLayout }: Pick< BlockSupportContext, 'parentLayout' >
+) {
 	const blockAllowedAlignments = getValidAlignments(
 		// The `align` support is a boolean or a list of alignments.
 		getBlockSupport( name, 'align' ) as AlignSupport,
 		hasBlockSupport( name, 'alignWide', true )
 	);
-	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
+	// As `useAvailableAlignments` does, for the parent's layout.
+	const validAlignments = getAvailableAlignments(
+		[ 'none', ...blockAllowedAlignments ],
+		( parentLayout ?? {} ) as Layout,
+		{
+			wideControlsEnabled: wideControlsEnabled as boolean,
+			themeSupportsLayout: themeSupportsLayout as boolean,
+			isBlockBasedTheme: isBlockBasedTheme as boolean,
+		}
+	);
 
 	if ( validAlignments.some( ( alignment ) => alignment.name === align ) ) {
 		return { 'data-align': align };
