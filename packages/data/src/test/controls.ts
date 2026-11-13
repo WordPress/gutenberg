@@ -1,14 +1,16 @@
+import type { AnyAction } from 'redux';
 import { describe, expect, it } from 'vitest';
 import { createRegistry, controls } from '..';
+import type { DataRegistry } from '../types';
 
 describe( 'controls', () => {
 	// Create a registry with store to test select controls.
-	function createSelectTestRegistry() {
+	function createSelectTestRegistry(): DataRegistry {
 		const registry = createRegistry();
 
 		// State is initially null and can receive data.
 		// Typical for fetching data from remote locations.
-		const reducer = ( state = null, action ) => {
+		const reducer = ( state: string | null = null, action: AnyAction ) => {
 			switch ( action.type ) {
 				case 'RECEIVE':
 					return action.data;
@@ -19,8 +21,8 @@ describe( 'controls', () => {
 
 		// Select state both without and with a resolver.
 		const selectors = {
-			selectorWithoutResolver: ( state ) => state,
-			selectorWithResolver: ( state ) => state,
+			selectorWithoutResolver: ( state: string | null ) => state,
+			selectorWithResolver: ( state: string | null ) => state,
 		};
 
 		// The resolver receives data after a little delay.
@@ -34,28 +36,28 @@ describe( 'controls', () => {
 		// actions that call the tested controls and return the selected value.
 		const actions = {
 			*resolveWithoutResolver() {
-				const value = yield controls.resolveSelect(
+				const value: string | null = yield controls.resolveSelect(
 					'test/select',
 					'selectorWithoutResolver'
 				);
 				return value;
 			},
 			*resolveWithResolver() {
-				const value = yield controls.resolveSelect(
+				const value: string | null = yield controls.resolveSelect(
 					'test/select',
 					'selectorWithResolver'
 				);
 				return value;
 			},
 			*selectWithoutResolver() {
-				const value = yield controls.select(
+				const value: string | null = yield controls.select(
 					'test/select',
 					'selectorWithoutResolver'
 				);
 				return value;
 			},
 			*selectWithResolver() {
-				const value = yield controls.select(
+				const value: string | null = yield controls.select(
 					'test/select',
 					'selectorWithResolver'
 				);
@@ -123,11 +125,11 @@ describe( 'controls', () => {
 	} );
 
 	describe( 'dispatch', () => {
-		function createDispatchTestRegistry() {
+		function createDispatchTestRegistry(): DataRegistry {
 			const registry = createRegistry();
 
 			// Store stores a counter that can be incremented.
-			const reducer = ( state = 0, action ) => {
+			const reducer = ( state = 0, action: AnyAction ) => {
 				switch ( action.type ) {
 					case 'INC':
 						return state + 1;
@@ -149,7 +151,7 @@ describe( 'controls', () => {
 			};
 
 			const selectors = {
-				get: ( state ) => state,
+				get: ( state: number ) => state,
 			};
 
 			registry.registerStore( 'test/dispatch', {

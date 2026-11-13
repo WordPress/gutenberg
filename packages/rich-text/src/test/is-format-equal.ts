@@ -1,8 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { isFormatEqual } from '../is-format-equal';
+import type { ParsedFormat } from '../types';
+
+type IsFormatEqualCase = {
+	format1?: Partial< ParsedFormat >;
+	format2?: Partial< ParsedFormat >;
+	isEqual: boolean;
+	description: string;
+};
 
 describe( 'isFormatEqual', () => {
-	const spec = [
+	const spec: IsFormatEqualCase[] = [
 		{
 			format1: undefined,
 			format2: undefined,
@@ -104,7 +112,12 @@ describe( 'isFormatEqual', () => {
 
 	spec.forEach( ( { format1, format2, isEqual, description } ) => {
 		it( description, () => {
-			expect( isFormatEqual( format1, format2 ) ).toBe( isEqual );
+			expect(
+				isFormatEqual(
+					format1 as ParsedFormat | undefined,
+					format2 as ParsedFormat | undefined
+				)
+			).toBe( isEqual );
 		} );
 	} );
 } );

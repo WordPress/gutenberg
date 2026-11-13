@@ -5,16 +5,16 @@ import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
-import { getSparseArrayLength } from './helpers';
+import { getSparseArrayLength, partialValue } from './helpers';
 
 describe( 'updateFormats', () => {
 	const em = { type: 'em' };
 
 	it( 'should update formats with empty array', () => {
-		const value = {
+		const value = partialValue( {
 			formats: [ [ em ] ],
 			text: '1',
-		};
+		} );
 		const expected = {
 			...value,
 			activeFormats: [],
@@ -33,10 +33,10 @@ describe( 'updateFormats', () => {
 	} );
 
 	it( 'should update formats and update references', () => {
-		const value = {
+		const value = partialValue( {
 			formats: [ [ em ], , ],
 			text: '123',
-		};
+		} );
 		const expected = {
 			...value,
 			activeFormats: [ em ],

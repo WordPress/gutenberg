@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { applyFormat } from '../apply-format';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'applyFormat', () => {
 	const strong = { type: 'strong' };
@@ -19,7 +18,7 @@ describe( 'applyFormat', () => {
 			activeFormats: [ em ],
 			formats: [ [ em ], [ em ], [ em ], [ em ] ],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat( freezeValue( record ), em, 0, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -41,7 +40,7 @@ describe( 'applyFormat', () => {
 				[ strong, em ],
 			],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat( freezeValue( record ), em, 0, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -63,7 +62,7 @@ describe( 'applyFormat', () => {
 				[ strong, em ],
 			],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 4 );
+		const result = applyFormat( freezeValue( record ), em, 0, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -80,7 +79,7 @@ describe( 'applyFormat', () => {
 			activeFormats: [ strong ],
 			formats: [ [ strong ], [ strong, em ], [ strong, em ], [ strong ] ],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 0, 4 );
+		const result = applyFormat( freezeValue( record ), strong, 0, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -97,7 +96,7 @@ describe( 'applyFormat', () => {
 			activeFormats: [ strong ],
 			formats: [ [ strong ], [ strong, em ], [ strong, em ], , ],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 0, 3 );
+		const result = applyFormat( freezeValue( record ), strong, 0, 3 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -114,7 +113,7 @@ describe( 'applyFormat', () => {
 			activeFormats: [ strong ],
 			formats: [ , [ strong, em ], [ strong, em ], [ strong ] ],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
+		const result = applyFormat( freezeValue( record ), strong, 1, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -131,7 +130,7 @@ describe( 'applyFormat', () => {
 			activeFormats: [ strong ],
 			formats: [ , [ strong, em ], [ strong ], [ strong, em ] ],
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 1, 4 );
+		const result = applyFormat( freezeValue( record ), strong, 1, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -162,7 +161,7 @@ describe( 'applyFormat', () => {
 			],
 			text: 'one two three',
 		};
-		const result = applyFormat( deepFreeze( record ), strong, 3, 6 );
+		const result = applyFormat( freezeValue( record ), strong, 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -197,7 +196,7 @@ describe( 'applyFormat', () => {
 			start: 3,
 			end: 6,
 		};
-		const result = applyFormat( deepFreeze( record ), strong );
+		const result = applyFormat( freezeValue( record ), strong );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -215,7 +214,7 @@ describe( 'applyFormat', () => {
 			...record,
 			activeFormats: [ a2 ],
 		};
-		const result = applyFormat( deepFreeze( record ), a2 );
+		const result = applyFormat( freezeValue( record ), a2 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -237,7 +236,7 @@ describe( 'applyFormat', () => {
 			start: 4,
 			end: 4,
 		};
-		const result = applyFormat( deepFreeze( record ), a2 );
+		const result = applyFormat( freezeValue( record ), a2 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -256,7 +255,7 @@ describe( 'applyFormat', () => {
 			// All references should be the same.
 			formats: [ [ em ], [ em ], [ em ], [ em ] ],
 		};
-		const result = applyFormat( deepFreeze( record ), em, 0, 2 );
+		const result = applyFormat( freezeValue( record ), em, 0, 2 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -272,7 +271,7 @@ describe( 'applyFormat', () => {
 			...record,
 			activeFormats: [ em ],
 		};
-		const result = applyFormat( deepFreeze( record ), em );
+		const result = applyFormat( freezeValue( record ), em );
 
 		expect( result ).toEqual( expected );
 	} );

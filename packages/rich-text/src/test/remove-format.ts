@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { removeFormat } from '../remove-format';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'removeFormat', () => {
 	const strong = { type: 'strong' };
@@ -31,7 +30,7 @@ describe( 'removeFormat', () => {
 			activeFormats: [],
 			text: 'one two three',
 		};
-		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
+		const result = removeFormat( freezeValue( record ), 'strong', 3, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -62,7 +61,7 @@ describe( 'removeFormat', () => {
 			activeFormats: [],
 			text: 'one two three',
 		};
-		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );
+		const result = removeFormat( freezeValue( record ), 'strong', 4, 4 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

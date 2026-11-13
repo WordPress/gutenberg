@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { concat } from '../concat';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'concat', () => {
 	const em = { type: 'em' };
@@ -23,7 +22,7 @@ describe( 'concat', () => {
 			text: 'onetwo',
 		};
 
-		const merged = concat( deepFreeze( one ), deepFreeze( two ) );
+		const merged = concat( freezeValue( one ), freezeValue( two ) );
 
 		expect( merged ).not.toBe( one );
 		expect( merged ).toEqual( three );
