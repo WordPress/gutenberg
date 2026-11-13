@@ -21,7 +21,7 @@
 -   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
--   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds.
+-   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds ([#86744](https://github.com/WordPress/gutenberg/pull/86744)).
 -   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 -   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
