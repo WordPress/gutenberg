@@ -56,6 +56,7 @@ describe( 'getPostBlocksByName', () => {
 			getBlockName: ( clientId ) =>
 				state.blocks.byClientId.get( clientId ).name,
 			getBlocks: () => [],
+			areInnerBlocksControlled: ( clientId ) => clientId === 'block3',
 		} ),
 	};
 
@@ -81,12 +82,19 @@ describe( 'getPostBlocksByName', () => {
 		] );
 		expect( result ).toEqual( [ 'block1', 'block2', 'block3' ] );
 	} );
+
+	it( 'should leave out the blocks whose inner blocks are not controlled when asked to', () => {
+		const result = getPostBlocksByName( state, 'core/paragraph', true );
+		expect( result ).toEqual( [ 'block3' ] );
+	} );
 } );
 
 describe( 'getTemplatePartsOutsidePostBlocks', () => {
 	// A template around a slot: a header part, the slot holding the blocks of
-	// the template being edited with a part of its own, and a query loop with
-	// a post content block that is not the slot.
+	// the template being edited with a part of its own, a query loop with
+	// a post content block that is not the slot, and a second block of the
+	// slot's type that holds blocks of the template around it, a part among
+	// them, rather than what is being edited.
 	const blocks = {
 		header: { name: 'core/template-part', parent: '' },
 		slot: { name: 'core/post-content', parent: '' },
@@ -95,6 +103,8 @@ describe( 'getTemplatePartsOutsidePostBlocks', () => {
 		query: { name: 'core/query', parent: '' },
 		loopContent: { name: 'core/post-content', parent: 'query' },
 		footer: { name: 'core/template-part', parent: '' },
+		otherSlot: { name: 'core/post-content', parent: '' },
+		banner: { name: 'core/template-part', parent: 'otherSlot' },
 	};
 	const state = {};
 
@@ -117,6 +127,8 @@ describe( 'getTemplatePartsOutsidePostBlocks', () => {
 			return parents;
 		},
 		getBlockName: ( clientId ) => blocks[ clientId ].name,
+		// What is being edited is the controlled inner blocks of its slot.
+		areInnerBlocksControlled: ( clientId ) => clientId === 'slot',
 	};
 
 	// `getPostBlocksByName()` is shared with the tests above, which set a
@@ -146,7 +158,17 @@ describe( 'getTemplatePartsOutsidePostBlocks', () => {
 	it( 'returns every template part when there are no such post blocks', () => {
 		expect(
 			getTemplatePartsOutsidePostBlocks( state, [ 'core/post-title' ] )
-		).toEqual( [ 'header', 'sidebar', 'footer' ] );
+		).toEqual( [ 'header', 'sidebar', 'footer', 'banner' ] );
+	} );
+
+	it( 'keeps the template parts inside a post block that is not controlled when only the controlled ones are asked for', () => {
+		expect(
+			getTemplatePartsOutsidePostBlocks(
+				state,
+				[ 'core/post-content' ],
+				true
+			)
+		).toEqual( [ 'header', 'footer', 'banner' ] );
 	} );
 } );
 
