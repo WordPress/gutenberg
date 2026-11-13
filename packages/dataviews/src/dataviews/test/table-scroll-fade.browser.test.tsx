@@ -50,10 +50,12 @@ function PostsTable( {
 	withActions = false,
 	width = 400,
 	dir = 'ltr',
+	density,
 }: {
 	withActions?: boolean;
 	width?: number;
 	dir?: 'ltr' | 'rtl';
+	density?: 'compact' | 'comfortable';
 } ) {
 	const view: View = {
 		type: 'table',
@@ -61,6 +63,7 @@ function PostsTable( {
 		fields: [ 'author', 'status', 'categories', 'tags' ],
 		page: 1,
 		perPage: 10,
+		layout: { density },
 	};
 	return (
 		<div dir={ dir } style={ { width, height: 400 } }>
@@ -79,6 +82,9 @@ function PostsTable( {
 
 // `--wpds-dimension-size-lg`.
 const FADE_SIZE = 40;
+// `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
+const CELL_PADDING = 12;
+const COMPACT_CELL_PADDING = 8;
 
 const getScrollContainer = () =>
 	document.querySelector< HTMLElement >( '.dataviews-layout__container' )!;
@@ -113,7 +119,17 @@ describe( 'DataViews table scroll fade', () => {
 			expect( style.maskImage ).toBe(
 				`linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
 			);
-			expect( style.paddingInlineStart ).toBe( `${ FADE_SIZE }px` );
+			expect( style.paddingInlineStart ).toBe(
+				`${ FADE_SIZE + CELL_PADDING }px`
+			);
+		} );
+
+		it( 'keeps the start padding of the actions after the fade', async () => {
+			await render( <PostsTable withActions density="compact" /> );
+
+			expect(
+				getComputedStyle( getActionsHeader() ).paddingInlineStart
+			).toBe( `${ FADE_SIZE + COMPACT_CELL_PADDING }px` );
 		} );
 
 		it( 'flips the fade in RTL', async () => {
