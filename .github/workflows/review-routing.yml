@@ -25,13 +25,15 @@ jobs:
         if: ${{ ! github.event.pull_request.draft && github.event.pull_request.base.ref == github.event.repository.default_branch }}
         runs-on: 'ubuntu-slim'
         # This job has the API key, so its token can only read. The report goes
-        # to the run summary, so the job writes nothing to the pull request.
+        # to the run summary, and the PR meta section to a job output, so the
+        # job writes nothing to the pull request.
         permissions:
             contents: read
             pull-requests: read
         timeout-minutes: 5
         outputs:
             reviewers: ${{ steps.score.outputs.reviewers }}
+            section: ${{ steps.score.outputs.section }}
         steps:
             # On `pull_request_target`, this checks out the base branch. The
             # tool has no runtime dependencies, so `npm run` needs no install.
@@ -61,6 +63,8 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   PR_NUMBER: ${{ github.event.number }}
                   REPO: ${{ github.repository }}
+                  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                  RULES_URL: ${{ github.server_url }}/${{ github.repository }}/blob/${{ github.sha }}/.github/review-routing
               run: |
                   # `--silent` keeps npm's own header out of the report.
                   # The tool runs in its workspace directory, so the path is
@@ -72,6 +76,16 @@ jobs:
                   # Several rules can name the same reviewer, who gets one request.
                   reviewers="$(jq -c '[ .[] | select( .requestReview ) | .reviewers[] ] | unique' "$RUNNER_TEMP/decisions.json")"
                   printf 'reviewers=%s\n' "$reviewers" >> "$GITHUB_OUTPUT"
+
+                  # Lists the matched rules for the PR meta section. Empty when
+                  # no rule matched, which removes the section.
+                  matches="$(jq -r --arg url "$RULES_URL" '.[] | select( .requestReview ) | "- [`\( .rule )`](\( $url )/\( .rule | @uri ).md): \( .reviewers | map( "`\( . )`" ) | join( ", " ) )"' "$RUNNER_TEMP/decisions.json")"
+                  section=''
+                  if [ -n "$matches" ]; then
+                      section="$(printf 'These rules matched:\n\n%s\n\n[All scores](%s) are in the run summary.' "$matches" "$RUN_URL")"
+                  fi
+                  # As a JSON string, so the output is one line.
+                  printf 'section=%s\n' "$(jq -n --arg section "$section" '$section')" >> "$GITHUB_OUTPUT"
 
     request:
         name: Request reviews
@@ -137,3 +151,36 @@ jobs:
                               `Requested review: ${ names( requested ) }. Skipped, requested before or the author: ${ names( skipped ) }.`
                           )
                           .write();
+
+    pr-meta:
+        name: Update PR meta comment
+        needs: route
+        # Only when the rules were scored: an empty body from a failed run would
+        # clear a section nothing had disproved.
+        if: ${{ needs.route.result == 'success' }}
+        runs-on: 'ubuntu-slim'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.number }}
+            cancel-in-progress: false
+            queue: max
+        steps:
+            # On `pull_request_target`, this checks out the base branch, so the
+            # pull request cannot supply the code that runs with this token.
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: review-routing
+                  body: ${{ fromJSON( needs.route.outputs.section ) }}
+                  commit-sha: ${{ github.event.pull_request.head.sha }}
+                  run-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

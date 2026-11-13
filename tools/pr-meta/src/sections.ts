@@ -80,6 +80,12 @@ export const SECTIONS: SectionDefinition[] = [
 		scope: 'commit',
 		budget: 14000,
 	},
+	{
+		id: 'review-routing',
+		heading: '🧭 Review routing',
+		scope: 'commit',
+		budget: 2000,
+	},
 ];
 
 /**
