@@ -34,7 +34,7 @@
 -   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).
 -   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
 -   `Button`, `Toolbar`: Show the pressed state in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
--   `Toolbar`: Use semantic colors for the border and focus ring ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+-   `Toolbar`: Use semantic border colors and the standard outline focus ring ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 -   `TimePicker`: Keep the hours field focus ring visible above the minutes field ([#86442](https://github.com/WordPress/gutenberg/pull/86442)).
 -   `InputControl`: Remove the leftover maximum width on the label wrapper so labels no longer wrap before reaching the input's width ([#86363](https://github.com/WordPress/gutenberg/pull/86363)).
 -   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).

@@ -110,10 +110,7 @@
 
 		// Focus style.
 		&:focus::before {
-			box-shadow: inset 0 0 0 $border-width var(--wpds-color-background-surface-neutral-strong), 0 0 0 var(--wp-admin-border-width-focus) var(--wpds-color-stroke-focus);
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
+			@include outset-ring__focus();
 		}
 
 		// Ensure the icon buttons remain square.
