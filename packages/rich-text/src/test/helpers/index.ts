@@ -50,7 +50,7 @@ type SpecRangeInput = {
 type RawSpecItem = {
 	description: string;
 	html?: string;
-	createRange?: ( element: HTMLElement ) => SpecRangeInput;
+	createRange: ( element: HTMLElement ) => SpecRangeInput;
 	startPath: number[];
 	endPath: number[];
 	record: {
@@ -65,7 +65,7 @@ type RawSpecItem = {
 export type SpecItem = {
 	description: string;
 	html?: string;
-	createRange?: ( element: HTMLElement ) => Range;
+	createRange: ( element: HTMLElement ) => Range;
 	startPath: number[];
 	endPath: number[];
 	record: RichTextValue;
@@ -919,9 +919,9 @@ const rawSpecWithRegistration: RawSpecRegistrationItem[] = [
 		html: '<math><mi>x</mi></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'mi' )?.firstChild,
+			startContainer: element.querySelector( 'mi' )!.firstChild,
 			endOffset: 1,
-			endContainer: element.querySelector( 'mi' )?.firstChild,
+			endContainer: element.querySelector( 'mi' )!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0 ],
 		endPath: [ 0, 0, 1 ],
@@ -936,9 +936,9 @@ const rawSpecWithRegistration: RawSpecRegistrationItem[] = [
 		html: '<math><mi>x</mi><mo>+</mo><mi>y</mi></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'mi' )?.firstChild,
+			startContainer: element.querySelector( 'mi' )!.firstChild,
 			endOffset: 1,
-			endContainer: element.querySelectorAll( 'mi' )[ 1 ]?.firstChild,
+			endContainer: element.querySelectorAll( 'mi' )[ 1 ]!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0 ],
 		endPath: [ 0, 2, 1 ],
@@ -957,9 +957,9 @@ const rawSpecWithRegistration: RawSpecRegistrationItem[] = [
 		html: '<math><mtext><strong>bold text</strong></mtext></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'strong' )?.firstChild,
+			startContainer: element.querySelector( 'strong' )!.firstChild,
 			endOffset: 9,
-			endContainer: element.querySelector( 'strong' )?.firstChild,
+			endContainer: element.querySelector( 'strong' )!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0, 0 ],
 		endPath: [ 0, 0, 0, 9 ],

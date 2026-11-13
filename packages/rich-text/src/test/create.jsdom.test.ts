@@ -19,7 +19,7 @@ describe( 'create', () => {
 
 		it( description, () => {
 			const element = createElement( document, html );
-			const range = createRange?.( element );
+			const range = createRange( element );
 			const createdRecord = create( {
 				element,
 				range,
