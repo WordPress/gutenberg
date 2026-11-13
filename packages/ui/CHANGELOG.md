@@ -9,6 +9,7 @@
 
 ### New Features
 
+-   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
@@ -18,6 +19,7 @@
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
+-   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
 
 ### Bug Fixes
 

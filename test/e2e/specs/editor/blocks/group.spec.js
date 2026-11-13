@@ -200,5 +200,42 @@ test.describe( 'Group', () => {
 				} );
 			}
 		} );
+
+		test( 'keeps the block expanded in List View when switching between Grid and Canvas', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { layout: { type: 'grid' } },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Paragraph' },
+					},
+				],
+			} );
+			await editor.openDocumentSettingsSidebar();
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await listView.getByRole( 'link', { name: 'Grid' } ).click();
+			await page.keyboard.press( 'ArrowRight' );
+			const paragraphRow = listView.getByRole( 'link', {
+				name: 'Paragraph',
+			} );
+			await expect( paragraphRow ).toBeVisible();
+
+			await page
+				.getByRole( 'radio', { name: 'Transform to Canvas' } )
+				.click();
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Canvas' } )
+			).toBeVisible();
+			await expect( paragraphRow ).toBeVisible();
+		} );
 	} );
 } );
