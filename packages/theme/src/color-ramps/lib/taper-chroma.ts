@@ -16,15 +16,15 @@ export interface TaperChromaOptions {
 	radiusDark?: number; // distance in L where kDark is reached (default 0.20)
 	kLight?: number; // floor multiplier near lighter side (default 0.85)
 	kDark?: number; // floor multiplier near darker side (default 0.85)
-	// Achromatic handling
-	hueFallback?: number; // degrees: if seed is achromatic and you still want color
-	achromaEpsilon?: number; // ≤ this chroma → treat as achromatic (default 0.005)
+	preserveNearGrayTint?: boolean; // keep faint background tints close to the seed chroma
 }
 
 /**
  * Given the seed and the target lightness, tapers the chroma smoothly.
  * - C_intended = Cmax(Lt,H0) * alpha * (seedRelative^carry)
  * - Continuous taper vs |Lt - Ls| to softly reduce chroma for neighbors
+ * - Background chroma capped relative to C_seed, so a near-gray seed stays near-gray
+ * - Seeds without a hue produce grayscale
  * - Downward-only clamp on C (preserve L & H)
  * @param seed
  * @param lTarget
@@ -55,25 +55,20 @@ export function createChromaTaper(
 	const radiusDark = options.radiusDark ?? 0.2;
 	const kLight = options.kLight ?? 0.85;
 	const kDark = options.kDark ?? 0.85;
-	const achromaEpsilon = options.achromaEpsilon ?? 0.005;
-
 	const cSeed = Math.max( 0, get( seed, [ OKLCH, 'c' ] ) );
-	let hSeed = get( seed, [ OKLCH, 'h' ] );
+	const hSeed = get( seed, [ OKLCH, 'h' ] );
 
-	const chromaIsTiny = cSeed < achromaEpsilon;
-	const hueIsInvalid = hSeed === null || ! Number.isFinite( hSeed );
-
-	if ( chromaIsTiny || hueIsInvalid ) {
-		if ( typeof options.hueFallback === 'number' ) {
-			hSeed = normalizeHue( options.hueFallback );
-		} else {
-			// Respect achromatic intent: grayscale at target L
-			return ( lTarget ) => ( {
-				space: OKLCH,
-				coords: [ clamp01( lTarget ), 0, 0 ],
-				alpha: 1,
-			} );
-		}
+	if (
+		hSeed === null ||
+		! Number.isFinite( hSeed ) ||
+		( ! options.preserveNearGrayTint && cSeed < 0.005 )
+	) {
+		// Respect achromatic intent: grayscale at target L
+		return ( lTarget ) => ( {
+			space: OKLCH,
+			coords: [ clamp01( lTarget ), 0, 0 ],
+			alpha: 1,
+		} );
 	}
 
 	// Capacity at seed
@@ -84,6 +79,14 @@ export function createChromaTaper(
 	const denom = cmaxSeed > 0 ? cmaxSeed : 1e-6;
 	const seedRelative = clamp01( cSeed / denom );
 	const seedCarry = Math.pow( seedRelative, clamp01( carry ) );
+
+	// Near the lightness extremes the seed's capacity approaches zero, so even
+	// an imperceptible tint reads as vivid. Bound the carried chroma by the
+	// seed's own chroma, which also fades near-gray seeds smoothly to gray.
+	// The allowance grows quadratically, so it stops binding for tinted seeds.
+	const cCap = options.preserveNearGrayTint
+		? cSeed * ( 1 + ( cSeed / 0.02 ) ** 2 )
+		: Infinity;
 
 	return ( lTarget ) => {
 		const cmaxTarget = getMaxChromaAtLH( clamp01( lTarget ), hSeed, gamut );
@@ -99,7 +102,7 @@ export function createChromaTaper(
 			kLight,
 			kDark,
 		} );
-		const cPlanned = cWithCarry * t;
+		const cPlanned = Math.min( cWithCarry * t, cCap );
 
 		// Downward-only clamp (preserve L & H)
 		const lOut = clamp01( lTarget );
