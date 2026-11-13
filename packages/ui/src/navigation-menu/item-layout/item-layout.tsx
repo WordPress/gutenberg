@@ -16,6 +16,15 @@ export function ItemLayout( {
 	suffix,
 	trailing,
 }: InternalItemLayoutProps ) {
+	const hasPrefix = Children.toArray( prefix ).some(
+		( child ) => child !== ''
+	);
+	const hasSuffix = Children.toArray( suffix ).some(
+		( child ) => child !== ''
+	);
+	const hasTrailing = Children.toArray( trailing ).some(
+		( child ) => child !== ''
+	);
 	const itemChildren = Children.map( children, ( child ) => {
 		if (
 			isValidElement< {
@@ -38,7 +47,7 @@ export function ItemLayout( {
 
 	return (
 		<>
-			{ prefix && (
+			{ hasPrefix && (
 				<span
 					className={ styles[ 'item-prefix' ] }
 					data-wp-ui-item-layout-prefix=""
@@ -51,7 +60,7 @@ export function ItemLayout( {
 				<span className={ styles[ 'item-children' ] }>
 					{ itemChildren }
 				</span>
-				{ suffix && (
+				{ hasSuffix && (
 					<span
 						className={ styles[ 'item-suffix' ] }
 						data-wp-ui-item-layout-muted=""
@@ -68,7 +77,7 @@ export function ItemLayout( {
 						<KeyboardShortcutDisplay shortcut={ shortcut } />
 					</span>
 				) }
-				{ trailing && (
+				{ hasTrailing && (
 					<span
 						className={ styles[ 'item-trailing' ] }
 						data-wp-ui-item-layout-muted=""
