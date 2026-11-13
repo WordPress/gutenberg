@@ -18,13 +18,13 @@ async function renderWithNotice(
 	registry.register( noticesStore );
 	registry.dispatch( noticesStore ).createNotice( status, MESSAGE, options );
 
-	await render(
+	const { rerender } = await render(
 		<RegistryProvider value={ registry }>
 			<InlineNotices />
 		</RegistryProvider>
 	);
 
-	return registry;
+	return { registry, rerender };
 }
 
 describe( 'InlineNotices', () => {
@@ -46,46 +46,48 @@ describe( 'InlineNotices', () => {
 		).toBe( 20 );
 	} );
 
-	it( 'announces repeated notifications with the same ID', async () => {
-		const registry = await renderWithNotice( 'error', {
-			id: 'editor-save',
-			details: DETAILS,
-		} );
+	it( 'announces repeated save errors while preserving focus and open details', async () => {
+		const options = { id: 'editor-save', details: DETAILS };
+		const message = 'The <title> tag is required.';
+		const { registry, rerender } = await renderWithNotice(
+			'error',
+			options
+		);
+		const retry = () =>
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( message, options );
+		const alert = screen.getByRole( 'alert' );
 		const user = userEvent.setup();
 		const trigger = screen.getByRole( 'button', { name: 'Show details' } );
 		await user.click( trigger );
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		expect( alert ).toBeEmptyDOMElement();
 
-		registry
-			.dispatch( noticesStore )
-			.createNotice( 'error', 'Publishing failed.', {
-				id: 'editor-save',
-				details: DETAILS,
-			} );
+		retry();
 		await waitFor( () =>
-			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
-				'Publishing failed.'
-			)
+			expect( alert ).toHaveProperty( 'textContent', message )
 		);
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
 
-		registry
-			.dispatch( noticesStore )
-			.createNotice( 'error', 'Publishing failed.', {
-				id: 'editor-save',
-				details: DETAILS,
-			} );
+		retry();
 		await waitFor( () =>
-			expect( screen.getByRole( 'alert' ) ).toHaveProperty(
-				'textContent',
-				'Publishing failed.\u00a0'
-			)
+			expect( alert ).toHaveProperty( 'textContent', message + '\u00a0' )
 		);
 		expect( trigger ).toHaveFocus();
 		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		await rerender(
+			<RegistryProvider value={ registry }>
+				<InlineNotices className="updated" />
+			</RegistryProvider>
+		);
+		expect( screen.getByRole( 'alert' ) ).toHaveProperty(
+			'textContent',
+			message + '\u00a0'
+		);
 	} );
 
 	describe( 'details', () => {
@@ -231,7 +233,7 @@ describe( 'InlineNotices', () => {
 		} );
 
 		it( 'shows details but no copy button for an HTML message', async () => {
-			const registry = await renderWithNotice( 'error', {
+			const { registry } = await renderWithNotice( 'error', {
 				details: DETAILS,
 				__unstableHTML: true,
 			} );
@@ -261,7 +263,7 @@ describe( 'InlineNotices', () => {
 		} );
 
 		it( 'preserves line breaks and omits hidden text in HTML announcements', async () => {
-			const registry = await renderWithNotice( 'error' );
+			const { registry } = await renderWithNotice( 'error' );
 			registry
 				.dispatch( noticesStore )
 				.createNotice(

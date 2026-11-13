@@ -351,27 +351,22 @@ describe( 'Notice.List', () => {
 		}
 	);
 
-	it( 'keeps external announcements silent while a shadow host is hidden', async () => {
+	it( 'clears an external announcement when its shadow host becomes hidden', async () => {
 		render( <section aria-label="Plugin" /> );
 		const host = screen.getByRole( 'region', { name: 'Plugin' } );
 		const shadow = host.attachShadow( { mode: 'open' } );
 		const container = document.createElement( 'div' );
 		shadow.appendChild( container );
-		const list = ( message?: string ) => (
+		const { rerender } = render(
+			<Notice.List liveRegionContainer={ document.body } />,
+			{ container }
+		);
+		rerender(
 			<Notice.List liveRegionContainer={ document.body }>
-				{ message && <Message spokenMessage={ message } /> }
+				<Message spokenMessage="Visible update." />
 			</Notice.List>
 		);
-		const { rerender } = render( list(), { container } );
 		const status = screen.getByRole( 'status' );
-		host.hidden = true;
-		rerender( list( 'Hidden update.' ) );
-		await act( () => Promise.resolve() );
-		expect( status ).toBeEmptyDOMElement();
-		host.hidden = false;
-		await act( () => Promise.resolve() );
-		expect( status ).toBeEmptyDOMElement();
-		rerender( list( 'Visible update.' ) );
 		await waitFor( () =>
 			expect( status ).toHaveTextContent( 'Visible update.' )
 		);

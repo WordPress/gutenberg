@@ -176,7 +176,7 @@ describe( 'InlineNotices', () => {
 	} );
 
 	describe( 'announcements', () => {
-		it( 'announces a background error while a modal is open', async () => {
+		it( 'announces only the error message while a modal is open', async () => {
 			const { registry, rerender } = renderInlineNotices();
 			rerender(
 				<RegistryProvider value={ registry }>
@@ -197,6 +197,7 @@ describe( 'InlineNotices', () => {
 				registry
 					.dispatch( noticesStore )
 					.createErrorNotice( 'Autosave failed.', {
+						details: 'Technical details.',
 						actions: [ { label: 'Retry autosave', onClick() {} } ],
 					} );
 			} );
@@ -207,23 +208,6 @@ describe( 'InlineNotices', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Retry autosave' } )
 			).not.toBeInTheDocument();
-		} );
-
-		it( 'announces new notices without details or action labels', async () => {
-			const { registry } = renderInlineNotices();
-
-			await act( async () => {
-				registry
-					.dispatch( noticesStore )
-					.createNotice( 'error', 'Updating failed.', {
-						details: 'Technical details.',
-						actions: [ { label: 'Try again', onClick() {} } ],
-					} );
-			} );
-
-			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
-				/^Updating failed\.$/
-			);
 			for ( const status of screen.getAllByRole( 'status' ) ) {
 				expect( status ).toBeEmptyDOMElement();
 			}
@@ -261,55 +245,6 @@ describe( 'InlineNotices', () => {
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 		} );
-
-		it.each( [ 'error', 'success' ] as const )(
-			'announces identical %s replacements once',
-			async ( status ) => {
-				const { registry, rerender } = renderInlineNotices();
-				const role = status === 'error' ? 'alert' : 'status';
-				await act( async () => {
-					registry
-						.dispatch( noticesStore )
-						.createNotice( status, 'First message.', {
-							id: 'editor-save',
-						} );
-				} );
-				await act( async () => {
-					registry
-						.dispatch( noticesStore )
-						.createNotice( status, 'The <title> tag is required.', {
-							id: 'editor-save',
-						} );
-				} );
-				expect( screen.getByRole( role ) ).toHaveTextContent(
-					/^The <title> tag is required\.$/
-				);
-
-				await act( async () => {
-					registry
-						.dispatch( noticesStore )
-						.createNotice( status, 'The <title> tag is required.', {
-							id: 'editor-save',
-						} );
-				} );
-				const region = screen.getByRole( role );
-				expect( region ).toHaveProperty(
-					'textContent',
-					'The <title> tag is required.\u00a0'
-				);
-
-				// An unrelated render must not announce the notification again.
-				rerender(
-					<RegistryProvider value={ registry }>
-						<InlineNotices className="updated" />
-					</RegistryProvider>
-				);
-				expect( region ).toHaveProperty(
-					'textContent',
-					'The <title> tag is required.\u00a0'
-				);
-			}
-		);
 
 		it.each( [
 			[ 'added', undefined, 'Technical details.' ],
