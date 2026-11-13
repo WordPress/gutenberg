@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Widget header: reserve the full title width when fitting inline controls and add a buffer before expanding them to prevent flicker while resizing.
 -   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).
 
 ### Internal

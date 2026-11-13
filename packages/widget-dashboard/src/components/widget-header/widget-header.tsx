@@ -1,12 +1,20 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { useResizeObserver } from '@wordpress/compose';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useMergeRefs, useResizeObserver } from '@wordpress/compose';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { inertValue } from '@wordpress/react-inert-value';
 import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
+import { measureTextOverflow } from './measure-text-overflow';
 import {
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -68,21 +76,51 @@ export function WidgetHeader( {
 		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
 	);
 
-	// Actual footprint of the identity cluster plus the gap before the toolbar.
-	// Measured, so whatever identity holds (a help tip, a future badge) is
-	// reserved without a per-element constant.
+	// Reserve the full title even when flex layout clips the identity.
 	const [ identityReserve, setIdentityReserve ] = useState( 0 );
-	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
-		( [ entry ] ) => {
-			const { columnGap } = getComputedStyle(
-				entry.target.parentElement as HTMLElement
-			);
-
-			setIdentityReserve(
-				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
-			);
+	const identityRef = useRef< HTMLDivElement >( null );
+	const titleRef = useRef< HTMLHeadingElement >( null );
+	const measureIdentity = useCallback( () => {
+		const identity = identityRef.current;
+		const title = titleRef.current;
+		if ( ! identity || ! title ) {
+			return;
 		}
-	);
+		const { columnGap } = getComputedStyle(
+			identity.parentElement as HTMLElement
+		);
+
+		setIdentityReserve(
+			identity.getBoundingClientRect().width +
+				Math.max( 0, measureTextOverflow( title ) ) +
+				( parseFloat( columnGap ) || 0 )
+		);
+	}, [] );
+	const identityMeasureRef = useMergeRefs( [
+		identityRef,
+		useResizeObserver< HTMLDivElement >( measureIdentity ),
+	] );
+
+	// A title change can alter scrollWidth without resizing either box.
+	// Header resizes and toolbar transitions also remeasure after layout.
+	useLayoutEffect( measureIdentity );
+	useEffect( () => {
+		const fonts = identityRef.current?.ownerDocument.fonts;
+		if ( ! fonts ) {
+			return;
+		}
+		let isActive = true;
+		fonts.ready.then( () => {
+			if ( isActive ) {
+				measureIdentity();
+			}
+		} );
+		fonts.addEventListener( 'loadingdone', measureIdentity );
+		return () => {
+			isActive = false;
+			fonts.removeEventListener( 'loadingdone', measureIdentity );
+		};
+	}, [ measureIdentity ] );
 
 	// Everything in the toolbar the collapsible controls cannot use: the chip's
 	// own padding, and each section beside them (the actions menu, and whatever
@@ -130,6 +168,7 @@ export function WidgetHeader( {
 		useIsTruncated< HTMLHeadingElement >(
 			widgetType?.help ? 0 : infotipReserve
 		);
+	const mergedTitleRef = useMergeRefs( [ titleRef, titleMeasureRef ] );
 
 	const hasIdentity = showIdentity && !! widgetType?.title;
 	const totalReserved = Object.values( reserved ).reduce(
@@ -168,7 +207,7 @@ export function WidgetHeader( {
 					) }
 
 					<Card.Title
-						ref={ titleMeasureRef }
+						ref={ mergedTitleRef }
 						id={ titleId }
 						render={ <h2 /> }
 						className={ styles.title }

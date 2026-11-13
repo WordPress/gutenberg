@@ -633,6 +633,66 @@ function DefaultStory() {
 	);
 }
 
+const inlineFitWidgetType: WidgetType = {
+	...trafficSnapshotWidgetType,
+	name: 'demo/inline-fit',
+	title: 'Top locations',
+	help: { content: 'Switch between views, visitors, and orders.' },
+	attributes: [
+		{
+			id: 'metric',
+			label: 'Metric',
+			type: 'text',
+			elements: METRICS,
+			relevance: 'high',
+			Edit: 'toggleGroup',
+		},
+	],
+};
+
+function InlineControlsFitStory() {
+	const [ layout, setLayout ] = useState< DashboardWidget[] >( [
+		{
+			...INITIAL_LAYOUT[ 0 ],
+			type: inlineFitWidgetType.name,
+			placement: { width: 1, height: 1 },
+		},
+	] );
+
+	return (
+		<div
+			style={ {
+				width: 480,
+				minWidth: 200,
+				maxWidth: '100%',
+				resize: 'horizontal',
+				overflow: 'auto',
+			} }
+		>
+			<WidgetDashboard
+				widgetTypes={ [ inlineFitWidgetType ] }
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ { model: 'grid', columns: 1, rowHeight: 200 } }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</div>
+	);
+}
+
+export const InlineControlsFit: StoryObj = {
+	render: () => <InlineControlsFitStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: 'Drag the bottom-right corner to resize the tile in both directions. The three-option toggle collapses before the title clips and returns with spare room. At narrow widths, the collapsed header still truncates the title.',
+			},
+		},
+	},
+};
+
 // The snapshot type under a title no tile fits comfortably, so the identity's
 // truncation shows at the widths the grid offers.
 const longTitleWidgetType: WidgetType = {

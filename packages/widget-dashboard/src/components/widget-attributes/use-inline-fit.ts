@@ -3,6 +3,8 @@ import { useResizeObserver } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-fit';
 
+const EXPAND_BUFFER = 16;
+
 interface InlineFitOptions {
 	/**
 	 * Holds the current presentation while the user interacts with it (an
@@ -39,22 +41,25 @@ export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
 
 	const availableSize = useWidgetHeaderAvailableSize();
 	const [ naturalSize, setNaturalSize ] = useState( 0 );
+	const [ held, setHeld ] = useState( false );
 
 	const measureRef = useResizeObserver< HTMLDivElement >( ( [ entry ] ) =>
 		setNaturalSize( entry.contentRect.width )
 	);
 
 	// The zero guards keep environments without layout (JSDOM) on the
-	// inline presentation.
+	// inline presentation. Once collapsed, require spare room to expand so
+	// small measurement changes cannot keep switching the controls.
 	const computed =
 		availableSize !== null &&
 		naturalSize > 0 &&
-		naturalSize > availableSize;
+		( held
+			? naturalSize + EXPAND_BUFFER > availableSize
+			: naturalSize > availableSize );
 
 	// The latch: while locked, the surface the user is interacting with
 	// must not be replaced under them, so the last unlocked decision holds.
 	// Releasing the lock lets the pending transition apply.
-	const [ held, setHeld ] = useState( computed );
 	if ( ! locked && held !== computed ) {
 		setHeld( computed );
 	}
