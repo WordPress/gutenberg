@@ -4,6 +4,7 @@ import {
 	createTable,
 	getFirstRow,
 	getCellAttribute,
+	getCellColumnRange,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -129,6 +130,54 @@ const tableWithAttribute = deepFreeze( {
 	],
 } );
 
+const tableWithRowspanHead = deepFreeze( {
+	head: [
+		{
+			cells: [
+				{ content: 'A', tag: 'th', rowspan: '2' },
+				{ content: 'B', tag: 'th', rowspan: '2' },
+				{
+					content: 'Grouped',
+					tag: 'th',
+					align: 'center',
+					colspan: '2',
+				},
+				{ content: 'E', tag: 'th', rowspan: '2' },
+			],
+		},
+		{
+			cells: [
+				{ content: 'Sub C', tag: 'th' },
+				{ content: 'Sub D', tag: 'th' },
+			],
+		},
+	],
+	body: [
+		{
+			cells: [
+				{ content: 'A1', tag: 'td' },
+				{ content: 'B1', tag: 'td' },
+				{ content: 'C1', tag: 'td' },
+				{ content: 'D1', tag: 'td' },
+				{ content: 'E1', tag: 'td' },
+			],
+		},
+	],
+} );
+
+const tableWithTallRowspan = deepFreeze( {
+	body: [
+		{
+			cells: [
+				{ content: 'A', tag: 'td', rowspan: '3' },
+				{ content: 'B', tag: 'td' },
+			],
+		},
+		{ cells: [ { content: 'C', tag: 'td' } ] },
+		{ cells: [ { content: 'D', tag: 'td' } ] },
+	],
+} );
+
 describe( 'createTable', () => {
 	it( 'should create a table', () => {
 		const state = createTable( { rowCount: 2, columnCount: 2 } );
@@ -169,6 +218,28 @@ describe( 'getCellAttribute', () => {
 		);
 
 		expect( state ).toBe( 'testVal' );
+	} );
+} );
+
+describe( 'getCellColumnRange', () => {
+	it( 'returns the logical columns covered by a cell', () => {
+		// "Sub C" is the first cell of its row, but starts at column 2
+		// because "A" and "B" span down into the row.
+		expect(
+			getCellColumnRange( tableWithRowspanHead, {
+				sectionName: 'head',
+				rowIndex: 1,
+				columnIndex: 0,
+			} )
+		).toEqual( { columnIndex: 2, colspan: 1 } );
+
+		expect(
+			getCellColumnRange( tableWithRowspanHead, {
+				sectionName: 'head',
+				rowIndex: 0,
+				columnIndex: 2,
+			} )
+		).toEqual( { columnIndex: 2, colspan: 2 } );
 	} );
 } );
 
@@ -338,6 +409,165 @@ describe( 'insertRow', () => {
 		} );
 	} );
 
+	it( 'uses the logical column count when the first row contains colspan', () => {
+		const tableWithColspan = {
+			head: [
+				{
+					cells: [
+						{
+							content: 'A',
+							tag: 'th',
+							rowspan: '2',
+						},
+						{
+							content: 'B',
+							tag: 'th',
+							rowspan: '2',
+						},
+						{
+							content: 'Grouped',
+							tag: 'th',
+							colspan: '2',
+						},
+						{
+							content: 'E',
+							tag: 'th',
+							rowspan: '2',
+						},
+					],
+				},
+			],
+			body: [
+				{
+					cells: [
+						{
+							content: 'A1',
+							tag: 'td',
+						},
+						{
+							content: 'B1',
+							tag: 'td',
+						},
+						{
+							content: 'C1',
+							tag: 'td',
+						},
+						{
+							content: 'D1',
+							tag: 'td',
+						},
+						{
+							content: 'E1',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toHaveLength( 5 );
+	} );
+
+	it( 'treats an invalid colspan in the first row as 1', () => {
+		const tableWithInvalidColspan = {
+			body: [
+				{
+					cells: [
+						{
+							align: 'left',
+							content: 'A',
+							tag: 'td',
+							colspan: 'abc',
+						},
+						{
+							align: 'right',
+							content: 'B',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithInvalidColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{
+				align: 'left',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'right',
+				content: '',
+				tag: 'td',
+			},
+		] );
+	} );
+
+	it( 'inherits align from the correct spanning source cell when the first row contains colspan', () => {
+		const tableWithAlignmentAndColspan = {
+			body: [
+				{
+					cells: [
+						{
+							align: 'left',
+							content: 'A',
+							tag: 'th',
+						},
+						{
+							align: 'center',
+							content: 'Grouped',
+							tag: 'th',
+							colspan: '2',
+						},
+						{
+							align: 'right',
+							content: 'D',
+							tag: 'th',
+						},
+					],
+				},
+			],
+		};
+
+		const state = insertRow( tableWithAlignmentAndColspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{
+				align: 'left',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'center',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'center',
+				content: '',
+				tag: 'td',
+			},
+			{
+				align: 'right',
+				content: '',
+				tag: 'td',
+			},
+		] );
+	} );
+
 	it( 'adds `th` cells to the head', () => {
 		const state = insertRow( tableWithHead, {
 			sectionName: 'head',
@@ -386,6 +616,78 @@ describe( 'insertRow', () => {
 		} );
 
 		expect( state ).toBe( tableWithHead );
+	} );
+
+	it( 'extends cells above that span across the inserted row and skips their columns', () => {
+		const state = insertRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 1,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '3' },
+					{ content: 'B', tag: 'th', rowspan: '3' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th', rowspan: '3' },
+				],
+			},
+			{
+				cells: [
+					{ content: '', tag: 'th', align: 'center' },
+					{ content: '', tag: 'th', align: 'center' },
+				],
+			},
+			{
+				cells: [
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'does not extend cells whose rowspan ends before the inserted row', () => {
+		const state = insertRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 2,
+		} );
+
+		expect( state.head[ 0 ] ).toEqual( tableWithRowspanHead.head[ 0 ] );
+		expect( state.head[ 2 ].cells ).toHaveLength( 5 );
+	} );
+
+	it( 'skips every column covered by a cell spanning both rows and columns', () => {
+		const state = insertRow(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{
+								content: 'X',
+								tag: 'td',
+								colspan: '2',
+								rowspan: '2',
+							},
+							{ content: 'Y', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'Z', tag: 'td' } ] },
+				],
+			} ),
+			{ sectionName: 'body', rowIndex: 1 }
+		);
+
+		expect( state.body[ 0 ].cells[ 0 ].rowspan ).toBe( '3' );
+		expect( state.body[ 1 ].cells ).toEqual( [
+			{ content: '', tag: 'td' },
+		] );
 	} );
 } );
 
@@ -708,6 +1010,107 @@ describe( 'insertColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'widens a cell that spans across the inserted column', () => {
+		const state = insertColumn( tableWithRowspanHead, {
+			columnIndex: 3,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '3',
+					},
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{
+				cells: [
+					{ content: 'Sub C', tag: 'th' },
+					{ content: '', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+		expect( state.body[ 0 ].cells[ 3 ] ).toEqual( {
+			content: '',
+			tag: 'td',
+		} );
+	} );
+
+	it( 'inserts cells at the logical column in rows covered by a rowspan', () => {
+		const state = insertColumn( tableWithRowspanHead, {
+			columnIndex: 2,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{ content: '', tag: 'th' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{
+				cells: [
+					{ content: '', tag: 'th' },
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+		expect( state.body[ 0 ].cells ).toHaveLength( 6 );
+	} );
+
+	it( 'does not add a cell to rows covered by a cell spanning across the inserted column', () => {
+		const state = insertColumn(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{
+								content: 'X',
+								tag: 'td',
+								colspan: '2',
+								rowspan: '2',
+							},
+							{ content: 'Y', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'Z', tag: 'td' } ] },
+				],
+			} ),
+			{ columnIndex: 1 }
+		);
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{
+						content: 'X',
+						tag: 'td',
+						colspan: '3',
+						rowspan: '2',
+					},
+					{ content: 'Y', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'Z', tag: 'td' } ] },
+		] );
+	} );
 } );
 
 describe( 'deleteRow', () => {
@@ -735,6 +1138,82 @@ describe( 'deleteRow', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'decrements the rowspan of cells above that span into the deleted row', () => {
+		const state = deleteRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 1,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th' },
+					{ content: 'B', tag: 'th' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'keeps the rowspan of cells above that still span multiple rows', () => {
+		const state = deleteRow( tableWithTallRowspan, {
+			sectionName: 'body',
+			rowIndex: 1,
+		} );
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'td', rowspan: '2' },
+					{ content: 'B', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'D', tag: 'td' } ] },
+		] );
+	} );
+
+	it( 'moves cells that span down from the deleted row to the next row', () => {
+		const state = deleteRow( tableWithRowspanHead, {
+			sectionName: 'head',
+			rowIndex: 0,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th' },
+					{ content: 'B', tag: 'th' },
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+					{ content: 'E', tag: 'th' },
+				],
+			},
+		] );
+	} );
+
+	it( 'moves a cell to the next row with its remaining rowspan', () => {
+		const state = deleteRow( tableWithTallRowspan, {
+			sectionName: 'body',
+			rowIndex: 0,
+		} );
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'td', rowspan: '2' },
+					{ content: 'C', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'D', tag: 'td' } ] },
+		] );
 	} );
 } );
 
@@ -935,6 +1414,62 @@ describe( 'deleteColumn', () => {
 
 		expect( state ).toEqual( expected );
 	} );
+
+	it( 'shrinks a cell that spans across the deleted column', () => {
+		const state = deleteColumn( tableWithRowspanHead, {
+			columnIndex: 3,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{ content: 'Grouped', tag: 'th', align: 'center' },
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{ cells: [ { content: 'Sub C', tag: 'th' } ] },
+		] );
+		expect(
+			state.body[ 0 ].cells.map( ( { content } ) => content )
+		).toEqual( [ 'A1', 'B1', 'C1', 'E1' ] );
+	} );
+
+	it( 'deletes cells by logical column in rows covered by a rowspan', () => {
+		const state = deleteColumn( tableWithRowspanHead, {
+			columnIndex: 2,
+		} );
+
+		// "Sub C" is the first cell of its row, but it is in column 2.
+		expect( state.head[ 1 ] ).toEqual( {
+			cells: [ { content: 'Sub D', tag: 'th' } ],
+		} );
+		expect(
+			state.body[ 0 ].cells.map( ( { content } ) => content )
+		).toEqual( [ 'A1', 'B1', 'D1', 'E1' ] );
+	} );
+
+	it( 'removes rows left empty and shrinks the cells spanning into them', () => {
+		const state = deleteColumn(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{ content: 'A', tag: 'td', rowspan: '2' },
+							{ content: 'B', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'C', tag: 'td' } ] },
+				],
+			} ),
+			{ columnIndex: 1 }
+		);
+
+		expect( state.body ).toEqual( [
+			{ cells: [ { content: 'A', tag: 'td' } ] },
+		] );
+	} );
 } );
 
 describe( 'toggleSection', () => {
@@ -969,6 +1504,31 @@ describe( 'toggleSection', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'uses the logical column count of the first body row when the row contains colspan', () => {
+		const tableWithColspan = {
+			head: [],
+			body: [
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+							colspan: '2',
+						},
+						{
+							content: '',
+							tag: 'td',
+						},
+					],
+				},
+			],
+		};
+
+		const state = toggleSection( tableWithColspan, 'head' );
+
+		expect( state.head[ 0 ].cells ).toHaveLength( 3 );
 	} );
 
 	it( 'uses the number of cells in the first row of the body for the added table row', () => {
@@ -1332,6 +1892,59 @@ describe( 'updateSelectedCell', () => {
 					],
 				},
 			],
+		} );
+	} );
+
+	describe( 'with merged cells', () => {
+		const markSelected = ( cell ) => ( { ...cell, selected: true } );
+		const getSelectedContent = ( state ) =>
+			[ 'head', 'body' ].flatMap( ( sectionName ) =>
+				state[ sectionName ].flatMap( ( row ) =>
+					row.cells
+						.filter( ( cell ) => cell.selected )
+						.map( ( cell ) => cell.content )
+				)
+			);
+
+		it( 'selects cells by logical column in rows covered by a rowspan', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 0 },
+				markSelected
+			);
+
+			// "Sub C" is the first cell of its row, but it is in column 2.
+			expect( getSelectedContent( state ) ).toEqual( [ 'A', 'A1' ] );
+		} );
+
+		it( 'selects cells spanning across the selected column', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 3 },
+				markSelected
+			);
+
+			expect( getSelectedContent( state ) ).toEqual( [
+				'Grouped',
+				'Sub D',
+				'D1',
+			] );
+		} );
+
+		it( 'selects every column covered by the selection', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 2, colspan: 2 },
+				markSelected
+			);
+
+			expect( getSelectedContent( state ) ).toEqual( [
+				'Grouped',
+				'Sub C',
+				'Sub D',
+				'C1',
+				'D1',
+			] );
 		} );
 	} );
 } );
