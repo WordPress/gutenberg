@@ -8,32 +8,32 @@ import {
 	MAX_BISECTION_ITERATIONS,
 	CONTRAST_EPSILON,
 } from './constants.ts';
-import type { Ramp, RampConfig, RampDirection } from './types.ts';
+import type { BaseRampStep, RampStepsConfig, RampDirection } from './types.ts';
 import { getContrast } from './color-utils.ts';
 
 /**
  * Build a dependency graph from the steps configuration
  * @param config - The steps configuration object
  */
-function buildDependencyGraph( config: RampConfig ): {
-	dependencies: Map< keyof Ramp, ( keyof Ramp | 'seed' )[] >;
-	dependents: Map< keyof Ramp | 'seed', ( keyof Ramp )[] >;
+function buildDependencyGraph( config: RampStepsConfig ): {
+	dependencies: Map< BaseRampStep, ( BaseRampStep | 'seed' )[] >;
+	dependents: Map< BaseRampStep | 'seed', BaseRampStep[] >;
 } {
-	const dependencies = new Map< keyof Ramp, ( keyof Ramp | 'seed' )[] >();
-	const dependents = new Map< keyof Ramp | 'seed', ( keyof Ramp )[] >();
+	const dependencies = new Map< BaseRampStep, ( BaseRampStep | 'seed' )[] >();
+	const dependents = new Map< BaseRampStep | 'seed', BaseRampStep[] >();
 
 	// Initialize maps
 	Object.keys( config ).forEach( ( step ) => {
-		dependencies.set( step as keyof Ramp, [] );
+		dependencies.set( step as BaseRampStep, [] );
 	} );
 	dependents.set( 'seed', [] );
 	Object.keys( config ).forEach( ( step ) => {
-		dependents.set( step as keyof Ramp, [] );
+		dependents.set( step as BaseRampStep, [] );
 	} );
 
 	// Build the graph
 	Object.entries( config ).forEach( ( [ stepName, stepConfig ] ) => {
-		const step = stepName as keyof Ramp;
+		const step = stepName as BaseRampStep;
 		const references = [
 			stepConfig.contrast.reference,
 			...( stepConfig.contrast.additionalReferences ?? [] ),
@@ -58,13 +58,13 @@ function buildDependencyGraph( config: RampConfig ): {
  * Topologically sort steps based on their dependencies
  * @param config - The steps configuration object
  */
-export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
+export function sortByDependency( config: RampStepsConfig ): BaseRampStep[] {
 	const { dependents } = buildDependencyGraph( config );
-	const result: ( keyof Ramp )[] = [];
-	const visited = new Set< keyof Ramp | 'seed' >();
-	const visiting = new Set< keyof Ramp | 'seed' >();
+	const result: BaseRampStep[] = [];
+	const visited = new Set< BaseRampStep | 'seed' >();
+	const visiting = new Set< BaseRampStep | 'seed' >();
 
-	function visit( node: keyof Ramp | 'seed' ): void {
+	function visit( node: BaseRampStep | 'seed' ): void {
 		if ( visiting.has( node ) ) {
 			throw new Error(
 				`Circular dependency detected involving step: ${ String(
@@ -105,11 +105,11 @@ export function sortByDependency( config: RampConfig ): ( keyof Ramp )[] {
  * @return Array of steps that `stepName` depends on.
  */
 export function stepsForStep(
-	stepName: keyof Ramp,
-	config: RampConfig
-): ( keyof Ramp )[] {
-	const result = new Set< keyof Ramp >();
-	function visit( step: keyof Ramp | 'seed' ) {
+	stepName: BaseRampStep,
+	config: RampStepsConfig
+): BaseRampStep[] {
+	const result = new Set< BaseRampStep >();
+	function visit( step: BaseRampStep | 'seed' ) {
 		if ( step === 'seed' || result.has( step ) ) {
 			return;
 		}

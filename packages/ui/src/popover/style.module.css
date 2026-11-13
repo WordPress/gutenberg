@@ -112,8 +112,8 @@
 		}
 
 		.title {
-			color: var(--wpds-color-foreground-content-neutral);
-			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral-strong);
+			--_gcd-heading-color: var(--wpds-color-foreground-content-neutral-strong);
 		}
 
 		.backdrop {

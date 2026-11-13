@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use semantic surface, text, and border colors in the interface skeleton and complementary sidebar ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

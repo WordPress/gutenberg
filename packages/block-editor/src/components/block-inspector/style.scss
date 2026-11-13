@@ -9,7 +9,7 @@
 	h2,
 	h3 {
 		font-size: $default-font-size;
-		color: $gray-900;
+		color: var(--wpds-color-foreground-content-neutral-strong);
 		margin-bottom: 1.5em;
 	}
 
@@ -35,7 +35,7 @@
 
 	.components-panel__body {
 		border: none;
-		border-top: $border-width solid $gray-200;
+		border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 
 		// Ensures this PanelBody is treated like the ToolsPanel, removing double borders.
 		margin-top: -$border-width;
@@ -46,7 +46,7 @@
 .block-editor-block-inspector__no-block-tools {
 	display: block;
 	font-size: $default-font-size;
-	background: $white;
+	background: var(--wpds-color-background-surface-neutral-strong);
 	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }
@@ -68,7 +68,7 @@
 }
 
 .block-editor-block-inspector__no-block-tools {
-	border-top: $border-width solid $gray-300;
+	border-top: $border-width solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .block-editor-block-inspector-edit-contents {

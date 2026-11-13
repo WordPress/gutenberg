@@ -10,8 +10,13 @@
 	}
 
 	&:hover,
-	&:active {
+	&:active,
+	&:focus-visible {
 		color: var(--wpds-color-foreground-interactive-brand-active);
+
+		.components-external-link__contents {
+			text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+		}
 	}
 
 	&:focus {
@@ -27,6 +32,7 @@
 
 .components-external-link__contents {
 	text-decoration: underline;
+	text-decoration-color: currentColor;
 	text-underline-offset: 0.2em;
 	text-decoration-thickness: from-font;
 }

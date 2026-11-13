@@ -6,6 +6,8 @@ import {
 	parseSeedColor,
 } from './color-utils.ts';
 import { findColorMeetingRequirements } from './find-color-with-constraints.ts';
+import { buildForegroundScale } from './build-foreground-scale.ts';
+import { buildPerceptualSteps } from './build-perceptual-steps.ts';
 import {
 	sortByDependency,
 	computeBetterFgColorDirection,
@@ -14,16 +16,19 @@ import {
 	solveWithBisect,
 } from './utils.ts';
 import type {
+	BaseRamp,
+	BaseRampStep,
 	FollowDirection,
 	Ramp,
 	RampDirection,
 	RampConfig,
 	RampResult,
+	RampStepsConfig,
 } from './types.ts';
 import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
 /**
- * Calculate a complete color ramp based on the provided configuration.
+ * Calculate the base color ramp before perceptual reconstruction.
  *
  * @param params                       - The calculation parameters
  * @param params.seed                  - The base color to build the ramp from
@@ -45,16 +50,16 @@ function calculateRamp( {
 	pinLightness,
 }: {
 	seed: PlainColorObject;
-	sortedSteps: ( keyof Ramp )[];
-	config: RampConfig;
+	sortedSteps: BaseRampStep[];
+	config: RampStepsConfig;
 	mainDir: RampDirection;
 	oppDir: RampDirection;
 	pinLightness?: {
-		stepName: keyof Ramp;
+		stepName: BaseRampStep;
 		value: number;
 	};
 } ) {
-	const rampResults = {} as Record< keyof Ramp, string >;
+	const rampResults = {} as BaseRamp;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -199,21 +204,35 @@ function calculateRamp( {
 	};
 }
 
+type BuildRampOptions = {
+	mainDirection?: RampDirection;
+	pinLightness?: { stepName: BaseRampStep; value: number };
+	backgroundRamp?: RampResult;
+	rescaleToFitContrastTargets?: boolean;
+};
+
+/**
+ * Solve base constraints, rebuild surfaces and strokes, then position the
+ * foreground scale. Seed lightness may shift to make the base constraints fit.
+ *
+ * @param seedArg                             Original opaque sRGB seed string.
+ * @param config                              Base constraints and foreground policy.
+ * @param options                             Direction, seed adjustment, and background.
+ * @param options.mainDirection               Main ramp direction override.
+ * @param options.pinLightness                Optional pinned step lightness.
+ * @param options.backgroundRamp              Background behind an accent ramp.
+ * @param options.rescaleToFitContrastTargets Whether seed rescaling is allowed.
+ * @return Generated colors, direction, and any remaining ramp warnings.
+ */
 export function buildRamp(
 	seedArg: string,
 	config: RampConfig,
 	{
 		mainDirection,
 		pinLightness,
+		backgroundRamp,
 		rescaleToFitContrastTargets = true,
-	}: {
-		mainDirection?: RampDirection;
-		pinLightness?: {
-			stepName: keyof Ramp;
-			value: number;
-		};
-		rescaleToFitContrastTargets?: boolean;
-	} = {}
+	}: BuildRampOptions = {}
 ): RampResult {
 	// Parse and validate here: the single point where user-supplied color strings enter.
 	const parsedSeed = parseSeedColor( seedArg );
@@ -242,14 +261,14 @@ export function buildRamp(
 	}
 
 	// Get the correct calculation order based on dependencies
-	const sortedSteps = sortByDependency( config );
+	const sortedSteps = sortByDependency( config.steps );
 
 	// Calculate the ramp with the initial seed.
 	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
 		calculateRamp( {
 			seed,
 			sortedSteps,
-			config,
+			config: config.steps,
 			mainDir,
 			oppDir,
 			pinLightness,
@@ -258,7 +277,7 @@ export function buildRamp(
 	let bestRamp = rampResults;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
-		const iterSteps = stepsForStep( maxDeficitStep!, config );
+		const iterSteps = stepsForStep( maxDeficitStep!, config.steps );
 
 		function getSeedForL( l: number ): PlainColorObject {
 			return clampToGamut( set( clone( seed ), [ OKLCH, 'l' ], l ) );
@@ -268,7 +287,7 @@ export function buildRamp(
 			const iterationResults = calculateRamp( {
 				seed: s,
 				sortedSteps: iterSteps,
-				config,
+				config: config.steps,
 				mainDir,
 				oppDir,
 				pinLightness,
@@ -303,7 +322,7 @@ export function buildRamp(
 		const finalResult = calculateRamp( {
 			seed: bestSeed,
 			sortedSteps,
-			config,
+			config: config.steps,
 			mainDir,
 			oppDir,
 			pinLightness,
@@ -316,7 +335,7 @@ export function buildRamp(
 	// alone cannot establish their contrast after serialization.
 	const serializedSeed = getColorString( seed );
 	const warnings = sortedSteps.filter( ( stepName ) => {
-		const { contrast } = config[ stepName ];
+		const { contrast } = config.steps[ stepName ];
 		if ( contrast.ignoreWhenAdjustingSeed ) {
 			return false;
 		}
@@ -344,9 +363,18 @@ export function buildRamp(
 		bestRamp.surface3 = tmpSurface1;
 	}
 
-	return {
-		ramp: bestRamp,
-		warnings: warnings.length ? warnings : undefined,
-		direction: mainDir,
-	};
+	const rampResult = buildPerceptualSteps(
+		{
+			ramp: bestRamp,
+			warnings: warnings.length ? warnings : undefined,
+			direction: mainDir,
+		},
+		backgroundRamp
+	);
+
+	return buildForegroundScale(
+		rampResult,
+		backgroundRamp ?? rampResult,
+		config.foregroundScale
+	);
 }
