@@ -25,14 +25,17 @@ vi.mock( import( '@wordpress/a11y' ), () => ( {
 	speak: vi.fn(),
 } ) );
 
-function mockQueue( items, failureCount = 0 ) {
+function mockQueue( items, failureCount = 0, warnings = [] ) {
 	const storeSelect = {
 		getItems: () => items,
 		isUploading: () => items.length > 0,
 	};
-	// `getFailureCount` is a private selector, so the component reads it
-	// through `unlock`.
-	lock( storeSelect, { getFailureCount: () => failureCount } );
+	// `getFailureCount` and `getWarnings` are private selectors, so the
+	// component reads them through `unlock`.
+	lock( storeSelect, {
+		getFailureCount: () => failureCount,
+		getWarnings: () => warnings,
+	} );
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => storeSelect )
 	);
@@ -294,6 +297,35 @@ describe( 'UploadProgressSnackbar', () => {
 			expect.objectContaining( {
 				icon: expect.anything(),
 			} )
+		);
+	} );
+
+	it( 'warns once about each upload that is missing image sizes', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+		const second = { id: 'b', code: 'GENERAL', message: 'Second warning' };
+
+		mockQueue( [], 0, [ first ] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'First warning',
+			expect.objectContaining( {
+				id: 'upload-warning-a',
+				type: 'snackbar',
+				explicitDismiss: true,
+			} )
+		);
+
+		mockQueue( [], 0, [ first, second ] );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
+		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+			'warning',
+			'Second warning',
+			expect.objectContaining( { id: 'upload-warning-b' } )
 		);
 	} );
 } );
