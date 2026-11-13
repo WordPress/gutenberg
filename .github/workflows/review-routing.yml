@@ -76,11 +76,8 @@ jobs:
                   reviewers="$(jq -c '[ .[] | select( .requestReview ) | .reviewers[] ] | unique' "$RUNNER_TEMP/decisions.json")"
                   printf 'reviewers=%s\n' "$reviewers" >> "$GITHUB_OUTPUT"
 
-                  # The PR meta section names the rules that matched, not who
-                  # was requested: the request job skips the author and anyone
-                  # requested before. Reviewers are in code format, so that a
-                  # new comment does not notify them. No rule matched leaves
-                  # the section empty, which removes it.
+                  # Lists the matched rules for the PR meta section. Empty when
+                  # no rule matched, which removes the section.
                   matches="$(jq -r '.[] | select( .requestReview ) | "- `\( .rule )`: \( .reviewers | map( "`\( . )`" ) | join( ", " ) )"' "$RUNNER_TEMP/decisions.json")"
                   section=''
                   if [ -n "$matches" ]; then
