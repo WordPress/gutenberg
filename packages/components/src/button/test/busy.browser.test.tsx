@@ -106,6 +106,40 @@ describe( 'Button busy presentation', () => {
 		}
 	);
 
+	it.each( [
+		{ name: 'disabled', accessibleWhenDisabled: false },
+		{ name: 'focusable disabled', accessibleWhenDisabled: true },
+	] )(
+		'keeps the primary busy indicator contrasting when $name',
+		async ( { accessibleWhenDisabled } ) => {
+			await render(
+				<>
+					<Button __next40pxDefaultSize variant="primary" isBusy>
+						Saving
+					</Button>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						isBusy
+						disabled
+						accessibleWhenDisabled={ accessibleWhenDisabled }
+					>
+						Saving disabled
+					</Button>
+				</>
+			);
+			const enabledButton = screen.getByRole( 'button', {
+				name: 'Saving',
+			} );
+			const disabledButton = screen.getByRole( 'button', {
+				name: 'Saving disabled',
+			} );
+			expect( getComputedStyle( disabledButton ).backgroundColor ).toBe(
+				getComputedStyle( enabledButton ).backgroundColor
+			);
+		}
+	);
+
 	it.each( variants )(
 		'keeps the spinner visible for a pressed disabled busy %s button',
 		async ( variant ) => {

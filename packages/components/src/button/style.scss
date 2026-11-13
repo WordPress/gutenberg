@@ -97,6 +97,7 @@
 		&.is-busy:disabled,
 		&.is-busy[aria-disabled="true"] {
 			color: var(--_wp-components-button-foreground-strong);
+			background: var(--_wp-components-button-background-strong);
 		}
 	}
 
@@ -283,7 +284,6 @@
 			color: var(--_wp-components-button-foreground-busy);
 		}
 	}
-
 
 	&.is-compact {
 		height: $button-size-compact;
