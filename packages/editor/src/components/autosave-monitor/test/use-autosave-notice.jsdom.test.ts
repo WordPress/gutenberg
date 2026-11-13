@@ -49,12 +49,16 @@ function select( store: string ) {
 		return { getEntitySyncConnectionStatus };
 	}
 
-	return { isCollaborationEnabledForCurrentPost, getEditorSettings };
+	return {
+		isCollaborationEnabledForCurrentPost,
+		getEditorSettings,
+		isEditedPostNew: () => false,
+	};
 }
 
 type Props = Parameters< typeof useAutosaveNotice >[ 0 ];
 
-const PROPS: Props = { postType: 'post', postId: 7, isNew: false };
+const PROPS: Props = { postType: 'post', postId: 7 };
 const EDIT_LINK = '/wp-admin/revision.php?revision=123';
 const NOTICE_TEXT =
 	'There is an autosave of this post that is more recent than the version below.';

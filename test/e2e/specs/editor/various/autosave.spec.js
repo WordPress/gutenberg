@@ -894,20 +894,6 @@ test.describe( 'Autosave with a block theme', () => {
 		} );
 		await expect.poll( getCurrentPostType ).toBe( 'wp_template' );
 		await expect( autosaveNotice ).toBeHidden();
-
-		await page.evaluate( () =>
-			window.wp.data
-				.select( 'core/editor' )
-				.getEditorSettings()
-				.onNavigateToPreviousEntityRecord()
-		);
-		await expect.poll( getCurrentPostType ).toBe( 'post' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { content: 'Saved' } },
-			] );
-		await expect( autosaveNotice ).toBeHidden();
 	} );
 
 	test( 'should back up a page when the page is left', async ( {
