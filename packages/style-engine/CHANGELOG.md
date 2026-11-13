@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   PHP style engine: add `has-background` for a background image, and leave it out for a gradient clipped to the text, matching the background block support ([#86244](https://github.com/WordPress/gutenberg/pull/86244)).
+-   Add the `background.backgroundAttachment`, `outline`, `shadow` and `typography.textIndent` styles the engine already generates to the `Style` type ([#85097](https://github.com/WordPress/gutenberg/pull/85097)).
 
 ## 3.1.0 (2026-11-04)
 
@@ -21,10 +22,6 @@
 ### New Features
 
 -   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
-
-### Bug Fixes
-
--   Add the `background.backgroundAttachment`, `outline`, `shadow` and `typography.textIndent` styles the engine already generates to the `Style` type ([#85097](https://github.com/WordPress/gutenberg/pull/85097)).
 
 ## 2.57.0 (2026-10-07)
 
