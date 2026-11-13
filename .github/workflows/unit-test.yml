@@ -61,7 +61,7 @@ jobs:
                           - '**'
                           # Documentation.
                           - '!**/*.md'
-                          - '!{backport-changelog,docs,storybook}/**'
+                          - '!{backport-changelog,docs}/**'
                           # Development tooling and its configuration.
                           - '!tools/{docs,eslint,stylelint}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'

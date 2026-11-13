@@ -80,15 +80,16 @@ function readMigrationGuides( stories: Story[] ): MigrationGuide[] {
 		.sort()
 		.map( ( file ) => {
 			const source = readFileSync( path.join( ROOT_DIR, file ), 'utf8' );
-			const [ , storiesName, name ] =
-				source.match( /<Meta\s+of=\{\s*(\w+)\s*\}\s+name="([^"]+)"/ ) ??
-				[];
-			const [ , storiesPath ] =
-				source.match(
-					new RegExp(
-						`import \\* as ${ storiesName } from '([^']+)'`
-					)
-				) ?? [];
+			const meta = source.match( /<Meta\s[^>]*>/ )?.[ 0 ] ?? '';
+			const storiesName = meta.match( /\bof=\{\s*(\w+)\s*\}/ )?.[ 1 ];
+			const name = meta.match( /\bname="([^"]+)"/ )?.[ 1 ];
+			const storiesPath = source.match(
+				new RegExp( `import \\* as ${ storiesName } from '([^']+)'` )
+			)?.[ 1 ];
+			if ( ! storiesName || ! name || ! storiesPath ) {
+				return { file, docsId: '' };
+			}
+
 			const storiesFile = path.join( path.dirname( file ), storiesPath );
 			const story = stories.find(
 				( { file: storyFile } ) =>
@@ -116,22 +117,30 @@ const componentStories = stories.filter(
 );
 const migrationGuides = readMigrationGuides( stories );
 
-function findStatusMismatches(): Map< string, string > {
-	const mismatches = new Map< string, string >();
+type StatusMismatch = {
+	component: string;
+	kind: 'missing-denylist-entry' | 'denylisted-status';
+	message: string;
+};
+
+function findStatusMismatches(): StatusMismatch[] {
+	const mismatches: StatusMismatch[] = [];
 	for ( const { file, component, status } of componentStories ) {
 		const entry = denylistEntriesByComponent.get( component );
 		if ( status === 'not-recommended' && ! entry ) {
-			mismatches.set(
+			mismatches.push( {
 				component,
-				`${ component } is "not-recommended" in ${ file }, but is not in DENYLIST in ${ RULE_FILE }. Add a denylist entry, or change the story's status.`
-			);
+				kind: 'missing-denylist-entry',
+				message: `${ component } is "not-recommended" in ${ file }, but is not in DENYLIST in ${ RULE_FILE }. Add a denylist entry, or change the story's status.`,
+			} );
 		} else if ( entry && status !== 'not-recommended' ) {
-			mismatches.set(
+			mismatches.push( {
 				component,
-				`${ entry.key } is in DENYLIST in ${ RULE_FILE }, but its status in ${ file } is ${
+				kind: 'denylisted-status',
+				message: `${ entry.key } is in DENYLIST in ${ RULE_FILE }, but its status in ${ file } is ${
 					status ? `"${ status }"` : 'missing'
-				}. Set the story's status to "not-recommended", or remove the denylist entry.`
-			);
+				}. Set the story's status to "not-recommended", or remove the denylist entry.`,
+			} );
 		}
 	}
 	return mismatches;
@@ -141,31 +150,46 @@ describe( '@wordpress/components recommendation status', () => {
 	it( 'reads the stories and migration guides', () => {
 		expect( componentStories ).not.toHaveLength( 0 );
 		expect( migrationGuides ).not.toHaveLength( 0 );
-		for ( const { file, story } of migrationGuides ) {
-			expect(
-				story,
-				`Could not find the story file that the <Meta of> of ${ file } refers to.`
-			).toBeDefined();
-		}
+		const unreadFiles = [
+			...stories
+				.filter( ( { component, status } ) => status && ! component )
+				.map(
+					( { file } ) =>
+						`Could not match ${ file } to a component of @wordpress/components. Set the meta's \`component\` to a component imported from this package.`
+				),
+			...migrationGuides
+				.filter( ( { story } ) => ! story )
+				.map(
+					( { file } ) =>
+						`Could not find the story file that ${ file } refers to. Check its <Meta of> and name, and the import of its stories.`
+				),
+		];
+
+		expect( unreadFiles ).toEqual( [] );
 	} );
 
 	it( 'marks a component "not-recommended" exactly when it is in the denylist', () => {
-		const mismatches = [ ...findStatusMismatches() ]
+		const mismatches = findStatusMismatches()
 			.filter(
-				( [ component ] ) =>
+				( { component, kind } ) =>
+					kind !== 'missing-denylist-entry' ||
 					! NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY[ component ]
 			)
-			.map( ( [ , message ] ) => message );
+			.map( ( { message } ) => message );
 
 		expect( mismatches ).toEqual( [] );
 	} );
 
 	it( 'lists only exceptions that still apply', () => {
-		const mismatches = findStatusMismatches();
+		const missingEntries = new Set(
+			findStatusMismatches()
+				.filter( ( { kind } ) => kind === 'missing-denylist-entry' )
+				.map( ( { component } ) => component )
+		);
 		const staleExceptions = Object.keys(
 			NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY
 		)
-			.filter( ( component ) => ! mismatches.has( component ) )
+			.filter( ( component ) => ! missingEntries.has( component ) )
 			.map(
 				( component ) =>
 					`${ component } no longer needs an entry in NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY in this test. Remove it.`
@@ -182,7 +206,7 @@ describe( '@wordpress/components recommendation status', () => {
 			)
 			.map(
 				( { file } ) =>
-					`${ file } is "not-recommended" but has the \`manifest\` tag. Remove the tag and update storybook/components-manifest.yml.`
+					`${ file } is "not-recommended" but has the \`manifest\` tag. Remove the tag, then run \`npm run storybook:build\` and \`npm run storybook:manifest-snapshot\`.`
 			);
 
 		expect( manifestStories ).toEqual( [] );
