@@ -2,14 +2,17 @@ import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { Suspense, startTransition } from '@wordpress/element';
 import type { MouseEventHandler } from 'react';
 import * as Breadcrumb from '../index';
 
 function OverflowTrail( {
 	width = 280,
+	currentLabel = 'Current',
 	onClick,
 }: {
 	width?: number;
+	currentLabel?: string;
 	onClick?: MouseEventHandler< HTMLAnchorElement >;
 } ) {
 	const itemStyle = { width: 80 };
@@ -29,7 +32,7 @@ function OverflowTrail( {
 				Page
 			</Breadcrumb.LinkItem>
 			<Breadcrumb.CurrentItem style={ itemStyle }>
-				Current
+				{ currentLabel }
 			</Breadcrumb.CurrentItem>
 		</Breadcrumb.Root>
 	);
@@ -61,6 +64,51 @@ function ClippedLinkTrail() {
 }
 
 describe( 'Breadcrumb browser interactions', () => {
+	it( 'keeps committed items when overflow is focused during a suspended update', async () => {
+		const suspend = vi.fn();
+		const pending = new Promise< never >( () => {} );
+
+		function PendingUpdate(): never {
+			suspend();
+			throw pending;
+		}
+
+		const trail = ( isPending = false ) => (
+			<Suspense fallback="Loading">
+				<OverflowTrail
+					width={ 120 }
+					currentLabel={ isPending ? 'Pending current' : 'Current' }
+				/>
+				{ isPending && <PendingUpdate /> }
+			</Suspense>
+		);
+		const { rerender } = await render( trail() );
+		const trigger = await screen.findByRole( 'button', {
+			name: /hidden breadcrumb items?/,
+		} );
+		expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
+
+		let update: ReturnType< typeof rerender > | undefined;
+		startTransition( () => {
+			update = rerender( trail( true ) );
+		} );
+		await update;
+		expect( suspend ).toHaveBeenCalled();
+		expect( screen.queryByText( 'Loading' ) ).not.toBeInTheDocument();
+
+		await userEvent.tab();
+
+		expect( trigger ).toHaveFocus();
+		expect(
+			screen.getByText( 'Current', { selector: '[aria-current="page"]' } )
+		).toBeVisible();
+		expect(
+			screen.queryByText( 'Pending current', {
+				selector: '[aria-current="page"]',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
 	it( 'restores links when the width grows', async () => {
 		const view = await render( <OverflowTrail width={ 180 } /> );
 
