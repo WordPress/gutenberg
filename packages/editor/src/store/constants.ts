@@ -18,6 +18,10 @@ export const AUTOSAVE_PROPERTIES = [ 'title', 'excerpt', 'content' ];
  * ID of the notice that offers the browser backup.
  */
 export const BROWSER_BACKUP_NOTICE_ID = 'wpEditorAutosaveRestore';
+/**
+ * ID of the notice that offers a newer server autosave.
+ */
+export const AUTOSAVE_NOTICE_ID = 'autosave-exists';
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';

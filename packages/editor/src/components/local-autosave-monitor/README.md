@@ -1,10 +1,8 @@
 # LocalAutosaveMonitor
 
-`LocalAutosaveMonitor` is a component based on `AutosaveMonitor` that ensures that a local copy of the current post is regularly saved in `sessionStorage`. Additionally, it will:
+`LocalAutosaveMonitor` keeps a backup of the current post in `sessionStorage`. It writes the backup every `localAutosaveInterval` seconds and when the page is hidden or unloaded, and clears it once a save covers it.
 
--   attempt to clear the local copy if a copy is successful saved on the server;
--   warn the user upon loading a post that there is a local copy that can be loaded;
--   defer to remote autosaves, if any is available.
+The editor already backs up the post it edits and offers to restore the backup, so render `LocalAutosaveMonitor` only in a custom editor.
 
 `LocalAutosaveMonitor` observes a saving interval defined specifically for local autosaves, in contrast with remote (server-side) autosaving.
 

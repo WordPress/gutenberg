@@ -112,6 +112,111 @@ test.describe( 'Autosave', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should back up edits when the page is left', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save after save' },
+			},
+		] );
+	} );
+
+	test( 'should discard the backup when its notice is dismissed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		const notice = page
+			.locator( '.notices-inline-notices__notice' )
+			.filter( { hasText: BACKUP_NOTICE } );
+		await notice.getByRole( 'button', { name: 'Close' } ).click();
+		await page.reload();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+		await expect( notice ).toBeHidden();
+	} );
+
+	test( 'should keep a newer backup when an older notice is dismissed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' backup' );
+		await page.reload();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' newer' );
+		// Stands in for switching tabs, which writes a newer backup.
+		await page.evaluate( () =>
+			window.dispatchEvent( new Event( 'pagehide' ) )
+		);
+		await page
+			.locator( '.notices-inline-notices__notice' )
+			.filter( { hasText: BACKUP_NOTICE } )
+			.getByRole( 'button', { name: 'Close' } )
+			.click();
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save newer' },
+			},
+		] );
+	} );
+
 	test( 'should keep the current content as a revision when restoring the backup', async ( {
 		editor,
 		page,
@@ -394,6 +499,45 @@ test.describe( 'Autosave', () => {
 		).toBeHidden();
 	} );
 
+	test( 'should discard the backup when the edits are undone', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+		await page.reload();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+		await expect(
+			page.locator( '.notices-inline-notices__notice' )
+		).toBeHidden();
+	} );
+
 	test( 'should clear local autosave after successful remote autosave', async ( {
 		editor,
 		page,
@@ -576,24 +720,13 @@ test.describe( 'Autosave', () => {
 			} )
 			.toBeGreaterThanOrEqual( 1 );
 
-		// Force conflicting local autosave.
-		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
-		);
-
-		expect(
-			await page.evaluate( () => window.sessionStorage.length )
-		).toBeGreaterThanOrEqual( 1 );
-
+		// Leaving the page writes a newer local backup.
 		await page.reload();
-		await page.waitForFunction( () => window?.wp?.data );
 
-		// Only remote autosave notice should be applied.
+		// Only the newer browser backup notice should be shown.
 		await expect(
 			page.locator( '.notices-inline-notices__notice' )
-		).toContainText(
-			'There is an autosave of this post that is more recent than the version below.'
-		);
+		).toHaveText( [ BACKUP_NOTICE ] );
 	} );
 
 	test( 'opens the visual revisions view from the autosave notice', async ( {
@@ -633,7 +766,10 @@ test.describe( 'Autosave', () => {
 			} )
 			.toBeGreaterThanOrEqual( 1 );
 
-		// Reload so the autosave notice appears.
+		// Reload twice so that the browser backup, written when leaving the
+		// edited post, is gone and the autosave notice appears.
+		await page.reload();
+		await page.evaluate( () => window.sessionStorage.clear() );
 		await page.reload();
 		await page.waitForFunction( () => window?.wp?.data );
 
@@ -682,5 +818,114 @@ test.describe( 'Autosave', () => {
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
 		).toBe( 0 );
+	} );
+} );
+
+test.describe( 'Autosave with a block theme', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+	} );
+
+	test.afterEach( async ( { page } ) => {
+		await page.evaluate( () => window.sessionStorage.clear() );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllPosts();
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
+	test( 'should offer the server autosave only for the post it was made for', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createPost( {
+			title: 'Autosaved post',
+			content: '<!-- wp:paragraph --><p>Saved</p><!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+		await admin.editPost( id );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' autosaved', { delay: 100 } );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		await expect
+			.poll( () =>
+				page.evaluate(
+					( postId ) =>
+						window.wp.data
+							.select( 'core' )
+							.getAutosaves( 'post', postId )?.length ?? 0,
+					id
+				)
+			)
+			.toBeGreaterThanOrEqual( 1 );
+		// Reload twice so that the browser backup, written when leaving the
+		// edited post, is gone and the autosave notice appears.
+		await page.reload();
+		await page.evaluate( () => window.sessionStorage.clear() );
+		await page.reload();
+		const autosaveNotice = page
+			.locator( '.notices-inline-notices__notice' )
+			.filter( {
+				hasText:
+					'There is an autosave of this post that is more recent than the version below.',
+			} );
+		await expect( autosaveNotice ).toBeVisible();
+
+		const getCurrentPostType = () =>
+			page.evaluate( () =>
+				window.wp.data.select( 'core/editor' ).getCurrentPostType()
+			);
+		await page.evaluate( () => {
+			const { getEditorSettings, getCurrentTemplateId } =
+				window.wp.data.select( 'core/editor' );
+			getEditorSettings().onNavigateToEntityRecord( {
+				postId: getCurrentTemplateId(),
+				postType: 'wp_template',
+			} );
+		} );
+		await expect.poll( getCurrentPostType ).toBe( 'wp_template' );
+		await expect( autosaveNotice ).toBeHidden();
+	} );
+
+	test( 'should back up a page when the page is left', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createPage( {
+			title: 'Backed up page',
+			content: '<!-- wp:paragraph --><p>Saved</p><!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+		await admin.visitSiteEditor( {
+			postId: id,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' unsaved' );
+		await page.reload();
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuidePage: false,
+		} );
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'Saved unsaved' );
 	} );
 } );

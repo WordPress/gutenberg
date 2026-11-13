@@ -8904,14 +8904,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/local-autosave-monitor/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/media-categories/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -10155,11 +10147,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/provider/test/use-autosave-notice.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/provider/test/use-network-reconnect.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -10170,17 +10157,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/provider/use-autosave-notice.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/provider/use-block-editor-settings.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/provider/use-entity-contains-snapshot.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

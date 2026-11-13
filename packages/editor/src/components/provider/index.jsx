@@ -20,7 +20,6 @@ import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
 import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
-import useAutosaveNotice from './use-autosave-notice';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -364,11 +363,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			// We only want to run setupEditor (with initialEdits) only once per post.
 			// A better solution in the future would be to split this effect into multiple ones.
 		}, [] );
-
-		// Manages the "more recent autosave" notice. Called after the mount
-		// effect above so that its own mount effect runs once `setupEditor`
-		// has populated the current post.
-		useAutosaveNotice( { post, recovery, settings } );
 
 		// Synchronizes the active post with the state
 		useEffect( () => {
