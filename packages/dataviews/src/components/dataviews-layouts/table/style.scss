@@ -330,8 +330,14 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 			mask-image: linear-gradient(to left, transparent, #000);
 		}
 
-		// The fade cell takes the place of the last column's end padding.
+		// The fade cell takes the place of the last column's end padding,
+		// except for the header button's own padding, which the other cells
+		// match so that end-aligned columns line up.
 		> :last-child {
+			padding-inline-end: var(--wpds-dimension-padding-sm);
+		}
+
+		> th:has(.dataviews-view-table-header-button):last-child {
 			padding-inline-end: 0;
 		}
 	}

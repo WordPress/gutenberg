@@ -1,8 +1,9 @@
 import { render } from 'vitest-browser-react';
 import { describe, expect, it } from 'vitest';
 import '@wordpress/theme/design-tokens.css';
+import '@wordpress/components/src/button/style.scss';
 import DataViews from '../index';
-import type { Action, Field, View } from '../../types';
+import type { Action, ColumnStyle, Field, View } from '../../types';
 import '../../style.scss';
 
 type Post = {
@@ -51,11 +52,13 @@ function PostsTable( {
 	width = 400,
 	dir = 'ltr',
 	density,
+	styles,
 }: {
 	withActions?: boolean;
 	width?: number;
 	dir?: 'ltr' | 'rtl';
 	density?: 'compact' | 'comfortable';
+	styles?: Record< string, ColumnStyle >;
 } ) {
 	const view: View = {
 		type: 'table',
@@ -63,7 +66,7 @@ function PostsTable( {
 		fields: [ 'author', 'status', 'categories', 'tags' ],
 		page: 1,
 		perPage: 10,
-		layout: { density },
+		layout: { density, styles },
 	};
 	return (
 		<div dir={ dir } style={ { width, height: 400 } }>
@@ -100,6 +103,12 @@ const getRows = () =>
 			'.dataviews-view-table tr'
 		)
 	);
+
+const getTextRight = ( element: Element ) => {
+	const range = document.createRange();
+	range.selectNodeContents( element );
+	return range.getBoundingClientRect().right;
+};
 
 function scrollToEnd() {
 	const container = getScrollContainer();
@@ -203,6 +212,29 @@ describe( 'DataViews table scroll fade', () => {
 				const rowBox = row.getBoundingClientRect();
 				const lastCell = row.lastElementChild!.getBoundingClientRect();
 				expect( rowBox.right - lastCell.right ).toBe( FADE_SIZE );
+			}
+		} );
+
+		it( 'aligns the header of an end-aligned last column with its cells', async () => {
+			await render(
+				<PostsTable
+					width={ 1600 }
+					styles={ { tags: { align: 'end' } } }
+				/>
+			);
+
+			const header = document.querySelector(
+				'thead th:last-child .dataviews-view-table-header-button'
+			)!;
+			const cells = document.querySelectorAll(
+				'tbody td:last-child .dataviews-view-table__cell-content-wrapper'
+			);
+			expect( cells.length ).toBeGreaterThan( 0 );
+			// The header button has a 1px border, as it had before the fade.
+			for ( const cell of cells ) {
+				expect(
+					Math.abs( getTextRight( cell ) - getTextRight( header ) )
+				).toBeLessThanOrEqual( 1 );
 			}
 		} );
 
