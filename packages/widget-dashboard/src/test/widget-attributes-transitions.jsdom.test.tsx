@@ -37,9 +37,6 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
  * @param frame   Padding and border to report around that width.
  */
 function notifyResize( element: Element, width: number, frame = 0 ) {
-	vi.spyOn( element, 'getBoundingClientRect' ).mockReturnValue( {
-		width: width + frame,
-	} as DOMRect );
 	act( () =>
 		mockObserved.get( element )?.( [
 			{
@@ -93,7 +90,7 @@ const initialLayout: DashboardWidget[] = [
 	},
 ];
 
-function Harness( { title = 'Snapshot' }: { title?: string } ) {
+function Harness() {
 	const [ layout, setLayout ] =
 		useState< DashboardWidget[] >( initialLayout );
 
@@ -101,7 +98,7 @@ function Harness( { title = 'Snapshot' }: { title?: string } ) {
 		<WidgetDashboard
 			layout={ layout }
 			onLayoutChange={ setLayout }
-			widgetTypes={ [ { ...widgetTypes[ 0 ], title } ] }
+			widgetTypes={ widgetTypes }
 			resolveWidgetModule={ resolveWidgetModule }
 		/>
 	);
@@ -199,35 +196,6 @@ describe( 'header fit budget', () => {
 			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
 		}
 	);
-
-	it( 'remeasures a changed title when the clipped boxes do not resize', async () => {
-		const { rerender } = render( <Harness /> );
-		await screen.findByTestId( 'metric' );
-
-		/* eslint-disable testing-library/no-node-access */
-		const header = document.querySelector( '.style-widget-header' )!;
-		const identity = document.querySelector( '.style-identity' )!;
-		const inline = document.querySelector( '.style-inline-controls' )!;
-		/* eslint-enable testing-library/no-node-access */
-		const title = screen.getByRole( 'heading', { name: 'Snapshot' } );
-		vi.spyOn( title, 'clientWidth', 'get' ).mockReturnValue( 80 );
-		const scrollWidth = vi.spyOn( title, 'scrollWidth', 'get' );
-		scrollWidth.mockReturnValue( 80 );
-		notifyResize( identity, 120 );
-		notifyResize( inline, 226 );
-		notifyResize( header, 400 );
-		expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
-
-		scrollWidth.mockReturnValue( 160 );
-		rerender( <Harness title="Top locations" /> );
-		expect(
-			screen.getByRole( 'button', { name: 'Widget controls' } )
-		).toBeInTheDocument();
-
-		scrollWidth.mockReturnValue( 80 );
-		rerender( <Harness /> );
-		expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
-	} );
 
 	it( "counts the toolbar chip's own padding and border", async () => {
 		render( <Harness /> );

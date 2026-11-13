@@ -3,6 +3,8 @@ import { useResizeObserver } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { useWidgetHeaderAvailableSize } from '../widget-header/widget-header-fit';
 
+// Spare room (px) the collapsed controls need before they expand again, so
+// a tile resized around the threshold cannot flip between presentations.
 const EXPAND_BUFFER = 16;
 
 interface InlineFitOptions {
