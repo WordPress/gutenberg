@@ -267,9 +267,9 @@ describe.each( [
 
 		await userEvent.hover( firstRadio );
 
-		const tooltip = await screen.findByRole( 'tooltip', {
-			name: 'Click for Delicious Gnocchi',
-		} );
+		const tooltip = await screen.findByText(
+			'Click for Delicious Gnocchi'
+		);
 
 		await waitFor( () => expect( tooltip ).toBeVisible() );
 
@@ -277,11 +277,11 @@ describe.each( [
 		await hoverOutside();
 
 		// Tooltip should hide
-		expect(
-			screen.queryByRole( 'tooltip', {
-				name: 'Click for Delicious Gnocchi',
-			} )
-		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.queryByText( 'Click for Delicious Gnocchi' )
+			).not.toBeInTheDocument()
+		);
 	} );
 
 	it( 'should not render tooltip', async () => {

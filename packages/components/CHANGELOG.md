@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `ToggleGroupControl`: Show option tooltips above `@wordpress/ui` overlays such as `Dialog` and `Popover`. Tooltips no longer have `role="tooltip"`, open after 600ms instead of 700ms, and do not open on touch devices. In apps that bundle `@wordpress/components` outside WordPress, rendering an option also moves `@wordpress/ui` overlays on the page into the compat overlay slot ([#86804](https://github.com/WordPress/gutenberg/pull/86804)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).

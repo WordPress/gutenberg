@@ -3,6 +3,7 @@ import type { ForwardedRef } from 'react';
 import * as Ariakit from '@ariakit/react';
 import { useInstanceId } from '@wordpress/compose';
 import { useLayoutEffect, useRef } from '@wordpress/element';
+import { Tooltip, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect, useContextSystem } from '../../context';
 import type {
@@ -11,14 +12,14 @@ import type {
 } from '../types';
 import { useToggleGroupControlContext } from '../context';
 import styles from './style.module.scss';
-import Tooltip from '../../tooltip';
 
 const WithToolTip = ( { showTooltip, text, children }: WithToolTipProps ) => {
 	if ( showTooltip && text ) {
 		return (
-			<Tooltip text={ text } placement="top">
-				{ children }
-			</Tooltip>
+			<Tooltip.Root>
+				<Tooltip.Trigger render={ children } />
+				<Tooltip.Popup>{ text }</Tooltip.Popup>
+			</Tooltip.Root>
 		);
 	}
 	return <>{ children }</>;
@@ -38,6 +39,8 @@ function ToggleGroupControlOptionBase(
 	>,
 	forwardedRef: ForwardedRef< any >
 ) {
+	useEnableWpCompatOverlaySlot();
+
 	const toggleGroupControlContext = useToggleGroupControlContext();
 
 	const id = useInstanceId(
