@@ -132,6 +132,14 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 
 		if ( $should_promote_auto_draft ) {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
+
+			if ( ! is_wp_error( $autosave_id ) ) {
+				$meta_update = $this->update_parent_post_meta( $post, $request );
+
+				if ( is_wp_error( $meta_update ) ) {
+					return $meta_update;
+				}
+			}
 		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
 			 * Nothing changed from the latest shared state, so storing a
@@ -160,6 +168,34 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$response = rest_ensure_response( $response );
 
 		return $response;
+	}
+
+	/**
+	 * Persists meta sent with an autosave to the parent post it updated.
+	 *
+	 * An autosave that updates the parent post directly writes the same post
+	 * a regular save writes, but core drops the request's meta in that case.
+	 * This stores the meta exactly as a regular save does: every key exposed
+	 * in the REST API, with the same validation and permission checks. RTC
+	 * relies on this to store the CRDT document in the same request as the
+	 * content it describes.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param WP_Post         $post    The parent post the autosave updated.
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return null|WP_Error Null on success, WP_Error if a meta value could not be stored.
+	 */
+	private function update_parent_post_meta( $post, $request ) {
+		$schema = $this->gutenberg_parent_controller->get_item_schema();
+
+		if ( empty( $schema['properties']['meta'] ) || ! isset( $request['meta'] ) ) {
+			return null;
+		}
+
+		$meta_fields = new WP_REST_Post_Meta_Fields( $post->post_type );
+
+		return $meta_fields->update_value( $request['meta'], $post->ID );
 	}
 
 	/**

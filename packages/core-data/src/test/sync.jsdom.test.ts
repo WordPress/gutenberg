@@ -423,6 +423,97 @@ describe( 'the default entity sync manager', () => {
 				expect( result ).toEqual( {
 					crdt_snapshot: 'ENCODED_SNAPSHOT',
 				} );
+				expect(
+					mockSyncManager.createPersistedCRDTDoc
+				).not.toHaveBeenCalled();
+			} );
+
+			it( 'sends the serialized CRDT document as meta with the autosave that promotes an auto-draft', async () => {
+				mockStore( { syncConfig: {} } );
+				const callOrder: string[] = [];
+				mockSyncManager.update.mockImplementation( () =>
+					callOrder.push( 'update' )
+				);
+				mockSyncManager.getEntitySnapshot.mockReturnValue(
+					'ENCODED_SNAPSHOT'
+				);
+				mockSyncManager.createPersistedCRDTDoc.mockImplementation(
+					async () => {
+						callOrder.push( 'document' );
+						return 'serialized-crdt-doc-data';
+					}
+				);
+
+				const result = await manager.beforeSave(
+					'postType',
+					'post',
+					10,
+					{
+						id: 10,
+						content: 'First autosaved content',
+						meta: { footnotes: '[]' },
+					},
+					{
+						persistedRecord: { id: 10, status: 'auto-draft' },
+						isAutosave: true,
+					}
+				);
+
+				expect(
+					mockSyncManager.createPersistedCRDTDoc
+				).toHaveBeenCalledWith( 'postType/post', 10 );
+				expect( callOrder ).toEqual( [ 'update', 'document' ] );
+				// The document joins the edited meta, as it does on a manual
+				// save, so the server persists it with the parent content.
+				expect( result ).toEqual( {
+					crdt_snapshot: 'ENCODED_SNAPSHOT',
+					meta: {
+						footnotes: '[]',
+						_crdt_document: 'serialized-crdt-doc-data',
+					},
+				} );
+			} );
+
+			it( 'does not send a CRDT document with a draft autosave or when none is created', async () => {
+				mockStore( { syncConfig: {} } );
+				mockSyncManager.getEntitySnapshot.mockReturnValue(
+					'ENCODED_SNAPSHOT'
+				);
+				mockSyncManager.createPersistedCRDTDoc.mockResolvedValue(
+					null
+				);
+
+				expect(
+					await manager.beforeSave(
+						'postType',
+						'post',
+						10,
+						{ id: 10 },
+						{
+							persistedRecord: { id: 10, status: 'draft' },
+							isAutosave: true,
+						}
+					)
+				).toEqual( { crdt_snapshot: 'ENCODED_SNAPSHOT' } );
+				expect(
+					mockSyncManager.createPersistedCRDTDoc
+				).not.toHaveBeenCalled();
+
+				expect(
+					await manager.beforeSave(
+						'postType',
+						'post',
+						10,
+						{ id: 10 },
+						{
+							persistedRecord: { id: 10, status: 'auto-draft' },
+							isAutosave: true,
+						}
+					)
+				).toEqual( { crdt_snapshot: 'ENCODED_SNAPSHOT' } );
+				expect(
+					mockSyncManager.createPersistedCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
 			} );
 
 			it( 'returns nothing when the entity has no snapshot or no sync config', async () => {

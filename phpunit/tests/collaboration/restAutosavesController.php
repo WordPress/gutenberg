@@ -30,6 +30,12 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 		wp_set_current_user( self::$author_id );
+
+		// The base test case unregisters all meta keys after each test, so
+		// the registration from the plugin's `init` hook only survives for
+		// the first test in a class. Register the CRDT document meta the way
+		// the plugin does so the response exposes it.
+		gutenberg_rest_api_crdt_post_meta();
 	}
 
 	public function tear_down() {
@@ -559,25 +565,170 @@ class Tests_Collaboration_RestAutosavesController extends WP_UnitTestCase {
 		$this->assertSame( '', get_post_meta( $autosave->ID, self::CRDT_DOC_META_KEY, true ) );
 	}
 
-	public function test_auto_draft_promotion_does_not_overwrite_crdt_doc_meta() {
-		$post_id       = $this->create_auto_draft();
-		$persisted_doc = 'persisted-auto-draft-crdt-doc';
-		$stale_doc     = 'stale-auto-draft-autosave-crdt-doc';
+	public function test_auto_draft_promotion_persists_the_crdt_document_on_the_parent_post() {
+		$post_id = $this->create_auto_draft();
+		$content = '<!-- wp:paragraph --><p>Promoted auto-draft content with CRDT document</p><!-- /wp:paragraph -->';
+		$doc     = '{"document":"AQEBAAA=","updateId":1}';
 
-		update_post_meta( $post_id, self::CRDT_DOC_META_KEY, $persisted_doc );
+		// The editor sends the document in `meta`, exactly as a manual save does.
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with CRDT document',
+			$content,
+			array(
+				self::CRDT_DOC_META_KEY => $doc,
+			),
+			'PROMOTION_SNAPSHOT'
+		);
+
+		$this->assertSame( 200, $response->get_status() );
+
+		$post = get_post( $post_id );
+		$this->assertSame( 'draft', $post->post_status );
+		$this->assertSame( $content, $post->post_content );
+		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
+
+		// The editor learns about the persisted document from the response.
+		$data = $response->get_data();
+		$this->assertSame( $doc, $data['meta'][ self::CRDT_DOC_META_KEY ] );
+	}
+
+	public function test_auto_draft_promotion_replaces_a_previously_persisted_crdt_document() {
+		$post_id = $this->create_auto_draft();
+		$doc     = '{"document":"AQEBAAA=","updateId":2}';
+
+		update_post_meta( $post_id, self::CRDT_DOC_META_KEY, 'older-auto-draft-crdt-doc' );
 
 		$response = $this->dispatch_autosave(
 			$post_id,
-			'RTC promoted auto-draft title with stale CRDT meta',
-			'<!-- wp:paragraph --><p>RTC promoted auto-draft content with stale CRDT meta</p><!-- /wp:paragraph -->',
+			'Promoted auto-draft title replacing CRDT document',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content replacing CRDT document</p><!-- /wp:paragraph -->',
 			array(
-				self::CRDT_DOC_META_KEY => $stale_doc,
+				self::CRDT_DOC_META_KEY => $doc,
 			)
 		);
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertSame( 'draft', get_post_status( $post_id ) );
-		$this->assertSame( $persisted_doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
+		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
+	}
+
+	public function test_auto_draft_promotion_persists_meta_exposed_in_the_rest_api() {
+		// The autosave that promotes an auto-draft writes the parent post, so
+		// it stores meta the way a regular save does. That covers every key
+		// exposed in the REST API, whether or not the key is revisioned.
+		$meta_key            = 'test_unrevisioned_meta';
+		$revisioned_meta_key = 'test_revisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'       => true,
+				'type'         => 'string',
+				'show_in_rest' => true,
+			)
+		);
+		register_post_meta(
+			'post',
+			$revisioned_meta_key,
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => true,
+				'revisions_enabled' => true,
+			)
+		);
+
+		$post_id = $this->create_auto_draft();
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key            => 'promoted meta value',
+				$revisioned_meta_key => 'promoted revisioned meta value',
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+		unregister_post_meta( 'post', $revisioned_meta_key );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( 'promoted meta value', get_post_meta( $post_id, $meta_key, true ) );
+		$this->assertSame( 'promoted revisioned meta value', get_post_meta( $post_id, $revisioned_meta_key, true ) );
+	}
+
+	public function test_auto_draft_promotion_ignores_meta_not_exposed_in_the_rest_api() {
+		// A regular save cannot write a key that is hidden from the REST API,
+		// so the promoting autosave cannot either, even for a revisioned key.
+		$meta_key = 'test_hidden_revisioned_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'            => true,
+				'type'              => 'string',
+				'show_in_rest'      => false,
+				'revisions_enabled' => true,
+			)
+		);
+
+		$post_id = $this->create_auto_draft();
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with hidden meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with hidden meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key => 'hidden meta value',
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
+	}
+
+	public function test_auto_draft_promotion_rejects_meta_the_user_cannot_edit_but_keeps_the_crdt_document() {
+		// A key the user may not edit fails as it does on a regular save. The
+		// other keys in the request are still stored, so the promoted post is
+		// never left with content but no CRDT document.
+		$meta_key = 'test_forbidden_meta';
+		register_post_meta(
+			'post',
+			$meta_key,
+			array(
+				'single'        => true,
+				'type'          => 'string',
+				'show_in_rest'  => true,
+				'auth_callback' => '__return_false',
+			)
+		);
+
+		$post_id = $this->create_auto_draft();
+		$doc     = '{"document":"AQEBAAA=","updateId":3}';
+
+		$response = $this->dispatch_autosave(
+			$post_id,
+			'Promoted auto-draft title with forbidden meta',
+			'<!-- wp:paragraph --><p>Promoted auto-draft content with forbidden meta</p><!-- /wp:paragraph -->',
+			array(
+				$meta_key               => 'forbidden meta value',
+				self::CRDT_DOC_META_KEY => $doc,
+			)
+		);
+
+		unregister_post_meta( 'post', $meta_key );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_cannot_update', $response->get_data()['code'] );
+		$this->assertSame( 'draft', get_post_status( $post_id ) );
+		$this->assertSame( '', get_post_meta( $post_id, $meta_key, true ) );
+		$this->assertSame( $doc, get_post_meta( $post_id, self::CRDT_DOC_META_KEY, true ) );
 	}
 
 	public function test_autosave_stores_the_crdt_snapshot_on_the_revision() {
