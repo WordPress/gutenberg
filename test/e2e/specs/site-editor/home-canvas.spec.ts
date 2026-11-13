@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 // Whether the run targets the extensible site editor (v2). Its navigation is a
@@ -5,6 +6,25 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 // screens with a back button, and its Pages list previews the first page of
 // the list rather than one the URL names.
 const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+/**
+ * Shows pages inside their template, as they are once "Show template" has been
+ * ticked for one.
+ *
+ * The choice is a preference of the `core` scope, which the `setPreferences()`
+ * util of the editor is not typed for.
+ *
+ * @param page The page of the test, with the site editor loaded.
+ */
+async function showPagesInsideTheirTemplate( page: Page ) {
+	await page.evaluate( () =>
+		window.wp.data
+			.dispatch( 'core/preferences' )
+			.set( 'core', 'renderingModes', {
+				emptytheme: { page: 'template-locked' },
+			} )
+	);
+}
 
 test.describe( 'Home canvas', () => {
 	let testPageId: number;
@@ -53,12 +73,8 @@ test.describe( 'Home canvas', () => {
 		editor,
 		page,
 	} ) => {
-		// Pages are shown inside their template, as they are once "Show
-		// template" has been ticked for one.
 		await admin.visitSiteEditor( { postType: 'page' } );
-		await editor.setPreferences( 'core', {
-			renderingModes: { emptytheme: { page: 'template-locked' } },
-		} );
+		await showPagesInsideTheirTemplate( page );
 
 		// The page in the canvas of the Pages list.
 		await admin.visitSiteEditor(
@@ -100,9 +116,7 @@ test.describe( 'Home canvas', () => {
 		page,
 	} ) => {
 		await admin.visitSiteEditor( { postType: 'page' } );
-		await editor.setPreferences( 'core', {
-			renderingModes: { emptytheme: { page: 'template-locked' } },
-		} );
+		await showPagesInsideTheirTemplate( page );
 		await admin.visitSiteEditor( {
 			postType: 'page',
 			postId: testPageId,
