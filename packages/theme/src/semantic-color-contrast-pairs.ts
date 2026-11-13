@@ -7,6 +7,20 @@
 export const MINIMUM_TEXT_CONTRAST = 4.5;
 
 export const SEMANTIC_COLOR_CONTRAST_PAIRS = [
+	...(
+		[
+			'background.surface.neutral',
+			'background.surface.neutral-strong',
+			'background.surface.neutral-weak',
+		] as const
+	 ).flatMap( ( background ) =>
+		(
+			[
+				'foreground.interactive.brand',
+				'foreground.interactive.brand-active',
+			] as const
+		 ).map( ( foreground ) => ( { background, foreground } ) )
+	),
 	{
 		background: 'background.interactive.neutral',
 		foreground: 'foreground.interactive.neutral',

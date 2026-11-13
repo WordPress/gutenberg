@@ -9,8 +9,10 @@ describe( 'accent focus contrast', () => {
 		[ '#1ae427', '#646c3e' ],
 		[ 'rgb(9.9% 9.9% 10.1%)', '#3858e9' ],
 		[ '#00ffff', '#ffffff' ],
+		[ '#13a586', '#3858e9' ],
+		[ '#330000', '#3858e9' ],
 	] )(
-		'keeps focus and both brand fills above 3:1 for background %s and primary %s',
+		'keeps brand focus, fills, and text accessible for background %s and primary %s',
 		( background, primary ) => {
 			const neutral = buildBgRamp( background );
 			const before = JSON.stringify( neutral );
@@ -29,6 +31,11 @@ describe( 'accent focus contrast', () => {
 					expect(
 						getContrast( ramp[ step ], surface )
 					).toBeGreaterThanOrEqual( 3 );
+				}
+				for ( const step of [ 'fgSurface3', 'fgSurface4' ] as const ) {
+					expect(
+						getContrast( ramp[ step ], surface )
+					).toBeGreaterThanOrEqual( 4.5 );
 				}
 			}
 			expect( warnings ).toBeUndefined();
