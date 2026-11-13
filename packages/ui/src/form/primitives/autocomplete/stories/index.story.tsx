@@ -277,9 +277,10 @@ export const AsyncItems: Story = {
 
 /**
  * The suggestion list can be rendered inline by enabling `inline` and `open`.
- * The list body's inline-end padding keeps the items clear of a classic
- * scrollbar, and `scrollbar-gutter: stable` prevents width changes when the
- * scrollbar appears or disappears.
+ *
+ * To keep the items clear of a classic scrollbar, give `Autocomplete.ListBody` an
+ * inline-end padding. Also set `scrollbar-gutter: stable` on it, so that the
+ * items keep their width when the scrollbar appears or disappears.
  */
 export const Inline: Story = {
 	parameters: {
