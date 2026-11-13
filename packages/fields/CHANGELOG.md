@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `MediaEdit`: Allow the media picker's closing animation to finish. ([#78029](https://github.com/WordPress/gutenberg/pull/78029))
+-   `MediaEdit`: Allow the media picker's closing animation to finish. ([#86822](https://github.com/WordPress/gutenberg/pull/86822))
 
 ### Internal
 
