@@ -124,7 +124,20 @@
 		padding: 4px;
 
 		&.is-pressed {
-			background: $gray-900;
+			background: var(--wpds-color-background-interactive-neutral-strong-active);
+
+			&:is(:disabled, [aria-disabled="true"]) {
+				background: var(--wpds-color-background-interactive-neutral-strong-disabled);
+			}
+
+			@media (forced-colors: active) {
+				background: SelectedItem !important;
+
+				&:disabled,
+				&[aria-disabled="true"] {
+					background: GrayText !important;
+				}
+			}
 		}
 
 		&:focus:not(:active) {

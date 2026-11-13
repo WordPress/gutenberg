@@ -350,9 +350,16 @@ function TableEdit( {
 		);
 	}
 
-	// Clear the selected cell when the block is deselected.
-	if ( ! isSingleSelected && selectedCell ) {
-		setSelectedCell();
+	// Clear the selected cell when the block is deselected. Only react to the
+	// block going from selected to deselected: a cell receives focus (and is
+	// set as the selected cell) before the block itself becomes selected.
+	const [ prevIsSingleSelected, setPrevIsSingleSelected ] =
+		useState( isSingleSelected );
+	if ( isSingleSelected !== prevIsSingleSelected ) {
+		setPrevIsSingleSelected( isSingleSelected );
+		if ( ! isSingleSelected ) {
+			setSelectedCell();
+		}
 	}
 
 	useEffect( () => {

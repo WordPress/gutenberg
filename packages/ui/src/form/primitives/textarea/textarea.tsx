@@ -1,23 +1,21 @@
-import { mergeProps } from '@base-ui/react';
+import { useRender } from '@base-ui/react';
 import clsx from 'clsx';
-import { cloneElement, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import styles from './style.module.css';
 import type { TextareaProps } from './types';
 import { Input } from '../input';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 
-const wrappedRender = (
-	render: NonNullable< TextareaProps[ 'render' ] >,
-	restProps: TextareaProps & { ref: React.Ref< HTMLTextAreaElement > }
-) => {
-	return function textareaRender(
-		props: React.HTMLAttributes< HTMLTextAreaElement >
-	) {
-		return typeof render === 'function'
-			? render( mergeProps( props, restProps ) )
-			: cloneElement( render, mergeProps( props, restProps ) );
-	};
-};
+const TextareaElement = forwardRef< HTMLTextAreaElement, TextareaProps >(
+	function UnforwardedTextareaElement( { render, ...props }, ref ) {
+		return useRender( {
+			render,
+			defaultTagName: 'textarea',
+			ref,
+			props,
+		} );
+	}
+);
 
 /**
  * A low-level primitive for a textarea field.
@@ -41,20 +39,20 @@ export const Textarea = forwardRef< HTMLTextAreaElement, TextareaProps >(
 	) {
 		return (
 			<Input
+				ref={ ref }
 				className={ clsx( styles.wrapper, className ) }
 				style={ style }
-				render={ wrappedRender(
-					render || ( ( props ) => <textarea { ...props } /> ),
-					{
-						className: clsx(
+				render={
+					<TextareaElement
+						className={ clsx(
 							defenseStyles.textarea,
 							styles.textarea
-						),
-						ref,
-						rows,
-						...restProps,
-					}
-				) }
+						) }
+						rows={ rows }
+						{ ...restProps }
+						render={ render }
+					/>
+				}
 				value={ value }
 				defaultValue={ defaultValue }
 				onValueChange={ onValueChange }

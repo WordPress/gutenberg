@@ -81,11 +81,10 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/views": "file:../views",
 		"@wordpress/widgets": "file:../widgets",
-		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

@@ -13,7 +13,6 @@
 	"Autocomplete.Root>Autocomplete.List",
 	"Autocomplete.Root>Autocomplete.List:children",
 	"Autocomplete.Root>Autocomplete.ListBody:children",
-	"Autocomplete.Root>Autocomplete.Popup",
 	"Autocomplete.Root>Autocomplete.Popup:children",
 	"Autocomplete.Root>Autocomplete.Row:children",
 	"Autocomplete.Root>Autocomplete.Status:children",
