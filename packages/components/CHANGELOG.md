@@ -35,6 +35,7 @@
 -   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
+-   `ColorPalette`: Preserve swatch identity across index changes and refresh Composite keyboard navigation after reordering ([#86776](https://github.com/WordPress/gutenberg/pull/86776)).
 
 ### Internal
 
