@@ -86,6 +86,29 @@ $revision-code-diff-marker-width: 3ch;
 	}
 }
 
+// Use a stronger tint for word-level changes than for the surrounding line.
+.editor-revisions-code-diff__segment {
+	&.is-added {
+		background: rgba($revision-diff-added-color, 0.3);
+	}
+
+	&.is-removed {
+		background: rgba($revision-diff-removed-color, 0.3);
+	}
+
+	// Forced colors replace both background tints, so use text decoration to
+	// keep word-level changes visible.
+	@media (forced-colors: active) {
+		&.is-added {
+			text-decoration: underline;
+		}
+
+		&.is-removed {
+			text-decoration: line-through;
+		}
+	}
+}
+
 .editor-revisions-code-diff__line-number,
 .editor-revisions-code-diff__marker {
 	position: sticky;
