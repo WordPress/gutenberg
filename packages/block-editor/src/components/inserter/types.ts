@@ -175,6 +175,8 @@ export interface PatternsFilterProps {
 	patternAuthorFilter: string;
 	scrollContainerRef: PatternsScrollContainerRef;
 	category: PatternCategory;
+	siteHasDirectoryPatterns: boolean;
+	categorySources: Set< string >;
 }
 
 export interface PatternsExplorerProps {
