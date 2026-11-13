@@ -374,6 +374,8 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			// The post meta endpoint updates only keys included in the request.
+			partialEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				// A fetched title is an object, an edited one a string.
