@@ -1,6 +1,7 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
+import type { DataFormControlProps } from '@wordpress/dataviews';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useState } from '@wordpress/element';
 import type {
@@ -95,7 +96,8 @@ describe( 'WidgetAttributes fit', () => {
 	beforeEach( () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: false,
+			selectMeasureRef: () => {},
+			presentation: 'inline',
 		} );
 	} );
 
@@ -121,7 +123,8 @@ describe( 'WidgetAttributes fit', () => {
 	it( 'collapses the fields into a dropdown when space runs out', async () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: true,
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
 		} );
 		const user = userEvent.setup();
 		render( <Harness /> );
@@ -160,7 +163,8 @@ describe( 'WidgetAttributes fit', () => {
 	it( 'stages edits made from the dropdown form', async () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: true,
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
 		} );
 		const user = userEvent.setup();
 		render( <Harness /> );
@@ -184,7 +188,8 @@ describe( 'WidgetAttributes fit', () => {
 	it( 'dismisses the dropdown with Escape and restores focus', async () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: true,
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
 		} );
 		const user = userEvent.setup();
 		render( <Harness /> );
@@ -211,7 +216,8 @@ describe( 'WidgetAttributes fit', () => {
 	it( 'locks the fit while the dropdown is open', async () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: true,
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
 		} );
 		const user = userEvent.setup();
 		render( <Harness /> );
@@ -268,7 +274,8 @@ describe( 'WidgetAttributes fit', () => {
 	it( 'keeps the settings surface reachable while collapsed', async () => {
 		mockedUseInlineFit.mockReturnValue( {
 			measureRef: () => {},
-			collapsed: true,
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
 		} );
 		const user = userEvent.setup();
 		render( <Harness /> );
@@ -281,5 +288,85 @@ describe( 'WidgetAttributes fit', () => {
 		expect(
 			await screen.findByRole( 'dialog', { name: 'Snapshot settings' } )
 		).toBeInTheDocument();
+	} );
+} );
+
+describe( 'WidgetAttributes Edit surface', () => {
+	// An in-process widget type's component `Edit` reads where it renders.
+	function SurfaceEdit( props: DataFormControlProps< unknown > ) {
+		const { surface } = props as { surface?: string };
+		return <span data-testid="surface">{ surface ?? 'none' }</span>;
+	}
+
+	const surfaceTypes: WidgetType[] = [
+		{
+			apiVersion: 1,
+			name: 'test/surface',
+			title: 'Surface',
+			renderModule: 'snapshot-module',
+			attributes: [
+				{
+					id: 'metric',
+					label: 'Metric',
+					type: 'text',
+					relevance: 'high',
+					Edit: SurfaceEdit,
+				},
+			],
+		},
+	];
+
+	function SurfaceHarness() {
+		const [ layout, setLayout ] = useState< DashboardWidget[] >( [
+			{
+				uuid: 'w1',
+				type: 'test/surface',
+				attributes: { metric: 'views' },
+				placement: { width: 1, height: 1 },
+			},
+		] );
+
+		return (
+			<WidgetDashboard
+				layout={ layout }
+				onLayoutChange={ setLayout }
+				widgetTypes={ surfaceTypes }
+				resolveWidgetModule={ resolveWidgetModule }
+			/>
+		);
+	}
+
+	it( 'tells the Edit control it renders in the header', async () => {
+		mockedUseInlineFit.mockReturnValue( {
+			measureRef: () => {},
+			selectMeasureRef: () => {},
+			presentation: 'inline',
+		} );
+		render( <SurfaceHarness /> );
+
+		expect( await screen.findByTestId( 'surface' ) ).toHaveTextContent(
+			'header'
+		);
+	} );
+
+	it( 'tells the Edit control it renders in the dropdown', async () => {
+		mockedUseInlineFit.mockReturnValue( {
+			measureRef: () => {},
+			selectMeasureRef: () => {},
+			presentation: 'dropdown',
+		} );
+		const user = userEvent.setup();
+		render( <SurfaceHarness /> );
+
+		await user.click(
+			await screen.findByRole( 'button', { name: 'Widget controls' } )
+		);
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Widget controls',
+		} );
+
+		expect( within( dialog ).getByTestId( 'surface' ) ).toHaveTextContent(
+			'dropdown'
+		);
 	} );
 } );

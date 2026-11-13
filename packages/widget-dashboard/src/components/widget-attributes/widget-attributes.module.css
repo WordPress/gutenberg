@@ -2,6 +2,12 @@
 	flex-shrink: 0;
 }
 
+/* Measured at its natural width, like the inline controls it replaces. */
+.select-area {
+	display: inline-flex;
+	flex-shrink: 0;
+}
+
 .persistent-controls {
 	display: inline-flex;
 }

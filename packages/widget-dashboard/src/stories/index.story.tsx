@@ -686,7 +686,7 @@ export const InlineControlsFit: StoryObj = {
 	parameters: {
 		docs: {
 			description: {
-				story: 'Drag the bottom-right corner to resize the tile in both directions. The three-option toggle collapses before the title clips and returns with spare room. At narrow widths, the collapsed header still truncates the title.',
+				story: 'Drag the bottom-right corner to resize the tile in both directions. The three-option toggle collapses to a select holding the same options before the title clips, and returns with spare room. Narrower still, the select gives way to the "Widget controls" button. At narrow widths, the collapsed header still truncates the title.',
 			},
 		},
 	},

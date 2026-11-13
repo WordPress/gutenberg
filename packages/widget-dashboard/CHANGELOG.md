@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Widget header: a single high-relevance field with a fixed set of options (such as a toggle group or radio control) now collapses to one select holding those options when its inline control no longer fits. It falls back to the "Widget controls" button only when the select does not fit either.
+-   Widget header: a component `Edit` declared by an in-process widget type now receives a `surface` prop, `'header'` inline or `'dropdown'` in the "Widget controls" popover.
+
 ### Bug Fixes
 
 -   Widget header: collapse focused inline controls when they no longer fit, moving focus to the "Widget controls" button, so they are no longer clipped at the tile edge.
