@@ -1,4 +1,10 @@
-import { useMemo, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
 import { Text } from '@wordpress/ui';
@@ -16,7 +22,7 @@ import {
 	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
 import type { BlockPattern } from '../../../store/types';
-import type { PatternListProps } from '../types';
+import type { InsertPattern, PatternListProps } from '../types';
 
 function PatternList( {
 	searchValue,
@@ -31,9 +37,19 @@ function PatternList( {
 		rootClientId,
 		shouldFocusBlock: true,
 	} );
+	const onInsertPattern: InsertPattern = useCallback(
+		( blocks, patternName, shouldForceFocusBlock, _rootClientId ) => {
+			onInsertBlocks(
+				blocks,
+				{ patternName },
+				shouldForceFocusBlock,
+				_rootClientId
+			);
+		},
+		[ onInsertBlocks ]
+	);
 	const [ patterns, , onClickPattern ] = usePatternsState(
-		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
-		onInsertBlocks,
+		onInsertPattern,
 		destinationRootClientId,
 		selectedCategory
 	);
