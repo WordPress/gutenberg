@@ -33,6 +33,10 @@ Renders notice lists for notices with type `default`:
 
 `children` are rendered inside the dismissible list.
 
+Keep `InlineNotices` mounted when there are no notices. It announces added and changed messages. Replacing a notice with the same ID and message repeats the announcement. An identical replacement keeps focus and open details. Notices present on mount and notices created with `speak: false` stay silent. Errors are announced assertively and other notices politely.
+
+Child notices built with the same version of `@wordpress/ui` as `InlineNotices` share its `Notice.List` announcements. If your plugin bundles a different version, verify that the list announces your child notice before removing a separate `speak()` call.
+
 _Props_
 
 - `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.

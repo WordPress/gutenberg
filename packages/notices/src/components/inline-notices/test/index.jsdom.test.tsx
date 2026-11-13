@@ -1,11 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
+import { Modal } from '@wordpress/components';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
 
 function getInlineNoticesWrapper( container: HTMLElement ) {
-	return container.firstChild as HTMLElement;
+	return container.querySelector< HTMLElement >(
+		'.notices-inline-notices-wrapper'
+	)!;
 }
 
 function renderInlineNotices( props = {} ) {
@@ -22,28 +25,30 @@ function renderInlineNotices( props = {} ) {
 }
 
 describe( 'InlineNotices', () => {
-	it( 'should return null when there are no notices and no children', () => {
+	it( 'keeps empty announcement regions without a visible wrapper when there are no notices', () => {
 		const { container } = renderInlineNotices();
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
+		expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 	} );
 
-	it( 'should return null when children is false and there are no notices', () => {
+	it( 'omits the visible wrapper when children is false and there are no notices', () => {
 		const { container } = renderInlineNotices( {
 			children: false,
 		} );
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
 	} );
 
-	it( 'should return null when every one of several children renders nothing', () => {
+	it( 'omits the visible wrapper when every child renders nothing', () => {
 		// More than one child arrives as an array, which is itself neither
 		// `false` nor empty, so the array is what has to be looked through.
 		const { container } = renderInlineNotices( {
 			children: [ false, null, undefined, '' ],
 		} );
 
-		expect( container ).toBeEmptyDOMElement();
+		expect( getInlineNoticesWrapper( container ) ).toBeNull();
 	} );
 
 	it( 'should render when one of several children renders something', () => {
@@ -168,5 +173,156 @@ describe( 'InlineNotices', () => {
 		expect(
 			within( dismissible ).getByText( 'Extra notice' )
 		).toBeInTheDocument();
+	} );
+
+	describe( 'announcements', () => {
+		it( 'announces only the error message while a modal is open', async () => {
+			const { registry, rerender } = renderInlineNotices();
+			rerender(
+				<RegistryProvider value={ registry }>
+					<InlineNotices />
+					<Modal
+						title="Keyboard shortcuts"
+						onRequestClose={ () => {} }
+					>
+						Shortcuts
+					</Modal>
+				</RegistryProvider>
+			);
+			expect(
+				screen.getByRole( 'dialog', { name: 'Keyboard shortcuts' } )
+			).toBeInTheDocument();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice( 'Autosave failed.', {
+						details: 'Technical details.',
+						actions: [ { label: 'Retry autosave', onClick() {} } ],
+					} );
+			} );
+
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Autosave failed\.$/
+			);
+			expect(
+				screen.queryByRole( 'button', { name: 'Retry autosave' } )
+			).not.toBeInTheDocument();
+			for ( const status of screen.getAllByRole( 'status' ) ) {
+				expect( status ).toBeEmptyDOMElement();
+			}
+		} );
+
+		it( 'announces non-error notices politely', async () => {
+			const { registry } = renderInlineNotices();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'success', 'Draft saved.' );
+			} );
+
+			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+				'Draft saved.'
+			);
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		} );
+
+		it( 'keeps speak:false notices silent', async () => {
+			const { registry } = renderInlineNotices();
+
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						speak: false,
+					} );
+			} );
+
+			expect(
+				screen.getByText( 'Updating failed.' )
+			).toBeInTheDocument();
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+		} );
+
+		it.each( [
+			[ 'added', undefined, 'Technical details.' ],
+			[ 'removed', 'Technical details.', undefined ],
+		] )(
+			'announces an identical replacement once when details are %s',
+			async ( _, previousDetails, details ) => {
+				const registry = createRegistry();
+				registry.register( noticesStore );
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+						details: previousDetails,
+					} );
+				render(
+					<RegistryProvider value={ registry }>
+						<InlineNotices />
+					</RegistryProvider>
+				);
+				expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+
+				await act( async () => {
+					registry
+						.dispatch( noticesStore )
+						.createNotice( 'error', 'Updating failed.', {
+							id: 'editor-save',
+							details,
+						} );
+				} );
+
+				expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+					/^Updating failed\.$/
+				);
+			}
+		);
+
+		it( 'keeps a replacement created with speak:false silent', async () => {
+			const { registry } = renderInlineNotices();
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+					} );
+			} );
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Updating failed.', {
+						id: 'editor-save',
+						speak: false,
+					} );
+			} );
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+		} );
+
+		it( 'announces an urgency change through the list without an extra announcement', async () => {
+			const { registry } = renderInlineNotices();
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'info', 'Connection lost.', {
+						id: 'connection',
+					} );
+			} );
+			await act( async () => {
+				registry
+					.dispatch( noticesStore )
+					.createNotice( 'error', 'Connection lost.', {
+						id: 'connection',
+					} );
+			} );
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Connection lost\.$/
+			);
+			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+		} );
 	} );
 } );

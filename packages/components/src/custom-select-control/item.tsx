@@ -2,7 +2,7 @@ import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
-import type { CustomSelectItemProps } from './types';
+import type { CustomSelectItemProps } from './internal-types';
 import type { WordPressComponentProps } from '../context';
 import styles from './style.module.scss';
 import { CustomSelectContext } from './custom-select';
@@ -19,7 +19,6 @@ export function CustomSelectItem( {
 			store={ customSelectContext?.store }
 			{ ...props }
 			className={ clsx( styles.item, className, {
-				[ styles[ 'is-compact' ] ]: size === 'compact',
 				[ styles[ 'is-small' ] ]: size === 'small',
 			} ) }
 		>
@@ -31,6 +30,6 @@ export function CustomSelectItem( {
 	);
 }
 
-CustomSelectItem.displayName = 'CustomSelectControlV2.Item';
+CustomSelectItem.displayName = 'CustomSelectControl.Item';
 
 export default CustomSelectItem;

@@ -1,6 +1,6 @@
 == Changelog ==
 
-= 24.4.0-rc.1 =
+= 24.4.0 =
 
 ## Changelog
 
@@ -308,11 +308,10 @@
 The following PRs were merged by first-time contributors:
 
 - @justlevine: Add PHPStan static analysis at rule level 5. ([66693](https://github.com/WordPress/gutenberg/pull/66693))
-- @lucatume: iOS tests: De-flake the selection handle test. ([85461](https://github.com/WordPress/gutenberg/pull/85461))
+- @lucatume: Stabilize web-editor selection tests in iOS Safari. ([85461](https://github.com/WordPress/gutenberg/pull/85461))
 - @mattmiklic: Theme: Update Figma border import documentation. ([85304](https://github.com/WordPress/gutenberg/pull/85304))
 - @RajkiranBagal: DataViews: Use a page number input in the footer pagination above 100 pages. ([85303](https://github.com/WordPress/gutenberg/pull/85303))
 - @theritiktiwari: Fix typo in .gitignore comment about re-included .cache paths. ([85375](https://github.com/WordPress/gutenberg/pull/85375))
-
 
 ## Contributors
 
