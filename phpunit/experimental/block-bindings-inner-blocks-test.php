@@ -39,6 +39,7 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function tear_down() {
+		unset( $GLOBALS['gutenberg_block_bindings_rendering_inner_blocks'], $GLOBALS['gutenberg_block_bindings_inner_blocks_budget_spent'] );
 		unregister_block_bindings_source( self::SOURCE );
 		parent::tear_down();
 	}
