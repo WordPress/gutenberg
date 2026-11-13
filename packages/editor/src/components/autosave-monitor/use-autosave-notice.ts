@@ -165,21 +165,23 @@ function showBrowserBackupNotice(
  * @param props            Hook props.
  * @param props.postType   The post type.
  * @param props.postId     The post ID.
- * @param props.isNew      Whether the post is new.
  * @param [props.autosave] The `autosave` editor setting.
  */
 export default function useAutosaveNotice( {
 	postType,
 	postId,
-	isNew,
 	autosave,
 }: {
 	postType: string;
 	postId: number | string;
-	isNew: boolean;
 	autosave?: Autosave;
 } ) {
 	const registry = useRegistry();
+	// Read once: the first save of a new post moves it off the `auto-draft`
+	// key, but the backup was read under the key it had on mount.
+	const [ isNew ] = useState( () =>
+		registry.select( editorStore ).isEditedPostNew()
+	);
 	const [ backup ] = useState(
 		() => getBrowserBackup( postId, isNew ) as BrowserBackup | null
 	);
@@ -234,10 +236,13 @@ export default function useAutosaveNotice( {
 			};
 		}
 		return undefined;
-
-		// Each snapshot status settles at most once, so a notice is created
-		// at most once. The values read on mount are used on purpose: the
-		// backup was read under the key the post had then.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ backupStatus, autosaveStatus ] );
+	}, [
+		registry,
+		postId,
+		isNew,
+		backup,
+		autosave,
+		backupStatus,
+		autosaveStatus,
+	] );
 }

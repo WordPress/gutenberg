@@ -32,18 +32,13 @@ function Editor( {
 	extraSidebarPanels,
 	...props
 } ) {
-	// The `autosave` setting describes the post the page loaded, as it was
-	// then, so it is offered only until the editor moves to another post.
+	// Temporary: the `autosave` setting doesn't name its post, so it is
+	// offered only for the post the page loaded. Coming back to that post
+	// offers it again, like a reload, even if the post was saved since.
 	const postKey = `${ postType }-${ postId }`;
 	const [ loadedPostKey ] = useState( postKey );
-	const [ hasLeftLoadedPost, setHasLeftLoadedPost ] = useState( false );
-	if ( postKey !== loadedPostKey && ! hasLeftLoadedPost ) {
-		setHasLeftLoadedPost( true );
-	}
 	const loadedPostAutosave =
-		postKey === loadedPostKey && ! hasLeftLoadedPost
-			? settings.autosave
-			: undefined;
+		postKey === loadedPostKey ? settings.autosave : undefined;
 
 	const {
 		post,
@@ -137,7 +132,6 @@ function Editor( {
 					<Autosave
 						postType={ post.type }
 						postId={ post.id }
-						isNew={ post.status === 'auto-draft' }
 						autosave={ loadedPostAutosave }
 					/>
 					<Sidebar
