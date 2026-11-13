@@ -280,6 +280,10 @@ _Warning_: This property is still experimental. “Experimental” means this is
 -   Required: No
 -   Default: `false`
 
+## WordPress UI compatibility
+
+`Modal.supportsUiOverlays === true` identifies an implementation that renders inside its owning WordPress UI portal. Check this capability before choosing a UI host when Components is supplied by an independently updated WordPress runtime. It describes this component copy only; it does not establish compatibility for custom controls that bundle another implementation.
+
 ## Related components
 
 -   To notify a user with a message of medium importance, use `Notice`.

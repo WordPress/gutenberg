@@ -1,6 +1,6 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import { forwardRef } from '@wordpress/element';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { useWpCompatOverlayContainer } from '../utils/use-wp-compat-overlay-container';
 import type { PortalProps } from './types';
 
 /**
@@ -10,14 +10,17 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function MenuPortal(
 	{ container, ...props },
 	ref
 ) {
+	const portal = useWpCompatOverlayContainer( container );
 	return (
-		<_Menu.Portal
-			ref={ ref }
-			container={
-				container === undefined ? getWpCompatOverlaySlot() : container
-			}
-			{ ...props }
-		/>
+		<>
+			<span hidden ref={ portal.setSource } />
+			<_Menu.Portal
+				ref={ ref }
+				data-wp-ui-overlay-portal=""
+				container={ portal.container }
+				{ ...props }
+			/>
+		</>
 	);
 } );
 

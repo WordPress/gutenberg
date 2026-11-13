@@ -89,6 +89,20 @@ function App() {
 
 This opts the app into a shared body-level overlay container so `@wordpress/ui` overlays reliably stack above `@wordpress/components` overlays. The opt-in is one-way and idempotent. It is shared across React roots and `@wordpress/ui` package copies in the same window and remains enabled after the calling component unmounts. Explicit portal containers still take precedence. It is not needed in standard WordPress editor screens, where the slot auto-enables based on `window.wp.components`.
 
+Nested UI overlays use their owning overlay's portal by default. This preserves focus and accessibility isolation, including when several overlays open together. An explicit `container` still takes precedence, and `container={ null }` still delays rendering.
+
+For a legacy overlay with its own portal implementation, `getWpCompatOverlayContainer( element )` returns the owning compatibility portal for a source element rendered inside it. UI overlays and updated Components Modals provide that ownership boundary. It returns `undefined` outside an owning overlay, so the legacy overlay can keep its usual destination. Resolve the source from the overlay's place in the DOM rather than assuming its opening control has focus. The lookup works across package copies and React roots without sharing React context. Explicit slot and container choices still take precedence; their host must place them inside its active overlay.
+
+```tsx
+import { getWpCompatOverlayContainer } from '@wordpress/ui';
+
+const container = getWpCompatOverlayContainer( sourceElement );
+```
+
+This helper does not update older legacy implementations. When independently bundled packages or older WordPress versions supply the legacy overlays, verify their portal integration before migrating the containing overlay. See [Testing published packages across WordPress versions](../../docs/contributors/code/package-runtime-compatibility.md).
+
+Updated Components implementations expose `Modal.supportsUiOverlays` and `Popover.supportsUiOverlays`. Check each required primitive with `=== true` before choosing a UI host when Components comes from an independently updated runtime. These capabilities describe the checked copy only. They do not establish compatibility for custom content that bundles another copy, so retain a legacy host for unverified external controls.
+
 ## Usage
 
 ### Component names

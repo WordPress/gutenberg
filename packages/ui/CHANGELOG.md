@@ -9,6 +9,8 @@
 
 ### New Features
 
+-   Add `getWpCompatOverlayContainer` to resolve the owning UI portal for a legacy overlay across package copies and React roots.
+
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
@@ -26,6 +28,8 @@
 -   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
 
 ### Bug Fixes
+
+-   Keep nested overlay portals within their owning portal by default, including initially open overlays. Preserve explicit container overrides.
 
 -   `Breadcrumb`: Keep committed navigation items when the overflow trigger receives focus during a suspended update ([#86746](https://github.com/WordPress/gutenberg/pull/86746)).
 -   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column ([#86652](https://github.com/WordPress/gutenberg/pull/86652)).
