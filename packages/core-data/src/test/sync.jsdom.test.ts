@@ -82,6 +82,10 @@ vi.mock( import( '../utils/save-crdt-doc' ), () => ( {
 	saveCRDTDoc: mockSaveCRDTDoc,
 } ) );
 
+vi.mock( import( '../utils/crdt-edit-batch' ), () => ( {
+	applyEditBatchToCRDTDoc: vi.fn(),
+} ) );
+
 vi.mock( import( '../utils/crdt-selection' ), () => ( {
 	getSelectionHistory: vi.fn(),
 	restoreSelection: vi.fn(),
@@ -203,16 +207,17 @@ describe( 'the default entity sync manager', () => {
 
 			mockStore( {} );
 			expect( manager.shouldSync( 'postType', 'post', 1 ) ).toBe( false );
-			manager.update(
-				'postType',
-				'post',
-				1,
-				{ title: 'x' },
-				{
-					isCached: false,
-					undoIgnore: false,
-				}
-			);
+			manager.applyEditBatch( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: '',
+						value: 'x',
+					},
+				],
+				options: { isCached: false, undoIgnore: false },
+			} );
 			manager.unload( 'postType', 'post', 1 );
 			expect( mockSyncManager.update ).not.toHaveBeenCalled();
 			expect( mockSyncManager.unload ).not.toHaveBeenCalled();
@@ -232,7 +237,10 @@ describe( 'the default entity sync manager', () => {
 			manager.load( 'postType', 'post', 1, record, handlers );
 
 			expect( mockSyncManager.load ).toHaveBeenCalledWith(
-				syncConfig,
+				{
+					...syncConfig,
+					applyChangesToCRDTDoc: expect.any( Function ),
+				},
 				'postType/post',
 				1,
 				record,
@@ -340,50 +348,153 @@ describe( 'the default entity sync manager', () => {
 			} );
 		} );
 
+		it( 'keeps an intent batch queued until the Yjs transaction applies it', async () => {
+			const { applyEditBatchToCRDTDoc } =
+				await import( '../utils/crdt-edit-batch' );
+			const syncConfig = { applyChangesToCRDTDoc: vi.fn() };
+			mockStore( { syncConfig } );
+			manager.load(
+				'postType',
+				'post',
+				1,
+				{ id: 1 },
+				{
+					editRecord: vi.fn(),
+					getEditedRecord: vi.fn(),
+					refetchRecord: vi.fn(),
+					onUndoLevelOpened: vi.fn(),
+				}
+			);
+			const batch = {
+				operations: [
+					{
+						type: 'move' as const,
+						clientId: 'a',
+						parent: null,
+						before: 'b',
+					},
+				],
+				options: { isCached: false, undoIgnore: false },
+			};
+			manager.applyEditBatch( 'postType', 'post', 1, batch );
+			expect( applyEditBatchToCRDTDoc ).not.toHaveBeenCalled();
+			const queuedChanges = mockSyncManager.update.mock.calls[ 0 ][ 2 ];
+			const loadedConfig = mockSyncManager.load.mock.calls[ 0 ][ 0 ];
+			const doc = {} as Parameters< typeof applyEditBatchToCRDTDoc >[ 0 ];
+			loadedConfig.applyChangesToCRDTDoc( doc, queuedChanges );
+			expect( applyEditBatchToCRDTDoc ).toHaveBeenCalledExactlyOnceWith(
+				doc,
+				batch,
+				syncConfig
+			);
+			expect( syncConfig.applyChangesToCRDTDoc ).not.toHaveBeenCalled();
+			// Load and save reconciliation still use the configured snapshot mapper.
+			loadedConfig.applyChangesToCRDTDoc( doc, {
+				title: 'Server value',
+			} );
+			expect(
+				syncConfig.applyChangesToCRDTDoc
+			).toHaveBeenCalledExactlyOnceWith( doc, { title: 'Server value' } );
+		} );
+
 		it( 'maps the edit intent to origins and undo levels', () => {
 			mockStore( { syncConfig: {} } );
 
-			manager.update(
-				'postType',
-				'post',
-				1,
-				{ title: 'a' },
-				{ isCached: false, undoIgnore: false }
-			);
-			manager.update(
-				'postType',
-				'post',
-				1,
-				{ title: 'b' },
-				{ isCached: true, undoIgnore: false }
-			);
-			manager.update(
-				'postType',
-				'post',
-				1,
-				{ title: 'c' },
-				{ isCached: false, undoIgnore: true }
-			);
+			manager.applyEditBatch( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: '',
+						value: 'a',
+					},
+				],
+				options: { isCached: false, undoIgnore: false },
+			} );
+			manager.applyEditBatch( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: '',
+						value: 'b',
+					},
+				],
+				options: { isCached: true, undoIgnore: false },
+			} );
+			manager.applyEditBatch( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: '',
+						value: 'c',
+					},
+				],
+				options: { isCached: false, undoIgnore: true },
+			} );
 
 			expect( mockSyncManager.update.mock.calls ).toEqual( [
 				[
 					'postType/post',
 					1,
-					{ title: 'a' },
+					{
+						[ Object.getOwnPropertySymbols(
+							mockSyncManager.update.mock.calls[ 0 ][ 2 ]
+						)[ 0 ] ]: {
+							operations: [
+								{
+									type: 'set-field',
+									field: 'title',
+									previousValue: '',
+									value: 'a',
+								},
+							],
+							options: { isCached: false, undoIgnore: false },
+						},
+					},
 					'local-editor',
 					{ isNewUndoLevel: true },
 				],
 				[
 					'postType/post',
 					1,
-					{ title: 'b' },
+					{
+						[ Object.getOwnPropertySymbols(
+							mockSyncManager.update.mock.calls[ 0 ][ 2 ]
+						)[ 0 ] ]: {
+							operations: [
+								{
+									type: 'set-field',
+									field: 'title',
+									previousValue: '',
+									value: 'b',
+								},
+							],
+							options: { isCached: true, undoIgnore: false },
+						},
+					},
 					'local-editor',
 					{ isNewUndoLevel: false },
 				],
 				[
 					'postType/post',
 					1,
-					{ title: 'c' },
+					{
+						[ Object.getOwnPropertySymbols(
+							mockSyncManager.update.mock.calls[ 0 ][ 2 ]
+						)[ 0 ] ]: {
+							operations: [
+								{
+									type: 'set-field',
+									field: 'title',
+									previousValue: '',
+									value: 'c',
+								},
+							],
+							options: { isCached: false, undoIgnore: true },
+						},
+					},
 					'local-undo-ignored',
 					{ isNewUndoLevel: false },
 				],

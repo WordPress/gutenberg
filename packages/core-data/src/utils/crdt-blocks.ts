@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { getBlockTypes } from '@wordpress/blocks';
+import type { BlockOperation } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { Y } from '@wordpress/sync';
 import {
@@ -403,6 +404,126 @@ function createNewYBlock( block: Block ): YBlock {
 			} )
 		)
 	);
+}
+
+/**
+ * Apply an explicit block operation without comparing block trees.
+ * Y.Array moves require a clone; the block's clientId is retained.
+ * Missing targets can result from a concurrent deletion and are ignored.
+ *
+ * @param yblocks        The shared root block list.
+ * @param operation      The accepted editor operation.
+ * @param cursorPosition Selection for rich-text diff cursor hints.
+ */
+export function applyCrdtBlockOperation(
+	yblocks: YBlocks,
+	operation: BlockOperation,
+	cursorPosition: MergeCursorPosition = null
+): void {
+	const find = (
+		blocks: YBlocks,
+		id: string
+	): { block: YBlock; siblings: YBlocks; index: number } | undefined => {
+		for ( let index = 0; index < blocks.length; index++ ) {
+			const block = blocks.get( index );
+			if ( block.get( 'clientId' ) === id ) {
+				return { block, siblings: blocks, index };
+			}
+			const children = block.get( 'innerBlocks' );
+			const match =
+				children instanceof Y.Array ? find( children, id ) : undefined;
+			if ( match ) {
+				return match;
+			}
+		}
+		return undefined;
+	};
+	if ( operation.type === 'insert' || operation.type === 'move' ) {
+		const destination =
+			operation.parent === null
+				? yblocks
+				: find( yblocks, operation.parent )?.block.get( 'innerBlocks' );
+		if ( ! destination ) {
+			return;
+		}
+		let block: YBlock;
+		if ( operation.type === 'insert' ) {
+			if ( find( yblocks, operation.block.clientId ) ) {
+				return;
+			}
+			block = createNewYBlock(
+				makeBlocksSerializable( [ operation.block as Block ] )[ 0 ]
+			);
+		} else {
+			const source = find( yblocks, operation.clientId );
+			if ( ! source ) {
+				return;
+			}
+			// A concurrent move can make the requested parent a descendant.
+			const children = source.block.get( 'innerBlocks' );
+			if (
+				operation.parent === operation.clientId ||
+				( operation.parent &&
+					children &&
+					find( children, operation.parent ) )
+			) {
+				return;
+			}
+			block = source.block.clone() as YBlock;
+			source.siblings.delete( source.index, 1 );
+		}
+		const anchor =
+			operation.before === null
+				? -1
+				: destination
+						.toArray()
+						.findIndex(
+							( item ) =>
+								item.get( 'clientId' ) === operation.before
+						);
+		destination.insert( anchor < 0 ? destination.length : anchor, [
+			block,
+		] );
+		return;
+	}
+	const target = find( yblocks, operation.clientId );
+	if ( ! target ) {
+		return;
+	}
+	if ( operation.type === 'remove' ) {
+		target.siblings.delete( target.index, 1 );
+	} else if ( operation.type === 'set-block-property' ) {
+		// Validation issues include logging functions and are editor-local.
+		if ( operation.property !== 'validationIssues' ) {
+			if ( operation.value === undefined ) {
+				target.block.delete( operation.property );
+			} else {
+				target.block.set( operation.property, operation.value );
+			}
+		}
+	} else {
+		const name = target.block.get( 'name' );
+		if ( ! name || isLocalAttribute( name, operation.attribute ) ) {
+			return;
+		}
+		let attributes = target.block.get( 'attributes' );
+		if ( ! attributes ) {
+			attributes = new Y.Map();
+			target.block.set( 'attributes', attributes );
+		}
+		if ( operation.value === undefined ) {
+			attributes.delete( operation.attribute );
+		} else {
+			updateYBlockAttribute(
+				name,
+				operation.clientId,
+				operation.attribute,
+				serializeAttributeValue( operation.value ),
+				attributes,
+				cursorPosition
+			);
+		}
+	}
 }
 
 /**

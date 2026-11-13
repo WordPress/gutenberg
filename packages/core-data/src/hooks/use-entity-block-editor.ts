@@ -7,6 +7,7 @@ import type { store as coreStore } from '../';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
 import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
+import { diffBlockOperations } from '../utils/block-operations';
 import type {
 	EntityBlockEditorChangeOptions,
 	EntityBlockEditorOptions,
@@ -127,6 +128,10 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: false,
 				...rest,
+				blockOperations: rest.blockOperations && [
+					...rest.blockOperations,
+					...diffBlockOperations( newBlocks, edits.blocks ),
+				],
 			} );
 		},
 		[
@@ -154,6 +159,10 @@ export default function useEntityBlockEditor(
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,
 				...rest,
+				blockOperations: rest.blockOperations && [
+					...rest.blockOperations,
+					...diffBlockOperations( newBlocks, edits.blocks ),
+				],
 			} );
 		},
 		[ kind, name, id, meta, editEntityRecord ]

@@ -62,5 +62,7 @@ export type {
 	EntitySyncRecord,
 	EntitySyncRecordId,
 	EntitySyncEditOptions,
+	EntitySyncEditOperation,
+	EntitySyncEditBatch,
 	EntitySyncBeforeSaveContext,
 } from './entity-sync';

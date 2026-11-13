@@ -10,6 +10,7 @@ import {
 import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+import { withBlockOperations } from './block-operations';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
 import type {
@@ -3441,5 +3442,6 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 
 export default pipe(
 	withDerivedBlockEditingModes,
-	withAutomaticChangeReset
+	withAutomaticChangeReset,
+	withBlockOperations
 )( combinedReducers ) as Reducer< State >;

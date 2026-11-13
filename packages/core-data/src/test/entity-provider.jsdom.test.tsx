@@ -1,13 +1,18 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render } from '@testing-library/react';
+import { act, render, renderHook } from '@testing-library/react';
 import {
 	createBlock,
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { createRegistry, RegistryProvider } from '@wordpress/data';
+import {
+	RichText,
+	useBlockProps,
+	BlockEditorProvider,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { createRegistry, RegistryProvider, useRegistry } from '@wordpress/data';
 // @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterFormatType } from '@wordpress/rich-text';
@@ -15,6 +20,8 @@ import type { ReactNode } from 'react';
 import type { Block } from '@wordpress/blocks';
 import { store as coreDataStore } from '../index';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
+import { registerEntitySyncManager } from '../entity-sync';
+import type { EntitySyncManager } from '../entity-sync';
 import type { EntityBlockEditorHandler } from '../hooks/types';
 
 // Given an ID, the hook returns the blocks of the record.
@@ -57,9 +64,9 @@ const aSinglePost = {
 	},
 };
 
-function createRegistryWithStores() {
+function createRegistryWithStores( parent?: ReturnType< typeof useRegistry > ) {
 	// Create a registry.
-	const registry = createRegistry();
+	const registry = createRegistry( {}, parent );
 
 	// Register store.
 	registry.register( coreDataStore );
@@ -162,6 +169,213 @@ describe( 'useEntityBlockEditor', () => {
 		} );
 		unregisterFormatType( 'core/footnote' );
 	} );
+
+	it( 'delivers a paragraph split and later typing through one engine method', () => {
+		// The real provider also uses registered shortcut and preference stores.
+		const { result } = renderHook( () => useRegistry() );
+		registry = createRegistryWithStores( result.current );
+		registry.register( blockEditorStore );
+		registry
+			.dispatch( coreDataStore )
+			.receiveEntityRecords( 'postType', 'post', [
+				{
+					id: 1,
+					type: 'post',
+					content: {
+						raw: '<!-- wp:paragraph --><p>abcd</p><!-- /wp:paragraph -->',
+					},
+					meta: {},
+				},
+			] );
+		const applyEditBatch =
+			vi.fn< NonNullable< EntitySyncManager[ 'applyEditBatch' ] > >();
+		const unregister = registerEntitySyncManager( {
+			load: vi.fn(),
+			unload: vi.fn(),
+			unloadAll: vi.fn(),
+			applyEditBatch,
+		} );
+		let editorRegistry!: ReturnType< typeof useRegistry >;
+		function CaptureRegistry() {
+			editorRegistry = useRegistry();
+			return null;
+		}
+		function Editor() {
+			const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+				'postType',
+				'post',
+				{ id: 1 }
+			);
+			return (
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ onInput }
+					onChange={ onChange }
+				>
+					<CaptureRegistry />
+				</BlockEditorProvider>
+			);
+		}
+		let view: ReturnType< typeof render > | undefined;
+		try {
+			view = render(
+				<RegistryProvider value={ registry }>
+					<Editor />
+				</RegistryProvider>
+			);
+			const [ original ] = editorRegistry
+				.select( blockEditorStore )
+				.getBlocks();
+			act( () => {
+				editorRegistry.dispatch( blockEditorStore ).resetSelection(
+					{
+						clientId: original.clientId,
+						attributeKey: 'content',
+						offset: 2,
+					},
+					{
+						clientId: original.clientId,
+						attributeKey: 'content',
+						offset: 2,
+					}
+				);
+				editorRegistry
+					.dispatch( blockEditorStore )
+					.__unstableSplitSelection();
+			} );
+			const [ head, tail ] = editorRegistry
+				.select( blockEditorStore )
+				.getBlocks();
+			expect( head.clientId ).toBe( original.clientId );
+			expect( head.attributes.content ).toBe( 'ab' );
+			expect( tail.attributes.content ).toBe( 'cd' );
+			expect( applyEditBatch ).toHaveBeenCalledExactlyOnceWith(
+				'postType',
+				'post',
+				1,
+				{
+					operations: [
+						{
+							type: 'set-attribute',
+							clientId: head.clientId,
+							attribute: 'content',
+							previousValue: original.attributes.content,
+							value: 'ab',
+						},
+						{
+							type: 'insert',
+							block: tail,
+							parent: null,
+							before: null,
+						},
+					],
+					selection: expect.any( Object ),
+					options: { isCached: false, undoIgnore: false },
+				}
+			);
+			applyEditBatch.mockClear();
+			act( () => {
+				editorRegistry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( tail.clientId, { content: 'cde' } );
+			} );
+			expect( applyEditBatch ).toHaveBeenCalledTimes( 1 );
+			expect( applyEditBatch.mock.calls[ 0 ][ 3 ].operations ).toEqual( [
+				{
+					type: 'set-attribute',
+					clientId: tail.clientId,
+					attribute: 'content',
+					previousValue: 'cd',
+					value: 'cde',
+				},
+			] );
+		} finally {
+			view?.unmount();
+			unregister();
+		}
+	} );
+
+	it.each( [ false, true ] )(
+		'delivers one batch through the entity hook including footnote rewrites (%s)',
+		( hasFootnote ) => {
+			let blocks!: Block[], onChange!: EntityBlockEditorHandler;
+			const applyEditBatch = vi.fn();
+			const unregister = registerEntitySyncManager( {
+				load: vi.fn(),
+				unload: vi.fn(),
+				unloadAll: vi.fn(),
+				applyEditBatch,
+			} );
+			const TestComponent = () => {
+				[ blocks, , onChange ] = useEntityBlockEditor(
+					'postType',
+					'post',
+					{ id: 1 }
+				) as EntityBlockEditorWithBlocks;
+				return null;
+			};
+			try {
+				render(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+				const inserted = createBlock( 'core/test-block', {
+					content: hasFootnote
+						? '<sup data-fn="1234" class="fn"><a href="#1234" id="1234-link">99</a></sup>'
+						: 'Plain text',
+				} );
+				const operations = [
+					{
+						type: 'insert' as const,
+						block: inserted,
+						parent: null,
+						before: null,
+					},
+				];
+				act( () => {
+					onChange( [ ...blocks, inserted ], {
+						blockOperations: operations,
+					} );
+				} );
+				const rewrittenOperations = [
+					{
+						type: 'set-field',
+						field: 'meta',
+						previousValue: { footnotes: '[]' },
+						value: { footnotes: expect.stringContaining( '1234' ) },
+					},
+					...operations,
+					{
+						type: 'set-attribute',
+						clientId: inserted.clientId,
+						attribute: 'content',
+						previousValue: inserted.attributes.content,
+						value: '<sup data-fn="1234" class="fn"><a href="#1234" id="1234-link">1</a></sup>',
+					},
+				];
+				expect( applyEditBatch ).toHaveBeenCalledExactlyOnceWith(
+					'postType',
+					'post',
+					1,
+					{
+						operations: hasFootnote
+							? rewrittenOperations
+							: operations,
+						selection: undefined,
+						options: { isCached: false, undoIgnore: false },
+					}
+				);
+				expect(
+					registry
+						.select( coreDataStore )
+						.getEntityRecordEdits( 'postType', 'post', 1 )?.blocks
+				).toHaveLength( 3 );
+			} finally {
+				unregister();
+			}
+		}
+	);
 
 	it( 'does not mutate block attributes that include an array of strings or null values', async () => {
 		// Set by the component's first render.

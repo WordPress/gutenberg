@@ -302,6 +302,8 @@ export type EntityRecordFetch = ( options: {
  * Options of `editEntityRecord`.
  */
 export interface EditEntityRecordOptions {
+	/** Internal block operations supplied by the block editor. */
+	blockOperations?: import( '@wordpress/blocks' ).BlockOperation[];
 	/**
 	 * Whether to ignore the edit in undo history or not.
 	 */

@@ -52,6 +52,14 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
+/**
+ * Returns accepted structural edits for the provider's change callback.
+ * @param state Editor state.
+ */
+export function getBlockOperationChanges( state: State ) {
+	return state.blockOperationChanges;
+}
+
 function isViewportAvailable( state: State, viewport: string ) {
 	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {
 		return true;

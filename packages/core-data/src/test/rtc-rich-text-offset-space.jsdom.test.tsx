@@ -15,6 +15,8 @@ import { registerEntitySyncManager } from '../entity-sync';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
+import { applyEditBatchToCRDTDoc } from '../utils/crdt-edit-batch';
+import { applyCrdtBlockOperation, type YBlock } from '../utils/crdt-blocks';
 import { getRootMap } from '../utils/crdt-utils';
 import type { EntityBlockEditorHandler } from '../hooks/types';
 
@@ -109,11 +111,17 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		// document the way the Yjs engine applies it.
 		unregisterSyncManager = registerEntitySyncManager( {
 			load: () => {},
-			update: ( _kind, _name, _recordId, changes ) => {
-				applyPostChangesToCRDTDoc(
-					crdtDoc,
-					changes,
-					SYNCED_PROPERTIES
+			applyEditBatch: ( _kind, _name, _recordId, batch ) => {
+				crdtDoc.transact( () =>
+					applyEditBatchToCRDTDoc( crdtDoc, batch, {
+						applyChangesToCRDTDoc: ( doc, changes ) =>
+							applyPostChangesToCRDTDoc(
+								doc,
+								changes,
+								SYNCED_PROPERTIES
+							),
+						getChangesFromCRDTDoc: () => ( {} ),
+					} )
 				);
 			},
 			unload: () => {},
@@ -158,6 +166,17 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 		);
 
 		await waitFor( () => expect( blocks ).toHaveLength( 1 ) );
+		// Loading supplies the initial document; edits now contain only intents.
+		const initialBlocks = new Y.Array< YBlock >();
+		crdtDoc.getMap( CRDT_RECORD_MAP_KEY ).set( 'blocks', initialBlocks );
+		for ( const block of blocks ) {
+			applyCrdtBlockOperation( initialBlocks, {
+				type: 'insert',
+				block,
+				parent: null,
+				before: null,
+			} );
+		}
 		// Keep the async render setup on real timers.
 		vi.useFakeTimers();
 

@@ -842,6 +842,7 @@ _Parameters_
 - _options_ `EditEntityRecordOptions`: Options for the edit.
 - _options.undoIgnore_ `EditEntityRecordOptions[ 'undoIgnore' ]`: Whether to ignore the edit in undo history or not.
 - _options.isCached_ `EditEntityRecordOptions[ 'isCached' ]`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
+- _options.blockOperations_ `EditEntityRecordOptions[ 'blockOperations' ]`: Internal block operations from the block editor.
 
 _Returns_
 

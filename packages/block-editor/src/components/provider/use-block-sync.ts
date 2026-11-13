@@ -1,8 +1,10 @@
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
-import type { Block } from '@wordpress/blocks';
+import type { Block, BlockOperation } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+import { getBlockOperationsSince } from '../../store/block-operations';
 import { SelectionContext } from './selection-context';
 import type { BlockSelection } from '../../store/types';
 import type {
@@ -68,6 +70,41 @@ function restoreExternalIds(
 			clientId: externalId ?? block.clientId,
 			innerBlocks: restoreExternalIds( block.innerBlocks, mapping ),
 		};
+	} );
+}
+
+function restoreOperationIds(
+	operations: BlockOperation[],
+	mapping: ClientIdMapping
+): BlockOperation[] {
+	const restore = ( id: string | null ) =>
+		id === null ? null : ( mapping.internalToExternal.get( id ) ?? id );
+	return operations.map( ( operation ) => {
+		if (
+			operation.type === 'remove' ||
+			operation.type === 'set-block-property' ||
+			operation.type === 'set-attribute'
+		) {
+			return { ...operation, clientId: restore( operation.clientId )! };
+		}
+		const position = {
+			parent: restore( operation.parent ),
+			before: restore( operation.before ),
+		};
+		return operation.type === 'insert'
+			? {
+					...operation,
+					...position,
+					block: restoreExternalIds(
+						[ operation.block ],
+						mapping
+					)[ 0 ],
+				}
+			: {
+					...operation,
+					...position,
+					clientId: restore( operation.clientId )!,
+				};
 	} );
 }
 
@@ -371,6 +408,11 @@ export default function useBlockSync( {
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
+		const { getBlockOperationChanges } = unlock(
+			registry.select( blockEditorStore )
+		);
+		let operationRevision =
+			getBlockOperationChanges?.()?.at( -1 )?.revision ?? 0;
 		let isPersistent = isLastBlockChangePersistent();
 		let blockHistoryMode = __unstableGetLastBlockChangeHistoryMode();
 		let previousAreBlocksDifferent = false;
@@ -394,6 +436,7 @@ export default function useBlockSync( {
 			const newBlockHistoryMode =
 				__unstableGetLastBlockChangeHistoryMode();
 			const newBlocks = getBlocks( clientId );
+			const operationChanges = getBlockOperationChanges?.();
 			const areBlocksDifferent = newBlocks !== blocks;
 			blocks = newBlocks;
 			if (
@@ -404,8 +447,18 @@ export default function useBlockSync( {
 				pendingChangesRef.current.incoming = null;
 				isPersistent = newIsPersistent;
 				blockHistoryMode = newBlockHistoryMode;
+				operationRevision =
+					operationChanges?.at( -1 )?.revision ?? operationRevision;
 				return;
 			}
+			const blockOperations = getBlockOperationsSince(
+				operationChanges,
+				operationRevision,
+				clientId ?? ''
+			);
+			// Advance before callbacks so reentrant notifications cannot replay operations.
+			operationRevision =
+				operationChanges?.at( -1 )?.revision ?? operationRevision;
 
 			// Since we often dispatch an action to mark the previous action as
 			// persistent, we need to make sure that the blocks changed on the
@@ -472,6 +525,14 @@ export default function useBlockSync( {
 							};
 						if ( blockHistoryMode === 'ignore' ) {
 							updateOptions.undoIgnore = true;
+						}
+						if ( areBlocksDifferent && blockOperations ) {
+							updateOptions.blockOperations = clientId
+								? restoreOperationIds(
+										blockOperations,
+										idMappingRef.current
+									)
+								: blockOperations;
 						}
 						updateParent( blocksForParent, updateOptions );
 					}

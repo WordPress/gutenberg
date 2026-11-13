@@ -8,6 +8,7 @@ import type {
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { Color } from '@wordpress/global-styles-engine';
 import type { BlockEditingMode } from '../components/block-editing-mode';
+import type { BlockOperationChange } from './block-operations';
 import type { EditorStylesStyle } from '../components/editor-styles/types';
 import type {
 	BlockVisibility,
@@ -571,6 +572,7 @@ export interface SelectedBlockStyleState {
 }
 
 export interface State {
+	blockOperationChanges?: BlockOperationChange[];
 	blocks: BlocksState;
 	isDragging: boolean;
 	isTyping: boolean;

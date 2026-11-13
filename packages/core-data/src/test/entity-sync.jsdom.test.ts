@@ -33,7 +33,7 @@ type FakeManager = Record<
 	| 'shouldSync'
 	| 'load'
 	| 'loadCollection'
-	| 'update'
+	| 'applyEditBatch'
 	| 'beforeSave'
 	| 'afterSave'
 	| 'unload'
@@ -60,7 +60,7 @@ function createFakeManager(): FakeManager {
 		shouldSync: vi.fn( () => true ),
 		load: vi.fn(),
 		loadCollection: vi.fn(),
-		update: vi.fn(),
+		applyEditBatch: vi.fn(),
 		beforeSave: vi.fn(),
 		afterSave: vi.fn(),
 		unload: vi.fn(),
@@ -359,7 +359,9 @@ describe( 'the entity sync interface', () => {
 
 		it( 'forwards the edit and its intent before the store edit lands', () => {
 			const order: string[] = [];
-			manager.update.mockImplementation( () => order.push( 'update' ) );
+			manager.applyEditBatch.mockImplementation( () =>
+				order.push( 'update' )
+			);
 			dispatch.mockImplementation( () => order.push( 'dispatch' ) );
 
 			editEntityRecord(
@@ -370,12 +372,21 @@ describe( 'the entity sync interface', () => {
 				{ isCached: true }
 			)( thunkArgs( { select, dispatch } ) );
 
-			expect( manager.update ).toHaveBeenCalledWith(
+			expect( manager.applyEditBatch ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				1,
-				{ title: 'Updated' },
-				{ isCached: true, undoIgnore: false }
+				{
+					operations: [
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: 'Initial',
+							value: 'Updated',
+						},
+					],
+					options: { isCached: true, undoIgnore: false },
+				}
 			);
 			expect( order ).toEqual( [ 'update', 'dispatch' ] );
 		} );
@@ -389,12 +400,21 @@ describe( 'the entity sync interface', () => {
 				{ undoIgnore: true }
 			)( thunkArgs( { select, dispatch } ) );
 
-			expect( manager.update ).toHaveBeenCalledWith(
+			expect( manager.applyEditBatch ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				1,
-				{ title: 'Updated' },
-				{ isCached: false, undoIgnore: true }
+				{
+					operations: [
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: 'Initial',
+							value: 'Updated',
+						},
+					],
+					options: { isCached: false, undoIgnore: true },
+				}
 			);
 		} );
 	} );

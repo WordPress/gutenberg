@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { ObservableMap } from '@wordpress/compose';
-import type { Block } from '@wordpress/blocks';
+import type { Block, BlockOperation } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
 import type { BlockEventHandlers } from '../writing-flow/types';
 import type {
@@ -65,7 +65,12 @@ export interface ClientIdMapping {
  */
 export type OnBlockUpdate = (
 	blocks: Block[],
-	options: { selection: BlockSelectionState; undoIgnore?: boolean }
+	options: {
+		selection: BlockSelectionState;
+		undoIgnore?: boolean;
+		/** Internal block operations; absent when a complete tree diff is required. */
+		blockOperations?: BlockOperation[];
+	}
 ) => void;
 
 /**

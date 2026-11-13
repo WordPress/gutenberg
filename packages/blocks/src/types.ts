@@ -3,6 +3,46 @@ import type { WPKeycodeModifier } from '@wordpress/keycodes';
 import type { ShortcodeAttrs, ShortcodeMatch } from '@wordpress/shortcode';
 
 /**
+ * An edit in one block controller's coordinate space. Null parent
+ * means the controller root; null before means append. IDs identify blocks,
+ * not array offsets. Operations in a batch must be applied in order.
+ *
+ * Attribute edits carry values, not text deltas. The engine must diff text
+ * against previousValue, then reconcile that edit with its shared document.
+ */
+export type BlockOperation =
+	| {
+			type: 'insert';
+			block: Block;
+			parent: string | null;
+			before: string | null;
+	  }
+	| { type: 'remove'; clientId: string }
+	| {
+			type: 'set-block-property';
+			clientId: string;
+			property: Exclude<
+				keyof Block,
+				'clientId' | 'attributes' | 'innerBlocks'
+			>;
+			previousValue: unknown;
+			value: unknown;
+	  }
+	| {
+			type: 'set-attribute';
+			clientId: string;
+			attribute: string;
+			previousValue: unknown;
+			value: unknown;
+	  }
+	| {
+			type: 'move';
+			clientId: string;
+			parent: string | null;
+			before: string | null;
+	  };
+
+/**
  * An icon type definition. One of a Dashicon slug, an element,
  * or a component.
  *

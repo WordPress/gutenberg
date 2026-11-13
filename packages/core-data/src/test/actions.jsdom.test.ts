@@ -10,6 +10,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { dispatch as dispatchStore } from '@wordpress/data';
 import type { Mock } from 'vitest';
+import type { BlockOperation } from '@wordpress/blocks';
 import {
 	editEntityRecord,
 	clearEntityRecordEdits,
@@ -62,7 +63,8 @@ vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	};
 } );
 
-vi.mock( import( '../entity-sync' ), () => ( {
+vi.mock( import( '../entity-sync' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
 	getEntitySyncManager: vi.fn(),
 } ) );
 
@@ -304,7 +306,7 @@ describe( 'editEntityRecord', () => {
 
 		beforeEach( () => {
 			syncManager = {
-				update: vi.fn(),
+				applyEditBatch: vi.fn(),
 			};
 			vi.mocked( getEntitySyncManager ).mockReturnValue(
 				asSyncManager( syncManager )
@@ -313,6 +315,189 @@ describe( 'editEntityRecord', () => {
 
 		afterEach( () => {
 			vi.mocked( getEntitySyncManager ).mockReset();
+		} );
+
+		it( 'delivers structural and field operations in one required batch', () => {
+			const dispatch = vi.fn();
+			const operations: BlockOperation[] = [
+				{ type: 'remove', clientId: 'removed' },
+			];
+			const edits = {
+				blocks: [],
+				title: 'New title',
+				selection: { offset: 0 },
+			};
+			const select = {
+				getEntityConfig: () => ( {
+					kind: 'postType',
+					name: 'post',
+				} ),
+				getRawEntityRecord: () => ( { id: 1 } ),
+				getEditedEntityRecord: () => ( { id: 1 } ),
+				getUndoManager: () => ( {
+					hasRedo: () => false,
+					addRecord: vi.fn(),
+				} ),
+			};
+			editEntityRecord( 'postType', 'post', 1, edits, {
+				blockOperations: operations,
+				isCached: true,
+				undoIgnore: true,
+			} )( thunkArgs( { select, dispatch } ) );
+			const operationCall = [
+				'postType',
+				'post',
+				1,
+				{
+					operations: [
+						...operations,
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: undefined,
+							value: 'New title',
+						},
+					],
+					selection: { offset: 0 },
+					options: { isCached: true, undoIgnore: true },
+				},
+			];
+			expect( syncManager.applyEditBatch.mock.calls ).toEqual( [
+				operationCall,
+			] );
+			expect( dispatch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: 'EDIT_ENTITY_RECORD',
+					edits,
+				} )
+			);
+		} );
+
+		it( 'converts state-based block edits to operations alongside text values', () => {
+			const edits = {
+				title: 'Typing',
+				blocks: [
+					{
+						clientId: 'a',
+						name: 'core/paragraph',
+						innerBlocks: [],
+						attributes: { content: '<strong>Text</strong>' },
+					},
+				],
+			};
+			const select = {
+				getEntityConfig: () => ( { kind: 'postType', name: 'post' } ),
+				getRawEntityRecord: () => ( { id: 1, title: 'Saved' } ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					title: 'Earlier edit',
+				} ),
+			};
+			editEntityRecord( 'postType', 'post', 1, edits, {
+				isCached: true,
+				undoIgnore: true,
+			} )( thunkArgs( { select, dispatch: vi.fn() } ) );
+			expect(
+				syncManager.applyEditBatch
+			).toHaveBeenCalledExactlyOnceWith( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: 'Earlier edit',
+						value: 'Typing',
+					},
+					{
+						type: 'insert',
+						block: edits.blocks[ 0 ],
+						parent: null,
+						before: null,
+					},
+				],
+				options: { isCached: true, undoIgnore: true },
+			} );
+		} );
+
+		it( 'delivers edits for keyless entities through the same intent method', () => {
+			const select = {
+				getEntityConfig: () => ( { kind: 'root', name: 'site' } ),
+				getRawEntityRecord: () => ( { title: 'Saved' } ),
+				getEditedEntityRecord: () => ( { title: 'Edited' } ),
+			};
+			editEntityRecord(
+				'root',
+				'site',
+				undefined,
+				{ title: 'New' },
+				{ undoIgnore: true }
+			)( thunkArgs( { select, dispatch: vi.fn() } ) );
+			expect(
+				syncManager.applyEditBatch
+			).toHaveBeenCalledExactlyOnceWith( 'root', 'site', undefined, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'title',
+						previousValue: 'Edited',
+						value: 'New',
+					},
+				],
+				options: { isCached: false, undoIgnore: true },
+			} );
+		} );
+
+		it( 'sends raw source changes without treating cache invalidation as block deletion', () => {
+			const select = {
+				getEntityConfig: () => ( { kind: 'postType', name: 'post' } ),
+				getRawEntityRecord: () => ( { id: 1, content: 'Before' } ),
+				getEditedEntityRecord: () => ( {
+					id: 1,
+					content: 'Before',
+					blocks: [],
+				} ),
+			};
+			editEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ content: 'After', blocks: undefined },
+				{ undoIgnore: true }
+			)( thunkArgs( { select, dispatch: vi.fn() } ) );
+			expect(
+				syncManager.applyEditBatch
+			).toHaveBeenCalledExactlyOnceWith( 'postType', 'post', 1, {
+				operations: [
+					{
+						type: 'set-field',
+						field: 'content',
+						previousValue: 'Before',
+						value: 'After',
+					},
+				],
+				options: { isCached: false, undoIgnore: true },
+			} );
+		} );
+
+		it( 'carries selection metadata without logging derived values', () => {
+			const select = {
+				getEntityConfig: () => ( { kind: 'postType', name: 'post' } ),
+				getRawEntityRecord: () => ( { id: 1 } ),
+				getEditedEntityRecord: () => ( { id: 1 } ),
+			};
+			editEntityRecord(
+				'postType',
+				'post',
+				1,
+				{ selection: { offset: 2 }, content: () => 'derived' },
+				{ undoIgnore: true }
+			)( thunkArgs( { select, dispatch: vi.fn() } ) );
+			expect(
+				syncManager.applyEditBatch
+			).toHaveBeenCalledExactlyOnceWith( 'postType', 'post', 1, {
+				operations: [],
+				selection: { offset: 2 },
+				options: { isCached: false, undoIgnore: true },
+			} );
 		} );
 
 		it( 'passes merged edits to the sync manager for merged fields', () => {
@@ -349,18 +534,28 @@ describe( 'editEntityRecord', () => {
 				} )
 			);
 
-			expect( syncManager.update ).toHaveBeenCalledWith(
+			expect( syncManager.applyEditBatch ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				1,
 				{
-					meta: {
-						existingKey: 'existingValue',
-						editedKey: 'editedValue',
-						newKey: 'newValue',
-					},
-				},
-				{ isCached: false, undoIgnore: false }
+					operations: [
+						{
+							type: 'set-field',
+							field: 'meta',
+							previousValue: {
+								existingKey: 'existingValue',
+								editedKey: 'editedValue',
+							},
+							value: {
+								existingKey: 'existingValue',
+								editedKey: 'editedValue',
+								newKey: 'newValue',
+							},
+						},
+					],
+					options: { isCached: false, undoIgnore: false },
+				}
 			);
 		} );
 
@@ -392,17 +587,21 @@ describe( 'editEntityRecord', () => {
 			} )( thunkArgs( { select, dispatch } ) );
 
 			// The sync manager sees the merged edits (not cleaned/undefined)
-			expect( syncManager.update ).toHaveBeenCalledWith(
+			expect( syncManager.applyEditBatch ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				1,
 				{
-					meta: {
-						key1: 'value1',
-						key2: 'value2',
-					},
-				},
-				{ isCached: false, undoIgnore: false }
+					operations: [
+						{
+							type: 'set-field',
+							field: 'meta',
+							previousValue: { key1: 'value1' },
+							value: { key1: 'value1', key2: 'value2' },
+						},
+					],
+					options: { isCached: false, undoIgnore: false },
+				}
 			);
 
 			// But the local store dispatch should still receive undefined for the cleaned edit
@@ -446,18 +645,30 @@ describe( 'editEntityRecord', () => {
 				meta: { newKey: 'newValue' },
 			} )( thunkArgs( { select, dispatch } ) );
 
-			expect( syncManager.update ).toHaveBeenCalledWith(
+			expect( syncManager.applyEditBatch ).toHaveBeenCalledWith(
 				'postType',
 				'post',
 				1,
 				{
-					title: 'New Title',
-					meta: {
-						existingKey: 'existingValue',
-						newKey: 'newValue',
-					},
-				},
-				{ isCached: false, undoIgnore: false }
+					operations: [
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: 'Original Title',
+							value: 'New Title',
+						},
+						{
+							type: 'set-field',
+							field: 'meta',
+							previousValue: { existingKey: 'existingValue' },
+							value: {
+								existingKey: 'existingValue',
+								newKey: 'newValue',
+							},
+						},
+					],
+					options: { isCached: false, undoIgnore: false },
+				}
 			);
 		} );
 
@@ -491,21 +702,39 @@ describe( 'editEntityRecord', () => {
 				{ undoIgnore: true }
 			)( thunkArgs( { select, dispatch } ) );
 
-			expect( syncManager.update ).toHaveBeenNthCalledWith(
+			expect( syncManager.applyEditBatch ).toHaveBeenNthCalledWith(
 				1,
 				'postType',
 				'post',
 				1,
-				{ title: 'Typing' },
-				{ isCached: true, undoIgnore: false }
+				{
+					operations: [
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: 'Original',
+							value: 'Typing',
+						},
+					],
+					options: { isCached: true, undoIgnore: false },
+				}
 			);
-			expect( syncManager.update ).toHaveBeenNthCalledWith(
+			expect( syncManager.applyEditBatch ).toHaveBeenNthCalledWith(
 				2,
 				'postType',
 				'post',
 				1,
-				{ title: 'Selection' },
-				{ isCached: false, undoIgnore: true }
+				{
+					operations: [
+						{
+							type: 'set-field',
+							field: 'title',
+							previousValue: 'Original',
+							value: 'Selection',
+						},
+					],
+					options: { isCached: false, undoIgnore: true },
+				}
 			);
 		} );
 
@@ -541,7 +770,7 @@ describe( 'editEntityRecord', () => {
 				} )
 			);
 
-			expect( syncManager.update ).not.toHaveBeenCalled();
+			expect( syncManager.applyEditBatch ).not.toHaveBeenCalled();
 			expect( dispatch ).toHaveBeenCalledWith(
 				expect.objectContaining( { type: 'EDIT_ENTITY_RECORD' } )
 			);

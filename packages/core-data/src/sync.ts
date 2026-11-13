@@ -23,6 +23,7 @@ import {
 	type EntitySyncBeforeSaveContext,
 	type EntitySyncCollectionHandlers,
 	type EntitySyncEditOptions,
+	type EntitySyncEditBatch,
 	type EntitySyncManager,
 	type EntitySyncRecord,
 	type EntitySyncRecordHandlers,
@@ -38,6 +39,11 @@ import {
 } from './utils/crdt';
 import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 import { saveCRDTDoc } from './utils/save-crdt-doc';
+import { applyEditBatchToCRDTDoc } from './utils/crdt-edit-batch';
+
+// Only the Yjs adapter uses this envelope. It is consumed inside the queued
+// transaction, never written to the document or sent to another provider.
+const EDIT_BATCH = Symbol( 'entity edit batch' );
 
 export {
 	ConnectionErrorCode,
@@ -227,9 +233,8 @@ function toObjectId( recordId: EntitySyncRecordId ): ObjectID {
 
 /**
  * The entity sync manager that adapts core-data's entity sync interface
- * (`entity-sync.ts`) to the `@wordpress/sync` manager, so the real-time
- * collaboration experiment keeps working exactly as before through the
- * interface. Registered at load time when the experiment is on.
+ * (`entity-sync.ts`) to the `@wordpress/sync` manager, using its transaction queue and persistence support. This adapter is
+ * available for providers; it is not registered automatically.
  *
  * @param data How to reach the core-data store; defaults to the default
  *             registry.
@@ -285,7 +290,20 @@ export function createDefaultEntitySyncManager(
 			}
 
 			return manager.load(
-				syncConfig,
+				{
+					...syncConfig,
+					applyChangesToCRDTDoc( doc, changes ) {
+						if ( EDIT_BATCH in changes ) {
+							applyEditBatchToCRDTDoc(
+								doc,
+								changes[ EDIT_BATCH ] as EntitySyncEditBatch,
+								syncConfig
+							);
+						} else {
+							syncConfig.applyChangesToCRDTDoc( doc, changes );
+						}
+					},
+				},
 				`${ kind }/${ name }`,
 				toObjectId( recordId ),
 				record,
@@ -315,17 +333,17 @@ export function createDefaultEntitySyncManager(
 			);
 		},
 
-		update( kind, name, recordId, edits, options ) {
-			if ( ! getSyncConfig( kind, name ) ) {
+		applyEditBatch( kind, name, recordId, batch ) {
+			if ( recordId === undefined || ! getSyncConfig( kind, name ) ) {
 				return;
 			}
 
 			getSyncManager()?.update(
 				`${ kind }/${ name }`,
 				toObjectId( recordId ),
-				edits,
-				getEditOrigin( options ),
-				{ isNewUndoLevel: isNewUndoLevel( options ) }
+				{ [ EDIT_BATCH ]: batch },
+				getEditOrigin( batch.options ),
+				{ isNewUndoLevel: isNewUndoLevel( batch.options ) }
 			);
 		},
 

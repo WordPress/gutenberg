@@ -62,6 +62,203 @@ describe( 'useBlockSync hook', () => {
 		vi.clearAllMocks();
 	} );
 
+	it( 'delivers accepted insert, move, and remove operations once', () => {
+		const block = ( clientId: string ): Block => ( {
+			clientId,
+			name: 'test/test-block',
+			attributes: {},
+			innerBlocks: [],
+			isValid: true,
+		} );
+		const onChange = vi.fn();
+		let registry!: DataRegistry;
+		render(
+			<TestWrapper
+				setRegistry={ ( reg ) => {
+					registry = reg;
+				} }
+				value={ [ block( 'a' ), block( 'b' ) ] }
+				onChange={ onChange }
+			/>
+		);
+		const actions = registry.dispatch( blockEditorStore );
+		onChange.mockClear();
+		actions.insertBlocks( [ block( 'x' ) ], 1 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{ type: 'insert', block: block( 'x' ), parent: null, before: 'b' },
+		] );
+		onChange.mockClear();
+		actions.moveBlocksToPosition( [ 'x' ], '', '', 0 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{ type: 'move', clientId: 'x', parent: null, before: 'a' },
+		] );
+		onChange.mockClear();
+		actions.removeBlocks( [ 'x' ] );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{ type: 'remove', clientId: 'x' },
+		] );
+	} );
+
+	it( 'delivers a block insertion and attribute change in one batch', () => {
+		const onChange = vi.fn();
+		let registry!: DataRegistry;
+		const a = {
+			clientId: 'a',
+			name: 'test/test-block',
+			attributes: {},
+			innerBlocks: [],
+			isValid: true,
+		};
+		render(
+			<TestWrapper
+				setRegistry={ ( reg ) => {
+					registry = reg;
+				} }
+				value={ [ a ] }
+				onChange={ onChange }
+			/>
+		);
+		onChange.mockClear();
+		registry.batch( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlocks( [ { ...a, clientId: 'x' } ] );
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( 'a', { foo: 2 } );
+		} );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{
+				type: 'insert',
+				block: { ...a, clientId: 'x' },
+				parent: null,
+				before: null,
+			},
+			{
+				type: 'set-attribute',
+				clientId: 'a',
+				attribute: 'foo',
+				previousValue: undefined,
+				value: 2,
+			},
+		] );
+		expect( onChange.mock.calls[ 0 ][ 0 ] ).toEqual( [
+			{ ...a, attributes: { foo: 2 } },
+			{ ...a, clientId: 'x' },
+		] );
+	} );
+
+	it( 'does not echo an incoming block tree as operations', () => {
+		const onChange = vi.fn();
+		const onInput = vi.fn();
+		const a = {
+			clientId: 'a',
+			name: 'test/test-block',
+			attributes: {},
+			innerBlocks: [],
+			isValid: true,
+		};
+		const { rerender } = render(
+			<TestWrapper
+				value={ [ a ] }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		onChange.mockClear();
+		onInput.mockClear();
+		rerender(
+			<TestWrapper
+				value={ [ a, { ...a, clientId: 'remote' } ] }
+				onChange={ onChange }
+				onInput={ onInput }
+			/>
+		);
+		expect( onChange ).not.toHaveBeenCalled();
+		expect( onInput ).not.toHaveBeenCalled();
+	} );
+
+	it( 'uses entity-facing IDs for operations inside a controlled block', () => {
+		const block = ( clientId: string ): Block => ( {
+			clientId,
+			name: 'test/test-block',
+			attributes: {},
+			innerBlocks: [],
+			isValid: true,
+		} );
+		let registry!: DataRegistry;
+		const onChange = vi.fn();
+		render(
+			<TestWrapper
+				clientId="controller"
+				value={ [ block( 'external-a' ), block( 'external-b' ) ] }
+				onChange={ onChange }
+				setRegistry={ ( reg ) => {
+					if ( ! registry ) {
+						registry = reg;
+						reg.dispatch( blockEditorStore ).resetBlocks( [
+							block( 'controller' ),
+						] );
+						reg.dispatch(
+							blockEditorStore
+						).updateBlockListSettings( 'controller', {} );
+					}
+				} }
+			/>
+		);
+		onChange.mockClear();
+		const [ internalA ] = registry
+			.select( blockEditorStore )
+			.getBlockOrder( 'controller' );
+		expect( internalA ).not.toBe( 'external-a' );
+		registry
+			.dispatch( blockEditorStore )
+			.moveBlocksToPosition(
+				[ internalA ],
+				'controller',
+				'controller',
+				1
+			);
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{
+				type: 'move',
+				clientId: 'external-a',
+				parent: null,
+				before: null,
+			},
+		] );
+		onChange.mockClear();
+		registry
+			.dispatch( blockEditorStore )
+			.insertBlocks( [ block( 'new' ) ], 0, 'controller' );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{
+				type: 'insert',
+				block: block( 'new' ),
+				parent: null,
+				before: 'external-b',
+			},
+		] );
+		onChange.mockClear();
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( internalA, { foo: 3 } );
+		expect( onChange.mock.calls[ 0 ][ 1 ].blockOperations ).toEqual( [
+			{
+				type: 'set-attribute',
+				clientId: 'external-a',
+				attribute: 'foo',
+				previousValue: undefined,
+				value: 3,
+			},
+		] );
+	} );
+
 	it( 'resets the block-editor blocks when the controlled value changes', async () => {
 		const fakeBlocks: Block[] = [];
 		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );

@@ -1,10 +1,11 @@
-import type { Block } from '@wordpress/blocks';
+import type { Block, BlockOperation } from '@wordpress/blocks';
 
 /**
  * Options of the `useEntityBlockEditor` change and input handlers, as a
  * `BlockEditorProvider` passes them, forwarded to `editEntityRecord`.
  */
 export interface EntityBlockEditorChangeOptions {
+	blockOperations?: BlockOperation[];
 	selection?: unknown;
 	[ key: string ]: unknown;
 }

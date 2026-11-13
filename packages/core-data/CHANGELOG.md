@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Replace the private entity sync manager’s `update` method with required `applyEditBatch` intent transactions. Block edits arrive as operations; text values retain previous and new values for engine-side diffing.
+
 ### Bug Fixes
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).

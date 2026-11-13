@@ -8,7 +8,8 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getEntitySyncManager } from './entity-sync';
+import { getEntitySyncManager, createEntitySyncEditBatch } from './entity-sync';
+import { getCachedBlocks } from './parsed-blocks-cache';
 import { applyUndoLevel, recordEntityEdit } from './utils/sync-undo-levels';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 import type * as ET from './entity-types';
@@ -395,15 +396,16 @@ export const deleteEntityRecord =
  * Returns an action object that triggers an
  * edit to an entity record.
  *
- * @param kind               Kind of the edited entity record.
- * @param name               Name of the edited entity record.
- * @param recordId           Pass `undefined` for keyless entities.
- * @param edits              The edits.
- * @param options            Options for the edit.
- * @param options.undoIgnore Whether to ignore the edit in undo history or not.
- * @param options.isCached   Whether the edit is transient (e.g. typing). Transient
- *                           edits are staged and eventually merged into the
- *                           preceding undo level instead of creating a new one.
+ * @param kind                    Kind of the edited entity record.
+ * @param name                    Name of the edited entity record.
+ * @param recordId                Pass `undefined` for keyless entities.
+ * @param edits                   The edits.
+ * @param options                 Options for the edit.
+ * @param options.undoIgnore      Whether to ignore the edit in undo history or not.
+ * @param options.isCached        Whether the edit is transient (e.g. typing). Transient
+ *                                edits are staged and eventually merged into the
+ *                                preceding undo level instead of creating a new one.
+ * @param options.blockOperations Internal block operations from the block editor.
  *
  * @return Action object.
  */
@@ -413,7 +415,7 @@ export const editEntityRecord =
 		name: string,
 		recordId: number | string | undefined,
 		edits: object,
-		{ undoIgnore, isCached }: EditEntityRecordOptions = {}
+		{ undoIgnore, isCached, blockOperations }: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
@@ -462,17 +464,39 @@ export const editEntityRecord =
 		// store. It receives merged edits and the edit's intent, and decides
 		// what to do with them.
 		const syncManager = getEntitySyncManager();
-		syncManager?.update(
-			kind,
-			name,
-			// @ts-expect-error Bug: a keyless entity passes an `undefined` ID, which the sync manager's type excludes.
-			recordId,
-			editsWithMerges,
-			{
-				isCached: Boolean( isCached ),
-				undoIgnore: Boolean( undoIgnore ),
-			}
-		);
+		const syncOptions = {
+			isCached: Boolean( isCached ),
+			undoIgnore: Boolean( undoIgnore ),
+		};
+		if ( syncManager ) {
+			const previous =
+				! blockOperations &&
+				Array.isArray( editsWithMerges.blocks ) &&
+				! editedRecord.blocks &&
+				recordId !== undefined &&
+				typeof editedRecord.content === 'string'
+					? {
+							...editedRecord,
+							blocks: getCachedBlocks(
+								kind,
+								name,
+								recordId,
+								editedRecord.content
+							),
+						}
+					: editedRecord;
+			syncManager.applyEditBatch(
+				kind,
+				name,
+				recordId,
+				createEntitySyncEditBatch(
+					previous,
+					editsWithMerges,
+					syncOptions,
+					blockOperations
+				)
+			);
+		}
 		// A record the sync manager has loaded has its undo history tracked
 		// by the manager, which reports each level it opens (see
 		// `recordSyncUndoLevel`). Every other record is recorded here.

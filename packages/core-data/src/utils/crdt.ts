@@ -329,7 +329,9 @@ function mergeContentWithoutBlocks(
  *                  within a RichText field associated with a particular attribute of
  *                  that block, or none at all.
  */
-function parseCursorSelection( selection?: WPSelection ): MergeCursorPosition {
+export function parseCursorSelection(
+	selection?: WPSelection
+): MergeCursorPosition {
 	const selectionStart = selection?.selectionStart;
 
 	return selectionStart?.clientId &&

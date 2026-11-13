@@ -5,6 +5,8 @@ import type {
 	CollectionHandlers,
 } from '@wordpress/sync';
 import warning from '@wordpress/warning';
+import type { Block, BlockOperation } from '@wordpress/blocks';
+import { diffBlockOperations } from './utils/block-operations';
 
 /**
  * The entity sync interface.
@@ -29,7 +31,7 @@ export type EntitySyncRecord = Record< string, unknown >;
 export type EntitySyncRecordId = string | number;
 
 /**
- * Describes the intent behind an edit passed to `update`.
+ * Describes the intent behind an edit passed to the sync manager.
  *
  * In Gutenberg, block changes flow through two callbacks: `onInput` for
  * transient, in-progress changes (typing each character), which use
@@ -41,6 +43,74 @@ export type EntitySyncRecordId = string | number;
 export interface EntitySyncEditOptions {
 	isCached: boolean;
 	undoIgnore: boolean;
+}
+
+/** A block operation or an entity field value that still needs diffing. */
+export type EntitySyncEditOperation =
+	| BlockOperation
+	| {
+			type: 'set-field';
+			field: string;
+			previousValue: unknown;
+			value: unknown;
+	  };
+
+/** One local edit transaction, delivered before the store applies its edits. */
+export interface EntitySyncEditBatch {
+	operations: EntitySyncEditOperation[];
+	options: EntitySyncEditOptions;
+	/** Local selection accompanies the edit but is not a document operation. */
+	selection?: unknown;
+}
+
+/**
+ * Collect a local edit into one batch. Functions are derived field readers,
+ * such as the block-to-content serializer, rather than document values.
+ *
+ * @param previous        The record the editor edited.
+ * @param edits           Merged field edits.
+ * @param options         Undo grouping metadata.
+ * @param blockOperations Accepted operations covering the complete block edit.
+ */
+export function createEntitySyncEditBatch(
+	previous: EntitySyncRecord,
+	edits: EntitySyncRecord,
+	options: EntitySyncEditOptions,
+	blockOperations?: BlockOperation[]
+): EntitySyncEditBatch {
+	const operations: EntitySyncEditOperation[] = [];
+	for ( const [ field, value ] of Object.entries( edits ) ) {
+		if ( field === 'selection' || typeof value === 'function' ) {
+			continue;
+		}
+		if ( field === 'blocks' ) {
+			// Undefined invalidates the editor's parsed-block cache. It is not
+			// a document deletion; a raw content edit is carried by its field.
+			if ( Array.isArray( value ) ) {
+				operations.push(
+					...( blockOperations ??
+						diffBlockOperations(
+							Array.isArray( previous.blocks )
+								? ( previous.blocks as Block[] )
+								: [],
+							value as Block[]
+						) )
+				);
+			}
+		} else {
+			operations.push( {
+				type: 'set-field',
+				field,
+				previousValue: previous[ field ],
+				value,
+			} );
+		}
+	}
+	return {
+		operations,
+		options,
+		...( 'selection' in edits ? { selection: edits.selection } : {} ),
+	};
 }
 
 /**
@@ -181,7 +251,7 @@ export interface EntitySyncManager {
 	 * false for a record, core-data does not call `load` for it and skips
 	 * the transient reads it would otherwise do for a synced record.
 	 *
-	 * Only `load` is gated. `loadCollection`, `update`, `beforeSave`,
+	 * Only `load` is gated. `loadCollection`, `applyEditBatch`, `beforeSave`,
 	 * `afterSave`, and `unload` are still called for every record, so a
 	 * manager that syncs only some entities must check for itself inside
 	 * those members.
@@ -221,20 +291,24 @@ export interface EntitySyncManager {
 	) => void | Promise< void >;
 
 	/**
-	 * Called for every `editEntityRecord`, BEFORE the edit reaches the
-	 * store. The edits already have merged fields applied
-	 * (see `mergedEdits` on the entity config).
+	 * The only local edit entry point, called before the store applies the edit.
+	 * Apply each batch atomically with its undo metadata. Structural operations
+	 * describe accepted block actions; attribute and entity field operations
+	 * carry the editor's previous/new values for text and rich-text diffing.
+	 * State-based block setters are converted to operations by core-data.
+	 * A batch never contains a `set-field` operation for `blocks`.
 	 *
-	 * Known ordering: a manager that calls `editRecord` synchronously from
-	 * here has its edit overwritten by the store update that follows.
-	 * Dispatch such edits from a later task.
+	 * IDs are in the entity's block coordinate space. The engine resolves
+	 * anchors against its current document and owns concurrent move semantics.
+	 * There is no state fallback or acceptance return value. The engine must
+	 * ignore entities it does not sync. Corrections through `editRecord` must
+	 * run in a later task, after core-data has dispatched the local edit.
 	 */
-	update: (
+	applyEditBatch: (
 		kind: string,
 		name: string,
-		recordId: EntitySyncRecordId,
-		edits: EntitySyncRecord,
-		options: EntitySyncEditOptions
+		recordId: EntitySyncRecordId | undefined,
+		batch: EntitySyncEditBatch
 	) => void;
 
 	/**
