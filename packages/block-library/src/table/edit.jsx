@@ -46,6 +46,7 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getCellColumnRange,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -304,8 +305,13 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
-		const newColumnIndex = columnIndex + delta;
+		// Use the logical columns the selected cell covers, so that a column
+		// inserted after a cell with colspan lands after all of its columns.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		const newColumnIndex = delta > 0 ? columnIndex + colspan : columnIndex;
 
 		setAttributes(
 			insertColumn( attributes, {

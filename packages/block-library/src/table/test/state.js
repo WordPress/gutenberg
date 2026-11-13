@@ -4,6 +4,7 @@ import {
 	createTable,
 	getFirstRow,
 	getCellAttribute,
+	getCellColumnRange,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -217,6 +218,28 @@ describe( 'getCellAttribute', () => {
 		);
 
 		expect( state ).toBe( 'testVal' );
+	} );
+} );
+
+describe( 'getCellColumnRange', () => {
+	it( 'returns the logical columns covered by a cell', () => {
+		// "Sub C" is the first cell of its row, but starts at column 2
+		// because "A" and "B" span down into the row.
+		expect(
+			getCellColumnRange( tableWithRowspanHead, {
+				sectionName: 'head',
+				rowIndex: 1,
+				columnIndex: 0,
+			} )
+		).toEqual( { columnIndex: 2, colspan: 1 } );
+
+		expect(
+			getCellColumnRange( tableWithRowspanHead, {
+				sectionName: 'head',
+				rowIndex: 0,
+				columnIndex: 2,
+			} )
+		).toEqual( { columnIndex: 2, colspan: 2 } );
 	} );
 } );
 
@@ -986,6 +1009,107 @@ describe( 'insertColumn', () => {
 		};
 
 		expect( state ).toEqual( expected );
+	} );
+
+	it( 'widens a cell that spans across the inserted column', () => {
+		const state = insertColumn( tableWithRowspanHead, {
+			columnIndex: 3,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '3',
+					},
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{
+				cells: [
+					{ content: 'Sub C', tag: 'th' },
+					{ content: '', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+		expect( state.body[ 0 ].cells[ 3 ] ).toEqual( {
+			content: '',
+			tag: 'td',
+		} );
+	} );
+
+	it( 'inserts cells at the logical column in rows covered by a rowspan', () => {
+		const state = insertColumn( tableWithRowspanHead, {
+			columnIndex: 2,
+		} );
+
+		expect( state.head ).toEqual( [
+			{
+				cells: [
+					{ content: 'A', tag: 'th', rowspan: '2' },
+					{ content: 'B', tag: 'th', rowspan: '2' },
+					{ content: '', tag: 'th' },
+					{
+						content: 'Grouped',
+						tag: 'th',
+						align: 'center',
+						colspan: '2',
+					},
+					{ content: 'E', tag: 'th', rowspan: '2' },
+				],
+			},
+			{
+				cells: [
+					{ content: '', tag: 'th' },
+					{ content: 'Sub C', tag: 'th' },
+					{ content: 'Sub D', tag: 'th' },
+				],
+			},
+		] );
+		expect( state.body[ 0 ].cells ).toHaveLength( 6 );
+	} );
+
+	it( 'does not add a cell to rows covered by a cell spanning across the inserted column', () => {
+		const state = insertColumn(
+			deepFreeze( {
+				body: [
+					{
+						cells: [
+							{
+								content: 'X',
+								tag: 'td',
+								colspan: '2',
+								rowspan: '2',
+							},
+							{ content: 'Y', tag: 'td' },
+						],
+					},
+					{ cells: [ { content: 'Z', tag: 'td' } ] },
+				],
+			} ),
+			{ columnIndex: 1 }
+		);
+
+		expect( state.body ).toEqual( [
+			{
+				cells: [
+					{
+						content: 'X',
+						tag: 'td',
+						colspan: '3',
+						rowspan: '2',
+					},
+					{ content: 'Y', tag: 'td' },
+				],
+			},
+			{ cells: [ { content: 'Z', tag: 'td' } ] },
+		] );
 	} );
 } );
 

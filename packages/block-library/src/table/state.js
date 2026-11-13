@@ -267,6 +267,57 @@ function getSectionCellPositions( section ) {
 }
 
 /**
+ * Lists, for every row of a table section, the cells that cover it: the row's
+ * own cells and the cells spanning down into it from the rows above.
+ *
+ * @param {Array} positions Cell positions from `getSectionCellPositions`.
+ *
+ * @return {Array} For each row, an array with the `rowIndex` and `cellIndex`
+ *                 of each covering cell, and the logical `start` and `end`
+ *                 (exclusive) columns it covers.
+ */
+function getSectionCellCoverage( positions ) {
+	const coverage = positions.map( () => [] );
+
+	positions.forEach( ( rowPositions, rowIndex ) => {
+		rowPositions.forEach(
+			( { columnIndex, colspan, rowspan }, cellIndex ) => {
+				for ( let r = rowIndex; r < rowIndex + rowspan; r++ ) {
+					coverage[ r ].push( {
+						rowIndex,
+						cellIndex,
+						start: columnIndex,
+						end: columnIndex + colspan,
+					} );
+				}
+			}
+		);
+	} );
+
+	return coverage;
+}
+
+/**
+ * Returns the logical columns covered by a cell, accounting for colspan and
+ * rowspan in the table section.
+ *
+ * @param {Object} state        Current table state.
+ * @param {Object} cellLocation The location of the cell.
+ *
+ * @return {Object} The logical `columnIndex` where the cell starts, and its `colspan`.
+ */
+export function getCellColumnRange( state, cellLocation ) {
+	const { sectionName, rowIndex, columnIndex } = cellLocation;
+	const positions = getSectionCellPositions( state[ sectionName ] ?? [] );
+	const position = positions[ rowIndex ]?.[ columnIndex ];
+
+	return {
+		columnIndex: position?.columnIndex ?? columnIndex,
+		colspan: position?.colspan ?? 1,
+	};
+}
+
+/**
  * Inserts a row in the table state.
  *
  * @param {Object} state               Current table state.
@@ -427,23 +478,68 @@ export function insertColumn( state, { columnIndex } ) {
 				return [ sectionName, section ];
 			}
 
+			const positions = getSectionCellPositions( section );
+			const coverage = getSectionCellCoverage( positions );
+
 			return [
 				sectionName,
-				section.map( ( row ) => {
-					// Bail early if the row is empty or it's an attempt to insert past
-					// the last possible index of the array.
-					if ( isEmptyRow( row ) || row.cells.length < columnIndex ) {
+				section.map( ( row, rowIndex ) => {
+					// Bail early if the row is empty.
+					if ( isEmptyRow( row ) ) {
 						return row;
 					}
 
+					const rowCoverage = coverage[ rowIndex ];
+					const rowWidth = Math.max(
+						...rowCoverage.map( ( { end } ) => end )
+					);
+
+					// Bail early if it's an attempt to insert past the end of the row.
+					if ( rowWidth < columnIndex ) {
+						return row;
+					}
+
+					// A cell spanning across the insertion point grows by one
+					// column instead, in the row where it starts. The rows it
+					// covers don't get a new cell.
+					const spanningCell = rowCoverage.find(
+						( { start, end } ) =>
+							start < columnIndex && columnIndex < end
+					);
+					if ( spanningCell ) {
+						if ( spanningCell.rowIndex !== rowIndex ) {
+							return row;
+						}
+
+						return {
+							...row,
+							cells: row.cells.map( ( cell, cellIndex ) =>
+								cellIndex === spanningCell.cellIndex
+									? {
+											...cell,
+											colspan: String(
+												getSpan( cell.colspan ) + 1
+											),
+										}
+									: cell
+							),
+						};
+					}
+
+					// Insert the new cell after the cells that start before it.
+					const insertAt = positions[ rowIndex ].filter(
+						( position ) => position.columnIndex < columnIndex
+					).length;
+
 					return {
+						...row,
 						cells: [
-							...row.cells.slice( 0, columnIndex ),
+							...row.cells.slice( 0, insertAt ),
 							{
 								content: '',
 								tag: sectionName === 'head' ? 'th' : 'td',
 							},
-							...row.cells.slice( columnIndex ),
+							...row.cells.slice( insertAt ),
 						],
 					};
 				} ),
