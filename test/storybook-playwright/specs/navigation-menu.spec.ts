@@ -159,16 +159,25 @@ test.describe( 'NavigationMenu', () => {
 		expect( popupTransitionProperty ).toContain( 'height' );
 	} );
 
-	test( 'keeps tall flyout content reachable within the viewport', async ( {
+	test( 'keeps long and tall flyout content within the viewport', async ( {
 		page,
 	} ) => {
-		await page.setViewportSize( { width: 600, height: 320 } );
+		await page.setViewportSize( { width: 320, height: 320 } );
 		await gotoStoryId(
 			page,
 			'design-system-components-navigationmenu--tall-flyout-content'
 		);
 
 		await page.getByRole( 'button', { name: 'Destinations' } ).click();
+
+		const longLink = page.getByRole( 'link', {
+			name: 'A deliberately long translated navigation destination',
+		} );
+		await longLink.scrollIntoViewIfNeeded();
+		const box = await longLink.boundingBox();
+		expect( box ).not.toBeNull();
+		expect( box!.x ).toBeGreaterThanOrEqual( 0 );
+		expect( box!.x + box!.width ).toBeLessThanOrEqual( 320 );
 
 		const lastLink = page.getByRole( 'link', { name: 'Destination 20' } );
 		await lastLink.scrollIntoViewIfNeeded();

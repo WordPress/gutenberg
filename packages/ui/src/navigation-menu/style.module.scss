@@ -236,7 +236,7 @@
 			box-sizing: border-box;
 			width: max-content;
 			min-width: 100%;
-			max-width: var(--_wp-ui-navigation-menu-popup-max-width, var(--wpds-dimension-surface-width-md));
+			max-width: calc(min(var(--available-width), var(--_wp-ui-navigation-menu-popup-max-width, var(--wpds-dimension-surface-width-md))) - 2 * var(--wpds-border-width-xs));
 			padding: var(--wpds-dimension-padding-xs);
 			max-height: min(var(--available-height), 480px, 60dvh);
 			overflow-block: auto;

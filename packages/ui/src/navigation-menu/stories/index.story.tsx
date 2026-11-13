@@ -348,9 +348,9 @@ export const TallFlyoutContent: Story = {
 													href={ `#destination-${ index }` }
 													closeOnClick
 												>
-													{ `Destination ${
-														index + 1
-													}` }
+													{ index === 3
+														? 'A deliberately long translated navigation destination'
+														: `Destination ${ index + 1 }` }
 												</NavigationMenu.Link>
 											</NavigationMenu.Item>
 										)
