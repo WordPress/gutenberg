@@ -1,8 +1,9 @@
 const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
 
 // Read around aria-hidden descendants, which innerText includes.
-function readText( element: HTMLElement ): string {
+function readText( element: HTMLElement, useInnerText = true ): string {
 	if (
+		useInnerText &&
 		! element.querySelector( HIDDEN_CONTENT ) &&
 		element.getClientRects().length > 0 &&
 		typeof element.innerText === 'string'
@@ -28,7 +29,7 @@ function readText( element: HTMLElement ): string {
 				text += '\n';
 				continue;
 			}
-			const childText = readText( child );
+			const childText = readText( child, useInnerText );
 			const inline =
 				! display ||
 				display.startsWith( 'inline' ) ||
@@ -37,6 +38,35 @@ function readText( element: HTMLElement ): string {
 		}
 	}
 	return text;
+}
+
+function getText( element: HTMLElement, list?: HTMLElement ): string {
+	if ( element.matches( HIDDEN_CONTENT ) ) {
+		return '';
+	}
+	const view = element.ownerDocument.defaultView;
+	for (
+		let current: HTMLElement | null = element;
+		current && current !== list;
+		current = current.parentElement
+	) {
+		if (
+			current.hidden ||
+			view?.getComputedStyle( current ).display === 'none'
+		) {
+			return '';
+		}
+	}
+	return readText( element, ! list ).trim();
+}
+
+// List comparisons must stay readable under a hidden list. Always use the
+// recursive reader: innerText changes its formatting when an element is hidden.
+export function getAnnouncementComparisonText(
+	element: HTMLElement,
+	list: HTMLElement
+): string {
+	return getText( element, list );
 }
 
 /**
@@ -49,21 +79,5 @@ function readText( element: HTMLElement ): string {
  * @return The text to announce.
  */
 export function getAnnouncementText( element: HTMLElement ): string {
-	if ( element.matches( HIDDEN_CONTENT ) ) {
-		return '';
-	}
-	const view = element.ownerDocument.defaultView;
-	for (
-		let current: HTMLElement | null = element;
-		current;
-		current = current.parentElement
-	) {
-		if (
-			current.hidden ||
-			view?.getComputedStyle( current ).display === 'none'
-		) {
-			return '';
-		}
-	}
-	return readText( element ).trim();
+	return getText( element );
 }
