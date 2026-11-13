@@ -2,7 +2,10 @@ import loadAssets from '@wordpress/asset-loader';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 import { resolveSelect, useSelect } from '@wordpress/data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../lock-unlock';
+
+const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 let loadAssetsPromise: Promise< void >;
 
@@ -19,6 +22,7 @@ export async function loadEditorAssets() {
 			editorAssets.html_templates || [],
 			editorAssets.script_modules || {}
 		);
+		registerCoreBlockBindingsSources();
 	};
 
 	if ( ! loadAssetsPromise ) {
