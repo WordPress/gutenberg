@@ -19,7 +19,7 @@
 
 ### Bug Fixes
 
--   `AlignmentMatrixControl`: Show cell tooltips with the `@wordpress/ui` `Tooltip`, so they appear above `@wordpress/ui` overlays such as `Dialog` and `Popover`. Rendering the control enables the `@wordpress/ui` compat overlay slot, as `ColorPicker` already does. Each cell's accessible name is now its translated label, such as "Top Left", instead of its untranslated value, such as "top left". The tooltip no longer has `role="tooltip"`, opens after 600ms instead of 700ms, and does not open on touch devices ([#86807](https://github.com/WordPress/gutenberg/pull/86807)).
+-   `AlignmentMatrixControl`: Show cell tooltips with the `@wordpress/ui` `Tooltip`, so they appear above `@wordpress/ui` overlays such as `Dialog` and `Popover`. Rendering the control enables the `@wordpress/ui` compat overlay slot. Each cell's accessible name is now its translated label, such as "Top Left", instead of its untranslated value, such as "top left". The tooltip no longer has `role="tooltip"`, opens after 600ms instead of 700ms, and does not open on touch devices ([#86807](https://github.com/WordPress/gutenberg/pull/86807)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
