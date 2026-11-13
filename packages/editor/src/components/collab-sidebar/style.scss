@@ -84,13 +84,14 @@
 	position: relative;
 	padding: $grid-unit-20;
 	border-radius: $radius-large;
-	border: $border-width solid $gray-300;
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral);
 	background-color: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
 	overflow: hidden;
 	width: auto;
 
 	&.is-selected {
-		background-color: $white;
+		background-color: var(--wpds-color-background-surface-neutral-strong);
 		box-shadow: $elevation-medium;
 		z-index: 1;
 	}
