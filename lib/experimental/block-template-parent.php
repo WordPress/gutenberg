@@ -483,8 +483,9 @@ add_action( 'rest_api_init', 'gutenberg_register_block_template_parent_field' );
  *
  * Registered here rather than with the `wp_template` collection of
  * `@wordpress/core-fields`, which holds the fields core registers, so that the
- * field and its script module only exist while the experiment is on, and that
- * package stays as core ships it.
+ * field only exists while the experiment is on, and that package stays as core
+ * ships it. Its script module is registered with every other one, and is only
+ * imported for the field.
  *
  * Its id is `parent_template` rather than the `template` every other post type
  * has, which is the template that renders a post; its value is the `template`

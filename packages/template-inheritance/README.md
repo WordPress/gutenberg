@@ -6,7 +6,7 @@ The parts of the templates inside templates experiment that the editor loads as 
 
 The fields of the experiment are registered in PHP, by `lib/experimental/block-template-parent.php`, with the Entity fields API. That registration names this package's script module, `@wordpress/template-inheritance`, for the parts of the fields that cannot be serialized: their `Edit` and `render` components and their `getValue` and `setValue` callbacks. The editor imports the module when it needs the fields, and merges each entry of its default export into the field with the same id.
 
-The package exists apart from `@wordpress/core-fields`, which holds the fields core registers, so that nothing of the experiment ships with core.
+The package exists apart from `@wordpress/core-fields`, which holds the fields core registers, so that package stays as core ships it. The script module is built and registered with every other one, and nothing imports it while the experiment is off: only the PHP of the experiment registers the field that names it.
 
 ## Contributing to this package
 

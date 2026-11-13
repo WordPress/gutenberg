@@ -9,8 +9,10 @@
  * module on demand and merges each entry into the field with the same id.
  *
  * It is a package of its own, rather than part of `@wordpress/core-fields`,
- * which holds the fields core registers, so that nothing of the experiment
- * ships with core.
+ * which holds the fields core registers, so that package stays as core ships
+ * it. This module is built and registered with every other one, and nothing
+ * imports it while the experiment is off: only the PHP of the experiment
+ * registers the field that names it.
  */
 
 import { fieldExtensions as parentTemplate } from './parent-template/field';
