@@ -9,7 +9,7 @@
  */
 import * as Ariakit from '@ariakit/react';
 import { isRTL } from '@wordpress/i18n';
-import { useMemo, forwardRef } from '@wordpress/element';
+import { useLayoutEffect, useMemo, forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../context';
 import { CompositeContext } from './context';
 import { CompositeGroup } from './group';
@@ -77,6 +77,38 @@ export const Composite = Object.assign(
 		} );
 
 		const store = storeProp ?? internalStore;
+
+		useLayoutEffect( () => {
+			// React can move existing items without registering them again.
+			// Keep keyboard navigation in the committed DOM order.
+			store.setState( 'renderedItems', ( items ) => {
+				const sortedItems = [ ...items ].sort( ( first, second ) => {
+					if ( ! first.element || ! second.element ) {
+						return 0;
+					}
+					const position = first.element.compareDocumentPosition(
+						second.element
+					);
+					/* eslint-disable no-bitwise -- compareDocumentPosition returns a bitmask. */
+					if ( position & Node.DOCUMENT_POSITION_DISCONNECTED ) {
+						return 0;
+					}
+					if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
+						return -1;
+					}
+					if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
+						return 1;
+					}
+					/* eslint-enable no-bitwise */
+					return 0;
+				} );
+				return sortedItems.some(
+					( item, index ) => item !== items[ index ]
+				)
+					? sortedItems
+					: items;
+			} );
+		} );
 
 		const contextValue = useMemo(
 			() => ( {
