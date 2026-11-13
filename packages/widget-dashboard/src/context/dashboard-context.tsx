@@ -21,6 +21,8 @@ import {
 	resolveDashboardColumns,
 	resolveDashboardMinColumnWidth,
 } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
+import { resolveWidthOptions } from '../utils/resolve-width-options';
+import type { WidthOptionsResolution } from '../utils/resolve-width-options';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import { createPendingActionsMap } from '../utils/pending-actions-map';
 import type { PendingActionsMap } from '../utils/pending-actions-map';
@@ -30,6 +32,7 @@ import { useDashboardPolicy } from '../components/dashboard-policy';
 import { WIDGET_DASHBOARD_COLUMN_STEPS } from '../types';
 import type {
 	CanPerformDashboardOperation,
+	DashboardWidthOption,
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
@@ -85,6 +88,13 @@ interface InternalDashboardContextValue {
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
 	gridSettings: WidgetGridSettings;
+
+	/**
+	 * The host's validated width choices: the width menu, insertion
+	 * default, and resize targets read them, and `default` means none
+	 * were supplied (the current behavior everywhere).
+	 */
+	widthOptions: WidthOptionsResolution;
 
 	/**
 	 * Publishes the staged layout when it differs from the committed
@@ -183,6 +193,11 @@ interface ProviderProps {
 
 	gridSettings?: WidgetGridSettings;
 
+	/**
+	 * The host's width choices, validated on the way in.
+	 */
+	widthOptions?: readonly DashboardWidthOption[];
+
 	children: ReactNode;
 }
 
@@ -208,6 +223,7 @@ export function WidgetDashboardProvider( {
 	onEditChange,
 	resolveWidgetModule = DEFAULT_RESOLVE_WIDGET_MODULE,
 	gridSettings: committedGridSettings = DEFAULT_GRID,
+	widthOptions: widthOptionsProp,
 	children,
 }: ProviderProps ): React.ReactNode {
 	const [ stagingLayout, setStagingLayout ] =
@@ -228,25 +244,42 @@ export function WidgetDashboardProvider( {
 		[ policy ]
 	);
 
+	// The host's width choices, validated once. On the masonry model the
+	// list is not applicable and resolves away; an invalid list stays
+	// `invalid` so width governance can fail closed.
+	const widthOptions = useMemo< WidthOptionsResolution >(
+		() =>
+			resolveWidthOptions(
+				widthOptionsProp,
+				committedGridSettings.model ?? 'grid'
+			),
+		[ widthOptionsProp, committedGridSettings ]
+	);
+	const widthEnforcement =
+		widthOptions.kind === 'default' ? undefined : widthOptions;
+
 	// Every mutation stages through here, diffed against the current
-	// staging so every change the policy denies is re-asserted before it
-	// lands: what the interface hides, the staging layer rejects. Without
-	// a policy there is nothing to enforce, and staging stays byte-equal
+	// staging so every change the policy denies — or the width choices
+	// reject — is re-asserted before it lands: what the interface hides,
+	// the staging layer rejects. Without a policy and without width
+	// choices there is nothing to enforce, and staging stays byte-equal
 	// to what the trigger wrote.
 	const stageLayout = useCallback(
 		( next: DashboardWidget[] ) => {
 			setStagingLayout( ( previous ) =>
-				canPerform === ALLOW_EVERY_OPERATION
+				canPerform === ALLOW_EVERY_OPERATION &&
+				widthOptions.kind === 'default'
 					? next
 					: enforceLayoutPolicy( {
 							previous,
 							next,
 							canPerform,
 							widgetTypes,
+							widthOptions: widthEnforcement,
 						} )
 			);
 		},
-		[ canPerform, widgetTypes ]
+		[ canPerform, widgetTypes, widthOptions, widthEnforcement ]
 	);
 
 	// External change in `layout` (consumer-side reset, cross-tab sync,
@@ -255,6 +288,29 @@ export function WidgetDashboardProvider( {
 	useEffect( () => {
 		setStagingLayout( committedLayout );
 	}, [ committedLayout ] );
+
+	// Revalidate staging when the width choices change: a staged width is
+	// diffed against the committed layout, restoring the committed width
+	// when the staged one is no longer a choice and rejecting a staged
+	// insertion that has no committed width to restore. Independent
+	// staged edits (height, attributes, position) survive. Re-running the
+	// enforcement under a permissive policy is idempotent for already
+	// enforced staging, so the effect settles without churn.
+	useEffect( () => {
+		if ( ! widthEnforcement ) {
+			return;
+		}
+		setStagingLayout( ( staging ) => {
+			const enforced = enforceLayoutPolicy( {
+				previous: committedLayout,
+				next: staging,
+				canPerform,
+				widgetTypes,
+				widthOptions: widthEnforcement,
+			} );
+			return enforced === staging ? staging : enforced;
+		} );
+	}, [ widthEnforcement, committedLayout, canPerform, widgetTypes ] );
 
 	const gridSettings = useMemo(
 		() => resolveGridSettings( committedGridSettings ),
@@ -275,14 +331,37 @@ export function WidgetDashboardProvider( {
 	const commit = useCallback(
 		( options?: CommitOptions ) => {
 			if ( hasLayoutChanges ) {
-				onLayoutChange( canonicalizeLayout( stagingLayout ) );
+				// Width governance revalidates at the publish boundary:
+				// choices may have changed since the last staged write,
+				// so the staged layout re-checks against the committed
+				// one and the choices one last time.
+				const published =
+					widthEnforcement === undefined
+						? stagingLayout
+						: enforceLayoutPolicy( {
+								previous: committedLayout,
+								next: stagingLayout,
+								canPerform,
+								widgetTypes,
+								widthOptions: widthEnforcement,
+							} );
+				onLayoutChange( canonicalizeLayout( published ) );
 			}
 
 			if ( options?.exitEditMode !== false ) {
 				onEditChange?.( false );
 			}
 		},
-		[ hasLayoutChanges, onLayoutChange, stagingLayout, onEditChange ]
+		[
+			hasLayoutChanges,
+			onLayoutChange,
+			stagingLayout,
+			onEditChange,
+			committedLayout,
+			canPerform,
+			widgetTypes,
+			widthEnforcement,
+		]
 	);
 
 	// Auto-save for inline edits.
@@ -342,6 +421,7 @@ export function WidgetDashboardProvider( {
 			onLayoutChange: stageLayout,
 			onLayoutReset,
 			gridSettings,
+			widthOptions,
 			commit,
 			cancel,
 			scheduleAutoSave,
@@ -361,6 +441,7 @@ export function WidgetDashboardProvider( {
 			stageLayout,
 			onLayoutReset,
 			gridSettings,
+			widthOptions,
 			commit,
 			cancel,
 			scheduleAutoSave,
