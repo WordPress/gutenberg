@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Post Template: Add a `query_loop_block_item_html` filter for the markup of each post item ([#86396](https://github.com/WordPress/gutenberg/issues/86396)).
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
 -   Gallery: Use the UI SelectControl for the Order by settings ([#86620](https://github.com/WordPress/gutenberg/pull/86620)).
 -   Gallery: Use the UI SelectControl for the Resolution and Aspect ratio settings ([#86618](https://github.com/WordPress/gutenberg/pull/86618)).
