@@ -6,6 +6,10 @@
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
 
+### Bug Fixes
+
+-   When the root `package.json` has no `version`, use a content hash of the build as the version in `build/constants.php` instead of a comma ([#86778](https://github.com/WordPress/gutenberg/pull/86778)).
+
 ### Internal
 
 -   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
