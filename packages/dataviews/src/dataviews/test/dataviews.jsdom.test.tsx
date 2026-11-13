@@ -16,6 +16,7 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+globalThis.wpVitest.mockResizeObserver();
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
