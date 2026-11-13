@@ -142,6 +142,7 @@ A deprecated alternative to `onRemove`. This prop is kept for compatibility reas
 
 An array of notice actions. Each member object should contain:
 
+- `id`: `string` (optional) A stable identifier, unique within the notice. Supply it when actions can be reordered or replaced. It does not set an HTML ID. Actions without an ID keep positional identity.
 - `label`: `string` containing the text of the button/link
 - `url`: `string` (optional) The href URL for the action button. If provided, the action will render as an anchor tag.
 - `onClick`: `( event: SyntheticEvent ) => void` (optional) Function to call when clicked. Can be used alongside `url`.

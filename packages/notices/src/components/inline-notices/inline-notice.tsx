@@ -134,7 +134,14 @@ export default function InlineNotice( {
 			{ hasActions && (
 				<Notice.Actions>
 					{ actions.map( ( action, index ) => (
-						<NoticeActionControl key={ index } action={ action } />
+						<NoticeActionControl
+							key={
+								typeof action.id === 'string'
+									? `id:${ action.id }`
+									: `index:${ index }`
+							}
+							action={ action }
+						/>
 					) ) }
 					{ !! details && (
 						<Collapsible.Trigger

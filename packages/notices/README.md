@@ -33,6 +33,8 @@ Renders notice lists for notices with type `default`:
 
 `children` are rendered inside the dismissible list.
 
+Each inline notice action can include an optional string `id`. Supply a stable ID, unique within the notice, when actions can be reordered or replaced. This keeps focus on the same action when the array changes. The ID does not set an HTML ID. Actions without an ID keep positional identity.
+
 _Props_
 
 - `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.

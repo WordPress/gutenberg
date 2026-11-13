@@ -105,6 +105,7 @@ function Notice( {
 						(
 							{
 								className: buttonCustomClasses,
+								id,
 								label,
 								isPrimary,
 								variant,
@@ -133,7 +134,11 @@ function Notice( {
 							return (
 								<Button
 									size="compact"
-									key={ index }
+									key={
+										typeof id === 'string'
+											? `id:${ id }`
+											: `index:${ index }`
+									}
 									href={ url }
 									variant={ computedVariant }
 									onClick={ onClick }

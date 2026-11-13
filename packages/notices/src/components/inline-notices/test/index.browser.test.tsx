@@ -30,9 +30,87 @@ async function renderWithNotice(
 	return registry;
 }
 
+async function renderWithActions( actions: NoticeOptions[ 'actions' ] ) {
+	const registry = createRegistry();
+	registry.register( noticesStore );
+	const updateNotice = ( nextActions: NoticeOptions[ 'actions' ] ) =>
+		registry.dispatch( noticesStore ).createNotice( 'info', MESSAGE, {
+			id: 'action-owner',
+			isDismissible: false,
+			speak: false,
+			actions: nextActions,
+		} );
+	updateNotice( actions );
+	const view = await render(
+		<RegistryProvider value={ registry }>
+			<InlineNotices />
+		</RegistryProvider>
+	);
+	return async ( nextActions: NoticeOptions[ 'actions' ] ) => {
+		updateNotice( nextActions );
+		await view.rerender(
+			<RegistryProvider value={ registry }>
+				<InlineNotices />
+			</RegistryProvider>
+		);
+	};
+}
+
 describe( 'InlineNotices', () => {
 	beforeEach( () => {
 		vi.mocked( speak ).mockClear();
+	} );
+
+	describe( 'action identity', () => {
+		it( 'keeps an identified action and its current callback after reordering', async () => {
+			const user = userEvent.setup();
+			const previous = vi.fn();
+			const current = vi.fn();
+			const update = await renderWithActions( [
+				{ label: 'First', onClick: vi.fn() },
+				{ id: '0', label: 'Second', onClick: previous },
+			] );
+			await user.tab();
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: 'Second' } )
+			).toHaveFocus();
+
+			await update( [
+				{ id: '0', label: 'Updated second', onClick: current },
+				{ label: 'First', onClick: vi.fn() },
+			] );
+			expect(
+				screen.getByRole( 'button', { name: 'Updated second' } )
+			).toHaveFocus();
+			await user.keyboard( '{Enter}' );
+			expect( current ).toHaveBeenCalledTimes( 1 );
+			expect( previous ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not focus or activate an unrelated replacement action', async () => {
+			const user = userEvent.setup();
+			const replacement = vi.fn();
+			const update = await renderWithActions( [
+				{ label: 'First', onClick: vi.fn() },
+				{ id: 'second', label: 'Second', onClick: vi.fn() },
+			] );
+			await user.tab();
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: 'Second' } )
+			).toHaveFocus();
+
+			await update( [
+				{ label: 'First', onClick: vi.fn() },
+				{ id: 'third', label: 'Third', onClick: replacement },
+			] );
+			expect(
+				screen.getByRole( 'button', { name: 'Third' } )
+			).not.toHaveFocus();
+			await user.keyboard( '{Enter}' );
+			expect( replacement ).not.toHaveBeenCalled();
+		} );
 	} );
 
 	describe( 'details', () => {
