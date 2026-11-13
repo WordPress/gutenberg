@@ -9,11 +9,14 @@ import type {
 	FragmentProps,
 } from 'react';
 import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 import {
 	Children,
 	Fragment,
 	forwardRef,
 	isValidElement,
+	useEffect,
 } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { Spinner } from '@wordpress/ui';
@@ -138,6 +141,7 @@ export const Button = forwardRef( function UnforwardedButton(
 		__next40pxDefaultSize,
 		accessibleWhenDisabled,
 		isBusy,
+		loadingAnnouncement = __( 'Loading' ),
 		isDestructive,
 		className,
 		disabled,
@@ -155,6 +159,12 @@ export const Button = forwardRef( function UnforwardedButton(
 		description,
 		...buttonOrAnchorProps
 	} = useDeprecatedProps( props );
+
+	useEffect( () => {
+		if ( isBusy && loadingAnnouncement ) {
+			speak( loadingAnnouncement );
+		}
+	}, [ isBusy, loadingAnnouncement ] );
 
 	const {
 		href,
@@ -269,6 +279,7 @@ export const Button = forwardRef( function UnforwardedButton(
 			{ isBusy && (
 				<Spinner
 					className="components-button__busy-spinner"
+					aria-hidden="true"
 					data-testid="components-button-busy-spinner"
 				/>
 			) }
