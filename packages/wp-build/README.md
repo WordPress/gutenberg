@@ -52,6 +52,16 @@ or via npm script:
 }
 ```
 
+### Skipping Debug Assets
+
+```bash
+wp-build --no-script-debug
+```
+
+Builds only the minified `.min.js` and `.min.css` files, leaving out the non-minified copies used when `SCRIPT_DEBUG` is enabled. The generated registration code then loads the minified files even with `SCRIPT_DEBUG` on. Code that registers files from the build directory by hand should check the `has_debug_assets` key of the array that `build/constants.php` returns, the same way. The flag is ignored in watch mode.
+
+`wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
+
 ### Build Concurrency
 
 By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
@@ -743,7 +753,7 @@ The generated `widgets.php` registers each widget's entries as script modules vi
 {handlePrefix}/widgets/{widget-dir-name}/widget
 ```
 
-Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded. Builds made with `--no-script-debug` do not include the non-minified files, so they always load the minified ones.
 
 ### Watch Mode
 
