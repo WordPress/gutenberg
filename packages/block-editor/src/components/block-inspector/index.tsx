@@ -4,16 +4,15 @@ import {
 	getUnregisteredTypeHandlerName,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	MenuGroup,
-	MenuItem,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
 import type { ReactNode } from 'react';
-import { check } from '@wordpress/icons';
-import { Text } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Text,
+} from '@wordpress/ui';
 import EditContents from './edit-contents';
 import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
@@ -503,11 +502,9 @@ const BlockInspectorSingleBlock = ( {
 							value={ selectedBlockStyleState }
 							onChange={ onBlockStyleStateChange }
 						>
-							<MenuGroup>
-								<MenuItem
-									role="menuitemcheckbox"
-									isSelected={ showStateOnCanvas }
-									icon={ showStateOnCanvas ? check : null }
+							<Menu.Group>
+								<Menu.CheckboxItem
+									checked={ showStateOnCanvas }
 									// Previewing is only meaningful while a
 									// non-default pseudo state is selected.
 									disabled={
@@ -515,15 +512,17 @@ const BlockInspectorSingleBlock = ( {
 											selectedBlockStyleState
 										)
 									}
-									onClick={ () =>
+									onCheckedChange={ ( checked ) =>
 										onShowStateOnCanvasChange(
-											! showStateOnCanvas
+											Boolean( checked )
 										)
 									}
 								>
-									{ __( 'Preview on canvas' ) }
-								</MenuItem>
-							</MenuGroup>
+									<Menu.ItemLabel>
+										{ __( 'Preview on canvas' ) }
+									</Menu.ItemLabel>
+								</Menu.CheckboxItem>
+							</Menu.Group>
 						</BlockStatesControl>
 					)
 				}

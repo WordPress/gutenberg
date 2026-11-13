@@ -1,9 +1,16 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { check, chevronDown, moreVertical } from '@wordpress/icons';
-import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
-import { Stack } from '@wordpress/ui';
+import { chevronDown, moreVertical } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 import type { StateControlProps } from './types';
+
+type PositionerSide = ComponentProps< typeof Menu.Positioner >[ 'side' ];
+type PositionerAlign = ComponentProps< typeof Menu.Positioner >[ 'align' ];
 
 /**
  * State control for managing viewport and pseudo-state styles.
@@ -29,7 +36,7 @@ export default function StateControl( {
 	onChangeViewport,
 	onChangePseudoState,
 	showText = true,
-	popoverProps = {},
+	popoverProps,
 	children,
 }: StateControlProps ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
@@ -41,13 +48,19 @@ export default function StateControl( {
 		...viewportStates.map( ( state ) => ( {
 			label: state.label,
 			value: state.value,
+			info: state.info,
 		} ) ),
 	];
 	const pseudoStateOptions = [
-		{ label: __( 'Default' ), value: 'default' },
+		{
+			label: __( 'Default' ),
+			value: 'default',
+			info: __( 'Applies when no other state is active.' ),
+		},
 		...pseudoStates.map( ( state ) => ( {
 			label: state.label,
 			value: state.value,
+			info: state.info,
 		} ) ),
 	];
 
@@ -85,11 +98,31 @@ export default function StateControl( {
 	const currentStateLabel = activeStates.length
 		? activeStates.map( ( state ) => state.label ).join( ', ' )
 		: __( 'Default' );
-	const icon = showText ? chevronDown : moreVertical;
-	const toggleProps: ComponentProps< typeof DropdownMenu >[ 'toggleProps' ] =
-		showText
-			? { size: 'compact', iconPosition: 'right' }
-			: { size: 'small' };
+
+	const shouldCloseViewportOnClick = ! hasPseudoStateOptions && ! children;
+	const shouldClosePseudoOnClick = ! hasViewportOptions && ! children;
+
+	let side: PositionerSide = 'bottom';
+	let align: PositionerAlign = 'end';
+
+	if ( popoverProps?.placement ) {
+		const [ placementSide, placementAlign ] = popoverProps.placement.split(
+			'-'
+		) as [ PositionerSide | undefined, PositionerAlign | undefined ];
+		if ( placementSide ) {
+			side = placementSide;
+		}
+		align =
+			placementAlign ??
+			( placementSide === 'bottom' || placementSide === 'top'
+				? 'end'
+				: 'start' );
+	}
+
+	const sideOffset =
+		typeof popoverProps?.offset === 'number'
+			? popoverProps.offset
+			: popoverProps?.offset?.mainAxis;
 
 	return (
 		<Stack
@@ -98,82 +131,107 @@ export default function StateControl( {
 			align="flex-end"
 			className="block-editor-global-styles-state-control"
 		>
-			<DropdownMenu
-				icon={ icon }
-				label={
-					showText
-						? triggerLabel
-						: sprintf(
-								/* translators: %s: Current state (e.g. "Hover", "Focus") */
-								__( 'State: %s' ),
-								currentStateLabel
-							)
-				}
-				popoverProps={ {
-					placement: 'right-start',
-					...popoverProps,
-				} }
-				text={ showText ? triggerLabel : undefined }
-				toggleProps={ toggleProps }
-			>
-				{ ( { onClose } ) => (
-					<>
-						{ hasViewportOptions && (
-							<MenuGroup label={ __( 'Viewport' ) }>
-								{ viewportOptions.map( ( option ) => (
-									<MenuItem
-										key={ `viewport-${ option.value }` }
-										onClick={ () => {
-											onChangeViewport?.( option.value );
-											if (
-												! hasPseudoStateOptions &&
-												! children
-											) {
-												onClose();
-											}
-										} }
-										icon={
-											viewportValue === option.value
-												? check
-												: null
-										}
-									>
+			<Menu.Root modal={ false }>
+				<Menu.Trigger
+					render={
+						showText ? (
+							<Button
+								size="compact"
+								icon={ chevronDown }
+								iconPosition="right"
+							>
+								{ triggerLabel }
+							</Button>
+						) : (
+							<Button
+								size="small"
+								icon={ moreVertical }
+								label={ sprintf(
+									/* translators: %s: Current state (e.g. "Hover", "Focus") */
+									__( 'State: %s' ),
+									currentStateLabel
+								) }
+							/>
+						)
+					}
+				/>
+				<Menu.Popup
+					positioner={
+						<Menu.Positioner
+							side={ side }
+							align={ align }
+							sideOffset={ sideOffset }
+						/>
+					}
+				>
+					{ hasViewportOptions && (
+						<Menu.RadioGroup
+							value={ viewportValue }
+							onValueChange={ ( value ) =>
+								onChangeViewport?.( value as string )
+							}
+						>
+							<Menu.GroupLabel>
+								{ __( 'Viewport' ) }
+							</Menu.GroupLabel>
+							{ viewportOptions.map( ( option ) => (
+								<Menu.RadioItem
+									key={ `viewport-${ option.value }` }
+									value={ option.value }
+									closeOnClick={ shouldCloseViewportOnClick }
+								>
+									<Menu.ItemLabel>
 										{ option.label }
-									</MenuItem>
-								) ) }
-							</MenuGroup>
-						) }
-						{ hasPseudoStateOptions && (
-							<MenuGroup label={ __( 'Pseudo state' ) }>
-								{ pseudoStateOptions.map( ( option ) => (
-									<MenuItem
-										key={ `pseudo-${ option.value }` }
-										onClick={ () => {
-											onChangePseudoState?.(
-												option.value
-											);
-											if (
-												! hasViewportOptions &&
-												! children
-											) {
-												onClose();
-											}
-										} }
-										icon={
-											pseudoStateValue === option.value
-												? check
-												: null
-										}
-									>
+									</Menu.ItemLabel>
+									{ option.info ? (
+										<Menu.ItemDescription>
+											{ option.info }
+										</Menu.ItemDescription>
+									) : null }
+								</Menu.RadioItem>
+							) ) }
+						</Menu.RadioGroup>
+					) }
+					{ hasViewportOptions && hasPseudoStateOptions && (
+						<Menu.Separator />
+					) }
+					{ hasPseudoStateOptions && (
+						<Menu.RadioGroup
+							value={ pseudoStateValue }
+							onValueChange={ ( value ) =>
+								onChangePseudoState?.( value as string )
+							}
+						>
+							<Menu.GroupLabel>
+								{ __( 'Pseudo state' ) }
+							</Menu.GroupLabel>
+							{ pseudoStateOptions.map( ( option ) => (
+								<Menu.RadioItem
+									key={ `pseudo-${ option.value }` }
+									value={ option.value }
+									closeOnClick={ shouldClosePseudoOnClick }
+								>
+									<Menu.ItemLabel>
 										{ option.label }
-									</MenuItem>
-								) ) }
-							</MenuGroup>
-						) }
-						{ children }
-					</>
-				) }
-			</DropdownMenu>
+									</Menu.ItemLabel>
+									{ option.info ? (
+										<Menu.ItemDescription>
+											{ option.info }
+										</Menu.ItemDescription>
+									) : null }
+								</Menu.RadioItem>
+							) ) }
+						</Menu.RadioGroup>
+					) }
+					{ children && (
+						<>
+							{ ( hasViewportOptions ||
+								hasPseudoStateOptions ) && <Menu.Separator /> }
+							{ children }
+						</>
+					) }
+				</Menu.Popup>
+			</Menu.Root>
 		</Stack>
 	);
 }

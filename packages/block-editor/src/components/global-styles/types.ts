@@ -219,6 +219,8 @@ export interface StyleStateOption {
 	value: string;
 	/** Human readable name of the state. */
 	label: string;
+	/** Optional plain-English description of the state. */
+	info?: string;
 }
 
 export interface StateControlProps {
