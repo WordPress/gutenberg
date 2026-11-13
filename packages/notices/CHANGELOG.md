@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InlineNotices`: Accept optional action IDs to preserve focus during action list updates ([#86783](https://github.com/WordPress/gutenberg/pull/86783)).
+
 ## 6.1.0 (2026-11-04)
 
 ## 6.0.0 (2026-10-20)
