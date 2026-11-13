@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Block theme previews: show the previewed theme as a badge below the sidebar screen title, rather than prefixing the title itself ([#84029](https://github.com/WordPress/gutenberg/pull/84029)).
+
 ### Bug Fixes
 
 -   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
