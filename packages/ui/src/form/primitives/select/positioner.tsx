@@ -3,7 +3,7 @@ import { Select as _Select } from '@base-ui/react/select';
 import { forwardRef } from '@wordpress/element';
 import type { PositionerProps } from './types';
 import resetStyles from '../../../utils/css/resets.module.css';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import styles from './style.module.css';
 import { ITEM_POPUP_POSITIONER_PROPS } from '../constants';
 

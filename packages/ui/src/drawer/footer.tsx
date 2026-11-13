@@ -1,7 +1,7 @@
 import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { FooterProps } from './types';
 
 /**

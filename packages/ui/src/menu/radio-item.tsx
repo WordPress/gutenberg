@@ -5,7 +5,7 @@ import { Circle, SVG } from '@wordpress/primitives';
 import { Icon } from '../icon';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import { MenuItemContentContext } from './context';
 import { ItemContent, useItemContent } from './item';
 import type { RadioItemProps } from './types';

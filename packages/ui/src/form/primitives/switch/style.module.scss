@@ -1,4 +1,5 @@
 @use "../../../utils/css/mixins";
+@use "@wordpress/base-styles/variables";
 
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
@@ -67,19 +68,13 @@
 		}
 
 		.thumb {
-			--_wp-ui-elevation-xs:
-				0 1px 1px rgba(0, 0, 0, 0.03),
-				0 1px 2px rgba(0, 0, 0, 0.02),
-				0 3px 3px rgba(0, 0, 0, 0.02),
-				0 4px 4px rgba(0, 0, 0, 0.01);
-
 			display: block;
 			/* Thumb fills the inner track: height minus padding and border on both sides. */
 			height: calc(var(--_wp-ui-switch-height) - 4 * var(--_wp-ui-switch-track-inset));
 			aspect-ratio: 1;
 			background-color: var(--wpds-color-foreground-interactive-neutral);
 			border-radius: 50%;
-			box-shadow: var(--_wp-ui-elevation-xs);
+			box-shadow: variables.$elevation-x-small;
 
 			@media not (prefers-reduced-motion) {
 				transition:

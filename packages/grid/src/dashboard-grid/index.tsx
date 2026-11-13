@@ -41,7 +41,7 @@ import type { DashboardGridLayoutItem, DashboardGridProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
-import styles from './grid.module.css';
+import styles from './grid.module.scss';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],

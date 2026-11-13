@@ -7,7 +7,7 @@ import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { PopoverValidationProvider } from './context';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { PopupProps } from './types';
 
 const CLOSE_ATTR = 'data-wp-ui-popover-close';
@@ -48,7 +48,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function PopoverPopup(
 
 	// The popup is the (transformed) motion layer; visual chrome lives on the
 	// inner surface so the arrow's containing block stays borderless. See
-	// `style.module.css` for the full rationale.
+	// `style.module.scss` for the full rationale.
 	const popupChildren = useDefaultSurface ? (
 		<div className={ styles.surface }>{ validatedChildren }</div>
 	) : (

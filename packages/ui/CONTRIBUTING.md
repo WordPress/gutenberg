@@ -368,7 +368,7 @@ When the override also `composes` the primitive it extends, keep the override in
 
 Do not add new `--wp-ui-*` custom properties. Names in that prefix are public API. Existing ones remain supported; renaming or removing them is a breaking change.
 
-Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-elevation-lg`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
+Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-switch-height`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
 
 Style with semantic `--wpds-*` tokens, existing `--wp-ui-*` variables, props, or class composition. Do not introduce a new public CSS variable to make a value themeable.
 

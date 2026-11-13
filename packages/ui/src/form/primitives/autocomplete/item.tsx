@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useItemContent } from '../../../utils/item-popup';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	ITEM_DESCRIPTION_DIRECT_CHILD,
