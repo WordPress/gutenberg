@@ -18,7 +18,7 @@ Pick one for the entire surface. **Do not mix the two.** A page where some field
 A surface is a region whose save state is communicated by a single control: either one Save button, or the absence of any. Usually that is the whole screen, panel, or modal. A screen can occasionally be split into separate surfaces, for example a card of instantly applied switches beside a form with its own Save button, but only when the regions are visually distinct and each makes its model obvious. Treat this as the exception, not a way to mix models within one form.
 
 -   **Manual save** is the usual choice in WordPress. It is the right one when changes are interdependent and should apply together, when saving has side effects that are better batched into a single action, or when the environment submits a whole form at once (for example, classic WordPress admin screens, or third-party pages that post to PHP).
--   **Autosave** suits surfaces whose fields can be validated and persisted independently and asynchronously, such as a list of preferences that each take effect on their own (for example, the block editor’s Preferences modal). Nothing is ever “unsaved”, so there is no Save button and no unsaved-changes prompt.
+-   **Autosave** suits surfaces whose fields can be validated and persisted independently and asynchronously, such as a list of preferences that each take effect on their own (for example, the block editor’s Preferences modal). Changes save as they’re made, so there is no Save button, and no unsaved-changes prompt unless an edit fails to save.
 
 Choose the model that fits how the surface’s data is saved, and commit to it across every field on the surface.
 
@@ -39,7 +39,7 @@ When all changes are saved, the Save button is disabled. A disabled Save on a fo
 
 ### Unsaved changes on exit
 
-If the user navigates away with unsaved edits, prompt them to confirm before leaving so their changes aren’t lost. This guard exists **only** in the manual save model; an autosave surface never needs it.
+If the user navigates away with unsaved edits, prompt them to confirm before leaving so their changes aren’t lost. This guard belongs to the manual save model. An autosave surface only needs it while a text field holds an edit that failed to save (see [Autosave model](#autosave-model)).
 
 -   **Only ask when something would be lost.** Prompt only while there are unsaved edits. Once the user saves, or changes a field back to its saved value, navigation is free again.
 -   **Inside the app, use an [`AlertDialog`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-alertdialog--docs).** Hold the navigation (switching between adjacent pages, following a breadcrumb or opening a record) and ask “Discard unsaved changes?” with the `irreversible` intent, because leaving discards the edits and can’t be undone. Offer two choices: “Keep editing”, which cancels the navigation and is the safe default, and “Discard changes”, which continues. Don’t add a “Save and leave” option: a save can fail validation, and the dialog is the wrong place to show that.
@@ -58,7 +58,7 @@ Keep the Save button enabled when fields are invalid, so that clicking it can ex
 -   Move focus to the first invalid field, scrolling it into view.
 -   Don’t send the save until the errors are fixed.
 
-A form’s native validation does this for you: wrap the fields in a `<form>` and submit it, and controls built on `ControlWithError` show their message and move focus. Clear the site title below, then click “Save changes”:
+A form’s native validation does this for you: wrap the fields in a `<form>` and make Save a `type="submit"` button, so pressing Enter in a field submits too. Controls built on `ControlWithError` show their message and move focus. They also show a message as soon as focus leaves an invalid field, so place Save above the fields, for example in the card or page header, where a new message can’t push it away mid-click. Clear the site title below, then click “Save changes”:
 
 <Canvas of={ SaveSubmitStories.InvalidFields } />
 
@@ -68,7 +68,7 @@ If the save fails entirely, keep the user’s edits so they can retry, and show 
 
 ## Autosave model
 
-Each change is persisted as it is made. There is no Save button and no unsaved-changes guard, because there is never any unsaved state.
+Each change is persisted as it is made. There is no Save button, and no unsaved-changes guard while every change has saved.
 
 <Canvas of={ SaveSubmitStories.AutosaveFeatureList } />
 
@@ -77,7 +77,9 @@ Each change is persisted as it is made. There is no Save button and no unsaved-c
 -   **Per-field errors.** If a save fails, show the error at the field and let the user retry. A failure on one field must not block editing the others.
     -   For a switch, select, or radio, return the control to its saved value, so it never shows a state that wasn’t saved.
     -   For a text or number field, keep what the user entered so it isn’t lost, and mark the field as not saved until a retry succeeds.
--   **No global Save button** and **no “leave without saving?” prompt**. Both imply pending state that this model doesn’t have.
+    -   After “Try again”, move focus to the field it retried. The retry removes its notice, and focus would otherwise fall back to the page.
+-   **No global Save button.** It implies pending state that this model doesn’t have.
+-   **No unsaved-changes prompt while everything has saved.** The exception is a text or number field that failed to save: the field holds the user’s only copy of the edit. If the user navigates away, keep that edit so they can retry when they come back, or ask “Discard unsaved changes?” before throwing it away.
 
 In this example, saving “Show related posts” always fails. Flip it to see the switch return to its saved value, with an error `Notice` below it:
 

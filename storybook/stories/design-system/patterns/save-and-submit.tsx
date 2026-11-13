@@ -102,14 +102,17 @@ function SaveChangesButton( {
 	hasChanges,
 	isSaving,
 	onClick,
+	type = 'button',
 }: {
 	hasChanges: boolean;
 	isSaving: boolean;
-	onClick: () => void;
+	onClick?: () => void;
+	type?: 'button' | 'submit';
 } ) {
 	return (
 		<Stack>
 			<Button
+				type={ type }
 				disabled={ isSaving || ! hasChanges }
 				loading={ isSaving }
 				loadingAnnouncement="Saving changes"
@@ -194,10 +197,13 @@ export function SaveFormLayoutCardExample() {
 /**
  * Validates the form when "Save changes" is clicked.
  *
- * The button stays enabled while fields are invalid. Clicking it runs the
- * form's native validation, which shows each error below its field and
- * moves focus to the first invalid one. The save only starts once every
- * field is valid.
+ * The button stays enabled while fields are invalid. It submits the form,
+ * as does pressing Enter in a field, which runs the form's native
+ * validation: each error shows below its field and focus moves to the
+ * first invalid one. The save only starts once every field is valid.
+ *
+ * A field shows its error as soon as focus leaves it, so the button sits
+ * above the fields, where a new error can't push it away mid-click.
  */
 export function InvalidFieldsExample() {
 	const [ savedData, setSavedData ] = useState< SiteSettings >( {
@@ -205,7 +211,6 @@ export function InvalidFieldsExample() {
 		email: 'hello@example.com',
 	} );
 	const [ data, setData ] = useState( savedData );
-	const formRef = useRef< HTMLFormElement >( null );
 	const snackbar = useSnackbar();
 	const { validity } = useFormValidity( data, SITE_FIELDS, SITE_FORM );
 	const { isSaving, save } = useSimulatedSave< typeof data >( ( saved ) => {
@@ -217,39 +222,45 @@ export function InvalidFieldsExample() {
 
 	return (
 		<div className={ styles.container }>
-			<Card.Root className={ styles.card }>
-				<Card.Content>
-					<form
-						ref={ formRef }
-						onSubmit={ ( event ) => {
-							event.preventDefault();
-							save( data );
-						} }
-					>
-						<Stack direction="column" gap="lg">
-							<DataForm< SiteSettings >
-								data={ data }
-								fields={ SITE_FIELDS }
-								form={ SITE_FORM }
-								validity={ validity }
-								onChange={ ( edits ) =>
-									setData( ( previous ) => ( {
-										...previous,
-										...edits,
-									} ) )
-								}
-							/>
+			<form
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					if ( hasChanges && ! isSaving ) {
+						save( data );
+					}
+				} }
+			>
+				<Card.Root className={ styles.card }>
+					<Card.Header>
+						<Stack
+							direction="row"
+							justify="space-between"
+							align="center"
+						>
+							<Card.Title>Site</Card.Title>
 							<SaveChangesButton
+								type="submit"
 								hasChanges={ hasChanges }
 								isSaving={ isSaving }
-								onClick={ () =>
-									formRef.current?.requestSubmit()
-								}
 							/>
 						</Stack>
-					</form>
-				</Card.Content>
-			</Card.Root>
+					</Card.Header>
+					<Card.Content>
+						<DataForm< SiteSettings >
+							data={ data }
+							fields={ SITE_FIELDS }
+							form={ SITE_FORM }
+							validity={ validity }
+							onChange={ ( edits ) =>
+								setData( ( previous ) => ( {
+									...previous,
+									...edits,
+								} ) )
+							}
+						/>
+					</Card.Content>
+				</Card.Root>
+			</form>
 			<SnackbarArea snackbar={ snackbar } />
 		</div>
 	);
@@ -278,6 +289,9 @@ export function AutosaveFeatureListExample( {
 	>( {} );
 	const savedValuesRef = useRef( values );
 	const timeoutsRef = useRef< Partial< Record< FeatureId, number > > >( {} );
+	const switchesRef = useRef<
+		Partial< Record< FeatureId, HTMLSpanElement | null > >
+	>( {} );
 
 	useEffect( () => {
 		const timeouts = timeoutsRef.current;
@@ -311,6 +325,13 @@ export function AutosaveFeatureListExample( {
 		}, SAVE_DURATION );
 	}
 
+	// "Try again" is removed with its notice, so move focus to the switch
+	// it retries rather than letting it fall back to the page.
+	function retry( id: FeatureId, value: boolean ) {
+		switchesRef.current[ id ]?.focus();
+		onCheckedChange( id, value );
+	}
+
 	return (
 		<Card.Root className={ styles.card }>
 			<Card.Header>
@@ -327,6 +348,10 @@ export function AutosaveFeatureListExample( {
 								gap="sm"
 							>
 								<SwitchControl
+									ref={ ( element ) => {
+										switchesRef.current[ feature.id ] =
+											element;
+									} }
 									label={ feature.label }
 									description={ feature.description }
 									checked={ values[ feature.id ] }
@@ -343,7 +368,7 @@ export function AutosaveFeatureListExample( {
 											<Notice.Actions>
 												<Notice.ActionButton
 													onClick={ () =>
-														onCheckedChange(
+														retry(
 															feature.id,
 															failedValue
 														)
@@ -385,6 +410,19 @@ export function UnsavedChangesOnExitExample() {
 	} );
 	const [ isLeavePending, setIsLeavePending ] = useState( false );
 	const hasChanges = data.title !== savedData.title;
+	const backRef = useRef< HTMLButtonElement >( null );
+	const returnRef = useRef< HTMLButtonElement >( null );
+	const previousHasLeftRef = useRef( hasLeft );
+
+	// Leaving and returning each remove the button that was used, so move
+	// focus to the main action of the view that replaces it.
+	useEffect( () => {
+		if ( previousHasLeftRef.current === hasLeft ) {
+			return;
+		}
+		previousHasLeftRef.current = hasLeft;
+		( hasLeft ? returnRef : backRef ).current?.focus();
+	}, [ hasLeft ] );
 
 	useEffect( () => {
 		if ( hasLeft || ! hasChanges ) {
@@ -435,7 +473,11 @@ export function UnsavedChangesOnExitExample() {
 			<div className={ styles.container }>
 				<Stack direction="column" gap="md" align="start">
 					<Text render={ <p /> }>You left the settings page.</Text>
-					<Button variant="outline" onClick={ returnToSettings }>
+					<Button
+						ref={ returnRef }
+						variant="outline"
+						onClick={ returnToSettings }
+					>
 						Return to settings
 					</Button>
 				</Stack>
@@ -448,6 +490,7 @@ export function UnsavedChangesOnExitExample() {
 			<Stack direction="column" gap="md">
 				<Stack>
 					<Button
+						ref={ backRef }
 						variant="minimal"
 						tone="neutral"
 						loading={ isLeavePending }
