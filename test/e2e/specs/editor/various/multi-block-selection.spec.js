@@ -593,6 +593,38 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should keep a full block selection on right click', async ( {
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'first paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/verse',
+			attributes: { content: 'verse' },
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+
+		await editor.canvas
+			.getByText( 'first paragraph', { exact: true } )
+			.click( { button: 'right' } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+
+		// Playwright can't open the context menu, so cut with the keyboard.
+		await pageUtils.pressKeys( 'primary+x' );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
 	test( 'should copy and paste', async ( { page, editor, pageUtils } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
