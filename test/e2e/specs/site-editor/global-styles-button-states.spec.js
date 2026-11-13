@@ -48,7 +48,7 @@ test.describe( 'Global Styles - Button States', () => {
 		await stateDropdown.click();
 
 		await page
-			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
+			.getByRole( 'menuitemradio', { name: 'Hover', exact: true } )
 			.click();
 
 		await page
@@ -129,7 +129,7 @@ test.describe( 'Global Styles - Button States', () => {
 			.click();
 
 		await page
-			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
+			.getByRole( 'menuitemradio', { name: 'Hover', exact: true } )
 			.click();
 
 		await page
