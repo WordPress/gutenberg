@@ -10,13 +10,14 @@ it( 'announces formatted titles and descriptions using their visible text', asyn
 			<Notice.Root>
 				<Notice.Title>
 					Save <strong>failed</strong>!
+					<span aria-hidden="true">Decoration</span>
 				</Notice.Title>
 				<Notice.Description render={ <div /> }>
 					<p>
 						Retry
 						<br />
-						later.
-						<span aria-hidden="true">Decoration</span>
+						later &amp; reopen.
+						<span hidden>Hidden detail</span>
 					</p>
 					<p style={ { display: showHint ? 'block' : 'none' } }>
 						Check your connection.
@@ -36,14 +37,14 @@ it( 'announces formatted titles and descriptions using their visible text', asyn
 	await waitFor( () =>
 		expect( status ).toHaveProperty(
 			'textContent',
-			'Save failed! Retry\nlater.'
+			'Save failed! Retry\nlater & reopen.'
 		)
 	);
 	await rerender( notice( true ) );
 	await waitFor( () =>
 		expect( status ).toHaveProperty(
 			'textContent',
-			'Save failed! Retry\nlater.\n\nCheck your connection.'
+			'Save failed! Retry\nlater & reopen.\n\nCheck your connection.'
 		)
 	);
 } );

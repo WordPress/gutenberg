@@ -261,25 +261,6 @@ describe( 'InlineNotices', () => {
 			// `__unstableHTML` is deprecated.
 			expect( console ).toHaveWarned();
 		} );
-
-		it( 'preserves line breaks and omits hidden text in HTML announcements', async () => {
-			const { registry } = await renderWithNotice( 'error' );
-			registry
-				.dispatch( noticesStore )
-				.createNotice(
-					'error',
-					'<p>Save <strong>failed</strong><span aria-hidden="true"> (error)</span>.</p><p>Retry<br>later &amp; reopen.<span hidden>Hidden detail</span><span style="display:none">Hidden by CSS</span></p>',
-					{ __unstableHTML: true }
-				);
-
-			expect( console ).toHaveWarned();
-			await waitFor( () =>
-				expect( screen.getByRole( 'alert' ) ).toHaveProperty(
-					'textContent',
-					'Save failed.\n\nRetry\nlater & reopen.'
-				)
-			);
-		} );
 	} );
 
 	describe( 'actions', () => {
