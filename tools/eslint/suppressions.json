@@ -1825,6 +1825,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/gallery/controls.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/gallery/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1850,9 +1861,6 @@
 		}
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -1968,11 +1976,6 @@
 		}
 	},
 	"packages/block-library/src/gallery/use-get-media.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/gallery/use-image-sizes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
