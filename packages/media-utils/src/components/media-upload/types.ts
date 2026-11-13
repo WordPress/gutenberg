@@ -100,8 +100,18 @@ interface MediaView {
  */
 export interface MediaFrame {
 	options: MediaFrameOptions;
+	cid: string;
 	el?: HTMLElement;
-	modal?: { el?: HTMLElement; remove: () => void };
+	modal?: {
+		el: HTMLElement;
+		template: () => string;
+		options: { container: Element };
+		focusManager: {
+			setElement: ( element: Element ) => void;
+			undelegateEvents: () => void;
+		};
+		remove: () => void;
+	};
 	$el: { addClass: ( className: string ) => void };
 	content: {
 		set: ( view: MediaView ) => void;
@@ -123,6 +133,7 @@ export interface MediaFrame {
 		context?: unknown
 	) => void;
 	close: () => void;
+	escape: () => void;
 	open: () => void;
 	remove: () => void;
 	detach: () => void;

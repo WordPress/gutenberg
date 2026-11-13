@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `MediaUpload` and `MediaUploadModal`: Use `@wordpress/ui` Dialog for media-picker overlays. ([#78029](https://github.com/WordPress/gutenberg/pull/78029))
 -   `MediaUploadModal`: Query filters on attachment taxonomy fields by the taxonomy. ([#86458](https://github.com/WordPress/gutenberg/pull/86458))
 -   `MediaUploadModal`: Add a `fields` prop for fields registered for attachments, shown alongside the modal's own as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 

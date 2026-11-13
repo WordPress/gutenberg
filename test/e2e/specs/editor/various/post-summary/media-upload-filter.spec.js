@@ -6,7 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
  * featured image field must reach them with it, and open the featured-image
  * media frame.
  */
-test.describe( 'Featured image media upload filter', () => {
+test.describe( 'Featured image media upload filter (@firefox, @webkit)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.resetPreferences();
 		await requestUtils.activatePlugin(
@@ -36,6 +36,19 @@ test.describe( 'Featured image media upload filter', () => {
 			page.getByRole( 'button', { name: 'Set featured image' } )
 		).toBeVisible();
 		await expectFeaturedImageFrame( page );
+
+		// Extensions can reopen Core's current frame without calling the render prop.
+		await page.evaluate( () => {
+			window.wp.media.frame.open();
+		} );
+		const reopened = page.getByRole( 'dialog', { name: 'Featured image' } );
+		await expect( reopened ).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect( reopened ).toBeHidden();
+		await expect( marker ).toHaveAttribute( 'data-custom-state', 'true' );
+		await expect(
+			page.getByRole( 'button', { name: 'Set featured image' } )
+		).toBeFocused();
 	} );
 } );
 

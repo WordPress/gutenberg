@@ -891,7 +891,7 @@ test.describe( 'Media Library modal undo', () => {
 			.click();
 
 		const modal = page.locator( '.media-modal' );
-		const backdrop = page.locator( '.media-modal-backdrop' );
+		const backdrop = page.getByTestId( 'dialog-backdrop' );
 
 		await expect( modal ).toBeVisible();
 		await expect( backdrop ).toBeVisible();

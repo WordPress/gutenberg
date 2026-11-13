@@ -436,7 +436,7 @@ test.describe( 'Gallery', () => {
 			);
 	} );
 
-	test( 'when initially added the media library shows the Create Gallery view', async ( {
+	test( 'when initially added the media library shows the Create Gallery view (@firefox, @webkit)', async ( {
 		admin,
 		editor,
 		page,
@@ -455,6 +455,30 @@ test.describe( 'Gallery', () => {
 		await expect(
 			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
 		).toBeVisible();
+
+		await mediaLibrary
+			.getByRole( 'tab', { name: 'Media Library' } )
+			.click();
+		await mediaLibrary
+			.getByRole( 'checkbox', { name: uploadedMedia.title.rendered } )
+			.check();
+		const createGallery = mediaLibrary.getByRole( 'button', {
+			name: 'Create a new gallery',
+		} );
+		await expect( createGallery ).toBeEnabled();
+		await createGallery.click();
+		const editGallery = page.getByRole( 'dialog', {
+			name: 'Edit gallery',
+			exact: true,
+		} );
+		await expect( editGallery ).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect( editGallery ).toBeHidden();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library', exact: true } )
+			.click();
+		await expect( mediaLibrary ).toBeVisible();
+		await expect( createGallery ).toBeDisabled();
 	} );
 
 	test( 'can randomize the image on the front end', async ( {

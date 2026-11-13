@@ -8,22 +8,32 @@
 		'editor.MediaUpload',
 		'gutenberg-test/media-upload-filter',
 		function ( MediaUpload ) {
-			return function ( props ) {
-				return el(
-					Fragment,
-					{},
-					el( MediaUpload, props ),
-					el(
-						'div',
-						{
-							className: 'e2e-media-upload-filter',
-							'data-featured-image-flow': String(
-								!! props.featuredImageFlow
-							),
-						},
-						'Media upload filter'
-					)
-				);
+			return class FilteredMediaUpload extends MediaUpload {
+				constructor( props ) {
+					super( props );
+					this.state = { customFlag: true };
+				}
+
+				render() {
+					return el(
+						Fragment,
+						{},
+						super.render(),
+						el(
+							'div',
+							{
+								className: 'e2e-media-upload-filter',
+								'data-featured-image-flow': String(
+									!! this.props.featuredImageFlow
+								),
+								'data-custom-state': String(
+									this.state.customFlag
+								),
+							},
+							'Media upload filter'
+						)
+					);
+				}
 			};
 		}
 	);

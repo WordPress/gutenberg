@@ -3,15 +3,9 @@
 @use "@wordpress/base-styles/mixins" as *;
 
 .media-upload-modal {
-	.components-modal__header {
-		padding-bottom: $grid-unit-10;
-	}
-
-	.components-modal__frame.is-full-screen .components-modal__content {
-		margin-bottom: 0;
-	}
-
-	.components-modal__content {
+	.media-upload-modal__content {
+		display: flex;
+		flex-direction: column;
 		padding: 0;
 	}
 
@@ -74,20 +68,13 @@
 }
 
 .media-upload-modal__upload-status__popover {
-	.components-popover__content {
-		width: 320px;
-	}
+	width: min(320px, calc(100vw - 16px));
 
 	.media-upload-modal__upload-status__header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		padding: $grid-unit-15 $grid-unit-20;
-		h3 {
-			margin: 0;
-			font-size: 13px;
-			font-weight: var(--wpds-typography-font-weight-emphasis);
-		}
 	}
 
 	.media-upload-modal__upload-status__list {

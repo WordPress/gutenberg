@@ -1,9 +1,12 @@
+import type { ReactNode } from 'react';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { select, dispatch } from '@wordpress/data';
 import type { DataRegistry } from '@wordpress/data';
 import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
+import { MediaFrameDialog } from './media-frame-dialog';
+import styles from './media-frame-dialog.module.css';
 import type {
 	MediaAttachment,
 	MediaCollection,
@@ -261,18 +264,27 @@ const getAttachmentsCollection = ( ids?: number | number[] ) => {
 };
 
 class MediaUpload extends Component< MediaUploadProps > {
+	private isUnmounting = false;
+	private coreFrame?: { frame: MediaFrame; open: () => void };
 	declare frame: MediaFrame;
 	declare lastGalleryValue: number[] | undefined;
 	declare GalleryDetailsMediaFrame: MediaFrameConstructor | undefined;
 	constructor( ...args: [ props: MediaUploadProps, context?: unknown ] ) {
 		super( ...args );
+		this.state = { isOpen: false };
 		this.openModal = this.openModal.bind( this );
+		this.openFrame = this.openFrame.bind( this );
+		this.closeFrame = this.closeFrame.bind( this );
 		this.onOpen = this.onOpen.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
 		this.stopUndoRedoPropagation =
 			this.stopUndoRedoPropagation.bind( this );
+	}
+
+	private get isOpen() {
+		return ( this.state as { isOpen?: boolean } | null )?.isOpen === true;
 	}
 
 	stopUndoRedoPropagation( event: KeyboardEvent ) {
@@ -313,21 +325,20 @@ class MediaUpload extends Component< MediaUploadProps > {
 			value = DEFAULT_EMPTY_GALLERY,
 		} = this.props as MediaUploadProps & { value?: number[] };
 
-		const isFrameAttached = !! this.frame?.el?.isConnected;
-		// If the value did not change and the existing frame is still attached,
-		// we can continue to use the existing one.
-		if ( value === this.lastGalleryValue && isFrameAttached ) {
+		// A closed gallery starts a fresh session, discarding cancelled edits.
+		if (
+			this.isOpen &&
+			value === this.lastGalleryValue &&
+			this.frame?.el?.isConnected
+		) {
 			return;
 		}
 
 		const { wp } = window as unknown as MediaWindow;
-
 		this.lastGalleryValue = value;
 
 		// If a frame already existed remove it.
-		if ( this.frame ) {
-			this.frame.remove();
-		}
+		this.removeFrame();
 		let currentState;
 		if ( addToGallery ) {
 			currentState = 'gallery-library';
@@ -351,7 +362,6 @@ class MediaUpload extends Component< MediaUploadProps > {
 			...( allowedTypes && { library: { type: allowedTypes } } ),
 		} );
 		wp.media.frame = this.frame;
-		this.initializeListeners();
 	}
 
 	/**
@@ -360,6 +370,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 	buildAndSetFeatureImageFrame() {
 		const { wp } = window as unknown as MediaWindow;
 		const { value: featuredImageId, multiple, allowedTypes } = this.props;
+		this.removeFrame();
 		const featuredImageFrame = getFeaturedImageMediaFrame();
 		const attachments = getAttachmentsCollection( featuredImageId );
 		const selection = new wp.media.model.Selection( attachments.models, {
@@ -404,9 +415,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 		}
 
 		// If a frame already exists, remove it.
-		if ( this.frame ) {
-			this.frame.remove();
-		}
+		this.removeFrame();
 
 		const singleImageFrame = getSingleMediaFrame();
 		const attachments = getAttachmentsCollection( value );
@@ -423,20 +432,15 @@ class MediaUpload extends Component< MediaUploadProps > {
 	}
 
 	componentWillUnmount() {
-		this.detachUndoRedoGuard();
-		this.frame?.close();
-		this.frame?.modal?.remove();
-		this.frame?.remove();
+		this.isUnmounting = true;
+		this.removeFrame();
 	}
 
-	detachUndoRedoGuard() {
-		if ( this.frame?.modal?.el ) {
-			this.frame.modal.el.removeEventListener(
-				'keydown',
-				this.stopUndoRedoPropagation,
-				true
-			);
-		}
+	private removeFrame() {
+		this.frame?.close();
+		this.frame?.detach();
+		this.frame?.modal?.remove();
+		this.frame?.remove();
 	}
 
 	onUpdate( selections?: MediaCollection ) {
@@ -470,14 +474,6 @@ class MediaUpload extends Component< MediaUploadProps > {
 		const { wp } = window as unknown as MediaWindow;
 		const { value } = this.props;
 		this.updateCollection();
-
-		if ( this.frame?.modal?.el ) {
-			this.frame.modal.el.addEventListener(
-				'keydown',
-				this.stopUndoRedoPropagation,
-				true
-			);
-		}
 
 		//Handle active tab in media model on model open.
 		if ( this.props.mode ) {
@@ -514,8 +510,10 @@ class MediaUpload extends Component< MediaUploadProps > {
 	}
 
 	onClose() {
+		if ( this.isOpen && ! this.isUnmounting ) {
+			this.setState( { isOpen: false } );
+		}
 		const { onClose } = this.props;
-		this.detachUndoRedoGuard();
 
 		if ( onClose ) {
 			onClose();
@@ -540,8 +538,6 @@ class MediaUpload extends Component< MediaUploadProps > {
 			DataRegistry,
 			'select' | 'dispatch'
 		> );
-
-		this.frame.detach();
 	}
 
 	updateCollection() {
@@ -584,7 +580,9 @@ class MediaUpload extends Component< MediaUploadProps > {
 			);
 		}
 
-		if ( gallery ) {
+		if ( featuredImageFlow ?? unstableFeaturedImageFlow ) {
+			this.buildAndSetFeatureImageFrame();
+		} else if ( gallery ) {
 			this.buildAndSetGalleryFrame();
 		} else {
 			this.buildAndSetSingleMediaFrame();
@@ -594,15 +592,70 @@ class MediaUpload extends Component< MediaUploadProps > {
 			this.frame.$el.addClass( modalClass );
 		}
 
-		if ( featuredImageFlow ?? unstableFeaturedImageFlow ) {
-			this.buildAndSetFeatureImageFrame();
+		if ( this.coreFrame?.frame !== this.frame ) {
+			const frame = this.frame;
+			this.initializeListeners();
+			this.coreFrame = { frame, open: frame.open.bind( frame ) };
+			// Core and extensions can reopen the current frame directly.
+			frame.open = () => {
+				if ( ! this.isUnmounting ) {
+					this.setState( { isOpen: true } );
+				}
+				return frame;
+			};
 		}
-		this.initializeListeners();
 		this.frame.open();
 	}
 
-	render() {
-		return this.props.render( { open: this.openModal } );
+	openFrame( container: HTMLDivElement ) {
+		const { modal } = this.frame;
+		if ( ! modal ) {
+			return null;
+		}
+
+		// Core keeps the library, uploader, and plugin-provided views. Dialog
+		// replaces only the modal chrome around those views.
+		modal.template = () => '<div class="media-modal-content"></div>';
+		modal.el.classList.add( styles.frame );
+		modal.options.container = container;
+		const dialog = container.closest( '[role="dialog"]' );
+		if ( dialog?.parentElement ) {
+			// Keep Core's explicit focus() calls, but let Dialog own tabbing.
+			modal.focusManager.setElement( dialog.parentElement );
+			modal.focusManager.undelegateEvents();
+		}
+		this.coreFrame?.open();
+		return (
+			this.frame.el?.querySelector< HTMLElement >(
+				'.media-frame-title'
+			) ?? null
+		);
+	}
+
+	closeFrame() {
+		this.frame.escape();
+	}
+
+	render(): ReactNode {
+		return (
+			<>
+				{ this.props.render( { open: this.openModal } ) }
+				{ this.frame && (
+					<MediaFrameDialog
+						key={ this.frame.cid }
+						onOpen={ this.openFrame }
+						onClose={ this.closeFrame }
+						onKeyDown={ this.stopUndoRedoPropagation }
+						open={ this.isOpen }
+						title={
+							this.props.title ||
+							this.frame.options.title ||
+							__( 'Select or Upload Media' )
+						}
+					/>
+				) }
+			</>
+		);
 	}
 }
 
