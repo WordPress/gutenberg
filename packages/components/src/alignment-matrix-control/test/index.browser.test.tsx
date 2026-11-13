@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import AlignmentMatrixControl from '..';
 
 const getControl = () => {
@@ -14,7 +15,7 @@ const getCell = ( name: string ) => {
 
 const renderAndInitCompositeStore = async (
 	jsx: React.JSX.Element,
-	focusedCell = 'center center'
+	focusedCell = 'Center'
 ) => {
 	const view = await render( jsx );
 	await waitFor( () => {
@@ -44,7 +45,21 @@ describe( 'AlignmentMatrixControl', () => {
 
 			await userEvent.tab();
 
-			expect( getCell( 'center center' ) ).toHaveFocus();
+			expect( getCell( 'Center' ) ).toHaveFocus();
+		} );
+
+		it( 'should show the cell label in a tooltip in the overlay slot', async () => {
+			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
+
+			await userEvent.hover( getCell( 'Top Left' ) );
+
+			const slot = getWpCompatOverlaySlot();
+			expect( slot ).toBeDefined();
+			await waitFor( () =>
+				expect(
+					within( slot as HTMLDivElement ).getByText( 'Top Left' )
+				).toBeVisible()
+			);
 		} );
 	} );
 
@@ -52,15 +67,15 @@ describe( 'AlignmentMatrixControl', () => {
 		describe( 'with Mouse', () => {
 			describe( 'on cell click', () => {
 				it.each( [
-					'top left',
-					'top center',
-					'top right',
-					'center left',
-					'center right',
-					'bottom left',
-					'bottom center',
-					'bottom right',
-				] )( '%s', async ( alignment ) => {
+					[ 'Top Left', 'top left' ],
+					[ 'Top Center', 'top center' ],
+					[ 'Top Right', 'top right' ],
+					[ 'Center Left', 'center left' ],
+					[ 'Center Right', 'center right' ],
+					[ 'Bottom Left', 'bottom left' ],
+					[ 'Bottom Center', 'bottom center' ],
+					[ 'Bottom Right', 'bottom right' ],
+				] )( '%s', async ( name, alignment ) => {
 					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
@@ -70,7 +85,7 @@ describe( 'AlignmentMatrixControl', () => {
 						/>
 					);
 
-					const cell = getCell( alignment );
+					const cell = getCell( name );
 
 					await userEvent.click( cell );
 
@@ -88,7 +103,7 @@ describe( 'AlignmentMatrixControl', () => {
 						/>
 					);
 
-					const cell = getCell( 'center center' );
+					const cell = getCell( 'Center' );
 
 					await userEvent.click( cell );
 
@@ -101,39 +116,39 @@ describe( 'AlignmentMatrixControl', () => {
 		describe( 'with Keyboard', () => {
 			describe( 'on arrow press', () => {
 				it.each( [
-					[ 'ArrowUp', 'top center' ],
-					[ 'ArrowLeft', 'center left' ],
-					[ 'ArrowDown', 'bottom center' ],
-					[ 'ArrowRight', 'center right' ],
-				] as const )( '%s', async ( keyRef, cellRef ) => {
+					[ 'ArrowUp', 'Top Center', 'top center' ],
+					[ 'ArrowLeft', 'Center Left', 'center left' ],
+					[ 'ArrowDown', 'Bottom Center', 'bottom center' ],
+					[ 'ArrowRight', 'Center Right', 'center right' ],
+				] as const )( '%s', async ( keyRef, cellName, cellRef ) => {
 					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
-					await userEvent.click( getCell( 'center center' ) );
+					await userEvent.click( getCell( 'Center' ) );
 					await userEvent.keyboard( `{${ keyRef }}` );
 
-					expect( getCell( cellRef ) ).toHaveFocus();
+					expect( getCell( cellName ) ).toHaveFocus();
 					expect( spy ).toHaveBeenCalledWith( cellRef );
 				} );
 			} );
 
 			describe( 'but not at at edge', () => {
 				it.each( [
-					[ 'ArrowUp', 'top left' ],
-					[ 'ArrowLeft', 'top left' ],
-					[ 'ArrowDown', 'bottom right' ],
-					[ 'ArrowRight', 'bottom right' ],
-				] as const )( '%s', async ( keyRef, cellRef ) => {
+					[ 'ArrowUp', 'Top Left', 'top left' ],
+					[ 'ArrowLeft', 'Top Left', 'top left' ],
+					[ 'ArrowDown', 'Bottom Right', 'bottom right' ],
+					[ 'ArrowRight', 'Bottom Right', 'bottom right' ],
+				] as const )( '%s', async ( keyRef, cellName, cellRef ) => {
 					const spy = vi.fn();
 
 					await renderAndInitCompositeStore(
 						<AlignmentMatrixControl onChange={ spy } />
 					);
 
-					const cell = getCell( cellRef );
+					const cell = getCell( cellName );
 					await userEvent.click( cell );
 					await userEvent.keyboard( `{${ keyRef }}` );
 
