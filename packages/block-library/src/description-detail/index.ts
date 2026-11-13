@@ -1,4 +1,4 @@
-import { listItem as icon } from '@wordpress/icons';
+import { contents as icon } from '@wordpress/icons';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';

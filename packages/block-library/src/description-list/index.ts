@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { list as icon } from '@wordpress/icons';
+import icon from './icon';
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
