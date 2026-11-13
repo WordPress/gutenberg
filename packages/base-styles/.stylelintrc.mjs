@@ -11,12 +11,7 @@ export default {
 			{
 				...disallowedValues,
 				'/.*/': [
-					...disallowedValues[ '/.*/' ].filter(
-						( pattern ) =>
-							! new RegExp( pattern.slice( 1, -1 ) ).test(
-								'$font-family-body'
-							)
-					),
+					...disallowedValues[ '/.*/' ],
 					'/var\\(\\s*--wpds-/',
 				],
 			},

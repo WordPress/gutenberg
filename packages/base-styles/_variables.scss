@@ -7,6 +7,7 @@
  */
 
 @use "./colors";
+@use "./internal/wpds-token-fallbacks" as wpds;
 
 /**
  * Fonts & basic variables.
@@ -16,7 +17,7 @@ $font-family-headings: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans
 $font-family-body: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 $font-family-mono: Menlo, Consolas, monaco, monospace;
 
-$default-font: $font-family-body; // Todo: deprecate in favor of $family variables
+$default-font: wpds.var("--wpds-typography-font-family-body"); // Todo: deprecate in favor of $family variables
 $default-line-height: 1.4; // Todo: deprecate in favor of $line-height tokens
 
 /**
@@ -127,7 +128,7 @@ $editor-font-size: 16px;
 $default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks.
 $text-editor-font-size: 15px;
 $editor-line-height: 1.8;
-$editor-html-font: $font-family-mono;
+$editor-html-font: wpds.var("--wpds-typography-font-family-mono");
 
 /**
  * Block & Editor UI.

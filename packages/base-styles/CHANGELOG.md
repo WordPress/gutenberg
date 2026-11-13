@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   The `$default-font` and `$editor-html-font` variables now use the `--wpds-typography-font-family-body` and `--wpds-typography-font-family-mono` design tokens ([#86761](https://github.com/WordPress/gutenberg/pull/86761)).
 -   The `heading-*` and `body-*` mixins now use `--wpds-typography-*` design tokens for font family, size, and line height ([#86635](https://github.com/WordPress/gutenberg/pull/86635)).
 
 ## 15.0.0 (2026-11-04)
