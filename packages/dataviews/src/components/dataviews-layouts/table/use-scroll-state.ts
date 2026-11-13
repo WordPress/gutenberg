@@ -33,19 +33,17 @@ export function useScrollState( {
 		setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
 	}, [ scrollContainerRef ] );
 	useEffect( () => {
-		if ( typeof window === 'undefined' || ! scrollContainerRef.current ) {
-			return () => {};
+		const scrollContainer = scrollContainerRef.current;
+		if ( ! scrollContainer ) {
+			return;
 		}
 
-		const scrollContainer = scrollContainerRef.current;
-
+		// A resize that clamps the scroll position also fires `scroll`.
 		handleScroll();
 		scrollContainer.addEventListener( 'scroll', handleScroll );
-		window.addEventListener( 'resize', handleScroll );
 
 		return () => {
 			scrollContainer.removeEventListener( 'scroll', handleScroll );
-			window.removeEventListener( 'resize', handleScroll );
 		};
 	}, [ scrollContainerRef, handleScroll ] );
 
