@@ -132,6 +132,13 @@ jobs:
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
 
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
+
             - name: Run the Vitest Node and jsdom projects
               env:
                   SHARD: ${{ matrix.shard }}
@@ -184,6 +191,13 @@ jobs:
               # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
+
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
 
             - name: Run the Vitest Browser project
               env:
@@ -246,6 +260,13 @@ jobs:
               # native Vite transforms. Some packages have their own custom
               # build tasks, however. These must be run.
               run: npm exec --no -- lerna run build
+
+            # Lets the Flakiness.io reporter upload results from fork pull
+            # requests, which get no OIDC token. Does nothing in other runs.
+            - name: Authenticate a fork pull request with Flakiness.io
+              uses: flakiness/authenticate-fork-prs@b84c39fb86796b063a9152bdec3020b71c870477 # v1.2.0
+              with:
+                  flakiness-project: WordPress/gutenberg
 
             - name: Run the date tests
               env:
