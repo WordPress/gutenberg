@@ -107,7 +107,11 @@ export function useItemExitAnimation( {
 				clearTimeout( timeout );
 			}
 			exitTimeoutsRef.current.clear();
-			setExitingItems( [] );
+			// Keep the current array when nothing is exiting, so the
+			// surface does not render again for no change.
+			setExitingItems( ( current ) =>
+				current.length === 0 ? current : []
+			);
 			return;
 		}
 
