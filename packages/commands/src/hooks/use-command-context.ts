@@ -4,9 +4,19 @@ import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 /**
- * Sets the active context of the command palette
+ * Sets the active context of the command palette.
  *
  * @param context Context to set.
+ *
+ * @example
+ * ```js
+ * import { useCommandContext } from '@wordpress/commands';
+ *
+ * function MyComponent() {
+ * 	useCommandContext( 'entity-edit' );
+ * 	return <div>...</div>;
+ * }
+ * ```
  */
 export default function useCommandContext( context: string ) {
 	const { getContext } = useSelect( commandsStore );
