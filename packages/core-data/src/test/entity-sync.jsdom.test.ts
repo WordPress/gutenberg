@@ -170,6 +170,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'getEntityRecord', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
+		const select = { getEntityConfig: vi.fn() };
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
@@ -189,7 +190,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			expect( manager.shouldSync ).toHaveBeenCalledWith(
 				'postType',
@@ -213,20 +214,20 @@ describe( 'the entity sync interface', () => {
 
 		it( 'does not load records with a query, a string id, or when shouldSync declines', async () => {
 			await getEntityRecord( 'postType', 'post', 1, { context: 'view' } )(
-				thunkArgs( { dispatch, registry, resolveSelect } )
+				thunkArgs( { select, dispatch, registry, resolveSelect } )
 			);
 			await getEntityRecord(
 				'postType',
 				'post',
 				'hello-world'
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			manager.shouldSync.mockReturnValue( false );
 			await getEntityRecord(
 				'postType',
 				'post',
 				1
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 		} );
@@ -236,7 +237,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 
@@ -268,7 +269,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			const handlers = manager.load.mock.calls[ 0 ][ 4 ];
 			const REFETCHED = { id: 1, title: 'Refetched' };
@@ -295,7 +296,7 @@ describe( 'the entity sync interface', () => {
 				'postType',
 				'post',
 				1
-			)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+			)( thunkArgs( { select, dispatch, registry, resolveSelect } ) );
 
 			expect( manager.load ).not.toHaveBeenCalled();
 			expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
@@ -309,6 +310,7 @@ describe( 'the entity sync interface', () => {
 
 	describe( 'getEntityRecords', () => {
 		const registry = { batch: ( callback: () => void ) => callback() };
+		const select = { getEntityConfig: vi.fn() };
 		const resolveSelect = {
 			getEntitiesConfig: vi.fn( () => [ POST_ENTITY ] ),
 		};
@@ -318,6 +320,7 @@ describe( 'the entity sync interface', () => {
 
 			await getEntityRecords( 'postType', 'post', { per_page: -1 } )(
 				thunkArgs( {
+					select,
 					dispatch,
 					registry,
 					resolveSelect,
@@ -336,6 +339,7 @@ describe( 'the entity sync interface', () => {
 
 			await getEntityRecords( 'postType', 'post', { per_page: 10 } )(
 				thunkArgs( {
+					select,
 					dispatch,
 					registry,
 					resolveSelect,
