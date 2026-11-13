@@ -122,6 +122,15 @@
 				}
 			}
 		}
+
+		// Color- or style-only on one side still needs a 1px width. The
+		// all-sides rule above only matches values set on every edge.
+		table[style*="border-#{$edge}-color"],
+		table[style*="border-#{$edge}-style"] {
+			&:not([style*="border-#{$edge}-width"]) {
+				border-#{$edge}-width: 1px;
+			}
+		}
 	}
 	/*rtl:end:rename*/
 }
