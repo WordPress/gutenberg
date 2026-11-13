@@ -86,6 +86,7 @@ export default function TextIndentControl( {
 			<Flex>
 				<FlexItem isBlock>
 					<UnitControl
+						{ ...otherProps }
 						label={ __( 'Line indent' ) }
 						labelPosition="top"
 						hideLabelFromVision
