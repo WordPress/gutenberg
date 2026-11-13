@@ -1,7 +1,34 @@
+import deepFreeze from 'deep-freeze';
 import { ZWNBSP, OBJECT_REPLACEMENT_CHARACTER } from '../../special-characters';
+import type {
+	FormatType,
+	ParsedFormat,
+	RichTextFormat,
+	RichTextFormatList,
+	RichTextValue,
+} from '../../types';
 
-export function getSparseArrayLength( array ) {
-	return array.reduce( ( accumulator ) => accumulator + 1, 0 );
+export type PartialRichTextValue = {
+	text?: string;
+	formats?: Array< RichTextFormatList | undefined >;
+	replacements?: Array< RichTextFormat | undefined >;
+	start?: number;
+	end?: number;
+	activeFormats?: RichTextFormatList;
+};
+
+export function partialValue( value: PartialRichTextValue ): RichTextValue {
+	return value as RichTextValue;
+}
+
+export function freezeValue( value: PartialRichTextValue ): RichTextValue {
+	return deepFreeze( value ) as RichTextValue;
+}
+
+export function getSparseArrayLength(
+	array: ReadonlyArray< unknown >
+): number {
+	return array.reduce< number >( ( accumulator ) => accumulator + 1, 0 );
 }
 
 const em = { type: 'em' };
@@ -13,7 +40,66 @@ const mi = { type: 'mi' };
 const mo = { type: 'mo' };
 const mtext = { type: 'mtext' };
 
-export const spec = [
+type SpecRangeInput = {
+	startOffset: number;
+	startContainer: Node | null | undefined;
+	endOffset: number;
+	endContainer: Node | null | undefined;
+};
+
+type RawSpecItem = {
+	description: string;
+	html?: string;
+	createRange: ( element: HTMLElement ) => SpecRangeInput;
+	startPath: number[];
+	endPath: number[];
+	record: {
+		text: string;
+		formats: Array< Array< ParsedFormat > | undefined >;
+		replacements: Array< ParsedFormat | undefined >;
+		start?: number;
+		end?: number;
+	};
+};
+
+export type SpecItem = {
+	description: string;
+	html?: string;
+	createRange: ( element: HTMLElement ) => Range;
+	startPath: number[];
+	endPath: number[];
+	record: RichTextValue;
+};
+
+type RawSpecRegistrationItem = {
+	description: string;
+	formatName?: string;
+	formatType?: Omit< FormatType, 'name' >;
+	html: string;
+	createRange?: ( element: HTMLElement ) => SpecRangeInput;
+	startPath?: number[];
+	endPath?: number[];
+	value: {
+		text: string;
+		formats: Array< Array< ParsedFormat > | undefined >;
+		replacements: Array< ParsedFormat | undefined >;
+	};
+	noToHTMLString?: boolean;
+};
+
+export type SpecRegistrationItem = {
+	description: string;
+	formatName?: string;
+	formatType?: Omit< FormatType, 'name' >;
+	html: string;
+	createRange?: ( element: HTMLElement ) => Range;
+	startPath?: number[];
+	endPath?: number[];
+	value: RichTextValue;
+	noToHTMLString?: boolean;
+};
+
+const rawSpec: RawSpecItem[] = [
 	{
 		description: 'should create an empty value',
 		html: '',
@@ -665,7 +751,9 @@ export const spec = [
 	},
 ];
 
-export const specWithRegistration = [
+export const spec: SpecItem[] = rawSpec as unknown as SpecItem[];
+
+const rawSpecWithRegistration: RawSpecRegistrationItem[] = [
 	{
 		description: 'should create format by matching the class',
 		formatName: 'my-plugin/link',
@@ -831,9 +919,9 @@ export const specWithRegistration = [
 		html: '<math><mi>x</mi></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'mi' ).firstChild,
+			startContainer: element.querySelector( 'mi' )!.firstChild,
 			endOffset: 1,
-			endContainer: element.querySelector( 'mi' ).firstChild,
+			endContainer: element.querySelector( 'mi' )!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0 ],
 		endPath: [ 0, 0, 1 ],
@@ -848,9 +936,9 @@ export const specWithRegistration = [
 		html: '<math><mi>x</mi><mo>+</mo><mi>y</mi></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'mi' ).firstChild,
+			startContainer: element.querySelector( 'mi' )!.firstChild,
 			endOffset: 1,
-			endContainer: element.querySelectorAll( 'mi' )[ 1 ].firstChild,
+			endContainer: element.querySelectorAll( 'mi' )[ 1 ]!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0 ],
 		endPath: [ 0, 2, 1 ],
@@ -869,9 +957,9 @@ export const specWithRegistration = [
 		html: '<math><mtext><strong>bold text</strong></mtext></math>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
-			startContainer: element.querySelector( 'strong' ).firstChild,
+			startContainer: element.querySelector( 'strong' )!.firstChild,
 			endOffset: 9,
-			endContainer: element.querySelector( 'strong' ).firstChild,
+			endContainer: element.querySelector( 'strong' )!.firstChild,
 		} ),
 		startPath: [ 0, 0, 0, 0 ],
 		endPath: [ 0, 0, 0, 9 ],
@@ -892,3 +980,6 @@ export const specWithRegistration = [
 		},
 	},
 ];
+
+export const specWithRegistration: SpecRegistrationItem[] =
+	rawSpecWithRegistration as unknown as SpecRegistrationItem[];

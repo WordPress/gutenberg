@@ -25,7 +25,7 @@ describe( 'apply', () => {
 			const current = document.createElement( 'div' );
 			apply( { value: record, current, __unstableDomOnly: true } );
 			expect( current.innerHTML ).toBe(
-				toDom( { value: record } ).body.innerHTML
+				( toDom( { value: record } ).body as HTMLElement ).innerHTML
 			);
 		} );
 	} );
@@ -41,7 +41,7 @@ describe( 'apply', () => {
 		const value = create( { html: 'a <math><mi>x</mi></math>' } );
 		const current = document.createElement( 'div' );
 		apply( { value, current, __unstableDomOnly: true } );
-		const expected = toDom( { value } ).body.innerHTML;
+		const expected = ( toDom( { value } ).body as HTMLElement ).innerHTML;
 		unregisterFormatType( 'test/math' );
 
 		expect( current.innerHTML ).toBe( expected );
@@ -126,7 +126,9 @@ describe( 'applyValue', () => {
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
-			const body = createElement( document, current ).cloneNode( true );
+			const body = createElement( document, current ).cloneNode(
+				true
+			) as HTMLElement;
 			const futureBody = createElement( document, future ).cloneNode(
 				true
 			);

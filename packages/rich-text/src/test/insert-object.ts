@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { insertObject } from '../insert-object';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';
 
 describe( 'insert', () => {
@@ -23,7 +22,7 @@ describe( 'insert', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = insertObject( deepFreeze( record ), obj, 2, 6 );
+		const result = insertObject( freezeValue( record ), obj, 2, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

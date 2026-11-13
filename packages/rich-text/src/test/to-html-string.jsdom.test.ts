@@ -6,10 +6,10 @@ import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 import { specWithRegistration } from './helpers';
 
-function createNode( HTML ) {
+function createNode( HTML: string ): Element {
 	const doc = document.implementation.createHTMLDocument( '' );
 	doc.body.innerHTML = HTML;
-	return doc.body.firstChild;
+	return doc.body.firstChild as Element;
 }
 
 describe( 'toHTMLString', () => {
@@ -27,7 +27,7 @@ describe( 'toHTMLString', () => {
 			}
 
 			it( description, () => {
-				if ( formatName ) {
+				if ( formatName && formatType ) {
 					registerFormatType( formatName, formatType );
 				}
 
