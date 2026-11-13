@@ -38,14 +38,14 @@ The header is a single row of three sections.
 The sections are semantic. A control belongs to a section by its nature, not by how it renders.
 
 -   **Identity.** The widget's icon, title, and help. It names the tile, and its title truncates rather than wrapping when the row runs short.
--   **Attributes.** The widget's high-relevance attributes: quick in-place editing or a dropdown button when there isn't enough space.
+-   **Attributes.** The widget's high-relevance attributes: quick in-place editing, or, when there isn't enough space, a select (for a single field with options) or a dropdown button.
 -   **More.** The widget's low-relevance actions, gathered in a menu on the trailing edge.
 
 ### Fitting the row
 
 Only the attributes change form. The identity truncates its title, and the actions menu is compact throughout.
 
-Attributes are inline fields when they fit, or a form within a dropdown when they do not.
+Attributes are inline fields when they fit, or a form within a dropdown when they do not. A single field with a fixed set of options collapses to one select first, and reaches the dropdown only when the select does not fit either.
 
 ![Wide tiles keep the attributes inline; narrow tiles fold them into a dropdown, while the identity truncates its title and the actions menu stays.](./assets/header-fit.svg)
 

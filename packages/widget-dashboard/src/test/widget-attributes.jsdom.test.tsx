@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import type { ComponentType } from 'react';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import type {
 	ResolveWidgetModule,
 	WidgetRenderProps,
@@ -293,9 +293,19 @@ describe( 'WidgetAttributes fit', () => {
 
 describe( 'WidgetAttributes Edit surface', () => {
 	// An in-process widget type's component `Edit` reads where it renders.
+	// Its local count shows whether the control kept its identity.
 	function SurfaceEdit( props: DataFormControlProps< unknown > ) {
 		const { surface } = props as { surface?: string };
-		return <span data-testid="surface">{ surface ?? 'none' }</span>;
+		const [ count, setCount ] = useState( 0 );
+		return (
+			<button
+				type="button"
+				data-testid="surface"
+				onClick={ () => setCount( count + 1 ) }
+			>
+				{ `${ surface ?? 'none' } ${ count }` }
+			</button>
+		);
 	}
 
 	const surfaceTypes: WidgetType[] = [
@@ -316,7 +326,20 @@ describe( 'WidgetAttributes Edit surface', () => {
 		},
 	];
 
-	function SurfaceHarness() {
+	// A new `version` passes equivalent widget types as new objects, with
+	// the same `Edit` component.
+	function SurfaceHarness( { version = 0 }: { version?: number } ) {
+		const widgetTypesForVersion = useMemo(
+			() =>
+				surfaceTypes.map( ( type ) => ( {
+					...type,
+					description: `Version ${ version }`,
+					attributes: type.attributes?.map( ( attribute ) => ( {
+						...attribute,
+					} ) ),
+				} ) ),
+			[ version ]
+		);
 		const [ layout, setLayout ] = useState< DashboardWidget[] >( [
 			{
 				uuid: 'w1',
@@ -330,7 +353,7 @@ describe( 'WidgetAttributes Edit surface', () => {
 			<WidgetDashboard
 				layout={ layout }
 				onLayoutChange={ setLayout }
-				widgetTypes={ surfaceTypes }
+				widgetTypes={ widgetTypesForVersion }
 				resolveWidgetModule={ resolveWidgetModule }
 			/>
 		);
@@ -367,6 +390,26 @@ describe( 'WidgetAttributes Edit surface', () => {
 
 		expect( within( dialog ).getByTestId( 'surface' ) ).toHaveTextContent(
 			'dropdown'
+		);
+	} );
+
+	it( 'keeps the wrapped Edit control mounted when the widget types are passed again', async () => {
+		mockedUseInlineFit.mockReturnValue( {
+			measureRef: () => {},
+			selectMeasureRef: () => {},
+			presentation: 'inline',
+		} );
+		const user = userEvent.setup();
+		const { rerender } = render( <SurfaceHarness /> );
+
+		await user.click( await screen.findByTestId( 'surface' ) );
+		expect( screen.getByTestId( 'surface' ) ).toHaveTextContent(
+			'header 1'
+		);
+
+		rerender( <SurfaceHarness version={ 1 } /> );
+		expect( await screen.findByTestId( 'surface' ) ).toHaveTextContent(
+			'header 1'
 		);
 	} );
 } );

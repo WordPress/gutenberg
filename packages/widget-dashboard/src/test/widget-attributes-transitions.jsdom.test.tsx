@@ -118,6 +118,22 @@ const widgetTypes: WidgetType[] = [
 			},
 		],
 	},
+	{
+		apiVersion: 1,
+		name: 'test/async-options',
+		title: 'Async options',
+		renderModule: 'snapshot-module',
+		attributes: [
+			{
+				id: 'metric',
+				label: 'Metric',
+				type: 'text',
+				getElements: async () => METRICS,
+				relevance: 'high',
+				Edit: 'toggleGroup',
+			},
+		],
+	},
 ];
 
 const resolveWidgetModule: ResolveWidgetModule = async () => ( {
@@ -357,6 +373,37 @@ describe( 'single option field', () => {
 		notifyResize( header, 200 );
 		expect( trigger() ).toBeInTheDocument();
 		expect( select() ).not.toBeInTheDocument();
+	} );
+
+	it( 'hands focus to a select whose options come from getElements, and keeps it', async () => {
+		const user = userEvent.setup();
+		render( <Harness type="test/async-options" /> );
+		await user.click(
+			await screen.findByRole( 'radio', { name: 'Orders' } )
+		);
+
+		notifyResize( part( 'inline-controls' ), 150 );
+		notifyResize( part( 'identity' ), 120 );
+		notifyResize( part( 'widget-header' ), 600 );
+		notifyResize( part( 'widget-header' ), 200 );
+
+		// The select mounts with the loaded options, not a loading spinner
+		// that would take the focus with it.
+		const control = await screen.findByRole( 'combobox', {
+			name: 'Metric',
+		} );
+		await waitFor( () => expect( control ).toHaveFocus() );
+		expect( control ).toHaveValue( 'orders' );
+		notifyResize( part( 'select-area' ), 40 );
+		expect( control ).toHaveFocus();
+
+		// Focus stayed, so the hold does too: growing keeps the select.
+		notifyResize( part( 'widget-header' ), 600 );
+		expect( control ).toBeInTheDocument();
+		await user.tab();
+		expect(
+			await screen.findByRole( 'radio', { name: 'Orders' } )
+		).toBeInTheDocument();
 	} );
 } );
 

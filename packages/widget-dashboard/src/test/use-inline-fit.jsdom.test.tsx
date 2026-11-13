@@ -4,26 +4,50 @@ import { describe, expect, it, vi } from 'vitest';
 import { useInlineFit } from '../components/widget-attributes/use-inline-fit';
 import { WidgetHeaderAvailableSizeProvider } from '../components/widget-header/widget-header-fit';
 
-// The hook observes two elements per render, in order: the inline
-// controls, then the select. The latest callback of each is kept.
+// Each observer ref records the element it is attached to, so a test
+// resizes the inline controls or the select by element.
 type Notify = ( entries: unknown[] ) => void;
-const mockObservers: Notify[] = [];
+const mockObserved = new Map< Element, Notify >();
 
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useResizeObserver: ( ( callback: Notify ) => {
-		mockObservers.push( callback );
-		return () => {};
-	} ) as typeof import( '@wordpress/compose' ).useResizeObserver,
+	useResizeObserver: ( ( callback: Notify ) =>
+		( element: Element | null ) => {
+			if ( element ) {
+				mockObserved.set( element, callback );
+			}
+		} ) as typeof import( '@wordpress/compose' ).useResizeObserver,
 } ) );
 
-const notifyResize: Notify = ( entries ) =>
-	mockObservers[ mockObservers.length - 2 ]( entries );
-const notifySelectResize: Notify = ( entries ) =>
-	mockObservers[ mockObservers.length - 1 ]( entries );
+const inlineElement = document.createElement( 'div' );
+const selectElement = document.createElement( 'span' );
 
-function measureSelect( width: number ) {
-	act( () => notifySelectResize( [ { contentRect: { width } } ] ) );
+/**
+ * Attaches the ref to its element, as a render would, and reports a width.
+ *
+ * @param ref     The hook's measure ref.
+ * @param element The element it observes.
+ * @param width   Content width to report.
+ */
+function measure( ref: unknown, element: Element, width: number ) {
+	act( () => {
+		( ref as ( node: Element ) => void )( element );
+		mockObserved.get( element )!( [ { contentRect: { width } } ] );
+	} );
+}
+
+function measureFields(
+	result: { current: ReturnType< typeof useInlineFit > },
+	width: number
+) {
+	measure( result.current.measureRef, inlineElement, width );
+}
+
+function measureSelect(
+	result: { current: ReturnType< typeof useInlineFit > },
+	width: number
+) {
+	measure( result.current.selectMeasureRef, selectElement, width );
 }
 
 let availableSize: number | null = null;
@@ -36,10 +60,6 @@ function wrapper( { children }: { children: ReactNode } ) {
 	);
 }
 
-function measureFields( width: number ) {
-	act( () => notifyResize( [ { contentRect: { width } } ] ) );
-}
-
 describe( 'useInlineFit', () => {
 	it( 'keeps inline controls at an exact fit and requires spare space to expand', () => {
 		availableSize = 100;
@@ -47,7 +67,7 @@ describe( 'useInlineFit', () => {
 			wrapper,
 		} );
 
-		measureFields( 100 );
+		measureFields( result, 100 );
 		expect( result.current.presentation ).toBe( 'inline' );
 
 		availableSize = 99;
@@ -76,7 +96,7 @@ describe( 'useInlineFit', () => {
 			{ wrapper, initialProps: { locked: false } }
 		);
 
-		measureFields( 100 );
+		measureFields( result, 100 );
 		expect( result.current.presentation ).toBe( 'inline' );
 
 		availableSize = 80;
@@ -95,7 +115,7 @@ describe( 'useInlineFit', () => {
 			{ wrapper, initialProps: { locked: false } }
 		);
 
-		measureFields( 100 );
+		measureFields( result, 100 );
 		expect( result.current.presentation ).toBe( 'inline' );
 
 		// The user starts interacting; space shrinks meanwhile. Holding the
@@ -121,7 +141,7 @@ describe( 'useInlineFit', () => {
 			{ wrapper, initialProps: { locked: false } }
 		);
 
-		measureFields( 100 );
+		measureFields( result, 100 );
 		expect( result.current.presentation ).toBe( 'dropdown' );
 
 		// The user opens the dropdown; space grows meanwhile.
@@ -152,14 +172,14 @@ describe( 'useInlineFit', () => {
 		);
 
 		// Inline 150 wide; the select, once measured, 90.
-		measureFields( 150 );
+		measureFields( result, 150 );
 		expect( result.current.presentation ).toBe( 'inline' );
 
 		// An unmeasured select is tried first, so it can be measured.
 		availableSize = 149;
 		rerender();
 		expect( result.current.presentation ).toBe( 'select' );
-		measureSelect( 90 );
+		measureSelect( result, 90 );
 
 		const sweep = ( widths: number[] ) =>
 			widths.map( ( width ) => {
@@ -199,10 +219,10 @@ describe( 'useInlineFit', () => {
 			{ wrapper }
 		);
 
-		measureFields( 150 );
+		measureFields( result, 150 );
 		availableSize = 140;
 		rerender();
-		measureSelect( 160 );
+		measureSelect( result, 160 );
 		expect( result.current.presentation ).toBe( 'dropdown' );
 	} );
 
@@ -212,7 +232,7 @@ describe( 'useInlineFit', () => {
 			wrapper,
 		} );
 
-		measureFields( 150 );
+		measureFields( result, 150 );
 		availableSize = 149;
 		rerender();
 		expect( result.current.presentation ).toBe( 'dropdown' );
@@ -226,8 +246,8 @@ describe( 'useInlineFit', () => {
 			{ wrapper, initialProps: { locked: false } }
 		);
 
-		measureFields( 150 );
-		measureSelect( 90 );
+		measureFields( result, 150 );
+		measureSelect( result, 90 );
 		expect( result.current.presentation ).toBe( 'select' );
 
 		// Focused select, room to expand: held.

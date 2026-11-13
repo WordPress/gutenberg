@@ -15,6 +15,7 @@ import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useReserveHeaderSpace } from '../widget-header/widget-header-fit';
 import { WidgetSettingsTrigger } from '../widget-settings';
 import { AttributesDropdown } from './attributes-dropdown';
+import { useFieldOptions } from './use-field-options';
 import { useInlineFit } from './use-inline-fit';
 import type { InlinePresentation } from './use-inline-fit';
 import { withSurface } from './with-surface';
@@ -79,12 +80,14 @@ export function WidgetAttributes( {
 	// A single field with a fixed set of options (a toggle group, a radio
 	// control) collapses to one select holding them before it collapses
 	// to the dropdown. Several fields, or one without options, skip it; so
-	// does an array field, which would need a multiple select.
-	const onlyField = fields.length === 1 ? fields[ 0 ] : undefined;
-	const canSelect =
-		!! onlyField &&
-		onlyField.type !== 'array' &&
-		( !! onlyField.elements?.length || !! onlyField.getElements );
+	// does an array field, which would need a multiple select. Options from
+	// `getElements` offer the step once they have loaded.
+	const onlyField =
+		fields.length === 1 && fields[ 0 ].type !== 'array'
+			? fields[ 0 ]
+			: undefined;
+	const options = useFieldOptions( onlyField );
+	const canSelect = !! onlyField && !! options?.length;
 
 	// While the user interacts with a collapsed presentation, the fit holds
 	// it in place; expanding mid-interaction would drop focus on the floor.
@@ -163,10 +166,21 @@ export function WidgetAttributes( {
 	);
 
 	// The select presentation renders the single field through the
-	// built-in select control, whatever control it declares inline.
+	// built-in select control, whatever control it declares inline, with
+	// its options already resolved.
 	const selectFields = useMemo< Field< WidgetAttributeValues >[] >(
-		() => ( onlyField ? [ { ...onlyField, Edit: 'select' } ] : [] ),
-		[ onlyField ]
+		() =>
+			onlyField && options
+				? [
+						{
+							...onlyField,
+							Edit: 'select',
+							elements: options,
+							getElements: undefined,
+						},
+					]
+				: [],
+		[ onlyField, options ]
 	);
 
 	// A `row` top-level layout lays the controls out horizontally; each field

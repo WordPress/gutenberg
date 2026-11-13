@@ -92,9 +92,8 @@ export function useInlineFit( options: InlineFitOptions = {} ): InlineFit {
 	// once collapsed past it, it needs spare room to return.
 	const fits = ( size: number, step: InlinePresentation ) =>
 		availableSize !== null &&
-		( RANK[ held ] > RANK[ step ]
-			? size + EXPAND_BUFFER <= availableSize
-			: size <= availableSize );
+		size + ( RANK[ held ] > RANK[ step ] ? EXPAND_BUFFER : 0 ) <=
+			availableSize;
 
 	// The zero guard keeps environments without layout (JSDOM) on the
 	// inline presentation. An unmeasured select is tried, so it can be
