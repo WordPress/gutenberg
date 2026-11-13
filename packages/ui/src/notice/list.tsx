@@ -15,6 +15,17 @@ type Announcement = {
 	politeness: NonNullable< RootProps[ 'politeness' ] >;
 };
 
+function getComposedParent( element: Element ): Element | null {
+	const ShadowRoot = element.ownerDocument.defaultView?.ShadowRoot;
+	return (
+		element.assignedSlot ??
+		element.parentElement ??
+		( ShadowRoot && element.parentNode instanceof ShadowRoot
+			? element.parentNode.host
+			: null )
+	);
+}
+
 function isHidden( element: Element, root: Element ) {
 	for (
 		let current: Element | null = element;
@@ -92,13 +103,18 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 					notice.dataset.wpUiNoticeSpokenMessage === undefined
 						? HIDDEN_CONTENT
 						: '[hidden]';
-				const hidden = notice.closest( selector );
-				if ( ! hidden ) {
-					return 'visible';
+				for (
+					let current: Element | null = notice;
+					current;
+					current = getComposedParent( current )
+				) {
+					if ( current.matches( selector ) ) {
+						return current !== list && list.contains( current )
+							? 'hidden'
+							: 'list-hidden';
+					}
 				}
-				return hidden !== list && list.contains( hidden )
-					? 'hidden'
-					: 'list-hidden';
+				return 'visible';
 			}
 		);
 		const observerRef = useRefEffect< HTMLDivElement >(
@@ -205,9 +221,9 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				refreshRef.current?.()
 			);
 			for (
-				let parent = list.parentElement;
+				let parent = getComposedParent( list );
 				parent;
-				parent = parent.parentElement
+				parent = getComposedParent( parent )
 			) {
 				observer.observe( parent, {
 					attributeFilter: [ 'hidden', 'aria-hidden' ],
