@@ -636,7 +636,6 @@ function DefaultStory() {
 const inlineFitWidgetType: WidgetType = {
 	...trafficSnapshotWidgetType,
 	name: 'demo/inline-fit',
-	title: 'Top locations',
 	help: { content: 'Switch between views, visitors, and orders.' },
 	attributes: [
 		{
