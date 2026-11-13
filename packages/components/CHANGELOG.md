@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `DatePicker`: Keep selected dates readable when `ThemeProvider` adjusts the brand fill by using its paired background and foreground tokens ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
 -   `Card`: Use theme tokens for borders, corners, and spacing ([#85857](https://github.com/WordPress/gutenberg/pull/85857)).
 -   `Autocomplete`: Use the last committed completion callback when a background update suspends ([#86738](https://github.com/WordPress/gutenberg/pull/86738)).

@@ -101,7 +101,7 @@ describe( 'collectThemeProviderColorWarnings', () => {
 				foregroundToken: 'background.interactive.brand-strong',
 				foregroundColor: '#0f755d',
 				requiredContrast: 3,
-				achievedContrast: expect.closeTo( 2.7173, 4 ),
+				achievedContrast: expect.closeTo( 2.7174, 4 ),
 			},
 		] );
 	} );

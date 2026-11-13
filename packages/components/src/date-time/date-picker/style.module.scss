@@ -79,7 +79,7 @@
 	}
 
 	&:where(.has-events.is-selected)::before {
-		border-color: $components-color-accent-inverted;
+		border-color: var(--wpds-color-foreground-interactive-brand-strong);
 	}
 }
 
@@ -91,11 +91,11 @@
 	font-weight: 400;
 
 	&:where(.is-selected) {
-		background: $components-color-accent;
+		background: var(--wpds-color-background-interactive-brand-strong);
 
 		&,
 		&:hover:not(:disabled, [aria-disabled="true"]) {
-			color: $components-color-accent-inverted;
+			color: var(--wpds-color-foreground-interactive-brand-strong);
 		}
 
 		&:focus:not(:disabled) {
