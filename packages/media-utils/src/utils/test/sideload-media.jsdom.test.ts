@@ -38,4 +38,29 @@ describe( 'sideloadMedia', () => {
 		expect( sideloadToServer ).toHaveBeenCalled();
 		expect( onSuccess ).toHaveBeenCalledWith( mockSubSizeData );
 	} );
+
+	it.each( [
+		[ 'rest_upload_limited_space', 'STORAGE_LIMIT_REACHED' ],
+		[ 'rest_upload_user_quota_exceeded', 'STORAGE_LIMIT_REACHED' ],
+		[ 'rest_upload_file_too_big', 'GENERAL' ],
+	] )( 'should report the REST error %s as %s', async ( restCode, code ) => {
+		( sideloadToServer as Mock ).mockRejectedValue( {
+			code: restCode,
+			message: 'Rejected by the server.',
+		} );
+
+		const onError = vi.fn();
+		await sideloadMedia( {
+			file: imageFile,
+			attachmentId: 1,
+			onError,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				code,
+				message: 'Rejected by the server.',
+			} )
+		);
+	} );
 } );
