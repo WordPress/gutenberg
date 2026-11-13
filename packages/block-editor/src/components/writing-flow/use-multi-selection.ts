@@ -43,13 +43,6 @@ export default function useMultiSelection() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			// Allow initialPosition to bypass focus behavior. This is useful
-			// for the list view or other areas where we don't want to transfer
-			// focus to the editor canvas.
-			if ( initialPosition === undefined || initialPosition === null ) {
-				return;
-			}
-
 			if ( ! hasMultiSelection || isMultiSelecting ) {
 				return;
 			}
@@ -60,11 +53,20 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			// Allow initialPosition to bypass focus behavior. This is useful
+			// for the list view or other areas where we don't want to transfer
+			// focus to the editor canvas.
+			const keepsFocus =
+				initialPosition === undefined || initialPosition === null;
+
 			// A text selection across blocks needs the wrapper as the editing
 			// host, also when it is set from the store, as after undo. The
 			// fields at either end put the native selection in place.
 			if ( ! isFullSelection ) {
-				if ( node.contains( ownerDocument.activeElement ) ) {
+				if (
+					! keepsFocus &&
+					node.contains( ownerDocument.activeElement )
+				) {
 					setContentEditableWrapper( node, true );
 				}
 				return;
@@ -76,7 +78,9 @@ export default function useMultiSelection() {
 			// able to select across instances immediately.
 			// For some browsers, like Safari, it is important that focus
 			// happens BEFORE selection removal.
-			setContentEditableWrapper( node, true );
+			if ( ! keepsFocus ) {
+				setContentEditableWrapper( node, true );
+			}
 
 			// A mounted element's window has a selection.
 			const selection = defaultView!.getSelection()!;

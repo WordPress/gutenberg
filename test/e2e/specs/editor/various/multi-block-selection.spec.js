@@ -594,18 +594,10 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 	} );
 
 	test( 'should keep a full block selection on right click', async ( {
-		page,
 		editor,
 		pageUtils,
 		multiBlockSelectionUtils,
 	} ) => {
-		const isFullySelected = () =>
-			page.evaluate( () =>
-				window.wp.data
-					.select( 'core/block-editor' )
-					.__unstableIsFullySelected()
-			);
-
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'first paragraph' },
@@ -620,7 +612,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
-		await expect.poll( isFullySelected ).toBe( true );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
 
 		// On a word, which the browser would otherwise select.
 		await editor.canvas
@@ -629,10 +623,112 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
-		await expect.poll( isFullySelected ).toBe( true );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
 
 		// Playwright can't open the context menu, so cut with the keyboard.
 		await pageUtils.pressKeys( 'primary+x' );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'should keep a full block selection from List View on right click', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'first paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/verse',
+			attributes: { content: 'verse' },
+		} );
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView.getByRole( 'link', { name: 'Paragraph' } ).click();
+		const poetry = listView.getByRole( 'link', { name: 'Poetry' } );
+		await poetry.click( { modifiers: [ 'Shift' ] } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
+		await expect( poetry ).toBeFocused();
+
+		// On a word, which the browser would otherwise select.
+		await editor.canvas
+			.getByText( 'first paragraph', { exact: true } )
+			.click( { button: 'right', position: { x: 10, y: 10 } } );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
+
+		// Playwright can't open the context menu, so cut with the keyboard.
+		await pageUtils.pressKeys( 'primary+x' );
+		await expect.poll( editor.getBlocks ).toEqual( [] );
+	} );
+
+	test( 'should keep a full block selection when the browser moves the native selection into the text', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'first paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'second paragraph' },
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
+
+		// Safari moves the selection of the blocks into their text (#42340).
+		const first = await editor.canvas
+			.getByText( 'first paragraph', { exact: true } )
+			.elementHandle();
+		const second = await editor.canvas
+			.getByText( 'second paragraph', { exact: true } )
+			.elementHandle();
+		await page.evaluate(
+			( [ start, end ] ) =>
+				start.ownerDocument
+					.getSelection()
+					.setBaseAndExtent(
+						start.firstChild,
+						0,
+						end.firstChild,
+						end.firstChild.length
+					),
+			[ first, second ]
+		);
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2 ] );
+		await expect
+			.poll( multiBlockSelectionUtils.isFullySelected )
+			.toBe( true );
+
+		await page.keyboard.press( 'Delete' );
 		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
@@ -2690,6 +2786,14 @@ class MultiBlockSelectionUtils {
 				( clientId ) => allClientIds.indexOf( clientId ) + 1
 			);
 		} );
+	};
+
+	isFullySelected = async () => {
+		return await this.#page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.__unstableIsFullySelected()
+		);
 	};
 
 	/**
