@@ -1,6 +1,10 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "../../../dataviews/style" as *;
 
+// Width of the fade at the inline-end edge of the table while there are more
+// columns to scroll to.
+$scroll-fade-size: var(--wpds-dimension-size-lg);
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -32,18 +36,35 @@
 			position: sticky;
 			right: 0;
 			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
-		}
+			// The masked strip at the start of the cell lets the columns
+			// scrolling under it show through, fading into the cell's own
+			// background. At the end of the scroll range the strip only covers
+			// the cell's own space, so it needs no scroll state.
+			mask-image: linear-gradient(to right, transparent, #000 $scroll-fade-size);
 
-		&.dataviews-view-table__actions-column--stuck {
+			&:dir(rtl) {
+				mask-image: linear-gradient(to left, transparent, #000 $scroll-fade-size);
+			}
+
+			// Divider between the strip and the actions, shown while there are
+			// more columns to scroll to.
 			&::after {
-				display: block;
 				content: "";
 				position: absolute;
-				top: 0;
-				bottom: 0;
-				left: 0;
+				inset-block: 0;
+				inset-inline-start: $scroll-fade-size;
 				width: 1px;
 				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+
+				// Hidden at the end of the scroll range, and when nothing
+				// scrolls, where the scroll timeline is inactive. Browsers
+				// without scroll-driven animations always show it.
+				@supports (animation-timeline: scroll()) {
+					opacity: 0;
+					animation: dataviews-view-table-scroll-cue linear;
+					animation-timeline: scroll(nearest inline);
+					animation-range: normal calc(100% - 1px);
+				}
 			}
 		}
 
@@ -271,6 +292,22 @@
 				padding-right: 0;
 			}
 		}
+	}
+
+	// The fade strip takes the place of the sticky actions column's start
+	// padding, in every density.
+	td,
+	th {
+		&.dataviews-view-table__actions-column--sticky {
+			padding-inline-start: $scroll-fade-size;
+		}
+	}
+}
+
+@keyframes dataviews-view-table-scroll-cue {
+	from,
+	to {
+		opacity: 1;
 	}
 }
 
