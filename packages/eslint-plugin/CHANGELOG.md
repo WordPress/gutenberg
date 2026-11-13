@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `use-recommended-components`: Recognize `NavigationMenu` from `@wordpress/ui` as use-with-caution ([#80446](https://github.com/WordPress/gutenberg/pull/80446)).
 -   `use-recommended-components`: Recommend the WordPress UI select controls instead of legacy `SelectControl` and `CustomSelectControl` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `use-recommended-components`: Flag `Spinner` from `@wordpress/components` in favor of `Spinner` from `@wordpress/ui` ([#86352](https://github.com/WordPress/gutenberg/pull/86352)).
 -   `use-recommended-components`: Flag `Menu` from `@wordpress/components` in favor of `Menu` from `@wordpress/ui` in Gutenberg or `DropdownMenu` elsewhere ([#86324](https://github.com/WordPress/gutenberg/pull/86324)).
