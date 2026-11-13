@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental Template Slot block, where the templates rendered inside a template go, for the templates inside templates experiment ([#86603](https://github.com/WordPress/gutenberg/pull/86603)).
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
