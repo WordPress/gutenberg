@@ -79,6 +79,7 @@
 
 ### Bug Fixes
 
+-   `FormToggle`: Show a disabled checked switch with a gray track and light thumb, so it no longer looks unchecked ([#86262](https://github.com/WordPress/gutenberg/pull/86262)).
 -   `MenuItem` and `DropdownMenu`: Stop showing a focus ring when a disabled item is hovered with a pointer ([#86125](https://github.com/WordPress/gutenberg/pull/86125)).
 -   `PaletteEdit`: Avoid existing preset slugs when deduplicating palette items ([#85817](https://github.com/WordPress/gutenberg/pull/85817)).
 -   `Modal`: Keep dialog boundaries visible in forced-colors mode ([#85888](https://github.com/WordPress/gutenberg/pull/85888)).
