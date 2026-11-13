@@ -63,7 +63,7 @@ describe( 'flags warnings with invalid css (wpds fallbacks)', () => {
 
 	it( 'flags correct number of warnings', () => {
 		return result.then( ( data ) =>
-			expect( data.results[ 0 ].warnings ).toHaveLength( 7 )
+			expect( data.results[ 0 ].warnings ).toHaveLength( 8 )
 		);
 	} );
 

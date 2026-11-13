@@ -56,7 +56,7 @@ export function parseCSSVariableReferences( value ) {
 			prefix !== '#' &&
 			prefix !== '@' &&
 			value[ end ] === '(' &&
-			decodeIdentifier( identifier[ 0 ] ) === 'var'
+			decodeIdentifier( identifier[ 0 ] ).toLowerCase() === 'var'
 		) {
 			variableFunctionStarts.set( end, identifier.index );
 		}

@@ -18,3 +18,7 @@
 .escaped {
 	border-radius: v\61r(--wpds-border-radius-\73m, 2px);
 }
+
+.uppercase {
+	border-radius: VAR(--wpds-border-radius-sm, 2px);
+}

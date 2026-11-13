@@ -137,16 +137,19 @@ describe( 'design token fallback build plugin parity', () => {
 		expect( result.css ).toContain( 'var(--wpds-dimension-gap-sm, 8px)' );
 	} );
 
-	it( 'inserts a fallback for an escaped CSS token reference', async () => {
-		const source = '.fixture { gap: v\\61r(--wpds-dimension-gap-\\73m); }';
-		const result = await postcss( [ postcssPlugin ] ).process( source, {
-			from: 'styles.css',
-		} );
+	it.each( [ 'v\\61r', 'VAR', 'VaR', 'V\\41R' ] )(
+		'inserts a fallback for a CSS token reference using %s()',
+		async ( functionName ) => {
+			const source = `.fixture { gap: ${ functionName }(--wpds-dimension-gap-\\73m); }`;
+			const result = await postcss( [ postcssPlugin ] ).process( source, {
+				from: 'styles.css',
+			} );
 
-		expect( result.css ).toContain(
-			'v\\61r(--wpds-dimension-gap-\\73m, 8px)'
-		);
-	} );
+			expect( result.css ).toContain(
+				`${ functionName }(--wpds-dimension-gap-\\73m, 8px)`
+			);
+		}
+	);
 
 	it( 'keeps nested token fallbacks aligned across PostCSS and Lightning CSS', async () => {
 		const filename = join( fixturesDirectory, 'nested-fallback.css' );
