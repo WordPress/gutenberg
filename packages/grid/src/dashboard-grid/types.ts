@@ -1,3 +1,4 @@
+import type { GapSize } from '@wordpress/theme';
 import type {
 	DragPreviewRenderProps,
 	GridItemLimits,
@@ -222,9 +223,8 @@ export interface DashboardGridProps extends Omit<
 	/**
 	 * Inline styles applied to the grid root. Merged underneath the
 	 * grid's own layout styles, so the layout (`gridTemplateColumns`,
-	 * `gridAutoRows`) always wins. The gap between tiles is owned by
-	 * the design-system gap token and is not configurable per
-	 * instance; override it via a theme or density change.
+	 * `gridAutoRows`) always wins. The gap between tiles is declared
+	 * with `gap`, not here.
 	 */
 	style?: React.CSSProperties;
 
@@ -311,6 +311,14 @@ export interface DashboardGridProps extends Omit<
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Gap between tiles, as a step of the design-system gap scale. The
+	 * grid writes the step's token to `--wp-grid-gap` on its root, so the
+	 * value resolves in CSS and follows density. Absent, the root inherits
+	 * `--wp-grid-gap` from an ancestor or falls back to the `xl` step.
+	 */
+	gap?: GapSize;
 
 	/**
 	 * Per-item size limits in pixels, keyed by layout item key. Width

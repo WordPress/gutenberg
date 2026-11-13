@@ -27,6 +27,7 @@ import { LanesItem } from './lanes-item';
 import { useLanePlacement } from './use-lane-placement';
 import { arrayMoveWithPinned } from '../shared/array-move-with-pinned';
 import { resolveColumnCount } from '../shared/column-policy';
+import { gapStyle, readComputedGap } from '../shared/gap';
 import { GridOverlay } from '../shared/grid-overlay';
 import { clampSpan, gridSpanToPixelSize } from '../shared/resize-snap';
 import { useResizePixelLimits, useSpanBounds } from '../shared/use-span-bounds';
@@ -111,6 +112,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			flowTolerance = 16,
 			rowUnit = 4,
 			minColumnWidth,
+			gap,
 			itemLimits,
 			editMode = false,
 			onChangeLayout,
@@ -150,8 +152,9 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 		const [ containerWidth, setContainerWidth ] = useState( 0 );
 		const [ gapPx, setGapPx ] = useState( FALLBACK_GAP_PX );
 		const resizeObserverRef = useResizeObserver(
-			( [ { contentRect } ] ) => {
+			( [ { contentRect, target } ] ) => {
 				setContainerWidth( contentRect.width );
+				setGapPx( ( current ) => readComputedGap( target ) ?? current );
 			}
 		);
 		const mergedRootRef = useMergeRefs( [
@@ -160,9 +163,10 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			ref,
 		] );
 
-		// Measure synchronously before paint and snapshot the computed
+		// Measure synchronously before paint and read the computed
 		// `column-gap` so the placement math tracks the design-system
-		// token under any density.
+		// token under any density; read it again when `gap` changes,
+		// once its token is on the root.
 		useLayoutEffect( () => {
 			if ( ! container ) {
 				return;
@@ -171,13 +175,8 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 			if ( width > 0 ) {
 				setContainerWidth( width );
 			}
-			const parsed = Number.parseFloat(
-				window.getComputedStyle( container ).columnGap
-			);
-			if ( Number.isFinite( parsed ) && parsed > 0 ) {
-				setGapPx( parsed );
-			}
-		}, [ container ] );
+			setGapPx( ( current ) => readComputedGap( container ) ?? current );
+		}, [ container, gap ] );
 		const effectiveColumns = useMemo(
 			() =>
 				resolveColumnCount(
@@ -598,10 +597,11 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 						style={
 							{
 								...style,
+								...gapStyle( gap ),
 								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 								// `column-gap` and `row-gap` are set in
-								// `lanes.module.css` from the
-								// design-system gap token, with an
+								// `lanes.module.css` from `--wp-grid-gap`,
+								// which `gap` writes above, with an
 								// `@supports` block that zeroes `row-gap`
 								// in polyfill mode (the skyline already
 								// encodes vertical spacing in each tile's
