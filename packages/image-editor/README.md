@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that describes the edits to apply when saving it. Cropping is the first thing it does. The media editor is built on it.
+An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and functions that describe the edit for saving. The media editor is built on it.
 
 This package replaces `@wordpress/image-cropper`, which is deprecated and will be removed in a later release.
 
@@ -30,7 +30,7 @@ Or import it from JavaScript:
 import '@wordpress/image-editor/build-style/style.css';
 ```
 
-The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. Gutenberg's media editor reads the user's admin colour scheme for its accent and currently uses a light surface. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
+The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
 
 Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
 
@@ -61,7 +61,7 @@ To use the design tokens outside WordPress, install `@wordpress/theme` and load 
 
 ## Outside WordPress
 
-The package needs no WordPress site, and nothing it imports talks to one. Two things to know:
+The package needs no WordPress site, and nothing it imports talks to one.
 
 -   The examples import React hooks from `@wordpress/element`, which re-exports React. Import them from `react` instead if you prefer.
 -   The editor's own text, such as the labels on the resize handles and what a screen reader announces, is in English unless you give `@wordpress/i18n` your translations.
@@ -136,13 +136,13 @@ Whether two states have the same public edit fields, ignoring tiny floating-poin
 
 ### `getOutputSize( state )`
 
-The dimensions that the edits from `mapEditToOriginal` would produce on the image in `state.image`. A nearly full crop that the mapper omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
+The dimensions that the edit from `getImageEdit` would produce on the image in `state.image`. A nearly full crop that `getImageEdit` omits gives the full image dimensions. Use this for a size readout or a minimum-size check against the loaded image. A processor that edits a different file or rounds pixels may produce different dimensions. Returns `null` when no image has loaded.
 
-### `mapEditToOriginal( state )`
+### `getImageEdit( state )`
 
-Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `mapEditToOriginal` turns that state into operations for the full-size image loaded in `state.image`. Here, "original" means the image loaded into this editor, even if that file was edited before.
+Use it when saving. The editor stores where the image sits, how far it is zoomed, and a crop area measured against the view. `getImageEdit` describes the same result against the full-size image loaded in `state.image`, which may itself be a file someone edited before.
 
-The returned list contains flip, rotate and crop operations as needed, in the order to apply them. Crop positions and sizes are fractions of the image after rotation. An empty list means no image has loaded or there is no flip, rotation or crop to apply. A locked ratio can produce a crop operation before the person edits anything. The caller applies the operations and saves the result.
+The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order; anything absent needs nothing done. With exactly one axis flipped, `rotation` is 360 minus `state.rotation`, because the flip comes first. The crop is given as fractions of the image after rotation. An edit with no parts means there is nothing to apply, and `null` means no image has loaded. A locked ratio can produce a crop before the person edits anything.
 
 ### `exportImage( state, options? )`
 
@@ -152,9 +152,7 @@ It runs only in a browser. It rejects when no image has loaded, when the image f
 
 ## Not Yet Included
 
-The first version covers what the media editor needs. One addition is likely next, for simpler editors:
-
--   **A self-contained mode**, where `useImageEditor()` keeps the state itself. An editor without its own undo history would not need to store the state.
+-   **A self-contained mode**, where `useImageEditor()` keeps the state itself, for an editor without its own undo history.
 
 ## More
 

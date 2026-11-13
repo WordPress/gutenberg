@@ -504,24 +504,6 @@
       - onConfirm
       - size
       - title
-- name: CustomSelectControl
-  props:
-      - __experimentalShowSelectedHint
-      - __next40pxDefaultSize
-      - __nextUnconstrainedWidth
-      - className
-      - describedBy
-      - hideLabelFromVision
-      - label
-      - onBlur
-      - onChange
-      - onFocus
-      - onMouseOut
-      - onMouseOver
-      - options
-      - showSelectedHint
-      - size
-      - value
 - name: DataForm
   props:
       - data
@@ -1025,6 +1007,7 @@
         props:
             - children
             - className
+            - liveRegionContainer
             - render
             - style
       - name: Notice.Title

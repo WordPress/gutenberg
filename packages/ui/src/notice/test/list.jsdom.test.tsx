@@ -9,6 +9,7 @@ import {
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StrictMode, useState } from '@wordpress/element';
+import * as Dialog from '../../dialog';
 import * as Notice from '../index';
 
 function Message( {
@@ -242,6 +243,135 @@ describe( 'Notice.List', () => {
 		rerender( renderNotices( 2 ) );
 		await act( () => Promise.resolve() );
 		expect( status ).toBeEmptyDOMElement();
+	} );
+
+	it( 'announces an explicit message while a dialog hides its group', async () => {
+		const renderNotices = ( open: boolean, showError: boolean ) => (
+			<>
+				<Notice.List liveRegionContainer={ document.body }>
+					<div aria-live="polite" />
+					<div>
+						{ showError && (
+							<Message
+								politeness="assertive"
+								spokenMessage="Save failed."
+							/>
+						) }
+					</div>
+				</Notice.List>
+				<Dialog.Root open={ open }>
+					<Dialog.Popup>
+						<Dialog.Title>Preferences</Dialog.Title>
+					</Dialog.Popup>
+				</Dialog.Root>
+			</>
+		);
+		const { rerender } = render( renderNotices( false, false ) );
+		rerender( renderNotices( true, false ) );
+		await screen.findByRole( 'dialog', { name: 'Preferences' } );
+
+		rerender( renderNotices( true, true ) );
+		await waitFor( () =>
+			expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+				/^Save failed\.$/
+			)
+		);
+	} );
+
+	it.each( [
+		[ 'list prop', { 'aria-hidden': true } ],
+		[ 'render prop', { render: <section aria-hidden="true" /> } ],
+	] as const )(
+		'only announces explicit, unmuted messages outside a list hidden by its %s',
+		async ( _, props ) => {
+			const list = ( show: boolean ) => (
+				<Notice.List { ...props } liveRegionContainer={ document.body }>
+					{ show && (
+						<>
+							<Message spokenMessage="Draft saved." />
+							<Message>Background description.</Message>
+							<Message
+								politeness="off"
+								spokenMessage="Muted message."
+							/>
+							<div hidden>
+								<Message spokenMessage="Hidden message." />
+							</div>
+						</>
+					) }
+				</Notice.List>
+			);
+			const { rerender } = render( list( false ) );
+			rerender( list( true ) );
+			await waitFor( () =>
+				expect( screen.getByRole( 'status' ) ).toHaveTextContent(
+					/^Draft saved\.$/
+				)
+			);
+		}
+	);
+
+	it.each( [
+		[ 'hidden', true ],
+		[ 'aria-hidden', false ],
+	] as const )(
+		'clears an external announcement when an ancestor becomes %s without replaying it on reveal',
+		async ( attribute, explicit ) => {
+			const list = ( message?: string ) => (
+				<section aria-label="Editor">
+					<Notice.List liveRegionContainer={ document.body }>
+						{ message && (
+							<Notice.Root
+								spokenMessage={ explicit ? message : undefined }
+							>
+								<Notice.Description>
+									{ message }
+								</Notice.Description>
+							</Notice.Root>
+						) }
+					</Notice.List>
+				</section>
+			);
+			const { rerender } = render( list() );
+			const editor = screen.getByRole( 'region', { name: 'Editor' } );
+			const status = screen.getByRole( 'status' );
+			rerender( list( 'Saved.' ) );
+			await waitFor( () =>
+				expect( status ).toHaveTextContent( 'Saved.' )
+			);
+			editor.setAttribute( attribute, 'true' );
+			await waitFor( () => expect( status ).toBeEmptyDOMElement() );
+			editor.removeAttribute( attribute );
+			await act( () => Promise.resolve() );
+			expect( status ).toBeEmptyDOMElement();
+			rerender( list( 'Updated.' ) );
+			await waitFor( () =>
+				expect( status ).toHaveTextContent( 'Updated.' )
+			);
+		}
+	);
+
+	it( 'clears an external announcement when its shadow host becomes hidden', async () => {
+		render( <section aria-label="Plugin" /> );
+		const host = screen.getByRole( 'region', { name: 'Plugin' } );
+		const shadow = host.attachShadow( { mode: 'open' } );
+		const container = document.createElement( 'div' );
+		shadow.appendChild( container );
+		const { rerender } = render(
+			<Notice.List liveRegionContainer={ document.body } />,
+			{ container }
+		);
+		rerender(
+			<Notice.List liveRegionContainer={ document.body }>
+				<Message spokenMessage="Visible update." />
+			</Notice.List>
+		);
+		const status = screen.getByRole( 'status' );
+		await waitFor( () =>
+			expect( status ).toHaveTextContent( 'Visible update.' )
+		);
+		host.hidden = true;
+		await waitFor( () => expect( status ).toBeEmptyDOMElement() );
 	} );
 
 	it( 'removes dismissed announcements without repeating remaining messages', async () => {
