@@ -48,6 +48,13 @@
 			margin-right: 0;
 		}
 	}
+
+	&[aria-disabled="true"] {
+		@media ( forced-colors: active ) {
+			// Unlike `:disabled`, `aria-disabled` gets no system disabled color.
+			color: GrayText !important;
+		}
+	}
 }
 
 .components-menu-item__info-wrapper {
