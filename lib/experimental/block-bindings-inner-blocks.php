@@ -134,6 +134,14 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * The blocks still rendering inside it, if any, stopped with it, so they are
  * forgotten along with it.
  *
+ * A block that throws while it renders never reaches this filter, so it stays
+ * tracked. If something catches the exception and goes on rendering, the same
+ * request keeps its own inner blocks, and a bound block outside it counts
+ * against the budget as if nested, for the rest of the page load. Nothing loops
+ * or renders unsanitized because of it. No hook runs after a block throws;
+ * once the feature lands in Core, WP_Block::render() should stop tracking the
+ * block in a `finally` block instead.
+ *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
  * @param string   $block_content The rendered block.
@@ -152,37 +160,6 @@ function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_inner_blocks', 10, 3 );
-
-/**
- * Stops tracking the blocks whose supplied inner blocks were rendering when the
- * blocks themselves stopped rendering with an exception.
- *
- * A block that doesn't finish rendering never reaches the `render_block`
- * filter. If something catches the exception and goes on rendering, the block
- * would otherwise count as rendering for the rest of the page load. A block is
- * rendering while its `WP_Block::render()` call is on the call stack.
- *
- * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
- */
-function gutenberg_block_bindings_forget_bound_blocks_that_stopped_rendering() {
-	global $gutenberg_block_bindings_rendering_inner_blocks;
-	if ( empty( $gutenberg_block_bindings_rendering_inner_blocks ) ) {
-		return;
-	}
-
-	$rendering_blocks = array();
-	foreach ( debug_backtrace( DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS ) as $frame ) {
-		if ( isset( $frame['object'] ) && $frame['object'] instanceof WP_Block && 'render' === $frame['function'] ) {
-			$rendering_blocks[] = $frame['object'];
-		}
-	}
-	foreach ( $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
-		if ( ! in_array( $rendering['bound_block'], $rendering_blocks, true ) ) {
-			$gutenberg_block_bindings_rendering_inner_blocks = array_slice( $gutenberg_block_bindings_rendering_inner_blocks, 0, $index );
-			return;
-		}
-	}
-}
 
 /**
  * Parses the inner blocks a block bindings source supplies.
@@ -451,7 +428,6 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		return null;
 	}
 
-	gutenberg_block_bindings_forget_bound_blocks_that_stopped_rendering();
 	$request = gutenberg_block_bindings_get_inner_blocks_request( $source_name, $source_args, $block_instance );
 	if ( gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) ) {
 		return null;
