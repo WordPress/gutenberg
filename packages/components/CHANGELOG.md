@@ -23,6 +23,7 @@
 -   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   `ResizableBox`: Show corner handles above side handles, so a corner handle can be dragged when the side handle next to it is also enabled ([#86781](https://github.com/WordPress/gutenberg/pull/86781)).
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
 -   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).
 -   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
