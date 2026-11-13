@@ -12758,11 +12758,6 @@
 			"count": 1
 		}
 	},
-	"test/e2e/specs/editor/various/content-tab-hover-highlight.spec.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"test/e2e/specs/editor/various/contrast-checker.spec.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
