@@ -119,12 +119,14 @@ const {
 	useHasFiltersPanel,
 	useHasImageSettingsPanel,
 	useHasBackgroundPanel,
+	useHasTransformPanel,
 	BackgroundPanel: StylesBackgroundPanel,
 	BorderPanel: StylesBorderPanel,
 	ColorPanel: StylesColorPanel,
 	TypographyPanel: StylesTypographyPanel,
 	DimensionsPanel: StylesDimensionsPanel,
 	FiltersPanel: StylesFiltersPanel,
+	TransformPanel: StylesTransformPanel,
 	ImageSettingsPanel,
 	AdvancedPanel: StylesAdvancedPanel,
 } = unlock( blockEditorPrivateApis );
@@ -258,6 +260,7 @@ function ScreenBlock( {
 	const hasBorderPanel = useHasBorderPanel( settings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
 	const hasFiltersPanel = useHasFiltersPanel( settings );
+	const hasTransformPanel = useHasTransformPanel( settings );
 	const shouldShowFiltersPanel =
 		hasFiltersPanel && effectiveSelectedViewport === 'default';
 	const hasImageSettingsPanel = useHasImageSettingsPanel(
@@ -435,6 +438,14 @@ function ScreenBlock( {
 					inheritedValue={ inheritedStyle }
 					value={ style }
 					onChange={ onChangeBorders }
+					settings={ settings }
+				/>
+			) }
+			{ hasTransformPanel && (
+				<StylesTransformPanel
+					inheritedValue={ inheritedStyle }
+					value={ style }
+					onChange={ setStyle }
 					settings={ settings }
 				/>
 			) }

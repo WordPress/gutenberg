@@ -378,6 +378,24 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h5' . $color_css_rules .
 					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h6' . $color_css_rules . '$/',
 			),
+			'element transform styles are not applied'   => array(
+				'color_settings'  => array(
+					'button'  => true,
+					'link'    => true,
+					'heading' => true,
+				),
+				'elements_styles' => array(
+					'button'  => array( 'transform' => array( 'rotate' => '10deg' ) ),
+					'link'    => array(
+						'color'     => $color_styles,
+						'transform' => array( 'rotate' => '10deg' ),
+						':hover'    => array( 'transform' => array( 'rotate' => '20deg' ) ),
+					),
+					'heading' => array( 'transform' => array( 'rotate' => '10deg' ) ),
+					'h1'      => array( 'transform' => array( 'rotate' => '10deg' ) ),
+				),
+				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) a:where\(:not\(.wp-element-button\)\)' . $color_css_rules . '$/',
+			),
 		);
 	}
 }
