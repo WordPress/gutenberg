@@ -168,6 +168,15 @@ describe( 'ControlWithError', () => {
 				expect( screen.getByText( typeMismatchMessage ) ).toBeVisible();
 			} );
 			expect( input ).toHaveAttribute( 'data-validity-visible' );
+
+			await user.clear( input );
+			await user.tab();
+
+			expect( input.validity.valueMissing ).toBe( true );
+			const valueMissingMessage = input.validationMessage;
+			await waitFor( () => {
+				expect( screen.getByText( valueMissingMessage ) ).toBeVisible();
+			} );
 		} );
 
 		it( 'should mark a required number control with unparseable input as touched on blur', async () => {

@@ -11,8 +11,9 @@ import type { ValidatedControlProps } from '../types';
  * Native constraint violations (e.g. `required`, `pattern`) and custom
  * validity messages passed through the `customValidity` prop are reported
  * inline once focus leaves the control, or when the enclosing form is
- * submitted. A required control left empty reports its missing value only
- * when the form is submitted.
+ * submitted or `reportValidity()` is called. Focus leaving an empty required
+ * control doesn't reveal its messages, unless the user has left it with a
+ * value before.
  */
 export const ValidatedInputControl = forwardRef<
 	HTMLInputElement,
