@@ -14,8 +14,9 @@ const { DENYLIST } = createRequire( import.meta.url )(
 ) as { DENYLIST: Record< string, Record< string, string > > };
 
 const NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY = [
-	// Kept off the denylist in #81658: `InputControl` from `@wordpress/ui`
-	// does not clamp to `min` and `max` or align to `step` on blur.
+	// New code should use `InputControl` from `@wordpress/ui`, but existing
+	// usages are not pushed to migrate until we decide whether they need a
+	// shared helper.
 	'NumberControl',
 ];
 
@@ -213,7 +214,7 @@ describe( '@wordpress/components recommendation status', () => {
 		expect( manifestStories ).toEqual( [] );
 	} );
 
-	it( 'links the migration guide of a "not-recommended" component from its denylist message', () => {
+	it( 'links the migration guide of a "not-recommended" component, when it has one, from its denylist message', () => {
 		const unlinkedGuides = migrationGuides.flatMap(
 			( { file, docsId, story } ) => {
 				if (
