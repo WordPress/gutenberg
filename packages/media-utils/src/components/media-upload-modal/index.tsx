@@ -36,6 +36,7 @@ import {
 	Dialog,
 	Stack,
 	getWpCompatOverlaySlot,
+	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import {
 	altTextField,
@@ -286,6 +287,8 @@ export function MediaUploadModal( {
 	postType,
 	fields: registeredFields,
 }: MediaUploadModalProps ) {
+	// Enable before Dialog chooses its portal, ahead of DataViewsPicker's opt-in.
+	useEnableWpCompatOverlaySlot();
 	const legacyPopoverSlotName = useId();
 	// The "uploaded to this post" option resolves to this ID, and the media query
 	// has no use for anything else — a template's entity ID, for instance, is a

@@ -3,6 +3,7 @@ import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Replace the legacy media overlay shell.
 	Dialog,
 	VisuallyHidden,
+	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
 import styles from './media-frame-dialog.module.css';
 
@@ -24,6 +25,7 @@ export function MediaFrameDialog( {
 	open,
 	title,
 }: MediaFrameDialogProps ) {
+	useEnableWpCompatOverlaySlot();
 	const [ frameTitle, setFrameTitle ] = useState( title );
 	const [ container, setContainer ] = useState< HTMLDivElement | null >(
 		null
