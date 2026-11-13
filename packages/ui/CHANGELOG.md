@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Notice`: Add `getAnnouncementText` and use it in `List` to preserve line breaks and omit CSS-hidden message text ([#86790](https://github.com/WordPress/gutenberg/pull/86790)).
+
 ### Enhancements
 
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
