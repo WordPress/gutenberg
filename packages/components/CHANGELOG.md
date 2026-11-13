@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `FormToggle`, `ToggleControl`: Show the current state when `checked` isn't passed, so an uncontrolled toggle no longer looks off after it's turned on ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
 -   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).

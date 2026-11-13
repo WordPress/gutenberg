@@ -85,7 +85,7 @@
 			@media not (prefers-reduced-motion) {
 				transition:
 					border-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
-					transform var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+					inset-inline-start var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
 			}
 
 			@media (forced-colors: active) {
@@ -102,14 +102,10 @@
 			&[data-checked] {
 				background-color: var(--wpds-color-background-thumb-brand-strong);
 				border-color: var(--wpds-color-stroke-interactive-brand);
-				transform: translateX(calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width)));
+				inset-inline-start: calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-border-width));
 
 				@media (forced-colors: active) {
 					border-color: Highlight;
-				}
-
-				&:dir(rtl) {
-					transform: translateX(calc(var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-height) * 2));
 				}
 			}
 
