@@ -64,6 +64,8 @@ describe( 'Autocomplete hover navigation', () => {
 			return (
 				<>
 					<input
+						// eslint-disable-next-line jsx-a11y/no-autofocus -- Set initial focus independently of test order.
+						autoFocus
 						aria-label="Complete a fruit"
 						aria-activedescendant={ activeId ?? undefined }
 						defaultValue="~"
@@ -79,7 +81,6 @@ describe( 'Autocomplete hover navigation', () => {
 
 		await render( <AutocompleteInput /> );
 		const input = screen.getByRole( 'textbox' );
-		await user.tab();
 		const orange = await screen.findByRole( 'option', { name: 'Orange' } );
 		await user.hover( orange );
 		expect( orange ).toHaveAttribute( 'aria-selected', 'true' );
