@@ -47,6 +47,7 @@
 ### Documentation
 
 -   `Notice`: Add a Storybook example showing a neutral-toned `Link` inside `Notice.Description` ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
+-   `Tabs`: Describe that each tab shows its panel in place, without a change of URL ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
 
 ## 0.26.0 (2026-11-04)
 
