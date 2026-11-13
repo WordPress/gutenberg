@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).
+-   Activate plugins in config order in the experimental `php` runtime, each in its own PHP process, like the Docker runtime. A plugin that requires another plugin listed before it no longer fails to activate ([#86763](https://github.com/WordPress/gutenberg/pull/86763)).
 
 ### Internal
 
