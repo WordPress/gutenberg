@@ -1,7 +1,7 @@
 import { Switch as _Switch } from '@base-ui/react/switch';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { Circle, Path, SVG } from '@wordpress/primitives';
+import { Path, SVG } from '@wordpress/primitives';
 import resetStyles from '../../../utils/css/resets.module.css';
 import styles from './style.module.scss';
 import type { SwitchProps } from './types';
@@ -13,10 +13,11 @@ const onLabel = (
 		viewBox="0 0 8 8"
 	>
 		<Path
-			d="M4 1.5v5"
+			d="M1.5 4.25 3.25 6 6.5 2"
 			fill="none"
 			stroke="currentColor"
 			strokeLinecap="round"
+			strokeLinejoin="round"
 		/>
 	</SVG>
 );
@@ -27,7 +28,12 @@ const offLabel = (
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 8 8"
 	>
-		<Circle cx={ 4 } cy={ 4 } r={ 2.5 } fill="none" stroke="currentColor" />
+		<Path
+			d="M2 2l4 4M6 2 2 6"
+			fill="none"
+			stroke="currentColor"
+			strokeLinecap="round"
+		/>
 	</SVG>
 );
 

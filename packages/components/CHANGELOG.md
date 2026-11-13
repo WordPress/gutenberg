@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `FormToggle`, `ToggleControl`: Show a `1` on the track when the toggle is on and a `0` when it's off, as on iOS, so the state doesn't rely on color and thumb position alone. The thumb is now a pill that spans the full toggle height and slides over the label that doesn't apply, and disabled toggles use the same track whether on or off ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
+-   `FormToggle`, `ToggleControl`: Show a check mark on the track when the toggle is on and a cross when it's off, so the state doesn't rely on color and thumb position alone. The thumb is now a pill that spans the full toggle height and slides over the label that doesn't apply, and disabled toggles use the same track whether on or off ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   `AnglePickerControl`: Increase dial border contrast on hover and while pressed ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
