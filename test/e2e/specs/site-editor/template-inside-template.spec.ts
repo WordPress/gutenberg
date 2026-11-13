@@ -540,6 +540,20 @@ test.describe( 'Template rendered inside another template', () => {
 		).toBeVisible();
 		const onItsOwn = await getTemplatePartEditingModes();
 
+		// The panel listing the template parts of a template to edit.
+		const contentPanel = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-panel__body' )
+			.filter( {
+				has: page.getByRole( 'button', {
+					name: 'Content',
+					exact: true,
+				} ),
+			} );
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Archive sidebar' } )
+		).toBeVisible();
+
 		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
@@ -553,6 +567,16 @@ test.describe( 'Template rendered inside another template', () => {
 			editor.canvas.getByText( 'Archive sidebar text' )
 		).toBeVisible();
 		const insideFrame = await getTemplatePartEditingModes();
+
+		// The panel still lists the part of the template being edited, and
+		// leaves out the part of the template around it, which cannot be
+		// edited from here.
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Archive sidebar' } )
+		).toBeVisible();
+		await expect(
+			contentPanel.getByRole( 'button', { name: 'Frame header' } )
+		).toBeHidden();
 
 		// The part of the template being edited is edited as it is when that
 		// template is edited on its own, rather than locked with the template
