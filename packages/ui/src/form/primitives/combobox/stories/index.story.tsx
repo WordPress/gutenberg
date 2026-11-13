@@ -135,6 +135,10 @@ export const Compact: Story = {
  * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
  *
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
+ *
+ * To keep the items clear of a classic scrollbar, give `Combobox.ListBody` an
+ * inline-end padding. Also set `scrollbar-gutter: stable` on it, so that the
+ * items keep their width when the scrollbar appears or disappears.
  */
 export const DetachedInline: Story = {
 	parameters: {
@@ -167,7 +171,14 @@ export const DetachedInline: Story = {
 			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.ListBody style={ { maxHeight: 200 } }>
+					<Combobox.ListBody
+						style={ {
+							maxHeight: 200,
+							scrollbarGutter: 'stable',
+							paddingInlineEnd:
+								'var(--wpds-dimension-padding-xs)',
+						} }
+					>
 						<Combobox.Collection>
 							{ ( item: FixtureItem ) => (
 								<Combobox.Item
