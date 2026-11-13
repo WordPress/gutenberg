@@ -20,7 +20,7 @@ type Announcement = {
 };
 
 type NoticeSnapshot = Announcement & {
-	comparison: string;
+	comparison: string | undefined;
 	listHidden: boolean;
 };
 
@@ -114,6 +114,13 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				let previous = new Map< HTMLElement, NoticeSnapshot >();
 				const readNotices = () => {
 					const current = new Map< HTMLElement, NoticeSnapshot >();
+					const listVisibility =
+						element.ownerDocument.defaultView?.getComputedStyle(
+							element
+						).visibility;
+					const isListVisibilityHidden =
+						listVisibility === 'hidden' ||
+						listVisibility === 'collapse';
 					for ( const notice of element.querySelectorAll< HTMLElement >(
 						`.${ styles.notice }`
 					) ) {
@@ -129,19 +136,24 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 						}
 						const spokenMessage =
 							notice.dataset.wpUiNoticeSpokenMessage;
-						// Keep a stable comparison while the list is hidden. Revealing
-						// it alone must not replay its current messages.
+						const message = spokenMessage ?? readMessage( notice );
+						const before = previous.get( notice );
+						// Inherited CSS visibility can make the message unreadable.
+						// Preserve its last comparison until it can be read again.
+						const comparison =
+							spokenMessage ??
+							( isListVisibilityHidden && ! message
+								? before?.comparison
+								: readMessage( notice, ( content ) =>
+										getAnnouncementComparisonText(
+											content,
+											element
+										)
+									) );
 						current.set( notice, {
-							id: previous.get( notice )?.id ?? nextId++,
-							message: spokenMessage ?? readMessage( notice ),
-							comparison:
-								spokenMessage ??
-								readMessage( notice, ( content ) =>
-									getAnnouncementComparisonText(
-										content,
-										element
-									)
-								),
+							id: before?.id ?? nextId++,
+							message,
+							comparison,
 							politeness: notice.dataset
 								.wpUiNoticePoliteness as Announcement[ 'politeness' ],
 							listHidden: visibility === 'list-hidden',
@@ -165,6 +177,8 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 							announcement.message &&
 							! announcement.listHidden &&
 							announcement.politeness !== 'off' &&
+							// The first readable message establishes a silent baseline.
+							( ! before || before.comparison !== undefined ) &&
 							( announcement.comparison !== before?.comparison ||
 								announcement.politeness !== before?.politeness )
 						) {
@@ -224,7 +238,12 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				parent = getComposedParent( parent )
 			) {
 				observer.observe( parent, {
-					attributeFilter: [ 'hidden', 'aria-hidden' ],
+					attributeFilter: [
+						'class',
+						'style',
+						'hidden',
+						'aria-hidden',
+					],
 				} );
 			}
 			return () => observer.disconnect();

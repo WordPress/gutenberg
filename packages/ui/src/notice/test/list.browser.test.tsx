@@ -66,3 +66,61 @@ it( 'preserves formatted announcements across list visibility changes', async ()
 	await rerender( notice( false ) );
 	expect( status ).toBeEmptyDOMElement();
 } );
+
+it.each( [
+	[ 'hidden', 'list' ],
+	[ 'hidden', 'ancestor' ],
+	[ 'collapse', 'list' ],
+	[ 'collapse', 'ancestor' ],
+] as const )(
+	'does not replay an unchanged implicit message after CSS visibility %s on the %s',
+	async ( visibility, target ) => {
+		const notice = ( visible: boolean, message = 'Saved.' ) => (
+			<section
+				style={
+					target === 'ancestor'
+						? { visibility: visible ? 'visible' : visibility }
+						: undefined
+				}
+			>
+				<Notice.List
+					style={
+						target === 'list'
+							? { visibility: visible ? 'visible' : visibility }
+							: undefined
+					}
+					liveRegionContainer={ document.body }
+				>
+					<Notice.Root>
+						<Notice.Description>
+							{ message }
+							<span style={ { visibility: 'hidden' } }>
+								Hidden detail
+							</span>
+						</Notice.Description>
+					</Notice.Root>
+				</Notice.List>
+			</section>
+		);
+		const { rerender } = await render( notice( false ) );
+		const status = screen.getByRole( 'status' );
+		await rerender( notice( true ) );
+		expect( status ).toBeEmptyDOMElement();
+		await rerender( notice( true, 'Updated.' ) );
+		await waitFor( () =>
+			expect( status ).toHaveProperty( 'textContent', 'Updated.' )
+		);
+		await rerender( notice( false, 'Updated.' ) );
+		await waitFor( () => expect( status ).toBeEmptyDOMElement() );
+		await rerender( notice( true, 'Updated.' ) );
+		expect( status ).toBeEmptyDOMElement();
+		await rerender( notice( false, 'Updated.' ) );
+		await rerender( notice( true, 'Changed on reveal.' ) );
+		await waitFor( () =>
+			expect( status ).toHaveProperty(
+				'textContent',
+				'Changed on reveal.'
+			)
+		);
+	}
+);
