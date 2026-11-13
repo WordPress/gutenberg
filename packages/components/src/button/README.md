@@ -132,7 +132,7 @@ Sets the Tooltip content if `showTooltip` is provided.
 
  - Type: `string`
  - Required: No
- - Default: `'Loading'`, translated into the current locale.
+ - Default: `'Loading'`
 
 The message announced to assistive technology while `isBusy` is true. Set to an empty string when the caller provides its own progress announcement.
 

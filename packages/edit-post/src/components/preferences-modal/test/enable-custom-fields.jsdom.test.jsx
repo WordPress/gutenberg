@@ -75,12 +75,17 @@ describe( 'CustomFieldsConfirmation', () => {
 		const user = userEvent.setup();
 		const submit = vi.fn();
 		const setAttribute = vi.fn();
+		const originalGetElementById = document.getElementById.bind( document );
 		const getElementById = vi
 			.spyOn( document, 'getElementById' )
-			.mockImplementation( () => ( {
-				submit,
-				querySelector: () => ( { setAttribute } ),
-			} ) );
+			.mockImplementation( ( id ) =>
+				id === 'toggle-custom-fields-form'
+					? {
+							submit,
+							querySelector: () => ( { setAttribute } ),
+						}
+					: originalGetElementById( id )
+			);
 		render( <CustomFieldsConfirmation /> );
 
 		await user.click( screen.getByRole( 'button' ) );
