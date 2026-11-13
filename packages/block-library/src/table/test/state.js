@@ -1894,4 +1894,57 @@ describe( 'updateSelectedCell', () => {
 			],
 		} );
 	} );
+
+	describe( 'with merged cells', () => {
+		const markSelected = ( cell ) => ( { ...cell, selected: true } );
+		const getSelectedContent = ( state ) =>
+			[ 'head', 'body' ].flatMap( ( sectionName ) =>
+				state[ sectionName ].flatMap( ( row ) =>
+					row.cells
+						.filter( ( cell ) => cell.selected )
+						.map( ( cell ) => cell.content )
+				)
+			);
+
+		it( 'selects cells by logical column in rows covered by a rowspan', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 0 },
+				markSelected
+			);
+
+			// "Sub C" is the first cell of its row, but it is in column 2.
+			expect( getSelectedContent( state ) ).toEqual( [ 'A', 'A1' ] );
+		} );
+
+		it( 'selects cells spanning across the selected column', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 3 },
+				markSelected
+			);
+
+			expect( getSelectedContent( state ) ).toEqual( [
+				'Grouped',
+				'Sub D',
+				'D1',
+			] );
+		} );
+
+		it( 'selects every column covered by the selection', () => {
+			const state = updateSelectedCell(
+				tableWithRowspanHead,
+				{ type: 'column', columnIndex: 2, colspan: 2 },
+				markSelected
+			);
+
+			expect( getSelectedContent( state ) ).toEqual( [
+				'Grouped',
+				'Sub C',
+				'Sub D',
+				'C1',
+				'D1',
+			] );
+		} );
+	} );
 } );

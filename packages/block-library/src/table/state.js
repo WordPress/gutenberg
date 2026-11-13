@@ -86,6 +86,13 @@ export function updateSelectedCell( state, selection, updateCell ) {
 				return [ sectionName, section ];
 			}
 
+			// A column selection uses logical columns, so cells are matched
+			// by the columns they cover.
+			const positions =
+				selection.type === 'column'
+					? getSectionCellPositions( section )
+					: undefined;
+
 			return [
 				sectionName,
 				section.map( ( row, rowIndex ) => {
@@ -102,9 +109,16 @@ export function updateSelectedCell( state, selection, updateCell ) {
 									rowIndex,
 								};
 
-								if (
-									! isCellSelected( cellLocation, selection )
-								) {
+								const isSelected = positions
+									? isCellInColumnSelection(
+											positions[ rowIndex ][
+												columnIndex
+											],
+											selection
+										)
+									: isCellSelected( cellLocation, selection );
+
+								if ( ! isSelected ) {
 									return cellAttributes;
 								}
 
@@ -116,6 +130,24 @@ export function updateSelectedCell( state, selection, updateCell ) {
 			];
 		} )
 	);
+}
+
+/**
+ * Returns whether a cell covers any of the logical columns in a column selection.
+ *
+ * @param {Object} position             The logical position of the cell.
+ * @param {number} position.columnIndex The logical column where the cell starts.
+ * @param {number} position.colspan     The number of columns the cell covers.
+ * @param {Object} selection            A column selection, with the logical
+ *                                      `columnIndex` and optional `colspan`.
+ *
+ * @return {boolean} True if the cell is in the selection, false otherwise.
+ */
+function isCellInColumnSelection( { columnIndex, colspan }, selection ) {
+	const start = selection.columnIndex;
+	const end = start + ( selection.colspan ?? 1 );
+
+	return columnIndex < end && columnIndex + colspan > start;
 }
 
 /**

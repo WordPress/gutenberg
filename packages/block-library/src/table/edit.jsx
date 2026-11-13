@@ -195,10 +195,16 @@ function TableEdit( {
 		}
 
 		// Convert the cell selection to a column selection so that alignment
-		// is applied to the entire column.
+		// is applied to the entire column. Use the logical columns the cell
+		// covers, so that merged cells align every column under them.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
 		const columnSelection = {
 			type: 'column',
-			columnIndex: selectedCell.columnIndex,
+			columnIndex,
+			colspan,
 		};
 
 		const newAttributes = updateSelectedCell(
