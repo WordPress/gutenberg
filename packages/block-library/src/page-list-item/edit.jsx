@@ -25,7 +25,7 @@ function useFrontPageId() {
 }
 
 export default function PageListItemEdit( { context, attributes } ) {
-	const { id, label, link, hasChildren, title } = attributes;
+	const { id, link, hasChildren, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
@@ -61,34 +61,18 @@ export default function PageListItemEdit( { context, attributes } ) {
 				'menu-item-home': id === frontPageId,
 			} ) }
 		>
-			{ hasChildren && openOnClick ? (
-				<>
-					<button
-						type="button"
-						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-						aria-expanded="false"
-						dangerouslySetInnerHTML={ {
-							__html: safeHTML( label ),
-						} }
-					/>
-					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
-				</>
-			) : (
-				<a
-					className={ clsx( 'wp-block-pages-list__item__link', {
-						'wp-block-navigation-item__content': isNavigationChild,
-					} ) }
-					href={ link }
-					dangerouslySetInnerHTML={ {
-						__html: safeHTML( title ),
-					} }
-				/>
-			) }
+			<a
+				className={ clsx( 'wp-block-pages-list__item__link', {
+					'wp-block-navigation-item__content': isNavigationChild,
+				} ) }
+				href={ link }
+				dangerouslySetInnerHTML={ {
+					__html: safeHTML( title ),
+				} }
+			/>
 			{ hasChildren && (
 				<>
-					{ ! openOnClick && context.showSubmenuIcon && (
+					{ ( openOnClick || context.showSubmenuIcon ) && (
 						<button
 							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
 							aria-expanded="false"
