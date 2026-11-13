@@ -44,10 +44,10 @@ export function useFocusHandler( clientId: string ) {
 					// A mounted element's window has a selection.
 					const selection =
 						node.ownerDocument.defaultView!.getSelection()!;
-					if (
+					const caretClientId =
 						selection.anchorNode &&
-						getBlockClientId( selection.anchorNode ) !== clientId
-					) {
+						getBlockClientId( selection.anchorNode );
+					if ( caretClientId && caretClientId !== clientId ) {
 						selection.removeAllRanges();
 					}
 				}
