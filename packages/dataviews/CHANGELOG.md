@@ -5,7 +5,6 @@
 ### Enhancements
 
 -   DataForm: Use `@wordpress/ui` Popover for panel field flyouts, including fields opened inside Dialog and Drawer. ([#86819](https://github.com/WordPress/gutenberg/pull/86819))
-
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
