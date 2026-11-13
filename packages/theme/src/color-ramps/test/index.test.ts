@@ -147,22 +147,25 @@ describe( 'buildRamps', () => {
 			'rgb(0 10.6 0)',
 			{
 				...BG_RAMP_CONFIG,
-				fgSurface3: {
-					contrast: {
-						reference: 'seed',
-						followDirection: 'lighter',
-						target,
+				steps: {
+					...BG_RAMP_CONFIG.steps,
+					fgFill: {
+						contrast: {
+							reference: 'seed',
+							followDirection: 'lighter',
+							target,
+						},
+						lightness: () => 1,
 					},
-					lightness: () => 1,
 				},
 			},
 			{ rescaleToFitContrastTargets: false }
 		);
-		const contrast = getContrast( ramp.surface2, ramp.fgSurface3 );
+		const contrast = getContrast( ramp.surface2, ramp.fgFill );
 
 		expect( contrast ).toBeGreaterThanOrEqual( target );
 		expect( contrast ).toBeLessThan( adjustContrastTarget( target ) );
-		expect( warnings ?? [] ).not.toContain( 'fgSurface3' );
+		expect( warnings ?? [] ).not.toContain( 'fgFill' );
 	} );
 
 	it( 'warns when emitted colors miss the configured target', () => {
@@ -170,22 +173,25 @@ describe( 'buildRamps', () => {
 			'rgb(0 10.6 0)',
 			{
 				...BG_RAMP_CONFIG,
-				fgSurface3: {
-					contrast: {
-						reference: 'seed',
-						followDirection: 'lighter',
-						target: 20.05,
+				steps: {
+					...BG_RAMP_CONFIG.steps,
+					fgFill: {
+						contrast: {
+							reference: 'seed',
+							followDirection: 'lighter',
+							target: 20.05,
+						},
+						lightness: () => 1,
 					},
-					lightness: () => 1,
 				},
 			},
 			{ rescaleToFitContrastTargets: false }
 		);
 
-		expect( getContrast( ramp.surface2, ramp.fgSurface3 ) ).toBeLessThan(
+		expect( getContrast( ramp.surface2, ramp.fgFill ) ).toBeLessThan(
 			20.05
 		);
-		expect( warnings ).toContain( 'fgSurface3' );
+		expect( warnings ).toContain( 'fgFill' );
 	} );
 
 	it( 'restores the weak intent background colors', () => {

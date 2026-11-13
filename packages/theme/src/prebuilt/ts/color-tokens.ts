@@ -141,6 +141,7 @@ export default {
 	],
 	'bg-surface1': [ 'background-surface-neutral-weak' ],
 	'bg-fgSurface4': [
+		'background-indicator-neutral',
 		'background-thumb-neutral',
 		'foreground-content-neutral',
 		'foreground-interactive-neutral',

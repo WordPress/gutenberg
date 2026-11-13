@@ -12,16 +12,14 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
-import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import type { BaseRamp, BaseRampResult } from './types.ts';
-import { solveWithBisect } from './utils.ts';
+import { adjustContrastTarget, solveWithBisect } from './utils.ts';
 
 type GetColorAtLightness = ( lightness: number ) => PlainColorObject;
 
 const MINIMUM_CROSS_LANE_LIGHTNESS_GAP = 0.005;
-// The configured 3.01 target leaves room for the 3:1 hard gate after sRGB
-// serialization. The universal top-up covers the solver tolerance.
-const SERIALIZED_STROKE_WCAG_TARGET = 3.01 + UNIVERSAL_CONTRAST_TOPUP;
+// Reserve room for the solver tolerance and sRGB serialization.
+const SERIALIZED_STROKE_WCAG_TARGET = adjustContrastTarget( 3 );
 
 function clampUnitInterval( value: number ) {
 	return Math.max( 0, Math.min( 1, value ) );

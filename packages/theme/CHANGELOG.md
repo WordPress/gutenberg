@@ -8,11 +8,13 @@
 
 ### New Features
 
+-   Add `--wpds-color-foreground-content-neutral-strong` for headings and other content with strong emphasis ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 -   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 
 ### Enhancements
 
+-   Generate perceptually balanced color ramps with distinct resting and active foregrounds across light and dark themes ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 -   Check `--wpds-color-foreground-content-neutral-weak` text on `--wpds-color-background-surface-neutral-weak` and `--wpds-color-background-surface-neutral-strong` for WCAG AA contrast in the token build and `ThemeProvider` color warnings ([#86750](https://github.com/WordPress/gutenberg/pull/86750)).
 -   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
 
@@ -69,7 +71,6 @@
 -   Update Terrazzo token-generation tools to 2.9.0 ([#85067](https://github.com/WordPress/gutenberg/pull/85067)).
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
 -   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
--   Register color spaces only when calculating colors, avoiding module-import side effects. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Documentation
 

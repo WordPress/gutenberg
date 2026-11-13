@@ -16,6 +16,7 @@
 
 ### Enhancements
 
+-   Use strong neutral text for headings and overlay titles, and strengthen Link underlines on hover, press, and keyboard focus ([#82294](https://github.com/WordPress/gutenberg/pull/82294)).
 -   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
@@ -115,7 +116,6 @@
 -   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
 -   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
 -   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
--   Use strong neutral text for headings and overlay titles, give tabs padded interaction backgrounds and focus rings without widening minimal tab lists and match their indicators to the text color, match Notice dismiss controls to the notice's tone, and make link underlines follow the text color and thicken on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 
 ### Bug Fixes
 
@@ -168,7 +168,6 @@
 -   `Switch`, `SwitchControl`: Mark as recommended for use in a WordPress environment ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
 -   `Progress`: Default to a 160px width, overridable through `className` or `style` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
 -   `Progress`: Mark as recommended for use in a WordPress environment. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
--   Use strong neutral text for headings and overlay titles, highlight tabs on interaction, and thicken link underlines on hover, press, and keyboard focus. ([#82294](https://github.com/WordPress/gutenberg/pull/82294))
 -   `Menu`: Keep parent items highlighted with a neutral background while their submenus are open ([#84031](https://github.com/WordPress/gutenberg/pull/84031)).
 -   `Menu`: Align group labels and separators with item labels when a radio or checkbox column indents those labels ([#83993](https://github.com/WordPress/gutenberg/pull/83993)).
 -   `Menu`: Tighten item spacing and cap menus at 320px wide ([#84028](https://github.com/WordPress/gutenberg/pull/84028)).

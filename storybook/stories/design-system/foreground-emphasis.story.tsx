@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { ExternalLink, Notice, TabPanel } from '@wordpress/components';
+import {
+	ExternalLink,
+	Notice as WCNotice,
+	TabPanel,
+} from '@wordpress/components';
 import { cog, pencil, trash } from '@wordpress/icons';
 import { ThemeProvider } from '@wordpress/theme';
 import {
 	Button,
 	IconButton,
 	Link,
-	Notice as UINotice,
 	Stack,
 	Tabs,
 	Text,
@@ -154,9 +157,9 @@ export const Comparison: StoryObj = {
 							<ExternalLink href="https://wordpress.org">
 								Visit WordPress.org
 							</ExternalLink>
-							<Notice status="info" onRemove={ () => {} }>
+							<WCNotice status="info" onRemove={ () => {} }>
 								Changes saved.
-							</Notice>
+							</WCNotice>
 						</Stack>
 					</Stack>
 				</ThemeProvider>

@@ -264,19 +264,15 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config.steps );
 
 	// Calculate the ramp with the initial seed.
-	const {
-		rampResults,
-		maxDeficit,
-		maxDeficitDirection,
-		maxDeficitStep,
-	} = calculateRamp( {
-		seed,
-		sortedSteps,
-		config: config.steps,
-		mainDir,
-		oppDir,
-		pinLightness,
-	} );
+	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
+		calculateRamp( {
+			seed,
+			sortedSteps,
+			config: config.steps,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} );
 
 	let bestRamp = rampResults;
 
@@ -339,7 +335,7 @@ export function buildRamp(
 	// alone cannot establish their contrast after serialization.
 	const serializedSeed = getColorString( seed );
 	const warnings = sortedSteps.filter( ( stepName ) => {
-		const { contrast } = config[ stepName ];
+		const { contrast } = config.steps[ stepName ];
 		if ( contrast.ignoreWhenAdjustingSeed ) {
 			return false;
 		}

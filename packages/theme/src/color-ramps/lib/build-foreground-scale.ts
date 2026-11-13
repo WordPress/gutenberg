@@ -10,7 +10,6 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import { clampToGamut, getColorString, getContrast } from './color-utils.ts';
-import { UNIVERSAL_CONTRAST_TOPUP } from './constants.ts';
 import { taperChroma } from './taper-chroma.ts';
 import type {
 	BaseRampResult,
@@ -19,7 +18,7 @@ import type {
 	ForegroundRampStep,
 	RampResult,
 } from './types.ts';
-import { solveWithBisect } from './utils.ts';
+import { adjustContrastTarget, solveWithBisect } from './utils.ts';
 
 type GetColorForLightness = ( lightness: number ) => PlainColorObject;
 
@@ -149,7 +148,7 @@ function getContrastTargetMargin(
 	references: readonly string[],
 	target: number
 ) {
-	const adjustedTarget = target + UNIVERSAL_CONTRAST_TOPUP;
+	const adjustedTarget = adjustContrastTarget( target );
 	return Math.min(
 		...references.map( ( reference ) =>
 			Math.log( getContrast( reference, color ) / adjustedTarget )
