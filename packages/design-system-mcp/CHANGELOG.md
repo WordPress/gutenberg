@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `get_component_details` now includes each example's story description above its code snippet.
+
 ## 0.16.0 (2026-11-04)
 
 ### New Features
