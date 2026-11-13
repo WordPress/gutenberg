@@ -268,6 +268,53 @@ describe( 'Delta.diffWithCursor', () => {
 		} );
 	} );
 
+	describe( 'tokenized diffing via DiffOptions', () => {
+		it( 'should keep tokens whole when tokenizer is provided', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /\[[^\]]+\]|[\s\S]/gu ) ?? [];
+
+			const oldDelta = new Delta().insert( 'the quick brown fox' );
+			const newDelta = new Delta().insert(
+				'the [custom-token]quick[/custom-token] brown fox'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer,
+			} );
+			expect( diff.ops ).toEqual( [
+				{ retain: 4 },
+				{ insert: '[custom-token]' },
+				{ retain: 5 },
+				{ insert: '[/custom-token]' },
+			] );
+		} );
+
+		it( 'should refine replacements part by part when splitToken is provided and first parts match', () => {
+			const tokenizer = ( str: string ) =>
+				str.match( /<[^>]+>|[\s\S]/gu ) ?? [];
+			const splitToken = ( token: string ) =>
+				token.match( /^<[a-z]+|\s+[^\s>]+|>/gu ) ?? [ token ];
+
+			const oldDelta = new Delta().insert(
+				'see <tag foo="1">link</tag>'
+			);
+			const newDelta = new Delta().insert(
+				'see <tag foo="2">link</tag>'
+			);
+
+			const diff = oldDelta.diff( newDelta, {
+				tokenizer,
+				splitToken,
+			} );
+
+			expect( diff.ops ).toEqual( [
+				{ retain: 8 }, // 'see ' (4) + '<tag' (4)
+				{ insert: ' foo="2"' },
+				{ delete: 8 }, // ' foo="1"'
+			] );
+		} );
+	} );
+
 	describe( 'end of document operations', () => {
 		it( 'should handle adding content at the very end', () => {
 			// 'hello|' -> 'hello world|'

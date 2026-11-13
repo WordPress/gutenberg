@@ -3,7 +3,7 @@
 // - lodash.clonedeep is replaced with JSON parse / stringify
 // - lodash.isequal is replaced with fast-deep-equal.
 import type { Change } from 'diff';
-import { diffChars, diffLines } from 'diff';
+import { Diff, diffChars, diffLines } from 'diff';
 import { default as isEqual } from 'fast-deep-equal/es6';
 import AttributeMap from './AttributeMap';
 import Op from './Op';
@@ -15,6 +15,26 @@ function cloneDeep< T >( value: T ): T {
 
 const NULL_CHARACTER = String.fromCharCode( 0 ); // Placeholder char for embed in diff()
 const STRING_TOO_LARGE_THRESHOLD = 10000; // If either string is larger than this, use a less precise diff algorithm optimized for large strings
+
+/**
+ * Options for configuring Delta diff operations.
+ */
+export interface DiffOptions {
+	/**
+	 * An optional tokenizer function that decomposes a string into an array of
+	 * atomic tokens (such as HTML tags or entities). When provided, diffs are
+	 * computed over tokens rather than raw individual characters, preserving
+	 * token atomicity during merges.
+	 */
+	tokenizer?: ( value: string ) => string[];
+	/**
+	 * An optional function that splits one token into smaller parts. When a
+	 * replacement starts with the same kind of token on both sides (their first
+	 * parts are equal), the two tokens are compared part by part, and only the
+	 * parts that changed are replaced.
+	 */
+	splitToken?: ( token: string ) => string[];
+}
 
 /**
  * Normalize diff changes so that `count` reflects UTF-16 code-unit length
@@ -29,6 +49,102 @@ function normalizeChangeCounts( changes: Change[] ): Change[] {
 		...change,
 		count: change.value.length,
 	} ) );
+}
+
+function diffTokens(
+	a: string,
+	b: string,
+	tokenizer: ( value: string ) => string[]
+): Change[] {
+	const tokenDiff = new Diff();
+	tokenDiff.tokenize = tokenizer;
+	tokenDiff.join = ( tokens: string[] ) => tokens.join( '' );
+	return tokenDiff.diff( a, b ) as Change[];
+}
+
+function computeDiff( a: string, b: string, options?: DiffOptions ): Change[] {
+	if ( ! options?.tokenizer ) {
+		return diffChars( a, b );
+	}
+
+	const { tokenizer, splitToken } = options;
+	const changes = diffTokens( a, b, tokenizer );
+
+	if ( ! splitToken ) {
+		return changes;
+	}
+
+	const refined: Change[] = [];
+
+	for ( let i = 0; i < changes.length; i++ ) {
+		const removed = changes[ i ];
+		const added = changes[ i + 1 ];
+
+		if ( removed.removed && added?.added ) {
+			// Look at the first token on each side of the replacement.
+			const [ oldFirst, ...oldRest ] = tokenizer( removed.value );
+			const [ newFirst, ...newRest ] = tokenizer( added.value );
+			const oldParts = splitToken( oldFirst );
+			const newParts = splitToken( newFirst );
+
+			if (
+				oldParts.length > 1 &&
+				newParts.length > 1 &&
+				oldParts[ 0 ] === newParts[ 0 ]
+			) {
+				// Same kind of token on both sides. Replace only the parts
+				// that changed, so the token itself stays in place.
+				refined.push( ...diffTokens( oldFirst, newFirst, splitToken ) );
+
+				if ( oldRest.length > 0 ) {
+					refined.push( {
+						value: oldRest.join( '' ),
+						count: oldRest.length,
+						added: false,
+						removed: true,
+					} );
+				}
+
+				if ( newRest.length > 0 ) {
+					refined.push( {
+						value: newRest.join( '' ),
+						count: newRest.length,
+						added: true,
+						removed: false,
+					} );
+				}
+
+				i++;
+				continue;
+			}
+		}
+
+		refined.push( removed );
+	}
+
+	return refined;
+}
+
+function isOffsetOnTokenBoundary(
+	text: string,
+	targetOffset: number,
+	tokenizer?: ( value: string ) => string[]
+): boolean {
+	if ( ! tokenizer || targetOffset <= 0 || targetOffset >= text.length ) {
+		return true;
+	}
+	const tokens = tokenizer( text );
+	let offset = 0;
+	for ( const token of tokens ) {
+		if ( offset === targetOffset ) {
+			return true;
+		}
+		if ( offset > targetOffset ) {
+			return false;
+		}
+		offset += token.length;
+	}
+	return offset === targetOffset;
 }
 
 interface EmbedHandler< T > {
@@ -401,13 +517,13 @@ class Delta {
 		return delta;
 	}
 
-	diff( other: Delta ): Delta {
+	diff( other: Delta, options?: DiffOptions ): Delta {
 		if ( this.ops === other.ops ) {
 			return new Delta();
 		}
 		const strings = this.deltasToStrings( other );
 		const diffResult = normalizeChangeCounts(
-			diffChars( strings[ 0 ], strings[ 1 ] )
+			computeDiff( strings[ 0 ], strings[ 1 ], options )
 		);
 		const thisIter = new OpIterator( this.ops );
 		const otherIter = new OpIterator( other.ops );
@@ -616,9 +732,14 @@ class Delta {
 	 *
 	 * @param other             - The other Delta to diff against.
 	 * @param cursorAfterChange - The cursor position index after the change.
+	 * @param options           - Optional diff options such as a custom tokenizer.
 	 * @return A Delta that attempts to place insertions or deletions at the cursor position.
 	 */
-	diffWithCursor( other: Delta, cursorAfterChange: number | null ): Delta {
+	diffWithCursor(
+		other: Delta,
+		cursorAfterChange: number | null = null,
+		options?: DiffOptions
+	): Delta {
 		if ( this.ops === other.ops ) {
 			return new Delta();
 		}
@@ -651,11 +772,11 @@ class Delta {
 		} else if ( cursorAfterChange === null ) {
 			// If no cursor position is provided and the string
 			// is a reasonable length, do a regular diff.
-			return this.diff( other );
+			return this.diff( other, options );
 		}
 
 		let diffs = normalizeChangeCounts(
-			diffChars( strings[ 0 ], strings[ 1 ] )
+			computeDiff( strings[ 0 ], strings[ 1 ], options )
 		);
 		let lastDiffPosition = 0;
 		const adjustedDiffs: Change[] = [];
@@ -689,7 +810,8 @@ class Delta {
 					diff,
 					nextDiff,
 					cursorAfterChange,
-					segmentStart
+					segmentStart,
+					options
 				);
 
 				if ( movedSegments ) {
@@ -708,7 +830,8 @@ class Delta {
 					diff,
 					adjustedDiffs,
 					cursorAfterChange,
-					lastDiffPosition
+					lastDiffPosition,
+					options
 				);
 
 				if ( movedSegments ) {
@@ -748,17 +871,29 @@ class Delta {
 	 * @param nextDiff          - The next diff segment (expected to be an insertion).
 	 * @param cursorAfterChange - The cursor position after the change.
 	 * @param segmentStart      - The start position of the current segment.
+	 * @param options           - Optional diff options such as a custom tokenizer.
 	 * @return An array of adjusted diff segments if the insertion was successfully moved, null otherwise.
 	 */
 	private tryMoveInsertionToCursor(
 		diff: Change,
 		nextDiff: Change,
 		cursorAfterChange: number,
-		segmentStart: number
+		segmentStart: number,
+		options?: DiffOptions
 	): Change[] | null {
 		const nextDiffInsert = nextDiff.value;
 		const insertLength = nextDiffInsert.length;
 		const insertOffset = cursorAfterChange - segmentStart - insertLength;
+
+		if (
+			! isOffsetOnTokenBoundary(
+				diff.value,
+				insertOffset,
+				options?.tokenizer
+			)
+		) {
+			return null;
+		}
 
 		// Verify that the inserted text matches the text at the cursor position
 		const textAtCursor = diff.value.substring(
@@ -813,13 +948,15 @@ class Delta {
 	 * @param adjustedDiffs     - The array of previously processed diff segments.
 	 * @param cursorAfterChange - The cursor position after the change.
 	 * @param lastDiffPosition  - The position in the document up to (but not including) the current diff.
+	 * @param options           - Optional diff options such as a custom tokenizer.
 	 * @return An array of adjusted diff segments if the deletion was successfully moved, null otherwise.
 	 */
 	private tryMoveDeletionToCursor(
 		diff: Change,
 		adjustedDiffs: Change[],
 		cursorAfterChange: number,
-		lastDiffPosition: number
+		lastDiffPosition: number,
+		options?: DiffOptions
 	): Change[] | null {
 		// Check if there's a preceding unchanged segment where cursor falls
 		// and the deleted characters match characters in that segment
@@ -843,6 +980,21 @@ class Delta {
 		// Check if the deleted characters match the text at the cursor position
 		const deletedChars = diff.value;
 		const deleteOffset = cursorAfterChange - prevSegmentStart;
+
+		if (
+			! isOffsetOnTokenBoundary(
+				prevDiff.value,
+				deleteOffset,
+				options?.tokenizer
+			) ||
+			! isOffsetOnTokenBoundary(
+				prevDiff.value,
+				deleteOffset + deletedChars.length,
+				options?.tokenizer
+			)
+		) {
+			return null;
+		}
 		const textAtCursor = prevDiff.value.substring(
 			deleteOffset,
 			deleteOffset + deletedChars.length

@@ -8,7 +8,12 @@ import { applyPostChangesToCRDTDoc } from '../crdt';
 import type { YPostRecord } from '../crdt';
 import { mergeCrdtBlocks } from '../crdt-blocks';
 import type { Block, YBlock, YBlockAttributes, YBlocks } from '../crdt-blocks';
-import { getRootMap, richTextOffsetToHtmlIndex } from '../crdt-utils';
+import {
+	getRootMap,
+	richTextOffsetToHtmlIndex,
+	splitHtmlTag,
+	tokenizeHtml,
+} from '../crdt-utils';
 import type { RichTextOffset } from '../crdt-utils';
 /**
  * Mock block schemas and sync providers.
@@ -168,7 +173,8 @@ function deltaForUpdate(
 ) {
 	return new Delta( [ { insert: oldHtml } ] ).diffWithCursor(
 		new Delta( [ { insert: newHtml } ] ),
-		cursorPosition
+		cursorPosition,
+		{ tokenizer: tokenizeHtml, splitToken: splitHtmlTag }
 	);
 }
 
