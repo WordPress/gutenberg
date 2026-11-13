@@ -35,7 +35,7 @@ Edits are held locally and applied together when the user clicks a single primar
 
 ### No unsaved changes
 
-When all changes are saved, the Save button is disabled and can reveal a “No unsaved changes” [`Tooltip`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs) on hover or focus. A disabled `Button` stays focusable by default, so keyboard users can reach the tooltip too.
+When all changes are saved, the Save button is disabled. A disabled Save on a form with no changes is a familiar convention and needs no explanation. If a disabled state does need explaining, use inline text, not a [`Tooltip`](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-tooltip--docs): tooltips aren't available to screen readers or on touch devices.
 
 ### Unsaved changes on exit
 

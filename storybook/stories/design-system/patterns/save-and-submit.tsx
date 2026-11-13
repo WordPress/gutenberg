@@ -10,7 +10,6 @@ import {
 	Stack,
 	SwitchControl,
 	Text,
-	Tooltip,
 } from '@wordpress/ui';
 import styles from './save-and-submit.module.css';
 
@@ -110,21 +109,14 @@ function SaveChangesButton( {
 } ) {
 	return (
 		<Stack>
-			<Tooltip.Root disabled={ hasChanges }>
-				<Tooltip.Trigger
-					render={
-						<Button
-							disabled={ isSaving || ! hasChanges }
-							loading={ isSaving }
-							loadingAnnouncement="Saving changes"
-							onClick={ onClick }
-						>
-							Save changes
-						</Button>
-					}
-				/>
-				<Tooltip.Popup>No unsaved changes</Tooltip.Popup>
-			</Tooltip.Root>
+			<Button
+				disabled={ isSaving || ! hasChanges }
+				loading={ isSaving }
+				loadingAnnouncement="Saving changes"
+				onClick={ onClick }
+			>
+				Save changes
+			</Button>
 		</Stack>
 	);
 }
