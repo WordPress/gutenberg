@@ -5,8 +5,6 @@ import { KeyboardShortcutContext, InputEventContext } from './contexts';
 import { RichTextShortcut } from './keyboard-shortcut';
 import { RichTextInputEvent } from './input-event';
 import { shortcutsListener, inputEventsListener } from './event-listeners';
-import { ownsSelection } from './owns-selection';
-import { subscribeOwnedListener } from './subscribe-owned-listener';
 
 /**
  * Private `@wordpress/rich-text` APIs.
@@ -22,6 +20,4 @@ lock( privateApis, {
 	RichTextInputEvent,
 	shortcutsListener,
 	inputEventsListener,
-	ownsSelection,
-	subscribeOwnedListener,
 } );

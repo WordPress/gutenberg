@@ -43,10 +43,9 @@ import {
 } from '@wordpress/blocks';
 import {
 	useMergeRefs,
-	useRefEffect,
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useRegistry } from '@wordpress/data';
 import { CheckboxControl, Link } from '@wordpress/ui';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
@@ -59,7 +58,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
 const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { useDelegatedListeners } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -69,67 +68,53 @@ const LINK_SETTINGS = [
 	},
 ];
 
-function useEnter( clientId ) {
-	const { replaceBlocks, selectionChange } = useDispatch( blockEditorStore );
+function onEnter( { props }, event ) {
+	if ( event.defaultPrevented || event.keyCode !== ENTER ) {
+		return;
+	}
+	const { clientId, registry } = props.current;
 	const {
 		getBlock,
 		getBlockAttributes,
 		getBlockRootClientId,
 		getBlockIndex,
-	} = useSelect( blockEditorStore );
+	} = registry.select( blockEditorStore );
+	const { replaceBlocks, selectionChange } =
+		registry.dispatch( blockEditorStore );
+	const { text } = getBlockAttributes( clientId ) ?? {};
+	if ( text?.length ) {
+		return;
+	}
+	event.preventDefault();
+	const topParentListBlock = getBlock( getBlockRootClientId( clientId ) );
+	const blockIndex = getBlockIndex( clientId );
+	const head = cloneBlock( {
+		...topParentListBlock,
+		innerBlocks: topParentListBlock.innerBlocks.slice( 0, blockIndex ),
+	} );
+	const middle = createBlock( getDefaultBlockName() );
+	const after = topParentListBlock.innerBlocks.slice( blockIndex + 1 );
+	const tail = after.length
+		? [
+				cloneBlock( {
+					...topParentListBlock,
+					innerBlocks: after,
+				} ),
+			]
+		: [];
+	replaceBlocks( topParentListBlock.clientId, [ head, middle, ...tail ], 1 );
+	// We manually change the selection here because we are replacing
+	// a different block than the selected one.
+	selectionChange( middle.clientId );
+}
 
-	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
-			if ( event.defaultPrevented || event.keyCode !== ENTER ) {
-				return;
-			}
-			const { text } = getBlockAttributes( clientId ) ?? {};
-			if ( text?.length ) {
-				return;
-			}
-			event.preventDefault();
-			const topParentListBlock = getBlock(
-				getBlockRootClientId( clientId )
-			);
-			const blockIndex = getBlockIndex( clientId );
-			const head = cloneBlock( {
-				...topParentListBlock,
-				innerBlocks: topParentListBlock.innerBlocks.slice(
-					0,
-					blockIndex
-				),
-			} );
-			const middle = createBlock( getDefaultBlockName() );
-			const after = topParentListBlock.innerBlocks.slice(
-				blockIndex + 1
-			);
-			const tail = after.length
-				? [
-						cloneBlock( {
-							...topParentListBlock,
-							innerBlocks: after,
-						} ),
-					]
-				: [];
-			replaceBlocks(
-				topParentListBlock.clientId,
-				[ head, middle, ...tail ],
-				1
-			);
-			// We manually change the selection here because we are replacing
-			// a different block than the selected one.
-			selectionChange( middle.clientId );
-		}
+// Capture phase so we run before writing-flow's ancestor-bubble
+// keydown handlers that gate on `event.defaultPrevented`.
+const enterListeners = { first: { keydown: { target: [ onEnter ] } } };
 
-		// Capture phase so we run before writing-flow's ancestor-bubble
-		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeDelegatedListener(
-			element,
-			'keydown',
-			onKeyDown,
-			true
-		);
-	}, [] );
+function useEnter( clientId ) {
+	const registry = useRegistry();
+	return useDelegatedListeners( enterListeners, { clientId, registry } );
 }
 
 /**

@@ -1,16 +1,16 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
 import {
-	create,
-	privateApis as richTextPrivateApis,
-} from '@wordpress/rich-text';
+	useRefEffect,
+	privateApis as composePrivateApis,
+} from '@wordpress/compose';
+import { create } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
-const { ownsSelection } = unlock( richTextPrivateApis );
+const { ownsSelection } = unlock( composePrivateApis );
 
 /**
  * Extract the selection start node from the selection. When the anchor node is

@@ -1,10 +1,4 @@
-import {
-	privateApis as composePrivateApis,
-	useRefEffect,
-} from '@wordpress/compose';
-import { unlock } from '../../lock-unlock';
-
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Prevents focus from being captured by an editable element when clicking
@@ -16,13 +10,18 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  */
 export default function usePreventFocusCapture() {
 	return useRefEffect< HTMLElement >( ( node ) => {
+		const { ownerDocument } = node;
 		// A rendered element's document has a window.
-		const defaultView = node.ownerDocument.defaultView!;
+		const defaultView = ownerDocument.defaultView!;
 		// The editable elements made non editable by the current press.
 		const elements = new Set< HTMLElement >();
 
 		function onPointerDown( event: PointerEvent ) {
 			const target = event.target as Element;
+			// Only presses in this canvas.
+			if ( ! node.contains( target ) ) {
+				return;
+			}
 			// Abort if the event is default prevented, we will not get a pointer up event.
 			if ( event.defaultPrevented ) {
 				return;
@@ -55,27 +54,15 @@ export default function usePreventFocusCapture() {
 			elements.clear();
 		}
 
-		// Only presses in this canvas. The shared document listener runs after
-		// React's, so `defaultPrevented` is already known.
-		const unsubscribePointerDown = subscribeDelegatedListener(
-			node,
-			'pointerdown',
-			onPointerDown as EventListener
-		);
-		const unsubscribePointerUp = subscribeDelegatedListener(
-			defaultView,
-			'pointerup',
-			onPointerUp
-		);
-		const unsubscribePointerCancel = subscribeDelegatedListener(
-			defaultView,
-			'pointercancel',
-			onPointerUp
-		);
+		// On the document, which runs after React's listeners, so
+		// `defaultPrevented` is already known.
+		ownerDocument.addEventListener( 'pointerdown', onPointerDown );
+		defaultView.addEventListener( 'pointerup', onPointerUp );
+		defaultView.addEventListener( 'pointercancel', onPointerUp );
 		return () => {
-			unsubscribePointerDown();
-			unsubscribePointerUp();
-			unsubscribePointerCancel();
+			ownerDocument.removeEventListener( 'pointerdown', onPointerDown );
+			defaultView.removeEventListener( 'pointerup', onPointerUp );
+			defaultView.removeEventListener( 'pointercancel', onPointerUp );
 		};
 	}, [] );
 }

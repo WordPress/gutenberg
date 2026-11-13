@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ownsSelection } from '../owns-selection';
+import { ownsSelection } from '..';
 
 function createEditable() {
 	const element = document.createElement( 'div' );

@@ -1,30 +1,20 @@
-import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
-import type { RichTextEventListener } from '../types';
-
-const { subscribeOwnedListener } = unlock( richTextPrivateApis );
+import type { RichTextField } from '../types';
 
 /**
  * When the browser is about to auto correct, add an undo level so the user can
  * revert the change.
  *
- * @param props
+ * @param field
+ * @param event
  */
-const insertReplacementText: RichTextEventListener =
-	( props ) => ( element ) => {
-		function onInput( event: InputEvent ) {
-			if ( event.inputType !== 'insertReplacementText' ) {
-				return;
-			}
+export function onBeforeInput( field: RichTextField, event: InputEvent ) {
+	if ( event.inputType !== 'insertReplacementText' ) {
+		return;
+	}
 
-			const { registry } = props.current;
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkLastChangeAsPersistent();
-		}
-
-		return subscribeOwnedListener( element, 'beforeinput', onInput );
-	};
-
-export default insertReplacementText;
+	const { registry } = field.props.current;
+	registry
+		.dispatch( blockEditorStore )
+		.__unstableMarkLastChangeAsPersistent();
+}
