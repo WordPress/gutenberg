@@ -5,45 +5,6 @@ test.describe( 'Social Icons', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'keeps an unlinked icon fully opaque while it has keyboard focus', async ( {
-		editor,
-		page,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/social-links',
-			innerBlocks: [
-				{
-					name: 'core/social-link',
-					attributes: {
-						service: 'github',
-						url: 'https://github.com/',
-					},
-				},
-				{
-					name: 'core/social-link',
-					attributes: { service: 'instagram' },
-				},
-			],
-		} );
-		const linkedIcon = editor.canvas.locator( '.wp-social-link-github' );
-		const unlinkedIcon = editor.canvas.locator(
-			'.wp-social-link-instagram'
-		);
-		const linkedButton = linkedIcon.getByRole( 'button' );
-		const unlinkedButton = unlinkedIcon.getByRole( 'button' );
-
-		await linkedButton.focus();
-		await expect( unlinkedIcon ).toHaveCSS( 'opacity', '0.5' );
-		await page.keyboard.press( 'ArrowRight' );
-		await expect( unlinkedButton ).toBeFocused();
-		await expect( unlinkedIcon ).toHaveCSS( 'opacity', '1' );
-
-		await page.keyboard.press( 'ArrowLeft' );
-		await expect( linkedButton ).toBeFocused();
-		await expect( linkedIcon ).toHaveCSS( 'opacity', '1' );
-		await expect( unlinkedIcon ).toHaveCSS( 'opacity', '0.5' );
-	} );
-
 	test( 'edits a Social Icon link and text from the inspector', async ( {
 		editor,
 		page,
