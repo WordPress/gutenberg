@@ -1,6 +1,12 @@
 import { DataForm } from '@wordpress/dataviews';
 import type { Field, Form } from '@wordpress/dataviews';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
@@ -56,23 +62,36 @@ export function WidgetAttributes( {
 	const settingsReserveRef =
 		useReserveHeaderSpace< HTMLSpanElement >( 'settings' );
 
-	// While the user interacts with a presentation, the fit holds it in
-	// place; replacing it mid-interaction would drop focus on the floor.
-	// The hold covers the open dropdown, focus inside the inline form, and
-	// focus on the dropdown trigger itself: dismissing the popup restores
-	// focus to the trigger asynchronously, so the trigger must survive
-	// until focus moves on. The pending transition applies afterwards.
+	// While the user interacts with the collapsed presentation, the fit
+	// holds it in place; expanding mid-interaction would drop focus on the
+	// floor. The hold covers the open dropdown and focus on its trigger:
+	// dismissing the popup restores focus to the trigger asynchronously, so
+	// the trigger must survive until focus moves on. The pending expansion
+	// applies afterwards. Focus inside the inline form is tracked only to
+	// hand it to the trigger if the controls collapse.
 	const [ dropdownOpen, setDropdownOpen ] = useState( false );
 	const [ inlineHasFocus, setInlineHasFocus ] = useState( false );
 	const [ dropdownTriggerHasFocus, setDropdownTriggerHasFocus ] =
 		useState( false );
 
 	const { measureRef, collapsed } = useInlineFit( {
-		locked: dropdownOpen || inlineHasFocus || dropdownTriggerHasFocus,
+		locked: dropdownOpen || dropdownTriggerHasFocus,
 	} );
 
-	// A transition can only start once focus left the outgoing
-	// presentation; clear its flag if it unmounts with the flag still set.
+	// Inline controls that stop fitting collapse even while focused. Their
+	// focus moves to the dropdown trigger, which takes their place, so a
+	// keyboard user is not dropped onto the page. Noted while rendering:
+	// the unmount can blur the inline form before an effect runs.
+	const triggerRef = useRef< HTMLButtonElement >( null );
+	const [ wasCollapsed, setWasCollapsed ] = useState( collapsed );
+	const [ focusTrigger, setFocusTrigger ] = useState( false );
+	if ( collapsed !== wasCollapsed ) {
+		setWasCollapsed( collapsed );
+		setFocusTrigger( collapsed && inlineHasFocus );
+	}
+
+	// An expansion can only start once focus left the dropdown; clear the
+	// flag of whichever presentation unmounted with it still set.
 	useEffect( () => {
 		if ( collapsed ) {
 			setInlineHasFocus( false );
@@ -80,6 +99,13 @@ export function WidgetAttributes( {
 			setDropdownTriggerHasFocus( false );
 		}
 	}, [ collapsed ] );
+
+	useEffect( () => {
+		if ( focusTrigger ) {
+			triggerRef.current?.focus();
+			setFocusTrigger( false );
+		}
+	}, [ focusTrigger ] );
 
 	const fields = useMemo< Field< WidgetAttributeValues >[] >(
 		() =>
@@ -175,6 +201,7 @@ export function WidgetAttributes( {
 						data={ data }
 						onChange={ handleChange }
 						onOpenChange={ setDropdownOpen }
+						triggerRef={ triggerRef }
 					/>
 				</span>
 			) }
