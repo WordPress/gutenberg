@@ -6,7 +6,7 @@
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
--   Real-time collaboration: Re-parse blocks of persisted CRDT documents when unregistered blocks are present, so a block does not stay missing after its plugin is reactivated ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
+-   Real-time collaboration: Re-parse blocks of persisted CRDT documents that hold missing or invalid blocks, so a block does not stay missing after its plugin is reactivated or stay invalid after its block type accepts its markup again ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
 
 ## 9.1.0 (2026-11-04)
 
