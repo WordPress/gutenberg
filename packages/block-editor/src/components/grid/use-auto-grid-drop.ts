@@ -1,10 +1,12 @@
-import { getBlockSupport } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { normalizeLegacyLayout } from '../../layouts/utils';
-import type { Layout, LayoutBlockSupport } from '../../layouts/types';
+import {
+	getLayoutBlockSupport,
+	normalizeLegacyLayout,
+} from '../../layouts/utils';
+import type { Layout } from '../../layouts/types';
 import { isPlainObject } from '../../utils/object';
 import type { OnBlocksDrop } from '../use-on-block-drop/types';
 import { getAutoGridItemStyleAfterDrop } from './auto-grid-drop';
@@ -34,12 +36,7 @@ export default function useAutoGridDrop() {
 			const attributeLayout = isPlainObject( parentAttributes?.layout )
 				? ( parentAttributes.layout as Layout )
 				: undefined;
-			const layoutSupport = ( parentName &&
-				( getBlockSupport( parentName, 'layout' ) ||
-					getBlockSupport(
-						parentName,
-						'__experimentalLayout'
-					) ) ) as LayoutBlockSupport | undefined;
+			const layoutSupport = getLayoutBlockSupport( parentName );
 			const parentLayout =
 				normalizeLegacyLayout( attributeLayout ) ||
 				layoutSupport?.default;

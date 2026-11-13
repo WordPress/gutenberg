@@ -1,15 +1,17 @@
 import clsx from 'clsx';
 import { dragHandle } from '@wordpress/icons';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
-import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import AutoGridItemMovers from '../grid/auto-grid-item-movers';
 import { store as blockEditorStore } from '../../store';
-import { normalizeLegacyLayout } from '../../layouts/utils';
-import type { Layout, LayoutBlockSupport } from '../../layouts/types';
+import {
+	getLayoutBlockSupport,
+	normalizeLegacyLayout,
+} from '../../layouts/utils';
+import type { Layout } from '../../layouts/types';
 import type { BlockMoverProps } from './types';
 
 function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
@@ -47,12 +49,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 			const { layout } = ( getBlockAttributes( _rootClientId! ) ??
 				{} ) as { layout?: Layout };
 			const parentName = getBlockName( _rootClientId! );
-			const layoutSupport = ( parentName &&
-				( getBlockSupport( parentName, 'layout' ) ||
-					getBlockSupport(
-						parentName,
-						'__experimentalLayout'
-					) ) ) as LayoutBlockSupport | undefined;
+			const layoutSupport = getLayoutBlockSupport( parentName );
 			const parentLayout =
 				normalizeLegacyLayout( layout ) || layoutSupport?.default;
 
