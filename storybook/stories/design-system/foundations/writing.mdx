@@ -6,70 +6,23 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 The components in the design system carry very little text of their own. The product that uses them defines its own copy: the labels, descriptions, and messages people read. These guidelines are not rules for the components. They describe how to write that copy so interfaces built with the design system feel consistent and well thought out.
 
-The guidance here is general. It applies to the text in an interface, such as buttons, field labels, help text, and notices, as well as to the short documentation that sits next to it. For writing error messages in depth, see [Error Messages](?path=/docs/design-system-patterns-error-messages--docs). For the full contributor guide, see the [copy guide](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/documentation/copy-guide.md).
-
-## Principles
+The guidance applies to the text in an interface, such as buttons, field labels, help text, and notices, and to the short documentation next to it. For error messages and notices that disappear on their own, see [Error Messages](?path=/docs/design-system-patterns-error-messages--docs). For the full contributor guide, see the [copy guide](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/documentation/copy-guide.md).
 
 Write like a person talking to another person. Say what a thing does, say what the user can do next, and stop.
 
-- **Be clear first.** If someone can't tell what an option will do, no amount of personality makes up for it.
-- **Be direct.** Use short sentences and plain words. Cut anything that doesn't add meaning.
-- **Be friendly.** Contractions and a calm, human tone go a long way. Stay away from stern, alarmist, or cute.
-- **Focus on the user.** Describe what people can do and what they get, not what "we" built or want.
+## Tone and wording
 
-## Use plain, direct wording
-
-### Prefer contractions
-
-Contractions are more conversational and save space. Write "you’ll", "can’t", and "it’s" instead of "you will", "cannot", and "it is".
-
-### Choose active voice and state what things do
-
-Phrases like "can be", "is used", "allows you to", and "helps" usually signal passive or hedged writing. Features don’t allow anyone to do anything. They do specific things.
-
-Instead of:
-
-- This block can be used to display single images.
-- The gallery block can help you display multiple images.
-- Preformatted text allows you to keep your tabs and line breaks.
-
-Write:
-
-- This block displays single images.
-- The gallery block displays multiple images.
-- Preformatted text preserves your tabs and line breaks.
-
-### Don’t call things simple, easy, or "just" doing something
-
-It’s for the user to decide what is simple. If something is called easy and the experience isn’t, trust suffers. "Just click here" implies the step is no big deal, and that isn’t ours to say.
-
-These words usually stand in for an explanation that hasn’t been written. Say the specific thing instead: "Add content without taking your hands off the keyboard" is better than "It’s easy to add content." Words like "simplified" or "easier" are fine when they are descriptive and relative, for example in a note about a feature that now needs less setup.
-
-### Be wary of "we"
-
-A lot of "we" means the text is about the people behind the software and not the people using it. Reframe toward what the user needs and gets.
-
-### Don’t make wordplay do the work
-
-Idioms and puns are often misunderstood, especially across languages and cultures. If you use them at all, keep them to supplemental information and never use them to explain the main idea. Personality in UI text should be subtle: text that sounds like something a human said, not forced whimsy.
+- **Use contractions.** "You’ll", "can’t", and "it’s" are friendlier and shorter than "you will", "cannot", and "it is".
+- **Say what things do.** "Can be", "is used", "allows you to", and "helps" signal passive or hedged writing. Write "This block displays single images", not "This block can be used to display single images". Features don’t allow anything. They do specific things.
+- **Don’t call things simple, easy, or "just" doing something.** The user decides what is simple, and "Just click here" promises something we can’t know. Say the specific thing instead: "Add content without taking your hands off the keyboard" beats "It’s easy to add content". "Simplified" and "easier" are fine when they are descriptive and relative.
+- **Focus on the user.** A lot of "we" means the text is about the people behind the software. Describe what people can do and what they get.
+- **Avoid wordplay and idioms.** They are easily misunderstood and rarely translate. Keep personality subtle: text that sounds like a person said it, not forced whimsy.
 
 ## Be specific
 
-When an action depends on something the user did before, name that thing. "When you’re ready" could mean after proofreading, after adding a featured image, or after configuring every setting. Say which one.
+When an action depends on something the user did before, name it. "When you’re ready" could mean after proofreading, after adding a featured image, or after configuring every setting. Say which one.
 
-Prefer the shortest wording that still says who does what:
-
-Instead of:
-
-- When you click the "settings" button, the pop-up will display the advanced settings.
-- If you want to add an image, select the image block.
-
-Write:
-
-- Click "settings" to access advanced settings.
-- To add an image, select the image block.
-
-"If you want to…" is the right choice when there are real alternatives based on the user’s goal. When it only means "here is something you can do", use "To…".
+Prefer the shortest wording that still says who does what: "Click “settings” to access advanced settings", not "When you click the “settings” button, the pop-up will display the advanced settings". Use "To…" for something the user can do ("To add an image, select the image block"), and keep "If you want to…" for real alternatives based on the user’s goal.
 
 ## Capitalization
 
@@ -79,63 +32,36 @@ Use sentence case across the interface: capitalize the first word and proper nou
 - Product and brand names keep their own capitalization: WordPress, WooCommerce, Jetpack.
 - Never use all caps for emphasis. If text needs to be uppercase for visual reasons, style it with CSS and leave the string in sentence case.
 
-When looking at a full screen of copy, check that similar kinds of text, such as headings, tooltips, and buttons, all follow the same pattern.
-
 ## Labels and actions
 
-### Start button labels with a verb
-
-A button label says what happens when the user presses it: "Save changes", "Add block", "Delete page". Prefer a specific verb and object over "OK", "Yes", or "Submit". For destructive actions, see [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs).
-
-### Use verbs and nouns consistently
-
-Some words change form depending on how they’re used. The verb is two words and refers to the activity. The noun is one word and refers to the thing.
-
-- **Log in** and **log out** are verbs. "Log in to your account." The noun is "login".
-- **Sign up** and **set up** are verbs. The nouns are "signup" and "setup".
-
-Use "log in" and "log out", not "sign in" or "sign out", and keep that choice across the product.
-
-### Use an ellipsis for actions that need more input
-
-When an action opens a dialog or asks for more information before it completes, end the label with the ellipsis character: "Rename…", "Export…". Use the single `…` character, not three periods.
+- **Start button labels with a verb.** A label says what happens when the user presses it: "Save changes", "Add block", "Delete page". Prefer a specific verb and object over "OK", "Yes", or "Submit". For destructive actions, see [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs).
+- **Use "log in" and "log out" as verbs**, and "login" as the noun. Don’t switch to "sign in" or "sign out".
+- **Use an ellipsis when an action needs more input.** End labels that open a dialog or ask for more information with the `…` character: "Rename…", "Export…".
 
 ## Lists
 
-- **Keep structure parallel.** Every item should be built the same way, with the same subject and the same kind of opening word. Predictable lists are easier to scan.
-- **Start with a verb when you’re unsure.** Lists often describe actions. Vary the verbs when the list is persuasive or has several steps, and repeat the verb when the list is a plain set of choices.
-- **Use full sentences or fragments, not a mix.** Full sentences end with a period. Fragments don’t. If a list is only one- or two-word items, a single sentence often reads better.
+- **Keep structure parallel.** Build every item the same way, with the same subject and the same kind of opening word.
+- **Use full sentences or fragments, not a mix.** Full sentences end with a period. Fragments don’t.
 - **Use numbered lists for steps** and bulleted lists for everything else.
 - **Don’t announce the list.** "Here are some examples of ways you can use it" adds nothing when the list follows.
-- **Use bold sparingly.** Bold only the one key piece of information in an item, and skip it in short lists.
 
 ## Punctuation and typography
 
-- **Quotation marks.** Use curly quotation marks (“ ”) and apostrophes (’), not straight ones. Commas and periods go inside the closing quotation mark. Question marks and exclamation points go inside only when they’re part of the quoted text.
+- **Quotation marks.** Use curly quotation marks (“ ”) and apostrophes (’). Commas and periods go inside the closing quotation mark.
 - **Serial comma.** Put a comma before the last item in a list of three or more: "images, videos, and documents".
-- **Em dashes.** They can link ideas in documentation and descriptions, but avoid them in short UI strings. They wrap awkwardly in narrow containers and translate unpredictably.
-- **Ellipsis.** Use the `…` character with no space before it when it ends a label, and with a space on either side when it marks a pause or removed words.
-- **Numbers.** Use numerals for counts and quantities in the interface: "3 items selected", "Upload up to 5 files". In running prose, spell out whole numbers from zero to nine, and spell out any number that starts a sentence.
-- **Units.** Put a space between a number and its unit: "200 GB".
+- **Em dashes.** They can link ideas in documentation, but avoid them in short UI strings, where they wrap awkwardly and translate unpredictably.
+- **Numbers.** Use numerals for counts in the interface: "3 items selected". In running prose, spell out zero through nine, and any number that starts a sentence.
 
 ## Names and terminology
 
-- **Capitalization is part of a name.** Write WordPress with a capital W and a capital P, and keep the capitalization of names such as WooCommerce, Jetpack, and bbPress.
-- **Pick one term and keep it.** If the product calls something a "pattern" or a "template part", use that word every time. Don’t alternate with synonyms in the same flow.
-- **Match the language of the interface, unless it hurts understanding.** Consistency with existing UI language is good. It stops being good when people can’t follow what a message means. See [Error Messages](?path=/docs/design-system-patterns-error-messages--docs).
-- **Use example domains in examples.** Use `example.com`, `example.blog`, and `mail@example.com`. Never use real domains owned by others, or made-up names that might be registered.
+- **Capitalization is part of a name.** Write WordPress with a capital W and a capital P, and keep the capitalization of names such as WooCommerce and bbPress.
+- **Pick one term and keep it.** If the product calls something a "pattern", use that word every time rather than alternating with synonyms.
+- **Use example domains in examples.** Use `example.com`, `example.blog`, and `mail@example.com`, never real domains owned by others.
 
 ## Writing for translation
 
-Text in an interface is translated, and translated text is often longer than the English original. Keep that in mind when you write.
-
 - Write whole sentences as single strings. Don’t build a sentence by joining separate strings.
 - Leave room for longer text. A label that fits on one line in English may wrap to three lines elsewhere.
-- Avoid idioms and culture-specific references, which rarely translate.
-
-## Short messages
-
-Messages that disappear on their own, such as snackbars, can vanish before they’re read. Keep them short enough to take in at a glance, and don’t rely on character counts, since translations vary. When someone needs to read a message and act on it, don’t leave it on a timer. Keep it visible until it’s dismissed, or use a notice that stays in place.
 
 ## Checklist
 
