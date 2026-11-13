@@ -1,17 +1,13 @@
 import {
 	areGlobalStylesEqual,
-	privateApis as globalStylesEnginePrivateApis,
+	getViewportBreakpoints,
+	resolveStyle,
 } from '@wordpress/global-styles-engine';
 import type {
 	GlobalStylesConfig,
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-import { unlock } from './lock-unlock';
-
-const { getViewportBreakpoints, resolveStyle } = unlock(
-	globalStylesEnginePrivateApis
-);
 
 /**
  * State definition with value and label.

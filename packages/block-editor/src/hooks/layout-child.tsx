@@ -2,7 +2,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -40,8 +40,6 @@ import type {
 } from './types';
 import type { ChildLayout } from '../components/child-layout-control/types';
 import type { Layout, LayoutBlockSupport } from '../layouts/types';
-
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
