@@ -95,7 +95,7 @@ type ModalProps = {
 	fields?: Field< any >[];
 };
 
-function renderModal(
+async function renderModal(
 	{
 		isOpen = true,
 		value,
@@ -139,6 +139,14 @@ function renderModal(
 		</RegistryProvider>
 	);
 
+	if ( isOpen ) {
+		await waitFor( () => {
+			expect(
+				screen.getByRole( 'button', { name: 'Upload media' } )
+			).toHaveFocus();
+		} );
+	}
+
 	const rerender = ( props: ModalProps ) => {
 		view.rerender(
 			<RegistryProvider value={ registry }>
@@ -181,7 +189,7 @@ describe( 'MediaUploadModal', () => {
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {
 		const user = userEvent.setup();
-		const { rerender } = renderModal();
+		const { rerender } = await renderModal();
 
 		await user.click( screen.getByRole( 'button', { name: 'Next page' } ) );
 
@@ -216,7 +224,7 @@ describe( 'MediaUploadModal', () => {
 		const user = userEvent.setup();
 		mockRecords( IMAGE_RECORDS );
 
-		const { rerender } = renderModal();
+		const { rerender } = await renderModal();
 
 		const options = within(
 			await screen.findByRole( 'listbox' )
@@ -246,7 +254,7 @@ describe( 'MediaUploadModal', () => {
 		mockRecords( IMAGE_RECORDS );
 
 		// Opens with item 1 pre-selected via `value`.
-		const { rerender } = renderModal( { value: 1 } );
+		const { rerender } = await renderModal( { value: 1 } );
 
 		const options = within(
 			await screen.findByRole( 'listbox' )
@@ -283,14 +291,14 @@ describe( 'MediaUploadModal', () => {
 			totalPages: null,
 		} );
 
-		renderModal();
+		await renderModal();
 
 		expect( await screen.findByText( '0 items' ) ).toBeInTheDocument();
 	} );
 
 	it( 'updates the media query when the picker changes page', async () => {
 		const user = userEvent.setup();
-		const { registry } = renderModal();
+		const { registry } = await renderModal();
 
 		expect( mockUseEntityRecordsWithPermissions ).toHaveBeenLastCalledWith(
 			'postType',
@@ -323,7 +331,7 @@ describe( 'MediaUploadModal', () => {
 	describe( 'the "Attached to" filter', () => {
 		it( 'offers the current post only when the modal knows one', async () => {
 			const user = userEvent.setup();
-			const { rerender } = renderModal( {
+			const { rerender } = await renderModal( {
 				postId: 42,
 				postType: 'post',
 			} );
@@ -361,7 +369,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( "labels the option with the post type's own wording", async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42, postType: 'page' } );
+			await renderModal( { postId: 42, postType: 'page' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -379,7 +387,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'falls back to a generic label when the post type has none', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42, postType: 'cpt' } );
+			await renderModal( { postId: 42, postType: 'cpt' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -399,7 +407,7 @@ describe( 'MediaUploadModal', () => {
 			const user = userEvent.setup();
 			// A template's entity ID is a slug rather than a post ID, and media
 			// can't be uploaded to one.
-			renderModal( {
+			await renderModal( {
 				postId: 'twentytwentyfive//index' as unknown as number,
 				postType: 'wp_template',
 			} );
@@ -423,7 +431,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'stops constraining the query when the chosen option is clicked again', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42, postType: 'post' } );
+			await renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -468,7 +476,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'queries both options together as a single `parent` list', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42, postType: 'post' } );
+			await renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -501,7 +509,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'queries media uploaded to the post as its `parent`', async () => {
 			const user = userEvent.setup();
-			renderModal( { postId: 42, postType: 'post' } );
+			await renderModal( { postId: 42, postType: 'post' } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -535,7 +543,7 @@ describe( 'MediaUploadModal', () => {
 			// preference. Carrying it into the next post would quietly hide most
 			// of the library.
 			const user = userEvent.setup();
-			const { registry } = renderModal( {
+			const { registry } = await renderModal( {
 				postId: 42,
 				postType: 'post',
 			} );
@@ -571,7 +579,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'keeps the filter while the picker stays on screen', async () => {
 			const user = userEvent.setup();
-			const { rerender } = renderModal( {
+			const { rerender } = await renderModal( {
 				postId: 42,
 				postType: 'post',
 			} );
@@ -605,7 +613,7 @@ describe( 'MediaUploadModal', () => {
 		} );
 
 		it( 'ignores an `attached_to` filter left in the persisted view', async () => {
-			renderModal(
+			await renderModal(
 				{ postId: 42, postType: 'post' },
 				{
 					filters: [
@@ -637,7 +645,7 @@ describe( 'MediaUploadModal', () => {
 	} );
 
 	it( 'queries a filter on a taxonomy field by the taxonomy', async () => {
-		renderModal(
+		await renderModal(
 			{},
 			{
 				filters: [
@@ -671,7 +679,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'shows a registered field as a column', async () => {
 			mockRecords( IMAGE_RECORDS );
-			renderModal(
+			await renderModal(
 				{ fields: [ genreField ] },
 				{ type: 'pickerTable', fields: [ 'genre' ] }
 			);
@@ -683,7 +691,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'offers a registered field as a filter', async () => {
 			const user = userEvent.setup();
-			renderModal( { fields: [ genreField ] } );
+			await renderModal( { fields: [ genreField ] } );
 
 			await user.click(
 				screen.getByRole( 'button', { name: 'Add filter' } )
@@ -702,7 +710,7 @@ describe( 'MediaUploadModal', () => {
 
 		it( "keeps the modal's own field when one is registered with its ID", async () => {
 			mockRecords( IMAGE_RECORDS );
-			renderModal(
+			await renderModal(
 				{
 					fields: [
 						{
@@ -730,7 +738,7 @@ describe( 'MediaUploadModal', () => {
 
 	it( 'updates the media query when the picker changes search', async () => {
 		const user = userEvent.setup();
-		const { registry } = renderModal();
+		const { registry } = await renderModal();
 
 		await user.type(
 			screen.getByRole( 'searchbox', { name: 'Search media' } ),
