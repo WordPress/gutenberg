@@ -10,13 +10,10 @@ describe( 'controls', () => {
 
 		// State is initially null and can receive data.
 		// Typical for fetching data from remote locations.
-		const reducer = (
-			state: string | null = null,
-			action: AnyAction
-		): string | null => {
+		const reducer = ( state: string | null = null, action: AnyAction ) => {
 			switch ( action.type ) {
 				case 'RECEIVE':
-					return action.data as string;
+					return action.data;
 				default:
 					return state;
 			}
@@ -38,45 +35,29 @@ describe( 'controls', () => {
 
 		// actions that call the tested controls and return the selected value.
 		const actions = {
-			*resolveWithoutResolver(): Generator<
-				ReturnType< typeof controls.resolveSelect >,
-				string | null,
-				string | null
-			> {
-				const value = yield controls.resolveSelect(
+			*resolveWithoutResolver() {
+				const value: string | null = yield controls.resolveSelect(
 					'test/select',
 					'selectorWithoutResolver'
 				);
 				return value;
 			},
-			*resolveWithResolver(): Generator<
-				ReturnType< typeof controls.resolveSelect >,
-				string | null,
-				string | null
-			> {
-				const value = yield controls.resolveSelect(
+			*resolveWithResolver() {
+				const value: string | null = yield controls.resolveSelect(
 					'test/select',
 					'selectorWithResolver'
 				);
 				return value;
 			},
-			*selectWithoutResolver(): Generator<
-				ReturnType< typeof controls.select >,
-				string | null,
-				string | null
-			> {
-				const value = yield controls.select(
+			*selectWithoutResolver() {
+				const value: string | null = yield controls.select(
 					'test/select',
 					'selectorWithoutResolver'
 				);
 				return value;
 			},
-			*selectWithResolver(): Generator<
-				ReturnType< typeof controls.select >,
-				string | null,
-				string | null
-			> {
-				const value = yield controls.select(
+			*selectWithResolver() {
+				const value: string | null = yield controls.select(
 					'test/select',
 					'selectorWithResolver'
 				);
@@ -148,10 +129,7 @@ describe( 'controls', () => {
 			const registry = createRegistry();
 
 			// Store stores a counter that can be incremented.
-			const reducer = (
-				state: number = 0,
-				action: AnyAction
-			): number => {
+			const reducer = ( state = 0, action: AnyAction ) => {
 				switch ( action.type ) {
 					case 'INC':
 						return state + 1;
@@ -166,11 +144,7 @@ describe( 'controls', () => {
 					return { type: 'INC' };
 				},
 				// Increment the counter twice in an async routine with controls.
-				*doubleInc(): Generator<
-					ReturnType< typeof controls.dispatch >,
-					void,
-					void
-				> {
+				*doubleInc() {
 					yield controls.dispatch( 'test/dispatch', 'inc' );
 					yield controls.dispatch( 'test/dispatch', 'inc' );
 				},
