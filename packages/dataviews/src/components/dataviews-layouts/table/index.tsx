@@ -88,7 +88,6 @@ interface TableRowProps< Item > {
 			item: Item;
 		} & ComponentProps< 'a' >
 	) => ReactElement;
-	isActionsColumnSticky?: boolean;
 	posinset?: number;
 }
 
@@ -136,7 +135,6 @@ function TableRow< Item >( {
 	onChangeSelection,
 	onMouseDown,
 	onClickCapture,
-	isActionsColumnSticky,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
@@ -247,11 +245,7 @@ function TableRow< Item >( {
 				// intercepting click events from ItemActions.
 
 				<td
-					className={ clsx( 'dataviews-view-table__actions-column', {
-						'dataviews-view-table__actions-column--sticky': true,
-						'dataviews-view-table__actions-column--stuck':
-							isActionsColumnSticky,
-					} ) }
+					className="dataviews-view-table__actions-column dataviews-view-table__actions-column--sticky"
 					onClick={ ( e ) => e.stopPropagation() }
 				>
 					<ItemActions item={ item } actions={ actions } />
@@ -369,9 +363,8 @@ function ViewTable< Item >( {
 		hadSelectionRef.current = showBulkActions;
 	}, [ showBulkActions ] );
 
-	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
+	const { isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
-		enabledHorizontal: !! actions?.length,
 	} );
 
 	const disableHeaderControls = showBulkActions;
@@ -670,16 +663,7 @@ function ViewTable< Item >( {
 							);
 						} ) }
 						{ !! actions?.length && (
-							<th
-								className={ clsx(
-									'dataviews-view-table__actions-column',
-									{
-										'dataviews-view-table__actions-column--sticky': true,
-										'dataviews-view-table__actions-column--stuck':
-											! isHorizontalScrollEnd,
-									}
-								) }
-							>
+							<th className="dataviews-view-table__actions-column dataviews-view-table__actions-column--sticky">
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
@@ -743,9 +727,6 @@ function ViewTable< Item >( {
 											onClickItem={ onClickItem }
 											renderItemLink={ renderItemLink }
 											isItemClickable={ isItemClickable }
-											isActionsColumnSticky={
-												! isHorizontalScrollEnd
-											}
 										/>
 									);
 								} ) }
@@ -784,9 +765,6 @@ function ViewTable< Item >( {
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
-										isActionsColumnSticky={
-											! isHorizontalScrollEnd
-										}
 										posinset={
 											isInfiniteScroll
 												? index + 1
