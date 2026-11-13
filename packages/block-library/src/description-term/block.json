@@ -59,6 +59,7 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"visibility": false
 	}
 }

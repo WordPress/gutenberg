@@ -313,7 +313,7 @@ Add a description to a term.
 -	**Name:** [core/description-detail](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-detail/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Parent:** core/description-list
--	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~visibility~~
 -	**Attributes:** content, placeholder
 
 ## Description List
@@ -332,7 +332,7 @@ Add a term to a description list.
 -	**Name:** [core/description-term](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-term/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Parent:** core/description-list
--	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
+-	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~visibility~~
 -	**Attributes:** content, placeholder
 
 ## Details
