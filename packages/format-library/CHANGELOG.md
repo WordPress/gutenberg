@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Link: Preserve manually added attributes, HTML IDs, and unmanaged `rel` tokens when editing an existing inline link ([#84841](https://github.com/WordPress/gutenberg/pull/84841)).
 -   Warn when inline text and highlight colors have low contrast ([#86710](https://github.com/WordPress/gutenberg/pull/86710)).
 
 ## 6.1.0 (2026-11-04)

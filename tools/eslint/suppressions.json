@@ -1825,6 +1825,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/gallery/controls.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/gallery/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1850,16 +1861,10 @@
 		}
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 2
-		},
-		"react-hooks/immutability": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -1950,14 +1955,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/gallery/test/use-get-new-images.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/gallery/test/variations.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1968,22 +1965,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/gallery/use-apply-gallery-settings.ts": {
+		"no-restricted-syntax": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/gallery/use-dynamic-gallery.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/gallery/use-get-media.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/gallery/use-get-new-images.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/gallery/use-image-sizes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

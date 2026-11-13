@@ -20,12 +20,6 @@
 		outline: none; // Handled by InputBase.
 	}
 
-	&:where(:not(.has-custom-render)) {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
 	@media (min-width: $break-small) {
 		font-size: $font-size-medium;
 
@@ -37,7 +31,7 @@
 
 // Keep the trigger's end padding aligned with SelectControlChevronDown (18px).
 // The 6px correction aligns the item's checkmark with that chevron.
-$sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
+$sizes: (default, 40px, 12px), (small, 24px, 8px);
 
 @each $size, $height, $padding in $sizes {
 	$variant: "";
@@ -49,13 +43,7 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 		padding-inline-start: $padding;
 		padding-inline-end: $padding + 18px;
 
-		&:where(.has-custom-render) {
-			min-height: $height;
-		}
-
-		&:where(:not(.has-custom-render)) {
-			height: $height;
-		}
+		min-height: $height;
 	}
 
 	.item#{$variant} {
@@ -118,17 +106,12 @@ $sizes: (default, 40px, 12px), (compact, 32px, 8px), (small, 24px, 8px);
 	align-items: center;
 	justify-content: space-between;
 	font-size: $font-size-medium;
-	// TODO: reassess line-height for non-legacy v2.
 	line-height: 28px;
 	padding-block: 8px;
 	scroll-margin: 4px;
 	user-select: none;
 
-	&[aria-disabled="true"] {
-		cursor: not-allowed;
-	}
-
-	&[data-active-item]:not([aria-disabled="true"]) {
+	&[data-active-item] {
 		// Keep highlight colors paired when options have custom inline colors.
 		@include composite-item.highlight(!important);
 
