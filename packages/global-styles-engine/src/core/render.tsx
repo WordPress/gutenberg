@@ -155,11 +155,14 @@ export type BlockSelectors = Record<
  * - `name`: block name used by block-specific declaration adjustments.
  * - `elementName`: element name used to resolve valid pseudo selectors.
  * - `baseStyles`: for a state node, the styles it layers over, nearest first.
+ * - `sourceStyles`: the node's styles as in the theme.json tree. Feature
+ *   selector extraction strips `styles`, so the text clip check reads these.
  */
 interface StylesNode {
 	styles: any;
 	selector: string;
 	baseStyles?: any[];
+	sourceStyles?: any;
 	selectorSuffix?: string;
 	mediaQuery?: string;
 	skipSelectorWrapper?: boolean;
@@ -221,6 +224,17 @@ const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
 		':focus-visible',
 		':active',
 	],
+	// Validation states come before focus states because an edited field can match
+	// both at once, so user action styles must be output last to win.
+	textInput: [
+		':required',
+		':user-valid',
+		':user-invalid',
+		':focus',
+		':focus-visible',
+		'::placeholder',
+	],
+	select: [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
 /**
@@ -578,27 +592,30 @@ const getFeatureDeclarations = (
 };
 
 /**
- * Adds the declarations a state needs to escape a text clip set below it.
+ * Returns the declarations a state needs to escape a text clip set below it,
+ * keyed by the feature whose selector they belong on.
  *
  * Mirror of `getStateTextClipEscapeCSS` and `getStateTextFillResetCSS` in
  * packages/block-editor/src/hooks/style.jsx.
  *
- * @param declarations Declarations generated for the state.
- * @param stateStyles  State style object.
- * @param baseStyles   Styles the state layers over, nearest first.
- * @return Declarations with the escapes applied where needed.
+ * @param stateStyles State style object, as in the theme.json tree.
+ * @param baseStyles  Styles the state layers over, nearest first.
+ * @return The clip escape under `background`, the text fill reset under `color`.
  */
-function getStateDeclarationsWithTextClipEscapes(
-	declarations: string[],
+function getStateTextClipEscapes(
 	stateStyles: any,
 	baseStyles?: any[]
-): string[] {
+): Record< 'background' | 'color', string[] > {
+	const escapes: Record< 'background' | 'color', string[] > = {
+		background: [],
+		color: [],
+	};
 	const baseClip = baseStyles?.find(
 		( baseStyle ) => baseStyle?.background?.backgroundClip
 	)?.background?.backgroundClip;
 
 	if ( 'text' !== baseClip ) {
-		return declarations;
+		return escapes;
 	}
 
 	const stateClip = stateStyles?.background?.backgroundClip;
@@ -607,10 +624,8 @@ function getStateDeclarationsWithTextClipEscapes(
 		!! stateStyles?.background?.backgroundImage ||
 		!! stateStyles?.color?.gradient;
 
-	if ( stateClip && 'text' !== stateClip ) {
-		return paintsItsOwnBackground
-			? declarations
-			: [ ...declarations, 'background-image: unset' ];
+	if ( stateClip && 'text' !== stateClip && ! paintsItsOwnBackground ) {
+		escapes.background.push( 'background-image: unset' );
 	}
 
 	if (
@@ -618,10 +633,38 @@ function getStateDeclarationsWithTextClipEscapes(
 		! paintsItsOwnBackground &&
 		!! stateStyles?.color?.text
 	) {
-		return [ ...declarations, '-webkit-text-fill-color: currentColor' ];
+		escapes.color.push( '-webkit-text-fill-color: currentColor' );
 	}
 
-	return declarations;
+	return escapes;
+}
+
+/**
+ * Resolves the feature selector a text clip escape belongs on: the text
+ * subfeature for `color`, else the feature's own selector.
+ *
+ * Mirror of the selector lookup in `get_state_declarations_with_text_clip_escapes`
+ * in lib/class-wp-theme-json-gutenberg.php.
+ *
+ * @param featureSelectors The block's feature selectors.
+ * @param feature          `background` or `color`.
+ * @return The selector, or undefined when the block has none for the feature.
+ */
+function getTextClipEscapeSelector(
+	featureSelectors: FeatureSelectors | undefined,
+	feature: 'background' | 'color'
+): string | undefined {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
+		return undefined;
+	}
+
+	const featureSelector = featureSelectors[ feature ];
+	if ( typeof featureSelector === 'string' ) {
+		return featureSelector;
+	}
+
+	const subfeature = 'color' === feature ? 'text' : 'root';
+	return featureSelector?.[ subfeature ] ?? featureSelector?.root;
 }
 
 /**
@@ -1015,6 +1058,7 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	const {
 		styles,
 		baseStyles,
+		sourceStyles,
 		selector,
 		featureSelectors,
 		name,
@@ -1039,7 +1083,8 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		return [
 			{
 				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
-				baseStyles: [ styles, ...( baseStyles ?? [] ) ],
+				baseStyles: [ sourceStyles ?? styles, ...( baseStyles ?? [] ) ],
+				sourceStyles: sourceStyles?.[ pseudoSelector ],
 				selector,
 				selectorSuffix: pseudoSelector,
 				mediaQuery,
@@ -1053,6 +1098,36 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 			},
 		];
 	} );
+}
+
+function isPseudoElementSelector( selectorSuffix?: string ): boolean {
+	return selectorSuffix?.startsWith( '::' ) ?? false;
+}
+
+/**
+ * Builds the specificity-capped selector for a pseudo selector rule.
+ *
+ * Pseudo-classes are appended to each part of the base selector inside the
+ * `:root :where()` wrapper, e.g. `:root :where(a:hover)`. Pseudo-elements are
+ * not valid inside `:where()`, so they are appended after the wrapper instead,
+ * e.g. `:root :where(textarea, input)::placeholder`, which keeps the same
+ * specificity regardless of where the element styles are defined.
+ *
+ * @param baseSelector   Selector without the pseudo selector.
+ * @param pseudoSelector Pseudo selector to apply, e.g. ':hover' or '::placeholder'.
+ * @return The selector to use for the rule.
+ */
+function getPseudoRuleSelector(
+	baseSelector: string,
+	pseudoSelector: string
+): string {
+	if ( isPseudoElementSelector( pseudoSelector ) ) {
+		return `:root :where(${ baseSelector })${ pseudoSelector }`;
+	}
+	return `:root :where(${ appendToSelector(
+		baseSelector,
+		pseudoSelector
+	) })`;
 }
 
 /**
@@ -1072,6 +1147,7 @@ function getResponsiveStyleNodes(
 	const {
 		styles,
 		baseStyles,
+		sourceStyles,
 		selector,
 		fallbackGapValue,
 		featureSelectors,
@@ -1098,7 +1174,11 @@ function getResponsiveStyleNodes(
 			return [
 				{
 					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
-					baseStyles: [ styles, ...( baseStyles ?? [] ) ],
+					baseStyles: [
+						sourceStyles ?? styles,
+						...( baseStyles ?? [] ),
+					],
+					sourceStyles: sourceStyles?.[ breakpointKey ],
 					selector,
 					mediaQuery,
 					featureSelectors:
@@ -1150,7 +1230,8 @@ function getElementStylesByName(
 
 export const getNodesWithStyles = (
 	tree: GlobalStylesConfig,
-	blockSelectors: string | BlockSelectors
+	blockSelectors: string | BlockSelectors,
+	textClipBaseBlocks?: Record< string, any >
 ): any[] => {
 	const nodes: StylesNode[] = [];
 
@@ -1236,7 +1317,13 @@ export const getNodesWithStyles = (
 							const blockSelector = blockSelectors[ blockName ];
 							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
-								baseStyles: [ typedNode ],
+								baseStyles: [
+									typedNode,
+									...( textClipBaseBlocks?.[ blockName ]
+										? [ textClipBaseBlocks[ blockName ] ]
+										: [] ),
+								],
+								sourceStyles: typedVariation,
 								selector: variationSelector,
 								featureSelectors:
 									blockSelector?.featureSelectors,
@@ -1336,6 +1423,15 @@ export const getNodesWithStyles = (
 									selector: variationBlockSelector,
 									name: variationBlockName,
 									isStyleVariation: true,
+									...( textClipBaseBlocks?.[
+										variationBlockName
+									] && {
+										baseStyles: [
+											textClipBaseBlocks[
+												variationBlockName
+											],
+										],
+									} ),
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
 									fallbackGapValue:
@@ -1345,6 +1441,7 @@ export const getNodesWithStyles = (
 										blockSelectors[ variationBlockName ]
 											?.hasLayoutSupport,
 									styles: variationBlockStyleNodes,
+									sourceStyles: variationBlockStyles,
 								} );
 
 								// Process element styles for the inner blocks
@@ -1399,6 +1496,7 @@ export const getNodesWithStyles = (
 						blockSelectors[ blockName ].hasLayoutSupport,
 					selector: blockSelectors[ blockName ].selector,
 					styles: blockStyles,
+					sourceStyles: typedNode,
 					featureSelectors:
 						blockSelectors[ blockName ].featureSelectors,
 					name: blockName,
@@ -1693,6 +1791,7 @@ function renderStylesNode(
 		duotoneSelector,
 		styles,
 		baseStyles,
+		sourceStyles,
 		fallbackGapValue,
 		hasLayoutSupport,
 		featureSelectors,
@@ -1706,6 +1805,28 @@ function renderStylesNode(
 	const effectiveSelector = selectorSuffix
 		? appendToSelector( selector, selectorSuffix )
 		: selector;
+
+	// Escapes for features with their own selector join those declarations.
+	const textClipEscapes = getStateTextClipEscapes(
+		sourceStyles ?? styles,
+		baseStyles
+	);
+	const ownTextClipEscapes: string[] = [];
+	const featureTextClipEscapes: Record< string, string[] > = {};
+	( [ 'background', 'color' ] as const ).forEach( ( feature ) => {
+		const escapeSelector = getTextClipEscapeSelector(
+			featureSelectors,
+			feature
+		);
+		if ( ! escapeSelector ) {
+			ownTextClipEscapes.push( ...textClipEscapes[ feature ] );
+		} else if ( textClipEscapes[ feature ].length ) {
+			featureTextClipEscapes[ escapeSelector ] = [
+				...( featureTextClipEscapes[ escapeSelector ] ?? [] ),
+				...textClipEscapes[ feature ],
+			];
+		}
+	} );
 
 	// Process styles for block support features with custom feature level
 	// CSS selectors set.
@@ -1728,20 +1849,32 @@ function renderStylesNode(
 			tree.settings
 		);
 
+		Object.entries( featureTextClipEscapes ).forEach(
+			( [ escapeSelector, escapes ] ) => {
+				featureDeclarations[ escapeSelector ] = [
+					...( featureDeclarations[ escapeSelector ] ?? [] ),
+					...escapes,
+				];
+			}
+		);
+
 		Object.entries( featureDeclarations ).forEach(
 			( [ featureSelector, declarations ] ) => {
 				if ( declarations.length ) {
-					let selectorForRule = variationName
+					const selectorForRule = variationName
 						? getBlockStyleVariationFeatureSelector(
 								variationName,
 								featureSelector
 							)
 						: featureSelector;
-					selectorForRule = selectorSuffix
-						? appendToSelector( selectorForRule, selectorSuffix )
-						: selectorForRule;
+					const featureRuleSelector = selectorSuffix
+						? getPseudoRuleSelector(
+								selectorForRule,
+								selectorSuffix
+							)
+						: `:root :where(${ selectorForRule })`;
 					const rules = declarations.join( ';' );
-					ruleset += `:root :where(${ selectorForRule }){${ rules };}`;
+					ruleset += `${ featureRuleSelector }{${ rules };}`;
 				}
 			}
 		);
@@ -1787,15 +1920,14 @@ function renderStylesNode(
 		tree,
 		disableRootPadding
 	);
-	const styleDeclarations = getStateDeclarationsWithTextClipEscapes(
-		declarations,
-		styles,
-		baseStyles
-	);
+	const styleDeclarations = [ ...declarations, ...ownTextClipEscapes ];
 	if ( styleDeclarations?.length ) {
-		const generalSelector = skipSelectorWrapper
-			? effectiveSelector
-			: `:root :where(${ effectiveSelector })`;
+		let generalSelector = `:root :where(${ effectiveSelector })`;
+		if ( skipSelectorWrapper ) {
+			generalSelector = effectiveSelector;
+		} else if ( selectorSuffix ) {
+			generalSelector = getPseudoRuleSelector( selector, selectorSuffix );
+		}
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {
@@ -1850,7 +1982,43 @@ export const transformToStyles = (
 	disableLayoutStyles: boolean = false,
 	disableRootPadding: boolean = false,
 	styleOptions: Record< string, boolean > = {}
-): string => {
+): string =>
+	transformToStylesWithTextClipBase(
+		tree,
+		blockSelectors,
+		hasBlockGapSupport,
+		hasFallbackGapSupport,
+		disableLayoutStyles,
+		disableRootPadding,
+		styleOptions
+	);
+
+/**
+ * Like `transformToStyles`, but also takes the block type styles that block
+ * style variations layer over. They are read only to escape a text clip set
+ * there, and are never output. Mirror of the PHP `text_clip_base_blocks`
+ * stylesheet option.
+ *
+ * @param tree                  Global styles config.
+ * @param blockSelectors        Block selectors.
+ * @param hasBlockGapSupport    Whether block gap is supported.
+ * @param hasFallbackGapSupport Whether fallback gap is supported.
+ * @param disableLayoutStyles   Whether to disable layout styles.
+ * @param disableRootPadding    Whether to disable root padding.
+ * @param styleOptions          Sets of styles to opt in or out of.
+ * @param textClipBaseBlocks    Block type styles, keyed by block name.
+ * @return The stylesheet.
+ */
+export function transformToStylesWithTextClipBase(
+	tree: GlobalStylesConfig,
+	blockSelectors: string | BlockSelectors,
+	hasBlockGapSupport?: boolean,
+	hasFallbackGapSupport?: boolean,
+	disableLayoutStyles: boolean = false,
+	disableRootPadding: boolean = false,
+	styleOptions: Record< string, boolean > = {},
+	textClipBaseBlocks?: Record< string, any >
+): string {
 	// These allow opting out of certain sets of styles.
 	const options = {
 		blockGap: true,
@@ -1862,7 +2030,11 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
+	const nodesWithStyles = getNodesWithStyles(
+		tree,
+		blockSelectors,
+		textClipBaseBlocks
+	);
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
 	const { contentSize, wideSize } = tree?.settings?.layout || {};
@@ -1986,7 +2158,7 @@ export const transformToStyles = (
 	}
 
 	return ruleset;
-};
+}
 
 export function generateSvgFilters(
 	tree: GlobalStylesConfig,

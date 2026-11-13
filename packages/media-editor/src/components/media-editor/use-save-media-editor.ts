@@ -4,12 +4,36 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
+import { getImageEdit } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
-import {
-	buildModifiers,
-	type Modifier,
-} from '../media-editor-modal/build-modifiers';
+
+/**
+ * A single modifier in the Core REST `/edit` payload. Order is
+ * significant — the server applies modifiers sequentially (see
+ * `WP_REST_Attachments_Controller::edit_media_item`).
+ *
+ * Shape/units:
+ *   - `flip`:   booleans per axis.
+ *   - `rotate`: `angle` in degrees, clockwise-positive (matches the
+ *     image editor's own convention; Core negates it internally for
+ *     `WP_Image_Editor::rotate`, which is counterclockwise-positive).
+ *   - `crop`:   percentages (0–100) of the image's dimensions **at the
+ *     moment the crop is applied**. Because modifiers are applied in
+ *     order, after a preceding `rotate` the server's
+ *     `WP_Image_Editor::get_size()` reports the full post-rotate AABB,
+ *     so the percentages are of that AABB. Origin is top-left.
+ */
+type Modifier =
+	| {
+			type: 'flip';
+			args: { flip: { horizontal: boolean; vertical: boolean } };
+	  }
+	| { type: 'rotate'; args: { angle: number } }
+	| {
+			type: 'crop';
+			args: { left: number; top: number; width: number; height: number };
+	  };
 
 // Details-tab edits are bundled into transformed `/edit` requests. Core's
 // endpoint only accepts this whitelist.
@@ -62,14 +86,38 @@ interface UseSaveMediaEditorReturn {
 }
 
 function getCropModifiers( session: MediaEditorSession ): Modifier[] {
-	const { state } = session.cropper;
-	if ( ! session.hasOutputEdits || ! state.image ) {
+	if ( ! session.hasOutputEdits ) {
 		return [];
 	}
-	return buildModifiers( state, {
-		width: state.image.naturalWidth,
-		height: state.image.naturalHeight,
-	} );
+	const edit = getImageEdit( session.imageEditor.state );
+	if ( ! edit ) {
+		return [];
+	}
+
+	// Core applies modifiers in the order they arrive, so send them in the
+	// edit's order: flip, then rotate, then crop.
+	const modifiers: Modifier[] = [];
+	if ( edit.flip ) {
+		modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
+	}
+	if ( edit.rotation !== undefined ) {
+		modifiers.push( {
+			type: 'rotate',
+			args: { angle: edit.rotation },
+		} );
+	}
+	if ( edit.crop ) {
+		modifiers.push( {
+			type: 'crop',
+			args: {
+				left: edit.crop.x * 100,
+				top: edit.crop.y * 100,
+				width: edit.crop.width * 100,
+				height: edit.crop.height * 100,
+			},
+		} );
+	}
+	return modifiers;
 }
 
 function getMetadataEdits(
@@ -194,7 +242,7 @@ export function useSaveMediaEditor( {
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					session.cropper.reset();
+					session.reset();
 				}
 				onSaved?.( {
 					id: next.id,

@@ -103,6 +103,8 @@ add_action( 'init', function () {
 	wp_set_current_user( 1 );
 }, 0 );
 PHP
+# A block editor without an iframe, like GutenbergKit's.
+cp "$ROOT/test/ios/standalone-editor.php" "$WP_DIR/wp-content/mu-plugins/"
 step "Starting the server"
 # Without the JIT, and with a 120 second request limit: on the CI runner,
 # the first requests can take longer than the default 30 seconds.
@@ -132,6 +134,16 @@ fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
+# A fresh simulator covers the keyboard with the slide to type tutorial
+# the first time it shows, which takes the test's taps. Mark it as seen,
+# like Chromium's iOS test runner does.
+xcrun simctl spawn "$UDID" defaults write com.apple.keyboard.preferences DidShowContinuousPathIntroduction -bool true
+# The first suggestions a fresh simulator's keyboard computes, e.g. for a
+# double tapped word, block the app for up to 24 seconds, and the edit
+# menu for the selection then never shows. Turn suggestions off.
+for KEY in KeyboardPrediction KeyboardAutocorrection KeyboardCheckSpelling; do
+	xcrun simctl spawn "$UDID" defaults write com.apple.Preferences "$KEY" -bool false
+done
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )

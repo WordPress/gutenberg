@@ -54,6 +54,20 @@ export const WithSuffixControl: Story = {
 export const Disabled: Story = {
 	args: {
 		...Default.args,
+		defaultValue: 'Disabled value',
 		disabled: true,
+	},
+};
+
+/**
+ * A read-only field keeps its value at full contrast and is still focusable,
+ * so the value can be selected and copied. The border is muted to show that
+ * the value can't be edited.
+ */
+export const ReadOnly: Story = {
+	args: {
+		...Default.args,
+		defaultValue: 'Read-only value',
+		readOnly: true,
 	},
 };

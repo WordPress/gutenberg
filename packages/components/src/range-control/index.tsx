@@ -76,6 +76,7 @@ function UnforwardedRangeControl(
 		resetFallbackValue,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
+		size = 'default',
 		step = 1,
 		trackColor,
 		value: valueProp,
@@ -231,7 +232,10 @@ function UnforwardedRangeControl(
 				className={ clsx(
 					'components-range-control__root',
 					styles.root,
-					{ [ styles[ 'is-rtl' ] ]: isRTL() }
+					{
+						[ styles[ 'is-rtl' ] ]: isRTL(),
+						[ styles[ 'is-compact' ] ]: size === 'compact',
+					}
 				) }
 			>
 				{ beforeIcon && (
@@ -344,6 +348,7 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
+						size={ size }
 						__unstableInputWidth={ `${ NUMBER_CONTROL_WIDTH }px` }
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary

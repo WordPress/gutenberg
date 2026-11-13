@@ -37,7 +37,13 @@ beforeEach( () => {
 
 it( 'keeps responsive styles discoverable but prevents activation on Desktop', async () => {
 	await render( <Preview disabled={ false } /> );
-	await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+	const trigger = page.getByRole( 'button', { name: 'View', exact: true } );
+	await userEvent.tab();
+	await expect.element( trigger ).toHaveFocus();
+	await userEvent.keyboard( '{ArrowDown}' );
+	await expect
+		.element( page.getByRole( 'menuitemradio', { name: 'Desktop' } ) )
+		.toHaveFocus();
 	const option = page.getByRole( 'menuitemcheckbox', {
 		name: 'Responsive styles',
 	} );
@@ -47,7 +53,7 @@ it( 'keeps responsive styles discoverable but prevents activation on Desktop', a
 		.toHaveAccessibleDescription(
 			'Select Tablet or Mobile to style a specific viewport.'
 		);
-	await userEvent.keyboard( '{Home}{ArrowDown}{ArrowDown}{ArrowDown}' );
+	await userEvent.keyboard( '{ArrowDown}{ArrowDown}{ArrowDown}' );
 	await expect.element( option ).toHaveFocus();
 	await userEvent.keyboard( '{Enter} ' );
 	expect( setResponsiveEditing ).not.toHaveBeenCalled();

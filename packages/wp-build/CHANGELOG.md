@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
+
+### Internal
+
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.27.0 (2026-11-04)
+
+### Enhancements
+
+-   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
+-   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
+
+### Bug Fixes
+
+-   Derive CSS module class names from the stylesheet's CSS as well as its path, so two builds of a package share class names only where their CSS is identical. This stops an older bundled copy of a package from styling a newer copy's elements. All CSS module class names change once with this release ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
+
+### Internal
+
+-   Pass `false` instead of an empty string as `$src` in `wp_register_script()` in page templates ([#86106](https://github.com/WordPress/gutenberg/pull/86106)).
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
+-   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
+-   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).
+-   Point the page templates' preload comments at the TypeScript `entities.ts` in `@wordpress/core-data` ([#85070](https://github.com/WordPress/gutenberg/pull/85070)).
+-   Note beside `applyTemplateReplacements()` that Gutenberg's PHPStan analysis of the PHP templates keeps a sample value for each placeholder, which must be updated along with it ([#66693](https://github.com/WordPress/gutenberg/pull/66693)).
+
+## 0.26.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
@@ -9,10 +41,12 @@
 
 ### New Features
 
+-   Support importing `.svg` files from JavaScript. The SVG is inlined into the bundle (and into transpiled packages) and the import resolves to a `data:` URI ([#85147](https://github.com/WordPress/gutenberg/pull/85147)).
 -   Add a `{prefix}_{page_slug}_wp_admin_preload_paths` filter to the generated wp-admin page template, so a page can preload the REST API requests its JavaScript issues on mount ([#77353](https://github.com/WordPress/gutenberg/pull/77353)).
 
 ### Enhancements
 
+-   Expose a script's exports on its global as read-only data properties, holding the same values, instead of esbuild's getters, which forwarded to the getters of the module's own exports. Every use of a script's export by another script went through them, which was costly while the page loads ([#85180](https://github.com/WordPress/gutenberg/pull/85180)).
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes

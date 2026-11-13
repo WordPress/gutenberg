@@ -51,13 +51,15 @@ import useMovingAnimation from './use-moving-animation';
 function AnimatedMediaItem( {
 	children,
 	index,
+	itemsKey,
 	className,
 }: {
 	children: React.ReactNode;
 	index: number;
+	itemsKey: string;
 	className?: string;
 } ) {
-	const ref = useMovingAnimation( index );
+	const ref = useMovingAnimation( index, itemsKey );
 	return (
 		<div ref={ ref } className={ className }>
 			{ children }
@@ -275,8 +277,19 @@ function MoveButtons( {
 	);
 }
 
-function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
-	const url = attachment.source_url;
+function MediaPreview( {
+	attachment,
+	getPreviewUrl,
+}: {
+	attachment: MediaEditAttachment;
+	getPreviewUrl?: GetPreviewUrl;
+} ) {
+	// An upload in progress has no sizes and no attachment ID yet, so its
+	// preview is always the blob itself.
+	const url =
+		getPreviewUrl && ! isBlobURL( attachment.source_url )
+			? getPreviewUrl( attachment as Attachment< 'view' > )
+			: attachment.source_url;
 	const mimeType = attachment.mime_type || '';
 	if ( mimeType.startsWith( 'image' ) ) {
 		return (
@@ -297,6 +310,21 @@ function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 }
 
 type MediaEditAttachment = Attachment< 'view' > | BlobItem;
+type GetPreviewUrl = ( attachment: Attachment< 'view' > ) => string;
+
+/**
+ * Identifies the set of items regardless of their order, so a reorder can be
+ * told apart from items being added or removed.
+ *
+ * @param items The items in the list.
+ * @return A key that only changes when items are added or removed.
+ */
+function getItemsKey( items: Array< MediaEditAttachment > | null ) {
+	return ( items ?? [] )
+		.map( ( item ) => String( item.id ) )
+		.sort()
+		.join( ',' );
+}
 interface MediaEditAttachmentsProps {
 	allItems: Array< MediaEditAttachment > | null;
 	addButtonLabel: string;
@@ -307,6 +335,7 @@ interface MediaEditAttachmentsProps {
 	onFilesDrop: ( files: File[], attachmentId?: number ) => void;
 	isUploading: boolean;
 	setTargetItemId: ( id?: number ) => void;
+	getPreviewUrl?: GetPreviewUrl;
 }
 
 function ExpandedMediaEditAttachments( {
@@ -319,7 +348,9 @@ function ExpandedMediaEditAttachments( {
 	onFilesDrop,
 	isUploading,
 	setTargetItemId,
+	getPreviewUrl,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<div
 			className={ clsx( 'media-edit__expanded', {
@@ -337,6 +368,7 @@ function ExpandedMediaEditAttachments( {
 					<AnimatedMediaItem
 						key={ attachment.id }
 						index={ index }
+						itemsKey={ itemsKey }
 						className={ clsx( 'media-edit__expanded-item', {
 							'has-preview-image': hasPreviewImage,
 						} ) }
@@ -374,6 +406,7 @@ function ExpandedMediaEditAttachments( {
 									{ ( ! isBlob || hasPreviewImage ) && (
 										<MediaPreview
 											attachment={ attachment }
+											getPreviewUrl={ getPreviewUrl }
 										/>
 									) }
 								</VStack>
@@ -443,7 +476,9 @@ function CompactMediaEditAttachments( {
 	onFilesDrop,
 	isUploading,
 	setTargetItemId,
+	getPreviewUrl,
 }: MediaEditAttachmentsProps ) {
+	const itemsKey = getItemsKey( allItems );
 	return (
 		<>
 			{ !! allItems?.length && (
@@ -462,6 +497,7 @@ function CompactMediaEditAttachments( {
 								<AnimatedMediaItem
 									key={ attachment.id }
 									index={ index }
+									itemsKey={ itemsKey }
 									className="media-edit__compact"
 								>
 									<MediaPickerButton
@@ -480,6 +516,7 @@ function CompactMediaEditAttachments( {
 										<>
 											<MediaPreview
 												attachment={ attachment }
+												getPreviewUrl={ getPreviewUrl }
 											/>
 											{ ! isBlob && (
 												<MediaTitle
@@ -613,6 +650,7 @@ export function MediaEditControl< Item >( {
 	isPickerFiltered,
 	featuredImageFlow,
 	pickerTitle,
+	getPreviewUrl,
 }: MediaEditProps< Item > & {
 	/**
 	 * Whether the picker resolves through the `editor.MediaUpload` filter, so
@@ -628,6 +666,10 @@ export function MediaEditControl< Item >( {
 	 * Title of the picker, in place of the field label.
 	 */
 	pickerTitle?: string;
+	/**
+	 * The URL an image preview loads, in place of the full-size file.
+	 */
+	getPreviewUrl?: GetPreviewUrl;
 } ) {
 	const MediaUploadComponent = isPickerFiltered
 		? FilteredMediaUpload
@@ -1008,6 +1050,7 @@ export function MediaEditControl< Item >( {
 									onFilesDrop={ onFilesDrop }
 									isUploading={ !! blobs.length }
 									setTargetItemId={ setTargetItemId }
+									getPreviewUrl={ getPreviewUrl }
 								/>
 								{ field.description && (
 									<WCText

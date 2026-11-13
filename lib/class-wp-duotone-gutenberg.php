@@ -172,10 +172,7 @@ class WP_Duotone_Gutenberg {
 			'rad'  => 360 / ( M_PI * 2 ),
 		);
 
-		$factor = $angle_units[ $unit ];
-		if ( ! $factor ) {
-			$factor = 1;
-		}
+		$factor = $angle_units[ $unit ] ?? 1;
 
 		return (float) $value * $factor;
 	}
@@ -206,7 +203,7 @@ class WP_Duotone_Gutenberg {
 				'r' => (int) base_convert( $hex[0] . $hex[0], 16, 10 ),
 				'g' => (int) base_convert( $hex[1] . $hex[1], 16, 10 ),
 				'b' => (int) base_convert( $hex[2] . $hex[2], 16, 10 ),
-				'a' => 4 === strlen( $hex ) ? round( base_convert( $hex[3] . $hex[3], 16, 10 ) / 255, 2 ) : 1,
+				'a' => 4 === strlen( $hex ) ? round( (int) base_convert( $hex[3] . $hex[3], 16, 10 ) / 255, 2 ) : 1,
 			);
 		}
 
@@ -271,9 +268,7 @@ class WP_Duotone_Gutenberg {
 		// For some reason, preg_match doesn't include empty matches at the end
 		// of the array, so we add them manually to make things easier later.
 		for ( $i = 1; $i <= 8; $i++ ) {
-			if ( ! isset( $match[ $i ] ) ) {
-				$match[ $i ] = '';
-			}
+			$match[ $i ] ??= '';
 		}
 
 		if ( $match[2] !== $match[4] || $match[4] !== $match[6] ) {
@@ -403,14 +398,12 @@ class WP_Duotone_Gutenberg {
 		// For some reason, preg_match doesn't include empty matches at the end
 		// of the array, so we add them manually to make things easier later.
 		for ( $i = 1; $i <= 6; $i++ ) {
-			if ( ! isset( $match[ $i ] ) ) {
-				$match[ $i ] = '';
-			}
+			$match[ $i ] ??= '';
 		}
 
 		$hsla = self::colord_clamp_hsla(
 			array(
-				'h' => self::colord_parse_hue( $match[1], $match[2] ),
+				'h' => self::colord_parse_hue( (float) $match[1], $match[2] ),
 				's' => (float) $match[3],
 				'l' => (float) $match[4],
 				'a' => '' === $match[5] ? 1 : (float) $match[5] / ( $match[6] ? 100 : 1 ),
@@ -817,7 +810,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @return null|array<string, string> An array of global style block slugs, keyed on the block name.
+	 * @return array<string, string> An array of global style block slugs, keyed on the block name.
 	 */
 	private static function get_all_global_style_block_names() {
 		if ( isset( self::$global_styles_block_names ) ) {
@@ -1067,9 +1060,7 @@ class WP_Duotone_Gutenberg {
 	public static function add_editor_settings( $settings ) {
 		$global_styles_presets = self::get_all_global_styles_presets();
 		if ( ! empty( $global_styles_presets ) ) {
-			if ( ! isset( $settings['styles'] ) ) {
-				$settings['styles'] = array();
-			}
+			$settings['styles'] ??= array();
 
 			$settings['styles'][] = array(
 				// For the editor we can add all of the presets by default.

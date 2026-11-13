@@ -53,17 +53,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
@@ -104,17 +104,17 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > .alignleft',
 					'rules'    => array(
-						'float'               => 'left',
-						'margin-inline-start' => '0',
-						'margin-inline-end'   => '2em',
+						'float'        => 'left',
+						'margin-left'  => '0',
+						'margin-right' => '2em',
 					),
 				),
 				array(
 					'selector' => ' > .alignright',
 					'rules'    => array(
-						'float'               => 'right',
-						'margin-inline-start' => '2em',
-						'margin-inline-end'   => '0',
+						'float'        => 'right',
+						'margin-left'  => '2em',
+						'margin-right' => '0',
 					),
 				),
 				array(
@@ -315,6 +315,11 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
 		return null;
 	}
 
+	// Allow valid CSS custom property references, e.g. var(--wp--preset--spacing--32).
+	if ( preg_match( '/^var\(--[a-zA-Z0-9_-]+\)$/', $gap_value ) ) {
+		return $gap_value;
+	}
+
 	return $gap_value && preg_match( '%[\\\(&=}]|/\*%', $gap_value ) ? null : $gap_value;
 }
 
@@ -438,7 +443,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		$column_start_number = floatval( $column_start );
 		$parent_column_width = $minimum_column_width ? $minimum_column_width : '12rem';
 		$parent_column_value = floatval( $parent_column_width );
-		$parent_column_unit  = explode( $parent_column_value, $parent_column_width );
+		$parent_column_unit  = explode( (string) $parent_column_value, $parent_column_width );
 
 		$num_cols_to_break_at = 2;
 		if ( $column_span_number && $column_start_number ) {
@@ -939,7 +944,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+				/*
+				 * The aspect ratio gives empty rows a height, so cells are roughly square.
+				 * Rows still grow if their content is taller.
+				 */
+				'declarations' => array(
+					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+					'aspect-ratio'       => $column_count . ' / ' . $row_count,
+				),
 			);
 		}
 

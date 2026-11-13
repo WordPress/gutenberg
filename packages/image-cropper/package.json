@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/image-cropper",
-	"version": "1.21.0",
-	"description": "A basic image cropper component.",
+	"version": "2.1.0",
+	"description": "Deprecated image cropper component for WordPress. Use @wordpress/image-editor instead.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [

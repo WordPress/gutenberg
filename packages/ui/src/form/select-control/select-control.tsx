@@ -1,6 +1,7 @@
 import { useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 import { Field, Select } from '../primitives';
+import { warnSelectControlProps } from './dev-warnings';
 import { Item } from './item';
 import { Trigger } from './trigger';
 import type { SelectControlProps } from './types';
@@ -30,6 +31,10 @@ export const SelectControl = forwardRef<
 	},
 	ref
 ) {
+	if ( process.env.NODE_ENV !== 'production' ) {
+		warnSelectControlProps( items, restProps.itemToStringValue );
+	}
+
 	const triggerElement = useRender( {
 		render: trigger ?? DEFAULT_TRIGGER,
 		ref,

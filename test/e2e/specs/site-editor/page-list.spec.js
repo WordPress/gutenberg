@@ -1,4 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const { setPublishDate } = require( '../editor/various/post-summary/utils' );
 
 const createPages = async ( requestUtils ) => {
 	await requestUtils.createPage( {
@@ -197,10 +198,10 @@ test.describe( 'Page List', () => {
 					const dateEl = page
 						.getByRole( 'button', { name: 'Edit Date' } )
 						.locator( '..' );
-					const date = new Date();
-					const yy = String( date.getFullYear() );
 
-					await expect( dateEl ).toContainText( yy );
+					// A recent date reads as "Today at 10:28 am" or "November
+					// 3 10:28 am", without the year, but always has the time.
+					await expect( dateEl ).toContainText( /\d{1,2}:\d{2}/ );
 				},
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
@@ -209,25 +210,14 @@ test.describe( 'Page List', () => {
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
 
-					// Wait for the datetime control to appear
-					const datetimeInput = page.locator(
-						'input[type="datetime-local"]'
-					);
-					await datetimeInput.waitFor( { state: 'visible' } );
-
-					// Get current datetime value and increment year
-					const currentValue = await datetimeInput.inputValue();
-					if ( currentValue ) {
-						const currentDate = new Date( currentValue );
-						const newDate = new Date( currentDate );
-						newDate.setFullYear( currentDate.getFullYear() + 1 );
-
-						// Format for datetime-local input (YYYY-MM-DDTHH:MM)
-						const formattedDate = newDate
-							.toISOString()
-							.slice( 0, 16 );
-						await datetimeInput.fill( formattedDate );
-					}
+					// Increment the year in the date and time picker.
+					const yearInput = page.getByRole( 'spinbutton', {
+						name: 'Year',
+					} );
+					await expect( yearInput ).not.toHaveValue( '' );
+					const currentYear = Number( await yearInput.inputValue() );
+					await yearInput.fill( String( currentYear + 1 ) );
+					await yearInput.press( 'Enter' );
 				},
 				assertEditedState: async ( page ) => {
 					const date = new Date();
@@ -369,7 +359,7 @@ test.describe( 'Page List', () => {
 					// Targets newly created pages which are published by default.
 					has: page.getByRole( 'cell', { name: 'Published' } ),
 				} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -577,22 +567,30 @@ test.describe( 'Page List', () => {
 	} );
 
 	test.describe( 'Bulk Quick Edit', () => {
-		test( 'shows the bulk-editable fields for the selected pages', async ( {
+		test( 'keeps bulk-editable fields accessible after table sorting', async ( {
 			page,
 		} ) => {
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
 			const table = page.getByRole( 'table' );
+			await page.getByRole( 'button', { name: 'View options' } ).click();
+			await page.getByRole( 'combobox', { name: 'Sort by' } ).click();
+			await page
+				.getByRole( 'option', { name: 'Title', exact: true } )
+				.click();
+			await page.keyboard.press( 'Escape' );
 			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
 			// The extensible site editor keeps the selection in the URL, so
 			// the checkbox only flips once the route has re-rendered.
 			await expect(
-				table.getByRole( 'checkbox', { name: 'Deselect all' } )
+				page.getByRole( 'checkbox', {
+					name: 'Deselect all',
+					exact: true,
+				} )
 			).toBeChecked();
 			await page
-				.locator( '.dataviews-bulk-actions-footer__container' )
-				.getByRole( 'button', { name: 'Quick Edit' } )
+				.getByRole( 'button', { name: 'Bulk edit', exact: true } )
 				.click();
 
 			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
@@ -609,13 +607,51 @@ test.describe( 'Page List', () => {
 					modal.getByRole( 'button', { name } )
 				).toBeVisible();
 			}
+			await modal.getByRole( 'button', { name: 'Edit Status' } ).click();
+			const pending = page.getByRole( 'radio', {
+				name: 'Pending Review',
+			} );
+			await pending.check();
+			await expect( pending ).toBeChecked();
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				modal.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeFocused();
+		} );
+
+		test( 'keeps mobile grid selection visible and restores focus after cancelling', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 390, height: 844 } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Grid' } ).click();
+			await page.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			const selection = page.getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} );
+			await expect( selection ).toBeChecked();
+			const toolbar = page.locator( '.dataviews-bulk-actions' );
+			await toolbar.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Bulk edit' } )
+			).toBeVisible();
+			await expect( selection ).toBeInViewport( { ratio: 1 } );
+			await expect(
+				toolbar.getByText( /items selected/ )
+			).toBeInViewport( { ratio: 1 } );
+			await page.keyboard.press( 'Escape' );
+			await toolbar.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
 		} );
 	} );
 
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {
 		const PAGE_DATE_GMT = '2026-02-15T17:30:00';
-		// UTC-5 offset means the displayed time should be 5 hours earlier.
-		const EXPECTED_LOCAL_VALUE = '2026-02-15T12:30';
 		const PAGE_TITLE = 'Timezone Test Page';
 
 		test.beforeAll( async ( { requestUtils } ) => {
@@ -649,7 +685,7 @@ test.describe( 'Page List', () => {
 			const row = page.getByRole( 'row', {
 				name: new RegExp( PAGE_TITLE ),
 			} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 
 			// Open the date field for editing.
 			const editButton = page.getByRole( 'button', {
@@ -658,22 +694,51 @@ test.describe( 'Page List', () => {
 			await editButton.locator( '..' ).hover();
 			await editButton.click();
 
-			const datetimeInput = page.locator(
-				'input[type="datetime-local"]'
-			);
-			await datetimeInput.waitFor( { state: 'visible' } );
+			const year = page.getByRole( 'spinbutton', { name: 'Year' } );
+			const month = page.getByRole( 'combobox', { name: 'Month' } );
+			const day = page.getByRole( 'spinbutton', { name: 'Day' } );
+			const hours = page.getByRole( 'spinbutton', { name: 'Hours' } );
+			const minutes = page.getByRole( 'spinbutton', {
+				name: 'Minutes',
+			} );
+			const pm = page.getByRole( 'radio', { name: 'PM' } );
 
-			// The input value should reflect the WP timezone (UTC-5),
-			// not the browser/system timezone.
-			await expect( datetimeInput ).toHaveValue( EXPECTED_LOCAL_VALUE );
+			// The picker should reflect the WP timezone (UTC-5), not the
+			// browser/system timezone.
+			await expect( year ).toHaveValue( '2026' );
+			await expect( month ).toHaveValue( '02' );
+			await expect( day ).toHaveValue( '15' );
+			await expect( hours ).toHaveValue( '12' );
+			await expect( minutes ).toHaveValue( '30' );
+			await expect( pm ).toBeChecked();
 
-			// Change only the date via the input, preserving time.
-			await datetimeInput.fill( '2026-03-20T12:30' );
-			await expect( datetimeInput ).toHaveValue( '2026-03-20T12:30' );
+			// Change only the date, preserving time.
+			await setPublishDate( page, {
+				year: 2026,
+				month: 3,
+				day: 20,
+				hours: 12,
+				minutes: 30,
+			} );
+			await expect( month ).toHaveValue( '03' );
+			await expect( day ).toHaveValue( '20' );
+			await expect( hours ).toHaveValue( '12' );
+			await expect( minutes ).toHaveValue( '30' );
 
-			// Change the time portion, verify it updates correctly.
-			await datetimeInput.fill( '2026-03-20T09:45' );
-			await expect( datetimeInput ).toHaveValue( '2026-03-20T09:45' );
+			// Change the time, verify it updates correctly.
+			await setPublishDate( page, {
+				year: 2026,
+				month: 3,
+				day: 20,
+				hours: 9,
+				minutes: 45,
+			} );
+			await expect( day ).toHaveValue( '20' );
+			await expect( hours ).toHaveValue( '09' );
+			await expect( minutes ).toHaveValue( '45' );
+			await expect(
+				page.getByRole( 'radio', { name: 'AM' } )
+			).toBeChecked();
 		} );
 	} );
 } );
