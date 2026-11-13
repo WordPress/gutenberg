@@ -40,6 +40,7 @@
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
 -   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
+-   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it).
 
 ## 12.1.0 (2026-11-04)
 
