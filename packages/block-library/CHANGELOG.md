@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Playlist: Keep the playback position when a touch on the waveform turns into a page scroll, by updating `@arraypress/waveform-player` to 1.30.1 ([#86601](https://github.com/WordPress/gutenberg/issues/86601)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
