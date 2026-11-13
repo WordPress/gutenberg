@@ -1,4 +1,9 @@
-import type { GridInfo, GridRectOptions, GridTrack } from './types';
+import type {
+	GridInfo,
+	GridItemLayout,
+	GridRectOptions,
+	GridTrack,
+} from './types';
 
 export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );
@@ -64,6 +69,40 @@ export class GridRect {
 			this.rowEnd >= rect.rowStart
 		);
 	}
+}
+
+/**
+ * Reads an item's grid placement, defaulting omitted spans to one. Callers
+ * validate the values according to their placement requirements.
+ *
+ * @param layout The item's layout attributes.
+ *
+ * @return Placement fields with defaults for omitted spans.
+ */
+export function getGridItemPlacement( layout?: GridItemLayout ) {
+	const { columnStart, rowStart, columnSpan = 1, rowSpan = 1 } = layout ?? {};
+	return { columnStart, rowStart, columnSpan, rowSpan };
+}
+
+/**
+ * Gets the row count needed to contain a set of rectangles, respecting the
+ * caller's minimum. The minimum can be the current count to only grow rows,
+ * or a baseline to also allow automatically added rows to shrink.
+ *
+ * @param rects           Grid item rectangles.
+ * @param minimumRowCount Minimum number of rows to retain.
+ *
+ * @return Required row count.
+ */
+export function getRequiredGridRowCount(
+	rects: Iterable< GridRect >,
+	minimumRowCount: number
+): number {
+	let bottomMostRow = -Infinity;
+	for ( const rect of rects ) {
+		bottomMostRow = Math.max( bottomMostRow, rect.rowEnd );
+	}
+	return Math.max( minimumRowCount, bottomMostRow );
 }
 
 export function getComputedCSS( element: Element, property: string ) {

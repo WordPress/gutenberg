@@ -46,7 +46,7 @@ function GridItemResizerInner( {
 	blockElement,
 	rootBlockElement,
 	onChange,
-	isManualGrid,
+	isManualGrid = false,
 }: GridItemResizerInnerProps ) {
 	const [ resizeDirection, setResizeDirection ] = useState< string | null >(
 		null
@@ -99,11 +99,19 @@ function GridItemResizerInner( {
 	const justification: Record< string, string > = {
 		right: 'left',
 		left: 'right',
+		topRight: 'left',
+		bottomRight: 'left',
+		topLeft: 'right',
+		bottomLeft: 'right',
 	};
 
 	const alignment: Record< string, string > = {
 		top: 'flex-end',
 		bottom: 'flex-start',
+		topRight: 'flex-end',
+		topLeft: 'flex-end',
+		bottomRight: 'flex-start',
+		bottomLeft: 'flex-start',
 	};
 
 	// A `null` direction, while not resizing, matches no key.
@@ -134,13 +142,13 @@ function GridItemResizerInner( {
 				} }
 				enable={ {
 					bottom: enableSide.bottom,
-					bottomLeft: false,
-					bottomRight: false,
+					bottomLeft: enableSide.left && enableSide.bottom,
+					bottomRight: enableSide.bottom && enableSide.right,
 					left: enableSide.left,
 					right: enableSide.right,
 					top: enableSide.top,
-					topLeft: false,
-					topRight: false,
+					topLeft: enableSide.top && enableSide.left,
+					topRight: enableSide.top && enableSide.right,
 				} }
 				bounds={ bounds }
 				boundsByDirection

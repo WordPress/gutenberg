@@ -56,7 +56,8 @@ const HANDLE_CLASSES = {
 	),
 };
 
-// Removes the inline styles in the drag handles.
+// Removes the inline styles in the drag handles, so the stylesheet controls
+// their size, position, and stacking.
 const HANDLE_STYLES_OVERRIDES = {
 	width: undefined,
 	height: undefined,
@@ -64,6 +65,7 @@ const HANDLE_STYLES_OVERRIDES = {
 	right: undefined,
 	bottom: undefined,
 	left: undefined,
+	zIndex: undefined,
 };
 const HANDLE_STYLES = {
 	top: HANDLE_STYLES_OVERRIDES,

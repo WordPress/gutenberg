@@ -59,6 +59,13 @@ describe( 'getCleanTemplatePartSlug', () => {
 		expect( getCleanTemplatePartSlug( title ) ).toBe( 'my-template-part' );
 	} );
 
+	it( 'should replace accented letters with their unaccented forms', () => {
+		const title = 'Vyhľadávanie v portfóliu';
+		expect( getCleanTemplatePartSlug( title ) ).toBe(
+			'vyhladavanie-v-portfoliu'
+		);
+	} );
+
 	it( 'should return a slug with only latin chars and numbers', () => {
 		const title = 'My Template Part 2';
 		expect( getCleanTemplatePartSlug( title ) ).toBe(
