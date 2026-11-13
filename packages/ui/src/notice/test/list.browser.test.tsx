@@ -3,20 +3,24 @@ import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import * as Notice from '../index';
 
-it( 'announces formatted titles and descriptions using their visible text', async () => {
-	const { rerender } = await render( <Notice.List /> );
-	const notice = ( showHint: boolean ) => (
-		<Notice.List>
+it( 'preserves formatted announcements across list visibility changes', async () => {
+	const { rerender } = await render(
+		<Notice.List liveRegionContainer={ document.body } />
+	);
+	const notice = ( showHint: boolean, hidden = false, decorated = false ) => (
+		<Notice.List hidden={ hidden } liveRegionContainer={ document.body }>
 			<Notice.Root>
 				<Notice.Title>
-					Save <strong>failed</strong>!
-					<span aria-hidden="true">Decoration</span>
+					Save{ '  ' }
+					<strong>failed</strong>!
+					{ decorated && <span aria-hidden="true">Decoration</span> }
 				</Notice.Title>
 				<Notice.Description render={ <div /> }>
 					<p>
 						Retry
 						<br />
 						later &amp; reopen.
+						<span aria-hidden="true">Decoration</span>
 						<span hidden>Hidden detail</span>
 					</p>
 					<p style={ { display: showHint ? 'block' : 'none' } }>
@@ -40,6 +44,15 @@ it( 'announces formatted titles and descriptions using their visible text', asyn
 			'Save failed! Retry\nlater & reopen.'
 		)
 	);
+	await rerender( notice( false, false, true ) );
+	expect( status ).toHaveProperty(
+		'textContent',
+		'Save failed! Retry\nlater & reopen.'
+	);
+	await rerender( notice( false, true ) );
+	await waitFor( () => expect( status ).toBeEmptyDOMElement() );
+	await rerender( notice( false ) );
+	expect( status ).toBeEmptyDOMElement();
 	await rerender( notice( true ) );
 	await waitFor( () =>
 		expect( status ).toHaveProperty(
@@ -47,4 +60,9 @@ it( 'announces formatted titles and descriptions using their visible text', asyn
 			'Save failed! Retry\nlater & reopen.\n\nCheck your connection.'
 		)
 	);
+	await rerender( notice( true, true ) );
+	await waitFor( () => expect( status ).toBeEmptyDOMElement() );
+	await rerender( notice( false, true ) );
+	await rerender( notice( false ) );
+	expect( status ).toBeEmptyDOMElement();
 } );

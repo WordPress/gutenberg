@@ -3,7 +3,10 @@ import { createPortal, forwardRef, useRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ListProps, RootProps } from './types';
-import { getAnnouncementText } from './get-announcement-text';
+import {
+	getAnnouncementText,
+	getAnnouncementComparisonText,
+} from './get-announcement-text';
 import styles from './style.module.css';
 
 const LIST_SELECTOR = '[data-wp-ui-notice-list]';
@@ -14,6 +17,11 @@ type Announcement = {
 	id: number;
 	message: string;
 	politeness: NonNullable< RootProps[ 'politeness' ] >;
+};
+
+type NoticeSnapshot = Announcement & {
+	comparison: string;
+	listHidden: boolean;
 };
 
 function getComposedParent( element: Element ): Element | null {
@@ -43,7 +51,7 @@ function isHidden( element: Element, root: Element ) {
 	return false;
 }
 
-function readMessage( root: HTMLElement ) {
+function readMessage( root: HTMLElement, getText = getAnnouncementText ) {
 	function readText( kind: 'title' | 'description' ) {
 		return Array.from(
 			root.querySelectorAll< HTMLElement >( `.${ styles[ kind ] }` )
@@ -53,7 +61,7 @@ function readMessage( root: HTMLElement ) {
 					element.closest( CONTENT_BOUNDARY ) === root &&
 					! isHidden( element, root )
 			)
-			.map( getAnnouncementText )
+			.map( getText )
 			.filter( Boolean )
 			.join( ' ' );
 	}
@@ -103,12 +111,9 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		const observerRef = useRefEffect< HTMLDivElement >(
 			( element ) => {
 				let nextId = 0;
-				let previous = new Map< HTMLElement, Announcement >();
+				let previous = new Map< HTMLElement, NoticeSnapshot >();
 				const readNotices = () => {
-					const current = new Map<
-						HTMLElement,
-						Announcement & { listHidden: boolean }
-					>();
+					const current = new Map< HTMLElement, NoticeSnapshot >();
 					for ( const notice of element.querySelectorAll< HTMLElement >(
 						`.${ styles.notice }`
 					) ) {
@@ -122,13 +127,21 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 						if ( visibility === 'hidden' ) {
 							continue;
 						}
-						// Keep the message in the comparison while its list is hidden.
-						// Revealing the list alone must not replay it.
+						const spokenMessage =
+							notice.dataset.wpUiNoticeSpokenMessage;
+						// Keep a stable comparison while the list is hidden. Revealing
+						// it alone must not replay its current messages.
 						current.set( notice, {
 							id: previous.get( notice )?.id ?? nextId++,
-							message:
-								notice.dataset.wpUiNoticeSpokenMessage ??
-								readMessage( notice ),
+							message: spokenMessage ?? readMessage( notice ),
+							comparison:
+								spokenMessage ??
+								readMessage( notice, ( content ) =>
+									getAnnouncementComparisonText(
+										content,
+										element
+									)
+								),
 							politeness: notice.dataset
 								.wpUiNoticePoliteness as Announcement[ 'politeness' ],
 							listHidden: visibility === 'list-hidden',
@@ -152,7 +165,7 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 							announcement.message &&
 							! announcement.listHidden &&
 							announcement.politeness !== 'off' &&
-							( announcement.message !== before?.message ||
+							( announcement.comparison !== before?.comparison ||
 								announcement.politeness !== before?.politeness )
 						) {
 							changed.set( notice, announcement );
