@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
@@ -19,6 +20,7 @@
 
 ### Bug Fixes
 
+-   `MenuItem`: Show items with `aria-disabled` in the system disabled color in forced colors mode ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
