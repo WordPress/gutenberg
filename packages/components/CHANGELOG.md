@@ -8,9 +8,8 @@
 
 ### Enhancements
 
--   `Modal`, `Popover`: Keep overlays opened inside WordPress UI overlays in their owning portal, preserving stacking, focus return, and modal isolation across SlotFill providers.
--   `Modal`, `Popover`: Expose `supportsUiOverlays` so separately bundled consumers can retain legacy hosts with older implementations.
-
+-   `Modal`, `Popover`: Keep overlays opened inside WordPress UI overlays in their owning portal, preserving stacking, focus return, and modal isolation across SlotFill providers ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
+-   `Modal`, `Popover`: Expose `supportsUiOverlays` so separately bundled consumers can retain legacy hosts with older implementations ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
