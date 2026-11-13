@@ -192,7 +192,12 @@ export default function useSelectionObserver() {
 					( event as MouseEvent ).shiftKey &&
 					event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
-					const collapsedClientId = getBlockClientId( startNode );
+					// Not the start node: a caret between blocks (e.g. left
+					// where a replaced block was) is in no block, while the
+					// start node is the block next to it.
+					const collapsedClientId = getBlockClientId(
+						selection.anchorNode
+					);
 
 					// If the block supports an editable root, keep (or make)
 					// the wrapper contentEditable so the native selection can
