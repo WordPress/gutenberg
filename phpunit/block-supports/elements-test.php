@@ -393,6 +393,7 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					),
 					'heading' => array( 'transform' => array( 'rotate' => '10deg' ) ),
 					'h1'      => array( 'transform' => array( 'rotate' => '10deg' ) ),
+					'h2'      => array( 'transform' => array( 'translate' => array( 'x' => '10px' ) ) ),
 				),
 				'expected_styles' => '/^.wp-elements-(?:[a-f0-9]{32}|[0-9]+) a:where\(:not\(.wp-element-button\)\)' . $color_css_rules . '$/',
 			),

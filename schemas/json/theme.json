@@ -492,6 +492,11 @@
 							"description": "Allow users to set a rotation.",
 							"type": "boolean",
 							"default": true
+						},
+						"translate": {
+							"description": "Allow users to set an X and Y offset.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false
@@ -1950,6 +1955,21 @@
 						"rotate": {
 							"description": "Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`.",
 							"type": "string"
+						},
+						"translate": {
+							"description": "Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`.",
+							"type": "object",
+							"properties": {
+								"x": {
+									"description": "The horizontal offset.",
+									"type": "string"
+								},
+								"y": {
+									"description": "The vertical offset.",
+									"type": "string"
+								}
+							},
+							"additionalProperties": false
 						}
 					},
 					"additionalProperties": false

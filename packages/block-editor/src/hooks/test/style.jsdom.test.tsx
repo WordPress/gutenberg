@@ -384,6 +384,21 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
+	it( 'outputs a hover translation as the individual translate property', () => {
+		expect(
+			getBlockStateStylesCSS(
+				{ transform: { translate: { y: '-4px' } } },
+				{
+					name: 'test/state-button',
+					baseSelector: '.wp-elements-abc123',
+					state: ':hover',
+				}
+			)
+		).toBe(
+			'.wp-elements-abc123 .wp-block-button__link:hover { translate: 0 -4px !important; }'
+		);
+	} );
+
 	it( 'routes canvas preview styles through feature selectors without the pseudo state', () => {
 		expect(
 			getBlockStateStylesCSS(
@@ -555,6 +570,7 @@ describe( 'getElementCSSRules', () => {
 				},
 				heading: rotate,
 				h1: rotate,
+				h2: { transform: { translate: { x: '10px' } } },
 			},
 			'core/group',
 			'.wp-elements-1'
@@ -562,6 +578,7 @@ describe( 'getElementCSSRules', () => {
 
 		expect( css ).toContain( 'color: red;' );
 		expect( css ).not.toContain( 'rotate' );
+		expect( css ).not.toContain( 'translate' );
 	} );
 } );
 
@@ -625,7 +642,10 @@ describe( 'getResponsiveStateCSSRules', () => {
 					elements: {
 						link: {
 							color: { text: 'red' },
-							transform: { rotate: '10deg' },
+							transform: {
+								rotate: '10deg',
+								translate: { x: '10px' },
+							},
 						},
 					},
 				},
@@ -636,6 +656,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 
 		expect( rules.join( '' ) ).toContain( 'color: red' );
 		expect( rules.join( '' ) ).not.toContain( 'rotate' );
+		expect( rules.join( '' ) ).not.toContain( 'translate' );
 	} );
 
 	it( 'routes a viewport rotation through the transform feature selector', () => {
@@ -658,6 +679,33 @@ describe( 'getResponsiveStateCSSRules', () => {
 
 		expect( rules ).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 img { rotate: 0 !important; }}',
+		] );
+	} );
+
+	it( 'routes a viewport translation through the transform feature selector', () => {
+		registerBlockType( 'test/state-translate', {
+			apiVersion: 3,
+			title: 'State Translate',
+			category: 'media',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: { transform: '.wp-block-test-state-translate img' },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{
+				'@mobile': {
+					transform: { rotate: '5deg', translate: { x: '10%' } },
+				},
+			},
+			'test/state-translate',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-translate' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 5deg !important; translate: 10% 0 !important; }}',
 		] );
 	} );
 

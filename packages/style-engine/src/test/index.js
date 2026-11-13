@@ -632,3 +632,38 @@ describe( 'rotate', () => {
 		}
 	);
 } );
+
+describe( 'translate', () => {
+	it( 'should output the individual translate property for both axes', () => {
+		expect(
+			compileCSS( { transform: { translate: { x: '10px', y: '-50%' } } } )
+		).toEqual( 'translate: 10px -50%;' );
+	} );
+
+	it( 'should output 0 for a missing axis and ignore other keys', () => {
+		expect(
+			compileCSS( { transform: { translate: { y: '2rem', z: '5px' } } } )
+		).toEqual( 'translate: 0 2rem;' );
+	} );
+
+	it( 'should combine with a rotation', () => {
+		expect(
+			compileCSS( {
+				transform: { rotate: '15deg', translate: { x: '1em' } },
+			} )
+		).toEqual( 'rotate: 15deg; translate: 1em 0;' );
+	} );
+
+	it.each( [
+		[ 'a string', '10px 20px' ],
+		[ 'a bare number', { x: '10' } ],
+		[ 'a number type', { x: 10 } ],
+		[ 'calc()', { x: '10px', y: 'calc(1px + 2px)' } ],
+		[ 'var()', { x: 'var(--offset)' } ],
+		[ 'a list', { x: '1px 2px' } ],
+		[ 'an angle', { x: '5deg' } ],
+		[ 'a z axis only', { z: '5px' } ],
+	] )( 'should output nothing for %s', ( _, translate ) => {
+		expect( compileCSS( { transform: { translate } } ) ).toEqual( '' );
+	} );
+} );

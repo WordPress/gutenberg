@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add X offset and Y offset controls to the Transform panel, for the `transform.translate` block support ([#86282](https://github.com/WordPress/gutenberg/pull/86282)).
 
 ### Enhancements
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).

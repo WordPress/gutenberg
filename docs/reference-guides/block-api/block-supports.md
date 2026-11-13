@@ -1088,30 +1088,40 @@ _**Note:** Since WordPress 7.3._
 -   Default value: `null`
 -   Subproperties:
     -   `rotate`: type `boolean`, default value `false`
+    -   `translate`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, which is `true` by default.
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate` or `settings.transform.translate`, which are `true` by default.
 
-Each feature is output as its own CSS property, such as `rotate`, and never as the `transform` shorthand. This way a rotation combines with any `transform` a theme or block already applies.
+Each feature is output as its own CSS property, such as `rotate` or `translate`, and never as the `transform` shorthand. This way a rotation and an offset combine with each other and with any `transform` a theme or block already applies.
 
 ```js
 supports: {
 	transform: {
 		rotate: true, // Enable the rotation control.
+		translate: true, // Enable the X and Y offset controls.
 	}
 }
 ```
 
-The rotation is applied to the block wrapper. A block can apply it to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies the rotation itself can opt out of its output with `__experimentalSkipSerialization`.
+An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen.
+
+In Global Styles, a block style variation or state that sets one axis outputs the other axis as `0`. For example, a Global Styles X offset of `3rem` with a `:hover` Y offset alone moves the block back to an X of `0` on hover.
+
+Transforms are applied to the block wrapper. A block can apply them to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies a transform itself can opt out of its output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. A block that sets one axis keeps the other axis from Global Styles, or from its own default value in a state such as `@mobile`, and `0` when neither sets it. For example:
 
 ```js
 attributes: {
     style: {
         transform: {
             rotate: "15deg",
+            translate: {
+                x: "10px",
+                y: "-50%",
+            },
         }
     }
 }

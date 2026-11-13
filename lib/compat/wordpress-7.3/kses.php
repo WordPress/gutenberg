@@ -132,3 +132,54 @@ function gutenberg_allow_rotate_angle_only( $allow_css, $css_test_string ) {
 	return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_ANGLE_PATTERN, trim( $parts[1] ) );
 }
 add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_rotate_angle_only', 10, 2 );
+
+/**
+ * Adds 'translate' to the list of safe CSS properties.
+ *
+ * The transform block support outputs the individual `translate` property.
+ * The style engine filters every declaration through {@see safecss_filter_attr()},
+ * so without this entry the declaration is silently dropped.
+ *
+ * @param string[] $attr Array of allowed CSS attributes.
+ * @return string[] Modified array of allowed CSS attributes.
+ */
+function gutenberg_add_translate_to_safe_style_css( array $attr ): array {
+	if ( ! in_array( 'translate', $attr, true ) ) {
+		$attr[] = 'translate';
+	}
+
+	return $attr;
+}
+add_filter( 'safe_style_css', 'gutenberg_add_translate_to_safe_style_css' );
+
+/**
+ * Only allows one or two lengths or percentages as the value of the `translate` property.
+ *
+ * Mirrors the style engine, so a third, `z` axis and anything other than a
+ * single length or percentage per axis are rejected.
+ *
+ * @param bool   $allow_css       Whether the CSS is allowed.
+ * @param string $css_test_string The CSS declaration to test.
+ * @return bool Whether the CSS is allowed.
+ */
+function gutenberg_allow_translate_lengths_only( $allow_css, $css_test_string ) {
+	$parts = explode( ':', $css_test_string, 2 );
+
+	if ( ! $allow_css || 2 !== count( $parts ) || 'translate' !== strtolower( trim( $parts[0] ) ) ) {
+		return $allow_css;
+	}
+
+	$axes = preg_split( '/\s+/', trim( $parts[1] ) );
+	if ( count( $axes ) > 2 ) {
+		return false;
+	}
+
+	foreach ( $axes as $axis ) {
+		if ( 1 !== preg_match( WP_Style_Engine_Gutenberg::VALID_LENGTH_PERCENTAGE_PATTERN, $axis ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+add_filter( 'safecss_filter_attr_allow_css', 'gutenberg_allow_translate_lengths_only', 10, 2 );

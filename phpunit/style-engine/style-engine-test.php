@@ -340,6 +340,65 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(),
 			),
 
+			'inline_valid_transform_translate_style'       => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '-50%',
+							'y' => '1.5rem',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'translate:-50% 1.5rem;',
+					'declarations' => array(
+						'translate' => '-50% 1.5rem',
+					),
+				),
+			),
+
+			'inline_partial_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'y' => '10px',
+							'z' => '5px',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'translate:0 10px;',
+					'declarations' => array(
+						'translate' => '0 10px',
+					),
+				),
+			),
+
+			'inline_invalid_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array(
+							'x' => '10px',
+							'y' => 'calc(1px + 2px)',
+						),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_translate_style'     => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'translate' => array( 'x' => "10px\n" ),
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
 			'valid_classnames_deduped'                     => array(
 				'block_styles'    => array(
 					'color'      => array(
