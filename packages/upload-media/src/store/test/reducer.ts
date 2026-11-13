@@ -14,6 +14,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -38,6 +39,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -63,6 +65,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -89,6 +92,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 1,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -113,6 +117,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -144,6 +149,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 2,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -167,6 +173,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -192,6 +199,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -213,6 +221,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -236,6 +245,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -261,6 +271,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -289,6 +300,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -317,6 +329,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -343,6 +356,7 @@ describe( 'reducer', () => {
 			expect( state ).toEqual( {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: expect.any( Function ),
@@ -368,6 +382,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -400,6 +415,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -427,6 +443,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -456,6 +473,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -485,6 +503,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -523,6 +542,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -551,6 +571,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -580,6 +601,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -616,6 +638,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -635,6 +658,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -654,6 +678,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: { '1': [ 'blob:foo' ] },
 				settings: {
 					mediaUpload: vi.fn(),
@@ -681,6 +706,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -700,6 +726,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -719,6 +746,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -750,6 +778,7 @@ describe( 'reducer', () => {
 			const initialState: State = {
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),

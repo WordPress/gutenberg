@@ -33,6 +33,7 @@ describe( 'selectors', () => {
 				queue: [],
 				queueStatus: 'active',
 				failureCount: 3,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -73,6 +74,7 @@ describe( 'selectors', () => {
 				queue: [],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -101,6 +103,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -129,6 +132,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -159,6 +163,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -194,6 +199,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -233,6 +239,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -255,6 +262,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -286,6 +294,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -345,6 +354,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -372,6 +382,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -407,6 +418,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -439,6 +451,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'active',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -512,6 +525,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
@@ -538,6 +552,7 @@ describe( 'selectors', () => {
 				] as QueueItem[],
 				queueStatus: 'paused',
 				failureCount: 0,
+				warnings: [],
 				blobUrls: {},
 				settings: {
 					mediaUpload: vi.fn(),
