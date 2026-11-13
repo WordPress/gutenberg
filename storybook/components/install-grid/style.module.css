@@ -1,0 +1,157 @@
+.root {
+	margin: 24px 0;
+}
+
+.tiles {
+	display: grid;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 12px;
+}
+
+@media (max-width: 600px) {
+	.tiles {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+.tile {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 10px;
+	padding: 20px 12px;
+	border: 1px solid transparent;
+	border-radius: 8px;
+	background: #f6f7f7;
+	color: #1e1e1e;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: var(--wpds-cursor-control);
+}
+
+.tile:hover {
+	background: #f0f0f1;
+}
+
+.tile[aria-checked="true"] {
+	border-color: #3858e9;
+	background: #fff;
+}
+
+.tile:focus-visible {
+	outline: 2px solid #3858e9;
+	outline-offset: 2px;
+}
+
+.mark {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	border-radius: 8px;
+	color: #fff;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.panel {
+	padding-top: 24px;
+}
+
+.code {
+	position: relative;
+}
+
+.root .code pre {
+	margin: 0 0 12px;
+	padding: 16px;
+	padding-inline-end: 72px;
+	overflow-x: auto;
+	border-radius: 8px;
+	background: #1e1e1e;
+	color: #f0f0f0;
+}
+
+.copy {
+	position: absolute;
+	inset-block-start: 8px;
+	inset-inline-end: 8px;
+}
+
+.root .code pre code {
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font-size: 13px;
+	line-height: 1.5;
+	white-space: pre;
+}
+
+/* Storybook's docs link color would otherwise win over the button's text color. */
+.root .install,
+.root .install:visited,
+.root .install:hover {
+	color: var(--wp-ui-button-foreground-color);
+	text-decoration: none;
+}
+
+.root .steps {
+	margin: 16px 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: step;
+}
+
+.root .steps li {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	margin: 0 0 10px;
+	counter-increment: step;
+}
+
+.root .steps li::before {
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: #f0f0f1;
+	content: counter(step);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.root .steps code,
+.root .file code {
+	padding: 1px 4px;
+}
+
+.root .heading {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 16px;
+	padding: 0;
+	border: 0;
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.logo {
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
+}
+
+.root .file {
+	margin: 0 0 8px;
+}
