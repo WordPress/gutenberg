@@ -13,6 +13,10 @@ import { DEFAULT_SEED_COLORS } from '../lib/constants';
 const ColorGen = ( props: {
 	background: string;
 	primary: string;
+	/**
+	 * The `ThemeProvider` contrast value, from -1 to 1.
+	 */
+	contrast?: number;
 	children: React.ReactNode;
 } ) => {
 	return <div>{ props.children }</div>;
@@ -30,6 +34,9 @@ const meta: Meta< typeof ColorGen > = {
 				type: 'color',
 				presetColors: [ '#3858e9', '#069e08', '#873eff' ],
 			},
+		},
+		contrast: {
+			control: { type: 'range', min: -1, max: 1, step: 0.1 },
 		},
 	},
 	parameters: {
@@ -65,11 +72,13 @@ type RampTableRamp = React.ComponentProps<
 function buildDisplayedRamps( {
 	background,
 	primary,
+	contrast,
 }: {
 	background: string;
 	primary: string;
+	contrast: number;
 } ): RampTableRamp[] {
-	const bgRamp = buildBgRamp( background );
+	const bgRamp = buildBgRamp( background, contrast );
 	const ramps: RampTableRamp[] = [
 		{
 			name: 'background',
@@ -96,7 +105,7 @@ function buildDisplayedRamps( {
 				name: 'bgFill1',
 				value,
 			},
-			ramp: buildAccentRamp( value, bgRamp ).ramp,
+			ramp: buildAccentRamp( value, bgRamp, contrast ).ramp,
 		} );
 	}
 
@@ -108,8 +117,9 @@ function ColorScaleCombination( {
 	source,
 	background,
 	primary,
+	contrast = 0,
 	includeAllRamps = false,
-}: Combination & { includeAllRamps?: boolean } ) {
+}: Combination & { contrast?: number; includeAllRamps?: boolean } ) {
 	const headingId = useId();
 	const [ warnings, setWarnings ] = useState<
 		readonly ThemeProviderColorWarning[] | undefined
@@ -117,6 +127,7 @@ function ColorScaleCombination( {
 	const allRamps = buildDisplayedRamps( {
 		background,
 		primary,
+		contrast,
 	} );
 	const ramps = includeAllRamps
 		? allRamps
@@ -141,13 +152,15 @@ function ColorScaleCombination( {
 		>
 			<ThemeProvider
 				color={ { background, primary } }
+				contrast={ contrast }
 				onColorWarnings={ setWarnings }
 			/>
 			<header>
 				<h2 id={ headingId }>{ label }</h2>
 				<p>
 					Source: { source }. Primary seed: <code>{ primary }</code>.
-					Background seed: <code>{ background }</code>.
+					Background seed: <code>{ background }</code>. Contrast:{ ' ' }
+					<code>{ contrast }</code>.
 				</p>
 			</header>
 			<p>
@@ -166,14 +179,16 @@ export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
 		const background = args.background ?? DEFAULT_SEED_COLORS.background;
 		const primary = args.primary ?? DEFAULT_SEED_COLORS.primary;
+		const contrast = args.contrast ?? 0;
 
 		return (
 			<ColorScaleCombination
-				key={ `${ primary }-${ background }` }
+				key={ `${ primary }-${ background }-${ contrast }` }
 				label="Custom color scales"
 				source="Storybook controls"
 				background={ background }
 				primary={ primary }
+				contrast={ contrast }
 				includeAllRamps
 			/>
 		);
@@ -181,6 +196,7 @@ export const Default: StoryObj< typeof ColorGen > = {
 	args: {
 		background: DEFAULT_SEED_COLORS.background,
 		primary: DEFAULT_SEED_COLORS.primary,
+		contrast: 0,
 	},
 };
 
@@ -266,7 +282,7 @@ const SAMPLE_COMBINATIONS = [
 ] as const satisfies readonly Combination[];
 
 export const SampleCombinations: StoryObj< typeof ColorGen > = {
-	render: () => (
+	render: ( { contrast = 0 } ) => (
 		<div
 			style={ {
 				display: 'grid',
@@ -275,8 +291,9 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 		>
 			{ SAMPLE_COMBINATIONS.map( ( combination ) => (
 				<ColorScaleCombination
-					key={ combination.label }
+					key={ `${ combination.label }-${ contrast }` }
 					{ ...combination }
+					contrast={ contrast }
 				/>
 			) ) }
 		</div>
@@ -288,5 +305,8 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 		primary: {
 			control: false,
 		},
+	},
+	args: {
+		contrast: 0,
 	},
 };

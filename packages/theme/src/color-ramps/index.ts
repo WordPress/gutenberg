@@ -9,18 +9,49 @@ import type {
 } from './lib/types.ts';
 import { getContrast } from './lib/color-utils.ts';
 import { CONTRAST_COMBINATIONS } from './lib/constants.ts';
+import {
+	getRampConfigs,
+	quantizeContrast,
+	scaleBackgroundSeed,
+} from './lib/contrast-scale.ts';
 export { DEFAULT_SEED_COLORS } from './lib/constants.ts';
 
 /**
  * Creates a background ramp.
- * @param seed The seed color for the background ramp.
+ * @param seed     The seed color for the background ramp.
+ * @param contrast The contrast value, -1..1. `0` gives the standard ramp.
  */
-export function buildBgRamp( seed: string ) {
+export function buildBgRamp( seed: string, contrast = 0 ) {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
-	return buildRamp( seed, BG_RAMP_CONFIG );
+	const level = quantizeContrast( contrast );
+	if ( level === 0 ) {
+		return buildRamp( seed, BG_RAMP_CONFIG );
+	}
+
+	let config = getRampConfigs( level ).bg;
+	if ( level > 0 ) {
+		// Body text reaches the endpoint long before weak text does. Keep
+		// weak text at least as far below body text as it is at 0, so the
+		// two don't converge.
+		const { ramp } = buildRamp( seed, BG_RAMP_CONFIG );
+		config = {
+			...config,
+			fgSurface3: {
+				...config.fgSurface3,
+				maxRatioBelow: {
+					step: 'fgSurface4',
+					ratio:
+						getContrast( ramp.fgSurface4, ramp.surface3 ) /
+						getContrast( ramp.fgSurface3, ramp.surface3 ),
+				},
+			},
+		};
+	}
+
+	return buildRamp( scaleBackgroundSeed( seed, level ), config );
 }
 
 const STEP_TO_PIN = 'surface2';
@@ -50,19 +81,24 @@ function getBgRampInfo( ramp: InternalRampResult ): {
 /**
  * Creates an accent ramp (ie used by primary, success, info, warning and error
  * ramps).
- * @param seed   The seed color for the accent ramp.
- * @param bgRamp The ramp of the background on which the accent is shown.
+ * @param seed     The seed color for the accent ramp.
+ * @param bgRamp   The ramp of the background on which the accent is shown.
+ * @param contrast The contrast value, -1..1. `0` gives the standard ramp.
  */
 export function buildAccentRamp(
 	seed: string,
-	bgRamp?: InternalRampResult
+	bgRamp?: InternalRampResult,
+	contrast = 0
 ): InternalRampResult {
 	if ( typeof seed !== 'string' || seed.trim() === '' ) {
 		throw new Error( 'Seed color must be a non-empty string' );
 	}
 
+	const level = quantizeContrast( contrast );
+	const config =
+		level === 0 ? ACCENT_RAMP_CONFIG : getRampConfigs( level ).accent;
 	const bgRampInfo = bgRamp ? getBgRampInfo( bgRamp ) : undefined;
-	return buildRamp( seed, ACCENT_RAMP_CONFIG, bgRampInfo );
+	return buildRamp( seed, config, bgRampInfo );
 }
 
 /**
@@ -71,14 +107,32 @@ export function buildAccentRamp(
  * @param params
  * @param params.bgRamp
  * @param params.accentRamps
+ * @param params.contrast    The contrast value the ramps were built with.
  */
 export function checkAccessibleCombinations( {
 	bgRamp,
 	accentRamps = [],
+	contrast = 0,
 }: {
 	bgRamp: InternalRampResult;
 	accentRamps?: InternalRampResult[];
+	contrast?: number;
 } ) {
+	const level = quantizeContrast( contrast );
+	const { bg: scaledConfig } = getRampConfigs( level );
+	// Scale each combination's target by as much as its foreground step's own
+	// target was scaled, so strokes, held fill text and floors are respected.
+	const combinations = CONTRAST_COMBINATIONS.map( ( combination ) => {
+		const scale = Math.min(
+			...combination.fgs.map(
+				( fg ) =>
+					scaledConfig[ fg ].contrast.target /
+					BG_RAMP_CONFIG[ fg ].contrast.target
+			)
+		);
+		return { ...combination, target: combination.target * scale };
+	} );
+
 	const unmetTargets: {
 		bgName: keyof Ramp;
 		bgColor: string;
@@ -90,7 +144,7 @@ export function checkAccessibleCombinations( {
 
 	// Assess combinations within each ramp
 	[ bgRamp, ...accentRamps ].forEach( ( ramp ) => {
-		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+		combinations.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
 					const bgColor = ramp.ramp[ bg ];
@@ -112,7 +166,7 @@ export function checkAccessibleCombinations( {
 	} );
 	// Assess each accent ramp's fg color against bg ramp
 	accentRamps.forEach( ( ramp ) => {
-		CONTRAST_COMBINATIONS.forEach( ( { bgs, fgs, target } ) => {
+		combinations.forEach( ( { bgs, fgs, target } ) => {
 			for ( const bg of bgs ) {
 				for ( const fg of fgs ) {
 					const bgColor = bgRamp.ramp[ bg ];

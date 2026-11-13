@@ -18,11 +18,11 @@ This README is the entry point for package consumers. It covers how to load desi
 
 ## Public API
 
-| Entrypoint                           | Supported use                                                                                                                                                         |
-| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@wordpress/theme`                   | `ThemeProvider` and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
-| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document.                                                                                                |
-| `@wordpress/theme/design-tokens.js`  | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles.                                                                    |
+| Entrypoint                           | Supported use                                                                                                                                                                                                                  |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `@wordpress/theme`                   | `ThemeProvider`, the `contrastLevels` values for its `contrast` setting, and the generated token scale types, such as `PaddingSize` and `GapSize`. Derive provider props and callback types from the component as shown below. |
+| `@wordpress/theme/design-tokens.css` | Default semantic `--wpds-*` custom properties. Load once per document.                                                                                                                                                         |
+| `@wordpress/theme/design-tokens.js`  | Default token-name array, plus `tokens` metadata and `groups` named exports. Does not load styles.                                                                                                                             |
 
 The `privateApis` export exists for temporary compatibility with older WordPress bundles. It is not a supported consumer API. Token source JSON, ramp builders, generated fallback maps, and other paths not listed in the package's `exports` are implementation details.
 
@@ -224,6 +224,82 @@ The `cursor` prop accepts an object with the following optional properties:
 - `control`: The cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). Accepts `'default'` or `'pointer'` (default: `'pointer'`).
 
 The `cornerRadius` prop sets the overall roundness preset for the theme subtree. Accepts `'none'` (square corners), `'subtle'`, `'moderate'`, or `'pronounced'` (most rounded) (default: `'subtle'`). This scales the primitive `--wpds-border-radius-*` tokens for the provider subtree. The preset sets the overall amount of roundness, not an individual border-radius token size.
+
+### Contrast
+
+The `contrast` prop adjusts contrast across all generated colors with one value, from `-1` (lowest) to `1` (highest). `0` keeps the standard colors. Values outside the range are clamped, and values are rounded to steps of `0.1`.
+
+```tsx
+import { ThemeProvider, contrastLevels } from '@wordpress/theme';
+
+function App() {
+	return (
+		<ThemeProvider contrast={ contrastLevels.enhanced }>
+			{ /* Your app content */ }
+		</ThemeProvider>
+	);
+}
+```
+
+`contrastLevels` exports documented values, so you can offer them as a choice or use them as the ends of a slider:
+
+- `minimum` (`-1`): the softest theme. Weak text and strokes no longer meet WCAG AA contrast.
+- `standard` (`0`): the default colors.
+- `enhanced` (`1`): every text role, including weak text and text on solid fills, reaches at least 7:1 (WCAG AAA).
+
+Lower contrast is a user preference, not a default. Some things don't follow the scale all the way:
+
+- Focus indicators keep at least 3:1 at every value.
+- Solid fills and their text, such as buttons and their labels, keep their standard contrast below `0`.
+- Strokes soften faster than text below `0`, down to a minimum that keeps field edges visible.
+- Above `0`, weak text keeps its distance from body text, so text hierarchy stays visible on dark backgrounds.
+
+The seeds can be adjusted at positive values. A mid-tone primary seed is darkened or lightened so the text on it stays readable, and a dark background seed is moved towards black to leave room for stronger text. A near-white background barely moves. At `0` and below, the background seed is used as it is. To dim the page for users who prefer less glare, choose a different background seed rather than lowering contrast.
+
+`onColorWarnings` checks semantic pairs against minimums that follow the setting. On dark backgrounds, the strongest status strokes (`stroke4`) can't reach their higher target at positive values, and are reported as ramp warnings.
+
+Any value other than `0` generates every color ramp at runtime, instead of using the prebuilt default ramps. The colors are recalculated in a deferred update, so a slider stays responsive while the theme catches up.
+
+To follow the user's operating system preference, connect `prefers-contrast` to the setting:
+
+```tsx
+import { useEffect, useState } from '@wordpress/element';
+import { ThemeProvider, contrastLevels } from '@wordpress/theme';
+
+function useSystemContrast() {
+	const [ contrast, setContrast ] = useState( contrastLevels.standard );
+	useEffect( () => {
+		const more = window.matchMedia( '(prefers-contrast: more)' );
+		const less = window.matchMedia( '(prefers-contrast: less)' );
+		const update = () =>
+			setContrast(
+				more.matches
+					? contrastLevels.enhanced
+					: less.matches
+						? contrastLevels.minimum
+						: contrastLevels.standard
+			);
+		update();
+		more.addEventListener( 'change', update );
+		less.addEventListener( 'change', update );
+		return () => {
+			more.removeEventListener( 'change', update );
+			less.removeEventListener( 'change', update );
+		};
+	}, [] );
+	return contrast;
+}
+
+function App() {
+	return (
+		<ThemeProvider contrast={ useSystemContrast() }>
+			{ /* Your app content */ }
+		</ThemeProvider>
+	);
+}
+```
+
+Like the other settings, `contrast` inherits from the closest parent `ThemeProvider` when omitted.
 
 ### Light and dark themes
 

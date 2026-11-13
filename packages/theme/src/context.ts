@@ -10,5 +10,6 @@ export const ThemeContext = createContext< ThemeContextType >( {
 		color: {},
 		cursor: undefined,
 		cornerRadius: undefined,
+		contrast: undefined,
 	},
 } );

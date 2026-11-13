@@ -44,10 +44,17 @@ function buildDependencyGraph( config: RampConfig ): {
 			dependents.get( reference )!.push( step );
 		}
 
-		// Add dependency for sameAsIfPossible
-		if ( stepConfig.sameAsIfPossible ) {
-			dependencies.get( step )!.push( stepConfig.sameAsIfPossible );
-			dependents.get( stepConfig.sameAsIfPossible )!.push( step );
+		// Add dependencies for sameAsIfPossible and the steps a step is
+		// limited by.
+		for ( const dependency of [
+			stepConfig.sameAsIfPossible,
+			stepConfig.minimumContrastWith?.step,
+			stepConfig.maxRatioBelow?.step,
+		] ) {
+			if ( dependency ) {
+				dependencies.get( step )!.push( dependency );
+				dependents.get( dependency )!.push( step );
+			}
 		}
 	} );
 
@@ -123,6 +130,12 @@ export function stepsForStep(
 		stepConfig.contrast.additionalReferences?.forEach( visit );
 		if ( stepConfig.sameAsIfPossible ) {
 			visit( stepConfig.sameAsIfPossible );
+		}
+		if ( stepConfig.minimumContrastWith ) {
+			visit( stepConfig.minimumContrastWith.step );
+		}
+		if ( stepConfig.maxRatioBelow ) {
+			visit( stepConfig.maxRatioBelow.step );
 		}
 
 		result.add( step );

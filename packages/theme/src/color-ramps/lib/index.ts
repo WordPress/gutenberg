@@ -20,7 +20,12 @@ import type {
 	RampConfig,
 	RampResult,
 } from './types.ts';
-import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
+import {
+	BLACK,
+	WHITE,
+	CONTRAST_EPSILON,
+	CONTRAST_ROUNDING_MARGIN,
+} from './constants.ts';
 
 /**
  * Calculate a complete color ramp based on the provided configuration.
@@ -68,6 +73,9 @@ function calculateRamp( {
 		const {
 			contrast,
 			lightness: stepLightnessConstraint,
+			lightnessExponent,
+			maxRatioBelow,
+			minimumContrastWith,
 			taperChromaOptions,
 			sameAsIfPossible,
 		} = config[ stepName ];
@@ -154,14 +162,32 @@ function calculateRamp( {
 				type: 'force',
 			} as const;
 		} else if ( stepLightnessConstraint ) {
+			let maxContrast: number | undefined;
+			if ( maxRatioBelow ) {
+				const limitingColor = calculatedColors.get(
+					maxRatioBelow.step
+				);
+				if ( ! limitingColor ) {
+					throw new Error(
+						`Ratio step for step ${ stepName } not found: ${ maxRatioBelow.step }`
+					);
+				}
+				maxContrast = Math.max(
+					getContrast( referenceColor, limitingColor ) /
+						maxRatioBelow.ratio,
+					adjustedTarget
+				);
+			}
 			lightnessConstraint = {
 				value: stepLightnessConstraint( computedDir ),
 				type: 'onlyIfSucceeds',
+				exponent: lightnessExponent,
+				maxContrast,
 			} as const;
 		}
 
 		// Calculate the color meeting the requirements
-		const searchResults = findColorMeetingRequirements(
+		let searchResults = findColorMeetingRequirements(
 			referenceColor,
 			seed,
 			adjustedTarget,
@@ -172,10 +198,41 @@ function calculateRamp( {
 			}
 		);
 
+		// Apply the second minimum, if any, by moving the color away from
+		// that step until it meets it.
+		if ( minimumContrastWith ) {
+			const floorColor = calculatedColors.get( minimumContrastWith.step );
+			if ( ! floorColor ) {
+				throw new Error(
+					`Minimum contrast step for step ${ stepName } not found: ${ minimumContrastWith.step }`
+				);
+			}
+			// A visual floor rather than an accessibility target, so it skips
+			// the rounding margin that would lift it above its value at 0.
+			const floorTarget = minimumContrastWith.target;
+			if (
+				getContrast( searchResults.color, floorColor ) < floorTarget
+			) {
+				const awayFromFloor: RampDirection =
+					get( referenceColor, [ OKLCH, 'l' ] ) >=
+					get( floorColor, [ OKLCH, 'l' ] )
+						? 'lighter'
+						: 'darker';
+				searchResults = findColorMeetingRequirements(
+					floorColor,
+					seed,
+					floorTarget,
+					awayFromFloor,
+					{ taperChromaOptions }
+				);
+			}
+		}
+
 		// When the target contrast is not met, take note of it and use
 		// that information to guide the ramp calculation bisection.
 		if (
 			! contrast.ignoreWhenAdjustingSeed &&
+			! contrast.skipSeedAdjustment &&
 			searchResults.deficit &&
 			searchResults.deficit > maxDeficit
 		) {
@@ -316,8 +373,23 @@ export function buildRamp(
 	// alone cannot establish their contrast after serialization.
 	const serializedSeed = getColorString( seed );
 	const warnings = sortedSteps.filter( ( stepName ) => {
-		const { contrast } = config[ stepName ];
+		const { contrast, minimumContrastWith } = config[ stepName ];
 		if ( contrast.ignoreWhenAdjustingSeed ) {
+			return false;
+		}
+
+		// A met second minimum takes precedence: it can move the color closer
+		// to its reference than the target on purpose. It is searched without
+		// the rounding margin, so allow the search's tolerance here.
+		if (
+			minimumContrastWith &&
+			getContrast(
+				bestRamp[ stepName ],
+				bestRamp[ minimumContrastWith.step ]
+			) >=
+				( minimumContrastWith.target * Math.exp( -CONTRAST_EPSILON ) ) /
+					( 1 + CONTRAST_ROUNDING_MARGIN )
+		) {
 			return false;
 		}
 
