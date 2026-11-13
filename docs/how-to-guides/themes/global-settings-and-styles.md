@@ -571,6 +571,43 @@ body {
 
 Note that the name of the variable is created by adding `--` in between each nesting level and `camelCase` fields are transformed to `kebab-case`.
 
+#### Settings enabled per block by WordPress
+
+WordPress enables some settings for specific blocks in its [default `theme.json`](https://github.com/WordPress/wordpress-develop/blob/trunk/src/wp-includes/theme.json). A setting for a block takes precedence over the same setting at the top level, so disabling one of these settings at the top level of a theme's `theme.json` does not disable it for these blocks:
+
+| Block | Settings enabled by WordPress |
+| --- | --- |
+| `core/button` | `border.radius`, `dimensions.width` |
+| `core/icon` | `dimensions.width` |
+| `core/image` | `lightbox.allowEditing` |
+| `core/pullquote` | `border.color`, `border.radius`, `border.style`, `border.width` |
+
+To disable one of them, set it for the block under `settings.blocks`. For example, to remove all border controls, including those of the Pullquote block:
+
+```json
+{
+	"version": 3,
+	"settings": {
+		"border": {
+			"color": false,
+			"radius": false,
+			"style": false,
+			"width": false
+		},
+		"blocks": {
+			"core/pullquote": {
+				"border": {
+					"color": false,
+					"radius": false,
+					"style": false,
+					"width": false
+				}
+			}
+		}
+	}
+}
+```
+
 #### Settings examples
 
 - Enable custom colors only for the paragraph block:
