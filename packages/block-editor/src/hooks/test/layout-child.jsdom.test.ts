@@ -176,6 +176,63 @@ describe( 'layout child', () => {
 	} );
 
 	describe( 'getUpdatedChildLayoutStyle()', () => {
+		it( 'restores inherited grid placement when viewport overrides are reset', () => {
+			const baseLayout = {
+				columnStart: 2,
+				rowStart: 3,
+				columnSpan: 2,
+				rowSpan: 3,
+			};
+			const style = getUpdatedChildLayoutStyle(
+				{
+					layout: baseLayout,
+					'@tablet': { layout: { columnSpan: 1 } },
+					'@mobile': {
+						color: { text: '#000' },
+						layout: {
+							columnStart: null,
+							rowStart: null,
+							columnSpan: 1,
+							rowSpan: 1,
+						},
+					},
+				},
+				{
+					columnStart: undefined,
+					rowStart: undefined,
+					columnSpan: undefined,
+					rowSpan: undefined,
+				},
+				{ viewport: '@mobile', pseudo: 'default' }
+			);
+			expect( style ).toEqual( {
+				layout: baseLayout,
+				'@tablet': { layout: { columnSpan: 1 } },
+				'@mobile': { color: { text: '#000' } },
+			} );
+			expect(
+				getResponsiveChildLayoutStyles( { style, selector: '.test' } )
+			).not.toContain( '@media (width <= 480px)' );
+		} );
+
+		it( 'generates viewport auto-placement while preserving the default position and spans', () => {
+			const style = getUpdatedChildLayoutStyle(
+				{ layout: { columnStart: 2, rowStart: 3, columnSpan: 2 } },
+				{ columnStart: null, rowStart: null },
+				{ viewport: '@mobile', pseudo: 'default' }
+			);
+			expect( style?.layout ).toEqual( {
+				columnStart: 2,
+				rowStart: 3,
+				columnSpan: 2,
+			} );
+			expect(
+				getResponsiveChildLayoutStyles( { style, selector: '.test' } )
+			).toBe(
+				'@media (width <= 480px){.test {\n\t\tgrid-column: span 2; grid-row: auto;\n\t}}'
+			);
+		} );
+
 		it( 'stores resizer changes in the selected viewport when no default child layout exists', () => {
 			const style = getUpdatedChildLayoutStyle(
 				undefined,

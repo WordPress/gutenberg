@@ -146,9 +146,6 @@ describe( 'ChildLayoutControl', () => {
 		);
 
 		expect( onChange ).toHaveBeenCalledWith( {
-			columnStart: undefined,
-			rowStart: undefined,
-			rowSpan: undefined,
 			columnSpan: 1,
 		} );
 	} );

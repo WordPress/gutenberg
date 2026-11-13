@@ -1,6 +1,7 @@
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
+	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
 import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import type { BlockStyleState, ChildLayoutBlockStyle } from '../../hooks/types';
@@ -39,17 +40,22 @@ export function getAutoGridItemStyleAfterDrop(
 		...selectedState,
 		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
 	} );
-	if (
-		! isPlainObject( stateStyle?.layout ) ||
-		! hasExplicitGridPlacement( stateStyle.layout )
-	) {
+	const baseLayout = isPlainObject( style.layout ) ? style.layout : {};
+	const stateLayout = isPlainObject( stateStyle?.layout )
+		? stateStyle.layout
+		: {};
+	if ( ! hasExplicitGridPlacement( { ...baseLayout, ...stateLayout } ) ) {
 		return { shouldReset: false };
 	}
+	// Dropping explicitly chooses auto placement instead of inheriting a pin.
+	const automaticStart = hasViewportBlockStyleState( selectedState )
+		? null
+		: undefined;
 
 	return {
 		style: getUpdatedChildLayoutStyle(
 			style as ChildLayoutBlockStyle,
-			{ columnStart: undefined, rowStart: undefined },
+			{ columnStart: automaticStart, rowStart: automaticStart },
 			selectedState
 		),
 		shouldReset: true,

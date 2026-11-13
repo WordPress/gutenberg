@@ -78,21 +78,25 @@ function helpText(
  *
  * @param props                      Props.
  * @param props.value                The child layout value.
+ * @param props.inheritedValue       The default child layout inherited by the selected viewport.
  * @param props.onChange             Function to update the child layout value.
  * @param props.parentLayout         The parent layout value.
  *
  * @param props.isShownByDefault     Whether the control is shown by default.
  * @param props.panelId              The panel ID.
  * @param props.showGridSpanDefaults Whether unset grid span controls should show default values.
+ * @param props.isViewportState      Whether the controls edit a viewport style state.
  * @return child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},
+	inheritedValue,
 	onChange,
 	parentLayout,
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults = true,
+	isViewportState = false,
 }: ChildLayoutControlProps ) {
 	const {
 		type: parentType,
@@ -103,7 +107,7 @@ export default function ChildLayoutControl( {
 	if ( parentLayoutType === 'flex' ) {
 		return (
 			<FlexControls
-				childLayout={ childLayout }
+				childLayout={ { ...inheritedValue, ...childLayout } }
 				onChange={ onChange }
 				parentLayout={ parentLayout }
 				isShownByDefault={ isShownByDefault }
@@ -114,11 +118,13 @@ export default function ChildLayoutControl( {
 		return (
 			<GridControls
 				childLayout={ childLayout }
+				inheritedValue={ inheritedValue }
 				onChange={ onChange }
 				parentLayout={ parentLayout }
 				isShownByDefault={ isShownByDefault }
 				panelId={ panelId }
 				showGridSpanDefaults={ showGridSpanDefaults }
+				isViewportState={ isViewportState }
 			/>
 		);
 	}
@@ -258,28 +264,38 @@ export function childLayoutOrientation(
  *
  * @param value             The input value.
  * @param isManualPlacement Whether the parent grid uses manual placement.
+ * @param isViewportState   Whether a viewport style state is selected.
  *
- * @return The start position, or undefined for automatic placement.
+ * @return The start position, or null/undefined for automatic placement.
  */
 function parseGridStartValue(
 	value: string,
-	isManualPlacement: boolean | undefined
+	isManualPlacement: boolean | undefined,
+	isViewportState: boolean | undefined
 ) {
 	if ( value === '' ) {
-		return isManualPlacement ? 1 : undefined;
+		if ( isManualPlacement ) {
+			return 1;
+		}
+		return isViewportState ? null : undefined;
 	}
 	return parseInt( value, 10 );
 }
 
 function GridControls( {
 	childLayout,
+	inheritedValue,
 	onChange,
 	parentLayout,
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults,
+	isViewportState,
 }: ChildLayoutControlsProps ) {
-	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
+	const { columnStart, rowStart, columnSpan, rowSpan } = {
+		...inheritedValue,
+		...childLayout,
+	};
 	const { columnCount, rowCount } = parentLayout ?? {};
 	const isManualPlacement =
 		parentLayout?.isManualPlacement ??
@@ -293,8 +309,11 @@ function GridControls( {
 		rootClientId,
 		columnCount || 3
 	);
-	const hasStartValue = () => !! columnStart || !! rowStart;
-	const hasSpanValue = () => !! columnSpan || !! rowSpan;
+	const hasStartValue = () =>
+		childLayout.columnStart !== undefined ||
+		childLayout.rowStart !== undefined;
+	const hasSpanValue = () =>
+		!! childLayout.columnSpan || !! childLayout.rowSpan;
 	const resetGridStarts = () => {
 		onChange( {
 			columnStart: undefined,
@@ -351,9 +370,6 @@ function GridControls( {
 								: newColumnSpan;
 
 							onChange( {
-								columnStart,
-								rowStart,
-								rowSpan,
 								columnSpan: constrainedValue,
 							} );
 						} }
@@ -378,9 +394,6 @@ function GridControls( {
 								: newRowSpan;
 
 							onChange( {
-								columnStart,
-								rowStart,
-								columnSpan,
 								rowSpan: constrainedValue,
 							} );
 						} }
@@ -405,6 +418,10 @@ function GridControls( {
 						label={ __( 'Grid placement' ) }
 						onDeselect={ resetGridStarts }
 						isShownByDefault={ false }
+						defaultShown={
+							!! inheritedValue?.columnStart ||
+							!! inheritedValue?.rowStart
+						}
 						panelId={ panelId }
 					/>
 				}
@@ -419,14 +436,15 @@ function GridControls( {
 						onValueChange={ ( value ) => {
 							const newColumnStart = parseGridStartValue(
 								value,
-								isManualPlacement
+								isManualPlacement,
+								isViewportState
 							);
 							onChange( {
 								columnStart: newColumnStart,
 							} );
 							if (
 								isManualPlacement &&
-								newColumnStart !== undefined
+								typeof newColumnStart === 'number'
 							) {
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
@@ -442,7 +460,7 @@ function GridControls( {
 							}
 						} }
 						value={
-							columnStart === undefined
+							columnStart === undefined || columnStart === null
 								? ''
 								: String( columnStart )
 						}
@@ -461,14 +479,15 @@ function GridControls( {
 						onValueChange={ ( value ) => {
 							const newRowStart = parseGridStartValue(
 								value,
-								isManualPlacement
+								isManualPlacement,
+								isViewportState
 							);
 							onChange( {
 								rowStart: newRowStart,
 							} );
 							if (
 								isManualPlacement &&
-								newRowStart !== undefined
+								typeof newRowStart === 'number'
 							) {
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
@@ -484,7 +503,9 @@ function GridControls( {
 							}
 						} }
 						value={
-							rowStart === undefined ? '' : String( rowStart )
+							rowStart === undefined || rowStart === null
+								? ''
+								: String( rowStart )
 						}
 						min={ 1 }
 						max={

@@ -17,7 +17,10 @@ export function hasExplicitGridPlacement( layout: {
 	columnStart?: unknown;
 	rowStart?: unknown;
 } ) {
-	return layout.columnStart !== undefined || layout.rowStart !== undefined;
+	return (
+		( layout.columnStart !== undefined && layout.columnStart !== null ) ||
+		( layout.rowStart !== undefined && layout.rowStart !== null )
+	);
 }
 
 export function range( start: number, length: number ) {

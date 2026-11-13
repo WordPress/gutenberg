@@ -145,6 +145,11 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {
 			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		} else if (
+			hasViewportOverride( 'columnStart' ) &&
+			columnStart === null
+		) {
+			declarations[ 'grid-column' ] = 'auto';
 		}
 	}
 
@@ -159,6 +164,8 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-row' ] = `${ rowStart }`;
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		} else if ( hasViewportOverride( 'rowStart' ) && rowStart === null ) {
+			declarations[ 'grid-row' ] = 'auto';
 		}
 	}
 

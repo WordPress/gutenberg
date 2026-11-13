@@ -12,8 +12,8 @@ import type { GridRect } from './utils';
  * The position and size of a block within its grid, from `style.layout`.
  */
 export interface GridItemLayout {
-	columnStart?: number;
-	rowStart?: number;
+	columnStart?: number | null;
+	rowStart?: number | null;
 	columnSpan?: number;
 	rowSpan?: number;
 	[ key: string ]: unknown;
@@ -31,8 +31,8 @@ export interface GridItemAttributes {
  * The area of a grid a `GridRect` covers. Spans take precedence over ends.
  */
 export interface GridRectOptions {
-	columnStart?: number;
-	rowStart?: number;
+	columnStart?: number | null;
+	rowStart?: number | null;
 	columnEnd?: number;
 	rowEnd?: number;
 	columnSpan?: number;

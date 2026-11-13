@@ -11,6 +11,7 @@ import { useStateWithHistory } from '@wordpress/compose';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 import useBlockSync from '../../provider/use-block-sync';
 import useOnBlockDrop from '../../use-on-block-drop';
 import useAutoGridDrop from '../use-auto-grid-drop';
@@ -47,7 +48,13 @@ describe( 'useAutoGridDrop', () => {
 			targetBlockIndex: 1,
 			expectedOrder: [ 'item', 'sibling' ] as const,
 		},
-	] )( '$name', ( { targetBlockIndex, expectedOrder } ) => {
+		{
+			name: 'unpins inherited placement only in the selected viewport when dropped',
+			targetBlockIndex: 2,
+			expectedOrder: [ 'sibling', 'item' ] as const,
+			viewport: '@mobile',
+		},
+	] )( '$name', ( { targetBlockIndex, expectedOrder, viewport } ) => {
 		const registry = createRegistry();
 		registry.register( blocksStore );
 		registry.register( blockEditorStore );
@@ -87,6 +94,11 @@ describe( 'useAutoGridDrop', () => {
 
 		// Pinning the item is a separate edit that undoing the drop must preserve.
 		act( () => {
+			if ( viewport ) {
+				unlock(
+					registry.dispatch( blockEditorStore )
+				).setStyleStateViewport( viewport );
+			}
 			registry
 				.dispatch( blockEditorStore )
 				.updateBlockAttributes( item.clientId, {
@@ -123,13 +135,22 @@ describe( 'useAutoGridDrop', () => {
 			registry
 				.select( blockEditorStore )
 				.getBlockAttributes( item.clientId )?.style
-		).toEqual( {
-			layout: {
-				columnStart: undefined,
-				rowStart: undefined,
-				columnSpan: 2,
-			},
-		} );
+		).toEqual(
+			viewport
+				? {
+						layout: { columnStart: 2, rowStart: 3, columnSpan: 2 },
+						'@mobile': {
+							layout: { columnStart: null, rowStart: null },
+						},
+					}
+				: {
+						layout: {
+							columnStart: undefined,
+							rowStart: undefined,
+							columnSpan: 2,
+						},
+					}
+		);
 
 		act( () => result.current.undo() );
 		expect( registry.select( blockEditorStore ).getBlocks() ).toEqual(

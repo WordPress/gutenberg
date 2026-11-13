@@ -43,4 +43,41 @@ describe( 'getAutoGridItemStyleAfterDrop', () => {
 			)
 		).toEqual( { shouldReset: false } );
 	} );
+
+	it( 'returns an inherited pinned child to auto placement only in the selected viewport', () => {
+		const baseLayout = { columnStart: 2, rowStart: 3, columnSpan: 2 };
+		const result = getAutoGridItemStyleAfterDrop(
+			{ type: 'grid' },
+			{ layout: baseLayout, '@mobile': { color: { text: '#000' } } },
+			{ viewport: '@mobile', pseudo: 'default' }
+		);
+		expect( result ).toEqual( {
+			shouldReset: true,
+			style: {
+				layout: baseLayout,
+				'@mobile': {
+					color: { text: '#000' },
+					layout: { columnStart: null, rowStart: null },
+				},
+			},
+		} );
+		expect( JSON.parse( JSON.stringify( result.style ) ) ).toEqual(
+			result.style
+		);
+	} );
+
+	it( 'does not reset a child already auto-placed in the selected viewport', () => {
+		expect(
+			getAutoGridItemStyleAfterDrop(
+				{ type: 'grid' },
+				{
+					layout: { columnStart: 2, rowStart: 3 },
+					'@mobile': {
+						layout: { columnStart: null, rowStart: null },
+					},
+				},
+				{ viewport: '@mobile', pseudo: 'default' }
+			)
+		).toEqual( { shouldReset: false } );
+	} );
 } );

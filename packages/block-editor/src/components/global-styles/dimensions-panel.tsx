@@ -360,6 +360,7 @@ export default function DimensionsPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	inheritedChildLayout,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -743,14 +744,12 @@ export default function DimensionsPanel( {
 	const hasAspectRatioValue = () =>
 		hasValue( value?.dimensions?.aspectRatio );
 
-	// Child Layout. There is no Global Styles inheritance model for the
-	// child-layout sub-keys (`selfStretch`, `flexSize`, `columnStart`,
-	// `rowStart`, `columnSpan`, `rowSpan`); they are per-block attributes
-	// only. Render the local value directly so user-set overrides are
-	// reflected in the control rather than washed out by a misshapen
-	// inherited layout payload.
+	/* There is no Global Styles inheritance model for the
+	 * child-layout sub-keys; they are per-block attributes
+	 * only. But viewport states inherit their default values
+	 * so they can be unset per viewport.
+	 */
 	const showChildLayoutControl = hasChildLayout( settings, styleState );
-	// The block's layout style holds its child layout.
 	const childLayout = value?.layout as ChildLayout | undefined;
 
 	const setChildLayout = ( newChildLayout: ChildLayout ) => {
@@ -1036,6 +1035,7 @@ export default function DimensionsPanel( {
 			{ showChildLayoutControl && (
 				<ChildLayoutControl
 					value={ childLayout }
+					inheritedValue={ inheritedChildLayout }
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
 					// The block inspector passes the block's client ID here.
@@ -1043,6 +1043,7 @@ export default function DimensionsPanel( {
 					showGridSpanDefaults={
 						! hasViewportBlockStyleState( styleState )
 					}
+					isViewportState={ hasViewportBlockStyleState( styleState ) }
 					isShownByDefault={
 						defaultControls.childLayout ??
 						DEFAULT_CONTROLS.childLayout
