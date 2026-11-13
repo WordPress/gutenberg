@@ -203,6 +203,10 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 		}
 	}
 	tbody {
+		// Passed on to the rows, so the fade at their end has a color to
+		// fade into.
+		background-color: inherit;
+
 		td {
 			vertical-align: top;
 		}
