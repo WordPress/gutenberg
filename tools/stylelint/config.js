@@ -58,7 +58,7 @@ module.exports = {
 					if ( fontFamily ) {
 						return `Avoid using the \`$font-family-${ fontFamily }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamily ] }\` instead.`;
 					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are being removed from the components package.`;
 				},
 			},
 		],
