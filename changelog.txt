@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 24.4.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Table: Keep the selected cell on the first click into an unselected table. ([86757](https://github.com/WordPress/gutenberg/pull/86757))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@shreyasikhar
+
+
 = 24.4.0 =
 
 ## Changelog
