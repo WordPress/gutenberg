@@ -182,12 +182,9 @@ function UploadFonts() {
 		const isItalic = subfamily.toLowerCase().includes( 'italic' );
 		const fontWeight =
 			font.opentype.tables[ 'OS/2' ]!.usWeightClass || 'normal';
-		const isVariable = !! font.opentype.tables.fvar;
-		const weightAxis =
-			isVariable &&
-			font.opentype.tables.fvar!.axes.find(
-				( { tag } ) => tag === 'wght'
-			);
+		const weightAxis = font.opentype.tables.fvar?.axes.find(
+			( { tag } ) => tag === 'wght'
+		);
 		const weightRange = weightAxis
 			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
 			: null;
