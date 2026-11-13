@@ -9,6 +9,7 @@ import {
 import {
 	getActiveUploadCount,
 	getFailureCount,
+	getWarnings,
 	getActiveImageProcessingCount,
 	getActiveVideoProcessingCount,
 	getFailedItems,
@@ -41,6 +42,28 @@ describe( 'selectors', () => {
 			};
 
 			expect( getFailureCount( state ) ).toBe( 3 );
+		} );
+	} );
+
+	describe( 'getWarnings', () => {
+		it( 'should return the upload warnings', () => {
+			const warnings = [
+				{ id: '1', code: 'GENERAL', message: 'Missing sizes' },
+			];
+			const state: State = {
+				queue: [],
+				queueStatus: 'active',
+				failureCount: 0,
+				warnings,
+				blobUrls: {},
+				settings: {
+					mediaUpload: vi.fn(),
+					maxConcurrentUploads: 5,
+					maxConcurrentImageProcessing: 2,
+				},
+			};
+
+			expect( getWarnings( state ) ).toBe( warnings );
 		} );
 	} );
 

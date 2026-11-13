@@ -374,6 +374,64 @@ describe( 'private actions', () => {
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
+		it.each( [
+			[
+				'the storage limit',
+				{ code: ErrorCode.STORAGE_LIMIT_REACHED },
+				ErrorCode.STORAGE_LIMIT_REACHED,
+				'"photo.jpg" was uploaded, but not all of its image sizes could be saved because this site is out of storage space.',
+			],
+			[
+				'another failure',
+				new Error( 'Network request failed' ),
+				ErrorCode.GENERAL,
+				'"photo.jpg" was uploaded, but not all of its image sizes could be saved.',
+			],
+		] )(
+			'should warn when %s left a sub-size out',
+			async ( _cause, subSizeError, code, message ) => {
+				const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+				const finishOperation = vi.fn();
+				const select = {
+					getItem: () => ( {
+						attachment: { id: 42 },
+						sourceFile: { name: 'photo.jpg' },
+						subSizeError,
+					} ),
+					getSettings: () => ( { mediaFinalize } ),
+				};
+				const dispatch = Object.assign( vi.fn(), { finishOperation } );
+
+				const thunk = finalizeItem( 'test-id' );
+				await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+				expect( dispatch ).toHaveBeenCalledWith( {
+					type: Type.AddWarning,
+					warning: { id: 'test-id', code, message },
+				} );
+				expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
+			}
+		);
+
+		it( 'should not warn when every sub-size was saved', async () => {
+			const mediaFinalize = vi.fn().mockResolvedValue( undefined );
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					subSizes: mockSubSizes,
+				} ),
+				getSettings: () => ( { mediaFinalize } ),
+			};
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+			} );
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+			expect( dispatch ).not.toHaveBeenCalled();
+		} );
+
 		it( 'should not call mediaFinalize when no callback is provided', async () => {
 			const finishOperation = vi.fn();
 			const select = {
