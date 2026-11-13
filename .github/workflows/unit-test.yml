@@ -62,6 +62,9 @@ jobs:
                           # Documentation.
                           - '!**/*.md'
                           - '!{backport-changelog,docs}/**'
+                          # Storybook, except its unit tests and the top-level modules they import.
+                          - '!storybook/!(test)/**/*'
+                          - '!storybook/*.!(ts)'
                           # Development tooling and its configuration.
                           - '!tools/{docs,eslint,stylelint}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'

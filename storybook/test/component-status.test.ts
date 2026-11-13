@@ -13,10 +13,11 @@ const { DENYLIST } = createRequire( import.meta.url )(
 	path.join( ROOT_DIR, RULE_FILE )
 ) as { DENYLIST: Record< string, Record< string, string > > };
 
-const NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY: Record< string, string > = {
-	NumberControl:
-		'#81658 kept `__experimentalNumberControl` off the denylist: `InputControl` from `@wordpress/ui` does not clamp to `min` and `max` or align to `step` on blur, so existing usages migrate with caution.',
-};
+const NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY = [
+	// Kept off the denylist in #81658: `InputControl` from `@wordpress/ui`
+	// does not clamp to `min` and `max` or align to `step` on blur.
+	'NumberControl',
+];
 
 type Story = {
 	file: string;
@@ -173,7 +174,9 @@ describe( '@wordpress/components recommendation status', () => {
 			.filter(
 				( { component, kind } ) =>
 					kind !== 'missing-denylist-entry' ||
-					! NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY[ component ]
+					! NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY.includes(
+						component
+					)
 			)
 			.map( ( { message } ) => message );
 
@@ -186,14 +189,12 @@ describe( '@wordpress/components recommendation status', () => {
 				.filter( ( { kind } ) => kind === 'missing-denylist-entry' )
 				.map( ( { component } ) => component )
 		);
-		const staleExceptions = Object.keys(
-			NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY
-		)
-			.filter( ( component ) => ! missingEntries.has( component ) )
-			.map(
-				( component ) =>
-					`${ component } no longer needs an entry in NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY in this test. Remove it.`
-			);
+		const staleExceptions = NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY.filter(
+			( component ) => ! missingEntries.has( component )
+		).map(
+			( component ) =>
+				`${ component } no longer needs an entry in NOT_RECOMMENDED_WITHOUT_DENYLIST_ENTRY in this test. Remove it.`
+		);
 
 		expect( staleExceptions ).toEqual( [] );
 	} );
