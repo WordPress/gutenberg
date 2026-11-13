@@ -1445,6 +1445,11 @@ test.describe( 'Navigation block', () => {
 			// to prevent 404 errors.
 			await requestUtils.setupRest();
 
+			// Start from no pages: the Page List test expects Test Page 1
+			// first, and a page another describe or spec left on this
+			// worker's site (e.g. "Cat") would sort before it.
+			await requestUtils.deleteAllPages();
+
 			// Create test pages
 			testPage1 = await requestUtils.createPage( {
 				title: 'Test Page 1',
