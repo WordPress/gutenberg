@@ -277,6 +277,10 @@ export const AsyncItems: Story = {
 
 /**
  * The suggestion list can be rendered inline by enabling `inline` and `open`.
+ *
+ * To keep the items clear of a classic scrollbar, give `Autocomplete.ListBody` an
+ * inline-end padding. Also set `scrollbar-gutter: stable` on it, so that the
+ * items keep their width when the scrollbar appears or disappears.
  */
 export const Inline: Story = {
 	parameters: {
@@ -317,7 +321,14 @@ export const Inline: Story = {
 				<div style={ { marginTop: 8 } }>
 					<Autocomplete.Empty>No commands found.</Autocomplete.Empty>
 					<Autocomplete.List>
-						<Autocomplete.ListBody style={ { maxHeight: 200 } }>
+						<Autocomplete.ListBody
+							style={ {
+								maxHeight: 200,
+								scrollbarGutter: 'stable',
+								paddingInlineEnd:
+									'var(--wpds-dimension-padding-xs)',
+							} }
+						>
 							<Autocomplete.Collection>
 								{ ( command: FixtureItem ) => (
 									<Autocomplete.Item
@@ -793,6 +804,11 @@ export const Grid: Story = {
  * popover after a pick, control `open` on `Popover.Root` and set it to `false`
  * from each item's `onClick`. To open the popover somewhere other than its
  * trigger, such as at the caret, pass an `anchor` to `Popover.Positioner`.
+ *
+ * If the list scrolls, set `scrollbar-gutter: stable` on `Autocomplete.ListBody`
+ * to prevent width changes when its scrollbar appears or disappears. To keep
+ * the scrollbar clear of the last column, extend the list body into the popover's
+ * padding with a negative inline-end margin and the same inline-end padding.
  */
 export const InlineInPopover: Story = {
 	parameters: {
@@ -843,7 +859,14 @@ export const InlineInPopover: Story = {
 								</Autocomplete.Empty>
 								<Autocomplete.List aria-label="Emojis">
 									<Autocomplete.ListBody
-										style={ { maxHeight: 240 } }
+										style={ {
+											maxHeight: 240,
+											scrollbarGutter: 'stable',
+											marginInlineEnd:
+												'calc(-1 * var(--wpds-dimension-padding-lg))',
+											paddingInlineEnd:
+												'var(--wpds-dimension-padding-lg)',
+										} }
 									>
 										<Autocomplete.Collection>
 											{ (

@@ -1825,6 +1825,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/gallery/controls.jsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 1
+		},
+		"gutenberg/use-typescript": {
+			"count": 1
+		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/gallery/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1850,16 +1861,10 @@
 		}
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 3
-		},
-		"react-hooks/immutability": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -1950,14 +1955,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/gallery/test/use-get-new-images.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/gallery/test/variations.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1968,22 +1965,17 @@
 			"count": 1
 		}
 	},
+	"packages/block-library/src/gallery/use-apply-gallery-settings.ts": {
+		"no-restricted-syntax": {
+			"count": 1
+		}
+	},
 	"packages/block-library/src/gallery/use-dynamic-gallery.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/block-library/src/gallery/use-get-media.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/gallery/use-get-new-images.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/gallery/use-image-sizes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6695,7 +6687,7 @@
 	},
 	"packages/components/src/autocomplete/index.tsx": {
 		"react-hooks/refs": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {
@@ -6999,17 +6991,7 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/test/controls.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/test/privateAPIs.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/registry-selectors.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -11497,156 +11479,6 @@
 	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
-		}
-	},
-	"packages/rich-text/src/store/test/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/store/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/store/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/apply-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/concat.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/create.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-active-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-active-object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-format-type.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-format-types.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-text-content.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/helpers/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/insert-object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/insert.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-collapsed.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-empty.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-format-equal.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/join.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/normalise-formats.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/owns-selection.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/register-format-type.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/remove-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/replace.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/slice.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/split.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/to-dom.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/to-html-string.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/toggle-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/unregister-format-type.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/update-formats.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/server-side-render/src/server-side-render.tsx": {
