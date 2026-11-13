@@ -43,7 +43,7 @@ $transition-duration: 0.2s;
 		position: absolute;
 		box-sizing: border-box;
 		top: 0;
-		left: 0;
+		inset-inline-start: 0;
 		width: $toggle-thumb-width;
 		height: $toggle-height;
 		border: $toggle-border-width solid var(--wpds-color-stroke-interactive-neutral);
@@ -53,7 +53,7 @@ $transition-duration: 0.2s;
 
 		@media not (prefers-reduced-motion) {
 			transition:
-				$transition-duration transform ease,
+				$transition-duration inset-inline-start ease,
 				$transition-duration border-color ease;
 		}
 
@@ -82,7 +82,7 @@ $transition-duration: 0.2s;
 	}
 
 	svg.components-form-toggle__on-label {
-		left: $toggle-label-offset;
+		inset-inline-start: $toggle-label-offset;
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		@media ( forced-colors: active ) {
@@ -91,7 +91,7 @@ $transition-duration: 0.2s;
 	}
 
 	svg.components-form-toggle__off-label {
-		right: $toggle-label-offset;
+		inset-inline-end: $toggle-label-offset;
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		opacity: 1;
 
@@ -100,20 +100,13 @@ $transition-duration: 0.2s;
 		}
 	}
 
-	&:not(.is-checked, .is-disabled):hover {
-		.components-form-toggle__track,
-		.components-form-toggle__thumb {
+	// The hover and checked states follow the input rather than the `checked`
+	// prop, so they also work when the toggle is uncontrolled. `:where()` keeps
+	// them at a lower specificity than the disabled state.
+	:where(.components-form-toggle__input:not(:checked, :disabled):hover) {
+		~ .components-form-toggle__track,
+		~ .components-form-toggle__thumb {
 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
-		}
-	}
-
-	// Checked state.
-	&.is-checked .components-form-toggle__track {
-		background-color: var(--wpds-color-background-interactive-brand-strong);
-		border-color: transparent;
-
-		@media ( forced-colors: active ) {
-			background-color: Highlight;
 		}
 	}
 
@@ -121,22 +114,32 @@ $transition-duration: 0.2s;
 		@include outset-ring__focus();
 	}
 
-	&.is-checked {
-		.components-form-toggle__thumb {
+	// Checked state.
+	:where(.components-form-toggle__input:checked) {
+		~ .components-form-toggle__track {
+			background-color: var(--wpds-color-background-interactive-brand-strong);
+			border-color: transparent;
+
+			@media ( forced-colors: active ) {
+				background-color: Highlight;
+			}
+		}
+
+		~ .components-form-toggle__thumb {
 			background-color: var(--wpds-color-background-thumb-brand-strong);
 			border-color: var(--wpds-color-stroke-interactive-brand);
-			transform: translateX($toggle-width - $toggle-thumb-width);
+			inset-inline-start: $toggle-width - $toggle-thumb-width;
 
 			@media ( forced-colors: active ) {
 				border-color: Highlight;
 			}
 		}
 
-		svg.components-form-toggle__on-label {
+		~ svg.components-form-toggle__on-label {
 			opacity: 1;
 		}
 
-		svg.components-form-toggle__off-label {
+		~ svg.components-form-toggle__off-label {
 			opacity: 0;
 		}
 	}
