@@ -22,6 +22,7 @@
 -   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
+-   `DatePicker`: Keep selected dates readable when `ThemeProvider` adjusts the brand fill by using its paired background and foreground tokens ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
 -   `Card`: Use theme tokens for borders, corners, and spacing ([#85857](https://github.com/WordPress/gutenberg/pull/85857)).
 -   `Autocomplete`: Use the last committed completion callback when a background update suspends ([#86738](https://github.com/WordPress/gutenberg/pull/86738)).
