@@ -46,7 +46,6 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
