@@ -56,8 +56,8 @@ test.describe( 'Revision Fields Diff Panel', () => {
 			page.getByRole( 'button', { name: 'Restore' } )
 		).toBeVisible();
 
-		// Expand the Meta panel.
-		await settingsSidebar.getByRole( 'button', { name: 'Meta' } ).click();
+		// Expand the Fields panel.
+		await settingsSidebar.getByRole( 'button', { name: 'Fields' } ).click();
 
 		const footnotesRow = settingsSidebar.locator(
 			'.editor-post-panel__row',
