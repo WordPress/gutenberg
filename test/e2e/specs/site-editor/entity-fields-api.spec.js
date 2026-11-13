@@ -201,9 +201,10 @@ test.describe( 'Entity fields API', () => {
 			.getByRole( 'row', { name: /Short Page/ } )
 			.getByRole( 'button', { name: 'Quick Edit' } )
 			.click();
-		const quickEditModal = page.locator(
-			'.dataviews-action-modal__quick-edit'
-		);
+		const quickEditModal = page.getByRole( 'dialog', {
+			name: 'Quick edit',
+			exact: true,
+		} );
 		await expect( quickEditModal ).toBeVisible();
 
 		// The replaced field offers the control of its new type.
@@ -232,9 +233,10 @@ test.describe( 'Entity fields API', () => {
 		// it.
 		const shortPage = table.getByRole( 'row', { name: /Short Page/ } );
 		await shortPage.getByRole( 'button', { name: 'Quick Edit' } ).click();
-		const quickEditModal = page.locator(
-			'.dataviews-action-modal__quick-edit'
-		);
+		const quickEditModal = page.getByRole( 'dialog', {
+			name: 'Quick edit',
+			exact: true,
+		} );
 		await expect( quickEditModal ).toBeVisible();
 		await quickEditModal
 			.getByRole( 'button', { name: 'Edit Subtitle' } )

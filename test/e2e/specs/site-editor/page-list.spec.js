@@ -65,7 +65,9 @@ test.describe( 'Page List', () => {
 						name: 'Set featured image',
 					} );
 					await placeholder.click();
-					const mediaLibrary = page.getByRole( 'dialog' );
+					const mediaLibrary = page.getByRole( 'dialog', {
+						name: 'Featured image',
+					} );
 					const TEST_IMAGE_FILE_PATH =
 						'./assets/10x10_e2e_test_image_z9T8jK.png';
 
@@ -369,22 +371,86 @@ test.describe( 'Page List', () => {
 			await requestUtils.deleteAllUsers();
 		} );
 
-		Object.entries( fields ).forEach(
-			( [
-				key,
-				{ performEdit, assertInitialState, assertEditedState },
-			] ) => {
-				// Asserts are done in the individual functions
-				// eslint-disable-next-line playwright/expect-expect
-				test( `should initialize, edit, and update ${ key } field correctly`, async ( {
-					page,
-				} ) => {
-					await assertInitialState( page );
-					await performEdit( page );
-					await assertEditedState( page );
-				} );
-			}
-		);
+		test( 'should initialize, edit, and update featuredImage field correctly', async ( {
+			page,
+		} ) => {
+			await fields.featuredImage.assertInitialState( page );
+			const placeholder = page.getByRole( 'button', {
+				name: 'Set featured image',
+			} );
+			const mediaLibrary = page.getByRole( 'dialog', {
+				name: 'Featured image',
+			} );
+			await placeholder.click();
+
+			await expect( mediaLibrary ).toBeVisible();
+			await page.evaluate( () => {
+				window.mediaEscapeCount = 0;
+				window.wp.media.frame.on(
+					'escape',
+					() => window.mediaEscapeCount++
+				);
+			} );
+			await page.keyboard.press( 'Escape' );
+			await expect( mediaLibrary ).toBeHidden();
+			await expect( placeholder ).toBeFocused();
+			await page.keyboard.press( 'Enter' );
+			await expect( mediaLibrary ).toBeVisible();
+			await expect
+				.poll( () => page.evaluate( () => window.mediaEscapeCount ) )
+				.toBe( 1 );
+			await page.evaluate( () => {
+				window.mediaEscapeCount = 0;
+				window.wp.media.frame.on(
+					'escape',
+					() => window.mediaEscapeCount++
+				);
+			} );
+			await mediaLibrary
+				.getByRole( 'button', {
+					name: 'Close',
+					exact: true,
+				} )
+				.click();
+			await expect( mediaLibrary ).toBeHidden();
+			await expect
+				.poll( () => page.evaluate( () => window.mediaEscapeCount ) )
+				.toBe( 1 );
+			await page.evaluate( () => {
+				window.wp.media.frame.open();
+			} );
+			await expect( mediaLibrary ).toBeVisible();
+
+			await mediaLibrary
+				.getByRole( 'button', {
+					name: 'Close',
+					exact: true,
+				} )
+				.click();
+			await expect( mediaLibrary ).toBeHidden();
+			await fields.featuredImage.performEdit( page );
+			await fields.featuredImage.assertEditedState( page );
+		} );
+
+		Object.entries( fields )
+			.filter( ( [ key ] ) => key !== 'featuredImage' )
+			.forEach(
+				( [
+					key,
+					{ performEdit, assertInitialState, assertEditedState },
+				] ) => {
+					// Asserts are done in the individual functions
+					// eslint-disable-next-line playwright/expect-expect
+					test( `should initialize, edit, and update ${ key } field correctly`, async ( {
+						page,
+					} ) => {
+						await assertInitialState( page );
+
+						await performEdit( page );
+						await assertEditedState( page );
+					} );
+				}
+			);
 
 		test( 'should save multiple field changes and update Data Views UI', async ( {
 			page,
@@ -399,7 +465,7 @@ test.describe( 'Page List', () => {
 
 			// Wait for modal to close and verify changes in the table
 			await expect(
-				page.locator( '.dataviews-action-modal__quick-edit' )
+				page.getByRole( 'dialog', { name: /^(Quick edit|Bulk edit)$/ } )
 			).toBeHidden();
 
 			// Find the Privacy Policy row and verify updated values
@@ -414,6 +480,99 @@ test.describe( 'Page List', () => {
 			// Reset the page to its original state
 			await requestUtils.deleteAllPages();
 			await createPages( requestUtils );
+		} );
+
+		test( 'waits for saving before closing', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const quickEditUrl = page.url();
+			await page.getByRole( 'button', { name: 'Edit Status' } ).click();
+			await page
+				.getByRole( 'radio', { name: 'Draft', exact: true } )
+				.check();
+			await page.keyboard.press( 'Escape' );
+
+			let releaseSave;
+			const saveGate = new Promise( ( resolve ) => {
+				releaseSave = resolve;
+			} );
+			let saveStarted;
+			const saving = new Promise( ( resolve ) => {
+				saveStarted = resolve;
+			} );
+			await page.route( '**/wp/v2/pages/*', async ( route ) => {
+				if ( route.request().method() !== 'POST' ) {
+					await route.continue();
+					return;
+				}
+				saveStarted();
+				await saveGate;
+				await route.continue();
+			} );
+
+			const saved = page.waitForResponse(
+				( response ) =>
+					response.url().includes( '/wp/v2/pages/' ) &&
+					response.request().method() === 'POST'
+			);
+			try {
+				await page
+					.getByRole( 'button', { name: 'Done', exact: true } )
+					.click();
+				await saving;
+				await expect( page ).toHaveURL( quickEditUrl );
+				await expect(
+					page.getByRole( 'dialog', {
+						name: 'Quick edit',
+						exact: true,
+					} )
+				).toBeVisible();
+			} finally {
+				releaseSave();
+			}
+			await expect(
+				page.getByRole( 'dialog', { name: 'Quick edit', exact: true } )
+			).toBeHidden();
+			await expect(
+				page
+					.getByRole( 'row', { name: /Privacy Policy/ } )
+					.getByRole( 'cell', { name: 'Draft', exact: true } )
+			).toBeVisible();
+			const record = await ( await saved ).json();
+			await requestUtils.rest( {
+				path: `/wp/v2/pages/${ record.id }`,
+				method: 'POST',
+				data: { status: 'publish' },
+			} );
+		} );
+
+		test( 'discards unsaved edits when reopened', async ( { page } ) => {
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Quick edit',
+				exact: true,
+			} );
+			await dialog.getByRole( 'button', { name: 'Edit Status' } ).click();
+			await page
+				.getByRole( 'radio', { name: 'Draft', exact: true } )
+				.check();
+			await page.keyboard.press( 'Escape' );
+			await dialog
+				.getByRole( 'button', { name: 'Cancel', exact: true } )
+				.click();
+			await expect( dialog ).toBeHidden();
+
+			await page
+				.getByRole( 'row', { name: /Privacy Policy/ } )
+				.getByRole( 'button', { name: 'Quick edit' } )
+				.click();
+			await dialog.getByRole( 'button', { name: 'Edit Status' } ).click();
+			await expect(
+				page.getByRole( 'radio', { name: 'Published', exact: true } )
+			).toBeChecked();
+			await expect(
+				page.getByRole( 'radio', { name: 'Draft', exact: true } )
+			).not.toBeChecked();
 		} );
 
 		// TODO: Wrap up this test once https://github.com/WordPress/gutenberg/pull/67584 is merged
@@ -596,7 +755,9 @@ test.describe( 'Page List', () => {
 				.getByRole( 'button', { name: 'Bulk edit', exact: true } )
 				.click();
 
-			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
+			const modal = page.getByRole( 'dialog', {
+				name: /^(Quick edit|Bulk edit)$/,
+			} );
 			await expect( modal ).toContainText(
 				'Changes will be applied to all selected pages.'
 			);

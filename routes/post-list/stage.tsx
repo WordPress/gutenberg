@@ -414,17 +414,18 @@ function PostListView( {
 					/>
 				) }
 			/>
-			{ searchParams.quickEdit &&
-				! isResolving &&
-				selection.length > 0 &&
-				view.type !== LAYOUT_LIST && (
-					<QuickEditModal
-						postType={ postType }
-						postId={ selection }
-						closeModal={ closeQuickEditModal }
-						quickEditForm={ quickEditForm }
-					/>
-				) }
+			<QuickEditModal
+				open={
+					!! searchParams.quickEdit &&
+					! isResolving &&
+					selection.length > 0 &&
+					view.type !== LAYOUT_LIST
+				}
+				postType={ postType }
+				postId={ selection }
+				closeModal={ closeQuickEditModal }
+				quickEditForm={ quickEditForm }
+			/>
 		</Page>
 	);
 }

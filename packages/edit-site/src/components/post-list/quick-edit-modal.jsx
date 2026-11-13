@@ -1,14 +1,15 @@
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption alongside Drawer.
 	Button,
-	Modal,
-	Popover as WCPopover,
-	__experimentalHStack as HStack,
-} from '@wordpress/components';
-import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Replace the custom Modal drawer with the Drawer primitive.
+	Drawer,
+	VisuallyHidden,
+} from '@wordpress/ui';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
@@ -16,15 +17,9 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-export function QuickEditModal( {
-	postType,
-	postId,
-	closeModal,
-	quickEditForm,
-} ) {
+function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 	const isBulk = postId.length > 1;
 
-	const [ modalElement, setModalElement ] = useState( null );
 	const [ localEdits, setLocalEdits ] = useState( {} );
 	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
@@ -33,10 +28,11 @@ export function QuickEditModal( {
 				hasFinishedResolution: hasFinished,
 			} = select( coreDataStore );
 
-			if ( isBulk ) {
+			if ( isBulk || postId.length === 0 ) {
 				return {
 					record: null,
-					hasFinishedResolution: true,
+					hasFinishedResolution: postId.length > 0,
+					canSwitchTemplate: false,
 				};
 			}
 
@@ -152,22 +148,18 @@ export function QuickEditModal( {
 	};
 
 	return (
-		<Modal
-			ref={ setModalElement }
-			size="small"
-			overlayClassName="dataviews-action-modal__quick-edit"
-			__experimentalHideHeader
-			onRequestClose={ closeModal }
-			focusOnMount="firstElement"
-		>
-			<div className="dataviews-action-modal__quick-edit-header">
+		<>
+			<Drawer.Header>
+				<VisuallyHidden render={ <Drawer.Title /> }>
+					{ isBulk ? __( 'Bulk edit' ) : __( 'Quick edit' ) }
+				</VisuallyHidden>
 				<PostCardPanel
 					postType={ postType }
 					postId={ postId }
 					hideActions
 				/>
-			</div>
-			<div className="dataviews-action-modal__quick-edit-content">
+			</Drawer.Header>
+			<Drawer.Content>
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
@@ -176,26 +168,44 @@ export function QuickEditModal( {
 						onChange={ onChange }
 					/>
 				) }
-			</div>
-			<HStack className="dataviews-action-modal__quick-edit-footer">
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ closeModal }
-				>
+			</Drawer.Content>
+			<Drawer.Footer>
+				<Drawer.Action variant="outline">
 					{ __( 'Cancel' ) }
-				</Button>
-				<Button
-					__next40pxDefaultSize
-					variant="primary"
-					onClick={ onSave }
-				>
-					{ __( 'Done' ) }
-				</Button>
-			</HStack>
-			{ modalElement &&
-				// Keep popovers inside modal isolation but outside the clipped frame.
-				createPortal( <WCPopover.Slot />, modalElement ) }
-		</Modal>
+				</Drawer.Action>
+				<Button onClick={ onSave }>{ __( 'Done' ) }</Button>
+			</Drawer.Footer>
+		</>
+	);
+}
+
+export function QuickEditModal( {
+	open,
+	postType,
+	postId,
+	closeModal,
+	quickEditForm,
+} ) {
+	return (
+		<Drawer.Root
+			open={ open }
+			swipeDirection={ isRTL() ? 'left' : 'right' }
+			onOpenChange={ ( isOpen ) => {
+				if ( ! isOpen ) {
+					closeModal();
+				}
+			} }
+		>
+			<Drawer.Popup>
+				{ /* Keep edits alive through the exit animation and reset them for a different selection. */ }
+				<QuickEditSession
+					key={ `${ postType }:${ postId.join( ',' ) }` }
+					postType={ postType }
+					postId={ postId }
+					closeModal={ closeModal }
+					quickEditForm={ quickEditForm }
+				/>
+			</Drawer.Popup>
+		</Drawer.Root>
 	);
 }
