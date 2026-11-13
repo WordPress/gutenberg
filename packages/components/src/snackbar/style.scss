@@ -57,6 +57,14 @@
 	color: $white;
 	flex-shrink: 0;
 	--focus-color: #{$white};
+	position: relative;
+
+	// Increased click area for link.
+	&::after {
+		content: "";
+		position: absolute;
+		inset: -$grid-unit-15;
+	}
 
 	&:hover {
 		text-decoration: none;
