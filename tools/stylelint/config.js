@@ -1,6 +1,51 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
+const COMPONENTS_COLOR_VARIABLES_MESSAGE =
+	'`--wp-components-color-*` variables will be removed. Use semantic WPDS design tokens (`--wpds-*`) instead, and `ThemeProvider` from `@wordpress/theme` to customize colors.';
+const COMPONENTS_COLOR_VARIABLES = '/--wp-components-color-/';
+const COMPONENTS_COLOR_VARIABLE_DEFINITIONS = '/^--wp-components-color-/';
+
+const disallowedValues = {
+	'/.*/': [
+		COMPONENTS_COLOR_VARIABLES,
+		'/\\$font-weight-regular/',
+		'/\\$font-weight-medium/',
+	],
+	cursor: [ 'pointer' ],
+	'flex-direction': [ '/^(row|column)-reverse/' ],
+};
+const disallowedValueMessages = {
+	message: ( property, value ) => {
+		switch ( property ) {
+			case 'flex-direction':
+				return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
+			case 'cursor':
+				return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+		}
+		// The remaining patterns apply to every property, so tell them apart by value.
+		if (
+			value.includes( '$font-weight-regular' ) ||
+			value.includes( '$font-weight-medium' )
+		) {
+			const variable = value.includes( '$font-weight-regular' )
+				? '$font-weight-regular'
+				: '$font-weight-medium';
+			return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+		}
+		return `Avoid using "${ value }" in "${ property }". ${ COMPONENTS_COLOR_VARIABLES_MESSAGE }`;
+	},
+};
+const disallowedProperties = [ 'order', COMPONENTS_COLOR_VARIABLE_DEFINITIONS ];
+const disallowedPropertyMessages = {
+	message: ( property ) => {
+		if ( property === 'order' ) {
+			return 'Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction.';
+		}
+		return `Avoid setting "${ property }". ${ COMPONENTS_COLOR_VARIABLES_MESSAGE }`;
+	},
+};
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -13,48 +58,15 @@ module.exports = {
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
 		'declaration-property-value-disallowed-list': [
-			{
-				'/.*/': [
-					'/--wp-components-color-/',
-					'/\\$font-weight-regular/',
-					'/\\$font-weight-medium/',
-				],
-				cursor: [ 'pointer' ],
-				'flex-direction': [ '/^(row|column)-reverse/' ],
-			},
-			{
-				message: ( property, value ) => {
-					switch ( property ) {
-						case 'flex-direction':
-							return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
-						case 'cursor':
-							return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
-					}
-					// The remaining patterns apply to every property, so tell them apart by value.
-					if (
-						value.includes( '$font-weight-regular' ) ||
-						value.includes( '$font-weight-medium' )
-					) {
-						const variable = value.includes(
-							'$font-weight-regular'
-						)
-							? '$font-weight-regular'
-							: '$font-weight-medium';
-						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
-					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
-				},
-			},
+			disallowedValues,
+			disallowedValueMessages,
 		],
 		'font-weight-notation': 'numeric',
 		'@stylistic/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [
-			[ 'order' ],
-			{
-				message:
-					'Avoid the order property. For accessibility reasons, visual, reading, and DOM order must match. Only use the order property when it does not affect reading order, meaning, and interaction.',
-			},
+			disallowedProperties,
+			disallowedPropertyMessages,
 		],
 		'rule-empty-line-before': null,
 		'selector-class-pattern': [
@@ -161,6 +173,28 @@ module.exports = {
 							'z-index',
 						],
 					},
+				],
+			},
+		},
+		{
+			// `@wordpress/theme` owns these variables, as in the ESLint config.
+			files: [ 'packages/theme/**' ],
+			rules: {
+				'declaration-property-value-disallowed-list': [
+					{
+						...disallowedValues,
+						'/.*/': disallowedValues[ '/.*/' ].filter(
+							( value ) => value !== COMPONENTS_COLOR_VARIABLES
+						),
+					},
+					disallowedValueMessages,
+				],
+				'property-disallowed-list': [
+					disallowedProperties.filter(
+						( property ) =>
+							property !== COMPONENTS_COLOR_VARIABLE_DEFINITIONS
+					),
+					disallowedPropertyMessages,
 				],
 			},
 		},
