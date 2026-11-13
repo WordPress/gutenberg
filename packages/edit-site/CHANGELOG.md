@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Use the Drawer component for Quick Edit ([#78029](https://github.com/WordPress/gutenberg/pull/78029)).
+-   Use `@wordpress/ui` Drawer for Quick Edit in both Site Editor implementations ([#78029](https://github.com/WordPress/gutenberg/pull/78029)).
 
 ### Bug Fixes
 
