@@ -50,12 +50,10 @@ function PostsTable( {
 	withActions = false,
 	width = 400,
 	dir = 'ltr',
-	selection,
 }: {
 	withActions?: boolean;
 	width?: number;
 	dir?: 'ltr' | 'rtl';
-	selection?: string[];
 } ) {
 	const view: View = {
 		type: 'table',
@@ -74,8 +72,6 @@ function PostsTable( {
 				actions={ withActions ? actions : undefined }
 				paginationInfo={ { totalItems: 2, totalPages: 1 } }
 				defaultLayouts={ { table: true } }
-				selection={ selection }
-				onChangeSelection={ () => {} }
 			/>
 		</div>
 	);
@@ -92,6 +88,12 @@ const getActionsHeader = () =>
 	)!;
 const getDividerOpacity = () =>
 	getComputedStyle( getActionsHeader(), '::after' ).opacity;
+const getRows = () =>
+	Array.from(
+		document.querySelectorAll< HTMLTableRowElement >(
+			'.dataviews-view-table tr'
+		)
+	);
 
 function scrollToEnd() {
 	const container = getScrollContainer();
@@ -146,6 +148,76 @@ describe( 'DataViews table scroll fade', () => {
 			// Wait for a frame, so a scroll timeline would have been resolved.
 			await new Promise( requestAnimationFrame );
 			expect( getDividerOpacity() ).toBe( '0' );
+		} );
+	} );
+
+	describe( 'without actions', () => {
+		it( 'adds a sticky fade cell to the end of every row', async () => {
+			await render( <PostsTable /> );
+
+			const rows = getRows();
+			expect( rows.length ).toBeGreaterThan( 1 );
+			for ( const row of rows ) {
+				const fade = getComputedStyle( row, '::after' );
+				expect( fade.display ).toBe( 'table-cell' );
+				expect( fade.position ).toBe( 'sticky' );
+				expect( fade.insetInlineEnd ).toBe( '0px' );
+				expect( fade.maskImage ).toBe(
+					'linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
+				);
+			}
+		} );
+
+		it( 'flips the fade in RTL', async () => {
+			await render( <PostsTable dir="rtl" /> );
+
+			expect(
+				getComputedStyle( getRows()[ 0 ], '::after' ).maskImage
+			).toBe(
+				'linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
+			);
+		} );
+
+		// At the end of the scroll range, the fade must cover only its own
+		// space, not the last column.
+		it( 'keeps the space of the fade free after the last column', async () => {
+			await render( <PostsTable /> );
+
+			for ( const row of getRows() ) {
+				const rowBox = row.getBoundingClientRect();
+				const lastCell = row.lastElementChild!.getBoundingClientRect();
+				expect( rowBox.right - lastCell.right ).toBe( FADE_SIZE );
+			}
+		} );
+
+		it( 'fades into the background of each row', async () => {
+			const style = document.createElement( 'style' );
+			style.textContent =
+				'.dataviews-view-table tbody tr:first-child { background-color: rgb(1, 2, 3); }';
+			document.head.append( style );
+			try {
+				await render( <PostsTable /> );
+
+				const [ , firstRow, secondRow ] = getRows();
+				expect(
+					getComputedStyle( firstRow, '::after' ).backgroundColor
+				).toBe( 'rgb(1, 2, 3)' );
+				expect(
+					getComputedStyle( secondRow, '::after' ).backgroundColor
+				).toBe( getComputedStyle( secondRow ).backgroundColor );
+			} finally {
+				style.remove();
+			}
+		} );
+
+		it( 'does not add the fade cell when there are actions', async () => {
+			await render( <PostsTable withActions /> );
+
+			for ( const row of getRows() ) {
+				expect( getComputedStyle( row, '::after' ).content ).toBe(
+					'none'
+				);
+			}
 		} );
 	} );
 } );

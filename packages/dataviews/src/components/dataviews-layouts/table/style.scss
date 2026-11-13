@@ -302,6 +302,33 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 			padding-inline-start: $scroll-fade-size;
 		}
 	}
+
+	// Without actions, a sticky cell at the end of each row fades the columns
+	// scrolling under it into the row's own background. At the end of the
+	// scroll range it only covers its own space, so it needs no scroll state.
+	&:not(.has-actions) tr {
+		&::after {
+			content: "";
+			display: table-cell;
+			position: sticky;
+			inset-inline-end: 0;
+			width: $scroll-fade-size;
+			min-width: $scroll-fade-size;
+			padding: 0;
+			background-color: inherit;
+			pointer-events: none;
+			mask-image: linear-gradient(to right, transparent, #000);
+		}
+
+		&:dir(rtl)::after {
+			mask-image: linear-gradient(to left, transparent, #000);
+		}
+
+		// The fade cell takes the place of the last column's end padding.
+		> :last-child {
+			padding-inline-end: 0;
+		}
+	}
 }
 
 @keyframes dataviews-view-table-scroll-cue {

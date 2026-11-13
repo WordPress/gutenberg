@@ -488,6 +488,7 @@ function ViewTable< Item >( {
 							view.layout.density
 						),
 					'has-bulk-actions': hasBulkActions,
+					'has-actions': !! actions?.length,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
