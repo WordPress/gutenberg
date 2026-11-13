@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Fade the trailing edge of a table layout into each row's background while there are more columns to scroll to, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` class is removed.
+-   Fade the trailing edge of a table layout into each row's background while there are more columns to scroll to, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 

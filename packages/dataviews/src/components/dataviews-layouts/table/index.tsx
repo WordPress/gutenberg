@@ -245,7 +245,7 @@ function TableRow< Item >( {
 				// intercepting click events from ItemActions.
 
 				<td
-					className="dataviews-view-table__actions-column dataviews-view-table__actions-column--sticky"
+					className="dataviews-view-table__actions-column"
 					onClick={ ( e ) => e.stopPropagation() }
 				>
 					<ItemActions item={ item } actions={ actions } />
@@ -664,7 +664,7 @@ function ViewTable< Item >( {
 							);
 						} ) }
 						{ !! actions?.length && (
-							<th className="dataviews-view-table__actions-column dataviews-view-table__actions-column--sticky">
+							<th className="dataviews-view-table__actions-column">
 								<span className="dataviews-view-table-header">
 									{ __( 'Actions' ) }
 								</span>
