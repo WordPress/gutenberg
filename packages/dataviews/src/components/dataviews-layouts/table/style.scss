@@ -294,12 +294,21 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 		}
 	}
 
-	// The fade strip takes the place of the sticky actions column's start
+	// Room for the fade strip before the sticky actions column's start
 	// padding, in every density.
 	td,
 	th {
 		&.dataviews-view-table__actions-column--sticky {
-			padding-inline-start: $scroll-fade-size;
+			padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-md));
+		}
+	}
+
+	&.has-compact-density {
+		td,
+		th {
+			&.dataviews-view-table__actions-column--sticky {
+				padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
+			}
 		}
 	}
 
