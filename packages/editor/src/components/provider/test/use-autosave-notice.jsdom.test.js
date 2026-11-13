@@ -227,9 +227,9 @@ describe( 'useAutosaveNotice', () => {
 	} );
 
 	describe( 'notice actions', () => {
-		it( 'opens the autosave revision when the edit link has a revision ID', () => {
+		it( 'opens the autosave revision', () => {
 			renderAutosaveNotice( {
-				settings: { autosave: { editLink: EDIT_LINK } },
+				settings: { autosave: { id: 123, editLink: EDIT_LINK } },
 			} );
 
 			const [ , options ] = createWarningNotice.mock.calls[ 0 ];
@@ -240,20 +240,6 @@ describe( 'useAutosaveNotice', () => {
 			action.onClick();
 
 			expect( setCurrentRevisionId ).toHaveBeenCalledWith( 123 );
-		} );
-
-		it( 'links to the edit screen when the edit link has no revision ID', () => {
-			const editLink = '/wp-admin/post.php?post=9&action=edit';
-
-			renderAutosaveNotice( {
-				settings: { autosave: { editLink } },
-			} );
-
-			const [ , options ] = createWarningNotice.mock.calls[ 0 ];
-			const [ action ] = options.actions;
-
-			expect( action.onClick ).toBeUndefined();
-			expect( action.url ).toBe( editLink );
 		} );
 	} );
 } );

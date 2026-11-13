@@ -2,7 +2,6 @@ import { useLayoutEffect } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { getQueryArg } from '@wordpress/url';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import useEntityContainsSnapshot from './use-entity-contains-snapshot';
@@ -22,9 +21,6 @@ function showAutosaveExistsNotice( {
 	registry,
 	setCurrentRevisionId,
 } ) {
-	// The only place core exposes the autosave ID is the edit
-	// link, always `revision.php?revision=<autosave ID>`.
-	const autosaveId = Number( getQueryArg( autosave.editLink, 'revision' ) );
 	createWarningNotice(
 		__(
 			'There is an autosave of this post that is more recent than the version below.'
@@ -34,23 +30,18 @@ function showAutosaveExistsNotice( {
 			actions: [
 				{
 					label: __( 'View the autosave' ),
-					...( autosaveId
-						? {
-								onClick: () => {
-									// `disableVisualRevisions` is only set
-									// after mount, so read it at click time.
-									const { disableVisualRevisions } = registry
-										.select( editorStore )
-										.getEditorSettings();
-									if ( disableVisualRevisions ) {
-										window.location.href =
-											autosave.editLink;
-										return;
-									}
-									setCurrentRevisionId( autosaveId );
-								},
-							}
-						: { url: autosave.editLink } ),
+					onClick: () => {
+						// `disableVisualRevisions` is only set after mount,
+						// so read it at click time.
+						const { disableVisualRevisions } = registry
+							.select( editorStore )
+							.getEditorSettings();
+						if ( disableVisualRevisions ) {
+							window.location.href = autosave.editLink;
+							return;
+						}
+						setCurrentRevisionId( autosave.id );
+					},
 				},
 			],
 		}
