@@ -1195,6 +1195,12 @@ const elementTypes = [
 // Used for generating the instance ID
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
+// Transforms are for blocks only, so elements never output them.
+function omitTransform( style: PanelStyle ): Style {
+	const { transform, ...rest } = style as Style;
+	return rest;
+}
+
 /**
  * Generates CSS rules for block element styles (buttons, links, headings, etc.).
  *
@@ -1207,7 +1213,7 @@ const STYLE_BLOCK_PROPS_REFERENCE = {};
  * @param baseSelector       The base CSS selector to scope rules under.
  * @return Concatenated CSS rules string, or undefined if none.
  */
-function getElementCSSRules(
+export function getElementCSSRules(
 	blockElementStyles: Record< string, PanelStyle > | undefined,
 	blockName: string,
 	baseSelector: string
@@ -1238,8 +1244,9 @@ function getElementCSSRules(
 				ELEMENTS[ elementType ]
 			);
 
-			// The element styles have the shape the style engine reads.
-			rules.push( compileCSS( elementStyles as Style, { selector } ) );
+			rules.push(
+				compileCSS( omitTransform( elementStyles ), { selector } )
+			);
 
 			// Process any interactive states for the element type.
 			if ( pseudo ) {
@@ -1249,8 +1256,7 @@ function getElementCSSRules(
 						elementStyles[ pseudoSelector as `:${ string }` ];
 					if ( pseudoStyles ) {
 						rules.push(
-							// The element styles have the shape the style engine reads.
-							compileCSS( pseudoStyles as Style, {
+							compileCSS( omitTransform( pseudoStyles ), {
 								selector: scopeSelector(
 									baseSelector,
 									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
@@ -1267,13 +1273,15 @@ function getElementCSSRules(
 			elements.forEach( ( element ) => {
 				if ( blockElementStyles[ element ] ) {
 					rules.push(
-						// The element styles have the shape the style engine reads.
-						compileCSS( blockElementStyles[ element ] as Style, {
-							selector: scopeSelector(
-								baseSelector,
-								ELEMENTS[ element ]
-							),
-						} )
+						compileCSS(
+							omitTransform( blockElementStyles[ element ] ),
+							{
+								selector: scopeSelector(
+									baseSelector,
+									ELEMENTS[ element ]
+								),
+							}
+						)
 					);
 				}
 			} );
