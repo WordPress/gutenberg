@@ -17,15 +17,14 @@ import usePatternsState from '../hooks/use-patterns-state';
 import BlockPatternsList from '../../block-patterns-list';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import { PatternsFilter } from './patterns-filter';
-import { usePatternCategories } from './use-pattern-categories';
 import {
+	getPatternSourceType,
 	isPatternFiltered,
-	allPatternsCategory,
+	isPatternInCategory,
 	sitePatternsCategory,
-	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
-import type { BlockPattern } from '../../../store/types';
+import type { ParsedBlockPattern } from '../../../store/types';
 import type { PatternCategoryPreviewsProps } from '../types';
 
 const noop = () => {};
@@ -37,7 +36,7 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 }: PatternCategoryPreviewsProps ) {
-	const [ allPatterns, , onClickPattern ] = usePatternsState(
+	const [ allPatterns, allCategories, onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
 		category?.name
@@ -55,66 +54,50 @@ export function PatternCategoryPreviews( {
 		? patternAuthorFilter
 		: 'all';
 
-	const availableCategories = usePatternCategories(
-		rootClientId,
-		patternSourceFilter
-	);
 	const scrollContainerRef = useRef< HTMLDivElement >( null );
-	const currentCategoryPatterns = useMemo(
-		() =>
-			allPatterns.filter( ( pattern: BlockPattern ) => {
-				if (
-					isPatternFiltered(
-						pattern,
-						patternSourceFilter,
-						patternSyncFilter,
-						currentPatternAuthorFilter
-					)
-				) {
-					return false;
-				}
+	const {
+		currentCategoryPatterns,
+		siteHasDirectoryPatterns,
+		categorySources,
+	} = useMemo( () => {
+		const patterns: ParsedBlockPattern[] = [];
+		const sources = new Set< string >();
+		let siteHasDirectory = false;
+		for ( const pattern of allPatterns ) {
+			const sourceType = getPatternSourceType( pattern );
+			siteHasDirectory ||=
+				sourceType === INSERTER_PATTERN_TYPES.directory;
+			if (
+				! isPatternInCategory( pattern, category.name, allCategories )
+			) {
+				continue;
+			}
+			sources.add( sourceType );
+			if (
+				! isPatternFiltered(
+					pattern,
+					patternSourceFilter,
+					patternSyncFilter,
+					currentPatternAuthorFilter
+				)
+			) {
+				patterns.push( pattern );
+			}
+		}
 
-				if ( category.name === allPatternsCategory.name ) {
-					return true;
-				}
-
-				if (
-					category.name === sitePatternsCategory.name &&
-					pattern.type === INSERTER_PATTERN_TYPES.user
-				) {
-					return true;
-				}
-
-				if (
-					category.name === starterPatternsCategory.name &&
-					pattern.blockTypes?.includes( 'core/post-content' )
-				) {
-					return true;
-				}
-
-				if ( category.name === 'uncategorized' ) {
-					// The uncategorized category should show all the patterns without any category...
-					if ( ! pattern.categories ) {
-						return true;
-					}
-
-					// ...or with no available category.
-					return ! pattern.categories.some( ( catName ) =>
-						availableCategories.some( ( c ) => c.name === catName )
-					);
-				}
-
-				return pattern.categories?.includes( category.name );
-			} ),
-		[
-			allPatterns,
-			availableCategories,
-			category.name,
-			patternSourceFilter,
-			patternSyncFilter,
-			currentPatternAuthorFilter,
-		]
-	);
+		return {
+			currentCategoryPatterns: patterns,
+			siteHasDirectoryPatterns: siteHasDirectory,
+			categorySources: sources,
+		};
+	}, [
+		allPatterns,
+		allCategories,
+		category.name,
+		patternSourceFilter,
+		patternSyncFilter,
+		currentPatternAuthorFilter,
+	] );
 
 	const pagingProps = usePatternsPaging(
 		currentCategoryPatterns,
@@ -174,6 +157,8 @@ export function PatternCategoryPreviews( {
 						setPatternAuthorFilter={ onSetPatternAuthorFilter }
 						scrollContainerRef={ scrollContainerRef }
 						category={ category }
+						siteHasDirectoryPatterns={ siteHasDirectoryPatterns }
+						categorySources={ categorySources }
 					/>
 				</HStack>
 				{ ! currentCategoryPatterns.length && (

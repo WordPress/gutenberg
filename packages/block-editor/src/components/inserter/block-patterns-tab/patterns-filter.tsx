@@ -62,6 +62,8 @@ export function PatternsFilter( {
 	patternAuthorFilter,
 	scrollContainerRef,
 	category,
+	siteHasDirectoryPatterns,
+	categorySources,
 }: PatternsFilterProps ) {
 	// If the category is `sitePatterns` then we need to set the source filter to `user`, but
 	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
@@ -81,6 +83,21 @@ export function PatternsFilter( {
 	// We also hide the directory and theme source filter if the category is `sitePatterns`
 	// otherwise there will only be one option available.
 	const shouldHideSourcesFilter = getShouldHideSourcesFilter( category );
+
+	const patternSourceMenuOptions = useMemo(
+		() =>
+			PATTERN_SOURCE_MENU_OPTIONS.filter(
+				( { value } ) =>
+					siteHasDirectoryPatterns ||
+					value !== INSERTER_PATTERN_TYPES.directory
+			).map( ( option ) => ( {
+				...option,
+				disabled:
+					option.value !== 'all' &&
+					! categorySources.has( option.value ),
+			} ) ),
+		[ siteHasDirectoryPatterns, categorySources ]
+	);
 
 	// The author filter is only shown while only user patterns are listed, as
 	// they're the only ones with an author on this site.
@@ -146,7 +163,7 @@ export function PatternsFilter( {
 						{ ! shouldHideSourcesFilter && (
 							<MenuGroup label={ __( 'Source' ) }>
 								<MenuItemsChoice
-									choices={ PATTERN_SOURCE_MENU_OPTIONS }
+									choices={ patternSourceMenuOptions }
 									onSelect={ ( value ) => {
 										handleSetSourceFilterChange( value );
 										scrollContainerRef.current?.scrollTo(
@@ -187,21 +204,25 @@ export function PatternsFilter( {
 							/>
 						</MenuGroup>
 						<div className="block-editor-inserter__patterns-filter-help">
-							{ createInterpolateElement(
-								__(
-									'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
-								),
-								{
-									Link: (
-										// @ts-expect-error `createInterpolateElement` fills in the children.
-										<ExternalLink
-											href={ __(
-												'https://wordpress.org/patterns/'
-											) }
-										/>
-									),
-								}
-							) }
+							{ siteHasDirectoryPatterns
+								? createInterpolateElement(
+										__(
+											'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
+										),
+										{
+											Link: (
+												// @ts-expect-error `createInterpolateElement` fills in the children.
+												<ExternalLink
+													href={ __(
+														'https://wordpress.org/patterns/'
+													) }
+												/>
+											),
+										}
+									)
+								: __(
+										'Patterns are bundled in the active theme or created by users on this site. Only patterns created on this site can be synced.'
+									) }
 						</div>
 					</>
 				) }
