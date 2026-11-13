@@ -303,8 +303,8 @@ Add an image or video with a text overlay.
 
 -	**Name:** [core/cover](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-cover/)
 -	**Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
--	**Supports:** align, allowedBlocks, anchor, color (button, heading, link, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio, minWidth), filter (duotone), interactivity (clientNavigation, interactive), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, minHeight, minHeightUnit, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
+-	**Supports:** align, allowedBlocks, anchor, color (button, heading, link, text, ~~background~~, ~~enableContrastChecker~~), dimensions (aspectRatio, minHeight, minWidth), filter (duotone), interactivity (clientNavigation, interactive), layout (~~allowJustification~~), shadow, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Attributes:** allowedVideoProviders, alt, backgroundType, contentPosition, customGradient, customOverlayColor, dimRatio, focalPoint, gradient, hasParallax, id, isDark, isRepeated, isUserOverlayColor, overlayColor, poster, sizeSlug, tagName, templateLock, url, useFeaturedImage
 
 ## Description Detail
 
@@ -831,7 +831,7 @@ Displays the next posts page link.
 -	**Name:** [core/query-pagination-next](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-next/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/query-pagination
--	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Page Numbers
@@ -851,7 +851,7 @@ Displays the previous posts page link.
 -	**Name:** [core/query-pagination-previous](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-query-pagination-previous/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
 -	**Parent:** core/query-pagination
--	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (gradient), color (background, gradients, ~~text~~), interactivity (clientNavigation), spacing (padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Query Title
@@ -875,7 +875,7 @@ Display the total number of results in a query.
 
 ## Quote
 
-Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar
+Give quoted text visual emphasis.
 
 -	**Name:** [core/quote](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-quote/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)

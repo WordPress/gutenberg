@@ -1,6 +1,5 @@
 import {
 	TextControl,
-	SelectControl as WCSelectControl,
 	Notice as WCNotice,
 	__experimentalVStack as VStack,
 	__experimentalToolsPanel as ToolsPanel,
@@ -14,6 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
+import { SelectControl } from '@wordpress/ui';
 import OrderControl from './order-control';
 import AuthorControl from './author-control';
 import ParentControl from './parent-control';
@@ -275,12 +275,20 @@ export default function QueryInspectorControls( props ) {
 							isShownByDefault
 						>
 							{ postTypesSelectOptions.length > 2 ? (
-								<WCSelectControl
-									options={ postTypesSelectOptions }
-									value={ postType }
+								<SelectControl
+									items={ postTypesSelectOptions }
+									value={
+										postTypesSelectOptions.find(
+											( item ) => item.value === postType
+										) ?? postTypesSelectOptions[ 0 ]
+									}
 									label={ postTypeControlLabel }
-									onChange={ onPostTypeChange }
-									help={ postTypeControlHelp }
+									onValueChange={ ( item ) => {
+										if ( item && item.value !== postType ) {
+											onPostTypeChange( item.value );
+										}
+									} }
+									description={ postTypeControlHelp }
 								/>
 							) : (
 								<ToggleGroupControl
