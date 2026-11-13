@@ -4,6 +4,8 @@ import { Path, SVG } from '@wordpress/components';
 import {
 	Autocomplete,
 	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- The visible Close button that `trap-focus` requires; matches `Dialog.CloseIconButton`.
+	IconButton,
 	Input,
 	InputLayout,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Hosts the inline Autocomplete at the caret; Popover is not allowlisted yet.
@@ -14,7 +16,7 @@ import {
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { search } from '@wordpress/icons';
+import { close, search } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
 import {
 	getSpecialCharacterCategories,
@@ -49,6 +51,8 @@ interface CharacterOption {
 	key: string;
 	value: string;
 	label: string;
+	// Shown instead of `value` when the character has no visible glyph.
+	symbol?: string;
 }
 
 /**
@@ -76,7 +80,26 @@ function toOption(
 		key: `${ section }-${ character.char }`,
 		value: character.char,
 		label: character.name,
+		symbol: character.symbol,
 	};
+}
+
+/**
+ * Shows a character in a cell or the preview strip: its glyph, or its
+ * abbreviation when it has none, such as "NBSP" for a non-breaking space.
+ *
+ * @param props        Component props.
+ * @param props.option The character's grid cell.
+ */
+function CharacterGlyph( { option }: { option: CharacterOption } ) {
+	if ( option.symbol ) {
+		return (
+			<span className="format-library-special-characters__symbol">
+				{ option.symbol }
+			</span>
+		);
+	}
+	return <>{ option.value }</>;
 }
 
 /**
@@ -185,7 +208,9 @@ function InlineUI( {
 						onClick={ () => onSelect( option ) }
 					>
 						<Autocomplete.ItemLabel className="format-library-special-characters__character-label">
-							<span aria-hidden="true">{ option.value }</span>
+							<span aria-hidden="true">
+								<CharacterGlyph option={ option } />
+							</span>
 							{ /* The cell's name, as text, so screen readers don't
 							report the hidden glyph as blank. */ }
 							<VisuallyHidden>
@@ -209,9 +234,10 @@ function InlineUI( {
 					return;
 				}
 				onClose();
-				// Escape: put the caret back where the character would have
-				// gone. Clicking elsewhere leaves focus where it landed.
-				if ( reason === 'escape-key' ) {
+				// Escape or Close: put the caret back where the character
+				// would have gone. Clicking elsewhere leaves focus where it
+				// landed.
+				if ( reason === 'escape-key' || reason === 'close-press' ) {
 					onFocus();
 				}
 			} }
@@ -248,7 +274,7 @@ function InlineUI( {
 					}
 				>
 					<div className="format-library-special-characters__search">
-						<Autocomplete.InputGroup>
+						<Autocomplete.InputGroup className="format-library-special-characters__search-field">
 							<Autocomplete.Input
 								ref={ inputRef }
 								aria-label={ __( 'Search special characters' ) }
@@ -275,6 +301,19 @@ function InlineUI( {
 								}
 							/>
 						</Autocomplete.InputGroup>
+						{ /* Required by `trap-focus`, so keyboard and screen
+						reader users can leave. */ }
+						<Popover.Close
+							render={
+								<IconButton
+									variant="minimal"
+									size="compact"
+									tone="neutral"
+									icon={ close }
+									label={ __( 'Close' ) }
+								/>
+							}
+						/>
 					</div>
 					<div className="format-library-special-characters__results">
 						<Autocomplete.Empty>
@@ -324,7 +363,7 @@ function InlineUI( {
 						{ highlighted && (
 							<>
 								<span className="format-library-special-characters__preview-character">
-									{ highlighted.value }
+									<CharacterGlyph option={ highlighted } />
 								</span>
 								<Text
 									variant="body-sm"
@@ -336,10 +375,6 @@ function InlineUI( {
 						) }
 					</div>
 				</Autocomplete.Root>
-				{ /* Required by `trap-focus`, so screen reader users can leave. */ }
-				<VisuallyHidden render={ <Popover.Close /> }>
-					{ __( 'Close' ) }
-				</VisuallyHidden>
 			</Popover.Popup>
 		</Popover.Root>
 	);

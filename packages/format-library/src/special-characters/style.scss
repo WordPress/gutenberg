@@ -10,9 +10,17 @@
 }
 
 .format-library-special-characters__search {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
 	padding-block-end: var(--wpds-dimension-padding-sm);
 	// Stretch to the grid's width rather than widening the popover.
 	contain: inline-size;
+}
+
+.format-library-special-characters__search-field {
+	flex: 1;
+	min-width: 0;
 }
 
 .format-library-special-characters__results {
@@ -72,6 +80,14 @@
 
 .format-library-special-characters__character-label {
 	font-size: var(--wpds-typography-font-size-xl);
+}
+
+// The abbreviation shown for a character with no visible glyph, sized to
+// fit a cell.
+.format-library-special-characters__symbol {
+	font-size: var(--wpds-typography-font-size-xs);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	letter-spacing: 0;
 }
 
 .format-library-special-characters__preview {

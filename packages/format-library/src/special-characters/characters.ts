@@ -10,6 +10,16 @@ export interface SpecialCharacter {
 	 * name and the text that search matches against.
 	 */
 	name: string;
+	/**
+	 * What the grid shows for a character with no visible glyph, such as a
+	 * space. Not translated: like a code point, it names the character
+	 * itself.
+	 */
+	symbol?: string;
+	/**
+	 * Other terms search matches, such as an abbreviation.
+	 */
+	keywords?: string[];
 }
 
 export interface SpecialCharacterCategory {
@@ -65,6 +75,12 @@ export function getSpecialCharacterCategories(): SpecialCharacterCategory[] {
 				{ char: '†', name: __( 'Dagger' ) },
 				{ char: '‡', name: __( 'Double dagger' ) },
 				{ char: '№', name: __( 'Numero sign' ) },
+				{
+					char: '\u00a0',
+					name: __( 'Non-breaking space' ),
+					symbol: 'NBSP',
+					keywords: [ 'nbsp' ],
+				},
 			],
 		},
 		{
@@ -401,8 +417,8 @@ function normalize( text: string ): string {
 }
 
 /**
- * Finds the characters whose name contains every word of the search, or
- * which are the searched character itself.
+ * Finds the characters whose name and keywords contain every word of the
+ * search, or which are the searched character itself.
  *
  * @param categories The categories to search.
  * @param search     The search text.
@@ -424,10 +440,12 @@ export function searchSpecialCharacters(
 			if ( seen.has( character.char ) ) {
 				continue;
 			}
-			const name = normalize( character.name );
+			const terms = normalize(
+				[ character.name, ...( character.keywords ?? [] ) ].join( ' ' )
+			);
 			if (
 				character.char === trimmed ||
-				words.every( ( word ) => name.includes( word ) )
+				words.every( ( word ) => terms.includes( word ) )
 			) {
 				seen.add( character.char );
 				results.push( character );

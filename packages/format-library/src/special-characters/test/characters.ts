@@ -12,6 +12,12 @@ const categories: SpecialCharacterCategory[] = [
 		characters: [
 			{ char: '–', name: 'En dash' },
 			{ char: '—', name: 'Em dash' },
+			{
+				char: '\u00a0',
+				name: 'Non-breaking space',
+				symbol: 'NBSP',
+				keywords: [ 'nbsp' ],
+			},
 		],
 	},
 	{
@@ -56,6 +62,19 @@ describe( 'searchSpecialCharacters', () => {
 		).toEqual( [ '–' ] );
 	} );
 
+	it( 'matches keywords as well as the name', () => {
+		expect(
+			searchSpecialCharacters( categories, 'NBSP' ).map(
+				( { char } ) => char
+			)
+		).toEqual( [ '\u00a0' ] );
+		expect(
+			searchSpecialCharacters( categories, 'non-breaking' ).map(
+				( { char } ) => char
+			)
+		).toEqual( [ '\u00a0' ] );
+	} );
+
 	it( 'lists a character in several categories only once', () => {
 		expect(
 			searchSpecialCharacters( categories, 'dash' ).map(
@@ -75,6 +94,16 @@ describe( 'getSpecialCharacterCategories', () => {
 				expect( [ ...character.char ] ).toHaveLength( 1 );
 			}
 		}
+	} );
+
+	it( 'includes the non-breaking space, with a visible symbol', () => {
+		const nbsp = getSpecialCharacterCategories()
+			.flatMap( ( { characters } ) => characters )
+			.find( ( { char } ) => char === '\u00a0' );
+		expect( nbsp ).toMatchObject( {
+			name: 'Non-breaking space',
+			symbol: 'NBSP',
+		} );
 	} );
 
 	it( 'does not repeat a character', () => {
