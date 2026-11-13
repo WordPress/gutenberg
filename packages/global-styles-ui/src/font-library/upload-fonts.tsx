@@ -150,6 +150,12 @@ function UploadFonts() {
 		} );
 	}
 
+	/**
+	 * Reads the family, style, and weight metadata from an uploaded font.
+	 *
+	 * @param fontFile The font file to parse.
+	 * @return The font face metadata and the uploaded file.
+	 */
 	const getFontFaceMetadata = async ( fontFile: File ) => {
 		const buffer = await readFileAsArrayBuffer( fontFile );
 		const fontObj = new Font( 'Uploaded Font' );
@@ -160,7 +166,7 @@ function UploadFonts() {
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontName = name?.get( 16 ) || name?.get( 1 );
+		const fontName = name!.get( 16 ) || name!.get( 1 );
 		if ( ! fontName ) {
 			throw new Error(
 				sprintf(
@@ -172,13 +178,16 @@ function UploadFonts() {
 				)
 			);
 		}
-		const subfamily = name?.get( 2 ) || '';
+		const subfamily = name!.get( 2 ) || '';
 		const isItalic = subfamily.toLowerCase().includes( 'italic' );
 		const fontWeight =
-			font.opentype.tables[ 'OS/2' ]?.usWeightClass || 'normal';
-		const weightAxis = font.opentype.tables.fvar?.axes.find(
-			( { tag } ) => tag === 'wght'
-		);
+			font.opentype.tables[ 'OS/2' ]!.usWeightClass || 'normal';
+		const isVariable = !! font.opentype.tables.fvar;
+		const weightAxis =
+			isVariable &&
+			font.opentype.tables.fvar!.axes.find(
+				( { tag } ) => tag === 'wght'
+			);
 		const weightRange = weightAxis
 			? `${ weightAxis.minValue } ${ weightAxis.maxValue }`
 			: null;

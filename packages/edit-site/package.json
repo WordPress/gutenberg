@@ -81,7 +81,6 @@
 		"@wordpress/url": "file:../url",
 		"@wordpress/views": "file:../views",
 		"@wordpress/widgets": "file:../widgets",
-		"change-case": "^4.1.2",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
