@@ -77,14 +77,8 @@ function InserterSearchResults( {
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
 	const onInsertPattern: InsertPattern = useCallback(
-		( blocks, patternName, shouldForceFocusBlock, _rootClientId ) => {
-			onInsertBlocks(
-				blocks,
-				{ patternName },
-				shouldForceFocusBlock,
-				_rootClientId
-			);
-		},
+		( blocks, patternName, ...args ) =>
+			onInsertBlocks( blocks, { patternName }, ...args ),
 		[ onInsertBlocks ]
 	);
 	const [ patterns, , onClickPattern ] = usePatternsState(
