@@ -148,14 +148,15 @@ export function usePostTemplatePanelMode() {
 		const settings = getEditorSettings();
 		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
 		/*
-		 * A template can name the template it is rendered inside, so that the
-		 * header, the footer and whatever else surrounds it live in one place
-		 * instead of being repeated in every template. It is not a viewable
-		 * post type, so it is answered before the checks below. The field is
-		 * only in the form of the summary while the experiment is on.
+		 * The panels are for a post that picks the template it is rendered
+		 * inside, which a template is not, even though a canvas editing one
+		 * names a template for it too: the template itself where the canvas
+		 * stands for it, as in the extensible site editor, or the template it
+		 * is rendered inside, with the templates inside templates experiment,
+		 * which picks that one from a field of its own.
 		 */
 		if ( postTypeSlug === TEMPLATE_POST_TYPE ) {
-			return isBlockTheme ? 'template-parent' : null;
+			return null;
 		}
 		const postType = getPostType( postTypeSlug );
 		const hasTemplates =

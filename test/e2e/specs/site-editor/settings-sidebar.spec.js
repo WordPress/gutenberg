@@ -74,6 +74,29 @@ test.describe( 'Settings sidebar', () => {
 				'Displays any single entry, such as a post or a page. This template will serve as a fallback when a more specific template (e.g. Single Post, Page, or Attachment) cannot be found.'
 			);
 		} );
+
+		test( 'should not offer a template the template panel of a post', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.openDocumentSettingsSidebar();
+
+			const settingsSidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+
+			// The panels of the template have rendered.
+			await expect(
+				settingsSidebar.getByRole( 'button', { name: 'Content' } )
+			).toBeVisible();
+
+			// A post picks the template it is rendered inside from a panel
+			// named after that template. A template is not rendered inside
+			// one that way, whatever template the canvas names for it.
+			await expect(
+				settingsSidebar.getByRole( 'button', { name: /^Template:/ } )
+			).toBeHidden();
+		} );
 	} );
 
 	test.describe( 'Block tab', () => {
