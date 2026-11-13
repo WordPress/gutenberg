@@ -109,31 +109,45 @@ function MultipleOrigin( {
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
-			{ gradients.map( ( { name, gradients: gradientSet }, index ) => {
-				const id = `color-palette-${ instanceId }-${ index }`;
-				return (
-					<VStack spacing={ 2 } key={ index }>
-						<Heading
-							className={ colorPaletteStyles[ 'color-heading' ] }
-							level={ headingLevel }
-							id={ id }
-						>
-							{ name }
-						</Heading>
-						<SingleOrigin
-							clearGradient={ clearGradient }
-							gradients={ gradientSet }
-							onChange={ ( gradient, _index, slug ) =>
-								onChange( gradient, index, slug )
+			{ gradients.map(
+				(
+					{ name, slug: originSlug, gradients: gradientSet },
+					index
+				) => {
+					const id = `color-palette-${ instanceId }-${ index }`;
+					return (
+						<VStack
+							spacing={ 2 }
+							key={
+								typeof originSlug === 'string'
+									? `slug:${ originSlug }`
+									: `index:${ index }`
 							}
-							value={ value }
-							selectedSlug={ selectedSlug }
-							presentation={ presentation }
-							aria-labelledby={ id }
-						/>
-					</VStack>
-				);
-			} ) }
+						>
+							<Heading
+								className={
+									colorPaletteStyles[ 'color-heading' ]
+								}
+								level={ headingLevel }
+								id={ id }
+							>
+								{ name }
+							</Heading>
+							<SingleOrigin
+								clearGradient={ clearGradient }
+								gradients={ gradientSet }
+								onChange={ ( gradient, _index, slug ) =>
+									onChange( gradient, index, slug )
+								}
+								value={ value }
+								selectedSlug={ selectedSlug }
+								presentation={ presentation }
+								aria-labelledby={ id }
+							/>
+						</VStack>
+					);
+				}
+			) }
 		</VStack>
 	);
 }

@@ -111,6 +111,8 @@ selector. Alternatively, if there are multiple sets (or 'origins') of
 gradients, you can pass an array of objects each with a `name` and a
 `gradients` array which will in turn contain the predefined gradient objects.
 
+Each origin can also have an optional `slug`. Supply a stable slug, unique among origins, when origins can be reordered or removed. This keeps focus on the same origin as the list changes. Origins without a slug keep positional identity.
+
 ### `headingLevel`
 
  - Type: `1 | 2 | 3 | 4 | 5 | 6 | "1" | "2" | "3" | "4" | ...`

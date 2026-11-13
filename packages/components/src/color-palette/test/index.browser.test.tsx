@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
@@ -45,6 +45,70 @@ const ControlledColorPalette = ( {
 };
 
 describe( 'ColorPalette', () => {
+	it( 'keeps the focused origin and current group after reordering', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const red = { slug: 'red', name: 'Red', color: '#ff0000' };
+		const blue = { slug: 'blue', name: 'Blue', color: '#0000ff' };
+		const theme = { slug: 'theme', name: 'Palette', colors: [ red ] };
+		const custom = { slug: 'custom', name: 'Palette', colors: [ blue ] };
+		const view = await render(
+			<ColorPalette
+				aria-label="Presets"
+				colors={ [ theme, custom ] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomColors
+			/>
+		);
+		await user.click( screen.getByRole( 'option', { name: 'Blue' } ) );
+		onChange.mockClear();
+		const updated = { ...blue, name: 'Updated blue', color: '#00ffff' };
+
+		await view.rerender(
+			<ColorPalette
+				aria-label="Presets"
+				colors={ [
+					{ ...custom, name: 'Changed custom', colors: [ updated ] },
+					theme,
+				] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomColors
+			/>
+		);
+		const group = screen.getByRole( 'group', { name: 'Changed custom' } );
+		expect(
+			within( group ).getByRole( 'option', { name: 'Updated blue' } )
+		).toHaveFocus();
+		await user.keyboard( '{ArrowRight}' );
+		expect( screen.getByRole( 'option', { name: 'Red' } ) ).toHaveFocus();
+		await user.keyboard( '{ArrowLeft}{Enter}' );
+		expect( onChange ).toHaveBeenLastCalledWith( updated.color, 0, 'blue' );
+
+		onChange.mockClear();
+		await user.keyboard( '{ArrowRight}' );
+		await view.rerender(
+			<ColorPalette
+				aria-label="Presets"
+				colors={ [ theme ] }
+				onChange={ onChange }
+				clearable={ false }
+				disableCustomColors
+			/>
+		);
+		expect(
+			within(
+				screen.getByRole( 'group', { name: 'Palette' } )
+			).getByRole( 'option', { name: 'Red' } )
+		).toHaveFocus();
+		await user.keyboard( '{Enter}' );
+		expect( onChange ).toHaveBeenCalledExactlyOnceWith(
+			red.color,
+			0,
+			'red'
+		);
+	} );
 	it.each( [ false, true ] )(
 		'keeps focus and current keyboard actions after reordering colors with slugs=%s',
 		async ( withSlugs ) => {

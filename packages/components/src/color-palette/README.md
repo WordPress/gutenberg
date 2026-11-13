@@ -47,6 +47,8 @@ Whether the palette should have a clearing button.
 
 Array with the colors to be shown. When displaying multiple color palettes to choose from, the format of the array changes from an array of colors objects, to an array of color palettes.
 
+Each palette has a `name`, a `colors` array, and an optional `slug`. Supply a stable slug, unique among palettes, when palettes can be reordered or removed. This keeps focus on the same palette as the list changes. Palettes without a slug keep positional identity.
+
 -   Required: No
 -   Default: `[]`
 

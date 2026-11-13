@@ -123,31 +123,40 @@ function MultiplePalettes( {
 
 	return (
 		<VStack spacing={ 3 } className={ className }>
-			{ colors.map( ( { name, colors: colorPalette }, index ) => {
-				const id = `${ instanceId }-${ index }`;
-				return (
-					<VStack spacing={ 2 } key={ index }>
-						<Heading
-							className={ styles[ 'color-heading' ] }
-							id={ id }
-							level={ headingLevel }
-						>
-							{ name }
-						</Heading>
-						<SinglePalette
-							clearColor={ clearColor }
-							colors={ colorPalette }
-							onChange={ ( newColor, _colorIndex, slug ) =>
-								onChange( newColor, index, slug )
+			{ colors.map(
+				( { name, slug: originSlug, colors: colorPalette }, index ) => {
+					const id = `${ instanceId }-${ index }`;
+					return (
+						<VStack
+							spacing={ 2 }
+							key={
+								typeof originSlug === 'string'
+									? `slug:${ originSlug }`
+									: `index:${ index }`
 							}
-							value={ value }
-							selectedSlug={ selectedSlug }
-							presentation={ presentation }
-							aria-labelledby={ id }
-						/>
-					</VStack>
-				);
-			} ) }
+						>
+							<Heading
+								className={ styles[ 'color-heading' ] }
+								id={ id }
+								level={ headingLevel }
+							>
+								{ name }
+							</Heading>
+							<SinglePalette
+								clearColor={ clearColor }
+								colors={ colorPalette }
+								onChange={ ( newColor, _colorIndex, slug ) =>
+									onChange( newColor, index, slug )
+								}
+								value={ value }
+								selectedSlug={ selectedSlug }
+								presentation={ presentation }
+								aria-labelledby={ id }
+							/>
+						</VStack>
+					);
+				}
+			) }
 		</VStack>
 	);
 }
