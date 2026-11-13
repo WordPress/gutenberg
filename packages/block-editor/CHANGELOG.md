@@ -3,6 +3,8 @@
 ## Unreleased
 
 ### Enhancements
+
+-   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
@@ -10,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).
@@ -19,6 +22,7 @@
 -   Writing flow: Do not make the canvas an editing host in preview mode. In the revisions screen, the canvas stays read-only when a Paragraph or List Item block is focused or clicked, and Tab moves past these blocks instead of looping back to the first block ([#84578](https://github.com/WordPress/gutenberg/pull/84578)).
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
+-   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
 
 ### Internal
 

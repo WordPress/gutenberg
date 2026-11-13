@@ -42,12 +42,14 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should error without arguments', () => {
+		// @ts-expect-error Testing missing required arguments.
 		const format = registerFormatType();
 		expect( console ).toHaveErroredWith( 'Format names must be strings.' );
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types without a namespace', () => {
+		// @ts-expect-error Testing missing required settings argument.
 		const format = registerFormatType( 'doing-it-wrong' );
 		expect( console ).toHaveErroredWith(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
@@ -56,6 +58,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject format types with too many namespaces', () => {
+		// @ts-expect-error Testing missing required settings argument.
 		const format = registerFormatType( 'doing/it/wrong' );
 		expect( console ).toHaveErroredWith(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
@@ -64,6 +67,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject format types with invalid characters', () => {
+		// @ts-expect-error Testing missing required settings argument.
 		const format = registerFormatType( 'still/_doing_it_wrong' );
 		expect( console ).toHaveErroredWith(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
@@ -72,6 +76,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject format types with uppercase characters', () => {
+		// @ts-expect-error Testing missing required settings argument.
 		const format = registerFormatType( 'Core/Bold' );
 		expect( console ).toHaveErroredWith(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
@@ -80,6 +85,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject format types not starting with a letter', () => {
+		// @ts-expect-error Testing missing required settings argument.
 		const format = registerFormatType( 'my-plugin/4-fancy-format' );
 		expect( console ).toHaveErroredWith(
 			'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format'
@@ -88,6 +94,7 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject numbers', () => {
+		// @ts-expect-error Testing invalid non-string format name and missing settings.
 		const format = registerFormatType( 42 );
 		expect( console ).toHaveErroredWith( 'Format names must be strings.' );
 		expect( format ).toBeUndefined();
@@ -115,9 +122,12 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject formats without tag name', () => {
-		const settings = { ...validSettings };
-		delete settings.tagName;
-		const format = registerFormatType( validName, settings );
+		const { tagName, ...settings } = validSettings;
+		const format = registerFormatType(
+			validName,
+			// @ts-expect-error Testing missing tagName property.
+			settings
+		);
 		expect( console ).toHaveErroredWith(
 			'Format tag names must be a string.'
 		);
@@ -136,9 +146,12 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject formats without class name', () => {
-		const settings = { ...validSettings };
-		delete settings.className;
-		const format = registerFormatType( validName, settings );
+		const { className, ...settings } = validSettings;
+		const format = registerFormatType(
+			validName,
+			// @ts-expect-error Testing missing className property.
+			settings
+		);
 		expect( console ).toHaveErroredWith(
 			'Format class names must be a string, or null to handle bare elements.'
 		);
@@ -195,9 +208,12 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should reject formats without title', () => {
-		const settings = { ...validSettings };
-		delete settings.title;
-		const format = registerFormatType( validName, settings );
+		const { title, ...settings } = validSettings;
+		const format = registerFormatType(
+			validName,
+			// @ts-expect-error Testing missing title property.
+			settings
+		);
 		expect( console ).toHaveErroredWith(
 			`The format "${ validName }" must have a title.`
 		);
@@ -218,6 +234,7 @@ describe( 'registerFormatType', () => {
 	it( 'should reject titles which are not strings', () => {
 		const format = registerFormatType( validName, {
 			...validSettings,
+			// @ts-expect-error Testing invalid non-string title property.
 			title: 1337,
 		} );
 		expect( console ).toHaveErroredWith( 'Format titles must be strings.' );
@@ -225,7 +242,9 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should store a copy of the format type', () => {
-		const formatType = { ...validSettings };
+		const formatType: typeof validSettings & { mutated?: boolean } = {
+			...validSettings,
+		};
 		registerFormatType( validName, formatType );
 		formatType.mutated = true;
 		expect( getFormatType( validName ) ).toEqual( {

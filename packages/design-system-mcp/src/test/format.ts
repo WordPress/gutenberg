@@ -146,7 +146,11 @@ Button content.
 			importStatement: null,
 			props: [],
 			stories: [
-				{ name: 'Default', snippet: '<Button>Click</Button>' },
+				{
+					name: 'Default',
+					snippet: '<Button>Click</Button>',
+					description: 'A button with default settings.',
+				},
 				{ name: 'No Snippet' },
 			],
 		} );
@@ -159,6 +163,8 @@ Button content.
 ## Examples
 
 ### Default
+
+A button with default settings.
 
 \`\`\`tsx
 <Button>Click</Button>

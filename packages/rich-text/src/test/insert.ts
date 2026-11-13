@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { insert } from '../insert';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength, partialValue } from './helpers';
 
 describe( 'insert', () => {
 	const em = { type: 'em' };
@@ -15,11 +14,11 @@ describe( 'insert', () => {
 			start: 6,
 			end: 6,
 		};
-		const toInsert = {
+		const toInsert = partialValue( {
 			formats: [ [ strong ] ],
 			replacements: [],
 			text: 'a',
-		};
+		} );
 		const expected = {
 			formats: [ , , [ strong ], [ em ], , , , , , , ],
 			replacements: [],
@@ -27,7 +26,7 @@ describe( 'insert', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = insert( deepFreeze( record ), toInsert, 2, 6 );
+		const result = insert( freezeValue( record ), toInsert, 2, 6 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -42,11 +41,11 @@ describe( 'insert', () => {
 			start: 1,
 			end: 1,
 		};
-		const toInsert = {
+		const toInsert = partialValue( {
 			formats: [ , ],
 			replacements: [],
 			text: '\n',
-		};
+		} );
 		const expected = {
 			formats: [ , , , ],
 			replacements: [],
@@ -54,7 +53,7 @@ describe( 'insert', () => {
 			start: 2,
 			end: 2,
 		};
-		const result = insert( deepFreeze( record ), toInsert );
+		const result = insert( freezeValue( record ), toInsert );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -74,7 +73,7 @@ describe( 'insert', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = insert( deepFreeze( record ), 'c' );
+		const result = insert( freezeValue( record ), 'c' );
 
 		expect( result ).toEqual( expected );
 	} );

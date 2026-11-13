@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import deepFreeze from 'deep-freeze';
 import { split } from '../split';
-import { getSparseArrayLength } from './helpers';
+import { freezeValue, getSparseArrayLength } from './helpers';
 
 describe( 'split', () => {
 	const em = { type: 'em' };
@@ -28,10 +27,10 @@ describe( 'split', () => {
 				text: 'o three',
 			},
 		];
-		const result = split( deepFreeze( record ), 6, 6 );
+		const result = split( freezeValue( record ), 6, 6 );
 
 		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
+		result!.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
 			expect( getSparseArrayLength( item.formats ) ).toBe(
 				getSparseArrayLength( expected[ index ].formats )
@@ -61,10 +60,10 @@ describe( 'split', () => {
 				end: 0,
 			},
 		];
-		const result = split( deepFreeze( record ) );
+		const result = split( freezeValue( record ) );
 
 		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
+		result!.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
 			expect( getSparseArrayLength( item.formats ) ).toBe(
 				getSparseArrayLength( expected[ index ].formats )
@@ -94,10 +93,10 @@ describe( 'split', () => {
 				end: 0,
 			},
 		];
-		const result = split( deepFreeze( record ) );
+		const result = split( freezeValue( record ) );
 
 		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
+		result!.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
 			expect( getSparseArrayLength( item.formats ) ).toBe(
 				getSparseArrayLength( expected[ index ].formats )
@@ -170,10 +169,10 @@ describe( 'split', () => {
 				text: 'five',
 			},
 		];
-		const result = split( deepFreeze( record ), ' ' );
+		const result = split( freezeValue( record ), ' ' );
 
 		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
+		result!.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
 			expect( getSparseArrayLength( item.formats ) ).toBe(
 				getSparseArrayLength( expected[ index ].formats )
@@ -208,10 +207,10 @@ describe( 'split', () => {
 				text: 'three',
 			},
 		];
-		const result = split( deepFreeze( record ), ' ' );
+		const result = split( freezeValue( record ), ' ' );
 
 		expect( result ).toEqual( expected );
-		result.forEach( ( item, index ) => {
+		result!.forEach( ( item, index ) => {
 			expect( item ).not.toBe( record );
 			expect( getSparseArrayLength( item.formats ) ).toBe(
 				getSparseArrayLength( expected[ index ].formats )
@@ -225,7 +224,7 @@ describe( 'split', () => {
 			replacements: [],
 			text: '',
 		};
-		expect( split( deepFreeze( record ) ) ).toBe( undefined );
+		expect( split( freezeValue( record ) ) ).toBe( undefined );
 	} );
 
 	it( 'should split at indices without selection', () => {
@@ -234,7 +233,7 @@ describe( 'split', () => {
 			replacements: [ , , , , ],
 			text: 'abcd',
 		};
-		const [ before, after ] = split( deepFreeze( record ), 1, 3 );
+		const [ before, after ] = split( freezeValue( record ), 1, 3 )!;
 
 		expect( before.text ).toBe( 'a' );
 		expect( after.text ).toBe( 'd' );

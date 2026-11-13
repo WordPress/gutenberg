@@ -1,3 +1,4 @@
+import type { AnyAction } from 'redux';
 import { describe, expect, it } from 'vitest';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
@@ -8,19 +9,19 @@ const getElementCount = createRegistrySelector( ( select ) => () => {
 	return select( 'elements' ).getElements().length;
 } );
 
-const getFilterValue = ( state ) => state;
+const getFilterValue = ( state: string ) => state;
 
 const getFilteredElements = createRegistrySelector( ( select ) =>
 	createSelector(
-		( state ) => {
+		( state: string ) => {
 			const filter = getFilterValue( state );
 			const elements = select( 'elements' ).getElements();
 			if ( ! filter ) {
 				return elements;
 			}
-			return elements.filter( ( el ) => el.startsWith( filter ) );
+			return elements.filter( ( el: string ) => el.startsWith( filter ) );
 		},
-		( state ) => [
+		( state: string ) => [
 			select( 'elements' ).getElements(),
 			getFilterValue( state ),
 		]
@@ -28,29 +29,29 @@ const getFilteredElements = createRegistrySelector( ( select ) =>
 );
 
 const elementsStore = createReduxStore( 'elements', {
-	reducer( state = [], action ) {
+	reducer( state: string[] = [], action: AnyAction ) {
 		if ( action.type === 'ADD' ) {
 			return [ ...state, ...action.elements ];
 		}
 		return state;
 	},
 	actions: {
-		add: ( ...elements ) => ( { type: 'ADD', elements } ),
+		add: ( ...elements: string[] ) => ( { type: 'ADD', elements } ),
 	},
 	selectors: {
-		getElements: ( state ) => state,
+		getElements: ( state: string[] ) => state,
 	},
 } );
 
 const uiStore = createReduxStore( 'ui', {
-	reducer( state = '', action ) {
+	reducer( state = '', action: AnyAction ) {
 		if ( action.type === 'FILTER' ) {
 			return action.value;
 		}
 		return state;
 	},
 	actions: {
-		filter: ( value ) => ( { type: 'FILTER', value } ),
+		filter: ( value: string ) => ( { type: 'FILTER', value } ),
 	},
 	selectors: {
 		getFilterValue,
