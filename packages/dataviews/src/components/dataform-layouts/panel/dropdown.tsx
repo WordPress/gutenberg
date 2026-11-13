@@ -61,7 +61,14 @@ function DropdownContentWithValidation( {
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
 	useRevealValidity( ref, touched );
-	return <div ref={ ref }>{ children }</div>;
+	return (
+		<div
+			ref={ ref }
+			className="dataforms-layouts-panel__field-dropdown-content"
+		>
+			{ children }
+		</div>
+	);
 }
 
 function PanelDropdown< Item >( {

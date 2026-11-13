@@ -197,6 +197,14 @@
 	min-width: min(320px, calc(100vw - 16px));
 }
 
+.dataforms-layouts-panel__field-dropdown-content {
+	max-height: calc(var(--available-height) - 2 * (var(--wpds-dimension-padding-lg) + var(--wpds-border-width-xs)));
+	overflow: auto;
+	// Keep outward focus rings inside the scroll area.
+	margin: calc(-2 * var(--wpds-border-width-focus));
+	padding: calc(2 * var(--wpds-border-width-focus));
+}
+
 .dataforms-layouts-panel__dropdown-header {
 	margin-bottom: var(--wpds-dimension-gap-lg);
 }
