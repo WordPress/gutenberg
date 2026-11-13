@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Validate the `uri` schema format with the URL parser of the platform, so that URLs with non-ASCII characters, such as a permalink under a non-ASCII permalink structure, are accepted ([#86844](https://github.com/WordPress/gutenberg/pull/86844)).
+
 ## 0.25.0 (2026-11-04)
 
 ## 0.24.0 (2026-10-20)

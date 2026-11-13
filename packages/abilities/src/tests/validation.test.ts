@@ -241,6 +241,114 @@ describe( 'validateValueFromSchema', () => {
 				' is not a valid URI.'
 			);
 		} );
+
+		// The forms a WordPress URL takes in the output of an ability.
+		it.each( [
+			[
+				'a pretty permalink',
+				'https://example.com/2026/11/hello-world/',
+			],
+			[ 'a plain permalink', 'https://example.com/?p=123' ],
+			[
+				'a plain permalink of a custom post type',
+				'https://example.com/?post_type=book&p=5',
+			],
+			[
+				'a percent-encoded slug',
+				'https://example.com/%e6%96%87%e7%ab%a0/',
+			],
+			[ 'a local site with a port', 'http://localhost:8889/?page_id=2' ],
+			[
+				'an avatar with query arguments',
+				'https://secure.gravatar.com/avatar/0bc83cb571cd1c50ba6f3e8a78ef1346?s=96&d=mm&r=g',
+			],
+			[
+				'a permalink structure with non-ASCII characters',
+				'https://example.com/блог/hello-world/',
+			],
+			[
+				'a post type slug with non-ASCII characters',
+				'https://example.com/produkte-größe/stuhl/',
+			],
+			[
+				'an internationalized domain name',
+				'https://例え.jp/hello-world/',
+			],
+			[
+				'an internationalized domain name in Punycode',
+				'https://xn--r8jz45g.jp/hello-world/',
+			],
+			[
+				'a file with a non-ASCII name',
+				'https://example.com/wp-content/uploads/2026/11/写真.jpg',
+			],
+		] )( 'should accept %s as a URI', ( _description, value ) => {
+			const schema = { type: 'string', format: 'uri' };
+			expect( validateValueFromSchema( value, schema ) ).toBe( true );
+		} );
+
+		it.each( [
+			[ 'an empty string', '' ],
+			[ 'a root-relative URL', '/2026/11/hello-world/' ],
+			[ 'a protocol-relative URL', '//example.com/hello-world/' ],
+			[ 'a URL without a host', 'https://' ],
+			[ 'a host with a space', 'https://exa mple.com/' ],
+		] )( 'should reject %s as a URI', ( _description, value ) => {
+			const schema = { type: 'string', format: 'uri' };
+			expect( validateValueFromSchema( value, schema ) ).toBe(
+				' is not a valid URI.'
+			);
+		} );
+
+		it( 'should validate the links in a result shaped like the output of a core ability', () => {
+			// The shape of `core/content-query`: a page of posts, each with a `link`.
+			const schema = {
+				type: 'object',
+				required: [ 'items' ],
+				properties: {
+					items: {
+						type: 'array',
+						items: {
+							type: 'object',
+							properties: {
+								id: { type: 'integer' },
+								link: { type: 'string', format: 'uri' },
+							},
+						},
+					},
+				},
+			};
+
+			expect(
+				validateValueFromSchema(
+					{
+						items: [
+							{ id: 1, link: 'https://example.com/hello-world/' },
+							{
+								id: 2,
+								link: 'https://example.com/блог/привет-мир/',
+							},
+							{ id: 3, link: 'https://例え.jp/?p=3' },
+						],
+					},
+					schema,
+					'output'
+				)
+			).toBe( true );
+
+			expect(
+				validateValueFromSchema(
+					{
+						items: [
+							{ id: 1, link: 'https://example.com/hello-world/' },
+							{ id: 2, link: '/hello-world/' },
+						],
+					},
+					schema,
+					'output'
+				)
+			).toBe( 'output[items][1][link] is not a valid URI.' );
+		} );
 	} );
 
 	describe( 'pattern validation', () => {
