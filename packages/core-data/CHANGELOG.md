@@ -8,6 +8,10 @@
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
 
+### Internal
+
+-   Export 'getViewConfig' as a public selector on the core data store ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
+
 ## 9.1.0 (2026-11-04)
 
 ### Internal

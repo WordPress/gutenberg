@@ -11496,16 +11496,6 @@
 			"count": 1
 		}
 	},
-	"packages/views/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/views/src/use-view-config.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/warning/test/babel-plugin.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

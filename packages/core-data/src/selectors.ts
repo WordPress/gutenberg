@@ -1722,3 +1722,36 @@ export const getRevision = (
 
 	return getFilteredItem( item, query._fields );
 };
+
+/**
+ * Returns the view configuration for the given entity type.
+ *
+ * An optional fourth argument (e.g. `{ fields }`) may be passed when selecting;
+ * it is consumed by the `getViewConfig` resolver to request a subset of the
+ * config via the REST API `_fields` parameter and does not affect what is read
+ * here. Partial responses are merged in the reducer, so the returned object may
+ * accumulate properties across requests for the same entity.
+ *
+ * @param state   Data state.
+ * @param kind    Entity kind.
+ * @param name    Entity name.
+ * @param options Optional options.
+ *
+ * @return The view configuration or undefined if not loaded.
+ */
+export function getViewConfig(
+	state: State,
+	kind: string,
+	name: string,
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	options?: Record< string, any >
+): Record< string, any > | undefined {
+	return (
+		state.viewConfigs?.[ `${ kind }/${ name }` ] ?? {
+			default_view: undefined,
+			default_layouts: undefined,
+			view_list: undefined,
+			form: undefined,
+		}
+	);
+}
