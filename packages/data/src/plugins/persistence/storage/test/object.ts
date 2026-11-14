@@ -30,7 +30,11 @@ describe( 'objectStorage', () => {
 		} );
 
 		it( 'should assign as string', () => {
-			objectStorage.setItem( 'foo', null );
+			objectStorage.setItem(
+				'foo',
+				// @ts-expect-error Testing that null is coerced to a string.
+				null
+			);
 			const result = objectStorage.getItem( 'foo' );
 
 			expect( result ).toBe( 'null' );
