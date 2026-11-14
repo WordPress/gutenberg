@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: keep the HTML serialization of rich-text values read from the shared document, so syncing a local edit no longer serializes every rich-text value in the post again ([#85324](https://github.com/WordPress/gutenberg/pull/85324)).
+
 ### Bug Fixes
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
