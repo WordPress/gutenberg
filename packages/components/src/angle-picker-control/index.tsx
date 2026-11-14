@@ -1,4 +1,8 @@
-import type { ForwardedRef } from 'react';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
@@ -9,15 +13,21 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 import AngleCircle from './angle-circle';
 import type { WordPressComponentProps } from '../context';
-import type { AnglePickerControlProps } from './types';
+import type {
+	AnglePickerControlProps,
+	PrivateAnglePickerControlProps,
+} from './types';
 
 function UnforwardedAnglePickerControl(
-	props: WordPressComponentProps< AnglePickerControlProps, 'div' >,
+	props: WordPressComponentProps< PrivateAnglePickerControlProps, 'div' >,
 	ref: ForwardedRef< any >
 ) {
 	const {
+		allowEmpty = false,
 		className,
 		label = __( 'Angle' ),
+		max = 360,
+		min = 0,
 		onChange,
 		value,
 		...restProps
@@ -28,12 +38,15 @@ function UnforwardedAnglePickerControl(
 			return;
 		}
 
-		const inputValue =
-			unprocessedValue !== undefined && unprocessedValue !== ''
-				? parseInt( unprocessedValue, 10 )
-				: 0;
-		onChange( inputValue );
+		if ( unprocessedValue === undefined || unprocessedValue === '' ) {
+			onChange( allowEmpty ? undefined : 0 );
+			return;
+		}
+
+		onChange( parseInt( unprocessedValue, 10 ) );
 	};
+
+	const isEmpty = allowEmpty && ( value === undefined || value === '' );
 
 	const classes = clsx( 'components-angle-picker-control', className );
 
@@ -49,8 +62,8 @@ function UnforwardedAnglePickerControl(
 				<NumberControl
 					label={ label }
 					className="components-angle-picker-control__input-field"
-					max={ 360 }
-					min={ 0 }
+					max={ max }
+					min={ min }
 					onChange={ handleOnNumberChange }
 					step="1"
 					value={ value }
@@ -61,7 +74,9 @@ function UnforwardedAnglePickerControl(
 			<Spacer marginBottom="1" marginTop="auto">
 				<AngleCircle
 					aria-hidden="true"
-					value={ value }
+					value={ isEmpty ? undefined : ( value ?? 0 ) }
+					min={ min }
+					max={ max }
 					onChange={ onChange }
 				/>
 			</Spacer>
@@ -74,6 +89,11 @@ function UnforwardedAnglePickerControl(
  * pick an angle. Users can choose an angle in a visual UI with the mouse by
  * dragging an angle indicator inside a circle or by directly inserting the
  * desired angle in a text field.
+ *
+ * With a custom `min` or `max`, the dial works like a knob: dragging changes
+ * the angle by how far it turns, past a full turn if the range allows, and
+ * stops at `min` and `max`. The dial shows the direction and the text field
+ * shows the full angle.
  *
  * ```jsx
  * import { useState } from '@wordpress/element';
@@ -90,7 +110,21 @@ function UnforwardedAnglePickerControl(
  * }
  * ```
  */
-export const AnglePickerControl = forwardRef( UnforwardedAnglePickerControl );
+export const AnglePickerControl = forwardRef(
+	UnforwardedAnglePickerControl
+) as ForwardRefExoticComponent<
+	WordPressComponentProps< AnglePickerControlProps, 'div' > &
+		RefAttributes< any >
+>;
 AnglePickerControl.displayName = 'AnglePickerControl';
+
+/**
+ * `AnglePickerControl` with an `allowEmpty` option, so that clearing the
+ * input reports `undefined` instead of `0`.
+ */
+export const PrivateAnglePickerControl = forwardRef(
+	UnforwardedAnglePickerControl
+);
+PrivateAnglePickerControl.displayName = 'PrivateAnglePickerControl';
 
 export default AnglePickerControl;

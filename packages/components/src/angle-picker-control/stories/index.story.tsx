@@ -49,3 +49,35 @@ const AnglePickerWithState: StoryFn< typeof AnglePickerControl > = ( {
 };
 
 export const Default = AnglePickerWithState.bind( {} );
+
+/**
+ * Use `min` and `max` to change the range of angles that can be entered,
+ * for example to allow negative angles. Dragging the dial anticlockwise
+ * from 0 gives a negative angle, and it stops at `min` and `max`.
+ */
+export const WithCustomRange = AnglePickerWithState.bind( {} );
+WithCustomRange.args = {
+	min: -180,
+	max: 180,
+};
+
+/**
+ * A range wider than a full turn keeps counting as the dial turns, so
+ * dragging anticlockwise from 0 goes below 0, and dragging clockwise from
+ * 350 stops at 360.
+ */
+export const WithMoreThanOneTurn = AnglePickerWithState.bind( {} );
+WithMoreThanOneTurn.args = {
+	min: -360,
+	max: 360,
+};
+
+/**
+ * A range narrower than a full turn stops at `min` and `max`, however far
+ * the dial is dragged.
+ */
+export const WithNarrowRange = AnglePickerWithState.bind( {} );
+WithNarrowRange.args = {
+	min: 0,
+	max: 90,
+};

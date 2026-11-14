@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useEffect, useRef } from '@wordpress/element';
 import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
+import { clamp } from '../utils/math';
 import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import type { AngleCircleProps } from './types';
@@ -13,6 +14,8 @@ type UseDraggingCallbackEvent =
 
 function AngleCircle( {
 	value,
+	min = 0,
+	max = 360,
 	onChange,
 	className,
 	...props
@@ -23,6 +26,13 @@ function AngleCircle( {
 	);
 	const previousCursorValueRef =
 		useRef< CSSStyleDeclaration[ 'cursor' ] >( undefined );
+	// Read during a drag instead of `value`, which can lag between events.
+	const dragStateRef = useRef< {
+		lastPointerAngle: number;
+		unclampedValue: number;
+	} >( undefined );
+	// The default range keeps reporting the raw dial angle, as it always has.
+	const isDefaultRange = min === 0 && max === 360;
 
 	const setAngleCircleCenter = () => {
 		if ( angleCircleRef.current === null ) {
@@ -36,9 +46,9 @@ function AngleCircle( {
 		};
 	};
 
-	const changeAngleToPosition = ( event: UseDraggingCallbackEvent ) => {
+	const capturePointerAngle = ( event: UseDraggingCallbackEvent ) => {
 		if ( event === undefined ) {
-			return;
+			return undefined;
 		}
 
 		// Prevent (drag) mouse events from selecting and accidentally
@@ -47,24 +57,58 @@ function AngleCircle( {
 		// Input control needs to lose focus and by preventDefault above, it doesn't.
 		( event.target as HTMLDivElement | null )?.focus();
 
-		if (
-			angleCircleCenterRef.current !== undefined &&
-			onChange !== undefined
-		) {
-			const { x: centerX, y: centerY } = angleCircleCenterRef.current;
-			onChange(
-				getAngle( centerX, centerY, event.clientX, event.clientY )
-			);
+		if ( angleCircleCenterRef.current === undefined ) {
+			return undefined;
 		}
+
+		const { x: centerX, y: centerY } = angleCircleCenterRef.current;
+		return getAngle( centerX, centerY, event.clientX, event.clientY );
+	};
+
+	const turnDial = ( event: UseDraggingCallbackEvent, isStart: boolean ) => {
+		const angle = capturePointerAngle( event );
+		if ( angle === undefined || onChange === undefined ) {
+			return;
+		}
+
+		if ( isDefaultRange ) {
+			onChange( angle );
+			return;
+		}
+
+		let unclampedValue;
+		if ( isStart ) {
+			const currentValue = Number( value );
+			const reference =
+				value !== '' && Number.isFinite( currentValue )
+					? clamp( currentValue, min, max )
+					: clamp( 0, min, max );
+			unclampedValue = getNearestEquivalent( angle, reference );
+		} else {
+			if ( dragStateRef.current === undefined ) {
+				return;
+			}
+			// Between two events the pointer is taken to have turned the short
+			// way round, so a fast flick of more than half a turn reverses.
+			unclampedValue =
+				dragStateRef.current.unclampedValue +
+				getShortestTurn( dragStateRef.current.lastPointerAngle, angle );
+		}
+
+		dragStateRef.current = { lastPointerAngle: angle, unclampedValue };
+		onChange( clamp( unclampedValue, min, max ) );
 	};
 
 	const { startDrag, isDragging } = useDragging( {
 		onDragStart: ( event ) => {
 			setAngleCircleCenter();
-			changeAngleToPosition( event );
+			turnDial( event, true );
 		},
-		onDragMove: changeAngleToPosition,
-		onDragEnd: changeAngleToPosition,
+		onDragMove: ( event ) => turnDial( event, false ),
+		onDragEnd: ( event ) => {
+			turnDial( event, false );
+			dragStateRef.current = undefined;
+		},
 	} );
 
 	useEffect( () => {
@@ -91,23 +135,27 @@ function AngleCircle( {
 			) }
 			{ ...props }
 		>
-			<div
-				style={
-					value ? { transform: `rotate(${ value }deg)` } : undefined
-				}
-				className={ clsx(
-					'components-angle-picker-control__angle-circle-indicator-wrapper',
-					styles[ 'circle-indicator-wrapper' ]
-				) }
-				tabIndex={ -1 }
-			>
+			{ value !== undefined && (
 				<div
+					style={
+						value
+							? { transform: `rotate(${ value }deg)` }
+							: undefined
+					}
 					className={ clsx(
-						'components-angle-picker-control__angle-circle-indicator',
-						styles[ 'circle-indicator' ]
+						'components-angle-picker-control__angle-circle-indicator-wrapper',
+						styles[ 'circle-indicator-wrapper' ]
 					) }
-				/>
-			</div>
+					tabIndex={ -1 }
+				>
+					<div
+						className={ clsx(
+							'components-angle-picker-control__angle-circle-indicator',
+							styles[ 'circle-indicator' ]
+						) }
+					/>
+				</div>
+			) }
 		</div>
 	);
 }
@@ -127,6 +175,29 @@ function getAngle(
 		return 360 + angleInDeg;
 	}
 	return angleInDeg;
+}
+
+/**
+ * Returns the angle that points the same way as `angle` and is closest to
+ * `reference`.
+ *
+ * @param angle     An angle in degrees.
+ * @param reference The angle in degrees to stay close to.
+ */
+function getNearestEquivalent( angle: number, reference: number ) {
+	return angle + 360 * Math.round( ( reference - angle ) / 360 );
+}
+
+/**
+ * Returns the turn in degrees from `from` to `to` the short way round, with
+ * a half turn going clockwise.
+ *
+ * @param from The starting angle in degrees.
+ * @param to   The ending angle in degrees.
+ */
+function getShortestTurn( from: number, to: number ) {
+	const delta = to - from;
+	return delta + 360 * Math.round( -delta / 360 );
 }
 
 export default AngleCircle;

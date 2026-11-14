@@ -12,10 +12,12 @@ import {
 	ValidatedTextareaControl,
 } from './validated-form-controls';
 import ContentEditableControl from './content-editable-control';
+import { PrivateAnglePickerControl } from './angle-picker-control';
 
 export const privateApis = {};
 lock( privateApis, {
 	ContentEditableControl,
+	PrivateAnglePickerControl,
 	__experimentalPopoverLegacyPositionToPlacement,
 	ComponentsContext,
 	Tabs,
