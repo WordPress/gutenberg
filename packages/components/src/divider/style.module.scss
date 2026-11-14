@@ -5,7 +5,7 @@
 	// Keep the orientation selectors at the pre-#79444 specificity so existing
 	// border overrides continue to win.
 	&:where([aria-orientation="horizontal"]) {
-		border-block-end: 1px solid currentColor;
+		border-block-end: var(--_wp-components-divider-border-width, 1px) solid currentColor;
 		block-size: 0;
 		inline-size: auto;
 		margin-block-start: var(--wp-components-divider-margin-start, 0);
@@ -14,7 +14,7 @@
 
 	&:where([aria-orientation="vertical"]) {
 		display: inline;
-		border-inline-end: 1px solid currentColor;
+		border-inline-end: var(--_wp-components-divider-border-width, 1px) solid currentColor;
 		block-size: auto;
 		inline-size: 0;
 		margin-inline-start: var(--wp-components-divider-margin-start, 0);

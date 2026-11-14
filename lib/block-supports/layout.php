@@ -403,6 +403,8 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 			$child_layout_declarations['grid-column'] = "$column_start";
 		} elseif ( $column_span ) {
 			$child_layout_declarations['grid-column'] = "span $column_span";
+		} elseif ( null !== $viewport_overrides && $has_viewport_property_override( 'columnStart' ) && null === $viewport_overrides['columnStart'] ) {
+			$child_layout_declarations['grid-column'] = 'auto';
 		}
 	}
 
@@ -417,6 +419,8 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 			$child_layout_declarations['grid-row'] = "$row_start";
 		} elseif ( $row_span ) {
 			$child_layout_declarations['grid-row'] = "span $row_span";
+		} elseif ( null !== $viewport_overrides && $has_viewport_property_override( 'rowStart' ) && null === $viewport_overrides['rowStart'] ) {
+			$child_layout_declarations['grid-row'] = 'auto';
 		}
 	}
 
@@ -944,7 +948,14 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		if ( $should_output_grid_rows ) {
 			$layout_styles[] = array(
 				'selector'     => $selector,
-				'declarations' => array( 'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, auto))' ),
+				/*
+				 * The aspect ratio gives empty rows a height, so cells are roughly square.
+				 * Rows still grow if their content is taller.
+				 */
+				'declarations' => array(
+					'grid-template-rows' => 'repeat(' . $row_count . ', minmax(1rem, 1fr))',
+					'aspect-ratio'       => $column_count . ' / ' . $row_count,
+				),
 			);
 		}
 

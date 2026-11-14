@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.4.0-rc.1",
+	"version": "24.4.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -153,6 +153,7 @@
 		"lint:lockfile": "npm run --workspace @wordpress/validation-tools validate-package-lock --",
 		"lint:package-contents": "npm run --if-present --workspaces lint:package-contents",
 		"lint:peer-deps": "npm run --workspace @wordpress/validation-tools check-peer-dependencies --",
+		"lint:peer-ranges": "npm run --workspace @wordpress/validation-tools check-peer-version-ranges --",
 		"lint:tsconfig": "npm run --workspace @wordpress/validation-tools validate-tsconfig --",
 		"lint:changelogs": "npm run --workspace @wordpress/validation-tools validate-changelogs --",
 		"lint:md:docs": "wp-scripts lint-md-docs",

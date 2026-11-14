@@ -66,6 +66,9 @@
 		.is-draft-intent {
 			background-color: var(--wpds-color-background-surface-neutral-weak);
 			color: var(--wpds-color-foreground-content-neutral);
+			border: var(--wpds-border-width-xs) dashed var(--wpds-color-stroke-surface-neutral);
+			padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+			padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
 		}
 
 		.is-none-intent {

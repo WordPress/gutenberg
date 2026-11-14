@@ -9,18 +9,25 @@
 
 ### New Features
 
+-   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 
 ### Enhancements
 
+-   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
+-   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds.
+-   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
+-   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
 
 ### Bug Fixes
 
+-   `Breadcrumb`: Keep committed navigation items when the overflow trigger receives focus during a suspended update ([#86746](https://github.com/WordPress/gutenberg/pull/86746)).
 -   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column ([#86652](https://github.com/WordPress/gutenberg/pull/86652)).
 -   `Combobox` and `Autocomplete`: Keep `ListBody` out of the Tab order, so a scrolling inline list is no longer an extra Tab stop after the input ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `AlertDialog`: Honor canceled open state changes and restore usable controls when closing after confirmation is canceled ([#86544](https://github.com/WordPress/gutenberg/pull/86544)).
@@ -41,6 +48,7 @@
 ### Documentation
 
 -   `Notice`: Add a Storybook example showing a neutral-toned `Link` inside `Notice.Description` ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
+-   `Tabs`: Describe that each tab shows its panel in place, without a change of URL ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
 
 ## 0.26.0 (2026-11-04)
 

@@ -9,6 +9,8 @@ import { DirectionProvider } from '../utils/direction-provider';
  *
  * `Tabs` is a collection of React components that combine to render
  * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
+ *
+ * Each tab shows its panel in place, without a change of URL.
  */
 export const Root = forwardRef< HTMLDivElement, TabRootProps >(
 	function TabsRoot( { ...otherProps }, forwardedRef ) {

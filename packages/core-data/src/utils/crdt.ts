@@ -16,6 +16,7 @@ import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
 	deserializeBlockAttributes,
+	shouldReparseBlocks,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
@@ -417,6 +418,16 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
+						// Missing and invalid blocks serialize back to the markup
+						// they were loaded from, so the content comparison below
+						// cannot tell that the parser would now build a different
+						// block from that markup (for example, after a plugin is
+						// reactivated or updated). Check for those blocks first so
+						// the blocks are re-parsed from the content in that case.
+						if ( shouldReparseBlocks( blocksJson ) ) {
+							return true;
+						}
 
 						return (
 							__unstableSerializeAndClean( blocksJson ).trim() !==
