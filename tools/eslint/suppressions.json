@@ -6986,11 +6986,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/redux-store/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/test/privateAPIs.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
