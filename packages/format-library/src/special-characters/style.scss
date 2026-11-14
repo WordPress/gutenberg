@@ -1,0 +1,118 @@
+.format-library-special-characters__popover {
+	// Grid geometry: eight square cells with an extra small gap. The popover
+	// sizes to it, so it never resizes as results change.
+	--special-characters-cell-size: var(--wpds-dimension-size-md);
+	--special-characters-gap: var(--wpds-dimension-gap-xs);
+	// Matches the Popover surface's padding, so the scroller and the preview
+	// strip can reach its edges.
+	--special-characters-padding: var(--wpds-dimension-padding-lg);
+	--special-characters-grid-width: calc(var(--special-characters-cell-size) * 8 + var(--special-characters-gap) * 7);
+}
+
+.format-library-special-characters__search {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-xs);
+	padding-block-end: var(--wpds-dimension-padding-sm);
+	// Stretch to the grid's width rather than widening the popover.
+	contain: inline-size;
+}
+
+.format-library-special-characters__search-field {
+	flex: 1;
+	min-width: 0;
+}
+
+.format-library-special-characters__results {
+	// A fixed height, so the popover keeps one size as search results change
+	// and does not jump when it opens above the text.
+	display: grid;
+	grid-template-rows: auto minmax(0, 1fr);
+	height: 260px;
+}
+
+// The list's scroller, which also pins each section heading while its rows
+// scroll.
+.format-library-special-characters__list-body {
+	// Reserve room for a classic scrollbar, so the popover keeps its width
+	// when search results stop overflowing.
+	scrollbar-gutter: stable;
+	// Put the scrollbar at the popover's edge, clear of the last column. The
+	// grid still starts at the search field's edge.
+	margin-inline-end: calc(-1 * var(--special-characters-padding));
+	padding-inline-end: var(--special-characters-padding);
+	padding-block-end: var(--wpds-dimension-padding-sm);
+
+	// Search results have no heading, so space them from the field instead.
+	&.is-searching {
+		padding-block-start: var(--wpds-dimension-padding-sm);
+	}
+
+	// Hold the grid's width while there are no search results, so the
+	// popover doesn't resize and reposition. As content, unlike a minimum
+	// width, it keeps a classic scrollbar's gutter in the popover's width.
+	&:empty::before {
+		content: "";
+		display: block;
+		inline-size: var(--special-characters-grid-width);
+	}
+}
+
+.format-library-special-characters__group + .format-library-special-characters__group {
+	margin-block-start: var(--wpds-dimension-gap-md);
+}
+
+.format-library-special-characters__row {
+	display: grid;
+	// Matches COLUMNS in index.tsx, so arrow keys follow the visual columns.
+	grid-template-columns: repeat(8, var(--special-characters-cell-size));
+	gap: var(--special-characters-gap);
+}
+
+// The row's grid track sets the cell width. The Design System item supplies
+// the radius, cursor, and the highlight that follows the arrow keys and pointer.
+.format-library-special-characters__character {
+	justify-content: center;
+	height: var(--special-characters-cell-size);
+	margin-inline: 0;
+	padding: 0;
+}
+
+.format-library-special-characters__character-label {
+	font-size: var(--wpds-typography-font-size-xl);
+}
+
+// The abbreviation shown for a character with no visible glyph, sized to
+// fit a cell.
+.format-library-special-characters__symbol {
+	font-size: var(--wpds-typography-font-size-xs);
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	letter-spacing: 0;
+}
+
+.format-library-special-characters__preview {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-md);
+	// Long names wrap at the grid's width rather than widening the popup.
+	contain: inline-size;
+	// Reserve two lines, so the popup does not resize as the highlight moves
+	// between short and long names.
+	min-height: calc(2lh + var(--wpds-dimension-padding-sm) * 2);
+	// Span the surface's full width, down to its bottom edge.
+	margin-inline: calc(-1 * var(--special-characters-padding));
+	margin-block-end: calc(-1 * var(--special-characters-padding));
+	padding: var(--wpds-dimension-padding-sm) var(--special-characters-padding);
+	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+}
+
+.format-library-special-characters__preview-name {
+	min-width: 0;
+}
+
+.format-library-special-characters__preview-character {
+	flex-shrink: 0;
+	min-width: 1.5em;
+	font-size: var(--wpds-typography-font-size-2xl);
+	text-align: center;
+}
