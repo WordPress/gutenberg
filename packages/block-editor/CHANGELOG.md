@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `URLInput`: Add an opt-in `closeSuggestionsOnNavigateOutside` prop that closes the suggestions list when focus moves outside the field, dismisses it on Escape without also closing an enclosing popover, and only opens the list while the field has focus ([#80879](https://github.com/WordPress/gutenberg/pull/80879)).
+
 ### Enhancements
 
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
