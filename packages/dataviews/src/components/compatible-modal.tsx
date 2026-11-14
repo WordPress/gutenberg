@@ -4,7 +4,13 @@ import {
 	Popover as WCPopover,
 	SlotFillProvider,
 } from '@wordpress/components';
-import { useCallback, useId, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { tabbable } from 'tabbable';
 import {
@@ -39,6 +45,21 @@ export default function CompatibleModal( {
 }: Props ) {
 	const slotName = useId();
 	const finalFocusRef = useRef< HTMLElement | null >( null );
+	useEffect(
+		() => () => {
+			const target = finalFocusRef.current;
+			const active = target?.ownerDocument.activeElement;
+			// The session keeps its original opener when the overlay host changes.
+			if (
+				target?.isConnected &&
+				( ! active?.isConnected ||
+					active === target.ownerDocument.body )
+			) {
+				target.focus();
+			}
+		},
+		[]
+	);
 	const setSource = useCallback( ( node: HTMLSpanElement | null ) => {
 		if ( node && ! finalFocusRef.current ) {
 			const active = node.ownerDocument.activeElement;
@@ -88,7 +109,7 @@ export default function CompatibleModal( {
 				>
 					<Dialog.Popup
 						ref={ mergedFrameRef }
-						finalFocus={ finalFocusRef }
+						finalFocus={ false }
 						initialFocus={
 							focusOnMount === 'firstContentElement'
 								? () => {

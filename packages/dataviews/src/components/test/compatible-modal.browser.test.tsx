@@ -155,19 +155,42 @@ it( 'downgrades an action host when its actual filtered renderer loses support',
 	const RenderModal = withFilters( hook )(
 		Original
 	) as unknown as typeof Original;
-	try {
-		await render(
+	function ActionDemo() {
+		const [ open, setOpen ] = useState( false );
+		return (
 			<SlotFillProvider>
-				<ActionModal
-					action={ { id: 'test', label: 'Test action', RenderModal } }
-					items={ [] }
-					closeModal={ () => {} }
-				/>
+				<button onClick={ () => setOpen( true ) }>Open action</button>
+				{ open && (
+					<ActionModal
+						action={ {
+							id: 'test',
+							label: 'Test action',
+							RenderModal,
+						} }
+						items={ [] }
+						closeModal={ () => setOpen( false ) }
+					/>
+				) }
 			</SlotFillProvider>
 		);
+	}
+	try {
+		await render( <ActionDemo /> );
+		const opener = screen.getByRole( 'button', { name: 'Open action' } );
+		opener.focus();
+		await userEvent.keyboard( '{Enter}' );
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Replace action' } )
 		);
+		await expect
+			.poll(
+				() =>
+					screen.getByRole( 'dialog', { name: 'Test action' } )
+						.dataset.wpUiOverlayModal
+			)
+			.toBeUndefined();
+		const dialog = screen.getByRole( 'dialog', { name: 'Test action' } );
+		await expect.element( dialog ).toHaveFocus();
 		await userEvent.click(
 			await screen.findByRole( 'button', {
 				name: 'Open replacement popup',
@@ -178,6 +201,17 @@ it( 'downgrades an action host when its actual filtered renderer loses support',
 				screen.getByRole( 'button', { name: 'Replacement option' } )
 			)
 			.toHaveFocus();
+		await userEvent.keyboard( '{Escape}' );
+		await expect
+			.element(
+				screen.getByRole( 'button', { name: 'Open replacement popup' } )
+			)
+			.toHaveFocus();
+		await userEvent.keyboard( '{Escape}' );
+		await expect.element( opener ).toHaveFocus();
+		expect(
+			screen.queryByRole( 'dialog', { name: 'Test action' } )
+		).not.toBeInTheDocument();
 	} finally {
 		removeFilter( hook, 'test/replace' );
 	}
