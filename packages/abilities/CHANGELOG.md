@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Accept a date-time without a time zone offset, such as `2026-10-21T09:30:00`, in the `date-time` schema format, as the server does ([#86845](https://github.com/WordPress/gutenberg/pull/86845)).
+
 ## 0.25.0 (2026-11-04)
 
 ## 0.24.0 (2026-10-20)
