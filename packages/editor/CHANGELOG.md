@@ -40,6 +40,7 @@
 -   Autocomplete: Match user mention slugs to popup item highlights ([#84583](https://github.com/WordPress/gutenberg/pull/84583)).
 -   Add a translated ellipsis to modal action labels in post action menus, preserving recognized ellipses in existing labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Notes: Show the add-reaction picker as a single row of emoji, with each name in a tooltip ([#85819](https://github.com/WordPress/gutenberg/pull/85819)).
+-   Revisions: Show the code diff's focus ring with the design system's outline instead of a legacy box-shadow, so it is also visible in high contrast mode ([#85368](https://github.com/WordPress/gutenberg/pull/85368)).
 
 ### Bug Fixes
 
