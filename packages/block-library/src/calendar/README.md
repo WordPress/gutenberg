@@ -33,6 +33,18 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **border**:
+  - root: `.wp-block-calendar th, .wp-block-calendar td`
+  - top: `.wp-block-calendar thead th`
+  - right: `.wp-block-calendar:not(:dir(rtl)) tr > :last-child, .wp-block-calendar:dir(rtl) tr > :first-child`
+  - bottom: `.wp-block-calendar tbody tr:last-child > *`
+  - left: `.wp-block-calendar:not(:dir(rtl)) tr > :first-child, .wp-block-calendar:dir(rtl) tr > :last-child`
+- **color**: `.wp-block-calendar table, .wp-block-calendar th`
+
 ## Block Markup
 
 This is a [**dynamic block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It is rendered on the server and does not save HTML in post content.

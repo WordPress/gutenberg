@@ -25,8 +25,7 @@
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
-			},
-			"__experimentalSelector": "table, th"
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -40,9 +39,25 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalSkipSerialization": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		}
 	},
-	"style": "wp-block-calendar"
+	"style": "wp-block-calendar",
+	"selectors": {
+		"border": {
+			"root": ".wp-block-calendar th, .wp-block-calendar td",
+			"top": ".wp-block-calendar thead th",
+			"right": ".wp-block-calendar:not(:dir(rtl)) tr > :last-child, .wp-block-calendar:dir(rtl) tr > :first-child",
+			"bottom": ".wp-block-calendar tbody tr:last-child > *",
+			"left": ".wp-block-calendar:not(:dir(rtl)) tr > :first-child, .wp-block-calendar:dir(rtl) tr > :last-child"
+		},
+		"color": ".wp-block-calendar table, .wp-block-calendar th"
+	}
 }

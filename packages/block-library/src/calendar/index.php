@@ -43,23 +43,44 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	// Calendar applies only text and background colors, not gradients.
-	$color_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor' ) ) );
+	/*
+	 * Text, background, and border are skip-serialized onto the table (#42029).
+	 * Cell borders inherit from the table via style.scss (same pattern as Table).
+	 * Calendar applies only text and background colors, not gradients.
+	 */
+	$support_attributes = array_intersect_key( $attributes, array_flip( array( 'textColor', 'backgroundColor', 'borderColor' ) ) );
 	foreach ( array( 'text', 'background' ) as $feature ) {
 		if ( isset( $attributes['style']['color'][ $feature ] ) ) {
-			$color_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
+			$support_attributes['style']['color'][ $feature ] = $attributes['style']['color'][ $feature ];
+		}
+	}
+	if ( isset( $attributes['style']['border'] ) ) {
+		$support_attributes['style']['border'] = $attributes['style']['border'];
+	}
+
+	$styles        = wp_get_block_supports_classes_and_styles( $support_attributes, array( 'color', 'border' ) );
+	$table_styles  = $styles['style'] ?? '';
+	$table_classes = $styles['class'] ?? '';
+
+	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
+		$table_classes = trim( $table_classes . ' has-link-color' );
+	}
+
+	$calendar  = get_calendar( array( 'display' => false ) );
+	$calendar  = is_string( $calendar ) ? $calendar : '';
+	$processor = new WP_HTML_Tag_Processor( $calendar );
+
+	if ( $processor->next_tag( 'TABLE' ) ) {
+		if ( '' !== $table_styles ) {
+			$processor->set_attribute( 'style', $table_styles );
+		}
+
+		foreach ( preg_split( '/\s+/', $table_classes, -1, PREG_SPLIT_NO_EMPTY ) as $classname ) {
+			$processor->add_class( $classname );
 		}
 	}
 
-	$styles        = wp_get_color_classes_and_styles( $color_attributes );
-	$inline_styles = empty( $styles['style'] ) ? '' : sprintf( ' style="%s"', esc_attr( $styles['style'] ) );
-	$classnames    = empty( $styles['class'] ) ? '' : ' ' . esc_attr( $styles['class'] );
-	if ( isset( $attributes['style']['elements']['link']['color']['text'] ) ) {
-		$classnames .= ' has-link-color';
-	}
-	// Apply color classes and styles to the calendar.
-	$calendar = str_replace( '<table', '<table' . $inline_styles, get_calendar( array( 'display' => false ) ) );
-	$calendar = str_replace( 'class="wp-calendar-table', 'class="wp-calendar-table' . $classnames, $calendar );
+	$calendar = $processor->get_updated_html();
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$output             = sprintf(

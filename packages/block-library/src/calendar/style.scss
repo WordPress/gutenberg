@@ -6,7 +6,6 @@
 	th,
 	td {
 		padding: 0.25em;
-		border: 1px solid;
 	}
 
 	th {
@@ -32,16 +31,112 @@
 
 	:where(table:not(.has-text-color)) {
 		color: #40464d;
+	}
 
-		// Keep the hard-coded border color for backward compatibility.
+	/*
+	 * Keep `.wp-block-calendar` outside `:where()` so the specificity stays
+	 * (0,1,0). This beats bare theme `td`/`th` rules while still allowing
+	 * Global Styles to override it.
+	 */
+	:where(th),
+	:where(td) {
+		border: 1px solid;
+	}
+
+	:where(table:not(.has-text-color) th),
+	:where(table:not(.has-text-color) td) {
+		border-color: $gray-300;
+	}
+
+	// Border Styles
+	//
+	// Instance borders are applied on the table; th/td inherit color,
+	// style, and width. Per-side values are treated as outer edges.
+	// Global Styles target cells via block.json selectors.
+	// Flat border colors always add has-border-color (style engine).
+	//
+	// Color- or style-only selections add a default solid style with no
+	// width. Without an explicit width the table would draw medium (3px)
+	// over the 1px cells. Match the cell default instead. Do not touch
+	// tables that already have a width so cells still inherit it.
+	table.has-border-color:not([style*="border-width"]),
+	table[style*="border-style"]:not([style*="border-width"]) {
+		border-width: 1px;
+	}
+
+	table.has-border-color {
+		thead,
+		tbody,
+		tr,
 		th,
 		td {
-			border-color: $gray-300;
+			border-color: inherit;
 		}
 	}
+
+	// Cells inherit from their parent row, so width/style must pass through
+	// thead/tbody/tr. When only a style is set, also inherit width so those
+	// elements pick up the table's 1px instead of falling back to medium (~3px).
+	table[style*="border-style"] {
+		thead,
+		tbody,
+		tr,
+		th,
+		td {
+			border-style: inherit;
+			border-width: inherit;
+		}
+	}
+
+	table[style*="border-width"] {
+		thead,
+		tbody,
+		tr,
+		th,
+		td {
+			border-width: inherit;
+			border-style: inherit;
+		}
+	}
+
+	// The calendar table comes from `get_calendar()`, so the markup is fixed:
+	// one thead with a single row, one tbody, no tfoot. Avoid `> *` so the
+	// caption never picks up table edge borders.
+	/*rtl:begin:rename*/
+	$calendar-border-edges: (
+		"top": "> thead, > thead > tr, > thead > tr > *",
+		"right": "> thead, > tbody, > thead > tr, > tbody > tr, > thead > tr > :last-child, > tbody > tr > :last-child",
+		"bottom": "> tbody, > tbody > tr:last-child, > tbody > tr:last-child > *",
+		"left": "> thead, > tbody, > thead > tr, > tbody > tr, > thead > tr > :first-child, > tbody > tr > :first-child"
+	);
+
+	@each $edge, $selectors in $calendar-border-edges {
+		@each $property in ("color", "style", "width") {
+			table[style*="border-#{$edge}-#{$property}"] {
+				#{$selectors} {
+					border-#{$edge}-#{$property}: inherit;
+
+					@if $property == "width" {
+						border-#{$edge}-style: inherit;
+					}
+				}
+			}
+		}
+
+		// Color- or style-only on one side still needs a 1px width. The
+		// all-sides rule above only matches values set on every edge.
+		table[style*="border-#{$edge}-color"],
+		table[style*="border-#{$edge}-style"] {
+			&:not([style*="border-#{$edge}-width"]) {
+				border-#{$edge}-width: 1px;
+			}
+		}
+	}
+	/*rtl:end:rename*/
 }
 
 // Keep the hard-coded header background color for backward compatibility.
+// Global Styles also targets `th` (see block.json selectors.color).
 :where(.wp-block-calendar table:not(.has-background) th) {
 	background: $gray-300;
 }
