@@ -1,7 +1,5 @@
-@use "@wordpress/base-styles/variables" as *;
-
 .block-editor-format-toolbar__math-input input {
-	font-family: $font-family-mono;
+	font-family: var(--wpds-typography-font-family-mono);
 	/*rtl:ignore*/
 	direction: ltr;
 }
