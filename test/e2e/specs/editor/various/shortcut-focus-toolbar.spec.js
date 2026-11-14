@@ -25,11 +25,12 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		await page.mouse.move( 0, 0 );
 		await page.keyboard.type( '/heading' );
 		await expect(
-			page.getByRole( 'option', { name: 'Heading' } )
+			page.getByRole( 'option', { name: 'Heading', exact: true } )
 		).toBeVisible();
 
 		// Moving the pointer brings back the toolbar after typing.
-		await paragraph.hover();
+		const { x, y, height } = await paragraph.boundingBox();
+		await page.mouse.move( x + 10, y + height / 2, { steps: 12 } );
 		const floatingToolbar = page.locator(
 			'.block-editor-block-list__block-popover'
 		);
