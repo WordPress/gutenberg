@@ -1,9 +1,27 @@
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getPackageInfoFromFile } from './package-utils.mjs';
+import { generateContentHash } from './wordpress-externals-plugin.mjs';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
+
+/**
+ * Generate a content hash of the built assets, skipping the generated PHP files.
+ *
+ * @param {string} buildDir Build directory path.
+ * @return {Promise<string>} Content hash string.
+ */
+async function generateBuildHash( buildDir ) {
+	await mkdir( buildDir, { recursive: true } );
+	const files = (
+		await readdir( buildDir, { recursive: true, withFileTypes: true } )
+	)
+		.filter( ( file ) => file.isFile() && ! file.name.endsWith( '.php' ) )
+		.map( ( file ) => path.join( file.parentPath, file.name ) );
+
+	return generateContentHash( files );
+}
 
 /**
  * Get PHP replacements from root package.json.
@@ -22,7 +40,9 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 
 	// @ts-expect-error specific override to package.json
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
-	const version = rootPackageJson.version;
+	const version =
+		rootPackageJson.version ||
+		( await generateBuildHash( path.join( rootDir, 'build' ) ) );
 
 	return {
 		'{{PREFIX}}': name,
