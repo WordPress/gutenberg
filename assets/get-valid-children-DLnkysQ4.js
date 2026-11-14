@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{n as t,t as n}from"./react-Cd8OJmTE.js";function getValidChildren(e){return typeof e==`string`?[e]:n.Children.toArray(e).filter(e=>(0,n.isValidElement)(e))}function init_get_valid_children(){return(init_get_valid_children=e((()=>{t()})))()}export{init_get_valid_children as n,getValidChildren as t};

@@ -1,0 +1,5 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./jsx-runtime-BxZPLZy3.js";import{n,t as r}from"./spinner-uS1nFJbx.js";var i,a,Template,o,s;function init_index_story(){return(init_index_story=e((()=>{n(),i=t(),a={title:`Components/@wordpress-components/Feedback/Spinner`,id:`components-spinner`,component:r,parameters:{controls:{expanded:!0},docs:{canvas:{sourceState:`shown`}},componentStatus:{status:`not-recommended`,whereUsed:`global`,notes:"Use [`Spinner`](?path=/docs/design-system-components-spinner--docs) from `@wordpress/ui` instead."}}},Template=e=>(0,i.jsx)(r,{...e}),o=Template.bind({}),s=Template.bind({}),s.args={style:{width:`var(--wpds-dimension-size-lg, 40px)`,height:`var(--wpds-dimension-size-lg, 40px)`}},o.parameters={...o.parameters,docs:{...o.parameters?.docs,source:{originalSource:`args => {
+  return <Spinner {...args} />;
+}`,...o.parameters?.docs?.source}}},s.parameters={...s.parameters,docs:{...s.parameters?.docs,source:{originalSource:`args => {
+  return <Spinner {...args} />;
+}`,...s.parameters?.docs?.source}}}})))()}init_index_story();export{s as CustomSize,o as Default,a as default};
