@@ -1,0 +1,118 @@
+/*
+ * Layout containment makes the frame the containing block for the fixed
+ * overlays portalled into it, and clipping hides a drawer while it slides in.
+ */
+.example {
+	position: relative;
+	min-block-size: 640px;
+	display: flex;
+	flex-direction: column;
+	contain: layout;
+	overflow: clip;
+	isolation: isolate;
+}
+
+.example > * {
+	flex: 1;
+}
+
+/*
+ * Modal overlays lock page scrolling with inline styles. Here they only cover
+ * their example, so the docs page around it keeps scrolling.
+ */
+:global(html):has(.overlays:not(:empty)),
+:global(body):has(.overlays:not(:empty)) {
+	overflow: revert !important;
+	position: revert !important;
+	block-size: revert !important;
+	inline-size: revert !important;
+}
+
+.screen {
+	display: contents;
+}
+
+/* `Page` sets `z-index: 1`, so overlays need their own layer above it. */
+.example > .overlays {
+	flex: none;
+	position: relative;
+	z-index: 2;
+}
+
+.content {
+	inline-size: 100%;
+	max-inline-size: var(--wpds-dimension-surface-width-xl);
+
+	&.is-wide {
+		max-inline-size: var(--wpds-dimension-surface-width-2xl);
+	}
+	margin-inline: auto;
+}
+
+/*
+ * The notice list stays mounted so it can announce a failed save. Its notices
+ * join the content stack, so the empty list adds no gap.
+ */
+.content > .notices {
+	display: contents;
+}
+
+.description {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+/*
+ * A full-width row at the bottom of a card. The focus ring is inset because
+ * the card clips anything drawn outside it.
+ */
+.subpage-link {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--wpds-dimension-gap-md);
+	inline-size: 100%;
+	padding-block: var(--wpds-dimension-padding-lg);
+	padding-inline: var(--wpds-dimension-padding-2xl);
+	border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral);
+	text-decoration: none;
+
+	&:hover {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+	}
+
+	&:focus-visible {
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+}
+
+.subpage-list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.subpage-label {
+	flex: 1;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.footer-start {
+	margin-inline-end: auto;
+}
+
+.snackbars:global(.components-snackbar-list) {
+	position: absolute;
+	inset-block-start: auto;
+	inset-inline-end: 0;
+	inset-block-end: var(--wpds-dimension-padding-lg);
+	inset-inline-start: 0;
+	width: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.snackbars :global(.components-snackbar) {
+	margin-inline: auto;
+}
