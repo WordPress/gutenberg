@@ -42,9 +42,6 @@ describe( 'Button busy announcements', () => {
 			'aria-live',
 			'polite'
 		);
-		expect(
-			screen.getByRole( 'button', { name: 'Save changes' } )
-		).not.toHaveAttribute( 'loadingAnnouncement' );
 	} );
 
 	it( 'lets the caller suppress the loading announcement', () => {

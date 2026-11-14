@@ -280,7 +280,6 @@ export const Button = forwardRef( function UnforwardedButton(
 				<Spinner
 					className="components-button__busy-spinner"
 					aria-hidden="true"
-					data-testid="components-button-busy-spinner"
 				/>
 			) }
 		</>
