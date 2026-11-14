@@ -154,6 +154,7 @@ require __DIR__ . '/compat/wordpress-7.2/media.php';
 require __DIR__ . '/compat/wordpress-7.2/post.php';
 
 // WordPress 7.3 compat.
+require __DIR__ . '/compat/wordpress-7.3/edit-form-blocks.php';
 require __DIR__ . '/compat/wordpress-7.3/kses.php';
 
 // Experimental features.
