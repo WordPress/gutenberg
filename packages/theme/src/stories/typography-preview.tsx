@@ -1,14 +1,13 @@
 import type { CSSProperties } from 'react';
 import { GroupTitle } from './group-title';
+import { TokenText, tokenCardProps } from './token-item';
 import {
-	descriptionStyle,
 	itemStyle as sharedItemStyle,
 	listStyle,
 	previewStyle,
-	textStyle,
-	tokenNameStyle,
 } from './token-preview-styles';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import type { tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
 	sampleLines: string[];
@@ -94,22 +93,19 @@ function TypographyTokenSection( {
 
 	return (
 		<section>
-			<GroupTitle name={ groupKey } />
+			<GroupTitle name={ groupKey } id={ `typography-${ groupKey }` } />
 			<dl style={ listStyle }>
 				{ sectionTokens.map( ( tokenName ) => {
 					const tokenValue = getTokenValue( tokenName );
 					const tokenStyle = getSampleStyle( tokenValue, tokenName );
 
 					return (
-						<div key={ tokenName } style={ itemStyle }>
-							<dt style={ textStyle }>
-								<code style={ tokenNameStyle }>
-									{ tokenName }
-								</code>
-								<span style={ descriptionStyle }>
-									{ tokens[ tokenName ].$description }
-								</span>
-							</dt>
+						<div
+							key={ tokenName }
+							{ ...tokenCardProps( tokenName ) }
+							style={ itemStyle }
+						>
+							<TokenText name={ tokenName } />
 							<dd style={ { margin: 0 } }>
 								<p style={ sampleStyle }>
 									{ sampleLines.map( ( line ) => (
