@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).
 -   Mirror the slide animations of the mobile navigation sidebar and the drilldown navigation screens in RTL languages ([#86554](https://github.com/WordPress/gutenberg/pull/86554)).
 
 ## 0.26.0 (2026-11-04)

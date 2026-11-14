@@ -21,6 +21,7 @@ import CanvasRenderer from '../canvas-renderer';
 import ErrorBoundary from '../error-boundary';
 import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
+import useRouteFocus from '../app/use-route-focus';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
@@ -52,6 +53,7 @@ export default function Root() {
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	const layoutRef = useSyncBodyBackground();
+	useRouteFocus( layoutRef );
 
 	return (
 		<SlotFillProvider>

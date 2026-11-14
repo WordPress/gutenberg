@@ -14,6 +14,7 @@ import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
 import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
+import useRouteFocus from '../app/use-route-focus';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
 
@@ -35,6 +36,7 @@ export default function RootSinglePage() {
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	const layoutRef = useSyncBodyBackground();
+	useRouteFocus( layoutRef );
 
 	return (
 		<SlotFillProvider>
