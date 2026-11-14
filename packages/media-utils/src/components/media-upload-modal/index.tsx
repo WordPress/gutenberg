@@ -290,14 +290,19 @@ export function MediaUploadModal( {
 	// Enable before Dialog chooses its portal, ahead of DataViewsPicker's opt-in.
 	useEnableWpCompatOverlaySlot();
 	const legacyPopoverSlotName = useId();
-	// Custom renderers can bundle older overlay implementations that are invisible
+	// Custom content can bundle older overlay implementations that are invisible
 	// to the host's capability check. Keep their established legacy host.
 	const useUiOverlay =
 		supportsUiOverlays() &&
 		! registeredFields?.some(
 			( field ) =>
 				field.render !== undefined ||
-				( field.Edit !== undefined && typeof field.Edit !== 'string' )
+				( field.Edit !== undefined &&
+					typeof field.Edit !== 'string' ) ||
+				( field.header !== undefined &&
+					typeof field.header !== 'string' ) ||
+				( field.description !== undefined &&
+					typeof field.description !== 'string' )
 		);
 	const Content = useUiOverlay ? Dialog.Content : 'div';
 	// The "uploaded to this post" option resolves to this ID, and the media query

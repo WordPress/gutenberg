@@ -686,14 +686,25 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'shows a registered field as a column', async () => {
 			mockRecords( IMAGE_RECORDS );
-			renderModal(
-				{ fields: [ genreField ] },
-				{ type: 'pickerTable', fields: [ 'genre' ] }
-			);
-
-			expect(
-				await screen.findByRole( 'columnheader', { name: /Genre/ } )
-			).toBeInTheDocument();
+			for ( const { content, native } of [
+				{ content: {}, native: '' },
+				{ content: { header: <span>Genre</span> }, native: undefined },
+				{
+					content: { description: <span>Genre help</span> },
+					native: undefined,
+				},
+			] ) {
+				const { unmount } = renderModal(
+					{ fields: [ { ...genreField, ...content } ] },
+					{ type: 'pickerTable', fields: [ 'genre' ] }
+				);
+				expect(
+					await screen.findByRole( 'columnheader', { name: /Genre/ } )
+				).toBeInTheDocument();
+				const dialog = screen.getByRole( 'dialog' );
+				expect( dialog.dataset.wpUiOverlayModal ).toBe( native );
+				unmount();
+			}
 		} );
 
 		it( 'offers a registered field as a filter', async () => {
