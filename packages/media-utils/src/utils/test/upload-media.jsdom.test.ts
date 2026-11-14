@@ -262,4 +262,97 @@ describe( 'uploadMedia', () => {
 			} )
 		);
 	} );
+
+	it( 'should upload files sequentially one at a time', async () => {
+		const callOrder: string[] = [];
+		let resolveFirst: ( ( value: unknown ) => void ) | null = null;
+
+		( uploadToServer as Mock ).mockImplementation( ( file: File ) => {
+			callOrder.push( `start:${ file.name }` );
+			return new Promise( ( resolve ) => {
+				if ( file.name === 'test1.jpeg' ) {
+					resolveFirst = () => {
+						callOrder.push( `end:${ file.name }` );
+						resolve( { id: 1, url: 'http://example.com/1.jpeg' } );
+					};
+				} else {
+					callOrder.push( `end:${ file.name }` );
+					resolve( { id: 2, url: 'http://example.com/2.jpeg' } );
+				}
+			} );
+		} );
+
+		const file1 = new window.File( [ 'content1' ], 'test1.jpeg', {
+			type: 'image/jpeg',
+		} );
+		const file2 = new window.File( [ 'content2' ], 'test2.jpeg', {
+			type: 'image/jpeg',
+		} );
+
+		uploadMedia( {
+			filesList: [ file1, file2 ],
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
+		} );
+
+		// Under concurrent upload, test2 would also start immediately.
+		// When uploading sequentially, only the first file upload starts.
+		expect( callOrder ).toEqual( [ 'start:test1.jpeg' ] );
+
+		resolveFirst!( {} );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		expect( callOrder ).toEqual( [
+			'start:test1.jpeg',
+			'end:test1.jpeg',
+			'start:test2.jpeg',
+			'end:test2.jpeg',
+		] );
+	} );
+
+	it( 'should continue uploading subsequent files sequentially if a previous file fails', async () => {
+		const callOrder: string[] = [];
+		let rejectFirst: ( ( reason?: unknown ) => void ) | null = null;
+
+		( uploadToServer as Mock ).mockImplementation( ( file: File ) => {
+			callOrder.push( `start:${ file.name }` );
+			return new Promise( ( resolve, reject ) => {
+				if ( file.name === 'fail.jpeg' ) {
+					rejectFirst = () => {
+						callOrder.push( `fail:${ file.name }` );
+						reject( new Error( 'Upload failed' ) );
+					};
+				} else {
+					callOrder.push( `end:${ file.name }` );
+					resolve( { id: 2, url: 'http://example.com/2.jpeg' } );
+				}
+			} );
+		} );
+
+		const file1 = new window.File( [ 'fail' ], 'fail.jpeg', {
+			type: 'image/jpeg',
+		} );
+		const file2 = new window.File( [ 'success' ], 'success.jpeg', {
+			type: 'image/jpeg',
+		} );
+
+		const onError = vi.fn();
+		uploadMedia( {
+			filesList: [ file1, file2 ],
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
+			onError,
+		} );
+
+		expect( callOrder ).toEqual( [ 'start:fail.jpeg' ] );
+
+		rejectFirst!( new Error( 'Upload failed' ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		expect( callOrder ).toEqual( [
+			'start:fail.jpeg',
+			'fail:fail.jpeg',
+			'start:success.jpeg',
+			'end:success.jpeg',
+		] );
+		expect( onError ).toHaveBeenCalledTimes( 1 );
+	} );
 } );
