@@ -1,67 +1,45 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Card as WCCard, CardBody } from '@wordpress/components';
-import { DataForm } from '@wordpress/dataviews';
-import { useState } from '@wordpress/element';
+import {
+	AutosaveFeatureListExample,
+	InvalidFieldsExample,
+	SaveFormLayoutCardExample,
+	UnsavedChangesOnExitExample,
+} from './save-and-submit';
 
-const meta: Meta = {
+const meta = {
 	title: 'Design System/Patterns/Save & Submit',
+	component: SaveFormLayoutCardExample,
 	parameters: {
 		controls: { disable: true },
 	},
 	tags: [ 'docs-only' ],
-};
+} satisfies Meta< typeof SaveFormLayoutCardExample >;
 
 export default meta;
 
-type Story = StoryObj;
+type Story = StoryObj< typeof meta >;
 
 export const SaveFormLayoutCard: Story = {
 	name: 'Save form layout card',
-	render() {
-		const [ data, setData ] = useState( { title: '' } );
+	render: () => <SaveFormLayoutCardExample />,
+};
 
-		return (
-			<div style={ { maxWidth: '480px' } }>
-				<WCCard
-					size={ {
-						blockStart: 'medium',
-						blockEnd: 'medium',
-						inlineStart: 'medium',
-						inlineEnd: 'medium',
-					} }
-				>
-					<CardBody>
-						<DataForm
-							data={ data }
-							fields={ [
-								{
-									id: 'title',
-									label: 'Title',
-									type: 'text',
-								},
-							] }
-							form={ {
-								layout: { type: 'regular' },
-								fields: [ 'title' ],
-							} }
-							onChange={ ( edits ) =>
-								setData( ( previous ) => ( {
-									...previous,
-									...edits,
-								} ) )
-							}
-						/>
-						<Button
-							variant="primary"
-							isBusy
-							style={ { marginTop: '16px' } }
-							__next40pxDefaultSize
-						>
-							Save
-						</Button>
-					</CardBody>
-				</WCCard>
-			</div>
-		);
-	},
+export const UnsavedChangesOnExit: Story = {
+	name: 'Unsaved changes on exit',
+	render: () => <UnsavedChangesOnExitExample />,
+};
+
+export const InvalidFields: Story = {
+	name: 'Invalid fields',
+	render: () => <InvalidFieldsExample />,
+};
+
+export const AutosaveFeatureList: Story = {
+	name: 'Autosave feature list',
+	render: () => <AutosaveFeatureListExample />,
+};
+
+export const AutosaveFailure: Story = {
+	name: 'Autosave failure',
+	render: () => <AutosaveFeatureListExample failingFeature="relatedPosts" />,
 };
