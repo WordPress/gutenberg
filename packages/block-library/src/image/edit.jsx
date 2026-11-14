@@ -16,12 +16,18 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
-import { getDefaultLinkDestination, isValidFileType } from './utils';
+import { isValidFileType } from './utils';
+import {
+	getDefaultLinkDestination,
+	LINK_DESTINATION_PREFERENCE_NAME,
+	LINK_DESTINATION_PREFERENCE_SCOPE,
+} from './link-destination';
 import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -129,6 +135,7 @@ export function ImageEdit( {
 		getBlockName,
 		canInsertBlockType,
 	} = useSelect( blockEditorStore );
+	const { get: getPreference } = useSelect( preferencesStore );
 	const blockEditingMode = useBlockEditingMode();
 
 	const { createErrorNotice } = useDispatch( noticesStore );
@@ -254,7 +261,13 @@ export function ImageEdit( {
 		}
 
 		const linkDestination =
-			attributes.linkDestination || getDefaultLinkDestination();
+			attributes.linkDestination ||
+			getDefaultLinkDestination(
+				getPreference(
+					LINK_DESTINATION_PREFERENCE_SCOPE,
+					LINK_DESTINATION_PREFERENCE_NAME
+				)
+			);
 
 		// Check if the image is linked to it's media.
 		let href;
