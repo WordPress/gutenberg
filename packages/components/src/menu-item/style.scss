@@ -53,7 +53,7 @@
 	&:disabled,
 	&[aria-disabled="true"] {
 		// Override the button component's tertiary background and color.
-		&.is-tertiary {
+		&.is-tertiary:not(.is-busy) {
 			background: none;
 			color: $components-color-accent-darker-10;
 			opacity: 0.3;
