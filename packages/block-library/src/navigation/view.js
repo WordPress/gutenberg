@@ -147,8 +147,7 @@ const { state, actions } = store(
 				}
 			},
 			handleMenuKeydown: withSyncEvent( ( event ) => {
-				const { type, firstFocusableElement, lastFocusableElement } =
-					getContext();
+				const { type, modal } = getContext();
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
 					if ( event.key === 'Escape' ) {
@@ -159,7 +158,13 @@ const { state, actions } = store(
 					}
 
 					// Trap focus if it is an overlay (main menu).
-					if ( type === 'overlay' && event.key === 'Tab' ) {
+					if ( type === 'overlay' && event.key === 'Tab' && modal ) {
+						// Submenus can open and close while the overlay is open,
+						// so look up its focusable elements on each key press.
+						const focusableElements = getFocusableElements( modal );
+						const firstFocusableElement = focusableElements[ 0 ];
+						const lastFocusableElement =
+							focusableElements[ focusableElements.length - 1 ];
 						// If shift + tab it change the direction.
 						if (
 							event.shiftKey &&
@@ -233,11 +238,7 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements = getFocusableElements( ref );
 					ctx.modal = ref;
-					ctx.firstFocusableElement = focusableElements[ 0 ];
-					ctx.lastFocusableElement =
-						focusableElements[ focusableElements.length - 1 ];
 				}
 			},
 			focusFirstElement() {
