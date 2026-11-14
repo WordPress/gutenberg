@@ -45,6 +45,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import MediaUpload from '../media-upload';
 import { MediaUploadModal } from '../media-upload-modal';
 import { uploadMedia } from '../../utils/upload-media';
+import {
+	hasUiOverlaySupport,
+	withUiOverlaySupport,
+} from '../with-ui-overlay-support';
 import type { MediaEditProps } from './types';
 import useMovingAnimation from './use-moving-animation';
 
@@ -125,6 +129,11 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
  * context, so `MediaEdit` does not use it; `MediaEditControl` does when
  * `isPickerFiltered` is set, for fields that render inside the editor.
  */
+withUiOverlaySupport(
+	ConditionalMediaUpload,
+	() => MediaUpload.supportsUiOverlays
+);
+
 const FilteredMediaUpload = withFilters( 'editor.MediaUpload' )(
 	ConditionalMediaUpload
 ) as React.ComponentType< Record< string, unknown > >;
@@ -628,7 +637,7 @@ function CompactMediaEditAttachments( {
  * };
  * ```
  */
-export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
+function MediaEdit< Item >( props: MediaEditProps< Item > ) {
 	return <MediaEditControl { ...props } />;
 }
 
@@ -636,7 +645,7 @@ export default function MediaEdit< Item >( props: MediaEditProps< Item > ) {
  * Body of `MediaEdit`. Package-internal: the featured image field renders it
  * for the props the public control doesn't offer.
  */
-export function MediaEditControl< Item >( {
+function MediaEditControl< Item >( {
 	data,
 	field,
 	onChange,
@@ -1083,3 +1092,17 @@ export function MediaEditControl< Item >( {
 		</Stack>
 	);
 }
+
+const CompatibleMediaEdit = withUiOverlaySupport(
+	MediaEdit,
+	() => MediaUpload.supportsUiOverlays
+);
+const CompatibleMediaEditControl = withUiOverlaySupport(
+	MediaEditControl,
+	() =>
+		MediaUpload.supportsUiOverlays &&
+		hasUiOverlaySupport( FilteredMediaUpload ),
+	[ FilteredMediaUpload ]
+);
+export default CompatibleMediaEdit;
+export { CompatibleMediaEditControl as MediaEditControl };
