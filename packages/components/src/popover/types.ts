@@ -23,6 +23,7 @@ export type PopoverProps = {
 	/**
 	 * The name of the Slot in which the popover should be rendered. It should
 	 * be also passed to the corresponding `PopoverSlot` component.
+	 * An explicit name takes precedence over a surrounding slot name provider.
 	 *
 	 * @default 'Popover'
 	 */

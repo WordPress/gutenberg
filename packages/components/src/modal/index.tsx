@@ -8,9 +8,9 @@ import {
 	forwardRef,
 	useLayoutEffect,
 	useContext,
+	useId,
 } from '@wordpress/element';
 import {
-	useInstanceId,
 	useFocusReturn,
 	useFocusOnMount,
 	useConstrainedTabbing,
@@ -18,6 +18,7 @@ import {
 	useRefEffect,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { getWpCompatOverlayContainer } from '@wordpress/ui';
 import { close } from '@wordpress/icons';
 import { focus, getScrollContainer } from '@wordpress/dom';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
@@ -30,7 +31,7 @@ import { useModalExitAnimation } from './use-modal-exit-animation';
 import { ModalContext, type Dismissers } from './context';
 
 // Used to track body class names applied while modals are open.
-const bodyOpenClasses = new Map< string, number >();
+const bodyOpenClasses = new WeakMap< Document, Map< string, number > >();
 
 function UnforwardedModal(
 	props: ModalProps,
@@ -65,8 +66,18 @@ function UnforwardedModal(
 	} = props;
 
 	const ref = useRef< HTMLDivElement >( null );
+	const [ portalContainer, setPortalContainer ] =
+		useState< HTMLElement | null >( null );
+	const setPortalAnchor = useCallback( ( anchor: HTMLSpanElement | null ) => {
+		if ( anchor ) {
+			setPortalContainer(
+				getWpCompatOverlayContainer( anchor ) ?? document.body
+			);
+		}
+	}, [] );
+	const isInUiOverlay = !! getWpCompatOverlayContainer( portalContainer );
 
-	const instanceId = useInstanceId( Modal );
+	const instanceId = useId();
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
@@ -136,10 +147,13 @@ function UnforwardedModal(
 
 	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		const modalElement = ref.current!;
+		const modalElement = ref.current;
+		if ( ! modalElement ) {
+			return;
+		}
 		ariaHelper.modalize( modalElement );
 		return () => ariaHelper.unmodalize( modalElement );
-	}, [] );
+	}, [ portalContainer ] );
 
 	// Keeps a fresh ref for the subsequent effect.
 	const onRequestCloseRef =
@@ -177,20 +191,29 @@ function UnforwardedModal(
 
 	// Adds/removes the value of bodyOpenClassName to body element.
 	useEffect( () => {
+		if ( ! portalContainer ) {
+			return;
+		}
+		const { ownerDocument } = portalContainer;
+		let classes = bodyOpenClasses.get( ownerDocument );
+		if ( ! classes ) {
+			classes = new Map();
+			bodyOpenClasses.set( ownerDocument, classes );
+		}
 		const theClass = bodyOpenClassName;
-		const oneMore = 1 + ( bodyOpenClasses.get( theClass ) ?? 0 );
-		bodyOpenClasses.set( theClass, oneMore );
-		document.body.classList.add( bodyOpenClassName );
+		const oneMore = 1 + ( classes.get( theClass ) ?? 0 );
+		classes.set( theClass, oneMore );
+		ownerDocument.body.classList.add( theClass );
 		return () => {
-			const oneLess = bodyOpenClasses.get( theClass )! - 1;
+			const oneLess = classes.get( theClass )! - 1;
 			if ( oneLess === 0 ) {
-				document.body.classList.remove( theClass );
-				bodyOpenClasses.delete( theClass );
+				ownerDocument.body.classList.remove( theClass );
+				classes.delete( theClass );
 			} else {
-				bodyOpenClasses.set( theClass, oneLess );
+				classes.set( theClass, oneLess );
 			}
 		};
-	}, [ bodyOpenClassName ] );
+	}, [ bodyOpenClassName, portalContainer ] );
 
 	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
@@ -208,7 +231,7 @@ function UnforwardedModal(
 		return () => {
 			resizeObserver.disconnect();
 		};
-	}, [ isContentScrollable, childrenContainerRef ] );
+	}, [ isContentScrollable, childrenContainerRef, portalContainer ] );
 
 	function handleEscapeKeyDown(
 		event: React.KeyboardEvent< HTMLDivElement >
@@ -264,19 +287,28 @@ function UnforwardedModal(
 		},
 	};
 
-	const modal = (
+	const mergedOverlayRef = useMergeRefs( [ ref, forwardedRef ] );
+	const mergedFrameRef = useMergeRefs( [
+		frameRef,
+		constrainedTabbingRef,
+		focusReturnRef,
+		shouldFocusContent ? focusContentRef : focusOnMountRef,
+	] );
+	const modal = portalContainer && (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
 		<div
-			ref={ useMergeRefs( [ ref, forwardedRef ] ) }
+			ref={ mergedOverlayRef }
+			data-wp-ui-overlay-portal=""
 			className={ clsx(
 				'components-modal__screen-overlay',
+				isInUiOverlay && 'is-in-wp-ui-overlay',
 				overlayClassname,
 				overlayClassnameProp
 			) }
 			onKeyDown={ withIgnoreIMEEvents( handleEscapeKeyDown ) }
 			{ ...( shouldCloseOnClickOutside ? overlayPressHandlers : {} ) }
 		>
-			<StyleProvider document={ document }>
+			<StyleProvider document={ portalContainer.ownerDocument }>
 				<div
 					className={ clsx(
 						'components-modal__frame',
@@ -284,12 +316,7 @@ function UnforwardedModal(
 						className
 					) }
 					style={ style }
-					ref={ useMergeRefs( [
-						frameRef,
-						constrainedTabbingRef,
-						focusReturnRef,
-						shouldFocusContent ? focusContentRef : focusOnMountRef,
-					] ) }
+					ref={ mergedFrameRef }
 					role={ role }
 					aria-label={ dialogLabel }
 					aria-labelledby={ dialogLabel ? undefined : headingId }
@@ -372,11 +399,17 @@ function UnforwardedModal(
 		</div>
 	);
 
-	return createPortal(
-		<ModalContext.Provider value={ nestedDismissers }>
-			{ modal }
-		</ModalContext.Provider>,
-		document.body
+	return (
+		<>
+			{ ! portalContainer && <span hidden ref={ setPortalAnchor } /> }
+			{ portalContainer &&
+				createPortal(
+					<ModalContext.Provider value={ nestedDismissers }>
+						{ modal }
+					</ModalContext.Provider>,
+					portalContainer
+				) }
+		</>
 	);
 }
 
@@ -411,7 +444,10 @@ function UnforwardedModal(
  * };
  * ```
  */
-export const Modal = forwardRef( UnforwardedModal );
+export const Modal = Object.assign( forwardRef( UnforwardedModal ), {
+	/** Whether this implementation supports an owning WordPress UI portal. */
+	supportsUiOverlays: true as const,
+} );
 Modal.displayName = 'Modal';
 
 export default Modal;

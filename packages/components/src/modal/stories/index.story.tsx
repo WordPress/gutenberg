@@ -1,7 +1,15 @@
 import type { StoryFn, Meta } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
+import {
+	Dialog,
+	Popover,
+	SelectControl,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 import Button from '../../button';
+import Dropdown from '../../dropdown';
+import { Provider as SlotFillProvider } from '../../slot-fill';
 import InputControl from '../../input-control';
 import Modal from '../';
 import type { ModalProps } from '../types';
@@ -42,6 +50,64 @@ const meta: Meta< typeof Modal > = {
 	},
 };
 export default meta;
+
+function LegacyOverlayControls() {
+	const [ isOpen, setOpen ] = useState( false );
+	return (
+		<SlotFillProvider>
+			<Dropdown
+				renderToggle={ ( { onToggle } ) => (
+					<Button __next40pxDefaultSize onClick={ onToggle }>
+						Open legacy dropdown
+					</Button>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<Button __next40pxDefaultSize onClick={ onClose }>
+						Choose an option
+					</Button>
+				) }
+			/>
+			<Button __next40pxDefaultSize onClick={ () => setOpen( true ) }>
+				Open legacy modal
+			</Button>
+			{ isOpen && (
+				<Modal
+					title="Legacy modal"
+					onRequestClose={ () => setOpen( false ) }
+				>
+					<SelectControl
+						label="Selection"
+						items={ [
+							{ label: 'First option', value: 'first' },
+							{ label: 'Second option', value: 'second' },
+						] }
+					/>
+				</Modal>
+			) }
+		</SlotFillProvider>
+	);
+}
+
+export const WithUiOverlays = () => {
+	useEnableWpCompatOverlaySlot();
+	return (
+		<Dialog.Root>
+			<Dialog.Trigger>Open UI dialog</Dialog.Trigger>
+			<Dialog.Popup>
+				<Dialog.Title>UI dialog</Dialog.Title>
+				<Dialog.CloseIconButton />
+				<Popover.Root>
+					<Popover.Trigger>Open field</Popover.Trigger>
+					<Popover.Popup>
+						<Popover.Title>Field editor</Popover.Title>
+						<LegacyOverlayControls />
+						<Popover.Close>Close field</Popover.Close>
+					</Popover.Popup>
+				</Popover.Root>
+			</Dialog.Popup>
+		</Dialog.Root>
+	);
+};
 
 const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 	const [ isOpen, setOpen ] = useState( false );

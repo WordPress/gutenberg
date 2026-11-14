@@ -14,6 +14,10 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	@include reset;
 	z-index: z-index(".components-popover");
 
+	&.is-in-wp-ui-overlay {
+		z-index: auto;
+	}
+
 	&.is-expanded {
 		position: fixed;
 		top: 0;
@@ -21,6 +25,10 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		right: 0;
 		bottom: 0;
 		z-index: z-index(".components-popover") !important;
+
+		&.is-in-wp-ui-overlay {
+			z-index: auto !important;
+		}
 	}
 }
 

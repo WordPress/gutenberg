@@ -18,9 +18,15 @@ body.modal-open {
 	left: 0;
 	background-color: rgba(0, 0, 0, 0.35);
 	z-index: z-index(".components-modal__screen-overlay");
+	isolation: isolate;
 	display: flex;
 	// This animates the appearance of the backdrop.
 	@include animation__fade-in($speed: var(--wpds-motion-duration-sm), $easing: var(--wpds-motion-easing-subtle));
+
+	// The owning UI portal already provides the overlay's stacking context.
+	&.is-in-wp-ui-overlay {
+		z-index: auto;
+	}
 
 	&.is-animating-out {
 		// Note: it's important that the fade-out animation doesn't end after the

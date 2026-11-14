@@ -1,6 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { forwardRef } from '@wordpress/element';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { useWpCompatOverlayContainer } from '../utils/use-wp-compat-overlay-container';
 import type { PortalProps } from './types';
 
 /**
@@ -8,16 +8,19 @@ import type { PortalProps } from './types';
  */
 const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function AlertDialogPortal( { container, ...props }, ref ) {
+		const portal = useWpCompatOverlayContainer( container );
 		return (
-			<_AlertDialog.Portal
-				ref={ ref }
-				container={
-					container === undefined
-						? getWpCompatOverlaySlot()
-						: container
-				}
-				{ ...props }
-			/>
+			<>
+				{ portal.needsSource && (
+					<span hidden ref={ portal.setSource } />
+				) }
+				<_AlertDialog.Portal
+					ref={ ref }
+					data-wp-ui-overlay-portal=""
+					container={ portal.container }
+					{ ...props }
+				/>
+			</>
 		);
 	}
 );

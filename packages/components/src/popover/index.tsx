@@ -32,6 +32,7 @@ import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
+import { getWpCompatOverlayContainer } from '@wordpress/ui';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -134,7 +135,7 @@ const UnforwardedPopover = (
 		anchor,
 		expandOnMobile,
 		onFocusOutside,
-		__unstableSlotName = SLOT_NAME,
+		__unstableSlotName,
 		flip = true,
 		resize = true,
 		shift = false,
@@ -206,13 +207,24 @@ const UnforwardedPopover = (
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
+	const [ sourceParent, setSourceParent ] = useState< Element | null >(
+		null
+	);
+	const setSource = useCallback( ( node: HTMLSpanElement | null ) => {
+		if ( node ) {
+			setSourceParent( node.parentElement ?? node.ownerDocument.body );
+		}
+	}, [] );
 
 	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
 		( node ) => {
 			setFallbackReferenceElement( node );
+			setSource( node );
 		},
-		[]
+		[ setSource ]
 	);
+
+	const hasAnchor = anchorRef || anchorRect || anchor;
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
@@ -254,7 +266,8 @@ const UnforwardedPopover = (
 			} ),
 		arrow( { element: arrowRef } ),
 	];
-	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+	const inheritedSlotName = useContext( slotNameContext );
+	const slotName = __unstableSlotName ?? ( inheritedSlotName || SLOT_NAME );
 	const slot = useSlot( slotName );
 
 	let onDialogClose;
@@ -478,12 +491,18 @@ const UnforwardedPopover = (
 	// the popover, add the `is-positioned` class to signal that all transitions have finished.
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
+	const compatContainer = getWpCompatOverlayContainer( sourceParent );
+	const shouldRenderWithinSlot = slot.ref && ! inline;
+	const isInUiOverlay = !! getWpCompatOverlayContainer(
+		shouldRenderWithinSlot ? slot.ref?.current : compatContainer
+	);
 
 	let content = (
 		<motion.div
 			className={ clsx( className, {
 				'is-expanded': isExpanded,
 				'is-positioned': isPositioned,
+				'is-in-wp-ui-overlay': isInUiOverlay,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
 				[ `is-${
 					computedVariant === 'toolbar'
@@ -540,26 +559,29 @@ const UnforwardedPopover = (
 		</motion.div>
 	);
 
-	const shouldRenderWithinSlot = slot.ref && ! inline;
-	const hasAnchor = anchorRef || anchorRect || anchor;
-
 	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	} else if ( ! inline ) {
+		const portalContainer =
+			compatContainer ?? getPopoverFallbackContainer();
 		content = createPortal(
-			<StyleProvider document={ document }>{ content }</StyleProvider>,
-			getPopoverFallbackContainer()
+			<StyleProvider document={ portalContainer.ownerDocument }>
+				{ content }
+			</StyleProvider>,
+			portalContainer
 		);
 	}
 
-	if ( hasAnchor ) {
-		return content;
-	}
-
+	const needsSource = ! shouldRenderWithinSlot && ! inline;
 	return (
 		<>
-			<span ref={ anchorRefFallback } />
-			{ content }
+			{ hasAnchor ? (
+				needsSource &&
+				! sourceParent && <span hidden ref={ setSource } />
+			) : (
+				<span ref={ anchorRefFallback } />
+			) }
+			{ ( ! needsSource || sourceParent ) && content }
 		</>
 	);
 };
@@ -604,6 +626,8 @@ export const PopoverSlot = forwardRef< HTMLDivElement, PopoverSlotProps >(
 export const Popover = Object.assign(
 	contextConnect( UnforwardedPopover, 'Popover' ),
 	{
+		/** Whether this implementation supports an owning WordPress UI portal. */
+		supportsUiOverlays: true as const,
 		/**
 		 * Renders a slot that is used internally by Popover for rendering content.
 		 */

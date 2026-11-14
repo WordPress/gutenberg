@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useEffect, useState } from '@wordpress/element';
+import { createPortal, useEffect, useState } from '@wordpress/element';
 import {
 	getWpCompatOverlaySlot,
 	useEnableWpCompatOverlaySlot,
@@ -13,6 +13,28 @@ globalThis.wpVitest.mockMatchMedia();
 const noop = () => {};
 
 describe( 'Modal', () => {
+	it( 'preserves the top-document destination for a standalone iframe caller', () => {
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const { unmount } = render(
+			createPortal(
+				<Modal title="Iframe source" onRequestClose={ noop }>
+					<p>Modal content</p>
+				</Modal>,
+				iframe.contentDocument!.body
+			)
+		);
+		try {
+			expect(
+				screen.getByRole( 'dialog', { name: 'Iframe source' } )
+					.ownerDocument
+			).toBe( document );
+		} finally {
+			unmount();
+			iframe.remove();
+		}
+	} );
+
 	it( 'applies the aria-describedby attribute when provided', () => {
 		render(
 			<Modal
@@ -262,9 +284,7 @@ describe( 'Modal', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Start' } ) );
 		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
 
-		// Disable reason: No semantic query can reach the overlay.
-		// eslint-disable-next-line testing-library/no-node-access
-		const outer = screen.getByRole( 'dialog' ).parentElement!;
+		const outer = screen.getByRole( 'dialog' );
 
 		// Opens inner modal > hides outer modal.
 		await user.click( screen.getByRole( 'button', { name: 'Nest' } ) );

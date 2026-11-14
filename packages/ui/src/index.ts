@@ -31,6 +31,9 @@ export {
 	KeyboardShortcutDisplay,
 	useKeyboardShortcutProps,
 } from './utils/keyboard-shortcut';
-export { getWpCompatOverlaySlot } from './utils/wp-compat-overlay-slot';
+export {
+	getWpCompatOverlaySlot,
+	getWpCompatOverlayContainer,
+} from './utils/wp-compat-overlay-slot';
 export { useEnableWpCompatOverlaySlot } from './utils/use-enable-wp-compat-overlay-slot';
 export * from './visually-hidden';

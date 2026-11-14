@@ -6,8 +6,10 @@ const LIVE_REGION_ARIA_ROLES = new Set( [
 	'timer',
 ] );
 
-const modalElements: Element[] = [];
-const hiddenElements = new Set< Element >();
+const documentStates = new WeakMap<
+	Document,
+	{ modalElements: Element[]; hiddenElements: Set< Element > }
+>();
 
 /**
  * Hides all elements in the body element from screen-readers except
@@ -22,16 +24,35 @@ const hiddenElements = new Set< Element >();
  * @param modalElement The element that should not be hidden.
  */
 export function modalize( modalElement: HTMLDivElement ) {
-	modalElements.push( modalElement );
-	// A modal opened in the same commit may have hidden this one.
-	if ( hiddenElements.delete( modalElement ) ) {
-		modalElement.removeAttribute( 'aria-hidden' );
+	const ownerDocument = modalElement.ownerDocument;
+	let state = documentStates.get( ownerDocument );
+	if ( ! state ) {
+		state = { modalElements: [], hiddenElements: new Set() };
+		documentStates.set( ownerDocument, state );
 	}
-	for ( const element of Array.from( document.body.children ) ) {
-		if ( element !== modalElement && elementShouldBeHidden( element ) ) {
-			element.setAttribute( 'aria-hidden', 'true' );
-			hiddenElements.add( element );
+	const { modalElements, hiddenElements } = state;
+	modalElements.push( modalElement );
+	// An earlier modal may have hidden this modal or its owning portal.
+	for ( const element of hiddenElements ) {
+		if ( element.contains( modalElement ) ) {
+			element.removeAttribute( 'aria-hidden' );
+			hiddenElements.delete( element );
 		}
+	}
+	// UI-owned portals can contain a legacy Modal. Isolate sibling branches
+	// at each level instead of hiding an ancestor that contains the Modal.
+	let current: Element | null = modalElement;
+	while ( current?.parentElement ) {
+		for ( const element of Array.from( current.parentElement.children ) ) {
+			if ( element !== current && elementShouldBeHidden( element ) ) {
+				element.setAttribute( 'aria-hidden', 'true' );
+				hiddenElements.add( element );
+			}
+		}
+		if ( current.parentElement === ownerDocument.body ) {
+			break;
+		}
+		current = current.parentElement;
 	}
 }
 
@@ -60,12 +81,24 @@ export function elementShouldBeHidden( element: Element ) {
  * @param modalElement The element of the closing modal.
  */
 export function unmodalize( modalElement: HTMLDivElement ) {
+	const state = documentStates.get( modalElement.ownerDocument );
+	if ( ! state ) {
+		return;
+	}
+	const { modalElements, hiddenElements } = state;
 	modalElements.splice( modalElements.indexOf( modalElement ), 1 );
 	const topModalElement = modalElements[ modalElements.length - 1 ];
 	for ( const element of hiddenElements ) {
-		if ( ! topModalElement || element === topModalElement ) {
+		if (
+			! topModalElement ||
+			element.contains( topModalElement ) ||
+			topModalElement.contains( element )
+		) {
 			element.removeAttribute( 'aria-hidden' );
 			hiddenElements.delete( element );
 		}
+	}
+	if ( ! modalElements.length ) {
+		documentStates.delete( modalElement.ownerDocument );
 	}
 }

@@ -1,7 +1,7 @@
 import { Select as _Select } from '@base-ui/react/select';
 import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
-import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
+import { useWpCompatOverlayContainer } from '../../../utils/use-wp-compat-overlay-container';
 
 /**
  * Used to apply custom portal behavior to `Select`'s listbox content.
@@ -11,14 +11,17 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function SelectPortal(
 	{ container, ...restProps },
 	ref
 ) {
+	const portal = useWpCompatOverlayContainer( container );
 	return (
-		<_Select.Portal
-			container={
-				container === undefined ? getWpCompatOverlaySlot() : container
-			}
-			{ ...restProps }
-			ref={ ref }
-		/>
+		<>
+			{ portal.needsSource && <span hidden ref={ portal.setSource } /> }
+			<_Select.Portal
+				container={ portal.container }
+				{ ...restProps }
+				ref={ ref }
+				data-wp-ui-overlay-portal=""
+			/>
+		</>
 	);
 } );
 

@@ -17,6 +17,27 @@ type CompatOverlaySlotInternalWindow = {
  */
 export const WP_COMPAT_OVERLAY_SLOT_ATTRIBUTE = 'data-wp-compat-overlay-slot';
 
+/**
+ * Returns the owning compatibility portal for an overlay's source element.
+ *
+ * Resolve ownership through the DOM so separate React roots and package copies
+ * can share the container without sharing a React context. Returns undefined
+ * outside a UI overlay, preserving the legacy overlay's normal destination.
+ *
+ * @param element The legacy overlay's anchor or opening control.
+ */
+export function getWpCompatOverlayContainer(
+	element: Element | null | undefined
+): HTMLElement | undefined {
+	return (
+		// Older bundled UI releases used Base UI portals in the same shared slot.
+		// Limit this fallback to that slot so unrelated Base UI apps stay separate.
+		element?.closest< HTMLElement >(
+			'[data-wp-ui-overlay-portal], [data-wp-compat-overlay-slot] [data-base-ui-portal]'
+		) ?? undefined
+	);
+}
+
 function resolveOwnerDocument(): Document | null {
 	// Always the local document — not `window.top?.document`, which would
 	// put the slot in a document where this bundle's CSS modules aren't

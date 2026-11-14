@@ -61,6 +61,7 @@ const ALLOWLIST = {
 			'ValidityIndicator',
 			'VisuallyHidden',
 			'getWpCompatOverlaySlot',
+			'getWpCompatOverlayContainer',
 			'useEnableWpCompatOverlaySlot',
 			'useKeyboardShortcutProps',
 		],

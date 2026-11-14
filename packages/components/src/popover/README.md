@@ -77,6 +77,10 @@ root.render(
 );
 ```
 
+## WordPress UI compatibility
+
+`Popover.supportsUiOverlays === true` identifies an implementation that renders inside its owning compatibility portal when no slot is registered, including through a separate SlotFill provider. Registered slots and inline rendering retain their explicit placement. Check this capability before choosing a UI host when Components is supplied by an independently updated runtime. It describes this component copy only; custom content can bundle another implementation. A host that provides a slot must place it inside its active overlay to preserve stacking and accessibility isolation.
+
 ## Props
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
