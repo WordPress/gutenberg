@@ -10,6 +10,7 @@
  */
 
 import type { FieldsScriptParts } from '../types';
+import { withUiOverlayCompatibility } from '../shared/ui-overlay-compatibility';
 import { fieldExtensions as description } from './description/field';
 import { fieldExtensions as siteIcon } from './site_icon/field';
 import { fieldExtensions as siteLogo } from './site_logo/field';
@@ -22,4 +23,4 @@ const fields: FieldsScriptParts = {
 	title,
 };
 
-export default fields;
+export default withUiOverlayCompatibility( fields );

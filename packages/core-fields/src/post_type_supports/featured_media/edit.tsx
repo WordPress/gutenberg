@@ -10,6 +10,7 @@ import { useMemo } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
 import { unlock } from '../../lock-unlock';
+import { forwardUiOverlaySupport } from '../../shared/ui-overlay-compatibility';
 import type { FeaturedMediaField, PostWithFeaturedMedia } from './types';
 
 const { MediaEditControl } = unlock( mediaUtilsPrivateApis );
@@ -53,7 +54,7 @@ function getPreviewUrl(
 }
 
 const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
-	function PostFeaturedImage(
+	forwardUiOverlaySupport( function PostFeaturedImage(
 		props: FeaturedImageEditProps & {
 			postType: Type< 'edit' > | undefined;
 		}
@@ -72,7 +73,7 @@ const FilteredMediaEdit = withFilters( 'editor.PostFeaturedImage' )(
 				}
 			/>
 		);
-	}
+	}, MediaEditControl )
 ) as unknown as React.ComponentType<
 	FeaturedImageEditProps & {
 		currentPostId: Item[ 'id' ];
@@ -182,3 +183,5 @@ export default function FeaturedImageEdit( props: FeaturedImageEditProps ) {
 	}
 	return <FilteredFeaturedImageEdit { ...props } field={ field } />;
 }
+
+forwardUiOverlaySupport( FeaturedImageEdit, FilteredMediaEdit );

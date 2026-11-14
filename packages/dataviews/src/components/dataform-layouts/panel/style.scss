@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .dataforms-layouts-panel__field-trigger {
 	position: relative;
 	color: inherit;
@@ -82,6 +84,10 @@
 
 .dataforms-layouts-panel__field-dropdown-anchor {
 	width: 100%;
+
+	.components-dropdown {
+		width: 100%;
+	}
 }
 
 .dataforms-layouts-panel__field-label {
@@ -211,4 +217,15 @@
 
 .dataforms-layouts-panel__modal-footer {
 	margin-top: var(--wpds-dimension-gap-lg);
+}
+
+.components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
+	&:not(.is-in-wp-ui-overlay) {
+		z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+	}
+
+	.components-popover__content {
+		min-width: min(320px, calc(100vw - 16px));
+		padding: var(--wpds-dimension-padding-lg);
+	}
 }

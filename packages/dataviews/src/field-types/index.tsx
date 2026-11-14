@@ -5,7 +5,17 @@ import type {
 	SortDirection,
 } from '../types';
 import type { FieldType } from '../types/private';
-import { getControl } from '../components/dataform-controls';
+import {
+	getControl,
+	isBuiltinControl,
+	isEditConfig,
+	isCompatibleEditConfig,
+} from '../components/dataform-controls';
+import {
+	isUiOverlayCompatible,
+	isUiOverlayContentCompatible,
+	supportsUiOverlays,
+} from '../utils/ui-overlay-compatibility';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';
@@ -60,6 +70,32 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 	// This is a fallback for fields that don't provide a type.
 	// It can be removed when/if the field.type becomes mandatory.
 	return noType;
+}
+
+/** Check the actual renderers before placing a form inside a UI overlay. */
+export function canFieldsUseUiOverlays< Item >(
+	fields: Field< Item >[]
+): boolean {
+	return (
+		supportsUiOverlays() &&
+		fields.every( ( field ) => {
+			const fieldType = getFieldTypeByName< Item >( field.type );
+			return (
+				( ! field.render ||
+					field.render === fieldType.render ||
+					isUiOverlayCompatible( field.render ) ) &&
+				( ! field.Edit ||
+					typeof field.Edit === 'string' ||
+					( isEditConfig( field.Edit ) &&
+						isCompatibleEditConfig( field.Edit ) ) ||
+					isBuiltinControl( field.Edit ) ||
+					isUiOverlayCompatible( field.Edit ) ) &&
+				[ field.header, field.description ].every(
+					isUiOverlayContentCompatible
+				)
+			);
+		} )
+	);
 }
 
 /**

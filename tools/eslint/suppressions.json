@@ -7051,11 +7051,6 @@
 			"count": 2
 		}
 	},
-	"packages/dataviews/src/components/dataform-layouts/panel/dropdown.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/components/dataform-layouts/panel/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1

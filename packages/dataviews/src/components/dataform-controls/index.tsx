@@ -21,6 +21,10 @@ import array from './array';
 import color from './color';
 import password from './password';
 import hasElements from '../../field-types/utils/has-elements';
+import {
+	isUiOverlayCompatible,
+	subscribeToUiOverlaySupport,
+} from '../../utils/ui-overlay-compatibility';
 
 interface FormControls {
 	[ key: string ]: ComponentType< DataFormControlProps< any > >;
@@ -49,9 +53,30 @@ const FORM_CONTROLS: FormControls = {
 	toggleGroup,
 };
 
-function isEditConfig( value: any ): value is EditConfig {
+export function isEditConfig( value: unknown ): value is EditConfig {
 	return (
-		value && typeof value === 'object' && typeof value.control === 'string'
+		!! value &&
+		typeof value === 'object' &&
+		'control' in value &&
+		typeof value.control === 'string'
+	);
+}
+
+export function isBuiltinControl( component: unknown ): boolean {
+	return Object.values( FORM_CONTROLS ).some(
+		( control ) => control === component
+	);
+}
+
+export function isCompatibleEditConfig( config: EditConfig ): boolean {
+	return (
+		config.control !== 'text' ||
+		[ config.prefix, config.suffix ].every(
+			( renderer ) =>
+				renderer === undefined ||
+				typeof renderer === 'string' ||
+				isUiOverlayCompatible( renderer )
+		)
 	);
 }
 
@@ -62,11 +87,23 @@ function createConfiguredControl( config: EditConfig ) {
 		return null;
 	}
 
-	return function ConfiguredControl< Item >(
+	const ConfiguredControl = < Item, >(
 		props: DataFormControlProps< Item >
-	) {
+	) => {
 		return <BaseControlType { ...props } config={ controlConfig } />;
 	};
+	return Object.defineProperties( ConfiguredControl, {
+		supportsUiOverlays: { get: () => isCompatibleEditConfig( config ) },
+		subscribeUiOverlaySupport: {
+			value: ( listener: () => void ) =>
+				subscribeToUiOverlaySupport(
+					config.control === 'text'
+						? [ config.prefix, config.suffix ]
+						: [],
+					listener
+				),
+		},
+	} );
 }
 
 export function getControl< Item >(
@@ -83,6 +120,14 @@ export function getControl< Item >(
 
 	if ( isEditConfig( field.Edit ) ) {
 		return createConfiguredControl( field.Edit );
+	}
+
+	if (
+		field.Edit &&
+		typeof field.Edit === 'object' &&
+		'$$typeof' in field.Edit
+	) {
+		return field.Edit;
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {

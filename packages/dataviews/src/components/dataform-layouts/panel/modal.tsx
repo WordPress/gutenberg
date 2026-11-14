@@ -1,9 +1,5 @@
 import deepMerge from 'deepmerge';
-import {
-	__experimentalSpacer as Spacer,
-	Button,
-	Modal,
-} from '@wordpress/components';
+import { __experimentalSpacer as Spacer, Button } from '@wordpress/components';
 import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -22,6 +18,7 @@ import useFormValidity from '../../../hooks/use-form-validity';
 import useRevealValidity from '../../../hooks/use-reveal-validity';
 import DataFormContext from '../../dataform-context';
 import useFieldFromFormField from './utils/use-field-from-form-field';
+import CompatibleModal from '../../compatible-modal';
 
 function ModalContent< Item >( {
 	data,
@@ -40,7 +37,8 @@ function ModalContent< Item >( {
 } ) {
 	const { openAs } = field.layout as NormalizedPanelLayout;
 	const { applyLabel, cancelLabel } = openAs as PanelOpenAsModal;
-	const { fields } = useContext( DataFormContext );
+	const { fields, supportsUiOverlays = false } =
+		useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
 	const modalData = useMemo( () => {
 		return deepMerge( data, changes, {
@@ -96,10 +94,11 @@ function ModalContent< Item >( {
 	useRevealValidity( contentRef, touched );
 
 	return (
-		<Modal
+		<CompatibleModal
+			useUiOverlay={ supportsUiOverlays }
 			className="dataforms-layouts-panel__modal"
 			onRequestClose={ onClose }
-			isFullScreen={ false }
+			focusOnMount="firstInputElement"
 			title={ fieldLabel }
 			size="medium"
 		>
@@ -149,7 +148,7 @@ function ModalContent< Item >( {
 					{ applyLabel }
 				</Button>
 			</Stack>
-		</Modal>
+		</CompatibleModal>
 	);
 }
 

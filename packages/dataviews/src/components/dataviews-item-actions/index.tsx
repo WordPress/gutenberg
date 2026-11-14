@@ -1,7 +1,12 @@
 import type { MouseEventHandler } from 'react';
-import { Button, Modal } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useMemo,
+	useState,
+	useSyncExternalStore,
+} from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -13,6 +18,14 @@ import {
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import getActionLabel from '../../utils/get-action-label';
+import CompatibleModal from '../compatible-modal';
+import {
+	isUiOverlayCompatible,
+	isUiOverlayContentCompatible,
+	getUiOverlayContentOwners,
+	supportsUiOverlays,
+	subscribeToUiOverlaySupport,
+} from '../../utils/ui-overlay-compatibility';
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -100,8 +113,33 @@ export function ActionModal< Item >( {
 		typeof action.modalHeader === 'function'
 			? action.modalHeader( items )
 			: action.modalHeader;
+	const headerOwners = useMemo(
+		() => getUiOverlayContentOwners( modalHeader ),
+		[ modalHeader ]
+	);
+	const subscribe = useCallback(
+		( listener: () => void ) =>
+			subscribeToUiOverlaySupport(
+				[ action.RenderModal, ...headerOwners ],
+				listener
+			),
+		[ action.RenderModal, headerOwners ]
+	);
+	const getSnapshot = useCallback(
+		() =>
+			supportsUiOverlays() &&
+			isUiOverlayCompatible( action.RenderModal ) &&
+			isUiOverlayContentCompatible( modalHeader ),
+		[ action.RenderModal, modalHeader ]
+	);
+	const useUiOverlay = useSyncExternalStore(
+		subscribe,
+		getSnapshot,
+		() => false
+	);
 	return (
-		<Modal
+		<CompatibleModal
+			useUiOverlay={ useUiOverlay }
 			title={ modalHeader || label }
 			__experimentalHideHeader={ !! action.hideModalHeader }
 			onRequestClose={ closeModal }
@@ -112,7 +150,7 @@ export function ActionModal< Item >( {
 			) }` }
 		>
 			<action.RenderModal items={ items } closeModal={ closeModal } />
-		</Modal>
+		</CompatibleModal>
 	);
 }
 
