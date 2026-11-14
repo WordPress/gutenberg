@@ -4,6 +4,8 @@
 
 Wrapping a component with `withFilters` provides a filtering capability controlled externally by the `hookName`.
 
+The generated component's `supportsUiOverlays` getter reports whether its selected renderer has an own `supportsUiOverlays: true` declaration. It uses the same original component, filters, and package copy as rendering. A check before mounting does not freeze the renderer. `subscribeUiOverlaySupport( listener )` observes filter changes and support changes reported by the selected renderer, including while the control is not mounted. It returns an unsubscribe function. Overlay hosts can use these properties to retain a legacy host when a replacement cannot render inside WordPress UI overlays.
+
 ## Usage
 
 ```jsx

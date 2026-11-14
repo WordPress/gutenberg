@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import withFilters from '..';
 
@@ -8,11 +8,125 @@ describe( 'withFilters', () => {
 	const MyComponent = () => <div>My component</div>;
 
 	afterEach( () => {
+		vi.useRealTimers();
 		removeAllFilters( hookName, 'test/enhanced-component-override' );
 		removeAllFilters( hookName, 'test/enhanced-component-compose' );
 		removeAllFilters( hookName, 'test/enhanced-component-spy' );
 		removeAllFilters( hookName, 'test/enhanced-component-spy-1' );
 		removeAllFilters( hookName, 'test/enhanced-component-spy-2' );
+	} );
+
+	it( 'reports overlay support from the renderer selected for its actual original component', () => {
+		const Original = Object.assign( () => <span>Original</span>, {
+			supportsUiOverlays: true,
+		} );
+		const Enhanced = withFilters( hookName )( Original );
+		expect( Enhanced.supportsUiOverlays ).toBe( true );
+		addFilter(
+			hookName,
+			'test/enhanced-component-override',
+			( component ) =>
+				component === Original
+					? () => <span>Replacement</span>
+					: Original
+		);
+		expect( Enhanced.supportsUiOverlays ).toBe( false );
+		render( <Enhanced /> );
+		expect( screen.getByText( 'Replacement' ) ).toBeVisible();
+	} );
+
+	it( 'does not freeze a renderer when support is checked before mounting', () => {
+		const Original = Object.assign( () => null, {
+			supportsUiOverlays: true,
+		} );
+		const Enhanced = withFilters( hookName )( Original );
+		expect( Enhanced.supportsUiOverlays ).toBe( true );
+		addFilter( hookName, 'test/enhanced-component-override', () => () => (
+			<span>Later replacement</span>
+		) );
+		render( <Enhanced /> );
+		expect( screen.getByText( 'Later replacement' ) ).toBeVisible();
+		expect( Enhanced.supportsUiOverlays ).toBe( false );
+	} );
+
+	it( 'notifies overlay hosts of renderer changes before a control mounts', () => {
+		vi.useFakeTimers();
+		const Original = Object.assign( () => null, {
+			supportsUiOverlays: true,
+		} );
+		const Enhanced = withFilters( hookName )( Original );
+		const onChange = vi.fn();
+		const unsubscribe = Enhanced.subscribeUiOverlaySupport( onChange );
+		addFilter(
+			hookName,
+			'test/enhanced-component-override',
+			() => () => null
+		);
+		vi.advanceTimersByTime( 16 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( Enhanced.supportsUiOverlays ).toBe( false );
+		unsubscribe();
+		removeFilter( hookName, 'test/enhanced-component-override' );
+		vi.advanceTimersByTime( 16 );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( Enhanced.supportsUiOverlays ).toBe( true );
+	} );
+
+	it( 'forwards support changes owned by the selected renderer', () => {
+		let supported = true;
+		const listeners = new Set< () => void >();
+		const Original = Object.assign( () => null, {
+			subscribeUiOverlaySupport: ( listener: () => void ) => {
+				listeners.add( listener );
+				return () => listeners.delete( listener );
+			},
+		} );
+		Object.defineProperty( Original, 'supportsUiOverlays', {
+			get: () => supported,
+		} );
+		const Enhanced = withFilters( hookName )( Original );
+		const onChange = vi.fn();
+		const unsubscribe = Enhanced.subscribeUiOverlaySupport( onChange );
+		expect( Enhanced.supportsUiOverlays ).toBe( true );
+		supported = false;
+		listeners.forEach( ( listener ) => listener() );
+		expect( onChange ).toHaveBeenCalledTimes( 1 );
+		expect( Enhanced.supportsUiOverlays ).toBe( false );
+		unsubscribe();
+		expect( listeners.size ).toBe( 0 );
+	} );
+
+	it( 'keeps separate controls subscribed to the same filter hook', () => {
+		vi.useFakeTimers();
+		const Original = Object.assign( () => null, {
+			supportsUiOverlays: true,
+		} );
+		const First = withFilters( hookName )( Original );
+		const Second = withFilters( hookName )( Original );
+		const firstChanged = vi.fn();
+		const secondChanged = vi.fn();
+		const firstUnsubscribe =
+			First.subscribeUiOverlaySupport( firstChanged );
+		const secondUnsubscribe =
+			Second.subscribeUiOverlaySupport( secondChanged );
+		try {
+			addFilter(
+				hookName,
+				'test/enhanced-component-override',
+				() => () => null
+			);
+			vi.advanceTimersByTime( 16 );
+			expect( firstChanged ).toHaveBeenCalledTimes( 1 );
+			expect( secondChanged ).toHaveBeenCalledTimes( 1 );
+			firstUnsubscribe();
+			removeFilter( hookName, 'test/enhanced-component-override' );
+			vi.advanceTimersByTime( 16 );
+			expect( firstChanged ).toHaveBeenCalledTimes( 1 );
+			expect( secondChanged ).toHaveBeenCalledTimes( 2 );
+		} finally {
+			firstUnsubscribe();
+			secondUnsubscribe();
+		}
 	} );
 
 	it( 'should display original component when no filters applied', () => {

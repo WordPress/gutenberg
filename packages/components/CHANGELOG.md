@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `withFilters`: Report and observe UI overlay support from the actual selected renderer, including before mounting ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `Modal`, `Popover`: Keep overlays opened inside WordPress UI overlays in their owning portal, preserving stacking, focus return, and modal isolation across SlotFill providers ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `Modal`, `Popover`: Expose `supportsUiOverlays` so separately bundled consumers can retain legacy hosts with older implementations ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
@@ -21,6 +22,7 @@
 
 ### Bug Fixes
 
+-   `withFilters`: Keep subscriptions independent when separate wrappers use the same hook ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).

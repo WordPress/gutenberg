@@ -1,6 +1,7 @@
 import { Component } from '@wordpress/element';
 import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
 import { createHigherOrderComponent, debounce } from '@wordpress/compose';
+import { v4 as uuid } from 'uuid';
 
 const ANIMATION_FRAME_PERIOD = 16;
 
@@ -42,14 +43,78 @@ const ANIMATION_FRAME_PERIOD = 16;
  */
 export default function withFilters( hookName: string ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {
-		const namespace = 'core/with-filters/' + hookName;
+		const namespace = `core/with-filters/${ hookName }/${ uuid() }`;
 
 		/**
 		 * The component definition with current filters applied. Each instance
 		 * reuse this shared reference as an optimization to avoid excessive
 		 * calls to `applyFilters` when many instances exist.
 		 */
-		let FilteredComponent: React.ComponentType;
+		let FilteredComponent: React.ComponentType | undefined;
+		const overlaySupportListeners = new Set< () => void >();
+		let isListening = false;
+		let unsubscribeRenderer: ( () => void ) | undefined;
+
+		function notifyOverlaySupportListeners() {
+			// A listener can add or remove subscriptions while handling this update.
+			[ ...overlaySupportListeners ].forEach( ( listener ) =>
+				listener()
+			);
+		}
+
+		function updateRendererSubscription() {
+			unsubscribeRenderer?.();
+			unsubscribeRenderer = undefined;
+			if (
+				! overlaySupportListeners.size ||
+				! FilteredComponent ||
+				! Object.hasOwn(
+					FilteredComponent,
+					'subscribeUiOverlaySupport'
+				)
+			) {
+				return;
+			}
+			const subscribe = Reflect.get(
+				FilteredComponent,
+				'subscribeUiOverlaySupport'
+			);
+			if ( typeof subscribe === 'function' ) {
+				const unsubscribe = subscribe.call(
+					FilteredComponent,
+					notifyOverlaySupportListeners
+				);
+				if ( typeof unsubscribe === 'function' ) {
+					unsubscribeRenderer = unsubscribe;
+				}
+			}
+		}
+
+		function resolveFilteredComponent() {
+			return applyFilters(
+				hookName,
+				OriginalComponent
+			) as React.ComponentType;
+		}
+
+		function updateHookSubscription() {
+			const shouldListen =
+				FilteredComponentRenderer.instances.size > 0 ||
+				overlaySupportListeners.size > 0;
+			if ( shouldListen === isListening ) {
+				return;
+			}
+			isListening = shouldListen;
+			if ( shouldListen ) {
+				addAction( 'hookRemoved', namespace, onHooksUpdated );
+				addAction( 'hookAdded', namespace, onHooksUpdated );
+			} else {
+				removeAction( 'hookRemoved', namespace );
+				removeAction( 'hookAdded', namespace );
+				throttledForceUpdate.cancel();
+				FilteredComponent = undefined;
+			}
+		}
 
 		/**
 		 * Initializes the FilteredComponent variable once, if not already
@@ -57,15 +122,46 @@ export default function withFilters( hookName: string ) {
 		 */
 		function ensureFilteredComponent() {
 			if ( FilteredComponent === undefined ) {
-				FilteredComponent = applyFilters(
-					hookName,
-					OriginalComponent
-				) as React.ComponentType;
+				FilteredComponent = resolveFilteredComponent();
 			}
+			return FilteredComponent;
 		}
 
 		class FilteredComponentRenderer extends Component {
 			static instances: Set< FilteredComponentRenderer >;
+
+			/** Whether the selected renderer explicitly supports WordPress UI overlays. */
+			static get supportsUiOverlays(): boolean {
+				const component = isListening
+					? ensureFilteredComponent()
+					: resolveFilteredComponent();
+				return (
+					!! component &&
+					Object.hasOwn( component, 'supportsUiOverlays' ) &&
+					Reflect.get( component, 'supportsUiOverlays' ) === true
+				);
+			}
+
+			/** Observe changes even while the filtered control is not mounted. */
+			static subscribeUiOverlaySupport(
+				listener: () => void
+			): () => void {
+				ensureFilteredComponent();
+				const subscription = () => listener();
+				const hadListeners = overlaySupportListeners.size > 0;
+				overlaySupportListeners.add( subscription );
+				updateHookSubscription();
+				if ( ! hadListeners ) {
+					updateRendererSubscription();
+				}
+				return () => {
+					overlaySupportListeners.delete( subscription );
+					if ( ! overlaySupportListeners.size ) {
+						updateRendererSubscription();
+					}
+					updateHookSubscription();
+				};
+			}
 
 			constructor( props: { [ key: string ]: any } ) {
 				super( props );
@@ -76,27 +172,18 @@ export default function withFilters( hookName: string ) {
 			componentDidMount() {
 				FilteredComponentRenderer.instances.add( this );
 
-				// If there were previously no mounted instances for components
-				// filtered on this hook, add the hook handler.
-				if ( FilteredComponentRenderer.instances.size === 1 ) {
-					addAction( 'hookRemoved', namespace, onHooksUpdated );
-					addAction( 'hookAdded', namespace, onHooksUpdated );
-				}
+				updateHookSubscription();
 			}
 
 			componentWillUnmount() {
 				FilteredComponentRenderer.instances.delete( this );
 
-				// If this was the last of the mounted components filtered on
-				// this hook, remove the hook handler.
-				if ( FilteredComponentRenderer.instances.size === 0 ) {
-					removeAction( 'hookRemoved', namespace );
-					removeAction( 'hookAdded', namespace );
-				}
+				updateHookSubscription();
 			}
 
 			render() {
-				return <FilteredComponent { ...this.props } />;
+				const Renderer = ensureFilteredComponent();
+				return <Renderer { ...this.props } />;
 			}
 		}
 
@@ -109,10 +196,9 @@ export default function withFilters( hookName: string ) {
 		const throttledForceUpdate = debounce( () => {
 			// Recreate the filtered component, only after delay so that it's
 			// computed once, even if many filters added.
-			FilteredComponent = applyFilters(
-				hookName,
-				OriginalComponent
-			) as React.ComponentType;
+			FilteredComponent = resolveFilteredComponent();
+			updateRendererSubscription();
+			notifyOverlaySupportListeners();
 
 			// Force each instance to render.
 			FilteredComponentRenderer.instances.forEach( ( instance ) => {
