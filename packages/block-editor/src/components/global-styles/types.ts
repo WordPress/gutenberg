@@ -1,5 +1,5 @@
 import type { ComponentProps, ComponentType, ReactNode } from 'react';
-import type { Dropdown, DropdownMenu } from '@wordpress/components';
+import type { Dropdown } from '@wordpress/components';
 import type {
 	Color,
 	Duotone,
@@ -238,7 +238,7 @@ export interface StateControlProps {
 	/** Whether to show text label on the toggle. Default true. */
 	showText?: boolean;
 	/** Popover props for the dropdown menu. */
-	popoverProps?: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ];
+	popoverProps?: ToolsPanelPopoverProps;
 	/** Optional menu content rendered after the state groups. */
 	children?: ReactNode;
 }
