@@ -659,6 +659,12 @@ class MediaUpload extends Component< MediaUploadProps > {
 			// Keep Core's explicit focus() calls, but let Dialog own tabbing.
 			modal.focusManager.setElement( dialog.parentElement );
 			modal.focusManager.undelegateEvents();
+			// Core assumes its modal is a direct body child. Dialog owns isolation
+			// for nested portals, including restoring the parent overlay on close.
+			Object.assign( modal.focusManager, {
+				setAriaHiddenOnBodyChildren() {},
+				removeAriaHiddenFromBodyChildren() {},
+			} );
 		}
 		this.coreFrame?.open();
 		return (
