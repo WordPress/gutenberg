@@ -7,10 +7,11 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useRef,
 	useSyncExternalStore,
 } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, serialize } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
@@ -44,6 +45,7 @@ import {
 	pickNoteForCaret,
 } from './utils/note-selection';
 import { focusNoteThread } from './utils/dom';
+import { findNoteAnchors } from './find-note-anchors';
 import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
@@ -61,7 +63,7 @@ export function useNoteThreads( postId ) {
 		per_page: -1,
 	};
 
-	const { records: threads } = useEntityRecords(
+	const { records: threads, hasResolved } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
@@ -69,6 +71,37 @@ export function useNoteThreads( postId ) {
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
+
+	// Once the notes have loaded, re-attach those whose anchor was never
+	// saved with the post, without an undo level like the original edit.
+	const registry = useRegistry();
+	const hasReattachedRef = useRef( false );
+	const [ hasReattached, setHasReattached ] = useState( false );
+	useEffect( () => {
+		if ( ! hasResolved || hasReattachedRef.current ) {
+			return;
+		}
+		hasReattachedRef.current = true;
+		const attributesByClientId = findNoteAnchors(
+			threads ?? [],
+			registry.select( blockEditorStore ).getBlocks()
+		);
+		const reattachedClientIds = Object.keys( attributesByClientId );
+		if ( ! reattachedClientIds.length ) {
+			return;
+		}
+		const {
+			__unstableMarkNextChangeAsNotPersistent,
+			__unstableMarkLastChangeAsPersistent,
+			updateBlockAttributes,
+		} = registry.dispatch( blockEditorStore );
+		__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
+		updateBlockAttributes( reattachedClientIds, attributesByClientId, {
+			uniqueByBlock: true,
+		} );
+		__unstableMarkLastChangeAsPersistent();
+		setHasReattached( true );
+	}, [ registry, threads, hasResolved ] );
 	const { clientIds } = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants } = select( blockEditorStore );
 		return {
@@ -185,7 +218,8 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- Attribute changes aren't tracked, so recompute once anchors are restored.
+	}, [ clientIds, threads, getBlockAttributes, hasReattached ] );
 
 	return {
 		notes,
@@ -198,9 +232,12 @@ export function useNoteActions() {
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
+		getBlock,
 		getBlockAttributes,
 		getBlockCount,
+		getBlockIndex,
 		getBlockName,
+		getBlockParents,
 		getSelectedBlockClientIds,
 		getSelectionStart,
 		getSelectionEnd,
@@ -357,6 +394,17 @@ export function useNoteActions() {
 		} );
 	};
 
+	// The note's blocks as they stand, with the draft marker of an inline
+	// note. The anchor written below only persists with the post, so this
+	// lets a later load re-attach the note if the post isn't saved.
+	const getNoteAnchorSnapshot = ( clientIds ) =>
+		clientIds.map( ( clientId ) => ( {
+			path: [ ...getBlockParents( clientId ), clientId ].map(
+				getBlockIndex
+			),
+			content: serialize( getBlock( clientId ) ),
+		} ) );
+
 	const onCreate = async ( { content, parent } ) => {
 		try {
 			// Capture the target blocks *before* the async save: selection may
@@ -372,6 +420,11 @@ export function useNoteActions() {
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
+					...( clientIds.length && {
+						meta: {
+							_wp_note_anchor: getNoteAnchorSnapshot( clientIds ),
+						},
+					} ),
 				},
 				{ throwOnError: true }
 			);
