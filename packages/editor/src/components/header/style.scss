@@ -137,16 +137,13 @@
 		width: auto;
 
 		// Hide the button icons when labels are set to display...
-		svg:where(:not(.components-button__busy-spinner)) {
+		svg {
 			display: none;
 		}
 		// ... and display labels.
 		&::after {
 			content: attr(aria-label);
 			white-space: nowrap;
-		}
-		&[aria-disabled="true"]:not(.is-busy) {
-			background-color: transparent;
 		}
 		&.editor-collapsible-block-toolbar__toggle {
 			min-width: auto;
@@ -155,7 +152,7 @@
 	}
 	// Exception for drodpdown toggle buttons.
 	.components-button.has-icon.button-toggle {
-		svg:where(:not(.components-button__busy-spinner)) {
+		svg {
 			display: block;
 		}
 		&::after {
@@ -225,16 +222,14 @@
 		padding: 6px 6px 6px $grid-unit;
 		width: 14.625rem;
 		justify-content: flex-start;
+		gap: $grid-unit-10;
 
-		&[aria-expanded="true"] svg:where(:not(.components-button__busy-spinner)) {
+		&[aria-expanded="true"] svg {
 			display: block;
 			max-width: $grid-unit-30;
 		}
 		&[aria-expanded="false"] {
 			padding-left: $grid-unit-50;
-		}
-		svg:where(:not(.components-button__busy-spinner)) {
-			margin-right: 8px;
 		}
 	}
 }
