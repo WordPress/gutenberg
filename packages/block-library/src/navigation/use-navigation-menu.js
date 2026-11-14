@@ -4,13 +4,68 @@ import {
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+import {
+	getNavigationMenusBySlugArgs,
+	PRELOADED_NAVIGATION_MENUS_QUERY,
+} from './constants';
+import getNavigationMenuBySlug, {
+	getQueriedNavigationMenu,
+} from './get-navigation-menu-by-slug';
 
-export default function useNavigationMenu( ref ) {
+/**
+ * Resolves the Navigation Menu referenced by a Navigation block.
+ *
+ * A block may reference a menu either by post ID (`ref`) or by slug (`slug`).
+ * A slug reference is portable across sites, so it wins when both are present.
+ *
+ * @param {number} [ref]  The referenced Navigation Menu post ID.
+ * @param {string} [slug] The referenced Navigation Menu slug.
+ *
+ * @return {Object} The resolved Navigation Menu and its resolution state.
+ */
+export default function useNavigationMenu( ref, slug ) {
+	const {
+		records: navigationMenus,
+		isResolving: isResolvingNavigationMenus,
+		hasResolved: hasResolvedNavigationMenus,
+	} = useEntityRecords(
+		'postType',
+		`wp_navigation`,
+		PRELOADED_NAVIGATION_MENUS_QUERY
+	);
+
+	// A slug is resolved against the loaded Navigation Menus, so the menu it
+	// points at is only known once that collection has resolved.
+	const navigationMenuFromCollection = getNavigationMenuBySlug(
+		navigationMenus,
+		slug
+	);
+
+	// That collection is capped at 100 menus, and is matched against with
+	// `cleanForSlug()`, which only approximates `sanitize_title()`. So a slug
+	// it does not match may still match a menu the front end renders. Ask the
+	// server for that slug before treating the reference as missing: it
+	// sanitizes the `slug` parameter the way it sanitized the stored one.
+	const shouldQueryBySlug =
+		!! slug && hasResolvedNavigationMenus && ! navigationMenuFromCollection;
+
+	const {
+		records: navigationMenusMatchingSlug,
+		hasResolved: hasResolvedNavigationMenusMatchingSlug,
+	} = useEntityRecords( ...getNavigationMenusBySlugArgs( slug ), {
+		enabled: shouldQueryBySlug,
+	} );
+
+	const resolvedNavigationMenu =
+		navigationMenuFromCollection ??
+		getQueriedNavigationMenu( navigationMenusMatchingSlug );
+
+	const navigationMenuId = slug ? resolvedNavigationMenu?.id : ref;
+
 	const permissions = useResourcePermissions( {
 		kind: 'postType',
 		name: 'wp_navigation',
-		id: ref,
+		id: navigationMenuId,
 	} );
 
 	const {
@@ -19,10 +74,18 @@ export default function useNavigationMenu( ref ) {
 		isNavigationMenuMissing,
 	} = useSelect(
 		( select ) => {
-			return selectExistingMenu( select, ref );
+			return selectExistingMenu( select, navigationMenuId );
 		},
-		[ ref ]
+		[ navigationMenuId ]
 	);
+
+	// A slug that matches no menu is only "missing" once both the Navigation
+	// Menus and the query for the slug have resolved, otherwise the block
+	// would flash a deleted menu warning while they load.
+	const hasUnmatchedSlug = !! slug && ! navigationMenuId;
+	const hasResolvedSlug =
+		hasResolvedNavigationMenus &&
+		( ! shouldQueryBySlug || hasResolvedNavigationMenusMatchingSlug );
 
 	const {
 		// Can the user create navigation menus?
@@ -37,24 +100,19 @@ export default function useNavigationMenu( ref ) {
 		hasResolved: hasResolvedPermissions,
 	} = permissions;
 
-	const {
-		records: navigationMenus,
-		isResolving: isResolvingNavigationMenus,
-		hasResolved: hasResolvedNavigationMenus,
-	} = useEntityRecords(
-		'postType',
-		`wp_navigation`,
-		PRELOADED_NAVIGATION_MENUS_QUERY
-	);
-
-	const canSwitchNavigationMenu = ref
+	const canSwitchNavigationMenu = navigationMenuId
 		? navigationMenus?.length > 1
 		: navigationMenus?.length > 0;
 
 	return {
 		navigationMenu,
-		isNavigationMenuResolved,
-		isNavigationMenuMissing,
+		navigationMenuId,
+		isNavigationMenuResolved: hasUnmatchedSlug
+			? hasResolvedSlug
+			: isNavigationMenuResolved,
+		isNavigationMenuMissing: hasUnmatchedSlug
+			? hasResolvedSlug
+			: isNavigationMenuMissing,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
@@ -63,11 +121,11 @@ export default function useNavigationMenu( ref ) {
 		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
 		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
 		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
-		hasResolvedCanUserUpdateNavigationMenu: ref
+		hasResolvedCanUserUpdateNavigationMenu: navigationMenuId
 			? hasResolvedPermissions
 			: undefined,
 		canUserDeleteNavigationMenu: canDeleteNavigationMenu,
-		hasResolvedCanUserDeleteNavigationMenu: ref
+		hasResolvedCanUserDeleteNavigationMenu: navigationMenuId
 			? hasResolvedPermissions
 			: undefined,
 	};

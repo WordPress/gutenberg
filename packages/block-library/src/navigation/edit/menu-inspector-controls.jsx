@@ -45,7 +45,7 @@ const MainContent = ( {
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
-	if ( currentMenuId && isNavigationMenuMissing ) {
+	if ( isNavigationMenuMissing ) {
 		return (
 			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
 		);

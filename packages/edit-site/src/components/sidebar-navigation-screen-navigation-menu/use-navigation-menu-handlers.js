@@ -69,7 +69,7 @@ function useSaveNavigationMenu() {
 		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
 	} = useDispatch( coreStore );
 
-	const { createSuccessNotice, createErrorNotice } =
+	const { createSuccessNotice, createErrorNotice, createWarningNotice } =
 		useDispatch( noticesStore );
 
 	const handleSave = async ( navigationMenu, edits ) => {
@@ -92,7 +92,7 @@ function useSaveNavigationMenu() {
 
 		// Attempt to persist.
 		try {
-			await saveSpecifiedEntityEdits(
+			const savedRecord = await saveSpecifiedEntityEdits(
 				'postType',
 				postType,
 				postId,
@@ -101,9 +101,30 @@ function useSaveNavigationMenu() {
 					throwOnError: true,
 				}
 			);
-			createSuccessNotice( __( 'Renamed Navigation Menu' ), {
-				type: 'snackbar',
-			} );
+
+			// A slug already taken by another menu is suffixed on the server,
+			// which would leave blocks referencing the requested slug pointing
+			// at nothing. Say so rather than reporting a plain success.
+			if (
+				edits.slug &&
+				savedRecord &&
+				savedRecord.slug !== edits.slug
+			) {
+				createWarningNotice(
+					sprintf(
+						/* translators: %s: Navigation Menu slug that was stored instead of the requested one. */
+						__(
+							'That slug was already in use, so this Navigation Menu was saved as "%s".'
+						),
+						savedRecord.slug
+					),
+					{ type: 'snackbar' }
+				);
+			} else {
+				createSuccessNotice( __( 'Renamed Navigation Menu' ), {
+					type: 'snackbar',
+				} );
+			}
 		} catch ( error ) {
 			// Revert to original in case of error.
 			editEntityRecord( 'postType', postType, postId, originalRecord );

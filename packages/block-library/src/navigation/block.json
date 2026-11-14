@@ -25,6 +25,9 @@
 		"ref": {
 			"type": "number"
 		},
+		"slug": {
+			"type": "string"
+		},
 		"textColor": {
 			"type": "string"
 		},
