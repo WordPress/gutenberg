@@ -77,6 +77,12 @@ function MediaUploadModalWithPostContext( props ) {
  * with the stable MediaUpload component API (render prop pattern).
  */
 class MediaUploadModalWrapper extends Component {
+	static get supportsUiOverlays() {
+		// Attachment fields resolve in the active React registry on opening.
+		// A host cannot certify those extension renderers before they resolve.
+		return false;
+	}
+
 	constructor( props ) {
 		super( props );
 		this.state = {

@@ -102,22 +102,20 @@ function ConditionalMediaUpload( { render, multiple, ...props }: any ) {
 		return (
 			<>
 				{ render && render( { open: () => setIsModalOpen( true ) } ) }
-				{ isModalOpen && (
-					<MediaUploadModal
-						{ ...props }
-						// The modal takes a boolean.
-						multiple={ !! multiple }
-						isOpen={ isModalOpen }
-						onClose={ () => {
-							setIsModalOpen( false );
-							props.onClose?.();
-						} }
-						onSelect={ ( media: any ) => {
-							setIsModalOpen( false );
-							props.onSelect?.( media );
-						} }
-					/>
-				) }
+				<MediaUploadModal
+					{ ...props }
+					// The modal takes a boolean.
+					multiple={ !! multiple }
+					isOpen={ isModalOpen }
+					onClose={ () => {
+						setIsModalOpen( false );
+						props.onClose?.();
+					} }
+					onSelect={ ( media: any ) => {
+						setIsModalOpen( false );
+						props.onSelect?.( media );
+					} }
+				/>
 			</>
 		);
 	}

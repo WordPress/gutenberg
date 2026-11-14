@@ -1,0 +1,22 @@
+.popup[role="dialog"] {
+	/* Override media-modal positioning regardless of stylesheet load order. */
+	inset: auto;
+	inset-block-start: 50%;
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Dialog uses physical centering with translate(-50%, -50%). */
+	left: 50%;
+	z-index: auto;
+
+	&[hidden] {
+		display: none;
+	}
+}
+
+.content {
+	position: relative;
+	padding: 0;
+}
+
+.frame {
+	position: absolute;
+	inset: 0;
+}

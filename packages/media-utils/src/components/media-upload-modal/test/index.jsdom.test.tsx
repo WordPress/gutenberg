@@ -89,6 +89,7 @@ function mockRecords( records: unknown[] ) {
 
 type ModalProps = {
 	isOpen: boolean;
+	isDismissible?: boolean;
 	value?: number | number[];
 	postId?: number;
 	postType?: string;
@@ -98,6 +99,7 @@ type ModalProps = {
 function renderModal(
 	{
 		isOpen = true,
+		isDismissible = true,
 		value,
 		postId,
 		postType,
@@ -129,6 +131,7 @@ function renderModal(
 		<RegistryProvider value={ registry }>
 			<MediaUploadModal
 				isOpen={ isOpen }
+				isDismissible={ isDismissible }
 				value={ value }
 				postId={ postId }
 				postType={ postType }
@@ -151,11 +154,12 @@ function renderModal(
 		);
 	};
 
-	return { ...view, registry, rerender };
+	return { ...view, registry, rerender, onClose };
 }
 
 describe( 'MediaUploadModal', () => {
 	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', false );
 		mockUseEntityRecordsWithPermissions.mockReturnValue( {
 			records: [],
 			isResolving: false,
@@ -177,6 +181,17 @@ describe( 'MediaUploadModal', () => {
 			.querySelectorAll( '.components-popover__fallback-container' )
 			.forEach( ( node ) => node.remove() );
 		/* eslint-enable testing-library/no-node-access */
+	} );
+
+	it( 'keeps a non-dismissible picker open after Escape', async () => {
+		const user = userEvent.setup();
+		const { onClose } = renderModal( { isDismissible: false } );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Select Media',
+		} );
+		await user.keyboard( '{Escape}' );
+		expect( dialog ).toBeVisible();
+		expect( onClose ).not.toHaveBeenCalled();
 	} );
 
 	it( 'resets page and search when the modal is closed and reopened', async () => {
@@ -671,14 +686,49 @@ describe( 'MediaUploadModal', () => {
 
 		it( 'shows a registered field as a column', async () => {
 			mockRecords( IMAGE_RECORDS );
-			renderModal(
-				{ fields: [ genreField ] },
-				{ type: 'pickerTable', fields: [ 'genre' ] }
-			);
-
+			for ( const { content, native } of [
+				{ content: {}, native: '' },
+				{ content: { header: <span>Genre</span> }, native: undefined },
+				{
+					content: { description: <span>Genre help</span> },
+					native: undefined,
+				},
+			] ) {
+				const { unmount } = renderModal(
+					{ fields: [ { ...genreField, ...content } ] },
+					{ type: 'pickerTable', fields: [ 'genre' ] }
+				);
+				expect(
+					await screen.findByRole( 'columnheader', { name: /Genre/ } )
+				).toBeInTheDocument();
+				const dialog = screen.getByRole( 'dialog' );
+				expect( dialog.dataset.wpUiOverlayModal ).toBe( native );
+				unmount();
+			}
+			const { rerender, unmount } = renderModal( {
+				fields: [ genreField ],
+			} );
 			expect(
-				await screen.findByRole( 'columnheader', { name: /Genre/ } )
-			).toBeInTheDocument();
+				( await screen.findByRole( 'dialog' ) ).dataset.wpUiOverlayModal
+			).toBe( '' );
+			rerender( {
+				isOpen: true,
+				fields: [ { ...genreField, header: <span>Genre</span> } ],
+			} );
+			expect(
+				screen.getByRole( 'dialog' ).dataset.wpUiOverlayModal
+			).toBeUndefined();
+			rerender( { isOpen: true, fields: [ genreField ] } );
+			expect(
+				screen.getByRole( 'dialog' ).dataset.wpUiOverlayModal
+			).toBeUndefined();
+			rerender( { isOpen: false, fields: [ genreField ] } );
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			rerender( { isOpen: true, fields: [ genreField ] } );
+			expect(
+				( await screen.findByRole( 'dialog' ) ).dataset.wpUiOverlayModal
+			).toBe( '' );
+			unmount();
 		} );
 
 		it( 'offers a registered field as a filter', async () => {

@@ -121,6 +121,9 @@ Beware that first onFileChange is called with temporary blob URLs and then with 
 ### MediaUpload
 
 Media upload component provides a UI button that allows users to open the WordPress media library. It is normally used in conjunction with the filter `editor.MediaUpload`.
+
+`MediaUpload.supportsUiOverlays` reports whether the supplied Components implementations support WordPress UI overlays. Custom subclasses retain Core's legacy modal shell by default. A subclass can define its own static `supportsUiOverlays` getter returning `true` after verifying that its custom views and nested overlays support WordPress UI. An inherited property does not opt a subclass in. Callers that replace the media implementation must check the replacement itself before placing it inside a UI Dialog or Drawer.
+
 The component follows the interface specified in <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>, and more details regarding its usage can be checked there.
 
 ## Contributing to this package

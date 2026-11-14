@@ -11416,9 +11416,6 @@
 	"packages/media-utils/src/components/media-upload-modal/upload-status-popover.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"react-hooks/refs": {
-			"count": 1
 		}
 	},
 	"packages/nux/src/components/dot-tip/test/index.jsdom.test.jsx": {

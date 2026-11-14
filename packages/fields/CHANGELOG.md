@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `MediaEdit`: Allow the media picker's closing animation to finish. ([#86822](https://github.com/WordPress/gutenberg/pull/86822))
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
-	createPortal,
 	useState,
+	useId,
 	useCallback,
 	useMemo,
 	useRef,
@@ -13,7 +13,13 @@ import {
 	store as coreStore,
 } from '@wordpress/core-data';
 import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
-import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import {
+	DropZone,
+	FormFileUpload,
+	Button,
+	Popover as WCPopover,
+	SlotFillProvider,
+} from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type {
@@ -24,7 +30,12 @@ import type {
 	View,
 } from '@wordpress/dataviews';
 import { useView } from '@wordpress/views';
-import { Stack } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Use the same overlay implementation as nested media consumers.
+	Dialog,
+	Stack,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
 import {
 	altTextField,
 	attachedToField,
@@ -48,6 +59,8 @@ import { UploadStatusPopover } from './upload-status-popover';
 import { useInvalidateAttachmentResolutions } from './use-invalidate-attachment-resolutions';
 import { getTaxonomyQueryArgs } from './taxonomy-query';
 import { useUploadStatus } from './use-upload-status';
+import { supportsUiOverlays } from '../supports-ui-overlays';
+import { MediaPickerDialog } from './media-picker-dialog';
 
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 
@@ -234,7 +247,7 @@ interface MediaUploadModalProps {
 }
 
 /**
- * MediaUploadModal component that uses Modal and DataViewsPicker for media selection.
+ * MediaUploadModal component that uses Dialog and DataViewsPicker for media selection.
  *
  * This is a modern functional component alternative to the legacy MediaUpload class component.
  * It provides a cleaner API and better integration with the WordPress block editor.
@@ -274,6 +287,37 @@ export function MediaUploadModal( {
 	postType,
 	fields: registeredFields,
 }: MediaUploadModalProps ) {
+	// Enable before Dialog chooses its portal, ahead of DataViewsPicker's opt-in.
+	useEnableWpCompatOverlaySlot();
+	const legacyPopoverSlotName = useId();
+	// Custom content can bundle older overlay implementations that are invisible
+	// to the host's capability check. Keep their established legacy host.
+	const supported =
+		supportsUiOverlays() &&
+		! registeredFields?.some(
+			( field ) =>
+				field.render !== undefined ||
+				( field.Edit !== undefined &&
+					typeof field.Edit !== 'string' ) ||
+				( field.header !== undefined &&
+					typeof field.header !== 'string' ) ||
+				( field.description !== undefined &&
+					typeof field.description !== 'string' )
+		);
+	const [ overlaySession, setOverlaySession ] = useState( {
+		open: isOpen,
+		native: supported,
+	} );
+	if ( overlaySession.open !== isOpen ) {
+		setOverlaySession( {
+			open: isOpen,
+			native: isOpen ? supported : overlaySession.native,
+		} );
+	} else if ( overlaySession.native && ! supported ) {
+		setOverlaySession( { ...overlaySession, native: false } );
+	}
+	const useUiOverlay = overlaySession.native && supported;
+	const Content = useUiOverlay ? Dialog.Content : 'div';
 	// The "uploaded to this post" option resolves to this ID, and the media query
 	// has no use for anything else — a template's entity ID, for instance, is a
 	// slug.
@@ -736,18 +780,14 @@ export function MediaUploadModal( {
 		return allowedTypes?.join( ',' );
 	}, [ allowedTypes ] );
 
-	if ( ! isOpen ) {
-		return null;
-	}
-
 	return (
-		<Modal
+		<MediaPickerDialog
+			open={ isOpen }
+			onClose={ handleModalClose }
 			title={ title }
-			onRequestClose={ handleModalClose }
+			className={ clsx( 'media-upload-modal', modalClass ) }
 			isDismissible={ isDismissible }
-			className={ modalClass }
-			overlayClassName="media-upload-modal"
-			size="fill"
+			useUiOverlay={ useUiOverlay }
 			headerActions={
 				<FormFileUpload
 					accept={ acceptTypes }
@@ -765,99 +805,128 @@ export function MediaUploadModal( {
 				/>
 			}
 		>
-			<DropZone
-				onFilesDrop={ ( files ) => {
-					let filteredFiles = files;
-					// Filter files by allowed types if specified
-					if ( allowedTypes && ! allowedTypes.includes( '*' ) ) {
-						filteredFiles = files.filter( ( file ) =>
-							allowedTypes.some( ( allowedType ) => {
-								// Check if the file type matches the allowed MIME type
-								return (
-									file.type === allowedType ||
-									file.type.startsWith(
-										allowedType.replace( '*', '' )
-									)
-								);
-							} )
-						);
-					}
-					if ( filteredFiles.length > 0 ) {
-						const { onFileChange, onError } =
-							registerBatch( filteredFiles );
+			<SlotFillProvider passthrough>
+				<WCPopover.__unstableSlotNameProvider
+					value={ legacyPopoverSlotName }
+				>
+					<Content className="media-upload-modal__content">
+						<DropZone
+							onFilesDrop={ ( files ) => {
+								let filteredFiles = files;
+								// Filter files by allowed types if specified
+								if (
+									allowedTypes &&
+									! allowedTypes.includes( '*' )
+								) {
+									filteredFiles = files.filter( ( file ) =>
+										allowedTypes.some( ( allowedType ) => {
+											// Check if the file type matches the allowed MIME type
+											return (
+												file.type === allowedType ||
+												file.type.startsWith(
+													allowedType.replace(
+														'*',
+														''
+													)
+												)
+											);
+										} )
+									);
+								}
+								if ( filteredFiles.length > 0 ) {
+									const { onFileChange, onError } =
+										registerBatch( filteredFiles );
 
-						handleUpload( {
-							allowedTypes,
-							filesList: filteredFiles,
-							onFileChange,
-							onError,
-						} );
-					}
-				} }
-				label={ __( 'Drop files to upload' ) }
-			/>
-			<DataViewsPicker
-				data={ mediaRecords || [] }
-				fields={ fields }
-				view={ view }
-				onChangeView={ handleChangeView }
-				actions={ actions }
-				selection={ selection }
-				onChangeSelection={ setSelection }
-				isLoading={ isLoading }
-				paginationInfo={ paginationInfo }
-				defaultLayouts={ defaultLayouts }
-				config={ dataViewsConfig }
-				getItemId={ ( item: RestAttachment ) => String( item.id ) }
-				itemListLabel={ __( 'Media items' ) }
-				onReset={ isModified || attachedToFilter ? handleReset : false }
-			>
-				<Stack
-					direction="row"
-					align="top"
-					justify="space-between"
-					className="dataviews__view-actions"
-					gap="xs"
-				>
-					<Stack
-						direction="row"
-						gap="sm"
-						justify="start"
-						className="dataviews__search"
-					>
-						{ search && (
-							<DataViewsPicker.Search label={ searchLabel } />
-						) }
-						<DataViewsPicker.FiltersToggle />
-					</Stack>
-					<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
-						<DataViewsPicker.LayoutSwitcher />
-						<DataViewsPicker.ViewConfig />
-					</Stack>
-				</Stack>
-				<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
-				<DataViewsPicker.Layout />
-				<div
-					className={ clsx( 'media-upload-modal__footer', {
-						'is-uploading': uploadingFiles.length > 0,
-					} ) }
-				>
-					<UploadStatusPopover
-						uploadingFiles={ uploadingFiles }
-						onDismissError={ dismissError }
-						onOpenChange={ handlePopoverOpenChange }
-					/>
-					<DataViewsPicker.Footer />
-				</div>
-			</DataViewsPicker>
-			{ createPortal(
+									handleUpload( {
+										allowedTypes,
+										filesList: filteredFiles,
+										onFileChange,
+										onError,
+									} );
+								}
+							} }
+							label={ __( 'Drop files to upload' ) }
+						/>
+						<DataViewsPicker
+							data={ mediaRecords || [] }
+							fields={ fields }
+							view={ view }
+							onChangeView={ handleChangeView }
+							actions={ actions }
+							selection={ selection }
+							onChangeSelection={ setSelection }
+							isLoading={ isLoading }
+							paginationInfo={ paginationInfo }
+							defaultLayouts={ defaultLayouts }
+							config={ dataViewsConfig }
+							getItemId={ ( item: RestAttachment ) =>
+								String( item.id )
+							}
+							itemListLabel={ __( 'Media items' ) }
+							onReset={
+								isModified || attachedToFilter
+									? handleReset
+									: false
+							}
+						>
+							<Stack
+								direction="row"
+								align="top"
+								justify="space-between"
+								className="dataviews__view-actions"
+								gap="xs"
+							>
+								<Stack
+									direction="row"
+									gap="sm"
+									justify="start"
+									className="dataviews__search"
+								>
+									{ search && (
+										<DataViewsPicker.Search
+											label={ searchLabel }
+										/>
+									) }
+									<DataViewsPicker.FiltersToggle />
+								</Stack>
+								<Stack
+									direction="row"
+									gap="xs"
+									style={ { flexShrink: 0 } }
+								>
+									<DataViewsPicker.LayoutSwitcher />
+									<DataViewsPicker.ViewConfig />
+								</Stack>
+							</Stack>
+							<DataViewsPicker.FiltersToggled className="dataviews-filters__container" />
+							<DataViewsPicker.Layout />
+							<div
+								className={ clsx(
+									'media-upload-modal__footer',
+									{
+										'is-uploading':
+											uploadingFiles.length > 0,
+									}
+								) }
+							>
+								<UploadStatusPopover
+									uploadingFiles={ uploadingFiles }
+									useUiOverlay={ useUiOverlay }
+									onDismissError={ dismissError }
+									onOpenChange={ handlePopoverOpenChange }
+								/>
+								<DataViewsPicker.Footer />
+							</div>
+						</DataViewsPicker>
+					</Content>
+				</WCPopover.__unstableSlotNameProvider>
+				<WCPopover.Slot name={ legacyPopoverSlotName } />
 				<SnackbarNotices
 					className="media-upload-modal__snackbar"
 					context={ NOTICES_CONTEXT }
-				/>,
-				document.body
-			) }
-		</Modal>
+				/>
+			</SlotFillProvider>
+		</MediaPickerDialog>
 	);
 }
 

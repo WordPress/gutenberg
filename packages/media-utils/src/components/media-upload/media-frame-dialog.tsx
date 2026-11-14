@@ -1,0 +1,124 @@
+import { useLayoutEffect, useState } from '@wordpress/element';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Replace the legacy media overlay shell.
+	Dialog,
+	VisuallyHidden,
+	useEnableWpCompatOverlaySlot,
+} from '@wordpress/ui';
+import styles from './media-frame-dialog.module.css';
+
+interface MediaFrameDialogProps {
+	onOpen: ( container: HTMLDivElement ) => HTMLElement | null;
+	onClose: () => void;
+	onKeyDown: ( event: KeyboardEvent ) => void;
+	open: boolean;
+	title: string;
+}
+
+/**
+ * Keeps the Core media frame and its events while Dialog owns the overlay.
+ */
+export function MediaFrameDialog( {
+	onOpen,
+	onClose,
+	onKeyDown,
+	open,
+	title,
+}: MediaFrameDialogProps ) {
+	useEnableWpCompatOverlaySlot();
+	const [ frameTitle, setFrameTitle ] = useState( title );
+	const [ container, setContainer ] = useState< HTMLDivElement | null >(
+		null
+	);
+
+	useLayoutEffect( () => {
+		if ( ! open || ! container ) {
+			return;
+		}
+		const dialog = container.closest< HTMLElement >( '[role="dialog"]' );
+		if ( ! dialog ) {
+			return;
+		}
+		const ownerDocument = container.ownerDocument;
+		let focusedElement = container.contains( ownerDocument.activeElement )
+			? ownerDocument.activeElement
+			: null;
+		const rememberFocus = ( event: FocusEvent ) => {
+			focusedElement = event.target as Element;
+		};
+		container.addEventListener( 'focusin', rememberFocus );
+		// Core replaces its uploader controls imperatively after an upload.
+		// Restore dialog focus if the removed control left focus on the page.
+		const observer = new MutationObserver( ( records ) => {
+			if (
+				focusedElement &&
+				focusedElement !== ownerDocument.activeElement &&
+				( ! focusedElement.isConnected ||
+					records.some( ( { removedNodes } ) =>
+						Array.from( removedNodes ).some( ( node ) =>
+							node.contains( focusedElement )
+						)
+					) )
+			) {
+				focusedElement = null;
+				if ( ownerDocument.activeElement === ownerDocument.body ) {
+					dialog.focus();
+				}
+			}
+		} );
+		observer.observe( container, { childList: true, subtree: true } );
+		return () => {
+			container.removeEventListener( 'focusin', rememberFocus );
+			observer.disconnect();
+		};
+	}, [ open, container ] );
+
+	useLayoutEffect( () => {
+		if ( ! open || ! container ) {
+			return;
+		}
+
+		const heading = onOpen( container );
+		if ( ! heading ) {
+			return;
+		}
+		// Core updates the visible heading when the user changes media workflows.
+		const syncTitle = () => setFrameTitle( heading.textContent || title );
+		syncTitle();
+		const observer = new MutationObserver( syncTitle );
+		observer.observe( heading, {
+			childList: true,
+			characterData: true,
+			subtree: true,
+		} );
+		return () => observer.disconnect();
+	}, [ onOpen, open, container, title ] );
+
+	return (
+		<Dialog.Root
+			open={ open }
+			onOpenChange={ ( isOpen ) => {
+				if ( ! isOpen ) {
+					onClose();
+				}
+			} }
+		>
+			<Dialog.Popup
+				size="full"
+				// Keep Core's uploader and reusable frame attached between openings.
+				portal={ <Dialog.Portal keepMounted /> }
+				className={ `media-modal ${ styles.popup }` }
+				onKeyDownCapture={ ( event ) => onKeyDown( event.nativeEvent ) }
+			>
+				<VisuallyHidden render={ <Dialog.Title /> }>
+					{ frameTitle }
+				</VisuallyHidden>
+				<Dialog.Content
+					ref={ setContainer }
+					className={ styles.content }
+				/>
+				<Dialog.CloseIconButton className="media-modal-close" />
+			</Dialog.Popup>
+		</Dialog.Root>
+	);
+}
