@@ -8,6 +8,7 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -17,41 +18,21 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import DetachPageListDialog from './detach-dialog';
+import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
+import { getVisiblePages } from './utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-// We only show the detach option when page count is <= MAX_PAGE_COUNT
-// Performance of Navigation Links is not good past this value.
-const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+const EMPTY_ARRAY = [];
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
-function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
-	return (
-		<ConfirmDialog
-			isOpen
-			title={ __( 'Detach Page List' ) }
-			__experimentalHideHeader={ false }
-			confirmButtonText={ __( 'Detach' ) }
-			onConfirm={ onConfirm }
-			onCancel={ onCancel }
-			isBusy={ isBusy }
-			size="medium"
-		>
-			{ __(
-				"This Navigation Menu displays your website's pages. Detaching will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
-			) }
-		</ConfirmDialog>
-	);
-}
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -129,54 +110,21 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { parentPageID } = attributes;
+	const { parentPageID, excludedPageIDs = EMPTY_ARRAY } = attributes;
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			per_page: MAX_PAGE_COUNT,
-			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		}
-	);
+	const { pages, pagesByParentId, hasResolvedPages } = usePageListPages();
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
 
-	const pagesByParentId = useMemo( () => {
-		if ( pages === null ) {
-			return new Map();
-		}
-
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = pages.sort( ( a, b ) => {
-			if ( a.menu_order === b.menu_order ) {
-				return a.title.rendered.localeCompare( b.title.rendered );
-			}
-			return a.menu_order - b.menu_order;
-		} );
-
-		return sortedPages.reduce( ( accumulator, page ) => {
-			const { parent } = page;
-			if ( accumulator.has( parent ) ) {
-				accumulator.get( parent ).push( page );
-			} else {
-				accumulator.set( parent, [ page ] );
-			}
-			return accumulator;
-		}, new Map() );
-	}, [ pages ] );
+	const excludedIds = useMemo(
+		() => new Set( excludedPageIDs ),
+		[ excludedPageIDs ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-page-list', {
@@ -228,7 +176,13 @@ export default function PageListEdit( {
 			}
 
 			return childPages.reduce( ( template, page ) => {
-				const hasChildren = pagesByParentId.has( page.id );
+				// A hidden page is left out with its child pages, matching
+				// the `exclude_tree` the block renders with.
+				if ( excludedIds.has( page.id ) ) {
+					return template;
+				}
+				const children = getBlockList( page.id );
+				const hasChildren = children.length > 0;
 				const pageProps = {
 					id: page.id,
 					label:
@@ -244,9 +198,7 @@ export default function PageListEdit( {
 					link: page.url,
 					hasChildren,
 				};
-				let item = null;
-				const children = getBlockList( page.id );
-				item = createBlock(
+				const item = createBlock(
 					'core/page-list-item',
 					pageProps,
 					children
@@ -256,21 +208,13 @@ export default function PageListEdit( {
 				return template;
 			}, [] );
 		},
-		[ pagesByParentId, parentPageID ]
+		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const {
-		hasSelectedChild,
-		parentClientId,
-		hasDraggedChild,
-		isChildOfNavigation,
-	} = useSelect(
+	const { hasSelectedChild, parentClientId, isChildOfNavigation } = useSelect(
 		( select ) => {
-			const {
-				getBlockParentsByBlockName,
-				hasSelectedInnerBlock,
-				hasDraggedInnerBlock,
-			} = select( blockEditorStore );
+			const { getBlockParentsByBlockName, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
@@ -279,16 +223,21 @@ export default function PageListEdit( {
 			return {
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
-				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
 
+	// Detaching keeps what the block shows: its order, without hidden pages.
+	const visiblePages = useMemo(
+		() => getVisiblePages( pagesByParentId, excludedIds ),
+		[ pagesByParentId, excludedIds ]
+	);
+
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,
-		pages,
+		pages: visiblePages,
 		parentClientId,
 		parentPageID,
 	} );
@@ -296,7 +245,9 @@ export default function PageListEdit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
 		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
+		// Pages are reordered and hidden from the Pages panel, so they can't
+		// be moved out of the Page List, into the Navigation around it.
+		templateLock: 'all',
 		onInput: NOOP,
 		onChange: NOOP,
 		value: blockList,
@@ -304,12 +255,18 @@ export default function PageListEdit( {
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
+	// In a Navigation block, the Navigation block's sidebar lists the pages
+	// in place of the Page List, so the Page List itself can't be selected and
+	// isn't in the list view. Adding a link after one of its pages detaches it.
+	useBlockEditingMode( isChildOfNavigation ? 'disabled' : undefined );
+
+	// Selecting a page selects the Page List, whose Pages panel is where pages
+	// are reordered and hidden.
 	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			setIsConfirmingDetach( true );
-			selectBlock( parentClientId );
+		if ( hasSelectedChild ) {
+			selectBlock( clientId );
 		}
-	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
+	}, [ hasSelectedChild, clientId, selectBlock ] );
 
 	return (
 		<>

@@ -15,6 +15,7 @@ export function NavigationLinkUI( {
 	insertedBlockClientId,
 	setInsertedBlockClientId,
 	allowedBlockNames,
+	anchor,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -98,6 +99,7 @@ export function NavigationLinkUI( {
 			clientId={ insertedBlockClientId }
 			link={ insertedBlockAttributes }
 			allowedBlockNames={ allowedBlockNames }
+			anchor={ anchor }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function

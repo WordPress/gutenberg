@@ -26,10 +26,23 @@ import {
 	useBlockSuggestions,
 	useEntityBinding,
 } from '../shared';
-import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
+import {
+	useIsInPageListNavigation,
+	removePageSuggestions,
+	getLinkSuggestionsQuery,
+} from '../shared/use-is-in-page-list-navigation';
+import { useLinkPreview } from '../../utils/link-picker';
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { clientId } = props;
+
+	// When the Navigation has a Page List, pages are added to the menu only
+	// through it, so a Page Link here searches like a custom link.
+	const excludePages = useIsInPageListNavigation( clientId );
+	const isSearchingWithoutPages = excludePages && type === 'page';
+	const searchType = isSearchingWithoutPages ? undefined : type;
+	const searchKind = isSearchingWithoutPages ? undefined : kind;
 
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
 
@@ -41,7 +54,6 @@ function UnforwardedLinkUI( props, ref ) {
 		isEntityAvailable,
 	} );
 
-	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
@@ -143,7 +155,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const canAddBlock = blockEditingMode !== 'disabled';
 	const canAddPage = useSelect(
 		( select ) => {
-			if ( ! canAddBlock || type !== 'page' ) {
+			if ( ! canAddBlock || type !== 'page' || excludePages ) {
 				return false;
 			}
 
@@ -152,20 +164,34 @@ function UnforwardedLinkUI( props, ref ) {
 				name: 'page',
 			} );
 		},
-		[ canAddBlock, type ]
+		[ canAddBlock, type, excludePages ]
 	);
 
 	// Blocks are listed in the search results only when the "Add block"
 	// button would be shown: the link has no URL yet and the block is not
 	// locked.
-	const { transformSuggestions, insertBlockFromSuggestion } =
-		useBlockSuggestions( {
-			clientId,
-			isEnabled: canAddBlock && ! link?.url?.length,
-			allowedBlockNames: props.allowedBlockNames,
-			onBlockInsert: props.onBlockInsert,
-			onClose: props.onClose,
-		} );
+	const {
+		transformSuggestions: transformBlockSuggestions,
+		insertBlockFromSuggestion,
+	} = useBlockSuggestions( {
+		clientId,
+		isEnabled: canAddBlock && ! link?.url?.length,
+		allowedBlockNames: props.allowedBlockNames,
+		onBlockInsert: props.onBlockInsert,
+		onClose: props.onClose,
+	} );
+
+	const transformSuggestions = useMemo( () => {
+		if ( ! excludePages ) {
+			return transformBlockSuggestions;
+		}
+		return ( suggestions, options ) => {
+			const withoutPages = removePageSuggestions( suggestions );
+			return transformBlockSuggestions
+				? transformBlockSuggestions( withoutPages, options )
+				: withoutPages;
+		};
+	}, [ excludePages, transformBlockSuggestions ] );
 
 	return (
 		<WCPopover
@@ -197,9 +223,13 @@ function UnforwardedLinkUI( props, ref ) {
 						value={ link }
 						showInitialSuggestions
 						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						noDirectEntry={ !! searchType }
+						noURLSuggestion={ !! searchType }
+						suggestionsQuery={ getLinkSuggestionsQuery(
+							searchType,
+							searchKind,
+							excludePages
+						) }
 						transformSuggestions={ transformSuggestions }
 						onChange={ ( updatedValue ) => {
 							if ( isBlockSuggestion( updatedValue ) ) {

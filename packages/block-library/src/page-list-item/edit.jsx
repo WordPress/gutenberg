@@ -1,5 +1,9 @@
 import clsx from 'clsx';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	useBlockProps,
+	useInnerBlocksProps,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { safeHTML } from '@wordpress/dom';
@@ -28,6 +32,11 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const { id, label, link, hasChildren, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
+
+	// In a Navigation block, pages are reordered and hidden from the Pages
+	// controls in the Navigation block's sidebar, so the items themselves
+	// can't be selected and aren't in its list view.
+	useBlockEditingMode( isNavigationChild ? 'disabled' : undefined );
 
 	// Get submenu visibility from context. The Navigation block handles
 	// backward compatibility by migrating openSubmenusOnClick to submenuVisibility

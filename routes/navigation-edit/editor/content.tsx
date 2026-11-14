@@ -39,28 +39,15 @@ export default function NavigationMenuContent( {
 	// `undefined` (and crashing the screen). This component only renders once
 	// `useEditorAssets` reports the assets ready, which is exactly when the
 	// global is defined — do not "clean this up" into an import.
-	const { NavigationLinkUI } = unlock(
+	const { NavigationLinkUI, NavigationMenuItems } = unlock(
 		( window as any ).wp.blockLibrary.privateApis
 	);
 
-	const { listViewRootClientId, isLoading, hasChildren } = useSelect(
+	const { isLoading, hasChildren } = useSelect(
 		( select ) => {
-			const {
-				areInnerBlocksControlled,
-				getBlockName,
-				getBlockCount,
-				getBlockOrder,
-			} = select( blockEditorStore );
+			const { areInnerBlocksControlled, getBlockCount } =
+				select( blockEditorStore );
 			const { isResolving } = select( coreStore );
-
-			const blockClientIds = getBlockOrder( rootClientId );
-
-			const hasOnlyPageListBlock =
-				blockClientIds.length === 1 &&
-				getBlockName( blockClientIds[ 0 ] ) === 'core/page-list';
-			const pageListHasBlocks =
-				hasOnlyPageListBlock &&
-				getBlockCount( blockClientIds[ 0 ] ) > 0;
 
 			const isLoadingPages = isResolving(
 				'getEntityRecords',
@@ -68,10 +55,7 @@ export default function NavigationMenuContent( {
 			);
 
 			return {
-				listViewRootClientId: pageListHasBlocks
-					? blockClientIds[ 0 ]
-					: rootClientId,
-				hasChildren: blockClientIds.length > 0,
+				hasChildren: getBlockCount( rootClientId ) > 0,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
 				isLoading:
@@ -94,15 +78,24 @@ export default function NavigationMenuContent( {
 					{ __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
+			{ /*
+			 * A Page List's pages are listed to switch on and off and reorder,
+			 * in place of the Page List, which the list view leaves out.
+			 */ }
 			{ ! isLoading && (
-				<PrivateListView
-					rootClientId={ listViewRootClientId }
-					onSelect={ openListViewContentPanel }
-					blockSettingsMenu={ LeafMoreMenu }
-					showAppender
-					additionalBlockContent={ NavigationLinkUI }
-					showContentPopover
-					isExpanded
+				<NavigationMenuItems
+					clientId={ rootClientId }
+					listView={
+						<PrivateListView
+							rootClientId={ rootClientId }
+							onSelect={ openListViewContentPanel }
+							blockSettingsMenu={ LeafMoreMenu }
+							showAppender
+							additionalBlockContent={ NavigationLinkUI }
+							showContentPopover
+							isExpanded
+						/>
+					}
 				/>
 			) }
 			<div className="navigation-edit-editor__hidden-blocks">

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Page List: In a Navigation block, reorder pages and switch them on or off without converting the list to links, from Pages controls in the Navigation block's sidebar and in the Page List's. Reordering changes the pages' order. Hidden pages are saved in a new `excludedPageIDs` attribute and left out with their child pages. Adding a link between two pages turns the pages into links first. While a Navigation block has a Page List, its other links can't link to pages ([#86525](https://github.com/WordPress/gutenberg/pull/86525)).
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).

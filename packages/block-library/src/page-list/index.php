@@ -262,12 +262,21 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$parent_page_id      = is_scalar( $parent_page_id_attr ) ? (int) $parent_page_id_attr : 0;
 	$is_nested           = ! empty( $block->context['core/isInsideSubmenu'] );
 
-	$all_pages = get_pages(
-		array(
-			'sort_column' => 'menu_order,post_title',
-			'order'       => 'asc',
-		)
+	// Hidden pages are left out together with their child pages, as a hidden
+	// parent's dropdown would have nothing to open from.
+	$excluded_page_ids_attr = $attributes['excludedPageIDs'] ?? array();
+	$excluded_page_ids      = is_array( $excluded_page_ids_attr ) ? wp_parse_id_list( $excluded_page_ids_attr ) : array();
+
+	$page_query_args = array(
+		'sort_column' => 'menu_order,post_title',
+		'order'       => 'asc',
 	);
+
+	if ( ! empty( $excluded_page_ids ) ) {
+		$page_query_args['exclude_tree'] = $excluded_page_ids;
+	}
+
+	$all_pages = get_pages( $page_query_args );
 
 	// If there are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {

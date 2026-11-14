@@ -12,6 +12,13 @@
 		"parentPageID": {
 			"type": "integer",
 			"default": 0
+		},
+		"excludedPageIDs": {
+			"type": "array",
+			"items": {
+				"type": "integer"
+			},
+			"default": []
 		}
 	},
 	"usesContext": [

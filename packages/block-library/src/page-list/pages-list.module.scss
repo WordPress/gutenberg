@@ -1,0 +1,155 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+// The list of a Page List's pages, in the Navigation block's sidebar and the
+// site editor's Navigation screens. It's a CSS module, so its styles load
+// with it wherever it's shown, and the screens' light and dark sidebars both
+// set its text color.
+
+.help {
+	margin-block-start: 0;
+	opacity: 0.75;
+}
+
+.head {
+	display: flex;
+	justify-content: space-between;
+	padding-block-end: $grid-unit-05;
+	font-size: 11px;
+	font-weight: 500;
+	text-transform: uppercase;
+	opacity: 0.75;
+
+	// Lines the labels up with the titles and switches, past the drag handle
+	// and the options button.
+	&.has-handle {
+		padding-inline-start: calc(#{$grid-unit-30} + #{$grid-unit-05});
+	}
+
+	&.has-options {
+		padding-inline-end: calc(#{$grid-unit-30} + #{$grid-unit-05});
+	}
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.row {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-05;
+	min-height: $grid-unit-40;
+	margin: 0;
+
+	&.is-hidden .title {
+		opacity: 0.55;
+	}
+
+	&.is-dragging {
+		opacity: 0.5;
+	}
+
+	// The line shows where a dragged item lands.
+	&.is-drop-before::before,
+	&.is-drop-after::after {
+		content: "";
+		position: absolute;
+		// Indented to the level the dragged page lands at.
+		inset-inline-start: var(--wp-block-page-list-drop-indent, 0);
+		inset-inline-end: 0;
+		height: 2px;
+		background: var(--wp-admin-theme-color);
+	}
+
+	// A dragged page goes inside this one.
+	&.is-drop-inside {
+		border-radius: $radius-small;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-drop-before::before {
+		inset-block-start: -1px;
+	}
+
+	&.is-drop-after::after {
+		inset-block-end: -1px;
+	}
+}
+
+.handle {
+	display: flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	padding: 0;
+	border: 0;
+	border-radius: $radius-small;
+	background: none;
+	color: inherit;
+	opacity: 0.75;
+	cursor: grab;
+
+	svg {
+		fill: currentColor;
+	}
+
+	&:focus-visible {
+		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
+	}
+}
+
+.title {
+	flex: 1;
+	min-width: 0;
+}
+
+.toggle,
+.options {
+	flex-shrink: 0;
+}
+
+.options {
+	color: inherit;
+}
+
+.add-link {
+	margin-block-start: $grid-unit-15;
+}
+
+// Follows the cursor while a page is dragged. It matches the chip shown when
+// dragging blocks.
+.drag-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: $grid-unit-10;
+	// Centers the chip under the cursor.
+	transform: translate(-50%, -50%);
+	max-width: 240px;
+	height: $grid-unit-60;
+	padding: 0 $grid-unit-15;
+	border-radius: $radius-small;
+	background-color: $gray-900;
+	box-shadow: $elevation-small;
+	color: $white;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	white-space: nowrap;
+	cursor: grabbing;
+	user-select: none;
+
+	svg {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+}
+
+.drag-chip-title {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
