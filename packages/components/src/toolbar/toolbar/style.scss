@@ -4,7 +4,7 @@
 
 .components-accessible-toolbar {
 	display: inline-flex;
-	border: $border-width solid $components-color-foreground;
+	border: $border-width solid var(--wpds-color-stroke-surface-neutral-strong);
 	border-radius: $radius-small;
 	flex-shrink: 0;
 
@@ -110,7 +110,7 @@
 
 		// Focus style.
 		&:focus::before {
-			@include block-toolbar-button-style__focus();
+			@include outset-ring__focus();
 		}
 
 		// Ensure the icon buttons remain square.
