@@ -11,6 +11,7 @@ import {
 	getDistanceToNearestEdge,
 	isPointContainedByRect,
 } from '../../utils/math';
+import useAutoGridDrop from '../grid/use-auto-grid-drop';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 import type { EdgeName, Point } from '../../utils/math';
@@ -431,13 +432,15 @@ export default function useListViewDropZone( {
 		canInsertBlocks,
 	} = useSelect( blockEditorStore );
 	const [ target, setTarget ] = useState< ListViewDropZoneTarget | null >();
+	const { onBlocksDrop } = useAutoGridDrop();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
 	// Drops only run with a target.
 	const onBlockDrop = useOnBlockDrop(
 		targetRootClientId,
-		targetBlockIndex as number
+		targetBlockIndex as number,
+		{ onBlocksDrop }
 	);
 
 	const rtl = isRTL();

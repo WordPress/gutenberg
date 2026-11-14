@@ -31,12 +31,6 @@
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
-	:global(.is-dark-theme) & {
-		&::placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
-	}
-
 	&:disabled::placeholder {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}

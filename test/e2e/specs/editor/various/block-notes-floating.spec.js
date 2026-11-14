@@ -411,7 +411,8 @@ test.describe( 'Block Notes: floating notes', () => {
 		await test.step( 'An editor notice shifts the canvas', async () => {
 			const notice = page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.getByText( 'Test notice', { exact: true } );
+				.locator( '.notices-inline-notices__notice' )
+				.filter( { hasText: 'Test notice' } );
 			const initialTop = await getNotedTop();
 
 			// Moves the canvas without resizing anything inside it.
@@ -425,10 +426,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			await expect( notice ).toBeVisible();
 			// A notes column beside the canvas would cut the notice short.
-			const noticeBox = await page
-				.locator( '.notices-inline-notices__notice' )
-				.filter( { hasText: 'Test notice' } )
-				.boundingBox();
+			const noticeBox = await notice.boundingBox();
 			const canvasBox = await page
 				.locator( 'iframe[name="editor-canvas"]' )
 				.boundingBox();

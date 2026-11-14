@@ -207,7 +207,7 @@
 	},
 	"packages/block-editor/src/components/child-layout-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
@@ -6687,7 +6687,7 @@
 	},
 	"packages/components/src/autocomplete/index.tsx": {
 		"react-hooks/refs": {
-			"count": 2
+			"count": 1
 		}
 	},
 	"packages/components/src/base-control/stories/index.story.tsx": {
@@ -6991,17 +6991,7 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/test/controls.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/test/privateAPIs.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/registry-selectors.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -11489,156 +11479,6 @@
 	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
-		}
-	},
-	"packages/rich-text/src/store/test/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/store/test/reducer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/store/test/selectors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/apply-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/concat.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/create.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-active-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-active-object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-format-type.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-format-types.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/get-text-content.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/helpers/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/insert-object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/insert.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-collapsed.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-empty.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/is-format-equal.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/join.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/normalise-formats.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/owns-selection.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/register-format-type.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/remove-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/replace.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/slice.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/split.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/to-dom.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/to-html-string.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/toggle-format.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/unregister-format-type.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/rich-text/src/test/update-formats.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/server-side-render/src/server-side-render.tsx": {
