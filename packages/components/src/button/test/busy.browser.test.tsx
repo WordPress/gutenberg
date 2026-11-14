@@ -134,6 +134,7 @@ describe( 'Button busy presentation', () => {
 			const disabledButton = screen.getByRole( 'button', {
 				name: 'Saving disabled',
 			} );
+			await userEvent.unhover( enabledButton );
 			expect( getComputedStyle( disabledButton ).backgroundColor ).toBe(
 				getComputedStyle( enabledButton ).backgroundColor
 			);

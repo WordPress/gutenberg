@@ -4,6 +4,7 @@ exports[`Downloadable Block Icon > icon rendering > should render a <BlockIcon /
 <div>
   <span
     class="block-editor-block-icon block-directory-downloadable-block-icon has-colors"
+    data-wp-editor-icon="true"
   >
     <span
       class="dashicon dashicons dashicons-default"
