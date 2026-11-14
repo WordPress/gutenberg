@@ -1,0 +1,14 @@
+{
+	"domain": "messages",
+	"locale_data": {
+		"messages": {
+			"": {
+				"domain": "messages",
+				"lang": "en_US"
+			},
+			"This string comes from a script module that a classic script imports.": [
+				"This string comes from a script module that a classic script imports. (translated)"
+			]
+		}
+	}
+}

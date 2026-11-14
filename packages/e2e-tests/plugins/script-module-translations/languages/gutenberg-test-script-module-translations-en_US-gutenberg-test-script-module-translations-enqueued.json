@@ -1,0 +1,14 @@
+{
+	"domain": "messages",
+	"locale_data": {
+		"messages": {
+			"": {
+				"domain": "messages",
+				"lang": "en_US"
+			},
+			"This string comes from an enqueued script module.": [
+				"This string comes from an enqueued script module. (translated)"
+			]
+		}
+	}
+}

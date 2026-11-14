@@ -6,6 +6,10 @@
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
 
+### Bug Fixes
+
+-   Fire `admin_print_footer_scripts` in the footer of the generated full-page template, as `wp-admin/admin-footer.php` does, instead of calling the footer printers one by one, so full-page screens also print the translations of their script modules ([#84651](https://github.com/WordPress/gutenberg/pull/84651)).
+
 ### Internal
 
 -   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).

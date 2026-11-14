@@ -152,6 +152,7 @@ require __DIR__ . '/compat/wordpress-7.1/icons.php';
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
 require __DIR__ . '/compat/wordpress-7.2/media.php';
 require __DIR__ . '/compat/wordpress-7.2/post.php';
+require __DIR__ . '/compat/wordpress-7.2/script-modules.php';
 
 // WordPress 7.3 compat.
 require __DIR__ . '/compat/wordpress-7.3/kses.php';
