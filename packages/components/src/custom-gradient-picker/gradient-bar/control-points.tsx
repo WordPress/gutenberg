@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { colord } from 'colord';
-import { useInstanceId } from '@wordpress/compose';
+import { useEvent, useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
@@ -34,11 +34,19 @@ import DropdownContentWrapper from '../../dropdown/dropdown-content-wrapper';
 
 function ControlPointButton( {
 	isOpen,
+	onStopControlPointChange,
 	position,
 	color,
 	disablePositioning,
 	...additionalProps
 }: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
+	const releaseOpenEditor = useEvent( () => {
+		if ( isOpen ) {
+			onStopControlPointChange();
+		}
+	} );
+	useEffect( () => releaseOpenEditor, [ releaseOpenEditor ] );
+
 	const instanceId = useInstanceId( ControlPointButton );
 	const descriptionId = `components-custom-gradient-picker__control-point-button-description-${ instanceId }`;
 	return (
@@ -110,6 +118,7 @@ function GradientColorPickerDropdown( {
 }
 
 function ControlPoints( {
+	controlPointKeys,
 	disableRemove,
 	disableAlpha,
 	disablePositioning,
@@ -189,11 +198,10 @@ function ControlPoints( {
 							isRenderedInSidebar={
 								__experimentalIsRenderedInSidebar
 							}
-							key={ index }
+							key={ controlPointKeys?.[ index ] ?? index }
 							onClose={ onStopControlPointChange }
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<ControlPointButton
-									key={ index }
 									onClick={ () => {
 										if (
 											controlPointMoveStateRef.current &&
@@ -281,6 +289,9 @@ function ControlPoints( {
 										}
 									} }
 									isOpen={ isOpen }
+									onStopControlPointChange={
+										onStopControlPointChange
+									}
 									position={ point.position }
 									color={ point.color }
 									disablePositioning={ disablePositioning }

@@ -59,7 +59,16 @@ export type GradientTypePickerProps = {
 
 export type ControlPoint = { color: string; position: number };
 
+export type NormalizedControlPoint = {
+	point: ControlPoint;
+	sourceIndex: number;
+};
+
 export type CustomGradientBarProps = {
+	/** Projects emitted points to their serialized values and order. */
+	normalizeControlPoints?: (
+		points: ControlPoint[]
+	) => NormalizedControlPoint[];
 	background: React.CSSProperties[ 'background' ];
 	hasGradient: boolean;
 	value: ControlPoint[];
@@ -104,12 +113,15 @@ export type CustomGradientBarReducerAction =
 
 export type ControlPointButtonProps = {
 	isOpen: boolean;
+	onStopControlPointChange: () => void;
 	position: ControlPoint[ 'position' ];
 	color: string;
 	disablePositioning?: boolean;
 };
 
 export type ControlPointsProps = {
+	/** Stable identities supplied by the bar; standalone legacy callers keep positional keys. */
+	controlPointKeys?: number[];
 	disableRemove: boolean;
 	disableAlpha: boolean;
 	disablePositioning?: boolean;

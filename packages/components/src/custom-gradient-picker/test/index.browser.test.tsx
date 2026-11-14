@@ -32,6 +32,234 @@ function ControlledCustomGradientPicker( {
 }
 
 describe( 'CustomGradientPicker', () => {
+	describe( 'stop identity', () => {
+		const initialValue =
+			'linear-gradient(90deg,red 0%,green 50%,blue 100%)';
+
+		it( 'keeps editing the same stop after an earlier stop is removed', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const view = await render(
+				<CustomGradientPicker
+					value={ initialValue }
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code green/,
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+
+			await view.rerender(
+				<CustomGradientPicker
+					value="linear-gradient(90deg,green 50%,blue 100%)"
+					onChange={ onChange }
+				/>
+			);
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code green/,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			await user.fill(
+				screen.getByRole( 'textbox', { name: 'Hex color' } ),
+				'00ff00'
+			);
+			await user.keyboard( '{Enter}' );
+			expect( onChange ).toHaveBeenLastCalledWith(
+				'linear-gradient(90deg,rgb(0,255,0) 50%,rgb(0,0,255) 100%)'
+			);
+		} );
+
+		it( "closes the removed stop's editor and makes the inserter available", async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const view = await render(
+				<CustomGradientPicker
+					value={ initialValue }
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code green/,
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+
+			await view.rerender(
+				<CustomGradientPicker
+					value="linear-gradient(90deg,red 0%,blue 100%)"
+					onChange={ onChange }
+				/>
+			);
+			expect(
+				screen.queryByRole( 'slider', { name: 'Color' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 100% with color code blue/,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'false' );
+
+			// eslint-disable-next-line testing-library/no-node-access -- The hover target has no accessible role.
+			const bar = view.container.querySelector(
+				'.components-custom-gradient-picker__gradient-bar'
+			) as HTMLElement;
+			const bounds = bar.getBoundingClientRect();
+			expect( bounds.width ).toBeGreaterThan( 0 );
+			await user.hover( bar, {
+				position: { x: bounds.width / 2, y: bounds.height / 2 },
+			} );
+			// eslint-disable-next-line testing-library/no-node-access -- The existing inserter has no accessible name.
+			const inserter = view.container.querySelector(
+				'.components-custom-gradient-picker__insert-point-dropdown'
+			) as HTMLElement;
+			expect( inserter ).toBeVisible();
+			await user.click( inserter );
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+			expect(
+				screen.getByRole( 'slider', { name: 'Color' } )
+			).toBeVisible();
+		} );
+
+		it( 'keeps the exact stop open when equal-position alpha stops are reordered', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const first = 'rgba(0,128,0,0.5001)';
+			const second = 'rgba(0,128,0,0.5002)';
+			const view = await render(
+				<CustomGradientPicker
+					value={ `linear-gradient(90deg,${ first } 50%,${ second } 50%,blue 100%)` }
+					onChange={ onChange }
+				/>
+			);
+			const firstName = `Gradient control point at position 50% with color code ${ first }.`;
+			await user.tab();
+			expect(
+				screen.getByRole( 'button', { name: firstName } )
+			).toHaveFocus();
+			await user.keyboard( '{Enter}' );
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+
+			await view.rerender(
+				<CustomGradientPicker
+					value={ `linear-gradient(90deg,${ second } 50%,${ first } 50%,blue 100%)` }
+					onChange={ onChange }
+				/>
+			);
+			expect(
+				screen.getByRole( 'button', { name: firstName } )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			expect(
+				screen.getByRole( 'button', {
+					name: `Gradient control point at position 50% with color code ${ second }.`,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		it( 'closes the editor when its stop has no match in a replacement gradient', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const view = await render(
+				<CustomGradientPicker
+					value={ initialValue }
+					onChange={ onChange }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name: /position 50% with color code green/,
+				} )
+			);
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+
+			await view.rerender(
+				<CustomGradientPicker
+					value="linear-gradient(90deg,red 0%,purple 60%,blue 100%)"
+					onChange={ onChange }
+				/>
+			);
+			expect(
+				screen.queryByRole( 'slider', { name: 'Color' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 60% with color code purple/,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'false' );
+		} );
+
+		it( 'does not guess an editor owner from ambiguous normalized replacements', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const view = await render(
+				<CustomGradientPicker
+					value="linear-gradient(90deg,green 50%,rgba(0,128,0,0.5) 50%,blue 100%)"
+					onChange={ onChange }
+				/>
+			);
+			await user.tab();
+			await user.keyboard( '{Enter}' );
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+
+			await view.rerender(
+				<CustomGradientPicker
+					value="linear-gradient(90deg,rgba(0,128,0,0.5002) 50%,rgba(0,128,0,0.5001) 50%,blue 100%)"
+					onChange={ onChange }
+				/>
+			);
+			expect(
+				screen.queryByRole( 'slider', { name: 'Color' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'keeps focus and editing through serialized updates of identical stops', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ControlledCustomGradientPicker initialValue="linear-gradient(90deg,#008000 50%,#008000 50%,#0000ff 100%)" />
+			);
+			await user.tab();
+			await user.keyboard( '{Enter}' );
+			await user.click(
+				screen.getByRole( 'textbox', { name: 'Hex color' } )
+			);
+			await user.keyboard( '{Escape}{ArrowRight}' );
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 60% with color code/,
+				} )
+			).toHaveFocus();
+
+			await user.keyboard( '{Enter}' );
+			const hexInput = screen.getByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await user.fill( hexInput, '00ff00' );
+			await user.keyboard( '{Enter}' );
+			expect(
+				screen.getByRole( 'button', {
+					name: /position 60% with color code rgb\(0,255,0\)/,
+				} )
+			).toHaveAttribute( 'aria-expanded', 'true' );
+			expect( hexInput ).toHaveFocus();
+		} );
+	} );
+
 	describe( 'new gradient stop color picker', () => {
 		it( 'preserves visual saturation when setting a new stop color through black', async () => {
 			const { container } = await render(
