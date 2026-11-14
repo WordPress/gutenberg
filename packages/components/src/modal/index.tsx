@@ -8,9 +8,9 @@ import {
 	forwardRef,
 	useLayoutEffect,
 	useContext,
+	useId,
 } from '@wordpress/element';
 import {
-	useInstanceId,
 	useFocusReturn,
 	useFocusOnMount,
 	useConstrainedTabbing,
@@ -77,7 +77,7 @@ function UnforwardedModal(
 	}, [] );
 	const isInUiOverlay = !! getWpCompatOverlayContainer( portalContainer );
 
-	const instanceId = useInstanceId( Modal );
+	const instanceId = useId();
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
