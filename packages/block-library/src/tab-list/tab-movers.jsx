@@ -7,6 +7,7 @@ import { ToolbarButton } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import useTabActions from '../tabs/use-tab-actions';
+import renderActionIcon from '../utils/render-action-icon';
 
 /**
  * Block toolbar buttons that reorder the active tab one position before or after.
@@ -46,7 +47,9 @@ export default function TabMovers( { tabsClientId } ) {
 		<BlockControls group="parent">
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
-				icon={ isRTL() ? chevronRight : chevronLeft }
+				icon={ renderActionIcon(
+					isRTL() ? chevronRight : chevronLeft
+				) }
 				label={ __( 'Move tab before' ) }
 				onClick={ () => moveTab( -1 ) }
 				disabled={ activeIndex <= 0 }
@@ -54,7 +57,9 @@ export default function TabMovers( { tabsClientId } ) {
 			/>
 			<ToolbarButton
 				className="wp-block-tab-list__mover-button"
-				icon={ isRTL() ? chevronLeft : chevronRight }
+				icon={ renderActionIcon(
+					isRTL() ? chevronLeft : chevronRight
+				) }
 				label={ __( 'Move tab after' ) }
 				onClick={ () => moveTab( 1 ) }
 				disabled={ activeIndex >= tabCount - 1 }

@@ -38,6 +38,7 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import renderActionIcon from '../utils/render-action-icon';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -309,7 +310,7 @@ export default function NavigationSubmenuEdit( {
 					{ ! openSubmenusOnClick && (
 						<ToolbarButton
 							name="link"
-							icon={ linkIcon }
+							icon={ renderActionIcon( linkIcon ) }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
 							onClick={ () => {
@@ -320,7 +321,7 @@ export default function NavigationSubmenuEdit( {
 
 					<ToolbarButton
 						name="revert"
-						icon={ removeSubmenu }
+						icon={ renderActionIcon( removeSubmenu ) }
 						title={ __( 'Convert to Link' ) }
 						onClick={ transformToLink }
 						className="wp-block-navigation__submenu__revert"

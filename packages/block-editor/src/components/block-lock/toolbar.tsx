@@ -5,6 +5,7 @@ import { lock, unlock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
 import type { BlockLockControlProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 export default function BlockLockToolbar( {
 	clientId,
@@ -39,7 +40,7 @@ export default function BlockLockToolbar( {
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
 					disabled={ ! canLock }
-					icon={ isLocked ? lock : unlock }
+					icon={ renderActionIcon( isLocked ? lock : unlock ) }
 					label={ label }
 					onClick={ toggleModal }
 					aria-expanded={ isModalOpen }

@@ -47,6 +47,7 @@ import GalleryControls from './controls';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
 import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
+import renderActionIcon from '../utils/render-action-icon';
 
 const LINK_OPTIONS = [
 	{
@@ -439,7 +440,10 @@ export default function GalleryEdit( props ) {
 				/>
 			</InspectorControls>
 			<BlockControls group="block">
-				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
+				<ToolbarDropdownMenu
+					icon={ renderActionIcon( linkIcon ) }
+					label={ __( 'Link' ) }
+				>
 					{ ( { onClose } ) => (
 						<MenuGroup>
 							{ linkOptions.map( ( linkItem ) => {

@@ -9,6 +9,7 @@ import {
 	Menu,
 } from '@wordpress/ui';
 import { useGlobalStyles } from './hooks';
+import renderActionIcon from '../../utils/render-action-icon';
 
 /**
  * Action menu with Reset, Welcome Guide, and Additional CSS.
@@ -58,7 +59,7 @@ export function GlobalStylesActionMenu( {
 			<Menu.Trigger
 				render={
 					<Button
-						icon={ moreVertical }
+						icon={ renderActionIcon( moreVertical ) }
 						label={ __( 'More' ) }
 						size="compact"
 					/>

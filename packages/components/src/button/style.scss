@@ -432,9 +432,6 @@
 	}
 
 	.components-button__busy-spinner {
-		// Consumers may hide button icons with SVG selectors. The busy indicator
-		// must stay visible without requiring them to know its implementation.
-		display: inline-block !important;
 		position: absolute;
 		inset: 0;
 		margin: auto;

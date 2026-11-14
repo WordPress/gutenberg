@@ -3,6 +3,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import type { ComponentProps } from 'react';
 import { TOOLBAR_FORMATS } from './format-toolbar/formats';
 import type { RichTextToolbarButtonProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 // We need the `RichText.ToolbarControls` slot handler to identify core fills
 // by their `name` props, even though `name` isn't propagated to the actually
@@ -11,7 +12,9 @@ function NamedToolbarButton( {
 	name,
 	...props
 }: ComponentProps< typeof ToolbarButton > & { name?: string } ) {
-	return <ToolbarButton { ...props } />;
+	return (
+		<ToolbarButton { ...props } icon={ renderActionIcon( props.icon ) } />
+	);
 }
 
 export function RichTextToolbarButton( {

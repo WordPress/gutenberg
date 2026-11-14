@@ -21,6 +21,7 @@ import type {
 	BlockMoverDirection,
 	BlockMoverOrientation,
 } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const getArrowIcon = (
 	direction: BlockMoverDirection,
@@ -144,7 +145,9 @@ const BlockMoverButton = forwardRef<
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
-					icon={ getArrowIcon( direction, orientation ) }
+					icon={ renderActionIcon(
+						getArrowIcon( direction, orientation )
+					) }
 					// Both directions have a label.
 					label={ getMovementDirectionLabel(
 						direction,

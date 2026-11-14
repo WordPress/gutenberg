@@ -21,6 +21,7 @@ import deprecated from '@wordpress/deprecated';
 import OrderedListSettings from './ordered-list-settings';
 import { migrateToListV2 } from './utils';
 import TagName from './tag-name';
+import renderActionIcon from '../utils/render-action-icon';
 
 const DEFAULT_BLOCK = {
 	name: 'core/list-item',
@@ -109,7 +110,9 @@ function IndentUI( { clientId } ) {
 	return (
 		<>
 			<ToolbarButton
-				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
+				icon={ renderActionIcon(
+					isRTL() ? formatOutdentRTL : formatOutdent
+				) }
 				title={ __( 'Outdent' ) }
 				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
@@ -138,7 +141,9 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const controls = (
 		<BlockControls group="block">
 			<ToolbarButton
-				icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+				icon={ renderActionIcon(
+					isRTL() ? formatListBulletsRTL : formatListBullets
+				) }
 				title={ __( 'Unordered' ) }
 				description={ __( 'Convert to unordered list' ) }
 				isActive={ ordered === false }
@@ -147,7 +152,9 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				} }
 			/>
 			<ToolbarButton
-				icon={ isRTL() ? formatListNumberedRTL : formatListNumbered }
+				icon={ renderActionIcon(
+					isRTL() ? formatListNumberedRTL : formatListNumbered
+				) }
 				title={ __( 'Ordered' ) }
 				description={ __( 'Convert to ordered list' ) }
 				isActive={ ordered === true }

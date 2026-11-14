@@ -28,6 +28,7 @@ import { prependHTTPS } from '@wordpress/url';
 import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
 import URLPopover from './index';
 import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
@@ -274,7 +275,7 @@ const ImageURLInputUI = ( {
 						</p>
 					</div>
 					<Button
-						icon={ linkOff }
+						icon={ renderActionIcon( linkOff ) }
 						label={ __( 'Disable enlarge on click' ) }
 						onClick={ () => {
 							onSetLightbox?.( false );
@@ -303,7 +304,7 @@ const ImageURLInputUI = ( {
 						urlLabel={ urlLabel }
 					/>
 					<Button
-						icon={ linkOff }
+						icon={ renderActionIcon( linkOff ) }
 						label={ __( 'Remove link' ) }
 						onClick={ () => {
 							onLinkRemove();
@@ -320,7 +321,7 @@ const ImageURLInputUI = ( {
 	return (
 		<>
 			<ToolbarButton
-				icon={ linkIcon }
+				icon={ renderActionIcon( linkIcon ) }
 				className="components-toolbar__control"
 				label={ __( 'Link' ) }
 				aria-expanded={ isOpen }

@@ -2,6 +2,7 @@ import { useBlockProps, BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { resultsFound, displayingResults } from './icons';
+import renderActionIcon from '../utils/render-action-icon';
 
 export default function QueryTotalEdit( { attributes, setAttributes } ) {
 	const { displayType } = attributes;
@@ -44,7 +45,7 @@ export default function QueryTotalEdit( { attributes, setAttributes } ) {
 		<BlockControls>
 			<ToolbarGroup>
 				<ToolbarDropdownMenu
-					icon={ getButtonPositionIcon() }
+					icon={ renderActionIcon( getButtonPositionIcon() ) }
 					label={ __( 'Change display type' ) }
 					controls={ buttonPositionControls }
 				/>

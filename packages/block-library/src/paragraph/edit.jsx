@@ -19,11 +19,12 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
+import renderActionIcon from '../utils/render-action-icon';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		<ToolbarButton
-			icon={ formatLTR }
+			icon={ renderActionIcon( formatLTR ) }
 			title={ _x( 'Left to right', 'editor button' ) }
 			isActive={ direction === 'ltr' }
 			onClick={ () => {

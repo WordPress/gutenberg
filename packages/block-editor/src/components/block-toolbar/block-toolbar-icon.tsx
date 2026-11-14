@@ -18,6 +18,7 @@ import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 import type { BlockToolbarIconProps, BlockToolbarIconVariant } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function getBlockIconVariant( {
 	select,
@@ -236,7 +237,7 @@ export default function BlockToolbarIcon( {
 			disabled
 			className="block-editor-block-toolbar__block-icon-button"
 			title={ label }
-			icon={ BlockIconElement }
+			icon={ renderActionIcon( BlockIconElement ) }
 			text={ text }
 		/>
 	);

@@ -32,6 +32,7 @@ import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
 import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import renderActionIcon from '../utils/render-action-icon';
 
 const HEADING_LEVEL_ITEMS = [
 	{ value: 'all', label: __( 'All levels' ) },
@@ -70,18 +71,18 @@ function TableOfContentsToolbar( {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						icon={
+						icon={ renderActionIcon(
 							isRTL() ? formatListBulletsRTL : formatListBullets
-						}
+						) }
 						title={ __( 'Unordered' ) }
 						description={ __( 'Convert to unordered list' ) }
 						onClick={ () => setAttributes( { ordered: false } ) }
 						isActive={ ordered === false }
 					/>
 					<ToolbarButton
-						icon={
+						icon={ renderActionIcon(
 							isRTL() ? formatListNumberedRTL : formatListNumbered
-						}
+						) }
 						title={ __( 'Ordered' ) }
 						description={ __( 'Convert to ordered list' ) }
 						onClick={ () => setAttributes( { ordered: true } ) }

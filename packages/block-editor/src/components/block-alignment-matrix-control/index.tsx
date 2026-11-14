@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import type { KeyboardEvent } from 'react';
 import type { BlockAlignmentMatrixControlProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const noop = () => {};
 
@@ -71,7 +72,7 @@ function BlockAlignmentMatrixControl(
 						aria-expanded={ isOpen }
 						onKeyDown={ openOnArrowDown }
 						label={ label }
-						icon={ icon }
+						icon={ renderActionIcon( icon ) }
 						showTooltip
 						disabled={ isDisabled }
 					/>

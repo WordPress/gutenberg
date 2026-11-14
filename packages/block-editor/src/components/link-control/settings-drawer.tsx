@@ -8,6 +8,7 @@ import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { _x, isRTL } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import type { LinkSettingsDrawerProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function LinkSettingsDrawer( {
 	children,
@@ -31,7 +32,9 @@ function LinkSettingsDrawer( {
 				className="block-editor-link-control__drawer-toggle"
 				aria-expanded={ settingsOpen }
 				onClick={ () => setSettingsOpen( ! settingsOpen ) }
-				icon={ isRTL() ? chevronLeftSmall : chevronRightSmall }
+				icon={ renderActionIcon(
+					isRTL() ? chevronLeftSmall : chevronRightSmall
+				) }
 				aria-controls={ settingsDrawerId }
 			>
 				{ _x( 'Advanced', 'Additional link settings' ) }

@@ -75,6 +75,7 @@ function SearchItemIcon( {
 		return (
 			<Icon
 				className="block-editor-link-control__search-item-icon"
+				data-wp-editor-icon
 				icon={ icon }
 			/>
 		);

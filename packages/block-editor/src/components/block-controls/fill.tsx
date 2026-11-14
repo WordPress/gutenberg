@@ -5,6 +5,19 @@ import {
 import useBlockControlsFill from './hook';
 import type { ForwardedContext } from '../inspector-controls/types';
 import type { BlockControlsFillProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
+
+type Controls = NonNullable< BlockControlsFillProps[ 'controls' ] >;
+type Control = Exclude< Controls[ number ], unknown[] >;
+
+function isControlSets( controls: Controls ): controls is Control[][] {
+	return Array.isArray( controls[ 0 ] );
+}
+
+const withActionIcon = ( control: Control ) => ( {
+	...control,
+	icon: renderActionIcon( control.icon ),
+} );
 
 export default function BlockControlsFill( {
 	group = 'default',
@@ -20,9 +33,18 @@ export default function BlockControlsFill( {
 		return null;
 	}
 
+	let markedControls = controls;
+	if ( controls ) {
+		markedControls = isControlSets( controls )
+			? controls.map( ( set ) => set.map( withActionIcon ) )
+			: controls.map( withActionIcon );
+	}
+
 	const innerMarkup = (
 		<>
-			{ group === 'default' && <ToolbarGroup controls={ controls } /> }
+			{ group === 'default' && (
+				<ToolbarGroup controls={ markedControls } />
+			) }
 			{ children }
 		</>
 	);

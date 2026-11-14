@@ -106,6 +106,8 @@ the default value of its `size` prop.
 
 Displays a centered spinner while an action is in progress and announces the loading state. The label stays available to assistive technology. This does not disable the button.
 
+The busy indicator is also an SVG. Scope icon styles to a class or data attribute on the icon you provide. Broad SVG selectors inside buttons can affect the busy indicator.
+
 ### `isDestructive`
 
  - Type: `boolean`

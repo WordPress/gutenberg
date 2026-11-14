@@ -23,6 +23,7 @@ import type {
 	BlockSwitcherDropdownMenuContentsProps,
 	BlockSwitcherProps,
 } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function BlockSwitcherDropdownMenuContents( {
 	onClose,
@@ -256,7 +257,7 @@ export const BlockSwitcher = ( {
 							placement: 'bottom-start',
 							className: 'block-editor-block-switcher__popover',
 						} }
-						icon={ children }
+						icon={ renderActionIcon( children ) }
 						text={ text }
 						toggleProps={ {
 							description: blockSwitcherDescription,

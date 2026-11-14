@@ -12,6 +12,7 @@ import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import EditorHistoryRedo from '../editor-history/redo';
 import EditorHistoryUndo from '../editor-history/undo';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function DocumentTools( { className, disableBlockTools = false } ) {
 	const { setIsInserterOpened, setIsListViewOpened } =
@@ -107,7 +108,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 						onMouseDown={ preventDefault }
 						onClick={ toggleInserter }
 						disabled={ disableBlockTools }
-						icon={ plus }
+						icon={ renderActionIcon( plus ) }
 						label={ showIconLabels ? shortLabel : longLabel }
 						showTooltip={ ! showIconLabels }
 						aria-expanded={ isInserterOpened }
@@ -130,7 +131,7 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 						{ ! isDistractionFree && (
 							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"
-								icon={ listView }
+								icon={ renderActionIcon( listView ) }
 								disabled={ disableBlockTools }
 								isPressed={ isListViewOpen }
 								/* translators: button label text should, if possible, be under 16 characters. */

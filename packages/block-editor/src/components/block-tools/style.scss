@@ -218,7 +218,8 @@
 				padding: 0 $grid-unit-15;
 				color: inherit;
 
-				svg {
+				svg[data-wp-editor-icon],
+				[data-wp-editor-icon] svg {
 					display: none;
 				}
 

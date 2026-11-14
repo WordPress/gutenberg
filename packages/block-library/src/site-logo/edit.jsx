@@ -38,6 +38,7 @@ import { MIN_SIZE } from '../image/constants';
 import { MediaControl, MediaControlPreview } from '../utils/media-control';
 import { unlock } from '../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import renderActionIcon from '../utils/render-action-icon';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const { mediaEditKey, openMediaEditorModalKey } = unlock(
@@ -339,7 +340,7 @@ const SiteLogo = ( {
 								} )
 							}
 							aria-haspopup="dialog"
-							icon={ crop }
+							icon={ renderActionIcon( crop ) }
 							label={ __( 'Edit image' ) }
 						/>
 					</BlockControls>
@@ -670,7 +671,7 @@ export default function LogoEdit( {
 						return (
 							<Button
 								__next40pxDefaultSize
-								icon={ upload }
+								icon={ renderActionIcon( upload ) }
 								variant="primary"
 								label={ __( 'Choose logo' ) }
 								showTooltip

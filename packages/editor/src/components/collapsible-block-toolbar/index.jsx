@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { unlock } from '../../lock-unlock';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const { useHasBlockToolbar } = unlock( blockEditorPrivateApis );
 
@@ -48,7 +49,7 @@ export default function CollapsibleBlockToolbar( { isCollapsed, onToggle } ) {
 
 			<Button
 				className="editor-collapsible-block-toolbar__toggle"
-				icon={ isCollapsed ? next : previous }
+				icon={ renderActionIcon( isCollapsed ? next : previous ) }
 				onClick={ () => {
 					onToggle( ! isCollapsed );
 				} }

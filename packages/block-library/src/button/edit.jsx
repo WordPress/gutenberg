@@ -57,6 +57,7 @@ import ViewLinkButton from '../utils/view-link-button';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
+import renderActionIcon from '../utils/render-action-icon';
 
 const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
@@ -523,7 +524,7 @@ function ButtonEdit( props ) {
 					{ isLinkTag && ! lockUrlControls && (
 						<ToolbarButton
 							name="link"
-							icon={ link }
+							icon={ renderActionIcon( link ) }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
 							onClick={ () => setIsEditingURL( ! isEditingURL ) }

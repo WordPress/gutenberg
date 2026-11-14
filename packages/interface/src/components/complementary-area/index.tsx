@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { check, starEmpty, starFilled } from '@wordpress/icons';
+import { Icon, check, starEmpty, starFilled } from '@wordpress/icons';
 import {
 	cloneElement,
 	isValidElement,
@@ -305,7 +305,13 @@ function ComplementaryArea( {
 							aria-expanded={ isActive }
 							aria-disabled={ isLoading }
 							label={ title }
-							icon={ showIconLabels ? check : icon }
+							icon={
+								showIconLabels ? (
+									<Icon icon={ check } data-wp-editor-icon />
+								) : (
+									icon
+								)
+							}
 							showTooltip={ ! showIconLabels }
 							variant={ showIconLabels ? 'tertiary' : undefined }
 							size="compact"

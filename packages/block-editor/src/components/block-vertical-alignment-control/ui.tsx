@@ -12,6 +12,7 @@ import type {
 	BlockVerticalAlignment,
 	BlockVerticalAlignmentUIProps,
 } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
@@ -72,15 +73,18 @@ function BlockVerticalAlignmentUI( {
 
 	return (
 		<UIComponent
-			icon={
+			icon={ renderActionIcon(
 				activeAlignment
 					? activeAlignment.icon
 					: defaultAlignmentControl.icon
-			}
+			) }
 			label={ label }
 			controls={ controls.map( ( control ) => {
 				return {
 					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+					icon: renderActionIcon(
+						BLOCK_ALIGNMENTS_CONTROLS[ control ].icon
+					),
 					isActive: value === control,
 					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( control ),

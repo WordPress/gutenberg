@@ -18,6 +18,7 @@ import NotesMoreMenuGroup from './notes-more-menu-group';
 import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
+import renderActionIcon from '../../utils/render-action-icon';
 
 export default function MoreMenu( { isRevisionMode = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
@@ -38,7 +39,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 			render={
 				<Button
 					size="compact"
-					icon={ moreVertical }
+					icon={ renderActionIcon( moreVertical ) }
 					label={ __( 'Options' ) }
 					showTooltip={ ! showIconLabels }
 					tooltipPosition="bottom"

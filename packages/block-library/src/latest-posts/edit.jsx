@@ -41,6 +41,7 @@ import {
 	DEFAULT_EXCERPT_LENGTH,
 } from './constants';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import renderActionIcon from '../utils/render-action-icon';
 
 /**
  * Module Constants
@@ -634,13 +635,13 @@ export default function LatestPostsEdit( {
 
 	const layoutControls = [
 		{
-			icon: list,
+			icon: renderActionIcon( list ),
 			title: _x( 'List view', 'Latest posts block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
-			icon: grid,
+			icon: renderActionIcon( grid ),
 			title: _x( 'Grid view', 'Latest posts block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {

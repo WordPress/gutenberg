@@ -36,6 +36,7 @@ import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import ViewLinkButton from '../utils/view-link-button';
 import isValidLink from './is-valid-link';
+import renderActionIcon from '../utils/render-action-icon';
 
 const INVALID_LINK = {
 	type: 'invalid',
@@ -155,7 +156,7 @@ const SocialLinkURLPopover = ( {
 						suffix={
 							<InputControlSuffixWrapper variant="control">
 								<Button
-									icon={ keyboardReturn }
+									icon={ renderActionIcon( keyboardReturn ) }
 									label={ __( 'Apply' ) }
 									type="submit"
 									size="small"

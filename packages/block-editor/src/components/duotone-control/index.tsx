@@ -12,6 +12,7 @@ import { Icon, filter } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import type { KeyboardEvent } from 'react';
 import type { DuotoneControlProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function DuotoneControl( {
 	id: idProp,
@@ -59,7 +60,7 @@ function DuotoneControl( {
 						aria-expanded={ isOpen }
 						onKeyDown={ openOnArrowDown }
 						label={ actionLabel }
-						icon={ toolbarIcon }
+						icon={ renderActionIcon( toolbarIcon ) }
 					/>
 				);
 			} }

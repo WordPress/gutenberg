@@ -5,6 +5,7 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 import { store as editorStore } from '../../store';
+import renderActionIcon from '../../utils/render-action-icon';
 
 function EditorHistoryUndo( props, ref ) {
 	const hasUndo = useSelect(
@@ -17,7 +18,7 @@ function EditorHistoryUndo( props, ref ) {
 			__next40pxDefaultSize
 			{ ...props }
 			ref={ ref }
-			icon={ ! isRTL() ? undoIcon : redoIcon }
+			icon={ renderActionIcon( ! isRTL() ? undoIcon : redoIcon ) }
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }

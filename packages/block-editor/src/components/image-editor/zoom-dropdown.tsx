@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { MIN_ZOOM, MAX_ZOOM, POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
+import renderActionIcon from '../../utils/render-action-icon';
 
 export default function ZoomDropdown() {
 	const { isInProgress, zoom, setZoom } = useImageEditingContext();
@@ -17,7 +18,7 @@ export default function ZoomDropdown() {
 			popoverProps={ POPOVER_PROPS }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<ToolbarButton
-					icon={ search }
+					icon={ renderActionIcon( search ) }
 					label={ __( 'Zoom' ) }
 					onClick={ onToggle }
 					aria-expanded={ isOpen }

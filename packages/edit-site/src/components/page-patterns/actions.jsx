@@ -1,6 +1,6 @@
 import { DropdownMenu, MenuGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
+import { Icon, moreVertical } from '@wordpress/icons';
 import AddNewPattern from '../add-new-pattern';
 import RenameCategoryMenuItem from './rename-category-menu-item';
 import DeleteCategoryMenuItem from './delete-category-menu-item';
@@ -21,7 +21,7 @@ export default function PatternsActions( { categoryId, type } ) {
 			<AddNewPattern />
 			{ !! patternCategory?.id && (
 				<DropdownMenu
-					icon={ moreVertical }
+					icon={ <Icon icon={ moreVertical } data-wp-editor-icon /> }
 					label={ __( 'Actions' ) }
 					toggleProps={ {
 						className: 'edit-site-patterns__button',

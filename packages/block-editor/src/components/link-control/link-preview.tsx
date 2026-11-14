@@ -17,6 +17,7 @@ import { Badge, Link } from '@wordpress/ui';
 import { ViewerSlot } from './viewer-slot';
 import useRichUrlData from './use-rich-url-data';
 import type { LinkPreviewProps } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 export default function LinkPreview( {
 	value,
@@ -172,7 +173,7 @@ export default function LinkPreview( {
 					</Flex>
 				</Flex>
 				<Button
-					icon={ pencil }
+					icon={ renderActionIcon( pencil ) }
 					label={ __( 'Edit link' ) }
 					onClick={ onEditClick }
 					size="compact"
@@ -180,7 +181,7 @@ export default function LinkPreview( {
 				/>
 				{ hasUnlinkControl && (
 					<Button
-						icon={ linkOff }
+						icon={ renderActionIcon( linkOff ) }
 						label={ __( 'Remove link' ) }
 						onClick={ onRemove }
 						size="compact"
@@ -188,7 +189,7 @@ export default function LinkPreview( {
 					/>
 				) }
 				<Button
-					icon={ copy }
+					icon={ renderActionIcon( copy ) }
 					label={ __( 'Copy link' ) }
 					ref={ ref }
 					accessibleWhenDisabled

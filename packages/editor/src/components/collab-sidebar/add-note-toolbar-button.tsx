@@ -9,6 +9,7 @@ import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const { NoteIconToolbarSlotFill } = unlock( blockEditorPrivateApis );
 
@@ -49,7 +50,7 @@ function NoteToolbarButton( {
 
 	return (
 		<ToolbarButton
-			icon={ commentIcon }
+			icon={ renderActionIcon( commentIcon ) }
 			label={
 				count
 					? sprintf(

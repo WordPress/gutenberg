@@ -69,6 +69,7 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
@@ -102,7 +103,7 @@ function NavigationAddPageButton( { clientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					name="add-page"
-					icon={ page }
+					icon={ renderActionIcon( page ) }
 					onClick={ onAddPage }
 				>
 					{ __( 'Add page' ) }

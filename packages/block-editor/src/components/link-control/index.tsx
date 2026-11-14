@@ -37,6 +37,7 @@ import type {
 	LinkControlValue,
 	SearchSuffixControlProps,
 } from './types';
+import renderActionIcon from '../../utils/render-action-icon';
 
 const noop = () => {};
 
@@ -765,7 +766,7 @@ function SearchSuffixControl( {
 	if ( isEntity ) {
 		return (
 			<Button
-				icon={ linkOff }
+				icon={ renderActionIcon( linkOff ) }
 				onClick={ onUnlink }
 				// Set whenever `isEntity` is.
 				aria-describedby={ helpTextId! }
@@ -785,7 +786,7 @@ function SearchSuffixControl( {
 			<Button
 				onClick={ isDisabled ? noop : onSubmit }
 				label={ __( 'Apply' ) }
-				icon={ keyboardReturn }
+				icon={ renderActionIcon( keyboardReturn ) }
 				className="block-editor-link-control__search-submit"
 				aria-disabled={ isDisabled }
 				size="small"
