@@ -139,3 +139,126 @@ export const EMOJI_GROUPS = [
 		],
 	},
 ];
+
+export interface FixtureTreeItem extends FixtureItem {
+	count: number;
+	children?: FixtureTreeItem[];
+}
+
+export const CATEGORY_TREE: FixtureTreeItem[] = [
+	{
+		id: 'clothing',
+		value: 'Clothing',
+		count: 26,
+		children: [
+			{
+				id: 'clothing-women',
+				value: 'Women',
+				count: 9,
+				children: [
+					{
+						id: 'clothing-women-tops',
+						value: 'Tops',
+						count: 4,
+						children: [
+							{
+								id: 'clothing-women-tops-shirts',
+								value: 'Shirts',
+								count: 2,
+							},
+							{
+								id: 'clothing-women-tops-sweaters',
+								value: 'Sweaters',
+								count: 2,
+							},
+						],
+					},
+					{
+						id: 'clothing-women-dresses',
+						value: 'Dresses',
+						count: 3,
+					},
+					{
+						id: 'clothing-women-accessories',
+						value: 'Accessories',
+						count: 2,
+					},
+				],
+			},
+			{
+				id: 'clothing-men',
+				value: 'Men',
+				count: 8,
+				children: [
+					{ id: 'clothing-men-shirts', value: 'Shirts', count: 3 },
+					{ id: 'clothing-men-pants', value: 'Pants', count: 3 },
+					{
+						id: 'clothing-men-outerwear',
+						value: 'Outerwear',
+						count: 2,
+					},
+				],
+			},
+			{
+				id: 'clothing-kids',
+				value: 'Kids',
+				count: 9,
+				children: [
+					{ id: 'clothing-kids-baby', value: 'Baby', count: 4 },
+					{ id: 'clothing-kids-school', value: 'School', count: 5 },
+				],
+			},
+		],
+	},
+	{
+		id: 'home-kitchen',
+		value: 'Home & Kitchen',
+		count: 12,
+		children: [
+			{ id: 'home-kitchen-cookware', value: 'Cookware', count: 4 },
+			{ id: 'home-kitchen-tabletop', value: 'Tabletop', count: 3 },
+			{ id: 'home-kitchen-storage', value: 'Storage', count: 3 },
+			{ id: 'home-kitchen-linens', value: 'Linens', count: 2 },
+		],
+	},
+	{
+		id: 'electronics',
+		value: 'Electronics',
+		count: 10,
+		children: [
+			{ id: 'electronics-audio', value: 'Audio', count: 3 },
+			{ id: 'electronics-computers', value: 'Computers', count: 4 },
+			{ id: 'electronics-accessories', value: 'Accessories', count: 3 },
+		],
+	},
+	{
+		id: 'beauty',
+		value: 'Beauty',
+		count: 9,
+		children: [
+			{ id: 'beauty-skincare', value: 'Skincare', count: 4 },
+			{ id: 'beauty-makeup', value: 'Makeup', count: 3 },
+			{ id: 'beauty-haircare', value: 'Haircare', count: 2 },
+		],
+	},
+	{
+		id: 'office',
+		value: 'Office',
+		count: 8,
+		children: [
+			{ id: 'office-supplies', value: 'Supplies', count: 3 },
+			{ id: 'office-furniture', value: 'Furniture', count: 3 },
+			{ id: 'office-organization', value: 'Organization', count: 2 },
+		],
+	},
+	{
+		id: 'sale',
+		value: 'Sale',
+		count: 11,
+		children: [
+			{ id: 'sale-clearance', value: 'Clearance', count: 4 },
+			{ id: 'sale-seasonal', value: 'Seasonal', count: 4 },
+			{ id: 'sale-limited-time', value: 'Limited time', count: 3 },
+		],
+	},
+];
