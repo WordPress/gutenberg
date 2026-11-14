@@ -207,14 +207,6 @@ const UnforwardedPopover = (
 
 	const [ fallbackReferenceElement, setFallbackReferenceElement ] =
 		useState< HTMLSpanElement | null >( null );
-
-	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
-		( node ) => {
-			setFallbackReferenceElement( node );
-		},
-		[]
-	);
-
 	const [ sourceParent, setSourceParent ] = useState< Element | null >(
 		null
 	);
@@ -223,6 +215,15 @@ const UnforwardedPopover = (
 			setSourceParent( node.parentElement ?? node.ownerDocument.body );
 		}
 	}, [] );
+
+	const anchorRefFallback: RefCallback< HTMLSpanElement > = useCallback(
+		( node ) => {
+			setFallbackReferenceElement( node );
+			setSource( node );
+		},
+		[ setSource ]
+	);
+
 	const hasAnchor = anchorRef || anchorRect || anchor;
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -489,9 +490,7 @@ const UnforwardedPopover = (
 	// the popover, add the `is-positioned` class to signal that all transitions have finished.
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
-	const compatContainer = getWpCompatOverlayContainer(
-		hasAnchor ? sourceParent : fallbackReferenceElement
-	);
+	const compatContainer = getWpCompatOverlayContainer( sourceParent );
 	const shouldRenderWithinSlot = slot.ref && ! inline;
 	const isInUiOverlay = !! getWpCompatOverlayContainer(
 		shouldRenderWithinSlot ? slot.ref?.current : compatContainer
@@ -572,19 +571,16 @@ const UnforwardedPopover = (
 		);
 	}
 
-	// Explicit anchors in a slot or inline need no placeholder in editable content.
-	if ( hasAnchor && ( shouldRenderWithinSlot || inline ) ) {
-		return content;
-	}
+	const needsSource = ! shouldRenderWithinSlot && ! inline;
 	return (
 		<>
 			{ hasAnchor ? (
+				needsSource &&
 				! sourceParent && <span hidden ref={ setSource } />
 			) : (
 				<span ref={ anchorRefFallback } />
 			) }
-			{ ( hasAnchor ? sourceParent : fallbackReferenceElement ) &&
-				content }
+			{ ( ! needsSource || sourceParent ) && content }
 		</>
 	);
 };

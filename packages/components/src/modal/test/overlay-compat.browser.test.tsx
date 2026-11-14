@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { screen, within, render as renderDom } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import '@wordpress/theme/design-tokens.css';
-import { useState } from '@wordpress/element';
+import { createPortal, useState } from '@wordpress/element';
 import {
 	Dialog,
 	Popover as UIPopover,
@@ -329,16 +329,18 @@ it.each( [ 'native', 'legacy' ] )(
 	}
 );
 
-it( 'opens a portal when its React root is not attached to the document yet', async () => {
+it( 'opens a portal when its source is not attached to the document yet', async () => {
 	const container = document.createElement( 'div' );
-	renderDom(
-		<Dialog.Root defaultOpen>
-			<Dialog.Popup>
-				<Dialog.Title>Detached source</Dialog.Title>
-				<button>Detached option</button>
-			</Dialog.Popup>
-		</Dialog.Root>,
-		{ container }
+	await render(
+		createPortal(
+			<Dialog.Root defaultOpen>
+				<Dialog.Popup>
+					<Dialog.Title>Detached source</Dialog.Title>
+					<button>Detached option</button>
+				</Dialog.Popup>
+			</Dialog.Root>,
+			container
+		)
 	);
 	await expect
 		.element( screen.getByRole( 'button', { name: 'Detached option' } ) )
