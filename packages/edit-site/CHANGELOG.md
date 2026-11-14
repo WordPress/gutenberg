@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use `@wordpress/ui` Drawer for Quick Edit in both Site Editor implementations ([#78029](https://github.com/WordPress/gutenberg/pull/78029)).
+
 ### Bug Fixes
 
 -   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).

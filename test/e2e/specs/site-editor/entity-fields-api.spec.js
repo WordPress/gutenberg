@@ -201,10 +201,15 @@ test.describe( 'Entity fields API', () => {
 			.getByRole( 'row', { name: /Short Page/ } )
 			.getByRole( 'button', { name: 'Quick Edit' } )
 			.click();
-		const quickEditModal = page.locator(
-			'.dataviews-action-modal__quick-edit'
-		);
+		const quickEditModal = page.getByRole( 'dialog', {
+			name: 'Quick edit',
+			exact: true,
+		} );
 		await expect( quickEditModal ).toBeVisible();
+		await expect( quickEditModal ).not.toHaveAttribute(
+			'data-wp-ui-overlay-modal',
+			''
+		);
 
 		// The replaced field offers the control of its new type.
 		await quickEditModal
@@ -232,10 +237,15 @@ test.describe( 'Entity fields API', () => {
 		// it.
 		const shortPage = table.getByRole( 'row', { name: /Short Page/ } );
 		await shortPage.getByRole( 'button', { name: 'Quick Edit' } ).click();
-		const quickEditModal = page.locator(
-			'.dataviews-action-modal__quick-edit'
-		);
+		const quickEditModal = page.getByRole( 'dialog', {
+			name: 'Quick edit',
+			exact: true,
+		} );
 		await expect( quickEditModal ).toBeVisible();
+		await expect( quickEditModal ).not.toHaveAttribute(
+			'data-wp-ui-overlay-modal',
+			''
+		);
 		await quickEditModal
 			.getByRole( 'button', { name: 'Edit Subtitle' } )
 			.click();

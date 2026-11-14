@@ -174,9 +174,10 @@ test.describe( 'View config extensibility', () => {
 			.getByRole( 'button', { name: 'Quick edit' } )
 			.click();
 
-		const quickEditModal = page.locator(
-			'.dataviews-action-modal__quick-edit'
-		);
+		const quickEditModal = page.getByRole( 'dialog', {
+			name: 'Quick edit',
+			exact: true,
+		} );
 		await expect( quickEditModal ).toBeVisible();
 		await expect(
 			quickEditModal.getByRole( 'textbox', { name: 'Link' } )

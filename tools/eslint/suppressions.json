@@ -7623,9 +7623,6 @@
 		}
 	},
 	"packages/edit-site/src/components/post-list/quick-edit-modal.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -11693,11 +11690,6 @@
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
 		},
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/post-list/quick-edit-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
