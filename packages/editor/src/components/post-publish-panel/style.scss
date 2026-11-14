@@ -86,19 +86,6 @@
 	padding: $grid-unit-20;
 }
 
-.components-button.editor-post-publish-panel__toggle.is-primary {
-	display: inline-flex;
-	align-items: center;
-
-	&.is-busy .dashicon {
-		display: none;
-	}
-
-	.dashicon {
-		margin-right: -$grid-unit-05;
-	}
-}
-
 .editor-post-publish-panel__link {
 	font-weight: 400;
 	padding-left: $grid-unit-05;

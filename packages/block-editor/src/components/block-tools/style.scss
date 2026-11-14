@@ -218,7 +218,7 @@
 				padding: 0 $grid-unit-15;
 				color: inherit;
 
-				svg {
+				svg:where(:not(.components-button__busy-spinner)) {
 					display: none;
 				}
 

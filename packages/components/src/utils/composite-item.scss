@@ -27,6 +27,19 @@
 		// Popup colors take precedence over the underlying Button variant.
 		@include highlight(!important);
 
+		@media ( forced-colors: active ) {
+			&.is-busy {
+				// This highlight opts out of forced color adjustment, so transparent
+				// glyphs stay hidden and the spinner can use the paired foreground.
+				-webkit-text-fill-color: transparent;
+				text-decoration-color: transparent;
+
+				.components-button__busy-spinner > * {
+					stroke: currentColor;
+				}
+			}
+		}
+
 		.components-menu-item__info {
 			color: inherit;
 		}

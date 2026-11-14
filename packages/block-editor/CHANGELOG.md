@@ -16,6 +16,7 @@
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
+-   Keep busy button indicators visible when "Show button text labels" is enabled ([#85960](https://github.com/WordPress/gutenberg/pull/85960)).
 -   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Block quick navigation: Do not offer navigation to a List View panel subsumed by an ancestor's List View ([#86729](https://github.com/WordPress/gutenberg/pull/86729)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
