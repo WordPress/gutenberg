@@ -108,6 +108,27 @@ describe( 'Avatar custom rendering', () => {
 } );
 
 describe( 'Avatar initials', () => {
+	it( 'updates initials when the name or locale changes', () => {
+		const { rerender } = render(
+			<Avatar.Root>
+				<Avatar.Initials name="Alex Morgan" locale="en" />
+			</Avatar.Root>
+		);
+		expect( screen.getByText( 'AM' ) ).toBeInTheDocument();
+		rerender(
+			<Avatar.Root>
+				<Avatar.Initials name="ipek ışık" locale="en" />
+			</Avatar.Root>
+		);
+		expect( screen.getByText( 'II' ) ).toBeInTheDocument();
+		rerender(
+			<Avatar.Root>
+				<Avatar.Initials name="ipek ışık" locale="tr" />
+			</Avatar.Root>
+		);
+		expect( screen.getByText( 'İI' ) ).toBeInTheDocument();
+	} );
+
 	it.each( [
 		[ '  Alex   Morgan  ', 'AM' ],
 		[ 'Alex', 'A' ],

@@ -1,13 +1,7 @@
 import clsx from 'clsx';
 import {
-	ToggleControl,
-	RangeControl,
 	MenuGroup,
 	MenuItem,
-	__experimentalToolsPanel as ToolsPanel,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
 	Button,
 } from '@wordpress/components';
@@ -23,7 +17,6 @@ import {
 	useSettings,
 } from '@wordpress/block-editor';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
-import { SelectControl } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -37,48 +30,23 @@ import {
 	fullscreen,
 } from '@wordpress/icons';
 import { sharedIcon } from './shared-icon';
-import {
-	defaultColumnsNumber,
-	getAspectRatioAttributes,
-	getImageAttributes,
-	isGalleryFlexLayout,
-	isObject,
-} from './shared';
+import { getImageAttributes, isGalleryFlexLayout, isObject } from './shared';
 import { getHrefAndDestination } from './utils';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import {
-	getDefaultLinkDestination,
-	getUpdatedLinkTargetSettings,
-	getImageSizeAttributes,
-} from '../image/utils';
+import { getDefaultLinkDestination } from '../image/utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	LINK_DESTINATION_LIGHTBOX,
-	DEFAULT_MEDIA_SIZE_SLUG,
-	MAX_COLUMNS,
 } from './constants';
-import useImageSizes from './use-image-sizes';
 import useGetMedia from './use-get-media';
 import useApplyGallerySettings from './use-apply-gallery-settings';
 import GalleryStyles from './gallery-styles';
+import GalleryControls from './controls';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
-import { SortImagesControl, SourceOrderControl } from './order-controls';
-import {
-	getDynamicSource,
-	ATTACHED_MEDIA,
-	DEFAULT_ORDERBY,
-	DEFAULT_ORDER,
-} from './dynamic-source';
-import { hasSortableImages, sortImageBlocks } from './order-images';
-import {
-	getViewportGalleryStyle,
-	getUpdatedGalleryStyle,
-	isValidGalleryColumns,
-} from './responsive-styles';
+import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
 
 const LINK_OPTIONS = [
 	{
@@ -107,20 +75,6 @@ const LINK_OPTIONS = [
 		noticeText: __( 'None' ),
 	},
 ];
-const NAVIGATION_BUTTON_TYPE_OPTIONS = [
-	{
-		label: __( 'Icon' ),
-		value: 'icon',
-	},
-	{
-		label: __( 'Text' ),
-		value: 'text',
-	},
-	{
-		label: __( 'Both' ),
-		value: 'both',
-	},
-];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const PLACEHOLDER_TEXT = __(
@@ -136,7 +90,6 @@ export default function GalleryEdit( props ) {
 		attributes,
 		className,
 		clientId,
-		isSelected,
 		insertBlocksAfter,
 		isContentLocked,
 		context,
@@ -153,13 +106,7 @@ export default function GalleryEdit( props ) {
 	// `'disabled'`, where structural affordances are hidden.
 	const blockEditingMode = useBlockEditingMode();
 
-	const [ lightboxSetting, defaultRatios, themeRatios, showDefaultRatios ] =
-		useSettings(
-			'blocks.core/image.lightbox',
-			'dimensions.aspectRatios.default',
-			'dimensions.aspectRatios.theme',
-			'dimensions.defaultAspectRatios'
-		);
+	const [ lightboxSetting ] = useSettings( 'blocks.core/image.lightbox' );
 
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
@@ -167,17 +114,7 @@ export default function GalleryEdit( props ) {
 			)
 		: LINK_OPTIONS;
 
-	const {
-		align,
-		navigationButtonType,
-		columns,
-		imageCrop,
-		randomOrder,
-		linkTarget,
-		sizeSlug,
-		aspectRatio,
-		layout,
-	} = attributes;
+	const { align, columns, imageCrop, layout } = attributes;
 	const isDynamic = !! attributes.dynamicContent;
 	// The site default only applies to images being added, which a dynamic
 	// gallery never has, so match the server render.
@@ -188,7 +125,7 @@ export default function GalleryEdit( props ) {
 	const isFlexLayout = isGalleryFlexLayout( layout );
 	const previousLayoutRef = useRef( layout );
 
-	const { getBlocks, getSettings } = useSelect( blockEditorStore );
+	const { getBlocks } = useSelect( blockEditorStore );
 	const {
 		__unstableMarkNextChangeAsNotPersistent,
 		replaceInnerBlocks,
@@ -266,40 +203,6 @@ export default function GalleryEdit( props ) {
 	const isViewportStyleState =
 		selectedStyleState?.viewport &&
 		selectedStyleState.viewport !== 'default';
-	const viewportStyle = isViewportStyleState
-		? getViewportGalleryStyle(
-				attributes.style,
-				selectedStyleState.viewport
-			)
-		: {};
-	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
-	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
-	// Normalized so a Gallery with no aspect ratio and one explicitly set to
-	// Original compare equal, and a viewport override matching either is
-	// dropped rather than stored.
-	const baseAspectRatio = aspectRatio || 'auto';
-	const hasViewportColumns =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'columns' ) &&
-		isValidGalleryColumns( viewportStyle.columns );
-	const hasViewportImageCrop =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'imageCrop' ) &&
-		typeof viewportStyle.imageCrop === 'boolean';
-	const hasViewportAspectRatio =
-		isViewportStyleState &&
-		Object.hasOwn( viewportStyle, 'aspectRatio' ) &&
-		typeof viewportStyle.aspectRatio === 'string' &&
-		!! viewportStyle.aspectRatio;
-	const activeColumns = hasViewportColumns
-		? viewportStyle.columns
-		: baseColumns;
-	const activeImageCrop = hasViewportImageCrop
-		? viewportStyle.imageCrop
-		: baseImageCrop;
-	const activeAspectRatio = hasViewportAspectRatio
-		? viewportStyle.aspectRatio
-		: baseAspectRatio;
 
 	const imageData = useGetMedia( innerBlockImages );
 	const mediaById = useMemo(
@@ -313,17 +216,9 @@ export default function GalleryEdit( props ) {
 	// long as the images stay in the sequence that sort produced. Any other
 	// change to the images (a drag, an addition, a removal) drops it back to
 	// "Custom"; it never reports an order the user didn't choose. Nothing is
-	// stored, so this is local state rather than an attribute.
+	// stored, so this is local state rather than an attribute. It lives here,
+	// not in the Settings panel, which unmounts when the block is deselected.
 	const [ appliedSort, setAppliedSort ] = useState( null );
-	const currentOrder =
-		appliedSort &&
-		appliedSort.clientIds.length === innerBlockImages.length &&
-		appliedSort.clientIds.every(
-			( id, index ) => innerBlockImages[ index ].clientId === id
-		)
-			? appliedSort.order
-			: null;
-	const canSortImages = hasSortableImages( innerBlockImages, mediaById );
 
 	// Dynamic mode (resolving images from a source instead of inner blocks):
 	// source resolution, the editor-preview blocks, and the mode/ordering
@@ -335,56 +230,6 @@ export default function GalleryEdit( props ) {
 		postId,
 		postType,
 	} );
-
-	// State that drives counts/size options should reflect the dynamic media
-	// when the gallery is in dynamic mode.
-	const displayedImageCount = isDynamic
-		? dynamic.dynamicMedia.length
-		: innerBlockImages.length;
-
-	// Check if there is at least one image with lightbox enabled. In dynamic
-	// mode the images inherit the gallery's link setting, so the lightbox is on
-	// when the gallery links images to the lightbox.
-	let hasLightboxImages;
-	if ( isDynamic ) {
-		hasLightboxImages = linkTo === LINK_DESTINATION_LIGHTBOX;
-	} else if ( lightboxSetting?.enabled ) {
-		hasLightboxImages = innerBlockImages.some(
-			( block ) =>
-				block.attributes?.lightbox?.enabled === undefined ||
-				block.attributes?.lightbox?.enabled === true
-		);
-	} else {
-		hasLightboxImages = innerBlockImages.some(
-			( block ) => block.attributes.lightbox?.enabled
-		);
-	}
-
-	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
-		label: name,
-		value: ratio,
-	} ) );
-	const aspectRatioOptions = [
-		{
-			label: _x(
-				'Original',
-				'Aspect ratio option for dimensions control'
-			),
-			value: 'auto',
-		},
-		...( showDefaultRatios ? defaultOptions || [] : [] ),
-		...( themeOptions || [] ),
-	];
-
-	const imageSizeOptions = useImageSizes(
-		isDynamic ? dynamic.dynamicMedia : imageData,
-		isSelected,
-		getSettings
-	);
 
 	useApplyGallerySettings( innerBlockImages, mediaById, ( imageAttributes ) =>
 		getImageAttributes(
@@ -482,49 +327,6 @@ export default function GalleryEdit( props ) {
 		}
 	}
 
-	function selectRandomOrder() {
-		setAttributes( { randomOrder: true } );
-	}
-
-	// Choosing any other order turns "Random" off. Called straight after the
-	// edit that applies the order, and marked non-persistent so the two writes
-	// share one undo level: a single undo restores both the order and Random.
-	function clearRandomOrderAfterEdit() {
-		if ( randomOrder ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { randomOrder: false } );
-		}
-	}
-
-	// Reorders the inner image blocks in place. Left persistent on purpose so
-	// the sort is a single undoable step.
-	function sortImages( order ) {
-		const sortedBlocks = sortImageBlocks(
-			getBlocks( clientId ),
-			mediaById,
-			order
-		);
-		replaceInnerBlocks( clientId, sortedBlocks );
-		clearRandomOrderAfterEdit();
-		setAppliedSort( {
-			order,
-			clientIds: sortedBlocks.map( ( block ) => block.clientId ),
-		} );
-	}
-
-	// "Custom" is the order arranged in the editor: it turns Random off and
-	// forgets any sort applied earlier, so the control reads "Custom" from
-	// here on rather than that sort.
-	function selectCustomOrder() {
-		setAttributes( { randomOrder: false } );
-		setAppliedSort( null );
-	}
-
-	function changeSourceOrder( { orderby, order } ) {
-		dynamic.setSourceOrder( orderby, order );
-		clearRandomOrderAfterEdit();
-	}
-
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -572,116 +374,6 @@ export default function GalleryEdit( props ) {
 				type: 'snackbar',
 			}
 		);
-	}
-
-	function setGallerySettings( settings ) {
-		if ( ! isViewportStyleState ) {
-			setAttributes( settings );
-			return;
-		}
-
-		setAttributes( {
-			style: getUpdatedGalleryStyle( {
-				style: attributes.style,
-				viewport: selectedStyleState.viewport,
-				baseSettings: {
-					columns: baseColumns,
-					imageCrop: baseImageCrop,
-					aspectRatio: baseAspectRatio,
-				},
-				settings,
-			} ),
-		} );
-	}
-
-	function setColumnsNumber( value ) {
-		setGallerySettings( { columns: value } );
-	}
-
-	function toggleImageCrop() {
-		setGallerySettings( { imageCrop: ! activeImageCrop } );
-	}
-
-	function toggleOpenInNewTab( openInNewTab ) {
-		const newLinkTarget = openInNewTab ? '_blank' : undefined;
-		setAttributes( { linkTarget: newLinkTarget } );
-		updateInnerImages( ( block ) =>
-			getUpdatedLinkTargetSettings( newLinkTarget, block.attributes )
-		);
-		const noticeText = openInNewTab
-			? __( 'All gallery images updated to open in new tab' )
-			: __( 'All gallery images updated to not open in new tab' );
-		createSuccessNotice( noticeText, {
-			id: 'gallery-attributes-openInNewTab',
-			type: 'snackbar',
-		} );
-	}
-
-	function updateImagesSize( newSizeSlug ) {
-		setAttributes( { sizeSlug: newSizeSlug } );
-		updateInnerImages( ( block, media ) =>
-			getImageSizeAttributes( media, newSizeSlug )
-		);
-		const imageSize = imageSizeOptions.find(
-			( size ) => size.value === newSizeSlug
-		);
-
-		createSuccessNotice(
-			sprintf(
-				/* translators: %s: image size settings */
-				__( 'All gallery image sizes updated to: %s' ),
-				imageSize?.label ?? newSizeSlug
-			),
-			{
-				id: 'gallery-attributes-sizeSlug',
-				type: 'snackbar',
-			}
-		);
-	}
-
-	/**
-	 * Sets the Gallery's aspect ratio.
-	 *
-	 * The base value is added to the img element as an inline
-	 * style. A viewport value is instead rendered
-	 * from the Gallery's responsive CSS, which overrides that inline style.
-	 *
-	 * @param {string|undefined} value Aspect ratio to set. In a viewport state
-	 *                                 `'auto'` is an override that cancels the
-	 *                                 base ratio, while `undefined` removes the
-	 *                                 override so the base value applies again.
-	 */
-	function setAspectRatio( value ) {
-		if ( isViewportStyleState ) {
-			setGallerySettings( { aspectRatio: value } );
-		} else {
-			setAttributes( { aspectRatio: value ?? 'auto' } );
-			updateInnerImages( () => getAspectRatioAttributes( value ) );
-		}
-
-		const noticeValue = value ?? baseAspectRatio;
-		const aspectRatioText = aspectRatioOptions.find(
-			( option ) => option.value === noticeValue
-		);
-		const noticeText = isViewportStyleState
-			? sprintf(
-					/* translators: 1: viewport name, 2: aspect ratio setting */
-					__(
-						'Gallery images in the %1$s viewport updated to aspect ratio: %2$s'
-					),
-					selectedStyleState.viewport.replace( '@', '' ),
-					aspectRatioText?.label || noticeValue
-				)
-			: sprintf(
-					/* translators: %s: aspect ratio setting */
-					__( 'All gallery images updated to aspect ratio: %s' ),
-					aspectRatioText?.label || noticeValue
-				);
-
-		createSuccessNotice( noticeText, {
-			id: 'gallery-attributes-aspectRatio',
-			type: 'snackbar',
-		} );
 	}
 
 	const hasImageIds =
@@ -741,8 +433,6 @@ export default function GalleryEdit( props ) {
 		allowedBlocks: isDynamic ? EMPTY_ARRAY : undefined,
 	} );
 
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-
 	if ( ! hasImages && ! isDynamic ) {
 		return (
 			<div { ...innerBlocksProps }>
@@ -784,20 +474,10 @@ export default function GalleryEdit( props ) {
 		);
 	}
 
-	const hasLinkTo = linkTo && linkTo !== 'none';
-	// Columns and crop to fit are Flex-only, so a Gallery in another layout has
-	// viewport settings to show only when aspect ratios are available. Without
-	// this the viewport Settings panel would render empty.
-	const hasViewportSettings = isFlexLayout || aspectRatioOptions.length > 1;
-
 	return (
 		<>
 			<InspectorControls
-				group={
-					isViewportStyleState && hasViewportSettings
-						? 'style-state'
-						: 'default'
-				}
+				group={ isViewportStyleState ? 'style-state' : 'default' }
 			>
 				{ ! isViewportStyleState && (
 					<GallerySourcePanel
@@ -805,287 +485,22 @@ export default function GalleryEdit( props ) {
 						hasImages={ hasImages }
 					/>
 				) }
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						if ( isViewportStyleState ) {
-							setGallerySettings( {
-								columns: undefined,
-								imageCrop: undefined,
-								aspectRatio: undefined,
-							} );
-							return;
-						}
-
-						setAttributes( {
-							navigationButtonType: 'icon',
-							randomOrder: false,
-							...( isFlexLayout && {
-								columns: undefined,
-								imageCrop: true,
-							} ),
-						} );
-
-						setAspectRatio( 'auto' );
-
-						if ( isDynamic ) {
-							dynamic.setSourceOrder( undefined, undefined );
-						}
-
-						if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
-							updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
-						}
-
-						if ( linkTarget ) {
-							toggleOpenInNewTab( false );
-						}
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
-				>
-					{ isFlexLayout && displayedImageCount > 1 && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Columns' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportColumns
-									: !! activeColumns &&
-										activeColumns !== displayedImageCount
-							}
-							onDeselect={ () => setColumnsNumber( undefined ) }
-						>
-							<RangeControl
-								label={ __( 'Columns' ) }
-								value={
-									activeColumns
-										? activeColumns
-										: defaultColumnsNumber(
-												displayedImageCount
-											)
-								}
-								onChange={ setColumnsNumber }
-								min={ 1 }
-								max={ Math.min(
-									MAX_COLUMNS,
-									displayedImageCount
-								) }
-								required
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState && (
-						// "Random" is stored in both modes. Beyond that, a
-						// dynamic gallery's order is a stored query setting,
-						// while a static gallery's orders are one-off actions.
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Order by' ) }
-							hasValue={ () =>
-								!! randomOrder ||
-								( isDynamic &&
-									( dynamic.sourceOrderby !==
-										DEFAULT_ORDERBY ||
-										dynamic.sourceOrder !==
-											DEFAULT_ORDER ) )
-							}
-							onDeselect={ () => {
-								if ( isDynamic ) {
-									// Two writes, folded into one undo level.
-									dynamic.setSourceOrder(
-										undefined,
-										undefined
-									);
-									clearRandomOrderAfterEdit();
-								} else {
-									selectCustomOrder();
-								}
-							} }
-						>
-							{ isDynamic ? (
-								<SourceOrderControl
-									order={ {
-										orderby: dynamic.sourceOrderby,
-										order: dynamic.sourceOrder,
-									} }
-									isRandom={ !! randomOrder }
-									onChange={ changeSourceOrder }
-									onSelectRandom={ selectRandomOrder }
-								/>
-							) : (
-								<SortImagesControl
-									currentOrder={ currentOrder }
-									isRandom={ !! randomOrder }
-									canSort={ canSortImages }
-									onSort={ sortImages }
-									onSelectCustom={ selectCustomOrder }
-									onSelectRandom={ selectRandomOrder }
-								/>
-							) }
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState &&
-						imageSizeOptions?.length > 0 && (
-							<ToolsPanelItem
-								isShownByDefault
-								label={ __( 'Resolution' ) }
-								hasValue={ () =>
-									sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG
-								}
-								onDeselect={ () =>
-									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
-								}
-							>
-								<SelectControl
-									label={ __( 'Resolution' ) }
-									description={ __(
-										'Select the size of the source images.'
-									) }
-									value={
-										imageSizeOptions.find(
-											( item ) => item.value === sizeSlug
-										) ?? imageSizeOptions[ 0 ]
-									}
-									items={ imageSizeOptions }
-									onValueChange={ ( item ) => {
-										if ( item && item.value !== sizeSlug ) {
-											updateImagesSize( item.value );
-										}
-									} }
-								/>
-							</ToolsPanelItem>
-						) }
-					{ ! isViewportStyleState && hasLinkTo && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Open images in new tab' ) }
-							hasValue={ () => !! linkTarget }
-							onDeselect={ () => toggleOpenInNewTab( false ) }
-						>
-							<ToggleControl
-								label={ __( 'Open images in new tab' ) }
-								checked={ linkTarget === '_blank' }
-								onChange={ toggleOpenInNewTab }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ aspectRatioOptions.length > 1 && (
-						<ToolsPanelItem
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportAspectRatio
-									: activeAspectRatio !== 'auto'
-							}
-							label={ __( 'Aspect ratio' ) }
-							onDeselect={ () =>
-								// In a viewport state this clears the override
-								// so the base ratio applies again, rather than
-								// overriding it with Original.
-								setAspectRatio(
-									isViewportStyleState ? undefined : 'auto'
-								)
-							}
-							isShownByDefault
-						>
-							<SelectControl
-								label={ __( 'Aspect ratio' ) }
-								description={ __(
-									'Set a consistent aspect ratio for all images in the gallery.'
-								) }
-								value={
-									aspectRatioOptions.find(
-										( item ) =>
-											item.value === activeAspectRatio
-									) ?? aspectRatioOptions[ 0 ]
-								}
-								items={ aspectRatioOptions }
-								onValueChange={ ( item ) => {
-									if (
-										item &&
-										item.value !== activeAspectRatio
-									) {
-										setAspectRatio( item.value );
-									}
-								} }
-							>
-								{ aspectRatioOptions.map( ( item, index ) => (
-									<SelectControl.Item
-										key={ `${ item.value }-${ index }` }
-										value={ item }
-										label={ item.label }
-									>
-										<SelectControl.ItemLabel>
-											{ item.label }
-										</SelectControl.ItemLabel>
-									</SelectControl.Item>
-								) ) }
-							</SelectControl>
-						</ToolsPanelItem>
-					) }
-					{ isFlexLayout && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Crop images to fit' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportImageCrop
-									: ! activeImageCrop
-							}
-							onDeselect={ () =>
-								setGallerySettings( {
-									imageCrop: isViewportStyleState
-										? undefined
-										: true,
-								} )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Crop images to fit' ) }
-								checked={ activeImageCrop }
-								onChange={ toggleImageCrop }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState &&
-						lightboxSetting?.allowEditing &&
-						hasLightboxImages && (
-							<ToolsPanelItem
-								label={ __( 'Navigation button type' ) }
-								isShownByDefault
-								hasValue={ () =>
-									navigationButtonType !== 'icon'
-								}
-								onDeselect={ () =>
-									setAttributes( {
-										navigationButtonType: 'icon',
-									} )
-								}
-							>
-								<ToggleGroupControl
-									label={ __( 'Navigation button type' ) }
-									value={ navigationButtonType }
-									onChange={ ( value ) =>
-										setAttributes( {
-											navigationButtonType: value,
-										} )
-									}
-									isBlock
-									help={ __(
-										'Adjust the appearance of buttons in the lightbox.'
-									) }
-								>
-									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
-										( option ) => (
-											<ToggleGroupControlOption
-												key={ option.value }
-												value={ option.value }
-												label={ option.label }
-											/>
-										)
-									) }
-								</ToggleGroupControl>
-							</ToolsPanelItem>
-						) }
-				</ToolsPanel>
+				<GalleryControls
+					attributes={ galleryAttributes }
+					setAttributes={ setAttributes }
+					clientId={ clientId }
+					viewport={
+						isViewportStyleState
+							? selectedStyleState.viewport
+							: undefined
+					}
+					innerBlockImages={ innerBlockImages }
+					mediaById={ mediaById }
+					dynamic={ dynamic }
+					updateInnerImages={ updateInnerImages }
+					appliedSort={ appliedSort }
+					setAppliedSort={ setAppliedSort }
+				/>
 			</InspectorControls>
 			<BlockControls group="block">
 				<ToolbarDropdownMenu icon={ linkIcon } label={ __( 'Link' ) }>
