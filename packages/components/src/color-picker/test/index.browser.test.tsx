@@ -2,8 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { speak } from '@wordpress/a11y';
 import { useState } from '@wordpress/element';
 import { ColorPicker } from '..';
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
 
 const hslaMatcher = expect.objectContaining( {
 	h: expect.any( Number ),
@@ -1167,6 +1173,45 @@ describe( 'ColorPicker', () => {
 				expect( alphaSlider ).toHaveValue( '75' );
 				expect( alphaInput ).toHaveValue( 75 );
 			} );
+		} );
+	} );
+
+	describe( 'copy button', () => {
+		it( 'copies the color in the copy format and announces it', async () => {
+			const user = userEvent.setup();
+			const writeText = vi
+				.spyOn( navigator.clipboard, 'writeText' )
+				.mockResolvedValue();
+
+			await render( <ColorPicker color="#ff0000" copyFormat="rgb" /> );
+
+			const copyButton = screen.getByRole( 'button', { name: 'Copy' } );
+			await user.click( copyButton );
+
+			expect( writeText ).toHaveBeenCalledWith( 'rgb(255, 0, 0)' );
+			await waitFor( () =>
+				expect( speak ).toHaveBeenCalledWith( 'Copied to clipboard' )
+			);
+			expect( copyButton ).toHaveAccessibleName( 'Copy' );
+			expect( copyButton ).toHaveFocus();
+		} );
+
+		it( 'announces a copy that failed', async () => {
+			const user = userEvent.setup();
+			vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+				new Error( 'Not allowed' )
+			);
+
+			await render( <ColorPicker color="#ff0000" /> );
+
+			await user.click( screen.getByRole( 'button', { name: 'Copy' } ) );
+
+			await waitFor( () =>
+				expect( speak ).toHaveBeenCalledWith(
+					"Couldn't copy to clipboard."
+				)
+			);
+			expect( speak ).not.toHaveBeenCalledWith( 'Copied to clipboard' );
 		} );
 	} );
 } );
