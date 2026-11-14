@@ -591,6 +591,89 @@ test.describe( 'Page List', () => {
 			).not.toBeChecked();
 		} );
 
+		test( 'preserves edits when an extension requires the legacy overlay', async ( {
+			page,
+		} ) => {
+			const namespace = 'test/quick-edit-legacy-overlay';
+			const quickEditUrl = page.url();
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Quick edit',
+				exact: true,
+			} );
+			const status = dialog.getByRole( 'button', {
+				name: 'Edit Status',
+			} );
+			const draft = page.getByRole( 'radio', {
+				name: 'Draft',
+				exact: true,
+			} );
+			await status.focus();
+			await page.keyboard.press( 'Enter' );
+			await draft.check();
+			await expect( draft ).toBeFocused();
+			await page.keyboard.press( 'Escape' );
+			await expect( status ).toBeFocused();
+
+			try {
+				await page.evaluate( ( filterNamespace ) => {
+					window.wp.hooks.addFilter(
+						'editor.MediaUpload',
+						filterNamespace,
+						( Original ) =>
+							function UnverifiedMediaUpload( props ) {
+								return window.wp.element.createElement(
+									Original,
+									props
+								);
+							}
+					);
+				}, namespace );
+				await expect( dialog ).not.toHaveAttribute(
+					'data-wp-ui-overlay-modal',
+					''
+				);
+				await expect( page ).toHaveURL( quickEditUrl );
+				await status.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( draft ).toBeChecked();
+				await expect( draft ).toBeFocused();
+				await page.keyboard.press( 'Escape' );
+				await expect( status ).toBeFocused();
+
+				await page.evaluate( ( filterNamespace ) => {
+					window.wp.hooks.removeFilter(
+						'editor.MediaUpload',
+						filterNamespace
+					);
+				}, namespace );
+				await status.focus();
+				await page.keyboard.press( 'Enter' );
+				await expect( draft ).toBeChecked();
+				await expect( draft ).toBeFocused();
+				await expect( dialog ).not.toHaveAttribute(
+					'data-wp-ui-overlay-modal',
+					''
+				);
+				await page.keyboard.press( 'Escape' );
+				await dialog
+					.getByRole( 'button', { name: 'Cancel', exact: true } )
+					.click();
+				await expect( dialog ).toBeHidden();
+				await expect(
+					page
+						.getByRole( 'row', { name: /Privacy Policy/ } )
+						.getByRole( 'cell', { name: 'Published', exact: true } )
+				).toBeVisible();
+			} finally {
+				await page.evaluate( ( filterNamespace ) => {
+					window.wp.hooks.removeFilter(
+						'editor.MediaUpload',
+						filterNamespace
+					);
+				}, namespace );
+			}
+		} );
+
 		// TODO: Wrap up this test once https://github.com/WordPress/gutenberg/pull/67584 is merged
 		// test( 'should update pages according to the changes', async ( {
 		// 	page,
