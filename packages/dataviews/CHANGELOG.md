@@ -4,11 +4,14 @@
 
 ### Enhancements
 
+-   Use UI dialogs for compatible panel modals and action renderers, and expose `useUiOverlaySupport` and `DataForm.canUseUiOverlays` to retain legacy hosts for unverified custom content ([#86819](https://github.com/WordPress/gutenberg/pull/86819)).
+-   DataForm: Use `@wordpress/ui` Popover for compatible panel forms, including fields opened inside Dialog and Drawer ([#86819](https://github.com/WordPress/gutenberg/pull/86819)).
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
 ### Bug Fixes
 
+-   DataForm: Render memo and forwardRef custom edit controls ([#86819](https://github.com/WordPress/gutenberg/pull/86819)).
 -   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).

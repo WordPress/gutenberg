@@ -423,8 +423,10 @@ describe( 'DataForm component', () => {
 			expect(
 				screen.getByRole( 'textbox', { name: /title/i } )
 			).toBeInTheDocument();
-			// Should not have modal dialog
-			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			// The field flyout is a nonmodal dialog, so the rest of the form remains available.
+			expect(
+				screen.getByRole( 'dialog', { name: 'Title' } )
+			).not.toHaveAttribute( 'aria-modal', 'true' );
 			// Should not have modal buttons (Cancel/Apply)
 			expect(
 				screen.queryByRole( 'button', { name: /cancel/i } )

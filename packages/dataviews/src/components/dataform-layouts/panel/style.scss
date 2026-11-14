@@ -197,9 +197,18 @@
 	grid-column: 2;
 }
 
-.dataforms-layouts-panel__field-dropdown .components-popover__content {
-	min-width: 320px;
-	padding: var(--wpds-dimension-padding-lg);
+.dataforms-layouts-panel__field-dropdown {
+	width: min-content;
+	max-width: calc(100vw - 16px);
+	min-width: min(320px, calc(100vw - 16px));
+}
+
+.dataforms-layouts-panel__field-dropdown-content {
+	max-height: calc(var(--available-height) - 2 * (var(--wpds-dimension-padding-lg) + var(--wpds-border-width-xs)));
+	overflow: auto;
+	// Keep outward focus rings inside the scroll area.
+	margin: calc(-2 * var(--wpds-border-width-focus));
+	padding: calc(2 * var(--wpds-border-width-focus));
 }
 
 .dataforms-layouts-panel__dropdown-header {
@@ -211,5 +220,12 @@
 }
 
 .components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
-	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+	&:not(.is-in-wp-ui-overlay) {
+		z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
+	}
+
+	.components-popover__content {
+		min-width: min(320px, calc(100vw - 16px));
+		padding: var(--wpds-dimension-padding-lg);
+	}
 }

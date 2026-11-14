@@ -14,6 +14,7 @@
  */
 
 import type { FieldsScriptParts } from '../types';
+import { withUiOverlayCompatibility } from '../shared/ui-overlay-compatibility';
 import { fieldExtensions as author } from './author/field';
 import { fieldExtensions as description } from './description/field';
 import { fieldExtensions as descriptionReadonly } from './description_readonly/field';
@@ -32,4 +33,4 @@ const fields: FieldsScriptParts = {
 	title,
 };
 
-export default fields;
+export default withUiOverlayCompatibility( fields );

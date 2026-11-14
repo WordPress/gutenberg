@@ -1,6 +1,7 @@
 import { useMemo } from '@wordpress/element';
 import type { DataFormProps } from '../types';
-import normalizeFields from '../field-types';
+import normalizeFields, { canFieldsUseUiOverlays } from '../field-types';
+import { useUiOverlaySupport } from './use-ui-overlay-support';
 import { DataFormProvider } from '../components/dataform-context';
 import { DataFormLayout } from '../components/dataform-layouts/data-form-layout';
 import normalizeForm from '../components/dataform-layouts/normalize-form';
@@ -22,13 +23,17 @@ export default function DataForm< Item >( {
 		() => normalizeFields( fields ),
 		[ fields ]
 	);
+	const supportsUiOverlays = useUiOverlaySupport( fields );
 
 	if ( ! form.fields ) {
 		return null;
 	}
 
 	return (
-		<DataFormProvider fields={ normalizedFields }>
+		<DataFormProvider
+			fields={ normalizedFields }
+			supportsUiOverlays={ supportsUiOverlays }
+		>
 			<DataFormLayout
 				data={ data }
 				form={ normalizedForm }
@@ -38,3 +43,6 @@ export default function DataForm< Item >( {
 		</DataFormProvider>
 	);
 }
+
+/** Whether the supplied fields and runtime can be hosted in a UI overlay. */
+DataForm.canUseUiOverlays = canFieldsUseUiOverlays;
