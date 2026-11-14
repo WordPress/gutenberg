@@ -43,3 +43,27 @@
 .item.is-compact {
 	min-height: variables.$grid-unit-30;
 }
+
+// Next to the admin navigation rail, items match the admin submenu column.
+[data-admin-navigation-rail] .item.item {
+	min-height: 0;
+	margin-inline: var(--wpds-dimension-padding-sm);
+	margin-block-end: 0;
+	padding: var(--wpds-dimension-padding-xs);
+	width: calc(100% - var(--wpds-dimension-padding-sm) * 2);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+
+	&:hover,
+	&:focus {
+		color: var(--wpds-color-foreground-interactive-brand-active);
+	}
+
+	&[aria-current="page"],
+	&[data-status="active"] {
+		color: var(--wpds-color-foreground-content-neutral);
+	}
+
+	svg:last-child {
+		padding: 0;
+	}
+}

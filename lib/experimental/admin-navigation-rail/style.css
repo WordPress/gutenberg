@@ -1,0 +1,245 @@
+/**
+ * Admin navigation rail experiment.
+ *
+ * Builds on the folded admin menu, which already lays the menu out as a rail of
+ * icons with flyout submenus. Body classes, set as the menu is printed:
+ *
+ * - `gutenberg-has-submenu-column`: the submenu of the current section is
+ *   shown in a column next to the rail.
+ * - `gutenberg-admin-nav-rail-only`: the editors, which show the rail alone.
+ * - `gutenberg-admin-content-frame`: every other screen, whose content sits in
+ *   a frame.
+ */
+
+@media screen and (min-width: 783px) {
+	body.gutenberg-admin-nav-rail {
+		--wp-admin--admin-menu--width: 36px;
+		/* With the rail, as wide as the expanded menu. */
+		--gutenberg-admin-submenu-column-width: 124px;
+	}
+
+	/* The rail and the column share one background, as one surface. */
+	body.gutenberg-has-submenu-column #adminmenuback {
+		width: calc(var(--wp-admin--admin-menu--width) + var(--gutenberg-admin-submenu-column-width));
+	}
+
+	body.folded.gutenberg-has-submenu-column #wpcontent,
+	body.folded.gutenberg-has-submenu-column #wpfooter {
+		margin-inline-start: calc(var(--wp-admin--admin-menu--width) + var(--gutenberg-admin-submenu-column-width));
+	}
+
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu {
+		position: fixed;
+		top: var(--wp-admin--admin-bar--height, 0px);
+		bottom: 0;
+		inset-inline-start: var(--wp-admin--admin-menu--width);
+		inset-inline-end: auto;
+		box-sizing: border-box;
+		width: var(--gutenberg-admin-submenu-column-width);
+		min-width: 0;
+		margin: 0;
+		padding: 12px 8px;
+		overflow-y: auto;
+		border: 0;
+		border-inline-start: 1px solid rgb(255 255 255 / 0.1);
+		background: transparent;
+		box-shadow: none;
+	}
+
+	/* Flyout submenus open over the column, whether opened by pointer or keyboard. */
+	body.gutenberg-has-submenu-column #adminmenu li.menu-top.opensub,
+	body.gutenberg-has-submenu-column #adminmenu li.menu-top:focus-within {
+		z-index: 10000;
+	}
+
+	/* The section name heads the column, as it heads the flyouts. */
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu .wp-submenu-head {
+		margin: 0 0 4px;
+		padding: 4px;
+		border: 0;
+		font-size: 14px;
+		line-height: 20px;
+		background: transparent;
+		/* Not a link, though it sits in the menu item, which has the pointer. */
+		cursor: default;
+	}
+
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu .wp-submenu-head:hover {
+		box-shadow: none;
+	}
+
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu > li > a {
+		padding: 4px;
+		font-size: 13px;
+		line-height: 20px;
+		border-radius: 2px;
+	}
+
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu > li > a:hover {
+		box-shadow: none;
+	}
+
+	body.folded.gutenberg-has-submenu-column #adminmenu li.wp-has-current-submenu > .wp-submenu > li.current > a {
+		font-weight: 600;
+	}
+
+	/* The arrow pointing from the current item to the page. */
+	body.gutenberg-has-submenu-column ul#adminmenu a.wp-has-current-submenu::after,
+	body.gutenberg-admin-nav-rail-only ul#adminmenu a.wp-has-current-submenu::after,
+	body.gutenberg-admin-nav-rail-only ul#adminmenu > li.current > a.current::after {
+		display: none;
+	}
+
+	/* The column, or the editor, takes the place of the expanded menu. */
+	body.gutenberg-has-submenu-column #collapse-menu,
+	body.gutenberg-admin-nav-rail-only #collapse-menu {
+		display: none;
+	}
+
+	/*
+	 * The content area is a rounded frame, inset from the edges of the window,
+	 * that sits on the menu background and scrolls on its own, as on the pages
+	 * built with the boot package, which lay out their own.
+	 *
+	 * The frame is `#wpbody`: `#wpcontent` also holds the admin bar, whose
+	 * dropdowns have to open over the menu.
+	 */
+	body.gutenberg-admin-content-frame {
+		--gutenberg-admin-content-start: 160px;
+		--gutenberg-admin-content-inset: 8px;
+	}
+
+	body.gutenberg-admin-content-frame.folded {
+		--gutenberg-admin-content-start: var(--wp-admin--admin-menu--width);
+	}
+
+	body.gutenberg-admin-content-frame.folded.gutenberg-has-submenu-column {
+		--gutenberg-admin-content-start: calc(var(--wp-admin--admin-menu--width) + var(--gutenberg-admin-submenu-column-width));
+	}
+
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #adminmenuback {
+		inset-inline: 0;
+		width: auto;
+		/* Paints before the frame, which comes later in the document. */
+		z-index: 0;
+	}
+
+	/* Hands the page background down to the frame. */
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #wpwrap,
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #wpcontent {
+		background-color: inherit;
+	}
+
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #wpbody {
+		position: fixed;
+		top: var(--wp-admin--admin-bar--height, 0px);
+		bottom: var(--gutenberg-admin-content-inset);
+		inset-inline-start: var(--gutenberg-admin-content-start);
+		inset-inline-end: var(--gutenberg-admin-content-inset);
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		/* Takes over the padding of `#wpcontent`, which no longer frames the content. */
+		padding-inline-start: 20px;
+		overflow-y: auto;
+		/* Matches the `--wpds-border-radius-xl` token, which admin screens may not load. */
+		border-radius: 12px;
+		background-color: inherit;
+	}
+
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #wpbody-content {
+		flex: 1 0 auto;
+		padding-bottom: 20px;
+	}
+
+	/* The footer is moved into the frame once the page is parsed. */
+	body.gutenberg-admin-content-frame:not(:has(.boot-layout-container)) #wpwrap > #wpfooter {
+		display: none;
+	}
+
+	body.gutenberg-admin-content-frame #wpbody > #wpfooter {
+		position: static;
+		margin: 0;
+		padding-inline: 0;
+	}
+
+	/*
+	 * Page transitions leave the menu out: it changes in place instead of
+	 * animating each item, as the admin does, since its layout can change.
+	 */
+	body.gutenberg-admin-nav-rail #adminmenu > .menu-top {
+		view-transition-name: none;
+	}
+
+	body.gutenberg-admin-nav-rail #adminmenuwrap {
+		view-transition-name: gutenberg-admin-menu;
+	}
+
+	::view-transition-group(gutenberg-admin-menu),
+	::view-transition-new(gutenberg-admin-menu) {
+		animation: none;
+	}
+
+	::view-transition-old(gutenberg-admin-menu) {
+		display: none;
+	}
+
+	/* Post editor. */
+	body.js.block-editor-page.is-fullscreen-mode.gutenberg-admin-nav-rail-only #adminmenumain {
+		display: var(--wp-editor-admin-bar-display, block);
+	}
+
+	body.block-editor-page.is-fullscreen-mode.gutenberg-admin-nav-rail-only:has(.editor-editor-interface.is-distraction-free) {
+		--wp-admin--admin-menu--width: 0px;
+	}
+
+	body.block-editor-page.is-fullscreen-mode.gutenberg-admin-nav-rail-only .interface-interface-skeleton {
+		/* Outranks the `!important` offset of the full-screen editor. */
+		inset-inline-start: var(--wp-admin--admin-menu--width) !important;
+	}
+
+	/* Extensible site editor. */
+	body.site-editor-v2.gutenberg-admin-nav-rail:has(.editor-editor-interface.is-distraction-free) {
+		--wp-admin--admin-menu--width: 0px;
+	}
+
+	body.site-editor-v2.gutenberg-admin-nav-rail:has(.editor-editor-interface.is-distraction-free) #adminmenumain {
+		display: none;
+	}
+
+	body.site-editor-v2.gutenberg-admin-nav-rail:has(.editor-editor-interface.is-distraction-free) #site-editor-v2-app {
+		border-inline-start: 0;
+	}
+
+	body.site-editor-v2.gutenberg-admin-nav-rail #adminmenuwrap {
+		position: fixed;
+		top: var(--wp-admin--admin-bar--height, 0px);
+	}
+
+	body.site-editor-v2.gutenberg-admin-nav-rail #site-editor-v2-app {
+		position: fixed;
+		top: var(--wp-admin--admin-bar--height, 0px);
+		bottom: 0;
+		inset-inline-start: var(--wp-admin--admin-menu--width);
+		inset-inline-end: 0;
+		border-inline-start: 1px solid rgb(255 255 255 / 0.1);
+	}
+
+	/* Its own navigation takes the place of the submenu column. */
+	body.site-editor-v2.gutenberg-admin-nav-rail #adminmenu li.wp-has-current-submenu > .wp-submenu {
+		display: none;
+	}
+}
+
+/* Below this width, the admin menu folds itself while it has no column. */
+@media screen and (min-width: 783px) and (max-width: 960px) {
+	body.gutenberg-admin-content-frame.auto-fold {
+		--gutenberg-admin-content-start: var(--wp-admin--admin-menu--width);
+	}
+}
+
+@media screen and (max-width: 782px) {
+	body.site-editor-v2.gutenberg-admin-nav-rail #adminmenumain {
+		display: none;
+	}
+}

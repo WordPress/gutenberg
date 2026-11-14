@@ -5,6 +5,7 @@ import { chevronLeft, chevronRight } from '@wordpress/icons';
 import Navigation from '../navigation';
 import SaveButton from '../save-button';
 import { store as bootStore } from '../../store';
+import { isAdminNavigationRailEnabled } from '../../admin-navigation-rail';
 import styles from './style.module.scss';
 
 function DashboardBackButton() {
@@ -28,7 +29,7 @@ function DashboardBackButton() {
 export default function Sidebar() {
 	return (
 		<div className={ styles.scrollable }>
-			<DashboardBackButton />
+			{ ! isAdminNavigationRailEnabled() && <DashboardBackButton /> }
 			<div className={ styles.content }>
 				<Navigation />
 			</div>
