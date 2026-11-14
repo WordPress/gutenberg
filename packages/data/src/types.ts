@@ -12,7 +12,7 @@ import type {
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = ( ...args: any[] ) => any | Generator;
-export type Resolver = Function | Generator;
+export type Resolver = Function | Generator | NormalizedResolver;
 export type Selector = Function;
 
 export type AnyConfig = ReduxStoreConfig< any, any, any >;
