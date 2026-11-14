@@ -104,7 +104,7 @@ the default value of its `size` prop.
  - Type: `boolean`
  - Required: No
 
-Indicates activity while a action is being performed.
+Displays a centered spinner while an action is in progress and announces the loading state. The label stays available to assistive technology. This does not disable the button.
 
 ### `isDestructive`
 
@@ -127,6 +127,14 @@ Renders a pressed button style.
 
 Sets the `aria-label` of the component, if none is provided.
 Sets the Tooltip content if `showTooltip` is provided.
+
+### `loadingAnnouncement`
+
+ - Type: `string`
+ - Required: No
+ - Default: `'Loading'`
+
+The message announced to assistive technology while `isBusy` is true. Set to an empty string when the caller provides its own progress announcement.
 
 ### `shortcut`
 

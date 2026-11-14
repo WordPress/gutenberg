@@ -56,7 +56,7 @@ type BaseButtonProps = {
 	 */
 	iconSize?: IconProps[ 'size' ];
 	/**
-	 * Indicates activity while a action is being performed.
+	 * Displays a centered spinner while an action is in progress and announces the loading state. The label stays available to assistive technology. This does not disable the button.
 	 */
 	isBusy?: boolean;
 	/**
@@ -72,6 +72,12 @@ type BaseButtonProps = {
 	 * Sets the Tooltip content if `showTooltip` is provided.
 	 */
 	label?: string;
+	/**
+	 * The message announced to assistive technology while `isBusy` is true. Set to an empty string when the caller provides its own progress announcement.
+	 *
+	 * @default 'Loading'
+	 */
+	loadingAnnouncement?: string;
 	/**
 	 * If provided with `showTooltip`, appends the Shortcut label to the tooltip content.
 	 * If an object is provided, it should contain `display` and `ariaLabel` keys.

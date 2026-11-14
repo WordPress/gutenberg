@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Keep busy button indicators visible when "Show button text labels" is enabled ([#85960](https://github.com/WordPress/gutenberg/pull/85960)).
 -   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
 
 ## 8.1.0 (2026-11-04)
