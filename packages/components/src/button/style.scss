@@ -419,6 +419,11 @@
 		color: inherit;
 		pointer-events: none;
 
+		// Match the UI Button's heavier stroke for the emphasized label weight.
+		> * {
+			stroke-width: 2.75;
+		}
+
 		@media (prefers-reduced-motion) {
 			> * {
 				animation: none;
