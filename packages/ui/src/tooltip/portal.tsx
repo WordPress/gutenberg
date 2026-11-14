@@ -12,7 +12,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 		const portal = useWpCompatOverlayContainer( container );
 		return (
 			<>
-				<span hidden ref={ portal.setSource } />
+				{ portal.needsSource && (
+					<span hidden ref={ portal.setSource } />
+				) }
 				<_Tooltip.Portal
 					container={ portal.container }
 					{ ...restProps }

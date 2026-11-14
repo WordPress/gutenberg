@@ -13,7 +13,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function DrawerPortal(
 	const portal = useWpCompatOverlayContainer( container );
 	return (
 		<>
-			<span hidden ref={ portal.setSource } />
+			{ portal.needsSource && <span hidden ref={ portal.setSource } /> }
 			<_Drawer.Portal
 				ref={ ref }
 				data-wp-ui-overlay-portal=""

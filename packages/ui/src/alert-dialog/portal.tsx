@@ -11,7 +11,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 		const portal = useWpCompatOverlayContainer( container );
 		return (
 			<>
-				<span hidden ref={ portal.setSource } />
+				{ portal.needsSource && (
+					<span hidden ref={ portal.setSource } />
+				) }
 				<_AlertDialog.Portal
 					ref={ ref }
 					data-wp-ui-overlay-portal=""

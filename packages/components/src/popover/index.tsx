@@ -215,6 +215,16 @@ const UnforwardedPopover = (
 		[]
 	);
 
+	const [ sourceParent, setSourceParent ] = useState< Element | null >(
+		null
+	);
+	const setSource = useCallback( ( node: HTMLSpanElement | null ) => {
+		if ( node ) {
+			setSourceParent( node.parentElement ?? node.ownerDocument.body );
+		}
+	}, [] );
+	const hasAnchor = anchorRef || anchorRect || anchor;
+
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const hasArrow = ! isExpanded && ! noArrow;
@@ -480,7 +490,7 @@ const UnforwardedPopover = (
 	const isPositioned =
 		( ! shouldAnimate || animationFinished ) && x !== null && y !== null;
 	const compatContainer = getWpCompatOverlayContainer(
-		fallbackReferenceElement
+		hasAnchor ? sourceParent : fallbackReferenceElement
 	);
 	const shouldRenderWithinSlot = slot.ref && ! inline;
 	const isInUiOverlay = !! getWpCompatOverlayContainer(
@@ -549,8 +559,6 @@ const UnforwardedPopover = (
 		</motion.div>
 	);
 
-	const hasAnchor = anchorRef || anchorRect || anchor;
-
 	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	} else if ( ! inline ) {
@@ -564,10 +572,19 @@ const UnforwardedPopover = (
 		);
 	}
 
+	// Explicit anchors in a slot or inline need no placeholder in editable content.
+	if ( hasAnchor && ( shouldRenderWithinSlot || inline ) ) {
+		return content;
+	}
 	return (
 		<>
-			<span ref={ anchorRefFallback } hidden={ !! hasAnchor } />
-			{ fallbackReferenceElement && content }
+			{ hasAnchor ? (
+				! sourceParent && <span hidden ref={ setSource } />
+			) : (
+				<span ref={ anchorRefFallback } />
+			) }
+			{ ( hasAnchor ? sourceParent : fallbackReferenceElement ) &&
+				content }
 		</>
 	);
 };

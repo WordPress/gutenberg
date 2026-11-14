@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { screen, within } from '@testing-library/react';
+import { screen, within, render as renderDom } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import '@wordpress/theme/design-tokens.css';
@@ -286,4 +286,61 @@ describe( 'Mixed overlay compatibility', () => {
 			screen.getByRole( 'button', { name: 'Open legacy modal' } )
 		).toHaveFocus();
 	} );
+} );
+
+it.each( [ 'native', 'legacy' ] )(
+	'keeps %s portal source nodes out of editable content',
+	async ( implementation ) => {
+		function Editable() {
+			const [ editor, setEditor ] = useState< HTMLDivElement | null >(
+				null
+			);
+			return (
+				<div
+					ref={ setEditor }
+					contentEditable
+					suppressContentEditableWarning
+				>
+					Editable text
+					{ editor &&
+						( implementation === 'native' ? (
+							<Dialog.Root defaultOpen>
+								<Dialog.Popup>
+									<Dialog.Title>Editor popup</Dialog.Title>
+									<button>Option</button>
+								</Dialog.Popup>
+							</Dialog.Root>
+						) : (
+							<LegacyPopover anchor={ editor }>
+								<button>Option</button>
+							</LegacyPopover>
+						) ) }
+				</div>
+			);
+		}
+		await render( <Editable /> );
+		await expect
+			.element( screen.getByRole( 'button', { name: 'Option' } ) )
+			.toBeVisible();
+		// Rich text serializes this DOM, including otherwise hidden placeholder nodes.
+		expect( screen.getByText( 'Editable text' ).innerHTML ).toBe(
+			'Editable text'
+		);
+	}
+);
+
+it( 'opens a portal when its React root is not attached to the document yet', async () => {
+	const container = document.createElement( 'div' );
+	renderDom(
+		<Dialog.Root defaultOpen>
+			<Dialog.Popup>
+				<Dialog.Title>Detached source</Dialog.Title>
+				<button>Detached option</button>
+			</Dialog.Popup>
+		</Dialog.Root>,
+		{ container }
+	);
+	await expect
+		.element( screen.getByRole( 'button', { name: 'Detached option' } ) )
+		.toBeVisible();
 } );

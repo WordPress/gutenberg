@@ -14,7 +14,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function SelectPortal(
 	const portal = useWpCompatOverlayContainer( container );
 	return (
 		<>
-			<span hidden ref={ portal.setSource } />
+			{ portal.needsSource && <span hidden ref={ portal.setSource } /> }
 			<_Select.Portal
 				container={ portal.container }
 				{ ...restProps }

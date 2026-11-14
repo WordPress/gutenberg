@@ -401,7 +401,7 @@ function UnforwardedModal(
 
 	return (
 		<>
-			<span hidden ref={ setPortalAnchor } />
+			{ ! portalContainer && <span hidden ref={ setPortalAnchor } /> }
 			{ portalContainer &&
 				createPortal(
 					<ModalContext.Provider value={ nestedDismissers }>

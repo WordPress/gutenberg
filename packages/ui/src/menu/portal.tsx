@@ -13,7 +13,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function MenuPortal(
 	const portal = useWpCompatOverlayContainer( container );
 	return (
 		<>
-			<span hidden ref={ portal.setSource } />
+			{ portal.needsSource && <span hidden ref={ portal.setSource } /> }
 			<_Menu.Portal
 				ref={ ref }
 				data-wp-ui-overlay-portal=""
