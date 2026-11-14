@@ -58,8 +58,7 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/private-apis": "file:../private-apis",
-		"colord": "^2.9.4"
+		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"devDependencies": {
 		"@types/deep-freeze": "^0.1.5",
