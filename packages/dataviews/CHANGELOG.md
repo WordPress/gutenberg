@@ -6,6 +6,7 @@
 
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
+-   `DataForm`: a form field can pass settings to its field's `Edit` control through a new `config` property, so one form can ask a control for a variant without changing the field ([#85775](https://github.com/WordPress/gutenberg/pull/85775)).
 
 ### Bug Fixes
 

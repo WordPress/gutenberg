@@ -1,12 +1,4 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
-
-// TODO: These styles should be absorbed by DataForm API.
-// @see https://github.com/WordPress/gutenberg/issues/75916
-.fields-controls__password {
-	border-top: $border-width solid $gray-200;
-	padding-top: $grid-unit-20;
-}
 
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
@@ -64,7 +56,17 @@
 
 		.dataforms-layouts__wrapper {
 			flex: 1;
-			padding: 0 $grid-unit-30 $grid-unit-05; // Horizontal + bottom space for focus ring
+			padding: 0 $grid-unit-30 $grid-unit-20;
+		}
+	}
+
+	.dataviews-action-modal__quick-edit-panels {
+		flex-shrink: 0;
+		padding-top: $grid-unit-20;
+		border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+
+		.dataforms-layouts__wrapper {
+			padding: 0 $grid-unit-30;
 		}
 	}
 
