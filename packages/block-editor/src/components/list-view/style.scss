@@ -102,7 +102,7 @@
 	&.is-selected .components-button.has-icon {
 		color: var(--list-view-selected-color);
 	}
-	&.is-selected .block-editor-list-view-block__menu:focus {
+	&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
 		--focus-color: currentColor;
 		@include outset-ring__focus();
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
@@ -134,8 +134,8 @@
 			--focus-color: CanvasText;
 		}
 
-		// The menu ring is inset over the selected background.
-		&.is-selected .block-editor-list-view-block__menu:focus {
+		// The action buttons' rings are inset over the selected background.
+		&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
 			--focus-color: SelectedItemText;
 		}
 	}

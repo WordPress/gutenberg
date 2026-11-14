@@ -22,7 +22,7 @@
 		padding-right: 0;
 	}
 
-	.block-editor-list-view-block-select-button {
+	:where(.block-editor-list-view-leaf:not(.is-selected)) .block-editor-list-view-block-select-button {
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		&:hover,
 		&:focus,

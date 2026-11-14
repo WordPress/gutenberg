@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Navigation: Keep selected links readable on hover and keyboard focus when a custom theme changes the selection color ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
 
 ## 8.1.0 (2026-11-04)
