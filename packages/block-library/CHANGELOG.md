@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks ([#81728](https://github.com/WordPress/gutenberg/pull/81728)).
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
