@@ -19,6 +19,12 @@ import {
 	type YMapWrap,
 } from './crdt-utils';
 import { getCachedRichTextData } from './crdt-text';
+import {
+	collapseUniqueLists,
+	expandUniqueLists,
+	findUniqueLists,
+	type UniqueList,
+} from './crdt-unique-lists';
 import { Delta } from '../sync';
 import { type WPBlockSelection } from '../types';
 
@@ -30,10 +36,21 @@ interface BlockAttributeSchema {
 	role?: string;
 	type?: string;
 	query?: Record< string, BlockAttributeSchema >;
+	// The next two properties describe lists of unique items. See
+	// `findUniqueLists`.
+	properties?: Record< string, BlockAttributeSchema >;
+	uniqueItems?: boolean;
 }
 
 interface BlockType {
 	attributes?: Record< string, BlockAttributeSchema >;
+	name: string;
+}
+
+// The parts of a block that hold its attributes, in any representation.
+interface BlockWithAttributes {
+	attributes: BlockAttributes;
+	innerBlocks?: BlockWithAttributes[];
 	name: string;
 }
 
@@ -124,7 +141,10 @@ function makeBlockAttributesSerializable(
 
 		newAttributes[ key ] = serializeAttributeValue( value );
 	}
-	return newAttributes;
+
+	// Store each item of a list of unique items under its own key, so that
+	// collaborators who change the list at the same time do not conflict.
+	return expandUniqueLists( newAttributes, getBlockUniqueLists( blockName ) );
 }
 
 /**
@@ -213,8 +233,13 @@ function deserializeAttributeValue(
  */
 export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 	return blocks.map( ( block: Block ) => {
-		const { name, innerBlocks, attributes, ...rest } = block;
+		const { name, innerBlocks, ...rest } = block;
 
+		// Put the items of lists of unique items back into their attributes.
+		const attributes = collapseUniqueLists(
+			block.attributes,
+			getBlockUniqueLists( name )
+		);
 		const newAttributes = { ...attributes };
 
 		for ( const [ key, value ] of Object.entries( attributes ) ) {
@@ -1066,11 +1091,53 @@ function resolveRichTextCursorPosition(
 		: null;
 }
 
+// What is cached for each block type.
+interface CachedBlockAttributeSchema {
+	// The type definition of each attribute, by attribute name.
+	attributes: Map< string, BlockAttributeSchema >;
+
+	// The lists of unique items that the block type declares.
+	uniqueLists: UniqueList[];
+}
+
 // Cached block attribute types, populated once from getBlockTypes().
-let cachedBlockAttributeSchemas: Map<
-	string,
-	Map< string, BlockAttributeSchema >
->;
+let cachedBlockAttributeSchemas:
+	Map< string, CachedBlockAttributeSchema > | undefined;
+
+/**
+ * Get the cached attribute definitions of a block type. The definitions of
+ * all block types are read once, the first time this is called.
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The cached definitions. Undefined when the block type is not registered.
+ */
+function getCachedBlockAttributeSchema(
+	blockName: string
+): CachedBlockAttributeSchema | undefined {
+	if ( ! cachedBlockAttributeSchemas ) {
+		const schemas = new Map< string, CachedBlockAttributeSchema >();
+
+		for ( const blockType of getBlockTypes() as BlockType[] ) {
+			const attributes = blockType.attributes ?? {};
+
+			schemas.set( blockType.name, {
+				attributes: new Map< string, BlockAttributeSchema >(
+					Object.entries( attributes ).map(
+						( [ name, definition ] ) => {
+							const { role, type, query } = definition;
+							return [ name, { role, type, query } ];
+						}
+					)
+				),
+				uniqueLists: findUniqueLists( attributes ),
+			} );
+		}
+
+		cachedBlockAttributeSchemas = schemas;
+	}
+
+	return cachedBlockAttributeSchemas.get( blockName );
+}
 
 /**
  * Get the attribute type definition for a block attribute.
@@ -1083,26 +1150,88 @@ function getBlockAttributeSchema(
 	blockName: string,
 	attributeName: string
 ): BlockAttributeSchema | undefined {
-	if ( ! cachedBlockAttributeSchemas ) {
-		// Parse the attributes for all blocks once.
-		cachedBlockAttributeSchemas = new Map();
+	return getCachedBlockAttributeSchema( blockName )?.attributes.get(
+		attributeName
+	);
+}
 
-		for ( const blockType of getBlockTypes() as BlockType[] ) {
-			cachedBlockAttributeSchemas.set(
-				blockType.name,
-				new Map< string, BlockAttributeSchema >(
-					Object.entries( blockType.attributes ?? {} ).map(
-						( [ name, definition ] ) => {
-							const { role, type, query } = definition;
-							return [ name, { role, type, query } ];
-						}
-					)
-				)
-			);
-		}
-	}
+// Returned for block types that are not registered.
+const NO_UNIQUE_LISTS: UniqueList[] = [];
 
-	return cachedBlockAttributeSchemas.get( blockName )?.get( attributeName );
+/**
+ * Get the lists of unique items that a block type declares in its attributes.
+ *
+ * @example
+ * ```js
+ * // Notes declare the note IDs of every block as a list of unique items.
+ * getBlockUniqueLists( 'core/paragraph' );
+ * // => [
+ * //     {
+ * //         path: [ 'metadata', 'noteId' ],
+ * //         itemKeyPrefix: 'metadata.noteId#',
+ * //         orderKey: 'metadata.noteId@order',
+ * //     },
+ * // ]
+ * ```
+ *
+ * @param blockName The name of the block, e.g. 'core/paragraph'.
+ * @return The lists of unique items. Empty when the block type has none.
+ */
+function getBlockUniqueLists( blockName: string ): UniqueList[] {
+	return (
+		getCachedBlockAttributeSchema( blockName )?.uniqueLists ??
+		NO_UNIQUE_LISTS
+	);
+}
+
+/**
+ * Apply `collapseUniqueLists` to a list of blocks and their inner blocks.
+ *
+ * @example
+ * ```js
+ * // `metadata.noteId` is a list of unique numbers for both block types.
+ * collapseUniqueListsInBlocks( [
+ *     {
+ *         name: 'core/group',
+ *         attributes: { 'metadata.noteId#3': 3 },
+ *         innerBlocks: [
+ *             {
+ *                 name: 'core/paragraph',
+ *                 attributes: { 'metadata.noteId#7': 7 },
+ *                 innerBlocks: [],
+ *             },
+ *         ],
+ *     },
+ * ] );
+ * // => [
+ * //     {
+ * //         name: 'core/group',
+ * //         attributes: { metadata: { noteId: [ 3 ] } },
+ * //         innerBlocks: [
+ * //             {
+ * //                 name: 'core/paragraph',
+ * //                 attributes: { metadata: { noteId: [ 7 ] } },
+ * //                 innerBlocks: [],
+ * //             },
+ * //         ],
+ * //     },
+ * // ]
+ * ```
+ *
+ * @param blocks Blocks as read from the shared document.
+ * @return Blocks for the block editor.
+ */
+export function collapseUniqueListsInBlocks<
+	BlockLike extends BlockWithAttributes,
+>( blocks: BlockLike[] ): BlockLike[] {
+	return blocks.map( ( block ) => ( {
+		...block,
+		attributes: collapseUniqueLists(
+			block.attributes ?? {},
+			getBlockUniqueLists( block.name )
+		),
+		innerBlocks: collapseUniqueListsInBlocks( block.innerBlocks ?? [] ),
+	} ) );
 }
 
 /**

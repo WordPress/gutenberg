@@ -15,6 +15,7 @@ import {
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
+	collapseUniqueListsInBlocks,
 	deserializeBlockAttributes,
 	shouldReparseBlocks,
 	mergeCrdtBlocks,
@@ -417,7 +418,9 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+						const blocksJson = collapseUniqueListsInBlocks(
+							ymap.get( 'blocks' )?.toJSON() ?? []
+						);
 
 						// Missing and invalid blocks serialize back to the markup
 						// they were loaded from, so the content comparison below

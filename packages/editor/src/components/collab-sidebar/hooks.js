@@ -69,10 +69,26 @@ export function useNoteThreads( postId ) {
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { clientIds } = useSelect( ( select ) => {
-		const { getClientIdsWithDescendants } = select( blockEditorStore );
+	const { clientIds, noteIdsJson } = useSelect( ( select ) => {
+		const {
+			getClientIdsWithDescendants,
+			getBlockAttributes: selectBlockAttributes,
+		} = select( blockEditorStore );
+		const ids = getClientIdsWithDescendants();
+
 		return {
-			clientIds: getClientIdsWithDescendants(),
+			clientIds: ids,
+			// Used to react to note ids that arrive from collaborators
+			// during real-time collaboration. Stored as a string so that
+			// it only counts as changed when the note ids change, instead
+			// of on every editor update.
+			noteIdsJson: JSON.stringify(
+				ids.map( ( clientId ) =>
+					getNoteIdsFromMetadata(
+						selectBlockAttributes( clientId )?.metadata
+					)
+				)
+			),
 		};
 	}, [] );
 
@@ -91,9 +107,9 @@ export function useNoteThreads( postId ) {
 		// Duplicating or splitting a block copies its notes, so a note can
 		// belong to several blocks.
 		const clientIdsByNoteId = new Map();
-		for ( const clientId of clientIds ) {
-			const metadata = getBlockAttributes( clientId )?.metadata;
-			const noteIds = getNoteIdsFromMetadata( metadata );
+		const noteIdsByBlock = JSON.parse( noteIdsJson );
+		for ( const [ index, clientId ] of clientIds.entries() ) {
+			const noteIds = noteIdsByBlock[ index ];
 			if ( noteIds.length === 0 ) {
 				continue;
 			}
@@ -185,7 +201,7 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, threads, getBlockAttributes ] );
+	}, [ clientIds, noteIdsJson, threads, getBlockAttributes ] );
 
 	return {
 		notes,
@@ -378,11 +394,9 @@ export function useNoteActions() {
 
 			/*
 			 * If it's a top-level note, update the block attributes with the
-			 * note id. Read-modify-write on metadata is racy under concurrent
-			 * edits: two near-simultaneous adds against the same base will each
-			 * write a 2-element array and the later write wins, dropping the
-			 * other id. Tracking issue:
-			 * https://github.com/WordPress/gutenberg/issues/74751.
+			 * note id. Collaborators can do this at the same time, because
+			 * `hooks/note-sync.ts` declares the note ids as a list of
+			 * unique items for real-time collaboration.
 			 */
 			if ( ! parent && savedRecord?.id ) {
 				updateNoteAnchors( clientIds, ( attributes ) => {
