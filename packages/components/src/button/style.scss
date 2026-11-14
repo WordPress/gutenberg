@@ -384,6 +384,11 @@
 			background: SelectedItem !important;
 			color: SelectedItemText !important;
 
+			// Keep the spinner contrasting with the pressed system-color fill.
+			.components-button__busy-spinner > * {
+				stroke: currentColor;
+			}
+
 			&:disabled,
 			&[aria-disabled="true"] {
 				border-color: GrayText !important;
@@ -432,7 +437,7 @@
 
 		@media (forced-colors: active) {
 			> * {
-				stroke: currentColor;
+				stroke: ButtonText;
 			}
 		}
 	}
