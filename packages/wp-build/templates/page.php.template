@@ -7,6 +7,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes     = array();
@@ -189,6 +193,22 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		);
 		wp_register_style( '{{PAGE_SLUG}}-prerequisites', false, $style_dependencies, $asset['version'] );
 
+		// Base styles for the full-page screen, which renders without the wp-admin stylesheets.
+		$page_styles = <<<'CSS'
+		html {
+			background: #f1f1f1;
+			color: #444;
+			font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+			font-size: 13px;
+			line-height: 1.4em;
+		}
+		body {
+			margin: 0;
+		}
+		#wpadminbar { display: none; }
+		CSS;
+		wp_add_inline_style( '{{PAGE_SLUG}}-prerequisites', $page_styles );
+
 		// Build dependencies for {{PAGE_SLUG}} module
 		$boot_dependencies = array(
 			array(
@@ -252,19 +272,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		<meta charset="<?php bloginfo( 'charset' ); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title><?php echo esc_html( get_admin_page_title() ); ?></title>
-		<style>
-			html {
-				background: #f1f1f1;
-				color: #444;
-				font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-				font-size: 13px;
-				line-height: 1.4em;
-			}
-			body {
-				margin: 0;
-			}
-			#wpadminbar { display: none; }
-		</style>
 	<?php
 	global $hook_suffix;
 	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -285,18 +292,14 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	<body class="{{PAGE_SLUG}} no-js">
 	<?php
 	// BEGIN see wp-admin/admin-header.php
-	?>
-	<script type="text/javascript">
-		document.body.className = document.body.className.replace( 'no-js', 'js' );
-	</script>
-	<?php
+	wp_print_inline_script_tag( "document.body.className = document.body.className.replace( 'no-js', 'js' );" );
 	// END see wp-admin/admin-header.php
 	?>
 		<div class="wrap hide-if-js" style="margin: 20px;">
 			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<?php
 			wp_admin_notice(
-				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
+				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.'{{TEXT_DOMAIN_ARG}} ),
 				array( 'type' => 'error' )
 			);
 			?>
@@ -343,7 +346,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 
 		if ( ! current_user_can( '{{CAPABILITY}}' ) ) {
 			wp_die(
-				__( 'Sorry, you are not allowed to access this page.' ),
+				esc_html__( 'Sorry, you are not allowed to access this page.'{{TEXT_DOMAIN_ARG}} ),
 				403
 			);
 		}

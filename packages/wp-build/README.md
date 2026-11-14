@@ -264,6 +264,20 @@ With this configuration:
 - `@my-plugin/editor` → `window.myPlugin.editor` with handle `mp-editor`
 - `@my-plugin/data` → `window.myPlugin.data` with handle `mp-data`
 
+### `wpPlugin.textDomain`
+
+The text domain used to translate the strings in the generated PHP files, such as the notice shown when JavaScript is disabled on a page from `wpPlugin.pages`. Set it to your plugin's text domain to meet the WordPress.org Plugin Directory requirements:
+
+```json
+{
+	"wpPlugin": {
+		"textDomain": "my-plugin"
+	}
+}
+```
+
+When it is not set, the strings use the `default` text domain and reuse the translations that ship with WordPress.
+
 ### `wpPlugin.externalNamespaces`
 
 Additional package namespaces to externalize (consume as externals, not expose). Each namespace must be an object with `global` and optional `handlePrefix`:

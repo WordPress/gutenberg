@@ -10,6 +10,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_menu_items;
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_routes     = array();
@@ -217,6 +221,58 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
 		);
 		wp_register_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', false, $style_dependencies, $asset['version'] );
 
+		// Critical styles to prevent layout shifts.
+		$page_styles = <<<'CSS'
+		#wpwrap {
+			overflow-y: auto;
+		}
+		body.js {
+			background: #fff;
+		}
+
+		/* Reset wp-admin padding */
+		body.js #wpcontent {
+			padding-inline-start: 0;
+		}
+		body.js #wpbody-content {
+			padding-bottom: 0;
+		}
+
+		/* Hide legacy admin elements */
+		body.js #wpbody-content > div:not(#{{PAGE_SLUG}}-wp-admin-app):not(#screen-meta) {
+			display: none;
+		}
+		body.js #wpfooter {
+			display: none;
+		}
+
+		/* Accessibility regions */
+		.a11y-speak-region {
+			inset-inline-start: -1px;
+			top: -1px;
+		}
+
+		/* Admin menu indicators */
+		ul#adminmenu a.wp-has-current-submenu::after,
+		ul#adminmenu > li.current > a.current::after {
+			border-inline-end-color: #fff;
+		}
+
+		/* Media frame fix */
+		.media-frame select.attachment-filters:last-of-type {
+			width: auto;
+			max-width: 100%;
+		}
+
+		/* Responsive overflow fix for #wpwrap */
+		@media (min-width: 782px) {
+			#wpwrap {
+				overflow-y: initial;
+			}
+		}
+		CSS;
+		wp_add_inline_style( '{{PAGE_SLUG}}-wp-admin-prerequisites', $page_styles );
+
 		// Build dependencies for {{PAGE_SLUG}}-wp-admin module
 		$boot_dependencies = array(
 			array(
@@ -280,62 +336,11 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_enqueue_scripts( $hook_suf
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_render_page() {
 	?>
-	<style>
-		/* Critical styles to prevent layout shifts - inlined for immediate application */
-
-		#wpwrap {
-			overflow-y: auto;
-		}
-		body.js {
-			background: #fff;
-		}
-
-		/* Reset wp-admin padding */
-		body.js #wpcontent {
-			padding-inline-start: 0;
-		}
-		body.js #wpbody-content {
-			padding-bottom: 0;
-		}
-
-		/* Hide legacy admin elements */
-		body.js #wpbody-content > div:not(#{{PAGE_SLUG}}-wp-admin-app):not(#screen-meta) {
-			display: none;
-		}
-		body.js #wpfooter {
-			display: none;
-		}
-
-		/* Accessibility regions */
-		.a11y-speak-region {
-			inset-inline-start: -1px;
-			top: -1px;
-		}
-
-		/* Admin menu indicators */
-		ul#adminmenu a.wp-has-current-submenu::after,
-		ul#adminmenu > li.current > a.current::after {
-			border-inline-end-color: #fff;
-		}
-
-		/* Media frame fix */
-		.media-frame select.attachment-filters:last-of-type {
-			width: auto;
-			max-width: 100%;
-		}
-
-		/* Responsive overflow fix for #wpwrap */
-		@media (min-width: 782px) {
-			#wpwrap {
-				overflow-y: initial;
-			}
-		}
-	</style>
 	<div class="wrap hide-if-js">
 		<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 		<?php
 		wp_admin_notice(
-			__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
+			__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.'{{TEXT_DOMAIN_ARG}} ),
 			array( 'type' => 'error' )
 		);
 		?>
