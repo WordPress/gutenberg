@@ -390,7 +390,7 @@
 			}
 
 			// Keep the spinner contrasting with the pressed system-color fill.
-			.components-button__busy-spinner > * {
+			> .components-button__busy-spinner > * {
 				stroke: currentColor;
 			}
 
@@ -425,13 +425,13 @@
 			-webkit-text-fill-color: ButtonFace;
 			text-decoration-color: ButtonFace;
 		}
+
+		> :not(.components-button__busy-spinner) {
+			opacity: 0;
+		}
 	}
 
-	&.is-busy > :not(.components-button__busy-spinner) {
-		opacity: 0;
-	}
-
-	.components-button__busy-spinner {
+	> .components-button__busy-spinner {
 		position: absolute;
 		inset: 0;
 		margin: auto;
@@ -443,16 +443,12 @@
 		// Match the UI Button's heavier stroke for the emphasized label weight.
 		> * {
 			stroke-width: 2.75;
-		}
 
-		@media (prefers-reduced-motion) {
-			> * {
+			@media (prefers-reduced-motion) {
 				animation: none;
 			}
-		}
 
-		@media (forced-colors: active) {
-			> * {
+			@media (forced-colors: active) {
 				stroke: ButtonText;
 			}
 		}
