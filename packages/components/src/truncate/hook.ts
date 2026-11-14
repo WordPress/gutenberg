@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 import type { TruncateProps } from './types';
@@ -7,7 +7,15 @@ import styles from './style.module.scss';
 
 export default function useTruncate(
 	props: WordPressComponentProps< TruncateProps, 'span' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< TruncateProps, 'span' >,
+	'ellipsis' | 'ellipsizeMode' | 'limit' | 'numberOfLines',
+	{
+		className: string;
+		style: React.CSSProperties | undefined;
+		children: React.ReactNode;
+	}
+> {
 	const {
 		className,
 		children,

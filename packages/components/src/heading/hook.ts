@@ -1,4 +1,4 @@
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';
 import { getHeadingFontSize } from '../utils/font-size';
@@ -6,7 +6,15 @@ import type { HeadingProps } from './types';
 
 export function useHeading(
 	props: WordPressComponentProps< HeadingProps, 'h1' >
-) {
+): HookReturnProps<
+	ReturnType< typeof useText >,
+	never,
+	{
+		role?: string;
+		'aria-level'?: number;
+		as: keyof React.JSX.IntrinsicElements;
+	}
+> {
 	const {
 		as: asProp,
 		level = 2,

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useSurface } from '../../surface';
 import styles from '../style.module.scss';
@@ -35,7 +35,18 @@ function useDeprecatedProps( {
 	return propsToReturn;
 }
 
-export function useCard( props: CardProps ) {
+export function useCard( props: CardProps ): HookReturnProps<
+	CardProps,
+	'isElevated',
+	{
+		className: string;
+		style: React.CSSProperties | undefined;
+		elevation: number;
+		isBorderless: boolean;
+		isRounded: boolean;
+		size: NonNullable< CardProps[ 'size' ] >;
+	}
+> {
 	const {
 		className,
 		elevation = 0,

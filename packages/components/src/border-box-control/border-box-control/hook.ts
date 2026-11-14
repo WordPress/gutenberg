@@ -10,14 +10,41 @@ import {
 	isCompleteBorder,
 	isEmptyBorder,
 } from '../utils';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { Border } from '../../border-control/types';
 import type { Borders, BorderSide, BorderBoxControlProps } from '../types';
 
 export function useBorderBoxControl(
 	props: WordPressComponentProps< BorderBoxControlProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< BorderBoxControlProps, 'div' >,
+	'onChange' | 'value' | 'size' | '__next40pxDefaultSize',
+	{
+		className: string | undefined;
+		colors: NonNullable< BorderBoxControlProps[ 'colors' ] >;
+		hasVisibleLabel: boolean;
+		headerClassName: string;
+		hideLabelFromVision: boolean | undefined;
+		label: string | undefined;
+		disableUnits: boolean;
+		enableAlpha: boolean;
+		enableStyle: boolean;
+		hasMixedBorders: boolean;
+		isLinked: boolean;
+		linkedControlClassName: string;
+		onLinkedChange: ( newBorder?: Border ) => void;
+		onSplitChange: (
+			newBorder: Border | undefined,
+			side: BorderSide
+		) => void;
+		toggleLinked: () => void;
+		linkedValue: Border | undefined;
+		splitValue: Borders | undefined;
+		wrapperClassName: string;
+		__experimentalIsRenderedInSidebar: boolean;
+	}
+> {
 	const {
 		className,
 		colors = [],

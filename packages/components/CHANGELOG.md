@@ -43,6 +43,7 @@
 -   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across themes and interaction states, including numbered toolbar buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
+-   Type declarations: Stop inlining React DOM attribute types into the published declarations of component hooks and polymorphic components, so they type-check with `@types/react` 18 again ([#84526](https://github.com/WordPress/gutenberg/pull/84526)).
 
 ### Internal
 

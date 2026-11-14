@@ -6,7 +6,9 @@ import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../utils/get-valid-children';
 import type { Props } from './types';
 
-export function useHStack( props: WordPressComponentProps< Props, 'div' > ) {
+export function useHStack(
+	props: WordPressComponentProps< Props, 'div' >
+): Omit< ReturnType< typeof useFlex >, 'isColumn' > {
 	const {
 		alignment = 'edge',
 		children,
