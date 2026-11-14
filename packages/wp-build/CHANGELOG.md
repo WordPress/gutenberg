@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
+-   Export `compileStyleFile()` and `compileCss()` from `@wordpress/build/compile-style`, so a package can emit its styles in another form with the same scoped class names as the JavaScript build ([#85756](https://github.com/WordPress/gutenberg/pull/85756)).
 
 ### Internal
 

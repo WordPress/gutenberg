@@ -18,9 +18,10 @@ export { dsTokenFallbacks };
  * use it.
  *
  * @param {import('postcss').AcceptedPlugin[]} plugins Plugins that run before `postcss-modules`.
+ * @param {string}                             rootDir Directory that file paths are hashed relative to.
  * @return {(name: string, filename: string, css: string) => string} Class name generator.
  */
-function createScopedNameGenerator( plugins ) {
+function createScopedNameGenerator( plugins, rootDir ) {
 	const processor = postcss( plugins );
 	/** @type {Map<string, string>} */
 	const processedSources = new Map();
@@ -35,7 +36,7 @@ function createScopedNameGenerator( plugins ) {
 		// Hash a relative path so that names do not depend on the checkout location.
 		const hash = createHash( 'sha1' )
 			.update(
-				path.relative( process.cwd(), filename ).replaceAll( '\\', '/' )
+				path.relative( rootDir, filename ).replaceAll( '\\', '/' )
 			)
 			.update( '\0' )
 			.update( processedCss )
@@ -47,6 +48,61 @@ function createScopedNameGenerator( plugins ) {
 		// A class name cannot start with a digit.
 		return `${ /^\d/.test( hash ) ? '_' : '' }${ hash }__${ name }`;
 	};
+}
+
+/**
+ * Compile CSS the way wp-build does for every package, and return the result
+ * as data rather than as a JavaScript module.
+ *
+ * This is the single place that decides how CSS modules are scoped, so other
+ * outputs (for example a server-rendered stylesheet) get class names that are
+ * identical to the ones the JavaScript build injects at runtime.
+ *
+ * @param {string}  cssText                    CSS source to compile.
+ * @param {string}  filePath                   Source file path.
+ * @param {Object}  options
+ * @param {boolean} [options.cssModules=false] Whether to scope class names as CSS Modules.
+ * @param {boolean} [options.minify=true]      Whether to minify the CSS.
+ * @param {string}  [options.rootDir]          The repository root, which scoped class names depend on. Defaults to the current directory.
+ * @return {Promise<{css: string, classNames: Record<string, string>|null}>} Compiled CSS, and the local to scoped class name map when `cssModules` is set.
+ */
+export async function compileCss(
+	cssText,
+	filePath,
+	{ cssModules = false, minify = true, rootDir = process.cwd() } = {}
+) {
+	/** @type {Record<string, string>|null} */
+	let classNames = null;
+
+	/** @type {import('postcss').AcceptedPlugin[]} */
+	const plugins = [ dsTokenFallbacks ];
+	if ( cssModules ) {
+		plugins.push(
+			postcssModules( {
+				generateScopedName: createScopedNameGenerator(
+					plugins,
+					rootDir
+				),
+				getJSON: ( _, json ) => {
+					classNames = json;
+				},
+			} )
+		);
+	}
+	if ( minify ) {
+		plugins.push(
+			cssnano( {
+				preset: [ 'default', { discardComments: { removeAll: true } } ],
+			} )
+		);
+	}
+
+	const { css } = await postcss( plugins ).process( cssText, {
+		from: filePath,
+		map: false,
+	} );
+
+	return { css, classNames };
 }
 
 /**
@@ -68,34 +124,9 @@ export function compileInlineStyle( {
 	 * @return {Promise<string>} Compiled JavaScript module.
 	 */
 	return async function styleType( cssText, _dirname, filePath ) {
-		let moduleExports = null;
-
-		/** @type {import('postcss').AcceptedPlugin[]} */
-		const plugins = [ dsTokenFallbacks ];
-		if ( cssModules ) {
-			plugins.push(
-				postcssModules( {
-					generateScopedName: createScopedNameGenerator( plugins ),
-					getJSON: ( _, json ) => {
-						moduleExports = json;
-					},
-				} )
-			);
-		}
-		if ( minify ) {
-			plugins.push(
-				cssnano( {
-					preset: [
-						'default',
-						{ discardComments: { removeAll: true } },
-					],
-				} )
-			);
-		}
-
-		const { css } = await postcss( plugins ).process( cssText, {
-			from: filePath,
-			map: false,
+		const { css, classNames } = await compileCss( cssText, filePath, {
+			cssModules,
+			minify,
 		} );
 
 		// Hash the transformed CSS so that the dedup key reflects the actual
@@ -125,8 +156,8 @@ if (${ shouldInjectStyle }) {
 `;
 
 		// The CSS modules transform produces an `exports` object with class name mappings.
-		if ( moduleExports ) {
-			const exportsString = JSON.stringify( moduleExports );
+		if ( classNames ) {
+			const exportsString = JSON.stringify( classNames );
 			cssModule += `export default ${ exportsString };\n`;
 		}
 		return cssModule;

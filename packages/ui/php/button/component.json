@@ -1,0 +1,38 @@
+{
+	"name": "button",
+	"content": { "required": true },
+	"props": {
+		"tone": {
+			"type": "string",
+			"enum": [ "brand", "neutral" ],
+			"default": "brand"
+		},
+		"variant": {
+			"type": "string",
+			"enum": [ "solid", "outline", "minimal", "unstyled" ],
+			"default": "solid"
+		},
+		"size": {
+			"type": "string",
+			"enum": [ "default", "compact", "small" ],
+			"default": "default"
+		},
+		"type": {
+			"type": "string",
+			"enum": [ "button", "submit", "reset" ],
+			"default": "button"
+		},
+		"disabled": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"styles": [
+		"button/style",
+		"utils/css/global-css-defense",
+		"utils/css/resets",
+		"utils/css/focus"
+	],
+	"react": {
+		"component": "Button",
+		"props": { "focusableWhenDisabled": false }
+	}
+}
