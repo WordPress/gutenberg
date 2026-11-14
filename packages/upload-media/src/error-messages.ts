@@ -113,6 +113,17 @@ export function getErrorMessage(
 			),
 			action: __( 'Please try again.' ),
 		},
+		[ ErrorCode.STORAGE_LIMIT_REACHED ]: {
+			title: __( 'Out of storage space' ),
+			description: sprintf(
+				/* translators: %s: file name */
+				__(
+					'"%s" could not be uploaded because this site is out of storage space.'
+				),
+				fileName
+			),
+			action: __( 'Delete some files or contact your administrator.' ),
+		},
 		[ ErrorCode.GENERAL ]: {
 			title: __( 'Upload failed' ),
 			description: sprintf(
@@ -134,5 +145,35 @@ export function getErrorMessage(
 			),
 			action: __( 'Please try again.' ),
 		}
+	);
+}
+
+/**
+ * Gets the message for an image that uploaded without all of its sizes.
+ *
+ * @param code     The error code of the failure that left a size out.
+ * @param fileName The name of the uploaded file.
+ * @return Message telling the user which file is incomplete, and why if known.
+ */
+export function getIncompleteUploadMessage(
+	code: ErrorCode | string,
+	fileName: string
+): string {
+	if ( code === ErrorCode.STORAGE_LIMIT_REACHED ) {
+		return sprintf(
+			/* translators: %s: file name */
+			__(
+				'"%s" was uploaded, but not all of its image sizes could be saved because this site is out of storage space.'
+			),
+			fileName
+		);
+	}
+
+	return sprintf(
+		/* translators: %s: file name */
+		__(
+			'"%s" was uploaded, but not all of its image sizes could be saved.'
+		),
+		fileName
 	);
 }

@@ -7,6 +7,7 @@ import type {
 import { sideloadToServer } from './sideload-to-server';
 import { UploadError } from './upload-error';
 import { getUploadErrorMessage } from './get-upload-error-message';
+import { getUploadErrorCode } from './get-upload-error-code';
 
 const noop = () => {};
 
@@ -60,7 +61,7 @@ export async function sideloadMedia( {
 	} catch ( error ) {
 		onError(
 			new UploadError( {
-				code: 'GENERAL',
+				code: getUploadErrorCode( error ),
 				message: getUploadErrorMessage( error, file.name ),
 				file,
 				cause: error instanceof Error ? error : undefined,

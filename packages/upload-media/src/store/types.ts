@@ -57,6 +57,21 @@ export interface QueueItem {
 	abortController?: AbortController;
 	parentId?: QueueItemId;
 	subSizes?: SubSizeData[];
+	// First error that kept one of this item's sub-sizes from being saved,
+	// or the first storage limit error if there is one.
+	subSizeError?: Error;
+}
+
+/**
+ * An upload that succeeded, but not entirely.
+ */
+export interface UploadWarning {
+	// ID of the queue item the warning is about.
+	id: QueueItemId;
+	// Error code of the failure behind the warning.
+	code: string;
+	// Message to show the user.
+	message: string;
 }
 
 export interface State {
@@ -73,6 +88,13 @@ export interface State {
 	 * that batch started.
 	 */
 	failureCount: number;
+	/**
+	 * Uploads that succeeded without all of their sub-sizes.
+	 *
+	 * Like `failureCount` this only ever grows, since the items themselves
+	 * leave the queue. Consumers keep track of how many they have handled.
+	 */
+	warnings: UploadWarning[];
 }
 
 export enum Type {
@@ -94,6 +116,8 @@ export enum Type {
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
+	RecordSubSizeError = 'RECORD_SUB_SIZE_ERROR',
+	AddWarning = 'ADD_WARNING',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -158,6 +182,14 @@ export type UpdateProgressAction = Action<
 export type AccumulateSubSizeAction = Action<
 	Type.AccumulateSubSize,
 	{ id: QueueItemId; subSize: SubSizeData }
+>;
+export type RecordSubSizeErrorAction = Action<
+	Type.RecordSubSizeError,
+	{ id: QueueItemId; error: Error }
+>;
+export type AddWarningAction = Action<
+	Type.AddWarning,
+	{ warning: UploadWarning }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,

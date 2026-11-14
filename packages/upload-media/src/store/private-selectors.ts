@@ -4,6 +4,7 @@ import {
 	type QueueItem,
 	type QueueItemId,
 	type State,
+	type UploadWarning,
 } from './types';
 
 /**
@@ -31,6 +32,20 @@ export function getAllItems( state: State ): QueueItem[] {
  */
 export function getFailureCount( state: State ): number {
 	return state.failureCount;
+}
+
+/**
+ * Returns the uploads that succeeded without all of their sub-sizes.
+ *
+ * The list only ever grows, so consumers keep track of how many they have
+ * already handled.
+ *
+ * @param state Upload state.
+ *
+ * @return Upload warnings since the editor loaded.
+ */
+export function getWarnings( state: State ): UploadWarning[] {
+	return state.warnings;
 }
 
 /**

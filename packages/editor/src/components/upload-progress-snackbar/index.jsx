@@ -76,12 +76,15 @@ export const UPLOAD_DONE = (
  * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
-	const { items, csmFailureCount } = useSelect( ( select ) => {
+	const { items, csmFailureCount, warnings } = useSelect( ( select ) => {
 		const { getItems } = select( uploadStore );
-		const { getFailureCount } = unlock( select( uploadStore ) );
+		const { getFailureCount, getWarnings } = unlock(
+			select( uploadStore )
+		);
 		return {
 			items: getItems(),
 			csmFailureCount: getFailureCount(),
+			warnings: getWarnings(),
 		};
 	}, [] );
 	const tracker = useTracker();
@@ -133,6 +136,21 @@ export default function UploadProgressSnackbar() {
 			}
 		};
 	}, [] );
+
+	// An image that uploaded without all of its sizes counts as uploaded, so
+	// nothing above reports it. The list only ever grows: warn about the
+	// entries added since the last pass.
+	const warningsShownRef = useRef( 0 );
+	useEffect( () => {
+		for ( const warning of warnings.slice( warningsShownRef.current ) ) {
+			createNotice( 'warning', warning.message, {
+				id: `upload-warning-${ warning.id }`,
+				type: 'snackbar',
+				explicitDismiss: true,
+			} );
+		}
+		warningsShownRef.current = warnings.length;
+	}, [ warnings, createNotice ] );
 
 	useEffect( () => {
 		const isUploading = remaining > 0;

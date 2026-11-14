@@ -7,6 +7,10 @@
 -   `MediaUploadModal`: Query filters on attachment taxonomy fields by the taxonomy. ([#86458](https://github.com/WordPress/gutenberg/pull/86458))
 -   `MediaUploadModal`: Add a `fields` prop for fields registered for attachments, shown alongside the modal's own as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 
+### Bug Fixes
+
+-   `sideloadMedia`: Report a sideload rejected by a multisite storage limit with the `STORAGE_LIMIT_REACHED` error code ([#86834](https://github.com/WordPress/gutenberg/pull/86834)).
+
 ## 6.1.0 (2026-11-04)
 
 ### Enhancements
