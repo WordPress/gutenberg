@@ -35,6 +35,48 @@ export function MediaFrameDialog( {
 		if ( ! open || ! container ) {
 			return;
 		}
+		const dialog = container.closest< HTMLElement >( '[role="dialog"]' );
+		if ( ! dialog ) {
+			return;
+		}
+		const ownerDocument = container.ownerDocument;
+		let focusedElement = container.contains( ownerDocument.activeElement )
+			? ownerDocument.activeElement
+			: null;
+		const rememberFocus = ( event: FocusEvent ) => {
+			focusedElement = event.target as Element;
+		};
+		container.addEventListener( 'focusin', rememberFocus );
+		// Core replaces its uploader controls imperatively after an upload.
+		// Restore dialog focus if the removed control left focus on the page.
+		const observer = new MutationObserver( ( records ) => {
+			if (
+				focusedElement &&
+				focusedElement !== ownerDocument.activeElement &&
+				( ! focusedElement.isConnected ||
+					records.some( ( { removedNodes } ) =>
+						Array.from( removedNodes ).some( ( node ) =>
+							node.contains( focusedElement )
+						)
+					) )
+			) {
+				focusedElement = null;
+				if ( ownerDocument.activeElement === ownerDocument.body ) {
+					dialog.focus();
+				}
+			}
+		} );
+		observer.observe( container, { childList: true, subtree: true } );
+		return () => {
+			container.removeEventListener( 'focusin', rememberFocus );
+			observer.disconnect();
+		};
+	}, [ open, container ] );
+
+	useLayoutEffect( () => {
+		if ( ! open || ! container ) {
+			return;
+		}
 
 		const heading = onOpen( container );
 		if ( ! heading ) {
