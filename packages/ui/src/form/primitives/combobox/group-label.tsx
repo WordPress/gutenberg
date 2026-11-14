@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../../../text';
 import type { ComboboxGroupLabelProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Renders a label for a `Combobox.Group`, describing the group of items

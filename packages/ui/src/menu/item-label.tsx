@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMenuItemContentContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ItemLabelProps } from './types';
 import { Text } from '../text';
 

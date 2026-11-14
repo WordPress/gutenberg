@@ -3,7 +3,7 @@ import { Popover as _Popover } from '@base-ui/react/popover';
 import { forwardRef } from '@wordpress/element';
 import type { PositionerProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 /**
  * Used to apply custom positioning to `Popover`'s floating content.

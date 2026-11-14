@@ -4,7 +4,7 @@ import { forwardRef } from '@wordpress/element';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
 import styles from './style.module.css';

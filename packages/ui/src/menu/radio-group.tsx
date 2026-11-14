@@ -2,7 +2,7 @@ import { Menu as _Menu } from '@base-ui/react/menu';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { MenuGroupContext, useMenuGroupContext } from './context';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { RadioGroupProps } from './types';
 
 /**

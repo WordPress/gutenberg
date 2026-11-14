@@ -1,7 +1,7 @@
 import { forwardRef } from '@wordpress/element';
 import { mergeProps, useRender } from '@base-ui/react';
 import type { ComboboxListBodyProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * A layout container for the main scrolling area in the `List`, for holding `Item`s.

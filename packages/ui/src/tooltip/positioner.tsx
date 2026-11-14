@@ -3,7 +3,7 @@ import { Tooltip as _Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
 import type { PositionerProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 /**
  * Used to apply custom positioning to `Tooltip`'s floating content.

@@ -42,7 +42,7 @@ import type { DashboardLanesLayoutItem, DashboardLanesProps } from './types';
 import type { ResizeSnapSize } from '../shared/resize-snap';
 import type { ResizeDelta } from '../shared/types';
 import { createDashboardDragDropAnimation } from '../shared/drag-overlay-drop-animation';
-import styles from './lanes.module.css';
+import styles from './lanes.module.scss';
 
 const dashboardDragDropAnimation = createDashboardDragDropAnimation(
 	styles[ 'drag-preview-frame' ],
@@ -600,7 +600,7 @@ export const DashboardLanes = forwardRef< HTMLDivElement, DashboardLanesProps >(
 								...style,
 								gridTemplateColumns: `repeat(${ effectiveColumns }, minmax(0, 1fr))`,
 								// `column-gap` and `row-gap` are set in
-								// `lanes.module.css` from the
+								// `lanes.module.scss` from the
 								// design-system gap token, with an
 								// `@supports` block that zeroes `row-gap`
 								// in polyfill mode (the skyline already

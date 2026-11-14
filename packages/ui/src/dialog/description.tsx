@@ -1,7 +1,7 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../text';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { DescriptionProps } from './types';
 
 /**

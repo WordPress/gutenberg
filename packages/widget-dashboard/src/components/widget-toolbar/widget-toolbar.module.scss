@@ -1,0 +1,11 @@
+@use "@wordpress/base-styles/variables";
+
+.widget-toolbar {
+	padding: var(--wpds-dimension-padding-xs);
+	background: var(--wpds-color-background-surface-neutral-strong);
+}
+
+.elevated {
+	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+	box-shadow: variables.$elevation-x-small;
+}
