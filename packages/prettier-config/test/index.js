@@ -1,10 +1,12 @@
 import { execFile } from 'child_process';
+import { createRequire } from 'module';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { promisify } from 'util';
 import { describe, expect, it } from 'vitest';
 import config from '../lib/';
 
+const require = createRequire( import.meta.url );
 const execFileAsync = promisify( execFile );
 const testDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 

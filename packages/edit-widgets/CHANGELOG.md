@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching theme-aware colors for pressed header buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+
+## 7.1.0 (2026-11-04)
+
 ## 7.0.0 (2026-10-20)
 
 ### Breaking Changes

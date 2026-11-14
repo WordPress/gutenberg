@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { tip, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { Button } from '../../button';
+import { Link } from '../../link';
 import { Stack } from '../../stack';
 import * as Notice from '../index';
 
@@ -130,6 +131,28 @@ export const WithoutActions: Story = {
 			<Notice.Title key="title">Simple Notice</Notice.Title>,
 			<Notice.Description key="description">
 				A dismissable notice without any action buttons or links.
+			</Notice.Description>,
+			<Notice.CloseIconButton key="closeIconButton" />,
+		],
+	},
+};
+
+/**
+ * Use the `Link` component for inline links within the description. Set `tone="neutral"` so links match the styles used for actions and blend with the notice colors.
+ *
+ * It is usually clearer to use the dedicated `Notice.Actions` instead, with `Notice.ActionLink` or `Notice.ActionButton`.
+ */
+export const WithLinkInDescription: Story = {
+	args: {
+		intent: 'info',
+		children: [
+			<Notice.Title key="title">Notice Title</Notice.Title>,
+			<Notice.Description key="description">
+				Description text with a{ ' ' }
+				<Link href="#" tone="neutral">
+					link
+				</Link>{ ' ' }
+				and details about this notification.
 			</Notice.Description>,
 			<Notice.CloseIconButton key="closeIconButton" />,
 		],

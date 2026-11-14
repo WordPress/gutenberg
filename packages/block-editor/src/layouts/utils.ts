@@ -1,6 +1,29 @@
 import { __, sprintf } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import type { AlignmentsInfo, Layout, LayoutDefinition } from './types';
+import type {
+	AlignmentsInfo,
+	Layout,
+	LayoutBlockSupport,
+	LayoutDefinition,
+} from './types';
+
+/**
+ * Returns a block's layout support settings, including the legacy support key.
+ *
+ * @param blockName The block type name.
+ * @return The layout support settings, if available.
+ */
+export function getLayoutBlockSupport(
+	blockName: string | null | undefined
+): LayoutBlockSupport | undefined {
+	if ( ! blockName ) {
+		return;
+	}
+	return ( getBlockSupport( blockName, 'layout' ) ||
+		getBlockSupport( blockName, '__experimentalLayout' ) ) as
+		LayoutBlockSupport | undefined;
+}
 
 /**
  * Utility to generate the proper CSS selector for layout styles.
@@ -86,7 +109,7 @@ export function getAlignmentsInfo( layout: Layout ): AlignmentsInfo {
 	const { contentSize, wideSize, type = 'default' } = layout;
 	const alignmentInfo: AlignmentsInfo = {};
 	const sizeRegex =
-		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+		/^(?!0)\d+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax|cqw|cqh|cqi|cqb|cqmin|cqmax)?$/i;
 	// `test` reads a missing size as 'undefined', which never matches.
 	if ( sizeRegex.test( contentSize! ) && type === 'constrained' ) {
 		// translators: %s: container size (i.e. 600px etc)

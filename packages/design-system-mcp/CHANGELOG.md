@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `get_component_details` now includes each example's story description above its code snippet ([#86815](https://github.com/WordPress/gutenberg/pull/86815)).
+-   Add `Page` from `@wordpress/admin-ui` to the component catalog, and name `@wordpress/admin-ui` as a component source in the server instructions ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
+
+## 0.16.0 (2026-11-04)
+
+### New Features
+
+-   Add `get_patterns` and `get_pattern_details` tools, serving the design system pattern guidance (copy to clipboard, destructive actions, error messages, save and submit) from the Storybook docs manifest. The server instructions now describe how patterns, components, and design tokens relate, and which tools to call for each kind of request ([#84864](https://github.com/WordPress/gutenberg/pull/84864)).
+
 ## 0.15.0 (2026-10-20)
 
 ### Breaking Changes

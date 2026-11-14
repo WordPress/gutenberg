@@ -1,7 +1,7 @@
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { prependHTTPS } from '@wordpress/url';
 import {
 	create,
@@ -14,6 +14,7 @@ import {
 	split,
 	concat,
 	useAnchor,
+	getActiveFormat,
 } from '@wordpress/rich-text';
 import {
 	LinkControl,
@@ -21,7 +22,12 @@ import {
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import {
+	createLinkFormat,
+	isValidHref,
+	getFormatBoundary,
+	hasNofollow,
+} from './utils';
 import type { LinkFormatAttributes } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
@@ -93,6 +99,7 @@ function InlineLinkUI( {
 	focusOnMount,
 }: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
+	const currentFormat = getActiveFormat( value, 'core/link' );
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
@@ -120,7 +127,7 @@ function InlineLinkUI( {
 			type: activeAttributes.type,
 			id: activeAttributes.id,
 			opensInNewTab: activeAttributes.target === '_blank',
-			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
+			nofollow: hasNofollow( activeAttributes.rel ),
 			title: richTextText,
 			cssClasses: activeAttributes.class,
 		} ),
@@ -153,17 +160,20 @@ function InlineLinkUI( {
 		};
 
 		const newUrl = prependHTTPS( nextValue?.url ?? '' );
-		const linkFormat = createLinkFormat( {
-			url: newUrl,
-			type: nextValue.type,
-			id:
-				nextValue.id !== undefined && nextValue.id !== null
-					? String( nextValue.id )
-					: undefined,
-			opensInNewWindow: nextValue.opensInNewTab,
-			nofollow: nextValue.nofollow,
-			cssClasses: nextValue.cssClasses,
-		} );
+		const linkFormat = createLinkFormat(
+			{
+				url: newUrl,
+				type: nextValue.type,
+				id:
+					nextValue.id !== undefined && nextValue.id !== null
+						? String( nextValue.id )
+						: undefined,
+				opensInNewWindow: nextValue.opensInNewTab,
+				nofollow: nextValue.nofollow,
+				cssClasses: nextValue.cssClasses,
+			},
+			currentFormat
+		);
 
 		const newText = nextValue.title || newUrl;
 
@@ -335,7 +345,7 @@ function InlineLinkUI( {
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			animate={ false }
 			onClose={ stopAddingLink }
@@ -366,7 +376,7 @@ function InlineLinkUI( {
 					},
 				} }
 			/>
-		</Popover>
+		</WCPopover>
 	);
 }
 

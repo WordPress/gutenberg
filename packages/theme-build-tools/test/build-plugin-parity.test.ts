@@ -20,7 +20,7 @@ import vitePlugin from '../vite-plugins/vite-ds-token-fallbacks.mjs';
 import type { transformDsTokenFallbacks } from '../js-plugins/transform-ds-token-fallbacks.mjs';
 import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 
-const fixturesDirectory = join( __dirname, 'fixtures/build-plugins' );
+const fixturesDirectory = join( import.meta.dirname, 'fixtures/build-plugins' );
 const validJsFixture = join( fixturesDirectory, 'source.ts' );
 const unknownJsFixture = join( fixturesDirectory, 'unknown-token.ts' );
 const emptyFallbackCssFixture = join( fixturesDirectory, 'empty-fallback.css' );
@@ -121,6 +121,35 @@ describe( 'design token fallback build plugin parity', () => {
 			'var(--wpds-dimension-gap-sm, 8px)'
 		);
 	} );
+
+	it( 'leaves token-like text in CSS strings and URLs untouched', async () => {
+		const source = `.fixture {
+			content: "var(--wpds-not-a-token)";
+			background-image: url("var(--wpds-not-a-token)");
+			gap: var(--wpds-dimension-gap-sm);
+		}`;
+		const result = await postcss( [ postcssPlugin ] ).process( source, {
+			from: 'styles.css',
+		} );
+
+		expect( result.css ).toContain( '"var(--wpds-not-a-token)"' );
+		expect( result.css ).toContain( 'url("var(--wpds-not-a-token)")' );
+		expect( result.css ).toContain( 'var(--wpds-dimension-gap-sm, 8px)' );
+	} );
+
+	it.each( [ 'v\\61r', 'VAR', 'VaR', 'V\\41R' ] )(
+		'inserts a fallback for a CSS token reference using %s()',
+		async ( functionName ) => {
+			const source = `.fixture { gap: ${ functionName }(--wpds-dimension-gap-\\73m); }`;
+			const result = await postcss( [ postcssPlugin ] ).process( source, {
+				from: 'styles.css',
+			} );
+
+			expect( result.css ).toContain(
+				`${ functionName }(--wpds-dimension-gap-\\73m, 8px)`
+			);
+		}
+	);
 
 	it( 'keeps nested token fallbacks aligned across PostCSS and Lightning CSS', async () => {
 		const filename = join( fixturesDirectory, 'nested-fallback.css' );

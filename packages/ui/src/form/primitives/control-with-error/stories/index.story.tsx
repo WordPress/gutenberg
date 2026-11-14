@@ -11,6 +11,7 @@ const meta: Meta< typeof ControlWithError > = {
 	argTypes: {
 		children: { control: false },
 		getValidityTarget: { control: false },
+		getInteractiveTarget: { control: false },
 		customValidity: { control: false },
 	},
 	decorators: [ formDecorator ],
@@ -26,10 +27,6 @@ export default meta;
 
 type Story = StoryObj< typeof ControlWithError >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
- */
 export const Default: Story = {
 	args: {
 		required: true,

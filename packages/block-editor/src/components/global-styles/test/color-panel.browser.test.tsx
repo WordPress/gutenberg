@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
@@ -11,17 +11,6 @@ import ColorPanel, {
 	useHasButtonPanel,
 	useHasCaptionPanel,
 } from '../color-panel';
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 const settingsWithColors = ( overrides = {} ) => ( {
 	color: {
@@ -195,11 +184,9 @@ describe( 'element color hooks', () => {
 	} );
 } );
 
-// Inherited Global Styles label treatment for the controls the Color
-// ("Elements") panel still owns after relocation — i.e. link and
-// element-scoped colors. Top-level text and background color label
-// treatment is covered by the Typography and Background panel tests, which
-// now own those controls.
+// Inherited values for the link and element colors the Color ("Elements")
+// panel owns. Text and background colors are covered by the Typography and
+// Background panel tests.
 const baseSettings = {
 	color: {
 		link: true,
@@ -286,7 +273,7 @@ describe( 'ColorPanel — additional elements', () => {
 	} );
 } );
 
-describe( 'ColorPanel — inherited Global Styles label treatment', () => {
+describe( 'ColorPanel inherited Global Styles values', () => {
 	describe( 'Link color', () => {
 		it( 'exposes an accessible reset when local link.text overrides the inherited value', async () => {
 			const inheritedValue = {
@@ -307,10 +294,8 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
-					name: /reset to inherited value/i,
-				} ).length
-			).toBeGreaterThanOrEqual( 1 );
+				screen.getByRole( 'button', { name: 'Reset' } )
+			).toBeInTheDocument();
 		} );
 	} );
 

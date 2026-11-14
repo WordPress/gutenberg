@@ -2,7 +2,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import { unlock } from '../../lock-unlock';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
 // synthesizes from it. Other engines place it in the mousedown's default
@@ -23,7 +24,8 @@ export default function useClickSelection() {
 		__unstableIsFullySelected,
 		canMoveBlocks,
 		getSelectedBlockClientIds,
-	} = useSelect( blockEditorStore );
+		canHostEditableRoot,
+	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			let pointerType: string | undefined;
@@ -33,6 +35,58 @@ export default function useClickSelection() {
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
+
+				if ( node.contentEditable !== 'true' ) {
+					return;
+				}
+
+				const clientId = getBlockClientId( event.target as Element );
+
+				// A press on a block that is edited on its own element: give
+				// focus back to the field with the caret before the browser
+				// handles the press, so it handles a press into another field.
+				// A press inside the focused editing host loses the caret once
+				// focus moves to the field: Firefox drops it, and iOS moves it.
+				if ( ! clientId || canHostEditableRoot( clientId ) ) {
+					return;
+				}
+
+				const field = getSelectionEditableElement(
+					// A mounted element's window has a selection.
+					node.ownerDocument.defaultView!.getSelection()!,
+					node
+				) as HTMLElement | undefined;
+
+				if ( ! field ) {
+					return;
+				}
+
+				setContentEditableWrapper( node, false );
+				field.focus( { preventScroll: true } );
+
+				// A mouse press is also cancelled when a native drag starts,
+				// which must leave the field as its own editing host.
+				if ( pointerType !== 'touch' ) {
+					return;
+				}
+
+				// The touch became a scroll: the wrapper hosts the field again.
+				function onPointerCancel() {
+					setContentEditableWrapper( node, true );
+				}
+				node.addEventListener( 'pointercancel', onPointerCancel, {
+					once: true,
+				} );
+				// A tap: nothing to undo.
+				node.addEventListener(
+					'pointerup',
+					() =>
+						node.removeEventListener(
+							'pointercancel',
+							onPointerCancel
+						),
+					{ once: true }
+				);
 			}
 
 			function onMouseDown( event: MouseEvent ) {
@@ -62,7 +116,10 @@ export default function useClickSelection() {
 					clickedClientId &&
 					clickedClientId === startClientId &&
 					node.contentEditable === 'true' &&
-					node.ownerDocument.activeElement === node
+					// Not `activeElement`: with nothing focused, as after the
+					// keyboard is hidden, it falls back to the body, which in
+					// the iframe is this wrapper.
+					node.matches( ':focus' )
 				) {
 					event.preventDefault();
 					return;
@@ -212,6 +269,7 @@ export default function useClickSelection() {
 			__unstableIsFullySelected,
 			canMoveBlocks,
 			getSelectedBlockClientIds,
+			canHostEditableRoot,
 		]
 	);
 }

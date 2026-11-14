@@ -10,7 +10,7 @@ import {
 import { Y } from '@wordpress/sync';
 import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
@@ -25,43 +25,55 @@ import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
 /**
- * Mock getBlockTypes so CRDT merging can identify rich-text attributes.
- * Also stub __unstableSerializeAndClean so we can assert how it's invoked
- * (the real implementation returns "" without registered block types, which
- * isn't useful for asserting closure-capture behavior).
+ * Mock getBlockTypes so CRDT merging can identify rich-text attributes, and
+ * getBlockType so the persisted-document check can tell which block types are
+ * registered. Also stub __unstableSerializeAndClean so we can assert how it's
+ * invoked (the real implementation returns "" without registered block types,
+ * which isn't useful for asserting closure-capture behavior).
  */
 vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	const actual = await importOriginal();
-	return {
-		...actual,
-		getBlockTypes: ( () => [
-			{
-				name: 'core/paragraph',
-				attributes: { content: { type: 'rich-text' } },
-			},
-			{
-				name: 'core/table',
-				attributes: {
-					hasFixedLayout: { type: 'boolean' },
-					caption: { type: 'rich-text' },
-					body: {
-						type: 'array',
-						query: {
-							cells: {
-								type: 'array',
-								query: {
-									content: { type: 'rich-text' },
-									tag: { type: 'string' },
-								},
+	const blockTypes = [
+		{
+			name: 'core/paragraph',
+			attributes: { content: { type: 'rich-text' } },
+		},
+		{
+			name: 'core/table',
+			attributes: {
+				hasFixedLayout: { type: 'boolean' },
+				caption: { type: 'rich-text' },
+				body: {
+					type: 'array',
+					query: {
+						cells: {
+							type: 'array',
+							query: {
+								content: { type: 'rich-text' },
+								tag: { type: 'string' },
 							},
 						},
 					},
 				},
 			},
-		] ) as unknown as typeof import( '@wordpress/blocks' ).getBlockTypes,
+		},
+	];
+	return {
+		...actual,
+		getBlockTypes: ( () =>
+			blockTypes ) as unknown as typeof import( '@wordpress/blocks' ).getBlockTypes,
+		getBlockType: ( ( name: string ) =>
+			blockTypes.find(
+				( blockType ) => blockType.name === name
+			) ) as unknown as typeof import( '@wordpress/blocks' ).getBlockType,
+		getUnregisteredTypeHandlerName: () => 'core/missing',
 		// Mocked so tests can control what the Code Editor sync path "parses"
 		// from raw content without needing real block-type registration.
 		parse: vi.fn( () => [] ),
+		serialize: vi.fn(
+			( blocks: Parameters< typeof actual.serialize >[ 0 ] ) =>
+				`serialized-block:${ Array.isArray( blocks ) ? blocks.length : 1 }`
+		),
 		__unstableSerializeAndClean: vi.fn(
 			( blocks: unknown[] ) => `serialized:${ blocks?.length ?? 0 }`
 		),
@@ -1177,6 +1189,179 @@ describe( 'crdt', () => {
 			} );
 		} );
 
+		describe( 'with a persisted CRDT document', () => {
+			let persistedDoc: Y.Doc;
+			let persistedMap: YMapWrap< YPostRecord >;
+
+			// The mocked serializer turns one top-level block into
+			// "serialized:1", so this content matches any persisted document
+			// with a single top-level block and the serialized comparison on
+			// its own reports no change.
+			const editedRecord = {
+				content: { raw: 'serialized:1', rendered: '' },
+				blocks: [],
+			} as unknown as Post;
+
+			beforeEach( () => {
+				persistedDoc = new Y.Doc( {
+					meta: new Map( [
+						[ CRDT_DOC_META_PERSISTENCE_KEY, true ],
+					] ),
+				} );
+				persistedMap = getRootMap< YPostRecord >(
+					persistedDoc,
+					CRDT_RECORD_MAP_KEY
+				);
+			} );
+
+			afterEach( () => {
+				persistedDoc.destroy();
+			} );
+
+			it( 'returns no block changes when the serialized blocks match the content and every block type is registered', () => {
+				setBlocksInDoc( persistedMap, [
+					createYBlock( 'core/paragraph', { content: 'Hello' } ),
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+			} );
+
+			it( 'returns block changes when a missing block stands in for a block type that is registered again', () => {
+				setBlocksInDoc( persistedMap, [
+					createYBlock( 'core/missing', {
+						originalName: 'core/paragraph',
+						originalContent:
+							'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+					} ),
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.blocks ).toBeDefined();
+			} );
+
+			it( 'keeps a missing block whose block type is still not registered', () => {
+				setBlocksInDoc( persistedMap, [
+					createYBlock( 'core/missing', {
+						originalName: 'plugin/deactivated',
+						originalContent: '<!-- wp:plugin/deactivated /-->',
+					} ),
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+			} );
+
+			it( 'returns block changes when a block type is no longer registered', () => {
+				setBlocksInDoc( persistedMap, [
+					createYBlock( 'plugin/deactivated', {} ),
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.blocks ).toBeDefined();
+			} );
+
+			it( 'returns block changes when an invalid block would parse as valid now', () => {
+				const invalidBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				invalidBlock.set( 'isValid', false );
+				setBlocksInDoc( persistedMap, [ invalidBlock ] );
+
+				// The block type, or a new deprecation, accepts the markup again.
+				( parse as Mock ).mockReturnValueOnce( [
+					{ name: 'core/paragraph', isValid: true },
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.blocks ).toBeDefined();
+				expect( parse ).toHaveBeenCalledWith( 'serialized-block:1' );
+			} );
+
+			it( 'keeps an invalid block that still does not parse as valid', () => {
+				const invalidBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				invalidBlock.set( 'isValid', false );
+				setBlocksInDoc( persistedMap, [ invalidBlock ] );
+
+				( parse as Mock ).mockReturnValueOnce( [
+					{ name: 'core/paragraph', isValid: false },
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+			} );
+
+			it( 'does not re-parse blocks that were stored as valid', () => {
+				const validBlock = createYBlock( 'core/paragraph', {
+					content: 'Hello',
+				} );
+				validBlock.set( 'isValid', true );
+				setBlocksInDoc( persistedMap, [ validBlock ] );
+				( parse as Mock ).mockClear();
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes ).not.toHaveProperty( 'blocks' );
+				expect( parse ).not.toHaveBeenCalled();
+			} );
+
+			it( 'checks inner blocks too', () => {
+				setBlocksInDoc( persistedMap, [
+					createYBlock( 'core/paragraph', { content: 'Outer' }, [
+						createYBlock( 'core/missing', {
+							originalName: 'core/paragraph',
+							originalContent:
+								'<!-- wp:paragraph --><p>Inner</p><!-- /wp:paragraph -->',
+						} ),
+					] ),
+				] );
+
+				const changes = getPostChangesFromCRDTDoc(
+					persistedDoc,
+					editedRecord,
+					defaultSyncedProperties
+				);
+
+				expect( changes.blocks ).toBeDefined();
+			} );
+		} );
+
 		it( 'injects a closure-based content function when blocks changed but content did not', () => {
 			addBlockToDoc( map, 'block-1', 'Hello world' );
 
@@ -1274,6 +1459,53 @@ describe( 'crdt', () => {
 		} );
 	} );
 } );
+
+let yBlockCounter = 0;
+
+/**
+ * Builds a block for a CRDT document from plain attribute values, without
+ * adding it to a document.
+ *
+ * @param name        Block name.
+ * @param attributes  Attribute values, stored as plain values.
+ * @param innerBlocks Inner blocks, built with this same helper.
+ */
+function createYBlock(
+	name: string,
+	attributes: Record< string, unknown >,
+	innerBlocks: YBlock[] = []
+): YBlock {
+	const block = createYMap< YBlockRecord >();
+	block.set( 'name', name );
+	block.set( 'clientId', `block-${ ++yBlockCounter }` );
+
+	const attrs = new Y.Map();
+	Object.entries( attributes ).forEach( ( [ key, value ] ) => {
+		attrs.set( key, value );
+	} );
+	block.set( 'attributes', attrs );
+
+	const inner = new Y.Array< YBlock >();
+	inner.push( innerBlocks );
+	block.set( 'innerBlocks', inner );
+
+	return block;
+}
+
+/**
+ * Replaces the blocks of a CRDT document.
+ *
+ * @param map    The document's root map.
+ * @param blocks Blocks built with createYBlock.
+ */
+function setBlocksInDoc(
+	map: YMapWrap< YPostRecord >,
+	blocks: YBlock[]
+): void {
+	const yblocks = new Y.Array< YBlock >();
+	map.set( 'blocks', yblocks );
+	yblocks.push( blocks );
+}
 
 /**
  * Helper to create a block with a Y.Text content attribute

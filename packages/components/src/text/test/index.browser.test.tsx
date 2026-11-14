@@ -69,7 +69,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			'rgb(112, 112, 112)'
+			'rgb(110, 110, 110)'
 		);
 	} );
 
@@ -124,7 +124,7 @@ describe( 'Text', () => {
 		);
 
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			'rgb(112, 112, 112)'
+			'rgb(110, 110, 110)'
 		);
 	} );
 
