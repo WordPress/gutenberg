@@ -321,8 +321,7 @@ describe( 'PaletteEdit', () => {
 		await userEvent.click(
 			await screen.findByRole( 'menuitem', { name: 'Show details' } )
 		);
-		// Load the duplicate definitions in details view, where items use their
-		// position as the key rather than the currently duplicated slug.
+		// Load the duplicate definitions in details view before editing them.
 		await userEvent.click(
 			screen.getByRole( 'button', { name: 'Load palette' } )
 		);
@@ -1177,4 +1176,276 @@ describe( 'PaletteEdit', () => {
 			] );
 		} );
 	} );
+} );
+
+describe( 'PaletteEdit item identity', () => {
+	const red = { name: 'Red', slug: 'red', color: '#ff0000' },
+		blue = { name: 'Blue', slug: 'blue', color: '#0000ff' };
+	it( 'commits the last compact color edit when the editor is dismissed', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		await render(
+			<PaletteEdit
+				paletteLabel="Colors"
+				slugPrefix=""
+				onChange={ onChange }
+				colors={ [ red ] }
+			/>
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Red' } ) );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Edit: Red',
+		} );
+		await user.fill(
+			within( dialog ).getByRole( 'textbox', { name: 'Hex color' } ),
+			'00ff00'
+		);
+		await user.keyboard( '{Escape}' );
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect( onChange ).toHaveBeenCalledWith( [
+				{ ...red, color: '#00ff00' },
+			] )
+		);
+	} );
+	it( 'keeps the edited preset when a queued change finishes after a reorder', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const props = { paletteLabel: 'Colors', slugPrefix: '', onChange };
+		const view = await render(
+			<PaletteEdit { ...props } colors={ [ red, blue ] } />
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Red' } ) );
+		const dialog = await screen.findByRole( 'dialog', {
+			name: 'Edit: Red',
+		} );
+		const input = within( dialog ).getByRole( 'textbox', {
+			name: 'Hex color',
+		} );
+		await user.fill( input, '00ff00' );
+		await view.rerender(
+			<PaletteEdit { ...props } colors={ [ blue, red ] } />
+		);
+		const editedColors = [ { ...red, color: '#00ff00' }, blue ];
+		await waitFor( () =>
+			expect( onChange ).toHaveBeenCalledWith( editedColors )
+		);
+		await view.rerender(
+			<PaletteEdit { ...props } colors={ editedColors } />
+		);
+		expect(
+			screen.getByRole( 'dialog', { name: 'Edit: Red' } )
+		).toBeInTheDocument();
+		expect( input ).toHaveFocus();
+	} );
+	it.each( [ 'details', 'swatches' ] )(
+		'edits the same color after external reorder in %s',
+		async ( mode ) => {
+			const user = userEvent.setup(),
+				onChange = vi.fn();
+			const props = { paletteLabel: 'Colors', slugPrefix: '', onChange };
+			const view = await render(
+				<PaletteEdit { ...props } colors={ [ red, blue ] } />
+			);
+			if ( mode === 'details' ) {
+				await user.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await user.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			await user.click(
+				screen.getByRole( 'button', {
+					name: mode === 'details' ? 'Edit: Red' : 'Red',
+				} )
+			);
+			const originalDialog = await screen.findByRole( 'dialog', {
+				name: 'Edit: Red',
+			} );
+			const originalInput = within( originalDialog ).getByRole(
+				'textbox',
+				{ name: 'Hex color' }
+			);
+			await user.click( originalInput );
+			await view.rerender(
+				<PaletteEdit { ...props } colors={ [ blue, red ] } />
+			);
+			const dialog = screen.getByRole( 'dialog', { name: 'Edit: Red' } );
+			expect( originalInput ).toHaveFocus();
+			await user.fill(
+				within( dialog ).getByRole( 'textbox', { name: 'Hex color' } ),
+				'00ff00'
+			);
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenLastCalledWith( [
+					blue,
+					{ ...red, color: '#00ff00' },
+				] )
+			);
+		}
+	);
+	it( 'closes a removed swatch editor and keeps it closed if the slug returns', async () => {
+		const user = userEvent.setup();
+		const props = {
+			paletteLabel: 'Colors',
+			slugPrefix: '',
+			onChange: () => {},
+		};
+		const view = await render(
+			<PaletteEdit { ...props } colors={ [ red, blue ] } />
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Red' } ) );
+		await screen.findByRole( 'dialog', { name: 'Edit: Red' } );
+		await view.rerender( <PaletteEdit { ...props } colors={ [ blue ] } /> );
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		await view.rerender(
+			<PaletteEdit { ...props } colors={ [ red, blue ] } />
+		);
+		expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+	} );
+	it.each( [ 'details', 'swatches' ] )(
+		'closes a removed duplicate editor when a new preset uses its normalized slug in %s',
+		async ( mode ) => {
+			const user = userEvent.setup();
+			const props = {
+				paletteLabel: 'Colors',
+				slugPrefix: '',
+				onChange: vi.fn(),
+			};
+			const duplicate = { ...red, name: 'Duplicate red' };
+			const view = await render(
+				<PaletteEdit { ...props } colors={ [ red, duplicate ] } />
+			);
+			if ( mode === 'details' ) {
+				await user.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await user.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			await user.click(
+				screen.getByRole( 'button', {
+					name:
+						mode === 'details'
+							? 'Edit: Duplicate red'
+							: 'Duplicate red',
+				} )
+			);
+			await screen.findByRole( 'dialog', {
+				name: 'Edit: Duplicate red',
+			} );
+			await view.rerender(
+				<PaletteEdit
+					{ ...props }
+					colors={ [
+						red,
+						{ name: 'New green', slug: 'red-1', color: '#00ff00' },
+					] }
+				/>
+			);
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+		}
+	);
+	it.each( [ 'details', 'swatches' ] )(
+		'keeps duplicate preset identity when canonical slugs collide in %s',
+		async ( mode ) => {
+			const user = userEvent.setup(),
+				onChange = vi.fn();
+			const duplicate = {
+				name: 'Duplicate red',
+				slug: 'red',
+				color: '#ee0000',
+			};
+			const suffix = {
+				name: 'Existing suffix',
+				slug: 'red-1',
+				color: '#dd0000',
+			};
+			const props = { paletteLabel: 'Colors', slugPrefix: '', onChange };
+			const view = await render(
+				<PaletteEdit { ...props } colors={ [ red ] } />
+			);
+			if ( mode === 'details' ) {
+				await user.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await user.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			await view.rerender(
+				<PaletteEdit { ...props } colors={ [ red, duplicate ] } />
+			);
+			await user.click(
+				screen.getByRole( 'button', {
+					name:
+						mode === 'details'
+							? 'Edit: Duplicate red'
+							: 'Duplicate red',
+				} )
+			);
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Edit: Duplicate red',
+			} );
+			const input = within( dialog ).getByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await user.click( input );
+			await view.rerender(
+				<PaletteEdit
+					{ ...props }
+					colors={ [ red, duplicate, suffix ] }
+				/>
+			);
+			expect(
+				screen.getByRole( 'dialog', { name: 'Edit: Duplicate red' } )
+			).toBeInTheDocument();
+			expect( input ).toHaveFocus();
+			await user.fill( input, '00ff00' );
+			const normalized = [
+				red,
+				{ ...duplicate, slug: 'red-2', color: '#00ff00' },
+				suffix,
+			];
+			const emitted =
+				mode === 'details'
+					? normalized
+					: [ red, { ...duplicate, color: '#00ff00' }, suffix ];
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenLastCalledWith( emitted )
+			);
+			await view.rerender(
+				<PaletteEdit { ...props } colors={ normalized } />
+			);
+			expect(
+				screen.getByRole( 'dialog', { name: 'Edit: Duplicate red' } )
+			).toBeInTheDocument();
+			expect( input ).toHaveFocus();
+			await view.rerender(
+				<PaletteEdit
+					{ ...props }
+					colors={ [
+						...normalized,
+						{
+							name: 'New duplicate',
+							slug: 'red',
+							color: '#cc0000',
+						},
+					] }
+				/>
+			);
+			expect(
+				screen.getByRole( 'dialog', { name: 'Edit: Duplicate red' } )
+			).toBeInTheDocument();
+			expect( input ).toHaveFocus();
+		}
+	);
 } );
