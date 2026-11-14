@@ -556,5 +556,25 @@ describe( 'block parser', () => {
 
 			expect( serialize( parse( content ) ) ).toBe( content );
 		} );
+
+		it( 'should retain custom attributes through a Custom HTML fallback save and reload', () => {
+			registerBlockType( 'core/html', {
+				...htmlBlockSettings,
+				attributes: {
+					customAttribute: { type: 'string' },
+				},
+			} );
+			setFreeformContentHandlerName( 'core/html' );
+			const content =
+				'<!-- wp:html {"customAttribute":"Widget setting"} -->\n' +
+				'<p>Widget content</p>\n<!-- /wp:html -->';
+			const saved = serialize( parse( content ) );
+			const [ reloaded ] = parse( saved );
+
+			expect( reloaded.attributes.customAttribute ).toBe(
+				'Widget setting'
+			);
+			expect( serialize( reloaded ) ).toBe( content );
+		} );
 	} );
 } );
