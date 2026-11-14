@@ -10,6 +10,7 @@
 
 -   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   Ship `wp-theme` and `wp-theme-setup` agent skills with the package, including the design tokens reference, for agents styling with the design tokens and setting up linters and build-time fallbacks.
 
 ### Enhancements
 
