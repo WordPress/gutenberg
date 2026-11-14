@@ -292,7 +292,7 @@ export function MediaUploadModal( {
 	const legacyPopoverSlotName = useId();
 	// Custom content can bundle older overlay implementations that are invisible
 	// to the host's capability check. Keep their established legacy host.
-	const useUiOverlay =
+	const supported =
 		supportsUiOverlays() &&
 		! registeredFields?.some(
 			( field ) =>
@@ -304,6 +304,19 @@ export function MediaUploadModal( {
 				( field.description !== undefined &&
 					typeof field.description !== 'string' )
 		);
+	const [ overlaySession, setOverlaySession ] = useState( {
+		open: isOpen,
+		native: supported,
+	} );
+	if ( overlaySession.open !== isOpen ) {
+		setOverlaySession( {
+			open: isOpen,
+			native: isOpen ? supported : overlaySession.native,
+		} );
+	} else if ( overlaySession.native && ! supported ) {
+		setOverlaySession( { ...overlaySession, native: false } );
+	}
+	const useUiOverlay = overlaySession.native && supported;
 	const Content = useUiOverlay ? Dialog.Content : 'div';
 	// The "uploaded to this post" option resolves to this ID, and the media query
 	// has no use for anything else — a template's entity ID, for instance, is a

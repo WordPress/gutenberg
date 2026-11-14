@@ -705,6 +705,30 @@ describe( 'MediaUploadModal', () => {
 				expect( dialog.dataset.wpUiOverlayModal ).toBe( native );
 				unmount();
 			}
+			const { rerender, unmount } = renderModal( {
+				fields: [ genreField ],
+			} );
+			expect(
+				( await screen.findByRole( 'dialog' ) ).dataset.wpUiOverlayModal
+			).toBe( '' );
+			rerender( {
+				isOpen: true,
+				fields: [ { ...genreField, header: <span>Genre</span> } ],
+			} );
+			expect(
+				screen.getByRole( 'dialog' ).dataset.wpUiOverlayModal
+			).toBeUndefined();
+			rerender( { isOpen: true, fields: [ genreField ] } );
+			expect(
+				screen.getByRole( 'dialog' ).dataset.wpUiOverlayModal
+			).toBeUndefined();
+			rerender( { isOpen: false, fields: [ genreField ] } );
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			rerender( { isOpen: true, fields: [ genreField ] } );
+			expect(
+				( await screen.findByRole( 'dialog' ) ).dataset.wpUiOverlayModal
+			).toBe( '' );
+			unmount();
 		} );
 
 		it( 'offers a registered field as a filter', async () => {
