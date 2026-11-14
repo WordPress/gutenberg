@@ -10,7 +10,12 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback, useLayoutEffect } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useContext,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
 import { ThemeProvider } from '@wordpress/theme';
@@ -29,6 +34,7 @@ import {
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 import { useCollaboratorNotifications } from '../collaborators-presence/use-collaborator-notifications';
 import SavePublishPanels from '../save-publish-panels';
+import { SaveShortcutContext } from '../global-keyboard-shortcuts/save-shortcut-context';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
@@ -174,6 +180,42 @@ export default function EditorInterface( {
 	// Note 'truthy' callback implies an open panel.
 	const [ entitiesSavedStatesCallback, setEntitiesSavedStatesCallback ] =
 		useState( false );
+	const saveShortcutHandlerRef = useContext( SaveShortcutContext );
+	useLayoutEffect( () => {
+		if (
+			! saveShortcutHandlerRef ||
+			isPreviewMode ||
+			isRevisionsMode ||
+			customSavePanel
+		) {
+			return;
+		}
+
+		const handleSave = () => {
+			// Preserve the current selection and any publication callback.
+			if ( entitiesSavedStatesCallback ) {
+				return true;
+			}
+			if ( ! registry.select( editorStore ).hasNonPostEntityChanges() ) {
+				return false;
+			}
+			setEntitiesSavedStatesCallback( true );
+			return true;
+		};
+		saveShortcutHandlerRef.current = handleSave;
+		return () => {
+			if ( saveShortcutHandlerRef.current === handleSave ) {
+				saveShortcutHandlerRef.current = null;
+			}
+		};
+	}, [
+		saveShortcutHandlerRef,
+		registry,
+		entitiesSavedStatesCallback,
+		isPreviewMode,
+		isRevisionsMode,
+		customSavePanel,
+	] );
 	const closeEntitiesSavedStates = useCallback(
 		( arg ) => {
 			if ( typeof entitiesSavedStatesCallback === 'function' ) {
