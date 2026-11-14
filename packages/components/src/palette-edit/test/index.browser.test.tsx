@@ -676,8 +676,9 @@ describe( 'PaletteEdit', () => {
 				} )
 			);
 			const menu = await screen.findByRole( 'menu' );
-			const slot = getCompatibilityOverlaySlot();
-			expect( slot ).toBeInTheDocument();
+			expect( compatibilityWindow.__wpUiCompatOverlaySlotEnabled ).toBe(
+				true
+			);
 			expect( modalRef.current ).toContainElement( menu );
 			await waitFor( () => expect( menu ).toBeVisible() );
 

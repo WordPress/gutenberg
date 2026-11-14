@@ -1,5 +1,11 @@
 import { Component } from '@wordpress/element';
-import { addAction, applyFilters, removeAction } from '@wordpress/hooks';
+import {
+	addAction,
+	applyFilters,
+	removeAction,
+	filters,
+	type Handler,
+} from '@wordpress/hooks';
 import { createHigherOrderComponent, debounce } from '@wordpress/compose';
 import { v4 as uuid } from 'uuid';
 
@@ -51,6 +57,7 @@ export default function withFilters( hookName: string ) {
 		 * calls to `applyFilters` when many instances exist.
 		 */
 		let FilteredComponent: React.ComponentType | undefined;
+		let appliedHandlers: Handler[] = [];
 		const overlaySupportListeners = new Set< () => void >();
 		let isListening = false;
 		let unsubscribeRenderer: ( () => void ) | undefined;
@@ -111,18 +118,30 @@ export default function withFilters( hookName: string ) {
 			} else {
 				removeAction( 'hookRemoved', namespace );
 				removeAction( 'hookAdded', namespace );
-				throttledForceUpdate.cancel();
-				FilteredComponent = undefined;
 			}
 		}
 
 		/**
-		 * Initializes the FilteredComponent variable once, if not already
-		 * assigned. Subsequent calls are effectively a noop.
+		 * Keep the selected renderer stable across remounts. While no owner is
+		 * listening, only reapply filters if their handlers have changed.
 		 */
 		function ensureFilteredComponent() {
-			if ( FilteredComponent === undefined ) {
+			const handlers = filters[ hookName ]?.handlers ?? [];
+			if (
+				FilteredComponent === undefined ||
+				( ! isListening &&
+					( handlers.length !== appliedHandlers.length ||
+						handlers.some(
+							( handler, index ) =>
+								handler !== appliedHandlers[ index ]
+						) ) )
+			) {
+				// An inactive preflight or remount consumes any pending update.
+				if ( ! isListening ) {
+					throttledForceUpdate.cancel();
+				}
 				FilteredComponent = resolveFilteredComponent();
+				appliedHandlers = handlers.slice();
 			}
 			return FilteredComponent;
 		}
@@ -132,9 +151,7 @@ export default function withFilters( hookName: string ) {
 
 			/** Whether the selected renderer explicitly supports WordPress UI overlays. */
 			static get supportsUiOverlays(): boolean {
-				const component = isListening
-					? ensureFilteredComponent()
-					: resolveFilteredComponent();
+				const component = ensureFilteredComponent();
 				return (
 					!! component &&
 					Object.hasOwn( component, 'supportsUiOverlays' ) &&
@@ -197,6 +214,7 @@ export default function withFilters( hookName: string ) {
 			// Recreate the filtered component, only after delay so that it's
 			// computed once, even if many filters added.
 			FilteredComponent = resolveFilteredComponent();
+			appliedHandlers = ( filters[ hookName ]?.handlers ?? [] ).slice();
 			updateRendererSubscription();
 			notifyOverlaySupportListeners();
 

@@ -1,6 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import {
+	act,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from '@testing-library/react';
 import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
+import { useState } from '@wordpress/element';
 import withFilters from '..';
 
 describe( 'withFilters', () => {
@@ -127,6 +134,68 @@ describe( 'withFilters', () => {
 			firstUnsubscribe();
 			secondUnsubscribe();
 		}
+	} );
+
+	it( 'preserves renderer state when the final mounted instance is replaced in one commit', () => {
+		const Counter = () => {
+			const [ count, setCount ] = useState( 0 );
+			return (
+				<button onClick={ () => setCount( count + 1 ) }>
+					{ count }
+				</button>
+			);
+		};
+		addFilter(
+			hookName,
+			'test/enhanced-component-override',
+			( Wrapped ) => () => <Wrapped />
+		);
+		const Enhanced = withFilters( hookName )( Counter );
+		const { rerender } = render( <Enhanced key="first" /> );
+		rerender( <Enhanced key="second" /> );
+		fireEvent.click( screen.getByRole( 'button', { name: '0' } ) );
+		rerender( <Enhanced key="second" /> );
+		expect( screen.getByRole( 'button', { name: '1' } ) ).toBeVisible();
+	} );
+
+	it( 'applies a queued filter update when the final instance is replaced', () => {
+		vi.useFakeTimers();
+		const Original = Object.assign( () => <span>Original content</span>, {
+			supportsUiOverlays: true,
+		} );
+		const Enhanced = withFilters( hookName )( Original );
+		const { rerender } = render( <Enhanced key="first" /> );
+		addFilter( hookName, 'test/enhanced-component-override', () => () => (
+			<span>Updated content</span>
+		) );
+		rerender( <Enhanced key="second" /> );
+		act( () => vi.advanceTimersByTime( 16 ) );
+		expect( screen.getByText( 'Updated content' ) ).toBeVisible();
+		expect( Enhanced.supportsUiOverlays ).toBe( false );
+	} );
+
+	it( 'does not reapply an update already consumed by an inactive remount', () => {
+		vi.useFakeTimers();
+		const Counter = () => {
+			const [ count, setCount ] = useState( 0 );
+			return (
+				<button onClick={ () => setCount( count + 1 ) }>
+					{ count }
+				</button>
+			);
+		};
+		const Enhanced = withFilters( hookName )( Counter );
+		const { unmount } = render( <Enhanced /> );
+		addFilter(
+			hookName,
+			'test/enhanced-component-override',
+			( Wrapped ) => () => <Wrapped />
+		);
+		unmount();
+		render( <Enhanced /> );
+		fireEvent.click( screen.getByRole( 'button', { name: '0' } ) );
+		act( () => vi.advanceTimersByTime( 16 ) );
+		expect( screen.getByRole( 'button', { name: '1' } ) ).toBeVisible();
 	} );
 
 	it( 'should display original component when no filters applied', () => {
