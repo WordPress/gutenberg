@@ -125,21 +125,49 @@ function LegacyHost() {
 	);
 }
 
-function RegisteredSlotHost() {
+function RegisteredSlotHost( {
+	slotName,
+	scoped = false,
+	nested = false,
+}: {
+	slotName?: string;
+	scoped?: boolean;
+	nested?: boolean;
+} ) {
 	useEnableWpCompatOverlaySlot();
+	const scopedSlotName = scoped ? 'scoped' : undefined;
+	const nestedSlotName = nested ? 'nested' : scopedSlotName;
 	return (
 		<SlotFillProvider>
-			<section aria-label="Explicit popover slot">
+			<section aria-label="Default popover slot">
 				<LegacyPopover.Slot />
+			</section>
+			<section aria-label="Named popover slot">
+				<LegacyPopover.Slot name="named" />
 			</section>
 			<UIPopover.Root defaultOpen>
 				<UIPopover.Popup>
 					<UIPopover.Title>Slot host</UIPopover.Title>
-					<Dropdown
-						defaultOpen
-						renderToggle={ () => <span>Legacy dropdown</span> }
-						renderContent={ () => <p>Explicitly placed content</p> }
-					/>
+					<LegacyPopover.__unstableSlotNameProvider
+						value={ scopedSlotName }
+					>
+						<LegacyPopover.__unstableSlotNameProvider
+							value={ nestedSlotName }
+						>
+							<LegacyPopover
+								__unstableSlotName={ slotName }
+								focusOnMount={ false }
+							>
+								Explicitly placed content
+							</LegacyPopover>
+						</LegacyPopover.__unstableSlotNameProvider>
+					</LegacyPopover.__unstableSlotNameProvider>
+					<section aria-label="Scoped popover slot">
+						<LegacyPopover.Slot name="scoped" />
+					</section>
+					<section aria-label="Nested popover slot">
+						<LegacyPopover.Slot name="nested" />
+					</section>
 					<UIPopover.Close>Close slot host</UIPopover.Close>
 				</UIPopover.Popup>
 			</UIPopover.Root>
@@ -150,13 +178,32 @@ function RegisteredSlotHost() {
 describe( 'Mixed overlay compatibility', () => {
 	afterEach( () => vi.unstubAllGlobals() );
 
-	it( 'preserves a registered default popover slot outside the owning portal', async () => {
-		await render( <RegisteredSlotHost /> );
-		expect(
-			within(
-				screen.getByRole( 'region', { name: 'Explicit popover slot' } )
-			).getByText( 'Explicitly placed content' )
-		).toBeInTheDocument();
+	it( 'preserves registered popover slots and explicit names inside scoped providers', async () => {
+		for ( const { props, destination } of [
+			{ props: {}, destination: 'Default' },
+			{ props: { scoped: true }, destination: 'Scoped' },
+			{ props: { scoped: true, nested: true }, destination: 'Nested' },
+			{
+				props: { scoped: true, nested: true, slotName: 'named' },
+				destination: 'Named',
+			},
+			{
+				props: { scoped: true, slotName: 'Popover' },
+				destination: 'Default',
+			},
+		] ) {
+			const { unmount } = await render(
+				<RegisteredSlotHost { ...props } />
+			);
+			expect(
+				within(
+					screen.getByRole( 'region', {
+						name: `${ destination } popover slot`,
+					} )
+				).getByText( 'Explicitly placed content' )
+			).toBeInTheDocument();
+			await unmount();
+		}
 	} );
 
 	it( 'restores a legacy field flyout after its child modal closes', async () => {

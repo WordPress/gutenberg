@@ -22,6 +22,7 @@
 
 ### Bug Fixes
 
+-   `Popover`: Preserve explicit slot names inside scoped slot providers ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `withFilters`: Keep subscriptions independent when separate wrappers use the same hook ([#86843](https://github.com/WordPress/gutenberg/pull/86843)).
 -   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).

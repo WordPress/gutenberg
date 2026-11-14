@@ -135,7 +135,7 @@ const UnforwardedPopover = (
 		anchor,
 		expandOnMobile,
 		onFocusOutside,
-		__unstableSlotName = SLOT_NAME,
+		__unstableSlotName,
 		flip = true,
 		resize = true,
 		shift = false,
@@ -266,7 +266,8 @@ const UnforwardedPopover = (
 			} ),
 		arrow( { element: arrowRef } ),
 	];
-	const slotName = useContext( slotNameContext ) || __unstableSlotName;
+	const inheritedSlotName = useContext( slotNameContext );
+	const slotName = __unstableSlotName ?? ( inheritedSlotName || SLOT_NAME );
 	const slot = useSlot( slotName );
 
 	let onDialogClose;
