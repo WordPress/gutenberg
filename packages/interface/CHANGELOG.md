@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   ComplementaryArea: Mark the pinned sidebar icon for the editor's button text-label styles ([#85960](https://github.com/WordPress/gutenberg/pull/85960)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 11.1.0 (2026-11-04)
