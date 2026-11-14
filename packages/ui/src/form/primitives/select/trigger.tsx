@@ -1,12 +1,11 @@
 import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import selectTriggerStyles from '../../../utils/css/select-trigger.module.css';
+import { Caret } from '../../../utils/caret';
 import { InputLayout } from '../input-layout';
-import { Icon } from '../../../icon';
 import type { SelectTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
@@ -49,11 +48,7 @@ export const Trigger = forwardRef< HTMLButtonElement, SelectTriggerProps >(
 					>
 						{ children }
 					</_Select.Value>
-					<Icon
-						className={ selectTriggerStyles[ 'trigger-caret' ] }
-						icon={ chevronDown }
-						size={ 18 }
-					/>
+					<Caret />
 				</_Select.Trigger>
 			</InputLayout>
 		);

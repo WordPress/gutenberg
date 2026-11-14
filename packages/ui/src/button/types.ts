@@ -1,6 +1,7 @@
 import { type ReactNode, type HTMLAttributes } from 'react';
 import type { Button as _Button } from '@base-ui/react/button';
 import { type IconProps } from '../icon/types';
+import type { CaretProps } from '../utils/caret';
 import type { ComponentProps } from '../utils/types';
 
 type _ButtonProps = ComponentProps< typeof _Button >;
@@ -84,3 +85,5 @@ export interface ButtonIconProps extends IconProps {
 	 */
 	icon: IconProps[ 'icon' ];
 }
+
+export type ButtonCaretProps = CaretProps;
