@@ -12,7 +12,7 @@ const PRESET_CSS_VAR_REGEX =
 
 // Returns a preset's slug from either form, or `undefined` when the value isn't
 // a preset.
-function getPresetSlug( value ) {
+function getPresetSlug( value: string ): string | undefined {
 	if ( value.startsWith( PRESET_USER_PREFIX ) ) {
 		return value.split( '|' ).pop();
 	}
@@ -27,15 +27,26 @@ function getPresetSlug( value ) {
 }
 
 // True when a value is actually set.
-const isSet = ( value ) =>
+const isSet = ( value: unknown ): boolean =>
 	value !== undefined && value !== null && value !== '';
 
-const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+const BORDER_SIDES = [ 'top', 'right', 'bottom', 'left' ] as const;
+
+interface FlatBorder {
+	width?: unknown;
+	style?: unknown;
+	color?: unknown;
+}
+
+type Border = FlatBorder &
+	Partial< Record< ( typeof BORDER_SIDES )[ number ], FlatBorder > >;
+
+type ResolveValue = ( value: unknown ) => unknown;
 
 // Global Styles stores border style, width and color per side (e.g.
 // `border.top.style`). Collapse a per-side border object to flat
 // `{ width, style, color }`, keeping a value only when every set side agrees.
-function flattenBorder( border ) {
+function flattenBorder( border: Border ): FlatBorder {
 	if (
 		isSet( border.width ) ||
 		isSet( border.style ) ||
@@ -49,7 +60,7 @@ function flattenBorder( border ) {
 		return border;
 	}
 
-	const collapse = ( property ) => {
+	const collapse = ( property: keyof FlatBorder ) => {
 		const values = setSides.map( ( side ) => border[ side ]?.[ property ] );
 		return values.every( ( value ) => value === values[ 0 ] )
 			? values[ 0 ]
@@ -73,11 +84,11 @@ function flattenBorder( border ) {
  * - Objects and arrays (like a border side): turned into text, or an em dash
  *   when there's nothing to show.
  *
- * @param {*} value The raw style value.
+ * @param value The raw style value.
  *
- * @return {string} Readable text for the value.
+ * @return Readable text for the value.
  */
-export function formatStyleValue( value ) {
+export function formatStyleValue( value: unknown ): string {
 	if ( ! isSet( value ) ) {
 		return EMPTY_VALUE_LABEL;
 	}
@@ -117,17 +128,17 @@ export function formatStyleValue( value ) {
  * Global Styles stores borders) is collapsed to its shared values first.
  * Returns an em dash when the border has nothing set.
  *
- * @param {*} border A border object, e.g. `{ color, width, style }`, or a
- *                   per-side object, e.g. `{ top: { style } }`.
+ * @param border A border object, e.g. `{ color, width, style }`, or a
+ *               per-side object, e.g. `{ top: { style } }`.
  *
- * @return {string} The combined border value, or an em dash.
+ * @return The combined border value, or an em dash.
  */
-export function formatBorderShorthand( border ) {
+export function formatBorderShorthand( border: unknown ): string {
 	if ( ! border || typeof border !== 'object' ) {
 		return formatStyleValue( border );
 	}
 
-	const { width, style, color } = flattenBorder( border );
+	const { width, style, color } = flattenBorder( border as Border );
 	const parts = [ width, style, color ]
 		.filter( isSet )
 		.map( ( part ) => formatStyleValue( part ) );
@@ -136,7 +147,12 @@ export function formatBorderShorthand( border ) {
 }
 
 // Corner order used by the CSS `border-radius` shorthand.
-const RADIUS_CORNERS = [ 'topLeft', 'topRight', 'bottomRight', 'bottomLeft' ];
+const RADIUS_CORNERS = [
+	'topLeft',
+	'topRight',
+	'bottomRight',
+	'bottomLeft',
+] as const;
 
 /**
  * Turns a border radius into readable text.
@@ -145,14 +161,17 @@ const RADIUS_CORNERS = [ 'topLeft', 'topRight', 'bottomRight', 'bottomLeft' ];
  * CSS corner order, e.g. `1px 20px 1px 15px`. Returns an em dash when there's
  * nothing to show.
  *
- * @param {*} radius A radius string or an object with a value per corner.
+ * @param radius A radius string or an object with a value per corner.
  *
- * @return {string} The readable radius, or an em dash.
+ * @return The readable radius, or an em dash.
  */
-export function formatBorderRadius( radius ) {
+export function formatBorderRadius( radius: unknown ): string {
 	if ( radius && typeof radius === 'object' ) {
+		const corners = radius as Partial<
+			Record< ( typeof RADIUS_CORNERS )[ number ], unknown >
+		>;
 		const parts = RADIUS_CORNERS.map(
-			( corner ) => radius[ corner ]
+			( corner ) => corners[ corner ]
 		).filter( isSet );
 		return parts.length ? parts.join( ' ' ) : EMPTY_VALUE_LABEL;
 	}
@@ -172,22 +191,22 @@ export function formatBorderRadius( radius ) {
  * e.g. turning `var:preset|spacing|40` into its actual size, which reads
  * better than the preset name.
  *
- * @param {*}        spacing A spacing string or an object with a value per side.
- * @param {Function} resolve Optional callback to resolve each raw value.
+ * @param spacing A spacing string or an object with a value per side.
+ * @param resolve Optional callback to resolve each raw value.
  *
- * @return {string} The combined spacing, or an em dash.
+ * @return The combined spacing, or an em dash.
  */
 export function formatSpacingShorthand(
-	spacing,
-	resolve = ( value ) => value
-) {
-	const format = ( value ) => formatStyleValue( resolve( value ) );
+	spacing: unknown,
+	resolve: ResolveValue = ( value ) => value
+): string {
+	const format = ( value: unknown ) => formatStyleValue( resolve( value ) );
 
 	if ( ! spacing || typeof spacing !== 'object' ) {
 		return format( spacing );
 	}
 
-	const { top, right, bottom, left } = spacing;
+	const { top, right, bottom, left } = spacing as Record< string, unknown >;
 
 	if ( isSet( top ) && isSet( right ) && isSet( bottom ) && isSet( left ) ) {
 		if ( top === right && right === bottom && bottom === left ) {
@@ -226,19 +245,22 @@ export function formatSpacingShorthand(
  * The optional `resolve` callback swaps a raw value for its real one first,
  * e.g. turning `var:preset|spacing|40` into its actual size.
  *
- * @param {*}        gap     A gap string or an axial `{ top, left }` object.
- * @param {Function} resolve Optional callback to resolve each raw value.
+ * @param gap     A gap string or an axial `{ top, left }` object.
+ * @param resolve Optional callback to resolve each raw value.
  *
- * @return {string} The readable gap, or an em dash.
+ * @return The readable gap, or an em dash.
  */
-export function formatBlockGap( gap, resolve = ( value ) => value ) {
-	const format = ( value ) => formatStyleValue( resolve( value ) );
+export function formatBlockGap(
+	gap: unknown,
+	resolve: ResolveValue = ( value ) => value
+): string {
+	const format = ( value: unknown ) => formatStyleValue( resolve( value ) );
 
 	if ( ! gap || typeof gap !== 'object' ) {
 		return format( gap );
 	}
 
-	const { top: row, left: column } = gap;
+	const { top: row, left: column } = gap as Record< string, unknown >;
 
 	if ( ! isSet( row ) && ! isSet( column ) ) {
 		return EMPTY_VALUE_LABEL;

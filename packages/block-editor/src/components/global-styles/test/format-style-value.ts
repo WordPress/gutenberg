@@ -189,7 +189,7 @@ describe( 'formatSpacingShorthand', () => {
 	} );
 
 	it( 'resolves preset spacing tokens with a resolver', () => {
-		const resolve = ( value ) =>
+		const resolve = ( value: unknown ) =>
 			value === 'var:preset|spacing|40' ? '1.5rem' : value;
 
 		expect(
@@ -238,7 +238,7 @@ describe( 'formatBlockGap', () => {
 	} );
 
 	it( 'resolves preset gap tokens with a resolver', () => {
-		const resolve = ( value ) =>
+		const resolve = ( value: unknown ) =>
 			value === 'var:preset|spacing|40' ? '1.5rem' : value;
 
 		expect(
