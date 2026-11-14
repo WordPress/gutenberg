@@ -1,15 +1,30 @@
 import { __, isRTL } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { DataForm } from '@wordpress/dataviews';
+import { DataForm, useUiOverlaySupport } from '@wordpress/dataviews';
+import {
+	Modal,
+	SlotFillProvider,
+	Popover as WCPopover,
+	Button as LegacyButton,
+} from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption alongside Drawer.
 	Button,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Replace the custom Modal drawer with the Drawer primitive.
 	Drawer,
 	VisuallyHidden,
+	Stack,
 } from '@wordpress/ui';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createPortal,
+	useCallback,
+	useEffect,
+	useMemo,
+	useId,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
@@ -17,7 +32,14 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
+function QuickEditSession( {
+	open,
+	postType,
+	postId,
+	closeModal,
+	quickEditForm,
+	onClosed,
+} ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
@@ -105,6 +127,37 @@ function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 		};
 	}, [ isBulk, quickEditForm ] );
 
+	const legacySlotName = useId();
+	const supported = useUiOverlaySupport( fields ?? [] );
+	const [ nativeHost, setNativeHost ] = useState( supported );
+	if ( nativeHost && ! supported ) {
+		setNativeHost( false );
+	}
+	const useUiHost = nativeHost && supported;
+	const [ modalElement, setModalElement ] = useState( null );
+	const finalFocusRef = useRef( null );
+	const setSource = useCallback( ( node ) => {
+		if ( node && ! finalFocusRef.current ) {
+			const active = node.ownerDocument.activeElement;
+			if (
+				active instanceof node.ownerDocument.defaultView.HTMLElement
+			) {
+				finalFocusRef.current = active;
+			}
+		}
+	}, [] );
+	const finishClose = useCallback( () => {
+		onClosed();
+		if ( finalFocusRef.current?.isConnected ) {
+			finalFocusRef.current.focus();
+		}
+	}, [ onClosed ] );
+	useEffect( () => {
+		if ( ! open && ! useUiHost ) {
+			finishClose();
+		}
+	}, [ open, useUiHost, finishClose ] );
+
 	const onChange = ( edits ) => {
 		const currentData = { ...record, ...localEdits };
 
@@ -126,9 +179,6 @@ function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 
 		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
-	useEffect( () => {
-		setLocalEdits( {} );
-	}, [ postId ] );
 
 	const onSave = async () => {
 		for ( const id of postId ) {
@@ -147,34 +197,106 @@ function QuickEditSession( { postType, postId, closeModal, quickEditForm } ) {
 		closeModal?.();
 	};
 
+	const title = isBulk ? __( 'Bulk edit' ) : __( 'Quick edit' );
+	const card = (
+		<PostCardPanel postType={ postType } postId={ postId } hideActions />
+	);
+	const content = hasFinishedResolution && (
+		<DataForm
+			data={ { ...record, ...localEdits } }
+			fields={ fields }
+			form={ form }
+			onChange={ onChange }
+		/>
+	);
 	return (
 		<>
-			<Drawer.Header>
-				<VisuallyHidden render={ <Drawer.Title /> }>
-					{ isBulk ? __( 'Bulk edit' ) : __( 'Quick edit' ) }
-				</VisuallyHidden>
-				<PostCardPanel
-					postType={ postType }
-					postId={ postId }
-					hideActions
-				/>
-			</Drawer.Header>
-			<Drawer.Content>
-				{ hasFinishedResolution && (
-					<DataForm
-						data={ { ...record, ...localEdits } }
-						fields={ fields }
-						form={ form }
-						onChange={ onChange }
-					/>
-				) }
-			</Drawer.Content>
-			<Drawer.Footer>
-				<Drawer.Action variant="outline">
-					{ __( 'Cancel' ) }
-				</Drawer.Action>
-				<Button onClick={ onSave }>{ __( 'Done' ) }</Button>
-			</Drawer.Footer>
+			<span hidden ref={ setSource } />
+			{ useUiHost ? (
+				<Drawer.Root
+					open={ open }
+					swipeDirection={ isRTL() ? 'left' : 'right' }
+					onOpenChange={ ( isOpen ) => {
+						if ( ! isOpen ) {
+							closeModal();
+						}
+					} }
+					onOpenChangeComplete={ ( isOpen ) => {
+						if ( ! isOpen && ! open ) {
+							finishClose();
+						}
+					} }
+				>
+					<Drawer.Popup
+						finalFocus={ finalFocusRef }
+						style={ { overflow: 'visible' } }
+					>
+						<SlotFillProvider passthrough>
+							<WCPopover.__unstableSlotNameProvider
+								value={ legacySlotName }
+							>
+								<Drawer.Header>
+									<VisuallyHidden render={ <Drawer.Title /> }>
+										{ title }
+									</VisuallyHidden>
+									{ card }
+								</Drawer.Header>
+								<Drawer.Content>{ content }</Drawer.Content>
+								<Drawer.Footer>
+									<Drawer.Action variant="outline">
+										{ __( 'Cancel' ) }
+									</Drawer.Action>
+									<Button onClick={ onSave }>
+										{ __( 'Done' ) }
+									</Button>
+								</Drawer.Footer>
+							</WCPopover.__unstableSlotNameProvider>
+							<WCPopover.Slot name={ legacySlotName } />
+						</SlotFillProvider>
+					</Drawer.Popup>
+				</Drawer.Root>
+			) : (
+				open && (
+					<Modal
+						ref={ setModalElement }
+						size="small"
+						title={ title }
+						overlayClassName="dataviews-action-modal__quick-edit"
+						__experimentalHideHeader
+						onRequestClose={ closeModal }
+						focusOnMount="firstElement"
+					>
+						<div className="dataviews-action-modal__quick-edit-header">
+							{ card }
+						</div>
+						<div className="dataviews-action-modal__quick-edit-content">
+							{ content }
+						</div>
+						<Stack
+							direction="row"
+							gap="md"
+							className="dataviews-action-modal__quick-edit-footer"
+						>
+							<LegacyButton
+								__next40pxDefaultSize
+								variant="secondary"
+								onClick={ closeModal }
+							>
+								{ __( 'Cancel' ) }
+							</LegacyButton>
+							<LegacyButton
+								__next40pxDefaultSize
+								variant="primary"
+								onClick={ onSave }
+							>
+								{ __( 'Done' ) }
+							</LegacyButton>
+						</Stack>
+						{ modalElement &&
+							createPortal( <WCPopover.Slot />, modalElement ) }
+					</Modal>
+				)
+			) }
 		</>
 	);
 }
@@ -186,26 +308,34 @@ export function QuickEditModal( {
 	closeModal,
 	quickEditForm,
 } ) {
-	return (
-		<Drawer.Root
-			open={ open }
-			swipeDirection={ isRTL() ? 'left' : 'right' }
-			onOpenChange={ ( isOpen ) => {
-				if ( ! isOpen ) {
-					closeModal();
-				}
-			} }
-		>
-			<Drawer.Popup>
-				{ /* Keep edits alive through the exit animation and reset them for a different selection. */ }
-				<QuickEditSession
-					key={ `${ postType }:${ postId.join( ',' ) }` }
-					postType={ postType }
-					postId={ postId }
-					closeModal={ closeModal }
-					quickEditForm={ quickEditForm }
-				/>
-			</Drawer.Popup>
-		</Drawer.Root>
+	const [ session, setSession ] = useState( {
+		open,
+		mounted: open,
+		generation: 0,
+	} );
+	if ( open !== session.open ) {
+		setSession( {
+			open,
+			mounted: open || session.mounted,
+			generation: session.generation + Number( open ),
+		} );
+	}
+	const onClosed = useCallback(
+		() =>
+			setSession( ( previous ) =>
+				previous.open ? previous : { ...previous, mounted: false }
+			),
+		[]
 	);
+	return session.mounted ? (
+		<QuickEditSession
+			key={ `${ postType }:${ postId.join( ',' ) }:${ session.generation }` }
+			open={ open }
+			postType={ postType }
+			postId={ postId }
+			closeModal={ closeModal }
+			quickEditForm={ quickEditForm }
+			onClosed={ onClosed }
+		/>
+	) : null;
 }

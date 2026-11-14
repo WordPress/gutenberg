@@ -206,6 +206,10 @@ test.describe( 'Entity fields API', () => {
 			exact: true,
 		} );
 		await expect( quickEditModal ).toBeVisible();
+		await expect( quickEditModal ).not.toHaveAttribute(
+			'data-wp-ui-overlay-modal',
+			''
+		);
 
 		// The replaced field offers the control of its new type.
 		await quickEditModal
@@ -238,6 +242,10 @@ test.describe( 'Entity fields API', () => {
 			exact: true,
 		} );
 		await expect( quickEditModal ).toBeVisible();
+		await expect( quickEditModal ).not.toHaveAttribute(
+			'data-wp-ui-overlay-modal',
+			''
+		);
 		await quickEditModal
 			.getByRole( 'button', { name: 'Edit Subtitle' } )
 			.click();

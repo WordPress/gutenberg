@@ -365,6 +365,9 @@ test.describe( 'Page List', () => {
 					has: page.getByRole( 'cell', { name: 'Published' } ),
 				} );
 			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
+			await expect(
+				page.getByRole( 'dialog', { name: 'Quick edit', exact: true } )
+			).toHaveAttribute( 'data-wp-ui-overlay-modal', '' );
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -548,6 +551,7 @@ test.describe( 'Page List', () => {
 		} );
 
 		test( 'discards unsaved edits when reopened', async ( { page } ) => {
+			await page.emulateMedia( { reducedMotion: 'no-preference' } );
 			const dialog = page.getByRole( 'dialog', {
 				name: 'Quick edit',
 				exact: true,
@@ -557,15 +561,27 @@ test.describe( 'Page List', () => {
 				.getByRole( 'radio', { name: 'Draft', exact: true } )
 				.check();
 			await page.keyboard.press( 'Escape' );
+			const reopening = page.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						const modal = document.querySelector(
+							'[data-wp-ui-overlay-modal]'
+						);
+						const observer = new MutationObserver( () => {
+							if ( modal.hasAttribute( 'data-ending-style' ) ) {
+								observer.disconnect();
+								// Browser Back reopens the same selection during the exit animation.
+								window.history.back();
+								resolve( modal.isConnected );
+							}
+						} );
+						observer.observe( modal, { attributes: true } );
+					} )
+			);
 			await dialog
 				.getByRole( 'button', { name: 'Cancel', exact: true } )
 				.click();
-			await expect( dialog ).toBeHidden();
-
-			await page
-				.getByRole( 'row', { name: /Privacy Policy/ } )
-				.getByRole( 'button', { name: 'Quick edit' } )
-				.click();
+			expect( await reopening ).toBe( true );
 			await dialog.getByRole( 'button', { name: 'Edit Status' } ).click();
 			await expect(
 				page.getByRole( 'radio', { name: 'Published', exact: true } )
