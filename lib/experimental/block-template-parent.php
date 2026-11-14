@@ -9,11 +9,16 @@
  * what is particular to it and the header, the footer and whatever else
  * surrounds it live in one place.
  *
- * A site names it from the editor. The choice is stored in the
- * `_wp_template_parent` post meta of the template's own post, and exposed as
- * the `template` REST field, like the one on a post. The meta is `default`
- * when the site renders the template on its own, and absent when the site has
- * made no choice.
+ * A theme names the template each of its templates is rendered inside in the
+ * `templates` section of its `theme.json`, so a theme works that way on
+ * activation with nothing to set up.
+ *
+ * A site overrides what the theme names, including rendering a template on its
+ * own, from the editor. The choice is stored in the `_wp_template_parent` post
+ * meta of the template's own post, and exposed as the `template` REST field,
+ * like the one on a post. The meta is `default` when the site renders the
+ * template on its own, and absent when the site has made no choice and the
+ * theme's one stands.
  *
  * Behind the `gutenberg-template-inheritance` experiment, which is what loads
  * this file, while the product questions this opens are settled: named slots,
@@ -173,11 +178,22 @@ function gutenberg_get_block_template_read( $template_id ) {
 }
 
 /**
+ * Returns the slug of the template the active theme renders a template inside.
+ *
+ * @param string $template_slug Slug of the template, the name of its file.
+ * @return string Slug of the template the theme renders it inside, or an empty string when it names none.
+ */
+function gutenberg_get_theme_block_template_parent_slug( $template_slug ) {
+	$templates = WP_Theme_JSON_Resolver_Gutenberg::get_theme_data()->get_templates();
+
+	return $templates[ $template_slug ]['template'] ?? '';
+}
+
+/**
  * Returns the slug of the template a template is rendered inside.
  *
- * The choice is the site's own, stored on the template's post. The meta is
- * `default` when the site renders the template on its own, and absent when the
- * site has made no choice.
+ * The site's own choice, stored on the template's post, stands for the one the
+ * theme names, including when the site renders the template on its own.
  *
  * @param WP_Block_Template|null $template Template to read the assignment from.
  * @return string Slug of the template it is rendered inside, or an empty string when it is rendered on its own.
@@ -187,17 +203,22 @@ function gutenberg_get_block_template_parent_slug( $template ) {
 		return '';
 	}
 
-	if ( empty( $template->wp_id ) ) {
+	if ( ! empty( $template->wp_id ) ) {
+		$slug = get_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_PARENT_META_KEY, true );
+
+		// The meta is absent, so the site has made no choice and the one the
+		// theme names stands.
+		if ( is_string( $slug ) && '' !== $slug ) {
+			return 'default' === $slug ? '' : $slug;
+		}
+	}
+
+	// Only the active theme has a `theme.json` to read.
+	if ( get_stylesheet() !== $template->theme ) {
 		return '';
 	}
 
-	$slug = get_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_PARENT_META_KEY, true );
-
-	if ( ! is_string( $slug ) || '' === $slug ) {
-		return '';
-	}
-
-	return 'default' === $slug ? '' : $slug;
+	return gutenberg_get_theme_block_template_parent_slug( $template->slug );
 }
 
 /**

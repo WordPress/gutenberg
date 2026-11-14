@@ -383,6 +383,15 @@ Additional metadata for custom templates defined in the templates folder.
 | title | Title of the template, translatable. | `string` |
 | postTypes | List of post types that can use this custom template. | `[ string ]` |
 
+## templates
+
+Additional metadata for templates defined in the templates folder.
+
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| name | Filename, without extension, of the template in the templates folder. | `string` |
+| template | Filename, without extension, of the template this one is rendered inside of. Its Template Slot block is where this template renders. Templates nest one level deep: the template named is not rendered inside another in turn, even if it names one. A site can override it, or render the template on its own, from the editor. | `string` |
+
 ## templateParts
 
 Additional metadata for template parts defined in the parts folder.
