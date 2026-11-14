@@ -1,6 +1,6 @@
 import { useMemo, useContext } from '@wordpress/element';
 import { hasBlockSupport } from '@wordpress/blocks';
-import Edit from './edit';
+import useGeneratedEdit from './edit';
 import {
 	BlockEditContextProvider,
 	useBlockEditContext,
@@ -57,54 +57,54 @@ export default function BlockEdit( {
 		name === 'core/navigation';
 	const { originalBlockClientId } = useContext( PrivateBlockContext );
 
+	// It is important to return the same object if props haven't
+	// changed to avoid  unnecessary rerenders.
+	// See https://reactjs.org/docs/context.html#caveats.
+	const context = useMemo(
+		() => ( {
+			name,
+			isSelected,
+			clientId,
+			// The layout attribute is an object when the block supports it.
+			layout: layoutSupport
+				? ( layout as Record< string, unknown > | null )
+				: null,
+			__unstableLayoutClassNames,
+			// We use symbols in favour of an __unstable prefix to avoid
+			// usage outside of the package (this context is exposed).
+			[ mayDisplayControlsKey ]: mayDisplayControls,
+			[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
+			[ mayDisplayPatternEditingControlsKey ]:
+				mayDisplayPatternEditingControls &&
+				blockEditingMode !== 'disabled',
+			[ blockEditingModeKey ]: blockEditingMode,
+			[ blockBindingsKey ]: bindings,
+			[ isPreviewModeKey ]: isPreviewMode,
+			[ isMultiSelectedKey ]: isMultiSelected,
+			[ isInListViewBlockSupportTreeKey ]: isInListViewBlockSupportTree,
+		} ),
+		[
+			name,
+			isSelected,
+			clientId,
+			layoutSupport,
+			layout,
+			__unstableLayoutClassNames,
+			mayDisplayControls,
+			mayDisplayParentControls,
+			mayDisplayPatternEditingControls,
+			blockEditingMode,
+			bindings,
+			isPreviewMode,
+			isMultiSelected,
+			isInListViewBlockSupportTree,
+		]
+	);
+	const edit = useGeneratedEdit( props, context );
+
 	return (
-		<BlockEditContextProvider
-			// It is important to return the same object if props haven't
-			// changed to avoid  unnecessary rerenders.
-			// See https://reactjs.org/docs/context.html#caveats.
-			value={ useMemo(
-				() => ( {
-					name,
-					isSelected,
-					clientId,
-					// The layout attribute is an object when the block supports it.
-					layout: layoutSupport
-						? ( layout as Record< string, unknown > | null )
-						: null,
-					__unstableLayoutClassNames,
-					// We use symbols in favour of an __unstable prefix to avoid
-					// usage outside of the package (this context is exposed).
-					[ mayDisplayControlsKey ]: mayDisplayControls,
-					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
-					[ mayDisplayPatternEditingControlsKey ]:
-						mayDisplayPatternEditingControls &&
-						blockEditingMode !== 'disabled',
-					[ blockEditingModeKey ]: blockEditingMode,
-					[ blockBindingsKey ]: bindings,
-					[ isPreviewModeKey ]: isPreviewMode,
-					[ isMultiSelectedKey ]: isMultiSelected,
-					[ isInListViewBlockSupportTreeKey ]:
-						isInListViewBlockSupportTree,
-				} ),
-				[
-					name,
-					isSelected,
-					clientId,
-					layoutSupport,
-					layout,
-					__unstableLayoutClassNames,
-					mayDisplayControls,
-					mayDisplayParentControls,
-					mayDisplayPatternEditingControls,
-					blockEditingMode,
-					bindings,
-					isPreviewMode,
-					isMultiSelected,
-					isInListViewBlockSupportTree,
-				]
-			) }
-		>
-			<Edit { ...props } />
+		<BlockEditContextProvider value={ context }>
+			{ edit }
 			{ originalBlockClientId && (
 				<MultipleUsageWarning
 					originalBlockClientId={ originalBlockClientId }
