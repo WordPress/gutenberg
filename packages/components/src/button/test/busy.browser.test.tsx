@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
@@ -10,6 +11,14 @@ import '../../toolbar/toolbar-group/style.scss';
 import '../../toolbar/toolbar-button/style.scss';
 import Button from '..';
 import { Toolbar, ToolbarButton, ToolbarGroup } from '../../toolbar';
+
+function SavingButton( props: ComponentProps< typeof Button > ) {
+	return (
+		<Button __next40pxDefaultSize { ...props }>
+			Saving
+		</Button>
+	);
+}
 
 const variants = [ 'primary', 'secondary', 'tertiary' ] as const;
 
@@ -38,13 +47,7 @@ describe( 'Button busy presentation', () => {
 						'.busy-positioned-button { position: absolute; top: 12px; left: 16px; }'
 					}
 				</style>
-				<Button
-					__next40pxDefaultSize
-					className="busy-positioned-button"
-					isBusy
-				>
-					Saving
-				</Button>
+				<SavingButton className="busy-positioned-button" isBusy />
 			</>
 		);
 		const button = screen.getByRole( 'button', { name: 'Saving' } );
@@ -52,28 +55,33 @@ describe( 'Button busy presentation', () => {
 		expectBusyPresentation( button );
 	} );
 
-	it( 'keeps the spinner size inside a toolbar group', async () => {
-		await render(
-			<Toolbar label="Formatting">
-				<ToolbarGroup>
-					<ToolbarButton icon={ plus } title="Add" isBusy />
-				</ToolbarGroup>
-			</Toolbar>
-		);
-		const button = screen.getByRole( 'button', { name: 'Add' } );
-		expect( button ).toBeVisible();
-		expectBusyPresentation( button );
-	} );
-
-	it( 'keeps the spinner size on a legacy subscript toolbar button', async () => {
-		await render(
-			<ToolbarButton
-				icon={ plus }
-				title="Add"
-				data-subscript="1"
-				isBusy
-			/>
-		);
+	const toolbarButton = <ToolbarButton icon={ plus } title="Add" isBusy />;
+	it.each( [
+		[
+			'keeps the spinner size inside a toolbar group',
+			() => (
+				<Toolbar label="Formatting">
+					<ToolbarGroup>{ toolbarButton }</ToolbarGroup>
+				</Toolbar>
+			),
+		],
+		[
+			'keeps the spinner size on a legacy subscript toolbar button',
+			() => (
+				<ToolbarButton
+					icon={ plus }
+					title="Add"
+					data-subscript="1"
+					isBusy
+				/>
+			),
+		],
+		[
+			'centers the spinner in a toolbar button',
+			() => <Toolbar label="Formatting">{ toolbarButton }</Toolbar>,
+		],
+	] as const )( '%s', async ( _, renderToolbar ) => {
+		await render( renderToolbar() );
 		const button = screen.getByRole( 'button', { name: 'Add' } );
 		expect( button ).toBeVisible();
 		expectBusyPresentation( button );
@@ -84,14 +92,7 @@ describe( 'Button busy presentation', () => {
 		async ( variant ) => {
 			const onClick = vi.fn();
 			await render(
-				<Button
-					__next40pxDefaultSize
-					variant={ variant }
-					isBusy
-					onClick={ onClick }
-				>
-					Saving
-				</Button>
+				<SavingButton variant={ variant } isBusy onClick={ onClick } />
 			);
 			const button = screen.getByRole( 'button', { name: 'Saving' } );
 			await userEvent.hover( button );
@@ -114,9 +115,7 @@ describe( 'Button busy presentation', () => {
 		async ( { accessibleWhenDisabled } ) => {
 			await render(
 				<>
-					<Button __next40pxDefaultSize variant="primary" isBusy>
-						Saving
-					</Button>
+					<SavingButton variant="primary" isBusy />
 					<Button
 						__next40pxDefaultSize
 						variant="primary"
@@ -145,15 +144,12 @@ describe( 'Button busy presentation', () => {
 		'keeps the spinner visible for a pressed disabled busy %s button',
 		async ( variant ) => {
 			await render(
-				<Button
-					__next40pxDefaultSize
+				<SavingButton
 					variant={ variant }
 					aria-pressed
 					isBusy
 					disabled
-				>
-					Saving
-				</Button>
+				/>
 			);
 			const button = screen.getByRole( 'button', { name: 'Saving' } );
 			expect( button ).toBeDisabled();
@@ -189,27 +185,10 @@ describe( 'Button busy presentation', () => {
 
 	it( 'uses a consumer-supplied color for the spinner', async () => {
 		await render(
-			<Button
-				__next40pxDefaultSize
-				isBusy
-				style={ { color: 'rebeccapurple' } }
-			>
-				Saving
-			</Button>
+			<SavingButton isBusy style={ { color: 'rebeccapurple' } } />
 		);
 		const button = screen.getByRole( 'button', { name: 'Saving' } );
 		expect( getComputedStyle( button ).color ).toBe( 'rgb(102, 51, 153)' );
-		expectBusyPresentation( button );
-	} );
-
-	it( 'centers the spinner in a toolbar button', async () => {
-		await render(
-			<Toolbar label="Formatting">
-				<ToolbarButton icon={ plus } title="Add" isBusy />
-			</Toolbar>
-		);
-		const button = screen.getByRole( 'button', { name: 'Add' } );
-		expect( button ).toBeVisible();
 		expectBusyPresentation( button );
 	} );
 } );
