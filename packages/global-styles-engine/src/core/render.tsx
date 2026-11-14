@@ -180,6 +180,23 @@ interface StylesNode {
 
 type ElementName = keyof typeof ELEMENTS;
 
+// Keep in sync with the Link element override in WP_Theme_JSON_Gutenberg::get_block_nodes().
+function getRootLinkElementSelector(
+	blockName: string,
+	blockSelector: string,
+	elementName: string
+): string | undefined {
+	if (
+		elementName === 'link' &&
+		( blockName === 'core/query-pagination-next' ||
+			blockName === 'core/query-pagination-previous' )
+	) {
+		// The block root is the anchor. Keep the Link element's exclusions.
+		return appendToSelector( blockSelector, `:where(${ ELEMENTS.link })` );
+	}
+	return undefined;
+}
+
 // Elements that rely on class names in their selectors.
 const ELEMENT_CLASS_NAMES = {
 	button: 'wp-element-button',
@@ -1464,12 +1481,18 @@ export const getNodesWithStyles = (
 										) {
 											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
-												selector: scopeSelector(
-													variationBlockSelector,
-													ELEMENTS[
-														variationBlockElement as ElementName
-													]
-												),
+												selector:
+													getRootLinkElementSelector(
+														variationBlockName,
+														variationBlockSelector,
+														variationBlockElement
+													) ??
+													scopeSelector(
+														variationBlockSelector,
+														ELEMENTS[
+															variationBlockElement as ElementName
+														]
+													),
 												elementName:
 													variationBlockElement,
 												isStyleVariation: true,
@@ -1516,19 +1539,25 @@ export const getNodesWithStyles = (
 				) {
 					nodes.push( {
 						styles: value,
-						selector: blockSelectors[ blockName ]?.selector
-							.split( ',' )
-							.map( ( sel: string ) => {
-								const elementSelectors =
-									ELEMENTS[
-										elementName as ElementName
-									].split( ',' );
-								return elementSelectors.map(
-									( elementSelector: string ) =>
-										sel + ' ' + elementSelector
-								);
-							} )
-							.join( ',' ),
+						selector:
+							getRootLinkElementSelector(
+								blockName,
+								blockSelectors[ blockName ].selector,
+								elementName
+							) ??
+							blockSelectors[ blockName ].selector
+								.split( ',' )
+								.map( ( sel: string ) => {
+									const elementSelectors =
+										ELEMENTS[
+											elementName as ElementName
+										].split( ',' );
+									return elementSelectors.map(
+										( elementSelector: string ) =>
+											sel + ' ' + elementSelector
+									);
+								} )
+								.join( ',' ),
 						elementName,
 					} );
 				}

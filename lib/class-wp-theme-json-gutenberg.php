@@ -3969,6 +3969,13 @@ class WP_Theme_JSON_Gutenberg {
 
 					$element_selector = $selectors[ $name ]['elements'][ $element ];
 
+					if ( 'link' === $element &&
+						is_string( $selector ) && '' !== $selector &&
+						in_array( $name, array( 'core/query-pagination-next', 'core/query-pagination-previous' ), true )
+					) {
+						$element_selector = static::append_to_selector( $selector, ':where(' . static::ELEMENTS['link'] . ')' );
+					}
+
 					if ( isset( $block_node['elements'][ $element ] ) ) {
 						$nodes[] = array(
 							'path'     => $element_path,
