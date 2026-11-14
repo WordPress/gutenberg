@@ -172,6 +172,7 @@ function shouldEnableHeicCanvasProcessing(): boolean {
  * @param $3.additionalData Additional data to include in the request.
  * @param $3.filesList      List of files.
  * @param $3.onError        Function called when an error happens.
+ * @param $3.onWarning      Function called when an upload succeeds with a caveat.
  * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
@@ -185,6 +186,7 @@ function mediaUpload(
 		additionalData = {},
 		filesList,
 		onError = noop,
+		onWarning,
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
@@ -198,6 +200,7 @@ function mediaUpload(
 	void registry.dispatch( uploadStore ).addItems( {
 		files: Array.from( filesList ),
 		onChange: onFileChange,
+		onWarning,
 		onSuccess: ( attachments ) => {
 			// The private success callback takes the attachments.
 			(
@@ -230,6 +233,7 @@ function mediaUpload(
  * @param $3.additionalData Additional data to include in the request.
  * @param $3.filesList      List of files.
  * @param $3.onError        Function called when an error happens.
+ * @param $3.onWarning      Function called when an upload succeeds with a caveat.
  * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
@@ -243,6 +247,7 @@ async function heicMediaUpload(
 		additionalData = {},
 		filesList,
 		onError = noop,
+		onWarning,
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
@@ -285,6 +290,7 @@ async function heicMediaUpload(
 		void registry.dispatch( uploadStore ).addItems( {
 			files: heicFiles,
 			onChange: onFileChange,
+			onWarning,
 			onSuccess: ( attachments ) => {
 				// The private success callback takes the attachments.
 				(

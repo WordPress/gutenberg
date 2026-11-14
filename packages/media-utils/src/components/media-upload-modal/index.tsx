@@ -174,6 +174,7 @@ interface MediaUploadModalProps {
 		filesList: File[];
 		onFileChange?: ( attachments: Partial< Attachment >[] ) => void;
 		onError?: ( error: Error ) => void;
+		onWarning?: ( message: string ) => void;
 		multiple?: boolean;
 	} ) => void;
 
@@ -305,7 +306,7 @@ export function MediaUploadModal( {
 		getSelectionFromValue( value )
 	);
 
-	const { createSuccessNotice, removeAllNotices } =
+	const { createSuccessNotice, createWarningNotice, removeAllNotices } =
 		useDispatch( noticesStore );
 	const invalidateAttachmentResolutions =
 		useInvalidateAttachmentResolutions();
@@ -714,10 +715,15 @@ export function MediaUploadModal( {
 					filesList: filesArray,
 					onFileChange,
 					onError,
+					onWarning: ( message ) =>
+						createWarningNotice( message, {
+							type: 'snackbar',
+							explicitDismiss: true,
+						} ),
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload, registerBatch ]
+		[ allowedTypes, createWarningNotice, handleUpload, registerBatch ]
 	);
 
 	const paginationInfo = useMemo(
@@ -791,6 +797,11 @@ export function MediaUploadModal( {
 							filesList: filteredFiles,
 							onFileChange,
 							onError,
+							onWarning: ( message ) =>
+								createWarningNotice( message, {
+									type: 'snackbar',
+									explicitDismiss: true,
+								} ),
 						} );
 					}
 				} }

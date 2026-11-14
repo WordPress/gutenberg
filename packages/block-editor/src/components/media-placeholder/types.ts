@@ -66,6 +66,7 @@ interface MediaPlaceholderBaseProps<
 	dropZoneUIOnly?: boolean;
 	disableMediaButtons?: boolean;
 	onError?: ( message: string ) => void;
+	onWarning?: ( message: string ) => void;
 	onCancel?: () => void;
 	/**
 	 * Called with a URL inserted from the URL input.
