@@ -6,7 +6,6 @@ import {
 	serialize,
 	clone,
 	equals,
-	getLuminance,
 	sRGB,
 	OKLCH,
 	type ColorObject,
@@ -59,7 +58,7 @@ export function getContrast(
 function getRelativeLuminance( color: string | PlainColorObject ): number {
 	if ( typeof color === 'string' ) {
 		ColorSpace.register( sRGB );
-		return Math.max( getLuminance( color ), 0 );
+		return computeRelativeLuminance( color );
 	}
 
 	const cachedLuminance = objectLuminanceCache.get( color );
@@ -67,12 +66,25 @@ function getRelativeLuminance( color: string | PlainColorObject ): number {
 		return cachedLuminance.luminance;
 	}
 
-	const luminance = Math.max( getLuminance( color ), 0 );
+	const luminance = computeRelativeLuminance( color );
 	objectLuminanceCache.set( color, {
 		color: clone( color ),
 		luminance,
 	} );
 	return luminance;
+}
+
+function computeRelativeLuminance( color: string | PlainColorObject ): number {
+	const [ red, green, blue ] = to( color, sRGB ).coords.map( ( channel ) => {
+		const value = channel ?? 0;
+		return value <= 0.04045
+			? value / 12.92
+			: ( ( value + 0.055 ) / 1.055 ) ** 2.4;
+	} );
+	// Use WCAG's coefficients. Color.js uses more precise sRGB coefficients,
+	// which can accept a color pair just below WCAG's strict contrast threshold.
+	// https://www.w3.org/TR/WCAG22/#dfn-relative-luminance
+	return Math.max( 0.2126 * red + 0.7152 * green + 0.0722 * blue, 0 );
 }
 
 /**
