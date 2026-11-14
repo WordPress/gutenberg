@@ -3,6 +3,10 @@ import { createPortal, forwardRef, useRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ListProps, RootProps } from './types';
+import {
+	getAnnouncementText,
+	getAnnouncementComparisonText,
+} from './get-announcement-text';
 import styles from './style.module.css';
 
 const LIST_SELECTOR = '[data-wp-ui-notice-list]';
@@ -13,6 +17,11 @@ type Announcement = {
 	id: number;
 	message: string;
 	politeness: NonNullable< RootProps[ 'politeness' ] >;
+};
+
+type NoticeSnapshot = Announcement & {
+	comparison: string | undefined;
+	listHidden: boolean;
 };
 
 function getComposedParent( element: Element ): Element | null {
@@ -42,7 +51,7 @@ function isHidden( element: Element, root: Element ) {
 	return false;
 }
 
-function readMessage( root: HTMLElement ) {
+function readMessage( root: HTMLElement, getText = getAnnouncementText ) {
 	function readText( kind: 'title' | 'description' ) {
 		return Array.from(
 			root.querySelectorAll< HTMLElement >( `.${ styles[ kind ] }` )
@@ -52,25 +61,7 @@ function readMessage( root: HTMLElement ) {
 					element.closest( CONTENT_BOUNDARY ) === root &&
 					! isHidden( element, root )
 			)
-			.map( ( element ) => {
-				const walker = element.ownerDocument.createTreeWalker(
-					element,
-					NodeFilter.SHOW_TEXT,
-					{
-						acceptNode( node ) {
-							return node.parentElement &&
-								isHidden( node.parentElement, root )
-								? NodeFilter.FILTER_REJECT
-								: NodeFilter.FILTER_ACCEPT;
-						},
-					}
-				);
-				let text = '';
-				while ( walker.nextNode() ) {
-					text += walker.currentNode.textContent;
-				}
-				return text.trim();
-			} )
+			.map( getText )
 			.filter( Boolean )
 			.join( ' ' );
 	}
@@ -120,12 +111,16 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		const observerRef = useRefEffect< HTMLDivElement >(
 			( element ) => {
 				let nextId = 0;
-				let previous = new Map< HTMLElement, Announcement >();
+				let previous = new Map< HTMLElement, NoticeSnapshot >();
 				const readNotices = () => {
-					const current = new Map<
-						HTMLElement,
-						Announcement & { listHidden: boolean }
-					>();
+					const current = new Map< HTMLElement, NoticeSnapshot >();
+					const listVisibility =
+						element.ownerDocument.defaultView?.getComputedStyle(
+							element
+						).visibility;
+					const isListVisibilityHidden =
+						listVisibility === 'hidden' ||
+						listVisibility === 'collapse';
 					for ( const notice of element.querySelectorAll< HTMLElement >(
 						`.${ styles.notice }`
 					) ) {
@@ -139,13 +134,26 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 						if ( visibility === 'hidden' ) {
 							continue;
 						}
-						// Keep the message in the comparison while its list is hidden.
-						// Revealing the list alone must not replay it.
+						const spokenMessage =
+							notice.dataset.wpUiNoticeSpokenMessage;
+						const message = spokenMessage ?? readMessage( notice );
+						const before = previous.get( notice );
+						// Inherited CSS visibility can make the message unreadable.
+						// Preserve its last comparison until it can be read again.
+						const comparison =
+							spokenMessage ??
+							( isListVisibilityHidden && ! message
+								? before?.comparison
+								: readMessage( notice, ( content ) =>
+										getAnnouncementComparisonText(
+											content,
+											element
+										)
+									) );
 						current.set( notice, {
-							id: previous.get( notice )?.id ?? nextId++,
-							message:
-								notice.dataset.wpUiNoticeSpokenMessage ??
-								readMessage( notice ),
+							id: before?.id ?? nextId++,
+							message,
+							comparison,
 							politeness: notice.dataset
 								.wpUiNoticePoliteness as Announcement[ 'politeness' ],
 							listHidden: visibility === 'list-hidden',
@@ -169,7 +177,9 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 							announcement.message &&
 							! announcement.listHidden &&
 							announcement.politeness !== 'off' &&
-							( announcement.message !== before?.message ||
+							// The first readable message establishes a silent baseline.
+							( ! before || before.comparison !== undefined ) &&
+							( announcement.comparison !== before?.comparison ||
 								announcement.politeness !== before?.politeness )
 						) {
 							changed.set( notice, announcement );
@@ -203,6 +213,8 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 					characterData: true,
 					subtree: true,
 					attributeFilter: [
+						'class',
+						'style',
 						'hidden',
 						'aria-hidden',
 						'data-wp-ui-notice-politeness',
@@ -226,7 +238,12 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				parent = getComposedParent( parent )
 			) {
 				observer.observe( parent, {
-					attributeFilter: [ 'hidden', 'aria-hidden' ],
+					attributeFilter: [
+						'class',
+						'style',
+						'hidden',
+						'aria-hidden',
+					],
 				} );
 			}
 			return () => observer.disconnect();
