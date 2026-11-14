@@ -549,6 +549,7 @@ button.wp-block-navigation-item__content {
 		transform: translateY(0);
 	}
 }
+
 @keyframes overlay-menu__fade-out-animation {
 	from {
 		opacity: 1;
@@ -604,6 +605,7 @@ button.wp-block-navigation-item__content {
 
 			&.is-menu-closing {
 				animation-name: overlay-menu__fade-out-animation;
+				animation-duration: 0.1s;
 				pointer-events: none;
 			}
 		}

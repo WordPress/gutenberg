@@ -42,11 +42,35 @@ function getFocusableElements( ref ) {
 // capture the clicks, instead of relying on the focusout event.
 document.addEventListener( 'click', () => {} );
 
-// Longer than the fade-out animation in style.scss.
-const FADE_OUT_FALLBACK_MS = 300;
+// Extra time on top of the overlay's animation duration, in case
+// `animationend` never fires, e.g. when a theme overrides the animation.
+const FADE_OUT_BUFFER_MS = 100;
 
 function prefersReducedMotion() {
 	return window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
+}
+
+/**
+ * Returns the length of the overlay's animation in milliseconds, or 0 when the
+ * overlay has no animation, e.g. when a theme sets `animation: none`. The
+ * fade-out uses the same duration as the fade-in.
+ *
+ * @param {Element} modal The overlay element.
+ * @return {number} The animation duration in milliseconds.
+ */
+function getOverlayAnimationDuration( modal ) {
+	const { animationName, animationDuration } =
+		window.getComputedStyle( modal );
+	if ( animationName === 'none' ) {
+		return 0;
+	}
+	// Several animations are comma separated, e.g. `0.1s, 200ms`.
+	return Math.max(
+		...animationDuration.split( ',' ).map( ( duration ) => {
+			const value = parseFloat( duration );
+			return duration.trim().endsWith( 'ms' ) ? value : value * 1000;
+		} )
+	);
 }
 
 /**
@@ -254,16 +278,21 @@ const { state, actions } = store(
 					ctx.modal = null;
 					ctx.previousFocus = null;
 					if ( ctx.type === 'overlay' ) {
+						// Already fading out, e.g. closing for both `click` and `focus`.
 						if ( ctx.isClosing ) {
-							// Already fading out, e.g. closing for both `click` and `focus`.
-						} else if ( modal && ! prefersReducedMotion() ) {
+							return;
+						}
+						const animationDuration =
+							modal && ! prefersReducedMotion()
+								? getOverlayAnimationDuration( modal )
+								: 0;
+						if ( animationDuration ) {
 							// Keep the overlay displayed until its fade-out ends.
 							ctx.isClosing = true;
-							// Safety net in case `animationend` never fires, e.g.
-							// when a theme overrides the animation.
+							// Safety net in case `animationend` never fires.
 							ctx.closingTimeout = setTimeout(
 								() => finishClosingOverlay( ctx ),
-								FADE_OUT_FALLBACK_MS
+								animationDuration + FADE_OUT_BUFFER_MS
 							);
 						} else {
 							document.documentElement.classList.remove(
