@@ -1,0 +1,75 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Foundations/Writing" tags={ [ 'manifest' ] } />
+
+# Writing
+
+The components in the design system carry very little text of their own. The product that uses them defines its own copy: the labels, descriptions, and messages people read. These guidelines are not rules for the components. They describe how to write that copy so interfaces built with the design system feel consistent and well thought out.
+
+The guidance applies to the text in an interface, such as buttons, field labels, help text, and notices, and to the short documentation next to it. For error messages and notices that disappear on their own, see [Error Messages](?path=/docs/design-system-patterns-error-messages--docs). For the full contributor guide, see the [copy guide](https://github.com/WordPress/gutenberg/blob/trunk/docs/contributors/documentation/copy-guide.md).
+
+Write like a person talking to another person. Say what a thing does, say what the user can do next, and stop.
+
+## Tone and wording
+
+- **Use contractions.** "You’ll", "can’t", and "it’s" are friendlier and shorter than "you will", "cannot", and "it is".
+- **Say what things do.** "Can be", "is used", "allows you to", and "helps" signal passive or hedged writing. Write "This block displays single images", not "This block can be used to display single images". Features don’t allow anything. They do specific things.
+- **Don’t call things simple, easy, or "just" doing something.** The user decides what is simple, and "Just click here" promises something we can’t know. Say the specific thing instead: "Add content without taking your hands off the keyboard" beats "It’s easy to add content". "Simplified" and "easier" are fine when they are descriptive and relative.
+- **Focus on the user.** A lot of "we" means the text is about the people behind the software. Describe what people can do and what they get.
+- **Avoid wordplay and idioms.** They are easily misunderstood and rarely translate. Keep personality subtle: text that sounds like a person said it, not forced whimsy.
+
+## Be specific
+
+When an action depends on something the user did before, name it. "When you’re ready" could mean after proofreading, after adding a featured image, or after configuring every setting. Say which one.
+
+Prefer the shortest wording that still says who does what: "Click “settings” to access advanced settings", not "When you click the “settings” button, the pop-up will display the advanced settings". Use "To…" for something the user can do ("To add an image, select the image block"), and keep "If you want to…" for real alternatives based on the user’s goal.
+
+## Capitalization
+
+Use sentence case across the interface: capitalize the first word and proper nouns, and nothing else. This applies to buttons, labels, headings, menu items, tooltips, and notices.
+
+- Write "Add new page", not "Add New Page".
+- Product and brand names keep their own capitalization: WordPress, WooCommerce, Jetpack.
+- Never use all caps for emphasis. If text needs to be uppercase for visual reasons, style it with CSS and leave the string in sentence case.
+
+## Labels and actions
+
+- **Start button labels with a verb.** A label says what happens when the user presses it: "Save changes", "Add block", "Delete page". Prefer a specific verb and object over "OK", "Yes", or "Submit". For destructive actions, see [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs).
+- **Use "log in" and "log out" as verbs**, and "login" as the noun. Don’t switch to "sign in" or "sign out".
+- **Use an ellipsis when an action needs more input.** End labels that open a dialog or ask for more information with the `…` character: "Rename…", "Export…".
+
+## Lists
+
+- **Keep structure parallel.** Build every item the same way, with the same subject and the same kind of opening word.
+- **Use full sentences or fragments, not a mix.** Full sentences end with a period. Fragments don’t.
+- **Use numbered lists for steps** and bulleted lists for everything else.
+- **Don’t announce the list.** "Here are some examples of ways you can use it" adds nothing when the list follows.
+
+## Punctuation and typography
+
+- **Quotation marks.** Use curly quotation marks (“ ”) and apostrophes (’). Commas and periods go inside the closing quotation mark.
+- **Serial comma.** Put a comma before the last item in a list of three or more: "images, videos, and documents".
+- **Em dashes.** They can link ideas in documentation, but avoid them in short UI strings, where they wrap awkwardly and translate unpredictably.
+- **Numbers.** Use numerals for counts in the interface: "3 items selected". In running prose, spell out zero through nine, and any number that starts a sentence.
+
+## Names and terminology
+
+- **Capitalization is part of a name.** Write WordPress with a capital W and a capital P, and keep the capitalization of names such as WooCommerce and bbPress.
+- **Pick one term and keep it.** If the product calls something a "pattern", use that word every time rather than alternating with synonyms.
+- **Use example domains in examples.** Use `example.com`, `example.blog`, and `mail@example.com`, never real domains owned by others.
+
+## Writing for translation
+
+- Write whole sentences as single strings. Don’t build a sentence by joining separate strings.
+- Leave room for longer text. A label that fits on one line in English may wrap to three lines elsewhere.
+
+## Checklist
+
+Before shipping a string, check that it:
+
+- Reads naturally when said out loud.
+- Uses sentence case, active voice, and contractions.
+- Says something specific, with no "simple", "easy", or "just".
+- Focuses on what the user can do, not on "we".
+- Uses the same terms as the rest of the product.
+- Still works if it’s twice as long in another language.
