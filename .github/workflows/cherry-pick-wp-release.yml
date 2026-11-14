@@ -113,6 +113,19 @@ jobs:
                         issue_number: prNumber,
                         name: oldLabel
                       });
+                      // Clear any failure marker left by an earlier attempt.
+                      try {
+                        await github.rest.issues.removeLabel({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: prNumber,
+                          name: `Backport Failed`
+                        });
+                      } catch (error) {
+                        if (error.status !== 404) {
+                          throw error;
+                        }
+                      }
                       await github.rest.issues.addLabels({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
@@ -182,4 +195,36 @@ jobs:
                         # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
                         \`\`\`
                         `
+                      });
+
+            - name: Update labels after conflict
+              if: env.cherry_pick == 'true' && env.conflict == 'true'
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              with:
+                  script: |
+                      const prNumber = process.env.pr_number;
+                      const version = process.env.version;
+                      const oldLabel = `Backport to WP ${version} Beta/RC`;
+                      const failedLabel = `Backport Failed`;
+                      console.log(`prNumber: ${prNumber}`);
+                      console.log(`version: ${version}`);
+                      // Remove the trigger label so it can be added again to retry the cherry-pick.
+                      try {
+                        await github.rest.issues.removeLabel({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: prNumber,
+                          name: oldLabel
+                        });
+                      } catch (error) {
+                        // The label may already have been removed by someone else.
+                        if (error.status !== 404) {
+                          throw error;
+                        }
+                      }
+                      await github.rest.issues.addLabels({
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        issue_number: prNumber,
+                        labels: [failedLabel]
                       });
