@@ -95,7 +95,7 @@ export default function StateControl( {
 		ComponentProps< typeof Menu.Positioner >[ 'side' ],
 		ComponentProps< typeof Menu.Positioner >[ 'align' ],
 	];
-	const offset = popoverProps.offset ?? 0;
+	const offset = popoverProps.offset ?? 13;
 
 	return (
 		<Stack
