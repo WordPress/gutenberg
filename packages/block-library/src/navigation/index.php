@@ -702,6 +702,35 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Get the minimum width and height styles for the navigation wrapper.
+	 *
+	 * Serialization of these is skipped because the inner lists also call
+	 * `get_block_wrapper_attributes()`, and the sizes must not reach the overlay.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string Returns the dimensions styles for the navigation wrapper.
+	 */
+	private static function get_dimensions_styles( $attributes ) {
+		$dimensions = $attributes['style']['dimensions'] ?? null;
+		if ( ! is_array( $dimensions ) ) {
+			return '';
+		}
+
+		$styles = wp_style_engine_get_styles(
+			array(
+				'dimensions' => array(
+					'minHeight' => $dimensions['minHeight'] ?? null,
+					'minWidth'  => $dimensions['minWidth'] ?? null,
+				),
+			)
+		);
+
+		return $styles['css'] ?? '';
+	}
+
+	/**
 	 * Get responsive container classes for the navigation block.
 	 *
 	 * @since 7.0.0
@@ -926,7 +955,7 @@ class WP_Navigation_Block_Renderer {
 	private static function get_nav_attributes( $attributes, $inner_blocks ) {
 		$is_interactive     = self::is_interactive( $attributes, $inner_blocks );
 		$is_responsive_menu = self::is_responsive( $attributes );
-		$style              = self::get_styles( $attributes );
+		$style              = self::get_styles( $attributes ) . self::get_dimensions_styles( $attributes );
 		$class              = self::get_classes( $attributes );
 		$extra_attributes   = array(
 			'class' => $class,
