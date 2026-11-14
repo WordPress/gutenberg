@@ -13,7 +13,7 @@
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../date/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../hooks/tsconfig.build.json" },
+		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
