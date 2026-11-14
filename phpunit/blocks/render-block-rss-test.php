@@ -33,8 +33,9 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 	 */
 	public function mock_http_request( $response, $args, $url ) {
 		$feeds = array(
-			'https://example.com/testrss.xml'     => 'feed-with-gmt-offset.xml',
-			'https://example.com/testrss-dst.xml' => 'feed-across-dst.xml',
+			'https://example.com/testrss.xml'          => 'feed-with-gmt-offset.xml',
+			'https://example.com/testrss-dst.xml'      => 'feed-across-dst.xml',
+			'https://example.com/testrss-no-title.xml' => 'feed-without-item-title.xml',
 		);
 
 		if ( ! isset( $feeds[ $url ] ) ) {
@@ -136,5 +137,29 @@ class Tests_Blocks_Render_Rss extends WP_UnitTestCase {
 
 		$this->assertStringContainsString( 'datetime="2026-01-15T18:30:00-05:00"', $rendered_html, 'Standard time item has the wrong datetime' );
 		$this->assertStringContainsString( 'datetime="2026-07-16T00:30:00-04:00"', $rendered_html, 'Daylight saving time item has the wrong datetime' );
+	}
+
+	/**
+	 * Test that an item without a title renders the fallback title.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/issues/86828
+	 *
+	 * @covers ::gutenberg_render_block_core_rss
+	 */
+	public function test_rss_item_without_title() {
+		$this->setup_block_context();
+
+		$attributes = array(
+			'feedURL'        => 'https://example.com/testrss-no-title.xml',
+			'itemsToShow'    => 1,
+			'displayExcerpt' => false,
+			'displayAuthor'  => false,
+			'displayDate'    => false,
+			'blockLayout'    => 'list',
+		);
+
+		$rendered_html = gutenberg_render_block_core_rss( $attributes );
+
+		$this->assertStringContainsString( '(no title)', $rendered_html );
 	}
 }
