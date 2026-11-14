@@ -1,5 +1,10 @@
 import { h, type ComponentChild, type JSX, type VNode } from 'preact';
-import { warn, isReservedKey, jsonReviver } from './utils';
+import {
+	warn,
+	warnIfInvalidNamespace,
+	isReservedKey,
+	jsonReviver,
+} from './utils';
 import { type DirectiveEntry } from './hooks';
 
 /** Associates opaque HTML props with script-free snapshots owned by the live document's template-contents document. */
@@ -277,6 +282,7 @@ export const getInteractiveNamespace = (
 			: typeof value?.namespace === 'string'
 				? value.namespace
 				: null;
+	warnIfInvalidNamespace( namespace );
 	return isReservedKey( namespace ) ? null : namespace;
 };
 
@@ -309,6 +315,7 @@ export function toVdom(
 	root: Node,
 	namespace?: string | null
 ): ComponentChild {
+	warnIfInvalidNamespace( namespace );
 	if ( namespace === undefined ) {
 		return convertToVdom( root );
 	}

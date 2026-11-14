@@ -1,7 +1,7 @@
 import type { h as createElement, RefObject } from 'preact';
 import { signal } from '@preact/signals';
 import { getNamespace } from './namespaces';
-import { deepReadOnly, deepClone } from './utils';
+import { deepReadOnly, deepClone, warnIfInvalidNamespace } from './utils';
 import type { Evaluate } from './hooks';
 
 export interface Scope {
@@ -83,6 +83,7 @@ const throwNotInScope = ( method: string ) => {
  * @return The context content.
  */
 export const getContext = < T extends object >( namespace?: string ): T => {
+	warnIfInvalidNamespace( namespace );
 	const scope = getScope();
 	if ( globalThis.SCRIPT_DEBUG ) {
 		if ( ! scope ) {
@@ -153,6 +154,7 @@ export function getServerContext(
 ): Record< string, unknown >;
 export function getServerContext< T extends object >( namespace?: string ): T;
 export function getServerContext< T extends object >( namespace?: string ): T {
+	warnIfInvalidNamespace( namespace );
 	const scope = getScope();
 
 	if ( globalThis.SCRIPT_DEBUG ) {
