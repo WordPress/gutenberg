@@ -94,6 +94,27 @@ describe( 'ThemeProvider', () => {
 		expect( readProp( provider, SURFACE_BG ) ).toBe( BACKGROUND );
 	} );
 
+	it( 'keeps legacy accent text readable when the brand fill moves away from the seed', async () => {
+		await render(
+			<ThemeProvider
+				color={ { primary: DEFAULT_PRIMARY, background: '#1e1e1e' } }
+			>
+				<span>Legacy accent</span>
+			</ThemeProvider>
+		);
+
+		const child = screen.getByText( 'Legacy accent' );
+		const accent = readProp( child, '--wp-components-color-accent' );
+		expect( accent ).toBe( DEFAULT_PRIMARY );
+		expect( readProp( child, BRAND_BG ) ).not.toBe( accent );
+		expect(
+			getContrast(
+				accent,
+				readProp( child, '--wp-components-color-accent-inverted' )
+			)
+		).toBeGreaterThanOrEqual( 4.5 );
+	} );
+
 	it( 'does not define color tokens if neither customized nor inherited', async () => {
 		await render(
 			<ThemeProvider>

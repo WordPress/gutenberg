@@ -19,7 +19,8 @@ import {
 	DEFAULT_SEED_COLORS,
 	type RampResult,
 } from './color-ramps/index.ts';
-import { getColorString } from './color-ramps/lib/color-utils.ts';
+import { getColorString, getContrast } from './color-ramps/lib/color-utils.ts';
+import { MINIMUM_TEXT_CONTRAST } from './semantic-color-contrast-pairs.ts';
 import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
@@ -186,7 +187,7 @@ function generateStyles( {
 	primary: string;
 	colorEntries: Entry[];
 } ): CSSProperties {
-	return Object.fromEntries(
+	const styles = Object.fromEntries(
 		[
 			// Semantic color tokens
 			colorEntries,
@@ -195,6 +196,16 @@ function generateStyles( {
 			legacyWpComponentsOverridesCSS,
 		].flat()
 	);
+	// The legacy accent keeps the seed even when the semantic brand fill moves.
+	const accent = styles[ '--wp-admin-theme-color' ];
+	const onFill = styles[ '--wpds-color-foreground-interactive-brand-strong' ];
+	if ( getContrast( accent, onFill ) < MINIMUM_TEXT_CONTRAST ) {
+		styles[ '--wp-components-color-accent-inverted' ] =
+			getContrast( accent, '#000' ) >= MINIMUM_TEXT_CONTRAST
+				? '#000'
+				: '#fff';
+	}
+	return styles;
 }
 
 function generateThemeProviderColors(
