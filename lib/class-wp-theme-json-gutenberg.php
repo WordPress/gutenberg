@@ -1613,6 +1613,31 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Appends a sub-selector to every block feature and subfeature selector,
+	 * so styles set inside a block state only apply in that state.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array|null $feature_selectors Feature selectors, keyed by feature.
+	 * @param string     $to_append         Selector to append, e.g. ':hover'.
+	 * @return array The feature selectors with $to_append added.
+	 */
+	protected static function append_to_feature_selectors( $feature_selectors, $to_append ) {
+		$state_feature_selectors = array();
+		foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
+			if ( is_array( $feature_selector ) ) {
+				$state_feature_selectors[ $feature ] = array();
+				foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
+					$state_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $to_append );
+				}
+			} else {
+				$state_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $to_append );
+			}
+		}
+		return $state_feature_selectors;
+	}
+
+	/**
 	 * Appends a sub-selector to an existing one.
 	 *
 	 * Given the compounded $selector "h1, h2, h3"
@@ -3850,17 +3875,7 @@ class WP_Theme_JSON_Gutenberg {
 						 * pseudo-state (e.g. '.wp-block-button:hover') rather than the
 						 * default state (e.g. '.wp-block-button').
 						 */
-						$pseudo_feature_selectors = array();
-						foreach ( $feature_selectors ?? array() as $feature => $feature_selector ) {
-							if ( is_array( $feature_selector ) ) {
-								$pseudo_feature_selectors[ $feature ] = array();
-								foreach ( $feature_selector as $subfeature => $subfeature_selector ) {
-									$pseudo_feature_selectors[ $feature ][ $subfeature ] = static::append_to_selector( $subfeature_selector, $pseudo_selector );
-								}
-							} else {
-								$pseudo_feature_selectors[ $feature ] = static::append_to_selector( $feature_selector, $pseudo_selector );
-							}
-						}
+						$pseudo_feature_selectors = static::append_to_feature_selectors( $feature_selectors, $pseudo_selector );
 
 						if ( $has_pseudo ) {
 							$nodes[] = array(
@@ -3902,12 +3917,14 @@ class WP_Theme_JSON_Gutenberg {
 							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
 							isset( $selectors[ $name ]['states'][ $custom_state ] )
 						) {
-							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
-							$nodes[]             = array(
+							// Feature selectors must target the element that carries the state class.
+							$custom_css_selector     = $selectors[ $name ]['states'][ $custom_state ];
+							$state_feature_selectors = static::append_to_feature_selectors( $feature_selectors, ':is(' . $custom_css_selector . ')' );
+							$nodes[]                 = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
 								'selector'   => $custom_css_selector,
-								'selectors'  => $feature_selectors,
+								'selectors'  => $state_feature_selectors,
 								'elements'   => $selectors[ $name ]['elements'] ?? array(),
 								'duotone'    => $duotone_selector,
 								'variations' => $variation_selectors,
@@ -3923,7 +3940,7 @@ class WP_Theme_JSON_Gutenberg {
 											'name'       => $name,
 											'path'       => array( 'styles', 'blocks', $name, $custom_state, $pseudo ),
 											'selector'   => $compound_css_selector,
-											'selectors'  => $feature_selectors,
+											'selectors'  => static::append_to_feature_selectors( $state_feature_selectors, $pseudo ),
 											'elements'   => $selectors[ $name ]['elements'] ?? array(),
 											'duotone'    => $duotone_selector,
 											'variations' => $variation_selectors,

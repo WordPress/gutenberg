@@ -49,8 +49,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	public function tear_down() {
 		$registry = WP_Block_Type_Registry::get_instance();
 
-		if ( $registry->is_registered( 'test/feature-selector' ) ) {
-			unregister_block_type( 'test/feature-selector' );
+		foreach ( array( 'test/feature-selector', 'test/state-feature', 'test/state-subfeature' ) as $block_name ) {
+			if ( $registry->is_registered( $block_name ) ) {
+				unregister_block_type( $block_name );
+			}
 		}
 
 		parent::tear_down();
@@ -9751,6 +9753,129 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $stylesheet_unsupported );
 		$this->assertStringNotContainsString( '-current', $stylesheet_unsupported );
 		$this->assertStringNotContainsString( 'current-menu-item', $stylesheet_unsupported );
+	}
+
+	/**
+	 * Returns a theme.json object that treats `-current` as a valid custom
+	 * state for the test blocks below.
+	 *
+	 * @param string $block_name Test block name.
+	 * @param array  $styles     Block styles for the test block.
+	 * @return WP_Theme_JSON_Gutenberg
+	 */
+	private function get_theme_json_with_custom_state( $block_name, $styles ) {
+		return new class(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						$block_name => $styles,
+					),
+				),
+			)
+		) extends WP_Theme_JSON_Gutenberg {
+			const VALID_BLOCK_PSEUDO_SELECTORS = array(
+				'test/state-feature'    => array( ':hover' ),
+				'test/state-subfeature' => array( ':hover' ),
+			);
+			const VALID_BLOCK_CUSTOM_STATES    = array(
+				'test/state-feature'    => array( '-current' ),
+				'test/state-subfeature' => array( '-current' ),
+			);
+		};
+	}
+
+	public function test_block_custom_states_scope_feature_selectors() {
+		register_block_type(
+			'test/state-feature',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'       => '.wp-block-test',
+					'dimensions' => '.wp-block-test:not(.is-open *)',
+					'states'     => array(
+						'-current' => '.wp-block-list .is-current',
+					),
+				),
+			)
+		);
+
+		$theme_json = $this->get_theme_json_with_custom_state(
+			'test/state-feature',
+			array(
+				'-current' => array(
+					'color'      => array( 'text' => 'red' ),
+					'dimensions' => array( 'minWidth' => '200px' ),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-list .is-current){color: red;}:root :where(.wp-block-test:not(.is-open *):is(.wp-block-list .is-current)){min-width: 200px;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_block_custom_states_scope_subfeature_selectors() {
+		register_block_type(
+			'test/state-subfeature',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'   => '.wp-block-test',
+					'color'  => array(
+						'text' => '.wp-block-test, .wp-block-test-alias',
+					),
+					'states' => array(
+						'-current' => '.wp-block-test.is-current',
+					),
+				),
+			)
+		);
+
+		$theme_json = $this->get_theme_json_with_custom_state(
+			'test/state-subfeature',
+			array(
+				'-current' => array(
+					'color' => array(
+						'text'       => 'red',
+						'background' => 'blue',
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-test.is-current){background-color: blue;}:root :where(.wp-block-test:is(.wp-block-test.is-current), .wp-block-test-alias:is(.wp-block-test.is-current)){color: red;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_block_custom_state_pseudo_selectors_scope_feature_selectors() {
+		register_block_type(
+			'test/state-feature',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'       => '.wp-block-test',
+					'dimensions' => '.wp-block-test:not(.is-open *)',
+					'states'     => array(
+						'-current' => '.wp-block-list .is-current',
+					),
+				),
+			)
+		);
+
+		$theme_json = $this->get_theme_json_with_custom_state(
+			'test/state-feature',
+			array(
+				'-current' => array(
+					':hover' => array(
+						'color'      => array( 'text' => 'green' ),
+						'dimensions' => array( 'minHeight' => '60px' ),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-list .is-current:hover){color: green;}:root :where(.wp-block-test:not(.is-open *):is(.wp-block-list .is-current):hover){min-height: 60px;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
 	public function test_merge_incoming_data_block_level_inherits_global_default_setting() {
