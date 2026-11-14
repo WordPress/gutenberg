@@ -938,20 +938,60 @@
 			"type": "object",
 			"properties": {
 				"viewport": {
-					"description": "Viewport breakpoint settings used for responsive block styles and block visibility. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.",
+					"description": "Viewport breakpoint settings used for responsive block styles and block visibility. Each viewport is either its breakpoint size, or an object with a `breakpoint` size and an optional `preview` size for the editor's device preview. Invalid breakpoint values are ignored. If only one valid breakpoint is declared, it remains keyed by its configured viewport and uses a single max-width query. If neither breakpoint is valid, the default breakpoints are used. If `mobile` is greater than or equal to `tablet`, only the `mobile` breakpoint is used.",
 					"type": "object",
 					"properties": {
 						"mobile": {
 							"description": "Maximum viewport width for mobile styles.",
-							"type": "string",
 							"default": "480px",
-							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+							"oneOf": [
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"breakpoint": {
+											"description": "Maximum viewport width for mobile styles.",
+											"type": "string",
+											"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+										},
+										"preview": {
+											"description": "Canvas width of the editor's mobile preview. Ignored when it is larger than the mobile breakpoint.",
+											"type": "string",
+											"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+										}
+									},
+									"additionalProperties": false
+								}
+							]
 						},
 						"tablet": {
 							"description": "Maximum viewport width for tablet styles. Tablet styles apply above the mobile width and up to this width when both breakpoints are configured, or up to this width when tablet is the only valid breakpoint.",
-							"type": "string",
 							"default": "782px",
-							"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+							"oneOf": [
+								{
+									"type": "string",
+									"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"breakpoint": {
+											"description": "Maximum viewport width for tablet styles.",
+											"type": "string",
+											"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+										},
+										"preview": {
+											"description": "Canvas width of the editor's tablet preview. Ignored when it is not larger than the mobile breakpoint, or larger than the tablet breakpoint.",
+											"type": "string",
+											"pattern": "^(?:\\d+|\\d*\\.\\d+)(?:px|em|rem)$"
+										}
+									},
+									"additionalProperties": false
+								}
+							]
 						}
 					},
 					"additionalProperties": false

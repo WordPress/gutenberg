@@ -3,9 +3,11 @@ import { __ } from '@wordpress/i18n';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 
-const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
-	globalStylesEnginePrivateApis
-);
+const {
+	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
+	getViewportPreviewSizes,
+} = unlock( globalStylesEnginePrivateApis );
 
 const VIEWPORT_KEY_BY_DEVICE_TYPE = {
 	Tablet: 'tablet',
@@ -67,7 +69,8 @@ export function getDeviceTypeByCanvasWidth( canvasWidth, viewportSettings ) {
 }
 
 /**
- * Gets the canvas width for a device preview. The preview is inset from its
+ * Gets the canvas width for a device preview. Uses the viewport's preview size
+ * when the theme declares one. Otherwise, the preview is inset from its
  * breakpoint to avoid browser zoom rounding the iframe viewport outside the
  * intended media query.
  *
@@ -89,6 +92,15 @@ export function getCanvasWidthByDeviceType( deviceType, viewportSettings ) {
 
 	if ( width === undefined ) {
 		return undefined;
+	}
+
+	const previewWidth = getViewportBreakpointValueInPixels(
+		getViewportPreviewSizes( viewportSettings )[ viewportKey ]
+	);
+
+	// A preview at the breakpoint itself still needs the inset below.
+	if ( previewWidth !== undefined && previewWidth < width ) {
+		return previewWidth;
 	}
 
 	let lowerBreakpoint = 0;

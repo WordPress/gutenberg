@@ -1250,6 +1250,86 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	public function test_viewport_settings_preserve_valid_preview_sizes() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => array(
+							'breakpoint' => '690px',
+							'preview'    => ' 390px ',
+						),
+						'tablet' => array(
+							'breakpoint' => '1000px',
+							'preview'    => '850px',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'mobile' => array(
+					'breakpoint' => '690px',
+					'preview'    => '390px',
+				),
+				'tablet' => array(
+					'breakpoint' => '1000px',
+					'preview'    => '850px',
+				),
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+	}
+
+	public function test_viewport_settings_reduce_preview_sizes_outside_their_range_to_the_breakpoint() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'viewport' => array(
+						'mobile' => array(
+							'breakpoint' => '690px',
+							'preview'    => '800px',
+						),
+						'tablet' => array(
+							'breakpoint' => '1000px',
+							'preview'    => '600px',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'mobile' => '690px',
+				'tablet' => '1000px',
+			),
+			$theme_json->get_raw_data()['settings']['viewport']
+		);
+	}
+
+	public function test_get_viewport_media_queries_reads_breakpoints_from_viewport_objects() {
+		$this->assertSame(
+			array(
+				'@mobile' => '@media (width <= 690px)',
+				'@tablet' => '@media (690px < width <= 1000px)',
+			),
+			WP_Theme_JSON_Gutenberg::get_viewport_media_queries(
+				array(
+					'mobile' => array(
+						'breakpoint' => '690px',
+						'preview'    => '390px',
+					),
+					'tablet' => '1000px',
+				)
+			)
+		);
+	}
+
 	public function test_viewport_settings_use_defaults_when_no_custom_breakpoints_are_valid() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

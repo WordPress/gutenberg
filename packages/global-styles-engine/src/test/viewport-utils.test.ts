@@ -4,6 +4,7 @@ import {
 	getViewportBreakpoints,
 	getViewportBreakpointValueInPixels,
 	getViewportMediaQueries,
+	getViewportPreviewSizes,
 } from '../utils/viewport';
 
 describe( 'viewport utils', () => {
@@ -103,6 +104,69 @@ describe( 'viewport utils', () => {
 			).toEqual( {
 				mobile: '64rem',
 			} );
+		} );
+
+		it( 'reads breakpoints from viewports declared as objects', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: { breakpoint: '690px', preview: '390px' },
+					tablet: '1000px',
+				} )
+			).toEqual( {
+				mobile: '690px',
+				tablet: '1000px',
+			} );
+		} );
+
+		it( 'ignores a viewport object without a valid breakpoint', () => {
+			expect(
+				getViewportBreakpoints( {
+					mobile: { preview: '390px' },
+					tablet: '1000px',
+				} )
+			).toEqual( {
+				tablet: '1000px',
+			} );
+		} );
+	} );
+
+	describe( 'getViewportPreviewSizes', () => {
+		it( 'returns preview sizes within their viewport ranges', () => {
+			expect(
+				getViewportPreviewSizes( {
+					mobile: { breakpoint: '690px', preview: ' 390px ' },
+					tablet: { breakpoint: '1000px', preview: '850px' },
+				} )
+			).toEqual( {
+				mobile: '390px',
+				tablet: '850px',
+			} );
+		} );
+
+		it( 'returns no preview sizes for viewports declared as strings', () => {
+			expect(
+				getViewportPreviewSizes( {
+					mobile: '690px',
+					tablet: '1000px',
+				} )
+			).toEqual( {} );
+		} );
+
+		it( 'ignores preview sizes outside their viewport ranges', () => {
+			expect(
+				getViewportPreviewSizes( {
+					mobile: { breakpoint: '690px', preview: '800px' },
+					tablet: { breakpoint: '1000px', preview: '600px' },
+				} )
+			).toEqual( {} );
+		} );
+
+		it( 'ignores invalid preview sizes', () => {
+			expect(
+				getViewportPreviewSizes( {
+					mobile: { breakpoint: '690px', preview: '50%' },
+				} )
+			).toEqual( {} );
 		} );
 	} );
 
