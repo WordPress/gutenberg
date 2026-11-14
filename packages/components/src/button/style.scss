@@ -384,6 +384,11 @@
 			background: SelectedItem !important;
 			color: SelectedItemText !important;
 
+			&.is-busy {
+				-webkit-text-fill-color: SelectedItem;
+				text-decoration-color: SelectedItem;
+			}
+
 			// Keep the spinner contrasting with the pressed system-color fill.
 			.components-button__busy-spinner > * {
 				stroke: currentColor;
@@ -394,6 +399,11 @@
 				border-color: GrayText !important;
 				background: GrayText !important;
 				color: Canvas !important;
+
+				&.is-busy {
+					-webkit-text-fill-color: GrayText;
+					text-decoration-color: GrayText;
+				}
 			}
 		}
 	}
@@ -409,6 +419,12 @@
 		-webkit-text-fill-color: transparent;
 		text-decoration-color: transparent;
 		text-shadow: none;
+
+		// Forced colors ignore transparent glyph fills, so match the button fill.
+		@media (forced-colors: active) {
+			-webkit-text-fill-color: ButtonFace;
+			text-decoration-color: ButtonFace;
+		}
 	}
 
 	&.is-busy > :not(.components-button__busy-spinner) {
