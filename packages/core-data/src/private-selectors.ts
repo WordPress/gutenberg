@@ -188,6 +188,47 @@ export const getPostsPageId = createRegistrySelector( ( select ) => () => {
 
 export const getTemplateId = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
+		/*
+		 * A template names the template it is rendered inside the way a post
+		 * does, but nothing else in the template hierarchy applies to it: a
+		 * template that names none is rendered on its own. Answered as `null`
+		 * rather than `undefined`, which a caller reads as "not resolved yet".
+		 */
+		if ( postType === 'wp_template' ) {
+			const editedTemplate = select( STORE_NAME ).getEditedEntityRecord(
+				'postType',
+				'wp_template',
+				postId
+			);
+
+			if ( ! editedTemplate ) {
+				return;
+			}
+
+			if ( ! editedTemplate.template ) {
+				return null;
+			}
+
+			const templates = select( STORE_NAME ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{ per_page: -1 }
+			);
+
+			if ( ! templates ) {
+				return;
+			}
+
+			// A template that names one that no longer exists, or one with no
+			// slot to render it in, is rendered on its own, like one that
+			// names none.
+			const parentTemplate = templates.find(
+				( { slug } ) => slug === editedTemplate.template
+			);
+
+			return parentTemplate?.has_template_slot ? parentTemplate.id : null;
+		}
+
 		const homepage = unlock( select( STORE_NAME ) ).getHomePage();
 
 		if ( ! homepage ) {

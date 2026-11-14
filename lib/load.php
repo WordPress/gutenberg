@@ -273,6 +273,12 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-guidelines' ) ) {
 	require __DIR__ . '/experimental/knowledge/index.php';
 }
 
+// Rendering a template inside another template (only load when experiment is
+// enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-template-inheritance' ) ) {
+	require __DIR__ . '/experimental/block-template-parent.php';
+}
+
 // Dashboard Widgets (only load when experiment is enabled).
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 	require __DIR__ . '/experimental/dashboard-widgets/load.php';

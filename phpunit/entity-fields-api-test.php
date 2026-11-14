@@ -966,7 +966,17 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
 
 		$fields = array_column( wp_get_registered_entity_fields( 'postType', 'wp_template' ), null, 'id' );
-		$this->assertSame( array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The fields are the ones of the collection, not the default author and title fields.' );
+		// Plugins may add fields of their own, the experiments of this one
+		// among them, so only the ones core registers are compared.
+		$core_ids = array_values(
+			array_filter(
+				self::get_support_field_ids( 'wp_template' ),
+				static function ( $id ) use ( $fields ) {
+					return 'core' === $fields[ $id ]['origin']['registeredBy'];
+				}
+			)
+		);
+		$this->assertSame( array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ), $core_ids, 'The fields are the ones of the collection, not the default author and title fields.' );
 		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );

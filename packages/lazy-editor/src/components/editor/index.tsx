@@ -9,6 +9,13 @@ import { useEditorSettings } from '../../hooks/use-editor-settings';
 import { useEditorAssets } from '../../hooks/use-editor-assets';
 import { unlock } from '../../lock-unlock';
 
+/**
+ * The flag the templates inside templates experiment sets in the editor.
+ */
+type ExperimentalWindow = Window & {
+	__experimentalTemplateInheritance?: boolean;
+};
+
 const {
 	Editor: PrivateEditor,
 	BackButton,
@@ -73,7 +80,27 @@ export function Editor( {
 				return undefined;
 			}
 			if ( resolvedPostType === 'wp_template' ) {
-				return resolvedPostId;
+				// Without the templates inside templates experiment, a
+				// template stands for itself, as it always has.
+				if (
+					! ( window as ExperimentalWindow )
+						.__experimentalTemplateInheritance
+				) {
+					return resolvedPostId;
+				}
+				// A template can name the template it is rendered inside, so
+				// that is what the canvas shows around it. `null` means it is
+				// rendered on its own and stands for itself, `undefined` that
+				// the template has not resolved yet.
+				const parentTemplateId = unlock(
+					select( coreDataStore )
+				).getTemplateId( resolvedPostType, resolvedPostId );
+
+				if ( parentTemplateId === undefined ) {
+					return undefined;
+				}
+
+				return parentTemplateId ?? resolvedPostId;
 			}
 			// Use private API to get template ID for this post
 			return unlock( select( coreDataStore ) ).getTemplateId(
