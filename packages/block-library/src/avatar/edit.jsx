@@ -64,11 +64,11 @@ function useAvatarHelpText() {
 /**
  * Renders the inspector controls for the `core/avatar` block.
  *
- * @param {Object}   props                    React props.
- * @param {Function} props.setAttributes      Callback for updating block attributes.
- * @param {Object}   props.avatar             Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the `minSize` and `maxSize` bounds of the size control.
- * @param {Object}   props.attributes         Block attributes: `size`, `isLink`, `linkTarget` and `userId`.
- * @param {boolean}  props.selectUser         Whether to render the user selection control.
+ * @param {Object}   props                      React props.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {Object}   props.avatar               Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the `minSize` and `maxSize` bounds of the size control.
+ * @param {Object}   props.attributes           Block attributes: `size`, `isLink`, `linkTarget` and `userId`.
+ * @param {boolean}  props.selectUser           Whether to render the user selection control.
  * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  *
  * @return {React.JSX.Element} React element.
@@ -253,12 +253,12 @@ const AvatarLinkWrapper = ( { children, isLink } ) =>
  * Renders the avatar image inside a `ResizableBox` so its size can be adjusted
  * by dragging. Resizing keeps the aspect ratio and updates the `size` attribute.
  *
- * @param {Object}   props                    React props.
- * @param {Function} props.setAttributes      Callback for updating block attributes.
- * @param {Object}   props.attributes         Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
- * @param {Object}   props.avatar             Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
- * @param {Object}   props.blockProps         Props returned by `useBlockProps`, applied to the wrapper element.
- * @param {boolean}  props.isSelected         Whether the block is selected. Resize handles are only shown when it is.
+ * @param {Object}   props                      React props.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {Object}   props.attributes           Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
+ * @param {Object}   props.avatar               Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
+ * @param {Object}   props.blockProps           Props returned by `useBlockProps`, applied to the wrapper element.
+ * @param {boolean}  props.isSelected           Whether the block is selected. Resize handles are only shown when it is.
  * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  *
  * @return {React.JSX.Element} React element.
@@ -341,12 +341,12 @@ const ResizableAvatar = ( {
  * `commentId` context. The user selection control is not offered here because
  * the author is determined by the comment.
  *
- * @param {Object}   props               React props.
- * @param {Object}   props.attributes    Block attributes.
- * @param {Object}   props.context       Inherited context, from which the comment ID is read.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {boolean}  props.isSelected    Whether the block is selected.
- *
+ * @param {Object}   props                      React props.
+ * @param {Object}   props.attributes           Block attributes.
+ * @param {Object}   props.context              Inherited context, from which the comment ID is read.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {boolean}  props.isSelected           Whether the block is selected.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  * @return {React.JSX.Element} React element.
  */
 const CommentEdit = ( {
@@ -385,12 +385,12 @@ const CommentEdit = ( {
  * attribute when set, and otherwise from the author of the post identified by
  * the `postType` and `postId` context.
  *
- * @param {Object}   props               React props.
- * @param {Object}   props.attributes    Block attributes, from which the `userId` is read.
- * @param {Object}   props.context       Inherited context, from which the post type and post ID are read.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {boolean}  props.isSelected    Whether the block is selected.
- *
+ * @param {Object}   props                      React props.
+ * @param {Object}   props.attributes           Block attributes, from which the `userId` is read.
+ * @param {Object}   props.context              Inherited context, from which the post type and post ID are read.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {boolean}  props.isSelected           Whether the block is selected.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  * @return {React.JSX.Element} React element.
  */
 const UserEdit = ( {
