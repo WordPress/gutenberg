@@ -2,13 +2,39 @@ import {
 	store as blockEditorStore,
 	__unstableBlockToolbarLastItem as BlockToolbarLastItem,
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import type { PatternOverrides } from '../store/types';
 import type { ResetOverridesControlProps } from './types';
 
-const CONTENT = 'content';
+export function getPatternOverridesProvider(
+	select: DataRegistry[ 'select' ],
+	clientId: string
+) {
+	const { getBlockName, getBlockParents } = select( blockEditorStore );
+	const { getBlockType } = select( blocksStore );
+	// Parents always exist, so each one has a name.
+	const patternClientId = getBlockParents( clientId, true ).find(
+		( parentId ) =>
+			getBlockType( getBlockName( parentId )! )?.providesContext?.[
+				'pattern/overrides'
+			]
+	);
+
+	if ( ! patternClientId ) {
+		return;
+	}
+
+	return {
+		clientId: patternClientId,
+		// The search above only matches a block type with this mapping.
+		attributeName: getBlockType( getBlockName( patternClientId )! )!
+			.providesContext![ 'pattern/overrides' ],
+	};
+}
 
 export default function ResetOverridesControl(
 	props: ResetOverridesControlProps
@@ -21,21 +47,19 @@ export default function ResetOverridesControl(
 				return;
 			}
 
-			const { getBlockAttributes, getBlockParentsByBlockName } =
-				select( blockEditorStore );
-			const [ patternClientId ] = getBlockParentsByBlockName(
-				props.clientId,
-				'core/block',
-				true
+			const provider = getPatternOverridesProvider(
+				select,
+				props.clientId
 			);
 
-			if ( ! patternClientId ) {
+			if ( ! provider ) {
 				return;
 			}
 
-			// The pattern block exists, and keeps its overrides in `content`.
-			const overrides = getBlockAttributes( patternClientId )![
-				CONTENT
+			// The provider block exists, and keeps its overrides in its mapped attribute.
+			const { getBlockAttributes } = select( blockEditorStore );
+			const overrides = getBlockAttributes( provider.clientId )![
+				provider.attributeName
 			] as PatternOverrides | undefined;
 
 			if ( ! overrides ) {
@@ -48,21 +72,19 @@ export default function ResetOverridesControl(
 	);
 
 	function onClick() {
-		const { getBlockAttributes, getBlockParentsByBlockName } =
-			registry.select( blockEditorStore );
-		const [ patternClientId ] = getBlockParentsByBlockName(
-			props.clientId,
-			'core/block',
-			true
+		const provider = getPatternOverridesProvider(
+			registry.select,
+			props.clientId
 		);
 
-		if ( ! patternClientId ) {
+		if ( ! provider ) {
 			return;
 		}
 
-		// The button is only enabled once the pattern block has overrides.
-		const overrides = getBlockAttributes( patternClientId )![
-			CONTENT
+		// The button is only enabled once the provider block has overrides.
+		const { getBlockAttributes } = registry.select( blockEditorStore );
+		const overrides = getBlockAttributes( provider.clientId )![
+			provider.attributeName
 		] as PatternOverrides;
 
 		// An enabled button means the block has a name, as `isOverridden` needs one.
@@ -82,8 +104,8 @@ export default function ResetOverridesControl(
 			newOverrides = undefined;
 		}
 
-		updateBlockAttributes( patternClientId, {
-			[ CONTENT ]: newOverrides,
+		updateBlockAttributes( provider.clientId, {
+			[ provider.attributeName ]: newOverrides,
 		} );
 	}
 
