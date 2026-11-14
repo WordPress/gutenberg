@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { ReactElement, ReactNode } from 'react';
+import type { ReactElement, ReactNode, Ref } from 'react';
 import { Button } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { pencil } from '@wordpress/icons';
@@ -60,6 +60,7 @@ export default function SummaryButton< Item >( {
 	touched,
 	disabled,
 	isOpen,
+	buttonRef,
 	onClick,
 	renderButton,
 }: {
@@ -71,6 +72,7 @@ export default function SummaryButton< Item >( {
 	touched: boolean;
 	disabled?: boolean;
 	isOpen: boolean;
+	buttonRef?: Ref< HTMLButtonElement >;
 	onClick?: () => void;
 	renderButton?: (
 		button: ReactElement< Record< string, unknown > >
@@ -112,6 +114,7 @@ export default function SummaryButton< Item >( {
 
 	const button = (
 		<Button
+			ref={ buttonRef }
 			className="dataforms-layouts-panel__field-trigger-icon"
 			label={ ariaLabel }
 			icon={ pencil }

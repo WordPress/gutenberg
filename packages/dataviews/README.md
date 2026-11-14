@@ -2409,6 +2409,8 @@ DataForm panel flyouts and dialogs use `@wordpress/ui` when the runtime and ever
 
 Use `useUiOverlaySupport( fields )` before placing a DataForm inside your own UI Dialog or Drawer. It checks the imported Components and, on WordPress, `window.wp.components`. It observes support changes from the actual renderer owners, including `withFilters` wrappers. `DataForm.canUseUiOverlays( fields )` returns the same check as a non-reactive snapshot. Keep edits above a conditional overlay host so a support change does not discard them.
 
+Panel fields choose their flyout implementation when mounted. If compatibility is lost, they switch to the legacy flyout and retain it until remounting. This keeps triggers stable when support returns.
+
 A custom `Edit`, `render`, rich `header` or `description` component, or component-valued text `prefix` or `suffix`, can opt in with an own `supportsUiOverlays = true` property. The declaration promises that its complete content supports UI overlays, including nested legacy components. It must not rely on an inherited declaration or copy a declaration from a renderer that it replaces. Plain strings and built-in controls need no declaration.
 
 ```js

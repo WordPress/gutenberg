@@ -8,6 +8,7 @@ import {
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import {
+	useCallback,
 	useContext,
 	useId,
 	useMemo,
@@ -100,10 +101,28 @@ function PanelDropdown< Item >( {
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const legacyPopoverSlotName = useId();
-	const { supportsUiOverlays: useUiOverlay = false } =
+	const { supportsUiOverlays: supportsUiOverlay = false } =
 		useContext( DataFormContext );
+	const [ nativeHost, setNativeHost ] = useState( supportsUiOverlay );
+	if ( nativeHost && ! supportsUiOverlay ) {
+		setNativeHost( false );
+	}
+	const useUiOverlay = nativeHost && supportsUiOverlay;
 	const [ touched, setTouched ] = useState( false );
 	const [ isOpen, setIsOpen ] = useState( false );
+	const setTrigger = useCallback(
+		( node: HTMLButtonElement | null ) => {
+			// A host change can remove the focused trigger. Let the new popup
+			// capture its replacement without overriding another focus target.
+			if (
+				isOpen &&
+				node?.ownerDocument.activeElement === node?.ownerDocument.body
+			) {
+				node?.focus();
+			}
+		},
+		[ isOpen ]
+	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const initialFocusRef = useFocusOnMount( 'firstInputElement' );
 	const popupRef = useMergeRefs( [ constrainedTabbingRef, initialFocusRef ] );
@@ -161,6 +180,7 @@ function PanelDropdown< Item >( {
 			touched={ touched }
 			disabled={ isDisabled }
 			isOpen={ isOpen }
+			buttonRef={ setTrigger }
 			onClick={ onClick }
 			renderButton={
 				useUiOverlay
