@@ -1,4 +1,5 @@
 import {
+	Fragment,
 	useCallback,
 	useEffect,
 	useLayoutEffect,
@@ -21,6 +22,7 @@ import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
+import { useSuggestPostEditGuard } from '../suggestion-mode/use-suggest-post-edit-guard';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -41,10 +43,24 @@ import PatternDuplicateModal from '../pattern-duplicate-modal';
 import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
+import {
+	SuggestionOverlayProvider,
+	SuggestionAutoSave,
+	isSuggestionModeEnabled,
+} from '../suggestion-mode';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
 const { PrivateEntityProvider } = unlock( coreDataPrivateApis );
+
+/*
+ * With the experiment off the overlay context (and its block-tree
+ * subscriptions) never mounts; consumers fall back to the context default,
+ * which is inert.
+ */
+const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
+	? SuggestionOverlayProvider
+	: Fragment;
 
 const noop = () => {};
 
@@ -370,6 +386,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// has populated the current post.
 		useAutosaveNotice( { post, recovery, settings } );
 
+		// Refuses direct post-level entity writes while suggesting.
+		useSuggestPostEditGuard();
+
 		// Synchronizes the active post with the state
 		useEffect( () => {
 			setEditedPost( post.type, post.id );
@@ -456,28 +475,33 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							{ children }
-							{ ! settings.isPreviewMode && (
-								<>
-									<PatternsMenuItems />
-									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
-									{ type === 'wp_navigation' && (
-										<NavigationBlockEditingMode />
-									) }
-									<EditorKeyboardShortcutsRegister />
-									<EditorKeyboardShortcuts />
-									<KeyboardShortcutHelpModal />
-									<BlockRemovalWarnings />
-									<StartPageOptions />
-									<StartTemplateOptions />
-									<PatternRenameModal />
-									<PatternDuplicateModal />
-									<MediaEditorModalMount />
-								</>
-							) }
+							<MaybeSuggestionOverlayProvider>
+								{ children }
+								{ ! settings.isPreviewMode && (
+									<>
+										<PatternsMenuItems />
+										<TemplatePartMenuItems />
+										{ mode === 'template-locked' && (
+											<DisableNonPageContentBlocks />
+										) }
+										{ type === 'wp_navigation' && (
+											<NavigationBlockEditingMode />
+										) }
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+										<KeyboardShortcutHelpModal />
+										<BlockRemovalWarnings />
+										<StartPageOptions />
+										<StartTemplateOptions />
+										<PatternRenameModal />
+										<PatternDuplicateModal />
+										{ isSuggestionModeEnabled() && (
+											<SuggestionAutoSave />
+										) }
+										<MediaEditorModalMount />
+									</>
+								) }
+							</MaybeSuggestionOverlayProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</PrivateEntityProvider>
