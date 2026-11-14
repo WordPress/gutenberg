@@ -11,6 +11,35 @@ test.describe( 'Focus toolbar shortcut (alt + F10)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'keeps the floating toolbar out of the slash inserter until focused', async ( {
+		editor,
+		page,
+		toolbarUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { className: 'slash-inserter-paragraph' },
+		} );
+		const paragraph = editor.canvas.locator( '.slash-inserter-paragraph' );
+		await paragraph.click();
+		await page.mouse.move( 0, 0 );
+		await page.keyboard.type( '/heading' );
+		await expect(
+			page.getByRole( 'option', { name: 'Heading' } )
+		).toBeVisible();
+
+		// Moving the pointer brings back the toolbar after typing.
+		await paragraph.hover();
+		const floatingToolbar = page.locator(
+			'.block-editor-block-list__block-popover'
+		);
+		await expect( floatingToolbar ).toHaveCSS( 'opacity', '0' );
+
+		await toolbarUtils.moveToToolbarShortcut();
+		await expect( toolbarUtils.blockToolbarParagraphButton ).toBeFocused();
+		await expect( floatingToolbar ).toHaveCSS( 'opacity', '1' );
+	} );
+
 	test( 'Focuses correct toolbar in default view options in edit mode', async ( {
 		editor,
 		page,

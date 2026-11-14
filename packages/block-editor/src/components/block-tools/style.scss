@@ -143,6 +143,16 @@
 		visibility: hidden;
 	}
 
+	// Keep the toolbar focusable so its keyboard shortcut can still reveal it.
+	&.is-slash-inserter-visible:not(:focus-within) {
+		opacity: 0;
+		pointer-events: none;
+
+		.components-popover__content * {
+			pointer-events: none;
+		}
+	}
+
 	.is-dragging-components-draggable & {
 		opacity: 0;
 		@media not ( prefers-reduced-motion ) {

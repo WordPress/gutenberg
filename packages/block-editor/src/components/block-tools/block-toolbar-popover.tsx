@@ -12,6 +12,7 @@ import type { BlockToolbarPopoverProps } from './types';
 export default function BlockToolbarPopover( {
 	clientId,
 	isTyping,
+	isSlashInserterVisible,
 	__unstableContentRef,
 }: BlockToolbarPopoverProps ) {
 	const { capturingClientId, isInsertionPointVisible, lastClientId } =
@@ -58,6 +59,7 @@ export default function BlockToolbarPopover( {
 				bottomClientId={ lastClientId }
 				className={ clsx( 'block-editor-block-list__block-popover', {
 					'is-insertion-point-visible': isInsertionPointVisible,
+					'is-slash-inserter-visible': isSlashInserterVisible,
 				} ) }
 				resize={ false }
 				{ ...popoverProps }
