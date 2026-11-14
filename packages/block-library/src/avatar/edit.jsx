@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import {
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -20,6 +21,13 @@ import { Link, Text } from '@wordpress/ui';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useCommentAvatar, useUserAvatar } from './hooks';
+import {
+	getActiveAvatarSize,
+	getResetAvatarSizeAttributes,
+	getUpdatedAvatarSizeAttributes,
+	hasViewportAvatarSize,
+	isViewportStyleState,
+} from './responsive-styles';
 import UserControl from './user-control';
 
 /**
@@ -56,11 +64,12 @@ function useAvatarHelpText() {
 /**
  * Renders the inspector controls for the `core/avatar` block.
  *
- * @param {Object}   props               React props.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {Object}   props.avatar        Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the `minSize` and `maxSize` bounds of the size control.
- * @param {Object}   props.attributes    Block attributes: `size`, `isLink`, `linkTarget` and `userId`.
- * @param {boolean}  props.selectUser    Whether to render the user selection control.
+ * @param {Object}   props                      React props.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {Object}   props.avatar               Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the `minSize` and `maxSize` bounds of the size control.
+ * @param {Object}   props.attributes           Block attributes: `size`, `isLink`, `linkTarget` and `userId`.
+ * @param {boolean}  props.selectUser           Whether to render the user selection control.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  *
  * @return {React.JSX.Element} React element.
  */
@@ -69,14 +78,30 @@ const AvatarInspectorControls = ( {
 	avatar,
 	attributes,
 	selectUser,
+	selectedStyleState,
 } ) => {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const helpText = useAvatarHelpText();
+	const isViewport = isViewportStyleState( selectedStyleState );
+	const activeSize = getActiveAvatarSize( {
+		attributes,
+		selectedState: selectedStyleState,
+	} );
+
 	return (
-		<InspectorControls>
+		<InspectorControls group={ isViewport ? 'style-state' : 'default' }>
 			<ToolsPanel
 				label={ __( 'Settings' ) }
 				resetAll={ () => {
+					if ( isViewport ) {
+						setAttributes(
+							getResetAvatarSizeAttributes( {
+								attributes,
+								selectedState: selectedStyleState,
+							} )
+						);
+						return;
+					}
 					setAttributes( {
 						size: 96,
 						isLink: false,
@@ -86,7 +111,7 @@ const AvatarInspectorControls = ( {
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
-				{ helpText && (
+				{ ! isViewport && helpText && (
 					<Text className="wp-block-avatar__help-text">
 						{ helpText }
 					</Text>
@@ -94,74 +119,106 @@ const AvatarInspectorControls = ( {
 				<ToolsPanelItem
 					label={ __( 'Image size' ) }
 					isShownByDefault
-					hasValue={ () => attributes?.size !== 96 }
-					onDeselect={ () => setAttributes( { size: 96 } ) }
+					hasValue={ () =>
+						isViewport
+							? hasViewportAvatarSize( {
+									attributes,
+									selectedState: selectedStyleState,
+								} )
+							: attributes?.size !== 96
+					}
+					onDeselect={ () =>
+						setAttributes(
+							getResetAvatarSizeAttributes( {
+								attributes,
+								selectedState: selectedStyleState,
+							} )
+						)
+					}
 				>
 					<RangeControl
 						label={ __( 'Image size' ) }
 						onChange={ ( newSize ) =>
-							setAttributes( {
-								size: newSize,
-							} )
+							setAttributes(
+								getUpdatedAvatarSizeAttributes( {
+									attributes,
+									selectedState: selectedStyleState,
+									newSize,
+								} )
+							)
 						}
 						min={ avatar.minSize }
 						max={ avatar.maxSize }
-						initialPosition={ attributes?.size }
-						value={ attributes?.size }
+						initialPosition={ activeSize }
+						value={ activeSize }
 					/>
 				</ToolsPanelItem>
-				<ToolsPanelItem
-					label={ __( 'Link to user profile' ) }
-					isShownByDefault
-					hasValue={ () => attributes?.isLink }
-					onDeselect={ () => setAttributes( { isLink: false } ) }
-				>
-					<ToggleControl
-						label={ __( 'Link to user profile' ) }
-						onChange={ () =>
-							setAttributes( { isLink: ! attributes.isLink } )
-						}
-						checked={ attributes.isLink }
-					/>
-				</ToolsPanelItem>
-				{ attributes.isLink && (
-					<ToolsPanelItem
-						label={ __( 'Open in new tab' ) }
-						isShownByDefault
-						hasValue={ () => attributes?.linkTarget !== '_self' }
-						onDeselect={ () =>
-							setAttributes( { linkTarget: '_self' } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Open in new tab' ) }
-							onChange={ ( value ) =>
-								setAttributes( {
-									linkTarget: value ? '_blank' : '_self',
-								} )
+				{ ! isViewport && (
+					<>
+						<ToolsPanelItem
+							label={ __( 'Link to user profile' ) }
+							isShownByDefault
+							hasValue={ () => attributes?.isLink }
+							onDeselect={ () =>
+								setAttributes( { isLink: false } )
 							}
-							checked={ attributes.linkTarget === '_blank' }
-						/>
-					</ToolsPanelItem>
-				) }
-				{ selectUser && (
-					<ToolsPanelItem
-						label={ __( 'User' ) }
-						isShownByDefault
-						hasValue={ () => !! attributes?.userId }
-						onDeselect={ () =>
-							setAttributes( { userId: undefined } )
-						}
-					>
-						<UserControl
-							value={ attributes?.userId }
-							onChange={ ( value ) => {
-								setAttributes( {
-									userId: value,
-								} );
-							} }
-						/>
-					</ToolsPanelItem>
+						>
+							<ToggleControl
+								label={ __( 'Link to user profile' ) }
+								onChange={ () =>
+									setAttributes( {
+										isLink: ! attributes.isLink,
+									} )
+								}
+								checked={ attributes.isLink }
+							/>
+						</ToolsPanelItem>
+						{ attributes.isLink && (
+							<ToolsPanelItem
+								label={ __( 'Open in new tab' ) }
+								isShownByDefault
+								hasValue={ () =>
+									attributes?.linkTarget !== '_self'
+								}
+								onDeselect={ () =>
+									setAttributes( { linkTarget: '_self' } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Open in new tab' ) }
+									onChange={ ( value ) =>
+										setAttributes( {
+											linkTarget: value
+												? '_blank'
+												: '_self',
+										} )
+									}
+									checked={
+										attributes.linkTarget === '_blank'
+									}
+								/>
+							</ToolsPanelItem>
+						) }
+						{ selectUser && (
+							<ToolsPanelItem
+								label={ __( 'User' ) }
+								isShownByDefault
+								hasValue={ () => !! attributes?.userId }
+								onDeselect={ () =>
+									setAttributes( { userId: undefined } )
+								}
+							>
+								<UserControl
+									value={ attributes?.userId }
+									onChange={ ( value ) => {
+										setAttributes( {
+											userId: value,
+										} );
+									} }
+								/>
+							</ToolsPanelItem>
+						) }
+					</>
 				) }
 			</ToolsPanel>
 		</InspectorControls>
@@ -196,12 +253,13 @@ const AvatarLinkWrapper = ( { children, isLink } ) =>
  * Renders the avatar image inside a `ResizableBox` so its size can be adjusted
  * by dragging. Resizing keeps the aspect ratio and updates the `size` attribute.
  *
- * @param {Object}   props               React props.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {Object}   props.attributes    Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
- * @param {Object}   props.avatar        Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
- * @param {Object}   props.blockProps    Props returned by `useBlockProps`, applied to the wrapper element.
- * @param {boolean}  props.isSelected    Whether the block is selected. Resize handles are only shown when it is.
+ * @param {Object}   props                      React props.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {Object}   props.attributes           Block attributes: `size` and `isLink`, plus the border and shadow support values applied to the image.
+ * @param {Object}   props.avatar               Avatar data returned by `useCommentAvatar` or `useUserAvatar`, with the image `src` and `alt` and the `minSize` and `maxSize` resize bounds.
+ * @param {Object}   props.blockProps           Props returned by `useBlockProps`, applied to the wrapper element.
+ * @param {boolean}  props.isSelected           Whether the block is selected. Resize handles are only shown when it is.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  *
  * @return {React.JSX.Element} React element.
  */
@@ -211,13 +269,18 @@ const ResizableAvatar = ( {
 	avatar,
 	blockProps,
 	isSelected,
+	selectedStyleState,
 } ) => {
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
+	const activeSize = getActiveAvatarSize( {
+		attributes,
+		selectedState: selectedStyleState,
+	} );
 	const doubledSizedSrc = addQueryArgs(
 		removeQueryArgs( avatar?.src, [ 's' ] ),
 		{
-			s: attributes?.size * 2,
+			s: activeSize * 2,
 		}
 	);
 	return (
@@ -225,18 +288,22 @@ const ResizableAvatar = ( {
 			<AvatarLinkWrapper isLink={ attributes.isLink }>
 				<ResizableBox
 					size={ {
-						width: attributes.size,
-						height: attributes.size,
+						width: activeSize,
+						height: activeSize,
 					} }
 					showHandle={ isSelected }
 					onResizeStop={ ( event, direction, elt, delta ) => {
-						setAttributes( {
-							size: parseInt(
-								attributes.size +
-									( delta.height || delta.width ),
-								10
-							),
-						} );
+						setAttributes(
+							getUpdatedAvatarSizeAttributes( {
+								attributes,
+								selectedState: selectedStyleState,
+								newSize: parseInt(
+									activeSize +
+										( delta.height || delta.width ),
+									10
+								),
+							} )
+						);
 					} }
 					lockAspectRatio
 					enable={ {
@@ -253,7 +320,7 @@ const ResizableAvatar = ( {
 						alt={ avatar.alt }
 						className={ clsx(
 							'avatar',
-							'avatar-' + attributes.size,
+							'avatar-' + activeSize,
 							'photo',
 							'wp-block-avatar__image',
 							borderProps.className
@@ -274,15 +341,21 @@ const ResizableAvatar = ( {
  * `commentId` context. The user selection control is not offered here because
  * the author is determined by the comment.
  *
- * @param {Object}   props               React props.
- * @param {Object}   props.attributes    Block attributes.
- * @param {Object}   props.context       Inherited context, from which the comment ID is read.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {boolean}  props.isSelected    Whether the block is selected.
- *
+ * @param {Object}   props                      React props.
+ * @param {Object}   props.attributes           Block attributes.
+ * @param {Object}   props.context              Inherited context, from which the comment ID is read.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {boolean}  props.isSelected           Whether the block is selected.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  * @return {React.JSX.Element} React element.
  */
-const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
+const CommentEdit = ( {
+	attributes,
+	context,
+	setAttributes,
+	isSelected,
+	selectedStyleState,
+} ) => {
 	const { commentId } = context;
 	const blockProps = useBlockProps();
 	const avatar = useCommentAvatar( { commentId } );
@@ -293,6 +366,7 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				setAttributes={ setAttributes }
 				attributes={ attributes }
 				selectUser={ false }
+				selectedStyleState={ selectedStyleState }
 			/>
 			<ResizableAvatar
 				attributes={ attributes }
@@ -300,6 +374,7 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				blockProps={ blockProps }
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
+				selectedStyleState={ selectedStyleState }
 			/>
 		</>
 	);
@@ -310,15 +385,21 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
  * attribute when set, and otherwise from the author of the post identified by
  * the `postType` and `postId` context.
  *
- * @param {Object}   props               React props.
- * @param {Object}   props.attributes    Block attributes, from which the `userId` is read.
- * @param {Object}   props.context       Inherited context, from which the post type and post ID are read.
- * @param {Function} props.setAttributes Callback for updating block attributes.
- * @param {boolean}  props.isSelected    Whether the block is selected.
- *
+ * @param {Object}   props                      React props.
+ * @param {Object}   props.attributes           Block attributes, from which the `userId` is read.
+ * @param {Object}   props.context              Inherited context, from which the post type and post ID are read.
+ * @param {Function} props.setAttributes        Callback for updating block attributes.
+ * @param {boolean}  props.isSelected           Whether the block is selected.
+ * @param {Object}   [props.selectedStyleState] Currently selected block style state.
  * @return {React.JSX.Element} React element.
  */
-const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
+const UserEdit = ( {
+	attributes,
+	context,
+	setAttributes,
+	isSelected,
+	selectedStyleState,
+} ) => {
 	const { postId, postType } = context;
 	const avatar = useUserAvatar( {
 		userId: attributes?.userId,
@@ -333,6 +414,7 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }
+				selectedStyleState={ selectedStyleState }
 			/>
 
 			<ResizableAvatar
@@ -341,6 +423,7 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				blockProps={ blockProps }
 				isSelected={ isSelected }
 				setAttributes={ setAttributes }
+				selectedStyleState={ selectedStyleState }
 			/>
 		</>
 	);
@@ -363,9 +446,25 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
  * @return {React.JSX.Element} React element.
  */
 export default function Edit( props ) {
+	const { clientId } = props;
+	const { selectedStyleState } = useSelect(
+		( select ) => {
+			const { getSelectedBlockStyleState } = select( blockEditorStore );
+			return {
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const editProps = {
+		...props,
+		selectedStyleState,
+	};
+
 	// Don't show the Comment Edit controls if we have a comment ID set, or if we're in the Site Editor (where it is `null`).
 	if ( props?.context?.commentId || props?.context?.commentId === null ) {
-		return <CommentEdit { ...props } />;
+		return <CommentEdit { ...editProps } />;
 	}
-	return <UserEdit { ...props } />;
+	return <UserEdit { ...editProps } />;
 }
