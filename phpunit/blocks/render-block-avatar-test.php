@@ -94,4 +94,30 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 			)
 		);
 	}
+
+	public function test_viewport_state_renders_state_class_and_responsive_styles() {
+		$attributes = array(
+			'userId' => self::$user_id,
+			'size'   => 96,
+			'style'  => array(
+				'@mobile' => array(
+					'dimensions' => array(
+						'width'  => '48px',
+						'height' => '48px',
+					),
+				),
+			),
+		);
+
+		$rendered  = do_blocks( '<!-- wp:avatar ' . wp_json_encode( $attributes ) . ' /-->' );
+		$processor = new WP_HTML_Tag_Processor( $rendered );
+		$this->assertTrue( $processor->next_tag( 'div' ) );
+
+		$class_attribute = $processor->get_attribute( 'class' );
+		$this->assertMatchesRegularExpression( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute );
+
+		$stylesheet = wp_style_engine_get_stylesheet_from_context( 'block-supports' );
+		$this->assertStringContainsString( 'width:48px!important', $stylesheet );
+		$this->assertStringContainsString( 'height:48px!important', $stylesheet );
+	}
 }
