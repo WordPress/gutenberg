@@ -1,19 +1,34 @@
 import deepFreeze from 'deep-freeze';
+import type { AnyAction, Store as ReduxStore } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import plugin, { createPersistenceInterface, withLazySameState } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
+import type { DataRegistry, ReduxStoreConfig } from '../../../types';
+
+type PersistStoreConfig = ReduxStoreConfig< any, any, any > & {
+	persist?: boolean | string[];
+};
+
+type PersistedRegistry = Omit< DataRegistry, 'registerStore' > & {
+	registerStore: (
+		storeName: string,
+		options: PersistStoreConfig
+	) => ReduxStore;
+};
 
 describe( 'persistence', () => {
-	let registry;
+	let registry: PersistedRegistry;
 
 	beforeEach( () => {
 		vi.spyOn( objectStorage, 'setItem' );
 		objectStorage.clear();
-		objectStorage.setItem.mockClear();
+		vi.mocked( objectStorage.setItem ).mockClear();
 
 		// TODO: Remove the `use` function in favor of `registerGenericStore`
-		registry = createRegistry().use( plugin, { storage: objectStorage } );
+		registry = createRegistry().use( plugin, {
+			storage: objectStorage,
+		} ) as PersistedRegistry;
 	} );
 
 	it( 'should not mutate options', () => {
@@ -29,13 +44,13 @@ describe( 'persistence', () => {
 				getItem: () => JSON.stringify( { test: { a: 1 } } ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = {} ) => state,
+			reducer: ( state: Record< string, unknown > = {} ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: Record< string, unknown > ) => state,
 			},
 		} );
 
@@ -50,13 +65,13 @@ describe( 'persistence', () => {
 				getItem: () => JSON.stringify( { test: { a: 1 } } ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: [ 'a' ],
 			reducer: ( state = DEFAULT_STATE ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: typeof DEFAULT_STATE ) => state,
 			},
 		} );
 
@@ -83,13 +98,13 @@ describe( 'persistence', () => {
 					} ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: [ 'preferences' ],
 			reducer: ( state = DEFAULT_STATE ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: typeof DEFAULT_STATE ) => state,
 			},
 		} );
 
@@ -107,13 +122,13 @@ describe( 'persistence', () => {
 				getItem: () => JSON.stringify( { test: { persisted: true } } ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = null ) => state,
+			reducer: ( state: { persisted: boolean } | null = null ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: { persisted: boolean } | null ) => state,
 			},
 		} );
 
@@ -128,13 +143,13 @@ describe( 'persistence', () => {
 				getItem: () => JSON.stringify( { test: null } ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = {} ) => state,
+			reducer: ( state: Record< string, unknown > | null = {} ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: Record< string, unknown > | null ) => state,
 			},
 		} );
 
@@ -150,13 +165,13 @@ describe( 'persistence', () => {
 					} ),
 				setItem() {},
 			},
-		} );
+		} ) as PersistedRegistry;
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = null ) => state,
+			reducer: ( state: number | null = null ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: number | null ) => state,
 			},
 		} );
 
@@ -165,14 +180,17 @@ describe( 'persistence', () => {
 
 	it( 'should not persist if option not passed', () => {
 		const initialState = { foo: 'bar', baz: 'qux' };
-		function reducer( state = initialState, action ) {
+		function reducer(
+			state = initialState,
+			action: AnyAction & { nextState?: typeof initialState }
+		) {
 			return action.nextState || state;
 		}
 
 		registry.registerStore( 'test', {
 			reducer,
 			actions: {
-				setState( nextState ) {
+				setState( nextState: typeof initialState ) {
 					return { type: 'SET_STATE', nextState };
 				},
 			},
@@ -193,7 +211,7 @@ describe( 'persistence', () => {
 		const reducer = () => state;
 
 		objectStorage.setItem( 'WP_DATA', JSON.stringify( { test: state } ) );
-		objectStorage.setItem.mockClear();
+		vi.mocked( objectStorage.setItem ).mockClear();
 
 		registry.registerStore( 'test', {
 			reducer,
@@ -212,7 +230,10 @@ describe( 'persistence', () => {
 
 	it( 'should persist when state changes', () => {
 		const initialState = { foo: 'bar', baz: 'qux' };
-		function reducer( state = initialState, action ) {
+		function reducer(
+			state = initialState,
+			action: AnyAction & { nextState?: Record< string, unknown > }
+		) {
 			return action.nextState || state;
 		}
 
@@ -220,7 +241,7 @@ describe( 'persistence', () => {
 			reducer,
 			persist: true,
 			actions: {
-				setState( nextState ) {
+				setState( nextState: Record< string, unknown > ) {
 					return { type: 'SET_STATE', nextState };
 				},
 			},
@@ -236,7 +257,10 @@ describe( 'persistence', () => {
 
 	it( 'should persist a subset of keys', () => {
 		const initialState = { foo: 'bar', baz: 'qux' };
-		function reducer( state = initialState, action ) {
+		function reducer(
+			state = initialState,
+			action: AnyAction & { nextState?: Record< string, unknown > }
+		) {
 			return action.nextState || state;
 		}
 
@@ -244,7 +268,7 @@ describe( 'persistence', () => {
 			reducer,
 			persist: [ 'foo' ],
 			actions: {
-				setState( nextState ) {
+				setState( nextState: Record< string, unknown > ) {
 					return { type: 'SET_STATE', nextState };
 				},
 			},
@@ -260,7 +284,10 @@ describe( 'persistence', () => {
 
 	it( 'should not persist an unchanging subset', () => {
 		const initialState = { foo: 'bar' };
-		function reducer( state = initialState, action ) {
+		function reducer(
+			state = initialState,
+			action: AnyAction & { key: string; value: number }
+		) {
 			const { type, key, value } = action;
 			if ( type === 'SET_KEY_VALUE' ) {
 				return { ...state, [ key ]: value };
@@ -273,14 +300,14 @@ describe( 'persistence', () => {
 			reducer,
 			persist: [ 'foo' ],
 			actions: {
-				setKeyValue( key, value ) {
+				setKeyValue( key: string, value: number ) {
 					return { type: 'SET_KEY_VALUE', key, value };
 				},
 			},
 		} );
 
 		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
-		objectStorage.setItem.mockClear();
+		vi.mocked( objectStorage.setItem ).mockClear();
 
 		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
 		expect( objectStorage.setItem ).not.toHaveBeenCalled();
@@ -290,7 +317,8 @@ describe( 'persistence', () => {
 		const storage = objectStorage;
 		const storageKey = 'FOO';
 
-		let get, set;
+		let get: () => Record< string, unknown >;
+		let set: ( key: string, value: unknown ) => void;
 		beforeEach( () => {
 			( { get, set } = createPersistenceInterface( {
 				storage,
@@ -343,7 +371,10 @@ describe( 'persistence', () => {
 		it( 'should call the original reducer if action.nextState differs from state', () => {
 			const reducer = vi
 				.fn()
-				.mockImplementation( ( state, action ) => action.nextState );
+				.mockImplementation(
+					( state: number, action: { nextState: number } ) =>
+						action.nextState
+				);
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();
@@ -357,7 +388,10 @@ describe( 'persistence', () => {
 		it( 'should not call the original reducer if action.nextState equals state', () => {
 			const reducer = vi
 				.fn()
-				.mockImplementation( ( state, action ) => action.nextState );
+				.mockImplementation(
+					( state: number, action: { nextState: number } ) =>
+						action.nextState
+				);
 			const enhanced = withLazySameState( reducer );
 
 			reducer.mockClear();

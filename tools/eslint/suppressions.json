@@ -6976,16 +6976,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/plugins/persistence/storage/test/object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/plugins/persistence/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/redux-store/test/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
