@@ -2,6 +2,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetElementClassName,
+	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -29,10 +30,12 @@ export default function save( { attributes } ) {
 	// `aspect-ratio: auto W/H`, whose `auto` keyword is unreliable during load.
 	const aspectRatio =
 		width && height ? `${ width } / ${ height }` : undefined;
+	const borderProps = getBorderClassesAndStyles( attributes );
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
 		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
+		...borderProps.style,
 	};
 	return (
 		<figure { ...useBlockProps.save() }>
@@ -45,6 +48,7 @@ export default function save( { attributes } ) {
 					poster={ poster }
 					preload={ preload !== 'metadata' ? preload : undefined }
 					src={ src }
+					className={ borderProps.className }
 					playsInline={ playsInline }
 					width={ width }
 					height={ height }
