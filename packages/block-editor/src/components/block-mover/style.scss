@@ -16,10 +16,9 @@
 				width: 100%;
 				min-width: 0 !important; // overrides default button width.
 
-				// Focus style. The height is measured from the padding box,
-				// so add back the button's reserved border.
+				// Focus style.
 				&::before {
-					height: calc(100% - 4px + #{2 * $border-width});
+					height: calc(100% - 4px);
 				}
 			}
 
@@ -97,4 +96,11 @@
 			animation-fill-mode: forwards;
 		}
 	}
+}
+
+// The buttons clip their overflow, so keep the focus ring inset enough to stay
+// visible instead of following the toolbar group's offsets.
+.block-editor-block-mover .components-button.block-editor-block-mover-button.has-icon::before {
+	left: 2px;
+	right: 2px;
 }
