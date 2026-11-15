@@ -259,6 +259,19 @@ describe( 'getEntityRecords', () => {
 		// Resolved above.
 		expect( allPosts!.map( ( p ) => p.id ) ).toEqual( [ 1, 2, 3 ] );
 	} );
+
+	it( 'should not wait for the site entity to read static root entity records', async () => {
+		const { getEntityRecords } = registry.resolveSelect( coreDataStore );
+		const statuses = [ { slug: 'publish', name: 'Published' } ];
+		apiFetchMock.mockResolvedValue( statuses );
+
+		await expect( getEntityRecords( 'root', 'status' ) ).resolves.toEqual(
+			statuses
+		);
+		expect( triggerFetch ).not.toHaveBeenCalledWith(
+			expect.objectContaining( { method: 'OPTIONS' } )
+		);
+	} );
 } );
 
 describe( 'clearEntityRecordEdits', () => {
