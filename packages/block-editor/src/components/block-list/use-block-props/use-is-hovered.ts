@@ -32,6 +32,17 @@ export function useIsHovered( {
 				}
 				event.preventDefault();
 				const isHovered = event.type === 'mouseover';
+				// Moving between elements of the same block fires `mouseout`
+				// and then `mouseover`. Keep the classes so the outline does
+				// not flash off; the `mouseover` that follows updates them.
+				// Mouse events target elements.
+				const relatedTarget = event.relatedTarget as Element | null;
+				if (
+					! isHovered &&
+					relatedTarget?.closest?.( '[data-block]' ) === node
+				) {
+					return;
+				}
 				node.classList.toggle( 'is-hovered', isHovered );
 				clearTimeout( timeoutId );
 				if ( ! isHovered ) {
