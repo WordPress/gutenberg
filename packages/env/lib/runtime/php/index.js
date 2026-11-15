@@ -516,23 +516,36 @@ async function link( source, target ) {
  * @param {string} siteDir The site folder.
  */
 function install( config, siteDir ) {
-	runSetupScript( config, 'install.php', siteDir, config.name );
+	runSetupScript(
+		config,
+		'Installing WordPress failed',
+		'install.php',
+		siteDir,
+		config.name
+	);
 	// One process per plugin, in config order, like `wp plugin activate` in the
 	// Docker runtime. A plugin that requires another one then sees it active and
 	// loaded, including hooks like WooCommerce's `wp_plugin_dependencies_slug`.
 	for ( const source of config.env.development.pluginSources ) {
-		runSetupScript( config, 'activate.php', siteDir, source.basename );
+		runSetupScript(
+			config,
+			`Activating the plugin "${ source.basename }" failed`,
+			'activate.php',
+			siteDir,
+			source.basename
+		);
 	}
 }
 
 /**
  * Run one of the PHP setup scripts next to this file.
  *
- * @param {Object}    config The wp-env config object.
- * @param {string}    script The script file name.
- * @param {...string} args   The script arguments.
+ * @param {Object}    config  The wp-env config object.
+ * @param {string}    failure The error message prefix if the script fails.
+ * @param {string}    script  The script file name.
+ * @param {...string} args    The script arguments.
  */
-function runSetupScript( config, script, ...args ) {
+function runSetupScript( config, failure, script, ...args ) {
 	const result = spawn.sync(
 		'php',
 		[ path.join( __dirname, script ), ...args ],
@@ -544,7 +557,7 @@ function runSetupScript( config, script, ...args ) {
 		! existsSync( getDatabasePaths( config ).database )
 	) {
 		throw new Error(
-			`Installing WordPress failed:\n${ result.stdout }${ result.stderr }`
+			`${ failure }:\n${ result.stdout }${ result.stderr }`
 		);
 	}
 }
