@@ -30,14 +30,17 @@ const field = {
 
 // The component reads the upload permission and the attachments from the
 // `core` store; a stand-in avoids the resolvers' requests.
-function createTestRegistry( { canUpload = true } = {} ) {
+function createTestRegistry( {
+	canUpload = true,
+	attachments = null,
+}: { canUpload?: boolean; attachments?: unknown[] | null } = {} ) {
 	const registry = createRegistry();
 	registry.register(
 		createReduxStore( 'core', {
 			reducer: ( state = {} ) => state,
 			selectors: {
 				canUser: () => canUpload,
-				getEntityRecords: () => null,
+				getEntityRecords: () => attachments,
 			},
 			actions: {
 				receiveEntityRecords: () => ( {
@@ -139,5 +142,51 @@ describe( 'MediaEdit', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Set featured image' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'loads the full-size image for the preview unless getPreviewUrl picks another', () => {
+		const attachment = {
+			id: 42,
+			mime_type: 'image/jpeg',
+			alt_text: 'Forty-two',
+			title: { rendered: '42' },
+			source_url: 'https://example.com/42.jpg',
+			media_details: {
+				sizes: {
+					large: {
+						source_url: 'https://example.com/42-1024x768.jpg',
+					},
+				},
+			},
+		};
+		const renderWith = ( getPreviewUrl?: () => string ) =>
+			render(
+				<RegistryProvider
+					value={ createTestRegistry( {
+						attachments: [ attachment ],
+					} ) }
+				>
+					<MediaEditControl
+						data={ { featured_media: 42 } }
+						field={ field }
+						onChange={ () => {} }
+						getPreviewUrl={ getPreviewUrl }
+					/>
+				</RegistryProvider>
+			);
+		const preview = () => screen.getByRole( 'img', { name: 'Forty-two' } );
+
+		const view = renderWith();
+		expect( preview() ).toHaveAttribute(
+			'src',
+			'https://example.com/42.jpg'
+		);
+		view.unmount();
+
+		renderWith( () => attachment.media_details.sizes.large.source_url );
+		expect( preview() ).toHaveAttribute(
+			'src',
+			'https://example.com/42-1024x768.jpg'
+		);
 	} );
 } );

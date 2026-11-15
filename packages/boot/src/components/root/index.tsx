@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { UnsavedChangesWarning } from '@wordpress/editor';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
@@ -130,9 +130,13 @@ export default function Root() {
 									isMobileSidebarOpen &&
 									! isFullScreen && (
 										<motion.div
-											initial={ { x: '-100%' } }
+											initial={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											animate={ { x: 0 } }
-											exit={ { x: '-100%' } }
+											exit={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											transition={ {
 												type: 'tween',
 												duration: disableMotion
