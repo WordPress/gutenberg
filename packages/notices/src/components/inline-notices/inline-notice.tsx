@@ -1,11 +1,12 @@
-import { speak } from '@wordpress/a11y';
 import { Slot } from '@wordpress/components';
-import { RawHTML, useEffect, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { RawHTML, useRef, useState } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
 import DetailsText from './details-text';
+import getHTMLNoticeText from './get-html-notice-text';
 import { NOTICE_SLOT } from '../../store/constants';
 import type {
 	Notice as NoticeType,
@@ -25,6 +26,7 @@ type NoticeAction = NoticeActionType & {
 
 type InlineNoticeProps = {
 	notice: NoticeType;
+	announceOnMount: boolean;
 	onRemove: () => void;
 };
 
@@ -40,24 +42,6 @@ function getStatusLabel( status: NoticeType[ 'status' ] ) {
 		default:
 			return __( 'Notice' );
 	}
-}
-
-/**
- * Announces a notice when it is created, including when a new notice replaces
- * one with the same ID. Only the message is announced: details are read when
- * the user opens them, and action labels are not part of the message.
- *
- * @param notice The notice to announce.
- */
-function useAnnouncement( notice: NoticeType ) {
-	const { spokenMessage, status } = notice;
-	useEffect( () => {
-		if ( spokenMessage ) {
-			speak( spokenMessage, status === 'error' ? 'assertive' : 'polite' );
-		}
-		// Each `createNotice` call stores a new notice object, so depending
-		// on it announces every new notice, even one with the same message.
-	}, [ notice, spokenMessage, status ] );
 }
 
 function NoticeActionControl( {
@@ -92,6 +76,7 @@ function NoticeActionControl( {
 
 export default function InlineNotice( {
 	notice,
+	announceOnMount,
 	onRemove,
 }: InlineNoticeProps ) {
 	const {
@@ -106,18 +91,53 @@ export default function InlineNotice( {
 	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
 		symbol | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
+	const htmlDescriptionRef = useRef< HTMLDivElement >( null );
+	const [ spokenMessage, setSpokenMessage ] = useState( '' );
+	const previousNoticeRef = useRef( announceOnMount ? undefined : notice );
 
-	useAnnouncement( notice );
+	useIsomorphicLayoutEffect( () => {
+		if ( previousNoticeRef.current === notice ) {
+			return;
+		}
+		previousNoticeRef.current = notice;
+
+		const message =
+			notice.spokenMessage && htmlDescriptionRef.current
+				? getHTMLNoticeText( htmlDescriptionRef.current ).trim()
+				: ( notice.spokenMessage ?? '' );
+		// As in @wordpress/a11y, alternate a trailing space so an identical
+		// message changes the live region without remounting the notice.
+		setSpokenMessage( ( previous ) =>
+			message && previous === message ? message + '\u00a0' : message
+		);
+	}, [ notice ] );
 
 	// Copying HTML content would put its tags on the clipboard.
 	const canCopy = !! details && ! __unstableHTML;
 	const hasActions = actions.length > 0 || !! details;
 
-	const children = (
-		<>
+	return (
+		<Collapsible.Root
+			open={ isOpen }
+			onOpenChange={ setIsOpen }
+			render={
+				<Notice.Root
+					intent={ status }
+					spokenMessage={ spokenMessage }
+					politeness={ status === 'error' ? 'assertive' : 'polite' }
+					className={ clsx(
+						'notices-inline-notices__notice',
+						`is-${ status }`
+					) }
+				/>
+			}
+		>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			{ __unstableHTML ? (
-				<Notice.Description render={ <div /> }>
+				<Notice.Description
+					ref={ htmlDescriptionRef }
+					render={ <div /> }
+				>
 					<RawHTML>{ content }</RawHTML>
 				</Notice.Description>
 			) : (
@@ -150,7 +170,7 @@ export default function InlineNotice( {
 							text={ `${ content }\n\n${ details }` }
 							label={
 								status === 'error'
-									? __( 'Copy error' )
+									? _x( 'Copy error', 'button label' )
 									: __( 'Copy message' )
 							}
 						/>
@@ -175,25 +195,6 @@ export default function InlineNotice( {
 					} }
 				/>
 			) }
-		</>
-	);
-
-	const rootProps = {
-		intent: status,
-		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
-	};
-
-	if ( ! details ) {
-		return <Notice.Root { ...rootProps }>{ children }</Notice.Root>;
-	}
-
-	return (
-		<Collapsible.Root
-			open={ isOpen }
-			onOpenChange={ setIsOpen }
-			render={ <Notice.Root { ...rootProps } /> }
-		>
-			{ children }
 		</Collapsible.Root>
 	);
 }

@@ -120,7 +120,9 @@ function ItemContent( {
 						variant="body-sm"
 						className={ styles[ 'item-suffix' ] }
 					>
-						{ suffix }
+						<span className={ styles[ 'accessory-content' ] }>
+							{ suffix }
+						</span>
 					</Text>
 				) }
 				{ shortcut && (
@@ -128,12 +130,16 @@ function ItemContent( {
 						variant="body-sm"
 						className={ styles[ 'item-shortcut' ] }
 					>
-						<KeyboardShortcutDisplay shortcut={ shortcut } />
+						<span className={ styles[ 'accessory-content' ] }>
+							<KeyboardShortcutDisplay shortcut={ shortcut } />
+						</span>
 					</Text>
 				) }
 				{ hasTrailing && (
 					<span className={ styles[ 'item-trailing' ] }>
-						{ trailing }
+						<span className={ styles[ 'accessory-content' ] }>
+							{ trailing }
+						</span>
 					</span>
 				) }
 			</span>
@@ -144,7 +150,9 @@ function ItemContent( {
 			) }
 			{ hasPrefix && (
 				<span aria-hidden="true" className={ styles[ 'item-prefix' ] }>
-					{ prefix }
+					<span className={ styles[ 'accessory-content' ] }>
+						{ prefix }
+					</span>
 				</span>
 			) }
 			{ shortcut && shortcutDescriptionId && (
