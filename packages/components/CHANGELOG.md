@@ -19,6 +19,7 @@
 
 ### Bug Fixes
 
+-   `UnitControl`: Use WPDS tokens for the unit select and label colors, so the unit stays readable on dark backgrounds.
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
 -   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
