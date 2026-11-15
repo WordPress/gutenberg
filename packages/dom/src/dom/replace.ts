@@ -13,6 +13,6 @@ export default function replace(
 	newNode: Element
 ): void {
 	assertIsDefined( processedNode.parentNode, 'processedNode.parentNode' );
-	insertAfter( newNode, processedNode.parentNode );
+	insertAfter( newNode, processedNode );
 	remove( processedNode );
 }

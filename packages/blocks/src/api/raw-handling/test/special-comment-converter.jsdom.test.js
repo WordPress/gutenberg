@@ -129,4 +129,42 @@ describe( 'specialCommentConverter', () => {
 			);
 		} );
 	} );
+
+	describe( 'when the comment is not inside a paragraph', () => {
+		it( 'should replace a top-level "more" comment in place', () => {
+			const output = deepFilterHTML(
+				`<p>First paragraph.</p>
+<!--more-->
+<p>Second paragraph</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<p>First paragraph.</p>
+<wp-block data-block=\"core/more\"></wp-block>
+<p>Second paragraph</p>`
+			);
+		} );
+		it( 'should replace a top-level "nextpage" comment in place', () => {
+			const output = deepFilterHTML(
+				`<p>First page.</p>
+<!--nextpage-->
+<p>Second page</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<p>First page.</p>
+<wp-block data-block=\"core/nextpage\"></wp-block>
+<p>Second page</p>`
+			);
+		} );
+		it( 'should replace a "more" comment nested in a container in place', () => {
+			const output = deepFilterHTML(
+				`<div><p>First paragraph.</p><!--more--><p>Second paragraph</p></div><p>Third paragraph</p>`,
+				[ specialCommentConverter ]
+			);
+			expect( output ).toEqual(
+				`<div><p>First paragraph.</p><wp-block data-block=\"core/more\"></wp-block><p>Second paragraph</p></div><p>Third paragraph</p>`
+			);
+		} );
+	} );
 } );
