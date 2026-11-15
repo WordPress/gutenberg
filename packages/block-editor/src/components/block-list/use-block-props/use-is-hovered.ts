@@ -20,32 +20,33 @@ export function useIsHovered( {
 }: { isEnabled?: boolean } = {} ) {
 	return useRefEffect< HTMLElement >(
 		( node ) => {
-			if ( ! isEnabled ) {
+			const { defaultView } = node.ownerDocument;
+			if ( ! isEnabled || ! defaultView ) {
 				return;
 			}
 
 			let timeoutId: ReturnType< typeof setTimeout > | undefined;
+			let frameId = 0;
 
-			function listener( event: MouseEvent ) {
+			const listener = ( event: MouseEvent ) => {
 				if ( event.defaultPrevented ) {
 					return;
 				}
 				event.preventDefault();
-				const isHovered = event.type === 'mouseover';
-				// Ignore moves within the same block to avoid flicker.
-				const relatedTarget = event.relatedTarget as Element | null;
-				if (
-					! isHovered &&
-					relatedTarget?.closest?.( '[data-block]' ) === node
-				) {
+				defaultView.cancelAnimationFrame( frameId );
+				if ( event.type === 'mouseout' ) {
+					// Wait for a `mouseover` within the same block.
+					frameId = defaultView.requestAnimationFrame( () => {
+						clearTimeout( timeoutId );
+						node.classList.remove(
+							'is-hovered',
+							'is-hovered-draggable'
+						);
+					} );
 					return;
 				}
-				node.classList.toggle( 'is-hovered', isHovered );
+				node.classList.add( 'is-hovered' );
 				clearTimeout( timeoutId );
-				if ( ! isHovered ) {
-					node.classList.remove( 'is-hovered-draggable' );
-					return;
-				}
 				// Over editable content the cursor is a text cursor, not
 				// the grab cursor, so no drag would start there. The
 				// editability check can force a style recalculation, so it
@@ -59,7 +60,7 @@ export function useIsHovered( {
 						! target.isContentEditable
 					);
 				}, 100 );
-			}
+			};
 
 			const unsubscribeOut = subscribeDelegatedListener(
 				node,
@@ -78,6 +79,7 @@ export function useIsHovered( {
 
 				// Remove classes in case they linger.
 				clearTimeout( timeoutId );
+				defaultView.cancelAnimationFrame( frameId );
 				node.classList.remove( 'is-hovered' );
 				node.classList.remove( 'is-hovered-draggable' );
 			};
