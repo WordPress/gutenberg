@@ -238,8 +238,10 @@ describe( 'AiPluginCallout', () => {
 		const user = userEvent.setup();
 
 		storeState.plugin = undefined;
-		// The REST install (using `slug`) is rejected up front; the
-		// subsequent activate (using `plugin`) succeeds.
+		/*
+		 * The REST install (using `slug`) is rejected up front; the
+		 * subsequent activate (using `plugin`) succeeds.
+		 */
 		mockSaveEntityRecord.mockImplementation(
 			(
 				_kind: string,
@@ -297,8 +299,10 @@ describe( 'AiPluginCallout', () => {
 			);
 		} );
 
-		// Only the initial REST install attempt ran: no activate follow-up
-		// and no error notice.
+		/*
+		 * Only the initial REST install attempt ran: no activate follow-up
+		 * and no error notice.
+		 */
 		expect( mockSaveEntityRecord ).toHaveBeenCalledTimes( 1 );
 		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
 	} );

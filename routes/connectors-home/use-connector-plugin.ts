@@ -118,11 +118,13 @@ export function installPluginViaWpUpdates(
 			return;
 		}
 
-		// Handlers are registered with on()/off() (not one()) and filtered
-		// by slug. With one(), a concurrent install of a *different* plugin
-		// firing first would consume the one-shot handler and leave this
-		// promise pending forever. on() + explicit cleanup() only tears
-		// down once the matching slug's event arrives.
+		/*
+		 * Handlers are registered with on()/off() (not one()) and filtered
+		 * by slug. With one(), a concurrent install of a *different* plugin
+		 * firing first would consume the one-shot handler and leave this
+		 * promise pending forever. on() + explicit cleanup() only tears
+		 * down once the matching slug's event arrives.
+		 */
 		const cleanup = () => {
 			jq( document ).off( 'wp-plugin-install-success', onSuccess );
 			jq( document ).off( 'wp-plugin-install-error', onError );
@@ -156,10 +158,12 @@ export function installPluginViaWpUpdates(
 			cleanup();
 			resolve( 'canceled' );
 		};
-		// When the server returns an unexpected response (for example, an
-		// expired nonce or a PHP fatal error), none of the events above
-		// fire. Watch the install request itself so the install fails
-		// instead of staying on "Installing…".
+		/*
+		 * When the server returns an unexpected response (for example, an
+		 * expired nonce or a PHP fatal error), none of the events above
+		 * fire. Watch the install request itself so the install fails
+		 * instead of staying on "Installing…".
+		 */
 		const onAjaxComplete: JQueryAjaxCompleteHandler = (
 			_event,
 			xhr,
@@ -190,9 +194,11 @@ export function installPluginViaWpUpdates(
 		jq( document ).on( 'credential-modal-cancel', onCancel );
 		jq( document ).on( 'ajaxComplete', onAjaxComplete );
 
-		// Open the credentials modal before sending the request, as
-		// Plugins > Add Plugin does. The modal then opens without an error,
-		// and focus returns to the install button when it closes.
+		/*
+		 * Open the credentials modal before sending the request, as
+		 * Plugins > Add Plugin does. The modal then opens without an error,
+		 * and focus returns to the install button when it closes.
+		 */
 		updates.maybeRequestFilesystemCredentials?.( {
 			target: trigger ?? null,
 		} );
@@ -431,8 +437,10 @@ export function useConnectorPlugin( {
 		if ( ! pluginSlug ) {
 			return;
 		}
-		// `currentTarget` is only set while the event is being handled, so
-		// read it before the first `await`.
+		/*
+		 * `currentTarget` is only set while the event is being handled, so
+		 * read it before the first `await`.
+		 */
 		const trigger = event?.currentTarget;
 		setIsBusy( true );
 		try {
@@ -444,12 +452,14 @@ export function useConnectorPlugin( {
 					{ throwOnError: true }
 				);
 			} catch ( error ) {
-				// The REST plugin endpoint rejects installs up front with
-				// `fs_unavailable` when FS_METHOD is not 'direct' and
-				// credentials have not been stored. Fall back to
-				// wp.updates.installPlugin() so the standard "Connection
-				// Information" modal handles credential entry, then activate
-				// via REST.
+				/*
+				 * The REST plugin endpoint rejects installs up front with
+				 * `fs_unavailable` when FS_METHOD is not 'direct' and
+				 * credentials have not been stored. Fall back to
+				 * wp.updates.installPlugin() so the standard "Connection
+				 * Information" modal handles credential entry, then activate
+				 * via REST.
+				 */
 				if ( ! isFilesystemUnavailableError( error ) ) {
 					throw error;
 				}

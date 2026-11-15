@@ -126,8 +126,10 @@ export function AiPluginCallout() {
 		useDispatch( noticesStore );
 
 	const installPlugin = async ( event: InstallButtonClickEvent ) => {
-		// `currentTarget` is only set while the event is being handled, so
-		// read it before the first `await`.
+		/*
+		 * `currentTarget` is only set while the event is being handled, so
+		 * read it before the first `await`.
+		 */
 		const trigger = event.currentTarget;
 		setIsBusy( true );
 		try {
@@ -139,12 +141,14 @@ export function AiPluginCallout() {
 					{ throwOnError: true }
 				);
 			} catch ( error ) {
-				// The REST plugin endpoint rejects installs up front with
-				// `fs_unavailable` when FS_METHOD is not 'direct' and
-				// credentials have not been stored. Fall back to
-				// wp.updates.installPlugin() so the standard "Connection
-				// Information" modal handles credential entry, then activate
-				// via REST.
+				/*
+				 * The REST plugin endpoint rejects installs up front with
+				 * `fs_unavailable` when FS_METHOD is not 'direct' and
+				 * credentials have not been stored. Fall back to
+				 * wp.updates.installPlugin() so the standard "Connection
+				 * Information" modal handles credential entry, then activate
+				 * via REST.
+				 */
 				if ( ! isFilesystemUnavailableError( error ) ) {
 					throw error;
 				}
