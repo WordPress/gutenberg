@@ -10,6 +10,14 @@ const { state } = store( 'router-html-server', {
 	state: {
 		/** Shows that the page has hydrated. */
 		hydrated: 'yes',
+		/**
+		 * Reads the value from the element's context.
+		 *
+		 * @return {unknown} The value the context holds.
+		 */
+		get syncedContext() {
+			return getContext().synced;
+		},
 	},
 	actions: {
 		/** Navigates using the router without a document reload. */

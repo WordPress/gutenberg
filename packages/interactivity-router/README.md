@@ -128,6 +128,8 @@ Navigates to the specified page.
 
 This function normalizes the passed `href`, fetches the page HTML if needed, and updates any interactive regions whose contents have changed in the new page. It also creates a new entry in the browser session history.
 
+If another navigation starts before this one renders its page, whether another `navigate()` call or a back/forward traversal, this navigation is abandoned: it doesn't render its page, change the session history, or fall back to a full page load, and its promise resolves. See [Race condition protection](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#race-condition-protection) in the Client-Side Navigation guide.
+
 **Params**
 
 ```js

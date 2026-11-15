@@ -42,7 +42,7 @@
 		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

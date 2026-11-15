@@ -19,7 +19,6 @@ import {
 	MAX_ZOOM,
 } from '../../core/constants';
 import { getMinZoom } from '../../core/containment';
-import { exportCroppedImage } from '../../core/export/canvas-renderer';
 import {
 	imageEditorReducer,
 	areImageEditorStatesEqual,
@@ -41,12 +40,8 @@ import {
 declare const imageEditorController: unique symbol;
 
 /**
- * The editor controller surface — the contract the ImageEditorCanvas component
- * and its interaction hooks consume.
- *
- * History (undo / redo) is not part of this interface. Keep the state
- * yourself (`useInternalImageEditor( { state, onChange } )`) to put it in
- * your own undo history.
+ * The controller the canvas and its interaction hooks use: what
+ * `ImageEditorController` has, plus the methods only the canvas calls.
  */
 export interface InternalImageEditorController extends ImageEditorSetters {
 	readonly [ imageEditorController ]: true;
@@ -70,11 +65,6 @@ export interface InternalImageEditorController extends ImageEditorSetters {
 	maxZoom: number;
 	/** How far fine rotation goes either way of a quarter turn, in degrees. */
 	maxRotationOffset: number;
-	/**
-	 * Export the cropped image as a Blob. Throws on failure — see
-	 * `exportCroppedImage` for error semantics.
-	 */
-	getCroppedImage: ( mimeType?: string, quality?: number ) => Promise< Blob >;
 	/**
 	 * Called by `ImageEditorCanvas` when the viewport changes (window or canvas
 	 * resize); not for consumers to call. Like `setCropRect`, except that
@@ -155,9 +145,8 @@ export interface InternalImageEditorOptions {
 }
 
 /**
- * Controller for the image editor: the state, the named setters and the
- * export helpers. It keeps no undo history; keep the state yourself
- * (`state` and `onChange`) to add one.
+ * The hook behind `useImageEditor`. Leave out `state` and `onChange` and
+ * it keeps its own state, which the package's tests and debug story use.
  *
  * @param options Starting state, or the state and change handler when
  *                you keep the state yourself.
@@ -309,23 +298,6 @@ export function useInternalImageEditor(
 
 	const isDirty = isStateDirty( state, baseline );
 
-	const getCroppedImage = useCallback(
-		( mimeType?: string, quality?: number ): Promise< Blob > => {
-			if ( ! state.image ) {
-				return Promise.reject(
-					new Error( 'No image loaded — call setImage first.' )
-				);
-			}
-			return exportCroppedImage(
-				state.image.src,
-				state,
-				mimeType,
-				quality
-			);
-		},
-		[ state ]
-	);
-
 	// A refit after a window resize is not something the person did.
 	const adjustCropRectForViewport = useCallback(
 		( rect: NormalizedRect ) => {
@@ -349,7 +321,6 @@ export function useInternalImageEditor(
 				minZoom,
 				maxZoom: MAX_ZOOM,
 				maxRotationOffset: MAX_ROTATION_OFFSET,
-				getCroppedImage,
 				adjustCropRectForViewport,
 			} ) as InternalImageEditorController,
 		[
@@ -359,7 +330,6 @@ export function useInternalImageEditor(
 			reset,
 			isDirty,
 			minZoom,
-			getCroppedImage,
 			adjustCropRectForViewport,
 		]
 	);
@@ -403,9 +373,9 @@ export interface ImageEditorController {
 	setRotation: ( rotation: number ) => void;
 	/** Rotate a quarter turn: `1` clockwise, `-1` counter-clockwise. */
 	snapRotate90: ( direction: 1 | -1 ) => void;
-	/** Mirror the image along each axis that is `true`. */
+	/** Flip the image along each axis that is `true`. */
 	setFlip: ( flip: Flip ) => void;
-	/** Mirror the image along one axis, or undo that. */
+	/** Flip the image along one axis, or undo that. */
 	toggleFlip: ( direction: 'horizontal' | 'vertical' ) => void;
 	/** Set the crop area, in fractions of the view the canvas shows. */
 	setCropRect: ( rect: NormalizedRect ) => void;
