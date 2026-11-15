@@ -3,9 +3,7 @@
  * `core/` and `react/` do not become supported API by accident.
  */
 
-// The canvas, its controller and the state. The consumer keeps the state
-// (`useImageEditor( { state, onChange } )`), for example in its own undo
-// history.
+// The canvas, its controller and the state.
 export { ImageEditorCanvas } from './react/components';
 export type { ImageEditorCanvasProps } from './react/components';
 export { useImageEditor, createImageEditorState } from './react/hooks';
@@ -23,9 +21,11 @@ export type {
 } from './core/types';
 export { areImageEditorStatesEqual } from './core/state';
 
-// The size of the image the edit produces.
+// The edit, described against the loaded image, and the size it produces.
 export { getOutputSize } from './get-output-size';
+export { getImageEdit } from './get-image-edit';
+export type { ImageEdit } from './get-image-edit';
 
-// Map the edit onto the original image, for saving it.
-export { mapEditToOriginal } from './map-edit-to-original';
-export type { OriginalImageEdit } from './map-edit-to-original';
+// Export the edited image as a file, in the browser.
+export { exportImage } from './export-image';
+export type { ExportImageOptions } from './export-image';
