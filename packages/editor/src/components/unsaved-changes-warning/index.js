@@ -1,4 +1,3 @@
-import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -16,26 +15,21 @@ export default function UnsavedChangesWarning() {
 		/**
 		 * Warns the user if there are unsaved changes before leaving the editor.
 		 *
-		 * @param {Event} event `beforeunload` event.
-		 *
-		 * @return {string | undefined} Warning prompt message, if unsaved changes exist.
+		 * @param {BeforeUnloadEvent} event `beforeunload` event.
 		 */
 		const warnIfUnsavedChanges = ( event ) => {
-			// We need to call the selector directly in the listener to avoid race
-			// conditions with `BrowserURL` where `componentDidUpdate` gets the
-			// new value of `isEditedPostDirty` before this component does,
-			// causing this component to incorrectly think a trashed post is still dirty.
+			// Read the store here instead of subscribing to it. Trashing a post
+			// redirects in the same tick it stops being dirty, before this
+			// component could re-render, so a subscribed value would be stale.
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 			if ( dirtyEntityRecords.length > 0 ) {
-				event.returnValue = __(
-					'You have unsaved changes. If you proceed, they will be lost.'
-				);
-				return event.returnValue;
+				event.preventDefault();
+				// Chrome before 119 ignores `preventDefault()`.
+				event.returnValue = true;
 			}
 		};
 
 		window.addEventListener( 'beforeunload', warnIfUnsavedChanges );
-
 		return () => {
 			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
 		};
