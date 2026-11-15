@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/review-routing-tools",
 	"version": "0.0.0",
-	"description": "Decides which teams to ask for review on a pull request, using a decision model.",
+	"description": "Decides who to ask for review on a pull request, using a decision model.",
 	"private": true,
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,7 @@
 	"main": "src/cli.ts",
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
