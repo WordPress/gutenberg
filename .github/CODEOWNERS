@@ -44,6 +44,10 @@
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox
 
+# Icons
+/packages/icons/src/library                     @jasmussen
+/packages/icons/src/manifest.json               @jasmussen
+
 # Utilities
 /packages/dom                                   @ellatrix
 /packages/i18n                                  @swissspidy

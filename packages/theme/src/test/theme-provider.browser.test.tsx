@@ -133,12 +133,12 @@ describe( 'ThemeProvider', () => {
 				{
 					type: 'contrast',
 					backgroundToken: 'background.surface.neutral-strong',
-					backgroundColor: '#563b79',
+					backgroundColor: '#563c79',
 					foregroundToken:
 						'background.interactive.brand-strong-active',
-					foregroundColor: '#6e8f26',
+					foregroundColor: '#6e8f27',
 					requiredContrast: 3,
-					achievedContrast: expect.closeTo( 2.4462, 4 ),
+					achievedContrast: expect.closeTo( 2.4249, 4 ),
 				},
 			] )
 		);
