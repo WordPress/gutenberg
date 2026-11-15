@@ -237,8 +237,12 @@ export function itemIsComplete(
 // `compose` returns an untyped function, cast to the reducer it builds.
 const receiveQueries = compose( [
 	// Limit to matching action type so we don't attempt to replace action on
-	// an unhandled action.
-	ifMatchingAction( ( action: ReceiveItemsAction ) => 'query' in action ),
+	// an unhandled action. Only collection responses update queries: a single
+	// item has no information about the list it belongs to.
+	ifMatchingAction(
+		( action: ReceiveItemsAction ) =>
+			'query' in action && Array.isArray( action.items )
+	),
 
 	// Inject query parts into action for use both in `keyedReducer` and reducer.
 	replaceAction( ( action: ReceiveItemsAction ) => {
@@ -263,15 +267,11 @@ const receiveQueries = compose( [
 ] )(
 	(
 		state: Partial< QueryState > = {},
-		action: ReceiveItemsAction & Partial< QueryParts >
+		// `ifMatchingAction` lets through only collection responses.
+		action: ReceiveItemsAction &
+			Partial< QueryParts > & { items: Array< QueriedItem > }
 	): Partial< QueryState > => {
 		if ( action.type !== 'RECEIVE_ITEMS' ) {
-			return state;
-		}
-
-		// Single items don't have page or total count metadata
-		// (only collection query responses do), so skip updating itemIds.
-		if ( ! Array.isArray( action.items ) ) {
 			return state;
 		}
 

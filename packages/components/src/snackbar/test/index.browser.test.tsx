@@ -479,6 +479,37 @@ describe( 'Snackbar', () => {
 			expect( onClick ).toHaveBeenCalledTimes( 1 );
 		} );
 
+		it.each( [
+			[ 'Enter', '{Enter}' ],
+			[ 'Space', ' ' ],
+		] )(
+			'should call `onClick` when the action button is activated with %s',
+			async ( _keyName, key ) => {
+				const onClick = vi.fn();
+				const onDismiss = vi.fn();
+				const onRemove = vi.fn();
+
+				await render(
+					<Snackbar
+						actions={ [ { label: 'Undo', onClick } ] }
+						onDismiss={ onDismiss }
+						onRemove={ onRemove }
+					>
+						Post trashed.
+					</Snackbar>
+				);
+
+				within( screen.getByTestId( testId ) )
+					.getByRole( 'button', { name: 'Undo' } )
+					.focus();
+				await userEvent.keyboard( key );
+
+				expect( onClick ).toHaveBeenCalledTimes( 1 );
+				expect( onRemove ).toHaveBeenCalledTimes( 1 );
+				expect( onDismiss ).not.toHaveBeenCalled();
+			}
+		);
+
 		it( 'should be rendered as a link when the `url` prop and the `onClick` are set', async () => {
 			await render(
 				<Snackbar

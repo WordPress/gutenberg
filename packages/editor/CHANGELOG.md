@@ -11,11 +11,18 @@
 
 ### Enhancements
 
+-   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+-   RTC: Add an optional outline around the blocks a collaborator is working in. Turn it on in Preferences > General > Interface > "Outline collaborators' blocks" ([#86272](https://github.com/WordPress/gutenberg/pull/86272)).
 
 ### Bug Fixes
 
+-   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
+-   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
+-   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
 -   Notes: Keep a block's notes when it's merged into the previous block ([#86193](https://github.com/WordPress/gutenberg/pull/86193)).
 -   Notes: Keep a note selected when focus returns from its thread to its block ([#86355](https://github.com/WordPress/gutenberg/pull/86355)).
 -   PostSchedule: Mark the posts of the month the calendar moves to when the date is typed or reset ([#86298](https://github.com/WordPress/gutenberg/pull/86298)).
@@ -36,6 +43,10 @@
 -   Suggest mode: keep a review decision and its note together through undo. Accepting or rejecting a suggestion changes block content and resolves the note, but only the content half is in the undo stack, so undo put the marker back on a note that stayed resolved - a marked-up run with no Accept/Reject on it and no way to clear it. Undoing a decision made in this session now reopens its note along with the marker, restoring the suggestion's lifecycle meta to `pending` ([#81669](https://github.com/WordPress/gutenberg/pull/81669), [#81963](https://github.com/WordPress/gutenberg/pull/81963)).
 -   Suggest mode: extend a format suggestion on a second toggle instead of opening a second one. Toggling a further format over a run that already carries the suggester's own pending `format` marker recorded a suggestion whose before and after were both empty - unreviewable and unapplyable - and made every marker in the block disappear. The existing suggestion is now revised in place, a toggle that restores the original run retracts it rather than storing a note that proposes nothing, and a note that has replies is revised rather than withdrawn ([#81665](https://github.com/WordPress/gutenberg/pull/81665)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there when its click would change the status, rather than dropping the status edit and saving the post anyway; a plain save of a published or scheduled post stays available so the suggestion markers can be persisted. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
+
+### Internal
+
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 
 ## 16.1.0 (2026-11-04)
 
