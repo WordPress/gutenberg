@@ -16,32 +16,36 @@ const RESULT_ICON = {
 };
 
 function useCopyFeedback() {
-	const [ feedback, setFeedback ] = useState< { result: CopyResult } >( {
-		result: 'idle',
-	} );
+	// Bump the id on every result so a repeat of the same outcome restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
+		result: CopyResult;
+		id: number;
+	} >( { result: 'idle', id: 0 } );
 
 	useEffect( () => {
 		if ( feedback.result === 'idle' ) {
 			return;
 		}
 		const timeoutId = setTimeout(
-			() => setFeedback( { result: 'idle' } ),
+			() => setFeedback( { result: 'idle', id: 0 } ),
 			FEEDBACK_TIMEOUT
 		);
 		return () => clearTimeout( timeoutId );
 	}, [ feedback ] );
 
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
+		setFeedback( ( current ) => ( {
+			result,
+			id: current.id + 1,
+		} ) );
+		speak( message );
+	}
+
 	const ref = useCopyToClipboard(
 		SAMPLE_VALUE,
-		() => {
-			// A new feedback object restarts the timeout for repeated copies.
-			setFeedback( { result: 'copied' } );
-			speak( 'Copied to clipboard' );
-		},
-		() => {
-			setFeedback( { result: 'error' } );
-			speak( "Couldn't copy to clipboard." );
-		}
+		() => report( 'copied', 'Copied to clipboard' ),
+		() => report( 'error', "Couldn't copy to clipboard." )
 	);
 
 	return { result: feedback.result, ref };
