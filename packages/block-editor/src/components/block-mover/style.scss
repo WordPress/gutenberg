@@ -68,6 +68,11 @@
 		.block-editor-block-mover &.has-icon.has-icon {
 			padding-left: 0;
 			padding-right: 0;
+
+			// Draw the focus ring without an offset so it isn't clipped.
+			&:focus::before {
+				outline-offset: 0;
+			}
 		}
 	}
 }
@@ -96,12 +101,8 @@
 			animation-fill-mode: forwards;
 		}
 	}
-}
 
-// These buttons clip their overflow, which cuts off the toolbar's offset focus
-// ring. Draw the ring without an offset so it stays inside the button.
-.block-editor-block-mover .components-button.block-editor-block-mover-button,
-.block-editor-block-mover .components-button.block-editor-block-mover__drag-handle {
+	// Draw the focus ring without an offset so it isn't clipped.
 	&:focus::before {
 		outline-offset: 0;
 	}
