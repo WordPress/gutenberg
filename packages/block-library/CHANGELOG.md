@@ -17,7 +17,7 @@
 
 ### Bug Fixes
 
--   Gallery: Do not list the Grid variation of Group in the block switcher next to Gallery Grid, as both showed the same icon. The transform from Gallery to Grid is still available to `switchToBlockType` ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Gallery: Do not list the Grid variation of Group in the block switcher next to Gallery Grid, as both showed the same icon. The transform from Gallery to Grid is still available to `switchToBlockType` ([#86860](https://github.com/WordPress/gutenberg/pull/86860)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
