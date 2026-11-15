@@ -198,7 +198,7 @@ return array(
 		'label'       => _x( 'Chevron Up', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-up.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-arrow-up-alt2', 'dashicons-arrow-up-duplicate' ),
+		'dashicons'   => array( 'dashicons-arrow-up-alt2' ),
 	),
 	'chevron-up-down'     => array(
 		'label'       => _x( 'Chevron Up Down', 'icon label', 'gutenberg' ),
@@ -210,7 +210,7 @@ return array(
 		'label'       => _x( 'Chevron Up Small', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/chevron-up-small.svg',
 		'collections' => array( 'core', 'core-admin' ),
-		'dashicons'   => array( 'dashicons-arrow-up' ),
+		'dashicons'   => array( 'dashicons-arrow-up', 'dashicons-arrow-up-duplicate' ),
 	),
 	'close'               => array(
 		'label'       => _x( 'Close', 'icon label', 'gutenberg' ),

@@ -343,10 +343,7 @@
 		"label": "Chevron Up",
 		"filePath": "library/chevron-up.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [
-			"dashicons-arrow-up-alt2",
-			"dashicons-arrow-up-duplicate"
-		]
+		"dashicons": [ "dashicons-arrow-up-alt2" ]
 	},
 	{
 		"slug": "chevron-up-down",
@@ -360,7 +357,7 @@
 		"label": "Chevron Up Small",
 		"filePath": "library/chevron-up-small.svg",
 		"collections": [ "core", "core-admin" ],
-		"dashicons": [ "dashicons-arrow-up" ]
+		"dashicons": [ "dashicons-arrow-up", "dashicons-arrow-up-duplicate" ]
 	},
 	{
 		"slug": "classic",
