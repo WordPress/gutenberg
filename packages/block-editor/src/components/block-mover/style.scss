@@ -97,3 +97,12 @@
 		}
 	}
 }
+
+// These buttons clip their overflow, which cuts off the toolbar's offset focus
+// ring. Draw the ring without an offset so it stays inside the button.
+.block-editor-block-mover .components-button.block-editor-block-mover-button,
+.block-editor-block-mover .components-button.block-editor-block-mover__drag-handle {
+	&:focus::before {
+		outline-offset: 0;
+	}
+}
