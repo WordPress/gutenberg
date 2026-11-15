@@ -269,7 +269,13 @@ return array(
 		'label'       => _x( 'File', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/file.svg',
 		'collections' => array( 'core' ),
-		'keywords'    => array( _x( 'archive', 'icon keyword', 'gutenberg' ), _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'folder', 'icon keyword', 'gutenberg' ) ),
+		'keywords'    => array( _x( 'document', 'icon keyword', 'gutenberg' ), _x( 'attachment', 'icon keyword', 'gutenberg' ) ),
+	),
+	'folder'              => array(
+		'label'       => _x( 'Folder', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/folder.svg',
+		'collections' => array( 'core' ),
+		'keywords'    => array( _x( 'archive', 'icon keyword', 'gutenberg' ), _x( 'directory', 'icon keyword', 'gutenberg' ) ),
 	),
 	'gallery'             => array(
 		'label'       => _x( 'Gallery', 'icon label', 'gutenberg' ),
