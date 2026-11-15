@@ -4231,6 +4231,54 @@ describe( 'selectors', () => {
 			const items = getBlockTransformItems( state, block );
 			expect( items ).toHaveLength( 2 );
 		} );
+		it( 'should not return items for transforms that opt out of the block switcher', () => {
+			registerBlockType(
+				'core/with-hidden-transform',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Hidden transform',
+					edit: () => {},
+					save: () => {},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-b' ],
+								showInBlockSwitcher: false,
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-c' ],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+						],
+					},
+				} )
+			);
+			const state = partial< State >( {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
+					blockEditingModes: new Map(),
+				},
+				settings: {},
+				preferences: {},
+				blockListSettings: new Map(),
+			} );
+			const blocks = partial< Block[] >( [
+				{ name: 'core/with-hidden-transform' },
+			] );
+			const items = getBlockTransformItems( state, blocks );
+			unregisterBlockType( 'core/with-hidden-transform' );
+			expect( items ).toHaveLength( 1 );
+			expect( items[ 0 ].name ).toBe( 'core/with-tranforms-c' );
+		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
 			const state = partial< State >( {
 				blocks: {

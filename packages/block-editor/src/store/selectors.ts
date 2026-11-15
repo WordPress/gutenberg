@@ -2830,7 +2830,8 @@ export const getBlockTransformItems = createRegistrySelector( ( select ) =>
 			).reduce< InserterItem[] >( ( accumulator, block ) => {
 				const item = itemsByName[ block?.name ];
 
-				if ( ! item ) {
+				// A hidden transform stays available to `switchToBlockType`.
+				if ( ! item || block.showInBlockSwitcher === false ) {
 					return accumulator;
 				}
 

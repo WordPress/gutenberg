@@ -605,6 +605,99 @@ describe( 'block factory', () => {
 			} );
 		} );
 
+		it( 'should flag a transformation that opts out of the block switcher and keep it available', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							showInBlockSwitcher: false,
+							transform: ( { value } ) =>
+								createBlock( 'core/text-block', { value } ),
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ] ).toMatchObject( {
+				name: 'core/text-block',
+				showInBlockSwitcher: false,
+			} );
+			expect(
+				switchToBlockType( block, 'core/text-block' )
+			).toMatchObject( [
+				{ name: 'core/text-block', attributes: { value: 'ribs' } },
+			] );
+		} );
+
+		it( 'should not flag a transformation that is also reachable through a transformation that is listed', () => {
+			registerBlockType( 'core/updated-text-block', {
+				apiVersion: 3,
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					to: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							transform: noop,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'updated text block',
+			} );
+			registerBlockType( 'core/text-block', {
+				...defaultBlockSettings,
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/updated-text-block' ],
+							showInBlockSwitcher: false,
+							transform: noop,
+						},
+					],
+				},
+			} );
+
+			const block = createBlock( 'core/updated-text-block', {
+				value: 'ribs',
+			} );
+
+			const availableBlocks = getPossibleBlockTransformations( [
+				block,
+			] );
+
+			expect( availableBlocks ).toHaveLength( 1 );
+			expect( availableBlocks[ 0 ].name ).toBe( 'core/text-block' );
+			expect( availableBlocks[ 0 ].showInBlockSwitcher ).toBeUndefined();
+		} );
+
 		it( 'should not show a transformation if multiple blocks are passed and the transformation is not multi block (for a "from" transform)', () => {
 			registerBlockType( 'core/updated-text-block', {
 				apiVersion: 3,

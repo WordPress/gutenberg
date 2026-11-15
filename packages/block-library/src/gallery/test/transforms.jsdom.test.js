@@ -163,6 +163,27 @@ describe( 'transforms', () => {
 		} );
 	} );
 
+	it( 'keeps the Grid variation of Group out of the block switcher for a Gallery', () => {
+		const block = createBlock( 'core/gallery', {}, [
+			createBlock( 'core/image', {
+				url: 'https://example.com/one.jpg',
+			} ),
+		] );
+
+		const gridTransformation = getPossibleBlockTransformations( [
+			block,
+		] ).find(
+			( { name, variationName } ) =>
+				name === 'core/group' && variationName === 'group-grid'
+		);
+
+		// The Gallery Grid variation covers it in the block switcher. The
+		// transformation itself stays available to `switchToBlockType`.
+		expect( gridTransformation ).toMatchObject( {
+			showInBlockSwitcher: false,
+		} );
+	} );
+
 	describe( 'dynamic mode', () => {
 		const createDynamicGallery = () =>
 			createBlock(

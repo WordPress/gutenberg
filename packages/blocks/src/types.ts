@@ -251,6 +251,13 @@ export interface BlockBlockTransform<
 	 */
 	variationName?: string;
 	/**
+	 * Whether the transform is listed in the block switcher and in the matching
+	 * transform commands. Defaults to `true`. A transform that sets it to
+	 * `false` stays available to `switchToBlockType` and to its keyboard
+	 * shortcuts.
+	 */
+	showInBlockSwitcher?: boolean;
+	/**
 	 * Keyboard shortcuts that apply this transform to the selected block.
 	 *
 	 * On a `to` transform they apply to the block declaring it, and produce the
