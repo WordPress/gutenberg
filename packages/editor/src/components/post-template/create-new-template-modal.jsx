@@ -1,4 +1,3 @@
-import { paramCase as kebabCase } from 'change-case';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { serialize, createBlock } from '@wordpress/blocks';
@@ -10,6 +9,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { cleanForSlug } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 
@@ -85,7 +85,12 @@ export default function CreateNewTemplateModal( { onClose } ) {
 			] );
 
 		const newTemplate = await createTemplate( {
-			slug: kebabCase( title || DEFAULT_TITLE ) || 'wp-custom-template',
+			// The REST API only accepts Latin letters in template slugs.
+			slug:
+				cleanForSlug( title || DEFAULT_TITLE ).replace(
+					/[^\w-]+/g,
+					''
+				) || 'wp-custom-template',
 			content: newTemplateContent,
 			title: title || DEFAULT_TITLE,
 			status: 'publish',

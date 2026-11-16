@@ -144,11 +144,17 @@ export default function DimensionControl( {
 				'svmax',
 				'lvmax',
 				'dvmax',
+				'cqw',
+				'cqh',
+				'cqi',
+				'cqb',
+				'cqmin',
+				'cqmax',
 			].includes( newUnit ) &&
 			// An undefined quantity is not greater than 100.
 			( currentValue as number ) > 100
 		) {
-			// When converting to `%` or viewport-relative units, cap the new value at 100.
+			// When converting to `%`, viewport-relative or container-relative units, cap the new value at 100.
 			onChange( 100 + newUnit );
 		}
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
@@ -1111,6 +1111,32 @@ describe( 'TypographyPanel text gradient', () => {
 		// The panel called `onChange`.
 		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.color.gradient ).toBeUndefined();
+	} );
+
+	it( 'shows the contrast warning on the gradient control when the text is a gradient', async () => {
+		await renderPanel( {
+			settings: gradientSettings,
+			defaultControls: shownControls,
+			value: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+			contrastWarning: 'Low contrast gradient',
+		} );
+
+		expect(
+			screen.getAllByRole( 'button', { name: 'Low contrast' } )
+		).toHaveLength( 1 );
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /Gradient/ } )
+		);
+		const notice = await screen.findByText( 'Low contrast gradient' );
+		// The popover fades in from opacity 0, which `toBeVisible` counts as
+		// hidden, so wait for the fade to finish.
+		await waitFor( () => expect( notice ).toBePositionedPopover() );
+		expect( notice ).toBeVisible();
 	} );
 
 	it( 'keeps the gradient control usable while a background gradient is set', async () => {
