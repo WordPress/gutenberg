@@ -90,6 +90,27 @@ describe( 'Knob', () => {
 		await expect.element( slider ).toHaveValue( '50' );
 	} );
 
+	it.each( [
+		{ min: 1, max: 5 },
+		{ min: -0.2, max: 0.1 },
+	] )(
+		'lets both endpoints be selected when a step exceeds the whole range from $min to $max',
+		async ( { min, max } ) => {
+			await render(
+				<Knob aria-label="Offset" min={ min } max={ max } step={ 10 } />
+			);
+			const slider = page.getByRole( 'slider' );
+			await userEvent.tab();
+			await userEvent.keyboard( '{End}' );
+			await expect.element( slider ).toHaveValue( String( max ) );
+			await expect
+				.element( slider )
+				.toHaveAttribute( 'max', String( max ) );
+			await userEvent.keyboard( '{ArrowDown}' );
+			await expect.element( slider ).toHaveValue( String( min ) );
+		}
+	);
+
 	it( 'lets a consumer cancel a slider key before its value changes', async () => {
 		const onValueChange = vi.fn();
 		const onKeyDown = vi.fn( ( event: React.KeyboardEvent ) =>
@@ -255,6 +276,40 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 		await userEvent.keyboard( '{ArrowDown}' );
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '719' );
+	} );
+
+	it( 'taps by a whole turn in either direction and counts a dragged turn once', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Whole turns"
+					min={ -2 }
+					max={ 2 }
+					unitsPerTurn={ 1 }
+					defaultValue={ 0 }
+				/>
+			</ThemeProvider>
+		);
+		const slider = page.getByRole( 'slider' );
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		const left = { x: 3, y: height / 2 };
+		const right = { x: width - 3, y: height / 2 };
+		const top = { x: width / 2, y: 3 };
+		const bottom = { x: width / 2, y: height - 3 };
+		await dial.click( { position: left } );
+		await expect.element( slider ).toHaveValue( '-1' );
+		await dial.click( { position: right } );
+		await expect.element( slider ).toHaveValue( '0' );
+		await userEvent.pointer( [
+			{ target: dial, coords: right, keys: '[MouseLeft>]' },
+			...[ top, left, bottom, right ].map( ( coords ) => ( {
+				target: dial,
+				coords,
+			} ) ),
+			'[/MouseLeft]',
+		] );
+		await expect.element( slider ).toHaveValue( '-1' );
 	} );
 
 	it( 'selects the clicked direction when the wrapping range ends partway through a turn', async () => {

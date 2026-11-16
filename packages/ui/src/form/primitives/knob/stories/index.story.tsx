@@ -128,6 +128,18 @@ export const PartialTurns: Story = {
 	),
 };
 
+/** Each step is an entire revolution. A readout distinguishes identical headings. */
+export const WholeTurns: Story = {
+	args: { min: -2, max: 2, step: 1, unitsPerTurn: 1, defaultValue: 0 },
+	render: ( args ) => (
+		<RangeExample
+			{ ...args }
+			label="Rotation (whole turns)"
+			description="Tap the left half to subtract a turn or the right half to add one. Drag a full circle to change by one turn."
+		/>
+	),
+};
+
 /** Type a precise rotation or turn the dial. Clearing the override restores the inherited angle. */
 export const WithNumberInput: Story = {
 	args: {
