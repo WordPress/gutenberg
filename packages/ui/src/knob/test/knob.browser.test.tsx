@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { userEvent } from 'vitest/browser';
 // Browser Mode loads source CSS without the build's token fallbacks.
 import '@wordpress/theme/design-tokens.css';
 import { Knob } from '../index';
@@ -112,5 +113,13 @@ describe( 'Knob dragging', () => {
 		drag( knob, [ 45 ] );
 		await waitFor( () => expect( knob ).toHaveValue( 45 ) );
 		expect( knob ).not.toBeEmptyDOMElement();
+	} );
+
+	it( 'takes focus on click without showing the focus ring', async () => {
+		await render( <Knob aria-label="Angle" /> );
+		const knob = screen.getByRole( 'slider' );
+		await userEvent.click( knob );
+		expect( knob ).toHaveFocus();
+		expect( knob.matches( ':focus-visible' ) ).toBe( false );
 	} );
 } );

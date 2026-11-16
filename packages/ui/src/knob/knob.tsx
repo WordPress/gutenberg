@@ -124,10 +124,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			if ( event.button !== 0 ) {
 				return;
 			}
+			// The default action focuses the dial without a focus ring, and
+			// `user-select: none` keeps the drag from selecting text.
 			const element = event.currentTarget;
-			// Stops the drag from selecting text; focus is then moved by hand.
-			event.preventDefault();
-			element.focus();
 			element.setPointerCapture( event.pointerId );
 
 			const rect = element.getBoundingClientRect();
