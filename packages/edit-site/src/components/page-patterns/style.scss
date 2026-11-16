@@ -125,7 +125,7 @@
 		padding: 0 var(--wpds-dimension-padding-xs);
 
 		// Hide the button icons when labels are set to display...
-		svg:where(:not([data-wp-components-button-spinner])) {
+		svg {
 			display: none;
 		}
 		// ... and display labels.

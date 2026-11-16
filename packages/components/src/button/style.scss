@@ -339,7 +339,7 @@
 		// Offset the reserved 1px border so it doesn't widen the square
 		// icon button.
 		&:not(.has-text) {
-			svg:where(:not(.components-button__busy-spinner)),
+			svg,
 			.dashicon {
 				margin-inline: -$border-width;
 			}
@@ -432,11 +432,16 @@
 	}
 
 	> .components-button__busy-spinner {
-		position: absolute;
+		// Consumer icon rules must not hide, resize, or reposition this indicator.
+		display: block !important;
+		position: absolute !important;
 		inset: 0;
-		margin: auto;
-		width: 1em;
-		height: 1em;
+		margin: auto !important;
+		padding: 0 !important;
+		width: 1em !important;
+		height: 1em !important;
+		min-width: 0 !important;
+		transform: none !important;
 		color: inherit;
 		pointer-events: none;
 

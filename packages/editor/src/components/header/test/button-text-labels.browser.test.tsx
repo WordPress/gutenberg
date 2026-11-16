@@ -4,6 +4,9 @@ import { render } from 'vitest-browser-react';
 import { setup, speak } from '@wordpress/a11y';
 import { Button } from '@wordpress/components';
 import '../../../../../components/src/button/style.scss';
+import '../../../../../components/src/toolbar/toolbar/style.scss';
+import '../../../../../components/src/toolbar/toolbar-button/style.scss';
+import '../../../../../components/src/toolbar/toolbar-group/style.scss';
 import '../style.scss';
 import '../../../../../block-editor/src/components/block-toolbar/style.scss';
 import '../../../../../block-editor/src/components/block-tools/style.scss';
@@ -18,6 +21,7 @@ type FixtureProps = {
 	containerClassName?: string;
 	innerClassName?: string;
 	buttonClassName?: string;
+	subscript?: string;
 	showLabels?: boolean;
 	isBusy?: boolean;
 };
@@ -26,7 +30,14 @@ const contexts: ( FixtureProps & { name: string; pseudoElement?: string } )[] =
 	[
 		{ name: 'editor header', innerClassName: 'editor-header' },
 		{ name: 'pinned items', outerClassName: 'interface-pinned-items' },
-		{ name: 'block toolbar', innerClassName: 'block-editor-block-toolbar' },
+		{
+			name: 'block toolbar',
+			outerClassName: 'components-accessible-toolbar',
+			containerClassName: 'block-editor-block-toolbar',
+			innerClassName: 'components-toolbar-group',
+			buttonClassName: 'components-toolbar__control',
+			subscript: '2',
+		},
 		{
 			name: 'parent inserter',
 			containerClassName:
@@ -75,6 +86,7 @@ function Fixture( {
 	containerClassName,
 	innerClassName,
 	buttonClassName,
+	subscript,
 	showLabels = true,
 	isBusy,
 }: FixtureProps ) {
@@ -82,6 +94,7 @@ function Fixture( {
 		<Button
 			__next40pxDefaultSize
 			className={ buttonClassName }
+			data-subscript={ subscript }
 			icon={ <PluginIcon /> }
 			label="Plugin action"
 			isBusy={ isBusy }
@@ -136,9 +149,23 @@ describe.each( contexts )( 'Button text labels in $name', ( context ) => {
 
 		await rerender( <Fixture { ...context } isBusy /> );
 
-		expect(
-			screen.getByRole( 'presentation', { hidden: true } )
-		).toBeVisible();
+		const spinner = screen.getByRole( 'presentation', { hidden: true } );
+		expect( spinner ).toBeVisible();
+		const buttonBounds = button.getBoundingClientRect();
+		const spinnerBounds = spinner.getBoundingClientRect();
+		expect( spinnerBounds.x + spinnerBounds.width / 2 ).toBeCloseTo(
+			buttonBounds.x + buttonBounds.width / 2,
+			0
+		);
+		expect( spinnerBounds.y + spinnerBounds.height / 2 ).toBeCloseTo(
+			buttonBounds.y + buttonBounds.height / 2,
+			0
+		);
+		expect( spinnerBounds.width ).toBeCloseTo(
+			parseFloat( getComputedStyle( button ).fontSize ),
+			0
+		);
+		expect( spinnerBounds.height ).toBe( spinnerBounds.width );
 		expect( button ).toHaveAccessibleName( 'Plugin action' );
 		expect( screen.getByText( 'Loading' ) ).toHaveAttribute(
 			'aria-live',

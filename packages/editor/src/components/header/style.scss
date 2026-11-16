@@ -137,7 +137,7 @@
 		width: auto;
 
 		// Hide the button icons when labels are set to display...
-		svg:where(:not([data-wp-components-button-spinner])) {
+		svg {
 			display: none;
 		}
 		// ... and display labels.
@@ -152,7 +152,7 @@
 	}
 	// Exception for drodpdown toggle buttons.
 	.components-button.has-icon.button-toggle {
-		svg:where(:not([data-wp-components-button-spinner])) {
+		svg {
 			display: block;
 		}
 		&::after {
@@ -223,14 +223,14 @@
 		width: 14.625rem;
 		justify-content: flex-start;
 
-		&[aria-expanded="true"] svg:where(:not([data-wp-components-button-spinner])) {
+		&[aria-expanded="true"] svg {
 			display: block;
 			max-width: $grid-unit-30;
 		}
 		&[aria-expanded="false"] {
 			padding-left: $grid-unit-50;
 		}
-		svg:where(:not([data-wp-components-button-spinner])) {
+		svg {
 			margin-right: 8px;
 		}
 	}

@@ -57,8 +57,6 @@ type BaseButtonProps = {
 	iconSize?: IconProps[ 'size' ];
 	/**
 	 * Displays a centered spinner while an action is in progress and announces the loading state. The label stays available to assistive technology. This does not disable the button.
-	 *
-	 * The busy indicator is an SVG marked with `data-wp-components-button-spinner`. Exclude it from selectors intended for action icons, for example `svg:where(:not([data-wp-components-button-spinner]))`.
 	 */
 	isBusy?: boolean;
 	/**

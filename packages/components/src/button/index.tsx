@@ -279,7 +279,6 @@ export const Button = forwardRef( function UnforwardedButton(
 			{ isBusy && (
 				<Spinner
 					className="components-button__busy-spinner"
-					data-wp-components-button-spinner
 					aria-hidden="true"
 				/>
 			) }
