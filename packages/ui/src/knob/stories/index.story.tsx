@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import { Knob } from '../index';
 import { InputControl } from '../../form/input-control';
 import { InputLayout } from '../../form/primitives/input-layout';
 import * as Select from '../../form/primitives/select';
 import { Stack } from '../../stack';
+import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta< typeof Knob > = {
 	title: 'Components/@wordpress-ui/Knob',
@@ -86,6 +87,7 @@ export const WithInputControl: Story = {
 	render: function Template( args ) {
 		const [ angle, setAngle ] = useState< number | null >( 90 );
 		const [ unit, setUnit ] = useState< Unit >( 'deg' );
+		const unitLabelId = useId();
 
 		return (
 			<Stack direction="row" gap="sm" align="end">
@@ -103,6 +105,9 @@ export const WithInputControl: Story = {
 					}
 					suffix={
 						<InputLayout.Slot padding="minimal">
+							<VisuallyHidden id={ unitLabelId }>
+								Unit
+							</VisuallyHidden>
 							<Select.Root
 								items={ UNITS }
 								value={ unit }
@@ -125,7 +130,8 @@ export const WithInputControl: Story = {
 								<Select.Trigger
 									size="small"
 									variant="minimal"
-									aria-label="Unit"
+									// Overrides the field label, which names the input.
+									aria-labelledby={ unitLabelId }
 								/>
 								<Select.Popup width="content">
 									{ UNITS.map( ( item ) => (
