@@ -1,0 +1,41 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as KnobStories from './index.story';
+
+<Meta
+	id="design-system-components-knob-usage-guidelines"
+	title="Components/@wordpress-ui/Knob/Usage Guidelines"
+/>
+
+# Knob usage guidelines
+
+## When to use Knob
+
+Use `Knob` to choose an angle, such as the direction of a gradient or a rotation. `0` points up and values increase clockwise, in degrees.
+
+Knob is a dial only. Pair it with an `InputControl` so users can type an exact angle, and keep both in sync through one value. Give the Knob an accessible name with `aria-label` or `aria-labelledby`.
+
+<Canvas of={ KnobStories.WithInputControl } />
+
+## Choose wrapping or stops
+
+Without `min` and `max`, the dial covers one full turn. Dragging past the top wraps from 359 to 0, and the arrow keys wrap the same way. Use this when every direction is valid and 360 means the same as 0.
+
+<Canvas of={ KnobStories.Default } />
+
+Set `min` and `max` when the value has limits. The dial stops at the ends instead of wrapping.
+
+<Canvas of={ KnobStories.WithStops } />
+
+A range wider than one turn, such as -360 to 360, counts turns while dragging. A click picks the angle nearest the current value, so it never jumps a whole turn. The dial shows only the direction, so show the full value in a paired input.
+
+<Canvas of={ KnobStories.MultipleTurns } />
+
+## Show an empty value
+
+Pass `null` as the value when no angle is set. The dial shows no indicator until the user turns it.
+
+<Canvas of={ KnobStories.Empty } />
+
+## Keyboard
+
+The arrow keys change the value by `step`. Page Up, Page Down, and the arrow keys with Shift change it by `largeStep`. Home and End go to the start and end of the range.
