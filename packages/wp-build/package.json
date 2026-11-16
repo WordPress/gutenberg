@@ -61,10 +61,10 @@
 	"devDependencies": {
 		"@types/node": "^24.13.3",
 		"@wordpress/theme": "file:../theme",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
-		"@wordpress/theme": "^3.0.0 || ^4.0.0"
+		"@wordpress/theme": "^3.0.0 || ^4.0.0 || ^5.0.0"
 	},
 	"peerDependenciesMeta": {
 		"@wordpress/theme": {
