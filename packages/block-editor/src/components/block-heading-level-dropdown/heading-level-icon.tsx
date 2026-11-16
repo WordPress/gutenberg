@@ -32,12 +32,7 @@ const LEVEL_TO_PATH: Record< number, ReactElement > = {
 export default function HeadingLevelIcon( { level }: HeadingLevelIconProps ) {
 	// An unset level matches no icon.
 	if ( LEVEL_TO_PATH[ level as number ] ) {
-		return (
-			<WCIcon
-				icon={ LEVEL_TO_PATH[ level as number ] }
-				data-wp-editor-icon
-			/>
-		);
+		return <WCIcon icon={ LEVEL_TO_PATH[ level as number ] } />;
 	}
 
 	return null;

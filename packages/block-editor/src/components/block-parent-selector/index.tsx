@@ -11,7 +11,6 @@ import Inserter from '../inserter';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import renderActionIcon from '../../utils/render-action-icon';
 
 /**
  * Block parent selector component, displaying the hierarchy of the
@@ -163,7 +162,7 @@ export default function BlockParentSelector() {
 											)
 								}
 								showTooltip
-								icon={ renderActionIcon( plus ) }
+								icon={ plus }
 							/>
 						) }
 					/>

@@ -24,7 +24,6 @@ import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
-import renderActionIcon from '../utils/render-action-icon';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 20;
@@ -122,18 +121,18 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 
 	const toolbarControls = [
 		{
-			icon: renderActionIcon( pencil ),
+			icon: pencil,
 			title: __( 'Edit RSS URL' ),
 			onClick: () => setIsEditing( true ),
 		},
 		{
-			icon: renderActionIcon( list ),
+			icon: list,
 			title: _x( 'List view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'list' } ),
 			isActive: blockLayout === 'list',
 		},
 		{
-			icon: renderActionIcon( grid ),
+			icon: grid,
 			title: _x( 'Grid view', 'RSS block display setting' ),
 			onClick: () => setAttributes( { blockLayout: 'grid' } ),
 			isActive: blockLayout === 'grid',

@@ -18,7 +18,6 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -45,7 +44,6 @@ exports[`AlignmentUI > should allow custom alignment controls to be specified 1`
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -81,7 +79,6 @@ exports[`AlignmentUI > should match snapshot when controls are hidden 1`] = `
     >
       <svg
         aria-hidden="true"
-        data-wp-editor-icon="true"
         focusable="false"
         height="24"
         stroke="currentColor"
@@ -118,7 +115,6 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -145,7 +141,6 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -172,7 +167,6 @@ exports[`AlignmentUI > should match snapshot when controls are visible 1`] = `
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"

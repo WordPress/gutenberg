@@ -8,7 +8,6 @@ import type {
 	PatternOverridesDropdownProps,
 	PatternOverridesPopoverContentProps,
 } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 /**
  * Renders the content of the pattern overrides popover.
@@ -73,7 +72,7 @@ export default function PatternOverridesDropdown( {
 			<ToolbarButton
 				ref={ anchorRef }
 				className="block-editor-block-toolbar__pattern-overrides-indicator"
-				icon={ renderActionIcon( icon ) }
+				icon={ icon }
 				label={ label }
 				onClick={ () => setIsOpen( ! isOpen ) }
 				aria-expanded={ isOpen }

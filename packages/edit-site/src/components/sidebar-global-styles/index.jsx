@@ -8,7 +8,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { Button, __experimentalHStack as HStack } from '@wordpress/components';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
-import { Icon, seen } from '@wordpress/icons';
+import { seen } from '@wordpress/icons';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -35,7 +35,7 @@ const GlobalStylesPageActions = ( {
 		<HStack className="edit-site-styles__header-actions">
 			<Button
 				isPressed={ isStyleBookOpened }
-				icon={ <Icon icon={ seen } data-wp-editor-icon /> }
+				icon={ seen }
 				label={ __( 'Style Book' ) }
 				onClick={ () => {
 					setIsStyleBookOpened( ! isStyleBookOpened );

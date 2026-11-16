@@ -40,7 +40,6 @@ function BlockIcon( {
 
 	return (
 		<span
-			data-wp-editor-icon
 			style={ style as CSSProperties }
 			className={ clsx( 'block-editor-block-icon', className, {
 				'has-colors': showColors,

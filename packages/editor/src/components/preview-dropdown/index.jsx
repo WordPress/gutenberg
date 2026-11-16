@@ -23,7 +23,6 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../../utils/device-type';
 import { unlock } from '../../lock-unlock';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
@@ -168,9 +167,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 								isResponsiveEditing && deviceType !== 'Desktop',
 						} ) }
 						size="compact"
-						icon={ renderActionIcon(
-							DEVICE_TYPE_METADATA[ deviceType ].icon
-						) }
+						icon={ DEVICE_TYPE_METADATA[ deviceType ].icon }
 						label={ __( 'View' ) }
 						showTooltip={ ! showIconLabels }
 						accessibleWhenDisabled={ disabled }

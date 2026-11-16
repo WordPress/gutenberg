@@ -15,7 +15,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
 import WelcomeGuideStyles from './welcome-guide';
-import renderActionIcon from '../../utils/render-action-icon';
 
 export default function GlobalStylesSidebar() {
 	const {
@@ -155,7 +154,7 @@ export default function GlobalStylesSidebar() {
 						>
 							{ ! isMobileViewport && (
 								<Button
-									icon={ renderActionIcon( seen ) }
+									icon={ seen }
 									label={ __( 'Style Book' ) }
 									isPressed={ showStylebook }
 									accessibleWhenDisabled
@@ -166,7 +165,7 @@ export default function GlobalStylesSidebar() {
 							) }
 							<Button
 								label={ __( 'Revisions' ) }
-								icon={ renderActionIcon( backup ) }
+								icon={ backup }
 								onClick={ toggleRevisions }
 								accessibleWhenDisabled
 								disabled={ ! hasRevisions }

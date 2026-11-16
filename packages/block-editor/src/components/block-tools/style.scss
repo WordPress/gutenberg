@@ -218,8 +218,7 @@
 				padding: 0 $grid-unit-15;
 				color: inherit;
 
-				svg[data-wp-editor-icon],
-				[data-wp-editor-icon] svg {
+				svg:where(:not([data-wp-components-button-spinner])) {
 					display: none;
 				}
 

@@ -32,7 +32,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import renderActionIcon from '../utils/render-action-icon';
 
 // Matches the icon name pattern accepted by /wp/v2/icons/<name> REST route.
 const ICON_NAME_REGEX =
@@ -156,7 +155,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 			{ icon && (
 				<BlockControls group="block">
 					<ToolbarButton
-						icon={ renderActionIcon( flipHorizontalIcon ) }
+						icon={ flipHorizontalIcon }
 						label={ __( 'Flip horizontal' ) }
 						isPressed={ flipHorizontal }
 						onClick={ () =>
@@ -166,7 +165,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 						}
 					/>
 					<ToolbarButton
-						icon={ renderActionIcon( flipVerticalIcon ) }
+						icon={ flipVerticalIcon }
 						label={ __( 'Flip vertical' ) }
 						isPressed={ flipVertical }
 						onClick={ () =>
@@ -176,7 +175,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 						}
 					/>
 					<ToolbarButton
-						icon={ renderActionIcon( rotateRight ) }
+						icon={ rotateRight }
 						label={ __( 'Rotate' ) }
 						onClick={ () =>
 							setAttributes( {

@@ -55,7 +55,6 @@ import {
 } from './state';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import renderActionIcon from '../utils/render-action-icon';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -468,7 +467,7 @@ function TableEdit( {
 					</BlockControls>
 					<BlockControls group="other">
 						<ToolbarDropdownMenu
-							icon={ renderActionIcon( table ) }
+							icon={ table }
 							label={ __( 'Edit table' ) }
 							controls={ tableControls }
 						/>

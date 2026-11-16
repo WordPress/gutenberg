@@ -29,7 +29,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
-import renderActionIcon from '../utils/render-action-icon';
 
 export default function PostDateEdit( props ) {
 	const {
@@ -161,7 +160,7 @@ export default function PostDateEdit( props ) {
 									return (
 										<ToolbarButton
 											aria-expanded={ isOpen }
-											icon={ renderActionIcon( pencil ) }
+											icon={ pencil }
 											title={ __( 'Change Date' ) }
 											onClick={ onToggle }
 											onKeyDown={ openOnArrowDown }

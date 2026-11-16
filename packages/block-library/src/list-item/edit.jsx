@@ -23,7 +23,6 @@ import {
 	getIndentTarget,
 	getOutdentTarget,
 } from './utils';
-import renderActionIcon from '../utils/render-action-icon';
 
 export function IndentUI( { clientId } ) {
 	const registry = useRegistry();
@@ -41,9 +40,7 @@ export function IndentUI( { clientId } ) {
 	return (
 		<>
 			<ToolbarButton
-				icon={ renderActionIcon(
-					isRTL() ? formatOutdentRTL : formatOutdent
-				) }
+				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
 				shortcut={ displayShortcut.shift( 'Tab' ) }
 				description={ __( 'Outdent list item' ) }
@@ -51,9 +48,7 @@ export function IndentUI( { clientId } ) {
 				onClick={ () => outdentListItems( registry ) }
 			/>
 			<ToolbarButton
-				icon={ renderActionIcon(
-					isRTL() ? formatIndentRTL : formatIndent
-				) }
+				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
 				shortcut="Tab"
 				description={ __( 'Indent list item' ) }

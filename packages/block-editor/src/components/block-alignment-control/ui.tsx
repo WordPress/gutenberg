@@ -12,7 +12,6 @@ import { useAlignmentMenu } from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
 import type { BlockAlignmentUIProps } from './types';
 import type { LayoutAlignment } from '../../layouts/types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 function BlockAlignmentUI( {
 	value,
@@ -71,11 +70,9 @@ function BlockAlignmentUI( {
 		ComponentProps< typeof ToolbarDropdownMenu > & { isCollapsed?: boolean }
 	>;
 	const commonProps = {
-		icon: renderActionIcon(
-			activeAlignmentControl
-				? activeAlignmentControl.icon
-				: defaultAlignmentControl.icon
-		),
+		icon: activeAlignmentControl
+			? activeAlignmentControl.icon
+			: defaultAlignmentControl.icon,
 		label,
 	};
 	const extraProps = isToolbar
@@ -84,9 +81,6 @@ function BlockAlignmentUI( {
 				controls: enabledControls.map( ( { name: controlName } ) => {
 					return {
 						...BLOCK_ALIGNMENTS_CONTROLS[ controlName ],
-						icon: renderActionIcon(
-							BLOCK_ALIGNMENTS_CONTROLS[ controlName ].icon
-						),
 						isActive:
 							value === controlName ||
 							( ! value && controlName === 'none' ),

@@ -14,7 +14,6 @@ import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
 import { getAllowedVideoProviders } from '../embed-video-utils';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -103,7 +102,7 @@ export default function CoverBlockControls( {
 					{ showEditMediaButton && (
 						<ToolbarButton
 							ref={ editMediaButtonRef }
-							icon={ renderActionIcon( crop ) }
+							icon={ crop }
 							label={ __( 'Edit image' ) }
 							onClick={ onEditMedia }
 							aria-haspopup="dialog"

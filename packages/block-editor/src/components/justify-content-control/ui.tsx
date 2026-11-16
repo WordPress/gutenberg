@@ -9,7 +9,6 @@ import {
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import type { JustifyContentUIProps, JustifyContentValue } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const icons = {
 	left: justifyLeft,
@@ -42,35 +41,35 @@ function JustifyContentUI( {
 	const allControls = [
 		{
 			name: 'left',
-			icon: renderActionIcon( justifyLeft ),
+			icon: justifyLeft,
 			title: __( 'Justify items left' ),
 			isActive: 'left' === value,
 			onClick: () => handleClick( 'left' ),
 		},
 		{
 			name: 'center',
-			icon: renderActionIcon( justifyCenter ),
+			icon: justifyCenter,
 			title: __( 'Justify items center' ),
 			isActive: 'center' === value,
 			onClick: () => handleClick( 'center' ),
 		},
 		{
 			name: 'right',
-			icon: renderActionIcon( justifyRight ),
+			icon: justifyRight,
 			title: __( 'Justify items right' ),
 			isActive: 'right' === value,
 			onClick: () => handleClick( 'right' ),
 		},
 		{
 			name: 'space-between',
-			icon: renderActionIcon( justifySpaceBetween ),
+			icon: justifySpaceBetween,
 			title: __( 'Space between items' ),
 			isActive: 'space-between' === value,
 			onClick: () => handleClick( 'space-between' ),
 		},
 		{
 			name: 'stretch',
-			icon: renderActionIcon( justifyStretch ),
+			icon: justifyStretch,
 			title: __( 'Stretch items' ),
 			isActive: 'stretch' === value,
 			onClick: () => handleClick( 'stretch' ),
@@ -88,7 +87,7 @@ function JustifyContentUI( {
 
 	return (
 		<UIComponent
-			icon={ renderActionIcon( icon ) }
+			icon={ icon }
 			popoverProps={ popoverProps }
 			label={ __( 'Change items justification' ) }
 			controls={ allControls.filter( ( elem ) =>

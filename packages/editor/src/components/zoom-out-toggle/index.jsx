@@ -11,7 +11,6 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
 import { unlock } from '../../lock-unlock';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const ZoomOutToggle = ( { disabled } ) => {
 	const { isZoomOut, showIconLabels, isDistractionFree } = useSelect(
@@ -79,7 +78,7 @@ const ZoomOutToggle = ( { disabled } ) => {
 			accessibleWhenDisabled
 			disabled={ disabled }
 			onClick={ handleZoomOut }
-			icon={ renderActionIcon( zoomOutIcon ) }
+			icon={ zoomOutIcon }
 			label={ __( 'Zoom Out' ) }
 			isPressed={ isZoomOut }
 			size="compact"

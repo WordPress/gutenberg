@@ -13,7 +13,6 @@ import {
 } from '../../layouts/utils';
 import type { Layout } from '../../layouts/types';
 import type { BlockMoverProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 	const {
@@ -98,7 +97,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 					{ ( draggableProps ) => (
 						<Button
 							__next40pxDefaultSize
-							icon={ renderActionIcon( dragHandle ) }
+							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
 							label={ __( 'Drag' ) }
 							// Should not be able to tab to drag handle as this

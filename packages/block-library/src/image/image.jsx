@@ -70,7 +70,6 @@ import {
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
-import renderActionIcon from '../utils/render-action-icon';
 
 const {
 	DimensionsTool,
@@ -139,7 +138,7 @@ function ContentOnlyControls( {
 			<ToolbarItem ref={ setPopoverAnchor }>
 				{ ( toggleProps ) => (
 					<DropdownMenu
-						icon={ renderActionIcon( chevronDown ) }
+						icon={ chevronDown }
 						/* translators: button label text should, if possible, be under 16 characters. */
 						label={ __( 'More' ) }
 						toggleProps={ {
@@ -922,7 +921,7 @@ export default function Image( {
 							ref={ cropButtonRef }
 							onClick={ openImageMediaEditorModal }
 							aria-haspopup="dialog"
-							icon={ renderActionIcon( crop ) }
+							icon={ crop }
 							label={ __( 'Edit image' ) }
 							// Disable rather than hide while the edited image
 							// loads, so the button keeps focus when the modal
@@ -932,7 +931,7 @@ export default function Image( {
 					) }
 					{ showCoverControls && (
 						<ToolbarButton
-							icon={ renderActionIcon( overlayText ) }
+							icon={ overlayText }
 							label={ __( 'Add text over image' ) }
 							onClick={ switchToCover }
 						/>
@@ -944,7 +943,7 @@ export default function Image( {
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ uploadExternal }
-							icon={ renderActionIcon( upload ) }
+							icon={ upload }
 							label={ __( 'Upload to Media Library' ) }
 						/>
 					</ToolbarGroup>

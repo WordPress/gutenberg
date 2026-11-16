@@ -44,8 +44,7 @@
 			width: auto;
 
 			// Hide the button icons when labels are set to display...
-			svg[data-wp-editor-icon],
-			[data-wp-editor-icon] svg {
+			svg:where(:not([data-wp-components-button-spinner])) {
 				display: none;
 			}
 			// ... and display labels.

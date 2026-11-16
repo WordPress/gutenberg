@@ -5,7 +5,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
-import renderActionIcon from '../../utils/render-action-icon';
 
 export default function PostViewLink() {
 	const { hasLoaded, permalink, isPublished, label, showIconLabels } =
@@ -31,7 +30,7 @@ export default function PostViewLink() {
 
 	return (
 		<Button
-			icon={ renderActionIcon( external ) }
+			icon={ external }
 			label={ label || __( 'View post' ) }
 			href={ permalink }
 			target="_blank"

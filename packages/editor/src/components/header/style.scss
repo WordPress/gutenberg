@@ -137,8 +137,7 @@
 		width: auto;
 
 		// Hide the button icons when labels are set to display...
-		svg[data-wp-editor-icon],
-		[data-wp-editor-icon] svg {
+		svg:where(:not([data-wp-components-button-spinner])) {
 			display: none;
 		}
 		// ... and display labels.
@@ -153,8 +152,7 @@
 	}
 	// Exception for drodpdown toggle buttons.
 	.components-button.has-icon.button-toggle {
-		svg[data-wp-editor-icon],
-		[data-wp-editor-icon] svg {
+		svg:where(:not([data-wp-components-button-spinner])) {
 			display: block;
 		}
 		&::after {
@@ -162,6 +160,10 @@
 		}
 	}
 
+	// Don't hide MenuItemsChoice check icons
+	.components-menu-items-choice .components-menu-items__item-icon.components-menu-items__item-icon {
+		display: block;
+	}
 	.editor-document-tools__inserter-toggle.editor-document-tools__inserter-toggle,
 	.interface-pinned-items .components-button {
 		padding-left: $grid-unit;
@@ -220,15 +222,16 @@
 		padding: 6px 6px 6px $grid-unit;
 		width: 14.625rem;
 		justify-content: flex-start;
-		gap: $grid-unit-10;
 
-		&[aria-expanded="true"] svg[data-wp-editor-icon],
-		&[aria-expanded="true"] [data-wp-editor-icon] svg {
+		&[aria-expanded="true"] svg:where(:not([data-wp-components-button-spinner])) {
 			display: block;
 			max-width: $grid-unit-30;
 		}
 		&[aria-expanded="false"] {
 			padding-left: $grid-unit-50;
+		}
+		svg:where(:not([data-wp-components-button-spinner])) {
+			margin-right: 8px;
 		}
 	}
 }

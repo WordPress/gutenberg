@@ -13,7 +13,6 @@ import {
 import { Spinner as WCSpinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
-import renderActionIcon from '../utils/render-action-icon';
 
 // The Post Template's layout attribute arranges the post items, not the
 // blocks of the template, which always stack vertically inside each post
@@ -305,13 +304,13 @@ export default function PostTemplateEdit( {
 
 	const displayLayoutControls = [
 		{
-			icon: renderActionIcon( list ),
+			icon: list,
 			title: _x( 'List view', 'Post template block display setting' ),
 			onClick: () => setDisplayLayout( { type: 'default' } ),
 			isActive: layoutType === 'default' || layoutType === 'constrained',
 		},
 		{
-			icon: renderActionIcon( grid ),
+			icon: grid,
 			title: _x( 'Grid view', 'Post template block display setting' ),
 			onClick: () =>
 				setDisplayLayout( {

@@ -31,7 +31,6 @@ import {
 	useIsDraggingWithin,
 	selectLabelText,
 } from './shared';
-import renderActionIcon from '../utils/render-action-icon';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
 const NESTING_BLOCK_NAMES = [
@@ -369,7 +368,7 @@ export default function NavigationLinkEdit( {
 				<ToolbarGroup>
 					<ToolbarButton
 						name="link"
-						icon={ renderActionIcon( linkIcon ) }
+						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => {
@@ -379,7 +378,7 @@ export default function NavigationLinkEdit( {
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
 							name="submenu"
-							icon={ renderActionIcon( addSubmenu ) }
+							icon={ addSubmenu }
 							title={ __( 'Add submenu' ) }
 							onClick={ transformToSubmenu }
 						/>

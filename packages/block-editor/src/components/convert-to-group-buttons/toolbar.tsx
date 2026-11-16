@@ -7,7 +7,6 @@ import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import type { Layout } from '../../layouts/types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const layouts: Record< string, Layout > = {
 	group: { type: 'constrained' },
@@ -79,27 +78,27 @@ function BlockGroupToolbar() {
 	return (
 		<ToolbarGroup>
 			<ToolbarButton
-				icon={ renderActionIcon( group ) }
+				icon={ group }
 				label={ _x( 'Group', 'action: convert blocks to group' ) }
 				onClick={ onConvertToGroup }
 			/>
 			{ canInsertRow && (
 				<ToolbarButton
-					icon={ renderActionIcon( row ) }
+					icon={ row }
 					label={ _x( 'Row', 'action: convert blocks to row' ) }
 					onClick={ onConvertToRow }
 				/>
 			) }
 			{ canInsertStack && (
 				<ToolbarButton
-					icon={ renderActionIcon( stack ) }
+					icon={ stack }
 					label={ _x( 'Stack', 'action: convert blocks to stack' ) }
 					onClick={ onConvertToStack }
 				/>
 			) }
 			{ canInsertGrid && (
 				<ToolbarButton
-					icon={ renderActionIcon( grid ) }
+					icon={ grid }
 					label={ _x( 'Grid', 'action: convert blocks to grid' ) }
 					onClick={ onConvertToGrid }
 				/>

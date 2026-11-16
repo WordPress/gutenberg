@@ -6,7 +6,6 @@ import type { ComponentProps } from 'react';
 import { orderBy } from '../../../utils/sorting';
 import { DROPDOWN_FORMATS, TOOLBAR_FORMATS } from './formats';
 import type { ToolbarControlFill } from '../types';
-import renderActionIcon from '../../../utils/render-action-icon';
 
 type DropdownMenuControls = ComponentProps< typeof DropdownMenu >[ 'controls' ];
 
@@ -51,7 +50,7 @@ const FormatToolbar = () => {
 						<ToolbarItem>
 							{ ( toggleProps ) => (
 								<DropdownMenu
-									icon={ renderActionIcon( chevronDown ) }
+									icon={ chevronDown }
 									/* translators: button label text should, if possible, be under 16 characters. */
 									label={ __( 'More' ) }
 									toggleProps={ {

@@ -16,7 +16,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are hidden 1`] =
     >
       <svg
         aria-hidden="true"
-        data-wp-editor-icon="true"
         focusable="false"
         height="24"
         stroke="currentColor"
@@ -60,7 +59,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -94,7 +92,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -128,7 +125,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"
@@ -162,7 +158,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
       >
         <svg
           aria-hidden="true"
-          data-wp-editor-icon="true"
           focusable="false"
           height="24"
           stroke="currentColor"

@@ -2,7 +2,6 @@ import { __ } from '@wordpress/i18n';
 import { DropdownMenu, ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import BlockStylesMenu from '../block-switcher/block-styles-menu';
 import type { BlockStylesDropdownProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 export default function BlockStylesDropdown( {
 	clientIds,
@@ -21,7 +20,7 @@ export default function BlockStylesDropdown( {
 							placement: 'bottom-start',
 							className: 'block-editor-block-switcher__popover',
 						} }
-						icon={ renderActionIcon( children ) }
+						icon={ children }
 						text={ text }
 						toggleProps={ {
 							description: __( 'Change block style' ),

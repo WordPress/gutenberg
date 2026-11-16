@@ -22,7 +22,6 @@ import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -238,7 +237,7 @@ export function BlockSettingsDropdown( {
 
 				return (
 					<DropdownMenu
-						icon={ renderActionIcon( moreVertical ) }
+						icon={ moreVertical }
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }

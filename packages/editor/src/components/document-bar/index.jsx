@@ -24,7 +24,6 @@ import usePageTypeBadge from '../../utils/pageTypeBadge';
 import { getStylesCanvasTitle } from '../styles-canvas';
 import { unlock } from '../../lock-unlock';
 import useEditedSectionDetails from './useEditedSectionDetails';
-import renderActionIcon from '../../utils/render-action-icon';
 
 /** @typedef {import("@wordpress/components").IconType} IconType */
 
@@ -173,9 +172,7 @@ export default function DocumentBar( props ) {
 				{ hasBackButton && (
 					<MotionButton
 						className="editor-document-bar__back"
-						icon={ renderActionIcon(
-							isRTL() ? chevronRightSmall : chevronLeftSmall
-						) }
+						icon={ isRTL() ? chevronRightSmall : chevronLeftSmall }
 						onClick={ handleBackClick }
 						size="compact"
 						initial={

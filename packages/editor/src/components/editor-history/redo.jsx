@@ -5,7 +5,6 @@ import { displayShortcut, isAppleOS } from '@wordpress/keycodes';
 import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 import { store as editorStore } from '../../store';
-import renderActionIcon from '../../utils/render-action-icon';
 
 function EditorHistoryRedo( props, ref ) {
 	const shortcut = isAppleOS()
@@ -22,7 +21,7 @@ function EditorHistoryRedo( props, ref ) {
 			__next40pxDefaultSize
 			{ ...props }
 			ref={ ref }
-			icon={ renderActionIcon( ! isRTL() ? redoIcon : undoIcon ) }
+			icon={ ! isRTL() ? redoIcon : undoIcon }
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Redo' ) }
 			shortcut={ shortcut }

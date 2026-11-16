@@ -13,7 +13,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityRecords } from '@wordpress/core-data';
-import renderActionIcon from '../utils/render-action-icon';
 
 // The Term Template's layout attribute arranges the term items, not the
 // blocks of the template, which always stack vertically inside each term
@@ -162,7 +161,7 @@ export default function TermTemplateEdit( {
 				<ToolbarGroup
 					controls={ [
 						{
-							icon: renderActionIcon( list ),
+							icon: list,
 							title: _x(
 								'List view',
 								'Term template block display setting'
@@ -174,7 +173,7 @@ export default function TermTemplateEdit( {
 								layoutType === 'constrained',
 						},
 						{
-							icon: renderActionIcon( grid ),
+							icon: grid,
 							title: _x(
 								'Grid view',
 								'Term template block display setting'

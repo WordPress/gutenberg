@@ -9,7 +9,6 @@ import {
 	numberInAngleBrackets,
 } from './icons';
 import { useTermCount } from './use-term-count';
-import renderActionIcon from '../utils/render-action-icon';
 
 const BRACKET_TYPES = {
 	none: { label: __( 'No brackets' ), icon: bareNumber },
@@ -72,9 +71,7 @@ export default function TermCountEdit( {
 		<>
 			<BlockControls group="block">
 				<ToolbarDropdownMenu
-					icon={ renderActionIcon(
-						BRACKET_TYPES[ bracketType ]?.icon ?? bareNumber
-					) }
+					icon={ BRACKET_TYPES[ bracketType ]?.icon ?? bareNumber }
 					label={ __( 'Change bracket type' ) }
 					controls={ bracketTypeControls }
 				/>

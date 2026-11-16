@@ -13,7 +13,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';
-import renderActionIcon from '../../utils/render-action-icon';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -169,15 +168,11 @@ export default function PostSavedState( { forceIsDirty } ) {
 			shortcut={ isDisabled ? undefined : displayShortcut.primary( 's' ) }
 			variant="tertiary"
 			size="compact"
-			icon={ renderActionIcon(
-				isLargeViewport ? undefined : cloudUpload
-			) }
+			icon={ isLargeViewport ? undefined : cloudUpload }
 			label={ text || label }
 			aria-disabled={ isDisabled }
 		>
-			{ isSavedState && (
-				<Icon icon={ isSaved ? check : cloud } data-wp-editor-icon />
-			) }
+			{ isSavedState && <Icon icon={ isSaved ? check : cloud } /> }
 			{ text }
 		</Button>
 	);

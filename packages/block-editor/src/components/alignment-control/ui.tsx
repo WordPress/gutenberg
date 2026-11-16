@@ -3,7 +3,6 @@ import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 import type { ComponentProps, ComponentType } from 'react';
 import type { AlignmentControlOption, AlignmentUIProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 const DEFAULT_ALIGNMENT_CONTROLS: AlignmentControlOption[] = [
 	{
@@ -64,7 +63,7 @@ function AlignmentUI( {
 
 	return (
 		<UIComponent
-			icon={ renderActionIcon( setIcon() ) }
+			icon={ setIcon() }
 			label={ label }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
@@ -72,7 +71,6 @@ function AlignmentUI( {
 
 				return {
 					...control,
-					icon: renderActionIcon( control.icon ),
 					isActive,
 					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( align ),

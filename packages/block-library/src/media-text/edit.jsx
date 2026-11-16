@@ -41,7 +41,6 @@ import { unlock } from '../lock-unlock';
 import { getDefaultLinkDestination } from '../image/utils';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { MediaControl } from '../utils/media-control';
-import renderActionIcon from '../utils/render-action-icon';
 
 const { ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -525,7 +524,7 @@ function MediaTextEdit( {
 							label={ __( 'Align media and text vertically' ) }
 						/>
 						<ToolbarButton
-							icon={ renderActionIcon( pullLeft ) }
+							icon={ pullLeft }
 							title={ __( 'Show media on left' ) }
 							isActive={ mediaPosition === 'left' }
 							onClick={ () =>
@@ -533,7 +532,7 @@ function MediaTextEdit( {
 							}
 						/>
 						<ToolbarButton
-							icon={ renderActionIcon( pullRight ) }
+							icon={ pullRight }
 							title={ __( 'Show media on right' ) }
 							isActive={ mediaPosition === 'right' }
 							onClick={ () =>

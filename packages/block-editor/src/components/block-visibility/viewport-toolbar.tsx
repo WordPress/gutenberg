@@ -9,7 +9,6 @@ import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
 import type { TreeBlock } from '../../store/types';
 import type { BlockVisibilityClientIdsProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 export default function BlockVisibilityViewportToolbar( {
 	clientIds,
@@ -62,9 +61,7 @@ export default function BlockVisibilityViewportToolbar( {
 		<ToolbarGroup className="block-editor-block-visibility-toolbar">
 			<ToolbarButton
 				disabled={ ! canToggleBlockVisibility }
-				icon={ renderActionIcon(
-					areBlocksHiddenAnywhere ? unseen : seen
-				) }
+				icon={ areBlocksHiddenAnywhere ? unseen : seen }
 				label={
 					areBlocksHiddenAnywhere ? __( 'Hidden' ) : __( 'Visible' )
 				}

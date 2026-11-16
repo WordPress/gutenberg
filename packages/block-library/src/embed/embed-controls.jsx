@@ -9,7 +9,6 @@ import {
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { pencil } from '@wordpress/icons';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import renderActionIcon from '../utils/render-action-icon';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -39,7 +38,7 @@ const EmbedControls = ( {
 						<ToolbarButton
 							className="components-toolbar__control"
 							label={ __( 'Edit URL' ) }
-							icon={ renderActionIcon( pencil ) }
+							icon={ pencil }
 							onClick={ switchBackToURLInput }
 						/>
 					) }

@@ -21,7 +21,6 @@ import {
 import { isPlainObject } from '../../utils/object';
 import type { ChildLayoutBlockStyle } from '../../hooks/types';
 import type { GridItemMoverProps, GridItemMoversProps } from './types';
-import renderActionIcon from '../../utils/render-action-icon';
 
 export function GridItemMovers( {
 	style,
@@ -163,7 +162,7 @@ export function GridItemMover( {
 					'block-editor-grid-item-mover-button',
 					className
 				) }
-				icon={ renderActionIcon( icon ) }
+				icon={ icon }
 				label={ label }
 				aria-describedby={ descriptionId }
 				// The button ignores a `null` click handler.

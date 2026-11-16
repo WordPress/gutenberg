@@ -9,7 +9,6 @@ import {
 import { ToolbarButton } from '@wordpress/components';
 import { caption as captionIcon } from '@wordpress/icons';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import renderActionIcon from './render-action-icon';
 
 export function Caption( {
 	attributeKey = 'caption',
@@ -66,7 +65,7 @@ export function Caption( {
 								} );
 							}
 						} }
-						icon={ renderActionIcon( icon ) }
+						icon={ icon }
 						isPressed={ showCaption }
 						label={ showCaption ? removeLabel : addLabel }
 					/>

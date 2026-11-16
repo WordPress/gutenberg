@@ -1,7 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
-import { Icon, plus } from '@wordpress/icons';
+import { plus } from '@wordpress/icons';
 import type { LinkControlSearchCreateProps } from './types';
 
 export const LinkControlSearchCreate = ( {
@@ -35,7 +35,7 @@ export const LinkControlSearchCreate = ( {
 		<MenuItem
 			{ ...itemProps }
 			iconPosition="left"
-			icon={ <Icon icon={ plus } data-wp-editor-icon /> }
+			icon={ plus }
 			className="block-editor-link-control__search-item"
 			onClick={ onClick }
 		>
