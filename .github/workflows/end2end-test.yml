@@ -58,4 +58,4 @@ jobs:
               run: ./bin/reset-e2e-tests.sh
 
             - name: Running the tests
-              run: ./node_modules/.bin/wp-scripts test-e2e --config=test/e2e/jest.config.json --ci --cacheDirectory="$HOME/.jest-cache"
+              run: node --unhandled-rejections=warn ./node_modules/@wordpress/scripts/scripts/test-e2e.js --config=test/e2e/jest.config.json --ci --cacheDirectory="$HOME/.jest-cache"
