@@ -86,6 +86,11 @@ export const keyFields: Field< ApiKey >[] = [
 		id: 'name',
 		label: 'Name',
 		type: 'text',
+		// Marks each row with its record, so a pattern can find the row for a
+		// record by ID rather than by name, which needn't be unique.
+		render: ( { item } ) => (
+			<span data-key-id={ item.id }>{ item.name }</span>
+		),
 		enableHiding: false,
 		isValid: { required: true },
 	},

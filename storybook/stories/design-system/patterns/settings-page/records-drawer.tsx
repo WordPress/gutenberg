@@ -27,10 +27,11 @@ import { DiscardChangesDialog } from './unsaved-changes';
  * Where focus should land once a revoked record and its drawer are gone:
  * the next record, the previous one when it was last, or Add API key when
  * the list is empty. Captured before the record is removed, so the element
- * is still the one that remains.
+ * is still the one that remains. Rows are matched by record ID, since two
+ * records can share a name.
  */
 function focusTargetAfterRevoke(
-	name: string,
+	id: string,
 	scope: ParentNode | null,
 	addButton: HTMLElement | null
 ) {
@@ -41,7 +42,9 @@ function focusTargetAfterRevoke(
 		),
 	];
 	const index = titles.findIndex(
-		( title ) => title.textContent?.trim() === name
+		( title ) =>
+			title.querySelector< HTMLElement >( '[data-key-id]' )?.dataset
+				.keyId === id
 	);
 	// `titles[-1]` is undefined, so the first record falls through to the next.
 	const remaining = titles[ index + 1 ] ?? titles[ index - 1 ];
@@ -79,7 +82,7 @@ function KeyDrawer( {
 	const revokeKey = async () => {
 		await simulateRequest();
 		const target = focusTargetAfterRevoke(
-			editor.record.name,
+			editor.record.id,
 			pageRef.current,
 			addButtonRef.current
 		);
