@@ -98,21 +98,68 @@ describe( 'Avatar colors', () => {
 		}
 	} );
 
+	it( 'keeps the activity ring distinct from the adaptive fill', async () => {
+		const colors = [
+			'#008a20',
+			'#fbbf24',
+			'#000000',
+			'#ffffff',
+			'#767676',
+		];
+		await render(
+			<>
+				{ colors.map( ( color ) => (
+					<Avatar
+						key={ color }
+						name="Alex Morgan"
+						aria-label={ color }
+						color={ color }
+						active
+					/>
+				) ) }
+			</>
+		);
+		for ( const color of colors ) {
+			const avatar = screen.getByRole( 'img', { name: color } );
+			const fallback = within( avatar ).getByText( 'AM' );
+			const background = luminance(
+				getComputedStyle( fallback ).backgroundColor
+			);
+			// The ring is painted on the content wrapper, which has no accessible role.
+			// eslint-disable-next-line testing-library/no-node-access
+			const content = fallback.parentElement!;
+			const ring = luminance(
+				getComputedStyle( content, '::before' ).backgroundColor
+			);
+			expect(
+				( Math.max( background, ring ) + 0.05 ) /
+					( Math.min( background, ring ) + 0.05 )
+			).toBeGreaterThanOrEqual( 3 );
+		}
+	} );
+
 	it.each( [
 		[ '#00800080', [ 0, 128, 0, 255 ] ],
 		[ 'transparent', [ 0, 0, 0, 255 ] ],
 		[ 'color(display-p3 1 0 0)', [ 255, 0, 0, 255 ] ],
-	] )( 'uses an opaque sRGB fallback for %s', async ( color, expected ) => {
-		await render( <Avatar name="Alex Morgan" color={ color } /> );
-		const context = document.createElement( 'canvas' ).getContext( '2d' )!;
-		context.fillStyle = getComputedStyle(
-			screen.getByText( 'AM' )
-		).backgroundColor;
-		context.fillRect( 0, 0, 1, 1 );
-		expect( Array.from( context.getImageData( 0, 0, 1, 1 ).data ) ).toEqual(
-			expected
-		);
-	} );
+	] )(
+		'uses an opaque sRGB activity ring for %s',
+		async ( color, expected ) => {
+			await render(
+				<Avatar name="Alex Morgan" color={ color } active />
+			);
+			const context = document
+				.createElement( 'canvas' )
+				.getContext( '2d' )!;
+			context.fillStyle = getComputedStyle(
+				screen.getByText( 'AM' )
+			).getPropertyValue( '--_wp-ui-avatar-ring' );
+			context.fillRect( 0, 0, 1, 1 );
+			expect(
+				Array.from( context.getImageData( 0, 0, 1, 1 ).data )
+			).toEqual( expected );
+		}
+	);
 } );
 
 describe( 'Avatar layout', () => {

@@ -40,8 +40,8 @@ export type AvatarProps = Omit<
 	 */
 	locale?: string;
 	/**
-	 * Colors the opaque fallback background and active ring, automatically
-	 * choosing a contrasting foreground tint for the initials.
+	 * Sets the active ring color. The opaque fallback fill lightens or darkens
+	 * that color to contrast with the ring, and the initials use a contrasting tint.
 	 * When active, choose a color that contrasts with the surrounding surface.
 	 * Accepts CSS colors and variables that resolve to a color. Do not use
 	 * `currentColor`, including through variables, or CSS-wide keywords such as
@@ -58,8 +58,8 @@ export type AvatarProps = Omit<
 	active?: boolean;
 	/**
 	 * The intended image size on high-DPI screens. The outer footprint also
-	 * reserves room for the activity ring and transparent halo. It remains
-	 * constant across display densities and activity states; the image adjusts
+	 * reserves room for the activity ring. It remains constant across display
+	 * densities and activity states; the image adjusts
 	 * to the theme's focus-ring width within that space.
 	 *
 	 * @default "md"

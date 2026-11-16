@@ -23,15 +23,15 @@
 	@layer components {
 		.root {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-md);
-			/* Reserve both tracks at their high-DPI width, regardless of display density. */
-			--_wp-ui-avatar-track-space: 6px;
+			/* Reserve the ring at its high-DPI width, regardless of display density. */
+			--_wp-ui-avatar-track-space: 3px;
 			--_wp-ui-avatar-radius: 50%;
 			--_wp-ui-avatar-background: var(--wpds-color-background-surface-neutral-weak);
 			--_wp-ui-avatar-foreground: var(--wpds-color-foreground-content-neutral-weak);
 			--_wp-ui-avatar-ring: var(--wpds-color-stroke-surface-neutral-strong);
 			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-sm);
 			--_wp-ui-avatar-font-scale: 1;
-			--_wp-ui-avatar-content-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space) - 4 * var(--wpds-border-width-focus));
+			--_wp-ui-avatar-content-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space) - 2 * var(--wpds-border-width-focus));
 			/* Leave room for two wide glyphs, including color emoji. */
 			--_wp-ui-avatar-fitted-font-size: min(var(--_wp-ui-avatar-font-size), calc(var(--_wp-ui-avatar-content-size) / 2.5));
 
@@ -42,6 +42,7 @@
 
 			position: relative;
 			display: inline-flex;
+			isolation: isolate;
 			flex-shrink: 0;
 			inline-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space));
 			block-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space));
@@ -58,31 +59,31 @@
 			--_gcd-span-display: block;
 
 			position: absolute;
-			inset: calc(2 * var(--wpds-border-width-focus));
+			inset: var(--wpds-border-width-focus);
 			border-radius: 50%;
-			background-color: var(--wpds-color-background-surface-neutral-weak);
+			background-color: var(--_wp-ui-avatar-background);
 			color: var(--_wp-ui-avatar-foreground);
 		}
 
-		.is-active > .content::after {
+		.is-active > .content::before {
 			content: "";
 			position: absolute;
-			/* The halo is empty space, so it never paints in forced-colors mode. */
-			inset: calc(-2 * var(--wpds-border-width-focus));
+			inset: calc(-1 * var(--wpds-border-width-focus));
 			box-sizing: border-box;
 			border-radius: var(--_wp-ui-avatar-radius);
-			/* Unlike border widths, shadow spreads preserve fractional track widths. */
-			box-shadow: inset 0 0 0 var(--wpds-border-width-focus) var(--_wp-ui-avatar-ring);
+			/* Paint behind the content to avoid a seam between their rounded edges. */
+			z-index: -1;
+			background-color: var(--_wp-ui-avatar-ring);
 			pointer-events: none;
 
 			@media (forced-colors: active) {
 				border: var(--wpds-border-width-focus) solid CanvasText;
-				box-shadow: none;
+				background: none;
 			}
 		}
 
 		.is-square {
-			--_wp-ui-avatar-radius: calc(var(--wpds-border-radius-sm) + 2 * var(--wpds-border-width-focus));
+			--_wp-ui-avatar-radius: calc(var(--wpds-border-radius-sm) + var(--wpds-border-width-focus));
 
 			> .content {
 				border-radius: var(--wpds-border-radius-sm);
@@ -158,24 +159,29 @@
 			@supports (color: rgb(from green r g b / 1)) and
 				(color: color(from green srgb-linear round(up, r) g b / 1)) {
 				.has-color > .content {
-					/* Share the existing opaque sRGB fill with the activity ring. */
-					--_wp-ui-avatar-custom-background: rgb(from var(--_wp-ui-avatar-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
-					--_wp-ui-avatar-background: var(--_wp-ui-avatar-custom-background);
-					--_wp-ui-avatar-ring: var(--_wp-ui-avatar-custom-background);
+					/* Keep the assigned ring color opaque and within sRGB. */
+					--_wp-ui-avatar-ring: rgb(from var(--_wp-ui-avatar-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
 					--_wp-ui-avatar-contrast-target: 4.55;
 
 					--_wp-ui-avatar-luminance: calc(0.2126 * r + 0.7152 * g + 0.0722 * b);
 					/* The black/white crossover from the WCAG contrast formula is (sqrt(21) - 1) / 20. */
-					--_wp-ui-avatar-light-foreground: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-luminance)), 1));
+					--_wp-ui-avatar-light-contrast: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-luminance)), 1));
+					/* Lighten or darken the fill to separate it from the ring without a halo. */
+					--_wp-ui-avatar-fill-contrast-target: 3.05;
+					--_wp-ui-avatar-dark-fill-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / var(--_wp-ui-avatar-fill-contrast-target) - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), 1);
+					--_wp-ui-avatar-light-fill-tint: clamp(0, calc((1.05 - var(--_wp-ui-avatar-fill-contrast-target) * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), 1);
+					--_wp-ui-avatar-fill-tint: calc(var(--_wp-ui-avatar-light-contrast) * var(--_wp-ui-avatar-light-fill-tint) + (1 - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-dark-fill-tint));
+					--_wp-ui-avatar-background: color(from var(--_wp-ui-avatar-ring) srgb-linear calc(var(--_wp-ui-avatar-light-contrast) + (r - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-fill-tint)) calc(var(--_wp-ui-avatar-light-contrast) + (g - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-fill-tint)) calc(var(--_wp-ui-avatar-light-contrast) + (b - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-fill-tint)) / 1);
+
 					/*
 					 * Solve the WCAG ratio for the mix toward the background, with a rounding margin.
 					 * Denominator floors handle black and white.
 					 */
 					--_wp-ui-avatar-dark-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / var(--_wp-ui-avatar-contrast-target) - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), 1);
 					--_wp-ui-avatar-light-tint: clamp(0, calc((1.05 - var(--_wp-ui-avatar-contrast-target) * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), 1);
-					--_wp-ui-avatar-tint: calc(var(--_wp-ui-avatar-light-foreground) * var(--_wp-ui-avatar-light-tint) + (1 - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-dark-tint));
+					--_wp-ui-avatar-tint: calc(var(--_wp-ui-avatar-light-contrast) * var(--_wp-ui-avatar-light-tint) + (1 - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-dark-tint));
 
-					--_wp-ui-avatar-foreground: color(from var(--_wp-ui-avatar-custom-background) srgb-linear calc(var(--_wp-ui-avatar-light-foreground) + (r - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (g - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (b - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) / 1);
+					--_wp-ui-avatar-foreground: color(from var(--_wp-ui-avatar-background) srgb-linear calc(var(--_wp-ui-avatar-light-contrast) + (r - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-contrast) + (g - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-contrast) + (b - var(--_wp-ui-avatar-light-contrast)) * var(--_wp-ui-avatar-tint)) / 1);
 				}
 			}
 		}

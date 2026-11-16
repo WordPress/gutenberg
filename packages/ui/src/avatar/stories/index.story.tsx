@@ -31,7 +31,7 @@ export const Default: Story = {
 	args: { src: IMAGE_SRC },
 };
 
-/** The assigned color fills initials and the activity ring; inactive images have no ring. */
+/** The assigned color sets the activity ring; the initials fill adapts to contrast with it. */
 export const WithColor: Story = {
 	args: { color: '#008a20' },
 	render: ( args ) => (
@@ -73,7 +73,7 @@ export const Initials: Story = {
 	),
 };
 
-/** Size describes the intended image size on high-DPI screens, with ring and halo space reserved outside it. */
+/** Size describes the intended image size on high-DPI screens, with ring space reserved outside it. */
 export const Sizes: Story = {
 	render: ( args ) => (
 		<Stack gap="md" align="center">
@@ -98,7 +98,7 @@ export const Interactive: Story = {
 							display: 'inline-flex',
 							borderRadius:
 								args.shape === 'square'
-									? 'calc(var(--wpds-border-radius-sm) + 2 * var(--wpds-border-width-focus))'
+									? 'calc(var(--wpds-border-radius-sm) + var(--wpds-border-width-focus))'
 									: '50%',
 						} }
 					/>
