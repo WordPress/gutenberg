@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .block-editor-tabbed-sidebar {
 	background-color: $white;
@@ -35,4 +36,12 @@
 	flex-direction: column;
 	overflow-y: auto;
 	scrollbar-gutter: auto;
+
+	// Browsers can make a scrolling panel a tab stop, so show where focus is.
+	// Scoped to the sidebar to win over the Tabs panel's `outline: none`.
+	.block-editor-tabbed-sidebar &:focus-visible {
+		@include outset-ring__focus();
+		// Keep the ring inside the sidebar, which clips overflowing content.
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
 }
