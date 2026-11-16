@@ -7,6 +7,10 @@
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
+### Documentation
+
+-   `Page`: Add descriptions for the component and all of its props ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
+
 ## 3.1.0 (2026-11-04)
 
 ### Bug Fixes
