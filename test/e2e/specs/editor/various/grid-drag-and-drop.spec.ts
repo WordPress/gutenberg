@@ -194,7 +194,12 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 		editor,
 		page,
 		gridDragUtils,
+		browserName,
 	} ) => {
+		test.skip(
+			browserName === 'webkit',
+			'The drag of a block from outside the grid does not reach the grid in Playwright WebKit.'
+		);
 		await editor.setContent(
 			`<!-- wp:image -->
 <figure class="wp-block-image"><img src="${ BASE_URL }/wp-admin/images/wordpress-logo.png" alt="outside"/></figure>
