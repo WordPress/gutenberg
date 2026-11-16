@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { getMinimumInsertionRect } from '../get-minimum-insertion-rect';
-import { GridRect, getGridTracks } from '../utils';
+import { GridRect, getGridTracksFromTemplate } from '../utils';
 
 // Eight 40px columns and eight 40px rows, with 10px gaps: three tracks and
 // their two gaps measure 140px, and four measure 190px.
-const tracks = getGridTracks( '40px 40px 40px 40px 40px 40px 40px 40px', 10 );
+const tracks = getGridTracksFromTemplate(
+	'40px 40px 40px 40px 40px 40px 40px 40px',
+	10
+);
 const columnTracks = tracks;
 const rowTracks = tracks;
 
@@ -93,8 +96,14 @@ describe( 'getMinimumInsertionRect()', () => {
 			toPlain(
 				getMinimumInsertionRect( {
 					rect: new GridRect( { columnStart: 2, rowStart: 1 } ),
-					columnTracks: getGridTracks( '40px 40px 40px 40px', 10 ),
-					rowTracks: getGridTracks( '40px 40px 40px 40px 40px', 10 ),
+					columnTracks: getGridTracksFromTemplate(
+						'40px 40px 40px 40px',
+						10
+					),
+					rowTracks: getGridTracksFromTemplate(
+						'40px 40px 40px 40px 40px',
+						10
+					),
 					minimumWidth: 160,
 					minimumHeight: 160,
 				} )
@@ -112,8 +121,8 @@ describe( 'getMinimumInsertionRect()', () => {
 			toPlain(
 				getMinimumInsertionRect( {
 					rect: new GridRect( { columnStart: 2, rowStart: 1 } ),
-					columnTracks: getGridTracks( '40px 40px', 10 ),
-					rowTracks: getGridTracks( '40px 40px', 10 ),
+					columnTracks: getGridTracksFromTemplate( '40px 40px', 10 ),
+					rowTracks: getGridTracksFromTemplate( '40px 40px', 10 ),
 					minimumWidth: 160,
 					minimumHeight: 160,
 				} )
@@ -150,11 +159,11 @@ describe( 'getMinimumInsertionRect()', () => {
 			toPlain(
 				getMinimumInsertionRect( {
 					rect: new GridRect( { columnStart: 1, rowStart: 1 } ),
-					columnTracks: getGridTracks(
+					columnTracks: getGridTracksFromTemplate(
 						'41.66px 41.66px 41.66px 41.66px 41.66px 41.66px',
 						10
 					),
-					rowTracks: getGridTracks(
+					rowTracks: getGridTracksFromTemplate(
 						'41.66px 41.66px 41.66px 41.66px 41.66px 41.66px',
 						10
 					),

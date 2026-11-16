@@ -624,7 +624,13 @@
 										"vmax",
 										"svmax",
 										"lvmax",
-										"dvmax"
+										"dvmax",
+										"cqw",
+										"cqh",
+										"cqi",
+										"cqb",
+										"cqmin",
+										"cqmax"
 									],
 									"default": "rem"
 								}

@@ -3,15 +3,18 @@ import {
 	getInsertedBlockRect,
 	getInsertionSize,
 } from '../get-inserted-block-rect';
-import { GridRect, getGridTracks } from '../utils';
+import { GridRect, getGridTracksFromTemplate } from '../utils';
 
 // Eight 40px columns and six 40px rows, with 10px gaps: three tracks and
 // their two gaps measure 140px.
-const columnTracks = getGridTracks(
+const columnTracks = getGridTracksFromTemplate(
 	'40px 40px 40px 40px 40px 40px 40px 40px',
 	10
 );
-const rowTracks = getGridTracks( '40px 40px 40px 40px 40px 40px', 10 );
+const rowTracks = getGridTracksFromTemplate(
+	'40px 40px 40px 40px 40px 40px',
+	10
+);
 
 function toPlain( rect: GridRect ) {
 	return {
@@ -50,8 +53,8 @@ describe( 'getInsertionSize()', () => {
 	it( 'is one cell in a two by two grid', () => {
 		expect(
 			getInsertionSize( {
-				columnTracks: getGridTracks( '200px 200px', 10 ),
-				rowTracks: getGridTracks( '200px 200px', 10 ),
+				columnTracks: getGridTracksFromTemplate( '200px 200px', 10 ),
+				rowTracks: getGridTracksFromTemplate( '200px 200px', 10 ),
 			} )
 		).toEqual( { columnSpan: 1, rowSpan: 1 } );
 	} );

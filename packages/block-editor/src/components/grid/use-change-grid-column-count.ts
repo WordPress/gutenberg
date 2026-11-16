@@ -5,9 +5,9 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GRID_PLACEMENT_KEYS, getGridItemBox } from './free-placement';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
-	getUpdatedChildLayoutStyle,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import { isGridStackedOnMobile } from './mobile-stacking';
 import { getComputedCSS, isGridElementWithFixedCells } from './utils';
 import { getColumnCountChangeUpdates } from './remap-grid-placements';

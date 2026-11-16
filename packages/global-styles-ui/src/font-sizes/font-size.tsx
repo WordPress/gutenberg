@@ -56,14 +56,17 @@ function FontSize() {
 		fontSize.fluid !== undefined ? !! fontSize.fluid : !! globalFluid;
 	const isCustomFluid = typeof fontSize.fluid === 'object';
 
-	const set = ( key: keyof FontSizeType, value: unknown ) =>
+	const update = ( changes: Partial< FontSizeType > ) =>
 		setPresets(
 			presets.map( ( p ) =>
 				p.slug === slug
-					? ( { ...fontSize, [ key ]: value } as FontSizeType )
+					? ( { ...fontSize, ...changes } as FontSizeType )
 					: p
 			)
 		);
+
+	const set = ( key: keyof FontSizeType, value: unknown ) =>
+		update( { [ key ]: value } as Partial< FontSizeType > );
 
 	const handleCustomFluidValues = ( value: boolean ) => {
 		if ( value ) {
@@ -80,7 +83,10 @@ function FontSize() {
 	const handleMaxChange = ( value: string | undefined ) => {
 		const fluid: FluidTypographyConfig =
 			typeof fontSize.fluid === 'object' ? fontSize.fluid : {};
-		set( 'fluid', { ...fluid, max: value } );
+		update( {
+			fluid: { ...fluid, max: value },
+			...( value ? { size: value } : {} ),
+		} );
 	};
 
 	const menuItems: PresetEditHeaderMenuItem[] =

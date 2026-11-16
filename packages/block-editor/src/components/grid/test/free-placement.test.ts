@@ -10,12 +10,12 @@ import {
 	snapPixelRectPosition,
 	type PixelRectEdge,
 } from '../free-placement';
-import { getGridTracks } from '../utils';
+import { getGridTracksFromTemplate } from '../utils';
 
 // Four 100px columns and four 100px rows, with 10px gaps: tracks start at
 // 0, 110, 220 and 330, and the grid ends at 430.
-const columnTracks = getGridTracks( '100px 100px 100px 100px', 10 );
-const rowTracks = getGridTracks( '100px 100px 100px 100px', 10 );
+const columnTracks = getGridTracksFromTemplate( '100px 100px 100px 100px', 10 );
+const rowTracks = getGridTracksFromTemplate( '100px 100px 100px 100px', 10 );
 const bounds = { left: 0, top: 0, right: 430, bottom: 430 };
 
 describe( 'getGridPlacementFromPixelRect', () => {
