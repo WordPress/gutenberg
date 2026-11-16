@@ -11,6 +11,9 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
     />
     <span
       class="components-form-toggle__track"
+    />
+    <span
+      class="components-form-toggle__labels"
     >
       <svg
         aria-hidden="true"

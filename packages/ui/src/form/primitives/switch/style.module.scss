@@ -13,9 +13,9 @@
 			/* How far the thumb, and the labels with it, travel between the two states. */
 			--_wp-ui-switch-travel: calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width));
 			/* Centers each label in the part of the track the thumb leaves exposed. */
-			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-travel) - var(--_wp-ui-switch-label-size)) / 2);
+			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-travel) - var(--_wp-ui-switch-label-size)) / 2 + var(--_wp-ui-switch-border-width));
 			/* Where the brand panel starts when the switch is off. Its inline-end edge sits under the middle of the thumb. */
-			--_wp-ui-switch-panel-offset: calc(var(--_wp-ui-switch-thumb-width) / 2 - var(--_wp-ui-switch-border-width) - var(--_wp-ui-switch-height) * 2);
+			--_wp-ui-switch-panel-offset: calc(var(--_wp-ui-switch-thumb-width) / 2 - var(--_wp-ui-switch-height) * 2);
 
 			position: relative;
 			display: inline-block;
@@ -116,10 +116,14 @@
 			}
 		}
 
-		/* Clips the labels as they slide in and out of the track. */
+		/*
+		 * Clips the brand panel and the labels as they slide in and out. It covers
+		 * the track border, so the panel's rounded edge meets the page rather than
+		 * the neutral track.
+		 */
 		.labels {
 			position: absolute;
-			inset: 0;
+			inset: calc(-1 * var(--_wp-ui-switch-border-width));
 			overflow: hidden;
 			border-radius: inherit;
 			pointer-events: none;

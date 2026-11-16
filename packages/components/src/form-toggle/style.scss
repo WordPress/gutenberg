@@ -9,12 +9,11 @@ $toggle-border-width: 1px;
 $toggle-label-size: $grid-unit-10;
 // How far the thumb, and the labels with it, travel between the two states.
 $toggle-travel: $toggle-width - $toggle-thumb-width;
-// Centers each label in the part of the track the thumb leaves exposed,
-// measured from inside the track border.
+// Centers each label in the part of the track the thumb leaves exposed.
 $toggle-label-offset: math.div($toggle-travel - $toggle-label-size, 2);
-// Where the brand panel starts when the toggle is off, measured from inside the
-// track border. Its inline-end edge sits under the middle of the thumb.
-$toggle-panel-offset: math.div($toggle-thumb-width, 2) - $toggle-border-width - $toggle-width;
+// Where the brand panel starts when the toggle is off. Its inline-end edge sits
+// under the middle of the thumb.
+$toggle-panel-offset: math.div($toggle-thumb-width, 2) - $toggle-width;
 
 $transition-duration: 0.2s;
 
@@ -27,10 +26,7 @@ $transition-duration: 0.2s;
 	// Unchecked state.
 	.components-form-toggle__track {
 		content: "";
-		position: relative;
 		display: inline-block;
-		// Clips the labels as they slide in and out of the track.
-		overflow: hidden;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: var(--wpds-color-background-track-neutral);
@@ -42,6 +38,20 @@ $transition-duration: 0.2s;
 		@media not (prefers-reduced-motion) {
 			transition: $transition-duration border-color ease;
 		}
+	}
+
+	// Clips the brand panel and the labels as they slide in and out. It covers
+	// the track border, so the panel's rounded edge meets the page rather than
+	// the neutral track.
+	.components-form-toggle__labels {
+		position: absolute;
+		top: 0;
+		inset-inline-start: 0;
+		width: $toggle-width;
+		height: $toggle-height;
+		overflow: hidden;
+		border-radius: math.div($toggle-height, 2);
+		pointer-events: none;
 
 		// The brand half of the track. It slides with the thumb rather than
 		// changing color, and the thumb always covers the edge where it meets
@@ -101,7 +111,6 @@ $transition-duration: 0.2s;
 		margin: auto 0;
 		width: $toggle-label-size;
 		height: $toggle-label-size;
-		pointer-events: none;
 		// Override the browser's SVG default so the labels follow forced system colors.
 		forced-color-adjust: auto;
 
@@ -113,7 +122,7 @@ $transition-duration: 0.2s;
 	}
 
 	svg.components-form-toggle__on-label {
-		inset-inline-start: $toggle-label-offset - $toggle-travel;
+		inset-inline-start: $toggle-label-offset + $toggle-border-width - $toggle-travel;
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		@media ( forced-colors: active ) {
@@ -122,7 +131,7 @@ $transition-duration: 0.2s;
 	}
 
 	svg.components-form-toggle__off-label {
-		inset-inline-end: $toggle-label-offset;
+		inset-inline-end: $toggle-label-offset + $toggle-border-width;
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 
 		@media ( forced-colors: active ) {
@@ -152,10 +161,10 @@ $transition-duration: 0.2s;
 			@media ( forced-colors: active ) {
 				border-color: Highlight;
 			}
+		}
 
-			&::before {
-				inset-inline-start: $toggle-panel-offset + $toggle-travel;
-			}
+		~ .components-form-toggle__labels::before {
+			inset-inline-start: $toggle-panel-offset + $toggle-travel;
 		}
 
 		~ .components-form-toggle__thumb {
@@ -168,12 +177,12 @@ $transition-duration: 0.2s;
 			}
 		}
 
-		~ .components-form-toggle__track svg.components-form-toggle__on-label {
-			inset-inline-start: $toggle-label-offset;
+		~ .components-form-toggle__labels svg.components-form-toggle__on-label {
+			inset-inline-start: $toggle-label-offset + $toggle-border-width;
 		}
 
-		~ .components-form-toggle__track svg.components-form-toggle__off-label {
-			inset-inline-end: $toggle-label-offset - $toggle-travel;
+		~ .components-form-toggle__labels svg.components-form-toggle__off-label {
+			inset-inline-end: $toggle-label-offset + $toggle-border-width - $toggle-travel;
 		}
 	}
 
@@ -187,11 +196,11 @@ $transition-duration: 0.2s;
 			@media ( forced-colors: active ) {
 				border-color: GrayText;
 			}
+		}
 
-			// Disabled toggles use the same track whether on or off.
-			&::before {
-				display: none;
-			}
+		// Disabled toggles use the same track whether on or off.
+		.components-form-toggle__labels::before {
+			display: none;
 		}
 
 		.components-form-toggle__thumb {
