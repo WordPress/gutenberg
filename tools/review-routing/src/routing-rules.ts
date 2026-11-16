@@ -10,6 +10,8 @@ export type RoutingRule = {
 	threshold: number;
 	/** File body, sent to the model as the question. */
 	instructions: string;
+	/** Reference data from the rule's optional `.mts` file. */
+	context?: Record< string, unknown >;
 };
 
 export const DEFAULT_THRESHOLD = 0.7;
@@ -70,6 +72,45 @@ export function parseRoutingRule( id: string, source: string ): RoutingRule {
 	return { id, reviewers, threshold, instructions };
 }
 
+/** The imported `.mts` file of a rule. */
+type ContextModule = { default?: unknown };
+
+/**
+ * Reads the reference data from the module of a rule's `.mts` file. Its
+ * default export takes no arguments and returns the data, which the model
+ * reads in named fields next to the question.
+ *
+ * @param id     Rule id.
+ * @param module The imported module.
+ * @return The reference data.
+ */
+export async function readContext(
+	id: string,
+	module: ContextModule
+): Promise< Record< string, unknown > > {
+	if ( typeof module.default !== 'function' ) {
+		throw new Error( `${ id }.mts: the default export is not a function.` );
+	}
+
+	const context: unknown = await module.default();
+	if (
+		typeof context !== 'object' ||
+		context === null ||
+		Object.getPrototypeOf( context ) !== Object.prototype
+	) {
+		throw new Error( `${ id }.mts: the function must return an object.` );
+	}
+
+	// The question goes in this field, so the context cannot replace it.
+	if ( 'question' in context ) {
+		throw new Error(
+			`${ id }.mts: the object cannot have a \`question\`.`
+		);
+	}
+
+	return context as Record< string, unknown >;
+}
+
 /**
  * Reads every routing file in a directory.
  *
@@ -79,16 +120,25 @@ export function parseRoutingRule( id: string, source: string ): RoutingRule {
 export async function loadRoutingRules(
 	directory: URL = RULES_DIRECTORY
 ): Promise< RoutingRule[] > {
-	const names = ( await readdir( directory ) )
-		.filter( ( name ) => name.endsWith( '.md' ) )
-		.sort();
+	const files = await readdir( directory );
+	const names = files.filter( ( name ) => name.endsWith( '.md' ) ).sort();
 
 	return Promise.all(
-		names.map( async ( name ) =>
-			parseRoutingRule(
-				path.basename( name, '.md' ),
+		names.map( async ( name ) => {
+			const id = path.basename( name, '.md' );
+			const rule = parseRoutingRule(
+				id,
 				await readFile( new URL( name, directory ), 'utf8' )
-			)
-		)
+			);
+
+			if ( files.includes( `${ id }.mts` ) ) {
+				rule.context = await readContext(
+					id,
+					await import( new URL( `${ id }.mts`, directory ).href )
+				);
+			}
+
+			return rule;
+		} )
 	);
 }
