@@ -24,6 +24,10 @@ Set `unitsPerTurn` when dial positions have a physical meaning. Zero points up. 
 
 `min` and `max` bound the total value. Add `wrap` to repeat that range indefinitely. For a seamless loop, include one step per position. With whole degrees, use 0 to 359 for one turn or 0 to 719 for two turns before the value returns to zero.
 
+The range can end partway through a turn. With 0 to 500 and 360 units per turn, 500 points 140° clockwise from the top. A bounded dial stops there. On a wrapping dial, the next step returns to zero at the top. Clicking six o’clock from 500 selects 180, the only available value at that position. Omit `unitsPerTurn` to fit all 501 values around one continuous loop.
+
+<Canvas of={ KnobStories.PartialTurns } />
+
 Pair the dial with a number field when users need to enter an exact rotation or see how many turns they have made. This example keeps the override in the parent. Clearing the field restores an inherited 45°. Entering zero sets an explicit 0°.
 
 <Canvas of={ KnobStories.WithNumberInput } />
@@ -38,4 +42,4 @@ Pass `value` and `onValueChange` to keep a readout or another control in sync. F
 
 ## Keyboard interaction
 
-Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10. Home and End go straight to the first and last selectable values.
+Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10 units. The dial rounds this increment to the nearest whole number of steps, with a minimum of one step. Home and End go straight to the first and last selectable values.

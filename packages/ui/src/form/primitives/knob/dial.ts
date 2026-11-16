@@ -9,15 +9,21 @@ export function clamp( value: number, min: number, max: number ) {
 	return Math.max( min, Math.min( max, value ) );
 }
 
+export function decimalPlaces( value: number ) {
+	const [ coefficient, exponent ] = value.toExponential().split( 'e' );
+	const fractionLength = coefficient.split( '.' )[ 1 ]?.length ?? 0;
+	return Math.max( 0, fractionLength - Number( exponent ) );
+}
+
 export function getAngleOnTurn(
 	pointer: number,
 	current: number,
 	min: number,
 	max: number,
-	wrap: boolean
+	seamless: boolean
 ) {
 	const nearest = pointer + 360 * Math.round( ( current - pointer ) / 360 );
-	if ( wrap || ( nearest >= min && nearest <= max ) ) {
+	if ( seamless || ( nearest >= min && nearest <= max ) ) {
 		return nearest;
 	}
 	// At an end stop the adjacent turn may still contain the clicked angle.
@@ -44,11 +50,10 @@ export function getPointerAngle( event: React.PointerEvent< HTMLElement > ) {
 
 export function getStepChange(
 	event: React.KeyboardEvent,
-	step: number,
-	largeStep: number,
+	largeStepCount: number,
 	rtl: boolean
 ) {
-	const increment = event.shiftKey ? largeStep : step;
+	const increment = event.shiftKey ? largeStepCount : 1;
 	switch ( event.key ) {
 		case 'ArrowUp':
 			return increment;
@@ -59,9 +64,9 @@ export function getStepChange(
 		case 'ArrowLeft':
 			return rtl ? increment : -increment;
 		case 'PageUp':
-			return largeStep;
+			return largeStepCount;
 		case 'PageDown':
-			return -largeStep;
+			return -largeStepCount;
 	}
 	return 0;
 }

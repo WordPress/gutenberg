@@ -9,8 +9,12 @@ export type KnobProps = Omit<
 	| 'thumbCollisionBehavior'
 	| 'onValueChange'
 	| 'onValueCommitted'
+	| 'onKeyDown'
 > &
-	Pick< Slider.Thumb.Props, 'inputRef' | 'getAriaValueText' > & {
+	Pick<
+		Slider.Thumb.Props,
+		'inputRef' | 'getAriaValueText' | 'onKeyDown'
+	> & {
 		/**
 		 * Whether to continue at the opposite end when passing the first or
 		 * last value. Both endpoints are selectable. For angles
