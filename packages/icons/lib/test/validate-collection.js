@@ -144,9 +144,7 @@ describe( 'validateCollection', () => {
 
 			await expect(
 				validateCollection( iconLibraryDir )
-			).rejects.toThrow(
-				"expected 'keywords' to contain unique terms"
-			);
+			).rejects.toThrow( "expected 'keywords' to contain unique terms" );
 		} );
 
 		it.each( [

@@ -110,8 +110,7 @@ async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
 				keywords.length > 0 &&
 				keywords.every(
 					( keyword ) =>
-						typeof keyword === 'string' &&
-						keyword.trim().length > 0
+						typeof keyword === 'string' && keyword.trim().length > 0
 				);
 
 			if ( ! isValidShape ) {

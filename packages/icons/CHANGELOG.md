@@ -25,6 +25,7 @@
 
 ### Internal
 
+-   Tighten `keywords` validation in `validate-collection.cjs` to reject empty arrays, empty strings, duplicates within an entry, and terms that repeat the icon label ([#86589](https://github.com/WordPress/gutenberg/pull/86589)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
