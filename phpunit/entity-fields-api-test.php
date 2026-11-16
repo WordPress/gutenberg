@@ -29,7 +29,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status', 'template' );
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'publish_date', 'scheduled_date', 'status', 'template' );
 
 	/**
 	 * The ids of the default fields the design post types exclude: those
@@ -37,7 +37,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 *
 	 * @var string[]
 	 */
-	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' );
+	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'publish_date', 'scheduled_date', 'slug', 'status', 'template' );
 
 	/**
 	 * The callbacks a test hooked to `wp_entity_fields_api_init`, as callback and
@@ -564,6 +564,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			'date'             => array( 'date', true ),
 			'last_edited_date' => array( 'last_edited_date', false ),
 			'password'         => array( 'password', true ),
+			'publish_date'     => array( 'publish_date', true ),
 			'scheduled_date'   => array( 'scheduled_date', true ),
 			'status'           => array( 'status', true ),
 			'template'         => array( 'template', true ),

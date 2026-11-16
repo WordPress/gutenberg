@@ -164,7 +164,7 @@ A new component with a similar name is not necessarily a replacement. Use [Compa
 
 Add a `WC*` alias as soon as a public `@wordpress/ui` export has the same name as a `@wordpress/components` export, including a private API of `@wordpress/components`. The alias depends only on the name collision. It does not depend on the new component's status, or on whether the new component replaces the legacy one.
 
-Add the mapping to the `@wordpress/use-import-as` configuration in [`tools/eslint/config.mjs`](/tools/eslint/config.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog.
+Add the mapping to the `@wordpress/use-import-as` aliases in [`tools/eslint/components-import-aliases.mjs`](/tools/eslint/components-import-aliases.mjs), and rename every existing import, including destructuring from `unlock( privateApis )`. A unit test fails when a colliding name has no alias. The alias is a convention of this repository, so it needs no changes to the `@wordpress/components` documentation or changelog.
 
 ### 2. Try the replacement in Gutenberg
 

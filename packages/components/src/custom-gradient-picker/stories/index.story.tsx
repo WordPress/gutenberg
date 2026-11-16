@@ -1,10 +1,10 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-import CustomGradientPicker from '../';
+import CustomGradientPicker from '../deprecated';
 
 const meta: Meta< typeof CustomGradientPicker > = {
-	title: 'Components/@wordpress-components/Selection & Input/Color/CustomGradientPicker',
+	title: 'Components/@wordpress-components/Deprecated/CustomGradientPicker',
 	id: 'components-customgradientpicker',
 	component: CustomGradientPicker,
 	args: {
@@ -16,7 +16,7 @@ const meta: Meta< typeof CustomGradientPicker > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Mostly an internal component. Use `GradientPicker` instead.',
+			notes: 'Deprecated. Use [`GradientPicker`](?path=/docs/components-gradientpicker--docs) with `clearable={ false }` instead.',
 		},
 	},
 };

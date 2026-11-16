@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep the Site Editor canvas mounted when the viewport crosses the mobile breakpoint, so the editor no longer reloads on resize ([#86660](https://github.com/WordPress/gutenberg/pull/86660)).
+
+## 8.1.0 (2026-11-04)
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes

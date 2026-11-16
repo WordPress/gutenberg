@@ -85,6 +85,7 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
@@ -92,6 +93,7 @@
 		"@wordpress/dataviews": "file:../dataviews",
 		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
@@ -107,7 +109,7 @@
 	},
 	"devDependencies": {
 		"@testing-library/react": "^16.3.3",
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

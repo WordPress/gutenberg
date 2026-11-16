@@ -1033,9 +1033,11 @@ describe( 'PaletteEdit', () => {
 		);
 
 		// Select radial gradient option
-		await userEvent.selectOptions(
-			screen.getByRole( 'combobox', { name: 'Type' } ),
-			'radial-gradient'
+		await userEvent.click(
+			screen.getByRole( 'combobox', { name: 'Type' } )
+		);
+		await userEvent.click(
+			screen.getByRole( 'option', { name: 'Radial' } )
 		);
 
 		await waitFor( () => {
