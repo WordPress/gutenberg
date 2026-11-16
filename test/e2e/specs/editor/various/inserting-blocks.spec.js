@@ -732,6 +732,66 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'keeps focus moved into the canvas right after inserting from the main inserter', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		// Move focus in the same task as the insertion, before the inserter
+		// checks for focus loss on the next frame.
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
+			.evaluate( ( option ) => {
+				option.click();
+				document
+					.querySelector( 'iframe[name="editor-canvas"]' )
+					.contentDocument.querySelector( '[aria-label="Add title"]' )
+					.focus();
+			} );
+		await page.evaluate(
+			() =>
+				new Promise( ( resolve ) =>
+					window.requestAnimationFrame( () =>
+						window.requestAnimationFrame( resolve )
+					)
+				)
+		);
+		await page.keyboard.type( 'Title' );
+
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'Title' );
+	} );
+
+	test( 'keeps focus in the main inserter when the inserted block removes the focused option', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'List', exact: true } )
+			.focus();
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			blockLibrary.getByRole( 'option', { name: 'List Item' } )
+		).toBeFocused();
+	} );
+
 	test( 'passes the search value in the main inserter when clicking `Browse all`', async ( {
 		admin,
 		editor,

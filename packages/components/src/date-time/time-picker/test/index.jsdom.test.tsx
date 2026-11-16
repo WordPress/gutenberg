@@ -672,6 +672,52 @@ describe( 'TimePicker', () => {
 		} );
 	} );
 
+	describe( 'timezone tooltip', () => {
+		let originalSettings: DateSettings;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: 7,
+					offsetFormatted: '7',
+					string: 'Asia/Ho_Chi_Minh',
+					abbr: '+07',
+				},
+			} );
+		} );
+
+		beforeEach( () => {
+			timezoneMock.register( 'UTC' );
+		} );
+
+		afterEach( () => {
+			timezoneMock.unregister();
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		it( 'should replace every underscore in the timezone name with a space', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ vi.fn() }
+				/>
+			);
+
+			await user.hover( screen.getByText( 'UTC+7' ) );
+
+			expect(
+				await screen.findByText( '(UTC+7) Asia/Ho Chi Minh' )
+			).toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'ISO 8601 compliance', () => {
 		it( 'should handle years below 1000 with zero-padded output', async () => {
 			const user = userEvent.setup();

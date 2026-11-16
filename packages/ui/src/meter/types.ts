@@ -20,11 +20,14 @@ export type IndicatorProps = Omit<
 	'color'
 > & {
 	/**
-	 * The color tone of the filled indicator.
+	 * The semantic color tone of the filled indicator.
+	 * Choose success, warning, or error to interpret the measurement, and
+	 * provide matching visible and accessible status text.
+	 * The tone does not change automatically with the value.
 	 *
 	 * @default "neutral"
 	 */
-	tone?: 'neutral' | 'brand';
+	tone?: 'neutral' | 'brand' | 'success' | 'warning' | 'error';
 };
 
 export type LabelProps = ComponentProps< typeof _Meter.Label > & {

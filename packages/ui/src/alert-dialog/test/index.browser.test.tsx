@@ -1071,13 +1071,43 @@ describe( 'AlertDialog', () => {
 				).toHaveAttribute( 'aria-disabled', 'true' );
 			} );
 
-			// Unmount while pending — should not throw
 			await unmount();
+			vi.mocked( speak ).mockClear();
 
-			// Resolve the deferred — should be a no-op after unmount
 			await act( async () => {
-				deferred.resolve();
+				deferred.resolve( { error: 'Late confirmation error.' } );
 			} );
+
+			expect( speak ).not.toHaveBeenCalled();
+		} );
+
+		it( 'logs a confirmation rejection after unmount without announcing an error', async () => {
+			const deferred = createDeferred();
+
+			const { unmount } = await render(
+				<TestDialog
+					controlled
+					defaultOpen
+					onConfirm={ () => deferred.promise }
+				/>
+			);
+
+			await userEvent.click(
+				screen.getByRole( 'button', { name: 'OK' } )
+			);
+			await unmount();
+			vi.mocked( speak ).mockClear();
+
+			await act( async () => {
+				deferred.reject( new Error( 'Late confirmation rejection.' ) );
+			} );
+
+			expect( console ).toHaveErroredWith(
+				expect.objectContaining( {
+					message: 'Late confirmation rejection.',
+				} )
+			);
+			expect( speak ).not.toHaveBeenCalled();
 		} );
 
 		it( 'controlled mode: recovers to idle when consumer keeps dialog open after confirm', async () => {
