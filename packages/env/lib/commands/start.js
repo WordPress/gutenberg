@@ -6,6 +6,7 @@ const { rimraf } = require( 'rimraf' );
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
+const { savePorts } = require( '../resolve-available-ports' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -114,6 +115,7 @@ module.exports = async function start( {
 
 		// Save the runtime type after successful start.
 		await saveRuntime( runtimeName, config.workDirectoryPath );
+		await savePorts( config );
 	} catch ( error ) {
 		// Attempt to stop any partially-started environment so that
 		// processes do not linger after a failed start.

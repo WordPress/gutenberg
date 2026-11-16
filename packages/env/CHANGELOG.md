@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Make `wp-env reset`, `wp-env status` and the other commands use the ports that `wp-env start` picked with `autoPort` / `--auto-port`, instead of the configured ones ([#86906](https://github.com/WordPress/gutenberg/pull/86906)).
 -   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).
 
 ### Internal

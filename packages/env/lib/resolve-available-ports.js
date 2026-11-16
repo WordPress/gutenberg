@@ -1,5 +1,6 @@
 'use strict';
 const { findAvailablePort, isPortAvailable } = require( './port-utils' );
+const { setCache } = require( './cache' );
 
 /**
  * Port definitions to resolve. Each entry maps a config path to its
@@ -126,8 +127,27 @@ async function resolveConfigPorts( config, portResolver ) {
 	return config;
 }
 
+/**
+ * Saves the ports the environment started with, for the other commands.
+ *
+ * @param {Object} config The wp-env config object.
+ */
+async function savePorts( config ) {
+	const ports = {};
+	for ( const { env, property } of PORT_DEFINITIONS ) {
+		const port = config.env[ env ][ property ];
+		if ( port ) {
+			ports[ `env.${ env }.${ property }` ] = port;
+		}
+	}
+	await setCache( 'ports', ports, {
+		workDirectoryPath: config.workDirectoryPath,
+	} );
+}
+
 module.exports = {
 	createPortResolver,
 	resolveConfigPorts,
+	savePorts,
 	PORT_DEFINITIONS,
 };
