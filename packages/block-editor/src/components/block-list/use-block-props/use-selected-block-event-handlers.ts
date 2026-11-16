@@ -534,7 +534,6 @@ export function useEventHandlers( {
 					ownerDocument.removeEventListener( 'dragend', end );
 					ownerDocument.removeEventListener( 'drop', end );
 					ownerDocument.removeEventListener( 'scroll', over );
-					document.removeEventListener( 'drop', end );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
@@ -560,12 +559,6 @@ export function useEventHandlers( {
 				ownerDocument.addEventListener( 'dragend', end );
 				ownerDocument.addEventListener( 'drop', end );
 				ownerDocument.addEventListener( 'scroll', over );
-				// A drop in the editor document, such as on a manual grid's
-				// drop layer, can move the block before its `dragend`, which
-				// then no longer reaches the canvas document.
-				if ( document !== ownerDocument ) {
-					document.addEventListener( 'drop', end );
-				}
 
 				startDraggingBlocks( clientIds );
 				// Important because it hides the block toolbar.
