@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import {
 	InspectorControls,
+	useBlockEditingMode,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
@@ -57,6 +58,10 @@ export default function PageListItemEdit( { clientId, context, attributes } ) {
 		[ clientId ]
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
+
+	// Elsewhere, a Page List's pages can't be changed one by one, so clicking
+	// one selects the Page List.
+	useBlockEditingMode( isNavigationChild ? undefined : 'disabled' );
 	const allowedBlocks = usePageListAllowedBlocks( isNavigationChild );
 
 	// Get submenu visibility from context. The Navigation block handles
