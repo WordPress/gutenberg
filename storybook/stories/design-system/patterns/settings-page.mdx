@@ -163,7 +163,7 @@ The footer actions are the only way out: there is no close icon, and clicking ou
 
 ### Records that open a drawer
 
-The drawer works like the dialog, including closing only through its footer actions, with room for secondary actions. Revoking a key can't be undone, so it asks for confirmation in an `AlertDialog` with the `irreversible` intent, following [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs).
+The drawer works like the dialog, including closing only through its footer actions, with room for secondary actions. Revoking a key can't be undone, so it asks for confirmation in an `AlertDialog` with the `irreversible` intent, following [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs). Canceling returns focus to Revoke. After the key is revoked, focus moves to the next record, or to the previous one when it was last, and to Add API key when none remain.
 
 <Canvas
 	of={ SettingsPageStories.RecordsWithDrawer }

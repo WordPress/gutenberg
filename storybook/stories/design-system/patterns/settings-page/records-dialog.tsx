@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { Page } from '@wordpress/admin-ui';
 import type { Action } from '@wordpress/dataviews';
 import { pencil } from '@wordpress/icons';
@@ -97,9 +98,20 @@ export function KeySaveButton( {
 	);
 }
 
-export function AddKeyButton( { onClick }: { onClick: () => void } ) {
+export function AddKeyButton( {
+	onClick,
+	buttonRef,
+}: {
+	onClick: () => void;
+	buttonRef?: Ref< HTMLButtonElement >;
+} ) {
 	return (
-		<Button size="compact" variant="solid" onClick={ onClick }>
+		<Button
+			ref={ buttonRef }
+			size="compact"
+			variant="solid"
+			onClick={ onClick }
+		>
 			Add API key
 		</Button>
 	);

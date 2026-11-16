@@ -24,6 +24,34 @@ import styles from './style.module.css';
 import { DiscardChangesDialog } from './unsaved-changes';
 
 /**
+ * Where focus should land once a revoked record and its drawer are gone:
+ * the next record, the previous one when it was last, or Add API key when
+ * the list is empty. Captured before the record is removed, so the element
+ * is still the one that remains.
+ */
+function focusTargetAfterRevoke(
+	name: string,
+	scope: ParentNode | null,
+	addButton: HTMLElement | null
+) {
+	const root = scope ?? document;
+	const titles = [
+		...root.querySelectorAll< HTMLElement >(
+			'.dataviews-title-field[role="button"]'
+		),
+	];
+	const index = titles.findIndex(
+		( title ) => title.textContent?.trim() === name
+	);
+	// `titles[-1]` is undefined, so the first record falls through to the next.
+	const remaining = titles[ index + 1 ] ?? titles[ index - 1 ];
+	if ( index !== -1 && remaining ) {
+		return remaining;
+	}
+	return addButton;
+}
+
+/**
  * Edits one record in a drawer, which keeps the table in view and leaves
  * room for secondary actions. Like the dialog, it closes only through its
  * footer actions. Revoking asks for confirmation first, because it cannot
@@ -32,20 +60,42 @@ import { DiscardChangesDialog } from './unsaved-changes';
 function KeyDrawer( {
 	editor,
 	onRevoke,
+	pageRef,
+	addButtonRef,
 }: {
 	editor: ReturnType< typeof useKeyEditor >;
 	onRevoke: ( key: ApiKey ) => void;
+	pageRef: { current: HTMLElement | null };
+	addButtonRef: { current: HTMLElement | null };
 } ) {
 	const [ isConfirmingRevoke, setIsConfirmingRevoke ] = useState( false );
 	const revokeButtonRef = useRef< HTMLButtonElement >( null );
+	// Set only for a revoke that succeeded, so canceling still returns to
+	// Revoke while closing the drawer focuses whatever remains.
+	const revokedFocusRef = useRef< HTMLElement | null >( null );
 	const notify = useNotify();
 	const overlayContainer = useOverlayContainer();
 
 	const revokeKey = async () => {
 		await simulateRequest();
+		const target = focusTargetAfterRevoke(
+			editor.record.name,
+			pageRef.current,
+			addButtonRef.current
+		);
+		// Read by the dialog and drawer as they close. Cleared afterwards so
+		// a later close returns focus normally.
+		revokedFocusRef.current = target;
 		onRevoke( editor.record );
 		editor.close();
 		notify( 'API key revoked.' );
+		// Both overlays restore focus while closing, and the record they
+		// opened from is gone by then. Place focus once that has settled,
+		// then drop the target so the next close behaves normally.
+		window.setTimeout( () => target?.focus(), 50 );
+		window.setTimeout( () => {
+			revokedFocusRef.current = null;
+		}, 300 );
 	};
 
 	// The alert dialogs sit outside `Drawer.Root`: Base UI doesn't render a
@@ -61,6 +111,7 @@ function KeyDrawer( {
 			>
 				<Drawer.Popup
 					portal={ <Drawer.Portal container={ overlayContainer } /> }
+					finalFocus={ () => revokedFocusRef.current ?? true }
 				>
 					<Drawer.Header>
 						<Drawer.Title>
@@ -108,7 +159,9 @@ function KeyDrawer( {
 					portal={
 						<AlertDialog.Portal container={ overlayContainer } />
 					}
-					finalFocus={ revokeButtonRef }
+					finalFocus={ () =>
+						revokedFocusRef.current ?? revokeButtonRef.current
+					}
 					intent="irreversible"
 					title={ `Revoke “${ editor.record.name }”?` }
 					description="Apps using this key will lose access immediately. This can’t be undone."
@@ -127,6 +180,8 @@ function KeyDrawer( {
 function RecordsDrawerPage() {
 	const { keys, saveKey, revokeKey } = useKeys();
 	const editor = useKeyEditor( saveKey );
+	const pageRef = useRef< HTMLDivElement >( null );
+	const addButtonRef = useRef< HTMLButtonElement >( null );
 	const actions: Action< ApiKey >[] = [
 		{
 			id: 'edit',
@@ -138,24 +193,34 @@ function RecordsDrawerPage() {
 	];
 
 	return (
-		<Page
-			title="API keys"
-			subTitle="Let apps and services connect to your site."
-			showSidebarToggle={ false }
-			hasPadding
-			actions={
-				<AddKeyButton onClick={ () => editor.open( emptyKey ) } />
-			}
-		>
-			<SettingsContent wide>
-				<KeysTable
-					keys={ keys }
-					actions={ actions }
-					onClickItem={ editor.open }
+		<div ref={ pageRef } className={ styles.screen }>
+			<Page
+				title="API keys"
+				subTitle="Let apps and services connect to your site."
+				showSidebarToggle={ false }
+				hasPadding
+				actions={
+					<AddKeyButton
+						buttonRef={ addButtonRef }
+						onClick={ () => editor.open( emptyKey ) }
+					/>
+				}
+			>
+				<SettingsContent wide>
+					<KeysTable
+						keys={ keys }
+						actions={ actions }
+						onClickItem={ editor.open }
+					/>
+				</SettingsContent>
+				<KeyDrawer
+					editor={ editor }
+					onRevoke={ revokeKey }
+					pageRef={ pageRef }
+					addButtonRef={ addButtonRef }
 				/>
-			</SettingsContent>
-			<KeyDrawer editor={ editor } onRevoke={ revokeKey } />
-		</Page>
+			</Page>
+		</div>
 	);
 }
 
