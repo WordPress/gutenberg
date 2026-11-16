@@ -39,6 +39,7 @@
 -   RSS: Save the feed URL only when Apply is clicked, instead of on every keystroke, so a partly typed URL is no longer rendered or saved with the post ([#86659](https://github.com/WordPress/gutenberg/pull/86659)).
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
+-   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
 
 ## 12.1.0 (2026-11-04)
 
