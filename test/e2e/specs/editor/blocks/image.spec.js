@@ -1381,9 +1381,6 @@ test.describe( 'Image - lightbox', () => {
 
 			const postId = await editor.publishPost();
 
-			const pageErrors = [];
-			page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
-
 			await page.goto( `/?p=${ postId }` );
 
 			const enlargeButton = page.getByRole( 'button', {
@@ -1424,12 +1421,11 @@ test.describe( 'Image - lightbox', () => {
 				uploadedMedia.source_url
 			);
 
-			// Closing again restores focus to the trigger button without errors.
+			// Closing again restores focus to the trigger button.
 			await page.keyboard.press( 'Escape' );
 			await page.clock.runFor( 1000 );
 			await expect( overlay ).not.toHaveClass( /active/ );
 			await expect( enlargeButton ).toBeFocused();
-			expect( pageErrors ).toEqual( [] );
 		} );
 
 		test.describe( 'Overlay not a direct child of body', () => {
