@@ -9,6 +9,7 @@
 		"core/search",
 		"core/social-links",
 		"core/page-list",
+		"core/page-list-item",
 		"core/spacer",
 		"core/home-link",
 		"core/icon",

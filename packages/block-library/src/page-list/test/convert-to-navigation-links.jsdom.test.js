@@ -1,9 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
 	convertToNavigationLinks,
-	insertAfterPageLink,
-	insertNextToPageLink,
-	removePageLink,
+	convertPageListBlocksToLinks,
 } from '../use-convert-to-navigation-links';
 
 // Expected entity binding structure for navigation links
@@ -589,93 +587,74 @@ describe( 'page list convert to links', () => {
 	} );
 } );
 
-describe( 'insertAfterPageLink', () => {
-	const link = ( id, innerBlocks = [] ) => ( {
-		clientId: `link-${ id }`,
-		attributes: { id },
+describe( 'convertPageListBlocksToLinks', () => {
+	const pageItem = ( id, attributes = {}, innerBlocks = [] ) => ( {
+		clientId: `page-${ id }`,
+		name: 'core/page-list-item',
+		attributes: {
+			id,
+			title: `Page ${ id }`,
+			link: `https://example.com/${ id }`,
+			...attributes,
+		},
 		innerBlocks,
 	} );
-	const newLink = { clientId: 'new', attributes: {}, innerBlocks: [] };
-	const ids = ( links ) => links.map( ( { clientId } ) => clientId );
 
-	it( 'adds the block after a top-level page', () => {
-		const links = [ link( 1 ), link( 2 ), link( 3 ) ];
-		expect( insertAfterPageLink( links, 2, newLink ) ).toBe( true );
-		expect( ids( links ) ).toEqual( [
-			'link-1',
-			'link-2',
-			'new',
-			'link-3',
+	it( 'keeps the order, levels, hidden pages and other items', () => {
+		const link = {
+			clientId: 'link',
+			name: 'core/navigation-link',
+			attributes: { label: 'Shop' },
+			innerBlocks: [],
+		};
+		const links = convertPageListBlocksToLinks( [
+			pageItem( 2, {}, [ pageItem( 3 ) ] ),
+			link,
+			pageItem( 1, { metadata: { blockVisibility: false } } ),
 		] );
-	} );
 
-	it( 'adds the block among a parent page’s child pages', () => {
-		const children = [ link( 2 ), link( 3 ) ];
-		const links = [ link( 1, children ), link( 4 ) ];
-		insertAfterPageLink( links, 2, newLink );
-		expect( ids( children ) ).toEqual( [ 'link-2', 'new', 'link-3' ] );
-		expect( links ).toHaveLength( 2 );
-	} );
-
-	it( 'adds the block after a parent page, not inside it', () => {
-		const links = [ link( 1, [ link( 2 ) ] ), link( 4 ) ];
-		insertAfterPageLink( links, 1, newLink );
-		expect( ids( links ) ).toEqual( [ 'link-1', 'new', 'link-4' ] );
-	} );
-
-	it( 'reports a page that has no link', () => {
-		const links = [ link( 1 ) ];
-		expect( insertAfterPageLink( links, 9, newLink ) ).toBe( false );
-		expect( links ).toHaveLength( 1 );
-	} );
-} );
-
-describe( 'insertNextToPageLink', () => {
-	const link = ( id, innerBlocks = [] ) => ( {
-		clientId: `link-${ id }`,
-		attributes: { id },
-		innerBlocks,
-	} );
-	const ids = ( links ) => links.map( ( { clientId } ) => clientId );
-	const moved = [ { clientId: 'a', attributes: {}, innerBlocks: [] } ];
-
-	it( 'puts blocks before a page', () => {
-		const links = [ link( 1 ), link( 2 ) ];
-		insertNextToPageLink( links, 2, moved, false );
-		expect( ids( links ) ).toEqual( [ 'link-1', 'a', 'link-2' ] );
-	} );
-
-	it( 'puts blocks before a child page, among its siblings', () => {
-		const children = [ link( 2 ), link( 3 ) ];
-		insertNextToPageLink( [ link( 1, children ) ], 3, moved, false );
-		expect( ids( children ) ).toEqual( [ 'link-2', 'a', 'link-3' ] );
-	} );
-} );
-
-describe( 'removePageLink', () => {
-	const link = ( id, innerBlocks = [] ) => ( {
-		clientId: `link-${ id }`,
-		attributes: { id },
-		innerBlocks,
-	} );
-
-	it( 'takes out a page with its child pages', () => {
-		const about = link( 1, [ link( 2 ) ] );
-		const links = [ about, link( 3 ) ];
-		expect( removePageLink( links, 1 ) ).toBe( about );
-		expect( links.map( ( { clientId } ) => clientId ) ).toEqual( [
-			'link-3',
+		expect( links ).toEqual( [
+			{
+				name: 'core/navigation-submenu',
+				attributes: {
+					id: 2,
+					label: 'Page 2',
+					url: 'https://example.com/2',
+					type: 'page',
+					kind: 'post-type',
+					metadata: { bindings: EXPECTED_ENTITY_BINDING },
+				},
+				innerBlocks: [
+					{
+						name: 'core/navigation-link',
+						attributes: {
+							id: 3,
+							label: 'Page 3',
+							url: 'https://example.com/3',
+							type: 'page',
+							kind: 'post-type',
+							metadata: { bindings: EXPECTED_ENTITY_BINDING },
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			link,
+			{
+				name: 'core/navigation-link',
+				attributes: {
+					id: 1,
+					label: 'Page 1',
+					url: 'https://example.com/1',
+					type: 'page',
+					kind: 'post-type',
+					metadata: {
+						blockVisibility: false,
+						bindings: EXPECTED_ENTITY_BINDING,
+					},
+				},
+				innerBlocks: [],
+			},
 		] );
-	} );
-
-	it( 'takes out a child page', () => {
-		const children = [ link( 2 ), link( 3 ) ];
-		const links = [ link( 1, children ) ];
-		expect( removePageLink( links, 3 ).clientId ).toBe( 'link-3' );
-		expect( children ).toHaveLength( 1 );
-	} );
-
-	it( 'returns null for a page that has no link', () => {
-		expect( removePageLink( [ link( 1 ) ], 9 ) ).toBeNull();
 	} );
 } );

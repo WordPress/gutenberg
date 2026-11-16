@@ -13,21 +13,6 @@ export interface PageListPage {
 	type?: string;
 }
 
-/**
- * A page in the Pages panel, in the order the panel lists them.
- */
-export interface PageRow {
-	page: PageListPage;
-	/** How many levels below the list's top the page is. */
-	depth: number;
-	/** The page's position among its siblings. */
-	index: number;
-	/** IDs of the page and its siblings, in order. */
-	siblingIds: number[];
-	/** Whether a hidden ancestor hides the page, whatever its own setting. */
-	isHiddenByAncestor: boolean;
-}
-
 export interface MenuOrderEdit {
 	id: number;
 	menu_order: number;
@@ -86,173 +71,173 @@ export function getPagesByParentId(
 }
 
 /**
- * Flattens the page tree under a parent into rows for the Pages panel, child
- * pages straight after their parent.
- *
- * @param pagesByParentId Pages keyed by parent page ID.
- * @param parentId        ID of the page to start from.
- * @param excludedIds     IDs of hidden pages.
- * @return The rows.
+ * A block of a Page List's inner block tree: a page, or an item of the menu
+ * around the Page List that was put among its pages.
  */
-export function getPageRows(
-	pagesByParentId: Map< number, PageListPage[] >,
-	parentId: number,
-	excludedIds: Set< number >
-): PageRow[] {
-	const rows: PageRow[] = [];
+export interface PageListTreeBlock {
+	clientId: string;
+	name: string;
+	attributes: Record< string, any >;
+	innerBlocks: PageListTreeBlock[];
+}
 
-	function addRows( id: number, depth: number, isHiddenByAncestor: boolean ) {
-		const siblings = pagesByParentId.get( id ) ?? [];
-		const siblingIds = siblings.map( ( page ) => page.id );
+export const PAGE_LIST_ITEM = 'core/page-list-item';
 
-		siblings.forEach( ( page, index ) => {
-			rows.push( {
-				page,
-				depth,
-				index,
-				siblingIds,
-				isHiddenByAncestor,
-			} );
-			addRows(
-				page.id,
-				depth + 1,
-				isHiddenByAncestor || excludedIds.has( page.id )
-			);
-		} );
-	}
-
-	addRows( parentId, 0, false );
-	return rows;
+/**
+ * Returns whether a page's block is hidden, with the standard block
+ * visibility setting.
+ *
+ * @param block Block of a page.
+ * @return Whether it's hidden.
+ */
+export function isPageBlockHidden( block: PageListTreeBlock ): boolean {
+	return block.attributes?.metadata?.blockVisibility === false;
 }
 
 /**
- * Lists the pages the block shows, in the order it shows them, parents
- * before their child pages. Hidden pages are left out with their child pages.
+ * Returns whether a block of a page is anywhere in a tree.
+ *
+ * @param blocks Blocks of the tree.
+ * @param pageId ID of the page.
+ * @return Whether the page is in the tree.
+ */
+function hasPage( blocks: PageListTreeBlock[], pageId: number ): boolean {
+	return blocks.some(
+		( block ) =>
+			( block.name === PAGE_LIST_ITEM &&
+				block.attributes.id === pageId ) ||
+			hasPage( block.innerBlocks, pageId )
+	);
+}
+
+/**
+ * Lists the blocks in a Page List's tree that aren't pages, such as a link
+ * dropped among its pages.
+ *
+ * @param blocks Blocks of the tree.
+ * @return The blocks that aren't pages, not counting their inner blocks.
+ */
+export function getNonPageBlocks(
+	blocks: PageListTreeBlock[]
+): PageListTreeBlock[] {
+	return blocks.flatMap( ( block ) =>
+		block.name === PAGE_LIST_ITEM
+			? getNonPageBlocks( block.innerBlocks )
+			: [ block ]
+	);
+}
+
+/**
+ * Lists the IDs of the pages in a Page List's tree.
+ *
+ * @param blocks Blocks of the tree.
+ * @return IDs of the pages, in tree order.
+ */
+export function getPageIds( blocks: PageListTreeBlock[] ): number[] {
+	return blocks.flatMap( ( block ) =>
+		block.name === PAGE_LIST_ITEM
+			? [ block.attributes.id, ...getPageIds( block.innerBlocks ) ]
+			: getPageIds( block.innerBlocks )
+	);
+}
+
+/**
+ * Lists the IDs of the pages hidden in a Page List's tree.
+ *
+ * @param blocks Blocks of the tree.
+ * @return IDs of the hidden pages, in tree order.
+ */
+export function getHiddenPageIds( blocks: PageListTreeBlock[] ): number[] {
+	return blocks.flatMap( ( block ) => {
+		if ( block.name !== PAGE_LIST_ITEM ) {
+			return [];
+		}
+		const childIds = getHiddenPageIds( block.innerBlocks );
+		return isPageBlockHidden( block )
+			? [ block.attributes.id, ...childIds ]
+			: childIds;
+	} );
+}
+
+/**
+ * Lists the pages under a parent page whose blocks are missing from a Page
+ * List's tree: moved out of it, or removed.
  *
  * @param pagesByParentId Pages keyed by parent page ID.
- * @param excludedIds     IDs of hidden pages.
- * @return The visible pages.
+ * @param parentId        ID of the page the Page List starts from.
+ * @param blocks          Blocks of the tree.
+ * @return IDs of the missing pages.
  */
-export function getVisiblePages(
+export function getMissingPageIds(
 	pagesByParentId: Map< number, PageListPage[] >,
-	excludedIds: Set< number >
-): PageListPage[] {
-	const visiblePages: PageListPage[] = [];
+	parentId: number,
+	blocks: PageListTreeBlock[]
+): number[] {
+	return ( pagesByParentId.get( parentId ) ?? [] ).flatMap( ( page ) =>
+		hasPage( blocks, page.id )
+			? getMissingPageIds( pagesByParentId, page.id, blocks )
+			: [ page.id ]
+	);
+}
 
-	function addPages( parentId: number ) {
-		for ( const page of pagesByParentId.get( parentId ) ?? [] ) {
-			if ( ! excludedIds.has( page.id ) ) {
-				visiblePages.push( page );
-				addPages( page.id );
-			}
+/**
+ * Works out the `menu_order` and `parent` edits that give the pages the order
+ * and levels they have in a Page List's tree. Each level whose pages changed
+ * is numbered from 0, so pages that shared a `menu_order` keep the order
+ * shown, and levels that didn't change aren't edited.
+ *
+ * @param pagesByParentId Pages keyed by parent page ID.
+ * @param parentId        ID of the page the tree starts from.
+ * @param blocks          Blocks of the tree.
+ * @return The edits.
+ */
+export function getPageTreeEdits(
+	pagesByParentId: Map< number, PageListPage[] >,
+	parentId: number,
+	blocks: PageListTreeBlock[]
+): MenuOrderEdit[] {
+	const pagesById = new Map< number, PageListPage >();
+	for ( const siblings of pagesByParentId.values() ) {
+		for ( const page of siblings ) {
+			pagesById.set( page.id, page );
 		}
 	}
 
-	addPages( 0 );
-	return visiblePages;
-}
-
-/**
- * Works out the `menu_order` edits that move a page among its siblings. The
- * siblings are numbered from zero in their new order, and only pages whose
- * `menu_order` changes get an edit.
- *
- * @param siblings Sibling pages, in their current order.
- * @param pageId   ID of the page to move.
- * @param toIndex  Position to move it to.
- * @return Edits to apply.
- */
-export function getMenuOrderEdits(
-	siblings: PageListPage[],
-	pageId: number,
-	toIndex: number
-): MenuOrderEdit[] {
-	const fromIndex = siblings.findIndex( ( page ) => page.id === pageId );
-	if (
-		fromIndex === -1 ||
-		toIndex < 0 ||
-		toIndex >= siblings.length ||
-		toIndex === fromIndex
+	const edits: MenuOrderEdit[] = [];
+	function addEdits(
+		levelParentId: number,
+		levelBlocks: PageListTreeBlock[]
 	) {
-		return [];
-	}
-
-	const reordered = [ ...siblings ];
-	const [ moved ] = reordered.splice( fromIndex, 1 );
-	reordered.splice( toIndex, 0, moved );
-
-	return reordered.flatMap( ( page, index ) =>
-		page.menu_order === index ? [] : [ { id: page.id, menu_order: index } ]
-	);
-}
-
-/**
- * Whether a page is another page, or one of its descendants.
- *
- * @param pagesByParentId Pages keyed by parent page ID.
- * @param pageId          ID of the page that may be inside the other.
- * @param ancestorId      ID of the other page.
- * @return Whether the page is the other page or inside it.
- */
-export function isPageOrDescendant(
-	pagesByParentId: Map< number, PageListPage[] >,
-	pageId: number,
-	ancestorId: number
-): boolean {
-	if ( pageId === ancestorId ) {
-		return true;
-	}
-	return ( pagesByParentId.get( ancestorId ) ?? [] ).some( ( child ) =>
-		isPageOrDescendant( pagesByParentId, pageId, child.id )
-	);
-}
-
-/**
- * Works out the edits that move a page to a position under a parent, which
- * may be its own parent or another. The pages at its new level are numbered
- * from zero in their new order, only pages whose `menu_order` changes get an
- * edit, and the moved page gets its new `parent` when that changes. A page
- * moves with its child pages, so it can't go under itself or one of them.
- *
- * @param pagesByParentId Pages keyed by parent page ID.
- * @param page            The page to move.
- * @param parentId        ID of the parent to move it under, or 0.
- * @param toIndex         Position among that parent's pages, counted
- *                        without the moved page.
- * @return Edits to apply.
- */
-export function getMoveEdits(
-	pagesByParentId: Map< number, PageListPage[] >,
-	page: PageListPage,
-	parentId: number,
-	toIndex: number
-): MenuOrderEdit[] {
-	if ( isPageOrDescendant( pagesByParentId, parentId, page.id ) ) {
-		return [];
-	}
-	if ( parentId === page.parent ) {
-		return getMenuOrderEdits(
-			pagesByParentId.get( parentId ) ?? [],
-			page.id,
-			toIndex
+		const pageBlocks = levelBlocks.filter(
+			( block ) =>
+				block.name === PAGE_LIST_ITEM &&
+				pagesById.has( block.attributes.id )
+		);
+		const ids = pageBlocks.map( ( block ) => block.attributes.id );
+		const savedIds = ( pagesByParentId.get( levelParentId ) ?? [] ).map(
+			( page ) => page.id
+		);
+		const hasChanged =
+			ids.length !== savedIds.length ||
+			ids.some( ( id, index ) => id !== savedIds[ index ] );
+		if ( hasChanged ) {
+			ids.forEach( ( id, index ) => {
+				const page = pagesById.get( id )!;
+				if ( page.parent !== levelParentId ) {
+					edits.push( {
+						id,
+						menu_order: index,
+						parent: levelParentId,
+					} );
+				} else if ( page.menu_order !== index ) {
+					edits.push( { id, menu_order: index } );
+				}
+			} );
+		}
+		pageBlocks.forEach( ( block ) =>
+			addEdits( block.attributes.id, block.innerBlocks )
 		);
 	}
-
-	const siblings = ( pagesByParentId.get( parentId ) ?? [] ).filter(
-		( { id } ) => id !== page.id
-	);
-	if ( toIndex < 0 || toIndex > siblings.length ) {
-		return [];
-	}
-	const reordered = [ ...siblings ];
-	reordered.splice( toIndex, 0, page );
-
-	return reordered.flatMap( ( sibling, index ) => {
-		if ( sibling.id === page.id ) {
-			return [ { id: page.id, menu_order: index, parent: parentId } ];
-		}
-		return sibling.menu_order === index
-			? []
-			: [ { id: sibling.id, menu_order: index } ];
-	} );
+	addEdits( parentId, blocks );
+	return edits;
 }

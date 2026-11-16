@@ -4,7 +4,12 @@
 	"name": "core/page-list-item",
 	"title": "Page List Item",
 	"category": "widgets",
-	"parent": [ "core/page-list" ],
+	"parent": [
+		"core/page-list",
+		"core/page-list-item",
+		"core/navigation",
+		"core/navigation-submenu"
+	],
 	"description": "Displays a page inside a list of all pages.",
 	"keywords": [ "page", "menu", "navigation" ],
 	"textdomain": "default",

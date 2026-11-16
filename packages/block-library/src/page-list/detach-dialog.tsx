@@ -41,7 +41,7 @@ export default function DetachPageListDialog( {
 		>
 			{ message ??
 				__(
-					"This Navigation Menu displays your website's pages. Detaching will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
+					"This Navigation Menu displays your website's pages. Detaching will turn them into links that you can add to and remove. However, new pages will no longer be added automatically."
 				) }
 		</ConfirmDialog>
 	);

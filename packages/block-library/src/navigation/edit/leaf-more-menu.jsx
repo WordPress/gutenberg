@@ -12,13 +12,19 @@ import {
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	useSettings,
+} from '@wordpress/block-editor';
 import { DEFAULT_BLOCK } from '../constants';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
+
+const PAGE_LIST_ITEM = 'core/page-list-item';
 
 const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
 	'core/navigation-link',
@@ -104,7 +110,11 @@ export default function LeafMoreMenu( {
 		duplicateBlocks,
 		insertBeforeBlock,
 		insertAfterBlock,
+		updateBlockAttributes,
 	} = useDispatch( blockEditorStore );
+	const [ allowVisibilityEditing ] = useSettings(
+		'blockVisibility.allowEditing'
+	);
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -117,6 +127,8 @@ export default function LeafMoreMenu( {
 		rootClientId,
 		canDuplicate,
 		canInsertBlock,
+		canHide,
+		metadata,
 		isFirst,
 		isLast,
 	} = useSelect(
@@ -128,6 +140,8 @@ export default function LeafMoreMenu( {
 				getDirectInsertBlock,
 				getBlockIndex,
 				getBlockCount,
+				getBlockAttributes,
+				getBlockEditingMode,
 			} = select( blockEditorStore );
 			const { getDefaultBlockName } = select( blocksStore );
 
@@ -152,6 +166,11 @@ export default function LeafMoreMenu( {
 					( canInsertDefaultBlock || !! directInsertBlock ) &&
 					!! _blockName &&
 					canInsertBlockType( _blockName, _rootClientId ),
+				canHide:
+					!! _blockName &&
+					hasBlockSupport( _blockName, 'visibility', true ) &&
+					getBlockEditingMode( clientId ) === 'default',
+				metadata: getBlockAttributes( clientId )?.metadata,
 				isFirst: getBlockIndex( clientId ) === 0,
 				isLast:
 					getBlockIndex( clientId ) ===
@@ -163,6 +182,19 @@ export default function LeafMoreMenu( {
 
 	const isSubmenuDisabled =
 		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( blockName );
+
+	// A Page List lists every page, so its pages can be hidden but not
+	// removed or duplicated.
+	const isPage = blockName === PAGE_LIST_ITEM;
+	const isHidden = metadata?.blockVisibility === false;
+	const toggleHidden = () => {
+		const { blockVisibility, ...otherMetadata } = metadata ?? {};
+		updateBlockAttributes( clientId, {
+			metadata: isHidden
+				? otherMetadata
+				: { ...otherMetadata, blockVisibility: false },
+		} );
+	};
 
 	return (
 		<DropdownMenu
@@ -207,7 +239,7 @@ export default function LeafMoreMenu( {
 								setInsertedBlockClientId
 							}
 						/>
-						{ canDuplicate && (
+						{ canDuplicate && ! isPage && (
 							<MenuItem
 								onClick={ () => {
 									duplicateBlocks( [ clientId ] );
@@ -238,16 +270,31 @@ export default function LeafMoreMenu( {
 							</>
 						) }
 					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
+					{ ( ( canHide && allowVisibilityEditing !== false ) ||
+						! isPage ) && (
+						<MenuGroup>
+							{ canHide && allowVisibilityEditing !== false && (
+								<MenuItem
+									onClick={ () => {
+										toggleHidden();
+										onClose();
+									} }
+								>
+									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
+								</MenuItem>
+							) }
+							{ ! isPage && (
+								<MenuItem
+									onClick={ () => {
+										removeBlocks( [ clientId ], false );
+										onClose();
+									} }
+								>
+									{ removeLabel }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>

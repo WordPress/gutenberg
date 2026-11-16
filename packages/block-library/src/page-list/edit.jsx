@@ -8,7 +8,7 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
-	useBlockEditingMode,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -20,16 +20,26 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
 import DetachPageListDialog from './detach-dialog';
 import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
-import { getVisiblePages } from './utils';
+import { PAGE_LIST_ITEM } from './utils';
+import { usePageListAllowedBlocks } from './use-page-list-allowed-blocks';
+import {
+	usePageListChanges,
+	getPageListBlocksKey,
+} from './use-page-list-changes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
+import { unlock } from '../lock-unlock';
+
+const { useSkipListViewRow } = unlock( blockEditorPrivateApis );
 
 const NOOP = () => {};
 const EMPTY_ARRAY = [];
+const HIDDEN_METADATA = { blockVisibility: false };
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
@@ -114,7 +124,8 @@ export default function PageListEdit( {
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { pages, pagesByParentId, hasResolvedPages } = usePageListPages();
+	const { pages, pagesByParentId, hasResolvedPages, canReorderPages } =
+		usePageListPages();
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
@@ -167,6 +178,8 @@ export default function PageListEdit( {
 		[ pagesByParentId ]
 	);
 
+	// Hidden pages are listed too, hidden with the standard block visibility
+	// setting, so they can be shown again the way any hidden item can.
 	const blockList = useMemo(
 		function getBlockList( parentId = parentPageID ) {
 			const childPages = pagesByParentId.get( parentId );
@@ -175,46 +188,35 @@ export default function PageListEdit( {
 				return [];
 			}
 
-			return childPages.reduce( ( template, page ) => {
-				// A hidden page is left out with its child pages, matching
-				// the `exclude_tree` the block renders with.
-				if ( excludedIds.has( page.id ) ) {
-					return template;
-				}
+			return childPages.map( ( page ) => {
 				const children = getBlockList( page.id );
-				const hasChildren = children.length > 0;
-				const pageProps = {
-					id: page.id,
-					label:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					title:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					link: page.url,
-					hasChildren,
-				};
-				const item = createBlock(
-					'core/page-list-item',
-					pageProps,
+				const title =
+					// translators: displayed when a page has an empty title.
+					page.title?.rendered?.trim() !== ''
+						? page.title?.rendered
+						: __( '(no title)' );
+				return createBlock(
+					PAGE_LIST_ITEM,
+					{
+						id: page.id,
+						label: title,
+						title,
+						link: page.url,
+						hasChildren: children.length > 0,
+						...( excludedIds.has( page.id ) && {
+							metadata: HIDDEN_METADATA,
+						} ),
+					},
 					children
 				);
-				template.push( item );
-
-				return template;
-			}, [] );
+			} );
 		},
 		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const { hasSelectedChild, parentClientId, isChildOfNavigation } = useSelect(
+	const { parentClientId, isChildOfNavigation } = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
@@ -222,51 +224,67 @@ export default function PageListEdit( {
 			);
 			return {
 				isChildOfNavigation: navigationBlockParents.length > 0,
-				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
 			};
 		},
 		[ clientId ]
 	);
 
-	// Detaching keeps what the block shows: its order, without hidden pages.
-	const visiblePages = useMemo(
-		() => getVisiblePages( pagesByParentId, excludedIds ),
-		[ pagesByParentId, excludedIds ]
-	);
-
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,
-		pages: visiblePages,
 		parentClientId,
+	} );
+
+	const { onChange, changedBlocks, pendingDetach } = usePageListChanges( {
+		clientId,
 		parentPageID,
+		excludedPageIDs,
+		pagesByParentId,
+		setAttributes,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		// Pages are reordered and hidden from the Pages panel, so they can't
-		// be moved out of the Page List, into the Navigation around it.
-		templateLock: 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+	// Once the pages catch up with a change, the changed blocks are kept, so
+	// they aren't replaced by blocks with new client IDs, which would lose
+	// what's selected and expanded in the list view.
+	const innerBlocksValue =
+		changedBlocks &&
+		( changedBlocks.isHeld ||
+			getPageListBlocksKey( changedBlocks.blocks ) ===
+				getPageListBlocksKey( blockList ) )
+			? changedBlocks.blocks
+			: blockList;
 
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const allowedBlocks = usePageListAllowedBlocks( isChildOfNavigation );
 
-	// In a Navigation block, the Navigation block's sidebar lists the pages
-	// in place of the Page List, so the Page List itself can't be selected and
-	// isn't in the list view. Adding a link after one of its pages detaches it.
-	useBlockEditingMode( isChildOfNavigation ? 'disabled' : undefined );
+	const innerBlocksProps = useInnerBlocksProps(
+		blockProps,
+		isChildOfNavigation
+			? {
+					// Its pages are moved, hidden and added after like the
+					// other items of the Navigation block.
+					renderAppender: false,
+					allowedBlocks,
+					defaultBlock: DEFAULT_BLOCK,
+					directInsert: true,
+					templateLock: canReorderPages ? false : 'all',
+					onInput: NOOP,
+					onChange,
+					value: innerBlocksValue,
+				}
+			: {
+					renderAppender: false,
+					__unstableDisableDropZone: true,
+					allowedBlocks,
+					templateLock: 'all',
+					onInput: NOOP,
+					onChange: NOOP,
+					value: blockList,
+				}
+	);
 
-	// Selecting a page selects the Page List, whose Pages panel is where pages
-	// are reordered and hidden.
-	useEffect( () => {
-		if ( hasSelectedChild ) {
-			selectBlock( clientId );
-		}
-	}, [ hasSelectedChild, clientId, selectBlock ] );
+	// In a Navigation block, its pages are listed as items of the menu, so
+	// the Page List itself isn't.
+	useSkipListViewRow( isChildOfNavigation );
 
 	return (
 		<>
@@ -349,6 +367,18 @@ export default function PageListEdit( {
 						/>
 					) }
 				</>
+			) }
+			{ pendingDetach && (
+				<DetachPageListDialog
+					message={ pendingDetach.message }
+					onConfirm={ () => {
+						convertToNavigationLinks(
+							pendingDetach.movedOutClientIds
+						);
+						pendingDetach.confirm();
+					} }
+					onCancel={ pendingDetach.cancel }
+				/>
 			) }
 			<BlockContent
 				blockProps={ blockProps }

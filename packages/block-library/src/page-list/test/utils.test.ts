@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getPagesByParentId,
-	getPageRows,
-	getMenuOrderEdits,
-	getMoveEdits,
-	getVisiblePages,
-	isPageOrDescendant,
+	getHiddenPageIds,
+	getMissingPageIds,
+	getNonPageBlocks,
+	getPageIds,
+	getPageTreeEdits,
 } from '../utils';
+import type { PageListTreeBlock } from '../utils';
 
 const page = ( id: number, title: string, parent = 0, menuOrder = 0 ) => ( {
 	id,
@@ -48,150 +49,125 @@ describe( 'getPagesByParentId', () => {
 	} );
 } );
 
-describe( 'getPageRows', () => {
+const item = (
+	id: number,
+	innerBlocks: PageListTreeBlock[] = [],
+	isHidden = false
+): PageListTreeBlock => ( {
+	clientId: `page-${ id }`,
+	name: 'core/page-list-item',
+	attributes: {
+		id,
+		...( isHidden && { metadata: { blockVisibility: false } } ),
+	},
+	innerBlocks,
+} );
+
+const link = ( clientId: string ): PageListTreeBlock => ( {
+	clientId,
+	name: 'core/navigation-link',
+	attributes: {},
+	innerBlocks: [],
+} );
+
+// The tree as the pages are now.
+const tree = () => [
+	item( 1, [ item( 3 ), item( 2 ) ] ),
+	item( 4 ),
+	item( 5 ),
+];
+
+describe( 'getPageTreeEdits', () => {
 	const byParent = getPagesByParentId( PAGES );
 
-	it( 'lists child pages straight after their parent', () => {
-		const rows = getPageRows( byParent, 0, new Set() );
-
-		expect(
-			rows.map( ( { page: { id }, depth } ) => [ id, depth ] )
-		).toEqual( [
-			[ 1, 0 ],
-			[ 3, 1 ],
-			[ 2, 1 ],
-			[ 4, 0 ],
-			[ 5, 0 ],
-		] );
-		expect( rows[ 1 ] ).toMatchObject( { index: 0, siblingIds: [ 3, 2 ] } );
+	it( 'returns no edits when nothing moved', () => {
+		expect( getPageTreeEdits( byParent, 0, tree() ) ).toEqual( [] );
 	} );
 
-	it( 'marks the child pages of a hidden page', () => {
-		const rows = getPageRows( byParent, 0, new Set( [ 1 ] ) );
-
-		expect(
-			rows.map( ( { page: { id }, isHiddenByAncestor } ) => [
-				id,
-				isHiddenByAncestor,
-			] )
-		).toEqual( [
-			[ 1, false ],
-			[ 3, true ],
-			[ 2, true ],
-			[ 4, false ],
-			[ 5, false ],
-		] );
-	} );
-
-	it( 'starts from the parent page', () => {
-		const rows = getPageRows( byParent, 1, new Set() );
-		expect( rows.map( ( { page: { id } } ) => id ) ).toEqual( [ 3, 2 ] );
-	} );
-} );
-
-describe( 'getVisiblePages', () => {
-	it( 'leaves out hidden pages and their child pages', () => {
-		const byParent = getPagesByParentId( PAGES );
-		const visible = getVisiblePages( byParent, new Set( [ 1, 5 ] ) );
-		expect( visible.map( ( { id } ) => id ) ).toEqual( [ 4 ] );
-	} );
-
-	it( 'lists parents before their child pages, in order', () => {
-		const byParent = getPagesByParentId( PAGES );
-		const visible = getVisiblePages( byParent, new Set() );
-		expect( visible.map( ( { id } ) => id ) ).toEqual( [ 1, 3, 2, 4, 5 ] );
-	} );
-} );
-
-describe( 'getMenuOrderEdits', () => {
-	const siblings = [
-		page( 1, 'About', 0, 0 ),
-		page( 4, 'Shop', 0, 1 ),
-		page( 5, 'Contact', 0, 2 ),
-	];
-
-	it( 'renumbers the siblings in their new order', () => {
-		expect( getMenuOrderEdits( siblings, 5, 0 ) ).toEqual( [
-			{ id: 5, menu_order: 0 },
-			{ id: 1, menu_order: 1 },
-			{ id: 4, menu_order: 2 },
-		] );
-	} );
-
-	it( 'only edits pages whose order changes', () => {
-		expect( getMenuOrderEdits( siblings, 4, 2 ) ).toEqual( [
-			{ id: 5, menu_order: 1 },
-			{ id: 4, menu_order: 2 },
-		] );
-	} );
-
-	it( 'numbers pages that shared a menu order', () => {
-		const unordered = [
-			page( 1, 'About' ),
-			page( 4, 'Shop' ),
-			page( 5, 'Contact' ),
+	it( 'numbers a level whose order changed, editing the pages that need it', () => {
+		const moved = [
+			item( 5 ),
+			item( 1, [ item( 3 ), item( 2 ) ] ),
+			item( 4 ),
 		];
-		// Shop already has the order 0 that its new place gets.
-		expect( getMenuOrderEdits( unordered, 1, 1 ) ).toEqual( [
-			{ id: 1, menu_order: 1 },
-			{ id: 5, menu_order: 2 },
+		// About (1) and Shop (2) already have the menu order of their place.
+		expect( getPageTreeEdits( byParent, 0, moved ) ).toEqual( [
+			{ id: 5, menu_order: 0 },
 		] );
 	} );
 
-	it( 'returns no edits for a move that changes nothing', () => {
-		expect( getMenuOrderEdits( siblings, 1, 0 ) ).toEqual( [] );
-		expect( getMenuOrderEdits( siblings, 1, -1 ) ).toEqual( [] );
-		expect( getMenuOrderEdits( siblings, 1, 3 ) ).toEqual( [] );
-		expect( getMenuOrderEdits( siblings, 99, 0 ) ).toEqual( [] );
+	it( 'numbers pages that shared a menu order in the order shown', () => {
+		const moved = [
+			item( 1, [ item( 2 ), item( 3 ) ] ),
+			item( 4 ),
+			item( 5 ),
+		];
+		expect( getPageTreeEdits( byParent, 0, moved ) ).toEqual( [
+			{ id: 3, menu_order: 1 },
+		] );
+	} );
+
+	it( 'gives a page moved to another level its new parent', () => {
+		const moved = [
+			item( 1, [ item( 3 ), item( 2 ), item( 5 ) ] ),
+			item( 4 ),
+		];
+		expect( getPageTreeEdits( byParent, 0, moved ) ).toEqual( [
+			{ id: 1, menu_order: 0 },
+			{ id: 4, menu_order: 1 },
+			{ id: 2, menu_order: 1 },
+			{ id: 5, menu_order: 2, parent: 1 },
+		] );
 	} );
 } );
 
-describe( 'getMoveEdits', () => {
-	// About (with History, then Team), Shop, Contact.
-	const byParent = getPagesByParentId( [
-		page( 1, 'About', 0, 0 ),
-		page( 3, 'History', 1, 0 ),
-		page( 2, 'Team', 1, 1 ),
-		page( 4, 'Shop', 0, 1 ),
-		page( 5, 'Contact', 0, 2 ),
-	] );
-	const find = ( id: number ) =>
-		[ ...byParent.values() ].flat().find( ( p ) => p.id === id )!;
+describe( 'getMissingPageIds', () => {
+	const byParent = getPagesByParentId( PAGES );
 
-	it( 'moves a child page to the top level', () => {
-		// Team, after About.
-		expect( getMoveEdits( byParent, find( 2 ), 0, 1 ) ).toEqual( [
-			{ id: 2, menu_order: 1, parent: 0 },
-			{ id: 4, menu_order: 2 },
-			{ id: 5, menu_order: 3 },
-		] );
+	it( 'lists the pages that are not in the tree', () => {
+		expect(
+			getMissingPageIds( byParent, 0, [
+				item( 1, [ item( 3 ) ] ),
+				item( 5 ),
+			] )
+		).toEqual( [ 2, 4 ] );
 	} );
 
-	it( 'moves a top-level page under another page', () => {
-		// Contact, first under About.
-		expect( getMoveEdits( byParent, find( 5 ), 1, 0 ) ).toEqual( [
-			{ id: 5, menu_order: 0, parent: 1 },
-			{ id: 3, menu_order: 1 },
-			{ id: 2, menu_order: 2 },
-		] );
+	it( 'finds pages moved to another level', () => {
+		expect(
+			getMissingPageIds( byParent, 0, [
+				item( 1, [ item( 3 ), item( 2 ), item( 4 ) ] ),
+				item( 5 ),
+			] )
+		).toEqual( [] );
 	} );
+} );
 
-	it( 'reorders a page that stays at its level', () => {
-		expect( getMoveEdits( byParent, find( 5 ), 0, 0 ) ).toEqual( [
-			{ id: 5, menu_order: 0 },
-			{ id: 1, menu_order: 1 },
-			{ id: 4, menu_order: 2 },
-		] );
+describe( 'getNonPageBlocks', () => {
+	it( 'lists the items among the pages, at any level', () => {
+		expect(
+			getNonPageBlocks( [
+				item( 1, [ item( 3 ), link( 'a' ) ] ),
+				link( 'b' ),
+				item( 4 ),
+			] ).map( ( { clientId } ) => clientId )
+		).toEqual( [ 'a', 'b' ] );
 	} );
+} );
 
-	it( 'doesn’t move a page under itself or one of its child pages', () => {
-		expect( getMoveEdits( byParent, find( 1 ), 1, 0 ) ).toEqual( [] );
-		expect( getMoveEdits( byParent, find( 1 ), 3, 0 ) ).toEqual( [] );
+describe( 'getHiddenPageIds', () => {
+	it( 'lists the hidden pages, at any level', () => {
+		expect(
+			getHiddenPageIds( [
+				item( 1, [ item( 3, [], true ) ], true ),
+				item( 4 ),
+			] )
+		).toEqual( [ 1, 3 ] );
 	} );
+} );
 
-	it( 'knows which pages are inside another', () => {
-		expect( isPageOrDescendant( byParent, 2, 1 ) ).toBe( true );
-		expect( isPageOrDescendant( byParent, 1, 1 ) ).toBe( true );
-		expect( isPageOrDescendant( byParent, 4, 1 ) ).toBe( false );
+describe( 'getPageIds', () => {
+	it( 'lists the pages in tree order', () => {
+		expect( getPageIds( tree() ) ).toEqual( [ 1, 3, 2, 4, 5 ] );
 	} );
 } );
