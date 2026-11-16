@@ -23,14 +23,14 @@ struct Editor {
 
 	/// The block with this title and exactly this content.
 	func block( title: String, content: String ) -> XCUIElement {
-		canvas.otherElements
+		canvas.textViews
 			.matching( NSPredicate( format: "label == %@ AND value == %@", "Block: " + title, content ) )
 			.firstMatch
 	}
 
 	/// The blocks in the canvas, in document order.
 	func getBlocks() -> [ Block ] {
-		canvas.otherElements
+		canvas.descendants( matching: .any )
 			.matching( NSPredicate( format: "label BEGINSWITH 'Block: '" ) )
 			.allElementsBoundByIndex
 			.map { Block( title: String( $0.label.dropFirst( "Block: ".count ) ), content: $0.value as? String ?? "" ) }
