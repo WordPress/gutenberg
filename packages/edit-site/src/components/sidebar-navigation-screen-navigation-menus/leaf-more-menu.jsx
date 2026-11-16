@@ -3,7 +3,12 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	useSettings,
+} from '@wordpress/block-editor';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -17,8 +22,15 @@ export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		updateBlockAttributes,
+	} = useDispatch( blockEditorStore );
+	const [ allowVisibilityEditing ] = useSettings(
+		'blockVisibility.allowEditing'
+	);
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -32,19 +44,44 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, blockName, attributes } = useSelect(
-		( select ) => {
-			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+	const { rootClientId, blockName, attributes, isDefaultEditingMode } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getBlockName,
+					getBlockAttributes,
+					getBlockEditingMode,
+				} = select( blockEditorStore );
 
-			return {
-				rootClientId: getBlockRootClientId( clientId ),
-				blockName: getBlockName( clientId ),
-				attributes: getBlockAttributes( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					rootClientId: getBlockRootClientId( clientId ),
+					blockName: getBlockName( clientId ),
+					attributes: getBlockAttributes( clientId ),
+					isDefaultEditingMode:
+						getBlockEditingMode( clientId ) === 'default',
+				};
+			},
+			[ clientId ]
+		);
+
+	// A Page List lists every page, so its pages are hidden, not removed.
+	const isPage = blockName === 'core/page-list-item';
+	const canHide =
+		allowVisibilityEditing !== false &&
+		isDefaultEditingMode &&
+		!! blockName &&
+		hasBlockSupport( blockName, 'visibility', true );
+	const isHidden = attributes?.metadata?.blockVisibility === false;
+	const toggleHidden = () => {
+		const { blockVisibility, ...otherMetadata } =
+			attributes?.metadata ?? {};
+		updateBlockAttributes( clientId, {
+			metadata: isHidden
+				? otherMetadata
+				: { ...otherMetadata, blockVisibility: false },
+		} );
+	};
 
 	const onGoToPage = useCallback( () => {
 		if (
@@ -97,27 +134,42 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ attributes?.type === 'page' && attributes?.id && (
-							<MenuItem
-								onClick={ () => {
-									onGoToPage();
-									onClose();
-								} }
-							>
-								{ goToLabel }
-							</MenuItem>
-						) }
+						{ ( attributes?.type === 'page' || isPage ) &&
+							attributes?.id && (
+								<MenuItem
+									onClick={ () => {
+										onGoToPage();
+										onClose();
+									} }
+								>
+									{ goToLabel }
+								</MenuItem>
+							) }
 					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
+					{ ( canHide || ! isPage ) && (
+						<MenuGroup>
+							{ canHide && (
+								<MenuItem
+									onClick={ () => {
+										toggleHidden();
+										onClose();
+									} }
+								>
+									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
+								</MenuItem>
+							) }
+							{ ! isPage && (
+								<MenuItem
+									onClick={ () => {
+										removeBlocks( [ clientId ], false );
+										onClose();
+									} }
+								>
+									{ removeLabel }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>
