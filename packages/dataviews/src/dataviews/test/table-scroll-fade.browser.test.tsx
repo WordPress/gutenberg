@@ -83,8 +83,8 @@ function PostsTable( {
 	);
 }
 
-// `--wpds-dimension-size-lg`.
-const FADE_SIZE = 40;
+// `--wpds-dimension-size-md`.
+const FADE_SIZE = 32;
 // `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
 const CELL_PADDING = 12;
 const COMPACT_CELL_PADDING = 8;
