@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, moreVertical } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -109,15 +108,13 @@ export default function StateControl( {
 			direction="column"
 			gap="sm"
 			align="flex-end"
-			className={ clsx( 'block-editor-global-styles-state-control', {
-				'is-icon-only': ! showText,
-			} ) }
+			className="block-editor-global-styles-state-control"
 		>
 			<Menu.Root modal={ false }>
 				<Menu.Trigger
 					render={
 						<Button
-							size="small"
+							size={ showText ? 'compact' : 'small' }
 							icon={ showText ? chevronDown : moreVertical }
 							iconPosition="right"
 							label={
@@ -145,14 +142,13 @@ export default function StateControl( {
 									typeof offset === 'number'
 										? offset
 										: ( offset.mainAxis ?? 0 );
-								// The sidebar offset assumes a square icon button.
+								// The sidebar offset assumes a 24px-wide icon button.
 								// Keep the same gap for the wider text trigger.
 								return ! popoverProps &&
 									showText &&
 									side === 'left' &&
 									popupSide === 'left'
-									? mainAxis -
-											( anchor.width - anchor.height )
+									? mainAxis - ( anchor.width - 24 )
 									: mainAxis;
 							} }
 							alignOffset={

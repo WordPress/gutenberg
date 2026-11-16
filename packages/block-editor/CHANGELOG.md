@@ -13,7 +13,7 @@
 
 ### Bug Fixes
 
--   Style states: Open the Global Styles state menu beside the editor sidebar and match its trigger height to the Back button ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
+-   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
 -   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Block quick navigation: Do not offer navigation to a List View panel subsumed by an ancestor's List View ([#86729](https://github.com/WordPress/gutenberg/pull/86729)).
