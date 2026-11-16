@@ -48,6 +48,7 @@
 
 ### Internal
 
+-   Update the `@ariakit/react` dependency to 0.4.43.
 -   `CustomSelectControl`: Remove the unused V2 component and keep the shared implementation with the legacy component ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `ProgressBar`: Use the new `--wpds-color-background-indicator-neutral` token for the filled portion. The color is unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
