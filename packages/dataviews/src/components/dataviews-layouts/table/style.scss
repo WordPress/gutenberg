@@ -51,7 +51,7 @@ $scroll-fade-size: var(--wpds-dimension-size-lg);
 				inset-block: 0;
 				inset-inline-start: $scroll-fade-size;
 				width: 1px;
-				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+				background-color: var(--wpds-color-stroke-surface-neutral);
 
 				// Hidden at the end of the scroll range, and when nothing
 				// scrolls, where the scroll timeline is inactive. Browsers
