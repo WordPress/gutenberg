@@ -12,7 +12,7 @@ Inspect the project first. Run `node scripts/inspect-project.mjs`, with the path
 ## 1. Install and load the tokens
 
 -   Install `@wordpress/theme` and check its Node.js requirement (`>=22.13.0`). Its JavaScript entrypoints are ESM-only, so use `import` syntax in configuration files.
--   In standard WordPress admin and editor screens, WordPress loads the stylesheet as the `wp-theme` style handle (since WordPress 7.1). Do not bundle it there or add setup of your own. Before 7.1, check which version of the tokens your minimum supported WordPress provides.
+-   In standard WordPress admin and editor screens, WordPress loads the stylesheet as the `wp-theme` style handle (since WordPress 7.1). Do not bundle it there or add setup of your own. If you support WordPress versions before 7.1, which do not register `wp-theme`, load the tokens yourself for them: bundle `@wordpress/theme/design-tokens.css`, or enqueue your own copy only when the `wp-theme` handle is not registered (`wp_style_is( 'wp-theme', 'registered' )`).
 -   For a separate app shell, an iframe or a popup window inside WordPress, enqueue `wp-theme` as a style dependency in that document instead of bundling `@wordpress/theme/design-tokens.css`.
 -   Outside WordPress, import `@wordpress/theme/design-tokens.css` once per document, including each iframe or popup window that renders content.
 
@@ -62,6 +62,7 @@ export default {
 
 ```ts
 // vite.config.ts
+import { defineConfig } from 'vite';
 import dsTokenFallbacks from '@wordpress/theme-build-tools/postcss-plugins/postcss-ds-token-fallbacks';
 import dsTokenFallbacksJs from '@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks';
 
