@@ -160,14 +160,21 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
 
-	it( 'keeps the native slider focus target on the visible dial', async () => {
+	it( 'shows keyboard focus around the native slider target in wp-admin', async () => {
 		await render(
 			<ThemeProvider isRoot>
+				{ /* wp-admin common.css resets div outlines outside the wp-ui layer. */ }
+				<style>{ 'div { outline: 0; }' }</style>
 				<Knob aria-label="Rotation" />
 			</ThemeProvider>
 		);
 		const slider = page.getByRole( 'slider' ).element();
 		const dial = page.getByRole( 'group' ).element();
+		await userEvent.tab();
+		expect( slider ).toHaveFocus();
+		expect(
+			parseFloat( getComputedStyle( dial ).outlineWidth )
+		).toBeGreaterThan( 0 );
 		expect( slider.getBoundingClientRect().toJSON() ).toEqual(
 			dial.getBoundingClientRect().toJSON()
 		);

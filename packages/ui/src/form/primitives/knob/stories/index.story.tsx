@@ -104,6 +104,34 @@ export const WithField: Story = {
 	),
 };
 
+/** Compare a bounded amount with a wrapping angle at the same dial position. */
+export const BoundedAndWrapping: Story = {
+	parameters: { controls: { disable: true } },
+	render: () => (
+		<Stack direction="row" gap="xl" wrap="wrap">
+			<RangeExample
+				label="Opacity"
+				description="Stops at 0% and 100%."
+				defaultValue={ 50 }
+				unit="%"
+				format={ { style: 'unit', unit: 'percent' } }
+			/>
+			<RangeExample
+				label="Gradient angle"
+				description="Wraps from 359° to 0°."
+				max={ 359 }
+				wrap
+				unit="°"
+				format={ {
+					style: 'unit',
+					unit: 'degree',
+					unitDisplay: 'long',
+				} }
+			/>
+		</Stack>
+	),
+};
+
 /** Compare three ways to map the same 0–500 range onto a dial. */
 export const PartialTurns: Story = {
 	parameters: { controls: { disable: true } },

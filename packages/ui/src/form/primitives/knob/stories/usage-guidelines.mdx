@@ -16,11 +16,11 @@ By default, the dial spans 0 to 100 with a gap between its end stops. Use `min`,
 
 Set `wrap` when the first value follows the last. For whole degrees, use `min={ 0 }`, `max={ 359 }`, and `step={ 1 }`. Zero points up and 90 points right. Both endpoints are selectable, so each direction has one value.
 
-<Canvas of={ KnobStories.Wrapping } />
+<Canvas of={ KnobStories.BoundedAndWrapping } />
 
 ## Count turns
 
-Set `unitsPerTurn` when dial positions have a physical meaning. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. A positional tap picks the closest heading among selectable steps within one turn of the current value in either direction. When two values point the same way, the nearer value wins. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
+Set `unitsPerTurn` when dial positions have a physical meaning. The dot shows the heading on a full circle. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. A positional tap picks the closest heading among selectable steps within one turn of the current value in either direction. When two values point the same way, the nearer value wins. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
 
 `min` and `max` bound the total value. Add `wrap` to repeat that range indefinitely. For a seamless loop, include one step per position. With whole degrees, use 0 to 359 for one turn or 0 to 719 for two turns before the value returns to zero.
 
