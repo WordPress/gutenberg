@@ -1,7 +1,7 @@
 import { InnerBlocks } from '@wordpress/block-editor';
 
 type NavigationSaveProps = {
-	attributes: { ref?: number };
+	attributes: { ref?: number; slug?: string };
 };
 
 /**
@@ -14,9 +14,9 @@ type NavigationSaveProps = {
 export default function save( props: NavigationSaveProps ) {
 	const { attributes } = props;
 
-	if ( attributes.ref ) {
-		// Avoid rendering inner blocks when a ref is defined.
-		// When this id is defined the inner blocks are loaded from the
+	if ( attributes.ref || attributes.slug ) {
+		// Avoid rendering inner blocks when a menu reference is defined.
+		// When a reference is defined the inner blocks are loaded from the
 		// `wp_navigation` entity rather than the hard-coded block html.
 		return;
 	}

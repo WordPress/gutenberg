@@ -271,6 +271,11 @@ function Navigation( {
 	} = attributes;
 
 	const ref = attributes.ref;
+	const slug = attributes.slug;
+	// A `slug` reference is resolved on the server. The editor cannot
+	// resolve one yet, so this only stops it writing to a block whose
+	// reference it cannot read.
+	const hasNavigationMenuReference = !! ( ref || slug );
 	useLayoutCustomProperties( {
 		clientId,
 		layout: attributes.layout,
@@ -500,16 +505,22 @@ function Navigation( {
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+	const navigationFallbackId = ! (
+		hasNavigationMenuReference || hasUnsavedBlocks
+	)
 		? getNavigationFallbackId()
 		: null;
 
 	useEffect( () => {
 		// If:
-		// - there is an existing menu, OR
+		// - the block already references a menu, by ref or by slug, OR
 		// - there are existing (uncontrolled) inner blocks
 		// ...then don't request a fallback menu.
-		if ( ref || hasUnsavedBlocks || ! navigationFallbackId ) {
+		if (
+			hasNavigationMenuReference ||
+			hasUnsavedBlocks ||
+			! navigationFallbackId
+		) {
 			return;
 		}
 
@@ -522,7 +533,7 @@ function Navigation( {
 		__unstableMarkNextChangeAsNotPersistent();
 		setRef( navigationFallbackId );
 	}, [
-		ref,
+		hasNavigationMenuReference,
 		setRef,
 		hasUnsavedBlocks,
 		navigationFallbackId,
@@ -586,7 +597,7 @@ function Navigation( {
 		}
 
 		// Set vertical orientation and always-open submenus for new blocks.
-		if ( ! hasSetOverlayDefault.current && ! ref ) {
+		if ( ! hasSetOverlayDefault.current && ! hasNavigationMenuReference ) {
 			hasSetOverlayDefault.current = true;
 			setAttributes( {
 				submenuVisibility: 'always',
@@ -600,10 +611,10 @@ function Navigation( {
 		}
 	}, [
 		attributes.layout,
+		hasNavigationMenuReference,
 		isWithinOverlay,
 		name,
 		overlayMenu,
-		ref,
 		setAttributes,
 	] );
 

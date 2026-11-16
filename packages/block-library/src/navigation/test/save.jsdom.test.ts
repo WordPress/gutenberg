@@ -9,4 +9,8 @@ describe( 'navigation save', () => {
 	it( 'skips inner blocks when the block references a menu by ref', () => {
 		expect( save( { attributes: { ref: 1 } } ) ).toBeUndefined();
 	} );
+
+	it( 'skips inner blocks when the block references a menu by slug', () => {
+		expect( save( { attributes: { slug: 'header' } } ) ).toBeUndefined();
+	} );
 } );
