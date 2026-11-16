@@ -8,9 +8,9 @@ import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	BOUNDED_SWEEP,
 	clamp,
-	decimalPlaces,
 	getAngleOnTurn,
 	getPointerAngle,
+	getStepRange,
 	getStepChange,
 	modulo,
 } from './dial';
@@ -63,30 +63,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const input = useRef< HTMLInputElement >( null );
 		const mergedInputRef = useMergeRefs( [ input, inputRef ] );
 		const drag = useRef< Drag | null >( null );
-		const requestedStep =
-			Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
-		const span = max - min;
-		const spansRange = span > 0 && requestedStep >= span;
-		const precision = Math.min(
-			100,
-			Math.max(
-				decimalPlaces( min ),
-				decimalPlaces( spansRange ? max : requestedStep )
-			)
+		const { step, precision, lastStep, toValue, toIndex } = getStepRange(
+			min,
+			max,
+			stepProp
 		);
-		const step = spansRange
-			? Number( span.toFixed( precision ) )
-			: requestedStep;
 		const largeStepCount = Math.max( 1, Math.round( largeStep / step ) );
-		// Work in whole steps so that the last value on a wrapping dial has its
-		// own position one step before the first value.
-		const toValue = ( index: number ) =>
-			Number( ( min + index * step ).toFixed( precision ) ) || 0;
-		const upperStep = Math.ceil( ( max - min ) / step );
-		const lastStep =
-			toValue( upperStep ) <= max ? upperStep : upperStep - 1;
-		const toIndex = ( number: number ) =>
-			Math.round( ( number - min ) / step );
 		const index = clamp(
 			toIndex( value ?? uncontrolledValue ),
 			0,
@@ -107,7 +89,8 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		}
 		const maxAngle = minAngle + lastStep * degreesPerStep;
 		const angle = minAngle + index * degreesPerStep;
-		const wholeTurnStep = degreesPerStep >= 360;
+		const tapBySide =
+			degreesPerStep >= 360 || ( degreesPerStep === 180 && lastStep > 1 );
 		// When the numeric cycle spans whole turns, wrapping preserves the heading.
 		const cycleInTurns = ( ( lastStep + 1 ) * degreesPerStep ) / 360;
 		const seamless =
@@ -145,18 +128,19 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			drag.current = {
 				pointerId: event.pointerId,
 				pointerAngle,
-				tapOrigin: wholeTurnStep
+				tapOrigin: tapBySide
 					? { x: event.clientX, y: event.clientY }
 					: null,
 				dialAngle:
-					pointerAngle === null || wholeTurnStep
+					pointerAngle === null || tapBySide
 						? angle
 						: getAngleOnTurn(
 								pointerAngle,
 								angle,
 								minAngle,
 								maxAngle,
-								seamless
+								seamless,
+								degreesPerStep
 							),
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
@@ -201,14 +185,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			}
 			let nextAngle;
 			if ( gesture.pointerAngle === null ) {
-				nextAngle = wholeTurnStep
+				nextAngle = tapBySide
 					? gesture.dialAngle
 					: getAngleOnTurn(
 							pointerAngle,
 							gesture.dialAngle,
 							minAngle,
 							maxAngle,
-							seamless
+							seamless,
+							degreesPerStep
 						);
 			} else {
 				// Carry the turn count across twelve o'clock in either direction.

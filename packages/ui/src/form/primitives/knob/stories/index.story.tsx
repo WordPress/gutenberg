@@ -5,6 +5,7 @@ import { Text } from '../../../../text';
 import { InputControl } from '../../../input-control';
 import * as Field from '../../field';
 import { Knob } from '../index';
+import { getStepRange } from '../dial';
 import type { KnobProps } from '../types';
 
 const meta: Meta< typeof Knob > = {
@@ -58,7 +59,10 @@ function RangeExample( {
 	onValueChange,
 	...props
 }: KnobProps & { label: string; description: string; unit?: string } ) {
-	const [ value, setValue ] = useState( defaultValue );
+	const [ requestedValue, setValue ] = useState( defaultValue );
+	const value = getStepRange( props.min, props.max, props.step ).snap(
+		requestedValue
+	);
 	return (
 		<Field.Root name={ name }>
 			<Field.Label>{ label }</Field.Label>
@@ -102,38 +106,44 @@ export const WithField: Story = {
 
 /** Compare three ways to map the same 0–500 range onto a dial. */
 export const PartialTurns: Story = {
-	args: { min: 0, max: 500, defaultValue: 500 },
-	render: ( args ) => (
-		<Stack direction="column" gap="lg">
-			<RangeExample
-				{ ...args }
-				label="Bounded, 360 units per turn"
-				description="The dial stops at 500, partway through the second turn."
-				unitsPerTurn={ 360 }
-			/>
-			<RangeExample
-				{ ...args }
-				label="Wrapping, 360 units per turn"
-				description="One step past 500 returns to zero at twelve o’clock."
-				unitsPerTurn={ 360 }
-				wrap
-			/>
-			<RangeExample
-				{ ...args }
-				label="Wrapping, one turn for the full range"
-				description="All 501 steps share one turn. The last step sits beside zero."
-				wrap
-			/>
-		</Stack>
-	),
+	parameters: { controls: { disable: true } },
+	render: () => {
+		const range = { min: 0, max: 500, defaultValue: 500 };
+		return (
+			<Stack direction="column" gap="lg">
+				<RangeExample
+					{ ...range }
+					label="Bounded, 360 units per turn"
+					description="The dial stops at 500, partway through the second turn."
+					unitsPerTurn={ 360 }
+				/>
+				<RangeExample
+					{ ...range }
+					label="Wrapping, 360 units per turn"
+					description="One step past 500 returns to zero at twelve o’clock."
+					unitsPerTurn={ 360 }
+					wrap
+				/>
+				<RangeExample
+					{ ...range }
+					label="Wrapping, one turn for the full range"
+					description="All 501 steps share one turn. The last step sits beside zero."
+					wrap
+				/>
+			</Stack>
+		);
+	},
 };
 
 /** Each step is an entire revolution. A readout distinguishes identical headings. */
 export const WholeTurns: Story = {
-	args: { min: -2, max: 2, step: 1, unitsPerTurn: 1, defaultValue: 0 },
-	render: ( args ) => (
+	parameters: { controls: { disable: true } },
+	render: () => (
 		<RangeExample
-			{ ...args }
+			min={ -2 }
+			max={ 2 }
+			unitsPerTurn={ 1 }
+			defaultValue={ 0 }
 			label="Rotation (whole turns)"
 			description="Tap the left half to subtract a turn or the right half to add one. Drag a full circle to change by one turn."
 		/>
@@ -151,8 +161,13 @@ export const WithNumberInput: Story = {
 	},
 	render: function RotationField( { defaultValue, onValueChange, ...args } ) {
 		const descriptionId = useId();
-		const inheritedRotation = 45;
-		const [ rotation, setRotation ] = useState( defaultValue );
+		const range = getStepRange( args.min, args.max, args.step );
+		const inheritedRotation = range.snap( 45 );
+		const [ requestedRotation, setRotation ] = useState( defaultValue );
+		const rotation =
+			requestedRotation === undefined
+				? undefined
+				: range.snap( requestedRotation );
 		const [ draft, setDraft ] = useState< string >();
 		return (
 			<Stack direction="column" gap="sm">
@@ -160,9 +175,9 @@ export const WithNumberInput: Story = {
 					<InputControl
 						label="Rotation (degrees)"
 						type="number"
-						min={ args.min }
-						max={ args.max }
-						step={ args.step }
+						min={ args.min ?? 0 }
+						max={ range.toValue( range.lastStep ) }
+						step={ range.step }
 						disabled={ args.disabled }
 						aria-describedby={ descriptionId }
 						placeholder={ String( inheritedRotation ) }
@@ -191,7 +206,7 @@ export const WithNumberInput: Story = {
 					/>
 				</Stack>
 				<Text id={ descriptionId } variant="body-sm">
-					Clear the field to use the inherited 45°.
+					Clear the field to use the inherited { inheritedRotation }°.
 				</Text>
 			</Stack>
 		);

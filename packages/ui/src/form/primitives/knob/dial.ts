@@ -9,10 +9,35 @@ export function clamp( value: number, min: number, max: number ) {
 	return Math.max( min, Math.min( max, value ) );
 }
 
-export function decimalPlaces( value: number ) {
+function decimalPlaces( value: number ) {
 	const [ coefficient, exponent ] = value.toExponential().split( 'e' );
 	const fractionLength = coefficient.split( '.' )[ 1 ]?.length ?? 0;
 	return Math.max( 0, fractionLength - Number( exponent ) );
+}
+
+export function getStepRange( min = 0, max = 100, stepProp = 1 ) {
+	const requestedStep =
+		Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
+	const span = max - min;
+	const spansRange = span > 0 && requestedStep >= span;
+	const precision = Math.min(
+		100,
+		Math.max(
+			decimalPlaces( min ),
+			decimalPlaces( spansRange ? max : requestedStep )
+		)
+	);
+	const step = spansRange
+		? Number( span.toFixed( precision ) )
+		: requestedStep;
+	const toValue = ( index: number ) =>
+		Number( ( min + index * step ).toFixed( precision ) ) || 0;
+	const toIndex = ( value: number ) => Math.round( ( value - min ) / step );
+	const upperStep = Math.ceil( span / step );
+	const lastStep = toValue( upperStep ) <= max ? upperStep : upperStep - 1;
+	const snap = ( value: number ) =>
+		toValue( clamp( toIndex( value ), 0, lastStep ) );
+	return { step, precision, toValue, toIndex, lastStep, snap };
 }
 
 export function getAngleOnTurn(
@@ -20,20 +45,36 @@ export function getAngleOnTurn(
 	current: number,
 	min: number,
 	max: number,
-	seamless: boolean
+	seamless: boolean,
+	degreesPerStep: number
 ) {
 	const nearest = pointer + 360 * Math.round( ( current - pointer ) / 360 );
-	if ( seamless || ( nearest >= min && nearest <= max ) ) {
-		return nearest;
+	// A tap can move up to one turn. Compare actual step headings on either
+	// side, since a fractional number of steps per turn shifts their positions.
+	const reach =
+		Math.floor( Number( ( 360 / degreesPerStep ).toPrecision( 15 ) ) ) *
+		degreesPerStep;
+	const lower = seamless ? current - reach : Math.max( min, current - reach );
+	const upper = seamless ? current + reach : Math.min( max, current + reach );
+	let bestAngle = current;
+	let bestError = Infinity;
+	let bestSteps = Infinity;
+	for ( const turn of [ nearest, nearest - 360, nearest + 360 ] ) {
+		const angle = clamp( turn, lower, upper );
+		const steps = Math.round( ( angle - current ) / degreesPerStep );
+		const heading = current + steps * degreesPerStep;
+		const error = Math.abs( modulo( heading - pointer + 180, 360 ) - 180 );
+		if (
+			error < bestError - 1e-9 ||
+			( Math.abs( error - bestError ) <= 1e-9 &&
+				Math.abs( steps ) < bestSteps )
+		) {
+			bestAngle = angle;
+			bestError = error;
+			bestSteps = Math.abs( steps );
+		}
 	}
-	// At an end stop the adjacent turn may still contain the clicked angle.
-	// If neither turn does, select the stop closest to the pointer.
-	const adjacent = nearest + ( nearest < min ? 360 : -360 );
-	const stop = clamp( nearest, min, max );
-	const adjacentStop = clamp( adjacent, min, max );
-	return Math.abs( nearest - stop ) <= Math.abs( adjacent - adjacentStop )
-		? stop
-		: adjacentStop;
+	return bestAngle;
 }
 
 export function getPointerAngle( event: React.PointerEvent< HTMLElement > ) {
