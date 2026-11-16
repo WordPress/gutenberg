@@ -40,7 +40,7 @@
 		"yoast/phpunit-polyfills": "^1.1.0",
 		"gutenberg/gutenberg-coding-standards": "@dev",
 		"phpstan/extension-installer": "1.4.3",
-		"phpstan/phpstan": "2.3.5",
+		"phpstan/phpstan": "2.3.6",
 		"phpstan/phpstan-phpunit": "2.1.1",
 		"phpstan/phpstan-strict-rules": "2.1.1",
 		"php-stubs/wordpress-stubs": "@dev",
