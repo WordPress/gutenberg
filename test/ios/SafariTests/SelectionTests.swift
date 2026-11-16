@@ -16,6 +16,10 @@ final class SelectionTests: XCTestCase {
 	static let settleTimeout: TimeInterval = 5
 	/// The pause between two reads of a frame while it settles.
 	static let settleInterval: useconds_t = 250_000
+	/// How long a page gets to load.
+	static let loadTimeout: TimeInterval = 240
+	/// The host app's Darwin notification for a loaded page.
+	static let loadedNotification = "org.wordpress.gutenberg.tests.Host.loaded"
 
 	var web: XCUIElement { app.webViews.firstMatch }
 	var editor: Editor { Editor( app: app ) }
@@ -31,6 +35,17 @@ final class SelectionTests: XCTestCase {
 
 	override func tearDownWithError() throws {
 		app.terminate()
+	}
+
+	/// Opens the page in the host app and waits for it to load. Until the
+	/// simulator has launched WebKit's processes, accessibility queries for
+	/// the app time out after 30 seconds, however long the test waits, so
+	/// wait for the host app's notification instead.
+	func open( _ url: URL ) {
+		let loaded = XCTDarwinNotificationExpectation( notificationName: Self.loadedNotification )
+		app.launchEnvironment[ "START_URL" ] = url.absoluteString
+		app.launch()
+		wait( for: [ loaded ], timeout: Self.loadTimeout )
 	}
 
 	func point( _ x: CGFloat, _ y: CGFloat ) -> XCUICoordinate {
@@ -77,11 +92,10 @@ final class SelectionTests: XCTestCase {
 			name: "content",
 			value: "<!-- wp:paragraph --><p>Alpha <em>bravo</em> charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
 		) ]
-		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
-		app.launch()
+		open( url.url! )
 
 		let second = editor.block( title: "Paragraph", content: "Delta echo foxtrot" )
-		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+		XCTAssertTrue( second.waitForExistence( timeout: Self.loadTimeout ), "The post did not load" )
 
 		// Select the second paragraph, with the caret at the end of its line:
 		// a tap on the caret opens the edit menu instead of selecting a word.
@@ -144,12 +158,11 @@ final class SelectionTests: XCTestCase {
 			name: "content",
 			value: "<!-- wp:quote --><blockquote class=\"wp-block-quote\"><!-- wp:paragraph --><p>Quote here</p><!-- /wp:paragraph --></blockquote><!-- /wp:quote --><!-- wp:heading --><h2 class=\"wp-block-heading\">Heading here</h2><!-- /wp:heading --><!-- wp:paragraph --><p>Paragraph here</p><!-- /wp:paragraph -->"
 		) ]
-		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
-		app.launch()
+		open( url.url! )
 
 		let quote = editor.block( title: "Paragraph", content: "Quote here" )
 		let heading = editor.block( title: "Heading 2", content: "Heading here" )
-		XCTAssertTrue( heading.waitForExistence( timeout: 240 ), "The post did not load" )
+		XCTAssertTrue( heading.waitForExistence( timeout: Self.loadTimeout ), "The post did not load" )
 
 		// The heading has siblings, so it is edited through the canvas
 		// wrapper. The paragraph in the quote has none and is edited on
@@ -178,11 +191,10 @@ final class SelectionTests: XCTestCase {
 			name: "content",
 			value: "<!-- wp:paragraph --><p>First here</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Second here</p><!-- /wp:paragraph -->"
 		) ]
-		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
-		app.launch()
+		open( url.url! )
 
 		let second = editor.block( title: "Paragraph", content: "Second here" )
-		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
+		XCTAssertTrue( second.waitForExistence( timeout: Self.loadTimeout ), "The post did not load" )
 
 		second.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
 		let keyboard = app.keyboards.firstMatch
@@ -209,8 +221,7 @@ final class SelectionTests: XCTestCase {
 			URLQueryItem( name: "page", value: "standalone-editor" ),
 			URLQueryItem( name: "content", value: content ),
 		]
-		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
-		app.launch()
+		open( url.url! )
 	}
 
 	func testTapFromHeadingIntoQuoteWithoutIframePlacesCaret() throws {
@@ -218,7 +229,7 @@ final class SelectionTests: XCTestCase {
 
 		let quote = editor.block( title: "Paragraph", content: "Quote here" )
 		let heading = editor.block( title: "Heading 2", content: "Heading here" )
-		XCTAssertTrue( heading.waitForExistence( timeout: 240 ), "The editor did not load" )
+		XCTAssertTrue( heading.waitForExistence( timeout: Self.loadTimeout ), "The editor did not load" )
 
 		// The heading has siblings, so it is edited through the canvas
 		// wrapper. The paragraph in the quote has none and is edited on
@@ -242,7 +253,7 @@ final class SelectionTests: XCTestCase {
 		let quote = editor.block( title: "Paragraph", content: "Quote here" )
 		let paragraph = editor.block( title: "Paragraph", content: "Alpha bravo" )
 		let heading = editor.block( title: "Heading 2", content: "Delta echo" )
-		XCTAssertTrue( heading.waitForExistence( timeout: 240 ), "The editor did not load" )
+		XCTAssertTrue( heading.waitForExistence( timeout: Self.loadTimeout ), "The editor did not load" )
 
 		heading.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
 		let keyboard = app.keyboards.firstMatch
