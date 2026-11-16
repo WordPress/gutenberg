@@ -2,29 +2,54 @@ import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import type { KnobProps } from './types';
+import type { KnobProps, KnobUnit } from './types';
 import {
+	DEFAULT_STEPS,
 	FULL_TURN,
 	clamp,
+	getLastStepInTurn,
 	getNearestEquivalent,
 	getPointerAngle,
 	getShortestTurn,
 	roundToStep,
 	wrapAngle,
+	wrapToStep,
 } from './utils';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.scss';
 
-function getDefaultAriaValueText( value: number | null ) {
+function getDefaultAriaValueText( value: number | null, unit: KnobUnit ) {
 	if ( value === null ) {
 		return __( 'Not set' );
 	}
-	return sprintf(
-		/* translators: %s: angle in degrees. */
-		_n( '%s degree', '%s degrees', value ),
-		String( value )
-	);
+	const formatted = String( value );
+	switch ( unit ) {
+		case 'turn':
+			return sprintf(
+				/* translators: %s: angle in turns. */
+				_n( '%s turn', '%s turns', value ),
+				formatted
+			);
+		case 'rad':
+			return sprintf(
+				/* translators: %s: angle in radians. */
+				_n( '%s radian', '%s radians', value ),
+				formatted
+			);
+		case 'grad':
+			return sprintf(
+				/* translators: %s: angle in gradians. */
+				_n( '%s gradian', '%s gradians', value ),
+				formatted
+			);
+		default:
+			return sprintf(
+				/* translators: %s: angle in degrees. */
+				_n( '%s degree', '%s degrees', value ),
+				formatted
+			);
+	}
 }
 
 /**
@@ -32,7 +57,8 @@ function getDefaultAriaValueText( value: number | null ) {
  * `0` points up and values increase clockwise.
  *
  * Without `min` and `max`, the dial covers one full turn and wraps around.
- * With them, it stops at the ends and can count several turns.
+ * With them, it stops at the ends and can count several turns. Values are
+ * in `unit`, which accepts any CSS angle unit.
  */
 export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 	function UnforwardedKnob(
@@ -40,12 +66,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			value: valueProp,
 			defaultValue = 0,
 			onValueChange,
+			unit = 'deg',
 			min: minProp,
 			max: maxProp,
-			step = 1,
-			largeStep = 10,
+			step = DEFAULT_STEPS[ unit ].step,
+			largeStep = DEFAULT_STEPS[ unit ].largeStep,
 			disabled = false,
-			getAriaValueText = getDefaultAriaValueText,
+			getAriaValueText,
 			className,
 			render,
 			...restProps
@@ -61,9 +88,14 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const latestValueRef = useRef( value );
 		latestValueRef.current = value;
 
+		const fullTurn = FULL_TURN[ unit ];
 		const wraps = minProp === undefined && maxProp === undefined;
 		const min = minProp ?? 0;
-		const max = maxProp ?? ( wraps ? FULL_TURN - step : FULL_TURN );
+		const max =
+			maxProp ??
+			( wraps
+				? getLastStepInTurn( step, fullTurn )
+				: roundToStep( fullTurn, step, 0 ) );
 
 		// Read during a drag instead of `value`, which can lag between events.
 		const dragStateRef = useRef< {
@@ -86,12 +118,20 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 
 		const toValue = ( unclampedValue: number ) =>
 			wraps
-				? wrapAngle( roundToStep( unclampedValue, step, 0 ) )
+				? wrapToStep( unclampedValue, step, fullTurn )
 				: clamp( roundToStep( unclampedValue, step, min ), min, max );
 
 		const referenceValue = wraps
-			? wrapAngle( value ?? 0 )
+			? wrapAngle( value ?? 0, fullTurn )
 			: clamp( value ?? 0, min, max );
+
+		// The keys cycle through the steps in one turn, so they wrap from the
+		// last step to 0 even when a turn is not a whole number of steps.
+		const stepCycle = roundToStep( max + step, step, 0 );
+		const stepBy = ( delta: number ) =>
+			wraps
+				? wrapToStep( referenceValue + delta, step, stepCycle )
+				: toValue( referenceValue + delta );
 
 		const turnDial = ( event: React.PointerEvent< HTMLDivElement > ) => {
 			const dragState = dragStateRef.current;
@@ -101,13 +141,15 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			const angle = getPointerAngle(
 				dragState.rect,
 				event.clientX,
-				event.clientY
+				event.clientY,
+				fullTurn
 			);
 			// Between two events the pointer is taken to have turned the short
 			// way round, so a fast flick of more than half a turn reverses.
 			dragState.unclampedValue += getShortestTurn(
 				dragState.lastPointerAngle,
-				angle
+				angle,
+				fullTurn
 			);
 			dragState.lastPointerAngle = angle;
 			setValue( toValue( dragState.unclampedValue ) );
@@ -130,12 +172,17 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			element.setPointerCapture( event.pointerId );
 
 			const rect = element.getBoundingClientRect();
-			const angle = getPointerAngle( rect, event.clientX, event.clientY );
+			const angle = getPointerAngle(
+				rect,
+				event.clientX,
+				event.clientY,
+				fullTurn
+			);
 			// Picks the angle a click points at that is nearest the current
 			// value, so a click never jumps a whole turn.
 			const unclampedValue = wraps
 				? angle
-				: getNearestEquivalent( angle, referenceValue );
+				: getNearestEquivalent( angle, referenceValue, fullTurn );
 			dragStateRef.current = {
 				rect,
 				lastPointerAngle: angle,
@@ -153,17 +200,17 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			switch ( event.key ) {
 				case 'ArrowUp':
 				case 'ArrowRight':
-					nextValue = toValue( referenceValue + increment );
+					nextValue = stepBy( increment );
 					break;
 				case 'ArrowDown':
 				case 'ArrowLeft':
-					nextValue = toValue( referenceValue - increment );
+					nextValue = stepBy( -increment );
 					break;
 				case 'PageUp':
-					nextValue = toValue( referenceValue + largeStep );
+					nextValue = stepBy( largeStep );
 					break;
 				case 'PageDown':
-					nextValue = toValue( referenceValue - largeStep );
+					nextValue = stepBy( -largeStep );
 					break;
 				case 'Home':
 					nextValue = min;
@@ -207,7 +254,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					'aria-valuemax': max,
 					// Required for a slider; the value text says when it is empty.
 					'aria-valuenow': value ?? referenceValue,
-					'aria-valuetext': getAriaValueText( value ),
+					'aria-valuetext': getAriaValueText
+						? getAriaValueText( value )
+						: getDefaultAriaValueText( value, unit ),
 					'aria-disabled': disabled || undefined,
 					className: clsx(
 						resetStyles[ 'box-sizing' ],
@@ -218,7 +267,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					children: value !== null && (
 						<span
 							className={ styles.indicator }
-							style={ { transform: `rotate(${ value }deg)` } }
+							style={ {
+								transform: `rotate(${ value }${ unit })`,
+							} }
 						/>
 					),
 				},

@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import { Knob } from '../index';
 import { InputControl } from '../../form/input-control';
 import { InputLayout } from '../../form/primitives/input-layout';
+import * as Select from '../../form/primitives/select';
 import { Stack } from '../../stack';
 
 const meta: Meta< typeof Knob > = {
@@ -54,13 +55,37 @@ export const Disabled: Story = {
 	args: { defaultValue: 90, disabled: true },
 };
 
+/** `unit` sets the CSS angle unit for the value, range and steps. */
+export const Turns: Story = {
+	args: { unit: 'turn', defaultValue: 0.25 },
+};
+
+type Unit = NonNullable< React.ComponentProps< typeof Knob >[ 'unit' ] >;
+
+const UNITS: { value: Unit; label: string; fullTurn: number }[] = [
+	{ value: 'deg', label: 'deg', fullTurn: 360 },
+	{ value: 'turn', label: 'turn', fullTurn: 1 },
+	{ value: 'rad', label: 'rad', fullTurn: 2 * Math.PI },
+	{ value: 'grad', label: 'grad', fullTurn: 400 },
+];
+
+function convertAngle( value: number, from: Unit, to: Unit ) {
+	const fromTurn = UNITS.find( ( unit ) => unit.value === from )!.fullTurn;
+	const toTurn = UNITS.find( ( unit ) => unit.value === to )!.fullTurn;
+	// Keeps the precision of the default step in each unit.
+	const decimals = to === 'turn' || to === 'rad' ? 2 : 0;
+	return Number( ( ( value / fromTurn ) * toTurn ).toFixed( decimals ) );
+}
+
 /**
  * Knob is a dial only. Compose it with `InputControl` to let users type an
- * exact angle, keeping both in sync through a shared value.
+ * exact angle, keeping both in sync through a shared value. A unit `Select`
+ * in the input's suffix converts the value when the unit changes.
  */
 export const WithInputControl: Story = {
 	render: function Template( args ) {
 		const [ angle, setAngle ] = useState< number | null >( 90 );
+		const [ unit, setUnit ] = useState< Unit >( 'deg' );
 
 		return (
 			<Stack direction="row" gap="sm" align="end">
@@ -69,15 +94,62 @@ export const WithInputControl: Story = {
 					type="number"
 					min={ args.min }
 					max={ args.max }
+					step="any"
 					value={ angle ?? '' }
 					onValueChange={ ( nextValue ) =>
 						setAngle(
 							nextValue === '' ? null : parseFloat( nextValue )
 						)
 					}
-					suffix={ <InputLayout.Slot>°</InputLayout.Slot> }
+					suffix={
+						<InputLayout.Slot padding="minimal">
+							<Select.Root
+								items={ UNITS }
+								value={ unit }
+								onValueChange={ ( nextUnit ) => {
+									if ( ! nextUnit ) {
+										return;
+									}
+									setAngle(
+										( current ) =>
+											current &&
+											convertAngle(
+												current,
+												unit,
+												nextUnit
+											)
+									);
+									setUnit( nextUnit );
+								} }
+							>
+								<Select.Trigger
+									size="small"
+									variant="minimal"
+									aria-label="Unit"
+								/>
+								<Select.Popup width="content">
+									{ UNITS.map( ( item ) => (
+										<Select.Item
+											key={ item.value }
+											value={ item.value }
+											size="small"
+										>
+											<Select.ItemLabel>
+												{ item.label }
+											</Select.ItemLabel>
+										</Select.Item>
+									) ) }
+								</Select.Popup>
+							</Select.Root>
+						</InputLayout.Slot>
+					}
 				/>
-				<Knob { ...args } value={ angle } onValueChange={ setAngle } />
+				<Knob
+					{ ...args }
+					unit={ unit }
+					value={ angle }
+					onValueChange={ setAngle }
+				/>
 			</Stack>
 		);
 	},

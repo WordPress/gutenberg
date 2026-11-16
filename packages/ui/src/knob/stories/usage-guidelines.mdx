@@ -10,15 +10,23 @@ import * as KnobStories from './index.story';
 
 ## When to use Knob
 
-Use `Knob` to choose an angle, such as the direction of a gradient or a rotation. `0` points up and values increase clockwise, in degrees.
+Use `Knob` to choose an angle, such as the direction of a gradient or a rotation. `0` points up and values increase clockwise.
 
-Knob is a dial only. Pair it with an `InputControl` so users can type an exact angle, and keep both in sync through one value. Give the Knob an accessible name with `aria-label` or `aria-labelledby`.
+Knob is a dial only. Pair it with an `InputControl` so users can type an exact angle, and keep both in sync through one value. Give the Knob an accessible name with `aria-label` or `aria-labelledby`. The example below adds a unit `Select` to the input, which converts the value when the unit changes.
 
 <Canvas of={ KnobStories.WithInputControl } />
 
+## Choose a unit
+
+Set `unit` to any CSS angle unit: `deg` (the default), `turn`, `rad` or `grad`. The value, `min`, `max`, `step` and `largeStep` are all in that unit, so store the value as it comes and pass the same unit back. The value text names the unit, for example "90 degrees" or "0.25 turns".
+
+The default steps suit each unit: 1 and 10 in `deg` and `grad`, 0.01 and 0.1 in `turn` and `rad`. Values round to the step, so a `step` of 0.01 gives two decimal places.
+
+<Canvas of={ KnobStories.Turns } />
+
 ## Choose wrapping or stops
 
-Without `min` and `max`, the dial covers one full turn. Dragging past the top wraps from 359 to 0, and the arrow keys wrap the same way. Use this when every direction is valid and 360 means the same as 0.
+Without `min` and `max`, the dial covers one full turn in any unit. Dragging past the top wraps from the last step back to 0, for example from 359 to 0 in `deg` or from 0.99 to 0 in `turn`. The arrow keys wrap the same way. Use this when every direction is valid and 360 means the same as 0.
 
 <Canvas of={ KnobStories.Default } />
 

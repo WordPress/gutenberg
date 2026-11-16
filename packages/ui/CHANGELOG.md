@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Add `Knob`, a circular dial for choosing an angle. It wraps around a full turn by default, or stops at `min` and `max` and counts several turns.
+-   Add `Knob`, a circular dial for choosing an angle in any CSS angle unit (`deg`, `turn`, `rad` or `grad`). It wraps around a full turn by default, or stops at `min` and `max` and counts several turns. ([#86883](https://github.com/WordPress/gutenberg/pull/86883))
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).

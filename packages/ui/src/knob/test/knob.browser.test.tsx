@@ -92,6 +92,47 @@ describe( 'Knob dragging', () => {
 		await waitFor( () => expect( knob ).toHaveValue( -180 ) );
 	} );
 
+	it( 'wraps a full turn in each unit', async () => {
+		const cases = [
+			{ unit: 'turn', values: [ 0.94, 0, 0.03 ] },
+			{ unit: 'rad', values: [ 5.93, 6.27, 0.17 ] },
+			{ unit: 'grad', values: [ 378, 399, 11 ] },
+		] as const;
+		for ( const { unit, values } of cases ) {
+			const onValueChange = vi.fn();
+			const { unmount } = await render(
+				<Knob
+					aria-label="Angle"
+					unit={ unit }
+					onValueChange={ onValueChange }
+				/>
+			);
+			drag( screen.getByRole( 'slider' ), [ 340, 359, 10 ] );
+			expect(
+				onValueChange.mock.calls.map( ( [ value ] ) => value )
+			).toEqual( values );
+			await unmount();
+		}
+	} );
+
+	it( 'stops and counts turns in turn units', async () => {
+		await render(
+			<Knob
+				aria-label="Angle"
+				unit="turn"
+				defaultValue={ 0 }
+				min={ -1 }
+				max={ 1 }
+			/>
+		);
+		const knob = screen.getByRole( 'slider' );
+		drag( knob, [ 0, 90, 180, 270, 0, 90 ] );
+		await waitFor( () => expect( knob ).toHaveValue( 1 ) );
+		expect( knob ).toHaveAttribute( 'aria-valuetext', '1 turn' );
+		drag( knob, [ 0, 270, 180, 90, 0, 270, 180 ] );
+		await waitFor( () => expect( knob ).toHaveValue( -0.5 ) );
+	} );
+
 	it( 'picks the angle nearest the current value on click', async () => {
 		await render(
 			<Knob
