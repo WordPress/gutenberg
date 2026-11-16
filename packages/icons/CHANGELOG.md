@@ -12,8 +12,13 @@
 -   Remove the `bellUnread` icon. Compose an unread indicator from the `bell` icon and a separately positioned dot instead, so the dot can be separated from the bell with a ring in the surrounding surface colour ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
 -   Redraw `copy` on the footprint the removed `copySmall` occupied, so it sits lighter in the dense contexts that icon served, such as the link preview and the post URL field ([#85453](https://github.com/WordPress/gutenberg/pull/85453)).
 
+### New Features
+
+-   Add the `getAspectRatioIcon` function, which returns an icon that draws the shape of an aspect ratio, to pass to `Icon` ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
+
 ### Enhancements
 
+-   `manifest.json`: Map 45 more Dashicons to `core-admin` icons. To do so, add 33 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `lock` and `play`, and add `chevronUpDown`, `file` and `folder` from the `core` collection to the `core-admin` collection too ([#86708](https://github.com/WordPress/gutenberg/pull/86708)).
 -   `formatItalic`: Adds serifs to the italic icon for legibility ([#86561](https://github.com/WordPress/gutenberg/pull/86561)).
 -   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).

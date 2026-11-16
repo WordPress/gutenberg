@@ -4,7 +4,7 @@
 This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </div>
 
-An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and a helper that describes the edits to apply when saving it. Cropping is the first thing it does. The media editor is built on it.
+An image editor: a canvas where a person pans, zooms, rotates, flips and crops an image, and functions that describe the edit for saving. The media editor is built on it.
 
 This package replaces `@wordpress/image-cropper`, which is deprecated and will be removed in a later release.
 
@@ -30,7 +30,7 @@ Or import it from JavaScript:
 import '@wordpress/image-editor/build-style/style.css';
 ```
 
-The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. Gutenberg's media editor reads the user's admin colour scheme for its accent and currently uses a light surface. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
+The canvas follows WordPress Design System colours and spacing when their tokens are present. A surrounding `ThemeProvider` can supply a light or dark palette. The built stylesheet also supplies standalone defaults when the tokens are absent. The grid stays translucent white because it sits over the image.
 
 Set these CSS custom properties on a parent element or a class passed to `ImageEditorCanvas` through `className` to change its appearance without targeting its internal elements:
 
@@ -61,7 +61,7 @@ To use the design tokens outside WordPress, install `@wordpress/theme` and load 
 
 ## Outside WordPress
 
-The package needs no WordPress site, and nothing it imports talks to one. Two things to know:
+The package needs no WordPress site, and nothing it imports talks to one.
 
 -   The examples import React hooks from `@wordpress/element`, which re-exports React. Import them from `react` instead if you prefer.
 -   The editor's own text, such as the labels on the resize handles and what a screen reader announces, is in English unless you give `@wordpress/i18n` your translations.
@@ -152,9 +152,7 @@ It runs only in a browser. It rejects when no image has loaded, when the image f
 
 ## Not Yet Included
 
-The first version covers what the media editor needs. One addition is likely next, for simpler editors:
-
--   **A self-contained mode**, where `useImageEditor()` keeps the state itself. An editor without its own undo history would not need to store the state.
+-   **A self-contained mode**, where `useImageEditor()` keeps the state itself, for an editor without its own undo history.
 
 ## More
 

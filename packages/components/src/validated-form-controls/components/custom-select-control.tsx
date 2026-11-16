@@ -43,6 +43,7 @@ const UnforwardedValidatedCustomSelectControl = (
 				ref={ validityTargetRef }
 				required={ required }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				value={ restProps.value?.key ? 'hasvalue' : '' }
 				onChange={ () => {} }
 				onFocus={ () => getInteractiveTarget()?.focus() }
