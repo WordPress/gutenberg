@@ -170,6 +170,160 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
 }
 
+const ANGLE_UNITS: Record< string, number > = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
+
+const ROTATE_AXES: Record< string, [ number, number, number ] > = {
+	'': [ 0, 0, 1 ],
+	x: [ 1, 0, 0 ],
+	y: [ 0, 1, 0 ],
+	z: [ 0, 0, 1 ],
+};
+
+function parseAngle( value: string ) {
+	const match = value.match(
+		/^(-?[\d.]+(?:e[+-]?\d+)?)(deg|grad|rad|turn)$/
+	);
+	return match ? parseFloat( match[ 1 ] ) * ANGLE_UNITS[ match[ 2 ] ] : NaN;
+}
+
+function parseLength( value: string, size: number ) {
+	if ( value.endsWith( '%' ) ) {
+		return ( parseFloat( value ) / 100 ) * size;
+	}
+	return value.endsWith( 'px' ) ? parseFloat( value ) : NaN;
+}
+
+/**
+ * Builds the matrix an element's own `translate`, `rotate`, `scale` and
+ * `transform` apply to its border box, about its transform origin.
+ *
+ * @param element Element.
+ * @param style   Computed style of the element.
+ *
+ * @return The matrix, or undefined when the element is not transformed or
+ *         a value can't be read.
+ */
+function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
+	const {
+		translate = 'none',
+		rotate = 'none',
+		scale = 'none',
+		transform = 'none',
+	} = style;
+
+	if (
+		translate === 'none' &&
+		rotate === 'none' &&
+		scale === 'none' &&
+		transform === 'none'
+	) {
+		return;
+	}
+
+	const { offsetWidth: width, offsetHeight: height } = element;
+	const [ originX, originY ] = style.transformOrigin
+		.split( ' ' )
+		.map( ( value ) => parseFloat( value ) );
+	// CSS applies `translate`, then `rotate`, then `scale`, then `transform`.
+	const matrix = new window.DOMMatrix().translateSelf( originX, originY );
+
+	if ( translate !== 'none' ) {
+		const [ x, y = '0px' ] = translate.split( ' ' );
+		matrix.translateSelf(
+			parseLength( x, width ),
+			parseLength( y, height )
+		);
+	}
+
+	if ( rotate !== 'none' ) {
+		const parts = rotate.split( ' ' );
+		const angle = parseAngle( parts.pop()! );
+		const [ x, y, z ] =
+			ROTATE_AXES[ parts.join( ' ' ) ] ??
+			parts.map( ( value ) => parseFloat( value ) );
+		matrix.rotateAxisAngleSelf( x, y, z, angle );
+	}
+
+	if ( scale !== 'none' ) {
+		const [ x, y = x ] = scale
+			.split( ' ' )
+			.map( ( value ) =>
+				value.endsWith( '%' )
+					? parseFloat( value ) / 100
+					: parseFloat( value )
+			);
+		matrix.scaleSelf( x, y );
+	}
+
+	if ( transform !== 'none' ) {
+		matrix.multiplySelf( new window.DOMMatrix( transform ) );
+	}
+
+	matrix.translateSelf( -originX, -originY );
+
+	return Array.from( matrix.toFloat64Array() ).every( Number.isFinite )
+		? matrix
+		: undefined;
+}
+
+/**
+ * Returns the rectangle an element takes up in the layout, before its own
+ * transform moves, turns or resizes it. Transforms only change how an
+ * element is painted, so this is where neighbouring blocks and a newly
+ * inserted block line up. An untransformed element gets its bounding
+ * client rect.
+ *
+ * @param element Element.
+ * @return The element's untransformed rect in client coordinates.
+ */
+export function getLayoutRect( element: Element ) {
+	const rect = element.getBoundingClientRect();
+	const view = element.ownerDocument.defaultView;
+
+	if ( ! view || ! ( 'offsetWidth' in element ) ) {
+		return rect;
+	}
+
+	const htmlElement = element as HTMLElement;
+	const matrix = getOwnTransform(
+		htmlElement,
+		view.getComputedStyle( htmlElement )
+	);
+
+	if ( ! matrix ) {
+		return rect;
+	}
+
+	const { offsetWidth: width, offsetHeight: height } = htmlElement;
+	const corners = [
+		[ 0, 0 ],
+		[ width, 0 ],
+		[ 0, height ],
+		[ width, height ],
+	].map( ( [ x, y ] ) => matrix.transformPoint( { x, y } ) );
+	const xs = corners.map( ( { x } ) => x );
+	const ys = corners.map( ( { y } ) => y );
+	const minX = Math.min( ...xs );
+	const minY = Math.min( ...ys );
+	const spanX = Math.max( ...xs ) - minX;
+	const spanY = Math.max( ...ys ) - minY;
+	// Ancestors, such as the zoomed out canvas, can scale the whole block.
+	const scaleX = spanX > 0 ? rect.width / spanX : 1;
+	const scaleY = spanY > 0 ? rect.height / spanY : 1;
+
+	return new window.DOMRect(
+		rect.left - minX * scaleX,
+		rect.top - minY * scaleY,
+		width * scaleX,
+		height * scaleY
+	);
+}
+
 /**
  * Extends a rectangle upwards to a given top, keeping its horizontal extent.
  *

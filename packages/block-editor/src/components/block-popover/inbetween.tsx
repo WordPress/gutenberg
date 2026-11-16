@@ -6,6 +6,7 @@ import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import { getLayoutRect } from '../../utils/dom';
 import type { BlockPopoverInbetweenProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
@@ -77,11 +78,13 @@ function BlockPopoverInbetween( {
 		return {
 			contextElement,
 			getBoundingClientRect() {
+				// A transformed block keeps its place in the layout, so the
+				// insertion point stays in the gap between layout boxes.
 				const previousRect = previousElement
-					? previousElement.getBoundingClientRect()
+					? getLayoutRect( previousElement )
 					: null;
 				const nextRect = nextElement
-					? nextElement.getBoundingClientRect()
+					? getLayoutRect( nextElement )
 					: null;
 
 				// At least one of the elements exists, see the check above.
