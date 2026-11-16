@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   `MediaUpload`: Keep the Media Library modal open when the component unmounts while it is in use, such as when replacing an image while the viewport crosses the medium breakpoint. The modal is removed once it closes.
+-   `MediaUpload`: Keep the Media Library modal open when the component unmounts while it is in use, such as when replacing an image while the viewport crosses the medium breakpoint. The modal is removed once it closes ([#86882](https://github.com/WordPress/gutenberg/pull/86882)).
 
 ## 6.1.0 (2026-11-04)
 
