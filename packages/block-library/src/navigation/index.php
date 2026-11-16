@@ -41,6 +41,73 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 }
 
 /**
+ * Gets a unique `wp_navigation` slug.
+ *
+ * @since 7.1.0
+ *
+ * @param string $slug    Desired slug.
+ * @param int    $post_id Optional post ID to exclude when updating an existing post.
+ * @return string Unique slug.
+ */
+function block_core_navigation_get_unique_navigation_slug( $slug, $post_id = 0 ) {
+	global $wpdb;
+
+	$base_slug = $slug;
+	$suffix    = 2;
+
+	while (
+		$wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts WHERE post_name = %s AND post_type = 'wp_navigation' AND ID != %d LIMIT 1",
+				$slug,
+				$post_id
+			)
+		)
+	) {
+		$slug = $base_slug . '-' . $suffix;
+		++$suffix;
+	}
+
+	return $slug;
+}
+
+/**
+ * Ensures Navigation Menu slugs are unique before they are stored.
+ *
+ * Draft posts can otherwise share a `post_name` and only receive a unique slug
+ * once published. Navigation blocks reference menus by the slug they are
+ * created with, so that slug has to be stable immediately.
+ *
+ * @since 7.1.0
+ *
+ * @param array $data    An array of slashed, sanitized, and processed post data.
+ * @param array $postarr An array of sanitized but otherwise unmodified post data.
+ * @return array Filtered post data.
+ */
+function block_core_navigation_ensure_unique_navigation_slug( $data, $postarr ) {
+	if ( 'wp_navigation' !== ( $data['post_type'] ?? null ) || empty( $data['post_name'] ) ) {
+		return $data;
+	}
+
+	if ( 'auto-draft' === ( $data['post_status'] ?? null ) ) {
+		return $data;
+	}
+
+	$slug = sanitize_title( $data['post_name'] );
+
+	if ( empty( $slug ) ) {
+		return $data;
+	}
+
+	$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
+
+	$data['post_name'] = block_core_navigation_get_unique_navigation_slug( $slug, $post_id );
+
+	return $data;
+}
+add_filter( 'wp_insert_post_data', 'block_core_navigation_ensure_unique_navigation_slug', 10, 2 );
+
+/**
  * Returns the custom properties used by the Navigation block for a layout.
  *
  * @since 7.1.0
