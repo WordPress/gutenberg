@@ -126,13 +126,14 @@ _Returns_
 
 ### getFilename
 
-Returns the filename part of the URL.
+Returns the filename part of the URL, decoded so that percent-encoded characters read as they would in a file manager. A filename that can't be decoded is returned as it appears in the URL.
 
 _Usage_
 
 ```js
 const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
 const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
+const filename3 = getFilename( '/uploads/%E9%9F%B3.mp3' ); // '音.mp3'
 ```
 
 _Parameters_

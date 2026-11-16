@@ -1,6 +1,9 @@
+import { createRequire } from 'node:module';
 import { transformSync } from '@babel/core';
 import { describe, expect, it } from 'vitest';
 import plugin from '../';
+
+const require = createRequire( import.meta.url );
 
 describe( 'babel-plugin-import-jsx-pragma', () => {
 	it( 'does nothing if there is no jsx', () => {

@@ -27,32 +27,8 @@
 		background: $components-color-background;
 	}
 
-	// Use opacity to work in various editor styles.
-	// Keep the legacy vendor placeholder selectors.
-	&::-webkit-input-placeholder {
-		color: $components-color-dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $components-color-dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
-		color: $components-color-dark-gray-placeholder;
-	}
-
-	:global(.is-dark-theme) & {
-		&::-webkit-input-placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
-
-		&::-moz-placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
-
-		&:-ms-input-placeholder {
-			color: $components-color-light-gray-placeholder;
-		}
+	&::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&:disabled::placeholder {

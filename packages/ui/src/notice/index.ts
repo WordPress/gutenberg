@@ -1,4 +1,5 @@
 import { Root } from './root';
+import { List } from './list';
 import { Title } from './title';
 import { Description } from './description';
 import { Actions } from './actions';
@@ -8,6 +9,7 @@ import { ActionLink } from './action-link';
 
 export {
 	Root,
+	List,
 	Title,
 	Description,
 	Actions,

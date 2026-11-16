@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "19.0.0",
+	"version": "20.0.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -109,7 +109,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@storybook/react-vite": "^10.6.1",
+		"@storybook/react-vite": "^10.6.6",
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.8",
@@ -117,8 +117,8 @@
 		"@types/postcss-prefix-selector": "^1.16.3",
 		"@wordpress/block-library": "file:../block-library",
 		"deep-freeze": "^0.0.1",
-		"storybook": "^10.6.2",
-		"vitest": "^5.0.3",
+		"storybook": "^10.6.6",
+		"vitest": "^5.1.0",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
