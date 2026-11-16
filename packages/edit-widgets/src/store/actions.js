@@ -173,6 +173,9 @@ export const saveWidgetArea =
 						widgetAreaId
 				) {
 					widgetId = undefined;
+					// Drop the duplicate ID now, so nothing reads it before the
+					// new widget's ID is written back after the batch.
+					delete block.attributes.__internalWidgetId;
 				} else {
 					claimedWidgetIds.add( widgetId );
 				}
