@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Navigation: When submenus open on click, render a parent item that has a URL as a link and toggle its submenu with the arrow, so the parent page stays reachable, including in the mobile overlay ([#86795](https://github.com/WordPress/gutenberg/pull/86795)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).

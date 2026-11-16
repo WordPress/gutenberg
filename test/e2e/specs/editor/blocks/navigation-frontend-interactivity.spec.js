@@ -212,15 +212,19 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			page,
 			requestUtils,
 		} ) => {
+			// No URL, so the whole item is the toggle. The default overlay hides
+			// the arrow toggle with `display: none`.
 			const menu = await requestUtils.createNavigationMenu( {
 				title: 'Overlay menu',
-				content: submenuMenuContent,
+				content: `
+				<!-- wp:navigation-submenu {"label":"Submenu"} -->
+					<!-- wp:navigation-link {"label":"Submenu Link","type":"custom","url":"http://www.wordpress.org/"} /-->
+				<!-- /wp:navigation-submenu -->
+				`,
 			} );
 
 			// The same submenu setting as the test above, so that the overlay
-			// is the only difference between the two. The arrow toggle is not
-			// used here because the default overlay hides it with
-			// `display: none`, which takes it out of the accessibility tree.
+			// is the only difference between the two.
 			await requestUtils.createTemplate( 'wp_template_part', {
 				slug: 'header',
 				title: 'Header',
@@ -245,6 +249,33 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 				'aria-expanded',
 				'true'
 			);
+		} );
+
+		test( 'submenu parents with a URL stay links in the default overlay when set to open on click', async ( {
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Overlay menu',
+				content: submenuMenuContent,
+			} );
+
+			await requestUtils.createTemplate( 'wp_template_part', {
+				slug: 'header',
+				title: 'Header',
+				content: `<!-- wp:navigation {"ref":${ menu.id },"overlayMenu":"always","submenuVisibility":"click"} /-->`,
+			} );
+
+			await page.goto( '/' );
+			await page.getByRole( 'button', { name: 'Open menu' } ).click();
+
+			// See https://github.com/WordPress/gutenberg/issues/83322.
+			await expect(
+				page.getByRole( 'link', { name: 'Submenu', exact: true } )
+			).toHaveAttribute( 'href', '#heading' );
+			await expect(
+				page.getByRole( 'link', { name: 'Submenu Link' } )
+			).toBeVisible();
 		} );
 	} );
 
@@ -288,6 +319,10 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 			const innerElement = page.getByRole( 'link', {
 				name: 'Simple Submenu Link 1',
+			} );
+			const complexSubmenuLink = page.getByRole( 'link', {
+				name: 'Complex Submenu',
+				exact: true,
 			} );
 			const complexSubmenuButton = page.getByRole( 'button', {
 				name: 'Complex Submenu',
@@ -348,8 +383,12 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			await expect( innerElement ).toBeVisible();
 			// Tab to first element, then tab outside the submenu.
 			await pageUtils.pressKeys( 'Tab', { times: 2, delay: 50 } );
-			await expect( complexSubmenuButton ).toBeFocused();
+			await expect( complexSubmenuLink ).toBeFocused();
 			await expect( innerElement ).toBeHidden();
+
+			// Test: the submenu icon follows the parent link.
+			await pageUtils.pressKeys( 'Tab' );
+			await expect( complexSubmenuButton ).toBeFocused();
 
 			// Test: only nested submenu closes on tab outside
 			await pageUtils.pressKeys( 'Enter' );

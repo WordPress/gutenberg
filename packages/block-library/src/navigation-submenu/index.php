@@ -152,10 +152,14 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$html = '<li ' . $wrapper_attributes . '>';
 
-	// If Submenus open on hover or are always open, we render an anchor tag with attributes.
-	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
-	if ( ! $open_on_click ) {
-		$item_url = $attributes['url'] ?? '';
+	$item_url = $attributes['url'] ?? '';
+
+	// Without a URL, the whole item toggles the submenu.
+	$render_item_as_toggle = $open_on_click && empty( $item_url );
+
+	// If the item renders as a link, we render an anchor tag with attributes.
+	// If submenu icons show or submenus open on click, we also render a submenu button.
+	if ( ! $render_item_as_toggle ) {
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content"';
 
@@ -203,7 +207,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</a>';
 		// End anchor tag content.
 
-		if ( $show_submenu_indicators && $has_submenu ) {
+		if ( ( $show_submenu_indicators || $open_on_click ) && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
 			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';

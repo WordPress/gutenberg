@@ -272,6 +272,100 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Click submenus with a URL render a link and an icon toggle.
+	 *
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_render_parent_link_and_icon_toggle_when_open_on_click_with_url() {
+		$page_id = self::$page->ID;
+		$url     = 'http://localhost:8888/?page_id=' . $page_id;
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"' . $url . '","kind":"post-type"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"' . $url . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$navigation_submenu_block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'submenuVisibility' => 'click',
+				'showSubmenuIcon'   => true,
+			)
+		);
+
+		$tags = new WP_HTML_Tag_Processor(
+			gutenberg_render_block_core_navigation_submenu(
+				$navigation_submenu_block->attributes,
+				array(),
+				$navigation_submenu_block
+			)
+		);
+
+		$this->assertTrue( $tags->next_tag( 'li' ), 'Submenu should render a list item.' );
+		$this->assertTrue( $tags->has_class( 'open-on-click' ), 'Submenu should have the "open-on-click" class.' );
+
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'a',
+					'class_name' => 'wp-block-navigation-item__content',
+				)
+			),
+			'Parent item should render as a link.'
+		);
+		$this->assertSame( $url, $tags->get_attribute( 'href' ), 'Parent link should point to the submenu URL.' );
+
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'button',
+					'class_name' => 'wp-block-navigation-submenu__toggle',
+				)
+			),
+			'Submenu should render a toggle button.'
+		);
+		$this->assertTrue( $tags->has_class( 'wp-block-navigation__submenu-icon' ), 'Toggle button should be the submenu icon.' );
+		$this->assertFalse( $tags->has_class( 'wp-block-navigation-item__content' ), 'Toggle button should not be the parent item.' );
+	}
+
+	/**
+	 * Click submenus without a URL render the whole item as the toggle.
+	 *
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_render_parent_as_toggle_when_open_on_click_without_url() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","url":"http://localhost:8888/"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$navigation_submenu_block = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'submenuVisibility' => 'click',
+				'showSubmenuIcon'   => true,
+			)
+		);
+
+		$tags = new WP_HTML_Tag_Processor(
+			gutenberg_render_block_core_navigation_submenu(
+				$navigation_submenu_block->attributes,
+				array(),
+				$navigation_submenu_block
+			)
+		);
+
+		$this->assertTrue(
+			$tags->next_tag( array( 'class_name' => 'wp-block-navigation-item__content' ) ),
+			'Submenu should render the parent item.'
+		);
+		$this->assertSame( 'BUTTON', $tags->get_tag(), 'Parent item should render as a button without a URL.' );
+		$this->assertTrue( $tags->has_class( 'wp-block-navigation-submenu__toggle' ), 'Parent item should be the submenu toggle.' );
+	}
+
+	/**
 	 * @covers ::gutenberg_render_block_core_navigation_submenu
 	 */
 	public function test_should_apply_shadow_to_the_submenu_container() {

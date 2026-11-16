@@ -282,7 +282,8 @@ export default function NavigationSubmenuEdit( {
 			: isSelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
+	// Without a URL, the whole item toggles the submenu.
+	const ParentElement = openSubmenusOnClick && ! url ? 'button' : 'a';
 
 	function transformToLink() {
 		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
@@ -306,17 +307,15 @@ export default function NavigationSubmenuEdit( {
 		<>
 			<BlockControls>
 				<ToolbarGroup>
-					{ ! openSubmenusOnClick && (
-						<ToolbarButton
-							name="link"
-							icon={ linkIcon }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ () => {
-								setIsLinkOpen( true );
-							} }
-						/>
-					) }
+					<ToolbarButton
+						name="link"
+						icon={ linkIcon }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ () => {
+							setIsLinkOpen( true );
+						} }
+					/>
 
 					<ToolbarButton
 						name="revert"
@@ -333,7 +332,6 @@ export default function NavigationSubmenuEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isLinkEditable={ ! openSubmenusOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
@@ -374,7 +372,7 @@ export default function NavigationSubmenuEdit( {
 							className="wp-block-navigation-item__label"
 						/>
 					) }
-					{ ! openSubmenusOnClick && isLinkOpen && (
+					{ isLinkOpen && (
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
