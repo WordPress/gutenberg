@@ -210,6 +210,18 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 			.getByRole( 'document', { name: 'Block: Image' } )
 			.first();
 		await expect( gridImages ).toHaveCount( 2 );
+		// The image moves the grid down when it loads, so the drag is measured
+		// once it has.
+		await expect
+			.poll( () =>
+				outside
+					.getByRole( 'img' )
+					.evaluate(
+						( image: HTMLImageElement ) =>
+							image.complete && image.naturalWidth > 0
+					)
+			)
+			.toBe( true );
 		// A click selects the block the way a user does before dragging it.
 		await outside.click();
 
