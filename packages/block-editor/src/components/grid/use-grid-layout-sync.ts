@@ -4,7 +4,12 @@ import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import { GridRect, getGridTrackPositions } from './utils';
+import {
+	GridRect,
+	getGridItemPlacement,
+	getGridTrackPositions,
+	getRequiredGridRowCount,
+} from './utils';
 import {
 	getInsertedBlockRect,
 	getInsertionSize,
@@ -123,24 +128,14 @@ export function useGridLayoutSync( {
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
-				const {
-					columnStart,
-					rowStart,
-					columnSpan = 1,
-					rowSpan = 1,
-				} = ( getBlockAttributes( clientId ) as GridItemAttributes )
-					.style?.layout ?? {};
-				if ( ! columnStart || ! rowStart ) {
+				const placement = getGridItemPlacement(
+					( getBlockAttributes( clientId ) as GridItemAttributes )
+						.style?.layout
+				);
+				if ( ! placement.columnStart || ! placement.rowStart ) {
 					continue;
 				}
-				occupiedRects.push(
-					new GridRect( {
-						columnStart,
-						rowStart,
-						columnSpan,
-						rowSpan,
-					} )
-				);
+				occupiedRects.push( new GridRect( placement ) );
 			}
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
@@ -344,10 +339,10 @@ export function useGridLayoutSync( {
 			}
 
 			// Ensure there's enough rows to fit all blocks.
-			const bottomMostRow = Math.max(
-				...occupiedRects.map( ( r ) => r.rowEnd )
+			const newRowCount = getRequiredGridRowCount(
+				occupiedRects,
+				rowCount
 			);
-			const newRowCount = Math.max( rowCount, bottomMostRow );
 			if (
 				gridLayout.columnCount !== columnCount ||
 				gridLayout.rowCount !== newRowCount

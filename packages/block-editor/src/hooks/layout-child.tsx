@@ -146,6 +146,11 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {
 			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		} else if (
+			hasViewportOverride( 'columnStart' ) &&
+			columnStart === null
+		) {
+			declarations[ 'grid-column' ] = 'auto';
 		}
 	}
 
@@ -160,6 +165,8 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-row' ] = `${ rowStart }`;
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		} else if ( hasViewportOverride( 'rowStart' ) && rowStart === null ) {
+			declarations[ 'grid-row' ] = 'auto';
 		}
 	}
 
@@ -440,6 +447,7 @@ function GridTools( {
 		isChildBlockAGrid,
 		selectedState,
 		parentStyle,
+		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -449,6 +457,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -482,6 +491,7 @@ function GridTools( {
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ clientId ]
@@ -605,7 +615,13 @@ function GridTools( {
 			) }
 			{ isManualGrid && (
 				<GridItemMovers
-					layout={ effectiveLayout }
+					// A stacked grid shows the block at its place in the
+					// stack, whatever its own layout says.
+					style={
+						stackedLayouts ? { layout: effectiveLayout } : style
+					}
+					selectedState={ selectedState }
+					isResponsiveEditing={ isResponsiveEditing }
 					parentLayout={ effectiveParentLayout }
 					onChange={ updateLayout }
 					gridClientId={ rootClientId }

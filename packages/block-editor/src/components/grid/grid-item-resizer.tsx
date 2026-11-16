@@ -5,7 +5,7 @@ import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import {
 	getComputedCSS,
-	getGridTracks,
+	getGridMeasurement,
 	getClosestTrack,
 	getRowEndForResize,
 	getGridItemPixelRect,
@@ -25,7 +25,7 @@ export function GridItemResizer( {
 	// Block wrappers are HTML elements.
 	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
 	const rootBlockElement = blockElement?.parentElement;
-	const { isManualPlacement } = parentLayout;
+	const { autoFit, isManualPlacement } = parentLayout;
 
 	if ( ! blockElement || ! rootBlockElement ) {
 		return null;
@@ -42,6 +42,7 @@ export function GridItemResizer( {
 				isManualPlacement &&
 				window.__experimentalEnableGridInteractivity
 			}
+			collapseEmptyColumnGaps={ autoFit === true }
 		/>
 	);
 }
@@ -52,7 +53,8 @@ function GridItemResizerInner( {
 	blockElement,
 	rootBlockElement,
 	onChange,
-	isManualGrid,
+	isManualGrid = false,
+	collapseEmptyColumnGaps,
 }: GridItemResizerInnerProps ) {
 	const [ resizeDirection, setResizeDirection ] = useState< string | null >(
 		null
@@ -106,11 +108,19 @@ function GridItemResizerInner( {
 	const justification: Record< string, string > = {
 		right: 'left',
 		left: 'right',
+		topRight: 'left',
+		bottomRight: 'left',
+		topLeft: 'right',
+		bottomLeft: 'right',
 	};
 
 	const alignment: Record< string, string > = {
 		top: 'flex-end',
 		bottom: 'flex-start',
+		topRight: 'flex-end',
+		topLeft: 'flex-end',
+		bottomRight: 'flex-start',
+		bottomLeft: 'flex-start',
 	};
 
 	// A `null` direction, while not resizing, matches no key.
@@ -141,13 +151,13 @@ function GridItemResizerInner( {
 				} }
 				enable={ {
 					bottom: enableSide.bottom,
-					bottomLeft: false,
-					bottomRight: false,
+					bottomLeft: enableSide.left && enableSide.bottom,
+					bottomRight: enableSide.bottom && enableSide.right,
 					left: enableSide.left,
 					right: enableSide.right,
 					top: enableSide.top,
-					topLeft: false,
-					topRight: false,
+					topLeft: enableSide.top && enableSide.left,
+					topRight: enableSide.top && enableSide.right,
 				} }
 				// Manual grids grow when a block is resized past the last row,
 				// so they aren't limited to the grid's current size. Sizes are
@@ -174,26 +184,15 @@ function GridItemResizerInner( {
 					setResizeDirection( direction );
 				} }
 				onResizeStop={ ( event, direction, boxElement ) => {
-					const columnGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'column-gap' )
+					const measurement = getGridMeasurement(
+						rootBlockElement,
+						collapseEmptyColumnGaps
 					);
-					const rowGap = parseFloat(
-						getComputedCSS( rootBlockElement, 'row-gap' )
-					);
-					const gridColumnTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-columns'
-						),
-						columnGap
-					);
-					const gridRowTracks = getGridTracks(
-						getComputedCSS(
-							rootBlockElement,
-							'grid-template-rows'
-						),
-						rowGap
-					);
+					if ( ! measurement ) {
+						return;
+					}
+					const { columns: gridColumnTracks, rows: gridRowTracks } =
+						measurement;
 					// Grid tracks start at the grid's content box, so manual
 					// grids measure the resized box from there.
 					const itemRect = isManualGrid
@@ -219,15 +218,19 @@ function GridItemResizerInner( {
 						? getRowEndForResize(
 								gridRowTracks,
 								rect.bottom,
-								rowGap
+								parseFloat(
+									getComputedCSS(
+										rootBlockElement,
+										'row-gap'
+									)
+								) || 0
 							)
 						: getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
 							1;
 					onChange( {
 						columnSpan: columnEnd - columnStart + 1,
 						rowSpan: rowEnd - rowStart + 1,
-						columnStart: isManualGrid ? columnStart : undefined,
-						rowStart: isManualGrid ? rowStart : undefined,
+						...( isManualGrid && { columnStart, rowStart } ),
 					} );
 				} }
 			/>

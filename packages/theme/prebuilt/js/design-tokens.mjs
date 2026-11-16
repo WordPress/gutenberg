@@ -869,7 +869,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-thumb-neutral': {
 		$description:
-			'Background color for thumbs with a neutral tone and normal emphasis (eg. progressbar indicator).',
+			'Background color for thumbs with a neutral tone and normal emphasis.',
 		$type: 'color',
 		group: 'color',
 		fallback: '#1e1e1e',
@@ -923,7 +923,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-thumb-brand': {
 		$description:
-			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track).',
+			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb).',
 		$type: 'color',
 		group: 'color',
 		fallback: 'var(--wp-admin-theme-color, #3858e9)',
@@ -941,7 +941,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-thumb-brand-active': {
 		$description:
-			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track) that are hovered, focused, or active.',
+			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb) that are hovered, focused, or active.',
 		$type: 'color',
 		group: 'color',
 		fallback: 'var(--wp-admin-theme-color, #3858e9)',
@@ -959,7 +959,7 @@ export const tokens = /** @type {const} */ ( {
 	},
 	'--wpds-color-background-thumb-brand-disabled': {
 		$description:
-			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb and filled track), in their disabled state.',
+			'Background color for thumbs with a brand tone and normal emphasis (eg. slider thumb), in their disabled state.',
 		$type: 'color',
 		group: 'color',
 		fallback: '#dbdbdb',
@@ -990,6 +990,96 @@ export const tokens = /** @type {const} */ ( {
 					alpha: 1,
 				},
 				css: '#dbdbdb',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-neutral': {
+		$description:
+			'Background color for indicators with a neutral tone and normal emphasis (eg. the filled portion of a progressbar or meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#1e1e1e',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.118, 0.118, 0.118 ],
+					hex: '#1e1e1e',
+					alpha: 1,
+				},
+				css: '#1e1e1e',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-brand': {
+		$description:
+			'Background color for indicators with a brand tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: 'var(--wp-admin-theme-color, #3858e9)',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.22, 0.345, 0.914 ],
+					hex: '#3858e9',
+					alpha: 1,
+				},
+				css: '#3858e9',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-success': {
+		$description:
+			'Background color for indicators with a success tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#005e12',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0, 0.369, 0.071 ],
+					hex: '#005e12',
+					alpha: 1,
+				},
+				css: '#005e12',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-warning': {
+		$description:
+			'Background color for indicators with a warning tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#6d4700',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.427, 0.278, 0 ],
+					hex: '#6d4700',
+					alpha: 1,
+				},
+				css: '#6d4700',
+			},
+		},
+	},
+	'--wpds-color-background-indicator-error': {
+		$description:
+			'Background color for indicators with an error tone and normal emphasis (eg. the filled portion of a meter).',
+		$type: 'color',
+		group: 'color',
+		fallback: '#9c0000',
+		modes: {
+			default: {
+				$value: {
+					colorSpace: 'srgb',
+					components: [ 0.612, 0, 0 ],
+					hex: '#9c0000',
+					alpha: 1,
+				},
+				css: '#9c0000',
 			},
 		},
 	},
@@ -2989,6 +3079,16 @@ export const groups = /** @type {const} */ ( {
 							'--wpds-color-background-thumb-brand-active',
 							'--wpds-color-background-thumb-brand-disabled',
 							'--wpds-color-background-thumb-neutral-weak-disabled',
+						],
+						groups: {},
+					},
+					indicator: {
+						tokens: [
+							'--wpds-color-background-indicator-neutral',
+							'--wpds-color-background-indicator-brand',
+							'--wpds-color-background-indicator-success',
+							'--wpds-color-background-indicator-warning',
+							'--wpds-color-background-indicator-error',
 						],
 						groups: {},
 					},
