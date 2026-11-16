@@ -18,6 +18,15 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-bottom: auto;
 	background-color: inherit;
+	// Directions of the scroll fades' gradients, from the columns scrolling
+	// under them towards the edge of the row.
+	--dataviews-view-table-fade-to-start: left;
+	--dataviews-view-table-fade-to-end: right;
+
+	&:dir(rtl) {
+		--dataviews-view-table-fade-to-start: right;
+		--dataviews-view-table-fade-to-end: left;
+	}
 
 	th {
 		text-align: left;
@@ -38,11 +47,7 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 			// scrolling under it show through, fading into the cell's own
 			// background. At the end of the scroll range the strip only covers
 			// the cell's own space, so it needs no scroll state.
-			mask-image: linear-gradient(to right, transparent, #000 $scroll-fade-size);
-
-			&:dir(rtl) {
-				mask-image: linear-gradient(to left, transparent, #000 $scroll-fade-size);
-			}
+			mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 $scroll-fade-size);
 
 			// Divider between the strip and the actions, shown while there are
 			// more columns to scroll to.
@@ -79,14 +84,16 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
 		background-color: inherit;
 
+		// The fade cells at the ends of each row take the place of the outer
+		// padding of the first and last columns, so the columns do not move.
 		td:first-child,
 		th:first-child {
-			padding-left: var(--wpds-dimension-padding-2xl);
+			padding-inline-start: 0;
 		}
 
 		td:last-child,
 		th:last-child {
-			padding-right: var(--wpds-dimension-padding-2xl);
+			padding-inline-end: 0;
 		}
 
 		&:last-child {
@@ -185,22 +192,29 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 
 			&:has(.dataviews-view-table-header-button) {
-				padding-left: var(--wpds-dimension-padding-xs);
-				padding-right: var(--wpds-dimension-padding-xs);
+				padding-inline: var(--wpds-dimension-padding-xs);
 
 				.dataviews-view-table-header-button {
 					gap: var(--wpds-dimension-gap-xs);
 				}
 			}
 
+			// Next to the fade cells, the header button pulls back by its own
+			// padding, so that its label lines up with the cells.
 			&:has(.dataviews-view-table-header-button):first-child {
-				// Table cell padding minus the header button padding.
-				padding-left: var(--wpds-dimension-padding-lg);
+				padding-inline-start: 0;
+
+				.dataviews-view-table-header-button {
+					margin-inline-start: calc(-1 * var(--wpds-dimension-padding-sm));
+				}
 			}
 
 			&:has(.dataviews-view-table-header-button):last-child {
-				// Table cell padding minus the header button padding.
-				padding-right: var(--wpds-dimension-padding-lg);
+				padding-inline-end: 0;
+
+				.dataviews-view-table-header-button {
+					margin-inline-end: calc(-1 * var(--wpds-dimension-padding-sm));
+				}
 			}
 		}
 	}
@@ -263,16 +277,8 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
 	// Density style overrides.
 	&.has-compact-density {
-		thead {
-			th {
-				&:has(.dataviews-view-table-header-button):not(:first-child) {
-					padding-left: 0;
-				}
-
-				&:has(.dataviews-view-table-header-button):not(:last-child) {
-					padding-right: 0;
-				}
-			}
+		thead th:has(.dataviews-view-table-header-button) {
+			padding-inline: 0;
 		}
 		td,
 		th {
@@ -297,88 +303,46 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		}
 	}
 
-	// Room for the fade strip before the sticky actions column's start
-	// padding, in every density.
-	td,
-	th {
-		&.dataviews-view-table__actions-column {
-			padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-md));
-		}
+	// The sticky actions column ends the row in place of the fade cell, and
+	// keeps room for its fade strip before its start padding. Repeats `tr` and
+	// the cell types to outrank the padding of the first and last columns.
+	tr > td.dataviews-view-table__actions-column,
+	tr > th.dataviews-view-table__actions-column {
+		padding-inline: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-md)) var(--wpds-dimension-padding-2xl);
 	}
 
-	&.has-compact-density {
-		td,
-		th {
-			&.dataviews-view-table__actions-column {
-				padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
-			}
-		}
+	&.has-compact-density tr > td.dataviews-view-table__actions-column,
+	&.has-compact-density tr > th.dataviews-view-table__actions-column {
+		padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
 	}
 
 	// Sticky cells at the edges of each row fade the columns scrolling under
 	// them into the row's own background. At the matching end of the scroll
 	// range a cell only covers its own space, so it needs no scroll state.
+	// With actions, the sticky actions column fades the end instead.
 	tr::before,
 	&:not(.has-actions) tr::after {
 		content: "";
 		display: table-cell;
 		position: sticky;
 		width: $scroll-fade-size;
+		// Keeps the width against the shrink-to-fit width of the columns.
 		min-width: $scroll-fade-size;
 		padding: 0;
 		background-color: inherit;
 		pointer-events: none;
 	}
 
-	// The start of each row.
-	tr {
-		&::before {
-			inset-inline-start: 0;
-			// Above the positioned content of the cells that follow it.
-			z-index: 1;
-			mask-image: linear-gradient(to left, transparent, #000);
-		}
-
-		&:dir(rtl)::before {
-			mask-image: linear-gradient(to right, transparent, #000);
-		}
-
-		// The fade cell takes the place of the first column's start padding.
-		// The header button pulls back by its own padding, so that its label
-		// lines up with the cells.
-		> :is(td, th):first-child,
-		> th:has(.dataviews-view-table-header-button):first-child {
-			padding-inline-start: 0;
-		}
-
-		> th:first-child .dataviews-view-table-header-button {
-			margin-inline-start: calc(-1 * var(--wpds-dimension-padding-sm));
-		}
+	tr::before {
+		inset-inline-start: 0;
+		// Above the positioned content of the cells that follow it.
+		z-index: 1;
+		mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-start), transparent, #000);
 	}
 
-	// Without actions, the end of each row. With actions, the sticky actions
-	// column fades the columns instead.
-	&:not(.has-actions) tr {
-		&::after {
-			inset-inline-end: 0;
-			mask-image: linear-gradient(to right, transparent, #000);
-		}
-
-		&:dir(rtl)::after {
-			mask-image: linear-gradient(to left, transparent, #000);
-		}
-
-		// The fade cell takes the place of the last column's end padding.
-		// The header button pulls back by its own padding, so that the label
-		// of an end-aligned column lines up with the cells.
-		> :last-child,
-		> th:has(.dataviews-view-table-header-button):last-child {
-			padding-inline-end: 0;
-		}
-
-		> th:last-child .dataviews-view-table-header-button {
-			margin-inline-end: calc(-1 * var(--wpds-dimension-padding-sm));
-		}
+	tr::after {
+		inset-inline-end: 0;
+		mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000);
 	}
 }
 

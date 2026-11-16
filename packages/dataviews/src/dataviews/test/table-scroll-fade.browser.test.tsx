@@ -123,17 +123,18 @@ function scrollToEnd() {
 
 describe( 'DataViews table scroll fade', () => {
 	describe( 'with actions', () => {
-		it( 'fades the columns scrolling under the actions column', async () => {
-			await render( <PostsTable withActions /> );
+		it.each( [ 'ltr', 'rtl' ] as const )(
+			'keeps room for the fade before the actions and the row padding after them (%s)',
+			async ( dir ) => {
+				await render( <PostsTable withActions dir={ dir } /> );
 
-			const style = getComputedStyle( getActionsHeader() );
-			expect( style.maskImage ).toBe(
-				`linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
-			);
-			expect( style.paddingInlineStart ).toBe(
-				`${ FADE_SIZE + CELL_PADDING }px`
-			);
-		} );
+				const style = getComputedStyle( getActionsHeader() );
+				expect( style.paddingInlineStart ).toBe(
+					`${ FADE_SIZE + CELL_PADDING }px`
+				);
+				expect( style.paddingInlineEnd ).toBe( `${ FADE_SIZE }px` );
+			}
+		);
 
 		it( 'keeps the start padding of the actions after the fade', async () => {
 			await render( <PostsTable withActions density="compact" /> );
@@ -141,14 +142,6 @@ describe( 'DataViews table scroll fade', () => {
 			expect(
 				getComputedStyle( getActionsHeader() ).paddingInlineStart
 			).toBe( `${ FADE_SIZE + COMPACT_CELL_PADDING }px` );
-		} );
-
-		it( 'flips the fade in RTL', async () => {
-			await render( <PostsTable withActions dir="rtl" /> );
-
-			expect( getComputedStyle( getActionsHeader() ).maskImage ).toBe(
-				`linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
-			);
 		} );
 
 		it( 'shows the divider until the end of the scroll range', async () => {
@@ -178,33 +171,30 @@ describe( 'DataViews table scroll fade', () => {
 		} );
 	} );
 
-	describe( 'without actions', () => {
-		it( 'adds a sticky fade cell to the end of every row', async () => {
-			await render( <PostsTable /> );
-
-			const rows = getRows();
-			expect( rows.length ).toBeGreaterThan( 1 );
-			for ( const row of rows ) {
-				const fade = getComputedStyle( row, '::after' );
-				expect( fade.display ).toBe( 'table-cell' );
-				expect( fade.position ).toBe( 'sticky' );
-				expect( fade.insetInlineEnd ).toBe( '0px' );
-				expect( fade.maskImage ).toBe(
-					'linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
-				);
-			}
-		} );
-
-		it( 'flips the fade in RTL', async () => {
-			await render( <PostsTable dir="rtl" /> );
-
-			expect(
-				getComputedStyle( getRows()[ 0 ], '::after' ).maskImage
-			).toBe(
-				'linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
+	// Every fade is opaque towards the edge of the row it sits at.
+	it.each( [
+		[ 'ltr', 'left', 'right' ],
+		[ 'rtl', 'right', 'left' ],
+	] as const )(
+		'fades towards the edges of the rows (%s)',
+		async ( dir, start, end ) => {
+			await render( <PostsTable dir={ dir } /> );
+			const row = getRows()[ 0 ];
+			expect( getComputedStyle( row, '::before' ).maskImage ).toBe(
+				`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
 			);
-		} );
+			expect( getComputedStyle( row, '::after' ).maskImage ).toBe(
+				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
+			);
 
+			await render( <PostsTable withActions dir={ dir } /> );
+			expect( getComputedStyle( getActionsHeader() ).maskImage ).toBe(
+				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
+			);
+		}
+	);
+
+	describe( 'without actions', () => {
 		// At the end of the scroll range, the fade must cover only its own
 		// space, not the last column.
 		it( 'keeps the space of the fade free after the last column', async () => {
@@ -278,35 +268,6 @@ describe( 'DataViews table scroll fade', () => {
 	} );
 
 	describe( 'leading edge', () => {
-		it.each( [ false, true ] )(
-			'adds a sticky fade cell to the start of every row (with actions: %s)',
-			async ( withActions ) => {
-				await render( <PostsTable withActions={ withActions } /> );
-
-				const rows = getRows();
-				expect( rows.length ).toBeGreaterThan( 1 );
-				for ( const row of rows ) {
-					const fade = getComputedStyle( row, '::before' );
-					expect( fade.display ).toBe( 'table-cell' );
-					expect( fade.position ).toBe( 'sticky' );
-					expect( fade.insetInlineStart ).toBe( '0px' );
-					expect( fade.maskImage ).toBe(
-						'linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
-					);
-				}
-			}
-		);
-
-		it( 'flips the fade in RTL', async () => {
-			await render( <PostsTable dir="rtl" /> );
-
-			expect(
-				getComputedStyle( getRows()[ 0 ], '::before' ).maskImage
-			).toBe(
-				'linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
-			);
-		} );
-
 		// At the start of the scroll range, the fade must cover only its own
 		// space, not the first column.
 		it( 'keeps the space of the fade free before the first column', async () => {
