@@ -115,6 +115,7 @@
 		{ "path": "routes/navigation" },
 		{ "path": "routes/navigation-edit" },
 		{ "path": "routes/navigation-list" },
+		{ "path": "routes/navigation-list/tsconfig.test.json" },
 		{ "path": "routes/pattern" },
 		{ "path": "routes/pattern-list" },
 		{ "path": "routes/post" },

@@ -12,21 +12,17 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
+import { useRenameNavigationMenuAction } from './actions/rename-navigation-menu';
+import {
+	NAVIGATION_POST_TYPE,
+	PRELOADED_NAVIGATION_MENUS_QUERY,
+} from './constants';
 import { AddNavigationModal } from './add-navigation';
 import './style.scss';
 
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-
-const NAVIGATION_POST_TYPE = 'wp_navigation';
-
-const PRELOADED_NAVIGATION_MENUS_QUERY = {
-	per_page: 100,
-	status: [ 'publish', 'draft' ],
-	order: 'desc',
-	orderby: 'date',
-};
 
 function getItemId( item: Post ) {
 	return item.id.toString();
@@ -119,14 +115,23 @@ function NavigationListView( {
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
+	const renameAction = useRenameNavigationMenuAction();
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType: NAVIGATION_POST_TYPE,
 		context: 'list',
 	} );
 
+	// The registered `rename-post` action edits the name only, and a
+	// Navigation Menu's slug is what Navigation blocks reference portably, so
+	// this screen renames with both.
 	const actions: Action< Post >[] = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ editAction, postTypeActions ]
+		() => [
+			editAction,
+			...postTypeActions.map( ( action ) =>
+				action.id === 'rename-post' ? renameAction : action
+			),
+		],
+		[ editAction, renameAction, postTypeActions ]
 	);
 
 	const selection =
