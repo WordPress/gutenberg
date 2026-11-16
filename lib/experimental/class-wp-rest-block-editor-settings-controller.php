@@ -105,6 +105,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 
 			if ( 'mobile' === $context_param ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
+			} else {
+				$settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) ) );
 			}
 
 			return rest_ensure_response( $settings );
