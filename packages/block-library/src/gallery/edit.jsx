@@ -91,9 +91,7 @@ export default function GalleryEdit( props ) {
 		className,
 		clientId,
 		insertBlocksAfter,
-		isContentLocked,
 		context,
-		__unstableLayoutClassNames: layoutClassNames,
 	} = props;
 
 	const postId = context?.postId;
@@ -114,7 +112,7 @@ export default function GalleryEdit( props ) {
 			)
 		: LINK_OPTIONS;
 
-	const { align, columns, imageCrop, layout } = attributes;
+	const { layout } = attributes;
 	const isDynamic = !! attributes.dynamicContent;
 	// The site default only applies to images being added, which a dynamic
 	// gallery never has, so match the server render.
@@ -395,23 +393,7 @@ export default function GalleryEdit( props ) {
 		className: clsx(
 			className,
 			'has-nested-images',
-			`wp-block-gallery-${ clientId }`,
-			// In dynamic mode there are no inner blocks and the gallery isn't
-			// rendered through the `Gallery` component, so the classes that
-			// component normally composes onto the `<figure>` (see `gallery.jsx`)
-			// must be added here to keep the preview's flex/crop layout matching
-			// the static gallery and the frontend.
-			isDynamic && [
-				layoutClassNames,
-				'blocks-gallery-grid',
-				{
-					[ `align${ align }` ]: align,
-					[ `columns-${ columns }` ]:
-						isFlexLayout && columns !== undefined,
-					'columns-default': isFlexLayout && columns === undefined,
-					'is-cropped': isFlexLayout && imageCrop,
-				},
-			]
+			`wp-block-gallery-${ clientId }`
 		),
 	} );
 
@@ -568,11 +550,12 @@ export default function GalleryEdit( props ) {
 			) : (
 				<Gallery
 					{ ...props }
-					isContentLocked={ isContentLocked }
 					blockProps={ innerBlocksProps }
 					insertBlocksAfter={ insertBlocksAfter }
 					multiGallerySelection={ multiGallerySelection }
-				/>
+				>
+					{ innerBlocksProps.children }
+				</Gallery>
 			) }
 		</>
 	);
