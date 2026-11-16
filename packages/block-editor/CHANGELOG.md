@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
@@ -12,6 +13,9 @@
 
 ### Bug Fixes
 
+-   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
+-   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
+-   Block quick navigation: Do not offer navigation to a List View panel subsumed by an ancestor's List View ([#86729](https://github.com/WordPress/gutenberg/pull/86729)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
 -   Inserter: Do not pull focus back from the editor canvas after inserting a block from the main inserter ([#86610](https://github.com/WordPress/gutenberg/pull/86610)).
 -   Block Styles: Show the active style variation in forced colors mode ([#86378](https://github.com/WordPress/gutenberg/pull/86378)).

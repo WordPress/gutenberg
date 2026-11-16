@@ -16,9 +16,13 @@
 -   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
+-   `Snackbar`: Increase the action link hit target ([#86823](https://github.com/WordPress/gutenberg/pull/86823)).
 
 ### Bug Fixes
 
+-   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
+-   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
+-   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
 -   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
 -   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
 -   `Card`: Use theme tokens for borders, corners, and spacing ([#85857](https://github.com/WordPress/gutenberg/pull/85857)).
@@ -32,6 +36,7 @@
 -   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).
 -   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
 -   `Button`, `Toolbar`: Show the pressed state in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
+-   `Toolbar`: Use semantic border colors and the standard outline focus ring ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 -   `TimePicker`: Keep the hours field focus ring visible above the minutes field ([#86442](https://github.com/WordPress/gutenberg/pull/86442)).
 -   `InputControl`: Remove the leftover maximum width on the label wrapper so labels no longer wrap before reaching the input's width ([#86363](https://github.com/WordPress/gutenberg/pull/86363)).
 -   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).
@@ -39,6 +44,7 @@
 -   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
 -   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
+-   `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across themes and interaction states, including numbered toolbar buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
 
 ### Internal
