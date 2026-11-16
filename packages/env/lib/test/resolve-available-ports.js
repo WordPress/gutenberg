@@ -71,6 +71,22 @@ describe( 'resolve-available-ports', () => {
 				resolver.resolve( 8888, 'env.tests.port', true )
 			).rejects.toThrow( /conflicts with another wp-env service/ );
 		} );
+
+		it( 'should only count a published port as available for the service that holds it', async () => {
+			findAvailablePort.mockResolvedValue( 8889 );
+
+			const resolver = createPortResolver( null, {
+				ownPorts: {
+					'env.development.port': 8889,
+					'env.tests.port': 8890,
+				},
+			} );
+			await resolver.resolve( 8888, 'env.development.port' );
+
+			expect( findAvailablePort ).toHaveBeenCalledWith(
+				expect.objectContaining( { ownPort: 8889 } )
+			);
+		} );
 	} );
 
 	describe( 'resolveConfigPorts', () => {

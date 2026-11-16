@@ -29,10 +29,12 @@ const PREFERRED_PORTS = {
  * after environments have been merged but before URLs are set. This
  * allows `appendPortToWPConfigs` to use the resolved ports directly.
  *
- * @param {Object} spinner A CLI spinner for displaying progress.
+ * @param {Object} spinner          A CLI spinner for displaying progress.
+ * @param {Object} options          Options for the resolver.
+ * @param {Object} options.ownPorts The ports this environment publishes right now, by config path.
  * @return {Object} A port resolver with a `resolve` method.
  */
-function createPortResolver( spinner ) {
+function createPortResolver( spinner, { ownPorts = {} } = {} ) {
 	const usedPorts = [];
 
 	return {
@@ -72,6 +74,8 @@ function createPortResolver( spinner ) {
 				const resolvedPort = await findAvailablePort( {
 					preferredPort,
 					exclude: usedPorts,
+					// Only the service that holds a port may keep it.
+					ownPort: ownPorts[ configPath ],
 				} );
 
 				usedPorts.push( resolvedPort );

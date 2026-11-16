@@ -404,6 +404,33 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the HTTP ports the environment's running containers publish.
+	 *
+	 * @param {Object} config                         The wp-env config object, or only its paths.
+	 * @param {string} config.dockerComposeConfigPath Path to the docker-compose.yml file.
+	 * @return {Promise<Object.<string, number>>} The published ports, keyed by config path (e.g. "env.development.port"). Empty if nothing runs.
+	 */
+	async getPublishedPorts( { dockerComposeConfigPath } ) {
+		const ports = {};
+		await Promise.all(
+			Object.entries( {
+				wordpress: 'env.development.port',
+				'tests-wordpress': 'env.tests.port',
+				phpmyadmin: 'env.development.phpmyadminPort',
+				'tests-phpmyadmin': 'env.tests.phpmyadminPort',
+			} ).map( async ( [ service, configPath ] ) => {
+				const port = await this._getPublicDockerPort( service, 80, {
+					config: dockerComposeConfigPath,
+				} ).then( Number, () => null );
+				if ( port ) {
+					ports[ configPath ] = port;
+				}
+			} )
+		);
+		return ports;
+	}
+
+	/**
 	 * Get the warning message for destroy confirmation.
 	 *
 	 * @return {string} Warning message.

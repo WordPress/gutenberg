@@ -255,6 +255,17 @@ class PhpRuntime {
 	}
 
 	/**
+	 * Get the port the site's running server listens on.
+	 *
+	 * @param {Object} config The wp-env config object, or only its paths.
+	 * @return {Promise<Object.<string, number>>} The port, keyed by config path. Empty if the server does not run.
+	 */
+	async getPublishedPorts( config ) {
+		const server = await getServer( config );
+		return server ? { 'env.development.port': server.port } : {};
+	}
+
+	/**
 	 * Get the status of the environment.
 	 *
 	 * @param {Object} config The wp-env config object.
