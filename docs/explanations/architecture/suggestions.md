@@ -491,11 +491,13 @@ stateDiagram-v2
 **The save pass** (`Gutenberg_Suggestion_Reconciler`, `lib/compat/wordpress-7.2/`) runs on every write to a post whose type supports notes. On `wp_insert_post_data` (priority 999, after kses) it records the content the post had before the write; on `wp_insert_post` (priority 1, after the row is written and before a REST response is prepared) it compares the anchors of the previous and the saved content, read by `gutenberg_get_suggestion_anchor_index()`:
 
 - a provisional decision whose anchor is gone becomes final, whoever saves, so a decision made by one collaborator is finalized by another's save. A post-title accept is final once the saved title equals the proposal; a post-title reject on the next post write.
-- another author's pending suggestion whose anchor the write removed becomes `outdated`. A write without a user (cron, WP-CLI) counts as another author. The saver's own pending notes are left to the note collector.
+- another author's pending suggestion whose anchor the write removed becomes `outdated`, even when its note was already resolved. A write without a user (cron, WP-CLI) counts as another author. The saver's own pending notes are left to the note collector.
 
 The pass runs for post updates and own-draft autosaves (which update the post itself), and skips revisions and autosave revisions. It is idempotent, and a nested `wp_update_post()` from a `save_post` handler pairs with its own commit. Finalizing sends no mail. The pass records `_wp_suggestion_resolved_by`; the server also stamps `_wp_suggestion_decided_by` when a provisional status is written. Both are read-only over REST.
 
 **Final statuses are the server's.** A REST write of `applied`, `rejected` or `outdated` is refused with a 403 (`rest_suggestion_status_server_only`), so an editor session from before this change cannot finalize a decision its content never reached. The `gutenberg_allow_client_final_suggestion_status` filter lifts the refusal (the e2e suite uses it to seed stuck notes).
+
+**A suggestion is decided, not resolved.** A REST write that sets a suggestion note to `approved` before its decision is final (`pending` or a provisional status) is refused with a 409 (`rest_suggestion_pending`). A resolved note would hide the suggestion while its marker stays in the content, where it could still be accepted. The editor shows Accept and Reject in place of Resolve for the same reason.
 
 **On load**, a provisional decision whose anchor is still in the content means the decision was never saved, so the note shows Accept and Reject again, with "{Name} accepted this suggestion, but the post was not saved." Nothing is rewritten: the stored status stays provisional until someone decides again or a save finalizes it.
 
