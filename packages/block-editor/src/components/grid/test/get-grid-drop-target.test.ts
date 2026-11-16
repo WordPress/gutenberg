@@ -4,12 +4,12 @@ import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from '../get-grid-drop-target';
-import { getGridTracks } from '../utils';
+import { getGridTracksFromTemplate } from '../utils';
 import type { GridRect } from '../utils';
 
 // Three 100px columns and three 50px rows, with 10px gaps.
-const columnTracks = getGridTracks( '100px 100px 100px', 10 );
-const rowTracks = getGridTracks( '50px 50px 50px', 10 );
+const columnTracks = getGridTracksFromTemplate( '100px 100px 100px', 10 );
+const rowTracks = getGridTracksFromTemplate( '50px 50px 50px', 10 );
 
 function toPlain( rect: GridRect ) {
 	return {
@@ -127,7 +127,10 @@ describe( 'getGridDropTarget()', () => {
 	} );
 
 	it( 'handles uneven track sizes', () => {
-		const unevenColumns = getGridTracks( '40px 200px 60px', 10 );
+		const unevenColumns = getGridTracksFromTemplate(
+			'40px 200px 60px',
+			10
+		);
 		expect(
 			getGridDropTarget( {
 				x: 150,

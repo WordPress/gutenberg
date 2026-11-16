@@ -13,7 +13,7 @@ import {
 import type { PixelRect } from '../rotation';
 import {
 	getGridRectFromPixelRect,
-	getGridTracks,
+	getGridTracksFromTemplate,
 } from '../../components/grid/utils';
 
 describe( 'normalizeAngle', () => {
@@ -261,7 +261,10 @@ describe( 'getRotatedOverlayStyle()', () => {
 
 describe( 'getRotatedBoundingRect()', () => {
 	// Six 100px columns and rows, without gaps.
-	const tracks = getGridTracks( '100px 100px 100px 100px 100px 100px', 0 );
+	const tracks = getGridTracksFromTemplate(
+		'100px 100px 100px 100px 100px 100px',
+		0
+	);
 
 	function toCells( rect: PixelRect ) {
 		const cells = getGridRectFromPixelRect( rect, tracks, tracks );
