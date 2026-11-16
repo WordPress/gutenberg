@@ -28,8 +28,8 @@ export type KnobProps = Omit<
 		 * For rotation in degrees, use 360. The dial can count multiple turns
 		 * between `min` and `max`. Use a positive, finite number.
 		 * By default the entire range fits on the dial in one sweep.
-		 * If a step covers a full turn or more, tap the left half to subtract
-		 * one step or the right half to add one.
+		 * Tap the left or right half to step when a step covers at least a full
+		 * turn, or when multiple values share two alternating headings.
 		 */
 		unitsPerTurn?: number;
 		/**

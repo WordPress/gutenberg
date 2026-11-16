@@ -8,7 +8,7 @@ import * as KnobStories from './index.story';
 
 # Knob
 
-Use a knob when the position of a dial helps someone choose a number, such as the direction of a gradient. A click or tap on the dial selects that position. Dragging around its center adjusts the value continuously. For precise entry, a numeric field can share the same controlled value.
+Use a knob when the position of a dial helps someone choose a number, such as the direction of a gradient. Click or tap to choose a nearby step, or drag around the center to keep turning. For precise entry, a numeric field can share the same controlled value.
 
 ## Choose the range
 
@@ -20,7 +20,7 @@ Set `wrap` when the first value follows the last. For whole degrees, use `min={ 
 
 ## Count turns
 
-Set `unitsPerTurn` when dial positions have a physical meaning. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
+Set `unitsPerTurn` when dial positions have a physical meaning. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. A positional tap picks the closest heading among selectable steps within one turn of the current value in either direction. When two values point the same way, the nearer value wins. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
 
 `min` and `max` bound the total value. Add `wrap` to repeat that range indefinitely. For a seamless loop, include one step per position. With whole degrees, use 0 to 359 for one turn or 0 to 719 for two turns before the value returns to zero.
 
@@ -28,7 +28,7 @@ The range can end partway through a turn. With 0 to 500 and 360 units per turn, 
 
 <Canvas of={ KnobStories.PartialTurns } />
 
-For values measured in turns, use `unitsPerTurn={ 1 }`. A step of 0.25 allows quarter turns. If one step spans an entire turn or more, tap the left half to subtract a step or the right half to add one. Dragging still follows the physical scale. Include a visible value and a description of the tap gesture when multiple values share the same heading.
+For values measured in turns, use `unitsPerTurn={ 1 }`. A step of 0.25 allows quarter turns. If one step spans an entire turn or more, tap the left half to subtract a step or the right half to add one. The same gesture applies to half-turn steps when several values share the two headings. Dragging still follows the physical scale. Include a visible value and describe the tap gesture in these cases.
 
 <Canvas of={ KnobStories.WholeTurns } />
 
