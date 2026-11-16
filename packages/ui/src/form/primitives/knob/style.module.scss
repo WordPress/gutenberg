@@ -23,22 +23,28 @@
 		}
 
 		.thumb {
+			display: grid;
+			place-items: center;
 			inline-size: 100%;
 			block-size: 100%;
 			user-select: none;
-			fill: var(--wpds-color-background-interactive-neutral);
+			fill: var(--wpds-color-background-thumb-brand);
 			stroke: var(--wpds-color-stroke-interactive-neutral);
-			color: var(--wpds-color-foreground-interactive-brand);
+			stroke-width: var(--wpds-border-width-xs);
 
 			&:has(input:enabled) {
 				touch-action: none;
-				cursor: var(--wpds-cursor-control);
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
 			}
 
 			svg {
 				display: block;
-				inline-size: 100%;
-				block-size: 100%;
+				inline-size: var(--wpds-dimension-size-md);
+				block-size: var(--wpds-dimension-size-md);
 			}
 
 			/* Pointer positions belong to the dial. The range handles keyboard and AT input. */
@@ -49,67 +55,26 @@
 
 			@media (forced-colors: none) {
 				&:has(input:enabled):is(:hover, :active) {
+					fill: var(--wpds-color-background-thumb-brand-active);
 					stroke: var(--wpds-color-stroke-interactive-neutral-active);
-					color: var(--wpds-color-foreground-interactive-brand-active);
 				}
 
 				&:has(input:disabled) {
-					fill: var(--wpds-color-background-interactive-neutral-disabled);
+					fill: var(--wpds-color-background-thumb-brand-disabled);
 					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
-					color: var(--wpds-color-foreground-interactive-brand-disabled);
 				}
 			}
 
 			@media (forced-colors: active) {
 				forced-color-adjust: none;
-				fill: Canvas;
+				fill: Highlight;
 				stroke: ButtonText;
-				color: Highlight;
 
 				&:has(input:disabled) {
 					stroke: GrayText;
-					color: GrayText;
+					fill: GrayText;
 				}
 			}
-		}
-
-		.track,
-		.fill,
-		.pointer {
-			stroke-width: var(--wpds-border-width-sm);
-			stroke-linecap: round;
-		}
-
-		.track {
-			stroke: var(--wpds-color-stroke-interactive-neutral);
-
-			.thumb:has(input:disabled) & {
-				stroke: inherit;
-			}
-
-			@media (forced-colors: active) {
-				stroke: inherit;
-			}
-		}
-
-		.fill {
-			stroke: var(--wpds-color-background-indicator-brand);
-
-			.thumb:has(input:disabled) & {
-				stroke: currentColor;
-			}
-
-			@media (forced-colors: active) {
-				stroke: currentColor;
-			}
-		}
-
-		.face {
-			stroke-width: var(--wpds-border-width-xs);
-		}
-
-		.pointer {
-			stroke: currentColor;
 		}
 	}
 }

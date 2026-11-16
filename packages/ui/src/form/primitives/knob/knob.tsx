@@ -4,6 +4,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import { DirectionProvider } from '../../../utils/direction-provider';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	BOUNDED_SWEEP,
@@ -79,11 +80,11 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		let degreesPerStep = wrap
 			? 360 / ( lastStep + 1 )
 			: BOUNDED_SWEEP / Math.max( 1, lastStep );
-		if (
+		const hasUnitsPerTurn =
 			unitsPerTurn !== undefined &&
 			Number.isFinite( unitsPerTurn ) &&
-			unitsPerTurn > 0
-		) {
+			unitsPerTurn > 0;
+		if ( hasUnitsPerTurn ) {
 			minAngle = ( min / unitsPerTurn ) * 360;
 			degreesPerStep = ( step / unitsPerTurn ) * 360;
 		}
@@ -96,8 +97,6 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const seamless =
 			wrap &&
 			Number.isInteger( Number( cycleInTurns.toPrecision( 15 ) ) );
-		const sweep = seamless ? 360 : Math.min( 360, maxAngle - minAngle );
-		const fullCircle = sweep === 360;
 
 		function changeIndex( next: number ) {
 			const nextIndex = wrap
@@ -235,6 +234,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					{ ...props }
 					ref={ ref }
 					className={ clsx(
+						defenseStyles.div,
 						resetStyles[ 'box-sizing' ],
 						styles.root,
 						className
@@ -269,49 +269,29 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						} }
 					>
 						<svg
-							viewBox="0 0 48 48"
+							viewBox="0 0 32 32"
 							aria-hidden="true"
 							focusable="false"
 						>
-							<g
-								transform={ `rotate(${ ( fullCircle ? 0 : minAngle ) - 90 } 24 24)` }
-								fill="none"
-							>
-								<circle
-									className={ styles.track }
-									cx="24"
-									cy="24"
-									r="21"
-									pathLength="360"
-									strokeDasharray={ `${ sweep } 360` }
-								/>
-								{ fullCircle && (
-									<path
-										className={ styles.track }
-										d="M45 24h-3"
-									/>
-								) }
-								{ ! fullCircle && index > 0 && (
-									<circle
-										className={ styles.fill }
-										cx="24"
-										cy="24"
-										r="21"
-										pathLength="360"
-										strokeDasharray={ `${ angle - minAngle } 360` }
-									/>
-								) }
-							</g>
 							<circle
-								className={ styles.face }
-								cx="24"
-								cy="24"
-								r="16"
+								cx="16"
+								cy="16"
+								r="15.5"
+								fill="none"
+								pathLength="360"
+								strokeDasharray={
+									! wrap && ! hasUnitsPerTurn
+										? `${ BOUNDED_SWEEP } 360`
+										: undefined
+								}
+								transform={ `rotate(${ -BOUNDED_SWEEP / 2 - 90 } 16 16)` }
 							/>
-							<path
-								className={ styles.pointer }
-								d="M24 12v12"
-								transform={ `rotate(${ angle } 24 24)` }
+							<circle
+								cx="16"
+								cy="9"
+								r="4"
+								stroke="none"
+								transform={ `rotate(${ angle } 16 16)` }
 							/>
 						</svg>
 					</Slider.Thumb>
