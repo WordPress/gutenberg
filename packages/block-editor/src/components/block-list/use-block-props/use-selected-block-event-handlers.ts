@@ -534,6 +534,8 @@ export function useEventHandlers( {
 						endOnMouseMove
 					);
 					ownerDocument.removeEventListener( 'scroll', over );
+					document.removeEventListener( 'drop', end );
+					document.removeEventListener( 'mousemove', endOnMouseMove );
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
@@ -562,6 +564,14 @@ export function useEventHandlers( {
 				// `dragstart`, so none reaches this listener mid-drag.
 				ownerDocument.addEventListener( 'mousemove', endOnMouseMove );
 				ownerDocument.addEventListener( 'scroll', over );
+				// When the canvas is an iframe, the drag can also end in the
+				// editor's document, such as on a drop target drawn over the
+				// canvas. Neither that `drop` nor the mouse moves that follow
+				// it reach the canvas document.
+				if ( document !== ownerDocument ) {
+					document.addEventListener( 'drop', end );
+					document.addEventListener( 'mousemove', endOnMouseMove );
+				}
 				endDrag = end;
 
 				startDraggingBlocks( clientIds );
