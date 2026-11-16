@@ -43,7 +43,7 @@ This applies when the project enables the `@wordpress/use-recommended-components
 
 -   Use the new component's design as it is. Do not override its appearance: no custom colors, borders, radii, typography, shadows or spacing inside the component, and no CSS that only reproduces how the legacy component looked. Remove that CSS during the migration. Use the component's props for variants, tones and sizes.
 -   The only styles that belong with the component are sizing and layout, such as its width or its position in a layout. The component does not decide those, so the code that uses it does, usually with `Stack` or a layout style on a wrapper.
--   Delete selectors that target internal `.components-*` class names. They do not apply to `@wordpress/ui` components and are not stable.
+-   Delete selectors that target internal `.components-*` class names. They do not apply to `@wordpress/ui` components and are not stable. A selector can be shared with legacy components that remain in the project, so remove it only after checking that no remaining component uses it.
 -   Replace legacy Sass color variables and `--wp-admin-*` custom properties in the code you touch with `--wpds-*` tokens chosen by semantic role. Use the `wp-theme` skill.
 -   Replace hand-built layout and text around the component with `Stack`, `Text` and `Link` when that matches the existing design.
 -   Prefer a recommended `@wordpress/ui` or `@wordpress/components` component over one from an application or plugin component library when it covers the same use.
@@ -62,6 +62,7 @@ This applies when the project enables the `@wordpress/use-recommended-components
 
 This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it.
 
+-   Bulk suppressions need ESLint 9.24 or later. Check the installed version, for example in the output of the `wp-ui-setup` inspection script. If it is older, suggest upgrading ESLint, or set the rule to `warn` for now and skip the baseline.
 -   Do not migrate everything at once. Record the existing reports as a baseline with ESLint's bulk suppressions, for example `npx eslint --suppress-rule @wordpress/use-recommended-components`, and commit the generated suppressions file. New code is then checked, while existing code is migrated gradually.
 -   After you migrate a component, run `npx eslint --prune-suppressions` and commit the reduced suppressions.
 -   For an intentional early use of a component, put an `eslint-disable-next-line @wordpress/use-recommended-components` comment above that import specifier, with a reason. This keeps the other components in the import checked.
