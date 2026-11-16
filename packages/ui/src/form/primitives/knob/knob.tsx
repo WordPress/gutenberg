@@ -8,6 +8,7 @@ import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	BOUNDED_SWEEP,
 	clamp,
+	decimalPlaces,
 	getAngleOnTurn,
 	getPointerAngle,
 	getStepChange,
@@ -43,6 +44,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			value,
 			defaultValue = min,
 			onValueChange,
+			onKeyDown,
 			inputRef,
 			className,
 			'aria-label': ariaLabel,
@@ -61,13 +63,18 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const mergedInputRef = useMergeRefs( [ input, inputRef ] );
 		const drag = useRef< Drag | null >( null );
 		const step = Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
+		const largeStepCount = Math.max( 1, Math.round( largeStep / step ) );
+		const precision = Math.min(
+			100,
+			Math.max( decimalPlaces( min ), decimalPlaces( step ) )
+		);
 		// Work in whole steps so that the last value on a wrapping dial has its
 		// own position one step before the first value.
-		const lastStep = Math.floor(
-			Number( ( ( max - min ) / step ).toPrecision( 15 ) )
-		);
 		const toValue = ( index: number ) =>
-			Number( ( min + index * step ).toPrecision( 15 ) );
+			Number( ( min + index * step ).toFixed( precision ) ) || 0;
+		const upperStep = Math.ceil( ( max - min ) / step );
+		const lastStep =
+			toValue( upperStep ) <= max ? upperStep : upperStep - 1;
 		const toIndex = ( number: number ) =>
 			Math.round( ( number - min ) / step );
 		const index = clamp(
@@ -90,7 +97,12 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		}
 		const maxAngle = minAngle + lastStep * degreesPerStep;
 		const angle = minAngle + index * degreesPerStep;
-		const sweep = wrap ? 360 : Math.min( 360, maxAngle - minAngle );
+		// When the numeric cycle spans whole turns, wrapping preserves the heading.
+		const cycleInTurns = ( ( lastStep + 1 ) * degreesPerStep ) / 360;
+		const seamless =
+			wrap &&
+			Number.isInteger( Number( cycleInTurns.toPrecision( 15 ) ) );
+		const sweep = seamless ? 360 : Math.min( 360, maxAngle - minAngle );
 		const fullCircle = sweep === 360;
 
 		function changeIndex( next: number ) {
@@ -114,7 +126,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				drag.current ||
 				! event.isPrimary ||
 				event.button !== 0 ||
-				input.current?.disabled
+				! input.current?.matches( ':enabled' )
 			) {
 				return;
 			}
@@ -130,13 +142,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 								angle,
 								minAngle,
 								maxAngle,
-								wrap
+								seamless
 							),
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
 			event.currentTarget.setPointerCapture( event.pointerId );
-			input.current?.focus( { preventScroll: true } );
+			input.current.focus( { preventScroll: true } );
 		}
 
 		function updateFromPointer(
@@ -146,7 +158,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			if (
 				! gesture ||
 				gesture.pointerId !== event.pointerId ||
-				input.current?.disabled
+				! input.current?.matches( ':enabled' )
 			) {
 				return;
 			}
@@ -161,7 +173,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					gesture.dialAngle,
 					minAngle,
 					maxAngle,
-					wrap
+					seamless
 				);
 			} else {
 				// Carry the turn count across twelve o'clock in either direction.
@@ -181,16 +193,19 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		function handleKeyDown(
 			event: React.KeyboardEvent< HTMLInputElement >
 		) {
+			onKeyDown?.( event );
 			if ( ! wrap || event.defaultPrevented ) {
 				return;
 			}
-			const next = toIndex(
-				currentValue + getStepChange( event, step, largeStep, isRTL() )
-			);
+			const next =
+				index + getStepChange( event, largeStepCount, isRTL() );
 			if ( next < 0 || next > lastStep ) {
 				event.preventDefault();
 				event.stopPropagation();
-				changeIndex( next );
+				// Let the range report the wrapped value through Base UI's field handling.
+				const range = event.currentTarget;
+				range.valueAsNumber = toValue( modulo( next, lastStep + 1 ) );
+				range.dispatchEvent( new Event( 'input', { bubbles: true } ) );
 			}
 		}
 
@@ -207,7 +222,9 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 					min={ min }
 					max={ lastStep > 0 ? toValue( lastStep ) : max }
 					step={ step }
-					largeStep={ largeStep }
+					largeStep={ Number(
+						( largeStepCount * step ).toFixed( precision )
+					) }
 					value={ currentValue }
 					onValueChange={ ( next ) => changeIndex( toIndex( next ) ) }
 				>

@@ -31,7 +31,7 @@
 			stroke: var(--wpds-color-stroke-interactive-neutral);
 			color: var(--wpds-color-foreground-interactive-brand);
 
-			&:not([data-disabled]) {
+			&:has(input:enabled) {
 				cursor: var(--wpds-cursor-control);
 			}
 
@@ -48,12 +48,12 @@
 			}
 
 			@media (forced-colors: none) {
-				&:not([data-disabled]):is(:hover, :active) {
+				&:has(input:enabled):is(:hover, :active) {
 					stroke: var(--wpds-color-stroke-interactive-neutral-active);
 					color: var(--wpds-color-foreground-interactive-brand-active);
 				}
 
-				&[data-disabled] {
+				&:has(input:disabled) {
 					fill: var(--wpds-color-background-interactive-neutral-disabled);
 					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
 					color: var(--wpds-color-foreground-interactive-brand-disabled);
@@ -66,7 +66,7 @@
 				stroke: ButtonText;
 				color: Highlight;
 
-				&[data-disabled] {
+				&:has(input:disabled) {
 					stroke: GrayText;
 					color: GrayText;
 				}
@@ -83,6 +83,10 @@
 		.track {
 			stroke: var(--wpds-color-stroke-interactive-neutral);
 
+			.thumb:has(input:disabled) & {
+				stroke: inherit;
+			}
+
 			@media (forced-colors: active) {
 				stroke: inherit;
 			}
@@ -91,7 +95,7 @@
 		.fill {
 			stroke: var(--wpds-color-background-indicator-brand);
 
-			[data-disabled] & {
+			.thumb:has(input:disabled) & {
 				stroke: currentColor;
 			}
 

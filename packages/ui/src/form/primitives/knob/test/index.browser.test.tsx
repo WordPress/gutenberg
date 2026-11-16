@@ -53,6 +53,77 @@ describe( 'Knob', () => {
 		await expect.element( slider ).toHaveValue( '0.1' );
 	} );
 
+	it( 'reports exactly zero in the callback, native input, and form when stepping across zero', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<form aria-label="Settings">
+				<Knob
+					aria-label="Offset"
+					name="offset"
+					min={ -0.3 }
+					max={ 0.3 }
+					step={ 0.1 }
+					defaultValue={ -0.1 }
+					onValueChange={ onValueChange }
+				/>
+			</form>
+		);
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowUp}' );
+		const slider = page.getByRole( 'slider' );
+		await expect.element( slider ).toHaveValue( '0' );
+		await expect.element( slider ).toHaveAttribute( 'aria-valuenow', '0' );
+		expect( onValueChange ).toHaveBeenLastCalledWith( 0 );
+		const form = page.getByRole( 'form' ).element() as HTMLFormElement;
+		expect( new FormData( form ).get( 'offset' ) ).toBe( '0' );
+	} );
+
+	it( 'moves at least one whole step with large-step keys in both directions', async () => {
+		await render(
+			<Knob aria-label="Opacity" step={ 25 } defaultValue={ 50 } />
+		);
+		const slider = page.getByRole( 'slider' );
+		await userEvent.tab();
+		await userEvent.keyboard( '{PageUp}' );
+		await expect.element( slider ).toHaveValue( '75' );
+		await userEvent.keyboard( '{Shift>}{ArrowDown}{/Shift}' );
+		await expect.element( slider ).toHaveValue( '50' );
+	} );
+
+	it( 'lets a consumer cancel a slider key before its value changes', async () => {
+		const onValueChange = vi.fn();
+		const onKeyDown = vi.fn( ( event: React.KeyboardEvent ) =>
+			event.preventDefault()
+		);
+		await render(
+			<Knob
+				aria-label="Angle"
+				onKeyDown={ onKeyDown }
+				onValueChange={ onValueChange }
+			/>
+		);
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowUp}{PageUp}{End}' );
+		expect( onKeyDown ).toHaveBeenCalledTimes( 3 );
+		expect( onValueChange ).not.toHaveBeenCalled();
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+	} );
+
+	it( 'marks the field touched when the first keyboard step wraps', async () => {
+		await render(
+			<Field.Root>
+				<Field.Label>Gradient angle</Field.Label>
+				<Knob max={ 359 } defaultValue={ 359 } wrap />
+			</Field.Root>
+		);
+		await userEvent.tab();
+		await userEvent.keyboard( '{ArrowUp}' );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+		await expect
+			.element( page.getByRole( 'group' ) )
+			.toHaveAttribute( 'data-touched' );
+	} );
+
 	it( 'selects the angle at the pointer without dragging', async () => {
 		await render(
 			<ThemeProvider isRoot>
@@ -186,6 +257,24 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '719' );
 	} );
 
+	it( 'selects the clicked direction when the wrapping range ends partway through a turn', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					max={ 500 }
+					unitsPerTurn={ 360 }
+					defaultValue={ 500 }
+					wrap
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width / 2, y: height - 3 } } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '180' );
+	} );
+
 	it.each( [
 		{ wrap: false, max: 100, expected: '100' },
 		{ wrap: true, max: 359, expected: '225' },
@@ -288,6 +377,30 @@ describe( 'Knob', () => {
 		const dial = page.getByRole( 'group' );
 		const { width, height } = dial.element().getBoundingClientRect();
 		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		expect( onValueChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'ignores clicks inside a disabled native fieldset', async () => {
+		const onValueChange = vi.fn();
+		await render(
+			<ThemeProvider isRoot>
+				<fieldset disabled>
+					<legend>Appearance</legend>
+					<Knob
+						aria-label="Angle"
+						max={ 359 }
+						wrap
+						onValueChange={ onValueChange }
+					/>
+				</fieldset>
+			</ThemeProvider>
+		);
+		const slider = page.getByRole( 'slider' );
+		const dial = page.getByRole( 'group', { name: '', exact: true } );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: width - 3, y: height / 2 } } );
+		await expect.element( slider ).toBeDisabled();
+		await expect.element( slider ).toHaveValue( '0' );
 		expect( onValueChange ).not.toHaveBeenCalled();
 	} );
 } );
