@@ -108,6 +108,12 @@ const RANGE_CONTROL_MAX_VALUES: Record< string, number > = {
 	svmax: 100,
 	lvmax: 100,
 	dvmax: 100,
+	cqw: 100,
+	cqh: 100,
+	cqi: 100,
+	cqb: 100,
+	cqmin: 100,
+	cqmax: 100,
 };
 
 const units = [
@@ -555,8 +561,11 @@ export default {
 				);
 			}
 		} else if ( shouldOutputGridRows ) {
+			// The aspect ratio gives empty rows a height, so cells are roughly
+			// square. Rows still grow if their content is taller.
 			rules.push(
-				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				`aspect-ratio: ${ columnCount } / ${ rowCount }`
 			);
 		}
 
@@ -608,10 +617,7 @@ export default {
 	getOrientation(): string {
 		return 'horizontal';
 	},
-	// The blocks of a manual placement grid sit side by side and on top of
-	// each other, so a toolbar floating over each one would cover its
-	// neighbors and move with every selection. Their toolbars show over the
-	// grid instead.
+	// Blocks in a manual grid can overlap, so their toolbars show over the grid.
 	capturesToolbars( layout?: Layout ): boolean {
 		return (
 			!! layout?.isManualPlacement &&

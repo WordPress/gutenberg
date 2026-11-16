@@ -29,15 +29,19 @@ const UnforwardedValidatedComboboxControl = (
 
 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
 	// so we need to set it manually.
+	// The input holds the search text, which is empty while the combobox is
+	// focused even when an option is selected, so a selection satisfies
+	// `required` on its own.
+	const hasSelection = !! restProps.value;
 	useEffect( () => {
 		const input =
 			validityTargetRef.current?.querySelector< HTMLInputElement >(
 				'input[role="combobox"]'
 			);
 		if ( input ) {
-			input.required = required ?? false;
+			input.required = !! required && ! hasSelection;
 		}
-	}, [ required ] );
+	}, [ required, hasSelection ] );
 
 	return (
 		// TODO: Bug - Missing value error is not cleared immediately on change, waits for blur.

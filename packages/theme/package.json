@@ -71,7 +71,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@types/node": "^24.13.3",
 		"@wordpress/validation-tools": "file:../../tools/validation",
-		"postcss": "^8.4.38",
+		"postcss": "^8.5.33",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"storybook": "^10.6.6",
 		"vitest": "^5.1.0",

@@ -10,68 +10,73 @@
 @use "./functions";
 @use "./long-content-fade";
 
+// The `Text` component in `@wordpress/ui` turns the declarations of the
+// `heading-*` and `body-*` mixins into custom properties, and reads only
+// `font-family`, `font-weight`, `font-size`, and `line-height` from them.
+// If one of these mixins gains another property, update
+// `packages/ui/src/text/style.module.scss` to read it too.
 @mixin _text-heading() {
-	font-family: variables.$font-family-headings;
+	font-family: wpds.var("--wpds-typography-font-family-heading");
 	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
 }
 
 @mixin _text-body() {
-	font-family: variables.$font-family-body;
+	font-family: wpds.var("--wpds-typography-font-family-body");
 	font-weight: wpds.var("--wpds-typography-font-weight-default");
 }
 
 @mixin heading-small() {
 	@include _text-heading();
-	font-size: variables.$font-size-x-small;
-	line-height: variables.$font-line-height-x-small;
+	font-size: wpds.var("--wpds-typography-font-size-xs");
+	line-height: wpds.var("--wpds-typography-line-height-xs");
 }
 
 @mixin heading-medium() {
 	@include _text-heading();
-	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-md");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin heading-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-lg");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin heading-x-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-medium;
+	font-size: wpds.var("--wpds-typography-font-size-xl");
+	line-height: wpds.var("--wpds-typography-line-height-md");
 }
 
 @mixin heading-2x-large() {
 	@include _text-heading();
-	font-size: variables.$font-size-2x-large;
-	line-height: variables.$font-line-height-2x-large;
+	font-size: wpds.var("--wpds-typography-font-size-2xl");
+	line-height: wpds.var("--wpds-typography-line-height-2xl");
 }
 
 @mixin body-small() {
 	@include _text-body();
-	font-size: variables.$font-size-small;
-	line-height: variables.$font-line-height-x-small;
+	font-size: wpds.var("--wpds-typography-font-size-sm");
+	line-height: wpds.var("--wpds-typography-line-height-xs");
 }
 
 @mixin body-medium() {
 	@include _text-body();
-	font-size: variables.$font-size-medium;
-	line-height: variables.$font-line-height-small;
+	font-size: wpds.var("--wpds-typography-font-size-md");
+	line-height: wpds.var("--wpds-typography-line-height-sm");
 }
 
 @mixin body-large() {
 	@include _text-body();
-	font-size: variables.$font-size-large;
-	line-height: variables.$font-line-height-medium;
+	font-size: wpds.var("--wpds-typography-font-size-lg");
+	line-height: wpds.var("--wpds-typography-line-height-md");
 }
 
 @mixin body-x-large() {
 	@include _text-body();
-	font-size: variables.$font-size-x-large;
-	line-height: variables.$font-line-height-x-large;
+	font-size: wpds.var("--wpds-typography-font-size-xl");
+	line-height: wpds.var("--wpds-typography-line-height-xl");
 }
 
 /**
