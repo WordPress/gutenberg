@@ -11486,11 +11486,6 @@
 			"count": 1
 		}
 	},
-	"packages/style-engine/src/styles/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/views/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
