@@ -227,6 +227,30 @@ export function getGridTracks(
 }
 
 /**
+ * Gets the start and end position in pixels of each track in a computed grid
+ * template, such as the value of `grid-template-columns`.
+ *
+ * @param template The computed grid template: track sizes in pixels.
+ * @param gap      The gap between tracks, in pixels.
+ *
+ * @return An array of objects with the start and end position in pixels of
+ *         each grid track.
+ */
+export function getGridTracksFromTemplate(
+	template: string,
+	gap: number
+): GridTrack[] {
+	const tracks: GridTrack[] = [];
+	for ( const size of template.split( ' ' ) ) {
+		const previousTrack = tracks[ tracks.length - 1 ];
+		const start = previousTrack ? previousTrack.end + gap : 0;
+		const end = start + parseFloat( size );
+		tracks.push( { start, end } );
+	}
+	return tracks;
+}
+
+/**
  * Measures the grid values shared while locating each of its children.
  *
  * @param gridElement             The grid element.
@@ -464,11 +488,11 @@ export function getGridTrackPositions( gridElement: Element ): {
 	rowTracks: GridTrack[];
 } {
 	return {
-		columnTracks: getGridTracks(
+		columnTracks: getGridTracksFromTemplate(
 			getComputedCSS( gridElement, 'grid-template-columns' ),
 			parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0
 		),
-		rowTracks: getGridTracks(
+		rowTracks: getGridTracksFromTemplate(
 			getComputedCSS( gridElement, 'grid-template-rows' ),
 			parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0
 		),
