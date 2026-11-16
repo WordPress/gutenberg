@@ -73,6 +73,7 @@ describe( 'useTextContrastWarning', () => {
 	} );
 
 	it.each( [
+		[ 'background.gradient', 'linear-gradient(#888888, #999999)' ],
 		[ 'color.gradient', 'linear-gradient(#888888, #999999)' ],
 		[ 'background.backgroundImage', { url: 'https://example.com/a.jpg' } ],
 	] )( 'does not warn when the background has %s set', ( path, value ) => {

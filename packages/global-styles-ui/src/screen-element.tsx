@@ -118,13 +118,16 @@ export type ElementName = keyof typeof ELEMENTS;
 export function useTextContrastWarning( enabled: boolean ) {
 	const [ textColor ] = useStyle< string >( 'color.text' );
 	const [ backgroundColor ] = useStyle< string >( 'color.background' );
-	const [ gradient ] = useStyle< string >( 'color.gradient' );
+	// Gradients are stored in `background.gradient`, or in the legacy
+	// `color.gradient` location.
+	const [ gradient ] = useStyle< string >( 'background.gradient' );
+	const [ legacyGradient ] = useStyle< string >( 'color.gradient' );
 	const [ backgroundImage ] = useStyle< unknown >(
 		'background.backgroundImage'
 	);
 
 	const warning =
-		enabled && ! gradient && ! backgroundImage
+		enabled && ! gradient && ! legacyGradient && ! backgroundImage
 			? getContrastWarning( {
 					backgroundColor,
 					textColor,
