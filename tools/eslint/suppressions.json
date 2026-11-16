@@ -207,7 +207,7 @@
 	},
 	"packages/block-editor/src/components/child-layout-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
@@ -1862,9 +1862,6 @@
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -12597,11 +12594,6 @@
 		}
 	},
 	"test/e2e/specs/editor/various/content-only-lock.spec.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"test/e2e/specs/editor/various/content-tab-hover-highlight.spec.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
