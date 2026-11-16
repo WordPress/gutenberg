@@ -68,6 +68,124 @@ describe( 'Knob', () => {
 		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
 	} );
 
+	it( 'keeps the native slider focus target on the visible dial', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob aria-label="Rotation" />
+			</ThemeProvider>
+		);
+		const slider = page.getByRole( 'slider' ).element();
+		const dial = page.getByRole( 'group' ).element();
+		expect( slider.getBoundingClientRect().toJSON() ).toEqual(
+			dial.getBoundingClientRect().toJSON()
+		);
+	} );
+
+	it.each( [
+		{ from: -300, expected: '-270' },
+		{ from: 390, expected: '450' },
+		{ from: 710, expected: '450' },
+	] )(
+		'selects the nearest available turn from $from on click',
+		async ( { from, expected } ) => {
+			await render(
+				<ThemeProvider isRoot>
+					<Knob
+						aria-label="Rotation"
+						min={ -720 }
+						max={ 720 }
+						unitsPerTurn={ 360 }
+						defaultValue={ from }
+					/>
+				</ThemeProvider>
+			);
+			const dial = page.getByRole( 'group' );
+			const { width, height } = dial.element().getBoundingClientRect();
+			await dial.click( { position: { x: width - 3, y: height / 2 } } );
+			await expect
+				.element( page.getByRole( 'slider' ) )
+				.toHaveValue( expected );
+		}
+	);
+
+	it.each( [
+		{ direction: 'clockwise', unitsPerTurn: 360, step: 1, expected: '810' },
+		{
+			direction: 'counterclockwise',
+			unitsPerTurn: 360,
+			step: 1,
+			expected: '-810',
+		},
+		{
+			direction: 'clockwise',
+			unitsPerTurn: 1,
+			step: 0.25,
+			expected: '2.25',
+		},
+	] )(
+		'counts two full turns and a quarter $direction at $unitsPerTurn units per turn during one drag',
+		async ( { direction, unitsPerTurn, step, expected } ) => {
+			await render(
+				<ThemeProvider isRoot>
+					<Knob
+						aria-label="Rotation"
+						min={ -3 * unitsPerTurn }
+						max={ 3 * unitsPerTurn }
+						unitsPerTurn={ unitsPerTurn }
+						step={ step }
+						defaultValue={ 0 }
+					/>
+				</ThemeProvider>
+			);
+			const dial = page.getByRole( 'group' );
+			const { width, height } = dial.element().getBoundingClientRect();
+			const top = { x: width / 2, y: 3 };
+			const right = { x: width - 3, y: height / 2 };
+			const bottom = { x: width / 2, y: height - 3 };
+			const left = { x: 3, y: height / 2 };
+			const turn =
+				direction === 'clockwise'
+					? [ right, bottom, left, top ]
+					: [ left, bottom, right, top ];
+			await userEvent.pointer( [
+				{ target: dial, coords: top, keys: '[MouseLeft>]' },
+				...[ ...turn, ...turn, turn[ 0 ] ].map( ( coords ) => ( {
+					target: dial,
+					coords,
+				} ) ),
+				'[/MouseLeft]',
+			] );
+			await expect
+				.element( page.getByRole( 'slider' ) )
+				.toHaveValue( expected );
+		}
+	);
+
+	it( 'wraps at the end of a two-turn range', async () => {
+		await render(
+			<ThemeProvider isRoot>
+				<Knob
+					aria-label="Rotation"
+					max={ 719 }
+					unitsPerTurn={ 360 }
+					defaultValue={ 630 }
+					wrap
+				/>
+			</ThemeProvider>
+		);
+		const dial = page.getByRole( 'group' );
+		const { width, height } = dial.element().getBoundingClientRect();
+		await dial.click( { position: { x: 3, y: height / 2 } } );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '630' );
+		await dial.dropTo( dial, {
+			sourcePosition: { x: 3, y: height / 2 },
+			targetPosition: { x: width / 2, y: 3 },
+		} );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '0' );
+		await userEvent.keyboard( '{ArrowDown}' );
+		await expect.element( page.getByRole( 'slider' ) ).toHaveValue( '719' );
+	} );
+
 	it.each( [
 		{ wrap: false, max: 100, expected: '100' },
 		{ wrap: true, max: 359, expected: '225' },

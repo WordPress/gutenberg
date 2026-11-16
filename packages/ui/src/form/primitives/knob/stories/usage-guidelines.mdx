@@ -18,6 +18,16 @@ Set `wrap` when the first value follows the last. For whole degrees, use `min={ 
 
 <Canvas of={ KnobStories.Wrapping } />
 
+## Count turns
+
+Set `unitsPerTurn` when dial positions have a physical meaning. Zero points up. With `unitsPerTurn={ 360 }`, a clockwise turn adds 360 degrees and a quarter-turn adds 90 degrees. With `min={ -720 }` and `max={ 720 }`, the dial can turn twice in either direction from zero. Clicking three o'clock from −300° selects −270°. Clicking the same position from 390° selects 450°.
+
+`min` and `max` bound the total value. Add `wrap` to repeat that range indefinitely. For a seamless loop, include one step per position. With whole degrees, use 0 to 359 for one turn or 0 to 719 for two turns before the value returns to zero.
+
+Pair the dial with a number field when users need to enter an exact rotation or see how many turns they have made. This example keeps the override in the parent. Clearing the field restores an inherited 45°. Entering zero sets an explicit 0°.
+
+<Canvas of={ KnobStories.WithNumberInput } />
+
 ## Label the dial
 
 Place the knob in `Field.Root` with a visible `Field.Label`. Add `Field.Description` when the setting needs an explanation. For standalone use, provide `aria-labelledby` or `aria-label`. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText` for values with custom names.
@@ -28,4 +38,4 @@ Pass `value` and `onValueChange` to keep a readout or another control in sync. F
 
 ## Keyboard interaction
 
-Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10. Home and End go straight to the first and last selectable values in either mode.
+Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10. Home and End go straight to the first and last selectable values.
