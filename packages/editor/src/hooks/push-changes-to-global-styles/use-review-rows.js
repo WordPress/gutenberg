@@ -1,17 +1,19 @@
 import { useMemo } from '@wordpress/element';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	getValueFromVariable,
 	privateApis as globalStylesEnginePrivateApis,
 } from '@wordpress/global-styles-engine';
 import { unlock } from '../../lock-unlock';
-import { getStyleLabel } from './style-labels';
-import {
+
+const {
+	getStyleLabel,
 	formatStyleValue,
 	formatBorderShorthand,
 	formatBorderRadius,
 	formatSpacingShorthand,
 	formatBlockGap,
-} from './format-style-value';
+} = unlock( blockEditorPrivateApis );
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
