@@ -1,11 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { render, screen, fireEvent } from '@testing-library/react';
-/**
- * Internal dependencies
- */
+import { fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { RouterProvider, useHistory, useLocation } from '../router';
+
+globalThis.wpVitest.mockMatchMedia();
+
 function NavigationTestComponent() {
 	const history = useHistory();
 	const location = useLocation();
@@ -38,7 +36,7 @@ function NavigationTestComponent() {
 
 function renderWithRouter() {
 	return render(
-		<RouterProvider>
+		<RouterProvider pathArg="path">
 			<NavigationTestComponent />
 		</RouterProvider>
 	);
@@ -46,12 +44,12 @@ function renderWithRouter() {
 
 describe( 'useHistory', () => {
 	afterEach( () => {
-		jest.restoreAllMocks();
+		vi.restoreAllMocks();
 	} );
 
 	it( 'calls history.replaceState (not pushState) when replace: true is passed', () => {
-		const replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
-		const pushStateSpy = jest.spyOn( window.history, 'pushState' );
+		const replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
+		const pushStateSpy = vi.spyOn( window.history, 'pushState' );
 
 		renderWithRouter();
 		fireEvent.click( screen.getByText( 'Navigate with replace' ) );
@@ -60,8 +58,8 @@ describe( 'useHistory', () => {
 	} );
 
 	it( 'defaults to history.pushState when the replace option is omitted', () => {
-		const replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
-		const pushStateSpy = jest.spyOn( window.history, 'pushState' );
+		const replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
+		const pushStateSpy = vi.spyOn( window.history, 'pushState' );
 
 		renderWithRouter();
 		fireEvent.click( screen.getByText( 'Navigate with push' ) );
@@ -86,18 +84,18 @@ describe( 'useHistory', () => {
 	} );
 
 	it( 'passes state through correctly when using replace', () => {
-		const replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
+		const replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
 
 		renderWithRouter();
 		fireEvent.click(
 			screen.getByText( 'Navigate with replace and state' )
 		);
 		const [ passedState ] = replaceStateSpy.mock.calls[ 0 ];
-		expect( passedState.usr ).toMatchObject( { foo: 'bar' } );
+		expect( passedState?.usr ).toMatchObject( { foo: 'bar' } );
 	} );
 
 	it( 'builds the same query string for replace as it would for push', () => {
-		const replaceStateSpy = jest.spyOn( window.history, 'replaceState' );
+		const replaceStateSpy = vi.spyOn( window.history, 'replaceState' );
 
 		renderWithRouter();
 		fireEvent.click( screen.getByText( 'Navigate with replace' ) );

@@ -1,15 +1,14 @@
-/**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'Navigation Overlay back navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllTemplates( 'wp_template_part' );
 	} );
 
 	test( 'does not require an extra back click to exit the navigation overlay', async ( {
@@ -40,9 +39,15 @@ test.describe( 'Navigation Overlay back navigation', () => {
 			name: 'Create overlay',
 			exact: true,
 		} );
+		const createNewOverlayButton = page.getByRole( 'button', {
+			name: 'Create new overlay template',
+			exact: true,
+		} );
 
 		if ( await createOverlayButton.isVisible() ) {
 			await createOverlayButton.click();
+		} else if ( await createNewOverlayButton.isVisible() ) {
+			await createNewOverlayButton.click();
 		} else {
 			await page.getByRole( 'button', { name: /Edit overlay:/ } ).click();
 		}
