@@ -100,30 +100,33 @@ function MediaPreviewFileCard( {
 	fileDetails,
 }: MediaPreviewFileCardProps ) {
 	return (
-		<Card.Root className="media-editor-preview__file-card">
+		<Card.Root className="media-editor-preview__card">
 			<Card.Content>
-				<Stack direction="column" align="center" gap="md">
-					<Icon
-						className="media-editor-preview__file-icon"
-						icon={ file }
-					/>
-					<Stack direction="column" align="center" gap="xs">
-						{ !! fileName && (
-							<Text
-								variant="heading-sm"
-								className="media-editor-preview__file-name"
-							>
-								{ fileName }
-							</Text>
-						) }
-						{ !! fileDetails && (
-							<Text
-								variant="body-sm"
-								className="media-editor-preview__file-details"
-							>
-								{ fileDetails }
-							</Text>
-						) }
+				{ /* The gaps match the spacing of `EmptyState`. */ }
+				<Stack direction="column" align="center" gap="lg">
+					<Stack direction="column" align="center" gap="sm">
+						<Icon
+							className="media-editor-preview__file-icon"
+							icon={ file }
+						/>
+						<Stack direction="column" align="center" gap="xs">
+							{ !! fileName && (
+								<Text
+									variant="heading-sm"
+									className="media-editor-preview__file-name"
+								>
+									{ fileName }
+								</Text>
+							) }
+							{ !! fileDetails && (
+								<Text
+									variant="body-sm"
+									className="media-editor-preview__file-details"
+								>
+									{ fileDetails }
+								</Text>
+							) }
+						</Stack>
 					</Stack>
 					<Stack justify="center" gap="sm" wrap="wrap">
 						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
@@ -231,12 +234,18 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	if ( ! mediaUrl ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--empty">
-				<EmptyState.Root>
-					<EmptyState.Icon icon={ file } />
-					<EmptyState.Title>
-						{ __( 'No media file available.' ) }
-					</EmptyState.Title>
-				</EmptyState.Root>
+				<Card.Root className="media-editor-preview__card">
+					<Card.Content>
+						<EmptyState.Root>
+							<EmptyState.Visual>
+								<Icon icon={ file } />
+							</EmptyState.Visual>
+							<EmptyState.Title>
+								{ __( 'No media file available.' ) }
+							</EmptyState.Title>
+						</EmptyState.Root>
+					</Card.Content>
+				</Card.Root>
 			</div>
 		);
 	}
@@ -262,20 +271,28 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	if ( loadingState === 'error' ) {
 		return (
 			<div className="media-editor-preview media-editor-preview--error">
-				<EmptyState.Root>
-					<EmptyState.Icon icon={ file } />
-					<EmptyState.Title>
-						{ __( 'Failed to load media file.' ) }
-					</EmptyState.Title>
-					{ !! fileName && (
-						<EmptyState.Description className="media-editor-preview__file-name">
-							{ fileName }
-						</EmptyState.Description>
-					) }
-					<EmptyState.Actions className="media-editor-preview__error-actions">
-						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
-					</EmptyState.Actions>
-				</EmptyState.Root>
+				<Card.Root className="media-editor-preview__card">
+					<Card.Content>
+						<EmptyState.Root>
+							<EmptyState.Visual>
+								<Icon icon={ file } />
+							</EmptyState.Visual>
+							<EmptyState.Title>
+								{ __( 'Failed to load media file.' ) }
+							</EmptyState.Title>
+							{ !! fileName && (
+								<EmptyState.Description className="media-editor-preview__file-name">
+									{ fileName }
+								</EmptyState.Description>
+							) }
+							<EmptyState.Actions className="media-editor-preview__error-actions">
+								<MediaPreviewFileActions
+									mediaUrl={ mediaUrl }
+								/>
+							</EmptyState.Actions>
+						</EmptyState.Root>
+					</Card.Content>
+				</Card.Root>
 			</div>
 		);
 	}
