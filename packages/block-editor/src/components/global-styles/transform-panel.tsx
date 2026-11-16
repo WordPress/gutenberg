@@ -1,12 +1,12 @@
 import {
-	AnglePickerControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import UnitRangeControl, { type UnitRangeSettings } from './unit-range-control';
 import type {
 	PanelResetAllFilter,
 	StyleSettings,
@@ -14,38 +14,19 @@ import type {
 	TransformPanelProps,
 } from './types';
 
-// Mirror of `WP_Style_Engine::VALID_ANGLE_PATTERN` in PHP.
-const ANGLE_PATTERN =
-	/^(?:([+-]?(?:\d+(?:\.\d+)?|\.\d+))(deg|grad|rad|turn)|0)$/i;
+const ROTATE_UNITS = [
+	{ value: 'deg', label: 'deg' },
+	{ value: 'turn', label: 'turn' },
+	{ value: 'rad', label: 'rad' },
+	{ value: 'grad', label: 'grad' },
+];
 
-const DEGREES_PER_UNIT: Record< string, number > = {
-	deg: 1,
-	grad: 0.9,
-	rad: 180 / Math.PI,
-	turn: 360,
+const ROTATE_UNIT_SETTINGS: UnitRangeSettings = {
+	deg: { min: -360, max: 360, step: 1 },
+	turn: { min: -1, max: 1, step: 0.01 },
+	rad: { min: -6.28, max: 6.28, step: 0.01 },
+	grad: { min: -400, max: 400, step: 1 },
 };
-
-/**
- * Converts a CSS angle to whole degrees, the step the angle picker accepts.
- * A fraction would fail the field's validation and be rewritten on blur.
- *
- * @param value A CSS angle, such as `45deg` or `0.25turn`.
- * @return The angle in degrees, or `undefined` when the value is not an angle.
- */
-export function getAngleInDegrees( value: unknown ): number | undefined {
-	const match =
-		typeof value === 'string' ? ANGLE_PATTERN.exec( value ) : null;
-	if ( ! match ) {
-		return undefined;
-	}
-	if ( ! match[ 1 ] ) {
-		return 0;
-	}
-	const degrees =
-		Number( match[ 1 ] ) * DEGREES_PER_UNIT[ match[ 2 ].toLowerCase() ];
-	// Adding 0 turns -0 into 0.
-	return Math.round( degrees ) + 0;
-}
 
 export function useHasTransformPanel( settings: StyleSettings | undefined ) {
 	return useHasRotateControl( settings );
@@ -70,7 +51,10 @@ function TransformToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ __( 'Transform' ) }
+			label={ _x(
+				'Transform',
+				'Visual transform styles such as rotate, move and scale'
+			) }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
@@ -94,9 +78,9 @@ export default function TransformPanel( {
 	defaultControls = DEFAULT_CONTROLS,
 }: TransformPanelProps ) {
 	const showRotateControl = useHasRotateControl( settings );
-	const rotate =
-		getAngleInDegrees( value?.transform?.rotate ) ??
-		getAngleInDegrees( inheritedValue?.transform?.rotate );
+	const storedRotate =
+		value?.transform?.rotate ?? inheritedValue?.transform?.rotate;
+	const rotate = typeof storedRotate === 'string' ? storedRotate : undefined;
 	const setRotate = ( newValue: string | undefined ) => {
 		onChange( setImmutably( value, [ 'transform', 'rotate' ], newValue ) );
 	};
@@ -131,12 +115,12 @@ export default function TransformPanel( {
 					isShownByDefault={ defaultControls.rotate }
 					panelId={ panelId }
 				>
-					<AnglePickerControl
+					<UnitRangeControl
 						label={ __( 'Rotation' ) }
-						value={ rotate ?? '' }
-						onChange={ ( newValue ) =>
-							setRotate( `${ Math.round( newValue ) }deg` )
-						}
+						value={ rotate }
+						onChange={ setRotate }
+						units={ ROTATE_UNITS }
+						unitSettings={ ROTATE_UNIT_SETTINGS }
 					/>
 				</ToolsPanelItem>
 			) }
