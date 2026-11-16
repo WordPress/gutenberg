@@ -15,7 +15,7 @@ A `MenuItemsChoice` should be housed within in its own distinct `MenuGroup`, so 
 ![MenuItemsChoice Diagram](https://wordpress.org/gutenberg/files/2019/03/MenuItemsChoice-Checkbox-Keyboard-Shortcut.png)
 
 1. A check mark appears before the selected label. Unselected choices reserve the same space.
-2. An associated keyboard shortcut appears at the trailing edge of the row, aligned with the menu title.
+2. On wider screens, the keyboard shortcut appears at the trailing edge of the row, aligned with its title.
 
 #### When to use `MenuItemsChoice`
 
