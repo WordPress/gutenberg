@@ -55,15 +55,15 @@
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
 -   `Snackbar`: Increase the action link hit target ([#86823](https://github.com/WordPress/gutenberg/pull/86823)).
--   `Tabs`: Paint the hover, pressed, and focus states across the tab's hit area with an even 2px clearance and a small corner radius, and draw the focus ring inside the tab's bounds. Horizontal tab lists previously painted a pill around the label.
--   `Tabs`: Size a horizontal tab to 47px, so the tab bar occupies 48px including the 1px rule beneath it. Containers no longer need to shift the tab list to sit under that rule, which was leaving the interaction states lopsided.
+-   `Tabs`: Paint the hover, pressed, and focus states across the tab's hit area with an even 2px clearance and a small corner radius, and draw the focus ring inside the tab's bounds. Horizontal tab lists previously painted a pill around the label ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `Tabs`: Size a horizontal tab to 47px, so the tab bar occupies 48px including the 1px rule beneath it. Containers no longer need to shift the tab list to sit under that rule, which was leaving the interaction states lopsided ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Bug Fixes
 
 -   `TimePicker`: Show the full site time zone in a `Popover` from `@wordpress/ui` that keyboard, touch, and screen reader users can open from the time zone abbreviation, instead of a tooltip that only mouse users could reach. The popover shows above `@wordpress/ui` overlays. Underline the abbreviation only when it opens the popover ([#86806](https://github.com/WordPress/gutenberg/pull/86806)).
 -   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
 -   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
--   `Panel`: Keep `PanelHeader` at its full height inside containers that apply the `reset` mixin, such as the editor sidebar. The mixin's descendant selector overrode the header's `box-sizing` at equal specificity, leaving it a pixel short.
+-   `Panel`: Keep `PanelHeader` at its full height inside containers that apply the `reset` mixin, such as the editor sidebar. The mixin's descendant selector overrode the header's `box-sizing` at equal specificity, leaving it a pixel short ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
 -   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
