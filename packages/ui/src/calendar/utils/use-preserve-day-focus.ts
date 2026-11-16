@@ -10,6 +10,9 @@ type DayFocusHandler = NonNullable< DayPickerProps[ 'onDayFocus' ] >;
  * the focused day and the new month has no enabled day. DayPicker preserves
  * focus itself when an enabled day is available.
  *
+ * TODO: Remove this hook after adopting the upstream disabled-calendar focus fix.
+ * @see https://github.com/gpbl/react-day-picker/pull/3036
+ *
  * @param forwardedRef Ref forwarded to the calendar root.
  * @param month        The controlled first displayed month.
  *
