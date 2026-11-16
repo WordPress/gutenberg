@@ -119,7 +119,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace (-firefox)', async ( {
+	test( 'should undo asterisk transform with backspace', async ( {
 		editor,
 		page,
 	} ) => {
@@ -136,7 +136,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes (-firefox)', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes', async ( {
 		editor,
 		page,
 	} ) => {
@@ -156,7 +156,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace setting isTyping state (-firefox)', async ( {
+	test( 'should undo asterisk transform with backspace setting isTyping state', async ( {
 		editor,
 		page,
 	} ) => {
@@ -174,7 +174,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback (-firefox)', async ( {
+	test( 'should undo asterisk transform with backspace after selection changes without requestIdleCallback', async ( {
 		editor,
 		page,
 	} ) => {
@@ -195,7 +195,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should undo asterisk transform with escape (-firefox)', async ( {
+	test( 'should undo asterisk transform with escape', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1653,7 +1653,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'should preserve indentation after merging backward and forward (-firefox)', async ( {
+	test( 'should preserve indentation after merging backward and forward', async ( {
 		editor,
 		page,
 	} ) => {
@@ -1825,7 +1825,7 @@ test.describe( 'List (@firefox)', () => {
 		);
 	} );
 
-	test( 'can be created by pasting an empty list (-firefox)', async ( {
+	test( 'can be created by pasting an empty list', async ( {
 		editor,
 		page,
 		pageUtils,

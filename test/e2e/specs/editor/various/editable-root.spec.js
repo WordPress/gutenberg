@@ -220,12 +220,13 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 				caption: 'Caption',
 			},
 		} );
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Heading 2',
-				exact: true,
-			} )
-			.click();
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading 2',
+			exact: true,
+		} );
+		// The image toolbar would cover the heading once the image loads.
+		await editor.selectBlocks( headingBlock );
+		await headingBlock.click();
 		const [ heading, image ] = await editor.getBlocks( { full: true } );
 		const getSelectedBlockClientId = () =>
 			page.evaluate( () =>
