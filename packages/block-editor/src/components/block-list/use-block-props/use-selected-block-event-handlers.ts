@@ -6,8 +6,102 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+declare global {
+	interface Window {
+		/**
+		 * Whether the "drag blocks from anywhere" experiment is enabled.
+		 */
+		__experimentalBlockDragFromAnywhere?: boolean;
+	}
+}
+
 // The distance of the dragged blocks from the pointer.
 const PILE_OFFSET = 8;
+
+// Elements inside a block that keep their own pointer behaviour when blocks
+// can be dragged from anywhere.
+const INTERACTIVE_ELEMENTS =
+	'button, input, textarea, select, label, summary, iframe, video, audio, [role="button"]';
+
+/**
+ * Whether the block is being edited: the caret, or keyboard focus, is in one
+ * of its fields, as opposed to on the block itself or elsewhere.
+ *
+ * @param node The block's element.
+ */
+export function isEditingBlock( node: HTMLElement ) {
+	const { ownerDocument } = node;
+	const { activeElement } = ownerDocument;
+	// A field of the block has focus. The block itself can be the field, as a
+	// Paragraph is; otherwise focus on the block is not editing.
+	if (
+		activeElement &&
+		node.contains( activeElement ) &&
+		// Only the innermost block that contains the focus is being edited.
+		activeElement.closest( '[data-block]' ) === node &&
+		( ( activeElement as HTMLElement ).isContentEditable ||
+			isTextField( activeElement ) ||
+			activeElement !== node )
+	) {
+		return true;
+	}
+	// While a text block is selected, the writing flow wrapper is the editing
+	// host and holds focus (see `useEditableRoot`), so the caret tells which
+	// block is being edited.
+	if ( ! node.classList.contains( 'is-selected' ) ) {
+		return false;
+	}
+	// A document with a window has a selection.
+	const anchor = ownerDocument.defaultView!.getSelection()!.anchorNode;
+	const element =
+		anchor?.nodeType === anchor?.ELEMENT_NODE
+			? ( anchor as HTMLElement )
+			: anchor?.parentElement;
+	return (
+		!! element &&
+		node.contains( element ) &&
+		element.closest( '[data-block]' ) === node &&
+		element.isContentEditable
+	);
+}
+
+/**
+ * Places the caret at a point in the viewport, if the point is in an editable
+ * field.
+ *
+ * @param doc The document.
+ * @param x   Horizontal position within the viewport.
+ * @param y   Vertical position within the viewport.
+ */
+function placeCaretAtPoint( doc: Document, x: number, y: number ) {
+	let range: Range | null = null;
+	if ( doc.caretPositionFromPoint ) {
+		const point = doc.caretPositionFromPoint( x, y );
+		if ( point ) {
+			range = doc.createRange();
+			range.setStart( point.offsetNode, point.offset );
+			range.collapse( true );
+		}
+	} else if ( doc.caretRangeFromPoint ) {
+		range = doc.caretRangeFromPoint( x, y );
+	}
+	const container = range?.startContainer;
+	const element =
+		container?.nodeType === container?.ELEMENT_NODE
+			? ( container as Element )
+			: container?.parentElement;
+	const editable = element?.closest< HTMLElement >(
+		'[contenteditable="true"]'
+	);
+	if ( ! range || ! editable ) {
+		return;
+	}
+	editable.focus();
+	// A document with a window has a selection.
+	const selection = doc.defaultView!.getSelection()!;
+	selection.removeAllRanges();
+	selection.addRange( range );
+}
 
 function isColorTransparent( color: string ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
@@ -42,6 +136,8 @@ export function useEventHandlers( {
 		canMoveBlocks,
 		isZoomOut,
 		hasMultiSelection,
+		canMoveBlock,
+		hasSelectedInnerBlock,
 		__unstableIsFullySelected,
 		isSectionBlock,
 		editedContentOnlySection,
@@ -55,10 +151,135 @@ export function useEventHandlers( {
 		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
+	const isDragFromAnywhere = !! window.__experimentalBlockDragFromAnywhere;
+
 	return useRefEffect< HTMLElement >(
 		( node ) => {
-			if ( ! isSelected && ! isMultiSelected ) {
+			if ( ! isSelected && ! isMultiSelected && ! isDragFromAnywhere ) {
 				return;
+			}
+
+			// Whether the current press started a "drag from anywhere": a
+			// press on a block that isn't being edited, which drags the block
+			// if the pointer moves and puts the caret in it if it doesn't.
+			let isPressToDrag = false;
+
+			/**
+			 * Lets the browser start a drag of the block from a press anywhere
+			 * on it, text included, while the block isn't being edited. The
+			 * fields under the press are taken out of editing for the length
+			 * of the press, so the browser drags the draggable block instead
+			 * of placing a caret or selecting text. If the press ends without
+			 * a drag, the caret goes where the press was, as a click would
+			 * have put it, and from then on the block is being edited, so
+			 * dragging over its text selects text again.
+			 *
+			 * @param event Mouse down event.
+			 */
+			function onPressToDrag( event: MouseEvent ) {
+				// Mouse events target elements.
+				const target = event.target as HTMLElement;
+				// A double click needs no check of its own: the first click
+				// puts the caret in the block, so the second press is left to
+				// the browser, which selects a word.
+				if (
+					event.button !== 0 ||
+					event.shiftKey ||
+					event.metaKey ||
+					event.ctrlKey ||
+					event.altKey ||
+					// The innermost block under the press handles it.
+					target.closest( '[data-block]' ) !== node ||
+					! canMoveBlock( clientId ) ||
+					hasSelectedInnerBlock( clientId, true ) ||
+					hasMultiSelection() ||
+					isEditingBlock( node ) ||
+					target.closest( INTERACTIVE_ELEMENTS )
+				) {
+					return;
+				}
+
+				const { ownerDocument } = node;
+				const editables = [
+					// The writing flow wrapper, while it is the editing host
+					// for a selected text block (see `useEditableRoot`).
+					node.parentElement?.closest< HTMLElement >(
+						'[contenteditable="true"]'
+					),
+					target.closest< HTMLElement >( '[contenteditable="true"]' ),
+					...Array.from(
+						node.querySelectorAll< HTMLElement >(
+							'[contenteditable="true"]'
+						)
+					),
+				].filter(
+					( element, index, all ): element is HTMLElement =>
+						!! element && all.indexOf( element ) === index
+				);
+
+				if ( ! editables.length ) {
+					// Nothing to take out of editing: a block without fields,
+					// such as an Image, drags from a press already once it's
+					// focused, and focusing it is what a press does.
+					isPressToDrag = true;
+					const reset = () => {
+						isPressToDrag = false;
+						ownerDocument.removeEventListener( 'mouseup', reset );
+						ownerDocument.removeEventListener( 'dragend', reset );
+					};
+					ownerDocument.addEventListener( 'mouseup', reset );
+					ownerDocument.addEventListener( 'dragend', reset );
+					return;
+				}
+
+				isPressToDrag = true;
+				for ( const element of editables ) {
+					element.contentEditable = 'false';
+				}
+				// Rich text unsets `draggable` on a block that is itself the
+				// editable field, such as a Paragraph, and a press in a field
+				// takes it off the block (`useFirefoxDraggableCompatibility`),
+				// so it is set here for the length of the press.
+				const hadDraggable = node.getAttribute( 'draggable' );
+				node.setAttribute( 'draggable', 'true' );
+				node.classList.add( 'is-pressed-to-drag' );
+
+				let hasDragged = false;
+				const { clientX, clientY } = event;
+
+				function onDragStarted() {
+					hasDragged = true;
+				}
+
+				function restore() {
+					isPressToDrag = false;
+					node.classList.remove( 'is-pressed-to-drag' );
+					if ( hadDraggable === null ) {
+						node.removeAttribute( 'draggable' );
+					} else {
+						node.setAttribute( 'draggable', hadDraggable );
+					}
+					for ( const element of editables ) {
+						element.contentEditable = 'true';
+					}
+					ownerDocument.removeEventListener( 'mouseup', onRelease );
+					ownerDocument.removeEventListener(
+						'dragstart',
+						onDragStarted
+					);
+					ownerDocument.removeEventListener( 'dragend', restore );
+				}
+
+				function onRelease() {
+					restore();
+					if ( ! hasDragged ) {
+						placeCaretAtPoint( ownerDocument, clientX, clientY );
+					}
+				}
+
+				ownerDocument.addEventListener( 'mouseup', onRelease );
+				ownerDocument.addEventListener( 'dragstart', onDragStarted );
+				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
 			/**
@@ -303,6 +524,18 @@ export function useEventHandlers( {
 				// Checked to be an element below, before it is used as one.
 				const target = event.target as Element;
 				const { activeElement } = node.ownerDocument;
+				// A nested block has already claimed this drag. Drag events
+				// from the browser carry a data transfer.
+				if ( event.dataTransfer!.types.includes( 'wp-blocks' ) ) {
+					return;
+				}
+				// The drag of a press anywhere on a block that isn't being
+				// edited (see `onPressToDrag`).
+				const isPressDrag =
+					isPressToDrag &&
+					! hasMultiSelection() &&
+					target.nodeType === target.ELEMENT_NODE &&
+					target.closest( '[draggable="true"]' ) === node;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
 				// draggable, such as an inner block, is closer to the source.
@@ -324,7 +557,17 @@ export function useEventHandlers( {
 					__unstableIsFullySelected() &&
 					canMoveBlocks( getSelectedBlockClientIds() );
 
-				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
+				if (
+					! isDirectBlockDrag &&
+					! isMultiSelectionDrag &&
+					! isPressDrag
+				) {
+					// Blocks that are neither selected nor multi-selected only
+					// listen for drags from anywhere; any other drag in them is
+					// left to the selected block or the browser.
+					if ( ! isSelected && ! isMultiSelected ) {
+						return;
+					}
 					// Rich text carries a drag of the text selected in a field.
 					// Drag events from the browser carry a data transfer.
 					if ( ! event.dataTransfer!.types.includes( 'rich-text' ) ) {
@@ -543,13 +786,18 @@ export function useEventHandlers( {
 
 			node.addEventListener( 'dragstart', onDragStart );
 			node.addEventListener( 'mousedown', onMouseDown );
+			if ( isDragFromAnywhere ) {
+				node.addEventListener( 'mousedown', onPressToDrag );
+			}
 
-			// Blocks in a multi selection only get the drag handling; the
-			// key and double click handling is for the selected block.
+			// Blocks in a multi selection, and with drag from anywhere every
+			// other block, only get the drag handling; the key and double
+			// click handling is for the selected block.
 			if ( ! isSelected ) {
 				return () => {
 					node.removeEventListener( 'dragstart', onDragStart );
 					node.removeEventListener( 'mousedown', onMouseDown );
+					node.removeEventListener( 'mousedown', onPressToDrag );
 				};
 			}
 
@@ -586,6 +834,7 @@ export function useEventHandlers( {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeEventListener( 'mousedown', onPressToDrag );
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
@@ -593,6 +842,7 @@ export function useEventHandlers( {
 			clientId,
 			isSelected,
 			isMultiSelected,
+			isDragFromAnywhere,
 			getBlockRootClientId,
 			getSelectedBlockClientIds,
 			getBlock,
@@ -603,6 +853,8 @@ export function useEventHandlers( {
 			resetZoomLevel,
 			hasMultiSelection,
 			canMoveBlocks,
+			canMoveBlock,
+			hasSelectedInnerBlock,
 			startDraggingBlocks,
 			stopDraggingBlocks,
 			isSectionBlock,

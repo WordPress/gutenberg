@@ -90,6 +90,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
 	.block-editor-block-list__block.is-hovered-draggable[draggable="true"]:not(.is-multi-selected),
 	.block-editor-block-list__block.is-hovered-draggable[data-draggable="true"]:not(.is-multi-selected),
+	.block-editor-block-list__block.is-hovered-drag-anywhere:not(.is-multi-selected),
 	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
@@ -207,6 +208,20 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	&[contenteditable],
 	[contenteditable] {
 		cursor: text;
+	}
+
+	// With the "drag from anywhere" experiment, a block that isn't being
+	// edited drags from its text too, so its text shows the grab cursor.
+	// These follow the text cursor above, which they replace.
+	&.is-hovered-drag-anywhere,
+	&.is-hovered-drag-anywhere [contenteditable] {
+		cursor: grab;
+	}
+
+	&.is-pressed-to-drag,
+	&.is-pressed-to-drag * {
+		cursor: grabbing;
+		user-select: none;
 	}
 }
 

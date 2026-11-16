@@ -3,6 +3,7 @@ import {
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { unlock } from '../../../lock-unlock';
+import { isEditingBlock } from './use-selected-block-event-handlers';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
@@ -35,7 +36,10 @@ export function useIsHovered( {
 				node.classList.toggle( 'is-hovered', isHovered );
 				clearTimeout( timeoutId );
 				if ( ! isHovered ) {
-					node.classList.remove( 'is-hovered-draggable' );
+					node.classList.remove(
+						'is-hovered-draggable',
+						'is-hovered-drag-anywhere'
+					);
 					return;
 				}
 				// Over editable content the cursor is a text cursor, not
@@ -46,12 +50,42 @@ export function useIsHovered( {
 				// Mouse events target elements.
 				const target = event.target as HTMLElement;
 				timeoutId = setTimeout( () => {
+					// With drag from anywhere, the block drags from its text
+					// too, until the caret is in it.
+					const isDragAnywhere =
+						!! window.__experimentalBlockDragFromAnywhere &&
+						target.isContentEditable &&
+						target.closest( '[data-block]' ) === node &&
+						! isEditingBlock( node );
 					node.classList.toggle(
 						'is-hovered-draggable',
-						! target.isContentEditable
+						! target.isContentEditable || isDragAnywhere
+					);
+					node.classList.toggle(
+						'is-hovered-drag-anywhere',
+						isDragAnywhere
 					);
 				}, 100 );
 			}
+
+			// Once the caret is in the block, its text selects again, so
+			// the drag affordance goes.
+			function onFocusIn() {
+				if (
+					node.classList.contains( 'is-hovered-drag-anywhere' ) &&
+					isEditingBlock( node )
+				) {
+					node.classList.remove(
+						'is-hovered-draggable',
+						'is-hovered-drag-anywhere'
+					);
+				}
+			}
+			node.addEventListener( 'focusin', onFocusIn );
+			// While a text block is selected, focus is on the writing flow
+			// wrapper rather than in the block, so a click that puts the caret
+			// in the block is checked too.
+			node.addEventListener( 'click', onFocusIn );
 
 			const unsubscribeOut = subscribeDelegatedListener(
 				node,
@@ -67,11 +101,16 @@ export function useIsHovered( {
 			return () => {
 				unsubscribeOut();
 				unsubscribeOver();
+				node.removeEventListener( 'focusin', onFocusIn );
+				node.removeEventListener( 'click', onFocusIn );
 
 				// Remove classes in case they linger.
 				clearTimeout( timeoutId );
 				node.classList.remove( 'is-hovered' );
-				node.classList.remove( 'is-hovered-draggable' );
+				node.classList.remove(
+					'is-hovered-draggable',
+					'is-hovered-drag-anywhere'
+				);
 			};
 		},
 		[ isEnabled ]
