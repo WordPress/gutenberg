@@ -210,11 +210,28 @@ function deserializeAttributeValue(
  * function restores them to RichTextData instances so that block edit
  * components that rely on RichTextData methods (e.g. `.text`) work correctly.
  *
- * @param blocks Blocks as extracted from the CRDT document via toJSON().
+ * @param blocks          Blocks as extracted from the CRDT document via toJSON().
+ * @param referenceBlocks Editor blocks to reuse when their values match.
  * @return Blocks with rich-text attributes restored to RichTextData.
  */
-export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
-	return blocks.map( ( block: Block ) => {
+export function deserializeBlockAttributes(
+	blocks: Block[],
+	referenceBlocks: Block[] = []
+): Block[] {
+	const references = new Map(
+		referenceBlocks.map( ( block, index ) => [
+			block.clientId,
+			{
+				block,
+				serialized: getSerializableBlocks( referenceBlocks )[ index ],
+			},
+		] )
+	);
+	const restored = blocks.map( ( block: Block ) => {
+		const reference = references.get( block.clientId );
+		if ( reference && fastDeepEqual( block, reference.serialized ) ) {
+			return reference.block;
+		}
 		const { name, innerBlocks, attributes, ...rest } = block;
 
 		const newAttributes = { ...attributes };
@@ -230,13 +247,29 @@ export function deserializeBlockAttributes( blocks: Block[] ): Block[] {
 			}
 		}
 
-		return {
+		const result = {
 			...rest,
 			name,
 			attributes: newAttributes,
-			innerBlocks: deserializeBlockAttributes( innerBlocks ?? [] ),
+			innerBlocks: deserializeBlockAttributes(
+				innerBlocks ?? [],
+				reference?.block.innerBlocks
+			),
 		};
+		// RichTextData can normalize HTML, such as newlines to <br> tags.
+		// Compare the editor values so that normalization alone is not a correction.
+		return reference &&
+			fastDeepEqual(
+				makeBlocksSerializable( [ result ] )[ 0 ],
+				reference.serialized
+			)
+			? reference.block
+			: result;
 	} );
+	return restored.length === referenceBlocks.length &&
+		restored.every( ( block, index ) => block === referenceBlocks[ index ] )
+		? referenceBlocks
+		: restored;
 }
 
 /**
@@ -302,8 +335,8 @@ function isBlockValidNow( block: Block ): boolean {
 }
 
 /**
- * @param {any}   gblock
- * @param {Y.Map} yblock
+ * @param gblock The editor block.
+ * @param yblock The CRDT block.
  */
 function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	const yblockAsJson = yblock.toJSON();
@@ -896,13 +929,11 @@ export function rebaseCrdtBlocks(
 		removeSupersededBlocks( yblocks, deletedIds, context );
 	}
 
-	const merged = yblocks.toJSON() as Block[];
-	const blocks = fastDeepEqual(
-		merged,
-		getSerializableBlocks( incomingBlocks )
-	)
-		? undefined
-		: deserializeBlockAttributes( merged );
+	const merged = deserializeBlockAttributes(
+		yblocks.toJSON() as Block[],
+		incomingBlocks
+	);
+	const blocks = merged === incomingBlocks ? undefined : merged;
 	const rebasedSelection =
 		context.selection !== selection ? context.selection : undefined;
 	return blocks || rebasedSelection

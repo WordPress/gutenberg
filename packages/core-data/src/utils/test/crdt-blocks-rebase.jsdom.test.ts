@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Y } from '@wordpress/sync';
+import { RichTextData } from '@wordpress/rich-text';
 import {
+	deserializeBlockAttributes,
 	mergeCrdtBlocks,
 	rebaseCrdtBlocks,
 	rebaseRichTextUpdate,
@@ -335,6 +337,79 @@ describe( 'rebaseCrdtBlocks', () => {
 	} );
 
 	describe( 'ordinary edits', () => {
+		it( 'does not correct unchanged rich text when the editor normalizes its HTML', () => {
+			const { yA } = createPeers();
+			mergeCrdtBlocks(
+				yA,
+				[
+					group( 'g1', [ paragraph( 'p1', '\n    Quote\n' ) ] ),
+					paragraph( 'p2', 'Hello' ),
+				],
+				null
+			);
+			const previousBlocks = deserializeBlockAttributes( yA.toJSON() );
+			expect(
+				String(
+					previousBlocks[ 0 ].innerBlocks[ 0 ].attributes.content
+				)
+			).toBe( '<br>    Quote<br>' );
+			const incomingBlocks = [
+				previousBlocks[ 0 ],
+				paragraph( 'p2', 'Hello!' ),
+			];
+
+			expect(
+				rebaseCrdtBlocks( yA, previousBlocks, incomingBlocks, null )
+			).toBeUndefined();
+			expect( snapshot( yA )[ 1 ].content ).toBe( 'Hello!' );
+		} );
+
+		it( 'reuses unchanged editor blocks when a peer edit requires a correction', () => {
+			const { yA, yB } = createPeers();
+			const previousBlocks = [
+				group( 'g1', [
+					paragraph( 'p1', 'Hello' ),
+					paragraph( 'p2', 'Untouched' ),
+				] ),
+				paragraph( 'p3', 'Local' ),
+			];
+			previousBlocks[ 0 ].innerBlocks[ 1 ].attributes.content =
+				RichTextData.fromHTMLString( 'Untouched' );
+			mergeCrdtBlocks( yA, previousBlocks, null );
+			rebaseCrdtBlocks(
+				yB,
+				previousBlocks,
+				[
+					group( 'g1', [
+						paragraph( 'p1', 'Hello peer' ),
+						previousBlocks[ 0 ].innerBlocks[ 1 ],
+					] ),
+					previousBlocks[ 1 ],
+				],
+				null
+			);
+			const incomingBlocks = [
+				previousBlocks[ 0 ],
+				paragraph( 'p3', 'Local!' ),
+			];
+			const result = rebaseCrdtBlocks(
+				yA,
+				previousBlocks,
+				incomingBlocks,
+				null
+			);
+
+			expect(
+				String(
+					result?.blocks?.[ 0 ].innerBlocks[ 0 ].attributes.content
+				)
+			).toBe( 'Hello peer' );
+			expect( result?.blocks?.[ 0 ].innerBlocks[ 1 ] ).toBe(
+				previousBlocks[ 0 ].innerBlocks[ 1 ]
+			);
+			expect( result?.blocks?.[ 1 ] ).toBe( incomingBlocks[ 1 ] );
+		} );
+
 		it( 'keeps a peer reorder when the editor only changes text', () => {
 			const { yA, yB } = createPeers();
 			const a = paragraph( 'a', 'A' );
