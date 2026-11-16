@@ -12,7 +12,7 @@ Use a knob when the position of a dial helps someone choose a number, such as th
 
 ## Choose the range
 
-By default, the dial spans 0 to 100 with a gap between its end stops. Use `min`, `max`, and a positive `step` to set the selectable values. The steps start at `min`. If the range does not divide evenly, the last selectable value is the last step at or below `max`.
+By default, the dial spans 0 to 100 with a gap between its end stops. Use `min`, `max`, and a positive `step` to set the selectable values. The steps start at `min`. If the range does not divide evenly, the last selectable value is the last step at or below `max`. A step larger than the whole range selects between its two endpoints.
 
 Set `wrap` when the first value follows the last. For whole degrees, use `min={ 0 }`, `max={ 359 }`, and `step={ 1 }`. Zero points up and 90 points right. Both endpoints are selectable, so each direction has one value.
 
@@ -28,6 +28,10 @@ The range can end partway through a turn. With 0 to 500 and 360 units per turn, 
 
 <Canvas of={ KnobStories.PartialTurns } />
 
+For values measured in turns, use `unitsPerTurn={ 1 }`. A step of 0.25 allows quarter turns. If one step spans an entire turn or more, tap the left half to subtract a step or the right half to add one. Dragging still follows the physical scale. Include a visible value and a description of the tap gesture when multiple values share the same heading.
+
+<Canvas of={ KnobStories.WholeTurns } />
+
 Pair the dial with a number field when users need to enter an exact rotation or see how many turns they have made. This example keeps the override in the parent. Clearing the field restores an inherited 45°. Entering zero sets an explicit 0°.
 
 <Canvas of={ KnobStories.WithNumberInput } />
@@ -36,7 +40,7 @@ Pair the dial with a number field when users need to enter an exact rotation or 
 
 Place the knob in `Field.Root` with a visible `Field.Label`. Add `Field.Description` when the setting needs an explanation. For standalone use, provide `aria-labelledby` or `aria-label`. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText` for values with custom names.
 
-Pass `value` and `onValueChange` to keep a readout or another control in sync. For an uncontrolled dial, pass `defaultValue`. The `ref` points to the outer element. Use `inputRef` to focus the range input.
+Pass `value` and `onValueChange` to keep a readout or another control in sync. For an uncontrolled dial, pass `defaultValue`. To restore a form’s defaults with a Reset button, control the value and restore it in the form’s `onReset` handler. The `ref` points to the outer element. Use `inputRef` to focus the range input.
 
 <Canvas of={ KnobStories.WithField } />
 

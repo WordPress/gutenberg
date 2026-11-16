@@ -21,6 +21,7 @@ type Drag = {
 	pointerId: number;
 	pointerAngle: number | null;
 	dialAngle: number;
+	tapOrigin: { x: number; y: number } | null;
 };
 
 // Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
@@ -62,12 +63,21 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		const input = useRef< HTMLInputElement >( null );
 		const mergedInputRef = useMergeRefs( [ input, inputRef ] );
 		const drag = useRef< Drag | null >( null );
-		const step = Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
-		const largeStepCount = Math.max( 1, Math.round( largeStep / step ) );
+		const requestedStep =
+			Number.isFinite( stepProp ) && stepProp > 0 ? stepProp : 1;
+		const span = max - min;
+		const spansRange = span > 0 && requestedStep >= span;
 		const precision = Math.min(
 			100,
-			Math.max( decimalPlaces( min ), decimalPlaces( step ) )
+			Math.max(
+				decimalPlaces( min ),
+				decimalPlaces( spansRange ? max : requestedStep )
+			)
 		);
+		const step = spansRange
+			? Number( span.toFixed( precision ) )
+			: requestedStep;
+		const largeStepCount = Math.max( 1, Math.round( largeStep / step ) );
 		// Work in whole steps so that the last value on a wrapping dial has its
 		// own position one step before the first value.
 		const toValue = ( index: number ) =>
@@ -97,6 +107,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 		}
 		const maxAngle = minAngle + lastStep * degreesPerStep;
 		const angle = minAngle + index * degreesPerStep;
+		const wholeTurnStep = degreesPerStep >= 360;
 		// When the numeric cycle spans whole turns, wrapping preserves the heading.
 		const cycleInTurns = ( ( lastStep + 1 ) * degreesPerStep ) / 360;
 		const seamless =
@@ -134,8 +145,11 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			drag.current = {
 				pointerId: event.pointerId,
 				pointerAngle,
+				tapOrigin: wholeTurnStep
+					? { x: event.clientX, y: event.clientY }
+					: null,
 				dialAngle:
-					pointerAngle === null
+					pointerAngle === null || wholeTurnStep
 						? angle
 						: getAngleOnTurn(
 								pointerAngle,
@@ -163,18 +177,39 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				return;
 			}
 			const pointerAngle = getPointerAngle( event );
+			if ( gesture.tapOrigin ) {
+				// A whole step can lead back to the same heading. Tap either side
+				// to step, or start a drag from the current value after a small movement.
+				const distance = Math.hypot(
+					event.clientX - gesture.tapOrigin.x,
+					event.clientY - gesture.tapOrigin.y
+				);
+				if ( distance < 4 ) {
+					if (
+						event.type === 'pointerup' &&
+						pointerAngle !== null &&
+						Math.abs( pointerAngle ) < 180
+					) {
+						changeIndex( index + Math.sign( pointerAngle ) );
+					}
+					return;
+				}
+				gesture.tapOrigin = null;
+			}
 			if ( pointerAngle === null ) {
 				return;
 			}
 			let nextAngle;
 			if ( gesture.pointerAngle === null ) {
-				nextAngle = getAngleOnTurn(
-					pointerAngle,
-					gesture.dialAngle,
-					minAngle,
-					maxAngle,
-					seamless
-				);
+				nextAngle = wholeTurnStep
+					? gesture.dialAngle
+					: getAngleOnTurn(
+							pointerAngle,
+							gesture.dialAngle,
+							minAngle,
+							maxAngle,
+							seamless
+						);
 			} else {
 				// Carry the turn count across twelve o'clock in either direction.
 				const delta = pointerAngle - gesture.pointerAngle;
@@ -220,7 +255,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 						className
 					) }
 					min={ min }
-					max={ lastStep > 0 ? toValue( lastStep ) : max }
+					max={ toValue( lastStep ) }
 					step={ step }
 					largeStep={ Number(
 						( largeStepCount * step ).toFixed( precision )
