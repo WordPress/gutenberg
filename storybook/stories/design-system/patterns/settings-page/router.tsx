@@ -14,7 +14,7 @@ import {
 	Link as RouterLink,
 	privateApis as routePrivateApis,
 } from '@wordpress/route';
-import { Badge, ButtonLink, Icon, Text } from '@wordpress/ui';
+import { Badge, Icon, Link, Text } from '@wordpress/ui';
 import styles from './style.module.css';
 
 const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
@@ -251,7 +251,7 @@ export function SubpageLink( {
 	const labelId = useId();
 	const statusId = useId();
 	return (
-		<ButtonLink
+		<Link
 			variant="unstyled"
 			className={ styles[ 'subpage-link' ] }
 			render={ <RouterLink to={ to } /> }
@@ -271,6 +271,6 @@ export function SubpageLink( {
 				</Badge>
 			) }
 			<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
-		</ButtonLink>
+		</Link>
 	);
 }

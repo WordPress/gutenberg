@@ -91,6 +91,7 @@ export const keyFields: Field< ApiKey >[] = [
 		render: ( { item } ) => (
 			<span data-key-id={ item.id }>{ item.name }</span>
 		),
+		enableGlobalSearch: true,
 		enableHiding: false,
 		isValid: { required: true },
 	},
@@ -177,12 +178,55 @@ export function KeyForm( {
 }
 
 /**
+ * Where focus should land once a record's row leaves the table, because it
+ * was revoked or a save moved it out of the filtered view: the next record,
+ * the previous one when it was last, or Add API key when none remain.
+ * Captured before the row is removed, so the element is one that stays.
+ * Rows are matched by record ID, since two records can share a name.
+ */
+export function focusTargetAfterRemoval(
+	id: string,
+	scope: ParentNode | null,
+	addButton: HTMLElement | null
+) {
+	const titles = findRowTitles( scope );
+	const index = titles.findIndex( ( title ) => rowTitleId( title ) === id );
+	// `titles[-1]` is undefined, so the first record falls through to the next.
+	const remaining = titles[ index + 1 ] ?? titles[ index - 1 ];
+	if ( index !== -1 && remaining ) {
+		return remaining;
+	}
+	return addButton;
+}
+
+function findRowTitles( scope: ParentNode | null ) {
+	return [
+		...( scope ?? document ).querySelectorAll< HTMLElement >(
+			'.dataviews-title-field[role="button"]'
+		),
+	];
+}
+
+function rowTitleId( title: HTMLElement ) {
+	return title.querySelector< HTMLElement >( '[data-key-id]' )?.dataset.keyId;
+}
+
+/**
  * State for editing one record in an overlay. The overlay saves on its own:
  * its Save submits the form, which applies the draft, closes the overlay and
  * confirms in a snackbar. Invalid fields stop the submission and show their
  * errors instead.
  */
-export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
+export function useKeyEditor(
+	onSave: ( key: ApiKey ) => ApiKey,
+	{
+		scopeRef,
+		addButtonRef,
+	}: {
+		scopeRef: { current: HTMLElement | null };
+		addButtonRef: { current: HTMLElement | null };
+	}
+) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// The record stays set after closing, so the overlay keeps its content
 	// while it animates out.
@@ -196,7 +240,16 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 	const formId = useId();
 	const notify = useNotify();
 
+	// Set by a save, for the overlay to read as it closes. A filtered table
+	// drops a row whose saved values no longer match, and the overlay would
+	// otherwise return focus to a control that's gone.
+	const savedFocusRef = useRef< {
+		row: HTMLElement | undefined;
+		target: HTMLElement | null;
+	} | null >( null );
+
 	const open = ( key: ApiKey ) => {
+		savedFocusRef.current = null;
 		setRecord( key );
 		setDraft( key );
 		setIsOpen( true );
@@ -216,7 +269,8 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 
 	// Reloading or closing the tab can only be guarded by the browser's own
 	// warning.
-	const shouldWarnOnUnload = isOpen && isDirty;
+	// A pending save counts too: it hasn't been applied yet.
+	const shouldWarnOnUnload = isOpen && ( isDirty || isSaving );
 	useEffect( () => {
 		if ( ! shouldWarnOnUnload ) {
 			return;
@@ -260,6 +314,19 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 		const submitted = draft;
 		setIsSaving( true );
 		await simulateRequest();
+		if ( submitted.id ) {
+			// The row is still in the table until the save re-renders it.
+			savedFocusRef.current = {
+				row: findRowTitles( scopeRef.current ).find(
+					( title ) => rowTitleId( title ) === submitted.id
+				),
+				target: focusTargetAfterRemoval(
+					submitted.id,
+					scopeRef.current,
+					addButtonRef.current
+				),
+			};
+		}
 		const saved = onSave( submitted );
 		setIsSaving( false );
 		notify( 'API key saved.' );
@@ -272,6 +339,23 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 			setRecord( saved );
 			setDraft( { ...latest, id: saved.id, prefix: saved.prefix } );
 		}
+	};
+
+	/**
+	 * Passed to the overlay's `finalFocus`. Returns focus to whatever opened
+	 * the overlay, unless a save just took the record's row out of the table.
+	 */
+	const finalFocus = () => {
+		const saved = savedFocusRef.current;
+		savedFocusRef.current = null;
+		if (
+			saved?.row &&
+			! saved.row.isConnected &&
+			saved.target?.isConnected
+		) {
+			return saved.target;
+		}
+		return true;
 	};
 
 	const onSubmit = ( event: FormEvent ) => {
@@ -296,6 +380,7 @@ export function useKeyEditor( onSave: ( key: ApiKey ) => ApiKey ) {
 		onOpenChange,
 		discard,
 		save,
+		finalFocus,
 	};
 }
 

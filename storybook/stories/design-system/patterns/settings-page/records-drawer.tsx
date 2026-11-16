@@ -7,6 +7,7 @@ import { AlertDialog, Button, Drawer } from '@wordpress/ui';
 import type { ApiKey } from './api-keys';
 import {
 	emptyKey,
+	focusTargetAfterRemoval,
 	KeyForm,
 	KeysTable,
 	useKeyEditor,
@@ -22,37 +23,6 @@ import {
 } from './shared';
 import styles from './style.module.css';
 import { DiscardChangesDialog } from './unsaved-changes';
-
-/**
- * Where focus should land once a revoked record and its drawer are gone:
- * the next record, the previous one when it was last, or Add API key when
- * the list is empty. Captured before the record is removed, so the element
- * is still the one that remains. Rows are matched by record ID, since two
- * records can share a name.
- */
-function focusTargetAfterRevoke(
-	id: string,
-	scope: ParentNode | null,
-	addButton: HTMLElement | null
-) {
-	const root = scope ?? document;
-	const titles = [
-		...root.querySelectorAll< HTMLElement >(
-			'.dataviews-title-field[role="button"]'
-		),
-	];
-	const index = titles.findIndex(
-		( title ) =>
-			title.querySelector< HTMLElement >( '[data-key-id]' )?.dataset
-				.keyId === id
-	);
-	// `titles[-1]` is undefined, so the first record falls through to the next.
-	const remaining = titles[ index + 1 ] ?? titles[ index - 1 ];
-	if ( index !== -1 && remaining ) {
-		return remaining;
-	}
-	return addButton;
-}
 
 /**
  * Edits one record in a drawer, which keeps the table in view and leaves
@@ -81,7 +51,7 @@ function KeyDrawer( {
 
 	const revokeKey = async () => {
 		await simulateRequest();
-		const target = focusTargetAfterRevoke(
+		const target = focusTargetAfterRemoval(
 			editor.record.id,
 			pageRef.current,
 			addButtonRef.current
@@ -114,7 +84,9 @@ function KeyDrawer( {
 			>
 				<Drawer.Popup
 					portal={ <Drawer.Portal container={ overlayContainer } /> }
-					finalFocus={ () => revokedFocusRef.current ?? true }
+					finalFocus={ () =>
+						revokedFocusRef.current ?? editor.finalFocus()
+					}
 				>
 					<Drawer.Header>
 						<Drawer.Title>
@@ -182,9 +154,12 @@ function KeyDrawer( {
 
 function RecordsDrawerPage() {
 	const { keys, saveKey, revokeKey } = useKeys();
-	const editor = useKeyEditor( saveKey );
 	const pageRef = useRef< HTMLDivElement >( null );
 	const addButtonRef = useRef< HTMLButtonElement >( null );
+	const editor = useKeyEditor( saveKey, {
+		scopeRef: pageRef,
+		addButtonRef,
+	} );
 	const actions: Action< ApiKey >[] = [
 		{
 			id: 'edit',

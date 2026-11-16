@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { Page } from '@wordpress/admin-ui';
 import type { Action } from '@wordpress/dataviews';
+import { useRef } from '@wordpress/element';
 import { pencil } from '@wordpress/icons';
 import { Button, Dialog } from '@wordpress/ui';
 import type { ApiKey } from './api-keys';
@@ -17,6 +18,7 @@ import {
 	SettingsExample,
 	useOverlayContainer,
 } from './shared';
+import styles from './style.module.css';
 import { DiscardChangesDialog } from './unsaved-changes';
 
 /**
@@ -42,6 +44,7 @@ export function KeyDialog( {
 			>
 				<Dialog.Popup
 					portal={ <Dialog.Portal container={ overlayContainer } /> }
+					finalFocus={ editor.finalFocus }
 				>
 					<Dialog.Header>
 						<Dialog.Title>
@@ -119,7 +122,12 @@ export function AddKeyButton( {
 
 function RecordsDialogPage() {
 	const { keys, saveKey } = useKeys();
-	const editor = useKeyEditor( saveKey );
+	const pageRef = useRef< HTMLDivElement >( null );
+	const addButtonRef = useRef< HTMLButtonElement >( null );
+	const editor = useKeyEditor( saveKey, {
+		scopeRef: pageRef,
+		addButtonRef,
+	} );
 	const actions: Action< ApiKey >[] = [
 		{
 			id: 'edit',
@@ -131,24 +139,29 @@ function RecordsDialogPage() {
 	];
 
 	return (
-		<Page
-			title="API keys"
-			subTitle="Let apps and services connect to your site."
-			showSidebarToggle={ false }
-			hasPadding
-			actions={
-				<AddKeyButton onClick={ () => editor.open( emptyKey ) } />
-			}
-		>
-			<SettingsContent wide>
-				<KeysTable
-					keys={ keys }
-					actions={ actions }
-					onClickItem={ editor.open }
-				/>
-			</SettingsContent>
-			<KeyDialog editor={ editor } />
-		</Page>
+		<div ref={ pageRef } className={ styles.screen }>
+			<Page
+				title="API keys"
+				subTitle="Let apps and services connect to your site."
+				showSidebarToggle={ false }
+				hasPadding
+				actions={
+					<AddKeyButton
+						buttonRef={ addButtonRef }
+						onClick={ () => editor.open( emptyKey ) }
+					/>
+				}
+			>
+				<SettingsContent wide>
+					<KeysTable
+						keys={ keys }
+						actions={ actions }
+						onClickItem={ editor.open }
+					/>
+				</SettingsContent>
+				<KeyDialog editor={ editor } />
+			</Page>
+		</div>
 	);
 }
 

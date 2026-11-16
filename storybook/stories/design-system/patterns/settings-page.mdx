@@ -18,7 +18,7 @@ Templates for settings screens, composed from the admin-ui `Page`, `@wordpress/u
 
 These templates are starting points, not requirements. Not every settings page needs to match one exactly: adapt the structure to what your settings need, and combine or depart from the templates where that serves people better.
 
-Several of the `@wordpress/ui` components they use, including `Button`, `ButtonLink`, `Dialog`, `Drawer` and `AlertDialog`, are still marked “Use with caution”, so their APIs may change. Treat the templates as the direction settings pages are heading, not as a recommendation to migrate existing screens yet.
+Several of the `@wordpress/ui` components they use, including `Button`, `Dialog`, `Drawer` and `AlertDialog`, are still marked “Use with caution”, so their APIs may change. Treat the templates as the direction settings pages are heading, not as a recommendation to migrate existing screens yet.
 
 ## Building blocks
 
@@ -44,7 +44,7 @@ Plan a settings page like a document's outline before choosing how it looks. The
 
 ## Saving
 
-These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs), the usual choice for settings: edits are held in a draft until the user clicks “Save changes”. Autosave suits pages of independent preferences that each take effect on their own. If you adopt it, remove the Save button rather than mixing the two models on one page.
+These templates use the manual save model from [Save & Submit](?path=/docs/design-system-patterns-save-submit--docs): edits are held in a draft until the user clicks “Save changes”. Manual save is the usual choice for settings, because their fields often depend on each other and should apply together. Autosave suits a page of independent preferences that each take effect on their own, such as the block editor’s Preferences modal. Choose one model for the whole page and don't mix the two: if you choose autosave, remove the Save button. [Choose one save model per surface](?path=/docs/design-system-patterns-save-submit--docs#choose-one-save-model-per-surface) explains how to decide.
 
 -   **One “Save changes” button per page**, in the `Page` header actions. It covers every field on that page and nothing else.
 -   **Disabled only when there is nothing to save**, and busy while saving. Don't explain the disabled state with a tooltip: tooltips aren't available to screen readers or on touch devices.
@@ -105,7 +105,7 @@ Peer sections of one settings area, such as General, Payments and Emails, switch
 
 ## Subpages
 
-A subpage holds detail that would crowd the main page, such as the credentials for each payment gateway. Open it from the page body with a full-width row at the bottom of the card: an unstyled `ButtonLink` with a trailing chevron to signal that it navigates. A status badge in the row tells people what they will find there.
+A subpage holds detail that would crowd the main page, such as the credentials for each payment gateway. Open it from the page body with a full-width row at the bottom of the card: a `Link` with `variant="unstyled"`, styled as a row, with a trailing chevron to signal that it navigates. A status badge in the row tells people what they will find there.
 
 When a card leads to several subpages, put the rows in a list:
 
