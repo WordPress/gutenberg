@@ -1,28 +1,80 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Locator, Page } from '@playwright/test';
+import { test as base, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { Editor } from '@wordpress/e2e-test-utils-playwright';
 
 const BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8889';
 
-test.use( {
-	// Wide enough for the grids' cells to be bigger than the toolbars.
-	viewport: { width: 1600, height: 1100 },
+interface Point {
+	x: number;
+	y: number;
+}
+
+interface Box extends Point {
+	width: number;
+	height: number;
+}
+
+interface Cell {
+	columnCount: number;
+	rowCount: number;
+	column: number;
+	row: number;
+}
+
+interface DragOptions {
+	/** Called just before the drop. */
+	beforeDrop?: () => Promise< unknown >;
+}
+
+const test = base.extend< { gridDragUtils: GridDragUtils } >( {
 	gridDragUtils: async ( { page, editor }, use ) => {
 		await use( new GridDragUtils( { page, editor } ) );
 	},
 } );
 
+test.use( {
+	// Wide enough for the grids' cells to be bigger than the toolbars.
+	viewport: { width: 1600, height: 1100 },
+} );
+
+/**
+ * Whether a block drag is in progress, according to the block editor store.
+ *
+ * @param page The page.
+ *
+ * @return Whether blocks are being dragged.
+ */
+function isDraggingBlocks( page: Page ): Promise< boolean > {
+	return page.evaluate( () =>
+		( window as any ).wp.data
+			.select( 'core/block-editor' )
+			.isDraggingBlocks()
+	);
+}
+
 /**
  * A manual grid, whose cells have a fixed size, so blocks dropped in it land
  * exactly where they are let go.
  *
- * @param {Object} options
- * @param {number} options.columnCount Number of columns.
- * @param {number} options.rowCount    Number of rows.
- * @param {string} options.content     Inner blocks markup.
- * @param {Object} options.attributes  Other Group attributes.
+ * @param options
+ * @param options.columnCount Number of columns.
+ * @param options.rowCount    Number of rows.
+ * @param options.content     Inner blocks markup.
+ * @param options.attributes  Other Group attributes.
  *
- * @return {string} The grid's markup.
+ * @return The grid's markup.
  */
-function getGridMarkup( { columnCount, rowCount, content, attributes = {} } ) {
+function getGridMarkup( {
+	columnCount,
+	rowCount,
+	content,
+	attributes = {},
+}: {
+	columnCount: number;
+	rowCount: number;
+	content: string;
+	attributes?: Record< string, unknown >;
+} ) {
 	const attributesMarkup = JSON.stringify( {
 		...attributes,
 		layout: {
@@ -102,7 +154,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 			[ 'toolbar handle', 1, 2 ],
 			[ 'toolbar handle', 3, 2 ],
 			[ 'body', 1, 1 ],
-		] ) {
+		] as [ string, number, number ][] ) {
 			await test.step( `by its ${ by } to ${ column }, ${ row }`, async () => {
 				await editor.selectBlocks( image );
 				const from =
@@ -129,13 +181,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 					0
 				);
 				await expect
-					.poll( () =>
-						page.evaluate( () =>
-							window.wp.data
-								.select( 'core/block-editor' )
-								.isDraggingBlocks()
-						)
-					)
+					.poll( () => isDraggingBlocks( page ) )
 					.toBe( false );
 				await expect(
 					page.locator( '.block-editor-grid-item-resizer__box' )
@@ -180,15 +226,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 		// then never reaches the canvas. The drag has to end all the same, or
 		// the drop layer keeps taking every click on the grid.
 		await expect( gridImages ).toHaveCount( 3 );
-		await expect
-			.poll( () =>
-				page.evaluate( () =>
-					window.wp.data
-						.select( 'core/block-editor' )
-						.isDraggingBlocks()
-				)
-			)
-			.toBe( false );
+		await expect.poll( () => isDraggingBlocks( page ) ).toBe( false );
 		await expect( gridDragUtils.draggingBlockTools ).toHaveCount( 0 );
 
 		const otherImage = gridImages.filter( {
@@ -219,7 +257,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 						.poll( () =>
 							page.evaluate(
 								() =>
-									window.wp.data
+									( window as any ).wp.data
 										.select( 'core/block-editor' )
 										.getDraggedBlockClientIds().length
 							)
@@ -362,7 +400,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 						gridDragUtils.allowedDropLayer
 					).toBeAttached();
 					await page.evaluate( () =>
-						window.wp.data
+						( window as any ).wp.data
 							.dispatch( 'core/editor' )
 							.setIsInserterOpened( false )
 					);
@@ -375,7 +413,7 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 				},
 			}
 		);
-		const gridBox = await grid.boundingBox();
+		const gridBox = await gridDragUtils.getBox( grid );
 		await page.mouse.move(
 			gridBox.x + gridBox.width / 2,
 			gridBox.y + gridBox.height + 60,
@@ -420,7 +458,13 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 } );
 
 class GridDragUtils {
-	constructor( { page, editor } ) {
+	page: Page;
+	editor: Editor;
+	draggingBlockTools: Locator;
+	allowedDropLayer: Locator;
+	landingPreview: Locator;
+
+	constructor( { page, editor }: { page: Page; editor: Editor } ) {
 		this.page = page;
 		this.editor = editor;
 
@@ -435,16 +479,27 @@ class GridDragUtils {
 		);
 	}
 
-	async getPoint( locator, { x, y } ) {
+	async getBox( locator: Locator ): Promise< Box > {
 		const box = await locator.boundingBox();
+		if ( ! box ) {
+			throw new Error( 'The element has no bounding box.' );
+		}
+		return box;
+	}
+
+	async getPoint( locator: Locator, { x, y }: Point ): Promise< Point > {
+		const box = await this.getBox( locator );
 		return { x: box.x + box.width * x, y: box.y + box.height * y };
 	}
 
-	getCenter( locator ) {
+	getCenter( locator: Locator ) {
 		return this.getPoint( locator, { x: 0.5, y: 0.5 } );
 	}
 
-	getCellCenter( grid, { columnCount, rowCount, column, row } ) {
+	getCellCenter(
+		grid: Locator,
+		{ columnCount, rowCount, column, row }: Cell
+	) {
 		return this.getPoint( grid, {
 			x: ( column - 0.5 ) / columnCount,
 			y: ( row - 0.5 ) / rowCount,
@@ -455,14 +510,18 @@ class GridDragUtils {
 	 * Drags with the mouse, and returns where the grid showed the block
 	 * would land, just before the drop.
 	 *
-	 * @param {Object}                 from               Where the drag starts.
-	 * @param {Object}                 to                 Where the drag ends.
-	 * @param {Object}                 options
-	 * @param {() => Promise<unknown>} options.beforeDrop Called just before the drop.
+	 * @param from               Where the drag starts.
+	 * @param to                 Where the drag ends.
+	 * @param options
+	 * @param options.beforeDrop Called just before the drop.
 	 *
-	 * @return {Promise<Object|null>} The landing preview's box, if shown.
+	 * @return The landing preview's box, if shown.
 	 */
-	async drag( from, to, { beforeDrop } = {} ) {
+	async drag(
+		from: Point,
+		to: Point,
+		{ beforeDrop }: DragOptions = {}
+	): Promise< Box | null > {
 		await this.page.mouse.move( from.x, from.y );
 		await this.page.mouse.down();
 		// A few small moves start the browser's drag and drop.
@@ -487,7 +546,11 @@ class GridDragUtils {
 		return landing;
 	}
 
-	async dragFromInserter( blockTitle, to, options ) {
+	async dragFromInserter(
+		blockTitle: string,
+		to: Point,
+		options?: DragOptions
+	) {
 		await this.page
 			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
@@ -508,25 +571,27 @@ class GridDragUtils {
 	 * Playwright can't drag files in every browser, so this fires the drag
 	 * events itself.
 	 *
-	 * @param {Object} point The point, in the page.
+	 * @param point The point, in the page.
 	 *
-	 * @return {Promise<Object>} The drag, to end it.
+	 * @return The drag, to end it.
 	 */
-	async dragFile( point ) {
+	async dragFile( point: Point ) {
 		const dragHandle = await this.page.evaluateHandle( ( { x, y } ) => {
-			const iframe = document.querySelector(
+			// The canvas is an iframe, with a document and an element under
+			// the point.
+			const iframe = document.querySelector< HTMLIFrameElement >(
 				'iframe[name="editor-canvas"]'
-			);
+			)!;
 			const frame = iframe.getBoundingClientRect();
-			const doc = iframe.contentDocument;
+			const doc = iframe.contentDocument!;
 			const clientX = x - frame.left;
 			const clientY = y - frame.top;
-			const target = doc.elementFromPoint( clientX, clientY );
+			const target = doc.elementFromPoint( clientX, clientY )!;
 			const dataTransfer = new DataTransfer();
 			dataTransfer.items.add(
 				new File( [ 'x' ], 'photo.png', { type: 'image/png' } )
 			);
-			const fire = ( type ) =>
+			const fire = ( type: string ) =>
 				target.dispatchEvent(
 					new DragEvent( type, {
 						bubbles: true,
@@ -559,17 +624,19 @@ class GridDragUtils {
 	/**
 	 * Expects a dropped block to be where the grid showed it would land.
 	 *
-	 * @param {Object} block   The block.
-	 * @param {Object} landing The landing preview's box, before the drop.
+	 * @param block   The block.
+	 * @param landing The landing preview's box, before the drop.
 	 */
-	async expectToLandOnPreview( block, landing ) {
-		expect( landing ).not.toBeNull();
+	async expectToLandOnPreview( block: Locator, landing: Box | null ) {
+		if ( ! landing ) {
+			throw new Error( 'The grid showed no landing preview.' );
+		}
 		await expect
 			.poll( async () => {
-				const box = await block.boundingBox();
+				const box = await this.getBox( block );
 				return Math.max(
-					...[ 'x', 'y', 'width', 'height' ].map( ( key ) =>
-						Math.abs( box[ key ] - landing[ key ] )
+					...( [ 'x', 'y', 'width', 'height' ] as const ).map(
+						( key ) => Math.abs( box[ key ] - landing[ key ] )
 					)
 				);
 			} )
@@ -577,12 +644,12 @@ class GridDragUtils {
 	}
 
 	async expectCenterInCell(
-		block,
-		grid,
-		{ columnCount, rowCount, column, row }
+		block: Locator,
+		grid: Locator,
+		{ columnCount, rowCount, column, row }: Cell
 	) {
 		const center = await this.getCenter( block );
-		const gridBox = await grid.boundingBox();
+		const gridBox = await this.getBox( grid );
 		expect(
 			Math.ceil(
 				( ( center.x - gridBox.x ) / gridBox.width ) * columnCount
