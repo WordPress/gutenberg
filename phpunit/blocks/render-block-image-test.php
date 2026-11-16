@@ -179,12 +179,10 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$parsed_blocks = parse_blocks( '<!-- wp:image {"lightbox":{"enabled":true}} -->' . $content . '<!-- /wp:image -->' );
 		$block         = new WP_Block( $parsed_blocks[0] );
 
-		$block->render();
-
-		$state = wp_interactivity_state( 'core/image' );
-		$meta  = array_values( $state['metadata'] );
-
-		$this->assertSame( $expected, end( $meta )['triggerButtonAriaLabel'] );
+		$rendered_block = $block->render();
+		$processor      = new WP_HTML_Tag_Processor( $rendered_block );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'lightbox-trigger' ) ) );
+		$this->assertSame( $expected, $processor->get_attribute( 'aria-label' ) );
 
 		remove_all_filters( 'render_block_core/image' );
 	}

@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   Image, Gallery: Include shortened alt text in the lightbox trigger button's accessible name to distinguish multiple lightboxes on a page, and render the label server-side so it is available before JavaScript runs.([#85458](https://github.com/WordPress/gutenberg/pull/85458))
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -60,7 +61,6 @@
 
 ### Bug Fixes
 
--   Image, Gallery: Include shortened alt text in the lightbox trigger button's accessible name to distinguish multiple lightboxes on a page, and render the label server-side so it is available before JavaScript runs.([#85458](https://github.com/WordPress/gutenberg/pull/85458))
 -   Table of Contents: Show the Unordered and Ordered buttons in a template, so the list style can be changed there ([#86251](https://github.com/WordPress/gutenberg/pull/86251)).
 -   Social Icon: Keep focus on a field in the block inspector when clicking it closes the link popover, instead of moving focus back to the icon ([#86215](https://github.com/WordPress/gutenberg/pull/86215)).
 -   Table of Contents: List the previewed headings when previewing unsaved changes to a published post, instead of the saved ones ([#86155](https://github.com/WordPress/gutenberg/pull/86155)).

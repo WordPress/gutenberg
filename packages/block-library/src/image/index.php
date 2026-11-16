@@ -238,7 +238,12 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 	wp_interactivity_state(
 		'core/image',
 		array(
-			'metadata' => array(
+			'thisImage' => static function () {
+				$context = wp_interactivity_get_context();
+				$state   = wp_interactivity_state( 'core/image' );
+				return $state['metadata'][ $context['imageId'] ];
+			},
+			'metadata'  => array(
 				$unique_image_id => array(
 					'uploadedSrc'            => $img_uploaded_src,
 					'lightboxSrcset'         => $img_srcset,
