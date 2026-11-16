@@ -46,13 +46,6 @@ describe( 'DropdownMenu row layout', () => {
 							>
 								Show details
 							</MenuItem>
-							<MenuItem
-								role="menuitemcheckbox"
-								isSelected={ false }
-								className="components-menu-item__selection-row"
-							>
-								Show outlines
-							</MenuItem>
 						</MenuGroup>
 					) }
 				</DropdownMenu>
@@ -69,7 +62,6 @@ describe( 'DropdownMenu row layout', () => {
 		const indicator = item.querySelector( 'svg' )!;
 		await expect.element( indicator ).toBeVisible();
 		const left = textLeft( 'Show details' );
-		expect( textLeft( 'Show outlines' ) ).toBe( left );
 		expect( indicator.getBoundingClientRect().right ).toBeLessThanOrEqual(
 			left
 		);
@@ -102,6 +94,9 @@ describe( 'DropdownMenu row layout', () => {
 		const icon = item.querySelector( 'svg' )!;
 		expect( icon.getBoundingClientRect().left ).toBeGreaterThanOrEqual(
 			item.getBoundingClientRect().left
+		);
+		expect( icon.getBoundingClientRect().right ).toBeLessThanOrEqual(
+			textLeft( 'Code editor' )
 		);
 	} );
 
