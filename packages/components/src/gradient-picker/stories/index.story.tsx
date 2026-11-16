@@ -1,22 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Color/GradientPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,
 	parameters: {
@@ -128,6 +117,17 @@ export const WithNoExistingGradients: GradientPickerStory = {
 	},
 };
 
+/**
+ * Without presets or a Clear button, only the custom gradient editor is shown.
+ * This replaces the deprecated `CustomGradientPicker`.
+ */
+export const CustomGradientOnly: GradientPickerStory = {
+	render: Template,
+	args: {
+		clearable: false,
+	},
+};
+
 export const DuplicateGradients: GradientPickerStory = {
 	render: Template,
 	args: {
@@ -158,6 +158,11 @@ export const DuplicateGradients: GradientPickerStory = {
 };
 
 export const MultipleOrigins: GradientPickerStory = {
+	parameters: {
+		// FIXME: Multiple Origins: origin groups are missing required ARIA children (aria-required-children).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 	render: Template,
 	args: {
 		gradients: [

@@ -60,7 +60,7 @@ if ( ! class_exists( 'WP_REST_Icon_Collections_Controller' ) ) {
 		/**
 		 * Checks whether a given request has permission to read icon collections.
 		 *
-		 * @param WP_REST_Request $_request Full details about the request.
+		 * @param WP_REST_Request $request Full details about the request.
 		 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 		 */
 		public function get_items_permissions_check(

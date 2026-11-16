@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
 import lighthouse from 'lighthouse/core/index.cjs';
 

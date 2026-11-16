@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from '@playwright/test';
-
-/**
- * WordPress dependencies
- */
 import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 process.env.ASSETS_PATH = path.join( __dirname, 'assets' );

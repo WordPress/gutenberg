@@ -1,9 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-export const NOTE_FORMAT_NAME = 'core/note';
 
 /*
  * Anchoring-only format: it serializes an inline note's in-content marker as
@@ -20,5 +15,4 @@ export const noteFormat = {
 	attributes: {
 		'data-id': 'data-id',
 	},
-	edit: () => null,
 };

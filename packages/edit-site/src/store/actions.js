@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { parse } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { store as coreStore } from '@wordpress/core-data';
@@ -10,10 +7,6 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
 import {
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,

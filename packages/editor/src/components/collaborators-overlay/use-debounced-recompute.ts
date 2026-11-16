@@ -12,7 +12,7 @@ export function useDebouncedRecompute(
 	delayMs: number
 ): [ number, () => () => void ] {
 	const [ recomputeToken, setRecomputeToken ] = useState( 0 );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > | null >( null );
+	const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 	const rerenderAfterDelay = useCallback( () => {
 		if ( timeoutRef.current ) {

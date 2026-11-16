@@ -29,6 +29,7 @@ Private actions:
 Private selectors:
 - `getAllBlockBindingsSources`
 - `getBlockBindingsSource`
+- `getBlockKeyboardShortcuts`
 - `getBootstrappedBlockType`
 - `getSupportedStyles`
 - `getUnprocessedBlockTypes`
@@ -40,7 +41,6 @@ Private exports:
 - `__experimentalPopoverLegacyPositionToPlacement`
 - `ComponentsContext`
 - `Tabs`
-- `Theme`
 - `Menu`
 - `kebabCase`
 
@@ -114,7 +114,6 @@ Private exports:
 - `globalStylesLinksDataKey`
 - `selectBlockPatternsKey`
 - `requiresWrapperOnCopy`
-- `PrivateRichText`: has an extra prop `readOnly` added in #58916 and #60327 (Feb and Mar 2024).
 - `PrivateInserterLibrary`: has an extra prop `onPatternCategorySelection` added in #62130 (May 2024).
 - `reusableBlocksSelectKey`
 - `PrivateBlockPopover`: has two extra props, `__unstableContentRef` and `__unstablePopoverSlot`.
@@ -180,7 +179,6 @@ Private selectors:
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
 - `getZoomLevel`
-- `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
 - `isBlockSubtreeDisabled`
 - `isDragging`
@@ -200,10 +198,12 @@ Private exports:
 ### `core` store
 
 Private actions:
+- `receiveEntityActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
+- `getEntityActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`
@@ -218,6 +218,8 @@ Private exports:
 - `CreatePatternModal`
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
+- `CreateTemplatePartModal`
+- `CreateTemplatePartModalContents`
 - `isOverridableBlock`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
@@ -247,7 +249,8 @@ Private selectors:
 ## block-library
 
 Private exports:
-- `BlockKeyboardShortcuts`
+- `NAVIGATION_OVERLAY_TEMPLATE_PART_AREA`
+- `NavigationLinkUI`
 
 ## router (private exports only)
 
@@ -264,7 +267,6 @@ Private exports:
 ## editor
 
 Private exports:
-- `CreateTemplatePartModal`
 - `BackButton`
 - `Editor`
 - `PluginPostExcerpt`
@@ -288,18 +290,15 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
 - `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
-- `getEntityActions`
 - `getInserter`
 - `getInserterSidebarToggleRef`
 - `getListViewToggleRef`

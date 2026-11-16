@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext, getElement } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
 import {
 	initWaveformPlayer,
 	logPlayError,

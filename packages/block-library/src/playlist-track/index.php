@@ -17,7 +17,8 @@
  * @return string Returns the Playlist Track.
  */
 function render_block_core_playlist_track( $attributes, $content = '', $block = null ) {
-	if ( empty( $attributes['id'] ) ) {
+	// A track needs a source URL to be playable.
+	if ( empty( $attributes['src'] ) ) {
 		return '';
 	}
 
@@ -27,11 +28,12 @@ function render_block_core_playlist_track( $attributes, $content = '', $block = 
 		$show_images = $block->context['showImages'];
 	}
 
-	$artist = $attributes['artist'] ?? '';
-	$image  = $attributes['image'] ?? '';
-	$alt    = $attributes['imageAlt'] ?? '';
-	$length = $attributes['length'] ?? '';
-	$title  = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
+	$track_image = $attributes['image'] ?? null;
+	$image       = is_string( $track_image ) ? $track_image : '';
+	$artist      = $attributes['artist'] ?? '';
+	$alt         = $attributes['imageAlt'] ?? '';
+	$length      = $attributes['length'] ?? '';
+	$title       = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
 	$html  = '<li ' . $wrapper_attributes . '>';
 	$html .= '<button data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';

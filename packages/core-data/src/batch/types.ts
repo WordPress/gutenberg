@@ -1,0 +1,65 @@
+/**
+ * A REST API request in a batch.
+ */
+export interface BatchRequest {
+	path: string;
+	data?: unknown;
+	method?: string;
+	headers?: Record< string, string | Array< string > >;
+}
+
+/**
+ * The outcome of one batched input: its `output`, or its `error`.
+ */
+export interface BatchResult {
+	output?: unknown;
+	error?: unknown;
+}
+
+/**
+ * Processes the inputs of a batch, resolving to one result per input: an
+ * object with its `output` or `error`, or the output itself.
+ */
+export type BatchProcessor< Input > = (
+	inputs: Array< Input >
+) => Promise< Array< unknown > >;
+
+/**
+ * A thunk that adds an input to a batch asynchronously.
+ */
+export type BatchThunk< Input, Result = unknown > = (
+	add: ( input: Input ) => Promise< unknown >
+) => Result;
+
+/**
+ * A batch, which combines the inputs added to it into one processor call.
+ */
+export interface Batch< Input > {
+	add: < Result = unknown >(
+		inputOrThunk: Input | BatchThunk< Input, Result >
+	) => Promise< Awaited< Result > >;
+	run: () => Promise< boolean >;
+}
+
+/**
+ * The response to the preflight OPTIONS request to /batch/v1.
+ */
+export interface BatchPreflightResponse {
+	endpoints: Array< { args: { requests: { maxItems: number } } } >;
+}
+
+/**
+ * The response to one request of a batch.
+ */
+export interface BatchItemResponse {
+	status: number;
+	body: unknown;
+}
+
+/**
+ * The response to a batch request. A failed validation leaves `null` for the
+ * requests that passed it.
+ */
+export type BatchResponse =
+	| { failed: 'validation'; responses: Array< BatchItemResponse | null > }
+	| { failed?: undefined; responses: Array< BatchItemResponse > };

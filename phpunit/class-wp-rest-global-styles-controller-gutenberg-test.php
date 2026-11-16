@@ -39,6 +39,13 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 	public function set_up() {
 		parent::set_up();
+		// When the tests run outside of wp-env, the emptytheme fixture is not
+		// mounted in the WordPress theme root, so register the plugin's test
+		// theme directory to make it discoverable.
+		if ( ! wp_get_theme( 'emptytheme' )->exists() ) {
+			register_theme_directory( dirname( __DIR__ ) . '/test' );
+			wp_clean_themes_cache();
+		}
 		switch_theme( 'emptytheme' );
 	}
 
@@ -166,7 +173,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 					),
 					'wp:theme-file' => array(
 						array(
-							'href'   => home_url( '/wp-content/themes/emptytheme/img/1024x768_emptytheme_test_image.jpg' ),
+							'href'   => get_theme_file_uri( 'img/1024x768_emptytheme_test_image.jpg' ),
 							'name'   => 'file:./img/1024x768_emptytheme_test_image.jpg',
 							'target' => 'styles.background.backgroundImage.url',
 							'type'   => 'image/jpeg',
@@ -488,6 +495,56 @@ class WP_REST_Global_Styles_Controller_Gutenberg_Test extends WP_Test_REST_Contr
 
 		$this->assertArrayHasKey( 'self', $links );
 		$this->assertStringContainsString( '/wp/v2/global-styles/' . self::$global_styles_id, $links['self'][0]['href'] );
+	}
+
+	/**
+	 * Ensures the version-history link points to the revisions and counts them.
+	 *
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::prepare_links
+	 */
+	public function test_get_item_version_history_link(): void {
+		wp_update_post(
+			array(
+				'ID'           => self::$global_styles_id,
+				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true, "styles": { "color": { "text": "red" } } }',
+			)
+		);
+		wp_update_post(
+			array(
+				'ID'           => self::$global_styles_id,
+				'post_content' => '{"version": ' . WP_Theme_JSON_Gutenberg::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true, "styles": { "color": { "text": "blue" } } }',
+			)
+		);
+		$revisions_count = count( wp_get_post_revisions( self::$global_styles_id ) );
+		$this->assertGreaterThan( 0, $revisions_count, 'Expected the updates to create revisions.' );
+
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/global-styles/' . self::$global_styles_id );
+		$response = rest_get_server()->dispatch( $request );
+		$links    = $response->get_links();
+
+		$this->assertArrayHasKey( 'version-history', $links );
+		$this->assertSame( rest_url( '/wp/v2/global-styles/' . self::$global_styles_id . '/revisions' ), $links['version-history'][0]['href'] );
+		$this->assertArrayHasKey( 'count', $links['version-history'][0]['attributes'] );
+		$this->assertSame( $revisions_count, $links['version-history'][0]['attributes']['count'] );
+	}
+
+	/**
+	 * Ensures that links are prepared the same from a post ID as from a post object.
+	 *
+	 * @covers WP_REST_Global_Styles_Controller_Gutenberg::prepare_links
+	 */
+	public function test_prepare_links_accepts_post_id_or_object(): void {
+		$controller = new WP_REST_Global_Styles_Controller_Gutenberg( 'wp_global_styles' );
+		$post_id    = self::$global_styles_id;
+		$post       = get_post( $post_id );
+		$this->assertInstanceOf( WP_Post::class, $post );
+
+		$links_from_id   = Closure::bind( fn () => $this->prepare_links( $post_id ), $controller, $controller )();
+		$links_from_post = Closure::bind( fn () => $this->prepare_links( $post ), $controller, $controller )();
+
+		$this->assertSame( rest_url( '/wp/v2/global-styles/' . $post_id ), $links_from_id['self']['href'] );
+		$this->assertSame( $links_from_id, $links_from_post );
 	}
 
 	/**

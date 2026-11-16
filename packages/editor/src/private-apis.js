@@ -1,16 +1,4 @@
-/**
- * WordPress dependencies
- */
-import {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
-} from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
-
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
@@ -19,7 +7,10 @@ import PostCardPanel from './components/post-card-panel';
 import PreferencesModal from './components/preferences-modal';
 import { usePostActions } from './components/post-actions/actions';
 import usePostFields from './components/post-fields';
+import MoreMenuItem from './components/more-menu/more-menu-item';
+import MoreMenuPreferenceItem from './components/more-menu/more-menu-preference-item';
 import ToolsMoreMenuGroup from './components/more-menu/tools-more-menu-group';
+import SiteExport from './components/site-export';
 import ViewMoreMenuGroup from './components/more-menu/view-more-menu-group';
 import ResizableEditor from './components/resizable-editor';
 import { registerCoreBlockBindingsSources } from './bindings/api';
@@ -33,9 +24,6 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
 	BackButton,
 	Editor,
 	PluginPostExcerpt,
@@ -43,7 +31,10 @@ lock( privateApis, {
 	PreferencesModal,
 	usePostActions,
 	usePostFields,
+	MoreMenuItem,
+	MoreMenuPreferenceItem,
 	ToolsMoreMenuGroup,
+	SiteExport,
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	UploadProgressSnackbar,

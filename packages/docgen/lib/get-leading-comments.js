@@ -1,8 +1,8 @@
 /**
  * Function that returns the leading comment
- * of a Espree node.
+ * of an AST node.
  *
- * @param {import('@babel/core').Node} declaration Espree node to inspect
+ * @param {import('@babel/types').Node} declaration AST node to inspect
  *
  * @return {string | undefined} Leading comment or undefined if there is none.
  */

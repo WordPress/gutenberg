@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-restricted-imports -- Temporary compatibility fallback for older @wordpress/theme runtimes. Remove in WordPress 7.3.
 import * as theme from '@wordpress/theme';
+// eslint-disable-next-line no-restricted-imports -- Temporary compatibility fallback for older @wordpress/theme runtimes. Remove in WordPress 7.3.
 import { unlock } from '../lock-unlock';
 
 type ThemeProviderComponent = typeof theme.ThemeProvider;

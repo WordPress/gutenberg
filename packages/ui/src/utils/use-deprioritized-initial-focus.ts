@@ -11,7 +11,7 @@ type InitialFocus = _Popover.Popup.Props[ 'initialFocus' ];
 
 type DeprioritizedInitialFocus = {
 	resolvedInitialFocus: InitialFocus;
-	popupRef: React.RefObject< HTMLDivElement >;
+	popupRef: React.RefObject< HTMLDivElement | null >;
 };
 
 /**

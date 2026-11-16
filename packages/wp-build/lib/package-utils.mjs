@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { readFileSync, existsSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -69,7 +66,7 @@ function findPackageRoot( startDir ) {
  * and external dependencies in pnpm/yarn/npm workspaces.
  *
  * @param {string}      fullPackageName The full package name (e.g., '@wordpress/blocks').
- * @param {string|null} resolveDir      Optional directory context for resolution (from esbuild).
+ * @param {string|null} resolveDir      Optional directory context for resolution (the importer's directory).
  * @return {PackageJson|null} Package.json object or null if not found.
  */
 export function getPackageInfo( fullPackageName, resolveDir = null ) {
@@ -93,7 +90,7 @@ export function getPackageInfo( fullPackageName, resolveDir = null ) {
 	} catch ( error ) {
 		// Treat a genuine resolution miss (package not installed, or it doesn't
 		// expose its package.json) as `null` so callers can fall through to
-		// esbuild's own resolution. Rethrow anything unexpected so real errors
+		// the bundler's own resolution. Rethrow anything unexpected so real errors
 		// (invalid specifiers, resolver bugs) aren't silently swallowed.
 		const code = /** @type {NodeJS.ErrnoException} */ ( error ).code;
 		if (
@@ -127,3 +124,17 @@ export function getPackageInfoFromFile( packageJsonPath ) {
 	packagePathCache.set( packageJsonPath, packageJson );
 	return packageJson;
 }
+
+/**
+ * Interprets a configuration value as a boolean, where `"true"` and `"1"`
+ * are considered true while all other values are false.
+ *
+ * @param {string|undefined} value The configuration value to interpret.
+ * @return {boolean|undefined} Boolean interpretation of the given configuration value, or undefined if not set.
+ */
+export const boolConfigVal = ( value ) => {
+	if ( value === undefined ) {
+		return undefined;
+	}
+	return [ 'true', '1' ].includes( value.toLowerCase() );
+};

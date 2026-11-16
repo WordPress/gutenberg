@@ -28,30 +28,34 @@ The package also exports ready-to-use notice UI components powered by the `core/
 
 Renders notice lists for notices with type `default`:
 
--   non-dismissible notices in a pinned list.
--   dismissible notices in a removable list.
+- non-dismissible notices in a pinned list.
+- dismissible notices in a removable list.
 
 `children` are rendered inside the dismissible list.
 
+Keep `InlineNotices` mounted when there are no notices. It announces added and changed messages. Replacing a notice with the same ID and message repeats the announcement. An identical replacement keeps focus and open details. Notices present on mount and notices created with `speak: false` stay silent. Errors are announced assertively and other notices politely.
+
+Child notices built with the same version of `@wordpress/ui` as `InlineNotices` share its `Notice.List` announcements. If your plugin bundles a different version, verify that the list announces your child notice before removing a separate `speak()` call.
+
 _Props_
 
--   `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
--   `className: string` (optional): Extra class name added to the inline notices wrapper.
--   `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
--   `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
--   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
+- `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
+- `className: string` (optional): Extra class name added to the inline notices wrapper.
+- `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
+- `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
+- `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
 
 ### `SnackbarNotices`
 
 Renders notices with type `snackbar` using `SnackbarList`.
 
--   It renders the last three snackbar notices.
--   Dismiss actions are wired to `removeNotice`.
+- It renders the last three snackbar notices.
+- Dismiss actions are wired to `removeNotice`.
 
 _Props_
 
--   `className: string` (optional): Extra class name added to the snackbar list.
--   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
+- `className: string` (optional): Extra class name added to the snackbar list.
+- `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
 
 ## Example
 

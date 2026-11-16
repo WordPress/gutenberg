@@ -4,10 +4,29 @@
  *
  * Builds the default view configuration for an entity and exposes it through
  * the dynamic `get_entity_view_config_{$kind}_{$name}` filter so core and third
- * parties can provide the configuration for a specific entity.
+ * parties can provide the configuration for a specific entity. The dynamic
+ * portions of the hook name are lowercased, e.g.
+ * `get_entity_view_config_posttype_page` for the `page` post type.
  *
  * @package gutenberg
  */
+
+/**
+ * Builds the name of the dynamic filter that provides the view configuration
+ * for an entity.
+ *
+ * The entity kind and name are embedded in the hook name lowercased, so the
+ * hook follows the WordPress convention of lowercase hook names regardless of
+ * how the entity identifiers are spelled: the `postType`/`page` entity maps to
+ * the `get_entity_view_config_posttype_page` hook.
+ *
+ * @param string $kind The entity kind (e.g. `postType`).
+ * @param string $name The entity name (e.g. `page`).
+ * @return string The filter name.
+ */
+function gutenberg_get_entity_view_config_hook_name( $kind, $name ) {
+	return strtolower( "get_entity_view_config_{$kind}_{$name}" );
+}
 
 /**
  * Builds the default `form` configuration for post types that don't provide their own.
@@ -24,7 +43,7 @@
  *
  * @return array The default form configuration.
  */
-function _gutenberg_get_default_post_type_form() {
+function _gutenberg_get_default_posttype_form() {
 	return array(
 		'layout' => array( 'type' => 'panel' ),
 		'fields' => array(
@@ -94,8 +113,10 @@ function _gutenberg_get_default_post_type_form() {
  * Returns the view configuration for the given entity.
  *
  * Builds the default configuration shared by all entities and then exposes it
- * through the dynamic `get_entity_view_config_{$kind}_{$name}` filter so that core
- * and third parties can provide the configuration for a specific entity.
+ * through the dynamic `get_entity_view_config_{$kind}_{$name}` filter — with the
+ * dynamic portions lowercased, see gutenberg_get_entity_view_config_hook_name()
+ * — so that core and third parties can provide the configuration for a
+ * specific entity.
  *
  * @param string $kind The entity kind (e.g. `postType`).
  * @param string $name The entity name (e.g. `page`).
@@ -143,7 +164,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		'default_view'    => $default_view,
 		'default_layouts' => $default_layouts,
 		'view_list'       => $view_list,
-		'form'            => 'postType' === $kind ? _gutenberg_get_default_post_type_form() : array(),
+		'form'            => 'postType' === $kind ? _gutenberg_get_default_posttype_form() : array(),
 	);
 
 	$data = new Gutenberg_View_Config_Data( $config );
@@ -157,7 +178,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_page( $data ) {
+function _gutenberg_get_entity_view_config_posttype_page( $data ) {
 	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
@@ -295,7 +316,7 @@ function _gutenberg_get_entity_view_config_post_type_page( $data ) {
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
+function _gutenberg_get_entity_view_config_posttype_wp_block( $data ) {
 	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
@@ -411,7 +432,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_block( $data ) {
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
+function _gutenberg_get_entity_view_config_posttype_wp_template_part( $data ) {
 	$default_layouts = array(
 		'table' => array(
 			'layout' => array(
@@ -511,7 +532,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template_part( $data ) {
  * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
-function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
+function _gutenberg_get_entity_view_config_posttype_wp_template( $data ) {
 	$default_view = array(
 		'type'             => 'grid',
 		'perPage'          => 20,
@@ -723,7 +744,7 @@ function _gutenberg_get_entity_view_config_post_type_wp_template( $data ) {
  * Registers the Gutenberg entity view configuration filters, overriding any
  * defaults that WordPress core may have already registered.
  *
- * Core registers its own `_wp_get_entity_view_config_post_type_*` callbacks on
+ * Core registers its own `_wp_get_entity_view_config_posttype_*` callbacks on
  * the shared `get_entity_view_config_{$kind}_{$name}` hooks. The Gutenberg
  * plugin always ships the newest configuration, so it removes the core defaults
  * and installs its own `_gutenberg_*` callbacks instead.
@@ -740,9 +761,9 @@ function gutenberg_register_entity_view_config_filters() {
 	$post_types = array( 'page', 'post', 'wp_block', 'wp_template_part', 'wp_template' );
 
 	foreach ( $post_types as $post_type ) {
-		$hook        = "get_entity_view_config_postType_{$post_type}";
-		$wp_callback = "_wp_get_entity_view_config_post_type_{$post_type}";
-		$gb_callback = "_gutenberg_get_entity_view_config_post_type_{$post_type}";
+		$hook        = gutenberg_get_entity_view_config_hook_name( 'postType', $post_type );
+		$wp_callback = "_wp_get_entity_view_config_posttype_{$post_type}";
+		$gb_callback = "_gutenberg_get_entity_view_config_posttype_{$post_type}";
 
 		// has_filter() returns the priority the callback was registered at.
 		$wp_priority = has_filter( $hook, $wp_callback );

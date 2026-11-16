@@ -47,7 +47,9 @@
 
 	.block-editor-block-icon {
 		margin-right: 10px;
+		// Keep `fill` as a fallback for custom block icons that do not use `currentColor`.
 		fill: $gray-900;
+		color: $gray-900;
 	}
 }
 

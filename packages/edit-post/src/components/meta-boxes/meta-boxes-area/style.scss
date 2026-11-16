@@ -22,7 +22,7 @@
 	}
 
 	.postbox-header {
-		border-top: $border-width solid $gray-300;
+		border-top: $border-width solid $gray-200;
 		border-bottom: 0;
 	}
 
@@ -38,7 +38,8 @@
 	#poststuff .stuffbox > h3,
 	#poststuff h2.hndle { /* WordPress selectors yolo */
 		box-sizing: border-box;
-		color: inherit;
+		color: $gray-900;
+		font-size: $default-font-size;
 		font-weight: var(--wpds-typography-font-weight-emphasis);
 		outline: none;
 		padding: 0 $grid-unit-30;

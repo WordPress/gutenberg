@@ -12,7 +12,7 @@ class WP_Theme_JSON_Gutenberg_Selector_List_Test extends WP_UnitTestCase {
 	 * Invokes a protected static method on WP_Theme_JSON_Gutenberg.
 	 *
 	 * @param string $method_name Method name.
-	 * @param mixed ...$args Method arguments.
+	 * @param mixed  ...$args     Method arguments.
 	 * @return mixed Method result.
 	 */
 	private static function invoke_theme_json_method( $method_name, ...$args ) {
@@ -29,7 +29,7 @@ class WP_Theme_JSON_Gutenberg_Selector_List_Test extends WP_UnitTestCase {
 	/**
 	 * @dataProvider data_split_selector_list
 	 *
-	 * @param string $selector CSS selector list.
+	 * @param string   $selector CSS selector list.
 	 * @param string[] $expected Expected selectors.
 	 */
 	public function test_split_selector_list( $selector, $expected ) {
