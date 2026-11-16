@@ -10,3 +10,10 @@
 .dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 	padding: 0 var(--wpds-dimension-padding-xs);
 }
+
+// Wrappers used when the layout can collapse primary actions. They don't
+// take part in layout themselves; the layout hides them by class.
+.dataviews-item-actions__primary,
+.dataviews-item-actions__collapsed-menu {
+	display: contents;
+}
