@@ -5,6 +5,7 @@ const readFile = vi.fn();
 const stat = vi.fn();
 const mkdir = vi.fn();
 const writeFile = vi.fn();
+const rename = vi.fn();
 const existsSync = vi.fn();
 const resolveDns = vi.fn();
 const gotPath = require.resolve( 'got' );
@@ -53,7 +54,7 @@ let loadConfig;
 try {
 	require.cache.fs = {
 		exports: {
-			promises: { readFile, stat, mkdir, writeFile },
+			promises: { readFile, stat, mkdir, writeFile, rename },
 			existsSync,
 		},
 	};
@@ -83,6 +84,7 @@ describe( 'Config Integration', () => {
 		stat.mockReset().mockResolvedValue( true );
 		mkdir.mockReset().mockResolvedValue();
 		writeFile.mockReset().mockResolvedValue();
+		rename.mockReset().mockResolvedValue();
 		existsSync.mockReset().mockReturnValue( false );
 		resolveDns.mockReset().mockResolvedValue( [ '198.143.164.252' ] );
 		process.env.WP_ENV_HOME = '/cache';
