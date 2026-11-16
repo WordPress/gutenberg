@@ -13,6 +13,7 @@ import type { ColorGradientOptions } from '../colors-gradients/types';
 import type { Layout, LayoutBlockSupport } from '../../layouts/types';
 import type { BlockStyleState } from '../../hooks/types';
 import type { DimensionSizes } from '../dimension-control/types';
+import type { ChildLayout } from '../child-layout-control/types';
 
 export type ToolsPanelPopoverProps = Pick<
 	NonNullable< ComponentProps< typeof Dropdown >[ 'popoverProps' ] >,
@@ -555,6 +556,8 @@ export interface DimensionsPanelProps {
 	onChange: ( value: PanelStyle ) => void;
 	/** The styles inherited from global styles. */
 	inheritedValue?: PanelStyle;
+	/** The block's default child layout, inherited by viewport states. */
+	inheritedChildLayout?: ChildLayout;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
 	/** ID of the panel. */

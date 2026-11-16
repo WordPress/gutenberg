@@ -70,9 +70,14 @@ function isSameValidity( a?: Validity, b?: Validity ) {
  *
  * The wrapped control is cloned with `label` and `required` props, and the
  * validity state is read from the element returned by `getValidityTarget`.
- * Validation messages become visible once the control has been touched
- * (blurred at least once), when the enclosing form is submitted, or when an
- * `invalid` event is dispatched on the validity target.
+ * The validation message describes the element returned by
+ * `getInteractiveTarget`, or the validity target by default.
+ *
+ * Validation messages become visible once the control has been touched, when
+ * the enclosing form is submitted, or when an `invalid` event is dispatched on
+ * the validity target. A blur counts as a touch unless it leaves a required
+ * control empty, so tabbing or clicking through a form doesn't report missing
+ * values before the user has entered anything.
  */
 export const ControlWithError = forwardRef<
 	HTMLDivElement,
@@ -83,6 +88,7 @@ export const ControlWithError = forwardRef<
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
+		getInteractiveTarget,
 		children,
 		render = DEFAULT_RENDER,
 		...restProps
@@ -187,7 +193,7 @@ export const ControlWithError = forwardRef<
 		}
 	} );
 
-	// Show messages if field has been touched (i.e. has blurred at least once),
+	// Show messages if field has been touched (see `onBlur`),
 	// or validation has been triggered by the consumer/user.
 	useEffect( (): ReturnType< React.EffectCallback > => {
 		if ( ! isTouched || showMessage ) {
@@ -218,9 +224,16 @@ export const ControlWithError = forwardRef<
 			return;
 		}
 
-		if ( ! isTouched ) {
+		const validityTarget = getValidityTarget();
+		const targetValidity = validityTarget?.validity;
+		// A number or date input with unparseable text also reports
+		// `valueMissing`, but the user has entered something.
+		const isLeftEmpty =
+			targetValidity?.valueMissing && ! targetValidity.badInput;
+
+		if ( ! isTouched && ! isLeftEmpty ) {
 			setIsTouched( true );
-			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
+			validityTarget?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
 
 		// A control that commits an adjusted value on blur (e.g. a number
@@ -228,7 +241,6 @@ export const ControlWithError = forwardRef<
 		// while its controlled value catches up with the parent, so a message
 		// sampled in the render triggered by this event may be stale. Re-read
 		// it once React has flushed the blur's work.
-		const validityTarget = getValidityTarget();
 		const isValidating = customValidity?.type === 'validating';
 		window.queueMicrotask( () => {
 			if ( ! isValidating ) {
@@ -249,11 +261,13 @@ export const ControlWithError = forwardRef<
 
 	const visibleMessage = showMessage ? message : null;
 
-	// Imperatively manage `aria-describedby` on the validity target so we
-	// merge with any value the child control sets internally (e.g. from a
-	// `help` prop), rather than competing with it at the props level.
+	// Imperatively manage `aria-describedby` on the element users interact
+	// with, so we merge with any value the child control sets internally (e.g.
+	// from a `help` prop), rather than competing with it at the props level.
 	useEffect( () => {
-		const target = getValidityTarget();
+		const target = getInteractiveTarget
+			? getInteractiveTarget()
+			: getValidityTarget();
 		if ( ! target ) {
 			return;
 		}
@@ -277,7 +291,7 @@ export const ControlWithError = forwardRef<
 		setDescribedBy( target, !! visibleMessage );
 
 		return () => setDescribedBy( target, false );
-	}, [ visibleMessage, messageId, getValidityTarget ] );
+	}, [ visibleMessage, messageId, getValidityTarget, getInteractiveTarget ] );
 
 	return useRender( {
 		render,
