@@ -318,6 +318,10 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.mysqlPort = overrides.testsMysqlPort;
 	}
 
+	if ( overrides.testsPhpmyadminPort ) {
+		overrideConfig.env.tests.phpmyadminPort = overrides.testsPhpmyadminPort;
+	}
+
 	if ( overrides.coreSource ) {
 		overrideConfig.coreSource = overrides.coreSource;
 		overrideConfig.env.development.coreSource = overrides.coreSource;

@@ -197,15 +197,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 		);
 	}
 
-	// Set the default ports based on the config values.
-	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
-	const developmentMysqlPorts = `\${WP_ENV_MYSQL_PORT:-${
+	// The config already has the environment variable overrides applied.
+	const developmentPorts = `${ config.env.development.port }:80`;
+	const developmentMysqlPorts = `${
 		config.env.development.mysqlPort ?? ''
-	}}:3306`;
-
-	const developmentPhpmyadminPorts = `\${WP_ENV_PHPMYADMIN_PORT:-${
+	}:3306`;
+	const developmentPhpmyadminPorts = `${
 		config.env.development.phpmyadminPort ?? ''
-	}}:80`;
+	}:80`;
 
 	// Build the services object, conditionally including tests services.
 	const services = {
@@ -288,13 +287,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 	};
 
 	if ( testsEnabled ) {
-		const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
-		const testsMysqlPorts = `\${WP_ENV_TESTS_MYSQL_PORT:-${
-			config.env.tests.mysqlPort ?? ''
-		}}:3306`;
-		const testsPhpmyadminPorts = `\${WP_ENV_TESTS_PHPMYADMIN_PORT:-${
+		const testsPorts = `${ config.env.tests.port }:80`;
+		const testsMysqlPorts = `${ config.env.tests.mysqlPort ?? '' }:3306`;
+		const testsPhpmyadminPorts = `${
 			config.env.tests.phpmyadminPort ?? ''
-		}}:80`;
+		}:80`;
 
 		services[ 'tests-mysql' ] = {
 			image: dbEnv.getMariaDBImage( config.env.tests.mariadbVersion ),

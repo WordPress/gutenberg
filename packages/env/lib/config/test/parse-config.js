@@ -103,6 +103,7 @@ describe( 'parseConfig', () => {
 		vi.clearAllMocks();
 		delete process.env.WP_ENV_PORT;
 		delete process.env.WP_ENV_TESTS_PORT;
+		delete process.env.WP_ENV_TESTS_PHPMYADMIN_PORT;
 		delete process.env.WP_ENV_CORE;
 		delete process.env.WP_ENV_PHP_VERSION;
 		delete process.env.WP_ENV_MARIADB_VERSION;
@@ -377,6 +378,14 @@ describe( 'parseConfig', () => {
 				},
 			},
 		} );
+	} );
+
+	it( 'should override the tests phpMyAdmin port with an environment variable', async () => {
+		process.env.WP_ENV_TESTS_PHPMYADMIN_PORT = 9002;
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed.env.tests.phpmyadminPort ).toBe( 9002 );
 	} );
 
 	it( 'throws when latest WordPress version needed but not found', async () => {

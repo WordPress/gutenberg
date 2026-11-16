@@ -18,15 +18,16 @@ const {
  * Environment variable configuration.
  *
  * @typedef WPEnvironmentVariableConfig
- * @property {?number}                  port             An override for the development environment's port.
- * @property {?number}                  mysqlPort        An override for the development environment's MySQL port.
- * @property {?number}                  testsPort        An override for the testing environment's port.
- * @property {?number}                  testsMysqlPort   An override for the testing environment's MySQL port.
- * @property {?number}                  phpmyadminPort   An override for the development environment's phpMyAdmin port.
- * @property {?WPSource}                coreSource       An override for all environment's coreSource.
- * @property {?string}                  phpVersion       An override for all environment's PHP version.
- * @property {?string}                  mariadbVersion   An override for all environment's MariaDB version.
- * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
+ * @property {?number}                  port                An override for the development environment's port.
+ * @property {?number}                  mysqlPort           An override for the development environment's MySQL port.
+ * @property {?number}                  testsPort           An override for the testing environment's port.
+ * @property {?number}                  testsMysqlPort      An override for the testing environment's MySQL port.
+ * @property {?number}                  phpmyadminPort      An override for the development environment's phpMyAdmin port.
+ * @property {?number}                  testsPhpmyadminPort An override for the testing environment's phpMyAdmin port.
+ * @property {?WPSource}                coreSource          An override for all environment's coreSource.
+ * @property {?string}                  phpVersion          An override for all environment's PHP version.
+ * @property {?string}                  mariadbVersion      An override for all environment's MariaDB version.
+ * @property {?Object.<string, string>} lifecycleScripts    An override for various lifecycle scripts.
  */
 
 /**
