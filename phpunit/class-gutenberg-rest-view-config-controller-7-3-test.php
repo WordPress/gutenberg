@@ -356,6 +356,78 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A view whose status filter lists several statuses in one comma-separated
+	 * value, as the REST API accepts, counts each of them.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_counts_comma_separated_statuses() {
+		$add_comma_separated = static function ( $data ) {
+			return $data->merge(
+				array(
+					'view_list' => array(
+						array(
+							'slug'  => 'comma-separated',
+							'title' => 'Comma-separated',
+							'view'  => array(
+								'filters' => array(
+									array(
+										'field'    => 'status',
+										'operator' => 'is',
+										'value'    => 'draft, pending',
+									),
+								),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_comma_separated );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $add_comma_separated );
+
+		$this->assertSame( 3, $view_list['comma-separated']['count'] );
+	}
+
+	/**
+	 * A view filtered on the `any` status counts every status the REST API
+	 * queries for it, which leaves out trash.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_counts_any_status() {
+		$add_any = static function ( $data ) {
+			return $data->merge(
+				array(
+					'view_list' => array(
+						array(
+							'slug'  => 'any',
+							'title' => 'Any',
+							'view'  => array(
+								'filters' => array(
+									array(
+										'field'    => 'status',
+										'operator' => 'is',
+										'value'    => 'any',
+									),
+								),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_any );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $add_any );
+
+		$this->assertSame( 4, $view_list['any']['count'] );
+	}
+
+	/**
 	 * The counts are not computed when the request leaves out the view list.
 	 *
 	 * @covers ::get_items

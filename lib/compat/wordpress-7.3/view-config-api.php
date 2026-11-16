@@ -130,10 +130,22 @@ function _gutenberg_get_layered_view_statuses( $layers ) {
 		return null;
 	}
 
-	$statuses = is_array( $filter['value'] ) ? $filter['value'] : array( $filter['value'] );
-	foreach ( $statuses as $status ) {
-		if ( ! is_string( $status ) ) {
+	$values   = is_array( $filter['value'] ) ? $filter['value'] : array( $filter['value'] );
+	$statuses = array();
+	foreach ( $values as $value ) {
+		if ( ! is_string( $value ) ) {
 			return null;
+		}
+
+		// The REST API also accepts several statuses in one comma-separated value.
+		foreach ( explode( ',', $value ) as $status ) {
+			$status = trim( $status );
+			if ( 'any' === $status ) {
+				// As in WP_Query, `any` is every status not excluded from search.
+				$statuses = array_merge( $statuses, array_values( get_post_stati( array( 'exclude_from_search' => false ) ) ) );
+			} elseif ( '' !== $status ) {
+				$statuses[] = $status;
+			}
 		}
 	}
 
