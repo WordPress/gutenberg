@@ -392,6 +392,42 @@ class Tests_REST_View_Config_Controller_7_3 extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A view whose status filter lists several statuses in one space-separated
+	 * value, as the REST API also accepts, counts each of them.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_counts_space_separated_statuses() {
+		$add_space_separated = static function ( $data ) {
+			return $data->merge(
+				array(
+					'view_list' => array(
+						array(
+							'slug'  => 'space-separated',
+							'title' => 'Space-separated',
+							'view'  => array(
+								'filters' => array(
+									array(
+										'field'    => 'status',
+										'operator' => 'is',
+										'value'    => 'draft pending',
+									),
+								),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_space_separated );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $add_space_separated );
+
+		$this->assertSame( 3, $view_list['space-separated']['count'] );
+	}
+
+	/**
 	 * A view filtered on the `any` status counts every status the REST API
 	 * queries for it, which leaves out trash.
 	 *

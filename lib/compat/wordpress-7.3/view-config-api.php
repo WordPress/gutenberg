@@ -137,13 +137,13 @@ function _gutenberg_get_layered_view_statuses( $layers ) {
 			return null;
 		}
 
-		// The REST API also accepts several statuses in one comma-separated value.
-		foreach ( explode( ',', $value ) as $status ) {
-			$status = trim( $status );
+		// The REST API also accepts several statuses in one value, separated by
+		// commas or spaces, and parses them the same way.
+		foreach ( wp_parse_slug_list( $value ) as $status ) {
 			if ( 'any' === $status ) {
 				// As in WP_Query, `any` is every status not excluded from search.
 				$statuses = array_merge( $statuses, array_values( get_post_stati( array( 'exclude_from_search' => false ) ) ) );
-			} elseif ( '' !== $status ) {
+			} else {
 				$statuses[] = $status;
 			}
 		}
