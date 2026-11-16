@@ -144,6 +144,60 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 		}
 	} );
 
+	test( 'ends the drag of a block dropped in from outside the grid', async ( {
+		editor,
+		page,
+		gridDragUtils,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:image -->
+<figure class="wp-block-image"><img src="${ BASE_URL }/wp-admin/images/wordpress-logo.png" alt="outside"/></figure>
+<!-- /wp:image -->${ IMAGES_GRID }`
+		);
+		const grid = editor.canvas.getByRole( 'document', {
+			name: 'Block: Canvas',
+		} );
+		const gridImages = grid.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		const outside = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.first();
+		await expect( gridImages ).toHaveCount( 2 );
+		await editor.selectBlocks( outside );
+
+		await gridDragUtils.drag(
+			await gridDragUtils.getCenter( outside ),
+			await gridDragUtils.getCellCenter( grid, {
+				columnCount: 3,
+				rowCount: 2,
+				column: 3,
+				row: 2,
+			} )
+		);
+
+		// The drop moves the block into the grid before its `dragend`, which
+		// then never reaches the canvas. The drag has to end all the same, or
+		// the drop layer keeps taking every click on the grid.
+		await expect( gridImages ).toHaveCount( 3 );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.isDraggingBlocks()
+				)
+			)
+			.toBe( false );
+		await expect( gridDragUtils.draggingBlockTools ).toHaveCount( 0 );
+
+		const otherImage = gridImages.filter( {
+			has: editor.canvas.getByRole( 'img', { name: 'one' } ),
+		} );
+		await otherImage.click();
+		await expect( otherImage ).toHaveClass( /is-selected/ );
+	} );
+
 	test( 'drags the whole multi-selection', async ( {
 		editor,
 		page,
