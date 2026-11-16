@@ -1,6 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { isInaccessible, screen, within } from '@testing-library/react';
+import {
+	isInaccessible,
+	screen,
+	waitFor,
+	within,
+} from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import FontSizePickerSelect from '../font-size-picker-select';
 import type { FontSize } from '../types';
@@ -59,9 +64,14 @@ describe( 'FontSizePickerSelect', () => {
 		);
 		const trigger = screen.getByRole( 'combobox', { name: 'Font size' } );
 		await userEvent.click( trigger );
-		expect(
-			screen.getByRole( 'option', { name: 'Small', description: '12px' } )
-		).toBeVisible();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'option', {
+					name: 'Small',
+					description: '12px',
+				} )
+			).toBeVisible()
+		);
 		await userEvent.keyboard( '{Home}{ArrowDown}{Enter}' );
 		expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		await expect.element( trigger ).toHaveFocus();
