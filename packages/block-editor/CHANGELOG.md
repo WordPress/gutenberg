@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
 -   Inserter: Pass the pattern name in the insertion meta as `{ patternName }` when a pattern is inserted from the search results or the patterns explorer, as the Patterns tab does ([#86745](https://github.com/WordPress/gutenberg/pull/86745)).
 -   Unsynced patterns: Return selection to the pattern when exiting editing with a non-content block selected ([#86551](https://github.com/WordPress/gutenberg/pull/86551)).
