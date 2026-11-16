@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState } from '@wordpress/element';
+import { useId, useState } from '@wordpress/element';
 import { Stack } from '../../../../stack';
 import { Text } from '../../../../text';
+import { InputControl } from '../../../input-control';
 import * as Field from '../../field';
 import { Knob } from '../index';
 
@@ -74,6 +75,64 @@ export const WithField: Story = {
 					Choose the direction of the gradient.
 				</Field.Description>
 			</Field.Root>
+		);
+	},
+};
+
+/** Type a precise rotation or turn the dial. Clearing the override restores the inherited angle. */
+export const WithNumberInput: Story = {
+	args: {
+		min: -720,
+		max: 720,
+		unitsPerTurn: 360,
+		defaultValue: 0,
+		format: { style: 'unit', unit: 'degree', unitDisplay: 'long' },
+	},
+	render: function RotationField( { defaultValue, onValueChange, ...args } ) {
+		const descriptionId = useId();
+		const inheritedRotation = 45;
+		const [ rotation, setRotation ] = useState( defaultValue );
+		const [ draft, setDraft ] = useState< string >();
+		return (
+			<Stack direction="column" gap="sm">
+				<Stack direction="row" gap="sm" align="flex-end">
+					<InputControl
+						label="Rotation (degrees)"
+						type="number"
+						min={ args.min }
+						max={ args.max }
+						step={ args.step }
+						disabled={ args.disabled }
+						aria-describedby={ descriptionId }
+						placeholder={ String( inheritedRotation ) }
+						value={ draft ?? rotation ?? '' }
+						onChange={ ( { currentTarget } ) => {
+							setDraft( currentTarget.value );
+							if ( currentTarget.validity.valid ) {
+								setRotation(
+									currentTarget.value === ''
+										? undefined
+										: currentTarget.valueAsNumber
+								);
+							}
+						} }
+						onBlur={ () => setDraft( undefined ) }
+					/>
+					<Knob
+						{ ...args }
+						aria-label="Rotation (degrees)"
+						aria-describedby={ descriptionId }
+						value={ rotation ?? inheritedRotation }
+						onValueChange={ ( next ) => {
+							setRotation( next );
+							onValueChange?.( next );
+						} }
+					/>
+				</Stack>
+				<Text id={ descriptionId } variant="body-sm">
+					Clear the field to use the inherited 45°.
+				</Text>
+			</Stack>
 		);
 	},
 };

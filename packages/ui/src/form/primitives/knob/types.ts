@@ -12,13 +12,20 @@ export type KnobProps = Omit<
 > &
 	Pick< Slider.Thumb.Props, 'inputRef' | 'getAriaValueText' > & {
 		/**
-		 * Whether the dial turns through a full circle and continues from the
-		 * opposite end of the range. Both endpoints are selectable. For angles
+		 * Whether to continue at the opposite end when passing the first or
+		 * last value. Both endpoints are selectable. For angles
 		 * in whole degrees, use `min={ 0 }`, `max={ 359 }`, and `wrap`.
 		 *
 		 * @default false
 		 */
 		wrap?: boolean;
+		/**
+		 * Sets how many units one clockwise turn adds. Zero points up.
+		 * For rotation in degrees, use 360. The dial can count multiple turns
+		 * between `min` and `max`. Use a positive, finite number.
+		 * By default the entire range fits on the dial in one sweep.
+		 */
+		unitsPerTurn?: number;
 		/**
 		 * Called with the new numeric value when the user adjusts the dial.
 		 */

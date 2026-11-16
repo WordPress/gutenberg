@@ -7,7 +7,8 @@ import { DirectionProvider } from '../../../utils/direction-provider';
 import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	BOUNDED_SWEEP,
-	constrainAngle,
+	clamp,
+	getAngleOnTurn,
 	getPointerAngle,
 	getStepChange,
 	modulo,
@@ -21,9 +22,9 @@ type Drag = {
 	dialAngle: number;
 };
 
-// The native range input occupies the whole dial for touch exploration.
-// A linear Slider.Thumb would otherwise move from one side to the other.
-const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: 'none' };
+// Keep the thumb stationary. A zero translation keeps Base UI's fixed-position
+// range input inside the dial so its focus target matches what is on screen.
+const THUMB_STYLE = { insetInlineStart: 0, top: 0, translate: '0 0' };
 
 /**
  * A rotary slider for choosing a single number. Click or tap a position on the
@@ -38,6 +39,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			step: stepProp = 1,
 			largeStep = 10,
 			wrap = false,
+			unitsPerTurn,
 			value,
 			defaultValue = min,
 			onValueChange,
@@ -68,20 +70,33 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			Number( ( min + index * step ).toPrecision( 15 ) );
 		const toIndex = ( number: number ) =>
 			Math.round( ( number - min ) / step );
-		const index = Math.max(
+		const index = clamp(
+			toIndex( value ?? uncontrolledValue ),
 			0,
-			Math.min( lastStep, toIndex( value ?? uncontrolledValue ) )
+			lastStep
 		);
 		const currentValue = toValue( index );
-		const start = wrap ? 0 : -BOUNDED_SWEEP / 2;
-		const sweep = wrap ? 360 : BOUNDED_SWEEP;
-		const intervals = wrap ? lastStep + 1 : lastStep;
-		const angle = start + ( intervals ? ( index / intervals ) * sweep : 0 );
+		let minAngle = wrap ? 0 : -BOUNDED_SWEEP / 2;
+		let degreesPerStep = wrap
+			? 360 / ( lastStep + 1 )
+			: BOUNDED_SWEEP / Math.max( 1, lastStep );
+		if (
+			unitsPerTurn !== undefined &&
+			Number.isFinite( unitsPerTurn ) &&
+			unitsPerTurn > 0
+		) {
+			minAngle = ( min / unitsPerTurn ) * 360;
+			degreesPerStep = ( step / unitsPerTurn ) * 360;
+		}
+		const maxAngle = minAngle + lastStep * degreesPerStep;
+		const angle = minAngle + index * degreesPerStep;
+		const sweep = wrap ? 360 : Math.min( 360, maxAngle - minAngle );
+		const fullCircle = sweep === 360;
 
 		function changeIndex( next: number ) {
 			const nextIndex = wrap
 				? modulo( next, lastStep + 1 )
-				: Math.max( 0, Math.min( lastStep, next ) );
+				: clamp( next, 0, lastStep );
 			const nextValue = toValue( nextIndex );
 			if ( nextValue === currentValue ) {
 				return;
@@ -110,7 +125,13 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 				dialAngle:
 					pointerAngle === null
 						? angle
-						: constrainAngle( pointerAngle, wrap ),
+						: getAngleOnTurn(
+								pointerAngle,
+								angle,
+								minAngle,
+								maxAngle,
+								wrap
+							),
 			};
 			// Keep the browser's default mouse action from moving focus back to the dial wrapper.
 			event.preventDefault();
@@ -133,20 +154,27 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 			if ( pointerAngle === null ) {
 				return;
 			}
-			// Follow the shortest movement across the seam. A bounded dial keeps
-			// its end stop even when the pointer continues into the opposite half.
-			let nextAngle = pointerAngle;
-			if ( gesture.pointerAngle !== null ) {
+			let nextAngle;
+			if ( gesture.pointerAngle === null ) {
+				nextAngle = getAngleOnTurn(
+					pointerAngle,
+					gesture.dialAngle,
+					minAngle,
+					maxAngle,
+					wrap
+				);
+			} else {
+				// Carry the turn count across twelve o'clock in either direction.
 				const delta = pointerAngle - gesture.pointerAngle;
 				nextAngle =
 					gesture.dialAngle + ( modulo( delta + 180, 360 ) - 180 );
 			}
-			gesture.dialAngle = constrainAngle( nextAngle, wrap );
+			gesture.dialAngle = wrap
+				? nextAngle
+				: clamp( nextAngle, minAngle, maxAngle );
 			gesture.pointerAngle = pointerAngle;
 			changeIndex(
-				Math.round(
-					( ( gesture.dialAngle - start ) / sweep ) * intervals
-				)
+				Math.round( ( gesture.dialAngle - minAngle ) / degreesPerStep )
 			);
 		}
 
@@ -209,7 +237,7 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 							focusable="false"
 						>
 							<g
-								transform={ `rotate(${ start - 90 } 24 24)` }
+								transform={ `rotate(${ ( fullCircle ? 0 : minAngle ) - 90 } 24 24)` }
 								fill="none"
 							>
 								<circle
@@ -220,20 +248,20 @@ export const Knob = forwardRef< HTMLDivElement, KnobProps >(
 									pathLength="360"
 									strokeDasharray={ `${ sweep } 360` }
 								/>
-								{ wrap && (
+								{ fullCircle && (
 									<path
 										className={ styles.track }
 										d="M45 24h-3"
 									/>
 								) }
-								{ ! wrap && index > 0 && (
+								{ ! fullCircle && index > 0 && (
 									<circle
 										className={ styles.fill }
 										cx="24"
 										cy="24"
 										r="21"
 										pathLength="360"
-										strokeDasharray={ `${ angle - start } 360` }
+										strokeDasharray={ `${ angle - minAngle } 360` }
 									/>
 								) }
 							</g>
