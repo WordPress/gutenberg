@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 import { useId, useState } from '@wordpress/element';
 import { Stack } from '../../../../stack';
 import { Text } from '../../../../text';
@@ -178,7 +179,7 @@ export const WholeTurns: Story = {
 	),
 };
 
-/** Type a precise rotation or turn the dial. Clearing the override restores the inherited angle. */
+/** The number field and dial edit the same rotation. Each has its own accessible name and instructions. */
 export const WithNumberInput: Story = {
 	args: {
 		min: -720,
@@ -188,7 +189,8 @@ export const WithNumberInput: Story = {
 		format: { style: 'unit', unit: 'degree', unitDisplay: 'long' },
 	},
 	render: function RotationField( { defaultValue, onValueChange, ...args } ) {
-		const descriptionId = useId();
+		const numberHelpId = useId();
+		const dialHelpId = useId();
 		const range = getStepRange( args.min, args.max, args.step );
 		const inheritedRotation = range.snap( 45 );
 		const [ requestedRotation, setRotation ] = useState( defaultValue );
@@ -207,7 +209,7 @@ export const WithNumberInput: Story = {
 						max={ range.toValue( range.lastStep ) }
 						step={ range.step }
 						disabled={ args.disabled }
-						aria-describedby={ descriptionId }
+						aria-describedby={ numberHelpId }
 						placeholder={ String( inheritedRotation ) }
 						value={ draft ?? rotation ?? '' }
 						onChange={ ( { currentTarget } ) => {
@@ -224,8 +226,8 @@ export const WithNumberInput: Story = {
 					/>
 					<Knob
 						{ ...args }
-						aria-label="Rotation (degrees)"
-						aria-describedby={ descriptionId }
+						aria-label="Rotation (degrees) dial"
+						aria-describedby={ dialHelpId }
 						value={ rotation ?? inheritedRotation }
 						onValueChange={ ( next ) => {
 							setRotation( next );
@@ -233,10 +235,30 @@ export const WithNumberInput: Story = {
 						} }
 					/>
 				</Stack>
-				<Text id={ descriptionId } variant="body-sm">
-					Clear the field to use the inherited { inheritedRotation }°.
+				<Text variant="body-sm">
+					<span id={ dialHelpId }>
+						The dial adjusts the same rotation as the number field.
+					</span>{ ' ' }
+					<span id={ numberHelpId }>
+						Clear the field to use the inherited{ ' ' }
+						{ inheritedRotation }°.
+					</span>
 				</Text>
 			</Stack>
+		);
+	},
+	play: async ( { canvas } ) => {
+		const number = canvas.getByRole( 'spinbutton', {
+			name: 'Rotation (degrees)',
+		} );
+		const dial = canvas.getByRole( 'slider', {
+			name: 'Rotation (degrees) dial',
+		} );
+		await expect( number ).toHaveAccessibleDescription(
+			/^Clear the field to use the inherited/
+		);
+		await expect( dial ).toHaveAccessibleDescription(
+			'The dial adjusts the same rotation as the number field.'
 		);
 	},
 };
