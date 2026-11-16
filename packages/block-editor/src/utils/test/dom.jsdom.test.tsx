@@ -6,8 +6,11 @@ import {
 } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import {
+	extendRectToTop,
 	getElementBounds,
+	getOutermostRotatedAncestorBlock,
 	isElementVisible,
+	isStyleRotated,
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
 } from '../dom';
 
@@ -261,6 +264,109 @@ describe( 'dom', () => {
 					y: 0,
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'isStyleRotated', () => {
+		it.each( [
+			[ 'none', 'none' ],
+			[ '0deg', 'none' ],
+			[ '90deg', 'none' ],
+			[ '0.5turn', 'none' ],
+			[ 'x 30deg', 'none' ],
+			[ 'none', 'matrix(1, 0, 0, 1, 40, 20)' ],
+			[ 'none', 'matrix(1.5, 0, 0, 0.5, 0, 0)' ],
+			[ 'none', 'matrix(0, 1, -1, 0, 0, 0)' ],
+		] )(
+			'returns false for rotate %s and transform %s',
+			( rotate, transform ) => {
+				expect( isStyleRotated( { rotate, transform } ) ).toBe( false );
+			}
+		);
+
+		it.each( [
+			[ '12deg', 'none' ],
+			[ '-0.1rad', 'none' ],
+			[ 'z 45deg', 'none' ],
+			[ 'none', 'matrix(0.978, 0.208, -0.208, 0.978, 0, 0)' ],
+			[ 'none', 'matrix(1, 0, 0.268, 1, 0, 0)' ],
+			[
+				'none',
+				'matrix3d(0.978, 0.208, 0, 0, -0.208, 0.978, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)',
+			],
+		] )(
+			'returns true for rotate %s and transform %s',
+			( rotate, transform ) => {
+				expect( isStyleRotated( { rotate, transform } ) ).toBe( true );
+			}
+		);
+	} );
+
+	describe( 'getOutermostRotatedAncestorBlock', () => {
+		function createBlock( parent: Element, rotate = 'none' ) {
+			const block = window.document.createElement( 'div' );
+			block.className = 'block-editor-block-list__block';
+			block.dataset.rotate = rotate;
+			parent.appendChild( block );
+			return block;
+		}
+
+		function mockComputedRotate() {
+			const getComputedStyle = window.getComputedStyle;
+			return vi
+				.spyOn( window, 'getComputedStyle' )
+				.mockImplementation( ( element: Element ) => ( {
+					...getComputedStyle( element ),
+					rotate: ( element as HTMLElement ).dataset.rotate ?? 'none',
+					transform: 'none',
+				} ) );
+		}
+
+		it( 'returns the outermost rotated block, skipping the element itself', () => {
+			const spy = mockComputedRotate();
+			const outer = createBlock( window.document.body, '10deg' );
+			const middle = createBlock( outer, '5deg' );
+			const inner = createBlock( createBlock( middle ), '20deg' );
+
+			expect( getOutermostRotatedAncestorBlock( inner ) ).toBe( outer );
+			expect( getOutermostRotatedAncestorBlock( outer ) ).toBeUndefined();
+
+			outer.remove();
+			spy.mockRestore();
+		} );
+
+		it( 'returns undefined when no ancestor block is rotated', () => {
+			const spy = mockComputedRotate();
+			const outer = createBlock( window.document.body );
+			const inner = createBlock( outer );
+
+			expect( getOutermostRotatedAncestorBlock( inner ) ).toBeUndefined();
+
+			outer.remove();
+			spy.mockRestore();
+		} );
+	} );
+
+	describe( 'extendRectToTop', () => {
+		it( 'moves the top up and keeps the bottom and horizontal extent', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 120 ).toJSON() ).toEqual( {
+				left: 30,
+				top: 120,
+				right: 130,
+				bottom: 250,
+				width: 100,
+				height: 130,
+				x: 30,
+				y: 120,
+			} );
+		} );
+
+		it( 'returns the rectangle unchanged when the top is lower', () => {
+			const rect = new window.DOMRectReadOnly( 30, 200, 100, 50 );
+
+			expect( extendRectToTop( rect, 220 ) ).toBe( rect );
 		} );
 	} );
 } );

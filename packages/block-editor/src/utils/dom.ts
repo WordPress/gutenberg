@@ -91,6 +91,87 @@ export function getBlockClientId( node: Node | null ) {
 	return blockNode.id.slice( 'block-'.length );
 }
 
+const ANGLE_UNITS_IN_DEGREES: Record< string, number > = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
+
+/**
+ * Returns whether a computed style rotates or skews an element, so that its
+ * edges are no longer parallel to the viewport. Translating and scaling keep
+ * them parallel, so they don't count.
+ *
+ * @param style The computed style of the element.
+ * @return Whether the element is rotated or skewed.
+ */
+export function isStyleRotated(
+	style: Pick< CSSStyleDeclaration, 'rotate' | 'transform' >
+) {
+	// `rotate` serialises as `none`, `<angle>` or `<axis> <angle>`. Rotating
+	// around the x or y axis only foreshortens the element.
+	const rotate = style.rotate?.trim().split( /\s+/ ) ?? [];
+	if (
+		rotate.length === 1 ||
+		( rotate.length === 2 && rotate[ 0 ] === 'z' )
+	) {
+		const match = /^(-?[\d.]+)(deg|grad|rad|turn)$/.exec(
+			rotate.at( -1 )!
+		);
+		if (
+			match &&
+			( parseFloat( match[ 1 ] ) *
+				ANGLE_UNITS_IN_DEGREES[ match[ 2 ] ] ) %
+				90 !==
+				0
+		) {
+			return true;
+		}
+	}
+
+	// `transform` serialises as `none`, `matrix()` or `matrix3d()`.
+	const matrix = /^matrix(3d)?\((.+)\)$/.exec( style.transform ?? '' );
+	if ( matrix ) {
+		const values = matrix[ 2 ].split( ',' ).map( parseFloat );
+		const [ a, b ] = values;
+		const [ c, d ] = matrix[ 1 ]
+			? [ values[ 4 ], values[ 5 ] ]
+			: values.slice( 2 );
+		const isAxisAligned =
+			( Math.abs( b ) < 1e-6 && Math.abs( c ) < 1e-6 ) ||
+			( Math.abs( a ) < 1e-6 && Math.abs( d ) < 1e-6 );
+		return ! isAxisAligned;
+	}
+
+	return false;
+}
+
+/**
+ * Returns the outermost block element containing the given element that is
+ * rotated or skewed, if any.
+ *
+ * @param element Element.
+ * @return The outermost rotated ancestor block element.
+ */
+export function getOutermostRotatedAncestorBlock( element: Element ) {
+	const view = element.ownerDocument.defaultView;
+	if ( ! view ) {
+		return;
+	}
+
+	let rotatedAncestor: Element | undefined;
+	let ancestor = element.parentElement?.closest( BLOCK_SELECTOR );
+	while ( ancestor ) {
+		if ( isStyleRotated( view.getComputedStyle( ancestor ) ) ) {
+			rotatedAncestor = ancestor;
+		}
+		ancestor = ancestor.parentElement?.closest( BLOCK_SELECTOR );
+	}
+
+	return rotatedAncestor;
+}
+
 /**
  * Whether an element is a block's own element outside its fields, such as a
  * list item's bullet. Fields keep their own `contentEditable`.
@@ -120,6 +201,26 @@ export function rectUnion( rect1: DOMRect, rect2: DOMRect ) {
 	const top = Math.min( rect1.top, rect2.top );
 
 	return new window.DOMRectReadOnly( left, top, right - left, bottom - top );
+}
+
+/**
+ * Extends a rectangle upwards to a given top, keeping its horizontal extent.
+ *
+ * @param rect Rectangle.
+ * @param top  The top to extend to.
+ * @return The extended rectangle, or the original one if it is already higher.
+ */
+export function extendRectToTop( rect: DOMRect, top: number ) {
+	if ( top >= rect.top ) {
+		return rect;
+	}
+
+	return new window.DOMRectReadOnly(
+		rect.left,
+		top,
+		rect.width,
+		rect.bottom - top
+	);
 }
 
 /**
