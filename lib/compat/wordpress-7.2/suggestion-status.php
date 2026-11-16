@@ -96,3 +96,43 @@ function gutenberg_refuse_client_final_suggestion_status( $prepared_comment, $re
 	);
 }
 add_filter( 'rest_preprocess_comment', 'gutenberg_refuse_client_final_suggestion_status', 10, 2 );
+
+/**
+ * Refuses a REST write that resolves an undecided suggestion note.
+ *
+ * Resolving hides the note but leaves its anchor in the content, where it
+ * can still be accepted. The editor offers Accept and Reject instead of
+ * Resolve on a suggestion; this holds REST clients to the same rule until
+ * the save pass has made the decision final.
+ *
+ * @param array<string, mixed>|WP_Error $prepared_comment Comment data about to be written.
+ * @param WP_REST_Request                $request          Request.
+ * @return array<string, mixed>|WP_Error The comment data, or an error for an undecided suggestion.
+ */
+function gutenberg_refuse_resolving_undecided_suggestion( $prepared_comment, $request ) {
+	if ( is_wp_error( $prepared_comment ) || ! in_array( $request['status'], array( 'approved', 'approve', '1' ), true ) ) {
+		return $prepared_comment;
+	}
+	$meta    = is_array( $request['meta'] ) ? $request['meta'] : array();
+	$comment = isset( $request['id'] ) ? get_comment( absint( $request['id'] ) ) : null;
+	$type    = $comment ? $comment->comment_type : $request['type'];
+	$parent  = $comment ? (int) $comment->comment_parent : absint( $request['parent'] );
+	if ( 'note' !== $type || 0 !== $parent ) {
+		return $prepared_comment;
+	}
+
+	$payload = isset( $meta['_wp_suggestion'] ) ? $meta['_wp_suggestion'] : ( $comment ? get_comment_meta( (int) $comment->comment_ID, '_wp_suggestion', true ) : '' );
+	if ( empty( $payload ) ) {
+		return $prepared_comment;
+	}
+	$status = isset( $meta['_wp_suggestion_status'] ) ? $meta['_wp_suggestion_status'] : ( $comment ? get_comment_meta( (int) $comment->comment_ID, '_wp_suggestion_status', true ) : '' );
+	if ( in_array( $status, gutenberg_get_final_suggestion_statuses(), true ) ) {
+		return $prepared_comment;
+	}
+	return new WP_Error(
+		'rest_suggestion_pending',
+		__( 'Accept or reject the suggestion before resolving it.', 'gutenberg' ),
+		array( 'status' => 409 )
+	);
+}
+add_filter( 'rest_preprocess_comment', 'gutenberg_refuse_resolving_undecided_suggestion', 10, 2 );

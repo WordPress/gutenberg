@@ -284,7 +284,6 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 
 				if (
 					'pending' === $status &&
-					'0' === (string) $note->comment_approved &&
 					isset( $before[ $note_id ][ $kind ] ) &&
 					! isset( $after[ $note_id ][ $kind ] ) &&
 					( 0 === $user_id || (int) $note->user_id !== $user_id )
