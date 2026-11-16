@@ -324,6 +324,19 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$this->assertSame( self::$editor_id, (int) get_comment_meta( $note_id, '_wp_suggestion_resolved_by', true ) );
 	}
 
+	public function test_a_resolved_pending_note_becomes_outdated_when_a_save_removes_its_anchor() {
+		$post_id = $this->create_post( '' );
+		$note_id = $this->create_note( $post_id, $this->inline_op() );
+		$this->set_content( $post_id, $this->paragraph( 'Hello ' . $this->mark( $note_id, 'add', 'world' ) ) );
+		// Resolved outside the editor, which offers no Resolve on a suggestion.
+		wp_set_comment_status( $note_id, 'approve' );
+
+		$this->set_content( $post_id, $this->paragraph( 'Something else' ) );
+
+		$this->assertSame( 'outdated', $this->status_of( $note_id ) );
+		$this->assertSame( 'approved', $this->comment_status_of( $note_id ) );
+	}
+
 	public function test_the_savers_own_pending_note_is_left_to_the_editor() {
 		$post_id = $this->create_post( '' );
 		$note_id = $this->create_note( $post_id, $this->inline_op(), 'pending', self::$editor_id );
@@ -385,7 +398,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	public function test_an_autosave_revision_neither_finalizes_nor_outdates() {
 		$post_id = $this->create_post( '' );
-		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
+		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied' );
 		$pending = $this->create_note( $post_id, $this->inline_op() );
 		$this->set_content( $post_id, $this->paragraph( $this->mark( $decided, 'add', 'a' ) . $this->mark( $pending, 'add', 'b' ) ) );
 
@@ -406,7 +419,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	public function test_a_nested_update_from_save_post_is_idempotent() {
 		$post_id = $this->create_post( '' );
-		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
+		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied' );
 		$pending = $this->create_note( $post_id, $this->inline_op() );
 		$this->set_content( $post_id, $this->paragraph( $this->mark( $decided, 'add', 'a' ) . $this->mark( $pending, 'add', 'b' ) ) );
 
@@ -575,6 +588,72 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertSame( 403, $response->get_status() );
+	}
+
+	/**
+	 * Updates a note's comment status over REST.
+	 *
+	 * @param int    $note_id Note ID.
+	 * @param string $status  Comment status.
+	 * @param array  $meta    Meta to write with it.
+	 * @return WP_REST_Response
+	 */
+	private function rest_update_status( int $note_id, string $status, array $meta = array() ): WP_REST_Response {
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/comments/' . $note_id );
+		$params  = array( 'status' => $status );
+		if ( $meta ) {
+			$params['meta'] = $meta;
+		}
+		$request->set_body_params( $params );
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * @dataProvider data_undecided_statuses
+	 */
+	public function test_rest_refuses_resolving_an_undecided_suggestion( string $status ): void {
+		$post_id = $this->create_post( '' );
+		$note_id = $this->create_note( $post_id, $this->inline_op(), $status );
+
+		$response = $this->rest_update_status( $note_id, 'approved', array( '_wp_note_status' => 'resolved' ) );
+
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertSame( 'rest_suggestion_pending', $response->get_data()['code'] );
+		$this->assertSame( 'unapproved', $this->comment_status_of( $note_id ) );
+	}
+
+	public function data_undecided_statuses(): array {
+		return array(
+			'no status'        => array( '' ),
+			'pending'          => array( 'pending' ),
+			'applied-unsaved'  => array( 'applied-unsaved' ),
+			'rejected-unsaved' => array( 'rejected-unsaved' ),
+		);
+	}
+
+	public function test_rest_resolves_a_decided_suggestion_and_a_plain_note(): void {
+		$post_id = $this->create_post( '' );
+		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied' );
+		$plain   = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => $post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => '0',
+			)
+		);
+
+		$this->assertSame( 200, $this->rest_update_status( $decided, 'approved' )->get_status() );
+		$this->assertSame( 200, $this->rest_update_status( $plain, 'approved' )->get_status() );
+	}
+
+	public function test_rest_refuses_a_decision_and_resolve_in_one_request(): void {
+		$post_id = $this->create_post( '' );
+		$note_id = $this->create_note( $post_id, $this->inline_op() );
+
+		$response = $this->rest_update_status( $note_id, 'approved', array( '_wp_suggestion_status' => 'rejected-unsaved' ) );
+
+		$this->assertSame( 409, $response->get_status() );
+		$this->assertSame( '', $this->status_of( $note_id ) );
 	}
 
 	public function test_rest_cannot_write_provenance() {
