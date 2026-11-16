@@ -1,13 +1,10 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "../../../dataviews/style" as *;
 
-// Width of the fade at the inline-end edge of the table while there are more
-// columns to scroll to.
-$scroll-fade-size: var(--wpds-dimension-size-md);
-
-// Width of the fade at the inline-start edge. It takes the place of the start
-// padding of the first column, so that the column does not move.
-$leading-scroll-fade-size: var(--wpds-dimension-padding-2xl);
+// Width of the fades at the edges of the table while there are more columns to
+// scroll to. It matches the padding at the ends of the rows, which the fade
+// cells take the place of, so that the columns do not move.
+$scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
 .dataviews-view-table {
 	width: 100%;
@@ -326,6 +323,8 @@ $leading-scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		content: "";
 		display: table-cell;
 		position: sticky;
+		width: $scroll-fade-size;
+		min-width: $scroll-fade-size;
 		padding: 0;
 		background-color: inherit;
 		pointer-events: none;
@@ -335,8 +334,6 @@ $leading-scroll-fade-size: var(--wpds-dimension-padding-2xl);
 	tr {
 		&::before {
 			inset-inline-start: 0;
-			width: $leading-scroll-fade-size;
-			min-width: $leading-scroll-fade-size;
 			// Above the positioned content of the cells that follow it.
 			z-index: 1;
 			mask-image: linear-gradient(to left, transparent, #000);
@@ -364,8 +361,6 @@ $leading-scroll-fade-size: var(--wpds-dimension-padding-2xl);
 	&:not(.has-actions) tr {
 		&::after {
 			inset-inline-end: 0;
-			width: $scroll-fade-size;
-			min-width: $scroll-fade-size;
 			mask-image: linear-gradient(to right, transparent, #000);
 		}
 
@@ -373,15 +368,16 @@ $leading-scroll-fade-size: var(--wpds-dimension-padding-2xl);
 			mask-image: linear-gradient(to left, transparent, #000);
 		}
 
-		// The fade cell takes the place of the last column's end padding,
-		// except for the header button's own padding, which the other cells
-		// match so that end-aligned columns line up.
-		> :last-child {
-			padding-inline-end: var(--wpds-dimension-padding-sm);
-		}
-
+		// The fade cell takes the place of the last column's end padding.
+		// The header button pulls back by its own padding, so that the label
+		// of an end-aligned column lines up with the cells.
+		> :last-child,
 		> th:has(.dataviews-view-table-header-button):last-child {
 			padding-inline-end: 0;
+		}
+
+		> th:last-child .dataviews-view-table-header-button {
+			margin-inline-end: calc(-1 * var(--wpds-dimension-padding-sm));
 		}
 	}
 }

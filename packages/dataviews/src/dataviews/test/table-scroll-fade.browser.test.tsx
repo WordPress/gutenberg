@@ -83,10 +83,8 @@ function PostsTable( {
 	);
 }
 
-// `--wpds-dimension-size-md`.
-const FADE_SIZE = 32;
-// `--wpds-dimension-padding-2xl`, the start padding of the first column.
-const LEADING_FADE_SIZE = 24;
+// `--wpds-dimension-padding-2xl`, the padding at the ends of the rows.
+const FADE_SIZE = 24;
 // `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
 const CELL_PADDING = 12;
 const COMPACT_CELL_PADDING = 8;
@@ -318,9 +316,7 @@ describe( 'DataViews table scroll fade', () => {
 				const rowBox = row.getBoundingClientRect();
 				const firstCell =
 					row.firstElementChild!.getBoundingClientRect();
-				expect( firstCell.left - rowBox.left ).toBe(
-					LEADING_FADE_SIZE
-				);
+				expect( firstCell.left - rowBox.left ).toBe( FADE_SIZE );
 			}
 		} );
 
