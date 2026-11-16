@@ -1,0 +1,31 @@
+[
+	{
+		"blockName": "core/cover",
+		"attrs": {
+			"url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+			"id": 1,
+			"dimRatio": 50,
+			"customOverlayColor": "#3615d9",
+			"minHeight": 20,
+			"minHeightUnit": "em",
+			"layout": {
+				"type": "constrained"
+			}
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/paragraph",
+				"attrs": {},
+				"innerBlocks": [],
+				"innerHTML": "\n<p></p>\n",
+				"innerContent": [ "\n<p></p>\n" ]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-cover\" style=\"min-height:20em\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\" style=\"background-color:#3615d9\"></span><img class=\"wp-block-cover__image-background wp-image-1\" alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" data-object-fit=\"cover\"/><div class=\"wp-block-cover__inner-container\"></div></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-cover\" style=\"min-height:20em\"><span aria-hidden=\"true\" class=\"wp-block-cover__background has-background-dim\" style=\"background-color:#3615d9\"></span><img class=\"wp-block-cover__image-background wp-image-1\" alt=\"\" src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" data-object-fit=\"cover\"/><div class=\"wp-block-cover__inner-container\">",
+			null,
+			"</div></div>\n"
+		]
+	}
+]

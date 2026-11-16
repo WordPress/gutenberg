@@ -25,8 +25,8 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	getUpdatedChildLayoutStyle,
 } from './block-style-state';
+import { getUpdatedChildLayoutStyle } from './layout-child-utils';
 import type {
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
@@ -145,6 +145,11 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {
 			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		} else if (
+			hasViewportOverride( 'columnStart' ) &&
+			columnStart === null
+		) {
+			declarations[ 'grid-column' ] = 'auto';
 		}
 	}
 
@@ -159,6 +164,8 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-row' ] = `${ rowStart }`;
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		} else if ( hasViewportOverride( 'rowStart' ) && rowStart === null ) {
+			declarations[ 'grid-row' ] = 'auto';
 		}
 	}
 
@@ -426,6 +433,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -435,6 +443,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -467,6 +476,7 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ clientId ]
@@ -557,7 +567,9 @@ function GridTools( {
 			{ isManualPlacement &&
 				window.__experimentalEnableGridInteractivity && (
 					<GridItemMovers
-						layout={ style?.layout }
+						style={ style }
+						selectedState={ selectedState }
+						isResponsiveEditing={ isResponsiveEditing }
 						parentLayout={ parentLayout }
 						onChange={ updateLayout }
 						gridClientId={ rootClientId }

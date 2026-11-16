@@ -30,7 +30,7 @@ import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
-import { getUpdatedChildLayoutStyle } from '../../hooks/block-style-state';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import type { ChildLayoutBlockStyle } from '../../hooks/types';
 import type {
 	AutoGridVisualizerProps,

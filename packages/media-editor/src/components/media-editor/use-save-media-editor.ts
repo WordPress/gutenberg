@@ -4,7 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import { mapEditToOriginal } from '@wordpress/image-editor';
+import { getImageEdit } from '@wordpress/image-editor';
 import type { Media } from '../media-editor-provider';
 import type { MediaEditorSession } from '../../state';
 
@@ -89,35 +89,35 @@ function getCropModifiers( session: MediaEditorSession ): Modifier[] {
 	if ( ! session.hasOutputEdits ) {
 		return [];
 	}
-	// The edits already follow Core's order and frames; only the shape and
-	// the crop's units (fractions to percentages) differ.
-	return mapEditToOriginal( session.imageEditor.state ).map(
-		( edit ): Modifier => {
-			if ( edit.type === 'flip' ) {
-				return {
-					type: 'flip',
-					args: {
-						flip: {
-							horizontal: edit.horizontal,
-							vertical: edit.vertical,
-						},
-					},
-				};
-			}
-			if ( edit.type === 'rotate' ) {
-				return { type: 'rotate', args: { angle: edit.angle } };
-			}
-			return {
-				type: 'crop',
-				args: {
-					left: edit.x * 100,
-					top: edit.y * 100,
-					width: edit.width * 100,
-					height: edit.height * 100,
-				},
-			};
-		}
-	);
+	const edit = getImageEdit( session.imageEditor.state );
+	if ( ! edit ) {
+		return [];
+	}
+
+	// Core applies modifiers in the order they arrive, so send them in the
+	// edit's order: flip, then rotate, then crop.
+	const modifiers: Modifier[] = [];
+	if ( edit.flip ) {
+		modifiers.push( { type: 'flip', args: { flip: edit.flip } } );
+	}
+	if ( edit.rotation !== undefined ) {
+		modifiers.push( {
+			type: 'rotate',
+			args: { angle: edit.rotation },
+		} );
+	}
+	if ( edit.crop ) {
+		modifiers.push( {
+			type: 'crop',
+			args: {
+				left: edit.crop.x * 100,
+				top: edit.crop.y * 100,
+				width: edit.crop.width * 100,
+				height: edit.crop.height * 100,
+			},
+		} );
+	}
+	return modifiers;
 }
 
 function getMetadataEdits(
