@@ -7,6 +7,7 @@ export * as Field from './field';
 export * as Fieldset from './fieldset';
 export { Input } from './input';
 export { InputLayout } from './input-layout';
+export { Knob } from './knob';
 export { Radio } from './radio';
 export { RadioGroup } from './radio-group';
 export * as Select from './select';
