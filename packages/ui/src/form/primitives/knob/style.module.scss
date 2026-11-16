@@ -1,0 +1,111 @@
+@use "../../../utils/css/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			position: relative;
+			display: inline-block;
+			inline-size: var(--wpds-dimension-size-lg);
+			aspect-ratio: 1;
+			flex: none;
+			border-radius: 50%;
+			vertical-align: middle;
+
+			@media (pointer: coarse) {
+				inline-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-sm));
+			}
+
+			&:has(input:focus-visible) {
+				@include mixins.focus-ring();
+			}
+		}
+
+		.thumb {
+			inline-size: 100%;
+			block-size: 100%;
+			touch-action: none;
+			user-select: none;
+			fill: var(--wpds-color-background-interactive-neutral);
+			stroke: var(--wpds-color-stroke-interactive-neutral);
+			color: var(--wpds-color-foreground-interactive-brand);
+
+			&:not([data-disabled]) {
+				cursor: var(--wpds-cursor-control);
+			}
+
+			svg {
+				display: block;
+				inline-size: 100%;
+				block-size: 100%;
+			}
+
+			/* Pointer positions belong to the dial. The range handles keyboard and AT input. */
+			input,
+			svg {
+				pointer-events: none;
+			}
+
+			@media (forced-colors: none) {
+				&:not([data-disabled]):is(:hover, :active) {
+					stroke: var(--wpds-color-stroke-interactive-neutral-active);
+					color: var(--wpds-color-foreground-interactive-brand-active);
+				}
+
+				&[data-disabled] {
+					fill: var(--wpds-color-background-interactive-neutral-disabled);
+					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
+					color: var(--wpds-color-foreground-interactive-brand-disabled);
+				}
+			}
+
+			@media (forced-colors: active) {
+				forced-color-adjust: none;
+				fill: Canvas;
+				stroke: ButtonText;
+				color: Highlight;
+
+				&[data-disabled] {
+					stroke: GrayText;
+					color: GrayText;
+				}
+			}
+		}
+
+		.track,
+		.fill,
+		.pointer {
+			stroke-width: var(--wpds-border-width-sm);
+			stroke-linecap: round;
+		}
+
+		.track {
+			stroke: var(--wpds-color-stroke-interactive-neutral);
+
+			@media (forced-colors: active) {
+				stroke: inherit;
+			}
+		}
+
+		.fill {
+			stroke: var(--wpds-color-background-indicator-brand);
+
+			[data-disabled] & {
+				stroke: currentColor;
+			}
+
+			@media (forced-colors: active) {
+				stroke: currentColor;
+			}
+		}
+
+		.face {
+			stroke-width: var(--wpds-border-width-xs);
+		}
+
+		.pointer {
+			stroke: currentColor;
+		}
+	}
+}

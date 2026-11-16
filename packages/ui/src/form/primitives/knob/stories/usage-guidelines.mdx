@@ -1,0 +1,31 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as KnobStories from './index.story';
+
+<Meta
+	id="design-system-components-form-primitives-knob-usage-guidelines"
+	title="Components/@wordpress-ui/Form/Primitives/Knob/Usage Guidelines"
+/>
+
+# Knob
+
+Use a knob when the position of a dial helps someone choose a number, such as the direction of a gradient. A click or tap on the dial selects that position. Dragging around its center adjusts the value continuously. For precise entry, a numeric field can share the same controlled value.
+
+## Choose the range
+
+By default, the dial spans 0 to 100 with a gap between its end stops. Use `min`, `max`, and a positive `step` to set the selectable values. The steps start at `min`. If the range does not divide evenly, the last selectable value is the last step at or below `max`.
+
+Set `wrap` when the first value follows the last. For whole degrees, use `min={ 0 }`, `max={ 359 }`, and `step={ 1 }`. Zero points up and 90 points right. Both endpoints are selectable, so each direction has one value.
+
+<Canvas of={ KnobStories.Wrapping } />
+
+## Label the dial
+
+Place the knob in `Field.Root` with a visible `Field.Label`. Add `Field.Description` when the setting needs an explanation. For standalone use, provide `aria-labelledby` or `aria-label`. Use `format` to include the unit in the slider's accessible value, or supply `getAriaValueText` for values with custom names.
+
+Pass `value` and `onValueChange` to keep a readout or another control in sync. For an uncontrolled dial, pass `defaultValue`. The `ref` points to the outer element. Use `inputRef` to focus the range input.
+
+<Canvas of={ KnobStories.WithField } />
+
+## Keyboard interaction
+
+Tab focuses the slider. Up and Down change the value by one step. Right and Left follow the reading direction. Page Up, Page Down, and Shift with an arrow key use `largeStep`, which defaults to 10. Home and End go straight to the first and last selectable values in either mode.
