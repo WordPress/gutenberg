@@ -11,14 +11,28 @@ import type { BlockStatesControlProps, BlockStateBadgesProps } from './types';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
-export const PSEUDO_STATE_LABELS: Record< string, string > = {
-	':hover': _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
-	':focus': _x( 'Focus', 'Name for the CSS pseudo-class selector' ),
-	':focus-visible': _x(
-		'Focus-visible',
-		'Name for the CSS pseudo-class selector'
-	),
-	':active': _x( 'Active', 'Name for the CSS pseudo-class selector' ),
+export const PSEUDO_STATE_LABELS: Record<
+	string,
+	{ label: string; info: string }
+> = {
+	':hover': {
+		label: _x( 'Hover', 'Name for the CSS pseudo-class selector' ),
+		info: __( 'Applies when the pointer is over the element.' ),
+	},
+	':focus': {
+		label: _x( 'Focus', 'Name for the CSS pseudo-class selector' ),
+		info: __( 'Applies when the element has focus.' ),
+	},
+	':focus-visible': {
+		label: _x( 'Focus-visible', 'Name for the CSS pseudo-class selector' ),
+		info: __(
+			'Applies when the element has focus from keyboard navigation.'
+		),
+	},
+	':active': {
+		label: _x( 'Active', 'Name for the CSS pseudo-class selector' ),
+		info: __( 'Applies while the element is pressed.' ),
+	},
 };
 
 export const RESPONSIVE_STATE_LABELS = {
@@ -58,7 +72,8 @@ function getPseudoStateOptions( name: string ): StyleStateOption[] {
 		.filter( ( state ) => PSEUDO_STATE_LABELS[ state ] )
 		.map( ( state ) => ( {
 			value: state,
-			label: PSEUDO_STATE_LABELS[ state ],
+			label: PSEUDO_STATE_LABELS[ state ].label,
+			info: PSEUDO_STATE_LABELS[ state ].info,
 		} ) );
 }
 
