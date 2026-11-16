@@ -31,7 +31,7 @@
 
 	// For ContentEditableControl
 	&:has(input:invalid[data-validity-visible])
-	.components-validated-control__content-editable [role="textbox"] {
+	.components-validated-control__content-editable :has(> [role="textbox"]) {
 		@extend %red-error-border;
 	}
 }
