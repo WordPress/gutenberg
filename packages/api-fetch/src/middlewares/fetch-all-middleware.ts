@@ -1,5 +1,5 @@
 import { addQueryArgs } from '@wordpress/url';
-import apiFetch from '..';
+import apiFetch from '../api-fetch';
 import type { APIFetchMiddleware, APIFetchOptions } from '../types';
 
 /**

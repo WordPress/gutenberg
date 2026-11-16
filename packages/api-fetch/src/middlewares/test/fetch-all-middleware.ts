@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ApiFetch } from '../../index';
+import type { CoreApiFetch } from '../../api-fetch';
 import type { APIFetchOptions, FetchHandler } from '../../types';
 
 describe( 'Fetch All Middleware', () => {
@@ -23,7 +23,7 @@ describe( 'Fetch All Middleware', () => {
 		expect.hasAssertions();
 		const originalOptions = { url: '/posts?per_page=-1' };
 		let counter = 1;
-		vi.doMock( import( '../../index' ), () => {
+		vi.doMock( import( '../../api-fetch' ), () => {
 			const mockApiFetch = ( ( options: APIFetchOptions ) => {
 				const expectedUrl =
 					counter === 1
@@ -48,7 +48,7 @@ describe( 'Fetch All Middleware', () => {
 				counter++;
 
 				return response;
-			} ) as ApiFetch;
+			} ) as CoreApiFetch;
 
 			return { default: mockApiFetch };
 		} );
