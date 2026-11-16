@@ -256,17 +256,14 @@ export function ImageEdit( {
 		const linkDestination =
 			attributes.linkDestination || getDefaultLinkDestination();
 
-		// Check if the image is linked to it's media.
-		let href;
 		switch ( linkDestination ) {
 			case LINK_DESTINATION_MEDIA:
-				href = media.url;
+				mediaAttributes.href = media.url;
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
-				href = media.link;
+				mediaAttributes.href = media.link;
 				break;
 		}
-		mediaAttributes.href = href;
 
 		setAttributes( {
 			blob: undefined,
