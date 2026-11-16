@@ -863,6 +863,32 @@ parameters:
 		- phpunit
 ```
 
+#### Strict rules
+
+[`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist) also enables the rules from [phpstan-strict-rules](https://github.com/phpstan/phpstan-strict-rules) that the code already complies with, such as those disallowing loose comparisons, short ternaries, and the backtick operator, registering each rule individually. It does not include the package's `rules.neon`, since that file also makes several PHPStan parameters stricter, such as `checkDynamicProperties` and `reportMaybesInMethodSignatures`, even when its rules are disabled. For the same reason, `composer.json` tells `phpstan/extension-installer` to ignore the package, which would otherwise include `rules.neon` automatically. To work toward complying with more of the rules, include `rules.neon` in a `phpstan.neon`, and enable the rules to try. Setting `strictRules.allRules` to `false` enables only the rules set to `true`, but the parameters are still made stricter, so expect some errors from those as well. Either way, disable the rules `phpstan.neon.dist` already registers, or each error they report is reported twice:
+
+```neon
+includes:
+	- phpstan.neon.dist
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	strictRules:
+		allRules: false
+		requireParentConstructorCall: true
+		strictArrayFilter: true
+
+		# Already registered in phpstan.neon.dist.
+		disallowedLooseComparison: false
+		disallowedBacktick: false
+		disallowedImplicitArrayCreation: false
+		disallowedShortTernary: false
+		closureUsesThis: false
+		matchingInheritedMethodNames: false
+		switchConditionsMatchingType: false
+		strictFunctionCalls: false
+		illegalConstructorMethodCall: false
+```
+
 ## GitHub Actions workflow files
 
 GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
