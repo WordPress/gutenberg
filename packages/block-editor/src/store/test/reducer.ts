@@ -2779,6 +2779,109 @@ describe( 'state', () => {
 					).toEqual( [ 'content-inner' ] );
 				} );
 
+				it( 'should ignore inner blocks in RESET_BLOCKS for a controlled block with no inner blocks', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					// A block preview nested in another one can be reset with
+					// inner blocks that the controller did not provide.
+					const state = blocks( withControlled, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [
+									partial< Block >( {
+										clientId: 'ribs',
+										name: 'core/test-block',
+										attributes: {},
+										innerBlocks: [],
+									} ),
+								],
+							} ),
+						],
+					} );
+
+					const fullState = partial< State >( { blocks: state } );
+					expect( state.controlledInnerBlocks.has( 'chicken' ) ).toBe(
+						true
+					);
+					expect( getBlockOrder( fullState, 'chicken' ) ).toEqual(
+						[]
+					);
+					expect( getBlocks( fullState, 'chicken' ) ).toEqual( [] );
+					expect(
+						( getBlocks( fullState )[ 0 ] as Block ).innerBlocks
+					).toEqual( [] );
+				} );
+
+				it( 'should keep controlled inner blocks out of the parent tree in RESET_BLOCKS', () => {
+					const outer = partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'ribs',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} );
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ outer ],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'ribs',
+						hasControlledInnerBlocks: true,
+					} );
+					const withControlledContent = blocks( withControlled, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'ribs',
+						blocks: [
+							partial< Block >( {
+								clientId: 'content',
+								innerBlocks: [],
+							} ),
+						],
+					} );
+
+					const state = blocks( withControlledContent, {
+						type: 'RESET_BLOCKS',
+						blocks: [ outer ],
+					} );
+
+					const fullState = partial< State >( { blocks: state } );
+					const ribs = ( getBlocks( fullState )[ 0 ] as Block )
+						.innerBlocks[ 0 ];
+					expect( ribs.clientId ).toBe( 'ribs' );
+					expect( ribs.innerBlocks ).toEqual( [] );
+					expect(
+						getBlocks( fullState, 'ribs' ).map(
+							( b ) => ( b as Block ).clientId
+						)
+					).toEqual( [ 'content' ] );
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = partial< Block >( {
 						clientId: 'template',

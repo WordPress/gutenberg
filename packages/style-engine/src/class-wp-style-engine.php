@@ -19,6 +19,14 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 * This is a low-level API that may need to do breaking changes. Please, use wp_style_engine_get_styles instead.
 	 *
 	 * @access private
+	 *
+	 * @phpstan-type Style_Definition array{
+	 *     property_keys?: array{ default: string, individual?: string },
+	 *     path: non-empty-list<string>,
+	 *     css_vars?: array<string, string>,
+	 *     classnames?: array<string, string|true>,
+	 *     value_func?: callable( mixed, array<string, mixed>, array<mixed> ): array<string, string>,
+	 * }
 	 */
 	final class WP_Style_Engine {
 		/**
@@ -45,7 +53,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *  - path          => (array) a path that accesses the corresponding style value in the block style object.
 		 *  - value_func    => (string) the name of a function to generate a CSS definition array for a particular style object. The output of this function should be `array( "$property" => "$value", ... )`.
 		 *
-		 * @var array
+		 * @var array<string, array<string, array>>
+		 * @phpstan-var array<string, array<string, Style_Definition>>
 		 */
 		const BLOCK_STYLE_DEFINITIONS_METADATA = array(
 			'background' => array(
@@ -362,6 +371,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'textTransform' ),
 				),
+				'textWrap'       => array(
+					'property_keys' => array(
+						'default' => 'text-wrap',
+					),
+					'path'          => array( 'typography', 'textWrap' ),
+				),
 				'letterSpacing'  => array(
 					'property_keys' => array(
 						'default' => 'letter-spacing',
@@ -435,11 +450,21 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
 		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 */
-		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ) {
+		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ): void {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
 				return;
 			}
-			static::get_store( $store_name )->add_rule( $css_selector, $rules_group )->add_declarations( $css_declarations );
+
+			$store = static::get_store( $store_name );
+			if ( ! $store ) {
+				return;
+			}
+
+			// The rule is null when the selector is only whitespace.
+			$rule = $store->add_rule( $css_selector, $rules_group );
+			if ( $rule ) {
+				$rule->add_declarations( $css_declarations );
+			}
 		}
 
 		/**
@@ -447,7 +472,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @param string $store_name A store key.
 		 *
-		 * @return WP_Style_Engine_CSS_Rules_Store
+		 * @return WP_Style_Engine_CSS_Rules_Store|null
 		 */
 		public static function get_store( $store_name ) {
 			return WP_Style_Engine_CSS_Rules_Store::get_store( $store_name );
@@ -455,12 +480,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 		/**
 		 * Returns classnames and CSS based on the values in a styles object.
-		 * Return values are parsed based on the instructions in BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * Return values are parsed based on the instructions in {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @since 6.1.0
 		 *
-		 * @param array $block_styles The style object.
-		 * @param array $options      {
+		 * @param array<string, mixed> $block_styles The style object.
+		 * @param array                $options      {
 		 *     Optional. An array of options. Default empty array.
 		 *
 		 *     @type bool        $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
@@ -469,7 +494,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * }
 		 *
 		 * @return array {
-		 *     @type string   $classnames   Classnames separated by a space.
+		 *     @type string[] $classnames   Array of class names.
 		 *     @type string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 * }
 		 */
@@ -545,11 +570,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * Returns classnames, and generates classname(s) from a CSS preset property pattern, e.g., '`var:preset|<PRESET_TYPE>|<PRESET_SLUG>`'.
 		 *
 		 * @param mixed  $style_value      A single raw style value or CSS preset property from the $block_styles array.
-		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array  $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return string[] An array of CSS classnames, or empty array.
 		 *
-		 * @phpstan-param array{ classnames?: array<string, string|true>, ... } $style_definition
+		 * @phpstan-param Style_Definition $style_definition
 		 * @phpstan-return list<string>
 		 */
 		protected static function get_classnames( $style_value, $style_definition ) {
@@ -569,11 +594,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					if ( $slug ) {
 						/*
-						* Right now we expect a classname pattern to be stored in BLOCK_STYLE_DEFINITIONS_METADATA.
-						* One day, if there are no stored schemata, we could allow custom patterns or
-						* generate classnames based on other properties
-						* such as a path or a value or a prefix passed in options.
-						*/
+						 * Right now we expect a classname pattern to be stored in self::BLOCK_STYLE_DEFINITIONS_METADATA.
+						 * One day, if there are no stored schemata, we could allow custom patterns or
+						 * generate classnames based on other properties
+						 * such as a path or a value or a prefix passed in options.
+						 */
 						$classnames[] = strtr( $classname, array( '$slug' => $slug ) );
 					}
 				}
@@ -588,7 +613,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @since 6.1.0
 		 *
 		 * @param mixed $style_value      A single raw style value from $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 * @param array $options          {
 		 *     Optional. An array of options. Default empty array.
 		 *
@@ -596,10 +621,16 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * }
 		 *
 		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 *
+		 * @phpstan-param Style_Definition $style_definition
 		 */
 		protected static function get_css_declarations( $style_value, $style_definition, $options = array() ) {
 			if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
 				return call_user_func( $style_definition['value_func'], $style_value, $style_definition, $options );
+			}
+
+			if ( ! isset( $style_definition['property_keys'] ) ) {
+				return array();
 			}
 
 			$css_declarations     = array();
@@ -638,7 +669,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 					$individual_property = sprintf( $style_property_keys['individual'], _wp_to_kebab_case( $key ) );
 
-					if ( $individual_property && static::is_valid_style_value( $value ) ) {
+					if ( $individual_property && is_string( $value ) && static::is_valid_style_value( $value ) ) {
 						$css_declarations[ $individual_property ] = $value;
 					}
 				}
@@ -646,7 +677,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				return $css_declarations;
 			}
 
-			$css_declarations[ $style_property_keys['default'] ] = $style_value;
+			// CSS declarations only accept string values.
+			if ( is_string( $style_value ) ) {
+				$css_declarations[ $style_property_keys['default'] ] = $style_value;
+			}
 			return $css_declarations;
 		}
 
@@ -657,8 +691,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * "border-{top|right|bottom|left}-{color|width|style}: {value};" or,
 		 * "border-image-{outset|source|width|repeat|slice}: {value};"
 		 *
-		 * @param array $style_value                    A single raw style value from $block_styles array.
-		 * @param array $individual_property_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA representing an individual property of a CSS property, e.g., 'top' in 'border-top'.
+		 * @param mixed $style_value                    A single raw style value from $block_styles array.
+		 * @param array $individual_property_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA} representing an individual property of a CSS property, e.g., 'top' in 'border-top'.
 		 * @param array $options                        {
 		 *     Optional. An array of options. Default empty array.
 		 *
@@ -666,6 +700,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * }
 		 *
 		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 *
+		 * @phpstan-param Style_Definition $individual_property_definition
 		 */
 		protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
 			if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -683,17 +719,17 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			$css_declarations        = array();
 
 			foreach ( $style_value as $css_property => $value ) {
-				if ( empty( $value ) ) {
+				// CSS declarations only accept string values.
+				if ( empty( $value ) || ! is_string( $value ) ) {
 					continue;
 				}
 
-				// Build a path to the individual rules in definitions.
-				$style_definition_path = array( $definition_group_key, $css_property );
-				$style_definition      = _wp_array_get( static::BLOCK_STYLE_DEFINITIONS_METADATA, $style_definition_path, null );
+				// Get the corresponding style definition from the same group, e.g., `border.color`.
+				$style_definition = static::BLOCK_STYLE_DEFINITIONS_METADATA[ $definition_group_key ][ $css_property ] ?? null;
 
 				if ( $style_definition && isset( $style_definition['property_keys']['individual'] ) ) {
 					// Set a CSS var if there is a valid preset value.
-					if ( is_string( $value ) && str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
+					if ( str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 						$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 					}
 					$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
@@ -709,10 +745,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * with a single property and value, with `url` escaped and injected into a CSS `url()` function,
 		 * e.g., array( 'background-image' => "url( '...' )" ).
 		 *
-		 * @param array $style_value      A single raw style value from $block_styles array.
-		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 *
+		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-return array<string, string>
 		 */
 		protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
@@ -724,7 +763,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			if ( isset( $style_definition['property_keys']['default'] ) ) {
 				$value = null;
 
-				if ( ! empty( $style_value['url'] ) ) {
+				if ( is_array( $style_value ) && ! empty( $style_value['url'] ) && is_string( $style_value['url'] ) ) {
 					$value = "url('" . $style_value['url'] . "')";
 				} elseif ( is_string( $style_value ) ) {
 					$value = $style_value;
@@ -744,10 +783,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * When the value is 'text', this also outputs the necessary vendor-prefixed
 		 * properties to clip the background to the text.
 		 *
-		 * @param string $style_value      A single raw style value from $block_styles array.
-		 * @param array  $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 * @param mixed $style_value      A single raw style value from $block_styles array.
+		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
 		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 *
+		 * @phpstan-param Style_Definition $style_definition
 		 */
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
 		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
