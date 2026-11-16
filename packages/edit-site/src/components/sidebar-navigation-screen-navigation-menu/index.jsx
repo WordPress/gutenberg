@@ -6,11 +6,12 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
+import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-export const postType = `wp_navigation`;
+export const postType = NAVIGATION_POST_TYPE;
 
 export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 	const {
@@ -19,7 +20,7 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 
 	const { record: navigationMenu, isResolving } = useEntityRecord(
 		'postType',
-		postType,
+		NAVIGATION_POST_TYPE,
 		postId
 	);
 
@@ -29,10 +30,14 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 				select( coreStore );
 
 			return {
-				isSaving: isSavingEntityRecord( 'postType', postType, postId ),
+				isSaving: isSavingEntityRecord(
+					'postType',
+					NAVIGATION_POST_TYPE,
+					postId
+				),
 				isDeleting: isDeletingEntityRecord(
 					'postType',
-					postType,
+					NAVIGATION_POST_TYPE,
 					postId
 				),
 			};

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove circular import between `SidebarNavigationScreenNavigationMenu` and `useNavigationMenuHandlers` by using `NAVIGATION_POST_TYPE` directly ([#86867](https://github.com/WordPress/gutenberg/pull/86867)).
+
 ## 8.1.0 (2026-11-04)
 
 ## 8.0.0 (2026-10-20)

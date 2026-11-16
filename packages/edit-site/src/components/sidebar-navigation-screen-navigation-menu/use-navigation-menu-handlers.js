@@ -3,7 +3,6 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { postType } from '.';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
@@ -20,7 +19,7 @@ function useDeleteNavigationMenu() {
 		try {
 			await deleteEntityRecord(
 				'postType',
-				postType,
+				NAVIGATION_POST_TYPE,
 				postId,
 				{
 					force: true,
@@ -86,7 +85,7 @@ function useSaveNavigationMenu() {
 		);
 
 		// Apply the edits.
-		editEntityRecord( 'postType', postType, postId, edits );
+		editEntityRecord( 'postType', NAVIGATION_POST_TYPE, postId, edits );
 
 		const recordPropertiesToSave = Object.keys( edits );
 
@@ -94,7 +93,7 @@ function useSaveNavigationMenu() {
 		try {
 			await saveSpecifiedEntityEdits(
 				'postType',
-				postType,
+				NAVIGATION_POST_TYPE,
 				postId,
 				recordPropertiesToSave,
 				{
@@ -139,7 +138,7 @@ function useDuplicateNavigationMenu() {
 		try {
 			const savedRecord = await saveEntityRecord(
 				'postType',
-				postType,
+				NAVIGATION_POST_TYPE,
 				{
 					title: sprintf(
 						/* translators: %s: Navigation menu title */
