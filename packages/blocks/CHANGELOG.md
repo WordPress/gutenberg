@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Remove circular import between `api/children` and `api/node` ([#86328](https://github.com/WordPress/gutenberg/issues/86328)).
+-   Remove circular import between `api/children` and `api/node` ([#86900](https://github.com/WordPress/gutenberg/pull/86900)).
 
 ## 17.1.0 (2026-11-04)
 
