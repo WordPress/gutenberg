@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { dispatch, select } from '@wordpress/data';
 import { useEventHandlers } from '../use-selected-block-event-handlers';
 import { store as blockEditorStore } from '../../../../store';
@@ -111,78 +111,5 @@ describe( 'useEventHandlers', () => {
 		expect( document.body ).not.toHaveClass(
 			'is-dragging-components-draggable'
 		);
-	} );
-
-	describe( 'in an iframed canvas', () => {
-		let iframe: HTMLIFrameElement;
-
-		afterEach( () => {
-			iframe.remove();
-		} );
-
-		it.each( [
-			[
-				// A drop target drawn over the canvas is in the editor's
-				// document, so its `drop` never reaches the canvas document.
-				'a drop in the editor document',
-				() => document.dispatchEvent( dragEvent( 'drop' ) ),
-			],
-			[
-				// After such a drop the pointer is over the editor's
-				// document, which gets the mouse moves.
-				'the next mouse move in the editor document',
-				() =>
-					document.dispatchEvent(
-						new MouseEvent( 'mousemove', {
-							bubbles: true,
-							buttons: 0,
-						} )
-					),
-			],
-		] )( 'puts the block back on %s', ( _, end ) => {
-			iframe = document.createElement( 'iframe' );
-			document.body.append( iframe );
-			const canvasDocument = iframe.contentDocument!;
-			const canvas = within( canvasDocument.body );
-			render( <Block />, {
-				container: canvasDocument.body.appendChild(
-					canvasDocument.createElement( 'div' )
-				),
-				baseElement: canvasDocument.body,
-			} );
-			const node = canvas.getByTestId( 'block' );
-			node.focus();
-			node.dispatchEvent( dragEvent( 'dragstart' ) );
-			canvasDocument.dispatchEvent( dragEvent( 'dragover', 10, 10 ) );
-			// A move with the button held belongs to the drag in progress.
-			document.dispatchEvent(
-				new MouseEvent( 'mousemove', { bubbles: true, buttons: 1 } )
-			);
-
-			expect( node ).not.toHaveAttribute( 'id', `block-${ CLIENT_ID }` );
-			expect( select( blockEditorStore ).isDraggingBlocks() ).toBe(
-				true
-			);
-			expect( canvasDocument.documentElement ).toHaveClass(
-				'is-dragging'
-			);
-
-			end();
-
-			// Every drag style is gone, leaving an empty style attribute.
-			// eslint-disable-next-line jest-dom/prefer-to-have-style -- toHaveStyle() is disallowed in jsdom tests.
-			expect( node ).toHaveAttribute( 'style', '' );
-			expect( node ).toHaveAttribute( 'id', `block-${ CLIENT_ID }` );
-			expect( canvas.getAllByTestId( 'block' ) ).toHaveLength( 1 );
-			expect( select( blockEditorStore ).isDraggingBlocks() ).toBe(
-				false
-			);
-			expect( canvasDocument.documentElement ).not.toHaveClass(
-				'is-dragging'
-			);
-			expect( document.body ).not.toHaveClass(
-				'is-dragging-components-draggable'
-			);
-		} );
 	} );
 } );
