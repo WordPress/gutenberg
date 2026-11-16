@@ -306,6 +306,10 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/group' ],
 			variationName: 'group-grid',
+			// The Gallery Grid variation covers this in the block switcher, where
+			// both would show the same icon. The transform stays for code that
+			// switches a gallery to a grid.
+			showInBlockSwitcher: false,
 			// As above: with no inner blocks to clone, a dynamic gallery would
 			// transform into an empty grid.
 			isMatch: ( { dynamicContent } ) => ! dynamicContent,

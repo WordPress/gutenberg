@@ -22,6 +22,7 @@ import type {
 
 type BlockTypeWithTransformMetadata = BlockType & {
 	variationName?: string;
+	showInBlockSwitcher?: boolean;
 };
 
 type TemplateBlock = [
@@ -45,10 +46,24 @@ const isBlockTypeTransform = < Transform extends BlockTransform >(
 const getBlockTypeWithTransformMetadata = (
 	blockType: BlockType,
 	transform: BlockBlockTransform
-): BlockTypeWithTransformMetadata =>
-	transform.variationName
-		? { ...blockType, variationName: transform.variationName }
-		: blockType;
+): BlockTypeWithTransformMetadata => {
+	const isHidden = transform.showInBlockSwitcher === false;
+	if ( ! transform.variationName && ! isHidden ) {
+		return blockType;
+	}
+
+	const metadata: Pick<
+		BlockTypeWithTransformMetadata,
+		'variationName' | 'showInBlockSwitcher'
+	> = {};
+	if ( transform.variationName ) {
+		metadata.variationName = transform.variationName;
+	}
+	if ( isHidden ) {
+		metadata.showInBlockSwitcher = false;
+	}
+	return { ...blockType, ...metadata };
+};
 
 /**
  * Returns a block object given its type and attributes.
@@ -436,7 +451,13 @@ export function getPossibleBlockTransformations(
 		const key = blockType.variationName
 			? `${ blockType.name }/${ blockType.variationName }`
 			: blockType.name;
-		if ( ! blockTypesByNameAndVariation.has( key ) ) {
+		const existingBlockType = blockTypesByNameAndVariation.get( key );
+		// A listed transform wins over a hidden one that leads to the same block.
+		if (
+			! existingBlockType ||
+			( existingBlockType.showInBlockSwitcher === false &&
+				blockType.showInBlockSwitcher !== false )
+		) {
 			blockTypesByNameAndVariation.set( key, blockType );
 		}
 	}

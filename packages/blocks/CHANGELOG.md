@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
+-   Block transforms: Add the `showInBlockSwitcher` option to keep a block transform out of the block switcher and the transform commands while it stays available to `switchToBlockType` and its keyboard shortcuts ([#86860](https://github.com/WordPress/gutenberg/pull/86860)).
 
 ## 17.1.0 (2026-11-04)
 
