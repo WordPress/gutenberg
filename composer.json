@@ -27,6 +27,7 @@
 					"PKSA-ft77-7h5f-p3r6": "CVE-2026-45305: ReDoS via catastrophic backtracking. This is only reachable by YAML parsing of untrusted input, which this repository's PHPUnit-5.7-driven usage never performs.",
 					"PKSA-b14r-zh1d-vdrc": "CVE-2026-45133: stack exhaustion via unbounded recursion in symfony/yaml's handling of deeply nested blocks/sequences/mappings. Only exercised by YAML parsing of untrusted input, which does not happen in this repository.",
 					"PKSA-xz3r-9gp4-4m1z": "CVE-2026-109413: unbounded recursion in symfony/yaml's inline lexer. Only reachable by YAML parsing of untrusted input, which this repository's PHPUnit-5.7-driven usage never performs.",
+					"PKSA-nktx-f1n1-b4yd": "CVE-2026-123792: exponential and quadratic parse times in symfony/yaml's YAML parser. Only reachable by YAML parsing of untrusted input, which this repository's PHPUnit-5.7-driven usage never performs.",
 					"PKSA-mh9b-91zm-m1gy": "CVE-2026-45293 only affects the WordPress.WP.EnqueuedResourceParameters sniff included in the WordPress and WordPress-Extra rulesets, all of which are not used."
 				}
 			}
