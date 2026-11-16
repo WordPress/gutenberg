@@ -83,7 +83,8 @@ export default function LeafMoreMenu( {
 					( canInsertDefaultBlock || !! directInsertBlock ) &&
 					canInsertBlockType( _blockName, _rootClientId ),
 				canHide:
-					getBlockEditingMode( clientId ) === 'default' &&
+					// The screen locks its blocks to their content.
+					getBlockEditingMode( clientId ) !== 'disabled' &&
 					hasBlockSupport( _blockName as string, 'visibility', true ),
 				// A Page List lists every page, so its pages are hidden,
 				// not removed or duplicated.

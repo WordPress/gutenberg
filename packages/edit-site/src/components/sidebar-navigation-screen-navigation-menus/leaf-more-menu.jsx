@@ -44,32 +44,32 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, blockName, attributes, isDefaultEditingMode } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockName,
-					getBlockAttributes,
-					getBlockEditingMode,
-				} = select( blockEditorStore );
+	const { rootClientId, blockName, attributes, isEditable } = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
 
-				return {
-					rootClientId: getBlockRootClientId( clientId ),
-					blockName: getBlockName( clientId ),
-					attributes: getBlockAttributes( clientId ),
-					isDefaultEditingMode:
-						getBlockEditingMode( clientId ) === 'default',
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				rootClientId: getBlockRootClientId( clientId ),
+				blockName: getBlockName( clientId ),
+				attributes: getBlockAttributes( clientId ),
+				isEditable:
+					// The screen locks its blocks to their content.
+					getBlockEditingMode( clientId ) !== 'disabled',
+			};
+		},
+		[ clientId ]
+	);
 
 	// A Page List lists every page, so its pages are hidden, not removed.
 	const isPage = blockName === 'core/page-list-item';
 	const canHide =
 		allowVisibilityEditing !== false &&
-		isDefaultEditingMode &&
+		isEditable &&
 		!! blockName &&
 		hasBlockSupport( blockName, 'visibility', true );
 	const isHidden = attributes?.metadata?.blockVisibility === false;
