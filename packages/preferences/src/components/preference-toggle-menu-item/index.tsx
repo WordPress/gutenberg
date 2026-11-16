@@ -59,7 +59,6 @@ export default function PreferenceToggleMenuItem( {
 	return (
 		<MenuItem
 			className="components-menu-item__selection-row"
-			iconPosition="left"
 			icon={ isActive ? check : null }
 			isSelected={ isActive }
 			onClick={ () => {

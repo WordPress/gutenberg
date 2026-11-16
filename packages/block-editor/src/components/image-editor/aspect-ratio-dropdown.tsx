@@ -26,8 +26,7 @@ function AspectRatioGroup( {
 					role="menuitemradio"
 					isSelected={ ratio === value }
 					className="components-menu-item__selection-row"
-					iconPosition="left"
-					icon={ ratio === value ? check : null }
+					icon={ ratio === value ? check : undefined }
 				>
 					{ name }
 				</MenuItem>

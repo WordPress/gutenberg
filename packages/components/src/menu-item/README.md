@@ -58,10 +58,10 @@ Text to use as description for button text.
 
 ### `icon`
 
--   Type: `string`
+-   Type: `React.JSX.Element | null`
 -   Required: No
 
-Refer to documentation for [Button's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+Pass an icon element such as `check` from `@wordpress/icons`. JavaScript callers can also pass a Dashicon name. See [Button's `icon` prop](/packages/components/src/button/README.md#icon).
 
 ### `iconPosition`
 

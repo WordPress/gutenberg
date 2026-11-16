@@ -18,8 +18,7 @@ export type MenuItemProps = Pick<
 	 */
 	info?: string;
 	/**
-	 * The icon to render. Supported values are: Dashicons (specified as
-	 * strings), functions, Component instances and `null`.
+	 * The icon element to render, or `null` to omit the icon.
 	 *
 	 * @default null
 	 */

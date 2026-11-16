@@ -52,7 +52,6 @@ function MenuItemsChoice( {
 						key={ item.value }
 						role="menuitemradio"
 						disabled={ item.disabled }
-						iconPosition="left"
 						icon={ isSelected ? check : null }
 						info={ item.info }
 						isSelected={ isSelected }

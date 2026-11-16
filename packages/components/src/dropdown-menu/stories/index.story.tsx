@@ -191,7 +191,6 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 										role="menuitemcheckbox"
 										isSelected={ isSelected }
 										className="components-menu-item__selection-row"
-										iconPosition="left"
 										icon={ isSelected ? check : null }
 										onClick={ () => toggleOption( option ) }
 									>
@@ -208,11 +207,14 @@ export const MultiSelection: StoryObj< typeof DropdownMenu > = {
 };
 
 /**
- * Selection rows share their leading selection space with ordinary actions.
- * Action icons keep their explicit position and indent only their own label.
+ * This example uses Gutenberg's internal layout for selection checks.
+ * Action icons keep the position the caller chooses.
  */
 export const MixedContent: StoryObj< typeof DropdownMenu > = {
 	args: { label: 'Mixed menu', icon: more },
+	parameters: {
+		docs: { canvas: { sourceState: 'hidden' } },
+	},
 	render: function Render( args ) {
 		const [ mode, setMode ] = useState( 'code' );
 		const [ showDetails, setShowDetails ] = useState( true );
@@ -220,10 +222,7 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 			<DropdownMenu { ...args }>
 				{ ( { onClose } ) => (
 					<>
-						<MenuGroup label="Editor">
-							<MenuItem onClick={ onClose }>
-								Plain action
-							</MenuItem>
+						<MenuGroup label="Editor mode">
 							<MenuItemsChoice
 								value={ mode }
 								onSelect={ setMode }
@@ -241,11 +240,15 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 									},
 								] }
 							/>
+						</MenuGroup>
+						<MenuGroup label="Actions">
+							<MenuItem onClick={ onClose }>
+								Plain action
+							</MenuItem>
 							<MenuItem
 								role="menuitemcheckbox"
 								isSelected={ showDetails }
 								className="components-menu-item__selection-row"
-								iconPosition="left"
 								icon={ showDetails ? check : null }
 								info="Display additional information."
 								onClick={ () =>
@@ -263,8 +266,6 @@ export const MixedContent: StoryObj< typeof DropdownMenu > = {
 							>
 								Save
 							</MenuItem>
-						</MenuGroup>
-						<MenuGroup label="Actions">
 							<MenuItem
 								icon={ link }
 								iconPosition="left"

@@ -68,7 +68,6 @@ const DefaultControlsGroup = ( {
 					<MenuItem
 						key={ label }
 						icon={ check }
-						iconPosition="left"
 						className={ clsx(
 							itemClassName,
 							'components-menu-item__selection-row'
@@ -112,7 +111,6 @@ const OptionalControlsGroup = ( {
 					<MenuItem
 						key={ label }
 						className="components-menu-item__selection-row"
-						iconPosition="left"
 						icon={ isSelected ? check : null }
 						isSelected={ isSelected }
 						label={ itemLabel }

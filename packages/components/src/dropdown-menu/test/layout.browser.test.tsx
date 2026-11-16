@@ -19,16 +19,8 @@ const centerY = ( element: Element ) => {
 
 const textLeft = ( label: string ) => {
 	// Controls render bare text, so measure the label rather than its button.
-	const walker = document.createTreeWalker(
-		screen.getByText( label ),
-		NodeFilter.SHOW_TEXT
-	);
-	let node = walker.nextNode();
-	while ( node && node.textContent !== label ) {
-		node = walker.nextNode();
-	}
 	const range = document.createRange();
-	range.selectNodeContents( node! );
+	range.selectNodeContents( screen.getByText( label ) );
 	return range.getBoundingClientRect().left;
 };
 
@@ -49,7 +41,6 @@ describe( 'DropdownMenu row layout', () => {
 								role="menuitemcheckbox"
 								isSelected={ selected }
 								className="components-menu-item__selection-row"
-								iconPosition="left"
 								icon={ selected ? check : undefined }
 								onClick={ () => setSelected( ! selected ) }
 							>
@@ -59,7 +50,6 @@ describe( 'DropdownMenu row layout', () => {
 								role="menuitemcheckbox"
 								isSelected={ false }
 								className="components-menu-item__selection-row"
-								iconPosition="left"
 							>
 								Show outlines
 							</MenuItem>
