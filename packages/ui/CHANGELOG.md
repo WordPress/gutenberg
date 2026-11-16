@@ -52,6 +52,9 @@
 -   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 -   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
+-   `Tabs`: Paint the hover, pressed, and focus states across the tab's hit area with an even 2px clearance and a small corner radius, and draw the focus ring inside the tab's bounds. Horizontal tab lists previously painted a pill around the label.
+-   `Tabs`: Size a horizontal tab to 47px, so the tab bar occupies 48px including the 1px rule beneath it. Containers no longer need to shift the tab list to sit under that rule, which was leaving the interaction states lopsided.
+-   `Tabs`: Give `minimal` tab lists the same interaction states as the default variant. Their tabs carry inline padding instead of the list carrying a gap, so the hit area, the interaction background, and the selection indicator all cover the same box. The distance between labels is unchanged, and the indicator now spans the tab rather than just its label.
 
 ### Bug Fixes
 
