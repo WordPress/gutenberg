@@ -75,8 +75,9 @@ import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
 import InnerContent from './components/inner-content';
+import SafeRawHTML from './components/safe-raw-html';
 import { useNativeUndo, usesNativeUndo } from './utils/native-undo';
-import {
+import isURLLike, {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
@@ -155,7 +156,9 @@ lock( privateApis, {
 	useListViewPanelState,
 	isHashLink,
 	isRelativePath,
+	isURLLike,
 	InnerContent,
+	SafeRawHTML,
 	useNativeUndo,
 	usesNativeUndo,
 	isElementVisible,

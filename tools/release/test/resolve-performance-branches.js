@@ -256,7 +256,7 @@ describe( 'computeBuildKey', () => {
 describe( 'resolveShards', () => {
 	const specs = fs
 		.readdirSync(
-			path.join( __dirname, '../../../test/performance/specs' )
+			path.join( import.meta.dirname, '../../../test/performance/specs' )
 		)
 		.filter( ( file ) => file.endsWith( '.spec.js' ) )
 		.map( ( file ) => path.basename( file, '.spec.js' ) );

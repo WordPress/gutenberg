@@ -7,6 +7,9 @@
 
 $attributes = get_defined_vars()['attributes'];
 $page       = $attributes['page'];
+$resource   = is_string( $attributes['resource'] ?? null )
+	? sanitize_key( $attributes['resource'] )
+	: '';
 
 if ( 'pending' === $attributes['value'] ) {
 	wp_interactivity_state(
@@ -55,10 +58,23 @@ if ( 'pending' === $attributes['value'] ) {
 		<p data-testid="page-content">content from <?php echo esc_html( $page ); ?></p>
 		<div data-testid="kept-html" data-wp-html="state.html"><i><?php echo 'one' === $page ? 'one' : 'two'; ?></i></div>
 		<div data-testid="never-html" data-wp-html="state.never"><i><?php echo 'one' === $page ? 'never one' : 'never two'; ?></i></div>
+		<?php if ( $resource ) : ?>
+			<div data-testid="fallback-media" data-wp-html="state.media">
+				<p>Media fallback</p>
+				<video preload="metadata" src="<?php echo esc_url( home_url( '/wp-content/uploads/router-html-' . $resource . '.mp4' ) ); ?>"></video>
+			</div>
+		<?php endif; ?>
+		<?php if ( 'two' === $page && 'pending' === $attributes['value'] ) : ?>
+			<div data-testid="added-html" data-wp-html="state.late"><p>B fallback</p><script>window.fallbackRuns = ( window.fallbackRuns || 0 ) + 1;</script></div>
+		<?php endif; ?>
 		<p data-testid="value" data-wp-text="state.value">not hydrated</p>
 		<button data-wp-on--click="actions.resolve">Resolve HTML</button>
 		<?php if ( ! empty( $attributes['next'] ) ) : ?>
 			<a href="<?php echo esc_url( $attributes['next'] ); ?>" data-wp-on--click="actions.navigate">Next</a>
+		<?php endif; ?>
+		<?php if ( ! empty( $attributes['prefetch'] ) && ! empty( $attributes['next'] ) ) : ?>
+			<button data-prefetch-url="<?php echo esc_attr( $attributes['next'] ); ?>" data-testid="prefetch-next" data-wp-on--click="actions.prefetch">Prefetch next page</button>
+			<span data-testid="prefetching" data-wp-text="state.prefetching">false</span>
 		<?php endif; ?>
 	</div>
 </div>

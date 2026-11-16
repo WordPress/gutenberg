@@ -11,7 +11,7 @@ import FontCollection from './font-collection';
 import UploadFonts from './upload-fonts';
 import { unlock } from '../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 const DEFAULT_TAB = {
 	id: 'installed-fonts',
@@ -64,15 +64,15 @@ function FontLibraryModal( {
 			isFullScreen
 			className="font-library-modal"
 		>
-			<Tabs defaultTabId={ defaultTabId }>
+			<WCTabs defaultTabId={ defaultTabId }>
 				<div className="font-library-modal__tablist-container">
-					<Tabs.TabList>
+					<WCTabs.TabList>
 						{ tabs.map( ( { id, title } ) => (
-							<Tabs.Tab key={ id } tabId={ id }>
+							<WCTabs.Tab key={ id } tabId={ id }>
 								{ title }
-							</Tabs.Tab>
+							</WCTabs.Tab>
 						) ) }
-					</Tabs.TabList>
+					</WCTabs.TabList>
 				</div>
 				{ tabs.map( ( { id } ) => {
 					let contents;
@@ -87,17 +87,17 @@ function FontLibraryModal( {
 							contents = <FontCollection slug={ id } />;
 					}
 					return (
-						<Tabs.TabPanel
+						<WCTabs.TabPanel
 							key={ id }
 							tabId={ id }
 							focusable={ false }
 							className="font-library-modal__tab-panel"
 						>
 							{ contents }
-						</Tabs.TabPanel>
+						</WCTabs.TabPanel>
 					);
 				} ) }
-			</Tabs>
+			</WCTabs>
 		</Modal>
 	);
 }

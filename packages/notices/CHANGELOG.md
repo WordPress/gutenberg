@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `InlineNotices`: Keep the component mounted when there are no notices so it can announce the first new message. It now renders a list element and live regions even when empty. Notices present on mount stay silent ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
+
+## 6.1.0 (2026-11-04)
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
