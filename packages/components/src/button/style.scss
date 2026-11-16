@@ -410,8 +410,8 @@
 			forced-color-adjust: none;
 			outline-color: CanvasText !important;
 			border-color: ButtonBorder !important;
-			background: SelectedItem !important;
-			color: SelectedItemText !important;
+			background: Highlight !important;
+			color: HighlightText !important;
 
 			&:disabled,
 			&[aria-disabled="true"] {
