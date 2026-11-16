@@ -17,8 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
 const getExternalLink = ( url, text ) =>
 	`<a ${ getExternalLinkAttributes( url ) }>${ text }</a>`;
 
-const getExternalLinkAttributes = ( url ) =>
-	`href="${ url }" target="_blank" rel="noopener"`;
+const getExternalLinkAttributes = ( url ) => `href="${ url }" target="_blank"`;
 
 const getOpenverseLicense = ( license, licenseVersion ) => {
 	let licenseName = license.trim();

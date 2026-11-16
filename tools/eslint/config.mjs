@@ -1,5 +1,5 @@
 import { createRequire } from 'module';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import globals from 'globals';
 import { globSync } from 'glob';
 import eslintCommentsPlugin from '@eslint-community/eslint-plugin-eslint-comments';
@@ -11,6 +11,7 @@ import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
 import useTypeScript from './rules/use-typescript.mjs';
 import noBroadComponentSuppression from './rules/no-broad-component-suppression.mjs';
+import componentsImportAliases from './components-import-aliases.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -119,18 +120,28 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
 /*
- * Source and test trees of the packages wired into the TypeScript program,
- * plus routes and tools, which keep their sources at the workspace root.
+ * Every workspace is expected to be written in TypeScript, with the following
+ * exceptions:
+ *
+ * - Workspaces that don't have a `tsconfig.json` TypeScript configuration.
+ * - Packages published to NPM, where only the source code and tests should be
+ *   written as TypeScript so that the published code can be run in versions of
+ *   Node.js without support for TypeScript syntax.
  */
-const typeScriptOnlyFiles = [
-	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
-		.sort()
-		.map( ( fileName ) =>
-			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
-		),
-	`routes/**/*.${ JS_EXT }`,
-	`tools/**/*.${ JS_EXT }`,
-];
+const { workspaces } = require( join( rootDir, 'package.json' ) );
+const typeScriptOnlyFiles = globSync(
+	workspaces
+		.filter( ( pattern ) => ! pattern.startsWith( '!' ) )
+		.map( ( pattern ) => `${ pattern }/tsconfig.json` ),
+	{ cwd: rootDir, posix: true }
+)
+	.sort()
+	.map( ( fileName ) => {
+		const dir = dirname( fileName );
+		return dir.startsWith( 'packages/' )
+			? `${ dir }/@(src|test)/**/*.${ JS_EXT }`
+			: `${ dir }/**/*.${ JS_EXT }`;
+	} );
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -422,24 +433,7 @@ export default dedupePlugins( [
 			'@wordpress/use-import-as': [
 				'error',
 				{
-					'@wordpress/components': {
-						__experimentalText: 'WCText',
-						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
-						Autocomplete: 'WCAutocomplete',
-						Badge: 'WCBadge',
-						Card: 'WCCard',
-						CheckboxControl: 'WCCheckboxControl',
-						Icon: 'WCIcon',
-						IconButton: 'WCIconButton',
-						__experimentalInputControl: 'WCInputControl',
-						Menu: 'WCMenu',
-						Notice: 'WCNotice',
-						SelectControl: 'WCSelectControl',
-						Spinner: 'WCSpinner',
-						TextareaControl: 'WCTextareaControl',
-						Tooltip: 'WCTooltip',
-						VisuallyHidden: 'WCVisuallyHidden',
-					},
+					'@wordpress/components': componentsImportAliases,
 				},
 			],
 			'@wordpress/dependency-group': [ 'error', 'never' ],
@@ -570,6 +564,7 @@ export default dedupePlugins( [
 			'**/fixtures/**',
 			// Editors load the ESLint config with their own Node, which
 			// may not strip types.
+			'storybook/eslint/**',
 			'tools/eslint/**',
 			// Published as plain modules through package.json exports.
 			'tools/react-18/**',

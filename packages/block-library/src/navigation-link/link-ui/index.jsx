@@ -1,6 +1,6 @@
 import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
@@ -168,7 +168,7 @@ function UnforwardedLinkUI( props, ref ) {
 		} );
 
 	return (
-		<Popover
+		<WCPopover
 			ref={ ref }
 			placement="bottom"
 			onClose={ props.onClose }
@@ -275,7 +275,7 @@ function UnforwardedLinkUI( props, ref ) {
 					}
 				/>
 			) }
-		</Popover>
+		</WCPopover>
 	);
 }
 

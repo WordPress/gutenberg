@@ -4,10 +4,61 @@
 
 ### Breaking Changes
 
+-   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).
+-   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
+
+### New Features
+
+-   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
+-   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
+-   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
+-   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
+
+### Enhancements
+
+-   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
+-   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
+-   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
+-   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds.
+-   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
+-   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
+-   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
+
+### Bug Fixes
+
+-   `Breadcrumb`: Keep committed navigation items when the overflow trigger receives focus during a suspended update ([#86746](https://github.com/WordPress/gutenberg/pull/86746)).
+-   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column ([#86652](https://github.com/WordPress/gutenberg/pull/86652)).
+-   `Combobox` and `Autocomplete`: Keep `ListBody` out of the Tab order, so a scrolling inline list is no longer an extra Tab stop after the input ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
+-   `AlertDialog`: Honor canceled open state changes and restore usable controls when closing after confirmation is canceled ([#86544](https://github.com/WordPress/gutenberg/pull/86544)).
+-   `Textarea`: Fix ref and render prop composition, restoring Field filled state, required validation, and returning to pristine when the default value is restored ([#86546](https://github.com/WordPress/gutenberg/pull/86546)).
+-   `Input`, `Combobox`, `Autocomplete`, and their controls: Prevent wp-admin form styles from adding a grey background to read-only and disabled fields, and from changing the text color of disabled fields ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
+-   `Button` and `ButtonLink`: Keep the icon at full size when the button is narrower than its content ([#86497](https://github.com/WordPress/gutenberg/pull/86497)).
+-   `AlertDialog`: Ignore async confirmation results after the dialog unmounts ([#86545](https://github.com/WordPress/gutenberg/pull/86545)).
+-   `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels and squashed icons in a prefix or suffix. ([#86446](https://github.com/WordPress/gutenberg/pull/86446))
+-   `Button`: Show the pressed state of neutral minimal buttons in forced colors mode ([#85948](https://github.com/WordPress/gutenberg/pull/85948)).
+-   `Menu`: Align the selection indicator, prefix, suffix, shortcut, and submenu chevron with the first line of the label. Prefix icons larger than 16px and tall suffixes no longer sit above the label, and the row grows around them. The suffix, shortcut, and chevron of an item with a wrapped label now follow the first line instead of centering on the whole label ([#86135](https://github.com/WordPress/gutenberg/pull/86135)).
+
+### Internal
+
+-   `Meter`, `Progress`: Use the new `--wpds-color-background-indicator-*` tokens for the filled portion. The colors are unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+### Documentation
+
+-   `Notice`: Add a Storybook example showing a neutral-toned `Link` inside `Notice.Description` ([#86291](https://github.com/WordPress/gutenberg/pull/86291)).
+-   `Tabs`: Describe that each tab shows its panel in place, without a change of URL ([#86615](https://github.com/WordPress/gutenberg/pull/86615)).
+
+## 0.26.0 (2026-11-04)
+
+### Breaking Changes
+
 -   `Select` and `SelectControl`: The `sm`, `md`, and `lg` popup width presets now set a maximum width and size to content, retaining the anchor-width minimum. For fixed widths, compose `Select` with a popup `className` or `style`. Combobox, Autocomplete, and searchable-select presets remain fixed ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 
 ### New Features
 
+-   `Badge`: Add an optional `infotip` popup with a trailing help icon ([#85309](https://github.com/WordPress/gutenberg/pull/85309)).
 -   `Menu.Popup`: Add width presets, with `sm` as the default to preserve the 320px maximum width ([#84086](https://github.com/WordPress/gutenberg/pull/84086)).
 -   `Notice.List`: Add announcements for added and changed notices, excluding hidden content, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
 
@@ -19,11 +70,19 @@
 
 ### Bug Fixes
 
+-   `Menu`, `Select`, and `SelectControl`: Show a focus ring on disabled items when they have keyboard focus ([#85488](https://github.com/WordPress/gutenberg/pull/85488), [#86125](https://github.com/WordPress/gutenberg/pull/86125)).
+-   `Calendar`, `RangeCalendar`: Show only the localized day number in day cells, without locale-specific suffixes ([#86010](https://github.com/WordPress/gutenberg/pull/86010)).
+-   Generated CSS module class names now change whenever their CSS changes, so they differ from earlier versions. Two versions of the package loaded on the same page, such as one in WordPress Core and an older copy bundled in a plugin, no longer apply their styles to each other's elements ([#85900](https://github.com/WordPress/gutenberg/pull/85900)).
 -   `ControlWithError`: Fix dropped keystrokes under React 19 caused by a state update after every render ([#85479](https://github.com/WordPress/gutenberg/pull/85479)).
--   `Menu`: Show a focus ring on highlighted disabled items ([#85488](https://github.com/WordPress/gutenberg/pull/85488)).
+
+### Internal
+
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
+-   Update Storybook development dependencies to 10.6.5 ([#86172](https://github.com/WordPress/gutenberg/pull/86172)).
 
 ### Documentation
 
+-   `Calendar` and `RangeCalendar`: Document the `numberOfMonths` limits ([#86261](https://github.com/WordPress/gutenberg/pull/86261)).
 -   `Notice`: Add a Storybook example with native details and a text button to copy the error message and details ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
 
 ## 0.25.0 (2026-10-20)

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/patterns",
-	"version": "3.0.0",
+	"version": "3.1.0",
 	"description": "Management of user pattern editing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -66,11 +66,10 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url",
-		"change-case": "^4.1.2"
+		"@wordpress/url": "file:../url"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",

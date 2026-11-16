@@ -558,8 +558,8 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<BlockInspectorPreTabsSlot />
 			{ isEditingStyleState && (
-				// @ts-expect-error Bug: without `blockName`, template parts get the section controls.
 				<StyleStateInspectorSlots
+					blockName={ blockName }
 					clientId={ renderedBlockClientId }
 					contentClientIds={ contentClientIds }
 					isSectionBlock={ isSectionBlock }

@@ -214,5 +214,28 @@ describe( 'templates', () => {
 				synchronizeBlocksWithTemplate( [], template )[ 2 ].name
 			).toEqual( 'core/missing' );
 		} );
+
+		it( 'should migrate the legacy Cover minimum height', () => {
+			registerBlockType( 'core/cover', {
+				apiVersion: 3,
+				attributes: {
+					style: {
+						type: 'object',
+					},
+				},
+				save: noop,
+				category: 'media',
+				title: 'cover block',
+			} );
+
+			const [ block ] = synchronizeBlocksWithTemplate(
+				[],
+				[ [ 'core/cover', { minHeight: 100, minHeightUnit: 'vh' } ] ]
+			);
+
+			expect( block.attributes ).toEqual( {
+				style: { dimensions: { minHeight: '100vh' } },
+			} );
+		} );
 	} );
 } );

@@ -13,7 +13,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { external } from '@wordpress/icons';
 import { VisuallyHidden } from '@wordpress/ui';
-import PostScheduleLabel from '../post-schedule/label';
+import { usePostScheduleLabel } from '../post-schedule/label';
 import { store as editorStore } from '../../store';
 
 const POSTNAME = '%postname%';
@@ -106,14 +106,14 @@ export default function PostPublishPanelPostpublish( {
 		[ focusOnMount ]
 	);
 
-	const postPublishNonLinkHeader = isScheduled ? (
-		<>
-			{ __( 'is now scheduled. It will go live on' ) }{ ' ' }
-			<PostScheduleLabel />.
-		</>
-	) : (
-		__( 'is now live.' )
-	);
+	const scheduleLabel = usePostScheduleLabel( { full: true } );
+	const postPublishNonLinkHeader = isScheduled
+		? sprintf(
+				// translators: %s: Date and time the post will go live, e.g. "March 15, 2027 10:00 am UTC".
+				__( 'is now scheduled. It will go live on %s.' ),
+				scheduleLabel
+			)
+		: __( 'is now live.' );
 
 	return (
 		<div className="post-publish-panel__postpublish">
