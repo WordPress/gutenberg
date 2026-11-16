@@ -214,9 +214,10 @@ export default function PageListEdit( {
 		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const { parentClientId, isChildOfNavigation } = useSelect(
+	const { parentClientId, isChildOfNavigation, menuClientIds } = useSelect(
 		( select ) => {
-			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			const { getBlockParentsByBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
@@ -225,6 +226,10 @@ export default function PageListEdit( {
 			return {
 				isChildOfNavigation: navigationBlockParents.length > 0,
 				parentClientId: navigationBlockParents[ 0 ],
+				// To tell an item moved among the pages from a new one.
+				menuClientIds: navigationBlockParents.length
+					? getClientIdsOfDescendants( navigationBlockParents[ 0 ] )
+					: EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]
@@ -241,6 +246,7 @@ export default function PageListEdit( {
 		excludedPageIDs,
 		pagesByParentId,
 		setAttributes,
+		menuClientIds,
 	} );
 
 	// Once the pages catch up with a change, the changed blocks are kept, so

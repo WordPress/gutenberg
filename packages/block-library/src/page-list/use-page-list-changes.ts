@@ -15,7 +15,6 @@ import {
 	getPageTreeEdits,
 } from './utils';
 import type { PageListPage, PageListTreeBlock } from './utils';
-import { unlock } from '../lock-unlock';
 
 type Registry = ReturnType< typeof createRegistry >;
 
@@ -110,6 +109,8 @@ function runAfterChange( registry: Registry, change: () => void ) {
  * @param options.excludedPageIDs IDs of its hidden pages.
  * @param options.pagesByParentId Pages keyed by parent page ID.
  * @param options.setAttributes   Sets the Page List's attributes.
+ * @param options.menuClientIds   Client IDs of the blocks in the menu around
+ *                                the Page List, as they were before the change.
  *
  * @return `onChange` for the inner blocks; `changedBlocks`, the last blocks
  * it was given, with `isHeld` when they must stay as they are while a change
@@ -122,12 +123,14 @@ export function usePageListChanges( {
 	excludedPageIDs,
 	pagesByParentId,
 	setAttributes,
+	menuClientIds,
 }: {
 	clientId: string;
 	parentPageID: number;
 	excludedPageIDs: number[];
 	pagesByParentId: Map< number, PageListPage[] >;
 	setAttributes: ( attributes: { excludedPageIDs: number[] } ) => void;
+	menuClientIds: string[];
 } ) {
 	const registry = useRegistry();
 	const [ changedBlocks, setChangedBlocks ] = useState< {
@@ -243,10 +246,9 @@ export function usePageListChanges( {
 			const nonPageClientIds = nonPageBlocks.map(
 				( block ) => block.clientId
 			);
-			const insertedClientIds: string[] =
-				unlock( select() ).getLastInsertedBlocksClientIds() ?? [];
-			const wasInserted = nonPageClientIds.every( ( id ) =>
-				insertedClientIds.includes( id )
+			// Items that weren't in the menu before were just added.
+			const wasInserted = nonPageClientIds.every(
+				( id ) => ! menuClientIds.includes( id )
 			);
 			askToDetach( blocks, {
 				message: __(
