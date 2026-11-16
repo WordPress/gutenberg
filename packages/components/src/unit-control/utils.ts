@@ -200,6 +200,42 @@ const allUnits: Record< string, WPUnitControlUnit > = {
 		a11yLabel: __( 'Large viewport largest dimension (lvmax)' ),
 		step: 0.1,
 	},
+	cqw: {
+		value: 'cqw',
+		label: 'cqw',
+		a11yLabel: __( 'Container width (cqw)' ),
+		step: 0.1,
+	},
+	cqh: {
+		value: 'cqh',
+		label: 'cqh',
+		a11yLabel: __( 'Container height (cqh)' ),
+		step: 0.1,
+	},
+	cqi: {
+		value: 'cqi',
+		label: 'cqi',
+		a11yLabel: __( 'Container inline size (cqi)' ),
+		step: 0.1,
+	},
+	cqb: {
+		value: 'cqb',
+		label: 'cqb',
+		a11yLabel: __( 'Container block size (cqb)' ),
+		step: 0.1,
+	},
+	cqmin: {
+		value: 'cqmin',
+		label: 'cqmin',
+		a11yLabel: __( 'Container smallest dimension (cqmin)' ),
+		step: 0.1,
+	},
+	cqmax: {
+		value: 'cqmax',
+		label: 'cqmax',
+		a11yLabel: __( 'Container largest dimension (cqmax)' ),
+		step: 0.1,
+	},
 };
 
 /**
