@@ -210,7 +210,8 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 			.getByRole( 'document', { name: 'Block: Image' } )
 			.first();
 		await expect( gridImages ).toHaveCount( 2 );
-		await editor.selectBlocks( outside );
+		// A click selects the block the way a user does before dragging it.
+		await outside.click();
 
 		await gridDragUtils.drag(
 			await gridDragUtils.getCenter( outside ),
@@ -219,7 +220,12 @@ test.describe( 'Grid drag and drop (@webkit)', () => {
 				rowCount: 2,
 				column: 3,
 				row: 2,
-			} )
+			} ),
+			{
+				// The drop layer shows once the grid has seen the drag.
+				beforeDrop: () =>
+					expect( gridDragUtils.allowedDropLayer ).toBeAttached(),
+			}
 		);
 
 		// The drop moves the block into the grid before its `dragend`, which
