@@ -6,7 +6,7 @@
 
 -   `MediaEditor.MoreMenu` takes `actions` and `item` props, and lists the actions eligible for the item, such as "Permanently delete". It now also shows for media other than images when it has actions ([#86349](https://github.com/WordPress/gutenberg/pull/86349)).
 -   Show the shape of each aspect ratio in the aspect ratio dropdown of the crop panel and in the aspect ratio menu used on narrow screens ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
--   `MediaPreview` shows media without a preview, such as a zip file, as a card with the filename, file type and size, and Download and Copy URL buttons. The empty and error states use `EmptyState` from `@wordpress/ui`.
+-   `MediaPreview` shows media without a preview, such as a zip file, as a card with the filename, file type and size, and Download and Copy URL buttons. The empty and error states use `EmptyState` from `@wordpress/ui` ([#86490](https://github.com/WordPress/gutenberg/pull/86490)).
 
 ### Bug Fixes
 
