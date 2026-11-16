@@ -37,7 +37,8 @@ function render_block_core_file( $attributes, $content ) {
 	$processor->set_attribute( 'hidden', true );
 
 	$filename     = $processor->get_attribute( 'aria-label' );
-	$has_filename = is_string( $filename ) && ! empty( $filename ) && 'PDF embed' !== $filename;
+	$filename     = is_string( $filename ) ? trim( wp_strip_all_tags( $filename ) ) : '';
+	$has_filename = ! empty( $filename ) && 'PDF embed' !== $filename;
 	$label        = $has_filename ? sprintf(
 		/* translators: %s: filename. */
 		__( 'Embed of %s.' ),

@@ -5,6 +5,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	GridVisualizer,
 	GridRowResizer,
+	useGridAutoSpan,
 	useGridLayoutSync,
 } from '../components/grid';
 import { store as blockEditorStore } from '../store';
@@ -23,6 +24,7 @@ import type {
 
 function GridLayoutSync( props: GridLayoutSyncProps ) {
 	useGridLayoutSync( props );
+	useGridAutoSpan( props );
 	return undefined;
 }
 
