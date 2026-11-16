@@ -6,6 +6,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
+import { getLayoutRect } from '../../utils/dom';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -106,7 +107,7 @@ export function useInBetweenInserter() {
 							return false;
 						}
 
-						const blockElRect = blockEl.getBoundingClientRect();
+						const blockElRect = getLayoutRect( blockEl );
 
 						if ( orientation === 'vertical' ) {
 							return blockElRect.top > offsetTop;
@@ -162,7 +163,7 @@ export function useInBetweenInserter() {
 				// Don't show the insertion point when the pointer sits beside
 				// the block rather than before it.
 				if ( orientation === 'vertical' ) {
-					const elementRect = element.getBoundingClientRect();
+					const elementRect = getLayoutRect( element );
 
 					if (
 						event.clientX > elementRect.right ||
