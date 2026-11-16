@@ -50,8 +50,8 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
-	it( 'should size rows by their content if the grid interactivity experiment is off', () => {
-		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
+	it( 'should give rows a height from the grid's width if the grid interactivity experiment is off', () => {
+		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); aspect-ratio: 3 / 2; }`;
 
 		const result = grid.getLayoutStyle( {
 			selector: '.my-container',
@@ -89,8 +89,8 @@ describe( 'getLayoutStyle', () => {
 			window.__experimentalEnableGridInteractivity = originalExperiment;
 		} );
 
-		it( 'should size the rows of auto placement grids by their content', () => {
-			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
+		it( 'should give the rows of auto placement grids a height from the grid's width', () => {
+			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); aspect-ratio: 3 / 2; }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
