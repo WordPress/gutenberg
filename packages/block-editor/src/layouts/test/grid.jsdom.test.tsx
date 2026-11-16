@@ -55,8 +55,8 @@ describe( 'getLayoutStyle', () => {
 
 		expect( result ).toBe( expected );
 	} );
-	it( 'should size rows by their content if the grid interactivity experiment is off', () => {
-		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
+	it( 'should give rows a height from the width of the grid if the grid interactivity experiment is off', () => {
+		const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); aspect-ratio: 3 / 2; }`;
 
 		const result = grid.getLayoutStyle( {
 			selector: '.my-container',
@@ -94,8 +94,8 @@ describe( 'getLayoutStyle', () => {
 			window.__experimentalEnableGridInteractivity = originalExperiment;
 		} );
 
-		it( 'should size the rows of auto placement grids by their content', () => {
-			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, auto)); }`;
+		it( 'should give the rows of auto placement grids a height from the width of the grid', () => {
+			const expected = `.my-container { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(1rem, 1fr)); aspect-ratio: 3 / 2; }`;
 
 			const result = grid.getLayoutStyle( {
 				selector: '.my-container',
@@ -419,5 +419,33 @@ describe( 'startChildDrag', () => {
 			} )
 		).toBe( true );
 		expect( startGridItemDrag ).toHaveBeenCalledWith( event, options );
+	} );
+} );
+
+describe( 'capturesToolbars', () => {
+	let originalExperiment: boolean | undefined;
+	beforeEach( () => {
+		originalExperiment = window.__experimentalEnableGridInteractivity;
+		window.__experimentalEnableGridInteractivity = true;
+	} );
+	afterEach( () => {
+		window.__experimentalEnableGridInteractivity = originalExperiment;
+	} );
+
+	it( 'captures the toolbars of the blocks in a manual placement grid', () => {
+		expect(
+			grid.capturesToolbars( { type: 'grid', isManualPlacement: true } )
+		).toBe( true );
+	} );
+
+	it( 'leaves the toolbars of the blocks in an auto placement grid alone', () => {
+		expect( grid.capturesToolbars( { type: 'grid' } ) ).toBe( false );
+	} );
+
+	it( 'leaves the toolbars alone with the grid interactivity experiment off', () => {
+		window.__experimentalEnableGridInteractivity = false;
+		expect(
+			grid.capturesToolbars( { type: 'grid', isManualPlacement: true } )
+		).toBe( false );
 	} );
 } );

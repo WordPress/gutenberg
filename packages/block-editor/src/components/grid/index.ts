@@ -4,3 +4,4 @@ export { GridItemMovers } from './grid-item-movers';
 export { GridRowResizer } from './grid-row-resizer';
 export { useGridLayoutSync } from './use-grid-layout-sync';
 export { useIsInFixedGridCell } from './use-is-in-fixed-grid-cell';
+export { useGridAutoSpan } from './use-grid-auto-span';

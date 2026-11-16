@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
 	getGridRectFromPixelRect,
-	getGridTracks,
+	getGridTracksFromTemplate,
 	getRowEndForResize,
 } from '../utils';
 import type { GridRect } from '../utils';
 
 // Three 100px columns and three 50px rows, with 10px gaps. Rows are 0-50,
 // 60-110 and 120-170.
-const columnTracks = getGridTracks( '100px 100px 100px', 10 );
-const rowTracks = getGridTracks( '50px 50px 50px', 10 );
+const columnTracks = getGridTracksFromTemplate( '100px 100px 100px', 10 );
+const rowTracks = getGridTracksFromTemplate( '50px 50px 50px', 10 );
 
 function toPlain( rect: GridRect ) {
 	return {
