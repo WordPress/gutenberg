@@ -4,6 +4,7 @@ import { Resizable } from 're-resizable';
 import type { ResizableProps } from 're-resizable';
 import type { ForwardedRef } from 'react';
 import ResizeTooltip from './resize-tooltip';
+import { getScreenTransform, toLocalDelta } from './utils';
 
 const HANDLE_CLASS_NAME = 'components-resizable-box__handle';
 const SIDE_HANDLE_CLASS_NAME = 'components-resizable-box__side-handle';
@@ -78,6 +79,27 @@ const HANDLE_STYLES = {
 	bottomLeft: HANDLE_STYLES_OVERRIDES,
 };
 
+// Measures pointer movement along the box's own axes, so a handle on a
+// rotated or scaled block resizes the way it faces on screen.
+class TransformAwareResizable extends Resizable {
+	calculateNewSizeFromDirection( clientX: number, clientY: number ) {
+		const { original } = this.state;
+		// An explicit `scale` prop already corrects the movement.
+		if ( ! this.resizable || ( this.props.scale ?? 1 ) !== 1 ) {
+			return super.calculateNewSizeFromDirection( clientX, clientY );
+		}
+		const local = toLocalDelta(
+			getScreenTransform( this.resizable ),
+			clientX - original.x,
+			clientY - original.y
+		);
+		return super.calculateNewSizeFromDirection(
+			original.x + local.x,
+			original.y + local.y
+		);
+	}
+}
+
 type ResizableBoxProps = ResizableProps & {
 	showHandle?: boolean;
 	__experimentalShowTooltip?: boolean;
@@ -96,7 +118,7 @@ function UnforwardedResizableBox(
 	ref: ForwardedRef< Resizable >
 ) {
 	return (
-		<Resizable
+		<TransformAwareResizable
 			className={ clsx(
 				'components-resizable-box__container',
 				showHandle && 'has-show-handle',
@@ -119,7 +141,7 @@ function UnforwardedResizableBox(
 		>
 			{ children }
 			{ showTooltip && <ResizeTooltip { ...tooltipProps } /> }
-		</Resizable>
+		</TransformAwareResizable>
 	);
 }
 
