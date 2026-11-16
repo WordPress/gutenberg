@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { forwardRef } from '@wordpress/element';
-import { Path, SVG } from '@wordpress/primitives';
+import { Circle, Path, SVG } from '@wordpress/primitives';
 import type { FormToggleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -14,11 +14,10 @@ const onLabel = (
 		viewBox="0 0 8 8"
 	>
 		<Path
-			d="M1.5 4.25 3.25 6 6.5 2"
+			d="M4 1.5v5"
 			fill="none"
 			stroke="currentColor"
 			strokeLinecap="round"
-			strokeLinejoin="round"
 		/>
 	</SVG>
 );
@@ -29,12 +28,7 @@ const offLabel = (
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 8 8"
 	>
-		<Path
-			d="M2 2l4 4M6 2 2 6"
-			fill="none"
-			stroke="currentColor"
-			strokeLinecap="round"
-		/>
+		<Circle cx={ 4 } cy={ 4 } r={ 2.5 } fill="none" stroke="currentColor" />
 	</SVG>
 );
 

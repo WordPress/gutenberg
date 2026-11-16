@@ -12,6 +12,9 @@ $toggle-travel: $toggle-width - $toggle-thumb-width;
 // Centers each label in the part of the track the thumb leaves exposed,
 // measured from inside the track border.
 $toggle-label-offset: math.div($toggle-travel - $toggle-label-size, 2);
+// Where the brand panel starts when the toggle is off, measured from inside the
+// track border. Its inline-end edge sits under the middle of the thumb.
+$toggle-panel-offset: math.div($toggle-thumb-width, 2) - $toggle-border-width - $toggle-width;
 
 $transition-duration: 0.2s;
 
@@ -37,9 +40,28 @@ $transition-duration: 0.2s;
 		border-radius: math.div($toggle-height, 2);
 
 		@media not (prefers-reduced-motion) {
-			transition:
-				$transition-duration background-color ease,
-				$transition-duration border-color ease;
+			transition: $transition-duration border-color ease;
+		}
+
+		// The brand half of the track. It slides with the thumb rather than
+		// changing color, and the thumb always covers the edge where it meets
+		// the neutral half.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			inset-inline-start: $toggle-panel-offset;
+			width: $toggle-width;
+			background-color: var(--wpds-color-background-interactive-brand-strong);
+
+			@media not (prefers-reduced-motion) {
+				transition: $transition-duration inset-inline-start ease;
+			}
+
+			@media ( forced-colors: active ) {
+				background-color: Highlight;
+			}
 		}
 	}
 
@@ -125,11 +147,14 @@ $transition-duration: 0.2s;
 	// Checked state.
 	:where(.components-form-toggle__input:checked) {
 		~ .components-form-toggle__track {
-			background-color: var(--wpds-color-background-interactive-brand-strong);
-			border-color: transparent;
+			border-color: var(--wpds-color-background-interactive-brand-strong);
 
 			@media ( forced-colors: active ) {
-				background-color: Highlight;
+				border-color: Highlight;
+			}
+
+			&::before {
+				inset-inline-start: $toggle-panel-offset + $toggle-travel;
 			}
 		}
 
@@ -161,6 +186,11 @@ $transition-duration: 0.2s;
 
 			@media ( forced-colors: active ) {
 				border-color: GrayText;
+			}
+
+			// Disabled toggles use the same track whether on or off.
+			&::before {
+				display: none;
 			}
 		}
 

@@ -14,6 +14,8 @@
 			--_wp-ui-switch-travel: calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width));
 			/* Centers each label in the part of the track the thumb leaves exposed. */
 			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-travel) - var(--_wp-ui-switch-label-size)) / 2);
+			/* Where the brand panel starts when the switch is off. Its inline-end edge sits under the middle of the thumb. */
+			--_wp-ui-switch-panel-offset: calc(var(--_wp-ui-switch-thumb-width) / 2 - var(--_wp-ui-switch-border-width) - var(--_wp-ui-switch-height) * 2);
 
 			position: relative;
 			display: inline-block;
@@ -36,9 +38,7 @@
 
 			@media not (prefers-reduced-motion) {
 				&:not(:hover):not(:active) {
-					transition:
-						background-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle),
-						border-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+					transition: border-color var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
 				}
 			}
 
@@ -48,11 +48,10 @@
 			}
 
 			&[data-checked] {
-				background-color: var(--wpds-color-background-interactive-brand-strong);
-				border-color: transparent;
+				border-color: var(--wpds-color-background-interactive-brand-strong);
 
 				@media (forced-colors: active) {
-					background-color: Highlight;
+					border-color: Highlight;
 				}
 			}
 
@@ -124,6 +123,38 @@
 			overflow: hidden;
 			border-radius: inherit;
 			pointer-events: none;
+
+			/*
+			 * The brand half of the track. It slides with the thumb rather than
+			 * changing color, and the thumb always covers the edge where it meets
+			 * the neutral half.
+			 */
+			&::before {
+				content: "";
+				position: absolute;
+				inset-block: 0;
+				inset-inline-start: var(--_wp-ui-switch-panel-offset);
+				width: calc(var(--_wp-ui-switch-height) * 2);
+				background-color: var(--wpds-color-background-interactive-brand-strong);
+
+				@media not (prefers-reduced-motion) {
+					transition: inset-inline-start var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+				}
+
+				@media (forced-colors: active) {
+					background-color: Highlight;
+					transition: none;
+				}
+
+				[data-checked] > & {
+					inset-inline-start: calc(var(--_wp-ui-switch-panel-offset) + var(--_wp-ui-switch-travel));
+				}
+
+				/* Disabled switches use the same track whether on or off. */
+				[data-disabled] > & {
+					display: none;
+				}
+			}
 		}
 
 		/*
