@@ -163,7 +163,7 @@ function setFetchHandler( newFetchHandler: FetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
-export interface ApiFetch {
+export interface CoreApiFetch {
 	< T, Parse extends boolean = true >(
 		options: APIFetchOptions< Parse >
 	): Promise< Parse extends true ? T : Response >;
@@ -176,14 +176,15 @@ export interface ApiFetch {
 	createNonceMiddleware: typeof createNonceMiddleware;
 	createPreloadingMiddleware: typeof createPreloadingMiddleware;
 	createRootURLMiddleware: typeof createRootURLMiddleware;
-	fetchAllMiddleware: APIFetchMiddleware;
 	httpV1Middleware: typeof httpV1Middleware;
 	mediaUploadMiddleware: typeof mediaUploadMiddleware;
 	createThemePreviewMiddleware: typeof createThemePreviewMiddleware;
 	privateApis: object;
 }
 
-export type CoreApiFetch = Omit< ApiFetch, 'fetchAllMiddleware' >;
+export interface ApiFetch extends CoreApiFetch {
+	fetchAllMiddleware: APIFetchMiddleware;
+}
 
 /**
  * Fetch
