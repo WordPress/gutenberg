@@ -6,6 +6,10 @@
 
 -   Paste handling: stop adding `rel="noopener"` to pasted links that open in a new tab, as browsers already apply `noopener` to `target="_blank"` links ([#86499](https://github.com/WordPress/gutenberg/pull/86499)).
 
+### Bug Fixes
+
+-   Remove circular import between `api/children` and `api/node` ([#86328](https://github.com/WordPress/gutenberg/issues/86328)).
+
 ## 17.1.0 (2026-11-04)
 
 ### Enhancements
