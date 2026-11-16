@@ -129,7 +129,7 @@ describe( 'Avatar colors', () => {
 			// eslint-disable-next-line testing-library/no-node-access
 			const content = fallback.parentElement!;
 			const ring = luminance(
-				getComputedStyle( content, '::before' ).backgroundColor
+				getComputedStyle( content, '::before' ).boxShadow
 			);
 			expect(
 				( Math.max( background, ring ) + 0.05 ) /

@@ -59,26 +59,37 @@
 			--_gcd-span-display: block;
 
 			position: absolute;
-			inset: var(--wpds-border-width-focus);
+			inset: 0;
 			border-radius: 50%;
-			background-color: var(--_wp-ui-avatar-background);
 			color: var(--_wp-ui-avatar-foreground);
 		}
 
-		.is-active > .content::before {
+		.content::before {
 			content: "";
 			position: absolute;
-			inset: calc(-1 * var(--wpds-border-width-focus));
+			inset: 0;
 			box-sizing: border-box;
-			border-radius: var(--_wp-ui-avatar-radius);
-			/* Paint behind the content to avoid a seam between their rounded edges. */
+			inline-size: var(--_wp-ui-avatar-content-size);
+			block-size: var(--_wp-ui-avatar-content-size);
+			translate: var(--wpds-border-width-focus) var(--wpds-border-width-focus);
+			border-radius: inherit;
 			z-index: -1;
-			background-color: var(--_wp-ui-avatar-ring);
+			background-color: var(--_wp-ui-avatar-background);
 			pointer-events: none;
+		}
+
+		.is-active > .content::before {
+			inline-size: 100%;
+			block-size: 100%;
+			translate: none;
+			border-radius: var(--_wp-ui-avatar-radius);
+			/* Paint both ring edges in one box so fractional widths stay symmetric. */
+			box-shadow: inset 0 0 0 var(--wpds-border-width-focus) var(--_wp-ui-avatar-ring);
 
 			@media (forced-colors: active) {
 				border: var(--wpds-border-width-focus) solid CanvasText;
 				background: none;
+				box-shadow: none;
 			}
 		}
 
@@ -118,8 +129,10 @@
 		.fallback {
 			position: absolute;
 			inset: 0;
-			inline-size: 100%;
-			block-size: 100%;
+			inline-size: var(--_wp-ui-avatar-content-size);
+			block-size: var(--_wp-ui-avatar-content-size);
+			/* Translate after painting to preserve fractional insets on high-DPI screens. */
+			translate: var(--wpds-border-width-focus) var(--wpds-border-width-focus);
 			border-radius: inherit;
 		}
 
