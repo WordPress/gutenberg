@@ -3,7 +3,7 @@ import {
 	useRefEffect,
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
-import { isInsideRootBlock } from '../../../utils/dom';
+import { getBlockClientId, isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -34,11 +34,26 @@ export function useFocusHandler( clientId ) {
 			 * @param {FocusEvent} event Focus event.
 			 */
 			function onFocus( event ) {
+				// Focus on an element without text leaves the caret in another
+				// block: remove it, so the caret is only ever in the selected
+				// block.
+				function removeCaretElsewhere() {
+					const selection =
+						node.ownerDocument.defaultView.getSelection();
+					const caretClientId =
+						selection.anchorNode &&
+						getBlockClientId( selection.anchorNode );
+					if ( caretClientId && caretClientId !== clientId ) {
+						selection.removeAllRanges();
+					}
+				}
+
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
 					// Potentially change selection away from rich text.
 					if ( ! event.target.isContentEditable ) {
+						removeCaretElsewhere();
 						selectionChange( clientId );
 					}
 					return;
@@ -87,6 +102,7 @@ export function useFocusHandler( clientId ) {
 					return;
 				}
 
+				removeCaretElsewhere();
 				selectBlock( clientId );
 			}
 
