@@ -10,8 +10,10 @@
 			--_wp-ui-switch-thumb-width: var(--wpds-dimension-size-xs);
 			--_wp-ui-switch-border-width: var(--wpds-border-width-xs);
 			--_wp-ui-switch-label-size: var(--wpds-dimension-size-4xs);
+			/* How far the thumb, and the labels with it, travel between the two states. */
+			--_wp-ui-switch-travel: calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width));
 			/* Centers each label in the part of the track the thumb leaves exposed. */
-			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-label-size)) / 2);
+			--_wp-ui-switch-label-offset: calc((var(--_wp-ui-switch-travel) - var(--_wp-ui-switch-label-size)) / 2);
 
 			position: relative;
 			display: inline-block;
@@ -97,7 +99,7 @@
 			&[data-checked] {
 				background-color: var(--wpds-color-background-thumb-brand-strong);
 				border-color: var(--wpds-color-stroke-interactive-brand);
-				inset-inline-start: calc(var(--_wp-ui-switch-height) * 2 - var(--_wp-ui-switch-thumb-width) - var(--_wp-ui-switch-border-width));
+				inset-inline-start: calc(var(--_wp-ui-switch-travel) - var(--_wp-ui-switch-border-width));
 
 				@media (forced-colors: active) {
 					border-color: Highlight;
@@ -115,21 +117,39 @@
 			}
 		}
 
-		/* The thumb slides over whichever label doesn't match the current state. */
+		/* Clips the labels as they slide in and out of the track. */
+		.labels {
+			position: absolute;
+			inset: 0;
+			overflow: hidden;
+			border-radius: inherit;
+			pointer-events: none;
+		}
+
+		/*
+		 * The labels slide along with the thumb: the label for the current state
+		 * sits in the exposed part of the track, and the other waits just outside
+		 * the track's edge, where it is clipped.
+		 */
 		.label {
 			position: absolute;
 			inset-block: 0;
 			margin-block: auto;
 			width: var(--_wp-ui-switch-label-size);
 			height: var(--_wp-ui-switch-label-size);
-			opacity: 0;
-			pointer-events: none;
 
 			@media not (prefers-reduced-motion) {
-				transition: opacity var(--wpds-motion-duration-md) var(--wpds-motion-easing-subtle);
+				transition:
+					inset-inline-start var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced),
+					inset-inline-end var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
 			}
 
-			[data-disabled] > & {
+			/* Keep in step with the thumb, which doesn't animate in forced colors mode. */
+			@media (forced-colors: active) {
+				transition: none;
+			}
+
+			[data-disabled] > .labels > & {
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 				@media (forced-colors: active) {
@@ -139,15 +159,15 @@
 		}
 
 		.on-label {
-			inset-inline-start: var(--_wp-ui-switch-label-offset);
+			inset-inline-start: calc(var(--_wp-ui-switch-label-offset) - var(--_wp-ui-switch-travel));
 			color: var(--wpds-color-foreground-interactive-brand-strong);
 
 			@media (forced-colors: active) {
 				color: HighlightText;
 			}
 
-			[data-checked] > & {
-				opacity: 1;
+			[data-checked] > .labels > & {
+				inset-inline-start: var(--_wp-ui-switch-label-offset);
 			}
 		}
 
@@ -159,8 +179,8 @@
 				color: CanvasText;
 			}
 
-			[data-unchecked] > & {
-				opacity: 1;
+			[data-checked] > .labels > & {
+				inset-inline-end: calc(var(--_wp-ui-switch-label-offset) - var(--_wp-ui-switch-travel));
 			}
 		}
 	}

@@ -7,8 +7,11 @@ $toggle-height: $grid-unit-20;
 $toggle-thumb-width: $grid-unit-20 + $grid-unit-05;
 $toggle-border-width: 1px;
 $toggle-label-size: $grid-unit-10;
-// Centers each label in the part of the track the thumb leaves exposed.
-$toggle-label-offset: math.div($toggle-width - $toggle-thumb-width - $toggle-label-size, 2) + $toggle-border-width;
+// How far the thumb, and the labels with it, travel between the two states.
+$toggle-travel: $toggle-width - $toggle-thumb-width;
+// Centers each label in the part of the track the thumb leaves exposed,
+// measured from inside the track border.
+$toggle-label-offset: math.div($toggle-travel - $toggle-label-size, 2);
 
 $transition-duration: 0.2s;
 
@@ -21,7 +24,10 @@ $transition-duration: 0.2s;
 	// Unchecked state.
 	.components-form-toggle__track {
 		content: "";
+		position: relative;
 		display: inline-block;
+		// Clips the labels as they slide in and out of the track.
+		overflow: hidden;
 		box-sizing: border-box;
 		vertical-align: top;
 		background-color: var(--wpds-color-background-track-neutral);
@@ -63,7 +69,9 @@ $transition-duration: 0.2s;
 		}
 	}
 
-	// The thumb slides over whichever label doesn't match the current state.
+	// The labels slide along with the thumb: the label for the current state
+	// sits in the exposed part of the track, and the other waits just outside
+	// the track's edge, where it is clipped.
 	svg.components-form-toggle__label {
 		position: absolute;
 		top: 0;
@@ -71,18 +79,19 @@ $transition-duration: 0.2s;
 		margin: auto 0;
 		width: $toggle-label-size;
 		height: $toggle-label-size;
-		opacity: 0;
 		pointer-events: none;
 		// Override the browser's SVG default so the labels follow forced system colors.
 		forced-color-adjust: auto;
 
 		@media not (prefers-reduced-motion) {
-			transition: $transition-duration opacity ease;
+			transition:
+				$transition-duration inset-inline-start ease,
+				$transition-duration inset-inline-end ease;
 		}
 	}
 
 	svg.components-form-toggle__on-label {
-		inset-inline-start: $toggle-label-offset;
+		inset-inline-start: $toggle-label-offset - $toggle-travel;
 		color: var(--wpds-color-foreground-interactive-brand-strong);
 
 		@media ( forced-colors: active ) {
@@ -93,7 +102,6 @@ $transition-duration: 0.2s;
 	svg.components-form-toggle__off-label {
 		inset-inline-end: $toggle-label-offset;
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
-		opacity: 1;
 
 		@media ( forced-colors: active ) {
 			color: CanvasText;
@@ -128,19 +136,19 @@ $transition-duration: 0.2s;
 		~ .components-form-toggle__thumb {
 			background-color: var(--wpds-color-background-thumb-brand-strong);
 			border-color: var(--wpds-color-stroke-interactive-brand);
-			inset-inline-start: $toggle-width - $toggle-thumb-width;
+			inset-inline-start: $toggle-travel;
 
 			@media ( forced-colors: active ) {
 				border-color: Highlight;
 			}
 		}
 
-		~ svg.components-form-toggle__on-label {
-			opacity: 1;
+		~ .components-form-toggle__track svg.components-form-toggle__on-label {
+			inset-inline-start: $toggle-label-offset;
 		}
 
-		~ svg.components-form-toggle__off-label {
-			opacity: 0;
+		~ .components-form-toggle__track svg.components-form-toggle__off-label {
+			inset-inline-end: $toggle-label-offset - $toggle-travel;
 		}
 	}
 

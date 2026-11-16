@@ -74,9 +74,10 @@ function UnforwardedFormToggle(
 				{ ...additionalProps }
 				ref={ ref }
 			/>
-			<span className="components-form-toggle__track"></span>
-			{ onLabel }
-			{ offLabel }
+			<span className="components-form-toggle__track">
+				{ onLabel }
+				{ offLabel }
+			</span>
 			<span className="components-form-toggle__thumb"></span>
 		</span>
 	);

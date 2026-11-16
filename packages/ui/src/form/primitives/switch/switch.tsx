@@ -56,8 +56,10 @@ export const Switch = forwardRef< HTMLSpanElement, SwitchProps >(
 				) }
 				{ ...props }
 			>
-				{ onLabel }
-				{ offLabel }
+				<span className={ styles.labels }>
+					{ onLabel }
+					{ offLabel }
+				</span>
 				<_Switch.Thumb className={ styles.thumb } />
 			</_Switch.Root>
 		);

@@ -11,36 +11,37 @@ exports[`FormToggle > basic rendering > should render a span element with an unc
     />
     <span
       class="components-form-toggle__track"
-    />
-    <svg
-      aria-hidden="true"
-      class="components-form-toggle__label components-form-toggle__on-label"
-      focusable="false"
-      viewBox="0 0 8 8"
-      xmlns="http://www.w3.org/2000/svg"
     >
-      <path
-        d="M1.5 4.25 3.25 6 6.5 2"
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-    <svg
-      aria-hidden="true"
-      class="components-form-toggle__label components-form-toggle__off-label"
-      focusable="false"
-      viewBox="0 0 8 8"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M2 2l4 4M6 2 2 6"
-        fill="none"
-        stroke="currentColor"
-        stroke-linecap="round"
-      />
-    </svg>
+      <svg
+        aria-hidden="true"
+        class="components-form-toggle__label components-form-toggle__on-label"
+        focusable="false"
+        viewBox="0 0 8 8"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M1.5 4.25 3.25 6 6.5 2"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      <svg
+        aria-hidden="true"
+        class="components-form-toggle__label components-form-toggle__off-label"
+        focusable="false"
+        viewBox="0 0 8 8"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M2 2l4 4M6 2 2 6"
+          fill="none"
+          stroke="currentColor"
+          stroke-linecap="round"
+        />
+      </svg>
+    </span>
     <span
       class="components-form-toggle__thumb"
     />
