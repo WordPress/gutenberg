@@ -1,9 +1,9 @@
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	getUpdatedChildLayoutStyle,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
+import { getUpdatedChildLayoutStyle } from '../../hooks/layout-child-utils';
 import type { BlockStyle, BlockStyleState } from '../../hooks/types';
 import type { Layout } from '../../layouts/types';
 import { getGridRowResize } from './get-grid-row-resize';

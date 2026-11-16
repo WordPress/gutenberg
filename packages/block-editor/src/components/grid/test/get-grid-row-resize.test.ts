@@ -3,7 +3,7 @@ import {
 	getGridRowResize,
 	getRowDeltaFromDistance,
 } from '../get-grid-row-resize';
-import { getGridTracks } from '../utils';
+import { getGridTracksFromTemplate } from '../utils';
 
 const children = [
 	{ rowStart: 2, rowSpan: 2 },
@@ -89,7 +89,7 @@ describe( 'getGridRowResize()', () => {
 
 describe( 'getRowDeltaFromDistance()', () => {
 	// Three 50px rows with 10px gaps, so each row takes 60px.
-	const rowTracks = getGridTracks( '50px 50px 50px', 10 );
+	const rowTracks = getGridTracksFromTemplate( '50px 50px 50px', 10 );
 
 	it( 'rounds the distance to whole rows', () => {
 		expect( getRowDeltaFromDistance( rowTracks, 100, 10 ) ).toBe( 2 );
