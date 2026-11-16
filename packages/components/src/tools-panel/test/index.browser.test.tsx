@@ -27,33 +27,38 @@ const hiddenControlProps = {
 };
 
 describe( 'ToolsPanel styles', () => {
-	it( 'aligns reset actions with selection rows', async () => {
+	it( 'keeps the label aligned when the last checked control becomes a reset action', async () => {
 		const user = userEvent.setup();
-		await render(
+		const panel = ( hasValue: boolean ) => (
 			<ToolsPanel { ...defaultProps }>
-				<ToolsPanelItem { ...controlProps } isShownByDefault>
+				<ToolsPanelItem
+					{ ...controlProps }
+					hasValue={ () => hasValue }
+					isShownByDefault
+				>
 					Control
-				</ToolsPanelItem>
-				<ToolsPanelItem { ...hiddenControlProps }>
-					Hidden control
 				</ToolsPanelItem>
 			</ToolsPanel>
 		);
+		const { rerender } = await render( panel( false ) );
 		await user.click(
 			screen.getByRole( 'button', { name: 'Panel header options' } )
 		);
-		await expect
-			.element(
-				screen.getByRole( 'menuitem', {
-					name: 'Example, reset to default',
-				} )
-			)
-			.toBeVisible();
-		expect(
-			screen.getByText( 'Example' ).getBoundingClientRect().left
-		).toBe(
-			screen.getByText( 'Hidden example' ).getBoundingClientRect().left
-		);
+		const checked = screen.getByRole( 'menuitemcheckbox', {
+			name: 'Example',
+		} );
+		await expect.element( checked ).toBeChecked();
+		const labelInset = ( row: HTMLElement ) =>
+			screen.getByText( 'Example' ).getBoundingClientRect().left -
+			row.getBoundingClientRect().left;
+		const checkedInset = labelInset( checked );
+
+		await rerender( panel( true ) );
+		const reset = screen.getByRole( 'menuitem', {
+			name: 'Example, reset to default',
+		} );
+		await expect.element( reset ).toBeVisible();
+		expect( labelInset( reset ) ).toBe( checkedInset );
 	} );
 
 	it( 'applies the panel padding and border', async () => {

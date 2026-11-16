@@ -105,6 +105,40 @@ describe( 'DropdownMenu row layout', () => {
 		);
 	} );
 
+	it( 'keeps the selection inset inside the menu that owns the choices', async () => {
+		await render(
+			<>
+				<NavigableMenu>
+					<MenuItem>Reference action</MenuItem>
+				</NavigableMenu>
+				<NavigableMenu>
+					<MenuItem>Parent action</MenuItem>
+					<NavigableMenu>
+						<MenuGroup>
+							<MenuItemsChoice
+								choices={ [ { value: 'one', label: 'One' } ] }
+								value="one"
+								onSelect={ () => {} }
+							/>
+						</MenuGroup>
+						<MenuItem>Action beside choices</MenuItem>
+						<NavigableMenu>
+							<MenuItem>Submenu action</MenuItem>
+						</NavigableMenu>
+					</NavigableMenu>
+				</NavigableMenu>
+			</>
+		);
+
+		const inset = ( name: string ) =>
+			getComputedStyle( screen.getByRole( 'menuitem', { name } ) )
+				.paddingInlineStart;
+		const ordinaryInset = inset( 'Reference action' );
+		expect( inset( 'Parent action' ) ).toBe( ordinaryInset );
+		expect( inset( 'Submenu action' ) ).toBe( ordinaryInset );
+		expect( inset( 'Action beside choices' ) ).not.toBe( ordinaryInset );
+	} );
+
 	it( 'preserves trailing checks and descriptions in custom menu items', async () => {
 		await render(
 			<DropdownMenu
