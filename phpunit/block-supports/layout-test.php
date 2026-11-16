@@ -1769,12 +1769,12 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Check that manual placement grids size their rows by their content when the grid
-	 * interactivity experiment is off.
+	 * Check that manual placement grids take their rows' height from their width, with rows
+	 * that still grow with their content, when the grid interactivity experiment is off.
 	 *
 	 * @covers ::gutenberg_get_layout_style
 	 */
-	public function test_gutenberg_get_layout_style_sizes_manual_grid_rows_by_content_without_experiment() {
+	public function test_gutenberg_get_layout_style_sizes_manual_grid_rows_by_width_without_experiment() {
 		$layout_styles = gutenberg_get_layout_style(
 			'.wp-layout',
 			array(
@@ -1786,7 +1786,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));aspect-ratio:3 / 2;}',
 			$layout_styles
 		);
 	}
@@ -1853,7 +1853,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'experiment_enabled' => true,
 				'layout'             => $auto_layout,
 				'viewport_overrides' => null,
-				'expected_output'    => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+				'expected_output'    => '.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));aspect-ratio:3 / 2;}',
 			),
 			'auto grid, experiment on, viewport column count' => array(
 				'experiment_enabled' => true,
