@@ -218,13 +218,11 @@ export function deserializeBlockAttributes(
 	blocks: Block[],
 	referenceBlocks: Block[] = []
 ): Block[] {
+	const serializedReferences = getSerializableBlocks( referenceBlocks );
 	const references = new Map(
 		referenceBlocks.map( ( block, index ) => [
 			block.clientId,
-			{
-				block,
-				serialized: getSerializableBlocks( referenceBlocks )[ index ],
-			},
+			{ block, serialized: serializedReferences[ index ] },
 		] )
 	);
 	const restored = blocks.map( ( block: Block ) => {
@@ -1432,7 +1430,13 @@ export function rebaseRichTextUpdate(
 ): InstanceType< typeof Delta > | undefined {
 	const currentValue = blockYText.toString();
 
-	if ( currentValue === previousValue ) {
+	// The editor holds normalized HTML, such as <br> for a newline, while the
+	// document can hold the same text in another form. That difference is not
+	// a peer's edit: transforming over it misplaces an insertion next to it.
+	if (
+		currentValue === previousValue ||
+		getCachedRichTextData( currentValue ).toHTMLString() === previousValue
+	) {
 		mergeRichTextUpdate( blockYText, updatedValue, htmlCursorIndex );
 		return;
 	}

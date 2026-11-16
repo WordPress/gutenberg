@@ -99,6 +99,62 @@ describe( 'useBlockSync hook', () => {
 		] );
 	} );
 
+	it( 'reports the list it last sent as the previous blocks of an inner block controller', () => {
+		const onChange = vi.fn();
+		let registry!: DataRegistry;
+		const props = {
+			clientId: 'test',
+			onChange,
+			onInput: onChange,
+			setRegistry: ( value: DataRegistry ) => {
+				registry = value;
+			},
+		};
+		const { rerender } = render(
+			<TestWrapper { ...props } value={ [] } />
+		);
+		registry.dispatch( blockEditorStore ).resetBlocks( [
+			{
+				name: 'test/test-block',
+				clientId: 'test',
+				attributes: {},
+				innerBlocks: [],
+			} as unknown as Block,
+		] );
+		rerender(
+			<TestWrapper
+				{ ...props }
+				value={ [
+					{
+						name: 'test/test-block',
+						clientId: 'a',
+						attributes: { foo: 1 },
+						innerBlocks: [],
+					},
+				] }
+			/>
+		);
+		onChange.mockClear();
+		const [ { clientId: internalId } ] = registry
+			.select( blockEditorStore )
+			.getBlocks( 'test' );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( internalId, { foo: 2 } );
+		registry
+			.dispatch( blockEditorStore )
+			.updateBlockAttributes( internalId, { foo: 3 } );
+
+		expect( onChange ).toHaveBeenCalledTimes( 2 );
+		const [ [ firstBlocks ], [ , secondOptions ] ] = onChange.mock.calls;
+		expect( firstBlocks[ 0 ] ).toMatchObject( {
+			clientId: 'a',
+			attributes: { foo: 2 },
+		} );
+		// The same array, so the parent can compare the lists by identity.
+		expect( secondOptions.previousBlocks ).toBe( firstBlocks );
+	} );
+
 	it( 'resets the block-editor blocks when the controlled value changes', async () => {
 		const fakeBlocks: Block[] = [];
 		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );

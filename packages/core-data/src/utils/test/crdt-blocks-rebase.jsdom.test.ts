@@ -364,6 +364,44 @@ describe( 'rebaseCrdtBlocks', () => {
 			expect( snapshot( yA )[ 1 ].content ).toBe( 'Hello!' );
 		} );
 
+		it( 'applies an edit in place when the stored rich text differs only by HTML normalization', () => {
+			const { yA } = createPeers();
+			mergeCrdtBlocks( yA, [ paragraph( 'p1', '\n    Quote\n' ) ], null );
+			const previousBlocks = deserializeBlockAttributes( yA.toJSON() );
+			const content = RichTextData.fromHTMLString( '<br>    Quote!<br>' );
+			const incomingBlocks = [
+				{
+					...previousBlocks[ 0 ],
+					attributes: { content },
+				},
+			];
+			const selectionPoint = cursor(
+				'p1',
+				content.text.indexOf( '!' ) + 1
+			);
+
+			// The typed character must not move past the trailing line break,
+			// and the editor must not receive a correction for its own edit.
+			expect(
+				rebaseCrdtBlocks(
+					yA,
+					previousBlocks,
+					incomingBlocks,
+					selectionPoint,
+					{
+						selectionStart: selectionPoint,
+						selectionEnd: selectionPoint,
+					}
+				)
+			).toBeUndefined();
+			expect(
+				String(
+					deserializeBlockAttributes( yA.toJSON() )[ 0 ].attributes
+						.content
+				)
+			).toBe( '<br>    Quote!<br>' );
+		} );
+
 		it( 'reuses unchanged editor blocks when a peer edit requires a correction', () => {
 			const { yA, yB } = createPeers();
 			const previousBlocks = [
@@ -716,6 +754,17 @@ describe( 'rebaseRichTextUpdate', () => {
 		const text = createText( 'Hello' );
 		rebaseRichTextUpdate( text, 'Hello', 'Hello!', null );
 		expect( text.toString() ).toBe( 'Hello!' );
+	} );
+
+	it( 'applies the edit directly when the text differs only by HTML normalization', () => {
+		const text = createText( '\n    Quote\n' );
+		rebaseRichTextUpdate(
+			text,
+			'<br>    Quote<br>',
+			'<br>    Quote!<br>',
+			null
+		);
+		expect( text.toString() ).toBe( '<br>    Quote!<br>' );
 	} );
 
 	it( 'transforms an insertion over a concurrent insertion before it', () => {

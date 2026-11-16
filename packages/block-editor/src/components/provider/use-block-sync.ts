@@ -381,6 +381,11 @@ export default function useBlockSync( {
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
+		// The last list sent to the parent and the store list it came from.
+		// Sending the same array again as `previousBlocks` lets the parent
+		// see by identity that nothing changed in between.
+		let lastSent: { blocks: Block[]; blocksForParent: Block[] } | null =
+			null;
 		let isPersistent = isLastBlockChangePersistent();
 		let blockHistoryMode = __unstableGetLastBlockChangeHistoryMode();
 		let previousAreBlocksDifferent = false;
@@ -481,13 +486,17 @@ export default function useBlockSync( {
 							: onInputRef.current;
 						const updateOptions: Parameters< OnBlockUpdate >[ 1 ] =
 							{
-								previousBlocks: restoreExternalIds(
-									previousBlocks,
-									idMappingRef.current,
-									clientId
-								),
+								previousBlocks:
+									lastSent?.blocks === previousBlocks
+										? lastSent.blocksForParent
+										: restoreExternalIds(
+												previousBlocks,
+												idMappingRef.current,
+												clientId
+											),
 								selection: selectionForParent,
 							};
+						lastSent = { blocks, blocksForParent };
 						if ( blockHistoryMode === 'ignore' ) {
 							updateOptions.undoIgnore = true;
 						}
