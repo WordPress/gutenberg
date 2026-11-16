@@ -65,7 +65,7 @@ final class SelectionTests: XCTestCase {
 		if !cut.waitForExistence( timeout: 5 ) && select.exists {
 			select.tap()
 		}
-		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word", file: file, line: line )
+		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not show the edit menu", file: file, line: line )
 	}
 
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
