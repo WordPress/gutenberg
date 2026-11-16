@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>Test RSS Feed</title>
+<link>https://www.example.com</link>
+<description>An item without a title.</description>
+<item>
+<link>https://www.example.com/untitled</link>
+<guid isPermaLink="true">https://www.example.com/untitled</guid>
+<description>A post without a title.</description>
+<pubDate>Wed, 19 Mar 2025 10:00:00 +0000</pubDate>
+</item>
+</channel>
+</rss>
