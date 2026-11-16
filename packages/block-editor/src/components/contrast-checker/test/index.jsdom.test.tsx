@@ -501,4 +501,20 @@ describe( 'ContrastChecker', () => {
 			)
 		).toBeVisible();
 	} );
+
+	test.each( [
+		[
+			'background',
+			{ backgroundColor: 'oklch(0 0 0)', textColor: '#000' },
+		],
+		[ 'text', { backgroundColor: '#000', textColor: 'oklch(0.2 0 0)' } ],
+	] )(
+		'should render nothing when the %s color cannot be read',
+		( _, colors ) => {
+			const { container } = render( <ContrastChecker { ...colors } /> );
+
+			expect( speak ).not.toHaveBeenCalled();
+			expect( container ).toBeEmptyDOMElement();
+		}
+	);
 } );

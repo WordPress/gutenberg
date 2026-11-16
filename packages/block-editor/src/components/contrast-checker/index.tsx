@@ -67,6 +67,10 @@ export function getContrastWarning( {
 		},
 	];
 	const colordBackgroundColor = colord( currentBackgroundColor );
+	// A color that can't be read, such as `oklch()`, would compare as black.
+	if ( ! colordBackgroundColor.isValid() ) {
+		return null;
+	}
 	const backgroundColorHasTransparency = colordBackgroundColor.alpha() < 1;
 	const backgroundColorBrightness = colordBackgroundColor.brightness();
 	const isReadableOptions = {
@@ -87,6 +91,9 @@ export function getContrastWarning( {
 			continue;
 		}
 		const colordTextColor = colord( item.color );
+		if ( ! colordTextColor.isValid() ) {
+			continue;
+		}
 		const isColordTextReadable = colordTextColor.isReadable(
 			colordBackgroundColor,
 			// `colord` reads any size but `large` as normal.

@@ -88,6 +88,18 @@ describe( 'useTextContrastWarning', () => {
 		expect( result.current ).toBeUndefined();
 	} );
 
+	it( 'does not warn when the text color cannot be read', () => {
+		// A light `oklch()` color on black, which would otherwise compare as black.
+		mockStyles( {
+			'color.text': 'oklch(0.95 0 0)',
+			'color.background': '#000000',
+		} );
+
+		const { result } = renderHook( () => useTextContrastWarning( true ) );
+
+		expect( result.current ).toBeUndefined();
+	} );
+
 	it( 'does not warn or announce for a text gradient', () => {
 		// The root has no gradient control to show the warning on.
 		mockStyles( {
