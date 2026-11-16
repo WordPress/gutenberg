@@ -108,6 +108,20 @@
 	gap: $grid-unit-10;
 }
 
+// With "Show button text labels" on, pinned items show their label (the aria-label) in place of the icon.
+.edit-widgets-header.has-icon-labels .interface-pinned-items .components-button.has-icon {
+	padding: 0 $grid-unit-15;
+
+	svg {
+		display: none;
+	}
+
+	&::after {
+		content: attr(aria-label);
+		white-space: nowrap;
+	}
+}
+
 .edit-widgets-header-toolbar {
 	gap: $grid-unit-10;
 	// Some plugins add buttons here despite best practices.
