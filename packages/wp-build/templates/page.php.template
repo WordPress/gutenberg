@@ -299,7 +299,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<?php
 			wp_admin_notice(
-				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.'{{TEXT_DOMAIN_ARG}} ),
+				// phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Core string, translated in the default text domain.
+				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
 				array( 'type' => 'error' )
 			);
 			?>
@@ -346,7 +347,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 
 		if ( ! current_user_can( '{{CAPABILITY}}' ) ) {
 			wp_die(
-				esc_html__( 'Sorry, you are not allowed to access this page.'{{TEXT_DOMAIN_ARG}} ),
+				// phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Core string, translated in the default text domain.
+				esc_html__( 'Sorry, you are not allowed to access this page.' ),
 				403
 			);
 		}

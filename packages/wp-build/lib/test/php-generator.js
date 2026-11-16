@@ -2,10 +2,7 @@ import { readdirSync, readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { describe, expect, it } from 'vitest';
-import {
-	getTextDomainArgument,
-	renderTemplateToString as generateTemplate,
-} from '../php-generator.mjs';
+import { renderTemplateToString as generateTemplate } from '../php-generator.mjs';
 
 const TEMPLATES_DIR = path.join(
 	path.dirname( fileURLToPath( import.meta.url ) ),
@@ -77,23 +74,4 @@ describe( 'page.php template', () => {
 			interceptor.indexOf( 'wp_example_render_page()' )
 		);
 	} );
-} );
-
-describe( 'getTextDomainArgument', () => {
-	it( 'returns no argument when no text domain is configured', () => {
-		expect( getTextDomainArgument( undefined ) ).toBe( '' );
-	} );
-
-	it( 'returns the configured text domain as an argument', () => {
-		expect( getTextDomainArgument( 'my-plugin' ) ).toBe( ", 'my-plugin'" );
-	} );
-
-	it.each( [ '', "my'plugin", 'my plugin', 42 ] )(
-		'rejects the text domain %j',
-		( textDomain ) => {
-			expect( () => getTextDomainArgument( textDomain ) ).toThrow(
-				'Invalid wpPlugin.textDomain'
-			);
-		}
-	);
 } );
