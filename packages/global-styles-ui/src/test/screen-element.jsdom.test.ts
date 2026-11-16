@@ -87,4 +87,19 @@ describe( 'useTextContrastWarning', () => {
 
 		expect( result.current ).toBeUndefined();
 	} );
+
+	it( 'does not warn or announce for a text gradient', () => {
+		// The root has no gradient control to show the warning on.
+		mockStyles( {
+			'color.text': '#777777',
+			'color.background': '#888888',
+			'background.gradient': 'linear-gradient(#888888, #999999)',
+			'background.backgroundClip': 'text',
+		} );
+
+		const { result } = renderHook( () => useTextContrastWarning( true ) );
+
+		expect( result.current ).toBeUndefined();
+		expect( speak ).not.toHaveBeenCalled();
+	} );
 } );
