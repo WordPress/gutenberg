@@ -1864,9 +1864,6 @@
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
-		"no-restricted-syntax": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -12597,11 +12594,6 @@
 		}
 	},
 	"test/e2e/specs/editor/various/content-only-lock.spec.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"test/e2e/specs/editor/various/content-tab-hover-highlight.spec.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
