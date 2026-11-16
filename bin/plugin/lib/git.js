@@ -1,7 +1,8 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
-const SimpleGit = require( 'simple-git/promise' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Internal dependencies
