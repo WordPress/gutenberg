@@ -14,6 +14,7 @@
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
 -   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
+-   Cover: Remove the `data-object-fit` and `data-object-position` attributes from the saved markup; they were only read by the `object-fit-polyfill` removed in [#34536](https://github.com/WordPress/gutenberg/pull/34536) ([#86895](https://github.com/WordPress/gutenberg/pull/86895)).
 
 ### Bug Fixes
 
