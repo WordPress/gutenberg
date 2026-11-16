@@ -499,6 +499,8 @@ function ViewTable< Item >( {
 				inert={ inertValue( ! isInfiniteScroll && isLoading ) }
 			>
 				<colgroup>
+					{ /* The column of the fade cell at the start of each row. */ }
+					<col className="dataviews-view-table__col-scroll-fade" />
 					{ hasBulkActions && (
 						<col className="dataviews-view-table__col-checkbox" />
 					) }

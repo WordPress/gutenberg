@@ -85,6 +85,8 @@ function PostsTable( {
 
 // `--wpds-dimension-size-md`.
 const FADE_SIZE = 32;
+// `--wpds-dimension-padding-2xl`, the start padding of the first column.
+const LEADING_FADE_SIZE = 24;
 // `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
 const CELL_PADDING = 12;
 const COMPACT_CELL_PADDING = 8;
@@ -104,11 +106,13 @@ const getRows = () =>
 		)
 	);
 
-const getTextRight = ( element: Element ) => {
+const getTextBox = ( element: Element ) => {
 	const range = document.createRange();
 	range.selectNodeContents( element );
-	return range.getBoundingClientRect().right;
+	return range.getBoundingClientRect();
 };
+const getTextRight = ( element: Element ) => getTextBox( element ).right;
+const getTextLeft = ( element: Element ) => getTextBox( element ).left;
 
 function scrollToEnd() {
 	const container = getScrollContainer();
@@ -271,6 +275,70 @@ describe( 'DataViews table scroll fade', () => {
 				expect( getComputedStyle( row, '::after' ).content ).toBe(
 					'none'
 				);
+			}
+		} );
+	} );
+
+	describe( 'leading edge', () => {
+		it.each( [ false, true ] )(
+			'adds a sticky fade cell to the start of every row (with actions: %s)',
+			async ( withActions ) => {
+				await render( <PostsTable withActions={ withActions } /> );
+
+				const rows = getRows();
+				expect( rows.length ).toBeGreaterThan( 1 );
+				for ( const row of rows ) {
+					const fade = getComputedStyle( row, '::before' );
+					expect( fade.display ).toBe( 'table-cell' );
+					expect( fade.position ).toBe( 'sticky' );
+					expect( fade.insetInlineStart ).toBe( '0px' );
+					expect( fade.maskImage ).toBe(
+						'linear-gradient(to left, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
+					);
+				}
+			}
+		);
+
+		it( 'flips the fade in RTL', async () => {
+			await render( <PostsTable dir="rtl" /> );
+
+			expect(
+				getComputedStyle( getRows()[ 0 ], '::before' ).maskImage
+			).toBe(
+				'linear-gradient(to right, rgba(0, 0, 0, 0), rgb(0, 0, 0))'
+			);
+		} );
+
+		// At the start of the scroll range, the fade must cover only its own
+		// space, not the first column.
+		it( 'keeps the space of the fade free before the first column', async () => {
+			await render( <PostsTable /> );
+
+			for ( const row of getRows() ) {
+				const rowBox = row.getBoundingClientRect();
+				const firstCell =
+					row.firstElementChild!.getBoundingClientRect();
+				expect( firstCell.left - rowBox.left ).toBe(
+					LEADING_FADE_SIZE
+				);
+			}
+		} );
+
+		it( 'aligns the header of the first column with its cells', async () => {
+			await render( <PostsTable /> );
+
+			const header = document.querySelector(
+				'thead th:first-child .dataviews-view-table-header-button'
+			)!;
+			const cells = document.querySelectorAll(
+				'tbody td:first-child .dataviews-view-table__cell-content-wrapper'
+			);
+			expect( cells.length ).toBeGreaterThan( 0 );
+			// The header button has a 1px border, as it had before the fade.
+			for ( const cell of cells ) {
+				expect(
+					Math.abs( getTextLeft( cell ) - getTextLeft( header ) )
+				).toBeLessThanOrEqual( 1 );
 			}
 		} );
 	} );
