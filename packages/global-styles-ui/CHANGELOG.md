@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add TypeScript declarations for package consumers ([#86354](https://github.com/WordPress/gutenberg/pull/86354)).
 -   Font Library: Update the Category selector ([#86169](https://github.com/WordPress/gutenberg/pull/86169)).
 
 ### Bug Fixes

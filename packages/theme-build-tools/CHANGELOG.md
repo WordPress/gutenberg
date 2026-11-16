@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Parse CSS `var()` references for PostCSS fallback injection and Stylelint validation, avoiding false positives in strings and URLs ([#83766](https://github.com/WordPress/gutenberg/pull/83766)).
+
 ### Internal
 
 -   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).

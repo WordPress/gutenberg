@@ -140,7 +140,7 @@ export function GridItemMovers( {
 	);
 }
 
-function GridItemMover( {
+export function GridItemMover( {
 	className,
 	icon,
 	label,
