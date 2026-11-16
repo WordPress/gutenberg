@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, moreVertical } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -8,6 +9,7 @@ import {
 } from '@wordpress/ui';
 import type { ComponentProps } from 'react';
 import type { StateControlProps } from './types';
+import { useToolsPanelDropdownMenuProps } from './utils';
 
 /**
  * State control for managing viewport and pseudo-state styles.
@@ -33,9 +35,13 @@ export default function StateControl( {
 	onChangeViewport,
 	onChangePseudoState,
 	showText = true,
-	popoverProps = {},
+	popoverProps,
 	children,
 }: StateControlProps ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const menuPopoverProps =
+		popoverProps ?? dropdownMenuProps.popoverProps ?? {};
+
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
 	}
@@ -90,25 +96,28 @@ export default function StateControl( {
 		? activeStates.map( ( state ) => state.label ).join( ', ' )
 		: __( 'Default' );
 	const [ side, align = 'center' ] = (
-		popoverProps.placement ?? 'right-start'
+		menuPopoverProps.placement ?? 'right-start'
 	).split( '-' ) as [
 		ComponentProps< typeof Menu.Positioner >[ 'side' ],
 		ComponentProps< typeof Menu.Positioner >[ 'align' ],
 	];
-	const offset = popoverProps.offset ?? 13;
+	// Match the default offset inherited from the previous Dropdown component.
+	const offset = menuPopoverProps.offset ?? 13;
 
 	return (
 		<Stack
 			direction="column"
 			gap="sm"
 			align="flex-end"
-			className="block-editor-global-styles-state-control"
+			className={ clsx( 'block-editor-global-styles-state-control', {
+				'is-icon-only': ! showText,
+			} ) }
 		>
 			<Menu.Root modal={ false }>
 				<Menu.Trigger
 					render={
 						<Button
-							size={ showText ? 'compact' : 'small' }
+							size="small"
 							icon={ showText ? chevronDown : moreVertical }
 							iconPosition="right"
 							label={
@@ -131,11 +140,21 @@ export default function StateControl( {
 						<Menu.Positioner
 							side={ side }
 							align={ align }
-							sideOffset={
-								typeof offset === 'number'
-									? offset
-									: offset.mainAxis
-							}
+							sideOffset={ ( { anchor, side: popupSide } ) => {
+								const mainAxis =
+									typeof offset === 'number'
+										? offset
+										: ( offset.mainAxis ?? 0 );
+								// The sidebar offset assumes a square icon button.
+								// Keep the same gap for the wider text trigger.
+								return ! popoverProps &&
+									showText &&
+									side === 'left' &&
+									popupSide === 'left'
+									? mainAxis -
+											( anchor.width - anchor.height )
+									: mainAxis;
+							} }
 							alignOffset={
 								typeof offset === 'number'
 									? 0
@@ -145,7 +164,9 @@ export default function StateControl( {
 							}
 							collisionAvoidance={ {
 								side: 'flip',
-								align: popoverProps.shift ? 'shift' : 'flip',
+								align: menuPopoverProps.shift
+									? 'shift'
+									: 'flip',
 							} }
 						/>
 					}
