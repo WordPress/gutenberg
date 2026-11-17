@@ -5,13 +5,13 @@
 ### Enhancements
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
--   Add `wpPlugin.externals` to read individual packages from a classic script's global instead of bundling them, in both scripts and script modules ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Add `wpPlugin.externals` to read individual packages from a classic script's global instead of bundling them, in both scripts and script modules ([#86985](https://github.com/WordPress/gutenberg/pull/86985)).
 
 ### Bug Fixes
 
 -   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page. Plugins shipping the build now pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
 -   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
--   Load the classic scripts listed in a route's asset files. They were never enqueued, so a route importing one that `@wordpress/boot` doesn't already load, such as `lodash`, failed to render ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Load the classic scripts listed in a route's asset files. They were never enqueued, so a route importing one that `@wordpress/boot` doesn't already load, such as `lodash`, failed to render ([#86985](https://github.com/WordPress/gutenberg/pull/86985)).
 
 ### Internal
 
