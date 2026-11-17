@@ -1024,13 +1024,16 @@ test.describe( 'insert a file from inserter', () => {
 			page.getByRole( 'button', { name: uploadedImage.title.raw } )
 		).toBeHidden();
 		await fileItem.click();
-		// Inserted from the library as is, so it keeps the attachment's id.
+		// Inserted from the library as is, so it keeps the attachment's id,
+		// is named after its title and, being a PDF, shows a preview.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/file',
 				attributes: {
 					id: uploadedFile.id,
 					href: uploadedFile.source_url,
+					fileName: uploadedFile.title.raw,
+					displayPreview: true,
 				},
 			},
 		] );
