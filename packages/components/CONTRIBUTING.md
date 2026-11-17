@@ -95,6 +95,8 @@ In these situations, one possible approach is to "soft-deprecate" a given legacy
 2. Updating all places in Gutenberg that use that API.
 3. Adding deprecation warnings (only after the previous point is completed, otherwise the Browser Console will be polluted by all those warnings and some e2e tests may fail).
 
+When a component from `@wordpress/ui` replaces a component in this package, follow [Replace a legacy component](../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component) for the order of the alias, recommendation, migration, and deprecation steps.
+
 When adding new components or new props to existing components, it's recommended to create a [private version](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/) of the component until the changes are stable enough to be exposed as part of the public API.
 
 ### Learn more
@@ -585,7 +587,7 @@ All new components should add stories to the project's [Storybook](https://story
 
 ### Source code display
 
-Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the build uses [terser](https://terser.org/) with `keep_fnames: true` (configured in `storybook/main.ts`).
+Storybook displays source code snippets in the Docs tab. To ensure component names display correctly (instead of minified names like `<J>`), the production build uses Vite's Oxc minifier with function and class names preserved (`build.rolldownOptions.output.minify` in `storybook/main.ts`).
 
 For function declaration components, no additional configuration is needed — the function name is preserved automatically. For `forwardRef` components, ensure the unforwarded function is named (not an arrow function), and set `displayName` on the forwarded component.
 

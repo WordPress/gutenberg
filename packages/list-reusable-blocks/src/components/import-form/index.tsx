@@ -1,4 +1,4 @@
-import { Button, Notice } from '@wordpress/components';
+import { Button, Notice as WCNotice } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { useRef, useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -66,9 +66,9 @@ function ImportForm( { instanceId, onUpload }: ImportFormProps ) {
 			ref={ formRef }
 		>
 			{ error && (
-				<Notice status="error" onRemove={ () => onDismissError() }>
+				<WCNotice status="error" onRemove={ () => onDismissError() }>
 					{ error }
-				</Notice>
+				</WCNotice>
 			) }
 			<label
 				htmlFor={ inputId }

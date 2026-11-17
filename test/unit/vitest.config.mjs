@@ -245,7 +245,15 @@ export default defineConfig( {
 						headless: true,
 						instances: [ { browser: 'chromium' } ],
 						provider: createPlaywrightProvider(),
-						commands: browserTraces?.commands,
+						commands: {
+							...browserTraces?.commands,
+							// Vitest advances fake timers during built-in hover commands.
+							// Exact delay tests must retain control of the clock.
+							async hoverWithManualTimers( { frame }, selector ) {
+								const testFrame = await frame();
+								await testFrame.locator( selector ).hover();
+							},
+						},
 						screenshotDirectory: path.join(
 							ROOT_DIR,
 							'test-results/vitest-browser-screenshots'
@@ -259,6 +267,9 @@ export default defineConfig( {
 		// that overlap explicit and avoid a redundant cleanup pass.
 		clearMocks: false,
 		globals: false,
+		// Match native ES modules, which have no `__dirname`, `require`, or
+		// other CommonJS variables. CommonJS files keep them.
+		injectCjsGlobals: false,
 		includeTaskLocation: true,
 		isolate: true,
 		mockReset: true,

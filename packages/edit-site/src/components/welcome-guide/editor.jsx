@@ -7,7 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import WelcomeGuideImage from './image';
 
 export default function WelcomeGuideEditor() {
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { isActive, isBlockBasedTheme } = useSelect( ( select ) => {
 		return {
@@ -29,7 +29,9 @@ export default function WelcomeGuideEditor() {
 			className="edit-site-welcome-guide guide-editor"
 			contentLabel={ __( 'Welcome to the site editor' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuide' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-site', 'welcomeGuide', false )
+			}
 			pages={ [
 				{
 					image: (

@@ -6,7 +6,7 @@ import { store as interfaceStore } from '@wordpress/interface';
 import WelcomeGuideImage from './welcome-guide-image';
 
 export default function WelcomeGuideStyles() {
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { isActive, isStylesOpen } = useSelect( ( select ) => {
 		const sidebar =
@@ -32,7 +32,9 @@ export default function WelcomeGuideStyles() {
 			className="editor-welcome-guide guide-styles"
 			contentLabel={ welcomeLabel }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggle( 'core/edit-site', 'welcomeGuideStyles' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-site', 'welcomeGuideStyles', false )
+			}
 			pages={ [
 				{
 					image: (

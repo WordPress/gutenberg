@@ -45,7 +45,6 @@ export default function BackgroundPanel() {
 			onChange={ setStyle }
 			settings={ settings }
 			defaultValues={ BACKGROUND_DEFAULT_VALUES }
-			showInheritanceLabelIndicators={ false }
 		/>
 	);
 }
