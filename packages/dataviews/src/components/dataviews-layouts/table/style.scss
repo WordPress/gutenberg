@@ -6,6 +6,14 @@
 // cells take the place of, so that the columns do not move.
 $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
+// Without actions, the fade at the end of the rows is wider, and opaque over
+// its outer part, so that a vertical scrollbar over the edge of the table
+// (overlay scrollbars take no space) does not cut the columns off before they
+// fade out. The fade at the start keeps the padding of the components above
+// the table, so the first column lines up with them.
+$scroll-fade-end-size: var(--wpds-dimension-padding-3xl);
+$scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
+
 // Fades the element with `--dataviews-view-table-fade-mask` while the scroll
 // position is within `$range`, and hides its share of the row line. Outside the
 // range, and when nothing scrolls, the element only covers its own space, so it
@@ -371,9 +379,11 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		@include scroll-fade(1px normal, forwards);
 	}
 
-	tr::after {
+	&:not(.has-actions) tr::after {
 		inset-inline-end: 0;
-		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000);
+		width: $scroll-fade-end-size;
+		min-width: $scroll-fade-end-size;
+		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 calc(100% - #{$scroll-fade-end-opaque-size}));
 		@include scroll-fade(normal calc(100% - 1px));
 	}
 

@@ -83,8 +83,14 @@ function PostsTable( {
 	);
 }
 
-// `--wpds-dimension-padding-2xl`, the padding at the ends of the rows.
+// `--wpds-dimension-padding-2xl`, the padding at the start of the rows, and
+// at their end with actions.
 const FADE_SIZE = 24;
+// `--wpds-dimension-padding-3xl`, the padding at the end of the rows without
+// actions, and `--wpds-dimension-padding-lg`, its opaque part, which an overlay
+// scrollbar may cover.
+const END_FADE_SIZE = 32;
+const END_FADE_OPAQUE_SIZE = 16;
 // `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
 const CELL_PADDING = 12;
 const COMPACT_CELL_PADDING = 8;
@@ -216,7 +222,7 @@ describe( 'DataViews table scroll fade', () => {
 					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
 				);
 			expect( getComputedStyle( row, '::after' ).maskImage ).toBe(
-				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
+				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) calc(100% - ${ END_FADE_OPAQUE_SIZE }px))`
 			);
 
 			await render( <PostsTable withActions dir={ dir } /> );
@@ -274,7 +280,7 @@ describe( 'DataViews table scroll fade', () => {
 			for ( const row of getRows() ) {
 				const rowBox = row.getBoundingClientRect();
 				const lastCell = row.lastElementChild!.getBoundingClientRect();
-				expect( rowBox.right - lastCell.right ).toBe( FADE_SIZE );
+				expect( rowBox.right - lastCell.right ).toBe( END_FADE_SIZE );
 			}
 		} );
 
