@@ -58,6 +58,7 @@ describe( 'normalizeIconSvg', () => {
 		},
 	] )( '$name', ( { input, output } ) => {
 		expect( normalizeIconSvg( input ).content ).toBe( output );
+		expect( normalizeIconSvg( output ).content ).toBe( output );
 	} );
 
 	// Refusals: each input holds something that cannot be converted without
