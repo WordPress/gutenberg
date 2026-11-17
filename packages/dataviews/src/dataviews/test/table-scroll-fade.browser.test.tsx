@@ -252,10 +252,10 @@ describe( 'DataViews table scroll fade', () => {
 				getComputedStyle( row ).backgroundColor
 			);
 			// The mask covers the outline next to the columns.
-			expect( style.maskSize ).toBe(
+			expect( style.maskSize.split( ', ' )[ 0 ] ).toBe(
 				`calc(100% + ${ FADE_RAMP }px) 100%`
 			);
-			expect( style.maskClip ).toBe( 'no-clip' );
+			expect( style.maskClip.split( ', ' )[ 0 ] ).toBe( 'no-clip' );
 		}
 	} );
 
@@ -284,6 +284,33 @@ describe( 'DataViews table scroll fade', () => {
 				[ false, '100% 1px' ],
 			] );
 	} );
+
+	// At rest the cells at the edges keep only their share of the row line, so
+	// they do not cover what the columns next to them paint over their space,
+	// like the focus ring of a checkbox.
+	it.each( [
+		[ 'ltr', 'left', 'right' ],
+		[ 'rtl', 'right', 'left' ],
+	] as const )(
+		'only keeps the row line at rest (%s)',
+		async ( dir, start, end ) => {
+			await render( <PostsTable dir={ dir } width={ 1600 } /> );
+
+			// Wait for a frame, so a scroll timeline would have been resolved.
+			await new Promise( requestAnimationFrame );
+			const row = getRows()[ 1 ];
+			for ( const [ pseudo, to ] of [
+				[ '::before', start ],
+				[ '::after', end ],
+			] ) {
+				const style = getComputedStyle( row, pseudo );
+				expect( style.maskImage ).toBe(
+					`linear-gradient(to ${ to }, rgba(0, 0, 0, 0) ${ FADE_RAMP }px, rgb(0, 0, 0) ${ FADE_RAMP }px), linear-gradient(rgb(0, 0, 0) 1px, rgba(0, 0, 0, 0) 1px)`
+				);
+				expect( style.maskComposite ).toBe( 'intersect, intersect' );
+			}
+		}
+	);
 
 	it( 'does not fade when every column fits', async () => {
 		await render( <PostsTable width={ 1600 } /> );
