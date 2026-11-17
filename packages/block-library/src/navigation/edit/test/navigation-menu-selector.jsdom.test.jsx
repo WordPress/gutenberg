@@ -73,8 +73,8 @@ function mockNavigationMenu( { canUserCreateNavigationMenus, ...value } ) {
 		'create/postType/wp_navigation',
 		!! canUserCreateNavigationMenus
 	);
+	// `canUser` caches its resolution by resource, without the action.
 	finishResolution( 'canUser', [
-		'create',
 		{ kind: 'postType', name: 'wp_navigation' },
 	] );
 	useNavigationMenu.mockReturnValue( value );
