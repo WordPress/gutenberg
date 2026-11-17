@@ -693,6 +693,9 @@ const withBlockReset =
 			// (entity-level IDs), but we need them to reference the preserved
 			// cloned inner blocks instead. The entries are the blocks from the
 			// action, so they are replaced, and their ancestors after them.
+			// Controlled inner blocks live only under the `controlled||` key,
+			// so the controller's own entry has none, as it does outside a
+			// reset.
 			const fixedClientIds: string[] = [];
 			for ( const clientId of newState.controlledInnerBlocks ) {
 				const controlledOrder = newState.order.get( clientId )!;
@@ -703,7 +706,7 @@ const withBlockReset =
 				if ( existingEntry ) {
 					newState.tree.set( clientId, {
 						...existingEntry,
-						innerBlocks,
+						innerBlocks: [],
 					} );
 					fixedClientIds.push( clientId );
 				}
