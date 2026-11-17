@@ -16,14 +16,39 @@ import { SelectControl, Text } from '@wordpress/ui';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
+import useHasTabletViewport from './use-has-tablet-viewport';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
+import { getOverlayViewports } from '../overlay-viewports';
+
+/**
+ * Returns the viewport to edit an overlay template part at, so that it opens
+ * at a width where the overlay is shown.
+ *
+ * @param {string}  overlayMenu       Overlay visibility setting.
+ * @param {boolean} hasTabletViewport Whether the theme has a tablet breakpoint.
+ * @return {string|undefined} Viewport, or `undefined` to open at the default width.
+ */
+function getOverlayEditingViewport( overlayMenu, hasTabletViewport ) {
+	const overlayViewports = getOverlayViewports( { overlayMenu } );
+	// The default `mobile` behavior collapses below a fixed width.
+	if ( overlayViewports === null ) {
+		return 'mobile';
+	}
+	// Shown at the default width, or not shown at all.
+	if ( overlayViewports.desktop || ! overlayViewports.mobile ) {
+		return undefined;
+	}
+	// Without a tablet breakpoint, the editor's Tablet preview opens at
+	// desktop width.
+	return overlayViewports.tablet && hasTabletViewport ? 'tablet' : 'mobile';
+}
 
 /**
  * Overlay Template Part Selector component.
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
- * @param {string}   props.overlayMenu              Overlay visibility setting ('never', 'mobile', 'always').
+ * @param {string}   props.overlayMenu              Overlay visibility setting ('never', 'mobile', 'tablet', 'always').
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
@@ -52,6 +77,12 @@ export default function OverlayTemplatePartSelector( {
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const hasTabletViewport = useHasTabletViewport();
+	const editingViewport = getOverlayEditingViewport(
+		overlayMenu,
+		hasTabletViewport
+	);
 
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
@@ -163,8 +194,8 @@ export default function OverlayTemplatePartSelector( {
 			postId: templatePartId,
 			postType: 'wp_template_part',
 		};
-		if ( overlayMenu === 'mobile' ) {
-			params.viewport = 'mobile';
+		if ( editingViewport ) {
+			params.viewport = editingViewport;
 		}
 		onNavigateToEntityRecord( params );
 	};
@@ -191,8 +222,8 @@ export default function OverlayTemplatePartSelector( {
 					postId: templatePartId,
 					postType: 'wp_template_part',
 				};
-				if ( overlayMenu === 'mobile' ) {
-					params.viewport = 'mobile';
+				if ( editingViewport ) {
+					params.viewport = editingViewport;
 				}
 				onNavigateToEntityRecord( params );
 			} else {
@@ -221,7 +252,7 @@ export default function OverlayTemplatePartSelector( {
 		createErrorNotice,
 		currentTheme,
 		setIsCreating,
-		overlayMenu,
+		editingViewport,
 	] );
 
 	const handleClearOverlay = useCallback( () => {
