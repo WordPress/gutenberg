@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `waitForTransition`, which returns a Promise that resolves once a store-derived predicate goes from `true` to `false`, such as when a post finishes saving ([#41169](https://github.com/WordPress/gutenberg/pull/41169)).
+
 ## 11.1.0 (2026-11-04)
 
 ### Bug Fixes
