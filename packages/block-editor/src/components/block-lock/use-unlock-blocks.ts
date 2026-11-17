@@ -20,11 +20,9 @@ export default function useUnlockBlocks() {
 
 	return useCallback(
 		( clientIds: string[] ) => {
-			const {
-				getBlockAttributes,
-				getClientIdsOfDescendants,
-				isLayoutLockedBlock,
-			} = unlock( registry.select( blockEditorStore ) );
+			const { getBlockAttributes, getClientIdsOfDescendants } = unlock(
+				registry.select( blockEditorStore )
+			);
 
 			// Keep the lock attributes of every affected block, to undo.
 			const affectedIds = [
@@ -36,19 +34,10 @@ export default function useUnlockBlocks() {
 				Record< string, unknown >
 			> = {};
 			for ( const clientId of affectedIds ) {
-				const { lock, templateLock, metadata } =
+				const { lock, templateLock } =
 					getBlockAttributes( clientId ) ?? {};
-				previousAttributes[ clientId ] = {
-					lock,
-					templateLock,
-					metadata,
-				};
+				previousAttributes[ clientId ] = { lock, templateLock };
 			}
-			const detachesPattern = clientIds.some(
-				( clientId ) =>
-					!! getBlockAttributes( clientId )?.metadata?.patternName &&
-					isLayoutLockedBlock( clientId )
-			);
 
 			setBlocksLock( clientIds, {
 				move: false,
@@ -67,9 +56,7 @@ export default function useUnlockBlocks() {
 				clientIds.length
 			);
 			if ( clientIds.length === 1 ) {
-				message = detachesPattern
-					? __( 'Pattern detached.' )
-					: __( 'Block unlocked.' );
+				message = __( 'Block unlocked.' );
 			}
 
 			createSuccessNotice( message, {

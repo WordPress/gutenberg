@@ -724,10 +724,10 @@ export interface BlockLockChanges {
  *
  * Movement and deletion are stored in the `lock` attribute, and the layout
  * lock as `templateLock: 'all'`, which keeps blocks from being added, moved or
- * removed inside, without making the block a content-only section. Unlocking
- * the layout of an unsynced pattern section detaches it from its pattern,
- * keeping its content. A full unlock also clears any `templateLock` the blocks
- * carry.
+ * removed inside, without making the block a content-only section. The layout
+ * of an unsynced pattern is locked by the pattern and left as it is: detaching
+ * the pattern is what unlocks it. A full unlock also clears any `templateLock`
+ * the other blocks carry.
  *
  * @param clientIds Client IDs of the blocks to lock or unlock.
  * @param changes   The lock properties to change.
@@ -761,9 +761,12 @@ export const setBlocksLock =
 			const nextAttributes: Record< string, unknown > = {};
 			let templateLock = attributes.templateLock;
 
+			// The layout of a pattern is the pattern's: it changes by editing or
+			// detaching the pattern, so leave it.
 			if (
 				changes.layout !== undefined &&
-				select.canLayoutLockBlock( clientId )
+				select.canLayoutLockBlock( clientId ) &&
+				! select.isPatternLockedBlock( clientId )
 			) {
 				if ( changes.layout ) {
 					templateLock = 'all';
@@ -774,18 +777,6 @@ export const setBlocksLock =
 					templateLock = undefined;
 				}
 				nextAttributes.templateLock = templateLock;
-
-				if (
-					! changes.layout &&
-					attributes.metadata?.patternName &&
-					select.isLayoutLockedBlock( clientId )
-				) {
-					const metadata = { ...attributes.metadata };
-					delete metadata.patternName;
-					nextAttributes.metadata = Object.keys( metadata ).length
-						? metadata
-						: undefined;
-				}
 			}
 
 			nextTemplateLocks.set( clientId, templateLock );

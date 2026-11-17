@@ -27,6 +27,7 @@ export default function BlockLockMenuItems( {
 		isLayoutLocked,
 		isEditLocked,
 		canLayoutLock,
+		canChangeLayoutLock,
 		allowsEditLocking,
 	} = useSelect(
 		( select ) => {
@@ -37,8 +38,13 @@ export default function BlockLockMenuItems( {
 				isLayoutLockedBlock,
 				isEditLockedBlock,
 				canLayoutLockBlock,
+				isPatternLockedBlock,
 			} = unlock( select( blockEditorStore ) );
 			const layoutLockableIds = clientIds.filter( canLayoutLockBlock );
+			// A pattern's layout is the pattern's own, so it stays as it is.
+			const layoutChangeableIds = layoutLockableIds.filter(
+				( clientId ) => ! isPatternLockedBlock( clientId )
+			);
 			const editLockableIds = clientIds.filter( ( clientId ) =>
 				ALLOWS_EDIT_LOCKING.includes( getBlockName( clientId ) ?? '' )
 			);
@@ -51,6 +57,7 @@ export default function BlockLockMenuItems( {
 					layoutLockableIds.every( isLayoutLockedBlock ),
 				isEditLocked: editLockableIds.every( isEditLockedBlock ),
 				canLayoutLock: layoutLockableIds.length > 0,
+				canChangeLayoutLock: layoutChangeableIds.length > 0,
 				allowsEditLocking: editLockableIds.length > 0,
 			};
 		},
@@ -100,7 +107,7 @@ export default function BlockLockMenuItems( {
 			</Menu.CheckboxItem>
 			<Menu.CheckboxItem
 				checked={ isLayoutLocked }
-				disabled={ ! canLayoutLock }
+				disabled={ ! canChangeLayoutLock }
 				closeOnClick={ false }
 				onCheckedChange={ ( layout ) =>
 					setBlocksLock( clientIds, { layout } )

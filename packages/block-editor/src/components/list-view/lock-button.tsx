@@ -27,9 +27,9 @@ interface ListViewLockButtonProps {
  * unlocks the block and every block inside it. It is the same button as the
  * row's options menu toggle, so the two look alike.
  *
- * A block inside a layout-locked block is kept in place by that ancestor, so
- * its lock is managed from there: the button is disabled, but stays focusable
- * so its label can say why.
+ * The button is disabled, but stays focusable so its label can say why, for a
+ * pattern, which is unlocked by editing or detaching it, and for a block inside
+ * a layout-locked block, which is kept in place by that ancestor.
  */
 const ListViewLockButton = forwardRef<
 	HTMLButtonElement,
@@ -38,7 +38,7 @@ const ListViewLockButton = forwardRef<
 	{ clientId, tabIndex, onFocus },
 	ref
 ) {
-	const { canLock, lockType, layoutLockedAncestor } =
+	const { canLock, lockType, layoutLockedAncestor, isPatternLocked } =
 		useBlockLock( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -55,7 +55,9 @@ const ListViewLockButton = forwardRef<
 		__( 'Unlock %s' ),
 		blockTitle ?? ''
 	);
-	if ( layoutLockedAncestor ) {
+	if ( isPatternLocked ) {
+		label = __( 'Locked by its pattern' );
+	} else if ( layoutLockedAncestor ) {
 		label = sprintf(
 			/* translators: %s: The title of the parent block, e.g. "Group". */
 			__( 'Locked by %s' ),
@@ -72,7 +74,7 @@ const ListViewLockButton = forwardRef<
 			size="small"
 			icon={ lockType === 'full' ? lockFilled : lock }
 			label={ label }
-			disabled={ !! layoutLockedAncestor || ! canLock }
+			disabled={ isPatternLocked || !! layoutLockedAncestor || ! canLock }
 			accessibleWhenDisabled
 			tabIndex={ tabIndex }
 			onFocus={ onFocus }

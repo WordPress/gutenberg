@@ -25,6 +25,11 @@ export interface BlockLockStatus {
 	 * Whether the inner layout of the block can be locked.
 	 */
 	canLayoutLock: boolean;
+	/**
+	 * Whether the layout of the block is locked by its pattern, which is
+	 * changed by editing or detaching the pattern.
+	 */
+	isPatternLocked: boolean;
 	isLocked: boolean;
 	/**
 	 * How much of the block is locked: every property it supports (`full`),

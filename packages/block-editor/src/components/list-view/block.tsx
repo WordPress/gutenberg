@@ -574,10 +574,13 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
+	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
 	// With the lock menu, a locked block shows its lock state as a button in
-	// its own cell, and so does a block inside a layout-locked block.
+	// its own cell, and so does a block inside a layout-locked block. A pattern
+	// being edited is temporarily unlocked, so it shows none.
 	const hasLockCell =
-		!! window.__experimentalBlockLockMenu &&
+		isLockMenuEnabled &&
+		clientId !== editedSection &&
 		( isLocked || hasLayoutLockedAncestor );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
@@ -596,6 +599,11 @@ function ListViewBlock( {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
+	}
+	// Rows with a lock cell have one more column, so the contents of the other
+	// rows span it to keep every row the full width of the tree.
+	if ( isLockMenuEnabled && ! hasLockCell ) {
+		colSpan = ( colSpan ?? 1 ) + 1;
 	}
 
 	const classes = clsx( {

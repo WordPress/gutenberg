@@ -356,10 +356,10 @@ describe( 'private actions', () => {
 			attributes: Record< string, Record< string, any > >,
 			{
 				rootTemplateLock = false,
-				layoutLocked = [] as string[],
+				patternLocked = [] as string[],
 			}: {
 				rootTemplateLock?: string | false;
-				layoutLocked?: string[];
+				patternLocked?: string[];
 			} = {}
 		) => {
 			const names: Record< string, string > = {
@@ -395,8 +395,8 @@ describe( 'private actions', () => {
 						: ( attributes[ id ?? '' ]?.templateLock ?? false ),
 				canLayoutLockBlock: ( id: string ) =>
 					names[ id ] === 'core/group',
-				isLayoutLockedBlock: ( id: string ) =>
-					layoutLocked.includes( id ),
+				isPatternLockedBlock: ( id: string ) =>
+					patternLocked.includes( id ),
 			};
 		};
 
@@ -441,7 +441,36 @@ describe( 'private actions', () => {
 			);
 		} );
 
-		it( 'clears the lock and template lock on a full unlock, and detaches a pattern', () => {
+		it( 'clears the lock and template lock on a full unlock', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], {
+				move: false,
+				remove: false,
+				layout: false,
+			} )(
+				thunkArgs( {
+					select: createSelect( {
+						group: {
+							lock: { move: true, remove: true },
+							templateLock: 'all',
+						},
+						paragraph: { lock: { move: true, remove: true } },
+					} ),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'group', 'paragraph' ],
+				{
+					group: { lock: undefined, templateLock: undefined },
+					paragraph: { lock: undefined },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'leaves the layout of a pattern to the pattern', () => {
 			const dispatch = { updateBlockAttributes: vi.fn() };
 			setBlocksLock( [ 'group' ], {
 				move: false,
@@ -453,29 +482,20 @@ describe( 'private actions', () => {
 						{
 							group: {
 								lock: { move: true, remove: true },
-								templateLock: 'all',
 								metadata: { patternName: 'core/hero' },
 							},
-							paragraph: { lock: { move: true, remove: true } },
 						},
-						{ layoutLocked: [ 'group' ] }
+						{ patternLocked: [ 'group' ] }
 					),
 					dispatch,
 				} )
 			);
 
-			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
-				[ 'group', 'paragraph' ],
-				{
-					group: {
-						lock: undefined,
-						templateLock: undefined,
-						metadata: undefined,
-					},
-					paragraph: { lock: undefined },
-				},
-				{ uniqueByBlock: true }
-			);
+			// No `templateLock` or `metadata` change: detaching the pattern
+			// is what unlocks its layout.
+			expect(
+				dispatch.updateBlockAttributes.mock.calls[ 0 ][ 1 ].group
+			).toEqual( { lock: undefined } );
 		} );
 
 		it( 'keeps the blocks inside in a layout-locked block when unlocking movement', () => {

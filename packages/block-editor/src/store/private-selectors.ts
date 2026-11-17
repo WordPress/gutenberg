@@ -1312,20 +1312,20 @@ export function isLockedBlock( state: State, clientId: string ) {
 }
 
 /**
- * Returns whether the block is an unsynced pattern section, whose layout is
- * locked by its pattern association. A section being temporarily edited
- * keeps its lock.
+ * Returns whether the layout of a block is locked by its pattern: the block is
+ * an unsynced pattern section. The lock is the pattern's, so it is changed by
+ * editing or detaching the pattern, not from the lock controls. A pattern being
+ * edited is temporarily not a section, so it is not locked meanwhile.
  *
  * @param state    Global application state.
  * @param clientId ClientId of the block.
  *
- * @return Whether the block is an unsynced pattern section.
+ * @return Whether the block's layout is locked by its pattern.
  */
-function isLayoutLockedPatternSection( state: State, clientId: string ) {
+export function isPatternLockedBlock( state: State, clientId: string ) {
 	return (
 		!! getBlockAttributes( state, clientId )?.metadata?.patternName &&
-		( getEditedContentOnlySection( state ) === clientId ||
-			isSectionBlock( state, clientId ) )
+		isSectionBlock( state, clientId )
 	);
 }
 
@@ -1343,7 +1343,7 @@ export function isLayoutLockedBlock( state: State, clientId: string ) {
 	return (
 		LAYOUT_TEMPLATE_LOCKS.includes(
 			getBlockAttributes( state, clientId )?.templateLock as string
-		) || isLayoutLockedPatternSection( state, clientId )
+		) || isPatternLockedBlock( state, clientId )
 	);
 }
 
@@ -1361,7 +1361,7 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 	return (
 		( !! blockName &&
 			!! getBlockType( blockName )?.attributes?.templateLock ) ||
-		isLayoutLockedPatternSection( state, clientId )
+		isPatternLockedBlock( state, clientId )
 	);
 }
 

@@ -6,6 +6,7 @@ import {
 	ToolbarItem,
 } from '@wordpress/components';
 import { useReducer, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { lock, lockFilled, unlock } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
@@ -14,6 +15,8 @@ import {
 import BlockLockModal from './modal';
 import BlockLockMenuItems from './lock-menu-items';
 import useBlockLock from './use-block-lock';
+import { store as blockEditorStore } from '../../store';
+import { unlock as unlockPrivateApis } from '../../lock-unlock';
 import type { BlockLockControlProps } from './types';
 
 /**
@@ -66,6 +69,13 @@ export default function BlockLockToolbar( {
 	clientId,
 }: BlockLockControlProps ) {
 	const { canLock, isLocked } = useBlockLock( clientId );
+	const isEditedPattern = useSelect(
+		( select ) =>
+			unlockPrivateApis(
+				select( blockEditorStore )
+			).getEditedContentOnlySection() === clientId,
+		[ clientId ]
+	);
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive: boolean ) => ! isActive,
@@ -85,7 +95,10 @@ export default function BlockLockToolbar( {
 	}
 
 	if ( window.__experimentalBlockLockMenu ) {
-		return <BlockLockToolbarMenu clientId={ clientId } />;
+		// A pattern being edited is temporarily unlocked, so it shows no lock.
+		return isEditedPattern ? null : (
+			<BlockLockToolbarMenu clientId={ clientId } />
+		);
 	}
 
 	let label: string = isLocked ? __( 'Unlock' ) : __( 'Lock' );
