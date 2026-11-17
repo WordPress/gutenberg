@@ -25,7 +25,7 @@ function AdjacentPagesAndSubpagesScreen() {
 				settings={ settings }
 				header={ subpageHeader( [
 					SETTINGS_CRUMB,
-					{ label: 'Payments', to: '/payments' },
+					{ label: 'Payments', href: '/payments' },
 					{ label: gateway.name },
 				] ) }
 			/>

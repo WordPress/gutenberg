@@ -1,5 +1,4 @@
 import type { ComponentProps } from 'react';
-import { Breadcrumbs } from '@wordpress/admin-ui';
 import { useId, useState } from '@wordpress/element';
 import { Badge, Card } from '@wordpress/ui';
 import type { SubpageStatus } from './router';
@@ -89,7 +88,7 @@ type HeaderProps = Pick<
  */
 export const SETTINGS_CRUMB = {
 	label: 'Settings',
-	to: ADJACENT_PAGES[ 0 ].href,
+	href: ADJACENT_PAGES[ 0 ].href,
 };
 
 /**
@@ -111,11 +110,11 @@ export function adjacentPageHeader( currentHref: string ): HeaderProps {
  * so the page region takes its name from the last crumb.
  */
 export function subpageHeader(
-	trail: Array< { label: string; to?: string } >
+	trail: Array< { label: string; href?: string } >
 ): HeaderProps {
 	return {
-		breadcrumbs: <Breadcrumbs items={ trail } />,
-		ariaLabel: trail[ trail.length - 1 ].label,
+		breadcrumbs: trail,
+		components: { link: RouterNavLink },
 	};
 }
 

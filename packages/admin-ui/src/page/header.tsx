@@ -1,5 +1,7 @@
 import clsx from 'clsx';
 import { Stack, Text } from '@wordpress/ui';
+import Breadcrumbs from '../breadcrumbs';
+import type { BreadcrumbItem } from '../breadcrumbs/types';
 import Navigation from '../navigation';
 import type { NavigationConfig } from '../navigation/types';
 import { SidebarToggleSlot } from './sidebar-toggle-slot';
@@ -19,7 +21,7 @@ export default function Header( {
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
-	breadcrumbs?: React.ReactNode;
+	breadcrumbs?: readonly BreadcrumbItem[];
 	badges?: React.ReactNode;
 	visual?: React.ReactNode;
 	title?: React.ReactNode;
@@ -76,7 +78,13 @@ export default function Header( {
 							{ title }
 						</Text>
 					) }
-					{ breadcrumbs }
+					{ breadcrumbs && (
+						<Breadcrumbs
+							items={ breadcrumbs }
+							headingLevel={ headingLevel }
+							linkComponent={ components?.link }
+						/>
+					) }
 					{ badges }
 				</Stack>
 				{ actions && (

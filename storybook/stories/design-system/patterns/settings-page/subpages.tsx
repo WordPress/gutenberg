@@ -26,7 +26,7 @@ function SubpagesScreen() {
 				gatewayId={ gateway.id }
 				settings={ settings }
 				header={ subpageHeader( [
-					{ label: 'Settings', to: '/' },
+					{ label: 'Settings', href: '/' },
 					{ label: gateway.name },
 				] ) }
 			/>
