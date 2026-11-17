@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { speak } from '@wordpress/a11y';
 import type { Field } from '@wordpress/dataviews';
 import MediaPreview from '..';
 import { MediaEditorProvider } from '../../media-editor-provider';
@@ -39,6 +40,8 @@ function setup( media: Media, fields: Field< Media >[] = FIELDS ) {
 	);
 }
 
+vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+
 // jsdom doesn't implement `navigator.pdfViewerEnabled`.
 function setPdfViewerEnabled( enabled: boolean ) {
 	vi.stubGlobal( 'navigator', {
@@ -47,9 +50,22 @@ function setPdfViewerEnabled( enabled: boolean ) {
 	} );
 }
 
+// jsdom doesn't implement the Clipboard API.
+function setClipboardWriteText(
+	writeText: ( text: string ) => Promise< void >
+) {
+	Object.defineProperty( window.navigator, 'clipboard', {
+		value: { writeText },
+		configurable: true,
+	} );
+}
+
 describe( 'MediaPreview', () => {
 	afterEach( () => {
 		vi.unstubAllGlobals();
+		vi.mocked( speak ).mockClear();
+		// @ts-expect-error The property is only defined by the tests.
+		delete window.navigator.clipboard;
 	} );
 
 	it( 'embeds a PDF when the browser has a PDF viewer', () => {
@@ -107,12 +123,41 @@ describe( 'MediaPreview', () => {
 		expect( link ).toHaveAttribute( 'download' );
 	} );
 
-	it( 'shows a Copy URL button', () => {
+	it( 'opens Download in a new tab', () => {
 		setup( ZIP );
 
 		expect(
+			screen.getByRole( 'link', { name: 'Download' } )
+		).toHaveAttribute( 'target', '_blank' );
+	} );
+
+	it( 'copies the URL and announces it', async () => {
+		const writeText = vi.fn( () => Promise.resolve() );
+		setClipboardWriteText( writeText );
+		setup( ZIP );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Copy URL' } ) );
+
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith( 'Copied URL to clipboard.' )
+		);
+		expect( writeText ).toHaveBeenCalledWith( ZIP.source_url );
+		expect(
 			screen.getByRole( 'button', { name: 'Copy URL' } )
 		).toBeInTheDocument();
+	} );
+
+	it( 'announces when the URL could not be copied', async () => {
+		setClipboardWriteText( () => Promise.reject( new Error( 'Denied' ) ) );
+		setup( ZIP );
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'Copy URL' } ) );
+
+		await waitFor( () =>
+			expect( speak ).toHaveBeenCalledWith(
+				"Couldn't copy URL to clipboard."
+			)
+		);
 	} );
 
 	it( 'falls back to the title when there is no filename field', () => {

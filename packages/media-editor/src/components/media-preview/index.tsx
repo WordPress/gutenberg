@@ -1,11 +1,16 @@
 import clsx from 'clsx';
+import { speak } from '@wordpress/a11y';
 import { Button, Spinner as WCSpinner } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { copy, download, folder } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
+import {
+	check,
+	copy,
+	download,
+	error as errorIcon,
+	folder,
+} from '@wordpress/icons';
 import { EmptyState } from '@wordpress/ui';
 import { useMediaEditorContext } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
@@ -54,34 +59,81 @@ function getFieldValue(
 	return typeof value === 'string' ? value : '';
 }
 
+const COPY_FEEDBACK_TIMEOUT = 2000;
+
+type CopyResult = 'idle' | 'copied' | 'error';
+
+const COPY_RESULT_ICONS = {
+	idle: copy,
+	copied: check,
+	error: errorIcon,
+};
+
+/**
+ * Copies the text and shows the result on the copy button, following the
+ * Copy to Clipboard design system pattern.
+ *
+ * @param text The text to copy.
+ */
+function useCopyWithFeedback( text: string ) {
+	// Bump the id on every result, so a repeat of the same result restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
+		result: CopyResult;
+		id: number;
+	} >( { result: 'idle', id: 0 } );
+
+	useEffect( () => {
+		if ( feedback.result === 'idle' ) {
+			return;
+		}
+		const timeoutId = setTimeout(
+			() => setFeedback( { result: 'idle', id: 0 } ),
+			COPY_FEEDBACK_TIMEOUT
+		);
+		return () => clearTimeout( timeoutId );
+	}, [ feedback ] );
+
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
+		setFeedback( ( current ) => ( { result, id: current.id + 1 } ) );
+		speak( message );
+	}
+
+	const ref = useCopyToClipboard(
+		text,
+		() => report( 'copied', __( 'Copied URL to clipboard.' ) ),
+		() => report( 'error', __( "Couldn't copy URL to clipboard." ) )
+	);
+
+	return { result: feedback.result, ref };
+}
+
 function MediaPreviewFileActions( { mediaUrl }: { mediaUrl: string } ) {
-	const { createSuccessNotice } = useDispatch( noticesStore );
-	const copyRef = useCopyToClipboard( mediaUrl, () => {
-		createSuccessNotice( __( 'Copied URL to clipboard.' ), {
-			type: 'snackbar',
-		} );
-	} );
+	const { result, ref } = useCopyWithFeedback( mediaUrl );
 
 	return (
 		<>
 			{ /*
 			 * Browsers ignore `download` for cross-origin URLs, e.g. media
-			 * offloaded to a CDN, and open the file instead.
+			 * offloaded to a CDN, and show the file instead. Open it in a new
+			 * tab so it doesn't replace the editor.
 			 */ }
 			<Button
 				__next40pxDefaultSize
 				variant="primary"
 				href={ mediaUrl }
+				target="_blank"
 				download
 				icon={ download }
 			>
 				{ __( 'Download' ) }
 			</Button>
+			{ /* The label stays the same, and the icon shows the result. */ }
 			<Button
 				__next40pxDefaultSize
 				variant="secondary"
-				ref={ copyRef }
-				icon={ copy }
+				ref={ ref }
+				icon={ COPY_RESULT_ICONS[ result ] }
 			>
 				{ __( 'Copy URL' ) }
 			</Button>
