@@ -16,5 +16,6 @@ export const stage = () => (
 		<Link to="/settings/general" search={ { tab: 'advanced' } }>
 			Advanced
 		</Link>
+		<Link to="/own-focus">Own focus</Link>
 	</Page>
 );

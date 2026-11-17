@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
 import Router from '../router';
 import RootSinglePage from '../../root/single-page';
 
@@ -17,6 +18,11 @@ const ROUTES = [
 			import.meta.url
 		).href,
 	},
+	{
+		path: '/own-focus',
+		content_module: new URL( './fixtures/own-focus.tsx', import.meta.url )
+			.href,
+	},
 ];
 
 // Wait long enough for the router to finish a navigation that leaves no
@@ -25,7 +31,9 @@ const settle = () => new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
 
 async function renderAt( path: string ) {
 	window.history.replaceState( null, '', `?p=${ path }` );
-	render( <Router routes={ ROUTES } rootComponent={ RootSinglePage } /> );
+	await render(
+		<Router routes={ ROUTES } rootComponent={ RootSinglePage } />
+	);
 }
 
 describe( 'navigation focus', () => {
@@ -81,5 +89,20 @@ describe( 'navigation focus', () => {
 		await settle();
 
 		expect( link ).toHaveFocus();
+	} );
+
+	it( 'does not override focus that the new page recovers itself', async () => {
+		await renderAt( '/settings/general' );
+
+		const link = await screen.findByRole( 'link', { name: 'Own focus' } );
+		link.focus();
+		await userEvent.keyboard( '{Enter}' );
+
+		const button = await screen.findByRole( 'button', {
+			name: 'Own focus',
+		} );
+		await settle();
+
+		expect( button ).toHaveFocus();
 	} );
 } );

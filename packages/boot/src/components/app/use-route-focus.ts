@@ -1,9 +1,9 @@
-import { useEffect, type RefObject } from '@wordpress/element';
+import { useEffect, useRef, type RefObject } from '@wordpress/element';
 import { privateApis as routePrivateApis } from '@wordpress/route';
 import { unlock } from '../../lock-unlock';
 import styles from '../root/style.module.scss';
 
-const { useRouter } = unlock( routePrivateApis );
+const { useRouterState } = unlock( routePrivateApis );
 
 /**
  * Hook that moves focus to the new page when a navigation removes the focused
@@ -11,39 +11,43 @@ const { useRouter } = unlock( routePrivateApis );
  * Otherwise focus falls back to the document body, and keyboard and screen
  * reader users lose their place.
  *
+ * It runs in an effect after the route resolves. Effects of the page content
+ * run before it, so the page can move focus itself first.
+ *
  * @param layoutRef Ref to the layout element that contains the stage.
  */
 export default function useRouteFocus(
 	layoutRef: RefObject< HTMLElement | null >
 ) {
-	const router = useRouter();
+	const href: string | undefined = useRouterState( {
+		select: ( state: { resolvedLocation?: { href: string } } ) =>
+			state.resolvedLocation?.href,
+	} );
+	const previousHrefRef = useRef( href );
 
-	useEffect(
-		() =>
-			// TanStack Router emits `onRendered` only when scroll restoration is
-			// enabled, but `onResolved` also runs after the new route renders.
-			router.subscribe(
-				'onResolved',
-				( { fromLocation }: { fromLocation?: unknown } ) => {
-					const layout = layoutRef.current;
+	useEffect( () => {
+		const previousHref = previousHrefRef.current;
+		previousHrefRef.current = href;
 
-					// The initial page load has no previous location.
-					if ( ! fromLocation || ! layout ) {
-						return;
-					}
+		// The initial page load has no previous location.
+		if ( ! previousHref || href === previousHref ) {
+			return;
+		}
 
-					const { activeElement, body } = layout.ownerDocument;
-					if ( activeElement && activeElement !== body ) {
-						return;
-					}
+		const layout = layoutRef.current;
+		if ( ! layout ) {
+			return;
+		}
 
-					layout
-						.querySelector< HTMLElement >(
-							`.${ styles.stage } [role="region"]`
-						)
-						?.focus();
-				}
-			),
-		[ router, layoutRef ]
-	);
+		const { activeElement, body } = layout.ownerDocument;
+		if ( activeElement && activeElement !== body ) {
+			return;
+		}
+
+		layout
+			.querySelector< HTMLElement >(
+				`.${ styles.stage } [role="region"]`
+			)
+			?.focus();
+	}, [ href, layoutRef ] );
 }
