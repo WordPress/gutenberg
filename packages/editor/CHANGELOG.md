@@ -4,12 +4,16 @@
 
 ### Enhancements
 
+-   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
 -   RTC: Add an optional outline around the blocks a collaborator is working in. Turn it on in Preferences > General > Interface > "Outline collaborators' blocks" ([#86272](https://github.com/WordPress/gutenberg/pull/86272)).
 
 ### Bug Fixes
 
+-   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
+-   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. Each thread now opens and closes through a disclosure button that carries `aria-expanded` and takes the thread's keyboard focus, in place of a focusable list item, and the button is described by the note text, so a minimized floating note still reads it. Threads no longer carry an `aria-label`, which screen readers handle inconsistently on a list item, and note avatars are now decorative, since the author's name follows them ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
