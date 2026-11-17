@@ -6923,14 +6923,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/components/use-dispatch/test/use-dispatch.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/data/src/components/use-select/index.ts": {
 		"react-hooks/refs": {
 			"count": 2
