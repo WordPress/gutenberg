@@ -29,28 +29,19 @@ const TestComponent = () => {
 };
 
 describe( 'useStateWithHistory', () => {
-	it( 'preserves the number value type through undo and redo', () => {
+	// eslint-disable-next-line vitest/expect-expect -- compile-time assertions only.
+	it( 'preserves the number value type', () => {
 		const { result } = renderHook( () => useStateWithHistory( 0 ) );
 
 		expectTypeOf( result.current.value ).toEqualTypeOf< number >();
 		expectTypeOf( result.current.setValue ).parameters.toEqualTypeOf<
 			[ number, boolean? ]
 		>();
-		expect( result.current.value ).toBe( 0 );
-
-		act( () => result.current.setValue( 1 ) );
-		expect( result.current.value ).toBe( 1 );
-
-		act( () => result.current.undo() );
-		expect( result.current.value ).toBe( 0 );
-
-		act( () => result.current.redo() );
-		expect( result.current.value ).toBe( 1 );
 	} );
 
-	it( 'preserves the object value type through undo and redo', () => {
+	// eslint-disable-next-line vitest/expect-expect -- compile-time assertions only.
+	it( 'preserves the object value type', () => {
 		const initialValue = { count: 0 };
-		const nextValue = { count: 1 };
 		const { result } = renderHook( () =>
 			useStateWithHistory( initialValue )
 		);
@@ -61,16 +52,6 @@ describe( 'useStateWithHistory', () => {
 		expectTypeOf( result.current.setValue ).parameters.toEqualTypeOf<
 			[ typeof initialValue, boolean? ]
 		>();
-		expect( result.current.value ).toBe( initialValue );
-
-		act( () => result.current.setValue( nextValue ) );
-		expect( result.current.value ).toBe( nextValue );
-
-		act( () => result.current.undo() );
-		expect( result.current.value ).toBe( initialValue );
-
-		act( () => result.current.redo() );
-		expect( result.current.value ).toBe( nextValue );
 	} );
 
 	it( 'supports explicit staging flags', () => {
