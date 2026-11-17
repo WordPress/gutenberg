@@ -101,11 +101,11 @@
 	&:focus::before {
 		outline-offset: 0;
 	}
-}
 
-// The buttons clip their overflow, so keep the focus ring inset enough to stay
-// visible instead of following the toolbar group's offsets.
-.block-editor-block-mover .components-button.block-editor-block-mover-button.has-icon::before {
-	left: 2px;
-	right: 2px;
+	// Keep the focus ring inset enough to stay visible instead of following
+	// the toolbar group's offsets. Matches the toolbar group's specificity.
+	&.has-icon.has-icon::before {
+		left: 2px;
+		right: 2px;
+	}
 }
