@@ -300,9 +300,8 @@ describe( 'UploadProgressSnackbar', () => {
 		);
 	} );
 
-	it( 'warns once about each upload that is missing image sizes', () => {
+	it( 'names the file when one upload is missing files', () => {
 		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
-		const second = { id: 'b', code: 'GENERAL', message: 'Second warning' };
 
 		mockQueue( [] );
 		const { rerender } = render( <UploadProgressSnackbar /> );
@@ -314,21 +313,56 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
 			'First warning',
-			expect.objectContaining( {
-				id: 'upload-warning-a',
+			{
+				id: 'upload-warning',
 				type: 'snackbar',
 				explicitDismiss: true,
-			} )
+			}
 		);
+	} );
 
+	it( 'counts the uploads in one snackbar when several are missing files', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+		const second = {
+			id: 'b',
+			code: 'STORAGE_LIMIT_REACHED',
+			message: 'Second warning',
+		};
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
 		mockQueue( [], 0, [ first, second ] );
 		rerender( <UploadProgressSnackbar /> );
 
 		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
 		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
 			'warning',
-			'Second warning',
-			expect.objectContaining( { id: 'upload-warning-b' } )
+			'2 images were uploaded, but some of their files could not be saved.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'blames storage space when it caused every missing file', () => {
+		const warnings = [ 'a', 'b', 'c' ].map( ( id ) => ( {
+			id,
+			code: 'STORAGE_LIMIT_REACHED',
+			message: `Warning ${ id }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'3 images were uploaded, but some of their files could not be saved because this site is out of storage space.',
+			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );
 
@@ -348,7 +382,7 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
 			'Second warning',
-			expect.objectContaining( { id: 'upload-warning-b' } )
+			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );
 } );
