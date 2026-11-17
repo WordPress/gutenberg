@@ -116,4 +116,14 @@ describe( 'getStateInheritedValue', () => {
 			).transform
 		).toEqual( { rotate: '15deg' } );
 	} );
+
+	it( 'starts a state offset from the whole block offset', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { translate: { x: '5px' } } },
+				{ transform: { translate: { y: '20px' } } },
+				mobile
+			).transform
+		).toEqual( { translate: { y: '20px' } } );
+	} );
 } );
