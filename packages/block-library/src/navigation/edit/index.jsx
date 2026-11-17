@@ -936,6 +936,7 @@ function Navigation( {
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
+						overlayViewports={ overlayViewports }
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }

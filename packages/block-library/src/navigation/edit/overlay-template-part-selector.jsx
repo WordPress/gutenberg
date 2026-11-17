@@ -16,39 +16,16 @@ import { SelectControl, Text } from '@wordpress/ui';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
-import useHasTabletViewport from './use-has-tablet-viewport';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
-import { getOverlayViewports } from '../overlay-viewports';
-
-/**
- * Returns the viewport to edit an overlay template part at, so that it opens
- * at a width where the overlay is shown.
- *
- * @param {string}  overlayMenu       Overlay visibility setting.
- * @param {boolean} hasTabletViewport Whether the theme has a tablet breakpoint.
- * @return {string|undefined} Viewport, or `undefined` to open at the default width.
- */
-function getOverlayEditingViewport( overlayMenu, hasTabletViewport ) {
-	const overlayViewports = getOverlayViewports( { overlayMenu } );
-	// The default `mobile` behavior collapses below a fixed width.
-	if ( overlayViewports === null ) {
-		return 'mobile';
-	}
-	// Shown at the default width, or not shown at all.
-	if ( overlayViewports.desktop || ! overlayViewports.mobile ) {
-		return undefined;
-	}
-	// Without a tablet breakpoint, the editor's Tablet preview opens at
-	// desktop width.
-	return overlayViewports.tablet && hasTabletViewport ? 'tablet' : 'mobile';
-}
+import { getOverlayEditingViewport } from '../overlay-viewports';
 
 /**
  * Overlay Template Part Selector component.
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
- * @param {string}   props.overlayMenu              Overlay visibility setting ('never', 'mobile', 'tablet', 'always').
+ * @param {?Object}  props.overlayViewports         Viewport map from `getOverlayViewports()`, or `null` for the default `mobile` behavior.
+ * @param {boolean}  props.hasTabletViewport        Whether the theme has a tablet breakpoint.
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
@@ -57,7 +34,8 @@ function getOverlayEditingViewport( overlayMenu, hasTabletViewport ) {
  */
 export default function OverlayTemplatePartSelector( {
 	overlay,
-	overlayMenu,
+	overlayViewports,
+	hasTabletViewport,
 	setAttributes,
 	onNavigateToEntityRecord,
 	isCreatingOverlay,
@@ -78,11 +56,9 @@ export default function OverlayTemplatePartSelector( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
-	const hasTabletViewport = useHasTabletViewport();
-	const editingViewport = getOverlayEditingViewport(
-		overlayMenu,
-		hasTabletViewport
-	);
+	const editingViewport = getOverlayEditingViewport( overlayViewports, {
+		hasTabletViewport,
+	} );
 
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,

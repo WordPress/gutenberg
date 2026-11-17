@@ -8,6 +8,10 @@ import { getViewportMediaQueries } from '@wordpress/global-styles-engine';
  * theme's viewport settings give it a valid tablet breakpoint. Defaults apply
  * when the theme sets none.
  *
+ * Reads the block-scoped `useSettings( 'viewport' )` deliberately, to agree
+ * with `use-overlay-viewport-styles.ts`, which decides where the overlay
+ * renders.
+ *
  * @return Whether the theme has a tablet breakpoint.
  */
 export default function useHasTabletViewport(): boolean {

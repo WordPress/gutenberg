@@ -104,3 +104,37 @@ export function getInlineViewports(
 		( viewport ) => overlayViewports[ viewport ] === false
 	);
 }
+
+/**
+ * Returns the device preview to edit the overlay template part at, so that it
+ * opens at a width where the overlay is shown.
+ *
+ * Only the `mobile`, `tablet` and `desktop` keys are read, and a viewport shows
+ * the overlay only when its value is strictly `true`.
+ *
+ * @param overlayViewports          Viewport map from `getOverlayViewports()`.
+ * @param options                   Options.
+ * @param options.hasTabletViewport Whether the theme has a tablet breakpoint.
+ *                                  Without one, the Tablet preview opens at
+ *                                  desktop width.
+ * @return Device preview, or `undefined` to open at the default Desktop width.
+ */
+export function getOverlayEditingViewport(
+	overlayViewports: Partial< OverlayViewportMap > | null,
+	{ hasTabletViewport }: { hasTabletViewport: boolean }
+): 'tablet' | 'mobile' | undefined {
+	// The default `mobile` behavior collapses below a fixed 600px.
+	if ( overlayViewports === null ) {
+		return 'mobile';
+	}
+	if ( overlayViewports.desktop === true ) {
+		return undefined;
+	}
+	if ( overlayViewports.tablet === true && hasTabletViewport ) {
+		return 'tablet';
+	}
+	if ( overlayViewports.mobile === true ) {
+		return 'mobile';
+	}
+	return undefined;
+}

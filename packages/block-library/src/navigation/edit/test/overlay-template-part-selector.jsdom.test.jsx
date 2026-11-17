@@ -5,7 +5,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
-import useHasTabletViewport from '../use-has-tablet-viewport';
+import { getOverlayViewports } from '../../overlay-viewports';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -13,12 +13,6 @@ globalThis.wpVitest.mockMatchMedia();
 vi.mock( import( '@wordpress/core-data' ), () => ( {
 	useEntityRecords: vi.fn(),
 	store: {},
-} ) );
-
-// Covered with the theme's viewport settings in the control's tests.
-vi.mock( import( '../use-has-tablet-viewport' ), () => ( {
-	__esModule: true,
-	default: vi.fn(),
 } ) );
 
 // Mock useCreateOverlayTemplatePart hook
@@ -50,8 +44,9 @@ const mockOnNavigateToEntityRecord = vi.fn();
 
 const defaultProps = {
 	overlay: undefined,
-	// The block's default.
-	overlayMenu: 'mobile',
+	// The block's default `mobile` behavior.
+	overlayViewports: null,
+	hasTabletViewport: true,
 	setAttributes: mockSetAttributes,
 	onNavigateToEntityRecord: mockOnNavigateToEntityRecord,
 };
@@ -107,7 +102,6 @@ describe( 'OverlayTemplatePartSelector', () => {
 		// Mock useSelect to return current theme
 		// The component calls: select( coreStore ).getCurrentTheme()?.stylesheet
 		useSelect.mockReturnValue( 'twentytwentyfive' );
-		useHasTabletViewport.mockReturnValue( true );
 	} );
 
 	describe( 'Loading state', () => {
@@ -502,7 +496,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 		}
 
 		it( 'opens a Mobile overlay at mobile width', async () => {
-			await clickEdit( { overlayMenu: 'mobile' } );
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'mobile',
+				} ),
+			} );
 
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
@@ -512,7 +510,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'opens a Tablet overlay at tablet width', async () => {
-			await clickEdit( { overlayMenu: 'tablet' } );
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'tablet',
+				} ),
+			} );
 
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
@@ -522,9 +524,12 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'opens a Tablet overlay at mobile width when the theme has no tablet breakpoint', async () => {
-			useHasTabletViewport.mockReturnValue( false );
-
-			await clickEdit( { overlayMenu: 'tablet' } );
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'tablet',
+				} ),
+				hasTabletViewport: false,
+			} );
 
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
@@ -534,7 +539,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 		} );
 
 		it( 'opens an Always overlay at the default width', async () => {
-			await clickEdit( { overlayMenu: 'always' } );
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'always',
+				} ),
+			} );
 
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
@@ -561,7 +570,9 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render(
 				<OverlayTemplatePartSelector
 					{ ...defaultProps }
-					overlayMenu="tablet"
+					overlayViewports={ getOverlayViewports( {
+						overlayMenu: 'tablet',
+					} ) }
 				/>
 			);
 

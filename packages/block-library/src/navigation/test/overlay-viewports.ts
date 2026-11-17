@@ -4,6 +4,7 @@ import {
 	isOverlayResponsive,
 	isOverlayAlwaysShown,
 	getInlineViewports,
+	getOverlayEditingViewport,
 } from '../overlay-viewports';
 
 describe( 'getOverlayViewports', () => {
@@ -139,6 +140,79 @@ describe( 'overlay viewport helpers', () => {
 				isAlwaysShown
 			);
 			expect( getInlineViewports( overlayViewports ) ).toEqual( inline );
+		}
+	);
+} );
+
+describe( 'getOverlayEditingViewport', () => {
+	it.each( [
+		[ 'null (default 600px behavior)', null, true, 'mobile' ],
+		[
+			'never',
+			{ mobile: false, tablet: false, desktop: false },
+			true,
+			undefined,
+		],
+		[
+			'always',
+			{ mobile: true, tablet: true, desktop: true },
+			true,
+			undefined,
+		],
+		[
+			'tablet with a tablet breakpoint',
+			{ mobile: true, tablet: true, desktop: false },
+			true,
+			'tablet',
+		],
+		[
+			'tablet without a tablet breakpoint',
+			{ mobile: true, tablet: true, desktop: false },
+			false,
+			'mobile',
+		],
+		[
+			'tablet only, with a tablet breakpoint',
+			{ mobile: false, tablet: true, desktop: false },
+			true,
+			'tablet',
+		],
+		[
+			'tablet only, without a tablet breakpoint',
+			{ mobile: false, tablet: true, desktop: false },
+			false,
+			undefined,
+		],
+		[
+			'mobile and desktop',
+			{ mobile: true, tablet: false, desktop: true },
+			true,
+			undefined,
+		],
+		[
+			'desktop only',
+			{ mobile: false, tablet: false, desktop: true },
+			true,
+			undefined,
+		],
+		[ 'empty map', {}, true, undefined ],
+		[
+			'truthy values that are not strictly true',
+			{ mobile: 1, tablet: 'yes', desktop: false },
+			true,
+			undefined,
+		],
+	] )(
+		'returns the preview for %s',
+		( _name, overlayViewports, hasTabletViewport, expected ) => {
+			expect(
+				getOverlayEditingViewport(
+					overlayViewports as Parameters<
+						typeof getOverlayEditingViewport
+					>[ 0 ],
+					{ hasTabletViewport }
+				)
+			).toBe( expected );
 		}
 	);
 } );

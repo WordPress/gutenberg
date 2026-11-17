@@ -1,26 +1,11 @@
-import {
-	beforeAll,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-	type Mock,
-} from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ComponentType } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSettings } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
-
-// The real `getViewportMediaQueries` decides which breakpoints are valid.
-vi.mock( import( '@wordpress/block-editor' ), () => ( {
-	useSettings: vi.fn(),
-} ) );
-
-const DEFAULT_VIEWPORT_SETTINGS = { mobile: '480px', tablet: '782px' };
 
 const setAttributes = vi.fn();
 
@@ -28,13 +13,41 @@ const setAttributes = vi.fn();
 let OverlayVisibilityControl: ComponentType< {
 	overlayMenu: string;
 	setAttributes: ( attributes: { overlayMenu: string } ) => void;
+	hasTabletViewport: boolean;
 } >;
 
-function renderControl( overlayMenu: string ) {
-	render(
+/**
+ * Renders the control with its value held in state, as the block does.
+ *
+ * @param props                   Props.
+ * @param props.initialValue      Initial `overlayMenu` value.
+ * @param props.hasTabletViewport Whether the theme has a tablet breakpoint.
+ */
+function ControlledControl( {
+	initialValue,
+	hasTabletViewport,
+}: {
+	initialValue: string;
+	hasTabletViewport: boolean;
+} ) {
+	const [ overlayMenu, setOverlayMenu ] = useState( initialValue );
+	return (
 		<OverlayVisibilityControl
 			overlayMenu={ overlayMenu }
-			setAttributes={ setAttributes }
+			setAttributes={ ( attributes ) => {
+				setAttributes( attributes );
+				setOverlayMenu( attributes.overlayMenu );
+			} }
+			hasTabletViewport={ hasTabletViewport }
+		/>
+	);
+}
+
+function renderControl( initialValue: string, hasTabletViewport = true ) {
+	render(
+		<ControlledControl
+			initialValue={ initialValue }
+			hasTabletViewport={ hasTabletViewport }
 		/>
 	);
 }
@@ -54,9 +67,6 @@ describe( 'OverlayVisibilityControl', () => {
 
 	beforeEach( () => {
 		vi.clearAllMocks();
-		( useSettings as Mock ).mockReturnValue( [
-			DEFAULT_VIEWPORT_SETTINGS,
-		] );
 	} );
 
 	it( 'shows Off, Mobile, Tablet and Always, in that order', async () => {
@@ -68,16 +78,6 @@ describe( 'OverlayVisibilityControl', () => {
 			'Tablet',
 			'Always',
 		] );
-	} );
-
-	it( 'shows Tablet when the theme sets no viewport breakpoints', async () => {
-		( useSettings as Mock ).mockReturnValue( [ undefined ] );
-
-		renderControl( 'mobile' );
-
-		expect(
-			await screen.findByRole( 'radio', { name: 'Tablet' } )
-		).toBeInTheDocument();
 	} );
 
 	it( 'sets the overlay menu to tablet when Tablet is selected', async () => {
@@ -94,11 +94,7 @@ describe( 'OverlayVisibilityControl', () => {
 	} );
 
 	it( 'hides Tablet when the theme has no tablet breakpoint', async () => {
-		( useSettings as Mock ).mockReturnValue( [
-			{ mobile: '480px', tablet: 'invalid' },
-		] );
-
-		renderControl( 'mobile' );
+		renderControl( 'mobile', false );
 
 		expect( await getOptionLabels() ).toEqual( [
 			'Off',
@@ -108,14 +104,27 @@ describe( 'OverlayVisibilityControl', () => {
 	} );
 
 	it( 'shows Tablet, selected, when it is already set and the theme has no tablet breakpoint', async () => {
-		( useSettings as Mock ).mockReturnValue( [
-			{ mobile: '480px', tablet: 'invalid' },
-		] );
-
-		renderControl( 'tablet' );
+		renderControl( 'tablet', false );
 
 		expect(
 			await screen.findByRole( 'radio', { name: 'Tablet' } )
 		).toBeChecked();
+	} );
+
+	it( 'keeps a saved Tablet option after another option is selected', async () => {
+		const user = userEvent.setup();
+		renderControl( 'tablet', false );
+
+		await user.click(
+			await screen.findByRole( 'radio', { name: 'Mobile' } )
+		);
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			overlayMenu: 'mobile',
+		} );
+		expect( screen.getByRole( 'radio', { name: 'Mobile' } ) ).toBeChecked();
+		expect(
+			screen.getByRole( 'radio', { name: 'Tablet' } )
+		).toBeInTheDocument();
 	} );
 } );
