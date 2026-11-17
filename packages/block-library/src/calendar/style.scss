@@ -74,9 +74,9 @@
 		}
 	}
 
-	// Cells inherit from their parent row, so width/style must pass through
-	// thead/tbody/tr. When only a style is set, also inherit width so those
-	// elements pick up the table's 1px instead of falling back to medium (~3px).
+	// Cells inherit style from the table through thead/tbody/tr (same as Table).
+	// Do not inherit width here: a style-only block border would overwrite a
+	// Global Styles width on the cells with the table's fallback 1px.
 	table[style*="border-style"] {
 		thead,
 		tbody,
@@ -84,7 +84,17 @@
 		th,
 		td {
 			border-style: inherit;
-			border-width: inherit;
+		}
+	}
+
+	// Style-only borders still need 1px on the row structure so those elements
+	// do not fall back to medium (~3px). Leave th/td widths alone so Global
+	// Styles (and the cell defaults) keep control.
+	table[style*="border-style"]:not([style*="border-width"]) {
+		thead,
+		tbody,
+		tr {
+			border-width: 1px;
 		}
 	}
 

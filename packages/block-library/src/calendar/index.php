@@ -56,6 +56,13 @@ function render_block_core_calendar( $attributes ) {
 	}
 	if ( isset( $attributes['style']['border'] ) ) {
 		$support_attributes['style']['border'] = $attributes['style']['border'];
+		/*
+		 * Radius needs collapsed borders lifted and corner cells rounded.
+		 * Leave it for a follow-up (same as Table). Keep it off the table so
+		 * instance styles match Global Styles targeting the wrapper via
+		 * selectors.border.radius.
+		 */
+		unset( $support_attributes['style']['border']['radius'] );
 	}
 
 	$styles        = wp_get_block_supports_classes_and_styles( $support_attributes, array( 'color', 'border' ) );
