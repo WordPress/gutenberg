@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
+-   Add the missing `dimensions.aspectRatios` entry to `PRESET_METADATA`, so the editor outputs the `--wp--preset--aspect-ratio--*` variables ([#86049](https://github.com/WordPress/gutenberg/pull/86049)).
 
 ## 2.1.0 (2026-11-04)
 
@@ -15,7 +16,6 @@
 ### Bug Fixes
 
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
--   Add the missing `dimensions.aspectRatios` entry to `PRESET_METADATA`, so the editor outputs the `--wp--preset--aspect-ratio--*` variables ([#86049](https://github.com/WordPress/gutenberg/pull/86049)).
 
 ### Internal
 
