@@ -20,6 +20,7 @@
 
 ### Bug Fixes
 
+-   `Modal`: Fix the styling of the `icon` prop by targeting the class name the component renders, `.components-modal__icon-container`, instead of the unmatched `.components-modal__header-icon-container` ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
 -   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
