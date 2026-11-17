@@ -175,5 +175,51 @@ describe( 'viewport utils', () => {
 				'@mobile': '@media (width <= 960px)',
 			} );
 		} );
+
+		it( 'adds a desktop media query above the tablet breakpoint when includeDesktop is set', () => {
+			expect(
+				getResponsiveMediaQueries(
+					{
+						mobile: '640px',
+						tablet: '960px',
+					},
+					{ includeDesktop: true }
+				)
+			).toEqual( {
+				'@mobile': '@media (width <= 640px)',
+				'@tablet': '@media (640px < width <= 960px)',
+				'@desktop': '@media (width > 960px)',
+			} );
+		} );
+	} );
+
+	describe( 'getViewportMediaQueries with includeDesktop', () => {
+		it( 'omits @desktop by default', () => {
+			expect( getViewportMediaQueries() ).not.toHaveProperty(
+				'@desktop'
+			);
+		} );
+
+		it( 'adds @desktop above the tablet breakpoint', () => {
+			expect(
+				getViewportMediaQueries(
+					{ mobile: '480px', tablet: '782px' },
+					{ includeDesktop: true }
+				)
+			).toEqual( {
+				'@mobile': '@media (width <= 480px)',
+				'@tablet': '@media (480px < width <= 782px)',
+				'@desktop': '@media (width > 782px)',
+			} );
+		} );
+
+		it( 'falls back to the mobile breakpoint when tablet is missing', () => {
+			expect(
+				getViewportMediaQueries(
+					{ mobile: '30em' },
+					{ includeDesktop: true }
+				)[ '@desktop' ]
+			).toBe( '@media (width > 30em)' );
+		} );
 	} );
 } );

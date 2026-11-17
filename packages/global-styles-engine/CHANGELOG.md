@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `getViewportMediaQueries` accepts an `includeDesktop` option that adds an `@desktop` media query, matching the PHP `include_desktop` option.
+
 ### Bug Fixes
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
