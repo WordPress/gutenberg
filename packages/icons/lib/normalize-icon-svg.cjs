@@ -173,6 +173,31 @@ function isPainted( value ) {
 }
 
 /**
+ * Tells whether a paint value carries an alpha channel, such as `#00000080`,
+ * `rgba( 0, 0, 0, 0.5 )` or `rgb( 0 0 0 / 50% )`.
+ *
+ * @param {string} value A `fill` or `stroke` value.
+ * @return {boolean} Whether it has an alpha channel.
+ */
+function hasAlpha( value ) {
+	const color = value.trim().toLowerCase();
+	if ( /^#([0-9a-f]{4}|[0-9a-f]{8})$/.test( color ) ) {
+		return true;
+	}
+	const match = color.match( /^([a-z]+)\((.*)\)$/ );
+	if ( ! match ) {
+		return false;
+	}
+	const [ , name, args ] = match;
+	return (
+		name === 'rgba' ||
+		name === 'hsla' ||
+		args.includes( '/' ) ||
+		args.split( ',' ).length === 4
+	);
+}
+
+/**
  * Explains why the root element cannot be normalized.
  *
  * @param {Object<string,string>} root The root element's attributes.
@@ -374,6 +399,17 @@ function normalizeIconSvg( source ) {
 		const stroke = attributes.stroke ?? rootStroke;
 		const isFilled = isPainted( fill );
 		const isStroked = isPainted( stroke );
+
+		for ( const [ key, value, painted ] of [
+			[ 'fill', fill, isFilled ],
+			[ 'stroke', stroke, isStroked ],
+		] ) {
+			if ( painted && hasAlpha( value ) ) {
+				problems.push(
+					`${ key }="${ value }" on <${ name }> (a library icon inherits the text color, so make the shape translucent with the opacity attribute instead)`
+				);
+			}
+		}
 
 		if ( isStroked ) {
 			const strokeWidth = attributes[ 'stroke-width' ] ?? rootStrokeWidth;

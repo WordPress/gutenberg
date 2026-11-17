@@ -128,6 +128,36 @@ describe( 'normalizeIconSvg', () => {
 			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19" stroke="#000" stroke-width="1.5" filter="url(#f)"/>\n</svg>',
 			error: 'filter',
 		},
+		{
+			name: 'a fill with an alpha channel in hex',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z" fill="#00000080"/>\n</svg>',
+			error: 'fill="#00000080"',
+		},
+		{
+			name: 'a fill with an alpha channel in short hex',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z" fill="#0008"/>\n</svg>',
+			error: 'fill="#0008"',
+		},
+		{
+			name: 'a stroke with an alpha channel in rgba()',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19" stroke="rgba(0, 0, 0, 0.5)" stroke-width="1.5"/>\n</svg>',
+			error: 'stroke="rgba(0, 0, 0, 0.5)"',
+		},
+		{
+			name: 'a fill with an alpha channel in hsla()',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z" fill="hsla(0, 0%, 0%, 0.5)"/>\n</svg>',
+			error: 'fill="hsla(0, 0%, 0%, 0.5)"',
+		},
+		{
+			name: 'a fill with an alpha channel in the slash syntax',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z" fill="rgb(0 0 0 / 50%)"/>\n</svg>',
+			error: 'fill="rgb(0 0 0 / 50%)"',
+		},
+		{
+			name: 'a fill with an alpha channel inherited from the root',
+			input: '<svg viewBox="0 0 24 24" fill="#00000080" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z"/>\n</svg>',
+			error: 'fill="#00000080"',
+		},
 	] )( 'refuses $name', ( { input, error } ) => {
 		expect( () => normalizeIconSvg( input ) ).toThrow( error );
 	} );
