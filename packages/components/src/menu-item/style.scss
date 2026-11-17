@@ -49,7 +49,7 @@
 		}
 	}
 
-	&[aria-disabled="true"] {
+	&[aria-disabled="true"]:not(.is-pressed) {
 		@media ( forced-colors: active ) {
 			// Unlike `:disabled`, `aria-disabled` gets no system disabled color.
 			color: GrayText !important;
