@@ -13,13 +13,9 @@
  * resolution for `getEntityRecords` and invalidates only the entries where
  * the first two arguments match `['postType', 'attachment']`.
  */
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
 import { useRegistry } from '@wordpress/data';
+import { invalidateAttachmentResolutions } from '../../utils/invalidate-attachment-resolutions';
 
 /**
  * Returns a stable callback that invalidates all cached `getEntityRecords`
@@ -29,22 +25,8 @@ import { useRegistry } from '@wordpress/data';
 export function useInvalidateAttachmentResolutions() {
 	const registry = useRegistry();
 
-	return useCallback( () => {
-		const resolvers = registry.select( coreStore ).getCachedResolvers();
-
-		// getCachedResolvers() is typed as Record<string, unknown> but the
-		// values are EquivalentKeyMap instances (Map-like). Cast the same
-		// way the resolvers-cache-middleware does internally.
-		const entityRecordResolutions = resolvers.getEntityRecords as
-			| Map< string[], { status: string } >
-			| undefined;
-
-		entityRecordResolutions?.forEach( ( _value, args ) => {
-			if ( args[ 0 ] === 'postType' && args[ 1 ] === 'attachment' ) {
-				registry
-					.dispatch( coreStore )
-					.invalidateResolution( 'getEntityRecords', args );
-			}
-		} );
-	}, [ registry ] );
+	return useCallback(
+		() => invalidateAttachmentResolutions( registry ),
+		[ registry ]
+	);
 }

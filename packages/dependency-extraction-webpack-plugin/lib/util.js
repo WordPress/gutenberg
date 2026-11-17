@@ -3,18 +3,26 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
-	'@wordpress/icons',
-	'@wordpress/interface',
-	'@wordpress/undo-manager',
 	'@wordpress/fields',
-	'@wordpress/views',
+	'@wordpress/global-styles-engine',
+	'@wordpress/global-styles-ui',
+	'@wordpress/grid',
+	'@wordpress/icons',
+	'@wordpress/image-editor',
+	'@wordpress/interface',
+	'@wordpress/kebab-case',
+	'@wordpress/react-inert-value',
+	'@wordpress/style-runtime',
+	'@wordpress/sync',
 	'@wordpress/ui',
+	'@wordpress/undo-manager',
+	'@wordpress/views',
 ];
 
 /**
  * Default request to global transformation
  *
- * Transform @wordpress dependencies:
+ * Transform `@wordpress/*` dependencies:
  * - request `@wordpress/api-fetch` becomes `[ 'wp', 'apiFetch' ]`
  * - request `@wordpress/i18n` becomes `[ 'wp', 'i18n' ]`
  *
@@ -41,6 +49,7 @@ function defaultRequestToExternal( request ) {
 			return 'React';
 
 		case 'react-dom':
+		case 'react-dom/client':
 			return 'ReactDOM';
 
 		case 'react/jsx-runtime':
@@ -67,7 +76,7 @@ function defaultRequestToExternal( request ) {
 /**
  * Default request to external module transformation
  *
- * Currently only @wordpress/interactivity and `@wordpress/interactivity-router`
+ * Currently only `@wordpress/interactivity` and `@wordpress/interactivity-router`
  * are supported.
  *
  * Do not use the boolean shorthand here, it's only handled for the
@@ -107,7 +116,7 @@ function defaultRequestToExternalModule( request ) {
 /**
  * Default request to WordPress script handle transformation
  *
- * Transform @wordpress dependencies:
+ * Transform `@wordpress/*` dependencies:
  * - request `@wordpress/i18n` becomes `wp-i18n`
  * - request `@wordpress/escape-html` becomes `wp-escape-html`
  *
@@ -122,6 +131,9 @@ function defaultRequestToHandle( request ) {
 
 		case 'lodash-es':
 			return 'lodash';
+
+		case 'react-dom/client':
+			return 'react-dom';
 
 		case 'react/jsx-runtime':
 			return 'react-jsx-runtime';

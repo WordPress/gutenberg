@@ -9,7 +9,7 @@ const isPackageInstalled = ( packageName ) => {
 		if ( require.resolve( packageName ) ) {
 			return true;
 		}
-	} catch ( error ) {}
+	} catch {}
 	return false;
 };
 

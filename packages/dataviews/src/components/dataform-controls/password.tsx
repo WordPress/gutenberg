@@ -1,16 +1,8 @@
-/**
- * WordPress dependencies
- */
-import {
-	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
-	Button,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
+import { InputLayout } from '@wordpress/ui';
 import { useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { seen, unseen } from '@wordpress/icons';
-/**
- * Internal dependencies
- */
 import ValidatedText from './utils/validated-input';
 import type { DataFormControlProps } from '../../types';
 
@@ -23,6 +15,7 @@ export default function Password< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const [ isVisible, setIsVisible ] = useState( false );
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const toggleVisibility = useCallback( () => {
 		setIsVisible( ( prev ) => ! prev );
@@ -39,7 +32,7 @@ export default function Password< Item >( {
 				validity,
 				type: isVisible ? 'text' : 'password',
 				suffix: (
-					<InputControlSuffixWrapper variant="control">
+					<InputLayout.Slot padding="minimal">
 						<Button
 							icon={ isVisible ? unseen : seen }
 							onClick={ toggleVisibility }
@@ -49,8 +42,10 @@ export default function Password< Item >( {
 									? __( 'Hide password' )
 									: __( 'Show password' )
 							}
+							disabled={ disabled }
+							accessibleWhenDisabled
 						/>
-					</InputControlSuffixWrapper>
+					</InputLayout.Slot>
 				),
 			} }
 		/>

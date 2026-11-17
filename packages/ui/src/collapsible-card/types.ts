@@ -37,6 +37,18 @@ export interface HeaderProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
+export interface HeaderDescriptionProps extends ComponentProps< 'div' > {
+	/**
+	 * Secondary content that describes the header trigger via
+	 * `aria-describedby`. Rendered visually but marked `aria-hidden`
+	 * so assistive technologies consume it only through the description
+	 * relationship, avoiding double announcements.
+	 *
+	 * Avoid interactive elements — the entire header is the toggle trigger.
+	 */
+	children?: ReactNode;
+}
+
 export interface ContentProps extends ComponentProps< 'div' > {
 	/**
 	 * The content to be rendered inside the collapsible content area.

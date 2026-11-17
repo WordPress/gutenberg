@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
-
-/**
- * Internal dependencies
- */
 import { useFocusControl } from '.';
 
 export default function useBlocksFocusControl( blocks ) {

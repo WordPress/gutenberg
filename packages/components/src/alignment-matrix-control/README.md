@@ -43,7 +43,7 @@ underlying `grid` widget.
 
 ### `onChange`
 
- - Type: `(newValue: AlignmentMatrixControlValue) => void`
+ - Type: `((newValue: AlignmentMatrixControlValue) => void)`
  - Required: No
 
 A function that receives the updated alignment value.

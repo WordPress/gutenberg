@@ -1,13 +1,6 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' ).promises;
-
 const path = require( 'path' );
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( './validate-config' );
 
 /**

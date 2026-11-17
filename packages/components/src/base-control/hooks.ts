@@ -1,12 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import BaseControl from '.';
 import type { BaseControlProps } from './types';
 
 /**
@@ -22,7 +14,7 @@ export function useBaseControlProps(
 	const { help, id: preferredId, ...restProps } = props;
 
 	const uniqueId = useInstanceId(
-		BaseControl,
+		useBaseControlProps,
 		'wp-components-base-control',
 		preferredId
 	);

@@ -1,15 +1,11 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../i18n-text-domain';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 6,
 	},
 } );
@@ -168,7 +164,6 @@ ruleTester.run( 'i18n-text-domain', rule, {
 		},
 		{
 			code: `__( 'Hello World' )`,
-			output: `__( 'Hello World' )`,
 			options: [ { allowedTextDomain: [ 'foo', 'bar' ] } ],
 			errors: [ { messageId: 'missing' } ],
 		},

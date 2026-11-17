@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 export interface MenuData {
@@ -63,13 +60,9 @@ export async function createNavigationMenu(
 	this: RequestUtils,
 	menuData: MenuData
 ) {
-	return this.rest( {
-		method: 'POST',
-		path: `/wp/v2/navigation/`,
-		data: {
-			status: 'publish',
-			...menuData,
-		},
+	return this.createRecord< NavigationMenu >( 'navigation', {
+		status: 'publish',
+		...menuData,
 	} );
 }
 

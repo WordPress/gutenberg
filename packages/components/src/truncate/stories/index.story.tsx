@@ -1,29 +1,22 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { Truncate } from '..';
 
 const meta: Meta< typeof Truncate > = {
 	component: Truncate,
-	title: 'Components/Typography/Truncate',
+	title: 'Components/@wordpress-components/Typography/Truncate',
 	id: 'components-truncate',
 	argTypes: {
 		children: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 		},
 	},

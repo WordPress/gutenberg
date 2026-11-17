@@ -1,0 +1,25 @@
+.spacer {
+	// Custom properties inherit by default. Reset them per Spacer so nested
+	// instances only use their own spacing props.
+	--wp-components-spacer-margin: initial;
+	--wp-components-spacer-margin-block-start: initial;
+	--wp-components-spacer-margin-block-end: initial;
+	--wp-components-spacer-margin-inline-start: initial;
+	--wp-components-spacer-margin-inline-end: initial;
+	--wp-components-spacer-padding: initial;
+	--wp-components-spacer-padding-block-start: initial;
+	--wp-components-spacer-padding-block-end: initial;
+	--wp-components-spacer-padding-inline-start: initial;
+	--wp-components-spacer-padding-inline-end: initial;
+
+	margin: var(--wp-components-spacer-margin);
+	margin-block-start: var(--wp-components-spacer-margin-block-start, var(--wp-components-spacer-margin));
+	margin-block-end: var(--wp-components-spacer-margin-block-end, var(--wp-components-spacer-margin));
+	margin-inline-start: var(--wp-components-spacer-margin-inline-start, var(--wp-components-spacer-margin));
+	margin-inline-end: var(--wp-components-spacer-margin-inline-end, var(--wp-components-spacer-margin));
+	padding: var(--wp-components-spacer-padding);
+	padding-block-start: var(--wp-components-spacer-padding-block-start, var(--wp-components-spacer-padding));
+	padding-block-end: var(--wp-components-spacer-padding-block-end, var(--wp-components-spacer-padding));
+	padding-inline-start: var(--wp-components-spacer-padding-inline-start, var(--wp-components-spacer-padding));
+	padding-inline-end: var(--wp-components-spacer-padding-inline-end, var(--wp-components-spacer-padding));
+}

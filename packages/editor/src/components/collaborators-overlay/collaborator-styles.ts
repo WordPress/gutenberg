@@ -34,14 +34,21 @@ export const BORDER_WIDTH_FOCUS_FALLBACK = '2px';
 // _colors.scss — $white
 export const WHITE = '#fff';
 
+// _colors.scss — $gray-900
+export const GRAY_900 = '#1e1e1e';
+
+// _font.scss — $font-size-small
+export const FONT_SIZE_SMALL = '12px';
+
 // _font.scss — $font-size-x-small
 export const FONT_SIZE_X_SMALL = '11px';
 
 // _font.scss — $font-size-medium
 export const FONT_SIZE_MEDIUM = '13px';
 
-// _font.scss — $font-weight-medium
-export const FONT_WEIGHT_MEDIUM = '499';
+// @wordpress/theme — --wpds-typography-font-weight-emphasis
+export const FONT_WEIGHT_EMPHASIS =
+	'var(--wpds-typography-font-weight-emphasis)';
 
 // _font.scss — $font-line-height-small
 export const FONT_LINE_HEIGHT_SMALL = '20px';

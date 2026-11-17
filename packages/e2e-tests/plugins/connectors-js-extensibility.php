@@ -4,13 +4,16 @@
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Author: Gutenberg Team
  *
- * Registers two custom-type connectors on the server:
+ * Registers three connectors on the server:
  *
  * 1. test_custom_service — also registered client-side via a script module using
  *    the merging strategy (two registerConnector calls with the same slug: one
  *    providing the render function, the other metadata).
  * 2. test_server_only_service — server-only, with no client-side render function,
  *    so it should not display a card in the UI.
+ * 3. test_api_key_with_custom_render — an api_key connector whose JS render
+ *    is registered before the default registrations run, used to verify that
+ *    a subsequent default registration does not replace an existing render.
  *
  * @package gutenberg-test-connectors-js-extensibility
  */
@@ -39,6 +42,19 @@ add_action(
 				'type'           => 'custom_service',
 				'authentication' => array(
 					'method' => 'none',
+				),
+			)
+		);
+
+		$registry->register(
+			'test_api_key_with_custom_render',
+			array(
+				'name'           => 'Test API Key With Custom Render',
+				'description'    => 'An api_key connector with a JS-registered custom render.',
+				'type'           => 'ai_provider',
+				'authentication' => array(
+					'method'      => 'api_key',
+					'settingName' => 'test_api_key_with_custom_render_key',
 				),
 			)
 		);

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { _n, sprintf } from '@wordpress/i18n';
 import {
 	__experimentalHStack as HStack,
@@ -9,10 +6,6 @@ import {
 } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 import type { FontFamily } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { FontLibraryContext } from './font-library/context';
 import { getFamilyPreviewStyle } from './font-library/utils/preview-styles';
 

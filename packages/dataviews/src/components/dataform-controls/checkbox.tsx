@@ -1,17 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { privateApis } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import { ValidatedCheckboxControl } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
-
-const { ValidatedCheckboxControl } = unlock( privateApis );
 
 export default function Checkbox< Item >( {
 	field,
@@ -22,6 +12,7 @@ export default function Checkbox< Item >( {
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, label, description, isValid } = field;
+	const disabled = field.isDisabled( { item: data, field } );
 
 	const onChangeControl = useCallback( () => {
 		onChange(
@@ -39,6 +30,7 @@ export default function Checkbox< Item >( {
 			help={ description }
 			checked={ getValue( { item: data } ) }
 			onChange={ onChangeControl }
+			disabled={ disabled }
 		/>
 	);
 }

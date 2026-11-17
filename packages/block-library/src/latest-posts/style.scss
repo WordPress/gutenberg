@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/breakpoints" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
 .wp-block-latest-posts {
@@ -21,7 +22,9 @@
 		}
 	}
 
-	&.is-grid {
+	// These rules no longer apply to blocks using layout support, but should
+	// be kept for backwards compatibility.
+	&.is-grid:not(.is-layout-grid) {
 		display: flex;
 		flex-wrap: wrap;
 
@@ -33,7 +36,7 @@
 
 	@include break-small {
 		@for $i from 2 through 6 {
-			&.columns-#{ $i } li {
+			&.columns-#{ $i }:not(.is-layout-grid) li {
 				width: calc((100% / #{$i}) - 1.25em + (1.25em / #{$i}));
 
 				&:nth-child(#{ $i }n) {
@@ -41,6 +44,13 @@
 				}
 			}
 		}
+	}
+}
+
+@media (max-width: $break-small) {
+	// Temporary specificity bump until "wp-container" layout specificity is revisited.
+	.wp-block-latest-posts-is-layout-grid[class*="columns-"]:not(.has-native-responsive-grid) {
+		grid-template-columns: 1fr;
 	}
 }
 

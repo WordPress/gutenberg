@@ -1,12 +1,17 @@
-import { RuleTester } from 'eslint';
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-unmerged-classname';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 2018,
-		ecmaFeatures: {
-			jsx: true,
+		parserOptions: {
+			ecmaFeatures: {
+				jsx: true,
+			},
 		},
 	},
 } );

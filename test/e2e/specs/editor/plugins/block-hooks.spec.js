@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	setCollaboration,
 } = require( '../../editor/collaboration/fixtures/collaboration-utils' );
@@ -45,6 +38,7 @@ test.describe( 'Block Hooks API', () => {
 	].forEach( ( { name, postType, blockType, createMethod } ) => {
 		test.describe( `Hooked blocks in ${ name } (blocks)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -87,7 +81,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -185,6 +179,7 @@ test.describe( 'Block Hooks API', () => {
 
 		test.describe( `Hooked blocks in ${ name } (classic)`, () => {
 			let postObject, containerPost;
+
 			test.beforeAll( async ( { requestUtils } ) => {
 				postObject = await requestUtils[ createMethod ]( {
 					title: name,
@@ -227,7 +222,7 @@ test.describe( 'Block Hooks API', () => {
 
 				await requestUtils.deleteAllPosts();
 				await requestUtils.deleteAllBlocks();
-				await setCollaboration( requestUtils, true );
+				await setCollaboration( requestUtils, false );
 			} );
 
 			test( `should insert hooked blocks into ${ name } on frontend`, async ( {
@@ -308,6 +303,7 @@ test.describe( 'Block Hooks API', () => {
 
 	test.describe( 'Hooked blocks in Navigation Menu', () => {
 		let postObject, containerPost;
+
 		test.beforeAll( async ( { requestUtils } ) => {
 			postObject = await requestUtils.createNavigationMenu( {
 				title: 'Navigation Menu',

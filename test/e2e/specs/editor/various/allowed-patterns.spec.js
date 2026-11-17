@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Allowed Patterns', () => {
@@ -32,7 +29,7 @@ test.describe( 'Allowed Patterns', () => {
 
 		await expect(
 			page
-				.getByRole( 'listbox', { name: 'Block patterns' } )
+				.getByRole( 'listbox', { name: 'Patterns' } )
 				.getByRole( 'option' )
 		).toHaveText( [
 			'Test: Single heading',
@@ -75,7 +72,7 @@ test.describe( 'Allowed Patterns', () => {
 
 			await expect(
 				page
-					.getByRole( 'listbox', { name: 'Block patterns' } )
+					.getByRole( 'listbox', { name: 'Patterns' } )
 					.getByRole( 'option' )
 			).toHaveText( [ 'Test: Single heading' ] );
 		} );

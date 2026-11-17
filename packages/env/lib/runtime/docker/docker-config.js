@@ -1,15 +1,8 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const { writeFile, mkdir } = require( 'fs' ).promises;
 const { existsSync } = require( 'fs' );
 const yaml = require( 'js-yaml' );
-
-/**
- * Internal dependencies
- */
 const { ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
@@ -102,6 +95,12 @@ RUN sed -i 's|deb.debian.org/debian buster|archive.debian.org/debian buster|g' /
 RUN sed -i 's|security.debian.org/debian-security buster/updates|archive.debian.org/debian-security buster/updates|g' /etc/apt/sources.list
 RUN sed -i '/buster-updates/d' /etc/apt/sources.list
 
+# bullseye (https://www.debian.org/News/2026/20260831)
+RUN sed -i 's|deb.debian.org/debian bullseye|archive.debian.org/debian bullseye|g' /etc/apt/sources.list
+RUN sed -i 's|security.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
+RUN sed -i 's|deb.debian.org/debian-security bullseye-security|archive.debian.org/debian-security bullseye-security|g' /etc/apt/sources.list
+RUN sed -i '/bullseye-updates/d' /etc/apt/sources.list
+
 # Create the host's user so that we can match ownership in the container.
 ARG HOST_USERNAME
 ARG HOST_UID
@@ -111,7 +110,8 @@ RUN groupadd -o -g $HOST_GID $HOST_USERNAME || true
 RUN useradd -mlo -u $HOST_UID -g $HOST_GID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
-${ installDependencies( 'wordpress', env, config ) }`;
+${ installDependencies( 'wordpress', env, config ) }
+${ getLoopbackPortConfig( config.env[ env ].port ) }`;
 }
 
 /**
@@ -193,7 +193,21 @@ RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
-RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
+RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+# The MariaDB 11.4+ client requires TLS by default, which MariaDB servers
+# before 11.4 do not offer, so every \`wp db\` command fails against them. WP-CLI
+# runs the client with --no-defaults, which ignores option files, so wrap each
+# client to skip server certificate verification instead, which lets it fall
+# back to an unencrypted connection when the server has no TLS. This is the same
+# flag WP-CLI adds from db-command 3.0, so these wrappers can be removed once a
+# WP-CLI release with it is in the image. --no-defaults has to stay the first
+# argument.
+RUN for bin in mariadb mariadb-check mariadb-dump mysql mysqlcheck mysqldump; do \\
+	[ -x /usr/bin/$bin ] || continue; \\
+	printf '#!/bin/sh\\nif [ "$1" = "--no-defaults" ]; then\\n\\tshift\\n\\texec /usr/bin/%s --no-defaults --skip-ssl-verify-server-cert "$@"\\nfi\\nexec /usr/bin/%s --skip-ssl-verify-server-cert "$@"\\n' "$bin" "$bin" > /usr/local/bin/$bin; \\
+	chmod +x /usr/local/bin/$bin; \\
+done`;
 			break;
 		}
 		default: {
@@ -331,7 +345,40 @@ RUN echo 'spx.data_dir="/tmp/spx"' >> /usr/local/etc/php/php.ini
 RUN mkdir -p /tmp/spx && chmod 777 /tmp/spx`;
 }
 
+/**
+ * Generates Dockerfile RUN steps that make Apache also listen on the
+ * host-mapped wp-env port, so PHP loopback requests inside the container
+ * (WP-Cron, REST API loopback, Site Health) can reach WordPress at
+ * WP_HOME = http://localhost:<port>.
+ *
+ * @see https://github.com/WordPress/gutenberg/issues/20569
+ * @see https://github.com/docker-library/wordpress/issues/611#issuecomment-1378316911
+ *
+ * @param {number} port The host-side port wp-env exposes WordPress on.
+ * @return {string} The Dockerfile fragment, or '' when no change is needed.
+ */
+function getLoopbackPortConfig( port ) {
+	// Apache already listens on 80 by default and wp-env never
+	// configures SSL, so 80 and 443 are no-ops. Mirrors the same
+	// short-circuit in lib/config/add-or-replace-port.js.
+	if ( port === 80 || port === 443 ) {
+		return '';
+	}
+
+	return `
+# Make Apache listen on the wp-env-mapped port in addition to 80 so
+# PHP loopback requests (WP-Cron, REST API, Site Health) inside the
+# container reach WordPress at WP_HOME = http://localhost:${ port }.
+# See https://github.com/WordPress/gutenberg/issues/20569
+RUN echo 'Listen ${ port }' >> /etc/apache2/ports.conf
+RUN sed -i 's|<VirtualHost \\*:80>|<VirtualHost *:80 *:${ port }>|' /etc/apache2/sites-enabled/000-default.conf`;
+}
+
 module.exports = {
 	writeDockerFiles,
 	ensureDockerInitialized,
+	// Exported for testing.
+	wordpressDockerFileContents,
+	cliDockerFileContents,
+	getLoopbackPortConfig,
 };

@@ -1,0 +1,66 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as UsageGuidelinesStories from './usage-guidelines.story';
+
+<Meta of={ UsageGuidelinesStories } />
+
+# Dialog usage guidelines
+
+**When should something be shown in a [Dialog](?path=/docs/design-system-components-dialog--docs) vs. a [Drawer](?path=/docs/design-system-components-drawer--docs)?**
+
+Both patterns interrupt the primary workflow, but they signal different expectations about context, scope, and how long the user will stay in the overlay.
+
+## Use a `Dialog` (or `AlertDialog`) when
+
+### The task can be opened from multiple places
+
+Choose a `Dialog` when the same flow is reachable from several entry points and the user does not need much of the surrounding page to complete it.
+
+Examples in WordPress:
+
+-   **Draft a page** — the same flow can open from a navigation menu block, the Pages list, or other surfaces.
+-   **Command palette** — global, context-light navigation and actions.
+-   **Media Library** when adding an image — a reusable picker that does not depend on one specific screen.
+
+<Canvas of={ UsageGuidelinesStories.DialogForFocusedTask } />
+
+### The overlay is a deliberate interruption
+
+A `Dialog` is appropriate for focused, specific tasks that pause the current workflow and require the user to make a decision or acknowledge critical information.
+
+For destructive or irreversible actions, prefer [AlertDialog](?path=/docs/design-system-components-alertdialog--docs) so dismissal behavior and button emphasis match the severity of the action.
+
+<Canvas of={ UsageGuidelinesStories.AlertDialogForDeliberateInterruption } />
+
+### There is one decision or one primary action
+
+A `Dialog` works best when the user can answer a single question or complete one focused task:
+
+-   Add a tax rate
+-   Add an image
+-   Remove a customer
+
+Include a prominent and clear call to action so the expected next step is obvious.
+
+### Content is short enough to scan without scrolling
+
+In most cases, `Dialog` content should fit comfortably in the viewport. Longer flows with many fields, sections, or drill-down steps are usually better suited to a `Drawer`.
+
+### Do not nest dialogs
+
+Avoid launching one `Dialog` from another. If a flow needs additional steps, prefer a single `Dialog` with clearer content, or move the longer flow into a `Drawer`.
+
+## Use a `Drawer` when
+
+### The user is editing something on the current page
+
+A `Drawer` fits contextual work where it helps to keep the underlying page visible — or at least mentally available — while editing details of an item already on screen.
+
+<Canvas of={ UsageGuidelinesStories.DrawerForContextualEditing } />
+
+### There are multiple fields or sections
+
+When the overlay becomes a small parallel workspace with several inputs, tabs, or collapsible sections, a `Drawer` usually scales better than a `Dialog`.
+
+### The flow may drill down
+
+A `Drawer` can grow into multi-step or multi-section experiences without feeling cramped. Collapsible sections, tabs, and nested panels are common `Drawer` patterns.

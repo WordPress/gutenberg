@@ -1,6 +1,0 @@
-rootProject.name = 'gutenberg'
-
-includeBuild("../../react-native-bridge/android")
-
-include ':app'
-includeBuild('../../../node_modules/@react-native/gradle-plugin')

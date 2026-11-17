@@ -1,17 +1,11 @@
-/* eslint-env jest */
-
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule, { ALLOWLIST, DENYLIST } from '../use-recommended-components';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		sourceType: 'module',
 		ecmaVersion: 6,
 	},
@@ -29,8 +23,29 @@ ruleTester.run( 'use-recommended-components', rule, {
 
 		// Allowed @wordpress/ui components.
 		"import { Badge } from '@wordpress/ui';",
-		"import { Stack } from '@wordpress/ui';",
-		"import { Badge, Stack } from '@wordpress/ui';",
+
+		// "Use with caution" components are allowed when opted in.
+		{
+			code: "import { Button, Dialog } from '@wordpress/ui';",
+			options: [ { allowUseWithCaution: true } ],
+		},
+
+		// Unlocked private APIs are only checked for denied names.
+		"import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { SomethingElse } = unlock( privateApis );",
+		`
+			import { privateApis } from '@wordpress/components';
+			import { unlock } from '../../lock-unlock';
+
+			function test() {
+				function unlock( value ) {
+					return value;
+				}
+
+				const { Tabs } = unlock( privateApis );
+
+				return Tabs;
+			}
+		`,
 	],
 
 	invalid: [
@@ -57,13 +72,43 @@ ruleTester.run( 'use-recommended-components', rule, {
 				},
 			],
 		},
+		// "Use with caution" components are flagged unless opted in.
+		{
+			code: "import { Button } from '@wordpress/ui';",
+			errors: [
+				{
+					message:
+						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+			],
+		},
+		{
+			code: "import { Button } from '@wordpress/ui';",
+			options: [ { allowUseWithCaution: false } ],
+			errors: [
+				{
+					message:
+						'`Button` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+			],
+		},
+		// Opting in to "Use with caution" does not allow other components.
+		{
+			code: "import { Button, SomeComponent } from '@wordpress/ui';",
+			options: [ { allowUseWithCaution: true } ],
+			errors: [
+				{
+					message:
+						'`SomeComponent` from `@wordpress/ui` is not yet recommended for use in a WordPress environment.',
+				},
+			],
+		},
 		// Denylist: denied components are flagged with their message.
 		{
 			code: "import { __experimentalZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+					message: 'Write your own CSS instead.',
 				},
 			],
 		},
@@ -71,8 +116,23 @@ ruleTester.run( 'use-recommended-components', rule, {
 			code: "import { __experimentalZStack as ZStack } from '@wordpress/components';",
 			errors: [
 				{
-					message:
-						'__experimentalZStack is planned for deprecation. Write your own CSS instead.',
+					message: 'Write your own CSS instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs } = unlock( privateApis );",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
+				},
+			],
+		},
+		{
+			code: "import { privateApis as componentsPrivateApis } from '@wordpress/components'; import { unlock } from '../../lock-unlock'; const { Tabs: WCTabs } = unlock( componentsPrivateApis );",
+			errors: [
+				{
+					message: 'Use `Tabs` from `@wordpress/ui` instead.',
 				},
 			],
 		},
@@ -87,5 +147,13 @@ describe( 'ALLOWLIST and DENYLIST', () => {
 			denylistPackages.includes( pkg )
 		);
 		expect( overlap ).toEqual( [] );
+	} );
+
+	it( 'should not list a component as both allowed and "Use with caution"', () => {
+		Object.values( ALLOWLIST ).forEach( ( { allowed, caution = [] } ) => {
+			expect(
+				caution.filter( ( name ) => allowed.includes( name ) )
+			).toEqual( [] );
+		} );
 	} );
 } );

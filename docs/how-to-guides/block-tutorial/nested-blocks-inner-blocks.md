@@ -71,7 +71,9 @@ By default `InnerBlocks` opens a list of permitted blocks via `allowedBlocks` wh
 />
 ```
 
-This behavior is disabled until the `directInsert` prop is set to `true`. This allows you to specify conditions for when the default block should or should not be inserted.
+Set `directInsert` to `true` to force the appender to insert the `defaultBlock` immediately, bypassing the inserter dropdown, including any registered inserter variations of that block type. Leave it unset (or `false`) to let the appender open the inserter so users can pick a variation.
+
+Note: redundant when `allowedBlocks` resolves to a single block type with no variations, the appender already inserts directly.
 
 ## Template
 
@@ -275,7 +277,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 		return (
 			<div {...innerBlocksProps}>
     			{ children }
-				<!-- Insert any arbitrary html here at the same level as the children -->
+				{/* Insert any arbitrary html here at the same level as the children */}
 			</div>
 		);
 	},

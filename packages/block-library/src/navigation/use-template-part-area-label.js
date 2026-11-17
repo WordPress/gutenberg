@@ -1,14 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-
 // TODO: this util should perhaps be refactored somewhere like core-data.
 import { createTemplatePartId } from '../template-part/edit/utils/create-template-part-id';
 import { getTemplatePartIcon } from '../template-part/edit/utils/get-template-part-icon';

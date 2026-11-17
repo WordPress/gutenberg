@@ -1,4 +1,16 @@
-export const editorStyles = [
+// Base styles for the content rendered within the BlockCanvas iframe.
+import componentsStyles from '@wordpress/components/build-style/style.css?raw';
+import componentsStylesRtl from '@wordpress/components/build-style/style-rtl.css?raw';
+import blockEditorContentStyles from '@wordpress/block-editor/build-style/content.css?raw';
+import blockEditorContentStylesRtl from '@wordpress/block-editor/build-style/content-rtl.css?raw';
+import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
+import blockLibraryStylesRtl from '@wordpress/block-library/build-style/style-rtl.css?raw';
+import blockLibraryThemeStyles from '@wordpress/block-library/build-style/theme.css?raw';
+import blockLibraryThemeStylesRtl from '@wordpress/block-library/build-style/theme-rtl.css?raw';
+import blockLibraryEditorStyles from '@wordpress/block-library/build-style/editor.css?raw';
+import blockLibraryEditorStylesRtl from '@wordpress/block-library/build-style/editor-rtl.css?raw';
+
+const editorStyles = [
 	{
 		css: `
         body {
@@ -49,3 +61,25 @@ export const editorStyles = [
         `,
 	},
 ];
+
+/**
+ * Styles to pass to `BlockCanvas`, keyed by the Storybook text direction.
+ */
+export const contentStyles = {
+	ltr: [
+		{ css: componentsStyles },
+		{ css: blockLibraryStyles },
+		{ css: blockEditorContentStyles },
+		{ css: blockLibraryThemeStyles },
+		{ css: blockLibraryEditorStyles },
+		...editorStyles,
+	],
+	rtl: [
+		{ css: componentsStylesRtl },
+		{ css: blockLibraryStylesRtl },
+		{ css: blockEditorContentStylesRtl },
+		{ css: blockLibraryThemeStylesRtl },
+		{ css: blockLibraryEditorStylesRtl },
+		...editorStyles,
+	],
+};

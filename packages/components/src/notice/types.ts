@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { MouseEventHandler, ReactNode } from 'react';
 
 export type NoticeAction = {
@@ -53,8 +50,7 @@ export type NoticeProps = {
 	/**
 	 * Determines the color of the notice: `warning` (yellow),
 	 * `success` (green), `error` (red), or `'info'`.
-	 * By default `'info'` will be blue, but if there is a parent Theme component
-	 * with an accent color prop, the notice will take on that color instead.
+	 * By default `'info'` will be blue.
 	 *
 	 * @default 'info'
 	 */

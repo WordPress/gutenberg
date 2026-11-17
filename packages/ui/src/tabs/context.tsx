@@ -2,10 +2,11 @@ import {
 	createContext,
 	useContext,
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
-	useEffect,
 } from '@wordpress/element';
+import { useScheduleValidation } from '../utils/use-schedule-validation';
 
 type TabsValidationContextType = {
 	registerTab: () => () => void;
@@ -77,33 +78,20 @@ function TabsValidationProviderDev( {
 } ) {
 	const tabCountRef = useRef( 0 );
 	const panelCountRef = useRef( 0 );
-	const validationScheduledRef = useRef< ReturnType<
-		typeof setTimeout
-	> | null >( null );
 
-	const scheduleValidation = useCallback( () => {
-		if ( validationScheduledRef.current ) {
-			clearTimeout( validationScheduledRef.current );
+	const scheduleValidation = useScheduleValidation( () => {
+		const tabCount = tabCountRef.current;
+		const panelCount = panelCountRef.current;
+
+		if ( tabCount !== panelCount ) {
+			throw new Error(
+				`Tabs: Tab/Panel count mismatch (${ tabCount } Tabs, ${ panelCount } Panels). ` +
+					`Each Tab must be associated with exactly one Panel. ` +
+					`Mismatched or missing associations can break screen reader navigation ` +
+					`and violate WAI-ARIA Tabs pattern requirements.`
+			);
 		}
-
-		// Schedule validation for the next tick to allow all
-		// registrations/unregistrations to complete.
-		validationScheduledRef.current = setTimeout( () => {
-			const tabCount = tabCountRef.current;
-			const panelCount = panelCountRef.current;
-
-			if ( tabCount !== panelCount ) {
-				throw new Error(
-					`Tabs: Tab/Panel count mismatch (${ tabCount } Tabs, ${ panelCount } Panels). ` +
-						`Each Tab must be associated with exactly one Panel. ` +
-						`Mismatched or missing associations can break screen reader navigation ` +
-						`and violate WAI-ARIA Tabs pattern requirements.`
-				);
-			}
-
-			validationScheduledRef.current = null;
-		}, 0 );
-	}, [] );
+	} );
 
 	const registerTab = useCallback( () => {
 		tabCountRef.current += 1;
@@ -124,14 +112,6 @@ function TabsValidationProviderDev( {
 			scheduleValidation();
 		};
 	}, [ scheduleValidation ] );
-
-	useEffect( () => {
-		return () => {
-			if ( validationScheduledRef.current ) {
-				clearTimeout( validationScheduledRef.current );
-			}
-		};
-	}, [] );
 
 	const contextValue = useMemo(
 		() => ( {

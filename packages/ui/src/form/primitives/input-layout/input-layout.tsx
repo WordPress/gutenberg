@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { Children, forwardRef } from '@wordpress/element';
+import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import resetStyles from '../../../utils/css/resets.module.css';
 import styles from './style.module.css';
 import type { InputLayoutProps } from './types';
@@ -9,7 +10,7 @@ import type { InputLayoutProps } from './types';
  * including disabled states and standard prefix/suffix slots.
  */
 export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
-	function InputLayout(
+	function UnforwardedInputLayout(
 		{
 			className,
 			children,
@@ -26,6 +27,7 @@ export const InputLayout = forwardRef< HTMLDivElement, InputLayoutProps >(
 			<div
 				ref={ ref }
 				className={ clsx(
+					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],
 					styles[ 'input-layout' ],
 					styles[ `is-size-${ size }` ],

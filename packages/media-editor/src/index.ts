@@ -13,3 +13,6 @@ export type { MediaFormProps } from './components/media-form';
 
 // Re-export commonly used dataviews types for convenience
 export type { Field, Form } from '@wordpress/dataviews';
+
+// Private APIs (experimental — not for use outside of core packages).
+export { privateApis } from './private-apis';

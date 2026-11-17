@@ -7,7 +7,38 @@ import type { LinkProps } from '../link/types';
 
 export type NoticeIntent = 'warning' | 'success' | 'error' | 'info' | 'neutral';
 
+export interface ListProps extends ComponentProps< 'div' > {
+	/**
+	 * Where to render the live regions. Defaults to the list itself. Use a
+	 * container outside the app, such as its document body, for notifications
+	 * that should still be announced when a modal hides the app. An explicit
+	 * spokenMessage can announce through aria-hidden ancestors. Notices inside
+	 * an HTML hidden subtree and notices with politeness="off" stay silent.
+	 */
+	liveRegionContainer?: HTMLElement | null;
+	/**
+	 * Notices to display. Keep the list mounted when there are no notices.
+	 */
+	children?: ReactNode;
+}
+
 export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
+	/**
+	 * Announcement urgency inside `Notice.List`, independent of visual intent.
+	 * Use `assertive` for time-sensitive updates or `off` to skip announcements.
+	 * Has no effect outside a list.
+	 *
+	 * @default 'polite'
+	 */
+	politeness?: 'polite' | 'assertive' | 'off';
+
+	/**
+	 * Message announced inside `Notice.List`. Defaults to the plaintext title and
+	 * description, excluding actions. Use `politeness="off"` to skip announcements.
+	 * Has no effect outside a list.
+	 */
+	spokenMessage?: string;
+
 	/**
 	 * The semantic intent of the notice, communicating its meaning through color.
 	 * Available intents: neutral, info, warning, success, and error.
@@ -27,18 +58,6 @@ export interface RootProps extends Omit< ComponentProps< 'div' >, 'title' > {
 	 * The content to be rendered inside the notice.
 	 */
 	children?: ReactNode;
-
-	/**
-	 * The message to be announced to screen readers. Defaults to the children content.
-	 * Used by the `speak()` function from `@wordpress/a11y`.
-	 */
-	spokenMessage?: ReactNode;
-
-	/**
-	 * The politeness level for screen reader announcements.
-	 * Defaults to 'assertive' for error intent, 'polite' for others.
-	 */
-	politeness?: 'polite' | 'assertive';
 }
 
 export interface TitleProps extends ComponentProps< 'span' > {
@@ -62,17 +81,16 @@ export interface ActionsProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
-export interface CloseIconProps
-	extends Omit<
-		IconButtonProps,
-		| 'loading'
-		| 'loadingAnnouncement'
-		| 'variant'
-		| 'size'
-		| 'tone'
-		| 'label'
-		| 'icon'
-	> {
+export interface CloseIconButtonProps extends Omit<
+	IconButtonProps,
+	| 'loading'
+	| 'loadingAnnouncement'
+	| 'variant'
+	| 'size'
+	| 'tone'
+	| 'label'
+	| 'icon'
+> {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.
@@ -85,8 +103,10 @@ export interface CloseIconProps
 	icon?: IconButtonProps[ 'icon' ];
 }
 
-export interface ActionButtonProps
-	extends Omit< ButtonProps, 'size' | 'tone' > {
+export interface ActionButtonProps extends Omit<
+	ButtonProps,
+	'size' | 'tone'
+> {
 	/**
 	 * The content to be rendered inside the component.
 	 */

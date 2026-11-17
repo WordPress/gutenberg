@@ -1,0 +1,42 @@
+{
+	"wpds-motion": {
+		"duration": {
+			"$type": "duration",
+			"xs": {
+				"$value": { "value": 50, "unit": "ms" },
+				"$description": "Micro-delays and transition offsets"
+			},
+			"sm": {
+				"$value": { "value": 100, "unit": "ms" },
+				"$description": "Micro-interactions like focus rings and state changes"
+			},
+			"md": {
+				"$value": { "value": 200, "unit": "ms" },
+				"$description": "Standard transitions like menus and popovers"
+			},
+			"lg": {
+				"$value": { "value": 300, "unit": "ms" },
+				"$description": "Deliberate animations like slides and reveals"
+			},
+			"xl": {
+				"$value": { "value": 400, "unit": "ms" },
+				"$description": "Extended animations like complex or multi-step transitions"
+			}
+		},
+		"easing": {
+			"$type": "cubicBezier",
+			"subtle": {
+				"$value": [ 0.15, 0, 0.15, 1 ],
+				"$description": "Nearly imperceptible easing for hover, color, and background transitions"
+			},
+			"balanced": {
+				"$value": [ 0.4, 0, 0.2, 1 ],
+				"$description": "General-purpose easing for on-screen movement like resizing, morphing, and layout shifts"
+			},
+			"expressive": {
+				"$value": [ 0.25, 0, 0, 1 ],
+				"$description": "Noticeable easing for enter/exit and spatial transitions like menus, popovers, dialogs, and drawers"
+			}
+		}
+	}
+}

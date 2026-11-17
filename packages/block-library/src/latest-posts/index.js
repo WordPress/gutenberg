@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { postList as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';

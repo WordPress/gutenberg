@@ -1,18 +1,17 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import typescriptParser from '@typescript-eslint/parser';
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../no-dom-globals-in-constructor';
 
+const RuleTester = configureRuleTester( { describe, it } );
+
 const ruleTester = new RuleTester( {
-	parserOptions: {
+	languageOptions: {
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 
@@ -57,11 +56,13 @@ ruleTester.run( 'no-dom-globals-in-constructor', rule, {
 
 // TypeScript-specific tests for shouldSkipReference.
 const tsRuleTester = new RuleTester( {
-	parser: require.resolve( '@typescript-eslint/parser' ),
-	parserOptions: {
+	languageOptions: {
+		parser: typescriptParser,
 		ecmaVersion: 2020,
 		sourceType: 'module',
-		ecmaFeatures: { jsx: true },
+		parserOptions: {
+			ecmaFeatures: { jsx: true },
+		},
 	},
 } );
 
