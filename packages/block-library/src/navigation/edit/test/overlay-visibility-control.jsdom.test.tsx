@@ -58,12 +58,13 @@ async function getOptionLabels() {
 }
 
 describe( 'OverlayVisibilityControl', () => {
+	// Loading the component and its dependencies can take several seconds.
 	beforeAll( async () => {
 		const { default: Control } = await vi.importActual< {
 			default: typeof OverlayVisibilityControl;
 		} >( '../overlay-visibility-control' );
 		OverlayVisibilityControl = Control;
-	} );
+	}, 30000 );
 
 	beforeEach( () => {
 		vi.clearAllMocks();
