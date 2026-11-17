@@ -473,7 +473,7 @@ test.describe( 'Registered sources', () => {
 				);
 			} );
 
-			test( 'accordion heading', async ( { editor } ) => {
+			test( 'accordion heading', async ( { editor, page } ) => {
 				await insertAccordionWithHeading( editor, {
 					title: 'accordion heading default title',
 					metadata: {
@@ -488,6 +488,17 @@ test.describe( 'Registered sources', () => {
 				const accordionTitle = editor.canvas.getByRole( 'textbox', {
 					name: 'Accordion title',
 				} );
+				await accordionTitle.click();
+
+				const blockToolbar = page.getByRole( 'toolbar', {
+					name: 'Block tools',
+				} );
+				await expect( blockToolbar ).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Bold' } )
+				).toBeHidden();
 
 				// Accordion heading title is not editable.
 				await expect( accordionTitle ).toHaveText( 'Text Field Value' );
