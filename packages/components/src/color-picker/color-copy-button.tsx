@@ -19,33 +19,28 @@ const RESULT_ICON = {
 export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 	const { color, colorType } = props;
 
-	const [ { result, attempt }, setFeedback ] = useState< {
+	// Bump the id on every result so a repeat of the same outcome restarts
+	// the time the icon stays visible.
+	const [ feedback, setFeedback ] = useState< {
 		result: CopyResult;
-		attempt: number;
-	} >( { result: 'idle', attempt: 0 } );
+		id: number;
+	} >( { result: 'idle', id: 0 } );
 
 	useEffect( () => {
-		if ( result === 'idle' ) {
+		if ( feedback.result === 'idle' ) {
 			return;
 		}
 		const timeoutId = setTimeout(
-			() =>
-				setFeedback( ( current ) => ( {
-					...current,
-					result: 'idle',
-				} ) ),
+			() => setFeedback( { result: 'idle', id: 0 } ),
 			FEEDBACK_TIMEOUT
 		);
 		return () => clearTimeout( timeoutId );
-	}, [ result, attempt ] );
+	}, [ feedback ] );
 
-	function report(
-		nextResult: Exclude< CopyResult, 'idle' >,
-		message: string
-	) {
+	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
 		setFeedback( ( current ) => ( {
-			result: nextResult,
-			attempt: current.attempt + 1,
+			result,
+			id: current.id + 1,
 		} ) );
 		speak( message );
 	}
@@ -73,7 +68,7 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 		<IconButton
 			ref={ copyRef }
 			label={ __( 'Copy' ) }
-			icon={ RESULT_ICON[ result ] }
+			icon={ RESULT_ICON[ feedback.result ] }
 			variant="minimal"
 			tone="neutral"
 			size="compact"
