@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { normalizeBorderStyle } from '../screen-block';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
 
@@ -324,5 +325,82 @@ describe( 'getOverridingBlockTypes', () => {
 				[ 'core/button' ]
 			)
 		).toEqual( [] );
+	} );
+} );
+
+describe( 'normalizeBorderStyle', () => {
+	it( 'returns the style unchanged when no border is present', () => {
+		const style = { color: { text: '#000' } };
+		expect( normalizeBorderStyle( style ) ).toBe( style );
+	} );
+
+	it( 'expands a flat border into split sides and applies a fallback solid style', () => {
+		expect(
+			normalizeBorderStyle( {
+				border: {
+					color: 'currentColor',
+					width: '2px',
+					radius: '4px',
+				},
+			} )
+		).toEqual( {
+			border: {
+				top: { color: 'currentColor', width: '2px', style: 'solid' },
+				right: { color: 'currentColor', width: '2px', style: 'solid' },
+				bottom: { color: 'currentColor', width: '2px', style: 'solid' },
+				left: { color: 'currentColor', width: '2px', style: 'solid' },
+				radius: '4px',
+			},
+		} );
+	} );
+
+	it( 'normalizes split borders without adding null shorthand properties', () => {
+		const result = normalizeBorderStyle( {
+			border: {
+				top: { color: 'currentColor', style: 'solid', width: '0' },
+				right: { color: 'currentColor', style: 'solid', width: '0' },
+				bottom: { color: 'currentColor', style: 'solid', width: '0' },
+				left: { color: 'currentColor', width: '4px' },
+				radius: '4px',
+			},
+		} );
+
+		expect( result ).toEqual( {
+			border: {
+				top: { color: 'currentColor', style: 'solid', width: '0' },
+				right: { color: 'currentColor', style: 'solid', width: '0' },
+				bottom: { color: 'currentColor', style: 'solid', width: '0' },
+				left: { color: 'currentColor', style: 'solid', width: '4px' },
+				radius: '4px',
+			},
+		} );
+		expect( result.border ).not.toHaveProperty( 'color' );
+		expect( result.border ).not.toHaveProperty( 'style' );
+		expect( result.border ).not.toHaveProperty( 'width' );
+	} );
+
+	it( 'clears a side whose border has a style without color or width', () => {
+		expect(
+			normalizeBorderStyle( {
+				border: {
+					top: { style: 'solid' },
+					right: undefined,
+					bottom: undefined,
+					left: {
+						color: 'currentColor',
+						style: 'solid',
+						width: '4px',
+					},
+				},
+			} )
+		).toEqual( {
+			border: {
+				top: undefined,
+				right: undefined,
+				bottom: undefined,
+				left: { color: 'currentColor', style: 'solid', width: '4px' },
+				radius: undefined,
+			},
+		} );
 	} );
 } );

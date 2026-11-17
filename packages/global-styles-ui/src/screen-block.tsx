@@ -100,12 +100,7 @@ export function normalizeBorderStyle( newStyle: any ) {
 				bottom: border,
 				left: border,
 			}
-		: {
-				color: null,
-				style: null,
-				width: null,
-				...border,
-			};
+		: border;
 
 	return { ...newStyle, border: { ...updatedBorder, radius } };
 }
