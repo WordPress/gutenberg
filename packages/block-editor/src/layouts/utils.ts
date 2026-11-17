@@ -1,6 +1,29 @@
 import { __, sprintf } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import type { AlignmentsInfo, Layout, LayoutDefinition } from './types';
+import type {
+	AlignmentsInfo,
+	Layout,
+	LayoutBlockSupport,
+	LayoutDefinition,
+} from './types';
+
+/**
+ * Returns a block's layout support settings, including the legacy support key.
+ *
+ * @param blockName The block type name.
+ * @return The layout support settings, if available.
+ */
+export function getLayoutBlockSupport(
+	blockName: string | null | undefined
+): LayoutBlockSupport | undefined {
+	if ( ! blockName ) {
+		return;
+	}
+	return ( getBlockSupport( blockName, 'layout' ) ||
+		getBlockSupport( blockName, '__experimentalLayout' ) ) as
+		LayoutBlockSupport | undefined;
+}
 
 /**
  * Utility to generate the proper CSS selector for layout styles.
