@@ -67,7 +67,7 @@ npm does not link skills from dependencies yet. Use the community [`skills` CLI]
 ```bash
 npm install @wordpress/ui @wordpress/theme
 npm install --save-dev skills
-npx skills experimental_sync -y
+npm exec --no -- skills experimental_sync -y
 ```
 
 To keep the links current, add the sync to a `prepare` script in your `package.json`:

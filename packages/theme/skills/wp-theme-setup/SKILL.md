@@ -7,7 +7,7 @@ description: Use when setting up WordPress Design System tokens in a project: in
 
 This skill ships with the `@wordpress/theme` package and matches the installed version. To choose tokens once the project is set up, use the `wp-theme` skill.
 
-Inspect the project first. Run `node scripts/inspect-project.mjs`, with the path relative to this skill's directory, and read the JSON it prints. It only reads files. It reports the package manager, Node.js, ESLint and Stylelint versions and config, the bundler, the installed WordPress packages, and which setup steps already look done. It searches config files as text, so confirm any step reported as `false` or `null` before you edit. Change only what is missing, and do not duplicate setup that already exists.
+Inspect the project first: its package manager, its bundler (PostCSS, Lightning CSS, esbuild, Vite or `@wordpress/build`), and its Stylelint and ESLint configuration. Change only what is missing, and do not duplicate setup that already exists.
 
 ## 1. Install and load the tokens
 

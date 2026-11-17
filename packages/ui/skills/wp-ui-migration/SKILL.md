@@ -16,9 +16,11 @@ This skill ships with the `@wordpress/ui` package and matches the installed vers
 
 ## 2. Take an inventory with ESLint
 
+Run the project's installed tools, and never a bare `npx`, which downloads a package that is not installed and does not ask first in a non-interactive shell. The commands below use npm. With pnpm, use `pnpm exec eslint`, and with Yarn, use `yarn eslint`.
+
 This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it. Use ESLint's JSON output as the source of the inventory, and do not search the code by hand.
 
--   Run `npx eslint . --format json --output-file eslint-report.json`, limited to the source directories if the project is large. Read the report, and do not commit it.
+-   Run the project's installed ESLint, for example `npm exec --no -- eslint . --format json --output-file eslint-report.json`, limited to the source directories if the project is large. Read the report, and do not commit it.
 -   Keep only the messages with the `ruleId` `@wordpress/use-recommended-components`. Each has the `filePath`, `line` and `column` of the import, and a `message` that says what to use instead.
 -   Group the messages by the imported component and count them. Some messages do not name the component, so read the import specifier at the reported line and column. List the most used components first.
 -   Separate three kinds of result. A message that names a `@wordpress/ui` replacement is a candidate for migration. A message that says to write your own CSS, or that the component is planned for deprecation, has no `@wordpress/ui` replacement, so do not migrate it. A flagged `@wordpress/ui` component is not recommended yet, or is marked "Use with caution".
@@ -62,7 +64,7 @@ This applies when the project enables the `@wordpress/use-recommended-components
 
 This applies when the project enables the `@wordpress/use-recommended-components` rule. The `wp-ui-setup` skill describes how to enable it.
 
--   Bulk suppressions need ESLint 9.24 or later. Check the installed version, for example in the output of the `wp-ui-setup` inspection script. If it is older, suggest upgrading ESLint, or set the rule to `warn` for now and skip the baseline.
--   Do not migrate everything at once. Record the existing reports as a baseline with ESLint's bulk suppressions, for example `npx eslint --suppress-rule @wordpress/use-recommended-components`, and commit the generated suppressions file. New code is then checked, while existing code is migrated gradually.
--   After you migrate a component, run `npx eslint --prune-suppressions` and commit the reduced suppressions.
+-   Bulk suppressions need ESLint 9.24 or later. Check the installed ESLint version in the project's `package.json` or `node_modules`. If it is older, suggest upgrading ESLint, or set the rule to `warn` for now and skip the baseline.
+-   Do not migrate everything at once. Record the existing reports as a baseline with ESLint's bulk suppressions, for example `npm exec --no -- eslint --suppress-rule @wordpress/use-recommended-components`, and commit the generated suppressions file. New code is then checked, while existing code is migrated gradually.
+-   After you migrate a component, run `npm exec --no -- eslint --prune-suppressions` and commit the reduced suppressions.
 -   For an intentional early use of a component, put an `eslint-disable-next-line @wordpress/use-recommended-components` comment above that import specifier, with a reason. This keeps the other components in the import checked.
