@@ -1470,4 +1470,138 @@ test.describe( 'Description List', () => {
 			},
 		] );
 	} );
+
+	test.describe( 'inside a locked ancestor', () => {
+		const listInGroup = (
+			attributes: Record< string, unknown >,
+			detail: string
+		) =>
+			`<!-- wp:group ${ JSON.stringify( {
+				...attributes,
+				layout: { type: 'constrained' },
+			} ) } --><div class="wp-block-group">` +
+			'<!-- wp:description-list --><dl class="wp-block-description-list">' +
+			'<!-- wp:description-term --><dt class="wp-block-description-term">API</dt><!-- /wp:description-term -->' +
+			`<!-- wp:description-detail --><dd class="wp-block-description-detail">${ detail }</dd><!-- /wp:description-detail -->` +
+			'</dl><!-- /wp:description-list -->' +
+			'</div><!-- /wp:group -->';
+
+		const lockedPair = ( detail: string ) => [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/description-list',
+						innerBlocks: [
+							{
+								name: 'core/description-term',
+								attributes: { content: 'API' },
+							},
+							{
+								name: 'core/description-detail',
+								attributes: { content: detail },
+							},
+						],
+					},
+				],
+			},
+		];
+
+		test( 'should not append items on Enter when the ancestor locks all blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				listInGroup( { templateLock: 'all' }, 'Interface' )
+			);
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Detail' } )
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( lockedPair( 'Interface' ) );
+		} );
+
+		test( 'should not exit an empty trailing detail when the ancestor locks all blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				listInGroup( { templateLock: 'all' }, '' )
+			);
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Detail' } )
+				.click();
+			await page.keyboard.press( 'Enter' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( lockedPair( '' ) );
+		} );
+
+		test( 'should not merge items on Backspace when the ancestor locks all blocks', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				listInGroup( { templateLock: 'all' }, 'Interface' )
+			);
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Detail' } )
+				.click();
+			await page.keyboard.press( 'Home' );
+			await page.keyboard.press( 'Backspace' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( lockedPair( 'Interface' ) );
+		} );
+
+		test( 'should append a term and detail on Enter in a contentOnly section', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				listInGroup( { templateLock: 'contentOnly' }, 'Interface' )
+			);
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Detail' } )
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'SDK' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/group',
+					innerBlocks: [
+						{
+							name: 'core/description-list',
+							innerBlocks: [
+								{
+									name: 'core/description-term',
+									attributes: { content: 'API' },
+								},
+								{
+									name: 'core/description-detail',
+									attributes: { content: 'Interface' },
+								},
+								{
+									name: 'core/description-term',
+									attributes: { content: 'SDK' },
+								},
+								{
+									name: 'core/description-detail',
+									attributes: { content: '' },
+								},
+							],
+						},
+					],
+				},
+			] );
+		} );
+	} );
 } );

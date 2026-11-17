@@ -50,7 +50,8 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"listView": true
+		"listView": true,
+		"contentRole": true
 	},
 	"style": "wp-block-description-list"
 }

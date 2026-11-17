@@ -16,7 +16,6 @@ export default function Edit( {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
 		directInsert: true,
-		templateLock: false,
 	} );
 
 	return (
