@@ -1,0 +1,11 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Menu`: Align the selection indicator, prefix, suffix, shortcut, and submenu
+    chevron with the first line of the label. Prefix icons larger than 16px and
+    tall suffixes no longer sit above the label, and the row grows around them.
+    The suffix, shortcut, and chevron of an item with a wrapped label now follow
+    the first line instead of centering on the whole label
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86135'

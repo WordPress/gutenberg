@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `DropdownMenu`: Invert the selected item's icon indicator while the item is
+    highlighted, so that it stays visible against the highlight color
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86330'

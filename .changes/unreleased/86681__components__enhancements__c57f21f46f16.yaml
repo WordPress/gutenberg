@@ -1,0 +1,8 @@
+project: components
+kind: Enhancements
+body: >-
+    `Button`: Use theme-aware WPDS colors for disabled states, including a neutral
+    fill for disabled primary buttons
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86681'

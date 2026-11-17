@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Combobox` and `Autocomplete`: Keep `ListBody` out of the Tab order, so a
+    scrolling inline list is no longer an extra Tab stop after the input
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86535'

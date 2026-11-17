@@ -1,0 +1,9 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Textarea`: Fix ref and render prop composition, restoring Field filled state,
+    required validation, and returning to pristine when the default value is
+    restored
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86546'

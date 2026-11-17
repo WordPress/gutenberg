@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Button` and `ButtonLink`: Keep the icon at full size when the button is
+    narrower than its content
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86497'

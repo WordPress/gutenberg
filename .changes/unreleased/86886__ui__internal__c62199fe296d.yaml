@@ -1,0 +1,6 @@
+project: ui
+kind: Internal
+body: Update the `@daypicker/react` dependency to 10.0.2
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86886'

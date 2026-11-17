@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `TextareaControl`: Keep the placeholder visible inside an element with the
+    `is-dark-theme` class, such as the editor when it has a dark background
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86755'

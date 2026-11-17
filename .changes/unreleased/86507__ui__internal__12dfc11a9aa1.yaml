@@ -1,0 +1,6 @@
+project: ui
+kind: Internal
+body: Update the Storybook development dependencies to 10.6.6
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86507'

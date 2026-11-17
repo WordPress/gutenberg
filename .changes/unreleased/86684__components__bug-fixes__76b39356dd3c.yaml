@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across
+    themes and interaction states, including numbered toolbar buttons
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86684'

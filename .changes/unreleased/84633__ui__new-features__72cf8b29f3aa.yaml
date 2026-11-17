@@ -1,0 +1,9 @@
+project: ui
+kind: New Features
+body: >-
+    Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`,
+    `SearchableChipSelect`, and their controls, with a fixed spinner, customizable
+    loading message, and popup item layout
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '84633'

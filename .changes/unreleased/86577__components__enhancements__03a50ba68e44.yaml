@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: '`AnglePickerControl`: Increase dial border contrast on hover and while pressed'
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86577'

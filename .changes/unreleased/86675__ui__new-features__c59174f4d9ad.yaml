@@ -1,0 +1,6 @@
+project: ui
+kind: New Features
+body: '`Meter.Indicator`: Add `success`, `warning`, and `error` tones'
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86675'

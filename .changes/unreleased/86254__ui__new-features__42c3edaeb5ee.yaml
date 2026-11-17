@@ -1,0 +1,9 @@
+project: ui
+kind: New Features
+body: >-
+    `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that
+    validates a hidden stand-in element can attach the validation message to the
+    description of the element users interact with
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86254'

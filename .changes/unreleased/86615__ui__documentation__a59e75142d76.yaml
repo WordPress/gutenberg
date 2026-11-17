@@ -1,0 +1,8 @@
+project: ui
+kind: Documentation
+body: >-
+    `Tabs`: Describe that each tab shows its panel in place, without a change of
+    URL
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86615'

@@ -1,0 +1,6 @@
+project: components
+kind: Internal
+body: Update the `@ariakit/react` dependency to 0.4.43
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86887'

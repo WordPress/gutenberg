@@ -12,6 +12,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import semver from 'semver';
+import { isChangiePackage } from '@wordpress/changelog-tools/config';
+import { previewUnreleasedFragments } from '@wordpress/changelog-tools/preview';
 
 // Loaded untyped so this project does not pull the release tool into its sources.
 const { calculateVersionBumpFromChangelog } = createRequire( import.meta.url )(
@@ -126,23 +128,27 @@ export function findRangeMismatches(
 	return findings;
 }
 
-function readWorkspaces() {
+export function readWorkspaces( repoRoot = REPO_ROOT ) {
 	const workspaces: Record<
 		string,
 		{ manifest: Manifest; changelog?: string }
 	> = {};
-	const packagesDir = join( REPO_ROOT, 'packages' );
+	const packagesDir = join( repoRoot, 'packages' );
 	for ( const dir of readdirSync( packagesDir ) ) {
 		const manifestPath = join( packagesDir, dir, 'package.json' );
 		if ( ! existsSync( manifestPath ) ) {
 			continue;
 		}
 		const changelogPath = join( packagesDir, dir, 'CHANGELOG.md' );
+		let changelog: string | undefined;
+		if ( isChangiePackage( dir, repoRoot ) ) {
+			changelog = previewUnreleasedFragments( dir, repoRoot );
+		} else if ( existsSync( changelogPath ) ) {
+			changelog = readFileSync( changelogPath, 'utf8' );
+		}
 		workspaces[ `packages/${ dir }` ] = {
 			manifest: JSON.parse( readFileSync( manifestPath, 'utf8' ) ),
-			changelog: existsSync( changelogPath )
-				? readFileSync( changelogPath, 'utf8' )
-				: undefined,
+			changelog,
 		};
 	}
 	return workspaces;

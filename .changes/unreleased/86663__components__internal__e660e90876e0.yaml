@@ -1,0 +1,8 @@
+project: components
+kind: Internal
+body: >-
+    `CustomSelectControl`: Remove the unused V2 component and keep the shared
+    implementation with the legacy component
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86663'

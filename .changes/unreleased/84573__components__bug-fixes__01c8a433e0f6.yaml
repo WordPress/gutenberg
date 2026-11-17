@@ -1,0 +1,6 @@
+project: components
+kind: Bug Fixes
+body: '`Toolbar`: Use semantic border colors and the standard outline focus ring'
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '84573'

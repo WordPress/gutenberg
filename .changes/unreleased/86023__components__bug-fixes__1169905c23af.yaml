@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Modal`: Match scroll-area focus outline corners to the modal frame where they
+    meet
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86023'

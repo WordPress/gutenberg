@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Button`: Show the pressed state of neutral minimal buttons in forced colors
+    mode
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '85948'

@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `AlertDialog`: Honor canceled open state changes and restore usable controls
+    when closing after confirmation is canceled
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86544'

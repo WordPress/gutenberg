@@ -6,6 +6,15 @@ const glob = require( 'fast-glob' );
 const { inc: semverInc, parse: semverParse } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
 const { simpleGit } = require( 'simple-git' );
+const {
+	isChangiePackage,
+	validateChangieProjects,
+} = require( '@wordpress/changelog-tools/config' );
+const {
+	batchChangiePackage,
+	mergeChangieChangelogs,
+	getChangieUnreleasedLines,
+} = require( '@wordpress/changelog-tools/release' );
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
@@ -188,6 +197,7 @@ async function updatePackages( config ) {
 		return;
 	}
 
+	validateChangieProjects( gitWorkingDirectoryPath );
 	const changelogFiles = await glob(
 		path.resolve( gitWorkingDirectoryPath, 'packages/*/CHANGELOG.md' )
 	);
@@ -202,14 +212,28 @@ async function updatePackages( config ) {
 
 	const processedPackages = await Promise.all(
 		changelogFilesPublicPackages.map( async ( changelogPath ) => {
-			const fileStream = fs.createReadStream( changelogPath );
+			const parts = changelogPath.split( '/' );
+			const pkgKey = parts[ parts.length - 2 ];
+			const isChangie = isChangiePackage(
+				pkgKey,
+				gitWorkingDirectoryPath
+			);
 
-			const rl = readline.createInterface( {
-				input: fileStream,
-			} );
-			const lines = [];
-			for await ( const line of rl ) {
-				lines.push( line );
+			let lines = [];
+			if ( isChangie ) {
+				lines = getChangieUnreleasedLines(
+					pkgKey,
+					gitWorkingDirectoryPath
+				);
+			} else {
+				const fileStream = fs.createReadStream( changelogPath );
+
+				const rl = readline.createInterface( {
+					input: fileStream,
+				} );
+				for await ( const line of rl ) {
+					lines.push( line );
+				}
 			}
 
 			const packageJSONPath = changelogPath.replace(
@@ -222,9 +246,7 @@ async function updatePackages( config ) {
 				minimumVersionBump,
 				version
 			);
-			const packageName = `@wordpress/${
-				changelogPath.split( '/' ).reverse()[ 1 ]
-			}`;
+			const packageName = `@wordpress/${ pkgKey }`;
 			// Enforce version bump for all packages when
 			// the stable minor or major version bump requested.
 			if (
@@ -262,6 +284,8 @@ async function updatePackages( config ) {
 
 	// e.g. "2022-11-01T00:13:26.102Z" -> "2022-11-01"
 	const publishDate = new Date().toISOString().split( 'T' )[ 0 ];
+	let hasChangiePackages = false;
+
 	await Promise.all(
 		packagesToUpdate.map(
 			async ( {
@@ -271,19 +295,36 @@ async function updatePackages( config ) {
 				nextVersion,
 				version,
 			} ) => {
-				// Update changelog.
-				const content = fs.readFileSync( changelogPath, 'utf8' );
-				fs.writeFileSync(
-					changelogPath,
-					content.replace(
-						'## Unreleased',
-						`## Unreleased\n\n## ${
-							releaseType === 'next'
-								? nextVersion + '-next.0'
-								: nextVersion
-						} (${ publishDate })`
-					)
+				const parts = changelogPath.split( '/' );
+				const pkgKey = parts[ parts.length - 2 ];
+				const isChangie = isChangiePackage(
+					pkgKey,
+					gitWorkingDirectoryPath
 				);
+
+				const targetVersion =
+					releaseType === 'next'
+						? nextVersion + '-next.0'
+						: nextVersion;
+
+				if ( isChangie ) {
+					hasChangiePackages = true;
+					batchChangiePackage(
+						pkgKey,
+						targetVersion,
+						gitWorkingDirectoryPath
+					);
+				} else {
+					// Update traditional changelog.
+					const content = fs.readFileSync( changelogPath, 'utf8' );
+					fs.writeFileSync(
+						changelogPath,
+						content.replace(
+							'## Unreleased',
+							`## Unreleased\n\n## ${ targetVersion } (${ publishDate })`
+						)
+					);
+				}
 
 				// Update package.json.
 				const packageJson = readJSONFile( packageJSONPath );
@@ -297,15 +338,15 @@ async function updatePackages( config ) {
 				);
 
 				log(
-					`   - ${ packageName }: ${ version } -> ${
-						releaseType === 'next'
-							? nextVersion + '-next.0'
-							: nextVersion
-					}`
+					`   - ${ packageName }: ${ version } -> ${ targetVersion }`
 				);
 			}
 		)
 	);
+
+	if ( hasChangiePackages ) {
+		mergeChangieChangelogs( gitWorkingDirectoryPath );
+	}
 
 	if ( interactive ) {
 		await askForConfirmation(

@@ -1,0 +1,6 @@
+project: components
+kind: Bug Fixes
+body: '`Card`: Use theme tokens for borders, corners, and spacing'
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '85857'

@@ -1,0 +1,9 @@
+project: components
+kind: Enhancements
+body: >-
+    `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`,
+    `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`.
+    They are not part of the default `CSS_UNITS` list
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86241'

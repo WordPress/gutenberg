@@ -1,0 +1,6 @@
+project: ui
+kind: Bug Fixes
+body: '`AlertDialog`: Ignore async confirmation results after the dialog unmounts'
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86545'

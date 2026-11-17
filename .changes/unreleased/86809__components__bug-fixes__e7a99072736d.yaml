@@ -1,0 +1,9 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and
+    typography, including paired selected-date colors that remain readable when
+    `ThemeProvider` adjusts the brand fill
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86809'

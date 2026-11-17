@@ -1,0 +1,8 @@
+project: components
+kind: Enhancements
+body: >-
+    `CustomSelectControl`: Mark as not recommended for use in a WordPress
+    environment, in favour of `SelectControl` from `@wordpress/ui`
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86663'
