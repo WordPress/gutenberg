@@ -7,9 +7,9 @@ import type { ImageEdit } from './get-image-edit';
  *
  * Use it to build instructions for something that applies them one at a
  * time, such as the `modifiers` sent to the WordPress media REST endpoint.
- * The order is not a choice: `rotation` is measured after the flip, and
- * `crop` is a fraction of the image after both, so another order frames a
- * different part of the image.
+ * `rotation` is measured after the flip, and `crop` is a fraction of the
+ * image after both, so applying them in another order frames a different
+ * part of the image.
  *
  * @param edit              The edit, as returned by `getImageEdit`.
  * @param handlers          One function for each part, called only when the

@@ -177,10 +177,19 @@ For example, the WordPress media REST endpoint (`/wp/v2/media/<id>/edit`) applie
 ```ts
 import apiFetch from '@wordpress/api-fetch';
 import { getImageEdit, mapImageEdit } from '@wordpress/image-editor';
+import type { Flip } from '@wordpress/image-editor';
+
+type Modifier =
+	| { type: 'flip'; args: { flip: Flip } }
+	| { type: 'rotate'; args: { angle: number } }
+	| {
+			type: 'crop';
+			args: { left: number; top: number; width: number; height: number };
+	  };
 
 const edit = getImageEdit( controller.state );
 const modifiers = edit
-	? mapImageEdit( edit, {
+	? mapImageEdit< Modifier >( edit, {
 			flip: ( flip ) => ( { type: 'flip', args: { flip } } ),
 			rotation: ( angle ) => ( { type: 'rotate', args: { angle } } ),
 			crop: ( { x, y, width, height } ) => ( {
