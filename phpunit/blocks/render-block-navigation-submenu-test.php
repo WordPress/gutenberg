@@ -63,7 +63,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -90,7 +90,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 		);
 		$tags->get_attribute( 'class' );
 
-		$this->assertEquals(
+		$this->assertSame(
 			'wp-block-navigation__submenu-container has-text-color has-purple-color has-background has-yellow-background-color',
 			$tags->get_attribute( 'class' ),
 			'Submenu block colors inherited from context not applied correctly'
@@ -110,7 +110,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -160,7 +160,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -210,7 +210,7 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
         <!-- /wp:navigation-submenu -->'
 		);
 
-		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+		$this->assertCount( 1, $parsed_blocks, 'Submenu block not parsable.' );
 
 		$block = $parsed_blocks[0];
 
@@ -229,12 +229,6 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'<ul class="wp-block-navigation__submenu-container">',
 			$actual,
 			'Submenu block should not apply colors if missing from context'
-		);
-
-		$this->assertStringNotContainsString(
-			$actual,
-			'has-text-color has-background',
-			'Submenu block should not apply "has-*" color classes if missing from context'
 		);
 	}
 
@@ -275,5 +269,37 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			$rendered_html,
 			'Submenu should not have "open-on-hover-click" class when legacy openSubmenusOnClick was true'
 		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_apply_shadow_to_the_submenu_container() {
+		$page_id = self::$page->ID;
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type","style":{"shadow":"var:preset|shadow|natural"}} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$navigation_submenu_block = new WP_Block( $parsed_blocks[0], array( 'overlayTextColor' => 'purple' ) );
+
+		$tags = new WP_HTML_Tag_Processor(
+			gutenberg_render_block_core_navigation_submenu(
+				$navigation_submenu_block->attributes,
+				array(),
+				$navigation_submenu_block
+			)
+		);
+		$this->assertTrue(
+			$tags->next_tag(
+				array(
+					'tag_name'   => 'ul',
+					'class_name' => 'wp-block-navigation__submenu-container',
+				)
+			)
+		);
+		$this->assertSame( 'box-shadow:var(--wp--preset--shadow--natural)', $tags->get_attribute( 'style' ) );
 	}
 }

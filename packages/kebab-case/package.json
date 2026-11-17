@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/kebab-case",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Convert strings to kebab-case, matching WordPress Core's `_wp_to_kebab_case()`.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -44,7 +44,7 @@
 		"change-case": "^4.1.2"
 	},
 	"devDependencies": {
-		"vitest": "^5.0.3"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

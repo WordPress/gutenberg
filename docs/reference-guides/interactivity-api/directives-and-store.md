@@ -385,11 +385,11 @@ The element shows what its reference resolves to, calling it first when it is a 
 -   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
 -   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
 
-To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. When that value is pending or `{ "wpServerHtml": true }`, the element shows the content the new page's server-rendered HTML has for it, without its `<script>` elements, instead of the content it had before navigating. When it already shows that same server-rendered content, it keeps its nodes, along with any changes scripts or the visitor made to them after the page hydrated. Content on the page first loaded doesn't count as the same when a script changed it before the page hydrated, or when it holds `<noscript>` elements, which the router removes from the pages it renders. Navigating away from that page replaces such content, and so can navigating back to it. Two kinds of elements keep their content instead: elements outside every [router region](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#router-regions), because navigation doesn't render them, and elements inside [`data-wp-each`](#wp-each) items, because the client renders the items from its own list.
 
 #### Inert content
 
-Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup. Client-side navigation ignores router regions in this content too; see [Where to place router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#where-to-place-router-regions).
 
 #### Conflicts with other directives
 
@@ -402,7 +402,7 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending or `{ "wpServerHtml": true }` must have an empty fallback on sites enforcing Trusted Types.
+    -   The fallback of an element the client creates, such as a [`data-wp-each`](#wp-each) item or an element added by client-side navigation, and the new page's server-rendered content that an element shows after client-side navigation, are copied into the element as nodes, not as strings, so copying them calls no Trusted Types policy, default policy included. A default policy that transforms, filters or rejects HTML isn't called for them. On the page first loaded, they appear as the server rendered them. After client-side navigation, they appear as the router parsed the new page, and that parse of the whole page does go through the default policy. Don't rely on a policy to prepare fallback markup: it isn't sanitized, apart from leaving out `<script>` elements, so write it as you want it shown, from content you trust. This doesn't change values from `asDangerousHTML()`, which the browser still checks when they are rendered.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
@@ -566,6 +566,8 @@ The `wp-watch` directive is executed:
 
 The `wp-watch` directive can return a function. If it does, the returned function is used as cleanup logic, i.e., it will run just before the callback runs again, and it will run again when the element is removed from the DOM.
 
+The callback runs in the element's directive scope, but the cleanup does not. Return the cleanup wrapped with [`withScope()`](#withscope) to keep the element's scope.
+
 As a reference, some use cases for this directive may be:
 
 -   Logging
@@ -619,7 +621,7 @@ store( 'myPlugin', {
 
 </details>
 
-The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM.
+The `wp-init` can return a function. If it does, the returned function will run when the element is removed from the DOM. As with `wp-watch`, the returned function runs without a directive scope: return it wrapped with [`withScope()`](#withscope) to keep the element's scope.
 
 ### `wp-run`
 
@@ -1301,7 +1303,7 @@ If you subscribe to any value returned by `getServerContext()` or `getServerStat
 
 Actions can depend on the scope when they are called, e.g., when you call `getContext()` or `getElement()`.
 
-When the Interactivity API runtime execute callbacks, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
+When the Interactivity API runtime executes the actions and directive callbacks of an element, the scope is set automatically. However, if you call an action from a callback that is not executed by the runtime, like in a `setInterval()` callback, you need to ensure that the scope is properly set. Use the `withScope()` function to ensure the scope is properly set in these cases.
 
 An example, where `actions.nextImage` would trigger an undefined error without the wrapper:
 
@@ -1315,6 +1317,23 @@ store( 'mySliderPlugin', {
 				} ),
 				3_000
 			);
+		},
+	},
+} );
+```
+
+The same applies to cleanups. A cleanup returned by a `data-wp-watch` or `data-wp-init` callback, or by a [`watch()`](#watch) callback, runs without a directive scope, so `getContext()`, `getElement()` and `getServerContext()` throw inside it. To keep a scope, return the cleanup wrapped with `withScope()` from code that has the scope, such as the `data-wp-watch` or `data-wp-init` callback itself:
+
+```js
+store( 'myPlugin', {
+	callbacks: {
+		logRemoval: () => {
+			// The element's scope is available here, so the wrapped
+			// cleanup keeps it.
+			return withScope( () => {
+				const { name } = getContext();
+				console.log( `Cleaning up ${ name }` );
+			} );
 		},
 	},
 } );
@@ -1432,6 +1451,27 @@ const unwatch = watch( () => {
 	return () => {
 		document.removeEventListener( 'click', handler );
 	};
+} );
+```
+
+Like the callback, the cleanup runs without a directive scope, even when an action of an element triggers the re-run or the `unwatch()` call. To keep a scope, wrap it with [`withScope()`](#withscope) in code that has one, such as an action, and return the wrapped function:
+
+```js
+store( 'myPlugin', {
+	actions: {
+		startWatching: () => {
+			// Wrapped here, where the action's scope is available.
+			const cleanup = withScope( () => {
+				const { name } = getContext();
+				console.log( `Stopped watching for ${ name }` );
+			} );
+
+			watch( () => {
+				console.log( 'Counter is ' + state.counter );
+				return cleanup;
+			} );
+		},
+	},
 } );
 ```
 

@@ -1,5 +1,3 @@
-import clsx from 'clsx';
-import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -10,6 +8,7 @@ import {
 } from '@wordpress/icons';
 import { Icon, Stack } from '@wordpress/ui';
 import type { Template } from './types';
+import AuthorAvatar from '../../shared/author/avatar';
 import styles from '../../shared/author/style.module.css';
 
 function getIconForSource( originalSource: Template[ 'original_source' ] ) {
@@ -26,12 +25,11 @@ function getIconForSource( originalSource: Template[ 'original_source' ] ) {
 }
 
 /*
- * The author of a template: the avatar of the user or the site logo, or an
- * icon of the source (theme, plugin, site) when there is none, next to the
- * author text.
+ * The author of a template: the avatar of the user, when the site shows
+ * avatars, or the site logo, or else an icon of the source (user, theme,
+ * plugin, site), next to the author text.
  */
 export default function TemplateAuthorView( { item }: { item: Template } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	const originalSource = item.original_source;
 	const icon = getIconForSource( originalSource );
 	const text = item.author_text;
@@ -61,20 +59,8 @@ export default function TemplateAuthorView( { item }: { item: Template } ) {
 	);
 
 	return (
-		<Stack direction="row" align="center">
-			{ imageUrl && (
-				<div
-					className={ clsx( styles.avatar, {
-						[ styles[ 'is-loaded' ] ]: isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
-			) }
+		<Stack direction="row" gap="xs" align="flex-start">
+			{ imageUrl && <AuthorAvatar src={ imageUrl } /> }
 			{ ! imageUrl && (
 				<div className={ styles.icon }>
 					<Icon icon={ icon } />

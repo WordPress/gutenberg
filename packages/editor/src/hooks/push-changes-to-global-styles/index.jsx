@@ -23,7 +23,9 @@ import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import ApplyGloballyModal from './apply-globally-modal';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, getBlockElementLayers } = unlock(
+	blockEditorPrivateApis
+);
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -437,12 +439,18 @@ function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
 	setAttributes,
+	context,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
 	const rows = useChangesToPush( name, attributes, userConfig );
 
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
+	const elements = useMemo(
+		() => getBlockElementLayers( name, attributes, context ),
+		[ name, attributes, context ]
+	);
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -530,6 +538,7 @@ function PushChangesToGlobalStylesControl( {
 			{ isModalOpen && (
 				<ApplyGloballyModal
 					name={ name }
+					elements={ elements }
 					rows={ rows }
 					onApply={ pushChanges }
 					onRequestClose={ () => setIsModalOpen( false ) }

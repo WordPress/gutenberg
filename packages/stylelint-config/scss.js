@@ -14,7 +14,7 @@ export default {
 			'always',
 			{
 				except: [ 'blockless-after-blockless' ],
-				ignore: [ 'after-comment' ],
+				ignore: [ 'after-comment', 'inside-block' ],
 				ignoreAtRules: [ 'else' ],
 			},
 		],

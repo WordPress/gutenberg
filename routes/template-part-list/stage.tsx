@@ -33,7 +33,7 @@ import { previewField } from './fields/preview';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { CreateTemplatePartModal } = unlock( patternsPrivateApis );
 /**
  * Style dependencies
@@ -291,21 +291,21 @@ function TemplatePartListView( {
 		>
 			{ viewList && viewList.length > 1 && (
 				<div className="routes-template-part-list__tabs-wrapper">
-					<Tabs
+					<WCTabs
 						onSelect={ handleTabChange }
 						selectedTabId={ activeView }
 					>
-						<Tabs.TabList>
+						<WCTabs.TabList>
 							{ viewList.map( ( entry ) => (
-								<Tabs.Tab
+								<WCTabs.Tab
 									tabId={ entry.slug }
 									key={ entry.slug }
 								>
 									{ entry.title }
-								</Tabs.Tab>
+								</WCTabs.Tab>
 							) ) }
-						</Tabs.TabList>
-					</Tabs>
+						</WCTabs.TabList>
+					</WCTabs>
 				</div>
 			) }
 			<DataViews

@@ -166,81 +166,28 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  * }
  */
 function block_core_post_navigation_link_get_support_styles( $attributes ) {
-	$block_styles  = $attributes['style'] ?? array();
-	$border        = $block_styles['border'] ?? array();
-	$border_styles = array();
+	$support_attributes = $attributes;
 
-	// Border radius and width accept unitless numbers from the original implementation.
-	if ( isset( $border['radius'] ) ) {
-		$border_styles['radius'] = is_numeric( $border['radius'] ) ? "{$border['radius']}px" : $border['radius'];
+	// Post Navigation Link has no clip support, so ignore a stale value.
+	if ( isset( $support_attributes['style']['background'] ) && is_array( $support_attributes['style']['background'] ) ) {
+		unset( $support_attributes['style']['background']['backgroundClip'] );
 	}
 
-	if ( isset( $border['width'] ) ) {
-		$border_styles['width'] = is_numeric( $border['width'] ) ? "{$border['width']}px" : $border['width'];
-	}
-
-	if ( isset( $border['style'] ) ) {
-		$border_styles['style'] = $border['style'];
-	}
-
-	// A preset border color is stored in its own attribute rather than under `style`.
-	$border_styles['color'] = isset( $attributes['borderColor'] )
-		? "var:preset|color|{$attributes['borderColor']}"
-		: ( $border['color'] ?? null );
-
-	// Individual border sides e.g. top, left etc.
-	foreach ( array( 'top', 'right', 'bottom', 'left' ) as $side ) {
-		$border_styles[ $side ] = array(
-			'width' => $border[ $side ]['width'] ?? null,
-			'color' => $border[ $side ]['color'] ?? null,
-			'style' => $border[ $side ]['style'] ?? null,
-		);
-	}
-
-	$background        = $block_styles['background'] ?? array();
-	$background_styles = array(
-		'backgroundImage'      => $background['backgroundImage'] ?? null,
-		'backgroundSize'       => $background['backgroundSize'] ?? null,
-		'backgroundPosition'   => $background['backgroundPosition'] ?? null,
-		'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,
-		'backgroundAttachment' => $background['backgroundAttachment'] ?? null,
-		'gradient'             => $background['gradient'] ?? null,
-	);
-
-	// Mirrors the background image defaults of the background block support.
-	if ( ! empty( $background_styles['backgroundImage'] ) ) {
-		$background_styles['backgroundSize'] ??= 'cover';
-		if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
-			$background_styles['backgroundPosition'] = '50% 50%';
-		}
-	}
-
-	$styles = wp_style_engine_get_styles(
+	// Dimensions sit between shadow and spacing in the style engine's order, so spacing is fetched separately.
+	$support_styles    = wp_get_block_supports_classes_and_styles( $support_attributes, array( 'background', 'border', 'shadow' ) );
+	$dimensions_styles = wp_style_engine_get_styles(
 		array(
-			'background' => $background_styles,
-			'border'     => $border_styles,
 			'dimensions' => array(
-				'minHeight' => $block_styles['dimensions']['minHeight'] ?? null,
-				'minWidth'  => $block_styles['dimensions']['minWidth'] ?? null,
-			),
-			'shadow'     => $block_styles['shadow'] ?? null,
-			'spacing'    => array(
-				'margin'  => $block_styles['spacing']['margin'] ?? null,
-				'padding' => $block_styles['spacing']['padding'] ?? null,
+				'minHeight' => $attributes['style']['dimensions']['minHeight'] ?? null,
+				'minWidth'  => $attributes['style']['dimensions']['minWidth'] ?? null,
 			),
 		)
 	);
-
-	$class_names = $styles['classnames'] ?? '';
-
-	// The style engine only adds `has-background` for a gradient, the background block support adds it for an image too.
-	if ( ! empty( $background_styles['backgroundImage'] ) && ! in_array( 'has-background', explode( ' ', $class_names ), true ) ) {
-		$class_names = trim( "{$class_names} has-background" );
-	}
+	$spacing_styles    = wp_get_spacing_classes_and_styles( $attributes );
 
 	return array(
-		'class' => $class_names,
-		'style' => $styles['css'] ?? '',
+		'class' => implode( ' ', array_filter( array( $support_styles['class'] ?? '', $dimensions_styles['classnames'] ?? '' ) ) ),
+		'style' => ( $support_styles['style'] ?? '' ) . ( $dimensions_styles['css'] ?? '' ) . ( $spacing_styles['style'] ?? '' ),
 	);
 }
 
