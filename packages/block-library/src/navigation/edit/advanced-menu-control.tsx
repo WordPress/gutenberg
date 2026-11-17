@@ -5,8 +5,7 @@ import { Button } from '@wordpress/components';
 import { useEntityProp } from '@wordpress/core-data';
 import { Stack, SwitchControl, Text } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-// @ts-expect-error - The hook is in a JavaScript file without types.
-import { useConvertToNavigationLinks } from '../../page-list/use-convert-to-navigation-links';
+import { useConvertToNavigationLinks } from '../../page-list/use-detach-page-list';
 import DetachPageListDialog from '../../page-list/detach-dialog';
 import { useIsPagesOnlyMenu } from '../use-is-pages-only-menu';
 
