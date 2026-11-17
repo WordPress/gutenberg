@@ -66,6 +66,10 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$content_asset['module_dependencies'] ?? array(),
 					$content_asset['version'] ?? false
 				);
+				// A script module can't depend on classic scripts, so the page loads them instead.
+				foreach ( $content_asset['dependencies'] ?? array() as $dependency ) {
+					wp_enqueue_script( $dependency );
+				}
 			}
 		}
 
@@ -85,6 +89,9 @@ function {{PREFIX}}_register_page_routes( $page_routes, $register_function_name 
 					$route_asset['module_dependencies'] ?? array(),
 					$route_asset['version'] ?? false
 				);
+				foreach ( $route_asset['dependencies'] ?? array() as $dependency ) {
+					wp_enqueue_script( $dependency );
+				}
 			}
 		}
 

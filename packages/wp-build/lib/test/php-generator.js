@@ -75,3 +75,19 @@ describe( 'page.php template', () => {
 		);
 	} );
 } );
+
+describe( 'routes-registration.php template', () => {
+	it.each( [ 'content_asset', 'route_asset' ] )(
+		'enqueues the classic script dependencies of the %s',
+		async ( asset ) => {
+			const generated = await generateTemplate(
+				'routes-registration.php.template',
+				{}
+			);
+
+			expect( generated ).toContain(
+				`foreach ( $${ asset }['dependencies'] ?? array() as $dependency ) {\n\t\t\t\t\twp_enqueue_script( $dependency );`
+			);
+		}
+	);
+} );
