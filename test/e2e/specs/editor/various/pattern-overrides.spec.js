@@ -1495,4 +1495,123 @@ test.describe( 'Pattern Overrides', () => {
 			editorSettings.getByRole( 'button', { name: 'Enable overrides' } )
 		).toBeHidden();
 	} );
+
+	test.describe( 'accordion heading title', () => {
+		const titleName = 'Question';
+		const patternContent = `<!-- wp:accordion -->
+<div role="group" class="wp-block-accordion"><!-- wp:accordion-item -->
+<div class="wp-block-accordion-item"><!-- wp:accordion-heading {"metadata":{"name":"${ titleName }","bindings":{"__default":{"source":"core/pattern-overrides"}}}} -->
+<h3 class="wp-block-accordion-heading has-icon has-icon-right"><button type="button" class="wp-block-accordion-heading__toggle"><span class="wp-block-accordion-heading__toggle-title">Original title</span><span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span></button></h3>
+<!-- /wp:accordion-heading -->
+<!-- wp:accordion-panel -->
+<div role="region" class="wp-block-accordion-panel"><!-- wp:paragraph -->
+<p>Answer</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:accordion-panel --></div>
+<!-- /wp:accordion-item --></div>
+<!-- /wp:accordion -->`;
+
+		test( 'overrides the title without changing the pattern', async ( {
+			page,
+			admin,
+			requestUtils,
+			editor,
+		} ) => {
+			const { id } = await requestUtils.createBlock( {
+				title: 'Accordion',
+				content: patternContent,
+				status: 'publish',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: id },
+			} );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Accordion title' } )
+				.fill( 'Overridden title' );
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/block',
+					attributes: {
+						ref: id,
+						content: {
+							[ titleName ]: { title: 'Overridden title' },
+						},
+					},
+				},
+			] );
+
+			const postId = await editor.publishPost();
+
+			const pattern = await requestUtils.rest( {
+				path: `/wp/v2/blocks/${ id }`,
+				params: { context: 'edit' },
+			} );
+			expect( pattern.content.raw ).toContain(
+				'<span class="wp-block-accordion-heading__toggle-title">Original title</span>'
+			);
+
+			await page.goto( `/?p=${ postId }` );
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Overridden title',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+
+		test( 'resets the title override to the pattern default', async ( {
+			page,
+			admin,
+			requestUtils,
+			editor,
+		} ) => {
+			const { id } = await requestUtils.createBlock( {
+				title: 'Accordion',
+				content: patternContent,
+				status: 'publish',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( {
+				name: 'core/block',
+				attributes: { ref: id },
+			} );
+
+			const title = editor.canvas.getByRole( 'textbox', {
+				name: 'Accordion title',
+			} );
+			await title.fill( 'Overridden title' );
+			await expect( title ).toHaveText( 'Overridden title' );
+
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Accordion Heading',
+				} )
+			);
+			await editor.showBlockToolbar();
+			await page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Reset' } )
+				.click();
+
+			await expect( title ).toHaveText( 'Original title' );
+			await expect
+				.poll( editor.getEditedPostContent )
+				.toBe( `<!-- wp:block {"ref":${ id }} /-->` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Original title',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+	} );
 } );
