@@ -53,6 +53,10 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/sync',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',
+	// Do not remove: older `@wordpress/media-editor` versions published to npm
+	// call the opt-in at module load, so a plugin bundling one of those
+	// copies throws at load time if this entry is missing.
+	'@wordpress/media-editor',
 	'@wordpress/media-utils',
 	'@wordpress/upload-media',
 	'@wordpress/global-styles-engine',
