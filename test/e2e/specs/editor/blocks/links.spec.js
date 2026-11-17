@@ -154,6 +154,34 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
+	test( `will automatically create a tel link that keeps the plus if selected text is a phone number`, async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a block with a phone number.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+		} );
+		await page.keyboard.type( '+44 20 7946 0958' );
+
+		// Select the phone number.
+		await pageUtils.pressKeys( 'shift+Home' );
+
+		// Click on the Link button.
+		await editor.clickBlockToolbarButton( 'Link' );
+
+		// A tel link that keeps the plus should have been inserted.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="tel:+442079460958">+44 20 7946 0958</a>',
+				},
+			},
+		] );
+	} );
+
 	test( `does not create link when link ui is closed without submission`, async ( {
 		page,
 		editor,
@@ -221,6 +249,61 @@ test.describe( 'Links', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'This is <a href="/handbook">Gutenberg</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'preserves manually added attributes when editing a link', async ( {
+		editor,
+		page,
+		LinkUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="https://wordpress.org" id="manual-link" class="button" rel="sponsored nofollow" title="Tooltip" data-pizza="Pepperoni">Custom link</a>',
+			},
+		} );
+
+		const link = editor.canvas.getByRole( 'link', { name: 'Custom link' } );
+		await link.click();
+		const linkPopover = LinkUtils.getLinkPopover();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await page
+			.getByPlaceholder( 'Search or type URL' )
+			.fill( 'https://wordpress.org/gutenberg' );
+		await linkPopover.getByRole( 'button', { name: 'Advanced' } ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).check();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect( link ).toHaveAttribute(
+			'href',
+			'https://wordpress.org/gutenberg'
+		);
+		await expect( link ).toHaveAttribute( 'target', '_blank' );
+		await expect( link ).toHaveAttribute( 'rel', 'sponsored nofollow' );
+		await expect( link ).toHaveAttribute( 'data-pizza', 'Pepperoni' );
+		await expect( link ).toHaveAttribute( 'id', 'manual-link' );
+		await expect( link ).toHaveAttribute( 'class', 'button' );
+		await expect( link ).toHaveAttribute( 'title', 'Tooltip' );
+
+		// Clearing link settings should leave the unmanaged rel token alone.
+		await link.click();
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover.getByLabel( 'Open in new tab' ).uncheck();
+		await linkPopover.getByLabel( 'nofollow' ).uncheck();
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+		await expect( link ).not.toHaveAttribute( 'target' );
+		await expect( link ).toHaveAttribute( 'rel', 'sponsored' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: expect.stringContaining(
+						'data-pizza="Pepperoni"'
+					),
 				},
 			},
 		] );

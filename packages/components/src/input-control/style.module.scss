@@ -159,16 +159,8 @@
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&::-webkit-input-placeholder {
-		color: $components-color-dark-gray-placeholder;
-	}
-
-	&::-moz-placeholder {
-		color: $components-color-dark-gray-placeholder;
-	}
-
-	&:-ms-input-placeholder {
-		color: $components-color-dark-gray-placeholder;
+	&::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&[type="date"],
