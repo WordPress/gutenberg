@@ -174,19 +174,6 @@ const TOOLS: Tool[] = [
 		],
 	},
 	{
-		id: 'windsurf',
-		label: 'Windsurf',
-		domain: 'windsurf.com',
-		mark: 'Ws',
-		color: '#0b7a75',
-		file: '~/.codeium/windsurf/mcp_config.json',
-		config: JSON_CONFIG,
-		steps: [
-			'Add the configuration above to the file.',
-			'Open the Cascade panel and refresh the MCP servers list.',
-		],
-	},
-	{
 		id: 'zed',
 		label: 'Zed',
 		domain: 'zed.dev',
