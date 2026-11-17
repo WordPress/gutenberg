@@ -139,8 +139,9 @@ export default function UploadProgressSnackbar() {
 
 	// An image that uploaded without all of its sizes counts as uploaded, so
 	// nothing above reports it. The list only ever grows: warn about the
-	// entries added since the last pass.
-	const warningsShownRef = useRef( 0 );
+	// entries added since the last pass. Starting at the current length keeps
+	// a remount from bringing back warnings that were already dismissed.
+	const warningsShownRef = useRef( warnings.length );
 	useEffect( () => {
 		for ( const warning of warnings.slice( warningsShownRef.current ) ) {
 			createNotice( 'warning', warning.message, {

@@ -304,8 +304,11 @@ describe( 'UploadProgressSnackbar', () => {
 		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
 		const second = { id: 'b', code: 'GENERAL', message: 'Second warning' };
 
-		mockQueue( [], 0, [ first ] );
+		mockQueue( [] );
 		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, [ first ] );
+		rerender( <UploadProgressSnackbar /> );
 
 		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
@@ -323,6 +326,26 @@ describe( 'UploadProgressSnackbar', () => {
 
 		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
 		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+			'warning',
+			'Second warning',
+			expect.objectContaining( { id: 'upload-warning-b' } )
+		);
+	} );
+
+	it( 'does not repeat earlier warnings when it mounts again', () => {
+		const first = { id: 'a', code: 'GENERAL', message: 'First warning' };
+		const second = { id: 'b', code: 'GENERAL', message: 'Second warning' };
+
+		mockQueue( [], 0, [ first ] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).not.toHaveBeenCalled();
+
+		mockQueue( [], 0, [ first, second ] );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
 			'Second warning',
 			expect.objectContaining( { id: 'upload-warning-b' } )
