@@ -319,7 +319,7 @@ describe( 'global styles renderer', () => {
 
 	describe( 'generateCustomProperties', () => {
 		it( 'should return a ruleset', () => {
-			const tree = {
+			const tree: GlobalStylesConfig = {
 				settings: {
 					dimensions: {
 						aspectRatios: {
@@ -389,7 +389,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 				},
-			} as GlobalStylesConfig;
+			};
 
 			const blockSelectors = {
 				'core/heading': {
