@@ -175,6 +175,18 @@
 		}
 	}
 
+	// The grey stage normally marks the panel's edge. Without it, e.g. for a
+	// file without a preview, the panel takes a border instead.
+	.media-editor__body:has(.media-editor-preview.is-placeholder)
+	.media-editor__sidebar {
+		@include break-small() {
+			// Matches the page header's bottom border in the route.
+			border-inline-start:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-surface-neutral-weak);
+		}
+	}
+
 	// The strip and the open pane, stacked. No inline padding: the pane below
 	// scrolls, and a gutter here would inset its scrollbar from the sidebar
 	// edge. The strip and the pane carry their own instead.
@@ -229,9 +241,10 @@
 	.media-editor__body.has-panel-open .media-editor__content {
 		display: none;
 
+		// Only remove the right margin, so the route's bottom margin still applies.
 		@include break-small() {
 			display: flex;
-			margin: 0 0 0 $grid-unit-30;
+			margin-right: 0;
 		}
 	}
 
