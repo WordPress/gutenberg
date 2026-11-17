@@ -256,6 +256,14 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
+			// A local update that is still deferred was computed before this
+			// remote change. Applying it now would write the older values
+			// over the remote change, so discard it. The store update below
+			// replaces the same local values in the editor.
+			if ( ! transaction.local ) {
+				discardPendingCRDTDocUpdates( objectType, objectId );
+			}
+
 			void internal.updateEntityRecord( objectType, objectId );
 		};
 
@@ -752,6 +760,21 @@ export function createSyncManager( debug = false ): SyncManager {
 			}
 		} finally {
 			isFlushingCRDTDocUpdates = false;
+		}
+	}
+
+	// Discard the deferred updates of one entity. Used when a remote change
+	// reaches the entity's document before its deferred updates are applied.
+	function discardPendingCRDTDocUpdates(
+		objectType: ObjectType,
+		objectId: ObjectID | null
+	): void {
+		for ( let i = pendingCRDTDocUpdates.length - 1; i >= 0; i-- ) {
+			const [ pendingType, pendingId ] = pendingCRDTDocUpdates[ i ];
+
+			if ( pendingType === objectType && pendingId === objectId ) {
+				pendingCRDTDocUpdates.splice( i, 1 );
+			}
 		}
 	}
 

@@ -995,6 +995,96 @@ describe( 'SyncManager', () => {
 			] );
 		} );
 
+		it( 'discards a deferred update when a remote change reaches the document first', async () => {
+			let capturedDoc: CRDTDoc | null = null;
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
+
+			const initialRecord = {
+				id: '123',
+				content: 'Hello',
+				meta: {},
+			};
+			// The local edit is in the store before it is in the document.
+			const editedRecord = { ...initialRecord, content: 'Hello!' };
+			const syncConfig = {
+				...mockSyncConfig,
+				applyChangesToCRDTDoc: vi.fn(
+					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
+						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+						Object.entries( changes ).forEach(
+							( [ key, value ] ) => {
+								recordMap.set( key, value );
+							}
+						);
+					}
+				),
+			};
+			const handlers = {
+				...mockHandlers,
+				editRecord: vi.fn(),
+				getEditedRecord: vi.fn( async () =>
+					Promise.resolve( editedRecord )
+				),
+			};
+
+			const manager = createSyncManager();
+
+			await manager.load(
+				syncConfig,
+				'post',
+				'123',
+				initialRecord,
+				handlers
+			);
+
+			syncConfig.applyChangesToCRDTDoc.mockClear();
+			handlers.editRecord.mockClear();
+
+			// With no remote peers present, the local update is deferred.
+			manager.update(
+				'post',
+				'123',
+				{ content: 'Hello!' },
+				LOCAL_EDITOR_ORIGIN
+			);
+
+			// A remote change arrives before the deferred update is applied.
+			// The peer starts from the current document, so its change
+			// follows the initial value and does not compete with it.
+			const remoteDoc = new Y.Doc();
+			Y.applyUpdateV2(
+				remoteDoc,
+				Y.encodeStateAsUpdateV2( capturedDoc as unknown as Y.Doc )
+			);
+			remoteDoc
+				.getMap( CRDT_RECORD_MAP_KEY )
+				.set( 'content', 'Peer Hello' );
+			Y.applyUpdateV2(
+				capturedDoc as unknown as Y.Doc,
+				Y.encodeStateAsUpdateV2( remoteDoc )
+			);
+			remoteDoc.destroy();
+
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			// The deferred update was computed without the remote change, so
+			// it is not applied over it.
+			expect( syncConfig.applyChangesToCRDTDoc ).not.toHaveBeenCalled();
+			expect(
+				( capturedDoc as unknown as Y.Doc )
+					.getMap( CRDT_RECORD_MAP_KEY )
+					.get( 'content' )
+			).toBe( 'Peer Hello' );
+
+			// The store receives the remote value in place of the local one.
+			expect( handlers.editRecord ).toHaveBeenCalledWith( {
+				content: 'Peer Hello',
+			} );
+		} );
+
 		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 

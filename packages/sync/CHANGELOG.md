@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Discard a deferred local update when a remote change reaches the document first, so the update does not overwrite the remote change.
+
 ## 3.2.0 (2026-11-18)
 
 ## 3.1.0 (2026-11-04)
