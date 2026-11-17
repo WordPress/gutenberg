@@ -15,7 +15,11 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
-import { BROWSER_BACKUP_NOTICE_ID, STORE_NAME } from './constants';
+import {
+	AUTOSAVE_NOTICE_ID,
+	BROWSER_BACKUP_NOTICE_ID,
+	STORE_NAME,
+} from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -1027,7 +1031,7 @@ export const restoreRevision =
 
 		// The saved post is now newer than any autosave, so the
 		// autosave notice is stale.
-		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
+		registry.dispatch( noticesStore ).removeNotice( AUTOSAVE_NOTICE_ID );
 
 		const undoRestore = async () => {
 			// The editor may have moved on to a different post.
