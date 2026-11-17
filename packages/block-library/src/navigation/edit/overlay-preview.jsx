@@ -6,6 +6,7 @@ import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
+import OverlayPreviewContext from './overlay-preview-context';
 
 /**
  * Component that displays a read-only visual preview of the selected overlay template part.
@@ -91,17 +92,19 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 			aria-label={ __( 'Navigation Overlay template part preview' ) }
 			role="region"
 		>
-			<BlockPreview.Async
-				placeholder={
-					<div className="wp-block-navigation__overlay-preview-placeholder" />
-				}
-			>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ 400 }
-					minHeight={ 200 }
-				/>
-			</BlockPreview.Async>
+			<OverlayPreviewContext.Provider value>
+				<BlockPreview.Async
+					placeholder={
+						<div className="wp-block-navigation__overlay-preview-placeholder" />
+					}
+				>
+					<BlockPreview
+						blocks={ blocks }
+						viewportWidth={ 400 }
+						minHeight={ 200 }
+					/>
+				</BlockPreview.Async>
+			</OverlayPreviewContext.Provider>
 		</div>
 	);
 }

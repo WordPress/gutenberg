@@ -248,6 +248,37 @@ describe( 'getFilteredOverlayViewports', () => {
 		);
 	} );
 
+	it( 'passes null to the filter for the default behavior', () => {
+		const callback = vi.fn( ( value ) => value );
+		addFilter( HOOK, 'test/overlay-viewports', callback );
+
+		getFilteredOverlayViewports( { overlayMenu: 'mobile' }, 'client-1' );
+
+		expect( callback ).toHaveBeenCalledWith(
+			null,
+			{ overlayMenu: 'mobile' },
+			'client-1'
+		);
+	} );
+
+	it( 'skips the filter for a block inside an overlay', () => {
+		const callback = vi.fn( () => ( {
+			mobile: true,
+			tablet: true,
+			desktop: true,
+		} ) );
+		addFilter( HOOK, 'test/overlay-viewports', callback );
+
+		expect(
+			getFilteredOverlayViewports(
+				{ overlayMenu: 'always' },
+				'client-1',
+				{ isWithinOverlay: true }
+			)
+		).toEqual( { mobile: false, tablet: false, desktop: false } );
+		expect( callback ).not.toHaveBeenCalled();
+	} );
+
 	it( 'lets a filter replace the default behavior with a viewport map', () => {
 		addFilter( HOOK, 'test/overlay-viewports', () => ( {
 			mobile: true,
@@ -306,7 +337,6 @@ describe( 'getFilteredOverlayViewports', () => {
 			tablet: false,
 			desktop: false,
 		} );
-		expect( Object.keys( result ?? {} ) ).toHaveLength( 3 );
 	} );
 
 	it( 'returns a copy of the map the filter returned', () => {

@@ -9,7 +9,7 @@ import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
 import useHasTabletViewport from './use-has-tablet-viewport';
-import { isOverlayResponsive } from '../overlay-viewports';
+import { getOverlayViewports, isOverlayResponsive } from '../overlay-viewports';
 
 /**
  * Overlay Panel component for Navigation block.
@@ -49,9 +49,12 @@ export default function OverlayPanel( {
 } ) {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
 	const hasTabletViewport = useHasTabletViewport();
-	// Read the viewports rather than `overlayMenu`, since a filter can show
-	// the overlay for a block set to `never`.
-	const isOverlayShown = isOverlayResponsive( overlayViewports );
+	// The `overlay` attribute is shared by every language, while the filtered
+	// viewports follow the current one, so show the overlay settings when
+	// either the saved setting or the filtered viewports show the overlay.
+	const isOverlayShown =
+		isOverlayResponsive( getOverlayViewports( { overlayMenu } ) ) ||
+		isOverlayResponsive( overlayViewports );
 
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
