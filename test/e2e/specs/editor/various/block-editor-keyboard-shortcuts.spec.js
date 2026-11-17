@@ -19,6 +19,36 @@ test.describe( 'Block editor keyboard shortcuts', () => {
 	} );
 
 	test.describe( 'move blocks - single block selected', () => {
+		test( 'announces only a successful shortcut move', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await addTestParagraphBlocks( { editor, page } );
+			await editor.canvas.getByText( '1st', { exact: true } ).click();
+			const announcements = page.locator( '#a11y-speak-polite' );
+
+			await pageUtils.pressKeys( 'secondary+t' );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					{ attributes: { content: '1st' } },
+					{ attributes: { content: '2nd' } },
+					{ attributes: { content: '3rd' } },
+				] );
+			await expect( announcements ).not.toHaveText( '1 block moved.' );
+
+			await pageUtils.pressKeys( 'secondary+y' );
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [
+					{ attributes: { content: '2nd' } },
+					{ attributes: { content: '1st' } },
+					{ attributes: { content: '3rd' } },
+				] );
+			await expect( announcements ).toHaveText( '1 block moved.' );
+		} );
+
 		test( 'should move the block up', async ( {
 			editor,
 			page,

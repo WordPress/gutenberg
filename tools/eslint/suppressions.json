@@ -6692,11 +6692,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/components/src/custom-gradient-picker/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 1
