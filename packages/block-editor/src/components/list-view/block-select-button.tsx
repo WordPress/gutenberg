@@ -120,6 +120,7 @@ function ListViewBlockSelectButton(
 			draggable={ draggable }
 			href={ isDisabled ? undefined : `#block-${ clientId }` }
 			aria-disabled={ isDisabled ? true : undefined }
+			aria-keyshortcuts={ isDisabled ? undefined : 'Space' }
 			aria-describedby={ ariaDescribedBy }
 			aria-expanded={ isExpanded }
 		>
