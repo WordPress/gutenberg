@@ -14,6 +14,37 @@ test.describe( 'Meta boxes', () => {
 		await requestUtils.deactivatePlugin( 'gutenberg-test-plugin-meta-box' );
 	} );
 
+	test.describe( 'with a meta_boxes post type label', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-plugin-meta-box-pane-label'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-meta-box-pane-label'
+			);
+		} );
+
+		test( 'Should name the pane with the label', async ( {
+			admin,
+			page,
+		} ) => {
+			await admin.createNewPost();
+
+			await expect(
+				page.getByRole( 'region', { name: 'Post Options' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'button', {
+					name: 'Post Options',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+	} );
+
 	test( 'Should save the post', async ( { editor, page } ) => {
 		const saveDraft = page
 			.getByRole( 'region', { name: 'Editor top bar' } )

@@ -118,17 +118,23 @@ function useEditorStyles( settings ) {
 }
 
 function MetaBoxesMain() {
-	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
-		const { get } = select( preferencesStore );
-		const { isMetaBoxLocationVisible } = select( editPostStore );
-		return [
-			!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-			get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-			isMetaBoxLocationVisible( 'normal' ) ||
-				isMetaBoxLocationVisible( 'advanced' ) ||
-				isMetaBoxLocationVisible( 'side' ),
-		];
-	}, [] );
+	const [ isOpen, openHeight, hasAnyVisible, postTypeLabel ] = useSelect(
+		( select ) => {
+			const { get } = select( preferencesStore );
+			const { isMetaBoxLocationVisible } = select( editPostStore );
+			const { getCurrentPostType } = select( editorStore );
+			const { getPostType } = select( coreStore );
+			return [
+				!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
+				isMetaBoxLocationVisible( 'normal' ) ||
+					isMetaBoxLocationVisible( 'advanced' ) ||
+					isMetaBoxLocationVisible( 'side' ),
+				getPostType( getCurrentPostType() )?.labels?.meta_boxes,
+			];
+		},
+		[]
+	);
 	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
@@ -267,7 +273,8 @@ function MetaBoxesMain() {
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
 
-	const paneLabel = __( 'Meta Boxes' );
+	// Post types can name the pane with a `meta_boxes` label.
+	const paneLabel = postTypeLabel || __( 'Meta Boxes' );
 
 	// The toggle button. It also resizes when the viewport is tall to provide
 	// a larger hit area than the small separator button.
