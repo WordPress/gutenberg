@@ -21,6 +21,7 @@ import { fieldExtensions as description } from './description/field';
 import { fieldExtensions as filename } from './filename/field';
 import { fieldExtensions as filesize } from './filesize/field';
 import { fieldExtensions as mediaDimensions } from './media_dimensions/field';
+import { fieldExtensions as mediaFolders } from './media_folders/field';
 import { fieldExtensions as mediaThumbnail } from './media_thumbnail/field';
 import { fieldExtensions as mimeType } from './mime_type/field';
 import { fieldExtensions as title } from './title/field';
@@ -34,6 +35,9 @@ const fields: FieldsScriptParts = {
 	filename,
 	filesize,
 	media_dimensions: mediaDimensions,
+	// Only registered while the media folders experiment is on, see its
+	// `field.php`. An entry for a field that was not registered is ignored.
+	'media-folders': mediaFolders,
 	media_thumbnail: mediaThumbnail,
 	mime_type: mimeType,
 	title,

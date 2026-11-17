@@ -94,3 +94,43 @@ function gutenberg_register_media_folder_taxonomy() {
 	);
 }
 add_action( 'init', 'gutenberg_register_media_folder_taxonomy' );
+
+/**
+ * Adds the Folders field to the form of the media editor.
+ *
+ * The `attachment` view configuration sets its `form` to a fixed list of
+ * fields, see _gutenberg_get_entity_view_config_posttype_attachment(). This
+ * runs at the default priority, after that base definition at priority 5, and
+ * `merge()` matches the members of `form.fields` by identity: the entry below
+ * has an id no member carries, so it is appended to the end of the list.
+ *
+ * The field itself is registered with the `attachment` field collection, see
+ * packages/core-fields/src/attachment/media_folders/field.php.
+ *
+ * @param Gutenberg_View_Config_Data $data The view configuration container for the entity.
+ * @return Gutenberg_View_Config_Data The updated view configuration container.
+ */
+function gutenberg_add_media_folders_to_attachment_form( $data ) {
+	return $data->merge(
+		array(
+			'form' => array(
+				'fields' => array(
+					array(
+						'id'     => 'media-folders',
+						'layout' => array(
+							'type'                   => 'panel',
+							'showPlaceholderIfEmpty' => true,
+						),
+					),
+				),
+			),
+		),
+		1
+	);
+}
+add_filter(
+	gutenberg_get_entity_view_config_hook_name( 'postType', 'attachment' ),
+	'gutenberg_add_media_folders_to_attachment_form',
+	10,
+	1
+);
