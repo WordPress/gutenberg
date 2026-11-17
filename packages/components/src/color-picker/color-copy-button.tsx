@@ -16,6 +16,24 @@ const RESULT_ICON = {
 	error,
 };
 
+function getColorText(
+	color: ColorCopyButtonProps[ 'color' ],
+	colorType: ColorCopyButtonProps[ 'colorType' ]
+) {
+	switch ( colorType ) {
+		case 'hsl': {
+			return color.toHslString();
+		}
+		case 'rgb': {
+			return color.toRgbString();
+		}
+		default:
+		case 'hex': {
+			return color.toHex();
+		}
+	}
+}
+
 export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 	const { color, colorType } = props;
 
@@ -37,6 +55,15 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 		return () => clearTimeout( timeoutId );
 	}, [ feedback ] );
 
+	// Clear the feedback when the value changes, so it doesn't describe a
+	// value other than the one the button would copy.
+	const colorText = getColorText( color, colorType );
+	const [ previousColorText, setPreviousColorText ] = useState( colorText );
+	if ( colorText !== previousColorText ) {
+		setPreviousColorText( colorText );
+		setFeedback( { result: 'idle', id: 0 } );
+	}
+
 	function report( result: Exclude< CopyResult, 'idle' >, message: string ) {
 		setFeedback( ( current ) => ( {
 			result,
@@ -46,20 +73,7 @@ export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {
 	}
 
 	const copyRef = useCopyToClipboard< HTMLButtonElement >(
-		() => {
-			switch ( colorType ) {
-				case 'hsl': {
-					return color.toHslString();
-				}
-				case 'rgb': {
-					return color.toRgbString();
-				}
-				default:
-				case 'hex': {
-					return color.toHex();
-				}
-			}
-		},
+		colorText,
 		() => report( 'copied', __( 'Copied to clipboard' ) ),
 		() => report( 'error', __( "Couldn't copy to clipboard." ) )
 	);

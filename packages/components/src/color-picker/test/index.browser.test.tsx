@@ -1196,6 +1196,26 @@ describe( 'ColorPicker', () => {
 			expect( copyButton ).toHaveFocus();
 		} );
 
+		it( 'clears the copy feedback when the color changes', async () => {
+			const user = userEvent.setup();
+			vi.spyOn( navigator.clipboard, 'writeText' ).mockResolvedValue();
+
+			await render( <ColorPicker defaultValue="#ffffff" /> );
+
+			const copyButton = screen.getByRole( 'button', { name: 'Copy' } );
+			const idleIcon = copyButton.innerHTML;
+			await user.click( copyButton );
+			await waitFor( () =>
+				expect( copyButton.innerHTML ).not.toBe( idleIcon )
+			);
+
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, 'ff0000' );
+
+			expect( copyButton.innerHTML ).toBe( idleIcon );
+		} );
+
 		it( 'announces a copy that failed', async () => {
 			const user = userEvent.setup();
 			vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
