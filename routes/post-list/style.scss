@@ -16,7 +16,7 @@
 		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
 		height: calc(100% - #{$grid-unit-20 * 2});
 		max-height: calc(100% - #{$grid-unit-20 * 2});
-		max-width: 400px;
+		max-width: var(--wpds-dimension-surface-width-sm);
 		border-radius: $radius-large;
 		position: relative;
 		animation-name: none;
