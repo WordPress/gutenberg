@@ -60,8 +60,8 @@ export function useGridLayoutSync( {
 
 		if ( gridLayout.isManualPlacement ) {
 			// Manual grids need explicit counts; variations may not define them.
-			const columnCount = gridLayout.columnCount ?? 3;
-			const rowCount = gridLayout.rowCount ?? 3;
+			const columnCount = gridLayout.columnCount ?? 8;
+			const rowCount = gridLayout.rowCount ?? 8;
 			const occupiedRects: GridRect[] = [];
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.

@@ -90,7 +90,7 @@ export default {
 		// Auto-fit/auto-fill only applies when grid items are placed
 		// automatically, so the control is irrelevant in manual placement mode.
 		const showFillControl = ! layout?.isManualPlacement;
-		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
+		const defaultColumnCount = layout.isManualPlacement ? 8 : undefined;
 		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
