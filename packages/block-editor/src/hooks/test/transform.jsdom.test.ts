@@ -1,11 +1,9 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { getTransformStyleGroups } from '../transform';
+import { addSaveProps } from '../style';
+import { getTransformClassesAndStyles } from '../use-transform-props';
 
-const registerTransformBlock = (
-	transform: Record< string, unknown >,
-	selectors?: Record< string, string >
-) =>
+const registerTransformBlock = ( transform: Record< string, unknown > ) =>
 	registerBlockType( 'test/transform', {
 		apiVersion: 3,
 		title: 'Transform',
@@ -14,46 +12,61 @@ const registerTransformBlock = (
 		edit: () => null,
 		save: () => null,
 		supports: { transform },
-		selectors,
 	} );
 
-describe( 'getTransformStyleGroups', () => {
+describe( 'getTransformClassesAndStyles', () => {
+	it( 'returns a rotation as an inline style', () => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { rotate: '15deg' } },
+			} )
+		).toEqual( { style: { rotate: '15deg' } } );
+	} );
+
+	it( 'returns no styles for an invalid rotation', () => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { rotate: 'calc(10deg + 5deg)' } },
+			} )
+		).toEqual( { style: {} } );
+	} );
+
+	it( 'returns no styles without a transform', () => {
+		expect( getTransformClassesAndStyles( {} ) ).toEqual( { style: {} } );
+	} );
+} );
+
+describe( 'transform serialization', () => {
 	afterEach( () => {
 		unregisterBlockType( 'test/transform' );
 	} );
 
-	it( 'outputs a rotation inline on the block wrapper', () => {
+	it( 'saves a rotation inline on the block wrapper', () => {
 		registerTransformBlock( { rotate: true } );
 
 		expect(
-			getTransformStyleGroups( 'test/transform', { rotate: '15deg' } )
-		).toEqual( { inline: { rotate: '15deg' }, bySelector: {} } );
+			addSaveProps( {}, 'test/transform', {
+				style: { transform: { rotate: '15deg' } },
+			} ).style
+		).toEqual( { rotate: '15deg' } );
 	} );
 
-	it( 'outputs a rotation under the transform feature selector', () => {
-		registerTransformBlock(
-			{ rotate: true },
-			{ transform: '.wp-block-test-transform img' }
-		);
+	it.each( [
+		[ 'the whole support', true ],
+		[ 'the rotation', [ 'rotate' ] ],
+	] )(
+		'leaves a rotation to the block when it skips serialization of %s',
+		( _label, skipSerialization ) => {
+			registerTransformBlock( {
+				rotate: true,
+				__experimentalSkipSerialization: skipSerialization,
+			} );
 
-		expect(
-			getTransformStyleGroups( 'test/transform', { rotate: '15deg' } )
-		).toEqual( {
-			inline: {},
-			bySelector: {
-				'.wp-block-test-transform img': { rotate: '15deg' },
-			},
-		} );
-	} );
-
-	it( 'leaves a rotation that skips serialization to the block', () => {
-		registerTransformBlock( {
-			rotate: true,
-			__experimentalSkipSerialization: [ 'rotate' ],
-		} );
-
-		expect(
-			getTransformStyleGroups( 'test/transform', { rotate: '15deg' } )
-		).toEqual( { inline: {}, bySelector: {} } );
-	} );
+			expect(
+				addSaveProps( {}, 'test/transform', {
+					style: { transform: { rotate: '15deg' } },
+				} ).style
+			).toEqual( {} );
+		}
+	);
 } );

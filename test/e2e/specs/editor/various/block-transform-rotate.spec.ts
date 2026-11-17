@@ -1,6 +1,5 @@
 import type { Locator } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
-import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 const getRotate = ( locator: Locator ) =>
 	locator.evaluate(
@@ -8,13 +7,9 @@ const getRotate = ( locator: Locator ) =>
 	);
 
 test.describe( 'Transform rotate block support', () => {
-	let uploadedMedia: Awaited< ReturnType< RequestUtils[ 'uploadMedia' ] > >;
-
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
-		uploadedMedia = await requestUtils.uploadMedia(
-			'./assets/10x10_e2e_test_image_z9T8jK.png'
-		);
+		// The theme opts into the transform tools with `appearanceTools`.
+		await requestUtils.activateTheme( 'emptytheme' );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -22,28 +17,24 @@ test.describe( 'Transform rotate block support', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.deleteAllMedia();
+		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'rotates the image with its caption but not the enlarged lightbox image', async ( {
+	test( 'saves the rotation inline on the block wrapper', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.insertBlock( {
-			name: 'core/image',
-			attributes: {
-				id: uploadedMedia.id,
-				url: uploadedMedia.source_url,
-				caption: 'Caption',
-				lightbox: { enabled: true },
-			},
+			name: 'core/group',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'Tilted' } },
+			],
 		} );
 		await editor.openDocumentSettingsSidebar();
 
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-		await settings.getByRole( 'tab', { name: 'Styles' } ).click();
 		await settings
 			.getByRole( 'button', { name: 'Transform options' } )
 			.click();
@@ -56,36 +47,19 @@ test.describe( 'Transform rotate block support', () => {
 			.fill( '30' );
 
 		await expect
-			.poll( async () => {
-				const [ block ] = await editor.getBlocks();
-				return block.attributes.style;
-			} )
-			.toMatchObject( { transform: { rotate: '30deg' } } );
+			.poll( editor.getEditedPostContent )
+			.toContain( '<div class="wp-block-group" style="rotate:30deg">' );
 
-		const editorFigure = editor.canvas.locator( 'figure.wp-block-image' );
-		await expect.poll( () => getRotate( editorFigure ) ).toBe( '30deg' );
-		await expect( editorFigure.locator( 'figcaption' ) ).toBeVisible();
-		expect( await getRotate( editorFigure.locator( 'img' ) ) ).toBe(
-			'none'
-		);
+		const editorGroup = editor.canvas.getByRole( 'document', {
+			name: 'Block: Group',
+		} );
+		await expect.poll( () => getRotate( editorGroup ) ).toBe( '30deg' );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
-		const figure = page.locator( '.wp-lightbox-container' );
-		const image = figure.locator( 'img' );
-		expect( await getRotate( figure ) ).toBe( '30deg' );
-		await expect( figure.locator( 'figcaption' ) ).toBeVisible();
-		expect( await getRotate( image ) ).toBe( 'none' );
-
-		await image.click();
-		const enlargedFigure = page
-			.locator( '.wp-lightbox-overlay .wp-block-image' )
-			.last();
-		await expect( enlargedFigure.locator( 'img' ) ).toBeVisible();
-		expect( await getRotate( enlargedFigure ) ).toBe( 'none' );
-		expect( await getRotate( enlargedFigure.locator( 'img' ) ) ).toBe(
-			'none'
-		);
+		const group = page.locator( '.wp-block-group' );
+		await expect( group ).toHaveAttribute( 'style', 'rotate:30deg' );
+		expect( await getRotate( group ) ).toBe( '30deg' );
 	} );
 } );

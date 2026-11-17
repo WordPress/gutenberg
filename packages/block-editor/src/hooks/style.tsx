@@ -833,8 +833,9 @@ const skipSerializationPathsEdit: Record< string, string[] > = {
 	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		BACKGROUND_SUPPORT_KEY,
 	],
-	// The transform support outputs its own styles.
-	[ TRANSFORM_SUPPORT_KEY ]: [ TRANSFORM_SUPPORT_KEY ],
+	[ `${ TRANSFORM_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TRANSFORM_SUPPORT_KEY,
+	],
 };
 
 /**
@@ -859,7 +860,6 @@ const skipSerializationPathsSave: Record< string, string[] > = {
 const skipSerializationPathsSaveChecks: Record< string, boolean > = {
 	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
-	[ TRANSFORM_SUPPORT_KEY ]: true,
 };
 
 /**
@@ -1195,10 +1195,21 @@ const elementTypes = [
 // Used for generating the instance ID
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
-// Transforms are for blocks only, so elements never output them.
-function omitTransform( style: PanelStyle ): Style {
-	const { transform, ...rest } = style as Style;
-	return rest;
+/**
+ * Removes transform styles from an element style object and its pseudo
+ * selector styles, as transforms are for blocks only. Mirror of
+ * `gutenberg_remove_element_transform_styles()` in PHP.
+ *
+ * @param style Element style object.
+ * @return Element style object without transform styles.
+ */
+function omitElementTransformStyles( style: PanelStyle ): PanelStyle {
+	return omitStyle( style as BlockStyle, [
+		TRANSFORM_SUPPORT_KEY,
+		...Object.keys( style )
+			.filter( ( key ) => key.startsWith( ':' ) )
+			.map( ( key ) => [ key, TRANSFORM_SUPPORT_KEY ] ),
+	] ) as PanelStyle;
 }
 
 /**
@@ -1213,7 +1224,7 @@ function omitTransform( style: PanelStyle ): Style {
  * @param baseSelector       The base CSS selector to scope rules under.
  * @return Concatenated CSS rules string, or undefined if none.
  */
-export function getElementCSSRules(
+function getElementCSSRules(
 	blockElementStyles: Record< string, PanelStyle > | undefined,
 	blockName: string,
 	baseSelector: string
@@ -1221,6 +1232,13 @@ export function getElementCSSRules(
 	if ( ! blockElementStyles ) {
 		return;
 	}
+
+	blockElementStyles = Object.fromEntries(
+		Object.entries( blockElementStyles ).map( ( [ element, style ] ) => [
+			element,
+			omitElementTransformStyles( style ),
+		] )
+	);
 
 	const rules: string[] = [];
 
@@ -1244,9 +1262,8 @@ export function getElementCSSRules(
 				ELEMENTS[ elementType ]
 			);
 
-			rules.push(
-				compileCSS( omitTransform( elementStyles ), { selector } )
-			);
+			// The element styles have the shape the style engine reads.
+			rules.push( compileCSS( elementStyles as Style, { selector } ) );
 
 			// Process any interactive states for the element type.
 			if ( pseudo ) {
@@ -1256,7 +1273,8 @@ export function getElementCSSRules(
 						elementStyles[ pseudoSelector as `:${ string }` ];
 					if ( pseudoStyles ) {
 						rules.push(
-							compileCSS( omitTransform( pseudoStyles ), {
+							// The element styles have the shape the style engine reads.
+							compileCSS( pseudoStyles as Style, {
 								selector: scopeSelector(
 									baseSelector,
 									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
@@ -1273,15 +1291,13 @@ export function getElementCSSRules(
 			elements.forEach( ( element ) => {
 				if ( blockElementStyles[ element ] ) {
 					rules.push(
-						compileCSS(
-							omitTransform( blockElementStyles[ element ] ),
-							{
-								selector: scopeSelector(
-									baseSelector,
-									ELEMENTS[ element ]
-								),
-							}
-						)
+						// The element styles have the shape the style engine reads.
+						compileCSS( blockElementStyles[ element ] as Style, {
+							selector: scopeSelector(
+								baseSelector,
+								ELEMENTS[ element ]
+							),
+						} )
 					);
 				}
 			} );

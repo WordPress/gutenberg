@@ -1065,6 +1065,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0
 	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.3.0 Added `transform.rotate`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -1094,6 +1095,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'blockGap' ),
 		array( 'spacing', 'margin' ),
 		array( 'spacing', 'padding' ),
+		array( 'transform', 'rotate' ),
 		array( 'typography', 'lineHeight' ),
 		array( 'typography', 'textColumns' ),
 	);
@@ -3287,14 +3289,14 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			}
 
+			// The style engine validates transform values.
+			if ( 'transform' === $value_path[0] ) {
+				$value = gutenberg_style_engine_get_styles( array( 'transform' => array( $value_path[1] => $value ) ) )['declarations'][ $css_property ] ?? null;
+			}
+
 			// Skip if empty and not "0" or value represents array of longhand values.
 			$has_missing_value = empty( $value ) && ! is_numeric( $value );
 			if ( $has_missing_value || is_array( $value ) ) {
-				continue;
-			}
-
-			// Mirrors the style engine, which outputs a single angle only.
-			if ( 'rotate' === $css_property && ( ! is_string( $value ) || ! preg_match( WP_Style_Engine_Gutenberg::VALID_ANGLE_PATTERN, $value ) ) ) {
 				continue;
 			}
 

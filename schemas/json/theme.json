@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight, textColumns",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- transform: rotate\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -491,7 +491,7 @@
 						"rotate": {
 							"description": "Allow users to set a rotation.",
 							"type": "boolean",
-							"default": true
+							"default": false
 						}
 					},
 					"additionalProperties": false

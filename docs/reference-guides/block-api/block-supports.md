@@ -1089,7 +1089,7 @@ _**Note:** Since WordPress 7.3._
 -   Subproperties:
     -   `rotate`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate`, which is `true` by default.
+This value signals that a block supports some of the CSS transform properties. When it does, the block editor shows UI controls for the user to set their values in a Transform panel, if the theme allows it with `settings.transform.rotate` or `settings.appearanceTools`.
 
 Each feature is output as its own CSS property, such as `rotate`, and never as the `transform` shorthand. This way a rotation combines with any `transform` a theme or block already applies.
 
@@ -1101,7 +1101,7 @@ supports: {
 }
 ```
 
-The rotation is applied to the block wrapper. A block can apply it to an inner element instead with a `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md), for example `.wp-block-image img`. A block that applies the rotation itself can opt out of its output with `__experimentalSkipSerialization`.
+The rotation is saved as an inline style on the block wrapper. To apply it to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization` and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 

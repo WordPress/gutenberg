@@ -392,6 +392,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'margin'   => true,
 				'padding'  => true,
 			),
+			'transform'  => array(
+				'rotate' => true,
+			),
 			'typography' => array(
 				'lineHeight'  => true,
 				'textColumns' => true,
@@ -435,6 +438,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
+					),
+					'transform'  => array(
+						'rotate' => true,
 					),
 					'typography' => array(
 						'lineHeight'  => false,

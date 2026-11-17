@@ -4,7 +4,6 @@ import type { BlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
-	getElementCSSRules,
 	getInlineStyles,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
@@ -542,29 +541,6 @@ describe( 'getStateStylesCSS under a text clip', () => {
 	} );
 } );
 
-describe( 'getElementCSSRules', () => {
-	it( 'does not output element transforms', () => {
-		const rotate = { transform: { rotate: '10deg' } };
-		const css = getElementCSSRules(
-			{
-				button: rotate,
-				link: {
-					color: { text: 'red' },
-					...rotate,
-					':hover': { transform: { rotate: '20deg' } },
-				},
-				heading: rotate,
-				h1: rotate,
-			},
-			'core/group',
-			'.wp-elements-1'
-		);
-
-		expect( css ).toContain( 'color: red;' );
-		expect( css ).not.toContain( 'rotate' );
-	} );
-} );
-
 describe( 'getResponsiveStateCSSRules', () => {
 	beforeEach( () => {
 		registerBlockType( 'test/state-button', {
@@ -626,7 +602,10 @@ describe( 'getResponsiveStateCSSRules', () => {
 						link: {
 							color: { text: 'red' },
 							transform: { rotate: '10deg' },
+							':hover': { transform: { rotate: '20deg' } },
 						},
+						heading: { transform: { rotate: '10deg' } },
+						h1: { transform: { rotate: '10deg' } },
 					},
 				},
 			},

@@ -50,8 +50,6 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
-- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
-  - `rotate`: `true`
 
 ## Context
 

@@ -49,6 +49,7 @@ Setting that enables the following UI tools:
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
+- transform: rotate
 - typography: lineHeight, textColumns
 
 ---
@@ -199,7 +200,7 @@ Settings related to transforms.
 
 | Property | Description | Type | Default |
 | -------- | ----------- | ---- | ------- |
-| rotate | Allow users to set a rotation. | `boolean` | `true` |
+| rotate | Allow users to set a rotation. | `boolean` | `false` |
 
 ---
 

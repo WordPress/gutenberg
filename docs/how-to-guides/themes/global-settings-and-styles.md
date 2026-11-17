@@ -262,7 +262,7 @@ The settings section has the following structure:
 			"spacingSizes": []
 		},
 		"transform": {
-			"rotate": true
+			"rotate": false
 		},
 		"typography": {
 			"customFontSize": true,
@@ -311,6 +311,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
+- transform: rotate
 - typography: lineHeight
 
 #### Backward compatibility with add_theme_support
