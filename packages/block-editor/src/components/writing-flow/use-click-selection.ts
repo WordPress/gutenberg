@@ -1,5 +1,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { isAppleOS } from '@wordpress/keycodes';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import {
@@ -8,6 +9,7 @@ import {
 	isBlockElementOutsideFields,
 } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
+import { getCommonDepthClientIds } from '../list-view/utils';
 
 // iOS WebKit places the caret on the tap itself, before the mouse events it
 // synthesizes from it. Other engines place it in the mousedown's default
@@ -17,7 +19,9 @@ const placesCaretOnTap =
 	!! window.CSS?.supports?.( '-webkit-touch-callout', 'none' );
 
 export default function useClickSelection() {
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, multiSelect, toggleBlockSelection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const {
 		isSelectionEnabled,
 		getBlockSelectionStart,
@@ -29,6 +33,8 @@ export default function useClickSelection() {
 		canMoveBlocks,
 		getSelectedBlockClientIds,
 		canHostEditableRoot,
+		getExplicitSelectionClientIds,
+		getBlockParents,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
 		( node ) => {
@@ -37,6 +43,7 @@ export default function useClickSelection() {
 			// The block to collapse a multi-selection to on click, recorded
 			// on mousedown. See the comment in `onMouseDown`.
 			let clickCollapseClientId: string | undefined;
+			let isToggleClick = false;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
@@ -44,6 +51,14 @@ export default function useClickSelection() {
 				// on a page that lost focus, as when the keyboard is swiped
 				// away, focuses it again before mousedown.
 				isFocusedOnPointerDown = node.matches( ':focus' );
+				if (
+					! event.shiftKey &&
+					! event.altKey &&
+					( isAppleOS() ? event.metaKey : event.ctrlKey )
+				) {
+					// The mousedown capture handles membership before native caret placement.
+					return;
+				}
 
 				// A press on a block's own element outside its fields, such as
 				// a list item's bullet: stop editing so the browser drags the
@@ -82,6 +97,7 @@ export default function useClickSelection() {
 				}
 
 				clickCollapseClientId = undefined;
+				isToggleClick = false;
 
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -89,7 +105,45 @@ export default function useClickSelection() {
 					return;
 				}
 
+				if (
+					clickedClientId &&
+					! event.shiftKey &&
+					! event.altKey &&
+					( isAppleOS() ? event.metaKey : event.ctrlKey )
+				) {
+					const control = ( event.target as Element ).closest(
+						'button, input, textarea, select, a, [role="button"]'
+					);
+					if ( control && ! control.hasAttribute( 'data-block' ) ) {
+						return;
+					}
+					event.preventDefault();
+					event.stopPropagation();
+					isToggleClick = true;
+					node.ownerDocument
+						.defaultView!.getSelection()!
+						.removeAllRanges();
+					toggleBlockSelection( clickedClientId );
+					return;
+				}
 				const startClientId = getBlockSelectionStart();
+				if (
+					event.shiftKey &&
+					clickedClientId &&
+					startClientId &&
+					getExplicitSelectionClientIds()
+				) {
+					event.preventDefault();
+					event.stopPropagation();
+					const { start, end } = getCommonDepthClientIds(
+						startClientId,
+						clickedClientId,
+						getBlockParents( startClientId ),
+						getBlockParents( clickedClientId )
+					);
+					multiSelect( start, end );
+					return;
+				}
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus
@@ -192,6 +246,12 @@ export default function useClickSelection() {
 			}
 
 			function onClick( event: MouseEvent ) {
+				if ( isToggleClick ) {
+					isToggleClick = false;
+					event.preventDefault();
+					event.stopPropagation();
+					return;
+				}
 				const clientId = clickCollapseClientId;
 				clickCollapseClientId = undefined;
 
@@ -235,14 +295,14 @@ export default function useClickSelection() {
 				selectBlock( clientId );
 			}
 
-			node.addEventListener( 'pointerdown', onPointerDown );
-			node.addEventListener( 'mousedown', onMouseDown );
-			node.addEventListener( 'click', onClick );
+			node.addEventListener( 'pointerdown', onPointerDown, true );
+			node.addEventListener( 'mousedown', onMouseDown, true );
+			node.addEventListener( 'click', onClick, true );
 
 			return () => {
-				node.removeEventListener( 'pointerdown', onPointerDown );
-				node.removeEventListener( 'mousedown', onMouseDown );
-				node.removeEventListener( 'click', onClick );
+				node.removeEventListener( 'pointerdown', onPointerDown, true );
+				node.removeEventListener( 'mousedown', onMouseDown, true );
+				node.removeEventListener( 'click', onClick, true );
 			};
 		},
 		[
@@ -257,6 +317,10 @@ export default function useClickSelection() {
 			canMoveBlocks,
 			getSelectedBlockClientIds,
 			canHostEditableRoot,
+			multiSelect,
+			toggleBlockSelection,
+			getExplicitSelectionClientIds,
+			getBlockParents,
 		]
 	);
 }

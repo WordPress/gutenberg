@@ -27,6 +27,43 @@ const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
+ * Adds or removes one whole block without extending a selection range.
+ *
+ * @param clientId        Block to toggle.
+ * @param initialPosition Initial canvas position, or null to retain external focus.
+ * @return Selection thunk.
+ */
+export const toggleBlockSelection =
+	( clientId: string, initialPosition: InitialPosition = 0 ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		if (
+			! select.isSelectionEnabled() ||
+			! select.getBlock( clientId ) ||
+			select.getBlockEditingMode( clientId ) === 'disabled'
+		) {
+			return;
+		}
+		const selected = select.getSelectedBlockClientIds();
+		if (
+			select
+				.getBlockParents( clientId )
+				.some( ( parent ) => selected.includes( parent ) )
+		) {
+			return;
+		}
+		dispatch.multiSelectSet(
+			selected.includes( clientId )
+				? selected.filter( ( id ) => id !== clientId )
+				: [ ...selected, clientId ],
+			initialPosition,
+			{
+				anchorClientId: select.getBlockSelectionStart() ?? clientId,
+				focusClientId: clientId,
+			}
+		);
+	};
+
+/**
  * Pastes a sequence after the last target, without replacing scattered blocks.
  *
  * @param blocks          Clipboard blocks.
