@@ -33,6 +33,7 @@ import {
 	useSettings,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	getTransformClassesAndStyles,
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
@@ -1175,6 +1176,7 @@ export default function Image( {
 
 	const borderProps = useBorderProps( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
+	const transformProps = getTransformClassesAndStyles( attributes );
 
 	const { postType, postId, queryId } = context;
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
@@ -1253,6 +1255,7 @@ export default function Image( {
 									: undefined,
 							...borderProps.style,
 							...shadowProps.style,
+							...transformProps.style,
 						} }
 					/>
 					{ ( isUploading || isSwappingMedia ) && <WCSpinner /> }
@@ -1326,6 +1329,8 @@ export default function Image( {
 					// syncs the top with the img. This matters when the img height is
 					// less than the line-height.
 					inset: `${ offsetTop }px 0 0 0`,
+					// The box sits over the img, so it turns with it.
+					...transformProps.style,
 				} }
 				size={ pixelSize }
 				minWidth={ minWidth }

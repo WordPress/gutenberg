@@ -95,6 +95,22 @@ const FLICK_DISTANCE_PX = 50;
 const FLICK_MAX_DURATION_MS = 300;
 
 /**
+ * Reads the computed `scale` of an element as one factor.
+ *
+ * @param {string} value Computed `scale`, such as `none`, `1.2` or `120%`.
+ * @return {number} The horizontal scale factor, or 1 when there is none.
+ */
+function getUniformScale( value ) {
+	const factor = parseFloat( value );
+	if ( ! Number.isFinite( factor ) ) {
+		return 1;
+	}
+	return value.trim().split( /\s+/ )[ 0 ].endsWith( '%' )
+		? factor / 100
+		: factor;
+}
+
+/**
  * How far a committed swipe travels before the image is swapped.
  *
  * The enlarged image is centred in the viewport, so one viewport width is one
@@ -753,14 +769,20 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				const { imageRef } = state.selectedImage;
 				let {
 					naturalWidth,
 					naturalHeight,
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
-				} = state.selectedImage.imageRef;
-				let { x: screenPosX, y: screenPosY } =
-					state.selectedImage.imageRef.getBoundingClientRect();
+				} = imageRef;
+				// A transform turns, moves or scales the image around its centre,
+				// which its bounding box keeps, so place the image from there.
+				const imageRect = imageRef.getBoundingClientRect();
+				const imageCenterX = imageRect.x + imageRect.width / 2;
+				const imageCenterY = imageRect.y + imageRect.height / 2;
+				let screenPosX = imageCenterX - originalWidth / 2;
+				let screenPosY = imageCenterY - originalHeight / 2;
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
@@ -873,6 +895,16 @@ const { state, actions, callbacks } = store(
 				screenPosX -= cropX * containerScale;
 				screenPosY -= cropY * containerScale;
 
+				// A scale grows the image around its centre, so the zoom starts
+				// from the scaled image.
+				const imageScale = getUniformScale(
+					window.getComputedStyle( imageRef ).scale
+				);
+				screenPosX =
+					imageCenterX + ( screenPosX - imageCenterX ) * imageScale;
+				screenPosY =
+					imageCenterY + ( screenPosY - imageCenterY ) * imageScale;
+
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
 				// image in iOS Safari, perhaps due to an inconsistency in how browsers
@@ -893,7 +925,7 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-thumbnail-height: ${
 						hasCroppedSource ? thumbnailHeight : containerHeight
 					}px;
-					--wp--lightbox-scale: ${ containerScale };
+					--wp--lightbox-scale: ${ containerScale * imageScale };
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
