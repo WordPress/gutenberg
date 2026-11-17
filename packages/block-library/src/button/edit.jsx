@@ -241,6 +241,7 @@ function ButtonEdit( props ) {
 		context,
 	} = props;
 	const {
+		ariaLabel,
 		tagName,
 		linkTarget,
 		placeholder,
@@ -606,6 +607,16 @@ function ButtonEdit( props ) {
 						}
 					/>
 				) }
+				<TextControl
+					label={ __( 'ARIA label' ) }
+					help={ __(
+						'Describes the button to assistive technology when its visible text is not descriptive enough.'
+					) }
+					value={ ariaLabel || '' }
+					onChange={ ( value ) =>
+						setAttributes( { ariaLabel: value || undefined } )
+					}
+				/>
 			</InspectorControls>
 		</>
 	);
