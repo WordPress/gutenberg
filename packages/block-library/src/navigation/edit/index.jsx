@@ -458,12 +458,19 @@ function Navigation( {
 	} = useNavigationMenu( ref );
 
 	// Each permission is `undefined` until it resolves, then `true` or `false`.
+	// A block with a menu only uses them while it or its inner blocks are
+	// selected, so skip the requests until then.
+	const isBlockOrInnerBlockSelected = isSelected || isInnerBlockSelected;
 	const {
 		canUserCreateNavigationMenus,
 		canUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
 	} = useSelect(
 		( select ) => {
+			if ( ref && ! isBlockOrInnerBlockSelected ) {
+				return {};
+			}
+
 			const { canUser } = select( coreStore );
 			const resource = { kind: 'postType', name: 'wp_navigation' };
 			return {
@@ -476,7 +483,7 @@ function Navigation( {
 					: undefined,
 			};
 		},
-		[ ref ]
+		[ ref, isBlockOrInnerBlockSelected ]
 	);
 
 	const navMenuResolvedButMissing =
