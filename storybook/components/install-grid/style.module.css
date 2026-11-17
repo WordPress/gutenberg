@@ -103,17 +103,6 @@
 	padding: 1px 4px;
 }
 
-.root .heading {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-	margin: 0 0 16px;
-	padding: 0;
-	border: 0;
-	font-size: 18px;
-	font-weight: 600;
-}
-
 .logo {
 	width: 32px;
 	height: 32px;

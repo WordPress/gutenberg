@@ -1,5 +1,5 @@
 import { useState } from '@wordpress/element';
-import { Source } from '@storybook/addon-docs/blocks';
+import { Source, Subheading } from '@storybook/addon-docs/blocks';
 import { ButtonLink } from '@wordpress/ui';
 import styles from './style.module.css';
 
@@ -321,10 +321,7 @@ export function InstallGrid() {
 				) ) }
 			</div>
 			<div className={ styles.panel } role="group" aria-live="polite">
-				<h3 className={ styles.heading }>
-					<ToolIcon tool={ tool } />
-					{ tool.label }
-				</h3>
+				<Subheading>{ tool.label }</Subheading>
 				{ tool.command && (
 					<CopyBlock text={ tool.command } language="bash" />
 				) }
