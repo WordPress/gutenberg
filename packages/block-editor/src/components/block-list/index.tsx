@@ -74,10 +74,9 @@ function Root( { className, ...settings }: BlockListProps ) {
 		return {
 			isOutlineMode: outlineMode && ! isTyping(),
 			/*
-			 * A preview cannot be edited, so nothing should fade there.
-			 * Editing a content-only section dims the rest of the canvas the
-			 * same way the user preference does. Nothing else switches the
-			 * fade on: notes mark their block with its outline instead.
+			 * Spotlight fades everything but the block being worked on, which
+			 * has nothing to offer a canvas that cannot be edited — a preview
+			 * would just render most of its content faded out.
 			 */
 			isFocusMode:
 				! _isPreviewMode &&
