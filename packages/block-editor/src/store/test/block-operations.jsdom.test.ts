@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { Block } from '@wordpress/blocks';
 import reducer from '../reducer';
-import { getBlockOperationsSince } from '../block-operations';
+import {
+	getBlockOperationsSince,
+	withBlockOperations,
+} from '../block-operations';
 import type { State } from '../types';
 
 const block = ( clientId: string, innerBlocks: Block[] = [] ): Block => ( {
@@ -222,6 +225,33 @@ describe( 'block operations', () => {
 				value: 'B',
 			},
 		] );
+	} );
+
+	it( 'carries the history over without mutating the wrapped reducer result', () => {
+		const state = reducer( initial(), {
+			type: 'INSERT_BLOCKS',
+			blocks: [ block( 'x' ) ],
+			index: 1,
+		} );
+		// A reducer that leaves the blocks alone and returns a new state
+		// without the history, as `combineReducers` does. Frozen, so that
+		// writing to it throws.
+		const { blockOperationChanges, ...rest } = state;
+		const result = Object.freeze( rest ) as State;
+		const wrapped = withBlockOperations( () => result );
+
+		const next = wrapped( state, { type: 'UNRELATED' } );
+
+		expect( next ).not.toBe( result );
+		expect( next.blockOperationChanges ).toBe( blockOperationChanges );
+		expect( 'blockOperationChanges' in result ).toBe( false );
+	} );
+
+	it( 'returns the same state when the wrapped reducer changed nothing', () => {
+		const state = initial();
+		const wrapped = withBlockOperations( ( current ) => current as State );
+
+		expect( wrapped( state, { type: 'UNRELATED' } ) ).toBe( state );
 	} );
 
 	it( 'requires state diffing when an operation batch exceeds the retained history', () => {

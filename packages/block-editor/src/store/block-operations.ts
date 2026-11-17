@@ -279,8 +279,15 @@ export function withBlockOperations(
 		}
 		const changes = state.blockOperationChanges ?? [];
 		if ( state.blocks.tree === next.blocks.tree ) {
-			next.blockOperationChanges = state.blockOperationChanges;
-			return next;
+			// Carry the history over without changing the wrapped
+			// reducer's result: a reducer's output must not be mutated.
+			if ( next.blockOperationChanges === state.blockOperationChanges ) {
+				return next;
+			}
+			return {
+				...next,
+				blockOperationChanges: state.blockOperationChanges,
+			};
 		}
 		return {
 			...next,
