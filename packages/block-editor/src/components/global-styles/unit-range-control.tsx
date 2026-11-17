@@ -17,6 +17,8 @@ export type UnitRangeSettings = Record<
 interface UnitRangeControlProps {
 	/** A label for both the input and the slider. */
 	label: string;
+	/** An accessible label for the input and the slider, when it differs from `label`. */
+	controlLabel?: string;
 	/** The current CSS value, such as `45deg`. */
 	value?: string;
 	/** Called with the new CSS value, or `undefined` when cleared. */
@@ -33,6 +35,7 @@ interface UnitRangeControlProps {
  *
  * @param props              Component props.
  * @param props.label        A label for both the input and the slider.
+ * @param props.controlLabel An accessible label for the input and the slider, when it differs from `label`.
  * @param props.value        The current CSS value.
  * @param props.onChange     Called with the new value, or `undefined` when cleared.
  * @param props.units        The units offered; the first is the default.
@@ -42,6 +45,7 @@ interface UnitRangeControlProps {
  */
 export default function UnitRangeControl( {
 	label,
+	controlLabel = label,
 	value,
 	onChange,
 	units,
@@ -67,7 +71,7 @@ export default function UnitRangeControl( {
 			<Stack direction="row" align="center" gap="md">
 				<UnitControl
 					className="block-editor-global-styles-unit-range-control__input"
-					label={ label }
+					label={ controlLabel }
 					hideLabelFromVision
 					value={ value ?? '' }
 					units={ units }
@@ -76,7 +80,7 @@ export default function UnitRangeControl( {
 				/>
 				<RangeControl
 					className="block-editor-global-styles-unit-range-control__slider"
-					label={ label }
+					label={ controlLabel }
 					hideLabelFromVision
 					value={ quantity }
 					min={ range?.min }

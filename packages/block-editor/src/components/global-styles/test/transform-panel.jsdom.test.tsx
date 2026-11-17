@@ -156,3 +156,193 @@ describe( 'TransformPanel', () => {
 		} );
 	} );
 } );
+
+describe( 'TransformPanel offsets', () => {
+	const translateSettings = { transform: { translate: true } };
+
+	it( 'shows each stored axis in its own field', () => {
+		render(
+			<TransformPanel
+				value={ { transform: { translate: { x: '10px', y: '-50%' } } } }
+				settings={ translateSettings }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'X offset' } )
+		).toHaveValue( 10 );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Y offset' } )
+		).toHaveValue( -50 );
+	} );
+
+	it( 'writes a negative offset for one axis only', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Y offset' } ),
+			'-8'
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { y: '-8px' } },
+		} );
+	} );
+
+	it( 'removes an axis when its field is cleared', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { translate: { x: '10px', y: '4px' } } } }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.clear(
+			screen.getByRole( 'spinbutton', { name: 'X offset' } )
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { y: '4px' } },
+		} );
+	} );
+
+	it( 'lists both axes as one Offset menu item', async () => {
+		const user = userEvent.setup();
+		render(
+			<TransformPanel
+				value={ {} }
+				settings={ translateSettings }
+				onChange={ vi.fn() }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform options' } )
+		);
+
+		expect(
+			screen.getByRole( 'menuitemcheckbox', { name: /Offset/ } )
+		).toBeVisible();
+		expect(
+			screen.queryByRole( 'menuitemcheckbox', { name: /X offset/ } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'menuitemcheckbox', { name: /Y offset/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'clears both axes when the Offset item is reset', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {
+					transform: {
+						rotate: '15deg',
+						translate: { x: '10px', y: '4px' },
+					},
+				} }
+				settings={ { transform: { rotate: true, translate: true } } }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform options' } )
+		);
+		await user.click( screen.getByRole( 'menuitem', { name: /Offset/ } ) );
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			transform: { rotate: '15deg', translate: undefined },
+		} );
+	} );
+
+	it( 'keeps the unit of each axis when its slider moves', () => {
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { translate: { x: '2rem', y: '-50%' } } } }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const xSlider = screen.getByRole( 'slider', { name: 'X offset' } );
+		const ySlider = screen.getByRole( 'slider', { name: 'Y offset' } );
+		expect( xSlider ).toHaveAttribute( 'min', '-50' );
+		expect( xSlider ).toHaveAttribute( 'max', '50' );
+		expect( ySlider ).toHaveAttribute( 'min', '-100' );
+		expect( ySlider ).toHaveAttribute( 'max', '100' );
+
+		fireEvent.change( xSlider, { target: { value: '-2.5' } } );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { x: '-2.5rem', y: '-50%' } },
+		} );
+	} );
+
+	it( 'saves the inherited axis with the other axis when one is set', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				inheritedValue={ {
+					transform: { translate: { x: '3rem' } },
+				} }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'X offset' } )
+		).toHaveValue( 3 );
+
+		await user.type(
+			screen.getByRole( 'spinbutton', { name: 'Y offset' } ),
+			'4'
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { x: '3rem', y: '4px' } },
+		} );
+	} );
+
+	it( 'clears both axes and the rotation on reset all', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {
+					transform: { rotate: '15deg', translate: { x: '10px' } },
+				} }
+				settings={ { transform: { rotate: true, translate: true } } }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Transform options' } )
+		);
+		await user.click(
+			screen.getByRole( 'menuitem', { name: 'Reset all' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			transform: { rotate: undefined, translate: undefined },
+		} );
+	} );
+} );

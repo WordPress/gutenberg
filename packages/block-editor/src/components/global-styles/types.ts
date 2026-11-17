@@ -103,6 +103,7 @@ export interface StyleSettings {
 	};
 	transform?: Record< string, unknown > & {
 		rotate?: boolean;
+		translate?: boolean;
 	};
 	typography?: TypographyStyleSettings;
 }
@@ -209,7 +210,10 @@ export interface PanelStyle {
 	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
-	transform?: Record< string, StyleValue >;
+	transform?: {
+		rotate?: StyleValue;
+		translate?: { x?: string; y?: string };
+	};
 	elements?: Record< string, PanelStyle >;
 	css?: string;
 	[ state: `:${ string }` ]: PanelStyle | undefined;

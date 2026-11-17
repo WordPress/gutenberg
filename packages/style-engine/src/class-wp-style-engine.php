@@ -44,6 +44,13 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		const VALID_ANGLE_PATTERN = '/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:deg|grad|rad|turn)|0)$/iD';
 
 		/**
+		 * Matches a single CSS length or percentage: a number with a length unit or `%`, or `0`.
+		 *
+		 * @var string
+		 */
+		const VALID_LENGTH_PERCENTAGE_PATTERN = '/^(?:[+-]?(?:\d+(?:\.\d+)?|\.\d+)(?:%|px|cm|mm|q|in|pt|pc|r?em|r?ex|r?ch|r?cap|r?ic|r?lh|[sld]?v(?:w|h|i|b|min|max)|cq(?:w|h|i|b|min|max))|0)$/iD';
+
+		/**
 		 * Style definitions that contain the instructions to parse/output valid Gutenberg styles from a block's attributes.
 		 *
 		 * For every style definition, the following properties are valid:
@@ -300,12 +307,19 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				),
 			),
 			'transform'  => array(
-				'rotate' => array(
+				'rotate'    => array(
 					'property_keys' => array(
 						'default' => 'rotate',
 					),
 					'value_func'    => array( self::class, 'get_angle_css_declarations' ),
 					'path'          => array( 'transform', 'rotate' ),
+				),
+				'translate' => array(
+					'property_keys' => array(
+						'default' => 'translate',
+					),
+					'value_func'    => array( self::class, 'get_translate_css_declarations' ),
+					'path'          => array( 'transform', 'translate' ),
 				),
 			),
 			'typography' => array(
@@ -850,6 +864,35 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 			}
 
 			return array( $style_definition['property_keys']['default'] => $style_value );
+		}
+
+		/**
+		 * Style value parser that returns a CSS definition array for the `translate` property.
+		 *
+		 * The value is an object with `x` and `y` axes, each a single length or
+		 * percentage. A missing axis outputs `0`. Any invalid axis outputs nothing,
+		 * and other keys are ignored.
+		 *
+		 * @param array $style_value      A single raw style value from $block_styles array.
+		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
+		 *
+		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
+		 */
+		protected static function get_translate_css_declarations( $style_value, $style_definition ) {
+			if ( ! is_array( $style_value ) || ( ! isset( $style_value['x'] ) && ! isset( $style_value['y'] ) ) ) {
+				return array();
+			}
+
+			$axes = array();
+			foreach ( array( 'x', 'y' ) as $axis ) {
+				$axis_value = $style_value[ $axis ] ?? '0';
+				if ( ! is_string( $axis_value ) || ! preg_match( static::VALID_LENGTH_PERCENTAGE_PATTERN, $axis_value ) ) {
+					return array();
+				}
+				$axes[] = $axis_value;
+			}
+
+			return array( $style_definition['property_keys']['default'] => implode( ' ', $axes ) );
 		}
 
 		/**

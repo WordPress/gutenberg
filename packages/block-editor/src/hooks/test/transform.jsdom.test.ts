@@ -24,6 +24,14 @@ describe( 'getTransformClassesAndStyles', () => {
 		).toEqual( { style: { rotate: '15deg' } } );
 	} );
 
+	it( 'returns an offset with a missing axis as 0', () => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { translate: { y: '2rem' } } },
+			} )
+		).toEqual( { style: { translate: '0 2rem' } } );
+	} );
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {
