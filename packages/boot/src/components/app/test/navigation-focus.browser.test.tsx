@@ -76,6 +76,40 @@ describe( 'navigation focus', () => {
 		);
 	} );
 
+	it( 'moves focus to the same control on the new page', async () => {
+		await renderAt( '/settings/general' );
+
+		const link = await screen.findByRole( 'link', {
+			name: 'Main section',
+		} );
+		link.focus();
+		await userEvent.keyboard( '{Enter}' );
+
+		await waitFor( () => expect( link ).not.toBeInTheDocument() );
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'link', { name: 'Main section' } )
+			).toHaveFocus()
+		);
+	} );
+
+	it( 'ignores a control that lost focus before the navigation', async () => {
+		await renderAt( '/settings/general' );
+
+		const section = await screen.findByRole( 'link', {
+			name: 'Main section',
+		} );
+		section.focus();
+		section.blur();
+		// A click that does not move focus, such as a mouse click on a link in
+		// Safari.
+		// eslint-disable-next-line testing-library/no-node-access
+		screen.getByRole( 'link', { name: 'Settings' } ).click();
+
+		const page = await screen.findByRole( 'region', { name: 'Settings' } );
+		await waitFor( () => expect( page ).toHaveFocus() );
+	} );
+
 	it( 'keeps focus on a link that the navigation does not remove', async () => {
 		await renderAt( '/settings/general' );
 
