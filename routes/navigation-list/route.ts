@@ -13,6 +13,19 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	orderby: 'date',
 };
 
+/**
+ * Opening the Site Editor doesn't imply managing Navigation Menus. The REST
+ * API only reports the post type's `create_posts` capability for the
+ * collection, so that capability gates the screen, as it does the Navigation
+ * menu item on the server.
+ */
+async function canManageNavigationMenus() {
+	return !! ( await resolveSelect( coreStore ).canUser( 'create', {
+		kind: 'postType',
+		name: NAVIGATION_POST_TYPE,
+	} ) );
+}
+
 export const route = {
 	async beforeLoad() {
 		// Only block themes render `wp_navigation` posts. Classic themes manage
@@ -32,6 +45,11 @@ export const route = {
 			search?: string;
 		};
 	} ) => {
+		// The stage explains why there are no menus to show, without a canvas.
+		if ( ! ( await canManageNavigationMenus() ) ) {
+			return undefined;
+		}
+
 		const navigations = ( await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			NAVIGATION_POST_TYPE,
@@ -54,6 +72,12 @@ export const route = {
 		};
 	},
 	loader: async () => {
+		// The menus query includes drafts, which the REST API only returns to
+		// users who can edit Navigation Menus.
+		if ( ! ( await canManageNavigationMenus() ) ) {
+			return;
+		}
+
 		await Promise.all( [
 			// Preload the view configuration the stage resolves its view from.
 			loadNavigationViewConfig(),
@@ -63,10 +87,6 @@ export const route = {
 				NAVIGATION_POST_TYPE,
 				PRELOADED_NAVIGATION_MENUS_QUERY
 			),
-			resolveSelect( coreStore ).canUser( 'create', {
-				kind: 'postType',
-				name: NAVIGATION_POST_TYPE,
-			} ),
 			// Preload post type object (what usePostFields needs)
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
 			// Preload users data (what usePostFields needs for author field)

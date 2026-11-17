@@ -12,8 +12,11 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
+import useCanManageNavigationMenus from '../sidebar-navigation-screen-navigation-menus/use-can-manage-navigation-menus';
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
+	const canManageNavigationMenus = useCanManageNavigationMenus();
+
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-main">
 			<SidebarNavigationItem
@@ -52,7 +55,7 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 				to="/navigation"
 				withChevron
 				icon={ navigation }
-				isHidden={ ! isBlockBasedTheme }
+				isHidden={ ! isBlockBasedTheme || ! canManageNavigationMenus }
 			>
 				{ __( 'Navigation' ) }
 			</SidebarNavigationItem>

@@ -1,6 +1,10 @@
 import { useNavigate, useSearch } from '@wordpress/route';
 import type { Action, View, SupportedLayouts } from '@wordpress/dataviews';
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+import {
+	privateApis as coreDataPrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import type { Post } from '@wordpress/core-data';
 import { Page } from '@wordpress/admin-ui';
@@ -30,6 +34,30 @@ const PRELOADED_NAVIGATION_MENUS_QUERY = {
 
 function getItemId( item: Post ) {
 	return item.id.toString();
+}
+
+function NavigationListStage() {
+	// The route loader resolves the permission before the stage mounts.
+	const canManageNavigationMenus = useSelect(
+		( select ) =>
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: NAVIGATION_POST_TYPE,
+			} ),
+		[]
+	);
+
+	if ( ! canManageNavigationMenus ) {
+		return (
+			<Page title={ __( 'Navigation' ) } headingLevel={ 2 } hasPadding>
+				{ __(
+					'You do not have permission to manage Navigation Menus.'
+				) }
+			</Page>
+		);
+	}
+
+	return <NavigationList />;
 }
 
 function NavigationList() {
@@ -202,4 +230,4 @@ function NavigationListView( {
 	);
 }
 
-export const stage = NavigationList;
+export const stage = NavigationListStage;

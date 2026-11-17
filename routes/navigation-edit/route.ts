@@ -2,7 +2,7 @@ import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { notFound } from '@wordpress/route';
+import { notFound, redirect } from '@wordpress/route';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -25,6 +25,20 @@ export const route = {
 		const theme = await resolveSelect( coreStore ).getCurrentTheme();
 		if ( ! theme?.is_block_theme ) {
 			throw notFound();
+		}
+
+		// Opening the Site Editor doesn't imply managing Navigation Menus. The
+		// REST API only reports the post type's `create_posts` capability for
+		// the collection, so that capability gates the screen. The list route
+		// explains why the user can't manage menus.
+		const canManageNavigationMenus = await resolveSelect(
+			coreStore
+		).canUser( 'create', {
+			kind: 'postType',
+			name: NAVIGATION_POST_TYPE,
+		} );
+		if ( ! canManageNavigationMenus ) {
+			throw redirect( { to: '/navigation/list' } );
 		}
 
 		try {

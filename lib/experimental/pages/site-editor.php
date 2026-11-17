@@ -30,7 +30,15 @@ function gutenberg_site_editor_register_default_menu_items() {
 
 	// The screen edits `wp_navigation` posts, which only block themes render.
 	// Classic themes manage their menus through Appearance > Menus instead.
-	if ( wp_is_block_theme() ) {
+	// Opening the Site Editor doesn't imply managing Navigation Menus, so the
+	// item also checks the post type's `create_posts` capability: the one the
+	// client checks through the REST API before rendering the screen.
+	$navigation_post_type = get_post_type_object( 'wp_navigation' );
+	if (
+		wp_is_block_theme() &&
+		$navigation_post_type &&
+		current_user_can( $navigation_post_type->cap->create_posts )
+	) {
 		gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
 	}
 
