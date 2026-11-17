@@ -1030,23 +1030,27 @@ HTML;
 
 	public function data_accordion_heading_title_markup() {
 		return array(
-			'link'                 => array(
+			'link'                   => array(
 				'Read <a href="https://example.com">more</a>',
 				'Read more',
 			),
-			'block-level markup'   => array(
+			'block-level markup'     => array(
 				'<div><p>Block</p></div> text <br>here',
 				'Block text here',
 			),
-			'interactive elements' => array(
+			'interactive elements'   => array(
 				'Press <button type="button">this</button> now',
 				'Press this now',
 			),
-			'inline formatting'    => array(
+			'interactive attributes' => array(
+				'<span role="button" tabindex="0" data-wp-on--click="actions.toggle">Fake</span> title',
+				'<span>Fake</span> title',
+			),
+			'inline formatting'      => array(
 				'<strong>Bold</strong> <code>code</code> <mark class="has-inline-color" style="color:#f00">mark</mark> H<sub>2</sub>O <span lang="fr">mot</span>',
 				'<strong>Bold</strong> <code>code</code> <mark class="has-inline-color" style="color:#f00">mark</mark> H<sub>2</sub>O <span lang="fr">mot</span>',
 			),
-			'inline image'         => array(
+			'inline image'           => array(
 				'Logo <img class="wp-image-7" src="https://example.com/logo.png" alt="Logo" usemap="#map">',
 				'Logo <img class="wp-image-7" src="https://example.com/logo.png" alt="Logo">',
 			),
@@ -1092,6 +1096,46 @@ HTML;
 			$this->get_accordion_heading_html( 'Saved title' ),
 			$result,
 			'The saved title should be rendered when the source returns no value.'
+		);
+	}
+
+	/**
+	 * Tests if a title saved in the block comment is not rendered as a bound value.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 *
+	 * @expectedIncorrectUsage rest_validate_value_from_schema
+	 */
+	public function test_accordion_heading_title_ignores_title_in_block_comment() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return null;
+				},
+			)
+		);
+
+		$block_content = get_comment_delimited_block_content(
+			'core/accordion-heading',
+			array(
+				'title'    => '<em>From the block comment</em>',
+				'metadata' => array(
+					'bindings' => array(
+						'title' => array( 'source' => self::SOURCE_NAME ),
+					),
+				),
+			),
+			$this->get_accordion_heading_html( 'Saved title' )
+		);
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'Saved title' ),
+			trim( $block->render() ),
+			'A title saved in the block comment should not replace the saved title.'
 		);
 	}
 

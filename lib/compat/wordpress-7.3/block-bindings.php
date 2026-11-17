@@ -35,6 +35,11 @@ function gutenberg_get_accordion_heading_title_allowed_html() {
 	$inline_tags  = array( 'abbr', 'b', 'bdo', 'cite', 'code', 'del', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'q', 's', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'u' );
 	$allowed_html = array_intersect_key( wp_kses_allowed_html( 'post' ), array_flip( $inline_tags ) );
 
+	// Focus, roles and Interactivity API directives would make the content interactive.
+	foreach ( array_keys( $allowed_html ) as $tag ) {
+		unset( $allowed_html[ $tag ]['tabindex'], $allowed_html[ $tag ]['role'], $allowed_html[ $tag ]['data-*'] );
+	}
+
 	// An image map would make the image interactive.
 	unset( $allowed_html['img']['usemap'] );
 
@@ -75,6 +80,11 @@ function gutenberg_render_block_accordion_heading_title_binding( $block_content,
 
 	$title = $attributes['title'];
 	if ( ! is_string( $title ) && ! is_int( $title ) && ! is_float( $title ) ) {
+		return $block_content;
+	}
+
+	// A `title` saved in the block comment is not a bound value.
+	if ( isset( $parsed_block['attrs']['title'] ) && $parsed_block['attrs']['title'] === $title ) {
 		return $block_content;
 	}
 
