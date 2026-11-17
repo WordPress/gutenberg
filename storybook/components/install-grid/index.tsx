@@ -235,27 +235,6 @@ const TOOLS: Tool[] = [
 	},
 ];
 
-function CopyBlock( {
-	text,
-	file,
-	language,
-}: {
-	text: string;
-	file?: string;
-	language: 'json' | 'bash';
-} ) {
-	return (
-		<>
-			{ file && (
-				<p className={ styles.file }>
-					<Inline text={ `In \`${ file }\`:` } />
-				</p>
-			) }
-			<Source code={ text } language={ language } format={ false } />
-		</>
-	);
-}
-
 function ToolIcon( { tool }: { tool: Tool } ) {
 	if ( ! tool.domain ) {
 		return (
@@ -325,14 +304,25 @@ export function InstallGrid() {
 			<div className={ styles.panel } role="group" aria-live="polite">
 				<Subheading>{ tool.label }</Subheading>
 				{ tool.command && (
-					<CopyBlock text={ tool.command } language="bash" />
+					<Source
+						code={ tool.command }
+						language="bash"
+						format={ false }
+					/>
 				) }
 				{ tool.config && (
-					<CopyBlock
-						text={ tool.config }
-						file={ tool.file }
-						language="json"
-					/>
+					<>
+						{ tool.file && (
+							<p className={ styles.file }>
+								In <code>{ tool.file }</code>:
+							</p>
+						) }
+						<Source
+							code={ tool.config }
+							language="json"
+							format={ false }
+						/>
+					</>
 				) }
 				{ tool.install && (
 					<p>
