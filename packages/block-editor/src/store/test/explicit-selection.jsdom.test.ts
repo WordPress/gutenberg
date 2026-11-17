@@ -59,6 +59,194 @@ describe( 'explicit block selection', () => {
 		).toBeNull();
 	} );
 
+	it.each< [ number, number[] ] >( [
+		[ 0, [ 0, 2, 1, 3, 4 ] ],
+		[ 2, [ 1, 0, 2, 3, 4 ] ],
+		[ 5, [ 1, 3, 4, 0, 2 ] ],
+	] )(
+		'gathers non-contiguous siblings at drop position %s without moving intervening blocks',
+		async ( index, expected ) => {
+			const ids = blocks.map( ( block ) => block.clientId );
+			const moved = await unlock(
+				registry.dispatch( store )
+			).moveBlockSetToPosition( [ ids[ 2 ], ids[ 0 ] ], '', index );
+			expect( registry.select( store ).getBlockOrder() ).toEqual(
+				expected.map( ( i ) => ids[ i ] )
+			);
+			expect( moved ).toEqual( [ ids[ 0 ], ids[ 2 ] ] );
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( moved );
+		}
+	);
+
+	it( 'gathers blocks from different parents in document order while preserving their IDs and contents', async () => {
+		blocks.forEach( ( block, i ) => {
+			block.attributes.content = String( i );
+		} );
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 2, 4 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 4 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		parents.forEach( ( parent ) =>
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parent.clientId, {} )
+		);
+		const ids = blocks.map( ( block ) => block.clientId );
+		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
+			[ ids[ 2 ], ids[ 0 ] ],
+			parents[ 2 ].clientId,
+			1
+		);
+		expect(
+			registry
+				.select( store )
+				.getBlocks( parents[ 0 ].clientId )
+				.map( ( block ) => block.clientId )
+		).toEqual( [ ids[ 1 ] ] );
+		expect(
+			registry
+				.select( store )
+				.getBlocks( parents[ 1 ].clientId )
+				.map( ( block ) => block.clientId )
+		).toEqual( [ ids[ 3 ] ] );
+		expect(
+			registry
+				.select( store )
+				.getBlocks( parents[ 2 ].clientId )
+				.map( ( block ) => [
+					block.clientId,
+					block.attributes.content,
+				] )
+		).toEqual( [
+			[ ids[ 4 ], '4' ],
+			[ ids[ 0 ], '0' ],
+			[ ids[ 2 ], '2' ],
+		] );
+		expect(
+			registry.select( store ).getBlockRootClientId( ids[ 0 ] )
+		).toBe( parents[ 2 ].clientId );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ ids[ 0 ], ids[ 2 ] ]
+		);
+	} );
+
+	it( 'adjusts insertion positions using only selected blocks removed from the destination parent', async () => {
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		parents.forEach( ( parent ) =>
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parent.clientId, {} )
+		);
+		const ids = blocks.map( ( block ) => block.clientId );
+		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
+			[ ids[ 1 ], ids[ 3 ] ],
+			parents[ 1 ].clientId,
+			2
+		);
+		expect(
+			registry.select( store ).getBlockOrder( parents[ 1 ].clientId )
+		).toEqual( [ ids[ 2 ], ids[ 1 ], ids[ 3 ], ids[ 4 ] ] );
+		expect(
+			registry.select( store ).getBlockOrder( parents[ 0 ].clientId )
+		).toEqual( [ ids[ 0 ] ] );
+	} );
+
+	it.each( [
+		'move-locked',
+		'remove-locked',
+		'disallowed',
+		'cross-entity',
+		'stale',
+	] )( 'rejects %s moves without partial mutation', async ( reason ) => {
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		parents.forEach( ( parent ) =>
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parent.clientId, {} )
+		);
+		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+		if ( reason === 'move-locked' || reason === 'remove-locked' ) {
+			registry.dispatch( store ).updateBlockAttributes( ids[ 0 ], {
+				lock: {
+					[ reason === 'move-locked' ? 'move' : 'remove' ]: true,
+				},
+			} );
+		} else if ( reason === 'disallowed' ) {
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parents[ 1 ].clientId, {
+					allowedBlocks: [],
+				} );
+		} else if ( reason === 'cross-entity' ) {
+			registry
+				.dispatch( store )
+				.setHasControlledInnerBlocks( parents[ 1 ].clientId, true );
+			registry
+				.dispatch( store )
+				.replaceInnerBlocks(
+					parents[ 1 ].clientId,
+					blocks.slice( 2 ),
+					false
+				);
+		} else {
+			ids.push( 'missing' );
+		}
+		const before = registry.select( store ).getBlocks();
+		const selection = registry.select( store ).getSelectedBlockClientIds();
+		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
+			ids,
+			parents[ 1 ].clientId,
+			0
+		);
+		expect( registry.select( store ).getBlocks() ).toBe( before );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
+			selection
+		);
+	} );
+
+	it( 'rejects drops into selected blocks or their descendants', async () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 0, 2 )
+		);
+		registry.dispatch( store ).resetBlocks( [ parent, blocks[ 2 ] ] );
+		const ids = [ parent.clientId, blocks[ 2 ].clientId ];
+		const before = registry.select( store ).getBlocks();
+		for ( const destination of [ parent.clientId, blocks[ 0 ].clientId ] ) {
+			await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
+				ids,
+				destination,
+				0
+			);
+			expect( registry.select( store ).getBlocks() ).toBe( before );
+		}
+	} );
+
+	it( 'keeps scattered selections ineligible for toolbar and keyboard movers while allowing dragging', () => {
+		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+		expect( unlock( registry.select( store ) ).canDragBlocks( ids ) ).toBe(
+			true
+		);
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( false );
+		registry.dispatch( store ).moveBlocksDown( ids );
+		expect( registry.select( store ).getBlockOrder() ).toEqual(
+			blocks.map( ( block ) => block.clientId )
+		);
+	} );
+
 	it( 'selects blocks under different parents', () => {
 		const sixthCell = createBlock( 'core/test-selection' );
 		const extraCell = createBlock( 'core/test-selection' );

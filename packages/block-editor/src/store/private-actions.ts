@@ -27,6 +27,72 @@ const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
+ * Gathers explicit IDs at a pre-removal insertion position in one mutation.
+ *
+ * @param clientIds    Dragged IDs, in any input order.
+ * @param rootClientId Destination parent, or the document root.
+ * @param index        Destination index before removing dragged blocks.
+ * @return A thunk returning the moved IDs, or undefined for a rejected move.
+ */
+export const moveBlockSetToPosition =
+	( clientIds: string[], rootClientId = '', index?: number ) =>
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		if (
+			! select.canMoveBlockSetToPosition( clientIds, rootClientId ) ||
+			( index !== undefined &&
+				( ! Number.isInteger( index ) || index < 0 ) )
+		) {
+			return;
+		}
+		const members = new Set( clientIds );
+		const ordered = select
+			.getClientIdsWithDescendants()
+			.filter( ( id ) => members.has( id ) );
+		const targetOrder = select.getBlockOrder( rootClientId );
+		const targetIndex = Math.min(
+			index ?? targetOrder.length,
+			targetOrder.length
+		);
+		const insertionIndex =
+			targetIndex -
+			targetOrder
+				.slice( 0, targetIndex )
+				.filter( ( id ) => members.has( id ) ).length;
+		const remaining = targetOrder.filter( ( id ) => ! members.has( id ) );
+		const nextOrder = [
+			...remaining.slice( 0, insertionIndex ),
+			...ordered,
+			...remaining.slice( insertionIndex ),
+		];
+		const sourceParents = [
+			...new Set(
+				ordered.map( ( id ) => select.getBlockRootClientId( id )! )
+			),
+		];
+		if (
+			sourceParents.every( ( parent ) => parent === rootClientId ) &&
+			nextOrder.every( ( id, i ) => id === targetOrder[ i ] )
+		) {
+			return ordered;
+		}
+		registry.batch( () => {
+			dispatch( {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: ordered,
+				fromRootClientIds: sourceParents,
+				toRootClientId: rootClientId,
+				index: insertionIndex,
+			} );
+			dispatch.multiSelect(
+				ordered[ 0 ],
+				ordered[ ordered.length - 1 ],
+				0
+			);
+		} );
+		return ordered;
+	};
+
+/**
  * Adds or removes one whole block without extending a selection range.
  *
  * @param clientId        Block to toggle.

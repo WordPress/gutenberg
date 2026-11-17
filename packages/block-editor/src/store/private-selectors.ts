@@ -20,6 +20,9 @@ import {
 	getBlockAttributes,
 	getBlock,
 	getSelectedBlockClientIds,
+	canMoveBlock,
+	canRemoveBlock,
+	areInnerBlocksControlled,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -88,6 +91,77 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 			);
 		} )
 	);
+}
+
+/**
+ * Checks drag permissions independently of the contiguous-only movers.
+ *
+ * @param state     Editor state.
+ * @param clientIds Target IDs.
+ * @return Whether every target can be dragged.
+ */
+export function canDragBlocks( state: State, clientIds: string[] ) {
+	const members = new Set( clientIds );
+	return (
+		clientIds.length > 0 &&
+		members.size === clientIds.length &&
+		clientIds.every(
+			( id ) =>
+				!! getBlock( state, id ) &&
+				getBlockEditingMode( state, id ) !== 'disabled' &&
+				canMoveBlock( state, id ) &&
+				! getBlockParents( state, id ).some( ( parent ) =>
+					members.has( parent )
+				)
+		)
+	);
+}
+
+/**
+ * Validates an entire gathered move before any source parent is changed.
+ *
+ * @param state        Editor state.
+ * @param clientIds    Dragged IDs.
+ * @param rootClientId Destination parent, or the document root.
+ * @return Whether all blocks can move to the destination.
+ */
+export function canMoveBlockSetToPosition(
+	state: State,
+	clientIds: string[],
+	rootClientId = ''
+) {
+	if (
+		! canDragBlocks( state, clientIds ) ||
+		( rootClientId && ! getBlock( state, rootClientId ) )
+	) {
+		return false;
+	}
+	const destinationParents = rootClientId
+		? [ rootClientId, ...getBlockParents( state, rootClientId, true ) ]
+		: [];
+	if ( destinationParents.some( ( id ) => clientIds.includes( id ) ) ) {
+		return false;
+	}
+	const destinationScope =
+		destinationParents.find( ( id ) =>
+			areInnerBlocksControlled( state, id )
+		) ?? '';
+	return clientIds.every( ( id ) => {
+		const sourceScope =
+			getBlockParents( state, id, true ).find( ( parent ) =>
+				areInnerBlocksControlled( state, parent )
+			) ?? '';
+		return (
+			sourceScope === destinationScope &&
+			( getBlockRootClientId( state, id ) === rootClientId ||
+				( canRemoveBlock( state, id ) &&
+					canInsertBlockType(
+						state,
+						getBlockName( state, id ),
+						rootClientId
+					) ) )
+		);
+	} );
 }
 
 /**

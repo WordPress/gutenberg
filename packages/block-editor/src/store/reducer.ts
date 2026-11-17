@@ -376,15 +376,12 @@ const withBlockTree =
 				);
 				break;
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				const updatedBlockUids = [];
-				if ( action.fromRootClientId ) {
-					updatedBlockUids.push( action.fromRootClientId );
-				} else {
-					updatedBlockUids.push( '' );
-				}
-				if ( action.toRootClientId ) {
-					updatedBlockUids.push( action.toRootClientId );
-				}
+				const updatedBlockUids = [
+					...( action.fromRootClientIds ?? [
+						action.fromRootClientId ?? '',
+					] ),
+					action.toRootClientId ?? '',
+				];
 				newState.tree = new Map( newState.tree );
 				updateParentInnerBlocksInTree(
 					newState,
@@ -1086,6 +1083,30 @@ export const blocks = pipe(
 				const fromRootClientId = action.fromRootClientId ?? '';
 				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
+				if ( action.fromRootClientIds ) {
+					const members = new Set( clientIds );
+					const newState = new Map( state );
+					for ( const parent of new Set( [
+						...action.fromRootClientIds,
+						toRootClientId,
+					] ) ) {
+						newState.set(
+							parent,
+							( state.get( parent ) ?? [] ).filter(
+								( id ) => ! members.has( id )
+							)
+						);
+					}
+					newState.set(
+						toRootClientId,
+						insertAt(
+							newState.get( toRootClientId )!,
+							clientIds,
+							index
+						)
+					);
+					return newState;
+				}
 
 				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {

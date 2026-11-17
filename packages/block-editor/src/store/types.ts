@@ -655,6 +655,8 @@ export type Action =
 			type: 'MOVE_BLOCKS_TO_POSITION';
 			clientIds: string[];
 			fromRootClientId?: string | null;
+			/** All source parents for an atomic explicit-set move. */
+			fromRootClientIds?: string[];
 			toRootClientId?: string | null;
 			index?: number;
 	  }
