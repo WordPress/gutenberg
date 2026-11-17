@@ -126,10 +126,11 @@
 			}
 		}
 
-		&:focus-within,
+		// Only reveal primary actions on hover, not when the row is selected or
+		// holds focus elsewhere. Keyboard users reveal them by tabbing to one.
 		&.is-hovered,
 		&:hover,
-		&.is-selected {
+		&:has(.dataviews-view-table__primary-actions :focus-visible) {
 			@include primary-actions-revealed;
 		}
 
