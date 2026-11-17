@@ -39,6 +39,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 
 - **border**:
   - root: `.wp-block-calendar th, .wp-block-calendar td`
+  - radius: `.wp-block-calendar`
   - top: `.wp-block-calendar thead th`
   - right: `.wp-block-calendar:not(:dir(rtl)) tr > :last-child, .wp-block-calendar:dir(rtl) tr > :first-child`
   - bottom: `.wp-block-calendar tbody tr:last-child > *`
