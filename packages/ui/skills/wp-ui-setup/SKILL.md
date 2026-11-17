@@ -7,7 +7,7 @@ description: Use when setting up a project to use `@wordpress/ui` and to migrate
 
 This skill ships with the `@wordpress/ui` package and matches the installed version. To build with the components, use the `wp-ui` skill. To migrate a component, use the `wp-ui-migration` skill. For design tokens and their linters, use the `wp-theme-setup` skill from `@wordpress/theme`.
 
-Inspect the project first. Run `node scripts/inspect-project.mjs`, with the path relative to this skill's directory, and read the JSON it prints. It only reads files. It reports the package manager, ESLint version and config style, whether `@wordpress/use-recommended-components` is already configured, where `@wordpress/components` and `@wordpress/ui` are imported, and which setup steps already look done. It searches config files as text, so confirm any step reported as `false` or `null` before you edit. Change only what is missing.
+Inspect the project first: its package manager, its ESLint configuration (flat config) and ESLint version, and whether it bundles `@wordpress/components` or receives it from WordPress. Change only what is missing.
 
 ## 1. Install and set up the styles
 
