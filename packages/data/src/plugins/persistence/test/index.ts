@@ -1,12 +1,18 @@
 import deepFreeze from 'deep-freeze';
 import type { AnyAction, Store as ReduxStore } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import plugin, { createPersistenceInterface, withLazySameState } from '../';
+import persistencePlugin, {
+	createPersistenceInterface,
+	withLazySameState,
+} from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
-import type { DataRegistry, ReduxStoreConfig } from '../../../types';
+import type { DataPlugin, DataRegistry } from '../../../types';
 
-type PersistStoreConfig = ReduxStoreConfig< any, any, any > & {
+// Tests always pass options, which the plugin requires.
+const plugin = persistencePlugin as DataPlugin;
+
+type PersistStoreConfig = Parameters< DataRegistry[ 'registerStore' ] >[ 1 ] & {
 	persist?: boolean | string[];
 };
 
@@ -48,7 +54,7 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state: Record< string, unknown > = {} ) => state,
+			reducer: ( state = {} ) => state,
 			selectors: {
 				getState: ( state: Record< string, unknown > ) => state,
 			},
@@ -126,7 +132,7 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state: { persisted: boolean } | null = null ) => state,
+			reducer: ( state = null ) => state,
 			selectors: {
 				getState: ( state: { persisted: boolean } | null ) => state,
 			},
@@ -147,7 +153,7 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state: Record< string, unknown > | null = {} ) => state,
+			reducer: ( state = {} ) => state,
 			selectors: {
 				getState: ( state: Record< string, unknown > | null ) => state,
 			},
@@ -169,7 +175,7 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state: number | null = null ) => state,
+			reducer: ( state = null ) => state,
 			selectors: {
 				getState: ( state: number | null ) => state,
 			},
