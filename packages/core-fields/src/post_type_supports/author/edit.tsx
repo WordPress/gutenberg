@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
@@ -7,6 +6,7 @@ import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
 import { Icon, SelectControl, Stack } from '@wordpress/ui';
 import { AUTHORS_QUERY, type Author } from './authors-query';
 import type { PostWithAuthor } from './types';
+import AuthorAvatar from '../../shared/author/avatar';
 import styles from '../../shared/author/style.module.css';
 
 type AuthorItem = {
@@ -17,11 +17,9 @@ type AuthorItem = {
 
 function AuthorLabel( { item }: { item: AuthorItem } ) {
 	return (
-		<Stack direction="row" align="center">
+		<Stack direction="row" gap="xs" align="center">
 			{ item.avatar ? (
-				<div className={ clsx( styles.avatar, styles[ 'is-loaded' ] ) }>
-					<img alt="" src={ item.avatar } />
-				</div>
+				<AuthorAvatar src={ item.avatar } />
 			) : (
 				<div className={ styles.icon }>
 					<Icon icon={ authorIcon } />
