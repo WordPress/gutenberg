@@ -351,8 +351,6 @@ function ViewTable< Item >( {
 	// The toolbar covers the header, so move focus between the two
 	// selection checkboxes when an interaction shows or hides the toolbar.
 	const requestFocus = useBulkActionsFocus( showBulkActions, bulkActionsRef );
-	const focusTableSelection = () =>
-		requestFocus( tableSelectionRef, { isShown: false } );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
@@ -481,8 +479,16 @@ function ViewTable< Item >( {
 					<BulkActionToolbar
 						onActionInProgressChange={ setIsActionInProgress }
 						selectionCheckboxRef={ bulkSelectionRef }
-						onClearSelection={ focusTableSelection }
-						onActionComplete={ focusTableSelection }
+						onClearSelection={ () =>
+							requestFocus( tableSelectionRef, {
+								isShown: false,
+							} )
+						}
+						onActionComplete={ () =>
+							requestFocus( tableSelectionRef, {
+								isShown: false,
+							} )
+						}
 					/>
 				</div>
 			) }
