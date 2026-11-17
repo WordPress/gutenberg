@@ -1,7 +1,10 @@
 import type {
 	GridInfo,
 	GridItemLayout,
+	GridItemMeasurements,
+	GridPixelRect,
 	GridRectOptions,
+	GridSibling,
 	GridTrack,
 } from './types';
 
@@ -219,6 +222,30 @@ export function getGridTracks(
 		const end = start + size;
 		tracks.push( { start, end } );
 		hasNonEmptyTrack ||= size > 0;
+	}
+	return tracks;
+}
+
+/**
+ * Gets the start and end position in pixels of each track in a computed grid
+ * template, such as the value of `grid-template-columns`.
+ *
+ * @param template The computed grid template: track sizes in pixels.
+ * @param gap      The gap between tracks, in pixels.
+ *
+ * @return An array of objects with the start and end position in pixels of
+ *         each grid track.
+ */
+export function getGridTracksFromTemplate(
+	template: string,
+	gap: number
+): GridTrack[] {
+	const tracks: GridTrack[] = [];
+	for ( const size of template.split( ' ' ) ) {
+		const previousTrack = tracks[ tracks.length - 1 ];
+		const start = previousTrack ? previousTrack.end + gap : 0;
+		const end = start + parseFloat( size );
+		tracks.push( { start, end } );
 	}
 	return tracks;
 }
@@ -446,4 +473,144 @@ export function getGridInfo( gridElement: Element ): GridInfo {
 			`,
 		},
 	};
+}
+
+/**
+ * Gets the start and end position in pixels of each column and row track of a
+ * grid, relative to the grid's content box.
+ *
+ * @param gridElement The grid element.
+ *
+ * @return The grid tracks.
+ */
+export function getGridTrackPositions( gridElement: Element ): {
+	columnTracks: GridTrack[];
+	rowTracks: GridTrack[];
+} {
+	return {
+		columnTracks: getGridTracksFromTemplate(
+			getComputedCSS( gridElement, 'grid-template-columns' ),
+			parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0
+		),
+		rowTracks: getGridTracksFromTemplate(
+			getComputedCSS( gridElement, 'grid-template-rows' ),
+			parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0
+		),
+	};
+}
+
+/**
+ * Gets the position of a grid item in pixels, relative to the grid's content
+ * box. Offsets ignore CSS transforms, such as the ones the editor uses to
+ * animate block moves, so an item is measured by the area it takes up in the
+ * grid.
+ *
+ * @param gridItemElement The grid item element.
+ * @param padding         The grid's padding, when it is already known.
+ * @param padding.left    Left padding, in pixels.
+ * @param padding.top     Top padding, in pixels.
+ *
+ * @return The item's position.
+ */
+export function getGridItemPixelRect(
+	gridItemElement: HTMLElement,
+	padding: { left: number; top: number } = getGridPadding(
+		// A grid item is inside its grid.
+		gridItemElement.parentElement!
+	)
+): GridPixelRect {
+	// A grid item is inside its grid.
+	const gridElement = gridItemElement.parentElement!;
+	let left = gridItemElement.offsetLeft;
+	let top = gridItemElement.offsetTop;
+	if ( gridItemElement.offsetParent !== gridElement ) {
+		left -= gridElement.offsetLeft + gridElement.clientLeft;
+		top -= gridElement.offsetTop + gridElement.clientTop;
+	}
+	left -= padding.left;
+	top -= padding.top;
+	return {
+		left,
+		top,
+		right: left + gridItemElement.offsetWidth,
+		bottom: top + gridItemElement.offsetHeight,
+	};
+}
+
+/**
+ * Gets a grid's left and top padding, in pixels.
+ *
+ * @param gridElement The grid element.
+ *
+ * @return The padding.
+ */
+function getGridPadding( gridElement: Element ) {
+	return {
+		left: parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) || 0,
+		top: parseFloat( getComputedCSS( gridElement, 'padding-top' ) ) || 0,
+	};
+}
+
+/**
+ * Measures a grid's tracks and the blocks in it, once, when a drag starts.
+ * Blocks are measured in the canvas, so that the result matches what is on
+ * screen in every viewport. Hidden blocks are left out.
+ *
+ * @param gridElement The grid element.
+ * @param srcClientId Client ID of the dragged block, or null when it isn't in
+ *                    the grid.
+ *
+ * @return The measurements.
+ */
+export function getGridItemMeasurements(
+	gridElement: Element,
+	srcClientId: string | null
+): GridItemMeasurements {
+	const { columnTracks, rowTracks } = getGridTrackPositions( gridElement );
+	const padding = getGridPadding( gridElement );
+	const siblings: GridSibling[] = [];
+	let src: GridItemMeasurements[ 'src' ] = null;
+	for ( const element of gridElement.children ) {
+		// Block elements are HTML elements.
+		const child = element as HTMLElement;
+		const childClientId = child.getAttribute( 'data-block' );
+		if ( ! childClientId || ! child.offsetParent ) {
+			continue;
+		}
+		const pixelRect = getGridItemPixelRect( child, padding );
+		const rect = getGridRectFromPixelRect(
+			pixelRect,
+			columnTracks,
+			rowTracks
+		);
+		if ( childClientId === srcClientId ) {
+			src = { pixelRect, rect };
+		} else {
+			siblings.push( { pixelRect, rect } );
+		}
+	}
+	return { columnTracks, rowTracks, siblings, src };
+}
+
+/**
+ * Gets the grid cells that a rectangle in pixels covers, snapping its edges to
+ * the closest tracks.
+ *
+ * @param rect         Rectangle relative to the grid's content box.
+ * @param columnTracks Column tracks.
+ * @param rowTracks    Row tracks.
+ *
+ * @return The grid cells.
+ */
+export function getGridRectFromPixelRect(
+	rect: GridPixelRect,
+	columnTracks: GridTrack[],
+	rowTracks: GridTrack[]
+): GridRect {
+	return new GridRect( {
+		columnStart: getClosestTrack( columnTracks, rect.left ) + 1,
+		rowStart: getClosestTrack( rowTracks, rect.top ) + 1,
+		columnEnd: getClosestTrack( columnTracks, rect.right, 'end' ) + 1,
+		rowEnd: getClosestTrack( rowTracks, rect.bottom, 'end' ) + 1,
+	} );
 }

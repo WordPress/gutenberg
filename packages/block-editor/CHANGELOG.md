@@ -11,6 +11,7 @@
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
+-   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid snaps it to cells: one drop zone covers the grid, a block dragged by its body keeps the point it was grabbed at under the pointer and one dragged by its handle is centered on it, the cells it will land in and any blocks it will overlap are shown, and the block stays in place, dimmed, while it is dragged. Dropped outside the grid, the block moves to wherever it lands. Drags of several blocks fall through to the block flow, and a block bigger than the grid shrinks to fit it ([#84500](https://github.com/WordPress/gutenberg/pull/84500)).
 
 ### Bug Fixes
 
@@ -29,6 +30,7 @@
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
+-   Block drag: restore the dragged block (styles, pointer events, dragging state) when the drag ends without `drop` or `dragend` reaching the canvas document ([#85462](https://github.com/WordPress/gutenberg/pull/85462)).
 
 ### Internal
 
