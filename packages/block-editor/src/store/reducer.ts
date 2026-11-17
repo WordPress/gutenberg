@@ -1062,7 +1062,7 @@ export const blocks = pipe(
 				return newState;
 			}
 			case 'INSERT_BLOCKS': {
-				const { rootClientId = '' } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const subState = state.get( rootClientId ) || [];
 				const mappedBlocks = mapBlockOrder(
 					action.blocks,
@@ -1085,11 +1085,9 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				const {
-					fromRootClientId = '',
-					toRootClientId = '',
-					clientIds,
-				} = action;
+				const { clientIds } = action;
+				const fromRootClientId = action.fromRootClientId ?? '';
+				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
 
 				// Moving inside the same parent block.
@@ -1128,7 +1126,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const subState = state.get( rootClientId )!;
 
@@ -1151,7 +1150,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const lastClientId = clientIds[ clientIds.length - 1 ];
 				const subState = state.get( rootClientId )!;
