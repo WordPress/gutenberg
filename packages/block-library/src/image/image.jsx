@@ -49,6 +49,7 @@ import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload, chevronDown } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '../lock-unlock';
 import { createUpgradedEmbedBlock } from '../embed/util';
@@ -70,6 +71,11 @@ import {
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
+import {
+	isRememberedLinkDestination,
+	LINK_DESTINATION_PREFERENCE_NAME,
+	LINK_DESTINATION_PREFERENCE_SCOPE,
+} from './link-destination';
 
 const {
 	DimensionsTool,
@@ -413,6 +419,7 @@ export default function Image( {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { editEntityRecord } = useDispatch( coreStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideAligned = [ 'wide', 'full' ].includes( align );
@@ -527,6 +534,16 @@ export default function Image( {
 
 	function onSetHref( props ) {
 		setAttributes( props );
+
+		// Remember the chosen link destination, so that it is used by default
+		// for images added afterwards.
+		if ( isRememberedLinkDestination( props.linkDestination ) ) {
+			setPreference(
+				LINK_DESTINATION_PREFERENCE_SCOPE,
+				LINK_DESTINATION_PREFERENCE_NAME,
+				props.linkDestination
+			);
+		}
 	}
 
 	function onSetLightbox( enable ) {

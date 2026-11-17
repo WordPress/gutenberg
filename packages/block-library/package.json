@@ -126,6 +126,7 @@
 		"@wordpress/latex-to-mathml": "file:../latex-to-mathml",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/patterns": "file:../patterns",
+		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/react-inert-value": "file:../react-inert-value",

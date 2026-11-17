@@ -1,8 +1,10 @@
 export const MIN_SIZE = 20;
-export const LINK_DESTINATION_NONE = 'none';
-export const LINK_DESTINATION_MEDIA = 'media';
-export const LINK_DESTINATION_ATTACHMENT = 'attachment';
-export const LINK_DESTINATION_CUSTOM = 'custom';
+export {
+	LINK_DESTINATION_NONE,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+} from './link-destination';
 export const NEW_TAB_REL = [ 'noopener' ];
 export const ALLOWED_MEDIA_TYPES = [ 'image' ];
 export const MEDIA_ID_NO_FEATURED_IMAGE_SET = 0;

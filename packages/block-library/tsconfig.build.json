@@ -34,6 +34,7 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
+		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../primitives/tsconfig.build.json" },
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text/tsconfig.build.json" },

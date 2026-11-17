@@ -14,6 +14,7 @@
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
 -   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
+-   Image: Remember the last chosen "Link to" option (None, Media File or Attachment Page) and use it by default for new images. The block library now depends on `@wordpress/preferences` ([#86802](https://github.com/WordPress/gutenberg/pull/86802)).
 
 ### Bug Fixes
 

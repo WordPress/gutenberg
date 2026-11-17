@@ -1,30 +1,6 @@
-import {
-	NEW_TAB_REL,
-	ALLOWED_MEDIA_TYPES,
-	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_CUSTOM,
-	LINK_DESTINATION_MEDIA,
-	LINK_DESTINATION_NONE,
-} from './constants';
+import { NEW_TAB_REL, ALLOWED_MEDIA_TYPES } from './constants';
 
-/**
- * Returns the site's default link destination for newly added images, from the
- * `image_default_link_type` option.
- *
- * @return {string} Block link destination.
- */
-export function getDefaultLinkDestination() {
-	switch ( window.wp?.media?.view?.settings?.defaultProps?.link ) {
-		case 'file':
-			return LINK_DESTINATION_MEDIA;
-		case 'post':
-			return LINK_DESTINATION_ATTACHMENT;
-		case LINK_DESTINATION_CUSTOM:
-			return LINK_DESTINATION_CUSTOM;
-		default:
-			return LINK_DESTINATION_NONE;
-	}
-}
+export { getDefaultLinkDestination } from './link-destination';
 
 /**
  * Evaluates a CSS aspect-ratio property value as a number.
