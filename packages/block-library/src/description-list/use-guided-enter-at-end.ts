@@ -1,26 +1,24 @@
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useBlockEditContext,
+} from '@wordpress/block-editor';
 import { createBlock, type Block } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import isEmptyRichTextContent from './is-empty-rich-text-content';
 
-type DescriptionListChildBlockName =
-	'core/description-term' | 'core/description-detail';
-
 const DESCRIPTION_TERM = 'core/description-term';
 const DESCRIPTION_DETAIL = 'core/description-detail';
 const PARAGRAPH = 'core/paragraph';
 
-export default function useGuidedEnterAtEnd( {
-	blockName,
-	clientId,
-}: {
-	blockName: DescriptionListChildBlockName;
-	clientId: string;
-} ) {
+export default function useGuidedEnterAtEnd() {
+	const { name: blockName, clientId } = useBlockEditContext();
 	const registry = useRegistry();
 
 	return useCallback( () => {
+		if ( ! clientId ) {
+			return;
+		}
 		const {
 			canRemoveBlocks,
 			canInsertBlockType,

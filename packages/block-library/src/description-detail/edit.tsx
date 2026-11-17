@@ -33,11 +33,8 @@ export default function Edit( {
 }: DescriptionListItemEditProps ) {
 	const { content, placeholder } = attributes;
 	const blockProps = useBlockProps();
-	const onSplitAtEnd = useGuidedEnterAtEnd( {
-		blockName: 'core/description-detail',
-		clientId,
-	} );
-	const onMerge = useStructurePreservingMerge( { clientId, mergeBlocks } );
+	const onSplitAtEnd = useGuidedEnterAtEnd();
+	const onMerge = useStructurePreservingMerge( mergeBlocks );
 
 	return (
 		<>

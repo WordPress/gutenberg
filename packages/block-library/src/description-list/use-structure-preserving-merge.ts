@@ -1,4 +1,7 @@
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	store as blockEditorStore,
+	useBlockEditContext,
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
@@ -9,18 +12,20 @@ const DESCRIPTION_DETAIL = 'core/description-detail';
 
 type MergeBlocks = ( forward: boolean ) => void;
 
-export default function useStructurePreservingMerge( {
-	clientId,
-	mergeBlocks,
-}: {
-	clientId: string;
-	mergeBlocks?: MergeBlocks;
-} ) {
+export default function useStructurePreservingMerge(
+	mergeBlocks?: MergeBlocks
+) {
+	const { clientId } = useBlockEditContext();
 	const registry = useRegistry();
 
 	return useCallback(
 		( forward: boolean ) => {
 			if ( ! mergeBlocks ) {
+				return;
+			}
+
+			if ( ! clientId ) {
+				mergeBlocks( forward );
 				return;
 			}
 
