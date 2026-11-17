@@ -15,10 +15,12 @@
 @use "./components/widget-areas-block-editor-content/style.scss" as *;
 @use "./components/secondary-sidebar/style.scss" as *;
 
+// stylelint-disable selector-class-pattern -- WordPress admin body classes use underscores by convention.
 body.js.appearance_page_gutenberg-widgets,
 body.js.widgets-php {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
+// stylelint-enable selector-class-pattern
 
 .blocks-widgets-container {
 	@include reset;

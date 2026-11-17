@@ -1,9 +1,5 @@
 export type SurfaceVariant =
-	| 'primary'
-	| 'secondary'
-	| 'tertiary'
-	| 'dotted'
-	| 'grid';
+	'primary' | 'secondary' | 'tertiary' | 'dotted' | 'grid';
 
 export type SurfaceProps = {
 	/**

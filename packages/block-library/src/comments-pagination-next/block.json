@@ -9,7 +9,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postId", "comments/paginationArrow" ],
@@ -17,6 +18,9 @@
 		"anchor": true,
 		"reusable": false,
 		"html": false,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"text": false,
@@ -39,6 +43,19 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": false
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
-	}
+	},
+	"style": "wp-block-comments-pagination-next"
 }

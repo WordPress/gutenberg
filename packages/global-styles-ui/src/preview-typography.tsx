@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHStack as HStack } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import TypographyExample from './typography-example';
 import PreviewWrapper from './preview-wrapper';
 

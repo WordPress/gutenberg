@@ -1,17 +1,20 @@
-/**
- * External dependencies
- */
-import {
+import * as ReactDOM from 'react-dom';
+import { createRoot, hydrateRoot } from 'react-dom/client';
+
+const {
 	createPortal,
-	findDOMNode,
 	flushSync,
 	/* eslint-disable react/no-deprecated */
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
+	findDOMNode,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
 	render,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
 	hydrate,
+	// @ts-expect-error Removed from @types/react-dom; still present at runtime.
 	unmountComponentAtNode,
 	/* eslint-enable react/no-deprecated */
-} from 'react-dom';
-import { createRoot, hydrateRoot } from 'react-dom/client';
+} = ReactDOM;
 
 /**
  * Creates a portal into which a component can be rendered.

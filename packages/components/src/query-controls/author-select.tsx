@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { buildTermsTree } from './terms';
 import TreeSelect from '../tree-select';
 import type { AuthorSelectProps } from './types';
@@ -29,7 +26,6 @@ export default function AuthorSelect( {
 					? String( selectedAuthorId )
 					: undefined
 			}
-			__next40pxDefaultSize
 		/>
 	);
 }

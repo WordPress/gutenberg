@@ -2,9 +2,7 @@
  * Possible ways of counting text.
  */
 export type Strategy =
-	| 'words'
-	| 'characters_excluding_spaces'
-	| 'characters_including_spaces';
+	'words' | 'characters_excluding_spaces' | 'characters_including_spaces';
 
 /**
  * L10n settings for word counting.

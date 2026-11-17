@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .components-button-group {
@@ -7,8 +6,8 @@
 	.components-button {
 		border-radius: 0;
 		display: inline-flex;
-		color: $gray-900;
-		box-shadow: inset 0 0 0 $border-width $gray-900;
+		// Outline grouped buttons that do not have their own variant border.
+		border-color: var(--wpds-color-stroke-interactive-neutral);
 
 		& + .components-button {
 			margin-left: -1px;
@@ -28,11 +27,6 @@
 		&.is-primary {
 			position: relative;
 			z-index: 1;
-		}
-
-		// The active button should look pressed.
-		&.is-primary {
-			box-shadow: inset 0 0 0 $border-width $gray-900;
 		}
 	}
 }

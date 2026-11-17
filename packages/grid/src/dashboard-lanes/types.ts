@@ -1,8 +1,7 @@
-/**
- * Internal dependencies
- */
+import type { ColumnSteps } from '../shared/column-policy';
 import type {
 	DragPreviewRenderProps,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -39,6 +38,22 @@ export type DashboardLanesLayoutItem = {
 	lane?: number;
 
 	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Display order. Lower values render first. When omitted, the
 	 * item falls back to its index in the `layout` array.
 	 */
@@ -49,17 +64,17 @@ export type DashboardLanesLayoutItem = {
  * Props for `DashboardLanes`.
  *
  * `columns` and `minColumnWidth` compose as a layered model:
- * - `columns` alone: fixed N lanes; tiles scale with the container.
+ * - `columns` alone: the count at every width, or a count per container
+ *   width when given as `ColumnSteps`; tiles scale with the container.
  * - `minColumnWidth` alone: lane count derives from container width,
  *   floored by the per-tile minimum, down to 1.
  * - Both together: `columns` caps the count, `minColumnWidth` enforces
  *   a per-tile width floor that can reduce the count below the cap.
  */
-export interface DashboardLanesProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardLanesProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */
@@ -161,11 +176,13 @@ export interface DashboardLanesProps
 	renderGridOverlay?: React.ComponentType< GridOverlayRenderProps >;
 
 	/**
-	 * Target lane count, used as a cap. Defaults to six when neither
-	 * `columns` nor `minColumnWidth` is set; with `minColumnWidth` set
-	 * it can resolve lower on narrow containers.
+	 * Lane count, used as a cap. A number applies at every width; a
+	 * `ColumnSteps` map applies a count from each container width up, and
+	 * an `'auto'` step lifts the cap from its width up.
+	 * Defaults to six when neither `columns` nor `minColumnWidth` is set;
+	 * with `minColumnWidth` set it can resolve lower on narrow containers.
 	 */
-	columns?: number;
+	columns?: number | ColumnSteps;
 
 	/**
 	 * Per-tile minimum width in pixels. Enables responsive mode: the
@@ -173,4 +190,10 @@ export interface DashboardLanesProps
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
+	 */
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }

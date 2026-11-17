@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { select as globalSelect } from './select';
 import type { DataRegistry } from './types';
 

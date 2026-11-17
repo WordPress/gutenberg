@@ -27,7 +27,7 @@
 		&:hover,
 		&:focus,
 		&[aria-current] {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
@@ -35,7 +35,7 @@
 		color: var(--wpds-color-foreground-interactive-neutral-weak);
 		&:hover,
 		&:focus {
-			color: var(--wpds-color-foreground-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-weak-active);
 		}
 	}
 
@@ -49,6 +49,10 @@
 			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 	}
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__empty-message {
+	margin: 0 0 $grid-unit-10;
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__loading.components-spinner {

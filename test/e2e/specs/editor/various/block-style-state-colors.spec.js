@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Relocated color controls with block style states', () => {
@@ -19,13 +16,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 			name: 'Editor settings',
 		} );
 
-		// Switch the block's editing context to the Mobile viewport state.
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.keyboard.press( 'Escape' );
 
 		// Text color now lives in the Typography panel.
 		await settings
@@ -78,12 +74,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 		} );
 
 		// Switch the block's editing context to the Mobile viewport state.
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.keyboard.press( 'Escape' );
 
 		const elementsPanel = settings
 			.locator( '.components-tools-panel' )
@@ -97,7 +93,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )
@@ -118,6 +114,62 @@ test.describe( 'Relocated color controls with block style states', () => {
 
 		// ...and the default state's elements are untouched.
 		expect( block.attributes.style?.elements ).toBeUndefined();
+	} );
+
+	test( 'applies a viewport state color to a block whose selector targets a child element', async ( {
+		editor,
+		page,
+	} ) => {
+		// List Item's root selector is `.wp-block-list > li`, so the generated
+		// rule has to land on the `li` the instance class is on. A Paragraph
+		// alongside it shows the rule generation is working either way.
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: {
+						content: 'List item',
+						style: {
+							'@mobile': { color: { background: '#ff0000' } },
+						},
+					},
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Paragraph',
+				style: { '@mobile': { color: { background: '#00ff00' } } },
+			},
+		} );
+
+		const canvas = editor.canvas;
+		const listItem = canvas.locator( 'li' ).first();
+		const paragraph = canvas
+			.locator( 'p[data-type="core/paragraph"]' )
+			.first();
+		const backgroundOf = ( locator ) =>
+			locator.evaluate(
+				( element ) =>
+					window.getComputedStyle( element ).backgroundColor
+			);
+
+		await expect
+			.poll( () => backgroundOf( listItem ) )
+			.toBe( 'rgba(0, 0, 0, 0)' );
+
+		// The state styles are emitted in a media query, so narrowing the
+		// viewport is what brings them into play.
+		await page.setViewportSize( { width: 420, height: 900 } );
+
+		await expect
+			.poll( () => backgroundOf( listItem ) )
+			.toBe( 'rgb(255, 0, 0)' );
+		await expect
+			.poll( () => backgroundOf( paragraph ) )
+			.toBe( 'rgb(0, 255, 0)' );
 	} );
 
 	test( 'reset all in a viewport state clears only that viewport state colors', async ( {
@@ -146,12 +198,12 @@ test.describe( 'Relocated color controls with block style states', () => {
 			name: 'Editor settings',
 		} );
 
-		await settings
-			.getByRole( 'button', { name: 'State: Default', exact: true } )
-			.click();
+		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
 		await page
-			.getByRole( 'menuitem', { name: 'Mobile', exact: true } )
+			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
 			.click();
+		await page.keyboard.press( 'Escape' );
 
 		// Reset all of the Background panel while the Mobile state is selected.
 		await settings

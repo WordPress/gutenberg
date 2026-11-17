@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
 const { randomUUID } = require( 'crypto' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -72,7 +65,9 @@ test.describe( 'Classic', () => {
 
 		// Wait for upload (increased timeout for client-side media processing).
 		await expect(
-			page.getByRole( 'checkbox', { name: fileName } )
+			page
+				.getByRole( 'tabpanel', { name: 'Media Library' } )
+				.getByRole( 'checkbox', { name: fileName } )
 		).toBeChecked( { timeout: 30_000 } );
 
 		const createGallery = page.getByRole( 'button', {
@@ -87,9 +82,7 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.canvas
-			.getByRole( 'button', { name: 'Convert to blocks' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Convert to blocks' );
 		const galleryBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Gallery',
 		} );
@@ -104,9 +97,7 @@ test.describe( 'Classic', () => {
 			.poll( editor.getEditedPostContent )
 			.toMatch( /\[gallery ids=\"\d+\"\]/ );
 
-		await editor.canvas
-			.getByRole( 'button', { name: 'Convert to blocks' } )
-			.click();
+		await editor.clickBlockToolbarButton( 'Convert to blocks' );
 		await expect
 			.poll( editor.getEditedPostContent )
 			.toMatch( /<!-- wp:gallery/ );

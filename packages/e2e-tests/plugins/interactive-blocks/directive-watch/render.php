@@ -31,7 +31,7 @@
 
 	<div
 		data-testid="multiple watches"
-		data-wp-watch--one="callbacks.watch1"
+		data-wp-watch---one="callbacks.watch1"
 		data-wp-watch---two="callbacks.watch2"
 		data-wp-bind--data-watch-one="state.watch1"
 		data-wp-bind--data-watch-two="state.watch2"

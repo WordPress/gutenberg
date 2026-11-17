@@ -1,18 +1,5 @@
-/**
- * External dependencies
- */
 import { defineConfig, type PlaywrightTestConfig } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import baseConfig from './playwright.config';
-
-if ( process.env.CI && process.env.GUTENBERG_RTC_TEST_WS_ALLOW_CI !== '1' ) {
-	throw new Error(
-		'RTC WebSocket e2e tests are local-only. They are intentionally disabled in CI.'
-	);
-}
 
 const wsPort = process.env.GUTENBERG_RTC_TEST_WS_PORT || '18991';
 process.env.GUTENBERG_RTC_TEST_WS_PORT = wsPort;
@@ -50,7 +37,8 @@ const config = defineConfig( {
 	// (connection limits, wp-sync polling responses, document-size
 	// errors that surface via the polling pipeline) live under
 	// `http-only/` and are excluded here.
-	testMatch: '**/specs/editor/collaboration/**/collaboration-*.spec.ts',
+	testMatch:
+		'**/specs/editor/collaboration/**/collaboration-*.spec.@(ts|mts|cts)',
 	testIgnore: [ ...testIgnore, '**/specs/editor/collaboration/http-only/**' ],
 	webServer: [
 		...baseWebServer,

@@ -1,12 +1,11 @@
-'use strict';
-/**
- * External dependencies
- */
-const net = require( 'net' );
-
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const net = require( 'node:net' );
+let createServer = vi
+	.spyOn( net, 'createServer' )
+	.mockImplementation( () => undefined );
+let connect = vi.spyOn( net, 'connect' );
 const {
 	isPortAvailable,
 	findAvailablePort,
@@ -14,12 +13,37 @@ const {
 	DEFAULT_MAX_PORT,
 } = require( '../port-utils' );
 
-jest.mock( 'net' );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'port-utils', () => {
-	afterEach( () => {
-		jest.restoreAllMocks();
+	beforeEach( () => {
+		createServer = vi.spyOn( net, 'createServer' );
+		createServer.mockReset().mockImplementation( () => undefined );
+		mockAnswering( false );
 	} );
+
+	/**
+	 * Helper that configures net.connect to find another server on the port,
+	 * or none.
+	 *
+	 * @param {boolean} answers Whether another server answers.
+	 */
+	function mockAnswering( answers ) {
+		connect = vi.spyOn( net, 'connect' );
+		connect.mockReset().mockImplementation( () => {
+			const socket = {
+				once: vi.fn( ( event, cb ) => {
+					if ( event === ( answers ? 'connect' : 'error' ) ) {
+						cb();
+					}
+				} ),
+				destroy: vi.fn(),
+			};
+			return socket;
+		} );
+	}
 
 	/**
 	 * Helper that configures net.createServer to return fresh mock servers.
@@ -28,11 +52,11 @@ describe( 'port-utils', () => {
 	 * @param {Function} isAvailable A function (port) => boolean.
 	 */
 	function mockPortAvailability( isAvailable ) {
-		net.createServer.mockImplementation( () => {
+		createServer.mockImplementation( () => {
 			let errorCb, listenCb;
 
 			const server = {
-				once: jest.fn( ( event, cb ) => {
+				once: vi.fn( ( event, cb ) => {
 					if ( event === 'error' ) {
 						errorCb = cb;
 					}
@@ -40,7 +64,7 @@ describe( 'port-utils', () => {
 						listenCb = cb;
 					}
 				} ),
-				listen: jest.fn( ( port ) => {
+				listen: vi.fn( ( port ) => {
 					if ( isAvailable( port ) ) {
 						server.close.mockImplementation( ( cb ) => cb() );
 						listenCb();
@@ -48,7 +72,7 @@ describe( 'port-utils', () => {
 						errorCb( { code: 'EADDRINUSE' } );
 					}
 				} ),
-				close: jest.fn(),
+				close: vi.fn(),
 			};
 
 			return server;
@@ -68,19 +92,26 @@ describe( 'port-utils', () => {
 			expect( result ).toBe( false );
 		} );
 
+		it( 'returns false when another server answers on the port', async () => {
+			mockPortAvailability( () => true );
+			mockAnswering( true );
+			const result = await isPortAvailable( 8888 );
+			expect( result ).toBe( false );
+		} );
+
 		it( 'returns false for EACCES error', async () => {
-			net.createServer.mockImplementation( () => {
+			createServer.mockImplementation( () => {
 				let errorCb;
 				const server = {
-					once: jest.fn( ( event, cb ) => {
+					once: vi.fn( ( event, cb ) => {
 						if ( event === 'error' ) {
 							errorCb = cb;
 						}
 					} ),
-					listen: jest.fn( () => {
+					listen: vi.fn( () => {
 						errorCb( { code: 'EACCES' } );
 					} ),
-					close: jest.fn(),
+					close: vi.fn(),
 				};
 				return server;
 			} );

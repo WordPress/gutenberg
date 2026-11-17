@@ -1,0 +1,69 @@
+[
+	{
+		"name": "core/tabs",
+		"isValid": true,
+		"attributes": {
+			"activeTabIndex": 0
+		},
+		"innerBlocks": [
+			{
+				"name": "core/tab-list",
+				"isValid": true,
+				"attributes": {
+					"tabs": [
+						{
+							"label": "Tab 1"
+						},
+						{
+							"label": "Tab 2"
+						}
+					]
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/tab-panels",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/tab-panel",
+						"isValid": true,
+						"attributes": {
+							"label": "Tab 1"
+						},
+						"innerBlocks": [
+							{
+								"name": "core/paragraph",
+								"isValid": true,
+								"attributes": {
+									"content": "Panel 1",
+									"dropCap": false
+								},
+								"innerBlocks": []
+							}
+						]
+					},
+					{
+						"name": "core/tab-panel",
+						"isValid": true,
+						"attributes": {
+							"label": "Tab 2"
+						},
+						"innerBlocks": [
+							{
+								"name": "core/paragraph",
+								"isValid": true,
+								"attributes": {
+									"content": "Panel 2",
+									"dropCap": false
+								},
+								"innerBlocks": []
+							}
+						]
+					}
+				]
+			}
+		]
+	}
+]

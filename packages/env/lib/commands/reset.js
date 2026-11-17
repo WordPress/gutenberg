@@ -1,12 +1,5 @@
 'use strict';
-/**
- * External dependencies
- */
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { loadConfig } = require( '../config' );
 const { getRuntime, detectRuntime } = require( '../runtime' );

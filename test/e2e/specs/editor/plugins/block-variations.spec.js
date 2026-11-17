@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block variations', () => {
@@ -49,7 +46,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
@@ -85,7 +82,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
 		await page
@@ -104,7 +101,7 @@ test.describe( 'Block variations', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Columns' );
 		await page
@@ -131,7 +128,7 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Large Quote' );
 		await page.getByRole( 'option', { name: 'Large Quote' } ).click();
@@ -143,7 +140,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Quote' } )
+				.getByText( 'Quote', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -156,9 +153,7 @@ test.describe( 'Block variations', () => {
 
 		await expect(
 			page.locator( '.block-editor-block-card__description' )
-		).toHaveText(
-			'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
-		);
+		).toHaveText( 'Give quoted text visual emphasis.' );
 	} );
 
 	test( 'should display variations info if all declared', async ( {
@@ -168,7 +163,7 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
 		await page
@@ -181,7 +176,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Success Message' } )
+				.getByText( 'Success Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -206,7 +201,7 @@ test.describe( 'Block variations', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Heading' );
 		await page
@@ -219,7 +214,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Warning Message' } )
+				.getByText( 'Warning Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );

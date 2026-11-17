@@ -2,7 +2,6 @@ import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { ThemeProvider } from '@wordpress/theme';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
@@ -51,24 +50,22 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					data-testid="dialog-backdrop"
 				/>
 			) }
-			<ThemeProvider>
-				<_Dialog.Popup
-					ref={ mergedRef }
-					className={ clsx(
-						styles.popup,
-						className,
-						styles[ `is-${ size }` ]
-					) }
-					initialFocus={ resolvedInitialFocus }
-					finalFocus={ finalFocus }
-					{ ...props }
-					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
-				>
-					<DialogValidationProvider>
-						{ children }
-					</DialogValidationProvider>
-				</_Dialog.Popup>
-			</ThemeProvider>
+			<_Dialog.Popup
+				ref={ mergedRef }
+				className={ clsx(
+					styles.popup,
+					className,
+					styles[ `is-${ size }` ]
+				) }
+				initialFocus={ resolvedInitialFocus }
+				finalFocus={ finalFocus }
+				{ ...props }
+				data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
+			>
+				<DialogValidationProvider>
+					{ children }
+				</DialogValidationProvider>
+			</_Dialog.Popup>
 		</>
 	);
 
