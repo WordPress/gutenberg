@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Navigation: Add a Tablet option to Overlay Visibility that collapses the menu at the theme's tablet breakpoint.
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
