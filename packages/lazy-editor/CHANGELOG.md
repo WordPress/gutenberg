@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Bug Fixes
-
--   Register the client half of the core block bindings sources once the editor assets load, so blocks bound to a source show its values. ([#86896](https://github.com/WordPress/gutenberg/pull/86896))
-
 ## 2.1.0 (2026-11-04)
 
 ## 2.0.0 (2026-10-20)
