@@ -709,6 +709,39 @@ export const canUserEditEntityRecord =
 	};
 
 /**
+ * Requests the autosaves of a post from the REST API.
+ *
+ * @param resolveSelect Resolving selectors of the store.
+ * @param postType      The type of the parent post.
+ * @param postId        The id of the parent post.
+ * @param authorId      Optional. Limits the request to this author's autosave.
+ *
+ * @return The autosaves, or none if the post type does not support them.
+ */
+async function fetchAutosaves(
+	resolveSelect: CoreDataThunkArgs[ 'resolveSelect' ],
+	postType: string,
+	postId: number,
+	authorId?: number
+): Promise< Array< any > > {
+	const postTypeObject = await resolveSelect.getPostType( postType );
+	if ( ! postTypeObject?.supports?.autosave ) {
+		return [];
+	}
+
+	const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
+		postTypeObject;
+	const autosaves = await apiFetch< Array< any > >( {
+		path: addQueryArgs(
+			`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
+			{ context: 'edit', author: authorId }
+		),
+	} );
+
+	return autosaves ?? [];
+}
+
+/**
  * Request autosave data from the REST API.
  *
  * @param postType The type of the parent post.
@@ -717,21 +750,13 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType: string, postId: number ) =>
 	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
-		const {
-			rest_base: restBase,
-			rest_namespace: restNamespace = 'wp/v2',
-			supports,
-			// Autosaves are requested for posts of an existing post type.
-		} = ( await resolveSelect.getPostType( postType ) )!;
-		if ( ! supports?.autosave ) {
-			return;
-		}
+		const autosaves = await fetchAutosaves(
+			resolveSelect,
+			postType,
+			postId
+		);
 
-		const autosaves = await apiFetch< Array< unknown > >( {
-			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
-		} );
-
-		if ( autosaves && autosaves.length ) {
+		if ( autosaves.length ) {
 			dispatch.receiveAutosaves( postId, autosaves );
 		}
 	};
@@ -739,14 +764,8 @@ export const getAutosaves =
 /**
  * Requests a single author's autosave from the REST API.
  *
- * WordPress stores at most one autosave per author, and the `getAutosave`
- * selector only ever returns the one belonging to the given author, so this
- * requests that single record instead of every autosave for the post. On a
- * long-lived post with many editors, the difference is the entire collection
- * versus one row.
- *
- * The `getAutosaves` resolver is left alone: it still fetches the whole
- * collection for callers that want it.
+ * WordPress stores at most one autosave per author, so this avoids loading
+ * the autosaves of every author of the post.
  *
  * @param postType The type of the parent post.
  * @param postId   The id of the parent post.
@@ -754,31 +773,25 @@ export const getAutosaves =
  */
 export const getAutosave =
 	( postType: string, postId: number, authorId?: number ) =>
-	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
+	async ( { dispatch, select, resolveSelect }: CoreDataThunkArgs ) => {
 		if ( authorId === undefined ) {
 			return;
 		}
 
-		const {
-			rest_base: restBase,
-			rest_namespace: restNamespace = 'wp/v2',
-			supports,
-			// Autosaves are requested for posts of an existing post type.
-		} = ( await resolveSelect.getPostType( postType ) )!;
+		const autosaves = await fetchAutosaves(
+			resolveSelect,
+			postType,
+			postId,
+			authorId
+		);
 
-		if ( ! supports?.autosave ) {
-			return;
-		}
+		if ( autosaves.length ) {
+			// Keeps the autosaves already received for other authors.
+			const others = (
+				select.getAutosaves( postType, postId ) ?? []
+			).filter( ( autosave ) => autosave.author !== authorId );
 
-		const autosaves = await apiFetch< Array< unknown > >( {
-			path: addQueryArgs(
-				`/${ restNamespace }/${ restBase }/${ postId }/autosaves`,
-				{ context: 'edit', author: authorId }
-			),
-		} );
-
-		if ( autosaves && autosaves.length ) {
-			dispatch.receiveAutosaves( postId, autosaves );
+			dispatch.receiveAutosaves( postId, [ ...others, ...autosaves ] );
 		}
 	};
 

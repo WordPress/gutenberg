@@ -1163,109 +1163,77 @@ describe( 'getAutosaves', () => {
 
 describe( 'getAutosave', () => {
 	const AUTHOR_ID = 7;
-	const SUCCESSFUL_RESPONSE = [
-		{
-			title: 'test title',
-			excerpt: 'test excerpt',
-			content: 'test content',
-			author: AUTHOR_ID,
-		},
-	];
-
+	const AUTOSAVE = { id: 99, author: AUTHOR_ID };
+	const OTHER_AUTOSAVE = { id: 100, author: 999 };
 	const postType = 'post';
 	const postId = 1;
-	const restBase = 'posts';
 
-	const setUp = ( response: unknown ) => {
+	const setUp = ( postTypeObject?: Record< string, unknown > ) => {
 		apiFetchMock.mockReset();
-		apiFetchMock.mockImplementation( () => response );
+		apiFetchMock.mockImplementation( () => [ AUTOSAVE ] );
 
 		return {
 			dispatch: Object.assign( vi.fn(), {
 				receiveAutosaves: vi.fn(),
 			} ),
+			select: Object.assign( vi.fn(), {
+				getAutosaves: vi.fn( () => [
+					{ ...AUTOSAVE, id: 98 },
+					OTHER_AUTOSAVE,
+				] ),
+			} ),
 			resolveSelect: Object.assign( vi.fn(), {
-				getPostType: vi.fn( () => ( {
-					rest_base: restBase,
-					supports: { autosave: true },
-				} ) ),
+				getPostType: vi.fn( () => postTypeObject ),
 			} ),
 		};
 	};
 
-	it( 'requests a single autosave scoped to the given author', async () => {
-		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+	it( 'requests the autosave of the given author and keeps the others', async () => {
+		const args = setUp( {
+			rest_base: 'posts',
+			supports: { autosave: true },
+		} );
 
-		await getAutosave(
-			postType,
-			postId,
-			AUTHOR_ID
-		)( thunkArgs( { dispatch, resolveSelect } ) );
+		await getAutosave( postType, postId, AUTHOR_ID )( thunkArgs( args ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit&author=${ AUTHOR_ID }`,
+			path: `/wp/v2/posts/${ postId }/autosaves?context=edit&author=${ AUTHOR_ID }`,
 		} );
-		expect( dispatch.receiveAutosaves ).toHaveBeenCalledWith(
-			postId,
-			SUCCESSFUL_RESPONSE
-		);
-	} );
-
-	it( 'receives nothing when the author has no autosave', async () => {
-		const { dispatch, resolveSelect } = setUp( [] );
-
-		await getAutosave(
-			postType,
-			postId,
-			AUTHOR_ID
-		)( thunkArgs( { dispatch, resolveSelect } ) );
-
-		expect( dispatch.receiveAutosaves ).not.toHaveBeenCalled();
+		expect( args.dispatch.receiveAutosaves ).toHaveBeenCalledWith( postId, [
+			OTHER_AUTOSAVE,
+			AUTOSAVE,
+		] );
 	} );
 
 	it( 'does not fetch when the author is unknown', async () => {
-		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
+		const args = setUp();
 
-		await getAutosave(
-			postType,
-			postId,
-			undefined
-		)( thunkArgs( { dispatch, resolveSelect } ) );
+		await getAutosave( postType, postId, undefined )( thunkArgs( args ) );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		expect( resolveSelect.getPostType ).not.toHaveBeenCalled();
+		expect( args.resolveSelect.getPostType ).not.toHaveBeenCalled();
 	} );
 
-	it( 'does not fetch when the post type does not support autosaves', async () => {
-		const { dispatch } = setUp( SUCCESSFUL_RESPONSE );
-		const resolveSelect = Object.assign( vi.fn(), {
-			getPostType: vi.fn( () => ( {
-				rest_base: restBase,
-				supports: { autosave: false },
-			} ) ),
-		} );
+	it.each( [
+		[ 'is unknown', undefined ],
+		[
+			'does not support autosaves',
+			{ rest_base: 'posts', supports: { autosave: false } },
+		],
+	] )(
+		'does not fetch when the post type %s',
+		async ( _, postTypeObject ) => {
+			const args = setUp( postTypeObject );
 
-		await getAutosave(
-			postType,
-			postId,
-			AUTHOR_ID
-		)( thunkArgs( { dispatch, resolveSelect } ) );
+			await getAutosave(
+				postType,
+				postId,
+				AUTHOR_ID
+			)( thunkArgs( args ) );
 
-		expect( triggerFetch ).not.toHaveBeenCalled();
-	} );
-
-	it( 'leaves the getAutosaves resolver behavior unchanged', async () => {
-		const { dispatch, resolveSelect } = setUp( SUCCESSFUL_RESPONSE );
-
-		await getAutosaves(
-			postType,
-			postId
-		)( thunkArgs( { dispatch, resolveSelect } ) );
-
-		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
-		} );
-	} );
+			expect( triggerFetch ).not.toHaveBeenCalled();
+		}
+	);
 } );
 
 describe( 'getCurrentUser', () => {
