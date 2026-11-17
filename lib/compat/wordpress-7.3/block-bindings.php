@@ -67,11 +67,7 @@ function gutenberg_render_block_accordion_heading_title_binding( $block_content,
 		return $block_content;
 	}
 
-	/*
-	 * Core merges the computed attributes before this filter runs, including
-	 * the bindings metadata expanded from a pattern overrides `__default`
-	 * binding. A source that returns null leaves `title` unset.
-	 */
+	// Includes bindings expanded from `__default`. A `null` value leaves `title` unset.
 	$attributes = $instance->attributes;
 	if ( ! isset( $attributes['metadata']['bindings']['title'] ) || ! isset( $attributes['title'] ) ) {
 		return $block_content;
@@ -82,11 +78,8 @@ function gutenberg_render_block_accordion_heading_title_binding( $block_content,
 		return $block_content;
 	}
 
-	// Anonymous subclass with access to the bookmarks and lexical updates, as in
-	// `WP_Block::get_block_bindings_processor()`. The redeclaration-guard sniff
-	// cannot tell these class methods from global functions, so it is disabled
-	// for the class body.
-	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration
+	// Mirrors `WP_Block::get_block_bindings_processor()`.
+	// phpcs:disable Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.FunctionNotGuardedAgainstRedeclaration -- Class methods, not global functions.
 	$processor_class = new class( '', WP_HTML_Processor::CONSTRUCTOR_UNLOCK_CODE ) extends WP_HTML_Processor {
 		/**
 		 * Replaces the content between the current tag opener and its matching closer.
@@ -103,7 +96,7 @@ function gutenberg_render_block_accordion_heading_title_binding( $block_content,
 			$tag_name = $this->get_tag();
 
 			$this->set_bookmark( '_gutenberg_block_bindings' );
-			// The bookmark names are prefixed with `_` so the key below has an extra `_`.
+			// Bookmark keys get an extra `_` prefix.
 			$tag_opener = $this->bookmarks['__gutenberg_block_bindings'];
 			$start      = $tag_opener->start + $tag_opener->length;
 
