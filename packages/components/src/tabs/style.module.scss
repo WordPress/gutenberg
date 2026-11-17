@@ -181,23 +181,17 @@
 		height: 47px;
 		scroll-margin: 24px;
 
-		// Adjacent tabs share an edge, so the inset on the shared axis is
-		// halved: 1px on each of two neighbours reads as the same 2px gap as
-		// the clearance against the list's own edges.
+		// An even inset on all four sides, so the background keeps the tab's
+		// silhouette and reads as the tab lighting up rather than as a shape
+		// of its own. The value is what leaves a background exactly one
+		// control tall (--wpds-dimension-size-lg) inside the 47px tab, which
+		// ties the tab bar to the controls around it and is why a control's
+		// corner radius suits it. Vertical tabs are already a control tall,
+		// so they need no inset to match.
 		&::after {
 			content: "";
-			inset: 2px 1px;
+			inset: 3.5px;
 			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-		}
-
-		// The list's outer edges are not shared with another tab, so they take
-		// the full clearance rather than half of it.
-		&:first-child::after {
-			inset-inline-start: 2px;
-		}
-
-		&:not(:has(~ .tab))::after {
-			inset-inline-end: 2px;
 		}
 	}
 
@@ -205,20 +199,14 @@
 		padding: var(--wpds-dimension-padding-md);
 		min-height: var(--wpds-dimension-size-lg);
 
-		// Mirrored: tabs stack, so the halved inset is on the block axis.
+		// No inset here. A vertical tab is a full-width row in a column of
+		// controls, so its background has to line up with the search field and
+		// anything else stacked above it. Inset it and the column stops
+		// reading as one edge.
 		&::after {
 			content: "";
-			inset: 1px 2px;
+			inset: 0;
 			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-		}
-
-		// Outer edges again, mirrored onto the stacking axis.
-		&:first-child::after {
-			inset-block-start: 2px;
-		}
-
-		&:not(:has(~ .tab))::after {
-			inset-block-end: 2px;
 		}
 	}
 }
