@@ -349,8 +349,7 @@ const inserterMediaCategories = [
 		mediaType: 'audio',
 		getQuery: ( query ) => ( { ...query, media_type: 'audio' } ),
 	} ),
-	// Everything in the library, images, video and audio included, inserted as
-	// File blocks: any of them can be offered as a download.
+	// Documents, archives and other non-media files, inserted as File blocks.
 	createCoreMediaCategory( {
 		name: 'files',
 		labels: {
@@ -358,7 +357,10 @@ const inserterMediaCategories = [
 			search_items: __( 'Search files' ),
 		},
 		mediaType: 'application',
-		getQuery: ( query ) => query,
+		getQuery: ( query ) => ( {
+			...query,
+			media_type: [ 'application', 'text' ],
+		} ),
 	} ),
 	{
 		name: 'openverse',

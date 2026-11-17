@@ -1005,7 +1005,7 @@ test.describe( 'insert a file from inserter', () => {
 		] );
 	} );
 
-	test( 'inserts any library item as a File block', async ( {
+	test( 'lists only documents and inserts them as File blocks', async ( {
 		admin,
 		page,
 		editor,
@@ -1015,20 +1015,22 @@ test.describe( 'insert a file from inserter', () => {
 		await page.getByLabel( 'Block Inserter' ).click();
 		await page.getByRole( 'tab', { name: 'Media' } ).click();
 		await page.getByRole( 'tab', { name: 'Files' } ).click();
-		// Files lists the whole library, documents and images alike.
+		const fileItem = page.getByRole( 'button', {
+			name: uploadedFile.title.raw,
+		} );
+		await expect( fileItem ).toBeVisible();
+		// Images have their own category, so they are left out of Files.
 		await expect(
-			page.getByRole( 'button', { name: uploadedFile.title.raw } )
-		).toBeVisible();
-		await page
-			.getByRole( 'button', { name: uploadedImage.title.raw } )
-			.click();
+			page.getByRole( 'button', { name: uploadedImage.title.raw } )
+		).toBeHidden();
+		await fileItem.click();
 		// Inserted from the library as is, so it keeps the attachment's id.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/file',
 				attributes: {
-					id: uploadedImage.id,
-					href: uploadedImage.source_url,
+					id: uploadedFile.id,
+					href: uploadedFile.source_url,
 				},
 			},
 		] );
