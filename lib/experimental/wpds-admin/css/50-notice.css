@@ -1,9 +1,16 @@
 /**
  * Admin notices, styled from WordPress Design System tokens.
  *
- * Parity target is the React `Notice` (packages/components/src/notice/style.scss),
- * which is already expressed entirely in tokens. The admin's tone classes map
- * one to one onto its variants: `.notice-success` to `is-success`, and so on.
+ * Parity target is the design system's `Notice`. `@wordpress/ui` Notice is the
+ * canonical one:
+ * https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-notice--docs
+ *
+ * The values below are taken from `@wordpress/components` Notice
+ * (packages/components/src/notice/style.scss,
+ * https://wordpress.github.io/gutenberg/?path=/docs/components-notice--docs), which is
+ * already aligned to it and, unlike the composed `@wordpress/ui` parts, carries tone on
+ * a single element with variant classes that map one to one onto the admin's:
+ * `.notice-success` to `is-success`, and so on.
  *
  * The visible change is how tone is carried. WordPress signals it with a 4px bar on
  * the leading edge over a white or near-white background. The design system uses
@@ -163,6 +170,11 @@
 	   is compared before specificity. There are only three, all deliberately
 	   tighter than a standalone notice, and all in containers where the roomier
 	   padding would crowd or overflow.
+
+	   The values are WordPress's own and are left untokenised on purpose. These rules
+	   exist to preserve what WordPress already set, and no token matches 5px, 15px or
+	   2px; reaching for the nearest one would change the padding under the guise of a
+	   value swap.
 	   ----------------------------------------------------------------------- */
 
 	.wrap #templateside .notice {
