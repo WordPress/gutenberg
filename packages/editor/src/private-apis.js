@@ -19,6 +19,17 @@ import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
+import { diffRevisionContent } from './components/post-revisions-preview/block-diff';
+import {
+	registerDiffFormatTypes,
+	unregisterDiffFormatTypes,
+} from './components/post-revisions-preview/diff-format-types';
+import {
+	DiffDescriptions,
+	REVISION_DIFF_STYLES,
+	REVISION_REMOVED_FILTER_SVG,
+} from './components/post-revisions-preview/block-diff-view';
+import { RevisionsCodeDiff } from './components/post-revisions-preview/revisions-code-diff';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -45,6 +56,18 @@ lock( privateApis, {
 	StyleBookPreview,
 	useGlobalStyles,
 	useStyle,
+	// The revisions diff: the block differ, its rich-text formats, the
+	// visual layer (styles, removed-block filter, descriptions; the
+	// BlockListBlock filter registers when block-diff-view loads), and the
+	// presentational code diff. Hosts outside the revisions screen (a
+	// collaboration plugin's conflict review) render diffed blocks with these.
+	diffRevisionContent,
+	registerDiffFormatTypes,
+	unregisterDiffFormatTypes,
+	DiffDescriptions,
+	REVISION_DIFF_STYLES,
+	REVISION_REMOVED_FILTER_SVG,
+	RevisionsCodeDiff,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,
