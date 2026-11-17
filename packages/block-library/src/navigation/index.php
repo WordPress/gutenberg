@@ -140,7 +140,9 @@ function block_core_navigation_get_filtered_overlay_viewports( $attributes, $blo
 	 *
 	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map, or null for the default `mobile` behavior.
 	 * @param array                                                 $attributes        Block attributes, including `ref`, the ID of the
-	 *                                                                                 `wp_navigation` post.
+	 *                                                                                 `wp_navigation` post, when the block references one.
+	 *                                                                                 Deprecated attributes are migrated, so these may
+	 *                                                                                 differ from `$block->attributes`.
 	 * @param WP_Block|null                                         $block             Block instance, or null if not available.
 	 */
 	$filtered = apply_filters( 'block_core_navigation_overlay_viewports', $overlay_viewports, $attributes, $block );
@@ -175,7 +177,9 @@ function block_core_navigation_get_filtered_overlay_viewports( $attributes, $blo
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return bool Whether the overlay is shown in at least one viewport.
  */
 function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
@@ -201,7 +205,9 @@ function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return bool Whether the overlay is shown in every viewport.
  */
 function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
@@ -231,7 +237,9 @@ function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return string[] Viewports where the links are inline, in CSS order.
  */
 function block_core_navigation_get_inline_viewports( $overlay_viewports ) {
@@ -741,11 +749,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_inner_blocks( $attributes, $block ) {
 		$inner_blocks = $block->inner_blocks;
-
-		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
-		if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
-			$attributes['ref'] = $attributes['navigationMenuId'];
-		}
 
 		// If:
 		// - the gutenberg plugin is active
@@ -1381,7 +1384,8 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 * @since 7.3.0 Resolves the overlay viewports once per render, applying the
-	 *              `block_core_navigation_overlay_viewports` filter.
+	 *              `block_core_navigation_overlay_viewports` filter. Maps the legacy
+	 *              `navigationMenuId` attribute to `ref` before anything reads it.
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content    The saved content.
@@ -1405,6 +1409,12 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
+
+		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId)
+		// continue to render, and that every step below reads the same `ref`.
+		if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+			$attributes['ref'] = $attributes['navigationMenuId'];
+		}
 
 		// Submenu detection is memoized while a navigation block renders. Reset it so
 		// the result of a previously rendered navigation block is not reused for this one.

@@ -1223,7 +1223,35 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$this->assertSame( $navigation_id, $attributes['ref'] );
 		$this->assertInstanceOf( WP_Block::class, $block );
 		$this->assertSame( 'core/navigation', $block->name );
-		$this->assertSame( $attributes, $block->attributes, 'The filter must receive the attributes of the block it is given.' );
+	}
+
+	/**
+	 * Tests that the overlay viewports filter receives `ref` for a block saved
+	 * with the legacy `navigationMenuId` attribute, as in the editor.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_receives_ref_for_legacy_navigation_menu_id() {
+		$navigation_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /-->',
+			)
+		);
+		$calls         = array();
+		$this->add_overlay_viewports_filter(
+			static function ( $overlay_viewports, $attributes ) use ( &$calls ) {
+				$calls[] = $attributes;
+				return $overlay_viewports;
+			}
+		);
+
+		do_blocks( '<!-- wp:navigation {"navigationMenuId":' . $navigation_id . '} /-->' );
+
+		$this->assertCount( 1, $calls, 'The filter must be applied once.' );
+		$this->assertArrayHasKey( 'ref', $calls[0] );
+		$this->assertSame( $navigation_id, $calls[0]['ref'] );
 	}
 
 	/**
@@ -1297,6 +1325,8 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
 	 */
 	public function test_overlay_viewports_filter_can_show_the_overlay_for_never() {
+		$view_module = '@wordpress/block-library/navigation/view';
+		wp_dequeue_script_module( $view_module );
 		$this->add_overlay_viewports_filter(
 			static function () {
 				return array(
@@ -1308,6 +1338,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		);
 
 		$this->assert_tablet_overlay_markup( $this->render_navigation_block( array( 'overlayMenu' => 'never' ) ) );
+		$this->assertContains( $view_module, wp_script_modules()->get_queue(), 'The overlay must enqueue the view module.' );
 	}
 
 	/**
