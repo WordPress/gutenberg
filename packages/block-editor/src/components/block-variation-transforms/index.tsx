@@ -235,7 +235,16 @@ function BlockVariationTransforms( {
 		const transformedBlocks =
 			block && switchToBlockType( block, block.name, variationName );
 		if ( transformedBlocks ) {
-			replaceBlocks( blockClientId, transformedBlocks );
+			const [ transformedBlock, ...rest ] = transformedBlocks;
+			// Reusing the client ID updates the block in place instead of remounting it.
+			const replacements =
+				transformedBlock.name === block.name
+					? [
+							{ ...transformedBlock, clientId: blockClientId },
+							...rest,
+						]
+					: transformedBlocks;
+			replaceBlocks( blockClientId, replacements, undefined, null );
 			return;
 		}
 		updateBlockAttributes( blockClientId, {
