@@ -49,24 +49,28 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 			// the cell's own space, so it needs no scroll state.
 			mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 $scroll-fade-size);
 
-			// Divider between the strip and the actions, shown while there are
-			// more columns to scroll to.
+			// Double rule between the strip and the actions, shown whenever
+			// the columns scroll, to set the actions apart from them.
 			&::after {
 				content: "";
 				position: absolute;
-				inset-block: 0;
+				// Also covers the space of the line between rows, outside the
+				// padding box, so the rule is unbroken.
+				inset-block: -1px;
 				inset-inline-start: $scroll-fade-size;
-				width: 1px;
-				background-color: var(--wpds-color-stroke-surface-neutral);
+				box-sizing: border-box;
+				// Two lines as light as the ones between rows, 2px apart.
+				width: calc(2 * var(--wpds-border-width-xs) + 2px);
+				border-inline: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+				background-color: var(--wpds-color-background-surface-neutral);
 
-				// Hidden at the end of the scroll range, and when nothing
-				// scrolls, where the scroll timeline is inactive. Browsers
-				// without scroll-driven animations always show it.
+				// Hidden when nothing scrolls, where the scroll timeline is
+				// inactive. Browsers without scroll-driven animations always
+				// show it.
 				@supports (animation-timeline: scroll()) {
 					opacity: 0;
-					animation: dataviews-view-table-scroll-cue linear;
+					animation: dataviews-view-table-scroll-cue linear both;
 					animation-timeline: scroll(nearest inline);
-					animation-range: normal calc(100% - 1px);
 				}
 			}
 		}
@@ -177,6 +181,10 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
 		tr {
 			border: 0;
+		}
+		// Starts the rule at the top of the table.
+		th.dataviews-view-table__actions-column::after {
+			inset-block-start: 0;
 		}
 		th {
 			vertical-align: middle;
