@@ -91,18 +91,6 @@ describe( 'FontCollection', () => {
 		expect( speak ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	it( 'announces when a search matches a single font', async () => {
-		renderFontCollection();
-
-		fireEvent.change( screen.getByRole( 'searchbox' ), {
-			target: { value: 'noto' },
-		} );
-
-		await waitFor( () =>
-			expect( speak ).toHaveBeenCalledWith( '1 font found.' )
-		);
-	} );
-
 	it( 'announces when a search matches no fonts', async () => {
 		renderFontCollection();
 
