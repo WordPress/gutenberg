@@ -1,11 +1,137 @@
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
+import { loadChangieConfig } from '@wordpress/changelog-tools/config';
 import {
 	findRangeMismatches,
 	nextReleaseVersion,
+	readWorkspaces,
 } from './check-peer-version-ranges.ts';
 
 const changelog = ( body: string ) =>
 	`## Unreleased\n\n${ body }\n## 1.0.0 (2026-01-01)\n\n### Breaking Changes\n\n-   Old.\n`;
+
+describe( 'workspace changelog sources', () => {
+	test.each( [
+		{
+			behavior: 'flags the next breaking version from fragments',
+			version: '3.1.0',
+			range: '^3.0.0',
+			kinds: [ 'Breaking Changes' ],
+			usesChangie: true,
+			nextVersion: '4.0.0',
+		},
+		{
+			behavior: 'flags stable promotion even with breaking fragments',
+			version: '0.26.0',
+			range: '^0.26.0',
+			kinds: [ 'Breaking Changes', 'Stable Release' ],
+			usesChangie: true,
+			nextVersion: '1.0.0',
+		},
+		{
+			behavior: 'ignores published history when no fragments exist',
+			version: '3.1.0',
+			range: '^3.0.0',
+			kinds: [],
+			usesChangie: true,
+			nextVersion: null,
+		},
+		{
+			behavior:
+				'reads traditional changelogs for packages without fragments',
+			version: '3.1.0',
+			range: '^3.0.0',
+			kinds: [],
+			usesChangie: false,
+			nextVersion: '4.0.0',
+		},
+	] )(
+		'$behavior',
+		( { version, range, kinds, usesChangie, nextVersion } ) => {
+			const root = mkdtempSync(
+				join( tmpdir(), 'peer-range-changelogs-' )
+			);
+			try {
+				const config = loadChangieConfig(
+					resolve( import.meta.dirname, '../..' )
+				);
+				writeFileSync(
+					join( root, '.changie.yaml' ),
+					JSON.stringify( {
+						...config,
+						projects: usesChangie
+							? config.projects.filter(
+									( project ) => project.key === 'ui'
+								)
+							: [],
+					} )
+				);
+				const target = join( root, 'packages', 'ui' );
+				const consumer = join( root, 'packages', 'consumer' );
+				const unreleased = join( root, '.changes', 'unreleased' );
+				mkdirSync( target, { recursive: true } );
+				mkdirSync( consumer );
+				mkdirSync( unreleased, { recursive: true } );
+				writeFileSync(
+					join( target, 'package.json' ),
+					JSON.stringify( { name: '@wordpress/ui', version } )
+				);
+				writeFileSync(
+					join( target, 'CHANGELOG.md' ),
+					usesChangie
+						? `## ${ version }\n\n### Breaking Changes\n\n- Published change.\n`
+						: changelog(
+								'### Breaking Changes\n\n- Pending change.\n'
+							)
+				);
+				writeFileSync(
+					join( consumer, 'package.json' ),
+					JSON.stringify( {
+						name: '@wordpress/consumer',
+						version: '1.0.0',
+						peerDependencies: { '@wordpress/ui': range },
+					} )
+				);
+				for ( const kind of kinds ) {
+					writeFileSync(
+						join( unreleased, `${ kind }.yaml` ),
+						JSON.stringify( {
+							project: 'ui',
+							kind,
+							body: 'Prepare release.',
+							time: '2026-11-17T00:00:00Z',
+							custom: { PR: '85369' },
+						} )
+					);
+				}
+				const workspaces = readWorkspaces( root );
+				expect(
+					nextReleaseVersion(
+						version,
+						workspaces[ 'packages/ui' ].changelog!
+					)
+				).toBe( nextVersion );
+				expect( findRangeMismatches( workspaces ) ).toEqual(
+					nextVersion
+						? [
+								{
+									workspace: 'packages/consumer',
+									peer: '@wordpress/ui',
+									range,
+									version: nextVersion,
+									reason: 'the version its unreleased changelog entries will release as',
+								},
+							]
+						: []
+				);
+			} finally {
+				rmSync( root, { recursive: true, force: true } );
+			}
+		}
+	);
+} );
 
 describe( 'nextReleaseVersion', () => {
 	test( 'follows the release tool bump rules', () => {
