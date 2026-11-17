@@ -18,6 +18,7 @@
 
 ### Enhancements
 
+-   `manifest.json`: Map 45 more Dashicons to `core-admin` icons. To do so, add 33 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `lock` and `play`, and add `chevronUpDown`, `file` and `folder` from the `core` collection to the `core-admin` collection too ([#86708](https://github.com/WordPress/gutenberg/pull/86708)).
 -   `formatItalic`: Adds serifs to the italic icon for legibility ([#86561](https://github.com/WordPress/gutenberg/pull/86561)).
 -   `formatListNumbered`, `formatListNumberedRTL`, `postDate`, `queryPaginationNumbers`, `subscript`, `superscript` and `termCount`: enlarge the numerals and draw them from one construction, so they stay legible at small sizes ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
 -   `postCommentsCount`: drop the lines of text and pair a single speech bubble with the number sign, so the two halves of the icon read at the same weight ([#85450](https://github.com/WordPress/gutenberg/pull/85450)).
@@ -32,6 +33,7 @@
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+-   Add a `normalize-svg` script that rewrites a design-tool SVG export into the markup the library uses, run it on staged icons before each commit, and validate every library icon against it in the build ([#86657](https://github.com/WordPress/gutenberg/pull/86657)).
 
 ## 20.0.0 (2026-11-04)
 
