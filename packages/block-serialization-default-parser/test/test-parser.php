@@ -2,13 +2,17 @@
 /**
  * PHP Test Helper
  *
- * Facilitates running PHP parser against same tests as the JS parser implementation.
+ * Facilitates running Core's PHP parser against the same tests as the JS parser implementation.
  *
  * @package gutenberg
  */
 
-// Include the default parser.
-require_once __DIR__ . '/../parser.php';
+// Load Core's parser from the wordpress-develop checkout whose PHPUnit tests are in WP_TESTS_DIR.
+$wp_includes = dirname( getenv( 'WP_TESTS_DIR' ), 2 ) . '/src/wp-includes';
+
+require_once $wp_includes . '/html-api/class-wp-html-span.php';
+require_once $wp_includes . '/class-wp-block-processor.php';
+require_once $wp_includes . '/class-wp-block-parser.php';
 
 $parser = new WP_Block_Parser();
 

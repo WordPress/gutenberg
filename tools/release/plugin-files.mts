@@ -8,7 +8,6 @@
 export const PLUGIN_FILES = [
 	'gutenberg.php',
 	'lib',
-	'packages/block-serialization-default-parser/*.php',
 	'packages/icons/src/manifest.php',
 	'packages/icons/src/library/*.svg',
 	'build',
