@@ -265,18 +265,20 @@ class WP_Navigation_Block_Renderer {
 	/**
 	 * Returns whether or not this is responsive navigation.
 	 *
+	 * Backwards compatibility for the removed `isResponsive` attribute is
+	 * handled by block_core_navigation_get_overlay_viewports(). A missing
+	 * `overlayMenu` is treated as `mobile`, matching the block.json default.
+	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Reads the overlay viewports through the resolver.
 	 *
 	 * @param array $attributes The block attributes.
 	 * @return bool Returns whether or not this is responsive navigation.
 	 */
 	private static function is_responsive( $attributes ) {
-		/**
-		 * This is for backwards compatibility after the `isResponsive` attribute was been removed.
-		 */
-
-		$has_old_responsive_attribute = ! empty( $attributes['isResponsive'] );
-		return isset( $attributes['overlayMenu'] ) && 'never' !== $attributes['overlayMenu'] || $has_old_responsive_attribute;
+		return block_core_navigation_is_overlay_responsive(
+			block_core_navigation_get_overlay_viewports( $attributes )
+		);
 	}
 
 	/**
@@ -901,7 +903,9 @@ class WP_Navigation_Block_Renderer {
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
-		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
+		$is_hidden_by_default = block_core_navigation_is_overlay_always_shown(
+			block_core_navigation_get_overlay_viewports( $attributes )
+		);
 
 		// Set-up variables for custom overlays.
 		$has_custom_overlay             = false;

@@ -35,6 +35,29 @@ describe( 'getOverlayViewports', () => {
 	} );
 } );
 
+// The editor derives `isResponsive` and `isHiddenByDefault` this way. Matches
+// the PHP test_overlay_menu_markup() cases.
+describe( 'overlay visibility for each overlayMenu value', () => {
+	it.each( [
+		[ undefined, true, false ],
+		[ 'mobile', true, false ],
+		[ 'tablet', true, false ],
+		[ 'always', true, true ],
+		[ 'never', false, false ],
+	] )(
+		'%p is responsive: %p, always shown: %p',
+		( overlayMenu, isResponsive, isAlwaysShown ) => {
+			const overlayViewports = getOverlayViewports( { overlayMenu } );
+			expect( isOverlayResponsive( overlayViewports ) ).toBe(
+				isResponsive
+			);
+			expect( isOverlayAlwaysShown( overlayViewports ) ).toBe(
+				isAlwaysShown
+			);
+		}
+	);
+} );
+
 describe( 'overlay viewport helpers', () => {
 	const tablet = { mobile: true, tablet: true, desktop: false };
 	const never = { mobile: false, tablet: false, desktop: false };

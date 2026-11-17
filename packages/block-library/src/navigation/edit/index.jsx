@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -62,6 +68,11 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import {
+	getOverlayViewports,
+	isOverlayAlwaysShown,
+	isOverlayResponsive,
+} from '../overlay-viewports';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
@@ -607,7 +618,12 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+	const overlayViewports = useMemo(
+		() => getOverlayViewports( { overlayMenu } ),
+		[ overlayMenu ]
+	);
+	const isResponsive =
+		isOverlayResponsive( overlayViewports ) && ! editorDisabledResponsive;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -954,7 +970,7 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-	const isHiddenByDefault = 'always' === overlayMenu;
+	const isHiddenByDefault = isOverlayAlwaysShown( overlayViewports );
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 

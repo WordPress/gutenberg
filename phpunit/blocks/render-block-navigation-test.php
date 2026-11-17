@@ -777,4 +777,65 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Tests that the overlay setting decides whether the rendered markup is
+	 * responsive and whether the overlay is always shown.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 *
+	 * @dataProvider data_overlay_menu_markup
+	 *
+	 * @param array $attributes      Navigation block attributes.
+	 * @param bool  $is_responsive   Whether the markup is expected to be responsive.
+	 * @param bool  $is_always_shown Whether the overlay is expected to be always shown.
+	 */
+	public function test_overlay_menu_markup( $attributes, $is_responsive, $is_always_shown ) {
+		$markup = do_blocks(
+			'<!-- wp:navigation ' . wp_json_encode( (object) $attributes ) . ' -->' .
+			'<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /-->' .
+			'<!-- wp:navigation-link {"label":"About","url":"/about","kind":"custom"} /-->' .
+			'<!-- /wp:navigation -->'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertSame( $is_responsive, $processor->has_class( 'is-responsive' ), 'is-responsive class' );
+
+		$has_open_button = $processor->next_tag( array( 'class_name' => 'wp-block-navigation__responsive-container-open' ) );
+		$this->assertSame( $is_responsive, $has_open_button, 'Overlay open button' );
+		if ( ! $is_responsive ) {
+			return;
+		}
+		$this->assertSame( $is_always_shown, $processor->has_class( 'always-shown' ), 'always-shown class' );
+
+		$this->assertTrue(
+			$processor->next_tag( array( 'class_name' => 'wp-block-navigation__responsive-container' ) ),
+			'Responsive navigation must render the overlay container.'
+		);
+		$this->assertSame( $is_always_shown, $processor->has_class( 'hidden-by-default' ), 'hidden-by-default class' );
+	}
+
+	/**
+	 * Data provider for test_overlay_menu_markup().
+	 *
+	 * @return array[]
+	 */
+	public function data_overlay_menu_markup() {
+		return array(
+			'default (block.json mobile)'    => array( array(), true, false ),
+			'mobile'                         => array( array( 'overlayMenu' => 'mobile' ), true, false ),
+			'tablet'                         => array( array( 'overlayMenu' => 'tablet' ), true, false ),
+			'always'                         => array( array( 'overlayMenu' => 'always' ), true, true ),
+			'never'                          => array( array( 'overlayMenu' => 'never' ), false, false ),
+			'never with legacy isResponsive' => array(
+				array(
+					'overlayMenu'  => 'never',
+					'isResponsive' => true,
+				),
+				true,
+				false,
+			),
+		);
+	}
 }
