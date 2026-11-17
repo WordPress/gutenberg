@@ -255,7 +255,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.3.0 Added `text-wrap` property.
-	 * @since 7.3.0 Added the `transform.rotate` and `transform.translate` properties.
+	 * @since 7.3.0 Added the `transform.rotate`, `transform.translate` and
+	 *              `transform.scale` properties.
 	 *
 	 * @var array
 	 */
@@ -318,6 +319,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--translate-x'          => array( 'transform', 'translate', 'x' ),
 		'--wp--style--translate-y'          => array( 'transform', 'translate', 'y' ),
 		'translate'                         => array( 'transform', 'translate' ),
+		'scale'                             => array( 'transform', 'scale' ),
 		'--wp--style--root--padding'        => array( 'spacing', 'padding' ),
 		'--wp--style--root--padding-top'    => array( 'spacing', 'padding', 'top' ),
 		'--wp--style--root--padding-right'  => array( 'spacing', 'padding', 'right' ),
@@ -414,7 +416,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0 Added `viewport` property.
 	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
-	 * @since 7.3.0 Added `transform.rotate` and `transform.translate`.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -495,6 +497,7 @@ class WP_Theme_JSON_Gutenberg {
 		'transform'                     => array(
 			'rotate'    => null,
 			'translate' => null,
+			'scale'     => null,
 		),
 		'typography'                    => array(
 			'fluid'                    => null,
@@ -564,7 +567,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
 	 * @since 7.3.0 Added `typography.textWrap`.
-	 * @since 7.3.0 Added `transform.rotate` and `transform.translate`, for blocks and block style variations only.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`, for blocks and block style variations only.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -620,6 +623,7 @@ class WP_Theme_JSON_Gutenberg {
 				'x' => null,
 				'y' => null,
 			),
+			'scale'     => null,
 		),
 		'typography' => array(
 			'fontFamily'     => null,
@@ -1080,7 +1084,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0
 	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
-	 * @since 7.3.0 Added `transform.rotate` and `transform.translate`.
+	 * @since 7.3.0 Added `transform.rotate`, `transform.translate` and `transform.scale`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -1112,6 +1116,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'spacing', 'padding' ),
 		array( 'transform', 'rotate' ),
 		array( 'transform', 'translate' ),
+		array( 'transform', 'scale' ),
 		array( 'typography', 'lineHeight' ),
 		array( 'typography', 'textColumns' ),
 	);
