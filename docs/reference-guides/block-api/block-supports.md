@@ -695,11 +695,23 @@ attributes: {
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
-    -   `duotone`: type `boolean`, default value `false`
+    -   `duotone`: type `boolean` or `Object`, default value `false`
 
 This value signals that a block supports some of the properties related to filters. When it does, the block editor will show UI controls for the user to set their values.
 
 ### filter.duotone
+
+`filter.duotone` accepts a boolean or an options object. Set `defaultControls` to `false` to hide the built-in inspector and toolbar controls while keeping duotone rendering and the `style` attribute enabled:
+
+```js
+supports: {
+    filter: {
+        duotone: { defaultControls: false }
+    }
+}
+```
+
+Omitting `defaultControls` or setting it to `true` shows the default controls, as does `filter.duotone: true`.
 
 This property adds UI controls which allow the user to apply a duotone filter to
 a block or part of a block.

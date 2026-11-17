@@ -1288,11 +1288,11 @@ export interface BlockSupports {
 	 */
 	filter?: {
 		/**
-		 * Enable duotone filter control.
+		 * Enable duotone support, optionally disabling its default controls.
 		 *
 		 * (default) false
 		 */
-		duotone?: boolean;
+		duotone?: boolean | { defaultControls?: boolean };
 	};
 
 	/**

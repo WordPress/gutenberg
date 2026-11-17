@@ -161,7 +161,11 @@ function DuotonePanelPure( {
 		return null;
 	}
 
-	if ( blockEditingMode !== 'default' ) {
+	if (
+		blockEditingMode !== 'default' ||
+		getBlockSupport( name, 'filter.duotone.defaultControls', true ) ===
+			false
+	) {
 		return null;
 	}
 

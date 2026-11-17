@@ -369,7 +369,20 @@
 					"properties": {
 						"duotone": {
 							"description": "Allow blocks to define a duotone filter.",
-							"type": "boolean",
+							"oneOf": [
+								{ "type": "boolean" },
+								{
+									"type": "object",
+									"properties": {
+										"defaultControls": {
+											"description": "Show the default duotone inspector and toolbar controls.",
+											"type": "boolean",
+											"default": true
+										}
+									},
+									"additionalProperties": false
+								}
+							],
 							"default": false
 						}
 					}
