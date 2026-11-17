@@ -748,8 +748,20 @@ const { state, actions, callbacks } = store(
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
 				} = state.selectedImage.imageRef;
-				let { x: screenPosX, y: screenPosY } =
-					state.selectedImage.imageRef.getBoundingClientRect();
+				// A rotation turns the figure around its centre, which its
+				// bounding box keeps, so place the unrotated image from there.
+				const figure = state.selectedImage.imageRef.offsetParent;
+				const figureRect = figure.getBoundingClientRect();
+				let screenPosX =
+					figureRect.x +
+					( figureRect.width - figure.offsetWidth ) / 2 +
+					figure.clientLeft +
+					state.selectedImage.imageRef.offsetLeft;
+				let screenPosY =
+					figureRect.y +
+					( figureRect.height - figure.offsetHeight ) / 2 +
+					figure.clientTop +
+					state.selectedImage.imageRef.offsetTop;
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;

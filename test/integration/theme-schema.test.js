@@ -118,6 +118,72 @@ describe( 'theme.json schema', () => {
 		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
 	} );
 
+	test( 'accepts a rotation in block styles and block style variations', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/image': {
+						transform: { rotate: '0.25turn' },
+						variations: {
+							rounded: { transform: { rotate: '-5deg' } },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test.each( [
+		[ 'root', { transform: { rotate: '5deg' } } ],
+		[
+			'element',
+			{ elements: { link: { transform: { rotate: '5deg' } } } },
+		],
+		[
+			'element state',
+			{
+				elements: {
+					link: { ':hover': { transform: { rotate: '5deg' } } },
+				},
+			},
+		],
+		[
+			'select state',
+			{
+				elements: {
+					select: { ':hover': { transform: { rotate: '5deg' } } },
+				},
+			},
+		],
+		[
+			'text input state',
+			{
+				elements: {
+					textInput: {
+						':focus': { transform: { rotate: '5deg' } },
+					},
+				},
+			},
+		],
+		[
+			'text input placeholder',
+			{
+				elements: {
+					textInput: {
+						'::placeholder': { transform: { rotate: '5deg' } },
+					},
+				},
+			},
+		],
+	] )( 'rejects a rotation in %s styles', ( _, styles ) => {
+		expect( ajv.validate( themeSchema, { version: 3, styles } ) ).toBe(
+			false
+		);
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(
