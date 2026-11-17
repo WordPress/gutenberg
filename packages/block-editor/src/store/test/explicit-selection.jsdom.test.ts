@@ -4,9 +4,11 @@ import {
 	createBlock,
 	registerBlockType,
 	unregisterBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store } from '..';
+import { unlock } from '../../lock-unlock';
 
 describe( 'explicit block selection', () => {
 	let registry: ReturnType< typeof createRegistry >;
@@ -23,6 +25,7 @@ describe( 'explicit block selection', () => {
 	afterAll( () => unregisterBlockType( 'core/test-selection' ) );
 	beforeEach( () => {
 		registry = createRegistry();
+		registry.register( blocksStore );
 		registry.register( store );
 		blocks = Array.from( { length: 5 }, () =>
 			createBlock( 'core/test-selection' )
@@ -189,5 +192,35 @@ describe( 'explicit block selection', () => {
 						.getBlockAttributes( block.clientId )?.content
 			)
 		).toEqual( [ undefined, 'Changed', undefined, undefined, 'Changed' ] );
+	} );
+
+	it( 'restricts unsupported operations for non-contiguous selections', () => {
+		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+		registry.dispatch( store ).multiSelectSet( ids );
+		expect(
+			unlock( registry.select( store ) ).isSelectionContiguous()
+		).toBe( false );
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( false );
+		expect( registry.select( store ).isGroupable( ids ) ).toBe( false );
+		registry.dispatch( store ).moveBlocksUp( ids, '' );
+		expect( registry.select( store ).getBlockOrder() ).toEqual(
+			blocks.map( ( block ) => block.clientId )
+		);
+	} );
+
+	it( 'retains ordinary operations for contiguous explicit selections', () => {
+		const ids = [ blocks[ 0 ].clientId, blocks[ 1 ].clientId ];
+		registry.dispatch( store ).multiSelectSet( ids );
+		expect(
+			unlock( registry.select( store ) ).isSelectionContiguous()
+		).toBe( true );
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
+		// A separate single-block command is not blocked by the global selection.
+		registry
+			.dispatch( store )
+			.multiSelectSet( [ ids[ 0 ], blocks[ 4 ].clientId ] );
+		expect( registry.select( store ).canMoveBlocks( [ ids[ 1 ] ] ) ).toBe(
+			true
+		);
 	} );
 } );

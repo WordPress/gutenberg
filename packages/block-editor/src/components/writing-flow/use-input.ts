@@ -10,6 +10,7 @@ import {
 } from '@wordpress/blocks';
 import type { BlockEnterTransform } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import type { InitialPosition } from '../../store/types';
@@ -19,6 +20,7 @@ import type { WritingFlowKeyEvent } from './types';
  * Handles input for selections across blocks.
  */
 export default function useInput() {
+	const { isSelectionContiguous } = unlock( useSelect( blockEditorStore ) );
 	const {
 		__unstableIsFullySelected,
 		getSelectedBlockClientIds,
@@ -284,6 +286,10 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
+				if ( ! isSelectionContiguous() ) {
+					event.preventDefault();
+					return;
+				}
 				setContentEditableWrapper( node, false );
 				event.preventDefault();
 				if ( __unstableIsFullySelected() ) {

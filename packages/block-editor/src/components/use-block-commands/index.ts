@@ -43,6 +43,13 @@ const getTransformCommands = () =>
 			} = select( blockEditorStore );
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
+			if (
+				! unlock( select( blockEditorStore ) ).areBlocksContiguous(
+					selectedBlockClientIds
+				)
+			) {
+				return { invalidSelection: true };
+			}
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
 			);

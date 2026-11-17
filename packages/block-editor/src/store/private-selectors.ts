@@ -18,6 +18,7 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getSelectedBlockClientIds,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -25,6 +26,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	areBlocksContiguous,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -50,6 +52,17 @@ const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
+export { areBlocksContiguous } from './utils';
+
+/**
+ * Checks whether the selection is a contiguous sibling range.
+ *
+ * @param state Editor state.
+ * @return Whether the selection is contiguous.
+ */
+export function isSelectionContiguous( state: State ) {
+	return areBlocksContiguous( state, getSelectedBlockClientIds( state ) );
+}
 
 /**
  * Returns explicit selection membership, or undefined for a range selection.

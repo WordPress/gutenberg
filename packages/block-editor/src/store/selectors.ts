@@ -29,6 +29,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	areBlocksContiguous,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2280,7 +2281,10 @@ export function canMoveBlock( state: State, clientId: string ) {
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
 export function canMoveBlocks( state: State, clientIds: string[] ) {
-	return clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) );
+	return (
+		areBlocksContiguous( state, clientIds ) &&
+		clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) )
+	);
 }
 
 /**
@@ -3738,11 +3742,14 @@ export const isUngroupable = createRegistrySelector(
 export const isGroupable = createRegistrySelector(
 	( select ) =>
 		( state: State, clientIds: string[] = EMPTY_ARRAY ) => {
-			const { getGroupingBlockName } = select( blocksStore );
-			const groupingBlockName = getGroupingBlockName();
 			const _clientIds = clientIds?.length
 				? clientIds
 				: getSelectedBlockClientIds( state );
+			if ( ! areBlocksContiguous( state, _clientIds ) ) {
+				return false;
+			}
+			const { getGroupingBlockName } = select( blocksStore );
+			const groupingBlockName = getGroupingBlockName();
 			const rootClientId = _clientIds?.length
 				? getBlockRootClientId( state, _clientIds[ 0 ] )
 				: undefined;

@@ -3,6 +3,7 @@ import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { groupBlocks } from '../../utils/group-blocks';
 import type { BlockActionsProps } from './types';
 
@@ -61,6 +62,7 @@ export default function BlockActions( {
 		[ clientIds, getDefaultBlockName ]
 	);
 	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
+	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
 
 	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
 
@@ -93,7 +95,7 @@ export default function BlockActions( {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onGroup() {
-			if ( ! clientIds.length ) {
+			if ( ! clientIds.length || ! areBlocksContiguous( clientIds ) ) {
 				return;
 			}
 
