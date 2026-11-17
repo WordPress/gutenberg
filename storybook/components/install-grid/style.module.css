@@ -61,38 +61,6 @@
 	padding-top: 24px;
 }
 
-.code {
-	position: relative;
-}
-
-.root .code pre {
-	margin: 0 0 12px;
-	padding: 16px;
-	padding-inline-end: 72px;
-	overflow-x: auto;
-	border-radius: 8px;
-	background: #1e1e1e;
-	color: #f0f0f0;
-}
-
-.copy {
-	position: absolute;
-	inset-block-start: 8px;
-	inset-inline-end: 8px;
-}
-
-.root .code pre code {
-	display: block;
-	margin: 0;
-	padding: 0;
-	border: 0;
-	background: transparent;
-	color: inherit;
-	font-size: 13px;
-	line-height: 1.5;
-	white-space: pre;
-}
-
 /* Storybook's docs link color would otherwise win over the button's text color. */
 .root .install,
 .root .install:visited,
