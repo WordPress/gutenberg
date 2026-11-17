@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   DataViews: In the `table` layout, show primary actions next to the title while the row is hovered, and only the actions menu in the actions column ([#86971](https://github.com/WordPress/gutenberg/pull/86971)).
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
