@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { BreadcrumbItem } from '../breadcrumbs/types';
 import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
 import type { PageComponents } from './types';
@@ -35,11 +36,16 @@ function Page( {
 	 */
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
 	/**
-	 * A `Breadcrumbs` element from `@wordpress/admin-ui`, shown in place of
-	 * `title` on a page that is nested under another page. The last breadcrumb
-	 * is the page heading.
+	 * A breadcrumb trail, shown in place of `title` on a page that is nested
+	 * under another page. Give the list of items, for example
+	 * `[ { label: 'Settings', href: '/settings' }, { label: 'General' } ]`.
+	 * All items except the last one must have an `href`. The last item is the
+	 * page heading.
+	 *
+	 * To navigate with a client-side router, pass its link component as
+	 * `components.link`.
 	 */
-	breadcrumbs?: React.ReactNode;
+	breadcrumbs?: readonly BreadcrumbItem[];
 	/**
 	 * Elements shown after the title or breadcrumbs, such as a `Badge` that
 	 * shows the status of the page.
@@ -93,9 +99,9 @@ function Page( {
 	 */
 	components?: PageComponents;
 	/**
-	 * The accessible name of the page region. When `title` is a string, the
-	 * default is the title. Set it when `title` is not a string, or when the
-	 * page has no title, such as a page that shows breadcrumbs.
+	 * The accessible name of the page region. The default is `title` when it
+	 * is a string, or else the label of the last `breadcrumbs` item. Set it
+	 * when the page has neither.
 	 */
 	ariaLabel?: string;
 	/**
@@ -110,12 +116,14 @@ function Page( {
 } ) {
 	const classes = clsx( styles.page, className );
 	const effectiveAriaLabel =
-		ariaLabel ?? ( typeof title === 'string' ? title : '' );
+		ariaLabel ??
+		( typeof title === 'string' ? title : breadcrumbs?.at( -1 )?.label ) ??
+		'';
 
 	return (
 		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
 			{ ( title ||
-				breadcrumbs ||
+				!! breadcrumbs?.length ||
 				badges ||
 				actions ||
 				visual ||

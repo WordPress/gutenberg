@@ -1,4 +1,4 @@
-import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import { Page } from '@wordpress/admin-ui';
 import apiFetch from '@wordpress/api-fetch';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
@@ -11,9 +11,9 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useNavigate, useSearch } from '@wordpress/route';
+import { Link, useNavigate, useSearch } from '@wordpress/route';
 import { Badge, Stack, Text } from '@wordpress/ui';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, ComponentPropsWithoutRef } from 'react';
 
 /* Every async site health test core exposes over REST. The remaining core
    checks are direct (PHP-only) and have no endpoint; they appear only on
@@ -199,6 +199,16 @@ function withStatuses( view: View, statuses: HealthCheckStatus[] ): View {
 	return { ...view, filters };
 }
 
+/**
+ * Renders `Page` links with the router, which takes the path as `to`.
+ */
+function RouterLink( {
+	href,
+	...props
+}: ComponentPropsWithoutRef< 'a' > & { href: string } ) {
+	return <Link to={ href } { ...props } />;
+}
+
 function SiteHealthPage() {
 	const search = useSearch( { from: '/site-health' } ) as {
 		status?: unknown;
@@ -358,19 +368,16 @@ function SiteHealthPage() {
 	);
 
 	const isLoading = checks === null;
+	const breadcrumbs = [
+		{ label: __( 'Dashboard' ), href: '/' },
+		{ label: __( 'Site Health' ) },
+	];
 
 	if ( ! isLoading && checks.length === 0 && unavailable > 0 ) {
 		return (
 			<Page
-				breadcrumbs={
-					<Breadcrumbs
-						items={ [
-							{ label: __( 'Dashboard' ), to: '/' },
-							{ label: __( 'Site Health' ) },
-						] }
-					/>
-				}
-				ariaLabel={ __( 'Site Health' ) }
+				breadcrumbs={ breadcrumbs }
+				components={ { link: RouterLink } }
 				hasPadding
 			>
 				<Stack direction="column" gap="sm">
@@ -395,15 +402,8 @@ function SiteHealthPage() {
 
 	return (
 		<Page
-			breadcrumbs={
-				<Breadcrumbs
-					items={ [
-						{ label: __( 'Dashboard' ), to: '/' },
-						{ label: __( 'Site Health' ) },
-					] }
-				/>
-			}
-			ariaLabel={ __( 'Site Health' ) }
+			breadcrumbs={ breadcrumbs }
+			components={ { link: RouterLink } }
 			subTitle={ __( "Results from your site's latest health checks." ) }
 			hasPadding={ false }
 		>
