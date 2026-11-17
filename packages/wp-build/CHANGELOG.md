@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
+-   Add `wpPlugin.externals` to read individual packages from a classic script's global instead of bundling them, in both scripts and script modules ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 
 ### Bug Fixes
 

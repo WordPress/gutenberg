@@ -49,13 +49,15 @@ async function generateContentHash(
  * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
  * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
  * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
+ * @param {Object}       externals          Packages to read from a classic script's global (e.g., { '@my-plugin/data': { handle: 'my-plugin-data', global: 'myPlugin.data' } }).
  * @return {Function} Function that creates the Rolldown plugin instance.
  */
 export function createWordpressExternalsPlugin(
 	packageNamespace,
 	scriptGlobal,
 	externalNamespaces = {},
-	handlePrefix
+	handlePrefix,
+	externals = {}
 ) {
 	/**
 	 * WordPress externals plugin for Rolldown.
@@ -142,6 +144,7 @@ export function createWordpressExternalsPlugin(
 			lodash: { global: 'lodash', handle: 'lodash' },
 			'lodash-es': { global: 'lodash', handle: 'lodash' },
 			jquery: { global: 'jQuery', handle: 'jquery' },
+			...externals,
 		};
 
 		// Build list of package namespace configurations

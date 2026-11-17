@@ -293,6 +293,27 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.externals`
+
+Individual packages to read from a classic script's global instead of bundling, when the package does not follow a namespace's naming or other code on the page already loads it as a script. Each entry needs the script's `handle` and `global`:
+
+```json
+{
+	"wpPlugin": {
+		"externals": {
+			"@acme/connection": {
+				"handle": "acme-connection",
+				"global": "AcmeConnection"
+			}
+		}
+	}
+}
+```
+
+- `import { useConnection } from '@acme/connection'` → `window.AcmeConnection` with handle `acme-connection`, in both scripts and script modules
+- Only the exact package name matches: an import of a subpath, such as `@acme/connection/hooks`, is still bundled
+- Your plugin must register the script under that handle
+
 ### `wpPlugin.pages` (Experimental)
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.
