@@ -40,7 +40,7 @@ function setup( media: Media, fields: Field< Media >[] = FIELDS ) {
 	);
 }
 
-vi.mock( '@wordpress/a11y', () => ( { speak: vi.fn() } ) );
+vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 // jsdom doesn't implement `navigator.pdfViewerEnabled`.
 function setPdfViewerEnabled( enabled: boolean ) {
