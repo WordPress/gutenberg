@@ -14,7 +14,6 @@
  *
  * Usage:
  *   node lib/normalize-icon-svg.cjs src/library/my-icon.svg [...more]
- *   node lib/normalize-icon-svg.cjs --check src/library/*.svg
  */
 
 const fs = require( 'fs' );
@@ -579,27 +578,15 @@ function normalizeIconSvg( source ) {
  * @return {number} A process exit code.
  */
 function main( argv ) {
-	const usage =
-		'Usage: node lib/normalize-icon-svg.cjs [--check] <file.svg> [...]';
-	const flags = argv.filter( ( argument ) => argument.startsWith( '--' ) );
-	const files = argv.filter( ( argument ) => ! argument.startsWith( '--' ) );
-	const unknownFlags = flags.filter( ( flag ) => flag !== '--check' );
-
-	if ( unknownFlags.length || ! files.length ) {
+	if ( ! argv.length ) {
 		// eslint-disable-next-line no-console
-		console.error(
-			unknownFlags.length
-				? `Unknown option: ${ unknownFlags.join( ' ' ) }\n${ usage }`
-				: usage
-		);
+		console.error( 'Usage: node lib/normalize-icon-svg.cjs <file.svg> [...]' );
 		return 1;
 	}
 
-	const checkOnly = flags.includes( '--check' );
-	let changed = 0;
 	let failed = 0;
 
-	for ( const file of files ) {
+	for ( const file of argv ) {
 		let source;
 		let result;
 		try {
@@ -621,21 +608,12 @@ function main( argv ) {
 			continue;
 		}
 
-		changed += 1;
-		if ( checkOnly ) {
-			// eslint-disable-next-line no-console
-			console.error( `${ file }: needs normalizing` );
-			continue;
-		}
 		fs.writeFileSync( file, result.content );
 		// eslint-disable-next-line no-console
 		console.log( `${ file }: normalized` );
 	}
 
-	if ( failed || ( checkOnly && changed ) ) {
-		return 1;
-	}
-	return 0;
+	return failed ? 1 : 0;
 }
 
 if ( require.main === module ) {
