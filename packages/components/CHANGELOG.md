@@ -16,9 +16,12 @@
 -   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
+-   `Snackbar`: Increase the action link hit target ([#86823](https://github.com/WordPress/gutenberg/pull/86823)).
 
 ### Bug Fixes
 
+-   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
+-   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
 -   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
 -   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
@@ -43,11 +46,13 @@
 -   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
 -   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
+-   `TimePicker`: Replace every underscore in the time zone tooltip, so `Asia/Ho_Chi_Minh` shows as `Asia/Ho Chi Minh` instead of `Asia/Ho Chi_Minh` ([#86826](https://github.com/WordPress/gutenberg/pull/86826)).
 -   `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across themes and interaction states, including numbered toolbar buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
 
 ### Internal
 
+-   Update the `@ariakit/react` dependency to 0.4.43 ([#86887](https://github.com/WordPress/gutenberg/pull/86887)).
 -   `CustomSelectControl`: Remove the unused V2 component and keep the shared implementation with the legacy component ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `ProgressBar`: Use the new `--wpds-color-background-indicator-neutral` token for the filled portion. The color is unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).

@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { sharedIcon } from './shared-icon';
 import { isGalleryFlexLayout } from './shared';
-import { Caption } from '../utils/caption';
+import Gallery from './gallery';
 import { MAX_IMAGES } from './dynamic-source';
 
 /**
@@ -238,37 +238,24 @@ function GalleryImagesPreview( { imageBlocks, layout } ) {
  *
  * - a block-toolbar control to detach the gallery from its source, confirmed in
  *   a dialog;
- * - the gallery `<figure>` wrapper holding a non-editable preview of the
- *   resolved media (or a placeholder while resolving / when nothing is found),
- *   with the gallery's provided context so the previewed images inherit
- *   gallery-wide settings;
- * - an editable gallery-level caption, alongside the read-only preview;
+ * - the gallery `<figure>` and caption (see `gallery.jsx`) holding a
+ *   non-editable preview of the resolved media (or a placeholder while
+ *   resolving / when nothing is found), with the gallery's provided context so
+ *   the previewed images inherit gallery-wide settings;
  * - the (empty) inner blocks kept mounted so the container's `allowedBlocks: []`
  *   keeps syncing to block list settings (which blocks insertion and hides the
  *   List View).
  *
- * @param {Object}   props
- * @param {Object}   props.dynamic               The `useDynamicGallery` result.
- * @param {Object}   props.blockProps            The gallery's `useBlockProps()` result.
- * @param {Object}   props.innerBlocksProps      The gallery's `useInnerBlocksProps()` result.
- * @param {Object}   props.attributes            The gallery block attributes.
- * @param {Function} props.setAttributes         The block's `setAttributes`.
- * @param {boolean}  props.isSelected            Whether the gallery block is selected.
- * @param {Function} props.insertBlocksAfter     Inserts blocks after the gallery.
- * @param {boolean}  props.isContentLocked       Whether the gallery is content-locked.
- * @param {boolean}  props.multiGallerySelection Whether multiple galleries are selected.
+ * @param {Object} props
+ * @param {Object} props.dynamic          The `useDynamicGallery` result.
+ * @param {Object} props.innerBlocksProps The gallery's `useInnerBlocksProps()` result.
  */
 export function GalleryDynamicView( {
 	dynamic,
-	blockProps,
 	innerBlocksProps,
-	attributes,
-	setAttributes,
-	isSelected,
-	insertBlocksAfter,
-	isContentLocked,
-	multiGallerySelection,
+	...galleryProps
 } ) {
+	const { attributes } = galleryProps;
 	const {
 		sourceDescriptor,
 		dynamicImageBlocks,
@@ -337,7 +324,7 @@ export function GalleryDynamicView( {
 					) }
 				</>
 			) }
-			<figure { ...blockProps }>
+			<Gallery { ...galleryProps }>
 				{ dynamicImageBlocks.length ? (
 					<BlockContextProvider value={ galleryContext }>
 						<GalleryImagesPreview
@@ -354,19 +341,7 @@ export function GalleryDynamicView( {
 						{ isResolvingDynamic && <WCSpinner /> }
 					</Placeholder>
 				) }
-				<Caption
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					isSelected={ isSelected }
-					insertBlocksAfter={ insertBlocksAfter }
-					showToolbarButton={
-						! multiGallerySelection && ! isContentLocked
-					}
-					className="blocks-gallery-caption"
-					label={ __( 'Gallery caption text' ) }
-					placeholder={ __( 'Add gallery caption' ) }
-				/>
-			</figure>
+			</Gallery>
 			{ /*
 			 * Dynamic mode shows a preview instead of real inner blocks, but the
 			 * empty inner blocks are still rendered here for their side effect:
