@@ -15,15 +15,23 @@ describe( 'getOverlayViewports', () => {
 		expect( getOverlayViewports( { overlayMenu } ) ).toEqual( expected );
 	} );
 
-	it.each( [ 'mobile', undefined, 42, [], 'nonsense' ] )(
-		'returns null (default 600px behavior) for %p',
-		( overlayMenu ) => {
-			expect( getOverlayViewports( { overlayMenu } ) ).toBeNull();
-		}
-	);
+	it.each( [
+		'mobile',
+		undefined,
+		42,
+		[],
+		'nonsense',
+		'tablet}body{display:none',
+	] )( 'returns null (default 600px behavior) for %p', ( overlayMenu ) => {
+		expect( getOverlayViewports( { overlayMenu } ) ).toBeNull();
+	} );
 
 	it( 'returns null when called without attributes', () => {
 		expect( getOverlayViewports() ).toBeNull();
+	} );
+
+	it( 'returns null when called with null attributes', () => {
+		expect( getOverlayViewports( null ) ).toBeNull();
 	} );
 } );
 
@@ -56,4 +64,58 @@ describe( 'overlay viewport helpers', () => {
 			getInlineViewports( { mobile: false, tablet: true, desktop: true } )
 		).toEqual( [ 'mobile' ] );
 	} );
+
+	// Matches the PHP test_overlay_viewport_helpers_read_only_canonical_keys()
+	// cases: only the canonical keys are read, a viewport shows the overlay
+	// only when strictly `true`, and the links inline only when strictly `false`.
+	it.each( [
+		[ 'empty map', {}, false, false, [] ],
+		[ 'partial map', { mobile: true, tablet: true }, true, false, [] ],
+		[
+			'reordered keys',
+			{ desktop: false, tablet: true, mobile: true },
+			true,
+			false,
+			[ 'desktop' ],
+		],
+		[
+			'reordered non-contiguous',
+			{ desktop: true, tablet: true, mobile: false },
+			true,
+			false,
+			[ 'mobile' ],
+		],
+		[
+			'extra key with tablet',
+			{ mobile: true, tablet: true, desktop: false, wide: false },
+			true,
+			false,
+			[ 'desktop' ],
+		],
+		[
+			'extra false key with always',
+			{ mobile: true, tablet: true, desktop: true, wide: false },
+			true,
+			true,
+			[],
+		],
+		[
+			'extra true key with never',
+			{ mobile: false, tablet: false, desktop: false, wide: true },
+			false,
+			false,
+			[],
+		],
+	] )(
+		'reads only the canonical keys for %s',
+		( _name, overlayViewports, isResponsive, isAlwaysShown, inline ) => {
+			expect( isOverlayResponsive( overlayViewports ) ).toBe(
+				isResponsive
+			);
+			expect( isOverlayAlwaysShown( overlayViewports ) ).toBe(
+				isAlwaysShown
+			);
+			expect( getInlineViewports( overlayViewports ) ).toEqual( inline );
+		}
+	);
 } );

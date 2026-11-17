@@ -683,4 +683,98 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			),
 		);
 	}
+
+	/**
+	 * Test that the overlay viewport helpers read only the canonical keys, and
+	 * treat a viewport as overlay only when strictly `true` and as inline only
+	 * when strictly `false`. The JS helpers are tested with the same cases.
+	 *
+	 * @dataProvider data_overlay_viewport_helpers_canonical_keys
+	 * @covers ::gutenberg_block_core_navigation_is_overlay_responsive
+	 * @covers ::gutenberg_block_core_navigation_is_overlay_always_shown
+	 * @covers ::gutenberg_block_core_navigation_get_inline_viewports
+	 *
+	 * @param array    $overlay_viewports Viewport map.
+	 * @param bool     $is_responsive     Expected is_overlay_responsive() result.
+	 * @param bool     $is_always_shown   Expected is_overlay_always_shown() result.
+	 * @param string[] $inline_viewports  Expected get_inline_viewports() result.
+	 */
+	public function test_overlay_viewport_helpers_read_only_canonical_keys( $overlay_viewports, $is_responsive, $is_always_shown, $inline_viewports ) {
+		$this->assertSame( $is_responsive, gutenberg_block_core_navigation_is_overlay_responsive( $overlay_viewports ), 'is_overlay_responsive' );
+		$this->assertSame( $is_always_shown, gutenberg_block_core_navigation_is_overlay_always_shown( $overlay_viewports ), 'is_overlay_always_shown' );
+		$this->assertSame( $inline_viewports, gutenberg_block_core_navigation_get_inline_viewports( $overlay_viewports ), 'get_inline_viewports' );
+	}
+
+	/**
+	 * Data provider for test_overlay_viewport_helpers_read_only_canonical_keys().
+	 *
+	 * @return array[]
+	 */
+	public function data_overlay_viewport_helpers_canonical_keys() {
+		return array(
+			'empty array'                 => array( array(), false, false, array() ),
+			'partial map'                 => array(
+				array(
+					'mobile' => true,
+					'tablet' => true,
+				),
+				true,
+				false,
+				array(),
+			),
+			'reordered keys'              => array(
+				array(
+					'desktop' => false,
+					'tablet'  => true,
+					'mobile'  => true,
+				),
+				true,
+				false,
+				array( 'desktop' ),
+			),
+			'reordered non-contiguous'    => array(
+				array(
+					'desktop' => true,
+					'tablet'  => true,
+					'mobile'  => false,
+				),
+				true,
+				false,
+				array( 'mobile' ),
+			),
+			'extra key with tablet'       => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+					'wide'    => false,
+				),
+				true,
+				false,
+				array( 'desktop' ),
+			),
+			'extra false key with always' => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+					'wide'    => false,
+				),
+				true,
+				true,
+				array(),
+			),
+			'extra true key with never'   => array(
+				array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+					'wide'    => true,
+				),
+				false,
+				false,
+				array(),
+			),
+		);
+	}
 }

@@ -46,7 +46,7 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  * Returns null for the default `mobile` behavior, which uses the static
  * 600px breakpoint in style.scss rather than the theme's viewport settings.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
  * @param array $attributes Block attributes. Values are untrusted.
  * @return array{mobile: bool, tablet: bool, desktop: bool}|null Viewport map, or null.
@@ -88,29 +88,54 @@ function block_core_navigation_get_overlay_viewports( $attributes ) {
 /**
  * Returns whether the Navigation overlay is shown in at least one viewport.
  *
- * The default `mobile` behavior (null) is responsive.
+ * The default `mobile` behavior (null) is responsive. Only the `mobile`,
+ * `tablet` and `desktop` keys are read, and a viewport shows the overlay only
+ * when its value is strictly `true`.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
- * @param array<string, bool>|null $overlay_viewports Viewport map from
- *                                                    block_core_navigation_get_overlay_viewports().
+ * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
+ *                                                                               block_core_navigation_get_overlay_viewports().
  * @return bool Whether the overlay is shown in at least one viewport.
  */
 function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
-	return null === $overlay_viewports || in_array( true, $overlay_viewports, true );
+	if ( null === $overlay_viewports ) {
+		return true;
+	}
+
+	foreach ( array( 'mobile', 'tablet', 'desktop' ) as $viewport ) {
+		if ( true === ( $overlay_viewports[ $viewport ] ?? null ) ) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
  * Returns whether the Navigation overlay is shown in every viewport.
  *
- * @since 7.2.0
+ * Only the `mobile`, `tablet` and `desktop` keys are read, and a viewport shows
+ * the overlay only when its value is strictly `true`.
  *
- * @param array<string, bool>|null $overlay_viewports Viewport map from
- *                                                    block_core_navigation_get_overlay_viewports().
+ * @since 7.3.0
+ *
+ * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
+ *                                                                               block_core_navigation_get_overlay_viewports().
  * @return bool Whether the overlay is shown in every viewport.
  */
 function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
-	return null !== $overlay_viewports && ! in_array( false, $overlay_viewports, true );
+	if ( null === $overlay_viewports ) {
+		return false;
+	}
+
+	foreach ( array( 'mobile', 'tablet', 'desktop' ) as $viewport ) {
+		if ( true !== ( $overlay_viewports[ $viewport ] ?? null ) ) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 /**
@@ -119,12 +144,14 @@ function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
  *
  * Returns an empty list for the default `mobile` behavior (null), and when the
  * overlay is shown in no viewport or in every viewport, since no
- * viewport-specific rules are needed in those cases.
+ * viewport-specific rules are needed in those cases. Only the `mobile`,
+ * `tablet` and `desktop` keys are read, and a viewport shows the links inline
+ * only when its value is strictly `false`.
  *
- * @since 7.2.0
+ * @since 7.3.0
  *
- * @param array<string, bool>|null $overlay_viewports Viewport map from
- *                                                    block_core_navigation_get_overlay_viewports().
+ * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
+ *                                                                               block_core_navigation_get_overlay_viewports().
  * @return string[] Viewports where the links are inline, in CSS order.
  */
 function block_core_navigation_get_inline_viewports( $overlay_viewports ) {
@@ -136,14 +163,14 @@ function block_core_navigation_get_inline_viewports( $overlay_viewports ) {
 		return array();
 	}
 
-	return array_keys(
-		array_filter(
-			$overlay_viewports,
-			static function ( $is_overlay ) {
-				return false === $is_overlay;
-			}
-		)
-	);
+	$inline_viewports = array();
+	foreach ( array( 'mobile', 'tablet', 'desktop' ) as $viewport ) {
+		if ( false === ( $overlay_viewports[ $viewport ] ?? null ) ) {
+			$inline_viewports[] = $viewport;
+		}
+	}
+
+	return $inline_viewports;
 }
 
 /**

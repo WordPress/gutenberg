@@ -8,7 +8,7 @@ export type OverlayViewport = ( typeof OVERLAY_VIEWPORTS )[ number ];
 /**
  * Whether the Navigation overlay is shown in each viewport.
  */
-export type OverlayViewports = Record< OverlayViewport, boolean >;
+export type OverlayViewportMap = Record< OverlayViewport, boolean >;
 
 /**
  * Returns the viewports in which the Navigation overlay is shown.
@@ -21,9 +21,10 @@ export type OverlayViewports = Record< OverlayViewport, boolean >;
  * @return Viewport map, or `null` for the default `mobile` behavior.
  */
 export function getOverlayViewports(
-	attributes: { overlayMenu?: unknown } = {}
-): OverlayViewports | null {
-	switch ( attributes.overlayMenu ) {
+	attributes?: { overlayMenu?: unknown } | null
+): OverlayViewportMap | null {
+	// No `isResponsive` case: `deprecated.jsx` migrates it before edit.
+	switch ( attributes?.overlayMenu ) {
 		case 'never':
 			return { mobile: false, tablet: false, desktop: false };
 		case 'always':
@@ -38,32 +39,41 @@ export function getOverlayViewports(
 /**
  * Returns whether the overlay is shown in at least one viewport.
  *
- * The default `mobile` behavior (`null`) is responsive.
+ * The default `mobile` behavior (`null`) is responsive. Only the `mobile`,
+ * `tablet` and `desktop` keys are read, and a viewport shows the overlay only
+ * when its value is strictly `true`.
  *
  * @param overlayViewports Viewport map from `getOverlayViewports()`.
  * @return Whether the overlay is shown in at least one viewport.
  */
 export function isOverlayResponsive(
-	overlayViewports: OverlayViewports | null
+	overlayViewports: Partial< OverlayViewportMap > | null
 ): boolean {
 	return (
 		overlayViewports === null ||
-		OVERLAY_VIEWPORTS.some( ( viewport ) => overlayViewports[ viewport ] )
+		OVERLAY_VIEWPORTS.some(
+			( viewport ) => overlayViewports[ viewport ] === true
+		)
 	);
 }
 
 /**
  * Returns whether the overlay is shown in every viewport.
  *
+ * Only the `mobile`, `tablet` and `desktop` keys are read, and a viewport shows
+ * the overlay only when its value is strictly `true`.
+ *
  * @param overlayViewports Viewport map from `getOverlayViewports()`.
  * @return Whether the overlay is shown in every viewport.
  */
 export function isOverlayAlwaysShown(
-	overlayViewports: OverlayViewports | null
+	overlayViewports: Partial< OverlayViewportMap > | null
 ): boolean {
 	return (
 		overlayViewports !== null &&
-		OVERLAY_VIEWPORTS.every( ( viewport ) => overlayViewports[ viewport ] )
+		OVERLAY_VIEWPORTS.every(
+			( viewport ) => overlayViewports[ viewport ] === true
+		)
 	);
 }
 
@@ -73,13 +83,15 @@ export function isOverlayAlwaysShown(
  *
  * Returns an empty list for the default `mobile` behavior (`null`), and when
  * the overlay is shown in no viewport or in every viewport, since no
- * viewport-specific rules are needed in those cases.
+ * viewport-specific rules are needed in those cases. Only the `mobile`,
+ * `tablet` and `desktop` keys are read, and a viewport shows the links inline
+ * only when its value is strictly `false`.
  *
  * @param overlayViewports Viewport map from `getOverlayViewports()`.
  * @return Viewports where the links are inline, in CSS order.
  */
 export function getInlineViewports(
-	overlayViewports: OverlayViewports | null
+	overlayViewports: Partial< OverlayViewportMap > | null
 ): OverlayViewport[] {
 	if (
 		overlayViewports === null ||
@@ -89,6 +101,6 @@ export function getInlineViewports(
 		return [];
 	}
 	return OVERLAY_VIEWPORTS.filter(
-		( viewport ) => ! overlayViewports[ viewport ]
+		( viewport ) => overlayViewports[ viewport ] === false
 	);
 }
