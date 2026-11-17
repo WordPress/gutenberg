@@ -1758,14 +1758,19 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 			} );
 
-		it( 'locks the layout of a block with a contentOnly template lock', () => {
-			const state = createState( { templateLock: 'contentOnly' } );
-			expect( isLayoutLockedBlock( state, 'container' ) ).toBe( true );
-			expect( isLockedBlock( state, 'container' ) ).toBe( true );
-		} );
+		it.each( [ 'all', 'contentOnly' ] )(
+			'locks the layout of a block with an "%s" template lock',
+			( templateLock ) => {
+				const state = createState( { templateLock } );
+				expect( isLayoutLockedBlock( state, 'container' ) ).toBe(
+					true
+				);
+				expect( isLockedBlock( state, 'container' ) ).toBe( true );
+			}
+		);
 
-		it( 'does not lock the layout for other template locks', () => {
-			const state = createState( { templateLock: 'all' } );
+		it( 'does not lock the layout for an "insert" template lock', () => {
+			const state = createState( { templateLock: 'insert' } );
 			expect( isLayoutLockedBlock( state, 'container' ) ).toBe( false );
 		} );
 
@@ -1778,7 +1783,7 @@ describe( 'private selectors', () => {
 		it( 'returns the closest layout-locked ancestor', () => {
 			expect(
 				getLayoutLockedAncestor(
-					createState( { templateLock: 'contentOnly' } ),
+					createState( { templateLock: 'all' } ),
 					'leaf'
 				)
 			).toBe( 'container' );
@@ -1792,7 +1797,7 @@ describe( 'private selectors', () => {
 				getBlockLockType(
 					createState( {
 						lock: { move: true, remove: true },
-						templateLock: 'contentOnly',
+						templateLock: 'all',
 					} ),
 					'container'
 				)

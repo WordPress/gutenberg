@@ -11,6 +11,9 @@ import type { KeyboardEvent, MouseEvent } from 'react';
 import BlockLockMenuItems from './lock-menu-items';
 import type { BlockLockMenuProps } from './types';
 
+// How long the options stay open after the pointer leaves, in milliseconds.
+const HOVER_CLOSE_DELAY = 200;
+
 /**
  * Renders the "Lock" item of the block settings menu, which opens the lock
  * options to its side.
@@ -19,6 +22,9 @@ import type { BlockLockMenuProps } from './types';
  * which a `Menu` submenu from `@wordpress/ui` can't nest in. Until that menu
  * is migrated, the options open in their own `Menu`, anchored to the item and
  * portaled into the same popover so the settings menu stays open.
+ *
+ * Like a submenu, it opens when the pointer rests on the item, and closes
+ * shortly after the pointer leaves both the item and the options.
  */
 export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -27,6 +33,7 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 	const [ shouldFocusFirstItem, setShouldFocusFirstItem ] = useState( false );
 	const [ item, setItem ] = useState< HTMLElement | null >( null );
 	const popupRef = useRef< HTMLDivElement >( null );
+	const closeTimeoutRef = useRef< number >( undefined );
 	const container =
 		item?.closest< HTMLElement >( '.components-popover' ) ?? undefined;
 	const openKey = isRTL() ? 'ArrowLeft' : 'ArrowRight';
@@ -41,6 +48,26 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 		setIsOpen( false );
 		item?.focus();
 	}
+
+	function cancelHoverClose() {
+		window.clearTimeout( closeTimeoutRef.current );
+	}
+
+	// Leave time to move the pointer from the item to the options.
+	function scheduleHoverClose() {
+		cancelHoverClose();
+		closeTimeoutRef.current = window.setTimeout( () => {
+			const popup = popupRef.current;
+			// Don't leave focus behind in the closed options.
+			if ( popup?.contains( popup.ownerDocument.activeElement ) ) {
+				close();
+				return;
+			}
+			setIsOpen( false );
+		}, HOVER_CLOSE_DELAY );
+	}
+
+	useEffect( () => cancelHoverClose, [] );
 
 	// The settings menu stops arrow keys natively on its container, before
 	// React sees them, so listen on the item itself to open with the keyboard.
@@ -98,13 +125,14 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 				aria-haspopup="menu"
 				aria-expanded={ isOpen }
 				onClick={ ( event: MouseEvent ) => {
-					if ( isOpen ) {
-						setIsOpen( false );
-						return;
-					}
 					// Enter and Space press the item with a click of no detail.
 					open( { withKeyboard: event.detail === 0 } );
 				} }
+				onMouseEnter={ () => {
+					cancelHoverClose();
+					open( { withKeyboard: false } );
+				} }
+				onMouseLeave={ scheduleHoverClose }
 			>
 				{ __( 'Lock' ) }
 			</MenuItem>
@@ -124,6 +152,8 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 			>
 				<Menu.Popup
 					ref={ popupRef }
+					onMouseEnter={ cancelHoverClose }
+					onMouseLeave={ scheduleHoverClose }
 					portal={ <Menu.Portal container={ container } /> }
 					positioner={
 						<Menu.Positioner

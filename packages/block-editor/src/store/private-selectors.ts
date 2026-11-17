@@ -37,6 +37,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { LAYOUT_TEMPLATE_LOCKS } from '../components/block-lock/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -1330,7 +1331,8 @@ function isLayoutLockedPatternSection( state: State, clientId: string ) {
 
 /**
  * Returns whether the inner layout of a block is locked: the block's own
- * `templateLock` is `contentOnly`, or it is an unsynced pattern section.
+ * `templateLock` is `all` or `contentOnly`, or it is an unsynced pattern
+ * section.
  *
  * @param state    Global application state.
  * @param clientId ClientId of the block.
@@ -1339,8 +1341,9 @@ function isLayoutLockedPatternSection( state: State, clientId: string ) {
  */
 export function isLayoutLockedBlock( state: State, clientId: string ) {
 	return (
-		getBlockAttributes( state, clientId )?.templateLock === 'contentOnly' ||
-		isLayoutLockedPatternSection( state, clientId )
+		LAYOUT_TEMPLATE_LOCKS.includes(
+			getBlockAttributes( state, clientId )?.templateLock as string
+		) || isLayoutLockedPatternSection( state, clientId )
 	);
 }
 
@@ -1364,7 +1367,7 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 
 /**
  * Returns the closest ancestor whose layout is locked. Its descendants are
- * edited content only, so their own locks are managed from that ancestor.
+ * kept in place by it, so their own locks are managed from that ancestor.
  *
  * @param state    Global application state.
  * @param clientId ClientId of the block.

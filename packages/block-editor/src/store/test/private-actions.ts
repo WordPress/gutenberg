@@ -414,7 +414,7 @@ describe( 'private actions', () => {
 				{
 					group: {
 						lock: { move: true, remove: true },
-						templateLock: 'contentOnly',
+						templateLock: 'all',
 					},
 					// A paragraph can't lock its layout.
 					paragraph: { lock: { move: true, remove: true } },
@@ -473,6 +473,33 @@ describe( 'private actions', () => {
 						metadata: undefined,
 					},
 					paragraph: { lock: undefined },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'keeps the blocks inside in a layout-locked block when unlocking movement', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], { move: false } )(
+				thunkArgs( {
+					select: createSelect( {
+						group: {
+							lock: { move: true, remove: true },
+							templateLock: 'all',
+						},
+						paragraph: { lock: { move: true, remove: true } },
+					} ),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'group', 'paragraph' ],
+				{
+					group: { lock: { move: false, remove: true } },
+					// No explicit `move: false`, which would let it out of the
+					// layout lock of the group.
+					paragraph: { lock: { remove: true } },
 				},
 				{ uniqueByBlock: true }
 			);

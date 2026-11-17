@@ -1,11 +1,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { lock, lockFilled } from '@wordpress/icons';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the Design System IconButton, which the lock design specifies.
-	IconButton,
-} from '@wordpress/ui';
-import type { FocusEventHandler } from 'react';
+import { Button } from '@wordpress/components';
+import type { FocusEventHandler, MouseEvent } from 'react';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useBlockLock, useUnlockBlocks } from '../block-lock';
 
@@ -27,11 +24,12 @@ interface ListViewLockButtonProps {
 /**
  * Renders the lock state of a locked block in its List View row: an outlined
  * lock for a partial lock and a filled lock for a full lock. Pressing it
- * unlocks the block and every block inside it.
+ * unlocks the block and every block inside it. It is the same button as the
+ * row's options menu toggle, so the two look alike.
  *
- * A block inside a layout-locked block is edited content only, so its lock is
- * managed from that ancestor: the button is disabled, but stays focusable so
- * its label can say why.
+ * A block inside a layout-locked block is kept in place by that ancestor, so
+ * its lock is managed from there: the button is disabled, but stays focusable
+ * so its label can say why.
  */
 const ListViewLockButton = forwardRef<
 	HTMLButtonElement,
@@ -68,18 +66,17 @@ const ListViewLockButton = forwardRef<
 	}
 
 	return (
-		<IconButton
+		<Button
 			ref={ ref }
 			className="block-editor-list-view-block__lock"
-			variant="minimal"
-			tone="neutral"
 			size="small"
 			icon={ lockType === 'full' ? lockFilled : lock }
 			label={ label }
 			disabled={ !! layoutLockedAncestor || ! canLock }
+			accessibleWhenDisabled
 			tabIndex={ tabIndex }
 			onFocus={ onFocus }
-			onClick={ ( event ) => {
+			onClick={ ( event: MouseEvent< HTMLButtonElement > ) => {
 				// Unlocking removes the button, so keep focus in its row.
 				const row = event.currentTarget.closest( '[role="row"]' );
 				unlockBlocks( [ clientId ] );
