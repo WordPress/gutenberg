@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `getViewportMediaQueries` accepts an `includeDesktop` option that adds an `@desktop` media query, matching the PHP `include_desktop` option.
+-   `getViewportMediaQueries` accepts an `{ includeDesktop: true }` option that adds an `@desktop` media query above the largest breakpoint.
 
 ### Bug Fixes
 

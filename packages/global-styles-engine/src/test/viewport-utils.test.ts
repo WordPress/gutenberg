@@ -175,25 +175,9 @@ describe( 'viewport utils', () => {
 				'@mobile': '@media (width <= 960px)',
 			} );
 		} );
-
-		it( 'adds a desktop media query above the tablet breakpoint when includeDesktop is set', () => {
-			expect(
-				getResponsiveMediaQueries(
-					{
-						mobile: '640px',
-						tablet: '960px',
-					},
-					{ includeDesktop: true }
-				)
-			).toEqual( {
-				'@mobile': '@media (width <= 640px)',
-				'@tablet': '@media (640px < width <= 960px)',
-				'@desktop': '@media (width > 960px)',
-			} );
-		} );
 	} );
 
-	describe( 'getViewportMediaQueries with includeDesktop', () => {
+	describe( 'includeDesktop option', () => {
 		it( 'omits @desktop by default', () => {
 			expect( getViewportMediaQueries() ).not.toHaveProperty(
 				'@desktop'
@@ -213,6 +197,22 @@ describe( 'viewport utils', () => {
 			} );
 		} );
 
+		it( 'adds @desktop when called through getResponsiveMediaQueries', () => {
+			expect(
+				getResponsiveMediaQueries(
+					{
+						mobile: '640px',
+						tablet: '960px',
+					},
+					{ includeDesktop: true }
+				)
+			).toEqual( {
+				'@mobile': '@media (width <= 640px)',
+				'@tablet': '@media (640px < width <= 960px)',
+				'@desktop': '@media (width > 960px)',
+			} );
+		} );
+
 		it( 'falls back to the mobile breakpoint when tablet is missing', () => {
 			expect(
 				getViewportMediaQueries(
@@ -220,6 +220,30 @@ describe( 'viewport utils', () => {
 					{ includeDesktop: true }
 				)[ '@desktop' ]
 			).toBe( '@media (width > 30em)' );
+		} );
+
+		it( 'uses the mobile breakpoint when tablet is not larger than mobile', () => {
+			expect(
+				getViewportMediaQueries(
+					{ mobile: '800px', tablet: '600px' },
+					{ includeDesktop: true }
+				)
+			).toEqual( {
+				'@mobile': '@media (width <= 800px)',
+				'@desktop': '@media (width > 800px)',
+			} );
+		} );
+
+		it( 'uses the tablet breakpoint when mobile is invalid', () => {
+			expect(
+				getViewportMediaQueries(
+					{ mobile: 'bogus', tablet: '782px' },
+					{ includeDesktop: true }
+				)
+			).toEqual( {
+				'@tablet': '@media (width <= 782px)',
+				'@desktop': '@media (width > 782px)',
+			} );
 		} );
 	} );
 } );

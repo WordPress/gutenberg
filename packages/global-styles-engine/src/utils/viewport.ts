@@ -139,8 +139,7 @@ export function getViewportBreakpoints(
  *
  * By default, the returned keys are `@mobile` and `@tablet`. When
  * `options.includeDesktop` is true, `@desktop` is included, matching widths
- * above the tablet breakpoint, or above the mobile breakpoint when there is no
- * valid tablet breakpoint.
+ * above the largest breakpoint.
  *
  * @param configOrSettings       Global styles config or viewport settings.
  * @param options                Optional. Options for generating media queries.
