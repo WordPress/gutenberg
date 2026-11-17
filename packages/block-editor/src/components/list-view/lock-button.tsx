@@ -79,7 +79,18 @@ const ListViewLockButton = forwardRef<
 			disabled={ !! layoutLockedAncestor || ! canLock }
 			tabIndex={ tabIndex }
 			onFocus={ onFocus }
-			onClick={ () => unlockBlocks( [ clientId ] ) }
+			onClick={ ( event ) => {
+				// Unlocking removes the button, so keep focus in its row.
+				const row = event.currentTarget.closest( '[role="row"]' );
+				unlockBlocks( [ clientId ] );
+				window.requestAnimationFrame( () =>
+					row
+						?.querySelector< HTMLElement >(
+							'.block-editor-list-view-block-select-button'
+						)
+						?.focus()
+				);
+			} }
 		/>
 	);
 } );

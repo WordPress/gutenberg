@@ -18,11 +18,18 @@ import type { BlockLockControlProps } from './types';
 
 /**
  * Renders the toolbar button of a locked block, which opens the lock menu.
- * The icon is outlined for a partial lock and filled for a full lock.
+ * The icon is outlined for a partial lock and filled for a full lock. Once
+ * unlocked, the button stays until the toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 	const { canLock, lockType } = useBlockLock( clientId );
 	const label = canLock ? __( 'Lock' ) : __( 'Locked' );
+	let icon = lock;
+	if ( lockType === 'full' ) {
+		icon = lockFilled;
+	} else if ( lockType === 'none' ) {
+		icon = unlock;
+	}
 
 	return (
 		<ToolbarGroup className="block-editor-block-lock-toolbar">
@@ -35,9 +42,7 @@ function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 							render={
 								<Button
 									size="compact"
-									icon={
-										lockType === 'full' ? lockFilled : lock
-									}
+									icon={ icon }
 									label={ label }
 									accessibleWhenDisabled
 								/>

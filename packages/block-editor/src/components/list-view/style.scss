@@ -93,10 +93,12 @@
 		@include outset-ring__focus();
 	}
 	&.is-selected .block-editor-list-view-block-contents,
-	&.is-selected .components-button.has-icon {
+	&.is-selected .components-button.has-icon,
+	&.is-selected .block-editor-list-view-block__lock {
 		color: $white;
 	}
-	&.is-selected .block-editor-list-view-block__menu:focus {
+	&.is-selected .block-editor-list-view-block__menu:focus,
+	&.is-selected .block-editor-list-view-block__lock:focus-visible {
 		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
@@ -108,7 +110,8 @@
 		}
 
 		&.is-selected .block-editor-list-view-block-contents,
-		&.is-selected .components-button.has-icon {
+		&.is-selected .components-button.has-icon,
+		&.is-selected .block-editor-list-view-block__lock {
 			color: SelectedItemText;
 		}
 
