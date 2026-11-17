@@ -515,8 +515,8 @@ function normalizeIconSvg( source ) {
 		( line, index ) => lines.indexOf( line ) !== index
 	);
 	if ( duplicates.length ) {
-		notes.push(
-			`${ duplicates.length } duplicate element(s) left in place; check the source file for a stray copied layer`
+		throw new Error(
+			`cannot normalize: ${ duplicates.length } duplicate element(s) (check the source file for a stray copied layer)`
 		);
 	}
 

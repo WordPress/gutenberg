@@ -173,6 +173,11 @@ describe( 'normalizeIconSvg', () => {
 			input: '<svg viewBox="0 0 24 24" fill="#00000080" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z"/>\n</svg>',
 			error: 'fill="#00000080"',
 		},
+		{
+			name: 'a duplicated layer',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19" stroke="#000" stroke-width="1.5"/>\n<path d="M5 5H19" stroke="#000" stroke-width="1.5"/>\n</svg>',
+			error: 'duplicate',
+		},
 	] )( 'refuses $name', ( { input, error } ) => {
 		expect( () => normalizeIconSvg( input ) ).toThrow( error );
 	} );
@@ -195,13 +200,5 @@ describe( 'normalizeIconSvg', () => {
 		);
 
 		expect( notes ).toEqual( [ 'removed a shape that draws nothing' ] );
-	} );
-
-	it( 'reports a duplicated layer instead of silently removing it', () => {
-		const { notes } = normalizeIconSvg(
-			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19" stroke="#000" stroke-width="1.5"/>\n<path d="M5 5H19" stroke="#000" stroke-width="1.5"/>\n</svg>'
-		);
-
-		expect( notes.join( ' ' ) ).toContain( 'duplicate' );
 	} );
 } );
