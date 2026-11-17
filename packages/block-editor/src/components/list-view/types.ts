@@ -220,6 +220,7 @@ export type ListViewBranchProps = {
 
 export type ListViewBlockProps = {
 	clientId: string;
+	draggedItemsHeight?: number;
 	displacement?: ListViewDisplacement;
 	isAfterDraggedBlocks?: boolean;
 	isDragged: boolean;

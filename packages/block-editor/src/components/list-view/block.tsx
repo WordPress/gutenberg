@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from 'react';
+import type { CSSProperties, KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
@@ -47,6 +47,7 @@ import type { TreeBlock } from '../../store/types';
 
 function ListViewBlock( {
 	clientId,
+	draggedItemsHeight,
 	displacement,
 	isAfterDraggedBlocks,
 	isDragged,
@@ -633,6 +634,13 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			style={
+				draggedItemsHeight === undefined
+					? undefined
+					: ( {
+							'--wp-admin--list-view-dragged-items-height': `${ draggedItemsHeight }px`,
+						} as CSSProperties )
+			}
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
 			onMouseEnter={ isDisabled ? undefined : onMouseEnter }

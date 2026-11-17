@@ -13,6 +13,7 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
 import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import type { DragEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import type { Settings } from '../../store/types';
 import type {
 	BlockDropData,
@@ -46,10 +47,36 @@ export function parseDropEvent(
 	}
 
 	try {
-		result = Object.assign(
-			result,
-			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
+		const parsed: unknown = JSON.parse(
+			event.dataTransfer.getData( 'wp-blocks' )
 		);
+		if (
+			! parsed ||
+			typeof parsed !== 'object' ||
+			Array.isArray( parsed )
+		) {
+			return result;
+		}
+		const data = parsed as Partial< BlockDropData >;
+		if (
+			data.srcRootClientId !== undefined &&
+			data.srcRootClientId !== null &&
+			typeof data.srcRootClientId !== 'string'
+		) {
+			return result;
+		}
+		if (
+			data.srcClientIds !== undefined &&
+			data.srcClientIds !== null &&
+			( ! Array.isArray( data.srcClientIds ) ||
+				! data.srcClientIds.length ||
+				data.srcClientIds.some(
+					( id ) => typeof id !== 'string' || ! id
+				) )
+		) {
+			return result;
+		}
+		result = { ...result, ...data };
 	} catch {
 		return result;
 	}
@@ -70,6 +97,7 @@ export function parseDropEvent(
  * @param operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
  * @param getBlock                  A function that returns a block given its client id.
  * @param onSameOrderDrop           Runs custom behavior for insertion drops that keep the block order.
+ * @param onBlockSetDrop            Handles explicit-set drops before legacy contiguous index calculations.
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(
@@ -82,7 +110,11 @@ export function onBlockDrop(
 	clearSelectedBlock: () => void,
 	operation: BlockDropOperation,
 	getBlock: ( clientId: string ) => Block | null,
-	onSameOrderDrop?: OnBlocksDrop
+	onSameOrderDrop?: OnBlocksDrop,
+	onBlockSetDrop?: (
+		clientIds: string[],
+		sourceRootClientId: string | null
+	) => boolean
 ) {
 	return ( event: DragEvent | globalThis.DragEvent ) => {
 		const {
@@ -104,6 +136,12 @@ export function onBlockDrop(
 
 		// If the user is moving a block.
 		if ( dropType === 'block' ) {
+			if (
+				! sourceClientIds?.length ||
+				onBlockSetDrop?.( sourceClientIds, sourceRootClientId )
+			) {
+				return;
+			}
 			// A block drop carries the dragged client IDs.
 			const sourceBlockIndex = getBlockIndex( sourceClientIds![ 0 ] );
 
@@ -267,7 +305,14 @@ export default function useOnBlockDrop(
 		getBlocksByClientId,
 		getSettings,
 		getBlock,
+		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
+	const { areBlocksContiguous, canMoveBlockSetToPosition } = unlock(
+		useSelect( blockEditorStore )
+	);
+	const { moveBlockSetToPosition } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
 		insertBlocks,
@@ -426,7 +471,49 @@ export default function useOnBlockDrop(
 		clearSelectedBlock,
 		operation,
 		getBlock,
-		onBlocksDrop
+		onBlocksDrop,
+		( sourceIds, sourceRootClientId ) => {
+			if ( sourceIds.some( ( id ) => ! getBlock( id ) ) ) {
+				return true;
+			}
+			if (
+				areBlocksContiguous( sourceIds ) &&
+				getBlockRootClientId( sourceIds[ 0 ] ) === sourceRootClientId
+			) {
+				return false;
+			}
+			if (
+				operation === 'group' ||
+				operation === 'replace' ||
+				! canMoveBlockSetToPosition(
+					sourceIds,
+					targetRootClientId ?? ''
+				)
+			) {
+				return true;
+			}
+			registry.batch( () => {
+				// Grid and other custom behavior must see each block's actual origin.
+				if ( onBlocksDrop ) {
+					const byParent = new Map< string, string[] >();
+					for ( const id of sourceIds ) {
+						const parent = getBlockRootClientId( id )!;
+						const siblings = byParent.get( parent ) ?? [];
+						siblings.push( id );
+						byParent.set( parent, siblings );
+					}
+					for ( const [ parent, ids ] of byParent ) {
+						onBlocksDrop( ids, parent );
+					}
+				}
+				moveBlockSetToPosition(
+					sourceIds,
+					targetRootClientId ?? '',
+					targetBlockIndex
+				);
+			} );
+			return true;
+		}
 	);
 	const _onFilesDrop = onFilesDrop(
 		targetRootClientId,

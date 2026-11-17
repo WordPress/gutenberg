@@ -333,6 +333,8 @@ export default function useBlockDropZone( {
 		isZoomOut,
 		getSectionRootClientId,
 		getBlockParents,
+		areBlocksContiguous,
+		canMoveBlockSetToPosition,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -363,6 +365,9 @@ export default function useBlockDropZone( {
 				}
 
 				const draggedBlockClientIds = getDraggedBlockClientIds();
+				const isGatheredMove =
+					draggedBlockClientIds.length > 0 &&
+					! areBlocksContiguous( draggedBlockClientIds );
 				const targetParents = [
 					targetRootClientId,
 					...getBlockParents( targetRootClientId, true ),
@@ -383,17 +388,28 @@ export default function useBlockDropZone( {
 				const draggedBlockNames = getBlockNamesByClientId(
 					draggedBlockClientIds
 				);
-				const isBlockDroppingAllowed = isDropTargetValid(
-					getBlockType,
-					allowedBlocks,
-					draggedBlockNames,
-					targetBlockName
-				);
+				const isBlockDroppingAllowed =
+					( ! isGatheredMove ||
+						canMoveBlockSetToPosition(
+							draggedBlockClientIds,
+							targetRootClientId
+						) ) &&
+					isDropTargetValid(
+						getBlockType,
+						allowedBlocks,
+						draggedBlockNames,
+						targetBlockName
+					);
 
 				// The before/after operations insert into the parent block
 				// list, not the target's own.
 				const isParentDropTargetValid =
 					!! dropZoneElement &&
+					( ! isGatheredMove ||
+						canMoveBlockSetToPosition(
+							draggedBlockClientIds,
+							parentBlockClientId
+						) ) &&
 					isDropTargetValid(
 						getBlockType,
 						getAllowedBlocks( parentBlockClientId ),
@@ -478,8 +494,24 @@ export default function useBlockDropZone( {
 					}
 				);
 
-				const [ targetIndex, operation, nearestSide ] =
+				let [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
+				if (
+					isGatheredMove &&
+					( operation === 'group' || operation === 'replace' )
+				) {
+					// Gathering inserts next to content; it never replaces or groups it.
+					const rect =
+						blocksData[ targetIndex ]?.getBoundingClientRect();
+					if (
+						rect &&
+						event.clientY > ( rect.top + rect.bottom ) / 2
+					) {
+						targetIndex++;
+					}
+					operation = 'insert';
+					nearestSide = undefined;
+				}
 
 				// Any other operation would drop into the target itself.
 				if (
@@ -587,6 +619,8 @@ export default function useBlockDropZone( {
 				isGroupable,
 				getBlockVariations,
 				getGroupingBlockName,
+				areBlocksContiguous,
+				canMoveBlockSetToPosition,
 			]
 		),
 		200
