@@ -1,0 +1,65 @@
+/**
+ * Front-end admin bar colours from design system tokens.
+ *
+ * This file is not wrapped in `@layer`. Core's admin-bar.css is unlayered on
+ * the front end, and an unlayered declaration always wins over a layered one,
+ * whatever the order or specificity. Between two unlayered sheets of equal
+ * specificity the later one wins, so load.php enqueues this after `admin-bar`.
+ *
+ * admin-bar.css sets `#wpadminbar { background: #1d2327 }`, which predates 7.0.
+ * In wp-admin the colour scheme stylesheet overrides it, but no scheme loads on
+ * the front end, so visitors see the old colour. These rules replace it with
+ * the default scheme. Users on another scheme still see the default out here,
+ * which is also what happens today.
+ *
+ * The rules repeat the admin bar part of ../70-chrome-colour.css because that
+ * file has to be layered and this one cannot be.
+ *
+ * Colour only, every selector rooted at `#wpadminbar`, no `!important`.
+ */
+
+#wpadminbar {
+	background: var(--wpds-color-background-interactive-neutral-strong-active);
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+#wpadminbar .menupop .ab-sub-wrapper {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+}
+
+/* The secondary block of a dropdown uses the bar colour so it reads as a separate section. */
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary,
+#wpadminbar .quicklinks .menupop ul.ab-sub-secondary .ab-submenu {
+	background: var(--wpds-color-background-interactive-neutral-strong-active);
+}
+
+/* Text and icons */
+
+#wpadminbar .ab-item,
+#wpadminbar a.ab-item,
+#wpadminbar > #wp-toolbar span.ab-label,
+#wpadminbar > #wp-toolbar span.noticon,
+#wpadminbar .ab-icon,
+#wpadminbar .ab-icon::before,
+#wpadminbar .ab-item::before,
+#wpadminbar .ab-item::after,
+#wpadminbar .ab-submenu .ab-item,
+#wpadminbar .quicklinks .menupop ul li a,
+#wpadminbar .quicklinks .menupop.hover ul li a,
+#wpadminbar.nojs .quicklinks .menupop:hover ul li a,
+#wpadminbar .quicklinks li .blavatar,
+#wpadminbar .menupop .menupop > .ab-item::before,
+#wpadminbar.mobile .quicklinks .ab-icon::before,
+#wpadminbar.mobile .quicklinks .ab-item::before {
+	color: var(--wpds-color-foreground-interactive-neutral-strong);
+}
+
+/* Only the background changes on hover. There is no token for core's lightened accent text. */
+
+#wpadminbar:not(.mobile) .ab-top-menu > li:hover > .ab-item,
+#wpadminbar:not(.mobile) .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojq .quicklinks .ab-top-menu > li > .ab-item:focus,
+#wpadminbar.nojs .ab-top-menu > li.menupop:hover > .ab-item,
+#wpadminbar .ab-top-menu > li.menupop.hover > .ab-item {
+	background: var(--wpds-color-background-interactive-neutral-strong);
+}

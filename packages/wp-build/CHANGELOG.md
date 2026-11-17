@@ -4,6 +4,22 @@
 
 ### Enhancements
 
+-   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
+
+### Bug Fixes
+
+-   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page. Plugins shipping the build now pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
+-   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+
+### Internal
+
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 0.27.0 (2026-11-04)
+
+### Enhancements
+
 -   Copy `example` from `widget.json` into `build/widgets/registry.php`, next to `attributes`, so a widget's example attributes reach the server registry without a metadata module ([#85240](https://github.com/WordPress/gutenberg/pull/85240)).
 -   Limit concurrent `esbuild` build jobs to half of the available CPU parallelism ([#79889](https://github.com/WordPress/gutenberg/pull/79889)).
 
@@ -13,6 +29,8 @@
 
 ### Internal
 
+-   Pass `false` instead of an empty string as `$src` in `wp_register_script()` in page templates ([#86106](https://github.com/WordPress/gutenberg/pull/86106)).
+-   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).
 -   Bundle and transpile with Rolldown instead of esbuild ([#85476](https://github.com/WordPress/gutenberg/pull/85476)).
 -   Load design token fallback plugins from the new `@wordpress/theme-build-tools` dependency instead of the `@wordpress/theme` entry points ([#83568](https://github.com/WordPress/gutenberg/pull/83568)).
 -   Declare `@wordpress/theme` as an optional peer dependency again, so the fallback plugins use the version the consumer installs ([#85388](https://github.com/WordPress/gutenberg/pull/85388)).

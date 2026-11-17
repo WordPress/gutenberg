@@ -9,7 +9,7 @@ import {
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	ValidatedInputControl,
@@ -93,7 +93,7 @@ function InlineUI( {
 	};
 
 	return (
-		<Popover
+		<WCPopover
 			placement="bottom-start"
 			offset={ 8 }
 			focusOnMount={ false }
@@ -125,7 +125,7 @@ function InlineUI( {
 					{ __( 'Learn more about LaTeX syntax' ) }
 				</Link>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 
