@@ -57,6 +57,7 @@ import useCreateNavigationMenu from './use-create-navigation-menu';
 import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
+import NavigationMenuRevisionsButton from './navigation-menu-revisions-button';
 import MenuInspectorControls from './menu-inspector-controls';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
@@ -1101,6 +1102,18 @@ function Navigation( {
 							{ hasResolvedCanUserUpdateNavigationMenu &&
 								canUserUpdateNavigationMenu && (
 									<NavigationMenuNameControl />
+								) }
+							{ hasResolvedCanUserUpdateNavigationMenu &&
+								canUserUpdateNavigationMenu &&
+								! editorDisabledResponsive && (
+									// When editing the menu itself, its revisions
+									// are already in the document sidebar.
+									<NavigationMenuRevisionsButton
+										menuId={ ref }
+										onNavigateToEntityRecord={
+											onNavigateToEntityRecord
+										}
+									/>
 								) }
 							{ hasResolvedCanUserDeleteNavigationMenu &&
 								canUserDeleteNavigationMenu && (

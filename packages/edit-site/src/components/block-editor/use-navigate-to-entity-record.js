@@ -68,6 +68,14 @@ export default function useNavigateToEntityRecord() {
 			if ( isValidRequestedViewport ) {
 				queryArgs.viewport = requestedViewport;
 			}
+			// Opening on a revision goes through the URL, which the editor
+			// syncs into the revisions view once the entity has loaded.
+			if (
+				Number.isInteger( params.revisionId ) &&
+				params.revisionId > 0
+			) {
+				queryArgs.revision = params.revisionId;
+			}
 			const url = addQueryArgs(
 				`/${ params.postType }/${ params.postId }`,
 				queryArgs

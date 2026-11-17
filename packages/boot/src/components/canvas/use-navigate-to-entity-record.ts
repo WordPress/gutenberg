@@ -33,6 +33,7 @@ interface NavigateParams {
 	postType: string;
 	postId: string;
 	viewport?: string;
+	revisionId?: number;
 }
 
 /**
@@ -56,6 +57,7 @@ export default function useNavigateToEntityRecord() {
 	);
 	const router = useRouter();
 	const canGoBack = useCanGoBack();
+	const { openRevisionOfPost } = unlock( useDispatch( editorStore ) );
 
 	const onNavigateToEntityRecord = useCallback(
 		( params: NavigateParams ) => {
@@ -117,9 +119,19 @@ export default function useNavigateToEntityRecord() {
 							: {} ),
 					} ),
 				} );
+
+				// The editor opens the revision once it has switched to the
+				// entity navigated to.
+				if ( params.revisionId ) {
+					openRevisionOfPost( {
+						postType: params.postType,
+						postId: params.postId,
+						revisionId: params.revisionId,
+					} );
+				}
 			}
 		},
-		[ navigate, registry, getEntityLink ]
+		[ navigate, registry, getEntityLink, openRevisionOfPost ]
 	);
 
 	/*

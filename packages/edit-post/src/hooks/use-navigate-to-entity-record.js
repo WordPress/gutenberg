@@ -2,6 +2,7 @@ import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { unlock } from '../lock-unlock';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -57,7 +58,9 @@ export default function useNavigateToEntityRecord(
 		postHistory[ postHistory.length - 1 ];
 
 	const { getRenderingMode } = useSelect( editorStore );
-	const { setRenderingMode } = useDispatch( editorStore );
+	const { setRenderingMode, openRevisionOfPost } = unlock(
+		useDispatch( editorStore )
+	);
 	const { editEntityRecord } = useDispatch( coreStore );
 
 	const onNavigateToEntityRecord = useCallback(
@@ -77,8 +80,16 @@ export default function useNavigateToEntityRecord(
 				selectedBlockClientId: externalClientId,
 			} );
 			setRenderingMode( defaultRenderingMode );
+			if ( params.revisionId ) {
+				openRevisionOfPost( {
+					postType: params.postType,
+					postId: params.postId,
+					revisionId: params.revisionId,
+				} );
+			}
 		},
 		[
+			openRevisionOfPost,
 			registry,
 			post.postType,
 			post.postId,
