@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`. ([#86445](https://github.com/WordPress/gutenberg/pull/86445))
+-   `useStateWithHistory`: Preserve the initial value type, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
 
 ## 9.1.0 (2026-11-04)
 
@@ -31,7 +32,6 @@
 
 ### Bug Fixes
 
--   `useMergeRefs`, `useStateWithHistory`: Accept `false` in `useMergeRefs`, preserve the initial value type in `useStateWithHistory`, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
 -   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 
 ### Internal
