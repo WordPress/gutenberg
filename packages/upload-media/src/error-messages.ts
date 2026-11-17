@@ -163,7 +163,7 @@ export function getIncompleteUploadMessage(
 		return sprintf(
 			/* translators: %s: file name */
 			__(
-				'"%s" was uploaded, but some of its files could not be saved because this site is out of storage space.'
+				'"%s" was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.'
 			),
 			fileName
 		);
@@ -171,7 +171,9 @@ export function getIncompleteUploadMessage(
 
 	return sprintf(
 		/* translators: %s: file name */
-		__( '"%s" was uploaded, but some of its files could not be saved.' ),
+		__(
+			'"%s" was uploaded, but some of the sub-sized images could not be saved.'
+		),
 		fileName
 	);
 }

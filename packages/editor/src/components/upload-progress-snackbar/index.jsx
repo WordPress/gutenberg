@@ -159,8 +159,8 @@ export default function UploadProgressSnackbar() {
 				? sprintf(
 						/* translators: %d: number of images */
 						_n(
-							'%d image was uploaded, but some of its files could not be saved because this site is out of storage space.',
-							'%d images were uploaded, but some of their files could not be saved because this site is out of storage space.',
+							'%d image was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+							'%d images were uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
 							added.length
 						),
 						added.length
@@ -168,8 +168,8 @@ export default function UploadProgressSnackbar() {
 				: sprintf(
 						/* translators: %d: number of images */
 						_n(
-							'%d image was uploaded, but some of its files could not be saved.',
-							'%d images were uploaded, but some of their files could not be saved.',
+							'%d image was uploaded, but some of the sub-sized images could not be saved.',
+							'%d images were uploaded, but some of the sub-sized images could not be saved.',
 							added.length
 						),
 						added.length
