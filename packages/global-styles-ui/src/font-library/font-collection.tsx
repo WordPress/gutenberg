@@ -150,7 +150,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const hasFilters =
 		filters.search !== undefined || filters.category !== undefined;
 	useEffect( () => {
-		if ( ! hasFilters || ! selectedCollection ) {
+		if ( ! hasFilters ) {
 			return;
 		}
 		speak(
@@ -162,7 +162,7 @@ function FontCollection( { slug }: { slug: string } ) {
 					)
 				: __( 'No fonts found. Try with a different search term.' )
 		);
-	}, [ hasFilters, selectedCollection, fonts ] );
+	}, [ hasFilters, fonts ] );
 
 	// NOTE: The height of the font library modal unavailable to use for rendering font family items is roughly 417px
 	// The height of each font family item is 61px.
