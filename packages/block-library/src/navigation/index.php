@@ -41,6 +41,112 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 }
 
 /**
+ * Returns the viewports in which the Navigation overlay is shown.
+ *
+ * Returns null for the default `mobile` behavior, which uses the static
+ * 600px breakpoint in style.scss rather than the theme's viewport settings.
+ *
+ * @since 7.2.0
+ *
+ * @param array $attributes Block attributes. Values are untrusted.
+ * @return array{mobile: bool, tablet: bool, desktop: bool}|null Viewport map, or null.
+ */
+function block_core_navigation_get_overlay_viewports( $attributes ) {
+	$overlay_menu = $attributes['overlayMenu'] ?? 'mobile';
+	if ( ! is_string( $overlay_menu ) ) {
+		return null;
+	}
+
+	switch ( $overlay_menu ) {
+		case 'never':
+			// The removed `isResponsive` attribute behaved like `mobile`.
+			if ( ! empty( $attributes['isResponsive'] ) ) {
+				return null;
+			}
+			return array(
+				'mobile'  => false,
+				'tablet'  => false,
+				'desktop' => false,
+			);
+		case 'always':
+			return array(
+				'mobile'  => true,
+				'tablet'  => true,
+				'desktop' => true,
+			);
+		case 'tablet':
+			return array(
+				'mobile'  => true,
+				'tablet'  => true,
+				'desktop' => false,
+			);
+		default:
+			return null;
+	}
+}
+
+/**
+ * Returns whether the Navigation overlay is shown in at least one viewport.
+ *
+ * The default `mobile` behavior (null) is responsive.
+ *
+ * @since 7.2.0
+ *
+ * @param array<string, bool>|null $overlay_viewports Viewport map from
+ *                                                    block_core_navigation_get_overlay_viewports().
+ * @return bool Whether the overlay is shown in at least one viewport.
+ */
+function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
+	return null === $overlay_viewports || in_array( true, $overlay_viewports, true );
+}
+
+/**
+ * Returns whether the Navigation overlay is shown in every viewport.
+ *
+ * @since 7.2.0
+ *
+ * @param array<string, bool>|null $overlay_viewports Viewport map from
+ *                                                    block_core_navigation_get_overlay_viewports().
+ * @return bool Whether the overlay is shown in every viewport.
+ */
+function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
+	return null !== $overlay_viewports && ! in_array( false, $overlay_viewports, true );
+}
+
+/**
+ * Returns the viewports in which the Navigation links are shown inline while
+ * the overlay is shown in others.
+ *
+ * Returns an empty list for the default `mobile` behavior (null), and when the
+ * overlay is shown in no viewport or in every viewport, since no
+ * viewport-specific rules are needed in those cases.
+ *
+ * @since 7.2.0
+ *
+ * @param array<string, bool>|null $overlay_viewports Viewport map from
+ *                                                    block_core_navigation_get_overlay_viewports().
+ * @return string[] Viewports where the links are inline, in CSS order.
+ */
+function block_core_navigation_get_inline_viewports( $overlay_viewports ) {
+	if (
+		null === $overlay_viewports ||
+		! block_core_navigation_is_overlay_responsive( $overlay_viewports ) ||
+		block_core_navigation_is_overlay_always_shown( $overlay_viewports )
+	) {
+		return array();
+	}
+
+	return array_keys(
+		array_filter(
+			$overlay_viewports,
+			static function ( $is_overlay ) {
+				return false === $is_overlay;
+			}
+		)
+	);
+}
+
+/**
  * Returns the custom properties used by the Navigation block for a layout.
  *
  * @since 7.1.0

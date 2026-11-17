@@ -514,4 +514,173 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			$GLOBALS['wp_styles'] = $original_styles;
 		}
 	}
+
+	/**
+	 * Test that the overlay attributes are resolved to a viewport map.
+	 *
+	 * @dataProvider data_overlay_viewports
+	 * @covers ::gutenberg_block_core_navigation_get_overlay_viewports
+	 *
+	 * @param array      $attributes Block attributes.
+	 * @param array|null $expected   Expected viewport map.
+	 */
+	public function test_block_core_navigation_get_overlay_viewports( $attributes, $expected ) {
+		$this->assertSame( $expected, gutenberg_block_core_navigation_get_overlay_viewports( $attributes ) );
+	}
+
+	/**
+	 * Data provider for test_block_core_navigation_get_overlay_viewports().
+	 *
+	 * @return array[]
+	 */
+	public function data_overlay_viewports() {
+		return array(
+			'never'                   => array(
+				array( 'overlayMenu' => 'never' ),
+				array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+				),
+			),
+			'never with isResponsive' => array(
+				array(
+					'overlayMenu'  => 'never',
+					'isResponsive' => true,
+				),
+				null,
+			),
+			'always'                  => array(
+				array( 'overlayMenu' => 'always' ),
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				),
+			),
+			'tablet'                  => array(
+				array( 'overlayMenu' => 'tablet' ),
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				),
+			),
+			'mobile'                  => array( array( 'overlayMenu' => 'mobile' ), null ),
+			'missing'                 => array( array(), null ),
+			'array value'             => array( array( 'overlayMenu' => array( 'tablet' ) ), null ),
+			'integer value'           => array( array( 'overlayMenu' => 0 ), null ),
+			'injection attempt'       => array( array( 'overlayMenu' => 'tablet}body{display:none' ), null ),
+		);
+	}
+
+	/**
+	 * Test whether the overlay is shown in at least one viewport.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_is_overlay_responsive
+	 */
+	public function test_block_core_navigation_is_overlay_responsive() {
+		$this->assertTrue( gutenberg_block_core_navigation_is_overlay_responsive( null ) );
+		$this->assertTrue(
+			gutenberg_block_core_navigation_is_overlay_responsive(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				)
+			)
+		);
+		$this->assertFalse(
+			gutenberg_block_core_navigation_is_overlay_responsive(
+				array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+				)
+			)
+		);
+	}
+
+	/**
+	 * Test whether the overlay is shown in every viewport.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_is_overlay_always_shown
+	 */
+	public function test_block_core_navigation_is_overlay_always_shown() {
+		$this->assertTrue(
+			gutenberg_block_core_navigation_is_overlay_always_shown(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				)
+			)
+		);
+		$this->assertFalse(
+			gutenberg_block_core_navigation_is_overlay_always_shown(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				)
+			)
+		);
+		$this->assertFalse( gutenberg_block_core_navigation_is_overlay_always_shown( null ) );
+	}
+
+	/**
+	 * Test the list of viewports where the links are inline.
+	 *
+	 * @dataProvider data_inline_viewports
+	 * @covers ::gutenberg_block_core_navigation_get_inline_viewports
+	 *
+	 * @param array|null $overlay_viewports Viewport map.
+	 * @param string[]   $expected          Expected inline viewports.
+	 */
+	public function test_block_core_navigation_get_inline_viewports( $overlay_viewports, $expected ) {
+		$this->assertSame( $expected, gutenberg_block_core_navigation_get_inline_viewports( $overlay_viewports ) );
+	}
+
+	/**
+	 * Data provider for test_block_core_navigation_get_inline_viewports().
+	 *
+	 * @return array[]
+	 */
+	public function data_inline_viewports() {
+		return array(
+			'tablet'         => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				),
+				array( 'desktop' ),
+			),
+			'default mobile' => array( null, array() ),
+			'never'          => array(
+				array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+				),
+				array(),
+			),
+			'always'         => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				),
+				array(),
+			),
+			'non-contiguous' => array(
+				array(
+					'mobile'  => false,
+					'tablet'  => true,
+					'desktop' => true,
+				),
+				array( 'mobile' ),
+			),
+		);
+	}
 }
