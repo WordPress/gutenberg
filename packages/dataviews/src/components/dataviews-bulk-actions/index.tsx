@@ -149,7 +149,6 @@ interface ToolbarContentProps< Item > {
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 	onActionInProgressChange?: ( inProgress: boolean ) => void;
 	onClearSelection?: () => void;
-	onActionComplete?: () => void;
 }
 
 function ActionTrigger< Item >( {
@@ -343,7 +342,6 @@ function BulkActionsContent< Item >( {
 	selectionCheckboxRef,
 	onActionInProgressChange,
 	onClearSelection,
-	onActionComplete,
 }: ToolbarContentProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const [ pendingContent, setPendingContent ] =
@@ -363,7 +361,6 @@ function BulkActionsContent< Item >( {
 		try {
 			await action.callback( items, { registry } );
 		} finally {
-			onActionComplete?.();
 			setPendingContent( undefined );
 			onActionInProgressChange?.( false );
 		}
@@ -427,10 +424,7 @@ function BulkActionsContent< Item >( {
 				<ActionModal
 					action={ activeModal.action }
 					items={ activeModal.items }
-					closeModal={ () => {
-						onActionComplete?.();
-						setActiveModal( null );
-					} }
+					closeModal={ () => setActiveModal( null ) }
 				/>
 			) }
 		</>
@@ -441,14 +435,12 @@ interface BulkActionToolbarProps {
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 	onActionInProgressChange?: ( inProgress: boolean ) => void;
 	onClearSelection?: () => void;
-	onActionComplete?: () => void;
 }
 
 export function BulkActionToolbar( {
 	selectionCheckboxRef,
 	onActionInProgressChange,
 	onClearSelection,
-	onActionComplete,
 }: BulkActionToolbarProps = {} ) {
 	const {
 		data,
@@ -463,7 +455,6 @@ export function BulkActionToolbar( {
 			selectionCheckboxRef={ selectionCheckboxRef }
 			onActionInProgressChange={ onActionInProgressChange }
 			onClearSelection={ onClearSelection }
-			onActionComplete={ onActionComplete }
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }

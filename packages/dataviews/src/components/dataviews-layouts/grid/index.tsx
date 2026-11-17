@@ -33,16 +33,12 @@ function ViewGrid< Item >( {
 }: ViewGridProps< Item > ) {
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const selectionCheckboxRef = useRef< HTMLSpanElement >( null );
-	const bulkActionsRef = useRef< HTMLDivElement >( null );
 	// The toolbar keeps its selection checkbox but removes the controls
 	// that act on the selection, so move focus to the checkbox when an
 	// interaction in the toolbar removes them.
 	const requestFocus = useBulkActionsFocus( {
 		isShown: selection.length > 0 || isActionInProgress,
-		containerRef: bulkActionsRef,
 	} );
-	const focusSelectionCheckbox = () =>
-		requestFocus( selectionCheckboxRef, { isShown: false } );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -99,15 +95,15 @@ function ViewGrid< Item >( {
 		<>
 			{ ( hasBulkActions || isActionInProgress ) && (
 				<div
-					ref={ bulkActionsRef }
 					className="dataviews-view-grid__bulk-actions-header"
 					inert={ inertValue( !! isLoading ) }
 				>
 					<BulkActionToolbar
 						selectionCheckboxRef={ selectionCheckboxRef }
 						onActionInProgressChange={ setIsActionInProgress }
-						onClearSelection={ focusSelectionCheckbox }
-						onActionComplete={ focusSelectionCheckbox }
+						onClearSelection={ () =>
+							requestFocus( selectionCheckboxRef )
+						}
 					/>
 				</div>
 			) }
