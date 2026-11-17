@@ -135,12 +135,13 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * forgotten along with it.
  *
  * A block that throws while it renders never reaches this filter, so it stays
- * tracked. If something catches the exception and goes on rendering, the same
- * request keeps its own inner blocks, and a bound block outside it counts
- * against the budget as if nested, for the rest of the page load. Nothing loops
- * or renders unsanitized because of it. No hook runs after a block throws;
- * once the feature lands in Core, WP_Block::render() should stop tracking the
- * block in a `finally` block instead.
+ * tracked. If something catches the exception and goes on rendering, every
+ * bound block after it counts as nested for the rest of the page load: the
+ * same request keeps its own inner blocks, and once the budget is spent, so
+ * does every other bound block on the page. Nothing loops or renders
+ * unsanitized because of it. No hook runs after a block throws; once the
+ * feature lands in Core, WP_Block::render() should stop tracking the block in
+ * a `finally` block instead.
  *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
