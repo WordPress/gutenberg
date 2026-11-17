@@ -220,12 +220,13 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 				caption: 'Caption',
 			},
 		} );
-		await editor.canvas
-			.getByRole( 'document', {
-				name: 'Block: Heading 2',
-				exact: true,
-			} )
-			.click();
+		const headingBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Heading 2',
+			exact: true,
+		} );
+		// The image toolbar would cover the heading once the image loads.
+		await editor.selectBlocks( headingBlock );
+		await headingBlock.click();
 		const [ heading, image ] = await editor.getBlocks( { full: true } );
 		const getSelectedBlockClientId = () =>
 			page.evaluate( () =>
@@ -294,5 +295,57 @@ test.describe( 'Click into a block edited on its own element (@firefox, @webkit)
 			.toMatchObject( [
 				{ name: 'core/heading', attributes: { content: 'Heading' } },
 			] );
+	} );
+} );
+
+test.describe( 'Selecting a block without a caret (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'removes the caret from the previously selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		const [ , second, spacer ] = await editor.getBlocks( { full: true } );
+		const getSelectedBlockClientId = () =>
+			page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId()
+			);
+		const getCaretBlockClientId = () =>
+			editor.canvas.locator( ':root' ).evaluate( ( root ) => {
+				const { anchorNode } = root.ownerDocument.getSelection();
+				if ( ! anchorNode ) {
+					return null;
+				}
+				const element =
+					anchorNode.nodeType === anchorNode.TEXT_NODE
+						? anchorNode.parentElement
+						: anchorNode;
+				return element.closest( '[data-block]' )?.dataset.block ?? null;
+			} );
+
+		await editor.canvas.getByText( 'Second', { exact: true } ).click();
+		await expect.poll( getSelectedBlockClientId ).toBe( second.clientId );
+		await expect.poll( getCaretBlockClientId ).toBe( second.clientId );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Spacer', exact: true } )
+			.click();
+
+		await expect.poll( getSelectedBlockClientId ).toBe( spacer.clientId );
+		// WebKit moves the caret to the spacer, the others remove it.
+		await expect.poll( getCaretBlockClientId ).not.toBe( second.clientId );
 	} );
 } );

@@ -35,7 +35,7 @@
 	"dependencies": {
 		"@actions/core": "^3.0.1",
 		"@jest/test-result": "^30.5.0",
-		"@playwright/test": "^1.63.0",
+		"@playwright/test": "^1.65.0",
 		"jest-message-util": "^30.5.0"
 	},
 	"devDependencies": {

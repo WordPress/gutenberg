@@ -670,7 +670,7 @@ yield actions.navigate( '/page/', { timeout: 30000 } );
 
 ### Handling fetch errors
 
-When navigation fails (network error, timeout, or server error), the router automatically falls back to a full page reload. This means you cannot catch fetch errors from `navigate()` directly — the browser takes over before your code has a chance to handle them.
+When navigation fails (network error, timeout, or server error), the router automatically falls back to a full page reload, unless a newer navigation has started by then (see [Race condition protection](#race-condition-protection)). This means you cannot catch fetch errors from `navigate()` directly — the browser takes over before your code has a chance to handle them.
 
 If you need custom error handling (for example, showing an error message instead of reloading), you can fetch the page manually, handle any errors yourself, and then pass the fetched HTML to `navigate()` using the `html` option:
 
@@ -757,6 +757,8 @@ Use cases for disabling feedback:
 -   **Silent updates**: Background refreshes where you don't want to draw attention.
 -   **Custom loading UI**: When you're implementing your own loading indicators.
 -   **Custom accessibility**: When you're providing your own screen reader announcements.
+
+These options only cover the navigation's own feedback. When it abandons a navigation whose loading feedback is already showing, it still finishes that animation and announces that the page loaded when it renders its page (see [Race condition protection](#race-condition-protection)).
 
 ### Subscribing to page changes
 
@@ -1537,13 +1539,17 @@ Steps 3 and 11 are the two moments the lifecycle properties change. [Reacting to
 
 #### Race condition protection
 
-A subtle but important detail: users don't always wait for navigation to complete before clicking another link. The router handles this gracefully.
+A subtle but important detail: users don't always wait for navigation to complete before clicking another link, clicking the same link again, or pressing the browser's Back button. The router handles this gracefully.
 
-When `navigate()` is called, the router remembers the target URL. If another `navigate()` call comes in before the first completes, the router updates its target and the first navigation is abandoned. When the first navigation's fetch completes, it checks whether its URL is still the current target — if not, it simply returns without rendering.
+Only the most recently started navigation completes. Every `navigate()` call, including one to the URL already being loaded, and every back/forward traversal abandons the navigation in progress. Before a navigation renders its page or falls back to a full page load, it checks whether it is still the most recent one. If it isn't, it stops there: it doesn't render its page, update `state.url`, add or replace a history entry, scroll to its URL's fragment, or fall back to a full page load, even if its request failed or its `timeout` elapsed. Its `navigate()` promise resolves. A navigation abandoned before the 400ms delay ends never shows the loading animation or announces "loading" to screen readers. Loading feedback that is already showing stays until the next navigation renders its page, whichever it is: that render finishes the animation and announces that the page loaded.
 
-This ensures that rapid clicking through multiple links doesn't cause visual glitches or render stale content. Only the most recent navigation completes.
+This ensures that rapid clicking through multiple links doesn't cause visual glitches or render stale content, and that a visitor who presses Back while a page is still loading stays on the page they went back to.
 
-`state.navigating` and `state.initiator` follow the same latest-wins rule, but the update at the end of a navigation is not governed by the target-URL comparison described above: it carries a latest-wins check of its own. That is what stops an abandoned navigation from setting `state.navigating` to `false` while the winner is still in progress, and it holds for every way one navigation can supersede another, including a Back press landing mid-navigation. [Overlapping navigations](#overlapping-navigations) describes what your code can rely on.
+A navigation started while another one is rendering its page, from a `watch()` that reacts to `state.url` for example, doesn't stop that render: the other navigation still renders its page and adds its history entry, and the new navigation renders after it.
+
+A click on an in-page link, such as a footnote, isn't a navigation and doesn't abandon a `navigate()` call in progress. `state.url` changes to the link's URL right away, and the call then renders its page, adds its history entry after the link's, and keeps `state.navigating` and `state.initiator` until it ends. The router tells that click apart from a Back press through the browser's [Navigation API](https://developer.mozilla.org/en-US/docs/Web/API/Navigation_API). Browsers without it (Chrome and Edge before 102, Firefox before 147, Safari before 26.2) handle the click like a Back press, which abandons the call.
+
+`state.navigating` and `state.initiator` follow the same latest-wins rule: an abandoned navigation never sets `state.navigating` to `false` while the winner is still in progress. [Overlapping navigations](#overlapping-navigations) describes what your code can rely on.
 
 ## Full-page client-side navigation (experimental)
 
