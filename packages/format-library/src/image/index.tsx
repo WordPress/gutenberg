@@ -205,13 +205,7 @@ function Edit( {
 					alt: string;
 					width: number;
 				} ) => {
-					const { start } = value;
-					const existingFormats =
-						isObjectActive && start !== undefined
-							? ( value.formats[ start ] ?? [] )
-							: [];
-
-					let newValue = insertObject( value, {
+					const newImage = {
 						type: name,
 						attributes: {
 							className: `wp-image-${ id }`,
@@ -219,13 +213,21 @@ function Edit( {
 							url,
 							alt,
 						},
-					} );
+					};
 
-					// Keep the formats of the replaced image, like a link.
-					if ( start !== undefined && existingFormats.length ) {
-						const newFormats = newValue.formats.slice();
-						newFormats[ start ] = existingFormats;
-						newValue = { ...newValue, formats: newFormats };
+					let newValue: RichTextValue;
+					// Swap the image in place, so its formats, like a link, stay.
+					if ( isObjectActive && value.start !== undefined ) {
+						const replacements = value.replacements.slice();
+						replacements[ value.start ] = newImage;
+						newValue = {
+							...value,
+							replacements,
+							start: value.end,
+							end: value.end,
+						};
+					} else {
+						newValue = insertObject( value, newImage );
 					}
 
 					onChange( newValue );

@@ -26,6 +26,7 @@ import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
@@ -262,6 +263,9 @@ export function ImageEdit( {
 				break;
 			case LINK_DESTINATION_ATTACHMENT:
 				mediaAttributes.href = media.link;
+				break;
+			case LINK_DESTINATION_NONE:
+				mediaAttributes.href = undefined;
 				break;
 		}
 
