@@ -1,5 +1,56 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// The picker renders a toggle group for a short list of sizes and a select for
+// a longer one, so each suite declares the presets it needs rather than relying
+// on whatever the active theme happens to define.
+const FEW_FONT_SIZES = [
+	{ name: 'Small', slug: 'small', size: '13px' },
+	{ name: 'Medium', slug: 'medium', size: '20px' },
+	{ name: 'Large', slug: 'large', size: '36px' },
+	{ name: 'Extra Large', slug: 'x-large', size: '42px' },
+];
+
+const MORE_FONT_SIZES = [
+	{ name: 'Tiny', slug: 'tiny', size: '11px' },
+	...FEW_FONT_SIZES,
+	{ name: 'Huge', slug: 'huge', size: '48px' },
+];
+
+/**
+ * Replaces the font size presets the editor offers.
+ *
+ * The presets are set as the theme's, which is the origin the picker shows: a
+ * theme that defines its own sizes opts out of the default ones.
+ *
+ * @param {Object}   page      Playwright page.
+ * @param {Object[]} fontSizes Presets the picker should offer.
+ */
+async function setFontSizePresets( page, fontSizes ) {
+	await page.evaluate( ( presets ) => {
+		// set a deep `path[]` property in object `obj` to `value`, immutably
+		function setDeep( obj, path, value ) {
+			function doSet( o, i ) {
+				if ( i < path.length ) {
+					const key = path[ i ];
+					return { ...o, [ key ]: doSet( o[ key ], i + 1 ) };
+				}
+				return value;
+			}
+			return doSet( obj, 0 );
+		}
+
+		window.wp.data
+			.dispatch( 'core/editor' )
+			.updateEditorSettings(
+				setDeep(
+					window.wp.data.select( 'core/editor' ).getEditorSettings(),
+					[ '__experimentalFeatures', 'typography', 'fontSizes' ],
+					{ theme: presets }
+				)
+			);
+	}, fontSizes );
+}
+
 test.describe( 'Font Size Picker', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
@@ -71,65 +122,7 @@ test.describe( 'Font Size Picker', () => {
 
 	test.describe( 'More font sizes', () => {
 		test.beforeEach( async ( { page } ) => {
-			await page.evaluate( () => {
-				// set a deep `path[]` property in object `obj` to `value`, immutably
-				function setDeep( obj, path, value ) {
-					function doSet( o, i ) {
-						if ( i < path.length ) {
-							const key = path[ i ];
-							return { ...o, [ key ]: doSet( o[ key ], i + 1 ) };
-						}
-						return value;
-					}
-					return doSet( obj, 0 );
-				}
-
-				window.wp.data.dispatch( 'core/editor' ).updateEditorSettings(
-					setDeep(
-						window.wp.data
-							.select( 'core/editor' )
-							.getEditorSettings(),
-						[
-							'__experimentalFeatures',
-							'typography',
-							'fontSizes',
-							'default',
-						],
-						[
-							{
-								name: 'Tiny',
-								slug: 'tiny',
-								size: '11px',
-							},
-							{
-								name: 'Small',
-								slug: 'small',
-								size: '13px',
-							},
-							{
-								name: 'Medium',
-								slug: 'medium',
-								size: '20px',
-							},
-							{
-								name: 'Large',
-								slug: 'large',
-								size: '36px',
-							},
-							{
-								name: 'Extra Large',
-								slug: 'x-large',
-								size: '42px',
-							},
-							{
-								name: 'Huge',
-								slug: 'huge',
-								size: '48px',
-							},
-						]
-					)
-				);
-			} );
+			await setFontSizePresets( page, MORE_FONT_SIZES );
 		} );
 
 		test( 'should apply a named font size using the font size buttons', async ( {
@@ -233,6 +226,10 @@ test.describe( 'Font Size Picker', () => {
 	} );
 
 	test.describe( 'Few font sizes', () => {
+		test.beforeEach( async ( { page } ) => {
+			await setFontSizePresets( page, FEW_FONT_SIZES );
+		} );
+
 		test( 'should apply a named font size using the font size buttons', async ( {
 			editor,
 			page,

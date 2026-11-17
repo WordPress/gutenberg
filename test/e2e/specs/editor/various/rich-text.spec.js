@@ -761,7 +761,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: {
 				content:
-					'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark>',
+					'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-dark-gray-color">1</mark>',
 			},
 		};
 

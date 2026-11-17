@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove the Normalize Theme mu-plugin, so the editor offers the active theme's color palette and font sizes instead of the default ones. Tests that pick a default preset while a theme defines its own need updating ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 10.1.0 (2026-11-04)
 
 ## 10.0.0 (2026-10-20)

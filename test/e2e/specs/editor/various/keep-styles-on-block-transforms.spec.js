@@ -24,9 +24,7 @@ test.describe( 'Keep styles on block transforms', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page
-			.getByRole( 'option', { name: 'Luminous vivid orange' } )
-			.click();
+		await page.getByRole( 'option', { name: 'Orange' } ).click();
 
 		await page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
@@ -39,7 +37,7 @@ test.describe( 'Keep styles on block transforms', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'Heading',
-					textColor: 'luminous-vivid-orange',
+					textColor: 'orange',
 				},
 			},
 		] );
@@ -61,7 +59,13 @@ test.describe( 'Keep styles on block transforms', () => {
 		await page.keyboard.type( 'Line 3 to be made large' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
 		await pageUtils.pressKeys( 'shift+ArrowUp' );
-		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
+		// The active theme defines more than five sizes, so the picker
+		// renders a select rather than a toggle group.
+		await page
+			.getByRole( 'group', { name: 'Font size' } )
+			.getByRole( 'combobox', { name: 'Font size' } )
+			.click();
+		await page.getByRole( 'option', { name: /^Large/ } ).click();
 		await page
 			.getByRole( 'button', { name: 'Multiple blocks selected' } )
 			.click();
@@ -92,7 +96,13 @@ test.describe( 'Keep styles on block transforms', () => {
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Line 1 to be made large' );
-		await page.getByRole( 'radio', { name: 'Large', exact: true } ).click();
+		// The active theme defines more than five sizes, so the picker
+		// renders a select rather than a toggle group.
+		await page
+			.getByRole( 'group', { name: 'Font size' } )
+			.getByRole( 'combobox', { name: 'Font size' } )
+			.click();
+		await page.getByRole( 'option', { name: /^Large/ } ).click();
 		await editor.showBlockToolbar();
 		await page.getByRole( 'button', { name: 'Paragraph' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Group' } ).click();

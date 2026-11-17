@@ -309,7 +309,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await page.getByRole( 'option', { name: 'Dark gray' } ).click();
 		await editorSettings
 			.locator( '.components-tools-panel' )
 			.filter( {
@@ -317,14 +317,14 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+		await page.getByRole( 'option', { name: 'Red' } ).click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"vivid-red\",\"textColor\":\"cyan-bluish-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|cyan-bluish-gray\"}}}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-cyan-bluish-gray-color has-vivid-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"backgroundColor\":\"red\",\"textColor\":\"dark-gray\",\"style\":{\"elements\":{\"link\":{\"color\":{\"text\":\"var:preset|color|dark-gray\"}}}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-dark-gray-color has-red-background-color has-text-color has-background has-link-color wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -482,7 +482,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Cyan bluish gray' } ).click();
+		await page.getByRole( 'option', { name: 'Dark gray' } ).click();
 		await settings
 			.locator( '.components-tools-panel' )
 			.filter( {
@@ -490,7 +490,7 @@ test.describe( 'Buttons', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+		await page.getByRole( 'option', { name: 'Red' } ).click();
 
 		// Select the parent Buttons block so the appender is visible.
 		await editor.selectBlocks(
@@ -511,15 +511,15 @@ test.describe( 'Buttons', () => {
 						name: 'core/button',
 						attributes: {
 							text: 'Content',
-							backgroundColor: 'vivid-red',
-							textColor: 'cyan-bluish-gray',
+							backgroundColor: 'red',
+							textColor: 'dark-gray',
 						},
 					},
 					{
 						name: 'core/button',
 						attributes: {
-							backgroundColor: 'vivid-red',
-							textColor: 'cyan-bluish-gray',
+							backgroundColor: 'red',
+							textColor: 'dark-gray',
 						},
 					},
 				],
@@ -538,8 +538,8 @@ test.describe( 'Buttons', () => {
 					name: 'core/button',
 					attributes: {
 						text: 'Content',
-						backgroundColor: 'vivid-red',
-						textColor: 'cyan-bluish-gray',
+						backgroundColor: 'red',
+						textColor: 'dark-gray',
 						anchor: 'first-button',
 					},
 				},
@@ -564,8 +564,8 @@ test.describe( 'Buttons', () => {
 						name: 'core/button',
 						attributes: {
 							text: 'Content',
-							backgroundColor: 'vivid-red',
-							textColor: 'cyan-bluish-gray',
+							backgroundColor: 'red',
+							textColor: 'dark-gray',
 							anchor: 'first-button',
 						},
 					},
@@ -573,8 +573,8 @@ test.describe( 'Buttons', () => {
 						name: 'core/button',
 						attributes: {
 							text: 'Second',
-							backgroundColor: 'vivid-red',
-							textColor: 'cyan-bluish-gray',
+							backgroundColor: 'red',
+							textColor: 'dark-gray',
 						},
 					},
 				],

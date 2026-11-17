@@ -245,7 +245,7 @@ test.describe( 'Heading', () => {
 
 		await page
 			.getByRole( 'option', {
-				name: 'Luminous vivid orange',
+				name: 'Orange',
 			} )
 			.click();
 
@@ -258,7 +258,7 @@ test.describe( 'Heading', () => {
 				attributes: {
 					content: 'Heading',
 					level: 2,
-					textColor: 'luminous-vivid-orange',
+					textColor: 'orange',
 				},
 			},
 		] );
