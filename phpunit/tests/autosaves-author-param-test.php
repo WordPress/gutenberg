@@ -164,6 +164,40 @@ class Tests_Autosaves_Author_Param extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A controller that overrides `get_items()` must keep answering requests.
+	 */
+	public function test_leaves_a_controller_with_its_own_get_items_alone(): void {
+		register_post_type(
+			'autosave_cpt',
+			array(
+				'show_in_rest'                   => true,
+				'autosave_rest_controller_class' => Autosaves_Author_Param_Test_Controller::class,
+			)
+		);
+		$GLOBALS['wp_rest_server'] = null;
+
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'autosave_cpt',
+				'post_author' => self::$editor_ids[0],
+			)
+		);
+		$this->assertIsInt( $post_id );
+		wp_set_current_user( self::$editor_ids[0] );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/autosave_cpt/' . $post_id . '/autosaves' );
+		$request->set_param( 'author', self::$editor_ids[0] );
+		$response = rest_get_server()->dispatch( $request );
+
+		unregister_post_type( 'autosave_cpt' );
+		$GLOBALS['wp_rest_server'] = null;
+
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertArrayHasKey( 'custom', $data );
+	}
+
+	/**
 	 * @dataProvider data_invalid_author
 	 *
 	 * @param mixed $author Value passed as the author parameter.
@@ -190,5 +224,20 @@ class Tests_Autosaves_Author_Param extends WP_UnitTestCase {
 			'not a number'       => array( 'abc' ),
 			'negative in a list' => array( array( 1, -1 ) ),
 		);
+	}
+}
+
+/**
+ * Autosaves controller that answers collection requests itself.
+ */
+// phpcs:ignore Generic.Files.OneObjectStructurePerFile.MultipleFound
+class Autosaves_Author_Param_Test_Controller extends WP_REST_Autosaves_Controller {
+
+	/**
+	 * @param WP_REST_Request<array<string, mixed>> $request Full details about the request.
+	 * @return WP_REST_Response The response.
+	 */
+	public function get_items( $request ) {
+		return new WP_REST_Response( array( 'custom' => $request['author'] ) );
 	}
 }

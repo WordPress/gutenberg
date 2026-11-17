@@ -43,6 +43,12 @@ function gutenberg_register_autosaves_author_param( $endpoints ) {
 				continue;
 			}
 
+			// A controller with its own `get_items()` keeps answering for itself.
+			$get_items = new ReflectionMethod( $callback[0], 'get_items' );
+			if ( WP_REST_Autosaves_Controller::class !== $get_items->getDeclaringClass()->getName() ) {
+				continue;
+			}
+
 			$args['author'] = array(
 				'description' => __( 'Limit result set to autosaves assigned to specific authors.', 'gutenberg' ),
 				'type'        => 'array',
