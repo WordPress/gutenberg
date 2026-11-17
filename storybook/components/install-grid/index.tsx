@@ -123,6 +123,23 @@ const TOOLS: Tool[] = [
 		],
 	},
 	{
+		id: 'jetbrains',
+		label: 'JetBrains',
+		domain: 'jetbrains.com',
+		mark: 'JB',
+		color: '#000000',
+		config: JSON_CONFIG,
+		link: {
+			href: 'https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html',
+			label: 'JetBrains AI Assistant MCP guide',
+		},
+		steps: [
+			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, Model Context Protocol (MCP), and click Add.',
+			'Paste the configuration above into the JSON configuration field, then click OK and Apply.',
+			'Check that `wordpress-design-system` shows as connected in the Status column.',
+		],
+	},
+	{
 		id: 'claude-desktop',
 		label: 'Claude Desktop',
 		domain: 'anthropic.com',
@@ -186,23 +203,6 @@ const TOOLS: Tool[] = [
 		steps: [
 			'Open the Zed settings file and add the configuration above.',
 			'Open the Agent Panel settings and confirm `wordpress-design-system` shows as active.',
-		],
-	},
-	{
-		id: 'jetbrains',
-		label: 'JetBrains',
-		domain: 'jetbrains.com',
-		mark: 'JB',
-		color: '#000000',
-		config: JSON_CONFIG,
-		link: {
-			href: 'https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html',
-			label: 'JetBrains AI Assistant MCP guide',
-		},
-		steps: [
-			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, Model Context Protocol (MCP), and click Add.',
-			'Paste the configuration above into the JSON configuration field, then click OK and Apply.',
-			'Check that `wordpress-design-system` shows as connected in the Status column.',
 		],
 	},
 	{
