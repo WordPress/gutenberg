@@ -1924,10 +1924,16 @@ export function preferences(
 					let id = blockName;
 					// If a block variation match is found change the name to be the same with the
 					// one that is used for block variations in the Inserter (`getItemFromVariation`).
-					const match = select( blocksStore ).getActiveBlockVariation(
-						blockName,
-						attributes
-					);
+					const match =
+						select( blocksStore ).getActiveBlockVariation(
+							blockName,
+							attributes
+						) ??
+						select( blocksStore ).getActiveBlockVariation(
+							blockName,
+							attributes,
+							'block'
+						);
 					if ( match?.name ) {
 						id += '/' + match.name;
 					}

@@ -3659,8 +3659,57 @@ describe( 'state', () => {
 					} )
 				);
 			} );
+			const blockWithDefaultVariation =
+				'core/test-block-with-default-variation';
+			beforeAll( () => {
+				registerBlockType(
+					blockWithDefaultVariation,
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						title: 'Fruit with default variation',
+						attributes: { fruit: { type: 'string' } },
+						variations: [
+							partial< BlockVariation >( {
+								name: 'plain',
+								isDefault: true,
+								scope: [ 'block', 'inserter' ],
+							} ),
+							partial< BlockVariation >( {
+								name: 'orange',
+								attributes: { fruit: 'orange' },
+								isActive: [ 'fruit' ],
+							} ),
+						],
+					} )
+				);
+			} );
 			afterAll( () => {
 				unregisterBlockType( blockWithVariations );
+				unregisterBlockType( blockWithDefaultVariation );
+			} );
+			it( 'should record the default variation for blocks matching no other variation', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						partial< Block >( {
+							clientId: 'plain',
+							name: blockWithDefaultVariation,
+							attributes: { fruit: 'plain' },
+						} ),
+					],
+					time: 123456,
+				} );
+
+				expect( state ).toEqual( {
+					insertUsage: {
+						[ `${ blockWithDefaultVariation }/plain` ]: {
+							time: 123456,
+							count: 1,
+						},
+					},
+				} );
 			} );
 			it( 'should return proper results with both found or not found block variation matches', () => {
 				const state = preferences( deepFreeze( { insertUsage: {} } ), {
