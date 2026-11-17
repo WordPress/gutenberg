@@ -95,6 +95,10 @@ const getActionsHeader = () =>
 	document.querySelector< HTMLElement >(
 		'th.dataviews-view-table__actions-column'
 	)!;
+const getActionsCell = () =>
+	document.querySelector< HTMLElement >(
+		'td.dataviews-view-table__actions-column'
+	)!;
 const getDividerOpacity = () =>
 	getComputedStyle( getActionsHeader(), '::after' ).opacity;
 const getRows = () =>
@@ -111,6 +115,15 @@ const getTextBox = ( element: Element ) => {
 };
 const getTextRight = ( element: Element ) => getTextBox( element ).right;
 const getTextLeft = ( element: Element ) => getTextBox( element ).left;
+
+function scrollToMiddle() {
+	const container = getScrollContainer();
+	const distance = ( container.scrollWidth - container.clientWidth ) / 2;
+	container.scrollLeft =
+		getComputedStyle( container ).direction === 'rtl'
+			? -distance
+			: distance;
+}
 
 function scrollToEnd() {
 	const container = getScrollContainer();
@@ -169,6 +182,22 @@ describe( 'DataViews table scroll fade', () => {
 			await new Promise( requestAnimationFrame );
 			expect( getDividerOpacity() ).toBe( '0' );
 		} );
+
+		it( 'stops the row lines at the divider until the end of the scroll range', async () => {
+			await render( <PostsTable withActions /> );
+			const getLineSize = () =>
+				getComputedStyle( getActionsCell() ).backgroundSize;
+
+			await expect
+				.poll( getLineSize )
+				.toBe( `calc(100% - ${ FADE_SIZE }px) 1px` );
+
+			scrollToEnd();
+			await expect.poll( getLineSize ).toBe( '100% 1px' );
+			expect( getComputedStyle( getActionsCell() ).maskImage ).toBe(
+				'none'
+			);
+		} );
 	} );
 
 	// Every fade is opaque towards the edge of the row it sits at.
@@ -179,20 +208,62 @@ describe( 'DataViews table scroll fade', () => {
 		'fades towards the edges of the rows (%s)',
 		async ( dir, start, end ) => {
 			await render( <PostsTable dir={ dir } /> );
+			scrollToMiddle();
 			const row = getRows()[ 0 ];
-			expect( getComputedStyle( row, '::before' ).maskImage ).toBe(
-				`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
-			);
+			await expect
+				.poll( () => getComputedStyle( row, '::before' ).maskImage )
+				.toBe(
+					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
+				);
 			expect( getComputedStyle( row, '::after' ).maskImage ).toBe(
 				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
 			);
 
 			await render( <PostsTable withActions dir={ dir } /> );
-			expect( getComputedStyle( getActionsHeader() ).maskImage ).toBe(
-				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
-			);
+			scrollToMiddle();
+			await expect
+				.poll( () => getComputedStyle( getActionsHeader() ).maskImage )
+				.toBe(
+					`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
+				);
 		}
 	);
+
+	// A fade that covers only its own space keeps its share of the row line,
+	// and one that covers columns hides it, so their lines fade out.
+	it( 'fades each edge only while there are columns to scroll to on its side', async () => {
+		await render( <PostsTable /> );
+		const row = getRows()[ 1 ];
+		const getFade = ( pseudo: '::before' | '::after' ) => {
+			const style = getComputedStyle( row, pseudo );
+			return [ style.maskImage !== 'none', style.backgroundSize ];
+		};
+
+		await expect
+			.poll( () => [ getFade( '::before' ), getFade( '::after' ) ] )
+			.toEqual( [
+				[ false, '100% 1px' ],
+				[ true, '0px 0px' ],
+			] );
+
+		scrollToEnd();
+		await expect
+			.poll( () => [ getFade( '::before' ), getFade( '::after' ) ] )
+			.toEqual( [
+				[ true, '0px 0px' ],
+				[ false, '100% 1px' ],
+			] );
+	} );
+
+	it( 'does not fade when every column fits', async () => {
+		await render( <PostsTable width={ 1600 } /> );
+
+		// Wait for a frame, so a scroll timeline would have been resolved.
+		await new Promise( requestAnimationFrame );
+		const row = getRows()[ 1 ];
+		expect( getComputedStyle( row, '::before' ).maskImage ).toBe( 'none' );
+		expect( getComputedStyle( row, '::after' ).maskImage ).toBe( 'none' );
+	} );
 
 	describe( 'without actions', () => {
 		// At the end of the scroll range, the fade must cover only its own

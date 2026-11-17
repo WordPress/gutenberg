@@ -6,6 +6,23 @@
 // cells take the place of, so that the columns do not move.
 $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
+// Fades the element with `--dataviews-view-table-fade-mask` while the scroll
+// position is within `$range`, and hides its share of the row line. Outside the
+// range, and when nothing scrolls, the element only covers its own space, so it
+// stays opaque and keeps the line. Browsers without scroll-driven animations
+// always fade.
+@mixin scroll-fade($range, $fill-mode: none) {
+	@supports (animation-timeline: scroll()) {
+		animation: dataviews-view-table-scroll-fade linear $fill-mode;
+		animation-timeline: scroll(nearest inline);
+		animation-range: $range;
+	}
+
+	@supports not (animation-timeline: scroll()) {
+		mask-image: var(--dataviews-view-table-fade-mask);
+	}
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -43,11 +60,12 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 			position: sticky;
 			inset-inline-end: 0;
 			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
-			// The masked strip at the start of the cell lets the columns
-			// scrolling under it show through, fading into the cell's own
-			// background. At the end of the scroll range the strip only covers
-			// the cell's own space, so it needs no scroll state.
-			mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 $scroll-fade-size);
+			// While there are more columns to scroll to, the masked strip at
+			// the start of the cell lets them show through, fading into the
+			// cell's own background, and the row line stops at the divider.
+			--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 #{$scroll-fade-size});
+			--dataviews-view-table-fade-line-size: calc(100% - #{$scroll-fade-size}) 1px;
+			@include scroll-fade(normal calc(100% - 1px));
 
 			// Double rule between the strip and the actions, shown whenever
 			// the columns scroll, to set the actions apart from them.
@@ -85,7 +103,10 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		}
 	}
 	tr {
-		border-top: 1px solid var(--wpds-color-stroke-surface-neutral-weak);
+		--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-neutral-weak);
+		// Keeps the space of the line between rows. The cells draw the line
+		// itself, so the fades can hide it, see below.
+		border-top: 1px solid transparent;
 		background-color: inherit;
 
 		// The fade cells at the ends of each row take the place of the outer
@@ -121,7 +142,7 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
 			&,
 			& + tr {
-				border-top: 1px solid var(--wpds-color-stroke-surface-brand);
+				--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-brand);
 			}
 
 			.dataviews-view-table__actions-column {
@@ -325,9 +346,9 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 	}
 
 	// Sticky cells at the edges of each row fade the columns scrolling under
-	// them into the row's own background. At the matching end of the scroll
-	// range a cell only covers its own space, so it needs no scroll state.
-	// With actions, the sticky actions column fades the end instead.
+	// them into the row's own background, while there are more columns to
+	// scroll to on their side. With actions, the sticky actions column fades
+	// the end instead.
 	tr::before,
 	&:not(.has-actions) tr::after {
 		content: "";
@@ -345,12 +366,37 @@ $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 		inset-inline-start: 0;
 		// Above the positioned content of the cells that follow it.
 		z-index: 1;
-		mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-start), transparent, #000);
+		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-start), transparent, #000);
+		// From the first pixel scrolled, through the end of the range.
+		@include scroll-fade(1px normal, forwards);
 	}
 
 	tr::after {
 		inset-inline-end: 0;
-		mask-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000);
+		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000);
+		@include scroll-fade(normal calc(100% - 1px));
+	}
+
+	// Each cell draws its share of the line between rows, so a fade can hide
+	// its own share while it is active: the lines of the columns scrolling
+	// under it then fade out along with their content.
+	tbody tr > *,
+	tbody tr::before,
+	&:not(.has-actions) tbody tr::after {
+		background-image: linear-gradient(var(--dataviews-view-table-row-stroke), var(--dataviews-view-table-row-stroke));
+		background-repeat: no-repeat;
+		background-position: var(--dataviews-view-table-fade-to-end) top;
+		background-size: 100% 1px;
+	}
+}
+
+// Applied while a fade is active. Without `--dataviews-view-table-fade-line-size`
+// the element hides its share of the row line entirely.
+@keyframes dataviews-view-table-scroll-fade {
+	from,
+	to {
+		mask-image: var(--dataviews-view-table-fade-mask);
+		background-size: var(--dataviews-view-table-fade-line-size, 0 0);
 	}
 }
 
