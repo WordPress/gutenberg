@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so
+    `⌘K` no longer appears as `K⌘` in tooltips and menu items
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86606'

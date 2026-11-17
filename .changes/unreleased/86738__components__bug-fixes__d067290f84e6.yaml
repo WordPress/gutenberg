@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Autocomplete`: Use the last committed completion callback when a background
+    update suspends
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86738'

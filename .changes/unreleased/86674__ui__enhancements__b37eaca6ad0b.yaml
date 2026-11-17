@@ -1,0 +1,10 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Autocomplete`: Throw an error in development when `Autocomplete.Input` is
+    rendered inside `Autocomplete.Popup`. For a searchable picker that opens from
+    a button, render an inline `Autocomplete` inside a standalone `Popover`
+    component instead
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86674'

@@ -1,0 +1,10 @@
+project: ui
+kind: Breaking Changes
+body: >-
+    `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround.
+    Parent documents that need canvas presses to dismiss popups should forward
+    those events from the iframe document onto the `<iframe>` element, as the
+    block editor canvas does
+time: '2026-11-17T02:26:09.373Z'
+custom:
+    PR: '85263'

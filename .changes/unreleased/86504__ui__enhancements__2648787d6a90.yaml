@@ -1,0 +1,8 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only
+    fields with a muted border, keeping the value at full text contrast
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86504'

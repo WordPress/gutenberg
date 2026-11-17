@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `Snackbar`: Run the action when its button is activated with Enter or Space,
+    instead of dismissing the snackbar without running it
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86670'

@@ -1,0 +1,10 @@
+project: components
+kind: Enhancements
+body: >-
+    `InputControl`, `TextControl`, `TextareaControl`, and
+    `ContentEditableControl`: Use
+    `--wpds-color-foreground-interactive-neutral-weak` for placeholder text
+    instead of `--wp-components-color-foreground` overrides
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86578'

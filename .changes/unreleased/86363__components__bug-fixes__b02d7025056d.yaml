@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `InputControl`: Remove the leftover maximum width on the label wrapper so
+    labels no longer wrap before reaching the input's width
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86363'

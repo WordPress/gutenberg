@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `ResizableBox`: Show corner handles above side handles, so a corner handle can
+    be dragged when the side handle next to it is also enabled
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86781'

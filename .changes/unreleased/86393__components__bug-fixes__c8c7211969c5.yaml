@@ -1,0 +1,6 @@
+project: components
+kind: Bug Fixes
+body: '`Button`, `Toolbar`: Show the pressed state in forced colors mode'
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86393'

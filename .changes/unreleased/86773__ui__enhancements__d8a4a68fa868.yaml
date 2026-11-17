@@ -1,0 +1,8 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged
+    to avoid repeated allocations
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86773'

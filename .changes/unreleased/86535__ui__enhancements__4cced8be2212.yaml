@@ -1,0 +1,10 @@
+project: ui
+kind: Enhancements
+body: >-
+    `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep
+    group labels pinned to the top of the list while their group's items scroll.
+    Inline lists get this when their items are inside a `ListBody` with a limited
+    height
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86535'

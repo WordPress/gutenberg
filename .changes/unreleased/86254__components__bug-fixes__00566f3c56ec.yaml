@@ -1,0 +1,9 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `ContentEditableControl` and `CustomSelectControl`: Include validation errors
+    in the accessible description of the interactive controls, so screen readers
+    announce errors on the controls users focus
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86254'

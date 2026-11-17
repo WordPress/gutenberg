@@ -1,0 +1,9 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in
+    a surrounding CSS grid like any other child, instead of in an extra implicit
+    row and column
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86652'

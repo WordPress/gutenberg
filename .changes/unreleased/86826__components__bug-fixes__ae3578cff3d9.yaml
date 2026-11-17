@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `TimePicker`: Replace every underscore in the time zone tooltip, so
+    `Asia/Ho_Chi_Minh` shows as `Asia/Ho Chi Minh` instead of `Asia/Ho Chi_Minh`
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86826'

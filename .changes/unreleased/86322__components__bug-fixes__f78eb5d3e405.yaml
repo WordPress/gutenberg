@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `useBaseControlProps`: fix instance ID generation crash in CommonJS build by
+    avoiding a circular import of BaseControl
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86322'

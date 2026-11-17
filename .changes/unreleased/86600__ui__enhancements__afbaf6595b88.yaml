@@ -1,0 +1,11 @@
+project: ui
+kind: Enhancements
+body: >-
+    `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't
+    show the missing-value message when focus leaves an empty required control.
+    Tabbing or clicking through a form no longer reports fields the user hasn't
+    filled in, and coming back to type no longer reports an incomplete value on
+    every keystroke
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86600'

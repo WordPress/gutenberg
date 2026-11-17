@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `CircularOptionPicker`: Keep the selected check mark visible on every swatch
+    in forced colors mode
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86393'

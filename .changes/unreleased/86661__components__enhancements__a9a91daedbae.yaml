@@ -1,0 +1,6 @@
+project: components
+kind: Enhancements
+body: '`FontSizePicker`: Use the WordPress UI select for choosing preset sizes'
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86661'

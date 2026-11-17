@@ -1,0 +1,8 @@
+project: ui
+kind: Breaking Changes
+body: >-
+    `Calendar` and `RangeCalendar`: Fill their container width with no internal
+    maximum. Constrain the container width to keep a compact calendar
+time: '2026-11-17T02:26:09.372Z'
+custom:
+    PR: '86086'

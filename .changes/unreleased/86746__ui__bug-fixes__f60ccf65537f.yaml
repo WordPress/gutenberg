@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `Breadcrumb`: Keep committed navigation items when the overflow trigger
+    receives focus during a suspended update
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86746'

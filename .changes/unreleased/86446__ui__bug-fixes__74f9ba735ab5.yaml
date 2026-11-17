@@ -1,0 +1,8 @@
+project: ui
+kind: Bug Fixes
+body: >-
+    `InputLayout`: Keep `Slot` content from shrinking, which wrapped button labels
+    and squashed icons in a prefix or suffix.
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86446'

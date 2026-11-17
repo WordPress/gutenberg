@@ -1,0 +1,6 @@
+project: components
+kind: Bug Fixes
+body: '`ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves'
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86305'

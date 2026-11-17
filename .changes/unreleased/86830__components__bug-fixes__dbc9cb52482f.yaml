@@ -1,0 +1,9 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `ToggleGroupControl`: Animate the selection indicator's width along with its
+    position, so it stays inside the control when the options have different
+    widths
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '86830'

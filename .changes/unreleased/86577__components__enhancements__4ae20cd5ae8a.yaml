@@ -1,0 +1,9 @@
+project: components
+kind: Enhancements
+body: >-
+    `AnglePickerControl`, `BorderControl`: Use the design system border color.
+    Legacy `--wp-components-color-gray-600` overrides no longer affect these
+    borders
+time: '2026-11-17T02:26:06.496Z'
+custom:
+    PR: '86577'

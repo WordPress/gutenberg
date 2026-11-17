@@ -1,0 +1,8 @@
+project: ui
+kind: Internal
+body: >-
+    `Meter`, `Progress`: Use the new `--wpds-color-background-indicator-*` tokens
+    for the filled portion. The colors are unchanged
+time: '2026-11-17T02:26:09.374Z'
+custom:
+    PR: '86584'

@@ -1,0 +1,8 @@
+project: components
+kind: Bug Fixes
+body: >-
+    `UnitControl`: Preserve fractional values across CSS units on commit, and
+    prevent floating-point errors when stepping decimals
+time: '2026-11-17T02:26:06.497Z'
+custom:
+    PR: '85761'
