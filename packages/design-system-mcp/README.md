@@ -65,7 +65,7 @@ Where it goes, and what changes for each client:
 | [Gemini CLI](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md) | `~/.gemini/settings.json` | |
 | [Zed](https://zed.dev/docs/ai/mcp) | `settings.json` | Use `context_servers` instead of `mcpServers`. |
 | [OpenCode](https://opencode.ai/docs/mcp-servers/) | `opencode.json` | Use `mcp.servers`, add `"type": "local"`, and join `command` and `args` into one `command` array. |
-| Raycast | [Install in Raycast](raycast://mcp/install?%7B%22name%22%3A%22wordpress-design-system%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22--ignore-scripts%22%2C%22--min-release-age%3D2%22%2C%22%40wordpress%2Fdesign-system-mcp%40latest%22%5D%7D), or the "Install Server" command | For the command, paste only the server entry, the object holding `command` and `args`. |
+| Raycast | <a href="raycast://mcp/install?%7B%22name%22%3A%22wordpress-design-system%22%2C%22type%22%3A%22stdio%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22--ignore-scripts%22%2C%22--min-release-age%3D2%22%2C%22%40wordpress%2Fdesign-system-mcp%40latest%22%5D%7D">Install in Raycast</a>, or the "Install Server" command | For the command, paste only the server entry, the object holding `command` and `args`. |
 
 ## Importing the package
 
