@@ -61,13 +61,7 @@ interface BulkSelectionCheckboxProps< Item > {
 	getItemId: ( item: Item ) => string;
 	disableSelectAll?: boolean;
 	checkboxRef?: React.Ref< HTMLSpanElement >;
-	/**
-	 * Called when the checkbox clears the selection, before it changes.
-	 */
 	onClear?: () => void;
-	/**
-	 * Called when the checkbox selects items, before the selection changes.
-	 */
 	onSelect?: () => void;
 }
 
