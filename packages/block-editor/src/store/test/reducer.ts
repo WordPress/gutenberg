@@ -1738,6 +1738,40 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should insert into the root order when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'kumquat',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			const state = blocks( original, {
+				type: 'INSERT_BLOCKS',
+				rootClientId: null,
+				blocks: [
+					partial< Block >( {
+						clientId: 'persimmon',
+						name: 'core/registered-block',
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'kumquat',
+				'persimmon',
+			] );
+			expect( state.order.has( null as unknown as string ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'should move block to lower index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
