@@ -22,6 +22,10 @@ export async function loadEditorAssets() {
 			editorAssets.html_templates || [],
 			editorAssets.script_modules || {}
 		);
+		/*
+		 * Exception: this is a private API, so the assets endpoint can't call
+		 * it from an inline script. Register anything else in the endpoint.
+		 */
 		registerCoreBlockBindingsSources();
 	};
 
