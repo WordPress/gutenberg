@@ -2,13 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+
 ### New Features
 
 -   Add the `asterisk` icon to the `core` and `core-admin` collections, as a generic stand-in for an item whose type is not known ([#85442](https://github.com/WordPress/gutenberg/pull/85442)).
 -   Add the `formInput` and `formSelect` icons ([#84074](https://github.com/WordPress/gutenberg/pull/84074)).
+-   Add the `database` icon ([#85273](https://github.com/WordPress/gutenberg/pull/85273)).
 
 ### Enhancements
 
+-   `manifest.json`: Map 45 more Dashicons to `core-admin` icons. To do so, add 33 icons to the `core-admin` collection, such as `cloud`, `megaphone`, `trash`, `lock` and `play`, and add `chevronUpDown`, `file` and `folder` from the `core` collection to the `core-admin` collection too ([#86708](https://github.com/WordPress/gutenberg/pull/86708)).
 -   `manifest.json`: Add the `error`, `info` and `postComments` icons to the `core-admin` collection, and `postComments` to the `core` collection, to replace the Dashicons in the "At a Glance" dashboard widget ([#85452](https://github.com/WordPress/gutenberg/pull/85452)).
 -   `manifest.json`: Add 39 icons from the `core` collection to the `core-admin` collection, so the admin interface can render them in place of the Dashicons they replace ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
 -   `manifest.json`: New `dashicons` property, listing the Dashicon class names a `core-admin` icon replaces. `manifest.php` includes it too ([#85541](https://github.com/WordPress/gutenberg/pull/85541)).
