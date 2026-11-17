@@ -19,6 +19,23 @@ describe( 'block.json schema', () => {
 		ajv = new Ajv();
 	} );
 
+	test.each( [
+		true,
+		false,
+		{},
+		{ defaultControls: true },
+		{ defaultControls: false },
+	] )( 'accepts duotone support %j', ( duotone ) => {
+		expect(
+			ajv.validate( blockSchema, {
+				apiVersion: 3,
+				name: 'test/duotone',
+				title: 'Duotone test',
+				supports: { filter: { duotone } },
+			} )
+		).toBe( true );
+	} );
+
 	test( 'strictly adheres to the draft-07 meta schema', () => {
 		// Use ajv.compile instead of ajv.validateSchema to validate the schema
 		// because validateSchema only checks syntax, whereas, compile checks
