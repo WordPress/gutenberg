@@ -50,6 +50,16 @@
 			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
 	--antialiasing-factor: 100;
 	&[aria-orientation="horizontal"] {
+		// The indicator and the separator beneath the tab bar mark the same
+		// boundary, so the indicator has to span that hairline rather than
+		// stack on top of it. Reserve the hairline as padding and pull it back
+		// with a margin: the tabs keep their own box, the chrome keeps its
+		// height, and the indicator reaches the hairline from inside the
+		// scroll container, so a scrolling list cannot clip it. Consumers used
+		// to pull the whole list down instead, which moved the tabs with it.
+		padding-block-end: var(--wpds-border-width-xs);
+		margin-block-end: calc(-1 * var(--wpds-border-width-xs));
+
 		--fade-width: 64px;
 		--fade-gradient-base: transparent 0%, #000 var(--fade-width);
 		--fade-gradient-composed: var(--fade-gradient-base), #000 60%, transparent 50%;
