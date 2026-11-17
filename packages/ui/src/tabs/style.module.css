@@ -210,12 +210,22 @@
 				}
 			}
 
-			/* The minimal variant is the same tab with less inline padding, so
-			 * its interaction states behave exactly as above. The padding
+			/* The minimal variant is the same tab one size down, for a bar
+			 * nested inside a panel rather than heading one. Its inline padding
 			 * replaces the list gap this variant used to carry, which keeps the
-			 * same distance between labels while letting the hit areas meet. */
+			 * same distance between labels while letting the hit areas meet.
+			 *
+			 * Where a default tab is 47px around a background one control tall,
+			 * this one is a control tall around a background one compact control
+			 * tall, so both bars sit on the same scale as the fields and buttons
+			 * beside them. */
 			.is-minimal-variant[data-orientation="horizontal"] & {
 				padding-inline: var(--wpds-dimension-padding-sm);
+				height: var(--wpds-dimension-size-lg);
+
+				&::after {
+					inset: 4px;
+				}
 			}
 
 			[data-orientation="vertical"] & {
