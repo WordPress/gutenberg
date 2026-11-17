@@ -420,7 +420,10 @@
 	display: flex;
 	align-items: flex-start;
 	width: 100%;
-	min-width: 0;
+	// Reserve room for the actions in the column, which the title uses at
+	// rest, so revealing the actions doesn't elide the title, nor wrap them.
+	// Capped like the title itself.
+	min-width: min(calc(var(--wp-dataviews-title-width, 0px) + var(--wp-dataviews-primary-actions-unwrapped-width, 0px)), 80ch);
 
 	> .dataviews-title-field {
 		flex: 0 1 auto;
