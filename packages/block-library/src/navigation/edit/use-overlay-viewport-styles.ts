@@ -1,23 +1,16 @@
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { unlock } from '../../lock-unlock';
+import { getViewportMediaQueries } from '@wordpress/global-styles-engine';
 import {
 	getInlineViewports,
 	type OverlayViewportMap,
 } from '../overlay-viewports';
 
-const { getResponsiveMediaQueries } = unlock< {
-	getResponsiveMediaQueries: (
-		viewportSettings: unknown,
-		options: { includeDesktop?: boolean }
-	) => Record< string, string >;
-} >( globalStylesEnginePrivateApis );
-
 /**
  * Returns the rules that show the links inline in a viewport.
  *
  * Mirrors `WP_Navigation_Block_Renderer::add_overlay_viewport_styles()`, so
- * keep the selectors and declarations in sync with it.
+ * keep the selectors and declarations in sync with it. The editor needs no
+ * hashed class, since the base selector is already unique to the block.
  *
  * @param base Selector of the Navigation wrapper.
  * @return Rules, keyed by selector.
@@ -68,6 +61,8 @@ function serializeDeclarations( declarations: Record< string, string > ) {
  * @param options                  Options.
  * @param options.clientId         Block client ID.
  * @param options.overlayViewports Viewport map from `getOverlayViewports()`.
+ * @return Whether any rules were added, in which case the Navigation wrapper
+ *         needs the `has-overlay-viewports` class for them to apply.
  */
 export default function useOverlayViewportStyles( {
 	clientId,
@@ -75,15 +70,22 @@ export default function useOverlayViewportStyles( {
 }: {
 	clientId: string;
 	overlayViewports: OverlayViewportMap | null;
-} ): void {
+} ): boolean {
 	const [ viewportSettings ] = useSettings( 'viewport' );
 	const inlineViewports = getInlineViewports( overlayViewports );
 	let css = '';
 	if ( inlineViewports.length ) {
-		const mediaQueries = getResponsiveMediaQueries( viewportSettings, {
-			includeDesktop: true,
-		} );
-		const rules = Object.entries( getInlineRules( `#block-${ clientId }` ) )
+		const mediaQueries = getViewportMediaQueries(
+			viewportSettings as Parameters<
+				typeof getViewportMediaQueries
+			>[ 0 ],
+			{ includeDesktop: true }
+		);
+		const rules = Object.entries(
+			getInlineRules(
+				`.wp-block-navigation.has-overlay-viewports:where(#block-${ clientId })`
+			)
+		)
 			.map(
 				( [ selector, declarations ] ) =>
 					`${ selector } {${ serializeDeclarations( declarations ) }}`
@@ -97,4 +99,6 @@ export default function useOverlayViewportStyles( {
 	}
 
 	useStyleOverride( { css } );
+
+	return css !== '';
 }

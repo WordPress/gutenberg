@@ -1,11 +1,9 @@
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
+import { getViewportMediaQueries } from '@wordpress/global-styles-engine';
 import useOverlayViewportStyles from '../use-overlay-viewport-styles';
 import type { OverlayViewportMap } from '../../overlay-viewports';
-import type { unlock } from '../../../lock-unlock';
-
-const mockGetResponsiveMediaQueries = vi.fn();
 
 vi.mock( import( '@wordpress/block-editor' ), () => ( {
 	useSettings: vi.fn(),
@@ -13,17 +11,12 @@ vi.mock( import( '@wordpress/block-editor' ), () => ( {
 } ) );
 
 vi.mock( import( '@wordpress/global-styles-engine' ), () => ( {
-	privateApis: {},
-} ) );
-
-vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( () => ( {
-		getResponsiveMediaQueries: ( ...args: unknown[] ) =>
-			mockGetResponsiveMediaQueries( ...args ),
-	} ) ) as typeof unlock,
+	getViewportMediaQueries: vi.fn(),
 } ) );
 
 const VIEWPORT_SETTINGS = { mobile: 480, tablet: 782 };
+
+const BASE = '.wp-block-navigation.has-overlay-viewports:where(#block-test)';
 
 const MEDIA_QUERIES = {
 	'@mobile': '@media (width <= 480px)',
@@ -52,17 +45,20 @@ function getExpectedRules( base: string ) {
 function renderOverlayViewportStyles(
 	overlayViewports: OverlayViewportMap | null
 ) {
-	renderHook( () =>
+	const { result } = renderHook( () =>
 		useOverlayViewportStyles( { clientId: 'test', overlayViewports } )
 	);
-	return ( useStyleOverride as Mock ).mock.calls.at( -1 )?.[ 0 ];
+	return {
+		hasStyles: result.current,
+		css: ( useStyleOverride as Mock ).mock.calls.at( -1 )?.[ 0 ]?.css,
+	};
 }
 
 describe( 'useOverlayViewportStyles', () => {
 	beforeEach( () => {
 		vi.clearAllMocks();
 		( useSettings as Mock ).mockReturnValue( [ VIEWPORT_SETTINGS ] );
-		mockGetResponsiveMediaQueries.mockReturnValue( MEDIA_QUERIES );
+		( getViewportMediaQueries as Mock ).mockReturnValue( MEDIA_QUERIES );
 	} );
 
 	it( 'shows the links inline on desktop for the tablet overlay', () => {
@@ -73,9 +69,8 @@ describe( 'useOverlayViewportStyles', () => {
 				desktop: false,
 			} )
 		).toEqual( {
-			css: `@media (width > 782px){${ getExpectedRules(
-				'#block-test'
-			) }}`,
+			hasStyles: true,
+			css: `@media (width > 782px){${ getExpectedRules( BASE ) }}`,
 		} );
 	} );
 
@@ -86,7 +81,7 @@ describe( 'useOverlayViewportStyles', () => {
 			desktop: false,
 		} );
 
-		expect( mockGetResponsiveMediaQueries ).toHaveBeenCalledWith(
+		expect( getViewportMediaQueries ).toHaveBeenCalledWith(
 			VIEWPORT_SETTINGS,
 			{ includeDesktop: true }
 		);
@@ -104,6 +99,7 @@ describe( 'useOverlayViewportStyles', () => {
 		],
 	] )( 'does not emit styles for %s', ( _, overlayViewports ) => {
 		expect( renderOverlayViewportStyles( overlayViewports ) ).toEqual( {
+			hasStyles: false,
 			css: '',
 		} );
 	} );
@@ -116,12 +112,12 @@ describe( 'useOverlayViewportStyles', () => {
 		} );
 
 		expect( css ).toBe(
-			`@media (width <= 480px){${ getExpectedRules( '#block-test' ) }}`
+			`@media (width <= 480px){${ getExpectedRules( BASE ) }}`
 		);
 	} );
 
 	it( 'skips viewports without a media query', () => {
-		mockGetResponsiveMediaQueries.mockReturnValue( {
+		( getViewportMediaQueries as Mock ).mockReturnValue( {
 			'@mobile': MEDIA_QUERIES[ '@mobile' ],
 			'@desktop': MEDIA_QUERIES[ '@desktop' ],
 		} );
@@ -133,7 +129,22 @@ describe( 'useOverlayViewportStyles', () => {
 		} );
 
 		expect( css ).toBe(
-			`@media (width > 782px){${ getExpectedRules( '#block-test' ) }}`
+			`@media (width > 782px){${ getExpectedRules( BASE ) }}`
 		);
+	} );
+
+	it( 'does not emit styles when no inline viewport has a media query', () => {
+		( getViewportMediaQueries as Mock ).mockReturnValue( {
+			'@mobile': MEDIA_QUERIES[ '@mobile' ],
+			'@desktop': MEDIA_QUERIES[ '@desktop' ],
+		} );
+
+		expect(
+			renderOverlayViewportStyles( {
+				mobile: true,
+				tablet: false,
+				desktop: true,
+			} )
+		).toEqual( { hasStyles: false, css: '' } );
 	} );
 } );

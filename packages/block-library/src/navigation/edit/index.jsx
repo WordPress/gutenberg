@@ -69,7 +69,6 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import {
-	getInlineViewports,
 	getOverlayViewports,
 	isOverlayAlwaysShown,
 	isOverlayResponsive,
@@ -293,7 +292,6 @@ function Navigation( {
 		() => getOverlayViewports( { overlayMenu } ),
 		[ overlayMenu ]
 	);
-	useOverlayViewportStyles( { clientId, overlayViewports } );
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -333,6 +331,10 @@ function Navigation( {
 		},
 		[ clientId ]
 	);
+	const hasOverlayViewportStyles = useOverlayViewportStyles( {
+		clientId,
+		overlayViewports: editorDisabledResponsive ? null : overlayViewports,
+	} );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -627,8 +629,6 @@ function Navigation( {
 
 	const isResponsive =
 		isOverlayResponsive( overlayViewports ) && ! editorDisabledResponsive;
-	const hasOverlayViewports =
-		isResponsive && getInlineViewports( overlayViewports ).length > 0;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -643,7 +643,8 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
-				'has-overlay-viewports': hasOverlayViewports,
+				'has-overlay-viewports':
+					isResponsive && hasOverlayViewportStyles,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
