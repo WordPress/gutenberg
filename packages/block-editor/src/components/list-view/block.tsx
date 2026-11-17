@@ -17,7 +17,7 @@ import {
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, SPACE, isAppleOS } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
@@ -428,17 +428,31 @@ function ListViewBlock( {
 	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
-		( event: MouseEvent | KeyboardEvent ) => {
-			// For keyboard activation (Enter/Space on a link), transfer focus
+		async ( event: MouseEvent | KeyboardEvent ) => {
+			// For Enter activation on a link, transfer focus
 			// to the canvas at the default initial position (start of the first
 			// field). For mouse clicks, keep focus in the list view so that
 			// subsequent keyboard operations (arrow navigation, copy/paste)
 			// still work.
-			const isKeyboardActivation = event?.detail === 0;
-			selectBlock( event, clientId, isKeyboardActivation ? 0 : null );
+			const isMembershipToggle =
+				! event.shiftKey &&
+				! event.altKey &&
+				( ( 'keyCode' in event && event.keyCode === SPACE ) ||
+					( isAppleOS() ? event.metaKey : event.ctrlKey ) );
+			const isKeyboardActivation =
+				event?.detail === 0 && ! isMembershipToggle;
 			event.preventDefault();
+			await selectBlock(
+				event,
+				clientId,
+				isKeyboardActivation ? 0 : null
+			);
+			if ( isMembershipToggle ) {
+				// Enabling/disabling the drag wrapper can remount the row's link.
+				await focusListItem( clientId, treeGridElementRef?.current );
+			}
 		},
-		[ clientId, selectBlock ]
+		[ clientId, selectBlock, treeGridElementRef ]
 	);
 
 	const updateFocusAndSelection = useCallback(

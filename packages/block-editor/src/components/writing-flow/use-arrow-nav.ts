@@ -299,7 +299,8 @@ export default function useArrowNav() {
 								anchorClientId!,
 								nextClientId,
 								getBlockParents( anchorClientId! ),
-								getBlockParents( nextClientId )
+								getBlockParents( nextClientId ),
+								true
 							);
 							multiSelect( start, end );
 							event.preventDefault();

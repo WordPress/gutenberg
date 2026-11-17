@@ -60,12 +60,39 @@ describe( 'explicit block selection', () => {
 	} );
 
 	it( 'selects blocks under different parents', () => {
+		const sixthCell = createBlock( 'core/test-selection' );
+		const extraCell = createBlock( 'core/test-selection' );
 		const section = createBlock( 'core/test-selection', {}, [
 			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),
-			createBlock( 'core/test-selection', {}, blocks.slice( 3 ) ),
+			createBlock( 'core/test-selection', {}, [
+				...blocks.slice( 3 ),
+				sixthCell,
+			] ),
 		] );
-		registry.dispatch( store ).resetBlocks( [ section ] );
-		const ids = [ blocks[ 1 ].clientId, blocks[ 4 ].clientId ];
+		const secondSection = createBlock( 'core/test-selection', {}, [
+			createBlock( 'core/test-selection', {}, [ extraCell ] ),
+		] );
+		registry.dispatch( store ).resetBlocks( [ section, secondSection ] );
+		const rectangle = [
+			blocks[ 1 ].clientId,
+			blocks[ 2 ].clientId,
+			blocks[ 4 ].clientId,
+			sixthCell.clientId,
+		];
+		registry.dispatch( store ).multiSelectSet( rectangle, null, {
+			anchorClientId: blocks[ 2 ].clientId,
+			focusClientId: blocks[ 4 ].clientId,
+		} );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			rectangle
+		);
+		expect(
+			registry.select( store ).getMultiSelectedBlocksStartClientId()
+		).toBe( blocks[ 2 ].clientId );
+		expect(
+			registry.select( store ).getMultiSelectedBlocksEndClientId()
+		).toBe( blocks[ 4 ].clientId );
+		const ids = [ ...rectangle, extraCell.clientId ];
 		registry.dispatch( store ).multiSelectSet( ids );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
 			ids

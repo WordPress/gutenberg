@@ -11,6 +11,46 @@ test.describe( 'List View', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'builds a non-contiguous selection using the List View keyboard (@firefox, @webkit)', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Charlie</p><!-- /wp:paragraph -->'
+		);
+		await editor.canvas.getByText( 'Alpha', { exact: true } ).click();
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const links = listView.getByRole( 'link', {
+			name: 'Paragraph',
+			exact: true,
+		} );
+		await links.nth( 0 ).focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await expect( links.nth( 2 ) ).toBeFocused();
+		await page.keyboard.press( 'Space' );
+		await expect( links.nth( 2 ) ).toBeFocused();
+		await expect(
+			listView
+				.getByRole( 'gridcell', { selected: true } )
+				.filter( { has: page.getByRole( 'link' ) } )
+		).toHaveCount( 2 );
+		await expect(
+			editor.canvas.locator( '.is-multi-selected' )
+		).toHaveCount( 2 );
+		await page.keyboard.press( 'Space' );
+		await expect(
+			listView
+				.getByRole( 'gridcell', { selected: true } )
+				.filter( { has: page.getByRole( 'link' ) } )
+		).toHaveCount( 1 );
+		await expect( links.nth( 2 ) ).toBeFocused();
+	} );
+
 	test( 'allows a user to drag a block to a new sibling position', async ( {
 		editor,
 		page,

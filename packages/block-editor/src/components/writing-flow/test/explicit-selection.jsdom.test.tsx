@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, act } from '@testing-library/react';
+import { useMergeRefs } from '@wordpress/compose';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import {
 	createBlock,
@@ -9,10 +10,13 @@ import {
 import type { Block } from '@wordpress/blocks';
 import { store } from '../../../store';
 import useClickSelection from '../use-click-selection';
+import useMultiSelection from '../use-multi-selection';
 
 function Canvas( { blocks }: { blocks: Block[] } ) {
 	return (
-		<div ref={ useClickSelection() }>
+		<div
+			ref={ useMergeRefs( [ useClickSelection(), useMultiSelection() ] ) }
+		>
 			{ blocks.map( ( block, index ) => (
 				<div
 					key={ block.clientId }
@@ -91,21 +95,81 @@ describe( 'explicit canvas selection', () => {
 				<Canvas blocks={ blocks } />
 			</RegistryProvider>
 		);
-		registry
-			.dispatch( store )
-			.multiSelectSet( [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ] );
+		act( () => {
+			registry
+				.dispatch( store )
+				.multiSelectSet( [
+					blocks[ 0 ].clientId,
+					blocks[ 2 ].clientId,
+				] );
+		} );
 		fireEvent.mouseDown( screen.getByText( 'Block 3' ), {
 			shiftKey: true,
 		} );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
 			blocks.map( ( block ) => block.clientId )
 		);
-		registry
-			.dispatch( store )
-			.multiSelectSet( [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ] );
+		act( () => {
+			registry
+				.dispatch( store )
+				.multiSelectSet( [
+					blocks[ 0 ].clientId,
+					blocks[ 2 ].clientId,
+				] );
+		} );
 		fireEvent.mouseDown( screen.getByText( 'Block 1' ) );
 		expect( registry.select( store ).getSelectedBlockClientId() ).toBe(
 			blocks[ 1 ].clientId
+		);
+		const parents = [
+			createBlock(
+				'core/test-canvas-selection',
+				{},
+				blocks.slice( 0, 2 )
+			),
+			createBlock( 'core/test-canvas-selection', {}, blocks.slice( 2 ) ),
+		];
+		act( () => {
+			registry.dispatch( store ).resetBlocks( parents );
+			registry
+				.dispatch( store )
+				.multiSelectSet( [
+					blocks[ 0 ].clientId,
+					blocks[ 2 ].clientId,
+				] );
+		} );
+		fireEvent.mouseDown( screen.getByText( 'Block 3' ), {
+			shiftKey: true,
+		} );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			parents.map( ( block ) => block.clientId )
+		);
+	} );
+
+	it( 'keeps canvas and List View selection synchronized', () => {
+		render(
+			<RegistryProvider value={ registry }>
+				<Canvas blocks={ blocks } />
+			</RegistryProvider>
+		);
+		const control = screen.getByRole( 'button', { name: 'Control 3' } );
+		control.focus();
+		const range = document.createRange();
+		range.selectNodeContents( screen.getByText( 'Block 1' ) );
+		document.getSelection()!.addRange( range );
+		act( () => {
+			// null is the external-focus contract used by List View.
+			registry
+				.dispatch( store )
+				.multiSelectSet(
+					[ blocks[ 0 ].clientId, blocks[ 2 ].clientId ],
+					null
+				);
+		} );
+		expect( document.getSelection()!.rangeCount ).toBe( 0 );
+		expect( control ).toHaveFocus();
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ blocks[ 0 ].clientId, blocks[ 2 ].clientId ]
 		);
 	} );
 } );

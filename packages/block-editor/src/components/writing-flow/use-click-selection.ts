@@ -139,7 +139,8 @@ export default function useClickSelection() {
 						startClientId,
 						clickedClientId,
 						getBlockParents( startClientId ),
-						getBlockParents( clickedClientId )
+						getBlockParents( clickedClientId ),
+						true
 					);
 					multiSelect( start, end );
 					return;
