@@ -151,4 +151,83 @@ test.describe( 'Navigation block - Overlay viewports', () => {
 		await expect( link ).toBeVisible();
 		await expect( openMenuButton ).toBeHidden();
 	} );
+
+	test.describe( 'with a per-language filter', () => {
+		// The plugin shows the overlay on mobile and tablet for `de`, and
+		// leaves other languages unfiltered.
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-navigation-overlay-viewports-locale'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-navigation-overlay-viewports-locale'
+			);
+		} );
+
+		test( 'updates the editor when the language changes', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await insertNavigation( editor, requestUtils );
+
+			const openMenuButton = editor.canvas.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const link = editor.canvas
+				.getByRole( 'textbox', { name: 'Navigation link text' } )
+				.filter( { hasText: 'Overlay Link One' } );
+			const setLanguage = ( language: string ) =>
+				page.evaluate( ( value ) => {
+					window.wp.data
+						.dispatch(
+							'gutenberg-test/navigation-overlay-viewports-locale'
+						)
+						.setLanguage( value );
+				}, language );
+
+			// The Tablet preview is wider than the default 600px breakpoint.
+			await switchDevicePreview( page, 'Tablet' );
+			await expect( link ).toBeVisible();
+			await expect( openMenuButton ).toBeHidden();
+
+			await setLanguage( 'de' );
+			await expect( openMenuButton ).toBeVisible();
+			await expect( link ).toBeHidden();
+
+			await setLanguage( '' );
+			await expect( link ).toBeVisible();
+			await expect( openMenuButton ).toBeHidden();
+		} );
+
+		test( 'uses the language from the query on the front end', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await insertNavigation( editor, requestUtils );
+			const postId = await editor.publishPost();
+
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			const link = page.getByRole( 'link', { name: 'Overlay Link One' } );
+
+			await page.setViewportSize( { width: 700, height: 800 } );
+			await page.goto( `/?p=${ postId }` );
+			await expect( link ).toBeVisible();
+			await expect( openMenuButton ).toBeHidden();
+
+			await page.goto( `/?p=${ postId }&lang=de` );
+			await expect( openMenuButton ).toBeVisible();
+			await expect( link ).toBeHidden();
+
+			await page.setViewportSize( { width: 900, height: 800 } );
+			await expect( link ).toBeVisible();
+			await expect( openMenuButton ).toBeHidden();
+		} );
+	} );
 } );
