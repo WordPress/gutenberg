@@ -86,9 +86,8 @@ function isOverlayViewportMap( value: unknown ): value is OverlayViewportMap {
  * whose callbacks receive the viewport map or `null`, the block attributes,
  * and the `WP_Block` instance or `null`.
  *
- * Call it on every render or store change rather than memoizing it on the
- * attributes, since a filter can depend on state outside them, such as the
- * current language.
+ * Call it on every render rather than memoizing it on the attributes, since a
+ * filter can depend on state outside them, such as the current language.
  *
  * @param attributes              Block attributes.
  * @param attributes.overlayMenu  The `overlayMenu` attribute. Untrusted.

@@ -66,6 +66,22 @@ describe( 'useFilteredOverlayViewports', () => {
 		expect( result.current ).toEqual( TABLET );
 	} );
 
+	it( 'updates when the block re-renders after state outside the stores changes', () => {
+		let language = 'en';
+		addFilter( HOOK, 'test/overlay-viewports', ( value ) =>
+			language === 'de' ? TABLET : value
+		);
+		const { result, rerender } = renderHook( () =>
+			useFilteredOverlayViewports( attributes, 'client-1' )
+		);
+		expect( result.current ).toBeNull();
+
+		language = 'de';
+		rerender();
+
+		expect( result.current ).toEqual( TABLET );
+	} );
+
 	it( 'keeps the same map while its values are unchanged', () => {
 		addFilter( HOOK, 'test/overlay-viewports', () => ( { ...TABLET } ) );
 		const { result, rerender } = renderHook( () =>

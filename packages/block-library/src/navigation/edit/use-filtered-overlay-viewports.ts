@@ -10,9 +10,15 @@ import OverlayPreviewContext from './overlay-preview-context';
  * Returns the viewports in which the Navigation overlay is shown, after
  * plugins have filtered them.
  *
- * The filter runs inside `useSelect`, so it runs again when any store that a
- * callback reads through `select()` changes, for example a plugin's current
- * language. The map keeps its identity while its values are unchanged.
+ * The filter runs on every render, so it picks up state outside the block
+ * attributes, such as a plugin's current language, whenever the block
+ * re-renders. It runs inside `useSelect`, so it also runs again when a store
+ * that a callback reads through `select()` changes. Stores are tracked this
+ * way only in the default registry, which the post and site editors use. The
+ * map keeps its identity while its values are unchanged.
+ *
+ * Filter callbacks must be pure, since `useSelect` may call them twice in a
+ * render in debug mode.
  *
  * @param attributes              Block attributes.
  * @param attributes.overlayMenu  The `overlayMenu` attribute. Untrusted.
@@ -29,11 +35,9 @@ export default function useFilteredOverlayViewports(
 ): OverlayViewportMap | null {
 	const isInOverlayPreview = useContext( OverlayPreviewContext );
 	const isInOverlay = isWithinOverlay || isInOverlayPreview;
-	return useSelect(
-		() =>
-			getFilteredOverlayViewports( attributes, clientId, {
-				isWithinOverlay: isInOverlay,
-			} ),
-		[ attributes, clientId, isInOverlay ]
+	return useSelect( () =>
+		getFilteredOverlayViewports( attributes, clientId, {
+			isWithinOverlay: isInOverlay,
+		} )
 	);
 }
