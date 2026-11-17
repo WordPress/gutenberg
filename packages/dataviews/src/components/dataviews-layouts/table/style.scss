@@ -1,25 +1,44 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "../../../dataviews/style" as *;
 
-// Width of the fades at the edges of the table while there are more columns to
-// scroll to. It matches the padding at the ends of the rows, which the fade
-// cells take the place of, so that the columns do not move.
+// Width of the cells at the edges of the table that cover the columns
+// scrolling under them, while there are more columns to scroll to. It matches
+// the padding at the ends of the rows, which the cells take the place of, so
+// that the columns do not move.
 $scroll-fade-size: var(--wpds-dimension-padding-2xl);
 
-// Without actions, the fade at the end of the rows is wider, and opaque over
-// its outer part, so that a vertical scrollbar over the edge of the table
-// (overlay scrollbars take no space) does not cut the columns off before they
-// fade out. The fade at the start keeps the padding of the components above
-// the table, so the first column lines up with them.
+// Without actions, the cell at the end of the rows is wider, so that a vertical
+// scrollbar over the edge of the table (overlay scrollbars take no space) does
+// not cut the columns off before they fade out. The cell at the start keeps the
+// padding of the components above the table, so the first column lines up with
+// them.
 $scroll-fade-end-size: var(--wpds-dimension-padding-3xl);
-$scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 
-// Fades the element with `--dataviews-view-table-fade-mask` while the scroll
-// position is within `$range`, and hides its share of the row line. Outside the
-// range, and when nothing scrolls, the element only covers its own space, so it
-// stays opaque and keeps the line. Browsers without scroll-driven animations
-// always fade.
-@mixin scroll-fade($range, $fill-mode: none) {
+// Width of the fade itself, over the columns next to a covering cell.
+$scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
+
+// Covers the columns scrolling under the element on its `$side` of the row
+// while the scroll position is within `$range`: the element is opaque, and an
+// outline in the row's background reaches over the columns next to it, fading
+// them out over `$scroll-fade-ramp`. The element also hides its share of the
+// row line. Outside the range, and when nothing scrolls, the element only
+// covers its own space, so the mask hides the outline and the element keeps
+// the line. Browsers without scroll-driven animations always fade.
+@mixin scroll-fade($side, $range, $fill-mode: none) {
+	$to: var(--dataviews-view-table-fade-to-#{$side});
+
+	--dataviews-view-table-fade-mask: linear-gradient(to #{$to}, transparent, #000 #{$scroll-fade-ramp});
+	// An outline, as Chrome does not paint a box shadow on these cells. The mask only
+	// keeps the part next to the columns: it is sized to the row's height,
+	// and does not reach past the edge of the row.
+	outline: $scroll-fade-ramp solid var(--dataviews-view-table-row-background);
+	mask-image: linear-gradient(to #{$to}, transparent #{$scroll-fade-ramp}, #000 #{$scroll-fade-ramp});
+	mask-position: #{$to};
+	mask-size: calc(100% + #{$scroll-fade-ramp}) 100%;
+	mask-repeat: no-repeat;
+	// Lets the mask reach the outline, outside the element's box.
+	mask-clip: no-clip;
+
 	@supports (animation-timeline: scroll()) {
 		animation: dataviews-view-table-scroll-fade linear $fill-mode;
 		animation-timeline: scroll(nearest inline);
@@ -68,12 +87,11 @@ $scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 			position: sticky;
 			inset-inline-end: 0;
 			background-color: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
-			// While there are more columns to scroll to, the masked strip at
-			// the start of the cell lets them show through, fading into the
-			// cell's own background, and the row line stops at the divider.
-			--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 #{$scroll-fade-size});
+			// While there are more columns to scroll to, the strip at the
+			// start of the cell covers them, they fade out next to it, and the
+			// row line stops at the divider.
 			--dataviews-view-table-fade-line-size: calc(100% - #{$scroll-fade-size}) 1px;
-			@include scroll-fade(normal calc(100% - 1px));
+			@include scroll-fade(end, normal calc(100% - 1px));
 
 			// Double rule between the strip and the actions, shown whenever
 			// the columns scroll, to set the actions apart from them.
@@ -112,6 +130,9 @@ $scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 	}
 	tr {
 		--dataviews-view-table-row-stroke: var(--wpds-color-stroke-surface-neutral-weak);
+		// The row's background, for the fades: they cover the columns with
+		// it beyond their own box, where they cannot inherit it.
+		--dataviews-view-table-row-background: var(--wp-dataviews-color-background, var(--wpds-color-background-surface-neutral-strong));
 		// Keeps the space of the line between rows. The cells draw the line
 		// itself, so the fades can hide it, see below.
 		border-top: 1px solid transparent;
@@ -145,6 +166,7 @@ $scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 		}
 
 		&.is-selected {
+			--dataviews-view-table-row-background: var(--wpds-color-background-interactive-brand-weak-active);
 			background-color: var(--wpds-color-background-interactive-brand-weak-active);
 			color: var(--wpds-color-foreground-content-neutral);
 
@@ -353,10 +375,10 @@ $scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 		padding-inline-start: calc(#{$scroll-fade-size} + var(--wpds-dimension-padding-sm));
 	}
 
-	// Sticky cells at the edges of each row fade the columns scrolling under
-	// them into the row's own background, while there are more columns to
-	// scroll to on their side. With actions, the sticky actions column fades
-	// the end instead.
+	// Sticky cells at the edges of each row cover the columns scrolling under
+	// them, and fade out the columns next to them, while there are more columns
+	// to scroll to on their side. With actions, the sticky actions column
+	// covers the end instead.
 	tr::before,
 	&:not(.has-actions) tr::after {
 		content: "";
@@ -374,17 +396,15 @@ $scroll-fade-end-opaque-size: var(--wpds-dimension-padding-lg);
 		inset-inline-start: 0;
 		// Above the positioned content of the cells that follow it.
 		z-index: 1;
-		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-start), transparent, #000);
 		// From the first pixel scrolled, through the end of the range.
-		@include scroll-fade(1px normal, forwards);
+		@include scroll-fade(start, 1px normal, forwards);
 	}
 
 	&:not(.has-actions) tr::after {
 		inset-inline-end: 0;
 		width: $scroll-fade-end-size;
 		min-width: $scroll-fade-end-size;
-		--dataviews-view-table-fade-mask: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, #000 calc(100% - #{$scroll-fade-end-opaque-size}));
-		@include scroll-fade(normal calc(100% - 1px));
+		@include scroll-fade(end, normal calc(100% - 1px));
 	}
 
 	// Each cell draws its share of the line between rows, so a fade can hide

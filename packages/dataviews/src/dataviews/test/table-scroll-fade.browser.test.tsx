@@ -87,10 +87,11 @@ function PostsTable( {
 // at their end with actions.
 const FADE_SIZE = 24;
 // `--wpds-dimension-padding-3xl`, the padding at the end of the rows without
-// actions, and `--wpds-dimension-padding-lg`, its opaque part, which an overlay
-// scrollbar may cover.
+// actions, which an overlay scrollbar may cover.
 const END_FADE_SIZE = 32;
-const END_FADE_OPAQUE_SIZE = 16;
+// `--wpds-dimension-padding-2xl`, the width of the fade over the columns next
+// to a covering cell.
+const FADE_RAMP = 24;
 // `--wpds-dimension-padding-md` and `--wpds-dimension-padding-sm`.
 const CELL_PADDING = 12;
 const COMPACT_CELL_PADDING = 8;
@@ -107,6 +108,10 @@ const getActionsCell = () =>
 	)!;
 const getDividerOpacity = () =>
 	getComputedStyle( getActionsHeader(), '::after' ).opacity;
+// While a fade is active, its mask is transparent only towards the columns;
+// at rest, it also hides the outline that reaches over them.
+const isFading = ( style: CSSStyleDeclaration ) =>
+	style.maskImage.includes( 'rgba(0, 0, 0, 0), ' );
 const getRows = () =>
 	Array.from(
 		document.querySelectorAll< HTMLTableRowElement >(
@@ -200,13 +205,13 @@ describe( 'DataViews table scroll fade', () => {
 
 			scrollToEnd();
 			await expect.poll( getLineSize ).toBe( '100% 1px' );
-			expect( getComputedStyle( getActionsCell() ).maskImage ).toBe(
-				'none'
+			expect( isFading( getComputedStyle( getActionsCell() ) ) ).toBe(
+				false
 			);
 		} );
 	} );
 
-	// Every fade is opaque towards the edge of the row it sits at.
+	// Every fade covers its own cell, and fades out the columns next to it.
 	it.each( [
 		[ 'ltr', 'left', 'right' ],
 		[ 'rtl', 'right', 'left' ],
@@ -219,10 +224,10 @@ describe( 'DataViews table scroll fade', () => {
 			await expect
 				.poll( () => getComputedStyle( row, '::before' ).maskImage )
 				.toBe(
-					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0))`
+					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
 				);
 			expect( getComputedStyle( row, '::after' ).maskImage ).toBe(
-				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) calc(100% - ${ END_FADE_OPAQUE_SIZE }px))`
+				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
 			);
 
 			await render( <PostsTable withActions dir={ dir } /> );
@@ -230,10 +235,29 @@ describe( 'DataViews table scroll fade', () => {
 			await expect
 				.poll( () => getComputedStyle( getActionsHeader() ).maskImage )
 				.toBe(
-					`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_SIZE }px)`
+					`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
 				);
 		}
 	);
+
+	it( 'reaches over the columns with the background of the row', async () => {
+		await render( <PostsTable /> );
+		scrollToMiddle();
+		const row = getRows()[ 1 ];
+
+		for ( const pseudo of [ '::before', '::after' ] ) {
+			const style = getComputedStyle( row, pseudo );
+			expect( style.outlineWidth ).toBe( `${ FADE_RAMP }px` );
+			expect( style.outlineColor ).toBe(
+				getComputedStyle( row ).backgroundColor
+			);
+			// The mask covers the outline next to the columns.
+			expect( style.maskSize ).toBe(
+				`calc(100% + ${ FADE_RAMP }px) 100%`
+			);
+			expect( style.maskClip ).toBe( 'no-clip' );
+		}
+	} );
 
 	// A fade that covers only its own space keeps its share of the row line,
 	// and one that covers columns hides it, so their lines fade out.
@@ -242,7 +266,7 @@ describe( 'DataViews table scroll fade', () => {
 		const row = getRows()[ 1 ];
 		const getFade = ( pseudo: '::before' | '::after' ) => {
 			const style = getComputedStyle( row, pseudo );
-			return [ style.maskImage !== 'none', style.backgroundSize ];
+			return [ isFading( style ), style.backgroundSize ];
 		};
 
 		await expect
@@ -267,8 +291,8 @@ describe( 'DataViews table scroll fade', () => {
 		// Wait for a frame, so a scroll timeline would have been resolved.
 		await new Promise( requestAnimationFrame );
 		const row = getRows()[ 1 ];
-		expect( getComputedStyle( row, '::before' ).maskImage ).toBe( 'none' );
-		expect( getComputedStyle( row, '::after' ).maskImage ).toBe( 'none' );
+		expect( isFading( getComputedStyle( row, '::before' ) ) ).toBe( false );
+		expect( isFading( getComputedStyle( row, '::after' ) ) ).toBe( false );
 	} );
 
 	describe( 'without actions', () => {
