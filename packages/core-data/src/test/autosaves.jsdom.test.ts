@@ -71,14 +71,18 @@ describe( 'autosaves', () => {
 	 * makes. These drive a real registry rather than asserting on a mocked
 	 * dispatch, so they cover resolution end to end.
 	 */
-	it( 'reports hasFetchedAutosave once getAutosave has resolved', async () => {
+	it( 'finishes resolution once the autosave has been fetched', async () => {
 		const registry = createTestRegistry();
 		mockFetch( () => [ AUTOSAVE ] );
 
 		expect(
 			registry
 				.select( coreDataStore )
-				.hasFetchedAutosave( 'post', POST_ID, AUTHOR_ID )
+				.hasFinishedResolution( 'getAutosave', [
+					'post',
+					POST_ID,
+					AUTHOR_ID,
+				] )
 		).toBe( false );
 
 		await registry
@@ -88,7 +92,11 @@ describe( 'autosaves', () => {
 		expect(
 			registry
 				.select( coreDataStore )
-				.hasFetchedAutosave( 'post', POST_ID, AUTHOR_ID )
+				.hasFinishedResolution( 'getAutosave', [
+					'post',
+					POST_ID,
+					AUTHOR_ID,
+				] )
 		).toBe( true );
 
 		expect(
@@ -98,7 +106,7 @@ describe( 'autosaves', () => {
 		).toEqual( AUTOSAVE );
 	} );
 
-	it( 'reports hasFetchedAutosave even when the author has no autosave', async () => {
+	it( 'finishes resolution even when the author has no autosave', async () => {
 		const registry = createTestRegistry();
 		mockFetch( () => [] );
 
@@ -109,7 +117,11 @@ describe( 'autosaves', () => {
 		expect(
 			registry
 				.select( coreDataStore )
-				.hasFetchedAutosave( 'post', POST_ID, AUTHOR_ID )
+				.hasFinishedResolution( 'getAutosave', [
+					'post',
+					POST_ID,
+					AUTHOR_ID,
+				] )
 		).toBe( true );
 		expect(
 			registry
@@ -134,7 +146,7 @@ describe( 'autosaves', () => {
 	// A single network failure must not disable autosaving for the rest of the
 	// session. `hasFinishedResolution` counts an errored resolution as finished,
 	// so this holds without the resolver reporting completion itself.
-	it( 'reports hasFetchedAutosave after a failed request', async () => {
+	it( 'finishes resolution after a failed request', async () => {
 		const registry = createTestRegistry();
 		mockFetch( () => {
 			throw new Error( 'Network error' );
@@ -148,14 +160,15 @@ describe( 'autosaves', () => {
 		expect(
 			registry
 				.select( coreDataStore )
-				.hasFetchedAutosave( 'post', POST_ID, AUTHOR_ID )
+				.hasFinishedResolution( 'getAutosave', [
+					'post',
+					POST_ID,
+					AUTHOR_ID,
+				] )
 		).toBe( true );
 	} );
 
-	// Nothing was requested, so nothing is known yet. Reporting this as fetched
-	// would let `isEditedPostAutosaveable` conclude there is no existing
-	// autosave before the current user has loaded.
-	it( 'does not report hasFetchedAutosave when the author is not yet known', async () => {
+	it( 'does not request anything when the author is not yet known', async () => {
 		const registry = createTestRegistry();
 		mockFetch( () => [ AUTOSAVE ] );
 
@@ -164,11 +177,6 @@ describe( 'autosaves', () => {
 			.getAutosave( 'post', POST_ID, undefined );
 
 		expect( triggerFetch ).not.toHaveBeenCalled();
-		expect(
-			registry
-				.select( coreDataStore )
-				.hasFetchedAutosave( 'post', POST_ID, undefined )
-		).toBe( false );
 	} );
 
 	it( 'does not return another author’s autosave', async () => {

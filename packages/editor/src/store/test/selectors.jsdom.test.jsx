@@ -104,8 +104,10 @@ selectorNames.forEach( ( name ) => {
 				return state.getCurrentUser && state.getCurrentUser();
 			},
 
-			hasFetchedAutosave() {
-				return state.hasFetchedAutosave && state.hasFetchedAutosave();
+			hasFinishedResolution() {
+				return (
+					state.hasFinishedResolution && state.hasFinishedResolution()
+				);
 			},
 
 			getAutosave() {
@@ -1414,8 +1416,10 @@ describe( 'selectors', () => {
 				},
 				postAutosavingLock: {},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return false;
 				},
 				getAutosave() {
@@ -1423,6 +1427,34 @@ describe( 'selectors', () => {
 						title: 'sassel',
 					};
 				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return false if the current user is not yet known', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {
+					title: 'sassel',
+				},
+				postAutosavingLock: {},
+				saving: {},
+				getCurrentUser() {},
+				// The resolver returns early without a user, which still
+				// counts as a finished resolution.
+				hasFinishedResolution() {
+					return true;
+				},
+				getAutosave() {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
@@ -1444,8 +1476,10 @@ describe( 'selectors', () => {
 				},
 				postAutosavingLock: {},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1473,8 +1507,10 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {},
@@ -1501,8 +1537,10 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1531,8 +1569,10 @@ describe( 'selectors', () => {
 					excerpt: 'foo',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {
@@ -1570,8 +1610,10 @@ describe( 'selectors', () => {
 							content: 'foo',
 						},
 						saving: {},
-						getCurrentUser() {},
-						hasFetchedAutosave() {
+						getCurrentUser() {
+							return { id: 1 };
+						},
+						hasFinishedResolution() {
 							return true;
 						},
 						getAutosave() {
@@ -1613,8 +1655,10 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				saving: {},
-				getCurrentUser() {},
-				hasFetchedAutosave() {
+				getCurrentUser() {
+					return { id: 1 };
+				},
+				hasFinishedResolution() {
 					return true;
 				},
 				getAutosave() {},

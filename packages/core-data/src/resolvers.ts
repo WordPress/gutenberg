@@ -746,8 +746,7 @@ export const getAutosaves =
  * versus one row.
  *
  * The `getAutosaves` resolver is left alone: it still fetches the whole
- * collection for callers that want it. Use `hasFetchedAutosave` to tell when
- * this request has completed.
+ * collection for callers that want it.
  *
  * @param postType The type of the parent post.
  * @param postId   The id of the parent post.

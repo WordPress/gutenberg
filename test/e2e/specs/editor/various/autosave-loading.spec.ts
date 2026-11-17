@@ -81,10 +81,13 @@ async function waitForAutosaveResolution( page: Page, postId: number ) {
 				const { select } = window.wp.data;
 				const authorId = select( 'core' ).getCurrentUser()?.id;
 
-				return select( 'core' ).hasFetchedAutosave(
-					'post',
-					id,
-					authorId
+				return (
+					authorId !== undefined &&
+					select( 'core' ).hasFinishedResolution( 'getAutosave', [
+						'post',
+						id,
+						authorId,
+					] )
 				);
 			}, postId )
 		)
@@ -254,9 +257,9 @@ test.describe( 'Autosave loading', () => {
 		await page.keyboard.press( 'End' );
 		await page.keyboard.type( ' edited' );
 
-		// `isEditedPostAutosaveable` returns false for as long as
-		// `hasFetchedAutosave` is false, which is how a resolution recorded
-		// under a key nothing reads disables autosaving with no visible error.
+		// `isEditedPostAutosaveable` returns false until `getAutosave` has
+		// resolved, which is how a resolution recorded under a key nothing
+		// reads disables autosaving with no visible error.
 		await expect
 			.poll( () =>
 				page.evaluate( () =>
