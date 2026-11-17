@@ -2944,24 +2944,21 @@ export const getAllowedBlocks = createRegistrySelector( ( select ) =>
 	)
 );
 
-export const __experimentalGetAllowedBlocks = createRegistrySelector(
-	( select ) =>
-		(
-			state: State,
-			rootClientId: string | null = null
-		): ReturnType< typeof getAllowedBlocks > => {
-			deprecated(
-				'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
-				{
-					alternative:
-						'wp.data.select( "core/block-editor" ).getAllowedBlocks',
-					since: '6.2',
-					version: '6.4',
-				}
-			);
-			return select( STORE_NAME ).getAllowedBlocks( rootClientId );
+export const __experimentalGetAllowedBlocks = (
+	state: State,
+	rootClientId: string | null = null
+) => {
+	deprecated(
+		'wp.data.select( "core/block-editor" ).__experimentalGetAllowedBlocks',
+		{
+			alternative:
+				'wp.data.select( "core/block-editor" ).getAllowedBlocks',
+			since: '6.2',
+			version: '6.4',
 		}
-);
+	);
+	return getAllowedBlocks( state, rootClientId );
+};
 
 /**
  * Returns the block to be directly inserted by the block appender.
