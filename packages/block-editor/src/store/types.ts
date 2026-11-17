@@ -25,6 +25,7 @@ import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
 	deviceTypeKey,
+	isFromInserterKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -593,7 +594,11 @@ export interface State {
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
 	highlightedBlock: string | null | undefined;
-	lastBlockInserted: { clientIds?: string[]; source?: string };
+	lastBlockInserted: {
+		clientIds?: string[];
+		source?: string;
+		isFromInserter?: boolean;
+	};
 	editedContentOnlySection: string | undefined;
 	blockVisibility: Record< string, boolean >;
 	viewportModalClientIds: string[] | null;
@@ -619,7 +624,10 @@ export interface State {
 	automaticChangeStatus?: 'pending' | 'final';
 }
 
-type BlocksMeta = { source?: string } & Record< string, unknown >;
+type BlocksMeta = {
+	source?: string;
+	[ isFromInserterKey ]?: boolean;
+} & Record< string, unknown >;
 
 export type Action =
 	| { type: 'CLEAR_BLOCK_REMOVAL_PROMPT' }
