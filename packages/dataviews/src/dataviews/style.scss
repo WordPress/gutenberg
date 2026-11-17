@@ -133,7 +133,6 @@
 .dataviews-title-field--clickable {
 	cursor: var(--wpds-cursor-control);
 	color: var(--wpds-color-foreground-interactive-neutral);
-	// The wrapper itself is the link when `renderItemLink` is used.
 	text-decoration: none;
 	&:hover {
 		color: var(--wpds-color-foreground-interactive-brand);
