@@ -5,7 +5,11 @@ import type { ActionButtonLinkProps } from './types';
 import styles from './style.module.css';
 
 /**
- * An action link with button styling for use within Notice.Actions.
+ * An action link with button styling for use within Notice.Actions. Prefer
+ * `Notice.ActionLink` for navigation unless button prominence is intentional.
+ *
+ * See the [Usage Guidelines](https://wordpress.github.io/gutenberg/?path=/docs/design-system-components-button-usage-guidelines--docs)
+ * for when to use `Button`, `Link`, or `ButtonLink`.
  */
 export const ActionButtonLink = forwardRef<
 	HTMLAnchorElement,

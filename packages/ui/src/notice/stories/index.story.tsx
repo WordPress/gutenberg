@@ -50,9 +50,6 @@ export const Default: Story = {
 				<Notice.ActionButton variant="outline">
 					Secondary button
 				</Notice.ActionButton>
-				<Notice.ActionButtonLink href="#" variant="outline">
-					Button link
-				</Notice.ActionButtonLink>
 				<Notice.ActionLink href="#">Link</Notice.ActionLink>
 			</Notice.Actions>,
 			<Notice.CloseIconButton key="closeIconButton" />,
@@ -112,7 +109,9 @@ export const NonDismissible: Story = {
 };
 
 /**
- * Pass `openInNewTab` to `Notice.ActionButtonLink` or `Notice.ActionLink` for external destinations. This adds `target="_blank"` and an accessible new-tab indicator.
+ * Pass `openInNewTab` to `Notice.ActionLink` or `Notice.ActionButtonLink` for external destinations. This adds `target="_blank"` and an accessible new-tab indicator.
+ *
+ * Prefer `Notice.ActionLink` for navigation. Use `Notice.ActionButtonLink` only when button prominence is intentional. See the [Usage Guidelines](?path=/docs/design-system-components-button-usage-guidelines--docs) for when to use `Button`, `Link`, or `ButtonLink`.
  */
 export const WithExternalLink: Story = {
 	args: {
