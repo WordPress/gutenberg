@@ -9,14 +9,20 @@ import {
 	it,
 	vi,
 } from 'vitest';
+import type { ComponentType } from 'react';
+import type { AnyAction } from 'redux';
 import { compose } from '@wordpress/compose';
 import { Component, createRef, forwardRef } from '@wordpress/element';
 import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
+import type { DataRegistry } from '../../../types';
 
 /* eslint-disable @wordpress/wp-global-usage */
+declare global {
+	var SCRIPT_DEBUG: boolean | undefined;
+}
 describe( 'withSelect', () => {
 	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
 
@@ -34,7 +40,10 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'reactReducer', {
 			reducer: () => ( { reactKey: 'reactState' } ),
 			selectors: {
-				reactSelector: ( state, key ) => state[ key ],
+				reactSelector: (
+					state: Record< string, string >,
+					key: string
+				) => state[ key ],
 			},
 		} );
 
@@ -45,13 +54,19 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
-			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
-		} ) );
+		const mapSelectToProps = vi.fn(
+			( _select, ownProps: Record< string, unknown > ) => ( {
+				data: _select( 'reactReducer' ).reactSelector(
+					ownProps.keyName as string
+				),
+			} )
+		);
 
-		const OriginalComponent = vi.fn( ( props ) => (
-			<div role="status">{ props.data }</div>
-		) );
+		const OriginalComponent = vi.fn(
+			( props: { data?: string; keyName?: string } ) => (
+				<div role="status">{ props.data }</div>
+			)
+		);
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
@@ -75,7 +90,7 @@ describe( 'withSelect', () => {
 		const user = userEvent.setup();
 		const registry = createRegistry();
 		registry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
+			reducer: ( state = 0, action: AnyAction ) => {
 				if ( action.type === 'increment' ) {
 					return state + 1;
 				}
@@ -83,7 +98,7 @@ describe( 'withSelect', () => {
 				return state;
 			},
 			selectors: {
-				getCount: ( state ) => state,
+				getCount: ( state: number ) => state,
 			},
 			actions: {
 				increment: () => ( { type: 'increment' } ),
@@ -98,14 +113,16 @@ describe( 'withSelect', () => {
 			increment: _dispatch( 'counter' ).increment,
 		} ) );
 
-		const OriginalComponent = vi.fn( ( props ) => (
-			<button onClick={ props.increment }>{ props.count }</button>
-		) );
+		const OriginalComponent = vi.fn(
+			( props: { increment?: () => void; count?: number } ) => (
+				<button onClick={ props.increment }>{ props.count }</button>
+			)
+		);
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
 			withDispatch( mapDispatchToProps ),
-		] )( OriginalComponent );
+		] )( OriginalComponent ) as ComponentType;
 
 		render(
 			<RegistryProvider value={ registry }>
@@ -140,9 +157,14 @@ describe( 'withSelect', () => {
 		// on mount are discouraged in React (breaks Suspense and React Async Mode)
 		// leaving in place for now under the assumption there's current usage
 		// of withSelect in GB that expects support.
-		class OriginalComponent extends Component {
-			constructor( props ) {
-				super( ...arguments );
+		interface OriginalComponentProps {
+			increment: () => void;
+			count: number;
+		}
+
+		class OriginalComponent extends Component< OriginalComponentProps > {
+			constructor( props: OriginalComponentProps ) {
+				super( props );
 
 				props.increment();
 			}
@@ -156,15 +178,15 @@ describe( 'withSelect', () => {
 			}
 		}
 
-		let testRegistry;
-		let renderSpy;
-		let mapSelectToProps;
-		let DataBoundComponent;
+		let testRegistry: DataRegistry;
+		let renderSpy: ReturnType< typeof vi.spyOn >;
+		let mapSelectToProps: ReturnType< typeof vi.fn >;
+		let DataBoundComponent: ComponentType;
 
 		beforeEach( () => {
 			testRegistry = createRegistry();
 			testRegistry.registerStore( 'counter', {
-				reducer: ( state = 0, action ) => {
+				reducer: ( state = 0, action: AnyAction ) => {
 					if ( action.type === 'increment' ) {
 						return state + 1;
 					}
@@ -172,7 +194,7 @@ describe( 'withSelect', () => {
 					return state;
 				},
 				selectors: {
-					getCount: ( state ) => state,
+					getCount: ( state: number ) => state,
 				},
 				actions: {
 					increment: () => ( { type: 'increment' } ),
@@ -181,15 +203,23 @@ describe( 'withSelect', () => {
 
 			renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
 			mapSelectToProps = vi.fn( ( _select ) => ( {
-				count: _select( 'counter' ).getCount(),
+				count: (
+					_select( 'counter' ) as {
+						getCount: () => number;
+					}
+				 ).getCount(),
 			} ) );
 			const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
 				increment: _dispatch( 'counter' ).increment,
 			} ) );
 			DataBoundComponent = compose( [
-				withSelect( mapSelectToProps ),
+				withSelect(
+					mapSelectToProps as unknown as Parameters<
+						typeof withSelect
+					>[ 0 ]
+				),
 				withDispatch( mapDispatchToProps ),
-			] )( OriginalComponent );
+			] )( OriginalComponent ) as ComponentType;
 		} );
 
 		it( 'should rerun if had dispatched action during mount', () => {
@@ -236,7 +266,7 @@ describe( 'withSelect', () => {
 	it( 'should rerun selection on props changes', () => {
 		const registry = createRegistry();
 		registry.registerStore( 'counter', {
-			reducer: ( state = 0, action ) => {
+			reducer: ( state = 0, action: AnyAction ) => {
 				if ( action.type === 'increment' ) {
 					return state + 1;
 				}
@@ -244,15 +274,19 @@ describe( 'withSelect', () => {
 				return state;
 			},
 			selectors: {
-				getCount: ( state, offset ) => state + offset,
+				getCount: ( state: number, offset: number ) => state + offset,
 			},
 		} );
 
-		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
-			count: _select( 'counter' ).getCount( ownProps.offset ),
-		} ) );
+		const mapSelectToProps = vi.fn(
+			( _select, ownProps: Record< string, unknown > ) => ( {
+				count: _select( 'counter' ).getCount(
+					ownProps.offset as number
+				),
+			} )
+		);
 
-		const OriginalComponent = vi.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props: { count?: number } ) => (
 			<div role="status">{ props.count }</div>
 		) );
 
@@ -284,7 +318,7 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: Record< string, unknown > ) => state,
 			},
 		} );
 
@@ -293,9 +327,9 @@ describe( 'withSelect', () => {
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
-		] )( OriginalComponent );
+		] )( OriginalComponent ) as ComponentType< { propName: string } >;
 
-		const Parent = ( props ) => (
+		const Parent = ( props: { propName: string } ) => (
 			<DataBoundComponent propName={ props.propName } />
 		);
 
@@ -359,7 +393,7 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: Record< string, unknown > ) => state,
 			},
 		} );
 
@@ -368,7 +402,7 @@ describe( 'withSelect', () => {
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
-		] )( OriginalComponent );
+		] )( OriginalComponent ) as ComponentType< { propName?: string } >;
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
@@ -394,7 +428,7 @@ describe( 'withSelect', () => {
 		const store = registry.registerStore( 'unchanging', {
 			reducer: ( state = {} ) => state,
 			selectors: {
-				getState: ( state ) => state,
+				getState: ( state: Record< string, unknown > ) => state,
 			},
 		} );
 
@@ -403,7 +437,7 @@ describe( 'withSelect', () => {
 
 		const DataBoundComponent = compose( [
 			withSelect( mapSelectToProps ),
-		] )( OriginalComponent );
+		] )( OriginalComponent ) as ComponentType;
 
 		render(
 			<RegistryProvider value={ registry }>
@@ -425,19 +459,24 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'demo', {
 			reducer: ( state = 'OK' ) => state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
-		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
-			return {
-				[ ownProps.propName ]: _select( 'demo' ).getValue(),
-			};
-		} );
+		const mapSelectToProps = vi.fn(
+			( _select, ownProps: Record< string, unknown > ) => {
+				return {
+					[ ownProps.propName as string ]:
+						_select( 'demo' ).getValue(),
+				};
+			}
+		);
 
-		const OriginalComponent = vi.fn( ( props ) => (
-			<div role="status">{ JSON.stringify( props ) }</div>
-		) );
+		const OriginalComponent = vi.fn(
+			( props: Record< string, unknown > ) => (
+				<div role="status">{ JSON.stringify( props ) }</div>
+			)
+		);
 
 		const DataBoundComponent =
 			withSelect( mapSelectToProps )( OriginalComponent );
@@ -481,23 +520,27 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'demo', {
 			reducer: ( state = 'OK' ) => state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
-		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
-			if ( ownProps.pass ) {
-				return {
-					count: _select( 'demo' ).getValue(),
-				};
+		const mapSelectToProps = vi.fn(
+			( _select, ownProps: Record< string, unknown > ) => {
+				if ( ownProps.pass ) {
+					return {
+						count: _select( 'demo' ).getValue(),
+					};
+				}
+				return undefined;
 			}
-		} );
+		);
 
-		const OriginalComponent = vi.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props: { count?: string } ) => (
 			<div role="status">{ props.count || 'Unknown' }</div>
 		) );
 
 		const DataBoundComponent =
+			// @ts-expect-error Testing undefined return from mapSelectToProps.
 			withSelect( mapSelectToProps )( OriginalComponent );
 
 		const { rerender } = render(
@@ -534,10 +577,10 @@ describe( 'withSelect', () => {
 	it( 'should limit unnecessary selections run on children', async () => {
 		const registry = createRegistry();
 		registry.registerStore( 'childRender', {
-			reducer: ( state = true, action ) =>
+			reducer: ( state = true, action: AnyAction ) =>
 				action.type === 'TOGGLE_RENDER' ? ! state : state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: boolean ) => state,
 			},
 			actions: {
 				toggleRender: () => ( { type: 'TOGGLE_RENDER' } ),
@@ -550,9 +593,11 @@ describe( 'withSelect', () => {
 		} ) );
 
 		const ChildOriginalComponent = vi.fn( () => <div /> );
-		const ParentOriginalComponent = vi.fn( ( props ) => (
-			<div>{ props.isRenderingChild ? <Child /> : null }</div>
-		) );
+		const ParentOriginalComponent = vi.fn(
+			( props: { isRenderingChild?: boolean } ) => (
+				<div>{ props.isRenderingChild ? <Child /> : null }</div>
+			)
+		);
 
 		const Child = withSelect( childMapSelectToProps )(
 			ChildOriginalComponent
@@ -589,7 +634,7 @@ describe( 'withSelect', () => {
 		firstRegistry.registerStore( 'demo', {
 			reducer: ( state = 'first' ) => state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
@@ -597,7 +642,7 @@ describe( 'withSelect', () => {
 			value: _select( 'demo' ).getValue(),
 		} ) );
 
-		const OriginalComponent = vi.fn( ( props ) => (
+		const OriginalComponent = vi.fn( ( props: { value?: string } ) => (
 			<div role="status">{ props.value }</div>
 		) );
 
@@ -619,7 +664,7 @@ describe( 'withSelect', () => {
 		secondRegistry.registerStore( 'demo', {
 			reducer: ( state = 'second' ) => state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
@@ -642,21 +687,26 @@ describe( 'withSelect', () => {
 		registry.registerStore( 'demo', {
 			reducer: ( state = 'value' ) => state,
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
-		const OriginalComponent = forwardRef( ( { value }, ref ) => (
+		const OriginalComponent = forwardRef<
+			HTMLDivElement,
+			{ value?: string }
+		>( ( { value }, ref ) => (
 			<div ref={ ref } role="status">
 				{ value }
 			</div>
 		) );
 
-		const DataBoundComponent = withSelect( ( _select ) => ( {
-			value: _select( 'demo' ).getValue(),
-		} ) )( OriginalComponent );
+		const DataBoundComponent = withSelect(
+			( _select: DataRegistry[ 'select' ] ) => ( {
+				value: _select( 'demo' ).getValue(),
+			} )
+		)( OriginalComponent );
 
-		const ref = createRef();
+		const ref = createRef< HTMLDivElement >();
 
 		render(
 			<RegistryProvider value={ registry }>
