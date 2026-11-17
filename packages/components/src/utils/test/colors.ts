@@ -1,12 +1,5 @@
-import { describe, expect, it, test } from 'vitest';
-import { getOptimalTextColor, getOptimalTextShade, rgba } from '../colors';
-
-describe( 'rbga', () => {
-	it( 'should output the expected string', () => {
-		expect( rgba( '#000000', 0.5 ) ).toBe( 'rgba(0, 0, 0, 0.5)' );
-		expect( rgba( '#f00', 0.2 ) ).toBe( 'rgba(255, 0, 0, 0.2)' );
-	} );
-} );
+import { describe, expect, test } from 'vitest';
+import { getOptimalTextColor, getOptimalTextShade } from '../colors';
 
 describe( 'getOptimalTextColor', () => {
 	test( 'should be white for dark backgrounds', () => {

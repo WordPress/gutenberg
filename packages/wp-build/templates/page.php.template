@@ -7,6 +7,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes     = array();
@@ -88,10 +92,10 @@ function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
  */
 function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 	// Define paths to preload - same for all pages
-	// This must exactly match the _fields list in packages/core-data/src/entities.js,
+	// This must exactly match the _fields list in packages/core-data/src/entities.ts,
 	// same fields in the same order, or the preload is never consumed.
 	$preload_paths = array(
-		'/?_fields=description,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
+		'/?_fields=description,generate_animated_image_subsizes,gmt_offset,home,image_max_bit_depth,image_sizes,image_size_threshold,image_strip_meta,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
 		array( '/wp/v2/settings', 'OPTIONS' ),
 	);
 
@@ -164,7 +168,7 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		// This script serves two purposes:
 		// 1. It ensures all the globals that are made available to the modules are loaded.
 		// 2. It initializes the boot module as an inline script.
-		wp_register_script( '{{PAGE_SLUG}}-prerequisites', '', $asset['dependencies'], $asset['version'], true );
+		wp_register_script( '{{PAGE_SLUG}}-prerequisites', false, $asset['dependencies'], $asset['version'], true );
 
 		// Add inline script to initialize the app
 		$init_modules = {{INIT_MODULES_JSON}};
@@ -188,6 +192,22 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 			}
 		);
 		wp_register_style( '{{PAGE_SLUG}}-prerequisites', false, $style_dependencies, $asset['version'] );
+
+		// Base styles for the full-page screen, which renders without the wp-admin stylesheets.
+		$page_styles = <<<'CSS'
+		html {
+			background: #f1f1f1;
+			color: #444;
+			font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+			font-size: 13px;
+			line-height: 1.4em;
+		}
+		body {
+			margin: 0;
+		}
+		#wpadminbar { display: none; }
+		CSS;
+		wp_add_inline_style( '{{PAGE_SLUG}}-prerequisites', $page_styles );
 
 		// Build dependencies for {{PAGE_SLUG}} module
 		$boot_dependencies = array(
@@ -252,19 +272,6 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		<meta charset="<?php bloginfo( 'charset' ); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title><?php echo esc_html( get_admin_page_title() ); ?></title>
-		<style>
-			html {
-				background: #f1f1f1;
-				color: #444;
-				font-family: -apple-system, system-ui, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-				font-size: 13px;
-				line-height: 1.4em;
-			}
-			body {
-				margin: 0;
-			}
-			#wpadminbar { display: none; }
-		</style>
 	<?php
 	global $hook_suffix;
 	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
@@ -285,17 +292,14 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 	<body class="{{PAGE_SLUG}} no-js">
 	<?php
 	// BEGIN see wp-admin/admin-header.php
-	?>
-	<script type="text/javascript">
-		document.body.className = document.body.className.replace( 'no-js', 'js' );
-	</script>
-	<?php
+	wp_print_inline_script_tag( "document.body.className = document.body.className.replace( 'no-js', 'js' );" );
 	// END see wp-admin/admin-header.php
 	?>
 		<div class="wrap hide-if-js" style="margin: 20px;">
 			<h1 class="wp-heading-inline"><?php echo esc_html( get_admin_page_title() ); ?></h1>
 			<?php
 			wp_admin_notice(
+				// phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Core string, translated in the default text domain.
 				__( 'This screen requires JavaScript. Enable JavaScript in your browser settings and reload the page.' ),
 				array( 'type' => 'error' )
 			);
@@ -343,7 +347,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 
 		if ( ! current_user_can( '{{CAPABILITY}}' ) ) {
 			wp_die(
-				__( 'Sorry, you are not allowed to access this page.' ),
+				// phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- Core string, translated in the default text domain.
+				esc_html__( 'Sorry, you are not allowed to access this page.' ),
 				403
 			);
 		}

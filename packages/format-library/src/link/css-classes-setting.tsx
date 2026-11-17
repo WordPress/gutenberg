@@ -11,7 +11,7 @@ import { Stack, VisuallyHidden } from '@wordpress/ui';
  * Props for the Link UI's "Additional CSS class(es)" setting.
  */
 export interface CSSClassesSettingProps {
-	setting: { id: string; title: string };
+	setting: { id: string; title?: string };
 	value?: { cssClasses?: string };
 	onChange: ( newValue: { cssClasses?: string } ) => void;
 }

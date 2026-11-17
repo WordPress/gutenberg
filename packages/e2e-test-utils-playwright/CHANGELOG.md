@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `RequestUtils`: Open a new connection for each request, so requests no longer fail intermittently with "socket hang up" ([#86350](https://github.com/WordPress/gutenberg/pull/86350)).
+
+## 3.2.0 (2026-11-04)
+
+### Bug Fixes
+
+-   `RequestUtils`: `activateTheme()` and `setupRest()` now use the site the `RequestUtils` was created with, rather than always the `WP_BASE_URL` environment variable ([#85420](https://github.com/WordPress/gutenberg/pull/85420)).
+-   `Admin`: `createNewPost()` now waits until the editor has rendered into the canvas, so key presses right after it are not lost ([#85974](https://github.com/WordPress/gutenberg/pull/85974)).
+
+### Internal
+
+-   Convert the remaining viewport and widget utilities to TypeScript ([#84917](https://github.com/WordPress/gutenberg/pull/84917)).
+
+## 3.1.0 (2026-10-20)
+
 ## 3.0.0 (2026-10-07)
 
 ### Breaking Changes

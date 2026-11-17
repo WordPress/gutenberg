@@ -23,7 +23,11 @@ export function useBlockRefProvider(
 	);
 }
 
-function assignRef( ref: Ref< Element | null >, value: Element | null ) {
+function assignRef(
+	ref: Ref< Element | null | undefined >,
+	// A block without a registered element reads as `undefined`.
+	value: Element | null | undefined
+) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref ) {
@@ -40,7 +44,7 @@ function assignRef( ref: Ref< Element | null >, value: Element | null ) {
  */
 export function useBlockElementRef(
 	clientId: string,
-	ref: Ref< Element | null >
+	ref: Ref< Element | null | undefined >
 ) {
 	const { refsMap } = useContext( BlockRefs );
 	useLayoutEffect( () => {
@@ -64,9 +68,9 @@ export function useBlockElementRef(
  * @return The block's wrapper element.
  */
 export function useBlockElement( clientId: string ) {
-	const [ blockElement, setBlockElement ] = useState< Element | null >(
-		null
-	);
+	const [ blockElement, setBlockElement ] = useState<
+		Element | null | undefined
+	>( null );
 	useBlockElementRef( clientId, setBlockElement );
 	return blockElement;
 }

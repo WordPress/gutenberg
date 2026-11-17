@@ -3,8 +3,8 @@ import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
 	Icon as WCIcon,
-	Notice,
-	Popover,
+	Notice as WCNotice,
+	Popover as WCPopover,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { check, chevronDown } from '@wordpress/icons';
@@ -96,7 +96,7 @@ export function UploadStatusPopover( {
 				{ buttonLabel }
 			</Button>
 			{ isOpen && (
-				<Popover
+				<WCPopover
 					className="media-upload-modal__upload-status__popover"
 					placement="top-start"
 					offset={ 8 }
@@ -138,7 +138,7 @@ export function UploadStatusPopover( {
 									</span>
 								) }
 								{ file.status === 'error' && (
-									<Notice
+									<WCNotice
 										status="error"
 										isDismissible={ !! onDismissError }
 										onRemove={ () =>
@@ -146,12 +146,12 @@ export function UploadStatusPopover( {
 										}
 									>
 										{ file.name }: { file.error }
-									</Notice>
+									</WCNotice>
 								) }
 							</li>
 						) ) }
 					</ul>
-				</Popover>
+				</WCPopover>
 			) }
 		</div>
 	);

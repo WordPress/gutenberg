@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 // Load the tokens that the production build also supplies as fallbacks.
-import '../../../../theme/prebuilt/css/design-tokens.css';
+import '@wordpress/theme/design-tokens.css';
 import {
 	Card,
 	CardBody,
@@ -323,7 +323,7 @@ describe( 'Card', () => {
 
 		expect(
 			getComputedStyle( screen.getByTestId( 'footer' ) ).justifyContent
-		).toBe( 'flex-end' );
+		).toBe( 'flow-end' );
 	} );
 
 	it( 'makes CardBody scrollable when requested', async () => {

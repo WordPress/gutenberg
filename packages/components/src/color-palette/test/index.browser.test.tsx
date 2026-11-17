@@ -5,6 +5,7 @@ import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import { logged } from '@wordpress/deprecated';
 import ColorPalette from '..';
+import '../../popover/style.scss';
 
 const EXAMPLE_COLORS = [
 	{ name: 'red', color: '#f00' },
@@ -243,6 +244,44 @@ describe( 'ColorPalette', () => {
 		);
 
 		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'keeps the color format selector above the ColorPalette popup and returns focus after dismissal', async () => {
+		const user = userEvent.setup();
+		delete (
+			window as Window & { __wpUiCompatOverlaySlotEnabled?: boolean }
+		 ).__wpUiCompatOverlaySlotEnabled;
+		await render( <ControlledColorPalette /> );
+		const pickerTrigger = screen.getByRole( 'button', {
+			name: /^Custom color picker/,
+		} );
+		await user.click( pickerTrigger );
+		const formatTrigger = screen.getByRole( 'combobox', {
+			name: 'Color format',
+		} );
+		await user.click( formatTrigger );
+		const hslOption = screen.getByRole( 'option', { name: 'HSL' } );
+		await waitFor( () => {
+			const { x, y, width, height } = hslOption.getBoundingClientRect();
+			expect(
+				hslOption.contains(
+					document.elementFromPoint( x + width / 2, y + height / 2 )
+				)
+			).toBe( true );
+		} );
+		await user.click( hslOption );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Hue (HSL H value)' } )
+		).toBeVisible();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		await user.click( formatTrigger );
+		await user.keyboard( '{Escape}' );
+		await waitFor( () => expect( formatTrigger ).toHaveFocus() );
+		expect(
+			screen.queryByRole( 'option', { name: 'HSL' } )
+		).not.toBeInTheDocument();
+		expect( pickerTrigger ).toHaveAttribute( 'aria-expanded', 'true' );
 	} );
 
 	it( 'should render dropdown and its content', async () => {

@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `safeHTML`: Also strip script URLs and the `object`, `embed`, `base`, `meta`, `noscript` and `template` elements, sandbox iframes that the same-origin policy doesn't isolate, and no longer return markup that changes when it is parsed again ([#86176](https://github.com/WordPress/gutenberg/pull/86176)).
+
+## 5.1.0 (2026-11-04)
+
+### Bug Fixes
+
+-   `isVerticalEdge` and `isHorizontalEdge`: No longer scroll the page to find the edge, and find the vertical edge when it is just outside the viewport ([#85408](https://github.com/WordPress/gutenberg/pull/85408)).
+-   Make the `inline` argument to `removeInvalidHTML` optional in its types, matching existing behavior ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+### Internal
+
+-   Convert the remaining tests to TypeScript ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+## 5.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

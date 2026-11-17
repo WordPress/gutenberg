@@ -23,11 +23,12 @@
 }
 
 .editor-notices.notices-inline-notices-wrapper,
-.editor-notices .components-notice-list {
+.editor-notices .notices-inline-notices__list {
 	gap: 0;
 }
 
-.editor-notices .components-notice {
+.editor-notices .notices-inline-notices__notice,
+.editor-notices .editor-template-validation-notice {
 	border-top-width: 0;
 	border-inline-width: 0;
 }

@@ -1,6 +1,5 @@
 import clsx from 'clsx';
-import { useState, useEffect, useCallback } from '@wordpress/element';
-import { usePrevious } from '@wordpress/compose';
+import { useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
@@ -30,24 +29,18 @@ export function Caption( {
 	...props
 } ) {
 	const caption = attributes[ attributeKey ];
-	const prevCaption = usePrevious( caption );
 	const isCaptionEmpty = RichText.isEmpty( caption );
-	const isPrevCaptionEmpty = RichText.isEmpty( prevCaption );
 	const [ showCaption, setShowCaption ] = useState( ! isCaptionEmpty );
 
 	// We need to show the caption when changes come from
 	// history navigation(undo/redo).
-	useEffect( () => {
-		if ( ! isCaptionEmpty && isPrevCaptionEmpty ) {
-			setShowCaption( true );
-		}
-	}, [ isCaptionEmpty, isPrevCaptionEmpty ] );
+	if ( ! isCaptionEmpty && ! showCaption ) {
+		setShowCaption( true );
+	}
 
-	useEffect( () => {
-		if ( ! isSelected && isCaptionEmpty ) {
-			setShowCaption( false );
-		}
-	}, [ isSelected, isCaptionEmpty ] );
+	if ( ! isSelected && isCaptionEmpty && showCaption ) {
+		setShowCaption( false );
+	}
 
 	// Focus the caption when we click to add one.
 	const ref = useCallback(

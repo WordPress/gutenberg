@@ -89,7 +89,7 @@ export default function usePatternCategories() {
 
 		sortedCategories.unshift( {
 			name: PATTERN_USER_CATEGORY,
-			label: __( 'My patterns' ),
+			label: __( 'Site patterns' ),
 			count: userPatterns.length,
 		} );
 

@@ -13,7 +13,7 @@
  * MIT License: https://opensource.org/licenses/MIT
  */
 import { addImportMap, resolve } from './resolver';
-import { initPromise, topLevelLoad, preloadModule } from './loader';
+import { topLevelLoad, preloadModule } from './loader';
 
 type ImportMap = {
 	imports?: Record< string, string >;
@@ -34,7 +34,6 @@ Object.defineProperty( self, 'wpInteractivityRouterImport', {
 } );
 
 async function importShim< Module = unknown >( id: string ) {
-	await initPromise;
 	return topLevelLoad< Module >( resolve( id, pageBaseUrl ), {
 		credentials: 'same-origin',
 	} );
@@ -70,7 +69,6 @@ export async function importWithMap< Module = unknown >(
  */
 export async function preloadWithMap( id: string, importMapIn: ImportMap ) {
 	addImportMap( importMapIn );
-	await initPromise;
 	return preloadModule( resolve( id, pageBaseUrl ), {
 		credentials: 'same-origin',
 	} );

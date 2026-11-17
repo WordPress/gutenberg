@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import styles from '../style.module.scss';
-import { COLORS, CONFIG } from '../../utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import type { Border } from '../../border-control/types';
@@ -8,13 +7,12 @@ import type { VisualizerProps } from '../types';
 
 const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
-		color = COLORS.gray[ 200 ],
+		color = 'var(--wpds-color-stroke-surface-neutral)',
 		style = 'solid',
-		width = CONFIG.borderWidth,
+		width = 'var(--wpds-border-width-xs)',
 	} = border || {};
 
-	const clampedWidth =
-		width !== CONFIG.borderWidth ? `clamp(1px, ${ width }, 10px)` : width;
+	const clampedWidth = `clamp(1px, ${ width }, 10px)`;
 	const hasVisibleBorder = ( !! width && width !== '0' ) || !! color;
 	const borderStyle = hasVisibleBorder ? style || 'solid' : style;
 

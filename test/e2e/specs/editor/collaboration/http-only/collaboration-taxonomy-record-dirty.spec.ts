@@ -7,8 +7,8 @@ import { test, expect } from '../fixtures';
  * Opening the pre-publish panel resolves the default category record, which
  * loads the term document into the sync manager. When another peer has the
  * same term document loaded, its updates are relayed to this client. The
- * default sync config must not report the unchanged record as edits when
- * those updates arrive. If it does, the term becomes dirty,
+ * taxonomy sync config must not report read-only data as edits when those
+ * updates arrive. If it does, the term becomes dirty,
  * `hasNonPostEntityChanges()` returns true, and the Publish button silently
  * turns into "Save".
  */
@@ -47,11 +47,32 @@ test.describe( 'Collaboration - synced taxonomy records', () => {
 			} ).toPass( { timeout: 20000 } );
 		};
 
+		const waitForCategorySyncExchange = ( target: Page ) =>
+			target.waitForResponse(
+				( response ) =>
+					response.url().includes( 'wp-sync' ) &&
+					response.status() === 200 &&
+					( response.request().postData() ?? '' ).includes(
+						'taxonomy/category'
+					),
+				{ timeout: 20000 }
+			);
+
 		// Session 1: open the post and the pre-publish panel. This resolves
 		// the default category record and loads the term document into the
 		// sync manager, which starts exchanging it with the server.
 		await collaborationUtils.openPost( post.id );
 		await openPrePublishPanel( page );
+		await waitForCategorySyncExchange( page );
+
+		// Publishing another post changes the category's read-only count.
+		// The second tab receives the new count from REST while the first
+		// tab and the shared document still hold the previous count.
+		await requestUtils.createPost( {
+			title: 'Change the category count',
+			status: 'publish',
+			date_gmt: new Date().toISOString(),
+		} );
 
 		// Session 2: a second tab for the same user opens the same post and
 		// panel. Each tab is a distinct sync client, so the term document
@@ -63,22 +84,12 @@ test.describe( 'Collaboration - synced taxonomy records', () => {
 
 		// Wait until both tabs have exchanged sync messages that include the
 		// default category room.
-		const waitForCategorySyncExchange = ( target: Page ) =>
-			target.waitForResponse(
-				( response ) =>
-					response.url().includes( 'wp-sync' ) &&
-					response.status() === 200 &&
-					( response.request().postData() ?? '' ).includes(
-						'taxonomy/category'
-					),
-				{ timeout: 20000 }
-			);
 		await Promise.all( [
 			waitForCategorySyncExchange( page ),
 			waitForCategorySyncExchange( page2 ),
 		] );
 
-		// The relayed updates carry no actual changes, so the term record
+		// Only the read-only category count differs, so the term record
 		// must not accumulate edits in either tab. Poll across several sync
 		// cycles; on regression the record turns dirty within one cycle.
 		const watchForDirtyCategory = ( target: Page ) =>

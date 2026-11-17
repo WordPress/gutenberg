@@ -32,9 +32,24 @@
 	}
 
 	.block-editor-block-styles__item-text {
-		// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
-		text-align: start;
-		text-align-last: center;
+		text-align: center;
+		// Without this, the ellipsis of a centered line is partially clipped.
+		padding-inline: $grid-unit-05;
+		margin-inline: -$grid-unit-05;
+	}
+
+	// Forced colors discard the solid background that marks the active style,
+	// so fill it with the system selection colors instead. Opting out of color
+	// adjustment removes the text backplate, which would otherwise cover the
+	// fill, so the focus ring needs an explicit system color too.
+	.block-editor-block-styles__item[aria-checked="true"] {
+		@media (forced-colors: active) {
+			forced-color-adjust: none;
+			outline-color: CanvasText;
+			background-color: SelectedItem;
+			color: SelectedItemText;
+			border-color: ButtonBorder;
+		}
 	}
 }
 

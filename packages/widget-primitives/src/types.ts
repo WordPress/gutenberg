@@ -412,4 +412,11 @@ export interface WidgetModuleRecord extends WidgetModuleRecordOverrides {
 	 * attributes stand; otherwise entries merge with the module's by `id`.
 	 */
 	attributes?: WidgetAttributeRecord[] | null;
+
+	/**
+	 * Structured example in wire form: the shape of the runtime field, with
+	 * JSON values. `null`/absent means the module's example stands; a module
+	 * that declares its own wins, so values that need code stay there.
+	 */
+	example?: WidgetTypeMetadata[ 'example' ] | null;
 }

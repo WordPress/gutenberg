@@ -1,19 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { createCSSUnitValue, parseCSSUnitValue } from '../unit-values';
+import { parseCSSUnitValue } from '../unit-values';
 
 describe( 'unit-values', () => {
-	describe( 'createCSSUnitValue', () => {
-		it.each`
-			value     | unit      | output
-			${ 100 }  | ${ 'em' } | ${ '100em' }
-			${ '40' } | ${ 'vw' } | ${ '40vw' }
-		`(
-			'should combine $value and $unit to create $output',
-			( { value, unit, output } ) =>
-				expect( createCSSUnitValue( value, unit ) ).toEqual( output )
-		);
-	} );
-
 	describe( 'parseCSSUnitValue', () => {
 		it.each`
 			value                  | output
@@ -35,6 +23,12 @@ describe( 'unit-values', () => {
 			${ '10vmin' }          | ${ [ 10, 'vmin' ] }
 			${ '10vmax' }          | ${ [ 10, 'vmax' ] }
 			${ '10 vmax' }         | ${ [ 10, 'vmax' ] }
+			${ '10cqw' }           | ${ [ 10, 'cqw' ] }
+			${ '10cqh' }           | ${ [ 10, 'cqh' ] }
+			${ '10cqi' }           | ${ [ 10, 'cqi' ] }
+			${ '10cqb' }           | ${ [ 10, 'cqb' ] }
+			${ '10cqmin' }         | ${ [ 10, 'cqmin' ] }
+			${ '10cqmax' }         | ${ [ 10, 'cqmax' ] }
 			${ '10notacssunit' }   | ${ [ undefined, undefined ] }
 			${ 'notaunitedvalue' } | ${ [ undefined, undefined ] }
 			${ '10' }              | ${ [ 10, undefined ] }

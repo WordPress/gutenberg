@@ -1,10 +1,10 @@
 @use "../utils/theme-variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
-// Matches CONFIG.surfaceBorderColor — not the WPDS stroke token (#dbdbdb).
+// Keep the translucent surface border; the WPDS stroke token is opaque.
 $surface-border-color: rgba(0, 0, 0, 0.1);
 
-// Matches CONFIG.controlHeight.
+// Preserve the legacy 36px control height.
 $control-height: 36px;
 $base-font-height: calc(13px * 1.4);
 
@@ -106,7 +106,7 @@ $padding-y-large: calc((calc(#{$control-height} * 1.2) - #{$base-font-height} - 
 	}
 
 	&.is-size-large {
-		// Matches CONFIG.controlPaddingXLarge (`12 * 1.3334`).
+		// Preserve the legacy horizontal control padding (`12 * 1.3334`).
 		padding: $padding-y-large 16.0008px;
 	}
 }

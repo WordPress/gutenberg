@@ -521,6 +521,21 @@ By default, Playwright looks for JavaScript or TypeScript files with `.test` or 
 This script automatically detects the best config to start Playwright, but sometimes you may need to specify custom options.
 To do so, you can add a file called `playwright.config.ts` or `playwright.config.js` in the top-level directory of your package (at the same level as your `package.json`).
 
+#### Test Environment
+
+The tests run against the site at the `WP_BASE_URL` environment variable. When it is not set and [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) is installed, they run against the `wp-env` environment configured in the current directory: its tests environment if the config enables one, and otherwise its development environment. As with `wp-env start`, the port comes from `.wp-env.json` merged with `.wp-env.override.json` and any `WP_ENV_*` environment variables, so each project can have its own ports. Without either, the tests run against `http://localhost:8889`.
+
+If you start the environment for the tests from a custom config file with `wp-env --config`, pass the same file with `--wp-env-config=<path>`. Its path is resolved relative to the current directory, as with `wp-env --config`, and its override file is merged in too, for example `.wp-env.test.override.json` for `.wp-env.test.json`:
+
+```json
+{
+	"scripts": {
+		"env:test": "wp-env --config .wp-env.test.json",
+		"test:e2e": "wp-scripts test-e2e --wp-env-config=.wp-env.test.json"
+	}
+}
+```
+
 #### Failed Test Artifacts
 
 When tests fail, snapshots will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.

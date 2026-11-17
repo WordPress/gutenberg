@@ -18,6 +18,7 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
+					itemPopupStyles[ 'fixed-width-presets' ],
 					getItemPopupWidthClassName( width ),
 					className
 				) }

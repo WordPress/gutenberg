@@ -10,6 +10,8 @@
  * @covers ::gutenberg_sanitize_widget_icon
  * @covers ::gutenberg_sanitize_widget_actions
  * @covers ::gutenberg_sanitize_widget_attributes
+ * @covers ::gutenberg_sanitize_widget_example
+ * @covers ::gutenberg_is_widget_json_value
  * @covers ::gutenberg_resolve_widget_action_href
  */
 class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
@@ -82,6 +84,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 						),
 					),
 				),
+				'example'     => array( 'attributes' => array( 'title' => 'Welcome' ) ),
 				'category'    => 'dashboard',
 				'textdomain'  => 'default',
 			)
@@ -98,6 +101,7 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		$this->assertSame( 'text', $widget['attributes'][0]['type'] );
 		$this->assertSame( 'Compacto', $widget['attributes'][0]['elements'][0]['label'] );
 		$this->assertSame( 'Menos detalles.', $widget['attributes'][0]['elements'][0]['description'] );
+		$this->assertSame( array( 'attributes' => array( 'title' => 'Welcome' ) ), $widget['example'] );
 		$this->assertSame( 'dashboard', $widget['category'] );
 	}
 
@@ -582,6 +586,58 @@ class Gutenberg_Widget_Types_Test extends WP_UnitTestCase {
 		);
 		$this->assertNull( gutenberg_sanitize_widget_attributes( null ) );
 		$this->assertNull( gutenberg_sanitize_widget_attributes( array() ) );
+	}
+
+	/**
+	 * Keeps `attributes` as a map of JSON values, dropping every other key
+	 * and any attribute whose value does not encode as JSON data.
+	 */
+	public function test_sanitize_widget_example_keeps_json_attributes() {
+		$example = gutenberg_sanitize_widget_example(
+			array(
+				'attributes' => array(
+					'message'  => 'Hello World',
+					'perPage'  => 5,
+					'ratio'    => 0.5,
+					'compact'  => false,
+					'location' => null,
+					'tags'     => array( 'news', array( 'nested' => true ) ),
+					'infinite' => INF,
+					'object'   => new stdClass(),
+					'mixed'    => array( 'news', new stdClass() ),
+					''         => 'unnamed',
+					0          => 'indexed',
+				),
+				'preview'    => 'dropped',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'attributes' => array(
+					'message'  => 'Hello World',
+					'perPage'  => 5,
+					'ratio'    => 0.5,
+					'compact'  => false,
+					'location' => null,
+					'tags'     => array( 'news', array( 'nested' => true ) ),
+				),
+			),
+			$example
+		);
+	}
+
+	/**
+	 * An example needs a non-empty `attributes` map; anything else
+	 * normalizes to null.
+	 */
+	public function test_sanitize_widget_example_requires_attributes() {
+		$this->assertNull( gutenberg_sanitize_widget_example( null ) );
+		$this->assertNull( gutenberg_sanitize_widget_example( array() ) );
+		$this->assertNull( gutenberg_sanitize_widget_example( array( 'attributes' => array() ) ) );
+		$this->assertNull( gutenberg_sanitize_widget_example( array( 'attributes' => 'message' ) ) );
+		$this->assertNull( gutenberg_sanitize_widget_example( array( 'attributes' => array( 'news', 'events' ) ) ) );
+		$this->assertNull( gutenberg_sanitize_widget_example( array( 'attributes' => array( 'object' => new stdClass() ) ) ) );
 	}
 
 	/**

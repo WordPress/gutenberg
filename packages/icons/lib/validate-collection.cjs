@@ -7,6 +7,9 @@ const ICON_VIEW_BOX = '0 0 24 24';
 // The collections an icon may be shipped in.
 const VALID_ICON_COLLECTIONS = [ 'core', 'core-admin' ];
 
+// The format of a Dashicon class name, such as `dashicons-admin-post`.
+const DASHICON_CLASS_PATTERN = /^dashicons-[a-z0-9-]+$/;
+
 function isStrokeBasedSvg( svgContent ) {
 	const svgTag = svgContent.match( /<svg\b[^>]*>/ )?.[ 0 ];
 	return /\sstyle=(["'])fill\s*:\s*none\s*;?\s*\1/.test( svgTag ?? '' );
@@ -19,6 +22,9 @@ function isStrokeBasedSvg( svgContent ) {
  * - Each manifest entry's `collections` property, if present, is a non-empty array of
  *   known collection slugs.
  * - Each manifest entry's `keywords` property, if present, is an array of strings.
+ * - Each manifest entry's `dashicons` property, if present, is a non-empty array
+ *   of unique Dashicon class names, on an icon in the `core-admin` collection.
+ * - Each Dashicon class name is replaced by at most one icon.
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
@@ -51,6 +57,7 @@ async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
 	 * found in the file system.
 	 */
 	const manifestPaths = [];
+	const dashiconReplacements = new Map();
 	for ( const icon of manifest ) {
 		const expected = `library/${ icon.slug }.svg`;
 
@@ -108,6 +115,53 @@ async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
 					icon.keywords
 				) }`
 			);
+		}
+
+		/*
+		 * Verify that `dashicons`, if present, lists unique Dashicon class names,
+		 * and only on icons the admin interface can render in their place.
+		 */
+		if ( 'dashicons' in icon ) {
+			const { dashicons } = icon;
+			const isValid =
+				Array.isArray( dashicons ) &&
+				dashicons.length > 0 &&
+				dashicons.every(
+					( dashicon ) =>
+						typeof dashicon === 'string' &&
+						DASHICON_CLASS_PATTERN.test( dashicon )
+				) &&
+				new Set( dashicons ).size === dashicons.length;
+
+			if ( ! isValid ) {
+				problems.push(
+					`- Invalid icon definition for icon '${
+						icon.slug
+					}': expected 'dashicons' to be a non-empty array of unique Dashicon class names such as 'dashicons-admin-post', saw ${ JSON.stringify(
+						dashicons
+					) }`
+				);
+			} else {
+				if ( ! icon.collections?.includes( 'core-admin' ) ) {
+					problems.push(
+						`- Invalid icon definition for icon '${ icon.slug }': 'dashicons' is only allowed on icons in the 'core-admin' collection`
+					);
+				}
+
+				for ( const dashicon of dashicons ) {
+					if ( dashiconReplacements.has( dashicon ) ) {
+						problems.push(
+							`- Invalid icon definition for icon '${
+								icon.slug
+							}': '${ dashicon }' is already replaced by icon '${ dashiconReplacements.get(
+								dashicon
+							) }'`
+						);
+					} else {
+						dashiconReplacements.set( dashicon, icon.slug );
+					}
+				}
+			}
 		}
 
 		/*

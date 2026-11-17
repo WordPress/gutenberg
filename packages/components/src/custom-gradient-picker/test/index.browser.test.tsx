@@ -8,16 +8,27 @@ import '../style.scss';
 import '../../dropdown/style.scss';
 import '../../popover/style.scss';
 import CustomGradientPicker from '../';
+import DeprecatedCustomGradientPicker from '../deprecated';
 import CustomGradientBar from '../gradient-bar';
 import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
 
 function ControlledCustomGradientPicker( {
 	initialValue = 'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)',
+	onChange,
 }: {
 	initialValue?: string;
+	onChange?: ( value: string ) => void;
 } ) {
 	const [ value, setValue ] = useState( initialValue );
-	return <CustomGradientPicker value={ value } onChange={ setValue } />;
+	return (
+		<CustomGradientPicker
+			value={ value }
+			onChange={ ( nextValue ) => {
+				setValue( nextValue );
+				onChange?.( nextValue );
+			} }
+		/>
+	);
 }
 
 describe( 'CustomGradientPicker', () => {
@@ -95,14 +106,55 @@ describe( 'CustomGradientPicker', () => {
 		} );
 	} );
 
+	describe( 'GradientTypePicker selection', () => {
+		it( 'keeps an empty gradient unchanged when Linear is reselected', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker value={ null } onChange={ onChange } />
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Type' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not emit a change when the current gradient type is reselected', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value="linear-gradient(125deg,#ff0000 0%,#0000ff 100%)"
+					onChange={ onChange }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Type' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear', selected: true } )
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+	} );
+
 	describe( 'GradientTypePicker angle persistence', () => {
 		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 
 			await render(
-				<CustomGradientPicker
-					value="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				<ControlledCustomGradientPicker
+					initialValue="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
 					onChange={ onChange }
 				/>
 			);
@@ -110,8 +162,14 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'radial-gradient' );
-			await user.selectOptions( typeSelect, 'linear-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
+			);
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
 
 			// Verify the angle from before the radial switch is restored, not the default
 			const lastCall =
@@ -134,7 +192,10 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'linear-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Linear' } )
+			);
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
@@ -155,12 +216,120 @@ describe( 'CustomGradientPicker', () => {
 			const typeSelect = screen.getByRole( 'combobox', {
 				name: /type/i,
 			} );
-			await user.selectOptions( typeSelect, 'radial-gradient' );
+			await user.click( typeSelect );
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
+			);
 
 			// Radial gradients have no orientation, so deg should not appear in the output
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
 			expect( lastCall ).not.toContain( 'deg' );
+		} );
+	} );
+
+	describe( 'with a color interpolation method', () => {
+		// The gradient from the issue. It has more color stops than the default
+		// gradient the picker falls back to, so the assertions below can only
+		// pass when this is the gradient being edited.
+		const INTERPOLATED_GRADIENT =
+			'linear-gradient(in oklch 160deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)';
+
+		it( 'shows the color stops and angle of a gradient that has an interpolation method', async () => {
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect(
+				screen
+					.getAllByRole( 'button', {
+						name: /Gradient control point/,
+					} )
+					.map( ( point ) => point.getAttribute( 'aria-label' ) )
+			).toEqual( [
+				'Gradient control point at position 0% with color code #009ED4.',
+				'Gradient control point at position 45% with color code #003366.',
+				'Gradient control point at position 65% with color code #452955.',
+				'Gradient control point at position 95% with color code #F08119.',
+				'Gradient control point at position 100% with color code #FFCE00.',
+			] );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Angle' } )
+			).toHaveValue( 160 );
+		} );
+
+		it( 'keeps the interpolation method when the angle changes', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			screen.getByRole( 'spinbutton', { name: 'Angle' } ).focus();
+			await user.keyboard( '[ArrowUp]' );
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				'linear-gradient(in oklch 161deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
+		} );
+
+		it( 'keeps the interpolation method when switching to a radial gradient', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: /type/i } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: 'Radial' } )
+			);
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				'radial-gradient(in oklch,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
+		} );
+
+		it( 'keeps the interpolation method when a color stop moves', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			const [ firstPoint ] = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+			firstPoint.focus();
+			await user.keyboard( '[ArrowRight]' );
+
+			// Moving a color stop rewrites every color as `rgb()`.
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				`linear-gradient(in oklch 160deg,rgb(0,158,212) ${ KEYBOARD_CONTROL_POINT_VARIATION }%,rgb(0,51,102) 45%,rgb(69,41,85) 65%,rgb(240,129,25) 95%,rgb(255,206,0) 100%)`
+			);
 		} );
 	} );
 } );
@@ -348,5 +517,18 @@ describe( 'CustomGradientBar', () => {
 		await user.keyboard( '[ArrowRight]' );
 
 		expect( onChange ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'CustomGradientPicker public export', () => {
+	it( 'renders the gradient editor and logs a deprecation warning', async () => {
+		await render( <DeprecatedCustomGradientPicker onChange={ vi.fn() } /> );
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Type' } )
+		).toBeVisible();
+		expect( console ).toHaveWarnedWith(
+			'wp.components.CustomGradientPicker is deprecated since version 7.3. Please use wp.components.GradientPicker instead. Note: Set `clearable={ false }` to render only the custom gradient editor.'
+		);
 	} );
 } );

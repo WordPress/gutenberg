@@ -6,7 +6,7 @@ import type { DataRegistry } from '../../types';
 type DispatchMap = (
 	dispatch: DataRegistry[ 'dispatch' ],
 	registry: DataRegistry
-) => Record< string, ( ...args: unknown[] ) => unknown >;
+) => Record< string, ( ...args: never[] ) => unknown >;
 
 /**
  * Custom react hook for returning aggregate dispatch actions using the provided
@@ -50,9 +50,15 @@ const useDispatchWithMap = (
 					return [
 						propName,
 						( ...args: unknown[] ) =>
-							currentDispatchMapRef
-								.current( registry.dispatch, registry )
-								[ propName ]( ...args ),
+							// The arguments are passed through to the dispatcher.
+							(
+								currentDispatchMapRef.current(
+									registry.dispatch,
+									registry
+								)[ propName ] as (
+									...args: unknown[]
+								) => unknown
+							 )( ...args ),
 					];
 				}
 			)

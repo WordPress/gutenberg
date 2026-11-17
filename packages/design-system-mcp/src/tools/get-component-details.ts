@@ -2,6 +2,7 @@ import type { McpServer } from '@modelcontextprotocol/server';
 import { z } from 'zod';
 import { getComponentDetail } from '../data.ts';
 import { formatComponentDetail } from '../format.ts';
+import { findEach } from '../find-each.ts';
 
 const inputSchema = z.object( {
 	name: z
@@ -15,21 +16,10 @@ const inputSchema = z.object( {
 } );
 
 export async function handler( { name }: z.infer< typeof inputSchema > ) {
-	const names = Array.isArray( name ) ? name : [ name ];
-	const sections: string[] = [];
-	const missing: string[] = [];
+	const { found, missing } = await findEach( name, getComponentDetail );
+	const list = missing.map( ( key ) => `"${ key }"` ).join( ', ' );
 
-	for ( const componentName of names ) {
-		const detail = await getComponentDetail( componentName );
-		if ( detail ) {
-			sections.push( formatComponentDetail( detail ) );
-		} else {
-			missing.push( componentName );
-		}
-	}
-
-	if ( sections.length === 0 ) {
-		const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
+	if ( found.length === 0 ) {
 		return {
 			content: [
 				{
@@ -41,9 +31,8 @@ export async function handler( { name }: z.infer< typeof inputSchema > ) {
 		};
 	}
 
-	let text = sections.join( '\n\n---\n\n' );
+	let text = found.map( formatComponentDetail ).join( '\n\n---\n\n' );
 	if ( missing.length > 0 ) {
-		const list = missing.map( ( n ) => `"${ n }"` ).join( ', ' );
 		text += `\n\n---\n\n_No components were found for: ${ list }._`;
 	}
 

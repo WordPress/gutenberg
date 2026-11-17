@@ -1,34 +1,18 @@
 import { describe, expect, it } from 'vitest';
-import styled from '@emotion/styled';
 import { render, screen } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
 import { createElement, createRef } from '@wordpress/element';
 import { PolymorphicElement } from '../polymorphic-element';
 
-const StyledDiv = styled.div``;
-
-const components = [
-	{
-		name: 'PolymorphicElement',
-		Component: PolymorphicElement,
-	},
-	{
-		name: 'styled.div',
-		Component: StyledDiv,
-	},
-] as const;
-
-describe.each( components )( '$name', ( { Component: RawComponent } ) => {
-	const Component = RawComponent as typeof PolymorphicElement;
-
+describe( 'PolymorphicElement', () => {
 	it( 'filters invalid props from intrinsic elements', () => {
 		render(
-			createElement( Component, {
+			createElement( PolymorphicElement, {
 				as: 'label',
 				'data-testid': 'label',
 				htmlFor: 'field',
 				labelPosition: 'top',
-			} as Parameters< typeof Component >[ 0 ] & {
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
 				labelPosition: string;
 			} )
 		);
@@ -42,7 +26,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 
 	it( 'preserves standard props for intrinsic elements', () => {
 		render(
-			<Component
+			<PolymorphicElement
 				aria-label="Notice"
 				className="custom-class"
 				data-testid="notice"
@@ -59,10 +43,10 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 
 	it( 'preserves standard props without relying on the DOM', () => {
 		const view = renderToString(
-			createElement( Component, {
+			createElement( PolymorphicElement, {
 				as: 'form',
 				acceptCharset: 'utf-8',
-			} as Parameters< typeof Component >[ 0 ] & {
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
 				acceptCharset: string;
 			} )
 		);
@@ -72,7 +56,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 
 	it( 'preserves SVG props for SVG intrinsic elements', () => {
 		render(
-			<Component
+			<PolymorphicElement
 				as="svg"
 				data-testid="svg"
 				fill="currentColor"
@@ -94,7 +78,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 
 	it( 'preserves SVG props without relying on the DOM', () => {
 		const view = renderToString(
-			<Component
+			<PolymorphicElement
 				as="svg"
 				fill="currentColor"
 				strokeWidth={ 2 }
@@ -110,7 +94,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 	it( 'preserves SVG props for non-SVG-root intrinsic elements', () => {
 		render(
 			<svg>
-				<Component
+				<PolymorphicElement
 					as="path"
 					d="M0 0h24v24H0z"
 					data-testid="path"
@@ -129,12 +113,12 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 
 	it( 'filters invalid props from SVG intrinsic elements', () => {
 		render(
-			createElement( Component, {
+			createElement( PolymorphicElement, {
 				as: 'svg',
 				'data-testid': 'svg',
 				labelPosition: 'top',
 				viewBox: '0 0 24 24',
-			} as Parameters< typeof Component >[ 0 ] & {
+			} as Parameters< typeof PolymorphicElement >[ 0 ] & {
 				labelPosition: string;
 			} )
 		);
@@ -157,7 +141,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		}
 
 		render(
-			<Component
+			<PolymorphicElement
 				as={ CustomComponent }
 				data-testid="custom"
 				variant="primary"
@@ -174,7 +158,7 @@ describe.each( components )( '$name', ( { Component: RawComponent } ) => {
 		const ref = createRef< HTMLButtonElement >();
 
 		render(
-			<Component
+			<PolymorphicElement
 				as="button"
 				data-testid="button"
 				ref={ ref }

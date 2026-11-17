@@ -7,7 +7,10 @@ import { useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { symbolFilled } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { CreateTemplatePartModal } from '@wordpress/fields';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { unlock } from '../../lock-unlock';
+
+const { CreateTemplatePartModal } = unlock( patternsPrivateApis );
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
