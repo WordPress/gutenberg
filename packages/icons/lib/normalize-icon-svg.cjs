@@ -580,7 +580,9 @@ function normalizeIconSvg( source ) {
 function main( argv ) {
 	if ( ! argv.length ) {
 		// eslint-disable-next-line no-console
-		console.error( 'Usage: node lib/normalize-icon-svg.cjs <file.svg> [...]' );
+		console.error(
+			'Usage: node lib/normalize-icon-svg.cjs <file.svg> [...]'
+		);
 		return 1;
 	}
 
