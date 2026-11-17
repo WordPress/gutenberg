@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+<title>Test RSS Feed</title>
+<link>https://www.example.com</link>
+<description>Items published in standard time and in daylight saving time.</description>
+<item>
+<title>Standard Time Article</title>
+<link>https://www.example.com/standard-time</link>
+<guid isPermaLink="true">https://www.example.com/standard-time</guid>
+<pubDate>Thu, 15 Jan 2026 23:30:00 +0000</pubDate>
+</item>
+<item>
+<title>Daylight Saving Time Article</title>
+<link>https://www.example.com/daylight-saving-time</link>
+<guid isPermaLink="true">https://www.example.com/daylight-saving-time</guid>
+<pubDate>Thu, 16 Jul 2026 04:30:00 +0000</pubDate>
+</item>
+</channel>
+</rss>

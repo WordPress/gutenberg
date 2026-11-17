@@ -3,6 +3,8 @@ import { DirectionProvider } from '../utils/direction-provider';
 import { MenuContext, MenuGroupContext } from './context';
 import type { RootProps } from './types';
 
+const ROOT_CONTEXT_VALUE = { isSubmenu: false };
+
 /**
  * Groups all parts of a menu.
  *
@@ -64,7 +66,7 @@ function Root( props: RootProps ) {
 
 	return (
 		<DirectionProvider>
-			<MenuContext.Provider value={ { isSubmenu: false } }>
+			<MenuContext.Provider value={ ROOT_CONTEXT_VALUE }>
 				<MenuGroupContext.Provider value={ null }>
 					<_Menu.Root
 						{ ...props }

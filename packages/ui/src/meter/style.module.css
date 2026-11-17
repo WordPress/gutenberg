@@ -30,7 +30,7 @@
 			inset-block-start: 0;
 			height: 100%;
 			border-radius: inherit;
-			color: var(--wpds-color-background-thumb-neutral);
+			color: var(--wpds-color-background-indicator-neutral);
 			background-color: currentColor;
 
 			@media not (prefers-reduced-motion) {
@@ -39,7 +39,19 @@
 		}
 
 		.is-brand {
-			color: var(--wpds-color-background-thumb-brand);
+			color: var(--wpds-color-background-indicator-brand);
+		}
+
+		.is-success {
+			color: var(--wpds-color-background-indicator-success);
+		}
+
+		.is-warning {
+			color: var(--wpds-color-background-indicator-warning);
+		}
+
+		.is-error {
+			color: var(--wpds-color-background-indicator-error);
 		}
 
 		@media (forced-colors: active) {
