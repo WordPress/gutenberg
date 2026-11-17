@@ -3,6 +3,7 @@ import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { SelectionContext } from './selection-context';
 import type { BlockSelection } from '../../store/types';
 import type {
@@ -99,6 +100,13 @@ function restoreSelectionIds(
 		selectionStart: restoreClientId( selectionStart ),
 		selectionEnd: restoreClientId( selectionEnd ),
 		initialPosition,
+		...( selectionState.selectionClientIds
+			? {
+					selectionClientIds: selectionState.selectionClientIds.map(
+						( id ) => mapping.internalToExternal.get( id ) ?? id
+					),
+				}
+			: {} ),
 	};
 }
 
@@ -160,6 +168,9 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
+	const { getExplicitSelectionClientIds } = unlock(
+		registry.select( blockEditorStore )
+	);
 
 	const pendingChangesRef = useRef< {
 		incoming: Block[] | null;
@@ -230,7 +241,13 @@ export default function useBlockSync( {
 				convert( selection.selectionStart )!,
 				// The store accepts an unset selection end.
 				convert( selection.selectionEnd ) as BlockSelection,
-				selection.initialPosition
+				selection.initialPosition,
+				selection.selectionClientIds?.map( ( id ) =>
+					clientId
+						? ( idMappingRef.current.externalToInternal.get( id ) ??
+							id )
+						: id
+				)
 			);
 			isRestoringSelectionRef.current = false;
 		}
@@ -376,6 +393,7 @@ export default function useBlockSync( {
 		let previousAreBlocksDifferent = false;
 		let prevSelectionStart = getSelectionStart();
 		let prevSelectionEnd = getSelectionEnd();
+		let prevSelectionClientIds = getExplicitSelectionClientIds();
 
 		subscribedRef.current = true;
 		const unsubscribe = registry.subscribe( () => {
@@ -421,13 +439,16 @@ export default function useBlockSync( {
 			// Check if selection changed.
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
+			const newSelectionClientIds = getExplicitSelectionClientIds();
 			const selectionChanged =
 				newSelectionStart !== prevSelectionStart ||
-				newSelectionEnd !== prevSelectionEnd;
+				newSelectionEnd !== prevSelectionEnd ||
+				newSelectionClientIds !== prevSelectionClientIds;
 
 			if ( selectionChanged ) {
 				prevSelectionStart = newSelectionStart;
 				prevSelectionEnd = newSelectionEnd;
+				prevSelectionClientIds = newSelectionClientIds;
 			}
 
 			if ( blocksChanged || selectionChanged ) {
@@ -448,6 +469,9 @@ export default function useBlockSync( {
 						const selectionInfo = {
 							selectionStart: newSelectionStart,
 							selectionEnd: newSelectionEnd,
+							...( newSelectionClientIds
+								? { selectionClientIds: newSelectionClientIds }
+								: {} ),
 							initialPosition:
 								getSelectedBlocksInitialCaretPosition(),
 						};
@@ -503,6 +527,12 @@ export default function useBlockSync( {
 							const selectionInfo = {
 								selectionStart: newSelectionStart,
 								selectionEnd: newSelectionEnd,
+								...( newSelectionClientIds
+									? {
+											selectionClientIds:
+												newSelectionClientIds,
+										}
+									: {} ),
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
 							};
@@ -525,7 +555,7 @@ export default function useBlockSync( {
 			subscribedRef.current = false;
 			unsubscribe();
 		};
-	}, [ registry, clientId ] );
+	}, [ registry, clientId, getExplicitSelectionClientIds ] );
 
 	useEffect( () => {
 		return () => {

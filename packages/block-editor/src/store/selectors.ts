@@ -537,6 +537,9 @@ export function getSelectedBlockCount( state: State ) {
  * @return {boolean} Whether a single block is selected.
  */
 export function hasSelectedBlock( state: State ) {
+	if ( state.selection.selectionClientIds ) {
+		return false;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 	return (
 		!! selectionStart.clientId &&
@@ -553,6 +556,9 @@ export function hasSelectedBlock( state: State ) {
  * @return {?string} Selected block client ID.
  */
 export function getSelectedBlockClientId( state: State ) {
+	if ( state.selection.selectionClientIds ) {
+		return null;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 	const { clientId } = selectionStart;
 
@@ -879,6 +885,9 @@ function getSelectionNestingAncestor( state: State ) {
  */
 export const getSelectedBlockClientIds = createSelector(
 	( state: State ) => {
+		if ( state.selection.selectionClientIds ) {
+			return state.selection.selectionClientIds;
+		}
 		const { selectionStart, selectionEnd } = state.selection;
 
 		if ( ! selectionStart.clientId || ! selectionEnd.clientId ) {
@@ -919,6 +928,7 @@ export const getSelectedBlockClientIds = createSelector(
 	( state: State ) => [
 		state.blocks.order,
 		state.blocks.parents,
+		state.selection.selectionClientIds,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -933,6 +943,9 @@ export const getSelectedBlockClientIds = createSelector(
  * @return {Array} Multi-selected block client IDs.
  */
 export function getMultiSelectedBlockClientIds( state: State ) {
+	if ( state.selection.selectionClientIds ) {
+		return state.selection.selectionClientIds;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId === selectionEnd.clientId ) {
@@ -1044,6 +1057,7 @@ export const isAncestorMultiSelected = createSelector(
 	},
 	( state: State ) => [
 		state.blocks.order,
+		state.selection.selectionClientIds,
 		state.selection.selectionStart.clientId,
 		state.selection.selectionEnd.clientId,
 	]
@@ -1062,9 +1076,9 @@ export const isAncestorMultiSelected = createSelector(
  * @return {?string} Client ID of block beginning multi-selection.
  */
 export function getMultiSelectedBlocksStartClientId( state: State ) {
-	const { selectionStart, selectionEnd } = state.selection;
+	const { selectionStart } = state.selection;
 
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
+	if ( ! hasMultiSelection( state ) ) {
 		return null;
 	}
 
@@ -1084,9 +1098,9 @@ export function getMultiSelectedBlocksStartClientId( state: State ) {
  * @return {?string} Client ID of block ending multi-selection.
  */
 export function getMultiSelectedBlocksEndClientId( state: State ) {
-	const { selectionStart, selectionEnd } = state.selection;
+	const { selectionEnd } = state.selection;
 
-	if ( selectionStart.clientId === selectionEnd.clientId ) {
+	if ( ! hasMultiSelection( state ) ) {
 		return null;
 	}
 
@@ -1125,6 +1139,9 @@ export function __unstableIsFullySelected( state: State ) {
  * @return {boolean} Whether the selection is collapsed.
  */
 export function __unstableIsSelectionCollapsed( state: State ) {
+	if ( state.selection.selectionClientIds ) {
+		return false;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 	return (
@@ -1156,6 +1173,9 @@ export function __unstableIsSelectionMergeable(
 	state: State,
 	isForward?: boolean
 ) {
+	if ( state.selection.selectionClientIds ) {
+		return false;
+	}
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );
 
@@ -1357,6 +1377,9 @@ export function getBlockIndex( state: State, clientId: string ) {
  * @return {boolean} Whether block is selected and multi-selection exists.
  */
 export function isBlockSelected( state: State, clientId?: string | null ) {
+	if ( state.selection.selectionClientIds ) {
+		return false;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 
 	if ( selectionStart.clientId !== selectionEnd.clientId ) {
@@ -1482,6 +1505,9 @@ export function isBlockWithinSelection( state: State, clientId: string ) {
  * @return {boolean} Whether multi-selection has been made.
  */
 export function hasMultiSelection( state: State ) {
+	if ( state.selection.selectionClientIds ) {
+		return state.selection.selectionClientIds.length > 1;
+	}
 	const { selectionStart, selectionEnd } = state.selection;
 	return selectionStart.clientId !== selectionEnd.clientId;
 }

@@ -1527,6 +1527,15 @@ export function selection(
 	action: Action
 ) {
 	switch ( action.type ) {
+		case 'MULTI_SELECT_SET':
+			const explicitSelection = {
+				selectionStart: action.selectionStart,
+				selectionEnd: action.selectionEnd,
+				selectionClientIds: action.clientIds,
+			};
+			return fastDeepEqual( state, explicitSelection )
+				? state
+				: explicitSelection;
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
 				return {
@@ -1552,6 +1561,9 @@ export function selection(
 			return {
 				selectionStart,
 				selectionEnd,
+				...( action.selectionClientIds
+					? { selectionClientIds: action.selectionClientIds }
+					: {} ),
 			};
 		case 'MULTI_SELECT':
 			const nextSelection = {
@@ -1568,6 +1580,9 @@ export function selection(
 
 			return nextSelection;
 		case 'RESET_BLOCKS':
+			if ( state.selectionClientIds ) {
+				return state;
+			}
 			const startClientId = state?.selectionStart?.clientId;
 			const endClientId = state?.selectionEnd?.clientId;
 
@@ -1601,12 +1616,38 @@ export function selection(
 			}
 	}
 
+	if ( state.selectionClientIds ) {
+		if ( action.type === 'REMOVE_BLOCKS' ) {
+			// The outer reducer reconciles descendants and endpoints against the updated tree.
+			return state;
+		}
+		if ( action.type === 'REPLACE_BLOCKS' ) {
+			if (
+				! action.clientIds.some( ( id ) =>
+					state.selectionClientIds!.includes( id )
+				)
+			) {
+				return state;
+			}
+			return {
+				...state,
+				selectionClientIds: [
+					...state.selectionClientIds.filter(
+						( id ) => ! action.clientIds.includes( id )
+					),
+					...action.blocks.map( ( block ) => block.clientId ),
+				],
+			};
+		}
+	}
+
 	const selectionStart = selectionHelper( state.selectionStart, action );
 	const selectionEnd = selectionHelper( state.selectionEnd, action );
 
 	if (
 		selectionStart === state.selectionStart &&
-		selectionEnd === state.selectionEnd
+		selectionEnd === state.selectionEnd &&
+		! ( state.selectionClientIds && action.type === 'SELECT_BLOCK' )
 	) {
 		return state;
 	}
@@ -1762,6 +1803,7 @@ export function initialPosition(
 	} else if (
 		[
 			'MULTI_SELECT',
+			'MULTI_SELECT_SET',
 			'SELECT_BLOCK',
 			'RESET_SELECTION',
 			'INSERT_BLOCKS',
@@ -3440,7 +3482,66 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 	};
 }
 
+/**
+ * Keeps explicit membership in document order and valid after tree mutations.
+ *
+ * @param reducer Original state reducer.
+ * @return Reducer with normalized explicit selections.
+ */
+function withExplicitSelection( reducer: Reducer< State > ): Reducer< State > {
+	return ( state, action ) => {
+		const nextState = reducer( state, action );
+		const current = nextState.selection;
+		if (
+			! current.selectionClientIds ||
+			( state?.blocks.order === nextState.blocks.order &&
+				state.selection === current )
+		) {
+			return nextState;
+		}
+		const members = new Set( current.selectionClientIds );
+		const ordered: string[] = [];
+		const visit = ( root: string ) => {
+			for ( const id of nextState.blocks.order.get( root ) ?? [] ) {
+				if ( members.has( id ) ) {
+					ordered.push( id );
+				} else {
+					visit( id );
+				}
+			}
+		};
+		visit( '' );
+		const selectionStart = {
+			clientId:
+				members.has( current.selectionStart.clientId! ) &&
+				ordered.includes( current.selectionStart.clientId! )
+					? current.selectionStart.clientId
+					: ordered[ 0 ],
+		};
+		const selectionEnd = {
+			clientId: ordered.includes( current.selectionEnd.clientId! )
+				? current.selectionEnd.clientId
+				: ordered[ ordered.length - 1 ],
+		};
+		const normalized =
+			ordered.length > 1
+				? { selectionStart, selectionEnd, selectionClientIds: ordered }
+				: {
+						selectionStart: ordered.length
+							? { clientId: ordered[ 0 ] }
+							: {},
+						selectionEnd: ordered.length
+							? { clientId: ordered[ 0 ] }
+							: {},
+					};
+		return fastDeepEqual( current, normalized )
+			? nextState
+			: { ...nextState, selection: normalized };
+	};
+}
+
 export default pipe(
 	withDerivedBlockEditingModes,
+	withExplicitSelection,
 	withAutomaticChangeReset
 )( combinedReducers ) as Reducer< State >;

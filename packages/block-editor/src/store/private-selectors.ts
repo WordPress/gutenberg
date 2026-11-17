@@ -51,6 +51,16 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
 
+/**
+ * Returns explicit selection membership, or undefined for a range selection.
+ *
+ * @param state Editor state.
+ * @return Explicitly selected client IDs.
+ */
+export function getExplicitSelectionClientIds( state: State ) {
+	return state.selection.selectionClientIds;
+}
+
 function isViewportAvailable( state: State, viewport: string ) {
 	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {
 		return true;

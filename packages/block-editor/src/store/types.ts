@@ -532,6 +532,8 @@ export interface BlocksState {
 export interface SelectionState {
 	selectionStart: BlockSelection;
 	selectionEnd: BlockSelection;
+	/** Explicit membership, absent for text and contiguous range selections. */
+	selectionClientIds?: string[];
 }
 
 /**
@@ -672,6 +674,13 @@ export type Action =
 			end: string;
 			initialPosition?: InitialPosition;
 	  }
+	| {
+			type: 'MULTI_SELECT_SET';
+			clientIds: string[];
+			selectionStart: BlockSelection;
+			selectionEnd: BlockSelection;
+			initialPosition?: InitialPosition;
+	  }
 	| { type: 'OPEN_LIST_VIEW_CONTENT_PANEL' }
 	| { type: 'RECEIVE_BLOCKS'; blocks: Block[]; rootClientId?: never }
 	| {
@@ -727,6 +736,7 @@ export type Action =
 			selectionStart: BlockSelection;
 			selectionEnd: BlockSelection;
 			initialPosition?: InitialPosition;
+			selectionClientIds?: string[];
 	  }
 	| { type: 'RESET_ZOOM_LEVEL' }
 	| {

@@ -1270,7 +1270,7 @@ Action that clears the block selection.
 
 _Returns_
 
-- `Object`: Action object.
+- Action object.
 
 ### duplicateBlocks
 
@@ -1432,6 +1432,18 @@ _Parameters_
 - _start_ `string`: First block of the multi selection.
 - _end_ `string`: Last block of the multiselection.
 - _\_\_experimentalInitialPosition_ `number|null`: Optional initial position. Pass as null to skip focus within editor canvas.
+
+### multiSelectSet
+
+Selects an explicit set of whole blocks, including blocks with different parents.
+
+_Parameters_
+
+- _clientIds_ `string[]`: Block client IDs to select.
+- _initialPosition_ `InitialPosition`: Initial caret position, or null to retain focus outside the canvas.
+- _options_ `{ anchorClientId?: string; focusClientId?: string; }`: Optional directional selection endpoints.
+- _options.anchorClientId_ `string`: Block where the selection starts.
+- _options.focusClientId_ `string`: Block where the selection ends.
 
 ### receiveBlocks
 
@@ -1644,6 +1656,7 @@ _Parameters_
 - _selectionStart_ `WPBlockSelection`: The selection start.
 - _selectionEnd_ `WPBlockSelection`: The selection end.
 - _initialPosition_ `0|-1|null`: Initial block position.
+- _selectionClientIds_ `string[]`: Explicit whole-block selection membership.
 
 _Returns_
 

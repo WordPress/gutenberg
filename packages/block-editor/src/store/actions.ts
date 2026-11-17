@@ -103,22 +103,25 @@ export const validateBlocksToTemplate =
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {WPBlockSelection} selectionStart  The selection start.
- * @param {WPBlockSelection} selectionEnd    The selection end.
- * @param {0|-1|null}        initialPosition Initial block position.
+ * @param {WPBlockSelection} selectionStart     The selection start.
+ * @param {WPBlockSelection} selectionEnd       The selection end.
+ * @param {0|-1|null}        initialPosition    Initial block position.
+ * @param {string[]}         selectionClientIds Explicit whole-block selection membership.
  *
  * @return {Object} Action object.
  */
 export function resetSelection(
 	selectionStart: BlockSelection,
 	selectionEnd: BlockSelection,
-	initialPosition?: InitialPosition
+	initialPosition?: InitialPosition,
+	selectionClientIds?: string[]
 ) {
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
 		selectionEnd,
 		initialPosition,
+		...( selectionClientIds ? { selectionClientIds } : {} ),
 	};
 }
 
@@ -355,9 +358,68 @@ export const multiSelect =
 	};
 
 /**
+ * Selects an explicit set of whole blocks, including blocks with different parents.
+ *
+ * @param clientIds              Block client IDs to select.
+ * @param initialPosition        Initial caret position, or null to retain focus outside the canvas.
+ * @param options                Optional directional selection endpoints.
+ * @param options.anchorClientId Block where the selection starts.
+ * @param options.focusClientId  Block where the selection ends.
+ */
+export const multiSelectSet =
+	(
+		clientIds: string[],
+		initialPosition: InitialPosition = 0,
+		{
+			anchorClientId,
+			focusClientId,
+		}: {
+			anchorClientId?: string;
+			focusClientId?: string;
+		} = {}
+	) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const uniqueIds = [ ...new Set( clientIds ) ].filter(
+			( id ) =>
+				select.getBlock( id ) &&
+				select.getBlockEditingMode( id ) !== 'disabled'
+		);
+		// A controlled block's contents belong to a separate editing entity.
+		const getSelectionRoot = ( id: string ) =>
+			select
+				.getBlockParents( id, true )
+				.find( ( parent ) =>
+					select.areInnerBlocksControlled( parent )
+				) ?? '';
+		const root = uniqueIds.length ? getSelectionRoot( uniqueIds[ 0 ] ) : '';
+		if ( uniqueIds.some( ( id ) => getSelectionRoot( id ) !== root ) ) {
+			return;
+		}
+		dispatch( {
+			type: 'MULTI_SELECT_SET',
+			clientIds: uniqueIds,
+			selectionStart: { clientId: anchorClientId ?? uniqueIds[ 0 ] },
+			selectionEnd: {
+				clientId: focusClientId ?? uniqueIds[ uniqueIds.length - 1 ],
+			},
+			initialPosition,
+		} );
+		const count = select.getSelectedBlockCount();
+		speak(
+			sprintf(
+				/* translators: %s: number of selected blocks */
+				_n( '%s block selected.', '%s blocks selected.', count ),
+				// @ts-expect-error `%s` formats the number too.
+				count
+			),
+			'assertive'
+		);
+	};
+
+/**
  * Action that clears the block selection.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function clearSelectedBlock() {
 	return {
