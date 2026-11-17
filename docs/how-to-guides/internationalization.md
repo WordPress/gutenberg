@@ -73,6 +73,27 @@ Common functions available, these mirror their PHP counterparts are:
 <strong>Note:</strong> Every string displayed to the user should be wrapped in an i18n function.
 </div>
 
+### Translating strings with HTML or embedded elements
+
+When translating strings that contain HTML formatting elements (such as `<strong>`, `<em>`, or `<a>`), do not concatenate string fragments and avoid embedding raw HTML markup directly in translation strings. Concatenating fragments breaks translations because grammatical structure and word order differ across languages, while raw HTML complicates translation tools and introduces potential security issues.
+
+Instead, use [`createInterpolateElement`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-element/#createinterpolateelement) from `@wordpress/element`. It safely interpolates React elements and components into translated strings containing placeholder tags:
+
+```js
+import { __ } from '@wordpress/i18n';
+import { createInterpolateElement } from '@wordpress/element';
+
+const message = createInterpolateElement(
+	__( 'Please visit the <link>documentation</link> for <strong>more details</strong>.', 'my-text-domain' ),
+	{
+		link: <a href="https://example.com" />,
+		strong: <strong />,
+	}
+);
+```
+
+When using `createInterpolateElement`, ensure `'wp-element'` is included in your script dependencies array in `wp_register_script()` or `wp_enqueue_script()`.
+
 After all strings in your code is wrapped, the final step is to tell WordPress your JavaScript contains translations, using the [wp_set_script_translations()](https://developer.wordpress.org/reference/functions/wp_set_script_translations/) function.
 
 ```php
@@ -97,14 +118,14 @@ The translation files must be in the JED 1.x JSON format.
 
 To create a JED translation file, first you need to extract the strings from the text. Typically, the language files all live in a directory called `languages` in your plugin. Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
 
-```
+```bash
 mkdir languages
 wp i18n make-pot ./ languages/myguten.pot
 ```
 
 This will create the file `myguten.pot` which contains all the translatable strings from your project.
 
-```
+```po
 msgid ""
 msgstr ""
 "Project-Id-Version: Scratch Plugin\n"
@@ -137,7 +158,7 @@ Here, `msgid` is the string to be translated, and `msgstr` is the actual transla
 
 This POT file can then be used as the template for new translations. You should **copy the file** using the language code you are going to translate, this example will use the Esperanto (eo) language:
 
-```
+```bash
 cp myguten.pot myguten-eo.po
 ```
 
@@ -145,7 +166,7 @@ For this simple example, you can simply edit the `.po` file in your editor and a
 
 You need also to add the `Language: eo` parameter. Here is full `myguten-eo.po` translated file
 
-```
+```po
 # Copyright (C) 2019
 # This file is distributed under the same license as the Scratch Plugin plugin.
 msgid ""
@@ -178,7 +199,7 @@ msgstr "Saltuon mundo"
 
 The last step to create the translation file is to convert the `myguten-eo.po` to the JSON format needed. For this, you can use WP-CLI's [`wp i18n make-json` command](https://developer.wordpress.org/cli/commands/i18n/make-json/), which requires WP-CLI v2.2.0 and later.
 
-```
+```bash
 wp i18n make-json myguten-eo.po --no-purge
 ```
 

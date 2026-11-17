@@ -153,7 +153,7 @@ test.describe( 'Entity actions API', () => {
 		await expect(
 			page
 				.getByRole( 'row', { name: /Bin Page/ } )
-				.getByRole( 'button', { name: 'Trash…' } )
+				.getByRole( 'button', { name: 'Trash', exact: true } )
 		).toHaveCount( 0 );
 
 		// The substitute opens the confirmation of the core action.

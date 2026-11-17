@@ -645,6 +645,9 @@ interface ActionBase< Item > {
 	 * The label of the action.
 	 * In case we want to adjust the label based on the selected items,
 	 * a function can be provided.
+	 * Provide the label without an ellipsis. Menu items for actions with
+	 * `RenderModal` add a translated ellipsis. Common trailing ellipses in
+	 * legacy labels are preserved in menus and omitted on buttons.
 	 */
 	label: string | ( ( items: Item[] ) => string );
 

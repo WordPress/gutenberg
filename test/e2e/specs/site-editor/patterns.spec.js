@@ -65,6 +65,10 @@ test.describe( 'Patterns', () => {
 				.getByRole( 'menuitem', {
 					name: 'add pattern',
 				} );
+			await expect(
+				page.getByRole( 'menu', { name: 'add pattern' } )
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
 			await expect( addNewMenuItem ).toBeFocused();
 			await addNewMenuItem.click();
 		}
