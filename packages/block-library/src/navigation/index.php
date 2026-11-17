@@ -1099,6 +1099,12 @@ class WP_Navigation_Block_Renderer {
 			return array();
 		}
 
+		// Static styles are flipped for right-to-left languages by the RTL
+		// build, but generated rules are not, so pick the inline start side
+		// here. A logical property such as `inset-inline-start` would be
+		// removed by safecss_filter_attr().
+		$submenu_start = is_rtl() ? 'right' : 'left';
+
 		// Selectors are keys until the class is known, so the class can be
 		// derived from the rules.
 		$rules = array();
@@ -1122,7 +1128,7 @@ class WP_Navigation_Block_Renderer {
 			// Keep submenus in an open overlay positioned as overlay content.
 			$rules[] = array(
 				'selector'     => 'open-submenu',
-				'declarations' => array( 'left' => '0' ),
+				'declarations' => array( $submenu_start => '0' ),
 				'rules_group'  => $rules_group,
 			);
 			$rules[] = array(
@@ -1134,7 +1140,7 @@ class WP_Navigation_Block_Renderer {
 
 		// Hash the rules so blocks with the same rules share one class, and the
 		// style engine prints the rules once.
-		$overlay_class      = wp_unique_id_from_values( $rules, 'wp-block-navigation-overlay-' );
+		$overlay_class      = wp_unique_id_from_values( $rules, 'wp-navigation-overlay-' );
 		$selector_base      = ".wp-block-navigation.{$overlay_class}";
 		$container_selector = $selector_base . ' .wp-block-navigation__responsive-container';
 		$inline_selector    = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
@@ -1169,8 +1175,9 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_nav_attributes( $attributes, $inner_blocks ) {
 		$is_interactive = self::is_interactive( $attributes, $inner_blocks );
-		// Resolve the overlay viewports once, so the wrapper classes and the
-		// rules that target them cannot disagree.
+		// Resolve the overlay viewports once for the overlay viewport classes
+		// and the rules that target them, so they cannot disagree.
+		// get_classes() still resolves them separately for `is-responsive`.
 		$overlay_viewports  = block_core_navigation_get_overlay_viewports( $attributes );
 		$is_responsive_menu = block_core_navigation_is_overlay_responsive( $overlay_viewports );
 		$style              = self::get_styles( $attributes );

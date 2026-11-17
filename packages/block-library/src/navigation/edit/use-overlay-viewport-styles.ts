@@ -1,5 +1,6 @@
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
 import { getViewportMediaQueries } from '@wordpress/global-styles-engine';
+import { isRTL } from '@wordpress/i18n';
 import {
 	getInlineViewports,
 	type OverlayViewportMap,
@@ -20,6 +21,9 @@ function getInlineRules(
 ): Record< string, Record< string, string > > {
 	const container = `${ base } .wp-block-navigation__responsive-container`;
 	const inline = `${ container }:not(.hidden-by-default):not(.is-menu-open)`;
+	// Static styles are flipped for right-to-left languages by the RTL build,
+	// but these rules are not, so pick the inline start side here.
+	const submenuStart = isRTL() ? 'right' : 'left';
 	return {
 		[ inline ]: {
 			display: 'block',
@@ -33,7 +37,7 @@ function getInlineRules(
 		},
 		// Keep submenus in an open overlay positioned as overlay content.
 		[ `${ container }.is-menu-open .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container` ]:
-			{ left: '0' },
+			{ [ submenuStart ]: '0' },
 		[ `${ base } .wp-block-navigation__responsive-container-open:not(.always-shown)` ]:
 			{ display: 'none' },
 	};

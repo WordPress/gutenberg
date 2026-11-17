@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
 import { getViewportMediaQueries } from '@wordpress/global-styles-engine';
+import { isRTL } from '@wordpress/i18n';
 import useOverlayViewportStyles from '../use-overlay-viewport-styles';
 import type { OverlayViewportMap } from '../../overlay-viewports';
 
@@ -12,6 +13,11 @@ vi.mock( import( '@wordpress/block-editor' ), () => ( {
 
 vi.mock( import( '@wordpress/global-styles-engine' ), () => ( {
 	getViewportMediaQueries: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	isRTL: vi.fn(),
 } ) );
 
 const VIEWPORT_SETTINGS = { mobile: 480, tablet: 782 };
@@ -28,16 +34,17 @@ const MEDIA_QUERIES = {
  * Returns the rules expected inside a viewport's media query, written out in
  * full so that drift from the PHP renderer is caught.
  *
- * @param base The selector of the Navigation wrapper.
+ * @param base         The selector of the Navigation wrapper.
+ * @param submenuStart The physical side where open submenus start.
  * @return The expected rules.
  */
-function getExpectedRules( base: string ) {
+function getExpectedRules( base: string, submenuStart = 'left' ) {
 	const container = `${ base } .wp-block-navigation__responsive-container`;
 	const inline = `${ container }:not(.hidden-by-default):not(.is-menu-open)`;
 	return (
 		`${ inline } {display: block;width: 100%;position: relative;z-index: auto;background-color: inherit;}` +
 		`${ inline } .wp-block-navigation__responsive-container-close {display: none;}` +
-		`${ container }.is-menu-open .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {left: 0;}` +
+		`${ container }.is-menu-open .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {${ submenuStart }: 0;}` +
 		`${ base } .wp-block-navigation__responsive-container-open:not(.always-shown) {display: none;}`
 	);
 }
@@ -59,6 +66,7 @@ describe( 'useOverlayViewportStyles', () => {
 		vi.clearAllMocks();
 		( useSettings as Mock ).mockReturnValue( [ VIEWPORT_SETTINGS ] );
 		( getViewportMediaQueries as Mock ).mockReturnValue( MEDIA_QUERIES );
+		( isRTL as Mock ).mockReturnValue( false );
 	} );
 
 	it( 'shows the links inline on desktop for the tablet overlay', () => {
@@ -72,6 +80,20 @@ describe( 'useOverlayViewportStyles', () => {
 			hasStyles: true,
 			css: `@media (width > 782px){${ getExpectedRules( BASE ) }}`,
 		} );
+	} );
+
+	it( 'starts open submenus on the right in right-to-left languages', () => {
+		( isRTL as Mock ).mockReturnValue( true );
+
+		const { css } = renderOverlayViewportStyles( {
+			mobile: true,
+			tablet: true,
+			desktop: false,
+		} );
+
+		expect( css ).toBe(
+			`@media (width > 782px){${ getExpectedRules( BASE, 'right' ) }}`
+		);
 	} );
 
 	it( 'asks for the desktop media query', () => {

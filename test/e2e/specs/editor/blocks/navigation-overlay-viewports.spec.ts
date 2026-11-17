@@ -36,6 +36,9 @@ async function switchDevicePreview( page: Page, device: string ) {
 	await page.keyboard.press( 'Escape' );
 }
 
+// These tests intentionally run on the suite's default classic theme
+// (Twenty Twenty-One), which prints the generated block-supports styles in
+// the footer rather than the head, so the front-end tests cover that path.
 test.describe( 'Navigation block - Overlay viewports', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		// Leave room for the 781px Tablet preview beside the settings sidebar.

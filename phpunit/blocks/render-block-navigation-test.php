@@ -27,6 +27,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	private $orig_theme_dir;
 
 	/**
+	 * Original text direction, restored after tests that switch to RTL.
+	 *
+	 * @var string|null
+	 */
+	private $orig_text_direction;
+
+	/**
 	 * Theme data filter that overrides the viewport settings, if set.
 	 *
 	 * @var callable|null
@@ -40,6 +47,10 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 
 	public function tear_down() {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		if ( null !== $this->orig_text_direction ) {
+			$GLOBALS['wp_locale']->text_direction = $this->orig_text_direction;
+			$this->orig_text_direction            = null;
+		}
 		if ( null !== $this->viewport_settings_filter ) {
 			remove_filter( 'wp_theme_json_data_theme', $this->viewport_settings_filter );
 			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
@@ -139,7 +150,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$processor = new WP_HTML_Tag_Processor( $markup );
 		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
 		foreach ( $processor->class_list() as $class_name ) {
-			if ( preg_match( '/^wp-block-navigation-overlay-[a-f0-9]{8}$/', $class_name ) ) {
+			if ( preg_match( '/^wp-navigation-overlay-[a-f0-9]{8}$/', $class_name ) ) {
 				return $class_name;
 			}
 		}
@@ -152,9 +163,10 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $overlay_class Unique overlay class.
 	 * @param string $media_query   Media query.
+	 * @param string $submenu_start Physical side where open submenus start.
 	 * @return string[] Rules.
 	 */
-	private function get_expected_inline_rules( $overlay_class, $media_query ) {
+	private function get_expected_inline_rules( $overlay_class, $media_query, $submenu_start = 'left' ) {
 		$base      = ".wp-block-navigation.{$overlay_class}";
 		$container = "{$base} .wp-block-navigation__responsive-container";
 		$inline    = "{$container}:not(.hidden-by-default):not(.is-menu-open)";
@@ -163,7 +175,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		return array(
 			"{$media_query}{{$inline}{display:block;width:100%;position:relative;z-index:auto;background-color:inherit;}}",
 			"{$media_query}{{$inline} .wp-block-navigation__responsive-container-close{display:none;}}",
-			"{$media_query}{{$container}.is-menu-open {$submenu}{left:0;}}",
+			"{$media_query}{{$container}.is-menu-open {$submenu}{{$submenu_start}:0;}}",
 			"{$media_query}{{$base} .wp-block-navigation__responsive-container-open:not(.always-shown){display:none;}}",
 		);
 	}
@@ -970,6 +982,27 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		}
 		$this->assertStringNotContainsString( '@media (width <= 480px)', $stylesheet, 'The overlay is shown on mobile.' );
 		$this->assertStringNotContainsString( '@media (480px < width <= 782px)', $stylesheet, 'The overlay is shown on tablet.' );
+	}
+
+	/**
+	 * Tests that a Tablet overlay starts open submenus on the right in
+	 * right-to-left languages, matching the flipped static styles.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_tablet_overlay_positions_open_submenus_for_rtl() {
+		$this->orig_text_direction            = $GLOBALS['wp_locale']->text_direction;
+		$GLOBALS['wp_locale']->text_direction = 'rtl';
+
+		$markup        = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+		$overlay_class = $this->get_overlay_viewports_class( $markup );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have an overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 782px)', 'right' ) as $rule ) {
+			$this->assertStringContainsString( $rule, $stylesheet );
+		}
+		$this->assertStringNotContainsString( 'left:0', $stylesheet, 'Open submenus must not start on the left.' );
 	}
 
 	/**

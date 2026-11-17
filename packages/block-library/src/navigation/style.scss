@@ -759,6 +759,8 @@ button.wp-block-navigation-item__content {
 	// doesn't follow the theme's viewports. Blocks that do opt out here and
 	// receive rules generated from the theme's viewport settings. `:where()`
 	// keeps the specificity these rules had before the opt-out was added.
+	// These rules now need a `.wp-block-navigation` ancestor, which every
+	// render path has; nested Navigation blocks never show the overlay.
 	@include break-small() {
 		:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
 			&:not(.hidden-by-default) {
@@ -842,6 +844,8 @@ button.wp-block-navigation-item__content {
 		// doesn't follow the theme's viewports. Blocks that do opt out here and
 		// receive rules generated from the theme's viewport settings. `:where()`
 		// keeps the specificity these rules had before the opt-out was added.
+		// These rules now need a `.wp-block-navigation` ancestor, which every
+		// render path has; nested Navigation blocks never show the overlay.
 		@include break-small {
 			:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
 				display: none;
