@@ -70,7 +70,7 @@
 }
 
 .root .steps {
-	margin: 16px 0;
+	margin: 16px 0 40px;
 	padding: 0;
 	list-style: none;
 	counter-reset: step;
