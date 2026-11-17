@@ -148,6 +148,12 @@ function findStatusMismatches(): StatusMismatch[] {
 	return mismatches;
 }
 
+function readLinkedDocsIds( message: string ): string[] {
+	return [ ...message.matchAll( /\?path=\/docs\/([\w-]+)/g ) ].map(
+		( [ , docsId ] ) => docsId
+	);
+}
+
 describe( '@wordpress/components recommendation status', () => {
 	it( 'reads the stories and migration guides', () => {
 		expect( componentStories ).not.toHaveLength( 0 );
@@ -226,7 +232,7 @@ describe( '@wordpress/components recommendation status', () => {
 				const entry = denylistEntriesByComponent.get( story.component );
 				if (
 					! entry ||
-					entry.message.includes( `?path=/docs/${ docsId }` )
+					readLinkedDocsIds( entry.message ).includes( docsId )
 				) {
 					return [];
 				}
@@ -245,14 +251,14 @@ describe( '@wordpress/components recommendation status', () => {
 		);
 		const brokenLinks = Object.entries( denylist ).flatMap(
 			( [ key, message ] ) =>
-				[
-					...message.matchAll(
-						/\?path=\/docs\/([\w-]+--migration-guide)/g
-					),
-				]
-					.filter( ( [ , id ] ) => ! guideIds.has( id ) )
+				readLinkedDocsIds( message )
+					.filter(
+						( id ) =>
+							id.includes( '--migration-guide' ) &&
+							! guideIds.has( id )
+					)
 					.map(
-						( [ , id ] ) =>
+						( id ) =>
 							`The ${ key } message in DENYLIST in ${ RULE_FILE } links ${ id }, which is not the ID of any migration-guide.mdx under packages/components. Fix the link, or the guide's story \`id\` or <Meta name>.`
 					)
 		);
