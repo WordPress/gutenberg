@@ -35,41 +35,36 @@ export default function useClickSelection() {
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
+			}
 
-				// A touch may become a scroll, so it is left to the browser.
-				if (
-					pointerType !== 'mouse' ||
-					node.contentEditable !== 'true'
-				) {
-					return;
-				}
-
-				const clientId = getBlockClientId( event.target as Element );
+			function onMouseDown( event: MouseEvent ) {
+				// Mouse events reach the listener from nodes.
+				const clickedClientId = getBlockClientId(
+					event.target as Node
+				);
 
 				// A press on a block that is edited on its own element: give
 				// focus back to the field with the caret before the browser
 				// handles the press, so it handles a press into another field.
 				// A press inside the focused editing host loses the caret once
 				// focus moves to the field: Firefox drops it, and iOS moves it.
-				if ( ! clientId || canHostEditableRoot( clientId ) ) {
-					return;
+				if (
+					node.contentEditable === 'true' &&
+					clickedClientId &&
+					! canHostEditableRoot( clickedClientId )
+				) {
+					const field = getSelectionEditableElement(
+						// A mounted element's window has a selection.
+						node.ownerDocument.defaultView!.getSelection()!,
+						node
+					) as HTMLElement | undefined;
+
+					if ( field ) {
+						setContentEditableWrapper( node, false );
+						field.focus( { preventScroll: true } );
+					}
 				}
 
-				const field = getSelectionEditableElement(
-					// A mounted element's window has a selection.
-					node.ownerDocument.defaultView!.getSelection()!,
-					node
-				) as HTMLElement | undefined;
-
-				if ( ! field ) {
-					return;
-				}
-
-				setContentEditableWrapper( node, false );
-				field.focus( { preventScroll: true } );
-			}
-
-			function onMouseDown( event: MouseEvent ) {
 				clickCollapseClientId = undefined;
 
 				// The main button.
@@ -79,10 +74,6 @@ export default function useClickSelection() {
 				}
 
 				const startClientId = getBlockSelectionStart();
-				// Mouse events reach the listener from nodes.
-				const clickedClientId = getBlockClientId(
-					event.target as Node
-				);
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus
