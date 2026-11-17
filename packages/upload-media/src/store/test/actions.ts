@@ -1113,7 +1113,7 @@ describe( 'actions', () => {
 						id: parent.id,
 						code: ErrorCode.STORAGE_LIMIT_REACHED,
 						message:
-							'"example.jpg" was uploaded, but not all of its image sizes could be saved because this site is out of storage space.',
+							'"example.jpg" was uploaded, but some of its files could not be saved because this site is out of storage space.',
 					},
 				] );
 				expect(

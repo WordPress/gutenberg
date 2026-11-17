@@ -2042,7 +2042,7 @@ export function finalizeItem( id: QueueItemId ) {
 			}
 		}
 
-		// The attachment is kept, but a sub-size it should have is missing.
+		// The attachment is kept, but a file it should have is missing.
 		// Nothing else reports that: the item's own callbacks see a success.
 		if ( item.subSizeError ) {
 			const code = isStorageLimitError( item.subSizeError )
@@ -2053,9 +2053,10 @@ export function finalizeItem( id: QueueItemId ) {
 				warning: {
 					id,
 					code,
+					// A HEIC upload's source file is the converted JPEG.
 					message: getIncompleteUploadMessage(
 						code,
-						item.sourceFile.name
+						( item.originalHeicFile ?? item.sourceFile ).name
 					),
 				},
 			} );

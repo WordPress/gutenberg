@@ -379,13 +379,13 @@ describe( 'private actions', () => {
 				'the storage limit',
 				{ code: ErrorCode.STORAGE_LIMIT_REACHED },
 				ErrorCode.STORAGE_LIMIT_REACHED,
-				'"photo.jpg" was uploaded, but not all of its image sizes could be saved because this site is out of storage space.',
+				'"photo.jpg" was uploaded, but some of its files could not be saved because this site is out of storage space.',
 			],
 			[
 				'another failure',
 				new Error( 'Network request failed' ),
 				ErrorCode.GENERAL,
-				'"photo.jpg" was uploaded, but not all of its image sizes could be saved.',
+				'"photo.jpg" was uploaded, but some of its files could not be saved.',
 			],
 		] )(
 			'should warn when %s left a sub-size out',
@@ -412,6 +412,36 @@ describe( 'private actions', () => {
 				expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 			}
 		);
+
+		it( 'should name the HEIC file the user picked in the warning', async () => {
+			const select = {
+				getItem: () => ( {
+					attachment: { id: 42 },
+					sourceFile: { name: 'photo.jpg' },
+					originalHeicFile: { name: 'photo.heic' },
+					subSizeError: new Error( 'Network request failed' ),
+				} ),
+				getSettings: () => ( {
+					mediaFinalize: vi.fn().mockResolvedValue( undefined ),
+				} ),
+			};
+			const dispatch = Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+			} );
+
+			const thunk = finalizeItem( 'test-id' );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: Type.AddWarning,
+				warning: {
+					id: 'test-id',
+					code: ErrorCode.GENERAL,
+					message:
+						'"photo.heic" was uploaded, but some of its files could not be saved.',
+				},
+			} );
+		} );
 
 		it( 'should not warn when every sub-size was saved', async () => {
 			const mediaFinalize = vi.fn().mockResolvedValue( undefined );

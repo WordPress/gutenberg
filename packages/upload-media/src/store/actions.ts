@@ -289,9 +289,10 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 					item.additionalData?.image_size === 'animated_video_poster';
 
 				/*
-				 * Remember that a sub-size is missing, so the parent can warn
-				 * about it once it has uploaded. An optional companion is not
-				 * a sub-size: the attachment is complete without it.
+				 * Remember that a sub-size or a copy of the original is
+				 * missing, so the parent can warn about it once it has
+				 * uploaded. The attachment is complete without an optional
+				 * companion.
 				 */
 				if ( ! silent && error && ! isOptionalCompanion ) {
 					dispatch< RecordSubSizeErrorAction >( {
