@@ -17,7 +17,7 @@
  * - Post-type archive URL match: the item's URL matches the current archive permalink,
  *   regardless of whether an entity ID is stored.
  *
- * @since 6.8.0
+ * @since 7.3.0
  *
  * @param array $attributes The block attributes.
  * @return bool Whether the item represents the current page/archive.
@@ -36,6 +36,13 @@ function block_core_shared_navigation_item_is_active( $attributes ) {
 	 * back to inspecting `type` via `taxonomy_exists()` to distinguish taxonomy links from
 	 * post-type links without relying on a stored `kind`.
 	 *
+	 * Backwards compatibility - why `kind` may be "custom" for an entity link:
+	 * The JS editor stores `kind: "custom"` when a link arrives without a kind and its type
+	 * is not built in (e.g. a custom post type or custom taxonomy), while still storing the
+	 * entity `id`. "custom" says nothing about whether that id is a post or a term, so it is
+	 * inferred from `type` in the same way as an absent kind. Without this, a custom taxonomy
+	 * link would be compared against `WP_Post` and could match a post with the same ID.
+	 *
 	 * Backwards compatibility - the "tag" alias:
 	 * The JS editor normalises the WordPress taxonomy slug "post_tag" to "tag" before
 	 * storing it in the `type` attribute (see update-attributes.js). Map it back so that
@@ -45,7 +52,7 @@ function block_core_shared_navigation_item_is_active( $attributes ) {
 	$stored_type    = $attributes['type'] ?? '';
 	$resolved_type  = 'tag' === $stored_type ? 'post_tag' : $stored_type;
 	$kind_from_type = taxonomy_exists( $resolved_type ) ? 'taxonomy' : 'post-type';
-	$item_kind      = ! empty( $stored_kind ) ? $stored_kind : $kind_from_type;
+	$item_kind      = empty( $stored_kind ) || 'custom' === $stored_kind ? $kind_from_type : $stored_kind;
 	// Archive links match by URL (via is_post_type_archive()), not by entity ID, so skip ID matching.
 	$enable_id_match = 'post-type-archive' !== $item_kind;
 

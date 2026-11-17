@@ -17,6 +17,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $draft;
 	private static $custom_draft;
 	private static $custom_post;
+	private static $custom_term;
 
 	private static $pages;
 	private static $terms;
@@ -34,6 +35,15 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				'public'             => true,
 				'publicly_queryable' => true,
 				'has_archive'        => true,
+			)
+		);
+		// Custom taxonomy for links stored with kind "custom" and a taxonomy type.
+		register_taxonomy(
+			'gb_test_nav_tax',
+			'post',
+			array(
+				'public'             => true,
+				'publicly_queryable' => true,
 			)
 		);
 
@@ -111,16 +121,26 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			)
 		);
 		self::$terms[] = self::$tag;
+
+		self::$custom_term = self::factory()->term->create_and_get(
+			array(
+				'taxonomy' => 'gb_test_nav_tax',
+				'name'     => 'birds',
+				'slug'     => 'birds',
+			)
+		);
+		self::$terms[]     = self::$custom_term;
 	}
 
 	public static function wpTearDownAfterClass() {
-		unregister_post_type( 'gb_test_nav_cpt' );
 		foreach ( self::$pages as $page_to_delete ) {
 			wp_delete_post( $page_to_delete->ID );
 		}
 		foreach ( self::$terms as $term_to_delete ) {
 			wp_delete_term( $term_to_delete->term_id, $term_to_delete->taxonomy );
 		}
+		unregister_taxonomy( 'gb_test_nav_tax' );
+		unregister_post_type( 'gb_test_nav_cpt' );
 	}
 
 	public function set_up() {
@@ -217,11 +237,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Confirmed failing test (TDD red): a link with kind "custom" and a numeric id
-	 * must receive current-menu-item when on the matching page.
-	 *
-	 * Fails before fix because $kind = "custom", get_queried_object()->custom
-	 * does not exist on any WP object, so ! empty(...) is always false.
+	 * A link stored with kind "custom" and a numeric id is active on the matching page.
 	 */
 	public function test_current_menu_item_for_custom_kind_link_with_id() {
 		$this->go_to( get_permalink( self::$page->ID ) );
@@ -239,19 +255,18 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * When kind is absent but type is "page", the link should still be treated as a post-type
-	 * link. Covers WP 6.7 blocks created via Custom Link variation where kind may be omitted
-	 * for built-in types.
+	 * The editor stores kind "custom" for links to non-built-in types, such as a custom
+	 * post type, while keeping the entity id. These links are active on the matching post.
 	 */
-	public function test_current_menu_item_for_page_type_without_kind() {
-		$this->go_to( get_permalink( self::$page->ID ) );
+	public function test_current_menu_item_for_custom_kind_custom_post_type_link() {
+		$this->go_to( get_permalink( self::$custom_post->ID ) );
 		$output = $this->render_nav_link(
 			array(
-				'label' => 'Page',
-				'type'  => 'page',
-				// No 'kind' — simulates older/custom-link-variation blocks.
-				'id'    => self::$page->ID,
-				'url'   => get_permalink( self::$page->ID ),
+				'label' => 'Metal Dog',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'custom',
+				'id'    => self::$custom_post->ID,
+				'url'   => get_permalink( self::$custom_post->ID ),
 			)
 		);
 		$this->assertStringContainsString( 'current-menu-item', $output );
@@ -293,9 +308,8 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * When kind is absent but type is "category", the link should be inferred as a taxonomy
-	 * link via taxonomy_exists(). Fails before fix because kind defaults to 'post-type' and
-	 * instanceof WP_Post check fails on a term archive page.
+	 * When kind is absent but type is "category", the link is inferred to be a taxonomy
+	 * link via taxonomy_exists() and is active on the category archive.
 	 */
 	public function test_current_menu_item_for_category_type_without_kind() {
 		$this->go_to( get_term_link( self::$category ) );
@@ -313,8 +327,8 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Same as above but for tags. JS normalises 'post_tag' → 'tag' before storing in type,
-	 * so the fix must map 'tag' back to 'post_tag' for taxonomy_exists() to return true.
+	 * Same as above but for tags. The editor stores 'post_tag' as 'tag' in type, which
+	 * must be mapped back to 'post_tag' for taxonomy_exists() to recognise it.
 	 */
 	public function test_current_menu_item_for_tag_type_without_kind() {
 		$this->go_to( get_term_link( self::$tag ) );
@@ -325,6 +339,26 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 				// No 'kind' stored.
 				'id'    => self::$tag->term_id,
 				'url'   => get_term_link( self::$tag ),
+			)
+		);
+		$this->assertStringContainsString( 'current-menu-item', $output );
+		$this->assertStringContainsString( 'aria-current="page"', $output );
+	}
+
+	/**
+	 * The editor stores kind "custom" for links to non-built-in types, such as a custom
+	 * taxonomy, while keeping the term id. The kind is inferred from type, so these links
+	 * are active on the matching term archive.
+	 */
+	public function test_current_menu_item_for_custom_kind_custom_taxonomy_link() {
+		$this->go_to( get_term_link( self::$custom_term ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Birds',
+				'type'  => 'gb_test_nav_tax',
+				'kind'  => 'custom',
+				'id'    => self::$custom_term->term_id,
+				'url'   => get_term_link( self::$custom_term ),
 			)
 		);
 		$this->assertStringContainsString( 'current-menu-item', $output );
@@ -439,13 +473,30 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'aria-current', $output );
 	}
 
+	public function test_custom_kind_taxonomy_link_not_active_when_on_post_page_with_matching_id() {
+		// A custom-kind link whose type is a taxonomy refers to a term, so it must not be
+		// treated as a post link and match a post with the same integer id.
+		$this->go_to( get_permalink( self::$post->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Birds',
+				'type'  => 'gb_test_nav_tax',
+				'kind'  => 'custom',
+				'id'    => self::$post->ID,
+				'url'   => get_term_link( self::$custom_term ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
 	// -------------------------------------------------------------------------
-	// Group 6: Active state — post type archive (Branch C, mirrors classic menu)
+	// Group 6: Active state — post type archive (matched by URL)
 	// -------------------------------------------------------------------------
 
 	/**
-	 * A post-type-archive link should receive current-menu-item when on the matching
-	 * archive page. Mirrors Branch C of _wp_menu_item_classes_by_context().
+	 * A post-type-archive link receives current-menu-item on the matching archive page,
+	 * mirroring the post type archive check in _wp_menu_item_classes_by_context().
 	 */
 	public function test_current_menu_item_for_post_type_archive_link() {
 		$archive_url = get_post_type_archive_link( 'gb_test_nav_cpt' );
@@ -494,6 +545,26 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			)
 		);
 		$this->assertStringNotContainsString( 'current-menu-item', $output );
+	}
+
+	/**
+	 * Post-type-archive links are matched by URL only. A stray id that matches the current
+	 * post must not make the archive link active.
+	 */
+	public function test_no_current_menu_item_for_archive_link_with_id_matching_singular_post() {
+		$archive_url = get_post_type_archive_link( 'gb_test_nav_cpt' );
+		$this->go_to( get_permalink( self::$custom_post->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'post-type-archive',
+				'id'    => self::$custom_post->ID,
+				'url'   => $archive_url,
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
 	}
 
 	public function test_returns_link_when_post_is_published() {
