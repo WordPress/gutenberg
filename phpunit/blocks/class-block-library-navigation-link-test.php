@@ -13,6 +13,7 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 	private static $category;
 	private static $tag;
 	private static $page;
+	private static $other_page;
 	private static $post;
 	private static $draft;
 	private static $custom_draft;
@@ -95,6 +96,15 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		self::$pages[] = self::$page;
 
+		self::$other_page = self::factory()->post->create_and_get(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_title'  => 'Other page',
+			)
+		);
+		self::$pages[]    = self::$other_page;
+
 		self::$post    = self::factory()->post->create_and_get(
 			array(
 				'post_type'   => 'post',
@@ -169,6 +179,99 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			$block->attributes,
 			array(),
 			$block
+		);
+	}
+
+	/**
+	 * Renders a list of navigation-link blocks in a single do_blocks() pass, as a menu would.
+	 */
+	private function render_nav_links( array $links ): string {
+		$markup = '';
+		foreach ( $links as $attrs ) {
+			$markup .= '<!-- wp:navigation-link ' . wp_json_encode( $attrs ) . ' /-->';
+		}
+		return do_blocks( $markup );
+	}
+
+	/**
+	 * Returns the href of every rendered item with the current-menu-item class.
+	 */
+	private function get_current_item_urls( string $html ): array {
+		$urls      = array();
+		$processor = new WP_HTML_Tag_Processor( $html );
+		while ( $processor->next_tag( array( 'class_name' => 'current-menu-item' ) ) ) {
+			$processor->next_tag( 'a' );
+			$urls[] = $processor->get_attribute( 'href' );
+		}
+		return $urls;
+	}
+
+	/**
+	 * Returns attributes for a set of links covering each kind of entity and URL.
+	 */
+	private function get_mixed_menu_links(): array {
+		return array(
+			array(
+				'label' => 'Page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$page->ID,
+				'url'   => get_permalink( self::$page->ID ),
+			),
+			array(
+				'label' => 'Other page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$other_page->ID,
+				'url'   => get_permalink( self::$other_page->ID ),
+			),
+			array(
+				'label' => 'Post',
+				'type'  => 'post',
+				'kind'  => 'post-type',
+				'id'    => self::$post->ID,
+				'url'   => get_permalink( self::$post->ID ),
+			),
+			array(
+				'label' => 'Metal Dog',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'post-type',
+				'id'    => self::$custom_post->ID,
+				'url'   => get_permalink( self::$custom_post->ID ),
+			),
+			array(
+				'label' => 'Cats',
+				'type'  => 'category',
+				'kind'  => 'taxonomy',
+				'id'    => self::$category->term_id,
+				'url'   => get_term_link( self::$category ),
+			),
+			array(
+				'label' => 'Dogs',
+				'type'  => 'tag',
+				'kind'  => 'taxonomy',
+				'id'    => self::$tag->term_id,
+				'url'   => get_term_link( self::$tag ),
+			),
+			array(
+				'label' => 'Birds',
+				'type'  => 'gb_test_nav_tax',
+				'kind'  => 'custom',
+				'id'    => self::$custom_term->term_id,
+				'url'   => get_term_link( self::$custom_term ),
+			),
+			array(
+				'label' => 'External',
+				'type'  => 'custom',
+				'kind'  => 'custom',
+				'url'   => 'https://example.com/',
+			),
+			array(
+				'label' => 'Custom CPT Archive',
+				'type'  => 'gb_test_nav_cpt',
+				'kind'  => 'post-type-archive',
+				'url'   => get_post_type_archive_link( 'gb_test_nav_cpt' ),
+			),
 		);
 	}
 
@@ -384,6 +487,22 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'aria-current', $output );
 	}
 
+	public function test_no_current_menu_item_for_link_to_a_different_page() {
+		// Same kind and type as the current page, but a different id.
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_link(
+			array(
+				'label' => 'Other page',
+				'type'  => 'page',
+				'kind'  => 'post-type',
+				'id'    => self::$other_page->ID,
+				'url'   => get_permalink( self::$other_page->ID ),
+			)
+		);
+		$this->assertStringNotContainsString( 'current-menu-item', $output );
+		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
 	// -------------------------------------------------------------------------
 	// Group 4: Not active — ID edge cases
 	// -------------------------------------------------------------------------
@@ -565,6 +684,34 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 		);
 		$this->assertStringNotContainsString( 'current-menu-item', $output );
 		$this->assertStringNotContainsString( 'aria-current', $output );
+	}
+
+	// -------------------------------------------------------------------------
+	// Group 7: Only the matching item is active in a menu
+	// -------------------------------------------------------------------------
+
+	public function test_only_the_link_to_the_current_page_is_active_in_a_menu() {
+		$this->go_to( get_permalink( self::$page->ID ) );
+		$output = $this->render_nav_links( $this->get_mixed_menu_links() );
+
+		$this->assertSame(
+			array( get_permalink( self::$page->ID ) ),
+			$this->get_current_item_urls( $output ),
+			'Only the link to the current page should have current-menu-item.'
+		);
+		$this->assertSame( 1, substr_count( $output, 'aria-current="page"' ) );
+	}
+
+	public function test_only_the_link_to_the_current_term_is_active_in_a_menu() {
+		$this->go_to( get_term_link( self::$category ) );
+		$output = $this->render_nav_links( $this->get_mixed_menu_links() );
+
+		$this->assertSame(
+			array( get_term_link( self::$category ) ),
+			$this->get_current_item_urls( $output ),
+			'Only the link to the current term should have current-menu-item.'
+		);
+		$this->assertSame( 1, substr_count( $output, 'aria-current="page"' ) );
 	}
 
 	public function test_returns_link_when_post_is_published() {
