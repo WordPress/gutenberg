@@ -4,6 +4,7 @@ import {
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	PRELOADED_NAVIGATION_MENUS_QUERY,
@@ -11,31 +12,42 @@ import {
 } from './constants';
 
 export default function useNavigationMenu( ref ) {
-	const permissions = useResourcePermissions( {
+	// Whether the user can create menus is a collection-level check, which the
+	// Site Editor preloads, so it resolves without waiting for the check on the
+	// specific menu.
+	const {
+		canCreate: canCreateNavigationMenus,
+		isResolving: isResolvingCanCreateNavigationMenus,
+		hasResolved: hasResolvedCanCreateNavigationMenus,
+	} = useResourcePermissions( {
 		kind: 'postType',
 		name: 'wp_navigation',
-		id: ref,
 	} );
 
 	const {
-		// Can the user create navigation menus?
-		canCreate: canCreateNavigationMenus,
-
 		// Can the user update the specific navigation menu with the given post ID?
 		canUpdate: canUpdateNavigationMenu,
 
 		// Can the user delete the specific navigation menu with the given post ID?
 		canDelete: canDeleteNavigationMenu,
-		isResolving: isResolvingPermissions,
 		hasResolved: hasResolvedPermissions,
-	} = permissions;
+	} = useResourcePermissions( {
+		kind: 'postType',
+		name: 'wp_navigation',
+		id: ref,
+	} );
 
-	// Creation-capable users still need the editable collection before a menu
-	// is selected so drafts remain available and unsaved inner blocks can be
-	// saved as a new Navigation Menu.
+	// Users who can create menus use the editable records straight away, so
+	// that drafts stay available, unsaved inner blocks can be saved as a new
+	// menu, and a deleted menu can be replaced. Other users wait for the check
+	// on the specific menu.
+	const canCreateMenusResolved =
+		hasResolvedCanCreateNavigationMenus && canCreateNavigationMenus;
+	const hasResolvedDataSource =
+		canCreateMenusResolved || hasResolvedPermissions;
 	const canUseEditContext =
-		hasResolvedPermissions &&
-		( canUpdateNavigationMenu || ( ! ref && canCreateNavigationMenus ) );
+		canCreateMenusResolved ||
+		( hasResolvedPermissions && canUpdateNavigationMenu );
 
 	// Users who cannot edit the menu only get published menus in view context.
 	// Wait for permissions so that users who can edit menus don't make an
@@ -48,7 +60,7 @@ export default function useNavigationMenu( ref ) {
 		'postType',
 		'wp_navigation',
 		VIEW_NAVIGATION_MENUS_QUERY,
-		{ enabled: hasResolvedPermissions && ! canUseEditContext }
+		{ enabled: hasResolvedDataSource && ! canUseEditContext }
 	);
 
 	const {
@@ -73,12 +85,12 @@ export default function useNavigationMenu( ref ) {
 		: hasResolvedPublishedNavigationMenus;
 
 	const {
-		navigationMenu,
+		navigationMenu: selectedNavigationMenu,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
 	} = useSelect(
 		( select ) => {
-			if ( ! hasResolvedPermissions ) {
+			if ( ! hasResolvedDataSource ) {
 				return {
 					isNavigationMenuResolved: false,
 					isNavigationMenuMissing: false,
@@ -89,8 +101,28 @@ export default function useNavigationMenu( ref ) {
 				? selectEditableMenu( select, ref )
 				: selectViewableMenu( select, ref );
 		},
-		[ ref, hasResolvedPermissions, canUseEditContext ]
+		[ ref, hasResolvedDataSource, canUseEditContext ]
 	);
+
+	// View-context records are normalized outside the selector, so that the
+	// selector returns the stored record and doesn't trigger a re-render on
+	// every store update.
+	const navigationMenu = useMemo(
+		() =>
+			canUseEditContext
+				? selectedNavigationMenu
+				: normalizeViewableMenu( selectedNavigationMenu ),
+		[ canUseEditContext, selectedNavigationMenu ]
+	);
+
+	// The user can see the menu but not edit it. A menu that is missing, for
+	// example because it was deleted, isn't read-only.
+	const isNavigationMenuReadOnly =
+		!! ref &&
+		hasResolvedPermissions &&
+		! canUpdateNavigationMenu &&
+		isNavigationMenuResolved &&
+		! isNavigationMenuMissing;
 
 	const canSwitchNavigationMenu = ref
 		? navigationMenus?.length > 1
@@ -100,13 +132,16 @@ export default function useNavigationMenu( ref ) {
 		navigationMenu,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
+		isNavigationMenuReadOnly,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
 		canSwitchNavigationMenu,
 		canUserCreateNavigationMenus: canCreateNavigationMenus,
-		isResolvingCanUserCreateNavigationMenus: isResolvingPermissions,
-		hasResolvedCanUserCreateNavigationMenus: hasResolvedPermissions,
+		isResolvingCanUserCreateNavigationMenus:
+			isResolvingCanCreateNavigationMenus,
+		hasResolvedCanUserCreateNavigationMenus:
+			hasResolvedCanCreateNavigationMenus,
 		canUserUpdateNavigationMenu: canUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu: ref
 			? hasResolvedPermissions
@@ -176,21 +211,30 @@ function selectViewableMenu( select, ref ) {
 	);
 	const isNavigationMenuPublished = navigationMenu?.status === 'publish';
 
-	// Normalize to the shape of an edited record, where `title` and `content`
-	// are strings. The rendered title is HTML-encoded (e.g. `&#8217;`), so it
-	// is decoded once here for consumers that display it as text.
 	return {
 		isNavigationMenuResolved: hasResolvedNavigationMenu,
 		isNavigationMenuMissing:
 			hasResolvedNavigationMenu && ! isNavigationMenuPublished,
-		navigationMenu: isNavigationMenuPublished
-			? {
-					...navigationMenu,
-					title: decodeEntities(
-						navigationMenu.title?.rendered ?? ''
-					),
-					content: navigationMenu.content?.rendered ?? '',
-				}
-			: null,
+		navigationMenu: isNavigationMenuPublished ? navigationMenu : null,
+	};
+}
+
+/**
+ * Normalizes a view-context record to the shape of an edited record, where
+ * `title` and `content` are strings. The rendered title is HTML-encoded (e.g.
+ * `&#8217;`), so it is decoded once here for consumers that display it as text.
+ *
+ * @param {Object|null} navigationMenu The view-context Navigation Menu record.
+ * @return {Object|null} The normalized record.
+ */
+function normalizeViewableMenu( navigationMenu ) {
+	if ( ! navigationMenu ) {
+		return navigationMenu;
+	}
+
+	return {
+		...navigationMenu,
+		title: decodeEntities( navigationMenu.title?.rendered ?? '' ),
+		content: navigationMenu.content?.rendered ?? '',
 	};
 }

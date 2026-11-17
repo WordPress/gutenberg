@@ -46,10 +46,9 @@ const MainContent = ( {
 
 	const {
 		navigationMenu,
+		isNavigationMenuReadOnly,
 		canUserCreateNavigationMenus,
-		canUserUpdateNavigationMenu,
 		hasResolvedCanUserCreateNavigationMenus,
-		hasResolvedCanUserUpdateNavigationMenu,
 	} = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
@@ -66,11 +65,7 @@ const MainContent = ( {
 		return <WCSpinner />;
 	}
 
-	if (
-		currentMenuId &&
-		hasResolvedCanUserUpdateNavigationMenu &&
-		! canUserUpdateNavigationMenu
-	) {
+	if ( isNavigationMenuReadOnly ) {
 		return (
 			<Notice.Root intent="info">
 				<Notice.Description>

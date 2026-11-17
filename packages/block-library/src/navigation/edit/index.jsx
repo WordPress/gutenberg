@@ -330,6 +330,13 @@ function Navigation( {
 			name: 'block-library/core/navigation/classic-menu-conversion',
 		} );
 
+	const [
+		showNavigationMenuPermissionsNotice,
+		hideNavigationMenuPermissionsNotice,
+	] = useNavigationNotice( {
+		name: 'block-library/core/navigation/permissions/update',
+	} );
+
 	const {
 		create: createNavigationMenu,
 		status: createNavigationMenuStatus,
@@ -444,6 +451,7 @@ function Navigation( {
 		hasResolvedNavigationMenus,
 		isNavigationMenuResolved,
 		isNavigationMenuMissing,
+		isNavigationMenuReadOnly,
 		canUserUpdateNavigationMenu,
 		hasResolvedCanUserUpdateNavigationMenu,
 		canUserDeleteNavigationMenu,
@@ -737,6 +745,40 @@ function Navigation( {
 		showClassicMenuConversionNotice,
 		createNavigationMenuPost?.id,
 		handleUpdateMenu,
+	] );
+
+	// Tell users on the canvas when they can't edit the menu, so they don't
+	// need the block inspector open to find out.
+	useEffect( () => {
+		if ( ! isSelected && ! isInnerBlockSelected ) {
+			hideNavigationMenuPermissionsNotice();
+			return;
+		}
+
+		if ( isNavigationMenuReadOnly ) {
+			showNavigationMenuPermissionsNotice(
+				__(
+					'You can view this Menu, but you do not have permission to edit it.'
+				)
+			);
+		} else if (
+			! ref &&
+			hasResolvedCanUserCreateNavigationMenus &&
+			! canUserCreateNavigationMenus
+		) {
+			showNavigationMenuPermissionsNotice(
+				__( 'You do not have permission to create Navigation Menus.' )
+			);
+		}
+	}, [
+		isSelected,
+		isInnerBlockSelected,
+		isNavigationMenuReadOnly,
+		ref,
+		hasResolvedCanUserCreateNavigationMenus,
+		canUserCreateNavigationMenus,
+		hideNavigationMenuPermissionsNotice,
+		showNavigationMenuPermissionsNotice,
 	] );
 
 	const hasManagePermissions =
@@ -1144,7 +1186,7 @@ function Navigation( {
 									}
 								>
 									{ isEntityAvailable &&
-										canUserUpdateNavigationMenu && (
+										! isNavigationMenuReadOnly && (
 											<NavigationInnerBlocks
 												clientId={ clientId }
 												hasCustomPlaceholder={
@@ -1155,7 +1197,7 @@ function Navigation( {
 											/>
 										) }
 									{ isEntityAvailable &&
-										! canUserUpdateNavigationMenu && (
+										isNavigationMenuReadOnly && (
 											<ReadOnlyNavigationInnerBlocks
 												content={
 													navigationMenu?.content

@@ -114,6 +114,16 @@ test.describe( 'Navigation block for a default Editor without Navigation Menu wr
 		).toHaveCount( 0 );
 
 		await navigationBlock.click();
+
+		// The canvas tells the user the menu is read-only, so they don't need
+		// the block inspector open to find out.
+		await expect(
+			page.getByTestId( 'snackbar' ).filter( {
+				hasText:
+					'You can view this Menu, but you do not have permission to edit it.',
+			} )
+		).toBeVisible();
+
 		await editor.openDocumentSettingsSidebar();
 		await page.getByRole( 'tab', { name: 'List View' } ).click();
 

@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { renderHook } from '@testing-library/react';
 import { createRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
@@ -152,9 +153,14 @@ describe( 'useNavigationMenus', () => {
 		} = {}
 	) {
 		resolveCreatePermission( registry, create );
+		resolveReadPermission( registry, true );
 		resolveReadRecordPermission( registry, ref, read );
 		resolveUpdatePermission( registry, ref, update );
 		resolveDeletePermission( registry, ref, canDelete );
+	}
+
+	function getNavigationMenu( ref ) {
+		return renderHook( () => useNavigationMenu( ref ) ).result.current;
 	}
 
 	function hasRequestedMenus( query ) {
@@ -168,7 +174,7 @@ describe( 'useNavigationMenus', () => {
 	}
 
 	it( 'returns unresolved state before data and permissions resolve', () => {
-		expect( useNavigationMenu() ).toEqual(
+		expect( getNavigationMenu() ).toEqual(
 			expect.objectContaining( {
 				navigationMenus: [],
 				navigationMenu: undefined,
@@ -185,7 +191,7 @@ describe( 'useNavigationMenus', () => {
 		resolveCreatePermission( registry, false );
 		resolveReadPermission( registry, true );
 
-		expect( useNavigationMenu() ).toEqual(
+		expect( getNavigationMenu() ).toEqual(
 			expect.objectContaining( {
 				navigationMenus: publishedMenus,
 				canSwitchNavigationMenu: true,
@@ -205,7 +211,7 @@ describe( 'useNavigationMenus', () => {
 		resolveCreatePermission( registry, true );
 		resolveReadPermission( registry, true );
 
-		expect( useNavigationMenu() ).toEqual(
+		expect( getNavigationMenu() ).toEqual(
 			expect.objectContaining( {
 				navigationMenus: [ ...publishedMenus, draftMenu ],
 				canSwitchNavigationMenu: true,
@@ -221,7 +227,7 @@ describe( 'useNavigationMenus', () => {
 		resolveRecord( registry, publishedMenu.id );
 		resolvePermissions( publishedMenu.id );
 
-		expect( useNavigationMenu( publishedMenu.id ) ).toEqual(
+		expect( getNavigationMenu( publishedMenu.id ) ).toEqual(
 			expect.objectContaining( {
 				navigationMenu: expect.objectContaining( {
 					id: publishedMenu.id,
@@ -247,7 +253,7 @@ describe( 'useNavigationMenus', () => {
 		resolvePermissions( menuWithEntities.id );
 
 		expect(
-			useNavigationMenu( menuWithEntities.id ).navigationMenu.title
+			getNavigationMenu( menuWithEntities.id ).navigationMenu.title
 		).toBe( 'Bob\u2019s Fish & Chips' );
 	} );
 
@@ -256,7 +262,7 @@ describe( 'useNavigationMenus', () => {
 		resolveRecord( registry, draftMenu.id );
 		resolvePermissions( draftMenu.id );
 
-		expect( useNavigationMenu( draftMenu.id ) ).toEqual(
+		expect( getNavigationMenu( draftMenu.id ) ).toEqual(
 			expect.objectContaining( {
 				navigationMenu: null,
 				navigationMenus: publishedMenus,
@@ -277,7 +283,7 @@ describe( 'useNavigationMenus', () => {
 			delete: true,
 		} );
 
-		expect( useNavigationMenu( draftMenu.id ) ).toEqual(
+		expect( getNavigationMenu( draftMenu.id ) ).toEqual(
 			expect.objectContaining( {
 				navigationMenu: expect.objectContaining( {
 					id: draftMenu.id,
@@ -289,6 +295,73 @@ describe( 'useNavigationMenus', () => {
 				canUserCreateNavigationMenus: true,
 				canUserUpdateNavigationMenu: true,
 				canUserDeleteNavigationMenu: true,
+			} )
+		);
+		expect( hasRequestedMenus( VIEW_QUERY ) ).toBe( false );
+	} );
+	it( 'marks a published menu as read-only for a user without update permission', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecord( registry, publishedMenu.id );
+		resolvePermissions( publishedMenu.id );
+
+		expect(
+			getNavigationMenu( publishedMenu.id ).isNavigationMenuReadOnly
+		).toBe( true );
+	} );
+
+	it( 'returns the same normalized menu while the store is unchanged', () => {
+		resolveRecords( registry, publishedMenus );
+		resolveRecord( registry, publishedMenu.id );
+		resolvePermissions( publishedMenu.id );
+
+		const { result, rerender } = renderHook( () =>
+			useNavigationMenu( publishedMenu.id )
+		);
+		const firstNavigationMenu = result.current.navigationMenu;
+		rerender();
+
+		expect( result.current.navigationMenu ).toBe( firstNavigationMenu );
+	} );
+
+	it( 'uses editable menus for a user who can create menus before the menu permissions resolve', () => {
+		resolveRecords(
+			registry,
+			[ ...publishedMenus, draftMenu ],
+			EDIT_QUERY
+		);
+		resolveCreatePermission( registry, true );
+		resolveReadPermission( registry, true );
+
+		expect( getNavigationMenu( publishedMenu.id ) ).toEqual(
+			expect.objectContaining( {
+				navigationMenus: [ ...publishedMenus, draftMenu ],
+				hasResolvedNavigationMenus: true,
+				isNavigationMenuReadOnly: false,
+			} )
+		);
+		expect( hasRequestedMenus( VIEW_QUERY ) ).toBe( false );
+	} );
+
+	it( 'keeps a user who can create menus on editable menus when the menu was deleted', () => {
+		const deletedMenuId = 99;
+		const dispatch = registry.dispatch( coreStore );
+		const args = [ 'postType', 'wp_navigation', deletedMenuId ];
+		dispatch.startResolution( 'getEditedEntityRecord', args );
+		dispatch.finishResolution( 'getEditedEntityRecord', args );
+		resolveRecords(
+			registry,
+			[ ...publishedMenus, draftMenu ],
+			EDIT_QUERY
+		);
+		resolvePermissions( deletedMenuId, { create: true, read: false } );
+
+		expect( getNavigationMenu( deletedMenuId ) ).toEqual(
+			expect.objectContaining( {
+				navigationMenu: null,
+				navigationMenus: [ ...publishedMenus, draftMenu ],
+				isNavigationMenuMissing: true,
+				isNavigationMenuReadOnly: false,
+				canUserCreateNavigationMenus: true,
 			} )
 		);
 		expect( hasRequestedMenus( VIEW_QUERY ) ).toBe( false );
