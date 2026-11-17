@@ -42,6 +42,11 @@ describe( 'normalizeIconSvg', () => {
 			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M9 12h2v-2z" />\n</svg>\n',
 		},
 		{
+			name: 'treats the same color written differently as one color',
+			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19V9Z" fill="#000"/>\n<path d="M7 11H9V12Z" fill="black"/>\n<path d="M7 14H9V15Z" fill="#000000"/>\n<path d="M7 17H9V18Z" fill="rgb(0, 0, 0)"/>\n</svg>',
+			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M5 5H19V9Z" />\n\t<path d="M7 11H9V12Z" />\n\t<path d="M7 14H9V15Z" />\n\t<path d="M7 17H9V18Z" />\n</svg>\n',
+		},
+		{
 			name: 'drops a redundant inherited stroke',
 			input: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<rect x="5" y="5" width="14" height="14" stroke="currentColor" />\n</svg>\n',
 			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<rect x="5" y="5" width="14" height="14" />\n</svg>\n',

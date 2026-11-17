@@ -197,6 +197,47 @@ function hasAlpha( value ) {
 	);
 }
 
+// Color keywords that design tools commonly export, as hex.
+const NAMED_COLORS = {
+	black: '#000000',
+	white: '#ffffff',
+};
+
+/**
+ * Writes a color in one form, so that the same color written differently,
+ * such as `#000`, `#000000`, `black` and `rgb( 0, 0, 0 )`, compares equal.
+ * A value it does not recognize is returned lowercased.
+ *
+ * @param {string} value A `fill` or `stroke` value.
+ * @return {string} The color as six-digit hex, or the lowercased value.
+ */
+function canonicalColor( value ) {
+	const color = value.trim().toLowerCase();
+	if ( NAMED_COLORS[ color ] ) {
+		return NAMED_COLORS[ color ];
+	}
+	if ( /^#[0-9a-f]{3}$/.test( color ) ) {
+		return '#' + [ ...color.slice( 1 ) ].map( ( c ) => c + c ).join( '' );
+	}
+	const rgb = color.match(
+		/^rgb\(\s*(\d+)\s*[,\s]\s*(\d+)\s*[,\s]\s*(\d+)\s*\)$/
+	);
+	if ( rgb ) {
+		return (
+			'#' +
+			rgb
+				.slice( 1 )
+				.map( ( channel ) =>
+					Math.min( 255, Number( channel ) )
+						.toString( 16 )
+						.padStart( 2, '0' )
+				)
+				.join( '' )
+		);
+	}
+	return color;
+}
+
 /**
  * Explains why the root element cannot be normalized.
  *
@@ -443,7 +484,7 @@ function normalizeIconSvg( source ) {
 				isStroked ? stroke : undefined,
 			]
 				.filter( Boolean )
-				.map( ( color ) => color.toLowerCase() ),
+				.map( canonicalColor ),
 		} );
 	}
 
@@ -454,7 +495,7 @@ function normalizeIconSvg( source ) {
 		problems.push(
 			`more than one color (${ colors.join(
 				', '
-			) }; a library icon is drawn in a single color that inherits the text color, so a cut-out has to be part of the path, for example with fill-rule="evenodd")`
+			) }; a library icon is drawn in a single color that inherits the text color, so give every shape the same color, and if a shape is painted to cut out part of another, make the cut-out part of the path, for example with fill-rule="evenodd")`
 		);
 	}
 
