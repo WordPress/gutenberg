@@ -1,6 +1,6 @@
 import { ColorSpace, to, get, OKLCH, sRGB } from 'colorjs.io/fn';
-import colorTokens from '../../src/prebuilt/ts/color-tokens.ts';
-import { DEFAULT_RAMPS } from '../../src/color-ramps/lib/default-ramps.ts';
+import type { TokenNormalized } from '@terrazzo/parser';
+import { makeCSSVar } from '@terrazzo/token-tools/css';
 import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants.ts';
 
 const WP_ADMIN_THEME_COLOR_VAR = '--wp-admin-theme-color';
@@ -224,28 +224,14 @@ export function formatDesignTokenFallbacksScss(
 	].join( '\n' );
 }
 
-export function createTokenFallbackResolver() {
-	// Map semantic CSS variable names to primary ramp values.
+export function createTokenFallbackResolver(
+	tokens: Record< string, TokenNormalized >
+) {
 	// Only primary ramp aliases receive dynamic brand fallbacks.
-	const brandTokenStepHex: Record< string, string > = {};
-	const primaryRamp = DEFAULT_RAMPS.primary.ramp;
-
-	for ( const [ rampKey, tokenNames ] of Object.entries( colorTokens ) ) {
-		if ( ! rampKey.startsWith( 'primary-' ) ) {
-			continue;
-		}
-
-		const stepName = rampKey.replace(
-			'primary-',
-			''
-		) as keyof typeof primaryRamp;
-		const stepHex = primaryRamp[ stepName ];
-		if ( ! stepHex ) {
-			continue;
-		}
-
-		for ( const tokenName of tokenNames ) {
-			brandTokenStepHex[ `--wpds-color-${ tokenName }` ] = stepHex;
+	const brandTokens = new Set< string >();
+	for ( const token of Object.values( tokens ) ) {
+		if ( token.aliasOf?.startsWith( 'wpds-color.primitive.primary.' ) ) {
+			brandTokens.add( makeCSSVar( token.id ) );
 		}
 	}
 
@@ -259,9 +245,8 @@ export function createTokenFallbackResolver() {
 	};
 
 	return ( tokenName: string, css: string ): string => {
-		const brandStepHex = brandTokenStepHex[ tokenName ];
-		const fallback = brandStepHex
-			? computeBrandFallback( brandStepHex )
+		const fallback = brandTokens.has( tokenName )
+			? computeBrandFallback( css )
 			: css;
 
 		return overrides[ tokenName ] ?? fallback;

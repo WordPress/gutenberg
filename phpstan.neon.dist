@@ -1,6 +1,8 @@
 # PHPStan configuration for Gutenberg
 #
-# To overload this configuration, copy this file to phpstan.neon and adjust as needed.
+# To override this configuration, create a phpstan.neon which includes this file and adjusts its parameters as
+# needed, rather than copying it, so that the copy does not go stale. See docs/contributors/code/coding-guidelines.md
+# for examples.
 #
 # https://phpstan.org/config-reference
 
@@ -8,9 +10,53 @@ includes:
 	# The base configuration file for using PHPStan with the Gutenberg codebase.
 	- tools/phpstan/base.neon
 
-	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`.
+	# Preexisting errors that should be ignored. Regenerate with `composer phpstan:baselines`, or remove the entries
+	# for fixed errors with `composer phpstan:fix`.
 	# https://phpstan.org/user-guide/baseline
 	- tools/phpstan/baseline.neon
+
+# Rules from phpstan-strict-rules which Gutenberg already complies with. The others are not enabled until the code
+# complies with them, but they can be enabled in a local phpstan.neon to work toward that. See
+# docs/contributors/code/coding-guidelines.md.
+#
+# These are registered individually, rather than by including phpstan-strict-rules' rules.neon with only these
+# enabled, because that file also makes several PHPStan parameters stricter even when its rules are disabled. That is
+# also why composer.json tells phpstan/extension-installer to ignore the package, since it would otherwise include
+# rules.neon automatically.
+# https://github.com/phpstan/phpstan-strict-rules
+rules:
+	# strictRules.disallowedLooseComparison is registered under `services` below, since it takes an argument.
+	# strictRules.disallowedBacktick
+	- PHPStan\Rules\DisallowedConstructs\DisallowedBacktickRule
+	# strictRules.disallowedImplicitArrayCreation
+	- PHPStan\Rules\DisallowedConstructs\DisallowedImplicitArrayCreationRule
+	# strictRules.disallowedShortTernary
+	- PHPStan\Rules\DisallowedConstructs\DisallowedShortTernaryRule
+	# strictRules.closureUsesThis
+	- PHPStan\Rules\Functions\ClosureUsesThisRule
+	# strictRules.matchingInheritedMethodNames
+	- PHPStan\Rules\Methods\WrongCaseOfInheritedMethodRule
+	# strictRules.switchConditionsMatchingType
+	- PHPStan\Rules\SwitchConditions\MatchingTypeInSwitchCaseConditionRule
+	# strictRules.strictFunctionCalls, which for in_array(), array_search(), and array_keys() is also enforced by the
+	# WordPress.PHP.StrictInArray sniff.
+	- PHPStan\Rules\StrictCalls\StrictFunctionCallsRule
+	# strictRules.illegalConstructorMethodCall
+	- PHPStan\Rules\Methods\IllegalConstructorMethodCallRule
+	- PHPStan\Rules\Methods\IllegalConstructorStaticCallRule
+
+services:
+	# strictRules.disallowedLooseComparison, with the argument rules.neon passes it.
+	-
+		class: PHPStan\Rules\DisallowedConstructs\DisallowedLooseComparisonRule
+		arguments:
+			includeOperandTypesInErrorMessage: %featureToggles.bleedingEdge%
+		tags:
+			- phpstan.rules.rule
+
+	# strictRules.numericOperandsInArithmeticOperators is not enabled, although the code complies with it, because its
+	# rules need a PHPStan\Rules\Operators\OperatorRuleHelper service. Registering one here would leave two once a local
+	# phpstan.neon includes rules.neon, which also registers one, and PHPStan would then fail to load the configuration.
 
 parameters:
 	# https://phpstan.org/user-guide/rule-levels

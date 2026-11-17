@@ -14,14 +14,15 @@ export default [
 					isRepeated: false,
 					dimRatio: 100,
 					backgroundType: 'image',
-					minHeight: 66,
-					minHeightUnit: 'vh',
 					customGradient:
 						'linear-gradient(90deg,rgb(35,74,20) 50%,rgb(225,137,116) 50%)',
 					isDark: false,
 					tagName: 'div',
 					align: 'full',
 					style: {
+						dimensions: {
+							minHeight: '66vh',
+						},
 						spacing: {
 							padding: {
 								top: '5vw',
@@ -672,14 +673,15 @@ export default [
 					dimRatio: 100,
 					customOverlayColor: '#ffb43c',
 					backgroundType: 'image',
-					minHeight: 66,
-					minHeightUnit: 'vh',
 					isDark: false,
 					useFeaturedImage: false,
 					tagName: 'div',
 					align: 'full',
 					textColor: 'black',
 					style: {
+						dimensions: {
+							minHeight: '66vh',
+						},
 						spacing: {
 							padding: {
 								top: '48px',

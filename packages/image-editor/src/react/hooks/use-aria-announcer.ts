@@ -2,7 +2,7 @@ import { speak } from '@wordpress/a11y';
 import { useEffect, useLayoutEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import type { InternalImageEditorState } from '../../core/types';
-import { getSourceRegion } from '../../core/source-region';
+import { getOutputSize } from '../../get-output-size';
 
 /** Debounce delay for ARIA live announcements (ms). */
 const ARIA_DEBOUNCE_MS = 300;
@@ -76,26 +76,23 @@ function getCropAnnouncement(
 	state: InternalImageEditorState,
 	previousState: InternalImageEditorState | null
 ): string | undefined {
-	if ( ! state.image ) {
+	const size = getOutputSize( state );
+	if ( ! size ) {
 		return undefined;
 	}
-	const imageSize = {
-		width: state.image.naturalWidth,
-		height: state.image.naturalHeight,
-	};
-	const region = getSourceRegion( state, imageSize );
 	// Announce only when the crop's pixel dimensions change. Measuring both the
 	// previous and current crop rects under the current rotation and zoom keeps
 	// the comparison in the same pixel units we announce, and leaves a zoom-only
 	// change — which doesn't move the crop rect — silent.
 	if ( previousState?.image ) {
-		const previousRegion = getSourceRegion(
-			{ ...state, cropRect: previousState.cropRect },
-			imageSize
-		);
+		const previousSize = getOutputSize( {
+			...state,
+			cropRect: previousState.cropRect,
+		} );
 		if (
-			Math.round( previousRegion.width ) === Math.round( region.width ) &&
-			Math.round( previousRegion.height ) === Math.round( region.height )
+			previousSize &&
+			Math.round( previousSize.width ) === Math.round( size.width ) &&
+			Math.round( previousSize.height ) === Math.round( size.height )
 		) {
 			return undefined;
 		}
@@ -103,8 +100,8 @@ function getCropAnnouncement(
 	return sprintf(
 		/* translators: 1: crop width in pixels, 2: crop height in pixels. */
 		__( 'Crop %1$d by %2$d pixels' ),
-		Math.round( region.width ),
-		Math.round( region.height )
+		Math.round( size.width ),
+		Math.round( size.height )
 	);
 }
 

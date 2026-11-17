@@ -3695,10 +3695,7 @@ export const isUngroupable = createRegistrySelector(
 			const _isUngroupable =
 				block &&
 				( block.name === groupingBlockName ||
-					(
-						getBlockType( block.name )?.transforms as
-							{ ungroup?: unknown } | undefined
-					 )?.ungroup ) &&
+					getBlockType( block.name )?.transforms?.ungroup ) &&
 				!! block.innerBlocks.length;
 
 			return _isUngroupable && canRemoveBlock( state, _clientId );
