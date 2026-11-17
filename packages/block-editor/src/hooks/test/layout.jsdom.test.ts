@@ -229,6 +229,166 @@ describe( 'layout', () => {
 			);
 		} );
 
+		it.each( [
+			[ 'flow', { type: 'default' } ],
+			[ 'constrained', { type: 'constrained', contentSize: '600px' } ],
+			[ 'flex', { type: 'flex', flexWrap: 'nowrap' } ],
+			[ 'grid', { type: 'grid', columnCount: 3 } ],
+		] )(
+			'outputs nothing for %s layouts without viewport styles',
+			( _name, layout ) => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							layout,
+							style: { spacing: { blockGap: '12px' } },
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			}
+		);
+
+		describe( 'mobile stacking', () => {
+			const manualGridLayout = {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 3,
+				stackOnMobile: true,
+			};
+			const stackingCSS =
+				'.wp-container-test.wp-container-test { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
+				'.wp-container-test.wp-container-test > * { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }';
+
+			let originalExperiment: boolean | undefined;
+			beforeEach( () => {
+				originalExperiment =
+					window.__experimentalEnableGridInteractivity;
+				window.__experimentalEnableGridInteractivity = true;
+			} );
+			afterEach( () => {
+				window.__experimentalEnableGridInteractivity =
+					originalExperiment;
+			} );
+
+			it( 'stacks the children of a manual placement grid on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( `@media (width <= 480px){${ stackingCSS }}` );
+			} );
+
+			it( 'combines mobile stacking with mobile layout overrides', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': { layout: { columnCount: 2 } },
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe(
+					`@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }${ stackingCSS }}`
+				);
+			} );
+
+			it( 'does not stack a manual placement grid by default', () => {
+				const { stackOnMobile, ...unstackedLayout } = manualGridLayout;
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: unstackedLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack a manual placement grid when stacking is turned off', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: { ...manualGridLayout, stackOnMobile: false },
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack a manual placement grid when stacking is turned off on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': { layout: { stackOnMobile: false } },
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack a grid switched to auto placement on mobile', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {
+							style: {
+								'@mobile': {
+									layout: { isManualPlacement: null },
+								},
+							},
+						},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).not.toContain( 'grid-row: span' );
+			} );
+
+			it( 'does not stack auto placement grids', () => {
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: { type: 'grid', columnCount: 3 },
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+
+			it( 'does not stack manual placement grids without the grid interactivity experiment', () => {
+				window.__experimentalEnableGridInteractivity = false;
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: manualGridLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
+			} );
+		} );
+
 		it( 'generates responsive auto grid columns when column count is unset', () => {
 			expect(
 				getResponsiveLayoutStyles( {
