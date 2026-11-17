@@ -6,10 +6,9 @@ import { useResizeObserver } from '@wordpress/compose';
  * stylesheet for the CSS half of this.
  *
  * The stylesheet caps the actions to the room the row has left after a
- * minimum of title, using the widths this writes to custom properties. Actions
- * that don't fit wrap out of view: they're hidden, so they can't be focused
- * while invisible, and stay available in the actions menu. The width of the
- * actions that fit is what the title makes room for when they're revealed.
+ * minimum of title, using the widths this writes to custom properties, and
+ * actions that don't fit wrap. The width of their longest line is what the
+ * title makes room for when they're revealed.
  *
  * @param titleRow The title row, holding the title and the primary actions.
  */
@@ -36,22 +35,15 @@ function fitPrimaryActions( titleRow: HTMLElement ) {
 
 	const box = content.getBoundingClientRect();
 	const isRtl = getComputedStyle( content ).direction === 'rtl';
-	let firstLineTop: number | undefined;
-	let fittingWidth = 0;
-	for ( const action of Array.from( content.children ) as HTMLElement[] ) {
+	let actionsWidth = 0;
+	for ( const action of Array.from( content.children ) ) {
 		const rect = action.getBoundingClientRect();
-		firstLineTop ??= rect.top;
 		const end = isRtl ? box.right - rect.left : rect.right - box.left;
-		const fits =
-			Math.abs( rect.top - firstLineTop ) < 1 && end <= box.width + 0.5;
-		action.style.visibility = fits ? '' : 'hidden';
-		if ( fits ) {
-			fittingWidth = Math.max( fittingWidth, end );
-		}
+		actionsWidth = Math.max( actionsWidth, end );
 	}
 	titleRow.style.setProperty(
 		'--wp-dataviews-primary-actions-width',
-		`${ fittingWidth }px`
+		`${ actionsWidth }px`
 	);
 }
 

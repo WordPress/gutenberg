@@ -14,6 +14,7 @@
 	}
 
 	.dataviews-view-table__primary-actions {
+		height: auto;
 		overflow: visible;
 	}
 }
@@ -417,7 +418,7 @@
 
 .dataviews-view-table__title-row {
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	width: 100%;
 	min-width: 0;
 
@@ -437,30 +438,26 @@
 	}
 }
 
-// The actions start where the title ends. This box is always 0 wide, and the
-// actions are positioned out of the flow, so they never add to the width of
-// the column (or the height of the row).
+// The actions start where the title ends. This box is always 0 wide, so the
+// actions, which overflow it, never add to the width of the column. Until the
+// row reveals them, it's also 0 tall, and clips them: they stay focusable, and
+// focusing one reveals them. Once revealed, actions that wrap make the row
+// taller.
 .dataviews-view-table__primary-actions {
-	position: relative;
-	align-self: stretch;
+	align-self: flex-start;
 	flex: 0 0 0;
 	width: 0;
-	// Clip the actions until the row reveals them. They stay focusable, and
-	// focusing one reveals them.
+	height: 0;
 	overflow: hidden;
 }
 
 // Capped to the row's width minus a minimum of title: the whole title when
-// it's short, 10 characters otherwise. Actions that don't fit wrap, and
-// `usePrimaryActionsFit` hides them. The padding is the gap between the title
-// and the actions.
+// it's short, 10 characters otherwise. Actions that don't fit wrap. The
+// padding is the gap between the title and the actions.
 .dataviews-view-table__primary-actions-content {
-	position: absolute;
-	inset-block-start: 0;
-	inset-inline-start: 0;
 	display: flex;
 	flex-wrap: wrap;
-	gap: var(--wpds-dimension-gap-lg);
+	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-lg);
 	width: max-content;
 	max-width: calc(var(--wp-dataviews-title-row-width, 100vw) - min(10ch, var(--wp-dataviews-title-width, 0px)));
 	padding-inline-start: var(--wpds-dimension-gap-lg);
