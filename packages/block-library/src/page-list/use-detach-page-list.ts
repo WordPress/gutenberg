@@ -74,17 +74,29 @@ export function useConvertToNavigationLinks( {
 	const registry = useRegistry();
 
 	return ( movedOutClientIds: string[] = [] ) => {
-		const { getBlocks, getBlocksByClientId, getBlockAttributes } =
-			registry.select( blockEditorStore ) as any;
-		const { replaceBlock, selectBlock } = registry.dispatch(
-			blockEditorStore
-		) as any;
+		const {
+			getBlocks,
+			getBlocksByClientId,
+			getBlockAttributes,
+			getBlockListSettings,
+		} = registry.select( blockEditorStore ) as any;
+		const { replaceBlock, selectBlock, updateBlockListSettings } =
+			registry.dispatch( blockEditorStore ) as any;
 		const navigationLinks = convertPageListBlocksToLinks(
 			getBlocks( clientId )
 		);
 		const showsAllPages = ! getBlockAttributes( clientId )?.parentPageID;
 
 		registry.batch( () => {
+			// A pages menu is locked against inserting, until it's detached.
+			if ( parentClientId ) {
+				updateBlockListSettings( parentClientId, {
+					...getBlockListSettings( parentClientId ),
+					templateLock:
+						getBlockAttributes( parentClientId )?.templateLock ??
+						false,
+				} );
+			}
 			( getBlocksByClientId( movedOutClientIds ) as BlockInstance[] )
 				.filter( Boolean )
 				.forEach( ( block ) =>

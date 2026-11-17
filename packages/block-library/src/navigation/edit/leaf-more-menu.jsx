@@ -230,15 +230,17 @@ export default function LeafMoreMenu( {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						<AddSubmenuItem
-							clientId={ clientId }
-							onClose={ onClose }
-							isDisabled={ isSubmenuDisabled }
-							updateExpansion={ updateExpansion }
-							setInsertedBlockClientId={
-								setInsertedBlockClientId
-							}
-						/>
+						{ ! isPage && (
+							<AddSubmenuItem
+								clientId={ clientId }
+								onClose={ onClose }
+								isDisabled={ isSubmenuDisabled }
+								updateExpansion={ updateExpansion }
+								setInsertedBlockClientId={
+									setInsertedBlockClientId
+								}
+							/>
+						) }
 						{ canDuplicate && ! isPage && (
 							<MenuItem
 								onClick={ () => {
