@@ -1070,6 +1070,12 @@
 		"dashicons": [ "dashicons-lock", "dashicons-lock-duplicate" ]
 	},
 	{
+		"slug": "lock-filled",
+		"label": "Lock Filled",
+		"filePath": "library/lock-filled.svg",
+		"collections": [ "core" ]
+	},
+	{
 		"slug": "login",
 		"label": "Login",
 		"filePath": "library/login.svg"

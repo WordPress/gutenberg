@@ -1,5 +1,14 @@
 import type { BlockAttributes } from '../../store/types';
 
+declare global {
+	interface Window {
+		/**
+		 * Whether the block lock menu experiment is enabled.
+		 */
+		__experimentalBlockLockMenu?: boolean;
+	}
+}
+
 /**
  * The lock status of a block.
  */
@@ -7,8 +16,40 @@ export interface BlockLockStatus {
 	isEditLocked: boolean;
 	isMoveLocked: boolean;
 	isRemoveLocked: boolean;
+	/**
+	 * Whether the inner layout of the block is locked.
+	 */
+	isLayoutLocked: boolean;
 	canLock: boolean;
+	/**
+	 * Whether the inner layout of the block can be locked.
+	 */
+	canLayoutLock: boolean;
 	isLocked: boolean;
+	/**
+	 * How much of the block is locked: every property it supports (`full`),
+	 * some of them (`partial`), or none.
+	 */
+	lockType: BlockLockType;
+	/**
+	 * Client ID of the closest ancestor whose layout is locked, or `null`.
+	 */
+	layoutLockedAncestor: string | null;
+}
+
+/**
+ * How much of a block is locked.
+ */
+export type BlockLockType = 'none' | 'partial' | 'full';
+
+/**
+ * Props of the block lock controls acting on several blocks.
+ */
+export interface BlockLockMenuProps {
+	/**
+	 * The client IDs of the blocks the menu locks.
+	 */
+	clientIds: string[];
 }
 
 /**

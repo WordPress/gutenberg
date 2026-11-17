@@ -14,6 +14,7 @@
 
 ### New Features
 
+-   Add the `lockFilled` icon, the filled counterpart of `lock`.
 -   Add the `getAspectRatioIcon` function, which returns an icon that draws the shape of an aspect ratio, to pass to `Icon` ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
 
 ### Enhancements

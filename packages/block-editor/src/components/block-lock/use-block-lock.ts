@@ -19,15 +19,23 @@ export default function useBlockLock( clientId: string ): BlockLockStatus {
 				isEditLockedBlock,
 				isMoveLockedBlock,
 				isRemoveLockedBlock,
+				isLayoutLockedBlock,
+				canLayoutLockBlock,
 				isLockedBlock,
+				getBlockLockType,
+				getLayoutLockedAncestor,
 			} = unlock( select( blockEditorStore ) );
 
 			return {
 				isEditLocked: isEditLockedBlock( clientId ),
 				isMoveLocked: isMoveLockedBlock( clientId ),
 				isRemoveLocked: isRemoveLockedBlock( clientId ),
+				isLayoutLocked: isLayoutLockedBlock( clientId ),
 				canLock: canLockBlockType( getBlockName( clientId ) ),
+				canLayoutLock: canLayoutLockBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				lockType: getBlockLockType( clientId ),
+				layoutLockedAncestor: getLayoutLockedAncestor( clientId ),
 			};
 		},
 		[ clientId ]

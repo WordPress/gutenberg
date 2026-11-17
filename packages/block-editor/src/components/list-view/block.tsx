@@ -38,6 +38,7 @@ import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
 import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
+import ListViewLockButton from './lock-button';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
@@ -122,6 +123,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		hasLayoutLockedAncestor,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -132,6 +134,7 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				getLayoutLockedAncestor,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -149,6 +152,9 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				hasLayoutLockedAncestor:
+					!! window.__experimentalBlockLockMenu &&
+					!! getLayoutLockedAncestor( clientId ),
 			};
 		},
 		[ clientId ]
@@ -568,6 +574,11 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
+	// With the lock menu, a locked block shows its lock state as a button in
+	// its own cell, and so does a block inside a layout-locked block.
+	const hasLockCell =
+		!! window.__experimentalBlockLockMenu &&
+		( isLocked || hasLayoutLockedAncestor );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
@@ -727,6 +738,21 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasLockCell && (
+				<TreeGridCell
+					className="block-editor-list-view-block__lock-cell"
+					aria-selected={ !! isSelected }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<ListViewLockButton
+							clientId={ clientId }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

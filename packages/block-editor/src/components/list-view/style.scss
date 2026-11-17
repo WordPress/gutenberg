@@ -322,8 +322,15 @@
 
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell,
+	.block-editor-list-view-block__lock-cell,
 	.block-editor-list-view-block__contents-cell {
 		padding: 0;
+	}
+
+	.block-editor-list-view-block__lock-cell {
+		line-height: 0;
+		width: $button-size-small + $grid-unit-05;
+		vertical-align: middle;
 	}
 
 	.block-editor-list-view-block__menu-cell,

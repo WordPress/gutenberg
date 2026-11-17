@@ -15,6 +15,7 @@ import {
 	setSelectedBlockStyleStateCanvasPreview,
 	editContentOnlySection,
 	stopEditingContentOnlySection,
+	setBlocksLock,
 } from '../private-actions';
 import type { BlockEditorThunkArgs, Settings } from '../types';
 
@@ -346,6 +347,156 @@ describe( 'private actions', () => {
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'EDIT_CONTENT_ONLY_SECTION',
 			} );
+		} );
+	} );
+
+	describe( 'setBlocksLock', () => {
+		// A Group, holding a Paragraph, inside a root block.
+		const createSelect = (
+			attributes: Record< string, Record< string, any > >,
+			{
+				rootTemplateLock = false,
+				layoutLocked = [] as string[],
+			}: {
+				rootTemplateLock?: string | false;
+				layoutLocked?: string[];
+			} = {}
+		) => {
+			const names: Record< string, string > = {
+				root: 'core/group',
+				group: 'core/group',
+				paragraph: 'core/paragraph',
+			};
+			const parents: Record< string, string | null > = {
+				root: null,
+				group: 'root',
+				paragraph: 'group',
+			};
+			const children: Record< string, string[] > = {
+				root: [ 'group' ],
+				group: [ 'paragraph' ],
+				paragraph: [],
+			};
+			const getClientIdsOfDescendants = ( ids: string[] ): string[] =>
+				ids.flatMap( ( id ) => [
+					...children[ id ],
+					...getClientIdsOfDescendants( children[ id ] ),
+				] );
+
+			return {
+				getClientIdsOfDescendants,
+				getBlockName: ( id: string ) => names[ id ],
+				canLockBlockType: () => true,
+				getBlockAttributes: ( id: string ) => attributes[ id ] ?? {},
+				getBlockRootClientId: ( id: string ) => parents[ id ],
+				getTemplateLock: ( id: string | null ) =>
+					id === 'root'
+						? rootTemplateLock
+						: ( attributes[ id ?? '' ]?.templateLock ?? false ),
+				canLayoutLockBlock: ( id: string ) =>
+					names[ id ] === 'core/group',
+				isLayoutLockedBlock: ( id: string ) =>
+					layoutLocked.includes( id ),
+			};
+		};
+
+		it( 'locks the blocks and every block inside them in one update', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], {
+				move: true,
+				remove: true,
+				layout: true,
+			} )( thunkArgs( { select: createSelect( {} ), dispatch } ) );
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'group', 'paragraph' ],
+				{
+					group: {
+						lock: { move: true, remove: true },
+						templateLock: 'contentOnly',
+					},
+					// A paragraph can't lock its layout.
+					paragraph: { lock: { move: true, remove: true } },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'changes only the given property', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'paragraph' ], { remove: false } )(
+				thunkArgs( {
+					select: createSelect( {
+						paragraph: { lock: { move: true, remove: true } },
+					} ),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'paragraph' ],
+				{ paragraph: { lock: { move: true, remove: false } } },
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'clears the lock and template lock on a full unlock, and detaches a pattern', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], {
+				move: false,
+				remove: false,
+				layout: false,
+			} )(
+				thunkArgs( {
+					select: createSelect(
+						{
+							group: {
+								lock: { move: true, remove: true },
+								templateLock: 'all',
+								metadata: { patternName: 'core/hero' },
+							},
+							paragraph: { lock: { move: true, remove: true } },
+						},
+						{ layoutLocked: [ 'group' ] }
+					),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'group', 'paragraph' ],
+				{
+					group: {
+						lock: undefined,
+						templateLock: undefined,
+						metadata: undefined,
+					},
+					paragraph: { lock: undefined },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'keeps an explicit unlock when the parent stays template locked', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], {
+				move: false,
+				remove: false,
+				layout: false,
+			} )(
+				thunkArgs( {
+					select: createSelect(
+						{ group: { lock: { move: true, remove: true } } },
+						{ rootTemplateLock: 'all' }
+					),
+					dispatch,
+				} )
+			);
+
+			expect(
+				dispatch.updateBlockAttributes.mock.calls[ 0 ][ 1 ].group.lock
+			).toEqual( { move: false, remove: false } );
 		} );
 	} );
 } );

@@ -1305,8 +1305,114 @@ export function isLockedBlock( state: State, clientId: string ) {
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
-		isRemoveLockedBlock( state, clientId )
+		isRemoveLockedBlock( state, clientId ) ||
+		isLayoutLockedBlock( state, clientId )
 	);
+}
+
+/**
+ * Returns whether the block is an unsynced pattern section, whose layout is
+ * locked by its pattern association. A section being temporarily edited
+ * keeps its lock.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block is an unsynced pattern section.
+ */
+function isLayoutLockedPatternSection( state: State, clientId: string ) {
+	return (
+		!! getBlockAttributes( state, clientId )?.metadata?.patternName &&
+		( getEditedContentOnlySection( state ) === clientId ||
+			isSectionBlock( state, clientId ) )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block is locked: the block's own
+ * `templateLock` is `contentOnly`, or it is an unsynced pattern section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout is locked.
+ */
+export function isLayoutLockedBlock( state: State, clientId: string ) {
+	return (
+		getBlockAttributes( state, clientId )?.templateLock === 'contentOnly' ||
+		isLayoutLockedPatternSection( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block can be locked: its block type
+ * has a `templateLock` attribute, or it is an unsynced pattern section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout can be locked.
+ */
+export function canLayoutLockBlock( state: State, clientId: string ) {
+	const blockName = getBlockName( state, clientId );
+	return (
+		( !! blockName &&
+			!! getBlockType( blockName )?.attributes?.templateLock ) ||
+		isLayoutLockedPatternSection( state, clientId )
+	);
+}
+
+/**
+ * Returns the closest ancestor whose layout is locked. Its descendants are
+ * edited content only, so their own locks are managed from that ancestor.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Client ID of the closest layout-locked ancestor, or `null`.
+ */
+export function getLayoutLockedAncestor( state: State, clientId: string ) {
+	return (
+		getBlockParents( state, clientId, true ).find( ( parentId ) =>
+			isLayoutLockedBlock( state, parentId )
+		) ?? null
+	);
+}
+
+/**
+ * Returns how much of a block is locked. A block has up to three lock
+ * properties: movement, deletion and, where it can be locked, layout.
+ *
+ * - `full`: every property the block supports is locked.
+ * - `partial`: some, but not all, of them are locked, or only editing is.
+ * - `none`: the block is not locked.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return The lock type of the block.
+ */
+export function getBlockLockType(
+	state: State,
+	clientId: string
+): 'none' | 'partial' | 'full' {
+	const locks = [
+		isMoveLockedBlock( state, clientId ),
+		isRemoveLockedBlock( state, clientId ),
+	];
+	if ( canLayoutLockBlock( state, clientId ) ) {
+		locks.push( isLayoutLockedBlock( state, clientId ) );
+	}
+
+	if ( locks.every( Boolean ) ) {
+		return 'full';
+	}
+
+	if ( locks.some( Boolean ) || isEditLockedBlock( state, clientId ) ) {
+		return 'partial';
+	}
+
+	return 'none';
 }
 
 /**

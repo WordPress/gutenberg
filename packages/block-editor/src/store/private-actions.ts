@@ -19,6 +19,7 @@ import type {
 	TreeBlock,
 } from './types';
 import { unlock } from '../lock-unlock';
+import { ALLOWS_EDIT_LOCKING } from '../components/block-lock/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -691,3 +692,138 @@ export function setResponsiveEditing( enabled: boolean ) {
 		enabled,
 	};
 }
+
+/**
+ * The lock properties to change. A property left out keeps its value.
+ */
+export interface BlockLockChanges {
+	/**
+	 * Whether the block is locked in place.
+	 */
+	move?: boolean;
+	/**
+	 * Whether the block is protected from deletion.
+	 */
+	remove?: boolean;
+	/**
+	 * Whether the inner layout of the block is locked. Only applies to blocks
+	 * whose layout can be locked.
+	 */
+	layout?: boolean;
+	/**
+	 * Whether editing is locked. Only applies to blocks that allow it.
+	 */
+	edit?: boolean;
+}
+
+/**
+ * Locks or unlocks blocks and every block inside them, in a single undo step.
+ *
+ * Movement and deletion are stored in the `lock` attribute, and the layout
+ * lock as `templateLock: 'contentOnly'`. Unlocking the layout of an unsynced
+ * pattern section detaches it from its pattern, keeping its content. A full
+ * unlock also clears any `templateLock` the blocks carry.
+ *
+ * @param clientIds Client IDs of the blocks to lock or unlock.
+ * @param changes   The lock properties to change.
+ */
+export const setBlocksLock =
+	( clientIds: string[], changes: BlockLockChanges ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const targetIds = [
+			...new Set( [
+				...clientIds,
+				...select.getClientIdsOfDescendants( clientIds ),
+			] ),
+		];
+		const isFullUnlock =
+			changes.move === false &&
+			changes.remove === false &&
+			changes.layout === false;
+		const attributesByClientId: Record<
+			string,
+			Record< string, unknown >
+		> = {};
+
+		for ( const clientId of targetIds ) {
+			const blockName = select.getBlockName( clientId );
+			if ( ! blockName || ! select.canLockBlockType( blockName ) ) {
+				continue;
+			}
+
+			const attributes = select.getBlockAttributes( clientId ) ?? {};
+			const nextAttributes: Record< string, unknown > = {};
+			const lock = { ...attributes.lock };
+
+			if ( changes.move !== undefined ) {
+				lock.move = changes.move;
+			}
+			if ( changes.remove !== undefined ) {
+				lock.remove = changes.remove;
+			}
+			if (
+				changes.edit !== undefined &&
+				ALLOWS_EDIT_LOCKING.includes( blockName )
+			) {
+				lock.edit = changes.edit;
+			}
+
+			// An explicit `false` overrides a template lock inherited from a
+			// parent. Keep it only when the parent stays template locked.
+			const rootClientId = select.getBlockRootClientId( clientId );
+			const isParentUnlocked =
+				isFullUnlock &&
+				rootClientId !== null &&
+				targetIds.includes( rootClientId );
+			const parentTemplateLock = isParentUnlocked
+				? false
+				: select.getTemplateLock( rootClientId );
+			const needsExplicitLock =
+				parentTemplateLock === 'all' || parentTemplateLock === 'insert';
+			nextAttributes.lock =
+				Object.values( lock ).some( Boolean ) || needsExplicitLock
+					? lock
+					: undefined;
+
+			if (
+				changes.layout !== undefined &&
+				select.canLayoutLockBlock( clientId )
+			) {
+				if ( changes.layout ) {
+					nextAttributes.templateLock = 'contentOnly';
+				} else {
+					if (
+						isFullUnlock ||
+						attributes.templateLock === 'contentOnly'
+					) {
+						nextAttributes.templateLock = undefined;
+					}
+					if (
+						attributes.metadata?.patternName &&
+						select.isLayoutLockedBlock( clientId )
+					) {
+						const metadata = { ...attributes.metadata };
+						delete metadata.patternName;
+						nextAttributes.metadata = Object.keys( metadata ).length
+							? metadata
+							: undefined;
+					}
+				}
+			}
+
+			attributesByClientId[ clientId ] = nextAttributes;
+		}
+
+		const updatedClientIds = Object.keys( attributesByClientId );
+		if ( ! updatedClientIds.length ) {
+			return;
+		}
+
+		dispatch.updateBlockAttributes(
+			updatedClientIds,
+			attributesByClientId,
+			{
+				uniqueByBlock: true,
+			}
+		);
+	};
