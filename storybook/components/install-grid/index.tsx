@@ -180,9 +180,11 @@ const TOOLS: Tool[] = [
 		file: 'opencode.json',
 		config: toJson( {
 			mcp: {
-				[ SERVER_NAME ]: {
-					type: 'local',
-					command: [ 'npx', ...PACKAGE_ARGS ],
+				servers: {
+					[ SERVER_NAME ]: {
+						type: 'local',
+						command: [ 'npx', ...PACKAGE_ARGS ],
+					},
 				},
 			},
 		} ),
