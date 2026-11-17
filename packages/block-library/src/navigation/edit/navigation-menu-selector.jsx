@@ -8,7 +8,7 @@ import { moreVertical } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useMemo, useState } from '@wordpress/element';
-import { useEntityRecords, useEntityProp } from '@wordpress/core-data';
+import { useEntityRecords } from '@wordpress/core-data';
 import useNavigationMenu from '../use-navigation-menu';
 
 function buildMenuLabel( title, id, status ) {
@@ -43,12 +43,8 @@ function NavigationMenuSelector( {
 
 	actionLabel = actionLabel || createActionLabel;
 
-	const { records: classicMenus } = useEntityRecords( 'root', 'menu', {
-		per_page: -1,
-		context: 'view',
-	} );
-
 	const {
+		navigationMenu,
 		navigationMenus,
 		isResolvingNavigationMenus,
 		hasResolvedNavigationMenus,
@@ -57,12 +53,19 @@ function NavigationMenuSelector( {
 		isNavigationMenuMissing,
 	} = useNavigationMenu( currentMenuId );
 
-	const [ currentTitle ] = useEntityProp(
-		'postType',
-		'wp_navigation',
-		'title',
-		currentMenuId
+	const { records: classicMenus } = useEntityRecords(
+		'root',
+		'menu',
+		{
+			per_page: -1,
+			context: 'view',
+		},
+		{ enabled: canUserCreateNavigationMenus }
 	);
+
+	// `navigationMenu.title` is a plain string: the raw title of an editable
+	// menu, or the decoded rendered title of a read-only menu.
+	const currentTitle = navigationMenu?.title ?? '';
 
 	const menuChoices = useMemo( () => {
 		return (

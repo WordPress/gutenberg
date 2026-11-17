@@ -3089,7 +3089,7 @@
 			"count": 1
 		},
 		"no-restricted-syntax": {
-			"count": 8
+			"count": 7
 		},
 		"react-hooks/immutability": {
 			"count": 3

@@ -4,6 +4,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -43,16 +44,58 @@ const MainContent = ( {
 		useDispatch( blockEditorStore )
 	);
 
-	const { navigationMenu } = useNavigationMenu( currentMenuId );
+	const {
+		navigationMenu,
+		canUserCreateNavigationMenus,
+		canUserUpdateNavigationMenu,
+		hasResolvedCanUserCreateNavigationMenus,
+		hasResolvedCanUserUpdateNavigationMenu,
+	} = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
-			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
+			<DeletedNavigationWarning
+				onCreateNew={ onCreateNew }
+				canCreate={ canUserCreateNavigationMenus }
+				isNotice
+			/>
 		);
 	}
 
 	if ( isLoading ) {
 		return <WCSpinner />;
+	}
+
+	if (
+		currentMenuId &&
+		hasResolvedCanUserUpdateNavigationMenu &&
+		! canUserUpdateNavigationMenu
+	) {
+		return (
+			<Notice.Root intent="info">
+				<Notice.Description>
+					{ __(
+						'You can view this Menu, but you do not have permission to edit it.'
+					) }
+				</Notice.Description>
+			</Notice.Root>
+		);
+	}
+
+	if (
+		! currentMenuId &&
+		hasResolvedCanUserCreateNavigationMenus &&
+		! canUserCreateNavigationMenus
+	) {
+		return (
+			<Notice.Root intent="info">
+				<Notice.Description>
+					{ __(
+						'You do not have permission to create Navigation Menus.'
+					) }
+				</Notice.Description>
+			</Notice.Root>
+		);
 	}
 
 	const description = navigationMenu
