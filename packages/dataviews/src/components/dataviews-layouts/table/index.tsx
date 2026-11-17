@@ -156,22 +156,18 @@ function TableRow< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 
-	const { primaryActions, eligibleActions } = useMemo( () => {
-		const _eligibleActions = ( actions ?? [] ).filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		return {
-			primaryActions: _eligibleActions.filter(
-				( action ) => action.isPrimary
-			),
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
 	// Primary actions sit next to the title, like the list layout does. The
-	// actions column then only holds the menu, which lists every action. If
-	// the title isn't displayed, primary actions stay in the actions column.
-	const hasPrimaryActionsNextToTitle =
-		!! titleField && showTitle && primaryActions.length > 0;
+	// actions column only holds the menu, which lists every action, so when
+	// the title isn't displayed, primary actions are only in the menu.
+	const primaryActions = useMemo(
+		() =>
+			( actions ?? [] ).filter(
+				( action ) =>
+					action.isPrimary &&
+					( ! action.isEligible || action.isEligible( item ) )
+			),
+		[ actions, item ]
+	);
 
 	return (
 		<tr
@@ -231,9 +227,7 @@ function TableRow< Item >( {
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }
 						primaryActions={
-							hasPrimaryActionsNextToTitle
-								? primaryActions
-								: undefined
+							showTitle ? primaryActions : undefined
 						}
 					/>
 				</td>
@@ -278,15 +272,7 @@ function TableRow< Item >( {
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
 				>
-					{ hasPrimaryActionsNextToTitle ? (
-						<ItemActions
-							item={ item }
-							actions={ eligibleActions }
-							isMenuOnly
-						/>
-					) : (
-						<ItemActions item={ item } actions={ actions } />
-					) }
+					<ItemActions item={ item } actions={ actions } isMenuOnly />
 				</td>
 			) }
 		</tr>
@@ -712,19 +698,14 @@ function ViewTable< Item >( {
 									}
 								) }
 							>
-								{ titleField && showTitle ? (
-									// Primary actions sit next to the title, so
-									// the column only holds the actions menu, and
-									// a visible label would set its width. Keep it
-									// for assistive technology.
-									<VisuallyHidden>
-										{ __( 'Actions' ) }
-									</VisuallyHidden>
-								) : (
-									<span className="dataviews-view-table-header">
-										{ __( 'Actions' ) }
-									</span>
-								) }
+								{ /*
+								 * The column only holds the actions menu, so a
+								 * visible label would set its width. Keep it for
+								 * assistive technology.
+								 */ }
+								<VisuallyHidden>
+									{ __( 'Actions' ) }
+								</VisuallyHidden>
 							</th>
 						) }
 					</tr>
