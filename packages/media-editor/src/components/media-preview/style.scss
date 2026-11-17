@@ -64,27 +64,19 @@
 		border-radius: $radius-small;
 	}
 
-	&__card {
-		width: 100%;
-		max-width: var(--wpds-dimension-surface-width-sm);
-		text-align: center;
-	}
-
-	&__file-icon {
-		color: var(--wpds-color-foreground-content-neutral-weak);
-	}
-
 	// Long filenames often have no spaces to break on.
 	&__file-name {
 		overflow-wrap: anywhere;
 	}
 
-	&__file-details {
-		color: var(--wpds-color-foreground-content-neutral-weak);
-	}
-
-	// EmptyState.Actions only leaves a 4px gap between buttons.
-	&__error-actions {
+	// EmptyState.Actions switches between a column and a row on the viewport
+	// width, and the row doesn't wrap. The canvas can be narrow on a wide
+	// viewport, e.g. with the Details panel open, so wrap a row instead. Also
+	// widen its 4px gap between buttons.
+	&__actions {
+		flex-direction: row;
+		flex-wrap: wrap;
+		justify-content: center;
 		gap: var(--wpds-dimension-gap-sm);
 	}
 }

@@ -1,11 +1,12 @@
+import clsx from 'clsx';
 import { Button, Spinner as WCSpinner } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
-import { copy, download, file } from '@wordpress/icons';
+import { copy, download, folder } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { Card, EmptyState, Icon, Stack, Text } from '@wordpress/ui';
+import { EmptyState } from '@wordpress/ui';
 import { useMediaEditorContext } from '../media-editor-provider';
 import type { Media } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -100,40 +101,20 @@ function MediaPreviewFileCard( {
 	fileDetails,
 }: MediaPreviewFileCardProps ) {
 	return (
-		<Card.Root className="media-editor-preview__card">
-			<Card.Content>
-				{ /* The gaps match the spacing of `EmptyState`. */ }
-				<Stack direction="column" align="center" gap="lg">
-					<Stack direction="column" align="center" gap="sm">
-						<Icon
-							className="media-editor-preview__file-icon"
-							icon={ file }
-						/>
-						<Stack direction="column" align="center" gap="xs">
-							{ !! fileName && (
-								<Text
-									variant="heading-sm"
-									className="media-editor-preview__file-name"
-								>
-									{ fileName }
-								</Text>
-							) }
-							{ !! fileDetails && (
-								<Text
-									variant="body-sm"
-									className="media-editor-preview__file-details"
-								>
-									{ fileDetails }
-								</Text>
-							) }
-						</Stack>
-					</Stack>
-					<Stack justify="center" gap="sm" wrap="wrap">
-						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
-					</Stack>
-				</Stack>
-			</Card.Content>
-		</Card.Root>
+		<EmptyState.Root>
+			<EmptyState.Icon icon={ folder } />
+			{ !! fileName && (
+				<EmptyState.Title className="media-editor-preview__file-name">
+					{ fileName }
+				</EmptyState.Title>
+			) }
+			{ !! fileDetails && (
+				<EmptyState.Description>{ fileDetails }</EmptyState.Description>
+			) }
+			<EmptyState.Actions className="media-editor-preview__actions">
+				<MediaPreviewFileActions mediaUrl={ mediaUrl } />
+			</EmptyState.Actions>
+		</EmptyState.Root>
 	);
 }
 
@@ -233,19 +214,13 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 
 	if ( ! mediaUrl ) {
 		return (
-			<div className="media-editor-preview media-editor-preview--empty">
-				<Card.Root className="media-editor-preview__card">
-					<Card.Content>
-						<EmptyState.Root>
-							<EmptyState.Visual>
-								<Icon icon={ file } />
-							</EmptyState.Visual>
-							<EmptyState.Title>
-								{ __( 'No media file available.' ) }
-							</EmptyState.Title>
-						</EmptyState.Root>
-					</Card.Content>
-				</Card.Root>
+			<div className="media-editor-preview media-editor-preview--empty is-placeholder">
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ folder } />
+					<EmptyState.Title>
+						{ __( 'No media file available.' ) }
+					</EmptyState.Title>
+				</EmptyState.Root>
 			</div>
 		);
 	}
@@ -270,29 +245,21 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 
 	if ( loadingState === 'error' ) {
 		return (
-			<div className="media-editor-preview media-editor-preview--error">
-				<Card.Root className="media-editor-preview__card">
-					<Card.Content>
-						<EmptyState.Root>
-							<EmptyState.Visual>
-								<Icon icon={ file } />
-							</EmptyState.Visual>
-							<EmptyState.Title>
-								{ __( 'Failed to load media file.' ) }
-							</EmptyState.Title>
-							{ !! fileName && (
-								<EmptyState.Description className="media-editor-preview__file-name">
-									{ fileName }
-								</EmptyState.Description>
-							) }
-							<EmptyState.Actions className="media-editor-preview__error-actions">
-								<MediaPreviewFileActions
-									mediaUrl={ mediaUrl }
-								/>
-							</EmptyState.Actions>
-						</EmptyState.Root>
-					</Card.Content>
-				</Card.Root>
+			<div className="media-editor-preview media-editor-preview--error is-placeholder">
+				<EmptyState.Root>
+					<EmptyState.Icon icon={ folder } />
+					<EmptyState.Title>
+						{ __( 'Failed to load media file.' ) }
+					</EmptyState.Title>
+					{ !! fileName && (
+						<EmptyState.Description className="media-editor-preview__file-name">
+							{ fileName }
+						</EmptyState.Description>
+					) }
+					<EmptyState.Actions className="media-editor-preview__actions">
+						<MediaPreviewFileActions mediaUrl={ mediaUrl } />
+					</EmptyState.Actions>
+				</EmptyState.Root>
 			</div>
 		);
 	}
@@ -300,7 +267,14 @@ export default function MediaPreview( props: MediaPreviewProps ) {
 	return (
 		<div
 			{ ...props }
-			className={ `media-editor-preview media-editor-preview--${ previewType }` }
+			className={ clsx(
+				'media-editor-preview',
+				`media-editor-preview--${ previewType }`,
+				{
+					// Media with no preview of its own shows the file info.
+					'is-placeholder': previewType === 'application',
+				}
+			) }
 		>
 			{ previewType === 'image' && loadingState === 'loading' && (
 				<div className="media-editor-preview__spinner">

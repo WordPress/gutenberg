@@ -120,6 +120,13 @@
 			height: 100%;
 		}
 
+		// The grey stage is for previewing media. Without a preview, e.g. for
+		// a zip file or a file that failed to load, the placeholder sits on
+		// the surface instead.
+		&:has(.media-editor-preview.is-placeholder) {
+			background: none;
+		}
+
 		img,
 		video {
 			max-width: 100%;
