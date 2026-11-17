@@ -250,7 +250,8 @@
 
 @mixin caption-style-theme() {
 	color: #555;
-	font-size: wpds.var("--wpds-typography-font-size-md");
+	// Block theme styles apply to content, not admin UI, so they do not use the design tokens.
+	font-size: 13px;
 	text-align: center;
 
 	.is-dark-theme & {
