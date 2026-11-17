@@ -21,10 +21,6 @@ const VSCODE_URL = `vscode:mcp/install?${ encodeURIComponent(
 	JSON.stringify( { name: SERVER_NAME, ...SERVER_ENTRY } )
 ) }`;
 
-const LM_STUDIO_URL = `lmstudio://add_mcp?name=${ SERVER_NAME }&config=${ btoa(
-	JSON.stringify( SERVER_ENTRY )
-) }`;
-
 const RAYCAST_URL = `raycast://mcp/install?${ encodeURIComponent(
 	JSON.stringify( { name: SERVER_NAME, type: 'stdio', ...SERVER_ENTRY } )
 ) }`;
@@ -216,24 +212,6 @@ const TOOLS: Tool[] = [
 		steps: [
 			'Click “Install in Raycast”, or copy the configuration above and run the “Install Server” command in Raycast. The form fills in from your clipboard.',
 			'Install the server, then ask Raycast AI a question about the design system.',
-		],
-	},
-	{
-		id: 'lm-studio',
-		label: 'LM Studio',
-		domain: 'lmstudio.ai',
-		mark: 'LM',
-		color: '#4f46e5',
-		file: 'mcp.json',
-		config: JSON_CONFIG,
-		install: {
-			href: LM_STUDIO_URL,
-			label: 'Add to LM Studio',
-			image: 'https://files.lmstudio.ai/deeplink/mcp-install-dark.svg',
-		},
-		steps: [
-			'Click “Add to LM Studio”, or open the Program tab, choose Install, then Edit mcp.json, and add the configuration above.',
-			'Confirm `wordpress-design-system` is listed and enabled in the Program tab.',
 		],
 	},
 	{
