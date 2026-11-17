@@ -193,14 +193,15 @@
 
 		// An even inset on all four sides, so the background keeps the tab's
 		// silhouette and reads as the tab lighting up rather than as a shape
-		// of its own. The value is what leaves a background exactly one
-		// control tall (--wpds-dimension-size-lg) inside the 47px tab, which
-		// ties the tab bar to the controls around it and is why a control's
-		// corner radius suits it. Vertical tabs are already a control tall,
-		// so they need no inset to match.
+		// of its own. The value is what leaves a background 32px tall
+		// (--wpds-dimension-size-md) inside the 47px tab: the size of a button
+		// in this chrome, which already shares this background color and
+		// corner radius with a neutral minimal button. Vertical tabs are a row
+		// in a column of controls rather than a control themselves, so they
+		// take no inset.
 		&::after {
 			content: "";
-			inset: 3.5px;
+			inset: 7.5px;
 			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}
