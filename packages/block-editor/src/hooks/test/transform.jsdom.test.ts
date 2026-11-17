@@ -144,4 +144,14 @@ describe( 'getStateInheritedValue', () => {
 			).transform
 		).toEqual( { translate: { x: '5px', y: '20px' } } );
 	} );
+
+	it( 'starts a state scale from the block scale', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { rotate: '5deg', scale: '120%' } },
+				{ transform: { scale: 0.8 } },
+				mobile
+			).transform
+		).toEqual( { rotate: '5deg', scale: 0.8 } );
+	} );
 } );
