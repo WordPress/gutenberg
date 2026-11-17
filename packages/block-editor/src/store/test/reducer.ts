@@ -3709,6 +3709,68 @@ describe( 'state', () => {
 				} );
 			} );
 		} );
+		describe( 'default block variation handling', () => {
+			const blockWithDefaultVariation =
+				'core/test-block-with-default-variation';
+			beforeAll( () => {
+				registerBlockType(
+					blockWithDefaultVariation,
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						title: 'Block with a default variation',
+						attributes: { layout: { type: 'object' } },
+						variations: [
+							partial< BlockVariation >( {
+								name: 'default',
+								attributes: { layout: { type: 'constrained' } },
+								isDefault: true,
+							} ),
+							partial< BlockVariation >( {
+								name: 'row',
+								attributes: { layout: { type: 'flex' } },
+								isActive: [ 'layout.type' ],
+							} ),
+						],
+					} )
+				);
+			} );
+			afterAll( () => {
+				unregisterBlockType( blockWithDefaultVariation );
+			} );
+			it( 'should record inserts that match no variation under the default variation', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						partial< Block >( {
+							clientId: 'default',
+							name: blockWithDefaultVariation,
+							attributes: { layout: { type: 'constrained' } },
+						} ),
+						partial< Block >( {
+							clientId: 'row',
+							name: blockWithDefaultVariation,
+							attributes: { layout: { type: 'flex' } },
+						} ),
+					],
+					time: 123456,
+				} );
+
+				expect( state ).toEqual( {
+					insertUsage: {
+						[ `${ blockWithDefaultVariation }/default` ]: {
+							time: 123456,
+							count: 1,
+						},
+						[ `${ blockWithDefaultVariation }/row` ]: {
+							time: 123456,
+							count: 1,
+						},
+					},
+				} );
+			} );
+		} );
 	} );
 
 	describe( 'blocksMode', () => {
