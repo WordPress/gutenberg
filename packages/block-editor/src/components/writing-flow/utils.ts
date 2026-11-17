@@ -52,7 +52,7 @@ export function getClipboardBlocksContent(
 	blocks: Block[],
 	registry: Pick< DataRegistry, 'select' >,
 	attributesForCopy?: AttributesForCopy,
-	{ addWrapper = false } = {}
+	{ addWrapper = false }: { addWrapper?: boolean | 'bound' } = {}
 ) {
 	let hasBoundAttributes = false;
 	function resolveBlockForCopy( block: Block ): Block {
@@ -83,7 +83,11 @@ export function getClipboardBlocksContent(
 
 	const [ firstBlock ] = blocks;
 
-	if ( addWrapper && firstBlock ) {
+	if (
+		firstBlock &&
+		( addWrapper === true ||
+			( addWrapper === 'bound' && hasBoundAttributes ) )
+	) {
 		const firstBlockType = registry
 			.select( blocksStore )
 			.getBlockType( firstBlock.name );

@@ -94,12 +94,19 @@ describe( 'block clipboard content', () => {
 			[ 'core/group', 'div' ],
 			[ 'core/list', 'ul' ],
 		] ) {
-			registerBlockType( name, {
-				attributes: {},
+			registerBlockType< { ordered?: boolean } >( name, {
+				attributes:
+					name === 'core/list'
+						? { ordered: { type: 'boolean' } }
+						: {},
 				apiVersion: 3,
 				title: name,
 				category: 'text',
-				save: () => createElement( tagName, getInnerBlocksProps() ),
+				save: ( { attributes } ) =>
+					createElement(
+						attributes.ordered ? 'ol' : tagName,
+						getInnerBlocksProps()
+					),
 			} );
 		}
 	} );
@@ -266,6 +273,48 @@ describe( 'block clipboard content', () => {
 		expect(
 			parse(
 				getClipboardBlocksContent( [ item ], registry, new Map() ).html
+			)[ 0 ].name
+		).toBe( 'core/list-item' );
+	} );
+
+	it( 'keeps the ordered list wrapper around a bound item copied from the menu', () => {
+		const item = createBlock( 'core/list-item', {
+			metadata: { bindings },
+		} );
+		const list = createBlock( 'core/list', { ordered: true }, [ item ] );
+		dispatch( blockEditorStore ).resetBlocks( [ list ] );
+		const attributesForCopy = new Map();
+		registerResolvedAttributes( attributesForCopy, item, 'Bound item' );
+
+		const { html, plainText } = getClipboardBlocksContent(
+			[ item ],
+			registry,
+			attributesForCopy,
+			{ addWrapper: 'bound' }
+		);
+		expect( html ).toContain( '<ol>' );
+		expect( parse( html ) ).toMatchObject( [
+			{
+				name: 'core/list',
+				isValid: true,
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						isValid: true,
+						attributes: {
+							content: 'Bound item',
+							metadata: { bindings },
+						},
+					},
+				],
+			},
+		] );
+		expect( plainText ).toBe( 'Bound item' );
+		expect(
+			parse(
+				getClipboardBlocksContent( [ item ], registry, new Map(), {
+					addWrapper: 'bound',
+				} ).html
 			)[ 0 ].name
 		).toBe( 'core/list-item' );
 	} );

@@ -45,15 +45,17 @@ export function CopyMenuItem( {
 	const { attributesForCopy } = useContext( BlockRefs );
 	const notifyCopy = useNotifyCopy();
 	const ref = useBlockCopyToClipboard(
-		() =>
-			eventType === 'copyStyles'
-				? { hasBoundAttributes: false }
+		() => {
+			const blocks = getBlocksByClientId( clientIds ) as Block[];
+			return eventType === 'copyStyles'
+				? { html: serialize( blocks ), hasBoundAttributes: false }
 				: getClipboardBlocksContent(
-						getBlocksByClientId( clientIds ) as Block[],
+						blocks,
 						registry,
-						attributesForCopy
-					),
-		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
+						attributesForCopy,
+						{ addWrapper: 'bound' }
+					);
+		},
 		() => {
 			switch ( eventType ) {
 				case 'copy':

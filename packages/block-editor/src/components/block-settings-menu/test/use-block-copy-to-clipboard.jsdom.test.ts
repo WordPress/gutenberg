@@ -20,14 +20,12 @@ const content = {
 
 function CopyButton( {
 	getContent = () => content,
-	getText = () => '<p>Stored text</p>',
 	onSuccess,
 }: {
 	getContent?: Parameters< typeof useBlockCopyToClipboard >[ 0 ];
-	getText?: Parameters< typeof useBlockCopyToClipboard >[ 1 ];
-	onSuccess?: Parameters< typeof useBlockCopyToClipboard >[ 2 ];
+	onSuccess?: Parameters< typeof useBlockCopyToClipboard >[ 1 ];
 } ) {
-	const ref = useBlockCopyToClipboard( getContent, getText, onSuccess );
+	const ref = useBlockCopyToClipboard( getContent, onSuccess );
 	return createElement( 'button', { ref }, 'Copy' );
 }
 
@@ -134,7 +132,10 @@ describe( 'block clipboard writes', () => {
 		const onSuccess = vi.fn();
 		render(
 			createElement( CopyButton, {
-				getContent: () => ( { hasBoundAttributes: false as const } ),
+				getContent: () => ( {
+					html: '<p>Stored text</p>',
+					hasBoundAttributes: false as const,
+				} ),
 				onSuccess,
 			} )
 		);
@@ -166,8 +167,7 @@ describe( 'block clipboard writes', () => {
 		);
 	} );
 
-	it( 'uses the copy event on HTTP and restores the text selection', async () => {
-		vi.stubGlobal( 'ClipboardItem', undefined );
+	it( 'uses the copy event even when async rich clipboard writes are available', async () => {
 		render(
 			createElement(
 				'div',
@@ -202,6 +202,7 @@ describe( 'block clipboard writes', () => {
 			true
 		);
 		expect( copyEvent.defaultPrevented ).toBe( true );
+		expect( clipboard.write ).not.toHaveBeenCalled();
 		expect( setData ).toHaveBeenCalledWith(
 			'text/plain',
 			content.plainText
@@ -318,7 +319,10 @@ describe( 'block clipboard writes', () => {
 		const onSuccess = vi.fn();
 		render(
 			createElement( CopyButton, {
-				getContent: () => ( { hasBoundAttributes: false as const } ),
+				getContent: () => ( {
+					html: '<p>Stored text</p>',
+					hasBoundAttributes: false as const,
+				} ),
 				onSuccess,
 			} )
 		);

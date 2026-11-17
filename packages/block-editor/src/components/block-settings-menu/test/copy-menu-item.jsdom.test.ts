@@ -4,6 +4,7 @@ import type { ComponentProps, ContextType } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import {
 	createBlock,
+	getBlockType,
 	registerBlockType,
 	serialize,
 	unregisterBlockType,
@@ -28,7 +29,9 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useDispatch: ( () => ( {
 		removeBlocks,
 	} ) ) as unknown as typeof useDispatch,
-	useRegistry: ( () => ( {} ) ) as typeof useRegistry,
+	useRegistry: ( () => ( {
+		select: () => ( { getBlockType } ),
+	} ) ) as unknown as typeof useRegistry,
 } ) );
 
 vi.mock( import( '../../../utils/use-notify-copy' ), () => ( {
@@ -36,6 +39,10 @@ vi.mock( import( '../../../utils/use-notify-copy' ), () => ( {
 } ) );
 
 describe( 'CopyMenuItem', () => {
+	const save = vi.fn(
+		( { attributes }: { attributes: { content: string } } ) =>
+			createElement( 'p', null, attributes.content )
+	);
 	let clipboardDescriptor: PropertyDescriptor | undefined;
 	let execCommandDescriptor: PropertyDescriptor | undefined;
 	let clipboard: {
@@ -60,8 +67,7 @@ describe( 'CopyMenuItem', () => {
 				content: { type: 'string', source: 'html', selector: 'p' },
 				metadata: { type: 'object' },
 			},
-			save: ( { attributes } ) =>
-				createElement( 'p', null, attributes.content ),
+			save,
 		} );
 		block = createBlock( 'core/copy-menu-test', {
 			content: '',
@@ -248,12 +254,13 @@ describe( 'CopyMenuItem', () => {
 
 	it( 'keeps unbound blocks on the original serialization path', async () => {
 		attributesForCopy.clear();
+		const markup = serialize( [ block ] );
+		save.mockClear();
 		const { onCopy } = renderMenuItem();
 
 		await waitFor( () => expect( onCopy ).toHaveBeenCalledTimes( 1 ) );
-		expect( clipboard.writeText ).toHaveBeenCalledWith(
-			serialize( [ block ] )
-		);
+		expect( save ).toHaveBeenCalledTimes( 1 );
+		expect( clipboard.writeText ).toHaveBeenCalledWith( markup );
 		expect( clipboard.write ).not.toHaveBeenCalled();
 	} );
 } );

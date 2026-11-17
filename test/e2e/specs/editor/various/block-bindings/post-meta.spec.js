@@ -1,5 +1,19 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+async function expectResolvedClipboard( page ) {
+	await expect
+		.poll( () => page.evaluate( () => navigator.clipboard.readText() ) )
+		.toBe( 'Bound text' );
+	const clipboardHtml = await page.evaluate( async () => {
+		const items = await navigator.clipboard.read();
+		const item = items.find( ( entry ) =>
+			entry.types.includes( 'text/html' )
+		);
+		return ( await item.getType( 'text/html' ) ).text();
+	} );
+	expect( clipboardHtml ).toContain( '<p>Bound <strong>text</strong></p>' );
+}
+
 test.describe( 'Post Meta source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -383,19 +397,24 @@ test.describe( 'Post Meta source', () => {
 		} );
 
 		for ( const copyMethod of [ 'keyboard', 'menu', 'list view' ] ) {
-			test( `should copy resolved bound block content through the ${ copyMethod } and preserve its binding on paste`, async ( {
+			const tag = copyMethod === 'menu' ? ' @webkit' : '';
+
+			test( `should copy resolved bound block content through the ${ copyMethod } and preserve its binding on paste${ tag }`, async ( {
 				editor,
 				page,
 				pageUtils,
 				context,
+				browserName,
 			} ) => {
-				await context.grantPermissions( [
-					'clipboard-read',
-					'clipboard-write',
-				] );
-				await page.evaluate( () =>
-					navigator.clipboard.writeText( 'Uncopied' )
-				);
+				if ( browserName === 'chromium' ) {
+					await context.grantPermissions( [
+						'clipboard-read',
+						'clipboard-write',
+					] );
+					await page.evaluate( () =>
+						navigator.clipboard.writeText( 'Uncopied' )
+					);
+				}
 				const modifier =
 					process.platform === 'darwin' ? 'Meta' : 'Control';
 				await page.evaluate( () => {
@@ -444,21 +463,9 @@ test.describe( 'Post Meta source', () => {
 					await page.keyboard.press( `${ modifier }+c` );
 				}
 
-				await expect
-					.poll( () =>
-						page.evaluate( () => navigator.clipboard.readText() )
-					)
-					.toBe( 'Bound text' );
-				const clipboardHtml = await page.evaluate( async () => {
-					const items = await navigator.clipboard.read();
-					const item = items.find( ( entry ) =>
-						entry.types.includes( 'text/html' )
-					);
-					return ( await item.getType( 'text/html' ) ).text();
-				} );
-				expect( clipboardHtml ).toContain(
-					'<p>Bound <strong>text</strong></p>'
-				);
+				if ( browserName === 'chromium' ) {
+					await expectResolvedClipboard( page );
+				}
 				expect( await editor.getBlocks() ).toMatchObject( [
 					boundParagraph,
 				] );
@@ -479,6 +486,71 @@ test.describe( 'Post Meta source', () => {
 				] );
 			} );
 		}
+
+		test( 'should paste styles from a bound paragraph copied through Options', async ( {
+			editor,
+			page,
+			context,
+		} ) => {
+			await context.grantPermissions( [
+				'clipboard-read',
+				'clipboard-write',
+			] );
+			await page.evaluate( () => {
+				window.wp.data.dispatch( 'core/editor' ).editPost( {
+					meta: { movie_field: 'Bound text' },
+				} );
+			} );
+			const style = { typography: { fontSize: '23px' } };
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: {
+					style,
+					metadata: {
+						bindings: {
+							content: {
+								source: 'core/post-meta',
+								args: { key: 'movie_field' },
+							},
+						},
+					},
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Target' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphs.first() ).toHaveText( 'Bound text' );
+			await paragraphs.first().click();
+			await editor.clickBlockToolbarButton( 'Options' );
+			const menu = page.getByRole( 'menu', { name: 'Options' } );
+			await menu
+				.getByRole( 'menuitem' )
+				.filter( { has: page.getByText( 'Copy', { exact: true } ) } )
+				.click();
+			await expect
+				.poll( () =>
+					page.evaluate( () => navigator.clipboard.readText() )
+				)
+				.toBe( 'Bound text' );
+			await page.keyboard.press( 'Escape' );
+
+			await paragraphs.last().click();
+			await editor.clickBlockToolbarButton( 'Options' );
+			await menu
+				.getByRole( 'menuitem', { name: 'Paste styles' } )
+				.click();
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{ name: 'core/paragraph', attributes: { style } },
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Target', style },
+				},
+			] );
+		} );
 
 		test( 'should copy resolved text in a mixed block selection without changing the original blocks', async ( {
 			editor,

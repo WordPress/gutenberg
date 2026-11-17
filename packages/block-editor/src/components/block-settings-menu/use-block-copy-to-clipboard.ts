@@ -3,7 +3,7 @@ import { useLayoutEffect, useRef } from '@wordpress/element';
 
 type ClipboardContent =
 	| { html: string; plainText: string; hasBoundAttributes: boolean }
-	| { hasBoundAttributes: false };
+	| { html: string; hasBoundAttributes: false };
 
 function copyBlocksWithEvent(
 	{ html, plainText }: { html?: string; plainText: string },
@@ -82,6 +82,11 @@ export async function writeBlocksToClipboard(
 	if ( ! ownerDocument ) {
 		return false;
 	}
+	// Async HTML writes can strip the comments that carry block attributes.
+	// Dispatch the copy event while the menu click still has user activation.
+	if ( copyBlocksWithEvent( content, ownerDocument ) ) {
+		return true;
+	}
 	const view = ownerDocument.defaultView as
 		( Window & typeof globalThis ) | null;
 	if ( view?.navigator.clipboard?.write && view.ClipboardItem ) {
@@ -98,10 +103,10 @@ export async function writeBlocksToClipboard(
 			] );
 			return true;
 		} catch {
-			return copyBlocksWithEvent( content, ownerDocument );
+			return false;
 		}
 	}
-	return copyBlocksWithEvent( content, ownerDocument );
+	return false;
 }
 
 async function writeTextToClipboard( text: string, trigger: HTMLElement ) {
@@ -120,23 +125,19 @@ async function writeTextToClipboard( text: string, trigger: HTMLElement ) {
 
 export default function useBlockCopyToClipboard(
 	getContent: () => ClipboardContent,
-	getText: () => string,
 	onSuccess?: () => void
 ) {
-	const latestRef = useRef( { getContent, getText, onSuccess } );
+	const latestRef = useRef( { getContent, onSuccess } );
 	useLayoutEffect( () => {
-		latestRef.current = { getContent, getText, onSuccess };
-	}, [ getContent, getText, onSuccess ] );
+		latestRef.current = { getContent, onSuccess };
+	}, [ getContent, onSuccess ] );
 	return useRefEffect< HTMLElement >( ( node ) => {
 		let isActive = true;
 		const onClick = async () => {
 			const content = latestRef.current.getContent();
 			const success = content.hasBoundAttributes
 				? await writeBlocksToClipboard( content, node )
-				: await writeTextToClipboard(
-						latestRef.current.getText(),
-						node
-					);
+				: await writeTextToClipboard( content.html, node );
 			if ( success ) {
 				if ( isActive ) {
 					node.focus();
