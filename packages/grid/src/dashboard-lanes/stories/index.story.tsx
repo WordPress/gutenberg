@@ -26,6 +26,12 @@ const meta: Meta< typeof DashboardLanes > = {
 			description:
 				'Per-lane floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
+		gap: {
+			control: 'select',
+			options: [ 'xs', 'sm', 'md', 'lg', 'xl', '2xl', '3xl' ],
+			description:
+				'Gap between tiles as a design-system step. Writes `--wp-grid-gap` on the root; unset, the surface falls back to `xl`.',
+		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
 			description:
@@ -271,6 +277,7 @@ export const Columns: Story = {
  * `columns` as a map: one lane from 0px, two from 600px, four from
  * 960px. The count steps at those container widths regardless of how
  * wide each lane ends up; add `minColumnWidth` to lower it further.
+ * The `gap` control spaces the tiles by a design-system step.
  */
 export const ColumnSteps: Story = {
 	parameters: {
@@ -283,6 +290,7 @@ export const ColumnSteps: Story = {
 	},
 	args: {
 		columns: { 0: 1, 600: 2, 960: 4 },
+		gap: 'xl',
 		layout: [
 			{ key: 'fixed-1', width: 1 },
 			{ key: 'fixed-2', width: 2 },
@@ -325,7 +333,8 @@ export const ColumnSteps: Story = {
 /**
  * A step can be `'auto'`: from that width up there is no cap and the
  * floor alone decides the count. Here the steps fix one and two lanes
- * below 960px, and 200px lanes fill the container above it.
+ * below 960px, and 200px lanes fill the container above it. A wider
+ * `gap` fits fewer lanes at the same width.
  */
 export const ColumnStepsWithFloor: Story = {
 	parameters: ColumnSteps.parameters,

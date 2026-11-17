@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   `DashboardGrid` and `DashboardLanes` accept `columns` as a `Column Steps` map from container width to count. ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
+-   `DashboardGrid` and `DashboardLanes` accept `gap`, the gap between tiles as a step of the design-system gap scale (`GapSize` from `@wordpress/theme`), written to `--wp-grid-gap` on the surface root, and read the computed gap again on every resize, so a density change applies without a remount ([#86192](https://github.com/WordPress/gutenberg/pull/86192)).
 
 ### Bug Fixes
 
