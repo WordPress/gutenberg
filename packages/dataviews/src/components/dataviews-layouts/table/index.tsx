@@ -350,7 +350,10 @@ function ViewTable< Item >( {
 	useLayoutEffect( syncBulkActionsPosition, [ showBulkActions ] );
 	// The toolbar covers the header, so move focus between the two
 	// selection checkboxes when an interaction shows or hides the toolbar.
-	const requestFocus = useBulkActionsFocus( showBulkActions, bulkActionsRef );
+	const requestFocus = useBulkActionsFocus( {
+		isShown: showBulkActions,
+		containerRef: bulkActionsRef,
+	} );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,

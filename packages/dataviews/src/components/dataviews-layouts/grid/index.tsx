@@ -37,10 +37,10 @@ function ViewGrid< Item >( {
 	// The toolbar keeps its selection checkbox but removes the controls
 	// that act on the selection, so move focus to the checkbox when an
 	// interaction in the toolbar removes them.
-	const requestFocus = useBulkActionsFocus(
-		selection.length > 0 || isActionInProgress,
-		bulkActionsRef
-	);
+	const requestFocus = useBulkActionsFocus( {
+		isShown: selection.length > 0 || isActionInProgress,
+		containerRef: bulkActionsRef,
+	} );
 	const focusSelectionCheckbox = () =>
 		requestFocus( selectionCheckboxRef, { isShown: false } );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );

@@ -23,17 +23,21 @@ interface FocusRequest {
  * A request is dropped when focus moves outside of `containerRef`, so that a
  * later, unrelated change of selection does not move focus.
  *
- * @param isShown      Whether the bulk actions toolbar shows actions.
- * @param containerRef The element that holds focus while a request waits,
- *                     such as the bulk actions toolbar.
+ * @param options              Options.
+ * @param options.isShown      Whether the bulk actions toolbar shows actions.
+ * @param options.containerRef The element that holds focus while a request
+ *                             waits, such as the bulk actions toolbar.
  *
  * @return A function that asks to focus `target` once the toolbar reaches the
  *         `isShown` state.
  */
-export default function useBulkActionsFocus(
-	isShown: boolean,
-	containerRef: RefObject< HTMLElement | null >
-) {
+export default function useBulkActionsFocus( {
+	isShown,
+	containerRef,
+}: {
+	isShown: boolean;
+	containerRef: RefObject< HTMLElement | null >;
+} ) {
 	const requestRef = useRef< FocusRequest | null >( null );
 
 	// Layout effects run before the effects of ancestors, such as a router
