@@ -1,10 +1,11 @@
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { afterEach, beforeEach, expect, it } from 'vitest';
-import { useLayoutEffect, useState } from '@wordpress/element';
+import { useLayoutEffect, useRef, useState } from '@wordpress/element';
 import '@wordpress/theme/design-tokens.css';
 import DataViews from '../index';
 import type { Action, Field, View } from '../../types';
+import type { SelectionOrUpdater } from '../../types/private';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import '../../style.scss';
 
@@ -431,4 +432,104 @@ it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation 
 			);
 		} )
 		.toBe( true );
+} );
+
+// Focuses its region when focus is on the document body after a commit, the
+// way an app router recovers focus that a navigation lost. The layout effects
+// of an ancestor run after those of the DataViews inside it.
+function FocusRecovery( { children }: { children: React.ReactNode } ) {
+	const ref = useRef< HTMLDivElement >( null );
+	useLayoutEffect( () => {
+		const { activeElement, body } = document;
+		if ( ! activeElement || activeElement === body ) {
+			ref.current?.focus();
+		}
+	} );
+	return (
+		<div ref={ ref } role="region" aria-label="Page" tabIndex={ -1 }>
+			{ children }
+		</div>
+	);
+}
+
+// Applies selection changes asynchronously, like a consumer that keeps the
+// selection in the URL and changes it through navigation.
+function AsyncSelection( {
+	type,
+	itemActions = actions,
+}: {
+	type: 'table' | 'grid';
+	itemActions?: Action< Post >[];
+} ) {
+	const [ selection, setSelection ] = useState< string[] >( [] );
+	const onChangeSelection = ( value: SelectionOrUpdater ) =>
+		Promise.resolve().then( () =>
+			setSelection( ( current ) =>
+				typeof value === 'function' ? value( current ) : value
+			)
+		);
+	return (
+		<FocusRecovery>
+			<DataViews
+				data={ posts }
+				fields={ fields }
+				view={ { type, titleField: 'title', fields: [] } }
+				onChangeView={ () => {} }
+				actions={ itemActions }
+				selection={ selection }
+				onChangeSelection={ onChangeSelection }
+				paginationInfo={ { totalItems: posts.length, totalPages: 1 } }
+				defaultLayouts={ { [ type ]: true } }
+			/>
+		</FocusRecovery>
+	);
+}
+
+it.each( [ 'table', 'grid' ] as const )(
+	'returns focus to the %s selection checkbox when an asynchronous selection is cancelled',
+	async ( type ) => {
+		await render( <AsyncSelection type={ type } /> );
+		const user = userEvent.setup();
+		await user.click(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		);
+		await expect
+			.element(
+				page.getByRole( 'button', { name: 'Cancel', exact: true } )
+			)
+			.toBeVisible();
+		await user.click(
+			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		);
+		await expect
+			.element(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			)
+			.toHaveFocus();
+	}
+);
+
+it( 'keeps focus on an item checkbox that clears the selection after a bulk action', async () => {
+	await render( <AsyncSelection type="grid" /> );
+	const user = userEvent.setup();
+	const item = page.getByRole( 'checkbox', {
+		name: 'First post',
+		exact: true,
+	} );
+	item.element().focus();
+	await user.keyboard( ' ' );
+	await user.click(
+		page.getByRole( 'button', { name: 'Edit', exact: true } )
+	);
+	item.element().focus();
+	await user.keyboard( ' ' );
+	await expect
+		.element(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		)
+		.not.toBeChecked();
+	await expect.element( item ).toHaveFocus();
 } );

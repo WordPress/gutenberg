@@ -61,6 +61,14 @@ interface BulkSelectionCheckboxProps< Item > {
 	getItemId: ( item: Item ) => string;
 	disableSelectAll?: boolean;
 	checkboxRef?: React.Ref< HTMLSpanElement >;
+	/**
+	 * Called when the checkbox clears the selection, before it changes.
+	 */
+	onClear?: () => void;
+	/**
+	 * Called when the checkbox selects items, before the selection changes.
+	 */
+	onSelect?: () => void;
 }
 
 export function BulkSelectionCheckbox< Item >( {
@@ -71,6 +79,8 @@ export function BulkSelectionCheckbox< Item >( {
 	getItemId,
 	disableSelectAll = false,
 	checkboxRef,
+	onClear,
+	onSelect,
 }: BulkSelectionCheckboxProps< Item > ) {
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
@@ -95,7 +105,10 @@ export function BulkSelectionCheckbox< Item >( {
 				ref={ checkboxRef }
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
-				onCheckedChange={ () => onChangeSelection( [] ) }
+				onCheckedChange={ () => {
+					onClear?.();
+					onChangeSelection( [] );
+				} }
 				aria-label={ __( 'Deselect all' ) }
 			/>
 		);
@@ -108,8 +121,10 @@ export function BulkSelectionCheckbox< Item >( {
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onCheckedChange={ () => {
 				if ( areAllSelected ) {
+					onClear?.();
 					onChangeSelection( [] );
 				} else {
+					onSelect?.();
 					onChangeSelection(
 						selectableItems.map( ( item ) => getItemId( item ) )
 					);
@@ -139,6 +154,8 @@ interface ToolbarContentProps< Item > {
 	isInfiniteScroll: boolean;
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 	onActionInProgressChange?: ( inProgress: boolean ) => void;
+	onClearSelection?: () => void;
+	onActionComplete?: () => void;
 }
 
 function ActionTrigger< Item >( {
@@ -218,7 +235,8 @@ function renderBulkActionsContent< Item >(
 	onChangeSelection: SetSelection,
 	totalItems: number,
 	isMobile: boolean,
-	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
+	selectionCheckboxRef?: React.Ref< HTMLSpanElement >,
+	onClearSelection?: () => void
 ) {
 	const clearSelection = selectedItems.length > 0 && (
 		<IconButton
@@ -230,7 +248,10 @@ function renderBulkActionsContent< Item >(
 			label={ __( 'Cancel' ) }
 			disabled={ !! actionInProgress }
 			focusableWhenDisabled={ false }
-			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
+			onClick={ () => {
+				onClearSelection?.();
+				onChangeSelection( EMPTY_ARRAY );
+			} }
 		/>
 	);
 	const renderActions = ( isMenuItem = false ) =>
@@ -263,6 +284,7 @@ function renderBulkActionsContent< Item >(
 					actions={ actions }
 					getItemId={ getItemId }
 					disableSelectAll={ isInfiniteScroll }
+					onClear={ onClearSelection }
 				/>
 				{ ! selection.length && ! isInfiniteScroll && (
 					<Field.Label variant="plain">
@@ -326,6 +348,8 @@ function BulkActionsContent< Item >( {
 	isInfiniteScroll,
 	selectionCheckboxRef,
 	onActionInProgressChange,
+	onClearSelection,
+	onActionComplete,
 }: ToolbarContentProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
 	const [ pendingContent, setPendingContent ] =
@@ -345,6 +369,7 @@ function BulkActionsContent< Item >( {
 		try {
 			await action.callback( items, { registry } );
 		} finally {
+			onActionComplete?.();
 			setPendingContent( undefined );
 			onActionInProgressChange?.( false );
 		}
@@ -398,7 +423,8 @@ function BulkActionsContent< Item >( {
 			onChangeSelection,
 			paginationInfo.totalItems,
 			isMobile,
-			selectionCheckboxRef
+			selectionCheckboxRef,
+			onClearSelection
 		);
 	return (
 		<>
@@ -407,7 +433,10 @@ function BulkActionsContent< Item >( {
 				<ActionModal
 					action={ activeModal.action }
 					items={ activeModal.items }
-					closeModal={ () => setActiveModal( null ) }
+					closeModal={ () => {
+						onActionComplete?.();
+						setActiveModal( null );
+					} }
 				/>
 			) }
 		</>
@@ -417,11 +446,23 @@ function BulkActionsContent< Item >( {
 interface BulkActionToolbarProps {
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 	onActionInProgressChange?: ( inProgress: boolean ) => void;
+	/**
+	 * Called when the user clears the selection from the toolbar, before the
+	 * selection changes.
+	 */
+	onClearSelection?: () => void;
+	/**
+	 * Called when a bulk action started from the toolbar ends, before the
+	 * toolbar stops showing it as in progress.
+	 */
+	onActionComplete?: () => void;
 }
 
 export function BulkActionToolbar( {
 	selectionCheckboxRef,
 	onActionInProgressChange,
+	onClearSelection,
+	onActionComplete,
 }: BulkActionToolbarProps = {} ) {
 	const {
 		data,
@@ -435,6 +476,8 @@ export function BulkActionToolbar( {
 		<BulkActionsContent
 			selectionCheckboxRef={ selectionCheckboxRef }
 			onActionInProgressChange={ onActionInProgressChange }
+			onClearSelection={ onClearSelection }
+			onActionComplete={ onActionComplete }
 			selection={ selection }
 			onChangeSelection={ onChangeSelection }
 			data={ data }

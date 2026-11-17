@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { Spinner as WCSpinner } from '@wordpress/components';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
 import { Stack } from '@wordpress/ui';
 import type { ViewGridProps } from '../../../types';
+import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
 import useSelectionProps from '../utils/use-selection-props';
 import {
@@ -33,22 +34,15 @@ function ViewGrid< Item >( {
 	const [ isActionInProgress, setIsActionInProgress ] = useState( false );
 	const selectionCheckboxRef = useRef< HTMLSpanElement >( null );
 	const bulkActionsRef = useRef< HTMLDivElement >( null );
-	const hadSelectionRef = useRef( false );
-	const hasSelection = selection.length > 0;
-	useEffect( () => {
-		const ownerDocument = bulkActionsRef.current?.ownerDocument;
-		if (
-			hadSelectionRef.current &&
-			! hasSelection &&
-			( ownerDocument?.activeElement === ownerDocument?.body ||
-				bulkActionsRef.current?.contains(
-					ownerDocument?.activeElement ?? null
-				) )
-		) {
-			selectionCheckboxRef.current?.focus();
-		}
-		hadSelectionRef.current = hasSelection;
-	}, [ hasSelection ] );
+	// The toolbar keeps its selection checkbox but removes the controls
+	// that act on the selection, so move focus to the checkbox when an
+	// interaction in the toolbar removes them.
+	const requestFocus = useBulkActionsFocus(
+		selection.length > 0 || isActionInProgress,
+		bulkActionsRef
+	);
+	const focusSelectionCheckbox = () =>
+		requestFocus( selectionCheckboxRef, { isShown: false } );
 	const isDelayedLoading = useDelayedLoading( !! isLoading );
 	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
@@ -112,6 +106,8 @@ function ViewGrid< Item >( {
 					<BulkActionToolbar
 						selectionCheckboxRef={ selectionCheckboxRef }
 						onActionInProgressChange={ setIsActionInProgress }
+						onClearSelection={ focusSelectionCheckbox }
+						onActionComplete={ focusSelectionCheckbox }
 					/>
 				</div>
 			) }
