@@ -328,6 +328,7 @@ function normalizeIconSvg( source ) {
 
 	const shapes = [];
 	let droppedMetadata = 0;
+	let metadataDepth = 0;
 	let depth = 0;
 	let nonRenderingDepth = 0;
 	for ( const tag of tags.slice( 1 ) ) {
@@ -337,9 +338,14 @@ function normalizeIconSvg( source ) {
 			break;
 		}
 
-		if ( METADATA_ELEMENTS.includes( name ) ) {
-			if ( ! isClosing ) {
+		// Metadata carries no drawing, and neither does anything inside it,
+		// such as RDF licensing or a stray shape, so skip the whole subtree.
+		if ( metadataDepth > 0 || METADATA_ELEMENTS.includes( name ) ) {
+			if ( metadataDepth === 0 && ! isClosing ) {
 				droppedMetadata += 1;
+			}
+			if ( ! isSelfClosing ) {
+				metadataDepth += isClosing ? -1 : 1;
 			}
 			continue;
 		}

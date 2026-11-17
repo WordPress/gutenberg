@@ -37,6 +37,11 @@ describe( 'normalizeIconSvg', () => {
 			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<path d="M5 5H19" />\n</svg>\n',
 		},
 		{
+			name: 'drops metadata with everything inside it',
+			input: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">\n<metadata><rdf:RDF><cc:Work rdf:about=""><dc:format>image/svg+xml</dc:format></cc:Work></rdf:RDF><path d="M0 0h1v1z"/></metadata>\n<path d="M9 12h2v-2z"/>\n</svg>',
+			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M9 12h2v-2z" />\n</svg>\n',
+		},
+		{
 			name: 'drops a redundant inherited stroke',
 			input: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<rect x="5" y="5" width="14" height="14" stroke="currentColor" />\n</svg>\n',
 			output: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<rect x="5" y="5" width="14" height="14" />\n</svg>\n',
