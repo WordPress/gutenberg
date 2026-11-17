@@ -25,6 +25,17 @@
 
 				width: fit-content;
 
+				/* The indicator and the separator beneath the tab bar mark the
+				 * same boundary, so the indicator has to span that hairline
+				 * rather than stack on top of it. Reserve the hairline as padding
+				 * and pull it back with a margin: the tabs keep their own box, the
+				 * chrome keeps its height, and the indicator reaches the hairline
+				 * from inside the scroll container, so a scrolling list cannot
+				 * clip it. Consumers used to pull the whole list down instead,
+				 * which moved the tabs with it. */
+				padding-block-end: var(--wpds-border-width-xs);
+				margin-block-end: calc(-1 * var(--wpds-border-width-xs));
+
 				/* Paint outside the list when the tabs fit. Shadows and outlines
 				 * do not contribute to the measured scrollable width. */
 				&:not(.is-scrolling) {
@@ -43,10 +54,6 @@
 					mask-image:
 						linear-gradient(to right, var(--fade-gradient-composed)),
 						linear-gradient(to left, var(--fade-gradient-composed));
-				}
-
-				&.is-minimal-variant {
-					gap: 1rem;
 				}
 			}
 
@@ -157,7 +164,6 @@
 			}
 
 			/* Interaction background and focus indicator. */
-			&::before,
 			&::after {
 				position: absolute;
 				z-index: -1;
@@ -182,57 +188,44 @@
 
 			[data-orientation="horizontal"] & {
 				padding-inline: var(--wpds-dimension-padding-lg);
-				height: 48px; /* TODO: use semantic size/height tokens when available */
+				/* A horizontal tab bar occupies 48px including the 1px rule
+				 * beneath it, which the containing chrome draws, so the tab
+				 * itself is 47px. Sizing it to the full 48px makes the tab
+				 * overlap that rule, and consumers then shift the list to
+				 * compensate, which throws off the interaction clearance. */
+				height: 47px;
 				scroll-margin: 24px;
 
+				/* An even inset on all four sides, so the background keeps the
+				 * tab's silhouette and reads as the tab lighting up rather than
+				 * as a shape of its own. The value is what leaves a background
+				 * 32px tall (--wpds-dimension-size-md) inside the 47px tab: the
+				 * size of a button in this chrome, which already shares this
+				 * background color and corner radius with a neutral minimal
+				 * button. Vertical tabs are a row in a column of controls rather
+				 * than a control themselves, so they take no inset. */
 				&::after {
 					content: "";
-					inset-block:
-						calc(var(--wpds-dimension-padding-md) +
-						var(--wpds-dimension-padding-xs));
-					inset-inline: var(--wpds-dimension-padding-lg);
-					outline-offset: var(--wpds-dimension-padding-xs);
-				}
-
-				/* The shadow paints padding around the smaller pseudo-element
-				 * without increasing the tab's box or scrollable overflow. */
-				&:not([data-disabled]):is(
-					:not([aria-selected="true"]):hover,
-					:not([aria-selected="true"]):active,
-					:focus-visible
-				)::after {
-					box-shadow:
-						0 0 0 var(--wpds-dimension-padding-xs)
-						var(--wpds-color-background-interactive-neutral-weak-active);
+					inset: 7.5px;
+					outline-offset: calc(-1 * var(--wpds-border-width-focus));
 				}
 			}
 
+			/* The minimal variant is the same tab one size down, for a bar
+			 * nested inside a panel rather than heading one. Its inline padding
+			 * replaces the list gap this variant used to carry, which keeps the
+			 * same distance between labels while letting the hit areas meet.
+			 *
+			 * Where a default tab is 47px around a background one control tall,
+			 * this one is a control tall around a background one compact control
+			 * tall, so both bars sit on the same scale as the fields and buttons
+			 * beside them. */
 			.is-minimal-variant[data-orientation="horizontal"] & {
-				padding-inline: 0;
+				padding-inline: var(--wpds-dimension-padding-sm);
+				height: var(--wpds-dimension-size-lg);
 
 				&::after {
-					inset-inline: 0;
-				}
-			}
-
-			.is-minimal-variant.is-scrolling[data-orientation="horizontal"] & {
-				/* Paint the ring separately so only the background can be clipped. */
-				&::before {
-					content: "";
-					z-index: 0;
-					inset-block: var(--wpds-dimension-padding-md);
-					inset-inline: round(up, var(--wpds-border-width-focus), 1px);
-				}
-
-				&:focus-visible {
-					&::before {
-						outline-color: var(--wpds-color-stroke-focus);
-						opacity: 1;
-					}
-
-					&::after {
-						outline: none;
-					}
+					inset: 4px;
 				}
 			}
 
@@ -240,6 +233,10 @@
 				padding: var(--wpds-dimension-padding-md);
 				min-height: var(--wpds-dimension-size-lg);
 
+				/* No inset here. A vertical tab is a full-width row in a column
+				 * of controls, so its background has to line up with the search
+				 * field and anything else stacked above it. Inset it and the
+				 * column stops reading as one edge. */
 				&::after {
 					content: "";
 					inset: 0;

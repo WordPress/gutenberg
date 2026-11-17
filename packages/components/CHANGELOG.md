@@ -17,9 +17,12 @@
 -   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
 -   `Snackbar`: Increase the action link hit target ([#86823](https://github.com/WordPress/gutenberg/pull/86823)).
+-   `Tabs`: Draw the hover, pressed, and focus states as a background that keeps the tab's own silhouette and is the size of a button in the same chrome, which it already matches in background color and corner radius. Horizontal tabs inset it within the taller tab; vertical tabs fill the row, so it lines up with the controls stacked above it. Horizontal tab lists previously painted a pill whose rounding came from a shadow spread ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
+-   `Tabs`: Size a horizontal tab to 47px, so the tab bar occupies 48px including the 1px rule beneath it. Containers no longer need to shift the tab list to sit under that rule, which was leaving the interaction states lopsided ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 
 ### Bug Fixes
 
+-   `Panel`: Keep `PanelHeader` at its full height inside containers that apply the `reset` mixin, such as the editor sidebar. The mixin's descendant selector overrode the header's `box-sizing` at equal specificity, leaving it a pixel short ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
 -   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
