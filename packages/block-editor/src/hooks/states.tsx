@@ -3,7 +3,6 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 import { __, _x } from '@wordpress/i18n';
 import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
-import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
 import { unlock } from '../lock-unlock';
 import type { StyleStateOption } from '../components/global-styles/types';
@@ -89,7 +88,6 @@ export function BlockStatesControl( {
 		() => getPseudoStateOptions( name ),
 		[ name ]
 	);
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	if ( ! pseudoStateOptions.length ) {
 		return null;
@@ -100,7 +98,6 @@ export function BlockStatesControl( {
 			pseudoStates={ pseudoStateOptions }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
-			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
 		>
 			{ children }

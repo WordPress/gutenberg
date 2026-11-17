@@ -46,6 +46,39 @@ describe( 'SnackbarList', () => {
 		expect( screen.getByTestId( 'snackbar-list' ) ).toHaveFocus();
 	} );
 
+	it.each( [
+		[ 'Enter', '{Enter}' ],
+		[ 'Space', ' ' ],
+	] )(
+		'should run the action when its button is activated with %s',
+		async ( _keyName, key ) => {
+			const onClick = vi.fn();
+
+			function Notices() {
+				const [ notices, setNotices ] = useState( [
+					{
+						id: 'ID_1',
+						content: 'Post trashed.',
+						actions: [ { label: 'Undo', onClick } ],
+					},
+				] );
+
+				return (
+					<SnackbarList
+						notices={ notices }
+						onRemove={ () => setNotices( [] ) }
+					/>
+				);
+			}
+
+			await render( <Notices /> );
+			screen.getByRole( 'button', { name: 'Undo' } ).focus();
+			await userEvent.keyboard( key );
+
+			expect( onClick ).toHaveBeenCalledTimes( 1 );
+		}
+	);
+
 	it( 'should restart auto-dismissal when a notice is replaced with the same ID', async () => {
 		vi.useFakeTimers();
 		const onRemove = vi.fn();

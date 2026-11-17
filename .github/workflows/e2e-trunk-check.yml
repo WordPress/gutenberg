@@ -85,4 +85,4 @@ jobs:
                   PLAYWRIGHT_JSON_OUTPUT_FILE: ${{ runner.temp }}/results.json
               # The root package.json comes from trunk, so use the pull request's workspace script directly.
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk -- "$GITHUB_SHA"
+                  npm run --workspace @wordpress/e2e-tests-playwright test:e2e:trunk -- "$GITHUB_SHA"
