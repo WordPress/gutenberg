@@ -1,6 +1,8 @@
 import type { ComponentProps, ReactElement } from 'react';
+import { useRegistry } from '@wordpress/data';
 import { Stack } from '@wordpress/ui';
-import type { MediaAspectRatio, NormalizedField } from '../../../types';
+import type { Action, MediaAspectRatio, NormalizedField } from '../../../types';
+import { PrimaryActions } from '../../dataviews-item-actions';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 
 function ColumnPrimary< Item >( {
@@ -13,6 +15,7 @@ function ColumnPrimary< Item >( {
 	onClickItem,
 	renderItemLink,
 	isItemClickable,
+	primaryActions,
 }: {
 	item: Item;
 	level?: number;
@@ -27,7 +30,9 @@ function ColumnPrimary< Item >( {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
+	primaryActions?: Action< Item >[];
 } ) {
+	const registry = useRegistry();
 	// Srcset/size hint for the media render. The preview box is 32px square
 	// by default; when the view configures `layout.aspectRatio`, the box
 	// keeps the 32px height while the ratio derives its width, clamped by
@@ -73,20 +78,42 @@ function ColumnPrimary< Item >( {
 				className="dataviews-view-table__primary-column-content"
 			>
 				{ titleField && (
-					<ItemClickWrapper
-						item={ item }
-						isItemClickable={ isItemClickable }
-						onClickItem={ onClickItem }
-						renderItemLink={ renderItemLink }
-						className="dataviews-view-table__cell-content-wrapper dataviews-title-field"
-					>
-						{ level !== undefined && level > 0 && (
-							<span className="dataviews-view-table__level">
-								{ Array( level ).fill( '—' ).join( ' ' ) }&nbsp;
-							</span>
+					<div className="dataviews-view-table__title-row">
+						<ItemClickWrapper
+							item={ item }
+							isItemClickable={ isItemClickable }
+							onClickItem={ onClickItem }
+							renderItemLink={ renderItemLink }
+							className="dataviews-view-table__cell-content-wrapper dataviews-title-field"
+						>
+							{ level !== undefined && level > 0 && (
+								<span className="dataviews-view-table__level">
+									{ Array( level ).fill( '—' ).join( ' ' ) }
+									&nbsp;
+								</span>
+							) }
+							<titleField.render
+								item={ item }
+								field={ titleField }
+							/>
+						</ItemClickWrapper>
+						{ !! primaryActions?.length && (
+							// Stop clicks from reaching the row, which toggles
+							// its selection.
+							// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+							<div
+								className="dataviews-view-table__primary-actions"
+								onClick={ ( event ) => event.stopPropagation() }
+							>
+								<PrimaryActions
+									item={ item }
+									actions={ primaryActions }
+									registry={ registry }
+									buttonVariant="link"
+								/>
+							</div>
 						) }
-						<titleField.render item={ item } field={ titleField } />
-					</ItemClickWrapper>
+					</div>
 				) }
 				{ descriptionField && (
 					<descriptionField.render

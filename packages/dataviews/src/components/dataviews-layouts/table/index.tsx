@@ -11,6 +11,7 @@ import {
 	useEffect,
 	useId,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -154,6 +155,23 @@ function TableRow< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 
+	const { primaryActions, eligibleActions } = useMemo( () => {
+		const _eligibleActions = ( actions ?? [] ).filter(
+			( action ) => ! action.isEligible || action.isEligible( item )
+		);
+		return {
+			primaryActions: _eligibleActions.filter(
+				( action ) => action.isPrimary
+			),
+			eligibleActions: _eligibleActions,
+		};
+	}, [ actions, item ] );
+	// Primary actions sit next to the title, like the list layout does. The
+	// actions column then only holds the menu, which lists every action. If
+	// the title isn't displayed, primary actions stay in the actions column.
+	const hasPrimaryActionsNextToTitle =
+		!! titleField && showTitle && primaryActions.length > 0;
+
 	return (
 		<tr
 			className={ clsx( 'dataviews-view-table__row', {
@@ -211,6 +229,11 @@ function TableRow< Item >( {
 						isItemClickable={ isItemClickable }
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }
+						primaryActions={
+							hasPrimaryActionsNextToTitle
+								? primaryActions
+								: undefined
+						}
 					/>
 				</td>
 			) }
@@ -254,7 +277,15 @@ function TableRow< Item >( {
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
 				>
-					<ItemActions item={ item } actions={ actions } />
+					{ hasPrimaryActionsNextToTitle ? (
+						<ItemActions
+							item={ item }
+							actions={ eligibleActions }
+							isCompact
+						/>
+					) : (
+						<ItemActions item={ item } actions={ actions } />
+					) }
 				</td>
 			) }
 		</tr>

@@ -107,6 +107,30 @@
 				opacity: 1;
 			}
 		}
+
+		// Primary actions next to the title take no room until the row is
+		// hovered or focused, so the title can use the whole cell at rest.
+		.dataviews-view-table__primary-actions {
+			width: 0;
+			overflow: hidden;
+		}
+
+		&:focus-within,
+		&.is-hovered,
+		&:hover,
+		&.is-selected {
+			.dataviews-view-table__primary-actions {
+				width: auto;
+				overflow: visible;
+			}
+		}
+
+		@media (hover: none) {
+			.dataviews-view-table__primary-actions {
+				width: auto;
+				overflow: visible;
+			}
+		}
 	}
 
 	// Additional styles when bulk actions are available
@@ -379,4 +403,35 @@
 			@include dataviews-refreshing();
 		}
 	}
+}
+
+.dataviews-view-table__primary-column-content {
+	// Let the title row fill the cell, so the title elides at its edge.
+	min-width: 0;
+	width: 100%;
+}
+
+.dataviews-view-table__title-row {
+	display: flex;
+	align-items: center;
+	gap: var(--wpds-dimension-gap-lg);
+	width: 100%;
+	min-width: 0;
+
+	> .dataviews-title-field {
+		flex: 0 1 auto;
+		width: auto;
+		overflow: hidden;
+
+		// Let the rendered title shrink, so its own ellipsis kicks in.
+		> * {
+			min-width: 0;
+		}
+	}
+}
+
+.dataviews-view-table__primary-actions {
+	display: flex;
+	flex: 0 0 auto;
+	gap: var(--wpds-dimension-gap-lg);
 }
