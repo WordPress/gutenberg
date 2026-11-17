@@ -289,14 +289,6 @@ function findShapeProblems( name, attributes ) {
 		}
 	}
 
-	for ( const key of [ 'fill', 'stroke' ] ) {
-		if ( attributes[ key ]?.startsWith( 'url(' ) ) {
-			problems.push(
-				`${ key }="${ attributes[ key ] }" on <${ name }> (a library icon is drawn in a single color that inherits the text color)`
-			);
-		}
-	}
-
 	return problems;
 }
 
@@ -404,7 +396,11 @@ function normalizeIconSvg( source ) {
 			[ 'fill', fill, isFilled ],
 			[ 'stroke', stroke, isStroked ],
 		] ) {
-			if ( painted && hasAlpha( value ) ) {
+			if ( value.trim().startsWith( 'url(' ) ) {
+				problems.push(
+					`${ key }="${ value }" on <${ name }> (a library icon is drawn in a single color that inherits the text color)`
+				);
+			} else if ( painted && hasAlpha( value ) ) {
 				problems.push(
 					`${ key }="${ value }" on <${ name }> (a library icon inherits the text color, so make the shape translucent with the opacity attribute instead)`
 				);

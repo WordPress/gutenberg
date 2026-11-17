@@ -99,6 +99,16 @@ describe( 'normalizeIconSvg', () => {
 			error: 'url(#g)',
 		},
 		{
+			name: 'a gradient inherited from the root',
+			input: '<svg viewBox="0 0 24 24" fill="url(#g)" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z"/>\n</svg>',
+			error: 'fill="url(#g)"',
+		},
+		{
+			name: 'a paint server with a fallback inherited from the root',
+			input: '<svg viewBox="0 0 24 24" fill="url(#missing) none" xmlns="http://www.w3.org/2000/svg">\n<path d="M9 12h2v-2z"/>\n</svg>',
+			error: 'fill="url(#missing) none"',
+		},
+		{
 			name: 'more than one color',
 			input: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M5 5H19V9Z" fill="#000"/><path d="M7 6H9V7Z" fill="white"/>\n</svg>',
 			error: 'more than one color',
