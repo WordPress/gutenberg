@@ -202,6 +202,23 @@ const TOOLS: Tool[] = [
 		],
 	},
 	{
+		id: 'jetbrains',
+		label: 'JetBrains',
+		domain: 'jetbrains.com',
+		mark: 'JB',
+		color: '#000000',
+		config: JSON_CONFIG,
+		link: {
+			href: 'https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html',
+			label: 'JetBrains AI Assistant MCP guide',
+		},
+		steps: [
+			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, Model Context Protocol (MCP), and click Add.',
+			'Paste the configuration above into the JSON configuration field, then click OK and Apply.',
+			'Check that `wordpress-design-system` shows as connected in the Status column.',
+		],
+	},
+	{
 		id: 'raycast',
 		label: 'Raycast',
 		domain: 'raycast.com',
