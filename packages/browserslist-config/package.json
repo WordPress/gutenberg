@@ -32,7 +32,7 @@
 	},
 	"devDependencies": {
 		"browserslist": "^4.28.7",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

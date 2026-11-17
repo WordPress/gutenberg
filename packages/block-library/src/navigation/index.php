@@ -359,6 +359,7 @@ class WP_Navigation_Block_Renderer {
 			$markup = serialize_blocks( $blocks );
 			$markup = apply_block_hooks_to_content_from_post_object( $markup, $navigation_post );
 			$blocks = parse_blocks( $markup );
+			$blocks = block_core_navigation_filter_block_data( $blocks );
 
 			// TODO - this uses the full navigation block attributes for the
 			// context which could be refined.
@@ -383,6 +384,8 @@ class WP_Navigation_Block_Renderer {
 		if ( empty( $fallback_blocks ) || ! is_array( $fallback_blocks ) ) {
 			return new WP_Block_List( array(), $attributes );
 		}
+
+		$fallback_blocks = block_core_navigation_filter_block_data( $fallback_blocks );
 
 		return new WP_Block_List( $fallback_blocks, $attributes );
 	}
@@ -491,6 +494,7 @@ class WP_Navigation_Block_Renderer {
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
 				// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
 				$blocks = self::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+				$blocks = block_core_navigation_filter_block_data( $blocks );
 				return new WP_Block_List( $blocks, $attributes );
 			}
 			return new WP_Block_List( array(), $attributes );
@@ -521,6 +525,7 @@ class WP_Navigation_Block_Renderer {
 
 		// Disable overlay menu for any navigation blocks within the overlay to prevent nested overlays.
 		$blocks = self::disable_overlay_menu_for_nested_navigation_blocks( $blocks );
+		$blocks = block_core_navigation_filter_block_data( $blocks );
 
 		return new WP_Block_List( $blocks, $attributes );
 	}
@@ -1179,6 +1184,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
 
 		$menu_items_by_parent_id = block_core_navigation_sort_menu_items_by_parent_id( $menu_items );
 		$parsed_blocks           = block_core_navigation_parse_blocks_from_menu_items( $menu_items_by_parent_id[0], $menu_items_by_parent_id );
+		$parsed_blocks           = block_core_navigation_filter_block_data( $parsed_blocks );
 		return new WP_Block_List( $parsed_blocks, $attributes );
 	}
 }
@@ -1458,6 +1464,44 @@ function block_core_navigation_filter_out_empty_blocks( $parsed_blocks ) {
 
 	// Reset keys.
 	return array_values( $filtered );
+}
+
+/**
+ * Applies the `render_block_data` filter to each block in a list of parsed blocks.
+ *
+ * Direct `WP_Block::render()` calls skip `render_block()`, which is where Core
+ * applies `render_block_data` to root blocks. Applying it to the root parsed blocks
+ * before creating a `WP_Block_List` ensures that block supports such as block style
+ * variations, elements styles, and custom CSS are processed for referenced navigation
+ * menus and fallbacks in document order.
+ *
+ * @since 7.3.0
+ *
+ * @param array $parsed_blocks The parsed blocks to filter.
+ * @return array The filtered parsed blocks.
+ */
+function block_core_navigation_filter_block_data( $parsed_blocks ) {
+	if ( empty( $parsed_blocks ) || ! is_array( $parsed_blocks ) ) {
+		return array();
+	}
+
+	foreach ( $parsed_blocks as &$parsed_block ) {
+		if ( isset( $parsed_block['blockName'] ) ) {
+			/**
+			 * Filters the block being rendered, before it's processed into a WP_Block.
+			 *
+			 * @since 5.1.0
+			 * @since 5.9.0 The `$source_block` parameter was added.
+			 *
+			 * @param array         $parsed_block The block being rendered.
+			 * @param array         $source_block An un-modified copy of `$parsed_block`, as it appeared in the original markup.
+			 * @param WP_Block|null $parent_block If this is a nested block, a reference to the parent block.
+			 */
+			$parsed_block = apply_filters( 'render_block_data', $parsed_block, $parsed_block, null );
+		}
+	}
+
+	return $parsed_blocks;
 }
 
 /**
