@@ -21,16 +21,21 @@ const EMPTY_ARRAY: Completer[] = [];
 
 function useCompleters( {
 	completers = EMPTY_ARRAY,
-}: {
-	completers?: Completer[];
-} ) {
+	onReplace,
+}: Pick<
+	UseBlockEditorAutocompletePropsOptions,
+	'completers' | 'onReplace'
+> ) {
 	const { name } = useBlockEditContext();
+	// A block that cannot be removed has no `onReplace`.
+	const canReplace = !! onReplace;
 	return useMemo( () => {
 		let filteredCompleters = [ ...completers ];
 
 		if (
-			name === getDefaultBlockName() ||
-			getBlockSupport( name, '__experimentalSlashInserter', false )
+			canReplace &&
+			( name === getDefaultBlockName() ||
+				getBlockSupport( name, '__experimentalSlashInserter', false ) )
 		) {
 			filteredCompleters = [
 				...filteredCompleters,
@@ -56,14 +61,18 @@ function useCompleters( {
 		}
 
 		return filteredCompleters;
-	}, [ completers, name ] );
+	}, [ completers, name, canReplace ] );
 }
+
+const noop = () => {};
 
 export function useBlockEditorAutocompleteProps(
 	props: UseBlockEditorAutocompletePropsOptions
 ) {
 	return useAutocompleteProps( {
 		...props,
+		// A filtered completer may still replace.
+		onReplace: props.onReplace ?? noop,
 		completers: useCompleters( props ),
 	} );
 }
