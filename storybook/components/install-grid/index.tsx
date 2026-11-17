@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from '@wordpress/element';
-import { Button, ButtonLink } from '@wordpress/ui';
+import { useState } from '@wordpress/element';
+import { Source } from '@storybook/addon-docs/blocks';
+import { ButtonLink } from '@wordpress/ui';
 import styles from './style.module.css';
 
 const PACKAGE_ARGS = [
@@ -232,12 +233,15 @@ const TOOLS: Tool[] = [
 	},
 ];
 
-function CopyBlock( { text, file }: { text: string; file?: string } ) {
-	const [ copied, setCopied ] = useState( false );
-	const timeoutRef = useRef< ReturnType< typeof setTimeout > | undefined >(
-		undefined
-	);
-	useEffect( () => () => clearTimeout( timeoutRef.current ), [] );
+function CopyBlock( {
+	text,
+	file,
+	language,
+}: {
+	text: string;
+	file?: string;
+	language: 'json' | 'bash';
+} ) {
 	return (
 		<>
 			{ file && (
@@ -245,32 +249,7 @@ function CopyBlock( { text, file }: { text: string; file?: string } ) {
 					<Inline text={ `In \`${ file }\`:` } />
 				</p>
 			) }
-			<div className={ styles.code }>
-				<pre>
-					<code>{ text }</code>
-				</pre>
-				<Button
-					className={ styles.copy }
-					variant="solid"
-					tone="neutral"
-					size="small"
-					onClick={ async () => {
-						try {
-							await navigator.clipboard.writeText( text );
-							setCopied( true );
-							clearTimeout( timeoutRef.current );
-							timeoutRef.current = setTimeout(
-								() => setCopied( false ),
-								2000
-							);
-						} catch {
-							// Clipboard unavailable; the text remains selectable.
-						}
-					} }
-				>
-					{ copied ? 'Copied' : 'Copy' }
-				</Button>
-			</div>
+			<Source code={ text } language={ language } format={ false } />
 		</>
 	);
 }
@@ -346,9 +325,15 @@ export function InstallGrid() {
 					<ToolIcon tool={ tool } />
 					{ tool.label }
 				</h3>
-				{ tool.command && <CopyBlock text={ tool.command } /> }
+				{ tool.command && (
+					<CopyBlock text={ tool.command } language="bash" />
+				) }
 				{ tool.config && (
-					<CopyBlock text={ tool.config } file={ tool.file } />
+					<CopyBlock
+						text={ tool.config }
+						file={ tool.file }
+						language="json"
+					/>
 				) }
 				{ tool.install && (
 					<p>
