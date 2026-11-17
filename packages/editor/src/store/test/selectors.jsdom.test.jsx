@@ -6,6 +6,7 @@ import {
 	describe,
 	expect,
 	it,
+	vi,
 } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
@@ -104,9 +105,10 @@ selectorNames.forEach( ( name ) => {
 				return state.getCurrentUser && state.getCurrentUser();
 			},
 
-			hasFinishedResolution() {
+			hasFinishedResolution( ...resolutionArgs ) {
 				return (
-					state.hasFinishedResolution && state.hasFinishedResolution()
+					state.hasFinishedResolution &&
+					state.hasFinishedResolution( ...resolutionArgs )
 				);
 			},
 
@@ -1506,18 +1508,23 @@ describe( 'selectors', () => {
 				currentPost: {
 					title: 'sassel',
 				},
+				postType: 'post',
+				postId: 123,
 				saving: {},
 				getCurrentUser() {
 					return { id: 1 };
 				},
-				hasFinishedResolution() {
-					return true;
-				},
+				hasFinishedResolution: vi.fn( () => true ),
 				getAutosave() {},
 				postAutosavingLock: {},
 			};
 
 			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+			// The key the post editor preloads the autosave under.
+			expect( state.hasFinishedResolution ).toHaveBeenCalledWith(
+				'getAutosave',
+				[ 'post', 123, 1 ]
+			);
 		} );
 
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
