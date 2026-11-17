@@ -26,7 +26,25 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	private $orig_theme_dir;
 
+	/**
+	 * Theme data filter that overrides the viewport settings, if set.
+	 *
+	 * @var callable|null
+	 */
+	private $viewport_settings_filter;
+
+	public function set_up() {
+		parent::set_up();
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+	}
+
 	public function tear_down() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		if ( null !== $this->viewport_settings_filter ) {
+			remove_filter( 'wp_theme_json_data_theme', $this->viewport_settings_filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$this->viewport_settings_filter = null;
+		}
 		if ( null !== $this->theme_root ) {
 			remove_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
 			remove_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
@@ -62,6 +80,92 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		unset( $GLOBALS['wp_themes'] );
 
 		switch_theme( 'block-theme' );
+	}
+
+	/**
+	 * Overrides the theme's `settings.viewport` until the test tears down.
+	 *
+	 * @param array $viewport_settings Viewport settings.
+	 */
+	private function set_viewport_settings( $viewport_settings ) {
+		$this->viewport_settings_filter = static function ( $theme_json ) use ( $viewport_settings ) {
+			return $theme_json->update_with(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'viewport' => $viewport_settings,
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $this->viewport_settings_filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+	}
+
+	/**
+	 * Renders a Navigation block with two links.
+	 *
+	 * @param array $attributes Navigation block attributes.
+	 * @return string Rendered markup.
+	 */
+	private function render_navigation_block( $attributes ) {
+		return do_blocks(
+			'<!-- wp:navigation ' . wp_json_encode( (object) $attributes ) . ' -->' .
+			'<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /-->' .
+			'<!-- wp:navigation-link {"label":"About","url":"/about","kind":"custom"} /-->' .
+			'<!-- /wp:navigation -->'
+		);
+	}
+
+	/**
+	 * Returns the block-supports stylesheet generated so far.
+	 *
+	 * @return string Stylesheet.
+	 */
+	private function get_block_supports_stylesheet() {
+		return gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+	}
+
+	/**
+	 * Returns the unique overlay class on the rendered Navigation wrapper.
+	 *
+	 * @param string $markup Rendered markup.
+	 * @return string|null The class, or null if the wrapper has none.
+	 */
+	private function get_overlay_viewports_class( $markup ) {
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( preg_match( '/^wp-block-navigation-overlay-\d+$/', $class_name ) ) {
+				return $class_name;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the four rules that show the Navigation links inline for one
+	 * media query, as the style engine prints them.
+	 *
+	 * @param string $overlay_class Unique overlay class.
+	 * @param string $media_query   Media query.
+	 * @return string[] Rules.
+	 */
+	private function get_expected_inline_rules( $overlay_class, $media_query ) {
+		$base      = ".wp-block-navigation.{$overlay_class}.has-overlay-viewports";
+		$container = "{$base} .wp-block-navigation__responsive-container";
+		$inline    = "{$container}:not(.hidden-by-default):not(.is-menu-open)";
+		$submenu   = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
+
+		return array(
+			"{$media_query}{{$inline}{display:block;width:100%;position:relative;z-index:auto;background-color:inherit;}}",
+			"{$media_query}{{$inline} .wp-block-navigation__responsive-container-close{display:none;}}",
+			"{$media_query}{{$container}.is-menu-open {$submenu}{left:0;}}",
+			"{$media_query}{{$base} .wp-block-navigation__responsive-container-open:not(.always-shown){display:none;}}",
+		);
 	}
 
 	/**
@@ -791,12 +895,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @param bool  $is_always_shown Whether the overlay is expected to be always shown.
 	 */
 	public function test_overlay_menu_markup( $attributes, $is_responsive, $is_always_shown ) {
-		$markup = do_blocks(
-			'<!-- wp:navigation ' . wp_json_encode( (object) $attributes ) . ' -->' .
-			'<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /-->' .
-			'<!-- wp:navigation-link {"label":"About","url":"/about","kind":"custom"} /-->' .
-			'<!-- /wp:navigation -->'
-		);
+		$markup = $this->render_navigation_block( $attributes );
 
 		$processor = new WP_HTML_Tag_Processor( $markup );
 		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
@@ -823,12 +922,12 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	public function data_overlay_menu_markup() {
 		return array(
-			'default (block.json mobile)'    => array( array(), true, false ),
-			'mobile'                         => array( array( 'overlayMenu' => 'mobile' ), true, false ),
-			'tablet'                         => array( array( 'overlayMenu' => 'tablet' ), true, false ),
-			'always'                         => array( array( 'overlayMenu' => 'always' ), true, true ),
-			'never'                          => array( array( 'overlayMenu' => 'never' ), false, false ),
-			'never with legacy isResponsive' => array(
+			'default (block.json mobile)'     => array( array(), true, false ),
+			'mobile'                          => array( array( 'overlayMenu' => 'mobile' ), true, false ),
+			'tablet'                          => array( array( 'overlayMenu' => 'tablet' ), true, false ),
+			'always'                          => array( array( 'overlayMenu' => 'always' ), true, true ),
+			'never'                           => array( array( 'overlayMenu' => 'never' ), false, false ),
+			'never with legacy isResponsive'  => array(
 				array(
 					'overlayMenu'  => 'never',
 					'isResponsive' => true,
@@ -836,6 +935,133 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 				true,
 				false,
 			),
+			'always with legacy isResponsive' => array(
+				array(
+					'overlayMenu'  => 'always',
+					'isResponsive' => true,
+				),
+				true,
+				true,
+			),
+			// An invalid type reverts to the block.json default, `mobile`.
+			'invalid type'                    => array( array( 'overlayMenu' => true ), true, false ),
+		);
+	}
+
+	/**
+	 * Tests that a Tablet overlay shows its links inline above the theme's
+	 * tablet breakpoint, through rules scoped to the block.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_tablet_overlay_shows_links_inline_on_desktop() {
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertTrue( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must opt out of the static breakpoint.' );
+
+		$overlay_class = $this->get_overlay_viewports_class( $markup );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 782px)' ) as $rule ) {
+			$this->assertStringContainsString( $rule, $stylesheet );
+		}
+		$this->assertStringNotContainsString( '@media (width <= 480px)', $stylesheet, 'The overlay is shown on mobile.' );
+		$this->assertStringNotContainsString( '@media (480px < width <= 782px)', $stylesheet, 'The overlay is shown on tablet.' );
+	}
+
+	/**
+	 * Tests that a Tablet overlay follows the theme's tablet breakpoint.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_tablet_overlay_follows_custom_tablet_breakpoint() {
+		$this->set_viewport_settings(
+			array(
+				'mobile' => '30em',
+				'tablet' => '60em',
+			)
+		);
+
+		$markup        = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+		$overlay_class = $this->get_overlay_viewports_class( $markup );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 60em)' ) as $rule ) {
+			$this->assertStringContainsString( $rule, $stylesheet );
+		}
+		$this->assertStringNotContainsString( '782px', $stylesheet, 'The default tablet breakpoint must not be used.' );
+	}
+
+	/**
+	 * Tests that a Tablet overlay collapses at the mobile breakpoint when the
+	 * theme has no valid tablet breakpoint.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_tablet_overlay_uses_mobile_breakpoint_without_tablet_breakpoint() {
+		$this->set_viewport_settings(
+			array(
+				'mobile' => '30em',
+				'tablet' => 'invalid',
+			)
+		);
+
+		$markup        = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+		$overlay_class = $this->get_overlay_viewports_class( $markup );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 30em)' ) as $rule ) {
+			$this->assertStringContainsString( $rule, $stylesheet );
+		}
+	}
+
+	/**
+	 * Tests that overlay settings that don't follow the viewports keep the
+	 * static breakpoint and add no overlay rules.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 *
+	 * @dataProvider data_overlay_menu_without_viewport_rules
+	 *
+	 * @param mixed $overlay_menu The overlayMenu attribute value.
+	 */
+	public function test_overlay_menu_without_viewport_rules( $overlay_menu ) {
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => $overlay_menu ) );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertFalse( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must keep the static breakpoint.' );
+		$this->assertNull( $this->get_overlay_viewports_class( $markup ), 'The wrapper must not have a unique overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		$this->assertStringNotContainsString( 'has-overlay-viewports', $stylesheet );
+		$this->assertStringNotContainsString( 'responsive-container', $stylesheet );
+
+		if ( is_string( $overlay_menu ) && ! in_array( $overlay_menu, array( 'mobile', 'always', 'never' ), true ) ) {
+			$this->assertStringNotContainsString( $overlay_menu, $markup, 'The attribute value must not be printed.' );
+			$this->assertStringNotContainsString( '<script>', $markup );
+			$this->assertStringNotContainsString( 'alert(1)', $stylesheet );
+		}
+	}
+
+	/**
+	 * Data provider for test_overlay_menu_without_viewport_rules().
+	 *
+	 * @return array[]
+	 */
+	public function data_overlay_menu_without_viewport_rules() {
+		return array(
+			'mobile'                    => array( 'mobile' ),
+			'always'                    => array( 'always' ),
+			'never'                     => array( 'never' ),
+			'tablet with closing style' => array( 'tablet</style><script>alert(1)</script>' ),
+			'tablet in an array'        => array( array( 'tablet' ) ),
+			'tablet with closing brace' => array( 'tablet; }' ),
 		);
 	}
 }

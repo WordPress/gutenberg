@@ -1052,20 +1052,123 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Adds the rules that show the Navigation links inline in the viewports
+	 * where the overlay is not shown, and returns the wrapper classes they target.
+	 *
+	 * The base styles show the overlay, so only the inline viewports need rules.
+	 * The `has-overlay-viewports` class opts the block out of the static 600px
+	 * breakpoint in style.scss. It is only returned when at least one rule is
+	 * added, so a block is never left without a breakpoint.
+	 *
+	 * Media queries come from the theme's sanitized viewport settings. Nothing
+	 * from the block attributes is printed into the rules.
+	 *
+	 * When the theme has no valid tablet breakpoint, the desktop media query
+	 * starts at the mobile breakpoint, so the `tablet` setting collapses into
+	 * the overlay at the mobile breakpoint.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
+	 *                                                                               block_core_navigation_get_overlay_viewports().
+	 * @return string[] Classes for the navigation wrapper, or an empty list when no rules are needed.
+	 */
+	private static function add_overlay_viewport_styles( $overlay_viewports ) {
+		$inline_viewports = block_core_navigation_get_inline_viewports( $overlay_viewports );
+		if ( empty( $inline_viewports ) ) {
+			return array();
+		}
+
+		$global_settings   = wp_get_global_settings();
+		$viewport_settings = $global_settings['viewport'] ?? null;
+		$media_queries     = array();
+		if ( method_exists( 'WP_Theme_JSON_Gutenberg', 'get_viewport_media_queries' ) ) {
+			$media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings, array( 'include_desktop' => true ) );
+		} elseif ( method_exists( 'WP_Theme_JSON', 'get_viewport_media_queries' ) ) {
+			$media_queries = WP_Theme_JSON::get_viewport_media_queries( $viewport_settings, array( 'include_desktop' => true ) );
+		}
+
+		$rules_groups = array();
+		foreach ( $inline_viewports as $viewport ) {
+			if ( isset( $media_queries[ '@' . $viewport ] ) ) {
+				$rules_groups[] = $media_queries[ '@' . $viewport ];
+			}
+		}
+		if ( empty( $rules_groups ) ) {
+			return array();
+		}
+
+		$overlay_class        = wp_unique_id( 'wp-block-navigation-overlay-' );
+		$selector_base        = ".wp-block-navigation.{$overlay_class}.has-overlay-viewports";
+		$container_selector   = $selector_base . ' .wp-block-navigation__responsive-container';
+		$inline_selector      = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
+		$submenu_selector     = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
+		$open_button_selector = $selector_base . ' .wp-block-navigation__responsive-container-open:not(.always-shown)';
+
+		$rules = array();
+		foreach ( $rules_groups as $rules_group ) {
+			$rules[] = array(
+				'selector'     => $inline_selector,
+				'declarations' => array(
+					'display'          => 'block',
+					'width'            => '100%',
+					'position'         => 'relative',
+					'z-index'          => 'auto',
+					'background-color' => 'inherit',
+				),
+				'rules_group'  => $rules_group,
+			);
+			$rules[] = array(
+				'selector'     => $inline_selector . ' .wp-block-navigation__responsive-container-close',
+				'declarations' => array( 'display' => 'none' ),
+				'rules_group'  => $rules_group,
+			);
+			// Keep submenus in an open overlay positioned as overlay content.
+			$rules[] = array(
+				'selector'     => $container_selector . '.is-menu-open ' . $submenu_selector,
+				'declarations' => array( 'left' => '0' ),
+				'rules_group'  => $rules_group,
+			);
+			$rules[] = array(
+				'selector'     => $open_button_selector,
+				'declarations' => array( 'display' => 'none' ),
+				'rules_group'  => $rules_group,
+			);
+		}
+
+		wp_style_engine_get_stylesheet_from_css_rules(
+			$rules,
+			array( 'context' => 'block-supports' )
+		);
+
+		return array( 'has-overlay-viewports', $overlay_class );
+	}
+
+	/**
 	 * Get the wrapper attributes
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Adds the classes for overlays that follow the theme's viewports.
 	 *
 	 * @param array         $attributes   The block attributes.
 	 * @param WP_Block_List $inner_blocks A list of inner blocks.
 	 * @return string Returns the navigation block markup.
 	 */
 	private static function get_nav_attributes( $attributes, $inner_blocks ) {
-		$is_interactive     = self::is_interactive( $attributes, $inner_blocks );
-		$is_responsive_menu = self::is_responsive( $attributes );
+		$is_interactive = self::is_interactive( $attributes, $inner_blocks );
+		// Resolve the overlay viewports once, so the wrapper classes and the
+		// rules that target them cannot disagree.
+		$overlay_viewports  = block_core_navigation_get_overlay_viewports( $attributes );
+		$is_responsive_menu = block_core_navigation_is_overlay_responsive( $overlay_viewports );
 		$style              = self::get_styles( $attributes );
 		$class              = self::get_classes( $attributes );
-		$extra_attributes   = array(
+		if ( $is_responsive_menu ) {
+			$overlay_viewport_classes = self::add_overlay_viewport_styles( $overlay_viewports );
+			if ( ! empty( $overlay_viewport_classes ) ) {
+				$class = trim( $class . ' ' . implode( ' ', $overlay_viewport_classes ) );
+			}
+		}
+		$extra_attributes = array(
 			'class' => $class,
 			'style' => $style,
 		);
