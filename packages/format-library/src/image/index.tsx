@@ -1,5 +1,5 @@
 import {
-	Popover,
+	Popover as WCPopover,
 	Button,
 	__experimentalNumberControl as NumberControl,
 	TextareaControl as WCTextareaControl,
@@ -94,7 +94,7 @@ function InlineUI( {
 	} );
 
 	return (
-		<Popover
+		<WCPopover
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
 			className="block-editor-format-toolbar__image-popover"
@@ -111,6 +111,8 @@ function InlineUI( {
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
+						// Keep attributes the format doesn't register, like `loading`.
+						...value.replacements[ value.start ],
 						type: name,
 						attributes: {
 							...activeObjectAttributes,
@@ -175,7 +177,7 @@ function InlineUI( {
 					</Stack>
 				</Stack>
 			</form>
-		</Popover>
+		</WCPopover>
 	);
 }
 

@@ -128,7 +128,13 @@ export const Picker = ( {
 
 	const handleChange = ( next: HsvaColor ) => {
 		setHsva( next );
-		const nextHsla: HslaColor = { ...colord( next ).toHsl(), a: next.a };
+		// An alpha-only change keeps the current HSLA channels. Converting the
+		// HSVA to HSLA again rounds each channel and shifts the RGB values.
+		const isAlphaOnlyChange =
+			next.h === hsva.h && next.s === hsva.s && next.v === hsva.v;
+		const nextHsla: HslaColor = isAlphaOnlyChange
+			? { ...hsla, a: next.a }
+			: { ...colord( next ).toHsl(), a: next.a };
 		pickerOriginHslaRef.current = nextHsla;
 		onChange( nextHsla );
 	};

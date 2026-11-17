@@ -1,12 +1,15 @@
-import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Button, pending WordPress/gutenberg#76135.
+	Button,
 	Checkbox,
 	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of IconButton, pending WordPress/gutenberg#76135.
+	IconButton,
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu, pending WordPress/gutenberg#76135.
 	Menu,
 	Stack,
@@ -145,21 +148,17 @@ function ActionTrigger< Item >( {
 	items,
 }: ActionTriggerProps< Item > ) {
 	const label = getActionLabel( action, items );
-	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
 		<Button
-			variant="secondary"
-			className="dataviews-bulk-actions__action"
-			disabled={ !! action.disabled || isBusy }
-			accessibleWhenDisabled
-			label={ isMobile ? label : undefined }
-			icon={ isMobile ? action.icon : undefined }
+			variant="outline"
+			tone="neutral"
 			size="compact"
+			disabled={ !! action.disabled || isBusy }
+			loading={ isBusy }
 			onClick={ onClick }
-			isBusy={ isBusy }
 		>
-			{ ! isMobile && label }
+			{ label }
 		</Button>
 	);
 }
@@ -222,15 +221,15 @@ function renderBulkActionsContent< Item >(
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >
 ) {
 	const clearSelection = selectedItems.length > 0 && (
-		<Button
+		<IconButton
 			className="dataviews-bulk-actions__clear"
-			icon={ closeSmall }
-			showTooltip
-			tooltipPosition="top"
+			variant="minimal"
+			tone="neutral"
 			size="compact"
+			icon={ closeSmall }
 			label={ __( 'Cancel' ) }
 			disabled={ !! actionInProgress }
-			accessibleWhenDisabled={ false }
+			focusableWhenDisabled={ false }
 			onClick={ () => onChangeSelection( EMPTY_ARRAY ) }
 		/>
 	);
@@ -281,7 +280,12 @@ function renderBulkActionsContent< Item >(
 					) }
 				</span>
 			) }
-			<Stack direction="row" gap="md" justify="start">
+			<Stack
+				direction="row"
+				className="dataviews-bulk-actions__actions"
+				gap="md"
+				justify="start"
+			>
 				{ isMobile
 					? actionsToShow.length > 0 && (
 							<Menu.Root>
@@ -289,15 +293,13 @@ function renderBulkActionsContent< Item >(
 									disabled={ !! actionInProgress }
 									render={
 										<Button
-											variant="secondary"
+											variant="outline"
+											tone="neutral"
 											size="compact"
-											icon={ chevronDown }
-											iconPosition="right"
-											className="dataviews-bulk-actions__action"
-											isBusy={ !! actionInProgress }
-											accessibleWhenDisabled
+											loading={ !! actionInProgress }
 										>
 											{ __( 'Actions' ) }
+											<Button.Icon icon={ chevronDown } />
 										</Button>
 									}
 								/>

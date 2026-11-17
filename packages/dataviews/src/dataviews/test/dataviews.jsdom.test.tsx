@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import DataViews from '../index';
 import {
 	LAYOUT_ACTIVITY,
@@ -15,6 +16,12 @@ import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+
 type Data = {
 	id: number;
 	title: string;
@@ -281,7 +288,8 @@ describe( 'DataViews component', () => {
 			);
 			expect(
 				screen.getByRole( 'button', { name: 'Process' } )
-			).toHaveClass( 'is-busy' );
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
 			expect( screen.getByText( '1 item selected' ) ).toBeVisible();
 			finishAction!();
 			await waitFor( () =>
@@ -1631,6 +1639,44 @@ describe( 'DataViews component', () => {
 
 		afterEach( () => {
 			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'keeps the bulk actions menu trigger focusable while an action runs', async () => {
+			let finishAction: () => void;
+			const pending = new Promise< void >( ( resolve ) => {
+				finishAction = resolve;
+			} );
+			render(
+				<DataViewWrapper
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'process',
+							label: 'Process',
+							supportsBulk: true,
+							callback: () => pending,
+						},
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			const trigger = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
+			);
+			await user.click( trigger );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Process' } )
+			);
+			expect( trigger ).toHaveFocus();
+			expect( trigger ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
+
+			finishAction!();
+			await waitFor( () =>
+				expect( trigger ).toHaveAttribute( 'aria-disabled', 'false' )
+			);
 		} );
 
 		it( 'supports iconless and disabled grid bulk actions without losing modal focus', async () => {

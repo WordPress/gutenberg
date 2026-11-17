@@ -322,7 +322,7 @@ export const getAttributesFromPreview = memoize(
 			type = WP_EMBED_TYPE;
 		}
 
-		if ( html || 'photo' === type ) {
+		if ( html ) {
 			attributes.type = type;
 			attributes.providerNameSlug = providerNameSlug;
 		}

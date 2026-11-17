@@ -3,7 +3,7 @@ import type { SelectFunction } from '@wordpress/data';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { useRef, useState } from '@wordpress/element';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
@@ -328,7 +328,7 @@ export default function BlockTools( {
 
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode && ! hasFixedToolbar && (
-					<Popover.Slot
+					<WCPopover.Slot
 						name="block-toolbar"
 						ref={ blockToolbarRef }
 					/>
@@ -337,7 +337,7 @@ export default function BlockTools( {
 					{ children }
 				</MultiBlockFormatEdit>
 				{ /* Used for inline rich text popovers. */ }
-				<Popover.Slot
+				<WCPopover.Slot
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>

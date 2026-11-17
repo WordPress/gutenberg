@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2026-11-04)
+
 ### New Features
 
 -   Add `encodePixelsAsJpeg` and its worker counterpart `vipsEncodePixelsAsJpeg`, which encode raw RGBA pixels as a JPEG while copying the EXIF block from the image file they were decoded from ([#82040](https://github.com/WordPress/gutenberg/pull/82040)).
