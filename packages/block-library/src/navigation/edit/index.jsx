@@ -69,6 +69,7 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import {
+	getInlineViewports,
 	getOverlayViewports,
 	isOverlayAlwaysShown,
 	isOverlayResponsive,
@@ -76,6 +77,7 @@ import {
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
+import useOverlayViewportStyles from './use-overlay-viewport-styles';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -287,6 +289,11 @@ function Navigation( {
 		layout: attributes.layout,
 		style: attributes.style,
 	} );
+	const overlayViewports = useMemo(
+		() => getOverlayViewports( { overlayMenu } ),
+		[ overlayMenu ]
+	);
+	useOverlayViewportStyles( { clientId, overlayViewports } );
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -618,12 +625,10 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const overlayViewports = useMemo(
-		() => getOverlayViewports( { overlayMenu } ),
-		[ overlayMenu ]
-	);
 	const isResponsive =
 		isOverlayResponsive( overlayViewports ) && ! editorDisabledResponsive;
+	const hasOverlayViewports =
+		isResponsive && getInlineViewports( overlayViewports ).length > 0;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -638,6 +643,7 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
+				'has-overlay-viewports': hasOverlayViewports,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
