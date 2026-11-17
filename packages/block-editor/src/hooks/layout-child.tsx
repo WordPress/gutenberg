@@ -19,6 +19,8 @@ import {
 	GridItemMovers,
 	GridItemRotator,
 	GridItemDragHandle,
+	GridItemDeleteHandle,
+	GridItemHandles,
 	useUpdateGridChildLayout,
 } from '../components/grid';
 import type { GridBlockStyle } from '../components/grid/mobile-stacking';
@@ -458,6 +460,7 @@ function GridTools( {
 		parentStyle,
 		blockEditingMode,
 		canMove,
+		canRemove,
 		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
@@ -469,6 +472,7 @@ function GridTools( {
 				getSettings,
 				getSelectedBlockStyleState,
 				canMoveBlock,
+				canRemoveBlock,
 				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
@@ -505,6 +509,7 @@ function GridTools( {
 				parentStyle: parentAttributes?.style,
 				blockEditingMode: getBlockEditingMode( clientId ),
 				canMove: canMoveBlock( clientId ),
+				canRemove: canRemoveBlock( clientId ),
 				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
@@ -556,9 +561,9 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
-	// The angle shown while the rotate handle is being dragged. The drag
-	// handle turns with it. The grid visualizer is memoized, so it doesn't
-	// re-render for every degree.
+	// The angle shown while the rotate handle is being dragged. The toolbar
+	// of handles turns with it. The grid visualizer is memoized, so it
+	// doesn't re-render for every degree.
 	const [ previewRotate, setPreviewRotate ] = useState< number | null >(
 		null
 	);
@@ -627,6 +632,8 @@ function GridTools( {
 	// moved gets a handle that drags it the way a body drag does.
 	const showDragHandle =
 		isManualGrid && ! isBlockItselfCurrentlyHidden && canMove;
+	const showDeleteHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canRemove;
 
 	function updateLayout( layout: ChildLayout ) {
 		updateGridChildLayout( clientId, layout );
@@ -670,20 +677,30 @@ function GridTools( {
 					parentLayout={ parentLayout }
 				/>
 			) }
-			{ showRotator && (
-				<GridItemRotator
+			{ ( showDragHandle || showRotator || showDeleteHandle ) && (
+				<GridItemHandles
 					clientId={ clientId }
-					angle={ rotate }
-					onPreview={ setPreviewRotate }
-					onChange={ updateRotate }
-				/>
-			) }
-			{ showDragHandle && (
-				<GridItemDragHandle
-					clientId={ clientId }
-					gridClientId={ rootClientId }
 					angle={ previewRotate ?? rotate }
-				/>
+					anchorAngle={ rotate }
+				>
+					{ showDragHandle && (
+						<GridItemDragHandle
+							clientId={ clientId }
+							gridClientId={ rootClientId }
+						/>
+					) }
+					{ showRotator && (
+						<GridItemRotator
+							clientId={ clientId }
+							angle={ rotate }
+							onPreview={ setPreviewRotate }
+							onChange={ updateRotate }
+						/>
+					) }
+					{ showDeleteHandle && (
+						<GridItemDeleteHandle clientId={ clientId } />
+					) }
+				</GridItemHandles>
 			) }
 			{ isManualGrid && (
 				<GridItemMovers
