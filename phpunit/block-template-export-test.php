@@ -136,4 +136,3 @@ class Tests_Block_Template_Export extends WP_UnitTestCase {
 		$this->assertStringContainsString( '<!-- wp:template-part {"slug":"header","area":"header"} /-->', $template_content );
 	}
 }
-
