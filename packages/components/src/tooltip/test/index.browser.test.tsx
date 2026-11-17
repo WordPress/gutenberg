@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { page, server, userEvent } from 'vitest/browser';
 import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
+
+declare module 'vitest/browser' {
+	interface BrowserCommands {
+		hoverWithManualTimers: ( selector: string ) => Promise< void >;
+	}
+}
 
 const props = {
 	children: <button>Tooltip anchor</button>,
@@ -29,6 +35,12 @@ const waitExpectTooltipToHide = async () =>
 
 const hoverOutside = async () => {
 	await userEvent.hover( document.body );
+};
+
+const hoverWithManualTimers = async ( element: Element ) => {
+	await server.commands.hoverWithManualTimers(
+		page.elementLocator( element ).selector
+	);
 };
 
 describe( 'Tooltip', () => {
@@ -311,7 +323,7 @@ describe( 'Tooltip', () => {
 			// Keep browser command latency from consuming the hover delay.
 			vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
 			try {
-				await userEvent.hover( anchor );
+				await hoverWithManualTimers( anchor );
 				expectTooltipToBeHidden();
 
 				// One millisecond short of the custom delay, which is past the
@@ -375,7 +387,7 @@ describe( 'Tooltip', () => {
 			// Keep browser command latency from consuming the hover delay.
 			vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
 			try {
-				await userEvent.hover( anchor );
+				await hoverWithManualTimers( anchor );
 				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 				expectTooltipToBeHidden();
 
@@ -386,7 +398,7 @@ describe( 'Tooltip', () => {
 				} );
 				expectTooltipToBeHidden();
 
-				await hoverOutside();
+				await hoverWithManualTimers( document.body );
 				expectTooltipToBeHidden();
 				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 				expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );

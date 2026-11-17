@@ -647,7 +647,10 @@
 											"type": "array",
 											"items": {
 												"type": "string",
-												"enum": [ "vertical", "horizontal" ]
+												"enum": [
+													"vertical",
+													"horizontal"
+												]
 											}
 										}
 									}
