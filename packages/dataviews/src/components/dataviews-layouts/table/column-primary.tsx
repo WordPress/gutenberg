@@ -4,6 +4,7 @@ import { Stack } from '@wordpress/ui';
 import type { Action, MediaAspectRatio, NormalizedField } from '../../../types';
 import { PrimaryActions } from '../../dataviews-item-actions';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
+import { usePrimaryActionsFit } from './use-primary-actions-fit';
 
 function ColumnPrimary< Item >( {
 	item,
@@ -33,6 +34,7 @@ function ColumnPrimary< Item >( {
 	primaryActions?: Action< Item >[];
 } ) {
 	const registry = useRegistry();
+	const { titleRowRef, primaryActionsRef } = usePrimaryActionsFit();
 	// Srcset/size hint for the media render. The preview box is 32px square
 	// by default; when the view configures `layout.aspectRatio`, the box
 	// keeps the 32px height while the ratio derives its width, clamped by
@@ -78,7 +80,10 @@ function ColumnPrimary< Item >( {
 				className="dataviews-view-table__primary-column-content"
 			>
 				{ titleField && (
-					<div className="dataviews-view-table__title-row">
+					<div
+						ref={ titleRowRef }
+						className="dataviews-view-table__title-row"
+					>
 						<ItemClickWrapper
 							item={ item }
 							isItemClickable={ isItemClickable }
@@ -105,12 +110,17 @@ function ColumnPrimary< Item >( {
 								className="dataviews-view-table__primary-actions"
 								onClick={ ( event ) => event.stopPropagation() }
 							>
-								<PrimaryActions
-									item={ item }
-									actions={ primaryActions }
-									registry={ registry }
-									buttonVariant="link"
-								/>
+								<div
+									ref={ primaryActionsRef }
+									className="dataviews-view-table__primary-actions-content"
+								>
+									<PrimaryActions
+										item={ item }
+										actions={ primaryActions }
+										registry={ registry }
+										buttonVariant="link"
+									/>
+								</div>
 							</div>
 						) }
 					</div>
