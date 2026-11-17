@@ -40,6 +40,14 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	private $viewport_settings_filter;
 
+	/**
+	 * Callbacks added to `block_core_navigation_overlay_viewports`, removed
+	 * after each test.
+	 *
+	 * @var callable[]
+	 */
+	private $overlay_viewports_filters = array();
+
 	public function set_up() {
 		parent::set_up();
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
@@ -47,6 +55,10 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 
 	public function tear_down() {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+		foreach ( $this->overlay_viewports_filters as $callback ) {
+			remove_filter( 'block_core_navigation_overlay_viewports', $callback );
+		}
+		$this->overlay_viewports_filters = array();
 		if ( null !== $this->orig_text_direction ) {
 			$GLOBALS['wp_locale']->text_direction = $this->orig_text_direction;
 			$this->orig_text_direction            = null;
@@ -126,6 +138,44 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			'<!-- wp:navigation-link {"label":"About","url":"/about","kind":"custom"} /-->' .
 			'<!-- /wp:navigation -->'
 		);
+	}
+
+	/**
+	 * Adds a callback to `block_core_navigation_overlay_viewports` until the
+	 * test tears down.
+	 *
+	 * @param callable $callback Filter callback.
+	 */
+	private function add_overlay_viewports_filter( $callback ) {
+		$this->overlay_viewports_filters[] = $callback;
+		add_filter( 'block_core_navigation_overlay_viewports', $callback, 10, 3 );
+	}
+
+	/**
+	 * Asserts that the rendered Navigation block shows the overlay up to the
+	 * theme's tablet breakpoint and the links inline above it, with classes and
+	 * rules that agree.
+	 *
+	 * @param string $markup Rendered markup.
+	 */
+	private function assert_tablet_overlay_markup( $markup ) {
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertTrue( $processor->has_class( 'is-responsive' ), 'is-responsive class' );
+		$this->assertTrue( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must opt out of the static breakpoint.' );
+		$this->assertTrue(
+			$processor->next_tag( array( 'class_name' => 'wp-block-navigation__responsive-container-open' ) ),
+			'Overlay open button'
+		);
+
+		$overlay_class = $this->get_overlay_viewports_class( $markup );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have an overlay class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 782px)' ) as $rule ) {
+			$this->assertStringContainsString( $rule, $stylesheet );
+		}
+		$this->assertSame( 4, substr_count( $stylesheet, $overlay_class ), 'The stylesheet must contain only the Tablet rules.' );
 	}
 
 	/**
@@ -1118,5 +1168,430 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			'tablet in an array'          => array( array( 'tablet' ) ),
 			'tablet with closing brace'   => array( 'tablet; }' ),
 		);
+	}
+
+	/**
+	 * Tests that the filtered viewports are the unfiltered viewports when no
+	 * filter is added.
+	 *
+	 * @dataProvider data_overlay_viewports
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 *
+	 * @param array      $attributes Block attributes.
+	 * @param array|null $expected   Expected viewport map.
+	 */
+	public function test_filtered_overlay_viewports_without_a_filter( $attributes, $expected ) {
+		$this->assertSame( $expected, gutenberg_block_core_navigation_get_filtered_overlay_viewports( $attributes ) );
+	}
+
+	/**
+	 * Tests that the overlay viewports filter receives the unfiltered viewports,
+	 * the block attributes including `ref`, and the block instance.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 */
+	public function test_overlay_viewports_filter_receives_the_viewports_attributes_and_block() {
+		$navigation_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_navigation',
+				'post_status'  => 'publish',
+				'post_content' => '<!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /-->',
+			)
+		);
+		$calls         = array();
+		$this->add_overlay_viewports_filter(
+			static function ( $overlay_viewports, $attributes, $block ) use ( &$calls ) {
+				$calls[] = array( $overlay_viewports, $attributes, $block );
+				return $overlay_viewports;
+			}
+		);
+
+		do_blocks( '<!-- wp:navigation {"overlayMenu":"tablet","ref":' . $navigation_id . '} /-->' );
+
+		$this->assertCount( 1, $calls, 'The filter must be applied once.' );
+		list( $overlay_viewports, $attributes, $block ) = $calls[0];
+		$this->assertSame(
+			array(
+				'mobile'  => true,
+				'tablet'  => true,
+				'desktop' => false,
+			),
+			$overlay_viewports
+		);
+		$this->assertSame( 'tablet', $attributes['overlayMenu'] );
+		$this->assertSame( $navigation_id, $attributes['ref'] );
+		$this->assertInstanceOf( WP_Block::class, $block );
+		$this->assertSame( 'core/navigation', $block->name );
+		$this->assertSame( $attributes, $block->attributes, 'The filter must receive the attributes of the block it is given.' );
+	}
+
+	/**
+	 * Tests that the overlay viewports filter receives null for the default
+	 * `mobile` behavior, and null for the block when none is passed.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 */
+	public function test_overlay_viewports_filter_receives_null_for_the_default_behavior() {
+		$calls = array();
+		$this->add_overlay_viewports_filter(
+			static function ( $overlay_viewports, $attributes, $block ) use ( &$calls ) {
+				$calls[] = array( $overlay_viewports, $attributes, $block );
+				return $overlay_viewports;
+			}
+		);
+
+		$this->render_navigation_block( array() );
+		gutenberg_block_core_navigation_get_filtered_overlay_viewports( array( 'overlayMenu' => 'never' ) );
+
+		$this->assertCount( 2, $calls );
+		$this->assertNull( $calls[0][0], 'The default behavior must be passed as null.' );
+		$this->assertSame( 'mobile', $calls[0][1]['overlayMenu'] );
+		$this->assertInstanceOf( WP_Block::class, $calls[0][2] );
+		$this->assertNull( $calls[1][2], 'The block must default to null.' );
+	}
+
+	/**
+	 * Tests that a filter can make a `mobile` overlay collapse at the theme's
+	 * tablet breakpoint.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_can_show_a_mobile_overlay_on_tablet() {
+		$this->add_overlay_viewports_filter(
+			static function () {
+				return array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				);
+			}
+		);
+
+		$this->assert_tablet_overlay_markup( $this->render_navigation_block( array( 'overlayMenu' => 'mobile' ) ) );
+	}
+
+	/**
+	 * Tests that a filter can return null for the default `mobile` behavior.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_can_return_the_default_behavior() {
+		$this->add_overlay_viewports_filter( '__return_null' );
+
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertTrue( $processor->has_class( 'is-responsive' ), 'is-responsive class' );
+		$this->assertFalse( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must keep the static breakpoint.' );
+		$this->assertNull( $this->get_overlay_viewports_class( $markup ), 'The wrapper must not have an overlay class.' );
+		$this->assertStringNotContainsString( 'responsive-container', $this->get_block_supports_stylesheet() );
+	}
+
+	/**
+	 * Tests that a filter can show the overlay for a block whose overlay is
+	 * never shown.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_can_show_the_overlay_for_never() {
+		$this->add_overlay_viewports_filter(
+			static function () {
+				return array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => false,
+				);
+			}
+		);
+
+		$this->assert_tablet_overlay_markup( $this->render_navigation_block( array( 'overlayMenu' => 'never' ) ) );
+	}
+
+	/**
+	 * Tests that a filter can hide the overlay in every viewport.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_can_hide_the_overlay() {
+		$this->add_overlay_viewports_filter(
+			static function () {
+				return array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+				);
+			}
+		);
+
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'always' ) );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
+		$this->assertFalse( $processor->has_class( 'is-responsive' ), 'is-responsive class' );
+		$this->assertFalse(
+			$processor->next_tag( array( 'class_name' => 'wp-block-navigation__responsive-container-open' ) ),
+			'Overlay open button'
+		);
+	}
+
+	/**
+	 * Tests that an invalid filter result is ignored, and that nothing it
+	 * returns is printed.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 *
+	 * @dataProvider data_invalid_overlay_viewports_filter_results
+	 *
+	 * @param mixed $filtered Value returned by the filter.
+	 */
+	public function test_overlay_viewports_filter_ignores_invalid_results( $filtered ) {
+		$this->add_overlay_viewports_filter(
+			static function () use ( $filtered ) {
+				return $filtered;
+			}
+		);
+
+		$this->assertSame(
+			array(
+				'mobile'  => true,
+				'tablet'  => true,
+				'desktop' => false,
+			),
+			gutenberg_block_core_navigation_get_filtered_overlay_viewports( array( 'overlayMenu' => 'tablet' ) )
+		);
+		$this->assertNull(
+			gutenberg_block_core_navigation_get_filtered_overlay_viewports( array( 'overlayMenu' => 'mobile' ) ),
+			'An invalid result must keep the default behavior.'
+		);
+
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
+		$this->assert_tablet_overlay_markup( $markup );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		$this->assertStringNotContainsString( '900px', $markup );
+		$this->assertStringNotContainsString( '900px', $stylesheet );
+		$this->assertStringNotContainsString( 'display:none}', $stylesheet );
+		$this->assertStringNotContainsString( 'body', $stylesheet );
+	}
+
+	/**
+	 * Data provider for test_overlay_viewports_filter_ignores_invalid_results().
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_overlay_viewports_filter_results() {
+		$hostile = '900px; } body { display:none';
+
+		return array(
+			'a string'              => array( $hostile ),
+			'a partial map'         => array(
+				array(
+					'mobile' => true,
+					'tablet' => true,
+				),
+			),
+			'integer values'        => array(
+				array(
+					'mobile'  => 1,
+					'tablet'  => 1,
+					'desktop' => 0,
+				),
+			),
+			'string values'         => array(
+				array(
+					'mobile'  => 'yes',
+					'tablet'  => 'yes',
+					'desktop' => false,
+				),
+			),
+			'a string viewport'     => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => $hostile,
+				),
+			),
+			'a list'                => array( array( true, true, false ) ),
+			'false'                 => array( false ),
+			'an object'             => array(
+				(object) array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				),
+			),
+			'a map with null value' => array(
+				array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => null,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Tests that only the `mobile`, `tablet` and `desktop` keys are copied from
+	 * the map a filter returns, in that order.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 */
+	public function test_overlay_viewports_filter_keeps_only_the_known_viewports() {
+		$this->add_overlay_viewports_filter(
+			static function () {
+				return array(
+					'desktop' => false,
+					'wide'    => '</style><script>alert(1)</script>',
+					'tablet'  => true,
+					'mobile'  => true,
+				);
+			}
+		);
+
+		$this->assertSame(
+			array(
+				'mobile'  => true,
+				'tablet'  => true,
+				'desktop' => false,
+			),
+			gutenberg_block_core_navigation_get_filtered_overlay_viewports( array( 'overlayMenu' => 'never' ) )
+		);
+
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'never' ) );
+		$this->assert_tablet_overlay_markup( $markup );
+		$this->assertStringNotContainsString( 'alert(1)', $markup );
+		$this->assertStringNotContainsString( 'alert(1)', $this->get_block_supports_stylesheet() );
+	}
+
+	/**
+	 * Tests that the filter is not applied to a Navigation block inside an
+	 * overlay template part, which never shows an overlay of its own.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_filtered_overlay_viewports
+	 */
+	public function test_overlay_viewports_filter_is_skipped_inside_an_overlay() {
+		$calls = 0;
+		$this->add_overlay_viewports_filter(
+			static function () use ( &$calls ) {
+				++$calls;
+				return array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				);
+			}
+		);
+
+		$never = array(
+			'mobile'  => false,
+			'tablet'  => false,
+			'desktop' => false,
+		);
+		$this->assertSame(
+			$never,
+			gutenberg_block_core_navigation_get_filtered_overlay_viewports(
+				array(
+					'overlayMenu'                  => 'never',
+					'_isWithinOverlayTemplatePart' => true,
+				)
+			)
+		);
+		$this->assertSame(
+			$never,
+			gutenberg_block_core_navigation_get_filtered_overlay_viewports(
+				array(
+					'overlayMenu'                  => 'never',
+					'isResponsive'                 => true,
+					'_isWithinOverlayTemplatePart' => true,
+				)
+			),
+			'The legacy isResponsive attribute must not give a nested block an overlay.'
+		);
+		$this->assertSame( 0, $calls, 'The filter must not be applied.' );
+	}
+
+	/**
+	 * Tests that a Navigation block rendered inside an overlay template part
+	 * is not responsive, and that the filter is applied only to the outer block.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_is_skipped_for_a_nested_navigation() {
+		$template_part_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'wp_template_part',
+				'post_status'  => 'publish',
+				'post_name'    => 'navigation-overlay-viewports-test',
+				'post_content' => '<!-- wp:navigation {"overlayMenu":"always","className":"nested-navigation"} --><!-- wp:navigation-link {"label":"Nested","url":"/nested","kind":"custom"} /--><!-- /wp:navigation -->',
+			)
+		);
+		wp_set_post_terms( $template_part_id, get_stylesheet(), 'wp_theme' );
+
+		$calls = array();
+		$this->add_overlay_viewports_filter(
+			static function ( $overlay_viewports, $attributes ) use ( &$calls ) {
+				$calls[] = $attributes;
+				return array(
+					'mobile'  => true,
+					'tablet'  => true,
+					'desktop' => true,
+				);
+			}
+		);
+
+		$markup = $this->render_navigation_block( array( 'overlay' => 'navigation-overlay-viewports-test' ) );
+
+		$this->assertCount( 1, $calls, 'The filter must be applied to the outer block only.' );
+		$this->assertArrayNotHasKey( '_isWithinOverlayTemplatePart', $calls[0] );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-navigation__overlay-container' ) ), 'The overlay template part must be rendered.' );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'nested-navigation' ) ), 'The nested Navigation block must be rendered.' );
+		$this->assertSame( 'DIV', $processor->get_tag() );
+		$this->assertFalse( $processor->has_class( 'is-responsive' ), 'The nested Navigation block must not be responsive.' );
+		$this->assertFalse(
+			$processor->next_tag( array( 'class_name' => 'wp-block-navigation__responsive-container-open' ) ),
+			'The nested Navigation block must not have an open button.'
+		);
+	}
+
+	/**
+	 * Tests that the filter is applied once per render, so a filter that
+	 * returns a different map each time cannot make the classes, the markup
+	 * and the rules disagree.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_overlay_viewports_filter_is_applied_once_per_render() {
+		$calls = 0;
+		$this->add_overlay_viewports_filter(
+			static function () use ( &$calls ) {
+				++$calls;
+				if ( 1 === $calls ) {
+					return array(
+						'mobile'  => true,
+						'tablet'  => true,
+						'desktop' => false,
+					);
+				}
+				return array(
+					'mobile'  => false,
+					'tablet'  => false,
+					'desktop' => false,
+				);
+			}
+		);
+
+		$markup = $this->render_navigation_block( array( 'overlayMenu' => 'always' ) );
+
+		$this->assertSame( 1, $calls, 'The filter must be applied once per render.' );
+		$this->assert_tablet_overlay_markup( $markup );
+
+		$this->render_navigation_block( array( 'overlayMenu' => 'always' ) );
+		$this->assertSame( 2, $calls, 'The filter must be applied again on the next render.' );
 	}
 }

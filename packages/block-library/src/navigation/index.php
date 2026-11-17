@@ -46,6 +46,9 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  * Returns null for the default `mobile` behavior, which uses the static
  * 600px breakpoint in style.scss rather than the theme's viewport settings.
  *
+ * Does not apply the `block_core_navigation_overlay_viewports` filter. Use
+ * block_core_navigation_get_filtered_overlay_viewports() when rendering.
+ *
  * @since 7.3.0
  *
  * @param array $attributes Block attributes. Values are untrusted.
@@ -83,6 +86,83 @@ function block_core_navigation_get_overlay_viewports( $attributes ) {
 		default:
 			return null;
 	}
+}
+
+/**
+ * Returns the viewports in which the Navigation overlay is shown, after
+ * plugins have filtered them.
+ *
+ * Navigation blocks inside an overlay template part never show an overlay of
+ * their own, so the filter is not applied to them.
+ *
+ * Call it once per render rather than caching the result for the attributes,
+ * since a filter can depend on state outside them, such as the current
+ * language.
+ *
+ * @since 7.3.0
+ *
+ * @param array         $attributes Block attributes. Values are untrusted.
+ * @param WP_Block|null $block      Optional. Block instance. Default null.
+ * @return array{mobile: bool, tablet: bool, desktop: bool}|null Viewport map, or null.
+ */
+function block_core_navigation_get_filtered_overlay_viewports( $attributes, $block = null ) {
+	if ( ! empty( $attributes['_isWithinOverlayTemplatePart'] ) ) {
+		return array(
+			'mobile'  => false,
+			'tablet'  => false,
+			'desktop' => false,
+		);
+	}
+
+	$overlay_viewports = block_core_navigation_get_overlay_viewports( $attributes );
+
+	/**
+	 * Filters the viewports in which the Navigation overlay is shown.
+	 *
+	 * Lets plugins change where the overlay menu is shown, for example so a
+	 * multilingual plugin can collapse a menu whose translated labels are
+	 * longer at a larger viewport. The Navigation block is usually in a header
+	 * template part shared by every language, while plugins translate the
+	 * `wp_navigation` post that the block references through `ref`.
+	 *
+	 * Return an array with a boolean for each of the `mobile`, `tablet` and
+	 * `desktop` keys, or null for the default `mobile` behavior. Any other
+	 * value is ignored and the unfiltered viewports are used. Only those three
+	 * keys are read from a returned array. An array that shows the overlay only
+	 * on `mobile` differs from null: it collapses at the theme's mobile
+	 * breakpoint, while null uses the fixed 600px breakpoint.
+	 *
+	 * The filter is not applied to Navigation blocks inside an overlay template
+	 * part. Its counterpart in the editor is the JavaScript filter
+	 * `blocks.navigation.overlayViewports`.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map, or null for the default `mobile` behavior.
+	 * @param array                                                 $attributes        Block attributes, including `ref`, the ID of the
+	 *                                                                                 `wp_navigation` post.
+	 * @param WP_Block|null                                         $block             Block instance, or null if not available.
+	 */
+	$filtered = apply_filters( 'block_core_navigation_overlay_viewports', $overlay_viewports, $attributes, $block );
+
+	if ( null === $filtered ) {
+		return null;
+	}
+
+	if (
+		is_array( $filtered ) &&
+		is_bool( $filtered['mobile'] ?? null ) &&
+		is_bool( $filtered['tablet'] ?? null ) &&
+		is_bool( $filtered['desktop'] ?? null )
+	) {
+		return array(
+			'mobile'  => $filtered['mobile'],
+			'tablet'  => $filtered['tablet'],
+			'desktop' => $filtered['desktop'],
+		);
+	}
+
+	return $overlay_viewports;
 }
 
 /**
@@ -1058,7 +1138,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.3.0
 	 *
 	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
-	 *                                                                               block_core_navigation_get_overlay_viewports().
+	 *                                                                               block_core_navigation_get_filtered_overlay_viewports().
 	 * @return string[] Classes for the navigation wrapper, or an empty list when no rules are needed.
 	 */
 	private static function add_overlay_viewport_styles( $overlay_viewports ) {
@@ -1300,7 +1380,8 @@ class WP_Navigation_Block_Renderer {
 	 * Renders the navigation block.
 	 *
 	 * @since 6.5.0
-	 * @since 7.3.0 Resolves the overlay viewports once per render.
+	 * @since 7.3.0 Resolves the overlay viewports once per render, applying the
+	 *              `block_core_navigation_overlay_viewports` filter.
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content    The saved content.
@@ -1339,8 +1420,9 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Resolve the overlay viewports once, so the classes, the markup and
-		// the rules that target them cannot disagree.
-		$overlay_viewports = block_core_navigation_get_overlay_viewports( $attributes );
+		// the rules that target them cannot disagree, even if a filter returns
+		// a different value each time it is applied.
+		$overlay_viewports = block_core_navigation_get_filtered_overlay_viewports( $attributes, $block );
 
 		self::handle_view_script_module_loading( $attributes, $block, $inner_blocks, $overlay_viewports );
 
