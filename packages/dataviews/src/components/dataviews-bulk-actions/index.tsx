@@ -440,15 +440,7 @@ function BulkActionsContent< Item >( {
 interface BulkActionToolbarProps {
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >;
 	onActionInProgressChange?: ( inProgress: boolean ) => void;
-	/**
-	 * Called when the user clears the selection from the toolbar, before the
-	 * selection changes.
-	 */
 	onClearSelection?: () => void;
-	/**
-	 * Called when a bulk action started from the toolbar ends, before the
-	 * toolbar stops showing it as in progress.
-	 */
 	onActionComplete?: () => void;
 }
 
