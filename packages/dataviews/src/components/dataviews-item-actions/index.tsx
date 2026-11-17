@@ -39,6 +39,12 @@ interface ItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	isCompact?: boolean;
+	/**
+	 * Whether to only render the actions menu, without primary action
+	 * buttons, for layouts that render them elsewhere. The menu still lists
+	 * every action.
+	 */
+	isMenuOnly?: boolean;
 }
 
 interface CompactItemActionsProps< Item > {
@@ -166,6 +172,7 @@ export default function ItemActions< Item >( {
 	item,
 	actions,
 	isCompact,
+	isMenuOnly,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
@@ -191,6 +198,16 @@ export default function ItemActions< Item >( {
 				item={ item }
 				actions={ eligibleActions }
 				isSmall
+				registry={ registry }
+			/>
+		);
+	}
+
+	if ( isMenuOnly ) {
+		return (
+			<CompactItemActions
+				item={ item }
+				actions={ eligibleActions }
 				registry={ registry }
 			/>
 		);

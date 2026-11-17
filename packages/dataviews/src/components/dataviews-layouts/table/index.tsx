@@ -17,6 +17,7 @@ import {
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
+import { VisuallyHidden } from '@wordpress/ui';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -281,7 +282,7 @@ function TableRow< Item >( {
 						<ItemActions
 							item={ item }
 							actions={ eligibleActions }
-							isCompact
+							isMenuOnly
 						/>
 					) : (
 						<ItemActions item={ item } actions={ actions } />
@@ -711,9 +712,19 @@ function ViewTable< Item >( {
 									}
 								) }
 							>
-								<span className="dataviews-view-table-header">
-									{ __( 'Actions' ) }
-								</span>
+								{ titleField && showTitle ? (
+									// Primary actions sit next to the title, so
+									// the column only holds the actions menu, and
+									// a visible label would set its width. Keep it
+									// for assistive technology.
+									<VisuallyHidden>
+										{ __( 'Actions' ) }
+									</VisuallyHidden>
+								) : (
+									<span className="dataviews-view-table-header">
+										{ __( 'Actions' ) }
+									</span>
+								) }
 							</th>
 						) }
 					</tr>
