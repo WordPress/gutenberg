@@ -4,6 +4,7 @@
 
 ### Internal
 
+-   Retain `@wordpress/media-editor` in the list of core modules allowed to use private APIs for backward compatibility ([#86114](https://github.com/WordPress/gutenberg/pull/86114)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 3.1.0 (2026-11-04)
