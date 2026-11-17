@@ -780,7 +780,7 @@ function ListViewBlock( {
 							aria-label={ sprintf(
 								/* translators: %s: The block's name, such as a page title. */
 								__( 'Show %s' ),
-								blockTitle
+								blockTitle ?? ''
 							) }
 						/>
 					) }

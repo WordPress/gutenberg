@@ -1,5 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
-import type { BlockInstance } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
@@ -20,14 +20,17 @@ const PAGE_LINK_BINDINGS = {
  *
  * @return Navigation Link and Submenu blocks.
  */
-export function convertPageListBlocksToLinks(
-	blocks: BlockInstance[] = []
-): BlockInstance[] {
+export function convertPageListBlocksToLinks( blocks: Block[] = [] ): Block[] {
 	return blocks.map( ( block ) => {
 		if ( block.name !== PAGE_LIST_ITEM ) {
 			return block;
 		}
-		const { id, title, link, metadata } = block.attributes;
+		const { id, title, link, metadata } = block.attributes as {
+			id: number;
+			title: string;
+			link: string;
+			metadata?: { blockVisibility?: unknown };
+		};
 		const innerBlocks = convertPageListBlocksToLinks( block.innerBlocks );
 		return createBlock(
 			innerBlocks.length
@@ -97,7 +100,7 @@ export function useConvertToNavigationLinks( {
 						false,
 				} );
 			}
-			( getBlocksByClientId( movedOutClientIds ) as BlockInstance[] )
+			( getBlocksByClientId( movedOutClientIds ) as Block[] )
 				.filter( Boolean )
 				.forEach( ( block ) =>
 					replaceBlock(

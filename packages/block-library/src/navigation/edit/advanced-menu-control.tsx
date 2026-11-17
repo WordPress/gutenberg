@@ -21,7 +21,11 @@ function AutoAddPagesControl( { menuId }: { menuId: number } ) {
 		'wp_navigation',
 		'meta',
 		menuId
-	);
+	) as [
+		Record< string, unknown > | undefined,
+		( meta: Record< string, unknown > ) => void,
+		unknown,
+	];
 	return (
 		<SwitchControl
 			label={ __( 'Add new pages automatically' ) }
