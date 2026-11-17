@@ -111,6 +111,8 @@ function InlineUI( {
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
+						// Keep attributes the format doesn't register, like `loading`.
+						...value.replacements[ value.start ],
 						type: name,
 						attributes: {
 							...activeObjectAttributes,

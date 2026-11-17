@@ -64,7 +64,6 @@ const EmbedEdit = ( props ) => {
 			const {
 				getEmbedPreview,
 				isPreviewEmbedFallback,
-				isRequestingEmbedPreview,
 				getThemeSupports,
 				hasFinishedResolution,
 			} = select( coreStore );
@@ -75,25 +74,21 @@ const EmbedEdit = ( props ) => {
 			const embedPreview = getEmbedPreview( attributesUrl );
 			const previewIsFallback = isPreviewEmbedFallback( attributesUrl );
 
-			// The external oEmbed provider does not exist. We got no type info and no html.
-			const badEmbedProvider =
-				embedPreview?.html === false &&
-				embedPreview?.type === undefined;
-			// Some WordPress URLs that can't be embedded will cause the API to return
-			// a valid JSON response with no HTML and `data.status` set to 404, rather
-			// than generating a fallback response as other embeds do.
-			const wordpressCantEmbed = embedPreview?.data?.status === 404;
-			const validPreview =
-				!! embedPreview && ! badEmbedProvider && ! wordpressCantEmbed;
+			// No html to show: the provider or URL can't be embedded, or core
+			// dropped the html, as it does on the front end.
+			const validPreview = !! embedPreview?.html;
+			const resolved = hasFinishedResolution( 'getEmbedPreview', [
+				attributesUrl,
+			] );
 			return {
 				preview: validPreview ? embedPreview : undefined,
-				fetching: isRequestingEmbedPreview( attributesUrl ),
+				// Also loading before the request starts, which is a tick
+				// after the URL is set.
+				fetching: ! resolved,
 				themeSupportsResponsive:
 					getThemeSupports()[ 'responsive-embeds' ],
 				cannotEmbed: ! validPreview || previewIsFallback,
-				hasResolved: hasFinishedResolution( 'getEmbedPreview', [
-					attributesUrl,
-				] ),
+				hasResolved: resolved,
 			};
 		},
 		[ attributesUrl ]

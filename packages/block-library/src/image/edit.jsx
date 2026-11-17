@@ -21,13 +21,11 @@ import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 import Image from './image';
-import { isValidFileType } from './utils';
+import { getDefaultLinkDestination, isValidFileType } from './utils';
 import { useMaxWidthObserver } from './use-max-width-observer';
 import {
 	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_CUSTOM,
 	LINK_DESTINATION_MEDIA,
-	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
@@ -145,12 +143,7 @@ export function ImageEdit( {
 			explicitDismiss: true,
 		} );
 		setTemporaryURL();
-		setAttributes( {
-			src: undefined,
-			id: undefined,
-			url: undefined,
-			blob: undefined,
-		} );
+		setAttributes( { blob: undefined } );
 	}
 
 	function onFilesPreUpload( files ) {
@@ -206,14 +199,9 @@ export function ImageEdit( {
 		}
 
 		if ( ! media || ! media.url ) {
-			setAttributes( {
-				url: undefined,
-				alt: undefined,
-				id: undefined,
-				title: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current image and its details intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 
 			return;
@@ -265,31 +253,8 @@ export function ImageEdit( {
 			};
 		}
 
-		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
-			// Use the WordPress option to determine the proper default.
-			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			switch (
-				window?.wp?.media?.view?.settings?.defaultProps?.link ||
-				LINK_DESTINATION_NONE
-			) {
-				case 'file':
-				case LINK_DESTINATION_MEDIA:
-					linkDestination = LINK_DESTINATION_MEDIA;
-					break;
-				case 'post':
-				case LINK_DESTINATION_ATTACHMENT:
-					linkDestination = LINK_DESTINATION_ATTACHMENT;
-					break;
-				case LINK_DESTINATION_CUSTOM:
-					linkDestination = LINK_DESTINATION_CUSTOM;
-					break;
-				case LINK_DESTINATION_NONE:
-					linkDestination = LINK_DESTINATION_NONE;
-					break;
-			}
-		}
+		const linkDestination =
+			attributes.linkDestination || getDefaultLinkDestination();
 
 		// Check if the image is linked to it's media.
 		let href;
@@ -308,6 +273,18 @@ export function ImageEdit( {
 			...mediaAttributes,
 			...additionalAttributes,
 			linkDestination,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetImage() {
+		setAttributes( {
+			url: undefined,
+			alt: undefined,
+			id: undefined,
+			title: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -466,6 +443,7 @@ export function ImageEdit( {
 					onSelectImage={ onSelectImage }
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
+					onResetImage={ onResetImage }
 					context={ context }
 					clientId={ clientId }
 					blockEditingMode={ blockEditingMode }

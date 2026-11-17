@@ -24,6 +24,9 @@ import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
+import { STATUS_OPTIONS } from './constants';
+
+export { STATUS_OPTIONS };
 
 const postStatusesInfo = {
 	'auto-draft': { label: __( 'Draft' ), icon: drafts },
@@ -33,34 +36,6 @@ const postStatusesInfo = {
 	future: { label: __( 'Scheduled' ), icon: scheduled },
 	publish: { label: __( 'Published' ), icon: published },
 };
-
-export const STATUS_OPTIONS = [
-	{
-		label: __( 'Draft' ),
-		value: 'draft',
-		description: __( 'Not ready to publish.' ),
-	},
-	{
-		label: __( 'Pending' ),
-		value: 'pending',
-		description: __( 'Waiting for review before publishing.' ),
-	},
-	{
-		label: __( 'Private' ),
-		value: 'private',
-		description: __( 'Only visible to site admins and editors.' ),
-	},
-	{
-		label: __( 'Scheduled' ),
-		value: 'future',
-		description: __( 'Publish automatically on a chosen date.' ),
-	},
-	{
-		label: __( 'Published' ),
-		value: 'publish',
-		description: __( 'Visible to everyone.' ),
-	},
-];
 
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
