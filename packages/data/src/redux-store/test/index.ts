@@ -2,22 +2,14 @@ import type { AnyAction } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
-import type { DataRegistry, NormalizedResolver } from '../../types';
+import type {
+	BoundSelector,
+	DataRegistry,
+	NormalizedResolver,
+	ThunkArgs,
+} from '../../types';
 
 declare const process: { nextTick: ( callback: () => void ) => void };
-
-type SelectorWithNormalizeArgs = ( ( ...args: any[] ) => any ) & {
-	normalizeArgs?: ( ...args: any[] ) => any;
-	__unstableNormalizeArgs?: ( ...args: any[] ) => any;
-};
-
-type SelectorWithResolver = ( ( ...args: any[] ) => any ) & {
-	hasResolver?: boolean;
-};
-
-type ResolverWithIsFulfilled = ( ( ...args: any[] ) => any ) & {
-	isFulfilled?: ( ...args: any[] ) => any;
-};
 
 describe( 'controls', () => {
 	let registry: DataRegistry;
@@ -53,12 +45,7 @@ describe( 'controls', () => {
 								store: string;
 								action: string;
 							} ) => {
-								return (
-									reg.dispatch( store ) as Record<
-										string,
-										( ...args: any[] ) => any
-									>
-								 )[ action ]();
+								return reg.dispatch( store )[ action ]();
 							}
 					),
 				},
@@ -130,11 +117,11 @@ describe( 'controls', () => {
 				},
 			} );
 			expect(
-				( registry.select( 'store' ).getItems as SelectorWithResolver )
+				( registry.select( 'store' ).getItems as BoundSelector )
 					.hasResolver
 			).toBe( true );
 			expect(
-				( registry.select( 'store' ).getItem as SelectorWithResolver )
+				( registry.select( 'store' ).getItem as BoundSelector )
 					.hasResolver
 			).toBe( false );
 		} );
@@ -146,7 +133,7 @@ describe( 'controls', () => {
 				},
 			} );
 			expect(
-				( registry.select( 'store' ).getItems as SelectorWithResolver )
+				( registry.select( 'store' ).getItems as BoundSelector )
 					.hasResolver
 			).toBe( false );
 		} );
@@ -314,7 +301,7 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'resolves when a resolver implements isFulfilled', async () => {
-		const fulfilledResolver: ResolverWithIsFulfilled = () => {};
+		const fulfilledResolver = () => {};
 		fulfilledResolver.isFulfilled = (
 			state: Record< string, unknown[] >
 		) => !! state.items;
@@ -340,20 +327,17 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'handles isFulfilled with arguments correctly', async () => {
-		const fulfilledResolver: ResolverWithIsFulfilled = Object.assign(
-			vi.fn(),
-			{
-				isFulfilled: (
-					state: {
-						pages?: Record<
-							number,
-							{ title: string; content: string }
-						>;
-					},
-					id: number
-				) => state.pages?.[ id ],
-			}
-		);
+		const fulfilledResolver = Object.assign( vi.fn(), {
+			isFulfilled: (
+				state: {
+					pages?: Record<
+						number,
+						{ title: string; content: string }
+					>;
+				},
+				id: number
+			) => state.pages?.[ id ],
+		} );
 
 		const resolvedState: {
 			pages: Record< number, { title: string; content: string } >;
@@ -464,7 +448,7 @@ describe( 'resolveSelect', () => {
 describe( 'normalizing args', () => {
 	it( 'should call the normalizeArgs method of the selector for both the selector and the resolver', async () => {
 		const registry = createRegistry();
-		const selector: SelectorWithNormalizeArgs = () => {};
+		const selector = () => {};
 
 		const normalizingFunction = vi.fn( ( ...args: unknown[] ) => args );
 
@@ -492,7 +476,7 @@ describe( 'normalizing args', () => {
 
 	it( 'should not call the normalizeArgs method if there are no arguments passed to the selector (and thus the resolver)', async () => {
 		const registry = createRegistry();
-		const selector: SelectorWithNormalizeArgs = () => {};
+		const selector = () => {};
 
 		selector.normalizeArgs = vi.fn( ( ...args: unknown[] ) => args );
 
@@ -514,7 +498,7 @@ describe( 'normalizing args', () => {
 
 	it( 'should call the normalizeArgs method on the selectors without resolvers', async () => {
 		const registry = createRegistry();
-		const selector: SelectorWithNormalizeArgs = () => {};
+		const selector = () => {};
 
 		selector.normalizeArgs = vi.fn( ( ...args: unknown[] ) => args );
 
@@ -535,7 +519,7 @@ describe( 'normalizing args', () => {
 
 	it( 'should call the legacy __unstableNormalizeArgs method', async () => {
 		const registry = createRegistry();
-		const selector: SelectorWithNormalizeArgs = () => {};
+		const selector = () => {};
 
 		selector.__unstableNormalizeArgs = vi.fn( ( args: unknown[] ) => args );
 
@@ -599,11 +583,7 @@ describe( 'resolution args', () => {
 		const registry = createRegistry();
 		const fulfill = vi.fn(
 			( id: number ) =>
-				( {
-					dispatch,
-				}: {
-					dispatch: Record< string, ( ...args: any[] ) => any >;
-				} ) =>
+				( { dispatch }: ThunkArgs ) =>
 					dispatch.receive( { [ id ]: { a: 1, b: 2 } } )
 		);
 		registerStore( registry, { fulfill } );
@@ -635,11 +615,7 @@ describe( 'resolution args', () => {
 		registerStore( registry, {
 			fulfill:
 				( id: number ) =>
-				( {
-					dispatch,
-				}: {
-					dispatch: Record< string, ( ...args: any[] ) => any >;
-				} ) =>
+				( { dispatch }: ThunkArgs ) =>
 					dispatch.receive( { [ id ]: { a: 'A', b: 'B' } } ),
 		} );
 
@@ -682,7 +658,7 @@ describe( 'resolution args', () => {
 
 	it( 'should apply getResolutionArgs after normalizeArgs', async () => {
 		const registry = createRegistry();
-		const selector: SelectorWithNormalizeArgs = (
+		const selector = (
 			state: Record< string, Record< string, unknown > >,
 			field: string,
 			id: string | number
