@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { addSaveProps } from '../style';
+import { getStateInheritedValue } from '../transform';
 import { getTransformClassesAndStyles } from '../use-transform-props';
 
 const registerTransformBlock = ( transform: Record< string, unknown > ) =>
@@ -69,4 +70,42 @@ describe( 'transform serialization', () => {
 			).toEqual( {} );
 		}
 	);
+} );
+
+describe( 'getStateInheritedValue', () => {
+	const mobile = { viewport: '@mobile', pseudo: 'default' };
+
+	it( 'starts a state rotation from the block rotation', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { rotate: '5deg' } },
+				{ transform: { rotate: '15deg' } },
+				mobile
+			).transform
+		).toEqual( { rotate: '15deg' } );
+	} );
+
+	it( 'falls back to Global Styles for what the block does not set', () => {
+		expect(
+			getStateInheritedValue(
+				{ transform: { rotate: '5deg' } },
+				{},
+				mobile
+			).transform
+		).toEqual( { rotate: '5deg' } );
+	} );
+
+	it( 'layers the pseudo state over the viewport for both', () => {
+		expect(
+			getStateInheritedValue(
+				undefined,
+				{
+					transform: { rotate: '5deg' },
+					'@mobile': { transform: { rotate: '10deg' } },
+					':hover': { transform: { rotate: '15deg' } },
+				},
+				{ viewport: '@mobile', pseudo: ':hover' }
+			).transform
+		).toEqual( { rotate: '15deg' } );
+	} );
 } );

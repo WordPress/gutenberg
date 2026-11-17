@@ -11,12 +11,15 @@ import { store as blockEditorStore } from '../store';
 import { cleanEmptyObject } from './utils';
 import {
 	getStyleForState,
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
 import type { PanelStyle } from '../components/global-styles/types';
 import type {
+	BlockStyleState,
 	ResetAllFilter,
 	StyleInspectorControlProps,
 	TransformAttributes,
@@ -52,6 +55,53 @@ function TransformInspectorControl( {
 	);
 }
 
+/**
+ * Returns the inherited value the Transform panel shows for a block state.
+ * Each transform comes from the block styles the state renders over, else
+ * from Global Styles.
+ *
+ * @param resolvedValue Global Styles value resolved for the state.
+ * @param style         The block styles.
+ * @param selectedState Selected block style state.
+ *
+ * @return Inherited value for the panel.
+ */
+export function getStateInheritedValue(
+	resolvedValue: PanelStyle | undefined,
+	style: PanelStyle | undefined,
+	selectedState: BlockStyleState
+): PanelStyle {
+	const { viewport, pseudo } = selectedState;
+	// Ordered from the lowest to the highest priority.
+	const layers = [ style ];
+	if (
+		hasViewportBlockStyleState( selectedState ) &&
+		hasPseudoBlockStyleState( selectedState )
+	) {
+		layers.push(
+			style?.[ viewport as string ] as PanelStyle | undefined,
+			style?.[ pseudo as string ] as PanelStyle | undefined
+		);
+	}
+
+	const transform: Record< string, unknown > = {
+		...resolvedValue?.transform,
+	};
+	for ( const layer of layers ) {
+		const layerTransform = layer?.transform;
+		if ( ! layerTransform || typeof layerTransform !== 'object' ) {
+			continue;
+		}
+		for ( const [ key, layerValue ] of Object.entries( layerTransform ) ) {
+			if ( layerValue !== undefined && layerValue !== null ) {
+				transform[ key ] = layerValue;
+			}
+		}
+	}
+
+	return { ...resolvedValue, transform } as PanelStyle;
+}
+
 export function TransformPanel( {
 	clientId,
 	name,
@@ -78,7 +128,7 @@ export function TransformPanel( {
 		},
 		[ clientId, isEnabled ]
 	);
-	const { value: inheritedValue } = useResolvedStyle(
+	const { value: resolvedValue } = useResolvedStyle(
 		name,
 		className,
 		selectedState
@@ -88,6 +138,9 @@ export function TransformPanel( {
 		return null;
 	}
 
+	const inheritedValue = isStateSelected
+		? getStateInheritedValue( resolvedValue, style, selectedState )
+		: resolvedValue;
 	const value = isStateSelected
 		? // The state styles have the shape of the block styles.
 			( getStyleForState( style, selectedState ) as
