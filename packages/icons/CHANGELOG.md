@@ -6,6 +6,8 @@
 
 -   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
 -   Redraw `file` as a single document, the icon the library was missing. Import `folder` to keep the previous drawing ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
+-   Rename the `lockOutline` icon to `lock`, replacing the previous `lock` icon. The stroke-drawn outline is the drawing that pairs with `unlock`, so it becomes the canonical lock ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
+-   Remove the `lockSmall` icon. Use `lock`, which is stroke-drawn and can therefore be scaled down for the dense contexts `lockSmall` served, such as the list view ([#85740](https://github.com/WordPress/gutenberg/pull/85740)).
 
 ### New Features
 

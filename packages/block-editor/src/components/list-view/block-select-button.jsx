@@ -3,13 +3,7 @@ import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	symbol,
-	unseen,
-} from '@wordpress/icons';
+import { Icon, lock, pinSmall, symbol, unseen } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { Stack, Tooltip } from '@wordpress/ui';
 import BlockIcon from '../block-icon';
