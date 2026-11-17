@@ -180,6 +180,7 @@ export function TransformPanel( {
 			defaultControls={ {
 				rotate: false,
 				translate: false,
+				scale: false,
 				...defaultControls,
 			} }
 			inheritedValue={ inheritedValue }

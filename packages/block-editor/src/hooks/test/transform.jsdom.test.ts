@@ -38,6 +38,18 @@ describe( 'getTransformClassesAndStyles', () => {
 		} );
 	} );
 
+	it.each( [
+		[ 1.2, '1.2' ],
+		[ 0, '0' ],
+		[ '120%', '120%' ],
+	] )( 'returns a %s scale as an inline style', ( scale, expected ) => {
+		expect(
+			getTransformClassesAndStyles( {
+				style: { transform: { scale } },
+			} )
+		).toEqual( { style: { scale: expected } } );
+	} );
+
 	it( 'returns no styles for an invalid rotation', () => {
 		expect(
 			getTransformClassesAndStyles( {

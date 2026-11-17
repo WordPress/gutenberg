@@ -1,4 +1,6 @@
 import {
+	__experimentalNumberControl as NumberControl,
+	RangeControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -32,10 +34,39 @@ const ROTATE_UNIT_SETTINGS: UnitRangeSettings = {
 	grad: { min: -400, max: 400, step: 1 },
 };
 
+// Mirror of `WP_Style_Engine::VALID_SCALE_PATTERN` in PHP.
+const SCALE_PATTERN = /^((?:\d+(?:\.\d+)?|\.\d+))(%?)$/;
+
+const SCALE_STEP = 0.01;
+const SCALE_SLIDER_MAX = 3;
+// The slider stops at 3, but a typed scale may go up to 10.
+const SCALE_INPUT_MAX = 10;
+
+/**
+ * Converts a scale value to the number the scale field shows.
+ *
+ * @param value A scale, such as `1.2` or `'120%'`.
+ * @return The scale as a number, such as `1.2`, or `undefined` when the value
+ * is not a single non-negative number or percentage.
+ */
+export function getScaleAsNumber( value: unknown ): number | undefined {
+	const scale =
+		typeof value === 'number' && Number.isFinite( value )
+			? String( value )
+			: value;
+	const match =
+		typeof scale === 'string' ? SCALE_PATTERN.exec( scale ) : null;
+	if ( ! match ) {
+		return undefined;
+	}
+	return match[ 2 ] ? Number( match[ 1 ] ) / 100 : Number( match[ 1 ] );
+}
+
 export function useHasTransformPanel( settings: StyleSettings | undefined ) {
 	const hasRotate = useHasRotateControl( settings );
 	const hasTranslate = useHasTranslateControl( settings );
-	return hasRotate || hasTranslate;
+	const hasScale = useHasScaleControl( settings );
+	return hasRotate || hasTranslate || hasScale;
 }
 
 function useHasRotateControl( settings: StyleSettings | undefined ) {
@@ -44,6 +75,10 @@ function useHasRotateControl( settings: StyleSettings | undefined ) {
 
 function useHasTranslateControl( settings: StyleSettings | undefined ) {
 	return !! settings?.transform?.translate;
+}
+
+function useHasScaleControl( settings: StyleSettings | undefined ) {
+	return !! settings?.transform?.scale;
 }
 
 // An offset moves either way, so each range runs from -max to max.
@@ -97,6 +132,7 @@ function TransformToolsPanel( {
 const DEFAULT_CONTROLS: Record< string, boolean > = {
 	rotate: true,
 	translate: true,
+	scale: true,
 };
 
 export default function TransformPanel( {
@@ -156,6 +192,34 @@ export default function TransformPanel( {
 		);
 	};
 
+	const showScaleControl = useHasScaleControl( settings );
+	const scale =
+		getScaleAsNumber( value?.transform?.scale ) ??
+		getScaleAsNumber( inheritedValue?.transform?.scale );
+	const setScale = ( newValue: number | undefined ) => {
+		onChange( setImmutably( value, [ 'transform', 'scale' ], newValue ) );
+	};
+	const onScaleInputChange = (
+		newValue: string | undefined,
+		{ event }: { event: { type: string } }
+	) => {
+		// A cleared field removes the value, so an inherited scale shows again.
+		if ( newValue === undefined || newValue === '' ) {
+			setScale( undefined );
+			return;
+		}
+		let nextScale = Number( newValue );
+		if ( ! Number.isFinite( nextScale ) || nextScale < 0 ) {
+			return;
+		}
+		// An arrow key in an empty field starts from the unscaled size, not 0.
+		if ( scale === undefined && event.type === 'keydown' ) {
+			nextScale = nextScale > 0 ? 1 + nextScale : 1 - SCALE_STEP;
+		}
+		setScale( nextScale );
+	};
+	const hasScaleValue = () => value?.transform?.scale !== undefined;
+
 	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			return {
@@ -164,6 +228,7 @@ export default function TransformPanel( {
 					...previousValue?.transform,
 					rotate: undefined,
 					translate: undefined,
+					scale: undefined,
 				},
 			};
 		},
@@ -223,6 +288,45 @@ export default function TransformPanel( {
 									/>
 								)
 							) }
+						</Stack>
+					</Fieldset.Root>
+				</ToolsPanelItem>
+			) }
+			{ showScaleControl && (
+				<ToolsPanelItem
+					label={ __( 'Scale' ) }
+					hasValue={ hasScaleValue }
+					onDeselect={ () => setScale( undefined ) }
+					isShownByDefault={ defaultControls.scale }
+					panelId={ panelId }
+				>
+					<Fieldset.Root>
+						<Fieldset.Legend>{ __( 'Scale' ) }</Fieldset.Legend>
+						<Stack direction="row" align="center" gap="md">
+							<NumberControl
+								className="block-editor-global-styles-unit-range-control__input"
+								label={ __( 'Scale' ) }
+								hideLabelFromVision
+								value={ scale ?? '' }
+								min={ 0 }
+								max={ SCALE_INPUT_MAX }
+								step={ SCALE_STEP }
+								spinControls="none"
+								placeholder="1"
+								onChange={ onScaleInputChange }
+							/>
+							<RangeControl
+								className="block-editor-global-styles-unit-range-control__slider"
+								label={ __( 'Scale' ) }
+								hideLabelFromVision
+								value={ scale }
+								min={ 0 }
+								max={ SCALE_SLIDER_MAX }
+								step={ SCALE_STEP }
+								initialPosition={ 1 }
+								withInputField={ false }
+								onChange={ setScale }
+							/>
 						</Stack>
 					</Fieldset.Root>
 				</ToolsPanelItem>

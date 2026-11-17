@@ -229,6 +229,73 @@ describe( 'theme.json schema', () => {
 		);
 	} );
 
+	test( 'accepts a scale as a number or percentage in block styles and states', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: {
+					'core/image': {
+						transform: { scale: 1.2 },
+						variations: {
+							large: { transform: { scale: '150%' } },
+						},
+					},
+					'core/heading': {
+						'@mobile': { transform: { scale: '0.8' } },
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test.each( [
+		[ 'a negative number', -1 ],
+		[ 'a negative string', '-1' ],
+		[ 'two values', '1.2 1.5' ],
+		[ 'a calc() value', 'calc(1 + 0.2)' ],
+		[ 'a var() value', 'var(--scale)' ],
+		[ 'an object', { x: 1.2 } ],
+	] )( 'rejects a scale given as %s', ( _, scale ) => {
+		const theme = {
+			version: 3,
+			styles: {
+				blocks: { 'core/image': { transform: { scale } } },
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
+	test.each( [
+		[ 'element', { elements: { link: { transform: { scale: 1.2 } } } } ],
+		[
+			'element state',
+			{ elements: { link: { ':hover': { transform: { scale: 1.2 } } } } },
+		],
+		[
+			'select element state',
+			{
+				elements: {
+					select: { ':hover': { transform: { scale: 1.2 } } },
+				},
+			},
+		],
+		[
+			'text input element state',
+			{
+				elements: {
+					textInput: { ':focus': { transform: { scale: 1.2 } } },
+				},
+			},
+		],
+	] )( 'rejects a scale in %s styles', ( _, styles ) => {
+		expect( ajv.validate( themeSchema, { version: 3, styles } ) ).toBe(
+			false
+		);
+	} );
+
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(

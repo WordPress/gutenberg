@@ -77,6 +77,7 @@ export interface Style {
 			x?: string;
 			y?: string;
 		};
+		scale?: number | string;
 	};
 	typography?: {
 		fontSize?: CSSProperties[ 'fontSize' ];
