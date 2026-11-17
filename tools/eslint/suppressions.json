@@ -6944,14 +6944,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/components/with-dispatch/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/data/src/components/with-select/test/index.jsdom.test.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
