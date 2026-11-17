@@ -1,7 +1,9 @@
 import { Link as RouterLink } from '@wordpress/route';
+import { useContext } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
 import type { BreadcrumbsProps } from './types';
+import { PageHeadingIdContext } from '../page/heading-id-context';
 import styles from './style.module.css';
 
 /**
@@ -27,6 +29,8 @@ import styles from './style.module.css';
  * ```
  */
 export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
+	const headingId = useContext( PageHeadingIdContext );
+
 	if ( ! items.length ) {
 		return null;
 	}
@@ -89,7 +93,7 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 					) : (
 						<Text
 							variant="heading-lg"
-							render={ <h1 /> }
+							render={ <h1 id={ headingId } /> }
 							className={ styles.current }
 						>
 							{ lastItem.label }

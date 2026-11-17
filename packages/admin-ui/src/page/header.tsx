@@ -8,6 +8,7 @@ import styles from './style.module.css';
 
 export default function Header( {
 	headingLevel = 1,
+	headingId,
 	breadcrumbs,
 	badges,
 	visual,
@@ -19,6 +20,7 @@ export default function Header( {
 	showSidebarToggle = true,
 }: {
 	headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+	headingId?: string;
 	breadcrumbs?: React.ReactNode;
 	badges?: React.ReactNode;
 	visual?: React.ReactNode;
@@ -70,7 +72,7 @@ export default function Header( {
 					{ title && (
 						<Text
 							className={ styles[ 'header-title' ] }
-							render={ <HeadingTag /> }
+							render={ <HeadingTag id={ headingId } /> }
 							variant="heading-lg"
 						>
 							{ title }

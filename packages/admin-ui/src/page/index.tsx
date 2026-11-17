@@ -1,8 +1,10 @@
 import clsx from 'clsx';
+import { useId } from '@wordpress/element';
 import type { NavigationConfig } from '../navigation/types';
 import Header from './header';
 import type { PageComponents } from './types';
 import NavigableRegion from '../navigable-region';
+import { PageHeadingIdContext } from './heading-id-context';
 import { SidebarToggleFill } from './sidebar-toggle-slot';
 import styles from './style.module.css';
 
@@ -93,9 +95,9 @@ function Page( {
 	 */
 	components?: PageComponents;
 	/**
-	 * The accessible name of the page region. When `title` is a string, the
-	 * default is the title. Set it when `title` is not a string, or when the
-	 * page has no title, such as a page that shows breadcrumbs.
+	 * The accessible name of the page region. By default, the region takes its
+	 * name from the page heading: the title, or the current page in the
+	 * breadcrumbs. Set it when the page has neither.
 	 */
 	ariaLabel?: string;
 	/**
@@ -109,29 +111,39 @@ function Page( {
 	showSidebarToggle?: boolean;
 } ) {
 	const classes = clsx( styles.page, className );
-	const effectiveAriaLabel =
-		ariaLabel ?? ( typeof title === 'string' ? title : '' );
+	const headingId = useId();
 
 	return (
-		<NavigableRegion className={ classes } ariaLabel={ effectiveAriaLabel }>
+		<NavigableRegion
+			className={ classes }
+			ariaLabel={ ariaLabel }
+			aria-labelledby={
+				! ariaLabel && ( title || breadcrumbs ) ? headingId : undefined
+			}
+		>
 			{ ( title ||
 				breadcrumbs ||
 				badges ||
 				actions ||
 				visual ||
 				!! navigation?.items?.length ) && (
-				<Header
-					headingLevel={ headingLevel }
-					breadcrumbs={ breadcrumbs }
-					badges={ badges }
-					visual={ visual }
-					title={ title }
-					subTitle={ subTitle }
-					actions={ actions }
-					navigation={ navigation }
-					components={ components }
-					showSidebarToggle={ showSidebarToggle }
-				/>
+				<PageHeadingIdContext.Provider
+					value={ title ? undefined : headingId }
+				>
+					<Header
+						headingLevel={ headingLevel }
+						breadcrumbs={ breadcrumbs }
+						badges={ badges }
+						visual={ visual }
+						title={ title }
+						subTitle={ subTitle }
+						actions={ actions }
+						navigation={ navigation }
+						components={ components }
+						showSidebarToggle={ showSidebarToggle }
+						headingId={ headingId }
+					/>
+				</PageHeadingIdContext.Provider>
 			) }
 			{ hasPadding ? (
 				<div

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Page`: Name the page region after its heading, which is the title or the current page in the breadcrumbs. Before, a page with breadcrumbs and no `ariaLabel` had a region with no name.
+
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).

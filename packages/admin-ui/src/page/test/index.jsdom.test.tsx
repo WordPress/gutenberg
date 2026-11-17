@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import type { NavigationLinkProps } from '../../navigation/types';
+import Breadcrumbs from '../../breadcrumbs';
 import Page from '..';
 
 describe( 'Page navigation', () => {
@@ -69,5 +70,52 @@ describe( 'Page navigation', () => {
 		const link = screen.getByRole( 'link', { name: 'Overview' } );
 		expect( link ).toHaveAttribute( 'data-custom', 'true' );
 		expect( link ).toHaveAttribute( 'href', '/overview' );
+	} );
+} );
+
+describe( 'Page region name', () => {
+	it( 'takes its name from the title', () => {
+		render(
+			<Page title="Analytics" showSidebarToggle={ false }>
+				Content
+			</Page>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'Analytics' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'takes its name from the current page in the breadcrumbs', () => {
+		render(
+			<Page
+				showSidebarToggle={ false }
+				breadcrumbs={
+					<Breadcrumbs items={ [ { label: 'General' } ] } />
+				}
+			>
+				Content
+			</Page>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'General' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'uses `ariaLabel` in place of the heading', () => {
+		render(
+			<Page
+				title="Analytics"
+				ariaLabel="Site analytics"
+				showSidebarToggle={ false }
+			>
+				Content
+			</Page>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'Site analytics' } )
+		).toBeInTheDocument();
 	} );
 } );
