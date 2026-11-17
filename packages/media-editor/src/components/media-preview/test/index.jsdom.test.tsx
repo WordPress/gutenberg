@@ -83,7 +83,7 @@ describe( 'MediaPreview', () => {
 		expect( embed ).toHaveAttribute( 'type', 'application/pdf' );
 	} );
 
-	it( 'includes the file card as fallback content inside the PDF embed', () => {
+	it( 'includes the file info as fallback content inside the PDF embed', () => {
 		setPdfViewerEnabled( true );
 		setup( PDF );
 
@@ -93,7 +93,7 @@ describe( 'MediaPreview', () => {
 		expect( embed ).toContainElement( screen.getByText( 'file.pdf' ) );
 	} );
 
-	it( 'shows the file card when the browser has no PDF viewer', () => {
+	it( 'shows the file info when the browser has no PDF viewer', () => {
 		setPdfViewerEnabled( false );
 		setup( PDF );
 

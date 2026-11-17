@@ -141,17 +141,17 @@ function MediaPreviewFileActions( { mediaUrl }: { mediaUrl: string } ) {
 	);
 }
 
-interface MediaPreviewFileCardProps {
+interface MediaPreviewFileInfoProps {
 	mediaUrl: string;
 	fileName?: string;
 	fileDetails?: string;
 }
 
-function MediaPreviewFileCard( {
+function MediaPreviewFileInfo( {
 	mediaUrl,
 	fileName,
 	fileDetails,
-}: MediaPreviewFileCardProps ) {
+}: MediaPreviewFileInfoProps ) {
 	return (
 		<EmptyState.Root>
 			<EmptyState.Icon icon={ folder } />
@@ -217,7 +217,7 @@ function MediaPreviewContent( {
 					type="application/pdf"
 					aria-label={ __( 'Embed of the selected PDF file.' ) }
 				>
-					<MediaPreviewFileCard
+					<MediaPreviewFileInfo
 						mediaUrl={ mediaUrl }
 						fileName={ fileName }
 						fileDetails={ fileDetails }
@@ -226,7 +226,7 @@ function MediaPreviewContent( {
 			);
 		default:
 			return (
-				<MediaPreviewFileCard
+				<MediaPreviewFileInfo
 					mediaUrl={ mediaUrl }
 					fileName={ fileName }
 					fileDetails={ fileDetails }
