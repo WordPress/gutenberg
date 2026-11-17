@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { screen, waitFor } from '@testing-library/react';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { render } from 'vitest-browser-react';
 import { describe, expect, it } from 'vitest';
 import type {
@@ -158,5 +159,126 @@ describe( 'column count', () => {
 			rowHeight: 200,
 		} );
 		await waitFor( () => expect( columns() ).toBe( 3 ) );
+	} );
+} );
+
+interface MountReading {
+	span: string;
+	width: number;
+}
+
+// What each probe read from its tile in its first layout effect, by tile key.
+const mountReadings = new Map< string, MountReading >();
+
+function readTile( tile: HTMLElement ): MountReading {
+	return {
+		span: window.getComputedStyle( tile ).gridColumnEnd,
+		width: tile.getBoundingClientRect().width,
+	};
+}
+
+/**
+ * Widget body that reads its tile's span and width when it first mounts,
+ * as a widget that picks its layout from its own size does.
+ */
+function MountProbe() {
+	const ref = useRef< HTMLParagraphElement >( null );
+	useLayoutEffect( () => {
+		// eslint-disable-next-line testing-library/no-node-access
+		const tile = ref.current?.closest< HTMLElement >(
+			'[data-wp-grid-item-key]'
+		);
+		const key = tile?.getAttribute( 'data-wp-grid-item-key' );
+		if ( tile && key && ! mountReadings.has( key ) ) {
+			mountReadings.set( key, readTile( tile ) );
+		}
+	}, [] );
+	return <p ref={ ref }>Probe body</p>;
+}
+
+const probeWidgetTypes: WidgetType[] = [
+	{
+		apiVersion: 1,
+		name: 'test/probe',
+		title: 'Probe',
+		renderModule: 'test-probe-module',
+	},
+];
+
+const resolveProbeModule: ResolveWidgetModule = async () => ( {
+	default: MountProbe as ComponentType< WidgetRenderProps< unknown > >,
+} );
+
+describe( 'first render', () => {
+	// Wide enough for the 960px step, so the surface settles on three
+	// columns; a one-column first render would show as `span 1` on the wide
+	// tile and full width on the narrow one.
+	const STEPPED_WIDTH = 1000;
+
+	async function mountProbes(
+		gridSettings: WidgetGridSettings,
+		probeLayout: DashboardWidget[]
+	) {
+		const ui = (
+			<div style={ { width: STEPPED_WIDTH } }>
+				<WidgetDashboard
+					widgetTypes={ probeWidgetTypes }
+					resolveWidgetModule={ resolveProbeModule }
+					layout={ probeLayout }
+					onLayoutChange={ () => {} }
+					gridSettings={ gridSettings }
+				/>
+			</div>
+		);
+		// The first mount resolves the module; the remount renders the
+		// widgets from the module cache in the same commit as their tiles,
+		// as a host does when it switches back to a dashboard.
+		const first = await render( ui );
+		await screen.findAllByText( 'Probe body' );
+		await first.unmount();
+		mountReadings.clear();
+		const { container } = await render( ui );
+		await screen.findAllByText( 'Probe body' );
+		return ( key: string ) => {
+			// eslint-disable-next-line testing-library/no-node-access
+			const tile = container.querySelector< HTMLElement >(
+				`[data-wp-grid-item-key="${ key }"]`
+			);
+			if ( ! tile ) {
+				throw new Error( `No tile for ${ key }.` );
+			}
+			return {
+				atMount: mountReadings.get( key ),
+				settled: readTile( tile ),
+			};
+		};
+	}
+
+	it( 'gives grid tiles their resolved span when they mount', async () => {
+		const read = await mountProbes(
+			{ model: 'grid', columns: { 0: 1, 960: 3 }, rowHeight: 200 },
+			[
+				{ uuid: 'wide', type: 'test/probe', placement: { width: 3 } },
+				{ uuid: 'narrow', type: 'test/probe', placement: { width: 1 } },
+			]
+		);
+		const wide = read( 'wide' );
+		const narrow = read( 'narrow' );
+		expect( wide.settled.span ).toBe( 'span 3' );
+		expect( wide.atMount ).toEqual( wide.settled );
+		expect( narrow.settled.width ).toBeLessThan( STEPPED_WIDTH / 2 );
+		expect( narrow.atMount ).toEqual( narrow.settled );
+	} );
+
+	it( 'gives masonry tiles their resolved width when they mount', async () => {
+		const read = await mountProbes(
+			{ model: 'masonry', columns: { 0: 1, 960: 3 } },
+			[ { uuid: 'narrow', type: 'test/probe', placement: { width: 1 } } ]
+		);
+		// Only the width: the lane polyfill places tiles in rows after it
+		// measures their heights, so their grid lines change after mount.
+		const narrow = read( 'narrow' );
+		expect( narrow.settled.width ).toBeLessThan( STEPPED_WIDTH / 2 );
+		expect( narrow.atMount?.width ).toBe( narrow.settled.width );
 	} );
 } );
