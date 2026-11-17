@@ -22,6 +22,7 @@ import {
 } from '../hooks/block-style-state';
 import { LAYOUT_DEFINITIONS } from './definitions';
 import { store as blockEditorStore } from '../store';
+import { useChangeGridColumnCount } from '../components/grid/use-change-grid-column-count';
 import { startGridItemDrag } from '../components/grid/start-grid-item-drag';
 import { getMobilePlacementResets } from '../components/grid/mobile-stacking';
 import type { GridChild } from '../components/grid/mobile-stacking';
@@ -207,6 +208,7 @@ export default {
 			updateBlockAttributes,
 			__unstableMarkNextChangeAsNotPersistent,
 		} = useDispatch( blockEditorStore );
+		const changeGridColumnCount = useChangeGridColumnCount( clientId );
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -284,14 +286,22 @@ export default {
 				);
 			}
 		};
-		const resetColumnsAndRows = () =>
+		const resetColumnsAndRows = () => {
+			const columnCount = resetLayout?.columnCount ?? defaultColumnCount;
+			// A manual grid with cells of a fixed size keeps its blocks where
+			// they are, as when the count is typed, and gets as many rows as
+			// keep it about as tall.
+			if ( changeGridColumnCount( layout, columnCount, onChange ) ) {
+				return;
+			}
 			onChange(
 				cleanEmptyObject( {
 					...layout,
-					columnCount: resetLayout?.columnCount ?? defaultColumnCount,
+					columnCount,
 					rowCount: resetLayout?.rowCount,
 				} )
 			);
+		};
 		const resetMinimumColumnWidth = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -327,6 +337,13 @@ export default {
 						<GridLayoutColumnsAndRowsControl
 							layout={ layout }
 							onChange={ onChange }
+							onChangeColumnCount={ ( newColumnCount ) =>
+								changeGridColumnCount(
+									layout,
+									newColumnCount,
+									onChange
+								)
+							}
 							allowSizingOnChildren={ allowSizingOnChildren }
 						/>
 					</ToolsPanelItem>
@@ -748,8 +765,16 @@ function GridLayoutMinimumWidthControl( {
 function GridLayoutColumnsAndRowsControl( {
 	layout,
 	onChange,
+	onChangeColumnCount,
 	allowSizingOnChildren,
-}: LayoutControlProps & { allowSizingOnChildren?: boolean } ) {
+}: LayoutControlProps & {
+	allowSizingOnChildren?: boolean;
+	/**
+	 * Changes the column count, and returns whether it did. Manual grids with
+	 * cells of a fixed size keep their blocks in place.
+	 */
+	onChangeColumnCount?: ( columnCount: number | undefined ) => boolean;
+} ) {
 	// Allow unsetting the column count in Auto mode.
 	const defaultColumnCount = undefined;
 	const {
@@ -779,12 +804,23 @@ function GridLayoutColumnsAndRowsControl( {
 										? defaultNewColumnCount
 										: // Only an absent value is not a string.
 											parseInt( value as string, 10 );
+								if ( onChangeColumnCount?.( newColumnCount ) ) {
+									return;
+								}
 								onChange( {
 									...layout,
 									columnCount: newColumnCount,
 								} );
 							} }
 							value={ columnCount ?? '' }
+							// A new column count rearranges a manual grid's
+							// blocks, so a typed count only applies when
+							// it's committed with Enter or by leaving the field,
+							// and not for each digit on the way to it.
+							isPressEnterToChange={
+								isManualPlacement &&
+								window.__experimentalEnableGridInteractivity
+							}
 							min={ 1 }
 							label={ __( 'Columns' ) }
 							hideLabelFromVision={ ! isManualPlacement }

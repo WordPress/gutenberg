@@ -9,7 +9,10 @@ import {
 	getClosestTrack,
 	getRowEndForResize,
 	getGridItemPixelRect,
+	isGridElementWithFixedCells,
 } from './utils';
+import { getResizedGridPlacement } from './free-placement';
+import type { PixelRectEdge } from './free-placement';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import type {
 	GridItemResizerInnerProps,
@@ -158,19 +161,27 @@ function GridItemResizerInner( {
 					width: '100%',
 					height: '100%',
 				} }
+				// A block in a manual grid is resized from one side at a time:
+				// where the cells have a fixed size, it keeps the size it was
+				// resized to, which is worked out from the edge being dragged.
 				enable={ {
 					bottom: enableSide.bottom,
-					bottomLeft: enableSide.left && enableSide.bottom,
-					bottomRight: enableSide.bottom && enableSide.right,
+					bottomLeft:
+						! isManualGrid && enableSide.left && enableSide.bottom,
+					bottomRight:
+						! isManualGrid && enableSide.bottom && enableSide.right,
 					left: enableSide.left,
 					right: enableSide.right,
 					top: enableSide.top,
-					topLeft: enableSide.top && enableSide.left,
-					topRight: enableSide.top && enableSide.right,
+					topLeft:
+						! isManualGrid && enableSide.top && enableSide.left,
+					topRight:
+						! isManualGrid && enableSide.top && enableSide.right,
 				} }
 				// Manual grids grow when a block is resized past the last row,
-				// so they aren't limited to the grid's current size. Sizes are
-				// snapped to the grid's tracks when the resize stops.
+				// so they aren't limited to the grid's current size. When the
+				// resize stops, sizes are snapped to the grid's tracks, or kept
+				// inside the grid where its cells have a fixed size.
 				bounds={ isManualGrid ? undefined : bounds }
 				boundsByDirection
 				// @ts-expect-error ResizableBox passes DOM event props to its element without typing them.
@@ -202,6 +213,10 @@ function GridItemResizerInner( {
 					}
 					const { columns: gridColumnTracks, rows: gridRowTracks } =
 						measurement;
+					const rowGap =
+						parseFloat(
+							getComputedCSS( rootBlockElement, 'row-gap' )
+						) || 0;
 					// Grid tracks start at the grid's content box, so manual
 					// grids measure the resized box from there.
 					const itemRect = isManualGrid
@@ -216,6 +231,32 @@ function GridItemResizerInner( {
 						boxElement.offsetWidth,
 						boxElement.offsetHeight
 					);
+					// Where the cells have a fixed size, a block keeps the
+					// size it was resized to, and Shift snaps the edge being
+					// dragged to the grid lines. It loses any box it had when
+					// it fills its cells.
+					if (
+						isManualGrid &&
+						isGridElementWithFixedCells( rootBlockElement )
+					) {
+						const placement = getResizedGridPlacement( {
+							pixelRect: {
+								left: rect.left,
+								top: rect.top,
+								right: rect.right,
+								bottom: rect.bottom,
+							},
+							// Only the sides are enabled, so the edge being
+							// dragged is a side.
+							direction: direction as PixelRectEdge,
+							columnTracks: gridColumnTracks,
+							rowTracks: gridRowTracks,
+							rowGap,
+							snap: !! event?.shiftKey,
+						} );
+						onChange( { ...placement, box: placement.box } );
+						return;
+					}
 					const columnStart =
 						getClosestTrack( gridColumnTracks, rect.left ) + 1;
 					const rowStart =
@@ -227,12 +268,7 @@ function GridItemResizerInner( {
 						? getRowEndForResize(
 								gridRowTracks,
 								rect.bottom,
-								parseFloat(
-									getComputedCSS(
-										rootBlockElement,
-										'row-gap'
-									)
-								) || 0
+								rowGap
 							)
 						: getClosestTrack( gridRowTracks, rect.bottom, 'end' ) +
 							1;

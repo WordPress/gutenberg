@@ -164,6 +164,22 @@ interface GridMeasurement {
 }
 
 /**
+ * Checks whether a grid's cells have a fixed size, as it tells its children
+ * with `--wp--style--grid-cells`. Blocks are only placed freely inside cells
+ * of a fixed size.
+ *
+ * @param gridElement The grid element.
+ *
+ * @return Whether the grid's cells have a fixed size.
+ */
+export function isGridElementWithFixedCells( gridElement: Element ) {
+	return (
+		getComputedCSS( gridElement, '--wp--style--grid-cells' ).trim() ===
+		'fixed'
+	);
+}
+
+/**
  * Converts a computed `column-gap` or `row-gap` value to pixels. Lengths
  * compute to pixels, but percentages are preserved and `normal` is 0 in grids.
  *
@@ -685,7 +701,13 @@ export function getGridItemMeasurements(
 			),
 		} );
 	}
-	return { columnTracks, rowTracks, siblings, src };
+	return {
+		columnTracks,
+		rowTracks,
+		siblings,
+		src,
+		hasFixedCells: isGridElementWithFixedCells( gridElement ),
+	};
 }
 
 /**
