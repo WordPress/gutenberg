@@ -35,7 +35,10 @@ function PreviewField( { item } ) {
 				{ isEmpty && __( 'Empty template' ) }
 				{ ! isEmpty && (
 					<BlockPreview.Async>
-						<BlockPreview blocks={ blocks } />
+						<BlockPreview
+							blocks={ blocks }
+							viewportWidth={ item.viewportWidth ?? undefined }
+						/>
 					</BlockPreview.Async>
 				) }
 			</div>

@@ -67,6 +67,11 @@ declare module './base-entity-records' {
 			 */
 			description: string;
 			/**
+			 * Width, in pixels, of the viewport used to render the template's
+			 * preview. `null` when the theme does not set one.
+			 */
+			viewportWidth?: number | null;
+			/**
 			 * Status of template.
 			 */
 			status: PostStatus;

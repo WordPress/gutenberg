@@ -114,6 +114,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 			'author_text'     => 'Test Blog',
 			'original_source' => 'site',
 			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+			'viewportWidth'   => null,
 		);
 		$actual   = $data;
 
@@ -153,6 +154,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 			'author_text'     => 'Test Blog',
 			'original_source' => 'site',
 			'date'            => mysql_to_rfc3339( self::$template_post->post_date ),
+			'viewportWidth'   => null,
 		);
 		$actual   = $this->find_and_normalize_template_by_id( $data, 'default//my_template' );
 
@@ -160,6 +162,39 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		ksort( $expected );
 		ksort( $actual );
 		$this->assertSame( $expected, $actual );
+	}
+
+	/**
+	 * The `viewportWidth` of a template comes from its `customTemplates` entry in `theme.json`.
+	 *
+	 * @covers ::gutenberg_add_viewport_width_wp_template_schema
+	 */
+	public function test_get_item_includes_viewport_width_from_theme_json() {
+		$add_custom_template = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version'         => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'customTemplates' => array(
+						array(
+							'name'          => 'my_template',
+							'title'         => 'My Template',
+							'viewportWidth' => 1600,
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_theme', $add_custom_template );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/templates/default//my_template' );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_theme_json_data_theme', $add_custom_template );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		$this->assertSame( 1600, $response->get_data()['viewportWidth'] );
 	}
 
 	/**
@@ -234,7 +269,7 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 19, $properties );
+		$this->assertCount( 20, $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'slug', $properties );
@@ -255,5 +290,6 @@ class Gutenberg_REST_Templates_Controller_Test extends WP_Test_REST_Controller_T
 		$this->assertArrayHasKey( 'original_source', $properties );
 		$this->assertArrayHasKey( 'plugin', $properties );
 		$this->assertArrayHasKey( 'date', $properties );
+		$this->assertArrayHasKey( 'viewportWidth', $properties );
 	}
 }

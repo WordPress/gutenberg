@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the optional `viewportWidth` property to the `WpTemplate` entity type.
+
 ### Bug Fixes
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).

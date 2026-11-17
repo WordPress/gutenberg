@@ -2316,6 +2316,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * Returns the page templates of the active theme.
 	 *
 	 * @since 5.9.0
+	 * @since 7.3.0 Includes the optional `viewportWidth` of each template.
 	 *
 	 * @return array
 	 */
@@ -2331,6 +2332,11 @@ class WP_Theme_JSON_Gutenberg {
 					'title'     => $item['title'] ?? '',
 					'postTypes' => $item['postTypes'] ?? array( 'page' ),
 				);
+
+				// Only a positive integer is a usable preview width; anything else is ignored.
+				if ( isset( $item['viewportWidth'] ) && is_int( $item['viewportWidth'] ) && $item['viewportWidth'] > 0 ) {
+					$custom_templates[ $item['name'] ]['viewportWidth'] = $item['viewportWidth'];
+				}
 			}
 		}
 		return $custom_templates;

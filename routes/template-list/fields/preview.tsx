@@ -10,6 +10,7 @@ function PreviewField( { item }: { item: WpTemplate } ) {
 			content={ item?.content?.raw }
 			blocks={ item?.blocks }
 			description={ description }
+			viewportWidth={ item?.viewportWidth ?? undefined }
 		/>
 	);
 }
