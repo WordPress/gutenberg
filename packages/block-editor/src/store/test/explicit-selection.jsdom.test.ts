@@ -81,6 +81,10 @@ describe( 'explicit block selection', () => {
 	);
 
 	it( 'gathers blocks from different parents in document order while preserving their IDs and contents', async () => {
+		const nested = createBlock( 'core/test-selection', {
+			content: 'Nested',
+		} );
+		blocks[ 0 ].innerBlocks = [ nested ];
 		blocks.forEach( ( block, i ) => {
 			block.attributes.content = String( i );
 		} );
@@ -129,6 +133,13 @@ describe( 'explicit block selection', () => {
 		expect(
 			registry.select( store ).getBlockRootClientId( ids[ 0 ] )
 		).toBe( parents[ 2 ].clientId );
+		expect(
+			registry.select( store ).getBlockRootClientId( nested.clientId )
+		).toBe( ids[ 0 ] );
+		expect(
+			registry.select( store ).getBlock( ids[ 0 ] )?.innerBlocks[ 0 ]
+				.clientId
+		).toBe( nested.clientId );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
 			[ ids[ 0 ], ids[ 2 ] ]
 		);

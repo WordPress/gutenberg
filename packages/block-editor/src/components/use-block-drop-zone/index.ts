@@ -330,6 +330,7 @@ export default function useBlockDropZone( {
 		getAllowedBlocks,
 		isDragging,
 		isGroupable,
+		canRemoveBlocks,
 		isZoomOut,
 		getSectionRootClientId,
 		getBlockParents,
@@ -542,10 +543,12 @@ export default function useBlockDropZone( {
 						'core/gallery',
 						targetRootClientId
 					);
-					const areGroupableBlocks = isGroupable( [
-						targetBlock.clientId,
-						getDraggedBlockClientIds(),
-					] );
+					// A drop may bring a contiguous source to a distant target.
+					// Validate the wrapper destination and removal permissions, not
+					// the pre-drop adjacency of the target and source blocks.
+					const areGroupableBlocks =
+						isGroupable( [ targetBlock.clientId ] ) &&
+						canRemoveBlocks( draggedBlockClientIds );
 					const groupBlockVariations = getBlockVariations(
 						// A grouping block type is registered.
 						getGroupingBlockName()!,
@@ -617,6 +620,7 @@ export default function useBlockDropZone( {
 				showInsertionPoint,
 				canInsertBlockType,
 				isGroupable,
+				canRemoveBlocks,
 				getBlockVariations,
 				getGroupingBlockName,
 				areBlocksContiguous,

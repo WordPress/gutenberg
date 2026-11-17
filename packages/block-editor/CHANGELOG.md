@@ -29,6 +29,7 @@
 
 ### Enhancements
 
+-   Drag and drop: Gather non-contiguous selected blocks into a contiguous sequence at the destination in the canvas and List View, preserving block IDs and supporting one-step undo across source parents.
 -   Selection: Add Cmd/Ctrl-click selection in the canvas and List View, Space-key toggling in List View, and the `multiSelectSet` action for selecting blocks across different parents. Duplicate selected runs in place and paste after non-contiguous selections without replacing their originals.
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
