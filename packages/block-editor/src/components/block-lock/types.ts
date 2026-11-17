@@ -37,9 +37,10 @@ export interface BlockLockStatus {
 	 */
 	lockType: BlockLockType;
 	/**
-	 * Client ID of the closest ancestor whose layout is locked, or `null`.
+	 * Client ID of the pattern or other content-only section the block is in,
+	 * whose blocks can't change their lock, or `null`.
 	 */
-	layoutLockedAncestor: string | null;
+	lockingSection: string | null;
 }
 
 /**

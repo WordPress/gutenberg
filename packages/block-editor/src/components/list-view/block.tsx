@@ -123,7 +123,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
-		hasLayoutLockedAncestor,
+		isInLockingSection,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -134,7 +134,7 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
-				getLayoutLockedAncestor,
+				getParentSectionBlock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -152,9 +152,9 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
-				hasLayoutLockedAncestor:
+				isInLockingSection:
 					!! window.__experimentalBlockLockMenu &&
-					!! getLayoutLockedAncestor( clientId ),
+					!! getParentSectionBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -576,12 +576,12 @@ function ListViewBlock( {
 	const hasSiblings = siblingBlockCount > 0;
 	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
 	// With the lock menu, a locked block shows its lock state as a button in
-	// its own cell, and so does a block inside a layout-locked block. A pattern
-	// being edited is temporarily unlocked, so it shows none.
+	// its own cell, and so does a block inside a pattern, whose lock it can't
+	// change. A pattern being edited is temporarily unlocked, so it shows none.
 	const hasLockCell =
 		isLockMenuEnabled &&
 		clientId !== editedSection &&
-		( isLocked || hasLayoutLockedAncestor );
+		( isLocked || isInLockingSection );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(

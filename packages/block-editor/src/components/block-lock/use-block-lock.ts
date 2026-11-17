@@ -24,7 +24,7 @@ export default function useBlockLock( clientId: string ): BlockLockStatus {
 				isPatternLockedBlock,
 				isLockedBlock,
 				getBlockLockType,
-				getLayoutLockedAncestor,
+				getParentSectionBlock,
 			} = unlock( select( blockEditorStore ) );
 
 			return {
@@ -37,7 +37,7 @@ export default function useBlockLock( clientId: string ): BlockLockStatus {
 				isPatternLocked: isPatternLockedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
 				lockType: getBlockLockType( clientId ),
-				layoutLockedAncestor: getLayoutLockedAncestor( clientId ),
+				lockingSection: getParentSectionBlock( clientId ) ?? null,
 			};
 		},
 		[ clientId ]

@@ -30,7 +30,6 @@ import {
 	isLockedBlock,
 	isLayoutLockedBlock,
 	canLayoutLockBlock,
-	getLayoutLockedAncestor,
 	getBlockLockType,
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
@@ -1778,18 +1777,6 @@ describe( 'private selectors', () => {
 			const state = createState( {} );
 			expect( canLayoutLockBlock( state, 'container' ) ).toBe( true );
 			expect( canLayoutLockBlock( state, 'leaf' ) ).toBe( false );
-		} );
-
-		it( 'returns the closest layout-locked ancestor', () => {
-			expect(
-				getLayoutLockedAncestor(
-					createState( { templateLock: 'all' } ),
-					'leaf'
-				)
-			).toBe( 'container' );
-			expect(
-				getLayoutLockedAncestor( createState( {} ), 'leaf' )
-			).toBeNull();
 		} );
 
 		it( 'returns a full lock only when movement, deletion and layout are locked', () => {

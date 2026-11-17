@@ -1366,23 +1366,6 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 }
 
 /**
- * Returns the closest ancestor whose layout is locked. Its descendants are
- * kept in place by it, so their own locks are managed from that ancestor.
- *
- * @param state    Global application state.
- * @param clientId ClientId of the block.
- *
- * @return Client ID of the closest layout-locked ancestor, or `null`.
- */
-export function getLayoutLockedAncestor( state: State, clientId: string ) {
-	return (
-		getBlockParents( state, clientId, true ).find( ( parentId ) =>
-			isLayoutLockedBlock( state, parentId )
-		) ?? null
-	);
-}
-
-/**
  * Returns how much of a block is locked. A block has up to three lock
  * properties: movement, deletion and, where it can be locked, layout.
  *
