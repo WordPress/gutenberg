@@ -130,7 +130,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Returns the unique overlay class on the rendered Navigation wrapper.
+	 * Returns the hashed overlay class on the rendered Navigation wrapper.
 	 *
 	 * @param string $markup Rendered markup.
 	 * @return string|null The class, or null if the wrapper has none.
@@ -139,7 +139,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$processor = new WP_HTML_Tag_Processor( $markup );
 		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
 		foreach ( $processor->class_list() as $class_name ) {
-			if ( preg_match( '/^wp-block-navigation-overlay-\d+$/', $class_name ) ) {
+			if ( preg_match( '/^wp-block-navigation-overlay-[a-f0-9]{8}$/', $class_name ) ) {
 				return $class_name;
 			}
 		}
@@ -155,7 +155,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 * @return string[] Rules.
 	 */
 	private function get_expected_inline_rules( $overlay_class, $media_query ) {
-		$base      = ".wp-block-navigation.{$overlay_class}.has-overlay-viewports";
+		$base      = ".wp-block-navigation.{$overlay_class}";
 		$container = "{$base} .wp-block-navigation__responsive-container";
 		$inline    = "{$container}:not(.hidden-by-default):not(.is-menu-open)";
 		$submenu   = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
@@ -962,7 +962,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$this->assertTrue( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must opt out of the static breakpoint.' );
 
 		$overlay_class = $this->get_overlay_viewports_class( $markup );
-		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have an overlay class.' );
 
 		$stylesheet = $this->get_block_supports_stylesheet();
 		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 782px)' ) as $rule ) {
@@ -970,6 +970,26 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		}
 		$this->assertStringNotContainsString( '@media (width <= 480px)', $stylesheet, 'The overlay is shown on mobile.' );
 		$this->assertStringNotContainsString( '@media (480px < width <= 782px)', $stylesheet, 'The overlay is shown on tablet.' );
+	}
+
+	/**
+	 * Tests that Tablet overlays with the same rules share one class, and that
+	 * the stylesheet contains each rule once.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::render
+	 */
+	public function test_tablet_overlays_share_one_class() {
+		$first_class  = $this->get_overlay_viewports_class( $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) ) );
+		$second_class = $this->get_overlay_viewports_class( $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) ) );
+
+		$this->assertNotNull( $first_class, 'The wrapper must have an overlay class.' );
+		$this->assertSame( $first_class, $second_class, 'Tablet overlays with the same rules must share one class.' );
+
+		$stylesheet = $this->get_block_supports_stylesheet();
+		foreach ( $this->get_expected_inline_rules( $first_class, '@media (width > 782px)' ) as $rule ) {
+			$this->assertSame( 1, substr_count( $stylesheet, $rule ), 'Each rule must be printed once.' );
+		}
+		$this->assertSame( 4, substr_count( $stylesheet, $first_class ), 'The stylesheet must contain the four rules once.' );
 	}
 
 	/**
@@ -987,7 +1007,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 
 		$markup        = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
 		$overlay_class = $this->get_overlay_viewports_class( $markup );
-		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have an overlay class.' );
 
 		$stylesheet = $this->get_block_supports_stylesheet();
 		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 60em)' ) as $rule ) {
@@ -1012,7 +1032,7 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 
 		$markup        = $this->render_navigation_block( array( 'overlayMenu' => 'tablet' ) );
 		$overlay_class = $this->get_overlay_viewports_class( $markup );
-		$this->assertNotNull( $overlay_class, 'The wrapper must have a unique overlay class.' );
+		$this->assertNotNull( $overlay_class, 'The wrapper must have an overlay class.' );
 
 		$stylesheet = $this->get_block_supports_stylesheet();
 		foreach ( $this->get_expected_inline_rules( $overlay_class, '@media (width > 30em)' ) as $rule ) {
@@ -1028,15 +1048,16 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_overlay_menu_without_viewport_rules
 	 *
-	 * @param mixed $overlay_menu The overlayMenu attribute value.
+	 * @param mixed $overlay_menu The overlayMenu attribute value, or null to omit it.
 	 */
 	public function test_overlay_menu_without_viewport_rules( $overlay_menu ) {
-		$markup = $this->render_navigation_block( array( 'overlayMenu' => $overlay_menu ) );
+		$attributes = null === $overlay_menu ? array() : array( 'overlayMenu' => $overlay_menu );
+		$markup     = $this->render_navigation_block( $attributes );
 
 		$processor = new WP_HTML_Tag_Processor( $markup );
 		$this->assertTrue( $processor->next_tag( 'nav' ), 'The Navigation block must render a nav element.' );
 		$this->assertFalse( $processor->has_class( 'has-overlay-viewports' ), 'The wrapper must keep the static breakpoint.' );
-		$this->assertNull( $this->get_overlay_viewports_class( $markup ), 'The wrapper must not have a unique overlay class.' );
+		$this->assertNull( $this->get_overlay_viewports_class( $markup ), 'The wrapper must not have an overlay class.' );
 
 		$stylesheet = $this->get_block_supports_stylesheet();
 		$this->assertStringNotContainsString( 'has-overlay-viewports', $stylesheet );
@@ -1056,12 +1077,13 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	 */
 	public function data_overlay_menu_without_viewport_rules() {
 		return array(
-			'mobile'                    => array( 'mobile' ),
-			'always'                    => array( 'always' ),
-			'never'                     => array( 'never' ),
-			'tablet with closing style' => array( 'tablet</style><script>alert(1)</script>' ),
-			'tablet in an array'        => array( array( 'tablet' ) ),
-			'tablet with closing brace' => array( 'tablet; }' ),
+			'default (block.json mobile)' => array( null ),
+			'mobile'                      => array( 'mobile' ),
+			'always'                      => array( 'always' ),
+			'never'                       => array( 'never' ),
+			'tablet with closing style'   => array( 'tablet</style><script>alert(1)</script>' ),
+			'tablet in an array'          => array( array( 'tablet' ) ),
+			'tablet with closing brace'   => array( 'tablet; }' ),
 		);
 	}
 }

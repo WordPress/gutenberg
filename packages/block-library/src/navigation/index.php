@@ -1061,7 +1061,8 @@ class WP_Navigation_Block_Renderer {
 	 * added, so a block is never left without a breakpoint.
 	 *
 	 * Media queries come from the theme's sanitized viewport settings. Nothing
-	 * from the block attributes is printed into the rules.
+	 * from the block attributes is printed into the rules. The class is a hash
+	 * of the rules, so blocks with the same rules share it.
 	 *
 	 * When the theme has no valid tablet breakpoint, the desktop media query
 	 * starts at the mobile breakpoint, so the `tablet` setting collapses into
@@ -1098,17 +1099,12 @@ class WP_Navigation_Block_Renderer {
 			return array();
 		}
 
-		$overlay_class        = wp_unique_id( 'wp-block-navigation-overlay-' );
-		$selector_base        = ".wp-block-navigation.{$overlay_class}.has-overlay-viewports";
-		$container_selector   = $selector_base . ' .wp-block-navigation__responsive-container';
-		$inline_selector      = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
-		$submenu_selector     = '.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container';
-		$open_button_selector = $selector_base . ' .wp-block-navigation__responsive-container-open:not(.always-shown)';
-
+		// Selectors are keys until the class is known, so the class can be
+		// derived from the rules.
 		$rules = array();
 		foreach ( $rules_groups as $rules_group ) {
 			$rules[] = array(
-				'selector'     => $inline_selector,
+				'selector'     => 'inline-container',
 				'declarations' => array(
 					'display'          => 'block',
 					'width'            => '100%',
@@ -1119,22 +1115,39 @@ class WP_Navigation_Block_Renderer {
 				'rules_group'  => $rules_group,
 			);
 			$rules[] = array(
-				'selector'     => $inline_selector . ' .wp-block-navigation__responsive-container-close',
+				'selector'     => 'inline-close-button',
 				'declarations' => array( 'display' => 'none' ),
 				'rules_group'  => $rules_group,
 			);
 			// Keep submenus in an open overlay positioned as overlay content.
 			$rules[] = array(
-				'selector'     => $container_selector . '.is-menu-open ' . $submenu_selector,
+				'selector'     => 'open-submenu',
 				'declarations' => array( 'left' => '0' ),
 				'rules_group'  => $rules_group,
 			);
 			$rules[] = array(
-				'selector'     => $open_button_selector,
+				'selector'     => 'open-button',
 				'declarations' => array( 'display' => 'none' ),
 				'rules_group'  => $rules_group,
 			);
 		}
+
+		// Hash the rules so blocks with the same rules share one class, and the
+		// style engine prints the rules once.
+		$overlay_class      = wp_unique_id_from_values( $rules, 'wp-block-navigation-overlay-' );
+		$selector_base      = ".wp-block-navigation.{$overlay_class}";
+		$container_selector = $selector_base . ' .wp-block-navigation__responsive-container';
+		$inline_selector    = $container_selector . ':not(.hidden-by-default):not(.is-menu-open)';
+		$selectors          = array(
+			'inline-container'    => $inline_selector,
+			'inline-close-button' => $inline_selector . ' .wp-block-navigation__responsive-container-close',
+			'open-submenu'        => $container_selector . '.is-menu-open .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container',
+			'open-button'         => $selector_base . ' .wp-block-navigation__responsive-container-open:not(.always-shown)',
+		);
+		foreach ( $rules as &$rule ) {
+			$rule['selector'] = $selectors[ $rule['selector'] ];
+		}
+		unset( $rule );
 
 		wp_style_engine_get_stylesheet_from_css_rules(
 			$rules,

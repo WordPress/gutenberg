@@ -757,9 +757,10 @@ button.wp-block-navigation-item__content {
 
 	// Keep the static default breakpoint for Navigation blocks whose overlay
 	// doesn't follow the theme's viewports. Blocks that do opt out here and
-	// receive instance-scoped rules from server rendering.
+	// receive rules generated from the theme's viewport settings. `:where()`
+	// keeps the specificity these rules had before the opt-out was added.
 	@include break-small() {
-		.wp-block-navigation:not(.has-overlay-viewports) & {
+		:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
 			&:not(.hidden-by-default) {
 				&:not(.is-menu-open) {
 					display: block;
@@ -839,9 +840,10 @@ button.wp-block-navigation-item__content {
 	&:not(.always-shown) {
 		// Keep the static default breakpoint for Navigation blocks whose overlay
 		// doesn't follow the theme's viewports. Blocks that do opt out here and
-		// receive instance-scoped rules from server rendering.
+		// receive rules generated from the theme's viewport settings. `:where()`
+		// keeps the specificity these rules had before the opt-out was added.
 		@include break-small {
-			.wp-block-navigation:not(.has-overlay-viewports) & {
+			:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
 				display: none;
 			}
 		}
