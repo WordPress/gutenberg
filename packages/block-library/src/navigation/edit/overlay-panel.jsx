@@ -9,13 +9,14 @@ import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
 import useHasTabletViewport from './use-has-tablet-viewport';
+import { isOverlayResponsive } from '../overlay-viewports';
 
 /**
  * Overlay Panel component for Navigation block.
  *
  * @param {Object}   props                           Component props.
  * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'tablet', 'always').
- * @param {?Object}  props.overlayViewports          Viewport map from `getOverlayViewports()`, or `null` for the default `mobile` behavior.
+ * @param {?Object}  props.overlayViewports          Viewport map from `getFilteredOverlayViewports()`, or `null` for the default `mobile` behavior.
  * @param {string}   props.overlay                   Currently selected overlay template part ID.
  * @param {Function} props.setAttributes             Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
@@ -48,6 +49,9 @@ export default function OverlayPanel( {
 } ) {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
 	const hasTabletViewport = useHasTabletViewport();
+	// Read the viewports rather than `overlayMenu`, since a filter can show
+	// the overlay for a block set to `never`.
+	const isOverlayShown = isOverlayResponsive( overlayViewports );
 
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
@@ -58,7 +62,7 @@ export default function OverlayPanel( {
 					hasTabletViewport={ hasTabletViewport }
 				/>
 
-				{ overlayMenu !== 'never' && (
+				{ isOverlayShown && (
 					<OverlayMenuPreviewButton
 						isResponsive={ isResponsive }
 						overlayMenuPreview={ overlayMenuPreview }
@@ -71,7 +75,7 @@ export default function OverlayPanel( {
 					/>
 				) }
 
-				{ overlayMenu !== 'never' && (
+				{ isOverlayShown && (
 					<OverlayTemplatePartSelector
 						overlay={ overlay }
 						overlayViewports={ overlayViewports }
@@ -83,7 +87,7 @@ export default function OverlayPanel( {
 					/>
 				) }
 
-				{ overlayMenu !== 'never' &&
+				{ isOverlayShown &&
 					overlay &&
 					hasOverlays &&
 					! isCreatingOverlay && (

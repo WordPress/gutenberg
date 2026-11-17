@@ -24,7 +24,7 @@ import { getOverlayEditingViewport } from '../overlay-viewports';
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
- * @param {?Object}  props.overlayViewports         Viewport map from `getOverlayViewports()`, or `null` for the default `mobile` behavior.
+ * @param {?Object}  props.overlayViewports         Viewport map from `getFilteredOverlayViewports()`, or `null` for the default `mobile` behavior.
  * @param {boolean}  props.hasTabletViewport        Whether the theme has a tablet breakpoint.
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.

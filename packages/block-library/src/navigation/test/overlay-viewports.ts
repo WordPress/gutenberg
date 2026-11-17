@@ -1,6 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { addFilter, removeAllFilters } from '@wordpress/hooks';
 import {
 	getOverlayViewports,
+	getFilteredOverlayViewports,
 	isOverlayResponsive,
 	isOverlayAlwaysShown,
 	getInlineViewports,
@@ -215,4 +217,113 @@ describe( 'getOverlayEditingViewport', () => {
 			).toBe( expected );
 		}
 	);
+} );
+
+describe( 'getFilteredOverlayViewports', () => {
+	const HOOK = 'blocks.navigation.overlayViewports';
+
+	afterEach( () => {
+		removeAllFilters( HOOK );
+	} );
+
+	it( 'returns the unfiltered viewports when no filter is registered', () => {
+		for ( const overlayMenu of [ 'never', 'mobile', 'tablet', 'always' ] ) {
+			expect(
+				getFilteredOverlayViewports( { overlayMenu }, 'client-1' )
+			).toEqual( getOverlayViewports( { overlayMenu } ) );
+		}
+	} );
+
+	it( 'passes the resolved viewports, the attributes and the client ID to the filter', () => {
+		const callback = vi.fn( ( value ) => value );
+		addFilter( HOOK, 'test/overlay-viewports', callback );
+		const attributes = { overlayMenu: 'tablet', ref: 12 };
+
+		getFilteredOverlayViewports( attributes, 'client-1' );
+
+		expect( callback ).toHaveBeenCalledWith(
+			{ mobile: true, tablet: true, desktop: false },
+			attributes,
+			'client-1'
+		);
+	} );
+
+	it( 'lets a filter replace the default behavior with a viewport map', () => {
+		addFilter( HOOK, 'test/overlay-viewports', () => ( {
+			mobile: true,
+			tablet: true,
+			desktop: false,
+		} ) );
+
+		expect(
+			getFilteredOverlayViewports( { overlayMenu: 'mobile' }, 'client-1' )
+		).toEqual( { mobile: true, tablet: true, desktop: false } );
+	} );
+
+	it( 'lets a filter return null for the default behavior', () => {
+		addFilter( HOOK, 'test/overlay-viewports', () => null );
+
+		expect(
+			getFilteredOverlayViewports( { overlayMenu: 'tablet' }, 'client-1' )
+		).toBeNull();
+	} );
+
+	it.each( [
+		[ 'a string', '900px' ],
+		[ 'a partial map', { mobile: true } ],
+		[ 'non-boolean values', { mobile: 1, tablet: 'yes', desktop: false } ],
+		[ 'an array', [ true, true, false ] ],
+		[ 'undefined', undefined ],
+	] )(
+		'ignores %s and keeps the unfiltered viewports',
+		( _name, filtered ) => {
+			addFilter( HOOK, 'test/overlay-viewports', () => filtered );
+
+			expect(
+				getFilteredOverlayViewports(
+					{ overlayMenu: 'tablet' },
+					'client-1'
+				)
+			).toEqual( { mobile: true, tablet: true, desktop: false } );
+		}
+	);
+
+	it( 'keeps only the known viewports from a returned map', () => {
+		addFilter( HOOK, 'test/overlay-viewports', () => ( {
+			mobile: true,
+			tablet: false,
+			desktop: false,
+			wide: true,
+		} ) );
+
+		const result = getFilteredOverlayViewports(
+			{ overlayMenu: 'never' },
+			'client-1'
+		);
+
+		expect( result ).toEqual( {
+			mobile: true,
+			tablet: false,
+			desktop: false,
+		} );
+		expect( Object.keys( result ?? {} ) ).toHaveLength( 3 );
+	} );
+
+	it( 'returns a copy of the map the filter returned', () => {
+		const filtered = { mobile: true, tablet: true, desktop: false };
+		addFilter( HOOK, 'test/overlay-viewports', () => filtered );
+
+		const result = getFilteredOverlayViewports(
+			{ overlayMenu: 'never' },
+			'client-1'
+		);
+		filtered.desktop = true;
+
+		expect( result ).not.toBe( filtered );
+		expect( result ).toEqual( {
+			mobile: true,
+			tablet: true,
+			desktop: false,
+		} );
+	} );
 } );

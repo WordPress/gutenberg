@@ -1,11 +1,5 @@
 import clsx from 'clsx';
-import {
-	useCallback,
-	useState,
-	useEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -69,7 +63,7 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import {
-	getOverlayViewports,
+	getFilteredOverlayViewports,
 	isOverlayAlwaysShown,
 	isOverlayResponsive,
 } from '../overlay-viewports';
@@ -288,9 +282,11 @@ function Navigation( {
 		layout: attributes.layout,
 		style: attributes.style,
 	} );
-	const overlayViewports = useMemo(
-		() => getOverlayViewports( { overlayMenu } ),
-		[ overlayMenu ]
+	// Not memoized, since a filter can depend on state outside the attributes,
+	// such as the current language. Consumers derive primitives from it.
+	const overlayViewports = getFilteredOverlayViewports(
+		attributes,
+		clientId
 	);
 
 	const setRef = useCallback(
