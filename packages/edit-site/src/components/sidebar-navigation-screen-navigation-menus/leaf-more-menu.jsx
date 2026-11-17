@@ -65,7 +65,8 @@ export default function LeafMoreMenu( props ) {
 		[ clientId ]
 	);
 
-	// A Page List lists every page, so its pages are hidden, not removed.
+	// A Page List lists every page, so its pages can't be removed. They're
+	// hidden with the toggle on their List View row.
 	const isPage = blockName === 'core/page-list-item';
 	const canHide =
 		allowVisibilityEditing !== false &&
@@ -146,7 +147,7 @@ export default function LeafMoreMenu( props ) {
 								</MenuItem>
 							) }
 					</MenuGroup>
-					{ ( canHide || ! isPage ) && (
+					{ ! isPage && (
 						<MenuGroup>
 							{ canHide && (
 								<MenuItem
@@ -158,16 +159,14 @@ export default function LeafMoreMenu( props ) {
 									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
 								</MenuItem>
 							) }
-							{ ! isPage && (
-								<MenuItem
-									onClick={ () => {
-										removeBlocks( [ clientId ], false );
-										onClose();
-									} }
-								>
-									{ removeLabel }
-								</MenuItem>
-							) }
+							<MenuItem
+								onClick={ () => {
+									removeBlocks( [ clientId ], false );
+									onClose();
+								} }
+							>
+								{ removeLabel }
+							</MenuItem>
 						</MenuGroup>
 					) }
 				</>

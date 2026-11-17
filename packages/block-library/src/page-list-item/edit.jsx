@@ -18,6 +18,7 @@ import {
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
 import { usePageListAllowedBlocks } from '../page-list/use-page-list-allowed-blocks';
+import { useIsPagesOnlyMenu } from '../navigation/use-is-pages-only-menu';
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
@@ -42,7 +43,7 @@ export default function PageListItemEdit( { clientId, context, attributes } ) {
 	// In a Navigation block, pages are moved, nested and hidden like its
 	// other items, so a page's child pages follow the blocks, not the
 	// attribute set when the blocks were made.
-	const { hasChildren, pageListClientId } = useSelect(
+	const { hasChildren, pageListClientId, navigationClientId } = useSelect(
 		( select ) => {
 			const { getBlockCount, getBlockParentsByBlockName } =
 				select( blockEditorStore );
@@ -51,6 +52,11 @@ export default function PageListItemEdit( { clientId, context, attributes } ) {
 				pageListClientId: getBlockParentsByBlockName(
 					clientId,
 					'core/page-list',
+					true
+				)[ 0 ],
+				navigationClientId: getBlockParentsByBlockName(
+					clientId,
+					'core/navigation',
 					true
 				)[ 0 ],
 			};
@@ -62,7 +68,11 @@ export default function PageListItemEdit( { clientId, context, attributes } ) {
 	// Elsewhere, a Page List's pages can't be changed one by one, so clicking
 	// one selects the Page List.
 	useBlockEditingMode( isNavigationChild ? undefined : 'disabled' );
-	const allowedBlocks = usePageListAllowedBlocks( isNavigationChild );
+	const isPagesOnly = useIsPagesOnlyMenu( navigationClientId );
+	const allowedBlocks = usePageListAllowedBlocks(
+		isNavigationChild,
+		isPagesOnly
+	);
 
 	// Get submenu visibility from context. The Navigation block handles
 	// backward compatibility by migrating openSubmenusOnClick to submenuVisibility

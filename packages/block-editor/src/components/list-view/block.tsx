@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { useInstanceId, useDebounce } from '@wordpress/compose';
 import { moreVertical } from '@wordpress/icons';
+import { Switch } from '@wordpress/ui';
 import {
 	useCallback,
 	useMemo,
@@ -15,7 +16,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -40,6 +41,7 @@ import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
+import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { getBlockVisibilityLabel } from '../block-visibility';
 import type { ListViewBlockProps, TreeGridItemRenderProps } from './types';
 import type { TreeBlock } from '../../store/types';
@@ -86,6 +88,7 @@ function ListViewBlock( {
 		insertBeforeBlock,
 		showViewportModal,
 		stopEditingContentOnlySection,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -102,6 +105,7 @@ function ListViewBlock( {
 		getBlockParents,
 		getBlockEditingMode,
 		getBlocksByClientId,
+		getBlockAttributes: getAttributes,
 		canEditBlock,
 		canMoveBlock,
 		canRemoveBlocks,
@@ -173,8 +177,13 @@ function ListViewBlock( {
 		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
+		visibilityToggleBlockNames,
 	} = useListViewContext();
 	const isMatch = useShortcutEventMatch();
+	const blockTitle = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
 
 	// Determine which blocks to update:
 	// If the current (focused) block is part of the block selection, use the whole selection.
@@ -567,6 +576,27 @@ function ListViewBlock( {
 		viewportSettings
 	);
 
+	// Some List Views show or hide certain blocks with a toggle, which says
+	// whether the block is shown, in place of the hidden icon.
+	const hasVisibilityToggle =
+		!! blockName &&
+		!! visibilityToggleBlockNames?.includes( blockName ) &&
+		blockVisibilitySetting !== false &&
+		! isDisabled &&
+		hasBlockSupport( blockName, 'visibility', true ) &&
+		( blockVisibility === undefined ||
+			typeof blockVisibility === 'boolean' );
+	const isShown = blockVisibility !== false;
+	const toggleVisibility = () => {
+		const { blockVisibility: _blockVisibility, ...otherMetadata } =
+			getAttributes( clientId )?.metadata ?? {};
+		updateBlockAttributes( clientId, {
+			metadata: isShown
+				? { ...otherMetadata, blockVisibility: false }
+				: otherMetadata,
+		} );
+	};
+
 	const hasSiblings = siblingBlockCount > 0;
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
@@ -672,7 +702,11 @@ function ListViewBlock( {
 							isSelected={ isSelected }
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
-							visibilityLabel={ blockVisibilityDescription }
+							visibilityLabel={
+								hasVisibilityToggle
+									? undefined
+									: blockVisibilityDescription
+							}
 							isDisabled={ isDisabled }
 						/>
 						<AriaReferencedText id={ descriptionId }>
@@ -727,6 +761,31 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasVisibilityToggle && (
+				<TreeGridCell
+					className="block-editor-list-view-block__visibility-toggle"
+					aria-selected={ !! isSelected }
+				>
+					{ ( {
+						ref,
+						tabIndex,
+						onFocus,
+					}: TreeGridItemRenderProps ) => (
+						<Switch
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+							checked={ isShown }
+							onCheckedChange={ toggleVisibility }
+							aria-label={ sprintf(
+								/* translators: %s: The block's name, such as a page title. */
+								__( 'Show %s' ),
+								blockTitle
+							) }
+						/>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }

@@ -326,6 +326,13 @@
 		padding: 0;
 	}
 
+	// Always shown, as it says whether the block is shown.
+	.block-editor-list-view-block__visibility-toggle {
+		padding: 0 $grid-unit-05;
+		line-height: 0;
+		vertical-align: middle;
+	}
+
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell {
 		line-height: 0;

@@ -1,6 +1,7 @@
 import { createBlock } from '@wordpress/blocks';
 import { useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
 const PAGE_LIST_ITEM = 'core/page-list-item';
@@ -158,7 +159,9 @@ export function convertPageListBlocksToLinks( blocks = [] ) {
 
 /**
  * Returns a function that detaches a Page List: replaces it with links to its
- * pages, as they're shown in the editor.
+ * pages, as they're shown in the editor. The menu goes on adding new pages,
+ * as the Page List did: its Navigation Menu's `auto_add_pages` setting is
+ * turned on, unless the Page List showed only the child pages of one page.
  *
  * @param {Object} options
  * @param {string} options.clientId       Client ID of the Page List block.
@@ -171,7 +174,7 @@ export function useConvertToNavigationLinks( { clientId, parentClientId } ) {
 	const registry = useRegistry();
 
 	return ( movedOutClientIds = [] ) => {
-		const { getBlocks, getBlocksByClientId } =
+		const { getBlocks, getBlocksByClientId, getBlockAttributes } =
 			registry.select( blockEditorStore );
 		const { replaceBlock, selectBlock } =
 			registry.dispatch( blockEditorStore );
@@ -191,6 +194,19 @@ export function useConvertToNavigationLinks( { clientId, parentClientId } ) {
 			// Replace the Page List block with the Navigation Links.
 			replaceBlock( clientId, navigationLinks );
 		} );
+
+		const menuId =
+			parentClientId && getBlockAttributes( parentClientId )?.ref;
+		if ( menuId && ! getBlockAttributes( clientId )?.parentPageID ) {
+			const { meta } = registry
+				.select( coreStore )
+				.getEditedEntityRecord( 'postType', 'wp_navigation', menuId );
+			registry
+				.dispatch( coreStore )
+				.editEntityRecord( 'postType', 'wp_navigation', menuId, {
+					meta: { ...meta, auto_add_pages: true },
+				} );
+		}
 
 		// Select the Navigation block to reveal the changes.
 		if ( parentClientId ) {

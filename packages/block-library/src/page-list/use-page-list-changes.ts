@@ -252,7 +252,7 @@ export function usePageListChanges( {
 			);
 			askToDetach( blocks, {
 				message: __(
-					'Only pages can go between the pages of a Page List. To put this item there, the Page List will be detached: its pages will become links that you can add to, remove, and reorder like any other link. However, new pages will no longer be added automatically.'
+					'Only pages can go between the pages of a Page List. To put this item there, the Page List will be detached: its pages will become links that you can edit like any other link. New pages will still be added automatically.'
 				),
 				// A new item is removed again, and a moved one moved back.
 				cancel: wasInserted
@@ -299,7 +299,7 @@ export function usePageListChanges( {
 
 			askToDetach( blocks, {
 				message: __(
-					'Pages can only be reordered among the other pages of a Page List. To move this page there, the Page List will be detached: its pages will become links that you can add to, remove, and reorder like any other link. However, new pages will no longer be added automatically.'
+					'Pages can only be reordered among the other pages of a Page List. To move this page there, the Page List will be detached: its pages will become links that you can edit like any other link. New pages will still be added automatically.'
 				),
 				movedOutClientIds,
 				cancel: undo,

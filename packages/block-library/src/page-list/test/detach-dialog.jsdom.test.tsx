@@ -8,9 +8,7 @@ describe( 'DetachPageListDialog', () => {
 			<DetachPageListDialog onConfirm={ vi.fn() } onCancel={ vi.fn() } />
 		);
 		expect(
-			screen.getByText(
-				/new pages will no longer be added automatically/
-			)
+			screen.getByText( /New pages will still be added automatically/ )
 		).toBeInTheDocument();
 	} );
 
@@ -36,5 +34,24 @@ describe( 'DetachPageListDialog', () => {
 		} );
 		fireEvent.click( cancelButtons[ cancelButtons.length - 1 ] );
 		expect( onCancel ).toHaveBeenCalled();
+	} );
+} );
+
+describe( 'DetachPageListDialog title and button', () => {
+	it( 'can be titled for switching to an advanced menu', () => {
+		render(
+			<DetachPageListDialog
+				title="Switch to advanced menu"
+				confirmButtonText="Switch"
+				onConfirm={ vi.fn() }
+				onCancel={ vi.fn() }
+			/>
+		);
+		expect(
+			screen.getByRole( 'heading', { name: 'Switch to advanced menu' } )
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Switch' } )
+		).toBeInTheDocument();
 	} );
 } );

@@ -174,7 +174,7 @@ export default function LeafMoreMenu( {
 							</>
 						) }
 					</MenuGroup>
-					{ ( showHide || ! isPage ) && (
+					{ ! isPage && (
 						<MenuGroup>
 							{ showHide && (
 								<MenuItem
@@ -186,16 +186,14 @@ export default function LeafMoreMenu( {
 									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
 								</MenuItem>
 							) }
-							{ ! isPage && (
-								<MenuItem
-									onClick={ () => {
-										removeBlocks( [ clientId ], false );
-										onClose();
-									} }
-								>
-									{ removeLabel }
-								</MenuItem>
-							) }
+							<MenuItem
+								onClick={ () => {
+									removeBlocks( [ clientId ], false );
+									onClose();
+								} }
+							>
+								{ removeLabel }
+							</MenuItem>
 						</MenuGroup>
 					) }
 				</>

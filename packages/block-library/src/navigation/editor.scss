@@ -622,6 +622,10 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	opacity: 1;
 }
 
+.wp-block-navigation__advanced-menu-control {
+	margin-top: $grid-unit-20;
+}
+
 .wp-block-navigation__menu-inspector-controls__empty-message {
 	margin-left: 24px;
 }

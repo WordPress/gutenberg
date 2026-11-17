@@ -27,6 +27,7 @@ import DetachPageListDialog from './detach-dialog';
 import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
 import { PAGE_LIST_ITEM } from './utils';
 import { usePageListAllowedBlocks } from './use-page-list-allowed-blocks';
+import { useIsPagesOnlyMenu } from '../navigation/use-is-pages-only-menu';
 import {
 	usePageListChanges,
 	getPageListBlocksKey,
@@ -260,7 +261,13 @@ export default function PageListEdit( {
 			? changedBlocks.blocks
 			: blockList;
 
-	const allowedBlocks = usePageListAllowedBlocks( isChildOfNavigation );
+	// In a pages menu, only pages can be added or moved, and adding anything
+	// else is done by switching to an advanced menu.
+	const isPagesOnly = useIsPagesOnlyMenu( parentClientId );
+	const allowedBlocks = usePageListAllowedBlocks(
+		isChildOfNavigation,
+		isPagesOnly
+	);
 
 	const innerBlocksProps = useInnerBlocksProps(
 		blockProps,
@@ -270,8 +277,10 @@ export default function PageListEdit( {
 					// other items of the Navigation block.
 					renderAppender: false,
 					allowedBlocks,
-					defaultBlock: DEFAULT_BLOCK,
-					directInsert: true,
+					...( ! isPagesOnly && {
+						defaultBlock: DEFAULT_BLOCK,
+						directInsert: true,
+					} ),
 					templateLock: canReorderPages ? false : 'all',
 					onInput: NOOP,
 					onChange,

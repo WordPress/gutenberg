@@ -183,8 +183,8 @@ export default function LeafMoreMenu( {
 	const isSubmenuDisabled =
 		! BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU.includes( blockName );
 
-	// A Page List lists every page, so its pages can be hidden but not
-	// removed or duplicated.
+	// A Page List lists every page, so its pages can't be removed or
+	// duplicated. They're hidden with the toggle on their List View row.
 	const isPage = blockName === PAGE_LIST_ITEM;
 	const isHidden = metadata?.blockVisibility === false;
 	const toggleHidden = () => {
@@ -270,8 +270,7 @@ export default function LeafMoreMenu( {
 							</>
 						) }
 					</MenuGroup>
-					{ ( ( canHide && allowVisibilityEditing !== false ) ||
-						! isPage ) && (
+					{ ! isPage && (
 						<MenuGroup>
 							{ canHide && allowVisibilityEditing !== false && (
 								<MenuItem
@@ -283,16 +282,14 @@ export default function LeafMoreMenu( {
 									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
 								</MenuItem>
 							) }
-							{ ! isPage && (
-								<MenuItem
-									onClick={ () => {
-										removeBlocks( [ clientId ], false );
-										onClose();
-									} }
-								>
-									{ removeLabel }
-								</MenuItem>
-							) }
+							<MenuItem
+								onClick={ () => {
+									removeBlocks( [ clientId ], false );
+									onClose();
+								} }
+							>
+								{ removeLabel }
+							</MenuItem>
 						</MenuGroup>
 					) }
 				</>

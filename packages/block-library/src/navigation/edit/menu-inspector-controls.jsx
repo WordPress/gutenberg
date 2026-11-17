@@ -9,6 +9,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
+import AdvancedMenuControl from './advanced-menu-control';
+import { useIsPagesOnlyMenu } from '../use-is-pages-only-menu';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import useNavigationMenu from '../use-navigation-menu';
 import LeafMoreMenu from './leaf-more-menu';
@@ -23,6 +25,9 @@ const {
 	useListViewPanelState,
 	useBlockDisplayTitle,
 } = unlock( blockEditorPrivateApis );
+
+// A menu's pages are shown and hidden with a toggle on their rows.
+const VISIBILITY_TOGGLE_BLOCKS = [ 'core/page-list-item' ];
 
 const MainContent = ( {
 	clientId,
@@ -44,6 +49,7 @@ const MainContent = ( {
 	);
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
+	const isPagesOnly = useIsPagesOnlyMenu( clientId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
@@ -77,11 +83,13 @@ const MainContent = ( {
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
-				showAppender
+				showAppender={ ! isPagesOnly }
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }
+				visibilityToggleBlockNames={ VISIBILITY_TOGGLE_BLOCKS }
 			/>
+			<AdvancedMenuControl clientId={ clientId } />
 		</div>
 	);
 };
