@@ -30,7 +30,7 @@
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
 -   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
--   `Iframe`: Load the editor canvas document through `srcdoc` instead of a `blob:` URL, so the canvas no longer stays blank when navigation is controlled by browser automation such as AI browser agents ([#82419](https://github.com/WordPress/gutenberg/issues/82419)).
+-   `Iframe`: Load the editor canvas document through `srcdoc` instead of a `blob:` URL, so the canvas no longer stays blank when navigation is controlled by browser automation such as AI browser agents. Scripts running in the canvas now see `window.location.origin` as `"null"`; use `window.origin` instead ([#85143](https://github.com/WordPress/gutenberg/pull/85143)).
 
 ### Internal
 

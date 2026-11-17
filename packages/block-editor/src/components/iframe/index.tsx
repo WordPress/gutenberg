@@ -256,19 +256,18 @@ function Iframe( {
 				// Manually handle link fragment navigation within the iframe. The
 				// iframe's location is `about:srcdoc`, so a relative link like
 				// `#hash` would be resolved against the `<base>` URL, causing the
-				// iframe to navigate to the parent page. Scroll to the anchor instead.
+				// iframe to navigate to the parent page. Setting `location.hash`
+				// works because it stays on the `about:srcdoc` document, scrolls
+				// to the anchor, and updates `:target`.
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
-				const id = decodeURIComponent(
-					( event.target as Element )
-						.getAttribute( 'href' )!
-						.slice( 1 )
-				);
-				(
-					iFrameDocument!.getElementById( id ) ??
-					iFrameDocument!.getElementsByName( id )[ 0 ]
-				)?.scrollIntoView();
+				// The loaded document has a window, and the link an `href`.
+				iFrameDocument!.defaultView!.location.hash = (
+					event.target as Element
+				 )
+					.getAttribute( 'href' )!
+					.slice( 1 );
 			}
 		}
 
