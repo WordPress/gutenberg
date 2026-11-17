@@ -11,6 +11,7 @@ import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
 	InsertionPoint,
+	InitialPosition,
 	LastFocus,
 	RemovalPromptMessage,
 	Settings,
@@ -24,6 +25,49 @@ const { isContentBlock } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+/**
+ * Pastes a sequence after the last target, without replacing scattered blocks.
+ *
+ * @param blocks          Clipboard blocks.
+ * @param clientIds       Selected target IDs in document order.
+ * @param initialPosition Initial canvas position, or null to retain List View focus.
+ * @return Thunk inserting all clipboard blocks, or none if the destination rejects them.
+ */
+export const pasteBlocksAfter =
+	(
+		blocks: Block[],
+		clientIds: string[],
+		initialPosition: InitialPosition = 0
+	) =>
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		const lastId = clientIds[ clientIds.length - 1 ];
+		if ( ! blocks.length || ! lastId || ! select.getBlock( lastId ) ) {
+			return;
+		}
+		const parent = select.getBlockRootClientId( lastId );
+		if (
+			! blocks.every( ( block ) =>
+				select.canInsertBlockType( block.name, parent )
+			)
+		) {
+			return;
+		}
+		registry.batch( () => {
+			dispatch.insertBlocks(
+				blocks,
+				select.getBlockIndex( lastId ) + 1,
+				parent,
+				false,
+				initialPosition
+			);
+			dispatch.multiSelectSet(
+				blocks.map( ( block ) => block.clientId ),
+				initialPosition
+			);
+		} );
+		return blocks.map( ( block ) => block.clientId );
+	};
 
 /**
  * A list of private/experimental block editor settings that

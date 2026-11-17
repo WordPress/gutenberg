@@ -5,10 +5,13 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	store as blocksStore,
+	getBlockType,
+	parse,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { store } from '..';
 import { unlock } from '../../lock-unlock';
+import { setClipboardBlocks } from '../../components/writing-flow/utils';
 
 describe( 'explicit block selection', () => {
 	let registry: ReturnType< typeof createRegistry >;
@@ -26,6 +29,9 @@ describe( 'explicit block selection', () => {
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( blocksStore );
+		registry
+			.dispatch( blocksStore )
+			.addBlockTypes( getBlockType( 'core/test-selection' )! );
 		registry.register( store );
 		blocks = Array.from( { length: 5 }, () =>
 			createBlock( 'core/test-selection' )
@@ -285,5 +291,129 @@ describe( 'explicit block selection', () => {
 			await registry.dispatch( store ).duplicateBlocks( ids )
 		).toBeUndefined();
 		expect( registry.select( store ).getBlocks() ).toBe( before );
+	} );
+
+	it( 'pastes after the last selected block without replacing selected originals', async () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 2 )
+		);
+		registry
+			.dispatch( store )
+			.resetBlocks( [ ...blocks.slice( 0, 2 ), parent ] );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( parent.clientId, {} );
+		// Click order and focus do not decide the insertion destination.
+		registry
+			.dispatch( store )
+			.multiSelectSet( [ blocks[ 3 ].clientId, blocks[ 0 ].clientId ] );
+		const clipboard = [
+			createBlock( 'core/test-selection' ),
+			createBlock( 'core/test-selection' ),
+		];
+		await unlock( registry.dispatch( store ) ).pasteBlocksAfter(
+			clipboard,
+			registry.select( store ).getSelectedBlockClientIds()
+		);
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( [
+			blocks[ 2 ].clientId,
+			blocks[ 3 ].clientId,
+			...clipboard.map( ( block ) => block.clientId ),
+			blocks[ 4 ].clientId,
+		] );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			blocks[ 0 ].clientId,
+			blocks[ 1 ].clientId,
+			parent.clientId,
+		] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			clipboard.map( ( block ) => block.clientId )
+		);
+	} );
+
+	it( 'leaves content unchanged when the paste destination rejects insertion', async () => {
+		registry
+			.dispatch( store )
+			.multiSelectSet( [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ] );
+		registry.dispatch( store ).updateSettings( { templateLock: 'all' } );
+		const before = registry.select( store ).getBlocks();
+		const selection = registry.select( store ).getSelectedBlockClientIds();
+		await unlock( registry.dispatch( store ) ).pasteBlocksAfter(
+			[ createBlock( 'core/test-selection' ) ],
+			selection
+		);
+		expect( registry.select( store ).getBlocks() ).toBe( before );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
+			selection
+		);
+	} );
+
+	it( 'copies selected blocks in document order without gaps or unselected ancestor wrappers', () => {
+		for ( const [ index, block ] of blocks.entries() ) {
+			block.attributes.content = String( index );
+		}
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 3 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		registry
+			.dispatch( store )
+			.multiSelectSet( [ blocks[ 4 ].clientId, blocks[ 1 ].clientId ] );
+		const clipboard = new Map< string, string >();
+		const event = {
+			clipboardData: {
+				setData: ( type: string, value: string ) =>
+					clipboard.set( type, value ),
+			},
+		} as unknown as ClipboardEvent;
+		setClipboardBlocks(
+			event,
+			registry
+				.select( store )
+				.getMultiSelectedBlocks()
+				.filter( ( block ) => block !== null ),
+			registry
+		);
+		expect(
+			parse( clipboard.get( 'text/html' )! ).map(
+				( block ) => block.attributes.content
+			)
+		).toEqual( [ '1', '4' ] );
+	} );
+
+	it( 'cuts and deletes only selected blocks while respecting locks', () => {
+		const ids = blocks.map( ( block ) => block.clientId );
+		registry.dispatch( store ).multiSelectSet( [ ids[ 0 ], ids[ 2 ] ] );
+		registry
+			.dispatch( store )
+			.removeBlocks(
+				registry.select( store ).getSelectedBlockClientIds(),
+				false
+			);
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			ids[ 1 ],
+			ids[ 3 ],
+			ids[ 4 ],
+		] );
+		registry
+			.dispatch( store )
+			.updateBlockAttributes( ids[ 1 ], { lock: { remove: true } } );
+		registry.dispatch( store ).multiSelectSet( [ ids[ 1 ], ids[ 4 ] ] );
+		registry
+			.dispatch( store )
+			.removeBlocks(
+				registry.select( store ).getSelectedBlockClientIds(),
+				false
+			);
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			ids[ 1 ],
+			ids[ 3 ],
+			ids[ 4 ],
+		] );
 	} );
 } );

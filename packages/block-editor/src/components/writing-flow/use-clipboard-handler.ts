@@ -14,6 +14,7 @@ import {
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
@@ -47,6 +48,8 @@ function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
 }
 
 export default function useClipboardHandler() {
+	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
+	const { pasteBlocksAfter } = unlock( useDispatch( blockEditorStore ) );
 	const registry = useRegistry();
 	const {
 		getBlocksByClientId,
@@ -306,6 +309,11 @@ export default function useClipboardHandler() {
 				}
 
 				if ( isFullySelected ) {
+					if ( ! areBlocksContiguous( selectedBlockClientIds ) ) {
+						event.preventDefault();
+						pasteBlocksAfter( blocks, selectedBlockClientIds );
+						return;
+					}
 					replaceBlocks(
 						selectedBlockClientIds,
 						blocks,

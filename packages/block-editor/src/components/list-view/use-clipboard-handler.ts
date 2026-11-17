@@ -1,6 +1,7 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
@@ -28,6 +29,8 @@ export default function useClipboardHandler( {
 	const { flashBlock, removeBlocks, replaceBlocks, insertBlocks } =
 		useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
+	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
+	const { pasteBlocksAfter } = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect( ( node: HTMLElement ) => {
 		function updateFocusAndSelection(
@@ -66,7 +69,7 @@ export default function useClipboardHandler( {
 			};
 		}
 
-		function handler( event: ClipboardEvent ) {
+		async function handler( event: ClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was possibly already handled in rich-text/use-paste-handler.js.
 				return;
@@ -158,6 +161,17 @@ export default function useClipboardHandler( {
 					// The setting is a boolean.
 					canUserUseUnfilteredHTML as boolean | undefined
 				);
+				if ( ! areBlocksContiguous( selectedBlockClientIds ) ) {
+					const insertedIds = await pasteBlocksAfter(
+						blocks,
+						selectedBlockClientIds,
+						null
+					);
+					if ( insertedIds?.length ) {
+						updateFocusAndSelection( insertedIds[ 0 ], false );
+					}
+					return;
+				}
 
 				if ( selectedBlockClientIds.length === 1 ) {
 					const [ selectedBlockClientId ] = selectedBlockClientIds;
