@@ -1924,15 +1924,15 @@ export function preferences(
 					let id = blockName;
 					// If a block variation match is found change the name to be the same with the
 					// one that is used for block variations in the Inserter (`getItemFromVariation`).
+					const { getActiveBlockVariation, getBlockVariations } =
+						select( blocksStore );
 					const match =
-						select( blocksStore ).getActiveBlockVariation(
-							blockName,
-							attributes
-						) ??
-						select( blocksStore ).getActiveBlockVariation(
-							blockName,
-							attributes,
-							'block'
+						getActiveBlockVariation( blockName, attributes ) ??
+						// The Inserter lists an `inserter` scoped default variation instead of the block itself.
+						getBlockVariations( blockName, 'inserter' )?.find(
+							( variation ) =>
+								variation.isDefault &&
+								! Object.hasOwn( variation, 'isActive' )
 						);
 					if ( match?.name ) {
 						id += '/' + match.name;

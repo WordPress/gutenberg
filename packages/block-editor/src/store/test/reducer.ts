@@ -3661,7 +3661,25 @@ describe( 'state', () => {
 			} );
 			const blockWithDefaultVariation =
 				'core/test-block-with-default-variation';
+			const blockWithBlockScopedDefault =
+				'core/test-block-with-block-scoped-default';
 			beforeAll( () => {
+				registerBlockType(
+					blockWithBlockScopedDefault,
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						title: 'Block scoped default',
+						variations: [
+							partial< BlockVariation >( {
+								name: 'plain',
+								isDefault: true,
+								scope: [ 'block' ],
+							} ),
+						],
+					} )
+				);
 				registerBlockType(
 					blockWithDefaultVariation,
 					partial< BlockConfiguration >( {
@@ -3674,7 +3692,7 @@ describe( 'state', () => {
 							partial< BlockVariation >( {
 								name: 'plain',
 								isDefault: true,
-								scope: [ 'block', 'inserter' ],
+								scope: [ 'inserter' ],
 							} ),
 							partial< BlockVariation >( {
 								name: 'orange',
@@ -3688,6 +3706,7 @@ describe( 'state', () => {
 			afterAll( () => {
 				unregisterBlockType( blockWithVariations );
 				unregisterBlockType( blockWithDefaultVariation );
+				unregisterBlockType( blockWithBlockScopedDefault );
 			} );
 			it( 'should record the default variation for blocks matching no other variation', () => {
 				const state = preferences( deepFreeze( { insertUsage: {} } ), {
@@ -3696,7 +3715,6 @@ describe( 'state', () => {
 						partial< Block >( {
 							clientId: 'plain',
 							name: blockWithDefaultVariation,
-							attributes: { fruit: 'plain' },
 						} ),
 					],
 					time: 123456,
@@ -3705,6 +3723,27 @@ describe( 'state', () => {
 				expect( state ).toEqual( {
 					insertUsage: {
 						[ `${ blockWithDefaultVariation }/plain` ]: {
+							time: 123456,
+							count: 1,
+						},
+					},
+				} );
+			} );
+			it( 'should not record a block scoped default variation', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						partial< Block >( {
+							clientId: 'columns',
+							name: blockWithBlockScopedDefault,
+						} ),
+					],
+					time: 123456,
+				} );
+
+				expect( state ).toEqual( {
+					insertUsage: {
+						[ blockWithBlockScopedDefault ]: {
 							time: 123456,
 							count: 1,
 						},

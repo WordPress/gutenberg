@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Inserter: Count inserts of a block's default variation, such as Group, in the "Most used" ranking ([#86928](https://github.com/WordPress/gutenberg/pull/86928)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
