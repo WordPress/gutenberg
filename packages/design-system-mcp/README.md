@@ -35,9 +35,9 @@ codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-a
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
 
-### Other (Claude Desktop, VS Code)
+### Other clients
 
-Add to your MCP client configuration (`mcp.json` or equivalent):
+Most clients accept the same `mcpServers` configuration:
 
 ```json
 {
@@ -55,11 +55,17 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 }
 ```
 
-Configuration instructions for common clients:
+Where it goes, and what changes for each client:
 
-- [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
-- [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
-    - This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
+| Client | Where | What changes |
+| --- | --- | --- |
+| [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server) | `claude_desktop_config.json` (Settings, Developer, Edit Config) | Nothing. Restart the app. The guide is for the "filesystem" server, so substitute the entry above. |
+| [VS Code](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file) | `.vscode/mcp.json` | Use `servers` instead of `mcpServers`. |
+| [JetBrains](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html) | Settings, Tools, AI Assistant, Model Context Protocol (MCP), Add | Paste it into the JSON configuration field. |
+| [Gemini CLI](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md) | `~/.gemini/settings.json` | Nothing. |
+| [Zed](https://zed.dev/docs/ai/mcp) | `settings.json` | Use `context_servers` instead of `mcpServers`. |
+| [OpenCode](https://opencode.ai/docs/mcp-servers/) | `opencode.json` | Use `mcp.servers`, add `"type": "local"`, and join `command` and `args` into one `command` array. |
+| Raycast | The "Install Server" command | Paste only the server entry, the object holding `command` and `args`. |
 
 ## Importing the package
 
