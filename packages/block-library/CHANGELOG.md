@@ -41,6 +41,7 @@
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
 -   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
+-   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
 
 ## 12.1.0 (2026-11-04)
 
@@ -112,7 +113,6 @@
 -   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
 -   Navigation Link: Apply the "Open in new tab" setting from the link popover. Clicking Apply dropped the change, so the setting could only be changed from the block settings sidebar. The Submenu block had the same problem ([#83506](https://github.com/WordPress/gutenberg/pull/83506)).
--   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
 
 ## 11.2.0 (2026-10-07)
 
