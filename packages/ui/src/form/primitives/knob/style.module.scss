@@ -1,0 +1,80 @@
+@use "../../../utils/css/mixins";
+
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			position: relative;
+			display: inline-block;
+			inline-size: var(--wpds-dimension-size-lg);
+			aspect-ratio: 1;
+			flex: none;
+			border-radius: 50%;
+			vertical-align: middle;
+
+			@media (pointer: coarse) {
+				inline-size: calc(var(--wpds-dimension-size-lg) + var(--wpds-dimension-gap-sm));
+			}
+
+			&:has(input:focus-visible) {
+				@include mixins.focus-ring();
+			}
+		}
+
+		.thumb {
+			display: grid;
+			place-items: center;
+			inline-size: 100%;
+			block-size: 100%;
+			user-select: none;
+			fill: var(--wpds-color-background-thumb-brand);
+			stroke: var(--wpds-color-stroke-interactive-neutral);
+			stroke-width: var(--wpds-border-width-xs);
+
+			&:has(input:enabled) {
+				touch-action: none;
+				cursor: grab;
+
+				&:active {
+					cursor: grabbing;
+				}
+			}
+
+			svg {
+				display: block;
+				inline-size: var(--wpds-dimension-size-md);
+				block-size: var(--wpds-dimension-size-md);
+			}
+
+			/* Pointer positions belong to the dial. The range handles keyboard and AT input. */
+			input,
+			svg {
+				pointer-events: none;
+			}
+
+			@media (forced-colors: none) {
+				&:has(input:enabled):is(:hover, :active) {
+					fill: var(--wpds-color-background-thumb-brand-active);
+					stroke: var(--wpds-color-stroke-interactive-neutral-active);
+				}
+
+				&:has(input:disabled) {
+					fill: var(--wpds-color-background-thumb-brand-disabled);
+					stroke: var(--wpds-color-stroke-interactive-neutral-disabled);
+				}
+			}
+
+			@media (forced-colors: active) {
+				forced-color-adjust: none;
+				fill: Highlight;
+				stroke: ButtonText;
+
+				&:has(input:disabled) {
+					stroke: GrayText;
+					fill: GrayText;
+				}
+			}
+		}
+	}
+}
