@@ -190,6 +190,7 @@ const getQuickActionsCommands = () =>
 			getBlocksByClientId,
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
+			canDuplicateBlocks,
 		} = unlock( useSelect( blockEditorStore ) );
 		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
@@ -246,13 +247,7 @@ const getQuickActionsCommands = () =>
 			getDefaultBlockName()!,
 			rootClientId
 		);
-		const canDuplicate = blocks.every( ( block: Block | null ) => {
-			return (
-				!! block &&
-				hasBlockSupport( block.name, 'multiple', true ) &&
-				canInsertBlockType( block.name, rootClientId )
-			);
-		} );
+		const canDuplicate = canDuplicateBlocks( clientIds );
 		const canRemove = canRemoveBlocks( clientIds );
 
 		const commands = [];

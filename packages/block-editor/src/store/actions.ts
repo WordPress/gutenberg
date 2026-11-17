@@ -6,7 +6,6 @@ import {
 	doBlocksMatchTemplate,
 	getBlockType,
 	getDefaultBlockName,
-	hasBlockSupport,
 	switchToBlockType,
 	synchronizeBlocksWithTemplate,
 	getBlockSupport,
@@ -2015,49 +2014,59 @@ export function setBlockMovingClientId() {
  */
 export const duplicateBlocks =
 	( clientIds: string[], updateSelection: boolean = true ) =>
-	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		if ( ! clientIds || ! clientIds.length ) {
+	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		if ( ! clientIds?.length || ! select.canDuplicateBlocks( clientIds ) ) {
 			return;
 		}
-
-		// Return early if blocks don't exist.
-		const blocks = select.getBlocksByClientId( clientIds );
-		if ( blocks.some( ( block ) => ! block ) ) {
-			return;
-		}
-
-		// Return early if blocks don't support multiple usage.
-		const blockNames = blocks.map( ( block ) => block!.name );
-		if (
-			blockNames.some(
-				( blockName ) =>
-					! hasBlockSupport( blockName, 'multiple', true )
-			)
-		) {
-			return;
-		}
-
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const clientIdsArray = castArray( clientIds );
-		const lastSelectedIndex = select.getBlockIndex(
-			clientIdsArray[ clientIdsArray.length - 1 ]
-		);
-		const clonedBlocks = blocks.map( ( block ) =>
-			cloneSanitizedBlock( block! )
-		);
-		dispatch.insertBlocks(
-			clonedBlocks,
-			lastSelectedIndex + 1,
-			rootClientId,
-			updateSelection
-		);
-		if ( clonedBlocks.length > 1 && updateSelection ) {
-			dispatch.multiSelect(
-				clonedBlocks[ 0 ].clientId,
-				clonedBlocks[ clonedBlocks.length - 1 ].clientId
+		const members = new Set( clientIds );
+		const ordered = select
+			.getClientIdsWithDescendants()
+			.filter(
+				( id ) =>
+					members.has( id ) &&
+					! select
+						.getBlockParents( id )
+						.some( ( parent ) => members.has( parent ) )
 			);
+		const runs: {
+			parent: string | null;
+			index: number;
+			blocks: Block[];
+		}[] = [];
+		for ( const id of ordered ) {
+			const parent = select.getBlockRootClientId( id );
+			const index = select.getBlockIndex( id );
+			const clone = cloneSanitizedBlock( select.getBlock( id )! );
+			const previous = runs[ runs.length - 1 ];
+			if (
+				previous &&
+				previous.parent === parent &&
+				previous.index === index
+			) {
+				previous.blocks.push( clone );
+				previous.index++;
+			} else {
+				runs.push( { parent, index: index + 1, blocks: [ clone ] } );
+			}
 		}
-		return clonedBlocks.map( ( block ) => block.clientId );
+		const clonedIds = runs.flatMap( ( run ) =>
+			run.blocks.map( ( block ) => block.clientId )
+		);
+		registry.batch( () => {
+			// Later runs are inserted first so earlier insertion indices stay valid.
+			for ( const run of [ ...runs ].reverse() ) {
+				dispatch.insertBlocks(
+					run.blocks,
+					run.index,
+					run.parent,
+					runs.length === 1 && updateSelection
+				);
+			}
+			if ( updateSelection && clonedIds.length > 1 ) {
+				dispatch.multiSelectSet( clonedIds );
+			}
+		} );
+		return clonedIds;
 	};
 
 /**

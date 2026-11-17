@@ -22,7 +22,8 @@ export default function BlockActions( {
 				getBlocksByClientId,
 				getDirectInsertBlock,
 				canRemoveBlocks,
-			} = select( blockEditorStore );
+				canDuplicateBlocks,
+			} = unlock( select( blockEditorStore ) );
 
 			// The blocks to act on exist.
 			const blocks = getBlocksByClientId( clientIds ) as Block[];
@@ -50,13 +51,7 @@ export default function BlockActions( {
 							hasBlockSupport( block.name, 'typography' ) )
 					);
 				} ),
-				canDuplicate: blocks.every( ( block ) => {
-					return (
-						!! block &&
-						hasBlockSupport( block.name, 'multiple', true ) &&
-						canInsertBlockType( block.name, rootClientId )
-					);
-				} ),
+				canDuplicate: canDuplicateBlocks( clientIds ),
 			};
 		},
 		[ clientIds, getDefaultBlockName ]

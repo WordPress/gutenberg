@@ -99,7 +99,6 @@ function ListViewBlock( {
 	);
 
 	const {
-		canInsertBlockType,
 		getSelectedBlockClientIds,
 		getPreviousBlockClientId,
 		getBlockRootClientId,
@@ -113,6 +112,7 @@ function ListViewBlock( {
 		isGroupable,
 	} = useSelect( blockEditorStore );
 	const { getGroupingBlockName } = useSelect( blocksStore );
+	const { canDuplicateBlocks } = unlock( useSelect( blockEditorStore ) );
 
 	const pasteStyles = usePasteStyles();
 
@@ -282,25 +282,8 @@ function ListViewBlock( {
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			event.preventDefault();
 
-			const { blocksToUpdate, firstBlockRootClientId } =
-				getBlocksToUpdate();
-
-			const canDuplicate = getBlocksByClientId( blocksToUpdate ).every(
-				( blockToUpdate ) => {
-					return (
-						!! blockToUpdate &&
-						hasBlockSupport(
-							blockToUpdate.name,
-							'multiple',
-							true
-						) &&
-						canInsertBlockType(
-							blockToUpdate.name,
-							firstBlockRootClientId
-						)
-					);
-				}
-			);
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const canDuplicate = canDuplicateBlocks( blocksToUpdate );
 
 			if ( canDuplicate ) {
 				const updatedBlocks = await duplicateBlocks(

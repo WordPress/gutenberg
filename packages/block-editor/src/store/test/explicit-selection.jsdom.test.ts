@@ -223,4 +223,67 @@ describe( 'explicit block selection', () => {
 			true
 		);
 	} );
+
+	it( 'duplicates each selected run after itself within its original parent', async () => {
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 3 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		for ( const parent of parents ) {
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parent.clientId, {} );
+		}
+		const ids = blocks.map( ( block ) => block.clientId );
+		registry
+			.dispatch( store )
+			.multiSelectSet( [ ids[ 0 ], ids[ 2 ], ids[ 3 ], ids[ 4 ] ] );
+		const notifications: string[][] = [];
+		const unsubscribe = registry.subscribe( () => {
+			notifications.push(
+				registry.select( store ).getClientIdsWithDescendants()
+			);
+		}, store );
+		const clones = ( await registry
+			.dispatch( store )
+			.duplicateBlocks(
+				registry.select( store ).getSelectedBlockClientIds()
+			) )!;
+		unsubscribe();
+		expect(
+			registry.select( store ).getBlockOrder( parents[ 0 ].clientId )
+		).toEqual( [ ids[ 0 ], clones[ 0 ], ids[ 1 ], ids[ 2 ], clones[ 1 ] ] );
+		expect(
+			registry.select( store ).getBlockOrder( parents[ 1 ].clientId )
+		).toEqual( [ ids[ 3 ], ids[ 4 ], clones[ 2 ], clones[ 3 ] ] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			clones
+		);
+		// Providers receive the complete mutation once, not one history entry per run.
+		expect( notifications ).toHaveLength( 1 );
+	} );
+
+	it( 'leaves content unchanged when a duplication destination rejects insertion', async () => {
+		const parents = blocks
+			.slice( 0, 2 )
+			.map( ( block ) =>
+				createBlock( 'core/test-selection', {}, [ block ] )
+			);
+		registry.dispatch( store ).resetBlocks( parents );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( parents[ 0 ].clientId, {} );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( parents[ 1 ].clientId, {
+				allowedBlocks: [],
+			} );
+		const before = registry.select( store ).getBlocks();
+		const ids = blocks.slice( 0, 2 ).map( ( block ) => block.clientId );
+		expect(
+			await registry.dispatch( store ).duplicateBlocks( ids )
+		).toBeUndefined();
+		expect( registry.select( store ).getBlocks() ).toBe( before );
+	} );
 } );

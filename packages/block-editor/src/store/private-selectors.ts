@@ -18,6 +18,7 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getBlock,
 	getSelectedBlockClientIds,
 } from './selectors';
 import {
@@ -62,6 +63,31 @@ export { areBlocksContiguous } from './utils';
  */
 export function isSelectionContiguous( state: State ) {
 	return areBlocksContiguous( state, getSelectedBlockClientIds( state ) );
+}
+
+/**
+ * Checks duplication against each block's own insertion destination.
+ *
+ * @param state     Editor state.
+ * @param clientIds Target block IDs.
+ * @return Whether every target can be duplicated.
+ */
+export function canDuplicateBlocks( state: State, clientIds: string[] ) {
+	return (
+		clientIds.length > 0 &&
+		clientIds.every( ( id ) => {
+			const block = getBlock( state, id );
+			return (
+				!! block &&
+				hasBlockSupport( block.name, 'multiple', true ) &&
+				canInsertBlockType(
+					state,
+					block.name,
+					getBlockRootClientId( state, id )
+				)
+			);
+		} )
+	);
 }
 
 /**
