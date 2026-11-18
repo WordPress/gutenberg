@@ -643,6 +643,7 @@ jobs:
             # are not installed. Node.js is set up even when the analysis of the strict paths did not
             # complete, so that the results of the other analysis are still reported.
             - name: Use desired version of Node.js
+              id: setup-node
               if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
               uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
@@ -650,7 +651,8 @@ jobs:
                   package-manager-cache: false
 
             - name: Set up npm
-              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
+              id: setup-npm
+              if: ${{ ! cancelled() && steps.setup-node.outcome == 'success' }}
               uses: ./.github/setup-npm
               with:
                   cache: false
@@ -659,13 +661,14 @@ jobs:
             # the pull request did not change and those with no line, such as an out-of-date baseline.
             # Runs even when the analysis of the strict paths did not complete.
             - name: Report the PHPStan results
-              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
+              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' && steps.setup-npm.outcome == 'success' }}
               run: npm run --workspace @wordpress/phpstan-tools report -- "${RUNNER_TEMP}/phpstan-report.json"
 
             # Runs even when the previous step failed because the whole codebase has errors, so that
-            # the errors in the strict paths are reported too.
+            # the errors in the strict paths are reported too, but not when Node.js or npm could not be
+            # set up, which would only fail again with an unrelated error.
             - name: Report the PHPStan results for the strict paths
-              if: ${{ ! cancelled() && steps.phpstan-strict.outcome == 'success' }}
+              if: ${{ ! cancelled() && steps.phpstan-strict.outcome == 'success' && steps.setup-npm.outcome == 'success' }}
               run: npm run --workspace @wordpress/phpstan-tools report -- --strict "${RUNNER_TEMP}/phpstan-strict-report.json"
 
             - name: Ensure version-controlled files are not modified during the tests
