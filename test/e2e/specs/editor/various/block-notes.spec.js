@@ -1748,6 +1748,62 @@ test.describe( 'Block Notes', () => {
 			).toBeVisible();
 		} );
 
+		test( 'adds a block-level note when the selected text is bound to a source', async ( {
+			editor,
+			page,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			await requestUtils.activatePlugin(
+				'gutenberg-test-block-bindings'
+			);
+			try {
+				await page.evaluate( () =>
+					window.wp.data.dispatch( 'core/editor' ).editPost( {
+						meta: { text_custom_field: 'Hello brave new world.' },
+					} )
+				);
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Fallback',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'core/post-meta',
+									args: { key: 'text_custom_field' },
+								},
+							},
+						},
+					},
+				} );
+				const paragraph = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraph ).toHaveText(
+					'Hello brave new world.'
+				);
+
+				await paragraph.click();
+				await blockNoteUtils.selectBlockText( { start: 6, length: 5 } );
+				await blockNoteUtils.addNote( 'Bound text note' );
+
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Fallback',
+							metadata: { noteId: [ expect.any( Number ) ] },
+						},
+					},
+				] );
+			} finally {
+				await requestUtils.deactivatePlugin(
+					'gutenberg-test-block-bindings'
+				);
+			}
+		} );
+
 		test( 'highlights the drafted text and anchors the note to it across a block switch', async ( {
 			editor,
 			page,
@@ -3165,6 +3221,37 @@ test.describe( 'Block Notes', () => {
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'false' );
 			await image.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
+		test( 'tints an embed without a caption between the noted text', async ( {
+			editor,
+			requestUtils,
+			blockNoteUtils,
+		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			await editor.insertBlock( { name: 'core/embed' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'abcdef' },
+			} );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await paragraphs.last().click();
+			await blockNoteUtils.selectBlockText( { start: 3, length: 0 } );
+			await paragraphs
+				.first()
+				.click( { modifiers: [ 'Shift' ], position: { x: 1, y: 5 } } );
+			await blockNoteUtils.addNote( 'Note around an embed' );
+
+			await blockNoteUtils.deselect();
+			await expect(
+				editor.canvas.getByRole( 'document', { name: 'Block: Embed' } )
+			).toHaveCSS( 'background-color', tint, { pseudo: 'after' } );
 		} );
 	} );
 } );

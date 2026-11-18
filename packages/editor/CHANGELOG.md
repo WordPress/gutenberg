@@ -11,7 +11,9 @@
 
 ### Bug Fixes
 
--   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+-   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
+-   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Editor canvas: Remove the padding around the canvas when editing a template from the post editor, since the canvas can't be resized ([#86436](https://github.com/WordPress/gutenberg/pull/86436)).
@@ -23,6 +25,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
 
 ### Internal
 
