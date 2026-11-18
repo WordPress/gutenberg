@@ -152,6 +152,9 @@ test.describe( 'Router navigate', () => {
 		await expect( navigations ).toHaveText( '2' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
+		// Wait until both requests are held by the route handler, so the next
+		// `pop()` releases the request of the latest navigation.
+		await expect.poll( () => resolvers.length ).toBe( 2 );
 
 		resolvers.pop()!();
 

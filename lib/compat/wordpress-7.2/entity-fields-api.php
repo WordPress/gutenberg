@@ -117,14 +117,20 @@ if ( ! function_exists( 'wp_get_registered_entity_fields' ) ) {
 
 if ( ! function_exists( 'wp_get_registered_entity_field_modules' ) ) {
 	/**
-	 * Returns the ids of the script modules registered for the given entity.
+	 * Returns the script modules registered for the given entity.
 	 *
 	 * @param string $kind The entity kind (e.g. `postType`).
 	 * @param string $name The entity name (e.g. `page`).
-	 * @return array<string, string[]> The ids of the fields each module applies
-	 *                                 to, keyed by module id, in registration
-	 *                                 order. Empty until the `init` action has
-	 *                                 completed: a read before then is refused.
+	 * @return array[] {
+	 *     The script modules, in registration order. Empty until the `init`
+	 *     action has completed: a read before then is refused.
+	 *
+	 *     @type array ...$0 {
+	 *         @type string   $id     The id of the script module.
+	 *         @type string[] $fields The ids of the fields the module applies
+	 *                                to, in registration order.
+	 *     }
+	 * }
 	 */
 	function wp_get_registered_entity_field_modules( $kind, $name ) {
 		return WP_Entity_Fields_Registry::get_instance()->get_registered_field_modules( $kind, $name );
@@ -150,25 +156,11 @@ if ( ! function_exists( 'wp_get_all_registered_entity_field_modules' ) ) {
 if ( ! function_exists( '_wp_add_entity_field_modules_to_editor_script' ) ) {
 	/**
 	 * Declares the script modules of the entity fields as dependencies of the
-	 * editor script.
+	 * editor script, see _wp_add_entity_modules_to_editor_script().
 	 *
-	 * The editor imports the script modules of an entity on demand, with a dynamic
-	 * `import()` the browser resolves through the import map of the page. Listing
-	 * the modules as dynamic `module_dependencies` of the `wp-editor` script adds
-	 * them to the import map of every page that loads the editor script: the post
-	 * editor, the site editor, and the pages booted by `@wordpress/boot`, whose
-	 * prerequisites depend on it. A dynamic dependency is only listed in the
-	 * import map; the module is fetched when it is imported.
-	 *
-	 * Reading the registry fires `wp_entity_fields_api_init`, so the fields and their
-	 * script modules are registered on demand. It only reads the registry on the
-	 * pages that load the editor script, not on every admin request (heartbeat,
-	 * Ajax, other screens). It runs on `admin_footer`, the last action before the
-	 * import map is printed that fires both in the admin template and in the pages
-	 * rendered outside it, which print the import map themselves. By then `init`
-	 * has completed, so the supports the default fields derive from are final.
-	 * The registry only accepts registrations while the action fires, so the
-	 * modules declared here are the modules of every field the page can show.
+	 * The fields are loaded by the editor package, see
+	 * packages/editor/src/dataviews/store/private-resolvers.ts, which means any
+	 * screen that wants to use this mechanism needs to load the editor script.
 	 *
 	 * When called by the `admin_footer` action, `$scripts` is the hook suffix of
 	 * the page and the global registry is used. In other scenarios (tests), the
@@ -177,49 +169,7 @@ if ( ! function_exists( '_wp_add_entity_field_modules_to_editor_script' ) ) {
 	 * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
 	 */
 	function _wp_add_entity_field_modules_to_editor_script( $scripts = null ) {
-		if ( ! $scripts instanceof WP_Scripts ) {
-			$scripts = wp_scripts();
-		}
-
-		// The fields are loaded in packages/editor/src/dataviews/store/private-resolvers.ts
-		// which means any screen that wants to use this mechanism needs to load the editor script.
-		if ( ! $scripts->query( 'wp-editor', 'enqueued' ) && ! $scripts->query( 'wp-editor', 'done' ) ) {
-			return;
-		}
-
-		$kinds = wp_get_all_registered_entity_field_modules();
-		if ( empty( $kinds ) ) {
-			return;
-		}
-
-		$dependencies = $scripts->get_data( 'wp-editor', 'module_dependencies' );
-		$dependencies = is_array( $dependencies ) ? $dependencies : array();
-
-		$declared = array();
-		foreach ( $dependencies as $dependency ) {
-			$declared[] = is_array( $dependency ) ? $dependency['id'] : $dependency;
-		}
-
-		$added = false;
-		foreach ( $kinds as $entities ) {
-			foreach ( $entities as $modules ) {
-				foreach ( $modules as $module ) {
-					if ( ! in_array( $module, $declared, true ) ) {
-						$dependencies[] = array(
-							'id'     => $module,
-							'import' => 'dynamic',
-						);
-						$declared[]     = $module;
-						$added          = true;
-					}
-				}
-			}
-		}
-
-		if ( $added ) {
-			// `add_data()` replaces the value, hence the merge above.
-			$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
-		}
+		_wp_add_entity_modules_to_editor_script( $scripts, 'wp_get_all_registered_entity_field_modules' );
 	}
 	add_action( 'admin_footer', '_wp_add_entity_field_modules_to_editor_script' );
 }
@@ -257,3 +207,26 @@ if ( ! function_exists( 'wp_register_entity_field_collection' ) ) {
 		return WP_Entity_Fields_Registry::get_instance()->register_collection( $directory );
 	}
 }
+
+/**
+ * Preloads the fields of the post types the editors list.
+ *
+ * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
+ * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
+ * reads those of the edited post in the post summary of its inspector. The
+ * site editor reads those of the edited post, if any, and of the post types of
+ * the screen it opens on. A path must match the request of the
+ * `getFieldsConfig` core data resolver, see packages/core-data/src/resolvers.js.
+ *
+ * It replaces `_wp_preload_entity_fields()`, which WordPress versions before
+ * core#14716 ship without the guards of _wp_add_entity_preload_paths().
+ *
+ * @param mixed $paths   REST API paths to preload.
+ * @param mixed $context Optional. Block editor context. Default null.
+ * @return mixed Filtered preload paths. See _wp_add_entity_preload_paths().
+ */
+function _gutenberg_preload_entity_fields( $paths, $context = null ) {
+	return _wp_add_entity_preload_paths( $paths, $context, '/wp/v2/entity-fields' );
+}
+remove_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_fields' );
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );

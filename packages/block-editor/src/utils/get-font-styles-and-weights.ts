@@ -96,9 +96,7 @@ const FONT_WEIGHTS = [
  * @param fontFamilyFaces font family faces array
  * @return new object with combined and separated font style and weight properties
  */
-export function getFontStylesAndWeights(
-	fontFamilyFaces: FontFamilyFace[] | undefined
-) {
+export function getFontStylesAndWeights( fontFamilyFaces?: FontFamilyFace[] ) {
 	let fontStyles: FormattedFont[] = [];
 	let fontWeights: FormattedFont[] = [];
 	const combinedStyleAndWeightOptions: CombinedStyleAndWeightOption[] = [];

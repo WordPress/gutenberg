@@ -16,7 +16,7 @@ import {
 	MenuItem,
 	ToolbarItem,
 	DropdownMenu,
-	Popover,
+	Popover as WCPopover,
 } from '@wordpress/components';
 import {
 	useMergeRefs,
@@ -176,7 +176,7 @@ function ContentOnlyControls( {
 				) }
 			</ToolbarItem>
 			{ isAltDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsAltDialogOpen( false ) }
@@ -215,10 +215,10 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 			{ isTitleDialogOpen && (
-				<Popover
+				<WCPopover
 					placement="bottom-start"
 					anchor={ popoverAnchor }
 					onClose={ () => setIsTitleDialogOpen( false ) }
@@ -253,7 +253,7 @@ function ContentOnlyControls( {
 							}
 						/>
 					</div>
-				</Popover>
+				</WCPopover>
 			) }
 		</>
 	);
@@ -270,6 +270,7 @@ export default function Image( {
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
+	onResetImage,
 	context,
 	clientId,
 	blockEditingMode,
@@ -886,7 +887,7 @@ export default function Image( {
 					onSelectURL={ onSelectURL }
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
-					onReset={ () => onSelectImage( undefined ) }
+					onReset={ onResetImage }
 				/>
 			</BlockControls>
 		</>
@@ -965,7 +966,7 @@ export default function Image( {
 					<ToolsPanel
 						label={ __( 'Media' ) }
 						resetAll={ () => {
-							onSelectImage( undefined );
+							onResetImage();
 							setAttributes( { isDecorative: false } );
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
@@ -974,7 +975,7 @@ export default function Image( {
 							<ToolsPanelItem
 								label={ __( 'Image' ) }
 								hasValue={ () => !! url }
-								onDeselect={ () => onSelectImage( undefined ) }
+								onDeselect={ onResetImage }
 								isShownByDefault
 							>
 								<MediaControl
@@ -991,7 +992,7 @@ export default function Image( {
 									onSelect={ onSelectImage }
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
-									onReset={ () => onSelectImage( undefined ) }
+									onReset={ onResetImage }
 									isUploading={ isUploading }
 									emptyLabel={ __( 'Add image' ) }
 								/>

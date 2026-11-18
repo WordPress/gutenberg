@@ -1,11 +1,11 @@
 import type { ColorGradientControlProps } from '../colors-gradients/types';
 
 /**
- * Props of `ColorPaletteControl`.
+ * Props of `ColorPaletteControl`, which offers no gradients.
  */
 export interface ColorPaletteControlProps extends Omit<
 	ColorGradientControlProps,
-	'onColorChange' | 'colorValue'
+	'onColorChange' | 'colorValue' | 'gradients' | 'disableCustomGradients'
 > {
 	/**
 	 * Called with the selected color.

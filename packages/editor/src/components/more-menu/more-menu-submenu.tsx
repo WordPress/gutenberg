@@ -1,6 +1,8 @@
 import { Children, isValidElement } from '@wordpress/element';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import type { ComponentProps, ReactNode } from 'react';
 import MoreMenuItem from './more-menu-item';
 

@@ -4,11 +4,11 @@ import type { __experimentalUnitControl as UnitControl } from '@wordpress/compon
 type UnitControlProps = ComponentProps< typeof UnitControl >;
 
 /**
- * Props of `LetterSpacingControl`.
+ * Props of `LetterSpacingControl`. The units come from the block settings.
  */
 export interface LetterSpacingControlProps extends Omit<
 	UnitControlProps,
-	'value' | 'onChange' | 'label'
+	'value' | 'onChange' | 'label' | 'units'
 > {
 	/**
 	 * Start opting into the larger default height that will become the

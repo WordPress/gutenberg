@@ -1,11 +1,11 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import FormToggle from '..';
+import FormToggle from '../deprecated';
 
 const meta: Meta< typeof FormToggle > = {
 	component: FormToggle,
 	id: 'components-formtoggle',
-	title: 'Components/@wordpress-components/FormToggle',
+	title: 'Components/@wordpress-components/Deprecated/FormToggle',
 	argTypes: {
 		onChange: {
 			action: 'onChange',
@@ -19,7 +19,7 @@ const meta: Meta< typeof FormToggle > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Use [`Switch`](?path=/docs/design-system-components-form-primitives-switch--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-togglecontrol--migration-guide).',
+			notes: 'Deprecated. Use [`Switch`](?path=/docs/design-system-components-form-primitives-switch--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-togglecontrol--migration-guide).',
 		},
 		// FIXME: Story shows FormToggle without a visible label (label).
 		// See: https://github.com/WordPress/gutenberg/issues/81596

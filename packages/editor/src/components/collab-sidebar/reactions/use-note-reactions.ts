@@ -145,7 +145,8 @@ export function useNoteReactions(
 					},
 					{ throwOnError: true }
 				);
-				change = { added: saved.id };
+				// Comments are registered, so saving with `throwOnError` returns the reaction.
+				change = { added: saved!.id as number };
 			}
 
 			const note = getNote();

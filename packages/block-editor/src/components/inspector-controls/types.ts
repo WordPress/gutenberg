@@ -83,5 +83,5 @@ export interface BlockSupportToolsPanelProps {
  * Props of the List View content popover.
  */
 export interface ListViewContentPopoverProps {
-	listViewRef: RefObject< HTMLElement >;
+	listViewRef: RefObject< HTMLElement | null >;
 }

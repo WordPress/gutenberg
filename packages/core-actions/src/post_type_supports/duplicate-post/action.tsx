@@ -82,12 +82,13 @@ const duplicatePost: ActionScriptParts< BasePost > = {
 			} );
 			setIsCreatingPage( true );
 			try {
-				const newItem = await saveEntityRecord(
+				// A registered post type saved with `throwOnError` returns the post.
+				const newItem = ( await saveEntityRecord(
 					'postType',
 					item.type,
 					newItemObject,
 					{ throwOnError: true }
-				);
+				) ) as unknown as BasePost;
 
 				createSuccessNotice(
 					sprintf(

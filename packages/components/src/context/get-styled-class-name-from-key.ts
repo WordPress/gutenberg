@@ -1,3 +1,4 @@
+import { paramCase as kebabCase } from 'change-case';
 import memoize from 'memize';
 
 /**
@@ -7,12 +8,7 @@ import memoize from 'memize';
  * @return The generated CSS className.
  */
 function getStyledClassName( namespace: string ): string {
-	const kebab = namespace
-		.replace( /([a-z0-9])([A-Z])/g, '$1-$2' )
-		.replace( /([A-Z])([A-Z][a-z])/g, '$1-$2' )
-		.replace( /[^A-Z0-9]+/gi, '-' )
-		.replace( /^-|-$/g, '' )
-		.toLowerCase();
+	const kebab = kebabCase( namespace );
 	return `components-${ kebab }`;
 }
 

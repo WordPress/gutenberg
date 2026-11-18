@@ -13,14 +13,13 @@
 	},
 	"files": [ "global.d.ts" ],
 	"include": [
-		"*-plugins/test/**/*",
 		"src/**/stories/**/*",
 		"src/**/test/**/*",
 		"src/**/*.story.*"
 	],
 	"references": [
 		{ "path": "./tsconfig.build.json" },
-		{ "path": "./tsconfig.plugins.json" },
+		{ "path": "./tsconfig.prebuilt.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" }
 	]

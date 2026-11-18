@@ -47,6 +47,15 @@ export type SelectControlProps = Omit<
 		className?: string;
 		/**
 		 * The array of option items to render in the select.
+		 *
+		 * Use a non-empty string `value` for an ordinary choice. To
+		 * provide an option that clears the selection, use `value: null`.
+		 *
+		 * Empty string values are treated as empty selections by default.
+		 * To preserve an empty string in application state, provide
+		 * `itemToStringValue` that returns a unique, non-empty string.
+		 * This changes the submitted form value, but not the item passed
+		 * to `onValueChange`.
 		 */
 		items?: SelectItem[];
 		/**
@@ -57,9 +66,9 @@ export type SelectControlProps = Omit<
 		 * - `'anchor'`: Fixed width matching the anchor width.
 		 * - `'content'`: Width grows with item labels between the anchor and available
 		 *   viewport bounds.
-		 * - `'sm'`: Fixed width at the small surface width token (`--wpds-dimension-surface-width-sm`).
-		 * - `'md'`: Fixed width at the medium surface width token (`--wpds-dimension-surface-width-md`).
-		 * - `'lg'`: Fixed width at the large surface width token (`--wpds-dimension-surface-width-lg`).
+		 * - `'sm'`: Width grows with content up to the small surface width token (`--wpds-dimension-surface-width-sm`).
+		 * - `'md'`: Width grows with content up to the medium surface width token (`--wpds-dimension-surface-width-md`).
+		 * - `'lg'`: Width grows with content up to the large surface width token (`--wpds-dimension-surface-width-lg`).
 		 * - `'available'`: Fixed width at the available viewport width (`--available-width`).
 		 *
 		 * @default 'content'

@@ -4,11 +4,11 @@ import type { __experimentalUnitControl as UnitControl } from '@wordpress/compon
 type UnitControlProps = ComponentProps< typeof UnitControl >;
 
 /**
- * Props of `TextIndentControl`.
+ * Props of `TextIndentControl`. The units come from the block settings.
  */
 export interface TextIndentControlProps extends Omit<
 	UnitControlProps,
-	'value' | 'onChange' | 'label'
+	'value' | 'onChange' | 'label' | 'units'
 > {
 	/**
 	 * Currently selected text indent.

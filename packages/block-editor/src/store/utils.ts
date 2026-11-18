@@ -19,16 +19,16 @@ import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-ta
 import type {
 	BlockAttributes,
 	BlockPattern,
+	ParsedBlockPattern,
 	State,
 	UserPattern,
 	UserPatternCategory,
 } from './types';
 
-type ParsedPattern = BlockPattern & { blocks: Block[] };
 type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
-const parsedPatternCache = new WeakMap< BlockPattern, ParsedPattern >();
+const parsedPatternCache = new WeakMap< BlockPattern, ParsedBlockPattern >();
 const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 
 /**
@@ -63,7 +63,7 @@ export function mapUserPattern(
 	};
 }
 
-function parsePattern( pattern: BlockPattern ): ParsedPattern {
+function parsePattern( pattern: BlockPattern ): ParsedBlockPattern {
 	const blocks = parse( pattern.content, {
 		__unstableSkipMigrationLogs: true,
 	} );
@@ -164,8 +164,6 @@ export const getAllPatternsDependants =
 			state.settings.__experimentalReusableBlocks,
 			state.settings[ selectBlockPatternsKey ]?.( select ),
 			state.settings[ currentUserIdSelectKey ]?.( select ),
-			// @ts-expect-error The store has no `blockPatterns`, so this is always undefined.
-			state.blockPatterns,
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 		];
 	};

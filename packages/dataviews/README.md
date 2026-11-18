@@ -1086,6 +1086,10 @@ The unique identifier of the action.
 
 The user facing description of the action.
 
+Provide a translated label without an ellipsis. DataViews adds a translated ellipsis when an action with `RenderModal` is displayed in a menu. Buttons and default modal headings use the label without this added punctuation. Callback actions use the label unchanged in menus.
+
+For compatibility, DataViews recognizes common trailing ellipses in existing labels: `…`, `⋯`, and runs of three or more periods, ideographic full stops, or fullwidth full stops, including repeated ellipses and surrounding whitespace. It preserves these labels in menus without adding another ellipsis and removes the recognized suffix from buttons. This is a best-effort fallback, not a complete parser for every language. Migrate existing labels to text without an ellipsis rather than relying on this detection. Default modal headings still use the supplied label unchanged.
+
 -   Type: `string | function`
 -   Required
 -   Example:
@@ -1150,11 +1154,11 @@ Whether the action is disabled.
 
 ### `context`
 
-Where this action would be visible.
+The context the action is limited to: `list` for the lists of items. Without it, the action shows everywhere. DataViews does not filter the actions by context: the consumer does, before passing them.
 
 -   Type: `string`
 -   Optional
--   One of: `list`, `single`
+-   One of: `list`
 
 ### `callback`
 
@@ -2249,7 +2253,7 @@ For example:
 -   `type`: `panel`. Required.
 -   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
 -   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
--   `showPlaceholderIfEmpty`: boolean. Optional. `false` by default. Whether the summary shows the field's `placeholder` instead of its `render` output when the field's value is `undefined`, `null`, or an empty string.
+-   `showPlaceholderIfEmpty`: boolean. Optional. `false` by default. Whether the summary shows the field's `placeholder` instead of its `render` output when the field's value is `undefined`, `null`, or an empty string, or when the `render` output is empty, like for an id matching no record.
 -   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)

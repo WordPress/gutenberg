@@ -1,5 +1,5 @@
 import { colord } from 'colord';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import type { RefObject } from 'react';
 import type { RichTextRecord } from './types';
 
@@ -9,10 +9,11 @@ import type { RichTextRecord } from './types';
  */
 export function useBoundaryStyle( {
 	record,
+	ref,
 }: {
 	record: RefObject< RichTextRecord >;
+	ref: RefObject< HTMLElement | undefined >;
 } ) {
-	const ref = useRef< HTMLElement >( undefined );
 	const { activeFormats = [], replacements, start } = record.current;
 	const activeReplacement =
 		start === undefined ? undefined : replacements[ start ];
@@ -58,6 +59,5 @@ export function useBoundaryStyle( {
 		if ( globalStyle.innerHTML !== style ) {
 			globalStyle.innerHTML = style;
 		}
-	}, [ activeFormats, activeReplacement ] );
-	return ref;
+	}, [ ref, activeFormats, activeReplacement ] );
 }

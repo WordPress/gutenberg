@@ -1,7 +1,6 @@
 import { Navigator, useNavigator } from '@wordpress/components';
 import { getBlockTypes, store as blocksStore } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error: Not typed yet.
 import { BlockEditorProvider } from '@wordpress/block-editor';
 import { useMemo, useEffect, Fragment } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
