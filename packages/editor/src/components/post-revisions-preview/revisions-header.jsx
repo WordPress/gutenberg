@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -12,6 +13,55 @@ import { store as editorStore } from '../../store';
 import { sidebars } from '../sidebar/constants';
 import { unlock } from '../../lock-unlock';
 
+// Matches `POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE` in @wordpress/core-data.
+const CRDT_DOCUMENT_META_KEY = '_crdt_document';
+
+/**
+ * Whether restoring a revision would change the saved post.
+ *
+ * Compares fields rather than revision IDs, because an autosave is the post's
+ * latest revision while it exists.
+ *
+ * @param {?Object} revision The revision being previewed.
+ * @param {Object}  post     The saved post, with raw attribute values.
+ * @return {boolean} Whether restoring the revision would change the post.
+ */
+export function hasChangesToRestore( revision, post ) {
+	if ( ! revision ) {
+		return false;
+	}
+
+	if ( revision.content?.raw !== post.content ) {
+		return true;
+	}
+
+	if (
+		revision.title?.raw !== undefined &&
+		revision.title.raw !== post.title
+	) {
+		return true;
+	}
+
+	if (
+		revision.excerpt?.raw !== undefined &&
+		revision.excerpt.raw !== post.excerpt
+	) {
+		return true;
+	}
+
+	// Compare the keys the revision carries. The collaborative editing document
+	// is not revisioned and comes back empty on every revision, so it is skipped.
+	if ( revision.meta ) {
+		return Object.keys( revision.meta ).some(
+			( key ) =>
+				key !== CRDT_DOCUMENT_META_KEY &&
+				! fastDeepEqual( revision.meta[ key ], post.meta?.[ key ] )
+		);
+	}
+
+	return false;
+}
+
 /**
  * Header component for revisions preview mode.
  *
@@ -25,13 +75,29 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 		currentRevisionId,
 		isViewingBrowserBackup,
 		browserBackupDate,
+		canRestore,
 		sidebarIsOpened,
 	} = useSelect( ( select ) => {
 		const editor = unlock( select( editorStore ) );
+		const { getCurrentPostAttribute, isEditedPostDirty } =
+			select( editorStore );
+		const revisionId = editor.getCurrentRevisionId();
+		const viewingBackup = editor.isViewingBrowserBackup();
 		return {
-			currentRevisionId: editor.getCurrentRevisionId(),
-			isViewingBrowserBackup: editor.isViewingBrowserBackup(),
+			currentRevisionId: revisionId,
+			isViewingBrowserBackup: viewingBackup,
 			browserBackupDate: editor.getBrowserBackup()?.date,
+			canRestore:
+				viewingBackup ||
+				( !! revisionId &&
+					// Restoring replaces unsaved edits too.
+					( isEditedPostDirty() ||
+						hasChangesToRestore( editor.getCurrentRevision(), {
+							content: getCurrentPostAttribute( 'content' ),
+							title: getCurrentPostAttribute( 'title' ),
+							excerpt: getCurrentPostAttribute( 'excerpt' ),
+							meta: getCurrentPostAttribute( 'meta' ),
+						} ) ) ),
 			sidebarIsOpened:
 				!! select( interfaceStore ).getActiveComplementaryArea(
 					'core'
@@ -44,8 +110,6 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
-
-	const canRestore = !! currentRevisionId || isViewingBrowserBackup;
 
 	const handleRestore = () => {
 		if ( isViewingBrowserBackup ) {

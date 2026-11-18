@@ -146,6 +146,53 @@ test.describe( 'Post revisions', () => {
 			.toMatchObject( contentBeforeRestore );
 	} );
 
+	test( 'should only offer Restore when restoring changes the post', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Restore availability' );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'First version' );
+		await editor.saveDraft();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ', second version' );
+		await editor.saveDraft();
+
+		const restoreButton = page.getByRole( 'button', { name: 'Restore' } );
+		const openRevisions = async () => {
+			await editor.openDocumentSettingsSidebar();
+			const settingsSidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+			await settingsSidebar
+				.getByRole( 'button', { name: /^Open revisions screen/ } )
+				.click();
+			await expect( restoreButton ).toBeVisible();
+		};
+
+		// The newest revision matches the saved post.
+		await openRevisions();
+		await expect( restoreButton ).toBeDisabled();
+		await page.getByRole( 'button', { name: 'Exit' } ).click();
+
+		// Restoring would discard unsaved edits.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ', unsaved edit' );
+		await openRevisions();
+		await expect( restoreButton ).toBeEnabled();
+	} );
+
 	test( 'should show revision changes in the code editor (@webkit)', async ( {
 		editor,
 		page,
