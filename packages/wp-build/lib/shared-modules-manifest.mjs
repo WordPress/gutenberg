@@ -2,11 +2,31 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 
 /**
+ * @typedef {Object} SharedModulesConfig
+ * @property {string}                   namespace   Namespace of the module IDs.
+ * @property {Record<string, string>}   modules     Module name per bare specifier.
+ * @property {string}                   exports     Path to the export list, relative to package.json.
+ * @property {string}                   outdir      Output directory.
+ * @property {string|string[]}          [consumers] Globs of the built consumers `--update-exports` reads.
+ * @property {Record<string, string[]>} [styles]    Stylesheets each module imports.
+ */
+
+/**
+ * @typedef {Object} SharedModulesManifest
+ * @property {SharedModulesConfig}      config      The `wpSharedModules` config.
+ * @property {string}                   dir         Directory of package.json.
+ * @property {Record<string, string>}   modules     Module ID per bare specifier.
+ * @property {Record<string, string>}   names       Module name per module ID.
+ * @property {Record<string, string[]>} exports     Exported names per module name.
+ * @property {string}                   exportsPath Absolute path to the export list.
+ */
+
+/**
  * Read a package's `wpSharedModules` config and the export list its modules are pruned to.
  *
  * @param {string} packageJsonPath Path to the providing package's package.json.
- * @return {Promise<Object>} The config and its directory, the module ID per bare specifier (`modules`), the module
- *   name per ID (`names`), the exported names per module name, and the export list's path.
+ * @return {Promise<SharedModulesManifest>} The config and its directory, the module ID per bare specifier
+ *   (`modules`), the module name per ID (`names`), the exported names per module name, and the export list's path.
  */
 export async function readSharedModulesManifest( packageJsonPath ) {
 	const dir = path.dirname( packageJsonPath );
@@ -20,7 +40,9 @@ export async function readSharedModulesManifest( packageJsonPath ) {
 			);
 		}
 	}
+	/** @type {Record<string, string>} */
 	const modules = {};
+	/** @type {Record<string, string>} */
 	const names = {};
 	for ( const [ specifier, name ] of Object.entries( config.modules ) ) {
 		modules[ specifier ] = `@${ config.namespace }/${ name }`;
@@ -32,7 +54,9 @@ export async function readSharedModulesManifest( packageJsonPath ) {
 		exports = JSON.parse( await readFile( exportsPath, 'utf8' ) );
 	} catch ( error ) {
 		// `wp-build-shared --update-exports` creates the file.
-		if ( error.code !== 'ENOENT' ) {
+		if (
+			/** @type {NodeJS.ErrnoException} */ ( error ).code !== 'ENOENT'
+		) {
 			throw error;
 		}
 	}
@@ -57,14 +81,21 @@ export async function readSharedModulesManifest( packageJsonPath ) {
  * @return {Map<string, Set<string>>} Imported names per module ID, empty for a bare `import "id"`.
  */
 export function findSharedImports( source, ids ) {
+	/** @type {Map<string, Set<string>>} */
 	const used = new Map();
+	/**
+	 * @param {string} id     Module ID.
+	 * @param {string} [name] Imported name.
+	 */
 	const add = ( id, name ) => {
 		if ( ids.has( id ) ) {
-			if ( ! used.has( id ) ) {
-				used.set( id, new Set() );
+			let names = used.get( id );
+			if ( ! names ) {
+				names = new Set();
+				used.set( id, names );
 			}
 			if ( name ) {
-				used.get( id ).add( name );
+				names.add( name );
 			}
 		}
 	};

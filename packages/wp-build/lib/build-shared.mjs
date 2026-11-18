@@ -30,6 +30,16 @@ const ENTRY_PREFIX = '\0shared-entry:';
 // Bundling passes to try before failing on duplicate copies of a package.
 const MAX_PASSES = 3;
 
+/**
+ * @typedef {Object} SharedDependencies
+ * @property {string[]}                              dependencies       Script handles the modules depend on.
+ * @property {Array<{ id: string, import: string }>} moduleDependencies Script modules they import, and how.
+ */
+
+/**
+ * @typedef {Omit<import('rolldown').Plugin, 'api'> & { api: { getDependencies: () => SharedDependencies } }} ExternalsPlugin
+ */
+
 const styleRuntimeEntry = path.join(
 	path.dirname(
 		createRequire( import.meta.url ).resolve(
@@ -100,6 +110,7 @@ function packageRoot( id ) {
 		.match( /^([^\0]*\/node_modules\/(?:@[^/]+\/)?[^/]+)\// )?.[ 1 ];
 }
 
+/** @type {Map<string, string>} */
 const packageKeys = new Map();
 /**
  * Name and version of an installed package, plus pnpm's patch hash, so that only identical copies share a key.
@@ -115,7 +126,7 @@ function packageKey( root ) {
 		const patch = root.match( /_patch_hash=[^_/]+/ )?.[ 0 ] ?? '';
 		packageKeys.set( root, `${ name }@${ version }${ patch }` );
 	}
-	return packageKeys.get( root );
+	return /** @type {string} */ ( packageKeys.get( root ) );
 }
 
 /**
@@ -124,20 +135,24 @@ function packageKey( root ) {
  * A package manager installs a package once per set of peer dependencies (pnpm, npm's linked strategy) or once per
  * conflicting parent (npm's nested installs), and bundling every copy splits React contexts and stores across modules.
  *
- * @param {import('rolldown').OutputBundle[]} output Bundle output.
+ * @param {Array<import('rolldown').OutputChunk|import('rolldown').OutputAsset>} output Bundle output.
  * @return {Map<string, string[]>} Sorted directories per package key.
  */
 function findCopies( output ) {
+	/** @type {Map<string, Set<string>>} */
 	const copies = new Map();
-	for ( const { moduleIds = [] } of output ) {
+	for ( const file of output ) {
+		const moduleIds = file.type === 'chunk' ? file.moduleIds : [];
 		for ( const id of moduleIds ) {
 			const root = packageRoot( id );
 			if ( root ) {
 				const key = packageKey( root );
-				if ( ! copies.has( key ) ) {
-					copies.set( key, new Set() );
+				let roots = copies.get( key );
+				if ( ! roots ) {
+					roots = new Set();
+					copies.set( key, roots );
 				}
-				copies.get( key ).add( root );
+				roots.add( root );
 			}
 		}
 	}
@@ -151,6 +166,7 @@ function findCopies( output ) {
 // Only adds names: a plugin bundling an older copy of the provider may still import one.
 if ( process.argv.includes( '--update-exports' ) ) {
 	const ids = new Set( Object.keys( manifest.names ) );
+	/** @type {Record<string, Set<string>>} */
 	const used = {};
 	for ( const [ name, names ] of Object.entries( manifest.exports ) ) {
 		used[ name ] = new Set( names );
@@ -186,6 +202,7 @@ if ( process.argv.includes( '--update-exports' ) ) {
 }
 
 // One entry per module the list names; the others are not built.
+/** @type {Record<string, string>} */
 const entries = {};
 for ( const [ specifier, name ] of Object.entries( config.modules ) ) {
 	const listed = manifest.exports[ name ];
@@ -218,6 +235,7 @@ if ( ! Object.keys( entries ).length ) {
 	);
 }
 
+/** @type {import('rolldown').OutputOptions} */
 const outputOptions = {
 	dir: outdir,
 	format: 'esm',
@@ -231,14 +249,16 @@ const outputOptions = {
  * Bundle the entries, reading each package directory in `canonical` from the directory it maps to.
  *
  * @param {Map<string, string>} canonical Package directory to use in place of each other copy's.
- * @return {Promise<Object>} The bundle and its externals plugin.
+ * @return {Promise<{ bundle: import('rolldown').RolldownBuild, externals: ExternalsPlugin }>} The bundle and its externals plugin.
  */
 async function createBundle( canonical ) {
-	const externals = createWordpressExternalsPlugin( 'wordpress', 'wp' )(
-		'shared.min',
-		'esm',
-		[],
-		false
+	const externals = /** @type {ExternalsPlugin} */ (
+		createWordpressExternalsPlugin( 'wordpress', 'wp' )(
+			'shared.min',
+			'esm',
+			[],
+			false
+		)
 	);
 	const bundle = await rolldown( {
 		input: Object.fromEntries(
@@ -306,7 +326,7 @@ async function createBundle( canonical ) {
 							! resolved?.external &&
 							packageRoot( resolved?.id ?? '' );
 						const target = root && canonical.get( root );
-						if ( ! target ) {
+						if ( ! resolved || ! root || ! target ) {
 							return resolved;
 						}
 						return {
@@ -332,8 +352,14 @@ async function createBundle( canonical ) {
  * Bundle, then rebundle reading each package version from one directory, the first by name, until the output holds
  * one copy of each. Copies of one version differ only in which peer dependencies they resolve.
  */
+/** @type {Map<string, string>} */
 const canonical = new Map();
-let bundle, externals, output;
+/** @type {import('rolldown').RolldownBuild} */
+let bundle;
+/** @type {ExternalsPlugin} */
+let externals;
+/** @type {import('rolldown').RolldownOutput['output']} */
+let output;
 for ( let pass = 1; ; pass++ ) {
 	( { bundle, externals } = await createBundle( canonical ) );
 	( { output } = await bundle.generate( outputOptions ) );
@@ -397,8 +423,7 @@ await writeFile(
 	`<?php return array( ${ parts.join( ', ' ) } );\n`
 );
 
-for ( const { fileName, code } of output ) {
-	console.log(
-		`   ${ fileName } ${ Math.floor( ( code?.length ?? 0 ) / 1024 ) }K`
-	);
+for ( const file of output ) {
+	const size = file.type === 'chunk' ? file.code.length : 0;
+	console.log( `   ${ file.fileName } ${ Math.floor( size / 1024 ) }K` );
 }
