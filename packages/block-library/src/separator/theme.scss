@@ -25,3 +25,9 @@
 		height: 2px;
 	}
 }
+
+// The default style has a width of its own, so it doesn't fill Rows and Stacks.
+:root :where(.wp-block-separator:not(.is-style-wide):not(.is-style-dots)) {
+	align-self: auto;
+	flex-grow: 0;
+}

@@ -4,27 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 const require = createRequire( import.meta.url );
-const {
-	isStrokeBasedSvg,
-	validateCollection,
-} = require( '../validate-collection.cjs' );
-
-describe( 'isStrokeBasedSvg', () => {
-	it.each( [
-		'<svg style="fill: none">',
-		"<svg style='fill: none'>",
-		'<svg style="fill:none">',
-		'<svg style="fill: none; ">',
-	] )( 'recognizes a supported fill-none style in %s', ( svg ) => {
-		expect( isStrokeBasedSvg( svg ) ).toBe( true );
-	} );
-
-	it( 'ignores fill-none styles on child elements', () => {
-		expect(
-			isStrokeBasedSvg( '<svg><path style="fill: none" /></svg>' )
-		).toBe( false );
-	} );
-} );
+const { validateCollection } = require( '../validate-collection.cjs' );
 
 describe( 'validateCollection', () => {
 	let fixtureDir;
@@ -48,10 +28,10 @@ describe( 'validateCollection', () => {
 		await rm( fixtureDir, { recursive: true, force: true } );
 	} );
 
-	it( 'accepts stroke-based library icons without a vector effect', async () => {
+	it( 'accepts a normalized icon', async () => {
 		await writeFile(
 			path.join( iconLibraryDir, 'check.svg' ),
-			'<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L10 18L20 6" /></svg>'
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<path d="M4 12L10 18L20 6" />\n</svg>\n'
 		);
 
 		await expect(
@@ -59,22 +39,27 @@ describe( 'validateCollection', () => {
 		).resolves.toBeUndefined();
 	} );
 
-	it.each( [
-		'<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor" vector-effect="non-scaling-stroke"><path d="M4 12L10 18L20 6" /></svg>',
-		'<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor"><path d="M4 12L10 18L20 6" vector-effect="non-scaling-stroke" /></svg>',
-		'<svg viewBox="0 0 24 24" style="fill: none" stroke="currentColor"><path d="M4 12L10 18L20 6" vector-effect=\'non-scaling-stroke\' /></svg>',
-	] )(
-		'rejects library icons that prevent stroke scaling: %s',
-		async ( svg ) => {
-			await writeFile( path.join( iconLibraryDir, 'check.svg' ), svg );
+	it( 'rejects an icon that is not normalized', async () => {
+		await writeFile(
+			path.join( iconLibraryDir, 'check.svg' ),
+			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">\n<path d="M4 12L10 18L20 6" stroke="#1E1E1E" stroke-width="1.5"/>\n</svg>\n'
+		);
 
-			await expect(
-				validateCollection( iconLibraryDir )
-			).rejects.toThrow(
-				'must omit vector-effect so its stroke width scales with its size'
-			);
-		}
-	);
+		await expect( validateCollection( iconLibraryDir ) ).rejects.toThrow(
+			'is not normalized'
+		);
+	} );
+
+	it( 'rejects an icon that cannot be normalized', async () => {
+		await writeFile(
+			path.join( iconLibraryDir, 'check.svg' ),
+			'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">\n\t<path d="M4 12L10 18L20 6" stroke-width="2" />\n</svg>\n'
+		);
+
+		await expect( validateCollection( iconLibraryDir ) ).rejects.toThrow(
+			'cannot normalize: stroke-width="2"'
+		);
+	} );
 
 	describe( 'dashicons', () => {
 		async function writeManifest( icons ) {
@@ -90,7 +75,7 @@ describe( 'validateCollection', () => {
 			for ( const { slug } of icons ) {
 				await writeFile(
 					path.join( iconLibraryDir, `${ slug }.svg` ),
-					'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12L10 18L20 6" /></svg>'
+					'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M4 12L10 18L20 6" />\n</svg>\n'
 				);
 			}
 		}
