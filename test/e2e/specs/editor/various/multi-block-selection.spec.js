@@ -59,6 +59,38 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		).toHaveCount( 3 );
 	} );
 
+	test( 'keeps nested controls interactive during canvas modifier-click', async ( {
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph --><p>Alpha</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Bravo</p><!-- /wp:paragraph --><!-- wp:html --><details><summary>Disclosure control</summary><p>Details body</p></details><div role="checkbox" tabindex="0" aria-checked="false">Custom control</div><!-- /wp:html -->'
+		);
+		const firstParagraph = editor.canvas.getByText( 'Alpha', {
+			exact: true,
+		} );
+		await firstParagraph.click();
+		const details = editor.canvas.locator( 'details' );
+		await expect( details ).not.toHaveAttribute( 'open', '' );
+		await editor.canvas
+			.locator( 'summary' )
+			.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect( details ).toHaveAttribute( 'open', '' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toHaveLength( 1 );
+
+		await firstParagraph.click();
+		const customControl = editor.canvas.getByRole( 'checkbox', {
+			name: 'Custom control',
+		} );
+		await customControl.click( { modifiers: [ 'ControlOrMeta' ] } );
+		await expect( customControl ).toBeFocused();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toHaveLength( 1 );
+	} );
+
 	test( 'preserves selection when interacting with the toolbar and inspector', async ( {
 		editor,
 		page,

@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, act } from '@testing-library/react';
 import { useMergeRefs } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import {
 	createBlock,
@@ -12,7 +13,7 @@ import { store } from '../../../store';
 import useClickSelection from '../use-click-selection';
 import useMultiSelection from '../use-multi-selection';
 
-function Canvas( { blocks }: { blocks: Block[] } ) {
+function Canvas( { blocks, content }: { blocks: Block[]; content?: string } ) {
 	return (
 		<div
 			ref={ useMergeRefs( [ useClickSelection(), useMultiSelection() ] ) }
@@ -23,9 +24,13 @@ function Canvas( { blocks }: { blocks: Block[] } ) {
 					id={ `block-${ block.clientId }` }
 					data-block={ block.clientId }
 					className="block-editor-block-list__block"
+					tabIndex={ -1 }
 				>
 					<span>{ `Block ${ index }` }</span>
 					<button>Control { index }</button>
+					{ content && (
+						<div dangerouslySetInnerHTML={ { __html: content } } />
+					) }
 				</div>
 			) ) }
 		</div>
@@ -56,6 +61,116 @@ describe( 'explicit canvas selection', () => {
 		vi.restoreAllMocks();
 	} );
 
+	describe.each( [ 'predicate', 'find fallback' ] )( '%s', ( detection ) => {
+		const focusable = focus.focusable;
+
+		beforeEach( () => {
+			// JSDOM has no layout; browser DOM tests verify actual visibility.
+			vi.spyOn(
+				HTMLElement.prototype,
+				'offsetWidth',
+				'get'
+			).mockReturnValue( 20 );
+			vi.spyOn( window.navigator, 'platform', 'get' ).mockReturnValue(
+				'MacIntel'
+			);
+			if ( detection === 'find fallback' ) {
+				// Emulate the public API supplied by an older WordPress runtime.
+				focus.focusable = { find: focusable.find } as typeof focusable;
+			}
+		} );
+
+		afterEach( () => {
+			focus.focusable = focusable;
+		} );
+
+		it.each( [
+			[
+				'button',
+				'<button><span data-testid="target">Control</span></button>',
+			],
+			[ 'input', '<input data-testid="target">' ],
+			[ 'textarea', '<textarea data-testid="target"></textarea>' ],
+			[
+				'select',
+				'<select data-testid="target"><option>Option</option></select>',
+			],
+			[
+				'link',
+				'<a href="#target"><span data-testid="target">Link</span></a>',
+			],
+			[
+				'summary',
+				'<details><summary><span data-testid="target">Disclosure</span></summary></details>',
+			],
+			[
+				'custom checkbox',
+				'<div role="checkbox" tabindex="0"><span data-testid="target">Control</span></div>',
+			],
+			[
+				'negative tabindex control',
+				'<div tabindex="-1"><span data-testid="target">Control</span></div>',
+			],
+			[
+				'disabled form control',
+				'<button disabled><span data-testid="target">Control</span></button>',
+			],
+			[
+				'button role without tabindex',
+				'<div role="button"><span data-testid="target">Control</span></div>',
+			],
+			[
+				'control around editable text',
+				'<div role="checkbox" tabindex="0"><div contenteditable="true"><span data-testid="target">Text</span></div></div>',
+			],
+		] )(
+			'leaves modifier-click on a nested %s to the control',
+			( _, html ) => {
+				render(
+					<RegistryProvider value={ registry }>
+						<Canvas blocks={ blocks } content={ html } />
+					</RegistryProvider>
+				);
+				const target = screen.getAllByTestId( 'target' )[ 2 ];
+				expect( fireEvent.mouseDown( target, { metaKey: true } ) ).toBe(
+					true
+				);
+				expect( fireEvent.click( target, { metaKey: true } ) ).toBe(
+					true
+				);
+				expect(
+					registry.select( store ).getSelectedBlockClientIds()
+				).toEqual( [ blocks[ 0 ].clientId ] );
+			}
+		);
+
+		it.each( [
+			[
+				'editable text',
+				'<div contenteditable="true" role="textbox"><span data-testid="target">Text</span></div>',
+			],
+			[
+				'plain-text editable text',
+				'<div contenteditable="plaintext-only"><span data-testid="target">Text</span></div>',
+			],
+			[
+				'focusable block wrapper',
+				'<span data-testid="target">Text</span>',
+			],
+		] )( 'toggles block membership from %s', ( _, html ) => {
+			render(
+				<RegistryProvider value={ registry }>
+					<Canvas blocks={ blocks } content={ html } />
+				</RegistryProvider>
+			);
+			const target = screen.getAllByTestId( 'target' )[ 2 ];
+			fireEvent.mouseDown( target, { metaKey: true } );
+			fireEvent.click( target, { metaKey: true } );
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ] );
+		} );
+	} );
 	it.each( [ 'MacIntel', 'Linux' ] )(
 		'toggles canvas selection membership with the platform modifier (%s)',
 		( platform ) => {

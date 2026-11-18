@@ -1,6 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
+import { focus, isFormElement } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import {
@@ -111,11 +112,40 @@ export default function useClickSelection() {
 					! event.altKey &&
 					( isAppleOS() ? event.metaKey : event.ctrlKey )
 				) {
-					const control = ( event.target as Element ).closest(
-						'button, input, textarea, select, a, [role="button"]'
-					);
-					if ( control && ! control.hasAttribute( 'data-block' ) ) {
-						return;
+					const blockElement = node.ownerDocument.getElementById(
+						`block-${ clickedClientId }`
+					)!;
+					// Plugins may load this package with an older WordPress DOM API.
+					const isFocusable =
+						typeof focus.focusable.isFocusable === 'function'
+							? focus.focusable.isFocusable
+							: undefined;
+					const focusableElements = isFocusable
+						? undefined
+						: focus.focusable.find( blockElement );
+					// Stop at the clicked block: its focusable wrapper (or a control
+					// in an ancestor block) does not make its contents a nested control.
+					for (
+						let element: Element | null = event.target as Element;
+						element && element !== blockElement;
+						element = element.parentElement
+					) {
+						if (
+							// Disabled form controls and non-focusable button roles
+							// retain their existing exclusion from block selection.
+							isFormElement( element ) ||
+							element.getAttribute( 'role' ) === 'button' ||
+							// Ordinary editable text remains a block-selection target.
+							( ! element.matches(
+								'[contenteditable]:not([contenteditable="false"])'
+							) &&
+								( isFocusable?.( element ) ??
+									focusableElements?.includes(
+										element as HTMLElement
+									) ) )
+						) {
+							return;
+						}
 					}
 					event.preventDefault();
 					event.stopPropagation();
