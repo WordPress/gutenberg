@@ -187,6 +187,12 @@ describe( 'DataViews component', () => {
 		async ( label ) => {
 			render(
 				<DataViewWrapper
+					// Primary actions only render as buttons next to the title.
+					view={ {
+						type: LAYOUT_TABLE,
+						titleField: 'title',
+						fields: [ 'order', 'author' ],
+					} }
 					actions={ [
 						{ ...actions[ 0 ], label, isPrimary: true },
 						{ id: 'view', label: 'View', callback: vi.fn() },

@@ -1,6 +1,24 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "../../../dataviews/style" as *;
 
+// Primary actions sit next to the title, but never count towards the width of
+// the primary column: their box is always 0 wide and the buttons overflow it.
+// Revealing them on hover would otherwise widen the column, and make it jump
+// between rows. Instead, the title gives up the room they need. Its percentage
+// `max-width` is ignored when the table sizes its columns, so it doesn't
+// change the column width either.
+@mixin primary-actions-revealed {
+	.dataviews-view-table__title-row > .dataviews-title-field {
+		min-width: 0;
+		max-width: calc(100% - var(--wp-dataviews-primary-actions-width, 0px));
+	}
+
+	.dataviews-view-table__primary-actions {
+		height: auto;
+		overflow: visible;
+	}
+}
+
 .dataviews-view-table {
 	width: 100%;
 	text-indent: 0;
@@ -106,6 +124,18 @@
 			.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 				opacity: 1;
 			}
+		}
+
+		// Only reveal primary actions on hover, not when the row is selected or
+		// holds focus elsewhere. Keyboard users reveal them by tabbing to one.
+		&.is-hovered,
+		&:hover,
+		&:has(.dataviews-view-table__primary-actions :focus-visible) {
+			@include primary-actions-revealed;
+		}
+
+		@media (hover: none) {
+			@include primary-actions-revealed;
 		}
 	}
 
@@ -378,5 +408,67 @@
 		> .dataviews-bulk-actions {
 			@include dataviews-refreshing();
 		}
+	}
+}
+
+.dataviews-view-table__primary-column-content {
+	// Let the title row fill the cell, so the title elides at its edge.
+	min-width: 0;
+	width: 100%;
+}
+
+.dataviews-view-table__title-row {
+	display: flex;
+	align-items: flex-start;
+	width: 100%;
+	// Reserve room for the actions in the column, which the title uses at
+	// rest, so revealing the actions doesn't elide the title, nor wrap them.
+	// Capped like the title itself.
+	min-width: min(calc(var(--wp-dataviews-title-width, 0px) + var(--wp-dataviews-primary-actions-unwrapped-width, 0px)), 80ch);
+
+	> .dataviews-title-field {
+		flex: 0 1 auto;
+		width: auto;
+		overflow: hidden;
+
+		// Let the rendered title shrink, so its own ellipsis kicks in.
+		> :not(.dataviews-view-table__level) {
+			min-width: 0;
+		}
+	}
+
+	.dataviews-view-table__level {
+		flex-shrink: 0;
+	}
+}
+
+// The actions start where the title ends. This box is always 0 wide, so the
+// actions, which overflow it, never add to the width of the column. Until the
+// row reveals them, it's also 0 tall, and clips them: they stay focusable, and
+// focusing one reveals them. Once revealed, actions that wrap make the row
+// taller.
+.dataviews-view-table__primary-actions {
+	align-self: flex-start;
+	flex: 0 0 0;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+}
+
+// Capped to the row's width minus a minimum of title: the whole title when
+// it's short, 10 characters otherwise. Actions that don't fit wrap. The
+// padding is the gap between the title and the actions.
+.dataviews-view-table__primary-actions-content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: var(--wpds-dimension-gap-xs) var(--wpds-dimension-gap-lg);
+	width: max-content;
+	max-width: calc(var(--wp-dataviews-title-row-width, 100vw) - min(10ch, var(--wp-dataviews-title-width, 0px)));
+	padding-inline-start: var(--wpds-dimension-gap-lg);
+	box-sizing: border-box;
+
+	// Primary actions don't render on small viewports.
+	&:empty {
+		display: none;
 	}
 }

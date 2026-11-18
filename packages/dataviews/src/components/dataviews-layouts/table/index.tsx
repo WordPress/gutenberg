@@ -11,11 +11,13 @@ import {
 	useEffect,
 	useId,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
+import { VisuallyHidden } from '@wordpress/ui';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions from '../../dataviews-item-actions';
@@ -154,6 +156,19 @@ function TableRow< Item >( {
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
 
+	// Primary actions sit next to the title, like the list layout does. The
+	// actions column only holds the menu, which lists every action, so when
+	// the title isn't displayed, primary actions are only in the menu.
+	const primaryActions = useMemo(
+		() =>
+			( actions ?? [] ).filter(
+				( action ) =>
+					action.isPrimary &&
+					( ! action.isEligible || action.isEligible( item ) )
+			),
+		[ actions, item ]
+	);
+
 	return (
 		<tr
 			className={ clsx( 'dataviews-view-table__row', {
@@ -211,6 +226,9 @@ function TableRow< Item >( {
 						isItemClickable={ isItemClickable }
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }
+						primaryActions={
+							showTitle ? primaryActions : undefined
+						}
 					/>
 				</td>
 			) }
@@ -254,7 +272,7 @@ function TableRow< Item >( {
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
 				>
-					<ItemActions item={ item } actions={ actions } />
+					<ItemActions item={ item } actions={ actions } isMenuOnly />
 				</td>
 			) }
 		</tr>
@@ -680,9 +698,14 @@ function ViewTable< Item >( {
 									}
 								) }
 							>
-								<span className="dataviews-view-table-header">
+								{ /*
+								 * The column only holds the actions menu, so a
+								 * visible label would set its width. Keep it for
+								 * assistive technology.
+								 */ }
+								<VisuallyHidden>
 									{ __( 'Actions' ) }
-								</span>
+								</VisuallyHidden>
 							</th>
 						) }
 					</tr>
