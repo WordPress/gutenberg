@@ -8,15 +8,25 @@ import { useMemo, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { CheckboxControl, EmptyState, Stack, Text } from '@wordpress/ui';
 import { layout as layoutIcon } from '@wordpress/icons';
+import { inertValue } from '@wordpress/react-inert-value';
 import { getAreaLabel, getPreviewBlocks, getReplacedMenu } from './utils';
+import type { NavigationLocation, NavigationMenuRecord } from './utils';
 import withMenuName from './with-menu-name';
 
-function CandidatePreview( { location } ) {
+/**
+ * A place the menu would replace, and what it shows now.
+ */
+interface Replacement {
+	location: NavigationLocation;
+	replaced: NonNullable< ReturnType< typeof getReplacedMenu > >;
+}
+
+function CandidatePreview( { location }: { location: NavigationLocation } ) {
 	const blocks = useMemo( () => getPreviewBlocks( location ), [ location ] );
 
 	return (
 		<div
-			inert=""
+			inert={ inertValue( true ) }
 			style={ {
 				borderRadius: 2,
 				// Tall parts, like a vertical header, are clipped so every
@@ -38,19 +48,18 @@ function CandidatePreview( { location } ) {
  * Choose where a menu is shown: every header, footer and overlay with a
  * menu in it, each previewed, to tick or untick.
  *
- * @param {Object}   props
- * @param {Object[]} props.candidates         Every place a menu can be shown.
- * @param {string[]} props.initialSelectedIds The places ticked when it opens.
- * @param {boolean}  props.isUpdate           Whether the menu is already
- *                                            shown somewhere, so unticking
- *                                            removes it.
- * @param {Function} props.onApply            Called with the ticked IDs.
- * @param {Function} props.onClose            Closes the modal.
- * @param {number}   props.navigationId       The menu being placed.
- * @param {string}   props.menuTitle          The menu's name.
- * @param {Object[]} props.menus              Every menu.
- * @param {?number}  props.fallbackMenuId     The menu shown when no menu is chosen.
- * @return {Element} The modal.
+ * @param props
+ * @param props.candidates         Every place a menu can be shown.
+ * @param props.initialSelectedIds The places ticked when it opens.
+ * @param props.isUpdate           Whether the menu is already shown
+ *                                 somewhere, so unticking removes it.
+ * @param props.onApply            Called with the ticked IDs.
+ * @param props.onClose            Closes the modal.
+ * @param props.navigationId       The menu being placed.
+ * @param props.menuTitle          The menu's name.
+ * @param props.menus              Every menu.
+ * @param props.fallbackMenuId     The menu shown when no menu is chosen.
+ * @return The modal.
  */
 export default function ChooseLocationModal( {
 	candidates,
@@ -62,9 +71,22 @@ export default function ChooseLocationModal( {
 	menuTitle,
 	menus,
 	fallbackMenuId,
+}: {
+	candidates: NavigationLocation[];
+	initialSelectedIds: string[];
+	isUpdate: boolean;
+	onApply: ( selectedIds: string[] ) => void;
+	onClose: () => void;
+	navigationId: number | string;
+	menuTitle: string;
+	menus: NavigationMenuRecord[];
+	fallbackMenuId: number | null | undefined;
 } ) {
-	const [ selectedIds, setSelectedIds ] = useState( initialSelectedIds );
-	const [ replacements, setReplacements ] = useState( null );
+	const [ selectedIds, setSelectedIds ] =
+		useState< string[] >( initialSelectedIds );
+	const [ replacements, setReplacements ] = useState< Replacement[] | null >(
+		null
+	);
 
 	// Before showing this menu somewhere that already shows another one (or
 	// links of its own), say which, and ask first.
@@ -84,7 +106,9 @@ export default function ChooseLocationModal( {
 					fallbackMenuId
 				),
 			} ) )
-			.filter( ( { replaced } ) => replaced );
+			.filter( ( replacement ): replacement is Replacement =>
+				Boolean( replacement.replaced )
+			);
 
 		if ( found.length ) {
 			setReplacements( found );
@@ -96,14 +120,14 @@ export default function ChooseLocationModal( {
 		selectedIds.length !== initialSelectedIds.length ||
 		selectedIds.some( ( id ) => ! initialSelectedIds.includes( id ) );
 
-	const toggle = ( id, isChecked ) =>
+	const toggle = ( id: string, isChecked: boolean ) =>
 		setSelectedIds( ( ids ) =>
 			isChecked
 				? [ ...new Set( [ ...ids, id ] ) ]
 				: ids.filter( ( current ) => current !== id )
 		);
 
-	let summary = __( 'Choose one or more places for this menu.' );
+	let summary: string = __( 'Choose one or more places for this menu.' );
 	if ( selectedIds.length ) {
 		summary = sprintf(
 			/* translators: %d: Number of places chosen. */
@@ -241,14 +265,24 @@ export default function ChooseLocationModal( {
 /**
  * Confirms replacing the menu already shown in one or more places.
  *
- * @param {Object}   props
- * @param {Object[]} props.replacements `{ location, replaced }` for each place.
- * @param {string}   props.menuTitle    The menu about to be shown.
- * @param {Function} props.onConfirm    Replace them.
- * @param {Function} props.onCancel     Go back to choosing.
- * @return {Element} The dialog.
+ * @param props
+ * @param props.replacements `{ location, replaced }` for each place.
+ * @param props.menuTitle    The menu about to be shown.
+ * @param props.onConfirm    Replace them.
+ * @param props.onCancel     Go back to choosing.
+ * @return The dialog.
  */
-function ReplaceMenuDialog( { replacements, menuTitle, onConfirm, onCancel } ) {
+function ReplaceMenuDialog( {
+	replacements,
+	menuTitle,
+	onConfirm,
+	onCancel,
+}: {
+	replacements: Replacement[];
+	menuTitle: string;
+	onConfirm: () => void;
+	onCancel: () => void;
+} ) {
 	const isSingle = replacements.length === 1;
 	const [ first ] = replacements;
 	const savedMenus = [
@@ -259,7 +293,7 @@ function ReplaceMenuDialog( { replacements, menuTitle, onConfirm, onCancel } ) {
 		),
 	];
 
-	let title;
+	let title: string;
 	if ( ! isSingle ) {
 		title = sprintf(
 			/* translators: %d: Number of places that already show a menu. */

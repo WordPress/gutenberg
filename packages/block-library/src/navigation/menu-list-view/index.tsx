@@ -1,13 +1,17 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import type { ForwardedRef } from 'react';
 import { unlock } from '../../lock-unlock';
 import isNavigationMenuEditingEnabled from './is-enabled';
 import NavigationMenuAppender from './appender';
+import type { NavigationMenuAppenderProps } from './appender';
 import useSubmenuAppenderParentIds from './use-submenu-appender-parent-ids';
 import AutoMenu, { useIsAutoMenu } from './auto-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
-function renderAppender( props ) {
+function renderAppender(
+	props: NavigationMenuAppenderProps & { ref?: ForwardedRef< HTMLElement > }
+) {
 	return <NavigationMenuAppender { ...props } />;
 }
 
@@ -22,15 +26,20 @@ function renderAppender( props ) {
  * With the "Navigation menu editing prototypes" experiment off, this is a
  * plain `PrivateListView`.
  *
- * @param {Object} props                    Component props.
- * @param {string} props.rootClientId       Client id of the Navigation block.
- * @param {string} props.navigationClientId Client id of the Navigation block, when `rootClientId` points elsewhere (for example a Page List).
- * @param {Object} props.listViewProps      Remaining props, passed to `PrivateListView`.
+ * @param props                    Component props.
+ * @param props.rootClientId       Client id of the Navigation block.
+ * @param props.navigationClientId Client id of the Navigation block, when `rootClientId` points elsewhere (for example a Page List).
  */
 export default function NavigationMenuListView( {
 	rootClientId,
 	navigationClientId = rootClientId,
 	...listViewProps
+}: {
+	rootClientId: string;
+	navigationClientId?: string;
+	// Remaining props, passed to `PrivateListView`, whose props aren't
+	// exported.
+	[ key: string ]: any;
 } ) {
 	const isEnabled = isNavigationMenuEditingEnabled();
 	const submenuAppenderParentIds = useSubmenuAppenderParentIds(

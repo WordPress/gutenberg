@@ -26,7 +26,7 @@ import {
 	AutoMenuCustomizeDialog,
 } from './auto-menu-customize';
 
-function AutoMenuToolbar( { clientId } ) {
+function AutoMenuToolbar( { clientId }: { clientId: string } ) {
 	const [ isConfirming, setIsConfirming ] = useState( false );
 	const { canCustomize, isBusy, customize } =
 		useCustomizeAutoMenu( clientId );
@@ -103,10 +103,14 @@ function AutoMenuToolbar( { clientId } ) {
  * Renders the Auto menu toolbar button when the Navigation block is an Auto
  * menu and the experiment is on. Renders nothing otherwise.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Client id of the Navigation block.
+ * @param props          Component props.
+ * @param props.clientId Client id of the Navigation block.
  */
-export default function AutoMenuBlockControls( { clientId } ) {
+export default function AutoMenuBlockControls( {
+	clientId,
+}: {
+	clientId: string;
+} ) {
 	const isAutoMenu = useIsAutoMenu( clientId );
 	if ( ! isAutoMenu ) {
 		return null;

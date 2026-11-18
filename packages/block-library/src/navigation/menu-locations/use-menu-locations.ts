@@ -9,19 +9,28 @@ import {
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_PARTS_QUERY,
 } from './utils';
+import type {
+	NavigationLocation,
+	NavigationMenuRecord,
+	TemplatePartRecord,
+} from './utils';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: never[] = [];
 
 /**
  * Every template part with a Navigation block in it, with unsaved edits, and
  * the site's menus.
  *
- * @return {Object} `{ locations, menus, isResolving }`.
+ * @return `{ locations, menus, isResolving }`.
  */
-export function useNavigationLocations() {
+export function useNavigationLocations(): {
+	locations: NavigationLocation[];
+	menus: NavigationMenuRecord[];
+	isResolving: boolean;
+} {
 	const templateParts = useSelect( ( select ) => {
 		const { getEntityRecords, getEditedEntityRecord } = select( coreStore );
-		const records = getEntityRecords(
+		const records = getEntityRecords< TemplatePartRecord >(
 			'postType',
 			TEMPLATE_PART_POST_TYPE,
 			TEMPLATE_PARTS_QUERY
@@ -30,13 +39,13 @@ export function useNavigationLocations() {
 		// Each edited record is memoized by core-data, and an array is
 		// compared item by item, so this only re-renders on a real change.
 		return records
-			? records.map( ( record ) =>
+			? ( records.map( ( record ) =>
 					getEditedEntityRecord(
 						'postType',
 						TEMPLATE_PART_POST_TYPE,
 						record.id
 					)
-				)
+				) as TemplatePartRecord[] )
 			: null;
 	}, [] );
 
@@ -45,7 +54,7 @@ export function useNavigationLocations() {
 
 		return {
 			menus:
-				getEntityRecords(
+				getEntityRecords< NavigationMenuRecord >(
 					'postType',
 					NAVIGATION_POST_TYPE,
 					PRELOADED_NAVIGATION_MENUS_QUERY
@@ -74,10 +83,15 @@ export function useNavigationLocations() {
 /**
  * Where a menu is shown, and where else it could be.
  *
- * @param {number} navigationId The menu's ID.
- * @return {Object} `{ locations, otherLocations, menus, isResolving }`.
+ * @param navigationId The menu's ID.
+ * @return `{ locations, otherLocations, menus, isResolving }`.
  */
-export function useMenuLocations( navigationId ) {
+export function useMenuLocations( navigationId: number | string ): {
+	locations: NavigationLocation[];
+	otherLocations: NavigationLocation[];
+	menus: NavigationMenuRecord[];
+	isResolving: boolean;
+} {
 	const {
 		locations: allLocations,
 		menus,

@@ -7,12 +7,20 @@ import { InputControl, Stack } from '@wordpress/ui';
  * Asks for the label of a new label-only submenu (#86936), in a popover beside
  * its row, as in the Create Not Learn prototype.
  *
- * @param {Object}                  props          Component props.
- * @param {Element}                 props.anchor   The new submenu's row.
- * @param {(label: string) => void} props.onSubmit Called with the trimmed label.
- * @param {() => void}              props.onCancel Called when it closes without adding.
+ * @param props          Component props.
+ * @param props.anchor   The new submenu's row.
+ * @param props.onSubmit Called with the trimmed label.
+ * @param props.onCancel Called when it closes without adding.
  */
-export default function SubmenuLabelPopover( { anchor, onSubmit, onCancel } ) {
+export default function SubmenuLabelPopover( {
+	anchor,
+	onSubmit,
+	onCancel,
+}: {
+	anchor: Element | null | undefined;
+	onSubmit: ( label: string ) => void;
+	onCancel: () => void;
+} ) {
 	const [ label, setLabel ] = useState( '' );
 	const trimmedLabel = label.trim();
 

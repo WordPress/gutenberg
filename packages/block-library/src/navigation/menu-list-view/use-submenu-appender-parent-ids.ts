@@ -2,7 +2,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: string[] = [];
 
 /**
  * Returns the client ids of the submenus that should show their own add
@@ -13,10 +13,12 @@ const EMPTY_ARRAY = [];
  * every empty one) stacked up add buttons. Elsewhere, a submenu's items can
  * still be added from its options menu, or by dragging.
  *
- * @param {?string} navigationClientId Client id of the Navigation block.
- * @return {string[]} Client ids.
+ * @param navigationClientId Client id of the Navigation block.
+ * @return Client ids.
  */
-export default function useSubmenuAppenderParentIds( navigationClientId ) {
+export default function useSubmenuAppenderParentIds(
+	navigationClientId: string | null | undefined
+): string[] {
 	const activeSubmenuId = useActiveSubmenuId( navigationClientId );
 	return useMemo(
 		() => ( activeSubmenuId ? [ activeSubmenuId ] : EMPTY_ARRAY ),
@@ -28,10 +30,12 @@ export default function useSubmenuAppenderParentIds( navigationClientId ) {
  * The client id of the sub menu being worked on: the selected sub menu, or the
  * sub menu holding the selected item.
  *
- * @param {?string} navigationClientId Client id of the Navigation block.
- * @return {?string} Client id, or null.
+ * @param navigationClientId Client id of the Navigation block.
+ * @return Client id, or null.
  */
-export function useActiveSubmenuId( navigationClientId ) {
+export function useActiveSubmenuId(
+	navigationClientId: string | null | undefined
+): string | null {
 	return useSelect(
 		( select ) => {
 			if ( ! navigationClientId ) {

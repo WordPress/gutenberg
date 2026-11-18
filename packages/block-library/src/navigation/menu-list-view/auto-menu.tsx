@@ -14,6 +14,7 @@ import { update } from '@wordpress/icons';
 import { decodeEntities } from '@wordpress/html-entities';
 import isNavigationMenuEditingEnabled from './is-enabled';
 import { useAutoMenuPageList, useAutoMenuPages } from './auto-menu-use-pages';
+import type { AutoMenuPage } from './auto-menu-use-pages';
 import {
 	useCustomizeAutoMenu,
 	AutoMenuCustomizeDialog,
@@ -22,10 +23,12 @@ import {
 /**
  * Whether the Navigation block's only item is a Page List.
  *
- * @param {?string} navigationClientId Client id of the Navigation block.
- * @return {boolean} Whether the menu is an Auto menu.
+ * @param navigationClientId Client id of the Navigation block.
+ * @return Whether the menu is an Auto menu.
  */
-export function useIsAutoMenu( navigationClientId ) {
+export function useIsAutoMenu(
+	navigationClientId: string | null | undefined
+): boolean {
 	const pageList = useAutoMenuPageList(
 		isNavigationMenuEditingEnabled() ? navigationClientId : null
 	);
@@ -45,7 +48,7 @@ export function AutoMenuDescription() {
 	);
 }
 
-function PageTree( { pages } ) {
+function PageTree( { pages }: { pages: AutoMenuPage[] } ) {
 	return (
 		<ul className="wp-block-navigation-auto-menu__pages">
 			{ pages.map( ( page ) => (
@@ -63,11 +66,15 @@ function PageTree( { pages } ) {
 }
 
 /**
- * @param {Object} props                    Component props.
- * @param {string} props.navigationClientId Client id of the Navigation block.
+ * @param props                    Component props.
+ * @param props.navigationClientId Client id of the Navigation block.
  */
-export default function AutoMenu( { navigationClientId } ) {
-	const ref = useRef();
+export default function AutoMenu( {
+	navigationClientId,
+}: {
+	navigationClientId: string;
+} ) {
+	const ref = useRef< HTMLDivElement >( null );
 	const [ isConfirming, setIsConfirming ] = useState( false );
 	const pageList = useAutoMenuPageList( navigationClientId );
 	const { tree, hasResolved } = useAutoMenuPages(
@@ -84,7 +91,9 @@ export default function AutoMenu( { navigationClientId } ) {
 		customize();
 		window.requestAnimationFrame( () => {
 			container
-				?.querySelector( '.block-editor-list-view-block-select-button' )
+				?.querySelector< HTMLElement >(
+					'.block-editor-list-view-block-select-button'
+				)
 				?.focus();
 		} );
 	};

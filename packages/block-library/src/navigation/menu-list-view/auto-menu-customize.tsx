@@ -11,10 +11,12 @@ import { useAutoMenuPageList, useAutoMenuPages } from './auto-menu-use-pages';
  * Turns an Auto menu into a menu people manage themselves, reusing the Page
  * List's conversion: the pages it shows now become links and sub menus.
  *
- * @param {?string} navigationClientId Client id of the Navigation block.
- * @return {{canCustomize: boolean, isBusy: boolean, customize: () => void}} Customize state and action.
+ * @param navigationClientId Client id of the Navigation block.
+ * @return Customize state and action.
  */
-export function useCustomizeAutoMenu( navigationClientId ) {
+export function useCustomizeAutoMenu(
+	navigationClientId: string | null | undefined
+): { canCustomize: boolean; isBusy: boolean; customize: () => void } {
 	const pageList = useAutoMenuPageList( navigationClientId );
 	const { pages, hasResolved } = useAutoMenuPages(
 		pageList?.attributes?.parentPageID
@@ -68,7 +70,7 @@ export function useCustomizeAutoMenu( navigationClientId ) {
 	};
 
 	return {
-		canCustomize: !! pageList && hasResolved && pages?.length > 0,
+		canCustomize: !! pageList && hasResolved && ( pages?.length ?? 0 ) > 0,
 		isBusy: ! hasResolved,
 		customize,
 	};
@@ -81,12 +83,20 @@ export function useCustomizeAutoMenu( navigationClientId ) {
  * this follows the WPDS "Destructive actions" pattern for reversible changes:
  * a `ConfirmDialog` with a primary (not destructive) confirm button.
  *
- * @param {Object}     props           Component props.
- * @param {boolean}    props.isBusy    Whether the pages are still loading.
- * @param {() => void} props.onConfirm Called when confirmed.
- * @param {() => void} props.onCancel  Called when cancelled.
+ * @param props           Component props.
+ * @param props.isBusy    Whether the pages are still loading.
+ * @param props.onConfirm Called when confirmed.
+ * @param props.onCancel  Called when cancelled.
  */
-export function AutoMenuCustomizeDialog( { isBusy, onConfirm, onCancel } ) {
+export function AutoMenuCustomizeDialog( {
+	isBusy,
+	onConfirm,
+	onCancel,
+}: {
+	isBusy: boolean;
+	onConfirm: () => void;
+	onCancel: () => void;
+} ) {
 	return (
 		<ConfirmDialog
 			isOpen

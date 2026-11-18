@@ -6,10 +6,12 @@
  * doesn't go anywhere. A new submenu still waiting for its page or custom
  * link (no label yet, and a `kind` saying what it will link to) doesn't.
  *
- * @param {Object} attributes Block attributes.
- * @return {boolean} Whether the sub menu is label only.
+ * @param attributes Block attributes.
+ * @return Whether the sub menu is label only.
  */
-export default function isLabelOnlySubmenu( attributes ) {
+export default function isLabelOnlySubmenu(
+	attributes: Record< string, any > | null | undefined
+): boolean {
 	const url = attributes?.url?.trim?.();
 	if ( url === '#' ) {
 		return true;

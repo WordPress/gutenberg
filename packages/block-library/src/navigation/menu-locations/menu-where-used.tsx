@@ -5,12 +5,18 @@ import { getWhereUsedLabel } from './utils';
 /**
  * Says where a menu is used, like "Used in Header, Footer", or "Not used".
  *
- * @param {Object} props
- * @param {number} props.navigationId The menu's ID.
- * @param {string} props.className    Class name for the text.
- * @return {?Element} The text, once the template parts have loaded.
+ * @param props
+ * @param props.navigationId The menu's ID.
+ * @param props.className    Class name for the text.
+ * @return The text, once the template parts have loaded.
  */
-export default function MenuWhereUsed( { navigationId, className } ) {
+export default function MenuWhereUsed( {
+	navigationId,
+	className,
+}: {
+	navigationId: number | string;
+	className?: string;
+} ) {
 	const { locations, isResolving } = useNavigationLocations();
 	const label = useMemo(
 		() =>

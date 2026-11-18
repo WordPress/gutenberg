@@ -1,4 +1,5 @@
 import { createBlock, cloneBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -6,6 +7,8 @@ import { __ } from '@wordpress/i18n';
 import { addSubmenu } from '@wordpress/icons';
 import isNavigationMenuEditingEnabled from './is-enabled';
 import { setSubmenuRequest } from './submenu-request';
+import type { SubmenuRequest } from './submenu-request';
+import type { SubmenuType } from './submenu-type-menu-group';
 import {
 	createCustomLinkSubmenuBlock,
 	createPageSubmenuBlock,
@@ -14,11 +17,15 @@ import {
 /**
  * Run `callback` with the element once the list view has rendered it.
  *
- * @param {() => ?Element}             getElement Finds the element.
- * @param {(element: Element) => void} callback   Called with it.
- * @param {() => void}                 [onGiveUp] Called if it never shows.
+ * @param getElement Finds the element.
+ * @param callback   Called with it.
+ * @param onGiveUp   Called if it never shows.
  */
-export function whenRendered( getElement, callback, onGiveUp ) {
+export function whenRendered< T extends Element = HTMLElement >(
+	getElement: () => T | null | undefined,
+	callback: ( element: T ) => void,
+	onGiveUp?: () => void
+) {
 	let attempts = 0;
 	const check = () => {
 		const element = getElement();
@@ -43,13 +50,13 @@ export function whenRendered( getElement, callback, onGiveUp ) {
  *   block's inspector (where selecting moves away from the list), the new
  *   submenu is selected and its add button's menu opens, to add more items.
  *
- * @param {Object}   options
- * @param {string}   options.clientId                 The item.
- * @param {string}   options.type                     'page', 'custom' or 'label-only'.
- * @param {string}   [options.label]                  Label-only submenu's label (escaped).
- * @param {Object}   options.registry                 Data registry.
- * @param {Function} [options.updateExpansion]        List view expansion setter.
- * @param {Function} options.setInsertedBlockClientId Opens the link popover.
+ * @param options
+ * @param options.clientId                 The item.
+ * @param options.type                     'page', 'custom' or 'label-only'.
+ * @param options.label                    Label-only submenu's label (escaped).
+ * @param options.registry                 Data registry.
+ * @param options.updateExpansion          List view expansion setter.
+ * @param options.setInsertedBlockClientId Opens the link popover.
  */
 export function convertToSubmenu( {
 	clientId,
@@ -58,6 +65,14 @@ export function convertToSubmenu( {
 	registry,
 	updateExpansion,
 	setInsertedBlockClientId,
+}: {
+	clientId: string;
+	type: SubmenuType;
+	label?: string;
+	// The registry's `select` and `dispatch` are untyped for this store.
+	registry: any;
+	updateExpansion?: SubmenuRequest[ 'updateExpansion' ];
+	setInsertedBlockClientId: ( clientId: string ) => void;
 } ) {
 	const { getBlock } = registry.select( blockEditorStore );
 	const { replaceBlock, selectBlock } = registry.dispatch( blockEditorStore );
@@ -67,7 +82,7 @@ export function convertToSubmenu( {
 	const isInInspector = !! row?.closest( '.block-editor-block-inspector' );
 	const innerBlocks = [ cloneBlock( getBlock( clientId ) ) ];
 
-	let submenu;
+	let submenu: Block;
 	if ( type === 'page' ) {
 		submenu = createPageSubmenuBlock( innerBlocks );
 	} else if ( type === 'custom' ) {
@@ -93,10 +108,10 @@ export function convertToSubmenu( {
 	selectBlock( submenu.clientId, null );
 	whenRendered(
 		() =>
-			document.querySelector(
+			document.querySelector< HTMLElement >(
 				`[data-navigation-menu-appender-for="${ submenu.clientId }"] .navigation-menu-appender__toggle`
 			),
-		( toggle ) => {
+		( toggle: HTMLElement ) => {
 			toggle.focus();
 			toggle.click();
 		}
@@ -108,16 +123,20 @@ export function convertToSubmenu( {
  * choice of submenu as the add button's "Submenu" option, beside the item,
  * and the item becomes the new submenu's first item.
  *
- * @param {Object}   props
- * @param {string}   props.clientId        The item.
- * @param {Function} props.onClose         Closes the options menu.
- * @param {Function} props.updateExpansion List view expansion setter.
- * @return {?Element} The menu group, for links only.
+ * @param props
+ * @param props.clientId        The item.
+ * @param props.onClose         Closes the options menu.
+ * @param props.updateExpansion List view expansion setter.
+ * @return The menu group, for links only.
  */
 export default function CreateSubmenuMenuGroup( {
 	clientId,
 	onClose,
 	updateExpansion,
+}: {
+	clientId: string;
+	onClose: () => void;
+	updateExpansion?: SubmenuRequest[ 'updateExpansion' ];
 } ) {
 	const isLink = useSelect(
 		( select ) =>

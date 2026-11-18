@@ -12,11 +12,15 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { MenuLocations } = unlock( blockLibraryPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
-function isNavigationMenuEditingEnabled() {
-	return !! globalThis?.__experimentalNavigationMenuEditing;
+function isNavigationMenuEditingEnabled(): boolean {
+	return !! (
+		globalThis as typeof globalThis & {
+			__experimentalNavigationMenuEditing?: boolean;
+		}
+	 )?.__experimentalNavigationMenuEditing;
 }
 
-function NavigationMenuLocations( { navigationId } ) {
+function NavigationMenuLocations( { navigationId }: { navigationId: number } ) {
 	const history = useHistory();
 	// Previews are rendered outside the editor, so they get the theme's
 	// styles the same way the patterns and templates lists do.
@@ -26,7 +30,7 @@ function NavigationMenuLocations( { navigationId } ) {
 		<ExperimentalBlockEditorProvider settings={ settings }>
 			<MenuLocations
 				navigationId={ navigationId }
-				onEditLocation={ ( part ) =>
+				onEditLocation={ ( part: { id: string } ) =>
 					history.navigate(
 						`/wp_template_part/${ part.id }?canvas=edit`
 					)
@@ -61,11 +65,9 @@ export function NavigationMenuItemCanvas() {
  */
 export function NavigationCanvas() {
 	const { query } = useLocation();
-	const { records: menus, hasResolved } = useEntityRecords(
-		'postType',
-		NAVIGATION_POST_TYPE,
-		PRELOADED_NAVIGATION_MENUS_QUERY
-	);
+	const { records: menus, hasResolved } = useEntityRecords< {
+		id: number;
+	} >( 'postType', NAVIGATION_POST_TYPE, PRELOADED_NAVIGATION_MENUS_QUERY );
 
 	if (
 		! isNavigationMenuEditingEnabled() ||
@@ -76,5 +78,5 @@ export function NavigationCanvas() {
 		return <Editor />;
 	}
 
-	return <NavigationMenuLocations navigationId={ menus[ 0 ].id } />;
+	return <NavigationMenuLocations navigationId={ menus![ 0 ].id } />;
 }

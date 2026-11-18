@@ -9,6 +9,8 @@ import {
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { forwardRef, useRef, useState } from '@wordpress/element';
+import type { Block } from '@wordpress/blocks';
+import type { ComponentProps, FocusEventHandler, ForwardedRef } from 'react';
 import { escapeHTML } from '@wordpress/escape-html';
 import { __ } from '@wordpress/i18n';
 import {
@@ -25,6 +27,7 @@ import SubmenuTypeMenuGroup from './submenu-type-menu-group';
 import NavigationMenuListStyles from './appender-list-styles';
 import { convertToSubmenu, whenRendered } from './create-submenu';
 import { setSubmenuRequest, useSubmenuRequest } from './submenu-request';
+import type { SubmenuType } from './submenu-type-menu-group';
 import {
 	createCustomLinkBlock,
 	createCustomLinkSubmenuBlock,
@@ -47,8 +50,30 @@ const EMPTY_STATE_STYLE = {
 
 // Let the dropdown close and return focus to its toggle before the next UI
 // (the link popover or the label popover) takes focus.
-function afterDropdownCloses( callback ) {
+function afterDropdownCloses( callback: () => void ) {
 	window.requestAnimationFrame( callback );
+}
+
+/**
+ * Mirrors `ListViewRenderAppenderProps` in
+ * `packages/block-editor/src/components/list-view/types.ts`, which isn't
+ * exported.
+ */
+export interface NavigationMenuAppenderProps {
+	/** Client id of the block to add items into. */
+	clientId: string;
+	/** Nesting level of the appender row. */
+	nestingLevel?: number;
+	/** Number of items in the parent. */
+	blockCount: number;
+	/** Id of the appender's description. */
+	descriptionId: string;
+	/** Opens the link popover for a new item. */
+	setInsertedBlockClientId: ( clientId: string ) => void;
+	/** Tree grid tab index for the toggle. */
+	tabIndex?: number;
+	/** Tree grid focus handler for the toggle. */
+	onFocus?: FocusEventHandler;
 }
 
 /**
@@ -63,15 +88,15 @@ function afterDropdownCloses( callback ) {
  * Receives the props documented as `ListViewRenderAppenderProps` in
  * `packages/block-editor/src/components/list-view/types.ts`.
  *
- * @param {Object}   props                          Appender props from `PrivateListView`.
- * @param {string}   props.clientId                 Client id of the block to add items into.
- * @param {number}   props.nestingLevel             Nesting level of the appender row.
- * @param {number}   props.blockCount               Number of items in the parent.
- * @param {string}   props.descriptionId            Id of the appender's description.
- * @param {Function} props.setInsertedBlockClientId Opens the link popover for a new item.
- * @param {number}   props.tabIndex                 Tree grid tab index for the toggle.
- * @param {Function} props.onFocus                  Tree grid focus handler for the toggle.
- * @param {Object}   ref                            Ref for the focusable toggle.
+ * @param props                          Appender props from `PrivateListView`.
+ * @param props.clientId                 Client id of the block to add items into.
+ * @param props.nestingLevel             Nesting level of the appender row.
+ * @param props.blockCount               Number of items in the parent.
+ * @param props.descriptionId            Id of the appender's description.
+ * @param props.setInsertedBlockClientId Opens the link popover for a new item.
+ * @param props.tabIndex                 Tree grid tab index for the toggle.
+ * @param props.onFocus                  Tree grid focus handler for the toggle.
+ * @param ref                            Ref for the focusable toggle.
  */
 function NavigationMenuAppender(
 	{
@@ -82,8 +107,8 @@ function NavigationMenuAppender(
 		setInsertedBlockClientId,
 		tabIndex,
 		onFocus,
-	},
-	ref
+	}: NavigationMenuAppenderProps,
+	ref: ForwardedRef< HTMLElement >
 ) {
 	const [ isChoosingSubmenuType, setIsChoosingSubmenuType ] =
 		useState( false );
@@ -91,11 +116,13 @@ function NavigationMenuAppender(
 	// Asking for a new label-only submenu's label.
 	const [ isAddingLabelOnly, setIsAddingLabelOnly ] = useState( false );
 	// Kept in state, as it anchors the label popover.
-	const [ toggleElement, setToggleElement ] = useState( null );
+	const [ toggleElement, setToggleElement ] = useState< HTMLElement | null >(
+		null
+	);
 	const mergedToggleRef = useMergeRefs( [ ref, setToggleElement ] );
 	// The appender row has one cell. Span the row, so the row reads as one
 	// with the rows above it, and a sub menu's tint reaches the edge.
-	const cellRef = useRefEffect( ( node ) => {
+	const cellRef = useRefEffect< HTMLDivElement >( ( node ) => {
 		const cell = node.closest( 'td' );
 		if ( cell ) {
 			cell.colSpan = 3;
@@ -104,8 +131,8 @@ function NavigationMenuAppender(
 
 	// Moves focus into the menu when switching between its two steps, as the
 	// item that had focus is gone.
-	const stepFocusRef = useRef();
-	const switchStep = ( isSubmenuStep ) => {
+	const stepFocusRef = useRef< HTMLButtonElement >( null );
+	const switchStep = ( isSubmenuStep: boolean ) => {
 		setIsChoosingSubmenuType( isSubmenuStep );
 		window.requestAnimationFrame( () => stepFocusRef.current?.focus() );
 	};
@@ -144,21 +171,26 @@ function NavigationMenuAppender(
 					`.block-editor-list-view-leaf[data-block="${ submenuRequest.clientId }"]`
 				)
 			: null;
-	const finishSubmenuRequest = ( type, submenuLabel ) => {
+	const finishSubmenuRequest = (
+		type: SubmenuType,
+		submenuLabel?: string
+	) => {
 		setSubmenuRequest( null );
 		convertToSubmenu( {
-			clientId: submenuRequest.clientId,
+			clientId: submenuRequest!.clientId,
 			type,
 			label: submenuLabel,
 			registry,
-			updateExpansion: submenuRequest.updateExpansion,
+			updateExpansion: submenuRequest!.updateExpansion,
 			setInsertedBlockClientId,
 		} );
 	};
 	const cancelSubmenuRequest = () => {
 		setSubmenuRequest( null );
 		submenuRequestRow
-			?.querySelector( '.block-editor-list-view-block__menu' )
+			?.querySelector< HTMLElement >(
+				'.block-editor-list-view-block__menu'
+			)
 			?.focus();
 	};
 
@@ -172,7 +204,7 @@ function NavigationMenuAppender(
 	// same everywhere, including the inspector, where selecting moves away
 	// from the list, and a submenu being worked on keeps its add button.
 	const insertItem = (
-		block,
+		block: Block,
 		{ openLinkUI = true, updateSelection = false } = {}
 	) => {
 		insertBlock(
@@ -186,7 +218,7 @@ function NavigationMenuAppender(
 		}
 	};
 
-	const saveLabelOnly = ( submenuLabel ) => {
+	const saveLabelOnly = ( submenuLabel: string ) => {
 		// Look things up from the document, as adding a submenu can unmount
 		// this appender (a submenu that's no longer empty loses its own).
 		const doc = toggleElement?.ownerDocument;
@@ -211,7 +243,7 @@ function NavigationMenuAppender(
 		// Move to the new submenu's own add button.
 		whenRendered(
 			() =>
-				doc?.querySelector(
+				doc?.querySelector< HTMLElement >(
 					`[data-navigation-menu-appender-for="${ submenu.clientId }"] .navigation-menu-appender__toggle`
 				),
 			( element ) => element.focus()
@@ -234,18 +266,21 @@ function NavigationMenuAppender(
 				}
 			} }
 			popoverProps={ { placement: 'bottom-start' } }
-			toggleProps={ {
-				ref: mergedToggleRef,
-				tabIndex,
-				onFocus,
-				'aria-describedby': descriptionId,
-				className:
-					'block-editor-inserter__toggle navigation-menu-appender__toggle',
-				__next40pxDefaultSize: true,
-			} }
+			toggleProps={
+				{
+					ref: mergedToggleRef,
+					tabIndex,
+					onFocus,
+					'aria-describedby': descriptionId,
+					className:
+						'block-editor-inserter__toggle navigation-menu-appender__toggle',
+					__next40pxDefaultSize: true,
+					// `ToggleProps` leaves out `ref`, but the toggle receives it.
+				} as ComponentProps< typeof DropdownMenu >[ 'toggleProps' ]
+			}
 		>
 			{ ( { onClose } ) => {
-				const runTask = ( task ) => () => {
+				const runTask = ( task: () => void ) => () => {
 					onClose();
 					setIsChoosingSubmenuType( false );
 					afterDropdownCloses( task );
@@ -374,7 +409,7 @@ function NavigationMenuAppender(
 					} }
 				/>
 			) }
-			{ submenuRequestRow && submenuRequest.step === 'type' && (
+			{ submenuRequestRow && submenuRequest?.step === 'type' && (
 				// The same choice, and the same look, as the add button's
 				// "Submenu" option (a `DropdownMenu`, whose styles hang off these
 				// classes).
@@ -405,7 +440,7 @@ function NavigationMenuAppender(
 					</NavigableMenu>
 				</WCPopover>
 			) }
-			{ submenuRequestRow && submenuRequest.step === 'label' && (
+			{ submenuRequestRow && submenuRequest?.step === 'label' && (
 				<SubmenuLabelPopover
 					anchor={ submenuRequestRow }
 					onSubmit={ ( submenuLabel ) =>

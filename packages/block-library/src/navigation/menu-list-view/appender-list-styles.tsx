@@ -19,10 +19,14 @@ const ROW = '.block-editor-list-view-leaf';
  *
  * Rendered once, by the top-level appender, which every menu list view shows.
  *
- * @param {Object} props
- * @param {string} props.navigationClientId Client id of the Navigation block.
+ * @param props
+ * @param props.navigationClientId Client id of the Navigation block.
  */
-export default function NavigationMenuListStyles( { navigationClientId } ) {
+export default function NavigationMenuListStyles( {
+	navigationClientId,
+}: {
+	navigationClientId: string;
+} ) {
 	const activeSubmenuId = useActiveSubmenuId( navigationClientId );
 	// Joined so the selector returns primitives.
 	const { activeIds, labelOnlyIds } = useSelect(
@@ -52,7 +56,7 @@ export default function NavigationMenuListStyles( { navigationClientId } ) {
 		[ navigationClientId, activeSubmenuId ]
 	);
 
-	const rules = [];
+	const rules: string[] = [];
 
 	if ( activeIds ) {
 		const rows = activeIds

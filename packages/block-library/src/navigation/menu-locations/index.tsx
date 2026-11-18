@@ -9,6 +9,8 @@ import {
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
+import type { Block } from '@wordpress/blocks';
+import type { CSSProperties, ReactElement } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -26,6 +28,7 @@ import {
 	footer as footerIcon,
 	mobile as mobileIcon,
 } from '@wordpress/icons';
+import { inertValue } from '@wordpress/react-inert-value';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { useMenuLocations } from './use-menu-locations';
 import ChooseLocationModal from './choose-location-modal';
@@ -41,6 +44,12 @@ import {
 	setNavigationMenu,
 	showsMenu,
 	TEMPLATE_PART_POST_TYPE,
+} from './utils';
+import type {
+	MenuLocationBlock,
+	NavigationLocation,
+	NavigationMenuRecord,
+	TemplatePartRecord,
 } from './utils';
 import withMenuName from './with-menu-name';
 
@@ -100,9 +109,12 @@ const STYLES = {
 		overflow: 'hidden',
 		outline: '1px solid var(--wpds-color-stroke-surface-neutral, #ddd)',
 	},
-};
+} satisfies Record< string, CSSProperties >;
 
-function getAreaIcon( area ) {
+type RemovalOutcome = NonNullable< ReturnType< typeof getRemovalOutcome > >;
+type EditLocation = ( part: TemplatePartRecord ) => void;
+
+function getAreaIcon( area: string ) {
 	switch ( area ) {
 		case 'header':
 			return headerIcon;
@@ -115,7 +127,7 @@ function getAreaIcon( area ) {
 	}
 }
 
-function getLocationsSummary( count ) {
+function getLocationsSummary( count: number ) {
 	if ( ! count ) {
 		return __( 'Not shown on your site' );
 	}
@@ -130,29 +142,37 @@ function getLocationsSummary( count ) {
  * Edits a template part's blocks the way the editor does, so the change goes
  * through the usual save flow.
  *
- * @return {Function} Called with a location and its new blocks.
+ * @return Called with a location and its new blocks.
  */
 function useEditLocationBlocks() {
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	return ( location, blocks ) =>
+	return ( location: NavigationLocation, blocks: MenuLocationBlock[] ) =>
 		editEntityRecord( 'postType', TEMPLATE_PART_POST_TYPE, location.id, {
 			blocks,
-			content: ( { blocks: blocksForSerialization = [] } ) =>
-				__unstableSerializeAndClean( blocksForSerialization ),
+			content: ( {
+				blocks: blocksForSerialization = [],
+			}: {
+				blocks?: Block[];
+			} ) => __unstableSerializeAndClean( blocksForSerialization ),
 		} );
 }
 
 /**
  * The blocks of a location once a menu is taken out of it.
  *
- * @param {Object}  location     The location.
- * @param {number}  navigationId The menu.
- * @param {Object}  outcome      From `getRemovalOutcome`.
- * @param {?number} fallbackId   The menu shown when no menu is chosen.
- * @return {Object[]} The blocks.
+ * @param location     The location.
+ * @param navigationId The menu.
+ * @param outcome      From `getRemovalOutcome`.
+ * @param fallbackId   The menu shown when no menu is chosen.
+ * @return The blocks.
  */
-function getBlocksWithoutMenu( location, navigationId, outcome, fallbackId ) {
+function getBlocksWithoutMenu(
+	location: NavigationLocation,
+	navigationId: number,
+	outcome: RemovalOutcome,
+	fallbackId: number | null
+) {
 	return setNavigationMenu(
 		getTemplatePartBlocks( location.part ),
 		( block ) => showsMenu( block, navigationId, fallbackId ),
@@ -160,7 +180,10 @@ function getBlocksWithoutMenu( location, navigationId, outcome, fallbackId ) {
 	);
 }
 
-function getRemovalDescription( locationTitle, outcome ) {
+function getRemovalDescription(
+	locationTitle: string,
+	outcome: RemovalOutcome
+) {
 	const shownTitle = getMenuTitle( outcome.shownMenu );
 
 	return withMenuName(
@@ -181,7 +204,17 @@ function getRemovalDescription( locationTitle, outcome ) {
 	);
 }
 
-function RemoveAction( { location, navigationId, menuTitle, menus } ) {
+function RemoveAction( {
+	location,
+	navigationId,
+	menuTitle,
+	menus,
+}: {
+	location: NavigationLocation;
+	navigationId: number;
+	menuTitle: string;
+	menus: NavigationMenuRecord[];
+} ) {
 	const [ isConfirming, setIsConfirming ] = useState( false );
 	const registry = useRegistry();
 	const editLocationBlocks = useEditLocationBlocks();
@@ -199,11 +232,11 @@ function RemoveAction( { location, navigationId, menuTitle, menus } ) {
 					'postType',
 					TEMPLATE_PART_POST_TYPE,
 					location.id
-				)
+				) as TemplatePartRecord
 		);
 		editLocationBlocks(
 			location,
-			getBlocksWithoutMenu( location, navigationId, outcome, fallbackId )
+			getBlocksWithoutMenu( location, navigationId, outcome!, fallbackId )
 		);
 		createSuccessNotice(
 			sprintf(
@@ -279,6 +312,12 @@ function LocationCard( {
 	menuTitle,
 	menus,
 	onEditLocation,
+}: {
+	location: NavigationLocation;
+	navigationId: number;
+	menuTitle: string;
+	menus: NavigationMenuRecord[];
+	onEditLocation?: EditLocation;
 } ) {
 	const blocks = useMemo( () => getPreviewBlocks( location ), [ location ] );
 
@@ -329,7 +368,7 @@ function LocationCard( {
 						) }
 					</Text>
 				) }
-				<div style={ STYLES.preview } inert="">
+				<div style={ STYLES.preview } inert={ inertValue( true ) }>
 					<BlockPreview.Async>
 						<BlockPreview
 							blocks={ blocks }
@@ -342,7 +381,10 @@ function LocationCard( {
 	);
 }
 
-const FILTER_EMPTY_STATES = {
+const FILTER_EMPTY_STATES: Record<
+	string,
+	() => { title: string; description: string }
+> = {
 	header: () => ( {
 		title: __( 'Not in any headers' ),
 		description: __( 'This menu isn’t shown in a header.' ),
@@ -366,8 +408,15 @@ function LocationsView( {
 	menus,
 	onEditLocation,
 	onChooseLocation,
+}: {
+	locations: NavigationLocation[];
+	navigationId: number;
+	menuTitle: string;
+	menus: NavigationMenuRecord[];
+	onEditLocation?: EditLocation;
+	onChooseLocation: () => void;
 } ) {
-	const [ filter, setFilter ] = useState( AREA_FILTERS.all );
+	const [ filter, setFilter ] = useState< string >( AREA_FILTERS.all );
 
 	if ( ! locations.length ) {
 		return (
@@ -437,7 +486,7 @@ function LocationsView( {
 				hideLabelFromVision
 				isBlock
 				value={ filter }
-				onChange={ setFilter }
+				onChange={ ( value ) => setFilter( value as string ) }
 			>
 				<ToggleGroupControlOption
 					value={ AREA_FILTERS.all }
@@ -498,17 +547,23 @@ function LocationsView( {
  * place the menu is shown, with ways to edit those places and to change
  * where the menu shows.
  *
- * @param {Object}    props
- * @param {number}    props.navigationId   The menu's ID.
- * @param {?Function} props.onEditLocation Called with a template part record
- *                                         to open it for editing.
- * @return {Element} The canvas.
+ * @param props
+ * @param props.navigationId   The menu's ID.
+ * @param props.onEditLocation Called with a template part record to open it
+ *                             for editing.
+ * @return The canvas.
  */
-export default function MenuLocations( { navigationId, onEditLocation } ) {
+export default function MenuLocations( {
+	navigationId,
+	onEditLocation,
+}: {
+	navigationId: number | string;
+	onEditLocation?: EditLocation;
+} ) {
 	const id = Number( navigationId );
 	const { locations, otherLocations, menus, isResolving } =
 		useMenuLocations( id );
-	const [ view, setView ] = useState( VIEW_PREVIEW );
+	const [ view, setView ] = useState< string >( VIEW_PREVIEW );
 	const [ isChoosing, setIsChoosing ] = useState( false );
 	const editLocationBlocks = useEditLocationBlocks();
 	const { createSuccessNotice, createErrorNotice } =
@@ -526,7 +581,7 @@ export default function MenuLocations( { navigationId, onEditLocation } ) {
 		[ locations ]
 	);
 
-	const applyLocations = ( selectedIds ) => {
+	const applyLocations = ( selectedIds: string[] ) => {
 		setIsChoosing( false );
 		let skipped = 0;
 
@@ -573,7 +628,7 @@ export default function MenuLocations( { navigationId, onEditLocation } ) {
 
 	const openChooser = () => setIsChoosing( true );
 
-	let body;
+	let body: ReactElement;
 	if ( isResolving ) {
 		body = (
 			<div style={ STYLES.centered }>
@@ -632,7 +687,7 @@ export default function MenuLocations( { navigationId, onEditLocation } ) {
 						hideLabelFromVision
 						isAdaptiveWidth
 						value={ view }
-						onChange={ setView }
+						onChange={ ( value ) => setView( value as string ) }
 					>
 						<ToggleGroupControlOption
 							value={ VIEW_PREVIEW }

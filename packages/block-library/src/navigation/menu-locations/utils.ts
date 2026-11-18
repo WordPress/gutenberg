@@ -1,4 +1,5 @@
 import { parse } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
@@ -19,15 +20,47 @@ export const AREA_FILTERS = {
 	overlay: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 };
 
-const EMPTY_ARRAY = [];
+/**
+ * A block, as parsed from a template part or kept in its edits.
+ */
+export type MenuLocationBlock = Block< Record< string, any > >;
+
+/**
+ * A template part record, with its unsaved edits. Untyped in core-data.
+ */
+export type TemplatePartRecord = Record< string, any >;
+
+/**
+ * A Navigation Menu (`wp_navigation`) record.
+ */
+export interface NavigationMenuRecord {
+	id: number;
+	status?: string;
+	title?: string | { rendered?: string; raw?: string };
+	[ key: string ]: any;
+}
+
+/**
+ * A template part with a Navigation block in it, and the menus it shows.
+ */
+export interface NavigationLocation {
+	id: string;
+	part: TemplatePartRecord;
+	area: string;
+	title: string;
+	menuIds: number[];
+	usesFallback: boolean;
+}
+
+const EMPTY_ARRAY: never[] = [];
 
 /*
  * Parsing every template part on each change would be slow, so blocks are
  * kept by the content they were parsed from.
  */
-const parsedContentCache = new Map();
+const parsedContentCache = new Map< string, MenuLocationBlock[] >();
 
-function parseContent( content ) {
+function parseContent( content?: string ): MenuLocationBlock[] {
 	if ( ! content ) {
 		return EMPTY_ARRAY;
 	}
@@ -39,16 +72,18 @@ function parseContent( content ) {
 		);
 	}
 
-	return parsedContentCache.get( content );
+	return parsedContentCache.get( content )!;
 }
 
 /**
  * A template part's blocks, with its unsaved edits.
  *
- * @param {Object} part Edited template part record.
- * @return {Object[]} Its blocks.
+ * @param part Edited template part record.
+ * @return Its blocks.
  */
-export function getTemplatePartBlocks( part ) {
+export function getTemplatePartBlocks(
+	part: TemplatePartRecord | null | undefined
+): MenuLocationBlock[] {
 	if ( Array.isArray( part?.blocks ) ) {
 		return part.blocks;
 	}
@@ -62,11 +97,13 @@ export function getTemplatePartBlocks( part ) {
 /**
  * Every Navigation block in a tree, in document order.
  *
- * @param {Object[]} blocks Blocks to search.
- * @return {Object[]} Navigation blocks.
+ * @param blocks Blocks to search.
+ * @return Navigation blocks.
  */
-export function findNavigationBlocks( blocks ) {
-	const found = [];
+export function findNavigationBlocks(
+	blocks: MenuLocationBlock[] | null | undefined
+): MenuLocationBlock[] {
+	const found: MenuLocationBlock[] = [];
 
 	for ( const block of blocks || EMPTY_ARRAY ) {
 		if ( block.name === 'core/navigation' ) {
@@ -86,11 +123,14 @@ export function findNavigationBlocks( blocks ) {
  * no links of its own shows the site's fallback menu, as it does on the
  * front of the site.
  *
- * @param {Object}  block          Navigation block.
- * @param {?number} fallbackMenuId The menu shown when no menu is chosen.
- * @return {?number} The menu's ID, or null if the block has its own links.
+ * @param block          Navigation block.
+ * @param fallbackMenuId The menu shown when no menu is chosen.
+ * @return The menu's ID, or null if the block has its own links.
  */
-export function getShownMenuId( block, fallbackMenuId ) {
+export function getShownMenuId(
+	block: MenuLocationBlock,
+	fallbackMenuId: number | null | undefined
+): number | null {
 	const ref = Number( block.attributes?.ref );
 
 	if ( ref ) {
@@ -108,17 +148,20 @@ export function getShownMenuId( block, fallbackMenuId ) {
  * The menu WordPress shows in a Navigation block that hasn't chosen one: the
  * most recently published menu.
  *
- * @param {Object[]} menus Menus, most recent first.
- * @return {?number} The fallback menu's ID.
+ * @param menus Menus, most recent first.
+ * @return The fallback menu's ID.
  */
-export function getFallbackMenuId( menus ) {
+export function getFallbackMenuId(
+	menus: NavigationMenuRecord[] | null | undefined
+): number | null {
 	return (
-		( menus || EMPTY_ARRAY ).find( ( menu ) => menu.status === 'publish' )
-			?.id ?? null
+		( menus || EMPTY_ARRAY ).find(
+			( menu: NavigationMenuRecord ) => menu.status === 'publish'
+		)?.id ?? null
 	);
 }
 
-function getAreaOrder( area ) {
+function getAreaOrder( area: string ) {
 	const order = [
 		'header',
 		'footer',
@@ -128,7 +171,9 @@ function getAreaOrder( area ) {
 	return order === -1 ? 3 : order;
 }
 
-export function getTemplatePartTitle( part ) {
+export function getTemplatePartTitle(
+	part: TemplatePartRecord | null | undefined
+): string {
 	const title =
 		typeof part?.title === 'string'
 			? part.title
@@ -137,7 +182,7 @@ export function getTemplatePartTitle( part ) {
 	return title ? decodeEntities( title ) : part?.slug || '';
 }
 
-export function getAreaLabel( area ) {
+export function getAreaLabel( area: string ): string {
 	switch ( area ) {
 		case 'header':
 			return __( 'Header' );
@@ -154,13 +199,16 @@ export function getAreaLabel( area ) {
  * Every template part with a Navigation block in it, and the menus each
  * shows, sorted headers first, then footers, then overlays.
  *
- * @param {Object[]} templateParts  Edited template part records.
- * @param {?number}  fallbackMenuId The menu shown when no menu is chosen.
- * @return {Object[]} `{ id, part, area, title, menuIds, usesFallback }`.
+ * @param templateParts  Edited template part records.
+ * @param fallbackMenuId The menu shown when no menu is chosen.
+ * @return `{ id, part, area, title, menuIds, usesFallback }`.
  */
-export function getNavigationLocations( templateParts, fallbackMenuId ) {
+export function getNavigationLocations(
+	templateParts: TemplatePartRecord[] | null | undefined,
+	fallbackMenuId: number | null | undefined
+): NavigationLocation[] {
 	return ( templateParts || EMPTY_ARRAY )
-		.map( ( part ) => {
+		.map( ( part: TemplatePartRecord ): NavigationLocation | null => {
 			const navigationBlocks = findNavigationBlocks(
 				getTemplatePartBlocks( part )
 			);
@@ -169,7 +217,7 @@ export function getNavigationLocations( templateParts, fallbackMenuId ) {
 				return null;
 			}
 
-			const menuIds = [];
+			const menuIds: number[] = [];
 			let usesFallback = false;
 
 			for ( const block of navigationBlocks ) {
@@ -193,7 +241,9 @@ export function getNavigationLocations( templateParts, fallbackMenuId ) {
 				usesFallback,
 			};
 		} )
-		.filter( Boolean )
+		.filter( ( location ): location is NavigationLocation =>
+			Boolean( location )
+		)
 		.sort(
 			( a, b ) =>
 				getAreaOrder( a.area ) - getAreaOrder( b.area ) ||
@@ -205,22 +255,22 @@ export function getNavigationLocations( templateParts, fallbackMenuId ) {
  * Point Navigation blocks at another menu. Returns new blocks, leaving the
  * ones passed in untouched, so they can be handed to `editEntityRecord`.
  *
- * @param {Object[]} blocks            Blocks to change.
- * @param {Function} isMatch           Whether a Navigation block should change.
- * @param {number}   newMenuId         The menu to show.
- * @param {Object}   options
- * @param {boolean}  options.onlyFirst Change the first match only.
- * @return {Object[]} The changed blocks.
+ * @param blocks            Blocks to change.
+ * @param isMatch           Whether a Navigation block should change.
+ * @param newMenuId         The menu to show.
+ * @param options
+ * @param options.onlyFirst Change the first match only.
+ * @return The changed blocks.
  */
 export function setNavigationMenu(
-	blocks,
-	isMatch,
-	newMenuId,
-	{ onlyFirst = false } = {}
-) {
+	blocks: MenuLocationBlock[],
+	isMatch: ( block: MenuLocationBlock ) => boolean,
+	newMenuId: number | null | undefined,
+	{ onlyFirst = false }: { onlyFirst?: boolean } = {}
+): MenuLocationBlock[] {
 	let hasChanged = false;
 
-	function visit( list ) {
+	function visit( list: MenuLocationBlock[] ): MenuLocationBlock[] {
 		return list.map( ( block ) => {
 			if ( onlyFirst && hasChanged ) {
 				return block;
@@ -263,17 +313,19 @@ export function setNavigationMenu(
  * A template part's blocks, ready to preview: an overlay's Navigation blocks
  * never collapse into a menu button of their own, as the site renders them.
  *
- * @param {Object} location Location from `getNavigationLocations`.
- * @return {Object[]} Blocks to preview.
+ * @param location Location from `getNavigationLocations`.
+ * @return Blocks to preview.
  */
-export function getPreviewBlocks( location ) {
+export function getPreviewBlocks(
+	location: NavigationLocation
+): MenuLocationBlock[] {
 	const blocks = getTemplatePartBlocks( location.part );
 
 	if ( location.area !== NAVIGATION_OVERLAY_TEMPLATE_PART_AREA ) {
 		return blocks;
 	}
 
-	function visit( list ) {
+	function visit( list: MenuLocationBlock[] ): MenuLocationBlock[] {
 		return list.map( ( block ) => ( {
 			...block,
 			attributes:
@@ -290,10 +342,12 @@ export function getPreviewBlocks( location ) {
 /**
  * Says where a menu is used, for the menus list.
  *
- * @param {Object[]} locations The menu's locations.
- * @return {string} "Used in Header, Footer" or "Not used".
+ * @param locations The menu's locations.
+ * @return "Used in Header, Footer" or "Not used".
  */
-export function getWhereUsedLabel( locations ) {
+export function getWhereUsedLabel(
+	locations: NavigationLocation[] | null | undefined
+): string {
 	if ( ! locations?.length ) {
 		return __( 'Not used' );
 	}
@@ -322,7 +376,9 @@ export function getWhereUsedLabel( locations ) {
 	);
 }
 
-export function getMenuTitle( menu ) {
+export function getMenuTitle(
+	menu: NavigationMenuRecord | null | undefined
+): string {
 	const title =
 		typeof menu?.title === 'string'
 			? menu.title
@@ -331,19 +387,23 @@ export function getMenuTitle( menu ) {
 	return title
 		? decodeEntities( title )
 		: /* translators: %d: menu ID. */
-			sprintf( __( '(no title %d)' ), menu?.id );
+			sprintf( __( '(no title %d)' ), menu?.id as number );
 }
 
 /**
  * Whether a Navigation block shows a menu, by choice or because it is the
  * site's fallback.
  *
- * @param {Object}  block          Navigation block.
- * @param {number}  menuId         The menu's ID.
- * @param {?number} fallbackMenuId The menu shown when no menu is chosen.
- * @return {boolean} Whether the block shows the menu.
+ * @param block          Navigation block.
+ * @param menuId         The menu's ID.
+ * @param fallbackMenuId The menu shown when no menu is chosen.
+ * @return Whether the block shows the menu.
  */
-export function showsMenu( block, menuId, fallbackMenuId ) {
+export function showsMenu(
+	block: MenuLocationBlock,
+	menuId: number | string,
+	fallbackMenuId: number | null | undefined
+): boolean {
 	return getShownMenuId( block, fallbackMenuId ) === Number( menuId );
 }
 
@@ -353,12 +413,19 @@ export function showsMenu( block, menuId, fallbackMenuId ) {
  * front of the site does. When that is the menu being removed, the newest
  * other menu is chosen instead, so the menu really goes.
  *
- * @param {Object[]} menus  Menus, most recent first.
- * @param {number}   menuId The menu being removed.
- * @return {?Object} `{ newMenuId, shownMenu, isFallback }`, or null when there
- *                   is no other menu to show.
+ * @param menus  Menus, most recent first.
+ * @param menuId The menu being removed.
+ * @return `{ newMenuId, shownMenu, isFallback }`, or null when there is no
+ *         other menu to show.
  */
-export function getRemovalOutcome( menus, menuId ) {
+export function getRemovalOutcome(
+	menus: NavigationMenuRecord[],
+	menuId: number | string
+): {
+	newMenuId: number | null;
+	shownMenu: NavigationMenuRecord | undefined;
+	isFallback: boolean;
+} | null {
 	const id = Number( menuId );
 	const fallbackMenuId = getFallbackMenuId( menus );
 
@@ -371,7 +438,8 @@ export function getRemovalOutcome( menus, menuId ) {
 	}
 
 	const replacement = ( menus || EMPTY_ARRAY ).find(
-		( menu ) => menu.id !== id && menu.status === 'publish'
+		( menu: NavigationMenuRecord ) =>
+			menu.id !== id && menu.status === 'publish'
 	);
 
 	return replacement
@@ -387,19 +455,18 @@ export function getRemovalOutcome( menus, menuId ) {
  * What a location shows now, in the Navigation block a new menu would
  * replace (the first one). Used to warn before replacing another menu.
  *
- * @param {Object}   location       A location from `getNavigationLocations`.
- * @param {number}   navigationId   The menu about to be shown there.
- * @param {Object[]} menus          Every menu.
- * @param {?number}  fallbackMenuId The menu shown when no menu is chosen.
- * @return {?{ title: string, isOwnLinks: boolean }} What would be replaced,
- *                                                  or null if nothing would.
+ * @param location       A location from `getNavigationLocations`.
+ * @param navigationId   The menu about to be shown there.
+ * @param menus          Every menu.
+ * @param fallbackMenuId The menu shown when no menu is chosen.
+ * @return What would be replaced, or null if nothing would.
  */
 export function getReplacedMenu(
-	location,
-	navigationId,
-	menus,
-	fallbackMenuId
-) {
+	location: NavigationLocation,
+	navigationId: number | string,
+	menus: NavigationMenuRecord[] | null | undefined,
+	fallbackMenuId: number | null | undefined
+): { title: string; isOwnLinks: boolean } | null {
 	const [ block ] = findNavigationBlocks(
 		getTemplatePartBlocks( location.part )
 	);
@@ -416,7 +483,7 @@ export function getReplacedMenu(
 
 	if ( shownId ) {
 		const menu = ( menus || EMPTY_ARRAY ).find(
-			( record ) => record.id === shownId
+			( record: NavigationMenuRecord ) => record.id === shownId
 		);
 		return {
 			title: menu ? getMenuTitle( menu ) : __( 'Another menu' ),

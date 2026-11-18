@@ -1,9 +1,12 @@
 import { speak } from '@wordpress/a11y';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import type { Block, BlockType, Icon as BlockIcon } from '@wordpress/blocks';
 import { Button, Icon as WCIcon, Modal } from '@wordpress/components';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
+import type { Field, View } from '@wordpress/dataviews';
+import type { ComponentProps } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -30,7 +33,38 @@ import { useLinksInMenu } from './bulk-add-sources';
  * (`routes/navigation-edit/add-menu-items-modal.jsx`), so the two match.
  */
 
-const EMPTY_ARRAY = [];
+type WCIconType = ComponentProps< typeof WCIcon >[ 'icon' ];
+
+// Records from `getEntityRecords`, which are untyped for these queries.
+type EntityRecord = Record< string, any >;
+type EntityRecordsArgs = [
+	kind: string,
+	name: string,
+	query: Record< string, any >,
+];
+
+/**
+ * An item in the picker: a page, post, block, term, archive or media item.
+ */
+interface PickerItem {
+	group: string;
+	id: string;
+	linkLabel: string;
+	objectId?: number;
+	sourceKind: string;
+	sourceType: string;
+	status?: string;
+	title: string;
+	typeLabel: string;
+	url?: string;
+	blockIcon?: BlockIcon;
+	blockName?: string;
+	description?: string;
+	mediaUrl?: string;
+	inThisMenu?: boolean;
+}
+
+const EMPTY_ARRAY: EntityRecord[] = [];
 
 const MENU_ITEM_GROUPS = [
 	{
@@ -88,7 +122,7 @@ const MENU_ITEM_GROUPS_BY_ID = Object.fromEntries(
 	MENU_ITEM_GROUPS.map( ( group ) => [ group.id, group ] )
 );
 
-const PAGE_ARGS = [
+const PAGE_ARGS: EntityRecordsArgs = [
 	'postType',
 	'page',
 	{
@@ -100,7 +134,7 @@ const PAGE_ARGS = [
 		_fields: 'id,link,menu_order,parent,status,title,type',
 	},
 ];
-const POST_ARGS = [
+const POST_ARGS: EntityRecordsArgs = [
 	'postType',
 	'post',
 	{
@@ -112,7 +146,7 @@ const POST_ARGS = [
 		_fields: 'id,link,status,title,type',
 	},
 ];
-const CATEGORY_ARGS = [
+const CATEGORY_ARGS: EntityRecordsArgs = [
 	'taxonomy',
 	'category',
 	{
@@ -123,7 +157,7 @@ const CATEGORY_ARGS = [
 		per_page: 25,
 	},
 ];
-const TAG_ARGS = [
+const TAG_ARGS: EntityRecordsArgs = [
 	'taxonomy',
 	'post_tag',
 	{
@@ -134,7 +168,7 @@ const TAG_ARGS = [
 		per_page: 25,
 	},
 ];
-const MEDIA_ARGS = [
+const MEDIA_ARGS: EntityRecordsArgs = [
 	'postType',
 	'attachment',
 	{
@@ -146,7 +180,7 @@ const MEDIA_ARGS = [
 	},
 ];
 
-function getRecordTitle( record ) {
+function getRecordTitle( record: EntityRecord ) {
 	const title =
 		record?.title?.raw || record?.title?.rendered || record?.title;
 
@@ -157,7 +191,7 @@ function getRecordTitle( record ) {
 	return __( '(no title)' );
 }
 
-function createPickerView( group ) {
+function createPickerView( group: string ): View {
 	let fields = [ 'typeLabel', 'linkLabel', 'inThisMenu' ];
 
 	if ( group === 'pages' ) {
@@ -182,14 +216,17 @@ function createPickerView( group ) {
 		showMedia: group === 'media',
 		titleField: 'title',
 		type: group === 'media' ? 'pickerGrid' : 'pickerTable',
-	};
+		// The table view ignores the grid's `layout` options.
+	} as View;
 }
 
-function getRecordStatusLabel( status ) {
+function getRecordStatusLabel( status?: string ) {
 	return status === 'publish' ? __( 'Published' ) : __( 'Draft' );
 }
 
-function normalizeMenuItemUrl( rawUrl ) {
+function normalizeMenuItemUrl(
+	rawUrl: string
+): { href: string; error?: undefined } | { error: string; href?: undefined } {
 	const trimmed = rawUrl.trim();
 
 	if ( ! trimmed ) {
@@ -226,9 +263,9 @@ function normalizeMenuItemUrl( rawUrl ) {
 	}
 }
 
-function createBlockFromPickerItem( item ) {
+function createBlockFromPickerItem( item: PickerItem ): Block {
 	if ( item.group === 'blocks' ) {
-		return createBlock( item.blockName );
+		return createBlock( item.blockName as string );
 	}
 
 	return createMenuLinkBlock( {
@@ -240,7 +277,10 @@ function createBlockFromPickerItem( item ) {
 	} );
 }
 
-function isPickerItemInMenu( item, linksInMenu ) {
+function isPickerItemInMenu(
+	item: Omit< PickerItem, 'inThisMenu' >,
+	linksInMenu: Set< string >
+) {
 	if ( item.group === 'blocks' ) {
 		return false;
 	}
@@ -259,18 +299,26 @@ function isPickerItemInMenu( item, linksInMenu ) {
  * go. Less common content (categories and tags, archives, media and custom
  * links) sits behind "More", so the main flow stays simple.
  *
- * @param {Object}   props              Component props.
- * @param {string}   props.rootClientId Client id of the block to add items into (the Navigation block or a sub menu).
- * @param {Function} props.onClose      Called when the modal closes.
+ * @param props              Component props.
+ * @param props.rootClientId Client id of the block to add items into (the Navigation block or a sub menu).
+ * @param props.onClose      Called when the modal closes.
  */
-export default function BulkAddModal( { rootClientId, onClose } ) {
+export default function BulkAddModal( {
+	rootClientId,
+	onClose,
+}: {
+	rootClientId: string;
+	onClose: () => void;
+} ) {
 	const [ activeGroup, setActiveGroup ] = useState( 'pages' );
 	const [ areMoreGroupsVisible, setAreMoreGroupsVisible ] = useState( false );
 	const [ customLabel, setCustomLabel ] = useState( '' );
 	const [ customUrl, setCustomUrl ] = useState( '' );
 	const [ error, setError ] = useState( '' );
-	const [ selection, setSelection ] = useState( [] );
-	const [ view, setView ] = useState( () => createPickerView( 'pages' ) );
+	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ view, setView ] = useState< View >( () =>
+		createPickerView( 'pages' )
+	);
 	const linksInMenu = useLinksInMenu( rootClientId );
 	const { insertBlocks } = useDispatch( blockEditorStore );
 	const {
@@ -285,6 +333,8 @@ export default function BulkAddModal( { rootClientId, onClose } ) {
 		tags,
 	} = useSelect( ( select ) => {
 		const store = select( coreDataStore );
+		const getRecords = ( ...args: EntityRecordsArgs ) =>
+			store.getEntityRecords( ...args ) as EntityRecord[] | null;
 
 		return {
 			isResolvingContent: store.isResolving(
@@ -302,18 +352,17 @@ export default function BulkAddModal( { rootClientId, onClose } ) {
 			isResolvingTerms:
 				store.isResolving( 'getEntityRecords', CATEGORY_ARGS ) ||
 				store.isResolving( 'getEntityRecords', TAG_ARGS ),
-			media: store.getEntityRecords( ...MEDIA_ARGS ) || EMPTY_ARRAY,
-			pages: store.getEntityRecords( ...PAGE_ARGS ) || EMPTY_ARRAY,
-			posts: store.getEntityRecords( ...POST_ARGS ) || EMPTY_ARRAY,
-			categories:
-				store.getEntityRecords( ...CATEGORY_ARGS ) || EMPTY_ARRAY,
-			tags: store.getEntityRecords( ...TAG_ARGS ) || EMPTY_ARRAY,
+			media: getRecords( ...MEDIA_ARGS ) || EMPTY_ARRAY,
+			pages: getRecords( ...PAGE_ARGS ) || EMPTY_ARRAY,
+			posts: getRecords( ...POST_ARGS ) || EMPTY_ARRAY,
+			categories: getRecords( ...CATEGORY_ARGS ) || EMPTY_ARRAY,
+			tags: getRecords( ...TAG_ARGS ) || EMPTY_ARRAY,
 		};
 	}, [] );
 	// Built here rather than in the selectors, which would hand back new
 	// arrays, and re-render the modal, on every change to any store.
 	const terms = useMemo(
-		() => [
+		(): EntityRecord[] => [
 			...categories.map( ( term ) => ( {
 				...term,
 				taxonomy: 'category',
@@ -347,12 +396,14 @@ export default function BulkAddModal( { rootClientId, onClose } ) {
 						canInsertBlockType( name, rootClientId )
 				)
 				.map( ( name ) => blockTypesByName.get( name ) )
-				.filter( Boolean );
+				.filter( ( blockType ): blockType is BlockType =>
+					Boolean( blockType )
+				);
 		},
 		[ rootClientId ]
 	);
-	const items = useMemo( () => {
-		const nextItems = [
+	const items = useMemo( (): PickerItem[] => {
+		const nextItems: Omit< PickerItem, 'inThisMenu' >[] = [
 			...pages.map( ( page ) => ( {
 				group: 'pages',
 				id: `post-type:page:${ page.id }`,
@@ -452,13 +503,13 @@ export default function BulkAddModal( { rootClientId, onClose } ) {
 		( activeGroup === 'content' && isResolvingContent ) ||
 		( activeGroup === 'taxonomy' && isResolvingTerms ) ||
 		( activeGroup === 'media' && isResolvingMedia );
-	const selectGroup = ( nextGroup ) => {
+	const selectGroup = ( nextGroup: string ) => {
 		setActiveGroup( nextGroup );
 		setError( '' );
 		setSelection( [] );
 		setView( createPickerView( nextGroup ) );
 	};
-	const addBlocks = ( blocks ) => {
+	const addBlocks = ( blocks: Block[] ) => {
 		// Keep the current selection, so the list view and inspector stay
 		// where people were working.
 		insertBlocks( blocks, undefined, rootClientId, false );
@@ -672,7 +723,7 @@ export default function BulkAddModal( { rootClientId, onClose } ) {
 	);
 }
 
-function PickerPreview( { item } ) {
+function PickerPreview( { item }: { item: PickerItem } ) {
 	if ( item.group === 'media' && item.mediaUrl ) {
 		return (
 			<div className="navigation-add-items-picker__preview is-image">
@@ -690,11 +741,12 @@ function PickerPreview( { item } ) {
 	);
 }
 
-function PickerSourceIcon( { item } ) {
-	let icon = pageIcon;
+function PickerSourceIcon( { item }: { item: PickerItem } ) {
+	let icon: WCIconType = pageIcon;
 
 	if ( item.group === 'blocks' ) {
-		icon = item.blockIcon || blockDefaultIcon;
+		// A block's icon can be a Dashicon name, which `WCIcon` also takes.
+		icon = ( item.blockIcon || blockDefaultIcon ) as WCIconType;
 	} else if ( item.group === 'media' ) {
 		icon = item.mediaUrl ? imageIcon : fileIcon;
 	} else if ( item.group === 'taxonomy' ) {
@@ -715,7 +767,7 @@ function PickerSourceIcon( { item } ) {
 	);
 }
 
-const pickerFields = [
+const pickerFields: Field< PickerItem >[] = [
 	{
 		enableGlobalSearch: false,
 		enableHiding: false,

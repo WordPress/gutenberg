@@ -5,15 +5,16 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
 import { unlock } from '../../lock-unlock';
 
 /**
  * The template that renders the front of the site.
  *
- * @return {?string|undefined} Its ID, null if there is none, undefined while
- *                             it is being worked out.
+ * @return Its ID, null if there is none, undefined while it is being worked
+ *         out.
  */
-function useFrontTemplateId() {
+function useFrontTemplateId(): string | null | undefined {
 	return useSelect( ( select ) => {
 		const { getHomePage, getTemplateId } = unlock( select( coreStore ) );
 		const homePage = getHomePage();
@@ -43,18 +44,19 @@ function useFrontTemplateId() {
  * menus are read from the same records the editor edits, so unsaved changes
  * to a menu show here as they are made.
  *
- * @return {Element} The preview.
+ * @return The preview.
  */
 export default function MenuSitePreview() {
 	const templateId = useFrontTemplateId();
 	const template = useSelect(
 		( select ) =>
 			templateId
-				? select( coreStore ).getEditedEntityRecord(
+				? // Template records are untyped here.
+					( select( coreStore ).getEditedEntityRecord(
 						'postType',
 						'wp_template',
 						templateId
-					)
+					) as Record< string, any > )
 				: null,
 		[ templateId ]
 	);
@@ -96,7 +98,7 @@ export default function MenuSitePreview() {
 		<div
 			className="menu-locations__site-preview"
 			// Nothing in a preview is reachable by pointer or keyboard.
-			inert=""
+			inert={ inertValue( true ) }
 		>
 			<BlockPreview.Async>
 				<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />

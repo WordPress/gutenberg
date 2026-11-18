@@ -15,13 +15,36 @@ const PAGES_QUERY = {
 };
 
 /**
+ * A page record, with the fields in `PAGES_QUERY`.
+ */
+export interface AutoMenuPageRecord {
+	id: number;
+	link: string;
+	menu_order: number;
+	parent: number;
+	title?: { rendered?: string };
+	type: string;
+}
+
+/**
+ * A page in an Auto menu, nested under its parent page.
+ */
+export interface AutoMenuPage {
+	id: number;
+	title: string;
+	children: AutoMenuPage[];
+}
+
+/**
  * The Page List that makes a menu an Auto menu, if the Navigation block's
  * only inner block is one.
  *
- * @param {?string} navigationClientId Client id of the Navigation block.
- * @return {{clientId: string, attributes: Object}|null} The Page List block.
+ * @param navigationClientId Client id of the Navigation block.
+ * @return The Page List block.
  */
-export function useAutoMenuPageList( navigationClientId ) {
+export function useAutoMenuPageList(
+	navigationClientId: string | null | undefined
+): { clientId: string; attributes: Record< string, any > } | null {
 	return useSelect(
 		( select ) => {
 			if ( ! navigationClientId ) {
@@ -38,14 +61,17 @@ export function useAutoMenuPageList( navigationClientId ) {
 			}
 			return {
 				clientId: order[ 0 ],
-				attributes: getBlockAttributes( order[ 0 ] ),
+				attributes: getBlockAttributes( order[ 0 ] ) as Record<
+					string,
+					any
+				>,
 			};
 		},
 		[ navigationClientId ]
 	);
 }
 
-function getTitle( page ) {
+function getTitle( page: AutoMenuPageRecord ) {
 	const title = page.title?.rendered?.trim();
 	// translators: displayed when a page has an empty title.
 	return title ? title : __( '(no title)' );
@@ -56,17 +82,22 @@ function getTitle( page ) {
  * sorted by page order then title, nested by parent, starting from the
  * Page List's parent page.
  *
- * @param {number} parentPageID The Page List's `parentPageID` attribute.
- * @return {{pages: ?Array, tree: Array, hasResolved: boolean}} The pages.
+ * @param parentPageID The Page List's `parentPageID` attribute.
+ * @return The pages.
  */
-export function useAutoMenuPages( parentPageID = 0 ) {
-	const { records: pages, hasResolved } = useEntityRecords(
-		'postType',
-		'page',
-		PAGES_QUERY
-	);
+export function useAutoMenuPages( parentPageID: number | null = 0 ): {
+	pages: AutoMenuPageRecord[] | null;
+	tree: AutoMenuPage[];
+	hasResolved: boolean;
+} {
+	const { records: pages, hasResolved } =
+		useEntityRecords< AutoMenuPageRecord >(
+			'postType',
+			'page',
+			PAGES_QUERY
+		);
 
-	const tree = useMemo( () => {
+	const tree = useMemo( (): AutoMenuPage[] => {
 		if ( ! pages ) {
 			return [];
 		}
@@ -76,14 +107,14 @@ export function useAutoMenuPages( parentPageID = 0 ) {
 			}
 			return a.menu_order - b.menu_order;
 		} );
-		const byParent = new Map();
+		const byParent = new Map< number, AutoMenuPageRecord[] >();
 		sorted.forEach( ( page ) => {
 			if ( ! byParent.has( page.parent ) ) {
 				byParent.set( page.parent, [] );
 			}
-			byParent.get( page.parent ).push( page );
+			byParent.get( page.parent )!.push( page );
 		} );
-		const build = ( parentId ) =>
+		const build = ( parentId: number ): AutoMenuPage[] =>
 			( byParent.get( parentId ) ?? [] ).map( ( page ) => ( {
 				id: page.id,
 				title: getTitle( page ),

@@ -1,4 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 
 /**
  * Blocks created by the task-based appender (#86177). Each task maps to an
@@ -16,7 +17,7 @@ export function createCustomLinkBlock() {
 	return createBlock( 'core/navigation-link', { kind: 'custom' } );
 }
 
-export function createPageSubmenuBlock( innerBlocks = [] ) {
+export function createPageSubmenuBlock( innerBlocks: Block[] = [] ) {
 	return createBlock(
 		'core/navigation-submenu',
 		{ kind: 'post-type', type: 'page' },
@@ -24,7 +25,7 @@ export function createPageSubmenuBlock( innerBlocks = [] ) {
 	);
 }
 
-export function createCustomLinkSubmenuBlock( innerBlocks = [] ) {
+export function createCustomLinkSubmenuBlock( innerBlocks: Block[] = [] ) {
 	return createBlock(
 		'core/navigation-submenu',
 		{ kind: 'custom' },
@@ -32,6 +33,6 @@ export function createCustomLinkSubmenuBlock( innerBlocks = [] ) {
 	);
 }
 
-export function createLabelOnlySubmenuBlock( label ) {
+export function createLabelOnlySubmenuBlock( label: string ) {
 	return createBlock( 'core/navigation-submenu', { label } );
 }

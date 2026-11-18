@@ -8,11 +8,11 @@ import { createInterpolateElement } from '@wordpress/element';
  * The name fills a `<menu />` tag in the translated string, rather than
  * being part of the string, so a name with `<` in it is shown as it is.
  *
- * @param {string} text Translated text with a `<menu />` tag.
- * @param {string} name The menu's name.
- * @return {Element} The sentence.
+ * @param text Translated text with a `<menu />` tag.
+ * @param name The menu's name.
+ * @return The sentence.
  */
-export default function withMenuName( text, name ) {
+export default function withMenuName( text: string, name: string ) {
 	return createInterpolateElement( text, {
 		menu: <strong>{ name }</strong>,
 	} );
