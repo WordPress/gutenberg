@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `ColorPicker`: Keep the copy button named "Copy", show a check or error icon for two seconds after copying, and announce whether the copy succeeded. Its tooltip now shows above `@wordpress/ui` overlays ([#86808](https://github.com/WordPress/gutenberg/pull/86808)).
 -   `BaseControl`, `FocalPointPicker`, and `Tabs`: Use the `--wpds-typography-font-family-body` token for their font family ([#86761](https://github.com/WordPress/gutenberg/pull/86761)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
