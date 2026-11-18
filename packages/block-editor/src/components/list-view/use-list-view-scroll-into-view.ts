@@ -44,7 +44,7 @@ export default function useListViewScrollIntoView( {
 			rowRect.top < scrollContainerRect.top ||
 			rowRect.bottom > scrollContainerRect.bottom
 		) {
-			rowItemRef.current.scrollIntoView();
+			scrollContainer.scrollTop += rowRect.top - scrollContainerRect.top;
 		}
 	}, [ isSelected, isSingleSelection, rowItemRef ] );
 }
