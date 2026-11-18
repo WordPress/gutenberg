@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 5.28.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 5.28.0 (2024-02-09)
 
 ## 5.27.0 (2024-01-24)
