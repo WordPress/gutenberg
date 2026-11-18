@@ -48,6 +48,8 @@ import { getThreadLayout } from './utils/layout';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
+const EMPTY_ARRAY = [];
+
 /**
  * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
  */
@@ -69,28 +71,36 @@ export function useNoteThreads( postId ) {
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );
-	const { clientIds, noteIdsJson } = useSelect( ( select ) => {
-		const {
-			getClientIdsWithDescendants,
-			getBlockAttributes: selectBlockAttributes,
-		} = select( blockEditorStore );
-		const ids = getClientIdsWithDescendants();
-
+	const { clientIds } = useSelect( ( select ) => {
+		const { getClientIdsWithDescendants } = select( blockEditorStore );
 		return {
-			clientIds: ids,
-			// Used to react to note ids that arrive from collaborators
-			// during real-time collaboration. Stored as a string so that
-			// it only counts as changed when the note ids change, instead
-			// of on every editor update.
-			noteIdsJson: JSON.stringify(
-				ids.map( ( clientId ) =>
-					getNoteIdsFromMetadata(
-						selectBlockAttributes( clientId )?.metadata
-					)
-				)
-			),
+			clientIds: getClientIdsWithDescendants(),
 		};
 	}, [] );
+
+	// The note IDs of each block, in the order of `clientIds`. They are
+	// selected to react to note IDs that arrive from collaborators during
+	// real-time collaboration. `useSelect` compares the entries one by one,
+	// so the result only changes when the note IDs of a block change.
+	const hasThreads = !! threads?.length;
+	const noteIdsByBlock = useSelect(
+		( select ) => {
+			if ( ! hasThreads ) {
+				return EMPTY_ARRAY;
+			}
+
+			const {
+				getClientIdsWithDescendants,
+				getBlockAttributes: selectBlockAttributes,
+			} = select( blockEditorStore );
+
+			return getClientIdsWithDescendants().map(
+				( clientId ) =>
+					selectBlockAttributes( clientId )?.metadata?.noteId
+			);
+		},
+		[ hasThreads ]
+	);
 
 	// Process notes to build the tree structure.
 	const { notes, unresolvedNotes } = useMemo( () => {
@@ -107,9 +117,10 @@ export function useNoteThreads( postId ) {
 		// Duplicating or splitting a block copies its notes, so a note can
 		// belong to several blocks.
 		const clientIdsByNoteId = new Map();
-		const noteIdsByBlock = JSON.parse( noteIdsJson );
 		for ( const [ index, clientId ] of clientIds.entries() ) {
-			const noteIds = noteIdsByBlock[ index ];
+			const noteIds = getNoteIdsFromMetadata( {
+				noteId: noteIdsByBlock[ index ],
+			} );
 			if ( noteIds.length === 0 ) {
 				continue;
 			}
@@ -201,7 +212,7 @@ export function useNoteThreads( postId ) {
 			notes: [ ...unresolved, ...orphans, ...resolved ],
 			unresolvedNotes: unresolved,
 		};
-	}, [ clientIds, noteIdsJson, threads, getBlockAttributes ] );
+	}, [ clientIds, noteIdsByBlock, threads, getBlockAttributes ] );
 
 	return {
 		notes,
