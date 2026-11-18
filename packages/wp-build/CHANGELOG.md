@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Let a full-page screen show the admin bar again. The page template's rule that hides it now loads after the page's own styles, so it has zero specificity to keep it overridable.
+-   Let a full-page screen show the admin bar again. The page template's rule that hides it now loads after the page's own styles, so it has zero specificity to keep it overridable ([#86992](https://github.com/WordPress/gutenberg/pull/86992)).
 
 ### Enhancements
 
