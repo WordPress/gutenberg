@@ -1,4 +1,5 @@
 import { createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
@@ -17,11 +18,15 @@ function createNavigationLinks( pages = [] ) {
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
 		// See if a placeholder exists. This is created if children appear before parents in list.
 		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
+		const label = title?.rendered?.trim()
+			? title.rendered
+			: // translators: displayed when a page has an empty title.
+				__( '(no title)' );
 		linkMap[ id ] = createBlock(
 			'core/navigation-link',
 			{
 				id,
-				label: title.rendered,
+				label,
 				url,
 				type,
 				kind: POST_TYPE_KIND,
