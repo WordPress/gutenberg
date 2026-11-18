@@ -1192,18 +1192,6 @@ export const isBlockParentHiddenAtViewport = (
 };
 
 /**
- * Returns true if there is a spotlighted block, which is the case while a
- * contentOnly section is being edited.
- *
- * @param state Global application state.
- *
- * @return Whether the block is currently spotlighted.
- */
-export function hasBlockSpotlight( state: State ) {
-	return !! state.editedContentOnlySection;
-}
-
-/**
  * Returns whether a block is locked to prevent editing.
  *
  * This selector only reasons about block lock, not associated features
