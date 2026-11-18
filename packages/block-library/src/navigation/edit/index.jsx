@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useState,
+	useEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -62,9 +68,15 @@ import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
+import {
+	getOverlayViewports,
+	isOverlayAlwaysShown,
+	isOverlayResponsive,
+} from '../overlay-viewports';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
+import useOverlayViewportStyles from './use-overlay-viewport-styles';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -276,6 +288,10 @@ function Navigation( {
 		layout: attributes.layout,
 		style: attributes.style,
 	} );
+	const overlayViewports = useMemo(
+		() => getOverlayViewports( { overlayMenu } ),
+		[ overlayMenu ]
+	);
 
 	const setRef = useCallback(
 		( postId ) => {
@@ -315,6 +331,10 @@ function Navigation( {
 		},
 		[ clientId ]
 	);
+	const hasOverlayViewportStyles = useOverlayViewportStyles( {
+		clientId,
+		overlayViewports: editorDisabledResponsive ? null : overlayViewports,
+	} );
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
@@ -607,7 +627,8 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	const isResponsive = 'never' !== overlayMenu && ! editorDisabledResponsive;
+	const isResponsive =
+		isOverlayResponsive( overlayViewports ) && ! editorDisabledResponsive;
 
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -622,6 +643,8 @@ function Navigation( {
 				'is-vertical': orientation === 'vertical',
 				'no-wrap': flexWrap === 'nowrap',
 				'is-responsive': isResponsive,
+				'has-overlay-viewports':
+					isResponsive && hasOverlayViewportStyles,
 				'has-text-color': !! textColor.color || !! textColor?.class,
 				[ getColorClassName( 'color', textColor?.slug ) ]:
 					!! textColor?.slug,
@@ -913,6 +936,7 @@ function Navigation( {
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
+						overlayViewports={ overlayViewports }
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
@@ -954,7 +978,7 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-	const isHiddenByDefault = 'always' === overlayMenu;
+	const isHiddenByDefault = isOverlayAlwaysShown( overlayViewports );
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 

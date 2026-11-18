@@ -755,25 +755,33 @@ button.wp-block-navigation-item__content {
 		}
 	}
 
+	// Keep the static default breakpoint for Navigation blocks whose overlay
+	// doesn't follow the theme's viewports. Blocks that do opt out here and
+	// receive rules generated from the theme's viewport settings. `:where()`
+	// keeps the specificity these rules had before the opt-out was added.
+	// These rules now need a `.wp-block-navigation` ancestor, which every
+	// render path has; nested Navigation blocks never show the overlay.
 	@include break-small() {
-		&:not(.hidden-by-default) {
-			&:not(.is-menu-open) {
-				display: block;
-				width: 100%;
-				position: relative;
-				z-index: auto;
-				background-color: inherit;
+		:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
+			&:not(.hidden-by-default) {
+				&:not(.is-menu-open) {
+					display: block;
+					width: 100%;
+					position: relative;
+					z-index: auto;
+					background-color: inherit;
 
-				.wp-block-navigation__responsive-container-close {
-					display: none;
+					.wp-block-navigation__responsive-container-close {
+						display: none;
+					}
 				}
 			}
-		}
 
-		&.is-menu-open {
-			// Override breakpoint-inherited submenu rules.
-			.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
-				left: 0;
+			&.is-menu-open {
+				// Override breakpoint-inherited submenu rules.
+				.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
+					left: 0;
+				}
 			}
 		}
 	}
@@ -832,8 +840,16 @@ button.wp-block-navigation-item__content {
 	}
 
 	&:not(.always-shown) {
+		// Keep the static default breakpoint for Navigation blocks whose overlay
+		// doesn't follow the theme's viewports. Blocks that do opt out here and
+		// receive rules generated from the theme's viewport settings. `:where()`
+		// keeps the specificity these rules had before the opt-out was added.
+		// These rules now need a `.wp-block-navigation` ancestor, which every
+		// render path has; nested Navigation blocks never show the overlay.
 		@include break-small {
-			display: none;
+			:where(.wp-block-navigation:not(.has-overlay-viewports)) & {
+				display: none;
+			}
 		}
 	}
 }

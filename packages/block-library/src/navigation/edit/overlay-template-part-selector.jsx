@@ -17,13 +17,15 @@ import { createTemplatePartId } from '../../template-part/edit/utils/create-temp
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
+import { getOverlayEditingViewport } from '../overlay-viewports';
 
 /**
  * Overlay Template Part Selector component.
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
- * @param {string}   props.overlayMenu              Overlay visibility setting ('never', 'mobile', 'always').
+ * @param {?Object}  props.overlayViewports         Viewport map from `getOverlayViewports()`, or `null` for the default `mobile` behavior.
+ * @param {boolean}  props.hasTabletViewport        Whether the theme has a tablet breakpoint.
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
@@ -32,7 +34,8 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  */
 export default function OverlayTemplatePartSelector( {
 	overlay,
-	overlayMenu,
+	overlayViewports,
+	hasTabletViewport,
 	setAttributes,
 	onNavigateToEntityRecord,
 	isCreatingOverlay,
@@ -52,6 +55,10 @@ export default function OverlayTemplatePartSelector( {
 	} );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
+
+	const editingViewport = getOverlayEditingViewport( overlayViewports, {
+		hasTabletViewport,
+	} );
 
 	const currentTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
@@ -163,8 +170,8 @@ export default function OverlayTemplatePartSelector( {
 			postId: templatePartId,
 			postType: 'wp_template_part',
 		};
-		if ( overlayMenu === 'mobile' ) {
-			params.viewport = 'mobile';
+		if ( editingViewport ) {
+			params.viewport = editingViewport;
 		}
 		onNavigateToEntityRecord( params );
 	};
@@ -191,8 +198,8 @@ export default function OverlayTemplatePartSelector( {
 					postId: templatePartId,
 					postType: 'wp_template_part',
 				};
-				if ( overlayMenu === 'mobile' ) {
-					params.viewport = 'mobile';
+				if ( editingViewport ) {
+					params.viewport = editingViewport;
 				}
 				onNavigateToEntityRecord( params );
 			} else {
@@ -221,7 +228,7 @@ export default function OverlayTemplatePartSelector( {
 		createErrorNotice,
 		currentTheme,
 		setIsCreating,
-		overlayMenu,
+		editingViewport,
 	] );
 
 	const handleClearOverlay = useCallback( () => {

@@ -8,12 +8,14 @@ import OverlayTemplatePartSelector from './overlay-template-part-selector';
 import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import OverlayPreview from './overlay-preview';
+import useHasTabletViewport from './use-has-tablet-viewport';
 
 /**
  * Overlay Panel component for Navigation block.
  *
  * @param {Object}   props                           Component props.
- * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'always').
+ * @param {string}   props.overlayMenu               Overlay menu setting ('never', 'mobile', 'tablet', 'always').
+ * @param {?Object}  props.overlayViewports          Viewport map from `getOverlayViewports()`, or `null` for the default `mobile` behavior.
  * @param {string}   props.overlay                   Currently selected overlay template part ID.
  * @param {Function} props.setAttributes             Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord  Function to navigate to template part editor.
@@ -30,6 +32,7 @@ import OverlayPreview from './overlay-preview';
  */
 export default function OverlayPanel( {
 	overlayMenu,
+	overlayViewports,
 	overlay,
 	setAttributes,
 	onNavigateToEntityRecord,
@@ -44,6 +47,7 @@ export default function OverlayPanel( {
 	hasOverlays,
 } ) {
 	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
+	const hasTabletViewport = useHasTabletViewport();
 
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
@@ -51,6 +55,7 @@ export default function OverlayPanel( {
 				<OverlayVisibilityControl
 					overlayMenu={ overlayMenu }
 					setAttributes={ setAttributes }
+					hasTabletViewport={ hasTabletViewport }
 				/>
 
 				{ overlayMenu !== 'never' && (
@@ -69,7 +74,8 @@ export default function OverlayPanel( {
 				{ overlayMenu !== 'never' && (
 					<OverlayTemplatePartSelector
 						overlay={ overlay }
-						overlayMenu={ overlayMenu }
+						overlayViewports={ overlayViewports }
+						hasTabletViewport={ hasTabletViewport }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 						isCreatingOverlay={ isCreatingOverlay }

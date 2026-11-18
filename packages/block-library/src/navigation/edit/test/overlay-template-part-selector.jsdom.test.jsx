@@ -5,6 +5,7 @@ import { useEntityRecords } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
 import useCreateOverlayTemplatePart from '../use-create-overlay';
+import { getOverlayViewports } from '../../overlay-viewports';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -43,6 +44,9 @@ const mockOnNavigateToEntityRecord = vi.fn();
 
 const defaultProps = {
 	overlay: undefined,
+	// The block's default `mobile` behavior.
+	overlayViewports: null,
+	hasTabletViewport: true,
 	setAttributes: mockSetAttributes,
 	onNavigateToEntityRecord: mockOnNavigateToEntityRecord,
 };
@@ -429,6 +433,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//my-overlay',
 				postType: 'wp_template_part',
+				viewport: 'mobile',
 			} );
 		} );
 
@@ -461,6 +466,125 @@ describe( 'OverlayTemplatePartSelector', () => {
 			await user.click( editButton );
 
 			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
+		} );
+	} );
+
+	describe( 'Editing viewport', () => {
+		async function clickEdit( props ) {
+			const user = userEvent.setup();
+
+			useEntityRecords.mockReturnValue( {
+				records: [ templatePart1 ],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render(
+				<OverlayTemplatePartSelector
+					{ ...defaultProps }
+					overlay="my-overlay"
+					{ ...props }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', {
+					name: ( accessibleName ) =>
+						accessibleName.startsWith( 'Edit overlay' ),
+				} )
+			);
+		}
+
+		it( 'opens a Mobile overlay at mobile width', async () => {
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'mobile',
+				} ),
+			} );
+
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//my-overlay',
+				postType: 'wp_template_part',
+				viewport: 'mobile',
+			} );
+		} );
+
+		it( 'opens a Tablet overlay at tablet width', async () => {
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'tablet',
+				} ),
+			} );
+
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//my-overlay',
+				postType: 'wp_template_part',
+				viewport: 'tablet',
+			} );
+		} );
+
+		it( 'opens a Tablet overlay at mobile width when the theme has no tablet breakpoint', async () => {
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'tablet',
+				} ),
+				hasTabletViewport: false,
+			} );
+
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//my-overlay',
+				postType: 'wp_template_part',
+				viewport: 'mobile',
+			} );
+		} );
+
+		it( 'opens an Always overlay at the default width', async () => {
+			await clickEdit( {
+				overlayViewports: getOverlayViewports( {
+					overlayMenu: 'always',
+				} ),
+			} );
+
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//my-overlay',
+				postType: 'wp_template_part',
+			} );
+		} );
+
+		it( 'opens a new Tablet overlay at tablet width', async () => {
+			const user = userEvent.setup();
+
+			mockCreateOverlayTemplatePart.mockResolvedValue( {
+				id: 'twentytwentyfive//overlay',
+				theme: 'twentytwentyfive',
+				slug: 'overlay',
+				title: { rendered: 'Overlay' },
+				area: 'navigation-overlay',
+			} );
+			useEntityRecords.mockReturnValue( {
+				records: [],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render(
+				<OverlayTemplatePartSelector
+					{ ...defaultProps }
+					overlayViewports={ getOverlayViewports( {
+						overlayMenu: 'tablet',
+					} ) }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Create overlay' } )
+			);
+
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//overlay',
+				postType: 'wp_template_part',
+				viewport: 'tablet',
+			} );
 		} );
 	} );
 
@@ -558,6 +682,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
 				postId: 'twentytwentyfive//overlay',
 				postType: 'wp_template_part',
+				viewport: 'mobile',
 			} );
 		} );
 
