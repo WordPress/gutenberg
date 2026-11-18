@@ -87,7 +87,7 @@ export default function filterSortAndPaginate< Item >(
 					field.enableSorting !== false &&
 					field.id === view.sort?.field
 				);
-		  } )
+			} )
 		: null;
 	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
@@ -95,7 +95,7 @@ export default function filterSortAndPaginate< Item >(
 					field.enableSorting !== false &&
 					field.id === view.groupBy?.field
 				);
-		  } )
+			} )
 		: null;
 	if ( sortByField || groupByField ) {
 		filteredData.sort( ( a, b ) => {

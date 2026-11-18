@@ -5,8 +5,10 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	RichText,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
@@ -31,9 +33,11 @@ function Edit( {
 } ) {
 	const { ariaLabel } = attributes;
 
+	const backgroundProps = useBackgroundProps( attributes );
 	const colorProps = useColorProps( attributes );
 	const borderProps = useBorderProps( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const { tabsClientId, tabPanels, editorActiveTabIndex, activeTabIndex } =
@@ -67,7 +71,11 @@ function Edit( {
 	} = useDispatch( blockEditorStore );
 	const { insertTab, removeTab } = useTabActions( tabsClientId );
 
-	const effectiveActiveIndex = editorActiveTabIndex ?? activeTabIndex;
+	// Fall back to the first tab when the index points past the last tab,
+	// matching the front end.
+	const activeIndex = editorActiveTabIndex ?? activeTabIndex;
+	const effectiveActiveIndex =
+		activeIndex < tabPanels.length ? activeIndex : 0;
 	const tabsList = useMemo(
 		() =>
 			tabPanels.map( ( tab ) => ( {
@@ -146,12 +154,18 @@ function Edit( {
 		className: layoutClassNames,
 	} );
 
-	const buttonClassName = clsx( colorProps.className, borderProps.className );
+	const buttonClassName = clsx(
+		backgroundProps.className,
+		colorProps.className,
+		borderProps.className
+	);
 
 	const buttonStyle = {
+		...backgroundProps.style,
 		...colorProps.style,
 		...borderProps.style,
 		...spacingProps.style,
+		...shadowProps.style,
 	};
 
 	return (

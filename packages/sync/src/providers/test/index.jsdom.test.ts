@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ProviderCreator } from '../../types';
 
-type ProvidersModule = typeof import('../index');
+type ProvidersModule = typeof import( '../index' );
 type ApplyFilters = ( hookName: string, defaultValue: unknown ) => unknown;
 
 function createMockProviderCreator(): ProviderCreator {

@@ -208,7 +208,7 @@ export default function PostDateEdit( props ) {
 										// translators: %s: Name of the post type e.g: "post".
 										__( 'Link to %s' ),
 										postType.labels.singular_name.toLowerCase()
-								  )
+									)
 								: __( 'Link to post' )
 						}
 						onDeselect={ () => setAttributes( { isLink: false } ) }
@@ -221,7 +221,7 @@ export default function PostDateEdit( props ) {
 											// translators: %s: Name of the post type e.g: "post".
 											__( 'Link to %s' ),
 											postType.labels.singular_name.toLowerCase()
-									  )
+										)
 									: __( 'Link to post' )
 							}
 							onChange={ () =>

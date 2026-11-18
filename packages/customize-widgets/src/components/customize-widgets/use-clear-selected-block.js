@@ -9,7 +9,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * the preview iframe.
  * This hook will clear the selected block when focusing outside the editor,
  * with a few exceptions:
- * 1. Focusing on popovers.
+ * 1. Focusing on popovers, including `@wordpress/ui` overlays.
  * 2. Focusing on the inspector.
  * 3. Focusing on any modals/dialogs.
  * These cases are normally triggered by user interactions from the editor,
@@ -40,6 +40,7 @@ export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 					// 3. It should also not exist in the container, the popover, nor the dialog.
 					! container.contains( element ) &&
 					! popoverRef.current.contains( element ) &&
+					! element.closest( '[data-wp-compat-overlay-slot]' ) &&
 					! element.closest( '[role="dialog"]' ) &&
 					// 4. The inspector should not be opened.
 					! inspector.expanded()

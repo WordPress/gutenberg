@@ -28,7 +28,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 				mockObserved.set( element, callback );
 			}
 		};
-	} ) as typeof import('@wordpress/compose').useResizeObserver,
+	} ) as typeof import( '@wordpress/compose' ).useResizeObserver,
 } ) );
 
 /**
@@ -37,16 +37,15 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
  * @param frame   Padding and border to report around that width.
  */
 function notifyResize( element: Element, width: number, frame = 0 ) {
-	act(
-		() =>
-			mockObserved.get( element )?.( [
-				{
-					target: element,
-					contentRect: { width },
-					contentBoxSize: [ { inlineSize: width } ],
-					borderBoxSize: [ { inlineSize: width + frame } ],
-				},
-			] )
+	act( () =>
+		mockObserved.get( element )?.( [
+			{
+				target: element,
+				contentRect: { width },
+				contentBoxSize: [ { inlineSize: width } ],
+				borderBoxSize: [ { inlineSize: width + frame } ],
+			},
+		] )
 	);
 }
 

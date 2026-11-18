@@ -29,6 +29,10 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
 - [`align`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#align): `true`
+- [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
+  - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
+  - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+  - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`

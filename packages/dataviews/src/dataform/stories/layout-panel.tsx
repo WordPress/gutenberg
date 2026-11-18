@@ -1,3 +1,4 @@
+import { Button } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import DataForm from '../index';
 import type {
@@ -143,6 +144,17 @@ const fields: Field< SamplePost >[] = [
 		id: 'file_type',
 		label: 'File type',
 		readOnly: true,
+	},
+	{
+		// A read-only field whose value is an interactive control.
+		id: 'attachment',
+		label: 'Attachment',
+		readOnly: true,
+		render: () => (
+			<Button variant="link" href="#">
+				View file
+			</Button>
+		),
 	},
 	{
 		id: 'tags',
@@ -315,6 +327,7 @@ const LayoutPanelComponent = ( {
 	showPlaceholderIfEmpty,
 	applyLabel,
 	cancelLabel,
+	disabled = false,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
@@ -323,6 +336,7 @@ const LayoutPanelComponent = ( {
 	showPlaceholderIfEmpty: boolean;
 	applyLabel?: string;
 	cancelLabel?: string;
+	disabled?: boolean;
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -347,6 +361,17 @@ const LayoutPanelComponent = ( {
 		gate: 'A12',
 		seat: '14F',
 	} );
+
+	const _fields: Field< SamplePost >[] = useMemo( () => {
+		if ( ! disabled ) {
+			return fields;
+		}
+
+		return fields.map( ( field ) => ( {
+			...field,
+			isDisabled: true,
+		} ) );
+	}, [ disabled ] );
 
 	const form: Form = useMemo( () => {
 		let openAs: PanelLayout[ 'openAs' ];
@@ -386,6 +411,7 @@ const LayoutPanelComponent = ( {
 				'filesize',
 				'dimensions',
 				'file_type',
+				'attachment',
 				'tags',
 				{
 					id: 'discussion',
@@ -454,7 +480,7 @@ const LayoutPanelComponent = ( {
 	return (
 		<DataForm< SamplePost >
 			data={ post }
-			fields={ fields }
+			fields={ _fields }
 			form={ form }
 			onChange={ ( edits ) =>
 				setPost( ( prev ) => ( {

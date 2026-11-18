@@ -19,8 +19,6 @@ export default function NavigationListViewHeader( {
 	onSelectClassicMenu,
 	onSelectNavigationMenu,
 	onCreateNew,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
 	isManageMenusButtonDisabled,
 } ) {
 	const blockTitle = useBlockDisplayTitle( {
@@ -42,10 +40,6 @@ export default function NavigationListViewHeader( {
 					onSelectClassicMenu={ onSelectClassicMenu }
 					onSelectNavigationMenu={ onSelectNavigationMenu }
 					onCreateNew={ onCreateNew }
-					createNavigationMenuIsSuccess={
-						createNavigationMenuIsSuccess
-					}
-					createNavigationMenuIsError={ createNavigationMenuIsError }
 					actionLabel={ actionLabel }
 					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
 				/>

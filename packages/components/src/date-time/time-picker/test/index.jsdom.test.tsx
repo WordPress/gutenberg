@@ -8,7 +8,7 @@ import {
 	it,
 	vi,
 } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import timezoneMock from 'timezone-mock';
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
@@ -325,7 +325,7 @@ describe( 'TimePicker', () => {
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-10-18T23:22:00' );
 	} );
 
-	it( 'should reset the date when currentTime changed', () => {
+	it( 'should reset the date when currentTime changed', async () => {
 		const onChangeSpy = vi.fn();
 
 		const { rerender } = render(
@@ -342,6 +342,9 @@ describe( 'TimePicker', () => {
 				onChange={ onChangeSpy }
 				is12Hour
 			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked()
 		);
 
 		expect(
@@ -364,7 +367,7 @@ describe( 'TimePicker', () => {
 		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
 	} );
 
-	it( 'should have different layouts/orders for 12/24 hour formats', () => {
+	it( 'should have different layouts/orders for 12/24 hour formats', async () => {
 		const onChangeSpy = vi.fn();
 
 		const { rerender } = render(
@@ -396,6 +399,9 @@ describe( 'TimePicker', () => {
 					is12Hour
 				/>
 			</form>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
 		);
 
 		monthInputIndex = Array.from( form.elements ).indexOf(
@@ -438,7 +444,7 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', async () => {
 		const onChangeSpy = vi.fn();
 
 		render(
@@ -450,6 +456,9 @@ describe( 'TimePicker', () => {
 					is12Hour
 				/>
 			</form>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
 		);
 
 		const form = screen.getByRole( 'form' ) as HTMLFormElement;
@@ -469,7 +478,7 @@ describe( 'TimePicker', () => {
 		expect( dayInputIndex > monthInputIndex ).toBe( true );
 	} );
 
-	it( 'Should set a time when passed a null currentTime', () => {
+	it( 'Should set a time when passed a null currentTime', async () => {
 		const onChangeSpy = vi.fn();
 
 		render(
@@ -478,6 +487,9 @@ describe( 'TimePicker', () => {
 				onChange={ onChangeSpy }
 				is12Hour
 			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
 		);
 
 		const monthInput = (
@@ -657,6 +669,52 @@ describe( 'TimePicker', () => {
 					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
 				} );
 			} );
+		} );
+	} );
+
+	describe( 'timezone tooltip', () => {
+		let originalSettings: DateSettings;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: 7,
+					offsetFormatted: '7',
+					string: 'Asia/Ho_Chi_Minh',
+					abbr: '+07',
+				},
+			} );
+		} );
+
+		beforeEach( () => {
+			timezoneMock.register( 'UTC' );
+		} );
+
+		afterEach( () => {
+			timezoneMock.unregister();
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		it( 'should replace every underscore in the timezone name with a space', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ vi.fn() }
+				/>
+			);
+
+			await user.hover( screen.getByText( 'UTC+7' ) );
+
+			expect(
+				await screen.findByText( '(UTC+7) Asia/Ho Chi Minh' )
+			).toBeInTheDocument();
 		} );
 	} );
 

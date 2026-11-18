@@ -54,9 +54,9 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				const scrollFromStart =
 					direction === 'rtl' && scrollLeft < 0
 						? // In RTL layouts, scrollLeft is typically 0 at the visual "start"
-						  // (right edge) and becomes negative toward the "end" (left edge).
-						  // Normalize value for correct first/last detection logic.
-						  -scrollLeft
+							// (right edge) and becomes negative toward the "end" (left edge).
+							// Normalize value for correct first/last detection logic.
+							-scrollLeft
 						: scrollLeft;
 
 				// Use SCROLL_EPSILON to handle subpixel rendering differences.
@@ -130,6 +130,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				data-select-on-move={ activateOnFocus ? 'true' : 'false' }
 				className={ clsx(
 					styles.tablist,
+					overflow.isScrolling && styles[ 'is-scrolling' ],
 					overflow.first && styles[ 'is-overflowing-first' ],
 					overflow.last && styles[ 'is-overflowing-last' ],
 					styles[ `is-${ variant }-variant` ],

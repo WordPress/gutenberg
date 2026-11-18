@@ -10,7 +10,7 @@ import { InputLayout } from '../input-layout';
 import type { ComboboxTriggerProps } from './types';
 
 export const Trigger = forwardRef< HTMLButtonElement, ComboboxTriggerProps >(
-	function Trigger(
+	function UnforwardedTrigger(
 		{
 			className,
 			children,

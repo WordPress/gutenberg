@@ -1,10 +1,10 @@
 import { __, _x } from '@wordpress/i18n';
 import {
 	ToggleControl,
-	SelectControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useMemo, useCallback } from '@wordpress/element';
+import { SelectControl } from '@wordpress/ui';
 
 const options = [
 	{ value: 'auto', label: __( 'Auto' ) },
@@ -48,8 +48,10 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 		};
 	}, [] );
 
-	const onChangePreload = useCallback( ( value ) => {
-		setAttributes( { preload: value } );
+	const onChangePreload = useCallback( ( item ) => {
+		if ( item ) {
+			setAttributes( { preload: item.value } );
+		}
 	}, [] );
 
 	return (
@@ -134,7 +136,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 							? __( 'Play inline enabled because of Autoplay.' )
 							: __(
 									'When enabled, videos will play directly within the webpage on mobile browsers, instead of opening in a fullscreen player.'
-							  )
+								)
 					}
 				/>
 			</ToolsPanelItem>
@@ -148,10 +150,12 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 			>
 				<SelectControl
 					label={ __( 'Preload' ) }
-					value={ preload }
-					onChange={ onChangePreload }
-					options={ options }
-					hideCancelButton
+					value={
+						options.find( ( item ) => item.value === preload ) ??
+						null
+					}
+					onValueChange={ onChangePreload }
+					items={ options }
 				/>
 			</ToolsPanelItem>
 		</>

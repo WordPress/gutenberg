@@ -36,7 +36,7 @@ function MaybeCategoryPanel() {
 			? !! select( coreStore ).getEntityRecords( 'taxonomy', 'category', {
 					exclude: [ defaultCategoryId ],
 					per_page: 1,
-			  } )?.length
+				} )?.length
 			: false;
 
 		// This boolean should return true if everything is loaded

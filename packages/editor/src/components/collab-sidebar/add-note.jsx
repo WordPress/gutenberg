@@ -9,28 +9,22 @@ import {
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
 import { FloatingContainer } from './floating-container';
-import { focusNoteThread } from './utils';
+import { isFocusInBlocks } from './utils/dom';
+import { useNoteActions, useNoteDraft } from './hooks';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
-export function AddNote( { onSubmit, sidebarRef, floating } ) {
-	const { clientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId } = select( blockEditorStore );
-		return {
-			clientId: getSelectedBlockClientId(),
-		};
-	}, [] );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
+export function AddNote( { clientIds, floating } ) {
+	const [ clientId ] = clientIds;
 	const blockElement = useBlockElement( clientId );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
+	const { onCreate, onDiscard } = useNoteActions();
 	const isSubmittingRef = useRef( false );
+	const { initialValue, setDraft, hasDraft } = useNoteDraft( clientId );
 
 	/*
 	 * Dismiss the form once focus leaves it. `useFocusOutside` keeps the form
@@ -51,27 +45,30 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 		if ( isSubmittingRef.current ) {
 			return;
 		}
+		// In the form's blocks, the caret events decide; dismissing here too would race them.
+		if ( isFocusInBlocks( blockElement?.ownerDocument, clientIds ) ) {
+			return;
+		}
 
 		/*
 		 * Selection may have moved on before this deferred callback runs; only
 		 * clear it while this still owns the selection, or it would wipe out the
 		 * newly selected note.
 		 */
-		if ( getSelectedNote() === 'new' ) {
-			toggleBlockSpotlight( clientId, false );
+		if ( getSelectedNote() === 'new' && ! hasDraft() ) {
+			onDiscard( clientIds );
+			toggleBlockHighlight( clientId, false );
 			selectNote( undefined );
 		}
 	} );
 
 	const unselectNote = () => {
+		setDraft( '' );
+		onDiscard( clientIds );
 		selectNote( undefined );
 		blockElement?.focus();
-		toggleBlockSpotlight( clientId, false );
+		toggleBlockHighlight( clientId, false );
 	};
-
-	if ( selectedNote !== 'new' || ! clientId ) {
-		return null;
-	}
 
 	return (
 		<FloatingContainer
@@ -81,9 +78,6 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 			tabIndex={ 0 }
 			aria-label={ __( 'New note' ) }
 			role="treeitem"
-			style={
-				floating ? { opacity: ! floating.y ? 0 : undefined } : undefined
-			}
 			{ ...focusOutside }
 		>
 			<NoteCard>
@@ -96,15 +90,11 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 							 * save fails (it surfaces its own error notice);
 							 * keep the form open so the draft isn't lost.
 							 */
-							const savedRecord = await onSubmit( {
+							const savedRecord = await onCreate( {
 								content: inputComment,
 							} );
 							if ( savedRecord ) {
-								selectNote( savedRecord.id );
-								focusNoteThread(
-									savedRecord.id,
-									sidebarRef.current
-								);
+								selectNote( savedRecord.id, { focus: true } );
 							}
 							return savedRecord;
 						} finally {
@@ -112,6 +102,8 @@ export function AddNote( { onSubmit, sidebarRef, floating } ) {
 						}
 					} }
 					onCancel={ unselectNote }
+					initialValue={ initialValue }
+					onChange={ setDraft }
 					labels={ {
 						input: __( 'New note' ),
 						placeholder: __( 'Add a note or @ mention' ),

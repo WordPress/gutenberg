@@ -20,8 +20,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=24.18.0",
-		"npm": ">=11.16.0"
+		"node": ">=24.18.0"
 	},
 	"type": "module",
 	"main": "src/index.ts",
@@ -36,12 +35,12 @@
 	"dependencies": {
 		"@actions/core": "^3.0.1",
 		"@jest/test-result": "^30.5.0",
-		"@playwright/test": "^1.63.0",
+		"@playwright/test": "^1.65.0",
 		"jest-message-util": "^30.5.0"
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
-		"vitest": "^5.0.0"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

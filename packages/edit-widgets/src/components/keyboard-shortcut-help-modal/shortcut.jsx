@@ -5,18 +5,19 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 	const shortcut = keyCombination.modifier
 		? displayShortcutList[ keyCombination.modifier ](
 				keyCombination.character
-		  )
+			)
 		: keyCombination.character;
 	const ariaLabel = keyCombination.modifier
 		? shortcutAriaLabel[ keyCombination.modifier ](
 				keyCombination.character
-		  )
+			)
 		: keyCombination.character;
 	const shortcuts = Array.isArray( shortcut ) ? shortcut : [ shortcut ];
 
 	return (
 		<kbd
 			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
+			dir="ltr"
 			aria-label={ forceAriaLabel || ariaLabel }
 		>
 			{ shortcuts.map( ( character, index ) => {

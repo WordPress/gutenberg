@@ -4,7 +4,8 @@ import { ValidatedTextareaControl } from '../index';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedTextareaControl > = {
-	title: 'Design System/Components/Form/With Validation/ValidatedTextareaControl',
+	title: 'Components/@wordpress-ui/Form/With Validation/ValidatedTextareaControl',
+	id: 'design-system-components-form-with-validation-validatedtextareacontrol',
 	component: ValidatedTextareaControl,
 	argTypes: {
 		customValidity: { control: false },
@@ -25,10 +26,6 @@ export default meta;
 
 type Story = StoryObj< typeof ValidatedTextareaControl >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
- */
 export const Default: Story = {
 	args: {
 		label: 'Text',
@@ -54,7 +51,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

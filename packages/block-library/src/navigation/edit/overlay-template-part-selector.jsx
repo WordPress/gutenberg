@@ -3,7 +3,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
-	SelectControl,
 	Button,
 	FlexBlock,
 	FlexItem,
@@ -13,7 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as noticesStore } from '@wordpress/notices';
 import { plus } from '@wordpress/icons';
-import { Text } from '@wordpress/ui';
+import { SelectControl, Text } from '@wordpress/ui';
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
 import DeletedOverlayWarning from './deleted-overlay-warning';
@@ -255,7 +254,7 @@ export default function OverlayTemplatePartSelector( {
 					selectedTemplatePart.title?.rendered
 						? decodeEntities( selectedTemplatePart.title.rendered )
 						: selectedTemplatePart.slug
-			  )
+				)
 			: __( 'Edit overlay' );
 	}, [ selectedTemplatePart ] );
 
@@ -304,13 +303,28 @@ export default function OverlayTemplatePartSelector( {
 							<SelectControl
 								label={ __( 'Overlay template' ) }
 								hideLabelFromVision
-								aria-labelledby={ headingId }
-								value={ overlay || '' }
-								options={ options }
-								onChange={ handleSelectChange }
+								trigger={
+									<SelectControl.Trigger
+										aria-labelledby={ headingId }
+									/>
+								}
+								value={
+									options.find(
+										( option ) =>
+											option.value === ( overlay || '' )
+									) ?? options[ 0 ]
+								}
+								items={ options }
+								itemToStringValue={ ( item ) =>
+									`overlay:${ item.value }`
+								}
+								onValueChange={ ( item ) => {
+									if ( item ) {
+										handleSelectChange( item.value );
+									}
+								} }
 								disabled={ isResolving }
-								accessibleWhenDisabled
-								help={ helpText }
+								description={ helpText }
 							/>
 						</FlexBlock>
 						{ overlay && hasResolved && selectedTemplatePart && (

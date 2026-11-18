@@ -1,15 +1,21 @@
+import clsx from 'clsx';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
-	SelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	useBackgroundProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -18,9 +24,10 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function PostNavigationLinkEdit( {
 	context: { postType },
-	attributes: { type, label, showTitle, linkLabel, arrow, taxonomy },
+	attributes,
 	setAttributes,
 } ) {
+	const { type, label, showTitle, linkLabel, arrow, taxonomy } = attributes;
 	const isNext = type === 'next';
 	let placeholder = isNext ? __( 'Next' ) : __( 'Previous' );
 
@@ -35,13 +42,34 @@ export default function PostNavigationLinkEdit( {
 	if ( showTitle ) {
 		placeholder = isNext
 			? /* translators: Label before for next and previous post. There is a space after the colon. */
-			  __( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				__( 'Next: ' ) // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 			: /* translators: Label before for next and previous post. There is a space after the colon. */
-			  __( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
+				__( 'Previous: ' ); // eslint-disable-line @wordpress/i18n-no-flanking-whitespace
 	}
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
-	const blockProps = useBlockProps();
+
+	/*
+	 * Background, border, dimensions, shadow and spacing serialization is
+	 * skipped for this block so the styles are not applied to the empty
+	 * wrapper the front end renders when there is no adjacent post. The editor
+	 * always renders the link, so they always apply here.
+	 */
+	const backgroundProps = useBackgroundProps( attributes );
+	const borderProps = useBorderProps( attributes );
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
+	const blockProps = useBlockProps( {
+		className: clsx( backgroundProps.className, borderProps.className ),
+		style: {
+			...backgroundProps.style,
+			...borderProps.style,
+			...dimensionsProps.style,
+			...shadowProps.style,
+			...spacingProps.style,
+		},
+	} );
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
@@ -53,22 +81,20 @@ export default function PostNavigationLinkEdit( {
 		},
 		[ postType ]
 	);
-	const getTaxonomyOptions = () => {
-		const selectOption = {
+	const taxonomyOptions = [
+		{
 			label: __( 'Unfiltered' ),
 			value: '',
-		};
-		const taxonomyOptions = ( taxonomies ?? [] )
+		},
+		...( taxonomies ?? [] )
 			.filter( ( { visibility } ) => !! visibility?.publicly_queryable )
 			.map( ( item ) => {
 				return {
 					value: item.slug,
 					label: item.name,
 				};
-			} );
-
-		return [ selectOption, ...taxonomyOptions ];
-	};
+			} ),
+	];
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -176,14 +202,20 @@ export default function PostNavigationLinkEdit( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					label={ __( 'Filter by taxonomy' ) }
-					value={ taxonomy }
-					options={ getTaxonomyOptions() }
-					onChange={ ( value ) =>
+					items={ taxonomyOptions }
+					itemToStringValue={ ( item ) => `taxonomy:${ item.value }` }
+					value={
+						taxonomyOptions.find(
+							( item ) => item.value === taxonomy
+						) ?? taxonomyOptions[ 0 ]
+					}
+					onValueChange={ ( item ) =>
+						item &&
 						setAttributes( {
-							taxonomy: value,
+							taxonomy: item.value,
 						} )
 					}
-					help={ __(
+					description={ __(
 						'Only link to posts that have the same taxonomy terms as the current post. For example the same tags or categories.'
 					) }
 				/>

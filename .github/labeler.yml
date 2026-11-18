@@ -127,6 +127,8 @@
 '[Package] Fields':
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
+          - any-glob-to-any-file: 'packages/core-fields/**'
+          - any-glob-to-any-file: 'packages/core-actions/**'
 
 '[Package] Format library':
     - changed-files:
@@ -156,6 +158,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/image-cropper/**'
 
+'[Package] Image Editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/image-editor/**'
+
 '[Package] Interactivity':
     - changed-files:
           - any-glob-to-any-file: 'packages/interactivity/**'
@@ -179,10 +185,6 @@
 '[Package] Keycodes':
     - changed-files:
           - any-glob-to-any-file: 'packages/keycodes/**'
-
-'[Package] Lazy import':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/lazy-import/**'
 
 '[Package] Media Utils':
     - changed-files:
@@ -216,10 +218,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/private-apis/**'
 
-'[Package] Project management automation':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/project-management-automation/**'
-
 '[Package] React i18n':
     - changed-files:
           - any-glob-to-any-file: 'packages/react-i18n/**'
@@ -251,6 +249,10 @@
 '[Package] Theme':
     - changed-files:
           - any-glob-to-any-file: 'packages/theme/**'
+
+'[Package] Theme Build Tools':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme-build-tools/**'
 
 '[Package] Token List':
     - changed-files:
@@ -333,14 +335,6 @@
 '[Tool] ESLint plugin':
     - changed-files:
           - any-glob-to-any-file: 'packages/eslint-plugin/**'
-
-'[Tool] Jest console':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/jest-console/**'
-
-'[Tool] Jest preset':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/jest-preset-default/**'
 
 '[Tool] npm-package-json-lint config':
     - changed-files:

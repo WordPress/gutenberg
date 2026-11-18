@@ -1,7 +1,7 @@
 import {
 	PanelBody,
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
@@ -241,7 +241,7 @@ export default function MaybeUploadMediaPanel() {
 					} ) }
 				</AnimatePresence>
 				{ isUploading || isAnimating ? (
-					<Spinner />
+					<WCSpinner />
 				) : (
 					<Button
 						size="compact"

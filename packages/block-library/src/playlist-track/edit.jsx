@@ -17,7 +17,7 @@ import {
 	TextControl,
 	TextareaControl as WCTextareaControl,
 	BaseControl,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { Link } from '@wordpress/ui';
 import { useDispatch } from '@wordpress/data';
@@ -100,19 +100,9 @@ const PlaylistTrackEdit = ( {
 		const mediaUrl = media?.url ?? media?.source_url;
 
 		if ( ! media || ! mediaUrl ) {
-			// In this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls.
-			setAttributes( {
-				blob: undefined,
-				id: undefined,
-				artist: undefined,
-				album: undefined,
-				image: undefined,
-				imageAlt: undefined,
-				length: undefined,
-				title: undefined,
-				url: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current track and its details intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -327,7 +317,7 @@ const PlaylistTrackEdit = ( {
 						) }
 						{ length }
 						{ !! temporaryURL && (
-							<Spinner className="wp-block-playlist-track__spinner" />
+							<WCSpinner className="wp-block-playlist-track__spinner" />
 						) }
 					</span>
 					<span className="screen-reader-text">{ __( 'Play' ) }</span>

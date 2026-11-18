@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
 	render,
 	screen,
@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import type { ComponentProps } from 'react';
 import { useState } from '@wordpress/element';
-import { logged } from '@wordpress/deprecated';
 import FormTokenField from '../';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -110,15 +109,10 @@ function unescapeAndFormatSpaces( str: string ) {
 	return escaped.documentElement.textContent?.replace( / /g, nbsp ) ?? '';
 }
 
-describe( 'FormTokenField', () => {
-	afterEach( () => {
-		// `@wordpress/deprecated` caches each warning message after the first
-		// log; reset it so multiple tests can assert the same deprecation.
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
-	} );
+const SHOW_HOW_TO_DEPRECATION =
+	'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.';
 
+describe( 'FormTokenField', () => {
 	describe( 'basic usage', () => {
 		it( "should add tokens with the input's value when pressing the enter key", async () => {
 			const user = userEvent.setup();
@@ -632,9 +626,7 @@ describe( 'FormTokenField', () => {
 				<FormTokenFieldWithState __experimentalShowHowTo={ false } />
 			);
 
-			expect( console ).toHaveWarnedWith(
-				'`__experimentalShowHowTo` prop in wp.components.FormTokenField is deprecated since version 7.1. Please use `help` prop instead. Note: The `help` prop now defaults to the previous how-to text. Pass an empty string to hide it.'
-			);
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 
 			expect(
 				screen.queryByText( 'Separate with commas or the Enter key.' )
@@ -652,7 +644,7 @@ describe( 'FormTokenField', () => {
 				/>
 			);
 
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith( SHOW_HOW_TO_DEPRECATION );
 			expect(
 				screen.getByRole( 'combobox' )
 			).toHaveAccessibleDescription( 'Help text' );
@@ -2499,8 +2491,6 @@ describe( 'FormTokenField', () => {
 		} );
 	} );
 
-	// This section is definitely testing things in a non-user centric way,
-	// but I wasn't sure if there was a better way.
 	describe( 'aria attributes', () => {
 		it( 'should add the correct aria attributes to the input as the user interacts with it', async () => {
 			const user = userEvent.setup();
@@ -2521,6 +2511,7 @@ describe( 'FormTokenField', () => {
 			expect( input ).toHaveAttribute( 'aria-autocomplete', 'list' );
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Typing "Pi" will show the "Pistachio" and "Pine" suggestions.
@@ -2530,7 +2521,11 @@ describe( 'FormTokenField', () => {
 			expect( suggestionList ).toBeVisible();
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 
 			// Select the "Pine" suggestion
@@ -2542,7 +2537,11 @@ describe( 'FormTokenField', () => {
 				{ name: 'Pine', selected: true }
 			);
 			expect( input ).toHaveAttribute( 'aria-expanded', 'true' );
-			expect( input ).toHaveAttribute( 'aria-owns', suggestionList.id );
+			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).toHaveAttribute(
+				'aria-controls',
+				suggestionList.id
+			);
 			expect( input ).toHaveAttribute(
 				'aria-activedescendant',
 				pineSuggestion.id
@@ -2571,6 +2570,7 @@ describe( 'FormTokenField', () => {
 
 			expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
 			expect( input ).not.toHaveAttribute( 'aria-owns' );
+			expect( input ).not.toHaveAttribute( 'aria-controls' );
 			expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
 		} );
 	} );

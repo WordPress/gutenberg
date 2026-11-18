@@ -47,11 +47,14 @@ const CONTENT_COLOR = { background: '#fcfcfc' };
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
 	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
-	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
+	const canvas =
+		routeKey === 'notfound' ? 'view' : ( query?.canvas ?? 'view' );
 	const showMobileSiteHub = !! areas.mobileContent;
 	const hasMobileAreas =
 		areas.mobileSidebar || areas.mobileContent || areas.preview;
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const showCanvas =
+		!! areas.preview && ( ! isMobileViewport || canvas === 'edit' );
 	const mobileToggleRef = useRef();
 	const sidebarRegionRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();
@@ -80,7 +83,7 @@ function Layout() {
 		if ( previousCanvaMode === 'edit' ) {
 			const desktopToggle = sidebarRegionRef.current
 				? // We're typically expecting the `<DashboardBackButton />` component as the first tabbable element.
-				  focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
+					focus.tabbable.find( sidebarRegionRef.current )[ 0 ]
 				: undefined;
 			( desktopToggle ?? mobileToggleRef.current )?.focus();
 		}
@@ -156,60 +159,46 @@ function Layout() {
 					<SnackbarNotices className="edit-site-layout__snackbar" />
 					<UploadProgressSnackbar />
 
-					{ isMobileViewport && hasMobileAreas && (
-						<div className="edit-site-layout__mobile">
-							<SidebarNavigationProvider>
-								{ canvas !== 'edit' ? (
-									<>
-										{ showMobileSiteHub && (
-											<SiteHubMobile
-												ref={ mobileToggleRef }
-											/>
-										) }
-										{ areas.mobileContent ? (
-											/*
-											 * ThemeProvider wraps SidebarContent (rather than
-											 * just the content) so the scroll wrapper it renders
-											 * inherits the content background tokens. See
-											 * `.edit-site-sidebar__screen-wrapper` in style.scss.
-											 */
-											<ThemeProvider
-												color={ CONTENT_COLOR }
-											>
-												<SidebarContent
-													routeKey={ routeKey }
-												>
-													<div className="edit-site-layout__mobile-content">
-														<ErrorBoundary>
-															{
-																areas.mobileContent
-															}
-														</ErrorBoundary>
-													</div>
-												</SidebarContent>
-											</ThemeProvider>
-										) : (
+					{ isMobileViewport &&
+						hasMobileAreas &&
+						canvas !== 'edit' && (
+							<div className="edit-site-layout__mobile">
+								<SidebarNavigationProvider>
+									{ showMobileSiteHub && (
+										<SiteHubMobile
+											ref={ mobileToggleRef }
+										/>
+									) }
+									{ areas.mobileContent ? (
+										/*
+										 * ThemeProvider wraps SidebarContent (rather than
+										 * just the content) so the scroll wrapper it renders
+										 * inherits the content background tokens. See
+										 * `.edit-site-sidebar__screen-wrapper` in style.scss.
+										 */
+										<ThemeProvider color={ CONTENT_COLOR }>
 											<SidebarContent
 												routeKey={ routeKey }
 											>
-												<ErrorBoundary>
-													{ areas.mobileSidebar }
-												</ErrorBoundary>
+												<div className="edit-site-layout__mobile-content">
+													<ErrorBoundary>
+														{ areas.mobileContent }
+													</ErrorBoundary>
+												</div>
 											</SidebarContent>
-										) }
-										<SaveHub />
-										<SavePanel />
-									</>
-								) : (
-									<ThemeProvider color={ CONTENT_COLOR }>
-										<ErrorBoundary>
-											{ areas.preview }
-										</ErrorBoundary>
-									</ThemeProvider>
-								) }
-							</SidebarNavigationProvider>
-						</div>
-					) }
+										</ThemeProvider>
+									) : (
+										<SidebarContent routeKey={ routeKey }>
+											<ErrorBoundary>
+												{ areas.mobileSidebar }
+											</ErrorBoundary>
+										</SidebarContent>
+									) }
+									<SaveHub />
+									<SavePanel />
+								</SidebarNavigationProvider>
+							</div>
+						) }
 
 					{ ! isMobileViewport &&
 						areas.content &&
@@ -241,7 +230,7 @@ function Layout() {
 						</div>
 					) }
 
-					{ ! isMobileViewport && areas.preview && (
+					{ showCanvas && (
 						<div className="edit-site-layout__canvas-container">
 							{ canvasResizer }
 							{ !! canvasSize.width && (

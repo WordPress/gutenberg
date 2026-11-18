@@ -8,10 +8,10 @@
  */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
-import esbuild from 'esbuild';
+import { buildWithConcurrency } from './build-concurrency.mjs';
 
 /**
- * Creates an esbuild plugin that redirects module loads based on filename patterns.
+ * Creates a Rolldown plugin that redirects module loads based on filename patterns.
  *
  * This is useful when bundling workers for Blob URL contexts where certain
  * ES module entry points use `import.meta.url` (which resolves to an invalid
@@ -30,11 +30,11 @@ import esbuild from 'esbuild';
  *   }
  *
  * @param {Object} resolveMap An object mapping source filenames to target
- *                            filenames. When esbuild loads a file whose path
+ *                            filenames. When Rolldown loads a file whose path
  *                            ends with a source key, the plugin rewrites it
  *                            to re-export from the corresponding target file
  *                            in the same directory.
- * @return {Object} An esbuild plugin.
+ * @return {import('rolldown').Plugin} A Rolldown plugin.
  */
 function createModuleRedirectPlugin( resolveMap ) {
 	// Build a single regex that matches any of the source filenames.
@@ -45,23 +45,31 @@ function createModuleRedirectPlugin( resolveMap ) {
 
 	return {
 		name: 'module-redirect',
-		setup( build ) {
-			build.onLoad( { filter: pattern }, ( args ) => {
+		load: {
+			filter: { id: pattern },
+			handler( id ) {
 				// Find which key matched.
 				const matchedKey = Object.keys( resolveMap ).find( ( key ) =>
-					args.path.endsWith( key )
+					id.endsWith( key )
 				);
-				const targetPath = args.path.replace(
+				const targetPath = id.replace(
 					matchedKey,
 					resolveMap[ matchedKey ]
 				);
+				// A relative specifier keeps the checkout path out of the source map.
+				const specifier =
+					'./' +
+					path
+						.relative( path.dirname( id ), targetPath )
+						.split( path.sep )
+						.join( '/' );
 				return {
-					contents: `export { default } from ${ JSON.stringify(
-						targetPath
+					code: `export { default } from ${ JSON.stringify(
+						specifier
 					) };`,
-					loader: 'js',
+					moduleType: 'js',
 				};
-			} );
+			},
 		},
 	};
 }
@@ -142,7 +150,7 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
  * @param {string}   options.buildDir         Path to the CJS build directory.
  * @param {string}   options.buildModuleDir   Path to the ESM build-module directory.
  * @param {string[]} options.target           esbuild target configuration.
- * @param {Object}   options.wasmInlinePlugin The WASM inline plugin for esbuild.
+ * @param {Object}   options.wasmInlinePlugin The WASM inline plugin for Rolldown.
  */
 export async function buildWorkers(
 	packageDir,
@@ -169,32 +177,39 @@ export async function buildWorkers(
 		// Build ESM worker for build-module (primary for browser use).
 		if ( packageJson.module ) {
 			workerBuilds.push(
-				esbuild.build( {
-					entryPoints: [ workerEntryPoint ],
-					outfile: path.join(
-						buildModuleDir,
-						`${ workerOutputName }.mjs`
-					),
-					bundle: true,
-					// Emit UTF-8 so binary-encoded inlined WASM stays compact
-					// (ASCII output would escape high bytes as \uXXXX).
-					charset: 'utf8',
-					format: 'esm',
+				buildWithConcurrency( {
+					input: workerEntryPoint,
+					// wasm-vips uses eval, don't warn about it
+					checks: { eval: false },
 					platform: 'browser',
-					target,
-					sourcemap: true,
+					// Rolldown's default conditions lack esbuild's module condition.
+					resolve: {
+						conditionNames: [ 'module', 'browser', 'default' ],
+					},
 					// Bundle everything - workers need to be self-contained.
-					external: [],
 					plugins: [
 						wasmInlinePlugin,
 						...( resolveMap
 							? [ createModuleRedirectPlugin( resolveMap ) ]
 							: [] ),
 					],
-					define: {
-						'process.env.NODE_ENV': JSON.stringify(
-							process.env.NODE_ENV || 'production'
+					transform: {
+						target,
+						define: {
+							'process.env.NODE_ENV': JSON.stringify(
+								process.env.NODE_ENV || 'production'
+							),
+						},
+					},
+					output: {
+						file: path.join(
+							buildModuleDir,
+							`${ workerOutputName }.mjs`
 						),
+						format: 'esm',
+						minify: false,
+						sourcemap: true,
+						codeSplitting: false,
 					},
 				} )
 			);
@@ -211,23 +226,32 @@ export async function buildWorkers(
 		// unused or misleading CJS artifacts.
 		if ( packageJson.main ) {
 			workerBuilds.push(
-				esbuild.build( {
-					entryPoints: [ workerEntryPoint ],
-					outfile: path.join( buildDir, `${ workerOutputName }.cjs` ),
-					bundle: true,
-					// Emit UTF-8 so binary-encoded inlined WASM stays compact
-					// (ASCII output would escape high bytes as \uXXXX).
-					charset: 'utf8',
-					format: 'cjs',
+				buildWithConcurrency( {
+					input: workerEntryPoint,
+					// wasm-vips uses eval, don't warn about it
+					checks: { eval: false },
 					platform: 'node',
-					target,
-					sourcemap: true,
-					external: [],
+					resolve: {
+						conditionNames: [ 'module', 'node', 'default' ],
+					},
 					plugins: [ wasmInlinePlugin ],
-					define: {
-						'process.env.NODE_ENV': JSON.stringify(
-							process.env.NODE_ENV || 'production'
+					transform: {
+						target,
+						define: {
+							'process.env.NODE_ENV': JSON.stringify(
+								process.env.NODE_ENV || 'production'
+							),
+						},
+					},
+					output: {
+						file: path.join(
+							buildDir,
+							`${ workerOutputName }.cjs`
 						),
+						format: 'cjs',
+						minify: false,
+						sourcemap: true,
+						codeSplitting: false,
 					},
 				} )
 			);
@@ -251,7 +275,7 @@ export async function buildWorkers(
  * @param {string}   options.buildDir       Path to the CJS build directory.
  * @param {string}   options.buildModuleDir Path to the ESM build-module directory.
  * @param {string[]} options.target         esbuild target configuration.
- * @param {Array}    options.plugins        esbuild plugins for transpilation.
+ * @param {Array}    options.plugins        Rolldown plugins for transpilation.
  */
 export async function generateWorkerCode(
 	packageDir,
@@ -314,48 +338,43 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 	// build-module/worker-code.mjs (and build/worker-code.cjs if applicable)
 	// reflect the actual worker code in a single build run.
 	const workerCodeSrcFile = path.join( packageDir, 'src', 'worker-code.ts' );
+	// Name the entry after its path in `src`, so the output mirrors it.
+	const workerCodeEntryName = path
+		.relative( srcDir, workerCodeSrcFile )
+		.replace( /\.ts$/, '' );
 	const retranspileBuilds = [];
 
 	if ( packageJson.module ) {
 		retranspileBuilds.push(
-			esbuild.build( {
-				entryPoints: [ workerCodeSrcFile ],
-				outdir: buildModuleDir,
-				outbase: srcDir,
-				outExtension: { '.js': '.mjs' },
-				bundle: true,
-				// Emit UTF-8 so binary-encoded inlined WASM stays compact
-				// (ASCII output would escape high bytes as \uXXXX).
-				charset: 'utf8',
+			buildWithConcurrency( {
+				input: { [ workerCodeEntryName ]: workerCodeSrcFile },
 				platform: 'neutral',
-				format: 'esm',
-				sourcemap: true,
-				target,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
+				transform: { target },
 				plugins,
+				output: {
+					dir: buildModuleDir,
+					entryFileNames: '[name].mjs',
+					format: 'esm',
+					sourcemap: true,
+				},
 			} )
 		);
 	}
 
 	if ( packageJson.main ) {
 		retranspileBuilds.push(
-			esbuild.build( {
-				entryPoints: [ workerCodeSrcFile ],
-				outdir: buildDir,
-				outbase: srcDir,
-				outExtension: { '.js': '.cjs' },
-				bundle: true,
-				// Emit UTF-8 so binary-encoded inlined WASM stays compact
-				// (ASCII output would escape high bytes as \uXXXX).
-				charset: 'utf8',
+			buildWithConcurrency( {
+				input: { [ workerCodeEntryName ]: workerCodeSrcFile },
 				platform: 'node',
-				format: 'cjs',
-				sourcemap: true,
-				target,
-				jsx: 'automatic',
-				jsxImportSource: 'react',
+				transform: { target },
 				plugins,
+				output: {
+					dir: buildDir,
+					entryFileNames: '[name].cjs',
+					format: 'cjs',
+					exports: 'named',
+					sourcemap: true,
+				},
 			} )
 		);
 	}

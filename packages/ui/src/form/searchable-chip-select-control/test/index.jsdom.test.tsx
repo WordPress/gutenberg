@@ -48,4 +48,29 @@ describe( 'SearchableChipSelectControl', () => {
 			} )
 		).toBeVisible();
 	} );
+
+	it( 'includes the field description and the selection hint when items are selected', () => {
+		render(
+			<SearchableChipSelectControl
+				label="Fruits"
+				description="Choose your favorite fruits"
+				items={ mockItems }
+				defaultValue={ [ mockItems[ 0 ], mockItems[ 1 ] ] }
+			/>
+		);
+
+		const combobox = screen.getByRole( 'combobox', { name: 'Fruits' } );
+
+		expect( combobox ).toHaveAccessibleDescription(
+			expect.stringContaining( 'Choose your favorite fruits' )
+		);
+		expect( combobox ).toHaveAccessibleDescription(
+			expect.stringContaining(
+				'2 items selected. From the start of the input, press Left Arrow to move to the selected items.'
+			)
+		);
+		expect(
+			screen.getByRole( 'toolbar', { name: 'Selected items' } )
+		).toBeVisible();
+	} );
 } );

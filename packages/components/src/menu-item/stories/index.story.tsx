@@ -8,7 +8,7 @@ import { NavigableMenu } from '../../navigable-container';
 const meta: Meta< typeof MenuItem > = {
 	tags: [ 'manifest' ],
 	component: MenuItem,
-	title: 'Components/Actions/MenuItem',
+	title: 'Components/@wordpress-components/Actions/MenuItem',
 	id: 'components-menuitem',
 	argTypes: {
 		children: { control: false },

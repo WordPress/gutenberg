@@ -32,7 +32,7 @@ export default function useTruncate(
 				ellipsizeMode,
 				limit,
 				numberOfLines,
-		  } )
+			} )
 		: children;
 
 	const shouldTruncate =
@@ -51,7 +51,7 @@ export default function useTruncate(
 		? {
 				...style,
 				'--wp-components-truncate-lines': numberOfLines,
-		  }
+			}
 		: style;
 
 	return {

@@ -1,8 +1,12 @@
 import { MenuGroup, MenuItem, DropdownMenu } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
-import { PreferenceToggleMenuItem } from '@wordpress/preferences';
+import {
+	PreferenceToggleMenuItem,
+	store as preferencesStore,
+} from '@wordpress/preferences';
 import { displayShortcut } from '@wordpress/keycodes';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
@@ -24,6 +28,7 @@ export default function MoreMenu() {
 	);
 
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const { toggle } = useDispatch( preferencesStore );
 
 	return (
 		<>
@@ -68,11 +73,17 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
-							<PreferenceToggleMenuItem
-								scope="core/edit-widgets"
-								name="welcomeGuide"
-								label={ __( 'Welcome Guide' ) }
-							/>
+							<MenuItem
+								onClick={ () =>
+									toggle(
+										'core/edit-widgets',
+										'welcomeGuide'
+									)
+								}
+								aria-haspopup="dialog"
+							>
+								{ __( 'Welcome Guide' ) }
+							</MenuItem>
 							<MenuItem
 								role="menuitem"
 								icon={ external }
@@ -80,7 +91,6 @@ export default function MoreMenu() {
 									'https://wordpress.org/documentation/article/block-based-widgets-editor/'
 								) }
 								target="_blank"
-								rel="noopener"
 							>
 								{ __( 'Help' ) }
 								<VisuallyHidden render={ <span /> }>

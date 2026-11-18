@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Text } from '../../../text';
 import type { AutocompleteGroupLabelProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Renders a label for an `Autocomplete.Group`, describing the group of items
@@ -12,7 +12,10 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 export const GroupLabel = forwardRef<
 	HTMLDivElement,
 	AutocompleteGroupLabelProps
->( function GroupLabel( { className, children, ...restProps }, ref ) {
+>( function UnforwardedGroupLabel(
+	{ className, children, ...restProps },
+	ref
+) {
 	return (
 		<Text
 			variant="heading-sm"

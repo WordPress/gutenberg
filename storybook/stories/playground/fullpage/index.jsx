@@ -4,19 +4,12 @@ import {
 	BlockEditorProvider,
 	BlockInspector,
 } from '@wordpress/block-editor';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
-// Reason: Styles are injected dynamically.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import styles from './style.lazy.scss?inline';
-import { editorStyles } from '../editor-styles';
+import { contentStyles } from '../editor-styles';
 
-export default function EditorFullPage() {
+export default function EditorFullPage( { direction = 'ltr' } ) {
 	const [ blocks, updateBlocks ] = useState( [] );
-
-	useEffect( () => {
-		registerCoreBlocks();
-	}, [] );
 
 	// Ensures that the CSS intended for the playground (especially the style resets)
 	// are only loaded for the playground and don't leak into other stories.
@@ -43,7 +36,10 @@ export default function EditorFullPage() {
 					<BlockInspector />
 				</div>
 				<div className="playground__content">
-					<BlockCanvas height="100%" styles={ editorStyles } />
+					<BlockCanvas
+						height="100%"
+						styles={ contentStyles[ direction ] }
+					/>
 				</div>
 			</BlockEditorProvider>
 		</div>

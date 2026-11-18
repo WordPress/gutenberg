@@ -6,14 +6,19 @@ import { useState } from '@wordpress/element';
 import { Menu } from '..';
 import Modal from '../../modal';
 
-const waitForFocusedMenu = () =>
-	expect.element( page.getByRole( 'menu' ) ).toHaveFocus();
+const waitForFocusedMenu = () => {
+	return expect.element( page.getByRole( 'menu' ) ).toHaveFocus();
+};
 
-const waitForFocusedMenuItem = ( name: string ) =>
-	expect.element( page.getByRole( 'menuitem', { name } ) ).toHaveFocus();
+const waitForFocusedMenuItem = ( name: string ) => {
+	return expect
+		.element( page.getByRole( 'menuitem', { name } ) )
+		.toHaveFocus();
+};
 
-const waitForClosedMenu = () =>
-	expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
+const waitForClosedMenu = () => {
+	return expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
+};
 
 const MenuWithModal = () => {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
@@ -85,6 +90,27 @@ describe( 'Menu keyboard navigation', () => {
 		await user.keyboard( '{ArrowDown}' );
 
 		await waitForFocusedMenuItem( 'First item' );
+	} );
+
+	it( 'should open when pressing the space key on the trigger', async () => {
+		const user = userEvent.setup();
+		await render(
+			<Menu>
+				<Menu.TriggerButton>Open dropdown</Menu.TriggerButton>
+				<Menu.Popover>
+					<Menu.Item>First item</Menu.Item>
+					<Menu.Item>Second item</Menu.Item>
+				</Menu.Popover>
+			</Menu>
+		);
+
+		await user.tab();
+		await user.keyboard( ' ' );
+
+		await expect
+			.element( page.getByRole( 'button', { name: 'Open dropdown' } ) )
+			.toHaveAttribute( 'aria-expanded', 'true' );
+		await expect.element( page.getByRole( 'menu' ) ).toBeInTheDocument();
 	} );
 
 	it( 'should close when pressing the escape key', async () => {

@@ -7,8 +7,8 @@ $blocks-block__margin: 0.5em;
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	// stylelint-disable-next-line declaration-property-value-keyword-no-deprecated -- overflow-wrap doesn't work well if a link is wrapped in the div, so use word-break here.
-	word-break: break-word;
+	word-break: normal;
+	overflow-wrap: anywhere;
 	box-sizing: border-box;
 	height: 100%;
 	align-content: center;
@@ -56,7 +56,7 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
-	&[class*="wp-block-button__width"] {
+	&.wp-block-button__width {
 		width:
 			calc(var(--wp--block-button--width) * 1% -
 			(
@@ -101,7 +101,7 @@ $blocks-block__margin: 0.5em;
 
 // For vertical buttons, gap is not factored into width calculations.
 .wp-block-buttons.is-vertical > .wp-block-button {
-	&[class*="wp-block-button__width"] {
+	&.wp-block-button__width {
 		width: calc(var(--wp--block-button--width) * 1%);
 	}
 

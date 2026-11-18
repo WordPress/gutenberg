@@ -4,7 +4,7 @@ import { useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 export default function WelcomeGuide( { sidebar } ) {
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const isEntirelyBlockWidgets = sidebar
 		.getWidgets()
@@ -34,16 +34,20 @@ export default function WelcomeGuide( { sidebar } ) {
 				{ isEntirelyBlockWidgets
 					? __(
 							'Your theme provides different “block” areas for you to add and edit content. Try adding a search bar, social icons, or other types of blocks here and see how they’ll look on your site.'
-					  )
+						)
 					: __(
 							'You can now add any block to your site’s widget areas. Don’t worry, all of your favorite widgets still work flawlessly.'
-					  ) }
+						) }
 			</p>
 			<Button
 				size="compact"
 				variant="primary"
 				onClick={ () =>
-					toggle( 'core/customize-widgets', 'welcomeGuide' )
+					setPreference(
+						'core/customize-widgets',
+						'welcomeGuide',
+						false
+					)
 				}
 			>
 				{ __( 'Got it' ) }

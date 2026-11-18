@@ -2,6 +2,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
+import { speak } from '@wordpress/a11y';
 import DataViews from '../index';
 import {
 	LAYOUT_ACTIVITY,
@@ -13,8 +14,14 @@ import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 globalThis.wpVitest.mockMatchMedia();
-
+globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
+
+vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	speak: vi.fn(),
+} ) );
+
 type Data = {
 	id: number;
 	title: string;
@@ -143,6 +150,12 @@ function DataViewWrapper( {
 	return <DataViews { ...dataViewProps } />;
 }
 
+function getBulkActionToolbar() {
+	return screen
+		.getByText( /\d+ items? selected/ )
+		.closest< HTMLDivElement >( '.dataviews-bulk-actions' )!;
+}
+
 // Tests run against a DataView which is 500px wide.
 const mockUseViewportMatch = vi.fn(
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -157,7 +170,7 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 			setTimeout( () => {
 				callback( [
 					{
-						borderBoxSize: [ { inlineSize: 500 } ],
+						borderBoxSize: [ { inlineSize: 500, blockSize: 48 } ],
 					},
 				] );
 			}, 0 );
@@ -169,6 +182,203 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => {
 } );
 
 describe( 'DataViews component', () => {
+	it.each( [ 'Delete', 'Delete……' ] )(
+		'uses button and item-menu labels for modal action "%s"',
+		async ( label ) => {
+			render(
+				<DataViewWrapper
+					actions={ [
+						{ ...actions[ 0 ], label, isPrimary: true },
+						{ id: 'view', label: 'View', callback: vi.fn() },
+					] }
+					data={ [ data[ 0 ] ] }
+				/>
+			);
+			const user = userEvent.setup();
+			expect(
+				screen.getByRole( 'button', { name: 'Delete' } )
+			).toBeInTheDocument();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+			expect(
+				await screen.findByRole( 'menuitem', {
+					name: label === 'Delete' ? 'Delete…' : label,
+				} )
+			).toBeInTheDocument();
+		}
+	);
+
+	it( 'renders header bulk actions once in a custom table composition', () => {
+		render(
+			<DataViewWrapper
+				view={ { type: LAYOUT_TABLE } }
+				actions={ actions }
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+			>
+				<DataViews.Layout />
+				<DataViews.BulkActionToolbar />
+				<DataViews.Pagination />
+			</DataViewWrapper>
+		);
+		expect( console ).toHaveWarnedWith(
+			'DataViews.BulkActionToolbar is deprecated. Note: Remove this component from your composition. Built-in table and grid layouts render bulk actions automatically.'
+		);
+		expect( screen.getByText( '1 item selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'renders header bulk actions in a custom grid composition', async () => {
+		render(
+			<DataViewWrapper view={ { type: LAYOUT_GRID } } actions={ actions }>
+				<DataViews.Layout />
+				<DataViews.Footer />
+			</DataViewWrapper>
+		);
+		const user = userEvent.setup();
+		expect( screen.getByText( 'Select all' ) ).toBeVisible();
+		await user.click( screen.getByText( 'Select all' ) );
+		expect( screen.queryByText( 'Select all' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( '3 items selected' ) ).toBeInTheDocument();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
+		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( screen.getByText( 'Select all' ) ).toBeVisible();
+	} );
+
+	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
+		'keeps %s bulk actions visible until a callback that clears selection finishes',
+		async ( type ) => {
+			let finishAction: () => void;
+			const pending = new Promise< void >( ( resolve ) => {
+				finishAction = resolve;
+			} );
+			function PendingActionView() {
+				const [ selection, setSelection ] = useState( [ '1' ] );
+				const [ items, setItems ] = useState( data );
+				return (
+					<DataViewWrapper
+						view={ { type } }
+						data={ items }
+						selection={ selection }
+						onChangeSelection={ setSelection }
+						actions={ [
+							{
+								id: 'process',
+								label: 'Process',
+								supportsBulk: true,
+								callback: async () => {
+									setSelection( [] );
+									setItems( [] );
+									await pending;
+								},
+							},
+						] }
+					/>
+				);
+			}
+			render( <PendingActionView /> );
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'button', { name: 'Process' } )
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Process' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
+			expect( screen.getByText( '1 item selected' ) ).toBeVisible();
+			finishAction!();
+			await waitFor( () =>
+				expect(
+					screen.queryByRole( 'button', { name: 'Process' } )
+				).not.toBeInTheDocument()
+			);
+			expect( screen.getByText( 'No results' ) ).toBeVisible();
+		}
+	);
+
+	it( 'restores column controls when bulk actions become unavailable', () => {
+		const props = { selection: [ '1' ], onChangeSelection: vi.fn() };
+		const { rerender } = render(
+			<DataViewWrapper { ...props } actions={ actions } />
+		);
+		rerender( <DataViewWrapper { ...props } actions={ [] } /> );
+		const titleHeader = screen.getByRole( 'columnheader', {
+			name: 'Title',
+		} );
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+	} );
+
+	it( 'disabled desktop bulk action cannot run', async () => {
+		const callback = vi.fn();
+		render(
+			<DataViewWrapper
+				selection={ [ '1' ] }
+				onChangeSelection={ vi.fn() }
+				actions={ [
+					{
+						id: 'edit',
+						label: 'Edit',
+						supportsBulk: true,
+						disabled: true,
+						callback,
+					},
+				] }
+			/>
+		);
+		const action = screen.getByRole( 'button', { name: 'Edit' } );
+		expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+		const user = userEvent.setup();
+		await user.click( action );
+		expect( callback ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows bulk actions outside the table without adding rows and preserves focus', async () => {
+		render( <DataViewWrapper actions={ actions } /> );
+		expect( screen.getByText( '3 items' ) ).toBeInTheDocument();
+		expect(
+			screen.getAllByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveLength( 1 );
+
+		const user = userEvent.setup();
+		await user.click(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		);
+
+		const tableHeader = within( screen.getByRole( 'table' ) ).getAllByRole(
+			'rowgroup'
+		)[ 0 ];
+		const toolbar = getBulkActionToolbar();
+		expect( screen.getByRole( 'table' ) ).not.toContainElement( toolbar );
+		expect( within( tableHeader ).getAllByRole( 'row' ) ).toHaveLength( 1 );
+		const titleHeader = within( tableHeader ).getByRole( 'columnheader', {
+			name: 'Title',
+		} );
+		expect(
+			within( titleHeader ).getByRole( 'button', { hidden: true } )
+		).toHaveAttribute( 'inert' );
+		expect(
+			within( toolbar ).getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} )
+		).toHaveFocus();
+		expect(
+			screen.getByRole( 'button', { name: 'Delete' } )
+		).toBeInTheDocument();
+
+		await user.click(
+			within( toolbar ).getByRole( 'button', { name: 'Cancel' } )
+		);
+		expect( within( titleHeader ).getByRole( 'button' ) ).toBeEnabled();
+		expect(
+			screen.getByRole( 'checkbox', { name: 'Select all' } )
+		).toHaveFocus();
+	} );
+
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
@@ -309,6 +519,136 @@ describe( 'DataViews component', () => {
 			expect( onChangeView ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'page select', () => {
+		// A server-backed dataset: the totals come from the consumer and only
+		// the current page is in `data`.
+		const manyPages = { totalItems: 1453038, totalPages: 72652 };
+
+		it( 'lists every page in a select up to 100 pages', () => {
+			render(
+				<DataViewWrapper
+					paginationInfo={ { totalItems: 1000, totalPages: 100 } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'combobox', { name: 'Current page' } )
+			).toHaveTextContent( '1' );
+			expect(
+				screen.queryByRole( 'spinbutton', { name: 'Current page' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'offers a page number input instead of a select above 100 pages', () => {
+			render( <DataViewWrapper paginationInfo={ manyPages } /> );
+
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Current page' } )
+			).toHaveValue( 1 );
+			expect( screen.getByText( 'of 72652' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Current page' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'goes to the typed page on Enter', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '42{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 42 } )
+			);
+		} );
+
+		it( 'goes to the typed page when the input loses focus', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '7' );
+			await user.tab();
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 7 } )
+			);
+		} );
+
+		it( 'clamps the typed page to the available pages', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			await user.type( input, '99999{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( onChangeView ).toHaveBeenCalledWith(
+				expect.objectContaining( { page: 72652 } )
+			);
+
+			// Below the first page clamps to it, which is where the view
+			// already is: nothing to change.
+			await user.clear( input );
+			await user.type( input, '0{Enter}' );
+
+			expect( onChangeView ).toHaveBeenCalledTimes( 1 );
+			expect( input ).toHaveValue( 1 );
+		} );
+
+		it( 'ignores an empty value and shows the current page again', async () => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			render(
+				<DataViewWrapper
+					paginationInfo={ manyPages }
+					onChangeView={ onChangeView }
+				/>
+			);
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Current page',
+			} );
+			await user.clear( input );
+			expect( input ).toHaveValue( null );
+			await user.keyboard( '{Enter}' );
+
+			expect( onChangeView ).not.toHaveBeenCalled();
+			expect( input ).toHaveValue( 1 );
+		} );
+	} );
+
 	describe( 'in table view', () => {
 		it( 'should display columns for each field', () => {
 			render( <DataViewWrapper /> );
@@ -751,7 +1091,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in grid view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -759,14 +1099,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getAllByText( item.title )[ 0 ]
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getAllByText( item.title )[ 0 ]
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render mediaField if defined', () => {
+		it( 'should render mediaField if defined', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -775,14 +1117,16 @@ describe( 'DataViews component', () => {
 					} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getByTestId( 'image-field-' + item.id )
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByTestId( 'image-field-' + item.id )
+					).toBeInTheDocument();
+				}
+			} );
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each grid item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each grid item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -792,7 +1136,11 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
@@ -827,7 +1175,7 @@ describe( 'DataViews component', () => {
 			expect( mediaClickItemCallback ).toHaveBeenCalledWith( data[ 0 ] );
 		} );
 
-		it( 'labels the clickable media area with the title when the title is hidden', () => {
+		it( 'labels the clickable media area with the title when the title is hidden', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -840,17 +1188,19 @@ describe( 'DataViews component', () => {
 					onClickItem={ () => {} }
 				/>
 			);
-			for ( const item of data ) {
-				expect(
-					screen.getByRole( 'button', { name: item.title } )
-				).toBeInTheDocument();
-			}
+			await waitFor( () => {
+				for ( const item of data ) {
+					expect(
+						screen.getByRole( 'button', { name: item.title } )
+					).toBeInTheDocument();
+				}
+			} );
 			expect(
 				screen.queryByRole( 'button', { name: 'Navigate to item' } )
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'labels the clickable media area by the visible title when the title is shown', () => {
+		it( 'labels the clickable media area by the visible title when the title is shown', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -865,11 +1215,13 @@ describe( 'DataViews component', () => {
 			// Both the media area and the title are clickable and share the
 			// name; the media area points at the rendered title
 			// (`aria-labelledby`) rather than carrying a label of its own.
-			const mediaButton = screen
-				.getAllByRole( 'button', { name: data[ 0 ].title } )
-				.find( ( button ) =>
-					button.classList.contains( 'dataviews-view-grid__media' )
-				);
+			const mediaButton = (
+				await screen.findAllByRole( 'button', {
+					name: data[ 0 ].title,
+				} )
+			).find( ( button ) =>
+				button.classList.contains( 'dataviews-view-grid__media' )
+			);
 			expect( mediaButton ).toHaveAttribute( 'aria-labelledby' );
 			expect( mediaButton ).not.toHaveAttribute( 'aria-label' );
 		} );
@@ -891,14 +1243,14 @@ describe( 'DataViews component', () => {
 			const firstCheckbox = screen.getByRole( 'checkbox', {
 				name: data[ 0 ].title,
 			} );
-			const thirdCheckbox = screen.getByRole( 'checkbox', {
-				name: data[ 2 ].title,
-			} );
 			const user = userEvent.setup();
 			await user.click( firstCheckbox );
 
 			// First item should be selected.
 			expect( firstCheckbox ).toBeChecked();
+			const thirdCheckbox = screen.getByRole( 'checkbox', {
+				name: data[ 2 ].title,
+			} );
 			await user.click( thirdCheckbox );
 
 			// Both items should be selected (checkboxes toggle independently).
@@ -1007,6 +1359,10 @@ describe( 'DataViews component', () => {
 			await user.click( viewOptionsButton );
 
 			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
+			await user.tab();
 			await user.tab();
 
 			expect(
@@ -1051,6 +1407,10 @@ describe( 'DataViews component', () => {
 			// instead of a direct .focus() so that effects have time to complete.
 			await user.click( viewOptionsButton );
 			await user.click( viewOptionsButton );
+			await user.tab();
+			expect(
+				screen.getByRole( 'checkbox', { name: 'Select all' } )
+			).toHaveFocus();
 			await user.tab();
 			await user.tab();
 
@@ -1129,19 +1489,29 @@ describe( 'DataViews component', () => {
 			// class the previews are styled from.
 			const getGrid = () => screen.getByRole( 'grid' );
 
-			it( 'crops previews by default', () => {
+			it( 'crops previews by default', async () => {
 				renderGrid();
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
-			it( 'fits previews when configured to contain', () => {
+			it( 'fits previews when configured to contain', async () => {
 				renderGrid( { mediaFit: 'contain' } );
-				expect( getGrid() ).toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).toHaveClass( 'has-media-fit-contain' )
+				);
 			} );
 
-			it( 'ignores an unsupported value and falls back to cropping', () => {
+			it( 'ignores an unsupported value and falls back to cropping', async () => {
 				renderGrid( { mediaFit: 'fill' } );
-				expect( getGrid() ).not.toHaveClass( 'has-media-fit-contain' );
+				await waitFor( () =>
+					expect( getGrid() ).not.toHaveClass(
+						'has-media-fit-contain'
+					)
+				);
 			} );
 
 			it( 'hides the control unless the consumer opts in', async () => {
@@ -1170,7 +1540,7 @@ describe( 'DataViews component', () => {
 	} );
 
 	describe( 'in list view', () => {
-		it( 'should display the passed in data', () => {
+		it( 'should display the passed in data', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1180,12 +1550,12 @@ describe( 'DataViews component', () => {
 			);
 			for ( const item of data ) {
 				expect(
-					screen.getAllByText( item.title )[ 0 ]
+					( await screen.findAllByText( item.title ) )[ 0 ]
 				).toBeInTheDocument();
 			}
 		} );
 
-		it( 'should render actions dropdown if actions are supported and passed in for each list item', () => {
+		it( 'should render actions dropdown if actions are supported and passed in for each list item', async () => {
 			render(
 				<DataViewWrapper
 					view={ {
@@ -1195,7 +1565,11 @@ describe( 'DataViews component', () => {
 				/>
 			);
 			expect(
-				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+				(
+					await screen.findAllByRole( 'button', {
+						name: 'Actions',
+					} )
+				).length
 			).toEqual( 3 );
 		} );
 
@@ -1209,14 +1583,16 @@ describe( 'DataViews component', () => {
 				layout: { density: 'compact' },
 			};
 
-			it( 'should apply the configured density', () => {
+			it( 'should apply the configured density', async () => {
 				const { container } = render(
 					<DataViewWrapper view={ view } />
 				);
-				expect(
-					// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
-					container.querySelector( '.dataviews-view-list' )
-				).toHaveClass( 'has-compact-density' );
+				await waitFor( () =>
+					expect(
+						// eslint-disable-next-line testing-library/no-container, testing-library/no-node-access
+						container.querySelector( '.dataviews-view-list' )
+					).toHaveClass( 'has-compact-density' )
+				);
 			} );
 
 			it( 'should become inert while loading and refreshing once the delay elapses', async () => {
@@ -1263,6 +1639,89 @@ describe( 'DataViews component', () => {
 
 		afterEach( () => {
 			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'keeps the bulk actions menu trigger focusable while an action runs', async () => {
+			let finishAction: () => void;
+			const pending = new Promise< void >( ( resolve ) => {
+				finishAction = resolve;
+			} );
+			render(
+				<DataViewWrapper
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'process',
+							label: 'Process',
+							supportsBulk: true,
+							callback: () => pending,
+						},
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			const trigger = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
+			);
+			await user.click( trigger );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Process' } )
+			);
+			expect( trigger ).toHaveFocus();
+			expect( trigger ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( speak ).toHaveBeenCalledWith( 'Loading' );
+
+			finishAction!();
+			await waitFor( () =>
+				expect( trigger ).toHaveAttribute( 'aria-disabled', 'false' )
+			);
+		} );
+
+		it( 'supports iconless and disabled grid bulk actions without losing modal focus', async () => {
+			const callback = vi.fn();
+			render(
+				<DataViewWrapper
+					view={ { ...DEFAULT_VIEW, type: LAYOUT_GRID } }
+					selection={ [ '1' ] }
+					onChangeSelection={ vi.fn() }
+					actions={ [
+						{
+							id: 'edit',
+							label: 'Edit',
+							supportsBulk: true,
+							disabled: true,
+							callback,
+						},
+						actions[ 0 ],
+					] }
+				/>
+			);
+			const user = userEvent.setup();
+			const bulkActions = within( getBulkActionToolbar() ).getByRole(
+				'button',
+				{ name: 'Actions' }
+			);
+			await user.click( bulkActions );
+
+			const disabledAction = await screen.findByRole( 'menuitem', {
+				name: 'Edit',
+			} );
+			expect( disabledAction ).toHaveAttribute( 'aria-disabled', 'true' );
+			await user.click( disabledAction );
+			expect( callback ).not.toHaveBeenCalled();
+
+			await user.click(
+				screen.getByRole( 'menuitem', { name: 'Delete…' } )
+			);
+			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'dialog', { name: 'Delete' } )
+			).toHaveTextContent( 'Modal Content' );
+			await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument();
+			expect( bulkActions ).toHaveFocus();
 		} );
 
 		it( 'should show actions dropdown on mobile even when there is only one action in table layout', () => {

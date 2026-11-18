@@ -30,7 +30,7 @@ export default function ConvertToRegularBlocks( { clientId, onClose } ) {
 						'postType',
 						'wp_template_part',
 						templatePartId
-				  )
+					)
 				: null;
 
 			return {
@@ -52,7 +52,7 @@ export default function ConvertToRegularBlocks( { clientId, onClose } ) {
 				/* translators: %s: template part title, e.g. "Header" */
 				__( 'Detach %s?' ),
 				templatePartTitle
-		  )
+			)
 		: __( 'Detach template part?' );
 
 	const message = templatePartTitle
@@ -62,10 +62,10 @@ export default function ConvertToRegularBlocks( { clientId, onClose } ) {
 					'The blocks will be separated from the original template part and will be fully editable. Future changes to the %s template part will not apply here.'
 				),
 				templatePartTitle
-		  )
+			)
 		: __(
 				'The blocks will be separated from the original template part and will be fully editable. Future changes to the template part will not apply here.'
-		  );
+			);
 
 	return (
 		<>

@@ -631,6 +631,40 @@ describe( 'DataForm component', () => {
 			expect( fieldsSelector.author.edit() ).toBeInTheDocument();
 		} );
 
+		it.each( [ 'dropdown', 'modal' ] as const )(
+			'renders a disabled field as text without an edit button (%s)',
+			( openAs ) => {
+				render(
+					<Dataform
+						onChange={ noop }
+						fields={ fields.map( ( field ) =>
+							field.id === 'title'
+								? {
+										...field,
+										isDisabled: ( {
+											item,
+										}: {
+											item: typeof data;
+										} ) => item.order === 1,
+									}
+								: field
+						) }
+						form={ {
+							...formPanelMode,
+							layout: { ...formPanelMode.layout, openAs },
+						} }
+						data={ data }
+					/>
+				);
+
+				expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'button', { name: /edit title/i } )
+				).not.toBeInTheDocument();
+				expect( fieldsSelector.order.view() ).toBeInTheDocument();
+			}
+		);
+
 		it( 'should render custom render component', async () => {
 			const fieldsWithCustomRenderFunction = fields.map( ( field ) => {
 				return {
@@ -681,7 +715,7 @@ describe( 'DataForm component', () => {
 			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should show the value of a non-empty field instead of its placeholder', () => {
+		it( 'should show the value of a non-empty field before its placeholder', () => {
 			render(
 				<Dataform
 					onChange={ noop }
@@ -701,10 +735,35 @@ describe( 'DataForm component', () => {
 				/>
 			);
 
+			// The placeholder follows the value, and the styles hide it while
+			// the value renders something.
 			expect( screen.getByText( 'Hello World' ) ).toBeInTheDocument();
-			expect(
-				screen.queryByText( 'Add a title' )
-			).not.toBeInTheDocument();
+			expect( screen.getByText( 'Add a title' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should follow an empty render output of a non-empty field with its placeholder', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'author',
+							label: 'Author',
+							type: 'integer',
+							placeholder: 'No author',
+							// Like an id matching no record.
+							render: () => null,
+						},
+					] }
+					form={ {
+						layout: { type: 'panel', showPlaceholderIfEmpty: true },
+						fields: [ 'author' ],
+					} }
+					data={ { author: 99 } }
+				/>
+			);
+
+			expect( screen.getByText( 'No author' ) ).toBeInTheDocument();
 		} );
 
 		it( 'should fall back to the render output when an empty field has no placeholder', () => {
@@ -987,6 +1046,11 @@ describe( 'DataForm component', () => {
 
 		it( 'should not show errors when tabbing past the header of a collapsed card', async () => {
 			const user = userEvent.setup();
+			// TODO: jsdom-only reset; browsers keep a content-visibility:hidden panel out of the tab order, but user-event only skips display:none.
+			const collapsedPanelReset = document.createElement( 'style' );
+			collapsedPanelReset.textContent =
+				'[hidden="until-found"] { display: none; }';
+			document.head.appendChild( collapsedPanelReset );
 			render(
 				<>
 					<Dataform
@@ -1024,6 +1088,8 @@ describe( 'DataForm component', () => {
 			expect(
 				screen.queryByText( /needs? attention/ )
 			).not.toBeInTheDocument();
+
+			collapsedPanelReset.remove();
 		} );
 
 		it( 'should show errors for fields that become invalid after focus already left the card once', async () => {
@@ -1041,7 +1107,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 

@@ -5,12 +5,17 @@ import type {
 	ComboboxEmptyProps,
 	ComboboxInputProps,
 	ComboboxRootProps,
+	ComboboxStatusProps,
 } from '../combobox/types';
 
 export type Item = {
 	label: string;
 	value: string;
 	disabled?: boolean;
+	/**
+	 * Supplementary text for the item in the popup.
+	 */
+	description?: string;
 	/**
 	 * When `true`, the item renders in the list footer, not the main list,
 	 * when it is in the filtered items.
@@ -64,7 +69,7 @@ export function hasGroupedItems(
 
 export type SearchableChipSelectProps = Omit<
 	ComboboxRootProps< Item, true >,
-	'children' | 'items' | 'multiple'
+	'children' | 'items' | 'multiple' | 'readOnly'
 > &
 	Partial<
 		Pick<
@@ -107,6 +112,9 @@ export type SearchableChipSelectProps = Omit<
 		/**
 		 * A render function for custom rendering the selected chips.
 		 *
+		 * The chip is named from its content. Pass `aria-label` when that
+		 * content is not a usable name.
+		 *
 		 * ```jsx
 		 * chipsContent={ ( value ) =>
 		 *   value.map( ( item ) => (
@@ -124,6 +132,10 @@ export type SearchableChipSelectProps = Omit<
 		 * which shows whenever there are no matching items.
 		 */
 		emptyContent?: ComboboxEmptyProps[ 'children' ];
+		/**
+		 * Content for the list status live region. The region stays mounted.
+		 */
+		statusContent?: ComboboxStatusProps[ 'children' ];
 		/**
 		 * The placeholder text to use for the search input.
 		 */

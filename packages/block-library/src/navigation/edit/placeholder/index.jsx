@@ -1,4 +1,8 @@
-import { Placeholder, Button, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	Button,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { navigation, Icon } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
@@ -57,7 +61,7 @@ export default function NavigationPlaceholder( {
 
 						<hr />
 
-						{ isResolvingActions && <Spinner /> }
+						{ isResolvingActions && <WCSpinner /> }
 
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }

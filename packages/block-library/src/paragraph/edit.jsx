@@ -19,20 +19,17 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
-import { unlock } from '../lock-unlock';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
-		isRTL() && (
-			<ToolbarButton
-				icon={ formatLTR }
-				title={ _x( 'Left to right', 'editor button' ) }
-				isActive={ direction === 'ltr' }
-				onClick={ () => {
-					setDirection( direction === 'ltr' ? undefined : 'ltr' );
-				} }
-			/>
-		)
+		<ToolbarButton
+			icon={ formatLTR }
+			title={ _x( 'Left to right', 'editor button' ) }
+			isActive={ direction === 'ltr' }
+			onClick={ () => {
+				setDirection( direction === 'ltr' ? undefined : 'ltr' );
+			} }
+		/>
 	);
 }
 
@@ -48,19 +45,18 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
 	const hasSelectedStyleState = useSelect(
 		( select ) => {
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
+			const { hasSelectedBlockStyleState } = select( blockEditorStore );
 
 			return hasSelectedBlockStyleState( clientId );
 		},
 		[ clientId ]
 	);
 
-	if ( ! isDropCapFeatureEnabled || hasSelectedStyleState ) {
+	const { style, dropCap } = attributes;
+	if ( ( ! isDropCapFeatureEnabled && ! dropCap ) || hasSelectedStyleState ) {
 		return null;
 	}
 
-	const { style, dropCap } = attributes;
 	const textAlign = style?.typography?.textAlign;
 
 	let helpText;
@@ -122,14 +118,15 @@ function ParagraphBlock( {
 		'aria-label': RichText.isEmpty( content )
 			? __(
 					'Empty block; start writing or type forward slash to choose a block'
-			  )
+				)
 			: __( 'Block: Paragraph' ),
 	} );
 	const blockEditingMode = useBlockEditingMode();
 
 	return (
 		<>
-			{ blockEditingMode === 'default' && (
+			{ /* An empty fill would still draw an empty toolbar group. */ }
+			{ blockEditingMode === 'default' && isRTL() && (
 				<BlockControls group="block">
 					<ParagraphRTLControl
 						direction={ direction }

@@ -4,10 +4,6 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill(
 	'EditWidgetsToolsMoreMenuGroup'
 );
 
-ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
-	<Slot fillProps={ fillProps }>
-		{ ( fills ) => fills.length > 0 && fills }
-	</Slot>
-);
+ToolsMoreMenuGroup.Slot = Slot;
 
 export default ToolsMoreMenuGroup;

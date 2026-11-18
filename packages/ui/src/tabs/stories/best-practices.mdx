@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
 
-<Meta title="Design System/Components/Tabs/Best Practices" />
+<Meta id="design-system-components-tabs-best-practices" title="Components/@wordpress-ui/Tabs/Best Practices" />
 
 # Tabs
 
@@ -78,11 +78,12 @@ const MyControlledTabs = () => {
 
 ### Using `Tabs` with links
 
-The semantics implemented by the `Tabs` component don't align well with the semantics needed by a list of links. Furthermore, end users usually expect every link to be tabbable, while `Tabs.List` is a [composite](https://w3c.github.io/aria/#composite) widget acting as a single tab stop.
+Do not use `Tabs` for links, even when the links look like tabs. `Tabs` shows panels in place on the same page. Links that go to different URLs are navigation, and navigation needs different semantics:
 
-For these reasons, even if the `Tabs` component is fully extensible, we don't recommend using `Tabs` with links, and we don't currently provide any related Storybook example.
+-   Assistive technology announces each tab as a control for a panel, not as a link to a different URL.
+-   Users expect to reach each link with the Tab key. `Tabs.List` is a [composite](https://w3c.github.io/aria/#composite) widget with a single tab stop, and users move between its tabs with the arrow keys.
 
-We may provide a dedicated component for tabs-like links in the future based on the feedback received.
+When you build an admin screen with the [`Page`](?path=/docs/admin-ui-page--docs) component from `@wordpress/admin-ui`, use its `navigation` prop for tab-style links to the sections of the screen.
 
 ### Panel and sidebar tabs
 

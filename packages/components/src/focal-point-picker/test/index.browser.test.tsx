@@ -53,15 +53,16 @@ describe( 'FocalPointPicker', () => {
 
 			const draggableArea = screen.getByRole( 'button' );
 
-			// `user-event` is not capable of testing drag interactions properly.
-			// we could consider using playwright instead.
+			// Start a gesture without releasing it so Tab can interrupt it.
 			fireEvent.mouseDown( draggableArea );
 
 			expect( mockOnDrag ).not.toHaveBeenCalled();
 			expect( mockOnDragEnd ).not.toHaveBeenCalled();
 
-			fireEvent.blur( draggableArea );
-			fireEvent.mouseMove( draggableArea );
+			expect( draggableArea ).toHaveFocus();
+			await userEvent.tab();
+			expect( draggableArea ).not.toHaveFocus();
+			await userEvent.hover( draggableArea );
 
 			expect( mockOnDrag ).not.toHaveBeenCalled();
 			expect( mockOnDragEnd ).toHaveBeenCalledTimes( 1 );
@@ -93,6 +94,38 @@ describe( 'FocalPointPicker', () => {
 					return last && logs[ index ].name === eventName;
 				}, true )
 			).toBe( true );
+		} );
+
+		it( 'ends the drag when the pointer is released over an iframe', async () => {
+			const onDragEnd = vi.fn();
+			const onChange = vi.fn();
+
+			await render(
+				<>
+					<Picker
+						{ ...props }
+						onChange={ onChange }
+						onDragEnd={ onDragEnd }
+					/>
+					<iframe
+						title="Editor canvas"
+						srcDoc="<body>canvas</body>"
+						style={ {
+							display: 'block',
+							width: 240,
+							height: 160,
+						} }
+					/>
+				</>
+			);
+
+			await userEvent.dragAndDrop(
+				screen.getByRole( 'button' ),
+				screen.getByTitle( 'Editor canvas' )
+			);
+
+			expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 

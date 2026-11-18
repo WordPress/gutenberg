@@ -1,4 +1,4 @@
-import { fireEvent, waitFor } from '@testing-library/react';
+import { waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import DataViews from '../index';
@@ -66,7 +66,6 @@ describe( 'DataViews browser scrolling', () => {
 		} );
 
 		layoutContainer!.scrollTop = layoutContainer!.scrollHeight;
-		fireEvent.scroll( layoutContainer! );
 
 		await waitFor( () => {
 			expect( onChangeView ).toHaveBeenCalledWith(

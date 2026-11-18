@@ -32,6 +32,7 @@ async function parseJsonAndNormalizeError(
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
+			data: { status: response.status },
 		};
 	}
 }
@@ -75,5 +76,16 @@ export async function parseAndThrowError(
 	}
 
 	// Parse the response JSON and throw it as an error.
-	throw await parseJsonAndNormalizeError( response );
+	const error = await parseJsonAndNormalizeError( response );
+
+	// Like WordPress's own REST errors, an error carries its status in `data`.
+	if (
+		error &&
+		typeof error === 'object' &&
+		! Array.isArray( error ) &&
+		error.data === undefined
+	) {
+		throw { ...error, data: { status: response.status } };
+	}
+	throw error;
 }

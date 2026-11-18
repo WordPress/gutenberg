@@ -1,5 +1,5 @@
 import { loadView } from '@wordpress/views';
-import { dispatch, resolveSelect, select } from '@wordpress/data';
+import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import type { View, Field, SupportedLayouts } from '@wordpress/dataviews';
@@ -76,20 +76,23 @@ export async function ensureView(
 }
 
 /**
- * Resolves the post fields of the template post type, for use in the route
- * loader that runs outside React (where `usePostFields` is unavailable).
+ * Loads the fields the server registers for the template post type, for use
+ * in the route loader that runs outside React.
  *
- * Registering the post type schema is what `usePostFields` does on mount;
- * it is a no-op once the schema is registered.
+ * `useFields` in the stage shares this resolution, so it renders the fields
+ * the loader loaded. It also reports a failure, which is why this resolves to
+ * no fields instead of rejecting: the canvas then previews the first template
+ * of the unsorted, unfiltered list rather than failing the whole route.
  *
  * @return The field definitions the stage renders.
  */
 export async function loadTemplateFields(): Promise< Field< Template >[] > {
-	await unlock( dispatch( editorStore ) ).registerPostTypeSchema(
-		TEMPLATE_POST_TYPE
-	);
-	return unlock( select( editorStore ) ).getEntityFields(
-		'postType',
-		TEMPLATE_POST_TYPE
-	);
+	try {
+		return await unlock( resolveSelect( editorStore ) ).getEntityFields(
+			'postType',
+			TEMPLATE_POST_TYPE
+		);
+	} catch {
+		return [];
+	}
 }

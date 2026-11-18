@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { screen, waitFor, within } from '@testing-library/react';
 import { render as renderInBrowser } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { forwardRef } from '@wordpress/element';
@@ -11,6 +11,7 @@ import type {
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
 import { WidgetActions } from '../components/widget-actions/widget-actions';
 import { WidgetFooter } from '../components/widget-footer/widget-footer';
+import { WidgetDashboard } from '../widget-dashboard';
 
 const MATCHED_HREF = 'admin.php?page=dashboard&p=/reports';
 const MATCHED_PATH = '/reports';
@@ -19,17 +20,32 @@ const MATCHED_PATH = '/reports';
  * A fake host: the matcher recognizes one href, and the link records
  * whether the composition handed it a ref before forwarding it on.
  */
-function createHost() {
+function createHost( onNavigate?: ( path: string ) => void ) {
 	const receivedRef: boolean[] = [];
 
 	const HostLink = forwardRef<
 		HTMLAnchorElement,
 		{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
-	>( function HostLink( { path, children, ...props }, ref ) {
+	>( function UnforwardedHostLink(
+		{ path, onClick, children, ...props },
+		ref
+	) {
 		receivedRef.push( ref !== null );
 
 		return (
-			<a ref={ ref } data-host-link="true" href={ path } { ...props }>
+			<a
+				ref={ ref }
+				data-host-link="true"
+				href={ path }
+				{ ...props }
+				onClick={ ( event ) => {
+					onClick?.( event );
+					if ( onNavigate ) {
+						event.preventDefault();
+						onNavigate( path );
+					}
+				} }
+			>
 				{ children }
 			</a>
 		);
@@ -43,9 +59,19 @@ function createHost() {
 	return { links, receivedRef };
 }
 
+/* The surfaces read the pending map from the dashboard's context. */
 function renderWithHost( ui: ReactNode, links: WidgetHostLinks ) {
 	return renderInBrowser(
-		<WidgetHostProvider value={ { links } }>{ ui }</WidgetHostProvider>
+		<WidgetHostProvider value={ { links } }>
+			<WidgetDashboard
+				layout={ [] }
+				onLayoutChange={ () => {} }
+				widgetTypes={ [] }
+				resolveWidgetModule={ async () => ( { default: () => null } ) }
+			>
+				{ ui }
+			</WidgetDashboard>
+		</WidgetHostProvider>
 	);
 }
 
@@ -99,7 +125,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'mounts the host link for a matched high action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -111,7 +137,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for an unmatched high action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -128,7 +154,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'hands the tooltip ref to the host link of a matched medium action', async () => {
 			const { links, receivedRef } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -144,7 +170,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor and the download for a download action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -157,7 +183,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for an empty-string download', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -172,7 +198,7 @@ describe( 'host links across the chrome compositions', () => {
 		it( 'keeps the plain anchor for a new-tab action', async () => {
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -182,6 +208,16 @@ describe( 'host links across the chrome compositions', () => {
 			expect( link ).not.toHaveAttribute( 'data-host-link' );
 			expect( link ).toHaveAttribute( 'href', MATCHED_HREF );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
+
+			/*
+			 * The target rides on the anchor rather than on the UI link,
+			 * whose own new-tab glyph would double the action's icon.
+			 */
+			expect(
+				within( link ).queryByRole( 'img', {
+					name: '(opens in a new tab)',
+				} )
+			).not.toBeInTheDocument();
 		} );
 
 		/*
@@ -192,7 +228,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetFooter actions={ footerActions } />,
+				<WidgetFooter uuid="w1" actions={ footerActions } />,
 				links
 			);
 
@@ -208,6 +244,38 @@ describe( 'host links across the chrome compositions', () => {
 	} );
 
 	describe( 'WidgetActions menu', () => {
+		it( 'closes the menu when the host handles a modified click', async () => {
+			const user = userEvent.setup();
+			const onNavigate = vi.fn();
+			const { links } = createHost( onNavigate );
+			await renderWithHost(
+				<WidgetActions
+					uuid="w1"
+					actions={ [
+						{
+							id: 'report',
+							label: 'See report',
+							href: MATCHED_HREF,
+						},
+					] }
+				/>,
+				links
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'More' } ) );
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'See report' } ),
+				{ modifiers: [ 'ControlOrMeta' ] }
+			);
+
+			expect( onNavigate ).toHaveBeenCalledExactlyOnceWith(
+				MATCHED_PATH
+			);
+			await waitFor( () =>
+				expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument()
+			);
+		} );
+
 		/*
 		 * Every target matches; only the modifiers keep the plain anchor.
 		 */
@@ -237,7 +305,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links, receivedRef } = createHost();
 			await renderWithHost(
-				<WidgetActions actions={ menuActions } />,
+				<WidgetActions uuid="w1" actions={ menuActions } />,
 				links
 			);
 
@@ -281,7 +349,7 @@ describe( 'host links across the chrome compositions', () => {
 			const user = userEvent.setup();
 			const { links } = createHost();
 			await renderWithHost(
-				<WidgetActions actions={ menuActions } />,
+				<WidgetActions uuid="w1" actions={ menuActions } />,
 				links
 			);
 

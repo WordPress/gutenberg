@@ -357,6 +357,13 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
 			remove_action( 'admin_print_styles', 'print_emoji_styles' );
 
+			// Before block registration: `registerBlockType()` drops an unknown `category`.
+			wp_add_inline_script(
+				'wp-block-library',
+				'wp.blocks.setCategories(' . wp_json_encode( get_block_categories( new WP_Block_Editor_Context() ), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES ) . ');',
+				'before'
+			);
+
 			// Preload blocks - this creates inline scripts.
 			$server_block_settings = get_block_editor_server_block_settings();
 			wp_add_inline_script(
@@ -384,7 +391,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 				);
 			}
 
-			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) );';
+			$load_blocks_scripts = 'wp.blockLibrary.registerCoreBlocks( wp.blockLibrary.__experimentalGetCoreBlocks().filter( ( block ) => block.name !== "core/freeform" ) ); wp.editor.registerCoreBlockBindingsSources();';
 			wp_add_inline_script(
 				'wp-block-library',
 				$load_blocks_scripts,

@@ -168,7 +168,11 @@ function MotionDemo() {
 							label="Duration"
 							items={ DURATION_OPTIONS }
 							defaultValue={ DEFAULT_DURATION_OPTION }
-							triggerContent={ ( item ) => item.value }
+							trigger={
+								<SelectControl.Trigger>
+									{ ( item ) => item.value }
+								</SelectControl.Trigger>
+							}
 							onValueChange={ ( item ) => {
 								if (
 									! item ||
@@ -234,6 +238,7 @@ function MotionDemo() {
 const meta: Meta< typeof MotionDemo > = {
 	title: 'Design System/Tokens/Motion',
 	component: MotionDemo,
+	tags: [ 'docs-only' ],
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 		docs: { canvas: { sourceState: 'shown' } },

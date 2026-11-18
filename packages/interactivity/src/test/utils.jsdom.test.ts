@@ -1,5 +1,5 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { kebabToCamelCase, withScope } from '../utils';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { kebabToCamelCase, withScope, afterNextFrame } from '../utils';
 import { setScope, getScope, resetScope, type Scope } from '../scopes';
 import { setNamespace, getNamespace, resetNamespace } from '../namespaces';
 
@@ -23,6 +23,24 @@ describe( 'Interactivity API', () => {
 			expect( kebabToCamelCase( '-my-item' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( 'my-item-' ) ).toBe( 'myItem' );
 			expect( kebabToCamelCase( '-my-item-' ) ).toBe( 'myItem' );
+		} );
+	} );
+
+	describe( 'afterNextFrame', () => {
+		afterEach( () => {
+			vi.useRealTimers();
+		} );
+
+		it( 'runs the callback after the next frame, not on a microtask', async () => {
+			vi.useFakeTimers();
+			const callback = vi.fn();
+			afterNextFrame( callback );
+
+			await Promise.resolve();
+			expect( callback ).not.toHaveBeenCalled();
+
+			vi.runAllTimers();
+			expect( callback ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 

@@ -20,6 +20,10 @@ _This block has no custom attributes._
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
+- [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#background):
+  - `backgroundImage`: `true`
+  - `backgroundSize`: `true`
+  - `gradient`: `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `true`
   - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
@@ -28,9 +32,13 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`multiple`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#multiple): `false`
 - [`reusable`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#reusable): `false`
 - [`inserter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#inserter): `false`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
