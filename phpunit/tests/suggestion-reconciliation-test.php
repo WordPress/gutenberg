@@ -476,6 +476,58 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$this->assertSame( 'applied-unsaved', $this->status_of( $reply ) );
 	}
 
+	public function test_suggestions_are_enabled_only_with_the_experiment_and_notes_support(): void {
+		$post_id = $this->create_post( '' );
+		register_post_type( 'no_notes', array( 'supports' => array( 'editor' ) ) );
+		$other_id = self::factory()->post->create( array( 'post_type' => 'no_notes' ) );
+
+		$enable = static function () {
+			return array( 'gutenberg-suggestion-mode' => true );
+		};
+		add_filter( 'pre_option_gutenberg-experiments', $enable );
+		$on       = gutenberg_suggestions_enabled( $post_id );
+		$on_other = gutenberg_suggestions_enabled( $other_id );
+		$on_none  = gutenberg_suggestions_enabled( 0 );
+		remove_filter( 'pre_option_gutenberg-experiments', $enable );
+
+		$disable = static function () {
+			return array( 'gutenberg-suggestion-mode' => false );
+		};
+		add_filter( 'pre_option_gutenberg-experiments', $disable );
+		$off = gutenberg_suggestions_enabled( $post_id );
+		remove_filter( 'pre_option_gutenberg-experiments', $disable );
+		unregister_post_type( 'no_notes' );
+
+		$this->assertTrue( $on );
+		$this->assertFalse( $on_other );
+		$this->assertFalse( $on_none );
+		$this->assertFalse( $off );
+	}
+
+	public function test_finalizing_fires_an_action_per_note(): void {
+		$post_id = $this->create_post( '' );
+		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
+		$other   = $this->create_note( $post_id, $this->inline_op() );
+		$kept    = $this->create_note( $post_id, $this->inline_op() );
+		$this->set_content( $post_id, $this->paragraph( $this->mark( $note_id, 'add', 'a' ) . $this->mark( $other, 'add', 'b' ) . $this->mark( $kept, 'add', 'c' ) ) );
+
+		$fired    = array();
+		$recorder = function ( int $note, string $status, int $post, int $user ) use ( &$fired ): void {
+			$fired[ $note ] = array( $status, $post, $user );
+		};
+		add_action( 'gutenberg_suggestion_finalized', $recorder, 10, 4 );
+		$this->set_content( $post_id, $this->paragraph( $this->mark( $kept, 'add', 'c' ) ) );
+		remove_action( 'gutenberg_suggestion_finalized', $recorder, 10 );
+
+		$this->assertSame(
+			array(
+				$note_id => array( 'applied', $post_id, self::$editor_id ),
+				$other   => array( 'outdated', $post_id, self::$editor_id ),
+			),
+			$fired
+		);
+	}
+
 	public function test_finalizing_sends_no_mail() {
 		$post_id = $this->create_post( '' );
 		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
