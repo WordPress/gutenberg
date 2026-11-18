@@ -5,7 +5,7 @@ import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
-import type { DataRegistry } from '../types';
+import type { DataRegistry, StoreDescriptor } from '../types';
 
 const REGISTER_GENERIC_STORE_DEPRECATION =
 	'wp.data.registerGenericStore is deprecated since version 5.9. Please use wp.data.register( storeDescriptor ) instead.';
@@ -24,13 +24,11 @@ describe( 'createRegistry', () => {
 	function subscribeUntil(
 		predicates: ( () => boolean ) | ( () => boolean )[]
 	) {
-		const predicateList = Array.isArray( predicates )
-			? predicates
-			: [ predicates ];
+		predicates = Array.isArray( predicates ) ? predicates : [ predicates ];
 
 		return new Promise< void >( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
-				if ( predicateList.every( ( predicate ) => predicate() ) ) {
+				if ( predicates.every( ( predicate ) => predicate() ) ) {
 					resolve();
 				}
 			} );
@@ -114,9 +112,7 @@ describe( 'createRegistry', () => {
 					getSelectors,
 					getActions,
 					subscribe,
-				} as Parameters<
-					DataRegistry[ 'registerGenericStore' ]
-				>[ 1 ] );
+				} );
 
 				expect( registry.select( 'grocer' ).getPrice ).toEqual(
 					getPrice
@@ -152,9 +148,7 @@ describe( 'createRegistry', () => {
 					getSelectors,
 					getActions,
 					subscribe,
-				} as Parameters<
-					DataRegistry[ 'registerGenericStore' ]
-				>[ 1 ] );
+				} );
 
 				expect( dispatch ).not.toHaveBeenCalled();
 
@@ -194,9 +188,7 @@ describe( 'createRegistry', () => {
 					getSelectors,
 					getActions,
 					subscribe,
-				} as Parameters<
-					DataRegistry[ 'registerGenericStore' ]
-				>[ 1 ] );
+				} );
 
 				expect( registryListener ).not.toHaveBeenCalled();
 				storeChanged();
@@ -942,7 +934,7 @@ describe( 'createRegistry', () => {
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
 			const subscribe = () => () => {};
-			const myStore = {
+			const myStore: StoreDescriptor = {
 				name: 'store',
 				instantiate: () => ( {
 					getSelectors,
@@ -950,25 +942,11 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} ),
 			};
-			registry.register(
-				myStore as unknown as Parameters<
-					DataRegistry[ 'register' ]
-				>[ 0 ]
-			);
+			registry.register( myStore );
 			const subRegistry = createRegistry( {}, registry );
 
-			(
-				subRegistry.select( myStore as never ) as Record<
-					string,
-					( ...args: unknown[] ) => unknown
-				>
-			 ).mySelector();
-			(
-				subRegistry.dispatch( myStore as never ) as Record<
-					string,
-					( ...args: unknown[] ) => unknown
-				>
-			 ).myAction();
+			subRegistry.select( myStore ).mySelector();
+			subRegistry.dispatch( myStore ).myAction();
 
 			expect( mySelector ).toHaveBeenCalled();
 			expect( myAction ).toHaveBeenCalled();
@@ -987,7 +965,7 @@ describe( 'createRegistry', () => {
 					getActions,
 					subscribe,
 				} ),
-			} as unknown as Parameters< DataRegistry[ 'register' ] >[ 0 ] );
+			} );
 
 			const subRegistry = createRegistry( {}, registry );
 			const mySelector2 = vi.fn();
@@ -1002,7 +980,7 @@ describe( 'createRegistry', () => {
 					getActions: getActions2,
 					subscribe: subscribe2,
 				} ),
-			} as unknown as Parameters< DataRegistry[ 'register' ] >[ 0 ] );
+			} );
 
 			subRegistry.select( 'store' ).mySelector();
 			subRegistry.dispatch( 'store' ).myAction();
