@@ -8,6 +8,13 @@ const DEFAULT_VIEWPORT_BREAKPOINTS = {
 type ViewportBreakpoint = keyof typeof DEFAULT_VIEWPORT_BREAKPOINTS;
 type ViewportSettings = Partial< Record< ViewportBreakpoint, string > >;
 type ViewportBreakpoints = Partial< Record< ViewportBreakpoint, string > >;
+type ViewportMediaQueryOptions = {
+	/**
+	 * Whether to include `@desktop`, matching widths above the largest
+	 * breakpoint. Default false.
+	 */
+	includeDesktop?: boolean;
+};
 
 // Matches positive CSS length values supported for viewport breakpoints, and
 // captures the numeric value and unit for conversion to pixels.
@@ -130,11 +137,18 @@ export function getViewportBreakpoints(
  * Returns responsive media query aliases for the configured viewport
  * breakpoints.
  *
- * @param configOrSettings Global styles config or viewport settings.
+ * By default, the returned keys are `@mobile` and `@tablet`. When
+ * `options.includeDesktop` is true, `@desktop` is included, matching widths
+ * above the largest breakpoint.
+ *
+ * @param configOrSettings       Global styles config or viewport settings.
+ * @param options                Optional. Options for generating media queries.
+ * @param options.includeDesktop Whether to include the desktop media query. Default false.
  * @return Responsive media queries keyed by alias.
  */
 export function getResponsiveMediaQueries(
-	configOrSettings?: GlobalStylesConfig | ViewportSettings
+	configOrSettings?: GlobalStylesConfig | ViewportSettings,
+	{ includeDesktop = false }: ViewportMediaQueryOptions = {}
 ): Record< string, string > {
 	const breakpoints = getViewportBreakpoints( configOrSettings );
 	const mediaQueries: Record< string, string > = {};
@@ -149,17 +163,32 @@ export function getResponsiveMediaQueries(
 			: `@media (width <= ${ breakpoints.tablet })`;
 	}
 
+	if ( includeDesktop ) {
+		const desktopBreakpoint = breakpoints.tablet ?? breakpoints.mobile;
+		if ( desktopBreakpoint ) {
+			mediaQueries[ '@desktop' ] =
+				`@media (width > ${ desktopBreakpoint })`;
+		}
+	}
+
 	return mediaQueries;
 }
 
 /**
  * Returns responsive media query aliases for viewport settings.
  *
- * @param viewportSettings Viewport settings.
+ * By default, the returned keys are `@mobile` and `@tablet`. When
+ * `options.includeDesktop` is true, `@desktop` is included, matching widths
+ * above the largest breakpoint.
+ *
+ * @param viewportSettings       Viewport settings.
+ * @param options                Optional. Options for generating media queries.
+ * @param options.includeDesktop Whether to include the desktop media query. Default false.
  * @return Responsive media queries keyed by alias.
  */
 export function getViewportMediaQueries(
-	viewportSettings?: ViewportSettings
+	viewportSettings?: ViewportSettings,
+	options?: ViewportMediaQueryOptions
 ): Record< string, string > {
-	return getResponsiveMediaQueries( viewportSettings );
+	return getResponsiveMediaQueries( viewportSettings, options );
 }
