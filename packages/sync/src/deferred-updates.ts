@@ -1,5 +1,4 @@
 import type {
-	CRDTDoc,
 	ObjectData,
 	ObjectID,
 	ObjectType,
@@ -14,23 +13,14 @@ export interface DeferredUpdateQueue {
 	 * Add an item to the queue. It is applied on the next tick of the event
 	 * loop, or sooner if `flush` is called first.
 	 *
-	 * @param key  Identifies the document the item belongs to.
 	 * @param item The item to apply later.
 	 */
-	defer: ( key: string, item: DeferredUpdate ) => void;
+	defer: ( item: DeferredUpdate ) => void;
 
 	/**
 	 * Apply all queued items now, in the order they were added.
 	 */
 	flush: () => void;
-
-	/**
-	 * Get the items of one document in the order they were added. The returned
-	 * items can be updated without changing their positions in the queue.
-	 *
-	 * @param key Identifies the document.
-	 */
-	get: ( key: string ) => DeferredUpdate[];
 }
 
 /**
@@ -47,7 +37,7 @@ export interface DeferredUpdateQueue {
 export function createDeferredUpdateQueue(
 	apply: ( item: DeferredUpdate ) => void
 ): DeferredUpdateQueue {
-	const queue: Array< { key: string; item: DeferredUpdate } > = [];
+	const queue: DeferredUpdate[] = [];
 	let isFlushing = false;
 
 	function flush(): void {
@@ -62,10 +52,10 @@ export function createDeferredUpdateQueue(
 
 		try {
 			while ( queue.length > 0 ) {
-				const entry = queue.shift();
+				const item = queue.shift();
 
-				if ( entry ) {
-					apply( entry.item );
+				if ( item ) {
+					apply( item );
 				}
 			}
 		} finally {
@@ -74,16 +64,11 @@ export function createDeferredUpdateQueue(
 	}
 
 	return {
-		defer( key, item ) {
-			queue.push( { key, item } );
+		defer( item ) {
+			queue.push( item );
 			setTimeout( flush, 0 );
 		},
 		flush,
-		get( key ) {
-			return queue
-				.filter( ( entry ) => entry.key === key )
-				.map( ( entry ) => entry.item );
-		},
 	};
 }
 
@@ -91,13 +76,9 @@ export function createDeferredUpdateQueue(
  * A local update that waits in the queue.
  */
 export interface DeferredUpdate {
-	/** Applies document-local state captured on the copy to the live document. */
-	applyLocalState?: ( ydoc: CRDTDoc ) => void;
 	changes: Partial< ObjectData >;
 	objectId: ObjectID | null;
 	objectType: ObjectType;
 	options: SyncManagerUpdateOptions;
 	origin: string;
-	/** The changes converted to Yjs operations before a remote update. */
-	update?: Uint8Array;
 }

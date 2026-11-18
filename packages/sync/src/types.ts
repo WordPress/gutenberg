@@ -45,6 +45,14 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 
 export interface ProviderCreatorResult {
 	destroy: () => void;
+
+	/**
+	 * Set to true when the provider calls `flushLocalUpdates` before it applies
+	 * each remote update to the document. The sync manager then keeps local
+	 * updates off the typing hot path while no remote peer is present. Without
+	 * it, the sync manager applies every local update at once.
+	 */
+	flushesLocalUpdates?: boolean;
 	on: ProviderOn;
 }
 
@@ -97,6 +105,14 @@ export interface ProviderCreatorOptions {
 	awareness?: Awareness;
 
 	/**
+	 * Applies the local updates that the sync manager holds back while no
+	 * remote peer is present. A provider that calls this before it applies each
+	 * remote update to `ydoc` can set `flushesLocalUpdates` on its result.
+	 * Otherwise a remote update that arrives first can be overwritten.
+	 */
+	flushLocalUpdates: () => void;
+
+	/**
 	 * The Yjs module used by the editor. Providers must use this instance
 	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
 	 * on the same document cause silent data corruption:
@@ -141,16 +157,6 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
-	/**
-	 * Capture document-local state after applying a deferred edit to a copy.
-	 * The returned callback applies that state to the live document after the
-	 * converted Yjs update and its undo callbacks finish, before reconciliation.
-	 * The captured state must not depend on the copy remaining alive.
-	 */
-	captureLocalState?: (
-		copy: Y.Doc,
-		changes: Partial< ObjectData >
-	) => ( ( ydoc: Y.Doc ) => void ) | undefined;
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID

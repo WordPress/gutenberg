@@ -18,8 +18,6 @@ import type { WPBlockSelection, WPSelection } from '../types';
 
 // WeakMap to store BlockSelectionHistory instances per Y.Doc
 const selectionHistoryMap = new WeakMap< CRDTDoc, BlockSelectionHistory >();
-// Captured selections supersede timers scheduled before their converted edit.
-const selectionHistoryVersions = new WeakMap< CRDTDoc, number >();
 
 /**
  * Get or create a BlockSelectionHistory instance for a given Y.Doc.
@@ -50,7 +48,12 @@ export function updateSelectionHistory(
 }
 
 /**
- * Update selection history after undo metadata has captured the old selection.
+ * Record a selection in the history after the current event loop turn.
+ *
+ * The delay lets undo metadata save the previous selection first. The
+ * selection is converted to document positions now, and not after the delay,
+ * because its offsets describe the text as the editor sees it now. A remote
+ * change can reach the document before the delay ends.
  *
  * @param ydoc        The document whose selection changed.
  * @param wpSelection The selection after the local edit.
@@ -59,42 +62,16 @@ export function scheduleSelectionHistory(
 	ydoc: CRDTDoc,
 	wpSelection: WPSelection
 ): void {
-	const version = selectionHistoryVersions.get( ydoc );
-	setTimeout( () => {
-		if ( selectionHistoryVersions.get( ydoc ) === version ) {
-			updateSelectionHistory( ydoc, wpSelection );
-		}
-	}, 0 );
-}
+	const history = getBlockSelectionHistory( ydoc );
+	const selection = history.resolveSelection( wpSelection );
 
-/**
- * Capture selection positions in a copy before remote changes arrive. Apply
- * them to the live document after merging, so reconciliation can resolve the
- * positions against the merged text without losing the original offsets.
- *
- * @param copy        The document containing the local edit.
- * @param wpSelection The selection after that edit.
- * @return A callback that adds the captured selection to the live history.
- */
-export function captureSelectionHistory(
-	copy: CRDTDoc,
-	wpSelection: WPSelection
-): ( liveDoc: CRDTDoc ) => void {
-	const history = createBlockSelectionHistory( copy );
-	history.updateSelection( wpSelection );
-	const [ selection ] = history.getSelectionHistory();
-
-	if ( selection ) {
-		return ( liveDoc ) => {
-			selectionHistoryVersions.set(
-				liveDoc,
-				( selectionHistoryVersions.get( liveDoc ) ?? 0 ) + 1
-			);
-			getBlockSelectionHistory( liveDoc ).addSelection( selection );
-		};
+	if ( ! selection ) {
+		return;
 	}
 
-	return () => {};
+	setTimeout( () => {
+		history.addSelection( selection );
+	}, 0 );
 }
 
 /**

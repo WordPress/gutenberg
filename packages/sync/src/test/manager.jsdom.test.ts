@@ -57,6 +57,7 @@ describe( 'SyncManager', () => {
 
 		mockProviderResult = {
 			destroy: vi.fn(),
+			flushesLocalUpdates: true,
 			on: vi.fn(),
 		};
 		mockProviderCreator = vi.fn( () =>
@@ -147,6 +148,7 @@ describe( 'SyncManager', () => {
 				objectId: '123',
 				ydoc: expect.any( Y.Doc ),
 				awareness: expect.any( Awareness ),
+				flushLocalUpdates: expect.any( Function ),
 				Y,
 			} );
 		} );
@@ -1040,12 +1042,17 @@ describe( 'SyncManager', () => {
 				} );
 			}
 
-			async function loadWithPeer() {
+			async function loadWithPeer( flushesLocalUpdates = true ) {
 				let ydoc: Y.Doc | null = null;
+				let flushLocalUpdates = () => {};
 				mockProviderCreator.mockImplementation(
-					async ( { ydoc: providedDoc } ) => {
+					async ( {
+						ydoc: providedDoc,
+						flushLocalUpdates: flush,
+					} ) => {
 						ydoc = providedDoc as unknown as Y.Doc;
-						return mockProviderResult;
+						flushLocalUpdates = flush;
+						return { ...mockProviderResult, flushesLocalUpdates };
 					}
 				);
 
@@ -1098,7 +1105,8 @@ describe( 'SyncManager', () => {
 					);
 				};
 
-				// The peer inserts text and the live document receives it.
+				// The peer inserts text and the live document receives it. A
+				// provider that supports it applies the local updates first.
 				const receiveFromPeer = ( index: number, text: string ) => {
 					const before = Y.encodeStateVector( peerDoc );
 					(
@@ -1106,6 +1114,9 @@ describe( 'SyncManager', () => {
 							.getMap( CRDT_RECORD_MAP_KEY )
 							.get( 'content' ) as Y.Text
 					 ).insert( index, text );
+					if ( flushesLocalUpdates ) {
+						flushLocalUpdates();
+					}
 					Y.applyUpdateV2(
 						liveDoc,
 						Y.encodeStateAsUpdateV2( peerDoc, before ),
@@ -1146,13 +1157,13 @@ describe( 'SyncManager', () => {
 
 				receiveFromPeer( 0, 'Bob says ' );
 
-				// The update was applied to a copy, not to the live document.
+				// The provider applied the update to the live document first.
 				expect(
 					syncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					syncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ][ 0 ]
-				).not.toBe( liveDoc );
+				).toBe( liveDoc );
 				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 
 				// The timer finds nothing left to apply.
@@ -1187,9 +1198,10 @@ describe( 'SyncManager', () => {
 				typeLocally( 'Hello!' );
 				receiveFromPeer( 0, 'Bob says ' );
 
+				// The local update is applied first, in its own transaction.
 				expect( origins ).toEqual( [
-					'provider',
 					LOCAL_EDITOR_ORIGIN,
+					'provider',
 				] );
 				expect( getContent( peerDoc ) ).toBe( 'Bob says Hello!' );
 			} );
@@ -1205,61 +1217,24 @@ describe( 'SyncManager', () => {
 				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!?' );
 			} );
 
-			it.each( [
-				'before changes',
-				'after changes',
-				'capturing local state',
-			] )(
-				'keeps remote and later local edits usable when conversion fails %s',
-				async ( failurePoint ) => {
-					const {
-						getContent,
-						liveDoc,
-						receiveFromPeer,
-						syncConfig,
-						typeLocally,
-					} = await loadWithPeer();
-					const error = new Error( 'Conversion failed' );
+			it( 'applies a local update at once when a provider does not apply local updates first', async () => {
+				const {
+					getContent,
+					liveDoc,
+					receiveFromPeer,
+					syncConfig,
+					typeLocally,
+				} = await loadWithPeer( false );
 
-					if ( failurePoint === 'capturing local state' ) {
-						syncConfig.captureLocalState = vi
-							.fn()
-							.mockImplementationOnce( () => {
-								throw error;
-							} );
-					} else {
-						syncConfig.applyChangesToCRDTDoc.mockImplementationOnce(
-							( doc, changes ) => {
-								if ( failurePoint === 'after changes' ) {
-									applyTextChanges( doc, changes );
-								}
-								throw error;
-							}
-						);
-					}
+				typeLocally( 'Hello!' );
+				expect(
+					syncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect( getContent( liveDoc ) ).toBe( 'Hello!' );
 
-					typeLocally( 'Hello!' );
-					expect( () => receiveFromPeer( 0, 'Bob says ' ) ).toThrow(
-						error
-					);
-					const mergedContent =
-						failurePoint === 'before changes'
-							? 'Bob says Hello'
-							: 'Bob says Hello!';
-					expect( getContent( liveDoc ) ).toBe( mergedContent );
-
-					// The failed callback did not leave the live transaction open.
-					typeLocally( `${ mergedContent }#` );
-					await nextTick();
-					expect( getContent( liveDoc ) ).toBe(
-						`${ mergedContent }#`
-					);
-					receiveFromPeer( 0, 'Alice and ' );
-					expect( getContent( liveDoc ) ).toBe(
-						`Alice and ${ mergedContent }#`
-					);
-				}
-			);
+				receiveFromPeer( 0, 'Bob says ' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
+			} );
 
 			it( 'undoes the deferred update and keeps the remote change', async () => {
 				const {
@@ -1404,47 +1379,6 @@ describe( 'SyncManager', () => {
 					expect( getContent( liveDoc ) ).toBe( first );
 					expect( getContent( otherDoc! ) ).toBe( second );
 				}
-			} );
-
-			it( 'leaves the deferred updates of other entities in the queue', async () => {
-				const { getContent, liveDoc, manager, receiveFromPeer } =
-					await loadWithPeer();
-
-				let otherDoc: Y.Doc | null = null;
-				mockProviderCreator.mockImplementation(
-					async ( { ydoc: providedDoc } ) => {
-						otherDoc = providedDoc as unknown as Y.Doc;
-						return mockProviderResult;
-					}
-				);
-				await manager.load(
-					{
-						...mockSyncConfig,
-						applyChangesToCRDTDoc: vi.fn( applyTextChanges ),
-					},
-					'post',
-					'456',
-					{ id: '456', content: 'Other', meta: {} },
-					mockHandlers
-				);
-
-				manager.update(
-					'post',
-					'456',
-					{ content: 'Other!' },
-					LOCAL_EDITOR_ORIGIN
-				);
-				receiveFromPeer( 0, 'Bob says ' );
-
-				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello' );
-				expect( getContent( otherDoc as unknown as Y.Doc ) ).toBe(
-					'Other'
-				);
-
-				await nextTick();
-				expect( getContent( otherDoc as unknown as Y.Doc ) ).toBe(
-					'Other!'
-				);
 			} );
 		} );
 
