@@ -1,5 +1,5 @@
 import {
-	__experimentalItemGroup as WCItemGroup,
+	__experimentalItemGroup as ItemGroup,
 	Button,
 	FlexItem,
 } from '@wordpress/components';
@@ -101,7 +101,7 @@ export default function PresetGroup( {
 				</Stack>
 			</Stack>
 			{ items.length > 0 && (
-				<WCItemGroup isBordered isSeparated>
+				<ItemGroup isBordered isSeparated>
 					{ items.map( ( item ) => (
 						<NavigationButtonAsItem
 							key={ item.slug }
@@ -121,7 +121,7 @@ export default function PresetGroup( {
 							</Stack>
 						</NavigationButtonAsItem>
 					) ) }
-				</WCItemGroup>
+				</ItemGroup>
 			) }
 		</Stack>
 	);

@@ -1,0 +1,205 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		/* Density, set on a group and on a standalone row alike. */
+		.is-comfortable {
+			--_wp-ui-item-padding-block: var(--wpds-dimension-padding-lg);
+			--_wp-ui-item-padding-inline: var(--wpds-dimension-padding-2xl);
+			--_wp-ui-item-gap: var(--wpds-dimension-gap-lg);
+			--_wp-ui-item-radius: var(--wpds-border-radius-lg);
+		}
+
+		.is-compact {
+			--_wp-ui-item-padding-block: var(--wpds-dimension-padding-sm);
+			--_wp-ui-item-padding-inline: var(--wpds-dimension-padding-md);
+			--_wp-ui-item-gap: var(--wpds-dimension-gap-md);
+			--_wp-ui-item-radius: var(--wpds-border-radius-sm);
+		}
+
+		.group {
+			display: flex;
+			flex-direction: column;
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		/* Joined: one frame, with a dividing line between entries. */
+		.has-frame.is-joined {
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: var(--_wp-ui-item-radius);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		/*
+		 * Without a frame the group sits in someone else's surface, so it
+		 * needs a line above it when something precedes it there — a card
+		 * title and its description, say. Alone in that surface it needs
+		 * none, which `:not(:first-child)` says without a prop.
+		 */
+		.is-joined:not(.has-frame):not(:first-child) {
+			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		}
+
+		/*
+		 * `of .listitem` rather than `:first-child`, so a consumer that
+		 * renders a placeholder between entries — as `ToolsPanel` does to
+		 * keep control order — does not take a dividing line with it.
+		 */
+		.is-joined .listitem:not(:nth-child(1 of .listitem)) {
+			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		}
+
+		/* The outer entries carry the group's corners. */
+		.is-joined .listitem:nth-child(1 of .listitem),
+		.is-joined .listitem:nth-child(1 of .listitem) > .row {
+			border-start-start-radius: var(--_wp-ui-item-radius);
+			border-start-end-radius: var(--_wp-ui-item-radius);
+		}
+
+		.is-joined .listitem:nth-last-child(1 of .listitem),
+		.is-joined .listitem:nth-last-child(1 of .listitem) > .row {
+			border-end-start-radius: var(--_wp-ui-item-radius);
+			border-end-end-radius: var(--_wp-ui-item-radius);
+		}
+
+		/* Separated: a frame around each entry, with space between them. */
+		.is-separated {
+			gap: var(--wpds-dimension-gap-md);
+		}
+
+		.has-frame.is-separated .listitem,
+		.has-frame.is-separated .listitem > .row {
+			border-radius: var(--_wp-ui-item-radius);
+		}
+
+		.has-frame.is-separated .listitem {
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+		}
+
+		.listitem {
+			display: flex;
+			min-width: 0;
+		}
+
+		.listitem > .row {
+			flex: 1;
+			min-width: 0;
+		}
+
+		/*
+		 * No column gap: an absent part would otherwise leave the space of
+		 * the track it did not fill. The parts carry their own spacing.
+		 */
+		.row {
+			position: relative;
+			display: grid;
+			grid-template-columns: auto minmax(0, 1fr) auto auto;
+			align-items: center;
+			row-gap: var(--wpds-dimension-gap-xs);
+			padding-block: var(--_wp-ui-item-padding-block);
+			padding-inline: var(--_wp-ui-item-padding-inline);
+			color: inherit;
+		}
+
+		/*
+		 * The row's own control covers the row rather than wrapping it, so
+		 * controls in `Actions` sit above it instead of inside it. Nothing
+		 * interactive is nested, and each keeps its own target.
+		 */
+		.surface {
+			position: absolute;
+			inset: 0;
+			border-radius: inherit;
+			cursor: var(--wpds-cursor-control);
+			background: none;
+			border: 0;
+			padding: 0;
+		}
+
+		.is-activatable {
+			transition: background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
+		}
+
+		.is-activatable:hover {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			.is-activatable {
+				transition: none;
+			}
+		}
+
+		.media {
+			grid-column: 1;
+			grid-row: 1 / -1;
+			display: inline-flex;
+			align-items: center;
+			margin-inline-end: var(--_wp-ui-item-gap);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.label {
+			grid-column: 2;
+			grid-row: 1;
+			color: inherit;
+			font-weight: var(--wpds-typography-font-weight-emphasis);
+		}
+
+		.description {
+			grid-column: 2;
+			grid-row: 2;
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.meta {
+			grid-column: 3;
+			grid-row: 1 / -1;
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: flex-end;
+			gap: var(--wpds-dimension-gap-xs);
+			margin-inline-start: var(--_wp-ui-item-gap);
+		}
+
+		.chevron {
+			grid-column: 4;
+			grid-row: 1 / -1;
+			margin-inline-start: var(--_wp-ui-item-gap);
+			color: var(--wpds-color-foreground-content-neutral-weak);
+		}
+
+		.chevron:dir(rtl) {
+			transform: rotateZ(180deg);
+		}
+
+		/* Above the row's own control, so each action keeps its target. */
+		.actions {
+			position: relative;
+			z-index: 1;
+			grid-column: 4;
+			grid-row: 1 / -1;
+			display: flex;
+			align-items: center;
+			gap: var(--wpds-dimension-gap-sm);
+			margin-inline-start: var(--_wp-ui-item-gap);
+		}
+	}
+
+	@layer compositions {
+		/*
+		 * The ring is drawn inside the row: the control runs edge to edge,
+		 * and the surface around the group — its own frame, or the `Card`
+		 * supplying one — clips anything drawn outside.
+		 *
+		 * `:focus` rather than `:focus-visible`, to match the shared focus
+		 * utility, which draws the ring on `:focus:not(:active)` so a
+		 * pointer press shows it too.
+		 */
+		.surface:focus {
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
+		}
+	}
+}

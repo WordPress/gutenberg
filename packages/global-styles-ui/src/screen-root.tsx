@@ -1,5 +1,5 @@
 import {
-	__experimentalItemGroup as WCItemGroup,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	FlexItem,
@@ -38,7 +38,7 @@ function ScreenRoot() {
 						</CardMedia>
 					</WCCard>
 					{ hasVariations && (
-						<WCItemGroup>
+						<ItemGroup>
 							<NavigationButtonAsItem path="/variations">
 								<HStack justify="space-between">
 									<FlexItem>
@@ -51,7 +51,7 @@ function ScreenRoot() {
 									/>
 								</HStack>
 							</NavigationButtonAsItem>
-						</WCItemGroup>
+						</ItemGroup>
 					) }
 					<RootMenu />
 				</VStack>

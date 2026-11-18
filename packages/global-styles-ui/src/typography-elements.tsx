@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalItemGroup as WCItemGroup,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	FlexItem,
@@ -72,13 +72,13 @@ function TypographyElements() {
 	return (
 		<VStack spacing={ 3 }>
 			<Subtitle level={ 3 }>{ __( 'Elements' ) }</Subtitle>
-			<WCItemGroup isBordered isSeparated>
+			<ItemGroup isBordered isSeparated>
 				<ElementItem
 					parentMenu={ parentMenu }
 					element="text"
 					label={ __( 'Text' ) }
 				/>
-			</WCItemGroup>
+			</ItemGroup>
 		</VStack>
 	);
 }
