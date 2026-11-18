@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { isPhrasingContent, getPhrasingContentSchema } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import { hasBlockSupport } from '..';
 import { getRawTransforms } from './get-raw-transforms';
 import type { NodeFilterFunction } from './types';

@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { Platform } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { createBlock, findTransform } from '../factory';
-import parse from '../parser';
+import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
 import { getBlockAttributes } from '../parser/get-block-attributes';
+import { getBlockType } from '../registration';
 import { getRawTransforms } from './get-raw-transforms';
-import type { Block } from '../../types';
+import type { Block, RawHandler } from '../../types';
 
 /**
  * Converts HTML directly to blocks. Looks for a matching transform for each
@@ -23,52 +16,54 @@ import type { Block } from '../../types';
  *
  * @return An array of blocks.
  */
-export function htmlToBlocks(
-	html: string,
-	handler: ( options: { HTML: string } ) => Block[] | string
-): Block[] {
+export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).flatMap( ( node ) => {
 		const transforms = getRawTransforms();
-		const rawTransform = findTransform(
-			transforms as unknown as Parameters< typeof findTransform >[ 0 ],
-			( ( t: unknown ) => {
-				const transform = t as ( typeof transforms )[ number ];
-				return transform.isMatch( node );
-			} ) as Parameters< typeof findTransform >[ 1 ]
-		) as unknown as ( typeof transforms )[ number ] | null;
+		const rawTransform = findTransform( transforms, ( transform ) =>
+			transform.isMatch( node )
+		);
 
 		if ( ! rawTransform ) {
-			// Until the HTML block is supported in the native version, we'll parse it
-			// instead of creating the block to generate it as an unsupported block.
-			if ( ( Platform as Record< string, unknown > ).isNative ) {
-				return parse(
-					`<!-- wp:html -->${ node.outerHTML }<!-- /wp:html -->`
-				);
-			}
 			return createBlock(
 				// Should not be hardcoded.
 				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
+				{},
+				[],
+				[ node.outerHTML ]
 			);
 		}
 
 		const { transform, blockName } = rawTransform;
+		let block: Block;
 
 		if ( transform ) {
-			const block = transform( node, handler ) as Block;
-			if ( node.hasAttribute( 'class' ) ) {
-				block.attributes.className = node.getAttribute( 'class' );
+			const transformed = transform( node, handler );
+
+			// A transform may return several blocks, and which of them the
+			// node's attributes belong on is ambiguous, so leave those alone.
+			if ( Array.isArray( transformed ) ) {
+				return transformed;
 			}
-			return block;
+
+			block = transformed;
+		} else {
+			block = createBlock(
+				blockName,
+				getBlockAttributes( blockName, node.outerHTML )
+			);
 		}
 
-		return createBlock(
-			blockName!,
-			getBlockAttributes( blockName!, node.outerHTML )
+		// A block support usually declares its attribute without a source, so
+		// `getBlockAttributes` cannot read it out of the markup. Recover
+		// those with the fixes the parser applies to an invalid block.
+		const { originalContent, ...fixedBlock } = applyBuiltInValidationFixes(
+			{ ...block, originalContent: node.outerHTML },
+			getBlockType( block.name )!
 		);
+		return fixedBlock;
 	} );
 }

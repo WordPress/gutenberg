@@ -1,24 +1,16 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import removeAccents from 'remove-accents';
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useMemo, useDeferredValue } from '@wordpress/element';
-import { Icon as WCIcon, Composite, Spinner } from '@wordpress/components';
-import { search, check } from '@wordpress/icons';
-import { VisuallyHidden } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import {
+	Icon as WCIcon,
+	Composite,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
+import { search } from '@wordpress/icons';
+import { Checkbox, Radio, RadioGroup, VisuallyHidden } from '@wordpress/ui';
 import { getCurrentValue } from './utils';
 import type { Filter, NormalizedFilter, View, Option } from '../../types';
 import useElements from '../../hooks/use-elements';
@@ -60,29 +52,27 @@ function generateFilterElementCompositeItemId(
 	return `${ prefix }-${ filterElementValue }`;
 }
 
-const MultiSelectionOption = ( { selected }: { selected: boolean } ) => {
-	return (
-		<span
-			className={ clsx(
-				'dataviews-filters__search-widget-listitem-multi-selection',
-				{ 'is-selected': selected }
-			) }
-		>
-			{ selected && <WCIcon icon={ check } /> }
-		</span>
-	);
-};
+const MultiSelectionOption = ( { selected }: { selected: boolean } ) => (
+	<Checkbox
+		checked={ selected }
+		readOnly
+		aria-hidden
+		tabIndex={ -1 }
+		className="dataviews-filters__selection-indicator"
+	/>
+);
 
-const SingleSelectionOption = ( { selected }: { selected: boolean } ) => {
-	return (
-		<span
-			className={ clsx(
-				'dataviews-filters__search-widget-listitem-single-selection',
-				{ 'is-selected': selected }
-			) }
-		/>
-	);
-};
+const SingleSelectionOption = ( { selected }: { selected: boolean } ) => (
+	<RadioGroup
+		value={ selected ? 'selected' : null }
+		readOnly
+		aria-hidden
+		tabIndex={ -1 }
+		render={ <span className="dataviews-filters__selection-indicator" /> }
+	>
+		<Radio value="selected" tabIndex={ -1 } />
+	</RadioGroup>
+);
 
 function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 	const baseId = useInstanceId( ListBox, 'dataviews-filter-list-box' );
@@ -170,7 +160,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 													return _filter;
 												}
 											),
-									  ]
+										]
 									: [
 											...( view.filters ?? [] ),
 											{
@@ -182,7 +172,7 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 													element.value
 												),
 											},
-									  ];
+										];
 								onChangeView( {
 									...view,
 									page: 1,
@@ -245,7 +235,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 								}
 								return _filter;
 							} ),
-					  ]
+						]
 					: [
 							...( view.filters ?? [] ),
 							{
@@ -253,7 +243,7 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 								operator: filter.operators[ 0 ],
 								value,
 							},
-					  ];
+						];
 				onChangeView( {
 					...view,
 					page: 1,
@@ -334,7 +324,7 @@ export default function SearchWidget( props: SearchWidgetProps ) {
 	if ( isLoading ) {
 		return (
 			<div className="dataviews-filters__search-widget-no-elements">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

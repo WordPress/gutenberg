@@ -85,9 +85,9 @@ This component provides a collection of sub-component that can be used to compos
 
 -   [`<CardBody />`](/packages/components/src/card/card-body/README.md)
 -   [`<CardDivider />`](/packages/components/src/card/card-divider/README.md)
--   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md))
--   [`<CardHeader />`](/packages/components/src/card/card-header/README.md))
--   [`<CardMedia />`](/packages/components/src/card/card-media/README.md))
+-   [`<CardFooter />`](/packages/components/src/card/card-footer/README.md)
+-   [`<CardHeader />`](/packages/components/src/card/card-header/README.md)
+-   [`<CardMedia />`](/packages/components/src/card/card-media/README.md)
 
 ### Sub-Components Example
 
@@ -165,7 +165,7 @@ const Example = () => (
 );
 ```
 
-These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render it's specified size:
+These sub-components are designed to be flexible. The Context props can be overridden by the sub-component(s) as required. In the following example, the last `<CardBody />` will render its specified size:
 
 ```jsx
 import { Card, CardBody } from '@wordpress/components';

@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store } from '@wordpress/interactivity';
-
-/**
- * External dependencies
- */
 // eslint-disable-next-line import/no-unresolved
 import nameStatic from 'test/router-script-modules-alpha-1';
 // eslint-disable-next-line import/no-unresolved

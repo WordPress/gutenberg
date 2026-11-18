@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { store as coreStore } from '../';
 import { Status } from './constants';
 import useQuerySelect from './use-query-select';
@@ -28,19 +21,13 @@ interface ResolutionDetails {
 	 * Is the data still being resolved?
 	 */
 	isResolving: boolean;
+	/** Is the data resolved by now? */
+	hasResolved: boolean;
 }
 
-/**
- * Is the data resolved by now?
- */
-type HasResolved = boolean;
-
-type ResourcePermissionsResolution< IdType > = [
-	HasResolved,
-	ResolutionDetails &
-		GlobalResourcePermissionsResolution &
-		( IdType extends void ? SpecificResourcePermissionsResolution : {} ),
-];
+type ResourcePermissionsResolution< IdType > = ResolutionDetails &
+	GlobalResourcePermissionsResolution &
+	( IdType extends void ? SpecificResourcePermissionsResolution : {} );
 
 type EntityResource = { kind: string; name: string; id?: string | number };
 
@@ -121,7 +108,7 @@ function useResourcePermissions< IdType = void >(
  * application, the appropriate permissions and the resolution details will be retrieved from
  * the store state using `canUser()`, or resolved if missing.
  *
- * @return Entity records data.
+ * @return Resource permissions and resolution details.
  * @template IdType
  */
 function useResourcePermissions< IdType = void >(

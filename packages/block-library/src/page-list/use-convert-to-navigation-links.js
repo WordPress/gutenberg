@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
 /**

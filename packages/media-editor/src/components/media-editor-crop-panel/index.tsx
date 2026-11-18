@@ -1,32 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { RangeControl, SelectControl } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { useMediaEditor } from '../../state';
-import {
-	useCropGestureHandlers,
-	CROP_CONTROL_ATTR,
-} from '../../hooks/use-crop-gesture-handlers';
-import { MAX_ZOOM } from '../../image-editor/core/constants';
-import { getMinZoom } from '../../image-editor/core/containment';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
-
-const ZOOM_PERCENTAGE_SCALE = 100;
-const MAX_ZOOM_PERCENTAGE = MAX_ZOOM * ZOOM_PERCENTAGE_SCALE;
-
-function getZoomPercentageForDisplay( zoom: number ): number {
-	return Math.round( zoom * ZOOM_PERCENTAGE_SCALE );
-}
-
-function getMinZoomPercentageForDisplay( zoom: number ): number {
-	return Math.ceil( zoom * ZOOM_PERCENTAGE_SCALE );
-}
+import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
+import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
+import MediaEditorImageControls from '../media-editor-image-controls';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -37,32 +14,32 @@ export interface MediaEditorCropPanelProps {
 	aspectRatioValue: string;
 	/** Setter for the aspect-ratio preset value. */
 	onAspectRatioChange: ( value: string ) => void;
-	/** Signal that a placement-oriented control is being adjusted. */
-	onPlacementControlInteraction?: () => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
+	/** Disable every control in the panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 /**
- * Sidebar panel for crop-shape controls. The tactile verbs (rotate, flip)
- * live in the bottom toolbar instead.
+ * Sidebar panel for crop controls: rotate, flip and zoom above the
+ * aspect-ratio selector. Rendered where the panel docks; below that the
+ * transform controls sit under the canvas instead, placed by the editor.
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
- * @param props.onPlacementControlInteraction
  * @param props.aspectRatioOptions
+ * @param props.disabled
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
-	onPlacementControlInteraction,
 	aspectRatioOptions,
+	disabled = false,
 }: MediaEditorCropPanelProps ) {
-	const { state, setZoom } = useMediaEditor();
-	const zoomGestureHandlers = useCropGestureHandlers();
-	const minZoom = getMinZoom( state );
-	const zoomPercentage = getZoomPercentageForDisplay( state.zoom );
-	const minZoomPercentage = getMinZoomPercentageForDisplay( minZoom );
+	const items = aspectRatioOptions.map( ( preset ) => ( {
+		label: preset.label,
+		value: preset.value.toString(),
+	} ) );
 
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
@@ -76,46 +53,56 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
+			<MediaEditorImageControls withLabels disabled={ disabled } />
 			<SelectControl
-				__next40pxDefaultSize
 				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
-			/>
-			<div role="presentation" { ...zoomGestureHandlers }>
-				<RangeControl
-					__next40pxDefaultSize
-					label={ __( 'Zoom (%)' ) }
-					min={ minZoomPercentage }
-					max={ MAX_ZOOM_PERCENTAGE }
-					step={ 1 }
-					shiftStep={ 10 }
-					value={ zoomPercentage }
-					onChange={ ( value ) => {
-						onPlacementControlInteraction?.();
-						setZoom(
-							typeof value === 'number'
-								? value / ZOOM_PERCENTAGE_SCALE
-								: minZoom
-						);
-					} }
-					renderTooltipContent={ ( value ) => {
-						const percentage =
-							typeof value === 'number'
-								? value
-								: minZoomPercentage;
-						return sprintf(
-							/* translators: %d: zoom level as a percentage. */
-							__( '%d%%' ),
-							Math.round( percentage )
-						);
-					} }
-				/>
-			</div>
+				value={
+					items.find( ( item ) => item.value === aspectRatioValue ) ??
+					null
+				}
+				onValueChange={ ( item ) => {
+					if ( item && item.value !== null ) {
+						onAspectRatioChange( item.value );
+					}
+				} }
+				disabled={ disabled }
+				items={ items }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								<span className="media-editor-crop-panel__aspect-ratio-label">
+									{ item.label }
+								</span>
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ items.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+					>
+						<SelectControl.ItemLabel>
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</Stack>
 	);
 }

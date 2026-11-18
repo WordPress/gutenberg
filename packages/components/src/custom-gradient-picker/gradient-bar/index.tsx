@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import type { MouseEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useRef, useReducer } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import type { MouseEventHandler } from 'react';
 import ControlPoints from './control-points';
 import { getHorizontalRelativeGradientPosition } from './utils';
 import { MINIMUM_DISTANCE_BETWEEN_INSERTER_AND_POINT } from './constants';
@@ -85,6 +74,7 @@ export default function CustomGradientBar( {
 	onChange,
 	disableInserter = false,
 	disableAlpha = false,
+	disablePositioning = false,
 	__experimentalIsRenderedInSidebar = false,
 }: CustomGradientBarProps ) {
 	const gradientMarkersContainerDomRef = useRef< HTMLDivElement >( null );
@@ -180,6 +170,7 @@ export default function CustomGradientBar( {
 					}
 					disableAlpha={ disableAlpha }
 					disableRemove={ disableInserter }
+					disablePositioning={ disablePositioning }
 					gradientPickerDomRef={ gradientMarkersContainerDomRef }
 					ignoreMarkerPosition={
 						isInsertingControlPoint

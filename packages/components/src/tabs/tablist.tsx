@@ -1,24 +1,13 @@
-/**
- * External dependencies
- */
-import * as Ariakit from '@ariakit/react';
+import { useStoreState, TabList as AriakitTabList } from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import warning from '@wordpress/warning';
 import { forwardRef, useLayoutEffect, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import type { TabListProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import type { ElementOffsetRect } from '../utils/element-rect';
 import { useTabsContext } from './context';
-import { StyledTabList } from './styles';
+import styles from './style.module.scss';
 import { useTrackElementOffsetRect } from '../utils/element-rect';
 import { useTrackOverflow } from './use-track-overflow';
 import { useAnimatedOffsetRect } from '../utils/hooks/use-animated-offset-rect';
@@ -70,18 +59,17 @@ function useScrollRectIntoView(
 export const TabList = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TabListProps, 'div', false >
->( function TabList( { children, ...otherProps }, ref ) {
+>( function UnforwardedTabList( { children, ...otherProps }, ref ) {
 	const { store } = useTabsContext() ?? {};
 
-	const selectedId = Ariakit.useStoreState( store, 'selectedId' );
-	const activeId = Ariakit.useStoreState( store, 'activeId' );
-	const selectOnMove = Ariakit.useStoreState( store, 'selectOnMove' );
-	const items = Ariakit.useStoreState( store, 'items' );
+	const selectedId = useStoreState( store, 'selectedId' );
+	const selectOnMove = useStoreState( store, 'selectOnMove' );
+	const items = useStoreState( store, 'items' );
 	const [ parent, setParent ] = useState< HTMLElement >();
 	const refs = useMergeRefs( [ ref, setParent ] );
 
 	const selectedItem = store?.item( selectedId );
-	const renderedItems = Ariakit.useStoreState( store, 'renderedItems' );
+	const renderedItems = useStoreState( store, 'renderedItems' );
 
 	const selectedItemIndex =
 		renderedItems && selectedItem
@@ -110,27 +98,13 @@ export const TabList = forwardRef<
 	// Make sure selected tab is scrolled into view.
 	useScrollRectIntoView( parent, selectedRect );
 
-	const onBlur = () => {
-		if ( ! selectOnMove ) {
-			return;
-		}
-
-		// When automatic tab selection is on, make sure that the active tab is up
-		// to date with the selected tab when leaving the tablist. This makes sure
-		// that the selected tab will receive keyboard focus when tabbing back into
-		// the tablist.
-		if ( selectedId !== activeId ) {
-			store?.setActiveId( selectedId );
-		}
-	};
-
 	if ( ! store ) {
 		warning( '`Tabs.TabList` must be wrapped in a `Tabs` component.' );
 		return null;
 	}
 
 	return (
-		<StyledTabList
+		<AriakitTabList
 			ref={ refs }
 			store={ store }
 			render={ ( props: React.HTMLAttributes< HTMLDivElement > ) => (
@@ -141,16 +115,16 @@ export const TabList = forwardRef<
 					tabIndex={ props.tabIndex ?? -1 }
 				/>
 			) }
-			onBlur={ onBlur }
 			data-select-on-move={ selectOnMove ? 'true' : 'false' }
 			{ ...otherProps }
 			className={ clsx(
+				styles[ 'tab-list' ],
 				overflow.first && 'is-overflowing-first',
 				overflow.last && 'is-overflowing-last',
 				otherProps.className
 			) }
 		>
 			{ children }
-		</StyledTabList>
+		</AriakitTabList>
 	);
 } );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	renderToString,
 	useEffect,
@@ -9,10 +6,10 @@ import {
 	useRef,
 } from '@wordpress/element';
 import {
+	useEvent,
 	useInstanceId,
 	useMergeRefs,
 	useRefEffect,
-	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import {
 	create,
@@ -20,16 +17,13 @@ import {
 	insert,
 	isCollapsed,
 	getTextContent,
+	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { speak } from '@wordpress/a11y';
-import { isAppleOS } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
+import { isAppleOS, withIgnoreIMEEvents } from '@wordpress/keycodes';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { AutocompleterUI } from './autocompleter-ui';
 import { getAutocompleteMatch } from './get-autocomplete-match';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import type {
 	AutocompleteAction,
 	AutocompleteProps,
@@ -43,16 +37,16 @@ import type {
 import getNodeText from '../utils/get-node-text';
 import { unlock } from '../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 const EMPTY_FILTERED_OPTIONS: KeyedOption[] = [];
 
 // Used for generating the instance ID
 const AUTOCOMPLETE_HOOK_REFERENCE = {};
 
-function getCompletionObject(
-	completion: OptionCompletion
-): InsertOption | ReplaceOption {
+function getCompletionObject< TReplacement >(
+	completion: OptionCompletion< TReplacement >
+): InsertOption | ReplaceOption< TReplacement > {
 	if (
 		completion !== null &&
 		typeof completion === 'object' &&
@@ -69,17 +63,17 @@ function getCompletionObject(
 	};
 }
 
-const initialState: AutocompleteState = {
+const initialState: AutocompleteState< never > = {
 	selectedIndex: 0,
 	filteredOptions: EMPTY_FILTERED_OPTIONS,
 	filterValue: '',
 	autocompleter: null,
 };
 
-function autocompleteReducer(
-	state: AutocompleteState,
-	action: AutocompleteAction
-): AutocompleteState {
+function autocompleteReducer< TReplacement >(
+	state: AutocompleteState< TReplacement >,
+	action: AutocompleteAction< TReplacement >
+): AutocompleteState< TReplacement > {
 	switch ( action.type ) {
 		case 'RESET':
 			return initialState;
@@ -103,15 +97,18 @@ function autocompleteReducer(
 	}
 }
 
-export function useAutocomplete( {
+export function useAutocomplete< TReplacement = RichTextValue >( {
 	record,
 	onChange,
 	onReplace,
 	completers,
 	contentRef,
-}: UseAutocompleteProps ) {
+}: UseAutocompleteProps< TReplacement > ) {
 	const instanceId = useInstanceId( AUTOCOMPLETE_HOOK_REFERENCE );
-	const [ state, dispatch ] = useReducer( autocompleteReducer, initialState );
+	const [ state, dispatch ] = useReducer(
+		autocompleteReducer< TReplacement >,
+		initialState
+	);
 	const { selectedIndex, filteredOptions, filterValue, autocompleter } =
 		state;
 
@@ -267,7 +264,7 @@ export function useAutocomplete( {
 							undefined,
 							getTextContent( record ).length
 						)
-				  )
+					)
 				: '';
 		}
 
@@ -339,6 +336,7 @@ export function useAutocomplete( {
 				selectedIndex={ selectedIndex }
 				onChangeOptions={ onChangeOptions }
 				onSelect={ select }
+				onHover={ ( index ) => dispatch( { type: 'SELECT', index } ) }
 				contentRef={ contentRef }
 				reset={ () => dispatch( { type: 'RESET' } ) }
 			/>
@@ -383,39 +381,44 @@ export function useLastDifferentValue(
 	return history.current[ 0 ];
 }
 
-export function useAutocompleteProps( options: UseAutocompleteProps ) {
+// The popover is anchored to the element this hook's own `ref` lands on, so it
+// owns `contentRef` and callers don't provide one.
+export function useAutocompleteProps< TReplacement = RichTextValue >(
+	options: Omit< UseAutocompleteProps< TReplacement >, 'contentRef' >
+) {
 	const ref = useRef< HTMLElement >( null );
-	const onKeyDownRef =
-		useRef< ( event: KeyboardEvent ) => void >( undefined );
 	const { record } = options;
 	const previousRecord = useLastDifferentValue( record );
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
-	onKeyDownRef.current = onKeyDown;
+	const onKeyDownEvent = useEvent( onKeyDown );
 
 	const mergedRefs = useMergeRefs( [
 		ref,
-		useRefEffect( ( element: HTMLElement ) => {
-			function _onKeyDown( event: Event ) {
-				onKeyDownRef.current?.( event as KeyboardEvent );
-			}
-			// Capture phase. When the autocomplete popover is open,
-			// Up/Down/Enter/Escape must navigate the completion list —
-			// they shouldn't be consumed by ancestor handlers (e.g.
-			// block-editor's writing-flow) for block navigation, block
-			// splitting, or "move out of parent" actions. Those handlers
-			// fire at bubble phase and gate on `event.defaultPrevented`,
-			// so firing in capture lets us preventDefault first when the
-			// popover is active.
-			return subscribeDelegatedListener(
-				element,
-				'keydown',
-				_onKeyDown,
-				true
-			);
-		}, [] ),
+		useRefEffect(
+			( element: HTMLElement ) => {
+				function _onKeyDown( event: Event ) {
+					onKeyDownEvent( event as KeyboardEvent );
+				}
+				// Capture phase. When the autocomplete popover is open,
+				// Up/Down/Enter/Escape must navigate the completion list —
+				// they shouldn't be consumed by ancestor handlers (e.g.
+				// block-editor's writing-flow) for block navigation, block
+				// splitting, or "move out of parent" actions. Those handlers
+				// fire at bubble phase and gate on `event.defaultPrevented`,
+				// so firing in capture lets us preventDefault first when the
+				// popover is active.
+				return subscribeOwnedListener(
+					element,
+					'keydown',
+					_onKeyDown,
+					true
+				);
+			},
+			[ onKeyDownEvent ]
+		),
 	] );
 
 	// We only want to show the popover if the user has typed something.
@@ -425,20 +428,29 @@ export function useAutocompleteProps( options: UseAutocompleteProps ) {
 		return { ref: mergedRefs };
 	}
 
+	// `aria-owns` and `aria-controls` point at the same list: either one lets
+	// `aria-activedescendant` resolve to an option rendered outside this
+	// element, and assistive technology support differs between them.
+	//
+	// No `aria-expanded`: consumers are `textbox` elements, which don't
+	// support it; that would mean `role="combobox"`, which in turn doesn't
+	// support the `aria-multiline` these fields set.
 	return {
 		ref: mergedRefs,
 		children: popover,
-		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-autocomplete': listBoxId ? ( 'list' as const ) : undefined,
+		'aria-haspopup': listBoxId ? ( 'listbox' as const ) : undefined,
+		'aria-controls': listBoxId,
 		'aria-owns': listBoxId,
-		'aria-activedescendant': activeId,
+		'aria-activedescendant': activeId ?? undefined,
 	};
 }
 
-export default function Autocomplete( {
+export default function Autocomplete< TReplacement = RichTextValue >( {
 	children,
 	isSelected,
 	...options
-}: AutocompleteProps ) {
+}: AutocompleteProps< TReplacement > ) {
 	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>

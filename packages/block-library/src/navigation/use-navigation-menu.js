@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	store as coreStore,
 	useResourcePermissions,
 	useEntityRecords,
 } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
 
 export default function useNavigationMenu( ref ) {

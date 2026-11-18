@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import requestIdleCallback from './request-idle-callback';
 
 /**
