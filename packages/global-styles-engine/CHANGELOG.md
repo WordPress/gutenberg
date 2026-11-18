@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Include viewport and pseudo style states in global styles save confirmation labels, grouping each block/element once with its state labels (e.g. Default, Mobile, Tablet), and export `getGlobalStylesChangeGroups` and `getGlobalStylesChangeGroupSummary` so UIs can render structured change summaries ([#81027](https://github.com/WordPress/gutenberg/pull/81027)).
+
 ### Bug Fixes
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
