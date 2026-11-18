@@ -240,11 +240,11 @@ export function useKeyEditor(
 	const formId = useId();
 	const notify = useNotify();
 
-	// Set by a save, for the overlay to read as it closes. A filtered table
+	// Set by a save, for the overlay to read when it closes. A filtered table
 	// drops a row whose saved values no longer match, and the overlay would
 	// otherwise return focus to a control that's gone.
 	const savedFocusRef = useRef< {
-		row: HTMLElement | undefined;
+		row: HTMLElement;
 		target: HTMLElement | null;
 	} | null >( null );
 
@@ -314,12 +314,17 @@ export function useKeyEditor(
 		const submitted = draft;
 		setIsSaving( true );
 		await simulateRequest();
-		if ( submitted.id ) {
-			// The row is still in the table until the save re-renders it.
-			savedFocusRef.current = {
-				row: findRowTitles( scopeRef.current ).find(
+		// The row is still in the table until the save re-renders it. When an
+		// earlier save already took it out, and edits made meanwhile kept the
+		// overlay open, keep the target that save found.
+		const row = submitted.id
+			? findRowTitles( scopeRef.current ).find(
 					( title ) => rowTitleId( title ) === submitted.id
-				),
+				)
+			: undefined;
+		if ( row ) {
+			savedFocusRef.current = {
+				row,
 				target: focusTargetAfterRemoval(
 					submitted.id,
 					scopeRef.current,
@@ -343,11 +348,12 @@ export function useKeyEditor(
 
 	/**
 	 * Passed to the overlay's `finalFocus`. Returns focus to whatever opened
-	 * the overlay, unless a save just took the record's row out of the table.
+	 * the overlay, unless a save took the record's row out of the table.
+	 * Base UI also calls it on re-renders while the overlay is open, so it
+	 * only reads the target; opening the editor again clears it.
 	 */
 	const finalFocus = () => {
 		const saved = savedFocusRef.current;
-		savedFocusRef.current = null;
 		if (
 			saved?.row &&
 			! saved.row.isConnected &&
@@ -418,6 +424,17 @@ export function useKeys() {
 	return { keys, saveKey, revokeKey };
 }
 
+export const defaultKeysView: View = {
+	type: 'table',
+	search: '',
+	page: 1,
+	perPage: 10,
+	filters: [],
+	layout: {},
+	titleField: 'name',
+	fields: [ 'prefix', 'access', 'lastUsed', 'active' ],
+};
+
 /**
  * The records table, in a card. The page title already names the records,
  * so the card has no title of its own.
@@ -427,24 +444,26 @@ export function KeysTable( {
 	actions,
 	onClickItem,
 	renderItemLink,
+	view: controlledView,
+	onChangeView,
 }: {
 	keys: ApiKey[];
+	/**
+	 * Pass the view from above when the table unmounts while people edit a
+	 * record, as it does when records open a subpage, so their search,
+	 * filters and page are still there when they come back.
+	 */
+	view?: View;
+	onChangeView?: ( view: View ) => void;
 	actions?: Action< ApiKey >[];
 	onClickItem?: ( item: ApiKey ) => void;
 	renderItemLink?: (
 		props: { item: ApiKey } & ComponentProps< 'a' >
 	) => ReactElement;
 } ) {
-	const [ view, setView ] = useState< View >( {
-		type: 'table',
-		search: '',
-		page: 1,
-		perPage: 10,
-		filters: [],
-		layout: {},
-		titleField: 'name',
-		fields: [ 'prefix', 'access', 'lastUsed', 'active' ],
-	} );
+	const [ ownView, setOwnView ] = useState< View >( defaultKeysView );
+	const view = controlledView ?? ownView;
+	const setView = onChangeView ?? setOwnView;
 
 	const { data, paginationInfo } = useMemo(
 		() => filterSortAndPaginate( keys, view, keyFields ),

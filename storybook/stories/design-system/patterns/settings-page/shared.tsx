@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps, MouseEvent, ReactNode, Ref } from 'react';
 import { Page } from '@wordpress/admin-ui';
 import { SnackbarList } from '@wordpress/components';
 import type { Field } from '@wordpress/dataviews';
@@ -140,16 +140,19 @@ export function SaveButton( {
 	hasChanges,
 	isSaving,
 	size,
+	buttonRef,
 	children = 'Save changes',
 }: {
 	form: string;
 	hasChanges: boolean;
 	isSaving: boolean;
 	size?: ComponentProps< typeof Button >[ 'size' ];
+	buttonRef?: Ref< HTMLButtonElement >;
 	children?: ReactNode;
 } ) {
 	return (
 		<Button
+			ref={ buttonRef }
 			type="submit"
 			form={ form }
 			size={ size }
@@ -171,7 +174,7 @@ export function SaveFailedNotice( {
 	onRetry,
 }: {
 	hasFailed: boolean;
-	onRetry: () => void;
+	onRetry: ( event: MouseEvent< HTMLButtonElement > ) => void;
 } ) {
 	return (
 		<Notice.List className={ styles.notices }>
@@ -222,6 +225,25 @@ export function SettingsFormPage< T extends object >( {
 		useManualSave( saved, onSave );
 	const formId = useId();
 	const formRef = useRef< HTMLFormElement >( null );
+	const saveButtonRef = useRef< HTMLButtonElement >( null );
+
+	/**
+	 * Retrying submits the form, so invalid fields take focus as usual. A
+	 * valid retry removes the notice and its button with it, so focus moves
+	 * to Save first, which stays focusable while it's busy or disabled.
+	 */
+	const retry = ( event: MouseEvent< HTMLButtonElement > ) => {
+		const retryButton = event.currentTarget;
+		formRef.current?.requestSubmit();
+		const { activeElement, body } = retryButton.ownerDocument;
+		if (
+			! activeElement ||
+			activeElement === retryButton ||
+			activeElement === body
+		) {
+			saveButtonRef.current?.focus();
+		}
+	};
 
 	return (
 		<Page
@@ -230,6 +252,7 @@ export function SettingsFormPage< T extends object >( {
 			{ ...pageProps }
 			actions={
 				<SaveButton
+					buttonRef={ saveButtonRef }
 					form={ formId }
 					size="compact"
 					hasChanges={ isDirty }
@@ -250,7 +273,7 @@ export function SettingsFormPage< T extends object >( {
 				<SettingsContent>
 					<SaveFailedNotice
 						hasFailed={ hasFailed }
-						onRetry={ () => formRef.current?.requestSubmit() }
+						onRetry={ retry }
 					/>
 					{ children( { data, onChange } ) }
 				</SettingsContent>

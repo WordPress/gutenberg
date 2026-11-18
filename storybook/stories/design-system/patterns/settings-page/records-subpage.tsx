@@ -1,9 +1,10 @@
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
-import type { Action } from '@wordpress/dataviews';
+import type { Action, View } from '@wordpress/dataviews';
+import { useState } from '@wordpress/element';
 import { pencil } from '@wordpress/icons';
 import { Link as RouterLink, useNavigate } from '@wordpress/route';
 import type { ApiKey } from './api-keys';
-import { KeyForm, KeysTable, useKeys } from './api-keys';
+import { defaultKeysView, KeyForm, KeysTable, useKeys } from './api-keys';
 import { SettingsRouter, useSettingsPath } from './router';
 import {
 	SettingsContent,
@@ -12,7 +13,15 @@ import {
 	SettingsSection,
 } from './shared';
 
-function KeysPage( { keys }: { keys: ApiKey[] } ) {
+function KeysPage( {
+	keys,
+	view,
+	onChangeView,
+}: {
+	keys: ApiKey[];
+	view: View;
+	onChangeView: ( view: View ) => void;
+} ) {
 	const navigate = useNavigate();
 	const actions: Action< ApiKey >[] = [
 		{
@@ -34,6 +43,8 @@ function KeysPage( { keys }: { keys: ApiKey[] } ) {
 			<SettingsContent wide>
 				<KeysTable
 					keys={ keys }
+					view={ view }
+					onChangeView={ onChangeView }
 					actions={ actions }
 					renderItemLink={ ( { item, ...props } ) => (
 						<RouterLink to={ `/keys/${ item.id }` } { ...props } />
@@ -47,10 +58,15 @@ function KeysPage( { keys }: { keys: ApiKey[] } ) {
 function RecordsSubpageScreen() {
 	const path = useSettingsPath();
 	const { keys, saveKey } = useKeys();
+	// Held above the routes, so returning from a record restores the
+	// table's search, filters and page.
+	const [ view, setView ] = useState< View >( defaultKeysView );
 	const key = keys.find( ( { id } ) => path === `/keys/${ id }` );
 
 	if ( ! key ) {
-		return <KeysPage keys={ keys } />;
+		return (
+			<KeysPage keys={ keys } view={ view } onChangeView={ setView } />
+		);
 	}
 
 	return (

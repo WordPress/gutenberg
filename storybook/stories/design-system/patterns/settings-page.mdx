@@ -57,7 +57,7 @@ These templates use the manual save model from [Save & Submit](?path=/docs/desig
 
 ### When a save fails
 
-Keep the draft, so nothing the user entered is lost, and explain the failure in a `Notice` at the top of the form with a “Try again” action. Retrying submits the form again, so validation runs first. In this example the first save fails: change a field, click “Save changes”, then try again.
+Keep the draft, so nothing the user entered is lost, and explain the failure in a `Notice` at the top of the form with a “Try again” action. Retrying submits the form again, so validation runs first. A retry that goes through removes the notice, and the focused button with it, so move focus to “Save changes” first. In this example the first save fails: change a field, click “Save changes”, then try again.
 
 <Canvas
 	of={ SettingsPageStories.FailedSave }
@@ -143,7 +143,7 @@ Some settings are lists of records, such as API keys, webhooks or redirects. The
 
 ### Records that open a subpage
 
-The record title links to the subpage, and the Edit action goes to the same place. The subpage uses breadcrumbs, and its Save sits in the `Page` header like any other settings page.
+The record title links to the subpage, and the Edit action goes to the same place. The subpage uses breadcrumbs, and its Save sits in the `Page` header like any other settings page. The table goes away while a record is open, so keep its search, filters and page somewhere that outlives it, and people find their results as they left them when they come back. Real screens usually keep the view in the URL or in user preferences; this example holds it above its routes.
 
 <Canvas
 	of={ SettingsPageStories.RecordsWithSubpages }
