@@ -6936,11 +6936,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/test/registry.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/components/dataform-controls/array.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
