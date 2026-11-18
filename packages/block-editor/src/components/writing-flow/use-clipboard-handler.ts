@@ -21,6 +21,7 @@ import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
 import type { WritingFlowClipboardEvent } from './types';
+import type { BlockEditorThunkArgs } from '../../store/types';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
@@ -48,8 +49,6 @@ function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
 }
 
 export default function useClipboardHandler() {
-	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
-	const { pasteBlocksAfter } = unlock( useDispatch( blockEditorStore ) );
 	const registry = useRegistry();
 	const {
 		getBlocksByClientId,
@@ -65,7 +64,10 @@ export default function useClipboardHandler() {
 		getBlockRootClientId,
 		getBlockAttributes,
 		getSelectionStart,
-	} = useSelect( blockEditorStore );
+		isSelectionContiguous,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
 	const {
 		flashBlock,
 		removeBlocks,
@@ -74,7 +76,10 @@ export default function useClipboardHandler() {
 		__unstableExpandSelection,
 		__unstableSplitSelection,
 		selectionChange,
-	} = useDispatch( blockEditorStore );
+		pasteBlocksAfter,
+	} = unlock< BlockEditorThunkArgs[ 'dispatch' ] >(
+		useDispatch( blockEditorStore )
+	);
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect< HTMLElement >( ( node ) => {
@@ -309,7 +314,7 @@ export default function useClipboardHandler() {
 				}
 
 				if ( isFullySelected ) {
-					if ( ! areBlocksContiguous( selectedBlockClientIds ) ) {
+					if ( ! isSelectionContiguous() ) {
 						event.preventDefault();
 						pasteBlocksAfter( blocks, selectedBlockClientIds );
 						return;

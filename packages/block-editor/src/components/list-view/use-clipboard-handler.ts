@@ -5,7 +5,7 @@ import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
-import type { TreeBlock } from '../../store/types';
+import type { BlockEditorThunkArgs, TreeBlock } from '../../store/types';
 import type { ListViewSelectBlock } from './types';
 
 // This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.ts
@@ -25,12 +25,20 @@ export default function useClipboardHandler( {
 		getSettings,
 		canInsertBlockType,
 		canRemoveBlocks,
-	} = useSelect( blockEditorStore );
-	const { flashBlock, removeBlocks, replaceBlocks, insertBlocks } =
-		useDispatch( blockEditorStore );
+		areBlocksContiguous,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
+	const {
+		flashBlock,
+		removeBlocks,
+		replaceBlocks,
+		insertBlocks,
+		pasteBlocksAfter,
+	} = unlock< BlockEditorThunkArgs[ 'dispatch' ] >(
+		useDispatch( blockEditorStore )
+	);
 	const notifyCopy = useNotifyCopy();
-	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
-	const { pasteBlocksAfter } = unlock( useDispatch( blockEditorStore ) );
 
 	return useRefEffect( ( node: HTMLElement ) => {
 		function updateFocusAndSelection(
