@@ -15,7 +15,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	isSafeEntityKey,
+} from './utils';
 import { getSyncProvider } from './sync';
 import { fetchBlockPatterns } from './fetch';
 
@@ -64,6 +68,10 @@ export const getEntityRecord =
 			( config ) => config.name === name && config.kind === kind
 		);
 		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+			return;
+		}
+
+		if ( ! isSafeEntityKey( key ) ) {
 			return;
 		}
 
@@ -360,14 +368,18 @@ export const getEmbedPreview =
 export const canUser =
 	( requestedAction, resource, id ) =>
 	async ( { dispatch, registry } ) => {
-		const { hasStartedResolution } = registry.select( STORE_NAME );
-
 		const resourcePath = id ? `${ resource }/${ id }` : resource;
 		const retrievedActions = [ 'create', 'read', 'update', 'delete' ];
 
 		if ( ! retrievedActions.includes( requestedAction ) ) {
 			throw new Error( `'${ requestedAction }' is not a valid action.` );
 		}
+
+		if ( ! isSafeEntityKey( resource ) || ! isSafeEntityKey( id ) ) {
+			return;
+		}
+
+		const { hasStartedResolution } = registry.select( STORE_NAME );
 
 		// Prevent resolving the same resource twice.
 		for ( const relatedAction of retrievedActions ) {
@@ -454,6 +466,10 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
+		if ( ! isSafeEntityKey( postId ) ) {
+			return;
+		}
+
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			await resolveSelect.getPostType( postType );
 		const autosaves = await apiFetch( {
@@ -740,7 +756,11 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if (
+			! entityConfig ||
+			entityConfig?.__experimentalNoFetch ||
+			! isSafeEntityKey( recordKey )
+		) {
 			return;
 		}
 
@@ -865,7 +885,12 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if (
+			! entityConfig ||
+			entityConfig?.__experimentalNoFetch ||
+			! isSafeEntityKey( recordKey ) ||
+			! isSafeEntityKey( revisionKey )
+		) {
 			return;
 		}
 
