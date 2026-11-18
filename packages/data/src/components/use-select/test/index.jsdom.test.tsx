@@ -43,7 +43,6 @@ function counterStore( initialCount = 0, step = 1 ) {
 
 /* eslint-disable @wordpress/wp-global-usage */
 declare global {
-	var SCRIPT_DEBUG: boolean | undefined;
 	var setImmediate: ( callback: ( ...args: unknown[] ) => void ) => void;
 }
 describe( 'useSelect', () => {
@@ -307,11 +306,7 @@ describe( 'useSelect', () => {
 
 		let TestComponent: ComponentType;
 		const mapSelectSpy = vi.fn( ( select: Select ) =>
-			(
-				select( 'testStore' ) as {
-					testSelector: () => unknown;
-				}
-			 ).testSelector()
+			select( 'testStore' ).testSelector()
 		);
 		const selectorSpy = vi.fn();
 
@@ -816,14 +811,7 @@ describe( 'useSelect', () => {
 				const state = useSelect(
 					( select: Select ) => ( {
 						count1: select( 'store-1' ).get(),
-						count2:
-							(
-								select( 'store-2' ) as
-									| {
-											get: () => number;
-									  }
-									| undefined
-							 )?.get() ?? 'blank',
+						count2: select( 'store-2' )?.get() ?? 'blank',
 					} ),
 					[]
 				);
@@ -861,13 +849,7 @@ describe( 'useSelect', () => {
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select: Select ) =>
-						(
-							select( 'not-yet-registered-store' ) as
-								| {
-										get: () => number;
-								  }
-								| undefined
-						 )?.get() ?? 'blank',
+						select( 'not-yet-registered-store' )?.get() ?? 'blank',
 					[]
 				);
 
@@ -908,13 +890,8 @@ describe( 'useSelect', () => {
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
 					( select: Select ) =>
-						(
-							select( 'not-yet-registered-child-store' ) as
-								| {
-										get: () => number;
-								  }
-								| undefined
-						 )?.get() ?? 'blank',
+						select( 'not-yet-registered-child-store' )?.get() ??
+						'blank',
 					[]
 				);
 
@@ -1080,7 +1057,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			} );
 
-			const App = ( { async = false }: { async?: boolean } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1121,7 +1098,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async = false }: { async?: boolean } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1356,7 +1333,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			} );
 
-			const App = ( { async = false }: { async?: boolean } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1407,7 +1384,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async = false }: { async?: boolean } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent async={ async } />
@@ -1444,7 +1421,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async = false }: { async?: boolean } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<Sibling async={ async } />
@@ -1522,13 +1499,7 @@ describe( 'useSelect', () => {
 
 		it( 'does not share the registry-wide fallback of a store registered late', async () => {
 			const selectLate = ( select: Select ) =>
-				(
-					select( 'late' ) as
-						| {
-								get: () => number;
-						  }
-						| undefined
-				 )?.get() ?? 'none';
+				select( 'late' )?.get() ?? 'none';
 			const selectSpy = vi.fn( selectLate );
 
 			const Early = () => {
@@ -1581,8 +1552,7 @@ describe( 'useSelect', () => {
 
 			const Status = ( { multiple }: { multiple: number } ) => {
 				const count = useSelect(
-					( select: Select ) =>
-						( select( 'store' ).get() as number ) * multiple
+					( select: Select ) => select( 'store' ).get() * multiple
 				);
 				return <div role="status">{ count }</div>;
 			};
