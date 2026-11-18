@@ -68,11 +68,15 @@ function PageTree( { pages }: { pages: AutoMenuPage[] } ) {
 /**
  * @param props                    Component props.
  * @param props.navigationClientId Client id of the Navigation block.
+ * @param props.showDescription    Whether to say what an Auto menu is.
  */
 export default function AutoMenu( {
 	navigationClientId,
+	showDescription = true,
 }: {
 	navigationClientId: string;
+	// Off where the screen around it already says what an Auto menu is.
+	showDescription?: boolean;
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
 	const [ isConfirming, setIsConfirming ] = useState( false );
@@ -107,7 +111,7 @@ export default function AutoMenu( {
 						{ __( 'Auto menu' ) }
 					</Text>
 				</Stack>
-				<AutoMenuDescription />
+				{ showDescription && <AutoMenuDescription /> }
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"

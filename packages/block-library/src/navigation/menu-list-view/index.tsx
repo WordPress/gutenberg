@@ -26,17 +26,20 @@ function renderAppender(
  * With the "Navigation menu editing prototypes" experiment off, this is a
  * plain `PrivateListView`.
  *
- * @param props                    Component props.
- * @param props.rootClientId       Client id of the Navigation block.
- * @param props.navigationClientId Client id of the Navigation block, when `rootClientId` points elsewhere (for example a Page List).
+ * @param props                         Component props.
+ * @param props.rootClientId            Client id of the Navigation block.
+ * @param props.navigationClientId      Client id of the Navigation block, when `rootClientId` points elsewhere (for example a Page List).
+ * @param props.showAutoMenuDescription Whether an Auto menu says what it is.
  */
 export default function NavigationMenuListView( {
 	rootClientId,
 	navigationClientId = rootClientId,
+	showAutoMenuDescription = true,
 	...listViewProps
 }: {
 	rootClientId: string;
 	navigationClientId?: string;
+	showAutoMenuDescription?: boolean;
 	// Remaining props, passed to `PrivateListView`, whose props aren't
 	// exported.
 	[ key: string ]: any;
@@ -57,7 +60,12 @@ export default function NavigationMenuListView( {
 	}
 
 	if ( isAutoMenu ) {
-		return <AutoMenu navigationClientId={ navigationClientId } />;
+		return (
+			<AutoMenu
+				navigationClientId={ navigationClientId }
+				showDescription={ showAutoMenuDescription }
+			/>
+		);
 	}
 
 	return (

@@ -31,8 +31,8 @@ function gutenberg_initialize_experiments_settings() {
 				),
 				array(
 					'id'          => 'gutenberg-navigation-menu-editing',
-					'label'       => __( 'Navigation menu editing prototypes', 'gutenberg' ),
-					'description' => __( 'Enables prototypes for editing Navigation Menus without needing to understand blocks: a task-based inserter, bulk adding, sub menu containers, label-only sub menus, Auto menus and live previews of menu locations. For user testing only.', 'gutenberg' ),
+					'label'       => __( 'Navigation menu editing enhancements', 'gutenberg' ),
+					'description' => __( 'Makes Navigation Menus easier to edit without needing to understand blocks. Adds a simpler way to add menu items, bulk adding, clearer submenus, label-only submenus, Auto menus, and a live preview of where each menu is shown.', 'gutenberg' ),
 				),
 			),
 		),

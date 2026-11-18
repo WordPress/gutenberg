@@ -655,9 +655,7 @@ export default function MenuLocations( {
 						</Notice.Actions>
 					</Notice.Root>
 				) }
-				<div style={ STYLES.preview }>
-					<MenuSitePreview />
-				</div>
+				<MenuSitePreview />
 			</>
 		);
 	} else {

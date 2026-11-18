@@ -103,6 +103,8 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				<NavigationMenuListView
 					rootClientId={ listViewRootClientId }
 					navigationClientId={ rootClientId }
+					// The screen's description says it's an Auto menu.
+					showAutoMenuDescription={ false }
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
