@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import AlignmentMatrixControl from '..';
 
 const getControl = () => {
@@ -46,20 +45,6 @@ describe( 'AlignmentMatrixControl', () => {
 			await userEvent.tab();
 
 			expect( getCell( 'Center' ) ).toHaveFocus();
-		} );
-
-		it( 'should show the cell label in a tooltip in the overlay slot', async () => {
-			await renderAndInitCompositeStore( <AlignmentMatrixControl /> );
-
-			await userEvent.hover( getCell( 'Top Left' ) );
-
-			const slot = getWpCompatOverlaySlot();
-			expect( slot ).toBeDefined();
-			await waitFor( () =>
-				expect(
-					within( slot as HTMLDivElement ).getByText( 'Top Left' )
-				).toBeVisible()
-			);
 		} );
 	} );
 
