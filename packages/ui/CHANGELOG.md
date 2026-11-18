@@ -28,7 +28,7 @@
 
 ### Bug Fixes
 
--   `Button`, `Combobox`: Use `Highlight` and `HighlightText` for pressed buttons and focused or hovered chips in forced colors mode, so they follow the active contrast theme in Chromium. These chips no longer draw their text on a backplate ([#86851](https://github.com/WordPress/gutenberg/issues/86851)).
+-   `Button`, `Combobox`: Use `Highlight` and `HighlightText` for pressed buttons and focused or hovered chips in forced colors mode, so they follow the active contrast theme in Chromium. These chips no longer draw their text on a backplate ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
 -   `Breadcrumb`: Keep committed navigation items when the overflow trigger receives focus during a suspended update ([#86746](https://github.com/WordPress/gutenberg/pull/86746)).
 -   `Autocomplete` and `Combobox`: Place an inline `List`, `Empty`, or `Status` in a surrounding CSS grid like any other child, instead of in an extra implicit row and column ([#86652](https://github.com/WordPress/gutenberg/pull/86652)).
 -   `Combobox` and `Autocomplete`: Keep `ListBody` out of the Tab order, so a scrolling inline list is no longer an extra Tab stop after the input ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
