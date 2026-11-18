@@ -645,6 +645,26 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_gutenberg_get_child_layout_style_rules() {
 		return array(
+			'viewport can unpin grid placement while retaining span' => array(
+				'child_layout'       => array(
+					'columnStart' => 2,
+					'columnSpan'  => 2,
+					'rowStart'    => 3,
+				),
+				'viewport_overrides' => array(
+					'columnStart' => null,
+					'rowStart'    => null,
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'grid-column' => 'span 2',
+							'grid-row'    => 'auto',
+						),
+					),
+				),
+			),
 			'legacy fixed sizing remains shrinkable'      => array(
 				'child_layout'       => array(
 					'selfStretch' => 'fixed',
@@ -769,6 +789,34 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					),
 				),
 			),
+		);
+	}
+
+	/**
+	 * Tests that the box-sizing of a child with a fixed size in a flex layout reaches the
+	 * stylesheet, which filters every declaration through safecss_filter_attr().
+	 *
+	 * @covers ::gutenberg_add_box_sizing_to_safe_style_css
+	 */
+	public function test_fixed_flex_child_keeps_box_sizing_in_stylesheet() {
+		$child_layout_styles = gutenberg_get_child_layout_style_rules(
+			'.wp-container-content-test',
+			array(
+				'selfStretch' => 'fixed',
+				'flexSize'    => '320px',
+			),
+			array()
+		);
+
+		$this->assertSame(
+			'.wp-container-content-test{flex-basis:320px;box-sizing:border-box;}',
+			gutenberg_style_engine_get_stylesheet_from_css_rules(
+				$child_layout_styles,
+				array(
+					'context'  => 'block-supports',
+					'prettify' => false,
+				)
+			)
 		);
 	}
 
@@ -1639,7 +1687,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertSame(
-			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, auto));}',
+			'.wp-layout{grid-template-columns:repeat(3, minmax(0, 1fr));grid-template-rows:repeat(2, minmax(1rem, 1fr));aspect-ratio:3 / 2;}',
 			$layout_styles
 		);
 	}

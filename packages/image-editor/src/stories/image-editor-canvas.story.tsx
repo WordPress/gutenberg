@@ -1,0 +1,1048 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
+import {
+	Button,
+	RangeControl,
+	ToggleControl,
+	Flex,
+	FlexItem,
+} from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
+import {
+	rotateLeft,
+	rotateRight,
+	flipHorizontal,
+	flipVertical,
+	reset as resetIcon,
+	cloudUpload,
+	download as downloadIcon,
+} from '@wordpress/icons';
+import {
+	ImageEditorCanvas,
+	createImageEditorState,
+	exportImage,
+	getOutputSize,
+	useImageEditor,
+} from '..';
+// The debug story shows the editor's internals, so it uses them directly.
+import { useInternalImageEditor } from '../react/hooks/use-image-editor';
+import { MAX_ZOOM, MAX_ROTATION_OFFSET } from '../core/constants';
+import { getMinZoom, restrictPanZoom } from '../core/containment';
+import {
+	loadImage,
+	renderToCanvas,
+	canvasToDataURL,
+} from '../core/export/canvas-renderer';
+import {
+	createCamera,
+	screenToWorld,
+	getImageFit,
+	getVisibleBounds,
+} from '../core/camera';
+import { getSourceRegion } from '../core/source-region';
+import styles from './style.module.css';
+
+// "-1" stands for the image's own ratio, worked out once it loads.
+const aspectRatioItems = [
+	{ label: 'Free', value: '0' },
+	{ label: 'Original', value: '-1' },
+	{ label: 'Square (1:1)', value: '1' },
+	{ label: 'Landscape (16:9)', value: String( 16 / 9 ) },
+	{ label: 'Portrait (9:16)', value: String( 9 / 16 ) },
+	{ label: 'Classic (4:3)', value: String( 4 / 3 ) },
+	{ label: 'Photo (3:2)', value: String( 3 / 2 ) },
+];
+const gridItems = [
+	{ label: 'Grid: off', value: 'off' },
+	{ label: 'Grid: always on', value: 'on' },
+	{ label: 'Grid: interactive', value: 'interactive' },
+];
+const formatItems = [
+	{ label: 'JPEG', value: 'image/jpeg' },
+	{ label: 'PNG', value: 'image/png' },
+	{ label: 'WebP', value: 'image/webp' },
+];
+
+const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
+
+const GRID_MODES = {
+	off: false,
+	on: true,
+	interactive: 'interactive',
+} as const;
+
+type GridMode = keyof typeof GRID_MODES;
+
+const IMAGE_CREDIT = (
+	<p style={ { fontSize: 10, color: '#aaa', margin: '4px 0 0' } }>
+		{ '"A fashionable melange of English words (1887)" ' }
+		<a
+			href="http://publicdomainreview.org/2013/01/23/a-fashionable-melange-of-english-words-1887"
+			style={ { color: '#bbb' } }
+		>
+			publicdomainreview.org
+		</a>
+		{ ' by See-ming Lee (SML) is licensed under CC BY 2.0.' }
+	</p>
+);
+
+// Hook: manage a swappable image source. Defaults to the sample image.
+// When a file is picked, reads it as a data URL so the <img> src updates
+// without leaving the page. The consumer also gets a reset callback to
+// return to the sample.
+function useUploadableImage() {
+	const [ src, setSrc ] = useState< string >( SAMPLE_IMAGE );
+	const [ isCustom, setIsCustom ] = useState( false );
+	const handleFileChange = useCallback(
+		( event: React.ChangeEvent< HTMLInputElement > ) => {
+			const file = event.target.files?.[ 0 ];
+			if ( ! file ) {
+				return;
+			}
+			const reader = new FileReader();
+			reader.onload = () => {
+				if ( typeof reader.result === 'string' ) {
+					setSrc( reader.result );
+					setIsCustom( true );
+				}
+			};
+			reader.readAsDataURL( file );
+		},
+		[]
+	);
+	const resetToSample = useCallback( () => {
+		setSrc( SAMPLE_IMAGE );
+		setIsCustom( false );
+	}, [] );
+	return { src, isCustom, handleFileChange, resetToSample };
+}
+
+const meta: Meta< typeof ImageEditorCanvas > = {
+	id: 'image-editor-canvas',
+	title: 'Editor/Image Editor/Canvas',
+	component: ImageEditorCanvas,
+	tags: [ 'status-experimental' ],
+};
+
+export default meta;
+
+type Story = StoryObj< typeof ImageEditorCanvas >;
+
+/**
+ * Default story. Basic canvas with a sample image, no controls.
+ */
+const DefaultComponent = () => {
+	const [ state, setState ] = useState( () => createImageEditorState() );
+	const controller = useImageEditor( { state, onChange: setState } );
+
+	return (
+		<div>
+			<div className={ styles.container }>
+				<ImageEditorCanvas
+					src={ SAMPLE_IMAGE }
+					controller={ controller }
+					showDimming
+				/>
+			</div>
+			{ IMAGE_CREDIT }
+		</div>
+	);
+};
+
+export const Default: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	render: DefaultComponent,
+};
+
+/**
+ * Full interactive demo with controls.
+ */
+const WithControlsComponent = () => {
+	const [ editorState, setEditorState ] = useState( () =>
+		createImageEditorState()
+	);
+	const controller = useImageEditor( {
+		state: editorState,
+		onChange: setEditorState,
+	} );
+	const {
+		state,
+		setRotation,
+		setFlip,
+		setZoom,
+		snapRotate90,
+		reset,
+		isDirty,
+		minZoom,
+		maxZoom,
+		maxRotationOffset,
+	} = controller;
+
+	const [ aspectRatioValue, setAspectRatioValue ] = useState( '0' );
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
+	const [ gridMode, setGridMode ] = useState< GridMode >( 'interactive' );
+	const { src, isCustom, handleFileChange, resetToSample } =
+		useUploadableImage();
+	const fileInputRef = useRef< HTMLInputElement >( null );
+	const openFilePicker = useCallback( () => {
+		fileInputRef.current?.click();
+	}, [] );
+
+	// Reset crop/pan/zoom when the image changes so the old framing
+	// doesn't linger on a newly-shaped image.
+	const prevSrcRef = useRef( src );
+	useEffect( () => {
+		if ( prevSrcRef.current !== src ) {
+			prevSrcRef.current = src;
+			reset();
+			setAspectRatioValue( '0' );
+		}
+	}, [ src, reset ] );
+
+	const cropDimensions = getOutputSize( state );
+
+	// The base cardinal angle (nearest 90° step) and the fine offset.
+	// `setRotation` is a raw state setter (absolute-angle assignment), so
+	// sliders need to flip the offset sign when a single flip is active to
+	// stay visually consistent. `snapRotate90` and the pipeline `rotate`
+	// op already handle this internally.
+	const baseAngle = Math.round( state.rotation / 90 ) * 90;
+	const singleFlip = state.flip.horizontal !== state.flip.vertical;
+	const visualDir = singleFlip ? -1 : 1;
+	const fineOffset = ( state.rotation - baseAngle ) * visualDir;
+
+	const handleRotateLeft = useCallback( () => {
+		snapRotate90( -1 );
+	}, [ snapRotate90 ] );
+
+	const handleRotateRight = useCallback( () => {
+		snapRotate90( 1 );
+	}, [ snapRotate90 ] );
+
+	const handleRotationSlider = useCallback(
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			// Clamp strictly inside [-MAX, MAX). Reaching exactly ±MAX
+			// lands state.rotation on a 90° midpoint, which flips the
+			// computed baseAngle on the next render; subsequent slider
+			// events then spiral because they're added to the NEW base.
+			const EPS = 0.01;
+			const clamped = Math.max(
+				-maxRotationOffset + EPS,
+				Math.min( maxRotationOffset - EPS, value )
+			);
+			setRotation( baseAngle + clamped * visualDir );
+		},
+		[ baseAngle, maxRotationOffset, setRotation, visualDir ]
+	);
+
+	const handleFlipHorizontal = useCallback( () => {
+		setFlip( {
+			horizontal: ! state.flip.horizontal,
+			vertical: state.flip.vertical,
+		} );
+	}, [ state.flip, setFlip ] );
+
+	const handleFlipVertical = useCallback( () => {
+		setFlip( {
+			horizontal: state.flip.horizontal,
+			vertical: ! state.flip.vertical,
+		} );
+	}, [ state.flip, setFlip ] );
+
+	const handleZoomChange = useCallback(
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setZoom( value );
+		},
+		[ setZoom ]
+	);
+
+	const handleAspectRatioChange = useCallback(
+		( value: string ) => {
+			setAspectRatioValue( value );
+			const ratio =
+				value === '-1' && state.image
+					? state.image.naturalWidth / state.image.naturalHeight
+					: parseFloat( value );
+			controller.setAspectRatio( ratio > 0 ? ratio : undefined );
+		},
+		[ controller, state.image ]
+	);
+
+	const handleReset = useCallback( () => {
+		reset();
+		setAspectRatioValue( '0' );
+	}, [ reset ] );
+
+	return (
+		<div>
+			<input
+				ref={ fileInputRef }
+				type="file"
+				accept="image/*"
+				onChange={ handleFileChange }
+				className={ styles[ 'hidden-file' ] }
+			/>
+			<div className={ styles.toolbar }>
+				<Flex align="center" gap={ 2 } wrap>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ cloudUpload }
+							onClick={ openFilePicker }
+						>
+							Upload
+						</Button>
+					</FlexItem>
+					{ isCustom && (
+						<FlexItem>
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ resetToSample }
+							>
+								Use sample
+							</Button>
+						</FlexItem>
+					) }
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateLeft }
+							label="Rotate 90° counter-clockwise"
+							showTooltip
+							onClick={ handleRotateLeft }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateRight }
+							label="Rotate 90° clockwise"
+							showTooltip
+							onClick={ handleRotateRight }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipHorizontal }
+							label="Flip horizontal"
+							showTooltip
+							isPressed={ state.flip.horizontal }
+							onClick={ handleFlipHorizontal }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipVertical }
+							label="Flip vertical"
+							showTooltip
+							isPressed={ state.flip.vertical }
+							onClick={ handleFlipVertical }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							label="Aspect ratio"
+							hideLabelFromVision
+							value={
+								aspectRatioItems.find(
+									( item ) => item.value === aspectRatioValue
+								) ?? null
+							}
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									handleAspectRatioChange( item.value );
+								}
+							} }
+							items={ aspectRatioItems }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<ToggleControl
+							label="Freeform"
+							checked={ freeformCrop }
+							onChange={ setFreeformCrop }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							label="Grid"
+							hideLabelFromVision
+							value={
+								gridItems.find(
+									( item ) => item.value === gridMode
+								) ?? null
+							}
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setGridMode( item.value as GridMode );
+								}
+							} }
+							items={ gridItems }
+						/>
+					</FlexItem>
+					<FlexItem isBlock />
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ resetIcon }
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
+							onClick={ handleReset }
+						>
+							Reset
+						</Button>
+					</FlexItem>
+				</Flex>
+				<div className={ styles.sliders }>
+					<RangeControl
+						label="Fine rotation"
+						min={ -maxRotationOffset }
+						max={ maxRotationOffset }
+						step={ 0.5 }
+						value={ fineOffset }
+						onChange={ handleRotationSlider }
+					/>
+					<RangeControl
+						label="Zoom"
+						min={ minZoom }
+						max={ maxZoom }
+						step={ 0.1 }
+						value={ state.zoom }
+						onChange={ handleZoomChange }
+					/>
+				</div>
+			</div>
+
+			<div className={ styles.resizable }>
+				<ImageEditorCanvas
+					src={ src }
+					controller={ controller }
+					showGrid={ GRID_MODES[ gridMode ] }
+					showDimming
+					freeformCrop={ freeformCrop }
+				/>
+			</div>
+			<Flex justify="space-between" align="center">
+				<FlexItem>{ ! isCustom && IMAGE_CREDIT }</FlexItem>
+				{ cropDimensions && (
+					<FlexItem
+						style={ {
+							fontSize: 11,
+							color: '#757575',
+							fontFamily: 'monospace',
+						} }
+					>
+						{ Math.round( cropDimensions.width ) } ×{ ' ' }
+						{ Math.round( cropDimensions.height ) } px
+					</FlexItem>
+				) }
+			</Flex>
+
+			<div style={ { marginTop: 16 } }>
+				<strong>Current State:</strong>
+				<pre className={ styles.state }>
+					{ JSON.stringify(
+						{
+							rotation: state.rotation,
+							zoom: state.zoom,
+							cropRect: state.cropRect,
+							pan: state.pan,
+							image: state.image
+								? {
+										naturalWidth: state.image.naturalWidth,
+										naturalHeight:
+											state.image.naturalHeight,
+									}
+								: null,
+						},
+						null,
+						2
+					) }
+				</pre>
+			</div>
+		</div>
+	);
+};
+
+export const WithControls: Story = {
+	parameters: {
+		// FIXME: The state dump scrolls once its content overflows, and is not keyboard-accessible (scrollable-region-focusable). Whether it overflows depends on the numbers rendered, so this appears intermittently.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	render: WithControlsComponent,
+};
+
+/**
+ * Debug visualization showing camera internals, export preview, and
+ * image info alongside the canvas.
+ *
+ * Displays the camera matrix, crop corner world-space coordinates,
+ * restriction values, source region, and a live export preview --
+ * updated live as you interact. Use this to debug containment issues
+ * or verify the camera and render paths agree.
+ */
+const DebugComponent = () => {
+	const controller = useInternalImageEditor();
+	const {
+		state,
+		setRotation,
+		setZoom,
+		setFlip,
+		snapRotate90,
+		reset,
+		isDirty,
+	} = controller;
+
+	const [ freeformCrop, setFreeformCrop ] = useState( true );
+	const [ exportFormat, setExportFormat ] =
+		useState< string >( 'image/jpeg' );
+	const { src, isCustom, handleFileChange, resetToSample } =
+		useUploadableImage();
+	const fileInputRef = useRef< HTMLInputElement >( null );
+	const [ previewSrc, setPreviewSrc ] = useState< string | null >( null );
+	const imageRef = useRef< HTMLImageElement | null >( null );
+
+	// Reset crop/pan/zoom when the image changes.
+	const prevSrcRef = useRef( src );
+	useEffect( () => {
+		if ( prevSrcRef.current !== src ) {
+			prevSrcRef.current = src;
+			reset();
+		}
+	}, [ src, reset ] );
+
+	const [ containerSize, setContainerSize ] = useState( {
+		width: 0,
+		height: 0,
+	} );
+	const containerRef = useRef< HTMLDivElement >( null );
+
+	// Load the source image whenever the src changes (sample or uploaded).
+	useEffect( () => {
+		let cancelled = false;
+		loadImage( src ).then( ( img ) => {
+			if ( ! cancelled ) {
+				imageRef.current = img;
+			}
+		} );
+		return () => {
+			cancelled = true;
+		};
+	}, [ src ] );
+
+	// Re-render the preview whenever state changes.
+	useEffect( () => {
+		if ( ! imageRef.current || ! state.image ) {
+			return;
+		}
+		const canvas = renderToCanvas( imageRef.current, state );
+		setPreviewSrc( canvasToDataURL( canvas, 'image/jpeg', 0.85 ) );
+	}, [ state ] );
+
+	// Track container size for camera computations.
+	useEffect( () => {
+		const el = containerRef.current;
+		if ( ! el ) {
+			return;
+		}
+		const ro = new ResizeObserver( ( entries ) => {
+			const { width, height } = entries[ 0 ].contentRect;
+			setContainerSize( { width, height } );
+		} );
+		ro.observe( el );
+		return () => ro.disconnect();
+	}, [] );
+
+	const imageSize = state.image
+		? { width: state.image.naturalWidth, height: state.image.naturalHeight }
+		: { width: 0, height: 0 };
+
+	const hasImage = imageSize.width > 0 && containerSize.width > 0;
+	const { elementSize, visualSize } = hasImage
+		? getImageFit( containerSize, imageSize, state.rotation )
+		: {
+				elementSize: { width: 0, height: 0 },
+				visualSize: { width: 0, height: 0 },
+			};
+
+	// Camera and restriction.
+	const camera = hasImage
+		? createCamera( state, containerSize, imageSize )
+		: null;
+	const baseCamera = hasImage
+		? createCamera(
+				{ ...state, pan: { x: 0, y: 0 }, zoom: 1 },
+				containerSize,
+				imageSize
+			)
+		: null;
+	const vb = baseCamera ? getVisibleBounds( baseCamera ) : null;
+
+	// Crop corners in world space (should be inside [0,1] when contained).
+	const cropWorldCorners =
+		camera && vb
+			? [
+					screenToWorld( camera, {
+						x: vb.left + state.cropRect.x * vb.width,
+						y: vb.top + state.cropRect.y * vb.height,
+					} ),
+					screenToWorld( camera, {
+						x:
+							vb.left +
+							( state.cropRect.x + state.cropRect.width ) *
+								vb.width,
+						y:
+							vb.top +
+							( state.cropRect.y + state.cropRect.height ) *
+								vb.height,
+					} ),
+				]
+			: null;
+
+	// Restriction result.
+	const restrictionResult = hasImage
+		? restrictPanZoom( state, imageSize, state.cropRect )
+		: null;
+
+	// Source region.
+	const sourceRegion = hasImage ? getSourceRegion( state, imageSize ) : null;
+
+	// Is contained? All crop corners in [0,1].
+	const isContained =
+		cropWorldCorners &&
+		cropWorldCorners[ 0 ].x >= -0.001 &&
+		cropWorldCorners[ 0 ].y >= -0.001 &&
+		cropWorldCorners[ 1 ].x <= 1.001 &&
+		cropWorldCorners[ 1 ].y <= 1.001;
+
+	// `setRotation` is a raw state setter (absolute-angle assignment), so
+	// sliders need to flip the offset sign when a single flip is active
+	// to stay visually consistent. `snapRotate90` already handles this.
+	const baseAngle = Math.round( state.rotation / 90 ) * 90;
+	const singleFlip = state.flip.horizontal !== state.flip.vertical;
+	const visualDir = singleFlip ? -1 : 1;
+	const fineOffset = ( state.rotation - baseAngle ) * visualDir;
+
+	const handleRotateLeft = useCallback( () => {
+		snapRotate90( -1 );
+	}, [ snapRotate90 ] );
+
+	const handleRotateRight = useCallback( () => {
+		snapRotate90( 1 );
+	}, [ snapRotate90 ] );
+
+	const handleRotationSlider = useCallback(
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			// Clamp strictly inside [-MAX, MAX). Reaching exactly ±MAX
+			// lands state.rotation on a 90° midpoint, which flips the
+			// computed baseAngle on the next render; subsequent slider
+			// events then spiral because they're added to the NEW base.
+			const EPS = 0.01;
+			const clamped = Math.max(
+				-MAX_ROTATION_OFFSET + EPS,
+				Math.min( MAX_ROTATION_OFFSET - EPS, value )
+			);
+			setRotation( baseAngle + clamped * visualDir );
+		},
+		[ baseAngle, setRotation, visualDir ]
+	);
+
+	const handleZoomChange = useCallback(
+		( value: number | undefined ) => {
+			if ( value === undefined ) {
+				return;
+			}
+			setZoom( value );
+		},
+		[ setZoom ]
+	);
+
+	const handleFlipHorizontal = useCallback( () => {
+		setFlip( {
+			horizontal: ! state.flip.horizontal,
+			vertical: state.flip.vertical,
+		} );
+	}, [ state.flip, setFlip ] );
+
+	const handleFlipVertical = useCallback( () => {
+		setFlip( {
+			horizontal: state.flip.horizontal,
+			vertical: ! state.flip.vertical,
+		} );
+	}, [ state.flip, setFlip ] );
+
+	const openFilePicker = useCallback( () => {
+		fileInputRef.current?.click();
+	}, [] );
+
+	return (
+		<div>
+			<input
+				ref={ fileInputRef }
+				type="file"
+				accept="image/*"
+				onChange={ handleFileChange }
+				className={ styles[ 'hidden-file' ] }
+			/>
+			<div className={ styles.toolbar }>
+				<Flex align="center" gap={ 2 } wrap>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ cloudUpload }
+							onClick={ openFilePicker }
+						>
+							Upload
+						</Button>
+					</FlexItem>
+					{ isCustom && (
+						<FlexItem>
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								onClick={ resetToSample }
+							>
+								Use sample
+							</Button>
+						</FlexItem>
+					) }
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateLeft }
+							label="Rotate 90° counter-clockwise"
+							showTooltip
+							onClick={ handleRotateLeft }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ rotateRight }
+							label="Rotate 90° clockwise"
+							showTooltip
+							onClick={ handleRotateRight }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipHorizontal }
+							label="Flip horizontal"
+							showTooltip
+							isPressed={ state.flip.horizontal }
+							onClick={ handleFlipHorizontal }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							icon={ flipVertical }
+							label="Flip vertical"
+							showTooltip
+							isPressed={ state.flip.vertical }
+							onClick={ handleFlipVertical }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<ToggleControl
+							label="Freeform"
+							checked={ freeformCrop }
+							onChange={ setFreeformCrop }
+						/>
+					</FlexItem>
+					<FlexItem isBlock />
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ resetIcon }
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
+							onClick={ () => reset() }
+						>
+							Reset
+						</Button>
+					</FlexItem>
+					<FlexItem>
+						<SelectControl
+							label="Format"
+							hideLabelFromVision
+							value={
+								formatItems.find(
+									( item ) => item.value === exportFormat
+								) ?? null
+							}
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setExportFormat( item.value );
+								}
+							} }
+							items={ formatItems }
+						/>
+					</FlexItem>
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							icon={ downloadIcon }
+							onClick={ async () => {
+								// The public export, as a consumer would call it.
+								const blob = await exportImage( state, {
+									type: exportFormat,
+									quality: 0.9,
+								} );
+								const url = URL.createObjectURL( blob );
+								const link = document.createElement( 'a' );
+								link.href = url;
+								link.download = `cropped.${
+									exportFormat.split( '/' )[ 1 ] ?? 'png'
+								}`;
+								link.click();
+								URL.revokeObjectURL( url );
+							} }
+						>
+							Download
+						</Button>
+					</FlexItem>
+				</Flex>
+				<div className={ styles.sliders }>
+					<RangeControl
+						label="Fine rotation"
+						min={ -MAX_ROTATION_OFFSET }
+						max={ MAX_ROTATION_OFFSET }
+						step={ 0.5 }
+						value={ fineOffset }
+						onChange={ handleRotationSlider }
+					/>
+					<RangeControl
+						label="Zoom"
+						min={ getMinZoom( state ) }
+						max={ MAX_ZOOM }
+						step={ 0.1 }
+						value={ state.zoom }
+						onChange={ handleZoomChange }
+					/>
+				</div>
+			</div>
+
+			<div
+				style={ { display: 'flex', gap: 16, alignItems: 'flex-start' } }
+			>
+				<div
+					ref={ containerRef }
+					style={ { flex: '1 1 60%', minWidth: 0 } }
+				>
+					<div className={ styles.container }>
+						<ImageEditorCanvas
+							src={ src }
+							controller={ controller }
+							showGrid
+							showDimming
+							freeformCrop={ freeformCrop }
+						/>
+					</div>
+					{ ! isCustom && IMAGE_CREDIT }
+				</div>
+
+				<div
+					style={ {
+						flex: '0 0 320px',
+						fontSize: 11,
+						fontFamily: 'monospace',
+						lineHeight: 1.5,
+						overflow: 'auto',
+						maxHeight: 500,
+					} }
+				>
+					<div className={ styles[ 'export-preview' ] }>
+						{ previewSrc ? (
+							<img
+								className={ styles[ 'export-image' ] }
+								src={ previewSrc }
+								alt="Crop preview"
+							/>
+						) : (
+							<p>Loading...</p>
+						) }
+					</div>
+					<strong>Containment</strong>
+					<div
+						style={ {
+							padding: '2px 6px',
+							background: isContained ? '#d4edda' : '#f8d7da',
+							borderRadius: 3,
+							marginBottom: 8,
+							display: 'inline-block',
+						} }
+					>
+						{ isContained ? 'COVERED' : 'NOT COVERED' }
+					</div>
+
+					{ state.image && (
+						<div>
+							<strong>Image info</strong>
+							<pre style={ { margin: '4px 0' } }>
+								{ `original: ${ state.image.naturalWidth }×${
+									state.image.naturalHeight
+								}
+aspect ratio: ${ (
+									state.image.naturalWidth /
+									state.image.naturalHeight
+								).toFixed( 2 ) }` }
+							</pre>
+						</div>
+					) }
+
+					<div>
+						<strong>State</strong>
+						<pre style={ { margin: '4px 0' } }>
+							{ `zoom: ${ state.zoom.toFixed( 3 ) }
+rotation: ${ state.rotation.toFixed( 1 ) }°
+pan: (${ state.pan.x.toFixed( 4 ) }, ${ state.pan.y.toFixed( 4 ) })
+cropRect: (${ state.cropRect.x.toFixed( 3 ) }, ${ state.cropRect.y.toFixed(
+								3
+							) }) ${ state.cropRect.width.toFixed(
+								3
+							) }×${ state.cropRect.height.toFixed( 3 ) }
+flip: h=${ state.flip.horizontal } v=${ state.flip.vertical }` }
+						</pre>
+					</div>
+
+					<div>
+						<strong>Sizes</strong>
+						<pre style={ { margin: '4px 0' } }>
+							{ `container: ${ containerSize.width }×${
+								containerSize.height
+							}
+element: ${ elementSize.width.toFixed( 0 ) }×${ elementSize.height.toFixed(
+								0
+							) }
+visual: ${ visualSize.width.toFixed( 0 ) }×${ visualSize.height.toFixed(
+								0
+							) }` }
+						</pre>
+					</div>
+
+					{ camera && (
+						<div>
+							<strong>Camera matrix</strong>
+							<pre style={ { margin: '4px 0' } }>
+								{ `[${ Array.from( camera )
+									.map( ( v ) => v.toFixed( 2 ) )
+									.join( ', ' ) }]` }
+							</pre>
+						</div>
+					) }
+
+					{ cropWorldCorners && (
+						<div>
+							<strong>Crop corners (world space)</strong>
+							<pre style={ { margin: '4px 0' } }>
+								{ `TL: (${ cropWorldCorners[ 0 ].x.toFixed(
+									4
+								) }, ${ cropWorldCorners[ 0 ].y.toFixed( 4 ) })
+BR: (${ cropWorldCorners[ 1 ].x.toFixed(
+									4
+								) }, ${ cropWorldCorners[ 1 ].y.toFixed(
+									4
+								) })` }
+							</pre>
+							<span style={ { fontSize: 10, color: '#666' } }>
+								Should be within [0,1] when contained
+							</span>
+						</div>
+					) }
+
+					{ restrictionResult && (
+						<div>
+							<strong>Restriction result</strong>
+							<pre style={ { margin: '4px 0' } }>
+								{ `zoom: ${ restrictionResult.zoom.toFixed(
+									3
+								) }
+pan: (${ restrictionResult.pan.x.toFixed(
+									4
+								) }, ${ restrictionResult.pan.y.toFixed(
+									4
+								) })` }
+							</pre>
+						</div>
+					) }
+
+					{ sourceRegion && (
+						<div>
+							<strong>Source region (px)</strong>
+							<pre style={ { margin: '4px 0' } }>
+								{ `x: ${ sourceRegion.x.toFixed(
+									0
+								) }  y: ${ sourceRegion.y.toFixed( 0 ) }
+w: ${ sourceRegion.width.toFixed( 0 ) }  h: ${ sourceRegion.height.toFixed(
+									0
+								) }` }
+							</pre>
+						</div>
+					) }
+
+					{ sourceRegion &&
+						sourceRegion.width > 0 &&
+						sourceRegion.height > 0 && (
+							<div>
+								<strong>Crop output</strong>
+								<pre style={ { margin: '4px 0' } }>
+									{ `dimensions: ${ Math.round(
+										sourceRegion.width
+									) }×${ Math.round( sourceRegion.height ) }
+aspect ratio: ${ ( sourceRegion.width / sourceRegion.height ).toFixed( 2 ) }
+% of original: ${ (
+										( ( sourceRegion.width *
+											sourceRegion.height ) /
+											( imageSize.width *
+												imageSize.height ) ) *
+										100
+									).toFixed( 1 ) }%` }
+								</pre>
+							</div>
+						) }
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export const Debug: Story = {
+	parameters: {
+		// FIXME: Image credit text and its link fail color-contrast.
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	render: DebugComponent,
+};

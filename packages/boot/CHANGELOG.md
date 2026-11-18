@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Mirror the slide animations of the mobile navigation sidebar and the drilldown navigation screens in RTL languages ([#86554](https://github.com/WordPress/gutenberg/pull/86554)).
+
+## 0.26.0 (2026-11-04)
+
 ### Enhancements
 
 -   Error boundary: Confirm success or failure when copying an error, and announce the result ([#85477](https://github.com/WordPress/gutenberg/pull/85477)).

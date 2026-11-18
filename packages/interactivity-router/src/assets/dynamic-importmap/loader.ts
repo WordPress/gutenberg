@@ -12,7 +12,11 @@
  *
  * MIT License: https://opensource.org/licenses/MIT
  */
-import * as lexer from 'es-module-lexer';
+// Use the asm.js build: the default build compiles WebAssembly and decodes
+// module specifiers with `eval()`, so it only works when the Content Security
+// Policy allows `'unsafe-eval'`. The asm.js build needs neither. It only
+// exports `parse()`, which doesn't need an `init` promise to resolve first.
+import { parse } from 'es-module-lexer/js';
 import { fetchModule } from './fetch';
 import { resolve } from './resolver';
 
@@ -22,13 +26,11 @@ export interface ModuleLoad {
 	fetchPromise?: Promise< ModuleLoad >; // fetch promise
 	source?: string; // source code
 	linkPromise?: Promise< void >; // link-promise (dependency fetch)
-	analysis?: ReturnType< typeof lexer.parse >; // analysis ([ imports, exports, ... ])
+	analysis?: ReturnType< typeof parse >; // analysis ([ imports, exports, ... ])
 	deps?: ModuleLoad[]; // deps
 	blobUrl?: string; // blobUrl
 	shellUrl?: string; // shellUrl for circular references
 }
-
-export const initPromise = lexer.init;
 
 /**
  * Script element containing the initial page's import map.
@@ -252,7 +254,7 @@ function getOrCreateLoad(
 			await ( fetchCache[ url ] ||
 				fetchModule( url, fetchOpts, parent ) ) );
 		try {
-			load.analysis = lexer.parse( source, load.url );
+			load.analysis = parse( source, load.url );
 		} catch ( e ) {
 			// eslint-disable-next-line no-console
 			console.error( e );
@@ -312,7 +314,6 @@ export async function preloadModule(
 	url: string,
 	fetchOpts?: RequestInit
 ): Promise< ModuleLoad > {
-	await initPromise;
 	const load = getOrCreateLoad( url, fetchOpts, null );
 	const seen = {};
 	await loadAll( load, seen );

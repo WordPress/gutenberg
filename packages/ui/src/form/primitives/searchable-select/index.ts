@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '../combobox/loading-indicator';
 import { Item } from './item';
 import { Trigger } from './trigger';
 import { ItemDescription } from '../combobox/item-description';
@@ -31,6 +32,7 @@ export const SearchableSelect = Object.assign( _SearchableSelect, {
 	Item,
 	ItemLabel,
 	ItemDescription,
+	LoadingIndicator,
 	Group,
 	GroupLabel,
 	Separator,

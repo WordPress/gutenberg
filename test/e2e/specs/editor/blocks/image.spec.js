@@ -1083,6 +1083,106 @@ test.describe( 'Image', () => {
 	} );
 } );
 
+test.describe( 'Image - server-side uploads', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterEach( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllMedia();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+	} );
+
+	test( 'keeps the image when a replacement upload fails, and Reset still removes it', async ( {
+		editor,
+		page,
+		requestUtils,
+		imageBlockUtils,
+	} ) => {
+		const media = await requestUtils.uploadMedia(
+			'./assets/10x10_e2e_test_image_z9T8jK.png'
+		);
+		await editor.insertBlock( {
+			name: 'core/image',
+			attributes: {
+				id: media.id,
+				url: media.source_url,
+				alt: 'Original image',
+				caption: 'Original caption',
+			},
+		} );
+		const image = editor.canvas
+			.getByRole( 'document', { name: 'Block: Image' } )
+			.getByRole( 'img', { name: 'Original image' } );
+		await expect( image ).toHaveAttribute( 'src', media.source_url );
+
+		// Make the replacement upload fail on the server.
+		await page.route( '**/wp/v2/media**', async ( route ) => {
+			if ( route.request().method() !== 'POST' ) {
+				return route.continue();
+			}
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'simulated_failure',
+					message: 'Simulated upload failure.',
+				} ),
+			} );
+		} );
+
+		await editor.clickBlockToolbarButton( 'Replace' );
+		await imageBlockUtils.upload(
+			page.getByRole( 'menu' ).getByTestId( 'form-file-upload-input' )
+		);
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Simulated upload failure.' } )
+		).toBeVisible();
+
+		// The failed upload leaves the current image and its details.
+		await expect( image ).toHaveAttribute( 'src', media.source_url );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: media.id,
+					url: media.source_url,
+					alt: 'Original image',
+					caption: 'Original caption',
+				},
+			},
+		] );
+
+		// Reset still removes the image.
+		await editor.clickBlockToolbarButton( 'Replace' );
+		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/image',
+				attributes: {
+					id: undefined,
+					url: undefined,
+					alt: undefined,
+					caption: undefined,
+				},
+			},
+		] );
+	} );
+} );
+
 test.describe( 'Image - lightbox', () => {
 	let uploadedMedia;
 
@@ -1269,6 +1369,63 @@ test.describe( 'Image - lightbox', () => {
 				);
 				expect( scrollWidth ).toBe( clientWidth );
 			} );
+		} );
+
+		test( 'should keep the overlay intact when reopened before the close cleanup runs', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent( `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image --> ` );
+
+			const postId = await editor.publishPost();
+
+			await page.goto( `/?p=${ postId }` );
+
+			const enlargeButton = page.getByRole( 'button', {
+				name: 'Enlarge',
+				exact: true,
+			} );
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+			const dialog = page.getByRole( 'dialog', {
+				name: 'Enlarged image',
+			} );
+			const enlargedImage = overlay.locator(
+				'img[data-wp-bind--src="state.enlargedSrc"]'
+			);
+
+			await enlargeButton.click();
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Controls the timer that cleans up after the close animation.
+			await page.clock.install();
+			await page.clock.pauseAt( Date.now() );
+
+			await overlay.getByRole( 'button', { name: 'Close' } ).click();
+			await expect( overlay ).not.toHaveClass( /active/ );
+
+			// Reopens before the close cleanup timer fires. The click is
+			// dispatched directly because the closing overlay still covers the
+			// trigger button.
+			await enlargeButton.dispatchEvent( 'click' );
+			await expect( overlay ).toHaveClass( /active/ );
+
+			// Lets the pending close cleanup run.
+			await page.clock.runFor( 1000 );
+
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( dialog ).toBeVisible();
+			await expect( enlargedImage ).toHaveAttribute(
+				'src',
+				uploadedMedia.source_url
+			);
+
+			// Closing again restores focus to the trigger button.
+			await page.keyboard.press( 'Escape' );
+			await page.clock.runFor( 1000 );
+			await expect( overlay ).not.toHaveClass( /active/ );
+			await expect( enlargeButton ).toBeFocused();
 		} );
 
 		test.describe( 'Overlay not a direct child of body', () => {
