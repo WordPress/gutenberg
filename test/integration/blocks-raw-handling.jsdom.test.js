@@ -798,4 +798,20 @@ describe( 'rawHandler', () => {
 		expect( blocks[ 0 ].name ).toBe( 'core/list' );
 		expect( blocks[ 0 ].attributes.className ).toBe( 'fancy' );
 	} );
+
+	it( 'should keep a top-level more comment between paragraphs', () => {
+		const HTML = '<p>before</p>\n<!--more-->\n<p>after</p>';
+
+		expect( rawHandler( { HTML } ).map( ( block ) => block.name ) ).toEqual(
+			[ 'core/paragraph', 'core/more', 'core/paragraph' ]
+		);
+	} );
+
+	it( 'should keep a top-level nextpage comment between paragraphs', () => {
+		const HTML = '<p>before</p>\n<!--nextpage-->\n<p>after</p>';
+
+		expect( rawHandler( { HTML } ).map( ( block ) => block.name ) ).toEqual(
+			[ 'core/paragraph', 'core/nextpage', 'core/paragraph' ]
+		);
+	} );
 } );
