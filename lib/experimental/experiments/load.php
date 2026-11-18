@@ -29,6 +29,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-block-drag-from-anywhere',
+					'label'       => __( 'Drag blocks from anywhere', 'gutenberg' ),
+					'description' => __( 'Lets you move a block by dragging it from anywhere on it, its text included, until you click into it to edit it.', 'gutenberg' ),
+				),
 			),
 		),
 		array(
