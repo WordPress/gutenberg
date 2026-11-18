@@ -168,23 +168,17 @@ describe( 'DataViews table scroll fade', () => {
 			).toBe( `${ FADE_SIZE + COMPACT_CELL_PADDING }px` );
 		} );
 
-		it( 'shows the divider until the end of the scroll range', async () => {
-			await render( <PostsTable withActions /> );
+		it.each( [ 'ltr', 'rtl' ] as const )(
+			'shows the divider until the end of the scroll range (%s)',
+			async ( dir ) => {
+				await render( <PostsTable withActions dir={ dir } /> );
 
-			await expect.poll( getDividerOpacity ).toBe( '1' );
+				await expect.poll( getDividerOpacity ).toBe( '1' );
 
-			scrollToEnd();
-			await expect.poll( getDividerOpacity ).toBe( '0' );
-		} );
-
-		it( 'shows the divider until the end of the scroll range in RTL', async () => {
-			await render( <PostsTable withActions dir="rtl" /> );
-
-			await expect.poll( getDividerOpacity ).toBe( '1' );
-
-			scrollToEnd();
-			await expect.poll( getDividerOpacity ).toBe( '0' );
-		} );
+				scrollToEnd();
+				await expect.poll( getDividerOpacity ).toBe( '0' );
+			}
+		);
 
 		it( 'hides the divider when every column fits', async () => {
 			await render( <PostsTable withActions width={ 1600 } /> );
