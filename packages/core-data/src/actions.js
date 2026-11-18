@@ -18,6 +18,7 @@ import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
+import { isSafeEntityKey } from './utils';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -230,6 +231,9 @@ export const deleteEntityRecord = (
 		} );
 
 		try {
+			if ( ! isSafeEntityKey( recordId ) ) {
+				throw new Error( 'Invalid entity record key.' );
+			}
 			let path = `${ entity.baseURL }/${ recordId }`;
 
 			if ( query ) {
@@ -431,6 +435,9 @@ export const saveEntityRecord = (
 		let updatedRecord;
 		let error;
 		try {
+			if ( ! isSafeEntityKey( recordId ) ) {
+				throw new Error( 'Invalid entity record key.' );
+			}
 			const path = `${ entity.baseURL }${
 				recordId ? '/' + recordId : ''
 			}`;

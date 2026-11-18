@@ -14,7 +14,11 @@ import apiFetch from '@wordpress/api-fetch';
  */
 import { STORE_NAME } from './name';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { forwardResolver, getNormalizedCommaSeparable } from './utils';
+import {
+	forwardResolver,
+	getNormalizedCommaSeparable,
+	isSafeEntityKey,
+} from './utils';
 
 /**
  * Requests authors from the REST API.
@@ -55,6 +59,10 @@ export const getEntityRecord = ( kind, name, key = '', query ) => async ( {
 	const entities = await dispatch( getKindEntities( kind ) );
 	const entity = find( entities, { kind, name } );
 	if ( ! entity || entity?.__experimentalNoFetch ) {
+		return;
+	}
+
+	if ( ! isSafeEntityKey( key ) ) {
 		return;
 	}
 
@@ -277,6 +285,10 @@ export const canUser = ( action, resource, id ) => async ( { dispatch } ) => {
 		throw new Error( `'${ action }' is not a valid action.` );
 	}
 
+	if ( ! isSafeEntityKey( resource ) || ! isSafeEntityKey( id ) ) {
+		return;
+	}
+
 	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
 
 	let response;
@@ -343,6 +355,10 @@ export const getAutosaves = ( postType, postId ) => async ( {
 	dispatch,
 	resolveSelect,
 } ) => {
+	if ( ! isSafeEntityKey( postId ) ) {
+		return;
+	}
+
 	const { rest_base: restBase } = await resolveSelect.getPostType( postType );
 	const autosaves = await apiFetch( {
 		path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
