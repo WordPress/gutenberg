@@ -103,6 +103,16 @@ function UnforwardedSnackbar(
 		onRemove?.();
 	}
 
+	function onKeyPress( event: KeyboardEvent< HTMLDivElement > ) {
+		// A key press on the action bubbles up to here. Leave it to the action:
+		// dismissing would cancel the key press, so the action would not run.
+		if ( event.target !== event.currentTarget ) {
+			return;
+		}
+
+		dismissMe( event );
+	}
+
 	function onActionClick(
 		event: MouseEvent< HTMLButtonElement | HTMLAnchorElement >,
 		onClick: NoticeAction[ 'onClick' ]
@@ -165,7 +175,7 @@ function UnforwardedSnackbar(
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : undefined }
-			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
+			onKeyPress={ ! explicitDismiss ? onKeyPress : undefined }
 			aria-label={
 				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
 			}

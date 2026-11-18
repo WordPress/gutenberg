@@ -116,6 +116,12 @@
             - className
             - render
             - style
+      - name: Autocomplete.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: Autocomplete.Popup
         props:
             - children
@@ -498,24 +504,6 @@
       - onConfirm
       - size
       - title
-- name: CustomSelectControl
-  props:
-      - __experimentalShowSelectedHint
-      - __next40pxDefaultSize
-      - __nextUnconstrainedWidth
-      - className
-      - describedBy
-      - hideLabelFromVision
-      - label
-      - onBlur
-      - onChange
-      - onFocus
-      - onMouseOut
-      - onMouseOver
-      - options
-      - showSelectedHint
-      - size
-      - value
 - name: DataForm
   props:
       - data
@@ -982,6 +970,15 @@
             - render
             - style
             - variant
+      - name: Notice.ActionButtonLink
+        props:
+            - children
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+            - variant
       - name: Notice.ActionLink
         props:
             - children
@@ -1019,6 +1016,7 @@
         props:
             - children
             - className
+            - liveRegionContainer
             - render
             - style
       - name: Notice.Title
@@ -1027,6 +1025,22 @@
             - className
             - render
             - style
+- name: Page
+  props:
+      - actions
+      - ariaLabel
+      - badges
+      - breadcrumbs
+      - children
+      - className
+      - components
+      - hasPadding
+      - headingLevel
+      - navigation
+      - showSidebarToggle
+      - subTitle
+      - title
+      - visual
 - name: Popover
   props:
       - __unstableForcePosition
@@ -1356,6 +1370,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelect.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelect.Separator
         props:
             - className
@@ -1465,6 +1485,12 @@
             - className
             - render
             - style
+      - name: SearchableChipSelectControl.LoadingIndicator
+        props:
+            - children
+            - className
+            - render
+            - style
       - name: SearchableChipSelectControl.Separator
         props:
             - className
@@ -1560,6 +1586,12 @@
             - render
             - style
       - name: SearchableSelectControl.ItemLabel
+        props:
+            - children
+            - className
+            - render
+            - style
+      - name: SearchableSelectControl.LoadingIndicator
         props:
             - children
             - className

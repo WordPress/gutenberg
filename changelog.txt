@@ -1,6 +1,48 @@
 == Changelog ==
 
-= 24.4.0-rc.1 =
+= 24.4.2 =
+
+**This is a security release. All users are strongly encouraged to update to this version as soon as possible.**
+
+## Changelog
+
+### Bug Fixes
+
+- Comment Date block: Ensure the formatted date is escaped before output.
+- Embed block: Remove support for Imgur embeds.
+- File block: Ensure a filename taken from a media block is kept as plain text.
+- Core Data: Ensure entity record keys are valid before they are used in REST API paths.
+- Editor: Ensure Openverse metadata is escaped in image captions.
+- REST API: Ensure a new comment can only be attributed to a member of the site.
+
+## Contributors
+
+The following contributors contributed to this release:
+
+@jeryj @johnbillion @lucatume @rfaile313 @sirreal @xknown
+
+
+= 24.4.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Table: Keep the selected cell on the first click into an unselected table. ([86757](https://github.com/WordPress/gutenberg/pull/86757))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@shreyasikhar
+
+
+= 24.4.0 =
 
 ## Changelog
 
@@ -308,11 +350,10 @@
 The following PRs were merged by first-time contributors:
 
 - @justlevine: Add PHPStan static analysis at rule level 5. ([66693](https://github.com/WordPress/gutenberg/pull/66693))
-- @lucatume: iOS tests: De-flake the selection handle test. ([85461](https://github.com/WordPress/gutenberg/pull/85461))
+- @lucatume: Stabilize web-editor selection tests in iOS Safari. ([85461](https://github.com/WordPress/gutenberg/pull/85461))
 - @mattmiklic: Theme: Update Figma border import documentation. ([85304](https://github.com/WordPress/gutenberg/pull/85304))
 - @RajkiranBagal: DataViews: Use a page number input in the footer pagination above 100 pages. ([85303](https://github.com/WordPress/gutenberg/pull/85303))
 - @theritiktiwari: Fix typo in .gitignore comment about re-included .cache paths. ([85375](https://github.com/WordPress/gutenberg/pull/85375))
-
 
 ## Contributors
 
