@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.2.0 (2026-11-18)
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).
