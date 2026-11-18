@@ -1,6 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Relocated color controls with block style states', () => {
+	// The presets picked below are the active theme's, and not every spec that
+	// switches theme switches back.
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -31,7 +37,7 @@ test.describe( 'Relocated color controls with block style states', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+		await page.getByRole( 'option', { name: 'Red' } ).click();
 
 		// Background color now lives in the Background panel.
 		await settings
@@ -41,16 +47,16 @@ test.describe( 'Relocated color controls with block style states', () => {
 			} )
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Vivid cyan blue' } ).click();
+		await page.getByRole( 'option', { name: 'Blue' } ).click();
 
 		const [ block ] = await editor.getBlocks();
 
 		// Values are stored inline under the selected state slice...
 		expect( block.attributes.style?.[ '@mobile' ]?.color?.text ).toBe(
-			'var:preset|color|vivid-red'
+			'var:preset|color|red'
 		);
 		expect( block.attributes.style?.[ '@mobile' ]?.color?.background ).toBe(
-			'var:preset|color|vivid-cyan-blue'
+			'var:preset|color|blue'
 		);
 
 		// ...and the default state is untouched (no bleed across contexts).
@@ -103,14 +109,14 @@ test.describe( 'Relocated color controls with block style states', () => {
 		await elementsPanel
 			.getByRole( 'button', { name: 'Link', exact: true } )
 			.click();
-		await page.getByRole( 'option', { name: 'Vivid red' } ).click();
+		await page.getByRole( 'option', { name: 'Red' } ).click();
 
 		const [ block ] = await editor.getBlocks();
 
 		// The element color is stored under the selected state slice...
 		expect(
 			block.attributes.style?.[ '@mobile' ]?.elements?.link?.color?.text
-		).toBe( 'var:preset|color|vivid-red' );
+		).toBe( 'var:preset|color|red' );
 
 		// ...and the default state's elements are untouched.
 		expect( block.attributes.style?.elements ).toBeUndefined();
@@ -182,11 +188,11 @@ test.describe( 'Relocated color controls with block style states', () => {
 			name: 'core/group',
 			attributes: {
 				style: {
-					color: { text: 'var:preset|color|vivid-red' },
+					color: { text: 'var:preset|color|red' },
 					'@mobile': {
 						color: {
-							text: 'var:preset|color|vivid-cyan-blue',
-							background: 'var:preset|color|vivid-red',
+							text: 'var:preset|color|blue',
+							background: 'var:preset|color|red',
 						},
 					},
 				},
@@ -223,11 +229,11 @@ test.describe( 'Relocated color controls with block style states', () => {
 		).toBeUndefined();
 		// The Mobile text color (owned by a different panel) is preserved.
 		expect( block.attributes.style?.[ '@mobile' ]?.color?.text ).toBe(
-			'var:preset|color|vivid-cyan-blue'
+			'var:preset|color|blue'
 		);
 		// The default-state text color is preserved.
 		expect( block.attributes.style?.color?.text ).toBe(
-			'var:preset|color|vivid-red'
+			'var:preset|color|red'
 		);
 	} );
 } );

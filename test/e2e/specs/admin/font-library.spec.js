@@ -69,7 +69,11 @@ test.describe( 'Font Library', () => {
 			await page
 				.getByRole( 'menuitemcheckbox', { name: 'Font, show' } )
 				.click();
-			await page.getByRole( 'combobox', { name: 'Font' } ).click();
+			// `exact`, because the theme's font sizes put the font size picker
+			// in a select, whose name a substring match also finds.
+			await page
+				.getByRole( 'combobox', { name: 'Font', exact: true } )
+				.click();
 			await page.getByRole( 'option', { name: 'Exo 2' } ).click();
 			await expect(
 				editor.canvas.locator( 'p:has-text("Testing custom font")' )

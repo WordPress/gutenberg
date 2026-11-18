@@ -1,6 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Format Library - Text color', () => {
+	// The presets picked below are the active theme's, and not every spec that
+	// switches theme switches back.
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -25,7 +31,7 @@ test.describe( 'Format Library - Text color', () => {
 		// active. Previously we had a broken regular expression.
 		const color = page
 			.getByRole( 'listbox', { name: 'Custom color picker' } )
-			.getByRole( 'option', { name: 'Cyan bluish gray' } );
+			.getByRole( 'option', { name: 'Dark gray' } );
 
 		await color.click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -33,7 +39,7 @@ test.describe( 'Format Library - Text color', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark>',
+						'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-dark-gray-color">1</mark>',
 				},
 			},
 		] );
@@ -67,7 +73,7 @@ test.describe( 'Format Library - Text color', () => {
 
 		const color = page
 			.getByRole( 'listbox', { name: 'Custom color picker' } )
-			.getByRole( 'option', { name: 'Cyan bluish gray' } );
+			.getByRole( 'option', { name: 'Dark gray' } );
 
 		await color.click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -75,7 +81,7 @@ test.describe( 'Format Library - Text color', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'<mark style="background-color:#abb8c3" class="has-inline-color">1</mark>',
+						'<mark style="background-color:#28303D" class="has-inline-color">1</mark>',
 				},
 			},
 		] );

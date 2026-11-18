@@ -1,6 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'RichText (@firefox, @webkit)', () => {
+	// The presets picked below are the active theme's, and not every spec that
+	// switches theme switches back.
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -761,7 +767,7 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: {
 				content:
-					'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-cyan-bluish-gray-color">1</mark>',
+					'<mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-dark-gray-color">1</mark>',
 			},
 		};
 
