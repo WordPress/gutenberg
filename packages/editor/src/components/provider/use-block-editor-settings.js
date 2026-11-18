@@ -85,6 +85,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'bodyPlaceholder',
 	'canEditCSS',
 	'canLockBlocks',
+	'canUpdateBlockBindings',
 	'capabilities',
 	'clearBlockSelection',
 	'codeEditingEnabled',
@@ -180,7 +181,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		viewablePostTypeLabel,
 		currentPostId,
-		canUpdateRootEntity,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -289,25 +289,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
-				canUpdateRootEntity:
-					settings.canUpdateBlockBindings === undefined &&
-					postType &&
-					postId
-						? canUser( 'update', {
-								kind: 'postType',
-								name: postType,
-								id: postId,
-							} )
-						: undefined,
 			};
 		},
-		[
-			postType,
-			postId,
-			isLargeViewport,
-			renderingMode,
-			settings.canUpdateBlockBindings,
-		]
+		[ postType, postId, isLargeViewport, renderingMode ]
 	);
 
 	const { merged: mergedGlobalStyles } = useGlobalStyles();
@@ -410,8 +394,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
-			canUpdateBlockBindings:
-				settings.canUpdateBlockBindings ?? !! canUpdateRootEntity,
 			allImageSizes,
 			bigImageSizeThreshold,
 			imageStripMeta,
@@ -525,7 +507,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		blockPatternCategories,
 		inserterMediaCategories,
 		canUseUnfilteredHTML,
-		canUpdateRootEntity,
 		undo,
 		createPageEntity,
 		userCanCreatePages,

@@ -16,6 +16,11 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	 */
 	protected static $admin_id;
 
+	/**
+	 * @var int
+	 */
+	protected static $editor_id;
+
 	public function set_up() {
 		parent::set_up();
 		switch_theme( 'block-theme' );
@@ -28,9 +33,14 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
+		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
+			)
+		);
+		self::$editor_id = $factory->user->create(
+			array(
+				'role' => 'editor',
 			)
 		);
 	}
@@ -38,6 +48,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	public static function wpTearDownAfterClass() {
 		// Delete the test user.
 		self::delete_user( self::$admin_id );
+		self::delete_user( self::$editor_id );
 	}
 
 	public function test_register_routes() {
@@ -64,16 +75,25 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		$this->assertArrayHasKey( 'fontSizes', $data, 'fontSizes should be in the returned data' );
 	}
 
-	public function test_get_items_leaves_can_update_block_bindings_to_the_editor() {
+	public function test_get_items_lets_users_who_can_edit_theme_options_update_block_bindings() {
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertArrayNotHasKey( 'canUpdateBlockBindings', $data );
+		$this->assertTrue( $data['canUpdateBlockBindings'] );
 	}
 
-	public function test_get_items_lets_filters_set_can_update_block_bindings() {
+	public function test_get_items_does_not_let_users_who_cannot_edit_theme_options_update_block_bindings() {
+		wp_set_current_user( self::$editor_id );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertFalse( $data['canUpdateBlockBindings'] );
+	}
+
+	public function test_get_items_lets_filters_change_can_update_block_bindings() {
 		wp_set_current_user( self::$admin_id );
 		$filter = static function ( $settings ) {
 			$settings['canUpdateBlockBindings'] = false;
@@ -88,14 +108,14 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		$this->assertFalse( $data['canUpdateBlockBindings'] );
 	}
 
-	public function test_get_items_keeps_can_update_block_bindings_for_mobile() {
+	public function test_get_items_does_not_check_block_bindings_with_the_site_editor_context_for_mobile() {
 		wp_set_current_user( self::$admin_id );
 		$request = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
 		$request->set_param( 'context', 'mobile' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertFalse( $data['canUpdateBlockBindings'] );
+		$this->assertNotTrue( $data['canUpdateBlockBindings'] ?? null );
 	}
 
 	/**

@@ -95,16 +95,22 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$is_mobile           = 'mobile' === $request->get_param( 'context' );
 			$editor_context_name = $is_mobile ? 'core/mobile' : 'core/edit-post';
 
-			// The editor checks per entity whether the user can update block bindings.
-			$remove_can_update_block_bindings = static function ( $settings ) {
-				unset( $settings['canUpdateBlockBindings'] );
+			/*
+			 * The default settings serve the site editor, but they are built for
+			 * core/edit-post without a post, where Core never grants
+			 * edit_block_binding. Check it with the site editor context, as
+			 * site-editor.php does. It runs before any other filter, so plugins
+			 * can still change the value.
+			 */
+			$set_can_update_block_bindings = static function ( $settings ) {
+				$settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) ) );
 				return $settings;
 			};
 
 			if ( $is_mobile ) {
 				add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 			} else {
-				add_filter( 'block_editor_settings_all', $remove_can_update_block_bindings, PHP_INT_MIN );
+				add_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
@@ -113,7 +119,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			if ( $is_mobile ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 			} else {
-				remove_filter( 'block_editor_settings_all', $remove_can_update_block_bindings, PHP_INT_MIN );
+				remove_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			return rest_ensure_response( $settings );
