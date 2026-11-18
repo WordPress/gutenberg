@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables";
+
 .grid {
 	width: 100%;
 	/* Placeholder and drag-preview radii: match `.tile` and `@wordpress/ui` Card (`--wpds-border-radius-lg`). */
@@ -19,13 +21,7 @@
  * (`.drag-preview-frame` on `@wordpress/grid`) uses a stronger shadow.
  */
 .tile-edit-mode {
-	--_wp-widget-dashboard-elevation-xs:
-		0 1px 1px rgba(0, 0, 0, 0.03),
-		0 1px 2px rgba(0, 0, 0, 0.02),
-		0 3px 3px rgba(0, 0, 0, 0.02),
-		0 4px 4px rgba(0, 0, 0, 0.01);
-
-	box-shadow: var(--_wp-widget-dashboard-elevation-xs);
+	box-shadow: variables.$elevation-x-small;
 }
 
 .tile-edit-mode:focus-visible {

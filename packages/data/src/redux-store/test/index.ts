@@ -1,9 +1,18 @@
+import type { AnyAction } from 'redux';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
+import type {
+	BoundSelector,
+	DataRegistry,
+	NormalizedResolver,
+	ThunkArgs,
+} from '../../types';
+
+declare const process: { nextTick: ( callback: () => void ) => void };
 
 describe( 'controls', () => {
-	let registry;
+	let registry: DataRegistry;
 
 	beforeEach( () => {
 		registry = createRegistry();
@@ -29,7 +38,13 @@ describe( 'controls', () => {
 				controls: {
 					DISPATCH: createRegistryControl(
 						( reg ) =>
-							( { store, action } ) => {
+							( {
+								store,
+								action,
+							}: {
+								store: string;
+								action: string;
+							} ) => {
 								return reg.dispatch( store )[ action ]();
 							}
 					),
@@ -44,11 +59,11 @@ describe( 'controls', () => {
 	it( 'resolves in expected order', async () => {
 		const actions = {
 			standby: () => ( { type: 'STANDBY' } ),
-			receive: ( items ) => ( { type: 'RECEIVE', items } ),
+			receive: ( items: number[] ) => ( { type: 'RECEIVE', items } ),
 		};
 
 		registry.registerStore( 'store', {
-			reducer: ( state = null, action ) => {
+			reducer: ( state = null, action: AnyAction ) => {
 				if ( action.type === 'RECEIVE' ) {
 					return action.items;
 				}
@@ -56,7 +71,7 @@ describe( 'controls', () => {
 				return state;
 			},
 			selectors: {
-				getItems: ( state ) => state,
+				getItems: ( state: number[] | null ) => state,
 			},
 			resolvers: {
 				*getItems() {
@@ -66,14 +81,14 @@ describe( 'controls', () => {
 			},
 			controls: {
 				STANDBY() {
-					return new Promise( ( resolve ) =>
+					return new Promise< void >( ( resolve ) =>
 						process.nextTick( resolve )
 					);
 				},
 			},
 		} );
 
-		await new Promise( ( resolve ) => {
+		await new Promise< void >( ( resolve ) => {
 			registry.subscribe( () => {
 				const isFinished = registry
 					.select( 'store' )
@@ -92,8 +107,8 @@ describe( 'controls', () => {
 			registry.registerStore( 'store', {
 				reducer: vi.fn(),
 				selectors: {
-					getItems: ( state ) => state,
-					getItem: ( state ) => state,
+					getItems: ( state: unknown ) => state,
+					getItem: ( state: unknown ) => state,
 				},
 				resolvers: {
 					*getItems() {
@@ -101,28 +116,31 @@ describe( 'controls', () => {
 					},
 				},
 			} );
-			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
-				true
-			);
-			expect( registry.select( 'store' ).getItem.hasResolver ).toBe(
-				false
-			);
+			expect(
+				( registry.select( 'store' ).getItems as BoundSelector )
+					.hasResolver
+			).toBe( true );
+			expect(
+				( registry.select( 'store' ).getItem as BoundSelector )
+					.hasResolver
+			).toBe( false );
 		} );
 		it( 'when custom store does not have resolvers defined', () => {
 			registry.registerStore( 'store', {
 				reducer: vi.fn(),
 				selectors: {
-					getItems: ( state ) => state,
+					getItems: ( state: unknown ) => state,
 				},
 			} );
-			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
-				false
-			);
+			expect(
+				( registry.select( 'store' ).getItems as BoundSelector )
+					.hasResolver
+			).toBe( false );
 		} );
 	} );
 	describe( 'various action types have expected response and resolve as expected with controls middleware', () => {
 		const actions = {
-			*withPromise() {
+			*withPromise(): Generator< { type: string }, unknown, unknown > {
 				yield { type: 'SOME_ACTION' };
 				return yield { type: 'TEST_PROMISE' };
 			},
@@ -231,8 +249,8 @@ describe( 'controls', () => {
 } );
 
 describe( 'resolveSelect', () => {
-	let registry;
-	let shouldFail;
+	let registry: DataRegistry;
+	let shouldFail: boolean;
 
 	beforeEach( () => {
 		shouldFail = false;
@@ -284,7 +302,9 @@ describe( 'resolveSelect', () => {
 
 	it( 'resolves when a resolver implements isFulfilled', async () => {
 		const fulfilledResolver = () => {};
-		fulfilledResolver.isFulfilled = ( state ) => !! state.items;
+		fulfilledResolver.isFulfilled = (
+			state: Record< string, unknown[] >
+		) => !! state.items;
 
 		const resolvedState = {
 			items: [ 'item' ],
@@ -295,7 +315,7 @@ describe( 'resolveSelect', () => {
 				return state;
 			},
 			selectors: {
-				getItems: ( state ) => state.items,
+				getItems: ( state: typeof resolvedState ) => state.items,
 			},
 			resolvers: {
 				getItems: fulfilledResolver,
@@ -307,10 +327,21 @@ describe( 'resolveSelect', () => {
 	} );
 
 	it( 'handles isFulfilled with arguments correctly', async () => {
-		const fulfilledResolver = vi.fn();
-		fulfilledResolver.isFulfilled = ( state, id ) => state.pages?.[ id ];
+		const fulfilledResolver = Object.assign( vi.fn(), {
+			isFulfilled: (
+				state: {
+					pages?: Record<
+						number,
+						{ title: string; content: string }
+					>;
+				},
+				id: number
+			) => state.pages?.[ id ],
+		} );
 
-		const resolvedState = {
+		const resolvedState: {
+			pages: Record< number, { title: string; content: string } >;
+		} = {
 			pages: {
 				1: { title: 'Page 1', content: 'Content 1' },
 				2: { title: 'Page 2', content: 'Content 2' },
@@ -320,7 +351,8 @@ describe( 'resolveSelect', () => {
 		registry.registerStore( 'demo', {
 			reducer: ( state = resolvedState ) => state,
 			selectors: {
-				getPage: ( state, id ) => state.pages?.[ id ],
+				getPage: ( state: typeof resolvedState, id: number ) =>
+					state.pages?.[ id ],
 			},
 			resolvers: {
 				getPage: fulfilledResolver,
@@ -350,7 +382,7 @@ describe( 'resolveSelect', () => {
 		registry.registerStore( 'demo', {
 			reducer: ( state = { items: [ 'item' ] } ) => state,
 			selectors: {
-				getItems: ( state ) => state.items,
+				getItems: ( state: { items: string[] } ) => state.items,
 			},
 			resolvers: {
 				getItems: { fulfill, isFulfilled },
@@ -377,17 +409,22 @@ describe( 'resolveSelect', () => {
 			type: 'SET_DATA',
 			data: 'resolved data',
 		} ) );
-		const isFulfilled = vi.fn( ( state ) => state.hasData );
+		const isFulfilled = vi.fn(
+			( state: { hasData: boolean } ) => state.hasData
+		);
 
 		registry.registerStore( 'demo', {
-			reducer: ( state = { hasData: false }, action ) => {
+			reducer: (
+				state = { hasData: false },
+				action: AnyAction & { data?: string }
+			) => {
 				if ( action.type === 'SET_DATA' ) {
 					return { hasData: true, data: action.data };
 				}
 				return state;
 			},
 			selectors: {
-				getData: ( state ) => state.data,
+				getData: ( state: { data?: string } ) => state.data,
 			},
 			resolvers: {
 				getData: { fulfill, isFulfilled },
@@ -413,7 +450,7 @@ describe( 'normalizing args', () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		const normalizingFunction = vi.fn( ( ...args ) => args );
+		const normalizingFunction = vi.fn( ( ...args: unknown[] ) => args );
 
 		selector.normalizeArgs = normalizingFunction;
 
@@ -441,7 +478,7 @@ describe( 'normalizing args', () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.normalizeArgs = vi.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args: unknown[] ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -463,7 +500,7 @@ describe( 'normalizing args', () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.normalizeArgs = vi.fn( ( ...args ) => args );
+		selector.normalizeArgs = vi.fn( ( ...args: unknown[] ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -484,7 +521,7 @@ describe( 'normalizing args', () => {
 		const registry = createRegistry();
 		const selector = () => {};
 
-		selector.__unstableNormalizeArgs = vi.fn( ( args ) => args );
+		selector.__unstableNormalizeArgs = vi.fn( ( args: unknown[] ) => args );
 
 		registry.registerStore( 'store', {
 			reducer: () => {},
@@ -508,19 +545,34 @@ describe( 'normalizing args', () => {
 describe( 'resolution args', () => {
 	// A store whose selector takes an extra leading argument the resolver does
 	// not need, so calls differing only in it share one resolver run.
-	function registerStore( registry, { fulfill } ) {
+	function registerStore(
+		registry: DataRegistry,
+		{ fulfill }: { fulfill: NormalizedResolver[ 'fulfill' ] }
+	) {
 		registry.registerStore( 'store', {
-			reducer: ( state = {}, action ) =>
-				action.type === 'RECEIVE' ? action.items : state,
+			reducer: (
+				state = {},
+				action: AnyAction & { items?: Record< string, unknown > }
+			) => ( action.type === 'RECEIVE' ? action.items : state ),
 			selectors: {
-				getItem: ( state, field, id ) => state[ id ]?.[ field ],
+				getItem: (
+					state: Record< string, Record< string, unknown > >,
+					field: string,
+					id: string | number
+				) => state[ id ]?.[ field ],
 			},
 			actions: {
-				receive: ( items ) => ( { type: 'RECEIVE', items } ),
+				receive: ( items: Record< string, unknown > ) => ( {
+					type: 'RECEIVE',
+					items,
+				} ),
 			},
 			resolvers: {
 				getItem: {
-					getResolutionArgs: ( field, id ) => [ id ],
+					getResolutionArgs: (
+						_field: string,
+						id: string | number
+					) => [ id ],
 					fulfill,
 				},
 			},
@@ -530,8 +582,8 @@ describe( 'resolution args', () => {
 	it( 'should run the resolver once for selector calls that share resolution args', async () => {
 		const registry = createRegistry();
 		const fulfill = vi.fn(
-			( id ) =>
-				( { dispatch } ) =>
+			( id: number ) =>
+				( { dispatch }: ThunkArgs ) =>
 					dispatch.receive( { [ id ]: { a: 1, b: 2 } } )
 		);
 		registerStore( registry, { fulfill } );
@@ -562,8 +614,8 @@ describe( 'resolution args', () => {
 		const registry = createRegistry();
 		registerStore( registry, {
 			fulfill:
-				( id ) =>
-				( { dispatch } ) =>
+				( id: number ) =>
+				( { dispatch }: ThunkArgs ) =>
 					dispatch.receive( { [ id ]: { a: 'A', b: 'B' } } ),
 		} );
 
@@ -606,9 +658,16 @@ describe( 'resolution args', () => {
 
 	it( 'should apply getResolutionArgs after normalizeArgs', async () => {
 		const registry = createRegistry();
-		const selector = ( state, field, id ) => state[ id ]?.[ field ];
+		const selector = (
+			state: Record< string, Record< string, unknown > >,
+			field: string,
+			id: string | number
+		) => state[ id ]?.[ field ];
 		// Coerce the numeric id, then drop the field.
-		selector.normalizeArgs = ( [ field, id ] ) => [ field, Number( id ) ];
+		selector.normalizeArgs = ( [ field, id ]: [ string, string ] ) => [
+			field,
+			Number( id ),
+		];
 		const fulfill = vi.fn( () => () => {} );
 
 		registry.registerStore( 'store', {
@@ -616,7 +675,10 @@ describe( 'resolution args', () => {
 			selectors: { getItem: selector },
 			resolvers: {
 				getItem: {
-					getResolutionArgs: ( field, id ) => [ id ],
+					getResolutionArgs: (
+						_field: string,
+						id: string | number
+					) => [ id ],
 					fulfill,
 				},
 			},
