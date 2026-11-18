@@ -20,6 +20,18 @@
 			"default": "",
 			"role": "content"
 		},
+		"caption": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "figure.wp-block-media-text__media > figcaption",
+			"role": "content"
+		},
+		"lightbox": {
+			"type": "object",
+			"enabled": {
+				"type": "boolean"
+			}
+		},
 		"mediaPosition": {
 			"type": "string",
 			"default": "left"
