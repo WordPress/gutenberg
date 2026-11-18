@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables";
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
@@ -21,7 +23,6 @@
 			--wp-ui-menu-selection-indicator-track-size: 0px;
 			--wp-ui-menu-selection-indicator-size: var(--wpds-dimension-size-2xs);
 			--wp-ui-menu-selection-indicator-gap: 0px;
-			--_wp-ui-menu-elevation-md: 0px 2px 3px 0px #0000000d, 0px 4px 5px 0px #0000000a, 0px 12px 12px 0px #00000008, 0px 16px 16px 0px #00000005;
 
 			max-height: min(var(--available-height), 480px, 60dvh);
 			min-width: min(var(--available-width), var(--wp-ui-menu-min-width));
@@ -32,7 +33,7 @@
 			scroll-padding: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--_wp-ui-menu-elevation-md);
+			box-shadow: variables.$elevation-medium;
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
 

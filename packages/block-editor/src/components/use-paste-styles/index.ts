@@ -44,6 +44,7 @@ async function readCopiedBlocks( clipboard: Clipboard ): Promise< Block[] > {
 	if ( clipboard.read ) {
 		try {
 			const items = await clipboard.read();
+			let hasReadError = false;
 			// Bound blocks have serialized markup in HTML and visible text in
 			// plain text. Copy styles and unbound blocks use serialized text.
 			for ( const type of [ 'text/html', 'text/plain' ] ) {
@@ -51,15 +52,23 @@ async function readCopiedBlocks( clipboard: Clipboard ): Promise< Block[] > {
 					if ( ! item.types.includes( type ) ) {
 						continue;
 					}
-					const blocks = getSerializedBlocks(
-						await ( await item.getType( type ) ).text()
-					);
-					if ( blocks.length ) {
-						return blocks;
+					try {
+						const blocks = getSerializedBlocks(
+							await ( await item.getType( type ) ).text()
+						);
+						if ( blocks.length ) {
+							return blocks;
+						}
+					} catch {
+						hasReadError = true;
+						// An advertised representation can be unavailable.
+						// Try the others from this successful clipboard read.
 					}
 				}
 			}
-			return [];
+			if ( ! hasReadError ) {
+				return [];
+			}
 		} catch {
 			// Some browsers only allow the legacy text read.
 		}

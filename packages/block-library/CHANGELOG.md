@@ -17,6 +17,8 @@
 
 ### Bug Fixes
 
+-   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
+-   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing ([#86656](https://github.com/WordPress/gutenberg/pull/86656)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -40,6 +42,8 @@
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
 -   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
+-   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
+-   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#86728](https://github.com/WordPress/gutenberg/pull/86728)).
 
 ## 12.1.0 (2026-11-04)
 
