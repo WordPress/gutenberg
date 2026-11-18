@@ -44,7 +44,11 @@ export default function useListViewScrollIntoView( {
 			rowRect.top < scrollContainerRect.top ||
 			rowRect.bottom > scrollContainerRect.bottom
 		) {
-			scrollContainer.scrollTop += rowRect.top - scrollContainerRect.top;
+			const { defaultView } = ownerDocument;
+			const scrollX = defaultView?.scrollX ?? 0;
+			const scrollY = defaultView?.scrollY ?? 0;
+			rowItemRef.current.scrollIntoView();
+			defaultView?.scrollTo( scrollX, scrollY );
 		}
 	}, [ isSelected, isSingleSelection, rowItemRef ] );
 }
