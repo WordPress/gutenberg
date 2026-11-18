@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Fix `wp-env` wrongly detecting that it is offline on some Windows machines, by checking access to WordPress.org with `dns.lookup` instead of `dns.resolve` ([#85522](https://github.com/WordPress/gutenberg/pull/85522)).
 -   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).
 
 ### Internal
