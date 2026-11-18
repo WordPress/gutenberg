@@ -49,6 +49,7 @@
 -   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
 -   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#86728](https://github.com/WordPress/gutenberg/pull/86728)).
 -   Separator: Show the Default and Wide styles inside Row and Stack blocks, where they collapsed to a width of zero, by filling the free space of the Row or the width of the Stack ([#80308](https://github.com/WordPress/gutenberg/pull/80308)).
+-   Synced Pattern (`core/block`): Cap the number of pattern expansions per top-level render to prevent memory exhaustion when a pattern references others in a dense, repeated, or "diamond" graph that expands exponentially. A new `block_core_block_render_budget` filter controls the limit (default 10000; return -1 to remove it) ([#79595](https://github.com/WordPress/gutenberg/pull/79595)).
 
 ## 12.1.0 (2026-11-04)
 
