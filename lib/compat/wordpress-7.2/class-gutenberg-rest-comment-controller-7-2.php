@@ -504,7 +504,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		}
 
 		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
-		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
+		// START CHANGE: Only a moderator can attribute a comment to another user, who must be a member of the site.
+		if (
+			isset( $request['author'] ) &&
+			get_current_user_id() !== $request['author'] &&
+			! ( current_user_can( 'moderate_comments' ) && is_user_member_of_blog( $request['author'] ) )
+		) {
+			// END CHANGE.
 			return new WP_Error(
 				'rest_comment_invalid_author',
 				/* translators: %s: Request parameter. */
