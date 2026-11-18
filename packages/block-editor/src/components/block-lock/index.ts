@@ -4,5 +4,5 @@ export { default as BlockLockToolbar } from './toolbar';
 export { default as useBlockLock } from './use-block-lock';
 export { default as BlockLockSubmenu } from './lock-submenu';
 export { default as BlockLockMenuItems } from './lock-menu-items';
-export { default as useUnlockBlocks } from './use-unlock-blocks';
+export { useLockBlocks, useUnlockBlocks } from './use-full-lock';
 export { default as DisabledWhenStylesLocked } from './disabled-when-styles-locked';

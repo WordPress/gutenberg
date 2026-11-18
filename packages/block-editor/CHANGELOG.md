@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Block lock: Add a lock menu to the block toolbar and the block settings menu, behind the block lock menu experiment. It locks movement, deletion and layout for one or several blocks and every block inside them, and List View rows unlock a block in one click ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
+-   Block lock: Add a lock menu to the block toolbar and the block settings menu, behind the block lock menu experiment. It locks styles, layout, movement and deletion for one or several blocks and every block inside them. List View rows lock or unlock a block in one click, and right-clicking a row's lock opens the lock menu ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).

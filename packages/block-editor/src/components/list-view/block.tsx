@@ -124,6 +124,7 @@ function ListViewBlock( {
 		isSynced,
 		isLocked,
 		isInLockingSection,
+		canLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -135,6 +136,7 @@ function ListViewBlock( {
 				isSyncedBlock,
 				isLockedBlock,
 				getParentSectionBlock,
+				canLockBlockType,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -155,6 +157,7 @@ function ListViewBlock( {
 				isInLockingSection:
 					!! window.__experimentalBlockLockMenu &&
 					!! getParentSectionBlock( clientId ),
+				canLock: canLockBlockType( getBlockName( clientId ) ),
 			};
 		},
 		[ clientId ]
@@ -575,13 +578,18 @@ function ListViewBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
-	// With the lock menu, a locked block shows its lock state as a button in
-	// its own cell, and so does a block inside a pattern, whose lock it can't
-	// change. A pattern being edited is temporarily unlocked, so it shows none.
+	// With the lock menu, a block that can be locked has a lock button in its
+	// own cell, and so does a locked block or a block inside a pattern, whose
+	// lock it can't change. A pattern being edited is temporarily unlocked, so
+	// it shows none.
 	const hasLockCell =
 		isLockMenuEnabled &&
 		clientId !== editedSection &&
-		( isLocked || isInLockingSection );
+		( canLock || isLocked || isInLockingSection );
+	// The lock of an unlocked block only shows on hover, focus or selection.
+	const lockCellClassName = clsx( 'block-editor-list-view-block__lock-cell', {
+		'is-visible': isLocked || isInLockingSection || isHovered || isSelected,
+	} );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
@@ -748,7 +756,7 @@ function ListViewBlock( {
 
 			{ hasLockCell && (
 				<TreeGridCell
-					className="block-editor-list-view-block__lock-cell"
+					className={ lockCellClassName }
 					aria-selected={ !! isSelected }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (

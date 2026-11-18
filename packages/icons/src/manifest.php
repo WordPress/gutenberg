@@ -453,9 +453,14 @@ return array(
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-lock', 'dashicons-lock-duplicate' ),
 	),
-	'lock-filled'         => array(
-		'label'       => _x( 'Lock Filled', 'icon label', 'gutenberg' ),
-		'filePath'    => 'library/lock-filled.svg',
+	'lock-dashed'         => array(
+		'label'       => _x( 'Lock Dashed', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/lock-dashed.svg',
+		'collections' => array( 'core' ),
+	),
+	'lock-open'           => array(
+		'label'       => _x( 'Lock Open', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/lock-open.svg',
 		'collections' => array( 'core' ),
 	),
 	'map-marker'          => array(

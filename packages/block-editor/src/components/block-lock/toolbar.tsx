@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { useReducer, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { lock, lockFilled, unlock } from '@wordpress/icons';
+import { lock, lockDashed, lockOpen, unlock } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
@@ -21,17 +21,18 @@ import type { BlockLockControlProps } from './types';
 
 /**
  * Renders the toolbar button of a locked block, which opens the lock menu.
- * The icon is outlined for a partial lock and filled for a full lock. Once
- * unlocked, the button stays until the toolbar remounts and shows it.
+ * The icon is a lock for a full lock, a lock with a dash for a partial lock,
+ * and an open lock once unlocked. Once unlocked, the button stays until the
+ * toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 	const { canLock, lockType } = useBlockLock( clientId );
 	const label = canLock ? __( 'Lock' ) : __( 'Locked' );
 	let icon = lock;
-	if ( lockType === 'full' ) {
-		icon = lockFilled;
+	if ( lockType === 'partial' ) {
+		icon = lockDashed;
 	} else if ( lockType === 'none' ) {
-		icon = unlock;
+		icon = lockOpen;
 	}
 
 	return (

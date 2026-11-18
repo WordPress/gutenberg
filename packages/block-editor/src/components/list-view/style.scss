@@ -332,6 +332,18 @@
 		line-height: 0;
 		width: $button-size-small + $grid-unit-05;
 		vertical-align: middle;
+
+		> * {
+			opacity: 0;
+		}
+
+		&:hover,
+		&:focus-within,
+		&.is-visible {
+			> * {
+				opacity: 1;
+			}
+		}
 	}
 
 	.block-editor-list-view-block__menu-cell,
