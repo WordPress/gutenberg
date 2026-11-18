@@ -1420,7 +1420,7 @@ export function getAutosave< EntityRecord extends ET.EntityRecord< any > >(
 	state: State,
 	postType: string,
 	postId: EntityRecordKey,
-	authorId: EntityRecordKey
+	authorId: EntityRecordKey | undefined
 ): EntityRecord | undefined {
 	if ( authorId === undefined ) {
 		return;
