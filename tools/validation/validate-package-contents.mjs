@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { readNpmPackResult } from './read-npm-pack-result.mjs';
 
 const usage =
 	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [--disallow-path <path>]';
@@ -13,7 +14,6 @@ let configuredDisallowedPath;
 
 try {
 	const { positionals, values } = parseArgs( {
-		args: process.argv.slice( 2 ),
 		allowPositionals: true,
 		options: {
 			'disallow-path': { type: 'string' },
@@ -68,7 +68,7 @@ if ( packResult.status !== 0 ) {
 	process.exit( packResult.status ?? 1 );
 }
 
-const [ pack ] = JSON.parse( packResult.stdout );
+const pack = readNpmPackResult( packResult.stdout, packageJson.name );
 const packedPaths = pack.files.map( ( { path } ) => path );
 const packedPathSet = new Set( packedPaths );
 const disallowedPathPatterns = [

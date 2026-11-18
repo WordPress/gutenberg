@@ -2,7 +2,7 @@
 /**
  * Tests the Style Engine CSS declarations class.
  *
- * @package    Gutenberg
+ * @package    gutenberg
  * @subpackage style-engine
  */
 

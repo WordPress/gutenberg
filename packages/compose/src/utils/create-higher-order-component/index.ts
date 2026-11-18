@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { pascalCase } from 'change-case';
 import type { ComponentType } from 'react';
 

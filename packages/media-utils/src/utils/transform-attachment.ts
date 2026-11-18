@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Attachment, RestAttachment } from './types';
 
 /**

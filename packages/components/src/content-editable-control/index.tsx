@@ -1,16 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useRef } from '@wordpress/element';
+import { InputLayout } from '@wordpress/ui';
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
@@ -27,36 +18,72 @@ function UnforwardedContentEditableControl(
 		disabled,
 		required,
 		placeholder,
+		onMouseDown,
 		...additionalProps
 	}: WordPressComponentProps< ContentEditableControlProps, 'div', false >,
 	forwardedRef: ForwardedRef< HTMLDivElement >
 ) {
+	// The label is not passed through to `BaseControl`: it would render a
+	// `<label for>` pointing at the `contentEditable` `div`, which is not a
+	// labelable element, making the association invalid. The label is instead
+	// rendered here without `for` and wired up via `aria-labelledby`.
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		id,
 		className,
 		help,
-		hideLabelFromVision,
-		label,
 	} );
+
+	const labelId = `${ controlProps.id }__label`;
+	const editableRef = useRef< HTMLDivElement >( null );
+	const mergedRefs = useMergeRefs( [ editableRef, forwardedRef ] );
 
 	return (
 		<BaseControl { ...baseControlProps }>
-			<div
-				className={ styles.editable }
-				role="textbox"
-				aria-multiline
-				aria-label={ label }
-				aria-placeholder={ placeholder || undefined }
-				aria-disabled={ disabled || undefined }
-				aria-required={ required || undefined }
-				ref={ forwardedRef }
-				// A disabled field is not `contentEditable`, which also
-				// removes it from the tab order.
-				contentEditable={ ! disabled }
-				suppressContentEditableWarning
-				{ ...additionalProps }
-				{ ...controlProps }
-			/>
+			{ ! hideLabelFromVision && (
+				<BaseControl.VisualLabel
+					id={ labelId }
+					// Focus the field on label click, like `<label for>` would.
+					onClick={ () => {
+						if ( ! disabled ) {
+							editableRef.current?.focus();
+						}
+					} }
+				>
+					{ label }
+				</BaseControl.VisualLabel>
+			) }
+			<InputLayout
+				className={ styles.layout }
+				visuallyDisabled={ disabled }
+			>
+				<div
+					className={ styles.editable }
+					role="textbox"
+					aria-multiline
+					// A hidden label is named directly, so it isn't also read as page text.
+					aria-label={ hideLabelFromVision ? label : undefined }
+					aria-labelledby={
+						hideLabelFromVision ? undefined : labelId
+					}
+					aria-placeholder={ placeholder || undefined }
+					aria-disabled={ disabled || undefined }
+					aria-required={ required || undefined }
+					ref={ mergedRefs }
+					// Not editable and out of the tab order, but still focusable:
+					// a field disabled while focused keeps focus.
+					contentEditable={ ! disabled }
+					tabIndex={ disabled ? -1 : undefined }
+					onMouseDown={ ( event ) => {
+						onMouseDown?.( event );
+						if ( disabled ) {
+							event.preventDefault();
+						}
+					} }
+					suppressContentEditableWarning
+					{ ...additionalProps }
+					{ ...controlProps }
+				/>
+			</InputLayout>
 		</BaseControl>
 	);
 }

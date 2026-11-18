@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Placeholder from '../';
 import TextControl from '../../text-control';
 
@@ -19,7 +8,8 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof Placeholder > = {
 	component: Placeholder,
-	title: 'Components/Placeholder',
+	id: 'components-placeholder',
+	title: 'Components/@wordpress-components/Placeholder',
 	argTypes: {
 		children: { control: false },
 		notices: { control: false },

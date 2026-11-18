@@ -21,7 +21,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 	// Find tab-panel block
 	foreach ( $innerblocks as $inner_block ) {
 		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
-			$tab_index = 0;
+			$tab_number = 1;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab-panel' === ( $tab_block['blockName'] ?? '' ) ) {
 					$attrs = $tab_block['attrs'] ?? array();
@@ -29,11 +29,12 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
 					$tab_id = ! empty( $attrs['anchor'] )
 						? $attrs['anchor']
 						: ( ! empty( $tabs_id )
-							? $tabs_id . '-tab-' . $tab_index
-							: 'tab-' . $tab_index );
+							? $tabs_id . '-tab-' . $tab_number
+							: 'tab-' . $tab_number );
 
-					$tabs_list[] = esc_attr( $tab_id );
-					++$tab_index;
+					// Escaped where it's output, so escaping here would double-escape it.
+					$tabs_list[] = (string) $tab_id;
+					++$tab_number;
 				}
 			}
 			break;
@@ -59,7 +60,7 @@ function block_core_tabs_provide_context( array $context, array $parsed_block ):
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		// Generate a unique ID for the tabs instance first, so it can be used
 		// to derive stable tab IDs.
-		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_id( 'tabs_' );
+		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_prefixed_id( 'tabs_' );
 		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
 		$context['core/tabs-list'] = $tabs_list;
 		$context['core/tabs-id']   = $tabs_id;
@@ -81,9 +82,15 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$active_tab_index = $attributes['activeTabIndex'] ?? 0;
-	$tabs_list        = $block->context['core/tabs-list'] ?? array();
-	$tabs_id          = $block->context['core/tabs-id'] ?? null;
+	$tabs_list = $block->context['core/tabs-list'] ?? array();
+	$tabs_id   = $block->context['core/tabs-id'] ?? null;
+
+	// A default tab index can be left past the last tab, for example after
+	// the default tab was removed. Fall back to the first tab so that a panel
+	// is still shown.
+	$active_tab_index = isset( $attributes['activeTabIndex'], $tabs_list[ $attributes['activeTabIndex'] ] )
+		? $attributes['activeTabIndex']
+		: 0;
 
 	if ( empty( $tabs_id ) ) {
 		// If malformed tabs, return early to avoid errors.
@@ -104,10 +111,13 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 			)
 		)
 	);
-	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.onTabsInit' );
-	$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
+	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.activateTabByHash' );
+	$tag_processor->set_attribute( 'data-wp-on-window--hashchange', 'callbacks.activateTabByHash' );
 
 	$output = $tag_processor->get_updated_html();
+
+	// Text direction for the arrow keys, as the view script can't use `isRTL()`.
+	wp_interactivity_config( 'core/tabs', array( 'isRTL' => is_rtl() ) );
 
 	/**
 	 * Builds a client side state for just this tabs instance, so each

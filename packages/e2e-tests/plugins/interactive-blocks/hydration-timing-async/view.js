@@ -1,5 +1,5 @@
 /**
- * This module dynamically imports @wordpress/interactivity on DOMContentLoaded.
+ * This module dynamically imports `@wordpress/interactivity` on DOMContentLoaded.
  *
  * This simulates a lazy-loading scenario where the Interactivity API is not
  * statically imported. The test verifies that hydration still occurs even

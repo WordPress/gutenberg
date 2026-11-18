@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { SelectControl } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -23,30 +16,31 @@ export interface MediaEditorCropPanelProps {
 	onAspectRatioChange: ( value: string ) => void;
 	/** Aspect-ratio presets to display in the selector. */
 	aspectRatioOptions: AspectRatioPreset[];
-	/**
-	 * When `true`, render the rotate/flip/zoom image controls at the top of
-	 * the panel. Used on wide viewports where the footer no longer carries
-	 * them.
-	 */
-	showTransformControls?: boolean;
+	/** Disable every control in the panel while the edit is saving. */
+	disabled?: boolean;
 }
 
 /**
- * Sidebar panel for crop controls. Renders the aspect-ratio selector, plus the
- * rotate/flip and zoom controls on wide viewports (these move to the footer
- * toolbar when the sidebar collapses).
+ * Sidebar panel for crop controls: rotate, flip and zoom above the
+ * aspect-ratio selector. Rendered where the panel docks; below that the
+ * transform controls sit under the canvas instead, placed by the editor.
  * @param props
  * @param props.aspectRatioValue
  * @param props.onAspectRatioChange
  * @param props.aspectRatioOptions
- * @param props.showTransformControls
+ * @param props.disabled
  */
 export default function MediaEditorCropPanel( {
 	aspectRatioValue,
 	onAspectRatioChange,
 	aspectRatioOptions,
-	showTransformControls = false,
+	disabled = false,
 }: MediaEditorCropPanelProps ) {
+	const items = aspectRatioOptions.map( ( preset ) => ( {
+		label: preset.label,
+		value: preset.value.toString(),
+	} ) );
+
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -59,16 +53,56 @@ export default function MediaEditorCropPanel( {
 			<VisuallyHidden render={ <h2 /> }>
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
-			{ showTransformControls && <MediaEditorImageControls withLabels /> }
+			<MediaEditorImageControls withLabels disabled={ disabled } />
 			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
-			/>
+				value={
+					items.find( ( item ) => item.value === aspectRatioValue ) ??
+					null
+				}
+				onValueChange={ ( item ) => {
+					if ( item && item.value !== null ) {
+						onAspectRatioChange( item.value );
+					}
+				} }
+				disabled={ disabled }
+				items={ items }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								<span className="media-editor-crop-panel__aspect-ratio-label">
+									{ item.label }
+								</span>
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ items.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+					>
+						<SelectControl.ItemLabel>
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</Stack>
 	);
 }

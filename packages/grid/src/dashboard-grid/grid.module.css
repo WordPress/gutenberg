@@ -82,14 +82,14 @@
  * is replaced.
  */
 @media not (prefers-reduced-motion: reduce) {
-	.drag-preview-frame.dragPreviewFrameExiting {
+	.drag-preview-frame.is-exiting {
 		animation:
 			wp-grid-drag-preview-shadow-exit
 			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
 			forwards;
 	}
 
-	.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
+	.drag-preview-frame.is-exiting .drag-preview-frame__lift {
 		animation:
 			wp-grid-drag-preview-scale-exit
 			var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced)
@@ -117,11 +117,11 @@
 	}
 }
 
-.drag-preview-frame.dragPreviewFrameExiting {
+.drag-preview-frame.is-exiting {
 	box-shadow: var(--_wp-grid-elevation-xs);
 }
 
-.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
+.drag-preview-frame.is-exiting .drag-preview-frame__lift {
 	transform: scale(1);
 }
 
@@ -134,12 +134,12 @@
 		transform: none;
 	}
 
-	.drag-preview-frame.dragPreviewFrameExiting {
+	.drag-preview-frame.is-exiting {
 		box-shadow: var(--_wp-grid-elevation-xs);
 		transition: none;
 	}
 
-	.drag-preview-frame.dragPreviewFrameExiting .drag-preview-frame__lift {
+	.drag-preview-frame.is-exiting .drag-preview-frame__lift {
 		transition: none;
 	}
 }

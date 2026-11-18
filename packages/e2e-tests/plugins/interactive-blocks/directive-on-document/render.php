@@ -26,7 +26,7 @@
 	</div>
 	<div
 		data-wp-on-document--keydown="actions.keydownHandler"
-		data-wp-on-document--keydown--second="actions.keydownSecondHandler"
+		data-wp-on-document--keydown---second="actions.keydownSecondHandler"
 		data-wp-on-document--keydown---third="actions.keydownThirdHandler"
 	>
 		<p data-wp-text="state.keydownHandler" data-testid="keydownHandler">no</p>

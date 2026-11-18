@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
 
 type BoxVariant = 'margin' | 'padding';
@@ -34,7 +31,9 @@ export interface Style {
 		backgroundPosition?: CSSProperties[ 'backgroundPosition' ];
 		backgroundRepeat?: CSSProperties[ 'backgroundRepeat' ];
 		backgroundSize?: CSSProperties[ 'backgroundSize' ];
+		backgroundAttachment?: CSSProperties[ 'backgroundAttachment' ];
 		gradient?: CSSProperties[ 'backgroundImage' ];
+		backgroundClip?: CSSProperties[ 'backgroundClip' ];
 	};
 	border?: {
 		color?: CSSProperties[ 'borderColor' ];
@@ -61,6 +60,13 @@ export interface Style {
 		objectFit?: CSSProperties[ 'objectFit' ];
 		width?: CSSProperties[ 'width' ];
 	};
+	outline?: {
+		color?: CSSProperties[ 'outlineColor' ];
+		offset?: CSSProperties[ 'outlineOffset' ];
+		style?: CSSProperties[ 'outlineStyle' ];
+		width?: CSSProperties[ 'outlineWidth' ];
+	};
+	shadow?: CSSProperties[ 'boxShadow' ];
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
@@ -74,8 +80,10 @@ export interface Style {
 		lineHeight?: CSSProperties[ 'lineHeight' ];
 		textColumns?: CSSProperties[ 'columnCount' ];
 		textDecoration?: CSSProperties[ 'textDecoration' ];
+		textIndent?: CSSProperties[ 'textIndent' ];
 		textShadow?: CSSProperties[ 'textShadow' ];
 		textTransform?: CSSProperties[ 'textTransform' ];
+		textWrap?: CSSProperties[ 'textWrap' ];
 		writingMode?: CSSProperties[ 'writingMode' ];
 	};
 	color?: {

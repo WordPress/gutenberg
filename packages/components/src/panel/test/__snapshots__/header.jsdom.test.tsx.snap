@@ -1,0 +1,9 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PanelHeader > basic rendering > should render PanelHeader with empty div inside 1`] = `
+<div>
+  <div
+    class="components-panel__header"
+  />
+</div>
+`;

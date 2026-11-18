@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, getDate } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Icon, comment, postList } from '@wordpress/icons';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { EmptyState, Link, Stack } from '@wordpress/ui';
@@ -292,7 +289,7 @@ export default function Activity( { attributes }: ActivityProps ) {
 				justify="center"
 				style={ { height: '100%' } }
 			>
-				<Spinner />
+				<WCSpinner />
 			</Stack>
 		);
 	}

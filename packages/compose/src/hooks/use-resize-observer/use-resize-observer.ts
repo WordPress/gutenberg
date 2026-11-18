@@ -1,10 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { useRef } from '@wordpress/element';
-/**
- * Internal dependencies
- */
+import { useEffect, useRef } from '@wordpress/element';
 import useEvent from '../use-event';
 
 // This is the current implementation of `useResizeObserver`.
@@ -18,8 +12,20 @@ export function useResizeObserver< T extends HTMLElement >(
 ): ( element?: T | null ) => void {
 	const callbackEvent = useEvent( callback );
 
-	const observedElementRef = useRef< T | null >( null );
+	const observedElementRef = useRef< T >( null );
 	const resizeObserverRef = useRef< ResizeObserver >( undefined );
+	useEffect( () => {
+		if ( observedElementRef.current ) {
+			resizeObserverRef.current?.observe(
+				observedElementRef.current,
+				resizeObserverOptions
+			);
+		}
+		return () => resizeObserverRef.current?.disconnect();
+		// This effect owns the observer lifecycle. The returned ref handles
+		// element and option changes without recreating the observer.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [] );
 	return useEvent( ( element?: T | null ) => {
 		if ( element === observedElementRef.current ) {
 			return;

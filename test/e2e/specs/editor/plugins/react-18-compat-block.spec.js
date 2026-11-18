@@ -1,12 +1,10 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // This block deliberately exercises legacy React 18 patterns (a bundled React
 // 18 development JSX runtime that produces `Symbol.for( 'react.element' )`
-// elements, a function component relying on `defaultProps`, and the `inert`
-// attribute) while the editor runs on the externalized React 19 runtime.
+// elements, function components relying on `defaultProps` both plain and
+// wrapped in `memo()`, and the `inert` attribute) while the editor runs on the
+// externalized React 19 runtime.
 //
 // It is expected to FAIL until the React 19 compatibility layer can render
 // elements created by an older React runtime and restore `defaultProps`
@@ -49,12 +47,72 @@ test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
 			block.locator( '.react-18-compat-block__greeting' )
 		).toHaveText( 'Hello from defaultProps' );
 
-		// The subtree built with the bundled React 18 runtime renders, keeping
-		// the `inert` attribute on the important element.
-		const inert = block.locator( '.react-18-compat-block__inert' );
-		await expect( inert ).toHaveAttribute( 'inert' );
-		await expect( inert ).toContainText(
-			'This subtree is inert and built with the React 18 runtime.'
+		// `defaultProps` declared on the component inside a `memo()` wrapper
+		// are resolved too, whichever runtime created the element — including
+		// the bundled React 18 one, which never wrote them into the element.
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting' )
+		).toHaveText( 'Hello from memo defaultProps' );
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting-jsx' )
+		).toHaveText( 'Hello from memo defaultProps' );
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting-legacy' )
+		).toHaveText( 'Hello from memo defaultProps' );
+
+		// `inert=''` attribute specified as string is rendered as `true` by a patched React 19 runtime.
+		const inertString = block.locator(
+			'.react-18-compat-block__inert-string'
 		);
+		await expect( inertString ).toHaveAttribute( 'inert' );
+
+		// `inert=true` attribute specified as boolean is rendered as `true`.
+		const inertBoolean = block.locator(
+			'.react-18-compat-block__inert-boolean'
+		);
+		await expect( inertBoolean ).toHaveAttribute( 'inert' );
+	} );
+} );
+
+test.describe( 'React 18 compatibility block (React 18 runtime)', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// React 19 is on by default, so this runtime has to be asked for.
+		await requestUtils.setGutenbergExperiments( {
+			'gutenberg-react-19': false,
+		} );
+		await requestUtils.activatePlugin(
+			'gutenberg-test-react-18-compat-block'
+		);
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-react-18-compat-block'
+		);
+		await requestUtils.setGutenbergExperiments( [] );
+	} );
+
+	test( 'renders a React 19 boolean inert attribute with React 18 runtime', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( { name: 'test/react-18-compat-block' } );
+
+		const block = editor.canvas.locator(
+			'role=document[name="Block: React 18 Compat Block"i]'
+		);
+		await expect( block ).toBeVisible();
+
+		const inertBoolean = block.locator(
+			'.react-18-compat-block__inert-boolean'
+		);
+
+		// This result is bad and should be fixed. The `inert=true` boolean
+		// attribute should be rendered as `true`, but only the React 19 runtime
+		// will do it (see the v19 test above). The React 18 runtime will ignore it.
+		await expect( inertBoolean ).not.toHaveAttribute( 'inert' );
 	} );
 } );

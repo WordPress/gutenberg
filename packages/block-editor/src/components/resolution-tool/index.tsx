@@ -1,0 +1,57 @@
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
+import { __, _x } from '@wordpress/i18n';
+import type { ResolutionOption, ResolutionToolProps } from './types';
+
+const DEFAULT_SIZE_OPTIONS: ResolutionOption[] = [
+	{
+		label: _x( 'Thumbnail', 'Image size option for resolution control' ),
+		value: 'thumbnail',
+	},
+	{
+		label: _x( 'Medium', 'Image size option for resolution control' ),
+		value: 'medium',
+	},
+	{
+		label: _x( 'Large', 'Image size option for resolution control' ),
+		value: 'large',
+	},
+	{
+		label: _x( 'Full Size', 'Image size option for resolution control' ),
+		value: 'full',
+	},
+];
+
+export default function ResolutionTool( {
+	panelId,
+	value,
+	onChange,
+	options = DEFAULT_SIZE_OPTIONS,
+	defaultValue = DEFAULT_SIZE_OPTIONS[ 0 ].value,
+	isShownByDefault = true,
+	resetAllFilter,
+}: ResolutionToolProps ) {
+	const displayValue = value ?? defaultValue;
+	return (
+		<ToolsPanelItem
+			hasValue={ () => displayValue !== defaultValue }
+			label={ __( 'Resolution' ) }
+			onDeselect={ () => onChange( defaultValue ) }
+			isShownByDefault={ isShownByDefault }
+			panelId={ panelId }
+			resetAllFilter={ resetAllFilter }
+		>
+			<SelectControl
+				label={ __( 'Resolution' ) }
+				value={
+					options.find( ( item ) => item.value === displayValue ) ??
+					options.find( ( item ) => ! item.disabled ) ??
+					null
+				}
+				items={ options }
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+				description={ __( 'Select the size of the source image.' ) }
+			/>
+		</ToolsPanelItem>
+	);
+}

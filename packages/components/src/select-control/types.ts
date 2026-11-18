@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { InputBaseProps } from '../input-control/types';
 import type { BaseControlProps } from '../base-control/types';
 
@@ -35,13 +28,6 @@ type SelectControlBaseProps< V extends string > = Pick<
 		 * @ignore
 		 */
 		__next40pxDefaultSize?: boolean;
-		/**
-		 * Do not throw a warning for the deprecated 36px default size.
-		 * For internal components of other components that already throw the warning.
-		 *
-		 * @ignore
-		 */
-		__shouldNotWarnDeprecated36pxSize?: boolean;
 		/**
 		 * An array of option property objects to be rendered,
 		 * each with a `label` and `value` property, as well as any other

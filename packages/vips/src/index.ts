@@ -1,25 +1,23 @@
-/**
- * External dependencies
- */
 import Vips from 'wasm-vips';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsModule from 'wasm-vips/vips.wasm';
-
 // @ts-expect-error - WASM files are inlined as Uint8Array at build time.
 import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,
 	LoadOptions,
 	SaveOptions,
 	ThumbnailOptions,
-} from './types';
-import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
+	ConvertImageOptions,
+	EncodePixelsOptions,
+	ResizeImageOptions,
+} from './types.ts';
+import {
+	supportsAnimation,
+	supportsInterlace,
+	supportsQuality,
+} from './utils.ts';
 
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
@@ -29,6 +27,66 @@ interface EmscriptenModule {
 let cleanup: () => void;
 
 let vipsPromise: Promise< typeof Vips > | undefined;
+
+/**
+ * Bytes of WASM memory a decoded pixel occupies.
+ *
+ * This is RGBA at one byte per channel, nothing more: it does not account for
+ * the working buffers vips allocates while resizing and re-encoding. All of
+ * the safety margin lives in `ANIMATION_MEMORY_BUDGET` being well under the
+ * heap size, so raise that constant rather than assuming slack here.
+ */
+const BYTES_PER_PIXEL = 4;
+
+/**
+ * Memory budget (in bytes) for decoding every frame of an animated image.
+ *
+ * An animation loaded with `[n=-1]` (every frame stacked into one tall image)
+ * costs at most frames * width * pageHeight * 4 bytes, so a long animation of
+ * otherwise modest dimensions can exhaust the heap even though a single frame
+ * is small. wasm-vips 0.0.19 grows its heap up to 2 GiB, but growth can fail
+ * on memory-constrained devices, so ~0.75 GiB leaves headroom for that and
+ * for the resize and re-encode steps.
+ *
+ * The estimate is the fully materialized frame stack, which is an upper bound:
+ * libvips streams the sequential load/resize/save pipeline, so real peak usage
+ * is lower and by how much depends on the operation. The check therefore errs
+ * toward flattening, trading the occasional static sub-size for an animation
+ * that would have fit against never failing an upload outright. See
+ * `logAnimationFallback()` for how that decision is surfaced.
+ */
+const ANIMATION_MEMORY_BUDGET = 0.75 * 1024 * 1024 * 1024;
+
+/**
+ * Warns that an animation was flattened even though it was asked to keep it.
+ *
+ * Silently producing a static sub-size would look like
+ * `wp_generate_animated_image_subsizes` had no effect.
+ * `ANIMATION_MEMORY_BUDGET` is a deliberate over-estimate, so this is also
+ * the signal that tells someone tuning it which uploads it turned away.
+ *
+ * @param frames         Frame count of the source animation.
+ * @param width          Width of a single frame, in pixels.
+ * @param pageHeight     Height of a single frame, in pixels.
+ * @param estimatedBytes Estimated bytes to hold every decoded frame at once.
+ */
+function logAnimationFallback(
+	frames: number,
+	width: number,
+	pageHeight: number,
+	estimatedBytes: number
+): void {
+	const mib = ( bytes: number ) => Math.round( bytes / ( 1024 * 1024 ) );
+
+	// eslint-disable-next-line no-console -- Deliberately log the degradation.
+	console.warn(
+		`[vips] Generating a static sub-size from the first frame: decoding all ${ frames } frames of this ${ width }x${ pageHeight } animation needs up to ${ mib(
+			estimatedBytes
+		) } MiB, over the ${ mib(
+			ANIMATION_MEMORY_BUDGET
+		) } MiB budget for the WASM heap.`
+	);
+}
 
 /**
  * Caches Blob URLs created for inlined WASM binaries.
@@ -140,18 +198,21 @@ export async function cancelOperations( id: ItemId ) {
  * @param buffer     Original file buffer.
  * @param inputType  Input mime type.
  * @param outputType Output mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param options    Conversion options.
  */
 export async function convertImageFormat(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	inputType: string,
 	outputType: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
+	const {
+		quality = 0.82,
+		interlaced = false,
+		stripMeta = true,
+		maxBitdepth = 16,
+	} = options;
 	const ext = outputType.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -160,8 +221,18 @@ export async function convertImageFormat(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof inputType > = {};
 
-		// To ensure all frames are loaded in case the image is animated.
-		if ( supportsAnimation( inputType ) ) {
+		/*
+		 * To ensure all frames are loaded in case the image is animated and
+		 * the output format can represent them. A still output (e.g. a JPEG
+		 * poster for a GIF) only needs the first frame; loading all frames
+		 * would decode them as one vertical strip whose height easily
+		 * exceeds encoder dimension limits for long animations.
+		 * See https://github.com/WordPress/gutenberg/issues/80259.
+		 */
+		if (
+			supportsAnimation( inputType ) &&
+			supportsAnimation( outputType )
+		) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof inputType > ).n = -1;
 		}
@@ -182,8 +253,9 @@ export async function convertImageFormat(
 
 		const saveOptions: SaveOptions< typeof outputType > = {
 			// Strip metadata except ICC color profiles,
-			// matching WordPress core's behavior.
-			keep: 'icc',
+			// matching WordPress core's behavior. The `image_strip_meta`
+			// filter can disable stripping entirely.
+			keep: stripMeta ? 'icc' : 'all',
 		};
 
 		if ( supportsQuality( outputType ) ) {
@@ -194,6 +266,15 @@ export async function convertImageFormat(
 			saveOptions.interlace = interlaced;
 		}
 
+		// Keep indexed sources indexed. libvips decodes a palette image into
+		// RGB(A) pixels, so without this a compressed or converted PNG is
+		// written as truecolour and can grow several times larger than the
+		// indexed original.
+		// See https://core.trac.wordpress.org/ticket/65922.
+		if ( 'image/png' === outputType && isPaletteImage( image ) ) {
+			saveOptions.palette = true;
+		}
+
 		// See https://github.com/swissspidy/media-experiments/issues/324.
 		if ( 'image/avif' === outputType ) {
 			saveOptions.effort = 2;
@@ -202,9 +283,16 @@ export async function convertImageFormat(
 			// images stay high-bit-depth when compressed or converted to AVIF
 			// instead of being flattened to 8-bit. Unlike resizing, this path
 			// keeps the decoded 16-bit image, so no extra handling is needed.
+			// The `image_max_bit_depth` filter can cap the output depth; the
+			// depth is set explicitly whenever the source is high-bit-depth,
+			// since heifsave would otherwise default to 12-bit for 16-bit
+			// pixel data.
 			const sourceBitdepth = getSourceBitdepth( image );
 			if ( sourceBitdepth > 8 ) {
-				saveOptions.bitdepth = sourceBitdepth;
+				saveOptions.bitdepth = resolveSaveBitdepth(
+					sourceBitdepth,
+					maxBitdepth
+				);
 			}
 		}
 
@@ -222,22 +310,55 @@ export async function convertImageFormat(
 /**
  * Compresses an existing image using vips.
  *
- * @param id         Item ID.
- * @param buffer     Original file buffer.
- * @param type       Mime type.
- * @param quality    Desired quality.
- * @param interlaced Whether to use interlaced/progressive mode.
- *                   Only used if the outputType supports it.
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param options Compression options.
  * @return Compressed file data.
  */
 export async function compressImage(
 	id: ItemId,
 	buffer: ArrayBuffer,
 	type: string,
-	quality = 0.82,
-	interlaced = false
+	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	return convertImageFormat( id, buffer, type, type, quality, interlaced );
+	return convertImageFormat( id, buffer, type, type, options );
+}
+
+/**
+ * Works out where a positional crop starts within a resized image.
+ *
+ * The result can be negative when the image is smaller than the crop.
+ *
+ * @param position   Horizontal and vertical crop position.
+ * @param width      Width of the resized image.
+ * @param height     Height of the resized image (of one frame, if animated).
+ * @param cropWidth  Width of the crop.
+ * @param cropHeight Height of the crop.
+ * @return The top-left corner of the crop.
+ */
+function getCropOrigin(
+	position: Exclude< ImageSizeCrop[ 'crop' ], boolean | undefined >,
+	width: number,
+	height: number,
+	cropWidth: number,
+	cropHeight: number
+): { left: number; top: number } {
+	let left = 0;
+	if ( 'center' === position[ 0 ] ) {
+		left = ( width - cropWidth ) / 2;
+	} else if ( 'right' === position[ 0 ] ) {
+		left = width - cropWidth;
+	}
+
+	let top = 0;
+	if ( 'center' === position[ 1 ] ) {
+		top = ( height - cropHeight ) / 2;
+	} else if ( 'bottom' === position[ 1 ] ) {
+		top = height - cropHeight;
+	}
+
+	return { left, top };
 }
 
 /**
@@ -318,19 +439,13 @@ function applyResizeAndCrop<
 
 	const image = createThumbnail( resizeWidth, thumbnailOptions );
 
-	let left = 0;
-	if ( 'center' === target.crop[ 0 ] ) {
-		left = ( image.width - target.width ) / 2;
-	} else if ( 'right' === target.crop[ 0 ] ) {
-		left = image.width - target.width;
-	}
-
-	let top = 0;
-	if ( 'center' === target.crop[ 1 ] ) {
-		top = ( image.height - target.height ) / 2;
-	} else if ( 'bottom' === target.crop[ 1 ] ) {
-		top = image.height - target.height;
-	}
+	let { left, top } = getCropOrigin(
+		target.crop,
+		image.width,
+		image.height,
+		target.width,
+		target.height
+	);
 
 	// Address rounding errors where `left` or `top` become negative integers
 	// and `target.width` / `target.height` are bigger than the actual dimensions.
@@ -383,6 +498,25 @@ function applyResizeAndCrop<
 }
 
 /**
+ * Determines whether a decoded image came from an indexed (palette) source.
+ *
+ * libvips decodes indexed images into full RGB(A) pixels and flags the source
+ * encoding with a `palette` metadata field. Writing such an image back out
+ * without asking for quantisation produces a truecolour PNG, which for
+ * palette-based artwork is typically several times larger than the indexed
+ * original. See https://core.trac.wordpress.org/ticket/65922.
+ *
+ * libvips only attaches the field when the source was indexed, so its presence
+ * is the signal. `getTypeof` reports the GType of a field, or 0 when absent.
+ *
+ * @param image Decoded vips image.
+ * @return Whether the source image used a palette.
+ */
+function isPaletteImage( image: Vips.Image ): boolean {
+	return image.getTypeof( 'palette' ) !== 0;
+}
+
+/**
  * Reads the source bit depth of a decoded HEIF/AVIF image.
  *
  * High-bit-depth (10/12-bit) AVIF/HEIF images decode into a 16-bit `ushort`
@@ -393,9 +527,7 @@ function applyResizeAndCrop<
  * @param image Decoded vips image.
  * @return Source bit depth (typically 8, 10, or 12).
  */
-function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
-	image: T
-): number {
+function getSourceBitdepth( image: Vips.Image ): number {
 	try {
 		const bitdepth = image.getInt( 'heif-bitdepth' );
 		if ( bitdepth > 8 ) {
@@ -408,26 +540,72 @@ function getSourceBitdepth< T extends { getInt: ( name: string ) => number } >(
 }
 
 /**
+ * Resolves the effective AVIF save bit depth from the source depth and the
+ * `image_max_bit_depth` cap, snapping down to the nearest depth supported by
+ * heifsave (8, 10, or 12) since the filter may return any integer.
+ *
+ * @param sourceBitdepth Source bit depth (8, 10, or 12).
+ * @param maxBitdepth    Maximum bit depth from the `image_max_bit_depth` filter.
+ * @return The bit depth to save at.
+ */
+function resolveSaveBitdepth(
+	sourceBitdepth: number,
+	maxBitdepth: number
+): number {
+	const target = Math.min( sourceBitdepth, maxBitdepth );
+	if ( target >= 12 ) {
+		return 12;
+	}
+	if ( target >= 10 ) {
+		return 10;
+	}
+	return 8;
+}
+
+/**
  * Builds save options for writing an image to a buffer.
  *
- * @param type     Output mime type.
- * @param quality  Desired quality (0-1).
- * @param bitdepth Source bit depth; values above 8 are preserved for AVIF.
+ * @param options           Save option inputs.
+ * @param options.type      Output mime type.
+ * @param options.quality   Desired quality (0-1).
+ * @param options.bitdepth  Save bit depth; values above 8 are preserved for
+ *                          AVIF.
+ * @param options.stripMeta Whether to strip metadata (except color
+ *                          profiles), from the `image_strip_meta` filter.
+ * @param options.isPalette Whether the source image was indexed (palette)
+ *                          encoded.
  * @return Save options object.
  */
-function buildSaveOptions(
-	type: string,
-	quality: number,
-	bitdepth = 8
-): SaveOptions< typeof type > {
+function buildSaveOptions( {
+	type,
+	quality,
+	bitdepth = 8,
+	stripMeta = true,
+	isPalette = false,
+}: {
+	type: string;
+	quality: number;
+	bitdepth?: number;
+	stripMeta?: boolean;
+	isPalette?: boolean;
+} ): SaveOptions< string > {
 	const saveOptions: SaveOptions< typeof type > = {
 		// Strip metadata except ICC color profiles or gainmaps,
-		// matching WordPress core's behavior.
-		keep: 'icc|gainmap',
+		// matching WordPress core's behavior. The `image_strip_meta`
+		// filter can disable stripping entirely.
+		keep: stripMeta ? 'icc|gainmap' : 'all',
 	};
 
 	if ( supportsQuality( type ) ) {
 		saveOptions.Q = quality * 100;
+	}
+
+	// Keep indexed sources indexed. libvips decodes a palette PNG into RGB(A)
+	// pixels, so without this the sub-sizes are written as truecolour and can
+	// end up larger than the indexed original.
+	// See https://core.trac.wordpress.org/ticket/65922.
+	if ( 'image/png' === type && isPalette ) {
+		saveOptions.palette = true;
 	}
 
 	// See https://github.com/swissspidy/media-experiments/issues/324.
@@ -506,6 +684,95 @@ function resizeHighBitDepth<
 }
 
 /**
+ * Resizes and crops every frame of an animation to the same rectangle.
+ *
+ * `thumbnail` flattens a multi-frame image to its first frame when it crops,
+ * so the animation is instead scaled to cover the target size, the crop
+ * rectangle is worked out once, and each frame is cut with it.
+ *
+ * @param vips           Vips instance.
+ * @param buffer         Original file buffer.
+ * @param optionString   Load options that keep every frame.
+ * @param resize         Target dimensions and crop mode.
+ * @param originalWidth  Width of the source image.
+ * @param originalHeight Height of one frame of the source image.
+ * @param smartCrop      Whether to use saliency-aware cropping.
+ * @return The resized and cropped animation.
+ */
+function resizeAndCropAnimation(
+	vips: typeof Vips,
+	buffer: ArrayBuffer,
+	optionString: string,
+	resize: ImageSizeCrop,
+	originalWidth: number,
+	originalHeight: number,
+	smartCrop: boolean
+): Vips.Image {
+	const targetWidth = resize.width;
+	const targetHeight =
+		resize.height || ( originalHeight / originalWidth ) * resize.width;
+
+	// Cover the target without upscaling, as `thumbnail` does when cropping.
+	const scale = Math.min(
+		1,
+		Math.max( targetWidth / originalWidth, targetHeight / originalHeight )
+	);
+	const resized = vips.Image.thumbnailBuffer(
+		buffer,
+		Math.ceil( originalWidth * scale ),
+		{
+			option_string: optionString,
+			height: Math.ceil( originalHeight * scale ),
+			size: 'down',
+		}
+	);
+
+	const frameWidth = resized.width;
+	const frameHeight = resized.pageHeight;
+	const cropWidth = Math.min( frameWidth, Math.round( targetWidth ) );
+	const cropHeight = Math.min( frameHeight, Math.round( targetHeight ) );
+
+	let left: number;
+	let top: number;
+	if ( Array.isArray( resize.crop ) ) {
+		( { left, top } = getCropOrigin(
+			resize.crop,
+			frameWidth,
+			frameHeight,
+			cropWidth,
+			cropHeight
+		) );
+	} else if ( smartCrop ) {
+		// Pick the area from the first frame. `smartcrop` reports where it
+		// cut as a negative offset.
+		const firstFrame = resized
+			.crop( 0, 0, frameWidth, frameHeight )
+			.smartcrop( cropWidth, cropHeight, { interesting: 'attention' } );
+		left = -firstFrame.xoffset;
+		top = -firstFrame.yoffset;
+	} else {
+		left = ( frameWidth - cropWidth ) / 2;
+		top = ( frameHeight - cropHeight ) / 2;
+	}
+	left = Math.max( 0, Math.round( left ) );
+	top = Math.max( 0, Math.round( top ) );
+
+	const frames = [];
+	for ( let i = 0; i < resized.height / frameHeight; i++ ) {
+		frames.push(
+			resized.crop( left, i * frameHeight + top, cropWidth, cropHeight )
+		);
+	}
+
+	// `arrayjoin` keeps the first frame's metadata, such as the frame delays
+	// and loop count, but not the new frame height. `setInt` mutates, so
+	// produce a unique copy first.
+	const animation = vips.Image.arrayjoin( frames, { across: 1 } ).copy();
+	animation.setInt( 'page-height', cropHeight );
+	return animation;
+}
+
+/**
  * Resizes an image using vips.
  *
  * UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*`
@@ -513,12 +780,25 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * @param id        Item ID.
- * @param buffer    Original file buffer.
- * @param type      Mime type.
- * @param resize    Resize options.
- * @param smartCrop Whether to use smart cropping (i.e. saliency-aware).
- * @param quality   Desired quality (0-1).
+ * Sub-sizes of animated GIF and WebP images keep every frame when
+ * `preserveAnimation` is set, as it is by default from the
+ * `wp_generate_animated_image_subsizes` filter. Cropped sizes cut every
+ * frame with the same rectangle. Animations whose decoded frames would not
+ * fit the WASM heap flatten to the first frame, so the upload gets a static
+ * sub-size rather than failing.
+ * See https://github.com/WordPress/gutenberg/issues/80383.
+ *
+ * Without `preserveAnimation`, sub-sizes are generated from the first frame
+ * only, matching WordPress core's server-side behavior: both GD and Imagick
+ * flatten animated images when resizing. Re-encoding every frame takes
+ * longer, and can produce sub-sizes larger than the original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
+ *
+ * @param id      Item ID.
+ * @param buffer  Original file buffer.
+ * @param type    Mime type.
+ * @param resize  Resize options.
+ * @param options Additional resize options.
  * @return Processed file data plus the old and new dimensions.
  */
 export async function resizeImage(
@@ -526,8 +806,7 @@ export async function resizeImage(
 	buffer: ArrayBuffer,
 	type: string,
 	resize: ImageSizeCrop,
-	smartCrop = false,
-	quality = 0.82
+	options: ResizeImageOptions = {}
 ): Promise< {
 	buffer: ArrayBuffer | ArrayBufferLike;
 	width: number;
@@ -535,6 +814,13 @@ export async function resizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
+	const {
+		smartCrop = false,
+		quality = 0.82,
+		stripMeta = true,
+		maxBitdepth = 16,
+		preserveAnimation = false,
+	} = options;
 	const ext = type.split( '/' )[ 1 ];
 
 	inProgressOperations.add( id );
@@ -545,9 +831,7 @@ export async function resizeImage(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
 
-		// To ensure all frames are loaded in case the image is animated.
-		// But only if we're not cropping.
-		if ( supportsAnimation( type ) && ! resize.crop ) {
+		if ( preserveAnimation && supportsAnimation( type ) ) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof type > ).n = -1;
 		}
@@ -561,52 +845,148 @@ export async function resizeImage(
 
 		let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
 
+		/*
+		 * Decoding is lazy, so the frame count is known before any pixels are
+		 * materialized. `[n=-1]` stacks every frame into one tall image, which
+		 * for a long animation needs far more memory than the single-frame
+		 * dimensions suggest. Rather than let the resize abort the whole
+		 * upload when that exceeds the WASM heap, fall back to a first-frame
+		 * sub-size, as WordPress core generates.
+		 */
+		let frames = 1;
+		if ( strOptions ) {
+			frames = image.pageHeight > 0 ? image.height / image.pageHeight : 1;
+			const estimatedBytes =
+				image.width * image.pageHeight * frames * BYTES_PER_PIXEL;
+			if ( estimatedBytes > ANIMATION_MEMORY_BUDGET ) {
+				logAnimationFallback(
+					frames,
+					image.width,
+					image.pageHeight,
+					estimatedBytes
+				);
+				strOptions = '';
+				frames = 1;
+				image = vips.Image.newFromBuffer( buffer, strOptions, {} );
+			}
+		}
+
 		image.onProgress = onProgress;
 
 		const { width, pageHeight } = image;
 
 		// Detect high-bit-depth (10/12-bit) AVIF sources. `thumbnail` would
 		// flatten these to 8-bit sRGB, so they are resized directly from the
-		// decoded 16-bit image, which keeps full precision. Animated images
-		// keep the streaming `thumbnail` path (multi-page resize/crop is not
-		// handled here, and HDR is a still-image concern).
+		// decoded 16-bit image, which keeps full precision.
 		const sourceBitdepth =
-			'image/avif' === type && ! strOptions
-				? getSourceBitdepth( image )
+			'image/avif' === type ? getSourceBitdepth( image ) : 8;
+		// The `image_max_bit_depth` filter can cap the output depth. When the
+		// cap flattens the image to 8-bit anyway, the regular colour-managed
+		// `thumbnail` path is used, matching standard-depth sources.
+		const saveBitdepth =
+			sourceBitdepth > 8
+				? resolveSaveBitdepth( sourceBitdepth, maxBitdepth )
 				: 8;
-		const isHighBitDepth = sourceBitdepth > 8;
+		const isHighBitDepth = saveBitdepth > 8;
 		const sourceImage = image;
 
-		image = applyResizeAndCrop(
-			resize,
-			width,
-			pageHeight,
-			smartCrop,
-			( resizeWidth, thumbnailOptions ) => {
-				if ( isHighBitDepth ) {
-					const resized = resizeHighBitDepth(
-						sourceImage,
+		if ( frames > 1 && resize.crop ) {
+			image = resizeAndCropAnimation(
+				vips,
+				buffer,
+				strOptions,
+				resize,
+				width,
+				pageHeight,
+				smartCrop
+			);
+			image.onProgress = onProgress;
+		} else {
+			image = applyResizeAndCrop(
+				resize,
+				width,
+				pageHeight,
+				smartCrop,
+				( resizeWidth, thumbnailOptions ) => {
+					if ( isHighBitDepth ) {
+						const resized = resizeHighBitDepth(
+							sourceImage,
+							resizeWidth,
+							thumbnailOptions
+						);
+						resized.onProgress = onProgress;
+						return resized;
+					}
+					if ( strOptions ) {
+						thumbnailOptions.option_string = strOptions;
+					}
+					const thumb = vips.Image.thumbnailBuffer(
+						buffer,
 						resizeWidth,
 						thumbnailOptions
 					);
-					resized.onProgress = onProgress;
-					return resized;
+					thumb.onProgress = onProgress;
+					return thumb;
 				}
-				if ( strOptions ) {
-					thumbnailOptions.option_string = strOptions;
-				}
-				const thumb = vips.Image.thumbnailBuffer(
-					buffer,
-					resizeWidth,
-					thumbnailOptions
-				);
-				thumb.onProgress = onProgress;
-				return thumb;
-			}
-		);
+			);
+		}
 
-		const saveOptions = buildSaveOptions( type, quality, sourceBitdepth );
-		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		const saveOptions = buildSaveOptions( {
+			type,
+			quality,
+			bitdepth: saveBitdepth,
+			stripMeta,
+			isPalette: isPaletteImage( sourceImage ),
+		} );
+
+		/*
+		 * When writing an animated GIF, tune gifsave for speed and size:
+		 * per-frame palette quantization dominates the re-encode cost, and
+		 * the defaults can produce sub-sizes larger than the original file.
+		 * Nearly all of that win comes from the lower effort, which is
+		 * roughly 7x faster with no visible quality difference at sub-size
+		 * dimensions. Rendering near-identical pixels as transparent adds a
+		 * couple of percent off the file size for a negligible further loss.
+		 *
+		 * `interpalette_maxerror` is deliberately left at the libvips default
+		 * (3). Raising it to reuse the previous frame's palette more often
+		 * only pays off when successive palettes are already close; on an
+		 * animation whose colours genuinely shift, frames reuse a palette
+		 * that no longer fits and have to be dithered harder to compensate.
+		 * Measured on a 48-frame colour-cycling GIF resized to 300px, a value
+		 * of 16 was ~50% slower and more than doubled the mean per-pixel
+		 * colour error against the default, to save 1.7% of the file size.
+		 *
+		 * This is keyed off the frame count rather than the option: the
+		 * inter-frame tolerance means nothing for a single frame, so a static
+		 * GIF would only pay the lower effort in worse compression.
+		 * See https://github.com/WordPress/gutenberg/issues/80266.
+		 */
+		if ( frames > 1 && 'image/gif' === type ) {
+			saveOptions.effort = 2;
+			saveOptions.interframe_maxerror = 8;
+		}
+
+		let outBuffer;
+		try {
+			outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+		} catch ( error ) {
+			// A frame that fails to decode only surfaces here, when the
+			// pipeline runs. Fall back to a first-frame sub-size, as for
+			// animations over the memory budget.
+			if ( ! strOptions || ! inProgressOperations.has( id ) ) {
+				throw error;
+			}
+			// eslint-disable-next-line no-console -- Deliberately log the degradation.
+			console.warn(
+				'[vips] Generating a static sub-size from the first frame: a later frame of this animation could not be decoded.',
+				error
+			);
+			return resizeImage( id, buffer, type, resize, {
+				...options,
+				preserveAnimation: false,
+			} );
+		}
 
 		const result = {
 			buffer: outBuffer.buffer,
@@ -738,6 +1118,10 @@ export async function rotateImage(
 			}
 		};
 
+		// Read this off the source, before the transforms below replace
+		// `image` with their result.
+		const isPalette = isPaletteImage( image );
+
 		// Apply transformation based on EXIF orientation.
 		// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
 		switch ( orientation ) {
@@ -784,6 +1168,15 @@ export async function rotateImage(
 		image.remove( 'orientation' );
 
 		const saveOptions: SaveOptions< typeof type > = {};
+
+		// Keep indexed sources indexed, as the resize and convert paths do.
+		// Rotating writes the full-size file, so losing the palette here
+		// inflates the image the user actually uploaded.
+		// See https://github.com/WordPress/gutenberg/issues/81895.
+		if ( 'image/png' === type && isPalette ) {
+			saveOptions.palette = true;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 
 		const result = {
@@ -839,6 +1232,102 @@ export async function hasTransparency(
 	return minAlpha < opaqueValue;
 }
 
+/**
+ * Encodes raw RGBA pixels as a JPEG, optionally carrying over the EXIF block
+ * from the file the pixels were decoded from.
+ *
+ * This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the
+ * browser decodes HEIC to pixels with its platform codecs, and a canvas
+ * re-encode would drop all metadata. libvips reads the source's EXIF from the
+ * container header alone, so no HEVC decoding is needed here either.
+ *
+ * @param id      Item ID.
+ * @param pixels  Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+ * @param width   Image width in pixels.
+ * @param height  Image height in pixels.
+ * @param options Encoding options.
+ * @return JPEG file data.
+ */
+export async function encodePixelsAsJpeg(
+	id: ItemId,
+	pixels: ArrayBuffer,
+	width: number,
+	height: number,
+	options: EncodePixelsOptions = {}
+): Promise< ArrayBuffer | ArrayBufferLike > {
+	const { quality = 0.82, metadataSource } = options;
+
+	inProgressOperations.add( id );
+
+	try {
+		const vips = await getVips();
+
+		// JPEG has no alpha channel and decoded photo pixels are opaque, so
+		// the alpha band is dropped rather than flattened.
+		const image = vips.Image.newFromMemory(
+			new Uint8Array( pixels ),
+			width,
+			height,
+			4,
+			vips.BandFormat.uchar
+		)
+			.extractBand( 0, { n: 3 } )
+			.copy( { interpretation: vips.Interpretation.srgb } );
+
+		image.onProgress = () => {
+			if ( ! inProgressOperations.has( id ) ) {
+				image.kill = true;
+			}
+		};
+
+		if ( metadataSource ) {
+			copyExif( vips, metadataSource, image );
+		}
+
+		const outBuffer = image.jpegsaveBuffer( {
+			Q: quality * 100,
+			// The source metadata was copied in deliberately; keep it.
+			keep: 'all',
+		} );
+		const result = outBuffer.buffer;
+
+		cleanup?.();
+
+		return result;
+	} finally {
+		inProgressOperations.delete( id );
+	}
+}
+
+/**
+ * Copies the EXIF block of an image file onto a decoded image, resetting the
+ * orientation to 1 as the destination pixels are already upright.
+ *
+ * Only the source header is read, so this works for formats libvips can parse
+ * but not decode (HEIC with HEVC tiles). A source without EXIF, or one libvips
+ * cannot parse, leaves the destination untouched.
+ *
+ * @param vips   The vips instance.
+ * @param source Raw bytes of the source image file.
+ * @param image  Decoded image to receive the EXIF block.
+ */
+function copyExif(
+	vips: typeof Vips,
+	source: ArrayBuffer,
+	image: Vips.Image
+): void {
+	try {
+		// `unlimited` lifts libheif's item-count limits, which the many tiles
+		// and auxiliary items of a phone HEIC exceed. Only the header is
+		// parsed here, so the decode-time guard it disables does not apply.
+		const sourceImage = vips.Image.newFromBuffer( source, '[unlimited]' );
+		image.setBlob( 'exif-data', sourceImage.getBlob( 'exif-data' ) );
+		image.setInt( 'orientation', 1 );
+	} catch {
+		// Best effort: the JPEG is still valid without metadata.
+	}
+}
+
 // Re-export with vips prefix for worker module compatibility.
 // The worker loader expects these prefixed names.
 export {
@@ -848,5 +1337,6 @@ export {
 	rotateImage as vipsRotateImage,
 	hasTransparency as vipsHasTransparency,
 	getUltraHdrInfo as vipsGetUltraHdrInfo,
+	encodePixelsAsJpeg as vipsEncodePixelsAsJpeg,
 	cancelOperations as vipsCancelOperations,
 };
