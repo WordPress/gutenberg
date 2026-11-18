@@ -21,6 +21,8 @@ See installing instructions also in [Storybook](https://wordpress.github.io/gute
 
 ### Claude Code
 
+See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
+
 ```bash
 claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
 ```
@@ -34,6 +36,8 @@ codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-a
 ```
 
 ### Cursor
+
+See the [Cursor MCP documentation](https://cursor.com/docs/mcp).
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
 
