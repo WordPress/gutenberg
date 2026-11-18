@@ -83,6 +83,14 @@
 		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
+	// Core gives meta box lists room to drop into while dragging, but its
+	// selectors only match the classic editor's markup. Without it, an empty
+	// list has no height and can't receive a meta box, and a list only accepts
+	// a drop directly over one of its boxes.
+	.is-dragging-metaboxes & .meta-box-sortables {
+		padding-bottom: $grid-unit-60;
+	}
+
 	// Hide disabled meta boxes using CSS so that we don't interfere with plugins
 	// that modify `element.style.display` on the meta box.
 	.is-hidden {
