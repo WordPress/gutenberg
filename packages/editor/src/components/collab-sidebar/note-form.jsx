@@ -35,8 +35,8 @@ const NOTE_COMPLETERS = [ noteMentionCompleter ];
 export function NoteForm( {
 	onSubmit,
 	onCancel,
-	onChange,
-	note,
+	onChange = undefined,
+	note = undefined,
 	labels,
 	initialValue = note?.content?.raw ?? '',
 } ) {

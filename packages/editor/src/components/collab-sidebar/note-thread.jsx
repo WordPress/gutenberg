@@ -79,6 +79,34 @@ function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 	);
 }
 
+/**
+ * A single note thread: the root note, its replies and the reply form.
+ *
+ * A thread normally anchors to a block, and a root note without one means the
+ * block was deleted - which the thread says so nobody wonders where their
+ * feedback went. Surfaces that anchor to something other than a block pass
+ * `anchorLabel` instead: the note is not orphaned there, it just points at
+ * something the block editor does not own, such as a Style Book example.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.note                    The root note.
+ * @param {Function} [props.focusThreadOrAdjacent] Moves focus after a resolve
+ *                                                 or delete.
+ * @param {boolean}  props.isSelected              Whether the thread is expanded.
+ * @param {boolean}  [props.expandReplies]         Whether to show every reply.
+ * @param {Object}   props.sidebarRef              Ref to the scroll container.
+ * @param {Object}   [props.floating]              Floating board placement, when floating.
+ * @param {Function} props.onKeyDown               Keyboard navigation handler.
+ * @param {string}   [props.anchorLabel]           What the note points at, when
+ *                                                 it is not a block.
+ * @param {Object}   [props.actions]               Overrides for the
+ *                                                 `useNoteActions()` handlers,
+ *                                                 for notes not stored on the
+ *                                                 edited post.
+ * @param {Function} [props.onSelect]              Called when the thread is selected.
+ * @param {Function} [props.onDeselect]            Called when the thread is deselected.
+ * @return {React.JSX.Element} The thread.
+ */
 export function NoteThread( {
 	note,
 	focusThreadOrAdjacent,
@@ -87,9 +115,17 @@ export function NoteThread( {
 	sidebarRef,
 	floating,
 	onKeyDown,
+	anchorLabel,
+	actions,
+	onSelect,
+	onDeselect,
 } ) {
 	const isFloating = !! floating;
-	const { onCreate, onEdit, onDiscard, onDelete } = useNoteActions();
+	const defaultActions = useNoteActions();
+	const { onCreate, onEdit, onDiscard, onDelete } = {
+		...defaultActions,
+		...actions,
+	};
 	const { selectBlock, toggleBlockHighlight } =
 		useDispatch( blockEditorStore );
 	const drafts = useContext( NoteDraftsContext );
@@ -206,11 +242,13 @@ export function NoteThread( {
 
 		pickNote( note.id, note.blockClientId );
 		focusNoteThread( note.id, sidebarRef.current );
+		onSelect?.();
 	}
 
 	function onDeselectNote() {
 		selectNote( undefined );
 		setBlockHighlight( false );
+		onDeselect?.();
 	}
 
 	function handleResolve() {
@@ -219,7 +257,7 @@ export function NoteThread( {
 		if ( isFloating ) {
 			relatedBlockElement?.focus();
 		} else {
-			focusThreadOrAdjacent( note, { ...note, status: 'approved' } );
+			focusThreadOrAdjacent?.( note, { ...note, status: 'approved' } );
 		}
 	}
 
@@ -237,7 +275,7 @@ export function NoteThread( {
 			return;
 		}
 
-		focusThreadOrAdjacent( note, null );
+		focusThreadOrAdjacent?.( note, null );
 	}
 
 	const allReplies = note?.reply || [];
@@ -255,17 +293,27 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
+	let ariaLabel;
+	if ( anchorLabel ) {
+		ariaLabel = sprintf(
+			// translators: %1$s: what the note is about, e.g. "Button". %2$s: note excerpt.
+			__( 'Note on %1$s: %2$s' ),
+			anchorLabel,
+			noteExcerpt
+		);
+	} else if ( note.blockClientId ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note: %s' ),
+			noteExcerpt
+		);
+	} else {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Original block deleted. Note: %s' ),
+			noteExcerpt
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -324,7 +372,7 @@ export function NoteThread( {
 			>
 				{ __( 'Add new reply' ) }
 			</Button>
-			{ ! note.blockClientId && (
+			{ ! note.blockClientId && ! anchorLabel && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
 				</p>
@@ -396,7 +444,7 @@ export function NoteThread( {
 						// Prevent the parent onClick from being triggered.
 						event.stopPropagation();
 						onDeselectNote();
-						focusThreadOrAdjacent( note, note );
+						focusThreadOrAdjacent?.( note, note );
 					} }
 				/>
 			) }
