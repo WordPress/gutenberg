@@ -330,6 +330,12 @@ function getListViewClientIdsTreeUnmemoized(
 		state,
 		rootClientId,
 		( _state, clientId ) => {
+			// A block can ask for its row to be left out, with its inner
+			// blocks listed in its place.
+			if ( _state.listViewSkippedRows.has( clientId ) ) {
+				return false;
+			}
+
 			// Non-disabled blocks are always shown in List view.
 			if ( getBlockEditingMode( _state, clientId ) !== 'disabled' ) {
 				return true;
@@ -394,7 +400,23 @@ export const getEnabledClientIdsTree = createSelector(
 );
 
 /**
+ * Returns whether List View leaves a block's own row out, listing its inner
+ * blocks in its place.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block's row is left out.
+ */
+export function isListViewRowSkipped( state: State, clientId: string ) {
+	return state.listViewSkippedRows.has( clientId );
+}
+
+/**
  * Returns the block tree displayed by List View.
+ *
+ * Blocks whose row is skipped (see `setListViewRowSkipped`) are left out,
+ * with their inner blocks listed in their place.
  *
  * Blocks with a 'disabled' editing mode are usually not included. When a
  * content-only section is being edited, List View keeps visible outside-section
@@ -415,6 +437,7 @@ export const getListViewClientIdsTree = createSelector(
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
 		state.editedContentOnlySection,
+		state.listViewSkippedRows,
 		// The state below is only read to resolve a block's parent section,
 		// which the tree does only while a content-only section is being
 		// edited. Depending on it otherwise rebuilds the tree on every

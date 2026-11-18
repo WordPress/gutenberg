@@ -16,7 +16,12 @@ import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { applyPlainTextEdit, getPlainText } from '../../utils/plain-text-edit';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
-import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
+import { useLinkPreview } from '../../utils/link-picker';
+import {
+	useIsInPageListNavigation,
+	removePageSuggestions,
+	getLinkSuggestionsQuery,
+} from './use-is-in-page-list-navigation';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import ViewLinkButton from '../../utils/view-link-button';
 import { unlock } from '../../lock-unlock';
@@ -74,6 +79,9 @@ export function Controls( {
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	// A Page List in the Navigation manages its pages, so links here can't
+	// point to a page.
+	const excludePages = useIsInPageListNavigation( clientId );
 
 	// Use the entity binding hook for UI state (help text, link preview, etc.)
 	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
@@ -181,10 +189,14 @@ export function Controls( {
 						<LinkPicker
 							preview={ preview }
 							onSelect={ handleLinkChange }
-							suggestionsQuery={ getSuggestionsQuery(
+							suggestionsQuery={ getLinkSuggestionsQuery(
 								attributes.type,
-								attributes.kind
+								attributes.kind,
+								excludePages
 							) }
+							transformSuggestions={
+								excludePages ? removePageSuggestions : undefined
+							}
 							label={ __( 'Link to' ) }
 							help={ helpText ? helpText : undefined }
 						/>

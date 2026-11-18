@@ -1,6 +1,4 @@
 import { createBlock } from '@wordpress/blocks';
-import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { buildNavigationLinkEntityBinding } from '../navigation-link/shared';
 
 /**
@@ -116,21 +114,7 @@ export function convertToNavigationLinks( pages = [], parentPageID = null ) {
 	return navigationLinks;
 }
 
-export function useConvertToNavigationLinks( {
-	clientId,
-	pages,
-	parentClientId,
-	parentPageID,
-} ) {
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
-
-	return () => {
-		const navigationLinks = convertToNavigationLinks( pages, parentPageID );
-
-		// Replace the Page List block with the Navigation Links.
-		replaceBlock( clientId, navigationLinks );
-
-		// Select the Navigation block to reveal the changes.
-		selectBlock( parentClientId );
-	};
-}
+export {
+	convertPageListBlocksToLinks,
+	useConvertToNavigationLinks,
+} from './use-detach-page-list';

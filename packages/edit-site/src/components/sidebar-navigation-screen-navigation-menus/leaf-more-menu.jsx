@@ -3,7 +3,12 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	useSettings,
+} from '@wordpress/block-editor';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -17,8 +22,15 @@ export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
-		useDispatch( blockEditorStore );
+	const {
+		moveBlocksDown,
+		moveBlocksUp,
+		removeBlocks,
+		updateBlockAttributes,
+	} = useDispatch( blockEditorStore );
+	const [ allowVisibilityEditing ] = useSettings(
+		'blockVisibility.allowEditing'
+	);
 
 	const removeLabel = sprintf(
 		/* translators: %s: block name */
@@ -32,19 +44,45 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, blockName, attributes } = useSelect(
+	const { rootClientId, blockName, attributes, isEditable } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				getBlockName,
+				getBlockAttributes,
+				getBlockEditingMode,
+			} = select( blockEditorStore );
 
 			return {
 				rootClientId: getBlockRootClientId( clientId ),
 				blockName: getBlockName( clientId ),
 				attributes: getBlockAttributes( clientId ),
+				isEditable:
+					// The screen locks its blocks to their content.
+					getBlockEditingMode( clientId ) !== 'disabled',
 			};
 		},
 		[ clientId ]
 	);
+
+	// A Page List lists every page, so its pages can't be removed. They're
+	// hidden with the toggle on their List View row.
+	const isPage = blockName === 'core/page-list-item';
+	const canHide =
+		allowVisibilityEditing !== false &&
+		isEditable &&
+		!! blockName &&
+		hasBlockSupport( blockName, 'visibility', true );
+	const isHidden = attributes?.metadata?.blockVisibility === false;
+	const toggleHidden = () => {
+		const { blockVisibility, ...otherMetadata } =
+			attributes?.metadata ?? {};
+		updateBlockAttributes( clientId, {
+			metadata: isHidden
+				? otherMetadata
+				: { ...otherMetadata, blockVisibility: false },
+		} );
+	};
 
 	const onGoToPage = useCallback( () => {
 		if (
@@ -97,27 +135,40 @@ export default function LeafMoreMenu( props ) {
 						>
 							{ __( 'Move down' ) }
 						</MenuItem>
-						{ attributes?.type === 'page' && attributes?.id && (
+						{ ( attributes?.type === 'page' || isPage ) &&
+							attributes?.id && (
+								<MenuItem
+									onClick={ () => {
+										onGoToPage();
+										onClose();
+									} }
+								>
+									{ goToLabel }
+								</MenuItem>
+							) }
+					</MenuGroup>
+					{ ! isPage && (
+						<MenuGroup>
+							{ canHide && (
+								<MenuItem
+									onClick={ () => {
+										toggleHidden();
+										onClose();
+									} }
+								>
+									{ isHidden ? __( 'Show' ) : __( 'Hide' ) }
+								</MenuItem>
+							) }
 							<MenuItem
 								onClick={ () => {
-									onGoToPage();
+									removeBlocks( [ clientId ], false );
 									onClose();
 								} }
 							>
-								{ goToLabel }
+								{ removeLabel }
 							</MenuItem>
-						) }
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
+						</MenuGroup>
+					) }
 				</>
 			) }
 		</DropdownMenu>

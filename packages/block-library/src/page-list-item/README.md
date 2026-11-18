@@ -13,6 +13,9 @@ Displays a page inside a list of all pages.
 
 **[Parent](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#parent) blocks (direct):**
 - [`core/page-list`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
+- [`core/page-list-item`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
+- [`core/navigation`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
+- [`core/navigation-submenu`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
 
 ## Attributes
 

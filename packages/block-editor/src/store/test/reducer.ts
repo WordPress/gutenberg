@@ -43,6 +43,7 @@ import {
 	expandedBlock,
 	zoomLevel,
 	editedContentOnlySection,
+	listViewSkippedRows,
 	withDerivedBlockEditingModes,
 	viewportModalClientIds,
 	selectedBlockStyleState,
@@ -6949,5 +6950,34 @@ describe( 'state', () => {
 			} );
 			expect( state ).toBe( currentState );
 		} );
+	} );
+} );
+
+describe( 'listViewSkippedRows', () => {
+	it( 'adds and removes skipped rows', () => {
+		const skipped = listViewSkippedRows( undefined, {
+			type: 'SET_LIST_VIEW_ROW_SKIPPED',
+			clientId: 'a',
+			isSkipped: true,
+		} );
+		expect( [ ...skipped ] ).toEqual( [ 'a' ] );
+
+		const restored = listViewSkippedRows( skipped, {
+			type: 'SET_LIST_VIEW_ROW_SKIPPED',
+			clientId: 'a',
+			isSkipped: false,
+		} );
+		expect( [ ...restored ] ).toEqual( [] );
+	} );
+
+	it( 'keeps the same state when nothing changes', () => {
+		const skipped = new Set( [ 'a' ] );
+		expect(
+			listViewSkippedRows( skipped, {
+				type: 'SET_LIST_VIEW_ROW_SKIPPED',
+				clientId: 'a',
+				isSkipped: true,
+			} )
+		).toBe( skipped );
 	} );
 } );

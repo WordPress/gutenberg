@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
+import { useIsPagesOnlyMenu } from '../use-is-pages-only-menu';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -73,8 +74,14 @@ export default function NavigationInnerBlocks( {
 	// As an exception to other blocks which feature nesting, the appender stays
 	// visible even when a child block (or a submenu item) is selected.
 	// See https://github.com/WordPress/gutenberg/issues/37572.
+	// A pages menu lists only its pages: nothing can be added to it, until
+	// it's switched to an advanced menu.
+	const isPagesOnly = useIsPagesOnlyMenu( clientId );
+
 	let renderAppender = false;
-	if ( isSelected && ! hasMenuItems ) {
+	if ( isPagesOnly ) {
+		renderAppender = false;
+	} else if ( isSelected && ! hasMenuItems ) {
 		renderAppender = InnerBlocks.ButtonBlockAppender;
 	} else if ( parentOrChildHasSelection || hasSelectedDescendant ) {
 		renderAppender = InnerBlocks.DefaultBlockAppender;
@@ -92,7 +99,7 @@ export default function NavigationInnerBlocks( {
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
 			orientation,
-			templateLock,
+			templateLock: isPagesOnly ? 'insert' : templateLock,
 			renderAppender,
 			placeholder: showPlaceholder ? placeholder : undefined,
 			__experimentalCaptureToolbars: true,

@@ -11,7 +11,12 @@ import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
+const {
+	NavigationLinkUI,
+	AdvancedMenuControl,
+	useIsPagesOnlyMenu,
+	NAVIGATION_VISIBILITY_TOGGLE_BLOCKS,
+} = unlock( blockLibraryPrivateApis );
 
 // The sidebar's link search lists only these blocks, which work as menu items
 // without editing them from the sidebar, which is not available yet. The other
@@ -92,6 +97,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const isPagesOnly = useIsPagesOnlyMenu( rootClientId );
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -107,12 +113,16 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					rootClientId={ listViewRootClientId }
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender
+					showAppender={ ! isPagesOnly }
 					additionalBlockContent={ SidebarNavigationLinkUI }
 					showContentPopover
 					isExpanded
+					visibilityToggleBlockNames={
+						NAVIGATION_VISIBILITY_TOGGLE_BLOCKS
+					}
 				/>
 			) }
+			{ ! isLoading && <AdvancedMenuControl clientId={ rootClientId } /> }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
 				<BlockList />
 			</div>

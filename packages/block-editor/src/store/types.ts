@@ -595,6 +595,7 @@ export interface State {
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
 	editedContentOnlySection: string | undefined;
+	listViewSkippedRows: Set< string >;
 	blockVisibility: Record< string, boolean >;
 	viewportModalClientIds: string[] | null;
 	styleOverrides: Map< unknown, StyleOverride >;
@@ -630,6 +631,11 @@ export type Action =
 	| { type: 'DO_NOTHING' }
 	| ( { type: 'DISPLAY_BLOCK_REMOVAL_PROMPT' } & RemovalPromptData )
 	| { type: 'EDIT_CONTENT_ONLY_SECTION'; clientId: string | undefined }
+	| {
+			type: 'SET_LIST_VIEW_ROW_SKIPPED';
+			clientId: string;
+			isSkipped: boolean;
+	  }
 	| { type: 'HIDE_BLOCK_INTERFACE' }
 	| { type: 'HIDE_INSERTION_POINT' }
 	| { type: 'HIDE_VIEWPORT_MODAL' }

@@ -2,6 +2,7 @@ import type {
 	LinkControlValue,
 	LinkPreviewBadge,
 	LinkSuggestionsQuery,
+	TransformSuggestions,
 } from '../link-control/types';
 
 /**
@@ -41,6 +42,10 @@ export interface LinkPickerProps {
 	preview: LinkPickerPreview;
 	onSelect: ( suggestion: LinkPickerSuggestion ) => void;
 	suggestionsQuery?: LinkSuggestionsQuery;
+	/**
+	 * Changes the suggestions before they're shown, such as to leave some out.
+	 */
+	transformSuggestions?: TransformSuggestions;
 	label?: string;
 	help?: string;
 }

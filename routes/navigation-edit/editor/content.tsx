@@ -39,9 +39,12 @@ export default function NavigationMenuContent( {
 	// `undefined` (and crashing the screen). This component only renders once
 	// `useEditorAssets` reports the assets ready, which is exactly when the
 	// global is defined — do not "clean this up" into an import.
-	const { NavigationLinkUI } = unlock(
-		( window as any ).wp.blockLibrary.privateApis
-	);
+	const {
+		NavigationLinkUI,
+		AdvancedMenuControl,
+		useIsPagesOnlyMenu,
+		NAVIGATION_VISIBILITY_TOGGLE_BLOCKS,
+	} = unlock( ( window as any ).wp.blockLibrary.privateApis );
 
 	const { listViewRootClientId, isLoading, hasChildren } = useSelect(
 		( select ) => {
@@ -84,6 +87,8 @@ export default function NavigationMenuContent( {
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	// A pages menu lists only pages, until it's switched to an advanced menu.
+	const isPagesOnly: boolean = useIsPagesOnlyMenu( rootClientId );
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -99,12 +104,16 @@ export default function NavigationMenuContent( {
 					rootClientId={ listViewRootClientId }
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
-					showAppender
+					showAppender={ ! isPagesOnly }
 					additionalBlockContent={ NavigationLinkUI }
 					showContentPopover
 					isExpanded
+					visibilityToggleBlockNames={
+						NAVIGATION_VISIBILITY_TOGGLE_BLOCKS
+					}
 				/>
 			) }
+			{ ! isLoading && <AdvancedMenuControl clientId={ rootClientId } /> }
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>

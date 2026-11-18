@@ -849,6 +849,7 @@ describe( 'private selectors', () => {
 				},
 				blockListSettings: new Map(),
 				editedContentOnlySection: 'edited-pattern',
+				listViewSkippedRows: new Set(),
 				derivedBlockEditingModes: new Map( [
 					[ 'header', 'disabled' ],
 					[ 'other-pattern', 'disabled' ],
@@ -1205,6 +1206,27 @@ describe( 'private selectors', () => {
 						{ clientId: 'other-structure', innerBlocks: [] },
 					],
 				},
+			] );
+		} );
+
+		it( 'lists the inner blocks of a block whose row is skipped in its place', () => {
+			const state = partial< State >( {
+				...createBaseState(),
+				editedContentOnlySection: undefined,
+				derivedBlockEditingModes: new Map(),
+				listViewSkippedRows: new Set( [ 'other-pattern' ] ),
+			} );
+
+			expect( getListViewClientIdsTree( state ) ).toEqual( [
+				{ clientId: 'header', innerBlocks: [] },
+				{
+					clientId: 'edited-pattern',
+					innerBlocks: [
+						{ clientId: 'edited-content', innerBlocks: [] },
+					],
+				},
+				{ clientId: 'other-content', innerBlocks: [] },
+				{ clientId: 'other-structure', innerBlocks: [] },
 			] );
 		} );
 

@@ -2161,6 +2161,34 @@ export function lastBlockInserted(
 }
 
 /**
+ * Reducer returning the blocks whose own row List View leaves out, listing
+ * their inner blocks in its place.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function listViewSkippedRows(
+	state: State[ 'listViewSkippedRows' ] = new Set(),
+	action: Action
+) {
+	if ( action.type !== 'SET_LIST_VIEW_ROW_SKIPPED' ) {
+		return state;
+	}
+	if ( state.has( action.clientId ) === action.isSkipped ) {
+		return state;
+	}
+	const newState = new Set( state );
+	if ( action.isSkipped ) {
+		newState.add( action.clientId );
+	} else {
+		newState.delete( action.clientId );
+	}
+	return newState;
+}
+
+/**
  * Reducer returning the contentOnly block that is being edited.
  *
  * @param state  Current state.
@@ -2612,6 +2640,7 @@ const combinedReducers = combineReducers( {
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,
+	listViewSkippedRows,
 	blockVisibility,
 	viewportModalClientIds,
 	styleOverrides,

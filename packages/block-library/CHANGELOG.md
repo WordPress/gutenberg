@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Page List: In a Navigation block, its pages are listed and moved like the block's other items, and shown or hidden with a toggle, without converting the list to links. Moving a page changes the pages' order. Hidden pages are saved in a new `excludedPageIDs` attribute and left out with their child pages. A menu whose only item is a Page List lists only pages: to add other items, it's switched to an advanced menu, which turns the pages into links. Navigation Menus get an `auto_add_pages` setting, turned on by that switch, that adds new pages to the menu when they're published. While a Navigation block has a Page List, its other links can't link to pages ([#86525](https://github.com/WordPress/gutenberg/pull/86525)).
+
 ### Enhancements
 
 -   Search: Use the UI SelectControl for the Button position and HTML element settings ([#86617](https://github.com/WordPress/gutenberg/pull/86617)).

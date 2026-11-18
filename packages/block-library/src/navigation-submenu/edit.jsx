@@ -43,6 +43,8 @@ const ALLOWED_BLOCKS = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/page-list',
+	// Only to be dropped here from a Page List, which asks to detach it.
+	'core/page-list-item',
 	'core/loginout',
 ];
 

@@ -147,6 +147,7 @@ export type ListViewContextValue = {
 	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
 	treeGridElementRef?: RefObject< HTMLElement | null >;
 	updateExpansion: UpdateListViewExpansion;
+	visibilityToggleBlockNames?: string[];
 };
 
 /**
@@ -191,6 +192,7 @@ export type PrivateListViewProps = ListViewProps & {
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
+	visibilityToggleBlockNames?: string[];
 };
 
 /**

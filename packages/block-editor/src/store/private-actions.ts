@@ -446,6 +446,23 @@ export const editContentOnlySection =
 	};
 
 /**
+ * Leaves a block's own row out of List View, which lists the block's inner
+ * blocks in its place, at its level. Unlike a `disabled` editing mode, the
+ * block and its inner blocks can still be edited, moved and inserted into.
+ *
+ * @param clientId  Client ID of the block.
+ * @param isSkipped Whether List View leaves the block's row out.
+ * @return Action object.
+ */
+export function setListViewRowSkipped( clientId: string, isSkipped: boolean ) {
+	return {
+		type: 'SET_LIST_VIEW_ROW_SKIPPED',
+		clientId,
+		isSkipped,
+	};
+}
+
+/**
  * Action that stops editing a contentOnly section.
  *
  * @return Thunk action.

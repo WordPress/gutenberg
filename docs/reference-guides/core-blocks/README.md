@@ -505,7 +505,7 @@ A collection of blocks that allow visitors to get around your site.
 
 -	**Name:** [core/navigation](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-navigation/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Allowed Blocks:** core/navigation-link, core/search, core/social-links, core/page-list, core/spacer, core/home-link, core/icon, core/site-title, core/site-logo, core/navigation-submenu, core/loginout, core/buttons
+-	**Allowed Blocks:** core/navigation-link, core/search, core/social-links, core/page-list, core/page-list-item, core/spacer, core/home-link, core/icon, core/site-title, core/site-logo, core/navigation-submenu, core/loginout, core/buttons
 -	**Supports:** align (full, wide), anchor, ariaLabel, contentRole, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
 -	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, overlay, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, submenuVisibility, templateLock, textColor
 
@@ -554,9 +554,8 @@ Display a list of all pages.
 
 -	**Name:** [core/page-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Allowed Blocks:** core/page-list-item
 -	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), contentRole, dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
--	**Attributes:** parentPageID
+-	**Attributes:** excludedPageIDs, parentPageID
 
 ## Page List Item
 
@@ -564,7 +563,7 @@ Displays a page inside a list of all pages.
 
 -	**Name:** [core/page-list-item](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Parent:** core/page-list
+-	**Parent:** core/page-list, core/page-list-item, core/navigation, core/navigation-submenu
 -	**Supports:** anchor, contentRole, interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
 -	**Attributes:** hasChildren, id, label, link, title
 

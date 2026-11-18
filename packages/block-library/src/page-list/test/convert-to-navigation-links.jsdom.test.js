@@ -1,5 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { convertToNavigationLinks } from '../use-convert-to-navigation-links';
+import {
+	convertToNavigationLinks,
+	convertPageListBlocksToLinks,
+} from '../use-convert-to-navigation-links';
 
 // Expected entity binding structure for navigation links
 const EXPECTED_ENTITY_BINDING = {
@@ -581,5 +584,77 @@ describe( 'page list convert to links', () => {
 				},
 			] );
 		} );
+	} );
+} );
+
+describe( 'convertPageListBlocksToLinks', () => {
+	const pageItem = ( id, attributes = {}, innerBlocks = [] ) => ( {
+		clientId: `page-${ id }`,
+		name: 'core/page-list-item',
+		attributes: {
+			id,
+			title: `Page ${ id }`,
+			link: `https://example.com/${ id }`,
+			...attributes,
+		},
+		innerBlocks,
+	} );
+
+	it( 'keeps the order, levels, hidden pages and other items', () => {
+		const link = {
+			clientId: 'link',
+			name: 'core/navigation-link',
+			attributes: { label: 'Shop' },
+			innerBlocks: [],
+		};
+		const links = convertPageListBlocksToLinks( [
+			pageItem( 2, {}, [ pageItem( 3 ) ] ),
+			link,
+			pageItem( 1, { metadata: { blockVisibility: false } } ),
+		] );
+
+		expect( links ).toEqual( [
+			{
+				name: 'core/navigation-submenu',
+				attributes: {
+					id: 2,
+					label: 'Page 2',
+					url: 'https://example.com/2',
+					type: 'page',
+					kind: 'post-type',
+					metadata: { bindings: EXPECTED_ENTITY_BINDING },
+				},
+				innerBlocks: [
+					{
+						name: 'core/navigation-link',
+						attributes: {
+							id: 3,
+							label: 'Page 3',
+							url: 'https://example.com/3',
+							type: 'page',
+							kind: 'post-type',
+							metadata: { bindings: EXPECTED_ENTITY_BINDING },
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+			link,
+			{
+				name: 'core/navigation-link',
+				attributes: {
+					id: 1,
+					label: 'Page 1',
+					url: 'https://example.com/1',
+					type: 'page',
+					kind: 'post-type',
+					metadata: {
+						blockVisibility: false,
+						bindings: EXPECTED_ENTITY_BINDING,
+					},
+				},
+				innerBlocks: [],
+			},
+		] );
 	} );
 } );

@@ -2088,3 +2088,193 @@ function block_core_navigation_get_most_recently_published_navigation() {
 
 	return null;
 }
+
+/**
+ * Registers the `auto_add_pages` setting of Navigation Menus. When it's on,
+ * a page that's published is added to the menu, as a Page List would show
+ * it: a top-level page at the end of the menu, and a child page at the end
+ * of its parent page's submenu, if its parent page is in the menu.
+ *
+ * Detaching a Page List into links turns it on, so the menu goes on adding
+ * new pages.
+ *
+ * @since 7.2.0
+ */
+function block_core_navigation_register_auto_add_pages_meta() {
+	add_post_type_support( 'wp_navigation', 'custom-fields' );
+	register_post_meta(
+		'wp_navigation',
+		'auto_add_pages',
+		array(
+			'show_in_rest'  => true,
+			'single'        => true,
+			'type'          => 'boolean',
+			'default'       => false,
+			'auth_callback' => static function ( $allowed, $meta_key, $post_id ) {
+				return current_user_can( 'edit_post', $post_id );
+			},
+		)
+	);
+}
+// The `wp_navigation` post type is registered at the default priority.
+add_action( 'init', 'block_core_navigation_register_auto_add_pages_meta', 20 );
+
+/**
+ * Finds the link to a page in a Navigation Menu's blocks.
+ *
+ * @since 7.2.0
+ *
+ * @param array $blocks  Parsed blocks.
+ * @param int   $page_id ID of the page.
+ * @return array|null Path of indexes to the link's block, or null if the page
+ *                    isn't linked to.
+ */
+function block_core_navigation_find_page_link( $blocks, $page_id ) {
+	foreach ( $blocks as $index => $block ) {
+		$attributes = $block['attrs'] ?? array();
+		$is_link    = in_array( $block['blockName'], array( 'core/navigation-link', 'core/navigation-submenu' ), true );
+		if (
+			$is_link &&
+			isset( $attributes['id'] ) &&
+			(int) $attributes['id'] === $page_id &&
+			( $attributes['kind'] ?? '' ) === 'post-type' &&
+			( $attributes['type'] ?? '' ) === 'page'
+		) {
+			return array( $index );
+		}
+		if ( ! empty( $block['innerBlocks'] ) ) {
+			$path = block_core_navigation_find_page_link( $block['innerBlocks'], $page_id );
+			if ( null !== $path ) {
+				return array_merge( array( $index ), $path );
+			}
+		}
+	}
+	return null;
+}
+
+/**
+ * Returns the parsed block of a link to a page, as detaching a Page List
+ * makes it.
+ *
+ * @since 7.2.0
+ *
+ * @param WP_Post $page The page.
+ * @return array Parsed block.
+ */
+function block_core_navigation_get_page_link_block( $page ) {
+	return array(
+		'blockName'    => 'core/navigation-link',
+		'attrs'        => array(
+			'id'       => $page->ID,
+			'label'    => get_the_title( $page ),
+			'url'      => get_permalink( $page ),
+			'type'     => 'page',
+			'kind'     => 'post-type',
+			'metadata' => array(
+				'bindings' => array(
+					'url' => array(
+						'source' => 'core/post-data',
+						'args'   => array( 'field' => 'link' ),
+					),
+				),
+			),
+		),
+		'innerBlocks'  => array(),
+		'innerHTML'    => '',
+		'innerContent' => array(),
+	);
+}
+
+/**
+ * Adds a page to a Navigation Menu's blocks, if it isn't linked to already:
+ * a top-level page at the end, and a child page at the end of its parent
+ * page's submenu. A child page whose parent page isn't in the menu isn't
+ * added, as a Page List leaves it out too.
+ *
+ * @since 7.2.0
+ *
+ * @param array   $blocks Parsed blocks of the menu.
+ * @param WP_Post $page   The page.
+ * @return array|null The blocks with the page added, or null if it isn't added.
+ */
+function block_core_navigation_add_page_to_blocks( $blocks, $page ) {
+	if ( null !== block_core_navigation_find_page_link( $blocks, $page->ID ) ) {
+		return null;
+	}
+
+	$link = block_core_navigation_get_page_link_block( $page );
+	if ( ! $page->post_parent ) {
+		$blocks[] = $link;
+		return $blocks;
+	}
+
+	$path = block_core_navigation_find_page_link( $blocks, (int) $page->post_parent );
+	if ( null === $path ) {
+		return null;
+	}
+
+	$parent = &$blocks;
+	foreach ( $path as $depth => $index ) {
+		if ( $depth > 0 ) {
+			$parent = &$parent['innerBlocks'];
+		}
+		$parent = &$parent[ $index ];
+	}
+
+	// A link with child pages is a submenu.
+	if ( 'core/navigation-link' === $parent['blockName'] ) {
+		$parent['blockName'] = 'core/navigation-submenu';
+	}
+	$parent['innerBlocks'][]  = $link;
+	$parent['innerContent'][] = null;
+	unset( $parent );
+
+	return $blocks;
+}
+
+/**
+ * Adds a page that's published to the Navigation Menus that add new pages
+ * automatically.
+ *
+ * @since 7.2.0
+ *
+ * @param string  $new_status New post status.
+ * @param string  $old_status Old post status.
+ * @param WP_Post $post       The post.
+ */
+function block_core_navigation_auto_add_page( $new_status, $old_status, $post ) {
+	if ( 'page' !== $post->post_type || 'publish' !== $new_status || 'publish' === $old_status ) {
+		return;
+	}
+
+	$menus = get_posts(
+		array(
+			'post_type'      => 'wp_navigation',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+			'meta_key'       => 'auto_add_pages',
+			'meta_value'     => '1',
+		)
+	);
+
+	foreach ( $menus as $menu ) {
+		$blocks = parse_blocks( $menu->post_content );
+		// A Page List adds new pages itself.
+		$has_page_list = str_contains( $menu->post_content, '<!-- wp:page-list ' ) || str_contains( $menu->post_content, '<!-- wp:page-list/' );
+		if ( $has_page_list ) {
+			continue;
+		}
+		$blocks = block_core_navigation_add_page_to_blocks( $blocks, $post );
+		if ( null === $blocks ) {
+			continue;
+		}
+		wp_update_post(
+			array(
+				'ID'           => $menu->ID,
+				'post_content' => wp_slash( serialize_blocks( $blocks ) ),
+			)
+		);
+	}
+}
+add_action( 'transition_post_status', 'block_core_navigation_auto_add_page', 10, 3 );

@@ -1,6 +1,14 @@
 import clsx from 'clsx';
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import {
+	InspectorControls,
+	useBlockEditingMode,
+	useBlockProps,
+	useInnerBlocksProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { Button, PanelBody } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { safeHTML } from '@wordpress/dom';
 import { ItemSubmenuIcon } from '../navigation-link/icons';
@@ -8,6 +16,9 @@ import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
+import { DEFAULT_BLOCK } from '../navigation/constants';
+import { usePageListAllowedBlocks } from '../page-list/use-page-list-allowed-blocks';
+import { useIsPagesOnlyMenu } from '../navigation/use-is-pages-only-menu';
 
 function useFrontPageId() {
 	return useSelect( ( select ) => {
@@ -24,10 +35,44 @@ function useFrontPageId() {
 	}, [] );
 }
 
-export default function PageListItemEdit( { context, attributes } ) {
-	const { id, label, link, hasChildren, title } = attributes;
+export default function PageListItemEdit( { clientId, context, attributes } ) {
+	const { id, label, link, title } = attributes;
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
+
+	// In a Navigation block, pages are moved, nested and hidden like its
+	// other items, so a page's child pages follow the blocks, not the
+	// attribute set when the blocks were made.
+	const { hasChildren, pageListClientId, navigationClientId } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockParentsByBlockName } =
+				select( blockEditorStore );
+			return {
+				hasChildren: getBlockCount( clientId ) > 0,
+				pageListClientId: getBlockParentsByBlockName(
+					clientId,
+					'core/page-list',
+					true
+				)[ 0 ],
+				navigationClientId: getBlockParentsByBlockName(
+					clientId,
+					'core/navigation',
+					true
+				)[ 0 ],
+			};
+		},
+		[ clientId ]
+	);
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	// Elsewhere, a Page List's pages can't be changed one by one, so clicking
+	// one selects the Page List.
+	useBlockEditingMode( isNavigationChild ? undefined : 'disabled' );
+	const isPagesOnly = useIsPagesOnlyMenu( navigationClientId );
+	const allowedBlocks = usePageListAllowedBlocks(
+		isNavigationChild,
+		isPagesOnly
+	);
 
 	// Get submenu visibility from context. The Navigation block handles
 	// backward compatibility by migrating openSubmenusOnClick to submenuVisibility
@@ -44,62 +89,94 @@ export default function PageListItemEdit( { context, attributes } ) {
 		className: 'wp-block-pages-list__item',
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps );
+	const innerBlocksProps = useInnerBlocksProps(
+		blockProps,
+		isNavigationChild
+			? {
+					renderAppender: false,
+					allowedBlocks,
+					defaultBlock: DEFAULT_BLOCK,
+					directInsert: true,
+				}
+			: { allowedBlocks }
+	);
 
 	return (
-		<li
-			key={ id }
-			className={ clsx( 'wp-block-pages-list__item', {
-				'has-child': hasChildren,
-				'wp-block-navigation-item': isNavigationChild,
-				// Class assignment logic matches PHP rendering in page-list/index.php
-				'open-on-click': openOnClick,
-				'open-always': submenuVisibility === 'always',
-				// Must check hover mode explicitly to match PHP elseif structure (index.php:212)
-				'open-on-hover-click':
-					submenuVisibility === 'hover' && context.showSubmenuIcon,
-				'menu-item-home': id === frontPageId,
-			} ) }
-		>
-			{ hasChildren && openOnClick ? (
-				<>
-					<button
-						type="button"
-						className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
-						aria-expanded="false"
+		<>
+			{ isNavigationChild && pageListClientId && (
+				<InspectorControls>
+					<PanelBody title={ __( 'Page List' ) }>
+						<p>
+							{ __(
+								'This page is listed automatically, with your other pages. To show only the child pages of a page, or to turn the pages into links, select the Page List.'
+							) }
+						</p>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ () => selectBlock( pageListClientId ) }
+						>
+							{ __( 'Select Page List' ) }
+						</Button>
+					</PanelBody>
+				</InspectorControls>
+			) }
+			<li
+				key={ id }
+				className={ clsx( 'wp-block-pages-list__item', {
+					'has-child': hasChildren,
+					'wp-block-navigation-item': isNavigationChild,
+					// Class assignment logic matches PHP rendering in page-list/index.php
+					'open-on-click': openOnClick,
+					'open-always': submenuVisibility === 'always',
+					// Must check hover mode explicitly to match PHP elseif structure (index.php:212)
+					'open-on-hover-click':
+						submenuVisibility === 'hover' &&
+						context.showSubmenuIcon,
+					'menu-item-home': id === frontPageId,
+				} ) }
+			>
+				{ hasChildren && openOnClick ? (
+					<>
+						<button
+							type="button"
+							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle"
+							aria-expanded="false"
+							dangerouslySetInnerHTML={ {
+								__html: safeHTML( label ),
+							} }
+						/>
+						<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
+							<ItemSubmenuIcon />
+						</span>
+					</>
+				) : (
+					<a
+						className={ clsx( 'wp-block-pages-list__item__link', {
+							'wp-block-navigation-item__content':
+								isNavigationChild,
+						} ) }
+						href={ link }
 						dangerouslySetInnerHTML={ {
-							__html: safeHTML( label ),
+							__html: safeHTML( title ),
 						} }
 					/>
-					<span className="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon">
-						<ItemSubmenuIcon />
-					</span>
-				</>
-			) : (
-				<a
-					className={ clsx( 'wp-block-pages-list__item__link', {
-						'wp-block-navigation-item__content': isNavigationChild,
-					} ) }
-					href={ link }
-					dangerouslySetInnerHTML={ {
-						__html: safeHTML( title ),
-					} }
-				/>
-			) }
-			{ hasChildren && (
-				<>
-					{ ! openOnClick && context.showSubmenuIcon && (
-						<button
-							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-							aria-expanded="false"
-							type="button"
-						>
-							<ItemSubmenuIcon />
-						</button>
-					) }
-					<ul { ...innerBlocksProps }></ul>
-				</>
-			) }
-		</li>
+				) }
+				{ hasChildren && (
+					<>
+						{ ! openOnClick && context.showSubmenuIcon && (
+							<button
+								className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
+								aria-expanded="false"
+								type="button"
+							>
+								<ItemSubmenuIcon />
+							</button>
+						) }
+						<ul { ...innerBlocksProps }></ul>
+					</>
+				) }
+			</li>
+		</>
 	);
 }

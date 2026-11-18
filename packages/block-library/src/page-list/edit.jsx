@@ -8,6 +8,7 @@ import {
 	getColorClassName,
 	store as blockEditorStore,
 	Warning,
+	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -17,41 +18,32 @@ import {
 	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import DetachPageListDialog from './detach-dialog';
+import { usePageListPages, MAX_PAGE_COUNT } from './use-page-list-pages';
+import { PAGE_LIST_ITEM } from './utils';
+import { usePageListAllowedBlocks } from './use-page-list-allowed-blocks';
+import { useIsPagesOnlyMenu } from '../navigation/use-is-pages-only-menu';
+import {
+	usePageListChanges,
+	getPageListBlocksKey,
+} from './use-page-list-changes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
+import { unlock } from '../lock-unlock';
 
-// We only show the detach option when page count is <= MAX_PAGE_COUNT
-// Performance of Navigation Links is not good past this value.
-const MAX_PAGE_COUNT = 100;
+const { useSkipListViewRow } = unlock( blockEditorPrivateApis );
+
 const NOOP = () => {};
+const EMPTY_ARRAY = [];
+const HIDDEN_METADATA = { blockVisibility: false };
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
-function DetachPageListDialog( { isBusy, onConfirm, onCancel } ) {
-	return (
-		<ConfirmDialog
-			isOpen
-			title={ __( 'Detach Page List' ) }
-			__experimentalHideHeader={ false }
-			confirmButtonText={ __( 'Detach' ) }
-			onConfirm={ onConfirm }
-			onCancel={ onCancel }
-			isBusy={ isBusy }
-			size="medium"
-		>
-			{ __(
-				"This Navigation Menu displays your website's pages. Detaching will enable you to add, delete, or reorder pages. However, new pages will no longer be added automatically."
-			) }
-		</ConfirmDialog>
-	);
-}
-
 function BlockContent( {
 	blockProps,
 	innerBlocksProps,
@@ -129,54 +121,22 @@ export default function PageListEdit( {
 	attributes,
 	setAttributes,
 } ) {
-	const { parentPageID } = attributes;
+	const { parentPageID, excludedPageIDs = EMPTY_ARRAY } = attributes;
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			per_page: MAX_PAGE_COUNT,
-			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		}
-	);
+	const { pages, pagesByParentId, hasResolvedPages, canReorderPages } =
+		usePageListPages();
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
 		pages?.length > 0 &&
 		pages?.length <= MAX_PAGE_COUNT;
 
-	const pagesByParentId = useMemo( () => {
-		if ( pages === null ) {
-			return new Map();
-		}
-
-		// TODO: Once the REST API supports passing multiple values to
-		// 'orderby', this can be removed.
-		// https://core.trac.wordpress.org/ticket/39037
-		const sortedPages = pages.sort( ( a, b ) => {
-			if ( a.menu_order === b.menu_order ) {
-				return a.title.rendered.localeCompare( b.title.rendered );
-			}
-			return a.menu_order - b.menu_order;
-		} );
-
-		return sortedPages.reduce( ( accumulator, page ) => {
-			const { parent } = page;
-			if ( accumulator.has( parent ) ) {
-				accumulator.get( parent ).push( page );
-			} else {
-				accumulator.set( parent, [ page ] );
-			}
-			return accumulator;
-		}, new Map() );
-	}, [ pages ] );
+	const excludedIds = useMemo(
+		() => new Set( excludedPageIDs ),
+		[ excludedPageIDs ]
+	);
 
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-page-list', {
@@ -219,6 +179,8 @@ export default function PageListEdit( {
 		[ pagesByParentId ]
 	);
 
+	// Hidden pages are listed too, hidden with the standard block visibility
+	// setting, so they can be shown again the way any hidden item can.
 	const blockList = useMemo(
 		function getBlockList( parentId = parentPageID ) {
 			const childPages = pagesByParentId.get( parentId );
@@ -227,50 +189,36 @@ export default function PageListEdit( {
 				return [];
 			}
 
-			return childPages.reduce( ( template, page ) => {
-				const hasChildren = pagesByParentId.has( page.id );
-				const pageProps = {
-					id: page.id,
-					label:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					title:
-						// translators: displayed when a page has an empty title.
-						page.title?.rendered?.trim() !== ''
-							? page.title?.rendered
-							: __( '(no title)' ),
-					link: page.url,
-					hasChildren,
-				};
-				let item = null;
+			return childPages.map( ( page ) => {
 				const children = getBlockList( page.id );
-				item = createBlock(
-					'core/page-list-item',
-					pageProps,
+				const title =
+					// translators: displayed when a page has an empty title.
+					page.title?.rendered?.trim() !== ''
+						? page.title?.rendered
+						: __( '(no title)' );
+				return createBlock(
+					PAGE_LIST_ITEM,
+					{
+						id: page.id,
+						label: title,
+						title,
+						link: page.url,
+						hasChildren: children.length > 0,
+						...( excludedIds.has( page.id ) && {
+							metadata: HIDDEN_METADATA,
+						} ),
+					},
 					children
 				);
-				template.push( item );
-
-				return template;
-			}, [] );
+			} );
 		},
-		[ pagesByParentId, parentPageID ]
+		[ pagesByParentId, parentPageID, excludedIds ]
 	);
 
-	const {
-		hasSelectedChild,
-		parentClientId,
-		hasDraggedChild,
-		isChildOfNavigation,
-	} = useSelect(
+	const { parentClientId, isChildOfNavigation, menuClientIds } = useSelect(
 		( select ) => {
-			const {
-				getBlockParentsByBlockName,
-				hasSelectedInnerBlock,
-				hasDraggedInnerBlock,
-			} = select( blockEditorStore );
+			const { getBlockParentsByBlockName, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
 				'core/navigation',
@@ -278,9 +226,11 @@ export default function PageListEdit( {
 			);
 			return {
 				isChildOfNavigation: navigationBlockParents.length > 0,
-				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
-				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
+				// To tell an item moved among the pages from a new one.
+				menuClientIds: navigationBlockParents.length
+					? getClientIdsOfDescendants( navigationBlockParents[ 0 ] )
+					: EMPTY_ARRAY,
 			};
 		},
 		[ clientId ]
@@ -288,28 +238,68 @@ export default function PageListEdit( {
 
 	const convertToNavigationLinks = useConvertToNavigationLinks( {
 		clientId,
-		pages,
 		parentClientId,
+	} );
+
+	const { onChange, changedBlocks, pendingDetach } = usePageListChanges( {
+		clientId,
 		parentPageID,
+		excludedPageIDs,
+		pagesByParentId,
+		setAttributes,
+		menuClientIds,
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
-		__unstableDisableDropZone: true,
-		templateLock: isChildOfNavigation ? false : 'all',
-		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
-	} );
+	// Once the pages catch up with a change, the changed blocks are kept, so
+	// they aren't replaced by blocks with new client IDs, which would lose
+	// what's selected and expanded in the list view.
+	const innerBlocksValue =
+		changedBlocks &&
+		( changedBlocks.isHeld ||
+			getPageListBlocksKey( changedBlocks.blocks ) ===
+				getPageListBlocksKey( blockList ) )
+			? changedBlocks.blocks
+			: blockList;
 
-	const { selectBlock } = useDispatch( blockEditorStore );
+	// In a pages menu, only pages can be added or moved, and adding anything
+	// else is done by switching to an advanced menu.
+	const isPagesOnly = useIsPagesOnlyMenu( parentClientId );
+	const allowedBlocks = usePageListAllowedBlocks(
+		isChildOfNavigation,
+		isPagesOnly
+	);
 
-	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			setIsConfirmingDetach( true );
-			selectBlock( parentClientId );
-		}
-	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
+	const innerBlocksProps = useInnerBlocksProps(
+		blockProps,
+		isChildOfNavigation
+			? {
+					// Its pages are moved, hidden and added after like the
+					// other items of the Navigation block.
+					renderAppender: false,
+					allowedBlocks,
+					...( ! isPagesOnly && {
+						defaultBlock: DEFAULT_BLOCK,
+						directInsert: true,
+					} ),
+					templateLock: canReorderPages ? false : 'all',
+					onInput: NOOP,
+					onChange,
+					value: innerBlocksValue,
+				}
+			: {
+					renderAppender: false,
+					__unstableDisableDropZone: true,
+					allowedBlocks,
+					templateLock: 'all',
+					onInput: NOOP,
+					onChange: NOOP,
+					value: blockList,
+				}
+	);
+
+	// In a Navigation block, its pages are listed as items of the menu, so
+	// the Page List itself isn't.
+	useSkipListViewRow( isChildOfNavigation );
 
 	return (
 		<>
@@ -392,6 +382,18 @@ export default function PageListEdit( {
 						/>
 					) }
 				</>
+			) }
+			{ pendingDetach && (
+				<DetachPageListDialog
+					message={ pendingDetach.message }
+					onConfirm={ () => {
+						convertToNavigationLinks(
+							pendingDetach.movedOutClientIds
+						);
+						pendingDetach.confirm();
+					} }
+					onCancel={ pendingDetach.cancel }
+				/>
 			) }
 			<BlockContent
 				blockProps={ blockProps }

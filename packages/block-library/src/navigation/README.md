@@ -29,6 +29,7 @@ A collection of blocks that allow visitors to get around your site.
 - [`core/search`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 - [`core/social-links`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-social-links/)
 - [`core/page-list`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list/)
+- [`core/page-list-item`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
 - [`core/spacer`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-spacer/)
 - [`core/home-link`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-home-link/)
 - [`core/icon`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/core-block-icon/)
