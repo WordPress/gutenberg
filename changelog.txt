@@ -1,5 +1,27 @@
 == Changelog ==
 
+= 24.4.2 =
+
+**This is a security release. All users are strongly encouraged to update to this version as soon as possible.**
+
+## Changelog
+
+### Bug Fixes
+
+- Comment Date block: Ensure the formatted date is escaped before output.
+- Embed block: Remove support for Imgur embeds.
+- File block: Ensure a filename taken from a media block is kept as plain text.
+- Core Data: Ensure entity record keys are valid before they are used in REST API paths.
+- Editor: Ensure Openverse metadata is escaped in image captions.
+- REST API: Ensure a new comment can only be attributed to a member of the site.
+
+## Contributors
+
+The following contributors contributed to this release:
+
+@jeryj @johnbillion @lucatume @rfaile313 @sirreal @xknown
+
+
 = 24.4.1 =
 
 
