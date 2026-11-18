@@ -30,17 +30,18 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 // columns next to them paint over their space, like a focus ring.
 @mixin scroll-fade($side, $range, $fill-mode: none, $rest: cover) {
 	$to: var(--dataviews-view-table-fade-to-#{$side});
+	$rest-mask: linear-gradient(to #{$to}, transparent #{$scroll-fade-ramp}, #000 #{$scroll-fade-ramp});
+	@if $rest == line {
+		$rest-mask: #{$rest-mask}, linear-gradient(#000 1px, transparent 1px);
+	}
 
 	--dataviews-view-table-fade-mask: linear-gradient(to #{$to}, transparent, #000 #{$scroll-fade-ramp});
 	// An outline, as Chrome does not paint a box shadow on these cells. The mask only
 	// keeps the part next to the columns: it is sized to the row's height,
 	// and does not reach past the edge of the row.
 	outline: $scroll-fade-ramp solid var(--dataviews-view-table-row-background);
-	mask-image: linear-gradient(to #{$to}, transparent #{$scroll-fade-ramp}, #000 #{$scroll-fade-ramp});
-	@if $rest == line {
-		mask-image: linear-gradient(to #{$to}, transparent #{$scroll-fade-ramp}, #000 #{$scroll-fade-ramp}), linear-gradient(#000 1px, transparent 1px);
-		mask-composite: intersect;
-	}
+	mask-image: var(--dataviews-view-table-fade-mask);
+	mask-composite: intersect;
 	mask-position: #{$to};
 	mask-size: calc(100% + #{$scroll-fade-ramp}) 100%;
 	mask-repeat: no-repeat;
@@ -48,13 +49,10 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	mask-clip: no-clip;
 
 	@supports (animation-timeline: scroll()) {
+		mask-image: $rest-mask;
 		animation: dataviews-view-table-scroll-fade linear $fill-mode;
 		animation-timeline: scroll(nearest inline);
 		animation-range: $range;
-	}
-
-	@supports not (animation-timeline: scroll()) {
-		mask-image: var(--dataviews-view-table-fade-mask);
 	}
 }
 
