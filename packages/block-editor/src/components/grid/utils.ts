@@ -437,6 +437,8 @@ export function getGridInfo( gridElement: Element ): GridInfo {
 		style: {
 			gridTemplateColumns,
 			gridTemplateRows,
+			// Preview rows beyond a manual grid retain its square cell height.
+			gridAutoRows: gridTemplateRows.split( ' ' )[ 0 ],
 			gap: getComputedCSS( gridElement, 'gap' ),
 			inset: `
 				calc(${ paddingTop } + ${ borderTopWidth })
