@@ -7,12 +7,24 @@
  * block. An empty string leaves it without inner blocks. Without a value, the
  * block keeps its own inner blocks.
  *
+ * Any other block gets the same when it adds `innerBlocks` through the
+ * `block_bindings_supported_attributes` filter.
+ *
+ * When merged to Core, the supported attributes go in
+ * `get_block_bindings_supported_attributes()` (`wp-includes/block-bindings.php`),
+ * the editor settings in `get_block_editor_settings()`
+ * (`wp-includes/block-editor.php`), and the rest in private methods of
+ * `WP_Block` (`wp-includes/class-wp-block.php`) that
+ * `WP_Block::process_block_bindings()` and `WP_Block::render()` call.
+ *
  * @package gutenberg
  */
 
 /**
  * Adds `innerBlocks` to the attributes that block bindings support on the Group
  * and Column blocks, so that Core resolves its binding.
+ *
+ * @since 7.3.0
  *
  * @param string[]|mixed $supported_attributes The attributes supported by block bindings.
  * @param string         $block_type           The block type name.
@@ -29,6 +41,8 @@ add_filter( 'block_bindings_supported_attributes', 'gutenberg_block_bindings_add
 /**
  * Keeps `innerBlocks` out of the attributes the editor offers to bind on the
  * Group and Column blocks: the editor doesn't render inner blocks bindings yet.
+ *
+ * @since 7.3.0
  *
  * @param array $settings The block editor settings.
  * @return array The block editor settings.
@@ -61,6 +75,8 @@ add_filter( 'block_editor_settings_all', 'gutenberg_block_bindings_remove_inner_
  * after any whitespace, opens a block. Any other value, like the plain text of
  * a field, leaves the block with its own inner blocks.
  *
+ * @since 7.3.0
+ *
  * @param mixed $value The value of the source.
  * @return bool Whether the value supplies inner blocks.
  */
@@ -90,6 +106,8 @@ function gutenberg_block_bindings_is_inner_blocks_value( $value ) {
  * Two bound blocks with the same binding request get the same inner blocks
  * from the source, whatever the order of its keys.
  *
+ * @since 7.3.0
+ *
  * @param string   $source_name    The name of the source.
  * @param array    $source_args    The arguments of the binding.
  * @param WP_Block $block_instance The block instance.
@@ -111,6 +129,8 @@ function gutenberg_block_bindings_get_inner_blocks_request( $source_name, $sourc
 /**
  * Returns whether the inner blocks a source supplied for the given binding
  * request are rendering.
+ *
+ * @since 7.3.0
  *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
@@ -143,6 +163,8 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * feature lands in Core, WP_Block::render() should stop tracking the block in
  * a `finally` block instead.
  *
+ * @since 7.3.0
+ *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  *
  * @param string   $block_content The rendered block.
@@ -150,7 +172,7 @@ function gutenberg_block_bindings_is_rendering_inner_blocks_request( $request ) 
  * @param WP_Block $instance      The block instance.
  * @return string The rendered block.
  */
-function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block_content, $parsed_block, $instance ) {
+function gutenberg_block_bindings_forget_rendered_inner_blocks( $block_content, $parsed_block, $instance ) {
 	global $gutenberg_block_bindings_rendering_inner_blocks;
 	foreach ( (array) $gutenberg_block_bindings_rendering_inner_blocks as $index => $rendering ) {
 		if ( $rendering['bound_block'] === $instance ) {
@@ -160,7 +182,7 @@ function gutenberg_block_bindings_finish_rendering_supplied_inner_blocks( $block
 	}
 	return $block_content;
 }
-add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_inner_blocks', 10, 3 );
+add_filter( 'render_block', 'gutenberg_block_bindings_forget_rendered_inner_blocks', 10, 3 );
 
 /**
  * Parses the inner blocks a block bindings source supplies.
@@ -171,6 +193,8 @@ add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_
  * embeds are expanded as the embeds of the content were, before its blocks
  * render.
  *
+ * @since 7.3.0
+ *
  * @global WP_Embed $wp_embed WordPress Embed object.
  *
  * @param string   $markup         The serialized blocks.
@@ -179,7 +203,7 @@ add_filter( 'render_block', 'gutenberg_block_bindings_finish_rendering_supplied_
  * @param WP_Block $block_instance The block instance.
  * @return array[] The parsed blocks.
  */
-function gutenberg_block_bindings_parse_inner_blocks( $markup, $source_name, $source_args, $block_instance ) {
+function gutenberg_block_bindings_parse_bound_inner_blocks( $markup, $source_name, $source_args, $block_instance ) {
 	global $wp_embed;
 
 	/**
@@ -211,7 +235,7 @@ function gutenberg_block_bindings_parse_inner_blocks( $markup, $source_name, $so
 		$markup = $wp_embed->autoembed( $markup );
 	}
 
-	return gutenberg_block_bindings_prepare_inner_blocks( parse_blocks( $markup ) );
+	return gutenberg_block_bindings_prepare_bound_inner_blocks( parse_blocks( $markup ) );
 }
 
 /**
@@ -220,10 +244,12 @@ function gutenberg_block_bindings_parse_inner_blocks( $markup, $source_name, $so
  * Removes their custom CSS, which only users who can edit CSS may add:
  * whoever supplied the value is unknown.
  *
+ * @since 7.3.0
+ *
  * @param array[] $blocks The parsed blocks.
  * @return array[] The parsed blocks.
  */
-function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
+function gutenberg_block_bindings_prepare_bound_inner_blocks( $blocks ) {
 	foreach ( $blocks as &$block ) {
 		if ( isset( $block['attrs']['style'] ) ) {
 			$block['attrs']['style'] = gutenberg_strip_custom_css_from_style_array( $block['attrs']['style'] );
@@ -232,7 +258,7 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
 			}
 		}
 
-		$block['innerBlocks'] = gutenberg_block_bindings_prepare_inner_blocks( $block['innerBlocks'] );
+		$block['innerBlocks'] = gutenberg_block_bindings_prepare_bound_inner_blocks( $block['innerBlocks'] );
 	}
 	return $blocks;
 }
@@ -245,12 +271,14 @@ function gutenberg_block_bindings_prepare_inner_blocks( $blocks ) {
  * block without inner blocks gets them before the closing tag of the element
  * that wraps its content.
  *
+ * @since 7.3.0
+ *
  * @param array $inner_content The inner content of the block.
  * @param int   $count         The number of inner blocks.
  * @return array|null The inner content, or null if there's no element to put
  *                    the inner blocks in.
  */
-function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
+function gutenberg_block_bindings_get_inner_content_with_slots( $inner_content, $count ) {
 	if ( ! is_array( $inner_content ) ) {
 		return null;
 	}
@@ -278,6 +306,8 @@ function gutenberg_block_bindings_get_inner_content( $inner_content, $count ) {
  * container of a Group block saved before WordPress 5.8, the split happens
  * before the closing tag of the container, where the block's own inner blocks
  * would be.
+ *
+ * @since 7.3.0
  *
  * @param string $html The HTML of the wrapper element.
  * @return string[]|null The HTML before the closing tag and the HTML from it,
@@ -319,6 +349,8 @@ function gutenberg_block_bindings_split_at_wrapper_closer( $html ) {
  * content: the last element of the content, or the legacy inner container of
  * a Group block when it is all that element holds.
  *
+ * @since 7.3.0
+ *
  * @param array[] $tokens The tokens, each with its HTML, its depth, and whether it opens an element, closes one, opens a legacy inner container, or is whitespace.
  * @return int|null The index of the closing tag, or null if no element wraps the content.
  */
@@ -356,6 +388,8 @@ function gutenberg_block_bindings_find_wrapper_closer( $tokens ) {
 /**
  * Finds the closing tag of the legacy inner container of a Group block, when
  * the container is all that the wrapper element holds, whitespace aside.
+ *
+ * @since 7.3.0
  *
  * @param array[] $tokens        The tokens of the block's content.
  * @param int     $opener_index  The index of the wrapper's opening tag.
@@ -407,6 +441,8 @@ function gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $op
  * ones supplied to the outermost bound block, at any depth. Once it is spent,
  * a bound block inside supplied inner blocks keeps its own.
  *
+ * @since 7.3.0
+ *
  * @global array[] $gutenberg_block_bindings_rendering_inner_blocks    The bound blocks whose supplied inner blocks are rendering, with their binding requests.
  * @global int     $gutenberg_block_bindings_inner_blocks_budget_spent How many bound blocks got inner blocks from a source inside the ones supplied to the outermost bound block rendering.
  *
@@ -456,8 +492,8 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		}
 	}
 
-	$blocks        = gutenberg_block_bindings_parse_inner_blocks( $value, $source_name, $source_args, $block_instance );
-	$inner_content = gutenberg_block_bindings_get_inner_content( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
+	$blocks        = gutenberg_block_bindings_parse_bound_inner_blocks( $value, $source_name, $source_args, $block_instance );
+	$inner_content = gutenberg_block_bindings_get_inner_content_with_slots( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
 	if ( null === $inner_content ) {
 		return null;
 	}
