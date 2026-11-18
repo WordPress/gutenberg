@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Image: Snap the lightbox image to whole device pixels, so the enlarged image is no longer blurry ([#85271](https://github.com/WordPress/gutenberg/pull/85271)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Enhancements
@@ -54,7 +58,6 @@
 -   Comment Date: Escape the formatted date output.
 -   Embed: Remove support for Imgur oEmbeds.
 -   File: Preserve the filename text in media transforms.
--   Image: Snap the lightbox image to whole device pixels, so the enlarged image is no longer blurry ([#85271](https://github.com/WordPress/gutenberg/pull/85271)).
 
 ## 12.1.0 (2026-11-04)
 
