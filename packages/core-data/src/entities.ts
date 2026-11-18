@@ -11,6 +11,7 @@ import {
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	taxonomySyncConfig,
 } from './utils/crdt';
+import { saveRecoveryPoint } from './utils/save-recovery-point';
 import type { Post } from './entity-types/post';
 import type { EntityConfigLoader, RestTypeDescription } from './private-types';
 import type { EntityConfig, TransientEditConfig } from './types';
@@ -460,6 +461,24 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 						POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 					] || null
 				);
+			},
+
+			/**
+			 * Store the content a remote peer's document replaced as a
+			 * permanent revision, so it can be restored from the revisions
+			 * screen.
+			 *
+			 * @param record The record before the replacement.
+			 */
+			onRemoteReplacement: ( record ) => {
+				// Best effort. There is no UI for a failed recovery point,
+				// and the editor must carry on either way.
+				saveRecoveryPoint(
+					`/${ namespace }/${ postType.rest_base }/${ String(
+						record.id
+					) }/autosaves`,
+					record
+				).catch( () => {} );
 			},
 			shouldSync: () =>
 				! (

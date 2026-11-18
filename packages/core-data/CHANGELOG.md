@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Real-time collaboration: store the content a conflicting document replaced as a permanent revision of the post, so it can be restored from the revisions screen ([#85876](https://github.com/WordPress/gutenberg/pull/85876)).
+
 ### Bug Fixes
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).

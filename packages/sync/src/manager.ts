@@ -47,12 +47,64 @@ interface CollectionState {
 interface EntityState {
 	awareness?: Awareness;
 	handlers: RecordHandlers;
+	// Whether the document was built from the entity record because no
+	// persisted document existed, so it holds nothing the record does not.
+	initializedFromRecord: boolean;
 	objectId: ObjectID;
 	objectType: ObjectType;
+	// Record keys a remote peer replaced (see `getReplacedRootKeys`), not yet
+	// reported through `onRemoteReplacement`.
+	replacedKeys: Set< string >;
 	syncConfig: SyncConfig;
 	undoManager: EntityUndoManager;
 	unload: () => void;
 	ydoc: CRDTDoc;
+}
+
+/**
+ * Get the top-level keys of the record map that a remote transaction replaced
+ * with values from an independent history.
+ *
+ * A peer that sets a key on top of a value it holds points the new item at
+ * that value (`origin`). A peer that never held the key sets an item with no
+ * origin. When such an item arrives for a key this document already holds,
+ * the two documents were built independently (both from the entity record)
+ * and Yjs resolved the conflict by client ID: the remote value is kept and the
+ * local value, with everything nested inside it, is deleted.
+ *
+ * Normal collaborative edits never replace a held key with an origin-less
+ * item, so this does not fire for them.
+ *
+ * @param {Y.Map<unknown>} recordMap The record map of the document.
+ * @param {Y.YEvent[]}     events    Events of a remote transaction.
+ * @return {string[]} Replaced keys.
+ */
+function getReplacedRootKeys(
+	recordMap: Y.Map< unknown >,
+	events: Y.YEvent< any >[]
+): string[] {
+	const rootEvent = events.find( ( event ) => event.target === recordMap );
+
+	if ( ! rootEvent ) {
+		return [];
+	}
+
+	const replacedKeys: string[] = [];
+
+	rootEvent.changes.keys.forEach( ( change, key ) => {
+		// An `add` means this document never held the key.
+		if ( 'update' !== change.action ) {
+			return;
+		}
+
+		const item = recordMap._map.get( key );
+
+		if ( item && null === item.origin ) {
+			replacedKeys.push( key );
+		}
+	} );
+
+	return replacedKeys;
 }
 
 /**
@@ -246,7 +298,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
 		const onRecordUpdate = (
-			_events: Y.YEvent< any >[],
+			events: Y.YEvent< any >[],
 			transaction: Y.Transaction
 		): void => {
 			if (
@@ -254,6 +306,12 @@ export function createSyncManager( debug = false ): SyncManager {
 				! ( transaction.origin instanceof Y.UndoManager )
 			) {
 				return;
+			}
+
+			if ( ! transaction.local ) {
+				getReplacedRootKeys( recordMap, events ).forEach( ( key ) =>
+					entityState.replacedKeys.add( key )
+				);
 			}
 
 			void internal.updateEntityRecord( objectType, objectId );
@@ -309,8 +367,10 @@ export function createSyncManager( debug = false ): SyncManager {
 		const entityState: EntityState = {
 			awareness,
 			handlers,
+			initializedFromRecord: false,
 			objectId,
 			objectType,
+			replacedKeys: new Set(),
 			syncConfig,
 			undoManager: entityUndoManager,
 			unload,
@@ -602,6 +662,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( ! tempDoc ) {
 			log( 'applyPersistedCrdtDoc', 'no persisted doc', entityId );
+			entityState.initializedFromRecord = true;
 			// Apply the current record as changes and request that the CRDT doc be
 			// persisted with the entity. The persisted CRDT doc can be created by
 			// calling `syncManager.createPersistedCRDTDoc`.
@@ -873,12 +934,14 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Determine which synced properties have actually changed by comparing
 		// them against the current edited entity record.
-		const changes = syncConfig.getChangesFromCRDTDoc(
-			ydoc,
-			await handlers.getEditedRecord()
-		);
+		const editedRecord = await handlers.getEditedRecord();
+		const changes = syncConfig.getChangesFromCRDTDoc( ydoc, editedRecord );
 
 		const changedKeys = Object.keys( changes );
+
+		// Report before bailing out, so a replacement that changed nothing is
+		// forgotten instead of being reported with a later update.
+		reportReplacedKeys( entityState, editedRecord, changedKeys );
 
 		if ( 0 === changedKeys.length ) {
 			return;
@@ -888,6 +951,46 @@ export function createSyncManager( debug = false ): SyncManager {
 			changedKeys,
 		} );
 		handlers.editRecord( changes );
+	}
+
+	/**
+	 * Report the record keys a remote peer replaced (see
+	 * `getReplacedRootKeys`) through the sync config's `onRemoteReplacement`,
+	 * with the record as it was before the replacement reached it.
+	 *
+	 * Nothing is reported when the document was built from the record and has
+	 * no local changes: everything it held is still in the record, so the
+	 * replacement lost nothing.
+	 *
+	 * @param {EntityState} entityState  Entity state.
+	 * @param {ObjectData}  editedRecord The record before the replacement.
+	 * @param {string[]}    changedKeys  Keys the replacement is about to change.
+	 */
+	function reportReplacedKeys(
+		entityState: EntityState,
+		editedRecord: ObjectData,
+		changedKeys: string[]
+	): void {
+		const { initializedFromRecord, replacedKeys, syncConfig } = entityState;
+
+		const keys = changedKeys.filter( ( key ) => replacedKeys.has( key ) );
+		replacedKeys.clear();
+
+		if ( 0 === keys.length || ! syncConfig.onRemoteReplacement ) {
+			return;
+		}
+
+		if ( initializedFromRecord && ! entityState.undoManager.hasUndo() ) {
+			return;
+		}
+
+		log(
+			'updateEntityRecord',
+			'remote replacement',
+			getEntityId( entityState.objectType, entityState.objectId ),
+			{ replacedKeys: keys }
+		);
+		syncConfig.onRemoteReplacement( editedRecord, keys );
 	}
 
 	/**

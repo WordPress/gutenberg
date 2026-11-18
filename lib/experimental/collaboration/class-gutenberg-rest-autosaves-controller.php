@@ -32,6 +32,22 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	public const CRDT_SNAPSHOT_PARAM = 'crdt_snapshot';
 
 	/**
+	 * Request parameter asking for the submitted content to be stored as a
+	 * permanent revision instead of an autosave.
+	 *
+	 * An autosave is a single slot per user that the next autosave overwrites,
+	 * and it may update a draft directly. A permanent revision is kept in the
+	 * post's history and changes nothing else: the post and the user's
+	 * autosave are left as they are. This lets a client keep a copy of content
+	 * before it is replaced, so it can be restored from the revisions screen.
+	 *
+	 * This string must match AS_REVISION_PARAM in @wordpress/core-data.
+	 *
+	 * @var string
+	 */
+	public const AS_REVISION_PARAM = 'as_revision';
+
+	/**
 	 * Maximum accepted length of a stored CRDT snapshot, in bytes.
 	 *
 	 * A snapshot is a state vector plus a delete set, so it grows with the
@@ -130,7 +146,11 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 			current_user_can( 'edit_post', $post->ID )
 		);
 
-		if ( $should_promote_auto_draft ) {
+		$store_as_revision = rest_sanitize_boolean( $request->get_param( self::AS_REVISION_PARAM ) );
+
+		if ( $store_as_revision ) {
+			$autosave_id = _wp_put_post_revision( $post_data );
+		} elseif ( $should_promote_auto_draft ) {
 			$autosave_id = wp_update_post( wp_slash( $post_data ), true );
 		} elseif ( $this->is_redundant_autosave( $post, $post_data, $meta ) ) {
 			/*
