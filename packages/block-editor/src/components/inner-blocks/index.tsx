@@ -20,6 +20,7 @@ import useBlockContext from './use-block-context';
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
+import useAutoGridDrop from '../grid/use-auto-grid-drop';
 import useBlockSync from '../provider/use-block-sync';
 import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
@@ -305,11 +306,13 @@ export function useInnerBlocksProps<
 		isDropZoneDisabled,
 		defaultLayout,
 	} = selected;
+	const autoGridDrop = useAutoGridDrop();
 
 	const blockDropZoneRef = useBlockDropZone( {
 		dropZoneElement,
 		rootClientId: clientId,
 		parentClientId,
+		...autoGridDrop,
 	} );
 
 	const ref = useMergeRefs( [

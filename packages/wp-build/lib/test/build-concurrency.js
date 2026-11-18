@@ -5,10 +5,8 @@ import {
 	setBuildConcurrency,
 } from '../build-concurrency.mjs';
 
-vi.mock( import( 'esbuild' ), () => ( {
-	default: {
-		build: vi.fn(),
-	},
+vi.mock( import( 'rolldown' ), () => ( {
+	build: vi.fn(),
 } ) );
 
 const flushPromises = () =>

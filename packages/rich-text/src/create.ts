@@ -439,9 +439,14 @@ function collapseWhiteSpace(
 	hasPrecedingSpace = false,
 	hasTrailingSpace = false
 ) {
-	const clone = element.cloneNode( true ) as HTMLElement;
-	clone.normalize();
-	Array.from( clone.childNodes ).forEach( ( node, i, nodes ) => {
+	// Copy once at the root, then collapse the copy in place.
+	if ( isRoot ) {
+		element = element.cloneNode( true ) as HTMLElement;
+		element.normalize();
+	}
+	const nodes = element.childNodes;
+	for ( let i = 0; i < nodes.length; i++ ) {
+		const node = nodes[ i ];
 		if ( node.nodeType === node.TEXT_NODE ) {
 			let newNodeValue = node.nodeValue!;
 
@@ -473,19 +478,15 @@ function collapseWhiteSpace(
 			const { previousSibling, nextSibling } = node;
 			const prevHasSpace = previousSibling?.textContent!.endsWith( ' ' );
 			const nextHasSpace = nextSibling?.textContent!.startsWith( ' ' );
-			node.replaceWith(
-				collapseWhiteSpace(
-					node as HTMLElement,
-					false,
-					previousSibling
-						? prevHasSpace
-						: isRoot || hasPrecedingSpace,
-					nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
-				)
+			collapseWhiteSpace(
+				node as HTMLElement,
+				false,
+				previousSibling ? prevHasSpace : isRoot || hasPrecedingSpace,
+				nextSibling ? nextHasSpace : isRoot || hasTrailingSpace
 			);
 		}
-	} );
-	return clone;
+	}
+	return element;
 }
 
 /**

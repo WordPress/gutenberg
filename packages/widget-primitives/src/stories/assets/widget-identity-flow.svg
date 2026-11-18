@@ -1,0 +1,56 @@
+<svg viewBox="0 0 880 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="WidgetRender holds the resolved WidgetType, including its translated title. It mounts the render module with attributes and setAttributes, and lends the subtree a filtered identity context. The widget body reads useWidgetIdentity for the title.">
+  <defs>
+    <marker id="arrow-wi" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="868" height="408" rx="12" fill="#ffffff"/>
+
+  <text x="440" y="36" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" fill="#334155">WidgetRender lends type identity into the body.</text>
+
+  <!-- Host -->
+  <rect x="44" y="58" width="792" height="290" rx="9" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="64" y="84" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12.5" font-weight="700" fill="#1d6b5a">host</text>
+  <text x="112" y="84" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">owns WidgetType - mounts WidgetRender - paints chrome from identity</text>
+
+  <!-- WidgetType -->
+  <rect x="64" y="102" width="220" height="128" rx="9" fill="#ffffff" stroke="#1d6b5a" stroke-width="1.4"/>
+  <text x="80" y="126" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">WidgetType</text>
+  <text x="80" y="148" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">name: 'test/sales'</text>
+  <text x="80" y="166" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#1d6b5a">title: 'Sales by device'</text>
+  <text x="80" y="184" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">renderModule: '.../render'</text>
+  <text x="80" y="210" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">title already translated</text>
+
+  <!-- Arrow to WidgetRender -->
+  <line x1="284" y1="166" x2="318" y2="166" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-wi)"/>
+
+  <!-- WidgetRender -->
+  <rect x="322" y="102" width="248" height="128" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="338" y="126" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#1d6b5a">WidgetRender</text>
+  <text x="338" y="148" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#475569">resolves the render module</text>
+  <text x="338" y="168" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#475569">attributes / setAttributes</text>
+  <line x1="334" y1="180" x2="554" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="338" y="200" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" font-weight="700" fill="#855317">identity: { title }</text>
+  <text x="338" y="216" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">filtered slice of the type</text>
+
+  <!-- Arrow to widget body -->
+  <line x1="570" y1="166" x2="604" y2="166" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow-wi)"/>
+
+  <!-- Widget body -->
+  <rect x="608" y="102" width="208" height="128" rx="9" fill="#fff3d0" stroke="#b07020" stroke-width="1.5"/>
+  <text x="624" y="126" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#855317">widget body</text>
+  <text x="624" y="148" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">useWidgetIdentity()</text>
+  <text x="624" y="168" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9.5" fill="#855317">-&gt; title</text>
+  <line x1="620" y1="180" x2="800" y2="180" stroke="#e8d4a8" stroke-width="1"/>
+  <text x="624" y="200" font-family="ui-monospace, SFMono-Regular, monospace" font-size="9" fill="#855317">aria-label: "Chart: ..."</text>
+  <text x="624" y="216" font-family="-apple-system, system-ui, sans-serif" font-size="9" font-style="italic" fill="#94a3b8">names its own content</text>
+
+  <!-- Note -->
+  <rect x="64" y="250" width="752" height="78" rx="9" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="80" y="276" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" font-weight="700" fill="#1d6b5a">useWidgetIdentity</text>
+  <text x="80" y="298" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Reads a filtered slice of the type's identity from context.</text>
+  <text x="80" y="316" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">WidgetRender provides it from the WidgetType it already holds.</text>
+
+  <text x="440" y="384" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, monospace" font-size="12" font-weight="700" fill="#855317">the type owns the title - WidgetRender lends it - the body reads it</text>
+</svg>

@@ -118,6 +118,7 @@ export const parameters = {
 				[
 					'Introduction',
 					'Contributing',
+					'Using with AI',
 					'Foundations',
 					'Tokens',
 					'Theme',

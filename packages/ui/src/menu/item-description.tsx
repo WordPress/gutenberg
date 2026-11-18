@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { ItemDescriptionProps } from './types';
 import { Text } from '../text';
 

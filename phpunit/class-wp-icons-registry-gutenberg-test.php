@@ -351,6 +351,27 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should sanitize the content of an icon file outside the core icon library.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_content
+	 */
+	public function test_get_content_sanitizes_non_core_icon_file() {
+		$path = $this->create_temp_icon_file( '<svg><script>alert( 1 )</script><path d="M0 0"/></svg>' );
+
+		$this->register(
+			'test-collection/from-file',
+			array(
+				'label'     => 'From File',
+				'file_path' => $path,
+			)
+		);
+
+		$icon = $this->registry->get_registered_icon( 'test-collection/from-file' );
+		$this->assertStringContainsString( '<path', $icon['content'] );
+		$this->assertStringNotContainsString( '<script', $icon['content'] );
+	}
+
+	/**
 	 * Provides icon files that cannot yield valid content.
 	 *
 	 * @return array<string, array{0: string|null, 1: string}> Data sets of [ $contents, $extension ].
@@ -542,6 +563,16 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Should serve a core icon unsanitized (sanitizing would lowercase `viewBox`, which would fail this test).
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_content
+	 */
+	public function test_get_content_does_not_sanitize_core_icon() {
+		$icon = $this->original_registry->get_registered_icon( 'core/pencil' );
+		$this->assertSame( file_get_contents( gutenberg_dir_path() . 'packages/icons/src/library/pencil.svg' ), $icon['content'] );
+	}
+
+	/**
 	 * Should register an icon that provides optional args like a valid `keywords` array.
 	 */
 	public function test_register_icon_with_optional_args() {
@@ -704,5 +735,77 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 		$names = array_column( $upgraded->get_registered_icons( 'peace' ), 'name' );
 		$this->assertContains( 'test-collection/dove', $names );
+	}
+
+	/**
+	 * Should return the registered core-admin icon that replaces a Dashicon,
+	 * including for Dashicons other than the first one listed for the icon.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_registered_icon() {
+		$this->register(
+			'core-admin/pin',
+			array(
+				'label'   => 'Pin',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertSame(
+			'core-admin/pin',
+			$this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ),
+			'First Dashicon in the mapping is replaced'
+		);
+		$this->assertSame(
+			'core-admin/pin',
+			$this->registry->get_admin_icon_name_for_dashicon( 'dashicons-format-standard' ),
+			'Alternative Dashicons are also replaced'
+		);
+	}
+
+	/**
+	 * Should return null when the replacement icon is not registered, so the
+	 * Dashicon can still be rendered.
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_null_for_unregistered_icon() {
+		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( 'dashicons-admin-post' ) );
+	}
+
+	/**
+	 * Should return null for values without a replacement.
+	 *
+	 * @dataProvider data_get_admin_icon_name_for_dashicon_without_replacement
+	 * @covers WP_Icons_Registry_Gutenberg::get_admin_icon_name_for_dashicon
+	 *
+	 * @param mixed $dashicon Value to look up.
+	 */
+	public function test_get_admin_icon_name_for_dashicon_returns_null_without_replacement( $dashicon ) {
+		$this->register(
+			'core-admin/pin',
+			array(
+				'label'   => 'Pin',
+				'content' => '<svg></svg>',
+			)
+		);
+
+		$this->assertNull( $this->registry->get_admin_icon_name_for_dashicon( $dashicon ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_get_admin_icon_name_for_dashicon_without_replacement() {
+		return array(
+			'unknown Dashicon'   => array( 'dashicons-not-a-real-icon' ),
+			'icon name'          => array( 'core-admin/pin' ),
+			'name without class' => array( 'admin-post' ),
+			'null'               => array( null ),
+			'array'              => array( array( 'dashicons-admin-post' ) ),
+		);
 	}
 }

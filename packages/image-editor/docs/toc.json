@@ -1,0 +1,14 @@
+[
+	{
+		"title": "Image Editor Architecture",
+		"slug": "packages-image-editor-architecture",
+		"markdown_source": "../packages/image-editor/docs/architecture.md",
+		"parent": "packages-image-editor"
+	},
+	{
+		"title": "Image Editor Recipes",
+		"slug": "packages-image-editor-recipes",
+		"markdown_source": "../packages/image-editor/docs/recipes.md",
+		"parent": "packages-image-editor"
+	}
+]

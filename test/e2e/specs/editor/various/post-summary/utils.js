@@ -66,4 +66,36 @@ async function openPostSummary( { editor, page, tab } ) {
 	return summary;
 }
 
-module.exports = { EDITOR_CONTEXTS, openPostSummary };
+/**
+ * Picks a publish date in the open date control's date and time picker.
+ *
+ * The test site uses a 12-hour time format, so the picker has an AM/PM toggle.
+ *
+ * @param {import('@playwright/test').Page} page         Playwright page.
+ * @param {Object}                          date
+ * @param {number}                          date.year    Full year.
+ * @param {number}                          date.month   Month, from 1 to 12.
+ * @param {number}                          date.day     Day of the month.
+ * @param {number}                          date.hours   Hours, from 0 to 23.
+ * @param {number}                          date.minutes Minutes.
+ */
+async function setPublishDate( page, { year, month, day, hours, minutes } ) {
+	// The number fields change on Enter, so each one is committed in turn.
+	const fillNumber = async ( name, value ) => {
+		const input = page.getByRole( 'spinbutton', { name } );
+		await input.fill( String( value ) );
+		await input.press( 'Enter' );
+	};
+
+	await fillNumber( 'Year', year );
+	// The month comes before the day, which can't exceed the month's length.
+	await page
+		.getByRole( 'combobox', { name: 'Month' } )
+		.selectOption( String( month ).padStart( 2, '0' ) );
+	await fillNumber( 'Day', day );
+	await fillNumber( 'Hours', hours % 12 || 12 );
+	await fillNumber( 'Minutes', minutes );
+	await page.getByRole( 'radio', { name: hours < 12 ? 'AM' : 'PM' } ).click();
+}
+
+module.exports = { EDITOR_CONTEXTS, openPostSummary, setPublishDate };

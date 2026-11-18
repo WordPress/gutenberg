@@ -16,7 +16,7 @@
 		{ "path": "../../packages/dom/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/route" },
+		{ "path": "../../packages/route/tsconfig.build.json" },
 		{ "path": "../../packages/ui/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
