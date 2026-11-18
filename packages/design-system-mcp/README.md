@@ -67,7 +67,7 @@ Where it goes, and what changes for each client:
 | [Antigravity](https://antigravity.google/docs/mcp) | Agent panel, MCP Servers, Manage MCP Servers, View raw config | Replaces Gemini CLI. |
 | [Zed](https://zed.dev/docs/ai/mcp) | `settings.json` | Use `context_servers` instead of `mcpServers`. |
 | [OpenCode](https://opencode.ai/docs/mcp-servers/) | `opencode.json` | Use `mcp.servers`, add `"type": "local"`, and join `command` and `args` into one `command` array. |
-| Raycast | The "Install Server" command | Paste only the server entry, the object holding `command` and `args`. |
+| [Raycast](https://manual.raycast.com/ai/model-context-protocol) | The "Install MCP Server" command | Choose Standard Input/Output, then enter `command` as the Command and `args` as the Arguments. |
 
 ## Importing the package
 
