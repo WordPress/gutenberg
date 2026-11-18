@@ -634,6 +634,7 @@ test.describe( 'Post revisions with classic meta boxes', () => {
 			},
 		} );
 
+		await admin.editPost( post.id );
 		await admin.visitAdminPage(
 			'post.php',
 			`post=${ post.id }&action=edit&revision=99999999`

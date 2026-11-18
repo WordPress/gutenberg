@@ -1,3 +1,6 @@
+import { getUpdatedLinkTargetSettings } from '../image/utils';
+import { getHrefAndDestination } from './utils';
+
 export function defaultColumnsNumber( imageCount ) {
 	return imageCount ? Math.min( 3, imageCount ) : 3;
 }
@@ -52,3 +55,51 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	}
 	return imageProps;
 };
+
+/**
+ * Returns the image attributes for a gallery aspect ratio.
+ *
+ * @param {string} aspectRatio The gallery aspect ratio.
+ * @return {Object} The `aspectRatio` and `scale` attributes.
+ */
+export function getAspectRatioAttributes( aspectRatio ) {
+	const hasAspectRatio = !! aspectRatio && aspectRatio !== 'auto';
+	return {
+		aspectRatio: hasAspectRatio ? aspectRatio : undefined,
+		scale: hasAspectRatio ? 'cover' : undefined,
+	};
+}
+
+/**
+ * Returns the attributes that apply the gallery settings to an added image.
+ *
+ * @param {Object} gallery    The gallery attributes, with the resolved `linkTo`.
+ * @param {Object} attributes The image block attributes.
+ * @param {Object} media      The image attachment.
+ * @return {Object} The attributes to set on the image block.
+ */
+export function getImageAttributes( gallery, attributes, media ) {
+	// An image transformed from an image block keeps its own link target.
+	const linkTargetAttributes =
+		attributes.linkTarget || attributes.rel
+			? { linkTarget: attributes.linkTarget, rel: attributes.rel }
+			: getUpdatedLinkTargetSettings( gallery.linkTarget, gallery );
+
+	return {
+		...pickRelevantMediaFiles( media, gallery.sizeSlug ),
+		...getHrefAndDestination(
+			media,
+			gallery.linkTo,
+			attributes.linkDestination
+		),
+		...linkTargetAttributes,
+		className: attributes.className || undefined,
+		sizeSlug: gallery.sizeSlug,
+		caption:
+			attributes.caption.length > 0
+				? attributes.caption
+				: media.caption?.raw,
+		alt: attributes.alt || media.alt_text,
+		...getAspectRatioAttributes( gallery.aspectRatio ),
+	};
+}
