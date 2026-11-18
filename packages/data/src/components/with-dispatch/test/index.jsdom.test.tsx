@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { AnyAction } from 'redux';
 import { describe, expect, it, vi } from 'vitest';
 import { memo } from '@wordpress/element';
 import withDispatch from '../';
@@ -8,7 +9,7 @@ import { RegistryProvider } from '../../registry-provider';
 
 describe( 'withDispatch', () => {
 	const storeOptions = {
-		reducer: ( state = 0, action ) => {
+		reducer: ( state = 0, action: AnyAction ) => {
 			if ( action.type === 'inc' ) {
 				return state + action.count;
 			}
@@ -18,7 +19,7 @@ describe( 'withDispatch', () => {
 			increment: ( count = 1 ) => ( { type: 'inc', count } ),
 		},
 		selectors: {
-			getCount: ( state ) => state,
+			getCount: ( state: number ) => state,
 		},
 	};
 
@@ -144,6 +145,7 @@ describe( 'withDispatch', () => {
 
 	it( 'warns when mapDispatchToProps returns non-function property', () => {
 		const registry = createRegistry();
+		// @ts-expect-error Testing non-function property returned from mapDispatchToProps.
 		const Component = withDispatch( () => {
 			return {
 				count: 3,
