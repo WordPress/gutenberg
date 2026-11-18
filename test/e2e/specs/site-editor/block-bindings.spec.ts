@@ -64,7 +64,12 @@ test.describe( 'Block bindings in the site editor', () => {
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'content, show' } )
 			.click();
-		await page.getByRole( 'button', { name: 'content' } ).click();
+		await page
+			.getByRole( 'button', {
+				name: 'content Not connected',
+				exact: true,
+			} )
+			.click();
 		await page.getByRole( 'menuitem', { name: 'Post Meta' } ).click();
 		await page
 			.getByRole( 'menuitemcheckbox' )
