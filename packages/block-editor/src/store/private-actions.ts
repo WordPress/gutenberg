@@ -720,6 +720,117 @@ export interface BlockLockChanges {
 }
 
 /**
+ * Returns the attributes that lock or unlock blocks and every block inside
+ * them, by client ID. See `setBlocksLock`.
+ *
+ * @param select    The block editor selectors.
+ * @param clientIds Client IDs of the blocks to lock or unlock.
+ * @param changes   The lock properties to change.
+ *
+ * @return The attributes to update, by client ID.
+ */
+function getBlocksLockAttributes(
+	select: BlockEditorThunkArgs[ 'select' ],
+	clientIds: string[],
+	changes: BlockLockChanges
+) {
+	const targetIds = [
+		...new Set( [
+			...clientIds,
+			...select.getClientIdsOfDescendants( clientIds ),
+		] ),
+	];
+	const isFullUnlock =
+		changes.move === false &&
+		changes.remove === false &&
+		changes.layout === false;
+	const lockableIds = targetIds.filter( ( clientId ) => {
+		const blockName = select.getBlockName( clientId );
+		return !! blockName && select.canLockBlockType( blockName );
+	} );
+	const attributesByClientId: Record<
+		string,
+		Record< string, unknown >
+	> = {};
+
+	// First, the layout lock, which the lock of the blocks inside depends on.
+	const nextTemplateLocks = new Map< string, unknown >();
+	for ( const clientId of lockableIds ) {
+		const attributes = select.getBlockAttributes( clientId ) ?? {};
+		const nextAttributes: Record< string, unknown > = {};
+		let templateLock = attributes.templateLock;
+
+		// The layout of a pattern is the pattern's: it changes by editing or
+		// detaching the pattern, so leave it.
+		if (
+			changes.layout !== undefined &&
+			select.canLayoutLockBlock( clientId ) &&
+			! select.isPatternLockedBlock( clientId )
+		) {
+			if ( changes.layout ) {
+				templateLock = 'all';
+			} else if (
+				isFullUnlock ||
+				LAYOUT_TEMPLATE_LOCKS.includes( templateLock as string )
+			) {
+				templateLock = undefined;
+			}
+			nextAttributes.templateLock = templateLock;
+		}
+
+		nextTemplateLocks.set( clientId, templateLock );
+		attributesByClientId[ clientId ] = nextAttributes;
+	}
+
+	// Then the lock of each block.
+	for ( const clientId of lockableIds ) {
+		const blockName = select.getBlockName( clientId ) as string;
+		const attributes = select.getBlockAttributes( clientId ) ?? {};
+		const lock = { ...attributes.lock };
+
+		if ( changes.move !== undefined ) {
+			lock.move = changes.move;
+		}
+		if ( changes.remove !== undefined ) {
+			lock.remove = changes.remove;
+		}
+		if (
+			changes.edit !== undefined &&
+			ALLOWS_EDIT_LOCKING.includes( blockName )
+		) {
+			lock.edit = changes.edit;
+		}
+
+		const rootClientId = select.getBlockRootClientId( clientId );
+		const isInsideTargets =
+			rootClientId !== null && nextTemplateLocks.has( rootClientId );
+		const parentTemplateLock = isInsideTargets
+			? nextTemplateLocks.get( rootClientId )
+			: select.getTemplateLock( rootClientId );
+		const isLockedByParent =
+			parentTemplateLock === 'all' || parentTemplateLock === 'insert';
+
+		let nextLock: typeof lock | undefined = lock;
+		if ( isLockedByParent && isInsideTargets ) {
+			// An explicit `false` would let the block out of the layout lock
+			// of its parent, so keep only what the block locks itself.
+			nextLock = Object.fromEntries(
+				Object.entries( lock ).filter( ( [ , value ] ) => value )
+			);
+		}
+		// An explicit `false` overrides a template lock inherited from a
+		// parent outside the blocks, so keep it only then.
+		const needsExplicitUnlock = isLockedByParent && ! isInsideTargets;
+		attributesByClientId[ clientId ].lock =
+			Object.values( nextLock ).some( Boolean ) || needsExplicitUnlock
+				? nextLock
+				: undefined;
+	}
+
+	return attributesByClientId;
+}
+
+/**
  * Locks or unlocks blocks and every block inside them, in a single undo step.
  *
  * Movement and deletion are stored in the `lock` attribute, and the layout
@@ -735,99 +846,11 @@ export interface BlockLockChanges {
 export const setBlocksLock =
 	( clientIds: string[], changes: BlockLockChanges ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		const targetIds = [
-			...new Set( [
-				...clientIds,
-				...select.getClientIdsOfDescendants( clientIds ),
-			] ),
-		];
-		const isFullUnlock =
-			changes.move === false &&
-			changes.remove === false &&
-			changes.layout === false;
-		const lockableIds = targetIds.filter( ( clientId ) => {
-			const blockName = select.getBlockName( clientId );
-			return !! blockName && select.canLockBlockType( blockName );
-		} );
-		const attributesByClientId: Record<
-			string,
-			Record< string, unknown >
-		> = {};
-
-		// First, the layout lock, which the lock of the blocks inside depends on.
-		const nextTemplateLocks = new Map< string, unknown >();
-		for ( const clientId of lockableIds ) {
-			const attributes = select.getBlockAttributes( clientId ) ?? {};
-			const nextAttributes: Record< string, unknown > = {};
-			let templateLock = attributes.templateLock;
-
-			// The layout of a pattern is the pattern's: it changes by editing or
-			// detaching the pattern, so leave it.
-			if (
-				changes.layout !== undefined &&
-				select.canLayoutLockBlock( clientId ) &&
-				! select.isPatternLockedBlock( clientId )
-			) {
-				if ( changes.layout ) {
-					templateLock = 'all';
-				} else if (
-					isFullUnlock ||
-					LAYOUT_TEMPLATE_LOCKS.includes( templateLock as string )
-				) {
-					templateLock = undefined;
-				}
-				nextAttributes.templateLock = templateLock;
-			}
-
-			nextTemplateLocks.set( clientId, templateLock );
-			attributesByClientId[ clientId ] = nextAttributes;
-		}
-
-		// Then the lock of each block.
-		for ( const clientId of lockableIds ) {
-			const blockName = select.getBlockName( clientId ) as string;
-			const attributes = select.getBlockAttributes( clientId ) ?? {};
-			const lock = { ...attributes.lock };
-
-			if ( changes.move !== undefined ) {
-				lock.move = changes.move;
-			}
-			if ( changes.remove !== undefined ) {
-				lock.remove = changes.remove;
-			}
-			if (
-				changes.edit !== undefined &&
-				ALLOWS_EDIT_LOCKING.includes( blockName )
-			) {
-				lock.edit = changes.edit;
-			}
-
-			const rootClientId = select.getBlockRootClientId( clientId );
-			const isInsideTargets =
-				rootClientId !== null && nextTemplateLocks.has( rootClientId );
-			const parentTemplateLock = isInsideTargets
-				? nextTemplateLocks.get( rootClientId )
-				: select.getTemplateLock( rootClientId );
-			const isLockedByParent =
-				parentTemplateLock === 'all' || parentTemplateLock === 'insert';
-
-			let nextLock: typeof lock | undefined = lock;
-			if ( isLockedByParent && isInsideTargets ) {
-				// An explicit `false` would let the block out of the layout lock
-				// of its parent, so keep only what the block locks itself.
-				nextLock = Object.fromEntries(
-					Object.entries( lock ).filter( ( [ , value ] ) => value )
-				);
-			}
-			// An explicit `false` overrides a template lock inherited from a
-			// parent outside the blocks, so keep it only then.
-			const needsExplicitUnlock = isLockedByParent && ! isInsideTargets;
-			attributesByClientId[ clientId ].lock =
-				Object.values( nextLock ).some( Boolean ) || needsExplicitUnlock
-					? nextLock
-					: undefined;
-		}
-
+		const attributesByClientId = getBlocksLockAttributes(
+			select,
+			clientIds,
+			changes
+		);
 		const updatedClientIds = Object.keys( attributesByClientId );
 		if ( ! updatedClientIds.length ) {
 			return;
@@ -839,5 +862,34 @@ export const setBlocksLock =
 			{
 				uniqueByBlock: true,
 			}
+		);
+	};
+
+/**
+ * Detaches an unsynced pattern, in a single undo step: the block is no longer
+ * associated with its pattern, and every block inside it is unlocked, so they
+ * are fully editable. The block keeps its own movement and deletion locks.
+ *
+ * @param clientId Client ID of the pattern block.
+ */
+export const detachPattern =
+	( clientId: string ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const metadata = { ...select.getBlockAttributes( clientId )?.metadata };
+		delete metadata.patternName;
+
+		const attributesByClientId = getBlocksLockAttributes(
+			select,
+			select.getClientIdsOfDescendants( [ clientId ] ),
+			{ move: false, remove: false, layout: false, edit: false }
+		);
+		attributesByClientId[ clientId ] = {
+			metadata: Object.keys( metadata ).length ? metadata : undefined,
+		};
+
+		dispatch.updateBlockAttributes(
+			Object.keys( attributesByClientId ),
+			attributesByClientId,
+			{ uniqueByBlock: true }
 		);
 	};

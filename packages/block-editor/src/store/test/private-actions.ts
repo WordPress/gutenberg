@@ -16,6 +16,7 @@ import {
 	editContentOnlySection,
 	stopEditingContentOnlySection,
 	setBlocksLock,
+	detachPattern,
 } from '../private-actions';
 import type { BlockEditorThunkArgs, Settings } from '../types';
 
@@ -520,6 +521,39 @@ describe( 'private actions', () => {
 					// No explicit `move: false`, which would let it out of the
 					// layout lock of the group.
 					paragraph: { lock: { remove: true } },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'detaches a pattern and unlocks the blocks inside it, keeping its own lock', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			detachPattern( 'group' )(
+				thunkArgs( {
+					select: createSelect(
+						{
+							group: {
+								lock: { move: true, remove: true },
+								metadata: {
+									patternName: 'core/hero',
+									name: 'Hero',
+								},
+							},
+							paragraph: { lock: { move: true, remove: true } },
+						},
+						{ patternLocked: [ 'group' ] }
+					),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'paragraph', 'group' ],
+				{
+					paragraph: { lock: undefined },
+					// No `lock` change: the pattern keeps its own lock.
+					group: { metadata: { name: 'Hero' } },
 				},
 				{ uniqueByBlock: true }
 			);
