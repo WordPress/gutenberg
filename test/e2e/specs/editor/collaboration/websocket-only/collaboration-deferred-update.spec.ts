@@ -151,10 +151,10 @@ test.describe( 'Collaboration - deferred local update', () => {
 		const held = await page.evaluate(
 			() => ( window as any ).__gate.messages.length
 		);
-		await page2.keyboard.type( 'Peer ' );
+		await page2.keyboard.type( 'Bob says ' );
 		await expect
 			.poll( () => getParagraphContents( page2 ) )
-			.toEqual( [ 'Peer Hello', 'Secondxy' ] );
+			.toEqual( [ 'Bob says Hello', 'Secondxy' ] );
 		await page.waitForFunction(
 			( before ) => ( window as any ).__gate.messages.length > before,
 			held
@@ -190,7 +190,7 @@ test.describe( 'Collaboration - deferred local update', () => {
 		} );
 
 		// Both edits stay, in both editors.
-		const merged = [ 'Peer Hello!', 'Secondxy' ];
+		const merged = [ 'Bob says Hello!', 'Secondxy' ];
 		await expect
 			.poll(
 				async () => ( {
@@ -204,11 +204,11 @@ test.describe( 'Collaboration - deferred local update', () => {
 		// The first editor's caret stays after its own character.
 		await expect
 			.poll( () => getCaret( page ) )
-			.toEqual( { blockIndex: 0, start: 11, end: 11 } );
+			.toEqual( { blockIndex: 0, start: 15, end: 15 } );
 
 		// The first editor can undo its own edit. The peer's edit stays.
 		await page.keyboard.press( 'ControlOrMeta+z' );
-		const undone = [ 'Peer Hello', 'Secondxy' ];
+		const undone = [ 'Bob says Hello', 'Secondxy' ];
 		await expect
 			.poll(
 				async () => ( {
@@ -220,6 +220,6 @@ test.describe( 'Collaboration - deferred local update', () => {
 			.toEqual( { first: undone, peer: undone } );
 		await expect
 			.poll( () => getCaret( page ) )
-			.toEqual( { blockIndex: 0, start: 10, end: 10 } );
+			.toEqual( { blockIndex: 0, start: 14, end: 14 } );
 	} );
 } );
