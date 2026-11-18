@@ -6,6 +6,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	aspectRatio as aspectRatioIcon,
+	getAspectRatioIcon,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -198,6 +199,11 @@ export default function MediaEditorImageControls( {
 							value={ preset.value.toString() }
 							closeOnClick
 							disabled={ disabled }
+							prefix={
+								<Menu.PrefixIcon
+									icon={ getAspectRatioIcon( preset.value ) }
+								/>
+							}
 						>
 							<Menu.ItemLabel>{ preset.label }</Menu.ItemLabel>
 						</Menu.RadioItem>
