@@ -1,17 +1,14 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { forwardRef, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { lock, lockOpen } from '@wordpress/icons';
+import { lock, lockDashed, lockOpen } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-	Menu,
-} from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
-import type { FocusEventHandler, KeyboardEvent, MouseEvent } from 'react';
+import type { FocusEventHandler, MouseEvent } from 'react';
 import {
-	BlockLockMenuItems,
+	BlockLockContextMenu,
+	getContextMenuAnchorRect,
 	useBlockLock,
 	useLockBlocks,
 	useUnlockBlocks,
@@ -40,8 +37,9 @@ interface ListViewLockButtonProps {
  * - An unlocked block or pattern shows an open lock while the pointer is over
  *   the row, or the button has keyboard focus. Pressing it locks every
  *   property of the block and every block inside it.
- * - A locked block or pattern always shows a lock. Pressing it unlocks the
- *   block and every block inside it.
+ * - A locked block or pattern always shows its lock: a lock for a full lock
+ *   and a lock with a dash for a partial lock. Pressing it unlocks the block
+ *   and every block inside it.
  * - Right-clicking the lock of a locked block or a pattern opens the lock menu
  *   at the pointer, to change each property.
  *
@@ -57,7 +55,7 @@ const ListViewLockButton = forwardRef<
 	{ clientId, tabIndex, onFocus },
 	ref
 ) {
-	const { canLock, hasOwnLock, lockingSection, isPatternLocked } =
+	const { canLock, hasOwnLock, lockType, lockingSection, isPatternLocked } =
 		useBlockLock( clientId );
 	// The block type, e.g. "Group", rather than any custom name of the block.
 	const blockTypeTitle = useSelect(
@@ -85,7 +83,10 @@ const ListViewLockButton = forwardRef<
 	// not of a block inside a pattern, whose lock is the pattern's.
 	const hasMenu =
 		canLock && ! lockingSection && ( isLocked || isPatternLocked );
-	const icon = isLocked ? lock : lockOpen;
+	let icon = lockOpen;
+	if ( isLocked ) {
+		icon = lockType === 'full' ? lock : lockDashed;
+	}
 
 	let label: string = isLocked
 		? sprintf(
@@ -120,8 +121,6 @@ const ListViewLockButton = forwardRef<
 				accessibleWhenDisabled
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
-				aria-haspopup={ hasMenu ? 'menu' : undefined }
-				aria-expanded={ hasMenu ? !! menuAnchorRect : undefined }
 				onClick={ () => {
 					if ( isLocked ) {
 						unlockBlocks( [ clientId ] );
@@ -134,62 +133,16 @@ const ListViewLockButton = forwardRef<
 						return;
 					}
 					event.preventDefault();
-					const buttonRect =
-						event.currentTarget.getBoundingClientRect();
-					// The context menu key gives no pointer position, so open
-					// the menu below the button.
-					const isFromKeyboard =
-						event.clientX === 0 && event.clientY === 0;
-					setMenuAnchorRect(
-						isFromKeyboard
-							? new window.DOMRect(
-									buttonRect.left,
-									buttonRect.bottom,
-									0,
-									0
-								)
-							: new window.DOMRect(
-									event.clientX,
-									event.clientY,
-									0,
-									0
-								)
-					);
+					setMenuAnchorRect( getContextMenuAnchorRect( event ) );
 				} }
 			/>
 			{ hasMenu && (
-				<Menu.Root
-					open={ !! menuAnchorRect }
-					onOpenChange={ ( nextOpen ) => {
-						if ( nextOpen ) {
-							return;
-						}
-						setMenuAnchorRect( null );
-						buttonRef.current?.focus();
-					} }
-				>
-					<Menu.Popup
-						// The popup is portaled, but its events still bubble
-						// to the row, whose keys move through List View.
-						onKeyDown={ ( event: KeyboardEvent ) =>
-							event.stopPropagation()
-						}
-						positioner={
-							<Menu.Positioner
-								anchor={ {
-									contextElement:
-										buttonRef.current ?? undefined,
-									getBoundingClientRect: () =>
-										menuAnchorRect ?? new window.DOMRect(),
-								} }
-								side="bottom"
-								align="start"
-							/>
-						}
-					>
-						<BlockLockMenuItems clientIds={ [ clientId ] } />
-					</Menu.Popup>
-				</Menu.Root>
+				<BlockLockContextMenu
+					clientIds={ [ clientId ] }
+					anchorRect={ menuAnchorRect }
+					contextElement={ buttonRef.current }
+					onClose={ () => setMenuAnchorRect( null ) }
+				/>
 			) }
 		</>
 	);

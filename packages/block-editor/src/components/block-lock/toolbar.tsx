@@ -1,62 +1,78 @@
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	ToolbarButton,
-	ToolbarGroup,
-	ToolbarItem,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useReducer, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { lock, lockOpen, unlock } from '@wordpress/icons';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-	Menu,
-} from '@wordpress/ui';
+import { lock, lockDashed, lockOpen, unlock } from '@wordpress/icons';
+import type { MouseEvent } from 'react';
 import BlockLockModal from './modal';
-import BlockLockMenuItems from './lock-menu-items';
+import BlockLockContextMenu, { getContextMenuAnchorRect } from './context-menu';
 import useBlockLock from './use-block-lock';
+import { useLockBlocks, useUnlockBlocks } from './use-full-lock';
 import { store as blockEditorStore } from '../../store';
 import { unlock as unlockPrivateApis } from '../../lock-unlock';
 import type { BlockLockControlProps } from './types';
 
 /**
- * Renders the toolbar button of a locked block, which opens the lock menu.
- * The icon is a lock while the block has a lock of its own, and an open lock
- * once unlocked, or for a pattern locked only by its layout. Once unlocked,
- * the button stays until the toolbar remounts and shows it.
+ * Renders the toolbar button of a locked block or pattern. Pressing it unlocks
+ * the block and every block inside it, or locks them once unlocked, and
+ * right-clicking it opens the lock menu at the pointer.
+ *
+ * The icon is a lock for a full lock, a lock with a dash for a partial lock,
+ * and an open lock once unlocked, or for a pattern locked only by its layout.
+ * Once unlocked, the button stays until the toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
-	const { canLock, hasOwnLock } = useBlockLock( clientId );
-	const label = canLock ? __( 'Lock' ) : __( 'Locked' );
-	const icon = hasOwnLock ? lock : lockOpen;
+	const { canLock, hasOwnLock, lockType, isPatternLocked } =
+		useBlockLock( clientId );
+	const lockBlocks = useLockBlocks();
+	const unlockBlocks = useUnlockBlocks();
+	const [ button, setButton ] = useState< HTMLButtonElement | null >( null );
+	// Where the lock menu opens, set when the button is right-clicked.
+	const [ menuAnchorRect, setMenuAnchorRect ] = useState< DOMRect | null >(
+		null
+	);
+	const hasMenu = canLock && ( hasOwnLock || isPatternLocked );
+
+	let icon = lockOpen;
+	if ( hasOwnLock ) {
+		icon = lockType === 'full' ? lock : lockDashed;
+	}
+	let label: string = hasOwnLock ? __( 'Unlock' ) : __( 'Lock' );
+	if ( ! canLock ) {
+		label = __( 'Locked' );
+	}
 
 	return (
 		<ToolbarGroup className="block-editor-block-lock-toolbar">
-			<Menu.Root>
-				<ToolbarItem>
-					{ ( toolbarItemProps ) => (
-						<Menu.Trigger
-							{ ...toolbarItemProps }
-							disabled={ ! canLock }
-							render={
-								<Button
-									size="compact"
-									icon={ icon }
-									label={ label }
-									accessibleWhenDisabled
-								/>
-							}
-						/>
-					) }
-				</ToolbarItem>
-				<Menu.Popup
-					positioner={
-						<Menu.Positioner side="bottom" align="start" />
+			<ToolbarButton
+				ref={ setButton }
+				icon={ icon }
+				label={ label }
+				disabled={ ! canLock }
+				accessibleWhenDisabled
+				onClick={ () => {
+					if ( hasOwnLock ) {
+						unlockBlocks( [ clientId ] );
+					} else {
+						lockBlocks( [ clientId ] );
 					}
-				>
-					<BlockLockMenuItems clientIds={ [ clientId ] } />
-				</Menu.Popup>
-			</Menu.Root>
+				} }
+				onContextMenu={ ( event: MouseEvent< HTMLButtonElement > ) => {
+					if ( ! hasMenu ) {
+						return;
+					}
+					event.preventDefault();
+					setMenuAnchorRect( getContextMenuAnchorRect( event ) );
+				} }
+			/>
+			{ hasMenu && (
+				<BlockLockContextMenu
+					clientIds={ [ clientId ] }
+					anchorRect={ menuAnchorRect }
+					contextElement={ button }
+					onClose={ () => setMenuAnchorRect( null ) }
+				/>
+			) }
 		</ToolbarGroup>
 	);
 }

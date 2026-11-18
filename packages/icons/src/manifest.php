@@ -453,6 +453,11 @@ return array(
 		'collections' => array( 'core-admin' ),
 		'dashicons'   => array( 'dashicons-lock', 'dashicons-lock-duplicate' ),
 	),
+	'lock-dashed'         => array(
+		'label'       => _x( 'Lock Dashed', 'icon label', 'gutenberg' ),
+		'filePath'    => 'library/lock-dashed.svg',
+		'collections' => array( 'core' ),
+	),
 	'lock-open'           => array(
 		'label'       => _x( 'Lock Open', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/lock-open.svg',
