@@ -1,3 +1,5 @@
+import type { UploadError } from '../upload-error';
+
 /**
  * Sub-size data returned by the sideload endpoint.
  *
@@ -44,6 +46,7 @@ export interface QueueItem {
 	onChange?: OnChangeHandler;
 	onSuccess?: OnSuccessHandler;
 	onError?: OnErrorHandler;
+	onWarning?: OnWarningHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
 	currentOperation?: OperationType;
 	operations?: Operation[];
@@ -56,6 +59,8 @@ export interface QueueItem {
 	sourceAttachmentId?: number;
 	abortController?: AbortController;
 	parentId?: QueueItemId;
+	/** Sub-sizes rejected before they could be sideloaded. */
+	failedSubSizes?: SubSizeFailure[];
 	subSizes?: SubSizeData[];
 }
 
@@ -94,6 +99,7 @@ export enum Type {
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
 	UpdateProgress = 'UPDATE_PROGRESS',
 	AccumulateSubSize = 'ACCUMULATE_SUB_SIZE',
+	AccumulateFailedSubSize = 'ACCUMULATE_FAILED_SUB_SIZE',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -158,6 +164,14 @@ export type UpdateProgressAction = Action<
 export type AccumulateSubSizeAction = Action<
 	Type.AccumulateSubSize,
 	{ id: QueueItemId; subSize: SubSizeData }
+>;
+export type SubSizeFailure = {
+	image_size: string | string[];
+	error: UploadError;
+};
+export type AccumulateFailedSubSizeAction = Action<
+	Type.AccumulateFailedSubSize,
+	{ id: QueueItemId; failure: SubSizeFailure }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
@@ -316,6 +330,7 @@ export interface Attachment {
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
 export type OnSuccessHandler = ( attachments: Partial< Attachment >[] ) => void;
 export type OnErrorHandler = ( error: Error ) => void;
+export type OnWarningHandler = ( message: string ) => void;
 export type OnBatchSuccessHandler = () => void;
 
 export enum ItemStatus {

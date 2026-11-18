@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   When client-side image processing generates a sub-size that exceeds
+    `maxUploadFileSize`, that sub-size is no longer sent to the server, and a
+    warning naming the missing size and the original file is shown once the
+    upload finishes ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
 ### New Features
 
 -   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
