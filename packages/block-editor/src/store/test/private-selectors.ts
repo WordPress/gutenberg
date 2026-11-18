@@ -31,6 +31,7 @@ import {
 	isLayoutLockedBlock,
 	canLayoutLockBlock,
 	getBlockLockType,
+	hasOwnBlockLock,
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
@@ -1831,6 +1832,24 @@ describe( 'private selectors', () => {
 					'leaf'
 				)
 			).toBe( 'partial' );
+		} );
+
+		it( 'counts a lock of the block itself as its own lock', () => {
+			expect(
+				hasOwnBlockLock(
+					createState( { templateLock: 'all' } ),
+					'container'
+				)
+			).toBe( true );
+			expect(
+				hasOwnBlockLock(
+					createState( {}, { lock: { move: true } } ),
+					'leaf'
+				)
+			).toBe( true );
+			expect( hasOwnBlockLock( createState( {} ), 'container' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'returns a partial lock when only the styles are locked', () => {

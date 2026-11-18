@@ -125,6 +125,7 @@ function ListViewBlock( {
 		isLocked,
 		isInLockingSection,
 		canLock,
+		hasOwnLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -137,6 +138,7 @@ function ListViewBlock( {
 				isLockedBlock,
 				getParentSectionBlock,
 				canLockBlockType,
+				hasOwnBlockLock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -158,6 +160,7 @@ function ListViewBlock( {
 					!! window.__experimentalBlockLockMenu &&
 					!! getParentSectionBlock( clientId ),
 				canLock: canLockBlockType( getBlockName( clientId ) ),
+				hasOwnLock: hasOwnBlockLock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -586,9 +589,10 @@ function ListViewBlock( {
 		isLockMenuEnabled &&
 		clientId !== editedSection &&
 		( canLock || isLocked || isInLockingSection );
-	// The lock of an unlocked block only shows on hover, focus or selection.
+	// The lock of an unlocked block or pattern only shows while the pointer is
+	// over the row, or the button has keyboard focus.
 	const lockCellClassName = clsx( 'block-editor-list-view-block__lock-cell', {
-		'is-visible': isLocked || isInLockingSection || isHovered || isSelected,
+		'is-visible': hasOwnLock || isInLockingSection || isHovered,
 	} );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;

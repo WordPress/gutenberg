@@ -1,7 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { forwardRef, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { lock, lockDashed, lockOpen } from '@wordpress/icons';
+import { lock, lockOpen } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
@@ -37,19 +37,18 @@ interface ListViewLockButtonProps {
  * Renders the lock of a block in its List View row. It is the same button as
  * the row's options menu toggle, so the two look alike.
  *
- * - An unlocked block shows an open lock while the row is hovered, focused or
- *   selected. Pressing it locks every property of the block and every block
- *   inside it.
- * - A locked block always shows its lock: a lock for a full lock and a lock
- *   with a dash for a partial lock. Pressing it unlocks the block and every
- *   block inside it.
+ * - An unlocked block or pattern shows an open lock while the pointer is over
+ *   the row, or the button has keyboard focus. Pressing it locks every
+ *   property of the block and every block inside it.
+ * - A locked block or pattern always shows a lock. Pressing it unlocks the
+ *   block and every block inside it.
  * - Right-clicking the lock of a locked block or a pattern opens the lock menu
  *   at the pointer, to change each property.
  *
- * The button is disabled, but stays focusable so its label can say why, for a
- * pattern, which is unlocked by editing or detaching it, and for a block inside
- * a pattern, which is edited content only. A block inside any other locked
- * block controls its own lock, so its button works.
+ * A pattern's layout is the pattern's, so it neither counts as a lock here nor
+ * changes. A block inside a pattern is edited content only, so its button is
+ * disabled, but stays focusable so its label can say why. A block inside any
+ * other locked block controls its own lock, so its button works.
  */
 const ListViewLockButton = forwardRef<
 	HTMLButtonElement,
@@ -58,7 +57,7 @@ const ListViewLockButton = forwardRef<
 	{ clientId, tabIndex, onFocus },
 	ref
 ) {
-	const { canLock, lockType, lockingSection, isPatternLocked } =
+	const { canLock, hasOwnLock, lockingSection, isPatternLocked } =
 		useBlockLock( clientId );
 	// The block type, e.g. "Group", rather than any custom name of the block.
 	const blockTypeTitle = useSelect(
@@ -80,20 +79,13 @@ const ListViewLockButton = forwardRef<
 		null
 	);
 
-	const isLocked = lockType !== 'none';
-	const isInPattern = isPatternLocked || !! lockingSection;
-	const isDisabled = isInPattern || ! canLock;
+	const isLocked = hasOwnLock;
+	const isDisabled = !! lockingSection || ! canLock;
 	// The lock menu changes the lock of a locked block or of a pattern, but
 	// not of a block inside a pattern, whose lock is the pattern's.
 	const hasMenu =
 		canLock && ! lockingSection && ( isLocked || isPatternLocked );
-
-	let icon = lockOpen;
-	if ( lockType === 'full' ) {
-		icon = lock;
-	} else if ( lockType === 'partial' ) {
-		icon = lockDashed;
-	}
+	const icon = isLocked ? lock : lockOpen;
 
 	let label: string = isLocked
 		? sprintf(
@@ -106,8 +98,11 @@ const ListViewLockButton = forwardRef<
 				__( 'Lock %s' ),
 				blockTypeTitle ?? ''
 			);
-	// A pattern, and every block inside it, is locked by the pattern.
-	if ( isInPattern ) {
+	if ( isPatternLocked ) {
+		label = isLocked ? __( 'Unlock Pattern' ) : __( 'Lock Pattern' );
+	}
+	// Every block inside a pattern is locked by the pattern.
+	if ( lockingSection ) {
 		label = __( 'Locked by Pattern' );
 	} else if ( ! canLock ) {
 		label = __( 'Locked' );

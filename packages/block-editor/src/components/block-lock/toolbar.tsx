@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { useReducer, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { lock, lockDashed, lockOpen, unlock } from '@wordpress/icons';
+import { lock, lockOpen, unlock } from '@wordpress/icons';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 	Menu,
@@ -21,19 +21,14 @@ import type { BlockLockControlProps } from './types';
 
 /**
  * Renders the toolbar button of a locked block, which opens the lock menu.
- * The icon is a lock for a full lock, a lock with a dash for a partial lock,
- * and an open lock once unlocked. Once unlocked, the button stays until the
- * toolbar remounts and shows it.
+ * The icon is a lock while the block has a lock of its own, and an open lock
+ * once unlocked, or for a pattern locked only by its layout. Once unlocked,
+ * the button stays until the toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
-	const { canLock, lockType } = useBlockLock( clientId );
+	const { canLock, hasOwnLock } = useBlockLock( clientId );
 	const label = canLock ? __( 'Lock' ) : __( 'Locked' );
-	let icon = lock;
-	if ( lockType === 'partial' ) {
-		icon = lockDashed;
-	} else if ( lockType === 'none' ) {
-		icon = lockOpen;
-	}
+	const icon = hasOwnLock ? lock : lockOpen;
 
 	return (
 		<ToolbarGroup className="block-editor-block-lock-toolbar">

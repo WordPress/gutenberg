@@ -32,6 +32,11 @@ export interface BlockLockStatus {
 	isPatternLocked: boolean;
 	isLocked: boolean;
 	/**
+	 * Whether the block has a lock of its own, not counting the layout of a
+	 * pattern, which is the pattern's.
+	 */
+	hasOwnLock: boolean;
+	/**
 	 * How much of the block is locked: every property it supports (`full`),
 	 * some of them (`partial`), or none.
 	 */

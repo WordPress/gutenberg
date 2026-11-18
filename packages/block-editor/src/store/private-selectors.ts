@@ -1404,6 +1404,25 @@ export function getBlockLockType(
 }
 
 /**
+ * Returns whether a block has a lock of its own. The layout of a pattern is
+ * the pattern's, so it doesn't count.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block has a lock of its own.
+ */
+export function hasOwnBlockLock( state: State, clientId: string ): boolean {
+	return (
+		isMoveLockedBlock( state, clientId ) ||
+		isRemoveLockedBlock( state, clientId ) ||
+		isEditLockedBlock( state, clientId ) ||
+		( isLayoutLockedBlock( state, clientId ) &&
+			! isPatternLockedBlock( state, clientId ) )
+	);
+}
+
+/**
  * Returns whether the list view content panel popover is open.
  *
  * @param state Global application state.

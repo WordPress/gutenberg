@@ -337,8 +337,10 @@
 			opacity: 0;
 		}
 
+		// Focus from a click stays on the button after unlocking, so only
+		// keyboard focus keeps it shown once the pointer leaves the row.
 		&:hover,
-		&:focus-within,
+		&:has(:focus-visible),
 		&.is-visible {
 			> * {
 				opacity: 1;
