@@ -12,6 +12,14 @@ import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { getFilename } from '@wordpress/url';
 
+/*
+ * `escapeEditableHTML()` and its helper are copied from
+ * `@wordpress/escape-html`, which `@wordpress/block-library` doesn't depend on.
+ */
+const escapeLessThan = ( value ) => value.replace( /</g, '&lt;' );
+const escapeEditableHTML = ( value ) =>
+	escapeLessThan( value.replace( /&/g, '&amp;' ) );
+
 const transforms = {
 	from: [
 		{
@@ -74,7 +82,10 @@ const transforms = {
 				return createBlock( 'core/file', {
 					href: attributes.url,
 					fileName:
-						attributes.caption || getFilename( attributes.url ),
+						attributes.caption ||
+						escapeEditableHTML(
+							getFilename( attributes.url ) ?? ''
+						),
 					textLinkHref: attributes.url,
 					id: attributes.id,
 					anchor: attributes.anchor,
