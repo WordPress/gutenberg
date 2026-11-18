@@ -6960,11 +6960,6 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/test/privateAPIs.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/data/src/test/registry.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
