@@ -16,6 +16,7 @@ import {
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
+import { VisuallyHidden } from '@wordpress/ui';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
 import ItemActions, { ItemPrimaryActions } from '../../dataviews-item-actions';
@@ -694,9 +695,10 @@ function ViewTable< Item >( {
 									}
 								) }
 							>
-								<span className="dataviews-view-table-header">
+								{ /* Visually hidden, so the column is only as wide as the actions menu. */ }
+								<VisuallyHidden>
 									{ __( 'Actions' ) }
-								</span>
+								</VisuallyHidden>
 							</th>
 						) }
 					</tr>
