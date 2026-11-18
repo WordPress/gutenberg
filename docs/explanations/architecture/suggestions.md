@@ -563,7 +563,8 @@ In the notes sidebar, a suggestion thread renders:
 
 | Status | Anchor in loaded content | Shows |
 |---|---|---|
-| pending | either | Accept / Reject |
+| pending | yes | Accept / Reject |
+| pending | no | Reject, with Accept disabled and "This suggestion is no longer in the post. Reject it to close the note." |
 | provisional | yes | Accept / Reject, and "{Name} accepted this suggestion, but the post was not saved." |
 | provisional | no | "Applied" (or "Rejected"), and "Save the post to keep this decision." |
 | `applied` / `rejected` | yes | "Applied, but the change is not in the post." (or "Rejected, but the suggestion is still in the post."), with Apply again, Reject again and Reopen |
@@ -571,6 +572,35 @@ In the notes sidebar, a suggestion thread renders:
 | `outdated` | no | "No longer applies - the text was removed." (the block was removed, or the block changed, for block suggestions), with Reopen |
 
 Reopen, from the card or the note's menu, writes `hold` and `pending` together, so a reopened suggestion offers its decision again.
+
+## Writing suggestions from code
+
+There is no dedicated API for creating a suggestion yet. A plugin that writes one today creates the `note` comment with its `_wp_suggestion` payload and places the anchor in post content itself, following [Inline suggestion markers](#inline-suggestion-markers) and [Suggestion Payload (v2)](#suggestion-payload-v2). Both formats are internal and can change; a server-side helper and a JavaScript counterpart are tracked in [#73411](https://github.com/WordPress/gutenberg/issues/73411). Until then:
+
+- **Check availability first.** `gutenberg_suggestions_enabled( $post )` is true when the experiment is on and the post's type supports notes.
+- **Slash the payload.** `update_comment_meta()` unslashes its value, which strips the backslashes out of JSON:
+
+    ```php
+    update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
+    ```
+
+- **Expect the writing user's capabilities to apply.** The meta `auth_callback`s need `edit_post` on the note's post, so a REST write with no user (WP-Cron, an unauthenticated request) is refused. A direct `update_comment_meta()` skips the auth check but still runs the `sanitize_callback`, which filters the payload through post KSES unless the current user has `unfiltered_html`.
+- **Match markers by `data-suggestion-id`, not by string.** Rich text writes a marker's attributes back in its own order the first time the editor loads the content.
+- **Place the anchor with the note.** A pending note whose anchor is not in the content shows Accept disabled (see [Review UI](#review-ui)), and the editor only collects such a note for the user who authored it.
+- **Listen for the outcome.** The save pass fires an action whenever it writes a final status:
+
+    ```php
+    add_action(
+    	'gutenberg_suggestion_finalized',
+    	function ( $note_id, $status, $post_id, $user_id ) {
+    		// $status is 'applied', 'rejected' or 'outdated'.
+    	},
+    	10,
+    	4
+    );
+    ```
+
+    A provisional decision (`applied-unsaved`, `rejected-unsaved`) fires nothing; see [Decision lifecycle](#decision-lifecycle).
 
 ## Yjs v2 Migration Path
 
