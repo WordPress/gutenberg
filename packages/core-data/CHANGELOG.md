@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 4.4.7 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 4.4.0 (2022-04-08)
 
 ## 4.3.0 (2022-03-23)
