@@ -1388,6 +1388,66 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	const doubleClickNextBlocks = {
+		separator: [ { name: 'core/separator' } ],
+		'placeholder block': [ { name: 'core/image' } ],
+		'container block': [
+			{
+				name: 'core/group',
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Inner' },
+					},
+				],
+			},
+		],
+		paragraph: [
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		],
+	};
+
+	for ( const [ label, nextBlocks ] of Object.entries(
+		doubleClickNextBlocks
+	) ) {
+		test( `should not select into the next block on double click past the end of the text before a ${ label }`, async ( {
+			page,
+			editor,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'One two three' },
+			} );
+			for ( const block of nextBlocks ) {
+				await editor.insertBlock( block );
+			}
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock()
+			);
+
+			// The middle of the paragraph is past the end of its short text.
+			// Double clicking there extends the forward selection to the
+			// boundary of the next block; that overshoot must not start a
+			// multi selection.
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
+				.first()
+				.dblclick();
+
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'One two three' },
+					},
+				] );
+		} );
+	}
+
 	test( 'should gradually multi-select', async ( {
 		page,
 		editor,

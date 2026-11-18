@@ -39,15 +39,15 @@ function extractSelectionStartNode( selection: Selection ): Node {
  * a text node, the selection offset is the index of a child node. The selection
  * reaches up to but excluding that child node.
  *
- * @param selection     The selection.
- * @param isTripleClick Whether the selection comes from a triple
- *                      click.
+ * @param selection    The selection.
+ * @param isMultiClick Whether the selection comes from a double or triple
+ *                     click.
  *
  * @return The selection start node.
  */
 function extractSelectionEndNode(
 	selection: Selection,
-	isTripleClick: boolean
+	isMultiClick: boolean
 ): Node {
 	// Callers only read a selection with a range.
 	const { focusNode, focusOffset } = selection;
@@ -64,8 +64,8 @@ function extractSelectionEndNode(
 	const range = selection.getRangeAt( 0 );
 	const clientId = getBlockClientId( selection.anchorNode );
 
-	// A triple click extends the forward selection past the block, which would
-	// trigger multi selection. Move the end back to the last text position
+	// A double click past the end of the text or a triple click extends the
+	// forward selection past the block, which would trigger multi selection. Move the end back to the last text position
 	// before it, but only within the block the selection starts in, so a drag
 	// across blocks is left alone. The focus is the range end for a forward
 	// selection; node positions can't tell, as the focus may be an ancestor of
@@ -73,7 +73,7 @@ function extractSelectionEndNode(
 	if (
 		range.endContainer === node &&
 		range.endOffset === focusOffset &&
-		isTripleClick &&
+		isMultiClick &&
 		clientId &&
 		getBlockClientId( endNode ) !== clientId
 	) {
@@ -137,10 +137,10 @@ export default function useSelectionObserver() {
 			// A mounted element's document has a window.
 			const { defaultView } = ownerDocument;
 
-			let isTripleClick = false;
+			let isMultiClick = false;
 
 			function onMouseDown( event: MouseEvent ) {
-				isTripleClick = event.detail === 3;
+				isMultiClick = event.detail >= 2;
 				// A shift+click makes a multi-selection: mark the gesture as
 				// in progress so the clicked block's focus handler does not
 				// select it (collapsing the native range being made), and so
@@ -159,7 +159,7 @@ export default function useSelectionObserver() {
 			}
 
 			function onKeyDown() {
-				isTripleClick = false;
+				isMultiClick = false;
 			}
 
 			function onSelectionChange( event: Event | MouseEvent ) {
@@ -180,7 +180,7 @@ export default function useSelectionObserver() {
 				const startNode = extractSelectionStartNode( selection );
 				const endNode = extractSelectionEndNode(
 					selection,
-					isTripleClick
+					isMultiClick
 				);
 
 				if (
@@ -503,7 +503,7 @@ export default function useSelectionObserver() {
 					extractSelectionStartNode( selection )
 				);
 				const endClientId = getBlockClientId(
-					extractSelectionEndNode( selection, isTripleClick )
+					extractSelectionEndNode( selection, isMultiClick )
 				);
 
 				if ( startClientId === endClientId ) {
