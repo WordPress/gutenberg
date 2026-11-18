@@ -39,6 +39,11 @@ export default function useDropZone( {
 			let isDragging = false;
 
 			const { ownerDocument } = element;
+			// A drag can end on an editor overlay in the iframe's parent document.
+			const dragEndDocuments = new Set( [
+				ownerDocument,
+				ownerDocument.defaultView?.frameElement?.ownerDocument,
+			] );
 
 			/**
 			 * Checks if an element is in the drop zone.
@@ -83,8 +88,11 @@ export default function useDropZone( {
 				// HTML drag events where the drag origin is outside the browser
 				// window. In Firefox it may also not fire if the originating
 				// node is removed.
-				ownerDocument.addEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.addEventListener( 'mousemove', maybeDragEnd );
+				for ( const dragDocument of dragEndDocuments ) {
+					dragDocument?.addEventListener( 'dragend', maybeDragEnd );
+					dragDocument?.addEventListener( 'drop', maybeDragEnd );
+					dragDocument?.addEventListener( 'mousemove', maybeDragEnd );
+				}
 
 				if ( _onDragStart ) {
 					onDragStartEvent( event );
@@ -163,11 +171,24 @@ export default function useDropZone( {
 
 				isDragging = false;
 
-				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
+				removeDragEndListeners();
 
 				if ( _onDragEnd ) {
 					onDragEndEvent( event as MouseEvent );
+				}
+			}
+
+			function removeDragEndListeners() {
+				for ( const dragDocument of dragEndDocuments ) {
+					dragDocument?.removeEventListener(
+						'dragend',
+						maybeDragEnd
+					);
+					dragDocument?.removeEventListener( 'drop', maybeDragEnd );
+					dragDocument?.removeEventListener(
+						'mousemove',
+						maybeDragEnd
+					);
 				}
 			}
 
@@ -192,8 +213,7 @@ export default function useDropZone( {
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
 				element.removeEventListener( 'dragleave', onDragLeave );
-				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
+				removeDragEndListeners();
 				ownerDocument.removeEventListener(
 					'dragenter',
 					maybeDragStart
