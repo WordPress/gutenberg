@@ -129,16 +129,27 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 		border-radius: 0;
 		border: none;
 		padding: 0 $grid-unit-05;
-
-		&:focus {
-			outline: none;
-		}
 	}
 
 	// For lower specificity.
 	:where(.wp-block-search__button) {
 		padding: $grid-unit-05 $grid-unit-10;
 	}
+}
+
+// Keep the field's focus indicator around the input and button, where themes can style it.
+:where(.wp-block-search__button-inside .wp-block-search__inside-wrapper:has(.wp-block-search__input:focus)) {
+	outline: 1px auto AccentColor;
+	outline: 1px auto -webkit-focus-ring-color;
+
+	// Leave room for native focus rings when forced colors match the border.
+	@media (forced-colors: active) {
+		outline-offset: 4px;
+	}
+}
+
+.wp-block-search__button-inside .wp-block-search__input:focus {
+	outline: none;
 }
 
 .wp-block-search.aligncenter .wp-block-search__inside-wrapper {
