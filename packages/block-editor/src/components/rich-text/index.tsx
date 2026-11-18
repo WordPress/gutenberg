@@ -332,8 +332,21 @@ function RichTextWrapper(
 		hasDefaultEditingMode,
 	] );
 
+	// With the lock menu, the text of a block whose design is locked can't be
+	// edited.
+	const isDesignLocked = useSelect(
+		( select ) =>
+			!! window.__experimentalBlockLockMenu &&
+			!! clientId &&
+			unlock( select( blockEditorStore ) ).isEditLockedBlock( clientId ),
+		[ clientId ]
+	);
+
 	const shouldDisableEditing =
-		readOnly || disableBoundBlock || shouldDisableForPattern;
+		readOnly ||
+		disableBoundBlock ||
+		shouldDisableForPattern ||
+		isDesignLocked;
 
 	const { getSelectionStart, getSelectionEnd, getBlockRootClientId } =
 		useSelect( blockEditorStore );

@@ -121,7 +121,7 @@ const BlockSettingsMenuControlsSlot = ( {
 								onClose={ fillProps?.onClose }
 							/>
 						) }
-						{ canEdit &&
+						{ ( canEdit || isLockMenuEnabled ) &&
 							showLockButton &&
 							( isLockMenuEnabled ? (
 								<BlockLockSubmenu

@@ -1366,11 +1366,12 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 }
 
 /**
- * Returns how much of a block is locked. A block has up to three lock
- * properties: movement, deletion and, where it can be locked, layout.
+ * Returns how much of a block is locked. A block has up to four lock
+ * properties: movement, deletion, design (editing its content and styles)
+ * and, where it can be locked, layout.
  *
  * - `full`: every property the block supports is locked.
- * - `partial`: some, but not all, of them are locked, or only editing is.
+ * - `partial`: some, but not all, of them are locked.
  * - `none`: the block is not locked.
  *
  * @param state    Global application state.
@@ -1385,6 +1386,7 @@ export function getBlockLockType(
 	const locks = [
 		isMoveLockedBlock( state, clientId ),
 		isRemoveLockedBlock( state, clientId ),
+		isEditLockedBlock( state, clientId ),
 	];
 	if ( canLayoutLockBlock( state, clientId ) ) {
 		locks.push( isLayoutLockedBlock( state, clientId ) );
@@ -1394,7 +1396,7 @@ export function getBlockLockType(
 		return 'full';
 	}
 
-	if ( locks.some( Boolean ) || isEditLockedBlock( state, clientId ) ) {
+	if ( locks.some( Boolean ) ) {
 		return 'partial';
 	}
 

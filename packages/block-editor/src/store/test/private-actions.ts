@@ -423,6 +423,22 @@ describe( 'private actions', () => {
 			);
 		} );
 
+		it( 'locks the design of every block, not only those with their own edit lock', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'group' ], { edit: true } )(
+				thunkArgs( { select: createSelect( {} ), dispatch } )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'group', 'paragraph' ],
+				{
+					group: { lock: { edit: true } },
+					paragraph: { lock: { edit: true } },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
 		it( 'changes only the given property', () => {
 			const dispatch = { updateBlockAttributes: vi.fn() };
 			setBlocksLock( [ 'paragraph' ], { remove: false } )(

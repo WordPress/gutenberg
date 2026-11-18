@@ -19,10 +19,7 @@ import type {
 	TreeBlock,
 } from './types';
 import { unlock } from '../lock-unlock';
-import {
-	ALLOWS_EDIT_LOCKING,
-	LAYOUT_TEMPLATE_LOCKS,
-} from '../components/block-lock/constants';
+import { LAYOUT_TEMPLATE_LOCKS } from '../components/block-lock/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -714,7 +711,8 @@ export interface BlockLockChanges {
 	 */
 	layout?: boolean;
 	/**
-	 * Whether editing is locked. Only applies to blocks that allow it.
+	 * Whether the design is locked: the content and styles of the block can't
+	 * be edited.
 	 */
 	edit?: boolean;
 }
@@ -785,7 +783,6 @@ export const setBlocksLock =
 
 		// Then the lock of each block.
 		for ( const clientId of lockableIds ) {
-			const blockName = select.getBlockName( clientId ) as string;
 			const attributes = select.getBlockAttributes( clientId ) ?? {};
 			const lock = { ...attributes.lock };
 
@@ -795,10 +792,7 @@ export const setBlocksLock =
 			if ( changes.remove !== undefined ) {
 				lock.remove = changes.remove;
 			}
-			if (
-				changes.edit !== undefined &&
-				ALLOWS_EDIT_LOCKING.includes( blockName )
-			) {
+			if ( changes.edit !== undefined ) {
 				lock.edit = changes.edit;
 			}
 

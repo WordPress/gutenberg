@@ -6,12 +6,12 @@ import {
 } from '@wordpress/ui';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { ALLOWS_EDIT_LOCKING } from './constants';
 import type { BlockLockMenuProps } from './types';
 
 /**
  * Renders the checkbox items of the lock menu: all properties, then
- * movement, deletion and layout. Each change applies right away to the blocks
+ * movement, deletion, layout and design, which locks editing the content and
+ * styles of the blocks. Each change applies right away to the blocks
  * and every block inside them, and the menu stays open so several properties
  * can be toggled in one pass.
  *
@@ -28,11 +28,9 @@ export default function BlockLockMenuItems( {
 		isEditLocked,
 		canLayoutLock,
 		canChangeLayoutLock,
-		allowsEditLocking,
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlockName,
 				isMoveLockedBlock,
 				isRemoveLockedBlock,
 				isLayoutLockedBlock,
@@ -45,9 +43,6 @@ export default function BlockLockMenuItems( {
 			const layoutChangeableIds = layoutLockableIds.filter(
 				( clientId ) => ! isPatternLockedBlock( clientId )
 			);
-			const editLockableIds = clientIds.filter( ( clientId ) =>
-				ALLOWS_EDIT_LOCKING.includes( getBlockName( clientId ) ?? '' )
-			);
 
 			return {
 				isMoveLocked: clientIds.every( isMoveLockedBlock ),
@@ -55,10 +50,9 @@ export default function BlockLockMenuItems( {
 				isLayoutLocked:
 					layoutLockableIds.length > 0 &&
 					layoutLockableIds.every( isLayoutLockedBlock ),
-				isEditLocked: editLockableIds.every( isEditLockedBlock ),
+				isEditLocked: clientIds.every( isEditLockedBlock ),
 				canLayoutLock: layoutLockableIds.length > 0,
 				canChangeLayoutLock: layoutChangeableIds.length > 0,
-				allowsEditLocking: editLockableIds.length > 0,
 			};
 		},
 		[ clientIds ]
@@ -68,7 +62,7 @@ export default function BlockLockMenuItems( {
 		isMoveLocked &&
 		isRemoveLocked &&
 		( ! canLayoutLock || isLayoutLocked ) &&
-		( ! allowsEditLocking || isEditLocked );
+		isEditLocked;
 
 	return (
 		<>
@@ -114,6 +108,15 @@ export default function BlockLockMenuItems( {
 				}
 			>
 				<Menu.ItemLabel>{ __( 'Layout' ) }</Menu.ItemLabel>
+			</Menu.CheckboxItem>
+			<Menu.CheckboxItem
+				checked={ isEditLocked }
+				closeOnClick={ false }
+				onCheckedChange={ ( edit ) =>
+					setBlocksLock( clientIds, { edit } )
+				}
+			>
+				<Menu.ItemLabel>{ __( 'Design' ) }</Menu.ItemLabel>
 			</Menu.CheckboxItem>
 		</>
 	);
