@@ -1024,6 +1024,51 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should append received blocks to the root order', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'RECEIVE_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							partial< Block >( {
+								clientId: 'wings',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							} ),
+						],
+					} ),
+				],
+			} );
+
+			expect( Object.fromEntries( state.order ) ).toEqual( {
+				'': [ 'chicken', 'ribs' ],
+				chicken: [],
+				ribs: [ 'wings' ],
+				wings: [],
+			} );
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
+				state.tree.get( 'chicken' )
+			);
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
+				state.tree.get( 'ribs' )
+			);
+		} );
+
 		it( 'should replace the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -1344,6 +1389,33 @@ describe( 'state', () => {
 			);
 		} );
 
+		it( 'should move the block up when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_UP',
+				clientIds: [ 'ribs' ],
+				rootClientId: null,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
 		it( 'should move the nested block up', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
@@ -1497,6 +1569,33 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
 				clientIds: [ 'chicken' ],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
+		} );
+
+		it( 'should move the block down when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_DOWN',
+				clientIds: [ 'chicken' ],
+				rootClientId: null,
 			} );
 
 			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
@@ -1779,6 +1878,40 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should insert into the root order when rootClientId is null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'kumquat',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			const state = blocks( original, {
+				type: 'INSERT_BLOCKS',
+				rootClientId: null,
+				blocks: [
+					partial< Block >( {
+						clientId: 'persimmon',
+						name: 'core/registered-block',
+						innerBlocks: [],
+					} ),
+				],
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'kumquat',
+				'persimmon',
+			] );
+			expect( state.order.has( null as unknown as string ) ).toBe(
+				false
+			);
+		} );
+
 		it( 'should move block to lower index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -1806,6 +1939,45 @@ describe( 'state', () => {
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				clientIds: [ 'ribs' ],
+				index: 0,
+			} );
+
+			expect( state.order.get( '' ) ).toEqual( [
+				'ribs',
+				'chicken',
+				'veggies',
+			] );
+		} );
+
+		it( 'should move block when fromRootClientId and toRootClientId are null', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					partial< Block >( {
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					} ),
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
+				fromRootClientId: null,
+				toRootClientId: null,
 				index: 0,
 			} );
 
