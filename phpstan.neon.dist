@@ -65,7 +65,8 @@ parameters:
 
 	# Errors that are intentionally ignored, as opposed to the baseline, which records errors still to be fixed.
 	#
-	# Each entry names the file its error occurs in with `path`, unless it is marked `reportUnmatched: false`. An entry
+	# Each entry names the file its error occurs in with `path`, unless it is a rule for every file, which is marked
+	# `reportUnmatched: false` instead, so that it is not reported when no file breaks it. An entry
 	# that names no file applies to every file, so phpstan-strict.neon.dist, which analyzes only some of them, would
 	# report it as unmatched when its error occurs only in the others. An error occurring in several files gets an entry
 	# for each, since PHPStan reports an entry naming several files with `paths` as unmatched even when it analyzes none
@@ -78,7 +79,7 @@ parameters:
 		-
 			message: '#^Action callback returns .+ but should not return anything\.$#'
 			identifier: return.void
-			path: lib/media/load.php
+			reportUnmatched: false
 
 		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.

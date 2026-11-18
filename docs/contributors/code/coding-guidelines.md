@@ -848,7 +848,7 @@ Some of the PHP is held to a stricter rule level than the rest, so that code whi
 
 To hold another file or directory to the stricter level, add it to that list, run `composer phpstan:strict`, and fix the errors it reports. Errors that cannot be fixed yet can be recorded in its baseline with `composer phpstan:baselines`, but only add a path whose errors are few.
 
-An entry in the `ignoreErrors` of `phpstan.neon.dist` needs a `path` naming the file its error occurs in, with an entry for each file, or `reportUnmatched: false`. Otherwise it applies to every file, and the strict analysis reports it as unmatched when its error occurs only outside the strict paths.
+An entry in the `ignoreErrors` of `phpstan.neon.dist` needs a `path` naming the file its error occurs in, with an entry for each file, or, when it is a rule for every file, `reportUnmatched: false`. Otherwise it applies to every file, and the strict analysis reports it as unmatched when its error occurs only outside the strict paths.
 
 #### WordPress stubs
 
