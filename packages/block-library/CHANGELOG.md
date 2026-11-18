@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 3.2.23 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 3.2.22 (2026-08-06)
 
 ### Bug Fixes
