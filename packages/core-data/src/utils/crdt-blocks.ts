@@ -6,6 +6,7 @@ import { Y } from '@wordpress/sync';
 import {
 	asRichTextOffset,
 	createYMap,
+	isRecord,
 	richTextOffsetToHtmlIndex,
 	type HtmlStringIndex,
 	type YMapRecord,
@@ -343,16 +344,6 @@ function createYValueFromSchema(
 	}
 
 	return value;
-}
-
-/**
- * Type guard that narrows `unknown` to `Record< string, unknown >`.
- *
- * @param value Value to check.
- * @return True if `value` is a non-null, non-array object.
- */
-function isRecord( value: unknown ): value is Record< string, unknown > {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
 }
 
 /**

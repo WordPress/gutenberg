@@ -1,3 +1,4 @@
+import { isRecord } from './crdt-utils';
 import getNestedValue from './get-nested-value';
 
 /**
@@ -32,10 +33,6 @@ const ITEM_KEY_SEPARATOR = '#';
 
 // Follows the path of a list in the key that stores the order of its items.
 const ORDER_KEY_SUFFIX = '@order';
-
-function isRecord( value: unknown ): value is Record< string, unknown > {
-	return !! value && typeof value === 'object' && ! Array.isArray( value );
-}
 
 /**
  * Find the lists of unique items in the attribute definitions of a block
