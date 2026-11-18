@@ -8,6 +8,12 @@
 - Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
   ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
 
+## 2.26.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.23.0 (2020-09-03)
 
 ### Enhancement
