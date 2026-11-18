@@ -69,7 +69,7 @@ class Tests_Block_Template_Export extends WP_UnitTestCase {
 				'post_status'  => 'publish',
 				'post_title'   => 'Test Template Part With Nested Part',
 				'post_name'    => 'test-nested-part',
-				'post_content' => '<!-- wp:template-part {"slug":"inner-part","theme":"old-theme","area":"header"} /-->',
+				'post_content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:template-part {"slug":"inner-part","theme":"old-theme","area":"header"} /--></div><!-- /wp:group -->',
 			),
 			true
 		);
