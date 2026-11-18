@@ -223,6 +223,26 @@ export interface BorderSettings {
 	radiusSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
+/**
+ * Aspect ratio preset definition
+ */
+export interface AspectRatioPreset extends BasePreset {
+	ratio: string;
+}
+
+/**
+ * Dimensions settings
+ */
+export interface DimensionsSettings {
+	aspectRatio?: boolean;
+	defaultAspectRatios?: boolean;
+	aspectRatios?: AspectRatioPreset[] | Record< string, AspectRatioPreset[] >;
+	height?: boolean;
+	minHeight?: boolean;
+	minWidth?: boolean;
+	width?: boolean;
+}
+
 // =============================================================================
 // GLOBAL STYLES STRUCTURE TYPES
 // =============================================================================
@@ -240,6 +260,7 @@ export interface GlobalStylesSettings {
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
 	border?: BorderSettings;
+	dimensions?: DimensionsSettings;
 	color?: {
 		palette?:
 			| Color[]
