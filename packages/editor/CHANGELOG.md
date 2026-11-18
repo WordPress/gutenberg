@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))

@@ -6928,48 +6928,6 @@
 			"count": 2
 		}
 	},
-	"packages/data/src/components/use-select/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/use-select/test/suspense.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/with-dispatch/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/with-select/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/privateAPIs.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/registry.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/dataviews/src/components/dataform-controls/array.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
