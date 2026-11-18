@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useSelect`: Passing a store no longer adds a hook unless `SCRIPT_DEBUG` is on, where it still throws when a component switches between a store and a function ([#86006](https://github.com/WordPress/gutenberg/pull/86006)).
+
 ### Bug Fixes
 
 -   `Resolver`: Accept `NormalizedResolver` in the resolver types ([#86847](https://github.com/WordPress/gutenberg/pull/86847)).

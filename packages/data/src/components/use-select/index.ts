@@ -429,14 +429,19 @@ export default function useSelect<
 	// On initial call, on mount, determine the mode of this `useSelect` call
 	// and then never allow it to change on subsequent updates.
 	const staticSelectMode = typeof mapSelect !== 'function';
-	const staticSelectModeRef = useRef( staticSelectMode );
 
-	if ( staticSelectMode !== staticSelectModeRef.current ) {
-		const prevMode = staticSelectModeRef.current ? 'static' : 'mapping';
-		const nextMode = staticSelectMode ? 'static' : 'mapping';
-		throw new Error(
-			`Switching useSelect from ${ prevMode } to ${ nextMode } is not allowed`
-		);
+	// Checked only while debugging: the check costs every call a hook.
+	// `SCRIPT_DEBUG` doesn't change while the page runs.
+	if ( ( globalThis as any ).SCRIPT_DEBUG ) {
+		const staticSelectModeRef = useRef( staticSelectMode );
+
+		if ( staticSelectMode !== staticSelectModeRef.current ) {
+			const prevMode = staticSelectModeRef.current ? 'static' : 'mapping';
+			const nextMode = staticSelectMode ? 'static' : 'mapping';
+			throw new Error(
+				`Switching useSelect from ${ prevMode } to ${ nextMode } is not allowed`
+			);
+		}
 	}
 
 	// `staticSelectMode` is not allowed to change during the hook instance's,
