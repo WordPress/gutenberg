@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.3.5 (2026-11-18)
+
+### Bug Fixes
+
+-   Core Data: Reject unsafe entity record keys.
+
 ## 6.3.0 (2023-02-01)
 
 ## 6.2.0 (2023-01-11)
