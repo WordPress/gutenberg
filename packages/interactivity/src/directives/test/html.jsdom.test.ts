@@ -1091,6 +1091,170 @@ describe( 'data-wp-html', () => {
 	} );
 
 	it.each( [ true, false ] )(
+		'ignores HTML on unsupported elements while other directives keep working (debug: %s)',
+		async ( debug ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const readHtml = vi.fn();
+			const renderHtml = vi.fn( () => state.value );
+			const { state } = runtime.store( namespace, {
+				state: {
+					/** Value that unsupported hosts must never read or render. */
+					value: runtime.asDangerousHTML(
+						'<b>ignored</b>'
+					) as unknown,
+					/** Reactive input for independent attribute and text directives. */
+					label: 'hydrated',
+					/**
+					 * Records access to the ignored HTML reference.
+					 *
+					 * @return The HTML-producing function, which must not be invoked.
+					 */
+					get html() {
+						readHtml();
+						return renderHtml;
+					},
+				},
+				actions: {
+					/** Changes content independently of the ignored HTML binding. */
+					editContent() {
+						contentTarget.textContent =
+							'edited by another directive';
+					},
+				},
+			} );
+			const region = createRegion(
+				namespace,
+				'<p data-wp-text="state.label">following</p>'
+			);
+			const voidTags = [
+				'area',
+				'base',
+				'basefont',
+				'bgsound',
+				'br',
+				'col',
+				'embed',
+				'frame',
+				'hr',
+				'img',
+				'input',
+				'keygen',
+				'link',
+				'meta',
+				'param',
+				'source',
+				'track',
+				'wbr',
+			];
+			const textTags = [
+				'textarea',
+				'title',
+				'script',
+				'style',
+				'iframe',
+				'xmp',
+				'noembed',
+				'noframes',
+			];
+			// Construct legacy elements directly so the HTML parser cannot drop
+			// or relocate them before the client receives them.
+			const targets = [ ...voidTags, ...textTags ].map( ( tag ) => {
+				const target = document.createElement( tag );
+				target.setAttribute( 'data-wp-html', 'state.html' );
+				target.setAttribute( 'data-wp-bind--title', 'state.label' );
+				if ( textTags.includes( tag ) ) {
+					target.textContent = '/* server */';
+				}
+				if ( tag === 'script' ) {
+					target.setAttribute( 'type', 'application/json' );
+				}
+				region.append( target );
+				return target;
+			} );
+			const contentTarget = document.createElement( 'textarea' );
+			contentTarget.setAttribute( 'data-wp-html', 'state.html' );
+			contentTarget.setAttribute( 'data-wp-bind--title', 'state.label' );
+			contentTarget.setAttribute(
+				'data-wp-on--click',
+				'actions.editContent'
+			);
+			contentTarget.textContent = 'editable content';
+			region.append( contentTarget );
+			const originalContent = targets.map(
+				( target ) => target.innerHTML
+			);
+			const originalNodes = targets.map(
+				( target ) => target.firstChild
+			);
+			const writes = targets.map( recordHtmlWrites );
+			const warnings = vi.spyOn( console, 'warn' );
+
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			expect( targets.map( ( target ) => target.innerHTML ) ).toEqual(
+				originalContent
+			);
+			expect( targets.map( ( target ) => target.firstChild ) ).toEqual(
+				originalNodes
+			);
+			expect( targets.map( ( target ) => target.title ) ).toEqual(
+				targets.map( () => 'hydrated' )
+			);
+			expect( region.querySelector( 'p' ) ).toHaveTextContent(
+				/^hydrated$/
+			);
+			expect( readHtml ).not.toHaveBeenCalled();
+			expect( renderHtml ).not.toHaveBeenCalled();
+
+			await runtime.act( () => contentTarget.click() );
+			for ( const value of [
+				null,
+				'<b>plain</b>',
+				undefined,
+				runtime.asDangerousHTML( '<em>updated</em>' ),
+			] ) {
+				await runtime.act( () => {
+					state.value = value;
+					state.label += '!';
+				} );
+				expect( targets.map( ( target ) => target.innerHTML ) ).toEqual(
+					originalContent
+				);
+				expect(
+					targets.map( ( target ) => target.firstChild )
+				).toEqual( originalNodes );
+				expect( targets.map( ( target ) => target.title ) ).toEqual(
+					targets.map( () => state.label )
+				);
+				expect( region.querySelector( 'p' ) ).toHaveTextContent(
+					state.label
+				);
+				expect( contentTarget ).toHaveTextContent(
+					'edited by another directive'
+				);
+			}
+			expect( writes ).toEqual( targets.map( () => [] ) );
+			expect( readHtml ).not.toHaveBeenCalled();
+			expect( renderHtml ).not.toHaveBeenCalled();
+			const messages = debug
+				? [ ...voidTags, ...textTags ].map(
+						( tag ) =>
+							`The data-wp-html directive is not supported on <${ tag }> elements. Use an element that supports HTML content instead.`
+					)
+				: [];
+			expect( warnings.mock.calls ).toEqual(
+				messages.map( ( message ) => [ message ] )
+			);
+			for ( const message of messages ) {
+				expect( console ).toHaveWarnedWith( message );
+			}
+		}
+	);
+
+	it.each( [ true, false ] )(
 		'empties rejected HTML and suppresses retries (at hydration: %s)',
 		async ( atHydration ) => {
 			const runtime = await loadConflictRuntime();
