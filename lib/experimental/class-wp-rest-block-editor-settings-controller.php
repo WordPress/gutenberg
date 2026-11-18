@@ -95,13 +95,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$is_mobile           = 'mobile' === $request->get_param( 'context' );
 			$editor_context_name = $is_mobile ? 'core/mobile' : 'core/edit-post';
 
-			/*
-			 * The default settings are shared by everything the editor edits, so
-			 * they can't say whether the user can update block bindings: that
-			 * depends on the entity. Core's value is always false here, because
-			 * there is no post. Remove it so the editor checks the entity itself.
-			 * It runs before any other filter, so plugins can still set a value.
-			 */
+			// The editor checks per entity whether the user can update block bindings.
 			$remove_can_update_block_bindings = static function ( $settings ) {
 				unset( $settings['canUpdateBlockBindings'] );
 				return $settings;
