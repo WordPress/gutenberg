@@ -83,10 +83,8 @@
 		z-index: 2; // Stack above the .is-loading::before overlay.
 	}
 
-	// Core gives meta box lists room to drop into while dragging, but its
-	// selectors only match the classic editor's markup. Without it, an empty
-	// list has no height and can't receive a meta box, and a list only accepts
-	// a drop directly over one of its boxes.
+	// Give lists room to drop into while dragging. Core's equivalent only
+	// targets the classic editor's markup.
 	.is-dragging-metaboxes & .meta-box-sortables {
 		padding-bottom: $grid-unit-60;
 	}
@@ -98,8 +96,7 @@
 	}
 }
 
-// The drag helper is rendered in the body, above the editor. Don't let it add
-// scrollbars to the page when it overflows the viewport.
+// Don't let the drag helper add page scrollbars when it overflows.
 body.is-dragging-metaboxes {
 	overflow: hidden;
 }
