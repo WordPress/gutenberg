@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Update router regions beneath ignored unique-ID `data-wp-html` entries, and allow `attachTo` to target elements whose `data-wp-html` is ignored because of a unique ID or an unsupported host such as `textarea` ([#86968](https://github.com/WordPress/gutenberg/pull/86968)).
 -   Only render the most recently started navigation: a navigation superseded by another `navigate()` call, including one to the same URL, or by a back/forward traversal no longer renders its page, updates `state.url`, changes the session history or falls back to a full page load, and its promise resolves. Its loading animation and screen reader announcements end when the next navigation renders. An in-page link clicked during a navigation no longer sets `state.navigating` to `false` or clears `state.initiator` before that navigation renders; browsers without the Navigation API handle that click like a back/forward traversal ([#86515](https://github.com/WordPress/gutenberg/pull/86515)).
 -   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 -   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
