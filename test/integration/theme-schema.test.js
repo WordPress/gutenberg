@@ -123,7 +123,7 @@ describe( 'theme.json schema', () => {
 			version: 3,
 			styles: {
 				blocks: {
-					'core/image': {
+					'core/group': {
 						transform: { rotate: '0.25turn' },
 						variations: {
 							rounded: { transform: { rotate: '-5deg' } },

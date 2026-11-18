@@ -1877,7 +1877,7 @@ describe( 'global styles renderer', () => {
 				settings: {},
 				styles: {
 					blocks: {
-						'core/image': {
+						'core/button': {
 							transform: {
 								rotate: '0.25turn',
 							},
@@ -1892,10 +1892,10 @@ describe( 'global styles renderer', () => {
 			} as unknown as GlobalStylesConfig;
 
 			const blockSelectors = {
-				'core/image': {
-					selector: '.wp-block-image',
+				'core/button': {
+					selector: '.wp-block-button',
 					featureSelectors: {
-						transform: '.wp-block-image img',
+						transform: '.wp-block-button .wp-block-button__link',
 					},
 				},
 			};
@@ -1911,7 +1911,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-image img){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-image img){rotate: -15deg;}}'
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){rotate: -15deg;}}'
 			);
 		} );
 

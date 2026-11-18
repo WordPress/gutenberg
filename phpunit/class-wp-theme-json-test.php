@@ -3254,7 +3254,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_stylesheet_outputs_rotate_for_block_styles_states_and_variations() {
 		register_block_style(
-			'core/image',
+			'core/group',
 			array(
 				'name'  => 'tilted',
 				'label' => 'Tilted',
@@ -3265,7 +3265,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'blocks' => array(
-						'core/image'  => array(
+						'core/group'  => array(
 							'transform'  => array( 'rotate' => '0.25turn' ),
 							'@mobile'    => array(
 								'transform' => array( 'rotate' => '0' ),
@@ -3293,11 +3293,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		unregister_block_style( 'core/image', 'tilted' );
+		unregister_block_style( 'core/group', 'tilted' );
 
-		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 0.25turn;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image){rotate: 0;}}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-tilted){rotate: -5deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 0.25turn;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
@@ -3349,7 +3349,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_sanitize_keeps_transform_styles_for_blocks_and_variations_only() {
 		register_block_style(
-			'core/image',
+			'core/group',
 			array(
 				'name'  => 'tilted',
 				'label' => 'Tilted',
@@ -3362,7 +3362,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'transform' => array( 'rotate' => false ),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform' => array( 'rotate' => true ),
 						),
 					),
@@ -3373,7 +3373,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => array( 'transform' => $rotate ),
 					),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform'  => $rotate,
 							'variations' => array(
 								'tilted' => array( 'transform' => $rotate ),
@@ -3383,7 +3383,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 			)
 		);
-		unregister_block_style( 'core/image', 'tilted' );
+		unregister_block_style( 'core/group', 'tilted' );
 
 		$this->assertEqualSetsWithIndex(
 			array(
@@ -3391,14 +3391,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'settings' => array(
 					'transform' => array( 'rotate' => false ),
 					'blocks'    => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform' => array( 'rotate' => true ),
 						),
 					),
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'core/image' => array(
+						'core/group' => array(
 							'transform'  => $rotate,
 							'variations' => array(
 								'tilted' => array( 'transform' => $rotate ),

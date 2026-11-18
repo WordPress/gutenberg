@@ -1720,8 +1720,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:-10deg !important;}}',
 			),
 			'viewport'       => array(
-				'core/image',
-				'<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>',
+				'core/group',
+				'<div class="wp-block-group"><p>Text</p></div>',
 				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
 				'@media (width <= 480px){.%s{rotate:0 !important;}}',
 			),
