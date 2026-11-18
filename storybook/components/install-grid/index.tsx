@@ -49,7 +49,6 @@ type Tool = {
 	command?: string;
 	config?: string;
 	install?: Link;
-	link?: Link;
 	steps: string[];
 };
 
@@ -65,12 +64,8 @@ const TOOLS: Tool[] = [
 		mark: 'CC',
 		color: '#d97757',
 		command: `claude mcp add ${ CLI_ARGS }`,
-		link: {
-			href: 'https://code.claude.com/docs/en/mcp',
-			label: 'Claude Code MCP documentation',
-		},
 		steps: [
-			'Open a terminal and run the command above.',
+			'Open a terminal and run the command above. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) for more options.',
 			'Start Claude Code and run `/mcp` to confirm `wordpress-design-system` is connected.',
 		],
 	},
@@ -81,12 +76,8 @@ const TOOLS: Tool[] = [
 		mark: 'Cx',
 		color: '#10a37f',
 		command: `codex mcp add ${ CLI_ARGS }`,
-		link: {
-			href: 'https://developers.openai.com/codex/cli',
-			label: 'Codex CLI documentation',
-		},
 		steps: [
-			'Install the Codex CLI if you have not already.',
+			'Install the [Codex CLI](https://developers.openai.com/codex/cli) if you have not already.',
 			'Open a terminal and run the command above.',
 			'Start Codex and run `/mcp` to confirm `wordpress-design-system` is connected.',
 		],
@@ -104,12 +95,8 @@ const TOOLS: Tool[] = [
 			label: 'Add to Cursor',
 			image: 'https://cursor.com/deeplink/mcp-install-dark.svg',
 		},
-		link: {
-			href: 'https://cursor.com/docs/mcp',
-			label: 'Cursor MCP documentation',
-		},
 		steps: [
-			'Click “Add to Cursor”, or add the configuration above to your Cursor MCP settings.',
+			'Click “Add to Cursor”, or add the configuration above to your Cursor [MCP settings](https://cursor.com/docs/mcp).',
 			'Open Cursor Settings, go to MCP, and confirm `wordpress-design-system` is enabled.',
 		],
 	},
@@ -122,12 +109,8 @@ const TOOLS: Tool[] = [
 		file: '.vscode/mcp.json',
 		config: toJson( { servers: { [ SERVER_NAME ]: SERVER_ENTRY } } ),
 		install: { href: VSCODE_URL, label: 'Install in VS Code' },
-		link: {
-			href: 'https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file',
-			label: 'VS Code MCP configuration guide',
-		},
 		steps: [
-			'Click “Install in VS Code”, or add the configuration above to your `mcp.json` file.',
+			'Click “Install in VS Code”, or add the configuration above to your [`mcp.json` file](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file).',
 			'Start the server from the MCP view, or from the `MCP: List Servers` command.',
 		],
 	},
@@ -138,12 +121,8 @@ const TOOLS: Tool[] = [
 		mark: 'JB',
 		color: '#000000',
 		config: JSON_CONFIG,
-		link: {
-			href: 'https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html',
-			label: 'JetBrains AI Assistant MCP guide',
-		},
 		steps: [
-			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, Model Context Protocol (MCP), and click Add.',
+			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add.',
 			'Paste the configuration above into the JSON configuration field, then click OK and Apply.',
 			'Check that `wordpress-design-system` shows as connected in the Status column.',
 		],
@@ -156,12 +135,8 @@ const TOOLS: Tool[] = [
 		color: '#c15f3c',
 		file: 'claude_desktop_config.json',
 		config: JSON_CONFIG,
-		link: {
-			href: 'https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server',
-			label: 'Claude Desktop guide (substitute the entry above for the filesystem server)',
-		},
 		steps: [
-			'Open Claude Desktop, then Settings, Developer, and Edit Config.',
+			'Open Claude Desktop, then Settings, Developer, and Edit Config. The [Claude Desktop guide](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server) shows the same steps for the filesystem server.',
 			'Add the configuration above to the file that opens.',
 			'Quit and reopen Claude Desktop.',
 		],
@@ -175,8 +150,7 @@ const TOOLS: Tool[] = [
 		file: '~/.gemini/config/mcp_config.json',
 		config: JSON_CONFIG,
 		steps: [
-			'See the [MCP installation instructions](https://antigravity.google/docs/mcp#getting-started-by-surface).',
-			'Or alternatively, prompt your agent to add the MCP configuration above.',
+			'See the [MCP installation instructions](https://antigravity.google/docs/mcp#getting-started-by-surface) for the Antigravity App, CLI, and IDE, or prompt your agent to add the MCP configuration above.',
 		],
 	},
 	{
@@ -196,12 +170,8 @@ const TOOLS: Tool[] = [
 				},
 			},
 		} ),
-		link: {
-			href: 'https://opencode.ai/docs/mcp-servers/',
-			label: 'OpenCode MCP documentation',
-		},
 		steps: [
-			'Add the configuration above to the file.',
+			'Add the configuration above to the file, as described in the [OpenCode MCP documentation](https://opencode.ai/docs/mcp-servers/).',
 			'Restart OpenCode and run `opencode mcp list` to confirm the server is connected.',
 		],
 	},
@@ -215,12 +185,8 @@ const TOOLS: Tool[] = [
 		config: toJson( {
 			context_servers: { [ SERVER_NAME ]: SERVER_ENTRY },
 		} ),
-		link: {
-			href: 'https://zed.dev/docs/ai/mcp',
-			label: 'Zed MCP documentation',
-		},
 		steps: [
-			'Open the Zed settings file and add the configuration above.',
+			'Open the Zed settings file and add the configuration above, as described in the [Zed MCP documentation](https://zed.dev/docs/ai/mcp#as-custom-servers).',
 			'Open the Agent Panel settings and confirm `wordpress-design-system` shows as active.',
 		],
 	},
@@ -232,12 +198,8 @@ const TOOLS: Tool[] = [
 		color: '#ff6363',
 		config: toJson( SERVER_ENTRY ),
 		install: { href: RAYCAST_URL, label: 'Install in Raycast' },
-		link: {
-			href: 'https://manual.raycast.com/ai/model-context-protocol',
-			label: 'Raycast MCP documentation',
-		},
 		steps: [
-			'Click “Install in Raycast”, or run the “Install MCP Server” command in Raycast and choose Standard Input/Output as the transport.',
+			'Click “Install in Raycast”, or run the [“Install MCP Server” command](https://manual.raycast.com/ai/model-context-protocol) in Raycast and choose Standard Input/Output as the transport.',
 			'If you filled in the form yourself, enter `command` from the configuration above as the Command and `args` as the Arguments, then press Install MCP Server.',
 		],
 	},
@@ -248,12 +210,8 @@ const TOOLS: Tool[] = [
 		color: '#6b7280',
 		file: 'mcp.json',
 		config: JSON_CONFIG,
-		link: {
-			href: 'https://modelcontextprotocol.io/docs/develop/connect-local-servers',
-			label: 'Model Context Protocol: connect to local servers',
-		},
 		steps: [
-			'Add the configuration above to your MCP client’s configuration (`mcp.json` or equivalent).',
+			'Add the configuration above to your MCP client’s configuration (`mcp.json` or equivalent), as described in the [MCP documentation](https://modelcontextprotocol.io/docs/develop/connect-local-servers).',
 			RESTART,
 		],
 	},
@@ -295,7 +253,6 @@ export function InstallGrid() {
 
 	return (
 		<div className={ styles.root }>
-			<p className={ styles.hint }>Pick your AI tool.</p>
 			<div
 				className={ styles.tiles }
 				role="radiogroup"
@@ -359,17 +316,6 @@ export function InstallGrid() {
 								{ tool.install.label }
 							</ButtonLink>
 						) }
-					</p>
-				) }
-				{ tool.link && (
-					<p>
-						<a
-							href={ tool.link.href }
-							target="_blank"
-							rel="noreferrer"
-						>
-							{ tool.link.label }
-						</a>
 					</p>
 				) }
 				<ol className={ styles.steps }>

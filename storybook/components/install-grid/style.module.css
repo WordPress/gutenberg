@@ -94,8 +94,6 @@
 	border-radius: 50%;
 	background: #f0f0f1;
 	content: counter(step);
-	font-size: 12px;
-	font-weight: 600;
 }
 
 .root .steps code,
