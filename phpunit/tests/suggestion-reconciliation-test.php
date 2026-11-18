@@ -398,7 +398,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	public function test_an_autosave_revision_neither_finalizes_nor_outdates() {
 		$post_id = $this->create_post( '' );
-		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied' );
+		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
 		$pending = $this->create_note( $post_id, $this->inline_op() );
 		$this->set_content( $post_id, $this->paragraph( $this->mark( $decided, 'add', 'a' ) . $this->mark( $pending, 'add', 'b' ) ) );
 
@@ -419,7 +419,7 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 
 	public function test_a_nested_update_from_save_post_is_idempotent() {
 		$post_id = $this->create_post( '' );
-		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied' );
+		$decided = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
 		$pending = $this->create_note( $post_id, $this->inline_op() );
 		$this->set_content( $post_id, $this->paragraph( $this->mark( $decided, 'add', 'a' ) . $this->mark( $pending, 'add', 'b' ) ) );
 
