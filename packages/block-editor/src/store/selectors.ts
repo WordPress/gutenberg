@@ -3551,8 +3551,17 @@ export function __unstableHasActiveBlockOverlayActive(
 	}
 
 	// If the block editing is locked, the block overlay is always active.
+	// With the block lock menu, the inner blocks of a block whose styles are
+	// locked can still be selected in the canvas: each one is locked on its
+	// own. Blocks whose inner blocks come from elsewhere, like Navigation or a
+	// synced pattern, keep them out of reach.
 	if ( ! canEditBlock( state, clientId ) ) {
-		return true;
+		return ! (
+			window.__experimentalBlockLockMenu &&
+			! state.settings.isPreviewMode &&
+			getBlockOrder( state, clientId ).length > 0 &&
+			! areInnerBlocksControlled( state, clientId )
+		);
 	}
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.

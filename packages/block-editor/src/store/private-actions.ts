@@ -727,6 +727,10 @@ export interface BlockLockChanges {
  * the pattern is what unlocks it. A full unlock also clears any `templateLock`
  * the other blocks carry.
  *
+ * Unlocking a property of a block also unlocks it where the blocks above hold
+ * it: the styles of locked ancestors, and the layout of a parent that keeps the
+ * block in place.
+ *
  * @param clientIds Client IDs of the blocks to lock or unlock.
  * @param changes   The lock properties to change.
  */
@@ -781,6 +785,63 @@ export const setBlocksLock =
 			attributesByClientId[ clientId ] = nextAttributes;
 		}
 
+		// Unlocking a property of a block can't leave the blocks above it
+		// holding that property locked, so they give it up: an unlocked style
+		// unlocks the styles of every locked ancestor, and unlocked movement or
+		// deletion unlocks the layout of the parent that keeps the block in
+		// place. A pattern keeps its layout, which detaching it unlocks.
+		const targetIdSet = new Set( targetIds );
+		const ancestorAttributes = new Map<
+			string,
+			Record< string, unknown >
+		>();
+		const getAncestorAttributes = ( ancestorId: string ) => {
+			if ( ! ancestorAttributes.has( ancestorId ) ) {
+				ancestorAttributes.set( ancestorId, {} );
+			}
+			return ancestorAttributes.get( ancestorId )!;
+		};
+		for ( const clientId of clientIds ) {
+			if ( changes.edit === false ) {
+				for ( const ancestorId of select.getBlockParents( clientId ) ) {
+					if (
+						targetIdSet.has( ancestorId ) ||
+						! select.isEditLockedBlock( ancestorId )
+					) {
+						continue;
+					}
+					const ancestorLock = {
+						...select.getBlockAttributes( ancestorId )?.lock,
+					};
+					delete ancestorLock.edit;
+					getAncestorAttributes( ancestorId ).lock = Object.keys(
+						ancestorLock
+					).length
+						? ancestorLock
+						: undefined;
+				}
+			}
+
+			const parentId = select.getBlockRootClientId( clientId );
+			if (
+				! parentId ||
+				targetIdSet.has( parentId ) ||
+				select.isPatternLockedBlock( parentId )
+			) {
+				continue;
+			}
+			const parentTemplateLock =
+				select.getBlockAttributes( parentId )?.templateLock;
+			const isHeldInPlace =
+				( changes.move === false && parentTemplateLock === 'all' ) ||
+				( changes.remove === false &&
+					( parentTemplateLock === 'all' ||
+						parentTemplateLock === 'insert' ) );
+			if ( isHeldInPlace ) {
+				getAncestorAttributes( parentId ).templateLock = undefined;
+			}
+		}
+
 		// Then the lock of each block.
 		for ( const clientId of lockableIds ) {
 			const attributes = select.getBlockAttributes( clientId ) ?? {};
@@ -799,9 +860,17 @@ export const setBlocksLock =
 			const rootClientId = select.getBlockRootClientId( clientId );
 			const isInsideTargets =
 				rootClientId !== null && nextTemplateLocks.has( rootClientId );
-			const parentTemplateLock = isInsideTargets
+			let parentTemplateLock = isInsideTargets
 				? nextTemplateLocks.get( rootClientId )
 				: select.getTemplateLock( rootClientId );
+			if (
+				rootClientId !== null &&
+				ancestorAttributes
+					.get( rootClientId )
+					?.hasOwnProperty( 'templateLock' )
+			) {
+				parentTemplateLock = false;
+			}
 			const isLockedByParent =
 				parentTemplateLock === 'all' || parentTemplateLock === 'insert';
 
@@ -820,6 +889,10 @@ export const setBlocksLock =
 				Object.values( nextLock ).some( Boolean ) || needsExplicitUnlock
 					? nextLock
 					: undefined;
+		}
+
+		for ( const [ ancestorId, attributes ] of ancestorAttributes ) {
+			attributesByClientId[ ancestorId ] = attributes;
 		}
 
 		const updatedClientIds = Object.keys( attributesByClientId );

@@ -397,6 +397,17 @@ describe( 'private actions', () => {
 					names[ id ] === 'core/group',
 				isPatternLockedBlock: ( id: string ) =>
 					patternLocked.includes( id ),
+				isEditLockedBlock: ( id: string ) =>
+					!! attributes[ id ]?.lock?.edit,
+				getBlockParents: ( id: string ) => {
+					const ancestors: string[] = [];
+					let parentId = parents[ id ];
+					while ( parentId ) {
+						ancestors.unshift( parentId );
+						parentId = parents[ parentId ];
+					}
+					return ancestors;
+				},
 			};
 		};
 
@@ -539,6 +550,71 @@ describe( 'private actions', () => {
 				},
 				{ uniqueByBlock: true }
 			);
+		} );
+
+		it( 'unlocks the styles of the blocks above when a block inside unlocks its styles', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'paragraph' ], { edit: false } )(
+				thunkArgs( {
+					select: createSelect( {
+						root: { lock: { edit: true } },
+						group: { lock: { move: true, edit: true } },
+						paragraph: { lock: { edit: true } },
+					} ),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'paragraph', 'root', 'group' ],
+				{
+					paragraph: { lock: undefined },
+					root: { lock: undefined },
+					// The group keeps its other locks.
+					group: { lock: { move: true } },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'unlocks the layout of the parent when a block inside unlocks its movement', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'paragraph' ], { move: false } )(
+				thunkArgs( {
+					select: createSelect( {
+						group: { templateLock: 'all' },
+						paragraph: {},
+					} ),
+					dispatch,
+				} )
+			);
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'paragraph', 'group' ],
+				{
+					// No explicit unlock is needed once the group is unlocked.
+					paragraph: { lock: undefined },
+					group: { templateLock: undefined },
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
+
+		it( 'leaves the layout of a pattern when a block inside unlocks its movement', () => {
+			const dispatch = { updateBlockAttributes: vi.fn() };
+			setBlocksLock( [ 'paragraph' ], { move: false } )(
+				thunkArgs( {
+					select: createSelect(
+						{ group: { templateLock: 'all' }, paragraph: {} },
+						{ patternLocked: [ 'group' ] }
+					),
+					dispatch,
+				} )
+			);
+
+			expect(
+				dispatch.updateBlockAttributes.mock.calls[ 0 ][ 1 ].group
+			).toBeUndefined();
 		} );
 
 		it( 'keeps an explicit unlock when the parent stays template locked', () => {
