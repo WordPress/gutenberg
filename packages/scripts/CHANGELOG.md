@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Allow passing a custom output path to the `--blocks-manifest` flag of the `build` and `start` commands, e.g. `--blocks-manifest=dist/blocks-manifest.php` ([#83876](https://github.com/WordPress/gutenberg/pull/83876)).
+
 ### Bug Fixes
 
 -   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).

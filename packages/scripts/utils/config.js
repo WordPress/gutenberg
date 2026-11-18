@@ -108,6 +108,10 @@ const getWebpackArgs = () => {
 
 	if ( hasArgInCLI( '--blocks-manifest' ) ) {
 		process.env.WP_BLOCKS_MANIFEST = true;
+		const blocksManifestOutput = getArgFromCLI( '--blocks-manifest' );
+		if ( blocksManifestOutput ) {
+			process.env.WP_BLOCKS_MANIFEST_OUTPUT = blocksManifestOutput;
+		}
 	}
 
 	const hasWebpackOutputOption =

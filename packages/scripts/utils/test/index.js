@@ -15,6 +15,7 @@ const require = createRequire( import.meta.url );
 const currentDirectory = path.dirname( fileURLToPath( import.meta.url ) );
 const crossSpawn = require( 'cross-spawn' );
 const processUtils = require( '../process' );
+const { getArgsFromCLI: originalGetArgsFromCLI } = processUtils;
 const getArgsFromCLIMock = vi.spyOn( processUtils, 'getArgsFromCLI' );
 const exitMock = vi.spyOn( processUtils, 'exit' );
 const packageUtils = require( '../package' );
@@ -147,6 +148,55 @@ describe( 'utils', () => {
 				} );
 			}
 		);
+
+		describe( 'blocks manifest', () => {
+			const originalArgv = process.argv;
+
+			const runWithArgs = ( args ) => {
+				process.argv = [ 'node', 'wp-scripts', ...args ];
+				getArgsFromCLIMock.mockImplementation( originalGetArgsFromCLI );
+				return getWebpackArgs();
+			};
+
+			afterEach( () => {
+				process.argv = originalArgv;
+				getArgsFromCLIMock.mockReset();
+				delete process.env.WP_BLOCKS_MANIFEST;
+				delete process.env.WP_BLOCKS_MANIFEST_OUTPUT;
+			} );
+
+			it( 'does not enable the blocks manifest without the flag', () => {
+				runWithArgs( [] );
+
+				expect( process.env.WP_BLOCKS_MANIFEST ).toBeUndefined();
+				expect( process.env.WP_BLOCKS_MANIFEST_OUTPUT ).toBeUndefined();
+			} );
+
+			it( 'enables the blocks manifest without a custom output path', () => {
+				const webpackArgs = runWithArgs( [ '--blocks-manifest' ] );
+
+				expect( process.env.WP_BLOCKS_MANIFEST ).toBe( 'true' );
+				expect( process.env.WP_BLOCKS_MANIFEST_OUTPUT ).toBeUndefined();
+				expect( webpackArgs ).not.toContain( '--blocks-manifest' );
+			} );
+
+			it( 'sets the custom output path for the blocks manifest', () => {
+				const webpackArgs = runWithArgs( [
+					'--blocks-manifest=dist/blocks/blocks-manifest.php',
+					'--output-path=dist',
+				] );
+
+				expect( process.env.WP_BLOCKS_MANIFEST ).toBe( 'true' );
+				expect( process.env.WP_BLOCKS_MANIFEST_OUTPUT ).toBe(
+					'dist/blocks/blocks-manifest.php'
+				);
+				expect( webpackArgs ).toEqual( [
+					'--output-path=dist',
+					'--config',
+					'/c/webpack.config.js',
+				] );
+			} );
+		} );
 	} );
 
 	describe( 'spawnScript', () => {
