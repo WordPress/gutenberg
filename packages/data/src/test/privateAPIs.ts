@@ -4,7 +4,7 @@ import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
 import { unlock } from '../lock-unlock';
 import { createRegistrySelector } from '../factory';
-import type { DataRegistry } from '../types';
+import type { DataRegistry, ThunkArgs } from '../types';
 
 describe( 'Private data APIs', () => {
 	let registry: DataRegistry;
@@ -120,11 +120,7 @@ describe( 'Private data APIs', () => {
 				resolvers: {
 					get:
 						( key: string ) =>
-						async ( {
-							dispatch,
-						}: {
-							dispatch: ( action: AnyAction ) => void;
-						} ) => {
+						async ( { dispatch }: ThunkArgs ) => {
 							const value = await ( 'resolved-' + key );
 							dispatch( { type: 'RECEIVE', key, value } );
 						},
@@ -157,11 +153,7 @@ describe( 'Private data APIs', () => {
 				resolvers: {
 					get:
 						( key: string ) =>
-						async ( {
-							dispatch,
-						}: {
-							dispatch: ( action: AnyAction ) => void;
-						} ) => {
+						async ( { dispatch }: ThunkArgs ) => {
 							const value = await ( 'resolved-' + key );
 							dispatch( { type: 'RECEIVE', key, value } );
 						},
@@ -408,11 +400,7 @@ describe( 'Private data APIs', () => {
 			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscountThunk:
 					( price: number ) =>
-					( {
-						dispatch,
-					}: {
-						dispatch: ( action: AnyAction ) => void;
-					} ) => {
+					( { dispatch }: ThunkArgs ) => {
 						dispatch( { type: 'SET_PRIVATE_PRICE', price } );
 					},
 			} );
@@ -434,15 +422,7 @@ describe( 'Private data APIs', () => {
 			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscount,
 				doubleSecretDiscount() {
-					return ( {
-						dispatch,
-						select,
-					}: {
-						dispatch: {
-							setSecretDiscount: ( discount: number ) => void;
-						};
-						select: { getSecretDiscount: () => number };
-					} ) => {
+					return ( { dispatch, select }: ThunkArgs ) => {
 						dispatch.setSecretDiscount(
 							select.getSecretDiscount() * 2
 						);
