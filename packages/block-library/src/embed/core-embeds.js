@@ -192,8 +192,9 @@ export const others = [
 			title: 'Imgur',
 			icon: embedPhotoIcon,
 			description: __( 'Embed Imgur content.' ),
+			supports: { inserter: false },
 		},
-		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/issuu',
