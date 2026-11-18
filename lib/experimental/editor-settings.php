@@ -47,6 +47,24 @@ function gutenberg_enable_experiments() {
 	}
 }
 
+/**
+ * Reports the Suggestion mode experiment as on.
+ *
+ * Only on this combined testing branch, where the editor has Suggest mode on
+ * unconditionally: server code that asks, `gutenberg_suggestions_enabled()`
+ * for one, then agrees with the editor.
+ *
+ * @param mixed $experiments The `gutenberg-experiments` option.
+ * @return array<string, mixed> The option with Suggestion mode on.
+ */
+function gutenberg_force_suggestion_mode_experiment( $experiments ): array {
+	$experiments                              = is_array( $experiments ) ? $experiments : array();
+	$experiments['gutenberg-suggestion-mode'] = true;
+	return $experiments;
+}
+add_filter( 'option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
+add_filter( 'default_option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
+
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
 add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
 
