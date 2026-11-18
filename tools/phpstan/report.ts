@@ -48,8 +48,12 @@ const INVOCATION_DIRECTORY = INIT_CWD || process.cwd();
 interface Analysis {
 	/** Name of the analysis, used in annotation titles and summary headings. */
 	name: string;
-	/** Path of the analysis's baseline, relative to the repository root. */
-	baseline: string;
+	/**
+	 * Paths of the baselines that the analysis loads, relative to the
+	 * repository root. The analysis of the strict paths also loads the
+	 * baseline of the other one.
+	 */
+	baselines: string[];
 	/** Name of the workflow step that runs the analysis. */
 	step: string;
 	/** Composer script that runs the analysis locally. */
@@ -65,7 +69,10 @@ const isStrict = process.argv.slice( 2 ).includes( '--strict' );
 const ANALYSIS: Analysis = isStrict
 	? {
 			name: 'PHPStan (strict paths)',
-			baseline: 'tools/phpstan/baseline-strict.neon',
+			baselines: [
+				'tools/phpstan/baseline-strict.neon',
+				'tools/phpstan/baseline.neon',
+			],
 			step: 'Run PHPStan on the strict paths',
 			script: 'composer phpstan:strict',
 			fixScript: 'composer phpstan:fix:strict',
@@ -73,7 +80,7 @@ const ANALYSIS: Analysis = isStrict
 		}
 	: {
 			name: 'PHPStan',
-			baseline: 'tools/phpstan/baseline.neon',
+			baselines: [ 'tools/phpstan/baseline.neon' ],
 			step: 'Run PHPStan',
 			script: 'composer phpstan:default',
 			fixScript: 'composer phpstan:fix',
@@ -326,10 +333,14 @@ function buildSummary( errors: PhpstanError[] ): string {
 		}`,
 	];
 
+	const baselines = ANALYSIS.baselines
+		.map( ( baseline ) => `\`${ baseline }\`` )
+		.join( ' or ' );
+
 	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
 			'### The baseline is out of date',
-			`An entry in \`${ ANALYSIS.baseline }\` records an error that now occurs fewer times, or not at all.`
+			`An entry in ${ baselines } records an error that now occurs fewer times, or not at all.`
 		);
 		sections.push(
 			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
@@ -357,7 +368,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.some( isExceededBaselineEntry ) ) {
 		sections.push(
 			'### A baselined error occurs more often',
-			`An entry in \`${ ANALYSIS.baseline }\` records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.`
+			`An entry in ${ baselines } records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.`
 		);
 	}
 
