@@ -254,6 +254,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
+	 * @since 7.3.0 Added `text-wrap` property.
 	 *
 	 * @var array
 	 */
@@ -321,6 +322,7 @@ class WP_Theme_JSON_Gutenberg {
 		'text-shadow'                       => array( 'typography', 'textShadow' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
 		'text-indent'                       => array( 'typography', 'textIndent' ),
+		'text-wrap'                         => array( 'typography', 'textWrap' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -552,6 +554,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
 	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`, and
 	 *              `typography.textIndent` properties.
+	 * @since 7.3.0 Added `typography.textWrap`.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -614,6 +617,7 @@ class WP_Theme_JSON_Gutenberg {
 			'textIndent'     => null,
 			'textShadow'     => null,
 			'textTransform'  => null,
+			'textWrap'       => null,
 			'writingMode'    => null,
 		),
 		'css'        => null,
@@ -1917,9 +1921,7 @@ class WP_Theme_JSON_Gutenberg {
 					$style_selectors = $block_metadata['styleVariations'] ?? array();
 
 					foreach ( $registered_styles[ $block_name ] as $block_style ) {
-						if ( ! isset( $style_selectors[ $block_style['name'] ] ) ) {
-							$style_selectors[ $block_style['name'] ] = static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
-						}
+						$style_selectors[ $block_style['name'] ] ??= static::get_block_style_variation_selector( $block_style['name'], $block_metadata['selector'] );
 					}
 
 					static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
@@ -2710,9 +2712,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				$target = self::get_feature_selector( $feature_selectors, $preset_metadata['path'][0], $selector );
 
-				if ( ! isset( $vars_by_selector[ $target ] ) ) {
-					$vars_by_selector[ $target ] = array();
-				}
+				$vars_by_selector[ $target ] ??= array();
 
 				foreach ( $values_by_slug as $slug => $value ) {
 					$vars_by_selector[ $target ][] = array(
@@ -3529,11 +3529,9 @@ class WP_Theme_JSON_Gutenberg {
 			return $nodes;
 		}
 
-		$block_options = $options;
-		if ( ! isset( $block_options['include_block_style_variations'] ) ) {
-			$block_options['include_block_style_variations'] = true;
-		}
-		$block_nodes = self::get_block_nodes( $theme_json, $selectors, $block_options );
+		$block_options                                     = $options;
+		$block_options['include_block_style_variations'] ??= true;
+		$block_nodes                                       = self::get_block_nodes( $theme_json, $selectors, $block_options );
 		foreach ( $block_nodes as $block_node ) {
 			$nodes[] = $block_node;
 		}
