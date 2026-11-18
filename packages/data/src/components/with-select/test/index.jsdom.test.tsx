@@ -20,9 +20,6 @@ import { RegistryProvider } from '../../registry-provider';
 import type { DataRegistry } from '../../../types';
 
 /* eslint-disable @wordpress/wp-global-usage */
-declare global {
-	var SCRIPT_DEBUG: boolean | undefined;
-}
 describe( 'withSelect', () => {
 	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
 
@@ -54,13 +51,9 @@ describe( 'withSelect', () => {
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
-		const mapSelectToProps = vi.fn(
-			( _select, ownProps: Record< string, unknown > ) => ( {
-				data: _select( 'reactReducer' ).reactSelector(
-					ownProps.keyName as string
-				),
-			} )
-		);
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
+			data: _select( 'reactReducer' ).reactSelector( ownProps.keyName ),
+		} ) );
 
 		const OriginalComponent = vi.fn(
 			( props: { data?: string; keyName?: string } ) => (
@@ -203,11 +196,7 @@ describe( 'withSelect', () => {
 
 			renderSpy = vi.spyOn( OriginalComponent.prototype, 'render' );
 			mapSelectToProps = vi.fn( ( _select ) => ( {
-				count: (
-					_select( 'counter' ) as {
-						getCount: () => number;
-					}
-				 ).getCount(),
+				count: _select( 'counter' ).getCount(),
 			} ) );
 			const mapDispatchToProps = vi.fn( ( _dispatch ) => ( {
 				increment: _dispatch( 'counter' ).increment,
@@ -278,13 +267,9 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = vi.fn(
-			( _select, ownProps: Record< string, unknown > ) => ( {
-				count: _select( 'counter' ).getCount(
-					ownProps.offset as number
-				),
-			} )
-		);
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => ( {
+			count: _select( 'counter' ).getCount( ownProps.offset ),
+		} ) );
 
 		const OriginalComponent = vi.fn( ( props: { count?: number } ) => (
 			<div role="status">{ props.count }</div>
@@ -463,14 +448,11 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = vi.fn(
-			( _select, ownProps: Record< string, unknown > ) => {
-				return {
-					[ ownProps.propName as string ]:
-						_select( 'demo' ).getValue(),
-				};
-			}
-		);
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
+			return {
+				[ ownProps.propName ]: _select( 'demo' ).getValue(),
+			};
+		} );
 
 		const OriginalComponent = vi.fn(
 			( props: Record< string, unknown > ) => (
@@ -524,16 +506,14 @@ describe( 'withSelect', () => {
 			},
 		} );
 
-		const mapSelectToProps = vi.fn(
-			( _select, ownProps: Record< string, unknown > ) => {
-				if ( ownProps.pass ) {
-					return {
-						count: _select( 'demo' ).getValue(),
-					};
-				}
-				return undefined;
+		const mapSelectToProps = vi.fn( ( _select, ownProps ) => {
+			if ( ownProps.pass ) {
+				return {
+					count: _select( 'demo' ).getValue(),
+				};
 			}
-		);
+			return undefined;
+		} );
 
 		const OriginalComponent = vi.fn( ( props: { count?: string } ) => (
 			<div role="status">{ props.count || 'Unknown' }</div>
