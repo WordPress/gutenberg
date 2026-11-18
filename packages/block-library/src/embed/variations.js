@@ -317,7 +317,7 @@ const variations = [
 			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'amazon-kindle' },
+		attributes: { providerNameSlug: 'amazon' },
 	},
 	{
 		name: 'pinterest',
