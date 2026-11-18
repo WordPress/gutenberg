@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Ignore `data-wp-html` on void elements and text-only elements such as `textarea` and `script` without evaluating its reference, log a development warning for unsupported hosts, and hydrate descendants of ignored unique-ID entries ([#86968](https://github.com/WordPress/gutenberg/pull/86968)).
 -   `data-wp-html` elements that the client creates instead of hydrating, such as `data-wp-each` items added after hydration or elements added by client-side navigation, now show their fallback while their value is pending or `{ "wpServerHtml": true }`, including on sites enforcing Trusted Types ([#84924](https://github.com/WordPress/gutenberg/pull/84924)).
 -   Run the cleanup returned by a `watch()` callback without a directive scope, so `getContext()` and `getElement()` never read the element whose action or navigation triggered it. Wrap the returned cleanup with `withScope()` to keep a scope ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
 -   Remove an element's directive scope when one of its directives throws, so `getContext()` and `getElement()` called later outside a scope no longer read that element ([#86058](https://github.com/WordPress/gutenberg/pull/86058)).
