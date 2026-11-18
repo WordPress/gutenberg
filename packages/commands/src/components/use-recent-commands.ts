@@ -1,21 +1,14 @@
-import {
-	useSelect,
-	useDispatch,
-	select as globalSelect,
-	dispatch,
-} from '@wordpress/data';
+import { useDispatch, select as globalSelect, dispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
-import type { CommandConfig, CommandLoaderHook } from '../store/types';
-import type { OnResolved } from './types';
+import type { Command, CommandConfig } from '../store/types';
+import type { LoaderCollectorOptions } from './types';
 
 const MAX_RECENTLY_SAVED = 30;
 const MAX_RECENTLY_DISPLAYED = 5;
-const EMPTY_ARRAY: string[] = [];
 const EMPTY_COMMANDS: CommandConfig[] = [];
-const EMPTY_SET = new Set< string >();
 
 export function recordUsage( name: string ) {
 	const current =
@@ -52,113 +45,67 @@ export function useLoaderLoadingState(
 	}, [ setLoaderLoading, name ] );
 }
 
-export function useLoaderCollector(
-	hook: CommandLoaderHook,
-	name: string,
-	filterNames: Set< string > | undefined,
-	onResolved: OnResolved
-) {
-	const { isLoading: loading, commands = EMPTY_COMMANDS } =
-		hook( { search: '' } ) ?? {};
-	useLoaderLoadingState( name, loading );
-
-	// A fresh array would re-run the effect below, and `onResolved`, on every render.
-	const filtered = useMemo(
-		() =>
-			filterNames
-				? commands.filter( ( c ) => filterNames.has( c.name ) )
-				: commands,
-		[ commands, filterNames ]
-	);
+/**
+ * Runs a single command loader and reports the commands it resolved to
+ * `onResolved`.
+ *
+ * Commands returned by a loader hook never pass through `registerCommand`, so
+ * the loader's own category stands in whenever the hook sets none.
+ *
+ * @param options            Options.
+ * @param options.hook       The loader hook.
+ * @param options.name       The loader's name.
+ * @param options.category   The loader's category.
+ * @param options.search     The search term.
+ * @param options.onResolved Called with the loader's name and commands.
+ */
+export function useLoaderCollector( {
+	hook,
+	name,
+	category,
+	search,
+	onResolved,
+}: LoaderCollectorOptions ) {
+	const { isLoading, commands = EMPTY_COMMANDS } = hook( { search } ) ?? {};
+	useLoaderLoadingState( name, isLoading );
 
 	useEffect( () => {
-		onResolved( name, filtered );
-	}, [ onResolved, name, filtered ] );
+		onResolved(
+			name,
+			commands.map( ( command ) =>
+				command.category ? command : { ...command, category }
+			)
+		);
+	}, [ onResolved, name, category, commands ] );
 
 	// Clear this loader's entries when it unmounts.
 	useEffect( () => {
-		return () => onResolved( name, [] );
+		return () => onResolved( name, EMPTY_COMMANDS );
 	}, [ onResolved, name ] );
 }
 
-export function useRecentCommands() {
-	const {
-		contextualCommands,
-		staticCommands,
-		contextualLoaders,
-		staticLoaders,
-		recentlyUsedNames = EMPTY_ARRAY,
-	} = useSelect( ( select ) => {
-		const { getCommands, getCommandLoaders } = select( commandsStore );
-		return {
-			contextualCommands: getCommands( true ),
-			staticCommands: getCommands( false ),
-			contextualLoaders: getCommandLoaders( true ),
-			staticLoaders: getCommandLoaders( false ),
-			recentlyUsedNames: select( preferencesStore ).get(
-				'core/commands',
-				'recentlyUsed'
-			) as string[] | undefined,
-		};
-	}, [] );
-
-	const [ resolvedMap, setResolvedMap ] = useState(
-		() => new Map< string, CommandConfig[] >()
-	);
-
-	const onResolved: OnResolved = useCallback( ( loaderName, cmds ) => {
-		setResolvedMap( ( prev ) => {
-			const prevCmds = prev.get( loaderName );
-			if (
-				prevCmds &&
-				prevCmds.length === cmds.length &&
-				prevCmds.every( ( c, i ) => c.name === cmds[ i ].name )
-			) {
-				return prev;
-			}
-			const next = new Map( prev );
-			next.set( loaderName, cmds );
-			return next;
-		} );
-	}, [] );
-
-	const { recentNames, recentSet } = useMemo( () => {
-		const names = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
-		return { recentNames: names, recentSet: new Set( names ) };
-	}, [ recentlyUsedNames ] );
-
-	const loaders = useMemo(
-		() => [ ...contextualLoaders, ...staticLoaders ],
-		[ contextualLoaders, staticLoaders ]
-	);
-
-	const commands = useMemo( () => {
-		// Merge static commands with loader-resolved commands.
-		const allByName = new Map< string, CommandConfig >();
-		[ ...contextualCommands, ...staticCommands ].forEach( ( c ) =>
-			allByName.set( c.name, c )
-		);
-		for ( const cmds of resolvedMap.values() ) {
-			cmds.forEach( ( c ) => {
-				if ( ! allByName.has( c.name ) ) {
-					allByName.set( c.name, c );
-				}
-			} );
-		}
-		// Return in recency order.
-		return recentNames
-			.map( ( n ) => allByName.get( n ) )
-			.filter( ( c ): c is CommandConfig => !! c );
-	}, [ contextualCommands, staticCommands, resolvedMap, recentNames ] );
-
-	if ( ! recentlyUsedNames.length ) {
-		return {
-			commands: EMPTY_COMMANDS,
-			loaders: [],
-			recentSet: EMPTY_SET,
-			onResolved,
-		};
+/**
+ * Resolves the most recently used command names against a pool of commands,
+ * keeping them in recency order and dropping the ones the pool cannot resolve.
+ *
+ * @param recentlyUsedNames Command names, most recently used first.
+ * @param commandPool       The commands to resolve the names against,
+ *                          de-duplicated by name.
+ *
+ * @return The recently used commands.
+ */
+export function getRecentCommands< T extends Command >(
+	recentlyUsedNames: string[],
+	commandPool: T[]
+): T[] {
+	const names = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
+	if ( ! names.length ) {
+		return [];
 	}
-
-	return { commands, loaders, recentSet, onResolved };
+	const pool = new Map(
+		commandPool.map( ( command ) => [ command.name, command ] )
+	);
+	return names
+		.map( ( name ) => pool.get( name ) )
+		.filter( ( command ): command is T => !! command );
 }

@@ -6669,14 +6669,6 @@
 			"count": 2
 		}
 	},
-	"packages/commands/src/components/command-menu.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/components/src/autocomplete/autocompleter-ui.tsx": {
 		"react-hooks/refs": {
 			"count": 6
