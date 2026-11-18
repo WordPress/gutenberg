@@ -20,9 +20,6 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		parent::set_up();
 		switch_theme( 'block-theme' );
 		remove_action( 'wp_print_styles', 'print_emoji_styles' );
-		// When this class runs alone, nothing creates these globals before the settings read them.
-		wp_scripts();
-		wp_styles();
 	}
 
 	/**
