@@ -169,15 +169,17 @@ const ImageURLInputUI = ( {
 					return;
 				}
 
+				const { url: href } = normalizeUrl( urlInput );
+
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
 				const selectedDestination =
 					getLinkDestinations().find(
-						( destination ) => destination.url === urlInput
+						( destination ) => destination.url === href
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: normalizeUrl( urlInput ).url,
+					href,
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );

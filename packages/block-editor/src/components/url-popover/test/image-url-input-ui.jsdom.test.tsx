@@ -95,6 +95,33 @@ describe( 'ImageURLInputUI', () => {
 		} );
 	} );
 
+	it( 'matches the image file destination when the URL has surrounding spaces', async () => {
+		const user = userEvent.setup();
+		const onChangeUrl = vi.fn();
+
+		render(
+			<ImageURLInputUI
+				linkDestination="none"
+				mediaType="image"
+				mediaUrl="https://example.com/image.jpg"
+				onChangeUrl={ onChangeUrl }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Link' } ) );
+		await user.type(
+			screen.getByRole( 'combobox' ),
+			' https://example.com/image.jpg '
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+
+		expect( onChangeUrl ).toHaveBeenCalledWith( {
+			href: 'https://example.com/image.jpg',
+			linkDestination: 'media',
+			lightbox: { enabled: false },
+		} );
+	} );
+
 	it( 'opens the link in a new tab without adding noopener', async () => {
 		const onChangeUrl = await toggleNewTab( {} );
 
