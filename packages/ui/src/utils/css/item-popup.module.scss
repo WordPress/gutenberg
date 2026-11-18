@@ -243,13 +243,14 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			position: relative;
 			width: var(--wpds-dimension-size-2xs);
 			height: var(--_wp-ui-popup-item-text-line-height);
 			pointer-events: none;
 		}
 
 		.item-indicator-icon {
-			translate: 0 1px;
+			position: absolute;
 		}
 
 		.item-content {
