@@ -200,6 +200,10 @@
 	.block-editor-block-contextual-toolbar:not(.editor-header__toolbar *) {
 		background-color: transparent;
 		border: none;
+		border-radius: 0;
+		// Wrapped groups draw their own borders, so a shadow around the whole
+		// toolbar would also cover the empty space beside the last row.
+		box-shadow: none;
 
 		.block-editor-block-toolbar {
 			flex-wrap: wrap;
@@ -237,6 +241,7 @@
 			.block-editor-block-parent-selector__button {
 				border: none;
 				margin: 0;
+				box-shadow: none;
 
 				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
 				.components-toolbar-group:last-child {
