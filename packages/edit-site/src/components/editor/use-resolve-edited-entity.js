@@ -30,7 +30,10 @@ function getPostType( name ) {
 		postType = NAVIGATION_POST_TYPE;
 	} else if ( name === 'pattern-item' ) {
 		postType = PATTERN_TYPES.user;
-	} else if ( name === 'template-part-item' ) {
+	} else if (
+		name === 'template-part-item' ||
+		( window.__experimentalSiteParts && name === 'site-part-item' )
+	) {
 		postType = TEMPLATE_PART_POST_TYPE;
 	} else if ( name === 'templates' ) {
 		postType = TEMPLATE_POST_TYPE;
@@ -49,7 +52,18 @@ export function useResolveEditedEntity() {
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const { hasEntityRecord } = useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
-	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
+	// The Site parts screens edit the primary part in an area, which the URL
+	// names by its area rather than its ID. Behind the "Site parts"
+	// experiment, which registers the route.
+	const sitePartId = useSelect(
+		( select ) =>
+			window.__experimentalSiteParts && name === 'site-part-item'
+				? ( unlock( select( coreDataStore ) ).getSitePartsUsage()
+						?.primary[ params.area ] ?? undefined )
+				: undefined,
+		[ name, params.area ]
+	);
+	const { postId = sitePartId ?? query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
 	// Extract selectedBlock from URL for selection restoration on navigation back.
 	const { selectedBlock } = query;

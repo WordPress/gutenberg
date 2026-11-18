@@ -49,6 +49,15 @@ function gutenberg_site_editor_register_default_menu_items() {
 		gutenberg_register_site_editor_v2_menu_item( 'templateParts', __( 'Template Parts', 'gutenberg' ), '/template-parts', '' );
 	}
 
+	// Site parts lists the template parts the homepage uses, so it needs the
+	// same theme support as the Template Parts screen.
+	if (
+		gutenberg_is_experiment_enabled( 'gutenberg-site-parts' ) &&
+		( current_theme_supports( 'block-templates' ) || current_theme_supports( 'block-template-parts' ) )
+	) {
+		gutenberg_register_site_editor_v2_menu_item( 'siteParts', __( 'Site parts', 'gutenberg' ), '/site-parts', '' );
+	}
+
 	gutenberg_register_site_editor_v2_menu_item( 'patterns', __( 'Patterns', 'gutenberg' ), '/patterns', '' );
 }
 add_action( 'site-editor-v2_init', 'gutenberg_site_editor_register_default_menu_items', 5 );

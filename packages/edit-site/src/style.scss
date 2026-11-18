@@ -29,6 +29,9 @@
 @use "./components/resizable-frame/style.scss" as *;
 @use "./components/sidebar-global-styles/style.scss" as *;
 @use "./components/sidebar-identity/style.scss" as *;
+@use "./components/sidebar-navigation-screen-site-part/style.scss" as *;
+@use "./components/sidebar-navigation-screen-site-parts/style.scss" as *;
+@use "./components/sidebar-site-part-panel/style.scss" as *;
 
 ::view-transition-image-pair(root) {
 	isolation: auto;
