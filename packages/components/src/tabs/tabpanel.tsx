@@ -1,8 +1,9 @@
-import { useStoreState } from '@ariakit/react';
+import { useStoreState, TabPanel as AriakitTabPanel } from '@ariakit/react';
+import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import type { TabPanelProps } from './types';
-import { TabPanel as StyledTabPanel } from './styles';
+import styles from './style.module.scss';
 import { useTabsContext } from './context';
 import type { WordPressComponentProps } from '../context';
 
@@ -10,7 +11,7 @@ export const TabPanel = forwardRef<
 	HTMLDivElement,
 	Omit< WordPressComponentProps< TabPanelProps, 'div', false >, 'id' >
 >( function UnforwardedTabPanel(
-	{ children, tabId, focusable = true, ...otherProps },
+	{ children, tabId, focusable = true, className, ...otherProps },
 	ref
 ) {
 	const context = useTabsContext();
@@ -23,7 +24,7 @@ export const TabPanel = forwardRef<
 	const instancedTabId = `${ instanceId }-${ tabId }`;
 
 	return (
-		<StyledTabPanel
+		<AriakitTabPanel
 			ref={ ref }
 			store={ store }
 			// For TabPanel, the id passed here is the id attribute of the DOM
@@ -33,8 +34,9 @@ export const TabPanel = forwardRef<
 			tabId={ instancedTabId }
 			focusable={ focusable }
 			{ ...otherProps }
+			className={ clsx( styles[ 'tab-panel' ], className ) }
 		>
 			{ selectedId === instancedTabId && children }
-		</StyledTabPanel>
+		</AriakitTabPanel>
 	);
 } );

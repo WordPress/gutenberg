@@ -13,7 +13,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function MenuPortal(
 	return (
 		<_Menu.Portal
 			ref={ ref }
-			container={ container ?? getWpCompatOverlaySlot() }
+			container={
+				container === undefined ? getWpCompatOverlaySlot() : container
+			}
 			{ ...props }
 		/>
 	);

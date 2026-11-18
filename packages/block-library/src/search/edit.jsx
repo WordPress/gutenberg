@@ -5,15 +5,17 @@ import {
 	RichText,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
+	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	getTypographyClassesAndStyles as useTypographyProps,
+	getDimensionsClassesAndStyles as useDimensionsProps,
 	store as blockEditorStore,
 	__experimentalGetElementClassName,
 	useSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
-	SelectControl as WCSelectControl,
 	ToggleControl,
 	ResizableBox,
 	__experimentalUseCustomUnits as useCustomUnits,
@@ -24,6 +26,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
@@ -51,6 +54,12 @@ const TAG_NAME_MESSAGES = {
 		'Uses a <form role="search"> wrapper for backward compatibility with existing theme styles.'
 	),
 };
+
+const TAG_NAME_ITEMS = [
+	{ label: __( 'Default' ), value: '' },
+	{ label: '<search>', value: 'search' },
+	{ label: '<form>', value: 'form' },
+];
 
 // Used to calculate border radius adjustment to avoid "fat" corners when
 // button is placed inside wrapper.
@@ -84,7 +93,7 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
-		tagName,
+		tagName = '',
 		style,
 	} = attributes;
 
@@ -135,6 +144,10 @@ export default function SearchEdit( {
 	}
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
+	const shadowProps = getShadowClassesAndStyles( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
+	const [ isResizing, setIsResizing ] = useState( false );
 	const [ fluidTypographySettings, layout ] = useSettings(
 		'typography.fluid',
 		'layout'
@@ -220,11 +233,13 @@ export default function SearchEdit( {
 		const textFieldClasses = clsx(
 			'wp-block-search__input',
 			hasNoButton ? colorProps.className : undefined,
+			hasNoButton ? backgroundProps.className : undefined,
 			isButtonPositionInside ? undefined : borderProps.className,
 			typographyProps.className
 		);
 		const textFieldStyles = {
 			...( hasNoButton ? colorProps.style : {} ),
+			...( hasNoButton ? backgroundProps.style : {} ),
 			...( isButtonPositionInside
 				? {
 						borderRadius: borderProps.style?.borderRadius,
@@ -237,7 +252,7 @@ export default function SearchEdit( {
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
 					}
-				: borderProps.style ),
+				: { ...borderProps.style, ...shadowProps.style } ),
 			...typographyProps.style,
 			textDecoration: undefined,
 		};
@@ -268,6 +283,7 @@ export default function SearchEdit( {
 		const buttonClasses = clsx(
 			'wp-block-search__button',
 			colorProps.className,
+			backgroundProps.className,
 			typographyProps.className,
 			isButtonPositionInside ? undefined : borderProps.className,
 			buttonUseIcon ? 'has-icon' : undefined,
@@ -275,6 +291,7 @@ export default function SearchEdit( {
 		);
 		const buttonStyles = {
 			...colorProps.style,
+			...backgroundProps.style,
 			...typographyProps.style,
 			...( isButtonPositionInside
 				? {
@@ -288,7 +305,7 @@ export default function SearchEdit( {
 						borderBottomRightRadius:
 							borderProps.style?.borderBottomRightRadius,
 					}
-				: borderProps.style ),
+				: { ...borderProps.style, ...shadowProps.style } ),
 		};
 		return (
 			<>
@@ -373,15 +390,21 @@ export default function SearchEdit( {
 						} }
 						isShownByDefault
 					>
-						<WCSelectControl
-							value={ buttonPosition }
+						<SelectControl
+							value={
+								buttonPositionControls.find(
+									( item ) => item.value === buttonPosition
+								) ?? null
+							}
 							label={ __( 'Button position' ) }
-							onChange={ ( value ) => {
-								setAttributes( {
-									buttonPosition: value,
-								} );
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== buttonPosition ) {
+									setAttributes( {
+										buttonPosition: item.value,
+									} );
+								}
 							} }
-							options={ buttonPositionControls }
+							items={ buttonPositionControls }
 						/>
 					</ToolsPanelItem>
 					{ buttonPosition !== 'no-button' && (
@@ -490,15 +513,21 @@ export default function SearchEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<WCSelectControl
+				<SelectControl
 					label={ __( 'HTML element' ) }
-					value={ tagName ?? '' }
-					options={ [
-						{ label: __( 'Default' ), value: '' },
-						{ label: '<search>', value: 'search' },
-						{ label: '<form>', value: 'form' },
-					] }
-					onChange={ ( value ) => {
+					value={
+						TAG_NAME_ITEMS.find(
+							( item ) => item.value === tagName
+						) ?? null
+					}
+					items={ TAG_NAME_ITEMS }
+					// Keep the empty-string Default choice selected.
+					itemToStringValue={ ( item ) => `tag:${ item.value }` }
+					onValueChange={ ( item ) => {
+						if ( ! item || item.value === tagName ) {
+							return;
+						}
+						const { value } = item;
 						setAttributes( { tagName: value } );
 						// The help text is updated via aria-describedby, which
 						// is not re-announced while focus remains on the select.
@@ -510,7 +539,7 @@ export default function SearchEdit( {
 							TAG_NAME_MESSAGES[ value ].replace( /[<>]/g, '' )
 						);
 					} }
-					help={ TAG_NAME_MESSAGES[ tagName ?? '' ] }
+					description={ TAG_NAME_MESSAGES[ tagName ] }
 				/>
 			</InspectorControls>
 		</>
@@ -526,7 +555,7 @@ export default function SearchEdit( {
 
 	const getWrapperStyles = () => {
 		const styles = isButtonPositionInside
-			? borderProps.style
+			? { ...borderProps.style, ...shadowProps.style }
 			: {
 					borderRadius: borderProps.style?.borderRadius,
 					borderTopLeftRadius: borderProps.style?.borderTopLeftRadius,
@@ -634,19 +663,30 @@ export default function SearchEdit( {
 							: undefined
 					) }
 					style={ getWrapperStyles() }
-					minWidth={ MIN_WIDTH }
+					// ResizableBox writes these over `style`, and only reads
+					// them as pixel limits while resizing.
+					minWidth={
+						isResizing ? MIN_WIDTH : dimensionsProps.style?.minWidth
+					}
+					minHeight={
+						isResizing
+							? undefined
+							: dimensionsProps.style?.minHeight
+					}
 					enable={ getResizableSides() }
 					onResizeStart={ ( event, direction, elt ) => {
 						setAttributes( {
 							width: parseInt( elt.offsetWidth, 10 ),
 							widthUnit: 'px',
 						} );
+						setIsResizing( true );
 						toggleSelection( false );
 					} }
 					onResizeStop={ ( event, direction, elt, delta ) => {
 						setAttributes( {
 							width: parseInt( width + delta.width, 10 ),
 						} );
+						setIsResizing( false );
 						toggleSelection( true );
 					} }
 					showHandle={ isSelected }

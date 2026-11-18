@@ -15,6 +15,37 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 	}
 
+	/**
+	 * Tests that unsupported duotone attribute types leave the block unchanged.
+	 *
+	 * @dataProvider data_render_duotone_support_invalid_attribute
+	 * @covers WP_Duotone_Gutenberg::render_duotone_support
+	 *
+	 * @param mixed $duotone Invalid duotone attribute value.
+	 */
+	public function test_gutenberg_render_duotone_support_invalid_attribute( $duotone ): void {
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => $duotone ) ) ),
+		);
+		$wp_block      = new WP_Block( $block );
+		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
+
+		$this->assertSame( $block_content, WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block ) );
+	}
+
+	/**
+	 * @return array<string, array{ 0: bool|int|float }>
+	 */
+	public function data_render_duotone_support_invalid_attribute(): array {
+		return array(
+			'false'   => array( false ),
+			'true'    => array( true ),
+			'integer' => array( 1 ),
+			'float'   => array( 1.5 ),
+		);
+	}
+
 	public function test_gutenberg_render_duotone_support_preset() {
 		$block         = array(
 			'blockName' => 'core/image',

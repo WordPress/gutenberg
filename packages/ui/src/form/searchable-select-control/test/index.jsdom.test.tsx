@@ -32,6 +32,107 @@ describe( 'SearchableSelectControl', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
+	it( 'calls focus and blur handlers passed to the trigger slot', async () => {
+		const user = userEvent.setup();
+		const onFocus = vi.fn();
+		const onBlur = vi.fn();
+
+		render(
+			<>
+				<SearchableSelectControl
+					label="Fruit"
+					items={ mockItems }
+					trigger={
+						<SearchableSelectControl.Trigger
+							onFocus={ onFocus }
+							onBlur={ onBlur }
+						/>
+					}
+				/>
+				<button>Next field</button>
+			</>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+
+		await user.tab();
+		expect( trigger ).toHaveFocus();
+		expect( onFocus ).toHaveBeenCalledTimes( 1 );
+		expect( onFocus.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+		expect( onBlur ).not.toHaveBeenCalled();
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Next field' } )
+		).toHaveFocus();
+		expect( onBlur ).toHaveBeenCalledTimes( 1 );
+		expect( onBlur.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+	} );
+
+	it( 'forwards both control and trigger slot refs to the visible trigger', () => {
+		const controlRef = createRef< HTMLButtonElement >();
+		const triggerRef = createRef< HTMLButtonElement >();
+
+		const { unmount } = render(
+			<SearchableSelectControl
+				ref={ controlRef }
+				label="Fruit"
+				items={ mockItems }
+				trigger={
+					<SearchableSelectControl.Trigger ref={ triggerRef } />
+				}
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+
+		expect( controlRef.current ).toBe( trigger );
+		expect( triggerRef.current ).toBe( trigger );
+
+		unmount();
+		expect( controlRef.current ).toBeNull();
+		expect( triggerRef.current ).toBeNull();
+	} );
+
+	it( 'preserves the placeholder and lets trigger slot props override it', () => {
+		const { rerender } = render(
+			<SearchableSelectControl
+				label="Fruit"
+				placeholder="Choose a fruit"
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		).toHaveTextContent( 'Choose a fruit' );
+
+		rerender(
+			<SearchableSelectControl
+				label="Fruit"
+				placeholder="Choose a fruit"
+				trigger={ <SearchableSelectControl.Trigger /> }
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		).toHaveTextContent( 'Choose a fruit' );
+
+		rerender(
+			<SearchableSelectControl
+				label="Fruit"
+				placeholder="Choose a fruit"
+				trigger={
+					<SearchableSelectControl.Trigger placeholder="Choose a berry" />
+				}
+			/>
+		);
+
+		expect(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		).toHaveTextContent( 'Choose a berry' );
+	} );
+
 	it( 'renders accessible label and description', () => {
 		render(
 			<SearchableSelectControl

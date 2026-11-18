@@ -9,6 +9,7 @@ import {
 	getQueriedTotalItems,
 	getQueriedTotalPages,
 } from './queried-data';
+import type { QueriesState } from './queried-data/types';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getUndoManager } from './private-selectors';
 import {
@@ -17,8 +18,8 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
-import { getEntitySyncManager } from './entity-sync';
 import type * as ET from './entity-types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -38,10 +39,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
-	syncUndoManagerState: {
-		hasRedo: boolean;
-		hasUndo: boolean;
-	};
+	undoManagerReference: Record< string, never >;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -53,6 +51,11 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
+	fieldsConfigs: Record< string, Record< string, FieldsConfig > >;
+	entityActionsConfigs: Record<
+		string,
+		Record< string, EntityActionsConfig >
+	>;
 }
 
 type EntityRecordKey = string | number;
@@ -63,19 +66,19 @@ interface EntitiesState {
 }
 
 interface QueriedData {
-	items: Record< ET.Context, Record< number, ET.EntityRecord > >;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	items: Record< ET.Context, Record< EntityRecordKey, ET.EntityRecord > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 type RevisionRecord =
-	| Record< ET.Context, Record< number, ET.PostRevision > >
-	| Record< ET.Context, Record< number, ET.GlobalStylesRevision > >;
+	| Record< ET.Context, Record< EntityRecordKey, ET.PostRevision > >
+	| Record< ET.Context, Record< EntityRecordKey, ET.GlobalStylesRevision > >;
 
 interface RevisionsQueriedData {
 	items: RevisionRecord;
-	itemIsComplete: Record< ET.Context, Record< number, boolean > >;
-	queries: Record< ET.Context, Record< string, Array< number > > >;
+	itemIsComplete: Record< ET.Context, Record< EntityRecordKey, boolean > >;
+	queries: QueriesState;
 }
 
 interface EntityState< EntityRecord extends ET.EntityRecord > {
@@ -499,7 +502,7 @@ export function hasEntityRecord(
 
 	// When `query._fields` is provided, check that each requested field exists,
 	// including any nested paths, on the item; return false if any part is missing.
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;
@@ -727,10 +730,11 @@ export const getEntityRecords = ( <
 	if ( ! queriedState ) {
 		return null;
 	}
+	// The caller names the record type of the entity it queries.
 	return getQueriedItems( queriedState, query, {
 		supportsPagination: !! getEntityConfig( state, kind, name )
 			?.supportsPagination,
-	} );
+	} ) as Array< EntityRecord > | null;
 } ) as GetEntityRecords;
 
 /**
@@ -1230,9 +1234,6 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	if ( getEntitySyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasUndo;
-	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1245,9 +1246,6 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	if ( getEntitySyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasRedo;
-	}
 	return getUndoManager( state ).hasRedo();
 }
 
@@ -1661,7 +1659,7 @@ export function hasRevision(
 		return false;
 	}
 
-	const fields = getNormalizedCommaSeparable( query._fields ) ?? [];
+	const fields = getNormalizedCommaSeparable< string >( query._fields ) ?? [];
 	for ( let i = 0; i < fields.length; i++ ) {
 		const path = fields[ i ].split( '.' );
 		let value = item;

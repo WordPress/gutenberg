@@ -45,6 +45,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`contentRole`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 
 ## Block Markup
 

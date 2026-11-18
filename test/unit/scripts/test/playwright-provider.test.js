@@ -2,7 +2,7 @@ import { expect, it, vi } from 'vitest';
 import { playwright } from '@vitest/browser-playwright';
 import { createPlaywrightProvider } from '../../config/playwright-provider.mjs';
 
-vi.mock( '@vitest/browser-playwright', () => ( {
+vi.mock( import( '@vitest/browser-playwright' ), () => ( {
 	playwright: vi.fn(),
 } ) );
 

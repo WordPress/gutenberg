@@ -260,17 +260,6 @@ function MetaBoxesMain() {
 		return;
 	}
 
-	const contents = (
-		<div
-			// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
-			className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
-			hidden={ ! isOpen }
-		>
-			<MetaBoxes location="normal" />
-			<MetaBoxes location="advanced" />
-		</div>
-	);
-
 	const isAutoHeight = openHeight === undefined;
 	const usedOpenHeight = isShort ? 'auto' : openHeight;
 	const usedHeight = isOpen ? usedOpenHeight : min;
@@ -341,7 +330,14 @@ function MetaBoxesMain() {
 				{ toggle }
 				{ separator }
 			</div>
-			{ contents }
+			<div
+				// The class name 'edit-post-layout__metaboxes' is retained because some plugins use it.
+				className="edit-post-layout__metaboxes edit-post-meta-boxes-main__liner"
+				hidden={ ! isOpen }
+			>
+				<MetaBoxes location="normal" />
+				<MetaBoxes location="advanced" />
+			</div>
 		</NavigableRegion>
 	);
 }
@@ -499,6 +495,14 @@ function Layout( {
 						} );
 					}
 					break;
+				case 'permanently-delete':
+					{
+						document.location.href = addQueryArgs( 'edit.php', {
+							deleted: 1,
+							post_type: items[ 0 ].type,
+						} );
+					}
+					break;
 				case 'duplicate-post':
 					{
 						const newItem = items[ 0 ];
@@ -560,7 +564,14 @@ function Layout( {
 						<div { ...navigateRegionsProps }>
 							<Editor
 								settings={ editorSettings }
-								initialEdits={ initialEdits }
+								// The initial edits belong to the post the editor was
+								// opened with, not to entities navigated to from it.
+								initialEdits={
+									currentPostId === initialPostId &&
+									currentPostType === initialPostType
+										? initialEdits
+										: undefined
+								}
 								postType={ currentPostType }
 								postId={ currentPostId }
 								templateId={ templateId }

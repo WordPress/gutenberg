@@ -1,6 +1,5 @@
 import { dispatch, select, subscribe } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import { isCollaboratorInfo } from './utils';
@@ -72,8 +71,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
-		let selectionStart = getSelectionStart();
-		let selectionEnd = getSelectionEnd();
+		// An empty selection is `{}`, which the selection helpers check for.
+		let selectionStart = getSelectionStart() as WPBlockSelection;
+		let selectionEnd = getSelectionEnd() as WPBlockSelection;
 		let localCursorTimeout: NodeJS.Timeout | null = null;
 
 		// During rapid selection changes (e.g. undo restoring content and
@@ -89,8 +89,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		} | null = null;
 
 		subscribe( () => {
-			const newSelectionStart = getSelectionStart();
-			const newSelectionEnd = getSelectionEnd();
+			// An empty selection is `{}`, see above.
+			const newSelectionStart = getSelectionStart() as WPBlockSelection;
+			const newSelectionEnd = getSelectionEnd() as WPBlockSelection;
 
 			if (
 				newSelectionStart === selectionStart &&
@@ -175,7 +176,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	private async updateSelectionInEntityRecord(
 		selectionStart: WPBlockSelection,
 		selectionEnd: WPBlockSelection,
-		initialPosition: number | null
+		initialPosition: number | null | undefined
 	): Promise< void > {
 		// Send an entityRecord `selection` update if we have a selection.
 		//

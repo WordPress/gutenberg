@@ -140,7 +140,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Quote' } )
+				.getByText( 'Quote', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -153,9 +153,7 @@ test.describe( 'Block variations', () => {
 
 		await expect(
 			page.locator( '.block-editor-block-card__description' )
-		).toHaveText(
-			'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
-		);
+		).toHaveText( 'Give quoted text visual emphasis.' );
 	} );
 
 	test( 'should display variations info if all declared', async ( {
@@ -178,7 +176,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Success Message' } )
+				.getByText( 'Success Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );
@@ -216,7 +214,7 @@ test.describe( 'Block variations', () => {
 			page
 				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
-				.filter( { hasText: 'Warning Message' } )
+				.getByText( 'Warning Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
 
 		await pageUtils.pressKeys( 'access+o' );

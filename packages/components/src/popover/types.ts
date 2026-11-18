@@ -1,6 +1,6 @@
 import type { Placement } from '@floating-ui/react-dom';
 import type { useFocusOnMount } from '@wordpress/compose';
-import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
+import type { RefObject, ReactNode, SyntheticEvent } from 'react';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
@@ -12,9 +12,7 @@ type DomRectWithOwnerDocument = DOMRect & {
 
 type PopoverPlacement = Placement | 'overlay';
 
-export type PopoverAnchorRefReference = MutableRefObject<
-	Element | null | undefined
->;
+export type PopoverAnchorRefReference = RefObject< Element | null | undefined >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
 
 export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {

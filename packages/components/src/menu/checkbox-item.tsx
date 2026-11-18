@@ -1,17 +1,25 @@
+import clsx from 'clsx';
 import * as Ariakit from '@ariakit/react';
 import { forwardRef, useContext } from '@wordpress/element';
 import { Icon, check } from '@wordpress/icons';
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { CheckboxItemProps } from './types';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import { useMenuItemHideOnClick } from './use-menu-item-hide-on-click';
 
 export const CheckboxItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CheckboxItemProps, 'div', false >
 >( function UnforwardedCheckboxItem(
-	{ suffix, children, disabled = false, hideOnClick = false, ...props },
+	{
+		className,
+		suffix,
+		children,
+		disabled = false,
+		hideOnClick = false,
+		...props
+	},
 	ref
 ) {
 	const menuContext = useContext( Context );
@@ -24,9 +32,14 @@ export const CheckboxItem = forwardRef<
 		);
 	}
 	return (
-		<Styled.CheckboxItem
+		<Ariakit.MenuItemCheckbox
 			ref={ ref }
 			{ ...props }
+			className={ clsx(
+				styles.item,
+				styles[ 'checkbox-item' ],
+				className
+			) }
 			accessibleWhenDisabled
 			disabled={ disabled }
 			store={ store }
@@ -34,24 +47,26 @@ export const CheckboxItem = forwardRef<
 		>
 			<Ariakit.MenuItemCheck
 				store={ store }
-				render={ <Styled.ItemPrefixWrapper /> }
+				render={
+					<span className={ styles[ 'item-prefix-wrapper' ] } />
+				}
 				// Override some ariakit inline styles
 				style={ { width: 'auto', height: 'auto' } }
 			>
 				<Icon icon={ check } size={ 24 } />
 			</Ariakit.MenuItemCheck>
 
-			<Styled.ItemContentWrapper>
-				<Styled.ItemChildrenWrapper>
+			<div className={ styles[ 'item-content-wrapper' ] }>
+				<div className={ styles[ 'item-children-wrapper' ] }>
 					{ children }
-				</Styled.ItemChildrenWrapper>
+				</div>
 
 				{ suffix && (
-					<Styled.ItemSuffixWrapper>
+					<span className={ styles[ 'item-suffix-wrapper' ] }>
 						{ suffix }
-					</Styled.ItemSuffixWrapper>
+					</span>
 				) }
-			</Styled.ItemContentWrapper>
-		</Styled.CheckboxItem>
+			</div>
+		</Ariakit.MenuItemCheckbox>
 	);
 } );

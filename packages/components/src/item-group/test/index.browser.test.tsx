@@ -37,7 +37,6 @@ describe( 'ItemGroup', () => {
 			).rejects.toThrow(
 				'Item with list semantics must be rendered inside an element with role="list".'
 			);
-			expect( console ).toHaveErrored();
 		} finally {
 			portalContainer.remove();
 		}

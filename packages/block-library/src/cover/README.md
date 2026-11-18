@@ -122,8 +122,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `isUserOverlayColor` | `boolean` | — | — |
 | `backgroundType` | `string` | `"image"` | — |
 | `focalPoint` | `object` | — | — |
-| `minHeight` | `number` | — | — |
-| `minHeightUnit` | `string` | — | — |
 | `gradient` | `string` | — | — |
 | `customGradient` | `string` | — | — |
 | `contentPosition` | `string` | — | — |
@@ -149,10 +147,14 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`heading`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-heading): `true`
   - [`text`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-text): `true`
+  - [`link`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-link): `true`
+  - [`button`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-button): `true`
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
   - [`enableContrastChecker`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-enablecontrastchecker): `false`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `aspectRatio`: `true`
+  - `minHeight`: `true`
+  - `minWidth`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
   - [`fontSize`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-fontsize): `true`
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
@@ -188,7 +190,7 @@ This is a [**hybrid block**](https://developer.wordpress.org/block-editor/gettin
 ```html
 <!-- wp:cover {"url":"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=","dimRatio":40} -->
 <div class="wp-block-cover">
-    <img class="wp-block-cover__image-background" alt="" src="data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=" data-object-fit="cover" />
+    <img class="wp-block-cover__image-background" alt="" src="data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=" />
     <span aria-hidden="true" class="wp-block-cover__background has-background-dim-40 has-background-dim"></span>
     <div class="wp-block-cover__inner-container">
 		<!-- wp:paragraph {"align":"center","placeholder":"Write title…","fontSize":"large"} -->

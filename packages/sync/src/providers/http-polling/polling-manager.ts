@@ -1114,6 +1114,14 @@ function retryNow(): void {
 	}
 }
 
+/**
+ * Immediately retries the sync connection instead of waiting for the next
+ * automatic retry. See `retryNow`.
+ */
+export function retrySyncConnection(): void {
+	pollingManager.retryNow();
+}
+
 export const pollingManager: PollingManager = {
 	registerRoom,
 	retryNow,

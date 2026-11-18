@@ -4,8 +4,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalHeading as Heading,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import ImageCropper from '../components/image-cropper';
 import ImageCropperProvider, { useImageCropper } from '../provider';
 import type { ImageCropperProps, MediaSize } from '../types';
@@ -188,10 +188,22 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 							cropperState.aspectRatio.toFixed( 2 )
 						) }
 					</Heading>
-					<WCSelectControl
-						value={ cropperState.aspectRatio.toString() }
-						options={ aspectRatioOptions }
-						onChange={ handleAspectRatioChange }
+					<SelectControl
+						label={ __( 'Aspect ratio' ) }
+						hideLabelFromVision
+						value={
+							aspectRatioOptions.find(
+								( item ) =>
+									item.value ===
+									cropperState.aspectRatio.toString()
+							) ?? null
+						}
+						items={ aspectRatioOptions }
+						onValueChange={ ( item ) => {
+							if ( item && item.value !== null ) {
+								handleAspectRatioChange( item.value );
+							}
+						} }
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>

@@ -56,6 +56,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `units`: `["px","em","rem","vh","vw"]`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`contentRole`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#contentrole): `true`
 - [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
 

@@ -3,6 +3,7 @@ import { Radio } from '../../radio';
 import { RadioGroup } from '../';
 
 const meta: Meta< typeof RadioGroup > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/Primitives/RadioGroup',
 	id: 'design-system-components-form-primitives-radiogroup',
 	component: RadioGroup,
@@ -11,20 +12,9 @@ const meta: Meta< typeof RadioGroup > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
-	},
-};
-
-export default meta;
-
-type Story = StoryObj< typeof RadioGroup >;
-
-export const Default: Story = {
-	args: {
-		'aria-label': 'Fruit',
 	},
 	render: ( args ) => (
 		<RadioGroup { ...args }>
@@ -35,12 +25,21 @@ export const Default: Story = {
 	),
 };
 
+export default meta;
+
+type Story = StoryObj< typeof RadioGroup >;
+
+export const Default: Story = {
+	args: {
+		'aria-label': 'Fruit',
+	},
+};
+
 export const Checked: Story = {
 	args: {
 		...Default.args,
 		defaultValue: 'Apple',
 	},
-	render: Default.render,
 };
 
 export const Disabled: Story = {
@@ -49,5 +48,4 @@ export const Disabled: Story = {
 		defaultValue: 'Apple',
 		disabled: true,
 	},
-	render: Default.render,
 };

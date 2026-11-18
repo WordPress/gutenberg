@@ -1,5 +1,7 @@
 import { createBlock, findTransform } from '../factory';
+import { applyBuiltInValidationFixes } from '../parser/apply-built-in-validation-fixes';
 import { getBlockAttributes } from '../parser/get-block-attributes';
+import { getBlockType } from '../registration';
 import { getRawTransforms } from './get-raw-transforms';
 import type { Block, RawHandler } from '../../types';
 
@@ -36,22 +38,32 @@ export function htmlToBlocks( html: string, handler: RawHandler ): Block[] {
 		}
 
 		const { transform, blockName } = rawTransform;
+		let block: Block;
 
 		if ( transform ) {
-			// A raw transform may return several blocks, in which case it is
-			// unclear which of them the node's class belongs on, so only the
-			// single-block case is handled. No core raw transform returns an
-			// array today; one that did would already have thrown here.
-			const block = transform( node, handler ) as Block;
-			if ( node.hasAttribute( 'class' ) ) {
-				block.attributes.className = node.getAttribute( 'class' );
+			const transformed = transform( node, handler );
+
+			// A transform may return several blocks, and which of them the
+			// node's attributes belong on is ambiguous, so leave those alone.
+			if ( Array.isArray( transformed ) ) {
+				return transformed;
 			}
-			return block;
+
+			block = transformed;
+		} else {
+			block = createBlock(
+				blockName,
+				getBlockAttributes( blockName, node.outerHTML )
+			);
 		}
 
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
+		// A block support usually declares its attribute without a source, so
+		// `getBlockAttributes` cannot read it out of the markup. Recover
+		// those with the fixes the parser applies to an invalid block.
+		const { originalContent, ...fixedBlock } = applyBuiltInValidationFixes(
+			{ ...block, originalContent: node.outerHTML },
+			getBlockType( block.name )!
 		);
+		return fixedBlock;
 	} );
 }

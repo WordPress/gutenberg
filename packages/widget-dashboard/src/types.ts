@@ -8,6 +8,7 @@
  */
 import type { ReactNode } from 'react';
 import type {
+	ColumnSteps,
 	DashboardGridLayoutItem,
 	DashboardLanesLayoutItem,
 } from '@wordpress/grid';
@@ -112,19 +113,27 @@ export interface WidgetContextValue {
 export type WidgetGridModel = 'grid' | 'masonry';
 
 /**
- * Column count used on wide containers when the host sets no
- * `gridSettings.columns`. A default, not a ceiling: the package renders
- * whatever count the host asks for. The four-column wp-admin dashboard is
- * that page's own decision, pinned where it reads its stored settings.
+ * Column count of the default policy on a wide container. A default, not
+ * a ceiling: the package renders whatever the host asks for.
  */
 export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
 
 /**
- * Settings common to every grid model. Column count is resolved from
- * the host's cap and the dashboard container width (see
- * `utils/resolve-dashboard-column-count`). `minColumnWidth` remains for
- * persisted payloads and `@wordpress/grid` compatibility; the dashboard
- * ignores it.
+ * Column policy used when the host sets neither `gridSettings.columns` nor
+ * `gridSettings.minColumnWidth`: one column from 0px, two from 600px and
+ * {@link WIDGET_DASHBOARD_COLUMN_COUNT} from 960px of container width. The
+ * steps are data the host can replace; the package applies none of its own.
+ */
+export const WIDGET_DASHBOARD_COLUMN_STEPS: ColumnSteps = {
+	0: 1,
+	600: 2,
+	960: WIDGET_DASHBOARD_COLUMN_COUNT,
+};
+
+/**
+ * Settings common to every grid model. The column policy travels to the
+ * `@wordpress/grid` surface untouched: the surface measures its own width
+ * and resolves the count from `columns` and `minColumnWidth`.
  *
  * `spacing` is intentionally absent: the gap between tiles is
  * presentational and lives with the design-system theme/density, not
@@ -133,17 +142,21 @@ export const WIDGET_DASHBOARD_COLUMN_COUNT = 4;
  */
 interface BaseWidgetGridSettings {
 	/**
-	 * Column count on wide containers. A finite value is floored, with a
-	 * floor of one and no ceiling; an absent or non-finite value resolves to
-	 * {@link WIDGET_DASHBOARD_COLUMN_COUNT}. Container width steps the
-	 * effective count down: `min( 2, count )` in the middle band, one
-	 * column below it.
+	 * Column count. A number applies at every width; a map applies a count
+	 * from each container width up (`{ 0: 1, 600: 2, 960: 4 }` is one
+	 * column from 0px, two from 600px, four from 960px). A step can be
+	 * `'auto'`, which lifts the cap from that width up and leaves the count
+	 * to `minColumnWidth`; with no floor set, the step is skipped and the
+	 * count below it holds. Counts are floored at one with no ceiling.
+	 * Absent, the policy is the default steps (`DEFAULT_GRID.columns`), or
+	 * whatever `minColumnWidth` fits when that is set.
 	 */
-	columns?: number;
+	columns?: number | ColumnSteps;
 
 	/**
-	 * Per-tile minimum width in pixels. Unused by the dashboard; column
-	 * count is derived from container width instead.
+	 * Per-column floor in pixels. The surface fits as many columns as its
+	 * width allows at this floor, capped by `columns` when set, down to one.
+	 * A non-finite or non-positive value is unset.
 	 */
 	minColumnWidth?: number;
 }
@@ -156,8 +169,9 @@ export interface WidgetGridLayoutSettings extends BaseWidgetGridSettings {
 	model?: 'grid';
 
 	/**
-	 * Row height in pixels (`200` small, `300` medium, `400` large). Every
-	 * tile in a row fills the row vertically.
+	 * Row height in pixels. Any positive value is honored; `ROW_HEIGHT_PRESETS`
+	 * suggests three. Every tile in a row fills the row vertically, and a
+	 * tile's stored `height` counts rows of this size.
 	 */
 	rowHeight?: number;
 }

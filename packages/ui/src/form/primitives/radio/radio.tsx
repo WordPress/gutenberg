@@ -9,6 +9,8 @@ import type { RadioProps } from './types';
 /**
  * A low-level radio button primitive.
  *
+ * Prefer `RadioGroupControl` for standard labeled radio groups.
+ *
  * Must be rendered inside a `RadioGroup`.
  */
 export const Radio = forwardRef< HTMLSpanElement, RadioProps >(

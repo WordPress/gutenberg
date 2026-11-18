@@ -2,7 +2,7 @@ import {
 	Button,
 	DropZone,
 	FlexBlock,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
@@ -151,7 +151,7 @@ export function MediaControl( {
 				}
 				renderToggle={ ( props ) => (
 					<Button { ...props } __next40pxDefaultSize>
-						{ isUploading ? <Spinner /> : props.children }
+						{ isUploading ? <WCSpinner /> : props.children }
 					</Button>
 				) }
 				onReset={ onReset }

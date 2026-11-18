@@ -2,8 +2,10 @@ import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
 import { Modal, SearchControl } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -11,7 +13,11 @@ import { parse } from '@wordpress/blocks';
 import { useAvailableTemplates, useEditedPostContext } from './hooks';
 import { searchTemplates } from '../../utils/search-templates';
 
-export function SwapTemplateModal( { onRequestClose, onSelect } ) {
+export function SwapTemplateModal( {
+	onRequestClose,
+	onSelect,
+	includeDefaultTemplate = true,
+} ) {
 	const { postType, postId } = useEditedPostContext();
 	const { editEntityRecord } = useDispatch( coreStore );
 	const onTemplateSelect = async ( template ) => {
@@ -35,14 +41,22 @@ export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 			isFullScreen
 		>
 			<div className="editor-post-template__swap-template-modal-content">
-				<TemplatesList onSelect={ onTemplateSelect } />
+				<TemplatesList
+					onSelect={ onTemplateSelect }
+					includeDefaultTemplate={ includeDefaultTemplate }
+				/>
 			</div>
 		</Modal>
 	);
 }
 
-export default function SwapTemplateButton( { onClick } ) {
-	const availableTemplates = useAvailableTemplates();
+export default function SwapTemplateButton( {
+	onClick,
+	includeDefaultTemplate = true,
+} ) {
+	const availableTemplates = useAvailableTemplates( {
+		includeDefaultTemplate,
+	} );
 
 	return (
 		<Menu.Item
@@ -54,9 +68,11 @@ export default function SwapTemplateButton( { onClick } ) {
 	);
 }
 
-function TemplatesList( { onSelect } ) {
+function TemplatesList( { onSelect, includeDefaultTemplate } ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
-	const availableTemplates = useAvailableTemplates();
+	const availableTemplates = useAvailableTemplates( {
+		includeDefaultTemplate,
+	} );
 	const templatesAsPatterns = useMemo(
 		() =>
 			availableTemplates.map( ( template ) => ( {

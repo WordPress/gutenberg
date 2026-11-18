@@ -1,8 +1,8 @@
 import removeAccents from 'remove-accents';
-import type { WPCompleter } from './types';
+import type { ListedOptionCompleter } from './types';
 
-type AutocompleteMatch = {
-	completer: WPCompleter;
+type AutocompleteMatch< TReplacement > = {
+	completer: ListedOptionCompleter< TReplacement >;
 	filterValue: string;
 };
 
@@ -13,11 +13,11 @@ type AutocompleteMatchOptions = {
 	lastCompletion?: { name: string; value: string } | null;
 };
 
-export function getAutocompleteMatch(
+export function getAutocompleteMatch< TReplacement >(
 	textContent: string,
-	completers: WPCompleter[],
+	completers: Array< ListedOptionCompleter< TReplacement > >,
 	options: AutocompleteMatchOptions
-): AutocompleteMatch | null {
+): AutocompleteMatch< TReplacement > | null {
 	const { matchCount, isBackspacing, getTextAfterSelection, lastCompletion } =
 		options;
 
@@ -28,7 +28,7 @@ export function getAutocompleteMatch(
 	// Find the completer whose trigger prefix ends closest to the cursor
 	// (rightmost end position). Comparing end positions instead of start
 	// positions correctly resolves overlapping prefixes like "@" and "@@".
-	let completer: WPCompleter | null = null;
+	let completer: ListedOptionCompleter< TReplacement > | null = null;
 	let triggerIndex = -1;
 	let matchedEndIndex = -1;
 	let matchedPrefixLength = 0;

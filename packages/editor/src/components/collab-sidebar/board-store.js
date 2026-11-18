@@ -1,11 +1,12 @@
 import { getScrollContainer } from '@wordpress/dom';
-import { getNoteAnchorRect } from './utils';
+import { getNoteAnchorRect } from './utils/dom';
 
 const EMPTY_SNAPSHOT = {
 	heights: {},
 	anchorRects: {},
 	canvas: null,
 	frameOffset: 0,
+	scrollbarWidth: 0,
 };
 
 function isSameTops( a, b ) {
@@ -70,9 +71,16 @@ export function createBoardStore() {
 					containerEl.getBoundingClientRect().top
 				: 0;
 
+		// The scrollbar toggles with the content height.
+		const view = rootEl?.ownerDocument.defaultView;
+		const scrollbarWidth = view
+			? view.innerWidth - view.document.documentElement.clientWidth
+			: 0;
+
 		if (
 			canvas === snapshot.canvas &&
 			frameOffset === snapshot.frameOffset &&
+			scrollbarWidth === snapshot.scrollbarWidth &&
 			isSameHeights( heights, snapshot.heights ) &&
 			isSameTops( anchorRects, snapshot.anchorRects )
 		) {
@@ -84,6 +92,7 @@ export function createBoardStore() {
 			anchorRects,
 			canvas,
 			frameOffset,
+			scrollbarWidth,
 		};
 		for ( const listener of listeners ) {
 			listener();

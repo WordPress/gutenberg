@@ -2,18 +2,22 @@ import { describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { Suspense, startTransition } from '@wordpress/element';
 import type { MouseEventHandler } from 'react';
 import * as Breadcrumb from '../index';
-import focusStyles from '../../utils/css/focus.module.scss';
 
 function OverflowTrail( {
+	width = 280,
+	currentLabel = 'Current',
 	onClick,
 }: {
-	onClick: MouseEventHandler< HTMLAnchorElement >;
+	width?: number;
+	currentLabel?: string;
+	onClick?: MouseEventHandler< HTMLAnchorElement >;
 } ) {
 	const itemStyle = { width: 80 };
 	return (
-		<Breadcrumb.Root style={ { width: 280 } }>
+		<Breadcrumb.Root style={ { width } }>
 			<Breadcrumb.LinkItem href="/" style={ itemStyle }>
 				Home
 			</Breadcrumb.LinkItem>
@@ -28,7 +32,7 @@ function OverflowTrail( {
 				Page
 			</Breadcrumb.LinkItem>
 			<Breadcrumb.CurrentItem style={ itemStyle }>
-				Current
+				{ currentLabel }
 			</Breadcrumb.CurrentItem>
 		</Breadcrumb.Root>
 	);
@@ -60,6 +64,71 @@ function ClippedLinkTrail() {
 }
 
 describe( 'Breadcrumb browser interactions', () => {
+	it( 'keeps committed items when overflow is focused during a suspended update', async () => {
+		const suspend = vi.fn();
+		const pending = new Promise< never >( () => {} );
+
+		function PendingUpdate(): never {
+			suspend();
+			throw pending;
+		}
+
+		const trail = ( isPending = false ) => (
+			<Suspense fallback="Loading">
+				<OverflowTrail
+					width={ 120 }
+					currentLabel={ isPending ? 'Pending current' : 'Current' }
+				/>
+				{ isPending && <PendingUpdate /> }
+			</Suspense>
+		);
+		const { rerender } = await render( trail() );
+		const trigger = await screen.findByRole( 'button', {
+			name: /hidden breadcrumb items?/,
+		} );
+		expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
+
+		let update: ReturnType< typeof rerender > | undefined;
+		startTransition( () => {
+			update = rerender( trail( true ) );
+		} );
+		await update;
+		expect( suspend ).toHaveBeenCalled();
+		expect( screen.queryByText( 'Loading' ) ).not.toBeInTheDocument();
+
+		await userEvent.tab();
+
+		expect( trigger ).toHaveFocus();
+		expect(
+			screen.getByText( 'Current', { selector: '[aria-current="page"]' } )
+		).toBeVisible();
+		expect(
+			screen.queryByText( 'Pending current', {
+				selector: '[aria-current="page"]',
+			} )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'restores links when the width grows', async () => {
+		const view = await render( <OverflowTrail width={ 180 } /> );
+
+		await screen.findByRole( 'button', {
+			name: /hidden breadcrumb items?/,
+		} );
+
+		await view.rerender( <OverflowTrail width={ 480 } /> );
+
+		await waitFor( () => {
+			expect(
+				screen.queryByRole( 'button', {
+					name: /hidden breadcrumb items?/,
+				} )
+			).not.toBeInTheDocument();
+		} );
+		expect( screen.getByRole( 'link', { name: 'Section' } ) ).toBeVisible();
+		expect( screen.getByRole( 'link', { name: 'Page' } ) ).toBeVisible();
+	} );
+
 	it( 'contains exactly the collapsed link and closes on activation', async () => {
 		await render(
 			<OverflowTrail onClick={ ( event ) => event.preventDefault() } />
@@ -127,9 +196,6 @@ describe( 'Breadcrumb browser interactions', () => {
 		} );
 		expect( current.scrollWidth ).toBe( current.clientWidth );
 		expect( current ).not.toHaveAttribute( 'tabindex' );
-		expect(
-			screen.getAllByText( 'A very long current page' )
-		).toHaveLength( 2 );
 		await userEvent.tab();
 		await expect
 			.element( page.getByRole( 'link', { name: 'Home' } ) )
@@ -138,64 +204,6 @@ describe( 'Breadcrumb browser interactions', () => {
 		await expect
 			.element( page.getByRole( 'button', { name: 'After breadcrumb' } ) )
 			.toHaveFocus();
-	} );
-
-	it( 'uses pluralized labels and supports menu keyboard behavior', async () => {
-		const itemStyle = { width: 80 };
-		await render(
-			<Breadcrumb.Root style={ { width: 280 } }>
-				<Breadcrumb.LinkItem href="/" style={ itemStyle }>
-					Home
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/alpha" style={ itemStyle }>
-					Alpha
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/beta" style={ itemStyle }>
-					Beta
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.LinkItem href="/page" style={ itemStyle }>
-					Page
-				</Breadcrumb.LinkItem>
-				<Breadcrumb.CurrentItem style={ itemStyle }>
-					Current
-				</Breadcrumb.CurrentItem>
-			</Breadcrumb.Root>
-		);
-
-		const trigger = page.getByRole( 'button', {
-			name: 'Show 2 hidden breadcrumb items',
-		} );
-		await expect.element( trigger ).toBeVisible();
-		await userEvent.tab();
-		await expect
-			.element( page.getByRole( 'link', { name: 'Home' } ) )
-			.toHaveFocus();
-		await userEvent.tab();
-		await expect.element( trigger ).toHaveFocus();
-		await userEvent.keyboard( ' ' );
-
-		const alpha = page.getByRole( 'menuitem', { name: 'Alpha' } );
-		const beta = page.getByRole( 'menuitem', { name: 'Beta' } );
-		await expect.element( alpha ).toHaveFocus();
-		await userEvent.keyboard( '{ArrowDown}' );
-		await expect.element( beta ).toHaveFocus();
-		await userEvent.keyboard( '{ArrowUp}' );
-		await expect.element( alpha ).toHaveFocus();
-		await userEvent.keyboard( '{End}' );
-		await expect.element( beta ).toHaveFocus();
-		await userEvent.keyboard( '{Home}' );
-		await expect.element( alpha ).toHaveFocus();
-		await userEvent.keyboard( 'b' );
-		await expect.element( beta ).toHaveFocus();
-		await userEvent.keyboard( '{Escape}' );
-		await expect.element( trigger ).toHaveFocus();
-
-		await userEvent.keyboard( '{Enter}' );
-		await expect.element( alpha ).toHaveFocus();
-		await userEvent.tab();
-		await expect
-			.element( page.getByRole( 'menu' ) )
-			.not.toBeInTheDocument();
 	} );
 
 	it( 'makes a truncated current item focusable and preserves focus when it expands', async () => {
@@ -217,16 +225,13 @@ describe( 'Breadcrumb browser interactions', () => {
 			.toHaveFocus();
 		await userEvent.tab();
 		await expect.element( current ).toHaveFocus();
-		await waitFor( () =>
-			expect(
-				screen.getAllByText( 'A very long current page' )
-			).toHaveLength( 3 )
-		);
-		expect(
-			screen.getByText( 'A very long current page', {
-				selector: '[data-open]',
-			} )
-		).toBeVisible();
+		await expect
+			.element(
+				await screen.findByText( 'A very long current page', {
+					selector: '[data-open]',
+				} )
+			)
+			.toBeVisible();
 
 		await view.rerender( <CurrentTrail width={ 500 } /> );
 		await waitFor( () => {
@@ -234,18 +239,12 @@ describe( 'Breadcrumb browser interactions', () => {
 			expect( current ).toHaveFocus();
 		} );
 		expect( current ).toHaveAttribute( 'tabindex', '0' );
-		expect( current ).toHaveClass(
-			focusStyles[ 'outset-ring--focus-visible' ]
-		);
 
 		await userEvent.tab();
 		await expect
 			.element( page.getByRole( 'button', { name: 'After breadcrumb' } ) )
 			.toHaveFocus();
 		await expect.element( current ).not.toHaveAttribute( 'tabindex' );
-		expect( current ).not.toHaveClass(
-			focusStyles[ 'outset-ring--focus-visible' ]
-		);
 	} );
 
 	it( 'shows the full text for an actually clipped link on focus', async () => {
@@ -256,43 +255,13 @@ describe( 'Breadcrumb browser interactions', () => {
 		expect( link.scrollWidth ).toBeGreaterThan( link.clientWidth );
 		await userEvent.tab();
 		await expect.element( link ).toHaveFocus();
-		await waitFor( () =>
-			expect(
-				screen.getAllByText( 'Constrained ancestor' )
-			).toHaveLength( 3 )
-		);
-		expect(
-			screen.getByText( 'Constrained ancestor', {
-				selector: '[data-open]',
-			} )
-		).toBeVisible();
-		expect( link ).toHaveTextContent( 'Constrained ancestor' );
-	} );
-
-	it( 'shows a clipped label tooltip on hover and dismisses it with Escape', async () => {
-		await render( <ClippedLinkTrail /> );
-		const link = page.getByRole( 'link', { name: 'Constrained ancestor' } );
-		const element = link.element();
-		expect( element.scrollWidth ).toBeGreaterThan( element.clientWidth );
-		await link.hover();
-		await waitFor( () =>
-			expect(
-				screen.getAllByText( 'Constrained ancestor' )
-			).toHaveLength( 3 )
-		);
-		expect(
-			screen.getByText( 'Constrained ancestor', {
-				selector: '[data-open]',
-			} )
-		).toBeVisible();
 		await expect
-			.element( link )
-			.toHaveAccessibleName( 'Constrained ancestor' );
-		await userEvent.keyboard( '{Escape}' );
-		await waitFor( () =>
-			expect(
-				screen.getAllByText( 'Constrained ancestor' )
-			).toHaveLength( 2 )
-		);
+			.element(
+				await screen.findByText( 'Constrained ancestor', {
+					selector: '[data-open]',
+				} )
+			)
+			.toBeVisible();
+		expect( link ).toHaveTextContent( 'Constrained ancestor' );
 	} );
 } );

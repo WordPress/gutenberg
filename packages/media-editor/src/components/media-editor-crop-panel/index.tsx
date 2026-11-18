@@ -1,9 +1,9 @@
-import { SelectControl as WCSelectControl } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { SelectControl, Stack, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import { Icon, getAspectRatioIcon } from '@wordpress/icons';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { CROP_CONTROL_ATTR } from '../../hooks/use-crop-gesture-handlers';
 import MediaEditorImageControls from '../media-editor-image-controls';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 export interface MediaEditorCropPanelProps {
 	/**
@@ -36,6 +36,11 @@ export default function MediaEditorCropPanel( {
 	aspectRatioOptions,
 	disabled = false,
 }: MediaEditorCropPanelProps ) {
+	const items = aspectRatioOptions.map( ( preset ) => ( {
+		label: preset.label,
+		value: preset.value.toString(),
+	} ) );
+
 	return (
 		// Tag the whole panel as a crop-control region so the modal's
 		// Cmd+Z handler doesn't mistake the SelectControl input for a
@@ -49,16 +54,55 @@ export default function MediaEditorCropPanel( {
 				{ __( 'Crop options' ) }
 			</VisuallyHidden>
 			<MediaEditorImageControls withLabels disabled={ disabled } />
-			<WCSelectControl
+			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ aspectRatioValue }
-				onChange={ onAspectRatioChange }
+				value={
+					items.find( ( item ) => item.value === aspectRatioValue ) ??
+					null
+				}
+				onValueChange={ ( item ) => {
+					if ( item && item.value !== null ) {
+						onAspectRatioChange( item.value );
+					}
+				} }
 				disabled={ disabled }
-				options={ aspectRatioOptions.map( ( preset ) => ( {
-					label: preset.label,
-					value: preset.value.toString(),
-				} ) ) }
-			/>
+				items={ items }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => (
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								<span className="media-editor-crop-panel__aspect-ratio-label">
+									{ item.label }
+								</span>
+							</span>
+						) }
+					</SelectControl.Trigger>
+				}
+			>
+				{ items.map( ( item ) => (
+					<SelectControl.Item
+						key={ item.value }
+						value={ item }
+						label={ item.label }
+					>
+						<SelectControl.ItemLabel>
+							<span className="media-editor-crop-panel__aspect-ratio-option">
+								<Icon
+									icon={ getAspectRatioIcon(
+										Number( item.value )
+									) }
+								/>
+								{ item.label }
+							</span>
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+			</SelectControl>
 		</Stack>
 	);
 }

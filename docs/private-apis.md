@@ -179,7 +179,6 @@ Private selectors:
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
 - `getZoomLevel`
-- `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
 - `isBlockSubtreeDisabled`
 - `isDragging`
@@ -199,10 +198,12 @@ Private exports:
 ### `core` store
 
 Private actions:
+- `receiveEntityActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
+- `getEntityActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`
@@ -217,6 +218,8 @@ Private exports:
 - `CreatePatternModal`
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
+- `CreateTemplatePartModal`
+- `CreateTemplatePartModalContents`
 - `isOverridableBlock`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
@@ -264,7 +267,6 @@ Private exports:
 ## editor
 
 Private exports:
-- `CreateTemplatePartModal`
 - `BackButton`
 - `Editor`
 - `PluginPostExcerpt`
@@ -288,18 +290,15 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
 - `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
-- `getEntityActions`
 - `getInserter`
 - `getInserterSidebarToggleRef`
 - `getListViewToggleRef`

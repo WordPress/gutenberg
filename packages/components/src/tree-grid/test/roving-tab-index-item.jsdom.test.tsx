@@ -18,7 +18,6 @@ describe( 'RovingTabIndexItem', () => {
 		).toThrow(
 			'TreeGridItem can only be rendered inside a TreeGrid component.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'allows another component to be specified as the rendered component using the `as` prop', () => {

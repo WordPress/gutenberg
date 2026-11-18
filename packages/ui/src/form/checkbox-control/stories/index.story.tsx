@@ -6,12 +6,19 @@ import {
 } from '../../stories/shared';
 
 const meta: Meta< typeof CheckboxControl > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/CheckboxControl',
 	id: 'design-system-components-form-checkboxcontrol',
 	component: CheckboxControl,
 	argTypes: {
 		checked: { control: false },
 		onCheckedChange: { action: 'onCheckedChange' },
+	},
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

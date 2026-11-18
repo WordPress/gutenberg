@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
+import { archive, copy } from '@wordpress/icons';
 import * as Autocomplete from '../../form/primitives/autocomplete';
 import { SelectControl } from '../../form/select-control';
 import * as Menu from '../';
@@ -16,6 +17,57 @@ export default meta;
 
 type Story = StoryObj;
 
+export const ConsistentPrefixIconsWithinGroups: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Item options</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Group>
+					<Menu.GroupLabel>Actions</Menu.GroupLabel>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+				<Menu.Separator />
+				<Menu.Group>
+					<Menu.GroupLabel>Navigation</Menu.GroupLabel>
+					<Menu.LinkItem href="#menu-usage-guidelines-destination">
+						<Menu.ItemLabel>View details</Menu.ItemLabel>
+					</Menu.LinkItem>
+					<Menu.LinkItem href="https://wordpress.org">
+						<Menu.ItemLabel>WordPress.org</Menu.ItemLabel>
+					</Menu.LinkItem>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
+export const MixedPrefixIcons: Story = {
+	render: () => (
+		<Menu.Root>
+			<Menu.Trigger>Mixed item options</Menu.Trigger>
+			<Menu.Popup>
+				<Menu.Group>
+					<Menu.GroupLabel>Actions</Menu.GroupLabel>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ copy } /> }>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item>
+						<Menu.ItemLabel>Rename…</Menu.ItemLabel>
+					</Menu.Item>
+					<Menu.Item prefix={ <Menu.PrefixIcon icon={ archive } /> }>
+						<Menu.ItemLabel>Archive</Menu.ItemLabel>
+					</Menu.Item>
+				</Menu.Group>
+			</Menu.Popup>
+		</Menu.Root>
+	),
+};
+
 const viewItems = [
 	{ value: 'list', label: 'List' },
 	{ value: 'grid', label: 'Grid' },
@@ -27,10 +79,6 @@ const commandItems = [
 	{ id: 'view-details', value: 'View details' },
 ];
 
-/**
- * Use SelectControl when the trigger represents a value and opens choices for
- * replacing it.
- */
 export const SelectForValues: Story = {
 	render: () => (
 		<SelectControl
@@ -41,9 +89,6 @@ export const SelectForValues: Story = {
 	),
 };
 
-/**
- * Use Menu when the trigger opens commands or destinations.
- */
 export const MenuForCommands: Story = {
 	render: () => (
 		<Menu.Root>
@@ -63,10 +108,6 @@ export const MenuForCommands: Story = {
 	),
 };
 
-/**
- * Use Autocomplete when users need to type to filter a menu-like list of
- * commands or suggestions. The input also accepts free-form text.
- */
 export const AutocompleteForSearchableCommands: Story = {
 	render: () => (
 		<Autocomplete.Root items={ commandItems }>
@@ -99,10 +140,6 @@ export const AutocompleteForSearchableCommands: Story = {
 	),
 };
 
-/**
- * Checkbox and radio items represent settings within a broader command menu.
- * Use SelectControl instead when choosing one value is the control's purpose.
- */
 export const CheckedOptionsWithinACommandMenu: Story = {
 	render: function Render() {
 		const [ showAuthor, setShowAuthor ] = useState( true );
