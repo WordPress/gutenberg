@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Remove circular import between `index.ts` and `middlewares/fetch-all-middleware.ts` so CommonJS builds resolve `per_page=-1` requests properly ([#86910](https://github.com/WordPress/gutenberg/pull/86910)).
+
 ## 8.1.0 (2026-11-04)
 
 ### Internal

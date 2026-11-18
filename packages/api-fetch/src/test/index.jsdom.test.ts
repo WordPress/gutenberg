@@ -414,6 +414,16 @@ describe( 'apiFetch', () => {
 		await apiFetch( expectedOptions );
 	} );
 
+	it( 'should resolve a per_page=-1 request via fetchAllMiddleware', async () => {
+		apiFetch.setFetchHandler(
+			async () => new Response( JSON.stringify( [ { id: 1 } ] ) )
+		);
+
+		await expect(
+			apiFetch( { path: '/wp/v2/posts?per_page=-1' } )
+		).resolves.toEqual( [ { id: 1 } ] );
+	} );
+
 	describe( 'unregister', () => {
 		it( 'should stop calling a middleware once it is unregistered', async () => {
 			const middleware = vi.fn( ( options, next ) => next( options ) );
