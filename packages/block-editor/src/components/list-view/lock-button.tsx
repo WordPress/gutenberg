@@ -5,7 +5,6 @@ import { Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import type { FocusEventHandler, MouseEvent } from 'react';
-import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useBlockLock, useUnlockBlocks } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 
@@ -55,10 +54,6 @@ const ListViewLockButton = forwardRef<
 		},
 		[ clientId ]
 	);
-	const ancestorTitle = useBlockDisplayTitle( {
-		clientId: lockingSection,
-		context: 'list-view',
-	} );
 	const unlockBlocks = useUnlockBlocks();
 
 	let label: string = sprintf(
@@ -66,14 +61,9 @@ const ListViewLockButton = forwardRef<
 		__( 'Unlock %s' ),
 		blockTypeTitle ?? ''
 	);
-	if ( isPatternLocked ) {
-		label = __( 'Locked by its pattern' );
-	} else if ( lockingSection ) {
-		label = sprintf(
-			/* translators: %s: The title of the parent block, e.g. "Group". */
-			__( 'Locked by %s' ),
-			ancestorTitle ?? ''
-		);
+	// A pattern, and every block inside it, is locked by the pattern.
+	if ( isPatternLocked || lockingSection ) {
+		label = __( 'Locked by Pattern' );
 	} else if ( ! canLock ) {
 		label = __( 'Locked' );
 	}
