@@ -120,7 +120,7 @@ const ANALYSIS: Analysis = isStrict
 			step: 'Run PHPStan',
 			script: 'composer phpstan:default',
 			npmScript:
-				'`npm run typecheck:php` in the local environment, which runs both analyses',
+				'`npm run typecheck:php:default` in the local environment',
 			fixScript: 'composer phpstan:fix',
 			fixNpmScript: 'npm run typecheck:php:fix',
 		};
