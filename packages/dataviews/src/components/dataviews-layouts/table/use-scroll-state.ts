@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * A hook to track the scroll state of a container element.
@@ -24,19 +24,14 @@ export function useScrollState( {
 } ): { isVerticallyScrolled: boolean } {
 	const [ isVerticallyScrolled, setIsVerticallyScrolled ] = useState( false );
 
-	const handleScroll = useCallback( () => {
-		const scrollContainer = scrollContainerRef.current;
-		if ( ! scrollContainer ) {
-			return;
-		}
-
-		setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
-	}, [ scrollContainerRef ] );
 	useEffect( () => {
 		const scrollContainer = scrollContainerRef.current;
 		if ( ! scrollContainer ) {
 			return;
 		}
+
+		const handleScroll = () =>
+			setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
 
 		// A resize that clamps the scroll position also fires `scroll`.
 		handleScroll();
@@ -45,7 +40,7 @@ export function useScrollState( {
 		return () => {
 			scrollContainer.removeEventListener( 'scroll', handleScroll );
 		};
-	}, [ scrollContainerRef, handleScroll ] );
+	}, [ scrollContainerRef ] );
 
 	return { isVerticallyScrolled };
 }
