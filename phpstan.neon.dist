@@ -64,6 +64,12 @@ parameters:
 	reportUnmatchedIgnoredErrors: true
 
 	# Errors that are intentionally ignored, as opposed to the baseline, which records errors still to be fixed.
+	#
+	# Each entry names the file its error occurs in with `path`, unless it is marked `reportUnmatched: false`. An entry
+	# that names no file applies to every file, so phpstan-strict.neon.dist, which analyzes only some of them, would
+	# report it as unmatched when its error occurs only in the others. An error occurring in several files gets an entry
+	# for each, since PHPStan reports an entry naming several files with `paths` as unmatched even when it analyzes none
+	# of them.
 	ignoreErrors:
 		# Level 0:
 		# Return values from action callbacks are discarded by do_action(), but returning one is harmless and lets
@@ -72,41 +78,85 @@ parameters:
 		-
 			message: '#^Action callback returns .+ but should not return anything\.$#'
 			identifier: return.void
+			path: lib/media/load.php
+
 		# wp_get_color_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_color_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/calendar/index.php
 
 		# wp_get_shadow_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/navigation-submenu/index.php
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-featured-image/index.php
+		-
+			message: '#^Function wp_get_shadow_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/search/index.php
 
 		# wp_get_spacing_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/comment-author-avatar/index.php
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_spacing_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-navigation-link/index.php
 
 		# wp_get_background_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/button/index.php
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_background_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/search/index.php
 
 		# wp_get_border_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/14094
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/avatar/index.php
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/icon/index.php
+		-
+			message: '#^Function wp_get_border_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-featured-image/index.php
 
 		# wp_get_block_supports_classes_and_styles() is new in WordPress Core: https://github.com/WordPress/wordpress-develop/pull/15485
 		# Remove this entry once the WordPress stubs are generated from a Core revision that includes it.
 		-
 			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
 			identifier: function.notFound
+			path: packages/block-library/src/avatar/index.php
+		-
+			message: '#^Function wp_get_block_supports_classes_and_styles not found\.$#'
+			identifier: function.notFound
+			path: packages/block-library/src/post-navigation-link/index.php
 
 		# Level 3:
 		# WP_REST_Request implements ArrayAccess, and the WordPress stubs declare its offsetSet() with a method-level
