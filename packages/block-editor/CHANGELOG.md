@@ -13,7 +13,7 @@
 
 ### Bug Fixes
 
--   List View: Keep the page in place when scrolling to the selected block.
+-   List View: Keep the page in place when scrolling to the selected block ([#86990](https://github.com/WordPress/gutenberg/pull/86990)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
