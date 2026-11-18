@@ -70,7 +70,7 @@ function gutenberg_restore_list_item_inner_blocks_after_binding( $block_content,
 		return $block_content;
 	}
 
-	if ( ! $instance instanceof WP_Block || empty( $instance->inner_blocks ) ) {
+	if ( ! $instance instanceof WP_Block || 0 === count( $instance->inner_blocks ) ) {
 		return $block_content;
 	}
 

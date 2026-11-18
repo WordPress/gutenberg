@@ -1,6 +1,7 @@
 import { tokenFallbacks } from '../lib/theme-tokens.mjs';
 import {
 	addFallbackToVar as _addFallbackToVar,
+	addFallbackToVarInCSS as _addFallbackToVarInCSS,
 	getTokenFallback as _getTokenFallback,
 } from './add-fallback-to-var.mjs';
 
@@ -41,6 +42,19 @@ export function addFallbackToVar( cssValue, options ) {
  * `@wordpress/theme` is installed. The plugins do nothing without them.
  */
 export const hasTokenFallbacks = tokenFallbacks !== undefined;
+
+/**
+ * Replace bare design token references in a parsed CSS declaration value.
+ *
+ * @param {string} cssValue A CSS declaration value.
+ * @return {string} The value with fallbacks injected.
+ */
+export function addFallbackToVarInCSS( cssValue ) {
+	if ( ! tokenFallbacks ) {
+		return cssValue;
+	}
+	return _addFallbackToVarInCSS( cssValue, tokenFallbacks );
+}
 
 /**
  * Get the generated fallback for a design token.

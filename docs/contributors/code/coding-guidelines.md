@@ -76,9 +76,9 @@ All new code in Gutenberg should be written in [TypeScript](https://www.typescri
 
 There are some exceptions where writing plain JavaScript (`.js`) is permitted:
 
--   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Note that as of Node.js v22.18.0 and newer, [TypeScript files containing erasable syntax can be executed directly by the Node.js runtime](https://nodejs.org/learn/typescript/run-natively).
+-   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Scripts that Node.js runs from this repository are not an exception, since the required Node.js version [supports erasable TypeScript syntax](https://nodejs.org/learn/typescript/run-natively), so write them as `.ts` or `.mts`.
 -   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
--   If authoring new files in a package that has no `tsconfig.json` yet, such that the new file would not have reasonable access to existing package typings. Packages with a `tsconfig.json` reject new JavaScript files (`.js`, `.jsx`, `.mjs`, `.cjs`) under `src` and `test` through the `gutenberg/use-typescript` ESLint rule, as do `routes/` and `tools/`, with the files that predate the rule listed in `tools/eslint/suppressions.json`.
+-   If authoring new files in a package or workspace that has no `tsconfig.json` yet, such that the new file would not have reasonable access to existing package typings.
 
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
@@ -816,7 +816,44 @@ The easiest way to use PHPCS is [local environment](/docs/contributors/code/gett
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
 
-PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in `lib/`, and all the PHP that WordPress core ships from this repository: the PHP in packages such as `block-library`, and the PHP templates in `packages/wp-build/templates`. The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves. After running `composer install` and `npm run build`, which generates PHP files that the analysis needs, run `composer phpstan`, or `npm run typecheck:php` to run it in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment). Errors that predate the analysis are recorded in `tools/phpstan/baseline.neon`. When a change fixes one of them, PHPStan reports the baseline entry as unmatched; regenerate the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`) and commit the result. The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: `tools/phpstan/wordpress-stubs/composer.json` records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access. To update them to the latest trunk, run `composer phpstan:generate-wordpress-stubs -- --commit=trunk`, then `composer update` and `composer phpstan:baselines`, and commit the updated `composer.json`. When a change depends on a wordpress-develop pull request, generate the stubs from that pull request with `--pr=<number>`, so that the analysis knows what the pull request adds, and commit the `composer.json` with the change. While working on both, `--checkout` generates them from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, but those stubs cannot be generated in CI, so use `--pr` before pushing. Once the core change is committed, regenerate them with `--commit=trunk` before merging. To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of `phpstan.neon.dist`. The tests in `phpunit/` are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
+### Static analysis with PHPStan
+
+PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in [`lib/`](https://github.com/WordPress/gutenberg/tree/HEAD/lib), and all the PHP that WordPress core ships from this repository: the PHP in packages such as [`block-library`](/packages/block-library/README.md), and the PHP templates in [`packages/wp-build/templates`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/templates). The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves.
+
+#### Running the analysis
+
+First run `composer install` and `npm run build`, which generates PHP files that the analysis needs. Then run the analysis in either of these ways:
+
+-   `composer phpstan`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php`, in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment).
+
+#### The baseline
+
+Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched, or its count as too high, and marks the error with 🔧. Remove the entry or lower its count in either of these ways, and commit the result:
+
+-   `composer phpstan:fix`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:fix`, in the local environment.
+
+This runs PHPStan with `--fix` over all the paths, since PHPStan reports no out-of-date entries when it analyzes only some files, and then runs the analysis again, since `--fix` reports only what it fixed. The script fails when errors remain, and also when there is nothing to fix. Both runs use `phpstan.neon.dist`, even when a local `phpstan.neon` exists, since a configuration at another rule level can report a baselined error with a different message, which would make `--fix` remove entries the default configuration still needs.
+
+Unlike regenerating the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`), `--fix` never adds an entry, so it does not record any other errors the change introduces as accepted. It also removes an `@phpstan-ignore` comment that no longer ignores anything, and fixes any other error marked with 🔧, so review the diff before committing it.
+
+#### WordPress stubs
+
+The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: [`tools/phpstan/wordpress-stubs/composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access.
+
+The stubs are generated by [`tools/phpstan/generate-wordpress-stubs.php`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/generate-wordpress-stubs.php), run with `composer phpstan:generate-wordpress-stubs -- <option>`, where the option is one of:
+
+-   `--commit=trunk`: Updates the stubs to the latest core trunk.
+-   `--pr=<number>`: Generates the stubs from a wordpress-develop pull request that a change depends on, so that the analysis knows what the pull request adds.
+-   `--checkout`: Generates the stubs from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, while working on both. Those stubs cannot be generated in CI, so use `--pr` before pushing.
+-   `--checkout --pr=<number>`: Once the pull request's branch is checked out with no uncommitted changes and pushed, records the same source as `--pr` without fetching anything.
+
+After generating them, run `composer update` and `composer phpstan:baselines`, and commit the updated [`composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) with the change. When the stubs come from a pull request, regenerate them with `--commit=trunk` once the core change is committed, before merging.
+
+#### Local configuration
+
+To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist). The tests in [`phpunit/`](https://github.com/WordPress/gutenberg/tree/HEAD/phpunit) are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
 
 ```neon
 includes:
@@ -824,6 +861,32 @@ includes:
 parameters:
 	paths:
 		- phpunit
+```
+
+#### Strict rules
+
+[`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist) also enables the rules from [phpstan-strict-rules](https://github.com/phpstan/phpstan-strict-rules) that the code already complies with, such as those disallowing loose comparisons, short ternaries, and the backtick operator, registering each rule individually. It does not include the package's `rules.neon`, since that file also makes several PHPStan parameters stricter, such as `checkDynamicProperties` and `reportMaybesInMethodSignatures`, even when its rules are disabled. For the same reason, `composer.json` tells `phpstan/extension-installer` to ignore the package, which would otherwise include `rules.neon` automatically. To work toward complying with more of the rules, include `rules.neon` in a `phpstan.neon`, and enable the rules to try. Setting `strictRules.allRules` to `false` enables only the rules set to `true`, but the parameters are still made stricter, so expect some errors from those as well. Either way, disable the rules `phpstan.neon.dist` already registers, or each error they report is reported twice:
+
+```neon
+includes:
+	- phpstan.neon.dist
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	strictRules:
+		allRules: false
+		requireParentConstructorCall: true
+		strictArrayFilter: true
+
+		# Already registered in phpstan.neon.dist.
+		disallowedLooseComparison: false
+		disallowedBacktick: false
+		disallowedImplicitArrayCreation: false
+		disallowedShortTernary: false
+		closureUsesThis: false
+		matchingInheritedMethodNames: false
+		switchConditionsMatchingType: false
+		strictFunctionCalls: false
+		illegalConstructorMethodCall: false
 ```
 
 ## GitHub Actions workflow files

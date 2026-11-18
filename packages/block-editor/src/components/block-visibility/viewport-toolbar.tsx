@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useRef, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { seen, unseen } from '@wordpress/icons';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -13,7 +13,6 @@ import type { BlockVisibilityClientIdsProps } from './types';
 export default function BlockVisibilityViewportToolbar( {
 	clientIds,
 }: BlockVisibilityClientIdsProps ) {
-	const hasBlockVisibilityButtonShownRef = useRef( false );
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
@@ -38,28 +37,21 @@ export default function BlockVisibilityViewportToolbar( {
 		[ clientIds ]
 	);
 	const blockEditorDispatch = useDispatch( blockEditorStore );
+	const [ hasButtonShown, setHasButtonShown ] = useState(
+		areBlocksHiddenAnywhere
+	);
 
-	/*
-	 * If the block visibility button has been shown, we don't want to
-	 * remove it from the toolbar until the toolbar is rendered again
-	 * without it. Removing it beforehand can cause focus loss issues.
-	 * It needs to return focus from whence it came, and to do that,
-	 * we need to leave the button in the toolbar.
-	 */
-	useEffect( () => {
-		if ( areBlocksHiddenAnywhere ) {
-			hasBlockVisibilityButtonShownRef.current = true;
-		}
-	}, [ areBlocksHiddenAnywhere ] );
+	// Once shown, keep the button until the toolbar remounts. Removing it
+	// early would lose the focus the modal needs to return to it.
+	if ( areBlocksHiddenAnywhere && ! hasButtonShown ) {
+		setHasButtonShown( true );
+	}
 
 	if ( blockVisibility === false ) {
 		return null;
 	}
 
-	if (
-		! areBlocksHiddenAnywhere &&
-		! hasBlockVisibilityButtonShownRef.current
-	) {
+	if ( ! hasButtonShown ) {
 		return null;
 	}
 

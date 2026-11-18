@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-directory",
-	"version": "6.0.0",
+	"version": "6.1.0",
 	"description": "Extend editor with block directory features to search, download and install blocks.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -66,7 +66,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.8",
 		"deep-freeze": "^0.0.1",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
