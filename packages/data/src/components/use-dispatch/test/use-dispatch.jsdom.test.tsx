@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { AnyAction } from 'redux';
 import { describe, expect, it } from 'vitest';
 import useDispatch from '../use-dispatch';
 import createReduxStore from '../../../redux-store';
@@ -8,7 +9,7 @@ import { RegistryProvider } from '../../registry-provider';
 
 describe( 'useDispatch', () => {
 	const counterStore = {
-		reducer: ( state = 0, action ) => {
+		reducer: ( state = 0, action: AnyAction ) => {
 			if ( action.type === 'INC' ) {
 				return state + 1;
 			}
@@ -19,7 +20,7 @@ describe( 'useDispatch', () => {
 			inc: () => ( { type: 'INC' } ),
 		},
 		selectors: {
-			get: ( state ) => state,
+			get: ( state: number ) => state,
 		},
 	};
 
@@ -30,7 +31,17 @@ describe( 'useDispatch', () => {
 
 		const TestComponent = () => {
 			const dispatch = useDispatch();
-			return <button onClick={ () => dispatch( 'demo' ).inc() } />;
+			return (
+				<button
+					onClick={ () =>
+						(
+							dispatch( 'demo' ) as {
+								inc: () => void;
+							}
+						 ).inc()
+					}
+				/>
+			);
 		};
 
 		render(
@@ -97,7 +108,17 @@ describe( 'useDispatch', () => {
 
 		const TestComponent = () => {
 			const dispatch = useDispatch();
-			return <button onClick={ () => dispatch( 'demo' ).inc() } />;
+			return (
+				<button
+					onClick={ () =>
+						(
+							dispatch( 'demo' ) as {
+								inc: () => void;
+							}
+						 ).inc()
+					}
+				/>
+			);
 		};
 
 		const { rerender } = render(
