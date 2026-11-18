@@ -15,6 +15,7 @@ const {
 	PreferencesModal,
 	ToolsMoreMenuGroup,
 	SiteExport,
+	UploadProgressSnackbar,
 } = unlock( editorPrivateApis );
 
 interface EditorProps {
@@ -145,6 +146,12 @@ export function Editor( {
 			   nothing until one of them opens it.
 			 */ }
 			<PreferencesModal />
+			{ /*
+			   Renders nothing: it manages a notice that the host's snackbar
+			   list displays. Mounted here rather than in boot so that pages
+			   without an editor don't load it.
+			 */ }
+			<UploadProgressSnackbar />
 			{ /*
 			   Self-gated: renders only while editing a template or template
 			   part, the entities the exported theme is made of.

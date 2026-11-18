@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Show media upload progress in a snackbar while the editor is open.
+
 ## 2.2.0 (2026-11-18)
 
 ## 2.1.0 (2026-11-04)
