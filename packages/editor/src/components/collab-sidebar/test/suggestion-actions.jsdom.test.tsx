@@ -181,16 +181,32 @@ describe( 'SuggestionActions states', () => {
 	it( 'pending, anchor present: Accept and Reject', async () => {
 		await setup( { anchored: true } );
 
-		expect( button( 'Accept suggestion' ) ).not.toBeNull();
+		expect( button( 'Accept suggestion' ) ).not.toHaveAttribute(
+			'aria-disabled'
+		);
 		expect( button( 'Reject suggestion' ) ).not.toBeNull();
 		expect( screen.queryByText( /not saved/ ) ).not.toBeInTheDocument();
 	} );
 
-	it( 'pending, anchor absent: Accept and Reject as before', async () => {
+	it( 'pending, anchor absent: Accept is disabled, Reject stays', async () => {
 		await setup( { anchored: false } );
 
-		expect( button( 'Accept suggestion' ) ).not.toBeNull();
+		await waitFor( () =>
+			expect( button( 'Accept suggestion' ) ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			)
+		);
+		expect(
+			screen.getByText( /no longer in the post/ )
+		).toBeInTheDocument();
+		expect( button( 'Reject suggestion' ) ).not.toHaveAttribute(
+			'aria-disabled'
+		);
 		expect( button( 'Apply again' ) ).toBeNull();
+
+		fireEvent.click( button( 'Accept suggestion' )! );
+		expect( decisions.applySuggestion ).not.toHaveBeenCalled();
 	} );
 
 	it( 'decided but not saved, anchor present: pending again, with a hint', async () => {
