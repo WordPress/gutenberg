@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Clear the “Drop pattern” placeholder when the inserter is closed in Zoom Out mode ([#86068](https://github.com/WordPress/gutenberg/pull/86068)).
+
 ### Documentation
 
 -   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
@@ -56,7 +60,6 @@
 
 ### Bug Fixes
 
--   Clear the “Drop pattern” placeholder when the inserter is closed in Zoom Out mode ([#86068](https://github.com/WordPress/gutenberg/pull/86068)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   Notes: Add, resolve and delete inline notes in merged text ([#85744](https://github.com/WordPress/gutenberg/pull/85744)).
