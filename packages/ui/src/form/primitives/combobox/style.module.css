@@ -34,7 +34,21 @@
 				color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				@media ( forced-colors: active ) {
-					background-color: SelectedItem;
+					background-color: Highlight;
+					color: HighlightText;
+
+					/* Opt out only where the text and icon are, so the chip keeps its
+					   forced border. Otherwise they sit on a `Canvas` backplate. */
+					.chip-content,
+					.chip-remove:not([data-disabled]) {
+						forced-color-adjust: none;
+					}
+
+					/* A read-only combobox disables the remove button but not the chip. */
+					.chip-remove:not([data-disabled]) {
+						background-color: transparent;
+						color: inherit;
+					}
 				}
 			}
 

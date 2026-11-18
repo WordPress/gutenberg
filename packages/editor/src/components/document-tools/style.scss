@@ -59,7 +59,7 @@
 			}
 
 			@media (forced-colors: active) {
-				background: SelectedItem !important;
+				background: Highlight !important;
 
 				&:disabled,
 				&[aria-disabled="true"] {

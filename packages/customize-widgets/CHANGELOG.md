@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Use `Highlight` and `HighlightText` for the pressed header buttons in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
 -   Use matching theme-aware colors for header buttons, including the inserter and disabled pressed controls ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Use semantic colors for the header background and bottom border ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
