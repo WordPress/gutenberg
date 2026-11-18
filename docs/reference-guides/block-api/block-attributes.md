@@ -494,3 +494,48 @@ _Example_: `local` role used for temporary data.
 ```
 
 Learn more in the [WordPress 6.7 dev note](https://make.wordpress.org/core/2024/10/20/miscellaneous-block-editor-changes-in-wordpress-6-7/#stabilized-role-property-for-block-attributes).
+
+## Unique items
+
+Set `uniqueItems` to `true` on an `array` attribute to declare that no two of its items are the same. The items must be strings or numbers.
+
+This changes how the attribute is merged during real-time collaboration. By default, an attribute is one value: when two people change it at the same time, one change replaces the other. A list of unique items is merged item by item, so the items that each person adds or removes are all kept.
+
+_Example_: A list of tags.
+
+```js
+{
+	tags: {
+		type: 'array',
+		items: { type: 'string' },
+		uniqueItems: true,
+	}
+}
+```
+
+Starting from `[ 'talk' ]`, one person adds `keynote` while another adds `panel`. Both end up with all three tags. Without `uniqueItems`, one of the two new tags is lost.
+
+To declare a list that is inside an `object` attribute, describe the object with `properties`. Each key is the name of a property, and each value is a definition with the same fields as an attribute.
+
+_Example_: A list of tags inside a `settings` attribute.
+
+```js
+{
+	settings: {
+		type: 'object',
+		properties: {
+			tags: {
+				type: 'array',
+				items: { type: 'string' },
+				uniqueItems: true,
+			},
+		},
+	}
+}
+```
+
+Keep the following in mind:
+
+- The order of the items is kept. If two people change the order at the same time, one order wins, and no item is lost.
+- A list that holds the same item twice, or an item that is not a string or number, is merged as one value like any other attribute.
+- On the server, the attributes of a dynamic block are checked against `uniqueItems` and `properties` before the block is rendered, the same way as `type` and `enum`. An attribute that does not match is replaced by its default value.
