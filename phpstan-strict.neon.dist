@@ -15,7 +15,7 @@ includes:
 	- phpstan.neon.dist
 
 	# Preexisting errors at this level in the strict paths, beyond those in the baseline of phpstan.neon.dist.
-	# Regenerate with `composer phpstan:baselines`, or remove the entries for fixed errors with `composer phpstan:fix`.
+	# Regenerate with `composer phpstan:baselines`, or remove the entries for fixed errors with `composer phpstan:fix:strict`.
 	- tools/phpstan/baseline-strict.neon
 
 parameters:
