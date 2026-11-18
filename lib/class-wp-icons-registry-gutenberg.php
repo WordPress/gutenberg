@@ -900,7 +900,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		 * Find the first SVG root, ignoring surrounding content. The namespace
 		 * check rejects a foreign-namespaced `<svg>`, such as in `<math><svg>`.
 		 */
-		// @phpstan-ignore argument.type (The core docblock accepts a string query, but the generated stub drops `string` when converting the hash notation to an array shape.)
 		if ( ! $processor->next_tag( 'SVG' ) || 'svg' !== $processor->get_namespace() ) {
 			return '';
 		}
@@ -930,7 +929,6 @@ class WP_Icons_Registry_Gutenberg extends WP_Icons_Registry {
 		 * Reject more than one top-level SVG. Nested SVGs were extracted above,
 		 * so only sibling roots remain to be found.
 		 */
-		// @phpstan-ignore argument.type (The core docblock accepts a string query, but the generated stub drops `string` when converting the hash notation to an array shape.)
 		while ( $processor->next_tag( 'SVG' ) ) {
 			if ( 'svg' === $processor->get_namespace() ) {
 				return '';
