@@ -182,14 +182,6 @@ const variations = [
 		attributes: { providerNameSlug: 'dailymotion', responsive: true },
 	},
 	{
-		name: 'imgur',
-		title: 'Imgur',
-		icon: embedPhotoIcon,
-		description: __( 'Embed Imgur content.' ),
-		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
-		attributes: { providerNameSlug: 'imgur', responsive: true },
-	},
-	{
 		name: 'issuu',
 		title: 'Issuu',
 		icon: embedContentIcon,
