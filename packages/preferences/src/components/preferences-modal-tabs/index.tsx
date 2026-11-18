@@ -1,8 +1,8 @@
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	Navigator,
-	__experimentalItemGroup as WCItemGroup,
-	__experimentalItem as Item,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
@@ -100,13 +100,13 @@ export default function PreferencesModalTabs( {
 				<Navigator.Screen path="/">
 					<WCCard isBorderless size="small">
 						<CardBody>
-							<WCItemGroup>
+							<ItemGroup>
 								{ tabs.map( ( tab ) => {
 									return (
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
-											as={ Item }
+											as={ WCItem }
 										>
 											<HStack justify="space-between">
 												<FlexItem>
@@ -127,7 +127,7 @@ export default function PreferencesModalTabs( {
 										</Navigator.Button>
 									);
 								} ) }
-							</WCItemGroup>
+							</ItemGroup>
 						</CardBody>
 					</WCCard>
 				</Navigator.Screen>

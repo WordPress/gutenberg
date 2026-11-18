@@ -1,6 +1,6 @@
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalItemGroup as WCItemGroup,
+	__experimentalItemGroup as ItemGroup,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	FlexItem,
@@ -15,14 +15,14 @@ function FontSizes() {
 			<HStack justify="space-between">
 				<Subtitle level={ 3 }>{ __( 'Font Sizes' ) }</Subtitle>
 			</HStack>
-			<WCItemGroup isBordered isSeparated>
+			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path="/typography/font-sizes">
 					<HStack direction="row">
 						<FlexItem>{ __( 'Font size presets' ) }</FlexItem>
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</HStack>
 				</NavigationButtonAsItem>
-			</WCItemGroup>
+			</ItemGroup>
 		</VStack>
 	);
 }

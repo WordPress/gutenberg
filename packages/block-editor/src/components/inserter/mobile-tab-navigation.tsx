@@ -1,7 +1,7 @@
 import { __, isRTL } from '@wordpress/i18n';
 import {
-	__experimentalItemGroup as WCItemGroup,
-	__experimentalItem as Item,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__experimentalSpacer as Spacer,
@@ -50,13 +50,13 @@ export default function MobileTabNavigation< T extends InserterTabCategory >( {
 			className="block-editor-inserter__mobile-tab-navigation"
 		>
 			<Navigator.Screen path="/">
-				<WCItemGroup>
+				<ItemGroup>
 					{ categories.map( ( category ) => (
 						<Navigator.Button
 							key={ category.name }
 							path={ `/category/${ category.name }` }
-							as={ Item }
-							// @ts-expect-error TODO: `Item` has no `isAction` prop, so remove it.
+							as={ WCItem }
+							// @ts-expect-error TODO: `WCItem` has no `isAction` prop, so remove it.
 							isAction
 						>
 							<HStack>
@@ -69,7 +69,7 @@ export default function MobileTabNavigation< T extends InserterTabCategory >( {
 							</HStack>
 						</Navigator.Button>
 					) ) }
-				</WCItemGroup>
+				</ItemGroup>
 			</Navigator.Screen>
 			{ categories.map( ( category ) => (
 				<Navigator.Screen

@@ -1,5 +1,5 @@
 import { __, isRTL } from '@wordpress/i18n';
-import { __experimentalItemGroup as WCItemGroup } from '@wordpress/components';
+import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import { Subtitle } from './subtitle';
@@ -9,7 +9,7 @@ function TextShadows() {
 	return (
 		<Stack direction="column" gap="sm">
 			<Subtitle level={ 3 }>{ __( 'Text shadows' ) }</Subtitle>
-			<WCItemGroup isBordered isSeparated>
+			<ItemGroup isBordered isSeparated>
 				<NavigationButtonAsItem path="/typography/text-shadows">
 					<Stack
 						direction="row"
@@ -20,7 +20,7 @@ function TextShadows() {
 						<Icon icon={ isRTL() ? chevronLeft : chevronRight } />
 					</Stack>
 				</NavigationButtonAsItem>
-			</WCItemGroup>
+			</ItemGroup>
 		</Stack>
 	);
 }
