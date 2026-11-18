@@ -1,8 +1,8 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { store as uploadStore } from '@wordpress/upload-media';
+import { store as uploadStore, ErrorCode } from '@wordpress/upload-media';
 import { store as noticesStore } from '@wordpress/notices';
 import { Icon as WCIcon, Spinner as WCSpinner } from '@wordpress/components';
 import { check } from '@wordpress/icons';
@@ -13,6 +13,7 @@ import {
 import { unlock } from '../../lock-unlock';
 
 const NOTICE_ID = 'upload-progress';
+const WARNING_NOTICE_ID = 'upload-warning';
 
 // How long the completion checkmark is shown before the snackbar dismisses.
 const COMPLETION_DISPLAY_MS = 3000;
@@ -76,12 +77,15 @@ export const UPLOAD_DONE = (
  * @return {null} This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
-	const { items, csmFailureCount } = useSelect( ( select ) => {
+	const { items, csmFailureCount, warnings } = useSelect( ( select ) => {
 		const { getItems } = select( uploadStore );
-		const { getFailureCount } = unlock( select( uploadStore ) );
+		const { getFailureCount, getWarnings } = unlock(
+			select( uploadStore )
+		);
 		return {
 			items: getItems(),
 			csmFailureCount: getFailureCount(),
+			warnings: getWarnings(),
 		};
 	}, [] );
 	const tracker = useTracker();
@@ -133,6 +137,51 @@ export default function UploadProgressSnackbar() {
 			}
 		};
 	}, [] );
+
+	// An image that uploaded without all of its files counts as uploaded, so
+	// nothing above reports it. One snackbar covers every warning added since
+	// mount, so a gallery on a full site does not stack one per image.
+	// Starting at the current length keeps a remount from bringing back
+	// warnings that were already dismissed.
+	const warningsAtMountRef = useRef( warnings.length );
+	useEffect( () => {
+		const added = warnings.slice( warningsAtMountRef.current );
+		if ( added.length === 0 ) {
+			return;
+		}
+
+		let message = added[ 0 ].message;
+		if ( added.length > 1 ) {
+			const isOutOfStorage = added.every(
+				( { code } ) => code === ErrorCode.STORAGE_LIMIT_REACHED
+			);
+			message = isOutOfStorage
+				? sprintf(
+						/* translators: %d: number of images */
+						_n(
+							'%d image was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+							'%d images were uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+							added.length
+						),
+						added.length
+					)
+				: sprintf(
+						/* translators: %d: number of images */
+						_n(
+							'%d image was uploaded, but some of the sub-sized images could not be saved.',
+							'%d images were uploaded, but some of the sub-sized images could not be saved.',
+							added.length
+						),
+						added.length
+					);
+		}
+
+		createNotice( 'warning', message, {
+			id: WARNING_NOTICE_ID,
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
+	}, [ warnings, createNotice ] );
 
 	useEffect( () => {
 		const isUploading = remaining > 0;
