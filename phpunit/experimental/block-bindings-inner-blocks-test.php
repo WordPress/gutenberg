@@ -173,9 +173,20 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 	}
 
 	public function test_default_pattern_overrides_binding_does_not_bind_inner_blocks() {
-		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->';
-		$output      = $this->render_group( array( '__default' => array( 'source' => 'core/pattern-overrides' ) ) );
-		$this->assertSame( $this->render_group( array() ), $output );
+		$markup  = '<!-- wp:group {"metadata":{"name":"Free","bindings":{"__default":{"source":"core/pattern-overrides"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$context = array( 'pattern/overrides' => array( 'Free' => array( 'innerBlocks' => '<!-- wp:paragraph --><p>Override</p><!-- /wp:paragraph -->' ) ) );
+		$values  = array();
+		$capture = static function ( $value, $source_name, $source_args, $block_instance, $attribute_name ) use ( &$values ) {
+			$values[ $attribute_name ] = $value;
+			return $value;
+		};
+		add_filter( 'block_bindings_source_value', $capture, 5, 5 );
+		$output = ( new WP_Block( parse_blocks( $markup )[0], $context ) )->render();
+		remove_filter( 'block_bindings_source_value', $capture, 5 );
+
+		$this->assertSame( $context['pattern/overrides']['Free']['innerBlocks'], $values['innerBlocks'] ?? null );
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'Override', $output );
 	}
 
 	public function test_value_is_sanitized() {
