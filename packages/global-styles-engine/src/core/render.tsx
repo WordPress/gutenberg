@@ -1776,6 +1776,36 @@ export const generateCustomProperties = (
  * @param context.disableRootPadding    Whether root padding declarations are disabled.
  * @return Rendered CSS rules for the node.
  */
+/**
+ * Returns a ruleset that fits a rotated block to its content, like the
+ * `.has-rotation` rule in the block library common styles. Mirror of
+ * `get_rotation_fit_content_ruleset()` in PHP.
+ *
+ * @param selector     Block or block style variation selector.
+ * @param declarations The node's declarations.
+ * @param nodes        Nodes whose `dimensions.width` takes precedence.
+ * @return The ruleset, or an empty string.
+ */
+function getRotationFitContentRuleset(
+	selector: string,
+	declarations: string[],
+	nodes: any[]
+): string {
+	if (
+		! declarations.some( ( declaration ) =>
+			declaration.startsWith( 'rotate:' )
+		) ||
+		nodes.some( ( node ) => node?.dimensions?.width !== undefined )
+	) {
+		return '';
+	}
+
+	return `:root :where(${ appendToSelector(
+		selector,
+		':not(.alignwide):not(.alignfull)'
+	) }){width: fit-content;}`;
+}
+
 function renderStylesNode(
 	node: StylesNode,
 	{
@@ -1809,6 +1839,7 @@ function renderStylesNode(
 		layoutHasBlockGapSupport,
 		skipSelectorWrapper,
 		name,
+		elementName,
 		variationName,
 	} = node;
 	let ruleset = '';
@@ -1939,6 +1970,13 @@ function renderStylesNode(
 			generalSelector = getPseudoRuleSelector( selector, selectorSuffix );
 		}
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
+	}
+	if ( name && ! elementName && ! selectorSuffix ) {
+		ruleset += getRotationFitContentRuleset(
+			effectiveSelector,
+			declarations,
+			[ sourceStyles ?? styles, ...( baseStyles ?? [] ) ]
+		);
 	}
 	if ( styles?.css ) {
 		// A block can declare a dedicated selector for custom CSS (e.g. to

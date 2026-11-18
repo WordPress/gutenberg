@@ -1988,6 +1988,115 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'fits a rotated block or block style variation to its content', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/group': {
+							transform: { rotate: '15deg' },
+							'@mobile': {
+								transform: { rotate: '5deg' },
+							},
+							variations: {
+								tilted: {
+									transform: { rotate: '-5deg' },
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					styleVariationSelectors: {
+						tilted: '.wp-block-group.is-style-tilted',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				{ ...minimalStyleOptions, variationStyles: true }
+			);
+
+			const fitContent = '{width: fit-content;}';
+			expect( result ).toEqual(
+				':root :where(.wp-block-group){rotate: 15deg;}' +
+					`:root :where(.wp-block-group:not(.alignwide):not(.alignfull))${ fitContent }` +
+					'@media (width <= 480px){:root :where(.wp-block-group){rotate: 5deg;}' +
+					`:root :where(.wp-block-group:not(.alignwide):not(.alignfull))${ fitContent }}` +
+					':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}' +
+					`:root :where(.wp-block-group.is-style-tilted:not(.alignwide):not(.alignfull))${ fitContent }`
+			);
+		} );
+
+		it.each( [
+			[
+				'block',
+				{ dimensions: { width: '20rem' } },
+				{},
+				'.wp-block-heading:not',
+			],
+			[
+				'variation',
+				{},
+				{ dimensions: { width: '20rem' } },
+				'.is-style-tilted:not',
+			],
+		] )(
+			'leaves a rotated block to a width set on the %s',
+			( _label, blockStyles, variationStyles, unfitSelector ) => {
+				const tree = {
+					settings: {},
+					styles: {
+						blocks: {
+							'core/heading': {
+								...blockStyles,
+								transform: { rotate: '15deg' },
+								variations: {
+									tilted: {
+										...variationStyles,
+										transform: { rotate: '-5deg' },
+									},
+								},
+							},
+						},
+					},
+				} as unknown as GlobalStylesConfig;
+
+				const blockSelectors = {
+					'core/heading': {
+						selector: '.wp-block-heading',
+						styleVariationSelectors: {
+							tilted: '.wp-block-heading.is-style-tilted',
+						},
+					},
+				};
+
+				const result = transformToStyles(
+					Object.freeze( tree ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain( 'rotate: -5deg' );
+				expect( result ).not.toContain( unfitSelector );
+				expect( result ).not.toContain( '.is-style-tilted:not' );
+			}
+		);
+
 		it( 'outputs a scale with a rotation on the block', () => {
 			const tree = {
 				settings: {},

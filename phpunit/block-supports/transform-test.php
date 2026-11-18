@@ -46,11 +46,14 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_rotation_is_returned_as_a_wrapper_inline_style() {
+	public function test_rotation_is_returned_as_a_wrapper_class_and_inline_style() {
 		$block_type = $this->register_transform_block( array( 'rotate' => true ) );
 
 		$this->assertSame(
-			array( 'style' => 'rotate:15deg;' ),
+			array(
+				'style' => 'rotate:15deg;',
+				'class' => 'has-rotation',
+			),
 			gutenberg_apply_transform_support(
 				$block_type,
 				array( 'style' => array( 'transform' => array( 'rotate' => '15deg' ) ) )
@@ -186,7 +189,10 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 
 	public function test_classes_and_styles_ignore_block_support() {
 		$this->assertSame(
-			array( 'style' => 'rotate:-0.25turn;' ),
+			array(
+				'style' => 'rotate:-0.25turn;',
+				'class' => 'has-rotation',
+			),
 			gutenberg_get_transform_classes_and_styles(
 				array( 'style' => array( 'transform' => array( 'rotate' => '-0.25turn' ) ) )
 			)

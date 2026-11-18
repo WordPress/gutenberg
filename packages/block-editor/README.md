@@ -661,7 +661,7 @@ _Returns_
 
 ### getTransformClassesAndStyles
 
-Provides the inline styles for a block's transform support attributes.
+Provides the class name and inline styles for a block's transform support attributes.
 
 _Parameters_
 
@@ -669,7 +669,7 @@ _Parameters_
 
 _Returns_
 
-- Transform block support derived inline styles.
+- Transform block support derived class name and inline styles.
 
 ### getTypographyClassesAndStyles
 

@@ -1,6 +1,8 @@
-import { getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import TokenList from '@wordpress/token-list';
 import InspectorControls from '../components/inspector-controls';
 import {
 	TransformPanel as StylesTransformPanel,
@@ -8,7 +10,8 @@ import {
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { store as blockEditorStore } from '../store';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
+import { getTransformClassesAndStyles } from './use-transform-props';
 import {
 	getStyleForState,
 	hasPseudoBlockStyleState,
@@ -187,3 +190,50 @@ export function TransformPanel( {
 		/>
 	);
 }
+
+/**
+ * Adds the transform support class names to the props of a saved block.
+ *
+ * @param props      Additional props applied to the save element.
+ * @param blockType  Block type or name.
+ * @param attributes Block attributes.
+ * @return Filtered props applied to the save element.
+ */
+function addSaveProps(
+	props: Record< string, unknown >,
+	blockType: string | BlockType,
+	attributes: TransformAttributes
+) {
+	// Mirror of the skipped style in `addSaveProps()` of `./style`.
+	if (
+		shouldSkipSerialization( blockType, TRANSFORM_SUPPORT_KEY, 'rotate' )
+	) {
+		return props;
+	}
+
+	const { className } = getTransformClassesAndStyles( attributes );
+	if ( ! className ) {
+		return props;
+	}
+
+	const classes = new TokenList( props.className as string | undefined );
+	classes.add( className );
+
+	return { ...props, className: classes.value };
+}
+
+function useBlockProps( {
+	name,
+	style,
+}: TransformAttributes & { name: string } ) {
+	return addSaveProps( {}, name, { style } );
+}
+
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'style' ],
+	hasSupport( name: string | BlockType ) {
+		return hasBlockSupport( name, TRANSFORM_SUPPORT_KEY );
+	},
+};
