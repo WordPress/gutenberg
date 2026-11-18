@@ -1144,7 +1144,7 @@ describe( 'SyncManager', () => {
 					syncConfig.applyChangesToCRDTDoc
 				).not.toHaveBeenCalled();
 
-				receiveFromPeer( 0, 'Peer ' );
+				receiveFromPeer( 0, 'Bob says ' );
 
 				// The update was applied to a copy, not to the live document.
 				expect(
@@ -1153,17 +1153,17 @@ describe( 'SyncManager', () => {
 				expect(
 					syncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ][ 0 ]
 				).not.toBe( liveDoc );
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 
 				// The timer finds nothing left to apply.
 				await nextTick();
 				expect(
 					syncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledTimes( 1 );
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 
 				// The store receives the merged value.
-				expect( editedRecord.content ).toBe( 'Peer Hello!' );
+				expect( editedRecord.content ).toBe( 'Bob says Hello!' );
 			} );
 
 			it( 'sends the deferred update to the peer with the local origin', async () => {
@@ -1185,13 +1185,13 @@ describe( 'SyncManager', () => {
 				} );
 
 				typeLocally( 'Hello!' );
-				receiveFromPeer( 0, 'Peer ' );
+				receiveFromPeer( 0, 'Bob says ' );
 
 				expect( origins ).toEqual( [
 					'provider',
 					LOCAL_EDITOR_ORIGIN,
 				] );
-				expect( getContent( peerDoc ) ).toBe( 'Peer Hello!' );
+				expect( getContent( peerDoc ) ).toBe( 'Bob says Hello!' );
 			} );
 
 			it( 'keeps the order of several deferred updates', async () => {
@@ -1200,9 +1200,9 @@ describe( 'SyncManager', () => {
 
 				typeLocally( 'Hello!' );
 				typeLocally( 'Hello!?' );
-				receiveFromPeer( 0, 'Peer ' );
+				receiveFromPeer( 0, 'Bob says ' );
 
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!?' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!?' );
 			} );
 
 			it( 'undoes the deferred update and keeps the remote change', async () => {
@@ -1215,18 +1215,18 @@ describe( 'SyncManager', () => {
 				} = await loadWithPeer();
 
 				typeLocally( 'Hello!' );
-				receiveFromPeer( 0, 'Peer ' );
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+				receiveFromPeer( 0, 'Bob says ' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 
 				expect( manager.undoManager.undo( 'post', '123' ) ).toBe(
 					true
 				);
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello' );
 
 				expect( manager.undoManager.redo( 'post', '123' ) ).toBe(
 					true
 				);
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 			} );
 
 			it( 'marks the live document as saved for a deferred save', async () => {
@@ -1248,14 +1248,14 @@ describe( 'SyncManager', () => {
 					LOCAL_EDITOR_ORIGIN,
 					{ isSave: true }
 				);
-				receiveFromPeer( 0, 'Peer ' );
+				receiveFromPeer( 0, 'Bob says ' );
 
 				// The mark is from this editor, and Yjs did not replace the
 				// editor's client ID.
 				const stateMap = liveDoc.getMap( CRDT_STATE_MAP_KEY );
 				expect( stateMap.get( 'savedBy' ) ).toBe( clientId );
 				expect( liveDoc.clientID ).toBe( clientId );
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 			} );
 
 			it( 'leaves the deferred updates of other entities in the queue', async () => {
@@ -1286,9 +1286,9 @@ describe( 'SyncManager', () => {
 					{ content: 'Other!' },
 					LOCAL_EDITOR_ORIGIN
 				);
-				receiveFromPeer( 0, 'Peer ' );
+				receiveFromPeer( 0, 'Bob says ' );
 
-				expect( getContent( liveDoc ) ).toBe( 'Peer Hello' );
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello' );
 				expect( getContent( otherDoc as unknown as Y.Doc ) ).toBe(
 					'Other'
 				);
