@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 
+-   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
 -   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
 -   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing ([#86656](https://github.com/WordPress/gutenberg/pull/86656)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
