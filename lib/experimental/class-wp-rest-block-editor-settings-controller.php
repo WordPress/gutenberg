@@ -96,21 +96,21 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			$editor_context_name = $is_mobile ? 'core/mobile' : 'core/edit-post';
 
 			/*
-			 * The default settings serve the site editor, but they are built for
-			 * core/edit-post without a post, where Core never grants
-			 * edit_block_binding. Check it with the site editor context, as
-			 * site-editor.php does. It runs before any other filter, so plugins
-			 * can still change the value.
+			 * The default settings are shared by everything the editor edits, so
+			 * they can't say whether the user can update block bindings: that
+			 * depends on the entity. Core's value is always false here, because
+			 * there is no post. Remove it so the editor checks the entity itself.
+			 * It runs before any other filter, so plugins can still set a value.
 			 */
-			$set_can_update_block_bindings = static function ( $settings ) {
-				$settings['canUpdateBlockBindings'] = current_user_can( 'edit_block_binding', new WP_Block_Editor_Context( array( 'name' => 'core/edit-site' ) ) );
+			$remove_can_update_block_bindings = static function ( $settings ) {
+				unset( $settings['canUpdateBlockBindings'] );
 				return $settings;
 			};
 
 			if ( $is_mobile ) {
 				add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 			} else {
-				add_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
+				add_filter( 'block_editor_settings_all', $remove_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			$editor_context = new WP_Block_Editor_Context( array( 'name' => $editor_context_name ) );
@@ -119,7 +119,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			if ( $is_mobile ) {
 				remove_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings_mobile', PHP_INT_MAX );
 			} else {
-				remove_filter( 'block_editor_settings_all', $set_can_update_block_bindings, PHP_INT_MIN );
+				remove_filter( 'block_editor_settings_all', $remove_can_update_block_bindings, PHP_INT_MIN );
 			}
 
 			return rest_ensure_response( $settings );

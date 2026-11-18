@@ -85,7 +85,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'bodyPlaceholder',
 	'canEditCSS',
 	'canLockBlocks',
-	'canUpdateBlockBindings',
 	'capabilities',
 	'clearBlockSelection',
 	'codeEditingEnabled',
@@ -181,6 +180,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isRevisionsMode,
 		viewablePostTypeLabel,
 		currentPostId,
+		canUpdateRootEntity,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -289,9 +289,27 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 							)?.area === 'navigation-overlay'
 						: false,
 				isRevisionsMode: _isRevisionsMode(),
+				// Only needed when the server can't tell for the entity being
+				// edited, as in settings shared by everything the editor edits.
+				canUpdateRootEntity:
+					settings.canUpdateBlockBindings === undefined &&
+					postType &&
+					postId
+						? canUser( 'update', {
+								kind: 'postType',
+								name: postType,
+								id: postId,
+							} )
+						: undefined,
 			};
 		},
-		[ postType, postId, isLargeViewport, renderingMode ]
+		[
+			postType,
+			postId,
+			isLargeViewport,
+			renderingMode,
+			settings.canUpdateBlockBindings,
+		]
 	);
 
 	const { merged: mergedGlobalStyles } = useGlobalStyles();
@@ -394,6 +412,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			// Updating a block's bindings edits the entity it belongs to.
+			canUpdateBlockBindings:
+				settings.canUpdateBlockBindings ?? !! canUpdateRootEntity,
 			allImageSizes,
 			bigImageSizeThreshold,
 			imageStripMeta,
@@ -507,6 +528,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		blockPatternCategories,
 		inserterMediaCategories,
 		canUseUnfilteredHTML,
+		canUpdateRootEntity,
 		undo,
 		createPageEntity,
 		userCanCreatePages,

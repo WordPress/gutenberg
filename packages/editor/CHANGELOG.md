@@ -17,6 +17,7 @@
 
 ### Bug Fixes
 
+-   When the editor settings don't say whether the user can update block bindings, check whether the user can update the entity being edited ([#86897](https://github.com/WordPress/gutenberg/pull/86897)).
 -   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
