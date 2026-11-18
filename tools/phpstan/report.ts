@@ -14,9 +14,11 @@
  * and explains the most common of those: a baseline entry that no longer
  * matches, because the error it recorded was fixed.
  *
- * Usage: `npm run --workspace @wordpress/phpstan-tools report -- <report.json>`
+ * Usage: `npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>`
  *
- * The report is the output of `phpstan analyse --error-format=json`.
+ * The report is the output of `phpstan analyse --error-format=json`. Pass
+ * `--strict` for the report of the analysis of the strict paths, with
+ * phpstan-strict.neon.dist, rather than that of phpstan.neon.dist.
  */
 
 import { appendFileSync, readFileSync } from 'node:fs';
@@ -39,6 +41,44 @@ const {
 const REPOSITORY_ROOT =
 	GITHUB_WORKSPACE || resolve( import.meta.dirname, '../..' );
 const INVOCATION_DIRECTORY = INIT_CWD || process.cwd();
+
+/**
+ * What differs between the reports of the two analyses.
+ */
+interface Analysis {
+	/** Name of the analysis, used in annotation titles and summary headings. */
+	name: string;
+	/** Path of the analysis's baseline, relative to the repository root. */
+	baseline: string;
+	/** Name of the workflow step that runs the analysis. */
+	step: string;
+	/** Composer script that runs the analysis locally. */
+	script: string;
+	/** Composer script that fixes the analysis's errors marked as fixable. */
+	fixScript: string;
+	/** npm script that runs `fixScript` in the local environment. */
+	fixNpmScript: string;
+}
+
+const isStrict = process.argv.slice( 2 ).includes( '--strict' );
+
+const ANALYSIS: Analysis = isStrict
+	? {
+			name: 'PHPStan (strict paths)',
+			baseline: 'tools/phpstan/baseline-strict.neon',
+			step: 'Run PHPStan on the strict paths',
+			script: 'composer phpstan:strict',
+			fixScript: 'composer phpstan:fix:strict',
+			fixNpmScript: 'npm run typecheck:php:fix:strict',
+		}
+	: {
+			name: 'PHPStan',
+			baseline: 'tools/phpstan/baseline.neon',
+			step: 'Run PHPStan',
+			script: 'composer phpstan:default',
+			fixScript: 'composer phpstan:fix',
+			fixNpmScript: 'npm run typecheck:php:fix',
+		};
 
 /**
  * An error that PHPStan reported.
@@ -83,8 +123,8 @@ interface PhpstanReport {
 
 /**
  * Whether an error means a baseline entry records more occurrences of an error
- * than there are now, because some were fixed. `composer phpstan:fix` fixes
- * it.
+ * than there are now, because some were fixed. `composer phpstan:fix`, or
+ * `composer phpstan:fix:strict` for the strict paths, fixes it.
  *
  * @param error The error.
  * @return Whether the baseline entry is stale.
@@ -122,8 +162,7 @@ const ANNOTATION_LIMIT = 10;
 const SUMMARY_LIMIT = 500;
 
 // Added to the annotation of an error that PHPStan can fix itself, such as an out-of-date baseline entry.
-const FIX_HINT =
-	'This can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).';
+const FIX_HINT = `This can be fixed automatically by running \`${ ANALYSIS.fixScript }\` (or \`${ ANALYSIS.fixNpmScript }\`).`;
 
 /**
  * Escapes the message of a workflow command.
@@ -222,7 +261,9 @@ function annotate( errors: PhpstanError[] ): void {
 	for ( const error of errors ) {
 		const properties = [
 			`title=${ escapeProperty(
-				error.identifier ? `PHPStan: ${ error.identifier }` : 'PHPStan'
+				error.identifier
+					? `${ ANALYSIS.name }: ${ error.identifier }`
+					: ANALYSIS.name
 			) }`,
 		];
 		if ( error.file ) {
@@ -276,11 +317,11 @@ function formatLocation( error: PhpstanError ): string {
  */
 function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.length === 0 ) {
-		return '## PHPStan\n\nNo errors were found.\n';
+		return `## ${ ANALYSIS.name }\n\nNo errors were found.\n`;
 	}
 
 	const sections = [
-		`## PHPStan found ${ errors.length } ${
+		`## ${ ANALYSIS.name } found ${ errors.length } ${
 			errors.length === 1 ? 'error' : 'errors'
 		}`,
 	];
@@ -288,13 +329,13 @@ function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
 			'### The baseline is out of date',
-			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs fewer times, or not at all.'
+			`An entry in \`${ ANALYSIS.baseline }\` records an error that now occurs fewer times, or not at all.`
 		);
 		sections.push(
 			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
-			'```bash\ncomposer phpstan:fix\n```',
+			`\`\`\`bash\n${ ANALYSIS.fixScript }\n\`\`\``,
 			'or, in the local environment:',
-			'```bash\nnpm run typecheck:php:fix\n```'
+			`\`\`\`bash\n${ ANALYSIS.fixNpmScript }\n\`\`\``
 		);
 		if (
 			errors.some(
@@ -316,7 +357,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 	if ( errors.some( isExceededBaselineEntry ) ) {
 		sections.push(
 			'### A baselined error occurs more often',
-			'An entry in `tools/phpstan/baseline.neon` records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.'
+			`An entry in \`${ ANALYSIS.baseline }\` records an error that now occurs more times than it records, which usually means this pull request added another occurrence. The occurrences past the recorded number are listed below as errors of their own, although PHPStan cannot tell which of them is the new one. **Fix the new occurrence rather than regenerating the baseline**, which would record it as an accepted error.`
 		);
 	}
 
@@ -350,7 +391,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 
 	if ( errors.some( ( error ) => error.fixable ) ) {
 		sections.push(
-			'Errors marked with 🔧 can be fixed automatically by running `composer phpstan:fix` (or `npm run typecheck:php:fix`).'
+			`Errors marked with 🔧 can be fixed automatically by running \`${ ANALYSIS.fixScript }\` (or \`${ ANALYSIS.fixNpmScript }\`).`
 		);
 	}
 
@@ -361,16 +402,18 @@ function buildSummary( errors: PhpstanError[] ): string {
 	}
 
 	sections.push(
-		'To run the analysis locally, run `npm run build` and then `composer phpstan`, or `npm run typecheck:php` in the local environment.'
+		`To run the analysis locally, run \`npm run build\` and then \`${ ANALYSIS.script }\`, or \`npm run typecheck:php\` in the local environment, which runs both analyses.`
 	);
 
 	return sections.join( '\n\n' ) + '\n';
 }
 
-const reportPath = process.argv[ 2 ];
+const reportPath = process.argv
+	.slice( 2 )
+	.find( ( arg ) => arg !== '--strict' );
 if ( ! reportPath ) {
 	process.stderr.write(
-		'Usage: npm run --workspace @wordpress/phpstan-tools report -- <report.json>\n'
+		'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>\n'
 	);
 	process.exit( 2 );
 }
@@ -378,12 +421,14 @@ if ( ! reportPath ) {
 const errors = readErrors( resolve( INVOCATION_DIRECTORY, reportPath ) );
 if ( errors === null ) {
 	process.stdout.write(
-		'::error title=PHPStan did not complete::The report is missing or is not valid JSON, so the code was not checked. See the output of the previous step for the reason.\n'
+		`::error title=${ escapeProperty(
+			`${ ANALYSIS.name } did not complete`
+		) }::The report is missing or is not valid JSON, so the code was not checked. See the output of the “${ ANALYSIS.step }” step for the reason.\n`
 	);
 	if ( GITHUB_STEP_SUMMARY ) {
 		appendFileSync(
 			GITHUB_STEP_SUMMARY,
-			'## PHPStan did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “Run PHPStan” step for the reason, such as an error in the configuration.\n'
+			`## ${ ANALYSIS.name } did not complete\n\nThe report is missing or is not valid JSON, so the code was not checked. See the output of the “${ ANALYSIS.step }” step for the reason, such as an error in the configuration.\n`
 		);
 	}
 	process.exit( 1 );
