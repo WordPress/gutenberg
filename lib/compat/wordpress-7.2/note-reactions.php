@@ -172,7 +172,7 @@ add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_
  * @param int|null $new_count The new comment count. Default null.
  * @param int      $old_count The old comment count.
  * @param int      $post_id   Post ID.
- * @return int|null The modified comment count.
+ * @return int The modified comment count.
  */
 function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count, $post_id ) {
 	global $wpdb;

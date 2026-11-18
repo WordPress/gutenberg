@@ -26,26 +26,31 @@
 		opacity: 0;
 	}
 }
+
 @keyframes fade-out {
 	to {
 		opacity: 0;
 	}
 }
+
 @keyframes slide-from-right {
 	from {
 		transform: translateX(100px);
 	}
 }
+
 @keyframes slide-to-left {
 	to {
 		transform: translateX(-80px);
 	}
 }
+
 @keyframes slide-from-left {
 	from {
 		transform: translateX(-100px);
 	}
 }
+
 @keyframes slide-to-right {
 	to {
 		transform: translateX(80px);

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/hooks",
-	"version": "5.0.0",
+	"version": "5.1.0",
 	"description": "WordPress hooks library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,7 +41,7 @@
 	"types": "build-types",
 	"devDependencies": {
 		"benchmark": "^2.1.4",
-		"vitest": "^5.0.5"
+		"vitest": "^5.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

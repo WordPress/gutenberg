@@ -569,6 +569,45 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * WordPress 7.2 sanitizes `status` to an array, so the default must still
+	 * pass the check for users who cannot edit posts.
+	 *
+	 * @see https://core.trac.wordpress.org/changeset/64494
+	 *
+	 * @dataProvider data_get_items_status_without_edit_posts
+	 *
+	 * @param string|null $role   User role, null when logged out.
+	 * @param string|null $status Status param, null for the default.
+	 * @param int         $code   Expected response status code.
+	 */
+	public function test_get_items_status_without_edit_posts( $role, $status, $code ) {
+		wp_set_current_user( $role ? self::$user_ids[ $role ] : 0 );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		if ( null !== $status ) {
+			$request->set_param( 'status', $status );
+		}
+		$response = rest_get_server()->dispatch( $request );
+
+		if ( 200 === $code ) {
+			$this->assertSame( 200, $response->get_status() );
+		} else {
+			$this->assertErrorResponse( 'rest_forbidden_param', $response, $code );
+		}
+	}
+
+	public function data_get_items_status_without_edit_posts() {
+		return array(
+			'logged out, default status' => array( null, null, 200 ),
+			'logged out, approve'        => array( null, 'approve', 200 ),
+			'logged out, hold'           => array( null, 'hold', 401 ),
+			'subscriber, default status' => array( 'subscriber', null, 200 ),
+			'subscriber, approve'        => array( 'subscriber', 'approve', 200 ),
+			'subscriber, hold'           => array( 'subscriber', 'hold', 403 ),
+		);
+	}
+
+	/**
 	 * Reactions are an internal comment type and must not be world-readable,
 	 * even when approved on a public post. Only the reacting user or a user who
 	 * can edit the comment may read a reaction via GET /wp/v2/comments/{id}.

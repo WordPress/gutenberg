@@ -208,13 +208,11 @@ function render_block_core_cover( $attributes, $content ) {
 
 	if ( ! ( $attributes['hasParallax'] || $attributes['isRepeated'] ) ) {
 		$attr = array(
-			'class'           => 'wp-block-cover__image-background',
-			'data-object-fit' => 'cover',
+			'class' => 'wp-block-cover__image-background',
 		);
 
 		if ( $object_position ) {
-			$attr['data-object-position'] = $object_position;
-			$attr['style']                = 'object-position:' . $object_position . ';';
+			$attr['style'] = 'object-position:' . $object_position . ';';
 		}
 
 		$image = get_the_post_thumbnail( null, $attributes['sizeSlug'] ?? 'post-thumbnail', $attr );
