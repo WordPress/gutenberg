@@ -3420,7 +3420,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_stylesheet_outputs_translate_for_block_styles_states_and_variations() {
 		register_block_style(
-			'core/image',
+			'core/group',
 			array(
 				'name'  => 'raised',
 				'label' => 'Raised',
@@ -3431,7 +3431,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'blocks' => array(
-						'core/image'  => array(
+						'core/group'  => array(
 							'transform'  => array(
 								'rotate'    => '5deg',
 								'translate' => array(
@@ -3465,11 +3465,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		unregister_block_style( 'core/image', 'raised' );
+		unregister_block_style( 'core/group', 'raised' );
 
-		$this->assertStringContainsString( ':root :where(.wp-block-image){rotate: 5deg;translate: 10px -50%;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image){translate: 0 0;}}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-image.is-style-raised){translate: 0 -1rem;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 5deg;translate: 10px -50%;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){translate: 0 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-raised){translate: 0 -1rem;}', $css );
 		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){translate: 0 -4px;}', $css );
 		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){translate: 2px 0;}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
@@ -3534,7 +3534,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'link' => array( 'transform' => array( 'translate' => array( 'x' => '1px' ) ) ),
 					),
 					'blocks'   => array(
-						'core/image' => array(
+						'core/heading' => array(
 							'transform' => array(
 								'translate' => array(
 									'x' => '10px',
@@ -3558,7 +3558,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'core/image' => array(
+						'core/heading' => array(
 							'transform' => array(
 								'translate' => array( 'x' => '10px' ),
 							),

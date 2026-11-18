@@ -1920,7 +1920,7 @@ describe( 'global styles renderer', () => {
 				settings: {},
 				styles: {
 					blocks: {
-						'core/image': {
+						'core/button': {
 							transform: {
 								rotate: '5deg',
 								translate: { x: '10px', y: '-50%' },
@@ -1936,10 +1936,10 @@ describe( 'global styles renderer', () => {
 			} as unknown as GlobalStylesConfig;
 
 			const blockSelectors = {
-				'core/image': {
-					selector: '.wp-block-image',
+				'core/button': {
+					selector: '.wp-block-button',
 					featureSelectors: {
-						transform: '.wp-block-image img',
+						transform: '.wp-block-button .wp-block-button__link',
 					},
 				},
 			};
@@ -1955,7 +1955,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-image img){rotate: 5deg;translate: 10px -50%;}@media (width <= 480px){:root :where(.wp-block-image img){translate: 0 1rem;}}'
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;translate: 10px -50%;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){translate: 0 1rem;}}'
 			);
 		} );
 

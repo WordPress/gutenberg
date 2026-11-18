@@ -1791,8 +1791,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:2deg !important;translate:1rem 0 !important;}}',
 			),
 			'viewport'       => array(
-				'core/image',
-				'<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>',
+				'core/group',
+				'<div class="wp-block-group"><p>Text</p></div>',
 				array(
 					'@mobile' => array(
 						'transform' => array(
@@ -1826,7 +1826,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 					'styles'  => array(
 						'blocks' => array(
-							'core/image' => array(
+							'core/group' => array(
 								'transform' => array( 'translate' => array( 'x' => '3rem' ) ),
 							),
 						),
@@ -1839,9 +1839,9 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		try {
 			$actual = gutenberg_render_block_states_support(
-				'<figure class="wp-block-image"><img src="x.png" /></figure>',
+				'<div class="wp-block-group"><p>Text</p></div>',
 				array(
-					'blockName' => 'core/image',
+					'blockName' => 'core/group',
 					'attrs'     => array( 'style' => $style ),
 				)
 			);

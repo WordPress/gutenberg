@@ -189,7 +189,7 @@ describe( 'theme.json schema', () => {
 			version: 3,
 			styles: {
 				blocks: {
-					'core/image': {
+					'core/group': {
 						transform: { translate: { x: '10px', y: '-50%' } },
 						variations: {
 							raised: { transform: { translate: { x: '1rem' } } },
@@ -212,7 +212,7 @@ describe( 'theme.json schema', () => {
 		const theme = {
 			version: 3,
 			styles: {
-				blocks: { 'core/image': { transform: { translate } } },
+				blocks: { 'core/group': { transform: { translate } } },
 			},
 		};
 
