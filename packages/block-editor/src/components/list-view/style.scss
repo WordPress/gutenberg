@@ -341,6 +341,7 @@
 		// keyboard focus keeps it shown once the pointer leaves the row.
 		&:hover,
 		&:has(:focus-visible),
+		&:has(.is-menu-open),
 		&.is-visible {
 			> * {
 				opacity: 1;

@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { forwardRef, useRef, useState } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
@@ -40,8 +41,8 @@ interface ListViewLockButtonProps {
  * - A locked block or pattern always shows its lock: a lock for a full lock
  *   and a lock with a dash for a partial lock. Pressing it unlocks the block
  *   and every block inside it.
- * - Right-clicking the lock of a locked block or a pattern opens the lock menu
- *   at the pointer, to change each property.
+ * - Right-clicking the lock, locked or not, opens the lock menu at the
+ *   pointer, to change each property.
  *
  * A pattern's layout is the pattern's, so it neither counts as a lock here nor
  * changes. A block inside a pattern is edited content only, so its button is
@@ -79,10 +80,9 @@ const ListViewLockButton = forwardRef<
 
 	const isLocked = hasOwnLock;
 	const isDisabled = !! lockingSection || ! canLock;
-	// The lock menu changes the lock of a locked block or of a pattern, but
+	// The lock menu changes the lock of a block or pattern, locked or not, but
 	// not of a block inside a pattern, whose lock is the pattern's.
-	const hasMenu =
-		canLock && ! lockingSection && ( isLocked || isPatternLocked );
+	const hasMenu = canLock && ! lockingSection;
 	let icon = lockOpen;
 	if ( isLocked ) {
 		icon = lockType === 'full' ? lock : lockDashed;
@@ -113,7 +113,9 @@ const ListViewLockButton = forwardRef<
 		<>
 			<Button
 				ref={ mergedRef }
-				className="block-editor-list-view-block__lock"
+				className={ clsx( 'block-editor-list-view-block__lock', {
+					'is-menu-open': !! menuAnchorRect,
+				} ) }
 				size="small"
 				icon={ icon }
 				label={ label }

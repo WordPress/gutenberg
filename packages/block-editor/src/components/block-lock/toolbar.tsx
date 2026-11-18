@@ -22,8 +22,7 @@ import type { BlockLockControlProps } from './types';
  * Once unlocked, the button stays until the toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
-	const { canLock, hasOwnLock, lockType, isPatternLocked } =
-		useBlockLock( clientId );
+	const { canLock, hasOwnLock, lockType } = useBlockLock( clientId );
 	const lockBlocks = useLockBlocks();
 	const unlockBlocks = useUnlockBlocks();
 	const [ button, setButton ] = useState< HTMLButtonElement | null >( null );
@@ -31,7 +30,7 @@ function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 	const [ menuAnchorRect, setMenuAnchorRect ] = useState< DOMRect | null >(
 		null
 	);
-	const hasMenu = canLock && ( hasOwnLock || isPatternLocked );
+	const hasMenu = canLock;
 
 	let icon = lockOpen;
 	if ( hasOwnLock ) {
