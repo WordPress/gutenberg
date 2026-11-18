@@ -9,6 +9,7 @@
 
 ### Bug Fixes
 
+-   Font Library: Announce the number of fonts found to screen readers when searching or filtering a font collection ([#86856](https://github.com/WordPress/gutenberg/pull/86856)).
 -   Font Library: Show an error when an uploaded font has no family name, instead of failing the upload with no feedback ([#86182](https://github.com/WordPress/gutenberg/pull/86182)).
 -   Font size presets: Keep a preset's `size` in sync with `fluid.max` when the Maximum is edited with custom fluid values on ([#86277](https://github.com/WordPress/gutenberg/pull/86277)).
 -   Font Library: Ignore leading and trailing spaces in the font search ([#76871](https://github.com/WordPress/gutenberg/pull/76871)).

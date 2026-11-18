@@ -9,7 +9,7 @@ import {
 	useKeyboardShortcutProps,
 } from '../utils/keyboard-shortcut';
 import { useItemContent as usePopupItemContent } from '../utils/item-popup';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import { MenuItemContentContext } from './context';
 import {
 	ITEM_DESCRIPTION_DIRECT_CHILD,
