@@ -292,6 +292,49 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The `date` panel of the default form is summarized by the
+	 * `publish_date` field, for every post type using that form.
+	 *
+	 * @dataProvider data_default_form_post_types
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_date_panel_is_summarized_by_publish_date( $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			register_post_type( $post_type );
+		}
+
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+
+		$this->assertSame(
+			array(
+				'type'    => 'panel',
+				'summary' => 'publish_date',
+			),
+			$this->get_form_field( $config, 'date' )['layout']
+		);
+
+		if ( ! in_array( $post_type, array( 'page', 'post' ), true ) ) {
+			unregister_post_type( $post_type );
+		}
+	}
+
+	/**
+	 * Post types providing their own form keep their `date` member, if any,
+	 * as it is, and get none appended.
+	 *
+	 * @dataProvider data_post_types_with_own_form
+	 *
+	 * @param string $post_type The post type.
+	 */
+	public function test_date_summary_is_not_applied_to_own_forms( $post_type ) {
+		$config = gutenberg_get_entity_view_config( 'postType', $post_type );
+		$date   = $this->get_form_field( $config, 'date' );
+
+		$this->assertTrue( null === $date || ! isset( $date['layout']['summary'] ) );
+	}
+
+	/**
 	 * Post types whose own form does not list the `author` field do not get
 	 * one appended by the `author` layout patch.
 	 *

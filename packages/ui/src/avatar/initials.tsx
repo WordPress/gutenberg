@@ -1,4 +1,4 @@
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useMemo } from '@wordpress/element';
 import { Fallback } from './fallback';
 import type { InitialsProps } from './types';
 
@@ -11,9 +11,10 @@ import type { InitialsProps } from './types';
  */
 export const Initials = forwardRef< HTMLSpanElement, InitialsProps >(
 	function AvatarInitials( { name, locale, ...props }, ref ) {
-		const segmenter = new Intl.Segmenter( locale, {
-			granularity: 'grapheme',
-		} );
+		const segmenter = useMemo(
+			() => new Intl.Segmenter( locale, { granularity: 'grapheme' } ),
+			[ locale ]
+		);
 		// Select whitespace-separated words without interpreting name structure.
 		// Segmenter only extracts complete characters, keeping accents and emoji intact.
 		const words = name?.trim().split( /\s+/ ) ?? [];

@@ -12,6 +12,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rules_Store' ) ) {
 	/**
 	 * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
 	 *
+	 * @phpstan-consistent-constructor
+	 *
 	 * @access private
 	 */
 	class WP_Style_Engine_CSS_Rules_Store {

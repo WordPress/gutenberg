@@ -164,8 +164,6 @@ export const getAllPatternsDependants =
 			state.settings.__experimentalReusableBlocks,
 			state.settings[ selectBlockPatternsKey ]?.( select ),
 			state.settings[ currentUserIdSelectKey ]?.( select ),
-			// @ts-expect-error The store has no `blockPatterns`, so this is always undefined.
-			state.blockPatterns,
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
 		];
 	};
