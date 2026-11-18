@@ -27,7 +27,6 @@ import { type Post } from '../entity-types/post';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../sync';
 import type { WPSelection } from '../types';
 import {
-	captureSelectionHistory,
 	getSelectionHistory,
 	getShiftedSelection,
 	scheduleSelectionHistory,
@@ -280,26 +279,10 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the current selection before
-		// it is overwritten by the new selection from Gutenberg.
-		// Without this, selection history will already contain the latest
-		// selection (after this change) when the undo stack is saved.
+		// Record the new selection after undo metadata captures the old one,
+		// before a remote update can reconcile against the selection history.
 		scheduleSelectionHistory( ydoc, changes.selection );
 	}
-}
-
-/**
- * Capture selection bookkeeping that is not included in an encoded Yjs update.
- *
- * @param copy    The document containing the local edit.
- * @param changes The local edit, including its selection.
- * @return A callback to update selection history after the edit is merged.
- */
-export function capturePostLocalState( copy: CRDTDoc, changes: PostChanges ) {
-	return changes.selection
-		? captureSelectionHistory( copy, changes.selection )
-		: undefined;
 }
 
 /**

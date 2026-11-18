@@ -16,7 +16,6 @@ import type { SyncConfig } from '../../../../sync/src/types';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
-	capturePostLocalState,
 	defaultCollectionSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -1567,10 +1566,16 @@ describe( 'selection after a deferred edit merges with a remote change', () => {
 		},
 	] )( '$name', async ( { remoteBlock, offset } ) => {
 		let liveDoc!: Y.Doc;
+		let flushLocalUpdates!: () => void;
 		vi.mocked( getProviderCreators ).mockReturnValue( [
-			async ( { ydoc } ) => {
+			async ( { ydoc, flushLocalUpdates: flush } ) => {
 				liveDoc = ydoc;
-				return { on: vi.fn(), destroy: vi.fn() };
+				flushLocalUpdates = flush!;
+				return {
+					on: vi.fn(),
+					destroy: vi.fn(),
+					supportsDeferredUpdates: true,
+				};
 			},
 		] );
 		const block = ( clientId: string, content: string ): Block => ( {
@@ -1600,7 +1605,6 @@ describe( 'selection after a deferred edit merges with a remote change', () => {
 		};
 		const syncedProperties = new Set( [ 'blocks', 'title' ] );
 		const config: SyncConfig = {
-			captureLocalState: capturePostLocalState,
 			applyChangesToCRDTDoc: ( doc, changes ) =>
 				applyPostChangesToCRDTDoc( doc, changes, syncedProperties ),
 			getChangesFromCRDTDoc: ( doc, editedRecord ) =>
@@ -1638,7 +1642,7 @@ describe( 'selection after a deferred edit merges with a remote change', () => {
 				.get( 'content' ) as Y.Text;
 
 		try {
-			// An earlier flush can leave selection bookkeeping on a timer.
+			// An earlier selection-only edit must not replace the new selection.
 			manager.update(
 				'post',
 				'123',
@@ -1657,6 +1661,7 @@ describe( 'selection after a deferred edit merges with a remote change', () => {
 			} else {
 				peerText( remoteBlock ).insert( 0, 'Bob ' );
 			}
+			flushLocalUpdates();
 			Y.applyUpdateV2(
 				liveDoc,
 				Y.encodeStateAsUpdateV2( peer ),
@@ -1664,8 +1669,16 @@ describe( 'selection after a deferred edit merges with a remote change', () => {
 			);
 			await nextTick();
 
+			expect( record.selection.selectionStart ).toEqual(
+				selection( 'b', offset ).selectionStart
+			);
+			expect( record.selection.selectionEnd ).toEqual(
+				selection( 'b', offset ).selectionEnd
+			);
+
 			// A later remote edit in the old block must not move the selection back.
 			peerText( 0 ).insert( 0, 'Bob ' );
+			flushLocalUpdates();
 			Y.applyUpdateV2(
 				liveDoc,
 				Y.encodeStateAsUpdateV2( peer ),
