@@ -10,7 +10,12 @@ import {
 	type Mock,
 } from 'vitest';
 import { useContext, useEffect } from '@wordpress/element';
-import { Fill, Popover, Slot, SlotFillProvider } from '@wordpress/components';
+import {
+	Fill,
+	Popover as WCPopover,
+	Slot,
+	SlotFillProvider,
+} from '@wordpress/components';
 import {
 	unregisterFormatType,
 	registerFormatType,
@@ -139,8 +144,8 @@ describe( 'RichTextControl', () => {
 		expect( getTextbox( container ) ).toBeInTheDocument();
 	} );
 
-	it( 'visually hides the label when `hideLabelFromVision` is set', () => {
-		render(
+	it( 'names the textbox without rendering the label when `hideLabelFromVision` is set', () => {
+		const { container } = render(
 			<RichTextControl
 				label="Note"
 				value=""
@@ -149,10 +154,8 @@ describe( 'RichTextControl', () => {
 			/>
 		);
 
-		const label = screen.getByText( 'Note' );
-		// `BaseControl` applies the `components-visually-hidden` class to its
-		// label when `hideLabelFromVision` is true.
-		expect( label ).toHaveClass( 'components-visually-hidden' );
+		expect( screen.queryByText( 'Note' ) ).not.toBeInTheDocument();
+		expect( getTextbox( container ) ).toHaveAccessibleName( 'Note' );
 	} );
 
 	it( 'forwards `disableLineBreaks` to the textbox via `aria-multiline`', () => {
@@ -409,9 +412,9 @@ describe( 'RichTextControl', () => {
 				tagName: 'kbd',
 				className: null,
 				edit: () => (
-					<Popover>
+					<WCPopover>
 						<button type="button">Inside popover</button>
-					</Popover>
+					</WCPopover>
 				),
 			} );
 		} );

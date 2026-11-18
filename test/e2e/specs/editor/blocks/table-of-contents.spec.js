@@ -166,6 +166,20 @@ test.describe( 'Table of Contents', () => {
 						level: 3,
 						anchor: 'preview-subsection',
 					},
+					// Inline math keeps its LaTeX source in an annotation that
+					// browsers don't display. Without an anchor, the editor
+					// generates one from the heading text.
+					{
+						content:
+							'Solving <math data-latex="x^2"><semantics><msup><mi>x</mi><mn>2</mn></msup><annotation encoding="application/x-tex">x^2</annotation></semantics></math>',
+					},
+					// A footnote number is a superscript link in the heading,
+					// not part of its text. Without an anchor, the editor
+					// generates one from the heading text.
+					{
+						content:
+							'Sources<sup data-fn="fn-sources" class="fn"><a href="#fn-sources" id="fn-sources-link">1</a></sup>',
+					},
 				] )
 			);
 
@@ -173,6 +187,8 @@ test.describe( 'Table of Contents', () => {
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
 				'Preview section',
 				'Preview subsection',
+				'Solving x2',
+				'Sources',
 			] );
 			// Looking inside the parent list item checks nesting, not just text order.
 			await expect(
@@ -204,7 +220,21 @@ test.describe( 'Table of Contents', () => {
 			await expect( frontendToc.getByRole( 'link' ) ).toHaveText( [
 				'Preview section',
 				'Preview subsection',
+				'Solving x2',
+				'Sources',
 			] );
+			await expect(
+				frontendToc.getByRole( 'link', {
+					name: 'Solving x2',
+					exact: true,
+				} )
+			).toHaveAttribute( 'href', /#solving-x2$/ );
+			await expect(
+				frontendToc.getByRole( 'link', {
+					name: 'Sources',
+					exact: true,
+				} )
+			).toHaveAttribute( 'href', /#sources$/ );
 			// Looking inside the parent list item checks nesting, not just text order.
 			await expect(
 				frontendToc
@@ -307,7 +337,8 @@ test.describe( 'Table of Contents', () => {
 				.getByRole( 'combobox', {
 					name: 'Include headings down to level',
 				} )
-				.selectOption( '3' );
+				.click();
+			await page.getByRole( 'option', { name: 'Heading 3' } ).click();
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
@@ -452,6 +483,51 @@ test.describe( 'Table of Contents', () => {
 				.click();
 			await expect( page ).toHaveURL( /#updated-section$/ );
 			await expect( page.locator( '#updated-section' ) ).toBeInViewport();
+		} );
+
+		test( 'previewing unsaved changes to a published post lists the previewed headings', async ( {
+			admin,
+			editor,
+			page,
+		} ) => {
+			await admin.createNewPost();
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Published section',
+						anchor: 'published-section',
+					},
+				] )
+			);
+			await editor.publishPost();
+			await page.getByRole( 'button', { name: 'Close panel' } ).click();
+
+			// Preview the post with unsaved changes. WordPress applies them to
+			// the global post only, not to the saved post.
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Previewed section',
+						anchor: 'previewed-section',
+					},
+				] )
+			);
+			const previewPage = await editor.openPreviewPage();
+
+			const tableOfContents = previewPage.getByRole( 'navigation', {
+				name: 'Table of Contents',
+			} );
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Previewed section',
+				} )
+			).toBeVisible();
+			await expect(
+				tableOfContents.getByRole( 'link', {
+					name: 'Published section',
+				} )
+			).toHaveCount( 0 );
+			await previewPage.close();
 		} );
 
 		test( 'clicking a table of contents item on the front of site scrolls to the matching section', async ( {

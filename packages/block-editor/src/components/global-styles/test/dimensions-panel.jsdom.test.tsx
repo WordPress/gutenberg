@@ -1,22 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
-import type { DimensionsPanelProps } from '../types';
+import type { DimensionsPanelProps, PanelStyle } from '../types';
+import {
+	getStyleForState,
+	setStyleForState,
+} from '../../../hooks/block-style-state';
 
 globalThis.wpVitest.mockMatchMedia();
-
-// The inheritance treatment sits behind the
-// `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
-// tests exercise the inheriting path.
-beforeEach( () => {
-	window.__experimentalGlobalStylesInheritanceUI = true;
-} );
-
-afterEach( () => {
-	delete window.__experimentalGlobalStylesInheritanceUI;
-} );
 
 // `AspectRatioTool` reads its option list from the block-editor data
 // store via `useSettings`. Mock that hook so the tests can render the
@@ -77,8 +70,7 @@ vi.mock( import( '../../use-settings' ), async ( importOriginal ) => {
  *
  * The control's `value` prop reads from local `value` only; inherited values
  * are surfaced through placeholders or at-rest selected options when local
- * paths are empty. The wrapping `ToolsPanelItem` carries the inherited or
- * local-override class hooks for label-level treatment.
+ * paths are empty.
  */
 
 const baseSettings = {
@@ -150,16 +142,6 @@ function renderPanel(
 	);
 }
 
-// A local override surfaces the accessible reset-to-inherited affordance, so
-// assert on that rather than the label's CSS class hook.
-function expectLocalOverride() {
-	expect(
-		screen.getByRole( 'button', {
-			name: /reset to inherited value/i,
-		} )
-	).toBeInTheDocument();
-}
-
 // Asserts the placeholder treatment for a control. A control can inherit a
 // value while showing no placeholder when the inherited sides differ
 // (BoxControl cannot render a per-side placeholder).
@@ -195,6 +177,295 @@ const getPaddingSliders = () =>
 	( screen.getAllByRole( 'slider' ) as HTMLInputElement[] ).filter( ( s ) =>
 		/padding/i.test( s.getAttribute( 'aria-label' ) || '' )
 	);
+
+describe( 'DimensionsPanel — viewport grid placement', () => {
+	it.each( [
+		{
+			name: 'grid placement',
+			placement: { columnStart: 4, rowStart: 5 },
+			resetSpans: false,
+		},
+		{
+			name: 'automatic placement',
+			placement: { columnStart: null, rowStart: null },
+			resetSpans: false,
+		},
+		{
+			name: 'grid spans',
+			placement: { columnStart: 4, rowStart: 5 },
+			resetSpans: true,
+		},
+	] )(
+		'resets viewport $name to the inherited values',
+		async ( { placement, resetSpans } ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const baseLayout = {
+				columnStart: 2,
+				rowStart: 3,
+				columnSpan: 2,
+				rowSpan: 3,
+			};
+			const selectedState = { viewport: '@mobile', pseudo: 'default' };
+			function Wrapper() {
+				const [ style, setStyle ] = useState< PanelStyle >( {
+					layout: baseLayout,
+					'@mobile': {
+						layout: { ...placement, columnSpan: 1, rowSpan: 1 },
+					},
+				} );
+				return (
+					<DimensionsPanel
+						panelId="test-panel"
+						settings={ {
+							layout: {},
+							parentLayout: {
+								type: 'grid',
+								allowSizingOnChildren: true,
+							},
+						} }
+						value={
+							getStyleForState(
+								style,
+								selectedState
+							) as PanelStyle
+						}
+						inheritedChildLayout={ baseLayout }
+						styleState={ selectedState }
+						onChange={ ( value ) => {
+							const nextStyle = setStyleForState(
+								style,
+								selectedState,
+								value
+							) as PanelStyle;
+							setStyle( nextStyle );
+							onChange( nextStyle );
+						} }
+					/>
+				);
+			}
+			render( <Wrapper /> );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Dimensions options' } )
+			);
+			await user.click(
+				screen.getByRole(
+					resetSpans ? 'menuitem' : 'menuitemcheckbox',
+					{
+						name: resetSpans
+							? 'Grid span, reset to default'
+							: 'Grid placement, hide and reset',
+					}
+				)
+			);
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				layout: baseLayout,
+				'@mobile': {
+					layout: resetSpans
+						? placement
+						: { columnSpan: 1, rowSpan: 1 },
+				},
+			} );
+			if ( ! resetSpans ) {
+				await user.click(
+					screen.getByRole( 'menuitemcheckbox', {
+						name: 'Grid placement, show',
+					} )
+				);
+			}
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: resetSpans ? 'Column span' : 'Column start',
+				} )
+			).toHaveValue( 2 );
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: resetSpans ? 'Row span' : 'Row start',
+				} )
+			).toHaveValue( 3 );
+		}
+	);
+
+	it.each( [
+		[ 'Column start', 'columnStart', 2 ],
+		[ 'Row start', 'rowStart', 3 ],
+	] as const )(
+		'clears the inherited %s in the selected viewport',
+		async ( label, key, start ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderPanel( {
+				settings: {
+					layout: {},
+					parentLayout: { type: 'grid', allowSizingOnChildren: true },
+				},
+				value: {},
+				inheritedChildLayout: { columnStart: 2, rowStart: 3 },
+				styleState: { viewport: '@mobile', pseudo: 'default' },
+				onChange,
+			} );
+
+			const input = screen.getByRole( 'spinbutton', { name: label } );
+			expect( input ).toHaveValue( start );
+			await user.clear( input );
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				layout: { [ key ]: null },
+			} );
+		}
+	);
+} );
+
+describe( 'DimensionsPanel — CSS box shorthand', () => {
+	describe.each( [ 'padding', 'margin' ] as const )( '%s', ( property ) => {
+		it.each( [
+			{
+				value: '68px 32px',
+				sides: {
+					top: '68px',
+					right: '32px',
+					bottom: '68px',
+					left: '32px',
+				},
+			},
+			{
+				value: '12px 24px 36px',
+				sides: {
+					top: '12px',
+					right: '24px',
+					bottom: '36px',
+					left: '24px',
+				},
+			},
+			{
+				value: '12px 24px 36px 48px',
+				sides: {
+					top: '12px',
+					right: '24px',
+					bottom: '36px',
+					left: '48px',
+				},
+			},
+		] )(
+			'preserves the other sides when editing $value',
+			async ( { value, sides } ) => {
+				const user = userEvent.setup();
+				const onChange = vi.fn();
+				renderPanel( {
+					value: { spacing: { [ property ]: value } },
+					settings: baseSettings,
+					onChange,
+				} );
+
+				const control = within(
+					screen.getByRole( 'group', {
+						name: new RegExp( property, 'i' ),
+					} )
+				);
+				const unlink = control.queryByRole( 'button', {
+					name: 'Unlink sides',
+				} );
+				if ( unlink ) {
+					await user.click( unlink );
+				}
+				expect(
+					control.getByRole( 'textbox', { name: 'Top side' } )
+				).toHaveValue( sides.top.replace( 'px', '' ) );
+				expect(
+					control.getByRole( 'textbox', { name: 'Right side' } )
+				).toHaveValue( sides.right.replace( 'px', '' ) );
+
+				const left = control.getByRole( 'textbox', {
+					name: 'Left side',
+				} );
+				await user.clear( left );
+				await user.type( left, '40{Enter}' );
+				expect( onChange ).toHaveBeenLastCalledWith( {
+					spacing: { [ property ]: { ...sides, left: '40px' } },
+				} );
+			}
+		);
+
+		it( 'does not show a multi-value inherited shorthand as a single-side placeholder', () => {
+			renderPanel( {
+				value: {},
+				inheritedValue: { spacing: { [ property ]: '68px 32px' } },
+				settings: baseSettings,
+			} );
+			const control = within(
+				screen.getByRole( 'group', {
+					name: new RegExp( property, 'i' ),
+				} )
+			);
+			expect(
+				control.getByRole( 'textbox', { name: 'All sides' } )
+			).not.toHaveAttribute( 'placeholder' );
+		} );
+	} );
+
+	it( 'preserves CSS functions containing spaces when another side changes', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		renderPanel( {
+			value: {
+				spacing: {
+					padding: 'calc(100% - 1rem) var(--theme-spacing, 24px)',
+				},
+			},
+			settings: baseSettings,
+			onChange,
+		} );
+		const control = within(
+			screen.getByRole( 'group', { name: /Padding/ } )
+		);
+		const unlink = control.queryByRole( 'button', {
+			name: 'Unlink sides',
+		} );
+		if ( unlink ) {
+			await user.click( unlink );
+		}
+		const left = control.getByRole( 'textbox', { name: 'Left side' } );
+		await user.clear( left );
+		await user.type( left, '40px{Enter}' );
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			spacing: {
+				padding: {
+					top: 'calc(100% - 1rem)',
+					right: 'var(--theme-spacing, 24px)',
+					bottom: 'calc(100% - 1rem)',
+					left: '40px',
+				},
+			},
+		} );
+	} );
+
+	it( 'preserves inherited shorthand sides when a spacing slider is activated', () => {
+		const onChange = vi.fn();
+		renderPanel( {
+			value: {},
+			inheritedValue: { spacing: { padding: '12px 24px' } },
+			settings: settingsWithSpacingPresets,
+			onChange,
+		} );
+		const sliders = getPaddingSliders();
+		expect( sliders ).toHaveLength( 2 );
+		expect( sliders.map( ( slider ) => slider.value ) ).toEqual( [
+			'1',
+			'2',
+		] );
+		expect( onChange ).not.toHaveBeenCalled();
+		fireEvent.change( sliders[ 0 ], { target: { value: '3' } } );
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			spacing: {
+				padding: {
+					top: 'var:preset|spacing|60',
+					right: 'var:preset|spacing|40',
+					bottom: 'var:preset|spacing|60',
+					left: 'var:preset|spacing|40',
+				},
+			},
+		} );
+	} );
+} );
 
 describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	describe( 'layout content width', () => {
@@ -590,7 +861,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	} );
 
 	describe( 'aspectRatio (select control archetype)', () => {
-		it( 'preselects the inherited aspectRatio option as at-rest with inherited-value treatment', () => {
+		it( 'preselects the inherited aspectRatio option at rest', () => {
 			renderPanel( {
 				value: {},
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
@@ -603,7 +874,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( aspectSelect ).toHaveTextContent( /^Wide$/ );
 		} );
 
-		it( 'renders a locally-set aspectRatio as the selected value with the local-override hook', () => {
+		it( 'renders a locally-set aspectRatio as the selected value', () => {
 			renderPanel( {
 				value: { dimensions: { aspectRatio: '1' } },
 				inheritedValue: { dimensions: { aspectRatio: '16/9' } },
@@ -614,11 +885,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				name: /aspect ratio/i,
 			} );
 			expect( aspectSelect ).toHaveTextContent( /^Square$/ );
-			// A local override now gets the same local-override flag as
-			// every other control, so the inline reset button can attach.
-			// The button itself is portaled and covered by the
-			// InheritanceResetButton unit tests.
-			expectLocalOverride();
 		} );
 
 		it( 'does not call `onChange` on mount of an at-rest aspectRatio', () => {
@@ -835,7 +1101,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( minHeightInput ).toBeDefined();
 			expect( minHeightInput ).toHaveValue( 0 );
 			expect( minHeightInput ).not.toHaveAttribute( 'placeholder' );
-			expectLocalOverride();
 		} );
 
 		it( 'treats a local zero block gap as a local value instead of inherited placeholder', () => {
@@ -848,7 +1113,6 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const gapInput = screen.getByLabelText( /block spacing/i );
 			expect( gapInput ).toHaveValue( 0 );
 			expect( gapInput ).not.toHaveAttribute( 'placeholder' );
-			expectLocalOverride();
 		} );
 	} );
 } );

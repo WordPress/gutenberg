@@ -4,8 +4,7 @@
  *
  * @package gutenberg
  *
- * @covers ::_gutenberg_get_post_type_fields_preload_paths
- * @covers ::_gutenberg_get_site_editor_screen_post_types
+ * @covers ::_wp_add_entity_preload_paths
  * @covers ::_gutenberg_preload_entity_fields
  */
 class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
@@ -124,5 +123,46 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $site_editor ) );
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $no_post ) );
 		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $widgets ) );
+	}
+
+	/**
+	 * An empty value that is not an array, left by an earlier callback,
+	 * becomes an array so the fields are still preloaded.
+	 *
+	 * @dataProvider data_empty_paths
+	 *
+	 * @param mixed $paths The paths an earlier callback returned.
+	 */
+	public function test_empty_paths_that_are_not_an_array_become_an_array( $paths ) {
+		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
+
+		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), _gutenberg_preload_entity_fields( $paths, $context ) );
+	}
+
+	/**
+	 * Data provider for test_empty_paths_that_are_not_an_array_become_an_array().
+	 *
+	 * @return array[]
+	 */
+	public function data_empty_paths() {
+		return array(
+			'null'         => array( null ),
+			'false'        => array( false ),
+			'empty string' => array( '' ),
+		);
+	}
+
+	/**
+	 * Paths that are neither an array nor empty, or a context that is not a
+	 * block editor context, are returned unchanged.
+	 */
+	public function test_unexpected_arguments_are_returned_unchanged() {
+		$context = new WP_Block_Editor_Context( array( 'post' => self::factory()->post->create_and_get( array( 'post_type' => 'page' ) ) ) );
+		$object  = new stdClass();
+
+		$this->assertSame( 'not paths', _gutenberg_preload_entity_fields( 'not paths', $context ) );
+		$this->assertSame( $object, _gutenberg_preload_entity_fields( $object, $context ) );
+		$this->assertSame( array( '/wp/v2/types' ), _gutenberg_preload_entity_fields( array( '/wp/v2/types' ) ) );
+		$this->assertSame( array(), _gutenberg_preload_entity_fields( null ) );
 	}
 }

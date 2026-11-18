@@ -57,12 +57,50 @@ export const GroupingCheckboxes: StoryObj = {
  * 2. Pass the child checkbox values to `allValues`.
  * 3. Mark the parent checkbox with the `parent` prop.
  *
+ * Pass `CheckboxGroup` to `Fieldset.Root`'s `render` prop so `Fieldset.Legend`
+ * gives the group its accessible name.
+ *
  * `CheckboxGroup.NestedItems` adds standard indentation to nested items.
  *
- * This example uses two `CheckboxGroup`s in one `Fieldset`. Do not nest more
- * than one level for screen readers.
+ * Limit nesting to one level to keep groups accessible to screen reader users.
  */
 export const Nesting: StoryObj = {
+	render: function Template() {
+		const [ value, setValue ] = useState( [ 'apple' ] );
+
+		return (
+			<Fieldset.Root
+				render={
+					<CheckboxGroup
+						value={ value }
+						onValueChange={ setValue }
+						allValues={ [ 'apple', 'orange', 'banana' ] }
+					/>
+				}
+			>
+				<Fieldset.Legend>Fruit</Fieldset.Legend>
+				<Fieldset.Description>
+					Select the fruit you want.
+				</Fieldset.Description>
+				<CheckboxControl parent value="fruit" label="All fruit" />
+				<CheckboxGroup.NestedItems>
+					<CheckboxControl value="apple" label="Apple" />
+					<CheckboxControl value="orange" label="Orange" />
+					<CheckboxControl value="banana" label="Banana" />
+				</CheckboxGroup.NestedItems>
+			</Fieldset.Root>
+		);
+	},
+};
+
+/**
+ * For multiple groups in one `Fieldset`, render each `CheckboxGroup` inside the
+ * fieldset and give it its own accessible name with `aria-label` or
+ * `aria-labelledby`.
+ *
+ * Each group manages its own selection and parent checkbox.
+ */
+export const MultipleGroups: StoryObj = {
 	render: function Template() {
 		const [ fruitValue, setFruitValue ] = useState( [ 'apple' ] );
 		const [ vegetableValue, setVegetableValue ] = useState< string[] >(
@@ -81,7 +119,7 @@ export const Nesting: StoryObj = {
 					allValues={ [ 'apple', 'orange', 'banana' ] }
 					aria-label="Fruit"
 				>
-					<CheckboxControl parent value="fruit" label="Fruit" />
+					<CheckboxControl parent value="fruit" label="All fruit" />
 					<CheckboxGroup.NestedItems>
 						<CheckboxControl value="apple" label="Apple" />
 						<CheckboxControl value="orange" label="Orange" />
@@ -92,12 +130,12 @@ export const Nesting: StoryObj = {
 					value={ vegetableValue }
 					onValueChange={ setVegetableValue }
 					allValues={ [ 'carrot', 'lettuce', 'pepper' ] }
-					aria-label="Vegetable"
+					aria-label="Vegetables"
 				>
 					<CheckboxControl
 						parent
 						value="vegetable"
-						label="Vegetable"
+						label="All vegetables"
 					/>
 					<CheckboxGroup.NestedItems>
 						<CheckboxControl value="carrot" label="Carrot" />

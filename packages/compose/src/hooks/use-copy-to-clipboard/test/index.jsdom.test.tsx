@@ -6,12 +6,23 @@ import useCopyToClipboard, { copyToClipboard, restoreFocus } from '../';
 interface TestComponentProps {
 	text: string | ( () => string );
 	onSuccess?: () => void;
+	onError?: () => void;
+	isDisabled?: boolean;
 }
 
 describe( 'useCopyToClipboard', () => {
-	const TestComponent = ( { text, onSuccess }: TestComponentProps ) => {
-		const ref = useCopyToClipboard( text, onSuccess );
-		return <button ref={ ref }>Copy</button>;
+	const TestComponent = ( {
+		text,
+		onSuccess,
+		onError,
+		isDisabled,
+	}: TestComponentProps ) => {
+		const ref = useCopyToClipboard( text, onSuccess, onError );
+		return (
+			<button ref={ ref } aria-disabled={ isDisabled }>
+				Copy
+			</button>
+		);
 	};
 
 	it( 'should copy text on click', async () => {
@@ -26,6 +37,43 @@ describe( 'useCopyToClipboard', () => {
 
 		expect( writeTextMock ).toHaveBeenCalledTimes( 1 );
 		expect( writeTextMock ).toHaveBeenCalledWith( 'test text' );
+	} );
+
+	it( 'should not copy when the element has aria-disabled', async () => {
+		const user = userEvent.setup();
+		const onSuccess = vi.fn();
+		const onError = vi.fn();
+		const { rerender } = render(
+			<TestComponent
+				text="test text"
+				onSuccess={ onSuccess }
+				onError={ onError }
+				isDisabled
+			/>
+		);
+
+		const writeTextMock = vi
+			.spyOn( navigator.clipboard, 'writeText' )
+			.mockClear()
+			.mockResolvedValue();
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( writeTextMock ).not.toHaveBeenCalled();
+		expect( onSuccess ).not.toHaveBeenCalled();
+		expect( onError ).not.toHaveBeenCalled();
+
+		rerender(
+			<TestComponent
+				text="test text"
+				onSuccess={ onSuccess }
+				onError={ onError }
+			/>
+		);
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( writeTextMock ).toHaveBeenCalledTimes( 1 );
+		expect( onSuccess ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should call onSuccess when copy succeeds', async () => {
@@ -60,6 +108,46 @@ describe( 'useCopyToClipboard', () => {
 		await user.click( screen.getByRole( 'button' ) );
 
 		expect( onSuccess ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call onError when copy fails', async () => {
+		const user = userEvent.setup();
+		const onError = vi.fn();
+		render( <TestComponent text="test text" onError={ onError } /> );
+
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockRejectedValue(
+			new Error()
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should call onError after the node unmounts', async () => {
+		const user = userEvent.setup();
+		let rejectPromise: ( reason?: unknown ) => void;
+		const delayedPromise = new Promise< void >( ( _, reject ) => {
+			rejectPromise = reject;
+		} );
+		vi.spyOn( navigator.clipboard, 'writeText' ).mockReturnValue(
+			delayedPromise
+		);
+
+		const onError = vi.fn();
+		const { unmount } = render(
+			<TestComponent text="test" onError={ onError } />
+		);
+
+		await user.click( screen.getByRole( 'button' ) );
+		unmount();
+
+		await act( async () => {
+			rejectPromise( new Error() );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		} );
+
+		expect( onError ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'should call onSuccess after the node unmounts', async () => {

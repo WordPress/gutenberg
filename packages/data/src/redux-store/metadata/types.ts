@@ -87,7 +87,7 @@ export type MetadataActions< S = unknown > = {
 	) => Promise< void >;
 	invalidateResolution: (
 		selectorName: SelectorKeysOf< S >,
-		args: unknown[]
+		args?: unknown[] | null
 	) => Promise< void >;
 	invalidateResolutionForStore: () => Promise< void >;
 	invalidateResolutionForStoreSelector: (

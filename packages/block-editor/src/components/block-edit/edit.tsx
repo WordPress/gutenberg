@@ -3,7 +3,6 @@ import {
 	getBlockDefaultClassName,
 	getBlockType,
 	hasBlockSupport,
-	store as blocksStore,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
@@ -17,7 +16,6 @@ import {
 	hasPatternOverridesDefaultBinding,
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
-import { unlock } from '../../lock-unlock';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 import type { BlockEditPublicProps } from './types';
 
@@ -43,20 +41,19 @@ const EditWithFilters = withFilters( 'editor.BlockEdit' )(
 	Edit
 ) as unknown as ComponentType< BlockEditPublicProps >; // `withFilters` erases the props of the filtered component.
 
+// Outside a block list there is no block context, nor bindable attributes.
+const NO_SOURCES: Record< string, Omit< BlockBindingsSource, 'name' > > = {};
+
 const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
-	const registeredSources: Record<
-		string,
-		Omit< BlockBindingsSource, 'name' >
-	> = useSelect(
-		( select ) =>
-			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
-		[]
-	);
-	const { bindableAttributes } = useContext( PrivateBlockContext );
+	// Read by the block's own subscription, rather than one more per block.
+	const {
+		bindableAttributes,
+		blockBindingsSources: registeredSources = NO_SOURCES,
+	} = useContext( PrivateBlockContext );
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		return {

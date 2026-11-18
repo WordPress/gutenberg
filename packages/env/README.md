@@ -20,13 +20,23 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 `wp-env` relies on a few commonly used developer tools:
 
--   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Docker**. `wp-env` is powered by Docker by default. Any Docker runtime that provides the `docker` CLI and Docker Compose v2 works. See [Docker runtime](#docker-runtime) below.
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
-## Experimental: WordPress Playground Runtime
+### Docker runtime
 
-`wp-env` now supports an experimental alternative runtime using [WordPress Playground](https://wordpress.github.io/wordpress-playground/). Playground runs WordPress entirely in WebAssembly, eliminating the need for Docker.
+On macOS, you can use [Colima](https://github.com/abiosoft/colima). It's free and open source, needs no account, and runs without a GUI. [Docker Desktop](https://docs.docker.com/desktop/) is available for macOS, Windows, and Linux. Other options are [Rancher Desktop](https://rancherdesktop.io/) on Windows and [Docker Engine](https://docs.docker.com/engine/install/) on Linux.
+
+For setup steps, see [Set up Docker](https://github.com/WordPress/gutenberg/blob/trunk/docs/getting-started/devenv/get-started-with-wp-env.md#set-up-docker) in the Get started with wp-env guide.
+
+## Experimental runtimes
+
+Besides Docker, `wp-env` has two experimental runtimes that don't need Docker. Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
+
+### WordPress Playground Runtime
+
+[WordPress Playground](https://wordpress.github.io/wordpress-playground/) runs WordPress entirely in WebAssembly, eliminating the need for Docker.
 
 To use the Playground runtime:
 
@@ -34,24 +44,33 @@ To use the Playground runtime:
 $ wp-env start --runtime=playground
 ```
 
-### Playground vs Docker
-
-| Feature | Docker | Playground |
-|---------|--------|------------|
-| Requires Docker | Yes | No |
-| Xdebug | Yes | Yes |
-| SPX profiling | Yes | No |
-| phpMyAdmin | Yes | Yes |
-| MySQL database | Yes | No (SQLite) |
-| Multisite | Yes | Yes |
-| Custom PHP version | Yes | Yes |
-| Custom MariaDB version | Yes | No (SQLite) |
-| Plugin/theme mounting | Yes | Yes |
-| `wp-env run` command | Yes | No |
-
 The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the `run` command for executing arbitrary commands.
 
-Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
+### PHP Runtime
+
+The PHP runtime serves WordPress with the PHP installed on your computer, using PHP's built-in web server and a SQLite database. It needs no Docker and starts in seconds. PHP must be on your `PATH`, with the `pdo_sqlite` extension.
+
+```sh
+$ wp-env start --runtime=php
+```
+
+WordPress is copied from the configured `core` source into the work directory, and plugins, themes and mappings are linked into it, so changes to your files show up straight away. When the plugins, themes, mappings or core in the config change, the next start builds the site again, keeping the database and uploads. After changing the files of a local `core` folder, run `wp-env start --update`. `wp-env reset` restores the database to how it was right after installation. Run it again with another `WP_ENV_PORT` to change the port. On Windows, PHP's built-in server handles one request at a time, so pages with many requests load slower.
+
+### Runtime comparison
+
+| Feature | Docker | Playground | PHP |
+|---------|--------|------------|-----|
+| Requires Docker | Yes | No | No |
+| Xdebug | Yes | Yes | No |
+| SPX profiling | Yes | No | No |
+| phpMyAdmin | Yes | Yes | No |
+| MySQL database | Yes | No (SQLite) | No (SQLite) |
+| Multisite | Yes | Yes | No |
+| Custom PHP version | Yes | Yes | No (the installed PHP) |
+| Custom MariaDB version | Yes | No (SQLite) | No (SQLite) |
+| Plugin/theme mounting | Yes | Yes | Yes |
+| `wp-env run` command | Yes | No | No |
+| `wp-env logs` command | Yes | No | Yes, without `--watch` |
 
 ## Installation
 
@@ -100,7 +119,7 @@ $ wp-env start --update
 
 ### Starting the environment
 
-First, ensure that Docker is running. You can do this by clicking on the Docker icon in the system tray or menu bar.
+First, ensure that Docker is running. With Colima, run `colima start`. With Docker Desktop or Rancher Desktop, open the app.
 
 Then, change to a directory that contains a WordPress plugin or theme:
 
@@ -166,7 +185,9 @@ $ wp-env start --update
 
 Restarting Docker will restart the underlying Docker containers and volumes which can fix many issues.
 
-To restart Docker:
+With Colima, run `colima restart`.
+
+With Docker Desktop:
 
 1. Click on the Docker icon in the system tray or menu bar.
 2. Select _Restart_.
@@ -352,8 +373,9 @@ Options:
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
   --runtime  Select the runtime to use. "docker" uses Docker containers,
-             "playground" uses WordPress Playground (experimental).
-                                  [string] [choices: "docker", "playground"]
+             "playground" uses WordPress Playground (experimental), "php" uses
+             the PHP installed on this computer (experimental).
+                                  [string] [choices: "docker", "playground", "php"]
   --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
              are set, uses "debug". You may set multiple Xdebug modes by passing
              them in a comma-separated list: `--xdebug=develop,coverage`. See

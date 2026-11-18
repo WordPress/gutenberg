@@ -4,6 +4,9 @@ import { render } from 'vitest-browser-react';
 import { ProgressBar } from '..';
 
 describe( 'ProgressBar', () => {
+	const deprecationWarning =
+		'wp.components.ProgressBar is deprecated since version 7.3 and will be removed in version 7.5. Please use Progress from @wordpress/ui instead.';
+
 	it( 'should render an indeterminate semantic progress bar element', async () => {
 		await render( <ProgressBar /> );
 
@@ -11,6 +14,7 @@ describe( 'ProgressBar', () => {
 
 		expect( progressBar ).toBeInTheDocument();
 		expect( progressBar ).not.toHaveValue();
+		expect( console ).toHaveWarnedWith( deprecationWarning );
 	} );
 
 	it( 'should render a determinate semantic progress bar element', async () => {
@@ -20,6 +24,7 @@ describe( 'ProgressBar', () => {
 
 		expect( progressBar ).toBeInTheDocument();
 		expect( progressBar ).toHaveValue( 55 );
+		expect( console ).toHaveWarnedWith( deprecationWarning );
 	} );
 
 	it( 'should use the stylesheet-defined width for an indeterminate progress bar', async () => {
@@ -41,6 +46,7 @@ describe( 'ProgressBar', () => {
 			Number.parseFloat( trackWidth ) / 2
 		);
 		expect( style.getPropertyValue( '--indicator-width' ) ).toBe( '50%' );
+		expect( console ).toHaveWarnedWith( deprecationWarning );
 	} );
 
 	it( 'should use `value`% as width for determinate progress bar', async () => {
@@ -58,6 +64,7 @@ describe( 'ProgressBar', () => {
 				'--indicator-width'
 			)
 		).toBe( '55%' );
+		expect( console ).toHaveWarnedWith( deprecationWarning );
 	} );
 
 	it( 'should pass any additional props down to the underlying `progress` element', async () => {
@@ -77,5 +84,6 @@ describe( 'ProgressBar', () => {
 		expect(
 			getComputedStyle( screen.getByRole( 'progressbar' ) ).opacity
 		).toBe( '0.5' );
+		expect( console ).toHaveWarnedWith( deprecationWarning );
 	} );
 } );

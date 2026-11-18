@@ -114,4 +114,128 @@ test.describe( 'Group', () => {
 			.toBe( 'core/group' );
 		await expect.poll( editor.getBlocks ).toMatchObject( expectedBlocks );
 	} );
+
+	test.describe( 'grid and canvas variations', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [
+				'gutenberg-grid-interactivity',
+			] );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.setGutenbergExperiments( [] );
+		} );
+
+		test( 'keeps sizing and focus when switching between Grid and Canvas', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: {
+					layout: {
+						type: 'grid',
+						columnCount: 4,
+						minimumColumnWidth: '10rem',
+					},
+				},
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Paragraph' },
+					},
+				],
+			} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', { name: 'Block: Grid' } )
+			);
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'radio', { name: 'Grid', exact: true } )
+				.click();
+
+			for ( const { key, to, layout } of [
+				{
+					key: 'ArrowRight',
+					to: 'Canvas',
+					layout: {
+						type: 'grid',
+						isManualPlacement: true,
+						columnCount: 4,
+						rowCount: 3,
+						minimumColumnWidth: '10rem',
+					},
+				},
+				{
+					key: 'ArrowLeft',
+					to: 'Grid',
+					layout: {
+						type: 'grid',
+						columnCount: 4,
+						minimumColumnWidth: '10rem',
+					},
+				},
+			] ) {
+				await test.step( `switch to ${ to }`, async () => {
+					await page.keyboard.press( key );
+
+					const radio = page.getByRole( 'radio', {
+						name: to,
+						exact: true,
+					} );
+					await expect( radio ).toBeChecked();
+					await expect( radio ).toBeFocused();
+					await expect(
+						editor.canvas.getByRole( 'document', {
+							name: 'Block: ' + to,
+						} )
+					).toHaveClass( /is-selected/ );
+					await expect
+						.poll(
+							async () =>
+								( await editor.getBlocks() )[ 0 ].attributes
+									.layout
+						)
+						.toEqual( layout );
+				} );
+			}
+		} );
+
+		test( 'keeps the block expanded in List View when switching between Grid and Canvas', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/group',
+				attributes: { layout: { type: 'grid' } },
+				innerBlocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Paragraph' },
+					},
+				],
+			} );
+			await editor.openDocumentSettingsSidebar();
+			await pageUtils.pressKeys( 'access+o' );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await listView.getByRole( 'link', { name: 'Grid' } ).click();
+			await page.keyboard.press( 'ArrowRight' );
+			const paragraphRow = listView.getByRole( 'link', {
+				name: 'Paragraph',
+			} );
+			await expect( paragraphRow ).toBeVisible();
+
+			await page
+				.getByRole( 'radio', { name: 'Transform to Canvas' } )
+				.click();
+
+			await expect(
+				listView.getByRole( 'link', { name: 'Canvas' } )
+			).toBeVisible();
+			await expect( paragraphRow ).toBeVisible();
+		} );
+	} );
 } );
