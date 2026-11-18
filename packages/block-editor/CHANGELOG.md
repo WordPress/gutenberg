@@ -31,6 +31,7 @@
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
 -   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
 -   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
+-   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
 
 ### Internal
 
