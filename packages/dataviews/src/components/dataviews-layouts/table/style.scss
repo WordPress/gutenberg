@@ -101,28 +101,24 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 			--dataviews-view-table-fade-line-size: calc(100% - #{$scroll-fade-size}) 1px;
 			@include scroll-fade(end, normal calc(100% - 1px));
 
-			// Double rule between the strip and the actions, shown whenever
-			// the columns scroll, to set the actions apart from them.
+			// Divider between the strip and the actions, shown while there are
+			// more columns to scroll to.
 			&::after {
 				content: "";
 				position: absolute;
-				// Also covers the space of the line between rows, outside the
-				// padding box, so the rule is unbroken.
-				inset-block: -1px;
+				inset-block: 0;
 				inset-inline-start: $scroll-fade-size;
-				box-sizing: border-box;
-				// Two lines as light as the ones between rows, 2px apart.
-				width: calc(2 * var(--wpds-border-width-xs) + 2px);
-				border-inline: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
-				background-color: var(--wpds-color-background-surface-neutral);
+				width: 1px;
+				background-color: var(--wpds-color-stroke-surface-neutral-weak);
 
-				// Hidden when nothing scrolls, where the scroll timeline is
-				// inactive. Browsers without scroll-driven animations always
-				// show it.
+				// Hidden at the end of the scroll range, and when nothing
+				// scrolls, where the scroll timeline is inactive. Browsers
+				// without scroll-driven animations always show it.
 				@supports (animation-timeline: scroll()) {
 					opacity: 0;
-					animation: dataviews-view-table-scroll-cue linear both;
+					animation: dataviews-view-table-scroll-cue linear;
 					animation-timeline: scroll(nearest inline);
+					animation-range: normal calc(100% - 1px);
 				}
 			}
 		}
@@ -240,10 +236,6 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
 		tr {
 			border: 0;
-		}
-		// Starts the rule at the top of the table.
-		th.dataviews-view-table__actions-column::after {
-			inset-block-start: 0;
 		}
 		th {
 			vertical-align: middle;
