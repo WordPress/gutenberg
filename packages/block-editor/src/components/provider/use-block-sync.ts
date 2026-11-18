@@ -100,11 +100,12 @@ function restoreSelectionIds(
 		selectionStart: restoreClientId( selectionStart ),
 		selectionEnd: restoreClientId( selectionEnd ),
 		initialPosition,
-		...( selectionState.selectionClientIds
+		...( selectionState.setSelectionClientIds
 			? {
-					selectionClientIds: selectionState.selectionClientIds.map(
-						( id ) => mapping.internalToExternal.get( id ) ?? id
-					),
+					setSelectionClientIds:
+						selectionState.setSelectionClientIds.map(
+							( id ) => mapping.internalToExternal.get( id ) ?? id
+						),
 				}
 			: {} ),
 	};
@@ -168,7 +169,7 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
-	const { getExplicitSelectionClientIds } = unlock(
+	const { getSetSelectionClientIds } = unlock(
 		registry.select( blockEditorStore )
 	);
 
@@ -242,7 +243,7 @@ export default function useBlockSync( {
 				// The store accepts an unset selection end.
 				convert( selection.selectionEnd ) as BlockSelection,
 				selection.initialPosition,
-				selection.selectionClientIds?.map( ( id ) =>
+				selection.setSelectionClientIds?.map( ( id ) =>
 					clientId
 						? ( idMappingRef.current.externalToInternal.get( id ) ??
 							id )
@@ -393,7 +394,7 @@ export default function useBlockSync( {
 		let previousAreBlocksDifferent = false;
 		let prevSelectionStart = getSelectionStart();
 		let prevSelectionEnd = getSelectionEnd();
-		let prevSelectionClientIds = getExplicitSelectionClientIds();
+		let prevSetSelectionClientIds = getSetSelectionClientIds();
 
 		subscribedRef.current = true;
 		const unsubscribe = registry.subscribe( () => {
@@ -439,16 +440,16 @@ export default function useBlockSync( {
 			// Check if selection changed.
 			const newSelectionStart = getSelectionStart();
 			const newSelectionEnd = getSelectionEnd();
-			const newSelectionClientIds = getExplicitSelectionClientIds();
+			const newSetSelectionClientIds = getSetSelectionClientIds();
 			const selectionChanged =
 				newSelectionStart !== prevSelectionStart ||
 				newSelectionEnd !== prevSelectionEnd ||
-				newSelectionClientIds !== prevSelectionClientIds;
+				newSetSelectionClientIds !== prevSetSelectionClientIds;
 
 			if ( selectionChanged ) {
 				prevSelectionStart = newSelectionStart;
 				prevSelectionEnd = newSelectionEnd;
-				prevSelectionClientIds = newSelectionClientIds;
+				prevSetSelectionClientIds = newSetSelectionClientIds;
 			}
 
 			if ( blocksChanged || selectionChanged ) {
@@ -469,8 +470,11 @@ export default function useBlockSync( {
 						const selectionInfo = {
 							selectionStart: newSelectionStart,
 							selectionEnd: newSelectionEnd,
-							...( newSelectionClientIds
-								? { selectionClientIds: newSelectionClientIds }
+							...( newSetSelectionClientIds
+								? {
+										setSelectionClientIds:
+											newSetSelectionClientIds,
+									}
 								: {} ),
 							initialPosition:
 								getSelectedBlocksInitialCaretPosition(),
@@ -527,10 +531,10 @@ export default function useBlockSync( {
 							const selectionInfo = {
 								selectionStart: newSelectionStart,
 								selectionEnd: newSelectionEnd,
-								...( newSelectionClientIds
+								...( newSetSelectionClientIds
 									? {
-											selectionClientIds:
-												newSelectionClientIds,
+											setSelectionClientIds:
+												newSetSelectionClientIds,
 										}
 									: {} ),
 								initialPosition:
@@ -555,7 +559,7 @@ export default function useBlockSync( {
 			subscribedRef.current = false;
 			unsubscribe();
 		};
-	}, [ registry, clientId, getExplicitSelectionClientIds ] );
+	}, [ registry, clientId, getSetSelectionClientIds ] );
 
 	useEffect( () => {
 		return () => {

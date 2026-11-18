@@ -19,7 +19,7 @@ import { unlock } from '../../lock-unlock';
 
 export default function useBlockSelection() {
 	const { toggleBlockSelection } = unlock( useDispatch( blockEditorStore ) );
-	const { getExplicitSelectionClientIds } = unlock(
+	const { getSetSelectionClientIds } = unlock(
 		useSelect( blockEditorStore )
 	);
 	const { clearSelectedBlock, multiSelect, selectBlock } =
@@ -132,7 +132,7 @@ export default function useBlockSelection() {
 					endTarget,
 					startParents,
 					endParents,
-					!! getExplicitSelectionClientIds()
+					!! getSetSelectionClientIds()
 				);
 				await multiSelect( start, end, null );
 			}
@@ -193,7 +193,7 @@ export default function useBlockSelection() {
 			multiSelect,
 			selectBlock,
 			toggleBlockSelection,
-			getExplicitSelectionClientIds,
+			getSetSelectionClientIds,
 		]
 	);
 

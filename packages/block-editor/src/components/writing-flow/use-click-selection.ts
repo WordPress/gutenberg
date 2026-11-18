@@ -33,7 +33,7 @@ export default function useClickSelection() {
 		canDragBlocks,
 		getSelectedBlockClientIds,
 		canHostEditableRoot,
-		getExplicitSelectionClientIds,
+		getSetSelectionClientIds,
 		getBlockParents,
 	} = unlock( useSelect( blockEditorStore ) );
 	return useRefEffect< HTMLElement >(
@@ -131,7 +131,7 @@ export default function useClickSelection() {
 					event.shiftKey &&
 					clickedClientId &&
 					startClientId &&
-					getExplicitSelectionClientIds()
+					getSetSelectionClientIds()
 				) {
 					event.preventDefault();
 					event.stopPropagation();
@@ -320,7 +320,7 @@ export default function useClickSelection() {
 			canHostEditableRoot,
 			multiSelect,
 			toggleBlockSelection,
-			getExplicitSelectionClientIds,
+			getSetSelectionClientIds,
 			getBlockParents,
 		]
 	);

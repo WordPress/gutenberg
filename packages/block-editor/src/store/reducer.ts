@@ -1549,14 +1549,12 @@ export function selection(
 ) {
 	switch ( action.type ) {
 		case 'MULTI_SELECT_SET':
-			const explicitSelection = {
+			const setSelection = {
 				selectionStart: action.selectionStart,
 				selectionEnd: action.selectionEnd,
-				selectionClientIds: action.clientIds,
+				setSelectionClientIds: action.clientIds,
 			};
-			return fastDeepEqual( state, explicitSelection )
-				? state
-				: explicitSelection;
+			return fastDeepEqual( state, setSelection ) ? state : setSelection;
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
 				return {
@@ -1582,8 +1580,8 @@ export function selection(
 			return {
 				selectionStart,
 				selectionEnd,
-				...( action.selectionClientIds
-					? { selectionClientIds: action.selectionClientIds }
+				...( action.setSelectionClientIds
+					? { setSelectionClientIds: action.setSelectionClientIds }
 					: {} ),
 			};
 		case 'MULTI_SELECT':
@@ -1601,7 +1599,9 @@ export function selection(
 
 			return nextSelection;
 		case 'RESET_BLOCKS':
-			if ( state.selectionClientIds ) {
+			if ( state.setSelectionClientIds ) {
+				// Preserve candidates: the outer normalizer sees the resulting tree,
+				// including nested survivors that endpoint-only handling would miss.
 				return state;
 			}
 			const startClientId = state?.selectionStart?.clientId;
@@ -1635,31 +1635,48 @@ export function selection(
 					selectionEnd: state.selectionStart,
 				};
 			}
-	}
-
-	if ( state.selectionClientIds ) {
-		if ( action.type === 'REMOVE_BLOCKS' ) {
-			// The outer reducer reconciles descendants and endpoints against the updated tree.
-			return state;
-		}
-		if ( action.type === 'REPLACE_BLOCKS' ) {
+			break;
+		case 'REMOVE_BLOCKS':
+			if ( state.setSelectionClientIds ) {
+				// Reconcile missing members and descendants against the updated tree.
+				return state;
+			}
+			break;
+		case 'REPLACE_BLOCKS':
+			if ( ! state.setSelectionClientIds ) {
+				break;
+			}
+			// Unlike removal, replacement supplies new member IDs that cannot be
+			// inferred from the surviving tree or changes to endpoints alone.
 			if (
 				! action.clientIds.some( ( id ) =>
-					state.selectionClientIds!.includes( id )
+					state.setSelectionClientIds!.includes( id )
 				)
 			) {
 				return state;
 			}
 			return {
 				...state,
-				selectionClientIds: [
-					...state.selectionClientIds.filter(
+				setSelectionClientIds: [
+					...state.setSelectionClientIds.filter(
 						( id ) => ! action.clientIds.includes( id )
 					),
 					...action.blocks.map( ( block ) => block.clientId ),
 				],
 			};
-		}
+		case 'SELECT_BLOCK':
+			if ( state.setSelectionClientIds ) {
+				// Explicitly selecting one block exits the set even if its two
+				// directional endpoints already happen to match that block.
+				return {
+					selectionStart: selectionHelper(
+						state.selectionStart,
+						action
+					),
+					selectionEnd: selectionHelper( state.selectionEnd, action ),
+				};
+			}
+			break;
 	}
 
 	const selectionStart = selectionHelper( state.selectionStart, action );
@@ -1667,8 +1684,7 @@ export function selection(
 
 	if (
 		selectionStart === state.selectionStart &&
-		selectionEnd === state.selectionEnd &&
-		! ( state.selectionClientIds && action.type === 'SELECT_BLOCK' )
+		selectionEnd === state.selectionEnd
 	) {
 		return state;
 	}
@@ -3504,23 +3520,23 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 }
 
 /**
- * Keeps explicit membership in document order and valid after tree mutations.
+ * Keeps set membership in document order and valid after tree mutations.
  *
  * @param reducer Original state reducer.
- * @return Reducer with normalized explicit selections.
+ * @return Reducer with normalized set selections.
  */
-function withExplicitSelection( reducer: Reducer< State > ): Reducer< State > {
+function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
 	return ( state, action ) => {
 		const nextState = reducer( state, action );
 		const current = nextState.selection;
 		if (
-			! current.selectionClientIds ||
+			! current.setSelectionClientIds ||
 			( state?.blocks.order === nextState.blocks.order &&
 				state.selection === current )
 		) {
 			return nextState;
 		}
-		const members = new Set( current.selectionClientIds );
+		const members = new Set( current.setSelectionClientIds );
 		const ordered: string[] = [];
 		const visit = ( root: string ) => {
 			for ( const id of nextState.blocks.order.get( root ) ?? [] ) {
@@ -3546,7 +3562,11 @@ function withExplicitSelection( reducer: Reducer< State > ): Reducer< State > {
 		};
 		const normalized =
 			ordered.length > 1
-				? { selectionStart, selectionEnd, selectionClientIds: ordered }
+				? {
+						selectionStart,
+						selectionEnd,
+						setSelectionClientIds: ordered,
+					}
 				: {
 						selectionStart: ordered.length
 							? { clientId: ordered[ 0 ] }
@@ -3563,6 +3583,6 @@ function withExplicitSelection( reducer: Reducer< State > ): Reducer< State > {
 
 export default pipe(
 	withDerivedBlockEditingModes,
-	withExplicitSelection,
+	withSetSelection,
 	withAutomaticChangeReset
 )( combinedReducers ) as Reducer< State >;

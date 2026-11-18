@@ -102,10 +102,10 @@ export const validateBlocksToTemplate =
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
  *
- * @param {WPBlockSelection} selectionStart     The selection start.
- * @param {WPBlockSelection} selectionEnd       The selection end.
- * @param {0|-1|null}        initialPosition    Initial block position.
- * @param {string[]}         selectionClientIds Explicit whole-block selection membership.
+ * @param {WPBlockSelection} selectionStart        The selection start.
+ * @param {WPBlockSelection} selectionEnd          The selection end.
+ * @param {0|-1|null}        initialPosition       Initial block position.
+ * @param {string[]}         setSelectionClientIds Whole-block set membership, absent for ranges.
  *
  * @return {Object} Action object.
  */
@@ -113,14 +113,14 @@ export function resetSelection(
 	selectionStart: BlockSelection,
 	selectionEnd: BlockSelection,
 	initialPosition?: InitialPosition,
-	selectionClientIds?: string[]
+	setSelectionClientIds?: string[]
 ) {
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
 		selectionEnd,
 		initialPosition,
-		...( selectionClientIds ? { selectionClientIds } : {} ),
+		...( setSelectionClientIds ? { setSelectionClientIds } : {} ),
 	};
 }
 
@@ -357,24 +357,31 @@ export const multiSelect =
 	};
 
 /**
- * Selects an explicit set of whole blocks, including blocks with different parents.
+ * Selects a set of whole blocks, including blocks with different ordinary parents.
  *
- * @param clientIds              Block client IDs to select.
- * @param initialPosition        Initial caret position, or null to retain focus outside the canvas.
- * @param options                Optional directional selection endpoints.
- * @param options.anchorClientId Block where the selection starts.
- * @param options.focusClientId  Block where the selection ends.
+ * Membership is stored in document order, independently of the directional
+ * endpoints. Start anchors range extension; end is its moving end, not keyboard
+ * focus. For example, selecting E then adding B stores [B, E], with start E and
+ * end B. Endpoints default to the first and last valid input IDs before tree
+ * normalization. Missing or suppressed endpoints are repaired to surviving
+ * members; equal endpoints do not imply a single-member set.
+ *
+ * @param clientIds                      Block client IDs to select.
+ * @param initialPosition                Initial caret position, or null to retain focus outside the canvas.
+ * @param options                        Optional directional selection endpoints.
+ * @param options.selectionStartClientId Directional start block (range-extension anchor).
+ * @param options.selectionEndClientId   Directional end block, independent of keyboard focus.
  */
 export const multiSelectSet =
 	(
 		clientIds: string[],
 		initialPosition: InitialPosition = 0,
 		{
-			anchorClientId,
-			focusClientId,
+			selectionStartClientId,
+			selectionEndClientId,
 		}: {
-			anchorClientId?: string;
-			focusClientId?: string;
+			selectionStartClientId?: string;
+			selectionEndClientId?: string;
 		} = {}
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
@@ -397,9 +404,12 @@ export const multiSelectSet =
 		dispatch( {
 			type: 'MULTI_SELECT_SET',
 			clientIds: uniqueIds,
-			selectionStart: { clientId: anchorClientId ?? uniqueIds[ 0 ] },
+			selectionStart: {
+				clientId: selectionStartClientId ?? uniqueIds[ 0 ],
+			},
 			selectionEnd: {
-				clientId: focusClientId ?? uniqueIds[ uniqueIds.length - 1 ],
+				clientId:
+					selectionEndClientId ?? uniqueIds[ uniqueIds.length - 1 ],
 			},
 			initialPosition,
 		} );

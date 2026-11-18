@@ -123,8 +123,9 @@ export const toggleBlockSelection =
 				: [ ...selected, clientId ],
 			initialPosition,
 			{
-				anchorClientId: select.getBlockSelectionStart() ?? clientId,
-				focusClientId: clientId,
+				selectionStartClientId:
+					select.getBlockSelectionStart() ?? clientId,
+				selectionEndClientId: clientId,
 			}
 		);
 	};

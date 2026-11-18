@@ -68,29 +68,29 @@ Cmd-click on macOS, or Ctrl-click on other platforms, adds or removes a block fr
 
 A selected parent includes its contents, so its descendants are not separately included in the selection. Selections cannot span the contents of different controlled entities, such as a template part and its surrounding template.
 
-Use the block-editor store's `multiSelectSet` action to supply an explicit selection, for example when selecting table cells across different row blocks:
+Use the block-editor store's `multiSelectSet` action to supply a set selection, for example when selecting table cells across different row blocks:
 
 ```js
 import { dispatch, select } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 dispatch( blockEditorStore ).multiSelectSet( cellClientIds, null, {
-	anchorClientId,
-	focusClientId,
+	selectionStartClientId,
+	selectionEndClientId,
 } );
 
 const selectedIds = select( blockEditorStore ).getSelectedBlockClientIds();
 ```
 
-Selected-block selectors return IDs in document order, not click order. Anchor and focus retain the selection's direction and need not be its document-order first and last blocks. Passing `null` as the second argument retains focus outside the canvas. Invalid and duplicate IDs are removed, and empty or single-member sets become ordinary empty or single-block selections. Existing range-selection calls remain supported.
+Selected-block selectors return IDs in document order, not click order. Selection start anchors range extension; selection end is its moving end, not keyboard focus. They need not be the document-order first and last members: selecting E then adding B stores `[B, E]`, with start E and end B. Defaults use the first and last valid input IDs before tree normalization; missing or suppressed endpoints are repaired to surviving members. A multi-member set can have equal endpoints. Passing `null` as the second argument retains focus outside the canvas. Invalid and duplicate IDs are removed, and empty or single-member sets become ordinary empty or single-block selections. Existing range-selection calls remain supported.
 
 Supported attribute updates, copy, cut, and delete operate on selected blocks only, subject to existing locks and permissions. Duplication places a copy of each contiguous run after that run in its original parent and selects all copies. Copying produces a single document-ordered sequence without intervening unselected blocks. Pasting over a non-contiguous or cross-parent selection inserts that sequence after the last selected block in its parent without replacing the originals; contiguous sibling selections retain their existing paste-over behavior. Duplication and paste validate their insertion destinations before changing content.
 
 Dragging a selection in the canvas or List View gathers the selected blocks into a contiguous sequence at the drop destination, in document order. Only selected blocks move; intervening unselected blocks stay in place. Blocks keep their IDs and contents, and one undo restores all original parents and positions. The destination must accept the entire selection, and blocks changing parents must be removable from their origins. Drops cannot cross controlled-entity boundaries or place a selected block inside itself or its descendants. Scattered selections use insertion positions rather than drop-to-group or replacement operations.
 
-Grouping, multi-block transformations, toolbar and keyboard movers, and Enter-based replacement are unavailable for non-contiguous or cross-parent selections. Typing does not replace scattered selections. An explicit selection that forms a contiguous sibling range retains ordinary structural tools. Table geometry, rectangular drag selection, cell merging, and grid-aware keyboard navigation are not provided by this selection API.
+Grouping, multi-block transformations, toolbar and keyboard movers, and Enter-based replacement are unavailable for non-contiguous or cross-parent selections. Typing does not replace scattered selections. A set selection that forms a contiguous sibling range retains ordinary structural tools. Table geometry, rectangular drag selection, cell merging, and grid-aware keyboard navigation are not provided by this selection API.
 
-Editors that preserve selection alongside their controlled block value must also preserve the optional `selectionClientIds` field reported in selection state. `resetSelection` accepts these IDs as its optional fourth argument when restoring an explicit selection.
+Editors that preserve selection alongside their controlled block value must also preserve the optional `setSelectionClientIds` field reported in selection state. This field lists set members only; it is absent for range and text selections. `resetSelection` accepts these IDs as its optional fourth argument when restoring a set selection.
 
 ## API
 

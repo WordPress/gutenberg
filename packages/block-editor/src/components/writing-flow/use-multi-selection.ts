@@ -13,7 +13,7 @@ function selector( select: SelectFunction ) {
 		getSelectedBlockClientId,
 		getSelectedBlocksInitialCaretPosition,
 		__unstableIsFullySelected,
-		getExplicitSelectionClientIds,
+		getSetSelectionClientIds,
 	} = unlock( select( blockEditorStore ) );
 
 	return {
@@ -23,7 +23,7 @@ function selector( select: SelectFunction ) {
 		selectedBlockClientId: getSelectedBlockClientId(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isFullSelection: __unstableIsFullySelected(),
-		isExplicitSelection: !! getExplicitSelectionClientIds(),
+		isSetSelection: !! getSetSelectionClientIds(),
 	};
 }
 
@@ -35,7 +35,7 @@ export default function useMultiSelection() {
 		hasMultiSelection,
 		selectedBlockClientId,
 		isFullSelection,
-		isExplicitSelection,
+		isSetSelection,
 	} = useSelect( selector, [] );
 
 	/**
@@ -55,7 +55,7 @@ export default function useMultiSelection() {
 				// intervening blocks, but must not take focus from List View either.
 				const nativeSelection = defaultView!.getSelection();
 				if (
-					isExplicitSelection &&
+					isSetSelection &&
 					nativeSelection?.anchorNode &&
 					node.contains( nativeSelection.anchorNode )
 				) {
@@ -102,7 +102,7 @@ export default function useMultiSelection() {
 			selectedBlockClientId,
 			initialPosition,
 			isFullSelection,
-			isExplicitSelection,
+			isSetSelection,
 		]
 	);
 }

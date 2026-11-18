@@ -165,13 +165,13 @@ export function canMoveBlockSetToPosition(
 }
 
 /**
- * Returns explicit selection membership, or undefined for a range selection.
+ * Returns stored set membership, or undefined for a text or range selection.
  *
  * @param state Editor state.
- * @return Explicitly selected client IDs.
+ * @return Set member client IDs, including when those members are adjacent.
  */
-export function getExplicitSelectionClientIds( state: State ) {
-	return state.selection.selectionClientIds;
+export function getSetSelectionClientIds( state: State ) {
+	return state.selection.setSelectionClientIds;
 }
 
 function isViewportAvailable( state: State, viewport: string ) {

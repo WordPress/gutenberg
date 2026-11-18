@@ -279,8 +279,8 @@ describe( 'explicit block selection', () => {
 			sixthCell.clientId,
 		];
 		registry.dispatch( store ).multiSelectSet( rectangle, null, {
-			anchorClientId: blocks[ 2 ].clientId,
-			focusClientId: blocks[ 4 ].clientId,
+			selectionStartClientId: blocks[ 2 ].clientId,
+			selectionEndClientId: blocks[ 4 ].clientId,
 		} );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
 			rectangle
@@ -354,15 +354,15 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it( 'preserves anchor and focus independently of document order', () => {
+	it( 'preserves directional endpoints independently of document order', () => {
 		const ids = [
 			blocks[ 0 ].clientId,
 			blocks[ 2 ].clientId,
 			blocks[ 4 ].clientId,
 		];
 		registry.dispatch( store ).multiSelectSet( ids, null, {
-			anchorClientId: ids[ 2 ],
-			focusClientId: ids[ 1 ],
+			selectionStartClientId: ids[ 2 ],
+			selectionEndClientId: ids[ 1 ],
 		} );
 		expect(
 			registry.select( store ).getMultiSelectedBlocksStartClientId()
@@ -399,6 +399,122 @@ describe( 'explicit block selection', () => {
 		expect( registry.select( store ).getSelectedBlockClientId() ).toBe(
 			replacement.clientId
 		);
+	} );
+
+	it( 'reports a multi-member set as multi-selected when its endpoints match', () => {
+		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+		registry.dispatch( store ).multiSelectSet( ids, null, {
+			selectionStartClientId: ids[ 0 ],
+			selectionEndClientId: ids[ 0 ],
+		} );
+		expect( registry.select( store ).hasSelectedBlock() ).toBe( false );
+		expect(
+			registry.select( store ).getSelectedBlockClientId()
+		).toBeNull();
+		expect( registry.select( store ).isBlockSelected( ids[ 0 ] ) ).toBe(
+			false
+		);
+		expect( registry.select( store ).hasMultiSelection() ).toBe( true );
+		registry.dispatch( store ).selectBlock( ids[ 0 ] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ ids[ 0 ] ]
+		);
+		expect( registry.select( store ).hasSelectedBlock() ).toBe( true );
+		expect( registry.select( store ).isBlockSelected( ids[ 0 ] ) ).toBe(
+			true
+		);
+	} );
+
+	it.each( [ 'clear', 'single', 'range', 'text', 'restore' ] )(
+		'replaces set membership for a %s selection request',
+		( request ) => {
+			const ids = blocks.map( ( block ) => block.clientId );
+			const actions = registry.dispatch( store );
+			actions.multiSelectSet( [ ids[ 0 ], ids[ 2 ] ] );
+			switch ( request ) {
+				case 'clear':
+					actions.clearSelectedBlock();
+					break;
+				case 'single':
+					actions.selectBlock( ids[ 0 ] );
+					break;
+				case 'range':
+					actions.multiSelect( ids[ 0 ], ids[ 2 ] );
+					break;
+				case 'text':
+					actions.selectionChange( ids[ 0 ], 'content', 0, 1 );
+					break;
+				case 'restore':
+					actions.resetSelection(
+						{ clientId: ids[ 0 ] },
+						{ clientId: ids[ 0 ] }
+					);
+					break;
+			}
+			expect(
+				unlock( registry.select( store ) ).getSetSelectionClientIds()
+			).toBeUndefined();
+			let expected = [ ids[ 0 ] ];
+			if ( request === 'clear' ) {
+				expected = [];
+			} else if ( request === 'range' ) {
+				expected = ids.slice( 0, 3 );
+			}
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( expected );
+		}
+	);
+
+	it.each( [ false, true ] )(
+		'respects insertion selection flags (%s)',
+		( updateSelection ) => {
+			const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+			registry.dispatch( store ).multiSelectSet( ids );
+			const inserted = createBlock( 'core/test-selection' );
+			registry
+				.dispatch( store )
+				.insertBlocks( [ inserted ], 1, '', updateSelection );
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( updateSelection ? [ inserted.clientId ] : ids );
+		}
+	);
+
+	it.each( [ false, true ] )(
+		'respects inner-block replacement selection flags (%s)',
+		( updateSelection ) => {
+			const parent = createBlock( 'core/test-selection', {}, blocks );
+			registry.dispatch( store ).resetBlocks( [ parent ] );
+			const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+			registry.dispatch( store ).multiSelectSet( ids );
+			const inserted = createBlock( 'core/test-selection' );
+			registry
+				.dispatch( store )
+				.replaceInnerBlocks(
+					parent.clientId,
+					[ inserted, ...blocks ],
+					updateSelection
+				);
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( updateSelection ? [ inserted.clientId ] : ids );
+		}
+	);
+
+	it( 'distinguishes adjacent set membership from range-derived selected IDs', () => {
+		const ids = blocks.slice( 0, 3 ).map( ( block ) => block.clientId );
+		registry.dispatch( store ).multiSelectSet( ids );
+		expect(
+			unlock( registry.select( store ) ).getSetSelectionClientIds()
+		).toEqual( ids );
+		registry.dispatch( store ).multiSelect( ids[ 0 ], ids[ 2 ] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			ids
+		);
+		expect(
+			unlock( registry.select( store ) ).getSetSelectionClientIds()
+		).toBeUndefined();
 	} );
 
 	it( 'applies attribute changes only to selected cells across row parents', () => {

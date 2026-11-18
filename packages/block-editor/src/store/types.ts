@@ -532,8 +532,8 @@ export interface BlocksState {
 export interface SelectionState {
 	selectionStart: BlockSelection;
 	selectionEnd: BlockSelection;
-	/** Explicit membership, absent for text and contiguous range selections. */
-	selectionClientIds?: string[];
+	/** Enumerated set members (even adjacent ones), absent for text and range selections. */
+	setSelectionClientIds?: string[];
 }
 
 /**
@@ -738,7 +738,7 @@ export type Action =
 			selectionStart: BlockSelection;
 			selectionEnd: BlockSelection;
 			initialPosition?: InitialPosition;
-			selectionClientIds?: string[];
+			setSelectionClientIds?: string[];
 	  }
 	| { type: 'RESET_ZOOM_LEVEL' }
 	| {

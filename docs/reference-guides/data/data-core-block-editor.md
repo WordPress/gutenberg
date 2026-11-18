@@ -1078,7 +1078,7 @@ _Parameters_
 
 _Returns_
 
-- `boolean`: Whether block is selected and multi-selection exists.
+- `boolean`: Whether block is selected and no multi-selection exists.
 
 ### isBlockValid
 
@@ -1435,15 +1435,17 @@ _Parameters_
 
 ### multiSelectSet
 
-Selects an explicit set of whole blocks, including blocks with different parents.
+Selects a set of whole blocks, including blocks with different ordinary parents.
+
+Membership is stored in document order, independently of the directional endpoints. Start anchors range extension; end is its moving end, not keyboard focus. For example, selecting E then adding B stores [B, E], with start E and end B. Endpoints default to the first and last valid input IDs before tree normalization. Missing or suppressed endpoints are repaired to surviving members; equal endpoints do not imply a single-member set.
 
 _Parameters_
 
 - _clientIds_ `string[]`: Block client IDs to select.
 - _initialPosition_ `InitialPosition`: Initial caret position, or null to retain focus outside the canvas.
-- _options_ `{ anchorClientId?: string; focusClientId?: string; }`: Optional directional selection endpoints.
-- _options.anchorClientId_ `string`: Block where the selection starts.
-- _options.focusClientId_ `string`: Block where the selection ends.
+- _options_ `{ selectionStartClientId?: string; selectionEndClientId?: string; }`: Optional directional selection endpoints.
+- _options.selectionStartClientId_ `string`: Directional start block (range-extension anchor).
+- _options.selectionEndClientId_ `string`: Directional end block, independent of keyboard focus.
 
 ### receiveBlocks
 
@@ -1656,7 +1658,7 @@ _Parameters_
 - _selectionStart_ `WPBlockSelection`: The selection start.
 - _selectionEnd_ `WPBlockSelection`: The selection end.
 - _initialPosition_ `0|-1|null`: Initial block position.
-- _selectionClientIds_ `string[]`: Explicit whole-block selection membership.
+- _setSelectionClientIds_ `string[]`: Whole-block set membership, absent for ranges.
 
 _Returns_
 
