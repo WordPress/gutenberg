@@ -59,15 +59,12 @@ function VideoEdit( {
 		muted,
 		playsInline,
 	} = attributes;
-	// Give the <video> an explicit (non-`auto`) aspect ratio derived from the
-	// stored dimensions. The width/height attributes alone only yield
-	// `aspect-ratio: auto W/H`, whose `auto` keyword defers to the element's
-	// natural ratio while the poster/metadata load - during which Chrome briefly
-	// computes a runaway height (tens of thousands of pixels) before settling.
-	// That spike is what reads as a duplicated image during the GIF-to-video
-	// swap. A non-`auto` ratio governs the box height throughout the load.
+	// `auto` makes the ratio size the content box, so a border does not shrink
+	// the picture under `box-sizing: border-box`. Until metadata loads the video
+	// has no natural ratio, so `W / H` holds the height and avoids the runaway
+	// height Chrome computed during the GIF-to-video swap (#78410).
 	const aspectRatio =
-		width && height ? `${ width } / ${ height }` : undefined;
+		width && height ? `auto ${ width } / ${ height }` : undefined;
 	const borderProps = useBorderProps( attributes );
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
