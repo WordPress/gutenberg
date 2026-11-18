@@ -1,5 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	__experimentalConfirmDialog as ConfirmDialog,
 	Button,
@@ -53,6 +53,13 @@ import SuggestionSizeNotice from './suggestion-size-notice';
 
 const EMPTY_ARRAY: Array< string | null > = [];
 const EMPTY_LINES: string[] = [];
+
+/*
+ * How long a pending suggestion's anchor has to stay absent before the note
+ * reads as having lost it. A note can be listed a moment before its marker
+ * lands (the suggester's own write, a peer's sync).
+ */
+const ANCHOR_MISSING_GRACE_MS = 500;
 
 const STRUCTURAL_OP_TYPES = new Set( [
 	'block-insert-after',
@@ -157,6 +164,19 @@ export function useSuggestionDecision( thread: any ) {
 		[ thread?.meta?._wp_suggestion ]
 	);
 	const anchorPresent = useSuggestionAnchorPresent( thread );
+	const [ isAnchorSettledMissing, setIsAnchorSettledMissing ] =
+		useState( false );
+	useEffect( () => {
+		if ( anchorPresent !== false ) {
+			setIsAnchorSettledMissing( false );
+			return;
+		}
+		const timer = setTimeout(
+			() => setIsAnchorSettledMissing( true ),
+			ANCHOR_MISSING_GRACE_MS
+		);
+		return () => clearTimeout( timer );
+	}, [ anchorPresent ] );
 	const { applySuggestion, rejectSuggestion } = useSuggestionsProvider();
 	const [ busy, setBusy ] = useState( false );
 	const [ showStaleDialog, setShowStaleDialog ] = useState( false );
@@ -388,10 +408,24 @@ export function useSuggestionDecision( thread: any ) {
 	// resolved blockClientId has no live target either.
 	const isTargetMissing =
 		! isPostSuggestion && ( ! thread?.blockClientId || ! blockExists );
-	const applyDisabled = busy || isTargetMissing;
-	const applyDisabledReason = isTargetMissing
-		? __( 'Target block has been deleted.' )
-		: undefined;
+	/*
+	 * A pending note whose suggestion is not in the content, left by an
+	 * editor that closed before saving it or by a writer that never placed
+	 * it. There is nothing to accept; Reject still closes the note.
+	 */
+	const isAnchorMissing =
+		! isTargetMissing &&
+		presentation === 'pending' &&
+		isAnchorSettledMissing;
+	const applyDisabled = busy || isTargetMissing || isAnchorMissing;
+	let applyDisabledReason;
+	if ( isTargetMissing ) {
+		applyDisabledReason = __( 'Target block has been deleted.' );
+	} else if ( isAnchorMissing ) {
+		applyDisabledReason = __(
+			'This suggestion is no longer in the post. Reject it to close the note.'
+		);
+	}
 
 	return {
 		payload,

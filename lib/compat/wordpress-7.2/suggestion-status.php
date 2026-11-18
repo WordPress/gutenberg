@@ -32,6 +32,23 @@ function gutenberg_get_final_suggestion_statuses() {
 }
 
 /**
+ * Whether Suggestion mode is available for a post.
+ *
+ * True when the experiment is on and the post's type supports notes, which
+ * is when the editor offers Suggesting and shows suggestion notes for it.
+ *
+ * @param int|WP_Post $post Post ID or object.
+ * @return bool Whether suggestions can be made on the post.
+ */
+function gutenberg_suggestions_enabled( $post ): bool {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-suggestion-mode' ) ) {
+		return false;
+	}
+	$post = get_post( $post );
+	return $post instanceof WP_Post && Gutenberg_Suggestion_Reconciler::post_type_supports_notes( $post->post_type );
+}
+
+/**
  * Records who made a provisional decision, and forgets it on reopen.
  *
  * Stamped here rather than sent by the client, so the name the sidebar shows
