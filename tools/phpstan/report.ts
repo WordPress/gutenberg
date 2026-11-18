@@ -377,8 +377,9 @@ function buildSummary( errors: PhpstanError[] ): string {
 
 	if ( errors.some( isStaleBaselineEntry ) ) {
 		sections.push(
-			'### The baseline is out of date',
-			`An entry in ${ baselines } records an error that now occurs fewer times, or not at all.`
+			'### An ignored error no longer occurs',
+			// PHPStan does not say which file an unmatched entry is in.
+			`An entry in ${ baselines }, or in the \`ignoreErrors\` of \`phpstan.neon.dist\`, records an error that now occurs fewer times, or not at all.`
 		);
 		sections.push(
 			'**If this pull request fixed one of them, this is expected**, and there is nothing to change in the code: remove the out-of-date entries by running PHPStan with `--fix`, and commit the result.',
