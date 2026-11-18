@@ -1,5 +1,5 @@
 import { useState } from '@wordpress/element';
-import { Source, Subheading } from '@storybook/addon-docs/blocks';
+import { Markdown, Source, Subheading } from '@storybook/addon-docs/blocks';
 import { ButtonLink } from '@wordpress/ui';
 import styles from './style.module.css';
 
@@ -286,22 +286,12 @@ function ToolIcon( { tool }: { tool: Tool } ) {
 	);
 }
 
-function Inline( { text }: { text: string } ) {
-	// Render `inline code` and **bold** spans.
-	return (
-		<>
-			{ text.split( /(`[^`]+`|\*\*[^*]+\*\*)/ ).map( ( part, i ) => {
-				if ( part.startsWith( '`' ) ) {
-					return <code key={ i }>{ part.slice( 1, -1 ) }</code>;
-				}
-				if ( part.startsWith( '**' ) ) {
-					return <strong key={ i }>{ part.slice( 2, -2 ) }</strong>;
-				}
-				return part;
-			} ) }
-		</>
-	);
-}
+const MARKDOWN_OPTIONS = {
+	forceInline: true,
+	overrides: {
+		a: { props: { target: '_blank', rel: 'noreferrer' } },
+	},
+};
 
 export function InstallGrid() {
 	const [ selected, setSelected ] = useState( TOOLS[ 0 ].id );
@@ -389,9 +379,9 @@ export function InstallGrid() {
 				<ol className={ styles.steps }>
 					{ tool.steps.map( ( step ) => (
 						<li key={ step }>
-							<span>
-								<Inline text={ step } />
-							</span>
+							<Markdown options={ MARKDOWN_OPTIONS }>
+								{ step }
+							</Markdown>
 						</li>
 					) ) }
 				</ol>
