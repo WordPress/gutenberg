@@ -15,10 +15,15 @@
 	align-self: stretch;
 }
 
-// Fill the free space inside a Row, unless Dimensions > Width sets a size,
-// which adds a `wp-container-content-*` class.
-:where(.is-layout-flex:not(.is-vertical)) > .wp-block-separator:where(:not([class*="wp-container-content-"])) {
+// Fill the free space inside a Row.
+:where(.is-layout-flex:not(.is-vertical)) > .wp-block-separator {
 	flex-grow: 1;
+}
+
+// Dimensions > Width (which adds a `wp-container-content-*` class) replaces the
+// fill. Its own styles load later, so Grow still applies.
+:root :where(.wp-block-separator[class*="wp-container-content-"]) {
+	flex-grow: 0;
 }
 
 // Dots block style variation
