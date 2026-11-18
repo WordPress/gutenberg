@@ -1,3 +1,12 @@
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
 import timezoneMock from 'timezone-mock';
 import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 import { inputToDate, getDaysInMonth } from '../utils';

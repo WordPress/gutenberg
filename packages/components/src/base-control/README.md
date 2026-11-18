@@ -28,13 +28,6 @@ const MyCustomTextareaControl = ({ children, ...baseProps }) => (
 
 ## Props
 
-### `as`
-
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | ... 516 more ... | ("view" & FunctionComponent<...>)`
- - Required: No
-
-The HTML element or React component to render the component as.
-
 ### `className`
 
  - Type: `string`
@@ -107,7 +100,7 @@ const MyBaseControl = () => (
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "label" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

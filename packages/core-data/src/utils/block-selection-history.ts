@@ -1,14 +1,4 @@
-/**
- * External dependencies
- */
-/**
- * WordPress dependencies
- */
 import { Y } from '@wordpress/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	asRichTextOffset,
 	findBlockByClientIdInDoc,

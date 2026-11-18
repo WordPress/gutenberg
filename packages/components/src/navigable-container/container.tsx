@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { forwardRef, useRef, useEffect, useCallback } from '@wordpress/element';
+import { forwardRef, useRef, useEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import type { NavigableContainerProps } from './types';
 
 const noop = () => {};
@@ -29,6 +18,21 @@ function cycleValue( value: number, total: number, offset: number ) {
 	return nextValue;
 }
 
+function getFocusableContext(
+	container: HTMLElement,
+	target: Element,
+	tabbableOnly: boolean
+) {
+	const finder = tabbableOnly ? focus.tabbable : focus.focusable;
+	const focusables = finder.find( container );
+
+	const index = focusables.indexOf( target as HTMLElement );
+	if ( index > -1 || ( ! tabbableOnly && target === container ) ) {
+		return { index, target, focusables };
+	}
+	return null;
+}
+
 function UnforwardedNavigableContainer(
 	{
 		children,
@@ -43,33 +47,6 @@ function UnforwardedNavigableContainer(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const containerRef = useRef< HTMLDivElement | null >( null );
-
-	const getFocusableIndex = useCallback(
-		( focusables: Element[], target: Element ) => {
-			return focusables.indexOf( target );
-		},
-		[]
-	);
-
-	const getFocusableContext = useCallback(
-		( target: Element ) => {
-			if ( ! containerRef.current ) {
-				return null;
-			}
-
-			const finder = onlyBrowserTabstops
-				? focus.tabbable
-				: focus.focusable;
-			const focusables = finder.find( containerRef.current );
-
-			const index = getFocusableIndex( focusables, target );
-			if ( index > -1 && target ) {
-				return { index, target, focusables };
-			}
-			return null;
-		},
-		[ onlyBrowserTabstops, getFocusableIndex ]
-	);
 
 	useEffect( () => {
 		const container = containerRef.current;
@@ -99,7 +76,10 @@ function UnforwardedNavigableContainer(
 				const targetHasMenuItemRole =
 					!! targetRole && MENU_ITEM_ROLES.includes( targetRole );
 
-				if ( targetHasMenuItemRole ) {
+				if (
+					targetHasMenuItemRole ||
+					( ! onlyBrowserTabstops && event.target === container )
+				) {
 					event.preventDefault();
 				}
 			}
@@ -114,15 +94,22 @@ function UnforwardedNavigableContainer(
 				return;
 			}
 
-			const context = getFocusableContext( activeElement );
+			const context = getFocusableContext(
+				container!,
+				activeElement,
+				!! onlyBrowserTabstops
+			);
 			if ( ! context ) {
 				return;
 			}
 
 			const { index, focusables } = context;
-			const nextIndex = cycle
-				? cycleValue( index, focusables.length, offset )
-				: index + offset;
+			let nextIndex = index + offset;
+			if ( index === -1 ) {
+				nextIndex = offset > 0 ? 0 : focusables.length - 1;
+			} else if ( cycle ) {
+				nextIndex = cycleValue( index, focusables.length, offset );
+			}
 
 			if ( nextIndex >= 0 && nextIndex < focusables.length ) {
 				focusables[ nextIndex ].focus();
@@ -151,7 +138,7 @@ function UnforwardedNavigableContainer(
 		stopNavigationEvents,
 		cycle,
 		onNavigate,
-		getFocusableContext,
+		onlyBrowserTabstops,
 	] );
 
 	const mergedRef = useMergeRefs( [ containerRef, ref ] );

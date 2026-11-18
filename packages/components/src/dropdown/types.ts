@@ -11,6 +11,10 @@ type CallbackProps = {
 
 export type DropdownContentWrapperProps = {
 	/**
+	 * The content to render inside the wrapper.
+	 */
+	children?: ReactNode;
+	/**
 	 * Amount of padding to apply on the dropdown content.
 	 *
 	 * @default 'small'

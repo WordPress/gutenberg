@@ -50,12 +50,6 @@
 		"focalPoint": {
 			"type": "object"
 		},
-		"minHeight": {
-			"type": "number"
-		},
-		"minHeightUnit": {
-			"type": "string"
-		},
 		"gradient": {
 			"type": "string"
 		},
@@ -85,10 +79,22 @@
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "poster"
+		},
+		"allowedVideoProviders": {
+			"type": "array",
+			"default": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			]
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
+		"__experimentalOnEnter": true,
 		"anchor": true,
 		"align": true,
 		"html": false,
@@ -117,12 +123,19 @@
 		"color": {
 			"heading": true,
 			"text": true,
+			"link": true,
+			"button": true,
 			"background": false,
 			"__experimentalSkipSerialization": [ "gradients" ],
 			"enableContrastChecker": false
 		},
 		"dimensions": {
-			"aspectRatio": true
+			"aspectRatio": true,
+			"minHeight": true,
+			"minWidth": true,
+			"__experimentalDefaultControls": {
+				"minHeight": true
+			}
 		},
 		"typography": {
 			"fontSize": true,
@@ -141,7 +154,8 @@
 			"allowJustification": false
 		},
 		"interactivity": {
-			"clientNavigation": true
+			"clientNavigation": true,
+			"interactive": true
 		},
 		"filter": {
 			"duotone": true

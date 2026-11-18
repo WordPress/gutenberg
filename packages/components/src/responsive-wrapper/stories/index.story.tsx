@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
-	title: 'Components/Layout/ResponsiveWrapper',
+	title: 'Components/@wordpress-components/Deprecated/ResponsiveWrapper',
 	id: 'components-responsivewrapper',
 	argTypes: {
 		children: { control: false },
@@ -21,7 +14,7 @@ const meta: Meta< typeof ResponsiveWrapper > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Use the CSS `aspect-ratio` property instead.',
 		},
 	},
 };

@@ -1,27 +1,41 @@
-/**
- * WordPress dependencies
- */
-import { resolveSelect } from '@wordpress/data';
+import { dispatch, resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { notFound } from '@wordpress/route';
 
+const TEMPLATE_POST_TYPES = [ 'wp_template', 'wp_template_part' ];
+
+type PostEditParams = {
+	type: string;
+	'*'?: string;
+};
+
+function getPostId( params: PostEditParams ) {
+	const id = params[ '*' ];
+
+	if ( ! id ) {
+		throw notFound();
+	}
+
+	try {
+		return decodeURIComponent( id );
+	} catch {
+		return id;
+	}
+}
+
 /**
  * Route configuration for post edit.
  */
 export const route = {
-	beforeLoad: async ( {
-		params,
-	}: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) => {
-		const postId = parseInt( params.id, 10 );
+	beforeLoad: async ( { params }: { params: PostEditParams } ) => {
+		const postId = getPostId( params );
 
-		if ( Number.isNaN( postId ) ) {
+		if (
+			! TEMPLATE_POST_TYPES.includes( params.type ) &&
+			! /^\d+$/.test( postId )
+		) {
 			throw notFound();
 		}
 
@@ -42,22 +56,23 @@ export const route = {
 			throw notFound();
 		}
 	},
-	title: async ( {
-		params,
-	}: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) => {
-		const post = await resolveSelect( coreStore ).getEntityRecord(
+	title: async ( { params }: { params: PostEditParams } ) => {
+		const postId = getPostId( params );
+		const post = ( await resolveSelect( coreStore ).getEntityRecord(
 			'postType',
 			params.type,
-			params.id
-		);
+			postId
+		) ) as { title?: { rendered?: string; raw?: string } } | undefined;
 
 		if ( post?.title?.rendered ) {
 			return decodeEntities( post.title.rendered );
+		}
+
+		// Some records only carry a raw title: the blocks REST controller
+		// strips `title.rendered` from patterns in every context, and a
+		// record received from a save has no rendered fields either.
+		if ( post?.title?.raw ) {
+			return post.title.raw;
 		}
 
 		const postType = await resolveSelect( coreStore ).getPostType(
@@ -65,17 +80,41 @@ export const route = {
 		);
 		return postType?.labels?.edit_item || __( 'Edit' );
 	},
-	async canvas( context: {
-		params: {
-			type: string;
-			id: string;
-		};
-	} ) {
+	async canvas( context: { params: PostEditParams } ) {
 		const { params } = context;
+		const postId = getPostId( params );
 
 		return {
 			postType: params.type,
-			postId: params.id,
+			postId,
 		};
+	},
+	async loader( context: {
+		params: PostEditParams;
+		search: { selectedBlock?: string };
+	} ) {
+		const { params, search } = context;
+
+		/*
+		 * Restore the block the canvas stashed on its way out, so returning to
+		 * an entity lands on the block that was selected when it was left. The
+		 * record is already resolved by `beforeLoad`, and running here rather
+		 * than from the canvas puts the selection in the entity's edits before
+		 * the editor provider renders and resets its blocks.
+		 */
+		if ( search.selectedBlock ) {
+			dispatch( coreStore ).editEntityRecord(
+				'postType',
+				params.type,
+				getPostId( params ),
+				{
+					selection: {
+						selectionStart: { clientId: search.selectedBlock },
+						selectionEnd: { clientId: search.selectedBlock },
+					},
+				},
+				{ undoIgnore: true }
+			);
+		}
 	},
 };

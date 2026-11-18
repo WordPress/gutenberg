@@ -1,0 +1,61 @@
+{
+	"wpds-border": {
+		"width": {
+			"xs": {
+				"$type": "dimension",
+				"$value": {
+					"value": 1,
+					"unit": "px"
+				},
+				"$description": "Extra small width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": {
+					"value": 2,
+					"unit": "px"
+				},
+				"$description": "Small width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": {
+					"value": 4,
+					"unit": "px"
+				},
+				"$description": "Medium width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": {
+					"value": 8,
+					"unit": "px"
+				},
+				"$description": "Large width",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			},
+			"focus": {
+				"$type": "dimension",
+				"$value": {
+					"value": 1.5,
+					"unit": "px"
+				},
+				"$description": "Border width for focus ring",
+				"$extensions": {
+					"com.figma.scopes": [ "STROKE_FLOAT" ]
+				}
+			}
+		}
+	}
+}

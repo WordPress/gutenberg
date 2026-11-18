@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalText as WCText,
@@ -11,10 +8,6 @@ import {
 } from '@wordpress/components';
 import { settings } from '@wordpress/icons';
 import { useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Subtitle } from './subtitle';
 import { useSetting } from './hooks';
 import FontLibraryProvider, {

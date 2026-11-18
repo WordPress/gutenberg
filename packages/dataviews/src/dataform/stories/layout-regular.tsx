@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DataForm from '../index';
 import type {
 	CardLayout,
@@ -27,6 +20,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -143,6 +137,12 @@ const fields: Field< SamplePost >[] = [
 		id: 'dimensions',
 		label: 'Dimensions',
 		type: 'text',
+		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
 		readOnly: true,
 	},
 	{
@@ -306,7 +306,7 @@ const getLayoutFromStoryArgs = ( {
 			type: 'card',
 		};
 		if ( withHeader !== undefined ) {
-			// @ts-ignore We want to demo the effects of configuring withHeader.
+			// @ts-expect-error `cardLayout` is narrowed to the member whose `withHeader` can only be `true`.
 			cardLayout.withHeader = withHeader;
 		}
 		layout = cardLayout;
@@ -336,6 +336,7 @@ const LayoutRegularComponent = ( {
 		can_comment: false,
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
 	} );
@@ -373,6 +374,7 @@ const LayoutRegularComponent = ( {
 				'birthdate',
 				'filesize',
 				'dimensions',
+				'file_type',
 				'tags',
 				'description',
 				'longDescription',

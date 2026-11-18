@@ -1,7 +1,90 @@
-/**
- * WordPress dependencies
- */
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
+
+function getLayout( attributes ) {
+	const { layout } = attributes;
+	return layout && typeof layout === 'object' && ! Array.isArray( layout )
+		? layout
+		: {};
+}
+
+function getColumnCount( layout ) {
+	return Number.isInteger( layout.columnCount ) && layout.columnCount > 0
+		? layout.columnCount
+		: undefined;
+}
+
+function getMinimumColumnWidth( layout ) {
+	return typeof layout.minimumColumnWidth === 'string' &&
+		layout.minimumColumnWidth
+		? layout.minimumColumnWidth
+		: undefined;
+}
+
+const canvasTransform = {
+	type: 'block',
+	blocks: [ 'core/group' ],
+	variationName: 'group-canvas',
+	isMatch: ( attributes ) => {
+		const layout = getLayout( attributes );
+		return (
+			!! window.__experimentalEnableGridInteractivity &&
+			layout.type === 'grid' &&
+			! layout.isManualPlacement
+		);
+	},
+	transform: ( attributes, innerBlocks ) => {
+		const layout = getLayout( attributes );
+		const columnCount = getColumnCount( layout ) ?? 3;
+		const minimumColumnWidth = getMinimumColumnWidth( layout );
+
+		return createBlock(
+			'core/group',
+			{
+				...attributes,
+				layout: {
+					type: 'grid',
+					isManualPlacement: true,
+					columnCount,
+					rowCount: 3,
+					...( minimumColumnWidth && { minimumColumnWidth } ),
+				},
+			},
+			innerBlocks
+		);
+	},
+};
+
+const gridTransform = {
+	type: 'block',
+	blocks: [ 'core/group' ],
+	variationName: 'group-grid',
+	isMatch: ( attributes ) => {
+		const layout = getLayout( attributes );
+		return (
+			!! window.__experimentalEnableGridInteractivity &&
+			layout.type === 'grid' &&
+			!! layout.isManualPlacement
+		);
+	},
+	transform: ( attributes, innerBlocks ) => {
+		const layout = getLayout( attributes );
+		const columnCount = getColumnCount( layout );
+		const minimumColumnWidth = getMinimumColumnWidth( layout );
+
+		return createBlock(
+			'core/group',
+			{
+				...attributes,
+				layout: {
+					type: 'grid',
+					...( columnCount && { columnCount } ),
+					...( minimumColumnWidth && { minimumColumnWidth } ),
+				},
+			},
+			innerBlocks
+		);
+	},
+};
 
 const transforms = {
 	from: [
@@ -29,13 +112,9 @@ const transforms = {
 				// to be replaced in the switchToBlockType call thereby meaning they
 				// are removed both from their original location and within the
 				// new group block.
-				const groupInnerBlocks = blocks.map( ( block ) => {
-					return createBlock(
-						block.name,
-						block.attributes,
-						block.innerBlocks
-					);
-				} );
+				const groupInnerBlocks = blocks.map( ( block ) =>
+					cloneSanitizedBlock( block )
+				);
 
 				return createBlock(
 					'core/group',
@@ -48,6 +127,7 @@ const transforms = {
 			},
 		},
 	],
+	to: [ canvasTransform, gridTransform ],
 };
 
 export default transforms;
