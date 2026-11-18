@@ -9,6 +9,7 @@ import {
 	useSuspenseSelect,
 	RegistryProvider,
 } from '@wordpress/data';
+import type { ThunkArgs } from '@wordpress/data';
 
 interface State {
 	prefix: string;
@@ -54,21 +55,13 @@ function createRegistryWithStore() {
 	const resolvers = {
 		getToken:
 			() =>
-			async ( {
-				dispatch,
-			}: {
-				dispatch: ( action: AnyAction ) => void;
-			} ) => {
+			async ( { dispatch }: ThunkArgs ) => {
 				await sleep( 10 );
 				dispatch( { type: 'RECEIVE_TOKEN', token: 'token' } );
 			},
 		getData:
 			( token: string | null ) =>
-			async ( {
-				dispatch,
-			}: {
-				dispatch: ( action: AnyAction ) => void;
-			} ) => {
+			async ( { dispatch }: ThunkArgs ) => {
 				await sleep( 10 );
 				if ( ! token ) {
 					throw 'missing token in resolver';
@@ -213,11 +206,7 @@ describe( 'useSuspenseSelect', () => {
 			resolvers: {
 				getData:
 					( endpoint: string ) =>
-					async ( {
-						dispatch,
-					}: {
-						dispatch: ( action: AnyAction ) => void;
-					} ) => {
+					async ( { dispatch }: ThunkArgs ) => {
 						const delay = endpoint === 'slow' ? 30 : 10;
 						await new Promise< void >( ( r ) =>
 							setTimeout( () => r(), delay )
