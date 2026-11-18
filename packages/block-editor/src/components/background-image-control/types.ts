@@ -1,5 +1,9 @@
 import type { ReactNode, RefObject } from 'react';
-import type { PanelStyle, StyleSettings } from '../global-styles/types';
+import type {
+	FeaturedImageBackground,
+	PanelStyle,
+	StyleSettings,
+} from '../global-styles/types';
 
 /**
  * The media properties of a background image. A theme.json string has none.
@@ -54,6 +58,7 @@ export interface BackgroundImageControlsProps {
 	displayInPanel?: boolean;
 	defaultValues?: Record< string, unknown >;
 	containerRef: RefObject< HTMLDivElement | null >;
+	featuredImage?: FeaturedImageBackground;
 }
 
 export interface BackgroundSizeControlsProps {
@@ -61,6 +66,8 @@ export interface BackgroundSizeControlsProps {
 	style?: PanelStyle;
 	inheritedValue?: PanelStyle;
 	defaultValues?: Record< string, unknown >;
+	/** URL of the featured image, when the background shows it. */
+	featuredImageURL?: string;
 }
 
 export interface BackgroundImageControlProps {
@@ -74,4 +81,6 @@ export interface BackgroundImageControlProps {
 	settings?: StyleSettings;
 	/** The values the controls default to. */
 	defaultValues?: Record< string, unknown >;
+	/** Offers the post's featured image as the background image. */
+	featuredImage?: FeaturedImageBackground;
 }
