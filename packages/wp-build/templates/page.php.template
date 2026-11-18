@@ -205,7 +205,8 @@ function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		body {
 			margin: 0;
 		}
-		#wpadminbar { display: none; }
+		/* Zero specificity, so a page that shows the admin bar can override it regardless of load order. */
+		:where(#wpadminbar) { display: none; }
 		CSS;
 		wp_add_inline_style( '{{PAGE_SLUG}}-prerequisites', $page_styles );
 
