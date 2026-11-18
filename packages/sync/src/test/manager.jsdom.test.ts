@@ -1258,6 +1258,98 @@ describe( 'SyncManager', () => {
 				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
 			} );
 
+			it( 'undoes deferred edits with separate undo levels one at a time', async () => {
+				const {
+					getContent,
+					liveDoc,
+					manager,
+					receiveFromPeer,
+					typeLocally,
+				} = await loadWithPeer();
+
+				typeLocally( 'Hello!' );
+				manager.update(
+					'post',
+					'123',
+					{ content: 'Hello!?' },
+					LOCAL_EDITOR_ORIGIN,
+					{ isNewUndoLevel: true }
+				);
+				receiveFromPeer( 0, 'Bob says ' );
+
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!?' );
+				expect( manager.undoManager.undo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
+				expect( manager.undoManager.undo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello' );
+				expect( manager.undoManager.redo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!' );
+				expect( manager.undoManager.redo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!?' );
+			} );
+
+			it( 'undoes deferred edits across entities in reverse edit order', async () => {
+				const levels: string[] = [];
+				mockHandlers.onUndoLevelOpened = () => levels.push( '123' );
+				const {
+					getContent,
+					liveDoc,
+					manager,
+					receiveFromPeer,
+					typeLocally,
+				} = await loadWithPeer();
+				let otherDoc: Y.Doc | undefined;
+				mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+					otherDoc = ydoc;
+					return mockProviderResult;
+				} );
+				await manager.load(
+					{
+						...mockSyncConfig,
+						applyChangesToCRDTDoc: applyTextChanges,
+					},
+					'post',
+					'456',
+					{ id: '456', content: 'Other', meta: {} },
+					{
+						...mockHandlers,
+						onUndoLevelOpened: () => levels.push( '456' ),
+					}
+				);
+
+				typeLocally( 'Hello!' );
+				manager.update(
+					'post',
+					'456',
+					{ content: 'Other!' },
+					LOCAL_EDITOR_ORIGIN
+				);
+				typeLocally( 'Hello!?' );
+				receiveFromPeer( 0, 'Bob says ' );
+				manager.undoManager.stopCapturing();
+
+				expect( levels ).toEqual( [ '123', '456', '123' ] );
+				for ( const [ first, second ] of [
+					[ 'Bob says Hello!', 'Other!' ],
+					[ 'Bob says Hello!', 'Other' ],
+					[ 'Bob says Hello', 'Other' ],
+				] ) {
+					expect(
+						manager.undoManager.undo( 'post', levels.pop()! )
+					).toBe( true );
+					expect( getContent( liveDoc ) ).toBe( first );
+					expect( getContent( otherDoc! ) ).toBe( second );
+				}
+			} );
+
 			it( 'leaves the deferred updates of other entities in the queue', async () => {
 				const { getContent, liveDoc, manager, receiveFromPeer } =
 					await loadWithPeer();
