@@ -23,8 +23,8 @@
 			color: var(--wpds-color-foreground-content-neutral);
 		}
 
-		/* Joined: one frame, with a dividing line between entries. */
-		.has-frame.is-joined {
+		/* One frame, with a dividing line between entries. */
+		.has-frame {
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 			border-radius: var(--_wp-ui-item-radius);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
@@ -36,7 +36,7 @@
 		 * title and its description, say. Alone in that surface it needs
 		 * none, which `:not(:first-child)` says without a prop.
 		 */
-		.is-joined:not(.has-frame):not(:first-child) {
+		.group:not(.has-frame):not(:first-child) {
 			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 
@@ -45,7 +45,7 @@
 		 * renders a placeholder between entries — as `ToolsPanel` does to
 		 * keep control order — does not take a dividing line with it.
 		 */
-		.is-joined .listitem:not(:nth-child(1 of .listitem)) {
+		.listitem:not(:nth-child(1 of .listitem)) {
 			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 
@@ -55,31 +55,16 @@
 		 * surface, which clips its own corners, and rounding the first row
 		 * there would curve it in the middle of a card.
 		 */
-		.has-frame.is-joined .listitem:nth-child(1 of .listitem),
-		.has-frame.is-joined .listitem:nth-child(1 of .listitem) > .row {
+		.has-frame .listitem:nth-child(1 of .listitem),
+		.has-frame .listitem:nth-child(1 of .listitem) > .row {
 			border-start-start-radius: var(--_wp-ui-item-radius);
 			border-start-end-radius: var(--_wp-ui-item-radius);
 		}
 
-		.has-frame.is-joined .listitem:nth-last-child(1 of .listitem),
-		.has-frame.is-joined .listitem:nth-last-child(1 of .listitem) > .row {
+		.has-frame .listitem:nth-last-child(1 of .listitem),
+		.has-frame .listitem:nth-last-child(1 of .listitem) > .row {
 			border-end-start-radius: var(--_wp-ui-item-radius);
 			border-end-end-radius: var(--_wp-ui-item-radius);
-		}
-
-		/* Separated: a frame around each entry, with space between them. */
-		.is-separated {
-			gap: var(--wpds-dimension-gap-md);
-		}
-
-		.has-frame.is-separated .listitem,
-		.has-frame.is-separated .listitem > .row {
-			border-radius: var(--_wp-ui-item-radius);
-		}
-
-		.has-frame.is-separated .listitem {
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 
 		.listitem {

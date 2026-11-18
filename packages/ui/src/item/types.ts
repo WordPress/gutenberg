@@ -16,14 +16,6 @@ export interface GroupProps extends ComponentProps< 'ul' > {
 	children?: ReactNode;
 
 	/**
-	 * Gives each entry its own frame, with space between them, instead of
-	 * joining them in one frame with dividing lines.
-	 *
-	 * @default false
-	 */
-	separated?: boolean;
-
-	/**
 	 * Whether the group draws the frame around its entries.
 	 *
 	 * Set this to `false` inside a `Card`, which supplies the frame itself,

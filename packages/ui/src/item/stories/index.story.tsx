@@ -5,6 +5,7 @@ import { Button } from '../../button';
 import * as Card from '../../card';
 import { Icon } from '../../icon';
 import { IconButton } from '../../icon-button';
+import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Item from '../index';
 
@@ -129,33 +130,34 @@ export const ActivatableWithActions: Story = {
 };
 
 /**
- * Each entry on its own surface, for a list of a few substantial choices.
+ * Entries on separate surfaces are a group per entry, stacked. The group
+ * has no variant for it: a frame around one row is a group of one.
  */
-export const Separated: Story = {
-	args: {
-		'aria-label': 'Connectors',
-		separated: true,
-		children: [
-			<Item.ContentRow key="akismet">
-				<Item.Label>Akismet Anti-spam</Item.Label>
-				<Item.Description>
-					Protect your site from spam.
-				</Item.Description>
-				<Item.Actions>
-					<Button variant="outline">Set up</Button>
-				</Item.Actions>
-			</Item.ContentRow>,
-			<Item.ContentRow key="jetpack">
-				<Item.Label>Jetpack</Item.Label>
-				<Item.Description>
-					Enhanced functionality with cloud services.
-				</Item.Description>
-				<Item.Actions>
-					<Button variant="outline">Connect</Button>
-				</Item.Actions>
-			</Item.ContentRow>,
-		],
-	},
+export const OnSeparateSurfaces: StoryObj< typeof Item.Group > = {
+	render: () => (
+		<Stack direction="column" gap="md">
+			{ [
+				[
+					'Akismet Anti-spam',
+					'Protect your site from spam.',
+					'Set up',
+				],
+				[ 'Anthropic', 'Text generation with Claude.', 'Install' ],
+			].map( ( [ label, description, action ] ) => (
+				<Item.Group aria-label={ label } key={ label }>
+					<Item.ContentRow>
+						<Item.Label>{ label }</Item.Label>
+						<Item.Description>{ description }</Item.Description>
+						<Item.Actions>
+							<Button variant="outline" size="compact">
+								{ action }
+							</Button>
+						</Item.Actions>
+					</Item.ContentRow>
+				</Item.Group>
+			) ) }
+		</Stack>
+	),
 };
 
 /**
