@@ -9,37 +9,41 @@ import { gotoStoryId } from '../utils';
  *
  * @see https://github.com/WordPress/gutenberg/issues/86851
  *
- * @param element Element painting the fill and holding the text.
+ * @param element Element painting the fill.
+ * @param text    Elements holding the text, if not the element itself.
  */
-async function expectHighlightColors( element: Locator ) {
-	const {
-		backgroundColor,
-		color,
-		forcedColorAdjust,
-		highlight,
-		highlightText,
-	} = await element.evaluate( ( el ) => {
+async function expectHighlightColors(
+	element: Locator,
+	text: Locator[] = [ element ]
+) {
+	const { highlight, highlightText } = await element.evaluate( ( el ) => {
 		const probe = el.ownerDocument.createElement( 'div' );
 		probe.style.cssText =
 			'background-color: Highlight; color: HighlightText; forced-color-adjust: none;';
 		el.ownerDocument.body.append( probe );
-		const probeStyle = window.getComputedStyle( probe );
-		const style = window.getComputedStyle( el );
+		const style = window.getComputedStyle( probe );
 		const result = {
-			backgroundColor: style.backgroundColor,
-			color: style.color,
-			forcedColorAdjust: style.forcedColorAdjust,
-			highlight: probeStyle.backgroundColor,
-			highlightText: probeStyle.color,
+			highlight: style.backgroundColor,
+			highlightText: style.color,
 		};
 		probe.remove();
 		return result;
 	} );
 
-	expect.soft( backgroundColor, 'background is Highlight' ).toBe( highlight );
-	expect.soft( color, 'text is HighlightText' ).toBe( highlightText );
-	// Without opting out, Chromium paints a Canvas backplate behind the text.
-	expect.soft( forcedColorAdjust, 'text has no backplate' ).toBe( 'none' );
+	// `toHaveCSS` retries, so color transitions can finish.
+	await expect
+		.soft( element, 'background is Highlight' )
+		.toHaveCSS( 'background-color', highlight );
+
+	for ( const locator of text ) {
+		await expect
+			.soft( locator, 'text is HighlightText' )
+			.toHaveCSS( 'color', highlightText );
+		// Without opting out, Chromium paints a Canvas backplate behind the text.
+		await expect
+			.soft( locator, 'text has no backplate' )
+			.toHaveCSS( 'forced-color-adjust', 'none' );
+	}
 }
 
 for ( const colorScheme of [ 'light', 'dark' ] as const ) {
@@ -76,7 +80,13 @@ for ( const colorScheme of [ 'light', 'dark' ] as const ) {
 			const chip = page.locator( ':focus' );
 			await expect( chip ).not.toHaveRole( 'combobox' );
 
-			await expectHighlightColors( chip );
+			const labelId = await chip.getAttribute( 'aria-labelledby' );
+			await expectHighlightColors( chip, [
+				page.locator( `[id="${ labelId }"]` ),
+				chip.getByRole( 'button' ),
+			] );
+			// Only the label and the remove button opt out, so the chip keeps its forced border.
+			await expect( chip ).toHaveCSS( 'forced-color-adjust', 'auto' );
 		} );
 	} );
 }

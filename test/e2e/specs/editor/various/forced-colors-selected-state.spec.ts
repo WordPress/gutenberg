@@ -17,35 +17,42 @@ async function expectHighlightColors(
 	text: Locator,
 	pseudo?: string
 ) {
-	const backgroundColor = await background.evaluate(
-		( el, pseudoElement ) =>
-			window.getComputedStyle( el, pseudoElement ).backgroundColor,
-		pseudo ?? null
-	);
-	const { color, forcedColorAdjust, highlight, highlightText } =
-		await text.evaluate( ( el ) => {
-			// Resolve the palette's system colors in the element's own document,
-			// which may be the editor canvas iframe.
-			const probe = el.ownerDocument.createElement( 'div' );
-			probe.style.cssText =
-				'background-color: Highlight; color: HighlightText; forced-color-adjust: none;';
-			el.ownerDocument.body.append( probe );
-			const probeStyle = window.getComputedStyle( probe );
-			const style = window.getComputedStyle( el );
-			const result = {
-				color: style.color,
-				forcedColorAdjust: style.forcedColorAdjust,
-				highlight: probeStyle.backgroundColor,
-				highlightText: probeStyle.color,
-			};
-			probe.remove();
-			return result;
-		} );
+	const { highlight, highlightText } = await text.evaluate( ( el ) => {
+		// Resolve the palette's system colors in the element's own document,
+		// which may be the editor canvas iframe.
+		const probe = el.ownerDocument.createElement( 'div' );
+		probe.style.cssText =
+			'background-color: Highlight; color: HighlightText; forced-color-adjust: none;';
+		el.ownerDocument.body.append( probe );
+		const style = window.getComputedStyle( probe );
+		const result = {
+			highlight: style.backgroundColor,
+			highlightText: style.color,
+		};
+		probe.remove();
+		return result;
+	} );
 
-	expect.soft( backgroundColor, 'background is Highlight' ).toBe( highlight );
-	expect.soft( color, 'text is HighlightText' ).toBe( highlightText );
+	// Poll and `toHaveCSS` retry, so color transitions can finish.
+	await expect
+		.poll(
+			() =>
+				background.evaluate(
+					( el, pseudoElement ) =>
+						window.getComputedStyle( el, pseudoElement )
+							.backgroundColor,
+					pseudo ?? null
+				),
+			{ message: 'background is Highlight' }
+		)
+		.toBe( highlight );
+	await expect
+		.soft( text, 'text is HighlightText' )
+		.toHaveCSS( 'color', highlightText );
 	// Without opting out, Chromium paints a Canvas backplate behind the text.
-	expect.soft( forcedColorAdjust, 'text has no backplate' ).toBe( 'none' );
+	await expect
+		.soft( text, 'text has no backplate' )
+		.toHaveCSS( 'forced-color-adjust', 'none' );
 }
 
 for ( const colorScheme of [ 'light', 'dark' ] as const ) {

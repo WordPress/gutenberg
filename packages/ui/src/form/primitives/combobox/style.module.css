@@ -34,13 +34,18 @@
 				color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				@media ( forced-colors: active ) {
-					/* Otherwise the text sits on a `Canvas` backplate. */
-					forced-color-adjust: none;
 					background-color: Highlight;
 					color: HighlightText;
 
-					/* The opt-out is inherited, so the remove button would keep its own colors. */
-					.chip-remove {
+					/* Opt out only where the text and icon are, so the chip keeps its
+					   forced border. Otherwise they sit on a `Canvas` backplate. */
+					.chip-content,
+					.chip-remove:not([data-disabled]) {
+						forced-color-adjust: none;
+					}
+
+					/* A read-only combobox disables the remove button but not the chip. */
+					.chip-remove:not([data-disabled]) {
 						background-color: transparent;
 						color: inherit;
 					}
