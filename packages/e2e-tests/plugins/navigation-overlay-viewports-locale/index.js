@@ -35,6 +35,11 @@
 		'blocks.navigation.overlayViewports',
 		'gutenberg-test/navigation-overlay-viewports-locale',
 		( overlayViewports ) => {
+			// Only adjust blocks on the default Mobile setting (null), so menus
+			// set to Off, Tablet or Always keep the viewports chosen for them.
+			if ( overlayViewports !== null ) {
+				return overlayViewports;
+			}
 			const currentLanguage = select( store ).getLanguage();
 			return Object.hasOwn( map, currentLanguage )
 				? map[ currentLanguage ]

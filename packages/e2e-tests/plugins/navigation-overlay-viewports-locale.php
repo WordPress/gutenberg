@@ -46,6 +46,12 @@ function navigation_overlay_viewports_locale_get_language() {
  * @return array|null Viewport map, or null.
  */
 function navigation_overlay_viewports_locale_filter( $overlay_viewports ) {
+	// Only adjust blocks on the default Mobile setting (null), so menus set to
+	// Off, Tablet or Always keep the viewports chosen for them.
+	if ( null !== $overlay_viewports ) {
+		return $overlay_viewports;
+	}
+
 	$map      = navigation_overlay_viewports_locale_get_map();
 	$language = navigation_overlay_viewports_locale_get_language();
 
