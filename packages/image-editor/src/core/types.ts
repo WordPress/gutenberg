@@ -59,13 +59,13 @@ export interface Flip {
 export type TransformOperation =
 	/**
 	 * Place the crop box in the view the canvas shows, in fractions of
-	 * the view. Which part of the photo it frames depends on the pan and
+	 * the view. Which part of the image it frames depends on the pan and
 	 * zoom.
 	 */
 	| { type: 'crop'; rect: NormalizedRect }
 	/** Rotate clockwise on screen by this many degrees, from where it is. */
 	| { type: 'rotate'; degrees: number }
-	/** Mirror along this axis, or undo a mirror already there. */
+	/** Flip along this axis, or undo a flip already there. */
 	| { type: 'flip'; direction: 'horizontal' | 'vertical' }
 	/** Set the zoom level. 1 = no zoom. */
 	| { type: 'zoom'; level: number };
@@ -89,7 +89,7 @@ export interface ImageEditorState {
 	readonly zoom: number;
 	/** Rotation in degrees, clockwise, from 0 to 360. */
 	readonly rotation: number;
-	/** Whether the image is mirrored along each axis. */
+	/** Whether the image is flipped along each axis. */
 	readonly flip: Readonly< Flip >;
 	/**
 	 * The crop area, as fractions of the view the canvas shows. The view
@@ -153,12 +153,8 @@ export interface InternalImageEditorState {
 }
 
 /**
- * Internal reducer action union.
- *
- * This type is intentionally not exported from the image-editor public barrel.
- * Consumers should drive state through the controller returned by
- * `useInternalImageEditor()` (or a composite store) or through serializable
- * `TransformOperation` values.
+ * The reducer's actions. Not exported: consumers change the state through
+ * the controller from `useImageEditor`.
  */
 export type ImageEditorAction =
 	/** Sets the loaded image metadata (natural size, src). */

@@ -829,10 +829,14 @@ First run `composer install` and `npm run build`, which generates PHP files that
 
 #### The baseline
 
-Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched. Regenerate the baseline in either of these ways, and commit the result:
+Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched, or its count as too high, and marks the error with 🔧. Remove the entry or lower its count in either of these ways, and commit the result:
 
--   `composer phpstan:baselines`, with PHP and Composer installed on your computer.
--   `npm run typecheck:php:baselines`, in the local environment.
+-   `composer phpstan:fix`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:fix`, in the local environment.
+
+This runs PHPStan with `--fix` over all the paths, since PHPStan reports no out-of-date entries when it analyzes only some files, and then runs the analysis again, since `--fix` reports only what it fixed. The script fails when errors remain, and also when there is nothing to fix. Both runs use `phpstan.neon.dist`, even when a local `phpstan.neon` exists, since a configuration at another rule level can report a baselined error with a different message, which would make `--fix` remove entries the default configuration still needs.
+
+Unlike regenerating the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`), `--fix` never adds an entry, so it does not record any other errors the change introduces as accepted. It also removes an `@phpstan-ignore` comment that no longer ignores anything, and fixes any other error marked with 🔧, so review the diff before committing it.
 
 #### WordPress stubs
 
@@ -857,6 +861,32 @@ includes:
 parameters:
 	paths:
 		- phpunit
+```
+
+#### Strict rules
+
+[`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist) also enables the rules from [phpstan-strict-rules](https://github.com/phpstan/phpstan-strict-rules) that the code already complies with, such as those disallowing loose comparisons, short ternaries, and the backtick operator, registering each rule individually. It does not include the package's `rules.neon`, since that file also makes several PHPStan parameters stricter, such as `checkDynamicProperties` and `reportMaybesInMethodSignatures`, even when its rules are disabled. For the same reason, `composer.json` tells `phpstan/extension-installer` to ignore the package, which would otherwise include `rules.neon` automatically. To work toward complying with more of the rules, include `rules.neon` in a `phpstan.neon`, and enable the rules to try. Setting `strictRules.allRules` to `false` enables only the rules set to `true`, but the parameters are still made stricter, so expect some errors from those as well. Either way, disable the rules `phpstan.neon.dist` already registers, or each error they report is reported twice:
+
+```neon
+includes:
+	- phpstan.neon.dist
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	strictRules:
+		allRules: false
+		requireParentConstructorCall: true
+		strictArrayFilter: true
+
+		# Already registered in phpstan.neon.dist.
+		disallowedLooseComparison: false
+		disallowedBacktick: false
+		disallowedImplicitArrayCreation: false
+		disallowedShortTernary: false
+		closureUsesThis: false
+		matchingInheritedMethodNames: false
+		switchConditionsMatchingType: false
+		strictFunctionCalls: false
+		illegalConstructorMethodCall: false
 ```
 
 ## GitHub Actions workflow files
