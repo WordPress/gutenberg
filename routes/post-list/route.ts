@@ -61,7 +61,15 @@ export const route = {
 		}
 
 		// Otherwise, fetch the first post from the filtered query
-		const query = viewToQuery( view, params.type );
+		const postType = await resolveSelect( coreStore ).getPostType(
+			params.type
+		);
+		const taxonomies = postType?.taxonomies?.length
+			? await resolveSelect( coreStore ).getTaxonomies( {
+					type: params.type,
+				} )
+			: [];
+		const query = viewToQuery( view, params.type, taxonomies ?? [] );
 		const posts = await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			params.type,
