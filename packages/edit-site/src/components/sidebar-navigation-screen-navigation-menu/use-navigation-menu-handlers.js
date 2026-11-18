@@ -105,7 +105,12 @@ function useSaveNavigationMenu() {
 			} );
 		} catch ( error ) {
 			// Revert to original in case of error.
-			editEntityRecord( 'postType', postType, postId, originalRecord );
+			editEntityRecord(
+				'postType',
+				NAVIGATION_POST_TYPE,
+				postId,
+				originalRecord
+			);
 
 			createErrorNotice(
 				sprintf(
