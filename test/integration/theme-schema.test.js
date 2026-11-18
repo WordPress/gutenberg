@@ -234,7 +234,7 @@ describe( 'theme.json schema', () => {
 			version: 3,
 			styles: {
 				blocks: {
-					'core/image': {
+					'core/group': {
 						transform: { scale: 1.2 },
 						variations: {
 							large: { transform: { scale: '150%' } },
@@ -261,7 +261,7 @@ describe( 'theme.json schema', () => {
 		const theme = {
 			version: 3,
 			styles: {
-				blocks: { 'core/image': { transform: { scale } } },
+				blocks: { 'core/group': { transform: { scale } } },
 			},
 		};
 
