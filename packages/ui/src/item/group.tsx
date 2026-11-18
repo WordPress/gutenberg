@@ -11,8 +11,8 @@ import type { GroupProps } from './types';
  * A collection of rows. Any mix of `Item.Link`, `Item.Button` and
  * `Item.Row` can go inside, and each becomes one entry of a list.
  *
- * By default the entries are joined in one frame, with a dividing line
- * between them. `separated` gives each its own frame instead.
+ * The entries are joined in one frame, with a dividing line between them.
+ * For entries on separate surfaces, stack a group per entry in a `Stack`.
  *
  * ```jsx
  * <Item.Group aria-labelledby="gateways">
@@ -30,7 +30,6 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 			density = 'comfortable',
 			frame = true,
 			render,
-			separated = false,
 			...restProps
 		},
 		ref
@@ -54,9 +53,6 @@ export const Group = forwardRef< HTMLUListElement, GroupProps >(
 						resetStyles[ 'box-sizing' ],
 						styles.group,
 						styles[ `is-${ density }` ],
-						separated
-							? styles[ 'is-separated' ]
-							: styles[ 'is-joined' ],
 						frame && styles[ 'has-frame' ],
 						className
 					),
