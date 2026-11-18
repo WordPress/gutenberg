@@ -13,6 +13,10 @@
 -   Let a full-page screen show the admin bar again. The page template's rule that hides it now loads after the page's own styles, so it has zero specificity to keep it overridable ([#86992](https://github.com/WordPress/gutenberg/pull/86992)).
 -   Load a `wp-admin` page's scripts and styles only on its own screen, not on a Core screen whose screen ID matches the page slug. The `dashboard` page no longer hides the content of the Core Dashboard (`index.php`) ([#86995](https://github.com/WordPress/gutenberg/pull/86995)).
 
+### Bug Fixes
+
+-   Fire `admin_print_footer_scripts` in the footer of the generated full-page template, as `wp-admin/admin-footer.php` does, instead of calling the footer printers one by one, so full-page screens also print the translations of their script modules ([#84651](https://github.com/WordPress/gutenberg/pull/84651)).
+
 ### Internal
 
 -   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
