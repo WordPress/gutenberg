@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { AnyAction, Reducer } from 'redux';
 
 /**

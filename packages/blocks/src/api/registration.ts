@@ -1,19 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { select, dispatch } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import i18nBlockSchema from './i18n-block.json';
 import { store as blocksStore } from '../store';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockType,
-	Block,
 	BlockVariation,
 	BlockVariationScope,
 	BlockStyle,
@@ -101,6 +93,14 @@ function getBlockSettingsFromMetadata( {
 }
 
 /**
+ * This acts as an intermediate type to explicitly note that the "name" property
+ * will be ignored if passed into the settings argument
+ */
+type SettingsBlockConfiguration<
+	Attributes extends Record< string, unknown > = Record< string, unknown >,
+> = Omit< BlockConfiguration< Attributes >, 'name' > & { name?: unknown };
+
+/**
  * Registers a new block provided a unique name and an object defining its
  * behavior. Once registered, the block is made available as an option to any
  * editor interface where blocks are implemented.
@@ -130,19 +130,19 @@ export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: BlockConfiguration< Attributes >,
-	settings?: Partial< BlockConfiguration< Attributes > >
+	settings?: Partial< SettingsBlockConfiguration< Attributes > >
 ): BlockType | undefined;
 export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: string,
-	settings: BlockConfiguration< Attributes >
+	settings: SettingsBlockConfiguration< Attributes >
 ): BlockType | undefined;
 export function registerBlockType<
 	Attributes extends Record< string, unknown > = Record< string, unknown >,
 >(
 	blockNameOrMetadata: string | BlockConfiguration< Attributes >,
-	settings?: Partial< BlockConfiguration< Attributes > >
+	settings?: Partial< SettingsBlockConfiguration< Attributes > >
 ): BlockType | undefined {
 	const name = isObject( blockNameOrMetadata )
 		? blockNameOrMetadata.name
@@ -448,7 +448,8 @@ export function getBlockTypes(): BlockType[] {
  * Returns the block support value for a feature, if defined.
  *
  * @param nameOrType      Block name or type object
- * @param feature         Feature to retrieve
+ * @param feature         Feature to retrieve, as a dot-separated path or an
+ *                        array of path segments
  * @param defaultSupports Default value to return if not
  *                        explicitly defined
  *
@@ -456,7 +457,7 @@ export function getBlockTypes(): BlockType[] {
  */
 export function getBlockSupport(
 	nameOrType: string | BlockType,
-	feature: string,
+	feature: string | string[],
 	defaultSupports?: unknown
 ): unknown {
 	return select( blocksStore ).getBlockSupport(
@@ -470,7 +471,8 @@ export function getBlockSupport(
  * Returns true if the block defines support for a feature, or false otherwise.
  *
  * @param nameOrType      Block name or type object.
- * @param feature         Feature to test.
+ * @param feature         Feature to test, as a dot-separated path or an array
+ *                        of path segments.
  * @param defaultSupports Whether feature is supported by
  *                        default if not explicitly defined.
  *
@@ -478,7 +480,7 @@ export function getBlockSupport(
  */
 export function hasBlockSupport(
 	nameOrType: string | BlockType,
-	feature: string,
+	feature: string | string[],
 	defaultSupports?: boolean
 ): boolean {
 	return select( blocksStore ).hasBlockSupport(
@@ -498,7 +500,7 @@ export function hasBlockSupport(
  * @return Whether the given block is a reusable block.
  */
 export function isReusableBlock(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/block';
 }
@@ -513,7 +515,7 @@ export function isReusableBlock(
  * @return Whether the given block is a template part.
  */
 export function isTemplatePart(
-	blockOrType: Block | BlockType | null | undefined
+	blockOrType: { name: string } | null | undefined
 ): boolean {
 	return blockOrType?.name === 'core/template-part';
 }
@@ -627,7 +629,7 @@ export const unregisterBlockStyle = (
 
 /**
  * Returns an array with the variations of a given block type.
- * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ * Ignored from documentation as the recommended usage is via useSelect from `@wordpress/data`.
  *
  * @ignore
  *

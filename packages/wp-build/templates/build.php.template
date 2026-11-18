@@ -6,6 +6,10 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 // Load script module registration.
 $modules_file = __DIR__ . '/modules.php';
 if ( file_exists( $modules_file ) ) {
@@ -28,6 +32,12 @@ if ( file_exists( $styles_file ) ) {
 $routes_file = __DIR__ . '/routes.php';
 if ( file_exists( $routes_file ) ) {
 	require_once $routes_file;
+}
+
+// Load widgets registration.
+$widgets_file = __DIR__ . '/widgets.php';
+if ( file_exists( $widgets_file ) ) {
+	require_once $widgets_file;
 }
 
 // Load pages registration.

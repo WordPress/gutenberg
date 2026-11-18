@@ -38,6 +38,7 @@ function enqueue_sync_connection_error_filter_scripts() {
 			'wp-element',
 			'wp-i18n',
 			'wp-plugins',
+			'wp-private-apis',
 		),
 		filemtime( plugin_dir_path( __FILE__ ) . 'sync-connection-error-filter/index.js' ),
 		true

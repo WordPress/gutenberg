@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../store';
 import { unlock } from '../lock-unlock';
 

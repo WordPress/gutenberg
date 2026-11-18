@@ -1,0 +1,17 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/button": {
+				"@mobile": {
+					":visited": {
+						"color": {
+							"text": "red"
+						}
+					}
+				}
+			}
+		}
+	}
+}

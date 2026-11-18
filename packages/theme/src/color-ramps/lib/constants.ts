@@ -1,22 +1,27 @@
-/**
- * External dependencies
- */
-import { to, OKLCH } from 'colorjs.io/fn';
+import { OKLCH, type PlainColorObject } from 'colorjs.io/fn';
+import type { Ramp } from './types.ts';
 
-/**
- * Internal dependencies
- */
-import './register-color-spaces';
-import type { Ramp } from './types';
+export const WHITE: PlainColorObject = {
+	space: OKLCH,
+	coords: [ 1, 0, 0 ],
+	alpha: 1,
+};
+export const BLACK: PlainColorObject = {
+	space: OKLCH,
+	coords: [ 0, 0, 0 ],
+	alpha: 1,
+};
 
-export const WHITE = to( 'white', OKLCH );
-export const BLACK = to( 'black', OKLCH );
-
-// Margin added to target contrasts to counter for algorithm approximations and rounding errors.
-// - the `CONTRAST_EPSILON` value is 0.004, so the real contrast can be lower by this amount.
-// - the max contrast between adjacent RGB values is 1.016, so 0.016 is the maximum total rounding error between two values.
-// - the sum is 0.02: the margin we add to ensure that the target contrast is met after all the rounding.
-export const UNIVERSAL_CONTRAST_TOPUP = 0.02;
+// Rounding reserve for 8-bit sRGB:
+// - Channels round by up to 0.5/255. Linearizing all 256 rounding intervals
+//   gives a maximum factor of about 1.00792 in (linear channel value + 0.05).
+//   The weighted luminance sum obeys the same bound for (luminance + 0.05).
+// - Contrast is (lighter luminance + 0.05) / (darker luminance + 0.05).
+//   Both colors' errors can compound: 1.00792 ** 2 is about 1.0159, close to
+//   the 1.016:1 maximum contrast between adjacent 8-bit gray levels.
+// - This is relative error, not 0.016 contrast points. adjustContrastTarget
+//   multiplies the target by 1.02 for a 2% reserve; log tolerance is separate.
+export const CONTRAST_ROUNDING_MARGIN = 0.02;
 
 // When enabling "lighter direction" bias, this is the amount by which
 // black text contrast needs to be greater than white text contrast.
@@ -35,7 +40,9 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 	darker: { min: 0.75, max: 0.98 },
 } as const;
 
-// Contrast precision we aim for. Approximately 1/256, resolution of an 8-bit number.
+// Convergence allows log(achieved/target) >= -0.004: achieved can be as low as
+// target * exp(-0.004), about 99.6% of target. This is relative, not 0.004
+// contrast points. adjustContrastTarget multiplies by exp(0.004), about 1.00401.
 export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
@@ -56,17 +63,12 @@ export const CONTRAST_COMBINATIONS: {
 		target: 4.5,
 	},
 	{
-		bgs: [ 'bgFill1' ],
+		bgs: [ 'bgFill1', 'bgFill2' ],
 		fgs: [ 'fgFill' ],
 		target: 4.5,
 	},
 	{
-		bgs: [ 'bgFillInverted1' ],
-		fgs: [ 'fgFillInverted' ],
-		target: 4.5,
-	},
-	{
-		bgs: [ 'bgFillInverted1' ],
+		bgs: [ 'bgFillInverted1', 'bgFillInverted2' ],
 		fgs: [ 'fgFillInverted' ],
 		target: 4.5,
 	},
@@ -79,7 +81,7 @@ export const CONTRAST_COMBINATIONS: {
 
 // Used when generating the DTCG tokens and the static color ramps.
 export const DEFAULT_SEED_COLORS = {
-	bg: '#fcfcfc',
+	background: '#fcfcfc',
 	primary: '#3858e9',
 	info: '#0090ff',
 	success: '#4ab866',

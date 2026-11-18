@@ -1,0 +1,23 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Design System/Patterns/Introduction" />
+
+# Patterns
+
+Patterns describe how to approach a kind of interaction, such as confirming a destructive action or saving a form. A pattern says which components to choose for the situation and how to configure them.
+
+## Patterns and components
+
+Component documentation describes what each component does and which props it accepts. It can't tell you which component fits a situation, or how several components work together to complete a task. Patterns record these decisions, such as when a destructive action needs a confirmation and which kind of confirmation to show.
+
+Before you build an interface or a user flow, check whether a pattern covers the situation. If one does, follow it, and refer to the documentation of each component it uses for more details. If none does, work from the [components](?path=/docs/components-packages-introduction--docs). Patterns don't cover every interaction, so use a pattern only when it fits the situation.
+
+## Using patterns with AI
+
+The [WordPress Design System MCP Server](?path=/docs/design-system-using-with-ai--docs) gives AI agents the same pattern documents that you find here, through its `get_patterns` and `get_pattern_details` tools. Its instructions tell agents to check for a pattern before they build an interface or a user flow.
+
+## Contributing a pattern
+
+If a pattern doesn't fit your situation, or an interaction that comes up often has no pattern, [report it](?path=/docs/design-system-contributing--docs) rather than working around it.
+
+Each pattern is a standalone MDX document in `storybook/stories/design-system/patterns/`, tagged so that the MCP server can serve it. The lead paragraph after the heading must say what the pattern is for, because the MCP server uses it to describe the pattern. See the "Manifests" section of the [Storybook README](https://github.com/WordPress/gutenberg/blob/trunk/storybook/README.md#manifests) for details.

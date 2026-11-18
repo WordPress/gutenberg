@@ -1,0 +1,200 @@
+import { Slot } from '@wordpress/components';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
+import { RawHTML, useRef, useState } from '@wordpress/element';
+import { __, _x } from '@wordpress/i18n';
+import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
+import clsx from 'clsx';
+import CopyButton from './copy-button';
+import DetailsText from './details-text';
+import getHTMLNoticeText from './get-html-notice-text';
+import { NOTICE_SLOT } from '../../store/constants';
+import type {
+	Notice as NoticeType,
+	NoticeAction as NoticeActionType,
+} from '../../store/types';
+
+/**
+ * Notice actions have long accepted a few props of the `@wordpress/components`
+ * `Button`, beyond the documented `label`, `url`, and `onClick`.
+ */
+type NoticeAction = NoticeActionType & {
+	className?: string;
+	variant?: string;
+	isPrimary?: boolean;
+	disabled?: boolean;
+};
+
+type InlineNoticeProps = {
+	notice: NoticeType;
+	announceOnMount: boolean;
+	onRemove: () => void;
+};
+
+function getStatusLabel( status: NoticeType[ 'status' ] ) {
+	switch ( status ) {
+		case 'warning':
+			return __( 'Warning notice' );
+		case 'info':
+			return __( 'Information notice' );
+		case 'error':
+			return __( 'Error notice' );
+		// The default will also catch the 'success' status.
+		default:
+			return __( 'Notice' );
+	}
+}
+
+function NoticeActionControl( {
+	action: { label, url, onClick, className, variant, isPrimary, disabled },
+}: {
+	action: NoticeAction;
+} ) {
+	// A link cannot be disabled, so a disabled action is always a button.
+	if ( url && ! disabled ) {
+		return (
+			<Notice.ActionLink
+				href={ url }
+				onClick={ onClick }
+				className={ className }
+			>
+				{ label }
+			</Notice.ActionLink>
+		);
+	}
+
+	return (
+		<Notice.ActionButton
+			variant={ variant === 'primary' || isPrimary ? 'solid' : 'outline' }
+			onClick={ onClick }
+			className={ className }
+			disabled={ disabled }
+		>
+			{ label }
+		</Notice.ActionButton>
+	);
+}
+
+export default function InlineNotice( {
+	notice,
+	announceOnMount,
+	onRemove,
+}: InlineNoticeProps ) {
+	const {
+		status,
+		content,
+		details,
+		__unstableHTML,
+		isDismissible,
+		onDismiss,
+	} = notice;
+	const actions = notice.actions as NoticeAction[];
+	const slot = ( notice as Record< symbol, unknown > )[ NOTICE_SLOT ] as
+		symbol | undefined;
+	const [ isOpen, setIsOpen ] = useState( false );
+	const htmlDescriptionRef = useRef< HTMLDivElement >( null );
+	const [ spokenMessage, setSpokenMessage ] = useState( '' );
+	const previousNoticeRef = useRef( announceOnMount ? undefined : notice );
+
+	useIsomorphicLayoutEffect( () => {
+		if ( previousNoticeRef.current === notice ) {
+			return;
+		}
+		previousNoticeRef.current = notice;
+
+		const message =
+			notice.spokenMessage && htmlDescriptionRef.current
+				? getHTMLNoticeText( htmlDescriptionRef.current ).trim()
+				: ( notice.spokenMessage ?? '' );
+		// As in @wordpress/a11y, alternate a trailing space so an identical
+		// message changes the live region without remounting the notice.
+		setSpokenMessage( ( previous ) =>
+			message && previous === message ? message + '\u00a0' : message
+		);
+	}, [ notice ] );
+
+	// Copying HTML content would put its tags on the clipboard.
+	const canCopy = !! details && ! __unstableHTML;
+	const hasActions = actions.length > 0 || !! details;
+
+	return (
+		<Collapsible.Root
+			open={ isOpen }
+			onOpenChange={ setIsOpen }
+			render={
+				<Notice.Root
+					intent={ status }
+					spokenMessage={ spokenMessage }
+					politeness={ status === 'error' ? 'assertive' : 'polite' }
+					className={ clsx(
+						'notices-inline-notices__notice',
+						`is-${ status }`
+					) }
+				/>
+			}
+		>
+			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
+			{ __unstableHTML ? (
+				<Notice.Description
+					ref={ htmlDescriptionRef }
+					render={ <div /> }
+				>
+					<RawHTML>{ content }</RawHTML>
+				</Notice.Description>
+			) : (
+				<Notice.Description>
+					{ content }
+					{ slot && (
+						<>
+							{ ' ' }
+							<Slot name={ slot } />
+						</>
+					) }
+				</Notice.Description>
+			) }
+			{ hasActions && (
+				<Notice.Actions>
+					{ actions.map( ( action, index ) => (
+						<NoticeActionControl key={ index } action={ action } />
+					) ) }
+					{ !! details && (
+						<Collapsible.Trigger
+							render={ <Notice.ActionButton variant="outline" /> }
+						>
+							{ isOpen
+								? __( 'Hide details' )
+								: __( 'Show details' ) }
+						</Collapsible.Trigger>
+					) }
+					{ canCopy && (
+						<CopyButton
+							text={ `${ content }\n\n${ details }` }
+							label={
+								status === 'error'
+									? _x( 'Copy error', 'button label' )
+									: __( 'Copy message' )
+							}
+						/>
+					) }
+				</Notice.Actions>
+			) }
+			{ !! details && (
+				<Collapsible.Panel
+					hiddenUntilFound
+					className="notices-inline-notices__details"
+					render={ <Notice.Description render={ <div /> } /> }
+				>
+					<DetailsText>{ details }</DetailsText>
+				</Collapsible.Panel>
+			) }
+			{ isDismissible && (
+				<Notice.CloseIconButton
+					label={ __( 'Close' ) }
+					onClick={ () => {
+						onDismiss?.();
+						onRemove();
+					} }
+				/>
+			) }
+		</Collapsible.Root>
+	);
+}

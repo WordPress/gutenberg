@@ -54,9 +54,6 @@ A boolean value, when true it means dragging is currently taking place; when fal
 The following example allows us to drag & drop a red square around the entire viewport.
 
 ```jsx
-/**
- * WordPress dependencies
- */
 import { useState, useCallback } from 'react';
 import { __experimentalUseDragging as useDragging } from '@wordpress/compose';
 

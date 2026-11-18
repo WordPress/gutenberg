@@ -1,8 +1,6 @@
 # View
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 `View` is a core component that renders everything in the library. It is the principle component in the entire library.
 
@@ -29,9 +27,3 @@ function Example() {
 **Type**: `string`,`E`
 
 Render the component as another React Component or HTML Element.
-
-### css
-
-**Type**: `InterpolatedCSS`
-
-Render custom CSS using the style system.

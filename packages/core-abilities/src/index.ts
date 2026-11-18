@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { registerAbility, registerAbilityCategory } from '@wordpress/abilities';
 import type {
 	Ability,

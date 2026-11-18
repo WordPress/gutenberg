@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs/promises' );
 const os = require( 'os' );
-const { v4: uuid } = require( 'uuid' );
-
-/**
- * WordPress dependencies
- */
+const { randomUUID } = require( 'crypto' );
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -72,7 +65,9 @@ test.describe( 'Classic', () => {
 
 		// Wait for upload (increased timeout for client-side media processing).
 		await expect(
-			page.getByRole( 'checkbox', { name: fileName } )
+			page
+				.getByRole( 'tabpanel', { name: 'Media Library' } )
+				.getByRole( 'checkbox', { name: fileName } )
 		).toBeChecked( { timeout: 30_000 } );
 
 		const createGallery = page.getByRole( 'button', {
@@ -158,7 +153,7 @@ class MediaUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const fileName = uuid();
+		const fileName = randomUUID();
 		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 

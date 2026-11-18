@@ -1,0 +1,1864 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { store as coreStore } from '@wordpress/core-data';
+import { createRegistry } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as preferencesStore } from '@wordpress/preferences';
+import warning from '@wordpress/warning';
+import { store as editorStore } from '..';
+import * as actions from '../actions';
+import { unlock } from '../../lock-unlock';
+
+vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/a11y' ), () => ( {
+	speak: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/warning' ) );
+
+const postId = 44;
+
+const postTypeConfig = {
+	kind: 'postType',
+	name: 'post',
+	baseURL: '/wp/v2/posts',
+	transientEdits: { blocks: true, selection: true },
+	mergedEdits: { meta: true },
+	rawAttributes: [ 'title', 'excerpt', 'content' ],
+	getRevisionsUrl: ( parentId, revisionId ) =>
+		`/wp/v2/posts/${ parentId }/revisions${
+			revisionId ? '/' + revisionId : ''
+		}`,
+};
+
+const postTypeEntity = {
+	slug: 'post',
+	rest_base: 'posts',
+	labels: {
+		item_updated: 'Updated Post',
+		item_published: 'Post published',
+		item_reverted_to_draft: 'Post reverted to draft.',
+		item_trashed: 'Post trashed.',
+	},
+};
+
+function createRegistryWithStores() {
+	// Create a registry.
+	const registry = createRegistry();
+
+	// Register stores.
+	registry.register( blockEditorStore );
+	registry.register( coreStore );
+	registry.register( editorStore );
+	registry.register( noticesStore );
+	registry.register( preferencesStore );
+
+	// Register post type entity.
+	registry.dispatch( coreStore ).addEntities( [ postTypeConfig ] );
+
+	// Store post type entity.
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( 'root', 'postType', [ postTypeEntity ] );
+
+	return registry;
+}
+
+const getMethod = ( options ) =>
+	options.headers?.[ 'X-HTTP-Method-Override' ] || options.method || 'GET';
+
+describe( 'Post actions', () => {
+	describe( 'setCanvasWidth', () => {
+		it( 'syncs the viewport style state while Responsive editing is enabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+			const setCanvasWidth = ( width ) =>
+				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
+					width
+				);
+
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setResponsiveEditing( true );
+
+			// A tablet-sized canvas selects the tablet viewport.
+			setCanvasWidth( 600 );
+			expect( getViewport() ).toBe( '@tablet' );
+
+			// A mobile-sized canvas selects the mobile viewport.
+			setCanvasWidth( 400 );
+			expect( getViewport() ).toBe( '@mobile' );
+
+			// A full-width (desktop) canvas resets to the default viewport.
+			setCanvasWidth( undefined );
+			expect( getViewport() ).toBe( 'default' );
+		} );
+
+		it( 'syncs the viewport style state using custom viewport settings', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+			const setCanvasWidth = ( width ) =>
+				unlock( registry.dispatch( editorStore ) ).setCanvasWidth(
+					width
+				);
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '640px',
+						tablet: '1024px',
+					},
+				},
+			} );
+			unlock(
+				registry.dispatch( blockEditorStore )
+			).setResponsiveEditing( true );
+
+			setCanvasWidth( 600 );
+			expect( getViewport() ).toBe( '@mobile' );
+
+			setCanvasWidth( 800 );
+			expect( getViewport() ).toBe( '@tablet' );
+
+			setCanvasWidth( 1200 );
+			expect( getViewport() ).toBe( 'default' );
+		} );
+
+		it( 'leaves the viewport style state untouched while Responsive editing is disabled', () => {
+			const registry = createRegistryWithStores();
+			const getViewport = () =>
+				unlock(
+					registry.select( blockEditorStore )
+				).getStyleStateViewport();
+
+			unlock( registry.dispatch( editorStore ) ).setCanvasWidth( 400 );
+
+			expect( getViewport() ).toBe( 'default' );
+		} );
+	} );
+
+	describe( 'setDeviceType', () => {
+		it( 'sets the canvas one pixel inside a custom rem viewport breakpoint', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '40rem',
+						tablet: '64rem',
+					},
+				},
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setDeviceType(
+				'Tablet'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getCanvasWidth()
+			).toBe( 1023 );
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Tablet'
+			);
+		} );
+
+		it( 'does not set a tablet canvas width when the tablet breakpoint is not larger than mobile', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( blockEditorStore ).updateSettings( {
+				__experimentalFeatures: {
+					viewport: {
+						mobile: '64rem',
+						tablet: '40rem',
+					},
+				},
+			} );
+
+			unlock( registry.dispatch( editorStore ) ).setDeviceType(
+				'Tablet'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getCanvasWidth()
+			).toBe( undefined );
+			expect( registry.select( editorStore ).getDeviceType() ).toBe(
+				'Desktop'
+			);
+		} );
+	} );
+
+	describe( 'savePost()', () => {
+		it( 'saves a modified post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					return { ...post, ...data };
+				} else if (
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post and initial edits.
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			// Check that the post is dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			// Save the post.
+			await registry.dispatch( editorStore ).savePost();
+
+			// Check the new content.
+			const content = registry
+				.select( editorStore )
+				.getEditedPostContent();
+			expect( content ).toBe( 'new bar' );
+
+			// Check that the post is no longer dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+
+			// Check that a success notice has been shown.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Draft saved.',
+				},
+			] );
+		} );
+
+		it( 'passes a plain-text server message as the notice details', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			// The server's account of the failure rides along on the notice,
+			// rather than being built into its message as escaped HTML.
+			expect( notice ).toMatchObject( {
+				status: 'error',
+				content:
+					'Updating failed. Keep this page open and try updating again.',
+				details: 'Details from server.',
+			} );
+			expect( notice.actions ).toEqual( [] );
+			expect( notice.__unstableHTML ).toBeUndefined();
+			// The message is a plain string again, so the notice announces
+			// itself and nothing has to be spoken by hand.
+			expect( notice.spokenMessage ).toBe(
+				'Updating failed. Keep this page open and try updating again.'
+			);
+		} );
+
+		it.each( [
+			[
+				// Two paragraphs, so two sentences, rather than run together.
+				'separates paragraphs with line breaks',
+				'<p>The <strong>title</strong> was rejected.</p><p>Try again.</p>',
+				'The title was rejected.\nTry again.',
+			],
+			[
+				'keeps the target of a link',
+				'<p>There has been a critical error on this website.</p><p><a href="https://wordpress.org/documentation/article/faq-troubleshooting/">Learn more about troubleshooting WordPress.</a></p>',
+				'There has been a critical error on this website.\nLearn more about troubleshooting WordPress. (https://wordpress.org/documentation/article/faq-troubleshooting/)',
+			],
+			[
+				'keeps a link target only once when it is also the text',
+				'See <a href="https://example.com/help">https://example.com/help</a>',
+				'See https://example.com/help',
+			],
+			[
+				'leaves out a link target that is not a web address',
+				'<a href="javascript:alert(1)">Fix it</a> now.',
+				'Fix it now.',
+			],
+			[
+				'leaves out scripts and styles',
+				'<style>p { color: red; }</style><p>Rejected.</p><script>alert( 1 );</script>',
+				'Rejected.',
+			],
+		] )(
+			'converts markup in a server message to plain text: %s',
+			async ( _description, message, expectedDetails ) => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
+				};
+
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
+
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw { code: 'test_save_failure', message };
+					}
+
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.details ).toBe( expectedDetails );
+				expect( notice.__unstableHTML ).toBeUndefined();
+			}
+		);
+
+		it.each( [
+			[
+				'adds the PHP error a fatal error reports to the details',
+				{
+					code: 'internal_server_error',
+					message:
+						'<p>There has been a critical error on this website.</p>',
+					data: {
+						status: 500,
+						error: {
+							type: 1,
+							message:
+								'Uncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+						},
+					},
+				},
+				'Error code 500. There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+			],
+			[
+				'ignores a PHP error message that is not a string',
+				{
+					code: 'internal_server_error',
+					message: 'Server error.',
+					data: { status: 500, error: { message: [ 'unexpected' ] } },
+				},
+				'Error code 500. Server error.',
+			],
+			[
+				'shows the status of a response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 502 },
+				},
+				'Error code 502.',
+			],
+			[
+				'shows no details for a successful response that is not JSON',
+				{
+					code: 'invalid_json',
+					message: 'The response is not a valid JSON response.',
+					data: { status: 200 },
+				},
+				undefined,
+			],
+		] )( '%s', async ( _description, serverError, expectedDetails ) => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw serverError;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.details ).toBe( expectedDetails );
+		} );
+
+		it( 'keeps a server message that only looks like markup', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw {
+						code: 'test_save_failure',
+						message: 'Unexpected token < at line 3',
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			// Parsing this as HTML would take everything after the `<`.
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.details ).toBe( 'Unexpected token < at line 3' );
+		} );
+
+		// These errors are generated by the client rather than returned by the
+		// server, so their message only restates the notice itself.
+		[
+			[
+				'offline_error',
+				'Unable to connect. Please check your Internet connection.',
+				'Updating failed because you were offline. Please verify your connection and try again.',
+			],
+			[
+				'fetch_error',
+				'Could not get a valid response from the server.',
+				'Updating failed. Keep this page open and try updating again.',
+			],
+		].forEach( ( [ code, message, expectedNotice ] ) => {
+			it( `omits the details disclosure for ${ code } failures`, async () => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
+				};
+
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
+
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw { code, message };
+					}
+
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.content ).toBe( expectedNotice );
+				expect( notice.details ).toBeUndefined();
+				expect( notice.__unstableHTML ).toBeUndefined();
+			} );
+		} );
+	} );
+
+	describe( 'savePost() attaching media', () => {
+		// `getEditorBlocks` parses the post's content when there is no `blocks`
+		// edit, so the block type has to exist for an image to be recognisable.
+		beforeEach( () => {
+			registerBlockType( 'core/image', {
+				title: 'Image',
+				category: 'media',
+				// Anything below 3 warns about iframe compatibility.
+				apiVersion: 3,
+				attributes: { id: { type: 'number' } },
+				save: () => null,
+			} );
+		} );
+
+		afterEach( () => {
+			unregisterBlockType( 'core/image' );
+		} );
+
+		const imagePost = {
+			id: postId,
+			type: 'post',
+			title: 'bar',
+			// Void form, so it validates against the minimal `save` registered
+			// above — the markup is incidental, the `id` attribute is the point.
+			content: '<!-- wp:image {"id":12} /-->',
+			excerpt: 'crackers',
+			status: 'draft',
+		};
+
+		/**
+		 * Answers everything `savePost` and the attach need, recording each
+		 * request so the test can assert on what was and wasn't issued.
+		 *
+		 * @param {string[]} requests         Collects `METHOD path` for every call.
+		 * @param {Function} [duringPostSave] Run while the post's own save is in
+		 *                                    flight, to stand in for the user
+		 *                                    editing before it comes back.
+		 */
+		function setFetchHandler( requests, duringPostSave ) {
+			attachedTo = undefined;
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+				requests.push( `${ method } ${ path }` );
+
+				if ( method === 'DELETE' ) {
+					return { ...imagePost, status: 'trash' };
+				}
+				if ( method === 'PUT' && path.startsWith( '/wp/v2/media/' ) ) {
+					attachedTo = data.post;
+					return { id: 12, post: data.post };
+				}
+				if ( method === 'GET' && path.startsWith( '/wp/v2/media' ) ) {
+					// Answer what was actually asked for. Returning a fixed
+					// record instead would mask the whole bug: a request that
+					// wrongly includes the template's image would still come
+					// back with only the post's.
+					const requested = [
+						...path.matchAll( /include(?:%5B\d+%5D)?=(\d+)/g ),
+					].map( ( match ) => Number( match[ 1 ] ) );
+
+					// Also resolved with `parse: false`, so the totals headers
+					// can be read. `link` must be absent or the fetch-all
+					// middleware follows a next page.
+					return {
+						json: async () =>
+							requested.map( ( id ) => ( { id, post: null } ) ),
+						headers: {
+							get: ( name ) =>
+								name.toLowerCase() === 'link' ? null : '1',
+						},
+					};
+				}
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					duringPostSave?.();
+					return { ...imagePost, ...data };
+				}
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					// Resolved with `parse: false`, so this has to look like a
+					// Response rather than the record itself.
+					return {
+						json: async () => ( {
+							...postTypeEntity,
+							viewable: true,
+						} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+		}
+
+		const hasAttached = ( requests ) =>
+			requests.some( ( request ) =>
+				request.startsWith( 'PUT /wp/v2/media/12' )
+			);
+
+		// What was written, not just that something was.
+		let attachedTo;
+
+		/**
+		 * The attach is deliberately not awaited by `savePost`, so give its
+		 * requests a chance to land before asserting they did not.
+		 */
+		async function flush() {
+			for ( let i = 0; i < 20; i++ ) {
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			}
+		}
+
+		/**
+		 * Opens the editor with `imagePost.content` over the given stored post.
+		 *
+		 * @param {Object} registry    The registry to set up.
+		 * @param {Object} [savedPost] The post as stored before the save.
+		 */
+		function setUpEditor( registry, savedPost = imagePost ) {
+			// Only the `post` entity is registered by default, and without a
+			// config for attachments the records lookup cannot resolve.
+			registry.dispatch( coreStore ).addEntities( [
+				{
+					kind: 'postType',
+					name: 'attachment',
+					baseURL: '/wp/v2/media',
+					rawAttributes: [ 'title', 'excerpt', 'content' ],
+					// As `loadPostTypeEntities` configures it. Without this the
+					// resolver takes its unpaginated branch, which isn't the one
+					// that runs in the editor.
+					supportsPagination: true,
+				},
+			] );
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', savedPost );
+			registry.dispatch( editorStore ).setupEditor( savedPost, {
+				content: imagePost.content,
+			} );
+			// The block editor store is populated by the editor provider, which
+			// isn't mounted here — and without blocks there is no media to find,
+			// so every assertion below would pass whether the guards work or not.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'image-1',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 12 },
+					innerBlocks: [],
+				},
+			] );
+		}
+
+		/**
+		 * `savePost` reads the post's blocks up front, next to the content it
+		 * sends. An image added while the request is in flight was not part of
+		 * this save, so it waits for the next one.
+		 */
+		it( 'attaches what was saved, not media added mid-save', async () => {
+			const requests = [];
+			const registry = createRegistryWithStores();
+			setFetchHandler( requests, () => {
+				registry.dispatch( editorStore ).editPost( {
+					blocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+						{
+							clientId: 'image-2',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 77 },
+							innerBlocks: [],
+						},
+					],
+				} );
+			} );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/77' )
+				)
+			).toBe( false );
+		} );
+
+		it( 'attaches media the post displays', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
+		} );
+
+		/**
+		 * The bug a contributor found: with "Show template" on, the block editor
+		 * holds the *template's* tree with the post nested inside a
+		 * `core/post-content` block, so reading the canvas picked up the
+		 * template's media and attached it to the post.
+		 */
+		it( "ignores media in the canvas that is not the post's own", async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			// The canvas as template mode leaves it: an image belonging to the
+			// template, alongside the post's content.
+			registry.dispatch( blockEditorStore ).resetBlocks( [
+				{
+					clientId: 'template-image',
+					name: 'core/image',
+					isValid: true,
+					attributes: { id: 99 },
+					innerBlocks: [],
+				},
+				{
+					clientId: 'post-content',
+					name: 'core/post-content',
+					isValid: true,
+					attributes: {},
+					innerBlocks: [
+						{
+							clientId: 'image-1',
+							name: 'core/image',
+							isValid: true,
+							attributes: { id: 12 },
+							innerBlocks: [],
+						},
+					],
+				},
+			] );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			// The post's own image, and only that.
+			expect( hasAttached( requests ) ).toBe( true );
+			expect(
+				requests.some( ( request ) =>
+					request.startsWith( 'PUT /wp/v2/media/99' )
+				)
+			).toBe( false );
+		} );
+
+		/**
+		 * Images already in a published post may have been left unattached on
+		 * purpose.
+		 */
+		it( 'leaves alone images that were already in a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, { ...imagePost, status: 'publish' } );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches images added to a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, {
+				...imagePost,
+				status: 'publish',
+				content: '',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
+		} );
+
+		it( 'attaches nothing when the editor setting is off', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( editorStore )
+				.updateEditorSettings( { autoAttachMediaEnabled: false } );
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		/**
+		 * `trashPost` deletes the post and then calls `savePost`, and
+		 * `isEditedPostSaveable` has no status check to stop it — so without a
+		 * guard a post on its way to the bin would claim media on the way out.
+		 */
+		it( 'attaches nothing while the post is being trashed', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry.dispatch( editorStore ).trashPost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches nothing on an autosave', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry );
+
+			await registry
+				.dispatch( editorStore )
+				.savePost( { isAutosave: true } );
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'autosave()', () => {
+		it( 'autosaves a modified post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'draft',
+			};
+
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/users/me' )
+				) {
+					return { id: 1 };
+				} else if (
+					path.startsWith( `/wp/v2/posts/${ postId }/autosaves` )
+				) {
+					if ( method === 'POST' ) {
+						return { ...post, ...data };
+					} else if ( method === 'GET' ) {
+						return [];
+					}
+				} else if ( method === 'GET' ) {
+					// These URLs are requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+					if (
+						path.startsWith( '/wp/v2/types/post' ) ||
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						return {
+							json: () => Promise.resolve( {} ),
+						};
+					}
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Set current user.
+			registry.dispatch( coreStore ).receiveCurrentUser( { id: 1 } );
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post and initial edits.
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			// Check that the post is dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			// Autosave the post.
+			await registry.dispatch( editorStore ).autosave();
+
+			// Check the new content.
+			const content = registry
+				.select( editorStore )
+				.getEditedPostContent();
+			expect( content ).toBe( 'new bar' );
+
+			// Check that the post is no longer dirty.
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				false
+			);
+
+			// Check that no notice has been shown on autosave.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [] );
+		} );
+	} );
+
+	describe( 'trashPost()', () => {
+		it( 'trashes a post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			let gotTrashed = false;
+
+			// Mock apiFetch response.
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if ( path.startsWith( `/wp/v2/posts/${ postId }` ) ) {
+					if ( method === 'DELETE' ) {
+						gotTrashed = true;
+						return { ...post, status: 'trash' };
+					} else if ( method === 'PUT' ) {
+						return {
+							...post,
+							...( gotTrashed && { status: 'trash' } ),
+							...data,
+						};
+					}
+					// This URL is requested by the actions dispatched in this test.
+					// They are safe to ignore and are only listed here to avoid triggeringan error.
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ path }`,
+				};
+			} );
+
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			// Store post.
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			// Setup editor with post.
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Trash the post.
+			await registry.dispatch( editorStore ).trashPost();
+
+			// Check that there are no notices.
+			const notices = registry.select( noticesStore ).getNotices();
+			expect( notices ).toMatchObject( [
+				{
+					status: 'success',
+					content: 'Post trashed.',
+				},
+			] );
+
+			// Check the new status.
+			const { status } = registry.select( editorStore ).getCurrentPost();
+			expect( status ).toBe( 'trash' );
+		} );
+
+		it( 'sets deleting state', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				content: 'foo',
+				status: 'publish',
+			};
+
+			const dispatch = Object.assign( vi.fn(), {
+				savePost: vi.fn(),
+			} );
+			const select = {
+				getCurrentPostType: () => 'post',
+				getCurrentPost: () => post,
+			};
+			const registry = {
+				dispatch: () => ( {
+					removeNotice: vi.fn(),
+					createErrorNotice: vi.fn(),
+				} ),
+				resolveSelect: () => ( {
+					getPostType: () => ( {
+						rest_namespace: 'wp/v2',
+						rest_base: 'posts',
+					} ),
+				} ),
+			};
+
+			apiFetch.setFetchHandler( async () => {
+				return { ...post, status: 'trash' };
+			} );
+
+			await actions.trashPost()( { select, dispatch, registry } );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_START',
+			} );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REQUEST_POST_DELETE_FINISH',
+			} );
+		} );
+	} );
+
+	describe( 'restoreRevision()', () => {
+		const revisionId = 12;
+
+		// Remove the filters added by tests, including when a test fails.
+		afterEach( () => {
+			removeFilter( 'editor.preSavePost', 'test/stop-save' );
+			removeFilter( 'editor.preSavePost', 'test/hold-save' );
+		} );
+
+		const revision = {
+			id: revisionId,
+			date: '2026-10-13T10:00:00',
+			modified: '2026-10-13T10:00:00',
+			author: 1,
+			title: { raw: 'Autosaved title' },
+			excerpt: { raw: '' },
+			content: { raw: 'autosaved content' },
+		};
+
+		/**
+		 * Sets up a registry with the given post open in the editor, and
+		 * records the data sent with each save.
+		 *
+		 * @param {Object}                   post             The post to edit.
+		 * @param {Object}                   [options]        Options.
+		 * @param {Object}                   [options.edits]  Unsaved edits to apply to the post.
+		 * @param {(data: Object) => Object} [options.onSave] Handles a save request. Returns the response.
+		 * @return {Object} The registry and the data sent with each save.
+		 */
+		function setUpRestore( post, { edits, onSave } = {} ) {
+			const savedData = [];
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					savedData.push( data );
+					if ( onSave ) {
+						return onSave( data );
+					}
+					return { ...post, ...data };
+				} else if (
+					method === 'GET' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/revisions/${ revisionId }`
+					)
+				) {
+					return revision;
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, edits );
+
+			return { registry, savedData };
+		}
+
+		it( 'saves the current content of a draft before restoring a revision', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 2 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'unsaved content',
+			} );
+			expect( savedData[ 1 ] ).toMatchObject( {
+				title: 'Autosaved title',
+				content: 'autosaved content',
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'autosaved content' );
+		} );
+
+		it( 'does not save first for a published post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'publish',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 1 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'autosaved content',
+			} );
+		} );
+
+		it( 'does not restore the revision when saving the current content fails', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+				onSave: () => {
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				},
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
+		} );
+
+		it( 'does not restore the revision when a filter stops the save of the current content', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+			addFilter( 'editor.preSavePost', 'test/stop-save', () => {
+				throw new Error( 'Stopped by a filter.' );
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.id )
+			).toContain( 'editor-revision-restore-failed' );
+		} );
+
+		it( 'keeps the restored content in the editor when saving the restored revision fails', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+				onSave: ( data ) => {
+					// Let the save of the current content succeed, and fail
+					// the save of the restored revision.
+					if ( savedData.length === 1 ) {
+						return { ...post, ...data };
+					}
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				},
+			} );
+			registry
+				.dispatch( noticesStore )
+				.createWarningNotice( 'There is an autosave.', {
+					id: 'autosave-exists',
+				} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 2 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'autosaved content' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			const allNotices = registry.select( noticesStore ).getNotices();
+			const noticeIds = allNotices.map( ( notice ) => notice.id );
+			// The editor has left revisions mode by now, so the notice is
+			// shown inline where it stays in view.
+			expect(
+				allNotices.find(
+					( notice ) => notice.id === 'editor-revision-restore-failed'
+				)
+			).toMatchObject( { type: 'default' } );
+			expect( noticeIds ).toContain( 'autosave-exists' );
+			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
+		} );
+
+		it( 'does not restore the revision while the post is saving', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			// Hold the save open before its request is sent.
+			let finishSave;
+			addFilter(
+				'editor.preSavePost',
+				'test/hold-save',
+				( edits ) =>
+					new Promise( ( resolve ) => {
+						finishSave = () => resolve( edits );
+					} )
+			);
+
+			const savePromise = registry.dispatch( editorStore ).savePost();
+			expect( registry.select( editorStore ).isSavingPost() ).toBe(
+				true
+			);
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
+
+			finishSave();
+			await savePromise;
+			expect( savedData ).toHaveLength( 1 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'unsaved content',
+			} );
+		} );
+	} );
+} );
+
+describe( 'Editor actions', () => {
+	describe( 'setupEditor()', () => {
+		it( 'should setup the editor', () => {
+			// Create registry.
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( editorStore )
+				.setupEditor( { id: 10, type: 'post' } );
+			expect( registry.select( editorStore ).getCurrentPostId() ).toBe(
+				10
+			);
+		} );
+	} );
+
+	describe( 'lockPostSaving', () => {
+		it( 'should return the LOCK_POST_SAVING action', () => {
+			const result = actions.lockPostSaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'LOCK_POST_SAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'unlockPostSaving', () => {
+		it( 'should return the UNLOCK_POST_SAVING action', () => {
+			const result = actions.unlockPostSaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'lockPostAutosaving', () => {
+		it( 'should return the LOCK_POST_AUTOSAVING action', () => {
+			const result = actions.lockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'LOCK_POST_AUTOSAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'unlockPostAutosaving', () => {
+		it( 'should return the UNLOCK_POST_AUTOSAVING action', () => {
+			const result = actions.unlockPostAutosaving( 'test' );
+			expect( result ).toEqual( {
+				type: 'UNLOCK_POST_AUTOSAVING',
+				lockName: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'enablePublishSidebar', () => {
+		it( 'enables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Starts off as `undefined` as a default hasn't been set.
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+
+			registry.dispatch( editorStore ).enablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'disablePublishSidebar', () => {
+		it( 'disables the publish sidebar', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable it to start with so that can test it flipping from `true` to `false`.
+			registry.dispatch( editorStore ).enablePublishSidebar();
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( true );
+
+			registry.dispatch( editorStore ).disablePublishSidebar();
+
+			expect(
+				registry.select( editorStore ).isPublishSidebarEnabled()
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'toggles panels to be enabled and not enabled', () => {
+			const registry = createRegistryWithStores();
+
+			// This will switch it off, since the default is on.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( false );
+
+			// Switch it on again.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelEnabled( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelEnabled( 'control-panel' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'toggles panels open and closed', () => {
+			const registry = createRegistryWithStores();
+
+			// This will open it, since the default is closed.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( true );
+
+			// Close it.
+			registry
+				.dispatch( editorStore )
+				.toggleEditorPanelOpened( 'control-panel' );
+
+			expect(
+				registry
+					.select( editorStore )
+					.isEditorPanelOpened( 'control-panel' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'switchEditorMode', () => {
+		let registry;
+
+		beforeEach( () => {
+			registry = createRegistryWithStores();
+		} );
+
+		it( 'to visual', () => {
+			// Switch to text first, since the default is visual.
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			registry.dispatch( editorStore ).switchEditorMode( 'visual' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+		} );
+
+		it( 'to text', () => {
+			// It defaults to visual.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+			// Add a selected client id and make sure it's there.
+			const clientId = 'clientId_1';
+			registry.dispatch( blockEditorStore ).selectionChange( clientId );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toEqual( clientId );
+
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientId()
+			).toBeNull();
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+		} );
+		it( 'should turn off distraction free mode when switching to code editor', () => {
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'distractionFree', true );
+			registry.dispatch( editorStore ).switchEditorMode( 'text' );
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'toggleDistractionFree', () => {
+		it( 'should properly update settings to prevent layout corruption when enabling distraction free mode', () => {
+			const registry = createRegistryWithStores();
+
+			// Enable everything that shouldn't be enabled in distraction free mode.
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'fixedToolbar', true );
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			// Initial state is falsy.
+			registry.dispatch( editorStore ).toggleDistractionFree();
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'fixedToolbar' )
+			).toBe( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+			expect(
+				registry
+					.select( preferencesStore )
+					.get( 'core', 'distractionFree' )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'setIsInserterOpened', () => {
+		it( 'should open and close the inserter', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				true
+			);
+
+			registry.dispatch( editorStore ).setIsInserterOpened( false );
+
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+		} );
+
+		it( 'the list view should close when the inserter is opened', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'setIsListViewOpened', () => {
+		it( 'should open and close the list view', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				true
+			);
+
+			registry.dispatch( editorStore ).setIsListViewOpened( false );
+
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+		} );
+
+		it( 'the inserter should close when the list view is opened', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setIsInserterOpened( true );
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				false
+			);
+
+			registry.dispatch( editorStore ).setIsListViewOpened( true );
+			expect( registry.select( editorStore ).isListViewOpened() ).toBe(
+				true
+			);
+			expect( registry.select( editorStore ).isInserterOpened() ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'setRenderingMode', () => {
+		beforeEach( () => {
+			warning.mockClear();
+		} );
+
+		it( 'changes the mode when none is fixed', () => {
+			const registry = createRegistryWithStores();
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			expect( warning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'applies the fixed mode, so an editor can enter it', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			// Applying the mode is how the editor enters it, so it is not a
+			// request to refuse.
+			expect( warning ).not.toHaveBeenCalled();
+		} );
+
+		it( 'ignores a move away from the fixed mode, and warns', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'template-locked'
+			);
+			expect( warning ).toHaveBeenCalledTimes( 1 );
+			expect( warning ).toHaveBeenCalledWith(
+				expect.stringContaining( "setRenderingMode( 'post-only' )" )
+			);
+		} );
+
+		it( 'changes the mode again once the fixed mode is cleared', () => {
+			const registry = createRegistryWithStores();
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: 'template-locked',
+			} );
+			registry
+				.dispatch( editorStore )
+				.setRenderingMode( 'template-locked' );
+
+			// Leaving a route that fixes the mode sends `undefined`, which
+			// has to clear it: editor settings merge, and the site editor
+			// shares one store across its routes.
+			registry.dispatch( editorStore ).updateEditorSettings( {
+				renderingMode: undefined,
+			} );
+			registry.dispatch( editorStore ).setRenderingMode( 'post-only' );
+
+			expect( registry.select( editorStore ).getRenderingMode() ).toBe(
+				'post-only'
+			);
+			expect( warning ).not.toHaveBeenCalled();
+		} );
+	} );
+} );

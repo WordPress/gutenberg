@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ShortcutProps } from './types';
 
 /**
@@ -36,7 +33,7 @@ function Shortcut( props: ShortcutProps ) {
 	}
 
 	return (
-		<span className={ className } aria-label={ ariaLabel }>
+		<span className={ className } aria-label={ ariaLabel } dir="ltr">
 			{ displayText }
 		</span>
 	);

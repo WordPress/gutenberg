@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import * as legacyWidget from './blocks/legacy-widget';
 import * as widgetGroup from './blocks/widget-group';
 

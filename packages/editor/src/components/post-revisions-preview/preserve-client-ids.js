@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { diffArrays } from 'diff/lib/diff/array';
+import { diffArrays } from 'diff';
 
 /**
  * Preserves clientIds from previously rendered blocks to prevent flashing.

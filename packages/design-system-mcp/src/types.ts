@@ -8,16 +8,17 @@ export interface ManifestComponent {
 		snippet?: string;
 		description?: string;
 	} >;
-	reactDocgen?: {
+	reactComponentMeta?: {
 		description?: string;
 		displayName?: string;
+		exportName?: string;
 		props?: Record<
 			string,
 			{
 				required?: boolean;
-				tsType?: { name: string; raw?: string };
+				type?: { name: string; raw?: string };
 				description?: string;
-				defaultValue?: { value: string };
+				defaultValue?: { value: string } | null;
 			}
 		>;
 	};
@@ -48,4 +49,17 @@ export interface ComponentDetail {
 		snippet?: string;
 		description?: string;
 	} >;
+}
+
+export interface ManifestDoc {
+	id: string;
+	title?: string;
+	content?: string;
+}
+
+export interface Pattern {
+	slug: string;
+	title: string;
+	description: string;
+	content: string;
 }

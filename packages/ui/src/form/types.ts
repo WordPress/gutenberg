@@ -4,7 +4,7 @@ export type ControlProps = {
 	/**
 	 * The accessible label. All controls must be labeled.
 	 */
-	label: React.ComponentProps< typeof Field.Label >[ 'children' ];
+	label: string;
 	/**
 	 * The accessible description, associated using `aria-describedby`.
 	 *

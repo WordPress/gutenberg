@@ -1,3 +1,10 @@
+const {
+	createPrivateApisState,
+	trackPrivateApisSpecifier,
+	getPropertyName,
+	getUnlockDestructuring,
+} = require( '../utils/private-apis' );
+
 /** @type {import('eslint').Rule.RuleModule} */
 const rule = {
 	meta: {
@@ -34,8 +41,7 @@ const rule = {
 			typeof context.options[ 0 ] === 'object'
 				? context.options[ 0 ]
 				: {};
-		const privateApisSources = new Map();
-		const trackedUnlockImports = new Set();
+		const privateApisState = createPrivateApisState();
 
 		return {
 			/** @param {import('estree').ImportDeclaration} node */
@@ -52,21 +58,24 @@ const rule = {
 						return;
 					}
 
-					const importedName = getImportedName( specifier );
-					if ( importedName === 'unlock' ) {
-						trackedUnlockImports.add( specifier.local.name );
-					}
+					const importedName = specifier.imported.name;
+					trackPrivateApisSpecifier(
+						privateApisState,
+						specifier,
+						source,
+						!! sourceMap
+					);
 
 					if ( ! sourceMap ) {
 						return;
 					}
 
-					if ( importedName === 'privateApis' ) {
-						privateApisSources.set( specifier.local.name, source );
+					if ( ! sourceMap.hasOwnProperty( importedName ) ) {
+						return;
 					}
-					const localName = sourceMap[ importedName ];
 
-					if ( ! localName || specifier.local.name === localName ) {
+					const localName = sourceMap[ importedName ];
+					if ( specifier.local.name === localName ) {
 						return;
 					}
 
@@ -101,50 +110,31 @@ const rule = {
 			},
 			/** @param {import('estree').VariableDeclarator} node */
 			VariableDeclarator( node ) {
-				if (
-					node.parent.type !== 'VariableDeclaration' ||
-					node.parent.kind !== 'const' ||
-					node.id.type !== 'ObjectPattern' ||
-					! isUnlockCall(
-						node.init,
-						context.sourceCode,
-						trackedUnlockImports
-					)
-				) {
-					return;
-				}
-
-				const privateApisIdentifier = node.init.arguments[ 0 ];
-				if ( privateApisIdentifier.type !== 'Identifier' ) {
-					return;
-				}
-
-				const source = privateApisSources.get(
-					privateApisIdentifier.name
+				const unlockDestructuring = getUnlockDestructuring(
+					node,
+					context.sourceCode,
+					privateApisState
 				);
-				if ( ! source ) {
+				if ( ! unlockDestructuring ) {
 					return;
 				}
 
+				const { source, properties } = unlockDestructuring;
 				const sourceMap = importAsMap[ source ];
 				if ( ! sourceMap ) {
 					return;
 				}
 
-				node.id.properties.forEach( ( property ) => {
-					if ( property.type !== 'Property' || property.computed ) {
-						return;
-					}
-
+				properties.forEach( ( property ) => {
 					const importedName = getPropertyName( property.key );
-					if ( ! importedName ) {
+					if (
+						! importedName ||
+						! sourceMap.hasOwnProperty( importedName )
+					) {
 						return;
 					}
 
 					const localName = sourceMap[ importedName ];
-					if ( ! localName ) {
-						return;
-					}
 
 					const propertyLocalName = getPropertyLocalName(
 						property.value
@@ -191,68 +181,12 @@ const rule = {
 
 /**
  * @param {import('estree').ImportSpecifier} specifier
- * @return {string} Imported name.
- */
-function getImportedName( specifier ) {
-	return specifier.imported.type === 'Identifier'
-		? specifier.imported.name
-		: String( specifier.imported.value );
-}
-
-/**
- * @param {import('estree').ImportSpecifier} specifier
  * @param {import('eslint').SourceCode}      sourceCode
  * @param {string}                           localName
  * @return {string} Suggested replacement text for an import specifier.
  */
 function getImportSpecifierSuggestionText( specifier, sourceCode, localName ) {
 	return `${ sourceCode.getText( specifier.imported ) } as ${ localName }`;
-}
-
-/**
- * @param {import('estree').CallExpression|import('estree').Expression|null} node
- * @param {import('eslint').SourceCode}                                      sourceCode
- * @param {ReadonlySet<string>}                                              trackedUnlockImports
- * @return {node is import('estree').CallExpression} Whether this is an `unlock()` call with one argument.
- */
-function isUnlockCall( node, sourceCode, trackedUnlockImports ) {
-	if (
-		node &&
-		node.type === 'CallExpression' &&
-		node.callee.type === 'Identifier' &&
-		node.arguments.length === 1
-	) {
-		if ( ! trackedUnlockImports.has( node.callee.name ) ) {
-			return false;
-		}
-
-		const { references } = sourceCode.getScope( node.callee );
-		const reference = references.find(
-			( currentReference ) => currentReference.identifier === node.callee
-		);
-
-		return !! reference?.resolved?.defs.some(
-			( definition ) => definition.type === 'ImportBinding'
-		);
-	}
-
-	return false;
-}
-
-/**
- * @param {import('estree').Expression|import('estree').PrivateIdentifier} key
- * @return {string|null} Property name.
- */
-function getPropertyName( key ) {
-	if ( key.type === 'Identifier' ) {
-		return key.name;
-	}
-
-	if ( key.type === 'Literal' ) {
-		return String( key.value );
-	}
-
-	return null;
 }
 
 /**

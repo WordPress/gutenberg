@@ -28,12 +28,12 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Record< string, unknown >`: Query arguments to apply to URL.
+- _url_ `string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+- _args_ `Record< string, unknown >`: Query arguments to apply to URL.
 
 _Returns_
 
--   `string`: URL with arguments applied.
+- `string`: URL with arguments applied.
 
 ### buildQueryString
 
@@ -58,27 +58,27 @@ const queryString = buildQueryString( {
 
 _Parameters_
 
--   _data_ `Record< string, unknown >`: Data to encode.
+- _data_ `Record< string, unknown >`: Data to encode.
 
 _Returns_
 
--   `string`: Query string.
+- `string`: Query string.
 
 ### cleanForSlug
 
 Performs some basic cleanup of a string for use as a post slug.
 
-This replicates some of what `sanitize_title_with_dashes()` does in WordPress core, but is only designed to approximate what the slug will be.
+This replicates what `sanitize_title()` does in WordPress core when saving a post, without the `sanitize_title` filters and the locale-specific transliterations of `remove_accents()`, so it can only approximate what the slug will be. It works on decoded characters, while WordPress returns the slug percent-encoded, and keeps percent-encoded octets as they are. Like WordPress, it keeps what fits in 200 percent-encoded characters.
 
-Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin letters. Removes combining diacritical marks. Converts whitespace, periods, and forward slashes to hyphens. Removes any remaining non-word characters except hyphens. Converts remaining string to lowercase. It does not account for octets, HTML entities, or other encoded characters.
+Converts accented letters to basic Latin letters, and strips HTML tags and entities. Converts spaces, periods, forward slashes, dashes and wide spaces to hyphens. Strips the punctuation and invisible characters WordPress strips, and any other ASCII character that isn't a letter, a number, an underscore or a hyphen. Keeps other characters, such as letters of other scripts and emoji. Converts the string to lowercase.
 
 _Parameters_
 
--   _string_ `string`: Title or slug to be processed.
+- _string_ `string`: Title or slug to be processed.
 
 _Returns_
 
--   `string`: Processed string.
+- `string`: Processed string.
 
 ### filterURLForDisplay
 
@@ -98,12 +98,12 @@ const imageUrl = filterURLForDisplay(
 
 _Parameters_
 
--   _url_ `string`: Original URL.
--   _maxLength_ `number | null`: URL length.
+- _url_ `string`: Original URL.
+- _maxLength_ `number | null`: URL length.
 
 _Returns_
 
--   `string`: Displayed URL.
+- `string`: Displayed URL.
 
 ### getAuthority
 
@@ -118,30 +118,31 @@ const authority2 = getAuthority( 'https://localhost:8080/test/' ); // 'localhost
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string | void`: The authority part of the URL.
+- `string | void`: The authority part of the URL.
 
 ### getFilename
 
-Returns the filename part of the URL.
+Returns the filename part of the URL, decoded so that percent-encoded characters read as they would in a file manager. A filename that can't be decoded is returned as it appears in the URL.
 
 _Usage_
 
 ```js
 const filename1 = getFilename( 'http://localhost:8080/this/is/a/test.jpg' ); // 'test.jpg'
 const filename2 = getFilename( '/this/is/a/test.png' ); // 'test.png'
+const filename3 = getFilename( '/uploads/%E9%9F%B3.mp3' ); // '音.mp3'
 ```
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string | void`: The filename part of the URL.
+- `string | void`: The filename part of the URL.
 
 ### getFragment
 
@@ -160,11 +161,11 @@ const fragment2 = getFragment(
 
 _Parameters_
 
--   _url_ `string`: The full URL
+- _url_ `string`: The full URL
 
 _Returns_
 
--   `string | void`: The fragment part of the URL.
+- `string | void`: The fragment part of the URL.
 
 ### getPath
 
@@ -179,11 +180,11 @@ const path2 = getPath( 'https://wordpress.org/help/faq/' ); // 'help/faq'
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string | void`: The path part of the URL.
+- `string | void`: The path part of the URL.
 
 ### getPathAndQueryString
 
@@ -202,11 +203,11 @@ const pathAndQueryString2 = getPathAndQueryString(
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string`: The path part and query string part of the URL.
+- `string`: The path part and query string part of the URL.
 
 ### getProtocol
 
@@ -221,11 +222,11 @@ const protocol2 = getProtocol( 'https://wordpress.org' ); // 'https:'
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string | void`: The protocol part of the URL.
+- `string | void`: The protocol part of the URL.
 
 ### getQueryArg
 
@@ -239,12 +240,12 @@ const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // ba
 
 _Parameters_
 
--   _url_ `string`: URL.
--   _arg_ `string`: Query arg name.
+- _url_ `string`: URL.
+- _arg_ `string`: Query arg name.
 
 _Returns_
 
--   `QueryArgParsed | undefined`: Query arg value.
+- `QueryArgParsed | undefined`: Query arg value.
 
 ### getQueryArgs
 
@@ -259,11 +260,11 @@ const foo = getQueryArgs( 'https://wordpress.org?foo=bar&bar=baz' );
 
 _Parameters_
 
--   _url_ `string`: URL.
+- _url_ `string`: URL.
 
 _Returns_
 
--   `QueryArgs`: Query args object.
+- `QueryArgs`: Query args object.
 
 ### getQueryString
 
@@ -279,11 +280,11 @@ const queryString = getQueryString(
 
 _Parameters_
 
--   _url_ `string`: The full URL.
+- _url_ `string`: The full URL.
 
 _Returns_
 
--   `string | void`: The query string part of the URL.
+- `string | void`: The query string part of the URL.
 
 ### hasQueryArg
 
@@ -297,12 +298,12 @@ const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); //
 
 _Parameters_
 
--   _url_ `string`: URL.
--   _arg_ `string`: Query arg name.
+- _url_ `string`: URL.
+- _arg_ `string`: Query arg name.
 
 _Returns_
 
--   `boolean`: Whether or not the URL contains the query arg.
+- `boolean`: Whether or not the URL contains the query arg.
 
 ### isEmail
 
@@ -316,11 +317,11 @@ const isEmail = isEmail( 'hello@wordpress.org' ); // true
 
 _Parameters_
 
--   _email_ `string`: The string to scrutinise.
+- _email_ `string`: The string to scrutinise.
 
 _Returns_
 
--   `boolean`: Whether or not it looks like an email.
+- `boolean`: Whether or not it looks like an email.
 
 ### isPhoneNumber
 
@@ -334,11 +335,11 @@ const isPhoneNumber = isPhoneNumber( '+1 (555) 123-4567' ); // true
 
 _Parameters_
 
--   _phoneNumber_ `string`: The string to scrutinize.
+- _phoneNumber_ `string`: The string to scrutinize.
 
 _Returns_
 
--   `boolean`: Whether or not it looks like a phone number.
+- `boolean`: Whether or not it looks like a phone number.
 
 ### isURL
 
@@ -346,8 +347,8 @@ Determines whether the given string looks like a URL.
 
 _Related_
 
--   <https://url.spec.whatwg.org/>
--   <https://url.spec.whatwg.org/#valid-url-string>
+- <https://url.spec.whatwg.org/>
+- <https://url.spec.whatwg.org/#valid-url-string>
 
 _Usage_
 
@@ -357,11 +358,11 @@ const isURL = isURL( 'https://wordpress.org' ); // true
 
 _Parameters_
 
--   _url_ `string`: The string to scrutinise.
+- _url_ `string`: The string to scrutinise.
 
 _Returns_
 
--   `boolean`: Whether or not it looks like a URL.
+- `boolean`: Whether or not it looks like a URL.
 
 ### isValidAuthority
 
@@ -376,11 +377,11 @@ const isNotValid = isValidAuthority( 'wordpress#org' ); // false
 
 _Parameters_
 
--   _authority_ `string`: A string containing the URL authority.
+- _authority_ `string`: A string containing the URL authority.
 
 _Returns_
 
--   `boolean`: True if the argument contains a valid authority.
+- `boolean`: True if the argument contains a valid authority.
 
 ### isValidFragment
 
@@ -395,11 +396,11 @@ const isNotValid = isValidFragment( '#invalid-#fragment' ); // false
 
 _Parameters_
 
--   _fragment_ `string`: The url fragment.
+- _fragment_ `string`: The url fragment.
 
 _Returns_
 
--   `boolean`: True if the argument contains a valid fragment.
+- `boolean`: True if the argument contains a valid fragment.
 
 ### isValidPath
 
@@ -414,11 +415,11 @@ const isNotValid = isValidPath( '/invalid?test/path/' ); // false
 
 _Parameters_
 
--   _path_ `string`: The URL path.
+- _path_ `string`: The URL path.
 
 _Returns_
 
--   `boolean`: True if the argument contains a valid path
+- `boolean`: True if the argument contains a valid path
 
 ### isValidProtocol
 
@@ -433,11 +434,11 @@ const isNotValid = isValidProtocol( 'https :' ); // false
 
 _Parameters_
 
--   _protocol_ `string`: The url protocol.
+- _protocol_ `string`: The url protocol.
 
 _Returns_
 
--   `boolean`: True if the argument is a valid protocol (e.g. http\:, tel:).
+- `boolean`: True if the argument is a valid protocol (e.g. http\:, tel:).
 
 ### isValidQueryString
 
@@ -452,11 +453,11 @@ const isNotValid = isValidQueryString( 'query=true?another=false' ); // false
 
 _Parameters_
 
--   _queryString_ `string`: The query string.
+- _queryString_ `string`: The query string.
 
 _Returns_
 
--   `boolean`: True if the argument contains a valid query string.
+- `boolean`: True if the argument contains a valid query string.
 
 ### normalizePath
 
@@ -464,11 +465,11 @@ Given a path, returns a normalized path where equal query parameter values will 
 
 _Parameters_
 
--   _path_ `string`: Original path.
+- _path_ `string`: Original path.
 
 _Returns_
 
--   `string`: Normalized path.
+- `string`: Normalized path.
 
 ### prependHTTP
 
@@ -482,11 +483,11 @@ const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 
 _Parameters_
 
--   _url_ `string`: The URL to test.
+- _url_ `string`: The URL to test.
 
 _Returns_
 
--   `string`: The updated URL.
+- `string`: The updated URL.
 
 ### prependHTTPS
 
@@ -502,11 +503,11 @@ const actualURL = prependHTTPS( 'wordpress.org' ); // https://wordpress.org
 
 _Parameters_
 
--   _url_ `string`: The URL to test.
+- _url_ `string`: The URL to test.
 
 _Returns_
 
--   `string`: The updated URL.
+- `string`: The updated URL.
 
 ### removeQueryArgs
 
@@ -524,12 +525,12 @@ const newUrl = removeQueryArgs(
 
 _Parameters_
 
--   _url_ `string`: URL.
--   _args_ `string[]`: Query Args.
+- _url_ `string`: URL.
+- _args_ `string[]`: Query Args.
 
 _Returns_
 
--   `string`: Updated URL.
+- `string`: Updated URL.
 
 ### safeDecodeURI
 
@@ -543,11 +544,11 @@ const badUri = safeDecodeURI( '%z' ); // does not throw an Error, simply returns
 
 _Parameters_
 
--   _uri_ `string`: URI to decode.
+- _uri_ `string`: URI to decode.
 
 _Returns_
 
--   `string`: Decoded URI if possible.
+- `string`: Decoded URI if possible.
 
 ### safeDecodeURIComponent
 
@@ -555,11 +556,11 @@ Safely decodes a URI component with `decodeURIComponent`. Returns the URI compon
 
 _Parameters_
 
--   _uriComponent_ `string`: URI component to decode.
+- _uriComponent_ `string`: URI component to decode.
 
 _Returns_
 
--   `string`: Decoded URI component if possible.
+- `string`: Decoded URI component if possible.
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

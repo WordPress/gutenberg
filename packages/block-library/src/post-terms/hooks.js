@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { postCategories, postTerms } from '@wordpress/icons';
 
 const variationIconMap = {
