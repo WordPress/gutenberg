@@ -65,6 +65,10 @@ const TOOLS: Tool[] = [
 		mark: 'CC',
 		color: '#d97757',
 		command: `claude mcp add ${ CLI_ARGS }`,
+		link: {
+			href: 'https://code.claude.com/docs/en/mcp',
+			label: 'Claude Code MCP documentation',
+		},
 		steps: [
 			'Open a terminal and run the command above.',
 			'Start Claude Code and run `/mcp` to confirm `wordpress-design-system` is connected.',
@@ -99,6 +103,10 @@ const TOOLS: Tool[] = [
 			href: CURSOR_URL,
 			label: 'Add to Cursor',
 			image: 'https://cursor.com/deeplink/mcp-install-dark.svg',
+		},
+		link: {
+			href: 'https://cursor.com/docs/mcp',
+			label: 'Cursor MCP documentation',
 		},
 		steps: [
 			'Click “Add to Cursor”, or add the configuration above to your Cursor MCP settings.',
@@ -192,6 +200,10 @@ const TOOLS: Tool[] = [
 				},
 			},
 		} ),
+		link: {
+			href: 'https://opencode.ai/docs/mcp-servers/',
+			label: 'OpenCode MCP documentation',
+		},
 		steps: [
 			'Add the configuration above to the file.',
 			'Restart OpenCode and run `opencode mcp list` to confirm the server is connected.',
@@ -207,6 +219,10 @@ const TOOLS: Tool[] = [
 		config: toJson( {
 			context_servers: { [ SERVER_NAME ]: SERVER_ENTRY },
 		} ),
+		link: {
+			href: 'https://zed.dev/docs/ai/mcp',
+			label: 'Zed MCP documentation',
+		},
 		steps: [
 			'Open the Zed settings file and add the configuration above.',
 			'Open the Agent Panel settings and confirm `wordpress-design-system` shows as active.',
@@ -220,9 +236,13 @@ const TOOLS: Tool[] = [
 		color: '#ff6363',
 		config: toJson( SERVER_ENTRY ),
 		install: { href: RAYCAST_URL, label: 'Install in Raycast' },
+		link: {
+			href: 'https://manual.raycast.com/ai/model-context-protocol',
+			label: 'Raycast MCP documentation',
+		},
 		steps: [
-			'Click “Install in Raycast”, or copy the configuration above and run the “Install Server” command in Raycast. The form fills in from your clipboard.',
-			'Install the server, then ask Raycast AI a question about the design system.',
+			'Click “Install in Raycast”, or run the “Install MCP Server” command in Raycast and choose Standard Input/Output as the transport.',
+			'If you filled in the form yourself, enter `command` from the configuration above as the Command and `args` as the Arguments, then press Install MCP Server.',
 		],
 	},
 	{
@@ -232,6 +252,10 @@ const TOOLS: Tool[] = [
 		color: '#6b7280',
 		file: 'mcp.json',
 		config: JSON_CONFIG,
+		link: {
+			href: 'https://modelcontextprotocol.io/docs/develop/connect-local-servers',
+			label: 'Model Context Protocol: connect to local servers',
+		},
 		steps: [
 			'Add the configuration above to your MCP client’s configuration (`mcp.json` or equivalent).',
 			RESTART,
