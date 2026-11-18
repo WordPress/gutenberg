@@ -2,9 +2,12 @@
 
 ## Unreleased
 
+## 9.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`. ([#86445](https://github.com/WordPress/gutenberg/pull/86445))
+-   `useStateWithHistory`: Preserve the initial value type, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
 
 ## 9.1.0 (2026-11-04)
 
