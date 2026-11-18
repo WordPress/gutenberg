@@ -347,7 +347,6 @@ function mapDispatchToProps(
 			const { clientId, rootClientId } = ownProps;
 			const { getBlockIndex } = registry.select( blockEditorStore );
 			const index = getBlockIndex( clientId );
-			// `insertBlocks` also accepts a single block.
 			insertBlocks( blocks as BlockObject[], index + 1, rootClientId );
 		},
 		onMerge( forward?: boolean ) {
