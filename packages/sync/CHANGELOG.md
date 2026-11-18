@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add the optional `SyncConfig.captureLocalState` callback to preserve document-local state when converting deferred edits to Yjs updates ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
+
 ### Bug Fixes
 
 -   Merge a deferred local update with a remote change that reaches the document first, so the update does not overwrite the remote change ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).

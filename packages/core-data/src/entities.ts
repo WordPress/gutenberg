@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import {
 	applyPostChangesToCRDTDoc,
+	capturePostLocalState,
 	defaultCollectionSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
@@ -403,6 +404,7 @@ async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
 		}
 
 		entity.syncConfig = {
+			captureLocalState: capturePostLocalState,
 			// Save a CRDT document with this entity
 			supportsPersistence: true,
 

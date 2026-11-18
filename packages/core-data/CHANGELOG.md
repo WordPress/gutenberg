@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
 -   Correct the `useResourcePermissions` return type to describe an object with resolution details ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).

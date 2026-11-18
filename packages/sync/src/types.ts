@@ -141,6 +141,16 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+	/**
+	 * Capture document-local state after applying a deferred edit to a copy.
+	 * The returned callback applies that state to the live document after the
+	 * converted Yjs update and its undo callbacks finish, before reconciliation.
+	 * The captured state must not depend on the copy remaining alive.
+	 */
+	captureLocalState?: (
+		copy: Y.Doc,
+		changes: Partial< ObjectData >
+	) => ( ( ydoc: Y.Doc ) => void ) | undefined;
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
