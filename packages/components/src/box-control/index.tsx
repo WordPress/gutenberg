@@ -1,32 +1,24 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import { BaseControl } from '../base-control';
 import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
+import Button from '../button';
 import { Grid } from '../grid';
-import {
-	InputWrapper,
-	ResetButton,
-	LinkedButtonWrapper,
-} from './styles/box-control-styles';
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
+import { HStack } from '../h-stack';
 import {
 	DEFAULT_VALUES,
 	isValueMixed,
 	isValuesDefined,
 	getAllowedSides,
+	getSelectedUnits,
 } from './utils';
 import { useControlledState } from '../utils/hooks';
 import type { BoxControlProps, BoxControlValue } from './types';
+import styles from './style.module.scss';
 
 const defaultInputProps = {
 	min: 0,
@@ -93,12 +85,9 @@ function BoxControl( {
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS only values prevents invalid style values.
-	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >( {
-		top: parseQuantityAndUnitFromRawValue( valuesProp?.top )[ 1 ],
-		right: parseQuantityAndUnitFromRawValue( valuesProp?.right )[ 1 ],
-		bottom: parseQuantityAndUnitFromRawValue( valuesProp?.bottom )[ 1 ],
-		left: parseQuantityAndUnitFromRawValue( valuesProp?.left )[ 1 ],
-	} );
+	const [ selectedUnits, setSelectedUnits ] = useState< BoxControlValue >(
+		getSelectedUnits( valuesProp )
+	);
 
 	const id = useUniqueId( idProp );
 	const headingId = `${ id }-heading`;
@@ -116,7 +105,7 @@ function BoxControl( {
 	const handleOnReset = () => {
 		onChange( resetValues );
 		setValues( resetValues );
-		setSelectedUnits( resetValues );
+		setSelectedUnits( getSelectedUnits( resetValues ) );
 		setIsDirty( false );
 	};
 
@@ -157,17 +146,17 @@ function BoxControl( {
 				{ label }
 			</BaseControl.VisualLabel>
 			{ isLinked && (
-				<InputWrapper>
+				<HStack className={ styles[ 'input-wrapper' ] }>
 					<BoxInputControl side="all" { ...inputControlProps } />
-				</InputWrapper>
+				</HStack>
 			) }
 			{ ! hasOneSide && (
-				<LinkedButtonWrapper>
+				<div className={ styles[ 'linked-button-wrapper' ] }>
 					<LinkedButton
 						onClick={ toggleLinked }
 						isLinked={ isLinked }
 					/>
-				</LinkedButtonWrapper>
+				</div>
 			) }
 
 			{ ! isLinked &&
@@ -189,15 +178,19 @@ function BoxControl( {
 					/>
 				) ) }
 			{ allowReset && (
-				<ResetButton
-					className="component-box-control__reset-button"
+				<Button
+					className={ clsx(
+						styles[ 'reset-button' ],
+						'component-box-control__reset-button'
+					) }
 					variant="secondary"
 					size="small"
 					onClick={ handleOnReset }
 					disabled={ ! isDirty }
+					accessibleWhenDisabled
 				>
 					{ __( 'Reset' ) }
-				</ResetButton>
+				</Button>
 			) }
 		</Grid>
 	);

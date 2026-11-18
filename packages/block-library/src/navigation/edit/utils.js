@@ -1,8 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-import { paramCase as kebabCase } from 'change-case';
+import { cleanForSlug } from '@wordpress/url';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -153,5 +150,5 @@ export const getUniqueTemplatePartTitle = ( title, templateParts ) => {
  * @return {string} A valid template part slug.
  */
 export const getCleanTemplatePartSlug = ( title ) => {
-	return kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+	return cleanForSlug( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
 };

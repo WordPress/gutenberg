@@ -5,7 +5,8 @@ import * as EmptyState from '../';
 
 const meta: Meta< typeof EmptyState.Root > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/EmptyState',
+	title: 'Components/@wordpress-ui/EmptyState',
+	id: 'design-system-components-emptystate',
 	component: EmptyState.Root,
 	subcomponents: {
 		'EmptyState.Visual': EmptyState.Visual,
@@ -14,11 +15,6 @@ const meta: Meta< typeof EmptyState.Root > = {
 		'EmptyState.Description': EmptyState.Description,
 		'EmptyState.Actions': EmptyState.Actions,
 	},
-	// Temporary: Due to an upstream bug, render the root explicitly so the
-	// components manifest extractor can resolve props from the JSX.
-	//
-	// See: https://github.com/storybookjs/storybook/issues/34877
-	render: ( args ) => <EmptyState.Root { ...args } />,
 	parameters: {
 		componentStatus: {
 			status: 'recommended',

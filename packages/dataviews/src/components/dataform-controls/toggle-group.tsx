@@ -1,22 +1,12 @@
-/**
- * WordPress dependencies
- */
 import {
-	privateApis,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
-import { unlock } from '../../lock-unlock';
+import { ValidatedToggleGroupControl } from '../validated-form-controls';
 import getCustomValidity from './utils/get-custom-validity';
 import useElements from '../../hooks/use-elements';
-
-const { ValidatedToggleGroupControl } = unlock( privateApis );
 
 export default function ToggleGroup< Item >( {
 	data,
@@ -42,7 +32,7 @@ export default function ToggleGroup< Item >( {
 	} );
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	if ( elements.length === 0 ) {

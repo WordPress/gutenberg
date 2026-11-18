@@ -22,6 +22,7 @@ Browse [the issues list](https://github.com/wordpress/gutenberg/issues) to find 
 -   [Testing Overview](/docs/contributors/code/testing-overview.md) for PHP and JavaScript development in Gutenberg.
 -   [Accessibility Testing](/docs/contributors/accessibility-testing.md) documents the process of testing accessibility in Gutenberg.
 -   [Managing Packages](/docs/contributors/code/managing-packages.md) documents the process for managing the npm packages.
+-   [Testing Published Packages Across WordPress Versions](/docs/contributors/code/package-runtime-compatibility.md) explains how to test package bundles that load dependencies from WordPress.
 -   [Workspace Development](/docs/contributors/code/workspace-development.md) explains how to create and work with internal workspaces under `tools/` and `test/`, and why dependencies belong in a workspace rather than at the repo root.
 -   [Agents and Skills](/docs/contributors/code/agents-and-skills.md) explains how instructions for AI coding agents (`AGENTS.md` files and `.agents/skills/`) are organized, and what to consider before adding more.
 -   [Gutenberg Release Process](/docs/contributors/code/release/README.md) - a checklist for the different types of releases for the Gutenberg project.

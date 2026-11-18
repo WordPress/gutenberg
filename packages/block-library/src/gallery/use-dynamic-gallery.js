@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
@@ -89,7 +82,7 @@ function buildImageBlocks( media, galleryAttributes ) {
  * that own them.
  *
  * @param {Object}   options
- * @param {Object}   options.attributes    The gallery block attributes.
+ * @param {Object}   options.attributes    The gallery block attributes, with `linkTo` defaulted.
  * @param {Function} options.setAttributes The block's `setAttributes`.
  * @param {string}   options.clientId      The block client ID.
  * @param {?number}  options.postId        The current post ID (from block context).
@@ -207,7 +200,7 @@ export default function useDynamicGallery( {
 	// current post. Clearing the inner blocks removes the manually-added images:
 	// they're the gallery's image data, so there's nothing else to reset. The
 	// legacy `images`/`ids` attributes aren't touched — they're back-compat shims
-	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
+	// for the pre-innerBlocks format (see `deprecated.jsx`/`transforms.js`), empty
 	// on any gallery reachable here.
 	function enableDynamicMode() {
 		// Batch the attribute change and the inner-block reset into a single
@@ -216,7 +209,12 @@ export default function useDynamicGallery( {
 		// opening a second undo level, which would otherwise leave the gallery
 		// in a half-switched state (dynamic source set, images still present).
 		registry.batch( () => {
-			setAttributes( { dynamicContent: { source: ATTACHED_MEDIA } } );
+			// The server renders dynamic images from the stored `linkTo`, so
+			// store the link shown in the editor.
+			setAttributes( {
+				dynamicContent: { source: ATTACHED_MEDIA },
+				linkTo: attributes.linkTo,
+			} );
 			__unstableMarkNextChangeAsNotPersistent();
 			replaceInnerBlocks( clientId, [] );
 		} );
@@ -236,13 +234,18 @@ export default function useDynamicGallery( {
 				buildImageBlocks( dynamicMedia, imageAttributes )
 			);
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { dynamicContent: undefined } );
+			// Keep the link the images were built with, since a static
+			// gallery without `linkTo` would derive the site default.
+			setAttributes( {
+				dynamicContent: undefined,
+				linkTo: attributes.linkTo,
+			} );
 		} );
 	}
 
 	// Updates the source ordering within `dynamicContent.args`. Passing
 	// `undefined` (or the default order) strips the keys so they aren't
-	// persisted redundantly and the ToolsPanel item reads as unset.
+	// persisted redundantly and the Settings "Order by" item reads as unset.
 	function setSourceOrder( nextOrderby, nextOrder ) {
 		const nextArgs = { ...dynamicContent?.args };
 		delete nextArgs.orderBy;
@@ -263,13 +266,6 @@ export default function useDynamicGallery( {
 		setAttributes( { dynamicContent: nextSource } );
 	}
 
-	// Resets the source to its bare form: keeps the source kind, drops its args.
-	function resetSource() {
-		setAttributes( {
-			dynamicContent: { source: dynamicContent.source },
-		} );
-	}
-
 	return {
 		dynamicContent,
 		canUseDynamicSource,
@@ -285,6 +281,5 @@ export default function useDynamicGallery( {
 		enableDynamicMode,
 		convertToStatic,
 		setSourceOrder,
-		resetSource,
 	};
 }

@@ -1,5 +1,7 @@
-export interface InputLayoutProps
-	extends Omit< React.HTMLAttributes< HTMLDivElement >, 'prefix' > {
+export interface InputLayoutProps extends Omit<
+	React.HTMLAttributes< HTMLDivElement >,
+	'prefix'
+> {
 	/**
 	 * Whether the field should be visually styled as disabled.
 	 */
@@ -26,8 +28,7 @@ export interface InputLayoutProps
 	suffix?: React.ReactNode;
 }
 
-export interface InputLayoutSlotProps
-	extends React.HTMLAttributes< HTMLDivElement > {
+export interface InputLayoutSlotProps extends React.HTMLAttributes< HTMLDivElement > {
 	/**
 	 * The padding of the slot.
 	 *

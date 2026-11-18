@@ -42,7 +42,7 @@
 
 .guidelines__revision-history-back {
 	align-self: flex-start;
-	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+	// stylelint-disable-next-line logical-css/require-logical-properties -- TODO: Please fix
 	margin-left: -$grid-unit-20;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	color: $gray-900;
@@ -54,7 +54,7 @@
 }
 
 .guidelines__revision-description {
-	// stylelint-disable-next-line plugin/use-logical-properties-and-values -- TODO: Please fix
+	// stylelint-disable-next-line logical-css/require-logical-properties -- TODO: Please fix
 	padding-left: $grid-unit-10;
 }
 

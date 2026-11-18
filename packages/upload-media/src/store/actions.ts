@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
 import { v4 as uuidv4 } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import type { createRegistry } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
 type WPDataRegistry = ReturnType< typeof createRegistry >;
-
-/**
- * Internal dependencies
- */
 import type {
 	AdditionalData,
 	CancelAction,
@@ -60,8 +48,8 @@ type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;

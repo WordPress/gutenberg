@@ -26,9 +26,9 @@ function gutenberg_dir_path() {
  *
  * @since 0.1.0
  *
- * @param  string $path Relative path of the desired file.
+ * @param string $path Relative path of the desired file.
  *
- * @return string       Fully qualified URL pointing to the desired file.
+ * @return string Fully qualified URL pointing to the desired file.
  */
 function gutenberg_url( $path ) {
 	return plugins_url( $path, __DIR__ );
@@ -425,11 +425,12 @@ function gutenberg_define_interactivity_modules_support() {
 		return;
 	}
 
+	/** @var list<array{ id: string, path: string, asset: string, min_only?: true }> $modules */
 	$modules = require $modules_registry_file;
 
 	// Add client navigation support to block library modules.
 	foreach ( $modules as $module ) {
-		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) && method_exists( 'WP_Interactivity_API', 'add_client_navigation_support_to_script_module' ) ) {
+		if ( str_starts_with( $module['id'], '@wordpress/block-library' ) ) {
 			wp_interactivity()->add_client_navigation_support_to_script_module( $module['id'] );
 		}
 	}

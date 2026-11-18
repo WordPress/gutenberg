@@ -1,12 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { getBlockType } from '@wordpress/blocks';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext, useMemo, useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
@@ -17,11 +11,6 @@ import {
 	setStyle as setStyleHelper,
 	setSetting as setSettingHelper,
 } from '@wordpress/global-styles-engine';
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import BlockPreviewPanel from './block-preview-panel';
 import { Subtitle } from './subtitle';
@@ -29,13 +18,18 @@ import {
 	useBlockVariations,
 	VariationsPanel,
 } from './variations/variations-panel';
-import { useStyle, useSetting } from './hooks';
+import {
+	useStyle,
+	useSetting,
+	useStyleWithResolvedBackground,
+	useCanEditCSS,
+} from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates, getValidViewportStates } from './utils';
 
 // Initial control values.
-const BACKGROUND_BLOCK_DEFAULT_VALUES = {
+export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 	backgroundSize: 'cover',
 	backgroundPosition: '50% 50%', // used only when backgroundSize is 'contain'.
 };
@@ -73,6 +67,47 @@ function applyAllFallbackStyles( border: any ) {
 	}
 
 	return applyFallbackStyle( border );
+}
+
+/**
+ * Prepares a style object from the border panel for storing in Global Styles.
+ *
+ * @param newStyle The style object as the border panel produced it.
+ * @return The style object with its border ready to store.
+ */
+export function normalizeBorderStyle( newStyle: any ) {
+	if ( ! newStyle?.border ) {
+		return newStyle;
+	}
+
+	// As Global Styles can't conditionally generate styles based on if
+	// other style properties have been set, we need to force split
+	// border definitions for user set global border styles. Border
+	// radius is derived from the same property i.e. `border.radius` if
+	// it is a string that is used. The longhand border radii styles are
+	// only generated if that property is an object.
+	//
+	// For borders (color, style, and width) those are all properties on
+	// the `border` style property. This means if the theme.json defined
+	// split borders and the user condenses them into a flat border or
+	// vice-versa we'd get both sets of styles which would conflict.
+	const { radius, ...newBorder } = newStyle.border;
+	const border = applyAllFallbackStyles( newBorder );
+	const updatedBorder = ! hasSplitBorders( border )
+		? {
+				top: border,
+				right: border,
+				bottom: border,
+				left: border,
+			}
+		: {
+				color: null,
+				style: null,
+				width: null,
+				...border,
+			};
+
+	return { ...newStyle, border: { ...updatedBorder, radius } };
 }
 
 const {
@@ -163,6 +198,11 @@ function ScreenBlock( {
 		false,
 		hasSelectedState ? stateParam : undefined
 	);
+	// The Default state a selected state layers over.
+	const [ baseStyle ] = useStyle( prefix, name, 'merged', false );
+	const baseValue = hasSelectedState ? baseStyle : undefined;
+	const inheritedStyleWithResolvedBackground =
+		useStyleWithResolvedBackground( inheritedStyle );
 
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
@@ -227,21 +267,7 @@ function ScreenBlock( {
 	);
 	const hasVariationsPanel =
 		!! blockVariations?.length && ! variation && ! hasSelectedState;
-	const { canEditCSS } = useSelect( ( select ) => {
-		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
-			select( coreStore );
-
-		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
-		const globalStyles = globalStylesId
-			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
-			: undefined;
-
-		return {
-			canEditCSS: !! ( globalStyles as GlobalStylesConfig )?._links?.[
-				'wp:action-edit-css'
-			],
-		};
-	}, [] );
+	const canEditCSS = useCanEditCSS();
 	const currentBlockStyle = variation
 		? blockVariations.find( ( s: any ) => s.name === variation )
 		: null;
@@ -326,41 +352,8 @@ function ScreenBlock( {
 			setStyle( styleWithoutSettings );
 		}
 	};
-	const onChangeBorders = ( newStyle: any ) => {
-		if ( ! newStyle?.border ) {
-			setStyle( newStyle );
-			return;
-		}
-
-		// As Global Styles can't conditionally generate styles based on if
-		// other style properties have been set, we need to force split
-		// border definitions for user set global border styles. Border
-		// radius is derived from the same property i.e. `border.radius` if
-		// it is a string that is used. The longhand border radii styles are
-		// only generated if that property is an object.
-		//
-		// For borders (color, style, and width) those are all properties on
-		// the `border` style property. This means if the theme.json defined
-		// split borders and the user condenses them into a flat border or
-		// vice-versa we'd get both sets of styles which would conflict.
-		const { radius, ...newBorder } = newStyle.border;
-		const border = applyAllFallbackStyles( newBorder );
-		const updatedBorder = ! hasSplitBorders( border )
-			? {
-					top: border,
-					right: border,
-					bottom: border,
-					left: border,
-			  }
-			: {
-					color: null,
-					style: null,
-					width: null,
-					...border,
-			  };
-
-		setStyle( { ...newStyle, border: { ...updatedBorder, radius } } );
-	};
+	const onChangeBorders = ( newStyle: any ) =>
+		setStyle( normalizeBorderStyle( newStyle ) );
 
 	return (
 		<>
@@ -400,23 +393,23 @@ function ScreenBlock( {
 				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
+					baseValue={ baseValue }
 					onChange={ onChangeTypography }
 					settings={ settings }
 					// Only expose global-settings controls (e.g. "Indent all
 					// paragraphs") when not editing a state-specific variation,
 					// because those settings are global and cannot be per-breakpoint.
 					isGlobalStyles={ ! hasSelectedState }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBackgroundPanel && (
 				<StylesBackgroundPanel
-					inheritedValue={ inheritedStyle }
+					inheritedValue={ inheritedStyleWithResolvedBackground }
 					value={ style }
+					baseValue={ baseValue }
 					onChange={ setStyle }
 					settings={ settings }
 					defaultValues={ BACKGROUND_BLOCK_DEFAULT_VALUES }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ shouldShowFiltersPanel && (
@@ -426,7 +419,6 @@ function ScreenBlock( {
 					onChange={ setStyle }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasDimensionsPanel && (
@@ -436,7 +428,6 @@ function ScreenBlock( {
 					onChange={ onChangeDimensions }
 					settings={ settings }
 					includeLayoutControls
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasBorderPanel && (
@@ -445,7 +436,6 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ onChangeBorders }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasColorPanel && (
@@ -454,7 +444,6 @@ function ScreenBlock( {
 					value={ style }
 					onChange={ setStyle }
 					settings={ settings }
-					showInheritanceLabelIndicators={ false }
 				/>
 			) }
 			{ hasImageSettingsPanel && ! hasSelectedState && (

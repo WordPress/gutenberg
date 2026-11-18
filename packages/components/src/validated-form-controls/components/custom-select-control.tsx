@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import CustomSelectControl from '../../custom-select-control';
 
@@ -21,6 +14,10 @@ const UnforwardedValidatedCustomSelectControl = (
 	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLSelectElement >( null );
+	const getInteractiveTarget = () =>
+		validityTargetRef.current?.previousElementSibling?.querySelector< HTMLButtonElement >(
+			'[role="combobox"]'
+		);
 
 	return (
 		<div
@@ -28,10 +25,12 @@ const UnforwardedValidatedCustomSelectControl = (
 			ref={ forwardedRef }
 		>
 			<ControlWithError
+				className="components-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ getInteractiveTarget }
 			>
 				<CustomSelectControl
 					// TODO: Upstream limitation - Required isn't passed down correctly,
@@ -44,15 +43,10 @@ const UnforwardedValidatedCustomSelectControl = (
 				ref={ validityTargetRef }
 				required={ required }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				value={ restProps.value?.key ? 'hasvalue' : '' }
 				onChange={ () => {} }
-				onFocus={ ( e ) => {
-					e.target.previousElementSibling
-						?.querySelector< HTMLButtonElement >(
-							'[role="combobox"]'
-						)
-						?.focus();
-				} }
+				onFocus={ () => getInteractiveTarget()?.focus() }
 			>
 				<option value="">No selection</option>
 				<option value="hasvalue">Has selection</option>

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Fit Text', () => {
@@ -30,7 +27,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -102,7 +99,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {
@@ -284,7 +281,7 @@ test.describe( 'Fit Text', () => {
 				.click();
 			await page
 				.getByRole( 'menu', { name: 'Typography options' } )
-				.getByRole( 'menuitemcheckbox', { name: 'Show Fit text' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Fit text, show' } )
 				.click();
 
 			const fitTextToggle = page.getByRole( 'checkbox', {

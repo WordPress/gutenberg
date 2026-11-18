@@ -2,9 +2,11 @@ import { cloneElement, type VNode } from 'preact';
 import { useLayoutEffect } from 'preact/hooks';
 import { signal, type Signal } from '@preact/signals';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { warn } from '../utils';
 import { getScope, navigationContextSignal } from '../scopes';
-import { warnUniqueIdNotSupported } from './utils/warnings';
+import {
+	warnSuffixNotSupported,
+	warnUniqueIdNotSupported,
+} from './utils/warnings';
 
 /**
  * Relates each router region with its current vDOM content. Used by the
@@ -31,9 +33,7 @@ directive(
 
 		if ( entry.suffix ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
-				warn(
-					`Suffixes for the data-wp-router-region directive are not supported. Ignoring the directive with suffix "${ entry.suffix }".`
-				);
+				warnSuffixNotSupported( 'router-region', entry.suffix );
 			}
 			return;
 		}

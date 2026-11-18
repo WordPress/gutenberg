@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { CRDT_AUTOSAVE_SNAPSHOT_KEY } = unlock( coreDataPrivateApis );
@@ -46,6 +39,7 @@ export function localAutosaveSet(
 		post_title: title,
 		content,
 		excerpt,
+		time: Date.now(),
 	};
 
 	// During real-time collaboration, record which shared document state this

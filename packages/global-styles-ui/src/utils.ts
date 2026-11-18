@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	areGlobalStylesEqual,
 	privateApis as globalStylesEnginePrivateApis,
@@ -10,13 +7,11 @@ import type {
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+const { getViewportBreakpoints, resolveStyle } = unlock(
+	globalStylesEnginePrivateApis
+);
 
 /**
  * State definition with value and label.
@@ -57,6 +52,12 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
  */
 export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 	'core/button': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
+	'core/navigation-link': [
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
 		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
@@ -254,116 +255,6 @@ export function getFontFamilies( themeJson: any ): [ any, any ] {
 	return [ bodyFontFamily, headingFontFamily ];
 }
 
-function findNearest( input: number, numbers: number[] ): number | null {
-	// If the numbers array is empty, return null
-	if ( numbers.length === 0 ) {
-		return null;
-	}
-	// Sort the array based on the absolute difference with the input
-	numbers.sort( ( a, b ) => Math.abs( input - a ) - Math.abs( input - b ) );
-	// Return the first element (which will be the nearest) from the sorted array
-	return numbers[ 0 ];
-}
-
-function extractFontWeights( fontFaces: any[] ): number[] {
-	const result: number[] = [];
-
-	fontFaces.forEach( ( face ) => {
-		const weights = String( face.fontWeight ).split( ' ' );
-
-		if ( weights.length === 2 ) {
-			const start = parseInt( weights[ 0 ] );
-			const end = parseInt( weights[ 1 ] );
-
-			for ( let i = start; i <= end; i += 100 ) {
-				result.push( i );
-			}
-		} else if ( weights.length === 1 ) {
-			result.push( parseInt( weights[ 0 ] ) );
-		}
-	} );
-
-	return result;
-}
-
-/*
- * Format the font family to use in the CSS font-family property of a CSS rule.
- *
- * The input can be a string with the font family name or a string with multiple font family names separated by commas.
- * It follows the recommendations from the CSS Fonts Module Level 4.
- * https://www.w3.org/TR/css-fonts-4/#font-family-prop
- *
- * @param input - The font family.
- * @return The formatted font family.
- */
-export function formatFontFamily( input: string ): string {
-	// Matches strings that are not exclusively alphabetic characters or hyphens, and do not exactly follow the pattern generic(alphabetic characters or hyphens).
-	const regex = /^(?!generic\([ a-zA-Z\-]+\)$)(?!^[a-zA-Z\-]+$).+/;
-	const output = input.trim();
-
-	const formatItem = ( item: string ) => {
-		item = item.trim();
-		if ( item.match( regex ) ) {
-			// removes leading and trailing quotes.
-			item = item.replace( /^["']|["']$/g, '' );
-			return `"${ item }"`;
-		}
-		return item;
-	};
-
-	if ( output.includes( ',' ) ) {
-		return output
-			.split( ',' )
-			.map( formatItem )
-			.filter( ( item ) => item !== '' )
-			.join( ', ' );
-	}
-
-	return formatItem( output );
-}
-
-/**
- * Gets the preview style for a font family.
- *
- * @param family The font family object
- * @return CSS style object for the font family
- */
-export function getFamilyPreviewStyle( family: any ): React.CSSProperties {
-	const style: React.CSSProperties = {
-		fontFamily: formatFontFamily( family.fontFamily ),
-	};
-
-	if ( ! Array.isArray( family.fontFace ) ) {
-		style.fontWeight = '400';
-		style.fontStyle = 'normal';
-		return style;
-	}
-
-	if ( family.fontFace ) {
-		//get all the font faces with normal style
-		const normalFaces = family.fontFace.filter(
-			( face: any ) =>
-				face?.fontStyle && face.fontStyle.toLowerCase() === 'normal'
-		);
-		if ( normalFaces.length > 0 ) {
-			style.fontStyle = 'normal';
-			const normalWeights = extractFontWeights( normalFaces );
-			const nearestWeight = findNearest( 400, normalWeights );
-			style.fontWeight = String( nearestWeight ) || '400';
-		} else {
-			style.fontStyle =
-				( family.fontFace.length && family.fontFace[ 0 ].fontStyle ) ||
-				'normal';
-			style.fontWeight =
-				( family.fontFace.length &&
-					String( family.fontFace[ 0 ].fontWeight ) ) ||
-				'400';
-		}
-	}
-
-	return style;
-}
-
 /**
  * Iterates through the presets array and searches for slugs that start with the specified
  * slugPrefix followed by a numerical suffix. It identifies the highest numerical suffix found
@@ -405,4 +296,101 @@ export function getNewIndexFromPresets(
 		return currentHighest;
 	}, 0 );
 	return highestPresetValue + 1;
+}
+
+// Heading blocks render at any level, so every heading screen shares one list.
+const HEADING_ELEMENTS = [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
+
+// Has no block styles, so resolving with it leaves only the root and element
+// layers, while `{ ref }` values can still point into `styles.blocks`.
+const ELEMENT_ONLY_BLOCK_NAME = 'core/__element-only';
+
+function getElementKeys( element: string ): string[] {
+	return HEADING_ELEMENTS.includes( element )
+		? HEADING_ELEMENTS
+		: [ element ];
+}
+
+// State and viewport styles go to other selectors, so they cannot override
+// the element itself.
+function isOwnStylePath( path: string ) {
+	return ! path.startsWith( ':' ) && ! path.startsWith( '@' );
+}
+
+const BOX_SIDES = [ 'top', 'right', 'bottom', 'left' ];
+
+// Shorthands whose longhands live elsewhere in the tree. Nested longhands,
+// such as `border.radius.topLeft` or `spacing.padding.top`, sit under their
+// shorthand and match by path.
+const SHORTHAND_LONGHANDS: Record< string, string[] > = {
+	'border.color': BOX_SIDES.map( ( side ) => `border.${ side }.color` ),
+	'border.style': BOX_SIDES.map( ( side ) => `border.${ side }.style` ),
+	'border.width': BOX_SIDES.map( ( side ) => `border.${ side }.width` ),
+	// Output as the `background` shorthand.
+	'color.gradient': [
+		'color.background',
+		'background.backgroundImage',
+		'background.backgroundPosition',
+		'background.backgroundRepeat',
+		'background.backgroundSize',
+		'background.backgroundAttachment',
+		'background.backgroundClip',
+	],
+};
+
+function isSameOrNestedPath( path: string, otherPath: string ) {
+	return (
+		path === otherPath ||
+		path.startsWith( `${ otherPath }.` ) ||
+		otherPath.startsWith( `${ path }.` )
+	);
+}
+
+// Whether two paths set any of the same CSS, whichever sets the shorthand.
+function setsSameProperty( path: string, otherPath: string ) {
+	const longhands = SHORTHAND_LONGHANDS[ path ] ?? [ path ];
+	const otherLonghands = SHORTHAND_LONGHANDS[ otherPath ] ?? [ otherPath ];
+	return longhands.some( ( longhand ) =>
+		otherLonghands.some( ( otherLonghand ) =>
+			isSameOrNestedPath( longhand, otherLonghand )
+		)
+	);
+}
+
+/**
+ * The block types an element paints whose own Global Styles beat the element
+ * for at least one property it sets. Block style variations are not counted.
+ *
+ * @param config     Merged Global Styles config.
+ * @param element    Element key, e.g. `heading`, `h2` or `button`.
+ * @param blockNames Block types that paint the element.
+ * @return Block names, in the given order.
+ */
+export function getOverridingBlockTypes(
+	config: GlobalStylesConfig | undefined,
+	element: string,
+	blockNames: string[]
+): string[] {
+	if ( ! blockNames.length || ! config?.styles ) {
+		return [];
+	}
+	const elements = getElementKeys( element );
+	const { sources: elementSources } = resolveStyle( config, {
+		blockName: ELEMENT_ONLY_BLOCK_NAME,
+		elements,
+	} );
+	const elementPaths = Object.keys( elementSources ).filter(
+		( path ) => elementSources[ path ].layer === 'element'
+	);
+	return blockNames.filter( ( blockName ) => {
+		const { sources } = resolveStyle( config, { blockName, elements } );
+		return Object.keys( sources ).some(
+			( path ) =>
+				isOwnStylePath( path ) &&
+				sources[ path ].layer === 'block' &&
+				elementPaths.some( ( elementPath ) =>
+					setsSameProperty( path, elementPath )
+				)
+		);
+	} );
 }

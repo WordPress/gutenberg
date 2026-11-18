@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	test as base,
 	expect,
 	type RequestUtils,
 } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { setCollaboration } from './fixtures/collaboration-utils';
 
 type CreatedPost = {

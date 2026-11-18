@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	recordRequests,
 	waitForRequestsToSettle,
@@ -18,6 +11,8 @@ test.describe( 'Preload', () => {
 	let postId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Panel open state is persisted, and open panels fetch.
+		await requestUtils.resetPreferences();
 		await setCollaboration( requestUtils, true );
 		const post = await requestUtils.createPost( {
 			content:
@@ -92,23 +87,14 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/comments?context=edit&post=${ postId }&type=note&status=all&per_page=100`,
 				'POST /wp-sync/v1/save',
 				'POST /wp-sync/v1/updates',
+				'GET /wp/v2/users?context=view&include%5B0%5D=1&who=authors',
 				'POST /wp/v2/users/me',
 			].sort()
 		);
 	} );
 } );
 
-test.describe( 'Preload with the DataForm inspector experiment', () => {
-	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [
-			'gutenberg-dataform-inspector',
-		] );
-	} );
-
-	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
+test.describe( 'Preload the post summary', () => {
 	test( 'Should serve the view config form request from the preload cache', async ( {
 		page,
 		admin,
@@ -137,7 +123,7 @@ test.describe( 'Preload with the DataForm inspector experiment', () => {
 		expect( preloadStatus ).toBe(
 			'[api-fetch][preload] All preloads consumed.'
 		);
-		// The DataForm-based inspector's form config must be served from the
+		// The post summary's form config must be served from the
 		// preload cache; a real request here means the sidebar renders an
 		// empty form first and flashes once the response arrives.
 		expect(

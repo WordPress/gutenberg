@@ -1,6 +1,6 @@
 import type { Placement } from '@floating-ui/react-dom';
 import type { useFocusOnMount } from '@wordpress/compose';
-import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
+import type { RefObject, ReactNode, SyntheticEvent } from 'react';
 
 type PositionYAxis = 'top' | 'middle' | 'bottom';
 type PositionXAxis = 'left' | 'center' | 'right';
@@ -12,9 +12,7 @@ type DomRectWithOwnerDocument = DOMRect & {
 
 type PopoverPlacement = Placement | 'overlay';
 
-export type PopoverAnchorRefReference = MutableRefObject<
-	Element | null | undefined
->;
+export type PopoverAnchorRefReference = RefObject< Element | null | undefined >;
 export type PopoverAnchorRefTopBottom = { top: Element; bottom: Element };
 
 export type VirtualElement = Pick< Element, 'getBoundingClientRect' > & {
@@ -105,9 +103,15 @@ export type PopoverProps = {
 	 */
 	noArrow?: boolean;
 	/**
-	 * The distance (in px) between the anchor and the popover.
+	 * The distance (in px) between the anchor and the popover. Pass an object to
+	 * also displace the popover along its cross axis.
 	 */
-	offset?: number;
+	offset?:
+		| number
+		| {
+				mainAxis?: number;
+				crossAxis?: number;
+		  };
 	/**
 	 * A callback invoked when the popover should be closed.
 	 */
@@ -188,10 +192,7 @@ export type PopoverProps = {
 	 * @deprecated
 	 */
 	anchorRef?:
-		| Element
-		| PopoverAnchorRefReference
-		| PopoverAnchorRefTopBottom
-		| Range;
+		Element | PopoverAnchorRefReference | PopoverAnchorRefTopBottom | Range;
 	/**
 	 * A function returning the same value as the one expected by the `anchorRect`
 	 * prop, used to specify a dynamic popover position.

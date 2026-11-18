@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/phpstan-tools",
+	"version": "0.0.0",
+	"description": "PHPStan configuration, WordPress stubs generation, and CI reporting for the PHP static analysis of Gutenberg.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"phpstan"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/phpstan/README.md",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/phpstan"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=24.18.0"
+	},
+	"type": "module",
+	"devDependencies": {
+		"@types/node": "^24.13.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"report": "node ./report.ts"
+	}
+}

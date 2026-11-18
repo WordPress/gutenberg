@@ -1,0 +1,118 @@
+{
+	"$schema": "https://www.designtokens.org/schemas/2025.10/resolver.json",
+	"name": "WordPress Design System",
+	"version": "2025.10",
+	"sets": {
+		"base": {
+			"sources": [
+				{ "$ref": "border.json" },
+				{ "$ref": "color.json" },
+				{ "$ref": "cursor.json" },
+				{ "$ref": "dimension.json" },
+				{ "$ref": "motion.json" },
+				{ "$ref": "typography.json" }
+			]
+		}
+	},
+	"modifiers": {
+		"corner-radius": {
+			"default": "subtle",
+			"contexts": {
+				"none": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"xl": { "$value": { "value": 0, "unit": "px" } }
+							}
+						}
+					}
+				],
+				"subtle": [],
+				"moderate": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 6, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 8, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 12, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 16, "unit": "px" }
+								},
+								"xl": {
+									"$value": { "value": 20, "unit": "px" }
+								}
+							}
+						}
+					}
+				],
+				"pronounced": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 18, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 20, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 22, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 24, "unit": "px" }
+								},
+								"xl": {
+									"$value": { "value": 26, "unit": "px" }
+								}
+							}
+						}
+					}
+				]
+			}
+		},
+		"pixel-density": {
+			"default": "standard",
+			"contexts": {
+				"standard": [],
+				"high-dpi": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"width": {
+								"focus": {
+									"$value": { "value": 1.5, "unit": "px" }
+								}
+							}
+						}
+					}
+				]
+			}
+		}
+	},
+	"resolutionOrder": [
+		{ "$ref": "#/sets/base" },
+		{ "$ref": "#/modifiers/corner-radius" },
+		{ "$ref": "#/modifiers/pixel-density" }
+	]
+}

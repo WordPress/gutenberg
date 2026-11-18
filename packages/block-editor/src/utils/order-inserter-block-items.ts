@@ -7,10 +7,10 @@ type EditorInserterItem = { id: string };
  * @param priority The array of block names to be prioritized.
  * @return The sorted array of editor inserter block items.
  */
-export const orderInserterBlockItems = (
-	items: EditorInserterItem[],
+export const orderInserterBlockItems = < T extends EditorInserterItem >(
+	items: T[],
 	priority: string[] | undefined
-) => {
+): T[] => {
 	if ( ! priority ) {
 		return items;
 	}

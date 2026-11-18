@@ -1,16 +1,17 @@
 # WordPress Design System MCP Server
 
 <p class="callout callout-alert">
-This package is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+The Design System MCP server is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
 </p>
 
 An [MCP (Model Context Protocol)](https://modelcontextprotocol.io/) server for the WordPress Design System. Provides AI agents with component documentation, usage examples, and design tokens.
 
 By using the MCP server, you can be confident that your AI agents are correctly following the latest design system guidance when asking questions like:
 
--   Which components should be used for a given interaction or user interface, like a button or a dropdown
--   How to implement those components in code, following sample code from the design system documentation
--   How to implement new components following the design system styling standards with design tokens
+- Which components should be used for a given interaction or user interface, like a button or a dropdown
+- How to implement those components in code, following sample code from the design system documentation
+- How to implement new components following the design system styling standards with design tokens
+- How to compose those components into an interaction, following the design system patterns, like confirming a destructive action or wording an error message
 
 Without the MCP server, an AI agent may produce a functional and convincing result, but there's a higher risk that its resources are out-of-date or inaccurate, and it may try to use components which are no longer recommended for use. Since AI agents are unable to read [the WordPress Gutenberg Storybook documentation](https://wordpress.github.io/gutenberg/), the MCP server provides an alternative, machine-readable interface to that same information.
 
@@ -56,12 +57,22 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 
 Configuration instructions for common clients:
 
--   [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
--   [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
-    -   This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
+- [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
+- [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
+    - This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
 
-## Contributing to this package
+## Importing the package
 
-This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/org/wordpress) and used by [WordPress](https://make.wordpress.org/core/) as well as by the broader JavaScript ecosystem.
+Most people only need the setup instructions above. To embed the server in your own tooling, install the `@wordpress/design-system-mcp` package from npm:
 
-To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+```bash
+npm install @wordpress/design-system-mcp
+```
+
+The package is ESM-only and requires Node.js 22.13.0 or newer. It exports `createServer`, which returns a ready-to-connect MCP server, and the `parseComponents` and `parseComponentDetail` helpers. TypeScript consumers that import the package require TypeScript 5 or newer.
+
+## Contributing
+
+The Design System MCP server is published as the `@wordpress/design-system-mcp` package, an individual package that's part of the [Gutenberg project](https://github.com/WordPress/gutenberg). The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/org/wordpress) and used by [WordPress](https://make.wordpress.org/core/) as well as by the broader JavaScript ecosystem.
+
+To find out more about contributing to the Design System MCP server or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __, isRTL } from '@wordpress/i18n';
@@ -26,7 +23,7 @@ export default function BootBackButton( { length }: { length: number } ) {
 		<Button
 			size="compact"
 			onClick={ handleBack }
-			label={ __( 'Go back' ) }
+			label={ __( 'Back' ) }
 			icon={ isRTL() ? chevronRight : chevronLeft }
 		/>
 	);

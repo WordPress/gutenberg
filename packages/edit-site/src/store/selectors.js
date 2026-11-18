@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector, createSelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 import { TEMPLATE_PART_POST_TYPE } from '../utils/constants';
 import getFilteredTemplatePartBlocks from '../utils/get-filtered-template-parts';

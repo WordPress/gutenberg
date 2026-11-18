@@ -1,16 +1,12 @@
-/**
- * WordPress dependencies
- */
+import { Button } from '@wordpress/components';
 import {
-	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+	Menu,
+} from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
 	aspectRatio as aspectRatioIcon,
-	check,
+	getAspectRatioIcon,
 	rotateLeft,
 	rotateRight,
 	flipHorizontal,
@@ -18,16 +14,8 @@ import {
 	lineSolid,
 	plus,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../../state';
-import {
-	MAX_ZOOM,
-	type AspectRatioPreset,
-} from '../../image-editor/core/constants';
-import { getMinZoom } from '../../image-editor/core/containment';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import { useCropOptions } from '../media-editor/use-crop-options';
 
 /**
@@ -61,6 +49,11 @@ export interface MediaEditorImageControlsProps {
 	 * `DEFAULT_ZOOM_FACTOR` (1.2).
 	 */
 	zoomFactor?: number;
+	/**
+	 * Disable every control. Set while the edit is saving, so the crop the
+	 * request was built from cannot change under it.
+	 */
+	disabled?: boolean;
 }
 
 /**
@@ -74,21 +67,23 @@ export interface MediaEditorImageControlsProps {
  * @param props.showAspectRatioControl
  * @param props.aspectRatioPresets
  * @param props.zoomFactor
+ * @param props.disabled
  */
 export default function MediaEditorImageControls( {
 	withLabels = false,
 	showAspectRatioControl = false,
 	aspectRatioPresets,
 	zoomFactor = DEFAULT_ZOOM_FACTOR,
+	disabled = false,
 }: MediaEditorImageControlsProps ) {
-	const { state, setFlip, snapRotate90, setZoom } = useMediaEditor();
+	const { state, setFlip, snapRotate90, setZoom, minZoom, maxZoom } =
+		useMediaEditor().imageEditor;
 	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
 		useCropOptions( { aspectRatioPresets } );
 	const hasAspectRatioControl = ! withLabels && showAspectRatioControl;
-	const minZoom = getMinZoom( state );
 	const zoomByFactor = ( factor: number ) => {
 		setZoom(
-			Math.min( MAX_ZOOM, Math.max( minZoom, state.zoom * factor ) )
+			Math.min( maxZoom, Math.max( minZoom, state.zoom * factor ) )
 		);
 	};
 
@@ -99,6 +94,8 @@ export default function MediaEditorImageControls( {
 				icon={ rotateLeft }
 				label={ __( 'Rotate 90° counter-clockwise' ) }
 				showTooltip
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () => snapRotate90( -1 ) }
 			/>
 			<Button
@@ -106,6 +103,8 @@ export default function MediaEditorImageControls( {
 				icon={ rotateRight }
 				label={ __( 'Rotate 90° clockwise' ) }
 				showTooltip
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () => snapRotate90( 1 ) }
 			/>
 		</>
@@ -119,6 +118,8 @@ export default function MediaEditorImageControls( {
 				label={ __( 'Flip horizontal' ) }
 				showTooltip
 				isPressed={ state.flip.horizontal }
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () =>
 					setFlip( {
 						horizontal: ! state.flip.horizontal,
@@ -132,6 +133,8 @@ export default function MediaEditorImageControls( {
 				label={ __( 'Flip vertical' ) }
 				showTooltip
 				isPressed={ state.flip.vertical }
+				disabled={ disabled }
+				accessibleWhenDisabled
 				onClick={ () =>
 					setFlip( {
 						horizontal: state.flip.horizontal,
@@ -149,7 +152,7 @@ export default function MediaEditorImageControls( {
 				icon={ plus }
 				label={ __( 'Zoom in' ) }
 				showTooltip
-				disabled={ state.zoom >= MAX_ZOOM }
+				disabled={ disabled || state.zoom >= maxZoom }
 				accessibleWhenDisabled
 				onClick={ () => zoomByFactor( zoomFactor ) }
 			/>
@@ -158,7 +161,7 @@ export default function MediaEditorImageControls( {
 				icon={ lineSolid }
 				label={ __( 'Zoom out' ) }
 				showTooltip
-				disabled={ state.zoom <= minZoom }
+				disabled={ disabled || state.zoom <= minZoom }
 				accessibleWhenDisabled
 				onClick={ () => zoomByFactor( 1 / zoomFactor ) }
 			/>
@@ -166,35 +169,48 @@ export default function MediaEditorImageControls( {
 	);
 
 	const aspectRatioDropdown = hasAspectRatioControl ? (
-		<DropdownMenu
-			icon={ aspectRatioIcon }
-			label={ __( 'Aspect ratio' ) }
-			popoverProps={ { placement: 'top' } }
-			toggleProps={ { size: 'compact' } }
-		>
-			{ ( { onClose } ) => (
-				<MenuGroup label={ __( 'Aspect ratio' ) }>
-					{ aspectRatioOptions.map( ( preset ) => {
-						const value = preset.value.toString();
-						const isSelected = value === aspectRatioValue;
-						return (
-							<MenuItem
-								key={ value }
-								role="menuitemradio"
-								isSelected={ isSelected }
-								icon={ isSelected ? check : undefined }
-								onClick={ () => {
-									setAspectRatioValue( value );
-									onClose();
-								} }
-							>
-								{ preset.label }
-							</MenuItem>
-						);
-					} ) }
-				</MenuGroup>
-			) }
-		</DropdownMenu>
+		<Menu.Root>
+			<Menu.Trigger
+				disabled={ disabled }
+				render={
+					<Button
+						size="compact"
+						icon={ aspectRatioIcon }
+						label={ __( 'Aspect ratio' ) }
+						accessibleWhenDisabled
+					/>
+				}
+			/>
+			<Menu.Popup
+				positioner={ <Menu.Positioner side="top" align="center" /> }
+			>
+				<Menu.RadioGroup
+					value={ aspectRatioValue }
+					onValueChange={ ( value ) => {
+						if ( ! disabled ) {
+							setAspectRatioValue( value );
+						}
+					} }
+				>
+					<Menu.GroupLabel>{ __( 'Aspect ratio' ) }</Menu.GroupLabel>
+					{ aspectRatioOptions.map( ( preset ) => (
+						<Menu.RadioItem
+							key={ preset.value }
+							value={ preset.value.toString() }
+							closeOnClick
+							disabled={ disabled }
+							prefix={
+								<Menu.PrefixIcon
+									icon={ getAspectRatioIcon( preset.value ) }
+								/>
+							}
+						>
+							<Menu.ItemLabel>{ preset.label }</Menu.ItemLabel>
+						</Menu.RadioItem>
+					) ) }
+				</Menu.RadioGroup>
+			</Menu.Popup>
+		</Menu.Root>
 	) : null;
 
 	if ( withLabels ) {

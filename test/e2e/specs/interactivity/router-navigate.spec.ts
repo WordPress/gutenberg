@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Router navigate', () => {
@@ -155,6 +152,9 @@ test.describe( 'Router navigate', () => {
 		await expect( navigations ).toHaveText( '2' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
+		// Wait until both requests are held by the route handler, so the next
+		// `pop()` releases the request of the latest navigation.
+		await expect.poll( () => resolvers.length ).toBe( 2 );
 
 		resolvers.pop()!();
 
@@ -324,7 +324,7 @@ test.describe( 'Router navigate', () => {
 		// Navigate to a page without clientNavigationDisabled.
 		await page.getByTestId( 'link 4' ).click();
 
-		// Check the page has updated and the navigation was successfull.
+		// Check the page has updated and the navigation was successful.
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
 		await expect( count ).toHaveText( '1' );

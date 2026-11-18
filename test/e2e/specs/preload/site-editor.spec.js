@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
 const {
 	recordRequests,
 	waitForRequestsToSettle,
@@ -17,6 +10,11 @@ test.describe( 'Preload', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.resetPreferences();
+		// Posts left behind by earlier specs change the startup requests:
+		// with at least one post, emptytheme's index template query loop
+		// renders the Post Excerpt block, whose editor component fetches
+		// /wp/v2/types/post?context=edit.
+		await requestUtils.deleteAllPosts();
 		const pg = await requestUtils.createPage( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -87,10 +85,12 @@ test.describe( 'Preload', () => {
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
 				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
+				'GET /wp/v2/templates?context=edit&per_page=100&post_type=page',
 				'GET /wp/v2/types/page?context=edit',
-				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',
+				'GET /wp/v2/users?context=view&include%5B0%5D=1&who=authors',
 				'GET /wp/v2/view-config?kind=postType&name=page',
+				'GET /wp/v2/view-config?kind=postType&name=page&_fields=form',
 				'OPTIONS /wp/v2/settings',
 				'OPTIONS /wp/v2/templates',
 				'POST /wp/v2/users/me',

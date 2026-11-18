@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
@@ -8,10 +5,6 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {

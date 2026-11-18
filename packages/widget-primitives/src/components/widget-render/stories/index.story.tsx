@@ -1,38 +1,34 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentType } from 'react';
-
-/**
- * WordPress dependencies
- */
-// Form controls read these stylesheets, normally enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
+import type { ComponentPropsWithoutRef, ComponentType } from 'react';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import {
 	Suspense,
+	forwardRef,
 	useEffect,
 	useId,
 	useMemo,
 	useState,
 } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { globe, starFilled } from '@wordpress/icons';
 // `IconButton` is not on the recommended list yet.
-/* eslint-disable @wordpress/use-recommended-components */
-import { Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
-
-/**
- * Internal dependencies
- */
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Button,
+	Card,
+	Icon,
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	IconButton,
+	Link,
+	Stack,
+} from '@wordpress/ui';
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';
+import { useWidgetIdentity } from '../../../widget-identity';
+import { HostLink, WidgetHostProvider } from '../../../widget-host';
+import type { WidgetHost, WidgetHostLinks } from '../../../widget-host';
 import type {
 	WidgetAction,
 	WidgetAttributeField,
@@ -163,7 +159,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -221,6 +218,81 @@ The minimal contract between a host and a widget:
 - The widget writes back through \`setAttributes\`, which the host provides. The "Next world" button calls it from inside the widget, and the host applies the change.
 
 The primitive resolves the render component with \`lazy()\`, so the surrounding \`Suspense\` boundary, and with it the loading UI, is a host decision.
+`,
+			},
+		},
+	},
+};
+
+function IdentityWidget() {
+	const { title } = useWidgetIdentity();
+	const accessibleName = title
+		? sprintf(
+				/* translators: %s: widget title */
+				__( 'Chart: %s' ),
+				title
+			)
+		: __( 'Chart' );
+
+	return (
+		<figure
+			aria-label={ accessibleName }
+			style={ {
+				background: 'var(--wpds-color-background-surface-info-weak)',
+				border: '1px solid var(--wpds-color-stroke-surface-neutral)',
+				borderRadius: 'var(--wpds-border-radius-md)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-sm)',
+				justifyItems: 'center',
+				margin: 0,
+				padding: 'var(--wpds-dimension-padding-xl)',
+			} }
+		>
+			<strong style={ { fontSize: '1.25em' } }>
+				{ title ?? 'Untitled' }
+			</strong>
+			<span style={ { opacity: 0.75 } }>
+				{ title
+					? `Accessible name: ${ accessibleName }`
+					: 'No identity provided' }
+			</span>
+		</figure>
+	);
+}
+
+const identityWidgetType: WidgetType = {
+	apiVersion: 1,
+	name: 'demo/sales-by-device',
+	title: 'Sales by device',
+	description:
+		'Demo widget that reads its type title through useWidgetIdentity.',
+	renderModule: 'demo/widgets/sales-by-device/render',
+};
+
+const resolveIdentityModule = async () => ( {
+	default: IdentityWidget as ComponentType< WidgetRenderProps< unknown > >,
+} );
+
+function WithIdentityStory() {
+	return (
+		<Suspense fallback={ null }>
+			<WidgetRender
+				widgetType={ identityWidgetType }
+				attributes={ {} }
+				resolveWidgetModule={ resolveIdentityModule }
+			/>
+		</Suspense>
+	);
+}
+
+export const WithIdentity: StoryObj = {
+	render: () => <WithIdentityStory />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+\`WidgetRender\` lends the type's identity into the subtree. The widget reads the translated \`title\` with \`useWidgetIdentity\`: it names a \`figure\` for assistive technology and shows the same string in the body.
 `,
 			},
 		},
@@ -538,7 +610,7 @@ export const WithRelevance: StoryObj = {
 		docs: {
 			description: {
 				story: `
-Each attribute may carry a \`relevance\` hint (\`'high' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
+Each attribute may carry a \`relevance\` hint (\`'high' | 'medium' | 'low'\`). The widget declares importance; the host chooses the surface. When absent, treat the hint as \`'low'\`.
 
 **In this demo**
 
@@ -845,6 +917,192 @@ Beyond its data, a widget can declare \`actions\`: verbs a user can trigger, lik
 **Takeaway**
 
 The widget names the intent and how it is fulfilled; the host mounts the primitive and places it, so the widget never knows its surface.
+`,
+			},
+		},
+	},
+};
+
+/*
+ * The demo application's router. The link and the capability are module
+ * constants: the provider memoizes on the value's identity, so a fresh
+ * object per render would remount every anchor below it.
+ */
+const DEMO_ROUTE_PREFIX = 'admin.php?page=demo-dashboard&p=';
+const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
+
+const RouteLink = forwardRef<
+	HTMLAnchorElement,
+	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
+>( function UnforwardedRouteLink( { path, onClick, children, ...props }, ref ) {
+	return (
+		<a
+			ref={ ref }
+			href={ path }
+			{ ...props }
+			onClick={ ( event ) => {
+				onClick?.( event );
+				event.preventDefault();
+				window.dispatchEvent(
+					new CustomEvent( DEMO_NAVIGATE_EVENT, { detail: path } )
+				);
+			} }
+		>
+			{ children }
+		</a>
+	);
+} );
+
+const demoLinks: WidgetHostLinks = {
+	match: ( href ) =>
+		href.startsWith( DEMO_ROUTE_PREFIX )
+			? decodeURIComponent( href.slice( DEMO_ROUTE_PREFIX.length ) )
+			: null,
+	Link: RouteLink,
+};
+
+const DEMO_HOST: WidgetHost = { links: demoLinks };
+const NO_CAPABILITIES: WidgetHost = {};
+
+const hostLinkWidgetType: WidgetType< DemoAttributes > = {
+	...demoWidgetType,
+	actions: [
+		{
+			id: 'see-report',
+			label: 'See report',
+			href: `${ DEMO_ROUTE_PREFIX }${ encodeURIComponent(
+				'/reports?by=world'
+			) }`,
+		},
+		...( actionsWidgetType.actions ?? [] ),
+	] satisfies WidgetAction[],
+};
+
+function WidgetWithHostLink() {
+	const titleId = useId();
+	const actions = hostLinkWidgetType.actions ?? [];
+	const [ hasCapability, setHasCapability ] = useState( true );
+	const [ lastPath, setLastPath ] = useState< string | null >( null );
+	const [ attributes ] = useState< DemoAttributes >( {
+		...hostLinkWidgetType.example?.attributes,
+	} );
+
+	useEffect( () => {
+		const onNavigate = ( event: Event ) =>
+			setLastPath( ( event as CustomEvent< string > ).detail );
+
+		window.addEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+		return () =>
+			window.removeEventListener( DEMO_NAVIGATE_EVENT, onNavigate );
+	}, [] );
+
+	let status = 'Pick "See report": its target is a route this host owns.';
+	if ( ! hasCapability ) {
+		status = 'No links capability: every action is a plain anchor.';
+	} else if ( lastPath ) {
+		status = `Client-side navigation to ${ lastPath }; the document never reloaded.`;
+	}
+
+	return (
+		<WidgetHostProvider
+			value={ hasCapability ? DEMO_HOST : NO_CAPABILITIES }
+		>
+			<Stack direction="column" gap="md" style={ { maxWidth: 560 } }>
+				<Stack direction="row" align="center" gap="md" wrap="wrap">
+					<Button
+						variant="outline"
+						size="compact"
+						onClick={ () => {
+							setHasCapability( ! hasCapability );
+							setLastPath( null );
+						} }
+					>
+						{ hasCapability
+							? 'Remove the capability'
+							: 'Provide the capability' }
+					</Button>
+					<p
+						role="status"
+						style={ {
+							margin: 0,
+							color: 'var(--wpds-color-foreground-content-neutral-weak)',
+							fontSize: 'var(--wpds-typography-font-size-sm)',
+						} }
+					>
+						{ status }
+					</p>
+				</Stack>
+
+				<Card.Root render={ <section /> } aria-labelledby={ titleId }>
+					<Card.Header>
+						<Stack direction="column" gap="sm">
+							<Stack direction="row" align="center" gap="sm">
+								{ hostLinkWidgetType.icon && (
+									<span aria-hidden="true">
+										<Icon
+											icon={ hostLinkWidgetType.icon }
+										/>
+									</span>
+								) }
+								<Card.Title id={ titleId } render={ <h3 /> }>
+									{ hostLinkWidgetType.title }
+								</Card.Title>
+							</Stack>
+
+							{ /* One composition per action, whatever the target. */ }
+							<Stack
+								direction="row"
+								align="center"
+								gap="md"
+								wrap="wrap"
+							>
+								{ actions.map( ( action ) => (
+									<Link
+										key={ action.id }
+										download={ action.download }
+										openInNewTab={ action.openInNewTab }
+										render={
+											<HostLink href={ action.href } />
+										}
+									>
+										{ action.label }
+									</Link>
+								) ) }
+							</Stack>
+						</Stack>
+					</Card.Header>
+					<Card.Content>
+						<Suspense fallback={ null }>
+							<WidgetRender< DemoAttributes >
+								widgetType={ hostLinkWidgetType }
+								attributes={ attributes }
+								resolveWidgetModule={ resolveDemoModule }
+							/>
+						</Suspense>
+					</Card.Content>
+				</Card.Root>
+			</Stack>
+		</WidgetHostProvider>
+	);
+}
+
+export const WithHostLink: StoryObj = {
+	render: () => <WidgetWithHostLink />,
+	parameters: {
+		docs: {
+			description: {
+				story: `
+The widget declares where to go; the application decides how to get there. \`HostLink\` is the anchor that carries the decision: it reads the \`links\` capability, mounts the application's own link for a target \`match\` recognizes, and a plain anchor for everything else.
+
+**In this demo**
+
+- The host provides a router that owns \`admin.php?page=demo-dashboard&p=…\`. "See report" targets one of its routes, so it navigates client-side and the status line records the path; the document never reloads.
+- "Open docs" opens another origin in a new tab and "Export greeting" downloads a file. Neither routes: a new document leaves the application, so \`HostLink\` keeps the plain anchor without asking the host.
+- **Remove the capability** drops \`links\` from the host bag. The declarations do not change, and every action falls back to a plain anchor.
+
+**Takeaway**
+
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`ButtonLink\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
 `,
 			},
 		},

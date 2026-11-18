@@ -15,7 +15,7 @@ This component should be used as a child of a `<BlockControls>` component.
 The URL of the media.
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 ### mediaId
 
@@ -29,14 +29,14 @@ The Id of the attachment post type for the current media.
 A list of media types allowed to replace the current media.
 
 -   Type: `Array`
--   Required: Yes
+-   Required: No
 
 ### accept
 
 Comma delimited list of MIME types accepted for upload.
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 ### onFilesUpload
 

@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import {
 	defineProxy,
 	type Adapter,
 	type SendMessage,
 	type OnMessage,
 } from 'comctx';
-
-/**
- * Internal dependencies
- */
 import { WORKER_SYMBOL, type Remote, type WithWorker } from './types';
 
 /**

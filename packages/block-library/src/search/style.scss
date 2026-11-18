@@ -37,7 +37,7 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	max-width: 100%;
 }
 
-.wp-block-search__label {
+:where(.wp-block-search__label) {
 	width: 100%;
 }
 
@@ -80,6 +80,15 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 			flex-grow: 0;
 			margin: 0;
 			flex-basis: 0;
+		}
+	}
+
+	// Don't clip the focus indicator of the button while the field is collapsed.
+	&.wp-block-search__searchfield-hidden:focus-within {
+		overflow: visible;
+
+		.wp-block-search__inside-wrapper {
+			overflow: visible;
 		}
 	}
 }

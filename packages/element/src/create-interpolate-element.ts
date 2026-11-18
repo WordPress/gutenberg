@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import {
 	createElement,
 	cloneElement,
@@ -202,7 +199,7 @@ function proceed( conversionMap: Record< string, ReactElement > ): boolean {
 	const [ tokenType, name, startOffset, tokenLength ] = next;
 	const stackDepth = stack.length;
 	const leadingTextStart = startOffset > offset ? offset : null;
-	if ( name && ! conversionMap[ name ] ) {
+	if ( name && ! Object.keys( conversionMap ).includes( name ) ) {
 		addText();
 		return false;
 	}

@@ -7,6 +7,7 @@
 	color: $gray-900;
 	height: 100%;
 	overflow: auto;
+	width: 100vw;
 
 	@include break-medium() {
 		width: $sidebar-width;

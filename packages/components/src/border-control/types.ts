@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ColorPaletteProps } from '../color-palette/types';
 import type { PopoverProps } from '../popover/types';
 import type { ToggleGroupControlProps } from '../toggle-group-control/types';

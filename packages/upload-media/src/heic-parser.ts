@@ -512,6 +512,17 @@ function readItemData(
 ): Uint8Array {
 	const baseOffset = loc.constructionMethod === 1 ? idatOffset : 0;
 
+	// An extent past the end of the buffer means the file was cut short,
+	// usually a partial copy or download. Slicing it would silently hand the
+	// decoder an empty or partial bitstream.
+	for ( const ext of loc.extents ) {
+		if ( baseOffset + ext.offset + ext.length > buffer.byteLength ) {
+			throw new Error(
+				'HEIC item data extends past the end of the file'
+			);
+		}
+	}
+
 	if ( loc.extents.length === 1 ) {
 		const ext = loc.extents[ 0 ];
 		const start = baseOffset + ext.offset;

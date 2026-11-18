@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { blockManagement, downloadableBlocks, errorNotices } from '../reducer';
 import { blockTypeInstalled, downloadableBlock } from './fixtures';
 

@@ -25,6 +25,15 @@
 		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -34,8 +43,14 @@
 				"link": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"shadow": true,
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"margin": true
 		},
 		"typography": {
 			"fontSize": true,

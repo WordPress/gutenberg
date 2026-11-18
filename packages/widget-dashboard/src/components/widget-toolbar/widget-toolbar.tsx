@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { useReserveHeaderPadding } from '../widget-header/widget-header-fit';
-import styles from './widget-toolbar.module.css';
+import styles from './widget-toolbar.module.scss';
 
 export interface WidgetToolbarProps {
 	/**

@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { InputControl } from '../input-control';
 import { Text } from '../text';
-import { COLORS } from '../utils/colors-values';
+import styles from './style.module.scss';
 import type { StateReducer } from '../input-control/reducer/state';
 import type { HexInputProps } from './types';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
@@ -47,8 +36,8 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	return (
 		<InputControl
 			prefix={
-				<InputControlPrefixWrapper>
-					<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+				<InputControlPrefixWrapper className={ styles.prefix }>
+					<Text color="inherit" lineHeight={ 1 }>
 						#
 					</Text>
 				</InputControlPrefixWrapper>

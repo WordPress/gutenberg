@@ -9,5 +9,28 @@
 	"icon": "core/shield",
 	"category": "site",
 	"presentation": "framed",
-	"textdomain": "default"
+	"textdomain": "default",
+	"actions": [
+		{
+			"id": "site-health-details",
+			"label": "Details",
+			"icon": "core/chart-bar",
+			"relevance": "high",
+			"href": "admin.php?page=dashboard-wp-admin&p=/site-health"
+		},
+		{
+			"id": "site-health-status",
+			"label": "Status",
+			"icon": "dashboard-widgets/seen",
+			"relevance": "low",
+			"href": "site-health.php"
+		},
+		{
+			"id": "site-health-info",
+			"label": "Info",
+			"icon": "core/info",
+			"relevance": "low",
+			"href": "site-health.php?tab=debug"
+		}
+	]
 }

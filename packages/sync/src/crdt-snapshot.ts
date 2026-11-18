@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as buffer from 'lib0/buffer';
-
-/**
- * Internal dependencies
- */
 import type { CRDTDoc } from './types';
 
 /**

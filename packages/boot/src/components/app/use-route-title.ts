@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore, type UnstableBase } from '@wordpress/core-data';
@@ -8,10 +5,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { decodeEntities } from '@wordpress/html-entities';
 import { privateApis as routePrivateApis } from '@wordpress/route';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 
 const { useLocation, useMatches } = unlock( routePrivateApis );
@@ -27,8 +20,7 @@ export default function useRouteTitle() {
 	const matches = useMatches();
 	const currentMatch = matches[ matches.length - 1 ];
 	const routeTitle = ( currentMatch?.loaderData as any )?.title as
-		| string
-		| undefined;
+		string | undefined;
 
 	const siteTitle = useSelect(
 		( select ) =>
