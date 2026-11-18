@@ -277,6 +277,8 @@ export function ItemPrimaryActions< Item >( {
 				item={ item }
 				actions={ primaryActions }
 				registry={ registry }
+				// Link-like, to set them apart from the content around them.
+				buttonVariant="tertiary"
 			/>
 		</Stack>
 	);
