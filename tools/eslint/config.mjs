@@ -1139,7 +1139,9 @@ export default dedupePlugins( [
 	},
 
 	// Override: bundled packages — restrict private-apis imports, both direct
-	// and via each package's local `lock-unlock` wrapper module.
+	// and via each package's local `lock-unlock` wrapper module. Development
+	// files such as tests and stories are excluded, because plugins do not
+	// bundle them.
 	// `packages/ui` is excluded because this entry would replace its more
 	// specific overrides above; it gets the same restriction through
 	// `UI_RESTRICTED_IMPORTS`. `packages/e2e-test-utils-playwright` is
@@ -1153,6 +1155,7 @@ export default dedupePlugins( [
 					'packages/e2e-test-utils-playwright/**',
 				].includes( files )
 		),
+		ignores: developmentFiles,
 		rules: {
 			'no-restricted-imports': [
 				'error',
