@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 16.2.0 (2026-11-18)
+
 ### New Features
 
 -   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).

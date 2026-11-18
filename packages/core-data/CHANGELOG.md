@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Fix `deleteEntityRecord` failing after a successful delete when the record had been fetched on its own with a query, such as `_embed` ([#86408](https://github.com/WordPress/gutenberg/pull/86408)).
