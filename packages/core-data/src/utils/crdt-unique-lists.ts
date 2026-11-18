@@ -110,13 +110,6 @@ export function findUniqueLists(
 /**
  * Get the ID of a list item. Two items with the same ID are the same item.
  *
- * @example
- * ```js
- * getItemId( 12 ); // => '12'
- * getItemId( 'keynote' ); // => 'keynote'
- * getItemId( { id: 12 } ); // => undefined
- * ```
- *
  * @param item List item.
  * @return The ID, or undefined when the item is not a string or number.
  */
@@ -131,12 +124,6 @@ function getItemId( item: unknown ): string | undefined {
 /**
  * Index the items of a list by their ID. Items without an ID are skipped, and
  * so are items whose ID was already seen.
- *
- * @example
- * ```js
- * getItemsById( [ 7, 3, 7, { id: 4 } ] );
- * // => Map { '7' => 7, '3' => 3 }
- * ```
  *
  * @param value Value that may be a list of items.
  * @return The items by ID, in the order of the list.
@@ -164,11 +151,6 @@ const idCollator = new Intl.Collator( 'en', { numeric: true } );
 
 /**
  * Sort item IDs into the order that items have when no order is stored.
- *
- * @example
- * ```js
- * sortIds( [ '12', '3', '7' ] ); // => [ '3', '7', '12' ]
- * ```
  *
  * @param ids Item IDs.
  * @return A sorted copy.
@@ -198,23 +180,6 @@ function sortIds( ids: string[] ): string[] {
 /**
  * Return a copy of an object with the value at a path replaced. An undefined
  * replacement removes the property, and with it any parent left empty.
- *
- * @example
- * ```js
- * const path = [ 'metadata', 'noteId' ];
- *
- * // Set a value. Missing parents are created.
- * setValueAtPath( { metadata: { name: 'Intro' } }, path, [ 3, 7 ] );
- * // => { metadata: { name: 'Intro', noteId: [ 3, 7 ] } }
- *
- * // Remove a value.
- * setValueAtPath( { metadata: { name: 'Intro', noteId: [ 3 ] } }, path, undefined );
- * // => { metadata: { name: 'Intro' } }
- *
- * // Remove a value that was the only property of its parent.
- * setValueAtPath( { metadata: { noteId: [ 3 ] } }, path, undefined );
- * // => {}
- * ```
  *
  * @param object   Object to copy.
  * @param path     Property names to follow.
@@ -334,33 +299,6 @@ export function expandUniqueLists(
  * Items follow the stored order. Items that the stored order does not mention
  * come last, sorted by ID. That happens when a collaborator adds an item while
  * another one changes the order.
- *
- * @example
- * ```js
- * // `metadata.noteId` is a list of unique numbers.
- * collapseUniqueLists(
- *     {
- *         metadata: { name: 'Intro' },
- *         'metadata.noteId#7': 7,
- *         'metadata.noteId#3': 3,
- *     },
- *     lists
- * );
- * // => { metadata: { name: 'Intro', noteId: [ 3, 7 ] } }
- *
- * // `tags` is a list of unique strings. The order was stored before
- * // `panel` was added.
- * collapseUniqueLists(
- *     {
- *         'tags#keynote': 'keynote',
- *         'tags#panel': 'panel',
- *         'tags#talk': 'talk',
- *         'tags@order': [ 'talk', 'keynote' ],
- *     },
- *     lists
- * );
- * // => { tags: [ 'talk', 'keynote', 'panel' ] }
- * ```
  *
  * @param attributes Block attributes from the shared document.
  * @param lists      Lists of unique items of the block type.
