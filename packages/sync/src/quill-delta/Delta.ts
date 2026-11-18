@@ -885,6 +885,9 @@ class Delta {
 		const insertLength = nextDiffInsert.length;
 		const insertOffset = cursorAfterChange - segmentStart - insertLength;
 
+		// Ensure the insertion point falls on a token boundary. If the offset
+		// falls inside an atomic token (such as an HTML tag), moving the insertion
+		// here would split the token across diff segments.
 		if (
 			! isOffsetOnTokenBoundary(
 				diff.value,
@@ -981,6 +984,9 @@ class Delta {
 		const deletedChars = diff.value;
 		const deleteOffset = cursorAfterChange - prevSegmentStart;
 
+		// Ensure both the start and end of the deleted region align with token
+		// boundaries. If either offset falls inside an atomic token, moving the
+		// deletion here would slice open or split the token.
 		if (
 			! isOffsetOnTokenBoundary(
 				prevDiff.value,
@@ -1118,4 +1124,4 @@ class Delta {
 }
 
 export default Delta;
-export { Op, OpIterator, AttributeMap };
+export { Op, OpIterator, AttributeMap, isOffsetOnTokenBoundary };
