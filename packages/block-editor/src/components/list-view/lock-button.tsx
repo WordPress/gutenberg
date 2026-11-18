@@ -45,8 +45,9 @@ interface ListViewLockButtonProps {
  *   pointer, to change each property.
  *
  * A pattern's layout is the pattern's, so it neither counts as a lock here nor
- * changes. A block inside a pattern is edited content only, so its button is
- * disabled, but stays focusable so its label can say why. A block inside any
+ * changes. A block inside a pattern is edited content only, so it shows a
+ * partial lock. Its button is disabled, but stays focusable so its label can
+ * say why. A block inside any
  * other locked block controls its own lock, so its button works.
  */
 const ListViewLockButton = forwardRef<
@@ -84,7 +85,9 @@ const ListViewLockButton = forwardRef<
 	// not of a block inside a pattern, whose lock is the pattern's.
 	const hasMenu = canLock && ! lockingSection;
 	let icon = lockOpen;
-	if ( isLocked ) {
+	// A block inside a pattern is partly locked by the pattern, whose content
+	// stays editable, unless its own lock is full.
+	if ( isLocked || lockingSection ) {
 		icon = lockType === 'full' ? lock : lockDashed;
 	}
 

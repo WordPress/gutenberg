@@ -22,7 +22,8 @@ import type { BlockLockControlProps } from './types';
  * Once unlocked, the button stays until the toolbar remounts and shows it.
  */
 function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
-	const { canLock, hasOwnLock, lockType } = useBlockLock( clientId );
+	const { canLock, hasOwnLock, lockType, lockingSection } =
+		useBlockLock( clientId );
 	const lockBlocks = useLockBlocks();
 	const unlockBlocks = useUnlockBlocks();
 	const [ button, setButton ] = useState< HTMLButtonElement | null >( null );
@@ -30,14 +31,21 @@ function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 	const [ menuAnchorRect, setMenuAnchorRect ] = useState< DOMRect | null >(
 		null
 	);
-	const hasMenu = canLock;
+	// A block inside a pattern is locked by the pattern, so its lock can't
+	// change.
+	const isDisabled = !! lockingSection || ! canLock;
+	const hasMenu = ! isDisabled;
 
 	let icon = lockOpen;
-	if ( hasOwnLock ) {
+	// A block inside a pattern is partly locked by the pattern, whose content
+	// stays editable, unless its own lock is full.
+	if ( hasOwnLock || lockingSection ) {
 		icon = lockType === 'full' ? lock : lockDashed;
 	}
 	let label: string = hasOwnLock ? __( 'Unlock' ) : __( 'Lock' );
-	if ( ! canLock ) {
+	if ( lockingSection ) {
+		label = __( 'Locked by Pattern' );
+	} else if ( ! canLock ) {
 		label = __( 'Locked' );
 	}
 
@@ -47,7 +55,7 @@ function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 				ref={ setButton }
 				icon={ icon }
 				label={ label }
-				disabled={ ! canLock }
+				disabled={ isDisabled }
 				accessibleWhenDisabled
 				onClick={ () => {
 					if ( hasOwnLock ) {
@@ -79,7 +87,10 @@ function BlockLockToolbarMenu( { clientId }: BlockLockControlProps ) {
 export default function BlockLockToolbar( {
 	clientId,
 }: BlockLockControlProps ) {
-	const { canLock, isLocked } = useBlockLock( clientId );
+	const { canLock, isLocked, lockingSection } = useBlockLock( clientId );
+	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
+	// With the lock menu, a block inside a pattern shows the pattern's lock.
+	const hasLock = isLocked || ( isLockMenuEnabled && !! lockingSection );
 	const isEditedPattern = useSelect(
 		( select ) =>
 			unlockPrivateApis(
@@ -92,12 +103,12 @@ export default function BlockLockToolbar( {
 		( isActive: boolean ) => ! isActive,
 		false
 	);
-	const [ hasLockButtonShown, setHasLockButtonShown ] = useState( isLocked );
+	const [ hasLockButtonShown, setHasLockButtonShown ] = useState( hasLock );
 
 	// Once shown, keep the button until the toolbar remounts. Removing it
 	// early, e.g. when unlocking from the modal, would lose the focus the
 	// modal needs to return to it.
-	if ( isLocked && ! hasLockButtonShown ) {
+	if ( hasLock && ! hasLockButtonShown ) {
 		setHasLockButtonShown( true );
 	}
 
@@ -105,7 +116,7 @@ export default function BlockLockToolbar( {
 		return null;
 	}
 
-	if ( window.__experimentalBlockLockMenu ) {
+	if ( isLockMenuEnabled ) {
 		// A pattern being edited is temporarily unlocked, so it shows no lock.
 		return isEditedPattern ? null : (
 			<BlockLockToolbarMenu clientId={ clientId } />
