@@ -1,10 +1,12 @@
 import type {
+	FocusEvent,
 	KeyboardEvent,
 	MutableRefObject,
 	ReactNode,
 	Ref,
 	RefObject,
 } from 'react';
+import type { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/compose';
 import type {
 	FetchLinkSuggestionsHandler,
 	LinkControlSuggestion,
@@ -80,7 +82,7 @@ export interface URLInputInputProps {
 	onChange: ( newValue: string ) => void;
 	onCompositionStart: () => void;
 	onCompositionEnd: () => void;
-	onFocus: () => void;
+	onFocus: ( event: FocusEvent< HTMLInputElement > ) => void;
 	onKeyDown: ( event: KeyboardEvent< HTMLInputElement > ) => void;
 	placeholder: string;
 	role: string;
@@ -134,6 +136,11 @@ export interface URLInputProps {
 	 * field and popover
 	 */
 	className?: string | null;
+	/**
+	 * Closes the suggestions list when focus moves outside the input and its
+	 * suggestions, or when Escape is pressed.
+	 */
+	closeSuggestionsOnNavigateOutside?: boolean;
 	/**
 	 * The validity reported on the field.
 	 */
@@ -208,6 +215,7 @@ export interface URLInputSuggestionsListProps {
 	className: string | null | undefined;
 	handleSuggestionClick: ( suggestion: LinkControlSuggestion ) => void;
 	isLoading: boolean;
+	navigateOutsideProps: ReturnType< typeof useFocusOutside > | undefined;
 	renderSuggestions: URLInputProps[ '__experimentalRenderSuggestions' ];
 	selectedSuggestion: number | null;
 	suggestionNodesRef: MutableRefObject< ( HTMLElement | null )[] >;
