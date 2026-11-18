@@ -71,3 +71,76 @@ describe( 'Page navigation', () => {
 		expect( link ).toHaveAttribute( 'href', '/overview' );
 	} );
 } );
+
+describe( 'Page breadcrumbs', () => {
+	const breadcrumbs = [
+		{ label: 'Settings', href: '/settings' },
+		{ label: 'General' },
+	];
+
+	it( 'should name the region from the last breadcrumb', () => {
+		render(
+			<Page showSidebarToggle={ false } breadcrumbs={ breadcrumbs }>
+				<div>Content</div>
+			</Page>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'General' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should name the region from `ariaLabel` before the last breadcrumb', () => {
+		render(
+			<Page
+				showSidebarToggle={ false }
+				breadcrumbs={ breadcrumbs }
+				ariaLabel="General settings"
+			>
+				<div>Content</div>
+			</Page>
+		);
+
+		expect(
+			screen.getByRole( 'region', { name: 'General settings' } )
+		).toBeInTheDocument();
+	} );
+
+	it( 'should render the last breadcrumb as a heading at `headingLevel`', () => {
+		render(
+			<Page
+				showSidebarToggle={ false }
+				breadcrumbs={ breadcrumbs }
+				headingLevel={ 2 }
+			>
+				<div>Content</div>
+			</Page>
+		);
+
+		expect( screen.getByRole( 'heading', { level: 2 } ) ).toHaveTextContent(
+			'General'
+		);
+	} );
+
+	it( 'should render breadcrumb links with the provided link component', () => {
+		const CustomLink = ( { children, ...props }: NavigationLinkProps ) => (
+			<a data-custom="true" { ...props }>
+				{ children }
+			</a>
+		);
+
+		render(
+			<Page
+				showSidebarToggle={ false }
+				components={ { link: CustomLink } }
+				breadcrumbs={ breadcrumbs }
+			>
+				<div>Content</div>
+			</Page>
+		);
+
+		const link = screen.getByRole( 'link', { name: 'Settings' } );
+		expect( link ).toHaveAttribute( 'data-custom', 'true' );
+		expect( link ).toHaveAttribute( 'href', '/settings' );
+	} );
+} );

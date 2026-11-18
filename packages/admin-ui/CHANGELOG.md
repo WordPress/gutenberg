@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Page`: The `breadcrumbs` prop now takes an array of `{ label, href }` items in place of a `Breadcrumbs` element. Links render through `components.link`, like `navigation`, so pass your router's link component there. The page region takes its name from the last item when it has no `ariaLabel` or string `title`. The `Breadcrumbs` component is no longer exported, and the package no longer depends on `@wordpress/route`.
+
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).

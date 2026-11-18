@@ -1,5 +1,5 @@
-import type { KeyboardEvent, ReactNode } from 'react';
-import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import type { ComponentPropsWithoutRef, KeyboardEvent, ReactNode } from 'react';
+import { Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import type { Action } from '@wordpress/dataviews';
@@ -13,6 +13,7 @@ import {
 } from '@wordpress/media-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
+	Link,
 	privateApis as routePrivateApis,
 	useNavigate,
 	useParams,
@@ -30,6 +31,16 @@ import './style.scss';
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { MediaEditor } = unlock( mediaEditorPrivateApis );
 const { useCanGoBack } = unlock( routePrivateApis );
+
+/**
+ * Renders `Page` links with the router, which takes the path as `to`.
+ */
+function RouterLink( {
+	href,
+	...props
+}: ComponentPropsWithoutRef< 'a' > & { href: string } ) {
+	return <Link to={ href } { ...props } />;
+}
 
 /**
  * The stage only renders a form, so it requests the `form` of the entity view
@@ -307,22 +318,18 @@ function MediaEditorRoute() {
 					>
 						<Page
 							className="media-editor-route"
-							ariaLabel={ title }
 							breadcrumbs={
-								<Breadcrumbs
-									items={
-										isStandaloneAdminPage
-											? [ { label: title } ]
-											: [
-													{
-														label: __( 'Media' ),
-														to: MEDIA_LIST_PATH,
-													},
-													{ label: title },
-												]
-									}
-								/>
+								isStandaloneAdminPage
+									? [ { label: title } ]
+									: [
+											{
+												label: __( 'Media' ),
+												href: MEDIA_LIST_PATH,
+											},
+											{ label: title },
+										]
 							}
+							components={ { link: RouterLink } }
 							badges={
 								<MediaEditorFileDetails
 									fileType={ fileType }
