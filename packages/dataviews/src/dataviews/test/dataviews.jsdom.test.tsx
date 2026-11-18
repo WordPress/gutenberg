@@ -806,6 +806,35 @@ describe( 'DataViews component', () => {
 				).toBeInTheDocument();
 			} );
 
+			it( 'should show destructive primary actions in a destructive color', () => {
+				render(
+					<DataViewWrapper
+						view={ {
+							...DEFAULT_VIEW,
+							fields: [ 'order' ],
+							titleField: 'title',
+						} }
+						actions={ [
+							...primaryActions,
+							{
+								id: 'trash',
+								label: 'Trash',
+								isPrimary: true,
+								isDestructive: true,
+								callback: vi.fn(),
+							},
+						] }
+					/>
+				);
+				const [ titleCell ] = getFirstRowCells();
+				expect(
+					within( titleCell ).getByRole( 'button', { name: 'Trash' } )
+				).toHaveClass( 'is-destructive' );
+				expect(
+					within( titleCell ).getByRole( 'button', { name: 'Edit' } )
+				).not.toHaveClass( 'is-destructive' );
+			} );
+
 			it( 'should render the primary actions in the actions column when there is no primary column', () => {
 				render(
 					<DataViewWrapper

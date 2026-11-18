@@ -664,6 +664,12 @@ interface ActionBase< Item > {
 	disabled?: boolean;
 
 	/**
+	 * Whether the action deletes data, in which case its button is shown in a
+	 * destructive (red) color.
+	 */
+	isDestructive?: boolean;
+
+	/**
 	 * Whether the action is a primary action.
 	 */
 	isPrimary?: boolean;

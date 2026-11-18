@@ -1115,6 +1115,13 @@ Whether the action should be displayed inline (primary) or only displayed in the
 -   Type: `boolean`
 -   Optional
 
+### `isDestructive`
+
+Whether the action deletes data, in which case its button is shown in a destructive (red) color. The action should still ask for confirmation, for example in its modal.
+
+-   Type: `boolean`
+-   Optional
+
 ### `icon`
 
 Icon to show for primary actions.

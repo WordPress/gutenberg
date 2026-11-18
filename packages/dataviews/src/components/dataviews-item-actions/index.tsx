@@ -78,6 +78,7 @@ function ButtonTrigger< Item >( {
 		<Button
 			disabled={ !! action.disabled }
 			accessibleWhenDisabled
+			isDestructive={ action.isDestructive }
 			size="compact"
 			variant={ variant }
 			onClick={ onClick }

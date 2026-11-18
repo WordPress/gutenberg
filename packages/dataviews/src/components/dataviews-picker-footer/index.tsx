@@ -113,7 +113,14 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, icon, isPrimary, isEligible, callback } = action;
+				const {
+					id,
+					icon,
+					isPrimary,
+					isDestructive,
+					isEligible,
+					callback,
+				} = action;
 
 				// `items` holds the current page's selection only, so an
 				// action without `isEligible` stays enabled for a selection
@@ -130,6 +137,7 @@ function ActionButtons< Item >( {
 						key={ id }
 						accessibleWhenDisabled
 						icon={ icon }
+						isDestructive={ isDestructive }
 						disabled={
 							isInProgress ||
 							! selection?.length ||

@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Add the `isDestructive` property to actions, to show the buttons of actions that delete data in a destructive (red) color ([#86247](https://github.com/WordPress/gutenberg/pull/86247)).
 -   Show the primary actions of table rows below the title, so the actions column only holds the actions menu ([#86247](https://github.com/WordPress/gutenberg/pull/86247)).
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
