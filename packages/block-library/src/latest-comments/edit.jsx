@@ -1,7 +1,6 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	RangeControl,
-	SelectControl as WCSelectControl,
 	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -10,6 +9,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
+import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
@@ -25,6 +25,12 @@ const MIN_COMMENTS = 1;
  * @type {number}
  */
 const MAX_COMMENTS = 100;
+
+const DISPLAY_CONTENT_ITEMS = [
+	{ label: __( 'No content' ), value: 'none' },
+	{ label: __( 'Excerpt' ), value: 'excerpt' },
+	{ label: __( 'Full content' ), value: 'full' },
+];
 
 export default function LatestComments( { attributes, setAttributes, name } ) {
 	const { commentsToShow, displayAvatar, displayDate, displayContent } =
@@ -106,18 +112,17 @@ export default function LatestComments( { attributes, setAttributes, name } ) {
 						}
 						isShownByDefault
 					>
-						<WCSelectControl
+						<SelectControl
 							label={ __( 'Display content' ) }
-							value={ displayContent }
-							options={ [
-								{ label: __( 'No content' ), value: 'none' },
-								{ label: __( 'Excerpt' ), value: 'excerpt' },
-								{ label: __( 'Full content' ), value: 'full' },
-							] }
-							onChange={ ( value ) =>
-								setAttributes( {
-									displayContent: value,
-								} )
+							items={ DISPLAY_CONTENT_ITEMS }
+							value={
+								DISPLAY_CONTENT_ITEMS.find(
+									( item ) => item.value === displayContent
+								) ?? DISPLAY_CONTENT_ITEMS[ 0 ]
+							}
+							onValueChange={ ( item ) =>
+								item &&
+								setAttributes( { displayContent: item.value } )
 							}
 						/>
 					</ToolsPanelItem>

@@ -36,6 +36,27 @@ describe( 'assignFixedIssues', () => {
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
 	} );
 
+	it( 'ignores keywords followed by a plain number', async () => {
+		const payload = {
+			pull_request: {
+				body: 'This resolves 1 of the 226 errors initially baselined.',
+			},
+		};
+		const octokit = {
+			rest: {
+				issues: {
+					addAssignees: vi.fn(),
+					addLabels: vi.fn(),
+				},
+			},
+		};
+
+		await assignFixedIssues( payload, octokit );
+
+		expect( octokit.rest.issues.addAssignees ).not.toHaveBeenCalled();
+		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
+	} );
+
 	it( 'assigns and labels fixed issues', async () => {
 		const payload = {
 			pull_request: {

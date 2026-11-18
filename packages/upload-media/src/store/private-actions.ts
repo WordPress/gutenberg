@@ -11,7 +11,11 @@ import {
 	isHeicFile,
 	renameFile,
 } from '../utils';
-import { canvasConvertToJpeg, HeicUnsupportedError } from '../canvas-utils';
+import {
+	canvasConvertToJpeg,
+	HeicUnsupportedError,
+	type JpegEncoder,
+} from '../canvas-utils';
 import { getHeicUnsupportedMessage } from '../heic-support';
 import { getUnappliedExifOrientation } from '../heic-parser';
 import {
@@ -27,6 +31,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
+	vipsEncodeCanvasAsJpeg,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	terminateVipsWorker,
@@ -919,10 +924,19 @@ export function prepareItem( id: QueueItemId ) {
 			// and upload the resulting JPEG. The server then handles it like
 			// any normal JPEG (threshold scaling, sub-sizes, etc.).
 			// This matches iOS behavior where HEIC is converted on the fly.
+			//
+			// When vips is available it encodes the decoded pixels so the
+			// source EXIF block carries over into the JPEG; the canvas
+			// encoder used otherwise produces a JPEG without metadata.
+			const encode: JpegEncoder | undefined = isClientSideMediaSupported()
+				? ( canvas, quality ) =>
+						vipsEncodeCanvasAsJpeg( id, canvas, heicFile, quality )
+				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(
 					heicFile,
-					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY
+					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
+					encode
 				);
 			} catch ( error ) {
 				/*
@@ -1886,11 +1900,29 @@ export function generateThumbnails( id: QueueItemId ) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
-					const bitmap = await createImageBitmap( thumbnailSource );
-					const needsScaling =
-						bitmap.width > bigImageSizeThreshold ||
-						bitmap.height > bigImageSizeThreshold;
-					bitmap.close();
+					//
+					// Some browsers cannot decode every image that the wasm-vips
+					// pipeline above was able to decode (e.g. certain JPEGs), which
+					// makes createImageBitmap() reject. Treat that as "no scaling
+					// needed" rather than letting the rejection bubble up and skip
+					// finishOperation() below, which would otherwise leave the item
+					// stuck in THUMBNAIL_GENERATION and cause it to be reprocessed
+					// (and its sub-sizes re-queued) indefinitely.
+					let needsScaling = false;
+					try {
+						const bitmap =
+							await createImageBitmap( thumbnailSource );
+						needsScaling =
+							bitmap.width > bigImageSizeThreshold ||
+							bitmap.height > bigImageSizeThreshold;
+						bitmap.close();
+					} catch ( err ) {
+						// eslint-disable-next-line no-console
+						console.warn(
+							'Could not determine whether the image exceeds the big image size threshold; skipping the scaled version.',
+							err
+						);
+					}
 
 					if ( needsScaling ) {
 						// Rename sourceFile to match the server attachment filename.

@@ -7,7 +7,7 @@
 	"references": [
 		{ "path": "./tsconfig.build.json" },
 		{ "path": "../api-fetch/tsconfig.build.json" },
-		{ "path": "../blocks" },
+		{ "path": "../blocks/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data/tsconfig.build.json" },

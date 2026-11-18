@@ -13,6 +13,11 @@ import PluginSidebar from '../plugin-sidebar';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
+import {
+	DEFAULT_NOTES_FILTERS,
+	NotesFilters,
+	hasActiveNotesFilters,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { AddNoteToolbarButton } from './add-note-toolbar-button';
@@ -33,15 +38,15 @@ function NotesSidebar( { postId, drafts } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	const { clientId, isClassicBlock } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName } =
+	const { clientIds, isClassicBlock } = useSelect( ( select ) => {
+		const { getSelectedBlockClientIds, getBlockName } =
 			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
+		const _clientIds = getSelectedBlockClientIds();
 		return {
-			clientId: _clientId,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
+			clientIds: _clientIds,
+			isClassicBlock: _clientIds.some(
+				( id ) => getBlockName( id ) === 'core/freeform'
+			),
 		};
 	}, [] );
 	const { notesDisplayMode, selectedNoteId, isAllNotesSidebarOpen } =
@@ -75,6 +80,8 @@ function NotesSidebar( { postId, drafts } ) {
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
 	const areNotesHidden = notesDisplayMode === 'hidden';
+	const [ filters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
@@ -91,7 +98,12 @@ function NotesSidebar( { postId, drafts } ) {
 	const showFloatingNotes =
 		hasFloatingNotes && ! areNotesHidden && ! isAllNotesSidebarOpen;
 
-	function focusNote( { targetClientId, noteId: targetNoteId, isApproved } ) {
+	function focusNote( {
+		targetClientIds,
+		noteId: targetNoteId,
+		isApproved,
+	} ) {
+		const [ targetClientId ] = targetClientIds;
 		if ( ! targetClientId ) {
 			return;
 		}
@@ -110,7 +122,7 @@ function NotesSidebar( { postId, drafts } ) {
 		}
 
 		if ( targetNoteId === 'new' ) {
-			onStart( targetClientId );
+			onStart( targetClientIds );
 		}
 
 		// A special case for the List View, where block selection isn't required to trigger an action.
@@ -118,9 +130,9 @@ function NotesSidebar( { postId, drafts } ) {
 		pickNote( targetNoteId, targetClientId, { focus: true } );
 	}
 
-	function addNewNoteForBlock( targetClientId ) {
+	function addNewNote( targetClientIds ) {
 		return focusNote( {
-			targetClientId,
+			targetClientIds,
 			noteId: 'new',
 			isApproved: false,
 		} );
@@ -130,10 +142,10 @@ function NotesSidebar( { postId, drafts } ) {
 		'core/editor/new-note',
 		( event ) => {
 			event.preventDefault();
-			addNewNoteForBlock( clientId );
+			addNewNote( clientIds );
 		},
 		{
-			isDisabled: isClassicBlock || ! clientId,
+			isDisabled: isClassicBlock || ! clientIds.length,
 		}
 	);
 
@@ -144,19 +156,17 @@ function NotesSidebar( { postId, drafts } ) {
 				selectedId={ selectedNoteId }
 				isHidden={ areNotesHidden && ! isAllNotesSidebarOpen }
 			/>
-			<AddNoteMenuItem
-				onClick={ ( menuClientId ) =>
-					addNewNoteForBlock( menuClientId )
-				}
-			/>
+			<AddNoteMenuItem onClick={ addNewNote } />
 			{ notes.length > 0 && (
 				<AddNoteToolbarButton
 					count={
-						notes.filter(
-							( thread ) => thread.blockClientId === clientId
+						notes.filter( ( thread ) =>
+							clientIds.some( ( id ) =>
+								thread.blockClientIds.includes( id )
+							)
 						).length
 					}
-					onClick={ addNewNoteForBlock }
+					onClick={ addNewNote }
 				/>
 			) }
 			<NotesDisplayModeMenu
@@ -177,8 +187,19 @@ function NotesSidebar( { postId, drafts } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
+					{ ( notes.length > 0 ||
+						hasActiveNotesFilters( filters ) ) && (
+						<NotesFilters
+							filters={ filters }
+							onChange={ setFilters }
+						/>
+					) }
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<Notes
+							notes={ notes }
+							sidebarRef={ sidebarRef }
+							filters={ filters }
+						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }

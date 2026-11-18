@@ -193,7 +193,6 @@ export type BlockGapValue = string | { top?: string; left?: string };
  */
 export interface BlockMetadata {
 	name?: string;
-	noteId?: unknown;
 	blockVisibility?: BlockVisibility;
 	[ key: string ]: unknown;
 }
@@ -251,6 +250,7 @@ export interface AlignAttributes {
 export interface AlignEditProps {
 	name: string;
 	align?: string;
+	clientId: string;
 	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
 }
 

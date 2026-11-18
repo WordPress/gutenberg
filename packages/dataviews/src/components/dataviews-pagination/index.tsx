@@ -1,12 +1,25 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
 import { Button } from '@wordpress/components';
-import { createInterpolateElement, memo, useContext } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	memo,
+	useContext,
+	useState,
+} from '@wordpress/element';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import { next, previous } from '@wordpress/icons';
-import { Select, Stack } from '@wordpress/ui';
+import { Input, Select, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import type { View } from '../../types';
+
+/**
+ * Above this many pages the page select gives way to a number input. A list
+ * of hundreds of pages is slower to scan than typing the page number, and
+ * rendering one option per page freezes the browser once a dataset runs to
+ * tens of thousands of pages.
+ */
+const MAX_PAGE_SELECT_PAGES = 100;
 
 export function hasPaginationControls(
 	view: View,
@@ -16,6 +29,55 @@ export function hasPaginationControls(
 		! view.infiniteScrollEnabled &&
 		paginationInfo.totalItems > 0 &&
 		paginationInfo.totalPages > 1
+	);
+}
+
+function PageNumberInput( {
+	currentPage,
+	totalPages,
+	onChangePage,
+}: {
+	currentPage: number;
+	totalPages: number;
+	onChangePage: ( page: number ) => void;
+} ) {
+	// What the user has typed but not committed; `null` shows the page.
+	const [ draft, setDraft ] = useState< string | null >( null );
+
+	const commit = () => {
+		setDraft( null );
+		const page = Number.parseInt( draft ?? '', 10 );
+		if ( Number.isNaN( page ) ) {
+			return;
+		}
+		const nextPage = Math.min( Math.max( page, 1 ), totalPages );
+		if ( nextPage !== currentPage ) {
+			onChangePage( nextPage );
+		}
+	};
+
+	return (
+		<Input
+			className="dataviews-pagination__page-input"
+			type="number"
+			size="compact"
+			min={ 1 }
+			max={ totalPages }
+			value={ draft ?? currentPage.toString() }
+			onValueChange={ setDraft }
+			onBlur={ commit }
+			onKeyDown={ ( event ) => {
+				if ( event.key === 'Enter' ) {
+					event.preventDefault();
+					commit();
+				}
+			} }
+			aria-label={ __( 'Current page' ) }
+			style={ {
+				'--dataviews-pagination-page-input-digits':
+					totalPages.toString().length,
+			} }
+		/>
 	);
 }
 
@@ -29,24 +91,25 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 
 	const { totalPages } = paginationInfo;
 	const currentPage = view.page ?? 1;
-	const pageSelectOptions = Array.from( Array( totalPages ) ).map(
-		( _, i ) => {
-			const page = i + 1;
-			return {
-				value: page.toString(),
-				label: page.toString(),
-				'aria-label':
-					currentPage === page
-						? sprintf(
-								// translators: 1: current page number. 2: total number of pages.
-								__( 'Page %1$d of %2$d' ),
-								currentPage,
-								totalPages
-							)
-						: page.toString(),
-			};
-		}
-	);
+	const hasPageInput = totalPages > MAX_PAGE_SELECT_PAGES;
+	const pageSelectOptions = hasPageInput
+		? []
+		: Array.from( Array( totalPages ) ).map( ( _, i ) => {
+				const page = i + 1;
+				return {
+					value: page.toString(),
+					label: page.toString(),
+					'aria-label':
+						currentPage === page
+							? sprintf(
+									// translators: 1: current page number. 2: total number of pages.
+									__( 'Page %1$d of %2$d' ),
+									currentPage,
+									totalPages
+								)
+							: page.toString(),
+				};
+			} );
 
 	return (
 		<Stack
@@ -66,7 +129,15 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 				{
 					div: <div aria-hidden />,
 					// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
-					CurrentPage: (
+					CurrentPage: hasPageInput ? (
+						<PageNumberInput
+							currentPage={ currentPage }
+							totalPages={ totalPages }
+							onChangePage={ ( page ) =>
+								onChangeView( { ...view, page } )
+							}
+						/>
+					) : (
 						<Select.Root
 							value={ currentPage.toString() }
 							onValueChange={ ( newValue ) => {
