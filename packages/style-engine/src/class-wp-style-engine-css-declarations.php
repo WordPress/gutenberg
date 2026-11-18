@@ -44,9 +44,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Adds a single declaration.
 		 *
-		 * @param string $property The CSS property.
-		 * @param string $value    The CSS value.
-		 * @param array  $options  {
+		 * @param string           $property The CSS property.
+		 * @param string|int|float $value    The CSS value. A number, such as `1.5` for `line-height`, is converted to a string.
+		 * @param array            $options  {
 		 *     Optional. An array of options. Default empty array.
 		 *
 		 *     @type bool $important Whether to output the declaration with !important. Default false.
@@ -60,6 +60,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			// Bails early if the property is empty.
 			if ( empty( $property ) ) {
 				return $this;
+			}
+
+			if ( is_int( $value ) || ( is_float( $value ) && is_finite( $value ) ) ) {
+				$value = (string) $value;
 			}
 
 			// Bail early if value is not a string. Prevents fatal errors from malformed block markup.
