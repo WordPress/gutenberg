@@ -4,7 +4,7 @@
 
 ### New Features
 
--   `getViewportMediaQueries` accepts an `{ includeDesktop: true }` option that adds an `@desktop` media query above the largest breakpoint.
+-   `getViewportMediaQueries` accepts an `{ includeDesktop: true }` option that adds an `@desktop` media query above the largest breakpoint ([#87001](https://github.com/WordPress/gutenberg/pull/87001)).
 
 ### Bug Fixes
 
