@@ -13,6 +13,8 @@
 
 ### Bug Fixes
 
+-   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
+-   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
@@ -28,11 +30,15 @@
 -   Forward `pointerdown`, `mousedown`, and `click` from the editor canvas iframe onto the outer `<iframe>` element so parent-document popups can dismiss on canvas presses, and stop React portal bubbling for those redispatched events so parent trees do not see them twice ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 -   Image link settings: Stop automatically adding `noopener` to links that open in a new tab, in the Image and Media & Text blocks ([#86568](https://github.com/WordPress/gutenberg/pull/86568)).
 -   `isUngroupable`: Type the return value as `boolean | null | undefined` instead of `unknown` ([#86748](https://github.com/WordPress/gutenberg/pull/86748)).
+-   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
+-   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
+-   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
 -   Default block appender: Keep long placeholders from overlapping the inserter button ([#85496](https://github.com/WordPress/gutenberg/pull/85496)).
 
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Remove the private `hasBlockSpotlight` selector ([#81538](https://github.com/WordPress/gutenberg/pull/81538)).
 
 ## 20.0.0 (2026-11-04)
 

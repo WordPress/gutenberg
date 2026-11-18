@@ -24,7 +24,7 @@
 		border: none;
 		box-shadow: none;
 		display: block;
-		font-family: $font-family-body;
+		font-family: var(--wpds-typography-font-family-body);
 
 		p {
 			margin: $grid-unit-10 0;

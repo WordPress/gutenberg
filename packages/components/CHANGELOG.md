@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   `BaseControl`, `FocalPointPicker`, and `Tabs`: Use the `--wpds-typography-font-family-body` token for their font family ([#86761](https://github.com/WordPress/gutenberg/pull/86761)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
 -   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
 -   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
@@ -20,6 +21,8 @@
 
 ### Bug Fixes
 
+-   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
+-   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
 -   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
 -   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
