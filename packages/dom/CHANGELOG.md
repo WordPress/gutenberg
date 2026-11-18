@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `focus.focusable.isFocusable()` to check an individual element using the same rules as `focus.focusable.find()`.
+
 ## 5.2.0 (2026-11-18)
 
 ### Bug Fixes
