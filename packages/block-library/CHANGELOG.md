@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Navigation: Add a Tablet option to Overlay Visibility that collapses the menu at the theme's tablet breakpoint.
+-   Navigation: Add a Tablet option to Overlay Visibility that collapses the menu at the theme's tablet breakpoint ([#87002](https://github.com/WordPress/gutenberg/pull/87002)).
 
 ### Enhancements
 
