@@ -43,7 +43,7 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
 import type { ListViewBlockProps, TreeGridItemRenderProps } from './types';
-import type { TreeBlock } from '../../store/types';
+import type { BlockEditorThunkArgs, TreeBlock } from '../../store/types';
 
 function ListViewBlock( {
 	clientId,
@@ -111,9 +111,11 @@ function ListViewBlock( {
 		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
-	} = useSelect( blockEditorStore );
+		canDuplicateBlocks,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+		useSelect( blockEditorStore )
+	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
-	const { canDuplicateBlocks } = unlock( useSelect( blockEditorStore ) );
 
 	const pasteStyles = usePasteStyles();
 

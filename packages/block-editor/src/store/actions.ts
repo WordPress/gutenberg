@@ -2036,29 +2036,36 @@ export function setBlockMovingClientId() {
 export const duplicateBlocks =
 	( clientIds: string[], updateSelection: boolean = true ) =>
 	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
-		if ( ! clientIds?.length || ! select.canDuplicateBlocks( clientIds ) ) {
+		if ( ! select.canDuplicateBlocks( clientIds ) ) {
 			return;
 		}
-		const members = new Set( clientIds );
-		const ordered = select
+		// Deduplicate and order targets as they appear in the document. Skip
+		// descendants of selected parents: cloning a parent already copies them.
+		const uniqueIds = new Set( clientIds );
+		const orderedIds = select
 			.getClientIdsWithDescendants()
 			.filter(
 				( id ) =>
-					members.has( id ) &&
+					uniqueIds.has( id ) &&
 					! select
 						.getBlockParents( id )
-						.some( ( parent ) => members.has( parent ) )
+						.some( ( parent ) => uniqueIds.has( parent ) )
 			);
-		const runs: {
+		// Prepare one insertion per adjacent sibling group before changing the
+		// tree. Copying A and B together keeps A B A' B', not A A' B B'.
+		const insertionOperations: {
 			parent: string | null;
 			index: number;
 			blocks: Block[];
 		}[] = [];
-		for ( const id of ordered ) {
+		for ( const id of orderedIds ) {
 			const parent = select.getBlockRootClientId( id );
 			const index = select.getBlockIndex( id );
 			const clone = cloneSanitizedBlock( select.getBlock( id )! );
-			const previous = runs[ runs.length - 1 ];
+			const previous =
+				insertionOperations[ insertionOperations.length - 1 ];
+			// The saved insertion index is just after the previous group. If this
+			// sibling occupies that position, extend the group and its insertion index.
 			if (
 				previous &&
 				previous.parent === parent &&
@@ -2067,23 +2074,30 @@ export const duplicateBlocks =
 				previous.blocks.push( clone );
 				previous.index++;
 			} else {
-				runs.push( { parent, index: index + 1, blocks: [ clone ] } );
+				insertionOperations.push( {
+					parent,
+					index: index + 1,
+					blocks: [ clone ],
+				} );
 			}
 		}
-		const clonedIds = runs.flatMap( ( run ) =>
-			run.blocks.map( ( block ) => block.clientId )
+		// Keep the returned IDs in document order, independently of insertion order.
+		const clonedIds = insertionOperations.flatMap( ( operation ) =>
+			operation.blocks.map( ( block ) => block.clientId )
 		);
 		registry.batch( () => {
-			// Later runs are inserted first so earlier insertion indices stay valid.
-			for ( const run of [ ...runs ].reverse() ) {
+			// Insert from last to first so copies do not shift any pending insertion
+			// positions. Batch the insertions and selection into one subscriber update.
+			for ( const operation of [ ...insertionOperations ].reverse() ) {
 				dispatch.insertBlocks(
-					run.blocks,
-					run.index,
-					run.parent,
-					runs.length === 1 && updateSelection
+					operation.blocks,
+					operation.index,
+					operation.parent,
+					insertionOperations.length === 1 && updateSelection
 				);
 			}
 			if ( updateSelection && clonedIds.length > 1 ) {
+				// Select only the copies, not originals in the gaps between them.
 				dispatch.multiSelectSet( clonedIds );
 			}
 		} );

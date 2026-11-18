@@ -101,7 +101,7 @@ export function isSelectionContiguous( state: State ) {
  */
 export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 	return (
-		clientIds.length > 0 &&
+		!! clientIds?.length &&
 		clientIds.every( ( id ) => {
 			const block = getBlock( state, id );
 			return (
