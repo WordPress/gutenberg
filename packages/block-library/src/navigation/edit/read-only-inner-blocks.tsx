@@ -1,111 +1,72 @@
-import type { ReactNode } from 'react';
-import parse from 'html-react-parser';
 import { useDisabled } from '@wordpress/compose';
-import { safeHTML } from '@wordpress/dom';
-import { Children, isValidElement } from '@wordpress/element';
-
-// Blocks that the frontend wraps in a list item. Mirrors
-// `WP_Navigation_Block_Renderer::$needs_list_item_wrapper` in `index.php`.
-const NEEDS_LIST_ITEM_WRAPPER = [
-	'wp-block-site-title',
-	'wp-block-site-logo',
-	'wp-block-social-links',
-];
-
-function isListItem( node: ReactNode ) {
-	return isValidElement( node ) && node.type === 'li';
-}
-
-function needsListItemWrapper( node: ReactNode ) {
-	if ( ! isValidElement< { className?: unknown } >( node ) ) {
-		return false;
-	}
-	const { className } = node.props;
-	return (
-		typeof className === 'string' &&
-		className
-			.split( /\s+/ )
-			.some( ( name ) => NEEDS_LIST_ITEM_WRAPPER.includes( name ) )
-	);
-}
+import { useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { useServerSideRender } from '@wordpress/server-side-render';
+import { Spinner } from '@wordpress/ui';
+import HtmlRenderer from '../../utils/html-renderer';
 
 /**
- * Groups the rendered menu items the same way as the frontend (see
- * `WP_Navigation_Block_Renderer::get_inner_blocks_html()` in `index.php`):
- * consecutive list items share a `ul.wp-block-navigation__container`, and
- * other blocks, such as Search, are rendered between the lists.
+ * Returns the menu items from the server-rendered Navigation block, without
+ * the `nav` element around them. The editor already renders that element as
+ * the block wrapper.
  *
- * @param nodes The top-level nodes of the rendered menu.
- * @return The grouped nodes.
+ * @param rendered The server-rendered Navigation block.
+ * @return The HTML of the menu items.
  */
-function groupMenuItems( nodes: ReactNode[] ) {
-	const groups: ReactNode[] = [];
-	let listItems: ReactNode[] = [];
-
-	const closeList = () => {
-		if ( listItems.length ) {
-			groups.push(
-				<ul
-					key={ `list-${ groups.length }` }
-					className="wp-block-navigation__container"
-				>
-					{ listItems }
-				</ul>
-			);
-			listItems = [];
-		}
-	};
-
-	nodes.forEach( ( node, index ) => {
-		if ( typeof node === 'string' && ! node.trim() ) {
-			return;
-		}
-
-		if ( isListItem( node ) ) {
-			listItems.push( node );
-		} else if ( needsListItemWrapper( node ) ) {
-			listItems.push(
-				<li
-					key={ isValidElement( node ) ? node.key : index }
-					className="wp-block-navigation-item"
-				>
-					{ node }
-				</li>
-			);
-		} else {
-			closeList();
-			groups.push( node );
-		}
-	} );
-	closeList();
-
-	return groups;
+export function getMenuItemsHtml( rendered = '' ) {
+	const document = new window.DOMParser().parseFromString(
+		rendered,
+		'text/html'
+	);
+	return document.body.firstElementChild?.innerHTML ?? '';
 }
 
 interface ReadOnlyNavigationInnerBlocksProps {
-	/** The rendered content of the Navigation Menu. */
-	content?: string;
+	/** The attributes of the Navigation block, including the menu's `ref`. */
+	attributes: Record< string, unknown >;
 }
 
 /**
- * Renders a preview of a Navigation Menu that the user cannot edit. Links
- * and form fields in the preview are inert.
+ * Renders a preview of a Navigation Menu that the user cannot edit. The menu
+ * is rendered on the server by the Navigation block itself, so the preview
+ * matches the frontend. Links and form fields in the preview are inert.
  *
- * @param props         Component props.
- * @param props.content The rendered content of the Navigation Menu.
+ * @param props            Component props.
+ * @param props.attributes The attributes of the Navigation block.
  */
 export default function ReadOnlyNavigationInnerBlocks( {
-	content = '',
+	attributes,
 }: ReadOnlyNavigationInnerBlocksProps ) {
 	const disabledRef = useDisabled();
-	const nodes = Children.toArray( parse( safeHTML( content ) ) );
+	const { content, status } = useServerSideRender( {
+		block: 'core/navigation',
+		// The editor renders the overlay itself, so only the menu items are
+		// needed from the server.
+		attributes: { ...attributes, overlayMenu: 'never' },
+	} );
+
+	// Keep showing the last preview while a new one loads, so changing a
+	// block setting doesn't make the menu flash.
+	const [ rendered, setRendered ] = useState< string >();
+	if ( status === 'success' && content !== rendered ) {
+		setRendered( content );
+	}
+	const html = useMemo( () => getMenuItemsHtml( rendered ), [ rendered ] );
+
+	if ( rendered === undefined ) {
+		return status === 'error' ? (
+			<p>{ __( 'The Navigation Menu could not be shown.' ) }</p>
+		) : (
+			<Spinner />
+		);
+	}
 
 	return (
 		<div
 			ref={ disabledRef }
 			className="wp-block-navigation__read-only-items"
 		>
-			{ groupMenuItems( nodes ) }
+			<HtmlRenderer html={ html } />
 		</div>
 	);
 }

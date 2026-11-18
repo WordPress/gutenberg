@@ -1199,9 +1199,7 @@ function Navigation( {
 									{ isEntityAvailable &&
 										isNavigationMenuReadOnly && (
 											<ReadOnlyNavigationInnerBlocks
-												content={
-													navigationMenu?.content
-												}
+												attributes={ attributes }
 											/>
 										) }
 								</ResponsiveWrapper>
