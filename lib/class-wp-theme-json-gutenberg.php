@@ -304,6 +304,7 @@ class WP_Theme_JSON_Gutenberg {
 		'margin-left'                       => array( 'spacing', 'margin', 'left' ),
 		'min-height'                        => array( 'dimensions', 'minHeight' ),
 		'min-width'                         => array( 'dimensions', 'minWidth' ),
+		'overflow'                          => array( 'dimensions', 'overflow' ),
 		'outline-color'                     => array( 'outline', 'color' ),
 		'outline-offset'                    => array( 'outline', 'offset' ),
 		'outline-style'                     => array( 'outline', 'style' ),
@@ -456,6 +457,7 @@ class WP_Theme_JSON_Gutenberg {
 			'height'              => null,
 			'minHeight'           => null,
 			'minWidth'            => null,
+			'overflow'            => null,
 			'width'               => null,
 		),
 		'layout'                        => array(
@@ -586,6 +588,7 @@ class WP_Theme_JSON_Gutenberg {
 			'height'      => null,
 			'minHeight'   => null,
 			'minWidth'    => null,
+			'overflow'    => null,
 			'width'       => null,
 		),
 		'filter'     => array(
@@ -1073,6 +1076,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'dimensions', 'height' ),
 		array( 'dimensions', 'minHeight' ),
 		array( 'dimensions', 'minWidth' ),
+		array( 'dimensions', 'overflow' ),
 		array( 'dimensions', 'width' ),
 		// BEGIN EXPERIMENTAL.
 		// Allow `position.fixed` to be opted-in by default.

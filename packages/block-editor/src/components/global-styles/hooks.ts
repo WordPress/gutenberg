@@ -169,16 +169,21 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'height', 'minHeight', 'minWidth', 'width' ].forEach(
-			( key ) => {
-				if ( ! supportedStyles.includes( key ) ) {
-					updatedSettings.dimensions = {
-						...updatedSettings.dimensions,
-						[ key ]: false,
-					};
-				}
+		[
+			'aspectRatio',
+			'height',
+			'minHeight',
+			'minWidth',
+			'overflow',
+			'width',
+		].forEach( ( key ) => {
+			if ( ! supportedStyles.includes( key ) ) {
+				updatedSettings.dimensions = {
+					...updatedSettings.dimensions,
+					[ key ]: false,
+				};
 			}
-		);
+		} );
 
 		[ 'radius', 'color', 'style', 'width' ].forEach( ( key ) => {
 			if (

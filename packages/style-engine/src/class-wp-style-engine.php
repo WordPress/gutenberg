@@ -260,6 +260,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'dimensions', 'objectFit' ),
 				),
+				'overflow'    => array(
+					'property_keys' => array(
+						'default' => 'overflow',
+					),
+					'path'          => array( 'dimensions', 'overflow' ),
+				),
 				'width'       => array(
 					'property_keys' => array(
 						'default' => 'width',

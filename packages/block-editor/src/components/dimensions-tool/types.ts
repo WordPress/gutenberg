@@ -199,3 +199,33 @@ export interface WidthHeightToolProps {
 	 */
 	isShownByDefault?: boolean;
 }
+
+/**
+ * Props of `OverflowTool`.
+ */
+export interface OverflowToolProps {
+	/**
+	 * ID of the panel that contains the controls.
+	 */
+	panelId?: string | null;
+	/**
+	 * Current overflow value.
+	 */
+	value?: string | null;
+	/**
+	 * Callback to update the overflow value.
+	 */
+	onChange: ( nextValue?: string ) => void;
+	/**
+	 * Overflow options.
+	 */
+	options?: DimensionsToolOption[];
+	/**
+	 * Whether the tool panel is shown by default.
+	 */
+	isShownByDefault?: boolean;
+	/**
+	 * Whether the tool has a value, in place of checking whether value is defined.
+	 */
+	hasValue?: () => boolean;
+}

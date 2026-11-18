@@ -10,6 +10,7 @@ import {
 } from '../../../hooks/block-style-state';
 
 globalThis.wpVitest.mockMatchMedia();
+globalThis.wpVitest.mockResizeObserver();
 
 // `AspectRatioTool` reads its option list from the block-editor data
 // store via `useSettings`. Mock that hook so the tests can render the
@@ -102,6 +103,7 @@ const settingsWithDimensions = {
 		minWidth: true,
 		width: true,
 		aspectRatio: true,
+		overflow: true,
 		aspectRatios: {
 			default: [
 				{ name: 'Square', slug: 'square', ratio: '1' },
@@ -931,6 +933,40 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			// minHeight from inheritedValue must not be copied into the
 			// committed local value (strip-not-copy).
 			expect( lastCall?.dimensions?.minHeight ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'overflow (toggle group control archetype)', () => {
+		it( 'renders a locally-set overflow as the pressed option', () => {
+			renderPanel( {
+				value: { dimensions: { overflow: 'clip' } },
+				settings: settingsWithDimensions,
+			} );
+
+			const clipButton = screen.getByRole( 'button', {
+				name: 'Clip',
+			} );
+			expect( clipButton ).toHaveAttribute( 'aria-pressed', 'true' );
+		} );
+
+		it( 'calls onChange when selecting an overflow option', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			renderPanel( {
+				value: {},
+				settings: settingsWithDimensions,
+				onChange,
+			} );
+
+			const clipButton = screen.getByRole( 'button', {
+				name: 'Clip',
+			} );
+			await user.click( clipButton );
+
+			expect( onChange ).toHaveBeenCalledWith( {
+				dimensions: { overflow: 'clip' },
+			} );
 		} );
 	} );
 

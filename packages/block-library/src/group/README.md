@@ -43,6 +43,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minHeight`: `true`
   - `minWidth`: `true`
+  - `overflow`: `true`
 - [`position`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#position):
   - `sticky`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):

@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize, gradient
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, height, minHeight, minWidth, width
+- dimensions: aspectRatio, height, minHeight, minWidth, overflow, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight, textColumns
@@ -126,6 +126,7 @@ Settings related to dimensions.
 | height | Allow users to set custom height. | `boolean` | `false` |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
 | minWidth | Allow users to set custom minimum width. | `boolean` | `false` |
+| overflow | Allow users to set custom overflow. | `boolean` | `false` |
 | width | Allow users to set custom width. | `boolean` | `false` |
 | dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
 
@@ -305,6 +306,7 @@ Dimensions styles.
 | height | Sets the `height` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
 | minWidth | Sets the `min-width` CSS property. | `string`, `{ ref }` |
+| overflow | Sets the `overflow` CSS property. | `string`, `{ ref }` |
 | width | Sets the `width` CSS property. | `string`, `{ ref }` |
 
 ---

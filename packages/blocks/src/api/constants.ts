@@ -245,6 +245,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'width' ],
 		useEngine: true,
 	},
+	overflow: {
+		value: [ 'dimensions', 'overflow' ],
+		support: [ 'dimensions', 'overflow' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],

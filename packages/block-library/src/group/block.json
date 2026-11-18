@@ -55,7 +55,8 @@
 		},
 		"dimensions": {
 			"minHeight": true,
-			"minWidth": true
+			"minWidth": true,
+			"overflow": true
 		},
 		"__experimentalBorder": {
 			"color": true,
