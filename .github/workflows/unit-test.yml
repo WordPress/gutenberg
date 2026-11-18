@@ -588,15 +588,18 @@ jobs:
             # PHPStan invalidates the parts of the cache that the changed files affect. The baseline is
             # left out of the key, since it only filters the errors and does not change the analysis,
             # so a change to it can reuse the cache. The same goes for the baseline of the strict
-            # paths. Each analysis keeps its own result cache in the same directory.
+            # paths. Each analysis keeps its own result cache in the same directory. The configuration
+            # of the strict paths is left out of the key too: PHPStan discards a result cache whose
+            # configuration changed, so adding a strict path only reruns that analysis in full, while
+            # the other one keeps its cache.
             - name: Restore PHPStan result cache
               id: restore-phpstan-cache
               uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpstan # This is defined in tools/phpstan/base.neon.
-                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'phpstan-strict.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon', '!tools/phpstan/baseline-strict.neon') }}-${{ github.run_id }}
+                  key: ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon', '!tools/phpstan/baseline-strict.neon') }}-${{ github.run_id }}
                   restore-keys: |
-                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'phpstan-strict.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon', '!tools/phpstan/baseline-strict.neon') }}-
+                      ${{ runner.os }}-date-${{ steps.get-date.outputs.date }}-phpstan-cache-${{ hashFiles('composer.json', 'phpstan.neon.dist', 'tools/phpstan/*.neon', 'tools/phpstan/*.php', 'tools/phpstan/*.stub', 'tools/phpstan/src/**', 'tools/phpstan/wordpress-stubs/*', '!tools/phpstan/baseline.neon', '!tools/phpstan/baseline-strict.neon') }}-
 
             # Each report is written to a file for the report steps below. PHPStan exits with 1 when it
             # reports errors, which those steps handle; anything higher means the analysis did not
