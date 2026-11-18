@@ -83,7 +83,15 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Local updates that are kept off the typing hot path (#79964).
 	const deferredUpdates = createDeferredUpdateQueue(
-		( { objectType, objectId, changes, origin, options, update } ) =>
+		( {
+			applyLocalState,
+			objectType,
+			objectId,
+			changes,
+			origin,
+			options,
+			update,
+		} ) => {
 			updateCRDTDoc(
 				objectType,
 				objectId,
@@ -91,7 +99,14 @@ export function createSyncManager( debug = false ): SyncManager {
 				origin,
 				options,
 				update
-			)
+			);
+			const entityState = entityStates.get(
+				getEntityId( objectType, objectId )
+			);
+			if ( entityState ) {
+				applyLocalState?.( entityState.ydoc );
+			}
+		}
 	);
 
 	/**
@@ -401,6 +416,10 @@ export function createSyncManager( debug = false ): SyncManager {
 						syncConfig.applyChangesToCRDTDoc( copy, item.changes );
 					} );
 					item.update = Y.encodeStateAsUpdateV2( copy, stateVector );
+					item.applyLocalState = syncConfig.captureLocalState?.(
+						copy,
+						item.changes
+					);
 				}
 			} finally {
 				copy.destroy();

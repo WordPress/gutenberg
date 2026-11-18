@@ -41,6 +41,7 @@ export interface YSelectionHistory {
 }
 
 export interface BlockSelectionHistory {
+	addSelection: ( selection: YFullSelection ) => void;
 	getSelectionHistory: () => YFullSelection[];
 	updateSelection: ( newSelection: WPSelection ) => void;
 }
@@ -118,6 +119,7 @@ export function createBlockSelectionHistory(
 	};
 
 	return {
+		addSelection: addToHistory,
 		getSelectionHistory,
 		updateSelection,
 	};

@@ -1,4 +1,5 @@
 import type {
+	CRDTDoc,
 	ObjectData,
 	ObjectID,
 	ObjectType,
@@ -90,6 +91,8 @@ export function createDeferredUpdateQueue(
  * A local update that waits in the queue.
  */
 export interface DeferredUpdate {
+	/** Applies document-local state captured on the copy to the live document. */
+	applyLocalState?: ( ydoc: CRDTDoc ) => void;
 	changes: Partial< ObjectData >;
 	objectId: ObjectID | null;
 	objectType: ObjectType;
