@@ -176,11 +176,38 @@ interface PhpstanReport {
  */
 function isStaleBaselineEntry( error: PhpstanError ): boolean {
 	return (
-		error.identifier === 'ignore.unmatched' ||
+		( error.identifier === 'ignore.unmatched' &&
+			! isUnscopedIgnoreEntry( error ) ) ||
 		( error.identifier === 'ignore.count' &&
 			error.message.includes( ', but occurred only ' ) )
 	);
 }
+
+/**
+ * Whether an error is an entry in the `ignoreErrors` of phpstan.neon.dist that
+ * the analysis of the strict paths did not match. That is usually because the
+ * entry names no file, so that it applies to every file, while its error occurs
+ * only outside the strict paths. PHPStan marks it as fixable, but `--fix` would
+ * remove the entry, which the analysis of phpstan.neon.dist still needs.
+ *
+ * @param error The error.
+ * @return Whether the error is an unmatched entry of phpstan.neon.dist.
+ */
+function isUnscopedIgnoreEntry( error: PhpstanError ): boolean {
+	return (
+		isStrict &&
+		error.identifier === 'ignore.unmatched' &&
+		error.file === 'phpstan.neon.dist'
+	);
+}
+
+/*
+ * Replaces the tip of an unmatched entry of phpstan.neon.dist in the report of
+ * the strict paths. It is shown as plain text, in an annotation and in an HTML
+ * table cell, so it has no Markdown.
+ */
+const UNSCOPED_IGNORE_TIP =
+	'Do not remove this entry with --fix, since the other analysis still needs it. Give it a path naming the file its error occurs in, or reportUnmatched: false if it is a rule for every file.';
 
 /**
  * Whether an error means a baseline entry records fewer occurrences of an error
@@ -294,7 +321,11 @@ function readErrors( reportPath: string ): PhpstanError[] | null {
 		}
 	}
 
-	return errors;
+	return errors.map( ( error ) =>
+		isUnscopedIgnoreEntry( error )
+			? { ...error, fixable: false, tip: UNSCOPED_IGNORE_TIP }
+			: error
+	);
 }
 
 /**
