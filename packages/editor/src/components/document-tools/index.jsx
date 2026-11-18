@@ -62,6 +62,11 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 	};
 
 	const isWideViewport = useViewportMatch( 'wide' );
+	// Undo and redo are not displayed below this breakpoint. They are omitted
+	// rather than hidden with CSS so that they are not registered as toolbar
+	// items, which would leave the roving tabindex stepping onto a button that
+	// cannot receive focus. See https://github.com/WordPress/gutenberg/issues/49479.
+	const isMediumViewport = useViewportMatch( 'medium' );
 
 	/* translators: accessibility text for the editor toolbar */
 	const toolbarAriaLabel = __( 'Document tools' );
@@ -115,18 +120,26 @@ function DocumentTools( { className, disableBlockTools = false } ) {
 				) }
 				{ ( isWideViewport || ! showIconLabels ) && (
 					<>
-						<ToolbarItem
-							as={ EditorHistoryUndo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
-						<ToolbarItem
-							as={ EditorHistoryRedo }
-							showTooltip={ ! showIconLabels }
-							variant={ showIconLabels ? 'tertiary' : undefined }
-							size="compact"
-						/>
+						{ isMediumViewport && (
+							<>
+								<ToolbarItem
+									as={ EditorHistoryUndo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									size="compact"
+								/>
+								<ToolbarItem
+									as={ EditorHistoryRedo }
+									showTooltip={ ! showIconLabels }
+									variant={
+										showIconLabels ? 'tertiary' : undefined
+									}
+									size="compact"
+								/>
+							</>
+						) }
 						{ ! isDistractionFree && (
 							<ToolbarButton
 								className="editor-document-tools__document-overview-toggle"

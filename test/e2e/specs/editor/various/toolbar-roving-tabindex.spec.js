@@ -136,6 +136,83 @@ test.describe( 'Toolbar roving tabindex', () => {
 	} );
 } );
 
+test.describe( 'Document tools roving tabindex', () => {
+	// Below the medium breakpoint (782px) the undo and redo buttons are not
+	// displayed. They must not stay registered as toolbar items, otherwise the
+	// roving tabindex moves onto a button that cannot take focus and the
+	// keypress is silently swallowed.
+	// See: https://github.com/WordPress/gutenberg/issues/49479
+	test.use( { viewport: { width: 700, height: 700 } } );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'moves focus to the next visible tool when undo and redo are not displayed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Block Inserter' );
+
+		// A single press must move focus. Undo and redo sit between these two
+		// buttons in the DOM, so if they are still toolbar items this lands on
+		// a hidden button and focus stays put.
+		await page.keyboard.press( 'ArrowRight' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+
+	test( 'does not leave focus on an element removed from the tab order', async ( {
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+
+		// Walking the whole toolbar must never park focus on an item whose
+		// tabindex has been handed to a different (hidden) item.
+		for ( let i = 0; i < 4; i++ ) {
+			await page.keyboard.press( 'ArrowRight' );
+			await expect
+				.poll( () =>
+					page.evaluate( () => document.activeElement?.tabIndex )
+				)
+				.toBe( 0 );
+		}
+	} );
+
+	test( 'stays reachable with Shift+Tab and Alt+F10 after an arrow key press', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'alt+F10' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		// The toolbar has one tab stop. If the arrow key handed it to a hidden
+		// button, the toolbar has no visible tab stop: Shift+Tab skips it and
+		// Alt+F10 finds nothing to focus.
+		await page.keyboard.press( 'Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.not.toBe( 'Document Overview' );
+		await pageUtils.pressKeys( 'shift+Tab' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+
+		await page.keyboard.press( 'Tab' );
+		await pageUtils.pressKeys( 'alt+F10' );
+		await expect
+			.poll( () => editor.getFocusOwnerLabel() )
+			.toBe( 'Document Overview' );
+	} );
+} );
+
 class ToolbarRovingTabindexUtils {
 	constructor( { editor, page, pageUtils } ) {
 		this.editor = editor;
