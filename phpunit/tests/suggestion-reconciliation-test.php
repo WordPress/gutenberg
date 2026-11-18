@@ -476,6 +476,30 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$this->assertSame( 'applied-unsaved', $this->status_of( $reply ) );
 	}
 
+	public function test_finalizing_fires_an_action_per_note(): void {
+		$post_id = $this->create_post( '' );
+		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
+		$other   = $this->create_note( $post_id, $this->inline_op() );
+		$kept    = $this->create_note( $post_id, $this->inline_op() );
+		$this->set_content( $post_id, $this->paragraph( $this->mark( $note_id, 'add', 'a' ) . $this->mark( $other, 'add', 'b' ) . $this->mark( $kept, 'add', 'c' ) ) );
+
+		$fired    = array();
+		$recorder = function ( int $note, string $status, int $post, int $user ) use ( &$fired ): void {
+			$fired[ $note ] = array( $status, $post, $user );
+		};
+		add_action( 'gutenberg_suggestion_finalized', $recorder, 10, 4 );
+		$this->set_content( $post_id, $this->paragraph( $this->mark( $kept, 'add', 'c' ) ) );
+		remove_action( 'gutenberg_suggestion_finalized', $recorder, 10 );
+
+		$this->assertSame(
+			array(
+				$note_id => array( 'applied', $post_id, self::$editor_id ),
+				$other   => array( 'outdated', $post_id, self::$editor_id ),
+			),
+			$fired
+		);
+	}
+
 	public function test_finalizing_sends_no_mail() {
 		$post_id = $this->create_post( '' );
 		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );

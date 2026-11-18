@@ -821,6 +821,19 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
 			}
 			wp_set_comment_status( $note_id, 'approve' );
+
+			$note = get_comment( $note_id );
+			/**
+			 * Fires when a post save makes a suggestion's outcome final.
+			 *
+			 * @since 7.2.0
+			 *
+			 * @param int    $note_id Note ID.
+			 * @param string $status  Final status: `applied`, `rejected` or `outdated`.
+			 * @param int    $post_id ID of the post the note belongs to.
+			 * @param int    $user_id User whose write made it final, 0 when there is none.
+			 */
+			do_action( 'gutenberg_suggestion_finalized', $note_id, $status, $note ? (int) $note->comment_post_ID : 0, $user_id );
 		}
 
 		/**
