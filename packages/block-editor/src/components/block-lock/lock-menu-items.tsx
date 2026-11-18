@@ -58,6 +58,10 @@ export default function BlockLockMenuItems( {
 		[ clientIds ]
 	);
 
+	// Every block whose layout can be locked is a pattern, whose layout is the
+	// pattern's, so say why the option can't be changed.
+	const isLayoutSetByPattern = canLayoutLock && ! canChangeLayoutLock;
+
 	const isAllLocked =
 		isMoveLocked &&
 		isRemoveLocked &&
@@ -99,6 +103,11 @@ export default function BlockLockMenuItems( {
 				}
 			>
 				<Menu.ItemLabel>{ __( 'Layout' ) }</Menu.ItemLabel>
+				{ isLayoutSetByPattern && (
+					<Menu.ItemDescription>
+						{ __( 'Disabled by Pattern' ) }
+					</Menu.ItemDescription>
+				) }
 			</Menu.CheckboxItem>
 			<Menu.CheckboxItem
 				checked={ isMoveLocked }
