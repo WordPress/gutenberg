@@ -14,6 +14,7 @@
 -   Categories List: Use the UI SelectControl for the Taxonomy setting ([#86197](https://github.com/WordPress/gutenberg/pull/86197)).
 -   Template Part: Use the UI SelectControl for the Area and Import widget area settings ([#86565](https://github.com/WordPress/gutenberg/pull/86565)).
 -   Cover: Move the minimum height to the `dimensions` block support ([#83447](https://github.com/WordPress/gutenberg/pull/83447)).
+-   Image, Cover, Video, Media & Text, Post Featured Image: Behind the `gutenberg-grid-interactivity` experiment, fill their cell in a manual placement grid whose cells have a fixed size, cropping media as needed. Each block reads the grid's `--wp--style--grid-cells` custom property with a container style query in its own styles. In the editor, the cell decides their size, so Image and Post Featured Image keep only Scale (and Image its focal point), the block-support minimum height and aspect ratio controls are hidden there, and Cover hides its own minimum height control, resize handle and full height toggle ([#84504](https://github.com/WordPress/gutenberg/pull/84504)).
 
 ### Bug Fixes
 
