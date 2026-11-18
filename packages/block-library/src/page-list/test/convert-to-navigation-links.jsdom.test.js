@@ -581,5 +581,114 @@ describe( 'page list convert to links', () => {
 				},
 			] );
 		} );
+
+		it( 'Falls back to "(no title)" for pages with an empty title', () => {
+			const pages = [
+				{
+					title: {
+						raw: '',
+						rendered: '',
+					},
+					id: 2,
+					parent: 0,
+					link: 'http://wordpress.local/?page_id=2',
+					type: 'page',
+				},
+				{
+					title: {
+						raw: '   ',
+						rendered: '   ',
+					},
+					id: 34,
+					parent: 0,
+					link: 'http://wordpress.local/?page_id=34',
+					type: 'page',
+				},
+				{
+					title: {
+						raw: 'Contact Page',
+						rendered: 'Contact Page',
+					},
+					id: 37,
+					parent: 0,
+					link: 'http://wordpress.local/contact-page/',
+					type: 'page',
+				},
+				{
+					title: {
+						raw: 'About Sub 1',
+						rendered: 'About Sub 1',
+					},
+					id: 738,
+					parent: 34,
+					link: 'http://wordpress.local/about/about-sub-1/',
+					type: 'page',
+				},
+			];
+
+			const convertLinks = convertToNavigationLinks( pages );
+
+			expect( convertLinks ).toEqual( [
+				{
+					attributes: {
+						id: 2,
+						kind: 'post-type',
+						label: '(no title)',
+						type: 'page',
+						url: 'http://wordpress.local/?page_id=2',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
+					},
+					innerBlocks: [],
+					name: 'core/navigation-link',
+				},
+				{
+					// A page with no title that has children keeps the
+					// fallback when it is promoted to a submenu.
+					attributes: {
+						id: 34,
+						kind: 'post-type',
+						label: '(no title)',
+						type: 'page',
+						url: 'http://wordpress.local/?page_id=34',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
+					},
+					innerBlocks: [
+						{
+							attributes: {
+								id: 738,
+								kind: 'post-type',
+								label: 'About Sub 1',
+								type: 'page',
+								url: 'http://wordpress.local/about/about-sub-1/',
+								metadata: {
+									bindings: EXPECTED_ENTITY_BINDING,
+								},
+							},
+							innerBlocks: [],
+							name: 'core/navigation-link',
+						},
+					],
+					name: 'core/navigation-submenu',
+				},
+				{
+					attributes: {
+						id: 37,
+						kind: 'post-type',
+						label: 'Contact Page',
+						type: 'page',
+						url: 'http://wordpress.local/contact-page/',
+						metadata: {
+							bindings: EXPECTED_ENTITY_BINDING,
+						},
+					},
+					innerBlocks: [],
+					name: 'core/navigation-link',
+				},
+			] );
+		} );
 	} );
 } );
