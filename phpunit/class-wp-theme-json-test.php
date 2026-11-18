@@ -53,6 +53,10 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			unregister_block_type( 'test/feature-selector' );
 		}
 
+		if ( $registry->is_registered( 'test/deprecated-feature-selector' ) ) {
+			unregister_block_type( 'test/deprecated-feature-selector' );
+		}
+
 		parent::tear_down();
 	}
 
@@ -2802,6 +2806,21 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 * the `supports` property are correctly output in the stylesheet.
 	 */
 	public function test_get_stylesheet_with_deprecated_feature_level_selectors() {
+		register_block_type(
+			'test/deprecated-feature-selector',
+			array(
+				'api_version' => 3,
+				'supports'    => array(
+					'color'      => array(
+						'__experimentalSelector' => 'h2, h3',
+					),
+					'typography' => array(
+						'fontSize' => true,
+					),
+				),
+			)
+		);
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
@@ -2821,7 +2840,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'styles'   => array(
 					'blocks' => array(
-						'core/calendar' => array(
+						'test/deprecated-feature-selector' => array(
 							'color'      => array(
 								'text' => 'green',
 							),
@@ -2835,12 +2854,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 
 		$base_styles   = ':root{--wp--preset--color--green: green;}';
-		$block_styles  = ':root :where(.wp-block-calendar){font-size: 3em;}:root :where(.wp-block-calendar table, .wp-block-calendar th){color: green;}';
+		$block_styles  = ':root :where(.wp-block-test-deprecated-feature-selector){font-size: 3em;}:root :where(.wp-block-test-deprecated-feature-selector h2, .wp-block-test-deprecated-feature-selector h3){color: green;}';
 		$preset_styles = '.has-green-color{color: var(--wp--preset--color--green) !important;}.has-green-background-color{background-color: var(--wp--preset--color--green) !important;}.has-green-border-color{border-color: var(--wp--preset--color--green) !important;}';
 		$expected      = $base_styles . $block_styles . $preset_styles;
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles', 'presets', 'variables' ), null, array( 'skip_root_layout_styles' => true ) ) );
-	}
 
+		unregister_block_type( 'test/deprecated-feature-selector' );
+	}
 
 	/**
 	 * This test checks that feature selectors defined in the stable `selectors`
