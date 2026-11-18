@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Show the primary actions of table rows below the title, so the actions column only holds the actions menu ([#86247](https://github.com/WordPress/gutenberg/pull/86247)).
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
 
@@ -32,7 +33,6 @@
 
 -   Use `Button` and `IconButton` from `@wordpress/ui` in the bulk actions bar. Hovered actions now get a background fill, a running action shows a spinner in place of its label and is announced to screen readers, and the `dataviews-bulk-actions__action` class is removed ([#85939](https://github.com/WordPress/gutenberg/pull/85939)).
 -   Use the UI SelectControl for Sort by and relative-date Unit settings ([#86167](https://github.com/WordPress/gutenberg/pull/86167)).
--   Show the primary actions of table rows below the title, so the actions column only holds the actions menu ([#86247](https://github.com/WordPress/gutenberg/pull/86247)).
 -   DataForm: Tighten the line height of field values in the panel layout, so values that wrap onto several lines take less room ([#85828](https://github.com/WordPress/gutenberg/pull/85828)).
 -   Omit trailing ellipses from action button labels ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
 -   Render table bulk actions outside the table while preserving their placement over the column headers ([#85250](https://github.com/WordPress/gutenberg/pull/85250)).
