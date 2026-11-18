@@ -356,7 +356,7 @@ const illustrations = {
 	adminui: AdminUIIllustration,
 };
 
-const PackageCard = ( {
+export const PackageCard = ( {
 	illustration,
 	title,
 	packageName,
@@ -409,76 +409,13 @@ const PackageCard = ( {
 	);
 };
 
-const handbook =
-	'https://developer.wordpress.org/block-editor/reference-guides/packages';
-
-const cards: Array< {
-	illustration: keyof typeof illustrations;
-	title: string;
-	packageName: string;
-	body: string;
-	storybookId: string;
-	docsHref: string;
-} > = [
-	{
-		illustration: 'theming',
-		title: 'Theming',
-		packageName: '@wordpress/theme',
-		body: 'Design tokens for colors, spacing, typography and more, plus a ThemeProvider that generates accessible color ramps from seed values.',
-		storybookId: 'design-system-theme-introduction--docs',
-		docsHref: `${ handbook }/packages-theme/`,
-	},
-	{
-		illustration: 'components',
-		title: 'Components',
-		packageName: '@wordpress/ui',
-		body: 'Themeable, accessible React components with consistent patterns, styled entirely with design tokens.',
-		storybookId: 'design-system-components-introduction--docs',
-		docsHref: `${ handbook }/packages-ui/`,
-	},
-	{
-		illustration: 'icons',
-		title: 'Icons',
-		packageName: '@wordpress/icons',
-		body: 'A curated library of SVG icons covering common editor and admin actions, drawn in one shared visual language.',
-		storybookId: 'icons-icon--docs',
-		docsHref: `${ handbook }/packages-icons/`,
-	},
-	{
-		illustration: 'dataviews',
-		title: 'DataViews',
-		packageName: '@wordpress/dataviews',
-		body: 'Display, filter and edit lists of data as a table, grid or list, with DataForm for editing individual records.',
-		storybookId: 'dataviews-dataviews--docs',
-		docsHref: `${ handbook }/packages-dataviews/`,
-	},
-	{
-		illustration: 'adminui',
-		title: 'Admin UI',
-		packageName: '@wordpress/admin-ui',
-		body: 'Building blocks for consistent admin page layouts and headers.',
-		storybookId: 'admin-ui-page--docs',
-		docsHref: `${ handbook }/packages-admin-ui/`,
-	},
-];
-
-export const PackageCards = ( {
-	only,
-}: {
-	only: Array< keyof typeof illustrations >;
-} ) => (
+export const PackageCards = ( { children }: { children: React.ReactNode } ) => (
 	<Stack
 		direction="row"
 		gap="lg"
 		wrap="wrap"
 		className={ styles[ 'card-group' ] }
 	>
-		{ cards
-			.filter( ( card ) => only.includes( card.illustration ) )
-			.map( ( { body, ...card } ) => (
-				<PackageCard key={ card.illustration } { ...card }>
-					{ body }
-				</PackageCard>
-			) ) }
+		{ children }
 	</Stack>
 );
