@@ -18,7 +18,11 @@ import type {
 } from '../types';
 
 function getErrorMessage( err: unknown ) {
-	return err instanceof Error ? err.message : __( 'Unknown error' );
+	// A REST API error is a plain object, not an `Error`.
+	const message = ( err as { message?: unknown } | undefined )?.message;
+	return typeof message === 'string' && message
+		? message
+		: __( 'Unknown error' );
 }
 
 interface GuidelineActionsSectionProps {
