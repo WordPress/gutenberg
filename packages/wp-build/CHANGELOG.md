@@ -10,8 +10,16 @@
 
 -   In watch mode, copy a changed PHP file from `wpCopyFiles` to the build on its own instead of rebuilding its whole package, so the change reaches the build in milliseconds rather than seconds. Adding or removing a PHP file still rebuilds the package ([#86271](https://github.com/WordPress/gutenberg/pull/86271)).
 
+### Bug Fixes
+
+-   Exit the generated PHP files when they are accessed directly, print the inline styles and scripts of generated pages through the WordPress enqueue functions, and escape the message shown when a user cannot access a page. Plugins shipping the build now pass the WordPress.org Plugin Directory review and Plugin Check ([#86699](https://github.com/WordPress/gutenberg/pull/86699)).
+-   Require PostCSS `^8.5.33` for CSS parser fixes and source-map file-loading protections ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
+-   Let a full-page screen show the admin bar again. The page template's rule that hides it now loads after the page's own styles, so it has zero specificity to keep it overridable ([#86992](https://github.com/WordPress/gutenberg/pull/86992)).
+-   Load a `wp-admin` page's scripts and styles only on its own screen, not on a Core screen whose screen ID matches the page slug. The `dashboard` page no longer hides the content of the Core Dashboard (`index.php`) ([#86995](https://github.com/WordPress/gutenberg/pull/86995)).
+
 ### Internal
 
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 0.27.0 (2026-11-04)

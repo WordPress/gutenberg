@@ -42,7 +42,9 @@ export function renderReport(
 		( { rule, probability, requestReview } ) =>
 			// Reviewers are in code format, so that a new comment does not
 			// notify them. The review request is what notifies.
-			`| ${ rule.id } | \`${ rule.reviewer }\` | ${ probability.toFixed(
+			`| ${ rule.id } | ${ rule.reviewers
+				.map( ( reviewer ) => `\`${ reviewer }\`` )
+				.join( ', ' ) } | ${ probability.toFixed(
 				2
 			) } | ${ rule.threshold.toFixed( 2 ) } | ${
 				requestReview ? 'Request review' : 'No request'
@@ -52,7 +54,7 @@ export function renderReport(
 	const tokens = Math.round( stats.characters / 4 ).toLocaleString( 'en' );
 
 	return [
-		'| Rule | Reviewer | Probability | Threshold | Decision |',
+		'| Rule | Reviewers | Probability | Threshold | Decision |',
 		'| --- | --- | --- | --- | --- |',
 		...rows,
 		'',

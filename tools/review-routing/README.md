@@ -17,7 +17,7 @@ threshold: 0.7
 Does this change add or change a public API of the design system packages? ...
 ```
 
-`reviewer` is a GitHub username, such as `octocat`, or a team as `org/team-slug`. Write it without `@`. `threshold` is optional and defaults to 0.7. Write the body in plain language, and say when to answer no if the boundary is not clear.
+`reviewer` is a GitHub username, such as `octocat`, or a team as `org/team-slug`. To name several reviewers, write them as a YAML bracketed array, separated by commas: `reviewer: [octocat, WordPress/gutenberg-components]`. `threshold` is optional and defaults to 0.7. Write the body in plain language, and say when to answer no if the boundary is not clear.
 
 Ask about one kind of change in each file. A question that combines several conditions gives a less useful probability, and the model can let one condition hide another. To route several kinds of change to the same reviewer, add a file for each kind with the same `reviewer`. The tool decides each rule on its own and does not combine the rules of a reviewer, so the report shows the probability of each rule. To ask a new reviewer, or to opt yourself in to a kind of change, add a file.
 
@@ -41,7 +41,7 @@ Run it from the repository root:
 npm run --workspace @wordpress/review-routing-tools route -- --pr 12345
 ```
 
-It prints a Markdown table of the decisions. `--json` prints them as JSON. `--dry-run` prints the evidence and the questions without calling the model, and needs no credentials: use it to see what the model reads when you change a routing file.
+It prints a Markdown table of the decisions. `--json` prints them as JSON, and `--json-file <path>` also writes the JSON to a file. `--dry-run` prints the evidence and the questions without calling the model, and needs no credentials: use it to see what the model reads when you change a routing file.
 
 ### Credentials
 
