@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { PackageCards } from './package-cards';
-import { PrincipleCards } from './principle-cards';
+import { PackageCard, PackageCards } from './package-cards';
+import { PrincipleCard, PrincipleCards } from './principle-cards';
 
 <Meta title="Design System/Introduction" />
 
@@ -26,19 +26,79 @@ Designers can find the matching design resources in the [WordPress Design System
 
 Foundational packages establish the fundamental components and theming behaviors.
 
-<PackageCards only={ [ 'theming', 'components', 'icons' ] } />
+<PackageCards>
+  <PackageCard
+    illustration="theming"
+    title="Theming"
+    packageName="@wordpress/theme"
+    storybookId="design-system-theme-introduction--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-theme/"
+  >
+    Design tokens for colors, spacing, typography and more, plus a ThemeProvider that generates accessible color ramps from seed values.
+  </PackageCard>
+  <PackageCard
+    illustration="components"
+    title="Components"
+    packageName="@wordpress/ui"
+    storybookId="design-system-components-introduction--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-ui/"
+  >
+    Themeable, accessible React components with consistent patterns, styled entirely with design tokens.
+  </PackageCard>
+  <PackageCard
+    illustration="icons"
+    title="Icons"
+    packageName="@wordpress/icons"
+    storybookId="icons-icon--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-icons/"
+  >
+    A curated library of SVG icons covering common editor and admin actions, drawn in one shared visual language.
+  </PackageCard>
+</PackageCards>
 
 ### Compositional Packages
 
 Higher-level compositional packages use the design system to provide solutions for common UI patterns:
 
-<PackageCards only={ [ 'dataviews', 'adminui' ] } />
+<PackageCards>
+  <PackageCard
+    illustration="dataviews"
+    title="DataViews"
+    packageName="@wordpress/dataviews"
+    storybookId="dataviews-dataviews--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-dataviews/"
+  >
+    Display, filter and edit lists of data as a table, grid or list, with DataForm for editing individual records.
+  </PackageCard>
+  <PackageCard
+    illustration="adminui"
+    title="Admin UI"
+    packageName="@wordpress/admin-ui"
+    storybookId="admin-ui-page--docs"
+    docsHref="https://developer.wordpress.org/block-editor/reference-guides/packages/packages-admin-ui/"
+  >
+    Building blocks for consistent admin page layouts and headers.
+  </PackageCard>
+</PackageCards>
 
 ## Principles of the Design System
 
 The design system is guided by a few principles that distinguish it from the existing [@wordpress/components](https://github.com/WordPress/gutenberg/tree/trunk/packages/components) package:
 
-<PrincipleCards />
+<PrincipleCards>
+  <PrincipleCard title="Cohesive by design">
+    Unlike `@wordpress/components`, which grew organically as a collection of unrelated UI elements, this design system guarantees user- and developer-facing cohesion through a unified token system and consistent component patterns.
+  </PrincipleCard>
+  <PrincipleCard title="Flexible theming">
+    Built from the ground up to support customizable color schemes and user personalization—capabilities needed to support the [Phase 3 admin redesign initiative](https://github.com/WordPress/gutenberg/issues/71196).
+  </PrincipleCard>
+  <PrincipleCard title="Modern distribution">
+    Distributed as a versioned npm package following [semantic versioning](https://semver.org/), rather than being bundled as a WordPress script on the `window.wp` global.
+  </PrincipleCard>
+  <PrincipleCard title="Composable architecture">
+    Components follow consistent patterns with proper composability, ref forwarding, and flexible rendering—avoiding the bloated abstractions that emerged from historical scope creep.
+  </PrincipleCard>
+</PrincipleCards>
 
 For more context on the motivations and goals behind this work, see the [Design System: Support for admin redesign](https://github.com/WordPress/gutenberg/issues/71196) overview issue.
 
