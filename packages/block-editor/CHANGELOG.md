@@ -32,6 +32,7 @@
 -   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
 -   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
 -   Writing flow: Move the end of a triple click selection back to the last text position before the boundary the browser overshoots to, instead of only correcting a next sibling reported at an offset of 0, so triple clicking a paragraph followed by a separator or a container block no longer starts a multi selection ([#81022](https://github.com/WordPress/gutenberg/pull/81022)).
+-   Writing flow: Apply the triple click selection correction to double clicks, so double clicking past the end of a paragraph's text no longer starts a multi selection with the next block ([#86997](https://github.com/WordPress/gutenberg/pull/86997)).
 
 ### Internal
 
