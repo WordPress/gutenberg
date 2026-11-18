@@ -10,6 +10,7 @@
 return array(
 	'label'             => _x( 'Trash', 'verb' ),
 	'isPrimary'         => true,
+	'isDestructive'     => true,
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,
 	'modalFocusOnMount' => 'firstContentElement',

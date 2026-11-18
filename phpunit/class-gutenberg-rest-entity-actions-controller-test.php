@@ -518,7 +518,7 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 		$action = $schema['properties']['actions']['items'];
 		$this->assertSame( 'object', $action['type'] );
 		$this->assertTrue( $action['additionalProperties'], 'A plugin can register properties of its own.' );
-		foreach ( array( 'id', 'origin', 'label', 'isPrimary', 'supportsBulk', 'disabled', 'context', 'modalHeader', 'hideModalHeader', 'modalSize', 'modalFocusOnMount' ) as $property ) {
+		foreach ( array( 'id', 'origin', 'label', 'isPrimary', 'isDestructive', 'supportsBulk', 'disabled', 'context', 'modalHeader', 'hideModalHeader', 'modalSize', 'modalFocusOnMount' ) as $property ) {
 			$this->assertArrayHasKey( $property, $action['properties'], "The `$property` action property should be described." );
 		}
 		foreach ( array( 'callback', 'RenderModal', 'isEligible', 'icon' ) as $property ) {
