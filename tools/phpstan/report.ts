@@ -23,6 +23,7 @@
 
 import { appendFileSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parseArgs } from 'node:util';
 
 const {
 	GITHUB_REPOSITORY,
@@ -66,7 +67,38 @@ interface Analysis {
 	fixNpmScript: string;
 }
 
-const isStrict = process.argv.slice( 2 ).includes( '--strict' );
+const USAGE =
+	'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>\n';
+
+let args: ReturnType< typeof parseArguments >;
+try {
+	args = parseArguments();
+} catch ( error ) {
+	// An unknown option, such as a mistyped `--strict`, rather than a report path.
+	process.stderr.write(
+		`${ error instanceof Error ? error.message : String( error ) }\n${ USAGE }`
+	);
+	process.exit( 2 );
+}
+if ( args.positionals.length !== 1 ) {
+	process.stderr.write( USAGE );
+	process.exit( 2 );
+}
+
+/**
+ * Parses the command-line arguments, rejecting unknown options.
+ *
+ * @return The parsed arguments.
+ */
+function parseArguments() {
+	return parseArgs( {
+		options: { strict: { type: 'boolean', default: false } },
+		allowPositionals: true,
+	} );
+}
+
+const isStrict = args.values.strict;
+const REPORT_PATH = args.positionals[ 0 ];
 
 const ANALYSIS: Analysis = isStrict
 	? {
@@ -425,17 +457,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 	return sections.join( '\n\n' ) + '\n';
 }
 
-const reportPath = process.argv
-	.slice( 2 )
-	.find( ( arg ) => arg !== '--strict' );
-if ( ! reportPath ) {
-	process.stderr.write(
-		'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>\n'
-	);
-	process.exit( 2 );
-}
-
-const errors = readErrors( resolve( INVOCATION_DIRECTORY, reportPath ) );
+const errors = readErrors( resolve( INVOCATION_DIRECTORY, REPORT_PATH ) );
 if ( errors === null ) {
 	process.stdout.write(
 		`::error title=${ escapeProperty(
