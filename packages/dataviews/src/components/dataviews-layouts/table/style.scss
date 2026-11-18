@@ -334,9 +334,19 @@
 
 // The primary column shows the primary actions below the title, so the actions
 // column only needs room for the actions menu.
+// They are text-sized links, like the row actions in wp-admin, so they add a
+// single line of text to the row height.
 .dataviews-view-table__primary-actions {
 	// Line up the first button's label with the title.
 	margin-inline-start: calc(-1 * var(--wpds-dimension-padding-xs));
+
+	&.dataviews-item-actions .components-button {
+		height: auto;
+		min-height: 0;
+		padding: 0 var(--wpds-dimension-padding-xs);
+		font-size: var(--wpds-typography-font-size-md);
+		line-height: var(--wpds-typography-line-height-sm);
+	}
 }
 
 .dataviews-view-table__group-header-row {
