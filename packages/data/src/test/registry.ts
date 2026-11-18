@@ -1,26 +1,32 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { AnyAction } from 'redux';
 import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
+import type { DataRegistry, StoreDescriptor } from '../types';
 
 const REGISTER_GENERIC_STORE_DEPRECATION =
 	'wp.data.registerGenericStore is deprecated since version 5.9. Please use wp.data.register( storeDescriptor ) instead.';
 
 describe( 'createRegistry', () => {
-	let registry;
+	let registry: DataRegistry;
 
-	const unsubscribes = [];
-	function subscribeWithUnsubscribe( ...args ) {
+	const unsubscribes: ( () => void )[] = [];
+	function subscribeWithUnsubscribe(
+		...args: Parameters< DataRegistry[ 'subscribe' ] >
+	) {
 		const unsubscribe = registry.subscribe( ...args );
 		unsubscribes.push( unsubscribe );
 		return unsubscribe;
 	}
-	function subscribeUntil( predicates ) {
+	function subscribeUntil(
+		predicates: ( () => boolean ) | ( () => boolean )[]
+	) {
 		predicates = Array.isArray( predicates ) ? predicates : [ predicates ];
 
-		return new Promise( ( resolve ) => {
+		return new Promise< void >( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
 				if ( predicates.every( ( predicate ) => predicate() ) ) {
 					resolve();
@@ -36,7 +42,7 @@ describe( 'createRegistry', () => {
 	} );
 
 	afterEach( () => {
-		let unsubscribe;
+		let unsubscribe: ( () => void ) | undefined;
 		while ( ( unsubscribe = unsubscribes.shift() ) ) {
 			unsubscribe();
 		}
@@ -45,28 +51,31 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'registerGenericStore', () => {
-		let getSelectors;
-		let getActions;
-		let subscribe;
+		let getSelectors: () => Record< string, Function >;
+		let getActions: () => Record< string, Function >;
+		let subscribe: ( listener: () => void ) => () => void;
 
 		beforeEach( () => {
 			getSelectors = () => ( {} );
 			getActions = () => ( {} );
-			subscribe = () => ( {} );
+			subscribe = () => () => {};
 		} );
 
 		it( 'should throw if not all required config elements are present', () => {
 			delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 			expect( () =>
+				// @ts-expect-error registerGenericStore requires complete store definition
 				registry.registerGenericStore( 'grocer', {} )
 			).toThrow();
 			expect( () =>
+				// @ts-expect-error registerGenericStore requires subscribe
 				registry.registerGenericStore( 'grocer', {
 					getSelectors,
 					getActions,
 				} )
 			).toThrow();
 			expect( () =>
+				// @ts-expect-error registerGenericStore requires getSelectors
 				registry.registerGenericStore( 'grocer', {
 					getActions,
 					subscribe,
@@ -79,17 +88,20 @@ describe( 'createRegistry', () => {
 
 		describe( 'getSelectors', () => {
 			it( 'should make selectors available via registry.select', () => {
-				const items = {
+				const items: Record<
+					string,
+					{ price: number; quantity: number }
+				> = {
 					broccoli: { price: 2, quantity: 15 },
 					lettuce: { price: 1, quantity: 12 },
 				};
 
-				function getPrice( itemName ) {
+				function getPrice( itemName: string ) {
 					const item = items[ itemName ];
 					return item && item.price;
 				}
 
-				function getQuantity( itemName ) {
+				function getQuantity( itemName: string ) {
 					const item = items[ itemName ];
 					return item && item.quantity;
 				}
@@ -115,19 +127,19 @@ describe( 'createRegistry', () => {
 			it( 'should make actions available via registry.dispatch', () => {
 				const dispatch = vi.fn();
 
-				function setPrice( itemName, price ) {
+				function setPrice( itemName: string, price: number ) {
 					return { type: 'SET_PRICE', itemName, price };
 				}
 
-				function setQuantity( itemName, quantity ) {
+				function setQuantity( itemName: string, quantity: number ) {
 					return { type: 'SET_QUANTITY', itemName, quantity };
 				}
 
 				getActions = () => {
 					return {
-						setPrice: ( ...args ) =>
+						setPrice: ( ...args: [ string, number ] ) =>
 							dispatch( setPrice( ...args ) ),
-						setQuantity: ( ...args ) =>
+						setQuantity: ( ...args: [ string, number ] ) =>
 							dispatch( setQuantity( ...args ) ),
 					};
 				};
@@ -166,8 +178,9 @@ describe( 'createRegistry', () => {
 				const storeChanged = () => {
 					listener();
 				};
-				subscribe = ( newListener ) => {
+				subscribe = ( newListener: () => void ) => {
 					listener = newListener;
+					return () => {};
 				};
 
 				const unsubscribe = registry.subscribe( registryListener );
@@ -192,7 +205,10 @@ describe( 'createRegistry', () => {
 	describe( 'registerStore', () => {
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
-				reducer( state = {}, action ) {
+				reducer(
+					state: Record< string, number > = {},
+					action: AnyAction
+				) {
 					switch ( action.type ) {
 						case 'sale':
 							return {
@@ -205,10 +221,13 @@ describe( 'createRegistry', () => {
 				},
 				initialState: { ribs: 6, chicken: 4 },
 				selectors: {
-					getPrice: ( state, meat ) => state[ meat ],
+					getPrice: (
+						state: Record< string, number >,
+						meat: string
+					) => state[ meat ],
 				},
 				actions: {
-					startSale: ( meat ) => ( { type: 'sale', meat } ),
+					startSale: ( meat: string ) => ( { type: 'sale', meat } ),
 				},
 			} );
 
@@ -247,7 +266,7 @@ describe( 'createRegistry', () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {},
 			} );
@@ -260,7 +279,7 @@ describe( 'createRegistry', () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: resolver,
@@ -284,7 +303,7 @@ describe( 'createRegistry', () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: { fulfill: resolver },
@@ -297,12 +316,17 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should use isFulfilled definition before calling the side effect', () => {
-			const fulfill = vi.fn().mockImplementation( ( state, page ) => {
-				return { type: 'SET_PAGE', page, result: [] };
-			} );
+			const fulfill = vi
+				.fn()
+				.mockImplementation( ( state: unknown, page: number ) => {
+					return { type: 'SET_PAGE', page, result: [] };
+				} );
 
 			const store = registry.registerStore( 'demo', {
-				reducer: ( state = {}, action ) => {
+				reducer: (
+					state: Record< number, unknown[] > = {},
+					action: AnyAction
+				) => {
 					switch ( action.type ) {
 						case 'SET_PAGE':
 							return {
@@ -314,12 +338,18 @@ describe( 'createRegistry', () => {
 					return state;
 				},
 				selectors: {
-					getPage: ( state, page ) => state[ page ],
+					getPage: (
+						state: Record< number, unknown[] >,
+						page: number
+					) => state[ page ],
 				},
 				resolvers: {
 					getPage: {
 						fulfill,
-						isFulfilled( state, page ) {
+						isFulfilled(
+							state: Record< number, unknown[] >,
+							page: number
+						) {
 							return state.hasOwnProperty( page );
 						},
 					},
@@ -365,11 +395,11 @@ describe( 'createRegistry', () => {
 
 		it( 'should resolve action to dispatch', async () => {
 			registry.registerStore( 'demo', {
-				reducer: ( state = 'NOTOK', action ) => {
+				reducer: ( state = 'NOTOK', action: AnyAction ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: () => ( { type: 'SET_OK' } ),
@@ -379,9 +409,14 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					registry
-						.select( coreDataStore )
-						.hasFinishedResolution( 'demo', 'getValue' ),
+					(
+						registry.select( coreDataStore ) as unknown as {
+							hasFinishedResolution: (
+								storeName: string,
+								selectorName: string
+							) => boolean;
+						}
+					 ).hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();
@@ -393,11 +428,11 @@ describe( 'createRegistry', () => {
 
 		it( 'should resolve promise action to dispatch', async () => {
 			registry.registerStore( 'demo', {
-				reducer: ( state = 'NOTOK', action ) => {
+				reducer: ( state = 'NOTOK', action: AnyAction ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: () => Promise.resolve( { type: 'SET_OK' } ),
@@ -407,9 +442,14 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					registry
-						.select( coreDataStore )
-						.hasFinishedResolution( 'demo', 'getValue' ),
+					(
+						registry.select( coreDataStore ) as unknown as {
+							hasFinishedResolution: (
+								storeName: string,
+								selectorName: string
+							) => boolean;
+						}
+					 ).hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();
@@ -424,13 +464,13 @@ describe( 'createRegistry', () => {
 				Promise.resolve( { type: 'SET_OK' } )
 			);
 			registry.registerStore( 'demo', {
-				reducer: ( state = 'NOTOK', action ) => {
+				reducer: ( state = 'NOTOK', action: AnyAction ) => {
 					return action.type === 'SET_OK' && state === 'NOTOK'
 						? 'OK'
 						: 'NOTOK';
 				},
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: resolver,
@@ -456,16 +496,16 @@ describe( 'createRegistry', () => {
 				Promise.resolve( { type: 'SET_OK' } )
 			);
 			registry.registerStore( 'demo', {
-				reducer: ( state = 'NOTOK', action ) => {
+				reducer: ( state = 'NOTOK', action: AnyAction ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
-					getValue: ( state ) => state,
+					getValue: ( state: string ) => state,
 				},
 				resolvers: {
 					getValue: {
 						fulfill,
-						shouldInvalidate: ( action ) =>
+						shouldInvalidate: ( action: AnyAction ) =>
 							action.type === 'INVALIDATE',
 					},
 				},
@@ -494,7 +534,7 @@ describe( 'createRegistry', () => {
 
 	describe( 'register', () => {
 		const store = createReduxStore( 'demo', {
-			reducer( state = 'OK', action ) {
+			reducer( state = 'OK', action: AnyAction ) {
 				if ( action.type === 'UPDATE' ) {
 					return 'UPDATED';
 				}
@@ -504,7 +544,7 @@ describe( 'createRegistry', () => {
 				update: () => ( { type: 'UPDATE' } ),
 			},
 			selectors: {
-				getValue: ( state ) => state,
+				getValue: ( state: string ) => state,
 			},
 		} );
 
@@ -613,11 +653,11 @@ describe( 'createRegistry', () => {
 
 	describe( 'subscribe', () => {
 		it( 'registers multiple selectors to the public API', () => {
-			let incrementedValue = null;
+			let incrementedValue: number | null = null;
 			const store = registry.registerStore( 'myAwesomeReducer', {
 				reducer: ( state = 0 ) => state + 1,
 				selectors: {
-					globalSelector: ( state ) => state,
+					globalSelector: ( state: number ) => state,
 				},
 			} );
 			const unsubscribe = registry.subscribe( () => {
@@ -732,7 +772,7 @@ describe( 'createRegistry', () => {
 		it( 'registers actions to the public API', async () => {
 			const increment = ( count = 1 ) => ( { type: 'increment', count } );
 			const store = registry.registerStore( 'counter', {
-				reducer: ( state = 0, action ) => {
+				reducer: ( state = 0, action: AnyAction ) => {
 					if ( action.type === 'increment' ) {
 						return state + action.count;
 					}
@@ -835,9 +875,12 @@ describe( 'createRegistry', () => {
 		it( 'should pass through options object to plugin', () => {
 			const expectedOptions = {};
 			const anyObject = expect.any( Object );
-			let actualOptions;
+			let actualOptions: Record< string, unknown > | undefined;
 
-			function plugin( _registry, options ) {
+			function plugin(
+				_registry: DataRegistry,
+				options?: Record< string, unknown >
+			) {
 				// The registry passed to a plugin is not the same as the one
 				// returned by createRegistry, as the former uses the internal
 				// representation of the object, the latter applying its
@@ -868,13 +911,19 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should override base method', () => {
-			function plugin( _registry, options ) {
-				return { select: () => options.value };
+			function plugin(
+				_registry: DataRegistry,
+				options?: Record< string, unknown >
+			) {
+				return {
+					select: ( () =>
+						options?.value ) as DataRegistry[ 'select' ],
+				};
 			}
 
 			registry.use( plugin, { value: 10 } );
 
-			expect( registry.select() ).toBe( 10 );
+			expect( ( registry.select as () => unknown )() ).toBe( 10 );
 		} );
 	} );
 
@@ -884,8 +933,8 @@ describe( 'createRegistry', () => {
 			const myAction = vi.fn();
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
-			const subscribe = () => {};
-			const myStore = {
+			const subscribe = () => () => {};
+			const myStore: StoreDescriptor = {
 				name: 'store',
 				instantiate: () => ( {
 					getSelectors,
@@ -908,7 +957,7 @@ describe( 'createRegistry', () => {
 			const myAction = vi.fn();
 			const getSelectors = () => ( { mySelector } );
 			const getActions = () => ( { myAction } );
-			const subscribe = () => {};
+			const subscribe = () => () => {};
 			registry.register( {
 				name: 'store',
 				instantiate: () => ( {
@@ -923,7 +972,7 @@ describe( 'createRegistry', () => {
 			const myAction2 = vi.fn();
 			const getSelectors2 = () => ( { mySelector: mySelector2 } );
 			const getActions2 = () => ( { myAction: myAction2 } );
-			const subscribe2 = () => {};
+			const subscribe2 = () => () => {};
 			subRegistry.register( {
 				name: 'store',
 				instantiate: () => ( {

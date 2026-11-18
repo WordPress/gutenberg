@@ -9,6 +9,8 @@ import {
 	it,
 	vi,
 } from 'vitest';
+import type { ComponentType } from 'react';
+import type { AnyAction } from 'redux';
 import {
 	useEffect,
 	useLayoutEffect,
@@ -22,24 +24,30 @@ import {
 	AsyncModeProvider,
 } from '../../..';
 import useSelect from '..';
+import type { DataRegistry } from '../../../types';
+
+type Select = DataRegistry[ 'select' ];
 
 function counterStore( initialCount = 0, step = 1 ) {
 	return {
-		reducer: ( state = initialCount, action ) =>
+		reducer: ( state = initialCount, action: AnyAction ) =>
 			action.type === 'INC' ? state + step : state,
 		actions: {
 			inc: () => ( { type: 'INC' } ),
 		},
 		selectors: {
-			get: ( state ) => state,
+			get: ( state: number ) => state,
 		},
 	};
 }
 
 /* eslint-disable @wordpress/wp-global-usage */
+declare global {
+	var setImmediate: ( callback: ( ...args: unknown[] ) => void ) => void;
+}
 describe( 'useSelect', () => {
 	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
-	let registry;
+	let registry: DataRegistry;
 
 	beforeAll( () => {
 		// Do not run hook in development mode; it will call `mapSelect` an extra time.
@@ -58,13 +66,16 @@ describe( 'useSelect', () => {
 		registry.registerStore( 'testStore', {
 			reducer: () => ( { foo: 'bar' } ),
 			selectors: {
-				testSelector: ( state, key ) => state[ key ],
+				testSelector: (
+					state: Record< string, string >,
+					key: string
+				) => state[ key ],
 			},
 		} );
 
 		const selectSpy = vi.fn();
-		const TestComponent = vi.fn( ( props ) => {
-			selectSpy.mockImplementation( ( select ) => ( {
+		const TestComponent = vi.fn( ( props: { keyName: string } ) => {
+			selectSpy.mockImplementation( ( select: Select ) => ( {
 				results: select( 'testStore' ).testSelector( props.keyName ),
 			} ) );
 			const data = useSelect( selectSpy, [ props.keyName ] );
@@ -88,17 +99,22 @@ describe( 'useSelect', () => {
 		registry.registerStore( 'testStore', {
 			reducer: () => ( { foo: 'bar' } ),
 			selectors: {
-				testSelector: ( state, key ) => state[ key ],
+				testSelector: (
+					state: Record< string, string >,
+					key: string
+				) => state[ key ],
 			},
 		} );
 
 		const selectSpyFoo = vi.fn( () => 'foo' );
 		const selectSpyBar = vi.fn( () => 'bar' );
-		const TestComponent = vi.fn( ( props ) => {
-			const mapSelect = props.change ? selectSpyFoo : selectSpyBar;
-			const data = useSelect( mapSelect, [ props.keyName ] );
-			return <div role="status">{ data }</div>;
-		} );
+		const TestComponent = vi.fn(
+			( props: { keyName: string; change?: boolean } ) => {
+				const mapSelect = props.change ? selectSpyFoo : selectSpyBar;
+				const data = useSelect( mapSelect, [ props.keyName ] );
+				return <div role="status">{ data }</div>;
+			}
+		);
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
@@ -144,17 +160,17 @@ describe( 'useSelect', () => {
 
 	it( 'does not rerender a nested component that is to be unmounted', () => {
 		registry.registerStore( 'toggler', {
-			reducer: ( state = false, action ) =>
+			reducer: ( state = false, action: AnyAction ) =>
 				action.type === 'TOGGLE' ? ! state : state,
 			actions: {
 				toggle: () => ( { type: 'TOGGLE' } ),
 			},
 			selectors: {
-				get: ( state ) => state,
+				get: ( state: boolean ) => state,
 			},
 		} );
 
-		const mapSelect = ( select ) => select( 'toggler' ).get();
+		const mapSelect = ( select: Select ) => select( 'toggler' ).get();
 
 		const mapSelectChild = vi.fn( mapSelect );
 		const Child = vi.fn( () => {
@@ -211,7 +227,7 @@ describe( 'useSelect', () => {
 		registry.registerStore( 'store-even', counterStore( 0, 2 ) );
 		registry.registerStore( 'store-odd', counterStore( 1, 2 ) );
 
-		const mapSelect = vi.fn( ( select ) => {
+		const mapSelect = vi.fn( ( select: Select ) => {
 			const first = select( 'store-main' ).get();
 			// select from other stores depending on whether main value is even or odd
 			const secondStore = first % 2 === 1 ? 'store-odd' : 'store-even';
@@ -282,13 +298,14 @@ describe( 'useSelect', () => {
 	} );
 
 	describe( 'rerenders as expected with various mapSelect return types', () => {
-		const getComponent = ( mapSelectSpy ) => () => {
-			const data = useSelect( mapSelectSpy, [] );
-			return <div role="status" data-d={ JSON.stringify( data ) } />;
-		};
+		const getComponent =
+			( mapSelectSpy: ( select: Select ) => unknown ) => () => {
+				const data = useSelect( mapSelectSpy, [] );
+				return <div role="status" data-d={ JSON.stringify( data ) } />;
+			};
 
-		let TestComponent;
-		const mapSelectSpy = vi.fn( ( select ) =>
+		let TestComponent: ComponentType;
+		const mapSelectSpy = vi.fn( ( select: Select ) =>
 			select( 'testStore' ).testSelector()
 		);
 		const selectorSpy = vi.fn();
@@ -328,7 +345,7 @@ describe( 'useSelect', () => {
 		] )(
 			'renders as expected with %s return values',
 			( type, testValues ) => {
-				const [ valueA, valueB ] = testValues;
+				const [ valueA, valueB ] = testValues as [ unknown, unknown ];
 				selectorSpy.mockReturnValue( valueA );
 				render(
 					<RegistryProvider value={ registry }>
@@ -364,11 +381,13 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const count1 = useSelect(
-					( select ) => selectCount1() || select( 'store-1' ).get(),
+					( select: Select ) =>
+						selectCount1() || select( 'store-1' ).get(),
 					[]
 				);
 				useSelect(
-					( select ) => selectCount2() || select( 'store-2' ).get(),
+					( select: Select ) =>
+						selectCount2() || select( 'store-2' ).get(),
 					[]
 				);
 
@@ -417,7 +436,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const { count1, count2 } = useSelect(
-					( select ) =>
+					( select: Select ) =>
 						selectCount1And2() || {
 							count1: select( 'store-1' ).get(),
 							count2: select( 'store-2' ).get(),
@@ -461,13 +480,13 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'store-2', counterStore() );
 			registry.registerStore( 'store-3', counterStore() );
 
-			let dep, setDep;
+			let dep: number, setDep: ( value: number ) => void;
 			const selectCount1AndDep = vi.fn();
 
 			const TestComponent = vi.fn( () => {
 				[ dep, setDep ] = useState( 0 );
 				const state = useSelect(
-					( select ) =>
+					( select: Select ) =>
 						selectCount1AndDep() || {
 							count1: select( 'store-1' ).get(),
 							dep,
@@ -515,7 +534,7 @@ describe( 'useSelect', () => {
 		it( 'captures state changes scheduled between render and subscription', () => {
 			registry.registerStore( 'store-1', counterStore() );
 
-			const selectCount1 = vi.fn( ( select ) => ( {
+			const selectCount1 = vi.fn( ( select: Select ) => ( {
 				count1: select( 'store-1' ).get(),
 			} ) );
 
@@ -553,7 +572,10 @@ describe( 'useSelect', () => {
 
 		it( 'captures state changes scheduled between render and effect after selector change', () => {
 			registry.registerStore( 'names', {
-				reducer: ( state = {}, action ) => {
+				reducer: (
+					state: Record< number, string > = {},
+					action: AnyAction
+				) => {
 					if ( action.type === 'SET_NAME' ) {
 						return {
 							...state,
@@ -563,20 +585,25 @@ describe( 'useSelect', () => {
 					return state;
 				},
 				actions: {
-					setName: ( id, name ) => ( { type: 'SET_NAME', id, name } ),
+					setName: ( id: number, name: string ) => ( {
+						type: 'SET_NAME',
+						id,
+						name,
+					} ),
 				},
 				selectors: {
-					getName: ( state, id ) => state[ id ] ?? 'null',
+					getName: ( state: Record< number, string >, id: number ) =>
+						state[ id ] ?? 'null',
 				},
 			} );
 
-			const renderedItems = [];
+			const renderedItems: string[] = [];
 
 			function TestComponent() {
 				const [ blockId, setBlockId ] = useState( 1 );
 
 				const name = useSelect(
-					( select ) => select( 'names' ).getName( blockId ),
+					( select: Select ) => select( 'names' ).getName( blockId ),
 					[ blockId ]
 				);
 
@@ -615,9 +642,9 @@ describe( 'useSelect', () => {
 
 		it( 'handles registry selectors', () => {
 			const getCount1And2 = createRegistrySelector(
-				( select ) => ( state ) => ( {
+				( select ) => ( state: number ) => ( {
 					count1: state,
-					count2: select( 'store-2' ).get(),
+					count2: ( select as Select )( 'store-2' ).get(),
 				} )
 			);
 
@@ -630,7 +657,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) =>
+					( select: Select ) =>
 						selectCount1And2() ||
 						select( 'store-1' ).getCount1And2(),
 					[]
@@ -673,11 +700,11 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const [ shouldSelectCount1, toggle ] = useReducer(
-					( should ) => ! should,
+					( should: boolean ) => ! should,
 					false
 				);
 				const state = useSelect(
-					( select ) => {
+					( select: Select ) => {
 						if ( shouldSelectCount1 ) {
 							selectCount1();
 							return 'count1:' + select( 'store-1' ).get();
@@ -742,7 +769,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) => ( {
+					( select: Select ) => ( {
 						parentCount: select( 'parent-store' ).get(),
 						childCount: select( 'child-store' ).get(),
 					} ),
@@ -782,7 +809,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) => ( {
+					( select: Select ) => ( {
 						count1: select( 'store-1' ).get(),
 						count2: select( 'store-2' )?.get() ?? 'blank',
 					} ),
@@ -821,7 +848,7 @@ describe( 'useSelect', () => {
 		it( 'handles registration of a non-existing store during rendering', () => {
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) =>
+					( select: Select ) =>
 						select( 'not-yet-registered-store' )?.get() ?? 'blank',
 					[]
 				);
@@ -862,7 +889,7 @@ describe( 'useSelect', () => {
 
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) =>
+					( select: Select ) =>
 						select( 'not-yet-registered-child-store' )?.get() ??
 						'blank',
 					[]
@@ -926,18 +953,27 @@ describe( 'useSelect', () => {
 						getActions() {
 							return actions;
 						},
-						subscribe( listener ) {
+						subscribe( listener: () => void ) {
 							storeChanged = listener;
 						},
 					};
 				},
 			};
 
-			registry.register( customStore );
+			registry.register(
+				customStore as unknown as Parameters<
+					DataRegistry[ 'register' ]
+				>[ 0 ]
+			);
 
 			const TestComponent = vi.fn( () => {
 				const state = useSelect(
-					( select ) => select( customStore ).get(),
+					( select: Select ) =>
+						(
+							select( customStore as never ) as {
+								get: () => number;
+							}
+						 ).get(),
 					[]
 				);
 
@@ -953,7 +989,11 @@ describe( 'useSelect', () => {
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			act( () => {
-				registry.dispatch( customStore ).inc();
+				(
+					registry.dispatch( customStore as never ) as {
+						inc: () => void;
+					}
+				 ).inc();
 			} );
 
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
@@ -968,7 +1008,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'renders with async mode', async () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
@@ -1006,14 +1048,16 @@ describe( 'useSelect', () => {
 
 		// Tests render queue fixes done in https://github.com/WordPress/gutenberg/pull/19286
 		it( 'catches updates while switching from async to sync', () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
 
-			const App = ( { async } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1048,13 +1092,13 @@ describe( 'useSelect', () => {
 		it( 'notifies synchronously after switching from async to sync', () => {
 			const TestComponent = () => {
 				const count = useSelect(
-					( select ) => select( 'counter' ).get(),
+					( select: Select ) => select( 'counter' ).get(),
 					[]
 				);
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1077,20 +1121,23 @@ describe( 'useSelect', () => {
 
 		it( 'cancels scheduled updates when mapSelect function changes', async () => {
 			const selectA = vi.fn(
-				( select ) => 'a:' + select( 'counter' ).get()
+				( select: Select ) => 'a:' + select( 'counter' ).get()
 			);
 			const selectB = vi.fn(
-				( select ) => 'b:' + select( 'counter' ).get()
+				( select: Select ) => 'b:' + select( 'counter' ).get()
 			);
 
-			const TestComponent = vi.fn( ( { variant } ) => {
-				const count = useSelect( variant === 'a' ? selectA : selectB, [
-					variant,
-				] );
-				return <div role="status">{ count }</div>;
-			} );
+			const TestComponent = vi.fn(
+				( { variant }: { variant: string } ) => {
+					const count = useSelect(
+						variant === 'a' ? selectA : selectB,
+						[ variant ]
+					);
+					return <div role="status">{ count }</div>;
+				}
+			);
 
-			const App = ( { variant } ) => (
+			const App = ( { variant }: { variant: string } ) => (
 				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent variant={ variant } />
@@ -1126,7 +1173,9 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'cancels scheduled updates when unmounting', async () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
@@ -1169,14 +1218,16 @@ describe( 'useSelect', () => {
 			const registry2 = createRegistry();
 			registry2.registerStore( 'counter', counterStore( 100 ) );
 
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
 
-			const App = ( { reg } ) => (
+			const App = ( { reg }: { reg: DataRegistry } ) => (
 				<AsyncModeProvider value>
 					<RegistryProvider value={ reg }>
 						<TestComponent />
@@ -1211,7 +1262,7 @@ describe( 'useSelect', () => {
 
 			const AsyncCounter = () => {
 				const count = useSelect(
-					( select ) => select( 'counter' ).get(),
+					( select: Select ) => select( 'counter' ).get(),
 					[]
 				);
 				return <div role="status">{ count }</div>;
@@ -1239,7 +1290,7 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'counter2', counterStore( 10 ) );
 
 			const selectSpy = vi.fn(
-				( select ) =>
+				( select: Select ) =>
 					select( 'counter' ).get() + ':' + select( 'counter2' ).get()
 			);
 
@@ -1273,14 +1324,16 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'defers updates after switching from sync to async', async () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			const TestComponent = vi.fn( () => {
 				const count = useSelect( selectSpy, [] );
 				return <div role="status">{ count }</div>;
 			} );
 
-			const App = ( { async } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
@@ -1314,9 +1367,11 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'catches an update dispatched from a layout effect on a mode switch', () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
-			const TestComponent = ( { async } ) => {
+			const TestComponent = ( { async }: { async?: boolean } ) => {
 				const count = useSelect( selectSpy, [] );
 				// Layout effects run between the render that switches the mode
 				// and the passive effects, the narrowest window in which a
@@ -1329,7 +1384,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<TestComponent async={ async } />
@@ -1345,12 +1400,14 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'catches an update dispatched from a sibling effect on a mode switch', () => {
-			const selectSpy = vi.fn( ( select ) => select( 'counter' ).get() );
+			const selectSpy = vi.fn( ( select: Select ) =>
+				select( 'counter' ).get()
+			);
 
 			// Rendered before the hook, so its passive effect runs before the
 			// hook's own, while `useSyncExternalStore` has not yet re-read the
 			// value for the new mode.
-			const Sibling = ( { async } ) => {
+			const Sibling = ( { async }: { async?: boolean } ) => {
 				useEffect( () => {
 					if ( ! async ) {
 						registry.dispatch( 'counter' ).inc();
@@ -1364,7 +1421,7 @@ describe( 'useSelect', () => {
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { async } ) => (
+			const App = ( { async }: { async: boolean } ) => (
 				<AsyncModeProvider value={ async }>
 					<RegistryProvider value={ registry }>
 						<Sibling async={ async } />
@@ -1383,7 +1440,7 @@ describe( 'useSelect', () => {
 		it( 'schedules another flush for updates dispatched during a flush', async () => {
 			const TestComponent = () => {
 				const count = useSelect(
-					( select ) => select( 'counter' ).get(),
+					( select: Select ) => select( 'counter' ).get(),
 					[]
 				);
 				useLayoutEffect( () => {
@@ -1414,7 +1471,7 @@ describe( 'useSelect', () => {
 		it( 'recreates the shared subscription after the last async subscriber leaves', async () => {
 			const TestComponent = () => {
 				const count = useSelect(
-					( select ) => select( 'counter' ).get(),
+					( select: Select ) => select( 'counter' ).get(),
 					[]
 				);
 				return <div role="status">{ count }</div>;
@@ -1441,7 +1498,8 @@ describe( 'useSelect', () => {
 		} );
 
 		it( 'does not share the registry-wide fallback of a store registered late', async () => {
-			const selectLate = ( select ) => select( 'late' )?.get() ?? 'none';
+			const selectLate = ( select: Select ) =>
+				select( 'late' )?.get() ?? 'none';
 			const selectSpy = vi.fn( selectLate );
 
 			const Early = () => {
@@ -1453,7 +1511,7 @@ describe( 'useSelect', () => {
 				return <div role="note">{ value }</div>;
 			};
 
-			const App = ( { withLate } ) => (
+			const App = ( { withLate }: { withLate?: boolean } ) => (
 				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<Early />
@@ -1492,14 +1550,14 @@ describe( 'useSelect', () => {
 		it( 'does not memoize the callback when there are no deps', () => {
 			registry.registerStore( 'store', counterStore( 1 ) );
 
-			const Status = ( { multiple } ) => {
+			const Status = ( { multiple }: { multiple: number } ) => {
 				const count = useSelect(
-					( select ) => select( 'store' ).get() * multiple
+					( select: Select ) => select( 'store' ).get() * multiple
 				);
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { multiple } ) => (
+			const App = ( { multiple }: { multiple: number } ) => (
 				<RegistryProvider value={ registry }>
 					<Status multiple={ multiple } />
 				</RegistryProvider>
@@ -1518,12 +1576,14 @@ describe( 'useSelect', () => {
 			registry.registerStore( 'counter-1', counterStore( 1 ) );
 			registry.registerStore( 'counter-2', counterStore( 10 ) );
 
-			const Status = ( { store } ) => {
-				const count = useSelect( ( select ) => select( store ).get() );
+			const Status = ( { store }: { store: string } ) => {
+				const count = useSelect( ( select: Select ) =>
+					select( store ).get()
+				);
 				return <div role="status">{ count }</div>;
 			};
 
-			const App = ( { store } ) => (
+			const App = ( { store }: { store: string } ) => (
 				<RegistryProvider value={ registry }>
 					<Status store={ store } />
 				</RegistryProvider>
@@ -1558,7 +1618,9 @@ describe( 'useSelect', () => {
 			const record = vi.fn();
 
 			function TestComponent() {
-				const { get } = useSelect( 'testStore' );
+				const { get } = (
+					useSelect as ( store: string ) => { get: () => number }
+				 )( 'testStore' );
 				return (
 					<button onClick={ () => record( get() ) }>record</button>
 				);
