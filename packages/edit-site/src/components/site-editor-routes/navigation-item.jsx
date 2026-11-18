@@ -1,7 +1,7 @@
-import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { isThemeDataLoaded } from './utils';
+import { NavigationMenuItemCanvas } from '../navigation-menu-locations';
 
 export const navigationItemRoute = {
 	name: 'navigation-item',
@@ -22,7 +22,7 @@ export const navigationItemRoute = {
 				return null;
 			}
 			return siteData.currentTheme.is_block_theme ? (
-				<Editor />
+				<NavigationMenuItemCanvas />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);

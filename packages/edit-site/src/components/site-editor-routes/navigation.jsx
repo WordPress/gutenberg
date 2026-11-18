@@ -1,7 +1,7 @@
-import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenus from '../sidebar-navigation-screen-navigation-menus';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import { isThemeDataLoaded } from './utils';
+import { NavigationCanvas } from '../navigation-menu-locations';
 
 export const navigationRoute = {
 	name: 'navigation',
@@ -19,7 +19,7 @@ export const navigationRoute = {
 		},
 		preview( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
-			return isBlockTheme ? <Editor /> : undefined;
+			return isBlockTheme ? <NavigationCanvas /> : undefined;
 		},
 		mobileSidebar( { siteData } ) {
 			if ( ! isThemeDataLoaded( siteData ) ) {

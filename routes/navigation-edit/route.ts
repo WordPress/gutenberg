@@ -6,6 +6,19 @@ import { notFound } from '@wordpress/route';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
+/**
+ * Whether the Navigation menu editing experiment is on. Its flag is set
+ * alongside the block editor script, which loads with the editor assets.
+ */
+async function isNavigationMenuEditingEnabled() {
+	if ( ! ( window as any ).__experimentalNavigationMenuEditing ) {
+		const { loadEditorAssets } = await import( '@wordpress/lazy-editor' );
+		await loadEditorAssets();
+	}
+
+	return !! ( window as any ).__experimentalNavigationMenuEditing;
+}
+
 export const route = {
 	beforeLoad: async ( {
 		params,
@@ -74,6 +87,12 @@ export const route = {
 			id: string;
 		};
 	} ) => {
+		// With the Navigation menu editing experiment on, the canvas shows
+		// where the menu is used instead (see `canvas.tsx`).
+		if ( await isNavigationMenuEditingEnabled() ) {
+			return null;
+		}
+
 		const postId = parseInt( params.id );
 		return {
 			postType: NAVIGATION_POST_TYPE,

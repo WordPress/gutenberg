@@ -1,8 +1,4 @@
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-	BlockList,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore, BlockList } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -10,8 +6,9 @@ import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library
 import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
-const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
+const { NavigationLinkUI, NavigationMenuListView } = unlock(
+	blockLibraryPrivateApis
+);
 
 // The sidebar's link search lists only these blocks, which work as menu items
 // without editing them from the sidebar, which is not available yet. The other
@@ -103,8 +100,9 @@ export default function NavigationMenuContent( { rootClientId } ) {
 				</p>
 			) }
 			{ ! isLoading && (
-				<PrivateListView
+				<NavigationMenuListView
 					rootClientId={ listViewRootClientId }
+					navigationClientId={ rootClientId }
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender

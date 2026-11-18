@@ -13,6 +13,11 @@ import { unlock } from '@wordpress/routes-lock-unlock';
 import { getActiveViewOverrides, type ViewOverrides } from './view-utils';
 import { useEditNavigationAction } from './actions/edit-navigation';
 import { AddNavigationModal } from './add-navigation';
+import {
+	getWhereUsedField,
+	useMenuLocationsApis,
+	WHERE_USED_FIELD_ID,
+} from './where-used';
 import './style.scss';
 
 // Unlock WordPress private APIs
@@ -113,9 +118,31 @@ function NavigationListView( {
 		PRELOADED_NAVIGATION_MENUS_QUERY
 	);
 
-	const fields = usePostFields( {
+	const postFields = usePostFields( {
 		postType: NAVIGATION_POST_TYPE,
 	} );
+	// Where each menu is used, with the Navigation menu editing experiment on.
+	const menuLocationsApis = useMenuLocationsApis();
+	const fields = useMemo(
+		() =>
+			menuLocationsApis && postFields
+				? [ ...postFields, getWhereUsedField( menuLocationsApis ) ]
+				: postFields,
+		[ menuLocationsApis, postFields ]
+	);
+	const shownView = useMemo(
+		() =>
+			menuLocationsApis && ! view.fields?.includes( WHERE_USED_FIELD_ID )
+				? {
+						...view,
+						fields: [
+							...( view.fields ?? [] ),
+							WHERE_USED_FIELD_ID,
+						],
+					}
+				: view,
+		[ menuLocationsApis, view ]
+	);
 	const [ showAddModal, setShowAddModal ] = useState( false );
 
 	const editAction = useEditNavigationAction();
@@ -168,7 +195,7 @@ function NavigationListView( {
 				<DataViews
 					data={ navigationMenus }
 					fields={ fields }
-					view={ view }
+					view={ shownView }
 					onChangeView={ updateView }
 					isLoading={ isResolving || ! fields }
 					actions={ actions }

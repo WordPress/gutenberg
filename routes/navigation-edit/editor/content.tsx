@@ -1,15 +1,9 @@
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-	BlockList,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore, BlockList } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
-
-const { PrivateListView } = unlock( blockEditorPrivateApis );
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
@@ -39,7 +33,7 @@ export default function NavigationMenuContent( {
 	// `undefined` (and crashing the screen). This component only renders once
 	// `useEditorAssets` reports the assets ready, which is exactly when the
 	// global is defined — do not "clean this up" into an import.
-	const { NavigationLinkUI } = unlock(
+	const { NavigationLinkUI, NavigationMenuListView } = unlock(
 		( window as any ).wp.blockLibrary.privateApis
 	);
 
@@ -95,8 +89,9 @@ export default function NavigationMenuContent( {
 				</p>
 			) }
 			{ ! isLoading && (
-				<PrivateListView
+				<NavigationMenuListView
 					rootClientId={ listViewRootClientId }
+					navigationClientId={ rootClientId }
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender

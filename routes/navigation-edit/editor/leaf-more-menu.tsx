@@ -4,6 +4,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -15,7 +16,14 @@ export default function LeafMoreMenu( {
 	...props
 }: {
 	clientId: string;
+	updateExpansion?: unknown;
+	setInsertedBlockClientId?: unknown;
 } ) {
+	// Read from the global, not imported: see `content.tsx`. This menu only
+	// renders inside the list view, once the editor assets have loaded.
+	const { CreateSubmenuMenuGroup } = unlock(
+		( window as any ).wp.blockLibrary.privateApis
+	);
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
@@ -139,6 +147,14 @@ export default function LeafMoreMenu( {
 							</>
 						) }
 					</MenuGroup>
+					<CreateSubmenuMenuGroup
+						clientId={ clientId }
+						onClose={ onClose }
+						updateExpansion={ props.updateExpansion }
+						setInsertedBlockClientId={
+							props.setInsertedBlockClientId
+						}
+					/>
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {

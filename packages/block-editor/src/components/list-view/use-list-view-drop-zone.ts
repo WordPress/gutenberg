@@ -175,18 +175,48 @@ function isNestingGesture(
 const ALLOWED_DROP_EDGES: [ EdgeName, ...EdgeName[] ] = [ 'top', 'bottom' ];
 
 /**
+ * The share of a row's height, at its top and at its bottom, that still drops
+ * before or after the row when dropping on a row nests. The band between them
+ * nests the dragged blocks inside the row.
+ */
+export const DROP_ON_ROW_EDGE_RATIO = 1 / 3;
+
+/**
+ * Determines whether the cursor is over the middle band of a row, where
+ * dropping on the row nests the dragged blocks inside it.
+ *
+ * @param point The point representing the cursor position when dragging.
+ * @param rect  The rectangle of the row.
+ * @return Whether the point is over the middle band of the row.
+ */
+function isOverRowCenter(
+	point: Point,
+	rect: Pick< DOMRect, 'top' | 'bottom' >
+): boolean {
+	const edgeHeight = ( rect.bottom - rect.top ) * DROP_ON_ROW_EDGE_RATIO;
+	return (
+		point.y > rect.top + edgeHeight && point.y < rect.bottom - edgeHeight
+	);
+}
+
+/**
  * Given blocks data and the cursor position, compute the drop target.
  *
- * @param blocksData Data about the blocks in list view.
- * @param position   The point representing the cursor position when dragging.
- * @param rtl        Whether the editor is in RTL mode.
+ * @param blocksData              Data about the blocks in list view.
+ * @param position                The point representing the cursor position when dragging.
+ * @param rtl                     Whether the editor is in RTL mode.
+ * @param options                 Optional behaviour.
+ * @param options.dropOnRowToNest Whether dropping over the middle of a row
+ *                                nests the dragged blocks inside it, even when
+ *                                the row has no children yet.
  *
  * @return An object containing data about the drop target.
  */
 export function getListViewDropTarget(
 	blocksData: ListViewDropZoneBlock[],
 	position: Point,
-	rtl = false
+	rtl = false,
+	{ dropOnRowToNest = false }: { dropOnRowToNest?: boolean } = {}
 ): ListViewDropZoneTarget | undefined {
 	// The edge, rect and index are set together with `candidateBlockData`.
 	let candidateEdge!: 'top' | 'bottom';
@@ -209,6 +239,26 @@ export function getListViewDropTarget(
 		);
 
 		const isCursorWithinBlock = isPointContainedByRect( position, rect );
+
+		// Dropping over the middle of a row nests inside it, when opted in.
+		if (
+			dropOnRowToNest &&
+			isCursorWithinBlock &&
+			blockData.canInsertDraggedBlocksAsChild &&
+			isOverRowCenter( position, rect )
+		) {
+			return {
+				rootClientId: blockData.clientId,
+				clientId: blockData.clientId,
+				// Expanded rows show their children right below them, so
+				// insert as the first child. Otherwise, append.
+				blockIndex: blockData.isExpanded
+					? 0
+					: blockData.innerBlockCount || 0,
+				dropPosition: 'inside',
+			};
+		}
+
 		if (
 			candidateDistance === undefined ||
 			distance < candidateDistance ||
@@ -414,12 +464,14 @@ const EXPAND_THROTTLE_OPTIONS = {
  * @param props                 Named parameters.
  * @param props.dropZoneElement Optional element to be used as the drop zone.
  * @param props.updateExpansion Dispatch to update the expansion state of a list of block clientIds.
+ * @param props.dropOnRowToNest Whether dropping over the middle of a row nests the dragged blocks inside it.
  *
  * @return The drop target.
  */
 export default function useListViewDropZone( {
 	dropZoneElement,
 	updateExpansion,
+	dropOnRowToNest = false,
 }: UseListViewDropZoneOptions ): {
 	ref: RefCallback< HTMLElement >;
 	target: ListViewDropZoneTarget | null | undefined;
@@ -538,7 +590,8 @@ export default function useListViewDropZone( {
 				const newTarget = getListViewDropTarget(
 					blocksData,
 					position,
-					rtl
+					rtl,
+					{ dropOnRowToNest }
 				);
 
 				if ( newTarget ) {
@@ -548,6 +601,7 @@ export default function useListViewDropZone( {
 			[
 				canInsertBlocks,
 				draggedBlockClientIds,
+				dropOnRowToNest,
 				getBlockCount,
 				getBlockIndex,
 				getBlockRootClientId,

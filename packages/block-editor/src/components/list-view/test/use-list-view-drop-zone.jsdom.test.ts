@@ -550,4 +550,132 @@ describe( 'getListViewDropTarget', () => {
 			} );
 		} );
 	} );
+
+	describe( 'with dropOnRowToNest', () => {
+		const options = { dropOnRowToNest: true };
+
+		it( 'does not nest over the middle of a childless row by default', () => {
+			// The middle of block-4, toward its left edge.
+			const target = getListViewDropTarget(
+				blocksData,
+				{ x: 20, y: 225 },
+				false
+			);
+
+			expect( target?.dropPosition ).not.toBe( 'inside' );
+		} );
+
+		it( 'nests inside a childless row when dropped over its middle', () => {
+			[
+				{ position: { x: 20, y: 225 }, rtl: false },
+				{ position: { x: 290, y: 225 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					blocksData,
+					position,
+					rtl,
+					options
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 0,
+					clientId: 'block-4',
+					dropPosition: 'inside',
+					rootClientId: 'block-4',
+				} );
+			} );
+		} );
+
+		it( 'nests inside the hovered row, not the row above, when over the upper middle of a row', () => {
+			// Just above the vertical centre of block-4, which would otherwise
+			// resolve to dropping after block-1's branch.
+			const target = getListViewDropTarget(
+				blocksData,
+				{ x: 20, y: 220 },
+				false,
+				options
+			);
+
+			expect( target ).toEqual( {
+				blockIndex: 0,
+				clientId: 'block-4',
+				dropPosition: 'inside',
+				rootClientId: 'block-4',
+			} );
+		} );
+
+		it( 'appends to a collapsed row that has children', () => {
+			const collapsedParent = [
+				{
+					...blocksData[ 3 ],
+					innerBlockCount: 2,
+					isExpanded: false,
+				},
+			] as ListViewDropZoneBlock[];
+
+			const target = getListViewDropTarget(
+				collapsedParent,
+				{ x: 20, y: 225 },
+				false,
+				options
+			);
+
+			expect( target ).toEqual( {
+				blockIndex: 2,
+				clientId: 'block-4',
+				dropPosition: 'inside',
+				rootClientId: 'block-4',
+			} );
+		} );
+
+		it( 'still drops before or after a row over its top and bottom edges', () => {
+			const singleRow = [ blocksData[ 3 ] ];
+
+			expect(
+				getListViewDropTarget(
+					singleRow,
+					{ x: 20, y: 205 },
+					false,
+					options
+				)
+			).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-4',
+				dropPosition: 'top',
+				rootClientId: '',
+			} );
+
+			expect(
+				getListViewDropTarget(
+					singleRow,
+					{ x: 20, y: 245 },
+					false,
+					options
+				)
+			).toEqual( {
+				blockIndex: 2,
+				clientId: 'block-4',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
+		} );
+
+		it( 'does not nest when the row cannot accept the dragged blocks', () => {
+			const lockedRow = [
+				{
+					...blocksData[ 3 ],
+					canInsertDraggedBlocksAsChild: false,
+				},
+			] as ListViewDropZoneBlock[];
+
+			const target = getListViewDropTarget(
+				lockedRow,
+				{ x: 20, y: 225 },
+				false,
+				options
+			);
+
+			expect( target?.dropPosition ).not.toBe( 'inside' );
+		} );
+	} );
 } );

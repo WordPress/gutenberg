@@ -64,3 +64,13 @@
 .edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor {
 	display: none;
 }
+
+.edit-site-sidebar-navigation-screen-navigation-menus__label {
+	display: flex;
+	flex-direction: column;
+}
+
+.edit-site-sidebar-navigation-screen-navigation-menus__where-used {
+	font-size: $helptext-font-size;
+	opacity: 0.7;
+}

@@ -58,6 +58,8 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import AutoMenuBlockControls from '../menu-list-view/auto-menu-block-controls';
+import { useIsAutoMenu } from '../menu-list-view/auto-menu';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
@@ -82,6 +84,8 @@ const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const { getBlockCount } = useSelect( blockEditorStore );
+	// An Auto menu is customized first, so pages aren't listed twice.
+	const isAutoMenu = useIsAutoMenu( clientId );
 
 	const onAddPage = useCallback( () => {
 		// Get the current number of blocks to insert at the end
@@ -96,6 +100,10 @@ function NavigationAddPageButton( { clientId } ) {
 		// Insert the block at the end of the navigation
 		insertBlock( newBlock, blockCount, clientId );
 	}, [ clientId, insertBlock, getBlockCount ] );
+
+	if ( isAutoMenu ) {
+		return null;
+	}
 
 	return (
 		<BlockControls>
@@ -1092,6 +1100,7 @@ function Navigation( {
 			{ blockEditingMode === 'default' && stylingInspectorControls }
 			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 				<RecursionProvider uniqueId={ recursionId }>
+					<AutoMenuBlockControls clientId={ clientId } />
 					{ blockEditingMode === 'contentOnly' &&
 						isEntityAvailable && (
 							<NavigationAddPageButton clientId={ clientId } />

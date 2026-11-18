@@ -1,9 +1,11 @@
 import { page, addSubmenu } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import isNavigationMenuEditingEnabled from '../navigation/menu-list-view/is-enabled';
+import isLabelOnlySubmenu from './is-label-only';
 import transforms from './transforms';
 
 const { name } = metadata;
@@ -33,6 +35,25 @@ export const settings = {
 
 		return label;
 	},
+	// A label-only submenu (#86936) has no link of its own and only opens its
+	// items. As a variation it gets its own icon, title and description in
+	// the list view and block card, so it reads as different from a link.
+	variations: isNavigationMenuEditingEnabled()
+		? [
+				{
+					name: 'label-only',
+					title: __( 'Label-only submenu' ),
+					description: __(
+						'A submenu heading that doesn’t link anywhere. It opens and closes its items.'
+					),
+					icon: addSubmenu,
+					attributes: {},
+					isActive: ( blockAttributes ) =>
+						isLabelOnlySubmenu( blockAttributes ),
+					scope: [],
+				},
+			]
+		: undefined,
 	edit,
 	example: {
 		attributes: {

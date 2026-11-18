@@ -29,6 +29,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-navigation-menu-editing',
+					'label'       => __( 'Navigation menu editing prototypes', 'gutenberg' ),
+					'description' => __( 'Enables prototypes for editing Navigation Menus without needing to understand blocks: a task-based inserter, bulk adding, sub menu containers, label-only sub menus, Auto menus and live previews of menu locations. For user testing only.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

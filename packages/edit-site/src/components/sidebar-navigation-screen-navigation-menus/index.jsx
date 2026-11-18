@@ -10,6 +10,7 @@ import { navigation } from '@wordpress/icons';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+import MenuItemLabel from './menu-item-label';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
@@ -116,7 +117,13 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 						withChevron
 						icon={ navigation }
 					>
-						{ buildMenuLabel( title?.rendered, index + 1, status ) }
+						<MenuItemLabel navigationId={ id }>
+							{ buildMenuLabel(
+								title?.rendered,
+								index + 1,
+								status
+							) }
+						</MenuItemLabel>
 					</NavMenuItem>
 				) ) }
 			</ItemGroup>

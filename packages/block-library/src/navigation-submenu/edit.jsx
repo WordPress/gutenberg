@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { Stack, Text } from '@wordpress/ui';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __ } from '@wordpress/i18n';
 import {
@@ -38,6 +39,8 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import isNavigationMenuEditingEnabled from '../navigation/menu-list-view/is-enabled';
+import isLabelOnlySubmenu from './is-label-only';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -78,6 +81,12 @@ export default function NavigationSubmenuEdit( {
 	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
 
+	// A sub menu with a label and no link (#86936) only opens its items, so
+	// it is rendered as a button, as on the front end.
+	const isMenuEditingEnabled = isNavigationMenuEditingEnabled();
+	const isLabelOnly =
+		isMenuEditingEnabled && !! label && isLabelOnlySubmenu( attributes );
+
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
@@ -99,6 +108,7 @@ export default function NavigationSubmenuEdit( {
 	const { __unstableMarkNextChangeAsNotPersistent, replaceBlock } =
 		useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
+	const [ isAddingLink, setIsAddingLink ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -175,7 +185,7 @@ export default function NavigationSubmenuEdit( {
 	// This can't be done in the useState call because it conflicts
 	// with the autofocus behavior of the BlockListBlock component.
 	useEffect( () => {
-		if ( ! openSubmenusOnClick && ! url ) {
+		if ( ! openSubmenusOnClick && ! url && ! isLabelOnly ) {
 			setIsLinkOpen( true );
 		}
 	}, [] );
@@ -233,7 +243,8 @@ export default function NavigationSubmenuEdit( {
 			'has-background': !! backgroundColor || customBackgroundColor,
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
-			'open-on-click': openSubmenusOnClick,
+			'open-on-click': openSubmenusOnClick || isLabelOnly,
+			'is-label-only': isLabelOnly,
 			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
@@ -282,7 +293,19 @@ export default function NavigationSubmenuEdit( {
 			: isSelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
+	const ParentElement = openSubmenusOnClick || isLabelOnly ? 'button' : 'a';
+
+	// A label-only submenu's settings say it doesn't link anywhere, rather
+	// than showing an empty link field, with a way to add a link anyway.
+	// With the prototypes on, the link is editable unless the menu really
+	// opens submenus on click (not just in contentOnly mode, where clicking
+	// is forced in the editor), since then the link isn't used.
+	let isLinkEditable = ! openSubmenusOnClick;
+	if ( isMenuEditingEnabled ) {
+		isLinkEditable = isLabelOnly
+			? isAddingLink
+			: submenuVisibility !== 'click';
+	}
 
 	function transformToLink() {
 		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
@@ -290,7 +313,12 @@ export default function NavigationSubmenuEdit( {
 	}
 
 	useEffect( () => {
-		// If block becomes empty, transform to Navigation Link.
+		// If block becomes empty, transform to Navigation Link. With the menu
+		// editing prototypes on, sub menus are containers that can be empty
+		// (#86178), so they stay sub menus.
+		if ( isMenuEditingEnabled ) {
+			return;
+		}
 		if ( ! hasChildren && prevHasChildren ) {
 			// This side-effect should not create an undo level as those should
 			// only be created via user interactions.
@@ -333,8 +361,25 @@ export default function NavigationSubmenuEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
-					isLinkEditable={ ! openSubmenusOnClick }
+					isLinkEditable={ isLinkEditable }
 				/>
+				{ isLabelOnly && ! isAddingLink && (
+					<LabelOnlyLinkNotice
+						onAddLink={ ( event ) => {
+							// The button goes away, so move focus to the
+							// link field that replaces it.
+							const container = event.currentTarget.closest(
+								'.components-popover__content, .block-editor-block-inspector'
+							);
+							setIsAddingLink( true );
+							window.requestAnimationFrame( () =>
+								container
+									?.querySelector( '.link-preview-button' )
+									?.focus()
+							);
+						} }
+					/>
+				) }
 			</InspectorControls>
 			<div { ...blockProps }>
 				<ParentElement className="wp-block-navigation-item__content">
@@ -354,7 +399,11 @@ export default function NavigationSubmenuEdit( {
 								placeholder={ itemLabelPlaceholder }
 								withoutInteractiveFormatting
 								onClick={ () => {
-									if ( ! openSubmenusOnClick && ! url ) {
+									if (
+										! openSubmenusOnClick &&
+										! url &&
+										! isLabelOnly
+									) {
 										setIsLinkOpen( true );
 									}
 								} }
@@ -395,7 +444,7 @@ export default function NavigationSubmenuEdit( {
 						/>
 					) }
 				</ParentElement>
-				{ ( showSubmenuIcon || openSubmenusOnClick ) && (
+				{ ( showSubmenuIcon || openSubmenusOnClick || isLabelOnly ) && (
 					<span className="wp-block-navigation__submenu-icon">
 						<ItemSubmenuIcon />
 					</span>
@@ -403,5 +452,40 @@ export default function NavigationSubmenuEdit( {
 				<div { ...innerBlocksProps } />
 			</div>
 		</>
+	);
+}
+
+/**
+ * Says a label-only submenu (#86936) doesn't link anywhere, in its settings,
+ * with a button to add a link anyway.
+ *
+ * @param {Object}                 props           Component props.
+ * @param {(event: Event) => void} props.onAddLink Called to show the link field.
+ */
+function LabelOnlyLinkNotice( { onAddLink } ) {
+	return (
+		<Stack
+			direction="column"
+			gap="sm"
+			align="flex-start"
+			className="wp-block-navigation-submenu__label-only-notice"
+			style={ {
+				padding:
+					'0 var(--wpds-dimension-padding-lg, 16px) var(--wpds-dimension-padding-lg, 16px)',
+			} }
+		>
+			<Text variant="body-sm" render={ <p /> } style={ { margin: 0 } }>
+				{ __(
+					'Doesn’t link anywhere. Visitors use it to open and close the submenu.'
+				) }
+			</Text>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ onAddLink }
+			>
+				{ __( 'Add link' ) }
+			</Button>
+		</Stack>
 	);
 }
