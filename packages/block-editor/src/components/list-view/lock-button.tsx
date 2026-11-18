@@ -2,9 +2,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { lock, lockFilled } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { store as blocksStore } from '@wordpress/blocks';
 import type { FocusEventHandler, MouseEvent } from 'react';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { useBlockLock, useUnlockBlocks } from '../block-lock';
+import { store as blockEditorStore } from '../../store';
 
 interface ListViewLockButtonProps {
 	/**
@@ -41,10 +44,17 @@ const ListViewLockButton = forwardRef<
 ) {
 	const { canLock, lockType, lockingSection, isPatternLocked } =
 		useBlockLock( clientId );
-	const blockTitle = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
+	// The block type, e.g. "Group", rather than any custom name of the block.
+	const blockTypeTitle = useSelect(
+		( select ) => {
+			const blockName =
+				select( blockEditorStore ).getBlockName( clientId );
+			return blockName
+				? select( blocksStore ).getBlockType( blockName )?.title
+				: undefined;
+		},
+		[ clientId ]
+	);
 	const ancestorTitle = useBlockDisplayTitle( {
 		clientId: lockingSection,
 		context: 'list-view',
@@ -52,9 +62,9 @@ const ListViewLockButton = forwardRef<
 	const unlockBlocks = useUnlockBlocks();
 
 	let label: string = sprintf(
-		/* translators: %s: The title of the block, e.g. "Group". */
+		/* translators: %s: The name of the block type, e.g. "Group". */
 		__( 'Unlock %s' ),
-		blockTitle ?? ''
+		blockTypeTitle ?? ''
 	);
 	if ( isPatternLocked ) {
 		label = __( 'Locked by its pattern' );

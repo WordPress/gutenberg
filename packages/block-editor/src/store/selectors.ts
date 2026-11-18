@@ -1831,6 +1831,16 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
+	// With the block lock menu, a block whose styles are locked takes no new
+	// inner blocks, as adding one would change its content.
+	if (
+		window.__experimentalBlockLockMenu &&
+		rootClientId &&
+		getBlockAttributes( state, rootClientId )?.lock?.edit
+	) {
+		return false;
+	}
+
 	// No insertion within static inner content: the inner blocks are fixed
 	// at their placeholder positions within the static markup.
 	if ( isInnerContentRoot( state, rootClientId ) ) {
