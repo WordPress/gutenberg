@@ -5,6 +5,7 @@
 ### New Features
 
 -   Navigation: Add a Tablet option to Overlay Visibility that collapses the menu at the theme's tablet breakpoint ([#87002](https://github.com/WordPress/gutenberg/pull/87002)).
+-   Navigation: Add the `blocks.navigation.overlayViewports` (JS) and `block_core_navigation_overlay_viewports` (PHP) filters so plugins can change where the overlay menu is shown, for example per language ([#87003](https://github.com/WordPress/gutenberg/pull/87003)).
 
 ### Enhancements
 

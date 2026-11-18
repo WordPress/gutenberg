@@ -64,7 +64,7 @@ function serializeDeclarations( declarations: Record< string, string > ) {
  *
  * @param options                  Options.
  * @param options.clientId         Block client ID.
- * @param options.overlayViewports Viewport map from `getOverlayViewports()`.
+ * @param options.overlayViewports Viewport map from `getFilteredOverlayViewports()`.
  * @return Whether any rules were added, in which case the Navigation wrapper
  *         needs the `has-overlay-viewports` class for them to apply.
  */

@@ -1,11 +1,5 @@
 import clsx from 'clsx';
-import {
-	useCallback,
-	useState,
-	useEffect,
-	useMemo,
-	useRef,
-} from '@wordpress/element';
+import { useCallback, useState, useEffect, useRef } from '@wordpress/element';
 import {
 	InspectorControls,
 	useBlockProps,
@@ -69,7 +63,6 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import {
-	getOverlayViewports,
 	isOverlayAlwaysShown,
 	isOverlayResponsive,
 } from '../overlay-viewports';
@@ -77,6 +70,7 @@ import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import useLayoutCustomProperties from './use-layout-custom-properties';
 import useOverlayViewportStyles from './use-overlay-viewport-styles';
+import useFilteredOverlayViewports from './use-filtered-overlay-viewports';
 import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
@@ -288,9 +282,14 @@ function Navigation( {
 		layout: attributes.layout,
 		style: attributes.style,
 	} );
-	const overlayViewports = useMemo(
-		() => getOverlayViewports( { overlayMenu } ),
-		[ overlayMenu ]
+	// Detect if we're editing inside an overlay template part.
+	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+	const overlayViewports = useFilteredOverlayViewports(
+		attributes,
+		clientId,
+		{
+			isWithinOverlay,
+		}
 	);
 
 	const setRef = useCallback(
@@ -550,9 +549,6 @@ function Navigation( {
 	] );
 
 	const navRef = useRef();
-
-	// Detect if we're editing inside an overlay template part.
-	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
 
 	// Use div wrapper if this navigation block is within an overlay template part.
 	// Otherwise, use nav as the standard HTML5 tag.
@@ -978,7 +974,8 @@ function Navigation( {
 	);
 
 	const accessibleDescriptionId = `${ clientId }-desc`;
-	const isHiddenByDefault = isOverlayAlwaysShown( overlayViewports );
+	const isHiddenByDefault =
+		! editorDisabledResponsive && isOverlayAlwaysShown( overlayViewports );
 	const isManageMenusButtonDisabled =
 		! hasManagePermissions || ! hasResolvedNavigationMenus;
 

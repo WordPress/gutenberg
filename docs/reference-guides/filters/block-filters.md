@@ -444,6 +444,66 @@ wp.hooks.addFilter(
 );
 ```
 
+## Navigation block
+
+### `block_core_navigation_overlay_viewports` and `blocks.navigation.overlayViewports`
+
+Filters the viewports in which a Navigation block collapses its links into the overlay menu. Use the PHP filter for the front end and the JavaScript filter for the editor, and return the same value from both so the editor matches the front end.
+
+A typical use is a multilingual site. When a menu needs to collapse depends on its labels, and translated labels are often much longer. The Navigation block usually sits in a template part shared by every language, so a multilingual plugin can use these filters to collapse a menu earlier for the languages that need it.
+
+The PHP callback receives three parameters:
+
+- `$overlay_viewports` (`array|null`): The viewports chosen in the block settings, as an array with boolean `mobile`, `tablet` and `desktop` keys, or `null` for the default Mobile setting.
+- `$attributes` (`array`): The block attributes, including `ref`, the ID of the `wp_navigation` post, when the block references one.
+- `$block` (`WP_Block|null`): The block instance.
+
+The JavaScript callback receives the same viewports and attributes, followed by the block's `clientId`.
+
+A block that doesn't reference a menu shows a fallback menu. The editor saves the fallback's ID in `ref`, but on the front end `ref` stays empty, so the two filters can receive different attributes for the same block. Decide based on the current language or another value that is the same in both places, rather than on `ref`.
+
+The callback must return one of the following:
+
+- An array in PHP, or an object in JavaScript, with boolean `mobile`, `tablet` and `desktop` keys. `true` shows the overlay in that viewport, and `false` shows the links inline. The viewports use the theme's `settings.viewport` breakpoints.
+- `null`, for the default Mobile setting, which collapses the menu below a fixed width of 600px. This is not the same as `{ mobile: true, tablet: false, desktop: false }`, which uses the theme's mobile breakpoint.
+
+Any other value is ignored. The filters don't run for Navigation blocks inside an overlay template part or the block's overlay preview, which never show their own overlay.
+
+In the editor the filter runs on every render of every Navigation block, so keep the callback cheap and free of side effects, and don't change the attributes it receives. It runs inside `useSelect`, so a callback that reads a data store with `select()` updates the block when that store changes. If the callback depends on state outside a data store, re-render the block when that state changes, for example from an `editor.BlockEdit` filter limited to `core/navigation`. Adding or removing a callback doesn't re-render blocks that are already showing, so register it before the editor loads.
+
+The following example collapses menus on tablets as well as phones when the language is German. It only changes blocks on the default Mobile setting, so a menu set to Off, Tablet or Always keeps its setting. `example_get_current_language()` stands in for however your plugin knows the current language.
+
+```php
+function example_navigation_overlay_viewports( $overlay_viewports ) {
+	if ( null === $overlay_viewports && 'de' === example_get_current_language() ) {
+		return array(
+			'mobile'  => true,
+			'tablet'  => true,
+			'desktop' => false,
+		);
+	}
+
+	return $overlay_viewports;
+}
+add_filter( 'block_core_navigation_overlay_viewports', 'example_navigation_overlay_viewports' );
+```
+
+```js
+wp.hooks.addFilter(
+	'blocks.navigation.overlayViewports',
+	'my-plugin/navigation-overlay-viewports',
+	( overlayViewports ) => {
+		const language = wp.data.select( 'my-plugin/language' ).getLanguage();
+		if ( overlayViewports === null && language === 'de' ) {
+			return { mobile: true, tablet: true, desktop: false };
+		}
+		return overlayViewports;
+	}
+);
+```
+
+These filters choose between the theme's breakpoints. They don't change the breakpoints themselves, which are set by `settings.viewport` in `theme.json` and apply to every responsive style on the site.
+
 ## Removing Blocks
 
 ### Using a deny list

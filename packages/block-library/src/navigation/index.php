@@ -46,6 +46,9 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
  * Returns null for the default `mobile` behavior, which uses the static
  * 600px breakpoint in style.scss rather than the theme's viewport settings.
  *
+ * Does not apply the `block_core_navigation_overlay_viewports` filter. Use
+ * block_core_navigation_get_filtered_overlay_viewports() when rendering.
+ *
  * @since 7.3.0
  *
  * @param array $attributes Block attributes. Values are untrusted.
@@ -86,6 +89,85 @@ function block_core_navigation_get_overlay_viewports( $attributes ) {
 }
 
 /**
+ * Returns the viewports in which the Navigation overlay is shown, after
+ * plugins have filtered them.
+ *
+ * Navigation blocks inside an overlay template part never show an overlay of
+ * their own, so the filter is not applied to them.
+ *
+ * Call it once per render rather than caching the result for the attributes,
+ * since a filter can depend on state outside them, such as the current
+ * language.
+ *
+ * @since 7.3.0
+ *
+ * @param array         $attributes Block attributes. Values are untrusted.
+ * @param WP_Block|null $block      Optional. Block instance. Default null.
+ * @return array{mobile: bool, tablet: bool, desktop: bool}|null Viewport map, or null.
+ */
+function block_core_navigation_get_filtered_overlay_viewports( $attributes, $block = null ) {
+	if ( ! empty( $attributes['_isWithinOverlayTemplatePart'] ) ) {
+		return array(
+			'mobile'  => false,
+			'tablet'  => false,
+			'desktop' => false,
+		);
+	}
+
+	$overlay_viewports = block_core_navigation_get_overlay_viewports( $attributes );
+
+	/**
+	 * Filters the viewports in which the Navigation overlay is shown.
+	 *
+	 * Lets plugins change where the overlay menu is shown, for example so a
+	 * multilingual plugin can collapse a menu whose translated labels are
+	 * longer at a larger viewport. The Navigation block is usually in a header
+	 * template part shared by every language, while plugins translate the
+	 * `wp_navigation` post that the block references through `ref`.
+	 *
+	 * Return an array with a boolean for each of the `mobile`, `tablet` and
+	 * `desktop` keys, or null for the default `mobile` behavior. Any other
+	 * value is ignored and the unfiltered viewports are used. Only those three
+	 * keys are read from a returned array. An array that shows the overlay only
+	 * on `mobile` differs from null: it collapses at the theme's mobile
+	 * breakpoint, while null uses the fixed 600px breakpoint.
+	 *
+	 * The filter is not applied to Navigation blocks inside an overlay template
+	 * part. Its counterpart in the editor is the JavaScript filter
+	 * `blocks.navigation.overlayViewports`.
+	 *
+	 * @since 7.3.0
+	 *
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map, or null for the default `mobile` behavior.
+	 * @param array                                                 $attributes        Block attributes, including `ref`, the ID of the
+	 *                                                                                 `wp_navigation` post, when the block references one.
+	 *                                                                                 Deprecated attributes are migrated, so these may
+	 *                                                                                 differ from `$block->attributes`.
+	 * @param WP_Block|null                                         $block             Block instance, or null if not available.
+	 */
+	$filtered = apply_filters( 'block_core_navigation_overlay_viewports', $overlay_viewports, $attributes, $block );
+
+	if ( null === $filtered ) {
+		return null;
+	}
+
+	if (
+		is_array( $filtered ) &&
+		is_bool( $filtered['mobile'] ?? null ) &&
+		is_bool( $filtered['tablet'] ?? null ) &&
+		is_bool( $filtered['desktop'] ?? null )
+	) {
+		return array(
+			'mobile'  => $filtered['mobile'],
+			'tablet'  => $filtered['tablet'],
+			'desktop' => $filtered['desktop'],
+		);
+	}
+
+	return $overlay_viewports;
+}
+
+/**
  * Returns whether the Navigation overlay is shown in at least one viewport.
  *
  * The default `mobile` behavior (null) is responsive. Only the `mobile`,
@@ -95,7 +177,9 @@ function block_core_navigation_get_overlay_viewports( $attributes ) {
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return bool Whether the overlay is shown in at least one viewport.
  */
 function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
@@ -121,7 +205,9 @@ function block_core_navigation_is_overlay_responsive( $overlay_viewports ) {
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return bool Whether the overlay is shown in every viewport.
  */
 function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
@@ -151,7 +237,9 @@ function block_core_navigation_is_overlay_always_shown( $overlay_viewports ) {
  * @since 7.3.0
  *
  * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
- *                                                                               block_core_navigation_get_overlay_viewports().
+ *                                                                               block_core_navigation_get_overlay_viewports(), or
+ *                                                                               the filtered map from
+ *                                                                               block_core_navigation_get_filtered_overlay_viewports().
  * @return string[] Viewports where the links are inline, in CSS order.
  */
 function block_core_navigation_get_inline_viewports( $overlay_viewports ) {
@@ -263,25 +351,6 @@ class WP_Navigation_Block_Renderer {
 
 
 	/**
-	 * Returns whether or not this is responsive navigation.
-	 *
-	 * Backwards compatibility for the removed `isResponsive` attribute is
-	 * handled by block_core_navigation_get_overlay_viewports(). A missing
-	 * `overlayMenu` is treated as `mobile`, matching the block.json default.
-	 *
-	 * @since 6.5.0
-	 * @since 7.3.0 Reads the overlay viewports through the resolver.
-	 *
-	 * @param array $attributes The block attributes.
-	 * @return bool Returns whether or not this is responsive navigation.
-	 */
-	private static function is_responsive( $attributes ) {
-		return block_core_navigation_is_overlay_responsive(
-			block_core_navigation_get_overlay_viewports( $attributes )
-		);
-	}
-
-	/**
 	 * Returns whether or not a navigation has a submenu.
 	 *
 	 * @since 6.5.0
@@ -324,14 +393,16 @@ class WP_Navigation_Block_Renderer {
 	 * Determine whether the navigation blocks is interactive.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block_List                                         $inner_blocks      The list of inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return bool Returns whether or not to load the view script.
 	 */
-	private static function is_interactive( $attributes, $inner_blocks ) {
+	private static function is_interactive( $attributes, $inner_blocks, $overlay_viewports ) {
 		$has_submenus        = self::has_submenus( $inner_blocks );
-		$is_responsive_menu  = self::is_responsive( $attributes );
+		$is_responsive_menu  = block_core_navigation_is_overlay_responsive( $overlay_viewports );
 		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
 		$open_on_click       = 'click' === $computed_visibility;
 		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
@@ -404,17 +475,19 @@ class WP_Navigation_Block_Renderer {
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block_List                                         $inner_blocks      The list of inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return string Returns the html for the inner blocks of the navigation block.
 	 */
-	private static function get_inner_blocks_html( $attributes, $inner_blocks ) {
+	private static function get_inner_blocks_html( $attributes, $inner_blocks, $overlay_viewports ) {
 		$has_submenus   = self::has_submenus( $inner_blocks );
-		$is_interactive = self::is_interactive( $attributes, $inner_blocks );
+		$is_interactive = self::is_interactive( $attributes, $inner_blocks, $overlay_viewports );
 
 		$style                = self::get_styles( $attributes );
-		$class                = self::get_classes( $attributes );
+		$class                = self::get_classes( $attributes, $overlay_viewports );
 		$container_attributes = get_block_wrapper_attributes(
 			array(
 				'class' => 'wp-block-navigation__container ' . $class,
@@ -677,11 +750,6 @@ class WP_Navigation_Block_Renderer {
 	private static function get_inner_blocks( $attributes, $block ) {
 		$inner_blocks = $block->inner_blocks;
 
-		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId) continue to render.
-		if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
-			$attributes['ref'] = $attributes['navigationMenuId'];
-		}
-
 		// If:
 		// - the gutenberg plugin is active
 		// - `__unstableLocation` is defined
@@ -796,16 +864,18 @@ class WP_Navigation_Block_Renderer {
 	 * Return classes for the navigation block.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array $attributes The block attributes.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return string Returns the classes for the navigation block.
 	 */
-	private static function get_classes( $attributes ) {
+	private static function get_classes( $attributes, $overlay_viewports ) {
 		// Restore legacy classnames for submenu positioning.
 		$layout_class       = self::get_layout_class( $attributes );
 		$colors             = block_core_navigation_build_css_colors( $attributes );
 		$font_sizes         = block_core_navigation_build_css_font_sizes( $attributes );
-		$is_responsive_menu = self::is_responsive( $attributes );
+		$is_responsive_menu = block_core_navigation_is_overlay_responsive( $overlay_viewports );
 
 		// Manually add block support text decoration as CSS class.
 		$text_decoration       = $attributes['style']['typography']['textDecoration'] ?? null;
@@ -892,20 +962,20 @@ class WP_Navigation_Block_Renderer {
 	 * Get the responsive container markup
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes        The block attributes.
-	 * @param WP_Block_List $inner_blocks      The list of inner blocks.
-	 * @param string        $inner_blocks_html The markup for the inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block_List                                         $inner_blocks      The list of inner blocks.
+	 * @param string                                                $inner_blocks_html The markup for the inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return string Returns the container markup.
 	 */
-	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
-		$is_interactive  = self::is_interactive( $attributes, $inner_blocks );
+	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html, $overlay_viewports ) {
+		$is_interactive  = self::is_interactive( $attributes, $inner_blocks, $overlay_viewports );
 		$colors          = block_core_navigation_build_css_colors( $attributes );
 		$modal_unique_id = wp_unique_id( 'modal-' );
 
-		$is_hidden_by_default = block_core_navigation_is_overlay_always_shown(
-			block_core_navigation_get_overlay_viewports( $attributes )
-		);
+		$is_hidden_by_default = block_core_navigation_is_overlay_always_shown( $overlay_viewports );
 
 		// Set-up variables for custom overlays.
 		$has_custom_overlay             = false;
@@ -1071,7 +1141,7 @@ class WP_Navigation_Block_Renderer {
 	 * @since 7.3.0
 	 *
 	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map from
-	 *                                                                               block_core_navigation_get_overlay_viewports().
+	 *                                                                               block_core_navigation_get_filtered_overlay_viewports().
 	 * @return string[] Classes for the navigation wrapper, or an empty list when no rules are needed.
 	 */
 	private static function add_overlay_viewport_styles( $overlay_viewports ) {
@@ -1168,20 +1238,18 @@ class WP_Navigation_Block_Renderer {
 	 *
 	 * @since 6.5.0
 	 * @since 7.3.0 Adds the classes for overlays that follow the theme's viewports.
+	 *              Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block_List $inner_blocks A list of inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block_List                                         $inner_blocks      A list of inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return string Returns the navigation block markup.
 	 */
-	private static function get_nav_attributes( $attributes, $inner_blocks ) {
-		$is_interactive = self::is_interactive( $attributes, $inner_blocks );
-		// Resolve the overlay viewports once for the overlay viewport classes
-		// and the rules that target them, so they cannot disagree.
-		// get_classes() still resolves them separately for `is-responsive`.
-		$overlay_viewports  = block_core_navigation_get_overlay_viewports( $attributes );
+	private static function get_nav_attributes( $attributes, $inner_blocks, $overlay_viewports ) {
+		$is_interactive     = self::is_interactive( $attributes, $inner_blocks, $overlay_viewports );
 		$is_responsive_menu = block_core_navigation_is_overlay_responsive( $overlay_viewports );
 		$style              = self::get_styles( $attributes );
-		$class              = self::get_classes( $attributes );
+		$class              = self::get_classes( $attributes, $overlay_viewports );
 		if ( $is_responsive_menu ) {
 			$overlay_viewport_classes = self::add_overlay_viewport_styles( $overlay_viewports );
 			if ( ! empty( $overlay_viewport_classes ) ) {
@@ -1250,13 +1318,15 @@ class WP_Navigation_Block_Renderer {
 	 * Handle view script module loading.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block      $block        The parsed block.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block                                              $block             The parsed block.
+	 * @param WP_Block_List                                         $inner_blocks      The list of inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 */
-	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks ) {
-		if ( self::is_interactive( $attributes, $inner_blocks ) ) {
+	private static function handle_view_script_module_loading( $attributes, $block, $inner_blocks, $overlay_viewports ) {
+		if ( self::is_interactive( $attributes, $inner_blocks, $overlay_viewports ) ) {
 			wp_enqueue_script_module( '@wordpress/block-library/navigation/view' );
 		}
 	}
@@ -1265,15 +1335,17 @@ class WP_Navigation_Block_Renderer {
 	 * Returns the markup for the navigation block.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Added the `$overlay_viewports` parameter.
 	 *
-	 * @param array         $attributes   The block attributes.
-	 * @param WP_Block_List $inner_blocks The list of inner blocks.
+	 * @param array                                                 $attributes        The block attributes.
+	 * @param WP_Block_List                                         $inner_blocks      The list of inner blocks.
+	 * @param array{mobile: bool, tablet: bool, desktop: bool}|null $overlay_viewports Viewport map resolved for this render.
 	 * @return string Returns the navigation wrapper markup.
 	 */
-	private static function get_inner_block_markup( $attributes, $inner_blocks ) {
-		$inner_blocks_html = self::get_inner_blocks_html( $attributes, $inner_blocks );
-		if ( self::is_responsive( $attributes ) ) {
-			return self::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
+	private static function get_inner_block_markup( $attributes, $inner_blocks, $overlay_viewports ) {
+		$inner_blocks_html = self::get_inner_blocks_html( $attributes, $inner_blocks, $overlay_viewports );
+		if ( block_core_navigation_is_overlay_responsive( $overlay_viewports ) ) {
+			return self::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html, $overlay_viewports );
 		}
 		return $inner_blocks_html;
 	}
@@ -1311,6 +1383,9 @@ class WP_Navigation_Block_Renderer {
 	 * Renders the navigation block.
 	 *
 	 * @since 6.5.0
+	 * @since 7.3.0 Resolves the overlay viewports once per render, applying the
+	 *              `block_core_navigation_overlay_viewports` filter. Maps the legacy
+	 *              `navigationMenuId` attribute to `ref` before anything reads it.
 	 *
 	 * @param array    $attributes The block attributes.
 	 * @param string   $content    The saved content.
@@ -1335,6 +1410,12 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
+		// Ensure that blocks saved with the legacy ref attribute name (navigationMenuId)
+		// continue to render, and that every step below reads the same `ref`.
+		if ( array_key_exists( 'navigationMenuId', $attributes ) ) {
+			$attributes['ref'] = $attributes['navigationMenuId'];
+		}
+
 		// Submenu detection is memoized while a navigation block renders. Reset it so
 		// the result of a previously rendered navigation block is not reused for this one.
 		self::$has_submenus = false;
@@ -1348,7 +1429,12 @@ class WP_Navigation_Block_Renderer {
 			return '';
 		}
 
-		self::handle_view_script_module_loading( $attributes, $block, $inner_blocks );
+		// Resolve the overlay viewports once, so the classes, the markup and
+		// the rules that target them cannot disagree, even if a filter returns
+		// a different value each time it is applied.
+		$overlay_viewports = block_core_navigation_get_filtered_overlay_viewports( $attributes, $block );
+
+		self::handle_view_script_module_loading( $attributes, $block, $inner_blocks, $overlay_viewports );
 
 		// Use div wrapper if this navigation block is within an overlay template part.
 		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
@@ -1357,8 +1443,8 @@ class WP_Navigation_Block_Renderer {
 		return sprintf(
 			'<%1$s %2$s>%3$s</%1$s>',
 			$tag_name,
-			self::get_nav_attributes( $attributes, $inner_blocks ),
-			self::get_inner_block_markup( $attributes, $inner_blocks )
+			self::get_nav_attributes( $attributes, $inner_blocks, $overlay_viewports ),
+			self::get_inner_block_markup( $attributes, $inner_blocks, $overlay_viewports )
 		);
 	}
 }
