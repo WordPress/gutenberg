@@ -81,8 +81,8 @@
 	}
 }
 
-// The controls of a block whose design is locked stay visible, but read as
+// The controls of a block whose styles are locked stay visible, but read as
 // disabled.
-.block-editor-block-lock__design-locked {
+.block-editor-block-lock__styles-locked {
 	opacity: 0.5;
 }

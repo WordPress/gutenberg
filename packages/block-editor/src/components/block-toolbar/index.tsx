@@ -166,7 +166,7 @@ export function PrivateBlockToolbar( {
 			isSectionContainer: _isSectionBlock,
 			hasContentOnlyLocking: _hasTemplateLock,
 			showShuffleButton: _isZoomOut,
-			// With the lock menu, a block whose design is locked shows no
+			// With the lock menu, a block whose styles are locked shows no
 			// controls of its own, as they would edit its content or styles.
 			showSlots:
 				! _isZoomOut &&

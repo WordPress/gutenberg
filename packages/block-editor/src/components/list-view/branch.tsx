@@ -87,7 +87,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				select( blockEditorStore )
 			);
 			return {
-				// With the lock menu, the blocks inside a design-locked block
+				// With the lock menu, the blocks inside a styles-locked block
 				// stay listed, as each one controls its own lock. Blocks with
 				// their own edit lock, like Navigation, keep them hidden.
 				canParentExpand:

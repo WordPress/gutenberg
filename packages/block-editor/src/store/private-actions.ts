@@ -711,7 +711,7 @@ export interface BlockLockChanges {
 	 */
 	layout?: boolean;
 	/**
-	 * Whether the design is locked: the content and styles of the block can't
+	 * Whether the styles are locked: the content and styles of the block can't
 	 * be edited.
 	 */
 	edit?: boolean;

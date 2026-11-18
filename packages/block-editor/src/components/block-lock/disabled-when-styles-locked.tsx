@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-interface DisabledWhenDesignLockedProps {
+interface DisabledWhenStylesLockedProps {
 	/**
 	 * The client ID of the block the controls edit, if any.
 	 */
@@ -16,15 +16,15 @@ interface DisabledWhenDesignLockedProps {
 }
 
 /**
- * Renders the controls of a block disabled while its design is locked, so its
+ * Renders the controls of a block disabled while its styles are locked, so its
  * content and styles can't be changed but the controls stay visible. Only
  * applies with the block lock menu experiment.
  */
-export default function DisabledWhenDesignLocked( {
+export default function DisabledWhenStylesLocked( {
 	clientId,
 	children,
-}: DisabledWhenDesignLockedProps ) {
-	const isDesignLocked = useSelect(
+}: DisabledWhenStylesLockedProps ) {
+	const isStylesLocked = useSelect(
 		( select ) =>
 			!! window.__experimentalBlockLockMenu &&
 			!! clientId &&
@@ -34,10 +34,10 @@ export default function DisabledWhenDesignLocked( {
 
 	return (
 		<Disabled
-			isDisabled={ isDesignLocked }
+			isDisabled={ isStylesLocked }
 			className={
-				isDesignLocked
-					? 'block-editor-block-lock__design-locked'
+				isStylesLocked
+					? 'block-editor-block-lock__styles-locked'
 					: undefined
 			}
 		>

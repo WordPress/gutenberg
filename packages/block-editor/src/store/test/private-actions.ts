@@ -423,7 +423,7 @@ describe( 'private actions', () => {
 			);
 		} );
 
-		it( 'locks the design of every block, not only those with their own edit lock', () => {
+		it( 'locks the styles of every block, not only those with their own edit lock', () => {
 			const dispatch = { updateBlockAttributes: vi.fn() };
 			setBlocksLock( [ 'group' ], { edit: true } )(
 				thunkArgs( { select: createSelect( {} ), dispatch } )

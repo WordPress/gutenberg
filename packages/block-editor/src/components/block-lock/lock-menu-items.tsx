@@ -10,7 +10,7 @@ import type { BlockLockMenuProps } from './types';
 
 /**
  * Renders the checkbox items of the lock menu: all properties, then
- * design, which locks editing the content and styles of the blocks, layout,
+ * styles, which locks editing the content and styles of the blocks, layout,
  * movement and deletion. Each change applies right away to the blocks
  * and every block inside them, and the menu stays open so several properties
  * can be toggled in one pass.
@@ -88,7 +88,7 @@ export default function BlockLockMenuItems( {
 					setBlocksLock( clientIds, { edit } )
 				}
 			>
-				<Menu.ItemLabel>{ __( 'Design' ) }</Menu.ItemLabel>
+				<Menu.ItemLabel>{ __( 'Styles' ) }</Menu.ItemLabel>
 			</Menu.CheckboxItem>
 			<Menu.CheckboxItem
 				checked={ isLayoutLocked }

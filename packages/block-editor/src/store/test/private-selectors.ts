@@ -1779,7 +1779,7 @@ describe( 'private selectors', () => {
 			expect( canLayoutLockBlock( state, 'leaf' ) ).toBe( false );
 		} );
 
-		it( 'returns a full lock only when movement, deletion, layout and design are locked', () => {
+		it( 'returns a full lock only when movement, deletion, layout and styles are locked', () => {
 			expect(
 				getBlockLockType(
 					createState( {
@@ -1815,7 +1815,7 @@ describe( 'private selectors', () => {
 			);
 		} );
 
-		it( 'returns a full lock for a block without layout locking when movement, deletion and design are locked', () => {
+		it( 'returns a full lock for a block without layout locking when movement, deletion and styles are locked', () => {
 			expect(
 				getBlockLockType(
 					createState(
@@ -1833,7 +1833,7 @@ describe( 'private selectors', () => {
 			).toBe( 'partial' );
 		} );
 
-		it( 'returns a partial lock when only the design is locked', () => {
+		it( 'returns a partial lock when only the styles are locked', () => {
 			expect(
 				getBlockLockType(
 					createState( {}, { lock: { edit: true } } ),

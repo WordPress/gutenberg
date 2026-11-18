@@ -1367,7 +1367,7 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 
 /**
  * Returns how much of a block is locked. A block has up to four lock
- * properties: movement, deletion, design (editing its content and styles)
+ * properties: movement, deletion, styles (editing its content and styles)
  * and, where it can be locked, layout.
  *
  * - `full`: every property the block supports is locked.
