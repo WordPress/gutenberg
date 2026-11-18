@@ -186,7 +186,7 @@ export default function useFixedWindowList(
 			return;
 		}
 		let scrollContainer = initialContainer;
-		const { defaultView } = scrollContainer.ownerDocument;
+		const { defaultView, documentElement } = scrollContainer.ownerDocument;
 		// `scroll` and `resize` already fire at about the rendering rate, so
 		// there is nothing to gain from debouncing them.
 		const onMeasure = () => measureWindow();
@@ -197,21 +197,24 @@ export default function useFixedWindowList(
 		defaultView?.addEventListener( 'resize', onMeasure );
 		defaultView?.addEventListener( 'keydown', onKeyDown );
 
-		const observer = new ResizeObserver( () => {
-			const nextContainer = getScrollContainer( element );
-			if ( nextContainer && nextContainer !== scrollContainer ) {
-				scrollContainer.removeEventListener( 'scroll', onMeasure );
-				scrollContainer = nextContainer;
-				scrollContainer.addEventListener( 'scroll', onMeasure );
-				onMeasure();
+		let observer: ResizeObserver | undefined;
+		if ( initialContainer === documentElement ) {
+			observer = new ResizeObserver( () => {
+				const nextContainer = getScrollContainer( element );
+				if ( nextContainer && nextContainer !== scrollContainer ) {
+					scrollContainer.removeEventListener( 'scroll', onMeasure );
+					scrollContainer = nextContainer;
+					scrollContainer.addEventListener( 'scroll', onMeasure );
+					onMeasure();
+				}
+			} );
+			for ( let node = element; node; node = node.parentElement ) {
+				observer.observe( node );
 			}
-		} );
-		for ( let node = element; node; node = node.parentElement ) {
-			observer.observe( node );
 		}
 
 		return () => {
-			observer.disconnect();
+			observer?.disconnect();
 			scrollContainer.removeEventListener( 'scroll', onMeasure );
 			defaultView?.removeEventListener( 'resize', onMeasure );
 			defaultView?.removeEventListener( 'keydown', onKeyDown );
