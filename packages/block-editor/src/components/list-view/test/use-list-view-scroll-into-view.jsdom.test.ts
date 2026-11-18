@@ -1,4 +1,4 @@
-import { describe, expect, it, onTestFinished, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { getScrollContainer } from '@wordpress/dom';
 import useListViewScrollIntoView from '../use-list-view-scroll-into-view';
@@ -16,15 +16,12 @@ describe( 'useListViewScrollIntoView', () => {
 		},
 		{
 			description:
-				'keeps the scroll position when the selected row is visible',
-			rowTop: 150,
-			expectedScrollTop: 100,
+				'scrolls only the List View up to reveal a row above it',
+			rowTop: 10,
+			expectedScrollTop: 60,
 		},
 	] )( '$description', ( { rowTop, expectedScrollTop } ) => {
-		const container = document.body.appendChild(
-			document.createElement( 'div' )
-		);
-		onTestFinished( () => container.remove() );
+		const container = document.createElement( 'div' );
 		const row = container.appendChild( document.createElement( 'div' ) );
 		vi.mocked( getScrollContainer ).mockReturnValue( container );
 		container.scrollTop = 100;
