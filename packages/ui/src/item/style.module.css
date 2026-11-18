@@ -49,15 +49,20 @@
 			border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 		}
 
-		/* The outer entries carry the group's corners. */
-		.is-joined .listitem:nth-child(1 of .listitem),
-		.is-joined .listitem:nth-child(1 of .listitem) > .row {
+		/*
+		 * The outer entries carry the group's corners — but only when the
+		 * group draws the frame. Unframed it sits inside someone else's
+		 * surface, which clips its own corners, and rounding the first row
+		 * there would curve it in the middle of a card.
+		 */
+		.has-frame.is-joined .listitem:nth-child(1 of .listitem),
+		.has-frame.is-joined .listitem:nth-child(1 of .listitem) > .row {
 			border-start-start-radius: var(--_wp-ui-item-radius);
 			border-start-end-radius: var(--_wp-ui-item-radius);
 		}
 
-		.is-joined .listitem:nth-last-child(1 of .listitem),
-		.is-joined .listitem:nth-last-child(1 of .listitem) > .row {
+		.has-frame.is-joined .listitem:nth-last-child(1 of .listitem),
+		.has-frame.is-joined .listitem:nth-last-child(1 of .listitem) > .row {
 			border-end-start-radius: var(--_wp-ui-item-radius);
 			border-end-end-radius: var(--_wp-ui-item-radius);
 		}
@@ -121,7 +126,7 @@
 			transition: background-color var(--wpds-motion-duration-sm) var(--wpds-motion-easing-subtle);
 		}
 
-		.is-activatable:hover {
+		.is-activatable:hover:not(:has(.actions:hover)) {
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 
