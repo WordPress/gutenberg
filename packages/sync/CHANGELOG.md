@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Merge a deferred local update with a remote change that reaches the document first, so the update does not overwrite the remote change ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
+-   Keep the document usable when a sync callback throws while converting deferred edits ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 
 ## 3.2.0 (2026-11-18)
 

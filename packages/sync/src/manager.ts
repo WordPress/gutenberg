@@ -403,6 +403,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 			const copy = new Y.Doc();
 			Y.applyUpdateV2( copy, Y.encodeStateAsUpdateV2( ydoc ) );
+			const conversionErrors: unknown[] = [];
 
 			try {
 				for ( const item of updates ) {
@@ -412,14 +413,26 @@ export function createSyncManager( debug = false ): SyncManager {
 					}
 
 					const stateVector = Y.encodeStateVector( copy );
-					copy.transact( () => {
-						syncConfig.applyChangesToCRDTDoc( copy, item.changes );
-					} );
+					try {
+						copy.transact( () => {
+							syncConfig.applyChangesToCRDTDoc(
+								copy,
+								item.changes
+							);
+						} );
+						item.applyLocalState = syncConfig.captureLocalState?.(
+							copy,
+							item.changes
+						);
+					} catch ( error ) {
+						// Yjs cannot close a transaction when beforeTransaction
+						// throws. Report callback errors after it has closed.
+						conversionErrors.push( error );
+					}
+					// Yjs retains writes made before a callback throws. Encode
+					// those writes too, so no failed item falls back to diffing
+					// its stale values against the remotely changed document.
 					item.update = Y.encodeStateAsUpdateV2( copy, stateVector );
-					item.applyLocalState = syncConfig.captureLocalState?.(
-						copy,
-						item.changes
-					);
 				}
 			} finally {
 				copy.destroy();
@@ -428,7 +441,18 @@ export function createSyncManager( debug = false ): SyncManager {
 			// Keep the shared queue's order, including edits to other entities.
 			// Wait for Yjs to finish so each update's undo callbacks run before
 			// the next update can close its undo level.
-			ydoc.once( 'afterAllTransactions', deferredUpdates.flush );
+			ydoc.once( 'afterAllTransactions', () => {
+				deferredUpdates.flush();
+				if ( conversionErrors.length === 1 ) {
+					throw conversionErrors[ 0 ];
+				}
+				if ( conversionErrors.length > 1 ) {
+					throw new AggregateError(
+						conversionErrors,
+						'Failed to convert deferred updates.'
+					);
+				}
+			} );
 		} );
 
 		hasObserversAttached = true;
