@@ -995,93 +995,308 @@ describe( 'SyncManager', () => {
 			] );
 		} );
 
-		it( 'discards a deferred update when a remote change reaches the document first', async () => {
-			let capturedDoc: CRDTDoc | null = null;
-			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
-				capturedDoc = ydoc;
-				return mockProviderResult;
+		describe( 'deferred update and a remote change that arrives first', () => {
+			// Keeps `content` in a Y.Text and applies a change as the
+			// smallest replacement, as the post sync config does for text.
+			function applyTextChanges(
+				ydoc: CRDTDoc,
+				changes: Partial< ObjectData >
+			) {
+				const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
+
+				Object.entries( changes ).forEach( ( [ key, value ] ) => {
+					if ( 'content' !== key ) {
+						recordMap.set( key, value );
+						return;
+					}
+
+					let text = recordMap.get( key ) as Y.Text | undefined;
+					if ( ! text ) {
+						text = new Y.Text();
+						recordMap.set( key, text );
+					}
+
+					const from = text.toString();
+					const to = String( value );
+					let start = 0;
+					while (
+						start < from.length &&
+						start < to.length &&
+						from[ start ] === to[ start ]
+					) {
+						start++;
+					}
+					let end = 0;
+					while (
+						end < from.length - start &&
+						end < to.length - start &&
+						from[ from.length - 1 - end ] ===
+							to[ to.length - 1 - end ]
+					) {
+						end++;
+					}
+					text.delete( start, from.length - start - end );
+					text.insert( start, to.slice( start, to.length - end ) );
+				} );
+			}
+
+			async function loadWithPeer() {
+				let ydoc: Y.Doc | null = null;
+				mockProviderCreator.mockImplementation(
+					async ( { ydoc: providedDoc } ) => {
+						ydoc = providedDoc as unknown as Y.Doc;
+						return mockProviderResult;
+					}
+				);
+
+				const record = { id: '123', content: 'Hello', meta: {} };
+				const editedRecord = { ...record };
+				const syncConfig = {
+					...mockSyncConfig,
+					applyChangesToCRDTDoc: vi.fn( applyTextChanges ),
+				};
+				const handlers = {
+					...mockHandlers,
+					editRecord: vi.fn( ( edits: Partial< ObjectData > ) => {
+						Object.assign( editedRecord, edits );
+					} ),
+					getEditedRecord: vi.fn( async () => editedRecord ),
+				};
+				const manager = createSyncManager();
+
+				await manager.load(
+					syncConfig,
+					'post',
+					'123',
+					record,
+					handlers
+				);
+
+				const liveDoc = ydoc as unknown as Y.Doc;
+
+				// The peer starts from the current document.
+				const peerDoc = new Y.Doc();
+				Y.applyUpdateV2( peerDoc, Y.encodeStateAsUpdateV2( liveDoc ) );
+
+				syncConfig.applyChangesToCRDTDoc.mockClear();
+				handlers.editRecord.mockClear();
+
+				const getContent = ( doc: Y.Doc ) =>
+					String(
+						doc.getMap( CRDT_RECORD_MAP_KEY ).get( 'content' )
+					);
+
+				// The local edit is in the store, and its update is deferred
+				// because no peer is in awareness.
+				const typeLocally = ( content: string ) => {
+					editedRecord.content = content;
+					manager.update(
+						'post',
+						'123',
+						{ content },
+						LOCAL_EDITOR_ORIGIN
+					);
+				};
+
+				// The peer inserts text and the live document receives it.
+				const receiveFromPeer = ( index: number, text: string ) => {
+					const before = Y.encodeStateVector( peerDoc );
+					(
+						peerDoc
+							.getMap( CRDT_RECORD_MAP_KEY )
+							.get( 'content' ) as Y.Text
+					 ).insert( index, text );
+					Y.applyUpdateV2(
+						liveDoc,
+						Y.encodeStateAsUpdateV2( peerDoc, before ),
+						'provider'
+					);
+				};
+
+				return {
+					editedRecord,
+					getContent,
+					handlers,
+					liveDoc,
+					manager,
+					peerDoc,
+					receiveFromPeer,
+					syncConfig,
+					typeLocally,
+				};
+			}
+
+			const nextTick = () =>
+				new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			it( 'keeps both the remote change and the deferred update', async () => {
+				const {
+					editedRecord,
+					getContent,
+					liveDoc,
+					receiveFromPeer,
+					syncConfig,
+					typeLocally,
+				} = await loadWithPeer();
+
+				typeLocally( 'Hello!' );
+				expect(
+					syncConfig.applyChangesToCRDTDoc
+				).not.toHaveBeenCalled();
+
+				receiveFromPeer( 0, 'Peer ' );
+
+				// The update was applied to a copy, not to the live document.
+				expect(
+					syncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect(
+					syncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ][ 0 ]
+				).not.toBe( liveDoc );
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+
+				// The timer finds nothing left to apply.
+				await nextTick();
+				expect(
+					syncConfig.applyChangesToCRDTDoc
+				).toHaveBeenCalledTimes( 1 );
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+
+				// The store receives the merged value.
+				expect( editedRecord.content ).toBe( 'Peer Hello!' );
 			} );
 
-			const initialRecord = {
-				id: '123',
-				content: 'Hello',
-				meta: {},
-			};
-			// The local edit is in the store before it is in the document.
-			const editedRecord = { ...initialRecord, content: 'Hello!' };
-			const syncConfig = {
-				...mockSyncConfig,
-				applyChangesToCRDTDoc: vi.fn(
-					( ydoc: CRDTDoc, changes: Partial< ObjectData > ) => {
-						const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-						Object.entries( changes ).forEach(
-							( [ key, value ] ) => {
-								recordMap.set( key, value );
-							}
-						);
+			it( 'sends the deferred update to the peer with the local origin', async () => {
+				const {
+					getContent,
+					liveDoc,
+					peerDoc,
+					receiveFromPeer,
+					typeLocally,
+				} = await loadWithPeer();
+
+				// A provider sends each update that it did not apply itself.
+				const origins: unknown[] = [];
+				liveDoc.on( 'updateV2', ( update: Uint8Array, origin ) => {
+					origins.push( origin );
+					if ( 'provider' !== origin ) {
+						Y.applyUpdateV2( peerDoc, update );
 					}
-				),
-			};
-			const handlers = {
-				...mockHandlers,
-				editRecord: vi.fn(),
-				getEditedRecord: vi.fn( async () =>
-					Promise.resolve( editedRecord )
-				),
-			};
+				} );
 
-			const manager = createSyncManager();
+				typeLocally( 'Hello!' );
+				receiveFromPeer( 0, 'Peer ' );
 
-			await manager.load(
-				syncConfig,
-				'post',
-				'123',
-				initialRecord,
-				handlers
-			);
+				expect( origins ).toEqual( [
+					'provider',
+					LOCAL_EDITOR_ORIGIN,
+				] );
+				expect( getContent( peerDoc ) ).toBe( 'Peer Hello!' );
+			} );
 
-			syncConfig.applyChangesToCRDTDoc.mockClear();
-			handlers.editRecord.mockClear();
+			it( 'keeps the order of several deferred updates', async () => {
+				const { getContent, liveDoc, receiveFromPeer, typeLocally } =
+					await loadWithPeer();
 
-			// With no remote peers present, the local update is deferred.
-			manager.update(
-				'post',
-				'123',
-				{ content: 'Hello!' },
-				LOCAL_EDITOR_ORIGIN
-			);
+				typeLocally( 'Hello!' );
+				typeLocally( 'Hello!?' );
+				receiveFromPeer( 0, 'Peer ' );
 
-			// A remote change arrives before the deferred update is applied.
-			// The peer starts from the current document, so its change
-			// follows the initial value and does not compete with it.
-			const remoteDoc = new Y.Doc();
-			Y.applyUpdateV2(
-				remoteDoc,
-				Y.encodeStateAsUpdateV2( capturedDoc as unknown as Y.Doc )
-			);
-			remoteDoc
-				.getMap( CRDT_RECORD_MAP_KEY )
-				.set( 'content', 'Peer Hello' );
-			Y.applyUpdateV2(
-				capturedDoc as unknown as Y.Doc,
-				Y.encodeStateAsUpdateV2( remoteDoc )
-			);
-			remoteDoc.destroy();
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!?' );
+			} );
 
-			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			it( 'undoes the deferred update and keeps the remote change', async () => {
+				const {
+					getContent,
+					liveDoc,
+					manager,
+					receiveFromPeer,
+					typeLocally,
+				} = await loadWithPeer();
 
-			// The deferred update was computed without the remote change, so
-			// it is not applied over it.
-			expect( syncConfig.applyChangesToCRDTDoc ).not.toHaveBeenCalled();
-			expect(
-				( capturedDoc as unknown as Y.Doc )
-					.getMap( CRDT_RECORD_MAP_KEY )
-					.get( 'content' )
-			).toBe( 'Peer Hello' );
+				typeLocally( 'Hello!' );
+				receiveFromPeer( 0, 'Peer ' );
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
 
-			// The store receives the remote value in place of the local one.
-			expect( handlers.editRecord ).toHaveBeenCalledWith( {
-				content: 'Peer Hello',
+				expect( manager.undoManager.undo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello' );
+
+				expect( manager.undoManager.redo( 'post', '123' ) ).toBe(
+					true
+				);
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+			} );
+
+			it( 'marks the live document as saved for a deferred save', async () => {
+				const {
+					editedRecord,
+					getContent,
+					liveDoc,
+					manager,
+					receiveFromPeer,
+				} = await loadWithPeer();
+
+				const clientId = liveDoc.clientID;
+
+				editedRecord.content = 'Hello!';
+				manager.update(
+					'post',
+					'123',
+					{ content: 'Hello!' },
+					LOCAL_EDITOR_ORIGIN,
+					{ isSave: true }
+				);
+				receiveFromPeer( 0, 'Peer ' );
+
+				// The mark is from this editor, and Yjs did not replace the
+				// editor's client ID.
+				const stateMap = liveDoc.getMap( CRDT_STATE_MAP_KEY );
+				expect( stateMap.get( 'savedBy' ) ).toBe( clientId );
+				expect( liveDoc.clientID ).toBe( clientId );
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello!' );
+			} );
+
+			it( 'leaves the deferred updates of other entities in the queue', async () => {
+				const { getContent, liveDoc, manager, receiveFromPeer } =
+					await loadWithPeer();
+
+				let otherDoc: Y.Doc | null = null;
+				mockProviderCreator.mockImplementation(
+					async ( { ydoc: providedDoc } ) => {
+						otherDoc = providedDoc as unknown as Y.Doc;
+						return mockProviderResult;
+					}
+				);
+				await manager.load(
+					{
+						...mockSyncConfig,
+						applyChangesToCRDTDoc: vi.fn( applyTextChanges ),
+					},
+					'post',
+					'456',
+					{ id: '456', content: 'Other', meta: {} },
+					mockHandlers
+				);
+
+				manager.update(
+					'post',
+					'456',
+					{ content: 'Other!' },
+					LOCAL_EDITOR_ORIGIN
+				);
+				receiveFromPeer( 0, 'Peer ' );
+
+				expect( getContent( liveDoc ) ).toBe( 'Peer Hello' );
+				expect( getContent( otherDoc as unknown as Y.Doc ) ).toBe(
+					'Other'
+				);
+
+				await nextTick();
+				expect( getContent( otherDoc as unknown as Y.Doc ) ).toBe(
+					'Other!'
+				);
 			} );
 		} );
 

@@ -7,6 +7,12 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 import { logPerformanceTiming, passThru } from './performance';
+import {
+	createDeferredUpdateQueue,
+	rebaseDeferredUpdates,
+	type DeferredUpdate,
+	type RebasedUpdate,
+} from './deferred-updates';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -91,7 +97,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	 */
 	const undoManager: SyncUndoManager = {
 		undo( objectType: ObjectType, objectId: ObjectID ): boolean {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 
 			// An unloaded entity has no undo manager, so its levels move
 			// nothing.
@@ -103,7 +109,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 
 		redo( objectType: ObjectType, objectId: ObjectID ): boolean {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 
 			const entityState = entityStates.get(
 				getEntityId( objectType, objectId )
@@ -125,14 +131,14 @@ export function createSyncManager( debug = false ): SyncManager {
 		},
 
 		stopCapturing(): void {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			entityStates.forEach( ( entityState ) =>
 				entityState.undoManager.stopCapturing()
 			);
 		},
 
 		clearRedo(): void {
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			entityStates.forEach( ( entityState ) =>
 				entityState.undoManager.clearRedo()
 			);
@@ -256,15 +262,72 @@ export function createSyncManager( debug = false ): SyncManager {
 				return;
 			}
 
-			// A local update that is still deferred was computed before this
-			// remote change. Applying it now would write the older values
-			// over the remote change, so discard it. The store update below
-			// replaces the same local values in the editor.
-			if ( ! transaction.local ) {
-				discardPendingCRDTDocUpdates( objectType, objectId );
+			void internal.updateEntityRecord( objectType, objectId );
+		};
+
+		/*
+		 * A local update that is still deferred was computed from the
+		 * document as it is before a remote change. If the remote change
+		 * arrives first, the update would write its older values over it.
+		 *
+		 * So, just before a remote transaction, take the deferred updates
+		 * of this entity out of the queue and turn them into operations.
+		 * After the remote transaction, apply those operations, and Yjs
+		 * merges them with the remote change. See `rebaseDeferredUpdates`.
+		 */
+		let rebasedUpdates: RebasedUpdate[] = [];
+
+		const onBeforeTransaction = ( transaction: Y.Transaction ): void => {
+			if ( transaction.local ) {
+				return;
 			}
 
-			void internal.updateEntityRecord( objectType, objectId );
+			const updates = deferredUpdates.take( entityId );
+
+			if ( updates.length > 0 ) {
+				rebasedUpdates = rebaseDeferredUpdates(
+					ydoc,
+					( copy, changes ) =>
+						syncConfig.applyChangesToCRDTDoc( copy, changes ),
+					updates
+				);
+			}
+		};
+
+		const onAfterTransaction = ( transaction: Y.Transaction ): void => {
+			if ( transaction.local || 0 === rebasedUpdates.length ) {
+				return;
+			}
+
+			const updates = rebasedUpdates;
+			rebasedUpdates = [];
+
+			for ( const { update, origin, options } of updates ) {
+				log( 'updateCRDTDoc', 'applying rebased changes', entityId );
+
+				if ( options.isNewUndoLevel ) {
+					undoManager.stopCapturing();
+				}
+
+				// The origin makes the undo manager track the operations and
+				// makes providers send them. The transaction is not local,
+				// so the record observer also updates the local store with
+				// the merged result.
+				Y.applyUpdateV2( ydoc, update, origin );
+
+				// A save also marks the document as saved. The mark holds
+				// this editor's client ID, so it goes to the live document.
+				// Wait until Yjs has finished the transaction above: a local
+				// write before that would look to Yjs like another client
+				// with this editor's client ID.
+				if ( options.isSave ) {
+					ydoc.once( 'afterAllTransactions', () => {
+						updateCRDTDoc( objectType, objectId, {}, origin, {
+							isSave: true,
+						} );
+					} );
+				}
+			}
 		};
 
 		const onStateMapUpdate = (
@@ -368,6 +431,8 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
+		ydoc.on( 'beforeTransaction', onBeforeTransaction );
+		ydoc.on( 'afterTransaction', onAfterTransaction );
 		hasObserversAttached = true;
 	}
 
@@ -730,61 +795,15 @@ export function createSyncManager( debug = false ): SyncManager {
 		}
 	}
 
-	/*
-	 * Local updates deferred off the typing hot path (#79964). They are held
-	 * in a queue, rather than closed over in their timeouts, so that reads of
-	 * the document (snapshots, persistence) can flush them synchronously
-	 * instead of waiting out the scheduled timeout.
-	 */
-	const pendingCRDTDocUpdates: Array< Parameters< typeof updateCRDTDoc > > =
-		[];
-	let isFlushingCRDTDocUpdates = false;
-
-	function flushPendingCRDTDocUpdates(): void {
-		// Applying an update can ask for a flush itself (closing an undo
-		// level flushes first). The updates already queued keep their order
-		// by letting the outer flush finish them.
-		if ( isFlushingCRDTDocUpdates ) {
-			return;
+	// Local updates that are kept off the typing hot path (#79964).
+	const deferredUpdates = createDeferredUpdateQueue<
+		DeferredUpdate & {
+			objectType: ObjectType;
+			objectId: ObjectID | null;
 		}
-
-		isFlushingCRDTDocUpdates = true;
-
-		try {
-			while ( pendingCRDTDocUpdates.length > 0 ) {
-				const args = pendingCRDTDocUpdates.shift();
-
-				if ( args ) {
-					updateCRDTDoc( ...args );
-				}
-			}
-		} finally {
-			isFlushingCRDTDocUpdates = false;
-		}
-	}
-
-	// Discard the deferred updates of one entity. Used when a remote change
-	// reaches the entity's document before its deferred updates are applied.
-	function discardPendingCRDTDocUpdates(
-		objectType: ObjectType,
-		objectId: ObjectID | null
-	): void {
-		for ( let i = pendingCRDTDocUpdates.length - 1; i >= 0; i-- ) {
-			const [ pendingType, pendingId ] = pendingCRDTDocUpdates[ i ];
-
-			if ( pendingType === objectType && pendingId === objectId ) {
-				pendingCRDTDocUpdates.splice( i, 1 );
-			}
-		}
-	}
-
-	// Deferred variant of `updateCRDTDoc`; keeps work off the typing hot path.
-	function deferUpdateCRDTDoc(
-		...args: Parameters< typeof updateCRDTDoc >
-	): void {
-		pendingCRDTDocUpdates.push( args );
-		setTimeout( flushPendingCRDTDocUpdates, 0 );
-	}
+	>( ( { objectType, objectId, changes, origin, options } ) =>
+		updateCRDTDoc( objectType, objectId, changes, origin, options )
+	);
 
 	// Apply local changes to the CRDT doc, synchronously when a remote peer is
 	// present so the change lands before a remote update can race it (#78756),
@@ -803,12 +822,18 @@ export function createSyncManager( debug = false ): SyncManager {
 		if ( hasRemotePeers ) {
 			// Apply any updates queued while editing alone first, so changes
 			// are never applied out of order.
-			flushPendingCRDTDocUpdates();
+			deferredUpdates.flush();
 			updateCRDTDoc( objectType, objectId, changes, origin, options );
 			return;
 		}
 
-		deferUpdateCRDTDoc( objectType, objectId, changes, origin, options );
+		deferredUpdates.defer( getEntityId( objectType, objectId ), {
+			objectType,
+			objectId,
+			changes,
+			origin,
+			options,
+		} );
 	}
 
 	/**
@@ -837,7 +862,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Apply deferred updates so the snapshot reflects every change issued
 		// before it, including changes made in the same tick.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return encodeDocSnapshot( entityState.ydoc );
 	}
@@ -868,7 +893,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Compare against the settled document, with no deferred updates
 		// pending.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return docContainsSnapshot( entityState.ydoc, encodedSnapshot );
 	}
@@ -932,7 +957,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Local updates may be deferred when editing alone. Apply them so
 		// they are included in the serialized document.
-		flushPendingCRDTDocUpdates();
+		deferredUpdates.flush();
 
 		return serializeCrdtDoc( entityState.ydoc );
 	}

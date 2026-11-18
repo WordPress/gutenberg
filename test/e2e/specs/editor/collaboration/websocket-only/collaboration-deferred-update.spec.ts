@@ -5,6 +5,20 @@ function paragraph( content: string ): string {
 	return `<!-- wp:paragraph -->\n<p>${ content }</p>\n<!-- /wp:paragraph -->`;
 }
 
+async function getCaret( page: Page ) {
+	return page.evaluate( () => {
+		const { getBlockIndex, getSelectionStart, getSelectionEnd } = (
+			window as any
+		 ).wp.data.select( 'core/block-editor' );
+		const start = getSelectionStart();
+		return {
+			blockIndex: getBlockIndex( start.clientId ),
+			start: start.offset,
+			end: getSelectionEnd().offset,
+		};
+	} );
+}
+
 async function getParagraphContents( page: Page ): Promise< string[] > {
 	return page.evaluate( () =>
 		( window as any ).wp.data
@@ -17,7 +31,7 @@ async function getParagraphContents( page: Page ): Promise< string[] > {
 }
 
 test.describe( 'Collaboration - deferred local update', () => {
-	test( 'does not write a deferred edit over a peer edit that arrived first', async ( {
+	test( 'keeps a deferred edit and a peer edit that arrived first', async ( {
 		collaborationUtils,
 		requestUtils,
 		editor,
@@ -175,9 +189,8 @@ test.describe( 'Collaboration - deferred local update', () => {
 			}
 		} );
 
-		// The peer's text stays in both editors. The first editor's own
-		// character does not: its update was older than the document.
-		const expected = [ 'Peer Hello', 'Secondxy' ];
+		// Both edits stay, in both editors.
+		const merged = [ 'Peer Hello!', 'Secondxy' ];
 		await expect
 			.poll(
 				async () => ( {
@@ -186,6 +199,27 @@ test.describe( 'Collaboration - deferred local update', () => {
 				} ),
 				{ timeout: 10_000 }
 			)
-			.toEqual( { first: expected, peer: expected } );
+			.toEqual( { first: merged, peer: merged } );
+
+		// The first editor's caret stays after its own character.
+		await expect
+			.poll( () => getCaret( page ) )
+			.toEqual( { blockIndex: 0, start: 11, end: 11 } );
+
+		// The first editor can undo its own edit. The peer's edit stays.
+		await page.keyboard.press( 'ControlOrMeta+z' );
+		const undone = [ 'Peer Hello', 'Secondxy' ];
+		await expect
+			.poll(
+				async () => ( {
+					first: await getParagraphContents( page ),
+					peer: await getParagraphContents( page2 ),
+				} ),
+				{ timeout: 10_000 }
+			)
+			.toEqual( { first: undone, peer: undone } );
+		await expect
+			.poll( () => getCaret( page ) )
+			.toEqual( { blockIndex: 0, start: 10, end: 10 } );
 	} );
 } );
