@@ -159,16 +159,20 @@ const TOOLS: Tool[] = [
 		],
 	},
 	{
-		id: 'gemini-cli',
-		label: 'Gemini CLI',
-		domain: 'gemini.google.com',
-		mark: 'Ge',
+		id: 'antigravity',
+		label: 'Antigravity',
+		domain: 'antigravity.google',
+		mark: 'Ag',
 		color: '#4285f4',
-		file: '~/.gemini/settings.json',
 		config: JSON_CONFIG,
+		link: {
+			href: 'https://antigravity.google/docs/mcp',
+			label: 'Antigravity MCP documentation',
+		},
 		steps: [
-			'Add the configuration above to the file.',
-			'Start Gemini CLI and run `/mcp` to confirm `wordpress-design-system` is connected.',
+			'In the agent panel, open the “…” menu, choose MCP Servers, then Manage MCP Servers, and click View raw config.',
+			'Add the configuration above to the file that opens, then save and refresh the server list.',
+			'In the CLI (`agy`), run `/mcp` to confirm `wordpress-design-system` is connected.',
 		],
 	},
 	{

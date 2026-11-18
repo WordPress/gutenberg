@@ -64,7 +64,7 @@ Where it goes, and what changes for each client:
 | [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server) | `claude_desktop_config.json` (Settings, Developer, Edit Config) | Restart the app. The guide is for the "filesystem" server, so substitute the entry above. |
 | [VS Code](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file) | `.vscode/mcp.json`, or [install in VS Code](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wordpress-design-system%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522-y%2522%252C%2522--ignore-scripts%2522%252C%2522--min-release-age%253D2%2522%252C%2522%2540wordpress%252Fdesign-system-mcp%2540latest%2522%255D%257D) | Use `servers` instead of `mcpServers`. |
 | [JetBrains](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html) | Settings, Tools, AI Assistant, Model Context Protocol (MCP), Add | Paste it into the JSON configuration field. |
-| [Gemini CLI](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md) | `~/.gemini/settings.json` | |
+| [Antigravity](https://antigravity.google/docs/mcp) | Agent panel, MCP Servers, Manage MCP Servers, View raw config | Replaces Gemini CLI. |
 | [Zed](https://zed.dev/docs/ai/mcp) | `settings.json` | Use `context_servers` instead of `mcpServers`. |
 | [OpenCode](https://opencode.ai/docs/mcp-servers/) | `opencode.json` | Use `mcp.servers`, add `"type": "local"`, and join `command` and `args` into one `command` array. |
 | Raycast | The "Install Server" command | Paste only the server entry, the object holding `command` and `args`. |
