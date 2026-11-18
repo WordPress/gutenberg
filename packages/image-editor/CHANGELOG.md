@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.1.0 (2026-11-18)
+
 Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 
 ### Enhancements
