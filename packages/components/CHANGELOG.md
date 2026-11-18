@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 45.0.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   `Button`: Use WPDS tokens for ordinary and destructive colors. Customize these colors with `ThemeProvider` instead of legacy color overrides ([#86683](https://github.com/WordPress/gutenberg/pull/86683)).
