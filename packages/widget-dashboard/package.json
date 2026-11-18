@@ -42,7 +42,8 @@
 	"wpScript": false,
 	"types": "build-types",
 	"sideEffects": [
-		"src/**/*.module.css"
+		"src/**/*.module.css",
+		"src/**/*.module.scss"
 	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
@@ -72,6 +73,7 @@
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/admin-ui": "file:../admin-ui",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/theme": "file:../theme",
 		"storybook": "^10.6.6",
 		"vitest": "^5.1.0",
