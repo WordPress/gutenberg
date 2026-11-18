@@ -100,6 +100,35 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 	} );
 
+	test( 'preserves set membership through the collaborative selection-history round trip', () => {
+		const selection = {
+			selectionStart: { clientId: 'block-1' },
+			selectionEnd: { clientId: 'block-3' },
+			setSelectionClientIds: [ 'block-1', 'block-3' ],
+		};
+		history.updateSelection( selection );
+		expect( history.getSelectionHistory()[ 0 ] ).toMatchObject( {
+			setSelectionClientIds: [ 'block-1', 'block-3' ],
+		} );
+	} );
+
+	test( 'distinguishes sets with identical endpoints but different members in history', () => {
+		const endpoints = {
+			selectionStart: { clientId: 'block-1' },
+			selectionEnd: { clientId: 'block-3' },
+		};
+		history.updateSelection( {
+			...endpoints,
+			setSelectionClientIds: [ 'block-1', 'block-3' ],
+		} );
+		history.updateSelection( {
+			...endpoints,
+			setSelectionClientIds: [ 'block-1', 'block-2', 'block-3' ],
+		} );
+		history.updateSelection( endpoints );
+		expect( history.getSelectionHistory() ).toHaveLength( 3 );
+	} );
+
 	describe( 'updateSelection with relative positions', () => {
 		test( 'should convert and store a selection as a relative position', () => {
 			const selection = createSelection( {

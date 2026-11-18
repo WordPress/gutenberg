@@ -1,10 +1,16 @@
-import { registerBlockType } from '@wordpress/blocks';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { act, render } from '@testing-library/react';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
 import type { ComponentType } from 'react';
 import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
-import type { BlockEditorProviderProps, RegistryProvidedProps } from '../types';
+import { SelectionContext } from '../selection-context';
+import type {
+	BlockEditorProviderProps,
+	RegistryProvidedProps,
+	BlockSelectionState,
+} from '../types';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
@@ -683,5 +689,66 @@ describe( 'useBlockSync hook', () => {
 
 		// The internal IDs should be different from the external IDs (due to cloning)
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
+	} );
+
+	it( 'maps every set member through controller cloning and incoming value resets', () => {
+		const registry = createRegistry();
+		registry.register( blockEditorStore );
+		const parent = createBlock( 'test/test-block' );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ parent ] );
+		const external = Array.from( { length: 3 }, () =>
+			createBlock( 'test/test-block' )
+		);
+		let savedSelection: BlockSelectionState | undefined;
+		const onChangeSelection = vi.fn( ( selection: BlockSelectionState ) => {
+			savedSelection = selection;
+		} );
+		const context = {
+			getSelection: () => savedSelection,
+			onChangeSelection,
+		};
+		const view = ( value: Block[] ) => (
+			<RegistryProvider value={ registry }>
+				<SelectionContext.Provider value={ context }>
+					<TestWrapper
+						useSubRegistry={ false }
+						clientId={ parent.clientId }
+						value={ value }
+						onChange={ vi.fn() }
+						onInput={ vi.fn() }
+					/>
+				</SelectionContext.Provider>
+			</RegistryProvider>
+		);
+		const { rerender } = render( view( external ) );
+		const internal = registry
+			.select( blockEditorStore )
+			.getBlockOrder( parent.clientId );
+		act( () => {
+			registry
+				.dispatch( blockEditorStore )
+				.multiSelectSet( [ internal[ 0 ], internal[ 2 ] ], null );
+		} );
+		expect( savedSelection ).toMatchObject( {
+			setSelectionClientIds: [
+				external[ 0 ].clientId,
+				external[ 2 ].clientId,
+			],
+		} );
+		rerender(
+			view(
+				external.map( ( block ) => ( {
+					...block,
+					attributes: { foo: 2 },
+				} ) )
+			)
+		);
+		const refreshed = registry
+			.select( blockEditorStore )
+			.getBlockOrder( parent.clientId );
+		expect( refreshed[ 0 ] ).not.toBe( internal[ 0 ] );
+		expect(
+			registry.select( blockEditorStore ).getSelectedBlockClientIds()
+		).toEqual( [ refreshed[ 0 ], refreshed[ 2 ] ] );
 	} );
 } );

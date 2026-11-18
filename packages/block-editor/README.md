@@ -92,6 +92,8 @@ Grouping, multi-block transformations, toolbar and keyboard movers, and Enter-ba
 
 Editors that preserve selection alongside their controlled block value must also preserve the optional `setSelectionClientIds` field reported in selection state. This field lists set members only; it is absent for range and text selections. `resetSelection` accepts these IDs as its optional fourth argument when restoring a set selection.
 
+Real-time collaboration preserves set membership through incoming edits and undo/redo. Updated clients outline each remotely selected member; older clients ignore the additive set-awareness metadata rather than displaying a misleading contiguous range. Existing text and range-selection awareness remains unchanged.
+
 ## API
 
 Any components in this package that have a counterpart in [@wordpress/components](/packages/components/README.md) are an extension of those components.

@@ -15,6 +15,11 @@ import {
 	htmlIndexToRichTextOffset,
 } from './crdt-utils';
 import type { WPBlockSelection, WPSelection } from '../types';
+import {
+	getBlockPathInYdoc,
+	resolveBlockClientIdByPath,
+} from '../awareness/block-lookup';
+import { unlock } from '../lock-unlock';
 
 // WeakMap to store BlockSelectionHistory instances per Y.Doc
 const selectionHistoryMap = new WeakMap< CRDTDoc, BlockSelectionHistory >();
@@ -132,6 +137,21 @@ function convertYFullSelectionToWPSelection(
 	ydoc: Y.Doc
 ): WPSelection | null {
 	const { start, end } = yFullSelection;
+	if ( yFullSelection.setSelectionClientIds ) {
+		const members = yFullSelection.setSelectionClientIds.filter( ( id ) =>
+			findBlockByClientIdInDoc( id, ydoc )
+		);
+		if ( ! members.length ) {
+			return null;
+		}
+		return {
+			// Keep direction until restoration: the editor's normalizer repairs
+			// missing endpoints using the resulting tree's order, not saved order.
+			selectionStart: { clientId: start.clientId },
+			selectionEnd: { clientId: end.clientId },
+			setSelectionClientIds: members,
+		};
+	}
 	const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
 	const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );
 
@@ -202,9 +222,36 @@ export function restoreSelection(
 		return;
 	}
 
-	const { getBlock } = select( blockEditorStore );
 	const { resetSelection } = dispatch( blockEditorStore );
 	const { selectionStart, selectionEnd } = selectionToRestore;
+	if ( selectionToRestore.setSelectionClientIds ) {
+		// History uses entity IDs. In template mode the editor uses cloned IDs;
+		// map every surviving member through the same tree paths as awareness.
+		const selectors = select( blockEditorStore );
+		const [ postContentId ] =
+			unlock( selectors ).getBlocksByName( 'core/post-content' );
+		const blocks = selectors.getBlocks( postContentId ?? '' );
+		const mapping = new Map< string, string >();
+		for ( const id of selectionToRestore.setSelectionClientIds ) {
+			const block = findBlockByClientIdInDoc( id, ydoc );
+			const path = block instanceof Y.Map && getBlockPathInYdoc( block );
+			const localId = path && resolveBlockClientIdByPath( path, blocks );
+			if ( localId ) {
+				mapping.set( id, localId );
+			}
+		}
+		const members = [ ...mapping.values() ];
+		if ( members.length ) {
+			resetSelection(
+				{ clientId: mapping.get( selectionStart.clientId ) },
+				{ clientId: mapping.get( selectionEnd.clientId ) },
+				0,
+				members
+			);
+		}
+		return;
+	}
+	const { getBlock } = select( blockEditorStore );
 	const isSelectionInSameBlock =
 		selectionStart.clientId === selectionEnd.clientId;
 
@@ -245,10 +292,8 @@ export function restoreSelection(
 			resetSelection( selectionStart, selectionEnd, 0 );
 		}
 	} else {
-		// Case 3: A multi-block selection was made. resetSelection() can only
-		// restore selections within the same block.
-		// When a multi-block selection is made, selectionEnd represents
-		// where the user's cursor ended.
+		// Case 3: Preserve legacy range-history behavior by collapsing to the
+		// moving end. Set histories, which have explicit members, restore above.
 		resetSelection( selectionEnd, selectionEnd, 0 );
 	}
 }

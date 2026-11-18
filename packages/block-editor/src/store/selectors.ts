@@ -1370,8 +1370,7 @@ export function getBlockIndex( state: State, clientId: string ) {
  * @return {boolean} Whether block is selected and no multi-selection exists.
  */
 export function isBlockSelected( state: State, clientId?: string | null ) {
-	// Both sides are `undefined` when nothing is selected and the caller
-	// passes an optional client ID.
+	// An absent client ID never identifies a selected block.
 	return !! clientId && getSelectedBlockClientId( state ) === clientId;
 }
 

@@ -146,6 +146,10 @@ export function useBlockHighlighting(
 				}
 				const selType = userState.editorState?.selection?.type;
 				return (
+					( selType === SelectionType.None &&
+						Array.isArray(
+							userState.editorState?.selection?.setSelection
+						) ) ||
 					selType === SelectionType.WholeBlock ||
 					selType === SelectionType.SelectionInMultipleBlocks ||
 					selType === SelectionType.Cursor ||
@@ -161,6 +165,42 @@ export function useBlockHighlighting(
 				// Cast to any: the selection union type is narrowed by the
 				// filter above, but TypeScript cannot infer that after .flatMap.
 				const selection = userState.editorState?.selection as any;
+				if (
+					selection.type === SelectionType.None &&
+					Array.isArray( selection.setSelection )
+				) {
+					const collaborator = describeCollaborator( userState );
+					return selection.setSelection.flatMap(
+						( member: unknown ) => {
+							if (
+								! member ||
+								typeof member !== 'object' ||
+								! ( 'type' in member ) ||
+								member.type !== SelectionType.WholeBlock
+							) {
+								return [];
+							}
+							try {
+								const { localClientId } = resolveSelection(
+									member as SelectionEndpoint
+								);
+								return localClientId
+									? [
+											{
+												blockId: localClientId,
+												...collaborator,
+												alwaysOutline: true,
+											},
+										]
+									: [];
+							} catch {
+								// A deleted or invalid remote member has no highlight. Never
+								// substitute a range through its unselected neighbors.
+								return [];
+							}
+						}
+					);
+				}
 
 				if ( selection.type === SelectionType.WholeBlock ) {
 					let localClientId: string | null;

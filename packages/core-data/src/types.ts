@@ -108,6 +108,7 @@ export interface WPBlockSelection {
 export interface WPSelection {
 	selectionEnd: WPBlockSelection;
 	selectionStart: WPBlockSelection;
+	setSelectionClientIds?: string[];
 	initialPosition?: number | null;
 }
 
@@ -135,8 +136,11 @@ export type CursorPosition = {
 };
 
 export type SelectionNone = {
-	// The user has not made a selection.
+	// No selection understood by legacy receivers; may carry a set extension.
 	type: SelectionType.None;
+	// An additive awareness extension: older receivers treat sets as no
+	// selection, never as a contiguous range. New receivers outline each member.
+	setSelection?: SelectionWholeBlock[];
 };
 
 export type SelectionCursor = {
@@ -184,6 +188,9 @@ export type SelectionWholeBlock = {
 	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
 	blockPosition: Y.RelativePosition;
+	// Set members include the CRDT block identity so deleting a member cannot
+	// accidentally highlight the next block occupying its former array slot.
+	clientId?: string;
 };
 
 export type SelectionState =
