@@ -336,6 +336,13 @@
 // column only needs room for the actions menu.
 // They are text-sized links, like the row actions in wp-admin, so they add a
 // single line of text to the row height.
+// The line of actions closes the row, so the cells only need a little room
+// below it, whatever the density. The density still sets the top and side
+// padding of the cells, and the padding of the headers.
+.dataviews-view-table tbody tr:has(.dataviews-view-table__primary-actions) td {
+	padding-bottom: var(--wpds-dimension-padding-xs);
+}
+
 .dataviews-view-table__primary-actions {
 	// Line up the first button's label with the title.
 	margin-inline-start: calc(-1 * var(--wpds-dimension-padding-xs));
