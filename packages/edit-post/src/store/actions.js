@@ -470,6 +470,15 @@ export const initializeMetaBoxes =
 			window.postboxes.add_postbox_toggles( postType );
 		}
 
+		// The meta box areas are separate scroll containers in the block
+		// editor. Render the drag helper outside of them so it doesn't grow
+		// their scrollable overflow or get clipped when dragged between areas,
+		// and don't let jQuery UI auto-scroll them while dragging.
+		window.jQuery?.( '.meta-box-sortables' ).sortable?.( 'option', {
+			appendTo: document.body,
+			scroll: false,
+		} );
+
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.
