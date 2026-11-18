@@ -54,7 +54,9 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 				icon={ navigation }
 				isHidden={ ! isBlockBasedTheme }
 			>
-				{ __( 'Navigation' ) }
+				{ globalThis.__experimentalNavigationMenuEditing
+					? __( 'Menus' )
+					: __( 'Navigation' ) }
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				uid="patterns-navigation-item"

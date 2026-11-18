@@ -85,7 +85,9 @@ export default function NavigationMenuContent( {
 		<>
 			{ ! isLoading && ! hasChildren && (
 				<p className="navigation-edit-editor__empty-message">
-					{ __( 'This Navigation Menu is empty.' ) }
+					{ ( window as any ).__experimentalNavigationMenuEditing
+						? __( 'This menu is empty.' )
+						: __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
 			{ ! isLoading && (

@@ -309,31 +309,67 @@ export function setNavigationMenu(
 	return visit( blocks );
 }
 
+export const PREVIEW_CURRENT_MENU_CLASS = 'menu-locations__current-menu';
+export const PREVIEW_OTHER_MENU_CLASS = 'menu-locations__other-menu';
+
+function addClassName( attributes: Record< string, any >, className: string ) {
+	return {
+		...attributes,
+		className: [ attributes?.className, className ]
+			.filter( Boolean )
+			.join( ' ' ),
+	};
+}
+
 /**
  * A template part's blocks, ready to preview: an overlay's Navigation blocks
  * never collapse into a menu button of their own, as the site renders them.
+ * Given a menu, and when the part has more than one Navigation block, the
+ * blocks showing the menu and the others are marked with
+ * `PREVIEW_CURRENT_MENU_CLASS` and `PREVIEW_OTHER_MENU_CLASS`, so the preview
+ * can tell them apart.
  *
- * @param location Location from `getNavigationLocations`.
+ * @param location       Location from `getNavigationLocations`.
+ * @param menuId         The menu to mark, if any.
+ * @param fallbackMenuId The menu shown when no menu is chosen.
  * @return Blocks to preview.
  */
 export function getPreviewBlocks(
-	location: NavigationLocation
+	location: NavigationLocation,
+	menuId?: number,
+	fallbackMenuId?: number | null
 ): MenuLocationBlock[] {
 	const blocks = getTemplatePartBlocks( location.part );
+	const isOverlay = location.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA;
+	const shouldMark =
+		menuId !== undefined && findNavigationBlocks( blocks ).length > 1;
 
-	if ( location.area !== NAVIGATION_OVERLAY_TEMPLATE_PART_AREA ) {
+	if ( ! isOverlay && ! shouldMark ) {
 		return blocks;
 	}
 
 	function visit( list: MenuLocationBlock[] ): MenuLocationBlock[] {
-		return list.map( ( block ) => ( {
-			...block,
-			attributes:
-				block.name === 'core/navigation'
-					? { ...block.attributes, overlayMenu: 'never' }
-					: block.attributes,
-			innerBlocks: visit( block.innerBlocks || EMPTY_ARRAY ),
-		} ) );
+		return list.map( ( block ) => {
+			if ( block.name !== 'core/navigation' ) {
+				return {
+					...block,
+					innerBlocks: visit( block.innerBlocks || EMPTY_ARRAY ),
+				};
+			}
+			let attributes = block.attributes;
+			if ( isOverlay ) {
+				attributes = { ...attributes, overlayMenu: 'never' };
+			}
+			if ( shouldMark ) {
+				attributes = addClassName(
+					attributes,
+					showsMenu( block, menuId!, fallbackMenuId )
+						? PREVIEW_CURRENT_MENU_CLASS
+						: PREVIEW_OTHER_MENU_CLASS
+				);
+			}
+			return { ...block, attributes };
+		} );
 	}
 
 	return visit( blocks );

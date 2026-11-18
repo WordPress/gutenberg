@@ -69,7 +69,11 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 	if ( ! isLoading && ! navigationMenu ) {
 		return (
 			<SidebarNavigationScreenWrapper
-				description={ __( 'Navigation Menu missing.' ) }
+				description={
+					globalThis.__experimentalNavigationMenuEditing
+						? __( 'Menu missing.' )
+						: __( 'Navigation Menu missing.' )
+				}
 				backPath={ backPath }
 			/>
 		);

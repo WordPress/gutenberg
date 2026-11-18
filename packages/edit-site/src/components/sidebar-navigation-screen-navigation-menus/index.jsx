@@ -86,7 +86,11 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	if ( ! isLoading && ! hasNavigationMenus ) {
 		return (
 			<SidebarNavigationScreenWrapper
-				description={ __( 'No Navigation Menus found.' ) }
+				description={
+					globalThis.__experimentalNavigationMenuEditing
+						? __( 'No menus found.' )
+						: __( 'No Navigation Menus found.' )
+				}
 				backPath={ backPath }
 			/>
 		);
@@ -140,7 +144,12 @@ export function SidebarNavigationScreenWrapper( {
 } ) {
 	return (
 		<SidebarNavigationScreen
-			title={ title || __( 'Navigation' ) }
+			title={
+				title ||
+				( globalThis.__experimentalNavigationMenuEditing
+					? __( 'Menus' )
+					: __( 'Navigation' ) )
+			}
 			actions={ actions }
 			description={
 				// `null` for none.

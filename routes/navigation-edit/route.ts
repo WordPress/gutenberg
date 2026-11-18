@@ -78,7 +78,9 @@ export const route = {
 			return navigation.title.raw;
 		}
 
-		return __( 'Navigation' );
+		return ( window as any ).__experimentalNavigationMenuEditing
+			? __( 'Menu' )
+			: __( 'Navigation' );
 	},
 	canvas: async ( {
 		params,

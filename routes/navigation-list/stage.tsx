@@ -178,7 +178,11 @@ function NavigationListView( {
 	return (
 		<>
 			<Page
-				title={ __( 'Navigation' ) }
+				title={
+					( window as any ).__experimentalNavigationMenuEditing
+						? __( 'Menus' )
+						: __( 'Navigation' )
+				}
 				headingLevel={ 2 }
 				className="navigation-page"
 				hasPadding={ false }

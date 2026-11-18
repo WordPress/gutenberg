@@ -39,6 +39,8 @@ import {
 	getFallbackMenuId,
 	getMenuTitle,
 	getPreviewBlocks,
+	PREVIEW_CURRENT_MENU_CLASS,
+	PREVIEW_OTHER_MENU_CLASS,
 	getRemovalOutcome,
 	getTemplatePartBlocks,
 	setNavigationMenu,
@@ -80,7 +82,11 @@ const STYLES = {
 			'1px solid var(--wpds-color-stroke-surface-neutral, #e0e0e0)',
 		flexShrink: 0,
 	},
+	// Sets the location cards and the preview apart from the space around
+	// them.
 	body: {
+		background:
+			'var(--wpds-color-background-surface-neutral-weak, #f0f0f0)',
 		flex: 1,
 		minHeight: 0,
 		overflowY: 'auto',
@@ -104,12 +110,36 @@ const STYLES = {
 		whiteSpace: 'nowrap',
 	},
 	list: { display: 'flex', flexDirection: 'column', gap: 24 },
+	locations: {
+		display: 'flex',
+		flexDirection: 'column',
+		gap: 16,
+	},
+	// A tall part, like a vertical header, is cut off rather than making its
+	// card fill the screen.
 	preview: {
+		maxHeight: 320,
 		borderRadius: 2,
 		overflow: 'hidden',
 		outline: '1px solid var(--wpds-color-stroke-surface-neutral, #ddd)',
 	},
 } satisfies Record< string, CSSProperties >;
+
+/*
+ * When a place has more than one menu, the one in question is outlined and
+ * the others are faded. The preview is scaled down, so the outline is thick.
+ */
+const PREVIEW_STYLES = [
+	{
+		css: `
+			.${ PREVIEW_OTHER_MENU_CLASS } { opacity: 0.3; }
+			.${ PREVIEW_CURRENT_MENU_CLASS } {
+				outline: 4px dashed var(--wp-admin-theme-color, #3858e9);
+				outline-offset: 8px;
+			}
+		`,
+	},
+];
 
 type RemovalOutcome = NonNullable< ReturnType< typeof getRemovalOutcome > >;
 type EditLocation = ( part: TemplatePartRecord ) => void;
@@ -319,7 +349,11 @@ function LocationCard( {
 	menus: NavigationMenuRecord[];
 	onEditLocation?: EditLocation;
 } ) {
-	const blocks = useMemo( () => getPreviewBlocks( location ), [ location ] );
+	const fallbackMenuId = getFallbackMenuId( menus );
+	const blocks = useMemo(
+		() => getPreviewBlocks( location, navigationId, fallbackMenuId ),
+		[ location, navigationId, fallbackMenuId ]
+	);
 
 	return (
 		<Card.Root className="menu-locations__card">
@@ -373,6 +407,7 @@ function LocationCard( {
 						<BlockPreview
 							blocks={ blocks }
 							viewportWidth={ 1200 }
+							additionalStyles={ PREVIEW_STYLES }
 						/>
 					</BlockPreview.Async>
 				</div>
@@ -453,7 +488,7 @@ function LocationsView( {
 		! filteredLocations.length && FILTER_EMPTY_STATES[ filter ]?.();
 
 	return (
-		<>
+		<div style={ STYLES.locations }>
 			<Notice.Root intent="info">
 				<Notice.Description>
 					{ locations.length === 1
@@ -538,7 +573,7 @@ function LocationsView( {
 					/>
 				) ) }
 			</div>
-		</>
+		</div>
 	);
 }
 
@@ -655,7 +690,11 @@ export default function MenuLocations( {
 						</Notice.Actions>
 					</Notice.Root>
 				) }
-				<MenuSitePreview />
+				<MenuSitePreview
+					navigationId={ id }
+					fallbackMenuId={ fallbackId }
+					locations={ locations }
+				/>
 			</>
 		);
 	} else {

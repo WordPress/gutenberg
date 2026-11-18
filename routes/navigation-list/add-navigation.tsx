@@ -50,7 +50,9 @@ export const AddNavigationModal = ( {
 
 			if ( savedRecord ) {
 				createSuccessNotice(
-					__( 'Navigation menu created successfully.' ),
+					( window as any ).__experimentalNavigationMenuEditing
+						? __( 'Menu created.' )
+						: __( 'Navigation menu created successfully.' ),
 					{
 						type: 'snackbar',
 					}
@@ -68,11 +70,17 @@ export const AddNavigationModal = ( {
 			const errorMessage =
 				error instanceof Error ? error.message : 'Unknown error';
 			createErrorNotice(
-				sprintf(
-					/* translators: %s: error message describing why the navigation menu could not be created. */
-					__( 'Unable to create navigation menu: %s' ),
-					errorMessage
-				),
+				( window as any ).__experimentalNavigationMenuEditing
+					? sprintf(
+							/* translators: %s: error message describing why the menu could not be created. */
+							__( 'Unable to create menu: %s' ),
+							errorMessage
+						)
+					: sprintf(
+							/* translators: %s: error message describing why the navigation menu could not be created. */
+							__( 'Unable to create navigation menu: %s' ),
+							errorMessage
+						),
 				{
 					type: 'snackbar',
 				}
@@ -85,7 +93,11 @@ export const AddNavigationModal = ( {
 
 	return (
 		<Modal
-			title={ __( 'Add New Navigation Menu' ) }
+			title={
+				( window as any ).__experimentalNavigationMenuEditing
+					? __( 'Add New Menu' )
+					: __( 'Add New Navigation Menu' )
+			}
 			onRequestClose={ () => closeModal?.() }
 			focusOnMount="firstContentElement"
 			size="small"

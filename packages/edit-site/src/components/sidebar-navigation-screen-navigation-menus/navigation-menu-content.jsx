@@ -96,7 +96,9 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		<>
 			{ ! isLoading && ! hasChildren && (
 				<p className="edit-site-sidebar-navigation-screen-navigation-menus__empty-message">
-					{ __( 'This Navigation Menu is empty.' ) }
+					{ globalThis.__experimentalNavigationMenuEditing
+						? __( 'This menu is empty.' )
+						: __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
 			{ ! isLoading && (
