@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `useSelect`: Keep less memory per mounted hook, which also makes mounting it faster ([#85803](https://github.com/WordPress/gutenberg/pull/85803)).
+
 ### Bug Fixes
 
 -   `Resolver`: Accept `NormalizedResolver` in the resolver types ([#86847](https://github.com/WordPress/gutenberg/pull/86847)).

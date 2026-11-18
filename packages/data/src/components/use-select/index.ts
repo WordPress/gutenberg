@@ -46,20 +46,16 @@ function warnOnUnstableReference(
 	);
 }
 
-interface StoreSubscriber {
-	subscribe: ( listener: () => void ) => () => void;
-	updateStores: ( newStores: string[] ) => void;
-	switchMode: VoidFunction;
-}
-
-interface ActiveSubscription {
-	subscribeStore: ( storeName: string ) => void;
-	resubscribeStores: VoidFunction;
-}
-
 interface DeferredListener {
 	context: object;
 	callback: VoidFunction;
+}
+
+// A subscription is also its own deferred listener record.
+interface ActiveSubscription extends DeferredListener {
+	// The unsubscribe of each active store, in the same order. The value
+	// could be undefined if the store is a custom generic store.
+	unsubs: Array< VoidFunction | undefined >;
 }
 
 type AddToBucket = ( listener: DeferredListener ) => VoidFunction;
@@ -124,213 +120,208 @@ function subscribeDeferred(
 	return addToBucket( listener );
 }
 
-function Store( registry: DataRegistry, suspense: boolean ) {
-	const select = ( suspense
-		? registry.suspendSelect
-		: registry.select ) as unknown as SelectFunction;
-	const queueContext = {};
-	let lastMapSelect: MapSelect | undefined;
-	let lastMapResult: unknown;
-	let lastMapResultValid = false;
-	let lastIsAsync: boolean | undefined;
-	let subscriber: StoreSubscriber | undefined;
-	let didWarnUnstableReference: boolean | undefined;
-	const storeStatesOnMount = new Map< string, unknown >();
+function getStoreState( registry: DataRegistry, name: string ): unknown {
+	// If there's no store property (custom generic store), return an empty
+	// object. When comparing the state, the empty objects will cause the
+	// equality check to fail, setting `lastMapResultValid` to false.
+	return registry.stores[ name ]?.store?.getState?.() ?? {};
+}
 
-	function getStoreState( name: string ): unknown {
-		// If there's no store property (custom generic store), return an empty
-		// object. When comparing the state, the empty objects will cause the
-		// equality check to fail, setting `lastMapResultValid` to false.
-		return registry.stores[ name ]?.store?.getState?.() ?? {};
+// One object per hook, with shared methods: every mounted `useSelect` keeps
+// it alive, so the less it holds, the less each block costs.
+class Store {
+	registry: DataRegistry;
+	select: SelectFunction;
+	mapSelect: MapSelect | undefined;
+	lastMapResult: unknown;
+	lastMapResultValid = false;
+	lastIsAsync: boolean | undefined;
+	didWarnUnstableReference: boolean | undefined;
+	// The stores the `subscribe` function is supposed to subscribe to. They
+	// are set by the first `mapSelect` call, and later calls can add to them.
+	activeStores: string[] | undefined;
+	// The state of each active store when the value was first computed.
+	storeStatesOnMount: unknown[] | undefined;
+	// The `subscribe` function, which is passed to the `useSyncExternalStore` hook, could
+	// be called multiple times to establish multiple subscriptions. That's why we need to
+	// keep a set of active subscriptions.
+	activeSubscriptions = new Set< ActiveSubscription >();
+
+	constructor( registry: DataRegistry, suspense: boolean ) {
+		this.registry = registry;
+		this.select = ( suspense
+			? registry.suspendSelect
+			: registry.select ) as unknown as SelectFunction;
 	}
 
-	const createSubscriber = ( stores: string[] ): StoreSubscriber => {
-		// The set of stores the `subscribe` function is supposed to subscribe to. Here it is
-		// initialized, and then the `updateStores` function can add new stores to it.
-		const activeStores = [ ...stores ];
+	// `useSyncExternalStore` takes functions, and the same ones on every
+	// render saves it storing new ones after each render.
+	subscribe = ( listener: () => void ): ( () => void ) => {
+		const { registry, activeStores, storeStatesOnMount } = this;
 
-		// The `subscribe` function, which is passed to the `useSyncExternalStore` hook, could
-		// be called multiple times to establish multiple subscriptions. That's why we need to
-		// keep a set of active subscriptions;
-		const activeSubscriptions = new Set< ActiveSubscription >();
-
-		function subscribe( listener: () => void ): () => void {
-			// Maybe invalidate the value right after subscription was created.
-			// React will call `getValue` after subscribing, to detect store
-			// updates that happened in the interval between the `getValue` call
-			// during render and creating the subscription, which is slightly
-			// delayed. We need to ensure that this second `getValue` call will
-			// compute a fresh value only if any of the store states have
-			// changed in the meantime.
-			if ( lastMapResultValid ) {
-				for ( const name of activeStores ) {
-					if (
-						storeStatesOnMount.get( name ) !== getStoreState( name )
-					) {
-						lastMapResultValid = false;
-					}
+		// Maybe invalidate the value right after subscription was created.
+		// React will call `getValue` after subscribing, to detect store
+		// updates that happened in the interval between the `getValue` call
+		// during render and creating the subscription, which is slightly
+		// delayed. We need to ensure that this second `getValue` call will
+		// compute a fresh value only if any of the store states have
+		// changed in the meantime.
+		if ( this.lastMapResultValid ) {
+			activeStores!.forEach( ( name, index ) => {
+				if (
+					storeStatesOnMount?.[ index ] !==
+					getStoreState( registry, name )
+				) {
+					this.lastMapResultValid = false;
 				}
-			}
-
-			storeStatesOnMount.clear();
-
-			const onStoreChange = () => {
-				// Invalidate the value on store update, so that a fresh value is computed.
-				lastMapResultValid = false;
-				listener();
-			};
-
-			// Listen to one store on the tier that matches the current mode:
-			// async listeners share one deferred subscription per store, sync
-			// ones listen to the store directly.
-			function listenToStore( storeName: string ) {
-				if ( lastIsAsync ) {
-					return subscribeDeferred( registry, storeName, {
-						context: queueContext,
-						callback: onStoreChange,
-					} );
-				}
-
-				return registry.subscribe( onStoreChange, storeName );
-			}
-
-			// The unsubscribe of each store this subscription listens to. The
-			// return value could be undefined if the store is a custom
-			// generic store.
-			const unsubs = new Map< string, VoidFunction | undefined >();
-
-			function subscribeStore( storeName: string ) {
-				unsubs.set( storeName, listenToStore( storeName ) );
-			}
-
-			// Move every store to the tier of the new mode, in place. Doing it
-			// here rather than by handing React a new `subscribe` identity
-			// keeps the listener registered at all times, so a dispatch can't
-			// slip through an unsubscribed gap.
-			function resubscribeStores() {
-				for ( const [ storeName, unsub ] of unsubs ) {
-					unsub?.();
-					unsubs.set( storeName, listenToStore( storeName ) );
-				}
-			}
-
-			for ( const storeName of activeStores ) {
-				subscribeStore( storeName );
-			}
-
-			const subscription = { subscribeStore, resubscribeStores };
-			activeSubscriptions.add( subscription );
-
-			return () => {
-				activeSubscriptions.delete( subscription );
-
-				for ( const unsub of unsubs.values() ) {
-					unsub?.();
-				}
-				// Cancel existing store updates that were already scheduled.
-				renderQueue.cancel( queueContext );
-			};
+			} );
 		}
 
-		// Check if `newStores` contains some stores we're not subscribed to yet, and add them.
-		function updateStores( newStores: string[] ) {
-			for ( const newStore of newStores ) {
-				if ( activeStores.includes( newStore ) ) {
+		this.storeStatesOnMount = undefined;
+
+		const subscription: ActiveSubscription = {
+			// The render queue coalesces the updates of each hook.
+			context: this,
+			callback: () => {
+				// Invalidate the value on store update, so that a fresh value is computed.
+				this.lastMapResultValid = false;
+				listener();
+			},
+			unsubs: [],
+		};
+		subscription.unsubs = activeStores!.map( ( name ) =>
+			this.listenToStore( subscription, name )
+		);
+		this.activeSubscriptions.add( subscription );
+
+		return () => {
+			this.activeSubscriptions.delete( subscription );
+
+			for ( const unsub of subscription.unsubs ) {
+				unsub?.();
+			}
+			// Cancel existing store updates that were already scheduled.
+			renderQueue.cancel( this );
+		};
+	};
+
+	getValue = () => {
+		// Update the value in case it's been invalidated or `mapSelect` has changed.
+		this.updateValue();
+		return this.lastMapResult;
+	};
+
+	// Listen to one store on the tier that matches the current mode: async
+	// listeners share one deferred subscription per store, sync ones listen
+	// to the store directly.
+	listenToStore( subscription: ActiveSubscription, storeName: string ) {
+		if ( this.lastIsAsync ) {
+			return subscribeDeferred( this.registry, storeName, subscription );
+		}
+
+		return this.registry.subscribe( subscription.callback, storeName );
+	}
+
+	updateValue(): void {
+		const { registry, select, mapSelect } = this;
+
+		// If the last value is valid, then we can safely return the cached value.
+		// The value can change only on store update or a new `mapSelect`, and
+		// both invalidate it.
+		if ( this.lastMapResultValid ) {
+			return;
+		}
+
+		const listeningStores = { current: null as string[] | null };
+		const mapResult = registry.__unstableMarkListeningStores(
+			() => mapSelect!( select, registry ),
+			listeningStores
+		);
+
+		if ( ( globalThis as any ).SCRIPT_DEBUG ) {
+			if ( ! this.didWarnUnstableReference ) {
+				const secondMapResult = mapSelect!( select, registry );
+				if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
+					warnOnUnstableReference( mapResult, secondMapResult );
+					this.didWarnUnstableReference = true;
+				}
+			}
+		}
+
+		if ( ! this.activeStores ) {
+			this.activeStores = listeningStores.current!;
+			this.storeStatesOnMount = this.activeStores.map( ( name ) =>
+				getStoreState( registry, name )
+			);
+		} else {
+			// Check if the selector read stores we're not subscribed to yet, and add them.
+			for ( const newStore of listeningStores.current! ) {
+				if ( this.activeStores.includes( newStore ) ) {
 					continue;
 				}
 
 				// New `subscribe` calls will subscribe to `newStore`, too.
-				activeStores.push( newStore );
+				this.activeStores.push( newStore );
 
 				// Add `newStore` to existing subscriptions.
-				for ( const subscription of activeSubscriptions ) {
-					subscription.subscribeStore( newStore );
+				for ( const subscription of this.activeSubscriptions ) {
+					subscription.unsubs.push(
+						this.listenToStore( subscription, newStore )
+					);
 				}
 			}
 		}
 
-		function switchMode() {
-			for ( const subscription of activeSubscriptions ) {
-				subscription.resubscribeStores();
-			}
+		// If the new value is shallow-equal to the old one, keep the old one so
+		// that we don't trigger unwanted updates that do a `===` check.
+		if ( ! isShallowEqual( this.lastMapResult, mapResult ) ) {
+			this.lastMapResult = mapResult;
+		}
+		this.lastMapResultValid = true;
+	}
+
+	update( mapSelect: MapSelect, isAsync: boolean ) {
+		if ( mapSelect !== this.mapSelect ) {
+			this.mapSelect = mapSelect;
+			this.lastMapResultValid = false;
 		}
 
-		return { subscribe, updateStores, switchMode };
-	};
-
-	return ( mapSelect: MapSelect, isAsync: boolean ) => {
-		function updateValue(): void {
-			// If the last value is valid, and the `mapSelect` callback hasn't changed,
-			// then we can safely return the cached value. The value can change only on
-			// store update, and in that case value will be invalidated by the listener.
-			if ( lastMapResultValid && mapSelect === lastMapSelect ) {
-				return;
-			}
-
-			const listeningStores = { current: null as string[] | null };
-			const mapResult = registry.__unstableMarkListeningStores(
-				() => mapSelect( select, registry ),
-				listeningStores
-			);
-
-			if ( ( globalThis as any ).SCRIPT_DEBUG ) {
-				if ( ! didWarnUnstableReference ) {
-					const secondMapResult = mapSelect( select, registry );
-					if ( ! isShallowEqual( mapResult, secondMapResult ) ) {
-						warnOnUnstableReference( mapResult, secondMapResult );
-						didWarnUnstableReference = true;
-					}
-				}
-			}
-
-			if ( ! subscriber ) {
-				for ( const name of listeningStores.current! ) {
-					storeStatesOnMount.set( name, getStoreState( name ) );
-				}
-				subscriber = createSubscriber( listeningStores.current! );
-			} else {
-				subscriber.updateStores( listeningStores.current! );
-			}
-
-			// If the new value is shallow-equal to the old one, keep the old one so
-			// that we don't trigger unwanted updates that do a `===` check.
-			if ( ! isShallowEqual( lastMapResult, mapResult ) ) {
-				lastMapResult = mapResult;
-			}
-			lastMapSelect = mapSelect;
-			lastMapResultValid = true;
-		}
-
-		function getValue() {
-			// Update the value in case it's been invalidated or `mapSelect` has changed.
-			updateValue();
-			return lastMapResult;
-		}
-
-		const wasAsync = lastIsAsync;
+		const wasAsync = this.lastIsAsync;
 		// `listenToStore` reads the mode when it subscribes, so record it
 		// before anything below can create or move a subscription.
-		lastIsAsync = isAsync;
+		this.lastIsAsync = isAsync;
 
 		// When transitioning from async to sync mode, cancel existing store updates
 		// that have been scheduled, and invalidate the value so that it's freshly
 		// computed. It might have been changed by the update we just cancelled.
 		if ( wasAsync && ! isAsync ) {
-			lastMapResultValid = false;
-			renderQueue.cancel( queueContext );
+			this.lastMapResultValid = false;
+			renderQueue.cancel( this );
 		}
 
-		updateValue();
+		this.updateValue();
 
 		// Each store subscription listens on the tier of the mode it was
-		// created in, so a mode switch has to move the live ones over.
+		// created in, so a mode switch has to move the live ones over. Doing
+		// it in place rather than by handing React a new `subscribe` identity
+		// keeps the listener registered at all times, so a dispatch can't
+		// slip through an unsubscribed gap.
 		if ( wasAsync !== isAsync ) {
-			subscriber!.switchMode();
+			this.switchMode();
 		}
+	}
 
-		// Return a pair of functions that can be passed to `useSyncExternalStore`.
-		return { subscribe: subscriber!.subscribe, getValue };
-	};
+	switchMode() {
+		for ( const subscription of this.activeSubscriptions ) {
+			subscription.unsubs.forEach( ( unsub, index ) => {
+				unsub?.();
+				subscription.unsubs[ index ] = this.listenToStore(
+					subscription,
+					this.activeStores![ index ]
+				);
+			} );
+		}
+	}
 }
 
 function _useStaticSelect( storeName: StoreDescriptor< AnyConfig > | string ) {
@@ -345,7 +336,7 @@ function _useMappingSelect(
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const store = useMemo(
-		() => Store( registry, suspense ),
+		() => new Store( registry, suspense ),
 		[ registry, suspense ]
 	);
 
@@ -353,8 +344,12 @@ function _useMappingSelect(
 	// and the parent should catch any hook rule violations.
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const selector = useCallback( mapSelect, deps );
-	const { subscribe, getValue } = store( selector, isAsync );
-	const result = useSyncExternalStore( subscribe, getValue, getValue );
+	store.update( selector, isAsync );
+	const result = useSyncExternalStore(
+		store.subscribe,
+		store.getValue,
+		store.getValue
+	);
 	useDebugValue( result );
 	return result;
 }
