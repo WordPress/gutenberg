@@ -470,6 +470,34 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 	} );
 
+	it( 'should bind the ports from the config', () => {
+		const { services } = buildDockerComposeConfig( {
+			workDirectoryPath: '/path',
+			env: {
+				development: {
+					...CONFIG,
+					port: 8890,
+					mysqlPort: 3307,
+					phpmyadmin: true,
+					phpmyadminPort: 9001,
+				},
+				tests: {
+					...CONFIG,
+					port: 8891,
+					phpmyadmin: true,
+					phpmyadminPort: 9002,
+				},
+			},
+		} );
+
+		expect( services.wordpress.ports ).toEqual( [ '8890:80' ] );
+		expect( services.mysql.ports ).toEqual( [ '3307:3306' ] );
+		expect( services.phpmyadmin.ports ).toEqual( [ '9001:80' ] );
+		expect( services[ 'tests-wordpress' ].ports ).toEqual( [ '8891:80' ] );
+		expect( services[ 'tests-mysql' ].ports ).toEqual( [ ':3306' ] );
+		expect( services[ 'tests-phpmyadmin' ].ports ).toEqual( [ '9002:80' ] );
+	} );
+
 	describe( 'phpmyadmin', () => {
 		function buildWithPhpmyadmin( development, tests ) {
 			return buildDockerComposeConfig( {
