@@ -96,6 +96,12 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
+	/*
+	 * A submenu without a link is a label that only opens its dropdown, so it is
+	 * rendered as the toggle button, as when submenus open on click.
+	 */
+	$is_label_only = $has_submenu && empty( $attributes['url'] );
+
 	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
 	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
 
@@ -131,6 +137,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( $is_active ) {
 		$classes[] = 'current-menu-item';
 	}
+	if ( $is_label_only ) {
+		$classes[] = 'is-label-only';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -154,7 +163,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	// If Submenus open on hover or are always open, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
-	if ( ! $open_on_click ) {
+	if ( ! $open_on_click && ! $is_label_only ) {
 		$item_url = $attributes['url'] ?? '';
 		// Start appending HTML attributes to anchor tag.
 		$html .= '<a class="wp-block-navigation-item__content"';

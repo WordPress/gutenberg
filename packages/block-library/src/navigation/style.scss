@@ -400,7 +400,8 @@ button.wp-block-navigation-item__content {
 // We pad it to include the arrow icon in the clickable area.
 // The padding can be blanket for click, since you can't set click and hide the icon.
 // This is only applied to the submenu in the page list block.
-.wp-block-navigation-item.open-on-click .wp-block-navigation-submenu__toggle {
+.wp-block-navigation-item.open-on-click .wp-block-navigation-submenu__toggle,
+.wp-block-navigation-item.is-label-only .wp-block-navigation-submenu__toggle {
 	padding-left: 0; // Remove the browser default padding.
 	padding-right: 0.6em + 0.25em; // Same size as icon plus margin.
 
@@ -410,7 +411,8 @@ button.wp-block-navigation-item__content {
 	}
 }
 // Remove the browser default padding on the button element used in the navigation link submenu.
-.wp-block-navigation-item.open-on-click button.wp-block-navigation-item__content:not(.wp-block-navigation-submenu__toggle) {
+.wp-block-navigation-item.open-on-click button.wp-block-navigation-item__content:not(.wp-block-navigation-submenu__toggle),
+.wp-block-navigation-item.is-label-only button.wp-block-navigation-item__content:not(.wp-block-navigation-submenu__toggle) {
 	padding: 0;
 }
 

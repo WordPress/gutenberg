@@ -239,6 +239,7 @@ function UnforwardedLinkUI( props, ref ) {
 									} }
 									canAddPage={ canAddPage }
 									canAddBlock={ canAddBlock }
+									onUseLabelOnly={ props.onUseLabelOnly }
 								/>
 							);
 						} }
@@ -288,11 +289,12 @@ const LinkUITools = ( {
 	setAddingPage,
 	canAddPage,
 	canAddBlock,
+	onUseLabelOnly,
 } ) => {
 	const blockInserterAriaRole = 'listbox';
 
-	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock ) {
+	// Don't render anything if no button should be shown
+	if ( ! canAddPage && ! canAddBlock && ! onUseLabelOnly ) {
 		return null;
 	}
 
@@ -324,6 +326,17 @@ const LinkUITools = ( {
 					aria-haspopup={ blockInserterAriaRole }
 				>
 					{ __( 'Add block' ) }
+				</Button>
+			) }
+			{ onUseLabelOnly && (
+				<Button
+					__next40pxDefaultSize
+					onClick={ ( e ) => {
+						e.preventDefault();
+						onUseLabelOnly();
+					} }
+				>
+					{ __( 'Label only' ) }
 				</Button>
 			) }
 		</VStack>
