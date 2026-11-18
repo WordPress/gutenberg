@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancements
+### Bug Fixes
 
 -   Show media upload progress in a snackbar while the editor is open ([#86999](https://github.com/WordPress/gutenberg/pull/86999)).
 

@@ -129,36 +129,39 @@ export function Editor( {
 
 	// Render the editor when ready
 	return (
-		<PrivateEditor
-			postType={ resolvedPostType }
-			postId={ resolvedPostId }
-			templateId={ templateId }
-			settings={ finalSettings }
-			styles={ finalSettings.styles }
-			onActionPerformed={ onActionPerformed }
-			initialViewport={ initialViewport }
-			renderingMode={ renderingMode }
-		>
-			{ backButton && <BackButton>{ backButton }</BackButton> }
-			{ /*
-			   Opened from the editor's own menu and from the command the editor
-			   registers, both of which exist only while it is mounted. Renders
-			   nothing until one of them opens it.
-			 */ }
-			<PreferencesModal />
+		<>
+			<PrivateEditor
+				postType={ resolvedPostType }
+				postId={ resolvedPostId }
+				templateId={ templateId }
+				settings={ finalSettings }
+				styles={ finalSettings.styles }
+				onActionPerformed={ onActionPerformed }
+				initialViewport={ initialViewport }
+				renderingMode={ renderingMode }
+			>
+				{ backButton && <BackButton>{ backButton }</BackButton> }
+				{ /*
+				   Opened from the editor's own menu and from the command the editor
+				   registers, both of which exist only while it is mounted. Renders
+				   nothing until one of them opens it.
+				 */ }
+				<PreferencesModal />
+				{ /*
+				   Self-gated: renders only while editing a template or template
+				   part, the entities the exported theme is made of.
+				 */ }
+				<ToolsMoreMenuGroup>
+					<SiteExport />
+				</ToolsMoreMenuGroup>
+			</PrivateEditor>
 			{ /*
 			   Renders nothing: it manages a notice that the host's snackbar
 			   list displays. Mounted here rather than in boot so that pages
-			   without an editor don't load it.
+			   without an editor don't load it. A sibling of the editor so it
+			   stays mounted while switching between entities.
 			 */ }
 			<UploadProgressSnackbar />
-			{ /*
-			   Self-gated: renders only while editing a template or template
-			   part, the entities the exported theme is made of.
-			 */ }
-			<ToolsMoreMenuGroup>
-				<SiteExport />
-			</ToolsMoreMenuGroup>
-		</PrivateEditor>
+		</>
 	);
 }
