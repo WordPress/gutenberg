@@ -1,4 +1,6 @@
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
+import type { AnyAction } from 'redux';
 import { describe, expect, it, vi } from 'vitest';
 import { Component, Suspense } from '@wordpress/element';
 import {
@@ -8,15 +10,22 @@ import {
 	RegistryProvider,
 } from '@wordpress/data';
 
+interface State {
+	prefix: string;
+	token: string | null;
+	data: string | null;
+	fails: boolean;
+}
+
 function createRegistryWithStore() {
-	const initialState = {
+	const initialState: State = {
 		prefix: 'pre-',
 		token: null,
 		data: null,
 		fails: true,
 	};
 
-	const reducer = ( state = initialState, action ) => {
+	const reducer = ( state = initialState, action: AnyAction ) => {
 		switch ( action.type ) {
 			case 'RECEIVE_TOKEN':
 				return { ...state, token: action.token };
@@ -28,29 +37,38 @@ function createRegistryWithStore() {
 	};
 
 	const selectors = {
-		getPrefix: ( state ) => state.prefix,
-		getToken: ( state ) => state.token,
-		getData: ( state, token ) => {
+		getPrefix: ( state: State ) => state.prefix,
+		getToken: ( state: State ) => state.token,
+		getData: ( state: State, token: string | null ) => {
 			if ( ! token ) {
 				throw 'missing token in selector';
 			}
 			return state.data;
 		},
-		getThatFails: ( state ) => state.fails,
+		getThatFails: ( state: State ) => state.fails,
 	};
 
-	const sleep = ( ms ) => new Promise( ( r ) => setTimeout( () => r(), ms ) );
+	const sleep = ( ms: number ) =>
+		new Promise< void >( ( r ) => setTimeout( () => r(), ms ) );
 
 	const resolvers = {
 		getToken:
 			() =>
-			async ( { dispatch } ) => {
+			async ( {
+				dispatch,
+			}: {
+				dispatch: ( action: AnyAction ) => void;
+			} ) => {
 				await sleep( 10 );
 				dispatch( { type: 'RECEIVE_TOKEN', token: 'token' } );
 			},
 		getData:
-			( token ) =>
-			async ( { dispatch } ) => {
+			( token: string | null ) =>
+			async ( {
+				dispatch,
+			}: {
+				dispatch: ( action: AnyAction ) => void;
+			} ) => {
 				await sleep( 10 );
 				if ( ! token ) {
 					throw 'missing token in resolver';
@@ -125,10 +143,18 @@ describe( 'useSuspenseSelect', () => {
 			return <div aria-label="loaded">{ token }</div>;
 		};
 
-		class Error extends Component {
-			state = { error: null };
+		interface ErrorProps {
+			children?: ReactNode;
+		}
 
-			static getDerivedStateFromError( error ) {
+		interface ErrorState {
+			error: string | null;
+		}
+
+		class Error extends Component< ErrorProps, ErrorState > {
+			state: ErrorState = { error: null };
+
+			static getDerivedStateFromError( error: string ) {
 				return { error };
 			}
 
@@ -167,7 +193,10 @@ describe( 'useSuspenseSelect', () => {
 
 	it( 'independent resolutions do not cause unrelated rerenders', async () => {
 		const store = createReduxStore( 'test', {
-			reducer: ( state = {}, action ) => {
+			reducer: (
+				state: Record< string, string > = {},
+				action: AnyAction
+			) => {
 				switch ( action.type ) {
 					case 'RECEIVE':
 						return { ...state, [ action.endpoint ]: action.data };
@@ -176,14 +205,21 @@ describe( 'useSuspenseSelect', () => {
 				}
 			},
 			selectors: {
-				getData: ( state, endpoint ) => state[ endpoint ],
+				getData: (
+					state: Record< string, string >,
+					endpoint: string
+				) => state[ endpoint ],
 			},
 			resolvers: {
 				getData:
-					( endpoint ) =>
-					async ( { dispatch } ) => {
+					( endpoint: string ) =>
+					async ( {
+						dispatch,
+					}: {
+						dispatch: ( action: AnyAction ) => void;
+					} ) => {
 						const delay = endpoint === 'slow' ? 30 : 10;
-						await new Promise( ( r ) =>
+						await new Promise< void >( ( r ) =>
 							setTimeout( () => r(), delay )
 						);
 						dispatch( {
