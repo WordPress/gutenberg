@@ -260,10 +260,31 @@ describe( 'utils', () => {
 				} )
 			);
 		} );
+		it( 'should return embed info when the provider slug differs from the variation name', () => {
+			expect( getEmbedInfoByProvider( 'amazon' ) ).toEqual(
+				expect.objectContaining( { title: 'Amazon Kindle Embed' } )
+			);
+		} );
+		it( 'should return embed info for a slug matching the variation name', () => {
+			expect( getEmbedInfoByProvider( 'amazon-kindle' ) ).toEqual(
+				expect.objectContaining( { title: 'Amazon Kindle Embed' } )
+			);
+		} );
 		it( 'should return undefined if not found in variations', () => {
+			registerBlockVariation( DEFAULT_EMBED_BLOCK, {
+				name: 'without-provider-slug',
+				title: 'Without Provider Slug',
+			} );
+
 			expect(
 				getEmbedInfoByProvider( 'i do not exist' )
 			).toBeUndefined();
+			expect( getEmbedInfoByProvider( undefined ) ).toBeUndefined();
+
+			unregisterBlockVariation(
+				DEFAULT_EMBED_BLOCK,
+				'without-provider-slug'
+			);
 		} );
 	} );
 } );
