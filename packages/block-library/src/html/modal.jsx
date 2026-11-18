@@ -5,7 +5,7 @@ import {
 	Modal,
 	Button,
 	Flex,
-	Notice,
+	Notice as WCNotice,
 	privateApis as componentsPrivateApis,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -21,7 +21,7 @@ import { unlock } from '../lock-unlock';
 import Preview from './preview';
 import { parseContent, serializeContent } from './utils';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 const { useNativeUndo } = unlock( blockEditorPrivateApis );
 
 export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
@@ -81,24 +81,24 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 				isFullScreen={ isFullscreen }
 				__experimentalHideHeader
 			>
-				<Tabs orientation="horizontal" defaultTabId="html">
+				<WCTabs orientation="horizontal" defaultTabId="html">
 					<VStack expanded>
 						<HStack
 							justify="space-between"
 							className="block-library-html__modal-header"
 						>
 							<div>
-								<Tabs.TabList>
-									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
+								<WCTabs.TabList>
+									<WCTabs.Tab tabId="html">HTML</WCTabs.Tab>
 									{ canUserUseUnfilteredHTML && (
-										<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+										<WCTabs.Tab tabId="css">CSS</WCTabs.Tab>
 									) }
 									{ canUserUseUnfilteredHTML && (
-										<Tabs.Tab tabId="js">
+										<WCTabs.Tab tabId="js">
 											{ __( 'JavaScript' ) }
-										</Tabs.Tab>
+										</WCTabs.Tab>
 									) }
-								</Tabs.TabList>
+								</WCTabs.TabList>
 							</div>
 							{ ! isMobileViewport && (
 								<div>
@@ -117,7 +117,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 							) }
 						</HStack>
 						{ hasRestrictedContent && (
-							<Notice
+							<WCNotice
 								status="warning"
 								isDismissible={ false }
 								className="block-library-html__modal-notice"
@@ -125,7 +125,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 								{ __(
 									'This block contains CSS or JavaScript that will be removed when you save because you do not have permission to use unfiltered HTML.'
 								) }
-							</Notice>
+							</WCNotice>
 						) }
 						<Flex
 							direction={ isMobileViewport ? 'column' : 'row' }
@@ -137,7 +137,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 								ref={ nativeUndoRef }
 								className="block-library-html__modal-content"
 							>
-								<Tabs.TabPanel
+								<WCTabs.TabPanel
 									tabId="html"
 									focusable={ false }
 									className="block-library-html__modal-tab"
@@ -149,9 +149,9 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 										aria-label={ __( 'HTML' ) }
 										className="block-library-html__modal-editor"
 									/>
-								</Tabs.TabPanel>
+								</WCTabs.TabPanel>
 								{ canUserUseUnfilteredHTML && (
-									<Tabs.TabPanel
+									<WCTabs.TabPanel
 										tabId="css"
 										focusable={ false }
 										className="block-library-html__modal-tab"
@@ -163,10 +163,10 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 											aria-label={ __( 'CSS' ) }
 											className="block-library-html__modal-editor"
 										/>
-									</Tabs.TabPanel>
+									</WCTabs.TabPanel>
 								) }
 								{ canUserUseUnfilteredHTML && (
-									<Tabs.TabPanel
+									<WCTabs.TabPanel
 										tabId="js"
 										focusable={ false }
 										className="block-library-html__modal-tab"
@@ -180,7 +180,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 											aria-label={ __( 'JavaScript' ) }
 											className="block-library-html__modal-editor"
 										/>
-									</Tabs.TabPanel>
+									</WCTabs.TabPanel>
 								) }
 							</div>
 							<div className="block-library-html__preview">
@@ -215,7 +215,7 @@ export default function HTMLEditModal( { onRequestClose, content, onUpdate } ) {
 							</Button>
 						</HStack>
 					</VStack>
-				</Tabs>
+				</WCTabs>
 			</Modal>
 		</>
 	);

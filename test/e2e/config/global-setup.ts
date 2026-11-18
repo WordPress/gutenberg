@@ -17,9 +17,12 @@ async function setupSite( baseURL?: string, storageStatePath?: string ) {
 	// Authenticate and save the storageState to disk.
 	await requestUtils.setupRest();
 
+	// Switch the theme alone: switch_theme() saves the parent before the child,
+	// so a request in between loads the old theme on the new parent and can fatal.
+	await requestUtils.activateTheme( 'twentytwentyone' );
+
 	// Reset the test environment before running the tests.
 	await Promise.all( [
-		requestUtils.activateTheme( 'twentytwentyone' ),
 		// Disable this test plugin as it's conflicting with some of the tests.
 		// We already have reduced motion enabled and Playwright will wait for most of the animations anyway.
 		requestUtils.deactivatePlugin(

@@ -1,5 +1,5 @@
 import { Warning } from '@wordpress/block-editor';
-import { Button, Notice } from '@wordpress/components';
+import { Button, Notice as WCNotice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState, createInterpolateElement } from '@wordpress/element';
 
@@ -29,9 +29,9 @@ function DeletedNavigationWarning( { onCreateNew, isNotice = false } ) {
 	);
 
 	return isNotice ? (
-		<Notice status="warning" isDismissible={ false }>
+		<WCNotice status="warning" isDismissible={ false }>
 			{ message }
-		</Notice>
+		</WCNotice>
 	) : (
 		<Warning>{ message }</Warning>
 	);

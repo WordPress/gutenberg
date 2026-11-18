@@ -1,6 +1,7 @@
 'use strict';
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
+const PhpRuntime = require( './php' );
 const {
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
@@ -14,6 +15,7 @@ const RUNTIME_CACHE_KEY = 'runtime';
 const runtimes = {
 	docker: DockerRuntime,
 	playground: PlaygroundRuntime,
+	php: PhpRuntime,
 };
 
 /**

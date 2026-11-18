@@ -353,7 +353,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$this->assertSame(
 			array(
 				'id'                => 'move-to-trash',
-				'label'             => 'Trash…',
+				'label'             => 'Trash',
 				'isPrimary'         => true,
 				'supportsBulk'      => true,
 				'hideModalHeader'   => true,

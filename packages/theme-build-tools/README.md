@@ -5,12 +5,12 @@ Build plugins and Stylelint plugins for the WordPress Design System design token
 -   The [Stylelint plugins](#stylelint-plugins) validate `--wpds-*` design token usage in CSS.
 -   The [build plugins](#build-plugins) inject the generated fallback values into `var(--wpds-*)` references, for PostCSS, Lightning CSS, esbuild, and Vite.
 
-The token names and fallback values come from the `@wordpress/theme` package, which this package depends on, so they match the design tokens stylesheet it ships.
+The token names and fallback values come from the `@wordpress/theme` package, which is an optional peer dependency, so they match the design tokens stylesheet of the version you installed. If `@wordpress/theme` is not installed, the plugins do nothing: the build plugins leave `var(--wpds-*)` references unchanged, and `no-unknown-ds-tokens` reports nothing.
 
 ## Installation
 
 ```sh
-npm install @wordpress/theme-build-tools --save-dev
+npm install @wordpress/theme-build-tools @wordpress/theme --save-dev
 ```
 
 Install the tool you use the plugins with (`stylelint`, `postcss`, `lightningcss`, `esbuild`, or `vite`) as well; they are optional peer dependencies.
@@ -40,6 +40,8 @@ These rules validate design token usage in CSS. Enable them in your Stylelint co
 
 Reports references to unknown `--wpds-*` tokens.
 
+The rule checks CSS `var()` references. It ignores token-like text in strings and URLs.
+
 ### `plugin-wpds/no-setting-wpds-custom-properties`
 
 Reports definitions or overrides in the `--wpds-*` namespace.
@@ -62,6 +64,8 @@ The build plugins inject generated fallbacks into bare `var(--wpds-*)` reference
 | `@wordpress/theme-build-tools/vite-plugins/vite-ds-token-fallbacks`                 | Vite          | JS/TS |
 
 Existing fallbacks are unchanged. An unknown token in a bare reference in transformed values fails the build.
+
+The PostCSS plugin leaves token-like text in CSS strings and URLs unchanged.
 
 The JavaScript plugins treat token references in string values, JSX attribute values, and static template parts as CSS. This includes tagged templates such as `String.raw`. They leave comments, regular expressions, property names, module paths, JSX text, and TypeScript types unchanged. Token names assembled across template expressions are not resolved. As before, a token reference in a runtime message string is also treated as CSS.
 

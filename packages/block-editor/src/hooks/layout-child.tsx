@@ -1,9 +1,16 @@
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { addFilter } from '@wordpress/hooks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import {
+	getValueFromObjectPath,
+	isPlainObject,
+	setImmutably,
+} from '../utils/object';
 import { useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
@@ -18,11 +25,9 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	hasViewportBlockStyleState,
-	setStyleForState,
 } from './block-style-state';
+import { getUpdatedChildLayoutStyle } from './layout-child-utils';
 import type {
-	BlockStyleState,
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
 	ChildLayoutControlsPureProps,
@@ -140,6 +145,11 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {
 			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		} else if (
+			hasViewportOverride( 'columnStart' ) &&
+			columnStart === null
+		) {
+			declarations[ 'grid-column' ] = 'auto';
 		}
 	}
 
@@ -154,6 +164,8 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-row' ] = `${ rowStart }`;
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		} else if ( hasViewportOverride( 'rowStart' ) && rowStart === null ) {
+			declarations[ 'grid-row' ] = 'auto';
 		}
 	}
 
@@ -294,47 +306,6 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
-/**
- * Merges child layout changes into the active layout style state.
- *
- * @param style         Block style attributes.
- * @param layout        Child layout changes.
- * @param selectedState Selected block style state.
- * @return Updated block style attributes.
- */
-export function getUpdatedChildLayoutStyle(
-	style: ChildLayoutBlockStyle | undefined,
-	layout: ChildLayout,
-	selectedState: BlockStyleState | undefined
-): ChildLayoutBlockStyle | undefined {
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
-		return {
-			...style,
-			layout: {
-				...style?.layout,
-				...layout,
-			},
-		};
-	}
-
-	const layoutState = {
-		// A viewport state is selected here.
-		viewport: selectedState!.viewport,
-		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-	};
-	// A style state holds the child layout it overrides.
-	const stateStyle = getStyleForState( style, layoutState ) as
-		ChildLayoutBlockStyle | undefined;
-
-	return setStyleForState( style, layoutState, {
-		...stateStyle,
-		layout: {
-			...stateStyle?.layout,
-			...layout,
-		},
-	} );
-}
-
 function useBlockPropsChildLayoutStyles( {
 	style,
 }: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
@@ -448,6 +419,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -457,6 +429,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -489,6 +462,7 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ clientId ]
@@ -579,7 +553,9 @@ function GridTools( {
 			{ isManualPlacement &&
 				window.__experimentalEnableGridInteractivity && (
 					<GridItemMovers
-						layout={ style?.layout }
+						style={ style }
+						selectedState={ selectedState }
+						isResponsiveEditing={ isResponsiveEditing }
 						parentLayout={ parentLayout }
 						onChange={ updateLayout }
 						gridClientId={ rootClientId }
@@ -589,6 +565,104 @@ function GridTools( {
 		</>
 	);
 }
+
+/**
+ * Returns the child layout of a block style: the default layout and the
+ * layout of each viewport state, keyed by their path in the style object.
+ *
+ * @param {Object|undefined} style Block style attributes.
+ * @return {Array} Pairs of style object path and child layout.
+ */
+function getChildLayoutEntries(
+	style: unknown
+): Array< [ string[], Record< string, unknown > ] > {
+	if ( ! isPlainObject( style ) ) {
+		return [];
+	}
+
+	const entries: Array< [ string[], Record< string, unknown > ] > = [];
+	if ( isPlainObject( style.layout ) ) {
+		entries.push( [ [ 'layout' ], style.layout ] );
+	}
+	Object.entries( style ).forEach( ( [ key, stateStyle ] ) => {
+		// Viewport states (`@mobile`, `@tablet`) hold their own child layout.
+		if (
+			key.startsWith( '@' ) &&
+			isPlainObject( stateStyle ) &&
+			isPlainObject( stateStyle.layout )
+		) {
+			entries.push( [ [ key, 'layout' ], stateStyle.layout ] );
+		}
+	} );
+	return entries;
+}
+
+/**
+ * Keeps the child layout (such as a grid item's position and span) of a block
+ * when it is switched to another block type. The child layout describes the
+ * block's place in its parent, not the block itself, but transforms usually
+ * build new attributes and drop it.
+ *
+ * @param {Object}       result  The transformed block.
+ * @param {Array|Object} source  Original blocks transformed.
+ * @param {number}       index   Index of the transformed block.
+ * @param {Array}        results All blocks that resulted from the transformation.
+ * @return {Object} Modified transformed block.
+ */
+export function addTransforms(
+	result: Block,
+	source: Block | Block[],
+	index: number,
+	results: Block[]
+): Block {
+	// `switchToBlockType` passes on a single original block as it got it.
+	const sourceBlocks = Array.isArray( source ) ? source : [ source ];
+
+	// A wrapping transform (e.g. a paragraph into a group) keeps the
+	// original blocks, child layout included, inside the result.
+	if (
+		results.length === 1 &&
+		result.innerBlocks.length === sourceBlocks.length
+	) {
+		return result;
+	}
+
+	// Only a block that takes the place of exactly one original block can
+	// take its child layout.
+	if ( results.length !== sourceBlocks.length ) {
+		return result;
+	}
+
+	let style = result.attributes?.style;
+	getChildLayoutEntries( sourceBlocks[ index ]?.attributes?.style ).forEach(
+		( [ path, layout ] ) => {
+			// A transform that sets a child layout itself knows best.
+			const styleObject = isPlainObject( style ) ? style : undefined;
+			if ( getValueFromObjectPath( styleObject, path ) === undefined ) {
+				// Setting a path on the style object keeps it an object.
+				style = setImmutably( styleObject, path, layout );
+			}
+		}
+	);
+
+	if ( style === result.attributes?.style ) {
+		return result;
+	}
+
+	return {
+		...result,
+		attributes: {
+			...result.attributes,
+			style,
+		},
+	};
+}
+
+addFilter(
+	'blocks.switchToBlockType.transformedBlock',
+	'core/layout-child/addTransforms',
+	addTransforms
+);
 
 export default {
 	useBlockProps: useBlockPropsChildLayoutStyles,
