@@ -13,6 +13,7 @@ import {
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	isNumericID,
+	isSafeEntityKey,
 	normalizeQueryForResolution,
 	getPaginationMeta,
 } from './utils';
@@ -64,6 +65,10 @@ export const getEntityRecord =
 			( config ) => config.name === name && config.kind === kind
 		);
 		if ( ! entityConfig ) {
+			return;
+		}
+
+		if ( ! isSafeEntityKey( key ) ) {
 			return;
 		}
 
@@ -574,6 +579,10 @@ export const canUser =
 				throw new Error( 'The entity resource object is not valid.' );
 			}
 
+			if ( ! isSafeEntityKey( resource.id ) ) {
+				return;
+			}
+
 			const configs = await resolveSelect.getEntitiesConfig(
 				resource.kind
 			);
@@ -589,6 +598,9 @@ export const canUser =
 			resourcePath =
 				entityConfig.baseURL + ( resource.id ? '/' + resource.id : '' );
 		} else {
+			if ( ! isSafeEntityKey( resource ) || ! isSafeEntityKey( id ) ) {
+				return;
+			}
 			resourcePath = `/wp/v2/${ resource }` + ( id ? '/' + id : '' );
 		}
 
@@ -656,6 +668,10 @@ export const canUserEditEntityRecord =
 export const getAutosaves =
 	( postType, postId ) =>
 	async ( { dispatch, resolveSelect } ) => {
+		if ( ! isSafeEntityKey( postId ) ) {
+			return;
+		}
+
 		const {
 			rest_base: restBase,
 			rest_namespace: restNamespace = 'wp/v2',
@@ -922,7 +938,7 @@ export const getRevisions =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig ) {
+		if ( ! entityConfig || ! isSafeEntityKey( recordKey ) ) {
 			return;
 		}
 
@@ -1049,7 +1065,11 @@ export const getRevision =
 			( config ) => config.name === name && config.kind === kind
 		);
 
-		if ( ! entityConfig ) {
+		if (
+			! entityConfig ||
+			! isSafeEntityKey( recordKey ) ||
+			! isSafeEntityKey( revisionKey )
+		) {
 			return;
 		}
 

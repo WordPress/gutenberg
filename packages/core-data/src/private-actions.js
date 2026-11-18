@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from './name';
 import { getEntitySyncManager } from './entity-sync';
 import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
+import isSafeEntityKey from './utils/is-safe-entity-key';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -89,6 +90,9 @@ export const editMediaEntity =
 			} );
 
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				const path = `${ entityConfig.baseURL }/${ recordId }/edit`;
 				const newRecord = await __unstableFetch( {
 					path,

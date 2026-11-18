@@ -2,7 +2,12 @@ import { v4 as uuid } from 'uuid';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import { clearUnchangedEdits, getNestedValue, setNestedValue } from './utils';
+import {
+	clearUnchangedEdits,
+	getNestedValue,
+	setNestedValue,
+	isSafeEntityKey,
+} from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
@@ -305,6 +310,9 @@ export const deleteEntityRecord =
 			let hasError = false;
 			const { baseURL } = entityConfig;
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				let path = `${ baseURL }/${ recordId }`;
 
 				if ( query ) {
@@ -609,6 +617,9 @@ export const saveEntityRecord =
 			let hasError = false;
 			const { baseURL } = entityConfig;
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
 				// Skip the raw values check when creating a new record; they don't exist yet.
 				const persistedRecord = ! isNewRecord
