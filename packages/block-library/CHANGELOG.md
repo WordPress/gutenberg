@@ -40,6 +40,7 @@
 -   Button: Stop automatically adding `noopener` to links that open in a new tab ([#86550](https://github.com/WordPress/gutenberg/pull/86550)).
 -   Table of Contents, Heading: Leave footnote numbers out of Table of Contents entries and auto-generated heading anchors ([#86667](https://github.com/WordPress/gutenberg/pull/86667)).
 -   Social Icons: Keep the focus outline at full opacity when an unlinked icon has keyboard focus ([#86784](https://github.com/WordPress/gutenberg/pull/86784)).
+-   Separator: Show the Default and Wide styles inside Row and Stack blocks, where they collapsed to a width of zero, by filling the free space of the Row or the width of the Stack ([#80308](https://github.com/WordPress/gutenberg/pull/80308)).
 
 ## 12.1.0 (2026-11-04)
 
