@@ -473,9 +473,10 @@ export const initializeMetaBoxes =
 		// The meta box areas are separate scroll containers in the block
 		// editor. Render the drag helper outside of them so it doesn't grow
 		// their scrollable overflow or get clipped when dragged between areas,
-		// and don't let jQuery UI auto-scroll them while dragging.
+		// and don't let jQuery UI auto-scroll them while dragging. The
+		// skeleton is fixed, so a helper overflowing it doesn't grow the page.
 		window.jQuery?.( '.meta-box-sortables' ).sortable?.( 'option', {
-			appendTo: document.body,
+			appendTo: '.interface-interface-skeleton',
 			scroll: false,
 		} );
 
