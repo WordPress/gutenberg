@@ -108,4 +108,15 @@ describe( 'EditPostPreferencesModal', () => {
 			} )
 		).toBeInTheDocument();
 	} );
+
+	it( 'shows the collaboration block outline control', async () => {
+		const user = setupActiveModal();
+		await user.click( screen.getByRole( 'tab', { name: 'General' } ) );
+
+		expect(
+			await screen.findByRole( 'checkbox', {
+				name: "Outline collaborators' blocks",
+			} )
+		).toBeInTheDocument();
+	} );
 } );

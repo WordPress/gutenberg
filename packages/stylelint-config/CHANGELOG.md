@@ -1,6 +1,16 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+### Enhancements
+
+-   SCSS: Stop checking empty lines before at-rules nested inside a block, such as `@include` in a rule or `@if` in a mixin, in `at-rule-empty-line-before` ([#69606](https://github.com/WordPress/gutenberg/pull/69606)).
+
+### Internal
+
+-   Widen the `@wordpress/theme` peer dependency range to include 5.x ([#86720](https://github.com/WordPress/gutenberg/pull/86720)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 27.1.0 (2026-11-04)
 
 ### Internal
 
