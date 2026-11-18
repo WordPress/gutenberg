@@ -1,5 +1,6 @@
 import { select } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { WpTemplatePart } from '@wordpress/core-data';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
 
 /**
@@ -12,9 +13,9 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
  * React components should wrap this in useSelect for reactivity. Non-React contexts
  * (like filter callbacks) can call this directly.
  *
- * @return {boolean} True if editing a navigation overlay template part, false otherwise.
+ * @return True if editing a navigation overlay template part, false otherwise.
  */
-export function isWithinNavigationOverlay() {
+export function isWithinNavigationOverlay(): boolean {
 	// @wordpress/block-library should not depend on @wordpress/editor.
 	// Blocks can be loaded into a *non-post* block editor, so to avoid
 	// declaring @wordpress/editor as a dependency, we must access its
@@ -40,7 +41,11 @@ export function isWithinNavigationOverlay() {
 			postId
 		);
 
-		return templatePart?.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA;
+		// A missing record is `false`, whose `area` reads as `undefined` too.
+		return (
+			( templatePart as Partial< WpTemplatePart > | undefined )?.area ===
+			NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		);
 	}
 
 	return false;

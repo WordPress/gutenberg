@@ -17,6 +17,11 @@ export {
 	useStyleOverride,
 } from './hooks';
 export { getStyleForState, setStyleForState } from './hooks/block-style-state';
+export type { BlockStyle, BlockStyleState } from './hooks/types';
+export type {
+	MediaUploadFunction,
+	MediaUploadOptions,
+} from './components/provider/types';
 export * from './components';
 export * from './elements';
 export * from './utils';

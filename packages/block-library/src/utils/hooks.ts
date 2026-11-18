@@ -2,17 +2,23 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import type { MediaUploadFunction } from '@wordpress/block-editor';
 import { store as coreStore, useEntityRecords } from '@wordpress/core-data';
 import { useEvent, useViewportMatch } from '@wordpress/compose';
+import type { UploadMediaFromBlobURLArgs } from './types';
 
 /**
  * Returns whether the current user can edit the given entity.
  *
- * @param {string} kind     Entity kind.
- * @param {string} name     Entity name.
- * @param {string} recordId Record's id.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record's id.
  */
-export function useCanEditEntity( kind, name, recordId ) {
+export function useCanEditEntity(
+	kind: string,
+	name: string,
+	recordId: string
+) {
 	return useSelect(
 		( select ) =>
 			select( coreStore ).canUser( 'update', {
@@ -28,11 +34,13 @@ export function useCanEditEntity( kind, name, recordId ) {
  * Returns the comments query of a post: `totalItems` is its comment count once
  * known, and stays null when the request fails.
  *
- * @param {number} postId Post ID. Nothing is fetched without one.
+ * @param postId Post ID. Nothing is fetched without one.
  */
-export function usePostCommentsCount( postId ) {
+export function usePostCommentsCount(
+	postId: number | undefined
+): ReturnType< typeof useEntityRecords< { id: number } > > {
 	// The view context lets users who can't moderate comments read the count.
-	return useEntityRecords(
+	return useEntityRecords< { id: number } >(
 		'root',
 		'comment',
 		{ post: postId, per_page: 1, _fields: 'id', context: 'view' },
@@ -43,13 +51,11 @@ export function usePostCommentsCount( postId ) {
 /**
  * Handles uploading a media file from a blob URL on mount.
  *
- * @param {Object}   args              Upload media arguments.
- * @param {string}   args.url          Blob URL.
- * @param {?Array}   args.allowedTypes Array of allowed media types.
- * @param {Function} args.onChange     Function called when the media is uploaded.
- * @param {Function} args.onError      Function called when an error happens.
+ * @param args Upload media arguments.
  */
-export function useUploadMediaFromBlobURL( args = {} ) {
+export function useUploadMediaFromBlobURL(
+	args: UploadMediaFromBlobURLArgs = {}
+): void {
 	const hasUploadStartedRef = useRef( false );
 	const { getSettings } = useSelect( blockEditorStore );
 	// The upload ends renders later, so call the latest callbacks.
@@ -72,7 +78,9 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 		}
 
 		const { url, allowedTypes } = args;
-		const { mediaUpload } = getSettings();
+		const { mediaUpload } = getSettings() as {
+			mediaUpload?: MediaUploadFunction;
+		};
 
 		if ( ! mediaUpload ) {
 			return;
@@ -84,7 +92,7 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 			filesList: [ file ],
 			allowedTypes,
 			onFileChange: ( [ media ] ) => {
-				if ( isBlobURL( media?.url ) ) {
+				if ( isBlobURL( media?.url as string | undefined ) ) {
 					return;
 				}
 
@@ -108,7 +116,9 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 export function useDefaultAvatar() {
 	const avatarURL = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		const { __experimentalDiscussionSettings } = getSettings();
+		const { __experimentalDiscussionSettings } = getSettings() as {
+			__experimentalDiscussionSettings?: { avatarURL?: string };
+		};
 		return __experimentalDiscussionSettings?.avatarURL ?? '';
 	}, [] );
 	return avatarURL;

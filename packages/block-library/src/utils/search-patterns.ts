@@ -8,22 +8,25 @@ const { normalizeString, searchItems } = unlock( blockEditorPrivateApis );
  *
  * @param {string} input The search input to normalize.
  *
- * @return {string} The normalized search input.
+ * @return The normalized search input.
  */
-export function normalizeSearchInput( input = '' ) {
+export function normalizeSearchInput( input = '' ): string {
 	return normalizeString( input ).trim();
 }
 
 /**
  * Filters a pattern list given a search term.
  *
- * @param {Array}  patterns    Item list
- * @param {string} searchValue Search input.
+ * @param patterns    Item list
+ * @param searchValue Search input.
  *
- * @return {Array} Filtered pattern list.
+ * @return Filtered pattern list.
  */
-export function searchPatterns( patterns = [], searchValue = '' ) {
+export function searchPatterns< T extends { title?: string } >(
+	patterns: T[] = [],
+	searchValue = ''
+): T[] {
 	return searchItems( patterns, searchValue, {
-		fields: [ { get: ( pattern ) => pattern.title } ],
+		fields: [ { get: ( pattern: T ) => pattern.title } ],
 	} );
 }

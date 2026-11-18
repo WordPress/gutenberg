@@ -273,7 +273,15 @@ _Returns_
 
 - `Element`: Element.
 
+### BlockStyle
+
+Undocumented declaration.
+
 ### BlockStyles
+
+Undocumented declaration.
+
+### BlockStyleState
 
 Undocumented declaration.
 
@@ -815,6 +823,14 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
+
+### MediaUploadFunction
+
+Undocumented declaration.
+
+### MediaUploadOptions
+
+Undocumented declaration.
 
 ### MultiSelectScrollIntoView
 

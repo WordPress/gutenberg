@@ -3025,11 +3025,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6192,23 +6187,12 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/deprecated-text-align-attributes.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/utils/deprecated-text-align-attributes.ts": {
 		"no-restricted-syntax": {
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/get-transformed-attributes.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/hooks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/utils/hooks.ts": {
 		"no-restricted-syntax": {
 			"count": 1
 		}
@@ -6218,21 +6202,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/init-block.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/is-block-metadata-experimental.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/is-within-overlay.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -6247,16 +6216,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/migrate-font-family.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/migrate-text-align.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/utils/poster-image.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -6265,36 +6224,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/reduced-motion.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/remove-anchor-tag.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/search-patterns.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/style-state.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/search-patterns.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/style-state.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

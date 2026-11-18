@@ -3,9 +3,11 @@
  * from block.json.
  *
  * @param {Object} metadata Parsed block.json metadata.
- * @return {boolean} Is the block experimental?
+ * @return Is the block experimental?
  */
-export default function isBlockMetadataExperimental( metadata ) {
+export default function isBlockMetadataExperimental(
+	metadata: Record< string, unknown > | undefined
+): boolean | undefined {
 	return (
 		metadata &&
 		'__experimental' in metadata &&
