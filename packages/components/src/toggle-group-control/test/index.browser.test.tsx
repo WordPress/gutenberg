@@ -284,6 +284,33 @@ describe.each( [
 		);
 	} );
 
+	it( 'should show the next tooltip without a delay when moving between options', async () => {
+		await render(
+			<Component label="Test Toggle Group Control">
+				<ToggleGroupControlOptionIcon
+					value="uppercase"
+					icon={ formatUppercase }
+					label="Uppercase"
+				/>
+				<ToggleGroupControlOptionIcon
+					value="lowercase"
+					icon={ formatLowercase }
+					label="Lowercase"
+				/>
+			</Component>
+		);
+
+		await userEvent.hover( screen.getByLabelText( 'Uppercase' ) );
+		const firstTooltip = await screen.findByText( 'Uppercase' );
+		await waitFor( () => expect( firstTooltip ).toBeVisible() );
+
+		await userEvent.hover( screen.getByLabelText( 'Lowercase' ) );
+		await waitFor(
+			() => expect( screen.getByText( 'Lowercase' ) ).toBeVisible(),
+			{ timeout: TOOLTIP_DELAY / 2 }
+		);
+	} );
+
 	it( 'should not render tooltip', async () => {
 		await render(
 			<Component label="Test Toggle Group Control">
