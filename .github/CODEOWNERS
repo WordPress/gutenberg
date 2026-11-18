@@ -30,6 +30,8 @@
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
+/tools/phpstan                                  @westonruter
+/phpstan.neon.dist                              @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
@@ -41,6 +43,10 @@
 /packages/ui                                    @WordPress/gutenberg-components
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox
+
+# Icons
+/packages/icons/src/library                     @jasmussen
+/packages/icons/src/manifest.json               @jasmussen
 
 # Utilities
 /packages/dom                                   @ellatrix
@@ -74,7 +80,5 @@
 # An entry without an owner cancels the rules above it, and last match wins,
 # so these stay at the end. Removing them brings back the review requests.
 /tools/eslint/suppressions.json
-/tools/phpstan/base.neon
-/tools/phpstan/baseline.neon
 /tools/stylelint/stylelint-suppressions.json
 /tools/validation/check-private-apis.config.json

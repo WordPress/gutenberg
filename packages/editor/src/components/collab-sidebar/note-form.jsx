@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { displayShortcut, isKeyboardEvent } from '@wordpress/keycodes';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { sanitizeNoteContent } from './utils';
+import { sanitizeNoteContent } from './utils/display';
 import noteMentionCompleter from './note-mention-completer';
 /*
  * The rich text form field wires `@wordpress/rich-text` into the presentational

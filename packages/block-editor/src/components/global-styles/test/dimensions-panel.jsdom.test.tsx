@@ -3,7 +3,11 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
-import type { DimensionsPanelProps } from '../types';
+import type { DimensionsPanelProps, PanelStyle } from '../types';
+import {
+	getStyleForState,
+	setStyleForState,
+} from '../../../hooks/block-style-state';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -173,6 +177,143 @@ const getPaddingSliders = () =>
 	( screen.getAllByRole( 'slider' ) as HTMLInputElement[] ).filter( ( s ) =>
 		/padding/i.test( s.getAttribute( 'aria-label' ) || '' )
 	);
+
+describe( 'DimensionsPanel — viewport grid placement', () => {
+	it.each( [
+		{
+			name: 'grid placement',
+			placement: { columnStart: 4, rowStart: 5 },
+			resetSpans: false,
+		},
+		{
+			name: 'automatic placement',
+			placement: { columnStart: null, rowStart: null },
+			resetSpans: false,
+		},
+		{
+			name: 'grid spans',
+			placement: { columnStart: 4, rowStart: 5 },
+			resetSpans: true,
+		},
+	] )(
+		'resets viewport $name to the inherited values',
+		async ( { placement, resetSpans } ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const baseLayout = {
+				columnStart: 2,
+				rowStart: 3,
+				columnSpan: 2,
+				rowSpan: 3,
+			};
+			const selectedState = { viewport: '@mobile', pseudo: 'default' };
+			function Wrapper() {
+				const [ style, setStyle ] = useState< PanelStyle >( {
+					layout: baseLayout,
+					'@mobile': {
+						layout: { ...placement, columnSpan: 1, rowSpan: 1 },
+					},
+				} );
+				return (
+					<DimensionsPanel
+						panelId="test-panel"
+						settings={ {
+							layout: {},
+							parentLayout: {
+								type: 'grid',
+								allowSizingOnChildren: true,
+							},
+						} }
+						value={
+							getStyleForState(
+								style,
+								selectedState
+							) as PanelStyle
+						}
+						inheritedChildLayout={ baseLayout }
+						styleState={ selectedState }
+						onChange={ ( value ) => {
+							const nextStyle = setStyleForState(
+								style,
+								selectedState,
+								value
+							) as PanelStyle;
+							setStyle( nextStyle );
+							onChange( nextStyle );
+						} }
+					/>
+				);
+			}
+			render( <Wrapper /> );
+			await user.click(
+				screen.getByRole( 'button', { name: 'Dimensions options' } )
+			);
+			await user.click(
+				screen.getByRole(
+					resetSpans ? 'menuitem' : 'menuitemcheckbox',
+					{
+						name: resetSpans
+							? 'Grid span, reset to default'
+							: 'Grid placement, hide and reset',
+					}
+				)
+			);
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				layout: baseLayout,
+				'@mobile': {
+					layout: resetSpans
+						? placement
+						: { columnSpan: 1, rowSpan: 1 },
+				},
+			} );
+			if ( ! resetSpans ) {
+				await user.click(
+					screen.getByRole( 'menuitemcheckbox', {
+						name: 'Grid placement, show',
+					} )
+				);
+			}
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: resetSpans ? 'Column span' : 'Column start',
+				} )
+			).toHaveValue( 2 );
+			expect(
+				screen.getByRole( 'spinbutton', {
+					name: resetSpans ? 'Row span' : 'Row start',
+				} )
+			).toHaveValue( 3 );
+		}
+	);
+
+	it.each( [
+		[ 'Column start', 'columnStart', 2 ],
+		[ 'Row start', 'rowStart', 3 ],
+	] as const )(
+		'clears the inherited %s in the selected viewport',
+		async ( label, key, start ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderPanel( {
+				settings: {
+					layout: {},
+					parentLayout: { type: 'grid', allowSizingOnChildren: true },
+				},
+				value: {},
+				inheritedChildLayout: { columnStart: 2, rowStart: 3 },
+				styleState: { viewport: '@mobile', pseudo: 'default' },
+				onChange,
+			} );
+
+			const input = screen.getByRole( 'spinbutton', { name: label } );
+			expect( input ).toHaveValue( start );
+			await user.clear( input );
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				layout: { [ key ]: null },
+			} );
+		}
+	);
+} );
 
 describe( 'DimensionsPanel — CSS box shorthand', () => {
 	describe.each( [ 'padding', 'margin' ] as const )( '%s', ( property ) => {

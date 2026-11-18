@@ -1,6 +1,7 @@
 import type { FieldsScriptParts } from '../../types';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { PostWithDate } from './types';
+import DateEdit from './edit';
 import DateView from './view';
 
 /**
@@ -10,4 +11,8 @@ export const fieldExtensions: FieldsScriptParts< PostWithDate >[ string ] = {
 	// Only the users who can publish the post see the control.
 	isVisible: ( item ) => hasActionLink( item, 'wp:action-publish' ),
 	render: DateView,
+	Edit: DateEdit,
+	// A cleared control gives `undefined`, which a save drops, so send `null`:
+	// the REST API resets the date on `null`.
+	setValue: ( { value } ) => ( { date: value ?? null } ),
 };
