@@ -83,6 +83,7 @@ export default function BlockTools( {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
+		getBlockIndex,
 		getBlockRootClientId,
 		getBlockEditingMode,
 		getBlockName,
@@ -138,7 +139,9 @@ export default function BlockTools( {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
+				const firstClientId = clientIds[ 0 ];
+				const rootClientId = getBlockRootClientId( firstClientId );
+				const previousIndex = getBlockIndex( firstClientId );
 				const direction = isMatch( 'core/block-editor/move-up', event )
 					? 'up'
 					: 'down';
@@ -147,9 +150,9 @@ export default function BlockTools( {
 				} else {
 					moveBlocksDown( clientIds, rootClientId );
 				}
-				const blockLength = Array.isArray( clientIds )
-					? clientIds.length
-					: 1;
+				if ( getBlockIndex( firstClientId ) === previousIndex ) {
+					return;
+				}
 				const message = sprintf(
 					// translators: %d: Number of blocks moved.
 					_n(
@@ -157,7 +160,7 @@ export default function BlockTools( {
 						'%d blocks moved.',
 						clientIds.length
 					),
-					blockLength
+					clientIds.length
 				);
 				speak( message );
 			}
