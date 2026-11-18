@@ -340,10 +340,17 @@
 	// Line up the first button's label with the title.
 	margin-inline-start: calc(-1 * var(--wpds-dimension-padding-xs));
 
+	// The title box is as tall as the media, to line the title up with the
+	// other cells, so its text leaves room below it: move up into that room.
+	.dataviews-title-field + & {
+		margin-block-start: calc((var(--wpds-typography-line-height-sm) - var(--wpds-dimension-size-md)) / 2);
+	}
+
 	&.dataviews-item-actions .components-button {
 		height: auto;
 		min-height: 0;
 		padding: 0 var(--wpds-dimension-padding-xs);
+		border-block-width: 0;
 		font-size: var(--wpds-typography-font-size-md);
 		font-weight: var(--wpds-typography-font-weight-default);
 		line-height: var(--wpds-typography-line-height-sm);
