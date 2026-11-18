@@ -1205,6 +1205,62 @@ describe( 'SyncManager', () => {
 				expect( getContent( liveDoc ) ).toBe( 'Bob says Hello!?' );
 			} );
 
+			it.each( [
+				'before changes',
+				'after changes',
+				'capturing local state',
+			] )(
+				'keeps remote and later local edits usable when conversion fails %s',
+				async ( failurePoint ) => {
+					const {
+						getContent,
+						liveDoc,
+						receiveFromPeer,
+						syncConfig,
+						typeLocally,
+					} = await loadWithPeer();
+					const error = new Error( 'Conversion failed' );
+
+					if ( failurePoint === 'capturing local state' ) {
+						syncConfig.captureLocalState = vi
+							.fn()
+							.mockImplementationOnce( () => {
+								throw error;
+							} );
+					} else {
+						syncConfig.applyChangesToCRDTDoc.mockImplementationOnce(
+							( doc, changes ) => {
+								if ( failurePoint === 'after changes' ) {
+									applyTextChanges( doc, changes );
+								}
+								throw error;
+							}
+						);
+					}
+
+					typeLocally( 'Hello!' );
+					expect( () => receiveFromPeer( 0, 'Bob says ' ) ).toThrow(
+						error
+					);
+					const mergedContent =
+						failurePoint === 'before changes'
+							? 'Bob says Hello'
+							: 'Bob says Hello!';
+					expect( getContent( liveDoc ) ).toBe( mergedContent );
+
+					// The failed callback did not leave the live transaction open.
+					typeLocally( `${ mergedContent }#` );
+					await nextTick();
+					expect( getContent( liveDoc ) ).toBe(
+						`${ mergedContent }#`
+					);
+					receiveFromPeer( 0, 'Alice and ' );
+					expect( getContent( liveDoc ) ).toBe(
+						`Alice and ${ mergedContent }#`
+					);
+				}
+			);
+
 			it( 'undoes the deferred update and keeps the remote change', async () => {
 				const {
 					getContent,
