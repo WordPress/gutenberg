@@ -178,41 +178,79 @@ function sortIds( ids: string[] ): string[] {
 }
 
 /**
- * Return a copy of an object with the value at a path replaced. An undefined
- * replacement removes the property, and with it any parent left empty.
+ * Return a copy of an object with a value set at a path. Missing parents are
+ * created. A property that already exists keeps its place among the others.
  *
- * @param object   Object to copy.
- * @param path     Property names to follow.
- * @param newValue Value to set at the path.
+ * @param object Object to copy.
+ * @param path   Property names to follow.
+ * @param value  Value to set at the path.
  * @return The updated copy.
  */
 function setValueAtPath(
 	object: Record< string, unknown >,
 	path: string[],
-	newValue: unknown
+	value: unknown
 ): Record< string, unknown > {
 	const [ key, ...rest ] = path;
-	const copy = { ...object };
-	let child = newValue;
+	let child = value;
 
 	if ( rest.length > 0 ) {
 		let parent = {};
-		const current = copy[ key ];
+		const current = object[ key ];
 		if ( isRecord( current ) ) {
 			parent = current;
 		}
 
-		const updated = setValueAtPath( parent, rest, newValue );
-		child = updated;
-		if ( newValue === undefined && Object.keys( updated ).length === 0 ) {
-			child = undefined;
-		}
+		child = setValueAtPath( parent, rest, value );
 	}
 
-	if ( child === undefined ) {
-		delete copy[ key ];
+	return { ...object, [ key ]: child };
+}
+
+/**
+ * Return a copy of an object with the list at a path taken out, and with it
+ * any parent left empty.
+ *
+ * Inside an attribute, the order of the properties is the order they are
+ * saved in. So a property that other properties follow is not removed. It
+ * stays as an empty value, and `setValueAtPath` later fills it in the same
+ * place. A block's attributes themselves are saved in the order of the block
+ * type, so there the property is always removed.
+ *
+ * @param object            Object to copy.
+ * @param path              Property names that lead to the list.
+ * @param isInsideAttribute Whether the object is inside an attribute.
+ * @return The updated copy.
+ */
+function removeListAtPath(
+	object: Record< string, unknown >,
+	path: string[],
+	isInsideAttribute = false
+): Record< string, unknown > {
+	const [ key, ...rest ] = path;
+	const copy = { ...object };
+	let emptyValue: unknown = [];
+
+	if ( rest.length > 0 ) {
+		const current = copy[ key ];
+		if ( ! isRecord( current ) ) {
+			return copy;
+		}
+
+		const child = removeListAtPath( current, rest, true );
+		if ( Object.keys( child ).length > 0 ) {
+			copy[ key ] = child;
+			return copy;
+		}
+
+		emptyValue = child;
+	}
+
+	const keys = Object.keys( copy );
+	if ( isInsideAttribute && keys[ keys.length - 1 ] !== key ) {
+		copy[ key ] = emptyValue;
 	} else {
-		copy[ key ] = child;
+		delete copy[ key ];
 	}
 
 	return copy;
@@ -230,6 +268,9 @@ function setValueAtPath(
  *
  * A list is left alone when it is empty, when an item is not a string or
  * number, or when two items are the same.
+ *
+ * A list that other properties follow leaves an empty list behind, which
+ * keeps its place. See `removeListAtPath`.
  *
  * @example
  * ```js
@@ -251,6 +292,16 @@ function setValueAtPath(
  * //     'tags#talk': 'talk',
  * //     'tags#keynote': 'keynote',
  * //     'tags@order': [ 'talk', 'keynote' ],
+ * // }
+ *
+ * // `name` follows the list, so an empty list keeps its place.
+ * expandUniqueLists(
+ *     { metadata: { noteId: [ 3 ], name: 'Intro' } },
+ *     lists
+ * );
+ * // => {
+ * //     metadata: { noteId: [], name: 'Intro' },
+ * //     'metadata.noteId#3': 3,
  * // }
  * ```
  *
@@ -277,7 +328,7 @@ export function expandUniqueLists(
 			continue;
 		}
 
-		result = setValueAtPath( result, path, undefined );
+		result = removeListAtPath( result, path );
 		for ( const [ id, item ] of items ) {
 			result[ itemKeyPrefix + id ] = item;
 		}
@@ -299,6 +350,9 @@ export function expandUniqueLists(
  * Items follow the stored order. Items that the stored order does not mention
  * come last, sorted by ID. That happens when a collaborator adds an item while
  * another one changes the order.
+ *
+ * The list goes back to the place it had in its parent. When that place was
+ * not kept, the list becomes the last property.
  *
  * @param attributes Block attributes from the shared document.
  * @param lists      Lists of unique items of the block type.
@@ -329,9 +383,9 @@ export function collapseUniqueLists(
 			continue;
 		}
 
-		// A list inside the attribute was written by code that does not know
-		// that the list has unique items. Keep its items too. The next local
-		// change moves them to their own keys.
+		// A list with items inside the attribute was written by code that
+		// does not know that the list has unique items. Keep its items too.
+		// The next local change moves them to their own keys.
 		const items = getItemsById( getNestedValue( result, path ) );
 
 		// The shared document is not validated, so skip unexpected values.

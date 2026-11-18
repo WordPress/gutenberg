@@ -51,6 +51,19 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 const noteLists = findUniqueLists( BLOCK_ATTRIBUTES[ 'core/paragraph' ] );
 const tagLists = findUniqueLists( BLOCK_ATTRIBUTES[ 'core/test-tags' ] );
 
+// A list two levels inside an attribute.
+const deepLists = findUniqueLists( {
+	settings: {
+		type: 'object',
+		properties: {
+			filters: {
+				type: 'object',
+				properties: { tags: { type: 'array', uniqueItems: true } },
+			},
+		},
+	},
+} );
+
 type BlockName = keyof typeof BLOCK_ATTRIBUTES;
 
 interface Peer {
@@ -136,6 +149,16 @@ function sync( a: Peer, b: Peer ): void {
 	Y.applyUpdate( a.ydoc, Y.encodeStateAsUpdate( b.ydoc ) );
 }
 
+/**
+ * Convert attributes to the JSON that a block comment holds. Unlike `toEqual`,
+ * comparing this text also checks the order of the properties.
+ *
+ * @param attributes Block attributes.
+ */
+function toJson( attributes: unknown ): string {
+	return JSON.stringify( attributes );
+}
+
 describe( 'lists of unique items in block attributes', () => {
 	describe( 'findUniqueLists', () => {
 		it( 'finds a list in an attribute of its own', () => {
@@ -209,6 +232,36 @@ describe( 'lists of unique items in block attributes', () => {
 			expect(
 				expandUniqueLists( { metadata: { noteId: [ 3 ] } }, noteLists )
 			).toEqual( { 'metadata.noteId#3': 3 } );
+		} );
+
+		it( 'leaves an empty list in place when other properties follow the list', () => {
+			const result = expandUniqueLists(
+				{ metadata: { id: 'a', noteId: [ 3 ], name: 'Intro' } },
+				noteLists
+			);
+
+			expect( result ).toEqual( {
+				metadata: { id: 'a', noteId: [], name: 'Intro' },
+				'metadata.noteId#3': 3,
+			} );
+			expect( toJson( result.metadata ) ).toBe(
+				'{"id":"a","noteId":[],"name":"Intro"}'
+			);
+		} );
+
+		it( 'leaves an empty parent in place when other properties follow the parent', () => {
+			const result = expandUniqueLists(
+				{ settings: { filters: { tags: [ 'talk' ] }, columns: 2 } },
+				deepLists
+			);
+
+			expect( result ).toEqual( {
+				settings: { filters: {}, columns: 2 },
+				'settings.filters.tags#talk': 'talk',
+			} );
+			expect( toJson( result.settings ) ).toBe(
+				'{"filters":{},"columns":2}'
+			);
 		} );
 
 		it( 'stores the order when it is not the sorted order', () => {
@@ -295,6 +348,34 @@ describe( 'lists of unique items in block attributes', () => {
 			expect(
 				collapseUniqueLists( { 'metadata.noteId#3': 3 }, noteLists )
 			).toEqual( { metadata: { noteId: [ 3 ] } } );
+		} );
+
+		it( 'puts the list back in the place it had in its parent', () => {
+			const result = collapseUniqueLists(
+				{
+					metadata: { id: 'a', noteId: [], name: 'Intro' },
+					'metadata.noteId#3': 3,
+				},
+				noteLists
+			);
+
+			expect( toJson( result ) ).toBe(
+				'{"metadata":{"id":"a","noteId":[3],"name":"Intro"}}'
+			);
+		} );
+
+		it( 'puts the parent of the list back in the place it had', () => {
+			const result = collapseUniqueLists(
+				{
+					settings: { filters: {}, columns: 2 },
+					'settings.filters.tags#talk': 'talk',
+				},
+				deepLists
+			);
+
+			expect( toJson( result ) ).toBe(
+				'{"settings":{"filters":{"tags":["talk"]},"columns":2}}'
+			);
 		} );
 
 		it( 'follows the stored order', () => {
@@ -417,6 +498,33 @@ describe( 'lists of unique items in block attributes', () => {
 
 			expect( read( a ) ).toEqual( { metadata: { name: 'Intro' } } );
 			expect( read( b ) ).toEqual( { metadata: { name: 'Intro' } } );
+		} );
+
+		it( 'keeps the order of the properties around the list', () => {
+			const a = createPeer();
+			edit( a, { metadata: { noteId: [ 5 ] } } );
+			edit( a, { metadata: { noteId: [ 5 ], name: 'Intro' } } );
+			const b = join( a );
+
+			// The saved block comment follows this order. If it changed here,
+			// reopening the post would look like a change to its content.
+			const expected = '{"metadata":{"noteId":[5],"name":"Intro"}}';
+			expect( toJson( read( a ) ) ).toBe( expected );
+			expect( toJson( read( b ) ) ).toBe( expected );
+		} );
+
+		it( 'keeps an item added while another collaborator adds a property after the list', () => {
+			const a = createPeer();
+			edit( a, { metadata: { noteId: [ 1 ] } } );
+			const b = join( a );
+
+			edit( a, { metadata: { noteId: [ 1 ], name: 'Intro' } } );
+			edit( b, { metadata: { noteId: [ 1, 2 ] } } );
+			sync( a, b );
+
+			const expected = '{"metadata":{"noteId":[1,2],"name":"Intro"}}';
+			expect( toJson( read( a ) ) ).toBe( expected );
+			expect( toJson( read( b ) ) ).toBe( expected );
 		} );
 
 		it( 'keeps an item added while another collaborator removes the last one', () => {
