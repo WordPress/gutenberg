@@ -11,13 +11,19 @@
 	}
 }
 
+@mixin when-highlighted {
+	&:is(:focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) {
+		@content;
+	}
+}
+
 @mixin menu-item {
 	&[aria-disabled="true"]:focus:not(:focus-visible) {
 		// Pointer navigation moves DOM focus, but should not show Button's ring.
 		outline: none;
 	}
 
-	&:is(:focus, [aria-selected="true"]):not(:disabled, [aria-disabled="true"]) {
+	@include when-highlighted {
 		// Popup colors take precedence over the underlying Button variant.
 		@include highlight(!important);
 

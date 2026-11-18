@@ -64,13 +64,6 @@ parameters:
 	# that lib/ calls. Run `npm run build` before analyzing.
 	scanDirectories:
 		- ../../build
-	ignoreErrors:
-		# Return values from action callbacks are discarded by do_action(), but returning one is
-		# harmless and lets callers and tests know whether the callback did anything. Core has many
-		# such callbacks, like _wp_cron() and wp_set_up_cross_origin_isolation().
-		-
-			message: '#^Action callback returns .+ but should not return anything\.$#'
-			identifier: return.void
 
 services:
 	# Renders the wp-build templates into valid PHP before they are parsed, in place of the parsers

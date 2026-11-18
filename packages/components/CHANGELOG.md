@@ -2,6 +2,65 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Button`: Use WPDS tokens for ordinary and destructive colors. Customize these colors with `ThemeProvider` instead of legacy color overrides ([#86683](https://github.com/WordPress/gutenberg/pull/86683)).
+
+### Enhancements
+
+-   `BaseControl`, `FocalPointPicker`, and `Tabs`: Use the `--wpds-typography-font-family-body` token for their font family ([#86761](https://github.com/WordPress/gutenberg/pull/86761)).
+-   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
+-   `Button`: Use theme-aware WPDS colors for disabled states, including a neutral fill for disabled primary buttons ([#86681](https://github.com/WordPress/gutenberg/pull/86681)).
+-   `InputControl`, `TextControl`, `TextareaControl`, and `ContentEditableControl`: Use `--wpds-color-foreground-interactive-neutral-weak` for placeholder text instead of `--wp-components-color-foreground` overrides ([#86578](https://github.com/WordPress/gutenberg/pull/86578)).
+-   `FontSizePicker`: Use the WordPress UI select for choosing preset sizes ([#86661](https://github.com/WordPress/gutenberg/pull/86661)).
+-   `AnglePickerControl`: Increase dial border contrast on hover and while pressed ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
+-   `AnglePickerControl`, `BorderControl`: Use the design system border color. Legacy `--wp-components-color-gray-600` overrides no longer affect these borders ([#86577](https://github.com/WordPress/gutenberg/pull/86577)).
+-   `UnitControl`: Recognize the container query length units `cqw`, `cqh`, `cqi`, `cqb`, `cqmin` and `cqmax`, so they can be offered through `useCustomUnits`. They are not part of the default `CSS_UNITS` list ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
+-   `ContentEditableControl`: Use the `InputLayout` field styles from `@wordpress/ui`, so its colors, height, and disabled state, including the placeholder, match the design system form fields ([#86591](https://github.com/WordPress/gutenberg/pull/86591)).
+-   `Snackbar`: Increase the action link hit target ([#86823](https://github.com/WordPress/gutenberg/pull/86823)).
+
+### Bug Fixes
+
+-   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
+-   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
+-   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
+-   `GradientPicker`, `CustomGradientPicker`: Remove active drag listeners when the picker unmounts, including after a rerender or a restarted drag ([#86742](https://github.com/WordPress/gutenberg/pull/86742)).
+-   `DatePicker`: Use WPDS tokens for calendar colors, borders, spacing, and typography, including paired selected-date colors that remain readable when `ThemeProvider` adjusts the brand fill ([#86809](https://github.com/WordPress/gutenberg/pull/86809)).
+-   `Autocomplete`: Keep suggestions for the latest query when option requests finish out of order ([#86762](https://github.com/WordPress/gutenberg/pull/86762)).
+-   `ProgressBar`: Remove the space before the ellipsis in the default `aria-label` ([#86793](https://github.com/WordPress/gutenberg/pull/86793)).
+-   `TextareaControl`: Keep the placeholder visible inside an element with the `is-dark-theme` class, such as the editor when it has a dark background ([#86755](https://github.com/WordPress/gutenberg/pull/86755)).
+-   `ComboboxControl`, `FormTokenField`: Link inputs to visible suggestions with `aria-controls` instead of `aria-owns`, and keep `ComboboxControl` popup states accurate while loading ([#86749](https://github.com/WordPress/gutenberg/pull/86749)).
+-   `Card`: Use theme tokens for borders, corners, and spacing ([#85857](https://github.com/WordPress/gutenberg/pull/85857)).
+-   `Autocomplete`: Use the last committed completion callback when a background update suspends ([#86738](https://github.com/WordPress/gutenberg/pull/86738)).
+-   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
+-   `ResizableBox`: Clear the resize tooltip's pending fade timer on unmount ([#86758](https://github.com/WordPress/gutenberg/pull/86758)).
+-   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
+-   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   `ResizableBox`: Show corner handles above side handles, so a corner handle can be dragged when the side handle next to it is also enabled ([#86781](https://github.com/WordPress/gutenberg/pull/86781)).
+-   `Modal`: Match scroll-area focus outline corners to the modal frame where they meet ([#86023](https://github.com/WordPress/gutenberg/pull/86023)).
+-   `UnitControl`: Preserve fractional values across CSS units on commit, and prevent floating-point errors when stepping decimals ([#85761](https://github.com/WordPress/gutenberg/pull/85761)).
+-   `CircularOptionPicker`: Keep the selected check mark visible on every swatch in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
+-   `Button`, `Toolbar`: Show the pressed state in forced colors mode ([#86393](https://github.com/WordPress/gutenberg/pull/86393)).
+-   `Toolbar`: Use semantic border colors and the standard outline focus ring ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+-   `TimePicker`: Keep the hours field focus ring visible above the minutes field ([#86442](https://github.com/WordPress/gutenberg/pull/86442)).
+-   `InputControl`: Remove the leftover maximum width on the label wrapper so labels no longer wrap before reaching the input's width ([#86363](https://github.com/WordPress/gutenberg/pull/86363)).
+-   `DropdownMenu`: Invert the selected item's icon indicator while the item is highlighted, so that it stays visible against the highlight color ([#86330](https://github.com/WordPress/gutenberg/pull/86330)).
+-   `useBaseControlProps`: fix instance ID generation crash in CommonJS build by avoiding a circular import of BaseControl ([#86322](https://github.com/WordPress/gutenberg/pull/86322)).
+-   `ContentEditableControl`: Stop screen readers from reading a label hidden with `hideLabelFromVision` twice, once as text and once as the field's name ([#85776](https://github.com/WordPress/gutenberg/pull/85776)).
+-   `ContentEditableControl` and `CustomSelectControl`: Include validation errors in the accessible description of the interactive controls, so screen readers announce errors on the controls users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
+-   `ValidatedContentEditableControl`: Hide the validation input from assistive technology, so screen readers no longer stop on an unlabeled text field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
+-   `TimePicker`: Replace every underscore in the time zone tooltip, so `Asia/Ho_Chi_Minh` shows as `Asia/Ho Chi Minh` instead of `Asia/Ho Chi_Minh` ([#86826](https://github.com/WordPress/gutenberg/pull/86826)).
+-   `Button`, `Toolbar`: Keep pressed foreground and fill colors paired across themes and interaction states, including numbered toolbar buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   `ColorPicker`: Keep the RGB values unchanged when only the alpha slider moves ([#86305](https://github.com/WordPress/gutenberg/pull/86305)).
+
+### Internal
+
+-   Update the `@ariakit/react` dependency to 0.4.43 ([#86887](https://github.com/WordPress/gutenberg/pull/86887)).
+-   `CustomSelectControl`: Remove the unused V2 component and keep the shared implementation with the legacy component ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
+-   `ProgressBar`: Use the new `--wpds-color-background-indicator-neutral` token for the filled portion. The color is unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
 ## 44.0.0 (2026-11-04)
 
 ### Breaking Changes
@@ -192,7 +251,7 @@
 -   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
 -   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
 -   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
--   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+-   `ResizableBox`: Update `re-resizable` from `6.9.0` to `6.11.2`, which supports React 18. A dimension missing from `size` is now reset to `auto` when a resize ends, instead of keeping its resized value ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
 -   `SandBox`: Send the page URL as the referrer from iframes inside `allowSameOrigin` sandboxes in Safari, fixing embed previews that require a referrer, such as YouTube's "Error 153" ([#84014](https://github.com/WordPress/gutenberg/pull/84014)).
 -   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
 -   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).

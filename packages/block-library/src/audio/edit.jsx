@@ -101,14 +101,9 @@ function AudioEdit( {
 
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
-			// In this case there was an error and we should continue in the editing state
-			// previous attributes should be removed because they may be temporary blob urls.
-			setAttributes( {
-				src: undefined,
-				id: undefined,
-				caption: undefined,
-				blob: undefined,
-			} );
+			// The upload failed. Only clear the temporary blob URL, so a failed
+			// replacement leaves the current audio and its caption intact.
+			setAttributes( { blob: undefined } );
 			setTemporaryURL();
 			return;
 		}
@@ -125,6 +120,16 @@ function AudioEdit( {
 			src: media.url,
 			id: media.id,
 			caption: media.caption,
+		} );
+		setTemporaryURL();
+	}
+
+	function onResetAudio() {
+		setAttributes( {
+			src: undefined,
+			id: undefined,
+			caption: undefined,
+			blob: undefined,
 		} );
 		setTemporaryURL();
 	}
@@ -166,7 +171,7 @@ function AudioEdit( {
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
-						onReset={ () => onSelectAudio( undefined ) }
+						onReset={ onResetAudio }
 						variant="toolbar"
 					/>
 				</BlockControls>
