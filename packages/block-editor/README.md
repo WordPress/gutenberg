@@ -66,7 +66,7 @@ registerCoreBlocks();
 
 Cmd-click on macOS, or Ctrl-click on other platforms, adds or removes a block from the selection in the canvas or List View. Blocks can have different parents within the same editable block tree. In List View, arrow keys move focus without changing selection; Space toggles the focused block. Shift returns to range selection from the selection anchor.
 
-A selected parent includes its contents, so its descendants are not separately included in the selection. Selections cannot span the contents of different controlled entities, such as a template part and its surrounding template.
+A selected parent includes its contents, so its descendants are not separately included in the selection. Selections cannot span the contents of different controlled entities, such as a template part and its surrounding template: selection persistence and history use one entity's ownership and ID mapping. Selecting a controller replaces its selected descendants. If a later structural change splits a selection across entities, it retains members in the surviving selection start block's current entity, falling back to the first surviving member in document order when that start block disappears or is suppressed by a selected parent.
 
 Use the block-editor store's `multiSelectSet` action to supply a set selection, for example when selecting table cells across different row blocks:
 

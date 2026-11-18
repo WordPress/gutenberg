@@ -390,20 +390,31 @@ export const multiSelectSet =
 				select.getBlock( id ) &&
 				select.getBlockEditingMode( id ) !== 'disabled'
 		);
-		// A controlled block's contents belong to a separate editing entity.
+		// Parent dominance must precede ownership validation: selecting a
+		// controller suppresses its children, leaving a valid outer-entity member.
+		const requested = new Set( uniqueIds );
+		const members = uniqueIds.filter(
+			( id ) =>
+				! select
+					.getBlockParents( id )
+					.some( ( parent ) => requested.has( parent ) )
+		);
+		// Controlled contents are saved in another entity with its own ID mapping
+		// and history. Persistence currently handles one owner per selection, so
+		// ordinary cross-parent sets are valid but mixed-entity sets are not.
 		const getSelectionRoot = ( id: string ) =>
 			select
 				.getBlockParents( id, true )
 				.find( ( parent ) =>
 					select.areInnerBlocksControlled( parent )
 				) ?? '';
-		const root = uniqueIds.length ? getSelectionRoot( uniqueIds[ 0 ] ) : '';
-		if ( uniqueIds.some( ( id ) => getSelectionRoot( id ) !== root ) ) {
+		const root = members.length ? getSelectionRoot( members[ 0 ] ) : '';
+		if ( members.some( ( id ) => getSelectionRoot( id ) !== root ) ) {
 			return;
 		}
 		dispatch( {
 			type: 'MULTI_SELECT_SET',
-			clientIds: uniqueIds,
+			clientIds: members,
 			selectionStart: {
 				clientId: selectionStartClientId ?? uniqueIds[ 0 ],
 			},

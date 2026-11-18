@@ -41,6 +41,7 @@
 
 ### Bug Fixes
 
+-   Selection: Apply parent dominance before checking controlled-entity boundaries, and retain members in the surviving selection anchor's entity after structural changes.
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
 -   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).

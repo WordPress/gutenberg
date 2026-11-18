@@ -335,6 +335,147 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
+	it( 'selects a controlled parent instead of its selected descendants', () => {
+		const parent = createBlock( 'core/test-selection' );
+		const actions = registry.dispatch( store );
+		actions.resetBlocks( [ parent ] );
+		actions.setHasControlledInnerBlocks( parent.clientId, true );
+		actions.replaceInnerBlocks( parent.clientId, blocks, false );
+		const ids = blocks.slice( 0, 2 ).map( ( block ) => block.clientId );
+		actions.multiSelectSet( ids );
+		actions.multiSelectSet( [ ...ids, parent.clientId ] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ parent.clientId ]
+		);
+	} );
+
+	it.each( [ 'end', 'start' ] )(
+		'retains members in the surviving %s anchor entity after a move',
+		( endpoint ) => {
+			const parent = createBlock( 'core/test-selection' );
+			const actions = registry.dispatch( store );
+			actions.resetBlocks( [ ...blocks, parent ] );
+			actions.updateBlockListSettings( parent.clientId, {} );
+			actions.setHasControlledInnerBlocks( parent.clientId, true );
+			const ids = blocks.map( ( block ) => block.clientId );
+			actions.multiSelectSet( [ ids[ 0 ], ids[ 2 ], ids[ 4 ] ] );
+			const moved = endpoint === 'start' ? ids[ 0 ] : ids[ 4 ];
+			actions.moveBlocksToPosition( [ moved ], '', parent.clientId, 0 );
+			expect(
+				registry.select( store ).getBlockRootClientId( moved )
+			).toBe( parent.clientId );
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual(
+				endpoint === 'start' ? [ ids[ 0 ] ] : [ ids[ 0 ], ids[ 2 ] ]
+			);
+		}
+	);
+
+	it( 'retains outside members when changing ownership removes controlled contents', () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 0, 2 )
+		);
+		const actions = registry.dispatch( store );
+		actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
+		const ids = [
+			blocks[ 0 ].clientId,
+			blocks[ 1 ].clientId,
+			blocks[ 4 ].clientId,
+		];
+		actions.multiSelectSet( ids );
+		actions.setHasControlledInnerBlocks( parent.clientId, true );
+		expect( registry.select( store ).getBlock( ids[ 0 ] ) ).toBeNull();
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ ids[ 2 ] ]
+		);
+	} );
+
+	it.each( [ 'missing', 'suppressed' ] )(
+		'uses the first surviving member entity when the anchor is %s',
+		( reason ) => {
+			const parent = createBlock( 'core/test-selection' );
+			const actions = registry.dispatch( store );
+			actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
+			actions.setHasControlledInnerBlocks( parent.clientId, true );
+			actions.replaceInnerBlocks(
+				parent.clientId,
+				blocks.slice( 0, 2 ),
+				false
+			);
+			const ids = blocks.map( ( block ) => block.clientId );
+			const start = reason === 'missing' ? 'missing' : ids[ 0 ];
+			// Restored candidates can have stale ownership or suppressed endpoints.
+			actions.resetSelection(
+				{ clientId: start },
+				{ clientId: ids[ 4 ] },
+				0,
+				[ parent.clientId, ids[ 0 ], ids[ 1 ], ids[ 4 ] ]
+			);
+			expect(
+				registry.select( store ).getSelectedBlockClientIds()
+			).toEqual( [ parent.clientId, ids[ 4 ] ] );
+			expect( registry.select( store ).getBlockSelectionStart() ).toBe(
+				parent.clientId
+			);
+		}
+	);
+
+	it( 'restores only members in the first surviving member entity when the anchor is missing', () => {
+		const parent = createBlock( 'core/test-selection' );
+		const actions = registry.dispatch( store );
+		actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
+		actions.setHasControlledInnerBlocks( parent.clientId, true );
+		actions.replaceInnerBlocks(
+			parent.clientId,
+			blocks.slice( 0, 2 ),
+			false
+		);
+		const ids = blocks.map( ( block ) => block.clientId );
+		actions.resetSelection(
+			{ clientId: 'missing' },
+			{ clientId: ids[ 4 ] },
+			0,
+			[ 'missing', ids[ 0 ], ids[ 1 ], ids[ 4 ] ]
+		);
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			ids.slice( 0, 2 )
+		);
+		expect( registry.select( store ).getBlockSelectionStart() ).toBe(
+			ids[ 0 ]
+		);
+		expect( registry.select( store ).getBlockSelectionEnd() ).toBe(
+			ids[ 1 ]
+		);
+		actions.resetBlocks( [] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[]
+		);
+		expect(
+			unlock( registry.select( store ) ).getSetSelectionClientIds()
+		).toBeUndefined();
+	} );
+
+	it( 'rejects mixed-entity creation without changing the existing selection', () => {
+		const parent = createBlock( 'core/test-selection' );
+		const actions = registry.dispatch( store );
+		actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
+		actions.setHasControlledInnerBlocks( parent.clientId, true );
+		actions.replaceInnerBlocks(
+			parent.clientId,
+			blocks.slice( 0, 2 ),
+			false
+		);
+		const ids = blocks.map( ( block ) => block.clientId );
+		actions.multiSelectSet( [ ids[ 0 ], ids[ 1 ] ] );
+		actions.multiSelectSet( [ ids[ 0 ], ids[ 4 ] ] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			ids.slice( 0, 2 )
+		);
+	} );
+
 	it( 'keeps selected parents without separately selecting their descendants', () => {
 		const parent = createBlock(
 			'core/test-selection',

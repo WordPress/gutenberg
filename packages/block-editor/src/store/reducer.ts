@@ -3532,22 +3532,41 @@ function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
 		if (
 			! current.setSelectionClientIds ||
 			( state?.blocks.order === nextState.blocks.order &&
+				state.blocks.controlledInnerBlocks ===
+					nextState.blocks.controlledInnerBlocks &&
 				state.selection === current )
 		) {
 			return nextState;
 		}
 		const members = new Set( current.setSelectionClientIds );
-		const ordered: string[] = [];
-		const visit = ( root: string ) => {
+		let ordered: string[] = [];
+		const scopes = new Map< string, string >();
+		const visit = ( root: string, scope: string ) => {
+			// As at creation, ownership is the nearest controlled ancestor, not
+			// an ordinary parent. The controller itself belongs to the outer scope.
+			const childScope = nextState.blocks.controlledInnerBlocks.has(
+				root
+			)
+				? root
+				: scope;
 			for ( const id of nextState.blocks.order.get( root ) ?? [] ) {
 				if ( members.has( id ) ) {
 					ordered.push( id );
+					scopes.set( id, childScope );
 				} else {
-					visit( id );
+					visit( id, childScope );
 				}
 			}
 		};
-		visit( '' );
+		visit( '', '' );
+		// Structural actions can move just one member across an entity boundary.
+		// Follow the surviving anchor's current owner, or the first survivor when
+		// the anchor disappeared or was suppressed by a selected ancestor.
+		const anchor = ordered.includes( current.selectionStart.clientId! )
+			? current.selectionStart.clientId!
+			: ordered[ 0 ];
+		const scope = scopes.get( anchor );
+		ordered = ordered.filter( ( id ) => scopes.get( id ) === scope );
 		const selectionStart = {
 			clientId:
 				members.has( current.selectionStart.clientId! ) &&
