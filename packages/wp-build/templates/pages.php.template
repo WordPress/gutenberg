@@ -6,4 +6,8 @@
  * @package {{PREFIX}}
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 {{PAGE_INCLUDES}}

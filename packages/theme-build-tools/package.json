@@ -83,11 +83,11 @@
 		"@wordpress/validation-tools": "file:../../tools/validation",
 		"esbuild": "^0.27.2",
 		"lightningcss": "^1.33.0",
-		"postcss": "^8.4.38",
+		"postcss": "^8.5.33",
 		"postcss-scss": "^4.0.9",
 		"source-map": "^0.6.1",
 		"stylelint": "^17.14.1",
-		"vite": "^8.3.6",
+		"vite": "^8.3.8",
 		"vitest": "^5.1.0"
 	},
 	"peerDependencies": {
