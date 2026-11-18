@@ -827,7 +827,7 @@ First run `composer install` and `npm run build`, which generates PHP files that
 -   `composer phpstan`, with PHP and Composer installed on your computer.
 -   `npm run typecheck:php`, in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment).
 
-This runs two analyses in turn: one of all the PHP with [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist), and then one of the [strict paths](#strict-paths) with [`phpstan-strict.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan-strict.neon.dist). When the first reports errors, the second does not run. To run only one of them, use `composer phpstan:default` or `composer phpstan:strict`. Arguments after `--`, such as `composer phpstan -- --error-format=json`, are passed to both, so pass a configuration or a report format meant for a program to one of those scripts instead.
+This runs two analyses in turn: one of all the PHP with [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist), and then one of the [strict paths](#strict-paths) with [`phpstan-strict.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan-strict.neon.dist). When the first reports errors, the second does not run. To run only one of them, use `composer phpstan:default` or `composer phpstan:strict` (or `npm run typecheck:php:strict` in the local environment). Arguments after `--`, such as `composer phpstan -- --error-format=json`, are passed to both, so pass a configuration or a report format meant for a program to one of those scripts instead.
 
 #### The baseline
 

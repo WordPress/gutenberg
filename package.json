@@ -220,6 +220,7 @@
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
+		"typecheck:php:strict": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:strict --",
 		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
 		"typecheck:php:fix": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix --",
 		"typecheck:php:fix:strict": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix:strict --",

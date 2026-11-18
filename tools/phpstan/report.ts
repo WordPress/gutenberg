@@ -58,6 +58,8 @@ interface Analysis {
 	step: string;
 	/** Composer script that runs the analysis locally. */
 	script: string;
+	/** How to run the analysis in the local environment, after `script`. */
+	npmScript: string;
 	/** Composer script that fixes the analysis's errors marked as fixable. */
 	fixScript: string;
 	/** npm script that runs `fixScript` in the local environment. */
@@ -75,6 +77,8 @@ const ANALYSIS: Analysis = isStrict
 			],
 			step: 'Run PHPStan on the strict paths',
 			script: 'composer phpstan:strict',
+			npmScript:
+				'`npm run typecheck:php:strict` in the local environment',
 			fixScript: 'composer phpstan:fix:strict',
 			fixNpmScript: 'npm run typecheck:php:fix:strict',
 		}
@@ -83,6 +87,8 @@ const ANALYSIS: Analysis = isStrict
 			baselines: [ 'tools/phpstan/baseline.neon' ],
 			step: 'Run PHPStan',
 			script: 'composer phpstan:default',
+			npmScript:
+				'`npm run typecheck:php` in the local environment, which runs both analyses',
 			fixScript: 'composer phpstan:fix',
 			fixNpmScript: 'npm run typecheck:php:fix',
 		};
@@ -413,7 +419,7 @@ function buildSummary( errors: PhpstanError[] ): string {
 	}
 
 	sections.push(
-		`To run the analysis locally, run \`npm run build\` and then \`${ ANALYSIS.script }\`, or \`npm run typecheck:php\` in the local environment, which runs both analyses.`
+		`To run the analysis locally, run \`npm run build\` and then \`${ ANALYSIS.script }\`, or ${ ANALYSIS.npmScript }.`
 	);
 
 	return sections.join( '\n\n' ) + '\n';
