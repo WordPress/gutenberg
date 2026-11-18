@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
-import type { BlockEditProps, Block } from '@wordpress/blocks';
+import type { BlockEditProps } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';
 import useGuidedEnterAtEnd from '../description-list/use-guided-enter-at-end';
 import useStructurePreservingMerge from '../description-list/use-structure-preserving-merge';
@@ -11,17 +11,6 @@ type DescriptionListItemAttributes = {
 	placeholder?: string;
 };
 
-type DescriptionListItemEditProps =
-	BlockEditProps< DescriptionListItemAttributes > & {
-		mergeBlocks?: ( forward: boolean ) => void;
-		onReplace?: (
-			blocks: Block | Block[],
-			indexToSelect?: number,
-			initialPosition?: number | null
-		) => void;
-		onRemove?: () => void;
-	};
-
 export default function Edit( {
 	attributes,
 	setAttributes,
@@ -30,7 +19,7 @@ export default function Edit( {
 	onRemove,
 	clientId,
 	isSelected,
-}: DescriptionListItemEditProps ) {
+}: BlockEditProps< DescriptionListItemAttributes > ) {
 	const { content, placeholder } = attributes;
 	const blockProps = useBlockProps();
 	const onSplitAtEnd = useGuidedEnterAtEnd();
@@ -38,10 +27,9 @@ export default function Edit( {
 
 	return (
 		<>
-			<DescriptionListStructureWarning
-				clientId={ clientId }
-				isSelected={ isSelected }
-			/>
+			{ isSelected && (
+				<DescriptionListStructureWarning clientId={ clientId } />
+			) }
 			<RichText
 				identifier="content"
 				tagName="dt"

@@ -77,19 +77,9 @@ function getWarningMessage( issue: Exclude< StructureIssue, null > ) {
 
 export default function DescriptionListStructureWarning( {
 	clientId,
-	isSelected,
 }: {
 	clientId: string;
-	isSelected: boolean;
 } ) {
-	if ( ! isSelected ) {
-		return null;
-	}
-
-	return <SelectedBlockStructureWarning clientId={ clientId } />;
-}
-
-function SelectedBlockStructureWarning( { clientId }: { clientId: string } ) {
 	const issue = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockOrder, getBlockRootClientId } =

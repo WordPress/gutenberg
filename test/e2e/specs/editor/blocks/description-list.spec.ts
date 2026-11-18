@@ -1445,6 +1445,62 @@ test.describe( 'Description List', () => {
 		] );
 	} );
 
+	test( 'should retain a trailing term that contains only an inline image when exiting', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'API' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: {
+						content: 'Application programming interface',
+					},
+				},
+				{
+					name: 'core/description-term',
+					attributes: {
+						content:
+							'<img src="https://example.com/logo.png" alt="Logo">',
+					},
+				},
+				{ name: 'core/description-detail' },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Description Detail' } )
+			.last()
+			.click();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'After' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{ name: 'core/description-term' },
+					{ name: 'core/description-detail' },
+					{
+						name: 'core/description-term',
+						attributes: {
+							content: expect.stringContaining( '<img' ),
+						},
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'After' },
+			},
+		] );
+	} );
+
 	test( 'should retain the initial empty pair when exiting an empty list', async ( {
 		editor,
 		page,

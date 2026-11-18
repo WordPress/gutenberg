@@ -20,10 +20,9 @@ export default function Edit( {
 
 	return (
 		<>
-			<DescriptionListStructureWarning
-				clientId={ clientId }
-				isSelected={ isSelected }
-			/>
+			{ isSelected && (
+				<DescriptionListStructureWarning clientId={ clientId } />
+			) }
 			<dl { ...innerBlocksProps } />
 		</>
 	);

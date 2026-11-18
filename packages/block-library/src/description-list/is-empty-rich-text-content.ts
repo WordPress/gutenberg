@@ -1,16 +1,21 @@
-import { RichTextData } from '@wordpress/rich-text';
+import { isEmpty, RichTextData } from '@wordpress/rich-text';
 
+/**
+ * Returns whether a term or description has no content. Inline objects such
+ * as images count as content.
+ *
+ * @param content The block's `content` attribute. It can be an HTML string
+ *                after a merge.
+ *
+ * @return Whether the content is empty.
+ */
 export default function isEmptyRichTextContent( content: unknown ) {
-	if ( content instanceof RichTextData ) {
-		return content.toPlainText().trim().length === 0;
-	}
+	const value =
+		content instanceof RichTextData
+			? content
+			: RichTextData.fromHTMLString(
+					typeof content === 'string' ? content : ''
+				);
 
-	if ( typeof content === 'string' ) {
-		return (
-			RichTextData.fromHTMLString( content ).toPlainText().trim()
-				.length === 0
-		);
-	}
-
-	return content === undefined || content === null;
+	return isEmpty( value );
 }
