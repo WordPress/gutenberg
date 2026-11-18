@@ -6,7 +6,7 @@ import {
 	__unstableMotion as motion,
 	__unstableAnimatePresence as AnimatePresence,
 } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { useReducedMotion, useViewportMatch } from '@wordpress/compose';
 import type { InterfaceSkeletonProps } from './types';
 
@@ -177,7 +177,9 @@ function InterfaceSkeleton(
 									} }
 									variants={ {
 										open: { x: 0 },
-										closed: { x: '-100%' },
+										closed: {
+											x: isRTL() ? '100%' : '-100%',
+										},
 									} }
 									transition={ defaultTransition }
 								>

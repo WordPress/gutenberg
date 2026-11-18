@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { __unstableMotion as motion } from '@wordpress/components';
+import { isRTL } from '@wordpress/i18n';
 import BackButton, { useHasBackButton } from './back-button';
 
 const toolbarVariations = {
@@ -8,14 +9,6 @@ const toolbarVariations = {
 	distractionFreeHidden: { y: '-50px' },
 	visible: { y: 0 },
 	hidden: { y: 0 },
-};
-
-const backButtonVariations = {
-	distractionFreeDisabled: { x: '-100%' },
-	distractionFreeHover: { x: 0 },
-	distractionFreeHidden: { x: '-100%' },
-	visible: { x: 0 },
-	hidden: { x: 0 },
 };
 
 /**
@@ -35,6 +28,7 @@ export default function HeaderSkeleton( {
 	settings,
 } ) {
 	const hasBackButton = useHasBackButton();
+	const backButtonHiddenX = isRTL() ? '100%' : '-100%';
 
 	/*
 	 * The edit-post-header classname is only kept for backward compatibility
@@ -45,7 +39,13 @@ export default function HeaderSkeleton( {
 			{ hasBackButton && (
 				<motion.div
 					className="editor-header__back-button"
-					variants={ backButtonVariations }
+					variants={ {
+						distractionFreeDisabled: { x: backButtonHiddenX },
+						distractionFreeHover: { x: 0 },
+						distractionFreeHidden: { x: backButtonHiddenX },
+						visible: { x: 0 },
+						hidden: { x: 0 },
+					} }
 					transition={ { type: 'tween' } }
 				>
 					<BackButton.Slot />

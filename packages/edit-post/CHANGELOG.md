@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Mirror the slide animation of the back button in distraction free mode in RTL languages ([#86553](https://github.com/WordPress/gutenberg/pull/86553)).
+
 ## 9.1.0 (2026-11-04)
 
 ### Enhancements
