@@ -380,3 +380,29 @@
 		}
 	}
 }
+
+// Primary actions collapse into the actions menu when the table doesn't have
+// room for them. See `use-collapsed-primary-actions.ts`.
+.dataviews-view-table:not(.has-collapsed-primary-actions) .dataviews-item-actions__collapsed-menu {
+	display: none;
+}
+
+.dataviews-view-table.has-collapsed-primary-actions {
+	.dataviews-item-actions__primary {
+		display: none;
+	}
+
+	// The "Actions" label is wider than the menu button; keep it for
+	// assistive technology only, so the column is as narrow as the button.
+	th.dataviews-view-table__actions-column .dataviews-view-table-header {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		padding: 0;
+		margin: -1px;
+		overflow: hidden;
+		clip-path: inset(50%);
+		white-space: nowrap;
+		border: 0;
+	}
+}

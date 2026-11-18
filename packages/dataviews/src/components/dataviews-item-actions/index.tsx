@@ -39,6 +39,14 @@ interface ItemActionsProps< Item > {
 	item: Item;
 	actions: Action< Item >[];
 	isCompact?: boolean;
+	/**
+	 * Render primary actions inside a wrapper the layout can hide with CSS,
+	 * and always render the actions menu so every action stays reachable
+	 * while they are hidden. The layout decides when to hide them by toggling
+	 * a class, so both states share one render and can be measured without
+	 * re-rendering.
+	 */
+	hasCollapsiblePrimaryActions?: boolean;
 }
 
 interface CompactItemActionsProps< Item > {
@@ -166,6 +174,7 @@ export default function ItemActions< Item >( {
 	item,
 	actions,
 	isCompact,
+	hasCollapsiblePrimaryActions,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
 	const { primaryActions, eligibleActions } = useMemo( () => {
@@ -184,6 +193,12 @@ export default function ItemActions< Item >( {
 	}, [ actions, item ] );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
+	const hasMenu =
+		primaryActions.length < eligibleActions.length ||
+		// Since we hide primary actions on mobile, we need to show the menu
+		// there if there are any actions at all.
+		isMobileViewport;
 
 	if ( isCompact ) {
 		return (
@@ -206,20 +221,37 @@ export default function ItemActions< Item >( {
 				width: 'auto',
 			} }
 		>
-			<PrimaryActions
-				item={ item }
-				actions={ primaryActions }
-				registry={ registry }
-			/>
-			{ ( primaryActions.length < eligibleActions.length ||
-				// Since we hide primary actions on mobile, we need to show the menu
-				// there if there are any actions at all.
-				isMobileViewport ) && (
+			{ hasCollapsiblePrimaryActions ? (
+				<div className="dataviews-item-actions__primary">
+					<PrimaryActions
+						item={ item }
+						actions={ primaryActions }
+						registry={ registry }
+					/>
+				</div>
+			) : (
+				<PrimaryActions
+					item={ item }
+					actions={ primaryActions }
+					registry={ registry }
+				/>
+			) }
+			{ hasMenu && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }
 					registry={ registry }
 				/>
+			) }
+			{ ! hasMenu && hasCollapsiblePrimaryActions && (
+				// Only shown while primary actions are collapsed.
+				<div className="dataviews-item-actions__collapsed-menu">
+					<CompactItemActions
+						item={ item }
+						actions={ eligibleActions }
+						registry={ registry }
+					/>
+				</div>
 			) }
 		</Stack>
 	);

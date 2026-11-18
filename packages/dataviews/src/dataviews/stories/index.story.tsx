@@ -2,6 +2,7 @@ import type { Meta } from '@storybook/react-vite';
 import DataViews from '../index';
 import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
+import LayoutTableDynamicActionsComponent from './layout-table-dynamic-actions';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
 import LayoutCustomComponent from './layout-custom';
@@ -88,6 +89,25 @@ export const LayoutTable = {
 		showMedia: {
 			control: 'boolean',
 			description: 'Whether to display the media field',
+		},
+	},
+};
+
+export const LayoutTableDynamicActions = {
+	render: LayoutTableDynamicActionsComponent,
+	args: {
+		containerWidth: '100%',
+		visibleFields: [ 'author', 'date' ],
+	},
+	argTypes: {
+		containerWidth: {
+			control: 'text',
+			description:
+				'Initial width of the resizable box (drag its corner to resize)',
+		},
+		visibleFields: {
+			control: 'object',
+			description: 'Initially visible fields, besides the title',
 		},
 	},
 };

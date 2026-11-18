@@ -38,6 +38,10 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
+import {
+	COLLAPSED_PRIMARY_ACTIONS_CLASS,
+	useCollapsedPrimaryActions,
+} from './use-collapsed-primary-actions';
 import getDataByGroup from '../utils/get-data-by-group';
 import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
@@ -89,6 +93,7 @@ interface TableRowProps< Item > {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isActionsColumnSticky?: boolean;
+	hasCollapsiblePrimaryActions?: boolean;
 	posinset?: number;
 }
 
@@ -137,6 +142,7 @@ function TableRow< Item >( {
 	onMouseDown,
 	onClickCapture,
 	isActionsColumnSticky,
+	hasCollapsiblePrimaryActions,
 	posinset,
 }: TableRowProps< Item > ) {
 	const { paginationInfo } = useContext( DataViewsContext );
@@ -254,7 +260,13 @@ function TableRow< Item >( {
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
 				>
-					<ItemActions item={ item } actions={ actions } />
+					<ItemActions
+						item={ item }
+						actions={ actions }
+						hasCollapsiblePrimaryActions={
+							hasCollapsiblePrimaryActions
+						}
+					/>
 				</td>
 			) }
 		</tr>
@@ -372,6 +384,17 @@ function ViewTable< Item >( {
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
 		enabledHorizontal: !! actions?.length,
+	} );
+
+	const tableRef = useRef< HTMLTableElement >( null );
+	const hasPrimaryActions = !! actions?.some(
+		( action ) => action.isPrimary
+	);
+	const isPrimaryActionsCollapsed = useCollapsedPrimaryActions( {
+		tableRef,
+		containerRef,
+		enabled: hasPrimaryActions,
+		contentDeps: [ data, fields, view, actions ],
 	} );
 
 	const disableHeaderControls = showBulkActions;
@@ -509,7 +532,10 @@ function ViewTable< Item >( {
 					'has-bulk-actions': hasBulkActions,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 					'has-media-aspect-ratio': !! mediaAspectRatio,
+					[ COLLAPSED_PRIMARY_ACTIONS_CLASS ]:
+						isPrimaryActionsCollapsed,
 				} ) }
+				ref={ tableRef }
 				style={ tableStyle }
 				aria-busy={ isLoading }
 				aria-describedby={ tableNoticeId }
@@ -743,6 +769,9 @@ function ViewTable< Item >( {
 											onClickItem={ onClickItem }
 											renderItemLink={ renderItemLink }
 											isItemClickable={ isItemClickable }
+											hasCollapsiblePrimaryActions={
+												hasPrimaryActions
+											}
 											isActionsColumnSticky={
 												! isHorizontalScrollEnd
 											}
@@ -784,6 +813,9 @@ function ViewTable< Item >( {
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
+										hasCollapsiblePrimaryActions={
+											hasPrimaryActions
+										}
 										isActionsColumnSticky={
 											! isHorizontalScrollEnd
 										}
