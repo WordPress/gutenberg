@@ -460,20 +460,22 @@ The PHP callback receives three parameters:
 
 The JavaScript callback receives the same viewports and attributes, followed by the block's `clientId`.
 
+A block that doesn't reference a menu shows a fallback menu. The editor saves the fallback's ID in `ref`, but on the front end `ref` stays empty, so the two filters can receive different attributes for the same block. Decide based on the current language or another value that is the same in both places, rather than on `ref`.
+
 The callback must return one of the following:
 
 - An array in PHP, or an object in JavaScript, with boolean `mobile`, `tablet` and `desktop` keys. `true` shows the overlay in that viewport, and `false` shows the links inline. The viewports use the theme's `settings.viewport` breakpoints.
 - `null`, for the default Mobile setting, which collapses the menu below a fixed width of 600px. This is not the same as `{ mobile: true, tablet: false, desktop: false }`, which uses the theme's mobile breakpoint.
 
-Any other value is ignored. The filters don't run for Navigation blocks inside an overlay, which never show their own overlay.
+Any other value is ignored. The filters don't run for Navigation blocks inside an overlay template part or the block's overlay preview, which never show their own overlay.
 
-In the editor the filter runs on every render of every Navigation block, so keep the callback cheap and free of side effects, and don't change the attributes it receives. It runs inside `useSelect`, so a callback that reads a data store with `select()` updates the block when that store changes. If the callback depends on state outside a data store, re-render the block when that state changes, for example from an `editor.BlockEdit` filter limited to `core/navigation`.
+In the editor the filter runs on every render of every Navigation block, so keep the callback cheap and free of side effects, and don't change the attributes it receives. It runs inside `useSelect`, so a callback that reads a data store with `select()` updates the block when that store changes. If the callback depends on state outside a data store, re-render the block when that state changes, for example from an `editor.BlockEdit` filter limited to `core/navigation`. Adding or removing a callback doesn't re-render blocks that are already showing, so register it before the editor loads.
 
-The following example collapses menus on tablets as well as phones when the language is German. `example_get_current_language()` stands in for however your plugin knows the current language.
+The following example collapses menus on tablets as well as phones when the language is German. It only changes blocks on the default Mobile setting, so a menu set to Off, Tablet or Always keeps its setting. `example_get_current_language()` stands in for however your plugin knows the current language.
 
 ```php
 function example_navigation_overlay_viewports( $overlay_viewports ) {
-	if ( 'de' === example_get_current_language() ) {
+	if ( null === $overlay_viewports && 'de' === example_get_current_language() ) {
 		return array(
 			'mobile'  => true,
 			'tablet'  => true,
@@ -492,7 +494,7 @@ wp.hooks.addFilter(
 	'my-plugin/navigation-overlay-viewports',
 	( overlayViewports ) => {
 		const language = wp.data.select( 'my-plugin/language' ).getLanguage();
-		if ( language === 'de' ) {
+		if ( overlayViewports === null && language === 'de' ) {
 			return { mobile: true, tablet: true, desktop: false };
 		}
 		return overlayViewports;
