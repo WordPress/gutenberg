@@ -604,6 +604,7 @@ jobs:
             # so that each writes a report of its own, and the strict paths are analyzed even when the
             # whole codebase has errors.
             - name: Run PHPStan
+              id: phpstan
               run: |
                   status=0
                   composer phpstan:default -- --error-format=json --no-progress > "${RUNNER_TEMP}/phpstan-report.json" || status=$?
@@ -624,9 +625,10 @@ jobs:
 
             # Only runs on trunk save a cache. One saved for a pull request could only be restored by
             # that pull request, so it would mostly use up the repository's cache storage, and push
-            # out the caches that every run restores.
+            # out the caches that every run restores. The cache is saved even when the analysis of the
+            # strict paths did not complete, since the other analysis's result cache is still valid.
             - name: Save PHPStan result cache
-              if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
+              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/trunk' }}
               uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
               with:
                   path: .cache/phpstan
@@ -635,21 +637,26 @@ jobs:
             # The report script is TypeScript, which Node runs by stripping the types, so it needs the
             # repository's Node version rather than the runner's default, and the npm version that
             # package.json requires to run it. It imports nothing outside Node, so the dependencies
-            # are not installed.
+            # are not installed. Node.js is set up even when the analysis of the strict paths did not
+            # complete, so that the results of the other analysis are still reported.
             - name: Use desired version of Node.js
+              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
               uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
               with:
                   node-version-file: .nvmrc
                   package-manager-cache: false
 
             - name: Set up npm
+              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
               uses: ./.github/setup-npm
               with:
                   cache: false
 
             # Annotates the errors and lists all of them in the job summary, including those on lines
             # the pull request did not change and those with no line, such as an out-of-date baseline.
+            # Runs even when the analysis of the strict paths did not complete.
             - name: Report the PHPStan results
+              if: ${{ ! cancelled() && steps.phpstan.outcome == 'success' }}
               run: npm run --workspace @wordpress/phpstan-tools report -- "${RUNNER_TEMP}/phpstan-report.json"
 
             # Runs even when the previous step failed because the whole codebase has errors, so that
