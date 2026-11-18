@@ -24,12 +24,12 @@ export interface DeferredUpdateQueue {
 	flush: () => void;
 
 	/**
-	 * Remove the items of one document from the queue without applying
-	 * them, and return them in the order they were added.
+	 * Get the items of one document in the order they were added. The returned
+	 * items can be updated without changing their positions in the queue.
 	 *
 	 * @param key Identifies the document.
 	 */
-	take: ( key: string ) => DeferredUpdate[];
+	get: ( key: string ) => DeferredUpdate[];
 }
 
 /**
@@ -46,7 +46,7 @@ export interface DeferredUpdateQueue {
 export function createDeferredUpdateQueue(
 	apply: ( item: DeferredUpdate ) => void
 ): DeferredUpdateQueue {
-	let queue: Array< { key: string; item: DeferredUpdate } > = [];
+	const queue: Array< { key: string; item: DeferredUpdate } > = [];
 	let isFlushing = false;
 
 	function flush(): void {
@@ -78,14 +78,10 @@ export function createDeferredUpdateQueue(
 			setTimeout( flush, 0 );
 		},
 		flush,
-		take( key ) {
-			const taken = queue.filter( ( entry ) => entry.key === key );
-
-			if ( taken.length > 0 ) {
-				queue = queue.filter( ( entry ) => entry.key !== key );
-			}
-
-			return taken.map( ( entry ) => entry.item );
+		get( key ) {
+			return queue
+				.filter( ( entry ) => entry.key === key )
+				.map( ( entry ) => entry.item );
 		},
 	};
 }
@@ -99,11 +95,6 @@ export interface DeferredUpdate {
 	objectType: ObjectType;
 	options: SyncManagerUpdateOptions;
 	origin: string;
+	/** The changes converted to Yjs operations before a remote update. */
+	update?: Uint8Array;
 }
-
-/**
- * The operations of one deferred update, as a Yjs update.
- */
-export type RebasedUpdate = Omit< DeferredUpdate, 'changes' > & {
-	update: Uint8Array;
-};

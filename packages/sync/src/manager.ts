@@ -7,10 +7,7 @@ import {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 import { logPerformanceTiming, passThru } from './performance';
-import {
-	createDeferredUpdateQueue,
-	type RebasedUpdate,
-} from './deferred-updates';
+import { createDeferredUpdateQueue } from './deferred-updates';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -86,8 +83,15 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Local updates that are kept off the typing hot path (#79964).
 	const deferredUpdates = createDeferredUpdateQueue(
-		( { objectType, objectId, changes, origin, options } ) =>
-			updateCRDTDoc( objectType, objectId, changes, origin, options )
+		( { objectType, objectId, changes, origin, options, update } ) =>
+			updateCRDTDoc(
+				objectType,
+				objectId,
+				changes,
+				origin,
+				options,
+				update
+			)
 	);
 
 	/**
@@ -371,72 +375,41 @@ export function createSyncManager( debug = false ): SyncManager {
 		recordMap.observeDeep( onRecordUpdate );
 		stateMap.observe( onStateMapUpdate );
 
-		let rebasedUpdates: RebasedUpdate[] = [];
-
 		ydoc.on( 'beforeTransaction', ( transaction: Y.Transaction ) => {
 			if ( transaction.local ) {
 				return;
 			}
 
-			const updates = deferredUpdates.take( entityId );
+			const updates = deferredUpdates.get( entityId );
 
-			if ( 0 === updates.length ) {
+			if ( updates.every( ( item ) => item.update ) ) {
 				return;
 			}
 
 			const copy = new Y.Doc();
 			Y.applyUpdateV2( copy, Y.encodeStateAsUpdateV2( ydoc ) );
 
-			rebasedUpdates = updates.map( ( { changes, ...rest } ) => {
-				const stateVector = Y.encodeStateVector( copy );
+			try {
+				for ( const item of updates ) {
+					if ( item.update ) {
+						Y.applyUpdateV2( copy, item.update );
+						continue;
+					}
 
-				copy.transact( () => {
-					syncConfig.applyChangesToCRDTDoc( copy, changes );
-				} );
-
-				return {
-					...rest,
-					update: Y.encodeStateAsUpdateV2( copy, stateVector ),
-				};
-			} );
-
-			copy.destroy();
-		} );
-
-		ydoc.on( 'afterTransaction', ( transaction: Y.Transaction ) => {
-			if ( transaction.local || 0 === rebasedUpdates.length ) {
-				return;
-			}
-
-			for ( const update of rebasedUpdates ) {
-				if ( update.options.isNewUndoLevel ) {
-					undoManager.stopCapturing();
-				}
-
-				// The origin makes the undo manager track the operations and
-				// makes providers send them. The transaction is not local, so
-				// observers of remote changes also see the merged result.
-				Y.applyUpdateV2( ydoc, update.update, update.origin );
-
-				// A save also marks the document as saved. The mark holds
-				// this editor's client ID, so it is a local write. Wait
-				// until Yjs has finished the transaction above: a local
-				// write before that would look to Yjs like another client
-				// with this editor's client ID.
-				if ( update.options.isSave ) {
-					ydoc.once( 'afterAllTransactions', () => {
-						updateCRDTDoc(
-							update.objectType,
-							update.objectId,
-							{},
-							update.origin,
-							{ isSave: true }
-						);
+					const stateVector = Y.encodeStateVector( copy );
+					copy.transact( () => {
+						syncConfig.applyChangesToCRDTDoc( copy, item.changes );
 					} );
+					item.update = Y.encodeStateAsUpdateV2( copy, stateVector );
 				}
+			} finally {
+				copy.destroy();
 			}
 
-			rebasedUpdates = [];
+			// Keep the shared queue's order, including edits to other entities.
+			// Wait for Yjs to finish so each update's undo callbacks run before
+			// the next update can close its undo level.
+			ydoc.once( 'afterAllTransactions', deferredUpdates.flush );
 		} );
 
 		hasObserversAttached = true;
@@ -757,13 +730,15 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
 	 * @param {boolean}                  options.isSave         Whether this update represents a user-facing entity save.
 	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
+	 * @param {Uint8Array}               update                 Changes already converted to Yjs operations before a remote update.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		options: SyncManagerUpdateOptions = {}
+		options: SyncManagerUpdateOptions = {},
+		update?: Uint8Array
 	): void {
 		const { isSave = false, isNewUndoLevel = false } = options;
 		const entityId = getEntityId( objectType, objectId );
@@ -782,16 +757,27 @@ export function createSyncManager( debug = false ): SyncManager {
 				undoManager.stopCapturing();
 			}
 
-			ydoc.transact( () => {
-				log( 'updateCRDTDoc', 'applying changes', entityId, {
-					changedKeys: Object.keys( changes ),
-				} );
-				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+			// Applying the converted operations with the local origin preserves
+			// undo tracking and provider delivery. It is a non-local transaction,
+			// so record observers also receive the merged content.
+			if ( update ) {
+				Y.applyUpdateV2( ydoc, update, origin );
+			}
 
-				if ( isSave ) {
-					markEntityAsSaved( ydoc );
-				}
-			}, origin );
+			if ( ! update || isSave ) {
+				ydoc.transact( () => {
+					log( 'updateCRDTDoc', 'applying changes', entityId, {
+						changedKeys: Object.keys( changes ),
+					} );
+					if ( ! update ) {
+						syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+					}
+
+					if ( isSave ) {
+						markEntityAsSaved( ydoc );
+					}
+				}, origin );
+			}
 		}
 
 		if ( collectionState && isSave ) {

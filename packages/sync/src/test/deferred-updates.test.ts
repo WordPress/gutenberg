@@ -71,7 +71,7 @@ describe( 'createDeferredUpdateQueue', () => {
 		expect( applied ).toEqual( [ 'a1', 'a2' ] );
 	} );
 
-	it( 'takes the updates of one key and leaves the others', () => {
+	it( 'updates the items of one key without changing their queue positions', () => {
 		const { applied, queue } = createQueue();
 		const a1 = createUpdate( 'a', 'a1' );
 		const a2 = createUpdate( 'a', 'a2' );
@@ -80,10 +80,13 @@ describe( 'createDeferredUpdateQueue', () => {
 		queue.defer( 'b', createUpdate( 'b', 'b1' ) );
 		queue.defer( 'a', a2 );
 
-		expect( queue.take( 'a' ) ).toEqual( [ a1, a2 ] );
-		expect( queue.take( 'a' ) ).toEqual( [] );
+		expect( queue.get( 'a' ) ).toEqual( [ a1, a2 ] );
+		for ( const item of queue.get( 'a' ) ) {
+			item.changes.title += ' updated';
+		}
 
 		vi.runAllTimers();
-		expect( applied ).toEqual( [ 'b1' ] );
+		expect( applied ).toEqual( [ 'a1 updated', 'b1', 'a2 updated' ] );
+		expect( queue.get( 'a' ) ).toEqual( [] );
 	} );
 } );
