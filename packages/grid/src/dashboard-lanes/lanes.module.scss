@@ -1,7 +1,27 @@
-.grid {
-	display: grid;
-	gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
+@use "@wordpress/base-styles/variables";
+
+.lanes {
+	display: grid-lanes;
+	column-gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
+	row-gap: var(--wp-grid-gap, var(--wpds-dimension-gap-xl));
 	position: relative;
+}
+
+/*
+ * Polyfill fallback. The hook computes per-item `grid-column-start`
+ * and `grid-row-start`/`grid-row-end: span N` against this row unit.
+ * The skyline already builds inter-item vertical spacing into each
+ * tile's `top`, so `row-gap` must be zero here to avoid compounding
+ * on top of the algorithm's spacing. `grid-auto-flow: dense` is a
+ * safety net; the algorithm drives placement.
+ */
+@supports not (display: grid-lanes) {
+	.lanes {
+		display: grid;
+		grid-auto-rows: var(--wp-grid-lane-row-unit, 4px);
+		grid-auto-flow: dense;
+		row-gap: 0;
+	}
 }
 
 /*
@@ -14,22 +34,11 @@
  * the shadow strengthens while dragging so it reads above edit tiles.
  */
 .drag-preview-frame {
-	--_wp-grid-elevation-xs:
-		0 1px 1px rgba(0, 0, 0, 0.03),
-		0 1px 2px rgba(0, 0, 0, 0.02),
-		0 3px 3px rgba(0, 0, 0, 0.02),
-		0 4px 4px rgba(0, 0, 0, 0.01);
-	--_wp-grid-elevation-md:
-		0 2px 3px rgba(0, 0, 0, 0.05),
-		0 4px 5px rgba(0, 0, 0, 0.04),
-		0 12px 12px rgba(0, 0, 0, 0.03),
-		0 16px 16px rgba(0, 0, 0, 0.02);
-
 	height: 100%;
 	border-radius: var(--wp-grid-drag-preview-radius, 0);
 	cursor: grabbing;
 	pointer-events: none;
-	box-shadow: var(--_wp-grid-elevation-md);
+	box-shadow: variables.$elevation-medium;
 }
 
 .drag-preview-frame__lift {
@@ -55,11 +64,11 @@
 @media not (prefers-reduced-motion: reduce) {
 	@keyframes wp-grid-drag-preview-shadow-enter {
 		from {
-			box-shadow: var(--_wp-grid-elevation-xs);
+			box-shadow: variables.$elevation-x-small;
 		}
 
 		to {
-			box-shadow: var(--_wp-grid-elevation-md);
+			box-shadow: variables.$elevation-medium;
 		}
 	}
 
@@ -98,11 +107,11 @@
 
 	@keyframes wp-grid-drag-preview-shadow-exit {
 		from {
-			box-shadow: var(--_wp-grid-elevation-md);
+			box-shadow: variables.$elevation-medium;
 		}
 
 		to {
-			box-shadow: var(--_wp-grid-elevation-xs);
+			box-shadow: variables.$elevation-x-small;
 		}
 	}
 
@@ -118,7 +127,7 @@
 }
 
 .drag-preview-frame.is-exiting {
-	box-shadow: var(--_wp-grid-elevation-xs);
+	box-shadow: variables.$elevation-x-small;
 }
 
 .drag-preview-frame.is-exiting .drag-preview-frame__lift {
@@ -127,7 +136,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.drag-preview-frame {
-		box-shadow: var(--_wp-grid-elevation-md);
+		box-shadow: variables.$elevation-medium;
 	}
 
 	.drag-preview-frame__lift {
@@ -135,7 +144,7 @@
 	}
 
 	.drag-preview-frame.is-exiting {
-		box-shadow: var(--_wp-grid-elevation-xs);
+		box-shadow: variables.$elevation-x-small;
 		transition: none;
 	}
 

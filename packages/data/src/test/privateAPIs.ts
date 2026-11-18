@@ -1,37 +1,47 @@
+import type { AnyAction } from 'redux';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createRegistry } from '../registry';
 import createReduxStore from '../redux-store';
 import { unlock } from '../lock-unlock';
 import { createRegistrySelector } from '../factory';
+import type { DataRegistry, ThunkArgs } from '../types';
 
 describe( 'Private data APIs', () => {
-	let registry;
+	let registry: DataRegistry;
 
 	beforeEach( () => {
 		registry = createRegistry();
 	} );
 
-	function getPublicPrice( state ) {
+	interface GroceryState {
+		price: number;
+		secretDiscount: number;
+	}
+
+	function getPublicPrice( state: GroceryState ) {
 		return state.price;
 	}
-	function getSecretDiscount( state ) {
+	function getSecretDiscount( state: GroceryState ) {
 		return state.secretDiscount;
 	}
-	function setSecretDiscount( price ) {
+	function setSecretDiscount( price: number ) {
 		return { type: 'SET_PRIVATE_PRICE', price };
 	}
 
-	function setPublicPrice( price ) {
+	function setPublicPrice( price: number ) {
 		return { type: 'SET_PUBLIC_PRICE', price };
 	}
 	const storeName = 'grocer';
 	const storeDescriptor = {
 		selectors: {
 			getPublicPrice,
-			getState: ( state ) => state,
+			getState: ( state: GroceryState ) => state,
 		},
 		actions: { setPublicPrice },
-		reducer: ( state = { price: 1000, secretDiscount: 800 }, action ) => {
+		reducer: (
+			state: GroceryState = { price: 1000, secretDiscount: 800 },
+			action: AnyAction
+		) => {
 			if ( action.type === 'SET_PRIVATE_PRICE' ) {
 				return {
 					...state,
@@ -72,6 +82,7 @@ describe( 'Private data APIs', () => {
 			} );
 
 			const publicSelectors = registry.select( groceryStore );
+			// @ts-expect-error Private selectors should not exist on public store.
 			expect( publicSelectors.getSecretDiscount ).toEqual( undefined );
 		} );
 
@@ -93,26 +104,31 @@ describe( 'Private data APIs', () => {
 
 		it( 'should support combination of private selectors and resolvers', async () => {
 			const testStore = createReduxStore( 'test', {
-				reducer: ( state = {}, action ) => {
+				reducer: (
+					state: Record< string, string > = {},
+					action: AnyAction
+				) => {
 					if ( action.type === 'RECEIVE' ) {
 						return { ...state, [ action.key ]: action.value };
 					}
 					return state;
 				},
 				selectors: {
-					get: ( state, key ) => state[ key ],
+					get: ( state: Record< string, string >, key: string ) =>
+						state[ key ],
 				},
 				resolvers: {
 					get:
-						( key ) =>
-						async ( { dispatch } ) => {
+						( key: string ) =>
+						async ( { dispatch }: ThunkArgs ) => {
 							const value = await ( 'resolved-' + key );
 							dispatch( { type: 'RECEIVE', key, value } );
 						},
 				},
 			} );
 			unlock( testStore ).registerPrivateSelectors( {
-				peek: ( state, key ) => state[ key ],
+				peek: ( state: Record< string, string >, key: string ) =>
+					state[ key ],
 			} );
 			registry.register( testStore );
 
@@ -124,7 +140,10 @@ describe( 'Private data APIs', () => {
 
 		it( 'should support private selectors with resolvers', async () => {
 			const testStore = createReduxStore( 'test', {
-				reducer: ( state = {}, action ) => {
+				reducer: (
+					state: Record< string, string > = {},
+					action: AnyAction
+				) => {
 					if ( action.type === 'RECEIVE' ) {
 						return { ...state, [ action.key ]: action.value };
 					}
@@ -133,8 +152,8 @@ describe( 'Private data APIs', () => {
 				selectors: {},
 				resolvers: {
 					get:
-						( key ) =>
-						async ( { dispatch } ) => {
+						( key: string ) =>
+						async ( { dispatch }: ThunkArgs ) => {
 							const value = await ( 'resolved-' + key );
 							dispatch( { type: 'RECEIVE', key, value } );
 						},
@@ -142,7 +161,8 @@ describe( 'Private data APIs', () => {
 			} );
 			registry.register( testStore );
 			unlock( testStore ).registerPrivateSelectors( {
-				get: ( state, key ) => state[ key ],
+				get: ( state: Record< string, string >, key: string ) =>
+					state[ key ],
 			} );
 
 			// Verify that the private selector is available in resolveSelect.
@@ -264,13 +284,15 @@ describe( 'Private data APIs', () => {
 
 		it( 'should support calling a private registry selector from a public selector', () => {
 			const groceryStore = createStore();
-			const getPriceWithShipping = createRegistrySelector(
+			const getPriceWithShipping = createRegistrySelector<
+				( state?: object ) => number
+			>(
 				( select ) => () => select( groceryStore ).getPublicPrice() + 5
 			);
 			const store = createReduxStore( 'a', {
 				reducer: ( state = {} ) => state,
 				selectors: {
-					getPriceWithShippingAndTax: ( state ) =>
+					getPriceWithShippingAndTax: ( state: object ) =>
 						getPriceWithShipping( state ) * 1.1,
 				},
 			} );
@@ -302,6 +324,7 @@ describe( 'Private data APIs', () => {
 				setSecretDiscount,
 			} );
 			const publicActions = registry.dispatch( groceryStore );
+			// @ts-expect-error Private actions should not exist on public store.
 			expect( publicActions.setSecretDiscount ).toEqual( undefined );
 		} );
 
@@ -376,8 +399,8 @@ describe( 'Private data APIs', () => {
 			const groceryStore = createStore();
 			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscountThunk:
-					( price ) =>
-					( { dispatch } ) => {
+					( price: number ) =>
+					( { dispatch }: ThunkArgs ) => {
 						dispatch( { type: 'SET_PRIVATE_PRICE', price } );
 					},
 			} );
@@ -399,7 +422,7 @@ describe( 'Private data APIs', () => {
 			unlock( groceryStore ).registerPrivateActions( {
 				setSecretDiscount,
 				doubleSecretDiscount() {
-					return ( { dispatch, select } ) => {
+					return ( { dispatch, select }: ThunkArgs ) => {
 						dispatch.setSecretDiscount(
 							select.getSecretDiscount() * 2
 						);
