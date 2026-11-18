@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   `Warning`: Move the z-index of the secondary actions dropdown from the content styles to the main stylesheet, since the dropdown renders outside the editor canvas ([#86011](https://github.com/WordPress/gutenberg/pull/86011)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
