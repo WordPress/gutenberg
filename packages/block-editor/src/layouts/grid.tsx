@@ -16,6 +16,7 @@ import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/util
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 import type {
+	Layout,
 	LayoutAlignment,
 	LayoutControlProps,
 	LayoutInspectorControlsProps,
@@ -311,8 +312,11 @@ export default {
 		}
 
 		if ( shouldOutputGridRows ) {
+			// The aspect ratio gives empty rows a height, so cells are roughly
+			// square. Rows still grow if their content is taller.
 			rules.push(
-				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
+				`grid-template-rows: repeat(${ rowCount }, minmax(1rem, 1fr))`,
+				`aspect-ratio: ${ columnCount } / ${ rowCount }`
 			);
 		}
 
@@ -335,6 +339,13 @@ export default {
 	},
 	getOrientation(): string {
 		return 'horizontal';
+	},
+	// Blocks in a manual grid can overlap, so their toolbars show over the grid.
+	capturesToolbars( layout?: Layout ): boolean {
+		return (
+			!! layout?.isManualPlacement &&
+			!! window.__experimentalEnableGridInteractivity
+		);
 	},
 	getAlignments(): LayoutAlignment[] {
 		return [];
