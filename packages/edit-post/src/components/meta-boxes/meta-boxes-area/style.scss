@@ -98,6 +98,12 @@
 	}
 }
 
+// The drag helper is rendered in the body, above the editor. Don't let it add
+// scrollbars to the page when it overflows the viewport.
+body.is-dragging-metaboxes {
+	overflow: hidden;
+}
+
 .edit-post-meta-boxes-area__clear {
 	clear: both;
 }
