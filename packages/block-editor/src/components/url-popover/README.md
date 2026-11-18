@@ -202,6 +202,20 @@ Reference passed to the auto complete element of the ([URLInput component](/pack
 -   Type: `Object`
 -   Required: no
 
+### customValidity
+
+Validity of the URL, passed to the `URLInput` component. When its `type` is `'invalid'`, its `message` is shown as an error on the input.
+
+-   Type: `Object`
+-   Required: no
+
+### inputRef
+
+Reference to the URL input element, passed to the `URLInput` component. For example, to call `reportValidity()` on it.
+
+-   Type: `Object`
+-   Required: no
+
 ### position
 
 _Note: this prop is deprecated. Please use the `placement` prop instead._

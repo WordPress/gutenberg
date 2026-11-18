@@ -33,6 +33,7 @@
 -   Announce a keyboard shortcut move only when the block changes position ([#86785](https://github.com/WordPress/gutenberg/pull/86785)).
 -   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
 -   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
+-   Image link settings: Validate the link URL the same way as `LinkControl`, in the Image and Media & Text blocks. An invalid URL, such as a shortcode, now shows "Please enter a valid URL." instead of being saved with `https://` in front of it ([#86736](https://github.com/WordPress/gutenberg/pull/86736)).
 
 ### Internal
 

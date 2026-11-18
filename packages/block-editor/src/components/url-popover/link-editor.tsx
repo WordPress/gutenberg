@@ -8,6 +8,8 @@ import type { URLPopoverLinkEditorProps } from './types';
 export default function LinkEditor( {
 	autocompleteRef,
 	className,
+	customValidity,
+	inputRef,
 	onChangeInputValue,
 	value,
 	...props
@@ -24,6 +26,8 @@ export default function LinkEditor( {
 				value={ value }
 				onChange={ onChangeInputValue }
 				autocompleteRef={ autocompleteRef }
+				customValidity={ customValidity }
+				inputRef={ inputRef }
 			/>
 			<Button
 				icon={ keyboardReturn }

@@ -18,7 +18,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import { isURL, prependHTTPS } from '@wordpress/url';
 import { useNativeUndo } from '../../utils/native-undo';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
@@ -28,8 +27,8 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
-import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
 import normalizeUrl from './normalize-url';
+import validateUrl from './validate-url';
 import type {
 	LinkControlProps,
 	LinkControlSuggestion,
@@ -282,55 +281,6 @@ function LinkControl( {
 	 */
 	const stopEditing = () => {
 		setIsEditingLink( false );
-	};
-
-	/**
-	 * Validates a URL string using a multi-stage validation process.
-	 * This helper consolidates URL validation logic used throughout the component.
-	 *
-	 * @param urlToValidate - The URL string to validate
-	 * @return Validation result with isValid boolean and optional errorMessage
-	 */
-	const validateUrl = (
-		urlToValidate: string | null | undefined
-	): LinkControlValidity => {
-		const invalidResult: LinkControlValidity = {
-			type: 'invalid',
-			message: __( 'Please enter a valid URL.' ),
-		};
-
-		const validResult: LinkControlValidity = {
-			type: 'valid',
-		};
-
-		const trimmedValue = urlToValidate?.trim();
-
-		// If empty or not URL-like, return invalid
-		if ( ! trimmedValue?.length || ! isURLLike( trimmedValue ) ) {
-			return invalidResult;
-		}
-
-		// Hash links (internal anchor links) and relative paths (/, ./, ../) are
-		// valid href values but cannot be validated by the native URL constructor
-		// (which requires absolute URLs). These are already validated by isURLLike.
-		// Skip URL constructor validation for these cases.
-		if ( isHashLink( trimmedValue ) || isRelativePath( trimmedValue ) ) {
-			return validResult;
-		}
-
-		// Perform URL validation using the native URL constructor as the authoritative source.
-		// The native URL constructor is the standard for URL validity - if it accepts a URL,
-		// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
-		// prepend "http://" before validating, as the URL constructor requires a protocol.
-		//
-		// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
-		// URL constructor, so we don't need special handling for them.
-		//
-		// Note: We rely on the native URL constructor rather than implementing custom TLD
-		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
-		// it's technically valid according to web standards.
-		const urlToCheck = prependHTTPS( trimmedValue );
-		return isURL( urlToCheck ) ? validResult : invalidResult;
 	};
 
 	const handleSelectSuggestion = ( updatedValue: LinkControlSuggestion ) => {
