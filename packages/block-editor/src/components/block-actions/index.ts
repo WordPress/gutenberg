@@ -56,8 +56,9 @@ export default function BlockActions( {
 		},
 		[ clientIds, getDefaultBlockName ]
 	);
-	const { getBlocksByClientId, getBlocks } = useSelect( blockEditorStore );
-	const { areBlocksContiguous } = unlock( useSelect( blockEditorStore ) );
+	const { getBlocksByClientId, getBlocks, areBlocksContiguous } = unlock(
+		useSelect( blockEditorStore )
+	);
 
 	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
 
@@ -90,6 +91,7 @@ export default function BlockActions( {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onGroup() {
+			// A group replaces one sibling run without relocating blocks across gaps or parents.
 			if ( ! clientIds.length || ! areBlocksContiguous( clientIds ) ) {
 				return;
 			}

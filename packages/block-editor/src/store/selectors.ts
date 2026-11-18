@@ -29,7 +29,6 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
-	areBlocksContiguous,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -46,6 +45,7 @@ import {
 	getClientIdsTree,
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleStateViewport,
+	areBlocksContiguous,
 } from './private-selectors';
 import type {
 	InserterItem,
@@ -2263,6 +2263,7 @@ export function canMoveBlock( state: State, clientId: string ) {
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
 export function canMoveBlocks( state: State, clientIds: string[] ) {
+	// Movers shift one sibling run; gathering scattered blocks is a separate drag operation.
 	return (
 		areBlocksContiguous( state, clientIds ) &&
 		clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) )
@@ -3727,6 +3728,7 @@ export const isGroupable = createRegistrySelector(
 			const _clientIds = clientIds?.length
 				? clientIds
 				: getSelectedBlockClientIds( state );
+			// One group replaces one sibling run; grouping scattered blocks would relocate them.
 			if ( ! areBlocksContiguous( state, _clientIds ) ) {
 				return false;
 			}

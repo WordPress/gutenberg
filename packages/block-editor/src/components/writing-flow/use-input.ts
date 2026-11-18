@@ -20,8 +20,8 @@ import type { WritingFlowKeyEvent } from './types';
  * Handles input for selections across blocks.
  */
 export default function useInput() {
-	const { isSelectionContiguous } = unlock( useSelect( blockEditorStore ) );
 	const {
+		isSelectionContiguous,
 		__unstableIsFullySelected,
 		getSelectedBlockClientIds,
 		getSelectedBlockClientId,
@@ -37,7 +37,7 @@ export default function useInput() {
 		getBlockOrder,
 		getBlockEditingMode,
 		getBlockListSettings,
-	} = useSelect( blockEditorStore );
+	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		replaceBlocks,
 		__unstableSplitSelection,
@@ -286,6 +286,7 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
+				// Enter replaces or splits one range; scattered blocks have no single insertion point.
 				if ( ! isSelectionContiguous() ) {
 					event.preventDefault();
 					return;

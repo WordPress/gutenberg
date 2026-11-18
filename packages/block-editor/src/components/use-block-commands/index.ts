@@ -23,6 +23,7 @@ import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
 import type { TransformCommandItem, TransformCommandsSelection } from './types';
+import type { BlockEditorThunkArgs } from '../../store/types';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -40,16 +41,16 @@ const getTransformCommands = () =>
 				getSelectedBlockClientIds,
 				getBlocksByClientId,
 				canRemoveBlocks,
-			} = select( blockEditorStore );
+				isSelectionContiguous,
+			} = unlock< BlockEditorThunkArgs[ 'select' ] >(
+				select( blockEditorStore )
+			);
 
-			const selectedBlockClientIds = getSelectedBlockClientIds();
-			if (
-				! unlock( select( blockEditorStore ) ).areBlocksContiguous(
-					selectedBlockClientIds
-				)
-			) {
+			// Transforms replace blocks at one location, so scattered selections are unsupported.
+			if ( ! isSelectionContiguous() ) {
 				return { invalidSelection: true };
 			}
+			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
 			);
@@ -191,8 +192,8 @@ const getQuickActionsCommands = () =>
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
 			canDuplicateBlocks,
+			getBlockEditingMode,
 		} = unlock( useSelect( blockEditorStore ) );
-		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 

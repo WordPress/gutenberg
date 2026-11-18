@@ -29,26 +29,6 @@ type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
 
-/**
- * Checks whether target IDs form one contiguous sibling run, in any input order.
- *
- * @param state     Editor state.
- * @param clientIds Target block IDs.
- * @return Whether the blocks form a single sibling run.
- */
-export function areBlocksContiguous( state: State, clientIds: string[] ) {
-	if ( clientIds.length < 2 ) {
-		return true;
-	}
-	const parent = state.blocks.parents.get( clientIds[ 0 ] );
-	const order = state.blocks.order.get( parent ?? '' ) ?? [];
-	const indices = clientIds.map( ( id ) => order.indexOf( id ) );
-	return (
-		new Set( clientIds ).size === clientIds.length &&
-		indices.every( ( index ) => index !== -1 ) &&
-		Math.max( ...indices ) - Math.min( ...indices ) + 1 === clientIds.length
-	);
-}
 const parsedPatternCache = new WeakMap< BlockPattern, ParsedBlockPattern >();
 const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 

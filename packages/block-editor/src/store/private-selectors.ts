@@ -30,7 +30,6 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
-	areBlocksContiguous,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -56,7 +55,32 @@ const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
-export { areBlocksContiguous } from './utils';
+
+/**
+ * Checks whether target IDs form one contiguous sibling run, in any input order.
+ *
+ * @param state     Editor state.
+ * @param clientIds Target block IDs.
+ * @return Whether the blocks form a single sibling run.
+ */
+export function areBlocksContiguous( state: State, clientIds: string[] ) {
+	if ( clientIds.length < 2 ) {
+		return true;
+	}
+	// Find each target's position among the first block's siblings. A missing
+	// block or a block with a different parent has no position in this list.
+	const parent = state.blocks.parents.get( clientIds[ 0 ] );
+	const order = state.blocks.order.get( parent ?? '' ) ?? [];
+	const indices = clientIds.map( ( id ) => order.indexOf( id ) );
+	return (
+		// Require distinct siblings so duplicates or missing IDs cannot fill a gap.
+		new Set( clientIds ).size === clientIds.length &&
+		indices.every( ( index ) => index !== -1 ) &&
+		// A run has no gaps when its span equals its block count, regardless of
+		// input order: positions [ 3, 1, 2 ] span three blocks; [ 1, 3 ] do not.
+		Math.max( ...indices ) - Math.min( ...indices ) + 1 === clientIds.length
+	);
+}
 
 /**
  * Checks whether the selection is a contiguous sibling range.
