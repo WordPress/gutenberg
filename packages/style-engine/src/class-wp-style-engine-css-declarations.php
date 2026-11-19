@@ -79,14 +79,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				return $this;
 			}
 
-			/** @var array{ important: bool } $options */
-			$options = wp_parse_args(
-				$options,
-				array(
-					'important' => false,
-				)
-			);
-
+			// Only options that are set are stored, so the default of `important` is left out.
 			$options = array_filter( $options );
 
 			// Adds the declaration property/value pair.
@@ -183,18 +176,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
-				/** @var array{ important: bool } $options */
-				$options = wp_parse_args(
-					$options,
-					array(
-						'important' => false,
-					)
-				);
-
 				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 
 				// Only append !important in the presence of an option value and when sanitization returns a single declaration.
-				if ( true === $options['important'] && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+				if ( true === ( $options['important'] ?? false ) &&'' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
 					return "$filtered_declaration !important";
 				}
 
