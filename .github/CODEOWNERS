@@ -64,6 +64,10 @@
 # Project Management
 /.github                                        @desrosj
 
+# Review routing
+/.github/review-routing                         @aduth
+/tools/review-routing                           @aduth
+
 # wp-env
 /packages/env                                   @t-hamano
 
