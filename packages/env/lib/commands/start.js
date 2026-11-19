@@ -49,6 +49,7 @@ module.exports = async function start( {
 		resolvePorts: true,
 		autoPort,
 		spinner,
+		getOwnPorts: ( paths ) => runtime.getPublishedPorts?.( paths ),
 	} );
 	config.debug = debug;
 	config.xdebug = xdebug;

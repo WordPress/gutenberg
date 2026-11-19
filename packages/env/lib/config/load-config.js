@@ -36,13 +36,14 @@ const { createPortResolver } = require( '../resolve-available-ports' );
  * @param {boolean}     options.resolvePorts Whether HTTP ports should be resolved for this command.
  * @param {boolean}     options.autoPort     CLI override for automatic port selection.
  * @param {Object}      options.spinner      A CLI spinner used by the port resolver.
+ * @param {Function}    options.getOwnPorts  Returns the ports the environment publishes right now, by config path, given its paths.
  *
  * @return {Promise<WPConfig>} The config object we've loaded.
  */
 module.exports = async function loadConfig(
 	configDirectoryPath,
 	customConfigPath = null,
-	{ resolvePorts = false, autoPort, spinner } = {}
+	{ resolvePorts = false, autoPort, spinner, getOwnPorts } = {}
 ) {
 	const configFilePath = getConfigFilePath(
 		configDirectoryPath,
@@ -78,6 +79,11 @@ module.exports = async function loadConfig(
 		);
 	}
 
+	const dockerComposeConfigPath = path.resolve(
+		cacheDirectoryPath,
+		'docker-compose.yml'
+	);
+
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
 	let config = await parseConfig(
@@ -97,7 +103,12 @@ module.exports = async function loadConfig(
 		}
 
 		if ( shouldAutoPort ) {
-			portResolver = createPortResolver( spinner );
+			portResolver = createPortResolver( spinner, {
+				ownPorts: await getOwnPorts?.( {
+					workDirectoryPath: cacheDirectoryPath,
+					dockerComposeConfigPath,
+				} ),
+			} );
 		}
 	}
 
@@ -108,10 +119,7 @@ module.exports = async function loadConfig(
 
 	return {
 		name: path.basename( configDirectoryPath ),
-		dockerComposeConfigPath: path.resolve(
-			cacheDirectoryPath,
-			'docker-compose.yml'
-		),
+		dockerComposeConfigPath,
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
 		customConfigPath,

@@ -245,6 +245,45 @@ describe( 'Config Integration', () => {
 		expect( config ).toMatchSnapshot();
 	} );
 
+	it( 'should keep a running environment on the ports it publishes', async () => {
+		vi.stubEnv( 'CI', '' );
+		const net = require( 'net' );
+		const busyPorts = [ 8888, 8889, 8890 ];
+		vi.spyOn( net, 'createServer' ).mockImplementation( () => {
+			const handlers = {};
+			return {
+				once: ( event, handler ) => ( handlers[ event ] = handler ),
+				listen: ( port ) =>
+					busyPorts.includes( port )
+						? handlers.error( { code: 'EADDRINUSE' } )
+						: handlers.listening(),
+				close: ( callback ) => callback(),
+			};
+		} );
+		vi.spyOn( net, 'connect' ).mockImplementation( () => ( {
+			once: ( event, handler ) => event === 'error' && handler(),
+		} ) );
+		const getOwnPorts = vi.fn().mockResolvedValue( {
+			'env.development.port': 8889,
+			'env.tests.port': 8890,
+		} );
+
+		const config = await loadConfig( '/test/gutenberg', null, {
+			resolvePorts: true,
+			autoPort: true,
+			getOwnPorts,
+		} );
+		vi.restoreAllMocks();
+		vi.unstubAllEnvs();
+
+		expect( getOwnPorts ).toHaveBeenCalledWith( {
+			workDirectoryPath: config.workDirectoryPath,
+			dockerComposeConfigPath: config.dockerComposeConfigPath,
+		} );
+		expect( config.env.development.port ).toEqual( 8889 );
+		expect( config.env.tests.port ).toEqual( 8890 );
+	} );
+
 	describe( 'cache directory naming', () => {
 		beforeEach( () => {
 			readFile.mockImplementation( async () => {

@@ -146,6 +146,15 @@ describe( 'port-utils', () => {
 			expect( result ).toBe( 8889 );
 		} );
 
+		it( 'treats the own port as available', async () => {
+			mockPortAvailability( () => false );
+			const result = await findAvailablePort( {
+				preferredPort: 8888,
+				ownPort: 8890,
+			} );
+			expect( result ).toBe( 8890 );
+		} );
+
 		it( 'returns a port higher than the preferred port when fallback is needed', async () => {
 			mockPortAvailability( ( port ) => port !== 8888 && port !== 8889 );
 			const result = await findAvailablePort( {

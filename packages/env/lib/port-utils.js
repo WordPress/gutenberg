@@ -65,6 +65,7 @@ function isPortAnswering( port ) {
  * @param {number}   options.minPort       Minimum port for fallback scanning.
  * @param {number}   options.maxPort       Maximum port for fallback scanning.
  * @param {number[]} options.exclude       Ports to exclude from selection.
+ * @param {number}   options.ownPort       A port to treat as available without checking it.
  * @return {Promise<number>} An available port number.
  * @throws {Error} If no available port is found within the range.
  */
@@ -73,11 +74,13 @@ async function findAvailablePort( {
 	minPort = preferredPort,
 	maxPort = DEFAULT_MAX_PORT,
 	exclude = [],
+	ownPort,
 } ) {
+	const isAvailable = ( port ) => port === ownPort || isPortAvailable( port );
+
 	// Try the preferred port first if it's not excluded
 	if ( ! exclude.includes( preferredPort ) ) {
-		const isAvailable = await isPortAvailable( preferredPort );
-		if ( isAvailable ) {
+		if ( await isAvailable( preferredPort ) ) {
 			return preferredPort;
 		}
 	}
@@ -88,8 +91,7 @@ async function findAvailablePort( {
 		if ( exclude.includes( port ) ) {
 			continue;
 		}
-		const isAvailable = await isPortAvailable( port );
-		if ( isAvailable ) {
+		if ( await isAvailable( port ) ) {
 			return port;
 		}
 	}
