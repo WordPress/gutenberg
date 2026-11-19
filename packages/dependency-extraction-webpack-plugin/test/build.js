@@ -303,6 +303,7 @@ describe( 'DependencyExtractionWebpackPlugin modules rebuild', () => {
 		const stats = await run();
 		await new Promise( ( resolve ) => compiler.close( resolve ) );
 
+		// The second compilation reuses the file's module from the cache.
 		const builtFiles = Array.from(
 			stats.compilation.builtModules,
 			( { resource } ) => resource
