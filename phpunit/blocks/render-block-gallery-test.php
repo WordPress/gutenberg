@@ -505,4 +505,21 @@ class Tests_Blocks_Render_Gallery extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'object-fit:fill', $stylesheet );
 		$this->assertStringContainsString( 'display:block', $stylesheet );
 	}
+
+	public function test_static_gallery_viewport_crop_keeps_rounded_image_ratio() {
+		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		do_blocks(
+			'<!-- wp:gallery {"style":{"@mobile":{"imageCrop":true}}} --><figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"className":"is-style-rounded"} --><figure class="wp-block-image is-style-rounded"><img alt=""/></figure><!-- /wp:image --></figure><!-- /wp:gallery -->'
+		);
+		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context(
+			'block-supports',
+			array( 'prettify' => false )
+		);
+
+		$this->assertStringContainsString( '@media (width <= 480px)', $stylesheet );
+		$this->assertStringContainsString( '.is-style-rounded img', $stylesheet );
+		$this->assertStringContainsString( 'flex:0 0 auto', $stylesheet );
+		$this->assertStringContainsString( 'height:auto', $stylesheet );
+	}
 }

@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Gallery: Keep a rounded image circular when the caption beside it wraps ([#87085](https://github.com/WordPress/gutenberg/pull/87085)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 
 ## 12.2.0 (2026-11-18)

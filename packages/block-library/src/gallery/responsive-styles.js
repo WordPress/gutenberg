@@ -137,7 +137,14 @@ function getImageCropCSS( selector, imageCrop ) {
 	const mediaSelector = `${ imageSelector } a,${ imageSelector } img`;
 
 	if ( imageCrop ) {
-		return `${ imageSelector }{align-self:inherit !important;margin-bottom:0 !important;}${ wrapperSelector },${ linkSelector }{display:flex !important;}${ mediaSelector }{width:100% !important;flex:1 0 0% !important;height:100% !important;object-fit:cover !important;}`;
+		const roundedSelector = `${ imageSelector }.is-style-rounded`;
+		return [
+			`${ imageSelector }{align-self:inherit !important;margin-bottom:0 !important;}`,
+			`${ wrapperSelector },${ linkSelector }{display:flex !important;}`,
+			`${ mediaSelector }{width:100% !important;flex:1 0 0% !important;height:100% !important;object-fit:cover !important;}`,
+			`${ roundedSelector } > div:not(.components-drop-zone),${ roundedSelector } > a{display:block !important;flex:0 0 auto !important;height:auto !important;}`,
+			`${ roundedSelector } img{flex:0 0 auto !important;height:auto !important;}`,
+		].join( '' );
 	}
 
 	return `${ imageSelector }{align-self:auto !important;margin-top:0 !important;margin-bottom:auto !important;}${ wrapperSelector }{display:block !important;}${ linkSelector }{display:inline-block !important;}${ mediaSelector }{width:auto !important;flex:0 1 auto !important;height:auto !important;object-fit:fill !important;}`;

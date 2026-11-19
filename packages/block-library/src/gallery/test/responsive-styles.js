@@ -113,6 +113,21 @@ describe( 'Gallery responsive styles', () => {
 		}
 	);
 
+	it( 'does not stretch a rounded image when a viewport crops', () => {
+		const css = getGalleryResponsiveCSS(
+			'#block-test',
+			{ '@mobile': { imageCrop: true } },
+			MEDIA_QUERIES
+		);
+
+		expect( css ).toContain(
+			'.is-style-rounded > a{display:block !important;flex:0 0 auto !important;height:auto !important;}'
+		);
+		expect( css ).toContain(
+			'.is-style-rounded img{flex:0 0 auto !important;height:auto !important;}'
+		);
+	} );
+
 	it( 'removes a viewport aspect ratio that matches the base value', () => {
 		expect(
 			getUpdatedGalleryStyle( {
