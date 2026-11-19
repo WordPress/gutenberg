@@ -43,7 +43,11 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >(
 				}
 				variant="body-sm"
 			>
-				{ children }
+				{ /*
+				 * An inline block stops a link's underline from reaching the
+				 * label, even when the badge itself is a flex or grid item.
+				 */ }
+				<span className={ styles.label }>{ children }</span>
 				{ infotip && (
 					<Icon
 						icon={ help }
