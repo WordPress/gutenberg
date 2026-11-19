@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `AlignmentMatrixControl`: Show cell tooltips with the `@wordpress/ui` `Tooltip`, so they appear above `@wordpress/ui` overlays such as `Dialog` and `Popover`. Each cell's accessible name is now its translated label, such as "Top Left", instead of its untranslated value, such as "top left" ([#86807](https://github.com/WordPress/gutenberg/pull/86807)).
+
 ## 45.0.0 (2026-11-18)
 
 ### Breaking Changes
