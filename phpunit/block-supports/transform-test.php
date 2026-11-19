@@ -253,7 +253,7 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 					'translate' => array( 'x' => '1em' ),
 					'scale'     => '0.5',
 				),
-				'rotate:15deg;translate:1em 0;scale:0.5;',
+				'rotate:15deg;--wp--style--translate-x:1em;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);scale:0.5;',
 			),
 		);
 	}

@@ -714,7 +714,9 @@ describe( 'scale', () => {
 					scale: 1.5,
 				},
 			} )
-		).toEqual( 'rotate: 15deg; translate: 1em 0; scale: 1.5;' );
+		).toEqual(
+			'rotate: 15deg; --wp--style--translate-x: 1em; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0); scale: 1.5;'
+		);
 	} );
 
 	it.each( [
