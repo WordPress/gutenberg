@@ -6,6 +6,7 @@ import {
 	getScreenTransform,
 	isIdentity,
 	measureGain,
+	toLocalDelta,
 } from './utils';
 import type { HandleDirection, LinearTransform } from './utils';
 
@@ -21,10 +22,11 @@ type TransformedDrag = {
 	frame?: number;
 	settles: number;
 	isSettling: boolean;
+	cannotFollow?: boolean;
 };
 
-// A gain outside this range is a measuring glitch, or a handle that cannot
-// follow the pointer at all, like one on a block turned 180deg.
+// Below the minimum, the handle cannot follow the pointer, like one on a
+// block turned 180deg. Above the maximum is a measuring glitch.
 const MIN_GAIN = 0.2;
 const MAX_GAIN = 2;
 const MAX_SETTLES = 10;
@@ -133,11 +135,27 @@ export class TransformAwareResizable extends Resizable {
 					y: handle.y - drag.last.handle.y,
 				}
 			);
-			if ( gain !== undefined && gain >= MIN_GAIN && gain <= MAX_GAIN ) {
+			if ( gain !== undefined && gain < MIN_GAIN ) {
+				drag.cannotFollow = true;
+			} else if ( gain !== undefined && gain <= MAX_GAIN ) {
 				drag.gain = gain;
 			}
 		}
 		drag.last = { size, handle };
+
+		// The handle doesn't move with the size, so map the pointer's
+		// movement into the box's axes instead of chasing it.
+		if ( drag.cannotFollow ) {
+			const local = toLocalDelta(
+				drag.matrix,
+				clientX - original.x,
+				clientY - original.y
+			);
+			return super.calculateNewSizeFromDirection(
+				original.x + local.x,
+				original.y + local.y
+			);
+		}
 
 		const step = getResizeStep(
 			drag.matrix,
