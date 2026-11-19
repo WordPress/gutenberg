@@ -59,7 +59,7 @@ export enum SelectionDirection {
  * @param yDoc                          - The Yjs document
  * @param options                       - Optional parameters
  * @param options.selectionDirection    - The direction of the selection (forward or backward)
- * @param options.setSelectionClientIds - Individually selected whole-block members, absent for ranges.
+ * @param options.setSelectionClientIds - Selected block client IDs from multiSelectSet, omitted for text and range selections.
  * @return The SelectionState
  */
 export function getSelectionState(
@@ -99,8 +99,8 @@ export function getSelectionState(
 				} );
 			}
 		}
-		// Keep the legacy discriminant: old clients safely ignore the additive
-		// member list instead of highlighting all intervening blocks as a range.
+		// Older clients treat SelectionType.None as no selection and ignore
+		// setSelection, rather than highlighting unselected blocks between them.
 		return { type: SelectionType.None, setSelection };
 	}
 
@@ -312,7 +312,7 @@ export function getBlockPathForLocalClientId(
 		current = parent;
 	}
 	if ( excludeOtherEntities ) {
-		// Reaching the editor root in template mode means the member belongs to
+		// Reaching the editor root in template mode means the block belongs to
 		// the surrounding template, not this post's controlled content. Its index
 		// must not be interpreted as a coincidentally matching post-block index.
 		const { getBlocksByName } = unlock( select( blockEditorStore ) );
@@ -398,9 +398,9 @@ export function areSelectionsStatesEqual(
 
 	switch ( selection1.type ) {
 		case SelectionType.None:
-			// This optional metadata arrives over awareness. Compare its serialized
-			// shape without assuming every remote member is a valid Yjs position;
-			// the resolver skips invalid/deleted members at the rendering boundary.
+			// setSelection comes from another client and may contain invalid data.
+			// Compare the values here; useBlockHighlighting checks each block
+			// selection before resolving its position and displaying an outline.
 			return deepEqual(
 				selection1.setSelection,
 				( selection2 as SelectionNone ).setSelection

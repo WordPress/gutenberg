@@ -42,7 +42,7 @@ test.describe( 'Collaboration - Selection Rendering', () => {
 			'.is-collaborator-selected'
 		);
 		await expect( remoteHighlights ).toHaveText( [ 'A', 'C', 'E' ] );
-		// Only the member list changes; directional endpoints remain A and E.
+		// Only the selected client IDs change; selection start and end remain A and E.
 		await page.evaluate( ( clientIds ) => {
 			window.wp.data
 				.dispatch( 'core/block-editor' )

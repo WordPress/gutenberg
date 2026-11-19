@@ -554,7 +554,7 @@ describe( 'getSelectionState', () => {
 		testDoc.destroy();
 	} );
 
-	test( 'broadcasts only set members and distinguishes membership-only awareness updates', () => {
+	test( 'shares each selected block and detects changes to selected blocks without changes to selection start or end', () => {
 		const start = { clientId: 'block-1' };
 		const end = { clientId: 'block-3' };
 		const first = getSelectionState( start, end, testDoc, {

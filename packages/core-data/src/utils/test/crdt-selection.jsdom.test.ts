@@ -24,7 +24,7 @@ describe( 'collaborative set restoration', () => {
 	} );
 	afterEach( () => dispatch( blockEditorStore ).resetBlocks( [] ) );
 
-	test( 'preserves legacy range restoration when set metadata is absent', () => {
+	test( 'preserves range restoration when setSelectionClientIds is absent', () => {
 		const blocks = Array.from( { length: 3 }, () =>
 			createBlock( 'test/history-selection' )
 		);
@@ -49,7 +49,7 @@ describe( 'collaborative set restoration', () => {
 				selectionEnd: { clientId: blocks[ 2 ].clientId },
 			} );
 			restoreSelection( history.getSelectionHistory(), doc );
-			// Legacy collaboration intentionally collapses ranges to the moving end.
+			// Existing range restoration selects only the selectionEnd block.
 			expect(
 				select( blockEditorStore ).getSelectedBlockClientIds()
 			).toEqual( [ blocks[ 2 ].clientId ] );
@@ -59,7 +59,7 @@ describe( 'collaborative set restoration', () => {
 	} );
 
 	test.each( [ false, true ] )(
-		'restores surviving members without filling gaps (cloned IDs: %s)',
+		'restores selected blocks that still exist without selecting blocks between them (cloned IDs: %s)',
 		( cloned ) => {
 			const blocks = Array.from( { length: 5 }, () =>
 				createBlock( 'test/history-selection' )
@@ -103,7 +103,7 @@ describe( 'collaborative set restoration', () => {
 				expect(
 					select( blockEditorStore ).getBlockSelectionStart()
 				).toBe( blocks[ 4 ].clientId );
-				// Simulate remote removal, including the saved anchor, before undo.
+				// Simulate another user deleting the selectionStart block before undo.
 				yBlocks.delete( 4, 1 );
 				const moved = yBlocks.get( 2 ).clone();
 				yBlocks.delete( 2, 1 );

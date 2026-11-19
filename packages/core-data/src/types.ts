@@ -136,10 +136,10 @@ export type CursorPosition = {
 };
 
 export type SelectionNone = {
-	// No selection understood by legacy receivers; may carry a set extension.
+	// Older clients interpret this type as no selection.
 	type: SelectionType.None;
-	// An additive awareness extension: older receivers treat sets as no
-	// selection, never as a contiguous range. New receivers outline each member.
+	// Newer clients outline each selected block. Older clients ignore this field
+	// rather than highlighting unselected blocks between the selected blocks.
 	setSelection?: SelectionWholeBlock[];
 };
 
@@ -188,8 +188,8 @@ export type SelectionWholeBlock = {
 	// since there is no text cursor to navigate up from.
 	type: SelectionType.WholeBlock;
 	blockPosition: Y.RelativePosition;
-	// Set members include the CRDT block identity so deleting a member cannot
-	// accidentally highlight the next block occupying its former array slot.
+	// Include the selected block's client ID so deleting it cannot accidentally
+	// highlight the next block at the same position in the Yjs array.
 	clientId?: string;
 };
 

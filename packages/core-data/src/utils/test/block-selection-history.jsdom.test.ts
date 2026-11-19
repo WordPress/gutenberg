@@ -100,7 +100,7 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 	} );
 
-	test( 'preserves set membership through the collaborative selection-history round trip', () => {
+	test( 'stores selected client IDs in collaborative selection history', () => {
 		const selection = {
 			selectionStart: { clientId: 'block-1' },
 			selectionEnd: { clientId: 'block-3' },
@@ -112,20 +112,20 @@ describe( 'BlockSelectionHistory', () => {
 		} );
 	} );
 
-	test( 'distinguishes sets with identical endpoints but different members in history', () => {
-		const endpoints = {
+	test( 'keeps separate history entries when selected client IDs change but selection start and end do not', () => {
+		const selection = {
 			selectionStart: { clientId: 'block-1' },
 			selectionEnd: { clientId: 'block-3' },
 		};
 		history.updateSelection( {
-			...endpoints,
+			...selection,
 			setSelectionClientIds: [ 'block-1', 'block-3' ],
 		} );
 		history.updateSelection( {
-			...endpoints,
+			...selection,
 			setSelectionClientIds: [ 'block-1', 'block-2', 'block-3' ],
 		} );
-		history.updateSelection( endpoints );
+		history.updateSelection( selection );
 		expect( history.getSelectionHistory() ).toHaveLength( 3 );
 	} );
 

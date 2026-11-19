@@ -74,8 +74,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
 		} = select( blockEditorStore );
-		// Older block-editor versions have no set representation. Keep their
-		// endpoint-only behavior rather than requiring the new private selector.
+		// Older block-editor versions only report selection start and end.
+		// Keep that behavior when getSetSelectionClientIds is unavailable.
 		const { getSetSelectionClientIds } = unlock(
 			select( blockEditorStore )
 		);
@@ -189,7 +189,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * @param selectionStart        - The start position of the selection.
 	 * @param selectionEnd          - The end position of the selection.
 	 * @param initialPosition       - The initial position of the selection.
-	 * @param setSelectionClientIds - Whole-block set members, absent for range/text selections.
+	 * @param setSelectionClientIds - Selected block client IDs from multiSelectSet, omitted for text and range selections.
 	 */
 	private async updateSelectionInEntityRecord(
 		selectionStart: WPBlockSelection,
@@ -205,10 +205,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		//
 		// Manually adding an edit for each movement ensures that other user's changes to the document will
 		// not cause the local user's selection to reset to the last local change location.
-		let membership: { setSelectionClientIds?: string[] } = {};
+		let selectionFields: { setSelectionClientIds?: string[] } = {};
 		if ( setSelectionClientIds ) {
-			// Provider controllers clone IDs. Persist entity/Y-document IDs, not
-			// local editor IDs, matching useBlockSync's ownership-local conversion.
+			// useBlockSync clones client IDs for controlled inner blocks. Save the
+			// client IDs from this entity's Yjs document, not the editor's cloned IDs.
 			const blocks = getRootMap< YPostRecord >(
 				this.doc,
 				CRDT_RECORD_MAP_KEY
@@ -220,9 +220,9 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			for ( const id of setSelectionClientIds ) {
 				const path = getBlockPathForLocalClientId( id, true );
 				const block = path && findBlockByPath( path, blocks );
-				const entityId = block?.get( 'clientId' );
-				if ( entityId ) {
-					mapping.set( id, entityId );
+				const entityClientId = block?.get( 'clientId' );
+				if ( entityClientId ) {
+					mapping.set( id, entityClientId );
 				}
 			}
 			const start = mapping.get( selectionStart.clientId );
@@ -236,14 +236,16 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			}
 			selectionStart = { clientId: start };
 			selectionEnd = { clientId: end };
-			membership = { setSelectionClientIds: [ ...mapping.values() ] };
+			selectionFields = {
+				setSelectionClientIds: [ ...mapping.values() ],
+			};
 		}
 		const edits = {
 			selection: {
 				selectionStart,
 				selectionEnd,
 				initialPosition,
-				...membership,
+				...selectionFields,
 			},
 		};
 

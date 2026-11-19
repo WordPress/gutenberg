@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Real-time collaboration: Preserve whole-block set membership through selection persistence and undo/redo, and broadcast individual selected members without filling gaps.
+-   Real-time collaboration: Save selected block client IDs through undo/redo and share each selected block with other users without including unselected blocks between them.
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).

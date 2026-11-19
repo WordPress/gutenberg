@@ -171,18 +171,18 @@ export function useBlockHighlighting(
 				) {
 					const collaborator = describeCollaborator( userState );
 					return selection.setSelection.flatMap(
-						( member: unknown ) => {
+						( blockSelection: unknown ) => {
 							if (
-								! member ||
-								typeof member !== 'object' ||
-								! ( 'type' in member ) ||
-								member.type !== SelectionType.WholeBlock
+								! blockSelection ||
+								typeof blockSelection !== 'object' ||
+								! ( 'type' in blockSelection ) ||
+								blockSelection.type !== SelectionType.WholeBlock
 							) {
 								return [];
 							}
 							try {
 								const { localClientId } = resolveSelection(
-									member as SelectionEndpoint
+									blockSelection as SelectionEndpoint
 								);
 								return localClientId
 									? [
@@ -194,8 +194,8 @@ export function useBlockHighlighting(
 										]
 									: [];
 							} catch {
-								// A deleted or invalid remote member has no highlight. Never
-								// substitute a range through its unselected neighbors.
+								// Ignore deleted blocks and invalid selection data rather
+								// than highlighting unselected blocks between selections.
 								return [];
 							}
 						}

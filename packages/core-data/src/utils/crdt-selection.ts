@@ -138,18 +138,18 @@ function convertYFullSelectionToWPSelection(
 ): WPSelection | null {
 	const { start, end } = yFullSelection;
 	if ( yFullSelection.setSelectionClientIds ) {
-		const members = yFullSelection.setSelectionClientIds.filter( ( id ) =>
-			findBlockByClientIdInDoc( id, ydoc )
+		const selectedClientIds = yFullSelection.setSelectionClientIds.filter(
+			( id ) => findBlockByClientIdInDoc( id, ydoc )
 		);
-		if ( ! members.length ) {
+		if ( ! selectedClientIds.length ) {
 			return null;
 		}
 		return {
-			// Keep direction until restoration: the editor's normalizer repairs
-			// missing endpoints using the resulting tree's order, not saved order.
+			// Keep selection start and end until resetSelection is dispatched.
+			// withSetSelection replaces missing IDs using the current document order.
 			selectionStart: { clientId: start.clientId },
 			selectionEnd: { clientId: end.clientId },
-			setSelectionClientIds: members,
+			setSelectionClientIds: selectedClientIds,
 		};
 	}
 	const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
@@ -225,8 +225,8 @@ export function restoreSelection(
 	const { resetSelection } = dispatch( blockEditorStore );
 	const { selectionStart, selectionEnd } = selectionToRestore;
 	if ( selectionToRestore.setSelectionClientIds ) {
-		// History uses entity IDs. In template mode the editor uses cloned IDs;
-		// map every surviving member through the same tree paths as awareness.
+		// History stores client IDs from the entity's Yjs document. In template
+		// mode, map selected blocks that still exist to the editor's cloned IDs.
 		const selectors = select( blockEditorStore );
 		const [ postContentId ] =
 			unlock( selectors ).getBlocksByName( 'core/post-content' );
@@ -240,13 +240,13 @@ export function restoreSelection(
 				mapping.set( id, localId );
 			}
 		}
-		const members = [ ...mapping.values() ];
-		if ( members.length ) {
+		const selectedClientIds = [ ...mapping.values() ];
+		if ( selectedClientIds.length ) {
 			resetSelection(
 				{ clientId: mapping.get( selectionStart.clientId ) },
 				{ clientId: mapping.get( selectionEnd.clientId ) },
 				0,
-				members
+				selectedClientIds
 			);
 		}
 		return;
@@ -292,8 +292,8 @@ export function restoreSelection(
 			resetSelection( selectionStart, selectionEnd, 0 );
 		}
 	} else {
-		// Case 3: Preserve legacy range-history behavior by collapsing to the
-		// moving end. Set histories, which have explicit members, restore above.
+		// Case 3: Preserve the existing range-history behavior by selecting only
+		// selectionEnd. Selections with setSelectionClientIds are restored above.
 		resetSelection( selectionEnd, selectionEnd, 0 );
 	}
 }

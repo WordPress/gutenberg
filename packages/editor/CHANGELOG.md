@@ -24,7 +24,7 @@
 
 ### Enhancements
 
--   Real-time collaboration: Outline each member of another user's block selection set without highlighting unselected blocks between them.
+-   Real-time collaboration: Outline each block selected by another user without highlighting unselected blocks between them.
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).

@@ -360,7 +360,7 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	test( 'persists and broadcasts membership changes with unchanged endpoints and cloned IDs', () => {
+	test( 'saves and shares changed selected client IDs when selection start and end are unchanged and IDs are cloned', () => {
 		vi.mocked( Date.now ).mockRestore();
 		const yBlocks = doc
 			.getMap( CRDT_RECORD_MAP_KEY )
@@ -445,12 +445,12 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'setUp', () => {
-		test( 'does not resolve a deleted set member to its unselected neighbor', () => {
+		test( 'does not resolve a deleted selected block to its unselected neighbor', () => {
 			const blocks = doc
 				.getMap( CRDT_RECORD_MAP_KEY )
 				.get( 'blocks' ) as Y.Array< Y.Map< any > >;
 			blocks.push( [ createYBlock( 'block-2', 'core/paragraph' ) ] );
-			const member: SelectionWholeBlock = {
+			const blockSelection: SelectionWholeBlock = {
 				type: SelectionType.WholeBlock,
 				blockPosition: Y.createRelativePositionFromTypeIndex(
 					blocks,
@@ -467,7 +467,7 @@ describe( 'PostEditorAwareness', () => {
 			try {
 				blocks.delete( 0, 1 );
 				expect(
-					awareness.convertSelectionStateToAbsolute( member, [
+					awareness.convertSelectionStateToAbsolute( blockSelection, [
 						{ clientId: 'local-2', innerBlocks: [] },
 					] ).localClientId
 				).toBeNull();

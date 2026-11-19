@@ -121,11 +121,12 @@ export function createBlockSelectionHistory(
 	/**
 	 * Add a selection to the history, maintaining only the last `historySize` unique selections.
 	 * New selections are added to the front.
-	 * Replaces entries with the same endpoints and membership, keeping distinct sets.
+	 * Replaces entries with the same selection start, end, and selected client IDs.
 	 * @param yFullSelection
 	 */
 	const addToHistory = ( yFullSelection: YFullSelection ): void => {
-		// Preserve membership-only changes and distinguish sets from ranges.
+		// The selected client IDs can change without selection start/end changing.
+		// A selection with setSelectionClientIds also differs from a range without it.
 		const startClientId = yFullSelection.start.clientId;
 		const endClientId = yFullSelection.end.clientId;
 
