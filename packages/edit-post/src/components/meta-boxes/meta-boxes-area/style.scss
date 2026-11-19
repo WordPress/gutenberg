@@ -102,6 +102,11 @@
 	}
 }
 
+// Don't let the drag helper add page scrollbars when it overflows.
+body.is-dragging-metaboxes {
+	overflow: hidden;
+}
+
 .edit-post-meta-boxes-area__clear {
 	clear: both;
 }

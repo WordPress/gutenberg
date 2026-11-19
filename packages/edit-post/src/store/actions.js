@@ -492,6 +492,13 @@ export const initializeMetaBoxes =
 			window.postboxes.add_postbox_toggles( postType );
 		}
 
+		// Keep the drag helper out of the meta box scroll containers, so it
+		// doesn't stretch or get clipped by them, and don't auto-scroll them.
+		window.jQuery( META_BOX_SORTABLES ).sortable?.( 'option', {
+			appendTo: document.body,
+			scroll: false,
+		} );
+
 		metaBoxesInitialized = true;
 
 		window
