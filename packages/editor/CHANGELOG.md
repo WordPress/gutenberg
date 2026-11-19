@@ -38,6 +38,10 @@
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes.
+
 ## 16.1.0 (2026-11-04)
 
 ### New Features
