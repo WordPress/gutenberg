@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Allow clicking block toolbar buttons that overlap the right edge of the Customizer sidebar ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
