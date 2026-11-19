@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { getItemPopupWidthClassName } from '../utils/css/item-popup';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { useMenuContext } from './context';

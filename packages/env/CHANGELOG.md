@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Stop `wp-env start` from downloading the phpMyAdmin image when phpMyAdmin is not enabled, by only defining the `phpmyadmin` and `tests-phpmyadmin` Docker services for the environments that enable it ([#86574](https://github.com/WordPress/gutenberg/pull/86574)).

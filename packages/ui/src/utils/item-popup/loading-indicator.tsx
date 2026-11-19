@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Spinner } from '../../spinner';
 import { Text } from '../../text';
 import type { LoadingIndicatorProps } from './types';
-import itemPopupStyles from '../css/item-popup.module.css';
+import itemPopupStyles from '../css/item-popup.module.scss';
 import resetStyles from '../css/resets.module.css';
 
 export const LoadingIndicator = forwardRef<
