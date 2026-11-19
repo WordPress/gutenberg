@@ -82,14 +82,15 @@ function loadWebpackConfig( configPath, defaults ) {
 }
 
 /**
- * Compiles a fixture as classic scripts or as script modules.
+ * Returns the webpack options that build a fixture as classic scripts or as
+ * script modules.
  *
  * @param {string}                configCase      Name of the fixture folder.
  * @param {'scripts' | 'modules'} moduleMode      Kind of output.
  * @param {string}                outputDirectory Folder to emit the build to.
- * @return {Promise<webpack.Stats>} Stats of the compilation.
+ * @return {webpack.Configuration} Webpack options.
  */
-function compileFixture( configCase, moduleMode, outputDirectory ) {
+function getFixtureOptions( configCase, moduleMode, outputDirectory ) {
 	const testDirectory = path.join( fixturesPath, configCase );
 	const options = loadWebpackConfig(
 		path.join( testDirectory, 'webpack.config.js' ),
@@ -118,6 +119,24 @@ function compileFixture( configCase, moduleMode, outputDirectory ) {
 		options.output.library.type = 'module';
 		options.experiments.outputModule = true;
 	}
+
+	return options;
+}
+
+/**
+ * Compiles a fixture as classic scripts or as script modules.
+ *
+ * @param {string}                configCase      Name of the fixture folder.
+ * @param {'scripts' | 'modules'} moduleMode      Kind of output.
+ * @param {string}                outputDirectory Folder to emit the build to.
+ * @return {Promise<webpack.Stats>} Stats of the compilation.
+ */
+function compileFixture( configCase, moduleMode, outputDirectory ) {
+	const options = getFixtureOptions(
+		configCase,
+		moduleMode,
+		outputDirectory
+	);
 
 	return new Promise( ( resolve, reject ) =>
 		webpack( options, ( err, stats ) => {
@@ -247,6 +266,55 @@ describe( 'DependencyExtractionWebpackPlugin modules emitted imports', () => {
 			}
 
 			expect( getEmittedImports( outputDirectory ) ).toMatchSnapshot();
+		} );
+	} );
+} );
+
+describe( 'DependencyExtractionWebpackPlugin modules rebuild', () => {
+	const configCase = 'wordpress-script-modules';
+	const outputDirectory = path.join(
+		currentDirectory,
+		'build',
+		'modules-rebuild',
+		configCase
+	);
+
+	beforeEach( () => {
+		rimrafSync( outputDirectory );
+		mkdirpSync( outputDirectory );
+	} );
+
+	afterEach( () => rimrafSync( outputDirectory ) );
+
+	test( 'should keep both import kinds of an unchanged file', async () => {
+		// Keep the modules in memory between compilations, as watch rebuilds do.
+		const compiler = webpack( {
+			...getFixtureOptions( configCase, 'modules', outputDirectory ),
+			cache: true,
+		} );
+		const run = () =>
+			new Promise( ( resolve, reject ) =>
+				compiler.run( ( err, stats ) =>
+					err ? reject( err ) : resolve( stats )
+				)
+			);
+
+		await run();
+		const stats = await run();
+		await new Promise( ( resolve ) => compiler.close( resolve ) );
+
+		const builtFiles = Array.from(
+			stats.compilation.builtModules,
+			( { resource } ) => resource
+		);
+		expect( builtFiles ).not.toContain(
+			path.join( fixturesPath, configCase, 'both-kinds.js' )
+		);
+		expect(
+			getEmittedImports( outputDirectory )[ 'both-kinds.mjs' ]
+		).toEqual( {
+			static: [ '@wordpress/a11y' ],
+			dynamic: [ '@wordpress/a11y' ],
 		} );
 	} );
 } );

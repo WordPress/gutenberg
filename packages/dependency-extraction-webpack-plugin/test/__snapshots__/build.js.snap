@@ -597,6 +597,36 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/a11y',
+		array(
+			'id' => '@wordpress/a11y',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '5aec48e840a9ed83ef2f',
+	'type' => 'module'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds-split.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/a11y',
+		array(
+			'id' => '@wordpress/a11y',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => '459f95ddfe8ec010458f',
+	'type' => 'module'
+);
+"
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'dynamic.asset.php' should match snapshot 1`] = `
 "<?php return array(
 	'dependencies' => array(
@@ -957,6 +987,22 @@ exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`w
 
 exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress-script-modules\` > should keep the kind of each import of an external 1`] = `
 {
+  "both-kinds-split.mjs": {
+    "dynamic": [
+      "@wordpress/a11y",
+    ],
+    "static": [
+      "@wordpress/a11y",
+    ],
+  },
+  "both-kinds.mjs": {
+    "dynamic": [
+      "@wordpress/a11y",
+    ],
+    "static": [
+      "@wordpress/a11y",
+    ],
+  },
   "dynamic.mjs": {
     "dynamic": [
       "@wordpress/a11y",
@@ -1592,6 +1638,26 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-require
     "userRequest": "@wordpress/blob",
   },
 ]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'wp-a11y'
+	),
+	'version' => 'eec39a5174acfc781251'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds-split.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'wp-a11y'
+	),
+	'version' => 'fdbb65633273fe53f799'
+);
+"
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'dynamic.asset.php' should match snapshot 1`] = `
