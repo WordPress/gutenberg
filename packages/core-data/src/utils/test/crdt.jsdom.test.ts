@@ -7,9 +7,12 @@ import {
 	vi,
 	type Mock,
 } from 'vitest';
-import { Y } from '@wordpress/sync';
+import { Y, LOCAL_EDITOR_ORIGIN } from '@wordpress/sync';
 import { parse } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
+import { createSyncManager } from '../../../../sync/src/manager';
+import { getProviderCreators } from '../../../../sync/src/providers';
+import type { SyncConfig } from '../../../../sync/src/types';
 import { CRDT_DOC_META_PERSISTENCE_KEY, CRDT_RECORD_MAP_KEY } from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
@@ -21,7 +24,7 @@ import {
 	type YPostRecord,
 } from '../crdt';
 import type { Block, YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
-import { updateSelectionHistory } from '../crdt-selection';
+import { getSelectionHistory, updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post } from '../../entity-types';
 /**
@@ -1540,3 +1543,172 @@ function addBlockToDoc(
 
 	return ytext;
 }
+
+vi.mock( import( '../../../../sync/src/providers' ), () => ( {
+	getProviderCreators: vi.fn(),
+} ) );
+
+describe( 'selection after a deferred edit merges with a remote change', () => {
+	afterEach( () => vi.clearAllMocks() );
+	const nextTick = () =>
+		new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+	it.each( [
+		{
+			name: 'keeps the selection in the newly selected block',
+			remoteBlock: null,
+			offset: 6,
+		},
+		{
+			name: 'adjusts the new selection for remote text inserted before it',
+			remoteBlock: 1,
+			offset: 10,
+		},
+	] )( '$name', async ( { remoteBlock, offset } ) => {
+		let liveDoc!: Y.Doc;
+		let flushLocalUpdates!: () => void;
+		vi.mocked( getProviderCreators ).mockReturnValue( [
+			async ( { ydoc, flushLocalUpdates: flush } ) => {
+				liveDoc = ydoc;
+				flushLocalUpdates = flush!;
+				return {
+					on: vi.fn(),
+					destroy: vi.fn(),
+					supportsDeferredUpdates: true,
+				};
+			},
+		] );
+		const block = ( clientId: string, content: string ): Block => ( {
+			clientId,
+			name: 'core/paragraph',
+			attributes: { content },
+			innerBlocks: [],
+		} );
+		const selection = ( clientId: string, position: number ) => ( {
+			selectionStart: {
+				clientId,
+				attributeKey: 'content',
+				offset: position,
+			},
+			selectionEnd: {
+				clientId,
+				attributeKey: 'content',
+				offset: position,
+			},
+		} );
+		const record = {
+			id: 123,
+			meta: {},
+			title: 'Title',
+			blocks: [ block( 'a', 'Hello' ), block( 'b', 'Other' ) ],
+			selection: selection( 'a', 5 ),
+		};
+		const syncedProperties = new Set( [ 'blocks', 'title' ] );
+		const config: SyncConfig = {
+			applyChangesToCRDTDoc: ( doc, changes ) =>
+				applyPostChangesToCRDTDoc( doc, changes, syncedProperties ),
+			getChangesFromCRDTDoc: ( doc, editedRecord ) =>
+				getPostChangesFromCRDTDoc(
+					doc,
+					editedRecord as Post,
+					syncedProperties
+				),
+			getPersistedCRDTDoc: () => null,
+		};
+		const undoSelections: string[] = [];
+		const manager = createSyncManager();
+		await manager.load( config, 'post', '123', record, {
+			addUndoMeta: ( doc ) => {
+				undoSelections.push(
+					getSelectionHistory( doc )[ 0 ].start.clientId
+				);
+			},
+			restoreUndoMeta: vi.fn(),
+			editRecord: ( changes ) => Object.assign( record, changes ),
+			getEditedRecord: async () => record,
+			onStatusChange: vi.fn(),
+			persistCRDTDoc: vi.fn(),
+			refetchRecord: async () => {},
+		} );
+		await nextTick();
+		const peer = new Y.Doc();
+		Y.applyUpdateV2( peer, Y.encodeStateAsUpdateV2( liveDoc ) );
+		const peerMap = getRootMap< YPostRecord >( peer, CRDT_RECORD_MAP_KEY );
+		const peerText = ( index: number ) =>
+			peerMap
+				.get( 'blocks' )!
+				.get( index )
+				.get( 'attributes' )!
+				.get( 'content' ) as Y.Text;
+
+		try {
+			// An earlier selection-only edit must not replace the new selection.
+			manager.update(
+				'post',
+				'123',
+				{ selection: selection( 'a', 5 ) },
+				LOCAL_EDITOR_ORIGIN
+			);
+			manager.undoManager.stopCapturing();
+			const edits = {
+				blocks: [ block( 'a', 'Hello' ), block( 'b', 'Other!' ) ],
+				selection: selection( 'b', 6 ),
+			};
+			Object.assign( record, edits );
+			manager.update( 'post', '123', edits, LOCAL_EDITOR_ORIGIN );
+			if ( remoteBlock === null ) {
+				peerMap.get( 'title' )!.insert( 0, 'Peer ' );
+			} else {
+				peerText( remoteBlock ).insert( 0, 'Bob ' );
+			}
+			flushLocalUpdates();
+			Y.applyUpdateV2(
+				liveDoc,
+				Y.encodeStateAsUpdateV2( peer ),
+				'provider'
+			);
+			await nextTick();
+
+			expect( record.selection.selectionStart ).toEqual(
+				selection( 'b', offset ).selectionStart
+			);
+			expect( record.selection.selectionEnd ).toEqual(
+				selection( 'b', offset ).selectionEnd
+			);
+
+			// A later remote edit in the old block must not move the selection back.
+			peerText( 0 ).insert( 0, 'Bob ' );
+			flushLocalUpdates();
+			Y.applyUpdateV2(
+				liveDoc,
+				Y.encodeStateAsUpdateV2( peer ),
+				'provider'
+			);
+			await nextTick();
+			expect( record.selection.selectionStart ).toEqual(
+				selection( 'b', offset ).selectionStart
+			);
+			expect( record.selection.selectionEnd ).toEqual(
+				selection( 'b', offset ).selectionEnd
+			);
+			expect( getSelectionHistory( liveDoc )[ 0 ].start.clientId ).toBe(
+				'b'
+			);
+			expect( undoSelections ).toEqual( [ 'a' ] );
+
+			// The next undo level must capture the new block's selection.
+			manager.update(
+				'post',
+				'123',
+				{ title: 'Changed title' },
+				LOCAL_EDITOR_ORIGIN,
+				{ isNewUndoLevel: true }
+			);
+			await nextTick();
+			expect( undoSelections ).toEqual( [ 'a', 'b' ] );
+		} finally {
+			manager.unloadAll();
+			peer.destroy();
+		}
+	} );
+} );
