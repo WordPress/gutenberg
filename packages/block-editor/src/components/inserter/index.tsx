@@ -40,7 +40,9 @@ const UnforwardedInserterToggle = (
 	} = toggleProps;
 
 	let label = labelProp;
-	if ( ! label && appenderLabel ) {
+	if ( ! label && isOpen && ! hasSingleBlockType ) {
+		label = __( 'Close' );
+	} else if ( ! label && appenderLabel ) {
 		// Block returns the full label; use directly (consistent with getBlockLabel).
 		label = appenderLabel;
 	} else if ( ! label && hasSingleBlockType ) {

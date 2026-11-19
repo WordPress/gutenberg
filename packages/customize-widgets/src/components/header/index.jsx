@@ -76,10 +76,14 @@ function Header( {
 						isPressed={ isInserterOpened }
 						variant="primary"
 						icon={ plus }
-						label={ _x(
-							'Add block',
-							'Generic label for block inserter button'
-						) }
+						label={
+							isInserterOpened
+								? __( 'Close' )
+								: _x(
+										'Add block',
+										'Generic label for block inserter button'
+									)
+						}
 						onClick={ () => {
 							setIsInserterOpened( ( isOpen ) => ! isOpen );
 						} }
