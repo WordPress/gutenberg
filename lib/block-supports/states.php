@@ -378,17 +378,22 @@ function gutenberg_get_root_state_style( $state_style, $nested_keys ) {
 }
 
 /**
- * Returns the Global Styles a block instance layers over: its block type's,
- * then those of the block style variation applied to it.
+ * Returns the Global Styles a block instance state layers over: its block
+ * type's, then those of the block style variation applied to it.
+ *
+ * Each includes the Global Styles for the same state, so a state only
+ * escapes a text clip that applies there. A breakpoint pseudo-state layers
+ * over the root, the breakpoint, the pseudo-state, then both, as output.
  *
  * Mirror of `getGlobalBlockBaseStyle` in packages/block-editor/src/hooks/style.tsx.
  *
  * @param string      $block_name Block name.
  * @param string|null $class_name Block class name, which names any applied variation.
  * @param string[]    $state_keys Pseudo-state and breakpoint keys to leave out.
+ * @param string[]    $state_path Optional state the styles are for, e.g. `array( '@mobile', ':hover' )`.
  * @return array<string, mixed> Root-only style object.
  */
-function gutenberg_get_block_state_global_base_style( $block_name, $class_name, $state_keys ) {
+function gutenberg_get_block_state_global_base_style( $block_name, $class_name, $state_keys, $state_path = array() ) {
 	$global_styles = gutenberg_get_global_styles();
 	$block_styles  = $global_styles['blocks'][ $block_name ] ?? array();
 	if ( ! is_array( $block_styles ) ) {
@@ -396,7 +401,29 @@ function gutenberg_get_block_state_global_base_style( $block_name, $class_name, 
 	}
 
 	$nested_keys = array_merge( array( 'elements', 'blocks', 'variations' ), $state_keys );
-	$base_style  = gutenberg_get_root_state_style( $block_styles, $nested_keys );
+	$layer_paths = array( array() );
+	foreach ( $state_path as $state ) {
+		$layer_paths[] = array( $state );
+	}
+	if ( count( $state_path ) > 1 ) {
+		$layer_paths[] = $state_path;
+	}
+
+	$get_layers = static function ( $styles ) use ( $layer_paths, $nested_keys ) {
+		$merged = array();
+		foreach ( $layer_paths as $layer_path ) {
+			$layer = empty( $layer_path ) ? $styles : _wp_array_get( $styles, $layer_path, null );
+			if ( is_array( $layer ) ) {
+				$merged = gutenberg_merge_state_style_objects(
+					$merged,
+					gutenberg_get_root_state_style( $layer, $nested_keys )
+				);
+			}
+		}
+		return $merged;
+	};
+
+	$base_style = $get_layers( $block_styles );
 
 	// Only the first block style variation with data applies, as in the variation support.
 	foreach ( gutenberg_get_block_style_variation_name_from_class( $class_name ) ?? array() as $variation ) {
@@ -404,7 +431,7 @@ function gutenberg_get_block_state_global_base_style( $block_name, $class_name, 
 		if ( ! empty( $variation_styles ) && is_array( $variation_styles ) ) {
 			return gutenberg_merge_state_style_objects(
 				$base_style,
-				gutenberg_get_root_state_style( $variation_styles, $nested_keys )
+				$get_layers( $variation_styles )
 			);
 		}
 	}
@@ -749,19 +776,18 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	$state_keys               = array_merge( $supported_pseudo_states, array_keys( $responsive_media_queries ) );
 
 	// Global Styles only matter for the clip escapes, so skip the lookup when no state could need one.
-	if (
-		array_intersect( $state_keys, array_keys( $style ) ) &&
-		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false )
-	) {
-		$default_root_style = gutenberg_merge_state_style_objects(
-			gutenberg_get_block_state_global_base_style(
-				$block_name,
-				$block['attrs']['className'] ?? null,
-				$state_keys
-			),
+	$has_global_base = array_intersect( $state_keys, array_keys( $style ) ) &&
+		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false );
+	$class_name      = $block['attrs']['className'] ?? null;
+	$get_base_style  = static function ( $state_path ) use ( $has_global_base, $block_name, $class_name, $state_keys, $default_root_style ) {
+		if ( ! $has_global_base ) {
+			return $default_root_style;
+		}
+		return gutenberg_merge_state_style_objects(
+			gutenberg_get_block_state_global_base_style( $block_name, $class_name, $state_keys, $state_path ),
 			$default_root_style
 		);
-	}
+	};
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -774,7 +800,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				array( $pseudo_state => $style[ $pseudo_state ] ),
 				$block_type,
 				null,
-				$default_root_style
+				$get_base_style( array( $pseudo_state ) )
 			)
 		);
 	}
@@ -796,7 +822,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 					array( '' => $root_state_style ),
 					$block_type,
 					$media_query,
-					$default_root_style
+					$get_base_style( array( $breakpoint ) )
 				)
 			);
 		}
@@ -870,7 +896,7 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 					// Cascade order: default, breakpoint, then the default pseudo-state.
 					gutenberg_merge_state_style_objects(
 						gutenberg_merge_state_style_objects(
-							$default_root_style,
+							$get_base_style( array( $breakpoint, $pseudo_state ) ),
 							$root_state_style
 						),
 						$style[ $pseudo_state ] ?? array()
