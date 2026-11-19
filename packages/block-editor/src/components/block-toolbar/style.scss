@@ -218,38 +218,40 @@
 				flex-wrap: wrap;
 			}
 			.components-toolbar-group {
-				background-color: $white;
+				background-color: var(--wpds-color-background-surface-neutral-strong);
 			}
 			// Groups can wrap onto several rows, so each one carries its own
 			// border instead of the toolbar having a single outer border.
 			.components-toolbar-group,
 			.components-toolbar,
 			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
-				border: $border-width solid $gray-900;
+				border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 				margin: 0 (-$border-width) (-$border-width) 0;
 				padding: 0;
 
-				//Nested groups shouldn't duplicate border styles.
+				// The border separates the groups, so drop the hairline. The mover
+				// keeps its own, which separates it from the block switcher.
+				&:not(.block-editor-block-mover)::after {
+					content: none;
+				}
+
+				// Nested groups shouldn't duplicate border styles.
 				.components-toolbar-group {
 					border: none;
 					margin: 0;
-
-					// Except if there are adjacent groups which need a border between them.
-					+ .components-toolbar-group {
-						border-left: 1px solid $gray-900;
-					}
 				}
 			}
 
 			.block-editor-block-parent-selector,
 			.block-editor-block-parent-selector__button {
 				border: none;
+				border-radius: 0;
 				margin: 0;
 				box-shadow: none;
 
 				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
 				.components-toolbar-group:last-child {
-					border-right: 1px solid $gray-900;
+					border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 				}
 			}
 		}
@@ -308,7 +310,7 @@
 				content: "";
 				height: $border-width;
 				width: 100%;
-				background: $gray-200;
+				background: var(--wpds-color-stroke-surface-neutral-weak);
 				position: absolute;
 				top: 50%;
 				left: 50%;
@@ -316,10 +318,10 @@
 				// X axis allows to make the separator always centered regardless of its width.
 				transform: translate(-50%, 0);
 				margin-top: -$border-width * 0.5;
-			}
 
-			@include break-medium {
-				background: $gray-900;
+				@media ( forced-colors: active ) {
+					background: CanvasText;
+				}
 			}
 		}
 	}
