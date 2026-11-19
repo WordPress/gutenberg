@@ -89,9 +89,10 @@ export interface UploadMediaFromBlobURLArgs {
 	 */
 	allowedTypes?: MediaUploadOptions[ 'allowedTypes' ];
 	/**
-	 * Function called when the media is uploaded.
+	 * Function called when the media is uploaded. Receives `undefined` when the
+	 * upload returns no media.
 	 */
-	onChange?: ( media: Record< string, unknown > ) => void;
+	onChange?: ( media: Record< string, unknown > | undefined ) => void;
 	/**
 	 * Function called when an error happens.
 	 */

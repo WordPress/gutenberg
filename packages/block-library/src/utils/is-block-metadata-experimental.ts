@@ -2,7 +2,7 @@
  * Checks if the block is experimental based on the metadata loaded
  * from block.json.
  *
- * @param {Object} metadata Parsed block.json metadata.
+ * @param metadata Parsed block.json metadata.
  * @return Is the block experimental?
  */
 export default function isBlockMetadataExperimental(

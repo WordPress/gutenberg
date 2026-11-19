@@ -17,7 +17,7 @@ import type { UploadMediaFromBlobURLArgs } from './types';
 export function useCanEditEntity(
 	kind: string,
 	name: string,
-	recordId: string
+	recordId: string | number
 ) {
 	return useSelect(
 		( select ) =>
@@ -129,7 +129,7 @@ export function useToolsPanelDropdownMenuProps() {
 	return ! isMobile
 		? {
 				popoverProps: {
-					placement: 'left-start',
+					placement: 'left-start' as const,
 					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 					offset: 259,
 				},
