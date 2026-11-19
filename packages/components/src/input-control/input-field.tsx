@@ -46,6 +46,7 @@ function InputField(
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
+	isDragEnabled &&= ! disabled;
 	const {
 		// State.
 		state,
