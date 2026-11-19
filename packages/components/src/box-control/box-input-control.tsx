@@ -87,10 +87,6 @@ export default function BoxInputControl( {
 
 	const defaultValuesToModify = getSidesToModify( side, sides );
 
-	const handleOnFocus = ( event: React.FocusEvent< HTMLInputElement > ) => {
-		onFocus( event, { side } );
-	};
-
 	const handleOnChange = ( nextValues: BoxControlValue ) => {
 		onChange( nextValues );
 	};
@@ -154,6 +150,20 @@ export default function BoxInputControl( {
 	const computedUnit = resolvedUnit ?? units?.[ 0 ]?.value ?? 'px';
 	const generatedId = useInstanceId( BoxInputControl, 'box-control-input' );
 	const inputId = [ generatedId, side ].join( '-' );
+
+	const handleOnFocus = (
+		event: React.FocusEvent< HTMLInputElement > & {
+			preventBaseUIHandler?: () => void;
+		}
+	) => {
+		onFocus( event, { side } );
+
+		const isUnitSelectFocus = event.target.id !== inputId;
+		if ( isUnitSelectFocus ) {
+			event.preventBaseUIHandler?.();
+		}
+	};
+
 	const isMixedUnit =
 		defaultValuesToModify.length > 1 &&
 		mergedValue === undefined &&
