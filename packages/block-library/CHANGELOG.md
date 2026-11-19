@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Shortcode: Fix stray paragraph tags in the shortcode output when the block is used in a block template or a block widget ([#86893](https://github.com/WordPress/gutenberg/pull/86893)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 
 ## 12.2.0 (2026-11-18)
