@@ -38,6 +38,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useScrollState } from './use-scroll-state';
+import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
 import getTableColumns from '../utils/get-table-columns';
 import useSelectionProps from '../utils/use-selection-props';
@@ -347,27 +348,11 @@ function ViewTable< Item >( {
 		( hasBulkActions && selection.length > 0 ) || isActionInProgress;
 	// The resize observer reports after the first paint, so measure on show.
 	useLayoutEffect( syncBulkActionsPosition, [ showBulkActions ] );
-	const hadSelectionRef = useRef( false );
-	useEffect( () => {
-		const tableHead = tableHeaderRef.current;
-		const ownerDocument = tableHead?.ownerDocument;
-		if (
-			showBulkActions &&
-			tableHead?.contains( ownerDocument?.activeElement ?? null )
-		) {
-			bulkSelectionRef.current?.focus();
-		} else if (
-			hadSelectionRef.current &&
-			! showBulkActions &&
-			( ownerDocument?.activeElement === ownerDocument?.body ||
-				bulkActionsRef.current?.contains(
-					ownerDocument?.activeElement ?? null
-				) )
-		) {
-			tableSelectionRef.current?.focus();
-		}
-		hadSelectionRef.current = showBulkActions;
-	}, [ showBulkActions ] );
+	// The toolbar covers the header, so move focus between the two
+	// selection checkboxes when an interaction shows or hides the toolbar.
+	const focusAfterToggle = useBulkActionsFocus( {
+		isShown: showBulkActions,
+	} );
 
 	const { isHorizontalScrollEnd, isVerticallyScrolled } = useScrollState( {
 		scrollContainerRef: containerRef,
@@ -496,6 +481,9 @@ function ViewTable< Item >( {
 					<BulkActionToolbar
 						onActionInProgressChange={ setIsActionInProgress }
 						selectionCheckboxRef={ bulkSelectionRef }
+						onClearSelection={ () =>
+							focusAfterToggle( tableSelectionRef )
+						}
 					/>
 				</div>
 			) }
@@ -574,6 +562,9 @@ function ViewTable< Item >( {
 								>
 									<BulkSelectionCheckbox
 										checkboxRef={ tableSelectionRef }
+										onSelect={ () =>
+											focusAfterToggle( bulkSelectionRef )
+										}
 										selection={ selection }
 										onChangeSelection={ onChangeSelection }
 										data={ data }

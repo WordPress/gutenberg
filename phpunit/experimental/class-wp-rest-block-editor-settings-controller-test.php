@@ -6,7 +6,7 @@
  */
 
 /**
- * Unit tests for the mobile block editor settings.
+ * Unit tests for the block editor settings endpoint.
  *
  * @covers WP_REST_Block_Editor_Settings_Controller
  */
@@ -15,6 +15,11 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	 * @var int
 	 */
 	protected static $admin_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $editor_id;
 
 	public function set_up() {
 		parent::set_up();
@@ -28,9 +33,14 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetupBeforeClass( $factory ) {
-		self::$admin_id = $factory->user->create(
+		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
+			)
+		);
+		self::$editor_id = $factory->user->create(
+			array(
+				'role' => 'editor',
 			)
 		);
 	}
@@ -38,6 +48,7 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 	public static function wpTearDownAfterClass() {
 		// Delete the test user.
 		self::delete_user( self::$admin_id );
+		self::delete_user( self::$editor_id );
 	}
 
 	public function test_register_routes() {
@@ -62,6 +73,49 @@ class Gutenberg_REST_Block_Editor_Settings_Controller_Test extends WP_Test_REST_
 		$this->assertArrayHasKey( 'colors', $data, 'colors should be in the returned data' );
 		$this->assertArrayHasKey( 'gradients', $data, 'gradients should be in the returned data' );
 		$this->assertArrayHasKey( 'fontSizes', $data, 'fontSizes should be in the returned data' );
+	}
+
+	public function test_get_items_lets_users_who_can_edit_theme_options_update_block_bindings() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertTrue( $data['canUpdateBlockBindings'] );
+	}
+
+	public function test_get_items_does_not_let_users_who_cannot_edit_theme_options_update_block_bindings() {
+		wp_set_current_user( self::$editor_id );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertFalse( $data['canUpdateBlockBindings'] );
+	}
+
+	public function test_get_items_lets_filters_change_can_update_block_bindings() {
+		wp_set_current_user( self::$admin_id );
+		$filter = static function ( $settings ) {
+			$settings['canUpdateBlockBindings'] = false;
+			return $settings;
+		};
+		add_filter( 'block_editor_settings_all', $filter );
+		$request  = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
+		$response = rest_get_server()->dispatch( $request );
+		remove_filter( 'block_editor_settings_all', $filter );
+		$data = $response->get_data();
+
+		$this->assertFalse( $data['canUpdateBlockBindings'] );
+	}
+
+	public function test_get_items_does_not_check_block_bindings_with_the_site_editor_context_for_mobile() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/wp-block-editor/v1/settings' );
+		$request->set_param( 'context', 'mobile' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertNotTrue( $data['canUpdateBlockBindings'] ?? null );
 	}
 
 	/**

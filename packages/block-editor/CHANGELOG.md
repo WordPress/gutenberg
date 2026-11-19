@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 20.1.0 (2026-11-18)
+
 ### Enhancements
 
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
