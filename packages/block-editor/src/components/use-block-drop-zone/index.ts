@@ -366,7 +366,7 @@ export default function useBlockDropZone( {
 				}
 
 				const draggedBlockClientIds = getDraggedBlockClientIds();
-				const isGatheredMove =
+				const isNonContiguousMove =
 					draggedBlockClientIds.length > 0 &&
 					! areBlocksContiguous( draggedBlockClientIds );
 				const targetParents = [
@@ -390,7 +390,7 @@ export default function useBlockDropZone( {
 					draggedBlockClientIds
 				);
 				const isBlockDroppingAllowed =
-					( ! isGatheredMove ||
+					( ! isNonContiguousMove ||
 						canMoveBlockSetToPosition(
 							draggedBlockClientIds,
 							targetRootClientId
@@ -406,7 +406,7 @@ export default function useBlockDropZone( {
 				// list, not the target's own.
 				const isParentDropTargetValid =
 					!! dropZoneElement &&
-					( ! isGatheredMove ||
+					( ! isNonContiguousMove ||
 						canMoveBlockSetToPosition(
 							draggedBlockClientIds,
 							parentBlockClientId
@@ -498,7 +498,7 @@ export default function useBlockDropZone( {
 				let [ targetIndex, operation, nearestSide ] =
 					dropTargetPosition;
 				if (
-					isGatheredMove &&
+					isNonContiguousMove &&
 					( operation === 'group' || operation === 'replace' )
 				) {
 					// Gathering inserts next to content; it never replaces or groups it.

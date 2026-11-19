@@ -636,6 +636,8 @@ function ListViewBlock( {
 	return (
 		<ListViewLeaf
 			className={ classes }
+			// Close the gaps left by dragged rows above this row, keeping one
+			// row of space for the drop marker.
 			style={
 				draggedItemsHeight === undefined
 					? undefined

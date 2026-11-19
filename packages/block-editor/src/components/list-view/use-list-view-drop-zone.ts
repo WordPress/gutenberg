@@ -496,7 +496,7 @@ export default function useListViewDropZone( {
 			( event: DragEvent, currentTarget: HTMLElement ) => {
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
-				const isGatheredMove =
+				const isNonContiguousMove =
 					isBlockDrag &&
 					! areBlocksContiguous( draggedBlockClientIds );
 
@@ -522,7 +522,7 @@ export default function useListViewDropZone( {
 					const rootClientId = getBlockRootClientId( clientId );
 					let canInsertDraggedBlocksAsSibling = true;
 					let canInsertDraggedBlocksAsChild = true;
-					if ( isGatheredMove ) {
+					if ( isNonContiguousMove ) {
 						canInsertDraggedBlocksAsSibling =
 							canMoveBlockSetToPosition(
 								draggedBlockClientIds,
@@ -566,7 +566,7 @@ export default function useListViewDropZone( {
 
 				if ( newTarget ) {
 					setTarget( newTarget );
-				} else if ( isGatheredMove ) {
+				} else if ( isNonContiguousMove ) {
 					setTarget( null );
 				}
 			},

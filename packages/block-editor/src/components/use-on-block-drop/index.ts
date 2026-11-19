@@ -46,6 +46,8 @@ export function parseDropEvent(
 		return result;
 	}
 
+	// Drag data may come from outside this editor. Ignore invalid JSON or
+	// unexpected shapes instead of using them as block IDs.
 	try {
 		const parsed: unknown = JSON.parse(
 			event.dataTransfer.getData( 'wp-blocks' )
@@ -58,6 +60,7 @@ export function parseDropEvent(
 			return result;
 		}
 		const data = parsed as Partial< BlockDropData >;
+		// The source parent must be an ID when provided.
 		if (
 			data.srcRootClientId !== undefined &&
 			data.srcRootClientId !== null &&
@@ -65,6 +68,7 @@ export function parseDropEvent(
 		) {
 			return result;
 		}
+		// Dragged block IDs must be a non-empty list of strings when provided.
 		if (
 			data.srcClientIds !== undefined &&
 			data.srcClientIds !== null &&
