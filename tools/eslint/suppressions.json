@@ -6208,14 +6208,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/html-renderer.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/utils/init-block.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

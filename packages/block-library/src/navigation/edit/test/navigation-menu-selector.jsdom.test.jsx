@@ -106,6 +106,27 @@ describe( 'NavigationMenuSelector', () => {
 				} )
 			).toBeInTheDocument();
 		} );
+
+		it( 'should show the title of the current menu without decoding it again', async () => {
+			useNavigationMenu.mockReturnValue( {
+				navigationMenu: {
+					id: navigationMenu1.id,
+					title: 'Fish &amp; Chips',
+					status: 'publish',
+				},
+				navigationMenus: navigationMenusFixture,
+				hasResolvedNavigationMenus: true,
+				canSwitchNavigationMenu: true,
+			} );
+
+			render(
+				<NavigationMenuSelector currentMenuId={ navigationMenu1.id } />
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Fish &amp; Chips' } )
+			).toBeInTheDocument();
+		} );
 	} );
 
 	describe( 'Dropdown', () => {
@@ -213,11 +234,16 @@ describe( 'NavigationMenuSelector', () => {
 				const toggleButton = screen.getByRole( 'button' );
 				await user.click( toggleButton );
 
-				// Check the Tools Group and Create Menu Button are present.
+				// Check the Tools Group and Create Menu Button are not present.
 				const toolsGroup = screen.queryByRole( 'group', {
 					name: 'Tools',
 				} );
 				expect( toolsGroup ).not.toBeInTheDocument();
+				expect(
+					screen.queryByRole( 'menuitem', {
+						name: 'Create new Menu',
+					} )
+				).not.toBeInTheDocument();
 			} );
 
 			it( 'should call handler callback and close popover when create menu button is clicked', async () => {
@@ -441,7 +467,7 @@ describe( 'NavigationMenuSelector', () => {
 				expect( menuItem ).toBeChecked();
 			} );
 
-			it( 'should call the handler when the Navigation Menu is selected', async () => {
+			it( 'should let a user without create permission switch the Navigation Menu', async () => {
 				const user = userEvent.setup();
 
 				const handler = vi.fn();
@@ -449,7 +475,7 @@ describe( 'NavigationMenuSelector', () => {
 				useNavigationMenu.mockReturnValue( {
 					navigationMenus: navigationMenusFixture,
 					hasResolvedNavigationMenus: true,
-					canUserCreateNavigationMenus: true,
+					canUserCreateNavigationMenus: false,
 					canSwitchNavigationMenu: true,
 				} );
 

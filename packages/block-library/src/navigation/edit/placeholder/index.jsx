@@ -22,7 +22,16 @@ export default function NavigationPlaceholder( {
 	onCreateEmpty,
 } ) {
 	const { isResolving: isResolvingMenus, hasResolved: hasResolvedMenus } =
-		useEntityRecords( 'root', 'menu', { per_page: -1, context: 'view' } );
+		useEntityRecords(
+			'root',
+			'menu',
+			{ per_page: -1, context: 'view' },
+			{ enabled: canUserCreateNavigationMenus }
+		);
+
+	// Classic menus are only loaded for users who can import them.
+	const hasResolvedSetupOptions =
+		hasResolvedMenus || ! canUserCreateNavigationMenus;
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -33,10 +42,10 @@ export default function NavigationPlaceholder( {
 			speak( __( 'Loading navigation block setup options…' ) );
 		}
 
-		if ( hasResolvedMenus ) {
+		if ( hasResolvedSetupOptions ) {
 			speak( __( 'Navigation block setup options ready.' ) );
 		}
-	}, [ hasResolvedMenus, isResolvingMenus, isSelected ] );
+	}, [ hasResolvedSetupOptions, isResolvingMenus, isSelected ] );
 
 	const isResolvingActions =
 		isResolvingMenus && isResolvingCanUserCreateNavigationMenus;

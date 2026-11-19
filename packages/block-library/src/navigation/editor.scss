@@ -85,6 +85,12 @@
 	flex-grow: 1;
 }
 
+// The read-only preview of a menu needs a wrapper element to make its items
+// inert. Keep that wrapper out of the navigation's flex layout.
+.wp-block-navigation__read-only-items {
+	display: contents;
+}
+
 // IE fix for submenu visibility on parent focus.
 .is-editing > .wp-block-navigation__container {
 	visibility: visible;
