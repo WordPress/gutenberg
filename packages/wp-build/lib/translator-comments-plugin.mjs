@@ -1,7 +1,8 @@
 import { RolldownMagicString } from 'rolldown';
 import { parseSync } from 'rolldown/utils';
 
-const TRANSLATOR_COMMENT = /^\s*translators:/i;
+// Also matches ` * translators:` in multi-line comments, but not JSDoc, which is kept already.
+const TRANSLATOR_COMMENT = /^(?!\*)[\s*]*translators:/i;
 
 /**
  * Rolldown plugin that keeps translator comments in the output.

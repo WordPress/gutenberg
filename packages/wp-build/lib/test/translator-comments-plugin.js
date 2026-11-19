@@ -31,6 +31,10 @@ describe( 'translatorCommentsPlugin()', () => {
 				'		<button',
 				'			// translators: %d: Number of items.',
 				"			title={ sprintf( __( '%d items' ), count ) }",
+				'			/*',
+				'			 * translators: Accessible label.',
+				'			 */',
+				"			aria-label={ __( 'Save' ) }",
 				'			data-note="/* translators: Not a comment. */"',
 				'		>',
 				'			{ label }',
@@ -59,6 +63,13 @@ describe( 'translatorCommentsPlugin()', () => {
 		expect( lineAfter( '/** translators: %d: Number of items. */' ) ).toBe(
 			'title: sprintf(__("%d items"), count),'
 		);
+		const multiLine = lines.indexOf( '* translators: Accessible label.' );
+		expect( lines.slice( multiLine - 1, multiLine + 3 ) ).toEqual( [
+			'/**',
+			'* translators: Accessible label.',
+			'*/',
+			'"aria-label": __("Save"),',
+		] );
 		expect( output[ 0 ].code ).toContain(
 			'"data-note": "/* translators: Not a comment. */"'
 		);
