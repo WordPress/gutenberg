@@ -654,9 +654,11 @@ export type Action =
 	| {
 			type: 'MOVE_BLOCKS_TO_POSITION';
 			clientIds: string[];
-			fromRootClientId?: string | null;
-			/** All source parents for an atomic explicit-set move. */
-			fromRootClientIds?: string[];
+			/**
+			 * Source parent, or all source parents for a gathered move.
+			 * Gathered moves use an index adjusted for source removals.
+			 */
+			fromRootClientId?: string | string[] | null;
 			toRootClientId?: string | null;
 			index?: number;
 	  }

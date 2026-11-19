@@ -89,7 +89,7 @@ export const moveBlockSetToPosition =
 			dispatch( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
 				clientIds: orderedIds,
-				fromRootClientIds: sourceParents,
+				fromRootClientId: sourceParents,
 				toRootClientId: rootClientId,
 				index: insertionIndex,
 			} );
