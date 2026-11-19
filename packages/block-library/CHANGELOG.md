@@ -1,3 +1,9 @@
+## 2.9.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.7.0 (2019-08-05)
 
 ### Enhancements
