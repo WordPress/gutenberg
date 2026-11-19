@@ -560,7 +560,7 @@ test.describe( 'Links', () => {
 		// and check that the input has the correct value.
 		await pageUtils.pressKeys( 'primary+K' );
 		await expect(
-			page.getByRole( 'link', { name: 'The new Gutenberg editing' } )
+			linkPopover.locator( `a[href="${ URL }"]` )
 		).toBeFocused();
 		await pageUtils.pressKeys( 'Tab' );
 		await pageUtils.pressKeys( 'Enter' );
