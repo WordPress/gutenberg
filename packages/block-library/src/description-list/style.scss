@@ -1,0 +1,5 @@
+// Default description indentation that scales with the text size.
+// Zero specificity so themes and block styles can always override it.
+:where(.wp-block-description-list dd) {
+	margin-inline-start: 2em;
+}

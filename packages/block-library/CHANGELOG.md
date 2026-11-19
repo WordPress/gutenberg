@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks ([#81728](https://github.com/WordPress/gutenberg/pull/81728)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Enhancements
