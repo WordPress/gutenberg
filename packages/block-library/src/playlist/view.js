@@ -72,9 +72,11 @@ const { state } = store(
 						( trackId ) =>
 							isTrackVisible( ref, context.tracks, trackId )
 					);
-					if ( firstVisibleTrack ) {
-						context.currentId = firstVisibleTrack;
+					// Don't load a hidden track when none are visible.
+					if ( ! firstVisibleTrack ) {
+						return;
 					}
+					context.currentId = firstVisibleTrack;
 				}
 
 				const track =
