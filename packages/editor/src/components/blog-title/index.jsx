@@ -12,12 +12,16 @@ import { useState, useMemo } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { TEMPLATE_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { store as editorStore } from '../../store';
 
 const EMPTY_OBJECT = {};
 
 export default function BlogTitle() {
 	const { editEntityRecord } = useDispatch( coreStore );
+	// Site settings are not part of the post: a suggestion cannot propose
+	// them, so they are read-only while suggesting.
+	const lockedProps = useLockedPostSettingProps();
 	const { postsPageTitle, postsPageId, isTemplate, postSlug } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEditedEntityRecord, canUser } =
@@ -93,6 +97,7 @@ export default function BlogTitle() {
 							decodedTitle
 						) }
 						onClick={ onToggle }
+						{ ...lockedProps }
 					>
 						{ decodedTitle }
 					</Button>
