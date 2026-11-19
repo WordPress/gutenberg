@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   `update`: redraw the icon as two curved arrows circling each other, so it reads as a cycle. The two straight diagonal arrows it carried read closer to a resize affordance ([#87088](https://github.com/WordPress/gutenberg/pull/87088)).
+-   `update`, `replay`, `backup`: redraw the three on a shared round base, a 7.25 radius circle centred on the canvas with the same arrowhead, so they read as one family. The `update` arrows now point counterclockwise, matching `replay` and `backup` ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
 
 ## 21.0.0 (2026-11-18)
 
