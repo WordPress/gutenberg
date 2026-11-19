@@ -26,7 +26,7 @@ includes:
 # https://github.com/phpstan/phpstan-strict-rules
 rules:
 	# strictRules.disallowedLooseComparison is registered under `services` below, since it takes an argument.
-	# strictRules.numericOperandsInArithmeticOperators is registered under `services` below, since its rules need an OperatorRuleHelper service.
+	# strictRules.numericOperandsInArithmeticOperators is registered under `services` below, since its rules need a helper.
 	# strictRules.disallowedBacktick
 	- PHPStan\Rules\DisallowedConstructs\DisallowedBacktickRule
 	# strictRules.disallowedImplicitArrayCreation
