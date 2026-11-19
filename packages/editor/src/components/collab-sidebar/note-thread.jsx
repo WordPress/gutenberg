@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { Button } from '@wordpress/components';
-import { Stack, VisuallyHidden } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 import {
 	useDebounce,
 	useEvent,
@@ -103,6 +103,7 @@ export function NoteThread( {
 	const contentId = `note-thread-${ note.id }-content`;
 	const noteContentId = `note-${ note.id }-text`;
 	const isKeyboardTabbingRef = useRef( false );
+	const wasPressedUnfocusedRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
 
@@ -214,26 +215,27 @@ export function NoteThread( {
 	}
 
 	function onThreadClick( event ) {
-		const thread = event.currentTarget;
 		// Clicks in portaled UI, like the link popover, bubble here too.
-		if ( ! thread.contains( event.target ) ) {
+		if ( ! event.currentTarget.contains( event.target ) ) {
 			return;
 		}
-		if ( ! isSelected ) {
-			onSelectNote();
-			return;
-		}
-		// Clicking the thread's text drops focus, which would deselect it.
-		if ( ! thread.contains( thread.ownerDocument.activeElement ) ) {
-			focusNoteThread( note.id, sidebarRef.current );
-		}
+		onSelectNote();
 	}
 
 	function onToggleNote( event ) {
 		// The thread's own click handler would select it again.
 		event.stopPropagation();
+		// A keyboard click has no press to go by.
+		const wasPressedUnfocused =
+			event.detail > 0 && wasPressedUnfocusedRef.current;
 		if ( ! isSelected ) {
 			onSelectNote();
+			return;
+		}
+		// A selected floating thread can still be minimized, until focused.
+		// Pressing it focuses it, so go by the state before the press.
+		if ( isFloating && ( wasPressedUnfocused || ! hasFocus ) ) {
+			focusNoteThread( note.id, sidebarRef.current );
 			return;
 		}
 		onDeselectNote();
@@ -318,75 +320,69 @@ export function NoteThread( {
 			} }
 			// No `aria-label`: screen readers handle one on a list item
 			// inconsistently, so the thread is announced from its content.
-			// Keyboard users expand it through the toggle below; the click
-			// handler above is a pointer shortcut.
+			// Keyboard users expand it through the root note's toggle; the
+			// click handler above is a pointer shortcut.
 			role="listitem"
+			// Holds focus when the thread's text is clicked. Otherwise focus
+			// leaves the thread, which deselects it.
+			tabIndex={ -1 }
 		>
-			{ /*
-			 * Covers the card, so its focus ring outlines the whole thread,
-			 * but lets clicks through to the content. Collapsed, it takes the
-			 * root note as its description: minimized floating threads hide
-			 * the note text, and stay minimized until focused.
-			 */ }
-			<button
-				type="button"
-				className="editor-collab-sidebar-panel__thread-toggle"
-				aria-expanded={ isSelected }
-				aria-controls={ contentId }
-				aria-describedby={
-					! isSelected || ( isFloating && ! hasFocus )
-						? noteContentId
-						: undefined
+			{ ! note.blockClientId && (
+				<p className="editor-collab-sidebar-panel__deleted-block-notice">
+					{ __( 'Original block deleted.' ) }
+				</p>
+			) }
+			<Note
+				note={ note }
+				contentId={ noteContentId }
+				toggleProps={ {
+					'aria-expanded': isSelected,
+					'aria-controls': contentId,
+					// Collapsed, the toggle takes the note as its description:
+					// minimized floating threads hide the note text, and stay
+					// minimized until focused.
+					'aria-describedby':
+						! isSelected || ( isFloating && ! hasFocus )
+							? noteContentId
+							: undefined,
+					onPointerDown: () => {
+						wasPressedUnfocusedRef.current = ! hasFocus;
+					},
+					onClick: onToggleNote,
+				} }
+				afterToggle={
+					/*
+					 * Only the selected thread has a reply field to skip to.
+					 * Rendered on every thread, the link would be announced
+					 * with each one.
+					 */
+					isSelected && (
+						<Button
+							className="editor-collab-sidebar-panel__skip-to-note"
+							variant="secondary"
+							size="compact"
+							onClick={ () => {
+								focusNoteThread(
+									note.id,
+									sidebarRef.current,
+									'[role="textbox"]'
+								);
+							} }
+						>
+							{ __( 'Add new reply' ) }
+						</Button>
+					)
 				}
-				onClick={ onToggleNote }
-			>
-				<VisuallyHidden>
-					{ sprintf(
-						// translators: %s: author name.
-						__( 'Note by %s' ),
-						note.author_name
-					) }
-				</VisuallyHidden>
-			</button>
+				isSelected={ isSelected }
+				onEditNote={ onEdit }
+				onDeleteNote={ handleDelete }
+				onResolve={ handleResolve }
+				isThreadResolved={ isThreadResolved }
+			/>
 			<div
 				id={ contentId }
 				className="editor-collab-sidebar-panel__thread-content"
 			>
-				{ /*
-				 * Only the selected thread has a reply field to skip to. Rendered
-				 * on every thread, the link would be the first thing a screen
-				 * reader announces for each one.
-				 */ }
-				{ isSelected && (
-					<Button
-						className="editor-collab-sidebar-panel__skip-to-note"
-						variant="secondary"
-						size="compact"
-						onClick={ () => {
-							focusNoteThread(
-								note.id,
-								sidebarRef.current,
-								'[role="textbox"]'
-							);
-						} }
-					>
-						{ __( 'Add new reply' ) }
-					</Button>
-				) }
-				{ ! note.blockClientId && (
-					<p className="editor-collab-sidebar-panel__deleted-block-notice">
-						{ __( 'Original block deleted.' ) }
-					</p>
-				) }
-				<Note
-					note={ note }
-					contentId={ noteContentId }
-					isSelected={ isSelected }
-					onEditNote={ onEdit }
-					onDeleteNote={ handleDelete }
-					onResolve={ handleResolve }
-					isThreadResolved={ isThreadResolved }
-				/>
 				{ showAllReplies &&
 					allReplies.map( ( reply ) => (
 						<Note
@@ -450,24 +446,24 @@ export function NoteThread( {
 						} }
 					/>
 				) }
-				{ !! note.blockClientId && (
-					<Button
-						className="editor-collab-sidebar-panel__skip-to-block"
-						variant="secondary"
-						size="compact"
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							relatedBlockElement?.focus();
-							// Another of the note's blocks can be selected, and an
-							// unselected block can't take focus while the canvas is
-							// an editing host.
-							selectBlock( note.blockClientId, true );
-						} }
-					>
-						{ __( 'Back to block' ) }
-					</Button>
-				) }
 			</div>
+			{ !! note.blockClientId && (
+				<Button
+					className="editor-collab-sidebar-panel__skip-to-block"
+					variant="secondary"
+					size="compact"
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						relatedBlockElement?.focus();
+						// Another of the note's blocks can be selected, and an
+						// unselected block can't take focus while the canvas is
+						// an editing host.
+						selectBlock( note.blockClientId, true );
+					} }
+				>
+					{ __( 'Back to block' ) }
+				</Button>
+			) }
 		</FloatingContainer>
 	);
 }

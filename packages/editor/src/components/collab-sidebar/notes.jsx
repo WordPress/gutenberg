@@ -160,10 +160,13 @@ export function Notes( {
 		}
 
 		const currentIndex = threads.findIndex( ( t ) => t.id === thread.id );
-		// The thread's disclosure toggle. Enter and Space are its own clicks.
-		const isSelfTarget = event.target.classList.contains(
-			'editor-collab-sidebar-panel__thread-toggle'
-		);
+		// The thread's disclosure toggle, or the thread itself after a click
+		// on its text. Enter and Space are the toggle's own clicks.
+		const isSelfTarget =
+			event.target === event.currentTarget ||
+			event.target.classList.contains(
+				'editor-collab-sidebar-panel__thread-toggle'
+			);
 
 		if ( event.key === 'ArrowRight' && isSelfTarget && ! isSelected ) {
 			// Expand thread.

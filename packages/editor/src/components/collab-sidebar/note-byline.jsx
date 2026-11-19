@@ -85,6 +85,8 @@ export function NoteByline( { avatar, name, date, userId } ) {
 			<Stack
 				direction="column"
 				className="editor-collab-sidebar-panel__user-info"
+				// Phrasing content: the byline can sit inside a button.
+				render={ <span /> }
 			>
 				<span className="editor-collab-sidebar-panel__user-name">
 					{ name ?? currentUserName }

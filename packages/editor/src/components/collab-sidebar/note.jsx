@@ -50,6 +50,8 @@ function NoteActionsMenu( { items, buttonRef } ) {
 
 export function Note( {
 	contentId,
+	toggleProps,
+	afterToggle,
 	note,
 	parentNote,
 	isSelected,
@@ -217,6 +219,8 @@ export function Note( {
 		<NoteCard
 			note={ note }
 			actions={ actions }
+			toggleProps={ toggleProps }
+			afterToggle={ afterToggle }
 			className="editor-collab-sidebar-panel__note"
 		>
 			<div className="editor-collab-sidebar-panel__note-body">

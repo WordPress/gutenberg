@@ -477,9 +477,11 @@ test.describe( 'Block Notes', () => {
 		const thread = blockNoteUtils.getThread( 'Disclosed note' );
 		const toggle = getThreadToggle( thread );
 
-		// The list item is structure; the toggle is the focusable control.
-		await expect( thread ).not.toHaveAttribute( 'tabindex' );
-		await expect( toggle ).toHaveAccessibleName( 'Note by admin' );
+		// The list item is structure, out of the tab order; the toggle is
+		// the focusable control.
+		await expect( thread ).toHaveAttribute( 'tabindex', '-1' );
+		// Named by the visible byline, so voice control can target it.
+		await expect( toggle ).toHaveAccessibleName( /^admin / );
 		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		await expect( toggle ).toHaveAccessibleDescription( 'Disclosed note' );
 
@@ -493,6 +495,50 @@ test.describe( 'Block Notes', () => {
 		await expect( thread ).not.toHaveClass( /is-selected/ );
 		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		await expect( toggle ).toBeFocused();
+	} );
+
+	test( 'toggles a thread with a click on its disclosure button', async ( {
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Clicked note',
+		} );
+		await blockNoteUtils.deselect();
+		const thread = blockNoteUtils.getThread( 'Clicked note' );
+		const toggle = getThreadToggle( thread );
+
+		// Voice control clicks the center of the button, which has to hit it.
+		await toggle.click();
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
+		await expect( toggle ).toBeFocused();
+
+		await toggle.click();
+		await expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+		await expect( thread ).not.toHaveClass( /is-selected/ );
+	} );
+
+	test( 'keeps a thread expanded while its text is pressed', async ( {
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.insertBlockWithNote( {
+			content: 'Testing block comments',
+			note: 'Pressed note',
+		} );
+		const thread = blockNoteUtils.getThread( 'Pressed note' );
+		await expect( thread ).toHaveClass( /is-selected/ );
+
+		// A real click holds the button down long enough for a focus loss
+		// to be handled before the click arrives.
+		await thread.getByText( 'Pressed note' ).hover();
+		await page.mouse.down();
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 300 );
+		await expect( thread ).toHaveClass( /is-selected/ );
+		await page.mouse.up();
+		await expect( thread ).toHaveClass( /is-selected/ );
+		await expect( thread ).toContainText( 'Pressed note' );
 	} );
 
 	test( 'exposes the note threads as a list rather than a tree', async ( {

@@ -155,7 +155,7 @@ function ReactionButton( {
 										'.editor-collab-sidebar-panel__thread'
 									)
 									?.querySelector< HTMLElement >(
-										':scope > .editor-collab-sidebar-panel__thread-toggle'
+										'.editor-collab-sidebar-panel__thread-toggle'
 									)
 									?.focus();
 							}

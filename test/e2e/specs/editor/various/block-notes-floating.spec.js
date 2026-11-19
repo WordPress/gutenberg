@@ -1043,7 +1043,7 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			// The hidden note text still reaches screen readers.
 			await expect( getThreadToggle( thread ) ).toHaveAccessibleName(
-				'Note by admin'
+				/^admin /
 			);
 			await expect(
 				getThreadToggle( thread )

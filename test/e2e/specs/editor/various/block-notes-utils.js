@@ -317,7 +317,7 @@ class BlockNoteUtils {
  * @param {import('@playwright/test').Locator} thread Note thread.
  */
 function getThreadToggle( thread ) {
-	return thread.getByRole( 'button', { name: /^Note by / } );
+	return thread.locator( '.editor-collab-sidebar-panel__thread-toggle' );
 }
 
 module.exports = { BlockNoteUtils, getAuthorTint, getThreadToggle };
