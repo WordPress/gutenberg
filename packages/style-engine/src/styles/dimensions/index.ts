@@ -73,4 +73,24 @@ const objectFit = {
 	},
 };
 
-export default [ height, minHeight, minWidth, aspectRatio, width, objectFit ];
+const overflow = {
+	name: 'overflow',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'dimensions', 'overflow' ],
+			'overflow'
+		);
+	},
+};
+
+export default [
+	height,
+	minHeight,
+	minWidth,
+	aspectRatio,
+	width,
+	objectFit,
+	overflow,
+];

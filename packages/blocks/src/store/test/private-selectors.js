@@ -216,6 +216,24 @@ describe( 'private selectors', () => {
 
 			expect( supports ).toEqual( [ 'fontSize', 'textIndent' ] );
 		} );
+
+		it( 'return overflow when supported by blocks', () => {
+			const supports = getSupportedStyles(
+				getState( [
+					{
+						name: 'core/group',
+						supports: {
+							dimensions: {
+								overflow: true,
+							},
+						},
+					},
+				] ),
+				'core/group'
+			);
+
+			expect( supports ).toEqual( [ 'overflow' ] );
+		} );
 	} );
 
 	describe( 'getBlockKeyboardShortcuts', () => {

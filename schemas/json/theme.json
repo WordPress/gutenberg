@@ -21,7 +21,7 @@
 			"type": "object",
 			"properties": {
 				"appearanceTools": {
-					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight, textColumns",
+					"description": "Setting that enables the following UI tools:\n\n- background: backgroundImage, backgroundSize, gradient\n- border: color, radius, style, width\n- color: link, heading, button, caption\n- dimensions: aspectRatio, height, minHeight, minWidth, overflow, width\n- position: sticky\n- spacing: blockGap, margin, padding\n- typography: lineHeight, textColumns",
 					"type": "boolean",
 					"default": false
 				}
@@ -339,6 +339,11 @@
 						},
 						"minWidth": {
 							"description": "Allow users to set custom minimum width.",
+							"type": "boolean",
+							"default": false
+						},
+						"overflow": {
+							"description": "Allow users to set custom overflow.",
 							"type": "boolean",
 							"default": false
 						},
@@ -1746,6 +1751,22 @@
 							"description": "Sets the `min-width` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"overflow": {
+							"description": "Sets the `overflow` CSS property.",
+							"oneOf": [
+								{
+									"type": "string",
+									"enum": [
+										"visible",
+										"hidden",
+										"clip",
+										"scroll",
+										"auto"
+									]
+								},
 								{ "$ref": "#/definitions/refComplete" }
 							]
 						},

@@ -381,6 +381,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'height'      => true,
 				'minHeight'   => true,
 				'minWidth'    => true,
+				'overflow'    => true,
 				'width'       => true,
 			),
 			'position'   => array(
@@ -425,6 +426,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'height'      => true,
 						'minHeight'   => true,
 						'minWidth'    => true,
+						'overflow'    => true,
 						'width'       => true,
 					),
 					'position'   => array(

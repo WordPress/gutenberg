@@ -76,6 +76,7 @@ export interface StyleSettings {
 		minWidth?: boolean;
 		width?: boolean;
 		aspectRatio?: boolean;
+		overflow?: boolean;
 		dimensionSizes?: DimensionSizes;
 	};
 	layout?: Record< string, unknown > & {

@@ -210,6 +210,21 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				),
 			),
 
+			'inline_valid_dimensions_overflow_style'       => array(
+				'block_styles'    => array(
+					'dimensions' => array(
+						'overflow' => 'clip',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'overflow:clip;',
+					'declarations' => array(
+						'overflow' => 'clip',
+					),
+				),
+			),
+
 			'inline_valid_typography_style'                => array(
 				'block_styles'    => array(
 					'typography' => array(

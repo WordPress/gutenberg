@@ -19,6 +19,7 @@ import SpacingSizesControl from '../spacing-sizes-control';
 import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
+import OverflowTool from '../dimensions-tool/overflow-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -60,8 +61,13 @@ export function useHasDimensionsPanel(
 		hasMinWidth( settings ) ||
 		hasWidth( settings ) ||
 		hasAspectRatio( settings, styleState ) ||
-		hasChildLayout( settings, styleState )
+		hasChildLayout( settings, styleState ) ||
+		hasOverflow( settings )
 	);
+}
+
+function hasOverflow( settings: StyleSettings | undefined ) {
+	return settings?.dimensions?.overflow;
 }
 
 function hasContentSize( settings: StyleSettings | undefined ) {
@@ -353,6 +359,7 @@ const DEFAULT_CONTROLS: Record< string, boolean > = {
 	width: true,
 	aspectRatio: true,
 	childLayout: true,
+	overflow: true,
 };
 
 export default function DimensionsPanel( {
@@ -441,6 +448,7 @@ export default function DimensionsPanel( {
 					minWidth: undefined,
 					aspectRatio: undefined,
 					width: undefined,
+					overflow: undefined,
 				},
 			};
 		},
@@ -743,6 +751,19 @@ export default function DimensionsPanel( {
 	};
 	const hasAspectRatioValue = () =>
 		hasValue( value?.dimensions?.aspectRatio );
+
+	const showOverflowControl = hasOverflow( settings );
+	const localOverflowValue = decodeValue( value?.dimensions?.overflow );
+	const inheritedOverflowValue = decodeValue(
+		inheritedValue?.dimensions?.overflow
+	);
+	const overflowValue = localOverflowValue ?? inheritedOverflowValue;
+	const setOverflowValue = ( newValue?: string ) => {
+		onChange(
+			setImmutably( value, [ 'dimensions', 'overflow' ], newValue )
+		);
+	};
+	const hasOverflowValue = () => hasValue( value?.dimensions?.overflow );
 
 	/* There is no Global Styles inheritance model for the
 	 * child-layout sub-keys; they are per-block attributes
@@ -1164,6 +1185,17 @@ export default function DimensionsPanel( {
 					isShownByDefault={
 						defaultControls.aspectRatio ??
 						DEFAULT_CONTROLS.aspectRatio
+					}
+				/>
+			) }
+			{ showOverflowControl && (
+				<OverflowTool
+					hasValue={ hasOverflowValue }
+					value={ overflowValue }
+					onChange={ setOverflowValue }
+					panelId={ panelId }
+					isShownByDefault={
+						defaultControls.overflow ?? DEFAULT_CONTROLS.overflow
 					}
 				/>
 			) }

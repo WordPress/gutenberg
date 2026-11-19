@@ -19,9 +19,10 @@
 	// Stop clipping while a Navigation overlay inside this cover is open. Safari
 	// clips a fixed overlay to this box when it sits inside a sticky element in
 	// the cover. The overlay covers the viewport, so nothing that would bleed is
-	// visible.
+	// visible. Use !important so inline overflow styles from block supports do
+	// not prevent the open overlay from escaping the clipped box.
 	&:has(.wp-block-navigation__responsive-container.is-menu-open) {
-		overflow: visible;
+		overflow: visible !important;
 	}
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;

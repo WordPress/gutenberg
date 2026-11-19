@@ -154,6 +154,7 @@ export function DimensionsPanel( {
 		// be shown by default unless the block explicitly opts in.
 		minHeight: false,
 		minWidth: false,
+		overflow: false,
 		...defaultDimensionsControls,
 		...defaultSpacingControls,
 	};
@@ -230,7 +231,8 @@ export function hasDimensionsSupport(
 			!! support?.height ||
 			!! support?.minHeight ||
 			!! support?.width ||
-			!! support?.minWidth
+			!! support?.minWidth ||
+			!! support?.overflow
 		);
 	}
 
