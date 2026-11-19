@@ -114,7 +114,7 @@
 	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
 	cursor: pointer;
 	line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
-	font-family: $font-family-body;
+	font-family: var(--wpds-typography-font-family-body);
 	font-weight: 400;
 	font-size: $font-size-medium;
 	color: var(--wpds-color-foreground-interactive-neutral);

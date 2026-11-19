@@ -25,11 +25,9 @@ import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/const
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
 	getStyleForState,
-	hasViewportBlockStyleState,
-	setStyleForState,
 } from './block-style-state';
+import { getUpdatedChildLayoutStyle } from './layout-child-utils';
 import type {
-	BlockStyleState,
 	BlockListBlockFeatureProps,
 	ChildLayoutBlockStyle,
 	ChildLayoutControlsPureProps,
@@ -147,6 +145,11 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-column' ] = `${ columnStart }`;
 		} else if ( columnSpan ) {
 			declarations[ 'grid-column' ] = `span ${ columnSpan }`;
+		} else if (
+			hasViewportOverride( 'columnStart' ) &&
+			columnStart === null
+		) {
+			declarations[ 'grid-column' ] = 'auto';
 		}
 	}
 
@@ -161,6 +164,8 @@ export function getChildLayoutStyleRules( {
 			declarations[ 'grid-row' ] = `${ rowStart }`;
 		} else if ( rowSpan ) {
 			declarations[ 'grid-row' ] = `span ${ rowSpan }`;
+		} else if ( hasViewportOverride( 'rowStart' ) && rowStart === null ) {
+			declarations[ 'grid-row' ] = 'auto';
 		}
 	}
 
@@ -301,47 +306,6 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
-/**
- * Merges child layout changes into the active layout style state.
- *
- * @param style         Block style attributes.
- * @param layout        Child layout changes.
- * @param selectedState Selected block style state.
- * @return Updated block style attributes.
- */
-export function getUpdatedChildLayoutStyle(
-	style: ChildLayoutBlockStyle | undefined,
-	layout: ChildLayout,
-	selectedState: BlockStyleState | undefined
-): ChildLayoutBlockStyle | undefined {
-	if ( ! hasViewportBlockStyleState( selectedState ) ) {
-		return {
-			...style,
-			layout: {
-				...style?.layout,
-				...layout,
-			},
-		};
-	}
-
-	const layoutState = {
-		// A viewport state is selected here.
-		viewport: selectedState!.viewport,
-		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-	};
-	// A style state holds the child layout it overrides.
-	const stateStyle = getStyleForState( style, layoutState ) as
-		ChildLayoutBlockStyle | undefined;
-
-	return setStyleForState( style, layoutState, {
-		...stateStyle,
-		layout: {
-			...stateStyle?.layout,
-			...layout,
-		},
-	} );
-}
-
 function useBlockPropsChildLayoutStyles( {
 	style,
 }: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
@@ -455,6 +419,7 @@ function GridTools( {
 		viewportSettings,
 		isChildBlockAGrid,
 		selectedState,
+		isResponsiveEditing,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -464,6 +429,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				isResponsiveEditing: getIsResponsiveEditing,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -496,6 +462,7 @@ function GridTools( {
 				// Check if the selected child block is itself a grid.
 				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 				selectedState: getSelectedBlockStyleState( clientId ),
+				isResponsiveEditing: getIsResponsiveEditing(),
 			};
 		},
 		[ clientId ]
@@ -586,7 +553,9 @@ function GridTools( {
 			{ isManualPlacement &&
 				window.__experimentalEnableGridInteractivity && (
 					<GridItemMovers
-						layout={ style?.layout }
+						style={ style }
+						selectedState={ selectedState }
+						isResponsiveEditing={ isResponsiveEditing }
 						parentLayout={ parentLayout }
 						onChange={ updateLayout }
 						gridClientId={ rootClientId }
