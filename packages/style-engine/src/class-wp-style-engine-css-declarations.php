@@ -23,6 +23,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * An array of CSS declarations (property => value pairs).
 		 *
 		 * @var array<string, string>
+		 * @phpstan-var array<non-falsy-string, non-empty-string>
 		 */
 		protected $declarations = array();
 
@@ -30,7 +31,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * CSS declaration options keyed by property name.
 		 *
 		 * @var array<string, array<string, bool>>
-		 * @phpstan-var array<string, Declaration_Options>
+		 * @phpstan-var array<non-falsy-string, Declaration_Options>
 		 */
 		protected $declaration_options = array();
 
@@ -144,6 +145,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * Gets the declarations array.
 		 *
 		 * @return array<string, string>
+		 *
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		public function get_declarations() {
 			return $this->declarations;
@@ -154,7 +157,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 *
 		 * @return array<string, array<string, bool>>
 		 *
-		 * @phpstan-return array<string, Declaration_Options>
+		 * @phpstan-return array<non-falsy-string, Declaration_Options>
 		 */
 		public function get_declaration_options() {
 			return $this->declaration_options;
