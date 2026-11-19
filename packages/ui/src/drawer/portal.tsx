@@ -1,6 +1,6 @@
 import { Drawer as _Drawer } from '@base-ui/react/drawer';
 import { forwardRef } from '@wordpress/element';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { wpCompatOverlaySlotContainer } from '../utils/wp-compat-overlay-slot';
 import type { PortalProps } from './types';
 
 /**
@@ -14,7 +14,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function DrawerPortal(
 		<_Drawer.Portal
 			ref={ ref }
 			container={
-				container === undefined ? getWpCompatOverlaySlot() : container
+				container === undefined
+					? wpCompatOverlaySlotContainer
+					: container
 			}
 			{ ...restProps }
 		/>

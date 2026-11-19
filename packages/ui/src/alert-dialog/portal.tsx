@@ -1,6 +1,6 @@
 import { AlertDialog as _AlertDialog } from '@base-ui/react/alert-dialog';
 import { forwardRef } from '@wordpress/element';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { wpCompatOverlaySlotContainer } from '../utils/wp-compat-overlay-slot';
 import type { PortalProps } from './types';
 
 /**
@@ -13,7 +13,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 				ref={ ref }
 				container={
 					container === undefined
-						? getWpCompatOverlaySlot()
+						? wpCompatOverlaySlotContainer
 						: container
 				}
 				{ ...props }
