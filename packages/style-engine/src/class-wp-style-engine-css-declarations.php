@@ -179,7 +179,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 
 				// Only append !important in the presence of an option value and when sanitization returns a single declaration.
-				if ( true === ( $options['important'] ?? false ) &&'' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+				if ( true === ( $options['important'] ?? false ) && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
 					return "$filtered_declaration !important";
 				}
 

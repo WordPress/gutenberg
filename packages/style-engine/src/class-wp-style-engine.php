@@ -757,7 +757,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 							continue;
 						}
 					}
-					$individual_css_property                     = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
+					$individual_css_property                      = sprintf( $style_definition['property_keys']['individual'], $individual_property_key );
 					$css_declarations[ $individual_css_property ] = $value;
 				}
 			}
