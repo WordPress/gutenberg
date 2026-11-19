@@ -14,6 +14,8 @@ import { SomeComponent } from '@wordpress/ui';
 // @wordpress/components — a newer alternative is available.
 import { Tabs } from '@wordpress/components';
 import { RadioControl } from '@wordpress/components';
+// @wordpress/components — CustomSelectControl is deprecated.
+import { CustomSelectControl } from '@wordpress/components';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 
@@ -29,6 +31,7 @@ import { Button } from '@wordpress/components';
 import UI from '@wordpress/ui';
 import { Tabs } from '@wordpress/ui';
 import { Radio, RadioGroup, RadioGroupControl } from '@wordpress/ui';
+import { SelectControl } from '@wordpress/ui';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 
