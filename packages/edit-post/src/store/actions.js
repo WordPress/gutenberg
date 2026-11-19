@@ -494,7 +494,9 @@ export const initializeMetaBoxes =
 
 		// Keep the drag helper out of the meta box scroll containers, so it
 		// doesn't stretch or get clipped by them, and don't auto-scroll them.
-		window.jQuery( META_BOX_SORTABLES ).sortable?.( 'option', {
+		// Not limited to `META_BOX_SORTABLES`: an area that isn't rendered yet,
+		// e.g. the sidebar one while the sidebar is closed, is outside it.
+		window.jQuery( '.meta-box-sortables' ).sortable?.( 'option', {
 			appendTo: document.body,
 			scroll: false,
 		} );
