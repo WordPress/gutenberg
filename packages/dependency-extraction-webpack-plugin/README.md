@@ -68,7 +68,7 @@ The asset file name mirrors the emitted JavaScript file name, replacing the file
 
 For example, for an entry named `entrypoint`:
 
-```
+```text
 // Entry `entrypoint`
 import { Component } from 'react';
 
@@ -138,7 +138,7 @@ Each entry point in the webpack bundle will include an asset file that declares 
 
 For example, for an entry named `entrypoint`:
 
-```
+```text
 // Entry `entrypoint`
 import { store, getContext } from '@wordpress/interactivity';
 
@@ -228,7 +228,7 @@ You can provide a filename, or set it to `true` to report to a default `external
 
 ##### `requestToExternal`
 
-**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
+**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requesttoexternalmodule) for module usage.
 
 - Type: function
 
@@ -259,7 +259,7 @@ module.exports = {
 
 ##### `requestToExternalModule`
 
-**Note**: This option is only available with script modules. See [`requestToExternal`](#requestToExternal) for script usage.
+**Note**: This option is only available with script modules. See [`requestToExternal`](#requesttoexternal) for script usage.
 
 - Type: function
 
