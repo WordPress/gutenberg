@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `BlockEditorProvider`: Keep Redo when the last change is marked persistent, for example by saving, right after an undo or redo ([#87119](https://github.com/WordPress/gutenberg/pull/87119)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
