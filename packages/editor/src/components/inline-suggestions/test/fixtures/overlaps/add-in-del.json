@@ -1,0 +1,21 @@
+{
+	"name": "add-in-del",
+	"description": "B types inside A's deletion: a separate addition standing in the struck text.",
+	"phase": "current",
+	"users": { "A": "overlap-anne", "B": "overlap-bob" },
+	"base": "The big red fox.",
+	"suggestions": [
+		{ "key": "A", "author": "A", "kind": "del", "range": [ 4, 12 ] },
+		{ "key": "B", "author": "B", "kind": "add", "text": "small ", "at": 8 }
+	],
+	"expect": {
+		"all-accepted": "The small fox.",
+		"all-rejected": "The big red fox."
+	},
+	"cases": [
+		{
+			"decisions": { "A": "reject", "B": "accept" },
+			"published": "The big small red fox."
+		}
+	]
+}

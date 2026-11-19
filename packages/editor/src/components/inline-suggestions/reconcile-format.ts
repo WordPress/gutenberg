@@ -4,10 +4,11 @@
  * A format-only edit (bold/italic/link toggled over a run, the text itself
  * unchanged) is modelled as a single `format` marker wrapping the run — the
  * Google Docs model: the text is shown once, in place, carrying the *proposed*
- * formatting, never duplicated. The original run is captured separately so a
- * reject can restore it (the caller persists it on the suggestion note).
- * Accepting unwraps the marker (proposed formatting stays); rejecting replaces
- * the run with the captured original.
+ * formatting, never duplicated. What the change adds and removes is recorded
+ * per character as a delta (see `format-delta.ts`), which the caller persists
+ * on the suggestion note with the run before and after for the summary.
+ * Changes stack: one by another author on the same words, or across the edge
+ * of someone's addition, is a second suggestion with its own delta.
  *
  * This module is the pure engine only: it detects the format delta and plans /
  * applies the marker against rich-text values. It does not touch the store or
@@ -15,23 +16,24 @@
  * wired for text edits. `analyzeTextEdit` sees no text change for a format-only
  * edit, so format detection needs this separate pass.
  */
-import { RichTextData, slice, removeFormat } from '@wordpress/rich-text';
+import { RichTextData, slice } from '@wordpress/rich-text';
 import { toRichTextRecord } from './rich-text-record';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
-	SUGGESTION_FORMAT_NAMES,
+	removeAllSuggestionMarkers,
 	SUGGESTION_ID_ATTRIBUTE,
 	SUGGESTION_TYPE_FORMAT,
 	canonicalizeSuggestionStack,
 	isSuggestionFormat,
 	suggestionFormatNameFor,
 	suggestionKindOf,
+	suggestionMarkerListsAt,
 	suggestionMarkersAt,
 	suggestionMarkersIn,
 } from './format';
 import { buildSuggestionMarkerAttributes } from './operations';
-import { classifyOverlap } from './overlap';
-import type { OverlapBlocking, OverlapReason } from './overlap';
+import { computeFormatDelta, isEmptyFormatDelta } from './format-delta';
+import type { FormatDelta } from './format-delta';
 
 /**
  * Serialize a rich-text record range to an HTML string, for capturing the
@@ -146,13 +148,21 @@ export function analyzeFormatEdit(
 }
 
 export interface FormatPlan {
-	kind: 'format' | 'none' | 'refuse';
-	/** Why a `refuse` plan declined the edit. */
-	reason?: OverlapReason;
-	/** The marker in the way of a `refuse` plan. */
-	blocking?: OverlapBlocking;
+	/**
+	 * `format` opens or revises a formatting suggestion; `merge-own` is a
+	 * change made only to the author's own proposed text, which already
+	 * carries it, so nothing is recorded.
+	 */
+	kind: 'format' | 'merge-own' | 'none';
 	/** The changed character range. */
 	range?: { start: number; end: number };
+	/**
+	 * The characters the marker covers, in document order: the range less
+	 * the author's own proposed text.
+	 */
+	indices?: number[];
+	/** What the change adds and removes, per covered character. */
+	delta?: FormatDelta;
 	/** HTML of the original run (for reject). */
 	beforeHTML?: string;
 	/** HTML of the reformatted run. */
@@ -350,11 +360,48 @@ function sliceToUnmarkedHTML(
 	start: number,
 	end: number
 ): string {
-	let unmarked = record;
-	for ( const name of SUGGESTION_FORMAT_NAMES ) {
-		unmarked = removeFormat( unmarked, name, start, end );
+	return sliceToHTML(
+		removeAllSuggestionMarkers( record, start, end ),
+		start,
+		end
+	);
+}
+
+/**
+ * The indices of `[start, end)`.
+ *
+ * @param start Range start.
+ * @param end   Range end (exclusive).
+ * @return Indices.
+ */
+function rangeIndices( start: number, end: number ): number[] {
+	return Array.from(
+		{ length: Math.max( 0, end - start ) },
+		( _, i ) => start + i
+	);
+}
+
+/**
+ * Serialize the given characters without suggestion markers, in order.
+ *
+ * @param record  Rich-text record.
+ * @param indices Character indices, in document order.
+ * @return HTML.
+ */
+function charactersToUnmarkedHTML( record: any, indices: number[] ): string {
+	let html = '';
+	let runStart = -1;
+	let previous = -2;
+	for ( const index of [ ...indices, -1 ] ) {
+		if ( index !== previous + 1 ) {
+			if ( runStart !== -1 ) {
+				html += sliceToUnmarkedHTML( record, runStart, previous + 1 );
+			}
+			runStart = index;
+		}
+		previous = index;
 	}
-	return sliceToHTML( unmarked, start, end );
+	return html;
 }
 
 /**
@@ -420,36 +467,48 @@ export function planFormatMarkers(
 		};
 	}
 	/*
-	 * Another author's addition may hold a formatting change, and a deletion
-	 * may sit under one, but formatting over a formatting change, or across
-	 * the edge of an addition, is declined with the marker in the way.
+	 * Formatting the author's own proposed text revises that proposal: the
+	 * addition carries its text's formatting, so those characters need no
+	 * marker. Everything else gets one formatting suggestion, nested in
+	 * other authors' additions, stacked on other formatting changes, and
+	 * crossing the edges of either.
 	 */
-	const verdict = classifyOverlap( prev.formats, {
-		gesture: 'format',
-		start: range.start,
-		end: range.end,
-		authorToken:
-			authorId === undefined || authorId === null
-				? null
-				: String( authorId ),
-	} );
-	if ( verdict.verdict === 'refuse' ) {
-		return {
-			kind: 'refuse',
-			reason: verdict.reason,
-			blocking: verdict.blocking,
-		};
+	const token =
+		authorId === undefined || authorId === null ? null : String( authorId );
+	const indices: number[] = [];
+	for ( let i = range.start; i < range.end; i++ ) {
+		const ownAddition = suggestionMarkerListsAt(
+			prev.formats?.[ i ]
+		).add.some(
+			( marker ) =>
+				String(
+					marker.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+				) === ( token ?? '' )
+		);
+		if ( ! ownAddition ) {
+			indices.push( i );
+		}
+	}
+	if ( ! indices.length ) {
+		return { kind: 'merge-own', range };
+	}
+	const delta = computeFormatDelta( prev, next, indices );
+	if ( isEmptyFormatDelta( delta ) ) {
+		return { kind: 'merge-own', range };
 	}
 	/*
-	 * Both runs are captured without markers: inside someone's addition the
-	 * original is the proposed text's own formatting, and a deletion over
-	 * the run is a suggestion of its own, not part of this one.
+	 * Both runs are captured without markers, for the summary and as the
+	 * state below the change: inside someone's addition that is the
+	 * proposed text's own formatting, and on someone's formatting change it
+	 * is that change as shown.
 	 */
 	return {
 		kind: 'format',
 		range,
-		beforeHTML: sliceToUnmarkedHTML( prev, range.start, range.end ),
-		afterHTML: sliceToUnmarkedHTML( next, range.start, range.end ),
+		indices,
+		delta,
+		beforeHTML: charactersToUnmarkedHTML( prev, indices ),
+		afterHTML: charactersToUnmarkedHTML( next, indices ),
 	};
 }
 
@@ -502,20 +561,20 @@ export function applyFormatPlan(
 	const { start, end } = plan.range!;
 
 	/*
-	 * Stamp the marker as the outermost format on every character, dropping
-	 * any suggestion marker already in the range the way `applyFormat` would.
-	 * `applyFormat` nests a new format inside the formats the whole range
-	 * shares, so bolding a run would serialize as `<strong><mark>…</mark>
-	 * </strong>`. The front end swaps the marker's span for the note's
-	 * original run, which only removes the proposed formatting when that
-	 * formatting sits inside the marker.
+	 * Add the marker to every covered character, keeping every other marker
+	 * there, other formatting changes included: they stack, oldest
+	 * outermost. An extending plan re-applies its own marker over its run.
 	 */
 	const marker = { type: suggestionFormatNameFor( 'format' ), attributes };
+	const markerId = String( attributes[ SUGGESTION_ID_ATTRIBUTE ] );
+	const covered = plan.indices ?? rangeIndices( start, end );
 	const formats = next.formats.slice();
-	for ( let index = start; index < end; index++ ) {
+	for ( const index of covered ) {
 		const stack = ( formats[ index ] ?? [] ).filter(
 			( format: any ) =>
-				suggestionKindOf( format ) !== SUGGESTION_TYPE_FORMAT
+				suggestionKindOf( format ) !== SUGGESTION_TYPE_FORMAT ||
+				String( format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ] ) !==
+					markerId
 		);
 		formats[ index ] = [ marker, ...stack ];
 	}

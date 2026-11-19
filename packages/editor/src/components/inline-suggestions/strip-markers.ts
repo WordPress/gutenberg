@@ -1,17 +1,12 @@
-import {
-	RichTextData,
-	create,
-	remove,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { RichTextData, create, remove } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	SUGGESTION_AUTHOR_ATTRIBUTE,
 	SUGGESTION_CLASS_PROBE,
-	SUGGESTION_FORMAT_NAMES,
 	SUGGESTION_ID_ATTRIBUTE,
 	isSuggestionFormat,
-	suggestionMarkersAt,
+	removeAllSuggestionMarkers,
+	suggestionMarkerListsAt,
 	suggestionMarkersIn,
 } from './format';
 
@@ -22,11 +17,7 @@ import {
  * @return The record without markers.
  */
 function removeAllMarkers( record: RichTextValue ): RichTextValue {
-	let result = record;
-	for ( const name of SUGGESTION_FORMAT_NAMES ) {
-		result = removeFormat( result, name, 0, result.text.length );
-	}
-	return result;
+	return removeAllSuggestionMarkers( record, 0, record.text.length );
 }
 
 /**
@@ -157,12 +148,14 @@ export function settleInsertedSuggestionMarkers(
 				ids.add( String( id ) );
 			}
 		}
-		const addition = suggestionMarkersAt( stack ).add;
-		isForeignAddition[ index ] =
-			!! addition &&
-			String(
-				addition.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
-			) !== authorToken;
+		// Text nested in another author's addition goes with it, even when
+		// the innermost addition is the author's own.
+		isForeignAddition[ index ] = suggestionMarkerListsAt( stack ).add.some(
+			( addition ) =>
+				String(
+					addition.attributes?.[ SUGGESTION_AUTHOR_ATTRIBUTE ] ?? ''
+				) !== authorToken
+		);
 	} );
 	// Last run first, so earlier offsets stay valid as text is removed.
 	for ( let end = record.text.length; end > 0; ) {
