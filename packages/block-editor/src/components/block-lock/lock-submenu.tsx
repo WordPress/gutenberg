@@ -14,6 +14,42 @@ import type { BlockLockMenuProps } from './types';
 // How long the options stay open after the pointer leaves, in milliseconds.
 const HOVER_CLOSE_DELAY = 200;
 
+interface Point {
+	x: number;
+	y: number;
+}
+
+/**
+ * Returns whether a point is inside the triangle between where the pointer
+ * left the item and the near edge of the options, the path it takes to reach
+ * them.
+ *
+ * @param point The pointer position.
+ * @param exit  Where the pointer left the item.
+ * @param popup The rectangle of the options.
+ *
+ * @return Whether the pointer is heading to the options.
+ */
+function isHeadingToOptions( point: Point, exit: Point, popup: DOMRect ) {
+	const edgeX = isRTL() ? popup.right : popup.left;
+	const corners: Point[] = [
+		exit,
+		{ x: edgeX, y: popup.top },
+		{ x: edgeX, y: popup.bottom },
+	];
+	const sides = corners.map( ( corner, index ) => {
+		const next = corners[ ( index + 1 ) % 3 ];
+		return (
+			( next.x - corner.x ) * ( point.y - corner.y ) -
+			( next.y - corner.y ) * ( point.x - corner.x )
+		);
+	} );
+	return (
+		sides.every( ( side ) => side >= 0 ) ||
+		sides.every( ( side ) => side <= 0 )
+	);
+}
+
 /**
  * Renders the "Lock" item of the block settings menu, which opens the lock
  * options to its side.
@@ -24,7 +60,9 @@ const HOVER_CLOSE_DELAY = 200;
  * portaled into the same popover so the settings menu stays open.
  *
  * Like a submenu, it opens when the pointer rests on the item, and closes
- * shortly after the pointer leaves both the item and the options.
+ * shortly after the pointer leaves both the item and the options. It closes
+ * right away once the pointer rests on another item, unless the pointer is
+ * heading to the options.
  */
 export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
@@ -34,6 +72,8 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 	const [ item, setItem ] = useState< HTMLElement | null >( null );
 	const popupRef = useRef< HTMLDivElement >( null );
 	const closeTimeoutRef = useRef< number >( undefined );
+	// The last pointer position on the item, where it leaves from.
+	const exitPointRef = useRef< Point | null >( null );
 	const container =
 		item?.closest< HTMLElement >( '.components-popover' ) ?? undefined;
 	const openKey = isRTL() ? 'ArrowLeft' : 'ArrowRight';
@@ -68,6 +108,41 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 	}
 
 	useEffect( () => cancelHoverClose, [] );
+
+	// Moving to another item of the settings menu closes the options right
+	// away, rather than after a delay, unless the pointer is on its way to
+	// them across that item.
+	useEffect( () => {
+		const menu = item?.closest< HTMLElement >( '[role="menu"]' );
+		if ( ! isOpen || ! item || ! menu ) {
+			return;
+		}
+
+		const onMenuMouseMove = ( event: globalThis.MouseEvent ) => {
+			const target = event.target as Element | null;
+			const otherItem = target?.closest( '[role^="menuitem"]' );
+			const popup = popupRef.current;
+			if ( ! otherItem || item.contains( otherItem ) || ! popup ) {
+				return;
+			}
+			const exit = exitPointRef.current;
+			if (
+				exit &&
+				isHeadingToOptions(
+					{ x: event.clientX, y: event.clientY },
+					exit,
+					popup.getBoundingClientRect()
+				)
+			) {
+				return;
+			}
+			cancelHoverClose();
+			setIsOpen( false );
+		};
+		menu.addEventListener( 'mousemove', onMenuMouseMove );
+
+		return () => menu.removeEventListener( 'mousemove', onMenuMouseMove );
+	}, [ isOpen, item ] );
 
 	// The settings menu stops arrow keys natively on its container, before
 	// React sees them, so listen on the item itself to open with the keyboard.
@@ -131,6 +206,12 @@ export default function BlockLockSubmenu( { clientIds }: BlockLockMenuProps ) {
 				onMouseEnter={ () => {
 					cancelHoverClose();
 					open( { withKeyboard: false } );
+				} }
+				onMouseMove={ ( event: MouseEvent ) => {
+					exitPointRef.current = {
+						x: event.clientX,
+						y: event.clientY,
+					};
 				} }
 				onMouseLeave={ scheduleHoverClose }
 			>
