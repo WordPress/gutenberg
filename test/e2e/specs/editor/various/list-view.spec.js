@@ -1638,8 +1638,18 @@ test.describe( 'List View', () => {
 	} );
 
 	test.describe( 'long lists', () => {
-		test.beforeEach( async ( { listViewUtils } ) => {
-			await listViewUtils.insertParagraphs( 200 );
+		test.beforeEach( async ( { editor } ) => {
+			// Sets the content in one go, as inserting the blocks one by one
+			// selects the last one and opens the list at its end.
+			await editor.setContent(
+				Array.from(
+					{ length: 200 },
+					( _, index ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+							index + 1
+						}"}} --><p></p><!-- /wp:paragraph -->`
+				).join( '' )
+			);
 		} );
 
 		test( 'shows the rows in view while scrolling', async ( {
@@ -1651,11 +1661,11 @@ test.describe( 'List View', () => {
 
 			await page.mouse.wheel( 0, 4000 );
 			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 
 			await page.mouse.wheel( 0, -4000 );
 			await expect( listViewUtils.getRow( 5 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 		} );
 
 		test( 'opens at a selected block far down the list', async ( {
@@ -1673,7 +1683,7 @@ test.describe( 'List View', () => {
 			await listViewUtils.openListView();
 
 			await expect( listViewUtils.getRow( 150 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 		} );
 
 		test( 'pages through the list with Page Down @firefox @webkit', async ( {
@@ -1686,7 +1696,7 @@ test.describe( 'List View', () => {
 			await page.keyboard.press( 'PageDown' );
 
 			await expect( listViewUtils.getRow( 1 ) ).not.toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 		} );
 
 		test( 'moves to both ends of the list with End and Home @firefox @webkit', async ( {
@@ -1699,14 +1709,16 @@ test.describe( 'List View', () => {
 			await page.keyboard.press( 'End' );
 			await expect( listViewUtils.getRow( 200 ) ).toBeFocused();
 			await expect( listViewUtils.getRow( 200 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 
 			await page.keyboard.press( 'Home' );
 			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
 			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 		} );
 
+		// TEMP: Remove before merge. The window keydown listener is gone, so this
+		// can only regress if someone adds one back.
 		test( 'keeps its scroll position while pressing navigation keys in another field', async ( {
 			editor,
 			page,
@@ -1730,6 +1742,8 @@ test.describe( 'List View', () => {
 			await expect( listViewUtils.getRow( 35 ) ).toBeInViewport();
 		} );
 
+		// TEMP: Remove before merge. It rebuilds the page to mount List View in a
+		// dropdown, which is a hook-level case for a browser test, not an e2e test.
 		test( 'shows the rows in a dropdown opened far down a scrolled page', async ( {
 			page,
 			listViewUtils,
@@ -1791,14 +1805,16 @@ test.describe( 'List View', () => {
 			await toggle.click();
 
 			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 
 			await listViewUtils.getRow( 1 ).hover();
 			await page.mouse.wheel( 0, 1000 );
 			await expect( listViewUtils.getRow( 35 ) ).toBeInViewport();
-			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+			await listViewUtils.expectNoBlankRows();
 		} );
 
+		// TEMP: Remove before merge. Both cases check the hook's geometry, and the
+		// second fakes a panel with injected CSS. They fit a browser test better.
 		test.describe( 'in a tall panel', () => {
 			test.use( {
 				viewport: { width: 1280, height: 1800 },
@@ -1810,9 +1826,7 @@ test.describe( 'List View', () => {
 				await listViewUtils.openListView();
 
 				await expect( listViewUtils.getRow( 45 ) ).toBeInViewport();
-				await expect
-					.poll( listViewUtils.countBlankRowsInView )
-					.toBe( 0 );
+				await listViewUtils.expectNoBlankRows();
 			} );
 
 			test( 'fills the panel when it grows without a window resize', async ( {
@@ -1836,9 +1850,7 @@ test.describe( 'List View', () => {
 				);
 
 				await expect( listViewUtils.getRow( 140 ) ).toBeInViewport();
-				await expect
-					.poll( listViewUtils.countBlankRowsInView )
-					.toBe( 0 );
+				await listViewUtils.expectNoBlankRows();
 			} );
 		} );
 	} );
@@ -1862,23 +1874,8 @@ class ListViewUtils {
 	}
 
 	/**
-	 * @param {number} count Number of paragraphs to replace the content with.
-	 */
-	insertParagraphs = async ( count ) => {
-		await this.#page.evaluate( ( length ) => {
-			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks(
-				Array.from( { length }, ( _, index ) =>
-					window.wp.blocks.createBlock( 'core/paragraph', {
-						metadata: { name: `Paragraph ${ index + 1 }` },
-					} )
-				)
-			);
-		}, count );
-	};
-
-	/**
 	 * @param {number} position One-based position of a paragraph in the list.
-	 * @return {Locator} The link of the paragraph's row.
+	 * @return {Locator} The link in the paragraph's row.
 	 */
 	getRow = ( position ) =>
 		this.listView.getByRole( 'link', {
@@ -1887,46 +1884,16 @@ class ListViewUtils {
 		} );
 
 	/**
-	 * Samples what the user sees in the visible part of the list.
-	 *
-	 * @return {Promise<number>} How many sampled points show no row.
+	 * Rows outside of the render window are replaced by a spacer before and
+	 * after the rendered rows, so neither should show up in the list.
 	 */
-	countBlankRowsInView = () =>
-		this.listView.evaluate( ( list ) => {
-			const { ownerDocument, parentElement } = list;
-			let container = parentElement;
-			while (
-				container &&
-				! (
-					container.scrollHeight > container.clientHeight &&
-					/auto|scroll/.test(
-						window.getComputedStyle( container ).overflowY
-					)
-				)
-			) {
-				container = container.parentElement;
-			}
-			const listRect = list.getBoundingClientRect();
-			const containerRect = container?.getBoundingClientRect();
-			const top = Math.max( listRect.top, containerRect?.top ?? 0 );
-			const bottom = Math.min(
-				listRect.bottom,
-				containerRect?.bottom ?? window.innerHeight,
-				window.innerHeight
-			);
-			const x = listRect.left + listRect.width / 2;
-			let blankRows = 0;
-			for ( let y = top + 1; y < bottom; y += 16 ) {
-				if (
-					ownerDocument
-						.elementFromPoint( x, y )
-						?.closest( '.block-editor-list-view-placeholder' )
-				) {
-					blankRows++;
-				}
-			}
-			return blankRows;
-		} );
+	expectNoBlankRows = async () => {
+		const spacers = this.listView.locator(
+			'.block-editor-list-view-placeholder'
+		);
+		await expect( spacers.first() ).not.toBeInViewport();
+		await expect( spacers.last() ).not.toBeInViewport();
+	};
 
 	/**
 	 * Drags a List View row onto the bottom half of another row, with the
