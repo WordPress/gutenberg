@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 
 ## 0.27.0 (2026-11-18)
 
