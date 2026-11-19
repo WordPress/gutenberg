@@ -241,26 +241,26 @@ describe( 'DataViews table scroll fade', () => {
 		} );
 	} );
 
-	// Every fade covers its own cell, and fades out the columns next to it.
-	it.each( [
-		[ 'ltr', 'left', 'right' ],
-		[ 'rtl', 'right', 'left' ],
-	] as const )(
-		'fades towards the edges of the rows (%s)',
-		async ( dir, start, end ) => {
+	// Every fade covers its own cell, and fades out the columns on both sides
+	// of it: the scroll container clips the side beyond the edge of the row,
+	// so the same mask serves both edges in both directions.
+	it.each( [ 'ltr', 'rtl' ] as const )(
+		'fades out on both sides of the edge cells (%s)',
+		async ( dir ) => {
 			await render( <PostsTable dir={ dir } /> );
 			scrollToMiddle();
 			const row = getRows()[ 0 ];
 			await expect
-				.poll( () =>
-					getFadeMask( getComputedStyle( row, '::before' ) )
-				)
-				.toContain(
-					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), `
+				.poll( () => isFading( getComputedStyle( row, '::before' ) ) )
+				.toBe( true );
+
+			for ( const pseudo of [ '::before', '::after' ] ) {
+				expect(
+					getFadeMask( getComputedStyle( row, pseudo ) )
+				).toMatch(
+					/^linear-gradient\(to right, rgba\(0, 0, 0, 0\), .*, rgba\(0, 0, 0, 0\)\)/
 				);
-			expect(
-				getFadeMask( getComputedStyle( row, '::after' ) )
-			).toContain( `linear-gradient(to ${ end }, rgba(0, 0, 0, 0), ` );
+			}
 		}
 	);
 
@@ -278,15 +278,16 @@ describe( 'DataViews table scroll fade', () => {
 			expect( style.outlineColor ).toBe(
 				getComputedStyle( row ).backgroundColor
 			);
-			// The mask covers the outline next to the columns: with the outset
-			// of a mask border (its last part), or with a mask image that is
-			// not clipped to the cell.
+			// The mask covers the outline on both sides: with the outsets of
+			// a mask border (its last part), or with a mask image that is not
+			// clipped to the cell.
 			const reachesOutline =
 				style.maskImage === 'none'
 					? getFadeMask( style )
 							.split( ' / ' )[ 2 ]
-							.includes( `${ FADE_RAMP }px` )
-					: style.maskSize === `calc(100% + ${ FADE_RAMP }px) 100%` &&
+							.includes( `0 ${ FADE_RAMP }px` )
+					: style.maskSize ===
+							`calc(100% + ${ 2 * FADE_RAMP }px) 100%` &&
 						style.maskClip === 'no-clip';
 			expect( reachesOutline ).toBe( true );
 		}
