@@ -887,6 +887,7 @@ parameters:
 		switchConditionsMatchingType: false
 		strictFunctionCalls: false
 		illegalConstructorMethodCall: false
+		numericOperandsInArithmeticOperators: false
 ```
 
 ## GitHub Actions workflow files
