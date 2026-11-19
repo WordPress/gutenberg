@@ -90,6 +90,10 @@ jobs:
             - name: Check peer dependencies of published packages
               run: npm run lint:peer-deps
 
+            - name: Check workspace peer dependency ranges
+              if: ${{ github.ref != 'refs/heads/wp/next' && github.base_ref != 'wp/next' }}
+              run: npm run lint:peer-ranges
+
             - name: Check root dependencies
               if: ${{ matrix.annotations && github.event_name == 'pull_request' }}
               run: |

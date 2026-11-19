@@ -8,7 +8,7 @@ import ContentEditableControl from '../../content-editable-control';
 /**
  * A `contentEditable` field does not participate in the Constraint Validation
  * API, so — like `ValidatedToggleGroupControl` — the validity state lives on a
- * visually hidden delegate input that mirrors whether the field has content.
+ * hidden delegate input that mirrors whether the field has content.
  */
 const UnforwardedValidatedContentEditableControl = (
 	{
@@ -66,6 +66,7 @@ const UnforwardedValidatedContentEditableControl = (
 				// text-oriented form field is expected to validate `required`.
 				value={ value?.trim() ?? '' }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				onChange={ () => {} }
 				onFocus={ () => getInteractiveTarget()?.focus() }
 			/>
