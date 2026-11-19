@@ -3369,11 +3369,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/edit/use-inner-blocks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/edit/use-layout-custom-properties.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

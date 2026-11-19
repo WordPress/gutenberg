@@ -8,6 +8,7 @@
 
 -   `useCopyToClipboard`: Don't copy when the element has `aria-disabled="true"`. ([#86445](https://github.com/WordPress/gutenberg/pull/86445))
 -   `useStateWithHistory`: Preserve the initial value type, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
+-   `useFixedWindowList`: Update the visible rows when an ancestor becomes the list's scroll container. ([#87019](https://github.com/WordPress/gutenberg/pull/87019))
 
 ## 9.1.0 (2026-11-04)
 

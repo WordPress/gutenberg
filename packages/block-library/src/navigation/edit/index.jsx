@@ -366,12 +366,8 @@ function Navigation( {
 		await createNavigationMenu( '' );
 	};
 
-	const {
-		hasUncontrolledInnerBlocks,
-		uncontrolledInnerBlocks,
-		isInnerBlockSelected,
-		innerBlocks,
-	} = useInnerBlocks( clientId );
+	const { hasUncontrolledInnerBlocks, isInnerBlockSelected, innerBlocks } =
+		useInnerBlocks( clientId );
 
 	const {
 		replaceInnerBlocks,
@@ -1161,7 +1157,7 @@ function Navigation( {
 											clientId={ clientId }
 											uncontrolledBlocks={
 												hasUnsavedBlocks
-													? uncontrolledInnerBlocks
+													? innerBlocks
 													: undefined
 											}
 											createNavigationMenu={

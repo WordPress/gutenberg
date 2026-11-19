@@ -4,6 +4,8 @@
 
 ### Bug Fixes
 
+-   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
+-   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 -   Navigation: Preserve input focus and edits while creating a menu from inline blocks ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
 
 ## 12.2.0 (2026-11-18)
@@ -55,6 +57,9 @@
 -   Categories: Set the `identifier` of the label `RichText`, so selected label text can be mapped to the `label` attribute ([#84522](https://github.com/WordPress/gutenberg/pull/84522)).
 -   Footnotes: Hide the Footnote button when the post has no Footnotes block and one can't be inserted, such as in a post type with a locked template, instead of adding a footnote number with nowhere to write the note ([#86728](https://github.com/WordPress/gutenberg/pull/86728)).
 -   Separator: Show the Default and Wide styles inside Row and Stack blocks, where they collapsed to a width of zero, by filling the free space of the Row or the width of the Stack ([#80308](https://github.com/WordPress/gutenberg/pull/80308)).
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
 
 ## 12.1.0 (2026-11-04)
 
@@ -379,6 +384,14 @@
 
 ## 9.34.0 (2025-10-29)
 
+## 9.33.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 9.33.12 (2026-10-28)
 
 ### Bug Fixes
@@ -431,6 +444,14 @@
 
 -   Query Loop Block: Enable custom order or `menu_order` ordering option for post types that support it. ([#68781](https://github.com/WordPress/gutenberg/pull/68781))
 
+## 9.19.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 9.19.8 (2026-10-28)
 
 ### Bug Fixes
@@ -468,6 +489,14 @@
 
 ## 9.9.0 (2024-10-03)
 
+## 9.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 9.8.19 (2026-10-28)
 
 ### Bug Fixes
@@ -502,6 +531,14 @@
 ## 9.2.0 (2024-06-26)
 
 ## 9.1.0 (2024-06-15)
+
+## 9.0.11 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
 
 ## 9.0.10 (2026-10-28)
 
@@ -541,6 +578,14 @@
 
 ## 8.29.0 (2024-02-21)
 
+## 8.28.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 8.28.14 (2026-10-28)
 
 ### Bug Fixes
@@ -576,6 +621,14 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 8.19.20 (2026-10-28)
 
 ### Bug Fixes
@@ -602,6 +655,14 @@
 ## 8.14.0 (2023-07-05)
 
 ## 8.13.0 (2023-06-23)
+
+## 8.12.23 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
 
 ## 8.12.22 (2026-10-28)
 
@@ -632,6 +693,14 @@
 ## 8.5.0 (2023-03-01)
 
 ## 8.4.0 (2023-02-15)
+
+## 8.3.19 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
 
 ## 8.3.18 (2026-10-28)
 
@@ -666,6 +735,14 @@
 ## 7.16.0 (2022-10-05)
 
 ## 7.15.0 (2022-09-21)
+
+## 7.14.18 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
 
 ## 7.14.17 (2026-10-28)
 
@@ -713,6 +790,14 @@
 
 ## 7.4.0 (2022-04-21)
 
+## 7.3.22 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 7.3.21 (2026-10-28)
 
 ### Bug Fixes
@@ -754,6 +839,13 @@
 
 -   Code quality: Add block schema to each core block ([#35900](https://github.com/WordPress/gutenberg/pull/35900)).
 
+## 6.0.34 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 6.0.33 (2026-10-28)
 
 ### Bug Fixes
@@ -788,6 +880,12 @@
 
 -   Include missing attributes when upgrading embed block ([#33235](https://github.com/WordPress/gutenberg/pull/33235))
 
+## 3.2.23 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 3.2.22 (2026-08-06)
 
 ### Bug Fixes
@@ -814,6 +912,12 @@
 ### Bug Fixes
 
 -   Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))
+
+## 2.28.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.28.0 (2021-02-01)
 
@@ -843,6 +947,12 @@
 
 -   File Block: Copy url button is moved to Block toolbar.
 
+## 2.26.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.23.0 (2020-09-03)
 
 ### Enhancements
@@ -853,12 +963,30 @@
 
 -   Add heading level controls to Site Title block.
 
+## 2.22.13 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
+## 2.14.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.12.0 (2020-01-13)
 
 ### Bug Fixes
 
 -   Fixes a regression published in version 2.9.2 that would prevent some build tools from including
     styles provided in the packages build-styles directory.
+
+## 2.9.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.7.0 (2019-08-05)
 
@@ -890,6 +1018,12 @@
 
 -   fix uncaught error in `columns` block due to accessing a property on an object that might be undefined [#14605](https://github.com/WordPress/gutenberg/pull/14605)
 
+## 2.4.14 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+
 ## 2.3.0 (2019-03-06)
 
 ### New Features
@@ -897,6 +1031,12 @@
 -   Add background color controls for the table block.
 -   Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).
 -   Add new `Search` block ([#13583](https://github.com/WordPress/gutenberg/pull/13583)).
+
+## 2.2.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
 
 ## 2.2.12 (2019-01-03)
 
