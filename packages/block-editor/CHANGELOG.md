@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Suggest mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
+-   Suggestion mode: show both authors on an addition nested in another author's addition: the inner run takes its author's color as a background and drops its underline below the outer author's ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
@@ -37,8 +42,6 @@
 -   `moveBlocksUp`, `moveBlocksDown` and `moveBlocksToPosition` no longer throw a `TypeError` when the root client ID is `null`, and `insertBlocks` adds the blocks to the root order when its root client ID is `null` ([#85760](https://github.com/WordPress/gutenberg/pull/85760)).
 -   `__experimentalGetAllowedBlocks` no longer throws a `TypeError` on every call ([#85851](https://github.com/WordPress/gutenberg/pull/85851)).
 -   Block drag: restore the dragged block (styles, pointer events, dragging state) when the drag ends without `drop` or `dragend` reaching the canvas document ([#85462](https://github.com/WordPress/gutenberg/pull/85462)).
--   Suggest mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
--   Suggestion mode: show both authors on an addition nested in another author's addition: the inner run takes its author's color as a background and drops its underline below the outer author's ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
 
 ### Internal
 
