@@ -292,6 +292,10 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 					'description' => __( 'Whether the action is a primary action.', 'gutenberg' ),
 					'type'        => 'boolean',
 				),
+				'isDestructive'     => array(
+					'description' => __( 'Whether the action deletes data.', 'gutenberg' ),
+					'type'        => 'boolean',
+				),
 				'supportsBulk'      => array(
 					'description' => __( 'Whether the action can be performed on several items at once.', 'gutenberg' ),
 					'type'        => 'boolean',

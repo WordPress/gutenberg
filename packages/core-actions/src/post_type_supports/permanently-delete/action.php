@@ -10,6 +10,7 @@
 
 return array(
 	'label'             => __( 'Permanently delete' ),
+	'isDestructive'     => true,
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,
 	'modalFocusOnMount' => 'firstContentElement',

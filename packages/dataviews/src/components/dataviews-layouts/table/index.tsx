@@ -16,9 +16,10 @@ import {
 } from '@wordpress/element';
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
+import { VisuallyHidden } from '@wordpress/ui';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
-import ItemActions from '../../dataviews-item-actions';
+import ItemActions, { ItemPrimaryActions } from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
 import {
 	useSomeItemHasAPossibleBulkAction,
@@ -212,6 +213,15 @@ function TableRow< Item >( {
 						isItemClickable={ isItemClickable }
 						onClickItem={ onClickItem }
 						renderItemLink={ renderItemLink }
+						actions={
+							!! actions?.length && (
+								<ItemPrimaryActions
+									item={ item }
+									actions={ actions }
+									className="dataviews-view-table__primary-actions"
+								/>
+							)
+						}
 					/>
 				</td>
 			) }
@@ -255,7 +265,12 @@ function TableRow< Item >( {
 					} ) }
 					onClick={ ( e ) => e.stopPropagation() }
 				>
-					<ItemActions item={ item } actions={ actions } />
+					<ItemActions
+						item={ item }
+						actions={ actions }
+						// The primary column shows the primary actions.
+						hidePrimaryActions={ !! hasPrimaryColumn }
+					/>
 				</td>
 			) }
 		</tr>
@@ -671,9 +686,10 @@ function ViewTable< Item >( {
 									}
 								) }
 							>
-								<span className="dataviews-view-table-header">
+								{ /* Visually hidden, so the column is only as wide as the actions menu. */ }
+								<VisuallyHidden>
 									{ __( 'Actions' ) }
-								</span>
+								</VisuallyHidden>
 							</th>
 						) }
 					</tr>

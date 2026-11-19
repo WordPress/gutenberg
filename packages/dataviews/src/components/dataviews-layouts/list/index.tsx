@@ -89,6 +89,7 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
+						isDestructive={ primaryAction.isDestructive }
 						text={ label }
 						size="small"
 						onClick={ () => setIsModalOpen( true ) }
@@ -112,6 +113,7 @@ function PrimaryActionGridCell< Item >( {
 					<Button
 						disabled={ !! primaryAction.disabled }
 						accessibleWhenDisabled
+						isDestructive={ primaryAction.isDestructive }
 						size="small"
 						onClick={ () => {
 							primaryAction.callback( [ item ], { registry } );

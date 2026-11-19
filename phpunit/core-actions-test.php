@@ -355,6 +355,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				'id'                => 'move-to-trash',
 				'label'             => 'Trash',
 				'isPrimary'         => true,
+				'isDestructive'     => true,
 				'supportsBulk'      => true,
 				'hideModalHeader'   => true,
 				'modalFocusOnMount' => 'firstContentElement',
