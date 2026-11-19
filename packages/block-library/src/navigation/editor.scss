@@ -86,9 +86,11 @@
 }
 
 // The read-only preview of a menu needs a wrapper element to make its items
-// inert. Keep that wrapper out of the navigation's flex layout.
+// inert. Keep that wrapper out of the navigation's flex layout, and pass the
+// block gap through to the menu items, which inherit it.
 .wp-block-navigation__read-only-items {
 	display: contents;
+	gap: inherit;
 }
 
 // IE fix for submenu visibility on parent focus.
