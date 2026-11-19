@@ -547,6 +547,25 @@ export function editorIntent( state = 'edit', action ) {
 }
 
 /**
+ * Whether Suggest mode holds a suggestion that Undo would withdraw. Such a
+ * suggestion never reaches the core-data history (an attribute suggestion
+ * lives in the overlay while the block stays at its baseline), so history
+ * alone would leave the Undo button inert. Kept current by the suggestion
+ * undo guard.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
+ */
+export function hasSuggestionUndo( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_HAS_SUGGESTION_UNDO':
+			return action.hasSuggestionUndo;
+	}
+	return state;
+}
+
+/**
  * Post field proposals made while suggesting, keyed by proposal id (the post
  * field, or `meta.<key>` for a meta key). Each holds the value the field had
  * when the proposal was first made (`baseline`) and the proposed value. They
@@ -603,6 +622,7 @@ export default combineReducers( {
 	showRevisionDiff,
 	selectedNote,
 	editorIntent,
+	hasSuggestionUndo,
 	postFieldProposals,
 	dataviews: dataviewsReducer,
 } );
