@@ -34,7 +34,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					continue;
 				}
 
-				if ( false === ( $inner_block->parsed_block['attrs']['metadata']['blockVisibility'] ?? null ) ) {
+				if ( false === ( $track_attributes['metadata']['blockVisibility'] ?? null ) ) {
 					continue;
 				}
 

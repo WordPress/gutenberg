@@ -539,6 +539,15 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 					'title' => 'Song Two',
 					'src'   => 'http://example.com/song2.mp3',
 				),
+				array(
+					'title'    => 'Song Three',
+					'src'      => 'http://example.com/song3.mp3',
+					'metadata' => array(
+						'blockVisibility' => array(
+							'viewport' => array( 'mobile' => false ),
+						),
+					),
+				),
 			)
 		);
 
@@ -546,7 +555,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$p      = new WP_HTML_Tag_Processor( $output );
 		$p->next_tag( 'figure' );
 		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
-		$this->assertSame( array( 'track-0' ), $context['tracks'] );
+		$this->assertSame( array( 'track-0', 'track-1' ), $context['tracks'] );
 
 		$p->next_tag( array( 'class_name' => 'wp-block-playlist-track__button' ) );
 		$button_context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
