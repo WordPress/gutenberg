@@ -30,7 +30,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 * @phpstan-type Parse_Options array{
 	 *     context?: string|null,
 	 *     convert_vars_to_classnames?: bool,
-	 *     selector?: string|null,
+	 *     selector?: string,
 	 * }
 	 * @phpstan-type Compile_Options array{
 	 *     context?: string|null,

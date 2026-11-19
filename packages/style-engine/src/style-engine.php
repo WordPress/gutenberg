@@ -41,7 +41,7 @@
  * @phpstan-param array{
  *     context?: string|null,
  *     convert_vars_to_classnames?: bool,
- *     selector?: string|null,
+ *     selector?: string,
  * }|null $options
  * @phpstan-return array{
  *     css?: string,
@@ -52,7 +52,7 @@
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	$options = array_merge(
 		array(
-			'selector'                   => null,
+			'selector'                   => '',
 			'context'                    => null,
 			'convert_vars_to_classnames' => false,
 		),
@@ -65,10 +65,10 @@ function wp_style_engine_get_styles( $block_styles, $options = array() ) {
 	$styles_output = array();
 
 	if ( ! empty( $parsed_styles['declarations'] ) ) {
-		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] ?? '' );
+		$styles_output['css']          = WP_Style_Engine::compile_css( $parsed_styles['declarations'], $options['selector'] );
 		$styles_output['declarations'] = $parsed_styles['declarations'];
 		if ( ! empty( $options['context'] ) ) {
-			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'] ?? '', $parsed_styles['declarations'] );
+			WP_Style_Engine::store_css_rule( $options['context'], $options['selector'], $parsed_styles['declarations'] );
 		}
 	}
 
