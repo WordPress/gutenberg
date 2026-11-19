@@ -6,6 +6,7 @@
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Navigation Link: Open the link UI when Enter is pressed on a link that still needs a URL, instead of inserting a duplicate link next to it ([#85865](https://github.com/WordPress/gutenberg/pull/85865)).
 
 ## 12.2.0 (2026-11-18)
 
@@ -29,7 +30,6 @@
 -   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
 -   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
 -   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing ([#86656](https://github.com/WordPress/gutenberg/pull/86656)).
--   Navigation Link: Open the link UI when Enter is pressed on a link that still needs a URL, instead of inserting a duplicate link next to it ([#85865](https://github.com/WordPress/gutenberg/pull/85865)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
 -   Accordion: Open the panel when a link points to its Accordion Heading's HTML anchor, as a link to content inside the panel already does ([#86564](https://github.com/WordPress/gutenberg/pull/86564)).
 -   Query Loop: Show the taxonomy filter loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -104,7 +104,6 @@
 -   Categories: Don't run the dropdown label through `sprintf()`. ([#85930](https://github.com/WordPress/gutenberg/pull/85930))
 -   Social Icons: Restore the larger icon size for the Logos Only style ([#85506](https://github.com/WordPress/gutenberg/pull/85506)).
 -   Post Title: Render the title of the post supplied through block context when it differs from the global post ([#85495](https://github.com/WordPress/gutenberg/pull/85495)).
--   Navigation Link: Open the link UI when Enter is pressed on a link that still needs a URL, instead of inserting a duplicate link next to it ([#85865](https://github.com/WordPress/gutenberg/pull/85865)).
 
 ## 12.0.0 (2026-10-20)
 
