@@ -64,7 +64,7 @@ export const Item = forwardRef< HTMLDivElement, SelectItemProps >(
 					<Icon
 						icon={ check }
 						className={ itemPopupStyles[ 'item-indicator-icon' ] }
-						size={ 16 }
+						size={ 20 }
 					/>
 				</span>
 				<div className={ itemPopupStyles[ 'item-text' ] }>
