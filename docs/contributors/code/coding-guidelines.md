@@ -888,6 +888,7 @@ parameters:
 		strictFunctionCalls: false
 		illegalConstructorMethodCall: false
 		numericOperandsInArithmeticOperators: false
+		dynamicCallOnStaticMethod: false
 ```
 
 ## GitHub Actions workflow files
