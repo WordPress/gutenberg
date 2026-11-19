@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `ToolsPanel`: Use WPDS colors for the reset label and the disabled "Reset all" menu item. Legacy `--wp-components-color-accent-darker-10` overrides no longer affect them ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
+
+### Bug Fixes
+
+-   `MenuItem`: Show items with `aria-disabled` in the system disabled color in forced colors mode ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
+
 ## 45.0.0 (2026-11-18)
 
 ### Breaking Changes
