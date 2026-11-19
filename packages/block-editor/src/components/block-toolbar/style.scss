@@ -242,6 +242,12 @@
 				}
 			}
 
+			// Separate the stacked movers from the drag handle with a full
+			// height border, like the borders between groups.
+			.block-editor-block-mover:not(.is-horizontal) .block-editor-block-mover__move-button-container {
+				border-inline-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			}
+
 			.block-editor-block-parent-selector,
 			.block-editor-block-parent-selector__button {
 				border: none;
