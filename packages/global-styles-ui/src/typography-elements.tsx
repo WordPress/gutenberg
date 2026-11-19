@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalItemGroup as ItemGroup,
@@ -8,10 +5,6 @@ import {
 	__experimentalHStack as HStack,
 	FlexItem,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { NavigationButtonAsItem } from './navigation-button';
 import { Subtitle } from './subtitle';
 import { useStyle } from './hooks';
@@ -29,7 +22,7 @@ function ElementItem( { parentMenu, element, label }: ElementItemProps ) {
 		element === 'link'
 			? {
 					textDecoration: 'underline',
-			  }
+				}
 			: {};
 
 	const [ fontFamily ] = useStyle< string >(
@@ -84,26 +77,6 @@ function TypographyElements() {
 					parentMenu={ parentMenu }
 					element="text"
 					label={ __( 'Text' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="link"
-					label={ __( 'Links' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="heading"
-					label={ __( 'Headings' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="caption"
-					label={ __( 'Captions' ) }
-				/>
-				<ElementItem
-					parentMenu={ parentMenu }
-					element="button"
-					label={ __( 'Buttons' ) }
 				/>
 			</ItemGroup>
 		</VStack>

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Register block type hooks', () => {
@@ -18,7 +15,7 @@ test.describe( 'Register block type hooks', () => {
 	} );
 
 	test( 'has a custom category for Paragraph block', async ( { page } ) => {
-		await page.click( 'role=button[name="Block Inserter"i]' );
+		await page.getByRole( 'button', { name: 'Block Inserter' } ).click();
 
 		expect(
 			page.locator(

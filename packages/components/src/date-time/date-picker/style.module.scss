@@ -1,0 +1,117 @@
+.wrapper {
+	box-sizing: border-box;
+
+	*,
+	*::before,
+	*::after {
+		box-sizing: inherit;
+	}
+}
+
+.navigator {
+	grid-template-columns: 0.5fr repeat(5, 1fr) 0.5fr;
+	justify-items: center;
+	margin-bottom: var(--wpds-dimension-gap-lg);
+}
+
+.navigator.navigator {
+	// Keep the calendar grid over HStack's Flex display in either style order.
+	display: grid;
+}
+
+.previous-month {
+	grid-column: 1 / 2;
+}
+
+.next-month {
+	grid-column: 7 / 8;
+}
+
+.heading {
+	grid-column: 2 / 7;
+
+	strong {
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+	}
+}
+
+.heading.heading {
+	// Preserve the existing override of Heading's typography.
+	font-size: var(--wpds-typography-font-size-md);
+	font-weight: var(--wpds-typography-font-weight-default);
+}
+
+.calendar {
+	column-gap: var(--wpds-dimension-gap-sm);
+	display: grid;
+	grid-template-columns: 0.5fr repeat(5, 1fr) 0.5fr;
+	justify-items: center;
+	row-gap: var(--wpds-dimension-gap-sm);
+}
+
+.day-of-week {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-size: var(--wpds-typography-font-size-md);
+	line-height: 1.4;
+}
+
+.day {
+	grid-column: var(--_wp-components-date-picker-column);
+	position: relative;
+	justify-content: center;
+	padding: 0;
+
+	&:where(:disabled) {
+		pointer-events: none;
+	}
+
+	&:where(.has-events)::before {
+		border: var(--wpds-border-width-sm) solid var(--wpds-color-stroke-interactive-brand);
+		border-radius: 50%;
+		content: " ";
+		/* stylelint-disable-next-line logical-css/require-logical-properties -- Preserve the physical center and translate offset in both directions. */
+		left: 50%;
+		position: absolute;
+		transform: translate(-50%, 9px);
+	}
+
+	&:where(.has-events.is-selected)::before {
+		border-color: var(--wpds-color-foreground-interactive-brand-strong);
+	}
+}
+
+.day.day.day {
+	// Preserve the original specificity over Button and wp-admin styles.
+	border-radius: 50%;
+	height: 28px;
+	width: 28px;
+	font-size: var(--wpds-typography-font-size-md);
+	font-weight: var(--wpds-typography-font-weight-default);
+
+	&:where(.is-selected) {
+		background: var(--wpds-color-background-interactive-brand-strong);
+
+		&,
+		&:hover:not(:disabled, [aria-disabled="true"]) {
+			color: var(--wpds-color-foreground-interactive-brand-strong);
+		}
+
+		&:focus:not(:disabled) {
+			border: var(--wpds-border-width-focus) solid currentColor;
+		}
+
+		// Highlight the selected day for high-contrast mode.
+		&::after {
+			content: "";
+			position: absolute;
+			pointer-events: none;
+			inset: 0;
+			border-radius: inherit;
+			border: var(--wpds-border-width-xs) solid transparent;
+		}
+	}
+
+	&:where(.is-today) {
+		background: var(--wpds-color-background-surface-neutral-weak);
+	}
+}

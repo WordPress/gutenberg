@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { startOfMinute } from 'date-fns';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -7,13 +8,8 @@ import { VisuallyHidden } from '../../visually-hidden';
 import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimeInputValue, TimePickerProps } from '../types';
-import {
-	Wrapper,
-	Fieldset,
-	MonthSelectWrapper,
-	DayInput,
-	YearInput,
-} from './styles';
+import NumberControl from '../../number-control';
+import styles from './style.module.scss';
 import { HStack } from '../../h-stack';
 import { Spacer } from '../../spacer';
 import type { InputChangeCallback } from '../../input-control/types';
@@ -131,12 +127,14 @@ export function TimePicker( {
 	};
 
 	const dayField = (
-		<DayInput
+		<NumberControl
 			key="day"
-			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
+			className={ clsx(
+				'components-datetime__time-field components-datetime__time-field-day',
+				styles[ 'day-input' ]
+			) } // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
-			__next40pxDefaultSize
 			value={ day }
 			step={ 1 }
 			min={ 1 }
@@ -151,12 +149,11 @@ export function TimePicker( {
 	);
 
 	const monthField = (
-		<MonthSelectWrapper key="month">
+		<div key="month" className={ styles[ 'month-select-wrapper' ] }>
 			<SelectControl
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision
-				__next40pxDefaultSize
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {
@@ -169,16 +166,18 @@ export function TimePicker( {
 					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 				} }
 			/>
-		</MonthSelectWrapper>
+		</div>
 	);
 
 	const yearField = (
-		<YearInput
+		<NumberControl
 			key="year"
-			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
+			className={ clsx(
+				'components-datetime__time-field components-datetime__time-field-year',
+				styles[ 'year-input' ]
+			) } // Unused, for backwards compatibility.
 			label={ __( 'Year' ) }
 			hideLabelFromVision
-			__next40pxDefaultSize
 			value={ year }
 			step={ 1 }
 			min={ 1 }
@@ -213,10 +212,10 @@ export function TimePicker( {
 	} );
 
 	return (
-		<Wrapper
-			className="components-datetime__time" // Unused, for backwards compatibility.
+		<div
+			className={ clsx( 'components-datetime__time', styles.wrapper ) } // Unused, for backwards compatibility.
 		>
-			<Fieldset>
+			<fieldset className={ styles.fieldset }>
 				{ hideLabelFromVision ? (
 					<VisuallyHidden as="legend">
 						{ __( 'Time' ) }
@@ -243,8 +242,8 @@ export function TimePicker( {
 					<Spacer />
 					<TimeZone />
 				</HStack>
-			</Fieldset>
-			<Fieldset>
+			</fieldset>
+			<fieldset className={ styles.fieldset }>
 				{ hideLabelFromVision ? (
 					<VisuallyHidden as="legend">
 						{ __( 'Date' ) }
@@ -262,8 +261,8 @@ export function TimePicker( {
 				>
 					{ fields }
 				</HStack>
-			</Fieldset>
-		</Wrapper>
+			</fieldset>
+		</div>
 	);
 }
 

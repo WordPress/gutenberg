@@ -125,7 +125,15 @@ Regularly linting and formatting your code ensures it's functional, clear, and m
 
 ### Running tests
 
-Beyond just writing code, verifying its functionality is crucial. `wp-scripts` includes [Jest](https://jestjs.io/), a JavaScript testing framework, and both end-to-end and unit testing scripts:
+`wp-scripts test-unit-js` runs your project's installed [Vitest](https://vitest.dev/) for unit tests. For a new test setup, install Vitest 5 and Vite 8 as development dependencies:
+
+```sh
+npm install --save-dev vitest@^5 vite@^8
+```
+
+If your project already uses Vite 7 or 8, keep it and install only `vitest@^5`.
+
+`wp-scripts` also provides [Playwright](https://playwright.dev/) for end-to-end tests. Add these commands to `package.json`:
 
 ```json
 {
@@ -136,7 +144,9 @@ Beyond just writing code, verifying its functionality is crucial. `wp-scripts` i
 }
 ```
 
-Unit tests validate individual units of code, such as functions, ensuring they work as intended, while end-to-end (E2E) tests evaluate the entire project by simulating real-world user scenarios to ensure all parts of the system work seamlessly together.
+Unit tests check individual functions or components. End-to-end tests check the application through user interactions.
+
+For Vitest configuration and examples, including DOM and browser tests, see the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md). Existing Jest projects can use `wp-scripts test-unit-jest` and follow [Keep an existing Jest suite](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite) for the required dependencies and configuration.
 
 ### Advanced configurations 
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 export type { Hooks } from './createHooks';
 
 export type Callback = ( ...args: any[] ) => any;

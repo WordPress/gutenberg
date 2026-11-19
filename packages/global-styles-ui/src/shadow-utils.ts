@@ -1,34 +1,3 @@
-export const CUSTOM_VALUE_SETTINGS = {
-	px: { max: 20, step: 1 },
-	'%': { max: 100, step: 1 },
-	vw: { max: 100, step: 1 },
-	vh: { max: 100, step: 1 },
-	em: { max: 10, step: 0.1 },
-	rm: { max: 10, step: 0.1 },
-	svw: { max: 100, step: 1 },
-	lvw: { max: 100, step: 1 },
-	dvw: { max: 100, step: 1 },
-	svh: { max: 100, step: 1 },
-	lvh: { max: 100, step: 1 },
-	dvh: { max: 100, step: 1 },
-	vi: { max: 100, step: 1 },
-	svi: { max: 100, step: 1 },
-	lvi: { max: 100, step: 1 },
-	dvi: { max: 100, step: 1 },
-	vb: { max: 100, step: 1 },
-	svb: { max: 100, step: 1 },
-	lvb: { max: 100, step: 1 },
-	dvb: { max: 100, step: 1 },
-	vmin: { max: 100, step: 1 },
-	svmin: { max: 100, step: 1 },
-	lvmin: { max: 100, step: 1 },
-	dvmin: { max: 100, step: 1 },
-	vmax: { max: 100, step: 1 },
-	svmax: { max: 100, step: 1 },
-	lvmax: { max: 100, step: 1 },
-	dvmax: { max: 100, step: 1 },
-};
-
 export interface ShadowObject {
 	x: string;
 	y: string;
@@ -164,4 +133,28 @@ export function shadowObjectToString( shadowObj: ShadowObject ): string {
 	return `${ shadowObj.inset ? 'inset' : '' } ${ shadowString } ${
 		shadowObj.color || ''
 	}`.trim();
+}
+
+// A text-shadow is a box-shadow without the spread radius and `inset` keyword,
+// so we reuse the box-shadow parser and only keep the supported fields.
+export type TextShadowObject = Pick<
+	ShadowObject,
+	'x' | 'y' | 'blur' | 'color'
+>;
+
+export function textShadowStringToObject(
+	textShadowValue: string
+): TextShadowObject {
+	const { x, y, blur, color } = shadowStringToObject( textShadowValue );
+	return { x, y, blur, color };
+}
+
+export function textShadowObjectToString(
+	textShadowObj: TextShadowObject
+): string {
+	const lengths = `${ textShadowObj.x || '0px' } ${
+		textShadowObj.y || '0px'
+	} ${ textShadowObj.blur || '0px' }`;
+
+	return `${ lengths } ${ textShadowObj.color || '' }`.trim();
 }

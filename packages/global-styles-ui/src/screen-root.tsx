@@ -1,25 +1,16 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
-	__experimentalSpacer as Spacer,
 	__experimentalVStack as VStack,
 	FlexItem,
 	CardBody,
-	Card,
-	CardDivider,
+	Card as WCCard,
 	CardMedia,
 } from '@wordpress/components';
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
@@ -33,7 +24,7 @@ function ScreenRoot() {
 	}, [] );
 
 	return (
-		<Card
+		<WCCard
 			size="small"
 			isBorderless
 			className="global-styles-ui-screen-root"
@@ -41,11 +32,11 @@ function ScreenRoot() {
 		>
 			<CardBody>
 				<VStack spacing={ 4 }>
-					<Card className="global-styles-ui-screen-root__active-style-tile">
+					<WCCard className="global-styles-ui-screen-root__active-style-tile">
 						<CardMedia className="global-styles-ui-screen-root__active-style-tile-preview">
 							<PreviewStyles />
 						</CardMedia>
-					</Card>
+					</WCCard>
 					{ hasVariations && (
 						<ItemGroup>
 							<NavigationButtonAsItem path="/variations">
@@ -65,32 +56,7 @@ function ScreenRoot() {
 					<RootMenu />
 				</VStack>
 			</CardBody>
-
-			<CardDivider />
-
-			<CardBody>
-				<Spacer
-					as="p"
-					paddingTop={ 2 }
-					paddingX="13px"
-					marginBottom={ 4 }
-				>
-					{ __(
-						'Customize the appearance of specific blocks for the whole site.'
-					) }
-				</Spacer>
-				<ItemGroup>
-					<NavigationButtonAsItem path="/blocks">
-						<HStack justify="space-between">
-							<FlexItem>{ __( 'Blocks' ) }</FlexItem>
-							<IconWithCurrentColor
-								icon={ isRTL() ? chevronLeft : chevronRight }
-							/>
-						</HStack>
-					</NavigationButtonAsItem>
-				</ItemGroup>
-			</CardBody>
-		</Card>
+		</WCCard>
 	);
 }
 

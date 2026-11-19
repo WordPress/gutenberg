@@ -6,7 +6,7 @@ This living document serves to prescribe coding guidelines specific to the Guten
 
 ### Naming
 
-To avoid class name collisions, class names **must** adhere to the following guidelines, which are loosely inspired by the [BEM (Block, Element, Modifier) methodology](https://en.bem.info/methodology/).
+To avoid class name collisions, class names **must** adhere to the following guidelines, which are loosely inspired by the [BEM (Block, Element, Modifier) methodology](https://bem.info/en/methodology/).
 
 All class names assigned to an element must be prefixed with the name of the package, followed by a dash and the name of the directory in which the component resides. Any descendent of the component's root element must append a dash-delimited descriptor, separated from the base by two consecutive underscores `__`.
 
@@ -72,6 +72,14 @@ Examples of styles that appear in both the theme and the editor include gallery 
 
 ## JavaScript
 
+All new code in Gutenberg should be written in [TypeScript](https://www.typescriptlang.org/), with a `.ts` file extension, or a `.tsx` file extension for files including JSX syntax.
+
+There are some exceptions where writing plain JavaScript (`.js`) is permitted:
+
+-   If the code is expected to be run directly in the browser or by Node.js in environments where TypeScript syntax is not supported. Scripts that Node.js runs from this repository are not an exception, since the required Node.js version [supports erasable TypeScript syntax](https://nodejs.org/learn/typescript/run-natively), so write them as `.ts` or `.mts`.
+-   If authoring new code in an existing `.js` or `.jsx` file. Migrating existing files to the equivalent `.ts` or `.tsx` is encouraged if it is trivial to do so.
+-   If authoring new files in a package or workspace that has no `tsconfig.json` yet, such that the new file would not have reasonable access to existing package typings.
+
 JavaScript in Gutenberg uses modern language features of the [ECMAScript language specification](https://www.ecma-international.org/ecma-262/) as well as the [JSX language syntax extension](https://react.dev/learn/writing-markup-with-jsx). These are enabled through a combination of preset configurations, notably [`@wordpress/babel-preset-default`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/babel-preset-default) which is used as a preset in the project's [Babel](https://babeljs.io/) configuration.
 
 While the [staged process](https://tc39.es/process-document/) for introducing a new JavaScript language feature offers an opportunity to use new features before they are considered complete, **the Gutenberg project and the `@wordpress/babel-preset-default` configuration will only target support for proposals which have reached Stage 4 ("Finished")**.
@@ -80,18 +88,17 @@ While the [staged process](https://tc39.es/process-document/) for introducing a 
 
 In the Gutenberg project, we use [the ES2015 import syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import) to enable us to create modular code with clear separations between code of a specific feature, code shared across distinct WordPress features, and third-party dependencies.
 
-These separations are identified by multi-line comments at the top of a file which imports code from another file or source.
+Imports can reference third-party packages, WordPress packages, or local files.
+
+Write imports as one contiguous block. Do not separate dependency types with comments or blank lines.
 
 #### External dependencies
 
-An external dependency is third-party code that is not maintained by WordPress contributors, but instead [included in WordPress as a default script](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-included-and-registered-by-wordpress) or referenced from an outside package manager like [npm](https://www.npmjs.com/).
+An external dependency is third-party code that is not maintained by WordPress contributors, but instead [included in WordPress as a default script](https://developer.wordpress.org/reference/functions/wp_enqueue_script/#default-scripts-and-js-libraries-included-and-registered-by-wordpress) or referenced from an outside package manager like [npm](https://www.npmjs.com/).
 
 Example:
 
 ```js
-/**
- * External dependencies
- */
 import moment from 'moment';
 ```
 
@@ -102,9 +109,6 @@ To encourage reusability between features, our JavaScript is split into domain-s
 Example:
 
 ```js
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 ```
 
@@ -115,9 +119,6 @@ Within a specific feature, code is organized into separate files and folders. As
 Example:
 
 ```js
-/**
- * Internal dependencies
- */
 import VisualEditor from '../visual-editor';
 ```
 
@@ -155,13 +156,13 @@ if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 }
 ```
 
-The public interface of such APIs is not yet finalized. Aside from references within the code, they APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
+The public interface of such APIs is not yet finalized. Aside from references within the code, these APIs should neither be documented nor mentioned in any CHANGELOG. They should effectively be considered to not exist from an external perspective. In most cases, they should only be exposed to satisfy requirements between packages maintained in this repository.
 
 While a plugin-only API may often stabilize into a publicly-available API, there is no guarantee that it will.
 
 #### Private APIs
 
-Each `@wordpress` package wanting to privately access or expose a private APIs can
+Each `@wordpress` package wanting to privately access or expose private APIs can
 do so by opting-in to `@wordpress/private-apis`:
 
 ```js
@@ -407,7 +408,7 @@ export function MyComponent() {
 
 WordPress extenders cannot update the private block settings on their own. The `updateSettings()` actions of the `@wordpress/block-editor` store will filter out all the settings that are **not** a part of the public API. The only way to actually store them is via the private action `__experimentalUpdateSettings()`.
 
-To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/actions.js](/packages/block-editor/src/store/actions.js):
+To privatize a block editor setting, add it to the `privateSettings` list in [/packages/block-editor/src/store/private-actions.ts](/packages/block-editor/src/store/private-actions.ts):
 
 ```js
 const privateSettings = [
@@ -542,14 +543,15 @@ It is preferred to implement all components as [function components](https://rea
 
 ## JavaScript documentation using JSDoc
 
-Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, the [use of TypeScript tooling](/docs/contributors/code/testing-overview.md#javascript-testing) for types validation, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
+Gutenberg follows the [WordPress JavaScript Documentation Standards](https://make.wordpress.org/core/handbook/best-practices/inline-documentation-standards/javascript/), with additional guidelines relevant for its distinct use of [import semantics](/docs/contributors/code/coding-guidelines.md#imports) in organizing files, and automated documentation generation using [`@wordpress/docgen`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/docgen).
 
-For additional guidance, consult the following resources:
-
--   [JSDoc Official Documentation](https://jsdoc.app/index.html)
--   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
+For additional guidance, consult the [JSDoc Official Documentation](https://jsdoc.app/index.html).
 
 ### Custom types
+
+<div class="callout callout-warning">
+Prefer defining types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 Define custom types using the [JSDoc `@typedef` tag](https://jsdoc.app/tags-typedef.html).
 
@@ -586,6 +588,10 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 ### Importing and exporting types
 
+<div class="callout callout-warning">
+Prefer importing and exporting types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
+
 Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#import-types) to import type declarations from other files or third-party dependencies.
 
 Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/code/coding-guidelines.md#imports).
@@ -617,6 +623,10 @@ If you use a [TypeScript integration](https://github.com/Microsoft/TypeScript/wi
 For packages which do not distribute their own TypeScript types, you are welcomed to install and use the [DefinitelyTyped](https://definitelytyped.org/) community-maintained types definitions, if one exists.
 
 ### Generic types
+
+<div class="callout callout-warning">
+Prefer annotating types using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 When documenting a generic type such as `Object`, `Function`, `Promise`, etc., always include details about the expected record types.
 
@@ -667,6 +677,10 @@ const BREAKPOINTS = { huge: 1440 /* , ... */ };
 ```
 
 ### Nullable, undefined, and void types
+
+<div class="callout callout-warning">
+Prefer using TypeScript types when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
 
 You can express a nullable type using a leading `?`. Use the nullable form of a type only if you're describing either the type or an explicit `null` value. Do not use the nullable form as an indicator of an optional parameter.
 
@@ -765,6 +779,10 @@ When documenting an example, use the markdown <code>\`\`\`</code> code block to 
 
 ### Documenting React components
 
+<div class="callout callout-warning">
+Component prop types should be written using TypeScript syntax when possible. This guidance applies to files which have not yet been migrated to TypeScript.
+</div>
+
 When possible, all components should be implemented as [function components](https://react.dev/learn/your-first-component), using [hooks](https://react.dev/reference/react/hooks) for managing component lifecycle and state.
 
 Documenting a function component should be treated the same as any other function. The primary caveat in documenting a component is being aware that the function typically accepts only a single argument (the "props"), which may include many property members. Use the [dot syntax for parameter properties](https://jsdoc.app/tags-param.html#parameters-with-properties) to document individual prop types.
@@ -794,6 +812,117 @@ For class components, there is no recommendation for documenting the props of th
 We use
 [`phpcs` (PHP_CodeSniffer)](https://github.com/PHPCSStandards/PHP_CodeSniffer) with the [WordPress Coding Standards ruleset](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards) to run a lot of automated checks against all PHP code in this project. This ensures that we are consistent with WordPress PHP coding standards.
 
-The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
+The easiest way to use PHPCS is [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment). Once that's installed, you can check your PHP by running `npm run lint:php`.
 
 If you prefer to install PHPCS locally, you should use `composer`. [Install `composer`](https://getcomposer.org/download/) on your computer, then run `composer install`. This will install `phpcs` and `WordPress-Coding-Standards` which you can then run via `composer lint`.
+
+### Static analysis with PHPStan
+
+PHP code is also statically analyzed with [PHPStan](https://phpstan.org/), using the [WordPress extension](https://github.com/szepeviktor/phpstan-wordpress). The analysis covers the plugin's own PHP in [`lib/`](https://github.com/WordPress/gutenberg/tree/HEAD/lib), and all the PHP that WordPress core ships from this repository: the PHP in packages such as [`block-library`](/packages/block-library/README.md), and the PHP templates in [`packages/wp-build/templates`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/wp-build/templates). The templates are rendered with sample values for their placeholders before they are analyzed, keeping each line in place, so errors are reported on the template lines themselves.
+
+#### Running the analysis
+
+First run `composer install` and `npm run build`, which generates PHP files that the analysis needs. Then run the analysis in either of these ways:
+
+-   `composer phpstan`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php`, in the [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-wordpress-environment).
+
+This runs two analyses in turn: one of all the PHP with [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist), and then one of the [strict paths](#strict-paths) with [`phpstan-strict.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan-strict.neon.dist). When the first reports errors, the second does not run. To run only one of them, use `composer phpstan:default` or `composer phpstan:strict` (or `npm run typecheck:php:default` or `npm run typecheck:php:strict` in the local environment). Arguments after `--`, such as `composer phpstan -- --error-format=json`, are passed to both, so pass a configuration or a report format meant for a program to one of those scripts instead.
+
+#### The baseline
+
+Errors that predate the analysis are recorded in [`tools/phpstan/baseline.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline.neon). When a change fixes one of them, PHPStan reports the baseline entry as unmatched, or its count as too high, and marks the error with 🔧. Remove the entry or lower its count in either of these ways, and commit the result:
+
+-   `composer phpstan:fix`, with PHP and Composer installed on your computer.
+-   `npm run typecheck:php:fix`, in the local environment.
+
+This runs PHPStan with `--fix` over all the paths, since PHPStan reports no out-of-date entries when it analyzes only some files, and then runs the analysis again, since `--fix` reports only what it fixed. The script fails when errors remain, and also when there is nothing to fix. Both runs use `phpstan.neon.dist`, even when a local `phpstan.neon` exists, since a configuration at another rule level can report a baselined error with a different message, which would make `--fix` remove entries the default configuration still needs.
+
+Unlike regenerating the baseline with `composer phpstan:baselines` (or `npm run typecheck:php:baselines`), `--fix` never adds an entry, so it does not record any other errors the change introduces as accepted. It also removes an `@phpstan-ignore` comment that no longer ignores anything, and fixes any other error marked with 🔧, so review the diff before committing it.
+
+The strict paths have a baseline of their own, [`tools/phpstan/baseline-strict.neon`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/baseline-strict.neon), which `composer phpstan:baselines` regenerates along with the other. Its out-of-date entries are removed with `composer phpstan:fix:strict` (or `npm run typecheck:php:fix:strict`), which is a separate script since `--fix` fails when there is nothing to fix, which would keep a single script from reaching the second baseline. Since the analysis of the strict paths also includes `tools/phpstan/baseline.neon`, it finds an entry there for a strict path out of date when its stricter level reports that error with a different message, and `composer phpstan:fix:strict` then removes an entry the other analysis still needs. `composer phpstan:default` then reports the error again, so restore the entry.
+
+#### Strict paths
+
+Some of the PHP is held to a stricter rule level than the rest, so that code which already meets it keeps meeting it. [`phpstan-strict.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan-strict.neon.dist) lists these paths under `paths!`, and analyzes them at its `level`, with everything `phpstan.neon.dist` enforces, including its baseline. The rest of the PHP is scanned rather than analyzed, so that what the strict paths use is known.
+
+To hold another file or directory to the stricter level, add it to that list, run `composer phpstan:strict`, and fix the errors it reports. Errors that cannot be fixed yet can be recorded in its baseline with `composer phpstan:baselines`, but only add a path whose errors are few.
+
+An entry in the `ignoreErrors` of `phpstan.neon.dist` needs a `path` naming the file its error occurs in, with an entry for each file, or, when it is a rule for every file, `reportUnmatched: false`. Otherwise it applies to every file, and the strict analysis reports it as unmatched when its error occurs only outside the strict paths.
+
+#### WordPress stubs
+
+The analysis runs against WordPress stubs generated from a pinned commit of core trunk, since Gutenberg uses functions that no released WordPress version has yet. The stubs are not committed: [`tools/phpstan/wordpress-stubs/composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) records the commit, and `composer phpstan` generates the stubs from it first when they are missing or out of date, which needs Git and network access.
+
+The stubs are generated by [`tools/phpstan/generate-wordpress-stubs.php`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/generate-wordpress-stubs.php), run with `composer phpstan:generate-wordpress-stubs -- <option>`, where the option is one of:
+
+-   `--commit=trunk`: Updates the stubs to the latest core trunk.
+-   `--pr=<number>`: Generates the stubs from a wordpress-develop pull request that a change depends on, so that the analysis knows what the pull request adds.
+-   `--checkout`: Generates the stubs from the wordpress-develop checkout that Gutenberg is in, including its uncommitted changes, while working on both. Those stubs cannot be generated in CI, so use `--pr` before pushing.
+-   `--checkout --pr=<number>`: Once the pull request's branch is checked out with no uncommitted changes and pushed, records the same source as `--pr` without fetching anything.
+
+After generating them, run `composer update` and `composer phpstan:baselines`, and commit the updated [`composer.json`](https://github.com/WordPress/gutenberg/blob/HEAD/tools/phpstan/wordpress-stubs/composer.json) with the change. When the stubs come from a pull request, regenerate them with `--commit=trunk` once the core change is committed, before merging.
+
+#### Local configuration
+
+To adjust the configuration locally, such as to try a higher rule level, create a `phpstan.neon`, which is ignored by Git and used in place of [`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist) by `composer phpstan` and `composer phpstan:default`, but not by the analysis of the strict paths. A local configuration that reports more errors keeps `composer phpstan` from reaching the strict paths, so run `composer phpstan:strict` as well. To adjust that one locally, create a `phpstan-strict.neon` that includes [`phpstan-strict.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan-strict.neon.dist), which is also ignored by Git, and name it when running the analysis, since PHPStan does not look for it: `composer phpstan:strict -- -c phpstan-strict.neon`. The tests in [`phpunit/`](https://github.com/WordPress/gutenberg/tree/HEAD/phpunit) are not analyzed by default, but the PHPUnit extension and stubs for the WordPress test library are installed, so a `phpstan.neon` can opt in to them:
+
+```neon
+includes:
+	- phpstan.neon.dist
+parameters:
+	paths:
+		- phpunit
+```
+
+#### Strict rules
+
+[`phpstan.neon.dist`](https://github.com/WordPress/gutenberg/blob/HEAD/phpstan.neon.dist) also enables the rules from [phpstan-strict-rules](https://github.com/phpstan/phpstan-strict-rules) that the code already complies with, such as those disallowing loose comparisons, short ternaries, and the backtick operator, registering each rule individually. It does not include the package's `rules.neon`, since that file also makes several PHPStan parameters stricter, such as `checkDynamicProperties` and `reportMaybesInMethodSignatures`, even when its rules are disabled. For the same reason, `composer.json` tells `phpstan/extension-installer` to ignore the package, which would otherwise include `rules.neon` automatically. To work toward complying with more of the rules, include `rules.neon` in a `phpstan.neon`, and enable the rules to try. Setting `strictRules.allRules` to `false` enables only the rules set to `true`, but the parameters are still made stricter, so expect some errors from those as well. Either way, disable the rules `phpstan.neon.dist` already registers, so they are not run twice:
+
+```neon
+includes:
+	- phpstan.neon.dist
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+parameters:
+	strictRules:
+		allRules: false
+		requireParentConstructorCall: true
+		strictArrayFilter: true
+
+		# Already registered in phpstan.neon.dist.
+		disallowedLooseComparison: false
+		disallowedBacktick: false
+		disallowedImplicitArrayCreation: false
+		disallowedShortTernary: false
+		closureUsesThis: false
+		matchingInheritedMethodNames: false
+		switchConditionsMatchingType: false
+		strictFunctionCalls: false
+		illegalConstructorMethodCall: false
+		numericOperandsInArithmeticOperators: false
+		dynamicCallOnStaticMethod: false
+```
+
+## GitHub Actions workflow files
+
+GitHub Actions workflows operate in a privileged software supply chain environment, therefore all workflow files must adhere to a high degree of quality and security standards.
+
+These files are statically scanned when modified using [Actionlint](https://github.com/rhysd/actionlint) and [Zizmor](https://github.com/zizmorcore/zizmor). Actionlint scans the YAML workflow files within the `.github/workflows` directory, while Zizmor additionally scans any action file (`action.yml`) located anywhere in the repository. It's recommended that you install both of these tools locally using a package manager to run prior to submitting changes to workflow or action files.
+
+-   [GitHub Actions Workflow Standards for WordPress](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
+-   [Actionlint installations instructions](https://github.com/rhysd/actionlint/blob/main/docs/install.md)
+-   [Zizmor installation instructions](https://docs.zizmor.sh/installation/)
+
+To run Actionlint:
+
+```
+actionlint
+```
+
+To run Zizmor for all workflow files (note the trailing period):
+
+```
+zizmor .
+```
+
+**Note:** A workflow run failure will not occur when issues are detected by Zizmor. Instead, the generated report is submitted to GitHub Code Scanning and surfaced through a status check and inline annotations contextually within a pull request. Some locally reported issues may be ignored based on the repository's configured Code Scanning settings.

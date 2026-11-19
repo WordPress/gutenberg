@@ -1,17 +1,38 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
 import { getBlockType } from './selectors';
 import { getValueFromObjectPath } from './utils';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '../api/constants';
+import {
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '../api/constants';
 import type { BlockStoreState } from './types';
-import type { BlockAttribute, BlockBindingsSource, BlockType } from '../types';
+import type {
+	BlockAttribute,
+	BlockBindingsSource,
+	BlockShortcut,
+	BlockType,
+	BlockVariation,
+} from '../types';
+
+/**
+ * A keyboard shortcut declared by a block variation or transform, together with
+ * the block change it performs.
+ */
+type ResolvedBlockShortcut = BlockShortcut & {
+	/**
+	 * The block type the shortcut produces.
+	 */
+	targetBlockName: string;
+	/**
+	 * The block types the shortcut applies to.
+	 */
+	blockNames: string[];
+	/**
+	 * The variation of `targetBlockName` the shortcut produces, if any.
+	 */
+	variationName?: string;
+};
 
 const ROOT_BLOCK_SUPPORTS: string[] = [
 	'background',
@@ -34,7 +55,32 @@ const ROOT_BLOCK_SUPPORTS: string[] = [
 	'textDecoration',
 	'textIndent',
 	'textTransform',
+	'textShadow',
 	'letterSpacing',
+];
+
+/*
+ * theme.json accepts the complete style set on every element, and the styles
+ * engine emits all of it, so Global Styles offers elements the same controls it
+ * offers blocks. These are the supports missing from the root list above.
+ *
+ * `filter` is deliberately absent: theme.json validates a duotone on an element
+ * but the engine emits no CSS for it, so the control would do nothing. Sizing
+ * is left out entirely (aspect ratio, height, width and their minimums)
+ * because an element is sized by the block that contains it.
+ */
+const ELEMENT_BLOCK_SUPPORTS: string[] = [
+	...ROOT_BLOCK_SUPPORTS,
+	'backgroundGradient',
+	'backgroundImage',
+	'backgroundSize',
+	'borderColor',
+	'borderRadius',
+	'borderStyle',
+	'borderWidth',
+	'margin',
+	'shadow',
+	'writingMode',
 ];
 
 /**
@@ -103,6 +149,18 @@ function filterElementBlockSupports(
 			return false;
 		}
 
+		const isElement = ! name && !! element && element in ELEMENTS;
+
+		// Block gap and the layout widths are emitted for blocks and for the
+		// root, but not for an element's own selector, so their controls would
+		// have no effect there.
+		if (
+			[ 'blockGap', 'contentSize', 'wideSize' ].includes( support ) &&
+			isElement
+		) {
+			return false;
+		}
+
 		return true;
 	} );
 }
@@ -117,8 +175,11 @@ export const getSupportedStyles = createSelector(
 		element: string | undefined
 	): string[] => {
 		if ( ! name ) {
+			// `element` also carries UI-only names such as 'text', which mean
+			// the root rather than an element, and keep the root supports.
+			const isElement = !! element && element in ELEMENTS;
 			return filterElementBlockSupports(
-				ROOT_BLOCK_SUPPORTS,
+				isElement ? ELEMENT_BLOCK_SUPPORTS : ROOT_BLOCK_SUPPORTS,
 				name,
 				element
 			);
@@ -135,8 +196,7 @@ export const getSupportedStyles = createSelector(
 		// Check for blockGap support.
 		// Block spacing support doesn't map directly to a single style property, so needs to be handled separately.
 		const supports = blockType?.supports as
-			| Record< string, unknown >
-			| undefined;
+			Record< string, unknown > | undefined;
 		if (
 			( supports?.spacing as Record< string, unknown > | undefined )
 				?.blockGap
@@ -229,6 +289,21 @@ export function getUnprocessedBlockTypes(
 }
 
 /**
+ * Returns the registered block variations of every block type, keyed by block
+ * name. The reference changes whenever a variation is added or removed, so it
+ * can serve as a cache dependency.
+ *
+ * @param state Data state.
+ *
+ * @return Block variations keyed by block name.
+ */
+export function getBlockVariationsRaw(
+	state: BlockStoreState
+): Record< string, BlockVariation[] > {
+	return state.blockVariations;
+}
+
+/**
  * Returns all the block bindings sources registered.
  *
  * @param state Data state.
@@ -291,6 +366,82 @@ export const getBlockBindingsSourceFieldsList = createRegistrySelector(
 				blockContext: Record< string, unknown >
 			) => [ source.getFieldsList, source.usesContext, blockContext ]
 		)
+);
+
+/**
+ * Returns every keyboard shortcut declared by a registered block type, through
+ * either a block variation or a block transform.
+ *
+ * @param state Data state.
+ *
+ * @return The declared shortcuts, each paired with the block change it makes.
+ */
+export const getBlockKeyboardShortcuts = createSelector(
+	( state: BlockStoreState ): ResolvedBlockShortcut[] => {
+		const shortcuts: ResolvedBlockShortcut[] = [];
+
+		for ( const blockName of Object.keys( state.blockTypes ) ) {
+			// A variation shortcut only applies to blocks that are already of
+			// the block type declaring it. Reaching the variation from another
+			// block type is a transform, and is declared as one.
+			for ( const variation of state.blockVariations[ blockName ] ??
+				[] ) {
+				if ( ! variation.shortcut ) {
+					continue;
+				}
+				shortcuts.push( {
+					...variation.shortcut,
+					targetBlockName: blockName,
+					blockNames: [ blockName ],
+					variationName: variation.name,
+				} );
+			}
+
+			const transforms = state.blockTypes[ blockName ]?.transforms;
+
+			for ( const transform of transforms?.to ?? [] ) {
+				if ( transform.type !== 'block' ) {
+					continue;
+				}
+				// A `to` transform can list several target blocks, but a shortcut
+				// can only produce one of them. The first is used.
+				const targetBlockName = transform.blocks?.[ 0 ];
+				if ( ! targetBlockName ) {
+					continue;
+				}
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName,
+						blockNames: [ blockName ],
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
+			}
+
+			for ( const transform of transforms?.from ?? [] ) {
+				if (
+					transform.type !== 'block' ||
+					! transform.blocks?.length
+				) {
+					continue;
+				}
+				for ( const shortcut of transform.shortcuts ?? [] ) {
+					shortcuts.push( {
+						...shortcut,
+						targetBlockName: blockName,
+						blockNames: transform.blocks,
+						variationName:
+							shortcut.variationName ?? transform.variationName,
+					} );
+				}
+			}
+		}
+
+		return shortcuts;
+	},
+	( state: BlockStoreState ) => [ state.blockTypes, state.blockVariations ]
 );
 
 /**

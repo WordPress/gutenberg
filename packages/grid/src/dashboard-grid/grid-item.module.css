@@ -21,23 +21,54 @@
 /*
  * During drag, the original item acts as a placeholder in its grid
  * cell while `<DragOverlay>` renders a clone that follows the cursor.
- * Fading the placeholder and outlining it makes
- * the destination visible without any scaling or translation on the
- * original element.
+ * Fading the placeholder and outlining it makes the destination visible
+ * without any scaling or translation on the original element.
+ *
+ * Placeholder chrome waits until `data-wp-grid-dragging` is set and the
+ * drag-preview enter animation (`--wpds-motion-duration-sm`) finishes
+ * so the dashed outline does not flash under the lifting clone.
  */
 .is-dragging {
-	opacity: var(--wp-grid-placeholder-opacity, 0.4);
 	pointer-events: none;
-	outline:
-		var(--wpds-border-width-sm)
-		var(--wp-grid-placeholder-outline-style, dashed)
-		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+}
+
+:global([data-wp-grid-dragging]) .is-dragging {
 	border-radius: var(--wp-grid-placeholder-radius, 0);
 }
 
+@media not (prefers-reduced-motion: reduce) {
+	:global([data-wp-grid-dragging]) .is-dragging {
+		opacity: 1;
+		outline-width: 0;
+		outline-style: var(--wp-grid-placeholder-outline-style, dashed);
+		outline-color: transparent;
+		animation:
+			wp-grid-item-placeholder-in 0ms linear
+			var(--wpds-motion-duration-sm) forwards;
+	}
+
+	@keyframes wp-grid-item-placeholder-in {
+		to {
+			opacity: var(--wp-grid-placeholder-opacity, 0.4);
+			outline-width: var(--wpds-border-width-sm);
+			outline-color: var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:global([data-wp-grid-dragging]) .is-dragging {
+		opacity: var(--wp-grid-placeholder-opacity, 0.4);
+		outline:
+			var(--wpds-border-width-sm)
+			var(--wp-grid-placeholder-outline-style, dashed)
+			var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+	}
+}
+
 @media (forced-colors: active) {
-	.is-dragging {
-		outline-color: Highlight;
+	:global([data-wp-grid-dragging]) .is-dragging {
+		--wp-grid-placeholder-outline-color: Highlight;
 	}
 }
 

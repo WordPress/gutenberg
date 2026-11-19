@@ -69,3 +69,12 @@ The text color to check the contrast of the background against.
 
 -   Type: `String`
 -   Required: No
+
+#### messageOverride
+
+Custom warning message to display (and announce) instead of the default
+contrast guidance when the color combination has insufficient contrast. Useful
+for providing panel-specific, more concise copy.
+
+-   Type: `String`
+-   Required: No

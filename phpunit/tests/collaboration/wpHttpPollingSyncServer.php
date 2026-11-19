@@ -24,15 +24,11 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		self::$category_id   = $factory->category->create();
 		self::$tag_id        = $factory->tag->create();
 		self::$comment_id    = $factory->comment->create( array( 'comment_post_ID' => self::$post_id ) );
-
-		// Enable option in setUpBeforeClass to ensure REST routes are registered.
-		update_option( 'wp_collaboration_enabled', 1 );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$subscriber_id );
-		delete_option( 'wp_collaboration_enabled' );
 		wp_delete_post( self::$post_id, true );
 		wp_delete_term( self::$category_id, 'category' );
 		wp_delete_term( self::$tag_id, 'post_tag' );
@@ -41,10 +37,6 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 	public function set_up() {
 		parent::set_up();
-
-		// Enable option for tests.
-		update_option( 'wp_collaboration_enabled', 1 );
-
 		// Reset storage post ID cache to ensure clean state after transaction rollback.
 		$reflection = new ReflectionProperty( 'WP_Sync_Post_Meta_Storage', 'storage_post_ids' );
 		if ( PHP_VERSION_ID < 80100 ) {
@@ -107,7 +99,29 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
+
+		$this->assertTrue( wp_is_collaboration_enabled() );
 		$this->assertArrayHasKey( '/wp-sync/v1/updates', $routes );
+	}
+
+	public function test_does_not_register_collaboration_routes_when_experiment_is_disabled() {
+		global $wp_rest_server;
+
+		$original_rest_server = $wp_rest_server;
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+
+		try {
+			$this->assertFalse( wp_is_collaboration_enabled() );
+			$wp_rest_server = new WP_REST_Server();
+			gutenberg_register_collaboration_rest_routes();
+
+			$routes = rest_get_server()->get_routes();
+			$this->assertArrayNotHasKey( '/wp-sync/v1/updates', $routes );
+			$this->assertArrayNotHasKey( '/wp-sync/v1/save', $routes );
+		} finally {
+			$wp_rest_server = $original_rest_server;
+			remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+		}
 	}
 
 	/**
@@ -251,18 +265,31 @@ class Tests_Collaboration_WpHttpPollingSyncServer extends WP_Test_REST_Controlle
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
 	}
 
+	/**
+	 * @ticket 77243
+	 */
 	public function test_sync_permission_checked_per_room() {
 		wp_set_current_user( self::$editor_id );
 
-		// First room is allowed, second room is forbidden.
+		$forbidden_rooms = array(
+			'unknown/entity',
+			'postType/post:999999',
+		);
+
+		// First room is allowed, remaining rooms are forbidden.
 		$response = $this->dispatch_sync(
 			array(
 				$this->build_room( $this->get_post_room() ),
-				$this->build_room( 'unknown/entity' ),
+				$this->build_room( $forbidden_rooms[0] ),
+				$this->build_room( $forbidden_rooms[1] ),
 			)
 		);
 
 		$this->assertErrorResponse( 'rest_cannot_edit', $response, 403 );
+		$data = $response->get_data();
+		$this->assertSame( $forbidden_rooms, $data['data']['rooms'] );
+		$this->assertStringContainsString( $forbidden_rooms[0], $data['message'] );
+		$this->assertStringContainsString( $forbidden_rooms[1], $data['message'] );
 	}
 
 	/**

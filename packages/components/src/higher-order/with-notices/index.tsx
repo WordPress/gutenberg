@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { v4 as uuid } from 'uuid';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useState, useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import NoticeList from '../../notice/list';
 import type { WithNoticeProps } from './types';
 
@@ -112,5 +101,5 @@ export default createHigherOrderComponent( ( OriginalComponent ) => {
 		isForwardRef = true;
 		return forwardRef( Component );
 	}
-	return Component;
+	return Component as React.ComponentType< any >;
 }, 'withNotices' );

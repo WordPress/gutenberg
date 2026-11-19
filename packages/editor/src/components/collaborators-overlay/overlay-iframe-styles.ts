@@ -7,10 +7,17 @@ import {
 	BORDER_WIDTH,
 	BORDER_WIDTH_FOCUS_FALLBACK,
 	ELEVATION_X_SMALL,
+	FONT_LINE_HEIGHT_SMALL,
+	FONT_SIZE_SMALL,
+	GRAY_900,
 	GRID_UNIT_05,
 	GRID_UNIT_10,
 	WHITE,
 } from './collaborator-styles';
+
+// The most avatars stacked above one highlighted block. Anyone past this is
+// counted in the "+N" after the stack, and keeps their avatar on their caret.
+export const MAX_BLOCK_LABEL_AVATARS = 3;
 
 export const OVERLAY_IFRAME_STYLES = `
 .block-canvas-cover {
@@ -65,15 +72,67 @@ export const OVERLAY_IFRAME_STYLES = `
 	pointer-events: auto;
 	overflow: visible;
 	width: max-content;
+	--label-base-transform: translate(-11px, -100%);
 }
-/* Avatar positioned above a highlighted block as a label. */
-.collaborators-overlay-block-label.editor-avatar {
+/* Avatars stacked above a highlighted block as a label. The anchor sits at
+   the block's top-left corner and lifts the whole stack above the block. */
+.collaborators-overlay-block-label-anchor {
 	position: absolute;
 	z-index: 1;
 	transform: translateY(calc(-100% - ${ GRID_UNIT_10 }));
 	pointer-events: auto;
+	width: max-content;
+}
+/* The stack mirrors AvatarGroup (collaborators-presence/avatar-group), with
+   each avatar wrapped in an item that carries the scroll-to-cursor ref:
+   later items tuck under earlier ones. Hovering the stack spreads it out
+   and opens every badge, so each name can be read; a badge expanding on
+   its own would slide under its neighbour. */
+.collaborators-overlay-block-label-group {
+	display: flex;
+	align-items: center;
+}
+.collaborators-overlay-block-label-item {
+	position: relative;
+	display: inline-flex;
+}
+.collaborators-overlay-block-label-item + .collaborators-overlay-block-label-item {
+	margin-inline-start: -${ GRID_UNIT_10 };
+	transition: margin-inline-start 0.3s cubic-bezier(0.15, 0, 0.15, 1);
+}
+.collaborators-overlay-block-label-group:hover .collaborators-overlay-block-label-item + .collaborators-overlay-block-label-item {
+	margin-inline-start: ${ GRID_UNIT_05 };
+	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+}
+${ Array.from(
+	{ length: MAX_BLOCK_LABEL_AVATARS },
+	( _, index ) =>
+		`.collaborators-overlay-block-label-item:nth-child(${
+			index + 1
+		}) { z-index: ${ MAX_BLOCK_LABEL_AVATARS - index }; }`
+).join( '\n' ) }
+.collaborators-overlay-block-label-group:hover .collaborators-overlay-block-label.editor-avatar.is-badge {
+	grid-template-columns: min-content 1fr;
+	column-gap: ${ GRID_UNIT_05 };
+	padding-inline-end: ${ GRID_UNIT_10 };
+	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+}
+.collaborators-overlay-block-label-group:hover .collaborators-overlay-block-label.editor-avatar.is-badge .editor-avatar__name {
+	opacity: 1;
+	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+}
+.collaborators-overlay-block-label-group .editor-avatar-group__overflow {
+	margin-inline-start: ${ GRID_UNIT_05 };
+	margin-inline-end: ${ GRID_UNIT_05 };
+	font-size: ${ FONT_SIZE_SMALL };
+	line-height: ${ FONT_LINE_HEIGHT_SMALL };
+	color: ${ GRAY_900 };
+	white-space: nowrap;
+}
+.collaborators-overlay-block-label.editor-avatar {
 	overflow: visible;
 	width: max-content;
+	--label-base-transform: translate(0, 0);
 }
 
 @keyframes collaborators-overlay-cursor-blink {
@@ -84,7 +143,8 @@ export const OVERLAY_IFRAME_STYLES = `
 .collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
 	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
 }
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label,
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-block-label {
 	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
 }
 @keyframes collaborators-overlay-cursor-highlight {
@@ -99,11 +159,11 @@ export const OVERLAY_IFRAME_STYLES = `
 }
 @keyframes collaborators-overlay-label-highlight {
 	0%, 100% {
-		transform: translate(-11px, -100%) scale(1);
+		transform: var(--label-base-transform) scale(1);
 		filter: drop-shadow(0 0 0 transparent);
 	}
 	50% {
-		transform: translate(-11px, -100%) scale(1.1);
+		transform: var(--label-base-transform) scale(1.1);
 		filter: drop-shadow(0 0 6px currentColor);
 	}
 }
@@ -124,8 +184,12 @@ export const OVERLAY_IFRAME_STYLES = `
 }
 @media (prefers-reduced-motion: reduce) {
 	.collaborators-overlay-user-label,
-	.collaborators-overlay-user-cursor {
+	.collaborators-overlay-user-cursor,
+	.collaborators-overlay-block-label {
 		animation: none;
+	}
+	.collaborators-overlay-block-label-item + .collaborators-overlay-block-label-item {
+		transition: none;
 	}
 }
 `;

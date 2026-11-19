@@ -1,40 +1,17 @@
-/**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { HeaderBackground } from '../header-background';
 import styles from './banner.module.css';
 
 const DISPLAY_VERSION = '7.1';
 
-interface BannerProps {
-	isWide?: boolean;
-	isTiny?: boolean;
-}
-
-export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
-	const className = clsx(
-		styles.banner,
-		isWide && styles.wide,
-		isTiny && styles.tiny
-	);
-
+export function Banner() {
 	return (
-		<Stack className={ className } direction="column" justify="center">
-			<HeaderBackground />
+		<Stack className={ styles.banner } direction="column" justify="center">
+			<HeaderBackground version={ DISPLAY_VERSION } />
 
 			<Stack
-				className={ styles.bannerContent }
+				className={ styles[ 'banner-content' ] }
 				gap="sm"
 				direction="column"
 			>
@@ -44,7 +21,7 @@ export function Banner( { isWide = false, isTiny = false }: BannerProps ) {
 
 				<Text variant="heading-lg">
 					<Link
-						className={ styles.bannerLink }
+						className={ styles[ 'banner-link' ] }
 						href="/wp-admin/about.php"
 						variant="unstyled"
 					>

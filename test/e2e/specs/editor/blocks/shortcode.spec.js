@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Shortcode', () => {
@@ -41,6 +38,28 @@ test.describe( 'Shortcode', () => {
 		await editor.insertBlock( {
 			name: 'core/shortcode',
 			attributes: { text: '[totally_unknown_shortcode_tag]' },
+		} );
+		await editor.clickBlockToolbarButton( 'Shortcode' );
+
+		const transformations = page
+			.getByRole( 'menu', { name: 'Shortcode' } )
+			.getByRole( 'menuitem' );
+		await expect( transformations ).toHaveCount( 3 );
+		await expect( transformations ).toHaveText( [
+			'Columns',
+			'Details',
+			'Group',
+		] );
+	} );
+
+	test( 'should not offer a transform when the shortcode does not meet the block conditions', async ( {
+		editor,
+		page,
+	} ) => {
+		// The Gallery block only converts a gallery shortcode that has `ids`.
+		await editor.insertBlock( {
+			name: 'core/shortcode',
+			attributes: { text: '[gallery]' },
 		} );
 		await editor.clickBlockToolbarButton( 'Shortcode' );
 

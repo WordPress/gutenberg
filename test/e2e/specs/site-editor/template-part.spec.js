@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Part', () => {
@@ -37,7 +34,10 @@ test.describe( 'Template Part', () => {
 			.click();
 
 		// Fill in a name in the dialog that pops up.
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'New' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'New' );
 		await page.keyboard.press( 'Enter' );
 
 		// The template part should be visible with a block appender.
@@ -57,7 +57,11 @@ test.describe( 'Template Part', () => {
 		page,
 	} ) => {
 		// Visit the index.
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		const headerTemplateParts = editor.canvas.locator(
 			'[data-type="core/template-part"]'
 		);
@@ -68,9 +72,10 @@ test.describe( 'Template Part', () => {
 		// Insert a new template block and choose an existing header pattern.
 		await editor.insertBlock( { name: 'core/template-part' } );
 		await editor.canvas.locator( 'role=button[name="Choose"i]' ).click();
-		await page.click(
-			'role=listbox[name="Block Patterns"i] >> role=option[name="header"i]'
-		);
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: 'header' } )
+			.click();
 
 		// There are now two header template parts.
 		await expect( headerTemplateParts ).toHaveCount( 2 );
@@ -83,7 +88,11 @@ test.describe( 'Template Part', () => {
 	} ) => {
 		const paragraphText = 'Test 2';
 
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -98,7 +107,10 @@ test.describe( 'Template Part', () => {
 
 		// Convert block to a template part.
 		await editor.clickBlockOptionsMenuItem( 'Create Template part' );
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'Test' );
 		await page.keyboard.press( 'Enter' );
 
 		await page.waitForSelector(
@@ -122,7 +134,11 @@ test.describe( 'Template Part', () => {
 		const paragraphText1 = 'Test 3';
 		const paragraphText2 = 'Test 4';
 
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Add a block and select it.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -147,7 +163,10 @@ test.describe( 'Template Part', () => {
 
 		// Convert block to a template part.
 		await editor.clickBlockOptionsMenuItem( 'Create template part' );
-		await page.type( 'role=dialog >> role=textbox[name="Name"i]', 'Test' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'textbox', { name: 'Name' } )
+			.type( 'Test' );
 		await page.keyboard.press( 'Enter' );
 
 		await page.waitForSelector(
@@ -197,7 +216,11 @@ test.describe( 'Template Part', () => {
 		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		// Check that the header contains the paragraph added earlier.
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
@@ -219,6 +242,47 @@ test.describe( 'Template Part', () => {
 		// There should be a paragraph but no header template part.
 		await expect( paragraph ).toBeVisible();
 		await expect( templatePartWithParagraph ).toBeHidden();
+	} );
+
+	test( 'shows the source block for a pattern wrapper in focus mode', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const templatePart = await requestUtils.createTemplate(
+			'wp_template_part',
+			{
+				slug: 'pattern-header',
+				title: 'Pattern Header',
+				content: `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Template part content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->`,
+			}
+		);
+
+		await admin.visitSiteEditor( {
+			postId: templatePart.id,
+			postType: 'wp_template_part',
+			canvas: 'edit',
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Group' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
 	test( 'shows changes in a template when a template part it contains is modified', async ( {
@@ -245,8 +309,11 @@ test.describe( 'Template Part', () => {
 		} );
 
 		// Visit the index.
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 		const paragraph = editor.canvas.locator(
 			`p >> text="${ paragraphText }"`
 		);
@@ -298,44 +365,142 @@ test.describe( 'Template Part', () => {
 		await expect( paragraph ).toBeVisible();
 	} );
 
-	// Reason: https://github.com/WordPress/gutenberg/issues/47003.
-	test.skip( 'can import a widget area into an empty template part', async ( {
+	test( 'can update and save the template part area', async ( {
 		admin,
 		editor,
 		page,
+		requestUtils,
 	} ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await editor.selectBlocks(
+			editor.canvas.locator( '[data-type="core/template-part"]' )
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'tab', { name: 'Settings', exact: true } )
+			.click();
+		await page
+			.getByRole( 'button', { name: 'Advanced', exact: true } )
+			.click();
 
-		// Add a block and select it.
+		const area = page.getByRole( 'combobox', {
+			name: 'Area',
+			exact: true,
+		} );
+		await area.click();
+		await page
+			.getByRole( 'option', { name: 'Footer', exact: true } )
+			.click();
+		await editor.saveSiteEditorEntities();
+		await expect
+			.poll( async () => {
+				const templatePart = await requestUtils.rest( {
+					path: '/wp/v2/template-parts/emptytheme//header',
+				} );
+				return templatePart.area;
+			} )
+			.toBe( 'footer' );
+	} );
+
+	test( 'can select, clear, and import a widget area', async ( {
+		admin,
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await page.route( '**/wp/v2/sidebars?*', ( route ) =>
+			route.fulfill( {
+				json: [
+					{
+						id: 'migration-widgets',
+						name: 'Migration widgets',
+						widgets: [ 'block-1' ],
+					},
+				],
+			} )
+		);
+		await page.route( '**/wp/v2/widgets?*', ( route ) =>
+			route.fulfill( {
+				json: [
+					{
+						id: 'block-1',
+						id_base: 'block',
+						sidebar: 'migration-widgets',
+						instance: {
+							raw: {
+								content:
+									'<!-- wp:paragraph --><p>Imported widget content</p><!-- /wp:paragraph -->',
+							},
+						},
+					},
+				],
+			} )
+		);
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'import-target',
+			title: 'Import target',
+			content: '',
+		} );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'editing all patterns' );
+		await page
+			.getByRole( 'option', { name: 'Enable editing all patterns' } )
+			.click();
 		await editor.insertBlock( {
 			name: 'core/template-part',
+			attributes: { slug: 'import-target', theme: 'emptytheme' },
 		} );
-
-		// Open Block Inspector -> Advanced.
+		await editor.canvas
+			.locator( '[data-type="core/template-part"]' )
+			.last()
+			.scrollIntoViewIfNeeded();
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Advanced' } ).click();
-
-		// Import the widget area.
 		await page
-			.getByRole( 'combobox', { name: 'Import widget area' } )
-			.selectOption( 'sidebar-1' );
-		await page.getByRole( 'button', { name: 'Import' } ).click();
+			.getByRole( 'button', { name: 'Advanced', exact: true } )
+			.click();
 
-		// Verify that the widget area was imported.
+		const widgetArea = page.getByRole( 'combobox', {
+			name: 'Import widget area',
+		} );
+		const importButton = page.getByRole( 'button', {
+			name: 'Import',
+			exact: true,
+		} );
+		await expect( widgetArea ).toHaveText( 'Select widget area' );
+		await expect( importButton ).toBeDisabled();
+		await widgetArea.click();
+		await page
+			.getByRole( 'option', { name: 'Migration widgets', exact: true } )
+			.click();
+		await expect( importButton ).toBeEnabled();
+		await widgetArea.click();
+		await page
+			.getByRole( 'option', { name: 'Select widget area', exact: true } )
+			.click();
+		await expect( widgetArea ).toHaveText( 'Select widget area' );
+		await expect( importButton ).toBeDisabled();
+
+		await widgetArea.click();
+		await page
+			.getByRole( 'option', { name: 'Migration widgets', exact: true } )
+			.click();
+		await importButton.click();
 		await expect(
-			editor.canvas.locator( '[data-type="core/search"]' )
-		).toBeVisible();
-		await expect(
-			editor.canvas.locator( '[data-type="core/latest-posts"]' )
-		).toBeVisible();
-		await expect(
-			editor.canvas.locator( '[data-type="core/latest-comments"]' )
-		).toBeVisible();
-		await expect(
-			editor.canvas.locator( '[data-type="core/archives"]' )
-		).toBeVisible();
-		await expect(
-			editor.canvas.locator( '[data-type="core/categories"]' )
+			editor.canvas.getByText( 'Imported widget content', {
+				exact: true,
+			} )
 		).toBeVisible();
 	} );
 
@@ -344,7 +509,11 @@ test.describe( 'Template Part', () => {
 		editor,
 		page,
 	} ) => {
-		await admin.visitSiteEditor( { canvas: 'edit' } );
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 
 		// Select existing header template part.
 		await editor.selectBlocks(

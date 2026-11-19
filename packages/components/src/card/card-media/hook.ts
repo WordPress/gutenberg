@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
 import type { MediaProps } from '../types';
 
 export function useCardMedia(
@@ -17,18 +9,11 @@ export function useCardMedia(
 ) {
 	const { className, ...otherProps } = useContextSystem( props, 'CardMedia' );
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.Media,
-				styles.borderRadius,
-				// This classname is added for legacy compatibility reasons.
-				'components-card__media',
-				className
-			),
-		[ className, cx ]
+	const classes = clsx(
+		styles.media,
+		// This classname is added for legacy compatibility reasons.
+		'components-card__media',
+		className
 	);
 
 	return {
