@@ -1,0 +1,287 @@
+/**
+ * The overlap matrix: which gestures may land on text that already carries
+ * another suggestion's marker. Markers stack, so only formatting over
+ * formatting, or across an addition's edge, is still refused.
+ */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { create } from '@wordpress/rich-text';
+import {
+	registerSuggestionFormat,
+	unregisterSuggestionFormats,
+} from '../format';
+import { classifyOverlap } from '../overlap';
+
+const OWN = '1';
+const OTHER = '2';
+
+const mark = (
+	kind: 'add' | 'del' | 'format',
+	id: number,
+	inner: string,
+	author = OTHER
+) =>
+	`<mark data-suggestion-id="${ id }" data-suggestion-type="${ kind }" data-author="${ author }" class="wp-suggestion-${ kind }">${ inner }</mark>`;
+
+/*
+ * "ab" + a run "CDEF" carrying the marker under test + "gh". The run spans
+ * offsets 2-6.
+ */
+const fixture = ( kind: 'add' | 'del' | 'format', author = OTHER ) =>
+	create( { html: `ab${ mark( kind, 7, 'CDEF', author ) }gh` } ).formats;
+
+type Gesture = 'insert' | 'delete' | 'format' | 'type-over';
+
+const verdict = (
+	formats: any,
+	gesture: Gesture,
+	start: number,
+	end = start,
+	authorToken: string | null = OWN
+) => classifyOverlap( formats, { gesture, start, end, authorToken } );
+
+describe( 'classifyOverlap', () => {
+	beforeAll( () => {
+		registerSuggestionFormat();
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+	} );
+
+	it( 'allows any gesture on unmarked text', () => {
+		const formats = create( { text: 'abcdef' } ).formats;
+		for ( const gesture of [
+			'insert',
+			'delete',
+			'format',
+			'type-over',
+		] as Gesture[] ) {
+			expect( verdict( formats, gesture, 1, 3 ).verdict ).toBe( 'allow' );
+		}
+	} );
+
+	/*
+	 * Each row: gesture, range, expected verdict and reason, for a run of
+	 * another author's marker of each kind.
+	 */
+	const cases: Array<
+		[
+			string,
+			'add' | 'del' | 'format',
+			Gesture,
+			number,
+			number,
+			'allow' | 'refuse',
+			string?,
+		]
+	> = [
+		// Insert at a caret.
+		[ 'insert inside an addition', 'add', 'insert', 4, 4, 'allow' ],
+		[
+			'insert at an addition’s trailing edge',
+			'add',
+			'insert',
+			6,
+			6,
+			'allow',
+		],
+		[
+			'insert at an addition’s leading edge',
+			'add',
+			'insert',
+			2,
+			2,
+			'allow',
+		],
+		[ 'insert inside a deletion', 'del', 'insert', 4, 4, 'allow' ],
+		[
+			'insert at a deletion’s trailing edge',
+			'del',
+			'insert',
+			6,
+			6,
+			'allow',
+		],
+		[
+			'insert inside a formatting change',
+			'format',
+			'insert',
+			4,
+			4,
+			'allow',
+		],
+		// Delete a range.
+		[ 'delete inside an addition', 'add', 'delete', 3, 5, 'allow' ],
+		[ 'delete an addition and plain text', 'add', 'delete', 0, 4, 'allow' ],
+		[ 'delete inside a deletion', 'del', 'delete', 3, 5, 'allow' ],
+		[ 'delete across a deletion', 'del', 'delete', 0, 4, 'allow' ],
+		[
+			'delete inside a formatting change',
+			'format',
+			'delete',
+			3,
+			5,
+			'allow',
+		],
+		[
+			'delete across a formatting change',
+			'format',
+			'delete',
+			0,
+			4,
+			'allow',
+		],
+		// Toggle a format over a range.
+		[ 'format inside an addition', 'add', 'format', 3, 5, 'allow' ],
+		[ 'format the whole addition', 'add', 'format', 2, 6, 'allow' ],
+		[ 'format across an addition’s edge', 'add', 'format', 0, 4, 'allow' ],
+		[ 'format inside a deletion', 'del', 'format', 3, 5, 'allow' ],
+		[ 'format across a deletion', 'del', 'format', 0, 4, 'allow' ],
+		[
+			'format inside a formatting change',
+			'format',
+			'format',
+			3,
+			5,
+			'allow',
+		],
+		[
+			'format across a formatting change',
+			'format',
+			'format',
+			0,
+			4,
+			'allow',
+		],
+		// Type over a selection.
+		[ 'type over inside an addition', 'add', 'type-over', 3, 5, 'allow' ],
+		[ 'type over inside a deletion', 'del', 'type-over', 3, 5, 'allow' ],
+		[
+			'type over inside a formatting change',
+			'format',
+			'type-over',
+			3,
+			5,
+			'allow',
+		],
+	];
+
+	it.each( cases )(
+		'%s by another author',
+		( _label, kind, gesture, start, end, expected, reason ) => {
+			expect( verdict( fixture( kind ), gesture, start, end ) ).toEqual(
+				expected === 'refuse'
+					? {
+							verdict: 'refuse',
+							reason,
+							blocking: { id: '7', kind, authorId: OTHER },
+						}
+					: { verdict: 'allow' }
+			);
+		}
+	);
+
+	it( 'leaves the author’s own markers to the merge paths', () => {
+		// Typing in or deleting across one's own markers is handled before
+		// the classifier is asked (grow, revise, delete across own markers).
+		// Whatever reaches it over an own add or del run is declined.
+		expect( verdict( fixture( 'add', OWN ), 'delete', 3, 5 ).verdict ).toBe(
+			'refuse'
+		);
+		expect( verdict( fixture( 'del', OWN ), 'delete', 3, 5 ).verdict ).toBe(
+			'refuse'
+		);
+		expect( verdict( fixture( 'del', OWN ), 'delete', 3, 5 ).reason ).toBe(
+			'own-marker'
+		);
+		// A sibling addition next to one's own deletion is fine.
+		expect( verdict( fixture( 'del', OWN ), 'insert', 4, 4 ).verdict ).toBe(
+			'allow'
+		);
+		// A deletion over one's own formatting change is a separate
+		// suggestion on the same text.
+		expect(
+			verdict( fixture( 'format', OWN ), 'delete', 3, 5 ).verdict
+		).toBe( 'allow' );
+	} );
+
+	it( 'treats an unknown author as matching only unauthored markers', () => {
+		const unauthored = create( {
+			html: `ab<mark data-suggestion-id="7" data-suggestion-type="del" class="wp-suggestion-del">CDEF</mark>gh`,
+		} ).formats;
+		expect( verdict( unauthored, 'delete', 3, 5, null ).reason ).toBe(
+			'own-marker'
+		);
+		expect(
+			verdict( fixture( 'del' ), 'delete', 3, 5, null ).verdict
+		).toBe( 'allow' );
+	} );
+
+	it( 'allows typing inside either half of a replacement', () => {
+		const formats = create( {
+			html: `a${ mark( 'add', 9, 'NEW' ) }${ mark( 'del', 9, 'old' ) }z`,
+		} ).formats;
+		for ( const caret of [ 2, 4, 5 ] ) {
+			expect( verdict( formats, 'insert', caret, caret ).verdict ).toBe(
+				'allow'
+			);
+		}
+	} );
+
+	it( 'allows a deletion over a deletion nested in an addition', () => {
+		// A deletion by author 3 nested in an addition by author 2.
+		const formats = create( {
+			html: `a${ mark(
+				'add',
+				4,
+				`bc${ mark( 'del', 5, 'de', '3' ) }f`
+			) }g`,
+		} ).formats;
+		expect( verdict( formats, 'delete', 2, 5 ).verdict ).toBe( 'allow' );
+		// Formatting inside the addition, over the nested deletion, is fine.
+		expect( verdict( formats, 'format', 2, 5 ).verdict ).toBe( 'allow' );
+	} );
+
+	it( 'allows formatting across the edge of a stacked addition', () => {
+		// An addition by author 3 nested in an addition by author 2.
+		const formats = create( {
+			html: `a${ mark(
+				'add',
+				4,
+				`bc${ mark( 'add', 5, 'de', '3' ) }f`
+			) }g`,
+		} ).formats;
+		// Inside the nested addition only.
+		expect( verdict( formats, 'format', 3, 5 ).verdict ).toBe( 'allow' );
+		// From the outer addition into the nested one, across its edge.
+		expect( verdict( formats, 'format', 2, 5 ) ).toEqual( {
+			verdict: 'allow',
+		} );
+	} );
+
+	it( 'declines a gesture over the author’s own marker in a stack', () => {
+		// The author's own addition nested in someone else's.
+		const formats = create( {
+			html: `a${ mark(
+				'add',
+				4,
+				`bc${ mark( 'add', 5, 'de', OWN ) }f`
+			) }g`,
+		} ).formats;
+		expect( verdict( formats, 'delete', 3, 5 ) ).toEqual( {
+			verdict: 'refuse',
+			reason: 'own-marker',
+			blocking: { id: '5', kind: 'add', authorId: OWN },
+		} );
+	} );
+
+	it( 'tolerates a missing formats array and an out-of-range span', () => {
+		expect( verdict( undefined, 'delete', 0, 3 ).verdict ).toBe( 'allow' );
+		expect( verdict( fixture( 'add' ), 'insert', 0, 0 ).verdict ).toBe(
+			'allow'
+		);
+		expect( verdict( fixture( 'add' ), 'insert', 8, 8 ).verdict ).toBe(
+			'allow'
+		);
+	} );
+} );

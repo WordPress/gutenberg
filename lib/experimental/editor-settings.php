@@ -26,6 +26,13 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-dashboard-widgets' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDashboardWidgets = true', 'before' );
 	}
+	/*
+	 * Suggest mode is enabled unconditionally on this combined testing branch so
+	 * testers get the feature without visiting the Experiments screen first. On
+	 * the reviewable stack (#80427 and up) this sits behind the
+	 * `gutenberg-suggestion-mode` experiment, off by default.
+	 */
+	wp_add_inline_script( 'wp-block-editor', 'window.__experimentalSuggestionMode = true', 'before' );
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-real-time-collaboration' ) ) {
 		$collaboration_enabled = ! (
 			'site-editor.php' === $pagenow ||
@@ -39,6 +46,24 @@ function gutenberg_enable_experiments() {
 		);
 	}
 }
+
+/**
+ * Reports the Suggestion mode experiment as on.
+ *
+ * Only on this combined testing branch, where the editor has Suggest mode on
+ * unconditionally: server code that asks, `gutenberg_suggestions_enabled()`
+ * for one, then agrees with the editor.
+ *
+ * @param mixed $experiments The `gutenberg-experiments` option.
+ * @return array<string, mixed> The option with Suggestion mode on.
+ */
+function gutenberg_force_suggestion_mode_experiment( $experiments ): array {
+	$experiments                              = is_array( $experiments ) ? $experiments : array();
+	$experiments['gutenberg-suggestion-mode'] = true;
+	return $experiments;
+}
+add_filter( 'option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
+add_filter( 'default_option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
 add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );

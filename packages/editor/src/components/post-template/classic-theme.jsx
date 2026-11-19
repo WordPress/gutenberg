@@ -11,12 +11,14 @@ import { store as editorStore } from '../../store';
 import CreateNewTemplateModal from './create-new-template-modal';
 import { useAllowSwitchingTemplates } from './hooks';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 
 // The default template is stored as an empty string, but the select treats an
 // empty value as no selection and shows its placeholder.
 const DEFAULT_TEMPLATE_VALUE = '//default';
 
 function PostTemplateToggle( { isOpen, onClick } ) {
+	const lockedProps = useLockedPostSettingProps();
 	const templateTitle = useSelect( ( select ) => {
 		const templateSlug =
 			select( editorStore ).getEditedPostAttribute( 'template' );
@@ -45,6 +47,7 @@ function PostTemplateToggle( { isOpen, onClick } ) {
 			aria-expanded={ isOpen }
 			aria-label={ __( 'Template options' ) }
 			onClick={ onClick }
+			{ ...lockedProps }
 		>
 			{ templateTitle ?? __( 'Default template' ) }
 		</Button>

@@ -6,6 +6,7 @@ import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '
 import { default as PostFormatForm, POST_FORMATS } from './';
 import PostFormatCheck from './check';
 import PostPanelRow from '../post-panel-row';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 import { store as editorStore } from '../../store';
 
 /**
@@ -21,6 +22,7 @@ function PostFormat() {
 			postFormat: _postFormat ?? 'standard',
 		};
 	}, [] );
+	const lockedProps = useLockedPostSettingProps();
 	const activeFormat = POST_FORMATS.find(
 		( format ) => format.id === postFormat
 	);
@@ -58,6 +60,7 @@ function PostFormat() {
 								activeFormat?.caption
 							) }
 							onClick={ onToggle }
+							{ ...lockedProps }
 						>
 							{ activeFormat?.caption }
 						</Button>

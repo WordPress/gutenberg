@@ -20,6 +20,7 @@ import { filterURLForDisplay } from '@wordpress/url';
 import PostPanelRow from '../post-panel-row';
 import { buildTermsTree } from '../../utils/terms';
 import { store as editorStore } from '../../store';
+import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 
 function getTitle( post ) {
 	return post?.title?.rendered
@@ -208,6 +209,7 @@ function PostParentToggle( { isOpen, onClick } ) {
 		const postTypeSlug = getEditedPostAttribute( 'type' );
 		return getEntityRecord( 'postType', postTypeSlug, parentPostId );
 	}, [] );
+	const lockedProps = useLockedPostSettingProps();
 	const parentTitle = useMemo(
 		() => ( ! parentPost ? __( 'None' ) : getTitle( parentPost ) ),
 		[ parentPost ]
@@ -223,6 +225,7 @@ function PostParentToggle( { isOpen, onClick } ) {
 				sprintf( __( 'Change parent: %s' ), parentTitle )
 			}
 			onClick={ onClick }
+			{ ...lockedProps }
 		>
 			{ parentTitle }
 		</Button>

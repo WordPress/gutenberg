@@ -5,12 +5,15 @@ import { displayShortcut } from '@wordpress/keycodes';
 import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function EditorHistoryUndo( props, ref ) {
-	const hasUndo = useSelect(
-		( select ) => select( editorStore ).hasEditorUndo(),
-		[]
-	);
+	const hasUndo = useSelect( ( select ) => {
+		const editor = unlock( select( editorStore ) );
+		// A pending suggestion Undo would withdraw may not be in the
+		// history at all (see `hasSuggestionUndo`).
+		return editor.hasEditorUndo() || editor.hasSuggestionUndo();
+	}, [] );
 	const { undo } = useDispatch( editorStore );
 	return (
 		<Button
