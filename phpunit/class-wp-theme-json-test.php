@@ -774,6 +774,32 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_styles_for_block( $social_links_node ) );
 	}
 
+	/**
+	 * The Social Links block maps `color.text` to its icons through its
+	 * block.json selectors, without enabling the text color control.
+	 */
+	public function test_get_stylesheet_social_links_color_text_targets_icons() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/social-links' => array(
+							'color' => array(
+								'text' => '#ff0000',
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-social-links .wp-social-link){color: #ff0000;}',
+			$theme_json->get_stylesheet( array( 'styles' ) )
+		);
+	}
+
 	public function test_get_stylesheet_skips_disabled_protected_properties() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

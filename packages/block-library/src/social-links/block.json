@@ -67,10 +67,9 @@
 			"enableContrastChecker": false,
 			"background": true,
 			"gradients": true,
-			"text": true,
+			"text": false,
 			"__experimentalDefaultControls": {
-				"background": false,
-				"text": false
+				"background": false
 			}
 		},
 		"spacing": {
