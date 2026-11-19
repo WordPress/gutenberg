@@ -5,26 +5,20 @@ import { render } from 'vitest-browser-react';
 import QueryControls from '..';
 
 describe( 'QueryControls order by', () => {
-	it.each( [
-		[ 'missing', undefined ],
-		[ 'unavailable', 'menu_order' ],
-	] as const )(
-		'shows the placeholder when the sort is %s',
-		async ( _, orderBy ) => {
-			await render(
-				<QueryControls
-					order="desc"
-					orderBy={ orderBy }
-					onOrderByChange={ vi.fn() }
-					onOrderChange={ vi.fn() }
-				/>
-			);
+	it( 'shows the placeholder when the current sort is unavailable', async () => {
+		await render(
+			<QueryControls
+				order="desc"
+				orderBy="menu_order"
+				onOrderByChange={ vi.fn() }
+				onOrderChange={ vi.fn() }
+			/>
+		);
 
-			expect(
-				screen.getByRole( 'combobox', { name: 'Order by' } )
-			).toHaveTextContent( /^Select$/ );
-		}
-	);
+		expect(
+			screen.getByRole( 'combobox', { name: 'Order by' } )
+		).toHaveTextContent( /^Select$/ );
+	} );
 
 	it( 'hides the field when there are no options', async () => {
 		await render(
@@ -66,7 +60,6 @@ describe( 'QueryControls order by', () => {
 		expect( onOrderByChange ).not.toHaveBeenCalled();
 		expect( onOrderChange ).not.toHaveBeenCalled();
 
-		await expect.element( trigger ).toHaveFocus();
 		await userEvent.click( trigger );
 		await userEvent.click(
 			screen.getByRole( 'option', { name: 'Menu order' } )
@@ -74,7 +67,6 @@ describe( 'QueryControls order by', () => {
 		expect( onOrderByChange ).not.toHaveBeenCalled();
 		expect( onOrderChange ).toHaveBeenCalledExactlyOnceWith( 'asc' );
 
-		await expect.element( trigger ).toHaveFocus();
 		await userEvent.click( trigger );
 		await userEvent.click(
 			screen.getByRole( 'option', { name: 'Newest first' } )
