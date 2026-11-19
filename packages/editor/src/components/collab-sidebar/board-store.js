@@ -1,5 +1,5 @@
 import { getScrollContainer } from '@wordpress/dom';
-import { getHiddenBlockAnchorRect, getNoteAnchorRect } from './utils/dom';
+import { getHiddenBlockAnchorTop, getNoteAnchorRect } from './utils/dom';
 
 const EMPTY_SNAPSHOT = {
 	heights: {},
@@ -57,20 +57,16 @@ export function createBoardStore() {
 		const scrollTop = canvas?.scrollTop ?? 0;
 		const anchorRects = {};
 		for ( const [ id, blockEl ] of blockRefs ) {
-			// A block hidden at the current viewport renders nothing once it
-			// is deselected. Anchor its threads to the place it would take.
-			const rect = blockEl
-				? getNoteAnchorRect( id, blockEl )
-				: getHiddenBlockAnchorRect(
+			// A hidden block has no element once it is deselected.
+			const top = blockEl
+				? getNoteAnchorRect( id, blockEl ).top
+				: getHiddenBlockAnchorTop(
 						clientIds.get( id ),
 						blockOrder,
-						( clientId ) =>
-							rootEl?.ownerDocument.getElementById(
-								`block-${ clientId }`
-							) ?? null
+						rootEl?.ownerDocument
 					);
-			if ( rect ) {
-				anchorRects[ id ] = { top: rect.top + scrollTop };
+			if ( top !== null ) {
+				anchorRects[ id ] = { top: top + scrollTop };
 			}
 		}
 
@@ -145,18 +141,14 @@ export function createBoardStore() {
 		}
 	}
 
-	// With every noted block hidden there is no block to climb from, so look
-	// the root up from the threads' document. The canvas is iframed unless
-	// something (e.g. meta boxes) forces same-document rendering.
+	// With every noted block hidden there is no block to climb from. The
+	// canvas is iframed unless something (e.g. meta boxes) prevents it.
 	function findCanvasRoot() {
 		const doc = [ ...floatingRefs.values() ][ 0 ]?.ownerDocument;
-		if ( ! doc ) {
-			return null;
-		}
 		const canvasDoc =
-			doc.querySelector( 'iframe[name="editor-canvas"]' )
+			doc?.querySelector( 'iframe[name="editor-canvas"]' )
 				?.contentDocument ?? doc;
-		return canvasDoc.querySelector( '.is-root-container' );
+		return canvasDoc?.querySelector( '.is-root-container' ) ?? null;
 	}
 
 	// Watch the block-list root, so editing, adding or removing any block
@@ -243,13 +235,9 @@ export function createBoardStore() {
 
 		requestMeasure,
 
-		// Document order of every block, so a thread whose block isn't
-		// rendered can be placed between the neighbours that are.
-		setBlockOrder( clientIdsInOrder ) {
-			if ( clientIdsInOrder !== blockOrder ) {
-				blockOrder = clientIdsInOrder;
-				requestMeasure();
-			}
+		// Document order of every block, to place the threads of hidden blocks.
+		setBlockOrder( orderedClientIds ) {
+			blockOrder = orderedClientIds;
 		},
 
 		registerThread( id, blockEl, floatingEl, clientId ) {

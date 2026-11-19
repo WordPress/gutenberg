@@ -1028,12 +1028,9 @@ export function useFloatingBoard( {
 
 	// Moving blocks shifts anchors without resizing anything or re-registering.
 	useLayoutEffect( () => {
-		store.requestMeasure();
-	}, [ store, threads ] );
-
-	useLayoutEffect( () => {
 		store.setBlockOrder( orderedBlockIds );
-	}, [ store, orderedBlockIds ] );
+		store.requestMeasure();
+	}, [ store, threads, orderedBlockIds ] );
 
 	// Derived during render, so a resize reaches the screen in the same paint.
 	const { positions: notePositions, contentHeight } = useMemo(

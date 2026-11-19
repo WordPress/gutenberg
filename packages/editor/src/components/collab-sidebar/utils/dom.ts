@@ -69,85 +69,46 @@ export function getNoteAnchorRect(
 }
 
 /**
- * A zero-height rect marking where a block with no rendered element sits.
+ * Measure where the thread of a block with no element should line up. A block
+ * hidden at the current viewport renders nothing once it is deselected, so
+ * its thread takes the block's place in the document: the top of the next
+ * rendered block, or the bottom of the previous one after the last block.
+ *
+ * @param clientId         Client ID of the block with no element, if it still exists.
+ * @param orderedClientIds Client IDs of every block, in document order.
+ * @param doc              Document of the editor canvas, once known.
+ * @return Anchor top in viewport coordinates, or `null` without a rendered block.
  */
-export interface BoundaryRect {
-	top: number;
-	left: number;
-	width: number;
-	height: number;
-}
-
-/**
- * Derives a stand-in anchor rect for a block that has no rendered element,
- * which happens when the block is hidden at the current viewport: `block.js`
- * renders nothing for it once it is deselected.
- *
- * The rect marks the gap the block leaves between its rendered neighbours,
- * so its threads keep their place in the notes column instead of collapsing
- * to the top of the panel. Centring it in the gap matches where the block
- * itself sits while it is selected - still hidden, but back in the DOM
- * collapsed to zero height between two block gaps - so selecting a thread
- * does not shift it.
- *
- * The element lookup is injected to keep this testable without a DOM.
- *
- * @param clientId         Client ID of the block with no element.
- * @param orderedClientIds Client IDs in document order.
- * @param getBlockElement  Resolves a client ID to its element, or null.
- * @return Zero-height boundary rect, or `null` when no block in the document
- *         is rendered.
- */
-export function getHiddenBlockAnchorRect(
+export function getHiddenBlockAnchorTop(
 	clientId: string | undefined,
-	orderedClientIds: string[] | undefined,
-	getBlockElement: (
-		clientId: string
-	) =>
-		| ( Pick< Element, 'getBoundingClientRect' > &
-				Partial< Pick< Element, 'checkVisibility' > > )
-		| null
-): BoundaryRect | null {
-	const index =
-		clientId === undefined
-			? -1
-			: ( orderedClientIds?.indexOf( clientId ) ?? -1 );
-	if ( ! orderedClientIds || index === -1 ) {
+	orderedClientIds: string[],
+	doc: Document | undefined
+): number | null {
+	const index = orderedClientIds.indexOf( clientId! );
+	if ( ! doc || index === -1 ) {
 		return null;
 	}
-
-	// Blocks nested inside a hidden block have no element either, so both
-	// walks skip whole hidden subtrees on their way to a rendered block.
 	// Collapsed content (e.g. a closed Details) still reports the box it
-	// would have when expanded, so skip it as well.
-	const findRect = ( from: number, step: number ) => {
-		for ( let i = from; i >= 0 && i < orderedClientIds.length; i += step ) {
-			const element = getBlockElement( orderedClientIds[ i ] );
-			if ( element && element.checkVisibility?.() !== false ) {
-				return element.getBoundingClientRect();
-			}
-		}
-		return null;
+	// would have when expanded, so it doesn't count as rendered.
+	const getRect = ( id: string ) => {
+		const element = doc.getElementById( `block-${ id }` );
+		return element?.checkVisibility?.() === false
+			? undefined
+			: element?.getBoundingClientRect();
 	};
-
-	const next = findRect( index + 1, 1 );
-	const previous = findRect( index - 1, -1 );
-
-	if ( ! next && ! previous ) {
-		return null;
+	for ( const id of orderedClientIds.slice( index + 1 ) ) {
+		const rect = getRect( id );
+		if ( rect ) {
+			return rect.top;
+		}
 	}
-
-	let top: number;
-	if ( next && previous ) {
-		top = ( previous.top + previous.height + next.top ) / 2;
-	} else if ( next ) {
-		top = next.top;
-	} else {
-		top = previous!.top + previous!.height;
+	for ( const id of orderedClientIds.slice( 0, index ).reverse() ) {
+		const rect = getRect( id );
+		if ( rect ) {
+			return rect.bottom;
+		}
 	}
-
-	const { left, width } = ( next ?? previous )!;
-	return { top, left, width, height: 0 };
+	return null;
 }
 
 /**

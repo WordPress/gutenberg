@@ -106,31 +106,15 @@ export function NoteThread( {
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
 
-	/*
-	 * A block hidden at the current viewport has nothing for its thread to
-	 * point at and nothing to highlight, so say so. Whether the metadata
-	 * covers the viewport in view is left to the block-editor package: the
-	 * block either drops out of the DOM (deselected) or stays in it collapsed
-	 * and invisible (selected, so the block toolbar still works). Requiring
-	 * metadata that hides the block somewhere keeps the frame before a freshly
-	 * mounted block registers from reading as hidden.
-	 */
+	// A hidden block has no element, or a collapsed one while it is selected.
+	// Checking its settings too keeps a block that is still mounting from
+	// reading as hidden.
 	const canBlockBeHidden = useSelect(
-		( select ) => {
-			if ( ! note.blockClientId ) {
-				return false;
-			}
-			const blockVisibility = select(
-				blockEditorStore
-			).getBlockAttributes( note.blockClientId )?.metadata
-				?.blockVisibility;
-			return (
-				blockVisibility === false ||
-				Object.values( blockVisibility?.viewport ?? {} ).includes(
-					false
-				)
-			);
-		},
+		( select ) =>
+			!! note.blockClientId &&
+			unlock( select( blockEditorStore ) ).isBlockHiddenAnywhere(
+				note.blockClientId
+			),
 		[ note.blockClientId ]
 	);
 	const isBlockHidden =
