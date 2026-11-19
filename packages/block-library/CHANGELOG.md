@@ -18,6 +18,7 @@
 
 ### Bug Fixes
 
+-   Search: Show a focus outline around the button-inside field when its input is focused ([#87020](https://github.com/WordPress/gutenberg/pull/87020)).
 -   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
 -   Image: Fix the lightbox showing a blank overlay when it's reopened right after closing ([#86656](https://github.com/WordPress/gutenberg/pull/86656)).
 -   Comment Template: Fix ordered list numbering inside comment content ([#86404](https://github.com/WordPress/gutenberg/pull/86404)).
