@@ -4,9 +4,13 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
+import { privateApis as routePrivateApis } from '@wordpress/route';
+import { unlock } from '../../lock-unlock';
+import type { CanvasData } from '../../store/types';
+
+const { useMatches } = unlock( routePrivateApis );
 
 const shortcutName = 'core/boot/save';
 
@@ -23,9 +27,10 @@ export default function useSaveShortcut( {
 } ) {
 	const { __experimentalGetDirtyEntityRecords, isSavingEntityRecord } =
 		useSelect( coreStore );
-	const { hasNonPostEntityChanges, isPostSavingLocked } =
-		useSelect( editorStore );
-	const { savePost } = useDispatch( editorStore );
+	const registry = useRegistry();
+	const matches = useMatches();
+	const canvas = ( matches[ matches.length - 1 ]?.loaderData as any )
+		?.canvas as CanvasData | null | undefined;
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
@@ -54,10 +59,37 @@ export default function useSaveShortcut( {
 		if ( ! hasDirtyEntities || isSaving ) {
 			return;
 		}
-		if ( hasNonPostEntityChanges() ) {
-			openSavePanel();
-		} else if ( ! isPostSavingLocked() ) {
-			savePost();
+
+		/*
+		 * An editor canvas that is not a preview handles the same shortcut
+		 * itself, and saves the post it shows unless saving is locked. When
+		 * that post is the only change, leave it to the editor. The post is the
+		 * one the canvas names, or the homepage when it names none, as the
+		 * editor resolves it.
+		 */
+		if ( canvas && ! canvas.isPreview ) {
+			const homePage =
+				canvas.postType || canvas.postId
+					? null
+					: ( unlock(
+							registry.select( coreStore )
+						).getHomePage() as {
+							postType?: string;
+							postId?: string;
+						} | null );
+			const postType = canvas.postType || homePage?.postType;
+			const postId = canvas.postId || homePage?.postId;
+			const hasOnlyPostChanges = dirtyEntityRecords.every(
+				( record ) =>
+					record.kind === 'postType' &&
+					record.name === postType &&
+					String( record.key ) === String( postId )
+			);
+			if ( hasOnlyPostChanges ) {
+				return;
+			}
 		}
+
+		openSavePanel();
 	} );
 }
