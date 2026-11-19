@@ -2256,8 +2256,6 @@ export function canMoveBlock( state: State, clientId: string ) {
 
 /**
  * Determines if the given blocks are allowed to be moved.
- * Blocks can have gaps or different parents. Operations that require a
- * contiguous sibling range must check that separately.
  *
  * @param {Object} state     Editor state.
  * @param {string} clientIds The block client IDs to be moved.
