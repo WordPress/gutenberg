@@ -19,12 +19,18 @@ const { name: DEFAULT_EMBED_BLOCK } = metadata;
  * Returns the embed block's information by matching the provided service provider
  *
  * @param {string} provider The embed block's provider
- * @return {WPBlockVariation} The embed block's information
+ * @return {WPBlockVariation|undefined} The embed block's information
  */
-export const getEmbedInfoByProvider = ( provider ) =>
-	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
-		( { name } ) => name === provider
+export const getEmbedInfoByProvider = ( provider ) => {
+	if ( ! provider ) {
+		return;
+	}
+
+	return getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name, attributes } ) =>
+			name === provider || attributes?.providerNameSlug === provider
 	);
+};
 
 /**
  * Returns true if any of the regular expressions match the URL.
