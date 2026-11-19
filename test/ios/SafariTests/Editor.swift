@@ -23,7 +23,7 @@ struct Editor {
 
 	/// The block with this title and exactly this content.
 	func block( title: String, content: String ) -> XCUIElement {
-		canvas.descendants( matching: .any )
+		canvas.textViews
 			.matching( NSPredicate( format: "label == %@ AND value == %@", "Block: " + title, content ) )
 			.firstMatch
 	}
