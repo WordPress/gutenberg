@@ -3,6 +3,7 @@ import {
 	getLayoutFrame,
 	getLayoutRect,
 	getOutermostRotatedAncestorBlock,
+	getVisibleGap,
 	toClientRect,
 	toLayoutPoint,
 } from '../dom';
@@ -244,5 +245,54 @@ describe( 'getLayoutRect', () => {
 			y: 7,
 		} );
 		expect( toClientRect( frame, rect ) ).toBe( rect );
+	} );
+
+	describe( 'getVisibleGap', () => {
+		function createPair( style: string ) {
+			const first = createLayoutElement( style );
+			const second = document.createElement( 'div' );
+			second.style.cssText =
+				'width: 200px; height: 100px; margin: 50px 0 0 20px;';
+			first.after( second );
+			const frame = getLayoutFrame( first.parentElement );
+			const line = toClientRect(
+				frame,
+				new window.DOMRect( 80, 150, 200, 50 )
+			);
+			return { first, second, frame, line };
+		}
+
+		it( 'matches the layout gap when nothing is transformed', () => {
+			const { first, second, frame, line } = createPair( '' );
+			expect(
+				round( getVisibleGap( first, second, frame, line )! )
+			).toEqual( { left: 80, top: 150, width: 200, height: 50 } );
+		} );
+
+		it( 'starts below a block moved into the gap', () => {
+			const { first, second, frame, line } =
+				createPair( 'translate: 0 20px;' );
+			expect(
+				round( getVisibleGap( first, second, frame, line )! )
+			).toEqual( { left: 80, top: 170, width: 200, height: 30 } );
+		} );
+
+		it( 'clears the lowest corner of a rotated block', () => {
+			const { first, second, frame, line } =
+				createPair( 'rotate: 5deg;' );
+			const gap = getVisibleGap( first, second, frame, line )!;
+			expect( gap.top ).toBeCloseTo(
+				first.getBoundingClientRect().bottom
+			);
+			expect( gap.bottom ).toBeCloseTo( 200 );
+		} );
+
+		it( 'returns nothing when the painted blocks overlap', () => {
+			const { first, second, frame, line } =
+				createPair( 'translate: 0 60px;' );
+			expect(
+				getVisibleGap( first, second, frame, line )
+			).toBeUndefined();
+		} );
 	} );
 } );

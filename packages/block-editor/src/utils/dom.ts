@@ -420,6 +420,92 @@ export function extendRectToTop( rect: DOMRect, top: number ) {
 }
 
 /**
+ * Returns the top and bottom of an element's painted box within a column of
+ * the screen, after every transform.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @param left    Left edge of the column, in client coordinates.
+ * @param right   Right edge of the column, in client coordinates.
+ * @return The span, or undefined when the box is outside the column.
+ */
+function getPaintedSpan(
+	element: Element,
+	frame: DOMMatrix,
+	left: number,
+	right: number
+) {
+	const { x, y, width, height } = getLayoutRect( element, frame );
+	const matrix = frame
+		.translate( x, y )
+		.multiply( getElementTransform( element ) ?? new window.DOMMatrix() );
+	const corners = [
+		[ 0, 0 ],
+		[ width, 0 ],
+		[ width, height ],
+		[ 0, height ],
+	].map( ( [ cornerX, cornerY ] ) =>
+		matrix.transformPoint( { x: cornerX, y: cornerY } )
+	);
+	const ys: number[] = [];
+
+	corners.forEach( ( start, index ) => {
+		const end = corners[ ( index + 1 ) % corners.length ];
+
+		if ( start.x >= left && start.x <= right ) {
+			ys.push( start.y );
+		}
+
+		// Where an edge crosses a side of the column.
+		for ( const edge of [ left, right ] ) {
+			if ( ( start.x - edge ) * ( end.x - edge ) < 0 ) {
+				ys.push(
+					start.y +
+						( ( edge - start.x ) / ( end.x - start.x ) ) *
+							( end.y - start.y )
+				);
+			}
+		}
+	} );
+
+	return ys.length
+		? { top: Math.min( ...ys ), bottom: Math.max( ...ys ) }
+		: undefined;
+}
+
+/**
+ * Returns the space between two stacked blocks as painted on screen, across
+ * the width of an insertion line. A transform can move a block's painting
+ * away from its layout box, so this keeps a level line clear of both blocks.
+ *
+ * @param previous Element of the block above.
+ * @param next     Element of the block below.
+ * @param frame    Layout frame of their parent, see `getLayoutFrame`.
+ * @param line     The line's rect in client coordinates.
+ * @return The visible gap, or undefined when the painted blocks overlap.
+ */
+export function getVisibleGap(
+	previous: Element,
+	next: Element,
+	frame: DOMMatrix,
+	line: DOMRect
+) {
+	const above = getPaintedSpan( previous, frame, line.left, line.right );
+	const below = getPaintedSpan( next, frame, line.left, line.right );
+
+	if ( ! above || ! below || below.top <= above.bottom ) {
+		return;
+	}
+
+	return new window.DOMRect(
+		line.left,
+		above.bottom,
+		line.width,
+		below.top - above.bottom
+	);
+}
+
+/**
  * Returns whether an element is visible.
  *
  * @param element Element.

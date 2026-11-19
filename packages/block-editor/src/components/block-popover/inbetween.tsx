@@ -6,7 +6,12 @@ import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
-import { getLayoutFrame, getLayoutRect, toClientRect } from '../../utils/dom';
+import {
+	getLayoutFrame,
+	getLayoutRect,
+	getVisibleGap,
+	toClientRect,
+} from '../../utils/dom';
 import type { BlockPopoverInbetweenProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
@@ -151,10 +156,30 @@ function BlockPopoverInbetween( {
 					width = Math.max( width, 0 );
 				}
 
-				return toClientRect(
+				const rect = toClientRect(
 					frame,
 					new window.DOMRect( left, top, width, height )
 				);
+
+				// Centre the line in the space left between the painted
+				// blocks. The block still lands in the layout gap.
+				if (
+					isVertical &&
+					operation !== 'group' &&
+					previousElement &&
+					nextElement
+				) {
+					return (
+						getVisibleGap(
+							previousElement,
+							nextElement,
+							frame,
+							rect
+						) ?? rect
+					);
+				}
+
+				return rect;
 			},
 		};
 	}, [
