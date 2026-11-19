@@ -51,10 +51,9 @@ export function useMenuDescription( navigationId ) {
 	if ( isAutoMenu === null ) {
 		return null;
 	}
+	// An Auto menu explains itself, in place of the list of items.
 	return isAutoMenu
-		? __(
-				'Your menu shows your published pages, and updates itself when you add a page.'
-			)
+		? null
 		: __(
 				'This menu is customized, so new pages aren’t added to it automatically.'
 			);

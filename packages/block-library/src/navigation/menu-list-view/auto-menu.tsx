@@ -7,10 +7,10 @@
  */
 
 import { Button, Icon as WCIcon } from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { EmptyState, Stack, Text } from '@wordpress/ui';
 import { useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { update } from '@wordpress/icons';
+import { arrowRight, page as pageIcon, plus, update } from '@wordpress/icons';
 import { decodeEntities } from '@wordpress/html-entities';
 import isNavigationMenuEditingEnabled from './is-enabled';
 import { useAutoMenuPageList, useAutoMenuPages } from './auto-menu-use-pages';
@@ -48,12 +48,24 @@ export function AutoMenuDescription() {
 	);
 }
 
+const PAGES_SCREEN_URL = 'site-editor.php?p=%2Fpage';
+
 function PageTree( { pages }: { pages: AutoMenuPage[] } ) {
 	return (
 		<ul className="wp-block-navigation-auto-menu__pages">
 			{ pages.map( ( page ) => (
 				<li key={ page.id }>
-					<span className="wp-block-navigation-auto-menu__page">
+					<span
+						className="wp-block-navigation-auto-menu__page"
+						// The pages can't be edited here.
+						style={ {
+							display: 'flex',
+							alignItems: 'center',
+							gap: 8,
+							cursor: 'not-allowed',
+						} }
+					>
+						<WCIcon icon={ pageIcon } size={ 20 } />
 						{ decodeEntities( page.title ) }
 					</span>
 					{ page.children.length > 0 && (
@@ -66,6 +78,11 @@ function PageTree( { pages }: { pages: AutoMenuPage[] } ) {
 }
 
 /**
+ * An Auto menu, shown in place of the menu's list view: what it is, the
+ * pages in it, and, where the "+" for adding an
+ * item would be, a way to the Pages screen, as adding a page is how an
+ * item is added. "Customize" turns it into links that can be edited.
+ *
  * @param props                    Component props.
  * @param props.navigationClientId Client id of the Navigation block.
  * @param props.showDescription    Whether to say what an Auto menu is.
@@ -104,44 +121,73 @@ export default function AutoMenu( {
 
 	return (
 		<div ref={ ref } className="wp-block-navigation-auto-menu">
-			<Stack direction="column" gap="sm">
-				<Stack direction="row" gap="xs" align="center">
-					<WCIcon icon={ update } size={ 20 } />
-					<Text variant="heading-sm" render={ <h3 /> }>
-						{ __( 'Auto menu' ) }
+			<Stack direction="column" gap="md">
+				<EmptyState.Root style={ { padding: 0 } }>
+					<EmptyState.Icon icon={ update } />
+					<EmptyState.Title>{ __( 'Auto menu' ) }</EmptyState.Title>
+					{ showDescription && (
+						<EmptyState.Description>
+							{ __(
+								'Shows your pages, and updates when they change.'
+							) }
+						</EmptyState.Description>
+					) }
+					<EmptyState.Actions>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							accessibleWhenDisabled
+							disabled={ ! canCustomize }
+							onClick={ () => setIsConfirming( true ) }
+							className="wp-block-navigation-auto-menu__customize"
+						>
+							{ __( 'Customize' ) }
+						</Button>
+					</EmptyState.Actions>
+				</EmptyState.Root>
+				<Stack direction="column" gap="xs">
+					<Text
+						variant="body-sm"
+						render={ <h4 /> }
+						className="wp-block-navigation-auto-menu__pages-heading"
+						// Inline, as the route editor doesn't load block styles.
+						style={ {
+							margin: 0,
+							textTransform: 'uppercase',
+							fontWeight: 500,
+							fontSize: 11,
+							opacity: 0.7,
+						} }
+					>
+						{ __( 'Pages in this menu' ) }
 					</Text>
-				</Stack>
-				{ showDescription && <AutoMenuDescription /> }
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					accessibleWhenDisabled
-					disabled={ ! canCustomize }
-					onClick={ () => setIsConfirming( true ) }
-					// Inline, as the route editor doesn't load block styles.
-					style={ { justifyContent: 'center' } }
-					className="wp-block-navigation-auto-menu__customize"
-				>
-					{ __( 'Customize' ) }
-				</Button>
-				<Text
-					variant="body-sm"
-					render={ <h4 /> }
-					className="wp-block-navigation-auto-menu__pages-heading"
-				>
-					{ __( 'Pages in this menu' ) }
-				</Text>
-				{ ! hasResolved && (
-					<Text variant="body-sm">{ __( 'Loading pages…' ) }</Text>
-				) }
-				{ hasResolved && tree.length === 0 && (
-					<Text variant="body-sm">
-						{ __(
-							'No published pages yet. Pages you publish will show up here.'
+					{ ! hasResolved && (
+						<Text variant="body-sm">
+							{ __( 'Loading pages…' ) }
+						</Text>
+					) }
+					{ tree.length > 0 && <PageTree pages={ tree } /> }
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						href={ PAGES_SCREEN_URL }
+						icon={ plus }
+						className="wp-block-navigation-auto-menu__add-page"
+						// Inline, as the route editor doesn't load block styles.
+						style={ {
+							justifyContent: 'flex-start',
+							borderStyle: 'dashed',
+						} }
+						description={ __(
+							'Opens the Pages screen. New pages are added to this menu.'
 						) }
-					</Text>
-				) }
-				{ tree.length > 0 && <PageTree pages={ tree } /> }
+					>
+						<span style={ { flex: 1, textAlign: 'start' } }>
+							{ __( 'Add a page' ) }
+						</span>
+						<WCIcon icon={ arrowRight } size={ 20 } />
+					</Button>
+				</Stack>
 			</Stack>
 			{ isConfirming && (
 				<AutoMenuCustomizeDialog

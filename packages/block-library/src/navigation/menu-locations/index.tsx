@@ -694,6 +694,7 @@ export default function MenuLocations( {
 					navigationId={ id }
 					fallbackMenuId={ fallbackId }
 					locations={ locations }
+					onChooseLocation={ openChooser }
 				/>
 			</>
 		);

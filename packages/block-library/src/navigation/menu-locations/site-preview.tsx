@@ -11,11 +11,16 @@ import {
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __, sprintf } from '@wordpress/i18n';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import {
+	Link,
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Menu,
 	Notice,
@@ -585,18 +590,21 @@ function DeviceMenu( {
  * Nothing else on the page can be changed.
  *
  * @param props
- * @param props.navigationId   The menu's ID.
- * @param props.fallbackMenuId The menu shown when no menu is chosen.
- * @param props.locations      The template parts that show the menu.
+ * @param props.navigationId     The menu's ID.
+ * @param props.fallbackMenuId   The menu shown when no menu is chosen.
+ * @param props.locations        The template parts that show the menu.
+ * @param props.onChooseLocation Opens the choice of where the menu appears.
  */
 export default function MenuSitePreview( {
 	navigationId,
 	fallbackMenuId,
 	locations,
+	onChooseLocation,
 }: {
 	navigationId: number;
 	fallbackMenuId: number | null;
 	locations: NavigationLocation[];
+	onChooseLocation?: () => void;
 } ) {
 	const { homePage, templateId: frontTemplateId } = useFrontOfSite();
 	const templates = useMenuTemplates(
@@ -718,9 +726,38 @@ export default function MenuSitePreview( {
 		!! locations.length && (
 			<Notice.Root intent="warning">
 				<Notice.Description>
-					{ __(
-						'This menu is only in template parts that aren’t used on any page of your site, so it doesn’t appear in the preview.'
-					) }
+					{ onChooseLocation
+						? createInterpolateElement(
+								__(
+									'This menu is only in headers, footers or overlays that your site doesn’t use, so it doesn’t appear in the preview. <link>Choose where it appears</link>.'
+								),
+								{
+									link: (
+										<Link
+											tone="neutral"
+											// A button, as it opens a dialog.
+											render={
+												<button
+													type="button"
+													onClick={ onChooseLocation }
+													style={ {
+														background: 'none',
+														border: 0,
+														padding: 0,
+														font: 'inherit',
+														cursor: 'pointer',
+														textDecoration:
+															'underline',
+													} }
+												/>
+											}
+										/>
+									),
+								}
+							)
+						: __(
+								'This menu is only in headers, footers or overlays that your site doesn’t use, so it doesn’t appear in the preview.'
+							) }
 				</Notice.Description>
 			</Notice.Root>
 		);
