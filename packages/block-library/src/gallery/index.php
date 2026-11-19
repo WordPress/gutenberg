@@ -252,7 +252,7 @@ function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewpor
 	// specificity, keeping the rounded image at its own ratio.
 	if ( $image_crop ) {
 		$rounded_selector = "{$image_selector}.is-style-rounded";
-		$rules[] = array(
+		$rules[]          = array(
 			'selector'     => "{$rounded_selector} > div:not(.components-drop-zone),{$rounded_selector} > a",
 			'declarations' => array(
 				'display' => 'block !important',
@@ -261,7 +261,7 @@ function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewpor
 			),
 			'rules_group'  => $media_query,
 		);
-		$rules[] = array(
+		$rules[]          = array(
 			'selector'     => "{$rounded_selector} img",
 			'declarations' => array(
 				'flex'   => '0 0 auto !important',
