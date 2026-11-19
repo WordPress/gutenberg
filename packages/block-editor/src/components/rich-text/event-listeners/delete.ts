@@ -22,13 +22,13 @@ const deleteListener: RichTextEventListener = ( props ) => ( element ) => {
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
-			const hasActiveFormats =
-				value.activeFormats && !! value.activeFormats.length;
 
-			// Only process delete if the key press occurs at an uncollapsed edge.
+			// Only process delete if the key press occurs at a collapsed edge.
+			// Active formats at that edge must still merge through the store.
+			// Letting the browser handle the key removes the element from the
+			// canvas while both blocks remain in the list.
 			if (
 				! isCollapsed( value ) ||
-				hasActiveFormats ||
 				( isReverse && start !== 0 ) ||
 				( ! isReverse && end !== text.length )
 			) {
