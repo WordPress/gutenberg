@@ -20,6 +20,8 @@ export type ParentLayout = Layout & { default?: Layout };
 export interface ChildLayoutControlProps {
 	/** The child layout value. */
 	value?: ChildLayout;
+	/** The default child layout inherited by the selected viewport. */
+	inheritedValue?: ChildLayout;
 	/** Function to update the child layout value. */
 	onChange: ( value: ChildLayout ) => void;
 	/** The parent layout value. */
@@ -30,6 +32,8 @@ export interface ChildLayoutControlProps {
 	panelId: string;
 	/** Whether unset grid span controls should show default values. */
 	showGridSpanDefaults?: boolean;
+	/** Whether the controls edit a viewport style state. */
+	isViewportState?: boolean;
 }
 
 export interface ChildLayoutControlsProps extends Omit<

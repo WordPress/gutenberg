@@ -135,6 +135,72 @@ describe( 'ControlWithError', () => {
 		} );
 	} );
 
+	describe( 'Touched state', () => {
+		it( 'should not mark an empty required control as touched on blur', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ValidatedInputControl label="Email" type="email" required />
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'textbox', {
+				name: /^Email/,
+			} );
+
+			await user.click( input );
+			await user.tab();
+
+			expect(
+				screen.queryByText( input.validationMessage )
+			).not.toBeInTheDocument();
+			expect( input ).not.toHaveAttribute( 'data-validity-visible' );
+
+			await user.type( input, 'a' );
+
+			const typeMismatchMessage = input.validationMessage;
+			expect( input.validity.typeMismatch ).toBe( true );
+			expect(
+				screen.queryByText( typeMismatchMessage )
+			).not.toBeInTheDocument();
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( typeMismatchMessage ) ).toBeVisible();
+			} );
+			expect( input ).toHaveAttribute( 'data-validity-visible' );
+
+			await user.clear( input );
+			await user.tab();
+
+			expect( input.validity.valueMissing ).toBe( true );
+			const valueMissingMessage = input.validationMessage;
+			await waitFor( () => {
+				expect( screen.getByText( valueMissingMessage ) ).toBeVisible();
+			} );
+		} );
+
+		it( 'should mark a required number control with unparseable input as touched on blur', async () => {
+			const user = userEvent.setup();
+			await render(
+				<ValidatedInputControl label="Count" type="number" required />
+			);
+
+			const input = screen.getByRole< HTMLInputElement >( 'spinbutton', {
+				name: /^Count/,
+			} );
+
+			await user.type( input, '-' );
+			expect( input.validity.badInput ).toBe( true );
+			const badInputMessage = input.validationMessage;
+
+			await user.tab();
+
+			await waitFor( () => {
+				expect( screen.getByText( badInputMessage ) ).toBeVisible();
+			} );
+		} );
+	} );
+
 	describe( 'aria-describedby', () => {
 		it( 'should connect the error message to the input via aria-describedby', async () => {
 			const user = userEvent.setup();
