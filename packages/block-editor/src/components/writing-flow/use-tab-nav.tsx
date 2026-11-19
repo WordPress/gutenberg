@@ -258,6 +258,13 @@ export default function useTabNav(): [
 				return;
 			}
 
+			// Tab with Ctrl, Cmd or Alt belongs to the browser or the
+			// operating system, such as Ctrl+Shift+Tab switching to the
+			// previous browser tab. Only plain Tab and Shift+Tab move focus.
+			if ( event.ctrlKey || event.metaKey || event.altKey ) {
+				return;
+			}
+
 			if (
 				// Bails in case the focus capture elements aren’t present. They
 				// may be omitted to avoid silent tab stops in preview mode.
