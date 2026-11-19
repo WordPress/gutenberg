@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.27.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).

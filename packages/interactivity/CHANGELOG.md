@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 8.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Ignore `data-wp-html` on void elements and text-only elements such as `textarea` and `script` without evaluating its reference, log a development warning for unsupported hosts, and hydrate descendants of ignored unique-ID entries ([#86968](https://github.com/WordPress/gutenberg/pull/86968)).
