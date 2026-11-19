@@ -7,6 +7,7 @@ const { parseConfig, getConfigFilePath } = require( './parse-config' );
 const { ValidationError } = require( './validate-config' );
 const postProcessConfig = require( './post-process-config' );
 const { createPortResolver } = require( '../resolve-available-ports' );
+const { getCache } = require( '../cache' );
 
 /**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
@@ -98,6 +99,17 @@ module.exports = async function loadConfig(
 
 		if ( shouldAutoPort ) {
 			portResolver = createPortResolver( spinner );
+		}
+	} else {
+		// Use the ports the environment was last started with.
+		const savedPorts = await getCache( 'ports', {
+			workDirectoryPath: cacheDirectoryPath,
+		} );
+		if ( savedPorts ) {
+			portResolver = {
+				resolve: ( port, configPath ) =>
+					savedPorts[ configPath ] ?? port,
+			};
 		}
 	}
 

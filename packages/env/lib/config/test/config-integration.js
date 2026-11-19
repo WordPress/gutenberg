@@ -245,6 +245,49 @@ describe( 'Config Integration', () => {
 		expect( config ).toMatchSnapshot();
 	} );
 
+	describe( 'saved ports', () => {
+		beforeEach( () => {
+			readFile.mockImplementation( async ( fileName ) => {
+				if ( fileName === '/test/gutenberg/.wp-env.json' ) {
+					return JSON.stringify( { autoPort: true } );
+				}
+
+				if ( fileName.endsWith( 'wp-env-cache.json' ) ) {
+					return JSON.stringify( {
+						ports: {
+							'env.development.port': 8890,
+							'env.tests.port': 8891,
+						},
+					} );
+				}
+
+				throw { code: 'ENOENT' };
+			} );
+		} );
+
+		it( 'should use the ports saved by the last start', async () => {
+			const config = await loadConfig( '/test/gutenberg' );
+
+			expect( config.env.development.port ).toEqual( 8890 );
+			expect( config.env.tests.config.WP_SITEURL ).toEqual(
+				'http://localhost:8891'
+			);
+			expect( config.env.tests.config.WP_TESTS_DOMAIN ).toEqual(
+				'localhost:8891'
+			);
+		} );
+
+		it( 'should ignore the saved ports when resolving ports for start', async () => {
+			const config = await loadConfig( '/test/gutenberg', null, {
+				resolvePorts: true,
+				autoPort: false,
+			} );
+
+			expect( config.env.development.port ).toEqual( 8888 );
+			expect( config.env.tests.port ).toEqual( 8889 );
+		} );
+	} );
+
 	describe( 'cache directory naming', () => {
 		beforeEach( () => {
 			readFile.mockImplementation( async () => {

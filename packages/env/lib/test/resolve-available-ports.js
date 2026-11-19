@@ -8,9 +8,12 @@ const findAvailablePort = vi
 const isPortAvailable = vi
 	.spyOn( portUtils, 'isPortAvailable' )
 	.mockImplementation( () => undefined );
+const cache = require( '../cache' );
+const setCache = vi.spyOn( cache, 'setCache' );
 const {
 	createPortResolver,
 	resolveConfigPorts,
+	savePorts,
 } = require( '../resolve-available-ports' );
 
 afterAll( () => {
@@ -158,6 +161,30 @@ describe( 'resolve-available-ports', () => {
 			// phpmyadminPort is undefined so should not trigger any resolution.
 			expect( config.env.development.phpmyadminPort ).toBeUndefined();
 			expect( config.env.tests.phpmyadminPort ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'savePorts', () => {
+		it( 'should save the set ports keyed by config path', async () => {
+			setCache.mockReset().mockResolvedValue();
+
+			await savePorts( {
+				workDirectoryPath: '/cache',
+				env: {
+					development: { port: 8890, phpmyadminPort: null },
+					tests: { port: 8891, phpmyadminPort: 9001 },
+				},
+			} );
+
+			expect( setCache ).toHaveBeenCalledWith(
+				'ports',
+				{
+					'env.development.port': 8890,
+					'env.tests.port': 8891,
+					'env.tests.phpmyadminPort': 9001,
+				},
+				{ workDirectoryPath: '/cache' }
+			);
 		} );
 	} );
 } );
