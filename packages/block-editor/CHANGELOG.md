@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Rich text: Merge the block when Backspace or Delete is pressed at an edge with an active format, so the canvas and the block list stay in step ([#87100](https://github.com/WordPress/gutenberg/issues/87100)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements

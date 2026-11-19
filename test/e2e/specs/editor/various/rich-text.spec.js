@@ -1297,4 +1297,62 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'x' } },
 		] );
 	} );
+
+	test( 'should merge into the previous block when Backspace is pressed at the start of bold text', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:heading -->
+<h2 class="wp-block-heading">Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p><strong>Key point:</strong> first paragraph text.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph text.</p>
+<!-- /wp:paragraph -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Home' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content:
+						'Overview<strong>Key point:</strong> first paragraph text.',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph text.' },
+			},
+		] );
+
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'x' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content:
+						'Overview<strong>Key point:</strong> first paragraph text.',
+				},
+			},
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Second paragraph text.' },
+			},
+		] );
+	} );
 } );
