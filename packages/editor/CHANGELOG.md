@@ -7,6 +7,12 @@
 -   Add a session-scoped editor intent (`edit`, `suggest`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit) and +X (Suggest) on Windows, ⌘⌥⇧Z/X on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. Pending overlay edits auto-save as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one. Blocks with a pending suggestion are marked with a green bracket/outline, and the notes sidebar shows a Docs-style 'Add / Delete / Format' summary with checkmark-and-close icon buttons to accept or reject ([#80428](https://github.com/WordPress/gutenberg/pull/80428)).
 
+## 16.2.0 (2026-11-18)
+
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
@@ -16,7 +22,9 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
 -   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -29,6 +37,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Editor: Escape Openverse metadata in image captions.
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Suggestion mode: stop post-level edits from reaching the saved post while suggesting. Only the post status was locked, so the excerpt, featured image, slug, terms, post meta and every other post setting changed directly. The title, excerpt, featured image, slug, terms and registered meta keys are now proposed - one note each, shown in place while suggesting, applied on accept - and every other post setting is read-only, refused whether it is written through `editPost` or straight to the entity, and stripped from any save made while suggesting ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
@@ -378,6 +387,12 @@
 
 ## 14.34.0 (2025-10-29)
 
+## 14.33.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)
@@ -406,6 +421,12 @@
 
 ## 14.20.0 (2025-03-13)
 
+## 14.19.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.19.0 (2025-02-28)
 
 ## 14.18.0 (2025-02-12)
@@ -432,6 +453,12 @@
 
 ## 14.9.0 (2024-10-03)
 
+## 14.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)
@@ -451,6 +478,12 @@
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)
+
+## 14.0.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 14.0.0 (2024-05-31)
 
@@ -477,6 +510,12 @@
 
 ## 13.29.0 (2024-02-21)
 
+## 13.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.28.0 (2024-02-09)
 
 ## 13.27.0 (2024-01-24)
@@ -499,6 +538,12 @@
 
 ## 13.20.0 (2023-10-05)
 
+## 13.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.19.0 (2023-09-20)
 
 ## 13.18.0 (2023-08-31)
@@ -512,6 +557,12 @@
 ## 13.14.0 (2023-07-05)
 
 ## 13.13.0 (2023-06-23)
+
+## 13.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.12.0 (2023-06-07)
 
@@ -530,6 +581,12 @@
 ## 13.5.0 (2023-03-01)
 
 ## 13.4.0 (2023-02-15)
+
+## 13.3.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.3.0 (2023-02-01)
 

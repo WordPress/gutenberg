@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.17.0 (2026-11-18)
+
 ### Enhancements
 
 -   `get_component_details` now includes each example's story description above its code snippet ([#86815](https://github.com/WordPress/gutenberg/pull/86815)).
