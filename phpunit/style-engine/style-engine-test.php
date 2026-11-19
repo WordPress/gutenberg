@@ -1029,4 +1029,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 			gutenberg_style_engine_get_styles( $block_styles )
 		);
 	}
+
+	/**
+	 * Tests that a context with no store returns an empty stylesheet
+	 * instead of calling {@see WP_Style_Engine_CSS_Rules_Store_Gutenberg::get_all_rules()} on null.
+	 *
+	 * @covers ::gutenberg_style_engine_get_stylesheet_from_context
+	 */
+	public function test_should_return_empty_stylesheet_for_context_without_store(): void {
+		$this->assertSame( '', gutenberg_style_engine_get_stylesheet_from_context( 123 ) ); // @phpstan-ignore argument.type (An invalid context is what is tested.)
+	}
 }
