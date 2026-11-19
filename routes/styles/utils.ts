@@ -1,24 +1,28 @@
 /**
- * Whether navigating between two Styles sections should turn the Style Book on.
+ * Preference that remembers whether Styles shows the Style Book. The site
+ * editor and the extensible site editor share it.
+ */
+export const STYLE_BOOK_PREFERENCE = 'showStyleBook';
+
+/**
+ * Whether a Styles section shows the Style Book when the URL doesn't say.
  *
- * The Style Book is turned on when entering a section from the root, as it is
- * a better preview of each section. Moving between sections keeps the current
- * state, so turning it off is respected. Revisions and custom CSS keep the
- * site preview. Mirrors `shouldOpenStyleBook()` in
+ * Follows the user's preference, which is on until they turn the Style Book
+ * off. Revisions and Additional CSS keep the site preview. Mirrors
+ * `shouldShowStyleBook()` in
  * `packages/edit-site/src/components/sidebar-global-styles/utils.js`.
  *
- * @param currentSection The section being navigated from.
- * @param nextSection    The section being navigated to.
- * @return Whether to turn the Style Book on.
+ * @param section    The Styles section.
+ * @param preference The saved preference, if any.
+ * @return Whether to show the Style Book.
  */
-export function shouldOpenStyleBook(
-	currentSection: string,
-	nextSection: string
+export function shouldShowStyleBook(
+	section: string,
+	preference: boolean | undefined
 ): boolean {
 	return (
-		currentSection === '/' &&
-		nextSection !== '/' &&
-		! nextSection.startsWith( '/revisions' ) &&
-		! nextSection.startsWith( '/css' )
+		preference !== false &&
+		! section.startsWith( '/revisions' ) &&
+		! section.startsWith( '/css' )
 	);
 }
