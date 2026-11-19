@@ -118,7 +118,8 @@ function isTrackVisible( ref, trackIds, trackId ) {
 		?.querySelectorAll( '.wp-block-playlist-track__button' )[
 		trackIds.indexOf( trackId )
 	];
-	return ! button || button.getClientRects().length > 0;
+	const track = button?.closest( '.wp-block-playlist-track' );
+	return ! track || window.getComputedStyle( track ).display !== 'none';
 }
 
 /**

@@ -417,6 +417,10 @@ test.describe( 'Playlist block', () => {
 				title: 'Second visible track',
 			},
 		];
+		const trackComments = tracks.map(
+			( track ) =>
+				`<!-- wp:playlist-track ${ JSON.stringify( track ) } /-->`
+		);
 		const post = await requestUtils.createPost( {
 			title: 'Playlist hidden tracks',
 			status: 'publish',
@@ -424,12 +428,13 @@ test.describe( 'Playlist block', () => {
 				'<!-- wp:playlist -->',
 				'<figure class="wp-block-playlist">',
 				'<ol class="wp-block-playlist__tracklist">',
-				...tracks.map(
-					( track ) =>
-						`<!-- wp:playlist-track ${ JSON.stringify(
-							track
-						) } /-->`
-				),
+				...trackComments,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+				'<!-- wp:playlist {"showTracklist":false} -->',
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-is-hidden">',
+				...trackComments,
 				'</ol></figure>',
 				'<!-- /wp:playlist -->',
 			].join( '' ),
@@ -437,16 +442,21 @@ test.describe( 'Playlist block', () => {
 
 		await page.goto( post.link );
 
-		const player = page.locator( '.wp-block-playlist__waveform-player' );
+		const [ playlist, playlistWithoutTracklist ] = await page
+			.locator( '.wp-block-playlist' )
+			.all();
+		const player = playlist.locator(
+			'.wp-block-playlist__waveform-player'
+		);
 
 		await expect(
-			page.getByRole( 'button', {
+			playlist.getByRole( 'button', {
 				name: /Hidden track/,
 				includeHidden: true,
 			} )
 		).toHaveCount( 0 );
 		await expect(
-			page.getByRole( 'button', {
+			playlist.getByRole( 'button', {
 				name: /Viewport hidden track/,
 				includeHidden: true,
 			} )
@@ -455,12 +465,19 @@ test.describe( 'Playlist block', () => {
 			player.getByRole( 'slider', { name: 'First visible track' } )
 		).toBeVisible();
 
-		await page
+		await playlist
 			.getByRole( 'button', { name: /Second visible track/ } )
 			.click();
 
 		await expect(
 			player.getByRole( 'slider', { name: 'Second visible track' } )
+		).toBeVisible();
+
+		// Hiding the tracklist doesn't hide its tracks.
+		await expect(
+			playlistWithoutTracklist
+				.locator( '.wp-block-playlist__waveform-player' )
+				.getByRole( 'slider', { name: 'First visible track' } )
 		).toBeVisible();
 	} );
 
