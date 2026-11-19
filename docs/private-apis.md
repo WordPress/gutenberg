@@ -179,7 +179,6 @@ Private selectors:
 - `getTemporarilyEditingAsBlocks`
 - `getTemporarilyEditingFocusModeToRevert`
 - `getZoomLevel`
-- `hasAllowedPatterns`
 - `isBlockInterfaceHidden`
 - `isBlockSubtreeDisabled`
 - `isDragging`
