@@ -66,17 +66,18 @@ describe( 'useListViewWindow', () => {
 		await render( <div style={ { height: '400vh' } } /> );
 		window.scrollTo( 0, 2 * window.innerHeight );
 		const { screen, panel } = await renderInPanel();
+		await settle();
 		// A popover only starts to clip its content after the first layout.
 		panel.style.maxHeight = '320px';
 		await settle();
 		expect(
-			screen.getByText( 'Row 35', { exact: true } ).query()
+			screen.getByText( 'Row 100', { exact: true } ).query()
 		).toBeNull();
 
-		panel.scrollTop = 1000;
+		panel.scrollTop = 3000;
 
 		await expect
-			.element( screen.getByText( 'Row 35', { exact: true } ) )
+			.element( screen.getByText( 'Row 100', { exact: true } ) )
 			.toBeVisible();
 	} );
 } );
