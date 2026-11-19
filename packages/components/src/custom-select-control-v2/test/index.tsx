@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { render } from '@ariakit/test/react';
 
 /**
  * WordPress dependencies
@@ -46,7 +47,7 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component
 					defaultValue={ defaultValues }
 					onChange={ onChangeMock }
@@ -127,7 +128,7 @@ describe.each( [
 				'ultraviolet morning light',
 			];
 
-			render(
+			await render(
 				<Component defaultValue={ defaultValues } label="Multi-select">
 					{ defaultValues.map( ( item ) => (
 						<CustomSelectItem key={ item } value={ item }>
@@ -182,7 +183,7 @@ describe.each( [
 			return <img src={ `${ value }.jpg` } alt={ value as string } />;
 		};
 
-		render(
+		await render(
 			<Component label="Rendered" renderSelectedValue={ renderValue }>
 				<CustomSelectItem value="april-29">
 					{ renderValue( 'april-29' ) }
