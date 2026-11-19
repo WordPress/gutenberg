@@ -321,7 +321,7 @@
 		height: var(--wpds-dimension-size-sm);
 		line-height: 22px;
 		padding: 0 8px;
-		font-size: 11px;
+		font-size: var(--wpds-typography-font-size-md);
 
 		&.has-icon:not(.has-text) {
 			padding: 0;

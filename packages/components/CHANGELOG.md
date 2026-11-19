@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Button`: Increase the label font size of small buttons from 11px to 13px ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
+
 ## 45.0.0 (2026-11-18)
 
 ### Breaking Changes
