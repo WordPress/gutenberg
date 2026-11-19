@@ -425,7 +425,7 @@ export default function useListViewDropZone( {
 	ref: RefCallback< HTMLElement >;
 	target: ListViewDropZoneTarget | null | undefined;
 } {
-	const { areBlocksContiguous, canMoveBlockSetToPosition } = unlock(
+	const { areBlocksContiguous, canMoveBlocksToPosition } = unlock(
 		useSelect( blockEditorStore )
 	);
 	const {
@@ -524,15 +524,14 @@ export default function useListViewDropZone( {
 					let canInsertDraggedBlocksAsChild = true;
 					if ( isNonContiguousMove ) {
 						canInsertDraggedBlocksAsSibling =
-							canMoveBlockSetToPosition(
+							canMoveBlocksToPosition(
 								draggedBlockClientIds,
 								rootClientId ?? ''
 							);
-						canInsertDraggedBlocksAsChild =
-							canMoveBlockSetToPosition(
-								draggedBlockClientIds,
-								clientId
-							);
+						canInsertDraggedBlocksAsChild = canMoveBlocksToPosition(
+							draggedBlockClientIds,
+							clientId
+						);
 					} else if ( isBlockDrag ) {
 						canInsertDraggedBlocksAsSibling = canInsertBlocks(
 							draggedBlockClientIds,
@@ -578,7 +577,7 @@ export default function useListViewDropZone( {
 				getBlockRootClientId,
 				rtl,
 				areBlocksContiguous,
-				canMoveBlockSetToPosition,
+				canMoveBlocksToPosition,
 			]
 		),
 		50

@@ -311,7 +311,7 @@ export default function useOnBlockDrop(
 		getBlock,
 		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
-	const { areBlocksContiguous, canMoveBlockSetToPosition } = unlock(
+	const { areBlocksContiguous, canMoveBlocksToPosition } = unlock(
 		useSelect( blockEditorStore )
 	);
 	const { moveBlockSetToPosition } = unlock(
@@ -489,10 +489,7 @@ export default function useOnBlockDrop(
 			if (
 				operation === 'group' ||
 				operation === 'replace' ||
-				! canMoveBlockSetToPosition(
-					sourceIds,
-					targetRootClientId ?? ''
-				)
+				! canMoveBlocksToPosition( sourceIds, targetRootClientId ?? '' )
 			) {
 				return true;
 			}

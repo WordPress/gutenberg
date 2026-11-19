@@ -335,7 +335,7 @@ export default function useBlockDropZone( {
 		getSectionRootClientId,
 		getBlockParents,
 		areBlocksContiguous,
-		canMoveBlockSetToPosition,
+		canMoveBlocksToPosition,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		showInsertionPoint,
@@ -391,7 +391,7 @@ export default function useBlockDropZone( {
 				);
 				const isBlockDroppingAllowed =
 					( ! isNonContiguousMove ||
-						canMoveBlockSetToPosition(
+						canMoveBlocksToPosition(
 							draggedBlockClientIds,
 							targetRootClientId
 						) ) &&
@@ -407,7 +407,7 @@ export default function useBlockDropZone( {
 				const isParentDropTargetValid =
 					!! dropZoneElement &&
 					( ! isNonContiguousMove ||
-						canMoveBlockSetToPosition(
+						canMoveBlocksToPosition(
 							draggedBlockClientIds,
 							parentBlockClientId
 						) ) &&
@@ -624,7 +624,7 @@ export default function useBlockDropZone( {
 				getBlockVariations,
 				getGroupingBlockName,
 				areBlocksContiguous,
-				canMoveBlockSetToPosition,
+				canMoveBlocksToPosition,
 			]
 		),
 		200

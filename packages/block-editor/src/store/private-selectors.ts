@@ -118,14 +118,15 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 }
 
 /**
- * Validates an entire gathered move before any source parent is changed.
+ * Checks whether blocks can move to a destination, regardless of selection.
+ * Accepts a single block, a contiguous sibling run, or blocks across parents.
  *
  * @param state        Editor state.
- * @param clientIds    Dragged IDs.
+ * @param clientIds    Block IDs to move.
  * @param rootClientId Destination parent, or the document root.
  * @return Whether all blocks can move to the destination.
  */
-export function canMoveBlockSetToPosition(
+export function canMoveBlocksToPosition(
 	state: State,
 	clientIds: string[],
 	rootClientId = ''

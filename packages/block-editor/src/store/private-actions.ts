@@ -39,7 +39,7 @@ export const moveBlockSetToPosition =
 	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
 		// Check every source and the destination before moving any blocks.
 		if (
-			! select.canMoveBlockSetToPosition( clientIds, rootClientId ) ||
+			! select.canMoveBlocksToPosition( clientIds, rootClientId ) ||
 			( index !== undefined &&
 				( ! Number.isInteger( index ) || index < 0 ) )
 		) {
