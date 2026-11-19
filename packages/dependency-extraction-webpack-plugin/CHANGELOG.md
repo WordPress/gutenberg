@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   Keep the kind of each import of an externalized script module in script module builds: a static `import` stays static and an `import()` stays dynamic, `@wordpress/interactivity` included. In a file that also imports the script module statically, an `import()` of it uses the static import ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   Keep the kind of each import of an externalized script module in script module builds: a static `import` stays static and an `import()` stays dynamic, `@wordpress/interactivity` included ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ## 7.2.0 (2026-11-18)
 
