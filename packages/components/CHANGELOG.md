@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 -   `Button`: Increase the label font size of small buttons from 11px to 13px ([#79993](https://github.com/WordPress/gutenberg/pull/79993)).
 
 ### Bug Fixes
