@@ -313,6 +313,7 @@ Individual packages to read from a classic script's global instead of bundling, 
 - `import { useConnection } from '@acme/connection'` → `window.AcmeConnection` with handle `acme-connection`, in both scripts and script modules
 - Only the exact package name matches: an import of a subpath, such as `@acme/connection/hooks`, is still bundled
 - Your plugin must register the script under that handle
+- Routes load the script; for other script modules, enqueue it on the page yourself, as with any classic script a module imports
 
 ### `wpPlugin.pages` (Experimental)
 
