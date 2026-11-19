@@ -7,14 +7,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`combine-assets\` 
 			'@wordpress/blob',
 			'lodash'
 		),
-		'version' => '270cb9e2d17f391e9270',
+		'version' => '7eff34617328511782d2',
 		'type' => 'module'
 	),
 	'fileB.mjs' => array(
 		'dependencies' => array(
 			'@wordpress/token-list'
 		),
-		'version' => '4cf36c37afb98cbb1f86',
+		'version' => '973c1e1bcd51b7984157',
 		'type' => 'module'
 	)
 );
@@ -24,17 +24,17 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`combine-assets\` 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`combine-assets\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/token-list",
     "userRequest": "@wordpress/token-list",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -55,7 +55,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dependency
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dependency-graph\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "module",
+    "externalType": "module-import",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -79,7 +79,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dynamic-de
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-dynamic-dependency-graph\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "module",
+    "externalType": "module-import",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -103,7 +103,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-external-d
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`cyclic-external-deps\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "module",
+    "externalType": "module-import",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -118,7 +118,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`dynamic-import\` 
 			'import' => 'dynamic'
 		)
 	),
-	'version' => '7d8b118ac6242e7f308e',
+	'version' => 'f2e6640468a84cdc4998',
 	'type' => 'module'
 );
 "
@@ -127,7 +127,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`dynamic-import\` 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`dynamic-import\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
@@ -149,7 +149,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`function-output-f
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => 'b68363f122fe0a26183e',
+	'version' => 'e1af539043c7b15bb0d6',
 	'type' => 'module'
 );
 "
@@ -158,12 +158,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`function-output-f
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`function-output-filename\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -176,7 +176,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`has-extension-suf
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => 'fd4b8dcc8741c1523219',
+	'version' => '409ace9b7131261ac392',
 	'type' => 'module'
 );
 "
@@ -185,12 +185,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`has-extension-suf
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`has-extension-suffix\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -203,7 +203,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`module-renames\` 
 		'renamed--@my/module',
 		'renamed--other-module'
 	),
-	'version' => '79d3c39076be7f6df4ea',
+	'version' => '373c8b2e6dde089cd84a',
 	'type' => 'module'
 );
 "
@@ -212,12 +212,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`module-renames\` 
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`module-renames\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "renamed--@my/module",
     "userRequest": "@my/module",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "renamed--other-module",
     "userRequest": "other-module",
   },
@@ -232,7 +232,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`nested-dynamic-im
 			'import' => 'dynamic'
 		)
 	),
-	'version' => '67bfe5b9e28926bb7d9f',
+	'version' => '3fcb9b25d95448d36ac5',
 	'type' => 'module'
 );
 "
@@ -241,7 +241,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`nested-dynamic-im
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`nested-dynamic-import\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "module",
+    "externalType": "module-import",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
   },
@@ -280,7 +280,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-function-o
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => 'b68363f122fe0a26183e',
+	'version' => 'e1af539043c7b15bb0d6',
 	'type' => 'module'
 );
 "
@@ -289,12 +289,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-function-o
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-function-output-filename\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -307,7 +307,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-output-fil
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => 'b68363f122fe0a26183e',
+	'version' => 'e1af539043c7b15bb0d6',
 	'type' => 'module'
 );
 "
@@ -316,12 +316,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-output-fil
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`option-output-filename\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -333,7 +333,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-jso
 	"dependencies": [
 		"lodash"
 	],
-	"version": "11156aba3b369605e939",
+	"version": "b88f38b51529fefd78ea",
 	"type": "module"
 }"
 `;
@@ -341,7 +341,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-jso
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`output-format-json\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -356,7 +356,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`overrides\` > sho
 		'rxjs',
 		'rxjs/operators'
 	),
-	'version' => 'af74b6f7d8a3f114b5b3',
+	'version' => '7b784cc8ae9ba073abe6',
 	'type' => 'module'
 );
 "
@@ -365,22 +365,22 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`overrides\` > sho
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`overrides\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/url",
     "userRequest": "@wordpress/url",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "rxjs",
     "userRequest": "rxjs",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "rxjs/operators",
     "userRequest": "rxjs/operators",
   },
@@ -418,7 +418,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 	'dependencies' => array(
 		'@wordpress/blob'
 	),
-	'version' => '0b4be29a9a428b9e8608',
+	'version' => '547479763ef3cc9c5b3f',
 	'type' => 'module',
 	'handle' => 'runtime-chunk-single-modules-a'
 );
@@ -431,7 +431,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => '95c637f4ad0885697262',
+	'version' => '123d6a6e989037833f6c',
 	'type' => 'module',
 	'handle' => 'runtime-chunk-single-modules-b'
 );
@@ -443,7 +443,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 	'dependencies' => array(
 		
 	),
-	'version' => '9c63db42c1fe56ddaf1e',
+	'version' => '06eb23ece3c1ab5f957a',
 	'type' => 'module',
 	'handle' => 'runtime-chunk-single-modules-runtime'
 );
@@ -453,12 +453,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-sin
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`runtime-chunk-single\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -470,7 +470,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-cache-group
 	'dependencies' => array(
 		'@wordpress/blob'
 	),
-	'version' => '8d9f598be79e102d0648',
+	'version' => 'c66c1495b04909af8337',
 	'type' => 'module'
 );
 "
@@ -479,7 +479,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-cache-group
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-cache-group\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
@@ -492,7 +492,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-imports\` >
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => '825b69f70b86760c73a3',
+	'version' => 'fc6bbfd4f4f314fc5b91',
 	'type' => 'module'
 );
 "
@@ -501,12 +501,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-imports\` >
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`style-imports\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -519,7 +519,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress\` > sho
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => 'b68363f122fe0a26183e',
+	'version' => 'e1af539043c7b15bb0d6',
 	'type' => 'module'
 );
 "
@@ -528,12 +528,12 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress\` > sho
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
@@ -549,7 +549,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-interac
 			'import' => 'dynamic'
 		)
 	),
-	'version' => '995805497b878a0197d9',
+	'version' => '06e112f232d0d7385044',
 	'type' => 'module'
 );
 "
@@ -558,14 +558,14 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-interac
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-interactivity\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
-    "request": "lodash",
-    "userRequest": "lodash",
-  },
-  {
-    "externalType": "module",
+    "externalType": "module-import",
     "request": "@wordpress/interactivity",
     "userRequest": "@wordpress/interactivity",
+  },
+  {
+    "externalType": "module-import",
+    "request": "lodash",
+    "userRequest": "lodash",
   },
 ]
 `;
@@ -576,7 +576,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require
 		'@wordpress/blob',
 		'lodash'
 	),
-	'version' => '9dcb7bb56f3fd06c5087',
+	'version' => '7c3ee7ef53a2ce355708',
 	'type' => 'module'
 );
 "
@@ -585,16 +585,395 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require\` > should produce expected output > External modules should match snapshot 1`] = `
 [
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "@wordpress/blob",
     "userRequest": "@wordpress/blob",
   },
   {
-    "externalType": "import",
+    "externalType": "module-import",
     "request": "lodash",
     "userRequest": "lodash",
   },
 ]
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'dynamic.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		array(
+			'id' => '@wordpress/a11y',
+			'import' => 'dynamic'
+		),
+		array(
+			'id' => '@wordpress/interactivity',
+			'import' => 'dynamic'
+		),
+		array(
+			'id' => '@wordpress/interactivity-router',
+			'import' => 'dynamic'
+		)
+	),
+	'version' => 'd341ba7ca1a44a5cf85a',
+	'type' => 'module'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'static.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/a11y',
+		'@wordpress/interactivity',
+		'@wordpress/interactivity-router'
+	),
+	'version' => '5025370194ea97be933a',
+	'type' => 'module'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/a11y",
+    "userRequest": "@wordpress/a11y",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/interactivity-router",
+    "userRequest": "@wordpress/interactivity-router",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/a11y",
+    "userRequest": "@wordpress/a11y",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/interactivity",
+    "userRequest": "@wordpress/interactivity",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/interactivity-router",
+    "userRequest": "@wordpress/interactivity-router",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`combine-assets\` > should keep the kind of each import of an external 1`] = `
+{
+  "fileA.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+  "fileB.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/token-list",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`cyclic-dependency-graph\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/interactivity",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`cyclic-dynamic-dependency-graph\` > should keep the kind of each import of an external 1`] = `
+{
+  "a_js.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/interactivity",
+    ],
+  },
+  "main.mjs": {
+    "dynamic": [
+      "./a_js.mjs",
+    ],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`cyclic-external-deps\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/interactivity",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`dynamic-import\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [
+      "./util_js.mjs",
+    ],
+    "static": [],
+  },
+  "util_js.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`function-output-filename\` > should keep the kind of each import of an external 1`] = `
+{
+  "chunk--main--main.js": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`has-extension-suffix\` > should keep the kind of each import of an external 1`] = `
+{
+  "index.min.js": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`module-renames\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "renamed--@my/module",
+      "renamed--other-module",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`nested-dynamic-import\` > should keep the kind of each import of an external 1`] = `
+{
+  "level-one_js.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+  "main.mjs": {
+    "dynamic": [
+      "./level-one_js.mjs",
+      "@wordpress/interactivity",
+    ],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`no-default\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`no-deps\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`option-function-output-filename\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`option-output-filename\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`output-format-json\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`overrides\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "@wordpress/url",
+      "rxjs",
+      "rxjs/operators",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`polyfill-magic-comment\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`polyfill-magic-comment-minified\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`runtime-chunk-single\` > should keep the kind of each import of an external 1`] = `
+{
+  "a.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+  "b.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+  "runtime.mjs": {
+    "dynamic": [],
+    "static": [],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`style-cache-group\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`style-imports\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress-interactivity\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [
+      "@wordpress/interactivity",
+    ],
+    "static": [
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress-require\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/blob",
+      "lodash",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress-script-modules\` > should keep the kind of each import of an external 1`] = `
+{
+  "dynamic.mjs": {
+    "dynamic": [
+      "@wordpress/a11y",
+      "@wordpress/interactivity",
+      "@wordpress/interactivity-router",
+    ],
+    "static": [],
+  },
+  "static.mjs": {
+    "dynamic": [],
+    "static": [
+      "@wordpress/a11y",
+      "@wordpress/interactivity",
+      "@wordpress/interactivity-router",
+    ],
+  },
+}
 `;
 
 exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`combine-assets\` > should produce expected output > Asset file 'assets.php' should match snapshot 1`] = `
@@ -1211,6 +1590,59 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-require
       "blob",
     ],
     "userRequest": "@wordpress/blob",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'dynamic.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'wp-a11y',
+		'wp-interactivity',
+		'wp-interactivity-router'
+	),
+	'version' => 'a32f1abc0cf670a4d0f5'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'static.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'wp-a11y',
+		'wp-interactivity',
+		'wp-interactivity-router'
+	),
+	'version' => 'eab49dbefc633236009b'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules\` > should produce expected output > External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "a11y",
+    ],
+    "userRequest": "@wordpress/a11y",
+  },
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivity",
+    ],
+    "userRequest": "@wordpress/interactivity",
+  },
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "interactivityRouter",
+    ],
+    "userRequest": "@wordpress/interactivity-router",
   },
 ]
 `;

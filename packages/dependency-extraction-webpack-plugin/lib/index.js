@@ -156,10 +156,15 @@ class DependencyExtractionWebpackPlugin {
 
 		/**
 		 * Offload externalization work to the ExternalsPlugin.
+		 *
+		 * Script modules use the `module-import` type, which keeps the kind of
+		 * each import: a static `import` declaration stays static and an
+		 * `import()` stays dynamic.
+		 *
 		 * @type {webpack.ExternalsPlugin}
 		 */
 		this.externalsPlugin = new webpack.ExternalsPlugin(
-			this.useModules ? 'import' : 'window',
+			this.useModules ? 'module-import' : 'window',
 			this.externalizeWpDeps.bind( this )
 		);
 

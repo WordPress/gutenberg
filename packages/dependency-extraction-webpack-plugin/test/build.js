@@ -27,6 +27,49 @@ function expectCompilationError( stats ) {
 	expect( stats.toString( { errors: true, all: false } ) ).toMatchSnapshot();
 }
 
+/**
+ * Lists, for each JavaScript file emitted to a folder, the specifiers its
+ * static `import` declarations and its `import()` calls name.
+ *
+ * @param {string} outputDirectory Folder of an unminified module build.
+ * @return {Record<string, { static: string[], dynamic: string[] }>} Specifiers by file and import kind.
+ */
+function getEmittedImports( outputDirectory ) {
+	const specifiers = ( content, pattern ) =>
+		[
+			...new Set(
+				Array.from(
+					content.matchAll( pattern ),
+					( match ) => match[ 1 ]
+				)
+			),
+		].sort();
+
+	return Object.fromEntries(
+		globSync( '**/*.@(js|mjs)', { cwd: outputDirectory } )
+			.sort()
+			.map( ( file ) => {
+				const content = fs.readFileSync(
+					path.join( outputDirectory, file ),
+					'utf-8'
+				);
+				return [
+					file,
+					{
+						static: specifiers(
+							content,
+							/^import\s(?:[^;]*?\sfrom\s)?"([^"]+)";$/gm
+						),
+						dynamic: specifiers(
+							content,
+							/\bimport\("([^"]+)"\)/g
+						),
+					},
+				];
+			} )
+	);
+}
+
 function loadWebpackConfig( configPath, defaults ) {
 	const config = require( configPath );
 
@@ -38,11 +81,58 @@ function loadWebpackConfig( configPath, defaults ) {
 	};
 }
 
+/**
+ * Compiles a fixture as classic scripts or as script modules.
+ *
+ * @param {string}                configCase      Name of the fixture folder.
+ * @param {'scripts' | 'modules'} moduleMode      Kind of output.
+ * @param {string}                outputDirectory Folder to emit the build to.
+ * @return {Promise<webpack.Stats>} Stats of the compilation.
+ */
+function compileFixture( configCase, moduleMode, outputDirectory ) {
+	const testDirectory = path.join( fixturesPath, configCase );
+	const options = loadWebpackConfig(
+		path.join( testDirectory, 'webpack.config.js' ),
+		{
+			name: `${ configCase }-${ moduleMode }`,
+			target: 'web',
+			context: testDirectory,
+			entry: './index.js',
+			mode: 'production',
+			optimization: {
+				minimize: false,
+				chunkIds: 'named',
+				moduleIds: 'named',
+			},
+			output: {},
+			experiments: {},
+		}
+	);
+	options.output.path = outputDirectory;
+
+	if ( moduleMode === 'modules' ) {
+		options.target = 'es2024';
+		options.output.module = true;
+		options.output.chunkFormat = 'module';
+		options.output.library = options.output.library || {};
+		options.output.library.type = 'module';
+		options.experiments.outputModule = true;
+	}
+
+	return new Promise( ( resolve, reject ) =>
+		webpack( options, ( err, stats ) => {
+			if ( err ) {
+				return reject( err );
+			}
+			resolve( stats );
+		} )
+	);
+}
+
 describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	'DependencyExtractionWebpackPlugin %s',
 	( moduleMode ) => {
 		describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
-			const testDirectory = path.join( fixturesPath, configCase );
 			const outputDirectory = path.join(
 				currentDirectory,
 				'build',
@@ -59,42 +149,10 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 			afterEach( () => rimrafSync( outputDirectory ) );
 
 			test( 'should produce expected output', async () => {
-				const options = loadWebpackConfig(
-					path.join( testDirectory, 'webpack.config.js' ),
-					{
-						name: `${ configCase }-${ moduleMode }`,
-						target: 'web',
-						context: testDirectory,
-						entry: './index.js',
-						mode: 'production',
-						optimization: {
-							minimize: false,
-							chunkIds: 'named',
-							moduleIds: 'named',
-						},
-						output: {},
-						experiments: {},
-					}
-				);
-				options.output.path = outputDirectory;
-
-				if ( moduleMode === 'modules' ) {
-					options.target = 'es2024';
-					options.output.module = true;
-					options.output.chunkFormat = 'module';
-					options.output.library = options.output.library || {};
-					options.output.library.type = 'module';
-					options.experiments.outputModule = true;
-				}
-
-				/** @type {webpack.Stats} */
-				const stats = await new Promise( ( resolve, reject ) =>
-					webpack( options, ( err, _stats ) => {
-						if ( err ) {
-							return reject( err );
-						}
-						resolve( _stats );
-					} )
+				const stats = await compileFixture(
+					configCase,
+					moduleMode,
+					outputDirectory
 				);
 
 				if ( configCase.includes( 'error' ) ) {
@@ -154,6 +212,44 @@ describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 		} );
 	}
 );
+
+describe( 'DependencyExtractionWebpackPlugin modules emitted imports', () => {
+	describe.each(
+		configFixtures.filter(
+			( configCase ) => ! configCase.includes( 'error' )
+		)
+	)( 'Webpack `%s`', ( configCase ) => {
+		const outputDirectory = path.join(
+			currentDirectory,
+			'build',
+			'modules-emitted-imports',
+			configCase
+		);
+
+		beforeEach( () => {
+			rimrafSync( outputDirectory );
+			mkdirpSync( outputDirectory );
+		} );
+
+		afterEach( () => rimrafSync( outputDirectory ) );
+
+		test( 'should keep the kind of each import of an external', async () => {
+			const stats = await compileFixture(
+				configCase,
+				'modules',
+				outputDirectory
+			);
+
+			if ( stats.hasErrors() ) {
+				throw new Error(
+					stats.toString( { errors: true, all: false } )
+				);
+			}
+
+			expect( getEmittedImports( outputDirectory ) ).toMatchSnapshot();
+		} );
+	} );
+} );
 
 describe.each( /** @type {const} */ ( [ 'scripts', 'modules' ] ) )(
 	'DependencyExtractionWebpackPlugin %s asset version',

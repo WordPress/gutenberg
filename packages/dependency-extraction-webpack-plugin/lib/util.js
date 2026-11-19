@@ -76,32 +76,26 @@ function defaultRequestToExternal( request ) {
 /**
  * Default request to external module transformation
  *
- * Currently only `@wordpress/interactivity` and `@wordpress/interactivity-router`
- * are supported.
+ * Currently only `@wordpress/interactivity`, `@wordpress/interactivity-router`,
+ * and `@wordpress/a11y` are supported. Each maps to its own script module ID,
+ * which every import of it keeps: a static `import` declaration stays static
+ * and an `import()` stays dynamic.
  *
  * Do not use the boolean shorthand here, it's only handled for the
  * `requestToExternalModule` option.
  *
  * @param {string} request Module request (the module name in `import from`) to be transformed
- * @return {string|Error|undefined} The resulting external definition.
+ * @return {string|undefined} The resulting external definition.
  *   - Return `undefined` to ignore the request (do not externalize).
  *   - Return `string` to map the request to an external.
- *   - Return `Error` to emit an error.
+ * @throws {Error} When the request is a WordPress script, which script modules can't import.
  */
 function defaultRequestToExternalModule( request ) {
-	if ( request === '@wordpress/interactivity' ) {
-		// This is a special case. Interactivity does not support dynamic imports at
-		// this time. We add the external "module" type to indicate that webpack
-		// should externalize this as a module (instead of our default `import()`
-		// external type) which forces @wordpress/interactivity imports to be
-		// hoisted to static imports.
-		return `module ${ request }`;
-	}
-
 	switch ( request ) {
+		case '@wordpress/interactivity':
 		case '@wordpress/interactivity-router':
 		case '@wordpress/a11y':
-			return `import ${ request }`;
+			return request;
 	}
 
 	const isWordPressScript = Boolean( defaultRequestToExternal( request ) );
