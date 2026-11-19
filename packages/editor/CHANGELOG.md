@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
 ## 16.2.0 (2026-11-18)
 
 ### New Features

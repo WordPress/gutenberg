@@ -1,11 +1,11 @@
 import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { SlotFillProvider } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getAdminThemeColors } from '@wordpress/admin-ui';
 import { ThemeProvider } from '@wordpress/theme';
-import { UnsavedChangesWarning } from '@wordpress/editor';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import PluginArea from '../plugin-area';
@@ -16,6 +16,7 @@ import styles from './style.module.scss';
 import useRouteTitle from '../app/use-route-title';
 
 const { useMatches, Outlet } = unlock( routePrivateApis );
+const { UnsavedChangesWarning } = unlock( coreDataPrivateApis );
 
 /**
  * Root component for single page mode (no sidebar).
