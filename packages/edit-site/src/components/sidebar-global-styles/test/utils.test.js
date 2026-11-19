@@ -1,34 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { shouldOpenStyleBook } from '../utils';
+import { shouldShowStyleBook } from '../utils';
 
-describe( 'shouldOpenStyleBook', () => {
+describe( 'shouldShowStyleBook', () => {
 	it.each( [
+		'/',
 		'/typography',
 		'/colors',
 		'/blocks',
 		'/blocks/core%2Fparagraph',
-		'/background',
-		'/shadows',
-		'/layout',
-	] )( 'opens the Style Book when entering %s from the root', ( section ) => {
-		expect( shouldOpenStyleBook( '/', section ) ).toBe( true );
-	} );
-
-	it.each( [ '/revisions', '/revisions/123', '/css' ] )(
-		'keeps the site preview when entering %s from the root',
+	] )(
+		'shows the Style Book for %s until the user turns it off',
 		( section ) => {
-			expect( shouldOpenStyleBook( '/', section ) ).toBe( false );
+			expect( shouldShowStyleBook( section, undefined ) ).toBe( true );
+			expect( shouldShowStyleBook( section, true ) ).toBe( true );
+			expect( shouldShowStyleBook( section, false ) ).toBe( false );
 		}
 	);
 
-	it( 'keeps the current state when moving between sections', () => {
-		expect( shouldOpenStyleBook( '/typography', '/colors' ) ).toBe( false );
-		expect(
-			shouldOpenStyleBook( '/blocks', '/blocks/core%2Fparagraph' )
-		).toBe( false );
-	} );
-
-	it( 'keeps the current state when returning to the root', () => {
-		expect( shouldOpenStyleBook( '/typography', '/' ) ).toBe( false );
-	} );
+	it.each( [ '/revisions', '/revisions/123', '/css' ] )(
+		'keeps the site preview for %s',
+		( section ) => {
+			expect( shouldShowStyleBook( section, undefined ) ).toBe( false );
+			expect( shouldShowStyleBook( section, true ) ).toBe( false );
+		}
+	);
 } );

@@ -1,20 +1,24 @@
 /**
- * Whether navigating between two Styles sections should turn the Style Book on.
- *
- * The Style Book is turned on when entering a section from the root, as it is
- * a better preview of each section. Moving between sections keeps the current
- * state, so turning it off is respected. Revisions and custom CSS keep the
- * site preview. Mirrors `shouldOpenStyleBook()` in `routes/styles/utils.ts`.
- *
- * @param {string} currentSection The section being navigated from.
- * @param {string} nextSection    The section being navigated to.
- * @return {boolean} Whether to turn the Style Book on.
+ * Preference that remembers whether Styles shows the Style Book. The site
+ * editor and the extensible site editor share it.
  */
-export function shouldOpenStyleBook( currentSection, nextSection ) {
+export const STYLE_BOOK_PREFERENCE = 'showStyleBook';
+
+/**
+ * Whether a Styles section shows the Style Book when the URL doesn't say.
+ *
+ * Follows the user's preference, which is on until they turn the Style Book
+ * off. Revisions and Additional CSS keep the site preview. Mirrors
+ * `shouldShowStyleBook()` in `routes/styles/utils.ts`.
+ *
+ * @param {string}            section    The Styles section.
+ * @param {boolean|undefined} preference The saved preference, if any.
+ * @return {boolean} Whether to show the Style Book.
+ */
+export function shouldShowStyleBook( section, preference ) {
 	return (
-		currentSection === '/' &&
-		nextSection !== '/' &&
-		! nextSection.startsWith( '/revisions' ) &&
-		! nextSection.startsWith( '/css' )
+		preference !== false &&
+		! section.startsWith( '/revisions' ) &&
+		! section.startsWith( '/css' )
 	);
 }
