@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 6.0.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
