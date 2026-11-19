@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataViews: Render a radio instead of a checkbox for single-selection pickers, and honour a consumer-supplied `isItemSelectable` predicate so items can be made non-selectable ([#86184](https://github.com/WordPress/gutenberg/pull/86184)).
+
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).

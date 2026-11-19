@@ -125,6 +125,14 @@ type DataViewsPickerProps< Item > = {
 	 */
 	onChangeSelection: ( items: string[] ) => void;
 	/**
+	 * Whether an item can be selected. Items that cannot be selected render
+	 * their selection indicator as disabled, ignore row-click selection, and
+	 * are left out of select-all.
+	 *
+	 * @default () => true
+	 */
+	isItemSelectable?: ( item: Item ) => boolean;
+	/**
 	 * Custom component tree rendered instead of the default layout
 	 * composition, using the internal `DataViewsPicker.*` sub-components.
 	 */
@@ -248,6 +256,7 @@ function DataViewsPicker< Item >( {
 	itemListLabel,
 	empty,
 	onReset,
+	isItemSelectable = () => true,
 }: DataViewsPickerProps< Item > ) {
 	useEnableWpCompatOverlaySlot();
 	// useData ensures data loading is correct whether infinite scroll is enabled or pagination is used.
@@ -340,6 +349,7 @@ function DataViewsPicker< Item >( {
 				isLoading,
 				paginationInfo,
 				isItemClickable,
+				isItemSelectable,
 				selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,

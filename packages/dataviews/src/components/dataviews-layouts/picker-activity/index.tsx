@@ -221,6 +221,7 @@ export default function ViewPickerActivity< Item >( {
 	actions,
 	className,
 	empty,
+	isItemSelectable,
 }: ViewPickerActivityProps< Item > ) {
 	const { itemListLabel, paginationInfo } = useContext( DataViewsContext );
 	const isMultiselect = useIsMultiselectPicker( actions );
@@ -256,7 +257,7 @@ export default function ViewPickerActivity< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: () => true,
+		isItemSelectable,
 		selection,
 		onChangeSelection,
 		selectionMode: isMultiselect ? 'multi' : 'single-clearable',

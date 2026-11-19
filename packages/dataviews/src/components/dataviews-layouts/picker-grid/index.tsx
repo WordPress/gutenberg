@@ -36,6 +36,8 @@ interface GridItemProps< Item > {
 	selectionProps: SelectionProps;
 	getItemId: ( item: Item ) => string;
 	item: Item;
+	isItemSelectable: ( item: Item ) => boolean;
+	isMultiselect: boolean;
 	titleField?: NormalizedField< Item >;
 	mediaField?: NormalizedField< Item >;
 	descriptionField?: NormalizedField< Item >;
@@ -55,6 +57,8 @@ function GridItem< Item >( {
 	selectionProps,
 	getItemId,
 	item,
+	isItemSelectable,
+	isMultiselect,
 	mediaField,
 	titleField,
 	descriptionField,
@@ -117,7 +121,8 @@ function GridItem< Item >( {
 					onChangeSelection={ onChangeSelection }
 					getItemId={ getItemId }
 					titleField={ titleField }
-					disabled={ false }
+					disabled={ ! isItemSelectable( item ) }
+					isMultiselect={ isMultiselect }
 					aria-hidden
 					tabIndex={ -1 }
 				/>
@@ -258,6 +263,7 @@ function ViewPickerGrid< Item >( {
 	view,
 	className,
 	empty,
+	isItemSelectable,
 }: ViewPickerGridProps< Item > ) {
 	const { resizeObserverRef, paginationInfo, itemListLabel } =
 		useContext( DataViewsContext );
@@ -316,7 +322,7 @@ function ViewPickerGrid< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: () => true,
+		isItemSelectable,
 		selection,
 		onChangeSelection,
 		selectionMode: isMultiselect ? 'multi' : 'single-clearable',
@@ -419,6 +425,12 @@ function ViewPickerGrid< Item >( {
 														regularFields
 													}
 													badgeFields={ badgeFields }
+													isItemSelectable={
+														isItemSelectable
+													}
+													isMultiselect={
+														isMultiselect
+													}
 													config={ {
 														sizes: size,
 													} }
@@ -506,6 +518,8 @@ function ViewPickerGrid< Item >( {
 									descriptionField={ descriptionField }
 									regularFields={ regularFields }
 									badgeFields={ badgeFields }
+									isItemSelectable={ isItemSelectable }
+									isMultiselect={ isMultiselect }
 									config={ {
 										sizes: size,
 									} }
