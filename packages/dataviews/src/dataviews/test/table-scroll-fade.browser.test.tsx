@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-react';
-import { describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/src/button/style.scss';
 import DataViews from '../index';
@@ -419,6 +419,66 @@ describe( 'DataViews table scroll fade', () => {
 					Math.abs( getTextLeft( cell ) - getTextLeft( header ) )
 				).toBeLessThanOrEqual( 1 );
 			}
+		} );
+	} );
+
+	// Firefox and iOS Safari 18 show the same cues, from classes that the
+	// table sets from its scroll position.
+	describe( 'without scroll-driven animations', () => {
+		beforeEach( () => {
+			const supports = CSS.supports.bind( CSS );
+			vi.spyOn( CSS, 'supports' ).mockImplementation(
+				( ...args: [ string, string? ] ) =>
+					args[ 0 ].startsWith( 'animation-timeline' )
+						? false
+						: supports( ...( args as [ string ] ) )
+			);
+		} );
+
+		afterEach( () => {
+			vi.restoreAllMocks();
+		} );
+
+		const getTableClasses = () => {
+			const { classList } = document.querySelector(
+				'.dataviews-view-table'
+			)!;
+			return {
+				before: classList.contains( 'has-columns-before' ),
+				after: classList.contains( 'has-columns-after' ),
+			};
+		};
+
+		it.each( [ 'ltr', 'rtl' ] as const )(
+			'tells which sides have columns to scroll to (%s)',
+			async ( dir ) => {
+				await render( <PostsTable withActions dir={ dir } /> );
+				await expect
+					.poll( getTableClasses )
+					.toEqual( { before: false, after: true } );
+
+				scrollToMiddle();
+				await expect
+					.poll( getTableClasses )
+					.toEqual( { before: true, after: true } );
+
+				scrollToEnd();
+				await expect
+					.poll( getTableClasses )
+					.toEqual( { before: true, after: false } );
+			}
+		);
+
+		it( 'updates when the table stops overflowing', async () => {
+			const { rerender } = await render( <PostsTable withActions /> );
+			await expect
+				.poll( getTableClasses )
+				.toEqual( { before: false, after: true } );
+
+			await rerender( <PostsTable withActions width={ 1600 } /> );
+			await expect
+				.poll( getTableClasses )
+				.toEqual( { before: false, after: false } );
 		} );
 	} );
 } );

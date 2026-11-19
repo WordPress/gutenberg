@@ -348,9 +348,10 @@ function ViewTable< Item >( {
 		isShown: showBulkActions,
 	} );
 
-	const { isVerticallyScrolled } = useScrollState( {
-		scrollContainerRef: containerRef,
-	} );
+	const { isVerticallyScrolled, hasColumnsBefore, hasColumnsAfter } =
+		useScrollState( {
+			scrollContainerRef: containerRef,
+		} );
 
 	const disableHeaderControls = showBulkActions;
 
@@ -489,6 +490,8 @@ function ViewTable< Item >( {
 						),
 					'has-bulk-actions': hasBulkActions,
 					'has-actions': !! actions?.length,
+					'has-columns-before': hasColumnsBefore,
+					'has-columns-after': hasColumnsAfter,
 					'is-refreshing': ! isInfiniteScroll && isDelayedLoading,
 					'has-media-aspect-ratio': !! mediaAspectRatio,
 				} ) }
