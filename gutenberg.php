@@ -51,7 +51,10 @@ function gutenberg_build_files_notice() {
  */
 function gutenberg_pre_init() {
 	global $wp_version;
-	if ( ! file_exists( __DIR__ . '/build/scripts/blocks' ) ) {
+	// build/build.php is generated at the end of the build, so its presence
+	// confirms the build has completed. Checking an early output such as
+	// build/scripts/blocks lets a partial build through and causes fatal errors.
+	if ( ! file_exists( __DIR__ . '/build/build.php' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
