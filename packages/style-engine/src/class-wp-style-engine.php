@@ -402,7 +402,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 */
 		protected static function get_slug_from_preset_value( $style_value, $property_key ) {
 			if ( is_string( $style_value ) && is_string( $property_key ) && str_contains( $style_value, "var:preset|{$property_key}|" ) ) {
-				$index_to_splice = strrpos( $style_value, '|' ) + 1;
+				// The string contains a pipe, as checked above, so strrpos() does not return false.
+				$index_to_splice = (int) strrpos( $style_value, '|' ) + 1;
 				return _wp_to_kebab_case( substr( $style_value, $index_to_splice ) );
 			}
 			return '';
