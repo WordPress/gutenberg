@@ -135,6 +135,15 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$breadcrumb_items = array_merge( $breadcrumb_items, block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) );
 		}
 
+		// Add parent post title if applicable.
+		if ( $parent_post ) {
+			$breadcrumb_items[] = array(
+				'label'      => block_core_breadcrumbs_get_post_title( $parent_post ),
+				'url'        => get_permalink( $parent_post ),
+				'allow_html' => true,
+			);
+		}
+
 		// Add post title: linked when viewing a paginated page, plain text otherwise.
 		$is_paged = (int) get_query_var( 'page' ) > 1 || (int) get_query_var( 'cpage' ) > 1;
 		$title    = block_core_breadcrumbs_get_post_title( $post );

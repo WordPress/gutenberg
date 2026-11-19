@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Breadcrumbs: Show the post or page an attachment is attached to in the trail on attachment pages ([#](https://github.com/WordPress/gutenberg/pull/)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 
 ## 12.2.0 (2026-11-18)
