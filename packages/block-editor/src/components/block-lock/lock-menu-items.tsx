@@ -28,6 +28,7 @@ export default function BlockLockMenuItems( {
 		isEditLocked,
 		canLayoutLock,
 		canChangeLayoutLock,
+		isEverySyncedPattern,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -37,6 +38,7 @@ export default function BlockLockMenuItems( {
 				isEditLockedBlock,
 				canLayoutLockBlock,
 				isPatternLockedBlock,
+				getBlockName,
 			} = unlock( select( blockEditorStore ) );
 			const layoutLockableIds = clientIds.filter( canLayoutLockBlock );
 			// A pattern's layout is the pattern's own, so it stays as it is.
@@ -53,13 +55,20 @@ export default function BlockLockMenuItems( {
 				isEditLocked: clientIds.every( isEditLockedBlock ),
 				canLayoutLock: layoutLockableIds.length > 0,
 				canChangeLayoutLock: layoutChangeableIds.length > 0,
+				isEverySyncedPattern:
+					clientIds.length > 0 &&
+					clientIds.every(
+						( clientId ) =>
+							getBlockName( clientId ) === 'core/block'
+					),
 			};
 		},
 		[ clientIds ]
 	);
 
 	// Every block whose layout can be locked is a pattern, whose layout is the
-	// pattern's, so say why the option can't be changed.
+	// pattern's, so say why the option can't be changed. A synced pattern's
+	// layout is edited in the pattern itself, so it has no layout lock here.
 	const isLayoutSetByPattern = canLayoutLock && ! canChangeLayoutLock;
 
 	const isAllLocked =
@@ -106,6 +115,11 @@ export default function BlockLockMenuItems( {
 				{ isLayoutSetByPattern && (
 					<Menu.ItemDescription>
 						{ __( 'Disabled by Pattern' ) }
+					</Menu.ItemDescription>
+				) }
+				{ isEverySyncedPattern && (
+					<Menu.ItemDescription>
+						{ __( 'Disabled by Sync pattern' ) }
 					</Menu.ItemDescription>
 				) }
 			</Menu.CheckboxItem>
