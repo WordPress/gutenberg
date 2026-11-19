@@ -42,7 +42,7 @@
  *     context?: string|null,
  *     convert_vars_to_classnames?: bool,
  *     selector?: string|null,
- * } $options
+ * }|null $options
  * @phpstan-return array{
  *     css?: string,
  *     declarations?: non-empty-array<non-falsy-string, non-empty-string>,
@@ -50,14 +50,13 @@
  * }
  */
 function wp_style_engine_get_styles( $block_styles, $options = array() ) {
-	/** @var array{ selector: string|null, context: string|null, convert_vars_to_classnames: bool } $options */
-	$options = wp_parse_args(
-		$options,
+	$options = array_merge(
 		array(
 			'selector'                   => null,
 			'context'                    => null,
 			'convert_vars_to_classnames' => false,
-		)
+		),
+		$options ?? array()
 	);
 
 	$parsed_styles = WP_Style_Engine::parse_block_styles( $block_styles, $options );
@@ -128,12 +127,11 @@ function wp_style_engine_get_stylesheet_from_css_rules( $css_rules, $options = a
 		return '';
 	}
 
-	/** @var array{ context: string|null, optimize?: bool, prettify?: bool } $options */
-	$options = wp_parse_args(
-		$options,
+	$options = array_merge(
 		array(
 			'context' => null,
-		)
+		),
+		$options
 	);
 
 	$css_rule_objects = array();
