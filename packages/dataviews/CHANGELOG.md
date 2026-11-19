@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   DataViews: Cut long values in table columns to one line, and show the full value in a popover on hover or focus. Long values no longer run into the next columns. Fields with their own `render` keep control of how their value fits ([#87097](https://github.com/WordPress/gutenberg/pull/87097)).
+
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
