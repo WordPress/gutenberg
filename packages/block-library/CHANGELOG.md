@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Tabs: Load the images in the panels that are not shown first only once the block is near the viewport, instead of with the page ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Tabs: Load the images in the panels that are not shown first only once the block is near the viewport, instead of with the page ([#87114](https://github.com/WordPress/gutenberg/pull/87114)).
 
 ### Bug Fixes
 
