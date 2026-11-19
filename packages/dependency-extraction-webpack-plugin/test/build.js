@@ -304,13 +304,16 @@ describe( 'DependencyExtractionWebpackPlugin modules rebuild', () => {
 		await new Promise( ( resolve ) => compiler.close( resolve ) );
 
 		// The second compilation reuses the file's module from the cache.
-		const builtFiles = Array.from(
-			stats.compilation.builtModules,
-			( { resource } ) => resource
-		);
-		expect( builtFiles ).not.toContain(
-			path.join( fixturesPath, configCase, 'both-kinds.js' )
-		);
+		const { modules } = stats.toJson( {
+			all: false,
+			modules: true,
+			nestedModules: true,
+			cachedModules: true,
+		} );
+		const bothKindsModule = modules
+			.flatMap( ( module ) => [ module, ...( module.modules ?? [] ) ] )
+			.find( ( { name } ) => name === './both-kinds.js' );
+		expect( bothKindsModule ).toMatchObject( { built: false } );
 		expect(
 			getEmittedImports( outputDirectory )[ 'both-kinds.mjs' ]
 		).toEqual( {
