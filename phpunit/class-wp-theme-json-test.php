@@ -3502,7 +3502,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 
 		$this->assertStringContainsString( ':root :where(.wp-block-image img, .wp-block-image .components-resizable-box__container){rotate: 5deg;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img, .wp-block-image .components-resizable-box__container){translate: 0 1rem;}}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img, .wp-block-image .components-resizable-box__container){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
 		$this->assertStringNotContainsString( ':root :where(.wp-block-image){', $css );
 	}
 

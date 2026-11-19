@@ -1833,7 +1833,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'core/image',
 				$image,
 				$offset,
-				'@media (width <= 480px){.%1$s img, .%1$s .components-resizable-box__container{translate:0 10%% !important;}}',
+				'@media (width <= 480px){.%1$s img, .%1$s .components-resizable-box__container{--wp--style--translate-x:0 !important;--wp--style--translate-y:10%% !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 		);
 	}
