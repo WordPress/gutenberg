@@ -108,10 +108,15 @@ const getActionsCell = () =>
 	)!;
 const getDividerOpacity = () =>
 	getComputedStyle( getActionsHeader(), '::after' ).opacity;
-// While a fade is active, its mask is transparent only towards the columns;
-// at rest, it also hides the outline that reaches over them.
+// A fade has its outline only while it is active.
 const isFading = ( style: CSSStyleDeclaration ) =>
-	style.maskImage.includes( 'rgba(0, 0, 0, 0), ' );
+	style.outlineStyle === 'solid';
+// The mask of an active fade: a mask border in Chrome and Safari, a mask
+// image in Firefox.
+const getFadeMask = ( style: CSSStyleDeclaration ) =>
+	style.maskImage === 'none'
+		? style.getPropertyValue( '-webkit-mask-box-image' )
+		: style.maskImage;
 const getRows = () =>
 	Array.from(
 		document.querySelectorAll< HTMLTableRowElement >(
@@ -216,21 +221,23 @@ describe( 'DataViews table scroll fade', () => {
 			scrollToMiddle();
 			const row = getRows()[ 0 ];
 			await expect
-				.poll( () => getComputedStyle( row, '::before' ).maskImage )
-				.toBe(
-					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
+				.poll( () =>
+					getFadeMask( getComputedStyle( row, '::before' ) )
+				)
+				.toContain(
+					`linear-gradient(to ${ start }, rgba(0, 0, 0, 0), `
 				);
-			expect( getComputedStyle( row, '::after' ).maskImage ).toBe(
-				`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
-			);
+			expect(
+				getFadeMask( getComputedStyle( row, '::after' ) )
+			).toContain( `linear-gradient(to ${ end }, rgba(0, 0, 0, 0), ` );
 
 			await render( <PostsTable withActions dir={ dir } /> );
 			scrollToMiddle();
 			await expect
-				.poll( () => getComputedStyle( getActionsHeader() ).maskImage )
-				.toBe(
-					`linear-gradient(to ${ end }, rgba(0, 0, 0, 0), rgb(0, 0, 0) ${ FADE_RAMP }px)`
-				);
+				.poll( () =>
+					getFadeMask( getComputedStyle( getActionsHeader() ) )
+				)
+				.toContain( `linear-gradient(to ${ end }, rgba(0, 0, 0, 0), ` );
 		}
 	);
 
@@ -238,6 +245,9 @@ describe( 'DataViews table scroll fade', () => {
 		await render( <PostsTable /> );
 		scrollToMiddle();
 		const row = getRows()[ 1 ];
+		await expect
+			.poll( () => isFading( getComputedStyle( row, '::before' ) ) )
+			.toBe( true );
 
 		for ( const pseudo of [ '::before', '::after' ] ) {
 			const style = getComputedStyle( row, pseudo );
@@ -245,11 +255,17 @@ describe( 'DataViews table scroll fade', () => {
 			expect( style.outlineColor ).toBe(
 				getComputedStyle( row ).backgroundColor
 			);
-			// The mask covers the outline next to the columns.
-			expect( style.maskSize.split( ', ' )[ 0 ] ).toBe(
-				`calc(100% + ${ FADE_RAMP }px) 100%`
-			);
-			expect( style.maskClip.split( ', ' )[ 0 ] ).toBe( 'no-clip' );
+			// The mask covers the outline next to the columns: with the outset
+			// of a mask border (its last part), or with a mask image that is
+			// not clipped to the cell.
+			const reachesOutline =
+				style.maskImage === 'none'
+					? getFadeMask( style )
+							.split( ' / ' )[ 2 ]
+							.includes( `${ FADE_RAMP }px` )
+					: style.maskSize === `calc(100% + ${ FADE_RAMP }px) 100%` &&
+						style.maskClip === 'no-clip';
+			expect( reachesOutline ).toBe( true );
 		}
 	} );
 
@@ -282,29 +298,20 @@ describe( 'DataViews table scroll fade', () => {
 	// At rest the cells at the edges keep only their share of the row line, so
 	// they do not cover what the columns next to them paint over their space,
 	// like the focus ring of a checkbox.
-	it.each( [
-		[ 'ltr', 'left', 'right' ],
-		[ 'rtl', 'right', 'left' ],
-	] as const )(
+	it.each( [ 'ltr', 'rtl' ] as const )(
 		'only keeps the row line at rest (%s)',
-		async ( dir, start, end ) => {
+		async ( dir ) => {
 			await render( <PostsTable dir={ dir } width={ 1600 } /> );
 
 			// Wait for a frame, so a scroll timeline would have been resolved.
 			await new Promise( requestAnimationFrame );
 			const row = getRows()[ 1 ];
-			for ( const [ pseudo, to ] of [
-				[ '::before', start ],
-				[ '::after', end ],
-			] ) {
+			for ( const pseudo of [ '::before', '::after' ] ) {
 				const style = getComputedStyle( row, pseudo );
 				expect( style.maskImage ).toBe(
-					`linear-gradient(to ${ to }, rgba(0, 0, 0, 0) ${ FADE_RAMP }px, rgb(0, 0, 0) ${ FADE_RAMP }px), linear-gradient(rgb(0, 0, 0) 1px, rgba(0, 0, 0, 0) 1px)`
+					'linear-gradient(rgb(0, 0, 0) 1px, rgba(0, 0, 0, 0) 1px)'
 				);
-				// Firefox lists a value once when it repeats for every layer.
-				expect( style.maskComposite ).toMatch(
-					/^intersect(, intersect)?$/
-				);
+				expect( style.outlineStyle ).toBe( 'none' );
 			}
 		}
 	);
