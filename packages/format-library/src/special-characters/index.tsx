@@ -14,7 +14,7 @@ import {
 	VisuallyHidden,
 } from '@wordpress/ui';
 import { useMemo, useRef, useState } from '@wordpress/element';
-import { insert, useAnchor } from '@wordpress/rich-text';
+import { getActiveFormats, insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import { close, search } from '@wordpress/icons';
 import type { FormatEditProps } from '../types';
@@ -182,7 +182,16 @@ function InlineUI( {
 	}, [ categories, isSearching, query ] );
 
 	function onSelect( option: CharacterOption ) {
-		onChange( insert( value, option.value ) );
+		// Give the character the formats at the caret, as typing does, so
+		// inserting inside a link or bold text doesn't split it.
+		const formats = getActiveFormats( value );
+		onChange(
+			insert( value, {
+				text: option.value,
+				formats: Array( option.value.length ).fill( formats ),
+				replacements: Array( option.value.length ),
+			} )
+		);
 		onClose();
 		onFocus();
 	}
@@ -273,106 +282,120 @@ function InlineUI( {
 						setHighlighted( option )
 					}
 				>
-					<div className="format-library-special-characters__search">
-						<Autocomplete.InputGroup className="format-library-special-characters__search-field">
-							<Autocomplete.Input
-								ref={ inputRef }
-								aria-label={ __( 'Search special characters' ) }
-								placeholder={ __( 'Search' ) }
-								render={
-									<Input
-										prefix={
-											<InputLayout.Slot padding="minimal">
-												<Icon icon={ search } />
-											</InputLayout.Slot>
-										}
-										suffix={
-											isSearching ? (
+					{ /* Caps the content at the space the positioner leaves,
+					so the preview stays on screen on small viewports. */ }
+					<div className="format-library-special-characters__content">
+						<div className="format-library-special-characters__search">
+							<Autocomplete.InputGroup className="format-library-special-characters__search-field">
+								<Autocomplete.Input
+									ref={ inputRef }
+									aria-label={ __(
+										'Search special characters'
+									) }
+									placeholder={ __( 'Search' ) }
+									render={
+										<Input
+											prefix={
 												<InputLayout.Slot padding="minimal">
-													<Autocomplete.Clear
-														aria-label={ __(
-															'Reset search'
-														) }
-													/>
+													<Icon icon={ search } />
 												</InputLayout.Slot>
-											) : undefined
-										}
+											}
+											suffix={
+												isSearching ? (
+													<InputLayout.Slot padding="minimal">
+														<Autocomplete.Clear
+															aria-label={ __(
+																'Reset search'
+															) }
+														/>
+													</InputLayout.Slot>
+												) : undefined
+											}
+										/>
+									}
+								/>
+							</Autocomplete.InputGroup>
+							{ /* Required by `trap-focus`, so keyboard and screen
+						reader users can leave. Like a skip link, it shows only
+						while focused, so it doesn't crowd the search field. */ }
+							<Popover.Close
+								render={
+									<IconButton
+										className="format-library-special-characters__close"
+										variant="minimal"
+										size="compact"
+										tone="neutral"
+										icon={ close }
+										label={ __( 'Close' ) }
 									/>
 								}
 							/>
-						</Autocomplete.InputGroup>
-						{ /* Required by `trap-focus`, so keyboard and screen
-						reader users can leave. */ }
-						<Popover.Close
-							render={
-								<IconButton
-									variant="minimal"
-									size="compact"
-									tone="neutral"
-									icon={ close }
-									label={ __( 'Close' ) }
-								/>
-							}
-						/>
-					</div>
-					<div className="format-library-special-characters__results">
-						<Autocomplete.Empty>
-							{ __( 'No characters found.' ) }
-						</Autocomplete.Empty>
-						<Autocomplete.List aria-label={ __( 'Characters' ) }>
-							<Autocomplete.ListBody
-								className={
-									isSearching
-										? 'format-library-special-characters__list-body is-searching'
-										: 'format-library-special-characters__list-body'
-								}
+						</div>
+						<div className="format-library-special-characters__results">
+							<Autocomplete.Empty>
+								{ __( 'No characters found.' ) }
+							</Autocomplete.Empty>
+							<Autocomplete.List
+								aria-label={ __( 'Characters' ) }
 							>
-								{ isSearching ? (
-									renderRows(
-										items as CharacterOption[],
-										__( 'Search results' )
-									)
-								) : (
-									<Autocomplete.Collection>
-										{ ( group: CharacterOptionGroup ) => (
-											<Autocomplete.Group
-												key={ group.key }
-												items={ group.items }
-												className="format-library-special-characters__group"
-											>
-												<Autocomplete.GroupLabel>
-													{ group.label }
-												</Autocomplete.GroupLabel>
-												{ renderRows(
-													group.items,
-													group.label
-												) }
-											</Autocomplete.Group>
-										) }
-									</Autocomplete.Collection>
-								) }
-							</Autocomplete.ListBody>
-						</Autocomplete.List>
-					</div>
-					{ /* A sighted-user aid only: each cell's accessible name
-					already carries the same name and code point. */ }
-					<div
-						className="format-library-special-characters__preview"
-						aria-hidden="true"
-					>
-						{ highlighted && (
-							<>
-								<span className="format-library-special-characters__preview-character">
-									<CharacterGlyph option={ highlighted } />
-								</span>
-								<Text
-									variant="body-sm"
-									className="format-library-special-characters__preview-name"
+								<Autocomplete.ListBody
+									className={
+										isSearching
+											? 'format-library-special-characters__list-body is-searching'
+											: 'format-library-special-characters__list-body'
+									}
 								>
-									{ describeCharacter( highlighted ) }
-								</Text>
-							</>
-						) }
+									{ isSearching ? (
+										renderRows(
+											items as CharacterOption[],
+											__( 'Search results' )
+										)
+									) : (
+										<Autocomplete.Collection>
+											{ (
+												group: CharacterOptionGroup
+											) => (
+												<Autocomplete.Group
+													key={ group.key }
+													items={ group.items }
+													className="format-library-special-characters__group"
+												>
+													<Autocomplete.GroupLabel>
+														{ group.label }
+													</Autocomplete.GroupLabel>
+													{ renderRows(
+														group.items,
+														group.label
+													) }
+												</Autocomplete.Group>
+											) }
+										</Autocomplete.Collection>
+									) }
+								</Autocomplete.ListBody>
+							</Autocomplete.List>
+						</div>
+						{ /* A sighted-user aid only: each cell's accessible name
+					already carries the same name and code point. */ }
+						<div
+							className="format-library-special-characters__preview"
+							aria-hidden="true"
+						>
+							{ highlighted && (
+								<>
+									<span className="format-library-special-characters__preview-character">
+										<CharacterGlyph
+											option={ highlighted }
+										/>
+									</span>
+									<Text
+										variant="body-sm"
+										className="format-library-special-characters__preview-name"
+									>
+										{ describeCharacter( highlighted ) }
+									</Text>
+								</>
+							) }
+						</div>
 					</div>
 				</Autocomplete.Root>
 			</Popover.Popup>

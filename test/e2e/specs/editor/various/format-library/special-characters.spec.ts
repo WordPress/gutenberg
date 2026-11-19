@@ -64,6 +64,39 @@ test.describe( 'Format Library - Special characters', () => {
 		] );
 	} );
 
+	test( 'keeps a character inserted inside a link in the link', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Go <a href="https://wordpress.org">here now</a>',
+			},
+		} );
+		// Put the caret between "here" and " now", inside the link. At the
+		// link's end, the first ArrowLeft only moves the caret into the link.
+		await editor.canvas.getByRole( 'link', { name: 'here now' } ).click();
+		await page.keyboard.press( 'End' );
+		for ( let i = 0; i < 5; i++ ) {
+			await page.keyboard.press( 'ArrowLeft' );
+		}
+
+		await openPicker( { editor, page } );
+		await page.keyboard.type( 'euro' );
+		await page.keyboard.press( 'Enter' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph' },
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Go <a href="https://wordpress.org">here€ now</a>',
+				},
+			},
+		] );
+	} );
+
 	test( 'returns the caret to the text on Escape', async ( {
 		editor,
 		page,
@@ -95,8 +128,8 @@ test.describe( 'Format Library - Special characters', () => {
 			.getByRole( 'dialog', { name: 'Special characters' } )
 			.getByRole( 'button', { name: 'Close' } );
 
-		// Tab moves from the search field to the Close button, which is
-		// visible so keyboard users can see where focus went.
+		// Tab moves from the search field to the Close button, which shows
+		// while focused so keyboard users can see where focus went.
 		await page.keyboard.press( 'Tab' );
 		await expect( closeButton ).toBeFocused();
 		await expect( closeButton ).toBeVisible();

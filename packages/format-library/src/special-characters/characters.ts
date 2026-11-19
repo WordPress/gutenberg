@@ -422,7 +422,9 @@ function normalize( text: string ): string {
  *
  * @param categories The categories to search.
  * @param search     The search text.
- * @return The matching characters, in category order, without duplicates.
+ * @return The matching characters, in category order, without duplicates. A
+ *         character that is the search itself comes first, so searching "é"
+ *         and pressing Enter inserts "é" rather than "En dash".
  */
 export function searchSpecialCharacters(
 	categories: SpecialCharacterCategory[],
@@ -443,10 +445,10 @@ export function searchSpecialCharacters(
 			const terms = normalize(
 				[ character.name, ...( character.keywords ?? [] ) ].join( ' ' )
 			);
-			if (
-				character.char === trimmed ||
-				words.every( ( word ) => terms.includes( word ) )
-			) {
+			if ( character.char === trimmed ) {
+				seen.add( character.char );
+				results.unshift( character );
+			} else if ( words.every( ( word ) => terms.includes( word ) ) ) {
 				seen.add( character.char );
 				results.push( character );
 			}

@@ -62,6 +62,15 @@ describe( 'searchSpecialCharacters', () => {
 		).toEqual( [ '–' ] );
 	} );
 
+	it( 'puts the searched character itself first', () => {
+		// "é" also matches names containing a plain "e", such as "En dash".
+		const results = searchSpecialCharacters( categories, 'é' ).map(
+			( { char } ) => char
+		);
+		expect( results[ 0 ] ).toBe( 'é' );
+		expect( results ).toContain( '–' );
+	} );
+
 	it( 'matches keywords as well as the name', () => {
 		expect(
 			searchSpecialCharacters( categories, 'NBSP' ).map(

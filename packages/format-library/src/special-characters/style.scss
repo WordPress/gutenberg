@@ -9,6 +9,15 @@
 	--special-characters-grid-width: calc(var(--special-characters-cell-size) * 8 + var(--special-characters-gap) * 7);
 }
 
+// The space the positioner leaves, less the surface's padding and border.
+// The results shrink first, so the search field and the preview stay
+// visible on small viewports.
+.format-library-special-characters__content {
+	display: flex;
+	flex-direction: column;
+	max-height: calc(var(--available-height, 100dvh) - var(--special-characters-padding) * 2 - var(--wpds-border-width-xs) * 2);
+}
+
 .format-library-special-characters__search {
 	display: flex;
 	align-items: center;
@@ -16,6 +25,21 @@
 	padding-block-end: var(--wpds-dimension-padding-sm);
 	// Stretch to the grid's width rather than widening the popover.
 	contain: inline-size;
+	flex-shrink: 0;
+}
+
+// Shown only while focused, like a skip link. Until then it is visually
+// hidden, so the search field takes the full width.
+.format-library-special-characters__close:not(:focus) {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip-path: inset(50%);
+	border: 0;
+	white-space: nowrap;
 }
 
 .format-library-special-characters__search-field {
@@ -28,7 +52,9 @@
 	// and does not jump when it opens above the text.
 	display: grid;
 	grid-template-rows: auto minmax(0, 1fr);
-	height: 260px;
+	// Shrinks below this only when the viewport is too short for it.
+	flex: 0 1 260px;
+	min-height: 0;
 }
 
 // The list's scroller, which also pins each section heading while its rows
@@ -79,7 +105,11 @@
 }
 
 .format-library-special-characters__character-label {
-	font-size: var(--wpds-typography-font-size-xl);
+	// Between the `lg` (15px) and `xl` (20px) tokens, and lighter than the
+	// regular weight: these are previews of the characters, not labels, and
+	// the tokens read too loud for them. Local to this picker for now.
+	font-size: 18px;
+	font-weight: 300;
 }
 
 // The abbreviation shown for a character with no visible glyph, sized to
@@ -104,6 +134,7 @@
 	margin-block-end: calc(-1 * var(--special-characters-padding));
 	padding: var(--wpds-dimension-padding-sm) var(--special-characters-padding);
 	border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
+	flex-shrink: 0;
 }
 
 .format-library-special-characters__preview-name {
