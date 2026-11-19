@@ -437,20 +437,20 @@ function ListViewBlock( {
 			// field). For mouse clicks, keep focus in the list view so that
 			// subsequent keyboard operations (arrow navigation, copy/paste)
 			// still work.
-			const isMembershipToggle =
+			const isUpdatingSetSelection =
 				! event.shiftKey &&
 				! event.altKey &&
 				( ( 'keyCode' in event && event.keyCode === SPACE ) ||
 					( isAppleOS() ? event.metaKey : event.ctrlKey ) );
 			const isKeyboardActivation =
-				event?.detail === 0 && ! isMembershipToggle;
+				event?.detail === 0 && ! isUpdatingSetSelection;
 			event.preventDefault();
 			await selectBlock(
 				event,
 				clientId,
 				isKeyboardActivation ? 0 : null
 			);
-			if ( isMembershipToggle ) {
+			if ( isUpdatingSetSelection ) {
 				// Enabling/disabling the drag wrapper can remount the row's link.
 				await focusListItem( clientId, treeGridElementRef?.current );
 			}
