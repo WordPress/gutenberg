@@ -321,6 +321,39 @@ describe( 'TransformPanel offsets', () => {
 		} );
 	} );
 
+	it( 'uses the inherited unit for an empty axis until another unit is picked', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				inheritedValue={ {
+					transform: { translate: { x: '3rem' } },
+				} }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const [ xUnit ] = screen.getAllByRole( 'combobox', {
+			name: 'Select unit',
+		} );
+		expect( xUnit ).toHaveValue( 'rem' );
+
+		const xOffset = screen.getByRole( 'spinbutton', { name: 'X offset' } );
+		await user.type( xOffset, '1' );
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { x: '1rem' } },
+		} );
+
+		await user.clear( xOffset );
+		await user.selectOptions( xUnit, 'px' );
+		await user.type( xOffset, '2' );
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { x: '2px' } },
+		} );
+	} );
+
 	it( 'clears both axes and the rotation on reset all', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();

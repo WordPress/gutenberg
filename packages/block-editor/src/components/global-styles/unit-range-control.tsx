@@ -80,7 +80,8 @@ export default function UnitRangeControl( {
 					className="block-editor-global-styles-unit-range-control__input"
 					label={ controlLabel }
 					hideLabelFromVision
-					value={ value ?? '' }
+					// A bare unit keeps the select on `selectedUnit` while the field is empty.
+					value={ value || selectedUnit }
 					placeholder={ placeholderQuantity?.toString() }
 					units={ units }
 					onChange={ handleChange }
