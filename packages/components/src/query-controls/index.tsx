@@ -1,9 +1,9 @@
 import { __, _x } from '@wordpress/i18n';
+import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import AuthorSelect from './author-select';
 import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
-import SelectControl from '../select-control';
 import { VStack } from '../v-stack';
 import type {
 	QueryControlsProps,
@@ -91,42 +91,51 @@ export function QueryControls( {
 	// but instead are destructured inline where necessary.
 	...props
 }: QueryControlsProps ) {
+	useEnableWpCompatOverlaySlot();
+
+	const sortValue =
+		orderBy === undefined || order === undefined
+			? null
+			: `${ orderBy }/${ order }`;
+	const selectedOrderByOption =
+		orderByOptions?.find( ( option ) => option.value === sortValue ) ??
+		null;
+
 	return (
 		<VStack spacing="4" className="components-query-controls">
 			{ [
-				onOrderChange && onOrderByChange && (
-					<SelectControl
-						key="query-controls-order-select"
-						label={ __( 'Order by' ) }
-						value={
-							orderBy === undefined || order === undefined
-								? undefined
-								: `${ orderBy }/${ order }`
-						}
-						options={ orderByOptions }
-						onChange={ ( value ) => {
-							if ( typeof value !== 'string' ) {
-								return;
-							}
+				onOrderChange &&
+					onOrderByChange &&
+					!! orderByOptions?.length && (
+						<SelectControl
+							key="query-controls-order-select"
+							label={ __( 'Order by' ) }
+							items={ orderByOptions }
+							value={ selectedOrderByOption }
+							onValueChange={ ( item ) => {
+								if ( typeof item?.value !== 'string' ) {
+									return;
+								}
 
-							const [ newOrderBy, newOrder ] = value.split( '/' );
-							if ( newOrder !== order ) {
-								onOrderChange(
-									newOrder as NonNullable<
-										QueryControlsProps[ 'order' ]
-									>
-								);
-							}
-							if ( newOrderBy !== orderBy ) {
-								onOrderByChange(
-									newOrderBy as NonNullable<
-										QueryControlsProps[ 'orderBy' ]
-									>
-								);
-							}
-						} }
-					/>
-				),
+								const [ newOrderBy, newOrder ] =
+									item.value.split( '/' );
+								if ( newOrder !== order ) {
+									onOrderChange(
+										newOrder as NonNullable<
+											QueryControlsProps[ 'order' ]
+										>
+									);
+								}
+								if ( newOrderBy !== orderBy ) {
+									onOrderByChange(
+										newOrderBy as NonNullable<
+											QueryControlsProps[ 'orderBy' ]
+										>
+									);
+								}
+							} }
+						/>
+					),
 				isSingleCategorySelection( props ) &&
 					props.categoriesList &&
 					props.onCategoryChange && (
