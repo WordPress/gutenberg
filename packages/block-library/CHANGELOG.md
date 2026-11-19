@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Search: Show a focus outline around the button-inside field when its input is focused ([#87020](https://github.com/WordPress/gutenberg/pull/87020)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Enhancements
