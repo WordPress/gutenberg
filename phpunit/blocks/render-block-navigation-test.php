@@ -13,6 +13,58 @@
  */
 class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	/**
+	 * Theme root directory used by tests that need a block theme.
+	 *
+	 * @var string|null
+	 */
+	private $theme_root;
+
+	/**
+	 * Original theme directories, restored after tests that switch themes.
+	 *
+	 * @var array|null
+	 */
+	private $orig_theme_dir;
+
+	public function tear_down() {
+		if ( null !== $this->theme_root ) {
+			remove_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
+			remove_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
+			remove_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
+			$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
+			wp_clean_themes_cache();
+			unset( $GLOBALS['wp_themes'] );
+			_gutenberg_clean_theme_json_caches();
+			$this->theme_root = null;
+		}
+		parent::tear_down();
+	}
+
+	public function filter_set_theme_root() {
+		return $this->theme_root;
+	}
+
+	/**
+	 * Switches to the `block-theme` test theme from `phpunit/data/themedir1`.
+	 */
+	private function switch_to_block_theme() {
+		$this->theme_root     = realpath( dirname( __DIR__ ) . '/data/themedir1' );
+		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
+
+		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
+
+		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
+
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+
+		switch_theme( 'block-theme' );
+	}
+
+	/**
 	 * @covers gutenberg_block_core_navigation_from_block_get_post_ids
 	 */
 	public function test_block_core_navigation_get_post_ids_from_block() {
@@ -310,5 +362,156 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			'<nav class="wp-block-navigation ' . $responsive_class . '"><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>Two</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li>Nested</li></ul></nav></div></nav>',
 			$actual
 		);
+	}
+
+	/**
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_custom_css_targets_only_the_navigation_wrapper() {
+		$markup = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","style":{"css":"border: 1px solid pink; padding: 10px;"}} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->' );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertSame( 1, preg_match( '/\bwp-custom-css-[a-f0-9]+\b/', $processor->get_attribute( 'class' ), $matches ) );
+
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertFalse( $processor->has_class( $matches[0] ), 'The Navigation block custom CSS must not also target its inner list.' );
+	}
+
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
+	 */
+	public function test_global_styles_custom_css_targets_only_the_navigation_wrapper() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/navigation' => array(
+							'css' => 'border: 1px solid pink;',
+						),
+					),
+				),
+			)
+		);
+
+		$this->assertStringContainsString(
+			':root :where(.wp-block-navigation:not(.wp-block-navigation__container)){border: 1px solid pink;}',
+			$theme_json->get_stylesheet( array( 'styles' ) ),
+			'Global Styles custom CSS for Navigation must not also target its inner list.'
+		);
+	}
+
+	/**
+	 * Tests that block style variations applied to blocks inside a navigation
+	 * menu post are generated on the frontend.
+	 *
+	 * @ticket 85833
+	 *
+	 * @covers ::gutenberg_block_core_navigation_filter_block_data
+	 */
+	public function test_block_style_variation_is_rendered_for_blocks_inside_a_navigation_menu() {
+		$this->switch_to_block_theme();
+		$original_styles = clone wp_styles();
+		register_block_style(
+			'core/navigation-link',
+			array(
+				'name'       => 'pill',
+				'style_data' => array(
+					'color' => array(
+						'text' => '#123456',
+					),
+				),
+			)
+		);
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_deregister_style( 'block-style-variation-styles' );
+			$navigation_id = self::factory()->post->create(
+				array(
+					'post_type'    => 'wp_navigation',
+					'post_status'  => 'publish',
+					'post_content' => '<!-- wp:navigation-link {"label":"Home","url":"https://example.org","className":"is-style-pill"} /-->',
+				)
+			);
+
+			$html       = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","ref":' . $navigation_id . '} /-->' );
+			$styles     = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$stylesheet = is_array( $styles ) ? implode( '', $styles ) : '';
+
+			$this->assertStringContainsString( 'is-style-pill--', $html );
+			$this->assertStringContainsString( 'color: #123456', $stylesheet );
+		} finally {
+			unregister_block_style( 'core/navigation-link', 'pill' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$GLOBALS['wp_styles'] = $original_styles;
+		}
+	}
+
+	/**
+	 * Tests that referenced submenu variations precede their children's styles.
+	 *
+	 * @ticket 85833
+	 *
+	 * @covers ::gutenberg_block_core_navigation_filter_block_data
+	 */
+	public function test_referenced_navigation_variation_styles_preserve_nested_order() {
+		$this->switch_to_block_theme();
+		$original_styles = clone wp_styles();
+		register_block_style(
+			'core/navigation-submenu',
+			array(
+				'name'       => 'navigation-parent-test',
+				'style_data' => array(
+					'blocks' => array(
+						'core/navigation-link' => array(
+							'color' => array(
+								'text' => '#ff0000',
+							),
+						),
+					),
+				),
+			)
+		);
+		register_block_style(
+			'core/navigation-link',
+			array(
+				'name'       => 'navigation-child-test',
+				'style_data' => array(
+					'color' => array(
+						'text' => '#0000ff',
+					),
+				),
+			)
+		);
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			wp_deregister_style( 'block-style-variation-styles' );
+			$navigation_id = self::factory()->post->create(
+				array(
+					'post_type'    => 'wp_navigation',
+					'post_status'  => 'publish',
+					'post_content' => '<!-- wp:navigation-submenu {"label":"Parent","className":"is-style-navigation-parent-test"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.org/child","kind":"custom","className":"is-style-navigation-child-test"} /--><!-- /wp:navigation-submenu -->',
+				)
+			);
+			$html          = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","ref":' . $navigation_id . '} /-->' );
+			$styles        = wp_styles()->get_data( 'block-style-variation-styles', 'after' );
+			$stylesheet    = is_array( $styles ) ? implode( '', $styles ) : '';
+			$parent_rule   = strpos( $stylesheet, 'color: #ff0000' );
+			$child_rule    = strpos( $stylesheet, 'color: #0000ff' );
+
+			$this->assertStringContainsString( 'is-style-navigation-parent-test--', $html );
+			$this->assertStringContainsString( 'is-style-navigation-child-test--', $html );
+			$this->assertNotFalse( $parent_rule );
+			$this->assertNotFalse( $child_rule );
+			$this->assertLessThan( $child_rule, $parent_rule, 'The child variation must be able to override its parent.' );
+		} finally {
+			unregister_block_style( 'core/navigation-submenu', 'navigation-parent-test' );
+			unregister_block_style( 'core/navigation-link', 'navigation-child-test' );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+			$GLOBALS['wp_styles'] = $original_styles;
+		}
 	}
 }

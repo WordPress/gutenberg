@@ -370,7 +370,7 @@ test.describe( 'Footnotes', () => {
 			.getByRole( 'tab', { name: 'Post' } )
 			.click();
 		await page
-			.locator( '.editor-private-post-last-revision__button' )
+			.getByRole( 'button', { name: /Open revisions screen/ } )
 			.click();
 		await page.locator( '.components-range-control__slider' ).focus();
 		await page.keyboard.press( 'ArrowLeft' );
@@ -541,5 +541,69 @@ test.describe( 'Footnotes meta written by something else', () => {
 			params: { context: 'edit' },
 		} );
 		expect( saved.content.raw ).toContain( 'a paragraph' );
+	} );
+} );
+
+test.describe( 'Footnotes in a post type with a locked template', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-footnotes-locked-template'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-footnotes-locked-template'
+		);
+	} );
+
+	// Adding the first footnote inserts a Footnotes block, which a locked
+	// template refuses. The button would add a footnote number with nowhere
+	// to write the note.
+	test( 'does not offer the Footnote button when a Footnotes block cannot be inserted', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { postType: 'locked-paragraph' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await page.keyboard.type( 'text' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+
+		const moreMenu = page.getByRole( 'menu', { name: 'More' } );
+		await expect( moreMenu ).toBeVisible();
+		await expect(
+			moreMenu.getByRole( 'menuitem', { name: 'Footnote', exact: true } )
+		).toBeHidden();
+	} );
+
+	test( 'adds a footnote when the locked template includes a Footnotes block', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost( { postType: 'locked-footnotes' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.click();
+		await page.keyboard.type( 'text' );
+
+		await editor.showBlockToolbar();
+		await editor.clickBlockToolbarButton( 'More' );
+		await page
+			.getByRole( 'menuitem', { name: 'Footnote', exact: true } )
+			.click();
+
+		await page.keyboard.type( 'cited source' );
+
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Footnotes',
+			} )
+		).toContainText( 'cited source' );
 	} );
 } );

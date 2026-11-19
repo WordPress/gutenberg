@@ -15,13 +15,13 @@ describe( 'getFooterMessage', () => {
 	afterEach( () => vi.restoreAllMocks() );
 
 	it.each( [
-		[ 1234, 10, 1234567, false, '1,234 Items selected' ],
-		[ 0, 1234, 1234567, false, '1,234 of 1,234,567 Items' ],
-		[ 0, 1234567, 1234567, false, '1,234,567 Items' ],
-		[ 0, 10, 1234567, true, '1,234,567 Items' ],
-		[ 1, 10, 1234567, false, '1 Item selected' ],
-		[ 0, 1, 1, false, '1 Item' ],
-		[ 0, 0, 0, false, '0 Items' ],
+		[ 1234, 10, 1234567, false, '1,234 items selected' ],
+		[ 0, 1234, 1234567, false, '1,234 of 1,234,567 items' ],
+		[ 0, 1234567, 1234567, false, '1,234,567 items' ],
+		[ 0, 10, 1234567, true, '1,234,567 items' ],
+		[ 1, 10, 1234567, false, '1 item selected' ],
+		[ 0, 1, 1, false, '1 item' ],
+		[ 0, 0, 0, false, '0 items' ],
 	] )(
 		'formats the count for selection %i, page %i, total %i, total-only %s',
 		( selection, page, total, totalOnly, expected ) => {
@@ -39,13 +39,13 @@ describe( 'getFooterMessage', () => {
 		);
 
 		expect( getFooterMessage( 1234, 10, 1234567 ) ).toBe(
-			'1.234 Items selected'
+			'1.234 items selected'
 		);
 		expect( getFooterMessage( 0, 1234, 1234567 ) ).toBe(
-			'1.234 of 1.234.567 Items'
+			'1.234 of 1.234.567 items'
 		);
 		expect( getFooterMessage( 0, 10, 1234567, true ) ).toBe(
-			'1.234.567 Items'
+			'1.234.567 items'
 		);
 	} );
 } );

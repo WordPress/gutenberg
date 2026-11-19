@@ -17,7 +17,6 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 
 | Attribute | [Type](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#type-validation) | [Default](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#default-value) | Description |
 |-----------|------|---------|-------------|
-| `headings` | `array` | `[]` | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `local` |
 | `onlyIncludeCurrentPage` | `boolean` | `false` | — |
 | `maxLevel` | `number` | — | — |
 | `ordered` | `boolean` | `true` | — |
@@ -48,6 +47,15 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+
+## Context
+
+_Defined via the [`usesContext` and `providesContext`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-context/) properties in block.json._
+
+**Uses context:**
+
+- `postId`
+- `postType`
 
 ## Block Markup
 

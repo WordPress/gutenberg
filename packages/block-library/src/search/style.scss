@@ -82,6 +82,15 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 			flex-basis: 0;
 		}
 	}
+
+	// Don't clip the focus indicator of the button while the field is collapsed.
+	&.wp-block-search__searchfield-hidden:focus-within {
+		overflow: visible;
+
+		.wp-block-search__inside-wrapper {
+			overflow: visible;
+		}
+	}
 }
 
 // We are lowering the specificity so that the input element can override the rule for the input element inside the search block.

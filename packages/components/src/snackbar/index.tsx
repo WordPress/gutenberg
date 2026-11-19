@@ -24,6 +24,9 @@ import type { NoticeAction } from '../notice/types';
 import type { WordPressComponentProps } from '../context';
 
 const NOTICE_TIMEOUT = 6000;
+// Snackbars with an action stay up longer, so there is time to read the
+// message and then use the action.
+const NOTICE_TIMEOUT_WITH_ACTIONS = 10000;
 
 /**
  * Custom hook which announces the message with the given politeness, if a
@@ -100,6 +103,16 @@ function UnforwardedSnackbar(
 		onRemove?.();
 	}
 
+	function onKeyPress( event: KeyboardEvent< HTMLDivElement > ) {
+		// A key press on the action bubbles up to here. Leave it to the action:
+		// dismissing would cancel the key press, so the action would not run.
+		if ( event.target !== event.currentTarget ) {
+			return;
+		}
+
+		dismissMe( event );
+	}
+
 	function onActionClick(
 		event: MouseEvent< HTMLButtonElement | HTMLAnchorElement >,
 		onClick: NoticeAction[ 'onClick' ]
@@ -122,6 +135,9 @@ function UnforwardedSnackbar(
 		callbacksRef.current = { onDismiss, onRemove };
 	} );
 
+	const timeout =
+		actions.length > 0 ? NOTICE_TIMEOUT_WITH_ACTIONS : NOTICE_TIMEOUT;
+
 	useEffect( () => {
 		if ( explicitDismiss || ! isPresent ) {
 			return;
@@ -130,10 +146,10 @@ function UnforwardedSnackbar(
 		const timeoutHandle = setTimeout( () => {
 			callbacksRef.current.onDismiss?.();
 			callbacksRef.current.onRemove?.();
-		}, NOTICE_TIMEOUT );
+		}, timeout );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss, isPresent ] );
+	}, [ explicitDismiss, isPresent, timeout ] );
 
 	const classes = clsx( className, 'components-snackbar', {
 		'components-snackbar-explicit-dismiss': !! explicitDismiss,
@@ -159,7 +175,7 @@ function UnforwardedSnackbar(
 			onClick={ ! explicitDismiss ? dismissMe : undefined }
 			tabIndex={ 0 }
 			role={ ! explicitDismiss ? 'button' : undefined }
-			onKeyPress={ ! explicitDismiss ? dismissMe : undefined }
+			onKeyPress={ ! explicitDismiss ? onKeyPress : undefined }
 			aria-label={
 				! explicitDismiss ? __( 'Dismiss this notice' ) : undefined
 			}

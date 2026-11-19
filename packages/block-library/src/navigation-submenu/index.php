@@ -277,11 +277,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		 * Shadow serialization is skipped for this block so the shadow lands on the
 		 * dropdown panel, the floating layer it is meant for, and not the menu item.
 		 */
-		if ( ! empty( $attributes['style']['shadow'] ) ) {
-			$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
-			if ( ! empty( $shadow_styles['css'] ) ) {
-				$style_attribute .= $shadow_styles['css'];
-			}
+		$shadow_attributes = wp_get_shadow_classes_and_styles( $attributes );
+		if ( ! empty( $shadow_attributes['style'] ) ) {
+			$style_attribute .= $shadow_attributes['style'];
 		}
 
 		if ( strpos( $inner_blocks_html, 'current-menu-item' ) ) {
@@ -318,7 +316,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
  * @since 5.9.0
  *
  * @uses render_block_core_navigation_submenu()
- * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_submenu() {
 	register_block_type_from_metadata(

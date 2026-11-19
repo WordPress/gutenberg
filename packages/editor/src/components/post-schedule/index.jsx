@@ -1,6 +1,6 @@
-import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { speak } from '@wordpress/a11y';
-import { getSettings } from '@wordpress/date';
+import { date as formatDate, getSettings } from '@wordpress/date';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -12,6 +12,58 @@ import { getFullPostScheduleLabel } from './label';
 import { unlock } from '../../lock-unlock';
 
 const { PrivatePublishDateTimePicker } = unlock( blockEditorPrivateApis );
+
+/**
+ * Today's month in the site's timezone: the month the date picker shows when
+ * there is no date. The browser's month can differ near a month boundary.
+ *
+ * @return {Date} The first day of the month.
+ */
+function getSiteMonth() {
+	const now = new Date();
+	return new Date(
+		Number( formatDate( 'Y', now ) ),
+		Number( formatDate( 'n', now ) ) - 1,
+		1
+	);
+}
+
+/**
+ * Formats the day of a date with a time, without a timezone.
+ *
+ * @param {Date}   date The date.
+ * @param {string} time The time, as `H:i:s`.
+ *
+ * @return {string} The date, e.g. `2026-10-31T23:59:59`.
+ */
+function toTimezonelessDate( date, time ) {
+	const pad = ( number ) => String( number ).padStart( 2, '0' );
+	return `${ date.getFullYear() }-${ pad( date.getMonth() + 1 ) }-${ pad(
+		date.getDate()
+	) }T${ time }`;
+}
+
+/**
+ * The bounds of the posts query for the month of a date. The server reads a
+ * date without a timezone in the site's timezone, as `post_date` is, so the
+ * bounds carry none. Both are exclusive: they are the last second of the
+ * previous month and the first second of the next one.
+ *
+ * @param {Date} date A date in the month.
+ *
+ * @return {{after: string, before: string}} The bounds.
+ */
+function getMonthBounds( date ) {
+	const year = date.getFullYear();
+	const month = date.getMonth();
+	return {
+		after: toTimezonelessDate( new Date( year, month, 0 ), '23:59:59' ),
+		before: toTimezonelessDate(
+			new Date( year, month + 1, 1 ),
+			'00:00:00'
+		),
+	};
+}
 
 /**
  * Renders the PostSchedule component. It allows the user to schedule a post.
@@ -61,17 +113,25 @@ export function PrivatePostSchedule( {
 		);
 	};
 
-	const [ previewedMonth, setPreviewedMonth ] = useState(
-		startOfMonth( new Date( postDate ) )
+	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
+		postDate ? new Date( postDate ) : getSiteMonth()
 	);
+
+	// The calendar moves to the month of a new date, from the Month and Year
+	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
+	// markers come from the month on screen.
+	const [ prevPostDate, setPrevPostDate ] = useState( postDate );
+	if ( postDate !== prevPostDate ) {
+		setPrevPostDate( postDate );
+		setPreviewedMonth( postDate ? new Date( postDate ) : getSiteMonth() );
+	}
 
 	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', postType, {
 				status: 'publish,future',
-				after: startOfMonth( previewedMonth ).toISOString(),
-				before: endOfMonth( previewedMonth ).toISOString(),
+				...getMonthBounds( previewedMonth ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
 				per_page: 100,
 				_fields: 'id,date',

@@ -83,18 +83,26 @@ $footer-height: 90px;
 	font-size: 11px;
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-transform: uppercase;
+}
 
-	@include mixins.break-small() {
-		.components-select-control__input {
-			font-size: 11px !important;
-			font-weight: var(--wpds-typography-font-weight-emphasis);
-		}
+.font-library__page-selection-trigger {
+	font-size: inherit;
+
+	button {
+		font-weight: inherit;
 	}
 }
 
 .font-library__search {
 	// Fixed width to ensure the control doesn't resize with the reset button.
 	width: 240px;
+}
+
+.font-library__category {
+	// Keep the width independent of the selected label while leaving room for Search.
+	width: 192px;
+	max-width: 50%;
+	flex-shrink: 0;
 }
 
 .font-library__fonts-title {

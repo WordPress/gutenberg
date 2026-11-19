@@ -69,7 +69,7 @@ const processFile = ( rootDir, inputFile ) => {
 		currentFileStack.pop();
 		return result;
 	} catch ( e ) {
-		process.stderr.write( `\n${ e }` );
+		process.stderr.write( `\n${ inputFile }: ${ e }` );
 		process.stderr.write( '\n' );
 		process.exit( 1 );
 	}

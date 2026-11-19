@@ -17,11 +17,12 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .markdownlintignore
     ├── .npmpackagejsonlintrc.json
     ├── phpcs.xml.dist
+    ├── phpstan.neon.dist
+    ├── phpstan-strict.neon.dist
     │   Dot files and config files used to configure the various linting tools
     │   used in the repository (PHP, JS, styles...).
     │
     ├── .browserslistrc
-    ├── babel.config.js
     ├── jsconfig.json
     ├── tsconfig.json
     ├── tsconfig.build.json
@@ -126,6 +127,9 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │
     ├── tools/eslint
     │   Configuration files for the ESLint linter.
+    │
+    ├── tools/phpstan
+    │   Configuration files for the PHPStan analysis, and the script that reports its results in CI.
     │
     ├── tools/webpack
     │   Configuration files for the webpack build.

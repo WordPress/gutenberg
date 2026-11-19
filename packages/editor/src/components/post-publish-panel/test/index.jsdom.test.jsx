@@ -79,9 +79,25 @@ describe( 'PostPublishPanel', () => {
 			select( editorStore ),
 			'isEditedPostBeingScheduled'
 		).mockReturnValue( true );
+		// Scheduled for tomorrow, which the short label calls "Tomorrow".
+		vi.useFakeTimers( { toFake: [ 'Date' ] } );
+		vi.setSystemTime( new Date( '2030-03-14T12:00:00Z' ) );
+		const getEditedPostAttribute =
+			select( editorStore ).getEditedPostAttribute;
+		vi.spyOn(
+			select( editorStore ),
+			'getEditedPostAttribute'
+		).mockImplementation( ( name ) =>
+			name === 'date'
+				? '2030-03-15T10:00:00'
+				: getEditedPostAttribute( name )
+		);
 
 		render( <PostPublishPanel /> );
+		vi.useRealTimers();
 
-		expect( screen.getByText( /is now scheduled/ ) ).toBeInTheDocument();
+		expect( screen.getByText( /is now scheduled/ ) ).toHaveTextContent(
+			'(no title)↗ is now scheduled. It will go live on March 15, 2030 10:00 am UTC+0.'
+		);
 	} );
 } );

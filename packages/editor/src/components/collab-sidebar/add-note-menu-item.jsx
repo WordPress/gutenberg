@@ -11,42 +11,45 @@ import { unlock } from '../../lock-unlock';
 
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
-function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
-	const block = useSelect(
+function NoteMenuItem( { clientIds, onClick, isDistractionFree } ) {
+	const { isValid, isClassicBlock, shortcut } = useSelect(
 		( select ) => {
-			return select( blockEditorStore ).getBlock( clientId );
+			const { getBlockName, isBlockValid } = select( blockEditorStore );
+			return {
+				isValid: clientIds.every(
+					( clientId ) =>
+						isBlockValid( clientId ) &&
+						getBlockName( clientId ) !==
+							getUnregisteredTypeHandlerName()
+				),
+				isClassicBlock: clientIds.some(
+					( clientId ) => getBlockName( clientId ) === 'core/freeform'
+				),
+				shortcut: select(
+					keyboardShortcutsStore
+				).getShortcutRepresentation( 'core/editor/new-note' ),
+			};
 		},
-		[ clientId ]
-	);
-	const shortcut = useSelect(
-		( select ) =>
-			select( keyboardShortcutsStore ).getShortcutRepresentation(
-				'core/editor/new-note'
-			),
-		[]
+		[ clientIds ]
 	);
 
-	if (
-		! block?.isValid ||
-		block?.name === getUnregisteredTypeHandlerName()
-	) {
+	if ( ! isValid ) {
 		return null;
 	}
 
-	const isDisabled = isDistractionFree || block?.name === 'core/freeform';
+	const isDisabled = isDistractionFree || isClassicBlock;
 
 	let infoText;
 
 	if ( isDistractionFree ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
-	} else if ( block?.name === 'core/freeform' ) {
+	} else if ( isClassicBlock ) {
 		infoText = __( 'Convert to blocks to add notes.' );
 	}
 
 	return (
 		<MenuItem
 			onClick={ onClick }
-			aria-haspopup="dialog"
 			disabled={ isDisabled }
 			info={ infoText }
 			shortcut={ shortcut }
@@ -59,12 +62,12 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 export function AddNoteMenuItem( { onClick, isDistractionFree } ) {
 	return (
 		<NoteIconSlotFill.Fill>
-			{ ( { clientId, onClose } ) => (
+			{ ( { clientIds, onClose } ) => (
 				<NoteMenuItem
-					clientId={ clientId }
+					clientIds={ clientIds }
 					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
-						onClick( clientId );
+						onClick( clientIds );
 						onClose();
 					} }
 				/>

@@ -40,7 +40,3 @@ interface NavigationButtonProps {
 export function NavigationButtonAsItem( props: NavigationButtonProps ) {
 	return <Navigator.Button as={ GenericNavigationButton } { ...props } />;
 }
-
-export function NavigationBackButtonAsItem( props: NavigationButtonProps ) {
-	return <Navigator.BackButton as={ GenericNavigationButton } { ...props } />;
-}

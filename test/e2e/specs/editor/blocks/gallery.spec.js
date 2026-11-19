@@ -108,9 +108,58 @@ test.describe( 'Gallery', () => {
 
 		// Check that content has a valid gallery with an image.
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
+	} );
+
+	test( 'links an added image using the site default until a link is chosen', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page.evaluate( () => {
+			window.wp.media.view.settings.defaultProps.link = 'file';
+		} );
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/gallery',
+				innerBlocks: [
+					{
+						attributes: {
+							href: uploadedMedia.source_url,
+							linkDestination: 'media',
+						},
+					},
+				],
+			},
+		] );
+		const [ gallery ] = await editor.getBlocks();
+		expect( gallery.attributes ).not.toHaveProperty( 'linkTo' );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Gallery' } )
+		);
+		await editor.clickBlockToolbarButton( 'Link' );
+		await expect(
+			page.getByRole( 'menuitemradio', {
+				name: 'Link images to media files',
+			} )
+		).toBeChecked();
 	} );
 
 	test( 'gallery caption can be edited', async ( {
@@ -154,6 +203,70 @@ test.describe( 'Gallery', () => {
 			.toMatch(
 				new RegExp( `<figcaption.*?>${ galleryCaption }</figcaption>` )
 			);
+	} );
+
+	test( 'applies the gallery size and link to an added image', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: { linkTo: 'media', sizeSlug: 'medium' },
+			innerBlocks: [
+				{
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+					},
+				},
+			],
+		} );
+
+		const image = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect( image ).toContainClass( 'size-medium' );
+		await expect( image.getByRole( 'link' ) ).toHaveAttribute(
+			'href',
+			uploadedMedia.source_url
+		);
+	} );
+
+	test( 'keeps the link and size of saved images', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const post = await requestUtils.createPost( {
+			status: 'draft',
+			content: `<!-- wp:gallery {"linkTo":"media","sizeSlug":"medium"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":${ landscapeMedia.id },"sizeSlug":"full","linkDestination":"custom"} -->
+<figure class="wp-block-image size-full"><a href="https://example.com/custom"><img src="${ landscapeMedia.source_url }" alt="" class="wp-image-${ landscapeMedia.id }"/></a></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->`,
+		} );
+		await admin.editPost( post.id );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Gallery' } )
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'Settings' } ).click();
+
+		// The Resolution control appears once the attachment loads.
+		await expect(
+			page.getByRole( 'combobox', { name: 'Resolution' } )
+		).toBeVisible();
+		const image = editor.canvas.getByRole( 'document', {
+			name: 'Block: Image',
+		} );
+		await expect( image ).toContainClass( 'size-full' );
+		await expect( image.getByRole( 'link' ) ).toHaveAttribute(
+			'href',
+			'https://example.com/custom'
+		);
 	} );
 
 	test( 'Grid layout uses native controls without Gallery Flex child styles', async ( {
