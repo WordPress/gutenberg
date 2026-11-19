@@ -16,7 +16,9 @@ Tooling for the [PHPStan](https://phpstan.org/) static analysis of the PHP in th
 The `PHP static analysis` job in `.github/workflows/unit-test.yml` writes the report of each analysis as JSON and passes it to `report.ts` with the workspace's `report` script, adding `--strict` for the report of the strict paths:
 
 ```bash
-npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>
+npm run --workspace @wordpress/phpstan-tools report -- [--strict [--default-report <default-report.json>]] <report.json>
 ```
+
+The analysis of the strict paths includes every rule of the other analysis, so an error at the lower rule level in a strict path is reported by both. The job passes the report of `phpstan.neon.dist` as `--default-report`, so that the report of the strict paths leaves out the errors that the other report already shows, and each error is annotated once.
 
 The script imports nothing outside Node, which runs it by stripping the types, so it needs no build step and no installed dependencies. A relative path to the report is resolved from the directory that npm is run in. The script is type checked by `npm run typecheck` and linted by `npm run lint:js`.

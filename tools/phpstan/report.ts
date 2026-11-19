@@ -14,11 +14,17 @@
  * and explains the most common of those: a baseline entry that no longer
  * matches, because the error it recorded was fixed.
  *
- * Usage: `npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>`
+ * Usage: `npm run --workspace @wordpress/phpstan-tools report -- [--strict [--default-report <default-report.json>]] <report.json>`
  *
  * The report is the output of `phpstan analyse --error-format=json`. Pass
  * `--strict` for the report of the analysis of the strict paths, with
  * phpstan-strict.neon.dist, rather than that of phpstan.neon.dist.
+ *
+ * The analysis of the strict paths includes every rule of the other analysis,
+ * so an error at the lower rule level in a strict path is reported by both. Pass
+ * the report of phpstan.neon.dist as `--default-report` to leave out of the
+ * report of the strict paths the errors that it already reports, so that each
+ * is shown once.
  */
 
 import { appendFileSync, readFileSync } from 'node:fs';
@@ -68,7 +74,7 @@ interface Analysis {
 }
 
 const USAGE =
-	'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict] <report.json>\n';
+	'Usage: npm run --workspace @wordpress/phpstan-tools report -- [--strict [--default-report <default-report.json>]] <report.json>\n';
 
 let args: ReturnType< typeof parseArguments >;
 try {
@@ -80,7 +86,10 @@ try {
 	);
 	process.exit( 2 );
 }
-if ( args.positionals.length !== 1 ) {
+if (
+	args.positionals.length !== 1 ||
+	( args.values[ 'default-report' ] !== undefined && ! args.values.strict )
+) {
 	process.stderr.write( USAGE );
 	process.exit( 2 );
 }
@@ -92,13 +101,17 @@ if ( args.positionals.length !== 1 ) {
  */
 function parseArguments() {
 	return parseArgs( {
-		options: { strict: { type: 'boolean', default: false } },
+		options: {
+			strict: { type: 'boolean', default: false },
+			'default-report': { type: 'string' },
+		},
 		allowPositionals: true,
 	} );
 }
 
 const isStrict = args.values.strict;
 const REPORT_PATH = args.positionals[ 0 ];
+const DEFAULT_REPORT_PATH = args.values[ 'default-report' ];
 
 const ANALYSIS: Analysis = isStrict
 	? {
@@ -386,21 +399,81 @@ function formatLocation( error: PhpstanError ): string {
 }
 
 /**
+ * Identifies an error, for matching it with the same error in another report.
+ *
+ * @param error The error.
+ * @return The key.
+ */
+function errorKey( error: PhpstanError ): string {
+	return JSON.stringify( [
+		error.file,
+		error.line,
+		error.identifier,
+		error.message,
+	] );
+}
+
+/**
+ * Leaves out the errors that the other analysis already reports, once for each
+ * time that it reports them.
+ *
+ * @param errors        The errors.
+ * @param defaultErrors The errors in the report of phpstan.neon.dist, or null if
+ *                      it could not be read, in which case none are left out.
+ * @return The errors that the other analysis does not report.
+ */
+function withoutReportedErrors(
+	errors: PhpstanError[],
+	defaultErrors: PhpstanError[] | null
+): PhpstanError[] {
+	const counts = new Map< string, number >();
+	for ( const error of defaultErrors ?? [] ) {
+		const key = errorKey( error );
+		counts.set( key, ( counts.get( key ) ?? 0 ) + 1 );
+	}
+	return errors.filter( ( error ) => {
+		const key = errorKey( error );
+		const count = counts.get( key ) ?? 0;
+		if ( count === 0 ) {
+			return true;
+		}
+		counts.set( key, count - 1 );
+		return false;
+	} );
+}
+
+/**
  * Builds the job summary.
  *
- * @param errors The errors.
+ * @param errors        The errors.
+ * @param omittedErrors The number of errors left out, since the other analysis
+ *                      reports them.
  * @return The summary as Markdown.
  */
-function buildSummary( errors: PhpstanError[] ): string {
+function buildSummary( errors: PhpstanError[], omittedErrors: number ): string {
+	const omitted =
+		omittedErrors > 0
+			? `${ omittedErrors } ${
+					omittedErrors === 1 ? 'error' : 'errors'
+				} that the analysis of \`phpstan.neon.dist\` also found ${
+					omittedErrors === 1 ? 'is' : 'are'
+				} listed only in its results.`
+			: null;
+
 	if ( errors.length === 0 ) {
-		return `## ${ ANALYSIS.name }\n\nNo errors were found.\n`;
+		return omitted
+			? `## ${ ANALYSIS.name }\n\nNo other errors were found. ${ omitted }\n`
+			: `## ${ ANALYSIS.name }\n\nNo errors were found.\n`;
 	}
 
 	const sections = [
 		`## ${ ANALYSIS.name } found ${ errors.length } ${
-			errors.length === 1 ? 'error' : 'errors'
-		}`,
+			omitted ? 'other ' : ''
+		}${ errors.length === 1 ? 'error' : 'errors' }`,
 	];
+	if ( omitted ) {
+		sections.push( omitted );
+	}
 
 	const baselines = ANALYSIS.baselines
 		.map( ( baseline ) => `\`${ baseline }\`` )
@@ -504,8 +577,20 @@ if ( errors === null ) {
 	}
 	process.exit( 1 );
 }
-annotate( errors );
+const reportedErrors =
+	DEFAULT_REPORT_PATH === undefined
+		? errors
+		: withoutReportedErrors(
+				errors,
+				readErrors(
+					resolve( INVOCATION_DIRECTORY, DEFAULT_REPORT_PATH )
+				)
+			);
+annotate( reportedErrors );
 if ( GITHUB_STEP_SUMMARY ) {
-	appendFileSync( GITHUB_STEP_SUMMARY, buildSummary( errors ) );
+	appendFileSync(
+		GITHUB_STEP_SUMMARY,
+		buildSummary( reportedErrors, errors.length - reportedErrors.length )
+	);
 }
-process.exitCode = errors.length > 0 ? 1 : 0;
+process.exitCode = reportedErrors.length > 0 ? 1 : 0;

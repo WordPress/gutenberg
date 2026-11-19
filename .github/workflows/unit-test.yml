@@ -669,7 +669,7 @@ jobs:
             # set up, which would only fail again with an unrelated error.
             - name: Report the PHPStan results for the strict paths
               if: ${{ ! cancelled() && steps.phpstan-strict.outcome == 'success' && steps.setup-npm.outcome == 'success' }}
-              run: npm run --workspace @wordpress/phpstan-tools report -- --strict "${RUNNER_TEMP}/phpstan-strict-report.json"
+              run: npm run --workspace @wordpress/phpstan-tools report -- --strict --default-report "${RUNNER_TEMP}/phpstan-report.json" "${RUNNER_TEMP}/phpstan-strict-report.json"
 
             - name: Ensure version-controlled files are not modified during the tests
               run: git diff --exit-code
