@@ -29,6 +29,7 @@
 
 ### Enhancements
 
+-   `canMoveBlocks`: Check movement permission for non-contiguous and cross-parent blocks independently of mover restrictions.
 -   Drag and drop: Gather non-contiguous selected blocks into a contiguous sequence at the destination in the canvas and List View, preserving block IDs and supporting one-step undo across source parents.
 -   Selection: Add Cmd/Ctrl-click selection in the canvas and List View, Space-key toggling in List View, and the `multiSelectSet` action for selecting blocks across different parents. Duplicate selected runs in place and paste after non-contiguous selections without replacing their originals.
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).

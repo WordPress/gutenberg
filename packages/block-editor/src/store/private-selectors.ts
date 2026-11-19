@@ -20,7 +20,7 @@ import {
 	getBlockAttributes,
 	getBlock,
 	getSelectedBlockClientIds,
-	canMoveBlock,
+	canMoveBlocks,
 	canRemoveBlock,
 	areInnerBlocksControlled,
 } from './selectors';
@@ -118,32 +118,6 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 }
 
 /**
- * Checks drag permissions independently of the contiguous-only movers.
- *
- * @param state     Editor state.
- * @param clientIds Target IDs.
- * @return Whether every target can be dragged.
- */
-export function canDragBlocks( state: State, clientIds: string[] ) {
-	const uniqueIds = new Set( clientIds );
-	return (
-		clientIds.length > 0 &&
-		uniqueIds.size === clientIds.length &&
-		clientIds.every(
-			( id ) =>
-				// Check the blocks themselves before considering a drop destination.
-				!! getBlock( state, id ) &&
-				getBlockEditingMode( state, id ) !== 'disabled' &&
-				canMoveBlock( state, id ) &&
-				// Moving a parent already moves its children; do not move them twice.
-				! getBlockParents( state, id ).some( ( parent ) =>
-					uniqueIds.has( parent )
-				)
-		)
-	);
-}
-
-/**
  * Validates an entire gathered move before any source parent is changed.
  *
  * @param state        Editor state.
@@ -158,7 +132,7 @@ export function canMoveBlockSetToPosition(
 ) {
 	// Reject an invalid source list or a destination that no longer exists.
 	if (
-		! canDragBlocks( state, clientIds ) ||
+		! canMoveBlocks( state, clientIds ) ||
 		( rootClientId && ! getBlock( state, rootClientId ) )
 	) {
 		return false;

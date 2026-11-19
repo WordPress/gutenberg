@@ -2256,6 +2256,8 @@ export function canMoveBlock( state: State, clientId: string ) {
 
 /**
  * Determines if the given blocks are allowed to be moved.
+ * Blocks can have gaps or different parents. Operations that require a
+ * contiguous sibling range must check that separately.
  *
  * @param {Object} state     Editor state.
  * @param {string} clientIds The block client IDs to be moved.
@@ -2263,10 +2265,21 @@ export function canMoveBlock( state: State, clientId: string ) {
  * @return {boolean} Whether the given blocks are allowed to be moved.
  */
 export function canMoveBlocks( state: State, clientIds: string[] ) {
-	// Movers shift one sibling run; gathering scattered blocks is a separate drag operation.
+	const uniqueIds = new Set( clientIds );
 	return (
-		areBlocksContiguous( state, clientIds ) &&
-		clientIds.every( ( clientId ) => canMoveBlock( state, clientId ) )
+		clientIds.length > 0 &&
+		uniqueIds.size === clientIds.length &&
+		clientIds.every(
+			( id ) =>
+				// Check the blocks themselves before considering a destination.
+				!! getBlock( state, id ) &&
+				getBlockEditingMode( state, id ) !== 'disabled' &&
+				canMoveBlock( state, id ) &&
+				// Moving a parent already moves its children; do not move them twice.
+				! getBlockParents( state, id ).some( ( parent ) =>
+					uniqueIds.has( parent )
+				)
+		)
 	);
 }
 

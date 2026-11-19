@@ -246,18 +246,70 @@ describe( 'explicit block selection', () => {
 		}
 	} );
 
-	it( 'keeps scattered selections ineligible for toolbar and keyboard movers while allowing dragging', () => {
+	it( 'allows scattered blocks to move while sibling mover actions leave them unchanged', () => {
 		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
-		expect( unlock( registry.select( store ) ).canDragBlocks( ids ) ).toBe(
-			true
-		);
-		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( false );
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
+		expect(
+			unlock( registry.select( store ) ).areBlocksContiguous( ids )
+		).toBe( false );
+		const before = registry.select( store ).getBlocks();
+		registry.dispatch( store ).moveBlocksUp( ids );
+		expect( registry.select( store ).getBlocks() ).toBe( before );
 		registry.dispatch( store ).moveBlocksDown( ids );
-		expect( registry.select( store ).getBlockOrder() ).toEqual(
-			blocks.map( ( block ) => block.clientId )
-		);
+		expect( registry.select( store ).getBlocks() ).toBe( before );
+		registry.dispatch( store ).moveBlocksToPosition( ids, '', '', 1 );
+		expect( registry.select( store ).getBlocks() ).toBe( before );
 	} );
 
+	it.each( [
+		'missing',
+		'duplicate',
+		'disabled',
+		'locked',
+		'parent and child',
+	] )(
+		'rejects invalid block lists before moving them (%s)',
+		async ( reason ) => {
+			const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
+			if ( reason === 'missing' ) {
+				ids.push( 'missing' );
+			} else if ( reason === 'duplicate' ) {
+				ids.push( ids[ 0 ] );
+			} else if ( reason === 'disabled' ) {
+				registry
+					.dispatch( store )
+					.setBlockEditingMode( ids[ 0 ], 'disabled' );
+			} else if ( reason === 'locked' ) {
+				registry.dispatch( store ).updateBlockAttributes( ids[ 0 ], {
+					lock: { move: true },
+				} );
+			} else {
+				const parent = createBlock( 'core/test-selection', {}, [
+					blocks[ 0 ],
+				] );
+				registry
+					.dispatch( store )
+					.resetBlocks( [ parent, blocks[ 2 ] ] );
+				ids.push( parent.clientId );
+			}
+			const before = registry.select( store ).getBlocks();
+			const selection = registry
+				.select( store )
+				.getSelectedBlockClientIds();
+			expect( registry.select( store ).canMoveBlocks( ids ) ).toBe(
+				false
+			);
+			await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
+				ids,
+				'',
+				0
+			);
+			expect( registry.select( store ).getBlocks() ).toBe( before );
+			expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
+				selection
+			);
+		}
+	);
 	it( 'selects blocks under different parents', () => {
 		const sixthCell = createBlock( 'core/test-selection' );
 		const extraCell = createBlock( 'core/test-selection' );
@@ -689,7 +741,7 @@ describe( 'explicit block selection', () => {
 		expect(
 			unlock( registry.select( store ) ).isSelectionContiguous()
 		).toBe( false );
-		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( false );
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
 		expect( registry.select( store ).isGroupable( ids ) ).toBe( false );
 		registry.dispatch( store ).moveBlocksUp( ids, '' );
 		expect( registry.select( store ).getBlockOrder() ).toEqual(

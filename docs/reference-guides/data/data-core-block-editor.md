@@ -88,7 +88,7 @@ _Returns_
 
 ### canMoveBlocks
 
-Determines if the given blocks are allowed to be moved.
+Determines if the given blocks are allowed to be moved. Blocks can have gaps or different parents. Operations that require a contiguous sibling range must check that separately.
 
 _Parameters_
 

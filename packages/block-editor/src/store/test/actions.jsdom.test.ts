@@ -944,6 +944,7 @@ describe( 'actions', () => {
 		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => true,
 			};
@@ -974,6 +975,7 @@ describe( 'actions', () => {
 		it( 'should not dispatch MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => false,
 			};
@@ -1000,6 +1002,7 @@ describe( 'actions', () => {
 		it( 'should dispatch MOVE_BLOCKS_TO_POSITION action with a single block', () => {
 			const select = {
 				canMoveBlocks: () => true,
+				areBlocksContiguous: () => true,
 			};
 			const dispatch = vi.fn() as MockDispatch;
 

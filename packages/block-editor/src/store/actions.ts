@@ -550,9 +550,11 @@ const createOnMove =
 	( type: string ) =>
 	( clientIds: string[], rootClientId?: string | null ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		const canMoveBlocks = select.canMoveBlocks( clientIds );
-		if ( ! canMoveBlocks ) {
+		// Up/down movers shift one sibling run; they do not gather scattered blocks.
+		if (
+			! select.canMoveBlocks( clientIds ) ||
+			! select.areBlocksContiguous( clientIds )
+		) {
 			return;
 		}
 
@@ -578,10 +580,12 @@ export const moveBlocksToPosition =
 		index?: number
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		const canMoveBlocks = select.canMoveBlocks( clientIds );
-
-		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		if ( ! canMoveBlocks ) {
+		// This action moves one sibling run from a single source parent.
+		// Scattered blocks use moveBlockSetToPosition instead.
+		if (
+			! select.canMoveBlocks( clientIds ) ||
+			! select.areBlocksContiguous( clientIds )
+		) {
 			return;
 		}
 

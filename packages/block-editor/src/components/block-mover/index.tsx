@@ -32,7 +32,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				getBlockIndex,
 				getBlockListSettings,
 				canMoveBlocks,
-				canDragBlocks,
+				areBlocksContiguous,
 				getBlockOrder,
 				getBlockRootClientId,
 				getBlockAttributes,
@@ -57,8 +57,11 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				normalizeLegacyLayout( layout ) || layoutSupport?.default;
 
 			return {
-				canMove: canMoveBlocks( clientIds ),
-				canDrag: canDragBlocks( clientIds ),
+				// Arrow movers need one sibling run; dragging can gather scattered blocks.
+				canMove:
+					canMoveBlocks( clientIds ) &&
+					areBlocksContiguous( clientIds ),
+				canDrag: canMoveBlocks( clientIds ),
 				rootClientId: _rootClientId,
 				isFirst: firstIndex === 0,
 				isLast: lastIndex === blockOrder.length - 1,

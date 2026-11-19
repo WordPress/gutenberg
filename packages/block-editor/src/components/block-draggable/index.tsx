@@ -31,7 +31,7 @@ const BlockDraggable = ( {
 	} = useSelect(
 		( select ) => {
 			const {
-				canDragBlocks,
+				canMoveBlocks,
 				getBlockRootClientId,
 				getBlockName,
 				getBlockAttributes,
@@ -49,7 +49,7 @@ const BlockDraggable = ( {
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: canDragBlocks( clientIds ),
+				isDraggable: canMoveBlocks( clientIds ),
 				icon: variation?.icon || _getBlockType( blockName )?.icon,
 				visibleInserter: isBlockInsertionPointVisible(),
 				getBlockType: _getBlockType,

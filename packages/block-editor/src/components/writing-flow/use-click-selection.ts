@@ -31,7 +31,7 @@ export default function useClickSelection() {
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
 		__unstableIsFullySelected,
-		canDragBlocks,
+		canMoveBlocks,
 		getSelectedBlockClientIds,
 		canHostEditableRoot,
 		getSetSelectionClientIds,
@@ -260,7 +260,7 @@ export default function useClickSelection() {
 					if (
 						clickedClientId &&
 						__unstableIsFullySelected() &&
-						canDragBlocks( getSelectedBlockClientIds() ) &&
+						canMoveBlocks( getSelectedBlockClientIds() ) &&
 						( isBlockMultiSelected( clickedClientId ) ||
 							isAncestorMultiSelected( clickedClientId ) )
 					) {
@@ -345,7 +345,7 @@ export default function useClickSelection() {
 			isBlockMultiSelected,
 			isAncestorMultiSelected,
 			__unstableIsFullySelected,
-			canDragBlocks,
+			canMoveBlocks,
 			getSelectedBlockClientIds,
 			canHostEditableRoot,
 			multiSelect,

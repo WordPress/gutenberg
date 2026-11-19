@@ -39,7 +39,7 @@ export function useEventHandlers( {
 	const {
 		getBlockRootClientId,
 		getSelectedBlockClientIds,
-		canDragBlocks,
+		canMoveBlocks,
 		isZoomOut,
 		hasMultiSelection,
 		__unstableIsFullySelected,
@@ -126,7 +126,7 @@ export function useEventHandlers( {
 					! isMultiSelected ||
 					! hasMultiSelection() ||
 					! __unstableIsFullySelected() ||
-					! canDragBlocks( getSelectedBlockClientIds() )
+					! canMoveBlocks( getSelectedBlockClientIds() )
 				) {
 					return;
 				}
@@ -340,7 +340,7 @@ export function useEventHandlers( {
 					isMultiSelected &&
 					hasMultiSelection() &&
 					__unstableIsFullySelected() &&
-					canDragBlocks( getSelectedBlockClientIds() );
+					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
 					// Rich text carries a drag of the text selected in a field.
@@ -644,7 +644,7 @@ export function useEventHandlers( {
 			isZoomOut,
 			resetZoomLevel,
 			hasMultiSelection,
-			canDragBlocks,
+			canMoveBlocks,
 			startDraggingBlocks,
 			stopDraggingBlocks,
 			isSectionBlock,

@@ -102,6 +102,7 @@ export function BlockSettingsDropdown( {
 				isZoomOut: _isZoomOut,
 				canEditBlock,
 				canMoveBlocks,
+				areBlocksContiguous,
 				getBlockIndex,
 				getBlockCount,
 			} = unlock( select( blockEditorStore ) );
@@ -129,7 +130,10 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
-				canMove: canMoveBlocks( clientIds ),
+				// Menu movers shift one sibling run rather than gathering a selection.
+				canMove:
+					canMoveBlocks( clientIds ) &&
+					areBlocksContiguous( clientIds ),
 				isFirst: getBlockIndex( firstBlockClientId ) === 0,
 				isLast:
 					getBlockIndex( firstBlockClientId ) ===
