@@ -5,7 +5,7 @@ import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
 import { createRef, useState } from '@wordpress/element';
 import * as AlertDialog from '..';
-import dialogStyles from '../../dialog/style.module.css';
+import dialogStyles from '../../dialog/style.module.scss';
 import type { ConfirmResult, RootProps } from '../types';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {

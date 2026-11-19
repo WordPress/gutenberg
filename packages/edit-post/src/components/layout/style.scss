@@ -116,11 +116,6 @@
 		isolation: isolate;
 	}
 
-	// Visual editor: inner container provides the scrollable viewport.
-	.editor-visual-editor {
-		overflow: hidden;
-	}
-
 	// Code (text) editor: allow internal scrolling so long content doesn't push
 	// the meta box pane outside the viewport.
 	.editor-text-editor {
