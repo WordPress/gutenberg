@@ -1039,4 +1039,31 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 	public function test_should_return_empty_stylesheet_for_context_without_store(): void {
 		$this->assertSame( '', gutenberg_style_engine_get_stylesheet_from_context( 123 ) ); // @phpstan-ignore argument.type (An invalid context is what is tested.)
 	}
+
+	/**
+	 * Tests that a preset for an individual border side that matches none of its
+	 * CSS var patterns is left out of the returned declarations, not returned as empty.
+	 *
+	 * @covers ::gutenberg_style_engine_get_styles
+	 */
+	public function test_should_omit_unmatched_individual_preset_from_declarations(): void {
+		$block_styles = array(
+			'border' => array(
+				'top' => array(
+					'color' => 'var:preset|font-size|large',
+					'style' => 'solid',
+				),
+			),
+		);
+
+		$this->assertSame(
+			array(
+				'css'          => 'border-top-style:solid;',
+				'declarations' => array(
+					'border-top-style' => 'solid',
+				),
+			),
+			gutenberg_style_engine_get_styles( $block_styles )
+		);
+	}
 }
