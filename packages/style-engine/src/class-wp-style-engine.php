@@ -22,9 +22,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 *
 	 * @phpstan-type Style_Definition array{
 	 *     property_keys?: array{ default: non-falsy-string, individual?: non-falsy-string },
-	 *     path: non-empty-list<string>,
-	 *     css_vars?: array<string, string>,
-	 *     classnames?: array<string, string|true>,
+	 *     path: non-empty-list<non-falsy-string>,
+	 *     css_vars?: array<non-falsy-string, non-falsy-string>,
+	 *     classnames?: array<non-falsy-string, non-falsy-string|true>,
 	 *     value_func?: callable( mixed, array<string, mixed>, array<mixed> ): array<non-falsy-string, non-empty-string>,
 	 * }
 	 * @phpstan-type Parse_Options array{
