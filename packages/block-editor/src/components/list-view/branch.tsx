@@ -158,8 +158,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
-		const { itemInView, focusedClientId } = fixedListWindow;
-		const blockInView = itemInView( blockListPosition );
+		const { start, end, focusedClientId } = fixedListWindow;
+		const blockInView =
+			blockListPosition >= start && blockListPosition < end;
 
 		const position = index + 1;
 		const updatedPath =

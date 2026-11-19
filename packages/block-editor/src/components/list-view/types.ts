@@ -197,7 +197,8 @@ export type PrivateListViewProps = ListViewProps & {
  * The window of rows that the list view renders.
  */
 export type FixedListWindow = {
-	itemInView: ( index: number ) => boolean;
+	start: number;
+	end: number;
 	focusedClientId?: string;
 };
 

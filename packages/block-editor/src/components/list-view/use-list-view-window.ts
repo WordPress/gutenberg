@@ -10,33 +10,6 @@ import type { FixedListWindow } from './types';
 const MIN_BUFFER_ROWS = 10;
 const MAX_BUFFER_ROWS = 40;
 
-type ListWindow = FixedListWindow & {
-	start: number;
-	end: number;
-};
-
-function createListWindow(
-	start: number,
-	end: number,
-	focusedClientId?: string
-): ListWindow {
-	return {
-		start,
-		end,
-		itemInView: ( index ) => index >= start && index < end,
-		focusedClientId,
-	};
-}
-
-function createInitialListWindow() {
-	// The list can't be measured without forcing a layout while it opens, but
-	// it never shows more rows than fit in the browser window.
-	return createListWindow(
-		0,
-		Math.ceil( window.innerHeight / BLOCK_LIST_ITEM_HEIGHT )
-	);
-}
-
 function getVisibleRows( list: HTMLElement, scrollContainer: Element ) {
 	const { documentElement } = list.ownerDocument;
 	const { top, bottom } =
@@ -58,7 +31,7 @@ function getVisibleRows( list: HTMLElement, scrollContainer: Element ) {
 }
 
 function coversRows(
-	{ start, end }: ListWindow,
+	{ start, end }: FixedListWindow,
 	first: number,
 	last: number,
 	spareRows: number
@@ -74,8 +47,13 @@ function coversRows(
  * @return The ref for the list element, and the window of rows to render.
  */
 export default function useListViewWindow() {
-	const [ fixedListWindow, setFixedListWindow ] = useState(
-		createInitialListWindow
+	// The list can't be measured without forcing a layout while it opens, but
+	// it never shows more rows than fit in the browser window.
+	const [ fixedListWindow, setFixedListWindow ] = useState< FixedListWindow >(
+		() => ( {
+			start: 0,
+			end: Math.ceil( window.innerHeight / BLOCK_LIST_ITEM_HEIGHT ),
+		} )
 	);
 	// The listeners below have to know which rows are rendered to tell
 	// whether a row in view is missing.
@@ -114,13 +92,14 @@ export default function useListViewWindow() {
 				ownerDocument.activeElement?.closest< HTMLElement >(
 					'[data-block]'
 				);
-			const nextWindow = createListWindow(
-				Math.max( 0, first - MAX_BUFFER_ROWS ),
-				last + MAX_BUFFER_ROWS,
-				list.contains( focusedRow ?? null )
-					? focusedRow?.dataset.block
-					: undefined
-			);
+			const nextWindow = {
+				start: Math.max( 0, first - MAX_BUFFER_ROWS ),
+				end: last + MAX_BUFFER_ROWS,
+				focusedClientId:
+					focusedRow && list.contains( focusedRow )
+						? focusedRow.dataset.block
+						: undefined,
+			};
 			listWindowRef.current = nextWindow;
 
 			// Scroll events run before paint, so rows that are already in view
