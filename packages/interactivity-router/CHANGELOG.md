@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Update router regions beneath ignored unique-ID `data-wp-html` entries, and allow `attachTo` to target elements whose `data-wp-html` is ignored because of a unique ID or an unsupported host such as `textarea` ([#86968](https://github.com/WordPress/gutenberg/pull/86968)).
