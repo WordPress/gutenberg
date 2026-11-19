@@ -38,12 +38,14 @@ export function useScrollState( {
 	scrollContainerRef: RefObject< HTMLDivElement | null >;
 } ): {
 	isVerticallyScrolled: boolean;
-	hasColumnsBefore: boolean;
-	hasColumnsAfter: boolean;
+	hasHorizontalScrollStart: boolean;
+	hasHorizontalScrollEnd: boolean;
 } {
 	const [ isVerticallyScrolled, setIsVerticallyScrolled ] = useState( false );
-	const [ hasColumnsBefore, setHasColumnsBefore ] = useState( false );
-	const [ hasColumnsAfter, setHasColumnsAfter ] = useState( false );
+	const [ hasHorizontalScrollStart, setHasHorizontalScrollStart ] =
+		useState( false );
+	const [ hasHorizontalScrollEnd, setHasHorizontalScrollEnd ] =
+		useState( false );
 
 	useEffect( () => {
 		const scrollContainer = scrollContainerRef.current;
@@ -73,8 +75,8 @@ export function useScrollState( {
 				scrollContainer.scrollWidth -
 				scrollContainer.clientWidth -
 				scrolled;
-			setHasColumnsBefore( scrolled >= 1 );
-			setHasColumnsAfter( remaining >= 1 );
+			setHasHorizontalScrollStart( scrolled >= 1 );
+			setHasHorizontalScrollEnd( remaining >= 1 );
 		};
 
 		update();
@@ -98,5 +100,9 @@ export function useScrollState( {
 		};
 	}, [ scrollContainerRef ] );
 
-	return { isVerticallyScrolled, hasColumnsBefore, hasColumnsAfter };
+	return {
+		isVerticallyScrolled,
+		hasHorizontalScrollStart,
+		hasHorizontalScrollEnd,
+	};
 }
