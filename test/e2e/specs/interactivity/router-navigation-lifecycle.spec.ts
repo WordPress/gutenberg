@@ -892,8 +892,8 @@ test.describe( 'Router navigation lifecycle', () => {
 			).toHaveText( 'lifecycle-b' );
 
 			// Release A's destination -- A's, not B's -- and wait for its
-			// generator to actually resume and take the `navigatingTo`
-			// bail. `page.waitForResponse` is the accurate signal here --
+			// generator to actually resume and take the superseded
+			// navigation's bail. `page.waitForResponse` is the accurate signal here --
 			// it resolves once the browser has the full response, unlike a
 			// Node-side "the route handler returned" signal, which can
 			// resolve well before the page's own fetch-then-parse pipeline
