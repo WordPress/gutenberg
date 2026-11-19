@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Link` is active only when the current path matches its `to` path exactly, so it no longer adds `aria-current="page"` on subpages. Pass `activeOptions` to change this ([#87050](https://github.com/WordPress/gutenberg/pull/87050)).
+-   `Link` is active only when its path and query string match the current URL exactly, so it no longer adds `aria-current="page"` on subpages. Pass `activeOptions` to change this ([#87050](https://github.com/WordPress/gutenberg/pull/87050)).
 
 ### Bug Fixes
 

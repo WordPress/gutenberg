@@ -37,7 +37,7 @@ function MyRoute() {
 }
 ```
 
-Unlike TanStack Router's default, `Link` is active only when the current path is exactly its `to` path.
+Unlike TanStack Router's default, `Link` is active only when its path and query string match the current URL exactly.
 
 ### Private API
 
