@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep `translators:` comments in the transpiled package files and the non-minified bundles. Rolldown drops plain comments, so string extraction from the built files (such as `wp i18n make-pot` for WordPress Core) lost every translator comment.
+
 ## 0.28.0 (2026-11-18)
 
 ### Enhancements
