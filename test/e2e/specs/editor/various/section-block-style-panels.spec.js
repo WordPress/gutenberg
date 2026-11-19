@@ -77,9 +77,8 @@ test.describe( 'Section block style panels', () => {
 			} )
 		).toHaveCount( 1 );
 
-		// The Typography panel exposes only the text color control — none of
-		// the font controls (size/family/etc.) leak into a section block, so
-		// the font-size control is absent from the whole Styles tab.
+		// The Typography panel styles represented text while the section keeps
+		// its curated Background and Elements panels.
 		await expect(
 			typographyPanel.getByRole( 'button', {
 				name: 'Color',
@@ -88,7 +87,7 @@ test.describe( 'Section block style panels', () => {
 		).toBeVisible();
 		await expect(
 			editorSettings.getByRole( 'group', { name: 'Font size' } )
-		).toHaveCount( 0 );
+		).toBeVisible();
 
 		// The Background panel exposes color/gradient but not the background
 		// image control.
@@ -105,16 +104,15 @@ test.describe( 'Section block style panels', () => {
 			} )
 		).toHaveCount( 0 );
 
-		// The Typography color control writes to the section block, proving the
-		// direct-rendered panel's round-trip works end to end (not just that it
-		// renders).
+		// The Typography color control writes to the represented text block.
 		await typographyPanel
 			.getByRole( 'button', { name: 'Color', exact: true } )
 			.click();
 		await page.getByRole( 'option', { name: 'Black' } ).click();
 		await expect
 			.poll( async () => {
-				const [ block ] = await editor.getBlocks();
+				const [ section ] = await editor.getBlocks();
+				const [ block ] = section.innerBlocks;
 				return (
 					block.attributes.textColor ||
 					block.attributes.style?.color?.text

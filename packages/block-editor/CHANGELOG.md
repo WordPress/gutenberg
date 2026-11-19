@@ -12,6 +12,7 @@
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   Mixed block selections containing text blocks now expose the core style controls shared by every selected text block, while leaving non-text blocks unchanged ([#81118](https://github.com/WordPress/gutenberg/pull/81118)).
 
 ### Bug Fixes
 
