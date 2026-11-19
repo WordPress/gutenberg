@@ -233,7 +233,7 @@ const variations = [
 		title: getTitle( 'ReverbNation' ),
 		icon: embedAudioIcon,
 		description: __( 'Embed ReverbNation content.' ),
-		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
+		patterns: [ /^https?:\/\/((legacy|www)\.)?reverbnation\.com\/.+/i ],
 		attributes: { providerNameSlug: 'reverbnation', responsive: true },
 	},
 	{
@@ -317,7 +317,7 @@ const variations = [
 			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
 		],
-		attributes: { providerNameSlug: 'amazon-kindle' },
+		attributes: { providerNameSlug: 'amazon' },
 	},
 	{
 		name: 'pinterest',
