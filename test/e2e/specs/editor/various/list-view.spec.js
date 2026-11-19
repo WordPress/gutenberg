@@ -1652,7 +1652,7 @@ test.describe( 'List View', () => {
 			);
 		} );
 
-		test( 'shows the rows in view while scrolling @firefox @webkit', async ( {
+		test( 'shows the rows in view while scrolling', async ( {
 			page,
 			listViewUtils,
 		} ) => {
@@ -1700,6 +1700,19 @@ test.describe( 'List View', () => {
 			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
 
 			await expect( listViewUtils.getRow( 2 ) ).toBeFocused();
+		} );
+
+		test( 'pages through the list with Page Down @firefox @webkit', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'PageDown' );
+
+			await expect( listViewUtils.getRow( 1 ) ).not.toBeInViewport();
+			await listViewUtils.expectNoBlankRows();
 		} );
 
 		test( 'moves to both ends of the list with End and Home @firefox @webkit', async ( {
