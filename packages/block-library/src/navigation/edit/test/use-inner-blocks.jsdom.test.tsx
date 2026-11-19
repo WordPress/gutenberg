@@ -110,4 +110,98 @@ describe( 'useInnerBlocks', () => {
 			controlledInnerBlocks: [ { name: 'core/navigation-link' } ],
 		} );
 	} );
+
+	it( 'returns no inner blocks when controlled by an empty menu', () => {
+		const { registry, clientId, result } = setup( [
+			createBlock( 'core/page-list' ),
+		] );
+
+		controlInnerBlocks( registry, clientId, [] );
+
+		expect( result.current ).toMatchObject( {
+			innerBlocks: [],
+			hasUncontrolledInnerBlocks: false,
+			uncontrolledInnerBlocks: [],
+			controlledInnerBlocks: [],
+		} );
+	} );
+
+	it( 'ignores stale inner blocks on the tree entry of a controlled block', () => {
+		const { registry, clientId, result } = setup();
+
+		controlInnerBlocks( registry, clientId, [
+			createBlock( 'core/navigation-link' ),
+		] );
+
+		// Replacing the root inner blocks with the same Navigation block,
+		// carrying inner blocks of its own, keeps the controlled inner
+		// blocks but leaves the given ones on the block's own tree entry.
+		act( () => {
+			registry.dispatch( blockEditorStore ).replaceInnerBlocks( '', [
+				{
+					...createBlock( 'core/navigation', {}, [
+						createBlock( 'core/page-list' ),
+					] ),
+					clientId,
+				},
+			] );
+		} );
+
+		expect(
+			registry.select( blockEditorStore ).getBlock( clientId )
+		).toMatchObject( { innerBlocks: [ { name: 'core/page-list' } ] } );
+		expect( result.current ).toMatchObject( {
+			innerBlocks: [ { name: 'core/navigation-link' } ],
+			hasUncontrolledInnerBlocks: false,
+			uncontrolledInnerBlocks: [],
+			controlledInnerBlocks: [ { name: 'core/navigation-link' } ],
+		} );
+	} );
+
+	describe( 'isInnerBlockSelected', () => {
+		it( 'is false when nothing is selected', () => {
+			const { result } = setup( [ createBlock( 'core/page-list' ) ] );
+
+			expect( result.current.isInnerBlockSelected ).toBe( false );
+		} );
+
+		it( 'is false when the Navigation block itself is selected', () => {
+			const { registry, clientId, result } = setup( [
+				createBlock( 'core/page-list' ),
+			] );
+
+			act( () => {
+				registry.dispatch( blockEditorStore ).selectBlock( clientId );
+			} );
+
+			expect( result.current.isInnerBlockSelected ).toBe( false );
+		} );
+
+		it( 'is true when an uncontrolled inner block is selected', () => {
+			const pageList = createBlock( 'core/page-list' );
+			const { registry, result } = setup( [ pageList ] );
+
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.selectBlock( pageList.clientId );
+			} );
+
+			expect( result.current.isInnerBlockSelected ).toBe( true );
+		} );
+
+		it( 'is true when a controlled inner block is selected', () => {
+			const navigationLink = createBlock( 'core/navigation-link' );
+			const { registry, clientId, result } = setup();
+
+			controlInnerBlocks( registry, clientId, [ navigationLink ] );
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.selectBlock( navigationLink.clientId );
+			} );
+
+			expect( result.current.isInnerBlockSelected ).toBe( true );
+		} );
+	} );
 } );
