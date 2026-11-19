@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.0.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
