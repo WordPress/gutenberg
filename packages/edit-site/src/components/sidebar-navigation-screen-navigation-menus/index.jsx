@@ -14,6 +14,7 @@ import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/s
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+import useCanManageNavigationMenus from './use-can-manage-navigation-menus';
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 function buildMenuLabel( title, id, status ) {
@@ -35,6 +36,26 @@ function buildMenuLabel( title, id, status ) {
 }
 
 export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
+	const canManageNavigationMenus = useCanManageNavigationMenus();
+
+	if ( canManageNavigationMenus === undefined ) {
+		return (
+			<SidebarNavigationScreenWrapper backPath={ backPath }>
+				<WCSpinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+			</SidebarNavigationScreenWrapper>
+		);
+	}
+
+	if ( ! canManageNavigationMenus ) {
+		return <NavigationMenusPermissionDenied backPath={ backPath } />;
+	}
+
+	return <NavigationMenus backPath={ backPath } />;
+}
+
+// The list includes drafts, which the REST API only returns to users who can
+// edit Navigation Menus, so it's only rendered after the permission check.
+function NavigationMenus( { backPath } ) {
 	const {
 		records: navigationMenus,
 		isResolving: isResolvingNavigationMenus,
@@ -121,6 +142,17 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 				) ) }
 			</ItemGroup>
 		</SidebarNavigationScreenWrapper>
+	);
+}
+
+export function NavigationMenusPermissionDenied( { backPath } ) {
+	return (
+		<SidebarNavigationScreenWrapper
+			description={ __(
+				'You do not have permission to manage Navigation Menus.'
+			) }
+			backPath={ backPath }
+		/>
 	);
 }
 

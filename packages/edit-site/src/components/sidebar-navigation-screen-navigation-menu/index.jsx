@@ -3,7 +3,11 @@ import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { SidebarNavigationScreenWrapper } from '../sidebar-navigation-screen-navigation-menus';
+import {
+	NavigationMenusPermissionDenied,
+	SidebarNavigationScreenWrapper,
+} from '../sidebar-navigation-screen-navigation-menus';
+import useCanManageNavigationMenus from '../sidebar-navigation-screen-navigation-menus/use-can-manage-navigation-menus';
 import SingleNavigationMenu from './single-navigation-menu';
 import useNavigationMenuHandlers from './use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
@@ -13,6 +17,24 @@ const { useLocation } = unlock( routerPrivateApis );
 export const postType = `wp_navigation`;
 
 export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
+	const canManageNavigationMenus = useCanManageNavigationMenus();
+
+	if ( canManageNavigationMenus === undefined ) {
+		return (
+			<SidebarNavigationScreenWrapper backPath={ backPath }>
+				<WCSpinner className="edit-site-sidebar-navigation-screen-navigation-menus__loading" />
+			</SidebarNavigationScreenWrapper>
+		);
+	}
+
+	if ( ! canManageNavigationMenus ) {
+		return <NavigationMenusPermissionDenied backPath={ backPath } />;
+	}
+
+	return <NavigationMenu backPath={ backPath } />;
+}
+
+function NavigationMenu( { backPath } ) {
 	const {
 		params: { postId },
 	} = useLocation();
