@@ -22,6 +22,7 @@ import { createBlock } from '@wordpress/blocks';
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
 import useAutosaveNotice from './use-autosave-notice';
+import useSuggestionReviewNotice from './use-suggestion-review-notice';
 import { useSuggestPostEditGuard } from '../suggestion-mode/use-suggest-post-edit-guard';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
@@ -44,14 +45,27 @@ import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 import {
-	SuggestionOverlayProvider,
+	SuggestionSessionProvider,
 	SuggestionAutoSave,
 	SuggestionStoreInterceptor,
 	SuggestionUndoGuard,
+	SuggestionNoteGC,
+	SuggestionMarkerGuard,
+	SuggestionAnnotations,
+	SuggestionAuthorColors,
+	RevealSelectedSuggestion,
+	SuggestionDeletionKeyboard,
+	SuggestionAdditionKeyboard,
+	SuggestionFormatKeyboard,
+	SuggestionMultiBlockFormatNotice,
+	SuggestionContentReconciler,
 	registerSuggestionOverlayFilter,
+	registerClipboardSuggestionStrip,
 	isSuggestionModeEnabled,
 	MoveGhostsProvider,
 } from '../suggestion-mode';
+import { registerSuggestionFormat } from '../inline-suggestions';
+import SuggestionFormatEdit from '../collab-sidebar/suggestion-format-edit';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { PatternsMenuItems } = unlock( editPatternsPrivateApis );
@@ -68,13 +82,26 @@ if ( isSuggestionModeEnabled() ) {
 	registerSuggestionOverlayFilter();
 }
 
+// Register the inline suggestion marker formats so rich-text round-trips
+// suggestion markers in block content and the annotations API can decorate
+// them. It has no toolbar entry: suggestions are created by editing in Suggest
+// mode, not from a control. Its `edit` selects the note of the marker under
+// the caret. Idempotent, so it's safe globally.
+registerSuggestionFormat( SuggestionFormatEdit );
+
+// Keep suggestion markers, `metadata.suggestion` and `metadata.noteId` off the
+// clipboard. Registered unconditionally for the same reason as the format:
+// content that already carries markers outlives the experiment flag, and a
+// paste into another post has no way to resolve ids from this one.
+registerClipboardSuggestionStrip();
+
 /*
  * With the experiment off the overlay context (and its block-tree
  * subscriptions) never mounts; consumers fall back to the context default,
  * which is inert.
  */
-const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
-	? SuggestionOverlayProvider
+const MaybeSuggestionSessionProvider = isSuggestionModeEnabled()
+	? SuggestionSessionProvider
 	: Fragment;
 
 /*
@@ -411,6 +438,11 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// has populated the current post.
 		useAutosaveNotice( { post, recovery, settings } );
 
+		// Explains suggestion markers to a user who does not have Suggest
+		// mode. Same ordering requirement as the autosave notice: it reads
+		// the current post, which `setupEditor` populates above.
+		useSuggestionReviewNotice();
+
 		// Refuses direct post-level entity writes while suggesting.
 		useSuggestPostEditGuard();
 
@@ -500,7 +532,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							<MaybeSuggestionOverlayProvider>
+							<MaybeSuggestionSessionProvider>
 								<MaybeMoveGhostsProvider>
 									{ children }
 									{ ! settings.isPreviewMode && (
@@ -525,14 +557,24 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 												<>
 													<SuggestionStoreInterceptor />
 													<SuggestionUndoGuard />
+													<SuggestionNoteGC />
+													<SuggestionMarkerGuard />
 													<SuggestionAutoSave />
+													<SuggestionAnnotations />
+													<SuggestionAuthorColors />
+													<RevealSelectedSuggestion />
+													<SuggestionDeletionKeyboard />
+													<SuggestionAdditionKeyboard />
+													<SuggestionFormatKeyboard />
+													<SuggestionMultiBlockFormatNotice />
+													<SuggestionContentReconciler />
 												</>
 											) }
 											<MediaEditorModalMount />
 										</>
 									) }
 								</MaybeMoveGhostsProvider>
-							</MaybeSuggestionOverlayProvider>
+							</MaybeSuggestionSessionProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</PrivateEntityProvider>

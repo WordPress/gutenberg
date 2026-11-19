@@ -11,9 +11,10 @@
  *
  * - `format`: existing text whose formatting is proposed to change.
  *
- * Markers of different kinds nest over the same characters (a deletion inside
- * someone else's addition) in one canonical order: add outermost, then
- * format, then del.
+ * A replacement (typing over a selection) is one note whose id is carried by an
+ * `add` run and the `del` run right after it. Markers of different kinds nest
+ * over the same characters (a deletion inside someone else's addition) in one
+ * canonical order: add outermost, then format, then del.
  *
  * The render-time strip (keep del-text, drop add-text, remove all wrappers) is
  * handled server-side by `gutenberg_strip_inline_suggestion_markers`
@@ -34,6 +35,7 @@ export {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_FORMAT,
+	SUGGESTION_TYPE_REPLACEMENT,
 	suggestionMarkerFormats,
 	suggestionA11yFormat,
 	addSuggestionRoleFormats,
@@ -56,9 +58,15 @@ export {
 	rejectInlineDeletion,
 	acceptInlineAddition,
 	rejectInlineAddition,
+	acceptInlineReplacement,
+	rejectInlineReplacement,
 	acceptInlineFormat,
 	rejectInlineFormat,
 	insertInlineAddition,
+	removeInlineAdditionRange,
+	reviseOwnAddition,
+	deleteAcrossOwnMarkers,
+	findAdditionRange,
 	growInlineAddition,
 	buildSuggestionMarkerAttributes,
 	formatsRangeHasSuggestion,
@@ -104,4 +112,5 @@ export {
 	hasSuggestionMarkers,
 	stripSuggestionMarkers,
 	stripSuggestionMarkersFromAttributes,
+	settleInsertedSuggestionMarkers,
 } from './strip-markers';

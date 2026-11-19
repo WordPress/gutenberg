@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Suggest mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
