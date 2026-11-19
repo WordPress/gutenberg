@@ -137,7 +137,11 @@ export function getShownMenuId(
 		return ref;
 	}
 
-	if ( ! block.innerBlocks?.length && fallbackMenuId ) {
+	if (
+		! block.innerBlocks?.length &&
+		! block.attributes?.noFallback &&
+		fallbackMenuId
+	) {
 		return Number( fallbackMenuId );
 	}
 
@@ -278,10 +282,16 @@ export function setNavigationMenu(
 
 			if ( block.name === 'core/navigation' && isMatch( block ) ) {
 				hasChanged = true;
-				const attributes = { ...block.attributes, ref: newMenuId };
-				if ( ! newMenuId ) {
-					// No menu chosen: the site shows its newest menu here.
+				const attributes: Record< string, any > = {
+					...block.attributes,
+					ref: newMenuId,
+				};
+				if ( newMenuId ) {
+					delete attributes.noFallback;
+				} else {
+					// No menu here, rather than the site's fallback menu.
 					delete attributes.ref;
+					attributes.noFallback = true;
 				}
 				return {
 					...block,
@@ -430,50 +440,6 @@ export function showsMenu(
 	fallbackMenuId: number | null | undefined
 ): boolean {
 	return getShownMenuId( block, fallbackMenuId ) === Number( menuId );
-}
-
-/**
- * What a place shows once a menu is removed from it. Removing the menu
- * leaves no menu chosen there, which shows the site's newest menu, as the
- * front of the site does. When that is the menu being removed, the newest
- * other menu is chosen instead, so the menu really goes.
- *
- * @param menus  Menus, most recent first.
- * @param menuId The menu being removed.
- * @return `{ newMenuId, shownMenu, isFallback }`, or null when there is no
- *         other menu to show.
- */
-export function getRemovalOutcome(
-	menus: NavigationMenuRecord[],
-	menuId: number | string
-): {
-	newMenuId: number | null;
-	shownMenu: NavigationMenuRecord | undefined;
-	isFallback: boolean;
-} | null {
-	const id = Number( menuId );
-	const fallbackMenuId = getFallbackMenuId( menus );
-
-	if ( fallbackMenuId && fallbackMenuId !== id ) {
-		return {
-			newMenuId: null,
-			shownMenu: menus.find( ( menu ) => menu.id === fallbackMenuId ),
-			isFallback: true,
-		};
-	}
-
-	const replacement = ( menus || EMPTY_ARRAY ).find(
-		( menu: NavigationMenuRecord ) =>
-			menu.id !== id && menu.status === 'publish'
-	);
-
-	return replacement
-		? {
-				newMenuId: replacement.id,
-				shownMenu: replacement,
-				isFallback: false,
-			}
-		: null;
 }
 
 /**

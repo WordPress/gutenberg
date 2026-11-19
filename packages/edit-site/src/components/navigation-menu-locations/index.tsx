@@ -1,12 +1,9 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useEntityRecords } from '@wordpress/core-data';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 import Editor from '../editor';
-import { PRELOADED_NAVIGATION_MENUS_QUERY } from '../sidebar-navigation-screen-navigation-menus/constants';
 import { unlock } from '../../lock-unlock';
-import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { MenuLocations } = unlock( blockLibraryPrivateApis );
@@ -57,26 +54,4 @@ export function NavigationMenuItemCanvas() {
 	}
 
 	return <NavigationMenuLocations navigationId={ Number( postId ) } />;
-}
-
-/**
- * The canvas on the Navigation section. With a single menu, the sidebar opens
- * it straight away, so its locations show here too.
- */
-export function NavigationCanvas() {
-	const { query } = useLocation();
-	const { records: menus, hasResolved } = useEntityRecords< {
-		id: number;
-	} >( 'postType', NAVIGATION_POST_TYPE, PRELOADED_NAVIGATION_MENUS_QUERY );
-
-	if (
-		! isNavigationMenuEditingEnabled() ||
-		query?.canvas === 'edit' ||
-		! hasResolved ||
-		menus?.length !== 1
-	) {
-		return <Editor />;
-	}
-
-	return <NavigationMenuLocations navigationId={ menus![ 0 ].id } />;
 }

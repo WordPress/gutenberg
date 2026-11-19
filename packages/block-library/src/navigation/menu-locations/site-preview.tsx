@@ -20,7 +20,6 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 import { __, sprintf } from '@wordpress/i18n';
 import { desktop, tablet, mobile } from '@wordpress/icons';
 import {
-	Link,
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	Menu,
 	Notice,
@@ -34,6 +33,7 @@ import type { ReactNode } from 'react';
 import { createBlock, parse } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
+import InlineActionLink from './inline-action-link';
 import {
 	getShownMenuId,
 	getTemplatePartBlocks,
@@ -781,23 +781,8 @@ export default function MenuSitePreview( {
 						{
 							term: <TemplatePartsTerm />,
 							link: (
-								<Link
-									tone="neutral"
-									// A button, as it opens a dialog.
-									render={
-										<button
-											type="button"
-											onClick={ onChooseLocation }
-											style={ {
-												background: 'none',
-												border: 0,
-												padding: 0,
-												font: 'inherit',
-												cursor: 'pointer',
-												textDecoration: 'underline',
-											} }
-										/>
-									}
+								<InlineActionLink
+									onClick={ onChooseLocation }
 								/>
 							),
 						}
@@ -825,7 +810,7 @@ export default function MenuSitePreview( {
 								size="compact"
 								aria-label={ __( 'Shown on' ) }
 							/>
-							<Select.Popup>
+							<Select.Popup width="content">
 								{ templateItems.map( ( item ) => (
 									<Select.Item
 										key={ item.value }

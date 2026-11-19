@@ -8,7 +8,12 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useRegistry } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	cloneElement,
+	createInterpolateElement,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import type { Block } from '@wordpress/blocks';
 import type { CSSProperties, ReactElement } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -27,11 +32,13 @@ import {
 	header as headerIcon,
 	footer as footerIcon,
 	mobile as mobileIcon,
+	symbol,
 } from '@wordpress/icons';
 import { inertValue } from '@wordpress/react-inert-value';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 import { useMenuLocations } from './use-menu-locations';
 import ChooseLocationModal from './choose-location-modal';
+import InlineActionLink from './inline-action-link';
 import MenuSitePreview from './site-preview';
 import {
 	AREA_FILTERS,
@@ -41,7 +48,6 @@ import {
 	getPreviewBlocks,
 	PREVIEW_CURRENT_MENU_CLASS,
 	PREVIEW_OTHER_MENU_CLASS,
-	getRemovalOutcome,
 	getTemplatePartBlocks,
 	setNavigationMenu,
 	showsMenu,
@@ -53,7 +59,6 @@ import type {
 	NavigationMenuRecord,
 	TemplatePartRecord,
 } from './utils';
-import withMenuName from './with-menu-name';
 
 export { useMenuLocations, useNavigationLocations } from './use-menu-locations';
 export { getWhereUsedLabel } from './utils';
@@ -110,6 +115,12 @@ const STYLES = {
 		whiteSpace: 'nowrap',
 	},
 	list: { display: 'flex', flexDirection: 'column', gap: 24 },
+	syncedNotice: {
+		background:
+			'color-mix(in srgb, var(--wp-block-synced-color, #7a00df) 6%, transparent)',
+		borderColor:
+			'color-mix(in srgb, var(--wp-block-synced-color, #7a00df) 40%, transparent)',
+	},
 	locations: {
 		display: 'flex',
 		flexDirection: 'column',
@@ -141,7 +152,11 @@ const PREVIEW_STYLES = [
 	},
 ];
 
-type RemovalOutcome = NonNullable< ReturnType< typeof getRemovalOutcome > >;
+// The synced icon, in the synced purple.
+const SYNCED_ICON = cloneElement( symbol, {
+	style: { fill: 'var(--wp-block-synced-color, #7a00df)' },
+} );
+
 type EditLocation = ( part: TemplatePartRecord ) => void;
 
 function getAreaIcon( area: string ) {
@@ -189,48 +204,23 @@ function useEditLocationBlocks() {
 }
 
 /**
- * The blocks of a location once a menu is taken out of it.
+ * The blocks of a location once a menu is taken out of it: the Navigation
+ * blocks showing it show no menu, rather than the site's fallback menu.
  *
  * @param location     The location.
  * @param navigationId The menu.
- * @param outcome      From `getRemovalOutcome`.
  * @param fallbackId   The menu shown when no menu is chosen.
  * @return The blocks.
  */
 function getBlocksWithoutMenu(
 	location: NavigationLocation,
 	navigationId: number,
-	outcome: RemovalOutcome,
 	fallbackId: number | null
 ) {
 	return setNavigationMenu(
 		getTemplatePartBlocks( location.part ),
 		( block ) => showsMenu( block, navigationId, fallbackId ),
-		outcome.newMenuId
-	);
-}
-
-function getRemovalDescription(
-	locationTitle: string,
-	outcome: RemovalOutcome
-) {
-	const shownTitle = getMenuTitle( outcome.shownMenu );
-
-	return withMenuName(
-		outcome.isFallback
-			? sprintf(
-					/* translators: %s: Where the menu is shown, like "Footer". "<menu />" is replaced by the name of another menu. */
-					__(
-						'%s will have no menu chosen, so it will show your newest menu, <menu />, instead.'
-					),
-					locationTitle
-				)
-			: sprintf(
-					/* translators: %s: Where the menu is shown, like "Footer". "<menu />" is replaced by the name of another menu. */
-					__( '%s will show <menu /> instead.' ),
-					locationTitle
-				),
-		shownTitle
+		null
 	);
 }
 
@@ -249,7 +239,6 @@ function RemoveAction( {
 	const registry = useRegistry();
 	const editLocationBlocks = useEditLocationBlocks();
 	const { createSuccessNotice } = useDispatch( noticesStore );
-	const outcome = getRemovalOutcome( menus, navigationId );
 	const fallbackId = getFallbackMenuId( menus );
 
 	const remove = () => {
@@ -266,7 +255,7 @@ function RemoveAction( {
 		);
 		editLocationBlocks(
 			location,
-			getBlocksWithoutMenu( location, navigationId, outcome!, fallbackId )
+			getBlocksWithoutMenu( location, navigationId, fallbackId )
 		);
 		createSuccessNotice(
 			sprintf(
@@ -294,25 +283,16 @@ function RemoveAction( {
 				variant="tertiary"
 				size="compact"
 				onClick={ () => setIsConfirming( true ) }
-				disabled={ ! outcome }
-				accessibleWhenDisabled
 				label={ sprintf(
 					/* translators: %s: Name of a header, footer or overlay. */
 					__( 'Remove from %s' ),
 					location.title
 				) }
 				showTooltip={ false }
-				description={
-					outcome
-						? undefined
-						: __(
-								'Publish another menu first. A place with no menu chosen shows your newest menu.'
-							)
-				}
 			>
 				{ __( 'Remove' ) }
 			</Button>
-			{ outcome && (
+			{ isConfirming && (
 				<ConfirmDialog
 					isOpen={ isConfirming }
 					title={ sprintf(
@@ -328,7 +308,13 @@ function RemoveAction( {
 					size="medium"
 				>
 					<Text render={ <p /> } style={ { margin: 0 } }>
-						{ getRemovalDescription( location.title, outcome ) }
+						{ sprintf(
+							/* translators: %s: Where the menu is shown, like "Footer". */
+							__(
+								'%s won’t show a menu. You can choose one for it again at any time.'
+							),
+							location.title
+						) }
 					</Text>
 				</ConfirmDialog>
 			) }
@@ -489,32 +475,38 @@ function LocationsView( {
 
 	return (
 		<div style={ STYLES.locations }>
-			<Notice.Root intent="info">
+			{ /* Synced purple: the menu is shared by every place it's in. */ }
+			<Notice.Root
+				intent="neutral"
+				icon={ SYNCED_ICON }
+				style={ STYLES.syncedNotice }
+			>
 				<Notice.Description>
-					{ locations.length === 1
-						? sprintf(
-								/* translators: %s: Where the menu is shown, like "Header". */
-								__(
-									'This menu appears in one place on your site, %s.'
+					{ createInterpolateElement(
+						locations.length === 1
+							? sprintf(
+									/* translators: %s: Where the menu is shown, like "Header". */
+									__(
+										'This menu appears in one place on your site, %s. <link>Change where it appears</link>'
+									),
+									locations[ 0 ].title
+								)
+							: sprintf(
+									/* translators: %d: How many places the menu is shown. */
+									__(
+										'This menu appears in %d places on your site, and changes to it show in all of them. <link>Change where it appears</link>'
+									),
+									locations.length
 								),
-								locations[ 0 ].title
-							)
-						: sprintf(
-								/* translators: %d: How many places the menu is shown. */
-								__(
-									'This menu appears in %d places on your site, shown below. Changes to the menu show in all of them.'
-								),
-								locations.length
-							) }
+						{
+							link: (
+								<InlineActionLink
+									onClick={ onChooseLocation }
+								/>
+							),
+						}
+					) }
 				</Notice.Description>
-				<Notice.Actions>
-					<Notice.ActionButton
-						variant="outline"
-						onClick={ onChooseLocation }
-					>
-						{ __( 'Change where it appears' ) }
-					</Notice.ActionButton>
-				</Notice.Actions>
 			</Notice.Root>
 			<ToggleGroupControl
 				label={ __( 'Show locations' ) }
@@ -601,8 +593,7 @@ export default function MenuLocations( {
 	const [ view, setView ] = useState< string >( VIEW_PREVIEW );
 	const [ isChoosing, setIsChoosing ] = useState( false );
 	const editLocationBlocks = useEditLocationBlocks();
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 	const menu = menus.find( ( record ) => record.id === id );
 	const menuTitle = menu ? getMenuTitle( menu ) : __( 'This menu' );
 	const fallbackId = getFallbackMenuId( menus );
@@ -618,7 +609,6 @@ export default function MenuLocations( {
 
 	const applyLocations = ( selectedIds: string[] ) => {
 		setIsChoosing( false );
-		let skipped = 0;
 
 		for ( const location of candidates ) {
 			const isSelected = selectedIds.includes( location.id );
@@ -635,27 +625,13 @@ export default function MenuLocations( {
 					)
 				);
 			} else if ( ! isSelected && isShown ) {
-				const outcome = getRemovalOutcome( menus, id );
-				if ( ! outcome ) {
-					skipped++;
-					continue;
-				}
 				editLocationBlocks(
 					location,
-					getBlocksWithoutMenu( location, id, outcome, fallbackId )
+					getBlocksWithoutMenu( location, id, fallbackId )
 				);
 			}
 		}
 
-		if ( skipped ) {
-			createErrorNotice(
-				__(
-					'Some places still show this menu. Publish another menu first, as a place with no menu chosen shows your newest menu.'
-				),
-				{ type: 'snackbar' }
-			);
-			return;
-		}
 		createSuccessNotice( __( 'Menu locations updated. Save to apply.' ), {
 			type: 'snackbar',
 		} );

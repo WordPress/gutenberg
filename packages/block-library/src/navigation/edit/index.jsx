@@ -61,6 +61,7 @@ import MenuInspectorControls from './menu-inspector-controls';
 import AutoMenuBlockControls from '../menu-list-view/auto-menu-block-controls';
 import { useIsAutoMenu } from '../menu-list-view/auto-menu';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import NoMenuWarning from './no-menu-warning';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
@@ -287,7 +288,10 @@ function Navigation( {
 
 	const setRef = useCallback(
 		( postId ) => {
-			setAttributes( { ref: postId } );
+			// Choosing a menu ends a "no menu" state.
+			setAttributes(
+				postId ? { ref: postId, noFallback: false } : { ref: postId }
+			);
 		},
 		[ setAttributes ]
 	);
@@ -508,7 +512,13 @@ function Navigation( {
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+	// A block told to show no menu doesn't get the site's fallback menu, and
+	// shows the placeholder for choosing one instead.
+	const navigationFallbackId = ! (
+		ref ||
+		hasUnsavedBlocks ||
+		attributes.noFallback
+	)
 		? getNavigationFallbackId()
 		: null;
 
@@ -1062,6 +1072,34 @@ function Navigation( {
 	 * for an empty navigation block, instead of the default fallbacks.
 	 *
 	 */
+
+	// Told to show no menu: say so and offer the choice of a menu, rather
+	// than falling back to the site's newest menu.
+	if ( attributes.noFallback && ! ref && ! hasUncontrolledInnerBlocks ) {
+		return (
+			<>
+				<MenuInspectorControls
+					clientId={ clientId }
+					currentMenuId={ ref }
+					isNavigationMenuMissing={ isNavigationMenuMissing }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
+					blockEditingMode={ blockEditingMode }
+				/>
+				<TagName { ...blockProps }>
+					<NoMenuWarning
+						currentMenuId={ ref }
+						onSelectNavigationMenu={ onSelectNavigationMenu }
+						onSelectClassicMenu={ onSelectClassicMenu }
+						onCreateNew={ createUntitledEmptyNavigationMenu }
+					/>
+				</TagName>
+			</>
+		);
+	}
 
 	if ( isPlaceholder && CustomPlaceholder ) {
 		return (

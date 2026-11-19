@@ -25,6 +25,10 @@
 		"ref": {
 			"type": "number"
 		},
+		"noFallback": {
+			"type": "boolean",
+			"default": false
+		},
 		"textColor": {
 			"type": "string"
 		},

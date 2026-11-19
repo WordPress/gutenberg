@@ -11,6 +11,7 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import { CheckboxControl } from '@wordpress/ui';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 
@@ -21,6 +22,11 @@ export const AddNavigationModal = ( {
 } ) => {
 	const [ menuTitle, setMenuTitle ] = useState( '' );
 	const [ isBusy, setIsBusy ] = useState( false );
+	// With the experiment on, a new menu lists every page (an Auto menu)
+	// unless this is unticked.
+	const isMenuEditing = !! ( window as any )
+		.__experimentalNavigationMenuEditing;
+	const [ includePages, setIncludePages ] = useState( true );
 	const navigate = useNavigate();
 
 	const { saveEntityRecord } = useDispatch( coreStore );
@@ -42,6 +48,9 @@ export const AddNavigationModal = ( {
 				{
 					title: trimmedTitle,
 					status: 'publish',
+					...( isMenuEditing && includePages
+						? { content: '<!-- wp:page-list /-->' }
+						: {} ),
 				},
 				{
 					throwOnError: true,
@@ -117,6 +126,19 @@ export const AddNavigationModal = ( {
 						placeholder={ __( 'Enter menu name' ) }
 						disabled={ isBusy }
 					/>
+					{ isMenuEditing && (
+						<CheckboxControl
+							label={ __(
+								'Automatically include all new pages'
+							) }
+							description={ __(
+								'The menu lists your pages, and new pages are added as you publish them. You can customize it later.'
+							) }
+							checked={ includePages }
+							onCheckedChange={ setIncludePages }
+							disabled={ isBusy }
+						/>
+					) }
 					<HStack justify="right" spacing={ 2 }>
 						<Button
 							variant="tertiary"

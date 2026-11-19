@@ -567,8 +567,9 @@ class WP_Navigation_Block_Renderer {
 			$inner_blocks = self::get_inner_blocks_from_navigation_post( $attributes );
 		}
 
-		// If there are no inner blocks then fallback to rendering an appropriate fallback.
-		if ( empty( $inner_blocks ) ) {
+		// If there are no inner blocks then fallback to rendering an appropriate fallback,
+		// unless the block has been told to show no menu.
+		if ( empty( $inner_blocks ) && empty( $attributes['noFallback'] ) ) {
 			$inner_blocks = self::get_inner_blocks_from_fallback( $attributes );
 		}
 
@@ -1080,6 +1081,12 @@ class WP_Navigation_Block_Renderer {
 		self::$has_submenus = false;
 
 		$inner_blocks = self::get_inner_blocks( $attributes, $block );
+
+		// A block told to show no menu, and given none, renders nothing.
+		if ( ! empty( $attributes['noFallback'] ) && ( empty( $inner_blocks ) || 0 === count( $inner_blocks ) ) ) {
+			return '';
+		}
+
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_tree_has_block_type(
 			$inner_blocks,
