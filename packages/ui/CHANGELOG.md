@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.27.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).
@@ -9,6 +11,7 @@
 
 ### New Features
 
+-   `Notice.ActionButtonLink`: Add a button-styled link action for use within `Notice.Actions` ([#86959](https://github.com/WordPress/gutenberg/pull/86959)).
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
@@ -18,9 +21,10 @@
 
 -   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
+-   `Switch`, `SwitchControl`: Show a `1` on the track when the switch is on and a `0` when it's off, as on iOS, so the state doesn't rely on color and thumb position alone. The thumb is now a pill that spans the full switch height, the labels slide in and out of the track along with it, and disabled switches use the same track whether on or off ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   `Select`, `Combobox`, `Autocomplete`, and the controls built on them: Keep group labels pinned to the top of the list while their group's items scroll. Inline lists get this when their items are inside a `ListBody` with a limited height ([#86535](https://github.com/WordPress/gutenberg/pull/86535)).
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
--   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds.
+-   `Badge`: Add a dashed border to the `draft` intent so it stays visible on gray backgrounds ([#86744](https://github.com/WordPress/gutenberg/pull/86744)).
 -   `Avatar.Initials`: Reuse the grapheme segmenter while the locale is unchanged to avoid repeated allocations ([#86773](https://github.com/WordPress/gutenberg/pull/86773)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
 -   `Menu`: Reuse unchanged root and submenu context values to avoid extra consumer renders ([#86771](https://github.com/WordPress/gutenberg/pull/86771)).
@@ -41,6 +45,7 @@
 
 ### Internal
 
+-   Update the `@daypicker/react` dependency to 10.0.2 ([#86886](https://github.com/WordPress/gutenberg/pull/86886)).
 -   `Meter`, `Progress`: Use the new `--wpds-color-background-indicator-*` tokens for the filled portion. The colors are unchanged ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
