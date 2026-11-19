@@ -201,9 +201,13 @@
 		background-color: transparent;
 		border: none;
 		border-radius: 0;
-		// Wrapped groups draw their own borders, so a shadow around the whole
-		// toolbar would also cover the empty space beside the last row.
+		// Follow the wrapped groups' shape. Mirrors `$elevation-medium`.
 		box-shadow: none;
+		filter:
+			drop-shadow(0 2px 3px rgba($black, 0.05))
+			drop-shadow(0 4px 5px rgba($black, 0.04))
+			drop-shadow(0 12px 12px rgba($black, 0.03))
+			drop-shadow(0 16px 16px rgba($black, 0.02));
 
 		.block-editor-block-toolbar {
 			flex-wrap: wrap;
