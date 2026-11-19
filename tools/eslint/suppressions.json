@@ -3372,11 +3372,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/edit/use-inner-blocks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/edit/use-layout-custom-properties.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -10444,11 +10439,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/unsaved-changes-warning/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
