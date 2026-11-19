@@ -741,7 +741,7 @@ describe( 'TimePicker', () => {
 		} );
 	} );
 
-	describe( 'timezone tooltip', () => {
+	describe( 'time zone with a numeric abbreviation', () => {
 		let originalSettings: DateSettings;
 
 		beforeAll( () => {
