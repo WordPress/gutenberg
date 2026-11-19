@@ -132,7 +132,8 @@ class DependencyExtractionWebpackPlugin {
 	 *
 	 * A `webpackMode: "weak"` `import()` stays with the static imports: on its
 	 * own, it would point to an external that no chunk loads, so it would
-	 * always reject.
+	 * always reject. Grouped, it comes first, so the group, the file's static
+	 * imports of the request included, gets the dynamic kind.
 	 *
 	 * @param {webpack.Module} module Module whose dependencies webpack is about to resolve.
 	 */
@@ -421,13 +422,6 @@ class DependencyExtractionWebpackPlugin {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
 					if ( this.useModules ) {
-						// A static occurrence (in the entry chunk) wins.
-						if (
-							fromAsyncChunk &&
-							chunkStaticDeps.has( m.request )
-						) {
-							return;
-						}
 						// Externals in an async chunk are reached via a dynamic
 						// import by definition.
 						const isStatic =
@@ -550,6 +544,8 @@ class DependencyExtractionWebpackPlugin {
 					// Sort these so we can produce a stable, stringified representation.
 					...Array.from( chunkStaticDeps ).sort(),
 					...Array.from( chunkDynamicDeps )
+						// A static occurrence of a script module wins.
+						.filter( ( id ) => ! chunkStaticDeps.has( id ) )
 						.sort()
 						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
 				],

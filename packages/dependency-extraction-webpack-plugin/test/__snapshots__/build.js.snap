@@ -600,11 +600,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-require
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds.asset.php' should match snapshot 1`] = `
 "<?php return array(
 	'dependencies' => array(
-		'@wordpress/a11y',
-		array(
-			'id' => '@wordpress/a11y',
-			'import' => 'dynamic'
-		)
+		'@wordpress/a11y'
 	),
 	'version' => '5aec48e840a9ed83ef2f',
 	'type' => 'module'
@@ -615,11 +611,7 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-
 exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules\` > should produce expected output > Asset file 'both-kinds-split.asset.php' should match snapshot 1`] = `
 "<?php return array(
 	'dependencies' => array(
-		'@wordpress/a11y',
-		array(
-			'id' => '@wordpress/a11y',
-			'import' => 'dynamic'
-		)
+		'@wordpress/a11y'
 	),
 	'version' => '459f95ddfe8ec010458f',
 	'type' => 'module'
