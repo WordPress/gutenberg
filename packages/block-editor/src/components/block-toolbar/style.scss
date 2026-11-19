@@ -51,11 +51,6 @@
 		}
 	}
 
-	.components-toolbar-group .components-toolbar-group::after,
-	.components-toolbar .components-toolbar::after {
-		content: none;
-	}
-
 	&.is-connected {
 		.block-editor-block-switcher .components-button::before {
 			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
@@ -96,8 +91,10 @@
 	&:has(> :last-child:empty) > :nth-last-child(2),
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar-group,
 	&:has(> :last-child:empty) > :nth-last-child(2) .components-toolbar {
+		// `display`, not `content`, so header toolbars that restyle the
+		// hairline cannot bring it back on the last segment.
 		&::after {
-			content: none;
+			display: none;
 		}
 	}
 
@@ -127,14 +124,6 @@
 
 		// Prevents padding from being applied to the left and right sides of the element.
 		scrollbar-gutter: auto;
-
-		> :last-child,
-		> :last-child .components-toolbar-group,
-		> :last-child .components-toolbar {
-			&::after {
-				display: none;
-			}
-		}
 	}
 
 	& > .block-editor-block-toolbar {
@@ -200,7 +189,6 @@
 	.block-editor-block-contextual-toolbar:not(.editor-header__toolbar *) {
 		background-color: transparent;
 		border: none;
-		border-radius: 0;
 		// Follow the wrapped groups' shape. Mirrors `$elevation-medium`.
 		box-shadow: none;
 		filter:
@@ -254,11 +242,6 @@
 				border-radius: 0;
 				margin: 0;
 				box-shadow: none;
-
-				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
-				.components-toolbar-group:last-child {
-					border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-				}
 			}
 		}
 	}
@@ -347,7 +330,6 @@
 
 	// Mover overrides.
 	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
-		position: relative;
 		margin-left: 6px;
 		margin-right: -6px;
 		white-space: nowrap;
