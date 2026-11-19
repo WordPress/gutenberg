@@ -253,7 +253,11 @@ test.describe( 'Cover', () => {
 
 		// Ensure the resize handle is in view before measuring its bounding box,
 		// so the cached coordinates match the actual position during the drag.
-		await coverBlockResizeHandle.scrollIntoViewIfNeeded();
+		// The handle is outside the canvas iframe, so scroll the block instead.
+		await coverBlock.evaluate( ( node ) =>
+			node.scrollIntoView( { block: 'center', behavior: 'instant' } )
+		);
+		await expect( coverBlockResizeHandle ).toBeInViewport( { ratio: 1 } );
 
 		// Establish the existing bounding boxes for the Cover block
 		// and the Cover block's resizing handle.
