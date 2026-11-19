@@ -2309,7 +2309,7 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	public function get_block_custom_css( $css, $selector ) {
 		_deprecated_function( __METHOD__, 'Gutenberg 18.6.0', 'get_styles_for_block' );
-		return $this->process_blocks_custom_css( $css, $selector );
+		return static::process_blocks_custom_css( $css, $selector );
 	}
 
 	/**
@@ -4266,7 +4266,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Store custom CSS for the style variation.
 				if ( isset( $style_variation_node['css'] ) ) {
-					$style_variation_custom_css[ $style_variation['selector'] ] = $this->process_blocks_custom_css( $style_variation_node['css'], $variation_css_selector );
+					$style_variation_custom_css[ $style_variation['selector'] ] = static::process_blocks_custom_css( $style_variation_node['css'], $variation_css_selector );
 				}
 
 				// Store variation metadata and node for layout styles generation.
@@ -4611,7 +4611,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		// 7. Generate and append any custom CSS rules.
 		if ( isset( $node['css'] ) && ! $is_root_selector ) {
-			$block_rules .= $this->process_blocks_custom_css( $node['css'], $css_selector );
+			$block_rules .= static::process_blocks_custom_css( $node['css'], $css_selector );
 		}
 
 		// 8. Wrap the entire block output in a media query if this is a responsive node.
