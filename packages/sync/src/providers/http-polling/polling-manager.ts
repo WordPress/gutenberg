@@ -61,6 +61,7 @@ interface RegisterRoomOptions {
 	room: string;
 	doc: Y.Doc;
 	awareness: Awareness;
+	flushLocalUpdates?: () => void;
 	log: LogFunction;
 	onStatusChange: ( status: ConnectionStatus ) => void;
 }
@@ -934,6 +935,7 @@ function registerRoom( {
 	room,
 	doc,
 	awareness,
+	flushLocalUpdates,
 	log,
 	onStatusChange,
 }: RegisterRoomOptions ): void {
@@ -1034,8 +1036,12 @@ function registerRoom( {
 		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
-		processDocUpdate: ( update: SyncUpdate ) =>
-			processDocUpdate( update, doc ),
+		processDocUpdate: ( update: SyncUpdate ) => {
+			// Local updates that wait in the sync manager were made before
+			// this update arrived, so they are applied first.
+			flushLocalUpdates?.();
+			return processDocUpdate( update, doc );
+		},
 		room,
 		unregister,
 		updateQueue,
