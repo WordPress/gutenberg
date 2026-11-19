@@ -214,31 +214,43 @@ describe( 'Navigation Link Block Labelling', () => {
 	} );
 
 	describe( 'Navigation Block DEFAULT_BLOCK integration', () => {
-		it( 'should work with Navigation block default block attributes', () => {
-			// This simulates the DEFAULT_BLOCK from Navigation block constants
-			const defaultBlockAttributes = {
+		it( 'labels an explicitly page-scoped block', () => {
+			const blockAttributes = {
 				kind: 'post-type',
 				type: 'page',
 			};
 
-			const result = __experimentalLabel( defaultBlockAttributes, {
+			const result = __experimentalLabel( blockAttributes, {
 				context: 'appender',
 			} );
 
 			expect( result ).toBe( 'Add page' );
 		} );
 
-		it( 'should work with Navigation block default block for posts', () => {
-			const defaultBlockAttributes = {
+		it( 'labels an explicitly post-scoped block', () => {
+			const blockAttributes = {
 				kind: 'post-type',
 				type: 'post',
 			};
+
+			const result = __experimentalLabel( blockAttributes, {
+				context: 'appender',
+			} );
+
+			expect( result ).toBe( 'Add post' );
+		} );
+
+		it( "labels the Navigation block appender's actual DEFAULT_BLOCK attributes (no kind/type set)", () => {
+			// This matches DEFAULT_BLOCK from Navigation block constants: the
+			// appender's inserted link isn't scoped to any one entity type,
+			// so its search isn't limited to pages.
+			const defaultBlockAttributes = {};
 
 			const result = __experimentalLabel( defaultBlockAttributes, {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'Add post' );
+			expect( result ).toBe( 'Add link' );
 		} );
 	} );
 } );
