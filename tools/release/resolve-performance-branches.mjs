@@ -33,6 +33,7 @@ export const SHARDS = {
 		'front-end-classic-theme',
 		'media-processing',
 		'media-upload',
+		'suggestion-mode',
 	],
 };
 
@@ -271,8 +272,8 @@ function main() {
 	const shards = resolveShards(
 		fs
 			.readdirSync( path.join( 'test', 'performance', 'specs' ) )
-			.filter( ( file ) => file.endsWith( '.spec.js' ) )
-			.map( ( file ) => path.basename( file, '.spec.js' ) )
+			.filter( ( file ) => /\.spec\.[jt]s$/.test( file ) )
+			.map( ( file ) => file.replace( /\.spec\.[jt]s$/, '' ) )
 	);
 
 	const pluginFiles = PLUGIN_FILES.join( ' ' );
