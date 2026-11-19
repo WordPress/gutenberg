@@ -301,7 +301,10 @@ describe( 'DataViews table scroll fade', () => {
 				expect( style.maskImage ).toBe(
 					`linear-gradient(to ${ to }, rgba(0, 0, 0, 0) ${ FADE_RAMP }px, rgb(0, 0, 0) ${ FADE_RAMP }px), linear-gradient(rgb(0, 0, 0) 1px, rgba(0, 0, 0, 0) 1px)`
 				);
-				expect( style.maskComposite ).toBe( 'intersect, intersect' );
+				// Firefox lists a value once when it repeats for every layer.
+				expect( style.maskComposite ).toMatch(
+					/^intersect(, intersect)?$/
+				);
 			}
 		}
 	);
