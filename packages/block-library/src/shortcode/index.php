@@ -18,20 +18,12 @@
  * @return string Returns the block content.
  */
 function render_block_core_shortcode( $attributes, $content ) {
-	/*
-	 * Block templates expand shortcodes before rendering blocks, so the content
-	 * can already be the HTML output of a shortcode. Running wpautop() on that
-	 * markup can break it, for example by adding stray closing paragraph tags.
-	 */
+	// Skip wpautop() on shortcode output that block templates have already expanded.
 	if ( str_contains( $content, '<' ) && ! preg_match( '/' . get_shortcode_regex() . '/', $content ) ) {
 		return $content;
 	}
 
-	/*
-	 * Remove the paragraphs wpautop() adds around standalone shortcodes, as
-	 * the_content does. Block widgets expand shortcodes without doing so, which
-	 * would leave block-level shortcode output inside a paragraph.
-	 */
+	// Remove the paragraphs around standalone shortcodes, which the_content does but block widgets don't.
 	return shortcode_unautop( wpautop( $content ) );
 }
 

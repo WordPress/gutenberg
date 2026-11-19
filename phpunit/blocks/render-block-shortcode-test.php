@@ -83,7 +83,7 @@ class Render_Block_Shortcode_Test extends WP_UnitTestCase {
 	 * Tests that a Shortcode block in a block template does not add stray paragraph tags
 	 * to the shortcode output.
 	 *
-	 * @see https://github.com/WordPress/gutenberg/issues/54136
+	 * @link https://github.com/WordPress/gutenberg/issues/54136
 	 */
 	public function test_should_not_add_paragraph_tags_to_shortcode_output_in_block_template() {
 		global $_wp_current_template_content;
@@ -100,6 +100,8 @@ class Render_Block_Shortcode_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that a Shortcode block in a block widget does not wrap the shortcode output
 	 * in a paragraph.
+	 *
+	 * @link https://github.com/WordPress/gutenberg/pull/86893#issuecomment-7004365134
 	 */
 	public function test_should_not_wrap_shortcode_output_in_paragraph_in_block_widget() {
 		$output = apply_filters(

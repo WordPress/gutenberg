@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Shortcode: Fix stray paragraph tags in the shortcode output when the block is used in a block template or a block widget ([#86893](https://github.com/WordPress/gutenberg/pull/86893)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 
 ## 12.2.0 (2026-11-18)
@@ -24,7 +25,6 @@
 
 ### Bug Fixes
 
--   Shortcode: Fix stray paragraph tags in the shortcode output when the block is used in a block template or a block widget ([#86893](https://github.com/WordPress/gutenberg/pull/86893)).
 -   Embed: Keep the Amazon Kindle title and icon after a URL is embedded, and stop the provider slug changing on each save ([#87016](https://github.com/WordPress/gutenberg/pull/87016)).
 -   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
 -   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
