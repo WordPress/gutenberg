@@ -54,8 +54,8 @@ class Render_Block_Shortcode_Test extends WP_UnitTestCase {
 	 */
 	public function test_should_autop_content_with_unexpanded_shortcode() {
 		$this->assertSame(
-			"<p>[test_block_shortcode]</p>\n",
-			$this->render_shortcode_block( '[test_block_shortcode]' )
+			"<p>Text [test_block_shortcode] here</p>\n",
+			$this->render_shortcode_block( 'Text [test_block_shortcode] here' )
 		);
 	}
 
@@ -95,5 +95,21 @@ class Render_Block_Shortcode_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( self::SHORTCODE_OUTPUT, $output );
 		$this->assertStringNotContainsString( '<p>', $output );
 		$this->assertStringNotContainsString( '</p>', $output );
+	}
+
+	/**
+	 * Tests that a Shortcode block in a block widget does not wrap the shortcode output
+	 * in a paragraph.
+	 */
+	public function test_should_not_wrap_shortcode_output_in_paragraph_in_block_widget() {
+		$output = apply_filters(
+			'widget_block_content',
+			"<!-- wp:shortcode -->\n[test_block_shortcode]\n<!-- /wp:shortcode -->",
+			array(),
+			null
+		);
+
+		$this->assertStringContainsString( self::SHORTCODE_OUTPUT, $output );
+		$this->assertStringNotContainsString( '<p>', $output );
 	}
 }

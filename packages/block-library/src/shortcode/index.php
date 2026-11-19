@@ -9,7 +9,8 @@
  * Performs wpautop() on the shortcode block content.
  *
  * @since 5.0.0
- * @since 7.3.0 Skips wpautop() when the shortcodes have already been expanded.
+ * @since 7.3.0 Skips wpautop() when the shortcodes have already been expanded,
+ *              and removes the paragraphs it adds around standalone shortcodes.
  *
  * @param array  $attributes The block attributes.
  * @param string $content    The block content.
@@ -26,7 +27,12 @@ function render_block_core_shortcode( $attributes, $content ) {
 		return $content;
 	}
 
-	return wpautop( $content );
+	/*
+	 * Remove the paragraphs wpautop() adds around standalone shortcodes, as
+	 * the_content does. Block widgets expand shortcodes without doing so, which
+	 * would leave block-level shortcode output inside a paragraph.
+	 */
+	return shortcode_unautop( wpautop( $content ) );
 }
 
 /**
