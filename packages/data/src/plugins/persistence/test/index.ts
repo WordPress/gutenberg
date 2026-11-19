@@ -7,10 +7,9 @@ import persistencePlugin, {
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
-import type { DataPlugin, DataRegistry } from '../../../types';
+import type { DataRegistry } from '../../../types';
 
-// Tests always pass options, which the plugin requires.
-const plugin = persistencePlugin as DataPlugin;
+const plugin = persistencePlugin;
 
 type PersistStoreConfig = Parameters< DataRegistry[ 'registerStore' ] >[ 1 ] & {
 	persist?: boolean | string[];
@@ -42,6 +41,12 @@ describe( 'persistence', () => {
 			const options = Object.freeze( { persist: true, reducer() {} } );
 			registry.registerStore( 'test', options );
 		} ).not.toThrow( /object is not extensible/ );
+	} );
+
+	it( 'should not throw when initialized without options', () => {
+		expect( () => {
+			createRegistry().use( persistencePlugin );
+		} ).not.toThrow();
 	} );
 
 	it( 'should load a persisted value as initialState', () => {
@@ -330,6 +335,13 @@ describe( 'persistence', () => {
 				storage,
 				storageKey,
 			} ) );
+		} );
+
+		it( 'creates interface without options', () => {
+			expect( () => {
+				const persistence = createPersistenceInterface();
+				expect( persistence.get() ).toEqual( {} );
+			} ).not.toThrow();
 		} );
 
 		describe( 'get', () => {

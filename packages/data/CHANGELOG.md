@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `plugins.persistence`: Allow calling `createPersistenceInterface` and registering the plugin without options.
+
 ## 11.2.0 (2026-11-18)
 
 ### Bug Fixes
