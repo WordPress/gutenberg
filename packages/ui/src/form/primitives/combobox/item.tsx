@@ -64,7 +64,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 							variant !== 'creatable' &&
 								itemPopupStyles[ 'item-indicator-icon' ]
 						) }
-						size={ 16 }
+						size={ variant === 'creatable' ? 16 : 20 }
 					/>
 				</span>
 				<div className={ itemPopupStyles[ 'item-text' ] }>
