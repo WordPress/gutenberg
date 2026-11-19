@@ -952,6 +952,39 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			await pageUtils.setBrowserViewport( 'large' );
 		} );
 	} );
+
+	test( 'keeps the canvas in place while scrolling to a block inserted at the end of the post', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '2000px' },
+		} );
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const canvas = page.locator( '.editor-visual-editor' );
+		await canvas.evaluate( ( node ) =>
+			node.addEventListener( 'scroll', () =>
+				node.setAttribute( 'data-scrolled', '' )
+			)
+		);
+		await page
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toBeInViewport( { ratio: 1 } );
+		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
+	} );
 } );
 
 test.describe( 'Default block ghost', () => {
@@ -1145,6 +1178,7 @@ class InsertingBlocksUtils {
 			'data-testid=block-draggable-chip >> visible=true'
 		);
 	}
+
 	async dragOver( boundingBox ) {
 		// Hover on the right side of the block to avoid collapsing with the preview.
 		// But not too far to avoid triggering the grouping block inserter.
