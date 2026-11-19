@@ -154,7 +154,11 @@ const PREVIEW_STYLES = [
 
 // The synced icon, in the synced purple.
 const SYNCED_ICON = cloneElement( symbol, {
-	style: { fill: 'var(--wp-block-synced-color, #7a00df)' },
+	// An outline icon: keep its own style, and colour its stroke.
+	style: {
+		...symbol.props.style,
+		color: 'var(--wp-block-synced-color, #7a00df)',
+	},
 } );
 
 type EditLocation = ( part: TemplatePartRecord ) => void;
@@ -307,15 +311,17 @@ function RemoveAction( {
 					confirmButtonText={ __( 'Remove' ) }
 					size="medium"
 				>
-					<Text render={ <p /> } style={ { margin: 0 } }>
-						{ sprintf(
-							/* translators: %s: Where the menu is shown, like "Footer". */
-							__(
-								'%s won’t show a menu. You can choose one for it again at any time.'
-							),
-							location.title
-						) }
-					</Text>
+					<Notice.Root intent="warning">
+						<Notice.Description>
+							{ sprintf(
+								/* translators: %s: Where the menu is shown, like "Footer". */
+								__(
+									'This will leave %s without a menu, so visitors won’t see one there. You can choose a menu for it again at any time.'
+								),
+								location.title
+							) }
+						</Notice.Description>
+					</Notice.Root>
 				</ConfirmDialog>
 			) }
 		</>
