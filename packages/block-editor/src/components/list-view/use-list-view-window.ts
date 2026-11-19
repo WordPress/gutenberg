@@ -62,24 +62,9 @@ export default function useListViewWindow() {
 	const ref = useRefEffect( ( list: HTMLElement ) => {
 		const { ownerDocument } = list;
 		const defaultView = ownerDocument.defaultView as Window;
-		let observedContainer: Element | undefined;
-
-		// The container can change while the list is open: a popover only
-		// clips its content after the first layout, and a list starts to
-		// overflow as it grows.
-		const observeContainer = ( scrollContainer: Element ) => {
-			if ( scrollContainer !== observedContainer ) {
-				observedContainer = scrollContainer;
-				resizeObserver.disconnect();
-				resizeObserver.observe( scrollContainer );
-			}
-		};
-
 		const updateWindow = ( spareRows: number ) => {
 			const scrollContainer =
 				getScrollContainer( list ) ?? ownerDocument.documentElement;
-			observeContainer( scrollContainer );
-
 			const { first, last } = getVisibleRows( list, scrollContainer );
 			const listWindow = listWindowRef.current;
 			if ( coversRows( listWindow, first, last, spareRows ) ) {
@@ -128,9 +113,17 @@ export default function useListViewWindow() {
 		} );
 		defaultView.addEventListener( 'resize', fillViewport );
 
-		// The observer first reports after layout, so the first measurement
-		// doesn't force one while the list opens.
-		resizeObserver.observe( list );
+		// Any ancestor can end up as the scroll container: a popover only
+		// clips its content after the first layout, and a list starts to
+		// overflow as it grows. The observer first reports after layout, so
+		// the first measurement doesn't force one while the list opens.
+		for (
+			let node: Element | null = list;
+			node;
+			node = node.parentElement
+		) {
+			resizeObserver.observe( node );
+		}
 
 		return () => {
 			resizeObserver.disconnect();
