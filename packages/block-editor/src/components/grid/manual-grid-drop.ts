@@ -112,12 +112,33 @@ export function getManualGridDropRect(
 			new GridRect(),
 			rowHeight
 		);
+		// Wrapping content can fit a single column by becoming arbitrarily
+		// tall. Measure its preferred width across the grid before choosing
+		// spans, so text and flexible containers also get horizontal space.
+		const previousWidth = item.style.getPropertyValue( 'width' );
+		const previousPriority = item.style.getPropertyPriority( 'width' );
+		item.style.setProperty( 'width', 'max-content' );
+		const preferredSize = measureGridItemAtRect(
+			item,
+			new GridRect( { columnSpan: columnCount } ),
+			rowHeight
+		);
+		if ( previousWidth ) {
+			item.style.setProperty( 'width', previousWidth, previousPriority );
+		} else {
+			item.style.removeProperty( 'width' );
+		}
 		columnSpan = Math.min(
 			columnCount,
 			Math.max(
 				columnSpan,
 				getGridSpan(
-					Math.max( oneCell.offsetWidth, oneCell.scrollWidth ),
+					Math.max(
+						oneCell.offsetWidth,
+						oneCell.scrollWidth,
+						preferredSize.offsetWidth,
+						preferredSize.scrollWidth
+					),
 					columnWidth,
 					columnGap
 				)
