@@ -75,6 +75,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		isLastBranch = true,
 	} = props;
 
 	const { canParentExpand, isParentSynced } = useSelect(
@@ -186,16 +187,17 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		// This prevents the entire tree from being rendered when a branch is
 		// selected, or a user selects all blocks, while still enabling scroll
 		// into view behavior when selecting a block or opening the list view.
-		// The first and last blocks of the list are always rendered, to ensure
-		// that Home and End keys work as expected. The focused block is
-		// rendered so that scrolling it out of view does not drop focus.
+		// The first block of the list and the last block of each branch that
+		// ends the list are always rendered, to ensure that Home and End keys
+		// work as expected. The focused block is rendered so that scrolling
+		// it out of view does not drop focus.
 		const showBlock =
 			isDragged ||
 			blockInView ||
 			clientId === focusedClientId ||
 			( isSelected && clientId === selectedClientIds[ 0 ] ) ||
-			index === 0 ||
-			index === blockCount - 1;
+			( level === 1 && index === 0 ) ||
+			( isLastBranch && index === blockCount - 1 );
 
 		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
 
@@ -261,6 +263,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						isLastBranch={
+							isLastBranch && index === blockCount - 1
+						}
 					/>
 				) }
 			</AsyncModeProvider>

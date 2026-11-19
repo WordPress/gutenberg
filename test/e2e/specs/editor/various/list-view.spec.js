@@ -1755,6 +1755,52 @@ test.describe( 'List View', () => {
 			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
 			await listViewUtils.expectNoBlankRows();
 		} );
+
+		test( 'moves to both ends of a nested list with End and Home @firefox @webkit', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				Array.from(
+					{ length: 100 },
+					( _, group ) =>
+						`<!-- wp:group {"metadata":{"name":"Group ${
+							group + 1
+						}"}} --><div class="wp-block-group">${ Array.from(
+							{ length: 4 },
+							( __, paragraph ) =>
+								`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+									group + 1
+								}.${
+									paragraph + 1
+								}"}} --><p></p><!-- /wp:paragraph -->`
+						).join( '' ) }</div><!-- /wp:group -->`
+				).join( '' )
+			);
+			const listView = await listViewUtils.openListView();
+			const getGroup = ( position ) =>
+				listView.getByRole( 'link', {
+					name: `Group ${ position }`,
+					exact: true,
+				} );
+			await expect( getGroup( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'End' );
+			await expect( getGroup( 100 ) ).toBeFocused();
+			await expect( getGroup( 100 ) ).toBeInViewport();
+
+			// Expands the last group, then leaves it far outside of the
+			// rendered rows.
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'Home' );
+			await expect( getGroup( 1 ) ).toBeFocused();
+			await expect( getGroup( 1 ) ).toBeInViewport();
+
+			await page.keyboard.press( 'End' );
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeFocused();
+			await expect( listViewUtils.getRow( '100.4' ) ).toBeInViewport();
+		} );
 	} );
 } );
 

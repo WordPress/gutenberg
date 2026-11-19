@@ -12,6 +12,10 @@
 
 -   List View: Mount a row's Options menu on first hover or focus. A custom `blockSettingsMenu` must render its toggle on its first render ([#87265](https://github.com/WordPress/gutenberg/pull/87265)).
 
+### Enhancements
+
+-   List View: Keep only the first and last rows of the whole list mounted outside the render window, not those of every expanded branch ([#87266](https://github.com/WordPress/gutenberg/pull/87266)).
+
 ### Bug Fixes
 
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
