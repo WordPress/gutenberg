@@ -115,6 +115,32 @@ test.describe( 'Canvas as a single tab stop', () => {
 		} );
 	}
 
+	test( 'leaves Tab with Ctrl or Cmd to the browser', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.canvas.getByText( 'First' ).click();
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( paragraph ).toBeFocused();
+
+		// Ctrl+Shift+Tab and Ctrl+Tab switch browser tabs, and Cmd+Shift+Tab
+		// is taken by macOS. None of them move focus out of the canvas.
+		for ( const keys of [
+			'Control+Shift+Tab',
+			'Control+Tab',
+			'Meta+Shift+Tab',
+		] ) {
+			await page.keyboard.press( keys );
+			await expect( paragraph ).toBeFocused();
+		}
+	} );
+
 	test( 'Escape steps out onto the canvas stop and Enter goes back in', async ( {
 		editor,
 		page,

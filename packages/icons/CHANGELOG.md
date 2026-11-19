@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 21.0.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   Rename the `file` icon to `folder`. The drawing it carried was a folder, so that is what it is now called ([#86526](https://github.com/WordPress/gutenberg/pull/86526)).
@@ -33,6 +35,7 @@
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+-   Add a `normalize-svg` script that rewrites a design-tool SVG export into the markup the library uses, run it on staged icons before each commit, and validate every library icon against it in the build ([#86657](https://github.com/WordPress/gutenberg/pull/86657)).
 
 ## 20.0.0 (2026-11-04)
 
