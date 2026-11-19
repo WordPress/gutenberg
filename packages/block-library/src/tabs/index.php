@@ -49,6 +49,9 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array(), strin
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
+ * The index of the default tab is provided as well, so that the Tabs block and
+ * each of its panels agree on which panel is shown first.
+ *
  * @since 7.1.0
  *
  * @param array $context      Default block context.
@@ -60,10 +63,31 @@ function block_core_tabs_provide_context( array $context, array $parsed_block ):
 	if ( 'core/tabs' === $parsed_block['blockName'] ) {
 		// Generate a unique ID for the tabs instance first, so it can be used
 		// to derive stable tab IDs.
-		$tabs_id                   = $parsed_block['attrs']['anchor'] ?? wp_unique_prefixed_id( 'tabs_' );
-		$tabs_list                 = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
-		$context['core/tabs-list'] = $tabs_list;
-		$context['core/tabs-id']   = $tabs_id;
+		$tabs_id   = $parsed_block['attrs']['anchor'] ?? wp_unique_prefixed_id( 'tabs_' );
+		$tabs_list = block_core_tabs_generate_tabs_list( $parsed_block['innerBlocks'] ?? array(), $tabs_id );
+
+		// A default tab index can be left past the last tab, for example after
+		// the default tab was removed. Fall back to the first tab so that a panel
+		// is still shown.
+		$active_tab_index = $parsed_block['attrs']['activeTabIndex'] ?? 0;
+
+		// JSON can hold a whole number as a float, such as `1.0`.
+		if (
+			is_float( $active_tab_index ) &&
+			$active_tab_index >= 0 &&
+			$active_tab_index < count( $tabs_list ) &&
+			floor( $active_tab_index ) === $active_tab_index
+		) {
+			$active_tab_index = (int) $active_tab_index;
+		}
+
+		if ( ! is_int( $active_tab_index ) || ! isset( $tabs_list[ $active_tab_index ] ) ) {
+			$active_tab_index = 0;
+		}
+
+		$context['core/tabs-list']             = $tabs_list;
+		$context['core/tabs-id']               = $tabs_id;
+		$context['core/tabs-active-tab-index'] = $active_tab_index;
 	}
 
 	return $context;
@@ -82,15 +106,9 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
  * @return string Updated HTML.
  */
 function block_core_tabs_render_block_callback( array $attributes, string $content, \WP_Block $block ): string {
-	$tabs_list = $block->context['core/tabs-list'] ?? array();
-	$tabs_id   = $block->context['core/tabs-id'] ?? null;
-
-	// A default tab index can be left past the last tab, for example after
-	// the default tab was removed. Fall back to the first tab so that a panel
-	// is still shown.
-	$active_tab_index = isset( $attributes['activeTabIndex'], $tabs_list[ $attributes['activeTabIndex'] ] )
-		? $attributes['activeTabIndex']
-		: 0;
+	$tabs_list        = $block->context['core/tabs-list'] ?? array();
+	$tabs_id          = $block->context['core/tabs-id'] ?? null;
+	$active_tab_index = $block->context['core/tabs-active-tab-index'] ?? 0;
 
 	if ( empty( $tabs_id ) ) {
 		// If malformed tabs, return early to avoid errors.
@@ -112,6 +130,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		)
 	);
 	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.activateTabByHash' );
+	$tag_processor->set_attribute( 'data-wp-init---load-images', 'callbacks.loadImagesNearViewport' );
 	$tag_processor->set_attribute( 'data-wp-on-window--hashchange', 'callbacks.activateTabByHash' );
 
 	$output = $tag_processor->get_updated_html();

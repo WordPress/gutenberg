@@ -6,6 +6,33 @@ import {
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
+/**
+ * Loads the images inside an element that the server made lazy because their
+ * tab panel is not the one shown first.
+ *
+ * Such an image has no layout box while its panel is hidden, so the browser
+ * never sees it coming near the viewport and would only fetch it once its tab
+ * is opened. Switching it to eager fetches it straight away, hidden or not.
+ *
+ * @param {Element|null} element The element to look for images in.
+ */
+const loadLazyImages = ( element ) => {
+	element
+		?.querySelectorAll( 'img[data-tab-panel-lazy]' )
+		.forEach( ( image ) => {
+			image.loading = 'eager';
+		} );
+};
+
+/**
+ * Observes every Tabs block on the page, and loads the lazy images of a block
+ * once it is within one viewport of being scrolled into view, so they are
+ * ready by the time one of its other tabs is opened.
+ *
+ * @type {IntersectionObserver|undefined}
+ */
+let lazyImagesObserver;
+
 const { actions, state } = store(
 	'core/tabs',
 	{
@@ -178,9 +205,14 @@ const { actions, state } = store(
 				const context = getContext();
 				context.activeTabIndex = newIndex;
 
+				const tabId = tabsList[ newIndex ];
+				const tabElement = document.getElementById( tabId );
+
+				// The panel can be opened before the block has come near the
+				// viewport, for example by a link to content inside it.
+				loadLazyImages( tabElement );
+
 				if ( scrollToTab ) {
-					const tabId = tabsList[ newIndex ];
-					const tabElement = document.getElementById( tabId );
 					if ( tabElement ) {
 						setTimeout( () => {
 							tabElement.scrollIntoView( { behavior: 'smooth' } );
@@ -190,6 +222,33 @@ const { actions, state } = store(
 			},
 		},
 		callbacks: {
+			/**
+			 * Loads the lazy images of the Tabs block when it comes near the
+			 * viewport.
+			 *
+			 * @return {(() => void)|undefined} Stops observing the Tabs block.
+			 */
+			loadImagesNearViewport: () => {
+				const { ref } = getElement();
+				if ( ! ref ) {
+					return;
+				}
+
+				lazyImagesObserver ??= new window.IntersectionObserver(
+					( entries ) => {
+						entries.forEach( ( { isIntersecting, target } ) => {
+							if ( isIntersecting ) {
+								lazyImagesObserver.unobserve( target );
+								loadLazyImages( target );
+							}
+						} );
+					},
+					{ rootMargin: '100%' }
+				);
+				lazyImagesObserver.observe( ref );
+
+				return () => lazyImagesObserver.unobserve( ref );
+			},
 			activateTabByHash: () => {
 				const { tabsList } = state;
 
