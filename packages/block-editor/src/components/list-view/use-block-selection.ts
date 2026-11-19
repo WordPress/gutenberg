@@ -50,6 +50,7 @@ export default function useBlockSelection() {
 					( event.type === 'click' &&
 						( isAppleOS() ? event.metaKey : event.ctrlKey ) ) )
 			) {
+				// Prevent link navigation or Space scrolling.
 				event.preventDefault();
 				await toggleBlockSelection( clientId, null );
 				return;
