@@ -7,6 +7,10 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 
+### Bug Fixes
+
+-   `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `Menu`, `Tooltip`, `Select`, `Combobox`, and `Autocomplete`: Keep an open overlay in its container when `useEnableWpCompatOverlaySlot()` is first called while it is open. The overlay no longer moves into the compat overlay slot on its next render, which remounted its contents and cleared their state, such as unsaved input. Overlays opened afterwards use the slot.
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes
