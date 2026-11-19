@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `QueryControls`: Use the WordPress UI select for the Order by field and show a placeholder when the current sort is missing or unavailable ([#87078](https://github.com/WordPress/gutenberg/pull/87078)).
+
 ### Bug Fixes
 
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
