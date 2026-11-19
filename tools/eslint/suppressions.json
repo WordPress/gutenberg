@@ -3224,9 +3224,6 @@
 		}
 	},
 	"packages/block-library/src/navigation/edit/overlay-panel.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
