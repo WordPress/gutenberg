@@ -125,17 +125,19 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
  * @return Whether every target can be dragged.
  */
 export function canDragBlocks( state: State, clientIds: string[] ) {
-	const members = new Set( clientIds );
+	const uniqueIds = new Set( clientIds );
 	return (
 		clientIds.length > 0 &&
-		members.size === clientIds.length &&
+		uniqueIds.size === clientIds.length &&
 		clientIds.every(
 			( id ) =>
+				// Check the blocks themselves before considering a drop destination.
 				!! getBlock( state, id ) &&
 				getBlockEditingMode( state, id ) !== 'disabled' &&
 				canMoveBlock( state, id ) &&
+				// Moving a parent already moves its children; do not move them twice.
 				! getBlockParents( state, id ).some( ( parent ) =>
-					members.has( parent )
+					uniqueIds.has( parent )
 				)
 		)
 	);
@@ -154,29 +156,36 @@ export function canMoveBlockSetToPosition(
 	clientIds: string[],
 	rootClientId = ''
 ) {
+	// Reject an invalid source list or a destination that no longer exists.
 	if (
 		! canDragBlocks( state, clientIds ) ||
 		( rootClientId && ! getBlock( state, rootClientId ) )
 	) {
 		return false;
 	}
+	// A block cannot be dropped into itself or one of its descendants.
 	const destinationParents = rootClientId
 		? [ rootClientId, ...getBlockParents( state, rootClientId, true ) ]
 		: [];
 	if ( destinationParents.some( ( id ) => clientIds.includes( id ) ) ) {
 		return false;
 	}
-	const destinationScope =
+	// The nearest controlled parent owns the contents as a separate entity.
+	// No controlled parent means the blocks belong to the main editor entity.
+	const controlledDestinationParent =
 		destinationParents.find( ( id ) =>
 			areInnerBlocksControlled( state, id )
 		) ?? '';
 	return clientIds.every( ( id ) => {
-		const sourceScope =
+		const controlledSourceParent =
 			getBlockParents( state, id, true ).find( ( parent ) =>
 				areInnerBlocksControlled( state, parent )
 			) ?? '';
 		return (
-			sourceScope === destinationScope &&
+			// Moving between saved entities needs coordinated updates to both;
+			// this action only changes the block tree owned by one entity.
+			controlledSourceParent === controlledDestinationParent &&
+			// Reordering needs no insertion/removal permission. Changing parents does.
 			( getBlockRootClientId( state, id ) === rootClientId ||
 				( canRemoveBlock( state, id ) &&
 					canInsertBlockType(

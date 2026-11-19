@@ -376,6 +376,7 @@ const withBlockTree =
 				);
 				break;
 			case 'MOVE_BLOCKS_TO_POSITION': {
+				// Refresh the nested block tree for every source and the destination.
 				const updatedBlockUids = [
 					...( action.fromRootClientIds ?? [
 						action.fromRootClientId ?? '',
@@ -1084,8 +1085,10 @@ export const blocks = pipe(
 				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
 				if ( action.fromRootClientIds ) {
-					const members = new Set( clientIds );
+					const uniqueIds = new Set( clientIds );
 					const newState = new Map( state );
+					// Remove the moved blocks from each affected parent first,
+					// including any already in the destination.
 					for ( const parent of new Set( [
 						...action.fromRootClientIds,
 						toRootClientId,
@@ -1093,10 +1096,11 @@ export const blocks = pipe(
 						newState.set(
 							parent,
 							( state.get( parent ) ?? [] ).filter(
-								( id ) => ! members.has( id )
+								( id ) => ! uniqueIds.has( id )
 							)
 						);
 					}
+					// Insert them together, using the index adjusted for those removals.
 					newState.set(
 						toRootClientId,
 						insertAt(

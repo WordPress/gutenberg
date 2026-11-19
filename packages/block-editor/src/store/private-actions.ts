@@ -37,6 +37,7 @@ const castArray = < T >( maybeArray: T | T[] ): T[] =>
 export const moveBlockSetToPosition =
 	( clientIds: string[], rootClientId = '', index?: number ) =>
 	( { select, dispatch, registry }: BlockEditorThunkArgs ) => {
+		// Check every source and the destination before moving any blocks.
 		if (
 			! select.canMoveBlockSetToPosition( clientIds, rootClientId ) ||
 			( index !== undefined &&
@@ -44,52 +45,61 @@ export const moveBlockSetToPosition =
 		) {
 			return;
 		}
-		const members = new Set( clientIds );
-		const ordered = select
+		// Keep the blocks in document order, regardless of the order they were selected.
+		const uniqueIds = new Set( clientIds );
+		const orderedIds = select
 			.getClientIdsWithDescendants()
-			.filter( ( id ) => members.has( id ) );
+			.filter( ( id ) => uniqueIds.has( id ) );
 		const targetOrder = select.getBlockOrder( rootClientId );
+		// An omitted index appends the blocks; an index past the end does too.
 		const targetIndex = Math.min(
 			index ?? targetOrder.length,
 			targetOrder.length
 		);
+		// Removing selected siblings before the drop position shifts it left.
+		// Blocks coming from other parents do not change that position.
 		const insertionIndex =
 			targetIndex -
 			targetOrder
 				.slice( 0, targetIndex )
-				.filter( ( id ) => members.has( id ) ).length;
-		const remaining = targetOrder.filter( ( id ) => ! members.has( id ) );
+				.filter( ( id ) => uniqueIds.has( id ) ).length;
+		// Work out the destination order without changing the store yet.
+		const remaining = targetOrder.filter( ( id ) => ! uniqueIds.has( id ) );
 		const nextOrder = [
 			...remaining.slice( 0, insertionIndex ),
-			...ordered,
+			...orderedIds,
 			...remaining.slice( insertionIndex ),
 		];
+		// The reducer needs every source parent so none retain the moved blocks.
 		const sourceParents = [
 			...new Set(
-				ordered.map( ( id ) => select.getBlockRootClientId( id )! )
+				orderedIds.map( ( id ) => select.getBlockRootClientId( id )! )
 			),
 		];
+		// Skip drops that would leave all blocks in their current positions.
 		if (
 			sourceParents.every( ( parent ) => parent === rootClientId ) &&
 			nextOrder.every( ( id, i ) => id === targetOrder[ i ] )
 		) {
-			return ordered;
+			return orderedIds;
 		}
+		// Move all blocks with one content action, then select the gathered range.
+		// Batch the two dispatches so subscribers see the final selection and tree together.
 		registry.batch( () => {
 			dispatch( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
-				clientIds: ordered,
+				clientIds: orderedIds,
 				fromRootClientIds: sourceParents,
 				toRootClientId: rootClientId,
 				index: insertionIndex,
 			} );
 			dispatch.multiSelect(
-				ordered[ 0 ],
-				ordered[ ordered.length - 1 ],
+				orderedIds[ 0 ],
+				orderedIds[ orderedIds.length - 1 ],
 				0
 			);
 		} );
-		return ordered;
+		return orderedIds;
 	};
 
 /**
