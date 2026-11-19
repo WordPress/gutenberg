@@ -23,4 +23,7 @@
 	flex-grow: 1;
 	min-height: 0;
 	overflow: auto;
+	// When the page itself can also scroll, don't hand the scroll over to it once
+	// the list reaches its end, which made one scroll gesture take several tries.
+	overscroll-behavior: contain;
 }
