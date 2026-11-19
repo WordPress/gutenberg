@@ -193,20 +193,51 @@ describe( 'DataViews table scroll fade', () => {
 			expect( getDividerOpacity() ).toBe( '0' );
 		} );
 
-		it( 'stops the row lines at the divider until the end of the scroll range', async () => {
+		it.each( [ 'ltr', 'rtl' ] as const )(
+			'covers the strip and fades the columns before it until the end of the scroll range (%s)',
+			async ( dir ) => {
+				await render( <PostsTable withActions dir={ dir } /> );
+				const cell = getActionsCell();
+				const getFadeOpacity = () =>
+					getComputedStyle( cell, '::before' ).opacity;
+
+				await expect.poll( getFadeOpacity ).toBe( '1' );
+				const fade = getComputedStyle( cell, '::before' );
+				// From the start of the fade over the columns to the divider.
+				expect( fade.width ).toBe( `${ FADE_RAMP + FADE_SIZE }px` );
+				expect( fade.insetInlineStart ).toBe( `-${ FADE_RAMP }px` );
+				expect( fade.backgroundImage ).toBe(
+					`linear-gradient(to ${
+						dir === 'rtl' ? 'left' : 'right'
+					}, rgba(0, 0, 0, 0), ${
+						getComputedStyle( cell ).backgroundColor
+					} ${ FADE_RAMP }px)`
+				);
+
+				scrollToEnd();
+				await expect.poll( getFadeOpacity ).toBe( '0' );
+			}
+		);
+
+		// Firefox moves the mask of a sticky cell behind the cell while
+		// scrolling, which cuts the actions off.
+		it( 'does not mask the actions', async () => {
 			await render( <PostsTable withActions /> );
-			const getLineSize = () =>
-				getComputedStyle( getActionsCell() ).backgroundSize;
-
+			scrollToMiddle();
 			await expect
-				.poll( getLineSize )
-				.toBe( `calc(100% - ${ FADE_SIZE }px) 1px` );
+				.poll(
+					() =>
+						getComputedStyle( getActionsCell(), '::before' ).opacity
+				)
+				.toBe( '1' );
 
-			scrollToEnd();
-			await expect.poll( getLineSize ).toBe( '100% 1px' );
-			expect( isFading( getComputedStyle( getActionsCell() ) ) ).toBe(
-				false
-			);
+			for ( const cell of [ getActionsHeader(), getActionsCell() ] ) {
+				const style = getComputedStyle( cell );
+				expect( style.maskImage ).toBe( 'none' );
+				expect(
+					style.getPropertyValue( '-webkit-mask-box-image' ) || 'none'
+				).toBe( 'none' );
+			}
 		} );
 	} );
 
@@ -230,14 +261,6 @@ describe( 'DataViews table scroll fade', () => {
 			expect(
 				getFadeMask( getComputedStyle( row, '::after' ) )
 			).toContain( `linear-gradient(to ${ end }, rgba(0, 0, 0, 0), ` );
-
-			await render( <PostsTable withActions dir={ dir } /> );
-			scrollToMiddle();
-			await expect
-				.poll( () =>
-					getFadeMask( getComputedStyle( getActionsHeader() ) )
-				)
-				.toContain( `linear-gradient(to ${ end }, rgba(0, 0, 0, 0), ` );
 		}
 	);
 

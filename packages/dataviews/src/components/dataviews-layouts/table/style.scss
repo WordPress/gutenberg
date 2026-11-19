@@ -17,30 +17,22 @@ $scroll-fade-end-size: var(--wpds-dimension-padding-3xl);
 // Width of the fade itself, over the columns next to a covering cell.
 $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
-// Covers the columns scrolling under the element on its `$side` of the row
-// while the scroll position is within `$range`: the element is opaque, and an
-// outline in the row's background reaches over the columns next to it, fading
-// them out over `$scroll-fade-ramp`. The element also hides its share of the
-// row line. Outside the range, and when nothing scrolls, the element has no
-// outline and keeps the line. Browsers without scroll-driven animations rest
-// here, until the table's `has-columns-before` and `has-columns-after`
-// classes, set from the scroll position, apply `scroll-fade-active`.
-//
-// With `$rest: line`, for cells with nothing of their own to show, the mask at
-// rest keeps only their share of the row line, so they do not cover what the
-// columns next to them paint over their space, like a focus ring.
+// Makes the cell at the edge of the rows on `$side` cover the columns
+// scrolling under it while the scroll position is within `$range`: the cell is
+// opaque, and an outline in the row's background reaches over the columns next
+// to it, fading them out over `$scroll-fade-ramp`. The cell also hides its
+// share of the row line, so the lines fade out with the columns. Outside the
+// range, and when nothing scrolls, its mask keeps only its share of the row
+// line, so it does not cover what the columns next to it paint over its space,
+// like a focus ring. Browsers without scroll-driven animations rest here,
+// until the table's `has-columns-before` and `has-columns-after` classes, set
+// from the scroll position, apply `scroll-fade-active`.
 //
 // With `$reset-range`, a second animation puts the element back at rest within
 // that range. Safari keeps an animation applied at the end of the scroll
 // range, past the end of its own range, until another one overrides it.
-@mixin scroll-fade($side, $range, $fill-mode: none, $rest: cover, $reset-range: null) {
+@mixin scroll-fade($side, $range, $fill-mode: none, $reset-range: null) {
 	$to: var(--dataviews-view-table-fade-to-#{$side});
-
-	@if $rest == line {
-		--dataviews-view-table-fade-rest-mask: linear-gradient(#000 1px, transparent 1px);
-	} @else {
-		--dataviews-view-table-fade-rest-mask: none;
-	}
 
 	// The masks only keep the part of the outline next to the columns: they
 	// are sized to the row's height, and do not reach past the edge of the row.
@@ -49,7 +41,7 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	// instead, as Safari clips the mask to the box anyway.
 	--dataviews-view-table-fade-mask: linear-gradient(to #{$to}, transparent, #000 #{$scroll-fade-ramp});
 	--dataviews-view-table-fade-mask-border: var(--dataviews-view-table-fade-mask-border-#{$side});
-	mask-image: var(--dataviews-view-table-fade-rest-mask);
+	mask-image: linear-gradient(#000 1px, transparent 1px);
 	mask-position: #{$to};
 	mask-size: calc(100% + #{$scroll-fade-ramp}) 100%;
 	mask-repeat: no-repeat;
@@ -73,15 +65,13 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 }
 
 // Applied while a fade is active, by its scroll-driven animation, or by the
-// table's classes where the browser does not support them. Without
-// `--dataviews-view-table-fade-line-size` the element hides its share of the
-// row line entirely. The outline, rather than a box shadow, as Chrome does not
+// table's classes where the browser does not support them. The outline, rather than a box shadow, as Chrome does not
 // paint box shadows on table cells.
 @mixin scroll-fade-active {
 	outline: $scroll-fade-ramp solid var(--dataviews-view-table-row-background);
 	mask-image: var(--dataviews-view-table-fade-mask);
 	-webkit-mask-box-image: var(--dataviews-view-table-fade-mask-border);
-	background-size: var(--dataviews-view-table-fade-line-size, 0 0);
+	background-size: 0 0;
 }
 
 // Shows the styles of the fade cues for the scroll positions that the
@@ -136,14 +126,23 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 			position: sticky;
 			inset-inline-end: 0;
 			background-color: var(--dataviews-view-table-row-background);
-			// While there are more columns to scroll to, the strip at the
-			// start of the cell covers them, they fade out next to it, and the
-			// row line stops at the divider.
-			--dataviews-view-table-fade-line-size: calc(100% - #{$scroll-fade-size}) 1px;
-			@include scroll-fade(end, normal calc(100% - 1px), $reset-range: calc(100% - 1px) normal);
 
-			// Divider between the strip and the actions, shown while there are
-			// more columns to scroll to.
+			// While there are more columns to scroll to, the strip at the
+			// start of the cell covers them and its share of the row line, and
+			// the columns fade out next to it. A child rather than a mask, as
+			// Firefox moves the mask of a sticky cell behind the cell while
+			// scrolling, and cuts the cell off.
+			&::before {
+				content: "";
+				position: absolute;
+				inset-block: 0;
+				inset-inline-start: calc(-1 * #{$scroll-fade-ramp});
+				width: calc(#{$scroll-fade-ramp} + #{$scroll-fade-size});
+				background-image: linear-gradient(to var(--dataviews-view-table-fade-to-end), transparent, var(--dataviews-view-table-row-background) #{$scroll-fade-ramp});
+				pointer-events: none;
+			}
+
+			// Divider between the strip and the actions.
 			&::after {
 				content: "";
 				position: absolute;
@@ -151,9 +150,14 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 				inset-inline-start: $scroll-fade-size;
 				width: 1px;
 				background-color: var(--wpds-color-stroke-surface-neutral-weak);
+			}
 
-				// Hidden at the end of the scroll range, and when nothing
-				// scrolls, where the scroll timeline is inactive.
+			// Hidden at the end of the scroll range, and when nothing scrolls,
+			// where the scroll timeline is inactive. The second animation
+			// hides them at the end of the range in Safari, which keeps the
+			// first one applied there.
+			&::before,
+			&::after {
 				opacity: 0;
 
 				@supports (animation-timeline: scroll()) {
@@ -415,14 +419,14 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		// Above the positioned content of the cells that follow it.
 		z-index: 1;
 		// From the first pixel scrolled, through the end of the range.
-		@include scroll-fade(start, 1px normal, forwards, $rest: line);
+		@include scroll-fade(start, 1px normal, forwards);
 	}
 
 	&:not(.has-actions) tr::after {
 		inset-inline-end: 0;
 		width: $scroll-fade-end-size;
 		min-width: $scroll-fade-end-size;
-		@include scroll-fade(end, normal calc(100% - 1px), $rest: line, $reset-range: calc(100% - 1px) normal);
+		@include scroll-fade(end, normal calc(100% - 1px), $reset-range: calc(100% - 1px) normal);
 	}
 
 	// Each cell draws its share of the line between rows, so a fade can hide
@@ -441,12 +445,11 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	// scroll-driven animations. They follow the rules above, to outrank them.
 	@include scroll-fade-fallback {
 		&.has-columns-before tr::before,
-		&.has-columns-after td.dataviews-view-table__actions-column,
-		&.has-columns-after th.dataviews-view-table__actions-column,
 		&.has-columns-after:not(.has-actions) tr::after {
 			@include scroll-fade-active;
 		}
 
+		&.has-columns-after .dataviews-view-table__actions-column::before,
 		&.has-columns-after .dataviews-view-table__actions-column::after {
 			opacity: 1;
 		}
@@ -472,7 +475,7 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	from,
 	to {
 		outline: none;
-		mask-image: var(--dataviews-view-table-fade-rest-mask);
+		mask-image: linear-gradient(#000 1px, transparent 1px);
 		-webkit-mask-box-image: none;
 		background-size: 100% 1px;
 	}
