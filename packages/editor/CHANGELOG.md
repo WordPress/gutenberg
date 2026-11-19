@@ -9,6 +9,12 @@
 -   Suggestion mode: let suggestions overlap the way they do in Google Docs. Another reviewer can type, delete or change formatting inside or across a pending suggestion: suggestions of one kind stack as nested markers (oldest outermost), each formatting suggestion records only what it changes as a per-suggestion `delta`, and other authors' removals and attribute changes on a suggested block nest on its marker with their own notes. Accepting and rejecting in any order ends at the same text, and a suggestion a decision leaves with nothing to change is marked outdated. Splitting a block inside someone else's suggestion and moving a block someone else already suggested moving are still declined ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
 -   Suggestion mode: keep overlapping suggestions consistent under real-time collaboration. Markers merged from peers are put in canonical order, and repeated, garbled, empty and foreign markers are dropped, with one peer writing each correction so the peers converge ([#86206](https://github.com/WordPress/gutenberg/pull/86206)).
 
+## 16.2.0 (2026-11-18)
+
+### New Features
+
+-   Add `registerCoreBlockBindingsSources` to the public API. It registers the client side of the core block bindings sources ([#86896](https://github.com/WordPress/gutenberg/pull/86896)).
+
 ### Enhancements
 
 -   Media modal: Show the fields registered for attachments on the server as columns and filters. ([#86457](https://github.com/WordPress/gutenberg/pull/86457))
@@ -18,7 +24,9 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
 -   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
+-   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
@@ -31,6 +39,7 @@
 -   Align the Tags field loading status with its suggestions and creation action ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 -   RTC: Change post and status snackbar notices to use the registered labels, so that custom post types and custom statuses use the correct terminology ([#86214](https://github.com/WordPress/gutenberg/pull/86214)).
 -   Lowercase the "(no author)" placeholder of the author panel, matching the "(no title)" convention ([#86391](https://github.com/WordPress/gutenberg/pull/86391)).
+-   Editor: Escape Openverse metadata in image captions.
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Hide the keyboard shortcut on the selected choice in the editor intent menu, matching `ModeSwitcher` ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Suggestion mode: stop post-level edits from reaching the saved post while suggesting. Only the post status was locked, so the excerpt, featured image, slug, terms, post meta and every other post setting changed directly. The title, excerpt, featured image, slug, terms and registered meta keys are now proposed - one note each, shown in place while suggesting, applied on accept - and every other post setting is read-only, refused whether it is written through `editPost` or straight to the entity, and stripped from any save made while suggesting ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
@@ -380,6 +389,12 @@
 
 ## 14.34.0 (2025-10-29)
 
+## 14.33.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.33.0 (2025-10-17)
 
 ## 14.32.0 (2025-10-01)
@@ -408,6 +423,12 @@
 
 ## 14.20.0 (2025-03-13)
 
+## 14.19.8 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.19.0 (2025-02-28)
 
 ## 14.18.0 (2025-02-12)
@@ -434,6 +455,12 @@
 
 ## 14.9.0 (2024-10-03)
 
+## 14.8.20 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 14.8.0 (2024-09-19)
 
 ## 14.7.0 (2024-09-05)
@@ -453,6 +480,12 @@
 ## 14.2.0 (2024-06-26)
 
 ## 14.1.0 (2024-06-15)
+
+## 14.0.9 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 14.0.0 (2024-05-31)
 
@@ -479,6 +512,12 @@
 
 ## 13.29.0 (2024-02-21)
 
+## 13.28.10 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.28.0 (2024-02-09)
 
 ## 13.27.0 (2024-01-24)
@@ -501,6 +540,12 @@
 
 ## 13.20.0 (2023-10-05)
 
+## 13.19.15 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
+
 ## 13.19.0 (2023-09-20)
 
 ## 13.18.0 (2023-08-31)
@@ -514,6 +559,12 @@
 ## 13.14.0 (2023-07-05)
 
 ## 13.13.0 (2023-06-23)
+
+## 13.12.17 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.12.0 (2023-06-07)
 
@@ -532,6 +583,12 @@
 ## 13.5.0 (2023-03-01)
 
 ## 13.4.0 (2023-02-15)
+
+## 13.3.12 (2026-11-18)
+
+### Bug Fixes
+
+-   Editor: Escape Openverse metadata in image captions.
 
 ## 13.3.0 (2023-02-01)
 
