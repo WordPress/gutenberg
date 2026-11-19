@@ -45,7 +45,7 @@
  * } $options
  * @phpstan-return array{
  *     css?: string,
- *     declarations?: array<string, string>,
+ *     declarations?: non-empty-array<non-falsy-string, non-empty-string>,
  *     classnames?: string,
  * }
  */

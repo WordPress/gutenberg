@@ -21,11 +21,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 * @access private
 	 *
 	 * @phpstan-type Style_Definition array{
-	 *     property_keys?: array{ default: string, individual?: string },
+	 *     property_keys?: array{ default: non-falsy-string, individual?: non-falsy-string },
 	 *     path: non-empty-list<string>,
 	 *     css_vars?: array<string, string>,
 	 *     classnames?: array<string, string|true>,
-	 *     value_func?: callable( mixed, array<string, mixed>, array<mixed> ): array<string, string>,
+	 *     value_func?: callable( mixed, array<string, mixed>, array<mixed> ): array<non-falsy-string, non-empty-string>,
 	 * }
 	 * @phpstan-type Parse_Options array{
 	 *     context?: string|null,
@@ -447,6 +447,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param mixed $style_value A single raw style value.
 		 *
 		 * @return bool
+		 *
+		 * @phpstan-assert-if-true !'' $style_value
 		 */
 		protected static function is_valid_style_value( $style_value ) {
 			return '0' === $style_value || ! empty( $style_value );
@@ -510,7 +512,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * }
 		 *
 		 * @phpstan-param Parse_Options $options
-		 * @phpstan-return array{ classnames: list<string>, declarations: array<string, string> }
+		 * @phpstan-return array{ classnames: list<string>, declarations: array<non-falsy-string, non-empty-string> }
 		 */
 		public static function parse_block_styles( $block_styles, $options ) {
 			$parsed_styles = array(
@@ -638,6 +640,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @phpstan-param Style_Definition $style_definition
 		 * @phpstan-param Parse_Options $options
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_css_declarations( $style_value, $style_definition, $options = array() ) {
 			if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
@@ -692,8 +695,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				return $css_declarations;
 			}
 
-			// CSS declarations only accept string values.
-			if ( is_string( $style_value ) ) {
+			// CSS declarations only accept non-empty string values.
+			if ( is_string( $style_value ) && static::is_valid_style_value( $style_value ) ) {
 				$css_declarations[ $style_property_keys['default'] ] = $style_value;
 			}
 			return $css_declarations;
@@ -718,6 +721,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *
 		 * @phpstan-param Style_Definition $individual_property_definition
 		 * @phpstan-param Parse_Options $options
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
 			if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -772,6 +776,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @return array<string, string> An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 *
 		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
@@ -785,7 +790,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 				if ( is_array( $style_value ) && ! empty( $style_value['url'] ) && is_string( $style_value['url'] ) ) {
 					$value = "url('" . $style_value['url'] . "')";
-				} elseif ( is_string( $style_value ) ) {
+				} elseif ( is_string( $style_value ) && static::is_valid_style_value( $style_value ) ) {
 					$value = $style_value;
 				}
 
@@ -809,6 +814,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @return array<string, string> An associative array of CSS definitions, mapping properties to values.
 		 *
 		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable -- Required by value_func callback signature.
 		protected static function get_background_clip_css_declarations( $style_value, $style_definition ) {
