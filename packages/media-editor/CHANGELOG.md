@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.23.0 (2026-11-18)
+
 ### Enhancements
 
 -   `MediaEditor.MoreMenu` takes `actions` and `item` props, and lists the actions eligible for the item, such as "Permanently delete". It now also shows for media other than images when it has actions ([#86349](https://github.com/WordPress/gutenberg/pull/86349)).

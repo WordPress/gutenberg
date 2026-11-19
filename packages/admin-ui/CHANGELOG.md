@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0 (2026-11-18)
+
 ### Internal
 
 -   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
