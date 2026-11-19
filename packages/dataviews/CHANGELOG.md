@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 22.1.0 (2026-11-18)
+
 ### Enhancements
 
 -   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
