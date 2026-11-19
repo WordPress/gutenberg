@@ -27,14 +27,17 @@ function createSidebar( { hasUndo = false, hasRedo = false } = {} ) {
 	return sidebar;
 }
 
-function renderHeader( sidebar: ReturnType< typeof createSidebar > ) {
+function renderHeader(
+	sidebar: ReturnType< typeof createSidebar >,
+	isInserterOpened = false
+) {
 	return render(
 		<Header
 			sidebar={ sidebar }
 			inserter={ {
 				contentContainer: [ document.createElement( 'div' ) ],
 			} }
-			isInserterOpened={ false }
+			isInserterOpened={ isInserterOpened }
 			setIsInserterOpened={ vi.fn() }
 			isFixedToolbarActive={ false }
 		/>
@@ -90,6 +93,17 @@ describe( 'Header', () => {
 		expect( sidebar.undo ).toHaveBeenCalledTimes( 1 );
 		await user.click( redoButton );
 		expect( sidebar.redo ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'labels the inserter toggle as a close button while the inserter is open', async () => {
+		renderHeader( createSidebar(), true );
+
+		expect(
+			await screen.findByRole( 'button', { name: 'Close' } )
+		).toHaveAttribute( 'aria-pressed', 'true' );
+		expect(
+			screen.queryByRole( 'button', { name: 'Add block' } )
+		).not.toBeInTheDocument();
 	} );
 
 	it( 'updates the undo and redo buttons when the history changes', async () => {
