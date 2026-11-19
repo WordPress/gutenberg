@@ -22,6 +22,8 @@ import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
 	renderTemplateToString,
+	toPhpAssociativeArrayLiteral,
+	toPhpListLiteral,
 } from './php-generator.mjs';
 import {
 	boolConfigVal,
@@ -971,12 +973,15 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 	const modulesArray = modules
 		.map(
 			( module ) =>
-				`\tarray(\n` +
-				`\t\t'id' => '${ module.id }',\n` +
-				`\t\t'path' => '${ module.path }',\n` +
-				`\t\t'asset' => '${ module.asset }',\n` +
-				( module.min_only ? `\t\t'min_only' => true,\n` : '' ) +
-				`\t),`
+				toPhpAssociativeArrayLiteral(
+					{
+						id: `'${ module.id }'`,
+						path: `'${ module.path }'`,
+						asset: `'${ module.asset }'`,
+						min_only: module.min_only ? 'true' : undefined,
+					},
+					'\t'
+				) + ','
 		)
 		.join( '\n' );
 
@@ -1008,11 +1013,14 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 	const scriptsArray = scripts
 		.map(
 			( script ) =>
-				`\tarray(\n` +
-				`\t\t'handle' => '${ script.handle }',\n` +
-				`\t\t'path' => '${ script.path }',\n` +
-				`\t\t'asset' => '${ script.asset }',\n` +
-				`\t),`
+				toPhpAssociativeArrayLiteral(
+					{
+						handle: `'${ script.handle }'`,
+						path: `'${ script.path }'`,
+						asset: `'${ script.asset }'`,
+					},
+					'\t'
+				) + ','
 		)
 		.join( '\n' );
 
@@ -1057,13 +1065,16 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 	const stylesArray = styles
 		.map(
 			( style ) =>
-				`\tarray(\n` +
-				`\t\t'handle' => '${ style.handle }',\n` +
-				`\t\t'path' => '${ style.path }',\n` +
-				`\t\t'dependencies' => array(${ style.dependencies
-					.map( ( dep ) => `'${ dep }'` )
-					.join( ', ' ) }),\n` +
-				`\t),`
+				toPhpAssociativeArrayLiteral(
+					{
+						handle: `'${ style.handle }'`,
+						path: `'${ style.path }'`,
+						dependencies: toPhpListLiteral(
+							style.dependencies.map( ( dep ) => `'${ dep }'` )
+						),
+					},
+					'\t'
+				) + ','
 		)
 		.join( '\n' );
 
