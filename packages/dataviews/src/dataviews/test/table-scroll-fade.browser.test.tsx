@@ -108,15 +108,9 @@ const getActionsCell = () =>
 	)!;
 const getDividerOpacity = () =>
 	getComputedStyle( getActionsHeader(), '::after' ).opacity;
-// A fade has its outline only while it is active.
+// A fade is doubled in width only while it is active.
 const isFading = ( style: CSSStyleDeclaration ) =>
-	style.outlineStyle === 'solid';
-// The mask of an active fade: a mask border in Chrome and Safari, a mask
-// image in Firefox.
-const getFadeMask = ( style: CSSStyleDeclaration ) =>
-	style.maskImage === 'none'
-		? style.getPropertyValue( '-webkit-mask-box-image' )
-		: style.maskImage;
+	style.transform === 'matrix(2, 0, 0, 1, 0, 0)';
 const getRows = () =>
 	Array.from(
 		document.querySelectorAll< HTMLTableRowElement >(
@@ -241,30 +235,44 @@ describe( 'DataViews table scroll fade', () => {
 		} );
 	} );
 
-	// Every fade covers its own cell, and fades out the columns on both sides
-	// of it: the scroll container clips the side beyond the edge of the row,
-	// so the same mask serves both edges in both directions.
-	it.each( [ 'ltr', 'rtl' ] as const )(
-		'fades out on both sides of the edge cells (%s)',
-		async ( dir ) => {
+	// Every fade grows from the edge of the row over the columns next to it,
+	// and fades out towards them.
+	it.each( [
+		[ 'ltr', 'left', 'right' ],
+		[ 'rtl', 'right', 'left' ],
+	] as const )(
+		'fades from the edges of the rows (%s)',
+		async ( dir, start, end ) => {
 			await render( <PostsTable dir={ dir } /> );
 			scrollToMiddle();
-			const row = getRows()[ 0 ];
+			const row = getRows()[ 1 ];
 			await expect
 				.poll( () => isFading( getComputedStyle( row, '::before' ) ) )
 				.toBe( true );
 
-			for ( const pseudo of [ '::before', '::after' ] ) {
-				expect(
-					getFadeMask( getComputedStyle( row, pseudo ) )
-				).toMatch(
-					/^linear-gradient\(to right, rgba\(0, 0, 0, 0\), .*, rgba\(0, 0, 0, 0\)\)/
+			for ( const [ pseudo, edge ] of [
+				[ '::before', start ],
+				[ '::after', end ],
+			] ) {
+				const style = getComputedStyle( row, pseudo );
+				expect( isFading( style ) ).toBe( true );
+				expect( style.transformOrigin.split( ' ' )[ 0 ] ).toBe(
+					edge === 'left' ? '0px' : style.width
+				);
+				// Transparent up to the ramp before the middle, then the
+				// background of the row from the middle to the edge.
+				expect( style.backgroundImage ).toBe(
+					`linear-gradient(to ${ edge }, rgba(0, 0, 0, 0) calc(50% - ${
+						FADE_RAMP / 2
+					}px), ${ getComputedStyle( row ).backgroundColor } 50%)`
 				);
 			}
 		}
 	);
 
-	it( 'reaches over the columns with the background of the row', async () => {
+	// Firefox misplaces the mask of a sticky cell while scrolling, which
+	// cuts it off.
+	it( 'does not mask the fades', async () => {
 		await render( <PostsTable /> );
 		scrollToMiddle();
 		const row = getRows()[ 1 ];
@@ -274,22 +282,10 @@ describe( 'DataViews table scroll fade', () => {
 
 		for ( const pseudo of [ '::before', '::after' ] ) {
 			const style = getComputedStyle( row, pseudo );
-			expect( style.outlineWidth ).toBe( `${ FADE_RAMP }px` );
-			expect( style.outlineColor ).toBe(
-				getComputedStyle( row ).backgroundColor
-			);
-			// The mask covers the outline on both sides: with the outsets of
-			// a mask border (its last part), or with a mask image that is not
-			// clipped to the cell.
-			const reachesOutline =
-				style.maskImage === 'none'
-					? getFadeMask( style )
-							.split( ' / ' )[ 2 ]
-							.includes( `0 ${ FADE_RAMP }px` )
-					: style.maskSize ===
-							`calc(100% + ${ 2 * FADE_RAMP }px) 100%` &&
-						style.maskClip === 'no-clip';
-			expect( reachesOutline ).toBe( true );
+			expect( style.maskImage ).toBe( 'none' );
+			expect(
+				style.getPropertyValue( '-webkit-mask-box-image' ) || 'none'
+			).toBe( 'none' );
 		}
 	} );
 
@@ -307,21 +303,21 @@ describe( 'DataViews table scroll fade', () => {
 			.poll( () => [ getFade( '::before' ), getFade( '::after' ) ] )
 			.toEqual( [
 				[ false, '100% 1px' ],
-				[ true, '0px 0px' ],
+				[ true, 'auto' ],
 			] );
 
 		scrollToEnd();
 		await expect
 			.poll( () => [ getFade( '::before' ), getFade( '::after' ) ] )
 			.toEqual( [
-				[ true, '0px 0px' ],
+				[ true, 'auto' ],
 				[ false, '100% 1px' ],
 			] );
 	} );
 
-	// At rest the cells at the edges keep only their share of the row line, so
-	// they do not cover what the columns next to them paint over their space,
-	// like the focus ring of a checkbox.
+	// At rest the cells at the edges only paint their share of the row line,
+	// so they do not cover what the columns next to them paint over their
+	// space, like the focus ring of a checkbox.
 	it.each( [ 'ltr', 'rtl' ] as const )(
 		'only keeps the row line at rest (%s)',
 		async ( dir ) => {
@@ -332,10 +328,12 @@ describe( 'DataViews table scroll fade', () => {
 			const row = getRows()[ 1 ];
 			for ( const pseudo of [ '::before', '::after' ] ) {
 				const style = getComputedStyle( row, pseudo );
-				expect( style.maskImage ).toBe(
-					'linear-gradient(rgb(0, 0, 0) 1px, rgba(0, 0, 0, 0) 1px)'
+				expect( style.backgroundColor ).toBe( 'rgba(0, 0, 0, 0)' );
+				expect( style.backgroundImage ).toMatch(
+					/^linear-gradient\(rgb[^)]*\), rgb[^)]*\)\)$/
 				);
-				expect( style.outlineStyle ).toBe( 'none' );
+				expect( style.backgroundSize ).toBe( '100% 1px' );
+				expect( style.transform ).toBe( 'none' );
 			}
 		}
 	);
@@ -389,23 +387,30 @@ describe( 'DataViews table scroll fade', () => {
 		it( 'fades into the background of each row', async () => {
 			const style = document.createElement( 'style' );
 			style.textContent =
-				'.dataviews-view-table tbody tr:first-child { background-color: rgb(1, 2, 3); }';
+				'.dataviews-view-table tbody tr:first-child { --dataviews-view-table-row-background: rgb(1, 2, 3); }';
 			document.head.append( style );
 			try {
 				await render( <PostsTable /> );
 
 				const [ , firstRow, secondRow ] = getRows();
+				await expect
+					.poll( () =>
+						isFading( getComputedStyle( firstRow, '::after' ) )
+					)
+					.toBe( true );
 				expect(
-					getComputedStyle( firstRow, '::after' ).backgroundColor
-				).toBe( 'rgb(1, 2, 3)' );
+					getComputedStyle( firstRow, '::after' ).backgroundImage
+				).toContain( 'rgb(1, 2, 3) 50%)' );
 				// Rows without their own background fade into the one of
 				// DataViews, not into a transparent cell.
 				expect(
-					getComputedStyle( secondRow, '::after' ).backgroundColor
-				).toBe(
-					getComputedStyle(
-						document.querySelector( '.dataviews-wrapper' )!
-					).backgroundColor
+					getComputedStyle( secondRow, '::after' ).backgroundImage
+				).toContain(
+					`${
+						getComputedStyle(
+							document.querySelector( '.dataviews-wrapper' )!
+						).backgroundColor
+					} 50%)`
 				);
 			} finally {
 				style.remove();

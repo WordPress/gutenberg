@@ -29,11 +29,13 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin-bottom: auto;
 	background-color: inherit;
-	// Direction of the fade before the sticky actions column, from the
-	// columns scrolling under it towards the end of the row.
+	// Physical sides of the start and end of the rows, for the directions of
+	// the scroll fades and the origins of their transforms.
+	--dataviews-view-table-fade-to-start: left;
 	--dataviews-view-table-fade-to-end: right;
 
 	&:dir(rtl) {
+		--dataviews-view-table-fade-to-start: right;
 		--dataviews-view-table-fade-to-end: left;
 	}
 
@@ -328,26 +330,20 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		// Keeps the width against the shrink-to-fit width of the columns.
 		min-width: $scroll-fade-size;
 		padding: 0;
-		background-color: inherit;
 		pointer-events: none;
-		// At rest, and when nothing scrolls, the mask keeps only the cell's
-		// share of the row line, so the cell does not cover what the columns
-		// next to it paint over its space, like a focus ring. It is as wide as
-		// the masks of an active fade, see below.
-		mask-image: linear-gradient(#000 1px, transparent 1px);
-		mask-position: center;
-		mask-size: calc(100% + 2 * #{$scroll-fade-ramp}) 100%;
-		mask-repeat: no-repeat;
-		mask-clip: no-clip;
+		// The side of the cell at the edge of the row, see below.
+		transform-origin: var(--dataviews-view-table-fade-edge);
 	}
 
 	tr::before {
+		--dataviews-view-table-fade-edge: var(--dataviews-view-table-fade-to-start);
 		inset-inline-start: 0;
 		// Above the positioned content of the cells that follow it.
 		z-index: 1;
 	}
 
 	&:not(.has-actions) tr::after {
+		--dataviews-view-table-fade-edge: var(--dataviews-view-table-fade-to-end);
 		inset-inline-end: 0;
 		width: $scroll-fade-end-size;
 		min-width: $scroll-fade-end-size;
@@ -366,31 +362,24 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
 	// While there are more columns to scroll to on its side, as the table's
 	// `has-columns-before` and `has-columns-after` classes tell, the cell at
-	// the edge of the rows covers the columns scrolling under it: it is
-	// opaque, and an outline in the row's background (an outline, as Chrome
-	// does not paint box shadows on table cells) reaches over the columns next
-	// to it, fading them out over `$scroll-fade-ramp`. The cell also hides its
-	// share of the row line, so the lines fade out with the columns. These
-	// rules follow the ones above, to outrank them.
+	// the edge of the rows covers the columns scrolling under it, in the row's
+	// background, and fades out the columns next to it over
+	// `$scroll-fade-ramp`. Doubled in width from the edge of the row, its
+	// outer half covers its own space, and its inner half holds the ramp,
+	// which needs the cell to be at least as wide as the ramp. The cell also
+	// hides its share of the row line, so the lines fade out with the
+	// columns. At rest, the cell is transparent, so it does not cover what the
+	// columns next to it paint over its space, like a focus ring.
+	//
+	// A transform rather than a mask over an outline or a box shadow, as
+	// Firefox misplaces the mask of a sticky cell while scrolling, and Chrome
+	// does not paint box shadows on table cells. These rules follow the ones
+	// above, to outrank them.
 	&.has-columns-before tr::before,
 	&.has-columns-after:not(.has-actions) tr::after {
-		outline: $scroll-fade-ramp solid var(--dataviews-view-table-row-background);
-		background-size: 0 0;
-		// The masks only keep the part of the outline next to the columns:
-		// they are sized to the row's height, and fade out over the ramp on
-		// both sides of the cell. The cells are stuck to the edges of the
-		// scroll container, which clips the side beyond the edge. Firefox
-		// reaches the outline with a mask that is not clipped to the cell.
-		mask-image: linear-gradient(to right, transparent, #000 #{$scroll-fade-ramp}, #000 calc(100% - #{$scroll-fade-ramp}), transparent);
-
-		// Chrome and Safari use a mask border with an outset instead, as
-		// Safari clips the mask to the cell anyway. The slice maps the ramps
-		// at the ends of the image onto the outsets, and fills the cell with
-		// the rest.
-		@supports (-webkit-mask-box-image: none) {
-			mask-image: none;
-			-webkit-mask-box-image: linear-gradient(to right, transparent, #000 25%, #000 75%, transparent) 0 25% fill / 0 #{$scroll-fade-ramp} / 0 #{$scroll-fade-ramp} stretch;
-		}
+		background-image: linear-gradient(to var(--dataviews-view-table-fade-edge), transparent calc(50% - #{$scroll-fade-ramp} / 2), var(--dataviews-view-table-row-background) 50%);
+		background-size: auto;
+		transform: scaleX(2);
 	}
 
 	&.has-columns-after .dataviews-view-table__actions-column::before,
