@@ -870,8 +870,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * Style value parser that returns a CSS definition array for the `translate` property.
 		 *
 		 * The value is an object with `x` and `y` axes, each a single length or
-		 * percentage. A missing axis outputs `0`. Any invalid axis outputs nothing,
-		 * and other keys are ignored.
+		 * percentage. Each axis set outputs its own custom property, so an axis
+		 * left out comes from other styles, and `translate` reads both. Any
+		 * invalid axis outputs nothing, and other keys are ignored.
 		 *
 		 * @param array $style_value      A single raw style value from $block_styles array.
 		 * @param array $style_definition A single style definition from BLOCK_STYLE_DEFINITIONS_METADATA.
@@ -883,16 +884,19 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 				return array();
 			}
 
-			$axes = array();
+			$declarations = array();
 			foreach ( array( 'x', 'y' ) as $axis ) {
-				$axis_value = $style_value[ $axis ] ?? '0';
-				if ( ! is_string( $axis_value ) || ! preg_match( static::VALID_LENGTH_PERCENTAGE_PATTERN, $axis_value ) ) {
+				if ( ! isset( $style_value[ $axis ] ) ) {
+					continue;
+				}
+				if ( ! is_string( $style_value[ $axis ] ) || ! preg_match( static::VALID_LENGTH_PERCENTAGE_PATTERN, $style_value[ $axis ] ) ) {
 					return array();
 				}
-				$axes[] = $axis_value;
+				$declarations[ "--wp--style--translate-$axis" ] = $style_value[ $axis ];
 			}
 
-			return array( $style_definition['property_keys']['default'] => implode( ' ', $axes ) );
+			$declarations[ $style_definition['property_keys']['default'] ] = 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)';
+			return $declarations;
 		}
 
 		/**

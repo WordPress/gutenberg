@@ -23,6 +23,8 @@ interface UnitRangeControlProps {
 	value?: string;
 	/** Called with the new CSS value, or `undefined` when cleared. */
 	onChange: ( value?: string ) => void;
+	/** A value to show, but not save, while `value` is empty, such as an inherited one. */
+	placeholder?: string;
 	/** The units offered; the first is the default. */
 	units: Units;
 	/** The slider range and step for each unit. */
@@ -38,6 +40,7 @@ interface UnitRangeControlProps {
  * @param props.controlLabel An accessible label for the input and the slider, when it differs from `label`.
  * @param props.value        The current CSS value.
  * @param props.onChange     Called with the new value, or `undefined` when cleared.
+ * @param props.placeholder  A value to show, but not save, while `value` is empty.
  * @param props.units        The units offered; the first is the default.
  * @param props.unitSettings The slider `min`, `max` and `step` for each unit.
  *
@@ -48,6 +51,7 @@ export default function UnitRangeControl( {
 	controlLabel = label,
 	value,
 	onChange,
+	placeholder,
 	units,
 	unitSettings,
 }: UnitRangeControlProps ) {
@@ -57,7 +61,10 @@ export default function UnitRangeControl( {
 		value,
 		units
 	);
-	const selectedUnit = parsedUnit ?? pickedUnit ?? units[ 0 ]?.value ?? '';
+	const [ placeholderQuantity, placeholderUnit ] =
+		parseQuantityAndUnitFromRawValue( placeholder, units );
+	const selectedUnit =
+		parsedUnit ?? pickedUnit ?? placeholderUnit ?? units[ 0 ]?.value ?? '';
 	const range = unitSettings[ selectedUnit ];
 
 	const handleChange = ( nextValue?: string ) => {
@@ -74,6 +81,7 @@ export default function UnitRangeControl( {
 					label={ controlLabel }
 					hideLabelFromVision
 					value={ value ?? '' }
+					placeholder={ placeholderQuantity?.toString() }
 					units={ units }
 					onChange={ handleChange }
 					onUnitChange={ setPickedUnit }
@@ -86,7 +94,7 @@ export default function UnitRangeControl( {
 					min={ range?.min }
 					max={ range?.max }
 					step={ range?.step }
-					initialPosition={ 0 }
+					initialPosition={ placeholderQuantity ?? 0 }
 					withInputField={ false }
 					onChange={ ( next ) =>
 						onChange(

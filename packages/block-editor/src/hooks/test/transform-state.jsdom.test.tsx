@@ -7,7 +7,7 @@ import { getStateInheritedValue } from '../transform';
 globalThis.wpVitest.mockMatchMedia();
 
 describe( 'Transform panel in a block style state', () => {
-	it( 'saves the block Y offset when only X is set on mobile', async () => {
+	it( 'saves only X on mobile and shows the block offset as placeholders', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
@@ -15,7 +15,7 @@ describe( 'Transform panel in a block style state', () => {
 				value={ undefined }
 				inheritedValue={ getStateInheritedValue(
 					undefined,
-					{ transform: { translate: { x: '10px', y: '20px' } } },
+					{ transform: { translate: { x: '66px', y: '35px' } } },
 					{ viewport: '@mobile', pseudo: 'default' }
 				) }
 				settings={ { transform: { translate: true } } }
@@ -24,12 +24,14 @@ describe( 'Transform panel in a block style state', () => {
 		);
 
 		const xOffset = screen.getByRole( 'spinbutton', { name: 'X offset' } );
-		expect( xOffset ).toHaveValue( 10 );
-		await user.clear( xOffset );
-		await user.type( xOffset, '30' );
+		expect( xOffset ).toHaveAttribute( 'placeholder', '66' );
+		expect(
+			screen.getByRole( 'spinbutton', { name: 'Y offset' } )
+		).toHaveAttribute( 'placeholder', '35' );
+		await user.type( xOffset, '21' );
 
 		expect( onChange ).toHaveBeenLastCalledWith( {
-			transform: { translate: { x: '30px', y: '20px' } },
+			transform: { translate: { x: '21px' } },
 		} );
 	} );
 } );

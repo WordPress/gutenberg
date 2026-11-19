@@ -153,10 +153,11 @@ function gutenberg_add_translate_to_safe_style_css( array $attr ): array {
 add_filter( 'safe_style_css', 'gutenberg_add_translate_to_safe_style_css' );
 
 /**
- * Only allows one or two lengths or percentages as the value of the `translate` property.
+ * Only allows lengths or percentages for `translate` and its axis custom properties.
  *
- * Mirrors the style engine, so a third, `z` axis and anything other than a
- * single length or percentage per axis are rejected.
+ * Mirrors the style engine: each axis property takes a single length or
+ * percentage, and `translate` takes one or two, or functions such as `var()`,
+ * which Core allows and removes before this check.
  *
  * @param bool   $allow_css       Whether the CSS is allowed.
  * @param string $css_test_string The CSS declaration to test.
@@ -165,8 +166,21 @@ add_filter( 'safe_style_css', 'gutenberg_add_translate_to_safe_style_css' );
 function gutenberg_allow_translate_lengths_only( $allow_css, $css_test_string ) {
 	$parts = explode( ':', $css_test_string, 2 );
 
-	if ( ! $allow_css || 2 !== count( $parts ) || 'translate' !== strtolower( trim( $parts[0] ) ) ) {
+	if ( ! $allow_css || 2 !== count( $parts ) ) {
 		return $allow_css;
+	}
+
+	$property = strtolower( trim( $parts[0] ) );
+	if ( '--wp--style--translate-x' === $property || '--wp--style--translate-y' === $property ) {
+		return 1 === preg_match( WP_Style_Engine_Gutenberg::VALID_LENGTH_PERCENTAGE_PATTERN, trim( $parts[1] ) );
+	}
+
+	if ( 'translate' !== $property ) {
+		return $allow_css;
+	}
+
+	if ( '' === trim( $parts[1] ) ) {
+		return true;
 	}
 
 	$axes = preg_split( '/\s+/', trim( $parts[1] ) );

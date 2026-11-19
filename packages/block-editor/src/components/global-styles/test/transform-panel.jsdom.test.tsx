@@ -293,7 +293,7 @@ describe( 'TransformPanel offsets', () => {
 		} );
 	} );
 
-	it( 'saves the inherited axis with the other axis when one is set', async () => {
+	it( 'shows an inherited axis as a placeholder and saves only the axis set', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 		render(
@@ -307,9 +307,9 @@ describe( 'TransformPanel offsets', () => {
 			/>
 		);
 
-		expect(
-			screen.getByRole( 'spinbutton', { name: 'X offset' } )
-		).toHaveValue( 3 );
+		const xOffset = screen.getByRole( 'spinbutton', { name: 'X offset' } );
+		expect( xOffset ).toHaveValue( null );
+		expect( xOffset ).toHaveAttribute( 'placeholder', '3' );
 
 		await user.type(
 			screen.getByRole( 'spinbutton', { name: 'Y offset' } ),
@@ -317,7 +317,7 @@ describe( 'TransformPanel offsets', () => {
 		);
 
 		expect( onChange ).toHaveBeenLastCalledWith( {
-			transform: { translate: { x: '3rem', y: '4px' } },
+			transform: { translate: { y: '4px' } },
 		} );
 	} );
 

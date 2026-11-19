@@ -383,7 +383,7 @@ describe( 'getBlockStateStylesCSS', () => {
 		);
 	} );
 
-	it( 'outputs a hover translation as the individual translate property', () => {
+	it( 'outputs a hover translation as the axis it sets', () => {
 		expect(
 			getBlockStateStylesCSS(
 				{ transform: { translate: { y: '-4px' } } },
@@ -394,7 +394,7 @@ describe( 'getBlockStateStylesCSS', () => {
 				}
 			)
 		).toBe(
-			'.wp-elements-abc123 .wp-block-button__link:hover { translate: 0 -4px !important; }'
+			'.wp-elements-abc123 .wp-block-button__link:hover { --wp--style--translate-y: -4px !important; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important; }'
 		);
 	} );
 
@@ -682,7 +682,7 @@ describe( 'getResponsiveStateCSSRules', () => {
 		unregisterBlockType( 'test/state-translate' );
 
 		expect( rules ).toEqual( [
-			'@media (width <= 480px){.wp-elements-1 img { rotate: 5deg !important; translate: 10% 0 !important; }}',
+			'@media (width <= 480px){.wp-elements-1 img { rotate: 5deg !important; --wp--style--translate-x: 10% !important; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important; }}',
 		] );
 	} );
 

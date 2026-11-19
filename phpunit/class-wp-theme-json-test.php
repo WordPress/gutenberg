@@ -3414,9 +3414,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that block offsets output the individual `translate` property, with
-	 * `0` for a missing axis, for block styles, states and style variations, and
-	 * combine with a rotation.
+	 * Tests that block offsets output a custom property for each axis they set
+	 * and the `translate` property, for block styles, states and style
+	 * variations, and combine with a rotation.
 	 */
 	public function test_get_stylesheet_outputs_translate_for_block_styles_states_and_variations() {
 		register_block_style(
@@ -3467,11 +3467,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
 		unregister_block_style( 'core/group', 'raised' );
 
-		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 5deg;translate: 10px -50%;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){translate: 0 0;}}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-raised){translate: 0 -1rem;}', $css );
-		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){translate: 0 -4px;}', $css );
-		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){translate: 2px 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){--wp--style--translate-x: 0;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-raised){--wp--style--translate-y: -1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){--wp--style--translate-y: -4px;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){--wp--style--translate-x: 2px;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
 		$this->assertStringNotContainsString( 'transform', $css );
 	}
 

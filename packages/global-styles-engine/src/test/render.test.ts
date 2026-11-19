@@ -1955,7 +1955,7 @@ describe( 'global styles renderer', () => {
 			);
 
 			expect( result ).toEqual(
-				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;translate: 10px -50%;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){translate: 0 1rem;}}'
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 5deg;--wp--style--translate-x: 10px;--wp--style--translate-y: -50%;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}'
 			);
 		} );
 

@@ -129,19 +129,20 @@ export default function TransformPanel( {
 			'vh',
 		],
 	} );
+	// An axis without its own value shows the inherited one as a placeholder.
 	const getTranslate = ( axis: 'x' | 'y' ) =>
-		value?.transform?.translate?.[ axis ] ??
+		value?.transform?.translate?.[ axis ];
+	const getInheritedTranslate = ( axis: 'x' | 'y' ) =>
 		inheritedValue?.transform?.translate?.[ axis ];
-	// An offset replaces the inherited one whole, so both axes are saved.
+	// Each axis is saved on its own. The other axis comes from the styles below.
 	const setTranslate = ( axis: 'x' | 'y', newValue: string | undefined ) => {
-		const otherAxis = axis === 'x' ? 'y' : 'x';
 		onChange(
 			setImmutably(
 				value,
 				[ 'transform', 'translate' ],
 				cleanEmptyObject( {
+					...value?.transform?.translate,
 					[ axis ]: newValue,
-					[ otherAxis ]: getTranslate( otherAxis ),
 				} )
 			)
 		);
@@ -211,6 +212,9 @@ export default function TransformPanel( {
 										label={ label }
 										controlLabel={ controlLabel }
 										value={ getTranslate( axis ) }
+										placeholder={ getInheritedTranslate(
+											axis
+										) }
 										onChange={ ( newValue ) =>
 											setTranslate( axis, newValue )
 										}

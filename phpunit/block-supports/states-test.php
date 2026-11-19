@@ -1731,9 +1731,9 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that an offset in a state outputs the individual `translate`
-	 * property, combined with a rotation, under the block's transform feature
-	 * selector or its root selector.
+	 * Tests that an offset in a state outputs a custom property for each axis it
+	 * sets and the `translate` property, combined with a rotation, under the
+	 * block's transform feature selector or its root selector.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 *
@@ -1773,7 +1773,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'core/button',
 				$button,
 				array( ':hover' => array( 'transform' => array( 'translate' => array( 'y' => '-4px' ) ) ) ),
-				'.%s .wp-block-button__link:hover{translate:0 -4px !important;}',
+				'.%s .wp-block-button__link:hover{--wp--style--translate-y:-4px !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}',
 			),
 			'hover viewport' => array(
 				'core/button',
@@ -1788,7 +1788,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:2deg !important;translate:1rem 0 !important;}}',
+				'@media (width <= 480px){.%s .wp-block-button__link:hover{rotate:2deg !important;--wp--style--translate-x:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 			'viewport'       => array(
 				'core/group',
@@ -1803,23 +1803,23 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'@media (width <= 480px){.%s{translate:0 10%% !important;}}',
+				'@media (width <= 480px){.%s{--wp--style--translate-x:0 !important;--wp--style--translate-y:10%% !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 		);
 	}
 
 	/**
-	 * Tests that a viewport offset replaces the block's default offset and the
-	 * Global Styles offset whole, so an axis it leaves out is `0`.
+	 * Tests that a viewport offset sets only its own axis, so the other axis
+	 * still comes from the block's default offset or Global Styles.
 	 *
 	 * @covers ::gutenberg_render_block_states_support
 	 *
-	 * @dataProvider data_translation_state_replaces_the_offset
+	 * @dataProvider data_translation_state_sets_only_its_axis
 	 *
 	 * @param array  $style        Block style attribute.
 	 * @param string $expected_css Expected CSS, with `%s` for the state class.
 	 */
-	public function test_translation_state_replaces_the_offset( $style, $expected_css ) {
+	public function test_translation_state_sets_only_its_axis( $style, $expected_css ) {
 		$filter = static function ( $theme_json ) {
 			return $theme_json->update_with(
 				array(
@@ -1862,18 +1862,18 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_translation_state_replaces_the_offset() {
+	public function data_translation_state_sets_only_its_axis() {
 		return array(
 			'over the block default' => array(
 				array(
 					'transform' => array( 'translate' => array( 'x' => '1px' ) ),
 					'@mobile'   => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ),
 				),
-				'@media (width <= 480px){.%s{translate:0 1rem !important;}}',
+				'@media (width <= 480px){.%s{--wp--style--translate-y:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 			'over Global Styles'     => array(
 				array( '@mobile' => array( 'transform' => array( 'translate' => array( 'y' => '1rem' ) ) ) ),
-				'@media (width <= 480px){.%s{translate:0 1rem !important;}}',
+				'@media (width <= 480px){.%s{--wp--style--translate-y:1rem !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 		);
 	}

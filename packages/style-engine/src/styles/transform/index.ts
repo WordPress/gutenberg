@@ -52,22 +52,33 @@ const translate = {
 			return [];
 		}
 
-		const axes = [ value.x ?? '0', value.y ?? '0' ];
-		if (
-			! axes.every(
-				( axis ) =>
-					typeof axis === 'string' &&
-					VALID_LENGTH_PERCENTAGE_PATTERN.test( axis )
-			)
-		) {
-			return [];
+		// Each axis is its own custom property, so a layer that sets one axis
+		// leaves the other to the layers below it.
+		const rules = [];
+		for ( const axis of [ 'x', 'y' ] as const ) {
+			const axisValue = value[ axis ];
+			if ( axisValue === undefined || axisValue === null ) {
+				continue;
+			}
+			if (
+				typeof axisValue !== 'string' ||
+				! VALID_LENGTH_PERCENTAGE_PATTERN.test( axisValue )
+			) {
+				return [];
+			}
+			rules.push( {
+				selector: options.selector,
+				key: `--wp--style--translate-${ axis }`,
+				value: axisValue,
+			} );
 		}
 
 		return [
+			...rules,
 			{
 				selector: options.selector,
 				key: 'translate',
-				value: axes.join( ' ' ),
+				value: 'var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)',
 			},
 		];
 	},

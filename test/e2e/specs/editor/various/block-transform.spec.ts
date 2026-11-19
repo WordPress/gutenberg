@@ -68,7 +68,7 @@ test.describe( 'Transform block support', () => {
 		expect( await getRotate( group ) ).toBe( '30deg' );
 	} );
 
-	test( 'saves the inherited Global Styles axis with the axis a user sets', async ( {
+	test( 'saves only the axis a user sets over a Global Styles axis', async ( {
 		editor,
 		page,
 		requestUtils,
@@ -111,7 +111,7 @@ test.describe( 'Transform block support', () => {
 			} );
 			await expect(
 				settings.getByRole( 'spinbutton', { name: 'X offset' } )
-			).toHaveValue( '30' );
+			).toHaveAttribute( 'placeholder', '30' );
 			await settings
 				.getByRole( 'spinbutton', { name: 'Y offset' } )
 				.fill( '4' );
@@ -122,7 +122,7 @@ test.describe( 'Transform block support', () => {
 					return block.attributes.style;
 				} )
 				.toEqual( {
-					transform: { translate: { x: '30px', y: '4px' } },
+					transform: { translate: { y: '4px' } },
 				} );
 
 			const postId = await editor.publishPost();
@@ -161,33 +161,52 @@ test.describe( 'Transform block support', () => {
 		await expect.poll( () => getTranslate( heading ) ).toBe( '0px -4px' );
 	} );
 
-	test( 'keeps the block Y offset when only X is set on mobile', async ( {
+	test( 'saves only the axis set on mobile and keeps the other one live', async ( {
 		editor,
 		page,
 	} ) => {
 		await editor.insertBlock( {
 			name: 'core/group',
-			attributes: {
-				style: { transform: { translate: { x: '10px', y: '20px' } } },
-			},
 			innerBlocks: [
 				{ name: 'core/paragraph', attributes: { content: 'Offset' } },
 			],
 		} );
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'View', exact: true } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
-		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Responsive styles' } )
-			.click();
-		await page.keyboard.press( 'Escape' );
 		await showTransformControl( page, /Offset/ );
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const xOffset = settings.getByRole( 'spinbutton', {
+			name: 'X offset',
+		} );
+		const yOffset = settings.getByRole( 'spinbutton', {
+			name: 'Y offset',
+		} );
+		await xOffset.fill( '66' );
+		await yOffset.fill( '35' );
 
-		const xOffset = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'spinbutton', { name: 'X offset' } );
-		await expect( xOffset ).toHaveValue( '10' );
-		await xOffset.fill( '30' );
+		const setView = async ( name: string ) => {
+			await page
+				.getByRole( 'button', { name: 'View', exact: true } )
+				.click();
+			await page.getByRole( 'menuitemradio', { name } ).click();
+			const responsive = page.getByRole( 'menuitemcheckbox', {
+				name: 'Responsive styles',
+			} );
+			if (
+				name === 'Mobile' &&
+				( await responsive.getAttribute( 'aria-checked' ) ) !== 'true'
+			) {
+				await responsive.click();
+			}
+			await page.keyboard.press( 'Escape' );
+		};
+
+		await setView( 'Mobile' );
+		await expect( yOffset ).toHaveAttribute( 'placeholder', '35' );
+		await xOffset.fill( '21' );
+		await setView( 'Desktop' );
+		await yOffset.fill( '45' );
 
 		await expect
 			.poll( async () => {
@@ -195,18 +214,16 @@ test.describe( 'Transform block support', () => {
 				return block.attributes.style;
 			} )
 			.toEqual( {
-				transform: { translate: { x: '10px', y: '20px' } },
-				'@mobile': {
-					transform: { translate: { x: '30px', y: '20px' } },
-				},
+				transform: { translate: { x: '66px', y: '45px' } },
+				'@mobile': { transform: { translate: { x: '21px' } } },
 			} );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
 
 		const group = page.locator( '.wp-block-group' );
-		expect( await getTranslate( group ) ).toBe( '10px 20px' );
+		expect( await getTranslate( group ) ).toBe( '66px 45px' );
 		await page.setViewportSize( { width: 400, height: 800 } );
-		await expect.poll( () => getTranslate( group ) ).toBe( '30px 20px' );
+		await expect.poll( () => getTranslate( group ) ).toBe( '21px 45px' );
 	} );
 } );

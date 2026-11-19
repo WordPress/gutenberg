@@ -647,17 +647,21 @@ describe( 'rotate', () => {
 } );
 
 describe( 'translate', () => {
-	it( 'should output the individual translate property for both axes', () => {
+	it( 'should output a custom property per axis and the translate property', () => {
 		expect(
 			compileCSS( { transform: { translate: { x: '10px', y: '-50%' } } } )
-		).toEqual( 'translate: 10px -50%;' );
+		).toEqual(
+			'--wp--style--translate-x: 10px; --wp--style--translate-y: -50%; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
 	} );
 
-	it( 'should output 0 for a missing axis and ignore other keys', () => {
+	it( 'should leave a missing axis to other styles and ignore other keys', () => {
 		expect(
 			// @ts-expect-error Test that keys other than x and y are ignored.
 			compileCSS( { transform: { translate: { y: '2rem', z: '5px' } } } )
-		).toEqual( 'translate: 0 2rem;' );
+		).toEqual(
+			'--wp--style--translate-y: 2rem; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
 	} );
 
 	it( 'should combine with a rotation', () => {
@@ -665,7 +669,9 @@ describe( 'translate', () => {
 			compileCSS( {
 				transform: { rotate: '15deg', translate: { x: '1em' } },
 			} )
-		).toEqual( 'rotate: 15deg; translate: 1em 0;' );
+		).toEqual(
+			'rotate: 15deg; --wp--style--translate-x: 1em; translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);'
+		);
 	} );
 
 	it.each( [

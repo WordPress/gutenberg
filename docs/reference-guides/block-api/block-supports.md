@@ -1105,13 +1105,13 @@ supports: {
 
 An offset moves the block visually without changing the layout around it, so it can overlap other content or push the block off screen.
 
-A block's offset replaces the Global Styles offset whole, and an axis it leaves out is `0`, as in CSS. When a user changes one axis in the block editor, both axes are saved: the changed one, and the other axis's inherited value. Global Styles work the same way: a block style variation or state that sets one axis outputs the other axis as `0`.
+Each axis is set on its own, like margin sides. An offset outputs a `--wp--style--translate-x` or `--wp--style--translate-y` custom property for each axis it sets, and `translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0)`. An axis left out comes from the styles below it, such as Global Styles, a block style variation or the block's default offset under a state, and is `0` when none sets it. When a user changes one axis in the block editor, only that axis is saved. The two custom properties are registered with `@property` and do not inherit, so a nested block does not take its parent's offset.
 
 Transforms are saved as an inline style on the block wrapper. To apply them to an inner element instead, a block opts out of the wrapper output with `__experimentalSkipSerialization`, for example `[ 'translate' ]`, and applies the styles itself with `getTransformClassesAndStyles()` from `@wordpress/block-editor`, or `wp_get_transform_classes_and_styles()` in PHP. A `transform` [feature selector](/docs/reference-guides/block-api/block-selectors.md) only changes where Global Styles and block style states apply the transform, so a block that skips serialization should also declare one for its inner element.
 
 When a block declares support for a specific transform property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. An axis left out is `0`. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `rotate` or `translate` support is declared. It stores the custom values set by the user. A rotation is a single CSS angle, such as `15deg`, `-0.1turn`, `1rad` or `100grad`. An offset is an object with `x` and `y` axes, each a single CSS length or percentage, such as `10px` or `-50%`. An axis can be left out. For example:
 
 ```js
 attributes: {
