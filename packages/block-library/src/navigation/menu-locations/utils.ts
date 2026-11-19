@@ -1,7 +1,7 @@
 import { parse } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';
@@ -379,36 +379,25 @@ export function getPreviewBlocks(
  * Says where a menu is used, for the menus list.
  *
  * @param locations The menu's locations.
- * @return "Used in Header, Footer" or "Not used".
+ * @return "Used in 2 locations" or "Not used".
  */
 export function getWhereUsedLabel(
 	locations: NavigationLocation[] | null | undefined
 ): string {
-	if ( ! locations?.length ) {
+	const count = new Set(
+		( locations ?? EMPTY_ARRAY ).map(
+			( location: NavigationLocation ) => location.id
+		)
+	).size;
+
+	if ( ! count ) {
 		return __( 'Not used' );
 	}
 
-	const titles = [
-		...new Set( locations.map( ( location ) => location.title ) ),
-	];
-	// translators: Separates the names in a list, like "Header, Footer".
-	const shown = titles
-		.slice( 0, 3 )
-		.join( `${ _x( ',', 'list separator' ) } ` );
-
-	if ( titles.length > 3 ) {
-		return sprintf(
-			/* translators: 1: Comma-separated names of places a menu is used, like "Header, Footer". 2: How many more places it is used. */
-			__( 'Used in %1$s and %2$d more' ),
-			shown,
-			titles.length - 3
-		);
-	}
-
 	return sprintf(
-		/* translators: %s: Comma-separated names of places a menu is used, like "Header, Footer". */
-		__( 'Used in %s' ),
-		shown
+		/* translators: %d: Number of places a menu is used. */
+		_n( 'Used in %d location', 'Used in %d locations', count ),
+		count
 	);
 }
 

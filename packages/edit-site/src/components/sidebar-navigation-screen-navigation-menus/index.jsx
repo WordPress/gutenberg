@@ -7,6 +7,8 @@ import {
 	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { navigation } from '@wordpress/icons';
+import { cloneElement } from '@wordpress/element';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
@@ -15,6 +17,8 @@ import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/s
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+
+const { useNavigationLocations } = unlock( blockLibraryPrivateApis );
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 function buildMenuLabel( title, id, status ) {
@@ -115,7 +119,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 		<SidebarNavigationScreenWrapper backPath={ backPath }>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-navigation-menus">
 				{ navigationMenus?.map( ( { id, title, status }, index ) => (
-					<NavMenuItem
+					<MenuListItem
 						postId={ id }
 						key={ id }
 						withChevron
@@ -128,7 +132,7 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 								status
 							) }
 						</MenuItemLabel>
-					</NavMenuItem>
+					</MenuListItem>
 				) ) }
 			</ItemGroup>
 		</SidebarNavigationScreenWrapper>
@@ -165,6 +169,36 @@ export function SidebarNavigationScreenWrapper( {
 		/>
 	);
 }
+
+// The menu icon, faded, for a menu that isn't used anywhere.
+const UNUSED_MENU_ICON = cloneElement( navigation, {
+	style: { ...navigation.props.style, opacity: 0.4 },
+} );
+
+/**
+ * A menu in the list, whose icon is faded when it isn't used anywhere.
+ *
+ * @param {Object} props
+ * @param {number} props.postId The menu's ID.
+ */
+function UsageAwareMenuItem( { postId, ...props } ) {
+	const { locations, isResolving } = useNavigationLocations();
+	const isUnused =
+		! isResolving &&
+		! locations.some( ( location ) => location.menuIds.includes( postId ) );
+
+	return (
+		<NavMenuItem
+			postId={ postId }
+			{ ...props }
+			icon={ isUnused ? UNUSED_MENU_ICON : props.icon }
+		/>
+	);
+}
+
+const MenuListItem = globalThis.__experimentalNavigationMenuEditing
+	? UsageAwareMenuItem
+	: ( props ) => <NavMenuItem { ...props } />;
 
 const NavMenuItem = ( { postId, ...props } ) => {
 	return (

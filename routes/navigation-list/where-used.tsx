@@ -42,7 +42,7 @@ export function useMenuLocationsApis() {
 }
 
 /**
- * A field saying where each menu is used, like "Used in Header, Footer", or
+ * A field saying where each menu is used, like "Used in 2 locations", or
  * "Not used".
  *
  * @param apis Block-library's private APIs.

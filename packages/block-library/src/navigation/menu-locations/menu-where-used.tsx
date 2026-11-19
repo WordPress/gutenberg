@@ -3,7 +3,7 @@ import { useNavigationLocations } from './use-menu-locations';
 import { getWhereUsedLabel } from './utils';
 
 /**
- * Says where a menu is used, like "Used in Header, Footer", or "Not used".
+ * Says where a menu is used, like "Used in 2 locations", or "Not used".
  *
  * @param props
  * @param props.navigationId The menu's ID.
