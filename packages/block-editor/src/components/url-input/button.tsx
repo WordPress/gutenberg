@@ -59,7 +59,7 @@ function URLInputButton( { url, onChange }: URLInputButtonProps ) {
 									<Button
 										size="small"
 										icon={ keyboardReturn }
-										label={ __( 'Submit' ) }
+										label={ __( 'Apply' ) }
 										type="submit"
 									/>
 								</InputControlSuffixWrapper>

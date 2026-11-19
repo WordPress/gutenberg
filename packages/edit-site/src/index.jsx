@@ -7,17 +7,14 @@ import {
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { registerCoreBlockBindingsSources } from '@wordpress/editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	registerLegacyWidgetBlock,
 	registerWidgetGroupBlock,
 } from '@wordpress/widgets';
 import { store as editSiteStore } from './store';
-import { unlock } from './lock-unlock';
 import App from './components/app';
-
-const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -66,6 +63,7 @@ export function initializeEditor( id, settings ) {
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: false,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,

@@ -2550,6 +2550,24 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-editor",
+		"slug": "packages-image-editor",
+		"markdown_source": "../packages/image-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "Image Editor Architecture",
+		"slug": "packages-image-editor-architecture",
+		"markdown_source": "../packages/image-editor/docs/architecture.md",
+		"parent": "packages-image-editor"
+	},
+	{
+		"title": "Image Editor Recipes",
+		"slug": "packages-image-editor-recipes",
+		"markdown_source": "../packages/image-editor/docs/recipes.md",
+		"parent": "packages-image-editor"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",

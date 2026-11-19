@@ -10,6 +10,7 @@ export { ItemDescription } from './item-description';
 export { ItemLabel } from './item-label';
 export { List } from './list';
 export { ListBody } from './list-body';
+export { LoadingIndicator } from './loading-indicator';
 export { Popup } from './popup';
 export { Portal } from './portal';
 export { Positioner } from './positioner';

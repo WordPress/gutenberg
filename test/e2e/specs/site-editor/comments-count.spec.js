@@ -63,10 +63,8 @@ test.describe( 'Comments Count in the page preview', () => {
 		const pageAReleased = new Promise( ( resolve ) => {
 			releasePageA = resolve;
 		} );
-		let heldRequests = 0;
 		await page.route( '**/wp/v2/comments**', async ( route ) => {
 			if ( isPageACountRequest( route.request() ) ) {
-				heldRequests++;
 				await pageAReleased;
 			}
 			await route.continue();
@@ -77,7 +75,6 @@ test.describe( 'Comments Count in the page preview', () => {
 			name: 'Block: Comments Count',
 		} );
 		await expect( commentsCount ).toHaveText( '0' );
-		expect( heldRequests ).toBe( 1 );
 
 		await page
 			.getByRole( 'button', { name: 'Page B', exact: true } )

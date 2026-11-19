@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -10,8 +11,7 @@ import {
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { UnsavedChangesWarning } from '@wordpress/editor';
+import { __, isRTL } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -27,6 +27,7 @@ import useSyncBodyBackground from './use-sync-body-background';
 import styles from './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+const { UnsavedChangesWarning } = unlock( coreDataPrivateApis );
 
 export default function Root() {
 	const matches = useMatches();
@@ -130,9 +131,13 @@ export default function Root() {
 									isMobileSidebarOpen &&
 									! isFullScreen && (
 										<motion.div
-											initial={ { x: '-100%' } }
+											initial={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											animate={ { x: 0 } }
-											exit={ { x: '-100%' } }
+											exit={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											transition={ {
 												type: 'tween',
 												duration: disableMotion

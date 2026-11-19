@@ -1,7 +1,7 @@
-import { paramCase as kebabCase } from 'change-case';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplatePart } from '@wordpress/core-data';
+import { cleanForSlug } from '@wordpress/url';
 
 const EMPTY_ARRAY: WpTemplatePart[] = [];
 
@@ -55,5 +55,5 @@ export function getUniqueTemplatePartTitle(
  * @return A valid template part slug.
  */
 export function getCleanTemplatePartSlug( title: string ): string {
-	return kebabCase( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
+	return cleanForSlug( title ).replace( /[^\w-]+/g, '' ) || 'wp-custom-part';
 }

@@ -22,6 +22,21 @@ export interface ReactionEmoji {
  */
 export const REACTION_EMOJIS: ReactionEmoji[] = [
 	{
+		emoji: '👍',
+		hexKey: '1f44d',
+		label: _x( 'Thumbs up', 'emoji reaction' ),
+		sentenceLabel: _x(
+			'thumbs up',
+			'emoji reaction, after "reacted with"'
+		),
+	},
+	{
+		emoji: '➕',
+		hexKey: '2795',
+		label: _x( 'Plus', 'emoji reaction' ),
+		sentenceLabel: _x( 'plus', 'emoji reaction, after "reacted with"' ),
+	},
+	{
 		emoji: '❤️',
 		hexKey: '2764',
 		label: _x( 'Heart', 'emoji reaction' ),
