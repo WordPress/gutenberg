@@ -2201,6 +2201,11 @@ export function canMoveBlock( state: State, clientId: string ) {
 		return false;
 	}
 
+	// Disabled blocks cannot move, even when lock.move is false.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
+		return false;
+	}
+
 	// Blocks within static inner content are fixed in place; a `lock`
 	// attribute can't override the structural constraint.
 	if (
@@ -2271,7 +2276,6 @@ export function canMoveBlocks( state: State, clientIds: string[] ) {
 			( id ) =>
 				// Check the blocks themselves before considering a destination.
 				!! getBlock( state, id ) &&
-				getBlockEditingMode( state, id ) !== 'disabled' &&
 				canMoveBlock( state, id ) &&
 				// Moving a parent already moves its children; do not move them twice.
 				! getBlockParents( state, id ).some( ( parent ) =>

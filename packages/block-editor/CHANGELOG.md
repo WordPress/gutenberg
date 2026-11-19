@@ -43,6 +43,7 @@
 
 ### Bug Fixes
 
+-   `canMoveBlock`: Return false for blocks with a disabled editing mode, even when movement is explicitly unlocked.
 -   Selection: Preserve nested disclosure and focusable custom controls when modifier-clicking in the canvas.
 -   Selection: Select parents instead of their descendants before checking that selected blocks belong to the same entity. After blocks change, keep selected blocks in the entity containing the selection start block, or the first selected block in document order if that block is no longer selected.
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).

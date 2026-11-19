@@ -345,6 +345,90 @@ describe( 'block selection with multiSelectSet', () => {
 		expect( registry.select( store ).getBlocks() ).toBe( before );
 	} );
 
+	it( 'prevents moving a disabled block', () => {
+		const clientId = blocks[ 0 ].clientId;
+		registry.dispatch( store ).setBlockEditingMode( clientId, 'disabled' );
+		expect( registry.select( store ).canMoveBlock( clientId ) ).toBe(
+			false
+		);
+		expect( registry.select( store ).canMoveBlocks( [ clientId ] ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'prevents moving a disabled block with lock.move set to false', () => {
+		const clientId = blocks[ 0 ].clientId;
+		registry.dispatch( store ).updateBlockAttributes( clientId, {
+			lock: { move: false },
+		} );
+		registry.dispatch( store ).setBlockEditingMode( clientId, 'disabled' );
+		expect( registry.select( store ).canMoveBlock( clientId ) ).toBe(
+			false
+		);
+		expect( registry.select( store ).canMoveBlocks( [ clientId ] ) ).toBe(
+			false
+		);
+	} );
+
+	it( 'allows moving an enabled parent containing a disabled child', () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 0, 2 )
+		);
+		registry.dispatch( store ).resetBlocks( [ parent, blocks[ 2 ] ] );
+		registry
+			.dispatch( store )
+			.setBlockEditingMode( blocks[ 0 ].clientId, 'disabled' );
+		expect(
+			registry.select( store ).getBlockEditingMode( parent.clientId )
+		).toBe( 'default' );
+		expect( registry.select( store ).canMoveBlock( parent.clientId ) ).toBe(
+			true
+		);
+		expect(
+			registry.select( store ).canMoveBlocks( [ parent.clientId ] )
+		).toBe( true );
+		registry
+			.dispatch( store )
+			.moveBlocksToPosition( [ parent.clientId ], '', '', 1 );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			blocks[ 2 ].clientId,
+			parent.clientId,
+		] );
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( blocks.slice( 0, 2 ).map( ( block ) => block.clientId ) );
+		expect(
+			registry
+				.select( store )
+				.getBlockRootClientId( blocks[ 0 ].clientId )
+		).toBe( parent.clientId );
+		expect(
+			registry.select( store ).getBlockEditingMode( blocks[ 0 ].clientId )
+		).toBe( 'disabled' );
+	} );
+
+	it( 'allows an enabled block to override a template movement lock', () => {
+		const clientId = blocks[ 0 ].clientId;
+		registry.dispatch( store ).updateSettings( { templateLock: 'all' } );
+		expect( registry.select( store ).canMoveBlock( clientId ) ).toBe(
+			false
+		);
+		registry.dispatch( store ).updateBlockAttributes( clientId, {
+			lock: { move: false },
+		} );
+		expect( registry.select( store ).getBlockEditingMode( clientId ) ).toBe(
+			'default'
+		);
+		expect( registry.select( store ).canMoveBlock( clientId ) ).toBe(
+			true
+		);
+		expect( registry.select( store ).canMoveBlocks( [ clientId ] ) ).toBe(
+			true
+		);
+	} );
+
 	it.each( [
 		'missing',
 		'duplicate',
