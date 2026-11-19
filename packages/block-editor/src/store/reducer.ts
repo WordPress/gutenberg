@@ -1605,8 +1605,8 @@ export function selection(
 			return nextSelection;
 		case 'RESET_BLOCKS':
 			if ( state.setSelectionClientIds ) {
-				// Preserve candidates: the outer normalizer sees the resulting tree,
-				// including nested survivors that endpoint-only handling would miss.
+				// Keep the selected client IDs for withSetSelection to check against
+				// the updated blocks, including blocks nested inside action.blocks.
 				return state;
 			}
 			const startClientId = state?.selectionStart?.clientId;
@@ -1643,7 +1643,8 @@ export function selection(
 			break;
 		case 'REMOVE_BLOCKS':
 			if ( state.setSelectionClientIds ) {
-				// Reconcile missing members and descendants against the updated tree.
+				// withSetSelection removes client IDs for deleted blocks, including
+				// blocks deleted along with their parent.
 				return state;
 			}
 			break;
@@ -1651,8 +1652,9 @@ export function selection(
 			if ( ! state.setSelectionClientIds ) {
 				break;
 			}
-			// Unlike removal, replacement supplies new member IDs that cannot be
-			// inferred from the surviving tree or changes to endpoints alone.
+			// Select the replacement blocks in place of the replaced blocks.
+			// withSetSelection can remove deleted IDs, but cannot determine
+			// which new blocks replace selected blocks from the updated tree alone.
 			if (
 				! action.clientIds.some( ( id ) =>
 					state.setSelectionClientIds!.includes( id )
@@ -1671,8 +1673,8 @@ export function selection(
 			};
 		case 'SELECT_BLOCK':
 			if ( state.setSelectionClientIds ) {
-				// Explicitly selecting one block exits the set even if its two
-				// directional endpoints already happen to match that block.
+				// Selecting one block clears setSelectionClientIds even when
+				// selectionStart and selectionEnd already refer to that block.
 				return {
 					selectionStart: selectionHelper(
 						state.selectionStart,
@@ -3525,10 +3527,12 @@ function withAutomaticChangeReset( reducer: Reducer< State > ) {
 }
 
 /**
- * Keeps set membership in document order and valid after tree mutations.
+ * Higher-order reducer that updates setSelectionClientIds after block or selection changes.
+ * Removes IDs for missing blocks and descendants of selected blocks, sorts IDs
+ * in document order, and keeps the selected blocks within one entity.
  *
  * @param reducer Original state reducer.
- * @return Reducer with normalized set selections.
+ * @return Reducer that also updates the selected client IDs and selection start/end.
  */
 function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
 	return ( state, action ) => {
@@ -3543,65 +3547,82 @@ function withSetSelection( reducer: Reducer< State > ): Reducer< State > {
 		) {
 			return nextState;
 		}
-		const members = new Set( current.setSelectionClientIds );
-		let ordered: string[] = [];
-		const scopes = new Map< string, string >();
-		const visit = ( root: string, scope: string ) => {
-			// As at creation, ownership is the nearest controlled ancestor, not
-			// an ordinary parent. The controller itself belongs to the outer scope.
-			const childScope = nextState.blocks.controlledInnerBlocks.has(
-				root
-			)
-				? root
-				: scope;
-			for ( const id of nextState.blocks.order.get( root ) ?? [] ) {
-				if ( members.has( id ) ) {
-					ordered.push( id );
-					scopes.set( id, childScope );
+		const uniqueIds = new Set( current.setSelectionClientIds );
+		let orderedIds: string[] = [];
+		const controlledParentsByClientId = new Map< string, string >();
+		const collectSelectedClientIds = (
+			rootClientId: string,
+			controlledParentClientId: string
+		) => {
+			// Only children of a controlled block belong to its separate entity.
+			// The controlled block itself belongs to its parent's entity.
+			const childControlledParentClientId =
+				nextState.blocks.controlledInnerBlocks.has( rootClientId )
+					? rootClientId
+					: controlledParentClientId;
+			for ( const id of nextState.blocks.order.get( rootClientId ) ??
+				[] ) {
+				if ( uniqueIds.has( id ) ) {
+					orderedIds.push( id );
+					controlledParentsByClientId.set(
+						id,
+						childControlledParentClientId
+					);
 				} else {
-					visit( id, childScope );
+					collectSelectedClientIds(
+						id,
+						childControlledParentClientId
+					);
 				}
 			}
 		};
-		visit( '', '' );
-		// Structural actions can move just one member across an entity boundary.
-		// Follow the surviving anchor's current owner, or the first survivor when
-		// the anchor disappeared or was suppressed by a selected ancestor.
-		const anchor = ordered.includes( current.selectionStart.clientId! )
+		collectSelectedClientIds( '', '' );
+		// A block can move into or out of a controlled parent. Keep selected
+		// blocks in the same entity as selectionStart. If that block is missing
+		// or has a selected parent, use the first selected block in document order.
+		const selectionStartClientId = orderedIds.includes(
+			current.selectionStart.clientId!
+		)
 			? current.selectionStart.clientId!
-			: ordered[ 0 ];
-		const scope = scopes.get( anchor );
-		ordered = ordered.filter( ( id ) => scopes.get( id ) === scope );
+			: orderedIds[ 0 ];
+		const controlledParentClientId = controlledParentsByClientId.get(
+			selectionStartClientId
+		);
+		orderedIds = orderedIds.filter(
+			( id ) =>
+				controlledParentsByClientId.get( id ) ===
+				controlledParentClientId
+		);
 		const selectionStart = {
 			clientId:
-				members.has( current.selectionStart.clientId! ) &&
-				ordered.includes( current.selectionStart.clientId! )
+				uniqueIds.has( current.selectionStart.clientId! ) &&
+				orderedIds.includes( current.selectionStart.clientId! )
 					? current.selectionStart.clientId
-					: ordered[ 0 ],
+					: orderedIds[ 0 ],
 		};
 		const selectionEnd = {
-			clientId: ordered.includes( current.selectionEnd.clientId! )
+			clientId: orderedIds.includes( current.selectionEnd.clientId! )
 				? current.selectionEnd.clientId
-				: ordered[ ordered.length - 1 ],
+				: orderedIds[ orderedIds.length - 1 ],
 		};
-		const normalized =
-			ordered.length > 1
+		const nextSelection =
+			orderedIds.length > 1
 				? {
 						selectionStart,
 						selectionEnd,
-						setSelectionClientIds: ordered,
+						setSelectionClientIds: orderedIds,
 					}
 				: {
-						selectionStart: ordered.length
-							? { clientId: ordered[ 0 ] }
+						selectionStart: orderedIds.length
+							? { clientId: orderedIds[ 0 ] }
 							: {},
-						selectionEnd: ordered.length
-							? { clientId: ordered[ 0 ] }
+						selectionEnd: orderedIds.length
+							? { clientId: orderedIds[ 0 ] }
 							: {},
 					};
-		return fastDeepEqual( current, normalized )
+		return fastDeepEqual( current, nextSelection )
 			? nextState
-			: { ...nextState, selection: normalized };
+			: { ...nextState, selection: nextSelection };
 	};
 }
 

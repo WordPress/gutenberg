@@ -130,7 +130,7 @@ export function BlockSettingsDropdown( {
 					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
-				// Menu movers shift one sibling run rather than gathering a selection.
+				// Menu movers require contiguous blocks with the same parent.
 				canMove:
 					canMoveBlocks( clientIds ) &&
 					areBlocksContiguous( clientIds ),

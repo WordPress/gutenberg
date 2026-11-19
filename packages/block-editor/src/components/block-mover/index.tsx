@@ -57,7 +57,7 @@ function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 				normalizeLegacyLayout( layout ) || layoutSupport?.default;
 
 			return {
-				// Arrow movers need one sibling run; dragging can gather scattered blocks.
+				// Arrow movers require contiguous blocks with the same parent; dragging does not.
 				canMove:
 					canMoveBlocks( clientIds ) &&
 					areBlocksContiguous( clientIds ),

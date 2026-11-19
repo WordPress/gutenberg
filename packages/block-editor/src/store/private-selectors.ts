@@ -57,11 +57,11 @@ const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 export { getBlockSettings } from './get-block-settings';
 
 /**
- * Checks whether target IDs form one contiguous sibling run, in any input order.
+ * Checks whether the specified blocks are contiguous siblings, in any input order.
  *
  * @param state     Editor state.
  * @param clientIds Target block IDs.
- * @return Whether the blocks form a single sibling run.
+ * @return Whether the blocks are contiguous siblings.
  */
 export function areBlocksContiguous( state: State, clientIds: string[] ) {
 	if ( clientIds.length < 2 ) {
@@ -76,7 +76,7 @@ export function areBlocksContiguous( state: State, clientIds: string[] ) {
 		// Require distinct siblings so duplicates or missing IDs cannot fill a gap.
 		new Set( clientIds ).size === clientIds.length &&
 		indices.every( ( index ) => index !== -1 ) &&
-		// A run has no gaps when its span equals its block count, regardless of
+		// The blocks have no gaps when their span equals their count, regardless of
 		// input order: positions [ 3, 1, 2 ] span three blocks; [ 1, 3 ] do not.
 		Math.max( ...indices ) - Math.min( ...indices ) + 1 === clientIds.length
 	);
@@ -119,7 +119,7 @@ export function canDuplicateBlocks( state: State, clientIds: string[] ) {
 
 /**
  * Checks whether blocks can move to a destination, regardless of selection.
- * Accepts a single block, a contiguous sibling run, or blocks across parents.
+ * Accepts a single block, contiguous siblings, or blocks across parents.
  *
  * @param state        Editor state.
  * @param clientIds    Block IDs to move.
@@ -173,10 +173,15 @@ export function canMoveBlocksToPosition(
 }
 
 /**
- * Returns stored set membership, or undefined for a text or range selection.
+ * Returns the selected block client IDs for a selection made with multiSelectSet,
+ * including when the selected blocks are adjacent.
+ *
+ * Returns undefined for no selection, a single selected block, a text selection,
+ * or a selection made with multiSelect. Use getSelectedBlockClientIds to get
+ * selected block client IDs regardless of how the selection was made.
  *
  * @param state Editor state.
- * @return Set member client IDs, including when those members are adjacent.
+ * @return Selected block client IDs, or undefined when no selection made with multiSelectSet is stored.
  */
 export function getSetSelectionClientIds( state: State ) {
 	return state.selection.setSelectionClientIds;

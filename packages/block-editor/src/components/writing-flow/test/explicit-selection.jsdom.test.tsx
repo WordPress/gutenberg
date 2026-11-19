@@ -37,7 +37,7 @@ function Canvas( { blocks, content }: { blocks: Block[]; content?: string } ) {
 	);
 }
 
-describe( 'explicit canvas selection', () => {
+describe( 'non-contiguous canvas selection', () => {
 	let registry: ReturnType< typeof createRegistry >;
 	let blocks: Block[];
 	beforeEach( () => {
@@ -157,7 +157,7 @@ describe( 'explicit canvas selection', () => {
 				'focusable block wrapper',
 				'<span data-testid="target">Text</span>',
 			],
-		] )( 'toggles block membership from %s', ( _, html ) => {
+		] )( 'toggles block selection from %s', ( _, html ) => {
 			render(
 				<RegistryProvider value={ registry }>
 					<Canvas blocks={ blocks } content={ html } />
@@ -172,7 +172,7 @@ describe( 'explicit canvas selection', () => {
 		} );
 	} );
 	it.each( [ 'MacIntel', 'Linux' ] )(
-		'toggles canvas selection membership with the platform modifier (%s)',
+		'toggles selected blocks in the canvas with the platform modifier (%s)',
 		( platform ) => {
 			render(
 				<RegistryProvider value={ registry }>
@@ -204,7 +204,7 @@ describe( 'explicit canvas selection', () => {
 		}
 	);
 
-	it( 'returns from explicit selection to ordinary click and Shift-range selection', () => {
+	it( 'returns from multiSelectSet to ordinary click and Shift-range selection', () => {
 		render(
 			<RegistryProvider value={ registry }>
 				<Canvas blocks={ blocks } />

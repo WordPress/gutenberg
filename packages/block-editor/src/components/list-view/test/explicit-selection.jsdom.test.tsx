@@ -11,7 +11,7 @@ import type { Block } from '@wordpress/blocks';
 import { store } from '../../../store';
 import useBlockSelection from '../use-block-selection';
 
-describe( 'explicit List View selection', () => {
+describe( 'non-contiguous List View selection', () => {
 	let registry: ReturnType< typeof createRegistry >;
 	let blocks: Block[];
 	beforeEach( () => {
@@ -37,7 +37,7 @@ describe( 'explicit List View selection', () => {
 	} );
 
 	it.each( [ 'MacIntel', 'Linux' ] )(
-		'toggles List View selection membership with the platform modifier (%s)',
+		'toggles selected blocks in List View with the platform modifier (%s)',
 		async ( platform ) => {
 			vi.spyOn( window.navigator, 'platform', 'get' ).mockReturnValue(
 				platform

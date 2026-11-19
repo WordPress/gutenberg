@@ -91,7 +91,7 @@ export default function BlockActions( {
 			insertAfterBlock( clientIds[ clientIds.length - 1 ] );
 		},
 		onGroup() {
-			// A group replaces one sibling run without relocating blocks across gaps or parents.
+			// Grouping requires contiguous blocks with the same parent.
 			if ( ! clientIds.length || ! areBlocksContiguous( clientIds ) ) {
 				return;
 			}

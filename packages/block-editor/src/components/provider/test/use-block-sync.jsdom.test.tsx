@@ -691,7 +691,7 @@ describe( 'useBlockSync hook', () => {
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
 	} );
 
-	it( 'maps every set member through controller cloning and incoming value resets', () => {
+	it( 'maps every selected client ID when cloning controlled blocks and resetting incoming values', () => {
 		const registry = createRegistry();
 		registry.register( blockEditorStore );
 		const parent = createBlock( 'test/test-block' );

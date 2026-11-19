@@ -43,7 +43,7 @@
 ### Bug Fixes
 
 -   Selection: Preserve nested disclosure and focusable custom controls when modifier-clicking in the canvas.
--   Selection: Apply parent dominance before checking controlled-entity boundaries, and retain members in the surviving selection anchor's entity after structural changes.
+-   Selection: Select parents instead of their descendants before checking that selected blocks belong to the same entity. After blocks change, keep selected blocks in the entity containing the selection start block, or the first selected block in document order if that block is no longer selected.
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
 -   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).

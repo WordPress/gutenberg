@@ -13,7 +13,7 @@ import { store } from '..';
 import { unlock } from '../../lock-unlock';
 import { setClipboardBlocks } from '../../components/writing-flow/utils';
 
-describe( 'explicit block selection', () => {
+describe( 'block selection with multiSelectSet', () => {
 	let registry: ReturnType< typeof createRegistry >;
 	let blocks: Block[];
 	beforeAll( () => {
@@ -39,7 +39,7 @@ describe( 'explicit block selection', () => {
 		registry.dispatch( store ).resetBlocks( blocks );
 	} );
 
-	it( 'selects explicit blocks without including intervening siblings', () => {
+	it( 'selects the specified blocks without including intervening siblings', () => {
 		const ids = [
 			blocks[ 4 ].clientId,
 			blocks[ 0 ].clientId,
@@ -374,7 +374,7 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it( 'normalizes duplicate, invalid, empty, and single-member selections', () => {
+	it( 'ignores duplicate and missing client IDs and supports zero or one selected block', () => {
 		const id = blocks[ 0 ].clientId;
 		registry.dispatch( store ).multiSelectSet( [ id, 'missing', id ] );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
@@ -402,8 +402,8 @@ describe( 'explicit block selection', () => {
 	} );
 
 	it.each( [ 'end', 'start' ] )(
-		'retains members in the surviving %s anchor entity after a move',
-		( endpoint ) => {
+		'keeps selected blocks in the entity containing selectionStart after moving selection %s',
+		( selectionPosition ) => {
 			const parent = createBlock( 'core/test-selection' );
 			const actions = registry.dispatch( store );
 			actions.resetBlocks( [ ...blocks, parent ] );
@@ -411,7 +411,7 @@ describe( 'explicit block selection', () => {
 			actions.setHasControlledInnerBlocks( parent.clientId, true );
 			const ids = blocks.map( ( block ) => block.clientId );
 			actions.multiSelectSet( [ ids[ 0 ], ids[ 2 ], ids[ 4 ] ] );
-			const moved = endpoint === 'start' ? ids[ 0 ] : ids[ 4 ];
+			const moved = selectionPosition === 'start' ? ids[ 0 ] : ids[ 4 ];
 			actions.moveBlocksToPosition( [ moved ], '', parent.clientId, 0 );
 			expect(
 				registry.select( store ).getBlockRootClientId( moved )
@@ -419,12 +419,14 @@ describe( 'explicit block selection', () => {
 			expect(
 				registry.select( store ).getSelectedBlockClientIds()
 			).toEqual(
-				endpoint === 'start' ? [ ids[ 0 ] ] : [ ids[ 0 ], ids[ 2 ] ]
+				selectionPosition === 'start'
+					? [ ids[ 0 ] ]
+					: [ ids[ 0 ], ids[ 2 ] ]
 			);
 		}
 	);
 
-	it( 'retains outside members when changing ownership removes controlled contents', () => {
+	it( 'keeps selected blocks outside a parent when its inner blocks become controlled', () => {
 		const parent = createBlock(
 			'core/test-selection',
 			{},
@@ -445,8 +447,8 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it.each( [ 'missing', 'suppressed' ] )(
-		'uses the first surviving member entity when the anchor is %s',
+	it.each( [ 'missing', 'inside a selected parent' ] )(
+		'uses the first selected block in document order when selectionStart is %s',
 		( reason ) => {
 			const parent = createBlock( 'core/test-selection' );
 			const actions = registry.dispatch( store );
@@ -459,7 +461,7 @@ describe( 'explicit block selection', () => {
 			);
 			const ids = blocks.map( ( block ) => block.clientId );
 			const start = reason === 'missing' ? 'missing' : ids[ 0 ];
-			// Restored candidates can have stale ownership or suppressed endpoints.
+			// Restore a missing selectionStart block, or one whose parent is selected.
 			actions.resetSelection(
 				{ clientId: start },
 				{ clientId: ids[ 4 ] },
@@ -475,7 +477,7 @@ describe( 'explicit block selection', () => {
 		}
 	);
 
-	it( 'restores only members in the first surviving member entity when the anchor is missing', () => {
+	it( 'restores selected blocks from one entity when the selectionStart block is missing', () => {
 		const parent = createBlock( 'core/test-selection' );
 		const actions = registry.dispatch( store );
 		actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
@@ -510,7 +512,7 @@ describe( 'explicit block selection', () => {
 		).toBeUndefined();
 	} );
 
-	it( 'rejects mixed-entity creation without changing the existing selection', () => {
+	it( 'rejects selecting blocks from different entities without changing the existing selection', () => {
 		const parent = createBlock( 'core/test-selection' );
 		const actions = registry.dispatch( store );
 		actions.resetBlocks( [ parent, ...blocks.slice( 2 ) ] );
@@ -547,7 +549,7 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it( 'preserves directional endpoints independently of document order', () => {
+	it( 'preserves selection start and end independently of document order', () => {
 		const ids = [
 			blocks[ 0 ].clientId,
 			blocks[ 2 ].clientId,
@@ -568,7 +570,7 @@ describe( 'explicit block selection', () => {
 		).toBe( ids[ 0 ] );
 	} );
 
-	it( 'keeps selection membership valid after block removal, replacement, reset, and reordering', () => {
+	it( 'updates selected client IDs after block removal, replacement, reset, and reordering', () => {
 		const ids = blocks.map( ( block ) => block.clientId );
 		registry
 			.dispatch( store )
@@ -594,7 +596,7 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it( 'reports a multi-member set as multi-selected when its endpoints match', () => {
+	it( 'reports multiple selected blocks when selection start and end match', () => {
 		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
 		registry.dispatch( store ).multiSelectSet( ids, null, {
 			selectionStartClientId: ids[ 0 ],
@@ -619,7 +621,7 @@ describe( 'explicit block selection', () => {
 	} );
 
 	it.each( [ 'clear', 'single', 'range', 'text', 'restore' ] )(
-		'replaces set membership for a %s selection request',
+		'clears setSelectionClientIds for a %s selection request',
 		( request ) => {
 			const ids = blocks.map( ( block ) => block.clientId );
 			const actions = registry.dispatch( store );
@@ -695,7 +697,7 @@ describe( 'explicit block selection', () => {
 		}
 	);
 
-	it( 'distinguishes adjacent set membership from range-derived selected IDs', () => {
+	it( 'distinguishes multiSelectSet from multiSelect when the same adjacent blocks are selected', () => {
 		const ids = blocks.slice( 0, 3 ).map( ( block ) => block.clientId );
 		registry.dispatch( store ).multiSelectSet( ids );
 		expect(
@@ -749,7 +751,7 @@ describe( 'explicit block selection', () => {
 		);
 	} );
 
-	it( 'retains ordinary operations for contiguous explicit selections', () => {
+	it( 'retains ordinary operations when multiSelectSet selects contiguous blocks', () => {
 		const ids = [ blocks[ 0 ].clientId, blocks[ 1 ].clientId ];
 		registry.dispatch( store ).multiSelectSet( ids );
 		expect(

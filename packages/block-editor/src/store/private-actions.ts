@@ -27,7 +27,8 @@ const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
 
 /**
- * Gathers explicit IDs at a pre-removal insertion position in one mutation.
+ * Moves the specified blocks together in one content update. The insertion
+ * position is relative to the blocks before the selected blocks are removed.
  *
  * @param clientIds    Dragged IDs, in any input order.
  * @param rootClientId Destination parent, or the document root.

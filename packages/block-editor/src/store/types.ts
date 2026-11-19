@@ -532,7 +532,7 @@ export interface BlocksState {
 export interface SelectionState {
 	selectionStart: BlockSelection;
 	selectionEnd: BlockSelection;
-	/** Enumerated set members (even adjacent ones), absent for text and range selections. */
+	/** Selected block client IDs from multiSelectSet, omitted for zero/one block, text, and range selections. */
 	setSelectionClientIds?: string[];
 }
 

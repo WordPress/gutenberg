@@ -64,7 +64,7 @@ export const isClientIdSelected = (
  * @param endId               The end id of a selection, usually one that has been clicked on.
  * @param startParents        An array of ancestor ids for the start id, in descending order.
  * @param endParents          An array of ancestor ids for the end id, in descending order.
- * @param requireCommonParent Whether to promote endpoints to siblings, rather than only matching depths.
+ * @param requireCommonParent Whether to find start and end blocks with the same parent, rather than only matching depths.
  * @return An object containing the start and end ids.
  */
 export function getCommonDepthClientIds(

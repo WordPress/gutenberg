@@ -57,7 +57,7 @@ export default function useClickSelection() {
 					! event.altKey &&
 					( isAppleOS() ? event.metaKey : event.ctrlKey )
 				) {
-					// The mousedown capture handles membership before native caret placement.
+					// The mousedown capture toggles block selection before native caret placement.
 					return;
 				}
 

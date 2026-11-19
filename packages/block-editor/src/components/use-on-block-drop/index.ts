@@ -101,7 +101,7 @@ export function parseDropEvent(
  * @param operation                 The type of operation to perform on drop. Could be `insert` or `replace` or `group`.
  * @param getBlock                  A function that returns a block given its client id.
  * @param onSameOrderDrop           Runs custom behavior for insertion drops that keep the block order.
- * @param onBlockSetDrop            Handles explicit-set drops before legacy contiguous index calculations.
+ * @param onBlockSetDrop            Handles non-contiguous block drops before calculating indices for contiguous blocks.
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(

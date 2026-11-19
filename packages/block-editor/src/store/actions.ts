@@ -105,7 +105,7 @@ export const validateBlocksToTemplate =
  * @param {WPBlockSelection} selectionStart        The selection start.
  * @param {WPBlockSelection} selectionEnd          The selection end.
  * @param {0|-1|null}        initialPosition       Initial block position.
- * @param {string[]}         setSelectionClientIds Whole-block set membership, absent for ranges.
+ * @param {string[]}         setSelectionClientIds Selected block client IDs, omitted for text and range selections.
  *
  * @return {Object} Action object.
  */
@@ -359,18 +359,21 @@ export const multiSelect =
 /**
  * Selects a set of whole blocks, including blocks with different ordinary parents.
  *
- * Membership is stored in document order, independently of the directional
- * endpoints. Start anchors range extension; end is its moving end, not keyboard
- * focus. For example, selecting E then adding B stores [B, E], with start E and
- * end B. Endpoints default to the first and last valid input IDs before tree
- * normalization. Missing or suppressed endpoints are repaired to surviving
- * members; equal endpoints do not imply a single-member set.
+ * Client IDs are stored in document order. Selection start and end preserve the
+ * order of selection: selecting E then adding B stores [B, E], with selection
+ * start E and selection end B. Shift-selection extends from selection start;
+ * selection end does not track keyboard focus.
+ *
+ * By default, selection start and end use the first and last valid input IDs.
+ * If either ID is not in the selected client IDs, withSetSelection uses the
+ * first or last selected block in document order instead. Matching
+ * selection start and end IDs do not imply that only one block is selected.
  *
  * @param clientIds                      Block client IDs to select.
  * @param initialPosition                Initial caret position, or null to retain focus outside the canvas.
- * @param options                        Optional directional selection endpoints.
- * @param options.selectionStartClientId Directional start block (range-extension anchor).
- * @param options.selectionEndClientId   Directional end block, independent of keyboard focus.
+ * @param options                        Optional selection start and end blocks.
+ * @param options.selectionStartClientId Client ID of the block where the selection starts.
+ * @param options.selectionEndClientId   Client ID of the block where the selection ends.
  */
 export const multiSelectSet =
 	(
@@ -390,31 +393,40 @@ export const multiSelectSet =
 				select.getBlock( id ) &&
 				select.getBlockEditingMode( id ) !== 'disabled'
 		);
-		// Parent dominance must precede ownership validation: selecting a
-		// controller suppresses its children, leaving a valid outer-entity member.
+		// Remove IDs whose parent is selected before checking controlled parents.
+		// Selecting a controlled parent includes its contents, not a separate
+		// selection inside the entity that stores those contents.
 		const requested = new Set( uniqueIds );
-		const members = uniqueIds.filter(
+		const selectedClientIds = uniqueIds.filter(
 			( id ) =>
 				! select
 					.getBlockParents( id )
 					.some( ( parent ) => requested.has( parent ) )
 		);
-		// Controlled contents are saved in another entity with its own ID mapping
-		// and history. Persistence currently handles one owner per selection, so
-		// ordinary cross-parent sets are valid but mixed-entity sets are not.
-		const getSelectionRoot = ( id: string ) =>
+		// Controlled inner blocks are saved in a separate entity with its own
+		// client IDs and undo history. Selected blocks can have different parents,
+		// but must belong to the same entity.
+		const getControlledParentClientId = ( id: string ) =>
 			select
 				.getBlockParents( id, true )
 				.find( ( parent ) =>
 					select.areInnerBlocksControlled( parent )
 				) ?? '';
-		const root = members.length ? getSelectionRoot( members[ 0 ] ) : '';
-		if ( members.some( ( id ) => getSelectionRoot( id ) !== root ) ) {
+		const controlledParentClientId = selectedClientIds.length
+			? getControlledParentClientId( selectedClientIds[ 0 ] )
+			: '';
+		if (
+			selectedClientIds.some(
+				( id ) =>
+					getControlledParentClientId( id ) !==
+					controlledParentClientId
+			)
+		) {
 			return;
 		}
 		dispatch( {
 			type: 'MULTI_SELECT_SET',
-			clientIds: members,
+			clientIds: selectedClientIds,
 			selectionStart: {
 				clientId: selectionStartClientId ?? uniqueIds[ 0 ],
 			},
@@ -550,7 +562,7 @@ const createOnMove =
 	( type: string ) =>
 	( clientIds: string[], rootClientId?: string | null ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// Up/down movers shift one sibling run; they do not gather scattered blocks.
+		// Up/down movers require contiguous blocks with the same parent.
 		if (
 			! select.canMoveBlocks( clientIds ) ||
 			! select.areBlocksContiguous( clientIds )
@@ -580,7 +592,7 @@ export const moveBlocksToPosition =
 		index?: number
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// This action moves one sibling run from a single source parent.
+		// This action moves contiguous blocks from a single source parent.
 		// Scattered blocks use moveBlockSetToPosition instead.
 		if (
 			! select.canMoveBlocks( clientIds ) ||

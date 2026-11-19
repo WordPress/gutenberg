@@ -3741,7 +3741,7 @@ export const isGroupable = createRegistrySelector(
 			const _clientIds = clientIds?.length
 				? clientIds
 				: getSelectedBlockClientIds( state );
-			// One group replaces one sibling run; grouping scattered blocks would relocate them.
+			// Grouping requires contiguous blocks with the same parent.
 			if ( ! areBlocksContiguous( state, _clientIds ) ) {
 				return false;
 			}
