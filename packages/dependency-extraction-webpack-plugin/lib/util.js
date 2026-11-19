@@ -78,8 +78,8 @@ function defaultRequestToExternal( request ) {
  *
  * Currently only `@wordpress/interactivity`, `@wordpress/interactivity-router`,
  * and `@wordpress/a11y` are supported. Each maps to its own script module ID,
- * which every import of it keeps: a static `import` declaration stays static
- * and an `import()` stays dynamic.
+ * without an externals type, so each import of it takes its kind from the
+ * plugin's externals type.
  *
  * Do not use the boolean shorthand here, it's only handled for the
  * `requestToExternalModule` option.

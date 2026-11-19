@@ -157,9 +157,10 @@ class DependencyExtractionWebpackPlugin {
 		/**
 		 * Offload externalization work to the ExternalsPlugin.
 		 *
-		 * Script modules use the `module-import` type, which keeps the kind of
-		 * each import: a static `import` declaration stays static and an
-		 * `import()` stays dynamic.
+		 * Script modules use the `module-import` type, so a static `import`
+		 * declaration of an external stays static and an `import()` of it stays
+		 * dynamic. Webpack externalizes the imports of one request in one file
+		 * together, so a file that has both gets the static import for both.
 		 *
 		 * @type {webpack.ExternalsPlugin}
 		 */
