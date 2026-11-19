@@ -17,21 +17,16 @@ $scroll-fade-end-size: var(--wpds-dimension-padding-3xl);
 // Width of the fade itself, over the columns next to a covering cell.
 $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 
-// Makes the cell at the edge of the rows on `$side` cover the columns
-// scrolling under it while the scroll position is within `$range`: the cell is
-// opaque, and an outline in the row's background reaches over the columns next
-// to it, fading them out over `$scroll-fade-ramp`. The cell also hides its
-// share of the row line, so the lines fade out with the columns. Outside the
-// range, and when nothing scrolls, its mask keeps only its share of the row
-// line, so it does not cover what the columns next to it paint over its space,
-// like a focus ring. Browsers without scroll-driven animations rest here,
-// until the table's `has-columns-before` and `has-columns-after` classes, set
-// from the scroll position, apply `scroll-fade-active`.
-//
-// With `$reset-range`, a second animation puts the element back at rest within
-// that range. Safari keeps an animation applied at the end of the scroll
-// range, past the end of its own range, until another one overrides it.
-@mixin scroll-fade($side, $range, $fill-mode: none, $reset-range: null) {
+// Sets up the cell at the edge of the rows on `$side` to cover the columns
+// scrolling under it while there are more columns to scroll to on that side,
+// as the table's `has-columns-before` and `has-columns-after` classes tell:
+// then `scroll-fade-active` makes the cell opaque, and an outline in the row's
+// background reaches over the columns next to it, fading them out over
+// `$scroll-fade-ramp`. The cell also hides its share of the row line, so the
+// lines fade out with the columns. At rest, its mask keeps only its share of
+// the row line, so it does not cover what the columns next to it paint over
+// its space, like a focus ring.
+@mixin scroll-fade($side) {
 	$to: var(--dataviews-view-table-fade-to-#{$side});
 
 	// The masks only keep the part of the outline next to the columns: they
@@ -50,36 +45,15 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	@supports (-webkit-mask-box-image: none) {
 		--dataviews-view-table-fade-mask: none;
 	}
-
-	@supports (animation-timeline: scroll()) {
-		@if $reset-range {
-			animation: dataviews-view-table-scroll-fade linear $fill-mode, dataviews-view-table-scroll-fade-reset linear;
-			animation-timeline: scroll(nearest inline);
-			animation-range: $range, $reset-range;
-		} @else {
-			animation: dataviews-view-table-scroll-fade linear $fill-mode;
-			animation-timeline: scroll(nearest inline);
-			animation-range: $range;
-		}
-	}
 }
 
-// Applied while a fade is active, by its scroll-driven animation, or by the
-// table's classes where the browser does not support them. The outline, rather than a box shadow, as Chrome does not
-// paint box shadows on table cells.
+// Applied while a fade is active. The outline, rather than a box shadow, as
+// Chrome does not paint box shadows on table cells.
 @mixin scroll-fade-active {
 	outline: $scroll-fade-ramp solid var(--dataviews-view-table-row-background);
 	mask-image: var(--dataviews-view-table-fade-mask);
 	-webkit-mask-box-image: var(--dataviews-view-table-fade-mask-border);
 	background-size: 0 0;
-}
-
-// Shows the styles of the fade cues for the scroll positions that the
-// table's classes describe, in browsers without scroll-driven animations.
-@mixin scroll-fade-fallback {
-	@supports not (animation-timeline: scroll()) {
-		@content;
-	}
 }
 
 .dataviews-view-table {
@@ -153,18 +127,10 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 			}
 
 			// Hidden at the end of the scroll range, and when nothing scrolls,
-			// where the scroll timeline is inactive. The second animation
-			// hides them at the end of the range in Safari, which keeps the
-			// first one applied there.
+			// see `has-columns-after` below.
 			&::before,
 			&::after {
 				opacity: 0;
-
-				@supports (animation-timeline: scroll()) {
-					animation: dataviews-view-table-scroll-cue linear, dataviews-view-table-scroll-cue-reset linear;
-					animation-timeline: scroll(nearest inline);
-					animation-range: normal calc(100% - 1px), calc(100% - 1px) normal;
-				}
 			}
 		}
 
@@ -418,15 +384,14 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		inset-inline-start: 0;
 		// Above the positioned content of the cells that follow it.
 		z-index: 1;
-		// From the first pixel scrolled, through the end of the range.
-		@include scroll-fade(start, 1px normal, forwards);
+		@include scroll-fade(start);
 	}
 
 	&:not(.has-actions) tr::after {
 		inset-inline-end: 0;
 		width: $scroll-fade-end-size;
 		min-width: $scroll-fade-end-size;
-		@include scroll-fade(end, normal calc(100% - 1px), $reset-range: calc(100% - 1px) normal);
+		@include scroll-fade(end);
 	}
 
 	// Each cell draws its share of the line between rows, so a fade can hide
@@ -441,50 +406,16 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		background-size: 100% 1px;
 	}
 
-	// The scroll cues, from the scroll position, in browsers without
-	// scroll-driven animations. They follow the rules above, to outrank them.
-	@include scroll-fade-fallback {
-		&.has-columns-before tr::before,
-		&.has-columns-after:not(.has-actions) tr::after {
-			@include scroll-fade-active;
-		}
-
-		&.has-columns-after .dataviews-view-table__actions-column::before,
-		&.has-columns-after .dataviews-view-table__actions-column::after {
-			opacity: 1;
-		}
-	}
-}
-
-@keyframes dataviews-view-table-scroll-fade {
-	from,
-	to {
+	// The scroll cues, from the scroll position. They follow the rules above,
+	// to outrank them.
+	&.has-columns-before tr::before,
+	&.has-columns-after:not(.has-actions) tr::after {
 		@include scroll-fade-active;
 	}
-}
 
-@keyframes dataviews-view-table-scroll-cue {
-	from,
-	to {
+	&.has-columns-after .dataviews-view-table__actions-column::before,
+	&.has-columns-after .dataviews-view-table__actions-column::after {
 		opacity: 1;
-	}
-}
-
-// Puts a fade back at rest, see `scroll-fade`.
-@keyframes dataviews-view-table-scroll-fade-reset {
-	from,
-	to {
-		outline: none;
-		mask-image: linear-gradient(#000 1px, transparent 1px);
-		-webkit-mask-box-image: none;
-		background-size: 100% 1px;
-	}
-}
-
-@keyframes dataviews-view-table-scroll-cue-reset {
-	from,
-	to {
-		opacity: 0;
 	}
 }
 

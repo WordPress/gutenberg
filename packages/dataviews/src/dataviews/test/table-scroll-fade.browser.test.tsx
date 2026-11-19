@@ -1,5 +1,5 @@
 import { render } from 'vitest-browser-react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import '@wordpress/theme/design-tokens.css';
 import '@wordpress/components/src/button/style.scss';
 import DataViews from '../index';
@@ -188,7 +188,7 @@ describe( 'DataViews table scroll fade', () => {
 		it( 'hides the divider when every column fits', async () => {
 			await render( <PostsTable withActions width={ 1600 } /> );
 
-			// Wait for a frame, so a scroll timeline would have been resolved.
+			// Wait for a frame, so the scroll state would have been resolved.
 			await new Promise( requestAnimationFrame );
 			expect( getDividerOpacity() ).toBe( '0' );
 		} );
@@ -326,7 +326,7 @@ describe( 'DataViews table scroll fade', () => {
 		async ( dir ) => {
 			await render( <PostsTable dir={ dir } width={ 1600 } /> );
 
-			// Wait for a frame, so a scroll timeline would have been resolved.
+			// Wait for a frame, so the scroll state would have been resolved.
 			await new Promise( requestAnimationFrame );
 			const row = getRows()[ 1 ];
 			for ( const pseudo of [ '::before', '::after' ] ) {
@@ -342,7 +342,7 @@ describe( 'DataViews table scroll fade', () => {
 	it( 'does not fade when every column fits', async () => {
 		await render( <PostsTable width={ 1600 } /> );
 
-		// Wait for a frame, so a scroll timeline would have been resolved.
+		// Wait for a frame, so the scroll state would have been resolved.
 		await new Promise( requestAnimationFrame );
 		const row = getRows()[ 1 ];
 		expect( isFading( getComputedStyle( row, '::before' ) ) ).toBe( false );
@@ -455,23 +455,8 @@ describe( 'DataViews table scroll fade', () => {
 		} );
 	} );
 
-	// Firefox and iOS Safari 18 show the same cues, from classes that the
-	// table sets from its scroll position.
-	describe( 'without scroll-driven animations', () => {
-		beforeEach( () => {
-			const supports = CSS.supports.bind( CSS );
-			vi.spyOn( CSS, 'supports' ).mockImplementation(
-				( ...args: [ string, string? ] ) =>
-					args[ 0 ].startsWith( 'animation-timeline' )
-						? false
-						: supports( ...( args as [ string ] ) )
-			);
-		} );
-
-		afterEach( () => {
-			vi.restoreAllMocks();
-		} );
-
+	// The cues follow classes that the table sets from its scroll position.
+	describe( 'scroll position classes', () => {
 		const getTableClasses = () => {
 			const { classList } = document.querySelector(
 				'.dataviews-view-table'

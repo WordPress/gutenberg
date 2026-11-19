@@ -2,25 +2,12 @@ import type { RefObject } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
- * Whether the browser drives the table's horizontal scroll cues in CSS, with a
- * scroll timeline. Checked on each mount, so tests can stub `CSS.supports`.
- */
-const supportsScrollTimeline = () =>
-	typeof CSS !== 'undefined' &&
-	typeof CSS.supports === 'function' &&
-	CSS.supports( 'animation-timeline: scroll()' );
-
-/**
  * A hook to track the scroll state of a container element.
  *
- * Returns whether the container has been scrolled vertically (for sticky header styling).
- *
- * The horizontal scroll cues of the table are handled in CSS, with scroll-driven
- * animations. Where the browser does not support them, the hook also returns
- * whether there are columns to scroll to before and after the visible ones, for
- * the table to show the same cues with classes. It mirrors the scroll ranges of
- * the animations: the cue at the start shows from the first pixel scrolled, and
- * the one at the end until the last pixel.
+ * Returns whether the container has been scrolled vertically (for sticky header
+ * styling), and whether there are columns to scroll to before and after the
+ * visible ones (for the table's scroll fades): the cue at the start shows from
+ * the first pixel scrolled, and the one at the end until the last pixel.
  *
  * The current way receives "refs" as arguments, but it lacks a mechanism to detect when a ref has changed.
  * As a result, when the "ref" is updated and attached to a new div, the computation should trigger again.
@@ -52,19 +39,6 @@ export function useScrollState( {
 		const scrollContainer = scrollContainerRef.current;
 		if ( ! scrollContainer ) {
 			return;
-		}
-
-		if ( supportsScrollTimeline() ) {
-			const handleScroll = () =>
-				setHasVerticalScrollStart( scrollContainer.scrollTop > 0 );
-
-			// A resize that clamps the scroll position also fires `scroll`.
-			handleScroll();
-			scrollContainer.addEventListener( 'scroll', handleScroll );
-
-			return () => {
-				scrollContainer.removeEventListener( 'scroll', handleScroll );
-			};
 		}
 
 		const update = () => {
