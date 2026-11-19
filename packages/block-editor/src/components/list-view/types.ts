@@ -122,6 +122,25 @@ export type AdditionalBlockContentProps = {
 };
 
 /**
+ * Props of the component that replaces the default block inserter in the
+ * List View appender row.
+ */
+export type ListViewCustomAppenderProps = {
+	/** The client ID of the block that new blocks are appended to. */
+	rootClientId?: string | null;
+	/** Marks a block as just inserted, so `additionalBlockContent` renders for it. */
+	setInsertedBlockClientId: Dispatch< SetStateAction< string | null > >;
+	/** Props to spread on the toggle, so it takes part in the tree grid's keyboard navigation. */
+	toggleProps: {
+		ref: ForwardedRef< HTMLElement >;
+		className: string;
+		tabIndex?: number;
+		onFocus?: FocusEventHandler;
+		'aria-describedby': string;
+	};
+};
+
+/**
  * Props of the settings menu of each row.
  */
 export type ListViewBlockSettingsMenuProps = Omit<
@@ -141,6 +160,7 @@ export type ListViewBlockSettingsMenuProps = Omit<
  */
 export type ListViewContextValue = {
 	AdditionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
+	CustomAppender?: ComponentType< ListViewCustomAppenderProps > | null;
 	BlockSettingsMenu?: ComponentType< ListViewBlockSettingsMenuProps >;
 	listViewInstanceId?: number | string;
 	rootClientId?: string | null;
@@ -189,6 +209,8 @@ export type PrivateListViewProps = ListViewProps & {
 	onSelect?: ( ( block: Block | null ) => void ) | null;
 	/** Component that renders additional block content UI. */
 	additionalBlockContent?: ComponentType< AdditionalBlockContentProps > | null;
+	/** Component that replaces the default block inserter in the appender row. Only used when `showAppender` is set. */
+	appender?: ComponentType< ListViewCustomAppenderProps > | null;
 	/** Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`. */
 	showContentPopover?: boolean;
 };

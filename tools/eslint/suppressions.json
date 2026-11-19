@@ -3025,11 +3025,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1

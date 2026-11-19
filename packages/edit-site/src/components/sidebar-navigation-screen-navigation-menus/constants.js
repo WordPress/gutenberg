@@ -4,7 +4,7 @@
 // These parameters must be kept aligned with those in
 // lib/compat/wordpress-6.3/navigation-block-preloading.php
 // and
-// block-library/src/navigation/constants.js
+// block-library/src/navigation/constants.ts
 export const PRELOADED_NAVIGATION_MENUS_QUERY = {
 	per_page: 100,
 	status: [ 'publish', 'draft' ],
