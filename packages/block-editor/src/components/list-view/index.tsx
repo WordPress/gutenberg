@@ -140,18 +140,18 @@ function ListViewComponent(
 		if ( ! draggedClientIds.length ) {
 			return draggedClientIds;
 		}
-		const members = new Set( draggedClientIds );
+		const uniqueIds = new Set( draggedClientIds );
 		const visible: string[] = [];
-		const visit = ( nodes: ClientIdsTreeNode[] ) => {
+		const collectVisibleClientIds = ( nodes: ClientIdsTreeNode[] ) => {
 			for ( const block of nodes ) {
-				if ( members.has( block.clientId ) ) {
+				if ( uniqueIds.has( block.clientId ) ) {
 					visible.push( block.clientId );
 				} else if ( expansionState[ block.clientId ] ?? isExpanded ) {
-					visit( block.innerBlocks );
+					collectVisibleClientIds( block.innerBlocks );
 				}
 			}
 		};
-		visit( clientIdsTree );
+		collectVisibleClientIds( clientIdsTree );
 		return visible;
 	}, [ draggedClientIds, clientIdsTree, expansionState, isExpanded ] );
 
