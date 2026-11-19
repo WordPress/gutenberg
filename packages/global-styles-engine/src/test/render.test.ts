@@ -2821,6 +2821,51 @@ describe( 'global styles renderer', () => {
 				':is(.a, .b){color: red;}',
 				':root :where(.foo:is(.a, .b)){color: red;}',
 			],
+			[
+				'leading newline keeps its existing output',
+				'\n:hover{color: red;}',
+				':root :where(.foo:hover){color: red;}',
+			],
+			[
+				'leading newline before a type selector',
+				'\nimg{color: red;}',
+				':root :where(.foo img){color: red;}',
+			],
+			[
+				'comment with ; before a leading rule',
+				'/* note; see docs */ .is-style-x{color: red;}',
+				':root :where(.foo .is-style-x){color: red;}',
+			],
+			[
+				'comment with braces and & between rules',
+				'color: red; /* & img { } */ img{color: blue;}',
+				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			],
+			[
+				'comment-like string is kept',
+				'img::after{content: "/* x */";}',
+				':root :where(.foo img)::after{content: "/* x */";}',
+			],
+			[
+				'declarations after a nested rule apply to the block',
+				'img{color: blue;} color: red;',
+				':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
+			],
+			[
+				'declarations after a nested rule inside &',
+				'& { img { color: blue; } color: red; }',
+				':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
+			],
+			[
+				'rule nested in a rule without & is not flattened',
+				'figure { img { color: blue; } }',
+				'',
+			],
+			[
+				'rule nested in a rule without & keeps sibling rules',
+				'figure { img { color: blue; } } p{color: red;}',
+				':root :where(.foo p){color: red;}',
+			],
 		] )( '%s', ( _description, css, expected ) => {
 			expect( processCSSNesting( css, '.foo' ) ).toBe( expected );
 		} );

@@ -2175,6 +2175,136 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns the position of the next `{`, `;` or `}` outside a string.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css   The CSS to search.
+	 * @param int    $start The position to start from.
+	 * @return int The position of the delimiter, or -1 when there is none.
+	 */
+	private static function find_next_custom_css_delimiter( $css, $start ) {
+		$quote  = '';
+		$length = strlen( $css );
+		for ( $i = $start; $i < $length; $i++ ) {
+			$char = $css[ $i ];
+			if ( '' !== $quote ) {
+				if ( '\\' === $char ) {
+					++$i;
+				} elseif ( $char === $quote ) {
+					$quote = '';
+				}
+			} elseif ( '"' === $char || "'" === $char ) {
+				$quote = $char;
+			} elseif ( '{' === $char || ';' === $char || '}' === $char ) {
+				return $i;
+			}
+		}
+		return -1;
+	}
+
+	/**
+	 * Rewrites custom CSS so that it can be split on `&`.
+	 *
+	 * - Comments are removed, so `;`, `{`, `}` or `&` inside them are ignored.
+	 * - A nested rule without `&` is treated as `& selector`, matching native
+	 *   CSS nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+	 * - A rule at the very start is only rewritten when it starts with a type
+	 *   selector, as other selectors there, e.g. `:hover {}`, are already
+	 *   appended to the block selector.
+	 * - Declarations after a nested rule are moved back to the block, e.g.
+	 *   `img {} color: blue;` becomes `& img {} & color: blue;`.
+	 * - A bare `& {}` block is unwrapped, as it is the block itself.
+	 * - Rules nested in any other rule, e.g. `figure { img {} }`, are left as
+	 *   is, as they can't be flattened.
+	 *
+	 * This must stay in sync with `normalizeNestedRules()` in the
+	 * `@wordpress/global-styles-engine` package.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css The custom CSS.
+	 * @return string The rewritten CSS.
+	 */
+	private static function normalize_nested_custom_css( $css ) {
+		// Remove comments, but keep strings that look like comments.
+		$css = preg_replace( '/("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|\/\*.*?\*\//s', '$1', $css );
+
+		$result = '';
+		// One entry per open brace: true for an unwrapped bare `& {}` block.
+		$blocks             = array();
+		$quote              = '';
+		$is_statement_start = true;
+		$is_first_statement = true;
+		$is_after_rule      = false;
+		$statement_start    = 0;
+		$length             = strlen( $css );
+
+		for ( $i = 0; $i < $length; $i++ ) {
+			$char = $css[ $i ];
+
+			if ( '' !== $quote ) {
+				$result .= $char;
+				if ( '\\' === $char && $i + 1 < $length ) {
+					$result .= $css[ ++$i ];
+				} elseif ( $char === $quote ) {
+					$quote = '';
+				}
+				continue;
+			}
+
+			// Rules can only be rewritten at the block level.
+			$is_block_level = ! in_array( false, $blocks, true );
+
+			if ( $is_statement_start && ! ctype_space( $char ) ) {
+				$is_statement_start = false;
+				if ( $is_block_level && ! in_array( $char, array( '&', '@', ';', '}' ), true ) ) {
+					$delimiter     = static::find_next_custom_css_delimiter( $css, $i );
+					$is_rule       = -1 !== $delimiter && '{' === $css[ $delimiter ];
+					$should_prefix = $is_rule
+						? ( ! $is_first_statement || ctype_alpha( $char ) || '*' === $char )
+						: $is_after_rule;
+					if ( $should_prefix ) {
+						$result .= '& ';
+					}
+				}
+				$is_first_statement = false;
+				$statement_start    = strlen( $result );
+			}
+
+			if ( '"' === $char || "'" === $char ) {
+				$quote = $char;
+			} elseif ( '{' === $char ) {
+				if ( $is_block_level && '&' === trim( substr( $result, $statement_start ) ) ) {
+					$result             = substr( $result, 0, $statement_start );
+					$blocks[]           = true;
+					$is_statement_start = true;
+					continue;
+				}
+				$blocks[] = false;
+			} elseif ( '}' === $char ) {
+				if ( ! empty( $blocks ) && end( $blocks ) ) {
+					array_pop( $blocks );
+					$is_statement_start = true;
+					continue;
+				}
+				array_pop( $blocks );
+				if ( ! in_array( false, $blocks, true ) ) {
+					$is_after_rule      = true;
+					$is_statement_start = true;
+				}
+			} elseif ( ';' === $char && $is_block_level ) {
+				$is_after_rule      = false;
+				$is_statement_start = true;
+			}
+
+			$result .= $char;
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Processes the CSS, to apply nesting.
 	 *
 	 * @since 6.2.0
@@ -2190,19 +2320,12 @@ class WP_Theme_JSON_Gutenberg {
 			return $processed_css;
 		}
 
-		/*
-		 * Treat a nested rule without `&` as `& selector`, matching native CSS
-		 * nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
-		 * A rule at the very start is only rewritten when it starts with a type
-		 * selector, as other selectors there, e.g. `:hover {}`, are already
-		 * appended to the block selector.
-		 */
-		$css = preg_replace( '/(^(?=[a-zA-Z*\s])|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/', '$1$2& ', $css );
+		$css = static::normalize_nested_custom_css( $css );
 
 		// Split CSS nested rules.
 		$parts = explode( '&', $css );
 		foreach ( $parts as $part ) {
-			if ( empty( $part ) ) {
+			if ( '' === trim( $part ) ) {
 				continue;
 			}
 			$is_root_css = ( ! str_contains( $part, '{' ) );

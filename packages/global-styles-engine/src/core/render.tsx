@@ -2305,6 +2305,141 @@ function updateConfigWithSeparator(
 	return config;
 }
 
+/**
+ * Returns the index of the next `{`, `;` or `}` outside a string, or -1.
+ *
+ * @param css   The CSS to search.
+ * @param start The index to start from.
+ * @return The index of the delimiter, or -1 when there is none.
+ */
+function findNextDelimiter( css: string, start: number ) {
+	let quote = '';
+	for ( let i = start; i < css.length; i++ ) {
+		const char = css[ i ];
+		if ( quote ) {
+			if ( char === '\\' ) {
+				i++;
+			} else if ( char === quote ) {
+				quote = '';
+			}
+		} else if ( char === '"' || char === "'" ) {
+			quote = char;
+		} else if ( char === '{' || char === ';' || char === '}' ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ * Rewrites custom CSS so that `processCSSNesting` can split it on `&`.
+ *
+ * - Comments are removed, so `;`, `{`, `}` or `&` inside them are ignored.
+ * - A nested rule without `&` is treated as `& selector`, matching native CSS
+ *   nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+ * - A rule at the very start is only rewritten when it starts with a type
+ *   selector, as other selectors there, e.g. `:hover {}`, are already
+ *   appended to the block selector.
+ * - Declarations after a nested rule are moved back to the block, e.g.
+ *   `img {} color: blue;` becomes `& img {} & color: blue;`.
+ * - A bare `& {}` block is unwrapped, as it is the block itself.
+ * - Rules nested in any other rule, e.g. `figure { img {} }`, are left as is,
+ *   as they can't be flattened.
+ *
+ * This must stay in sync with `normalize_nested_custom_css()` in PHP.
+ *
+ * @param css The custom CSS.
+ * @return The rewritten CSS.
+ */
+function normalizeNestedRules( css: string ) {
+	// Remove comments, but keep strings that look like comments.
+	css = css.replace(
+		/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\/\*[\s\S]*?\*\//g,
+		'$1'
+	);
+
+	let result = '';
+	// One entry per open brace: true for an unwrapped bare `& {}` block.
+	const blocks: boolean[] = [];
+	let quote = '';
+	let isStatementStart = true;
+	let isFirstStatement = true;
+	let isAfterRule = false;
+	let statementStart = 0;
+
+	for ( let i = 0; i < css.length; i++ ) {
+		const char = css[ i ];
+
+		if ( quote ) {
+			result += char;
+			if ( char === '\\' && i + 1 < css.length ) {
+				result += css[ ++i ];
+			} else if ( char === quote ) {
+				quote = '';
+			}
+			continue;
+		}
+
+		// Rules can only be rewritten at the block level.
+		const isBlockLevel = blocks.every( Boolean );
+
+		if ( isStatementStart && ! /\s/.test( char ) ) {
+			isStatementStart = false;
+			if (
+				isBlockLevel &&
+				char !== '&' &&
+				char !== '@' &&
+				char !== ';' &&
+				char !== '}'
+			) {
+				const delimiter = findNextDelimiter( css, i );
+				const isRule = delimiter !== -1 && css[ delimiter ] === '{';
+				const shouldPrefix = isRule
+					? ! isFirstStatement || /[a-zA-Z*]/.test( char )
+					: isAfterRule;
+				if ( shouldPrefix ) {
+					result += '& ';
+				}
+			}
+			isFirstStatement = false;
+			statementStart = result.length;
+		}
+
+		if ( char === '"' || char === "'" ) {
+			quote = char;
+		} else if ( char === '{' ) {
+			if (
+				isBlockLevel &&
+				result.slice( statementStart ).trim() === '&'
+			) {
+				result = result.slice( 0, statementStart );
+				blocks.push( true );
+				isStatementStart = true;
+				continue;
+			}
+			blocks.push( false );
+		} else if ( char === '}' ) {
+			if ( blocks.length && blocks[ blocks.length - 1 ] ) {
+				blocks.pop();
+				isStatementStart = true;
+				continue;
+			}
+			blocks.pop();
+			if ( blocks.every( Boolean ) ) {
+				isAfterRule = true;
+				isStatementStart = true;
+			}
+		} else if ( char === ';' && isBlockLevel ) {
+			isAfterRule = false;
+			isStatementStart = true;
+		}
+
+		result += char;
+	}
+
+	return result;
+}
+
 export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
@@ -2312,16 +2447,7 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 		return processedCSS;
 	}
 
-	// Treat a nested rule without `&` as `& selector`, matching native CSS
-	// nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
-	// A rule at the very start is only rewritten when it starts with a type
-	// selector, as other selectors there, e.g. `:hover {}`, are already
-	// appended to the block selector.
-	// This must stay in sync with `process_blocks_custom_css()` in PHP.
-	const normalizedCSS = css.replace(
-		/(^(?=[a-zA-Z*\s])|[{};])(\s*)(?=[^&@\s{};][^{};]*\{)/g,
-		'$1$2& '
-	);
+	const normalizedCSS = normalizeNestedRules( css );
 
 	// Split CSS nested rules.
 	const parts = normalizedCSS.split( '&' );

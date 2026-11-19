@@ -8517,6 +8517,72 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo:is(.a, .b)){color: red;}',
 			),
+			'leading newline'              => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => "\n:hover{color: red;}",
+				),
+				'expected' => ":root :where(.foo\n:hover){color: red;}",
+			),
+			'leading newline type'         => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => "\nimg{color: red;}",
+				),
+				'expected' => ':root :where(.foo img){color: red;}',
+			),
+			// Comments are removed before nested rules are rewritten.
+			'comment with ;'               => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '/* note; see docs */ .is-style-x{color: red;}',
+				),
+				'expected' => ':root :where(.foo .is-style-x){color: red;}',
+			),
+			'comment with braces and &'    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; /* & img { } */ img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+			),
+			'comment-like string'          => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'img::after{content: "/* x */";}',
+				),
+				'expected' => ':root :where(.foo img)::after{content: "/* x */";}',
+			),
+			// Declarations after a nested rule apply to the block.
+			'declarations after rule'      => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'img{color: blue;} color: red;',
+				),
+				'expected' => ':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
+			),
+			'declarations after rule in &' => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '& { img { color: blue; } color: red; }',
+				),
+				'expected' => ':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
+			),
+			// Rules nested in a rule without `&` aren't flattened.
+			'nested in rule'               => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'figure { img { color: blue; } }',
+				),
+				'expected' => '',
+			),
+			'nested in rule with sibling'  => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'figure { img { color: blue; } } p{color: red;}',
+				),
+				'expected' => ':root :where(.foo p){color: red;}',
+			),
 			'twenty twenty-four calendar'  => array(
 				'input'    => array(
 					'selector' => '.wp-block-calendar',
