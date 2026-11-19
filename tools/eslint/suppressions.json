@@ -10447,11 +10447,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/unsaved-changes-warning/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/upload-progress-snackbar/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
