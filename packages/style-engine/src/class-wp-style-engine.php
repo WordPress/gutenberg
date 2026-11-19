@@ -779,10 +779,6 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
-			if ( empty( $style_value ) ) {
-				return array();
-			}
-
 			$css_declarations = array();
 
 			if ( isset( $style_definition['property_keys']['default'] ) ) {
@@ -790,7 +786,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 
 				if ( is_array( $style_value ) && ! empty( $style_value['url'] ) && is_string( $style_value['url'] ) ) {
 					$value = "url('" . $style_value['url'] . "')";
-				} elseif ( is_string( $style_value ) && static::is_valid_style_value( $style_value ) ) {
+				} elseif ( is_string( $style_value ) && ! empty( $style_value ) ) {
 					$value = $style_value;
 				}
 
