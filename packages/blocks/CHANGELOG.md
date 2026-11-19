@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 17.2.0 (2026-11-18)
+
 ### Enhancements
 
 -   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).

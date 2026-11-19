@@ -375,6 +375,16 @@ store( 'myPlugin', {
 } );
 ```
 
+#### Unsupported entries and elements
+
+The directive is ignored, without evaluating its reference or changing the element's content, in these cases:
+
+-   Entries with a suffix or unique ID, such as `data-wp-html--suffix`, `data-wp-html---id`, or `data-wp-html--suffix---id`.
+-   Void elements: `area`, `base`, `basefont`, `bgsound`, `br`, `col`, `embed`, `frame`, `hr`, `img`, `input`, `keygen`, `link`, `meta`, `param`, `source`, `track`, and `wbr`.
+-   Text-only elements: `textarea`, `title`, `script`, `style`, `iframe`, `xmp`, `noembed`, and `noframes`.
+
+A warning is shown in development mode. An ignored HTML binding does not itself prevent other directives on the element or its descendants from working, including nested interactive islands. Content inside an enclosing supported HTML binding remains [inert](#inert-content).
+
 #### Values
 
 The element shows what its reference resolves to, calling it first when it is a function:
@@ -389,7 +399,7 @@ To keep showing the fallback, return a pending value, not `null`. After [client-
 
 #### Inert content
 
-Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup. Client-side navigation ignores router regions in this content too; see [Where to place router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#where-to-place-router-regions).
+For supported HTML bindings inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup. Client-side navigation ignores router regions in this content too; see [Where to place router regions](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#where-to-place-router-regions).
 
 #### Conflicts with other directives
 
