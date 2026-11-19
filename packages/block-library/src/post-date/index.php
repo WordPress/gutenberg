@@ -57,10 +57,10 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	$unformatted_date = $attributes['datetime'];
-	// Timezoneless strings from the date picker represent site-local time, not UTC.
-	// date_create_immutable with wp_timezone() parses them correctly; if the string
-	// already carries a timezone indicator, DateTimeImmutable ignores the $timezone
-	// parameter, so this is safe for both cases.
+	/*
+	 * The date picker saves timezone-naive strings in site-local time, so parse
+	 * them in the site timezone. Strings with an explicit offset ignore it.
+	 */
 	$date_obj       = date_create_immutable( $unformatted_date, wp_timezone() );
 	$post_timestamp = $date_obj ? $date_obj->getTimestamp() : false;
 

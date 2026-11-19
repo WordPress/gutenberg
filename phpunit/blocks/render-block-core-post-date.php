@@ -169,7 +169,7 @@ class Test_Render_Block_Core_Post_Date extends WP_UnitTestCase {
 
 			// The rendered time must match the manually-set site-local time.
 			$this->assertStringContainsString(
-				'04:30',
+				'>04:30</time>',
 				$output,
 				'The time should render in site-local time, not UTC.'
 			);
