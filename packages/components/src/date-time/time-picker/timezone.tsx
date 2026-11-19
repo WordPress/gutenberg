@@ -45,20 +45,20 @@ const TimeZone = () => {
 	const hasNoAdditionalTimezoneDetail =
 		prettyTimezoneString.trim().length === 0;
 
-	const className = clsx(
-		'components-datetime__timezone',
-		styles[ 'time-zone' ]
-	);
-
 	if ( hasNoAdditionalTimezoneDetail ) {
-		return <div className={ className }>{ zoneAbbr }</div>;
+		return (
+			<div className="components-datetime__timezone">{ zoneAbbr }</div>
+		);
 	}
 
 	return (
 		<Popover.Root>
 			<Popover.Trigger
 				openOnHover
-				className={ clsx( className, styles[ 'time-zone-trigger' ] ) }
+				className={ clsx(
+					'components-datetime__timezone',
+					styles[ 'time-zone-trigger' ]
+				) }
 				aria-label={ sprintf(
 					/* translators: %s: timezone abbreviation, e.g. "CEST" or "UTC+3". */
 					__( 'Timezone: %s' ),

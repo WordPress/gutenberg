@@ -96,10 +96,6 @@
 	width: 56px;
 }
 
-.time-zone {
-	text-decoration: underline dotted;
-}
-
 .time-zone-trigger {
 	appearance: none;
 	background: none;
@@ -110,6 +106,7 @@
 	font: inherit;
 	margin: 0;
 	padding: 0;
+	text-decoration: underline dotted;
 
 	&:focus-visible {
 		@include outset-ring__focus();

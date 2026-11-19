@@ -23,7 +23,7 @@
 
 ### Bug Fixes
 
--   `TimePicker`: Show the full site time zone in a popover that keyboard, touch, and screen reader users can open from the time zone abbreviation, instead of a tooltip that only mouse users could reach. Replace every underscore in the time zone name with a space, not only the first ([#86806](https://github.com/WordPress/gutenberg/pull/86806)).
+-   `TimePicker`: Show the full site time zone in a `Popover` from `@wordpress/ui` that keyboard, touch, and screen reader users can open from the time zone abbreviation, instead of a tooltip that only mouse users could reach. The popover shows above `@wordpress/ui` overlays. Underline the abbreviation only when it opens the popover, and replace every underscore in the time zone name with a space, not only the first ([#86806](https://github.com/WordPress/gutenberg/pull/86806)).
 -   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
 -   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).

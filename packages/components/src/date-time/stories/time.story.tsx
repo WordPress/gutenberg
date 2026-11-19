@@ -61,9 +61,13 @@ export const WithSiteTimeZone = Template.bind( {} );
 WithSiteTimeZone.args = {
 	currentTime: new Date(),
 };
-// The settings are global, so keep this story off the docs page, where they
-// would also apply to the other stories.
-WithSiteTimeZone.tags = [ '!autodocs' ];
+WithSiteTimeZone.parameters = {
+	docs: {
+		// Render in its own iframe, so the global settings don't apply to the
+		// other stories on the docs page.
+		story: { inline: false, height: '220px' },
+	},
+};
 WithSiteTimeZone.beforeEach = () => {
 	const settings = getSettings();
 	const browserOffset = -new Date().getTimezoneOffset() / 60;
