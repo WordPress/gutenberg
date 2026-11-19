@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Table: Let themes set the row color of the Stripes style with the `--wp--style--table-stripe-color` custom property, so it stays readable on dark backgrounds ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ### Bug Fixes
 
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
