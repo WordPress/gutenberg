@@ -7,7 +7,7 @@ describe( 'StateControlBadges', () => {
 	const viewportStates = [ { value: '@tablet', label: 'Tablet' } ];
 	const pseudoStates = [ { value: ':hover', label: 'Hover' } ];
 
-	it( 'explains viewport badges with a shared infotip', async () => {
+	it( 'explains a viewport badge with its infotip', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -17,13 +17,7 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'More information about Tablet',
-			} )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Tablet' } ) );
 
 		expect(
 			await screen.findByText(
@@ -32,7 +26,7 @@ describe( 'StateControlBadges', () => {
 		).toBeVisible();
 	} );
 
-	it( 'explains pseudo state badges with a shared infotip', async () => {
+	it( 'explains a pseudo state badge with its infotip', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -42,20 +36,14 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Hover' ) ).toBeVisible();
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'More information about Hover',
-			} )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Hover' } ) );
 
 		expect(
 			await screen.findByText( 'Style changes apply to the Hover state.' )
 		).toBeVisible();
 	} );
 
-	it( 'uses one summary infotip when multiple badges are active', async () => {
+	it( 'gives each badge its own infotip when multiple are active', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -67,24 +55,19 @@ describe( 'StateControlBadges', () => {
 			/>
 		);
 
-		expect( screen.getByText( 'Tablet' ) ).toBeVisible();
-		expect( screen.getByText( 'Hover' ) ).toBeVisible();
-		expect(
-			screen.getAllByRole( 'button', {
-				name: /More information/,
-			} )
-		).toHaveLength( 1 );
-
-		await user.click(
-			screen.getByRole( 'button', {
-				name: 'More information about style states',
-			} )
-		);
+		await user.click( screen.getByRole( 'button', { name: 'Tablet' } ) );
 
 		expect(
 			await screen.findByText(
-				'Style changes apply to the Tablet viewport and the Hover state.'
+				'Style changes apply to the Tablet viewport.'
 			)
+		).toBeVisible();
+
+		await user.keyboard( '{Escape}' );
+		await user.click( screen.getByRole( 'button', { name: 'Hover' } ) );
+
+		expect(
+			await screen.findByText( 'Style changes apply to the Hover state.' )
 		).toBeVisible();
 	} );
 } );

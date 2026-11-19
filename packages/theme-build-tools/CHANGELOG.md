@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Parse CSS `var()` references for PostCSS fallback injection and Stylelint validation, avoiding false positives in strings and URLs ([#83766](https://github.com/WordPress/gutenberg/pull/83766)).
