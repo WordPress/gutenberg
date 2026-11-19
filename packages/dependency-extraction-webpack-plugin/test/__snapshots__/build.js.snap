@@ -697,6 +697,32 @@ exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-
 ]
 `;
 
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules-eager\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'@wordpress/a11y'
+	),
+	'version' => 'a61fcddbcf32f703c0f3',
+	'type' => 'module'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules > Webpack \`wordpress-script-modules-eager\` > should produce expected output > External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/a11y",
+    "userRequest": "@wordpress/a11y",
+  },
+  {
+    "externalType": "module-import",
+    "request": "@wordpress/a11y",
+    "userRequest": "@wordpress/a11y",
+  },
+]
+`;
+
 exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`combine-assets\` > should keep the kind of each import of an external 1`] = `
 {
   "fileA.mjs": {
@@ -1017,6 +1043,19 @@ exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`w
       "@wordpress/a11y",
       "@wordpress/interactivity",
       "@wordpress/interactivity-router",
+    ],
+  },
+}
+`;
+
+exports[`DependencyExtractionWebpackPlugin modules emitted imports > Webpack \`wordpress-script-modules-eager\` > should keep the kind of each import of an external 1`] = `
+{
+  "main.mjs": {
+    "dynamic": [
+      "@wordpress/a11y",
+    ],
+    "static": [
+      "@wordpress/a11y",
     ],
   },
 }
@@ -1709,6 +1748,29 @@ exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-
       "interactivityRouter",
     ],
     "userRequest": "@wordpress/interactivity-router",
+  },
+]
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules-eager\` > should produce expected output > Asset file 'main.asset.php' should match snapshot 1`] = `
+"<?php return array(
+	'dependencies' => array(
+		'wp-a11y'
+	),
+	'version' => '73fdfd5f16ac27ad0c7c'
+);
+"
+`;
+
+exports[`DependencyExtractionWebpackPlugin scripts > Webpack \`wordpress-script-modules-eager\` > should produce expected output > External modules should match snapshot 1`] = `
+[
+  {
+    "externalType": "window",
+    "request": [
+      "wp",
+      "a11y",
+    ],
+    "userRequest": "@wordpress/a11y",
   },
 ]
 `;

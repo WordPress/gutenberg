@@ -125,23 +125,31 @@ class DependencyExtractionWebpackPlugin {
 	 *
 	 * Webpack externalizes the dependencies of one module that share a
 	 * resource identifier together, with the kind of the first one, so a
-	 * static import and an `import()` of one request would both come out
-	 * static. Giving the `import()` its own resource identifier makes webpack
+	 * static import and an `import()` of one request would get one kind.
+	 * Giving the `import()` its own resource identifier makes webpack
 	 * externalize it on its own, with the dynamic kind. The dependency keeps
 	 * that identifier when a rebuild reuses the module from the memory cache.
+	 *
+	 * A `webpackMode: "weak"` `import()` stays with the static imports: on its
+	 * own, it would point to an external that no chunk loads, so it would
+	 * always reject.
 	 *
 	 * @param {webpack.Module} module Module whose dependencies webpack is about to resolve.
 	 */
 	separateDynamicImports( module ) {
-		const blocks = [ ...module.blocks ];
+		const blocks = [ module ];
 		while ( blocks.length ) {
 			const block = blocks.pop();
 			blocks.push( ...block.blocks );
 
 			for ( const dependency of block.dependencies ) {
-				// Webpack types the dependency of an `import()` of a string as `import()`.
+				// Webpack types the dependency of an `import()` of a string as
+				// `import()`, or as `import() eager` in eager mode, where the
+				// module holds it instead of an async block.
 				if (
-					dependency.type !== 'import()' ||
+					! [ 'import()', 'import() eager' ].includes(
+						dependency.type
+					) ||
 					! this.isExternalized( dependency.request )
 				) {
 					continue;
