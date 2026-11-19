@@ -4,6 +4,14 @@
 
 ## 8.20.0 (2023-10-05)
 
+## 8.19.21 (2026-11-18)
+
+### Bug Fixes
+
+-   Comment Date: Escape the formatted date output.
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 8.19.20 (2026-10-28)
 
 ### Bug Fixes
