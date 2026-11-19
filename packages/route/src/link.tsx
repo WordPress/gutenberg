@@ -3,8 +3,8 @@ import { Link as RouterLink } from '@tanstack/react-router';
 import { forwardRef } from '@wordpress/element';
 
 /**
- * Link to a route. The link is active only when the current path is exactly
- * its `to` path.
+ * Link to a route. The link is active only when its path and query string
+ * match the current URL exactly.
  */
 export const Link = forwardRef( function UnforwardedLink(
 	{ activeOptions, ...props }: ComponentProps< typeof RouterLink >,
