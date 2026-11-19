@@ -6,6 +6,10 @@
 
 -   `Avatar`: Replace the compound API with a single component requiring `name`. Pass the image URL in `src` and its optional CORS setting in `crossOrigin`. Initials are the only fallback. The default avatar has the image role. Custom `render` elements keep their own role. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 
+### New Features
+
+-   Ship `wp-ui`, `wp-ui-migration` and `wp-ui-setup` agent skills with the package, for agents building with the components, migrating from `@wordpress/components` and setting up a project ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
+
 ### Enhancements
 
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
@@ -51,7 +55,6 @@
 -   `Notice.ActionButtonLink`: Add a button-styled link action for use within `Notice.Actions` ([#86959](https://github.com/WordPress/gutenberg/pull/86959)).
 -   `Notice.List`: Add `liveRegionContainer` to choose where announcements are rendered, including outside an app that a modal can hide ([#85799](https://github.com/WordPress/gutenberg/pull/85799)).
 -   `Meter.Indicator`: Add `success`, `warning`, and `error` tones ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
--   Ship `wp-ui`, `wp-ui-migration` and `wp-ui-setup` agent skills with the package, for agents building with the components, migrating from `@wordpress/components` and setting up a project ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
 -   `ControlWithError`: Add a `getInteractiveTarget` prop, so a control that validates a hidden stand-in element can attach the validation message to the description of the element users interact with ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 

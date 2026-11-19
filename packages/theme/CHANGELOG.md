@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Ship `wp-theme` and `wp-theme-setup` agent skills with the package, including the design tokens reference, for agents styling with the design tokens and setting up linters and build-time fallbacks ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
+
 ### Enhancements
 
 -   Swap the values of `--wpds-color-background-interactive-neutral-strong` and `--wpds-color-background-interactive-neutral-strong-active`, so solid neutral controls have a stronger resting fill and a softer fill wherever the active token is used ([#87429](https://github.com/WordPress/gutenberg/pull/87429)).
@@ -30,7 +34,6 @@
 -   Add `--wpds-color-background-indicator-success`, `--wpds-color-background-indicator-warning`, and `--wpds-color-background-indicator-error` for meter fills ([#86675](https://github.com/WordPress/gutenberg/pull/86675)).
 -   Add `--wpds-color-background-thumb-neutral-disabled` for disabled switch knobs, `--wpds-color-background-thumb-brand-strong` for the knob of a switch that's on, and `--wpds-color-background-track-neutral-disabled` for disabled switch tracks ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   Add `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` for the filled portion of a progressbar or meter ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).
--   Ship `wp-theme` and `wp-theme-setup` agent skills with the package, including the design tokens reference, for agents styling with the design tokens and setting up linters and build-time fallbacks ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
 
 ### Enhancements
 
