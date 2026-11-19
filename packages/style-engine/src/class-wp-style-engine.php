@@ -27,6 +27,16 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 	 *     classnames?: array<string, string|true>,
 	 *     value_func?: callable( mixed, array<string, mixed>, array<mixed> ): array<string, string>,
 	 * }
+	 * @phpstan-type Parse_Options array{
+	 *     context?: string|null,
+	 *     convert_vars_to_classnames?: bool,
+	 *     selector?: string|null,
+	 * }
+	 * @phpstan-type Compile_Options array{
+	 *     context?: string|null,
+	 *     optimize?: bool,
+	 *     prettify?: bool,
+	 * }
 	 */
 	final class WP_Style_Engine {
 		/**
@@ -445,11 +455,11 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Stores a CSS rule using the provided CSS selector and CSS declarations.
 		 *
-		 * @param string                                    $store_name       A valid store key.
-		 * @param string                                    $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
-		 * @param string[]|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
-		 *                                                                    or a WP_Style_Engine_CSS_Declarations object.
-		 * @param string                                    $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string                                                 $store_name       A valid store key.
+		 * @param string                                                 $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param array<string, string>|WP_Style_Engine_CSS_Declarations $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
+		 *                                                                                 or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                                 $rules_group      Optional. A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 */
 		public static function store_css_rule( $store_name, $css_selector, $css_declarations, $rules_group = '' ): void {
 			if ( empty( $store_name ) || empty( $css_selector ) || empty( $css_declarations ) ) {
@@ -498,6 +508,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *     @type string[] $classnames   Array of class names.
 		 *     @type string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 * }
+		 *
+		 * @phpstan-param Parse_Options $options
+		 * @phpstan-return array{ classnames: list<string>, declarations: array<string, string> }
 		 */
 		public static function parse_block_styles( $block_styles, $options ) {
 			$parsed_styles = array(
@@ -621,9 +634,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *     @type bool $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
 		 * }
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 *
 		 * @phpstan-param Style_Definition $style_definition
+		 * @phpstan-param Parse_Options $options
 		 */
 		protected static function get_css_declarations( $style_value, $style_definition, $options = array() ) {
 			if ( isset( $style_definition['value_func'] ) && is_callable( $style_definition['value_func'] ) ) {
@@ -700,9 +714,10 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 *     @type bool $convert_vars_to_classnames Whether to skip converting incoming CSS var patterns, e.g., `var:preset|<PRESET_TYPE>|<PRESET_SLUG>`, to var( --wp--preset--* ) values. Default `false`.
 		 * }
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 *
 		 * @phpstan-param Style_Definition $individual_property_definition
+		 * @phpstan-param Parse_Options $options
 		 */
 		protected static function get_individual_property_css_declarations( $style_value, $individual_property_definition, $options = array() ) {
 			if ( ! is_array( $style_value ) || empty( $style_value ) || empty( $individual_property_definition['path'] ) ) {
@@ -749,10 +764,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * @param mixed $style_value      A single raw style value from $block_styles array.
 		 * @param array $style_definition A single style definition from {@see self::BLOCK_STYLE_DEFINITIONS_METADATA}.
 		 *
-		 * @return string[] An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @return array<string, string> An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 *
 		 * @phpstan-param Style_Definition $style_definition
-		 * @phpstan-return array<string, string>
 		 */
 		protected static function get_url_or_value_css_declaration( $style_value, $style_definition ) {
 			if ( empty( $style_value ) ) {
@@ -822,8 +836,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		/**
 		 * Returns compiled CSS from css_declarations.
 		 *
-		 * @param string[] $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
-		 * @param string   $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
+		 * @param array<string, string> $css_declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @param string                $css_selector     When a selector is passed, the function will return a full CSS rule `$selector { ...rules }`, otherwise a concatenated string of properties and values.
 		 *
 		 * @return string A compiled CSS string.
 		 */
@@ -854,6 +868,8 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 		 * }
 		 *
 		 * @return string A compiled stylesheet from stored CSS rules.
+		 *
+		 * @phpstan-param Compile_Options $options
 		 */
 		public static function compile_stylesheet_from_css_rules( $css_rules, $options = array() ) {
 			$processor = new WP_Style_Engine_Processor();
