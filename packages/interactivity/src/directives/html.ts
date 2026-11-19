@@ -5,7 +5,12 @@ import { afterNextFrame, isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
 import { getHtmlFallback, getHtmlServerContent } from '../vdom';
-import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
+import {
+	emptyHTML,
+	isDangerousHTML,
+	getDangerousHTML,
+	unsupportedHtmlElements,
+} from '../html';
 
 /**
  * Checks whether a value is `{ wpServerHtml: true }`, the server's
@@ -56,15 +61,41 @@ const isSameServerContent = (
 	);
 };
 
-// data-wp-html — Inner HTML binding for explicitly trusted content.
+/**
+ * What the directive last did with its host element's content: the HTML it
+ * wrote, or adopted from matching content, or the kind and markup of the
+ * value the browser rejected.
+ */
+type WriteRecord =
+	| {
+			/**
+			 * The written or adopted value as a string, which the element may
+			 * serialize differently.
+			 */
+			applied: string;
+	  }
+	| {
+			/** The rejected value as a string. */
+			rejected: string;
+			/** Whether the rejected value is a plain string, not `TrustedHTML`. */
+			plainString: boolean;
+	  };
+
+// data-wp-html — Inner HTML binding for explicitly trusted content on supported hosts.
 directive(
 	'html',
 	( { directives: { html: htmlEntries }, element, evaluate } ) => {
 		// Default entry; unsupported variants retain their original props.
 		const entry = htmlEntries.find( isDefaultDirectiveSuffix );
-		// Serialized HTML last applied or rejected; non-token values reset it
-		// to empty HTML so returning tokens are applied again after a removal.
-		const lastAppliedKey = useRef< string | undefined >( undefined );
+		const supportedElement = ! unsupportedHtmlElements.has(
+			element.type as string
+		);
+		// What the directive last did with the host's content. It's undefined
+		// for a new host and after the server representation, so the next
+		// token is compared with the element's content and adopted when it
+		// matches. Non-token values write empty HTML, so returning tokens are
+		// written again after a removal.
+		const writeRecord = useRef< WriteRecord | undefined >( undefined );
 		// The value-rule state belongs to a host element, not its wrapper vnode.
 		const previousHost = useRef< HTMLElement | null >( null );
 		// Inputs are compared inside the effect so host replacements can be
@@ -104,6 +135,12 @@ directive(
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warnUniqueIdNotSupported( 'html', entry.uniqueId );
 			}
+		} else if ( ! supportedElement ) {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The data-wp-html directive is not supported on <${ element.type }> elements. Use an element that supports HTML content instead.`
+				);
+			}
 		} else {
 			try {
 				result = evaluate( entry );
@@ -116,8 +153,8 @@ directive(
 			}
 		}
 
-		// Only supported default entries own the element's content.
-		const active = !! entry && ! entry.uniqueId;
+		// Only supported default entries on supported hosts own content.
+		const active = !! entry && ! entry.uniqueId && supportedElement;
 		// Pending values and the server token representation keep the content,
 		// apart from showing server content that navigation brought to a kept
 		// host.
@@ -159,7 +196,7 @@ directive(
 
 			if ( hostChanged ) {
 				previousHost.current = node;
-				lastAppliedKey.current = undefined;
+				writeRecord.current = undefined;
 				owedServerContent.current = undefined;
 				shownServerContent.current = preserveContent
 					? serverContent
@@ -221,7 +258,7 @@ directive(
 				shownServerContent.current = owed;
 				// The element shows server content, not what was last applied,
 				// so the next token is compared with the DOM, as at hydration.
-				lastAppliedKey.current = undefined;
+				writeRecord.current = undefined;
 				return;
 			}
 			if ( ! hostChanged && ! inputsChanged ) {
@@ -232,7 +269,7 @@ directive(
 				// what was last applied, so the next token is compared with the
 				// DOM, as at hydration.
 				if ( serverHTMLRepresentation ) {
-					lastAppliedKey.current = undefined;
+					writeRecord.current = undefined;
 				}
 				return;
 			}
@@ -244,19 +281,29 @@ directive(
 				);
 			}
 			const key = String( resolvedValue );
-			if ( lastAppliedKey.current === key ) {
+			const plainString = typeof resolvedValue === 'string';
+			const record = writeRecord.current;
+			// A value matching the record is skipped: by its markup after a
+			// write or an adoption, and by its kind and markup after a
+			// rejected write, so a new token wrapping the rejected string isn't
+			// retried but a `TrustedHTML` value with the same markup is written.
+			if (
+				record &&
+				( 'rejected' in record
+					? record.rejected === key &&
+						record.plainString === plainString
+					: record.applied === key )
+			) {
 				return;
 			}
-			if (
-				lastAppliedKey.current === undefined &&
-				node.innerHTML === key
-			) {
-				lastAppliedKey.current = key;
+			if ( ! record && node.innerHTML === key ) {
+				writeRecord.current = { applied: key };
 				return;
 			}
 			try {
 				// DOM typings do not yet accept native TrustedHTML values.
 				node.innerHTML = resolvedValue as unknown as string;
+				writeRecord.current = { applied: key };
 			} catch ( error ) {
 				// A rejected token empties the element using the policy-free empty
 				// TrustedHTML value. Do not retry until the value changes.
@@ -266,8 +313,8 @@ directive(
 						`data-wp-html: the browser rejected this HTML value, so the element was emptied. ${ error }`
 					);
 				}
+				writeRecord.current = { rejected: key, plainString };
 			}
-			lastAppliedKey.current = key;
 		}, [
 			result,
 			active,
