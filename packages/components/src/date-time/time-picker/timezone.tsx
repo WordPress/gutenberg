@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { getSettings as getDateSettings } from '@wordpress/date';
 import {
+	Button,
 	Popover,
 	VisuallyHidden,
 	useEnableWpCompatOverlaySlot,
@@ -55,6 +56,7 @@ const TimeZone = () => {
 		<Popover.Root>
 			<Popover.Trigger
 				openOnHover
+				render={ <Button variant="unstyled" /> }
 				className={ clsx(
 					'components-datetime__timezone',
 					styles[ 'time-zone-trigger' ]

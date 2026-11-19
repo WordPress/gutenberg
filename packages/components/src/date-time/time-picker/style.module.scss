@@ -1,6 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/mixins" as *;
 
 .wrapper {
 	box-sizing: border-box;
@@ -97,18 +96,9 @@
 }
 
 .time-zone-trigger {
-	appearance: none;
-	background: none;
-	border: 0;
 	border-radius: $radius-small;
 	color: inherit;
 	cursor: var(--wpds-cursor-control);
-	font: inherit;
-	margin: 0;
-	padding: 0;
+	line-height: inherit;
 	text-decoration: underline dotted;
-
-	&:focus-visible {
-		@include outset-ring__focus();
-	}
 }
