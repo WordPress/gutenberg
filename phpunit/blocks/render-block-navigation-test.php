@@ -379,6 +379,54 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The font size must only be applied to the wrapper, so that relative units are not multiplied by the inner list.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_inner_blocks_html
+	 *
+	 * @dataProvider data_font_size_attributes
+	 *
+	 * @param array  $attributes   Navigation block attributes.
+	 * @param string $wrapper_pattern Pattern the wrapper must match.
+	 */
+	public function test_font_size_is_applied_only_to_the_navigation_wrapper( $attributes, $wrapper_pattern ) {
+		$attributes['overlayMenu'] = 'never';
+		$markup                    = do_blocks(
+			'<!-- wp:navigation ' . wp_json_encode( $attributes ) . ' --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertMatchesRegularExpression( $wrapper_pattern, $processor->get_attribute( 'class' ) . ' ' . $processor->get_attribute( 'style' ) );
+
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation__container' ) );
+		$this->assertDoesNotMatchRegularExpression( '/has-[\w-]+-font-size/', (string) $processor->get_attribute( 'class' ) );
+		$this->assertStringNotContainsString( 'font-size', (string) $processor->get_attribute( 'style' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public static function data_font_size_attributes() {
+		return array(
+			'custom relative size' => array(
+				array( 'style' => array( 'typography' => array( 'fontSize' => '2em' ) ) ),
+				'/font-size:\s*2em/',
+			),
+			'preset size'          => array(
+				array( 'fontSize' => 'large' ),
+				'/has-large-font-size/',
+			),
+			'legacy custom size'   => array(
+				array( 'customFontSize' => 24 ),
+				'/font-size:\s*24px/',
+			),
+		);
+	}
+
+	/**
 	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
 	 */
 	public function test_global_styles_custom_css_targets_only_the_navigation_wrapper() {
