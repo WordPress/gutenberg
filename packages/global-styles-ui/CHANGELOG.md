@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.2.0 (2026-11-18)
+
 ### Enhancements
 
 -   Add TypeScript declarations for package consumers ([#86354](https://github.com/WordPress/gutenberg/pull/86354)).
