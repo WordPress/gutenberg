@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require webpack 5.95.0 or newer ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+-   `defaultRequestToExternalModule`, exported from `lib/util`, returns script module IDs without an externals type prefix ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
+### Enhancements
+
+-   In script module builds, a static `import` of an externalized script module stays a static import, and an `import()` of it stays an `import()` unless the same file also imports it statically, `@wordpress/interactivity` included ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
 ## 7.2.0 (2026-11-18)
 
 ### Enhancements

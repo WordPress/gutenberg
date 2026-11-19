@@ -152,11 +152,13 @@ import { store, getContext } from '@wordpress/interactivity';
 
 By default, the following script module requests are handled:
 
-| Request                      |
-| ---------------------------- |
-| `@wordpress/interactivity  ` |
+| Request                           |
+| --------------------------------- |
+| `@wordpress/a11y`                 |
+| `@wordpress/interactivity`        |
+| `@wordpress/interactivity-router` |
 
-(`@wordpress/interactivity` is currently the only available WordPress script module.)
+Imports of an externalized script module keep their kind in the bundle: a static `import` declaration stays a static import, and an `import()` stays an `import()` of the script module, which loads it when that code runs. When one file both imports a script module statically and calls `import()` with it, both use the static import.
 
 **Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script module identifiers from bundle compilation so that a list of script module dependencies does not need to be manually maintained. If you don't need to extract a list of script module dependencies, use the `externals` option directly.
 
