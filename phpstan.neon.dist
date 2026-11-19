@@ -49,6 +49,15 @@ rules:
 	- PHPStan\Rules\StrictCalls\DynamicCallOnStaticMethodsCallableRule
 
 services:
+	# Ignores strictRules.dynamicCallOnStaticMethod errors for $this->assert*() calls in tests, since PHPUnit's
+	# assertions are static but conventionally called on $this, as in WordPress core's tests. The phpstan-phpunit
+	# extension registers this only with bleedingEdge. It matters only to a local phpstan.neon analyzing phpunit/.
+	-
+		class: PHPStan\Type\PHPUnit\DynamicCallToAssertionIgnoreExtension
+		autowired: false
+		tags:
+			- phpstan.ignoreErrorExtension
+
 	# strictRules.disallowedLooseComparison, with the argument rules.neon passes it.
 	-
 		class: PHPStan\Rules\DisallowedConstructs\DisallowedLooseComparisonRule
@@ -136,3 +145,13 @@ parameters:
 			message: '#^Call to function method_exists\(\) with ''WP_Theme_JSON…'' and ''get_viewport_media…'' will always evaluate to true\.$#'
 			identifier: function.alreadyNarrowedType
 			path: packages/block-library/src/navigation/index.php
+
+		# strictRules.dynamicCallOnStaticMethod:
+		# PHPUnit's markTestSkipped() is static, but like its assertions, which DynamicCallToAssertionIgnoreExtension
+		# covers above, it is conventionally called on $this, as in WordPress core's tests. The tests are analyzed only
+		# by a local phpstan.neon, so this entry goes unmatched otherwise.
+		-
+			message: '#^Dynamic call to static method PHPUnit\\Framework\\Assert::markTestSkipped\(\)\.$#'
+			identifier: staticMethod.dynamicCall
+			path: phpunit/*
+			reportUnmatched: false
