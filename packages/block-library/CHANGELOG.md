@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Comment Date: Show the formatted date in the editor instead of the raw date, and apply the Date format setting ([#87109](https://github.com/WordPress/gutenberg/pull/87109)).
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
 
