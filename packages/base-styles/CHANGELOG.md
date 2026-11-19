@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.1.0 (2026-11-18)
+
 ### Enhancements
 
 -   The `heading-*` and `body-*` mixins now use `--wpds-typography-*` design tokens for font family, size, and line height ([#86635](https://github.com/WordPress/gutenberg/pull/86635)).

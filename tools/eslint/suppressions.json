@@ -207,7 +207,7 @@
 	},
 	"packages/block-editor/src/components/child-layout-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 4
+			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
@@ -1862,9 +1862,6 @@
 	},
 	"packages/block-library/src/gallery/edit.jsx": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"no-restricted-syntax": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
@@ -6695,11 +6692,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
 	"packages/components/src/custom-gradient-picker/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 1
@@ -6931,74 +6923,9 @@
 			"count": 1
 		}
 	},
-	"packages/data/src/components/use-dispatch/test/use-dispatch.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/data/src/components/use-select/index.ts": {
 		"react-hooks/refs": {
 			"count": 2
-		}
-	},
-	"packages/data/src/components/use-select/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/use-select/test/suspense.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/with-dispatch/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/components/with-select/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/data/src/plugins/persistence/storage/test/object.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/plugins/persistence/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/redux-store/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/privateAPIs.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/data/src/test/registry.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/dataviews/src/components/dataform-controls/array.tsx": {
@@ -11486,16 +11413,6 @@
 			"count": 1
 		}
 	},
-	"packages/style-engine/src/styles/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/style-engine/src/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/views/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -12597,11 +12514,6 @@
 		}
 	},
 	"test/e2e/specs/editor/various/content-only-lock.spec.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"test/e2e/specs/editor/various/content-tab-hover-highlight.spec.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

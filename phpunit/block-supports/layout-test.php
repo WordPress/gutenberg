@@ -645,6 +645,26 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_gutenberg_get_child_layout_style_rules() {
 		return array(
+			'viewport can unpin grid placement while retaining span' => array(
+				'child_layout'       => array(
+					'columnStart' => 2,
+					'columnSpan'  => 2,
+					'rowStart'    => 3,
+				),
+				'viewport_overrides' => array(
+					'columnStart' => null,
+					'rowStart'    => null,
+				),
+				'expected_output'    => array(
+					array(
+						'selector'     => '.wp-container-content-test',
+						'declarations' => array(
+							'grid-column' => 'span 2',
+							'grid-row'    => 'auto',
+						),
+					),
+				),
+			),
 			'legacy fixed sizing remains shrinkable'      => array(
 				'child_layout'       => array(
 					'selfStretch' => 'fixed',
