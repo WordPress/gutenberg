@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Navigation: Prioritize the Category Link and Tag Link variations in the block appender's quick inserter, so they're reachable without opening "Browse all" ([#83108](https://github.com/WordPress/gutenberg/pull/83108)).
+
 ### Bug Fixes
 
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
