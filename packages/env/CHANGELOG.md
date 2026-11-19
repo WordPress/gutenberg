@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `wp-env status` now reports `urls.development` using the live Docker port, so it no longer goes stale after `--auto-port` reassigns the port ([#77815](https://github.com/WordPress/gutenberg/pull/77815)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Bug Fixes

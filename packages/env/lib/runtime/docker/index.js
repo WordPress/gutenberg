@@ -28,6 +28,7 @@ const { readWordPressVersion, canAccessWPORG } = require( '../../wordpress' );
 const { didCacheChange, setCache } = require( '../../cache' );
 const md5 = require( '../../md5' );
 const retry = require( '../../retry' );
+const addOrReplacePort = require( '../../config/add-or-replace-port' );
 
 /**
  * @typedef {import('../../config').WPConfig} WPConfig
@@ -749,7 +750,14 @@ class DockerRuntime {
 			// Containers are not running.
 		}
 
+		// `--auto-port` can start WordPress on another port than the config's.
 		const siteUrl = config.env.development.config.WP_SITEURL;
+		let developmentUrl = null;
+		if ( isRunning ) {
+			developmentUrl = developmentPort
+				? addOrReplacePort( siteUrl, developmentPort )
+				: siteUrl;
+		}
 
 		const testsEnabled = config.testsEnvironment !== false;
 
@@ -757,7 +765,7 @@ class DockerRuntime {
 			status: isRunning ? 'running' : 'stopped',
 			runtime: 'docker',
 			urls: {
-				development: isRunning ? siteUrl : null,
+				development: developmentUrl,
 				phpmyadmin:
 					isRunning && phpmyadminPort
 						? `http://localhost:${ phpmyadminPort }`
