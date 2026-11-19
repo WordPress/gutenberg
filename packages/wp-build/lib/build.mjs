@@ -32,6 +32,7 @@ import { copyPackageFile, getCopyFiles } from './copy-files.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
+import { translatorCommentsPlugin } from './translator-comments-plugin.mjs';
 import {
 	getAllRoutes,
 	getRouteFiles,
@@ -1369,6 +1370,7 @@ async function transpilePackage( packageName ) {
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
 		externalizeJsImportsPlugin,
+		translatorCommentsPlugin(),
 	].filter( Boolean );
 
 	/*
@@ -1699,6 +1701,7 @@ async function buildRoute( routeName ) {
 							[],
 							false // Skip asset file for non-minified build
 						),
+						translatorCommentsPlugin(),
 					],
 					output: {
 						file: path.join( outputDir, 'route.js' ),
@@ -1766,6 +1769,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
+					translatorCommentsPlugin(),
 				],
 				output: {
 					file: path.join( outputDir, 'content.js' ),
@@ -1892,6 +1896,7 @@ async function buildWidget( widgetName ) {
 							[],
 							false // Skip asset file for non-minified build
 						),
+						translatorCommentsPlugin(),
 					],
 					output: {
 						file: path.join( outputDir, 'render.js' ),
@@ -1958,6 +1963,7 @@ async function buildWidget( widgetName ) {
 							[],
 							false // Skip asset file for non-minified build
 						),
+						translatorCommentsPlugin(),
 					],
 					output: {
 						file: path.join( outputDir, 'widget.js' ),
