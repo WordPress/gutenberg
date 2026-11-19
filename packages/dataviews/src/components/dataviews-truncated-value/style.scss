@@ -1,0 +1,30 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.dataviews-truncated-value {
+	display: block;
+	// Let the value shrink below its text width inside the flex cell, down to
+	// the cell's `max-width`, instead of overflowing into the next column.
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border-radius: var(--wpds-border-radius-sm);
+
+	&:focus-visible {
+		@include outset-ring__focus();
+		// The value clips what overflows it, so keep the ring inside.
+		outline-offset: calc(-1 * var(--wpds-border-width-focus));
+	}
+}
+
+.dataviews-truncated-value__content {
+	padding: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-lg);
+	// `overflow-wrap: anywhere` lets the popover shrink to one character, so
+	// size it by its text, up to the maximum.
+	width: max-content;
+	max-width: min(60ch, calc(100vw - 2 * var(--wpds-dimension-padding-2xl)));
+	max-height: 50vh;
+	overflow: auto;
+	overflow-wrap: anywhere;
+	white-space: normal;
+}

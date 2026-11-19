@@ -18,6 +18,7 @@ import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
+import { TruncateValuesContext } from '../../dataviews-truncated-value';
 import ItemActions from '../../dataviews-item-actions';
 import { MEDIA_ASPECT_RATIOS, sortValues } from '../../../constants';
 import {
@@ -111,7 +112,9 @@ function TableColumnField< Item >( {
 
 	return (
 		<div className={ className }>
-			<field.render item={ item } field={ field } />
+			<TruncateValuesContext.Provider value>
+				<field.render item={ item } field={ field } />
+			</TruncateValuesContext.Provider>
 		</div>
 	);
 }
