@@ -1,11 +1,11 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import { Popover as WCPopover, Button } from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import { type CursorRegistry } from '../collaborators-overlay/cursor-registry';
 import { getCollaboratorDisplayName } from '../../utils/get-collaborator-display-name';
 
@@ -47,7 +47,7 @@ export function CollaboratorsList( {
 	};
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			placement="bottom"
 			offset={ 8 }
@@ -116,6 +116,6 @@ export function CollaboratorsList( {
 					} ) }
 				</div>
 			</div>
-		</Popover>
+		</WCPopover>
 	);
 }

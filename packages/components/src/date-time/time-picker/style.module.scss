@@ -39,6 +39,11 @@
 .hours-input {
 	width: 36px;
 
+	// Keep the focus ring above the following minutes field.
+	&:focus-within {
+		z-index: 1;
+	}
+
 	&.hours-input.hours-input {
 		/* stylelint-disable logical-css/require-logical-properties -- Preserve the physical joins between the LTR hours and minutes fields. */
 		:global(.components-input-control__input) {

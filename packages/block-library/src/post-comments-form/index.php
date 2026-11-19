@@ -21,7 +21,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 	}
 
 	if ( post_password_required( $block->context['postId'] ) ) {
-		return;
+		return '';
 	}
 
 	$classes = array( 'comment-respond' ); // See comment further below.

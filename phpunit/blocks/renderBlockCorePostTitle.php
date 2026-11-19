@@ -182,4 +182,64 @@ class Tests_Blocks_RenderBlockCorePostTitle extends WP_UnitTestCase {
 			'Failed to assert that $rendered contain the link relation attribute.'
 		);
 	}
+
+	/**
+	 * The title and its link must refer to the post provided by block context.
+	 *
+	 * @dataProvider data_should_render_context_post_title_when_global_post_differs
+	 *
+	 * @param bool $has_global_post Whether a different global post is available.
+	 */
+	public function test_should_render_context_post_title_when_global_post_differs( $has_global_post ) {
+		$GLOBALS['post'] = $has_global_post
+			? self::factory()->post->create_and_get( array( 'post_title' => 'Different global post' ) )
+			: null;
+
+		$block = new WP_Block(
+			array(
+				'blockName' => 'core/post-title',
+				'attrs'     => array( 'isLink' => true ),
+			),
+			array( 'postId' => self::$post->ID )
+		);
+
+		$rendered = $block->render();
+
+		$this->assertSame(
+			self::$post->post_title,
+			wp_strip_all_tags( $rendered ),
+			'The rendered title should belong to the post provided by block context.'
+		);
+		$this->assertStringContainsString(
+			'href="' . esc_url( get_permalink( self::$post ) ) . '"',
+			$rendered,
+			'The rendered title should link to the post provided by block context.'
+		);
+	}
+
+	/**
+	 * @return array[] Global post availability.
+	 */
+	public static function data_should_render_context_post_title_when_global_post_differs() {
+		return array(
+			'different global post' => array( true ),
+			'no global post'        => array( false ),
+		);
+	}
+
+	/**
+	 * An unsaved title in the global post must still appear in a preview.
+	 */
+	public function test_should_render_unsaved_title_when_context_matches_global_post() {
+		$GLOBALS['post']             = clone self::$post;
+		$GLOBALS['post']->post_title = 'Unsaved preview title';
+
+		$rendered = do_blocks( '<!-- wp:post-title /-->' );
+
+		$this->assertSame(
+			'Unsaved preview title',
+			wp_strip_all_tags( $rendered ),
+			'The rendered title should reflect unsaved changes when context matches the global post.'
+		);
+	}
 }

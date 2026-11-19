@@ -11,6 +11,7 @@ export const TOOLBAR_FORMATS = [
 // The core formats in the "More" dropdown, in the order they are listed.
 export const DROPDOWN_FORMATS = [
 	'text-color',
+	'highlight-color',
 	'image',
 	'code',
 	'keyboard',

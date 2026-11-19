@@ -24,7 +24,6 @@ const componentPaths = globSync( 'packages/components/src/*/**/README.md', {
 		'packages/components/src/view/README.md',
 		'packages/components/src/menu/README.md',
 		'packages/components/src/tabs/README.md',
-		'packages/components/src/custom-select-control-v2/README.md',
 		'packages/components/src/badge/README.md',
 	],
 } ).sort( ( a, b ) => a.localeCompare( b ) );

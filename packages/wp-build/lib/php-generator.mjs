@@ -34,6 +34,11 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 /**
  * Apply template replacements to a template string.
  *
+ * In the Gutenberg repository, the PHP templates are statically analyzed with
+ * a sample value for each placeholder, in `tools/phpstan/src/WpBuildTemplateParser.php`.
+ * When a placeholder is added, or what one expands to changes shape, update
+ * its sample value there too.
+ *
  * @param {string}                 template     Template string with placeholders.
  * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
  * @return {string} Template with replacements applied.
