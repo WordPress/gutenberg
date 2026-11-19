@@ -1053,6 +1053,7 @@ test.describe( 'Block Notes: floating notes', () => {
 		test( 'yields to All notes when the canvas is too narrow', async ( {
 			editor,
 			page,
+			pageUtils,
 		} ) => {
 			await page.setViewportSize( { width: 900, height: 900 } );
 			await editor.insertBlock( {
@@ -1065,7 +1066,7 @@ test.describe( 'Block Notes: floating notes', () => {
 				.getByRole( 'button', { name: 'Document Overview' } )
 				.click();
 
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
+			await pageUtils.pressKeys( 'primaryAlt+M' );
 
 			await expect(
 				getAllNotes( page ).getByRole( 'textbox', {

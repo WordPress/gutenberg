@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 28.2.0 (2026-11-18)
+
 ### Enhancements
 
 -   `use-recommended-components`: Recommend the WordPress UI select controls instead of legacy `SelectControl` and `CustomSelectControl` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
