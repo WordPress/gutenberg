@@ -4,8 +4,28 @@
 
 ### Bug Fixes
 
+-   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+
+## 22.1.0 (2026-11-18)
+
+### Enhancements
+
+-   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
+
+### Bug Fixes
+
+-   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
+-   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
 -   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
 -   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
+
+### Internal
+
+-   Update the `@ariakit/react` dependency to 0.4.43 ([#86887](https://github.com/WordPress/gutenberg/pull/86887)).
+-   Update the `@daypicker/react` dependency to 10.0.2 ([#86886](https://github.com/WordPress/gutenberg/pull/86886)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 22.0.0 (2026-11-04)
 

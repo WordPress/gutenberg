@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { useEffect, useState } from '@wordpress/element';
 // Only what the package exports, as a consumer would import it.
 import {
 	ImageEditorCanvas,
 	createImageEditorState,
+	exportImage,
 	getOutputSize,
-	mapEditToOriginal,
+	getImageEdit,
 	useImageEditor,
 	type ImageEditorController,
 	type ImageEditorState,
@@ -21,26 +22,54 @@ const IMAGE = {
 	naturalHeight: 600,
 };
 
+// A real image the renderer can draw, since `photo.png` never loads.
+function paintedImage( naturalWidth: number, naturalHeight: number ) {
+	const canvas = document.createElement( 'canvas' );
+	canvas.width = naturalWidth;
+	canvas.height = naturalHeight;
+	// A fresh canvas has a 2D context.
+	const context = canvas.getContext( '2d' )!;
+	context.fillStyle = 'rgb(51, 153, 255)';
+	context.fillRect( 0, 0, naturalWidth, naturalHeight );
+	return {
+		src: canvas.toDataURL( 'image/png' ),
+		naturalWidth,
+		naturalHeight,
+	};
+}
+
+async function decodedSize( blob: Blob ) {
+	const bitmap = await createImageBitmap( blob );
+	const size = { width: bitmap.width, height: bitmap.height };
+	bitmap.close();
+	return size;
+}
+
 function ConsumerEditor( {
 	onController,
 	initialState = createImageEditorState(),
 	freeformCrop = true,
+	className,
+	image = IMAGE,
 }: {
 	onController: ( controller: ImageEditorController ) => void;
 	initialState?: ImageEditorState;
 	freeformCrop?: boolean;
+	className?: string;
+	image?: typeof IMAGE;
 } ) {
 	const [ state, setState ] = useState( initialState );
 	const controller = useImageEditor( { state, onChange: setState } );
 	const { setImage } = controller;
-	useEffect( () => setImage( IMAGE ), [ setImage ] );
+	useEffect( () => setImage( image ), [ setImage, image ] );
 	useEffect( () => onController( controller ), [ controller, onController ] );
 	return (
 		<div style={ { width: 648, height: 448 } }>
 			<ImageEditorCanvas
-				src={ IMAGE.src }
+				src={ image.src }
 				controller={ controller }
 				freeformCrop={ freeformCrop }
+				className={ className }
 			/>
 		</div>
 	);
@@ -89,7 +118,7 @@ describe( 'the public API', () => {
 		expect( rejected ).toBeTruthy();
 	} );
 
-	it( 'crops and maps the edit to the original from the package exports alone', async () => {
+	it( 'crops and describes the edit from the package exports alone', async () => {
 		let controller!: ImageEditorController;
 		const onController = ( next: ImageEditorController ) => {
 			controller = next;
@@ -116,13 +145,14 @@ describe( 'the public API', () => {
 
 		act( () => controller.snapRotate90( 1 ) );
 		act( () => controller.toggleFlip( 'horizontal' ) );
-		expect(
-			mapEditToOriginal( controller.state ).map( ( { type } ) => type )
-		).toEqual( [ 'flip', 'rotate', 'crop' ] );
+		const edit = getImageEdit( controller.state );
+		expect( edit?.flip ).toEqual( { horizontal: true, vertical: false } );
+		expect( edit?.rotation ).toBeGreaterThan( 0 );
+		expect( edit?.crop ).toBeDefined();
 
 		act( () => controller.reset() );
 		expect( controller.state.aspectRatio ).toBeUndefined();
-		expect( mapEditToOriginal( controller.state ) ).toEqual( [] );
+		expect( getImageEdit( controller.state ) ).toEqual( {} );
 	} );
 
 	it( 'starts with the crop locked to a ratio', async () => {
@@ -202,5 +232,173 @@ describe( 'the public API', () => {
 			} )
 		);
 		expect( controller.isDirty ).toBe( false );
+	} );
+
+	it( 'lets a consumer theme the canvas with CSS custom properties', async () => {
+		await render(
+			<>
+				<style>{ `
+					.my-cropper {
+						--wp-image-editor-accent-color: rgb(90, 10, 110);
+						--wp-image-editor-surface-color: rgb(240, 230, 220);
+						--wp-image-editor-foreground-color: rgb(10, 20, 30);
+						--wp-image-editor-dimming-color: rgba(255, 0, 0, 0.6);
+						--wp-image-editor-canvas-inset: 30px;
+					}
+				` }</style>
+				<ConsumerEditor
+					onController={ () => {} }
+					className="my-cropper"
+				/>
+			</>
+		);
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const dimming = screen.getByTestId( 'image-editor-dimming' );
+
+		expect( getComputedStyle( canvas ).top ).toBe( '30px' );
+		expect( getComputedStyle( handle ).backgroundColor ).toBe(
+			'rgb(240, 230, 220)'
+		);
+		expect( getComputedStyle( handle ).borderTopColor ).toBe(
+			'rgb(90, 10, 110)'
+		);
+		expect( getComputedStyle( dimming ).boxShadow ).toContain(
+			'rgba(255, 0, 0, 0.6)'
+		);
+		dimming.style.transition = 'none';
+		fireEvent.pointerDown( canvas, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		expect( getComputedStyle( dimming ).boxShadow ).toContain(
+			'color(srgb 1 0 0 / 0.4'
+		);
+		fireEvent.pointerUp( canvas, { pointerId: 1 } );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			clientX: 100,
+			clientY: 100,
+			pointerId: 1,
+		} );
+		const tooltip = await screen.findByTestId(
+			'image-editor-dimensions-tooltip'
+		);
+		expect( getComputedStyle( tooltip ).backgroundColor ).toBe(
+			'rgb(240, 230, 220)'
+		);
+		expect( getComputedStyle( tooltip ).color ).toBe( 'rgb(10, 20, 30)' );
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+	} );
+
+	it( 'refuses to export before an image has loaded', async () => {
+		await expect( exportImage( createImageEditorState() ) ).rejects.toThrow(
+			/image/i
+		);
+	} );
+
+	it( 'rejects with an Error when the image fails to load', async () => {
+		const state = createImageEditorState( {
+			image: {
+				src: 'missing.png',
+				naturalWidth: 1200,
+				naturalHeight: 600,
+			},
+		} );
+		const rejection = exportImage( state );
+		await expect( rejection ).rejects.toBeInstanceOf( Error );
+		await expect( rejection ).rejects.toThrow( 'missing.png' );
+	} );
+
+	it( 'exports the framed region at the size getOutputSize reports, in the type asked for', async () => {
+		const state = createImageEditorState( {
+			image: paintedImage( 1200, 600 ),
+			aspectRatio: 1,
+		} );
+		expect( getOutputSize( state ) ).toEqual( { width: 600, height: 600 } );
+
+		const png = await exportImage( state );
+		expect( png.type ).toBe( 'image/png' );
+		expect( await decodedSize( png ) ).toEqual( {
+			width: 600,
+			height: 600,
+		} );
+
+		const jpeg = await exportImage( state, {
+			type: 'image/jpeg',
+			quality: 0.8,
+		} );
+		expect( jpeg.type ).toBe( 'image/jpeg' );
+		expect( await decodedSize( jpeg ) ).toEqual( {
+			width: 600,
+			height: 600,
+		} );
+	} );
+
+	it( 'exports the framed region at source size when zoomed, not upscaled', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		const image = paintedImage( 1200, 600 );
+		await render(
+			<ConsumerEditor onController={ onController } image={ image } />
+		);
+		await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+
+		act( () => controller.setZoom( 2 ) );
+
+		// At 2x the full-frame crop frames the middle quarter of the image.
+		const outputSize = getOutputSize( controller.state )!;
+		expect( outputSize.width ).toBeCloseTo( 600 );
+		expect( outputSize.height ).toBeCloseTo( 300 );
+		expect(
+			await decodedSize( await exportImage( controller.state ) )
+		).toEqual( { width: 600, height: 300 } );
+	} );
+
+	it( 'swaps the exported width and height after a quarter turn', async () => {
+		let controller!: ImageEditorController;
+		const onController = ( next: ImageEditorController ) => {
+			controller = next;
+		};
+		const image = paintedImage( 1200, 600 );
+		await render(
+			<ConsumerEditor onController={ onController } image={ image } />
+		);
+		await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+		expect(
+			await decodedSize( await exportImage( controller.state ) )
+		).toEqual( { width: 1200, height: 600 } );
+
+		act( () => controller.snapRotate90( 1 ) );
+		expect(
+			await decodedSize( await exportImage( controller.state ) )
+		).toEqual( { width: 600, height: 1200 } );
+	} );
+
+	it( 'shows the canvas with standalone style defaults', async () => {
+		await render( <ConsumerEditor onController={ () => {} } /> );
+		const handle = await screen.findByRole( 'button', {
+			name: 'Resize from bottom-right corner',
+		} );
+		const canvas = screen.getByRole( 'group', { name: 'Crop area' } );
+		const dimming = screen.getByTestId( 'image-editor-dimming' );
+
+		expect( getComputedStyle( canvas ).top ).toBe( '24px' );
+		expect( getComputedStyle( handle ).backgroundColor ).toBe(
+			'rgb(255, 255, 255)'
+		);
+		expect( getComputedStyle( dimming ).boxShadow ).toMatch(
+			/color\(srgb 0\.878\d* 0\.878\d* 0\.878\d* \/ 0\.6\)|rgba\(224, 224, 224, 0\.6\)/
+		);
 	} );
 } );
