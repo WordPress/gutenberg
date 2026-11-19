@@ -579,10 +579,13 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 /**
  * Action that moves given blocks to a new position.
  *
- * @param {?string} clientIds        The client IDs of the blocks.
- * @param {?string} fromRootClientId Root client ID source.
- * @param {?string} toRootClientId   Root client ID destination.
- * @param {number}  index            The index to move the blocks to.
+ * Does not select the moved blocks. Non-contiguous blocks are moved together in
+ * document order, using their current parents rather than fromRootClientId.
+ *
+ * @param {string[]} clientIds        The client IDs of the blocks.
+ * @param {?string}  fromRootClientId Source parent for contiguous siblings. Inferred for non-contiguous blocks.
+ * @param {?string}  toRootClientId   Root client ID destination.
+ * @param {number}   index            Destination index after removing moved blocks. Omit to append.
  */
 export const moveBlocksToPosition =
 	(
@@ -592,42 +595,78 @@ export const moveBlocksToPosition =
 		index?: number
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// This action moves contiguous blocks from a single source parent.
-		// Use moveBlockSetToPosition for non-contiguous blocks.
-		if (
-			! select.canMoveBlocks( clientIds ) ||
-			! select.areBlocksContiguous( clientIds )
-		) {
+		if ( ! select.canMoveBlocks( clientIds ) ) {
 			return;
 		}
 
-		// If moving inside the same root block the move is always possible.
-		if ( fromRootClientId !== toRootClientId ) {
-			const canRemoveBlocks = select.canRemoveBlocks( clientIds );
+		if ( select.areBlocksContiguous( clientIds ) ) {
+			// If moving inside the same root block the move is always possible.
+			if ( fromRootClientId !== toRootClientId ) {
+				const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
-			// If we're moving to another block, it means we're deleting blocks from
-			// the original block, so we need to check if removing is possible.
-			if ( ! canRemoveBlocks ) {
-				return;
+				// If we're moving to another block, it means we're deleting blocks from
+				// the original block, so we need to check if removing is possible.
+				if ( ! canRemoveBlocks ) {
+					return;
+				}
+
+				const canInsertBlocks = select.canInsertBlocks(
+					clientIds,
+					toRootClientId
+				);
+
+				// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
+				if ( ! canInsertBlocks ) {
+					return;
+				}
 			}
 
-			const canInsertBlocks = select.canInsertBlocks(
+			dispatch( {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				fromRootClientId,
+				toRootClientId,
 				clientIds,
-				toRootClientId
-			);
-
-			// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-			if ( ! canInsertBlocks ) {
-				return;
-			}
+				index,
+			} );
+			return;
 		}
 
+		const destinationRootClientId = toRootClientId ?? '';
+		if (
+			! select.canMoveBlocksToPosition(
+				clientIds,
+				destinationRootClientId
+			) ||
+			( index !== undefined &&
+				( ! Number.isInteger( index ) || index < 0 ) )
+		) {
+			return;
+		}
+		// Use document order even when the IDs were selected in another order.
+		const uniqueIds = new Set( clientIds );
+		const orderedIds = select
+			.getClientIdsWithDescendants()
+			.filter( ( id ) => uniqueIds.has( id ) );
+		const targetOrder = select.getBlockOrder( destinationRootClientId );
+		const remainingCount = targetOrder.filter(
+			( id ) => ! uniqueIds.has( id )
+		).length;
+		const insertionIndex = Math.min(
+			index ?? remainingCount,
+			remainingCount
+		);
+		// Every source parent must remove the moved blocks in the same update.
+		const sourceParents = [
+			...new Set(
+				orderedIds.map( ( id ) => select.getBlockRootClientId( id )! )
+			),
+		];
 		dispatch( {
 			type: 'MOVE_BLOCKS_TO_POSITION',
-			fromRootClientId,
-			toRootClientId,
-			clientIds,
-			index,
+			clientIds: orderedIds,
+			fromRootClientId: sourceParents,
+			toRootClientId: destinationRootClientId,
+			index: insertionIndex,
 		} );
 	};
 

@@ -14,7 +14,7 @@ import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import type { DragEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import type { Settings } from '../../store/types';
+import type { BlockEditorThunkArgs, Settings } from '../../store/types';
 import type {
 	BlockDropData,
 	BlockDropOperation,
@@ -310,12 +310,11 @@ export default function useOnBlockDrop(
 		getSettings,
 		getBlock,
 		getBlockRootClientId,
-	} = useSelect( blockEditorStore );
-	const { areBlocksContiguous, canMoveBlocksToPosition } = unlock(
+		getClientIdsWithDescendants,
+		areBlocksContiguous,
+		canMoveBlocksToPosition,
+	} = unlock< BlockEditorThunkArgs[ 'select' ] >(
 		useSelect( blockEditorStore )
-	);
-	const { moveBlockSetToPosition } = unlock(
-		useDispatch( blockEditorStore )
 	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const {
@@ -325,6 +324,7 @@ export default function useOnBlockDrop(
 		clearSelectedBlock,
 		replaceBlocks,
 		removeBlocks,
+		multiSelect,
 	} = useDispatch( blockEditorStore );
 	const registry = useRegistry();
 
@@ -507,10 +507,52 @@ export default function useOnBlockDrop(
 						onBlocksDrop( ids, parent );
 					}
 				}
-				moveBlockSetToPosition(
-					sourceIds,
-					targetRootClientId ?? '',
-					targetBlockIndex
+				// Custom drop behavior may have changed the blocks or their parents.
+				const destinationRootClientId = targetRootClientId ?? '';
+				if (
+					! canMoveBlocksToPosition(
+						sourceIds,
+						destinationRootClientId
+					) ||
+					! Number.isInteger( targetBlockIndex ) ||
+					targetBlockIndex < 0
+				) {
+					return;
+				}
+				const uniqueIds = new Set( sourceIds );
+				const orderedIds = getClientIdsWithDescendants().filter(
+					( id ) => uniqueIds.has( id )
+				);
+				const targetOrder = getBlockOrder( destinationRootClientId );
+				const targetIndex = Math.min(
+					targetBlockIndex,
+					targetOrder.length
+				);
+				// The pointer index is before removal; the move action expects an
+				// index after removing selected siblings from the destination.
+				const insertionIndex =
+					targetIndex -
+					targetOrder
+						.slice( 0, targetIndex )
+						.filter( ( id ) => uniqueIds.has( id ) ).length;
+				if (
+					orderedIds.every(
+						( id, i ) => targetOrder[ insertionIndex + i ] === id
+					)
+				) {
+					return;
+				}
+				moveBlocksToPosition(
+					orderedIds,
+					getBlockRootClientId( orderedIds[ 0 ] ),
+					destinationRootClientId,
+					insertionIndex
+				);
+				// Selection is part of the drop interaction, not the move action.
+				multiSelect(
+					orderedIds[ 0 ],
+					orderedIds[ orderedIds.length - 1 ],
+					0
 				);
 			} );
 			return true;

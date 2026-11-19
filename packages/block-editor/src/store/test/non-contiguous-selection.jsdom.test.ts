@@ -61,24 +61,100 @@ describe( 'block selection with multiSelectSet', () => {
 
 	it.each< [ number, number[] ] >( [
 		[ 0, [ 0, 2, 1, 3, 4 ] ],
-		[ 2, [ 1, 0, 2, 3, 4 ] ],
-		[ 5, [ 1, 3, 4, 0, 2 ] ],
+		[ 1, [ 1, 0, 2, 3, 4 ] ],
+		[ 3, [ 1, 3, 4, 0, 2 ] ],
 	] )(
-		'moves non-contiguous siblings together at drop position %s without moving unselected blocks',
+		'moves non-contiguous siblings together at destination index %s without moving unselected blocks',
 		async ( index, expected ) => {
 			const ids = blocks.map( ( block ) => block.clientId );
-			const moved = await unlock(
-				registry.dispatch( store )
-			).moveBlockSetToPosition( [ ids[ 2 ], ids[ 0 ] ], '', index );
+			registry.dispatch( store ).selectBlock( ids[ 4 ] );
+			const result = await registry
+				.dispatch( store )
+				.moveBlocksToPosition( [ ids[ 2 ], ids[ 0 ] ], '', '', index );
 			expect( registry.select( store ).getBlockOrder() ).toEqual(
 				expected.map( ( i ) => ids[ i ] )
 			);
-			expect( moved ).toEqual( [ ids[ 0 ], ids[ 2 ] ] );
+			expect( result ).toBeUndefined();
 			expect(
 				registry.select( store ).getSelectedBlockClientIds()
-			).toEqual( moved );
+			).toEqual( [ ids[ 4 ] ] );
 		}
 	);
+
+	it( 'uses an index after removing non-contiguous blocks', async () => {
+		const ids = blocks.map( ( block ) => block.clientId );
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition( [ ids[ 2 ], ids[ 0 ] ], '', '', 2 );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			ids[ 1 ],
+			ids[ 3 ],
+			ids[ 0 ],
+			ids[ 2 ],
+			ids[ 4 ],
+		] );
+	} );
+
+	it( 'preserves selection when moving blocks from different parents', async () => {
+		const parents = [
+			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
+			createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
+		];
+		registry.dispatch( store ).resetBlocks( parents );
+		const ids = blocks.map( ( block ) => block.clientId );
+		registry.dispatch( store ).selectionChange( ids[ 1 ], 'content', 1, 2 );
+		const selectionStart = registry.select( store ).getSelectionStart();
+		const selectionEnd = registry.select( store ).getSelectionEnd();
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				[ ids[ 2 ], ids[ 0 ] ],
+				parents[ 1 ].clientId,
+				'',
+				2
+			);
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			parents[ 0 ].clientId,
+			parents[ 1 ].clientId,
+			ids[ 0 ],
+			ids[ 2 ],
+		] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ ids[ 1 ] ]
+		);
+		expect( registry.select( store ).getSelectionStart() ).toBe(
+			selectionStart
+		);
+		expect( registry.select( store ).getSelectionEnd() ).toBe(
+			selectionEnd
+		);
+	} );
+
+	it( 'preserves existing same-parent move indices and selection', async () => {
+		const ids = blocks.map( ( block ) => block.clientId );
+		registry.dispatch( store ).selectionChange( ids[ 4 ], 'content', 1, 2 );
+		const selectionStart = registry.select( store ).getSelectionStart();
+		const selectionEnd = registry.select( store ).getSelectionEnd();
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition( [ ids[ 1 ] ], '', '', 3 );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			ids[ 0 ],
+			ids[ 2 ],
+			ids[ 3 ],
+			ids[ 1 ],
+			ids[ 4 ],
+		] );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ ids[ 4 ] ]
+		);
+		expect( registry.select( store ).getSelectionStart() ).toBe(
+			selectionStart
+		);
+		expect( registry.select( store ).getSelectionEnd() ).toBe(
+			selectionEnd
+		);
+	} );
 
 	it( 'moves blocks from different parents together in document order while preserving their IDs and contents', async () => {
 		const nested = createBlock( 'core/test-selection', {
@@ -100,11 +176,15 @@ describe( 'block selection with multiSelectSet', () => {
 				.updateBlockListSettings( parent.clientId, {} )
 		);
 		const ids = blocks.map( ( block ) => block.clientId );
-		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
-			[ ids[ 2 ], ids[ 0 ] ],
-			parents[ 2 ].clientId,
-			1
-		);
+		registry.dispatch( store ).multiSelectSet( [ ids[ 0 ], ids[ 2 ] ] );
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				[ ids[ 2 ], ids[ 0 ] ],
+				parents[ 1 ].clientId,
+				parents[ 2 ].clientId,
+				1
+			);
 		expect(
 			registry
 				.select( store )
@@ -145,7 +225,7 @@ describe( 'block selection with multiSelectSet', () => {
 		);
 	} );
 
-	it( 'adjusts insertion positions using only selected blocks removed from the destination parent', async () => {
+	it( 'uses the supplied destination index when moving blocks from different parents', async () => {
 		const parents = [
 			createBlock( 'core/test-selection', {}, blocks.slice( 0, 2 ) ),
 			createBlock( 'core/test-selection', {}, blocks.slice( 2 ) ),
@@ -157,11 +237,14 @@ describe( 'block selection with multiSelectSet', () => {
 				.updateBlockListSettings( parent.clientId, {} )
 		);
 		const ids = blocks.map( ( block ) => block.clientId );
-		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
-			[ ids[ 1 ], ids[ 3 ] ],
-			parents[ 1 ].clientId,
-			2
-		);
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				[ ids[ 1 ], ids[ 3 ] ],
+				parents[ 0 ].clientId,
+				parents[ 1 ].clientId,
+				1
+			);
 		expect(
 			registry.select( store ).getBlockOrder( parents[ 1 ].clientId )
 		).toEqual( [ ids[ 2 ], ids[ 1 ], ids[ 3 ], ids[ 4 ] ] );
@@ -216,32 +299,35 @@ describe( 'block selection with multiSelectSet', () => {
 		}
 		const before = registry.select( store ).getBlocks();
 		const selection = registry.select( store ).getSelectedBlockClientIds();
-		await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
-			ids,
-			parents[ 1 ].clientId,
-			0
-		);
+		await registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				ids,
+				parents[ 0 ].clientId,
+				parents[ 1 ].clientId,
+				0
+			);
 		expect( registry.select( store ).getBlocks() ).toBe( before );
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
 			selection
 		);
 	} );
 
-	it( 'rejects drops into selected blocks or their descendants', async () => {
+	it( 'rejects non-contiguous moves into selected blocks or their descendants', async () => {
 		const parent = createBlock(
 			'core/test-selection',
 			{},
 			blocks.slice( 0, 2 )
 		);
-		registry.dispatch( store ).resetBlocks( [ parent, blocks[ 2 ] ] );
+		registry
+			.dispatch( store )
+			.resetBlocks( [ parent, blocks[ 3 ], blocks[ 2 ] ] );
 		const ids = [ parent.clientId, blocks[ 2 ].clientId ];
 		const before = registry.select( store ).getBlocks();
 		for ( const destination of [ parent.clientId, blocks[ 0 ].clientId ] ) {
-			await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
-				ids,
-				destination,
-				0
-			);
+			await registry
+				.dispatch( store )
+				.moveBlocksToPosition( ids, '', destination, 0 );
 			expect( registry.select( store ).getBlocks() ).toBe( before );
 		}
 	} );
@@ -256,8 +342,6 @@ describe( 'block selection with multiSelectSet', () => {
 		registry.dispatch( store ).moveBlocksUp( ids );
 		expect( registry.select( store ).getBlocks() ).toBe( before );
 		registry.dispatch( store ).moveBlocksDown( ids );
-		expect( registry.select( store ).getBlocks() ).toBe( before );
-		registry.dispatch( store ).moveBlocksToPosition( ids, '', '', 1 );
 		expect( registry.select( store ).getBlocks() ).toBe( before );
 	} );
 
@@ -299,11 +383,9 @@ describe( 'block selection with multiSelectSet', () => {
 			expect( registry.select( store ).canMoveBlocks( ids ) ).toBe(
 				false
 			);
-			await unlock( registry.dispatch( store ) ).moveBlockSetToPosition(
-				ids,
-				'',
-				0
-			);
+			await registry
+				.dispatch( store )
+				.moveBlocksToPosition( ids, '', '', 0 );
 			expect( registry.select( store ).getBlocks() ).toBe( before );
 			expect( registry.select( store ).getSelectedBlockClientIds() ).toBe(
 				selection

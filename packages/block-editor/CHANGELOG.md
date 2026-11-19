@@ -29,6 +29,7 @@
 
 ### Enhancements
 
+-   `moveBlocksToPosition`: Support moving non-contiguous blocks and blocks from different parents together in document order.
 -   `canMoveBlocks`: Check movement permission for non-contiguous and cross-parent blocks independently of mover restrictions.
 -   Drag and drop: Move non-contiguous selected blocks together at the destination in the canvas and List View, preserving block IDs and supporting one-step undo across source parents.
 -   Selection: Add Cmd/Ctrl-click selection in the canvas and List View, Space-key toggling in List View, and the `multiSelectSet` action for selecting blocks across different parents. Duplicate each group of adjacent selected siblings after the originals, and paste after non-contiguous selections without replacing selected blocks.
