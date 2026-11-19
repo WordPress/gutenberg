@@ -1,7 +1,7 @@
 import { __, _x } from '@wordpress/i18n';
-import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import AuthorSelect from './author-select';
 import CategorySelect from './category-select';
+import OrderBySelect from './order-by-select';
 import FormTokenField from '../form-token-field';
 import RangeControl from '../range-control';
 import { VStack } from '../v-stack';
@@ -91,49 +91,19 @@ export function QueryControls( {
 	// but instead are destructured inline where necessary.
 	...props
 }: QueryControlsProps ) {
-	useEnableWpCompatOverlaySlot();
-
-	const sortValue =
-		orderBy === undefined || order === undefined
-			? null
-			: `${ orderBy }/${ order }`;
-	const selectedOrderByOption =
-		orderByOptions?.find( ( option ) => option.value === sortValue ) ??
-		null;
-
 	return (
 		<VStack spacing="4" className="components-query-controls">
 			{ [
 				onOrderChange &&
 					onOrderByChange &&
 					!! orderByOptions?.length && (
-						<SelectControl
+						<OrderBySelect
 							key="query-controls-order-select"
-							label={ __( 'Order by' ) }
-							items={ orderByOptions }
-							value={ selectedOrderByOption }
-							onValueChange={ ( item ) => {
-								if ( typeof item?.value !== 'string' ) {
-									return;
-								}
-
-								const [ newOrderBy, newOrder ] =
-									item.value.split( '/' );
-								if ( newOrder !== order ) {
-									onOrderChange(
-										newOrder as NonNullable<
-											QueryControlsProps[ 'order' ]
-										>
-									);
-								}
-								if ( newOrderBy !== orderBy ) {
-									onOrderByChange(
-										newOrderBy as NonNullable<
-											QueryControlsProps[ 'orderBy' ]
-										>
-									);
-								}
-							} }
+							order={ order }
+							orderBy={ orderBy }
+							orderByOptions={ orderByOptions }
+							onOrderChange={ onOrderChange }
+							onOrderByChange={ onOrderByChange }
 						/>
 					),
 				isSingleCategorySelection( props ) &&
