@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `Resolver`: Accept `NormalizedResolver` in the resolver types ([#86847](https://github.com/WordPress/gutenberg/pull/86847)).
