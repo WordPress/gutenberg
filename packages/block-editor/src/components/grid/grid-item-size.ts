@@ -20,39 +20,17 @@ export function getGridSpan(
 }
 
 /**
- * Measures a grid item at a given placement. Temporary styles are restored
- * before the browser paints.
+ * Measures an item with temporary styles, restoring them before painting.
  *
  * @param element   Grid item element.
- * @param rect      Placement to measure.
- * @param rowHeight Height of a grid row in pixels.
+ * @param overrides Style declarations to override for the measurement.
  * @return Grid item dimensions.
  */
-export function measureGridItemAtRect(
+function measureGridItemWithStyles(
 	element: HTMLElement,
-	rect: GridRect,
-	rowHeight: number
+	overrides: [ CSSStyleDeclaration, string, string ][]
 ): GridItemDimensions {
-	const gridStyle = element.parentElement!.style;
-	const overrides: [ CSSStyleDeclaration, string, string ][] = [
-		[
-			element.style,
-			'grid-column',
-			`${ rect.columnStart } / span ${ rect.columnSpan }`,
-		],
-		[
-			element.style,
-			'grid-row',
-			`${ rect.rowStart } / span ${ rect.rowSpan }`,
-		],
-		// Include implicit rows without letting their size change during measurement.
-		[
-			gridStyle,
-			'grid-template-rows',
-			`repeat(${ rect.rowEnd }, ${ rowHeight }px)`,
-		],
-		[ gridStyle, 'grid-auto-rows', `${ rowHeight }px` ],
-	];
+	const hadStyleAttribute = element.hasAttribute( 'style' );
 	const restoreStyles = overrides.map( ( [ style, property, value ] ) => {
 		const previousValue = style.getPropertyValue( property );
 		const previousPriority = style.getPropertyPriority( property );
@@ -76,8 +54,67 @@ export function measureGridItemAtRect(
 		};
 	} finally {
 		restoreStyles.forEach( ( restore ) => restore() );
+		if ( ! hadStyleAttribute && ! element.style.length ) {
+			element.removeAttribute( 'style' );
+		}
 	}
 	return dimensions;
+}
+
+/**
+ * Measures the live block at a given width without stretching its height.
+ * Keeping the original DOM preserves state such as loaded media dimensions.
+ *
+ * @param element Grid item element.
+ * @param width   Available width in pixels, including padding and borders.
+ * @return Grid item dimensions.
+ */
+export function measureGridItemAtWidth(
+	element: HTMLElement,
+	width: number
+): GridItemDimensions {
+	return measureGridItemWithStyles( element, [
+		[ element.style, 'width', `${ width }px` ],
+		[ element.style, 'max-width', 'none' ],
+		[ element.style, 'box-sizing', 'border-box' ],
+		[ element.style, 'align-self', 'start' ],
+	] );
+}
+
+/**
+ * Measures a grid item at a given placement. Temporary styles are restored
+ * before the browser paints.
+ *
+ * @param element   Grid item element.
+ * @param rect      Placement to measure.
+ * @param rowHeight Height of a grid row in pixels.
+ * @return Grid item dimensions.
+ */
+export function measureGridItemAtRect(
+	element: HTMLElement,
+	rect: GridRect,
+	rowHeight: number
+): GridItemDimensions {
+	const gridStyle = element.parentElement!.style;
+	return measureGridItemWithStyles( element, [
+		[
+			element.style,
+			'grid-column',
+			`${ rect.columnStart } / span ${ rect.columnSpan }`,
+		],
+		[
+			element.style,
+			'grid-row',
+			`${ rect.rowStart } / span ${ rect.rowSpan }`,
+		],
+		// Include implicit rows without letting their size change during measurement.
+		[
+			gridStyle,
+			'grid-template-rows',
+			`repeat(${ rect.rowEnd }, ${ rowHeight }px)`,
+		],
+		[ gridStyle, 'grid-auto-rows', `${ rowHeight }px` ],
+	] );
 }
 
 /**

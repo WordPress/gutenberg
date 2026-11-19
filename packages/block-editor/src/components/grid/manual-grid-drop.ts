@@ -1,10 +1,6 @@
 import { isPlainObject } from '../../utils/object';
 import { getGridMeasurement, GridRect } from './utils';
-import {
-	getGridItemRowSpan,
-	getGridSpan,
-	measureGridItemAtRect,
-} from './grid-item-size';
+import { getGridSpan, measureGridItemAtWidth } from './grid-item-size';
 
 function getSpan( value: unknown ): number {
 	return typeof value === 'number' && Number.isInteger( value ) && value > 0
@@ -14,8 +10,8 @@ function getSpan( value: unknown ): number {
 
 /**
  * Gets a drop placement within the grid's columns, allowing additional rows.
- * Incoming content is measured in a hidden copy of the destination grid so
- * that the real blocks and grid remain in place while dragging.
+ * Find a compact width without changing the block's rendered height or
+ * introducing overflow. Temporary styles are restored before painting.
  *
  * @param gridElement  Destination grid.
  * @param blockElement Dragged block's element, if rendered.
@@ -48,7 +44,13 @@ export function getManualGridDropRect(
 		return getRect();
 	}
 	const view = gridElement.ownerDocument.defaultView;
-	if ( ! view || ! ( gridElement instanceof view.HTMLElement ) ) {
+	const sourceView = blockElement.ownerDocument.defaultView;
+	if (
+		! view ||
+		! ( gridElement instanceof view.HTMLElement ) ||
+		! sourceView ||
+		! ( blockElement instanceof sourceView.HTMLElement )
+	) {
 		return getRect();
 	}
 	const measurement = getGridMeasurement( gridElement );
@@ -58,12 +60,14 @@ export function getManualGridDropRect(
 	const rowHeight = measurement
 		? measurement.rows[ 0 ]?.end - measurement.rows[ 0 ]?.start
 		: 0;
+	const renderedWidth = blockElement.offsetWidth;
+	const renderedHeight = blockElement.offsetHeight;
 	if (
 		! Number.isFinite( columnWidth ) ||
 		! Number.isFinite( rowHeight ) ||
 		columnWidth <= 0 ||
 		rowHeight <= 0 ||
-		! gridElement.parentElement
+		renderedWidth <= 0
 	) {
 		return getRect();
 	}
@@ -76,88 +80,51 @@ export function getManualGridDropRect(
 		measurement?.rows[ 1 ] !== undefined
 			? measurement.rows[ 1 ].start - rowHeight
 			: parseFloat( computedStyle.rowGap ) || 0;
-	const probe = gridElement.cloneNode( false ) as HTMLElement;
-	const item = blockElement.cloneNode( true ) as HTMLElement;
-	probe.appendChild( item );
-	for ( const element of [
-		probe,
-		...probe.querySelectorAll( '[id], [data-block]' ),
-	] ) {
-		element.removeAttribute( 'id' );
-		element.removeAttribute( 'data-block' );
-	}
-	probe.inert = true;
-	probe.setAttribute( 'aria-hidden', 'true' );
-	Object.assign( probe.style, {
-		position: 'absolute',
-		inset: '0 auto auto 0',
-		visibility: 'hidden',
-		opacity: '0',
-		pointerEvents: 'none',
-		contain: 'layout',
-		boxSizing: 'border-box',
-		width: `${ gridElement.offsetWidth }px`,
-		minWidth: '0',
-		maxWidth: 'none',
-		height: 'auto',
-		minHeight: '0',
-		aspectRatio: 'auto',
-		margin: '0',
-		gridTemplateColumns: computedStyle.gridTemplateColumns,
-	} );
-	gridElement.parentElement.appendChild( probe );
-	try {
-		const oneCell = measureGridItemAtRect(
-			item,
-			new GridRect(),
-			rowHeight
-		);
-		// Wrapping content can fit a single column by becoming arbitrarily
-		// tall. Measure its preferred width across the grid before choosing
-		// spans, so text and flexible containers also get horizontal space.
-		const previousWidth = item.style.getPropertyValue( 'width' );
-		const previousPriority = item.style.getPropertyPriority( 'width' );
-		item.style.setProperty( 'width', 'max-content' );
-		const preferredSize = measureGridItemAtRect(
-			item,
-			new GridRect( { columnSpan: columnCount } ),
-			rowHeight
-		);
-		if ( previousWidth ) {
-			item.style.setProperty( 'width', previousWidth, previousPriority );
+	const renderedContentHeight = Math.max(
+		renderedHeight,
+		blockElement.scrollHeight
+	);
+	const getWidth = ( span: number ) =>
+		span * ( columnWidth + columnGap ) - columnGap;
+
+	let minimumSpan = columnSpan;
+	let maximumSpan = Math.min(
+		columnCount,
+		Math.max(
+			columnSpan,
+			getGridSpan( renderedWidth, columnWidth, columnGap )
+		)
+	);
+	// Narrow content can have a full-width wrapper. Search by layout rather
+	// than markup or intrinsic width, which can depend on percentage sizing.
+	// A binary search bounds layout work as the number of columns grows.
+	while ( minimumSpan < maximumSpan ) {
+		const candidateSpan = Math.floor( ( minimumSpan + maximumSpan ) / 2 );
+		const width = Math.min( renderedWidth, getWidth( candidateSpan ) );
+		const dimensions = measureGridItemAtWidth( blockElement, width );
+		const fits =
+			Math.abs( dimensions.offsetHeight - renderedHeight ) <= 1 &&
+			dimensions.offsetWidth <= width + 1 &&
+			dimensions.scrollWidth <= width + 1 &&
+			dimensions.scrollHeight <= renderedContentHeight + 1;
+		if ( fits ) {
+			maximumSpan = candidateSpan;
 		} else {
-			item.style.removeProperty( 'width' );
+			minimumSpan = candidateSpan + 1;
 		}
-		columnSpan = Math.min(
-			columnCount,
-			Math.max(
-				columnSpan,
-				getGridSpan(
-					Math.max(
-						oneCell.offsetWidth,
-						oneCell.scrollWidth,
-						preferredSize.offsetWidth,
-						preferredSize.scrollWidth
-					),
-					columnWidth,
-					columnGap
-				)
-			)
-		);
-		const widthRect = new GridRect( { ...getRect(), rowSpan: 1 } );
-		const dimensions = measureGridItemAtRect( item, widthRect, rowHeight );
-		rowSpan = Math.max(
-			rowSpan,
-			getGridItemRowSpan(
-				item,
-				widthRect,
-				Math.max( dimensions.offsetHeight, dimensions.scrollHeight ),
-				rowHeight,
-				rowGap
-			)
-		);
-		return getRect();
-	} finally {
-		probe.remove();
 	}
+	columnSpan = minimumSpan;
+	const dimensions = measureGridItemAtWidth(
+		blockElement,
+		getWidth( columnSpan )
+	);
+	rowSpan = Math.max(
+		rowSpan,
+		getGridSpan(
+			Math.max( dimensions.offsetHeight, dimensions.scrollHeight ),
+			rowHeight,
+			rowGap
+		)
+	);
+	return getRect();
 }
