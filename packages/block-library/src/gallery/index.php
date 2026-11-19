@@ -246,6 +246,31 @@ function block_core_gallery_get_responsive_flex_style_rules( $selector, $viewpor
 		'rules_group'  => $media_query,
 	);
 
+	// The crop rules above stretch every image to the row. A rounded image
+	// uses a 9999px radius, so that stretch turns a square into an oval when
+	// the caption beside it is taller. These follow the crop rules and win on
+	// specificity, keeping the rounded image at its own ratio.
+	if ( $image_crop ) {
+		$rounded_selector = "{$image_selector}.is-style-rounded";
+		$rules[] = array(
+			'selector'     => "{$rounded_selector} > div:not(.components-drop-zone),{$rounded_selector} > a",
+			'declarations' => array(
+				'display' => 'block !important',
+				'flex'    => '0 0 auto !important',
+				'height'  => 'auto !important',
+			),
+			'rules_group'  => $media_query,
+		);
+		$rules[] = array(
+			'selector'     => "{$rounded_selector} img",
+			'declarations' => array(
+				'flex'   => '0 0 auto !important',
+				'height' => 'auto !important',
+			),
+			'rules_group'  => $media_query,
+		);
+	}
+
 	return $rules;
 }
 

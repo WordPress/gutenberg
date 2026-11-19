@@ -80,6 +80,25 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 		}
 	}
 
+	// Rounded images use a 9999px radius. Cropping stretches each image to the
+	// row height, so a taller caption next to one turns a square into an oval.
+	// Leave that image at its own ratio, with the spare room under the caption.
+	&.is-cropped figure.wp-block-image.is-style-rounded:not(#individual-image) {
+		justify-content: flex-start;
+
+		> div:not(.components-drop-zone),
+		> a {
+			display: block;
+			flex: 0 0 auto;
+			height: auto;
+		}
+
+		img {
+			flex: 0 0 auto;
+			height: auto;
+		}
+	}
+
 	&.columns-1 figure.wp-block-image:not(#individual-image) {
 		width: 100%;
 	}
