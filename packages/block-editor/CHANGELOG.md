@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   InnerBlocks: Keep the block list mounted and preserve block identities when adopting a controlled data source ([#84010](https://github.com/WordPress/gutenberg/pull/84010)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
