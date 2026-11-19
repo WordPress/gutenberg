@@ -6,7 +6,7 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { ThemeProvider } from '../utils/theme-provider';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 
 /*
  * This should ideally use whatever dark color makes sense, and not be

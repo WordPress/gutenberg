@@ -36,7 +36,7 @@ export default function filterFonts(
 				font.font_family_settings &&
 				font.font_family_settings.name
 					.toLowerCase()
-					.includes( search.toLowerCase() )
+					.includes( search.trim().toLowerCase() )
 		);
 	}
 

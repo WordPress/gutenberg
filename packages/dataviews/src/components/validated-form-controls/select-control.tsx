@@ -1,6 +1,9 @@
 import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
-import { SelectControl as WCSelectControl } from '@wordpress/components';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Requires an HTMLSelectElement ref for native constraint validation.
+	SelectControl as WCSelectControl,
+} from '@wordpress/components';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	ControlWithError,

@@ -93,6 +93,7 @@ add_filter(
 		<li data-wp-each-child><span data-wp-html="context.item.html"><b>pending two</b></span></li>
 	</ul>
 	<button data-wp-on--click="actions.setRejected" data-testid="set rejected html">Set Rejected HTML</button>
+	<button data-wp-on--click="actions.setRejectedTrusted" data-testid="set rejected trusted html">Set Rejected Trusted HTML</button>
 
 	<button data-wp-on--click="actions.setHtml" data-testid="set html">
 		Set HTML
