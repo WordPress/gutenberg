@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+	getClearLine,
 	getLayoutFrame,
 	getLayoutRect,
 	getOutermostRotatedAncestorBlock,
@@ -292,6 +293,49 @@ describe( 'getLayoutRect', () => {
 				createPair( 'translate: 0 60px;' );
 			expect(
 				getVisibleGap( first, second, frame, line )
+			).toBeUndefined();
+		} );
+	} );
+
+	describe( 'getClearLine', () => {
+		it( 'shortens the line between children of a rotated parent', () => {
+			const first = createLayoutElement( '', 'rotate: -20deg;' );
+			const second = document.createElement( 'div' );
+			second.style.cssText =
+				'width: 200px; height: 100px; margin: 50px 0 0 20px;';
+			first.after( second );
+			const frame = getLayoutFrame( first.parentElement );
+			const line = toClientRect(
+				frame,
+				new window.DOMRect( 20, 110, 200, 50 )
+			);
+			const clearLine = getClearLine( first, second, frame, line )!;
+
+			expect(
+				getVisibleGap( first, second, frame, line )
+			).toBeUndefined();
+			// The level line leaves the slanted gap where it meets its edges.
+			expect( clearLine.width ).toBeCloseTo(
+				50 / Math.sin( ( 20 * Math.PI ) / 180 )
+			);
+			expect( clearLine.left + clearLine.width / 2 ).toBeCloseTo(
+				line.left + line.width / 2
+			);
+			expect( clearLine.top ).toBe( line.top );
+			expect( clearLine.height ).toBe( line.height );
+		} );
+
+		it( 'returns nothing when a block covers the middle of the line', () => {
+			const first = createLayoutElement( 'translate: 0 60px;' );
+			const second = document.createElement( 'div' );
+			second.style.cssText =
+				'width: 200px; height: 100px; margin: 50px 0 0 20px;';
+			first.after( second );
+			const frame = getLayoutFrame( first.parentElement );
+			const line = new window.DOMRect( 80, 150, 200, 50 );
+
+			expect(
+				getClearLine( first, second, frame, line )
 			).toBeUndefined();
 		} );
 	} );

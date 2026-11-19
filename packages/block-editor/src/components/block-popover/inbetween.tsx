@@ -7,6 +7,7 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 import {
+	getClearLine,
 	getLayoutFrame,
 	getLayoutRect,
 	getVisibleGap,
@@ -162,7 +163,8 @@ function BlockPopoverInbetween( {
 				);
 
 				// Centre the line in the space left between the painted
-				// blocks. The block still lands in the layout gap.
+				// blocks, or shorten it to clear them. The block still lands
+				// in the layout gap.
 				if (
 					isVertical &&
 					operation !== 'group' &&
@@ -175,7 +177,14 @@ function BlockPopoverInbetween( {
 							nextElement,
 							frame,
 							rect
-						) ?? rect
+						) ??
+						getClearLine(
+							previousElement,
+							nextElement,
+							frame,
+							rect
+						) ??
+						rect
 					);
 				}
 

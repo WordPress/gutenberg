@@ -420,6 +420,29 @@ export function extendRectToTop( rect: DOMRect, top: number ) {
 }
 
 /**
+ * Returns the corners of an element's painted box in client coordinates,
+ * after every transform, in order around the box.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @return The four corners.
+ */
+function getPaintedCorners( element: Element, frame: DOMMatrix ) {
+	const { x, y, width, height } = getLayoutRect( element, frame );
+	const matrix = frame
+		.translate( x, y )
+		.multiply( getElementTransform( element ) ?? new window.DOMMatrix() );
+	return [
+		[ 0, 0 ],
+		[ width, 0 ],
+		[ width, height ],
+		[ 0, height ],
+	].map( ( [ cornerX, cornerY ] ) =>
+		matrix.transformPoint( { x: cornerX, y: cornerY } )
+	);
+}
+
+/**
  * Returns the top and bottom of an element's painted box within a column of
  * the screen, after every transform.
  *
@@ -435,18 +458,7 @@ function getPaintedSpan(
 	left: number,
 	right: number
 ) {
-	const { x, y, width, height } = getLayoutRect( element, frame );
-	const matrix = frame
-		.translate( x, y )
-		.multiply( getElementTransform( element ) ?? new window.DOMMatrix() );
-	const corners = [
-		[ 0, 0 ],
-		[ width, 0 ],
-		[ width, height ],
-		[ 0, height ],
-	].map( ( [ cornerX, cornerY ] ) =>
-		matrix.transformPoint( { x: cornerX, y: cornerY } )
-	);
+	const corners = getPaintedCorners( element, frame );
 	const ys: number[] = [];
 
 	corners.forEach( ( start, index ) => {
@@ -503,6 +515,66 @@ export function getVisibleGap(
 		line.width,
 		below.top - above.bottom
 	);
+}
+
+/**
+ * Shortens a level insertion line to the part around its middle that crosses
+ * neither painted block. Inside a rotated container the layout gap is
+ * slanted, so a full width line runs into the blocks at its ends.
+ *
+ * @param previous Element of the block above.
+ * @param next     Element of the block below.
+ * @param frame    Layout frame of their parent, see `getLayoutFrame`.
+ * @param line     The line's rect in client coordinates.
+ * @return The shortened line, or undefined when a block covers its middle.
+ */
+export function getClearLine(
+	previous: Element,
+	next: Element,
+	frame: DOMMatrix,
+	line: DOMRect
+) {
+	// The line is drawn across the middle of its rect.
+	const y = line.top + line.height / 2;
+	const middle = line.left + line.width / 2;
+	let left = line.left;
+	let right = line.right;
+
+	for ( const element of [ previous, next ] ) {
+		const corners = getPaintedCorners( element, frame );
+		const xs: number[] = [];
+
+		corners.forEach( ( start, index ) => {
+			const end = corners[ ( index + 1 ) % corners.length ];
+
+			if ( start.y !== end.y && ( start.y - y ) * ( end.y - y ) <= 0 ) {
+				xs.push(
+					start.x +
+						( ( y - start.y ) / ( end.y - start.y ) ) *
+							( end.x - start.x )
+				);
+			}
+		} );
+
+		if ( ! xs.length ) {
+			continue;
+		}
+
+		const blockLeft = Math.min( ...xs );
+		const blockRight = Math.max( ...xs );
+
+		if ( blockLeft <= middle && blockRight >= middle ) {
+			return;
+		}
+
+		if ( blockRight < middle ) {
+			left = Math.max( left, blockRight );
+		} else {
+			right = Math.min( right, blockLeft );
+		}
+	}
+
+	return new window.DOMRect( left, line.top, right - left, line.height );
 }
 
 /**
