@@ -2334,7 +2334,8 @@ function findNextDelimiter( css: string, start: number ) {
 /**
  * Rewrites custom CSS so that `processCSSNesting` can split it on `&`.
  *
- * - Comments are removed, so `;`, `{`, `}` or `&` inside them are ignored.
+ * - Comments are replaced with a space, so `;`, `{`, `}` or `&` inside them
+ *   are ignored, and a comment still separates what is around it.
  * - A nested rule without `&` is treated as `& selector`, matching native CSS
  *   nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
  * - A rule at the very start is only rewritten when it starts with a type
@@ -2352,10 +2353,10 @@ function findNextDelimiter( css: string, start: number ) {
  * @return The rewritten CSS.
  */
 function normalizeNestedRules( css: string ) {
-	// Remove comments, but keep strings that look like comments.
+	// Replace comments with a space, but keep strings that look like comments.
 	css = css.replace(
 		/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\/\*[\s\S]*?\*\//g,
-		'$1'
+		( match: string, string?: string ) => string ?? ' '
 	);
 
 	let result = '';

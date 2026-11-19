@@ -2214,7 +2214,8 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Rewrites custom CSS so that it can be split on `&`.
 	 *
-	 * - Comments are removed, so `;`, `{`, `}` or `&` inside them are ignored.
+	 * - Comments are replaced with a space, so `;`, `{`, `}` or `&` inside them
+	 *   are ignored, and a comment still separates what is around it.
 	 * - A nested rule without `&` is treated as `& selector`, matching native
 	 *   CSS nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
 	 * - A rule at the very start is only rewritten when it starts with a type
@@ -2235,8 +2236,14 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The rewritten CSS.
 	 */
 	protected static function normalize_nested_custom_css( $css ) {
-		// Remove comments, but keep strings that look like comments.
-		$css = preg_replace( '/("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|\/\*.*?\*\//s', '$1', $css );
+		// Replace comments with a space, but keep strings that look like comments.
+		$css = preg_replace_callback(
+			'/("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|\/\*.*?\*\//s',
+			static function ( $matches ) {
+				return $matches[1] ?? ' ';
+			},
+			$css
+		);
 
 		$result = '';
 		// One entry per open brace: true for an unwrapped bare `& {}` block.

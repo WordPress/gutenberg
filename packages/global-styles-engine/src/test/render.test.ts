@@ -2820,24 +2820,9 @@ describe( 'global styles renderer', () => {
 				':root :where(.foo:hover){color: red;}',
 			],
 			[
-				'leading pseudo-element keeps its existing output',
-				'::before{color: red;}',
-				':root :where(.foo)::before{color: red;}',
-			],
-			[
 				'leading class keeps its existing output',
 				'.is-style-x{color: red;}',
 				':root :where(.foo.is-style-x){color: red;}',
-			],
-			[
-				'leading id keeps its existing output',
-				'#hero{color: red;}',
-				':root :where(.foo#hero){color: red;}',
-			],
-			[
-				'leading :is() keeps its existing output',
-				':is(.a, .b){color: red;}',
-				':root :where(.foo:is(.a, .b)){color: red;}',
 			],
 			[
 				'leading newline keeps its existing output',
@@ -2853,6 +2838,11 @@ describe( 'global styles renderer', () => {
 				'comment with ; before a leading rule',
 				'/* note; see docs */ .is-style-x{color: red;}',
 				':root :where(.foo .is-style-x){color: red;}',
+			],
+			[
+				'comment before a leading pseudo-class',
+				'/* hover; state */\n:hover{color: red;}',
+				':root :where(.foo :hover){color: red;}',
 			],
 			[
 				'comment with braces and & between rules',

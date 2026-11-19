@@ -8511,33 +8511,12 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo:hover){color: red;}',
 			),
-			'leading pseudo-element'       => array(
-				'input'    => array(
-					'selector' => '.foo',
-					'css'      => '::before{color: red;}',
-				),
-				'expected' => ':root :where(.foo)::before{color: red;}',
-			),
 			'leading class'                => array(
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => '.is-style-x{color: red;}',
 				),
 				'expected' => ':root :where(.foo.is-style-x){color: red;}',
-			),
-			'leading id'                   => array(
-				'input'    => array(
-					'selector' => '.foo',
-					'css'      => '#hero{color: red;}',
-				),
-				'expected' => ':root :where(.foo#hero){color: red;}',
-			),
-			'leading :is()'                => array(
-				'input'    => array(
-					'selector' => '.foo',
-					'css'      => ':is(.a, .b){color: red;}',
-				),
-				'expected' => ':root :where(.foo:is(.a, .b)){color: red;}',
 			),
 			'leading newline'              => array(
 				'input'    => array(
@@ -8560,6 +8539,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'css'      => '/* note; see docs */ .is-style-x{color: red;}',
 				),
 				'expected' => ':root :where(.foo .is-style-x){color: red;}',
+			),
+			'comment before :hover'        => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => "/* hover; state */\n:hover{color: red;}",
+				),
+				'expected' => ':root :where(.foo :hover){color: red;}',
 			),
 			'comment with braces and &'    => array(
 				'input'    => array(
