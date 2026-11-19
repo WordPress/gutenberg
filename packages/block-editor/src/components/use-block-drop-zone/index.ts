@@ -501,7 +501,7 @@ export default function useBlockDropZone( {
 					isNonContiguousMove &&
 					( operation === 'group' || operation === 'replace' )
 				) {
-					// Gathering inserts next to content; it never replaces or groups it.
+					// Non-contiguous blocks can only be inserted, not grouped or used to replace a block.
 					const rect =
 						blocksData[ targetIndex ]?.getBoundingClientRect();
 					if (

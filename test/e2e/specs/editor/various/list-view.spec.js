@@ -11,7 +11,7 @@ test.describe( 'List View', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'drags scattered blocks from List View into a contiguous selection (@firefox, @webkit)', async ( {
+	test( 'drags non-contiguous blocks from List View into a contiguous selection (@firefox, @webkit)', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -93,7 +93,7 @@ test.describe( 'List View', () => {
 			.toEqual( [ before[ 0 ].clientId, before[ 2 ].clientId ] );
 	} );
 
-	test( 'drags scattered blocks from List View across collapsed parents without reserving hidden row space (@firefox, @webkit)', async ( {
+	test( 'drags non-contiguous blocks from List View across collapsed parents without reserving hidden row space (@firefox, @webkit)', async ( {
 		editor,
 		page,
 		pageUtils,

@@ -129,7 +129,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 3 ] );
 	} );
 
-	test( 'restores all duplicated runs in one undo step', async ( {
+	test( 'undoes duplication across multiple parents in one step', async ( {
 		editor,
 		page,
 		pageUtils,

@@ -1084,7 +1084,8 @@ export const blocks = pipe(
 				const fromRootClientId = action.fromRootClientId ?? '';
 				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
-				// An array gathers blocks; a string retains the legacy single-source move.
+				// An array lists the source parents for moving blocks together.
+				// A string specifies a single source parent.
 				if ( Array.isArray( fromRootClientId ) ) {
 					const uniqueIds = new Set( clientIds );
 					const newState = new Map( state );

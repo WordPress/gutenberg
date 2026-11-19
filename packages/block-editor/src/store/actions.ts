@@ -593,7 +593,7 @@ export const moveBlocksToPosition =
 	) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
 		// This action moves contiguous blocks from a single source parent.
-		// Scattered blocks use moveBlockSetToPosition instead.
+		// Use moveBlockSetToPosition for non-contiguous blocks.
 		if (
 			! select.canMoveBlocks( clientIds ) ||
 			! select.areBlocksContiguous( clientIds )

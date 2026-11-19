@@ -655,8 +655,8 @@ export type Action =
 			type: 'MOVE_BLOCKS_TO_POSITION';
 			clientIds: string[];
 			/**
-			 * Source parent, or all source parents for a gathered move.
-			 * Gathered moves use an index adjusted for source removals.
+			 * Source parent, or an array of source parents when moving blocks together.
+			 * With an array, index is relative to the destination after removing moved blocks.
 			 */
 			fromRootClientId?: string | string[] | null;
 			toRootClientId?: string | null;

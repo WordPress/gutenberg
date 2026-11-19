@@ -84,7 +84,7 @@ export const moveBlockSetToPosition =
 		) {
 			return orderedIds;
 		}
-		// Move all blocks with one content action, then select the gathered range.
+		// Move all blocks with one content action, then select the moved blocks.
 		// Batch the two dispatches so subscribers see the final selection and tree together.
 		registry.batch( () => {
 			dispatch( {
@@ -142,7 +142,7 @@ export const toggleBlockSelection =
 	};
 
 /**
- * Pastes a sequence after the last target, without replacing scattered blocks.
+ * Pastes blocks after the last selected block without replacing selected blocks.
  *
  * @param blocks          Clipboard blocks.
  * @param clientIds       Selected target IDs in document order.

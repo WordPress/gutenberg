@@ -59,6 +59,8 @@ export { getBlockSettings } from './get-block-settings';
 /**
  * Checks whether the specified blocks are contiguous siblings, in any input order.
  *
+ * For siblings [A, B, C, D], [B, C] and [C, B] are contiguous; [A, C] is not.
+ *
  * @param state     Editor state.
  * @param clientIds Target block IDs.
  * @return Whether the blocks are contiguous siblings.
@@ -67,17 +69,18 @@ export function areBlocksContiguous( state: State, clientIds: string[] ) {
 	if ( clientIds.length < 2 ) {
 		return true;
 	}
-	// Find each target's position among the first block's siblings. A missing
-	// block or a block with a different parent has no position in this list.
+	// Look up each block in the first block's sibling order. indexOf returns -1
+	// if a block is missing or belongs to a different parent.
 	const parent = state.blocks.parents.get( clientIds[ 0 ] );
 	const order = state.blocks.order.get( parent ?? '' ) ?? [];
 	const indices = clientIds.map( ( id ) => order.indexOf( id ) );
 	return (
-		// Require distinct siblings so duplicates or missing IDs cannot fill a gap.
+		// Reject repeated client IDs.
 		new Set( clientIds ).size === clientIds.length &&
+		// Every block must appear in this sibling list.
 		indices.every( ( index ) => index !== -1 ) &&
-		// The blocks have no gaps when their span equals their count, regardless of
-		// input order: positions [ 3, 1, 2 ] span three blocks; [ 1, 3 ] do not.
+		// Adjacent siblings occupy every index between the lowest and highest:
+		// [3, 1, 2] includes indices 1 through 3; [1, 3] skips index 2.
 		Math.max( ...indices ) - Math.min( ...indices ) + 1 === clientIds.length
 	);
 }

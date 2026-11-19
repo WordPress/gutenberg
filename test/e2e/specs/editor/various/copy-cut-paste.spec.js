@@ -6,7 +6,7 @@ test.describe( 'Copy/cut/paste', () => {
 	} );
 
 	for ( const surface of [ 'canvas', 'List View' ] ) {
-		test( `copies scattered blocks and pastes after the last selected block in ${ surface } (@firefox, @webkit)`, async ( {
+		test( `copies non-contiguous blocks and pastes after the last selected block in ${ surface } (@firefox, @webkit)`, async ( {
 			editor,
 			pageUtils,
 		} ) => {

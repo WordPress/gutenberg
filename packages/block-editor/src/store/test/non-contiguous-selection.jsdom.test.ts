@@ -64,7 +64,7 @@ describe( 'block selection with multiSelectSet', () => {
 		[ 2, [ 1, 0, 2, 3, 4 ] ],
 		[ 5, [ 1, 3, 4, 0, 2 ] ],
 	] )(
-		'gathers non-contiguous siblings at drop position %s without moving intervening blocks',
+		'moves non-contiguous siblings together at drop position %s without moving unselected blocks',
 		async ( index, expected ) => {
 			const ids = blocks.map( ( block ) => block.clientId );
 			const moved = await unlock(
@@ -80,7 +80,7 @@ describe( 'block selection with multiSelectSet', () => {
 		}
 	);
 
-	it( 'gathers blocks from different parents in document order while preserving their IDs and contents', async () => {
+	it( 'moves blocks from different parents together in document order while preserving their IDs and contents', async () => {
 		const nested = createBlock( 'core/test-selection', {
 			content: 'Nested',
 		} );
@@ -246,7 +246,7 @@ describe( 'block selection with multiSelectSet', () => {
 		}
 	} );
 
-	it( 'allows scattered blocks to move while sibling mover actions leave them unchanged', () => {
+	it( 'allows non-contiguous blocks to move while up/down mover actions leave them unchanged', () => {
 		const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
 		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
 		expect(
@@ -767,7 +767,7 @@ describe( 'block selection with multiSelectSet', () => {
 		);
 	} );
 
-	it( 'duplicates each selected run after itself within its original parent', async () => {
+	it( 'duplicates each group of adjacent selected siblings after the originals within the same parent', async () => {
 		const parents = [
 			createBlock( 'core/test-selection', {}, blocks.slice( 0, 3 ) ),
 			createBlock( 'core/test-selection', {}, blocks.slice( 3 ) ),
@@ -803,7 +803,7 @@ describe( 'block selection with multiSelectSet', () => {
 		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
 			clones
 		);
-		// Providers receive the complete mutation once, not one history entry per run.
+		// The provider receives one update after all copies have been inserted.
 		expect( notifications ).toHaveLength( 1 );
 	} );
 

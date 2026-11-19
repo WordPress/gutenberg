@@ -286,7 +286,7 @@ export default function useInput() {
 			}
 
 			if ( event.keyCode === ENTER ) {
-				// Enter replaces or splits one range; scattered blocks have no single insertion point.
+				// Enter can only replace or split a single block or contiguous siblings.
 				if ( ! isSelectionContiguous() ) {
 					event.preventDefault();
 					return;

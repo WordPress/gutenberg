@@ -77,7 +77,7 @@ test.describe( 'Draggable block', () => {
 	} );
 
 	for ( const source of [ 'Alpha', 'Charlie' ] ) {
-		test( `drags scattered blocks from selected ${ source } in the canvas into a contiguous selection (@firefox, @webkit)`, async ( {
+		test( `drags non-contiguous blocks from selected ${ source } in the canvas into a contiguous selection (@firefox, @webkit)`, async ( {
 			editor,
 			page,
 		} ) => {

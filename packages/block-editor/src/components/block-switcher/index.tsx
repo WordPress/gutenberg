@@ -105,7 +105,8 @@ function BlockSwitcherDropdownMenuContents( {
 	}
 	// Simple block transformation based on the `Block Transforms` API.
 	function onBlockTransform( name: string, variationName?: string ) {
-		// Replacement requires contiguous blocks with the same parent, even if blocks changed while the menu was open.
+		// Replacing blocks requires contiguous siblings. Check again in case
+		// the blocks changed while the menu was open.
 		if ( ! areBlocksContiguous( clientIds ) ) {
 			return;
 		}
@@ -143,7 +144,7 @@ function BlockSwitcherDropdownMenuContents( {
 	}
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks: Block[] ) {
-		// A pattern replaces blocks at one location, not across gaps or different parents.
+		// Transforming to a pattern requires a single block or contiguous siblings.
 		if ( ! areBlocksContiguous( clientIds ) ) {
 			return;
 		}
@@ -279,7 +280,7 @@ export const BlockSwitcher = ( {
 						icon={ children }
 						text={ text }
 						toggleProps={ {
-							// Transforms replace contiguous blocks with the same parent at one position.
+							// Only a single block or contiguous siblings can be transformed.
 							disabled: ! isContiguous,
 							description: blockSwitcherDescription,
 							...toggleProps,

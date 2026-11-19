@@ -46,7 +46,7 @@ const getTransformCommands = () =>
 				select( blockEditorStore )
 			);
 
-			// Transforms replace blocks at one location, so scattered selections are unsupported.
+			// Transforming requires a single selected block or contiguous selected siblings.
 			if ( ! isSelectionContiguous() ) {
 				return { invalidSelection: true };
 			}

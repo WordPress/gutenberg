@@ -115,7 +115,7 @@ describe( 'parseDropEvent', () => {
 } );
 
 describe( 'onBlockDrop', () => {
-	it( 'gathers non-contiguous siblings without treating a drop in their gap as a no-op', () => {
+	it( 'moves non-contiguous siblings together when dropped between selected blocks', () => {
 		const moveBlocks = vi.fn();
 		const handleSet = vi.fn( () => true );
 		const getBlockIndex = vi.fn( () => 0 );
