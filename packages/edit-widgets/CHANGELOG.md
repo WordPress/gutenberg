@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Use matching theme-aware colors for pressed header buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
