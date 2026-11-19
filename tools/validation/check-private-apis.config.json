@@ -32,11 +32,6 @@
 			"via": "packages/api-fetch/src/index.ts"
 		},
 		{
-			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",
-			"package": "global-styles-engine",
-			"via": "packages/global-styles-engine/src/lock-unlock.ts"
-		},
-		{
 			"comment": "Depends on @wordpress/blocks, whose store unlocks private APIs internally. Remove when blocks' store no longer does.",
 			"package": "global-styles-engine",
 			"via": "packages/blocks/src/index.ts"
@@ -55,11 +50,6 @@
 			"comment": "Depends on @wordpress/block-editor, which unlocks private APIs throughout its store and components. Remove when the block-editor dependency is dropped or that stops.",
 			"package": "global-styles-ui",
 			"via": "packages/block-editor/src/index.ts"
-		},
-		{
-			"comment": "Depends on @wordpress/global-styles-engine, which has its own private API surface. Remove when that surface goes public.",
-			"package": "global-styles-ui",
-			"via": "packages/global-styles-engine/src/index.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",

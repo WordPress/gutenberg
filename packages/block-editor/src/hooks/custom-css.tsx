@@ -7,7 +7,7 @@ import type { BlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	processCSSNesting,
-	privateApis as globalStylesEnginePrivateApis,
+	getResponsiveMediaQueries,
 } from '@wordpress/global-styles-engine';
 import { store as noticesStore } from '@wordpress/notices';
 import { useBlockEditingMode } from '../components/block-editing-mode';
@@ -33,8 +33,6 @@ import type {
 	CustomCSSControlProps,
 	CustomCSSStateEntry,
 } from './types';
-
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
 // Stable reference for useInstanceId.
 const CUSTOM_CSS_INSTANCE_REFERENCE = {};

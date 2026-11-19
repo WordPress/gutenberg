@@ -1,8 +1,5 @@
 import { useSettings, useStyleOverride } from '@wordpress/block-editor';
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-import { unlock } from '../../lock-unlock';
-
-const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
+import { getResponsiveMediaQueries } from '@wordpress/global-styles-engine';
 
 const JUSTIFICATION_VALUES = {
 	left: 'flex-start',

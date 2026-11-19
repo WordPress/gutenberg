@@ -1,11 +1,9 @@
-import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import {
+	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
+} from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 import { desktop, tablet, mobile } from '@wordpress/icons';
-import { unlock } from '../lock-unlock';
-
-const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
-	globalStylesEnginePrivateApis
-);
 
 const VIEWPORT_KEY_BY_DEVICE_TYPE = {
 	Tablet: 'tablet',

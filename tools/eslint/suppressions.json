@@ -10935,16 +10935,6 @@
 			"count": 2
 		}
 	},
-	"packages/global-styles-engine/src/lock-unlock.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-engine/src/private-apis.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/background-panel.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -10952,9 +10942,6 @@
 	},
 	"packages/global-styles-ui/src/block-preview-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
@@ -11225,11 +11212,6 @@
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/global-styles-ui/src/utils.ts": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/variations/test/variations-panel.jsdom.test.js": {
