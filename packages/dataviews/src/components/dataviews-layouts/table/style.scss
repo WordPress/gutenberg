@@ -29,7 +29,11 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 // With `$rest: line`, for cells with nothing of their own to show, the mask at
 // rest keeps only their share of the row line, so they do not cover what the
 // columns next to them paint over their space, like a focus ring.
-@mixin scroll-fade($side, $range, $fill-mode: none, $rest: cover) {
+//
+// With `$reset-range`, a second animation puts the element back at rest within
+// that range. Safari keeps an animation applied at the end of the scroll
+// range, past the end of its own range, until another one overrides it.
+@mixin scroll-fade($side, $range, $fill-mode: none, $rest: cover, $reset-range: null) {
 	$to: var(--dataviews-view-table-fade-to-#{$side});
 
 	@if $rest == line {
@@ -56,9 +60,15 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	}
 
 	@supports (animation-timeline: scroll()) {
-		animation: dataviews-view-table-scroll-fade linear $fill-mode;
-		animation-timeline: scroll(nearest inline);
-		animation-range: $range;
+		@if $reset-range {
+			animation: dataviews-view-table-scroll-fade linear $fill-mode, dataviews-view-table-scroll-fade-reset linear;
+			animation-timeline: scroll(nearest inline);
+			animation-range: $range, $reset-range;
+		} @else {
+			animation: dataviews-view-table-scroll-fade linear $fill-mode;
+			animation-timeline: scroll(nearest inline);
+			animation-range: $range;
+		}
 	}
 }
 
@@ -130,7 +140,7 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 			// start of the cell covers them, they fade out next to it, and the
 			// row line stops at the divider.
 			--dataviews-view-table-fade-line-size: calc(100% - #{$scroll-fade-size}) 1px;
-			@include scroll-fade(end, normal calc(100% - 1px));
+			@include scroll-fade(end, normal calc(100% - 1px), $reset-range: calc(100% - 1px) normal);
 
 			// Divider between the strip and the actions, shown while there are
 			// more columns to scroll to.
@@ -147,9 +157,9 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 				opacity: 0;
 
 				@supports (animation-timeline: scroll()) {
-					animation: dataviews-view-table-scroll-cue linear;
+					animation: dataviews-view-table-scroll-cue linear, dataviews-view-table-scroll-cue-reset linear;
 					animation-timeline: scroll(nearest inline);
-					animation-range: normal calc(100% - 1px);
+					animation-range: normal calc(100% - 1px), calc(100% - 1px) normal;
 				}
 			}
 		}
@@ -412,7 +422,7 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 		inset-inline-end: 0;
 		width: $scroll-fade-end-size;
 		min-width: $scroll-fade-end-size;
-		@include scroll-fade(end, normal calc(100% - 1px), $rest: line);
+		@include scroll-fade(end, normal calc(100% - 1px), $rest: line, $reset-range: calc(100% - 1px) normal);
 	}
 
 	// Each cell draws its share of the line between rows, so a fade can hide
@@ -454,6 +464,24 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	from,
 	to {
 		opacity: 1;
+	}
+}
+
+// Puts a fade back at rest, see `scroll-fade`.
+@keyframes dataviews-view-table-scroll-fade-reset {
+	from,
+	to {
+		outline: none;
+		mask-image: var(--dataviews-view-table-fade-rest-mask);
+		-webkit-mask-box-image: none;
+		background-size: 100% 1px;
+	}
+}
+
+@keyframes dataviews-view-table-scroll-cue-reset {
+	from,
+	to {
+		opacity: 0;
 	}
 }
 
