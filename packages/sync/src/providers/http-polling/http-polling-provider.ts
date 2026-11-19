@@ -11,6 +11,7 @@ import { pollingManager } from './polling-manager';
 export interface ProviderOptions {
 	awareness?: Awareness;
 	debug?: boolean;
+	flushLocalUpdates?: () => void;
 	room: string;
 	ydoc: Y.Doc;
 }
@@ -49,6 +50,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			room: this.options.room,
 			doc: this.options.ydoc,
 			awareness: this.awareness,
+			flushLocalUpdates: this.options.flushLocalUpdates,
 			log: this.log,
 			onStatusChange: this.emitStatus,
 		} );
@@ -133,6 +135,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 export function createHttpPollingProvider(): ProviderCreator {
 	return async ( {
 		awareness,
+		flushLocalUpdates,
 		objectType,
 		objectId,
 		ydoc,
@@ -142,6 +145,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 		const provider = new HttpPollingProvider( {
 			awareness,
 			// debug: true,
+			flushLocalUpdates,
 			room,
 			ydoc,
 		} );
@@ -153,6 +157,7 @@ export function createHttpPollingProvider(): ProviderCreator {
 			on: ( event, callback ) => {
 				provider.on( event, callback );
 			},
+			supportsDeferredUpdates: true,
 		};
 	};
 }

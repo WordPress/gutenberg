@@ -74,6 +74,10 @@ When the **Real-Time Collaboration** experiment is enabled, the default provider
 
 Plugins can replace or augment the default provider using the `sync.providers` WordPress filter hook. The filter receives an array of `ProviderCreator` functions and should return the same. Each `ProviderCreator` is an async function that receives `{ objectType, objectId, ydoc, awareness? }` and returns `{ destroy, on }`. The `on` method is used by the sync manager to listen for provider status events (e.g., connection state changes).
 
+Provider creators also receive `Y`, the editor's Yjs module, and `flushLocalUpdates()`. A provider can return `supportsDeferredUpdates: true` if it calls `flushLocalUpdates()` before every incoming document update, including initial sync, reconnection, and compaction. Call it before starting the remote transaction or invoking a protocol reader that can apply updates. If flushing throws, do not apply the incoming update. The flush applies queued edits across all documents in order, preserving undo order.
+
+The sync manager defers local edits while no remote peer is present only if every provider for that document returns `supportsDeferredUpdates: true`. If any provider omits the flag or returns `false`, local edits are applied synchronously. Existing providers therefore keep working without adopting the callback. Providers that also support older sync managers should call `flushLocalUpdates?.()`, because those managers do not supply it.
+
 ```js
 import { addFilter } from '@wordpress/hooks';
 import { Y } from '@wordpress/sync';
