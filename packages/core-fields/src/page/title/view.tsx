@@ -41,7 +41,11 @@ export default function PageTitleView( {
 	}
 	return (
 		<BaseTitleView item={ item }>
-			{ badge && <Badge className={ styles.badge }>{ badge }</Badge> }
+			{ badge && (
+				<span className={ styles[ 'badge-wrapper' ] }>
+					<Badge className={ styles.badge }>{ badge }</Badge>
+				</span>
+			) }
 		</BaseTitleView>
 	);
 }

@@ -1,6 +1,19 @@
+/*
+ * A link around the title underlines the badge too, and the badge cannot
+ * remove an inherited underline. Rendering the badge as an inline block
+ * inside a wrapper stops the underline from reaching it.
+ */
+.badge-wrapper {
+	min-width: 0;
+}
+
 /* Keep the badge on one line; it truncates alongside the title. */
 .badge {
+	display: inline-block;
+	box-sizing: border-box;
+	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	vertical-align: top;
 }
