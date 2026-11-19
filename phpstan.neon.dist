@@ -44,6 +44,9 @@ rules:
 	# strictRules.illegalConstructorMethodCall
 	- PHPStan\Rules\Methods\IllegalConstructorMethodCallRule
 	- PHPStan\Rules\Methods\IllegalConstructorStaticCallRule
+	# strictRules.dynamicCallOnStaticMethod
+	- PHPStan\Rules\StrictCalls\DynamicCallOnStaticMethodsRule
+	- PHPStan\Rules\StrictCalls\DynamicCallOnStaticMethodsCallableRule
 
 services:
 	# strictRules.disallowedLooseComparison, with the argument rules.neon passes it.

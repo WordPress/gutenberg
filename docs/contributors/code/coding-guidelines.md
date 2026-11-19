@@ -887,6 +887,7 @@ parameters:
 		switchConditionsMatchingType: false
 		strictFunctionCalls: false
 		illegalConstructorMethodCall: false
+		dynamicCallOnStaticMethod: false
 ```
 
 ## GitHub Actions workflow files
