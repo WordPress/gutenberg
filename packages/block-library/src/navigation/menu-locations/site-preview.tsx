@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useInstanceId, useRefEffect } from '@wordpress/compose';
 import {
 	createInterpolateElement,
 	useMemo,
@@ -28,7 +28,9 @@ import {
 	Spinner,
 	Stack,
 	Text,
+	Tooltip,
 } from '@wordpress/ui';
+import type { ReactNode } from 'react';
 import { createBlock, parse } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
@@ -581,6 +583,48 @@ function DeviceMenu( {
 }
 
 /**
+ * "Template parts", with a dashed underline and a tooltip saying what one is.
+ * Tooltips aren't read out, so the explanation is also the term's
+ * description for screen readers.
+ *
+ * @param props
+ * @param props.children The term.
+ */
+function TemplatePartsTerm( { children }: { children?: ReactNode } ) {
+	const id = useInstanceId( TemplatePartsTerm, 'template-parts-term' );
+	const explanation = __(
+		'A template part is an area shared by many pages of your site, like a header or footer. Change it once, and it changes everywhere it’s used.'
+	);
+	return (
+		<>
+			<Tooltip.Root>
+				<Tooltip.Trigger
+					render={
+						<span
+							// Focusable, so the tooltip opens from the keyboard.
+							tabIndex={ 0 }
+							aria-describedby={ id }
+							style={ {
+								textDecoration: 'underline dashed',
+								textUnderlineOffset: 3,
+								cursor: 'help',
+							} }
+						/>
+					}
+				>
+					{ children }
+				</Tooltip.Trigger>
+				<Tooltip.Popup>{ explanation }</Tooltip.Popup>
+			</Tooltip.Root>
+			{ /* Hidden, but still read as the term's description. */ }
+			<span id={ id } hidden>
+				{ explanation }
+			</span>
+		</>
+	);
+}
+
+/**
  * The site in the editor's canvas, on a page that shows the menu: the
  * homepage if it does, otherwise another template's, filled with a page or
  * post that uses it. When the menu shows on more than one template, they can
@@ -726,38 +770,38 @@ export default function MenuSitePreview( {
 		!! locations.length && (
 			<Notice.Root intent="warning">
 				<Notice.Description>
-					{ onChooseLocation
-						? createInterpolateElement(
-								__(
-									'This menu is only in headers, footers or overlays that your site doesn’t use, so it doesn’t appear in the preview. <link>Choose where it appears</link>.'
+					{ createInterpolateElement(
+						onChooseLocation
+							? __(
+									'This menu is only in <term>template parts</term> that your site doesn’t use, so it doesn’t appear in the preview. <link>Choose where it appears</link>.'
+								)
+							: __(
+									'This menu is only in <term>template parts</term> that your site doesn’t use, so it doesn’t appear in the preview.'
 								),
-								{
-									link: (
-										<Link
-											tone="neutral"
-											// A button, as it opens a dialog.
-											render={
-												<button
-													type="button"
-													onClick={ onChooseLocation }
-													style={ {
-														background: 'none',
-														border: 0,
-														padding: 0,
-														font: 'inherit',
-														cursor: 'pointer',
-														textDecoration:
-															'underline',
-													} }
-												/>
-											}
+						{
+							term: <TemplatePartsTerm />,
+							link: (
+								<Link
+									tone="neutral"
+									// A button, as it opens a dialog.
+									render={
+										<button
+											type="button"
+											onClick={ onChooseLocation }
+											style={ {
+												background: 'none',
+												border: 0,
+												padding: 0,
+												font: 'inherit',
+												cursor: 'pointer',
+												textDecoration: 'underline',
+											} }
 										/>
-									),
-								}
-							)
-						: __(
-								'This menu is only in headers, footers or overlays that your site doesn’t use, so it doesn’t appear in the preview.'
-							) }
+									}
+								/>
+							),
+						}
+					) }
 				</Notice.Description>
 			</Notice.Root>
 		);
