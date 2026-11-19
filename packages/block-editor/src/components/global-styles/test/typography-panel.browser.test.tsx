@@ -604,6 +604,96 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
+
+		describe( 'while a viewport state is selected', () => {
+			const settings: StyleSettings = {
+				typography: {
+					...baseSettings.typography,
+					fontSizes: {
+						theme: [
+							{ slug: 'small', size: '13px', name: 'Small' },
+							{ slug: 'medium', size: '20px', name: 'Medium' },
+							{ slug: 'large', size: '24px', name: 'Large' },
+						],
+					},
+				},
+			};
+			// Global Styles set Large for the viewport.
+			const inheritedValue = {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			};
+
+			it( 'shows the font size the block inherits from its default state', async () => {
+				const onChange = vi.fn();
+
+				await renderPanel( {
+					settings,
+					inheritedValue,
+					baseValue: {
+						typography: { fontSize: 'var:preset|font-size|small' },
+					},
+					onChange,
+				} );
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Small' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Large' } )
+				).not.toBeChecked();
+				expect( onChange ).not.toHaveBeenCalled();
+			} );
+
+			it( 'shows a custom font size the block inherits from its default state', async () => {
+				const onChange = vi.fn();
+
+				await renderPanel( {
+					settings,
+					inheritedValue,
+					baseValue: { typography: { fontSize: '14px' } },
+					onChange,
+				} );
+
+				expect(
+					screen.getByRole( 'spinbutton', { name: 'Font size' } )
+				).toHaveValue( 14 );
+				expect(
+					screen.queryByRole( 'radio', { name: 'Large' } )
+				).not.toBeInTheDocument();
+				expect( onChange ).not.toHaveBeenCalled();
+			} );
+
+			it( 'falls back to Global Styles without a default state style', async () => {
+				await renderPanel( { settings, inheritedValue } );
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Large' } )
+				).toBeChecked();
+			} );
+
+			it( 'shows the font size set for the state itself', async () => {
+				await renderPanel( {
+					settings,
+					value: {
+						typography: { fontSize: 'var:preset|font-size|medium' },
+					},
+					inheritedValue,
+					baseValue: {
+						typography: { fontSize: 'var:preset|font-size|small' },
+					},
+				} );
+
+				expect(
+					screen.getByRole( 'radio', { name: 'Medium' } )
+				).toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Small' } )
+				).not.toBeChecked();
+				expect(
+					screen.getByRole( 'radio', { name: 'Large' } )
+				).not.toBeChecked();
+			} );
+		} );
 	} );
 
 	it( 'treats local zero values as local overrides instead of inherited placeholders', async () => {
