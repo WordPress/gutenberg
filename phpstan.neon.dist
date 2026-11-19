@@ -57,8 +57,9 @@ services:
 
 	# strictRules.numericOperandsInArithmeticOperators
 	# Its rules need an OperatorRuleHelper service. The helper is registered with autowired: false and passed explicitly
-	# to the ten rules so that a local phpstan.neon including rules.neon, which also registers one, does not fail with
-	# "Multiple services of type PHPStan\Rules\Operators\OperatorRuleHelper found".
+	# to the twelve rules so that a local phpstan.neon including rules.neon, which also registers one, does not fail with
+	# "Multiple services of type PHPStan\Rules\Operators\OperatorRuleHelper found". The unary minus and plus rules are
+	# registered too, although rules.neon enables them only with bleedingEdge, since the code complies with them.
 	operatorRuleHelper:
 		class: PHPStan\Rules\Operators\OperatorRuleHelper
 		autowired: false
@@ -86,6 +87,20 @@ services:
 
 	-
 		class: PHPStan\Rules\Operators\OperandInArithmeticPreIncrementRule
+		arguments:
+			helper: @operatorRuleHelper
+		tags:
+			- phpstan.rules.rule
+
+	-
+		class: PHPStan\Rules\Operators\OperandInArithmeticUnaryMinusRule
+		arguments:
+			helper: @operatorRuleHelper
+		tags:
+			- phpstan.rules.rule
+
+	-
+		class: PHPStan\Rules\Operators\OperandInArithmeticUnaryPlusRule
 		arguments:
 			helper: @operatorRuleHelper
 		tags:
