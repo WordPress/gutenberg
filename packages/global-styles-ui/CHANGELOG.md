@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Font Library: Read the true weight of an uploaded Thin or ExtraLight face whose `usWeightClass` is clamped to 250 or 275, so that the two no longer install as duplicates of one another ([#86814](https://github.com/WordPress/gutenberg/pull/86814)).
+
 ## 2.2.0 (2026-11-18)
 
 ### Enhancements
