@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Label the header inserter toggle “Close” instead of “Add block” while the inserter is open ([#87056](https://github.com/WordPress/gutenberg/pull/87056)).
+
 ## 6.2.0 (2026-11-18)
 
 ### Bug Fixes
