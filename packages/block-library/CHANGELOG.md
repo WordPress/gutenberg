@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 6.0.34 (2026-11-18)
+
+### Bug Fixes
+
+-   Embed: Remove support for Imgur oEmbeds.
+-   File: Preserve the filename text in media transforms.
+
 ## 6.0.33 (2026-10-28)
 
 ### Bug Fixes
