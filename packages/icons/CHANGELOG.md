@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `update`: redraw the icon as two curved arrows circling each other, so it reads as a cycle. The two straight diagonal arrows it carried read closer to a resize affordance ([#87088](https://github.com/WordPress/gutenberg/pull/87088)).
+
 ## 21.0.0 (2026-11-18)
 
 ### Breaking Changes
