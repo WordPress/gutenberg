@@ -15,11 +15,16 @@ type ListWindow = FixedListWindow & {
 	end: number;
 };
 
-function createListWindow( start: number, end: number ): ListWindow {
+function createListWindow(
+	start: number,
+	end: number,
+	focusedClientId?: string
+): ListWindow {
 	return {
 		start,
 		end,
 		itemInView: ( index ) => index >= start && index < end,
+		focusedClientId,
 	};
 }
 
@@ -103,9 +108,18 @@ export default function useListViewWindow() {
 				return;
 			}
 
+			// A row can only be unmounted when the window moves, so this is
+			// the one moment the focused row has to be known.
+			const focusedRow =
+				ownerDocument.activeElement?.closest< HTMLElement >(
+					'[data-block]'
+				);
 			const nextWindow = createListWindow(
 				Math.max( 0, first - MAX_BUFFER_ROWS ),
-				last + MAX_BUFFER_ROWS
+				last + MAX_BUFFER_ROWS,
+				list.contains( focusedRow ?? null )
+					? focusedRow?.dataset.block
+					: undefined
 			);
 			listWindowRef.current = nextWindow;
 

@@ -1686,6 +1686,22 @@ test.describe( 'List View', () => {
 			await listViewUtils.expectNoBlankRows();
 		} );
 
+		test( 'keeps focus on a row scrolled out of view', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( listViewUtils.getRow( 2 ) ).toBeFocused();
+
+			await listViewUtils.getRow( 5 ).hover();
+			await page.mouse.wheel( 0, 4000 );
+			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
+
+			await expect( listViewUtils.getRow( 2 ) ).toBeFocused();
+		} );
+
 		test( 'pages through the list with Page Down @firefox @webkit', async ( {
 			page,
 			listViewUtils,

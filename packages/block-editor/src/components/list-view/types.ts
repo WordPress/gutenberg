@@ -198,6 +198,7 @@ export type PrivateListViewProps = ListViewProps & {
  */
 export type FixedListWindow = {
 	itemInView: ( index: number ) => boolean;
+	focusedClientId?: string;
 };
 
 export type ListViewBranchProps = {
