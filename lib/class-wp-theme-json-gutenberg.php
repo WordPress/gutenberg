@@ -2183,7 +2183,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param int    $start The position to start from.
 	 * @return int The position of the delimiter, or -1 when there is none.
 	 */
-	private static function find_next_custom_css_delimiter( $css, $start ) {
+	protected static function find_next_custom_css_delimiter( $css, $start ) {
 		$quote  = '';
 		$length = strlen( $css );
 		for ( $i = $start; $i < $length; $i++ ) {
@@ -2226,7 +2226,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $css The custom CSS.
 	 * @return string The rewritten CSS.
 	 */
-	private static function normalize_nested_custom_css( $css ) {
+	protected static function normalize_nested_custom_css( $css ) {
 		// Remove comments, but keep strings that look like comments.
 		$css = preg_replace( '/("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|\/\*.*?\*\//s', '$1', $css );
 
