@@ -7,6 +7,10 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 
+### Bug Fixes
+
+-   `Input`, `InputControl`, and the controls built on them: Stop VoiceOver on macOS from reading the value of a number input as a percentage of its range. Number inputs now set `aria-valuetext` to their value unless one is passed.
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes

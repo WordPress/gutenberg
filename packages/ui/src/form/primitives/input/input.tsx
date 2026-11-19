@@ -1,6 +1,6 @@
 import { Input as _Input } from '@base-ui/react/input';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import focusStyles from '../../../utils/css/focus.module.scss';
 import styles from './style.module.css';
@@ -14,9 +14,32 @@ import { InputLayout } from '../input-layout';
  */
 export const Input = forwardRef< HTMLElement, InputProps >(
 	function UnforwardedInput(
-		{ className, size = 'default', prefix, suffix, style, ...restProps },
+		{
+			className,
+			size = 'default',
+			prefix,
+			suffix,
+			style,
+			onValueChange,
+			...restProps
+		},
 		ref
 	) {
+		const [ uncontrolledValue, setUncontrolledValue ] = useState(
+			restProps.defaultValue
+		);
+		const currentValue = restProps.value ?? uncontrolledValue;
+
+		// VoiceOver reads a number input with a `max` as a percentage of its
+		// range, unless it has an `aria-valuetext`.
+		const ariaValueText =
+			restProps.type === 'number' &&
+			currentValue !== undefined &&
+			currentValue !== null &&
+			String( currentValue ) !== ''
+				? String( currentValue )
+				: undefined;
+
 		return (
 			<InputLayout
 				className={ clsx(
@@ -33,6 +56,11 @@ export const Input = forwardRef< HTMLElement, InputProps >(
 				<_Input
 					ref={ ref }
 					className={ clsx( defenseStyles.input, styles.input ) }
+					aria-valuetext={ ariaValueText }
+					onValueChange={ ( value, eventDetails ) => {
+						setUncontrolledValue( value );
+						onValueChange?.( value, eventDetails );
+					} }
 					{ ...restProps }
 				/>
 			</InputLayout>
