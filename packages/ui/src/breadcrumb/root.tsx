@@ -289,6 +289,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	);
 	const [ isOverflowTriggerFocused, setIsOverflowTriggerFocused ] =
 		useState( false );
+	const [ frozenItems, setFrozenItems ] = useState( items );
 	const mergedRootRef = useMergeRefs( [ forwardedRef, setRootElement ] );
 	const visibleListRef = useRef< HTMLOListElement | null >( null );
 	const intrinsicRowRef = useRef< HTMLDivElement | null >( null );
@@ -302,16 +303,13 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 	const currentItemRef = useRef< HTMLSpanElement | null >( null );
 	const focusedElementRef = useRef< HTMLElement | null >( null );
 	const overflowTriggerRef = useRef< HTMLButtonElement | null >( null );
-	const frozenItemsRef = useRef( items );
 	const pendingStateRef = useRef< ResponsiveState | null >( null );
 	const focusOverflowAfterLayoutRef = useRef( false );
 	const menuOpenRef = useRef( false );
 	const selectionChanged =
 		( variant === 'selection' ||
-			frozenItemsRef.current.some(
-				( item ) => item.kind === 'button'
-			) ) &&
-		! itemKeysAreEqual( frozenItemsRef.current, items );
+			frozenItems.some( ( item ) => item.kind === 'button' ) ) &&
+		! itemKeysAreEqual( frozenItems, items );
 
 	const focusCurrentItem = useCallback( () => {
 		const current = currentItemRef.current;
@@ -326,7 +324,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			setMenuOpen( false );
 			menuOpenRef.current = false;
 			setIsOverflowTriggerFocused( false );
-			frozenItemsRef.current = items;
+			setFrozenItems( items );
 		}
 		const focused = focusedElementRef.current;
 		if (
@@ -337,10 +335,6 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 			focusCurrentItem();
 		}
 	} );
-
-	if ( ! menuOpen && ! isOverflowTriggerFocused ) {
-		frozenItemsRef.current = items;
-	}
 
 	const applyResponsiveState = useCallback(
 		( next: ResponsiveState ) => {
@@ -353,7 +347,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				isOverflowTriggerFocused &&
 				! selectionChanged &&
 				( next.collapsedKeys.length === 0 ||
-					! itemKeysAreEqual( frozenItemsRef.current, items ) )
+					! itemKeysAreEqual( frozenItems, items ) )
 			) {
 				pendingStateRef.current = next;
 				return;
@@ -364,7 +358,13 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				responsiveStatesAreEqual( current, next ) ? current : next
 			);
 		},
-		[ isOverflowTriggerFocused, items, menuOpen, selectionChanged ]
+		[
+			frozenItems,
+			isOverflowTriggerFocused,
+			items,
+			menuOpen,
+			selectionChanged,
+		]
 	);
 
 	useIsomorphicLayoutEffect( () => {
@@ -546,7 +546,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 				} );
 			}
 			if ( open ) {
-				frozenItemsRef.current = items;
+				setFrozenItems( items );
 				activationFocusRef.current = null;
 			} else if (
 				eventDetails.reason !== 'escape-key' &&
@@ -577,7 +577,7 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 		variant !== 'selection' &&
 		! selectionChanged &&
 		( menuOpen || isOverflowTriggerFocused )
-			? frozenItemsRef.current
+			? frozenItems
 			: items;
 	const displayedAncestors = displayedItems.filter(
 		( item ) => item.kind !== 'current'
@@ -654,9 +654,15 @@ const Root = forwardRef< HTMLElement, RootProps >( function BreadcrumbRoot(
 								ref={ overflowTriggerRef }
 								aria-label={ overflowLabel }
 								onBlur={ handleOverflowTriggerBlur }
-								onFocus={ () =>
-									setIsOverflowTriggerFocused( true )
-								}
+								onFocus={ () => {
+									if (
+										! menuOpen &&
+										! isOverflowTriggerFocused
+									) {
+										setFrozenItems( items );
+									}
+									setIsOverflowTriggerFocused( true );
+								} }
 								render={
 									<Tooltip.Trigger
 										render={ <OverflowTriggerButton /> }
