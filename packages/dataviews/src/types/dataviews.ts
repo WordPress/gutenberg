@@ -462,6 +462,19 @@ export interface ViewTable extends ViewBase {
 		enableMoving?: boolean;
 
 		/**
+		 * Whether the first (primary) column stays pinned to the leading edge
+		 * while the table scrolls horizontally, the way the actions column is
+		 * pinned to the trailing edge. Off by default, so the table only does
+		 * it when the consumer asks.
+		 *
+		 * When bulk actions are enabled the checkbox column is pinned alongside
+		 * the first column so the pair stays together. Below 480px of available
+		 * width the column scrolls with the rest of the table, regardless of
+		 * this setting.
+		 */
+		stickyFirstColumn?: boolean;
+
+		/**
 		 * A fixed aspect ratio for the primary column's media preview, one of
 		 * the preset ratios. Applied uniformly to every row. Defaults to
 		 * `'1/1'`.

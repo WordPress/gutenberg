@@ -12,10 +12,24 @@ const isScrolledToEnd = ( element: Element ) => {
 };
 
 /**
+ * Whether the container is at the start of the horizontal scroll range.
+ *
+ * `Math.abs` because RTL scrolls negative from zero, the same reason
+ * `isScrolledToEnd` special-cases it. A one-pixel tolerance avoids a divider
+ * flickering on sub-pixel scroll positions.
+ *
+ * @param element The scroll container.
+ * @return Whether the container is at the horizontal scroll start.
+ */
+const isScrolledToStart = ( element: Element ) =>
+	Math.abs( element.scrollLeft ) <= 1;
+
+/**
  * A hook to track the scroll state of a container element.
  *
  * Returns whether the container has been scrolled vertically (for sticky header styling)
- * and whether it has reached the horizontal scroll end (for sticky actions column styling).
+ * and whether it is at the horizontal scroll start (for sticky first column styling) or
+ * end (for sticky actions column styling).
  *
  * The current way receives "refs" as arguments, but it lacks a mechanism to detect when a ref has changed.
  * As a result, when the "ref" is updated and attached to a new div, the computation should trigger again.
@@ -25,7 +39,7 @@ const isScrolledToEnd = ( element: Element ) => {
  *
  * @param params                           The parameters for the hook.
  * @param params.scrollContainerRef        The ref to the scroll container element.
- * @param [params.enabledHorizontal=false] Whether to track horizontal scroll end.
+ * @param [params.enabledHorizontal=false] Whether to track horizontal scroll start and end.
  * @return  The scroll state.
  */
 export function useScrollState( {
@@ -34,7 +48,13 @@ export function useScrollState( {
 }: {
 	scrollContainerRef: RefObject< HTMLDivElement | null >;
 	enabledHorizontal?: boolean;
-} ): { isHorizontalScrollEnd: boolean; isVerticallyScrolled: boolean } {
+} ): {
+	isHorizontalScrollStart: boolean;
+	isHorizontalScrollEnd: boolean;
+	isVerticallyScrolled: boolean;
+} {
+	const [ isHorizontalScrollStart, setIsHorizontalScrollStart ] =
+		useState( true );
 	const [ isHorizontalScrollEnd, setIsHorizontalScrollEnd ] =
 		useState( false );
 	const [ isVerticallyScrolled, setIsVerticallyScrolled ] = useState( false );
@@ -46,6 +66,7 @@ export function useScrollState( {
 		}
 
 		if ( enabledHorizontal ) {
+			setIsHorizontalScrollStart( isScrolledToStart( scrollContainer ) );
 			setIsHorizontalScrollEnd( isScrolledToEnd( scrollContainer ) );
 		}
 
@@ -68,5 +89,9 @@ export function useScrollState( {
 		};
 	}, [ scrollContainerRef, enabledHorizontal, handleScroll ] );
 
-	return { isHorizontalScrollEnd, isVerticallyScrolled };
+	return {
+		isHorizontalScrollStart,
+		isHorizontalScrollEnd,
+		isVerticallyScrolled,
+	};
 }
