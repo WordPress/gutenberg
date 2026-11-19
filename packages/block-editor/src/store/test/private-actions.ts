@@ -637,5 +637,91 @@ describe( 'private actions', () => {
 				dispatch.updateBlockAttributes.mock.calls[ 0 ][ 1 ].group.lock
 			).toEqual( { move: false, remove: false } );
 		} );
+
+		it( 'stops a layout lock passed on from above when unlocking a block deep inside', () => {
+			// A Group holding Columns, holding a Column, holding a Heading.
+			// Each one locked, and each container with its own layout lock.
+			const parents: Record< string, string | null > = {
+				group: null,
+				columns: 'group',
+				column: 'columns',
+				heading: 'column',
+			};
+			const children: Record< string, string[] > = {
+				group: [ 'columns' ],
+				columns: [ 'column' ],
+				column: [ 'heading' ],
+				heading: [],
+			};
+			const fullLock = { move: true, remove: true, edit: true };
+			const attributes: Record< string, Record< string, any > > = {
+				group: { lock: fullLock, templateLock: 'all' },
+				columns: { lock: fullLock, templateLock: 'all' },
+				column: { lock: fullLock, templateLock: 'all' },
+				heading: { lock: fullLock },
+			};
+			const getClientIdsOfDescendants = ( ids: string[] ): string[] =>
+				ids.flatMap( ( id ) => [
+					...children[ id ],
+					...getClientIdsOfDescendants( children[ id ] ),
+				] );
+			// Like the editor, a block without a template lock of its own
+			// passes on the one of the block above it.
+			const getTemplateLock = ( id: string | null ): unknown => {
+				if ( ! id ) {
+					return false;
+				}
+				return (
+					attributes[ id ]?.templateLock ??
+					getTemplateLock( parents[ id ] )
+				);
+			};
+			const select = {
+				getClientIdsOfDescendants,
+				getBlockName: ( id: string ) =>
+					id === 'heading' ? 'core/heading' : 'core/group',
+				canLockBlockType: () => true,
+				getBlockAttributes: ( id: string ) => attributes[ id ] ?? {},
+				getBlockRootClientId: ( id: string ) => parents[ id ],
+				getTemplateLock,
+				canLayoutLockBlock: ( id: string ) => id !== 'heading',
+				isPatternLockedBlock: () => false,
+				isEditLockedBlock: ( id: string ) =>
+					!! attributes[ id ]?.lock?.edit,
+				getBlockParents: ( id: string ) => {
+					const ancestors: string[] = [];
+					let parentId = parents[ id ];
+					while ( parentId ) {
+						ancestors.unshift( parentId );
+						parentId = parents[ parentId ];
+					}
+					return ancestors;
+				},
+			};
+			const dispatch = { updateBlockAttributes: vi.fn() };
+
+			setBlocksLock( [ 'column' ], {
+				move: false,
+				remove: false,
+				layout: false,
+				edit: false,
+			} )( thunkArgs( { select, dispatch } ) );
+
+			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
+				[ 'column', 'heading', 'group', 'columns' ],
+				{
+					// The Columns stop passing on the layout lock of the
+					// Group, so the Column and the Heading need no lock.
+					column: { lock: undefined, templateLock: undefined },
+					heading: { lock: undefined },
+					group: { lock: { move: true, remove: true } },
+					columns: {
+						lock: { move: true, remove: true },
+						templateLock: false,
+					},
+				},
+				{ uniqueByBlock: true }
+			);
+		} );
 	} );
 } );

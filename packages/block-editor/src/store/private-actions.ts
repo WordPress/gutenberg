@@ -731,6 +731,10 @@ export interface BlockLockChanges {
  * it: the styles of locked ancestors, and the layout of a parent that keeps the
  * block in place.
  *
+ * A block without a template lock of its own passes on the one of the block
+ * above it, so a layout unlock under a block that stays layout-locked is
+ * stored as `templateLock: false`, and otherwise by removing the template lock.
+ *
  * @param clientIds Client IDs of the blocks to lock or unlock.
  * @param changes   The lock properties to change.
  */
@@ -842,6 +846,102 @@ export const setBlocksLock =
 			}
 		}
 
+		// The template lock a block has of its own once the changes apply, and
+		// whether the changes set it.
+		const getNextOwnTemplateLock = ( clientId: string ) => {
+			const ancestorChange = ancestorAttributes.get( clientId );
+			if ( ancestorChange?.hasOwnProperty( 'templateLock' ) ) {
+				return { isChanged: true, value: ancestorChange.templateLock };
+			}
+			if (
+				attributesByClientId[ clientId ]?.hasOwnProperty(
+					'templateLock'
+				)
+			) {
+				return {
+					isChanged: true,
+					value: nextTemplateLocks.get( clientId ),
+				};
+			}
+			return {
+				isChanged: false,
+				value: select.getBlockAttributes( clientId )?.templateLock,
+			};
+		};
+
+		// The template lock the blocks inside a block get once the changes
+		// apply. A block without a template lock of its own passes on the one
+		// of the nearest block above that has one.
+		const getNextTemplateLock = (
+			rootClientId: string | null | undefined
+		): unknown => {
+			let clientId = rootClientId;
+			while ( clientId ) {
+				const { isChanged, value } = getNextOwnTemplateLock( clientId );
+				if ( value !== undefined ) {
+					return value;
+				}
+				// Nothing changes from here up, so the editor's own answer
+				// holds, including a lock its inner blocks set themselves.
+				if (
+					! isChanged &&
+					! select
+						.getBlockParents( clientId )
+						.some(
+							( parentId ) =>
+								getNextOwnTemplateLock( parentId ).isChanged
+						)
+				) {
+					return select.getTemplateLock( clientId );
+				}
+				clientId = select.getBlockRootClientId( clientId );
+			}
+			return select.getTemplateLock( null );
+		};
+
+		// A block whose template lock is cleared would pass on the lock of a
+		// block above it instead, so where one still applies, an explicit
+		// `false` unlocks the layout. Go top down, so each block sees the
+		// final lock of the blocks above it.
+		const clearedTemplateLockIds = [
+			...ancestorAttributes.keys(),
+			...nextTemplateLocks.keys(),
+		]
+			.filter( ( clientId, index, ids ) => {
+				const { isChanged, value } = getNextOwnTemplateLock( clientId );
+				return (
+					ids.indexOf( clientId ) === index &&
+					isChanged &&
+					value === undefined
+				);
+			} )
+			.sort(
+				( a, b ) =>
+					select.getBlockParents( a ).length -
+					select.getBlockParents( b ).length
+			);
+		for ( const clientId of clearedTemplateLockIds ) {
+			const inheritedTemplateLock = getNextTemplateLock(
+				select.getBlockRootClientId( clientId )
+			);
+			if (
+				inheritedTemplateLock !== 'all' &&
+				inheritedTemplateLock !== 'insert'
+			) {
+				continue;
+			}
+			if (
+				ancestorAttributes
+					.get( clientId )
+					?.hasOwnProperty( 'templateLock' )
+			) {
+				ancestorAttributes.get( clientId )!.templateLock = false;
+			} else {
+				nextTemplateLocks.set( clientId, false );
+				attributesByClientId[ clientId ].templateLock = false;
+			}
+		}
+
 		// Then the lock of each block.
 		for ( const clientId of lockableIds ) {
 			const attributes = select.getBlockAttributes( clientId ) ?? {};
@@ -860,17 +960,7 @@ export const setBlocksLock =
 			const rootClientId = select.getBlockRootClientId( clientId );
 			const isInsideTargets =
 				rootClientId !== null && nextTemplateLocks.has( rootClientId );
-			let parentTemplateLock = isInsideTargets
-				? nextTemplateLocks.get( rootClientId )
-				: select.getTemplateLock( rootClientId );
-			if (
-				rootClientId !== null &&
-				ancestorAttributes
-					.get( rootClientId )
-					?.hasOwnProperty( 'templateLock' )
-			) {
-				parentTemplateLock = false;
-			}
+			const parentTemplateLock = getNextTemplateLock( rootClientId );
 			const isLockedByParent =
 				parentTemplateLock === 'all' || parentTemplateLock === 'insert';
 
