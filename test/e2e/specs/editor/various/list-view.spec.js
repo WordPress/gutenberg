@@ -1636,6 +1636,212 @@ test.describe( 'List View', () => {
 		).toBeInViewport( { ratio: 1 } );
 		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
 	} );
+
+	test.describe( 'long lists', () => {
+		test.beforeEach( async ( { listViewUtils } ) => {
+			await listViewUtils.insertParagraphs( 200 );
+		} );
+
+		test( 'shows the rows in view while scrolling', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await listViewUtils.getRow( 5 ).hover();
+
+			await page.mouse.wheel( 0, 4000 );
+			await expect( listViewUtils.getRow( 130 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+
+			await page.mouse.wheel( 0, -4000 );
+			await expect( listViewUtils.getRow( 5 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+		} );
+
+		test( 'opens at a selected block far down the list', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await page.evaluate( () => {
+				const { getBlockOrder } =
+					window.wp.data.select( 'core/block-editor' );
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.selectBlock( getBlockOrder()[ 149 ] );
+			} );
+
+			await listViewUtils.openListView();
+
+			await expect( listViewUtils.getRow( 150 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+		} );
+
+		test( 'pages through the list with Page Down @firefox @webkit', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'PageDown' );
+
+			await expect( listViewUtils.getRow( 1 ) ).not.toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+		} );
+
+		test( 'moves to both ends of the list with End and Home @firefox @webkit', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+
+			await page.keyboard.press( 'End' );
+			await expect( listViewUtils.getRow( 200 ) ).toBeFocused();
+			await expect( listViewUtils.getRow( 200 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+
+			await page.keyboard.press( 'Home' );
+			await expect( listViewUtils.getRow( 1 ) ).toBeFocused();
+			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+		} );
+
+		test( 'keeps its scroll position while pressing navigation keys in another field', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await listViewUtils.openListView();
+			await listViewUtils.getRow( 5 ).hover();
+			await page.mouse.wheel( 0, 1000 );
+			await expect( listViewUtils.getRow( 35 ) ).toBeInViewport();
+			await listViewUtils.getRow( 35 ).click();
+
+			await editor.openDocumentSettingsSidebar();
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+			await page.getByRole( 'textbox', { name: 'HTML anchor' } ).click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'PageDown' );
+
+			await expect( listViewUtils.getRow( 35 ) ).toBeInViewport();
+		} );
+
+		test( 'shows the rows in a dropdown opened far down a scrolled page', async ( {
+			page,
+			listViewUtils,
+		} ) => {
+			await page.evaluate( () => {
+				const { createElement: h, createRoot } = window.wp.element;
+				const {
+					BlockEditorProvider,
+					__experimentalListView: ListView,
+				} = window.wp.blockEditor;
+				const { Dropdown, Button } = window.wp.components;
+				const blocks = Array.from( { length: 60 }, ( _, index ) =>
+					window.wp.blocks.createBlock( 'core/paragraph', {
+						metadata: { name: `Paragraph ${ index + 1 }` },
+					} )
+				);
+				document.documentElement.className = '';
+				document.body.className = '';
+				document.documentElement.style.cssText =
+					'overflow:auto;height:auto';
+				document.body.style.cssText = 'overflow:visible;height:auto';
+				document.body.innerHTML = '<div id="list-view-dropdown"></div>';
+				createRoot(
+					document.getElementById( 'list-view-dropdown' )
+				).render(
+					h(
+						'div',
+						null,
+						h( 'div', { style: { height: '300vh' } } ),
+						h(
+							BlockEditorProvider,
+							{ value: blocks },
+							h( Dropdown, {
+								renderToggle: ( { onToggle } ) =>
+									h(
+										Button,
+										{ onClick: onToggle },
+										'Open List View'
+									),
+								renderContent: () =>
+									h(
+										'div',
+										{ style: { width: 320 } },
+										h( ListView )
+									),
+							} )
+						),
+						h( 'div', { style: { height: '300vh' } } )
+					)
+				);
+			} );
+			const toggle = page.getByRole( 'button', {
+				name: 'Open List View',
+			} );
+			await toggle.evaluate( ( node ) =>
+				node.scrollIntoView( { block: 'start' } )
+			);
+
+			await toggle.click();
+
+			await expect( listViewUtils.getRow( 1 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+
+			await listViewUtils.getRow( 1 ).hover();
+			await page.mouse.wheel( 0, 1000 );
+			await expect( listViewUtils.getRow( 35 ) ).toBeInViewport();
+			await expect.poll( listViewUtils.countBlankRowsInView ).toBe( 0 );
+		} );
+
+		test.describe( 'in a tall panel', () => {
+			test.use( {
+				viewport: { width: 1280, height: 1800 },
+			} );
+
+			test( 'fills the panel when it opens', async ( {
+				listViewUtils,
+			} ) => {
+				await listViewUtils.openListView();
+
+				await expect( listViewUtils.getRow( 45 ) ).toBeInViewport();
+				await expect
+					.poll( listViewUtils.countBlankRowsInView )
+					.toBe( 0 );
+			} );
+
+			test( 'fills the panel when it grows without a window resize', async ( {
+				page,
+				listViewUtils,
+			} ) => {
+				await page.evaluate( () => {
+					const style = document.createElement( 'style' );
+					style.id = 'short-list-view';
+					style.textContent =
+						'.editor-list-view-sidebar { max-height: 200px; }';
+					document.head.append( style );
+				} );
+				await listViewUtils.openListView();
+				await listViewUtils.getRow( 1 ).hover();
+				await page.mouse.wheel( 0, 3000 );
+				await expect( listViewUtils.getRow( 95 ) ).toBeInViewport();
+
+				await page.evaluate( () =>
+					document.getElementById( 'short-list-view' ).remove()
+				);
+
+				await expect( listViewUtils.getRow( 140 ) ).toBeInViewport();
+				await expect
+					.poll( listViewUtils.countBlankRowsInView )
+					.toBe( 0 );
+			} );
+		} );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
@@ -1654,6 +1860,73 @@ class ListViewUtils {
 			name: 'Block navigation structure',
 		} );
 	}
+
+	/**
+	 * @param {number} count Number of paragraphs to replace the content with.
+	 */
+	insertParagraphs = async ( count ) => {
+		await this.#page.evaluate( ( length ) => {
+			window.wp.data.dispatch( 'core/block-editor' ).resetBlocks(
+				Array.from( { length }, ( _, index ) =>
+					window.wp.blocks.createBlock( 'core/paragraph', {
+						metadata: { name: `Paragraph ${ index + 1 }` },
+					} )
+				)
+			);
+		}, count );
+	};
+
+	/**
+	 * @param {number} position One-based position of a paragraph in the list.
+	 * @return {Locator} The link of the paragraph's row.
+	 */
+	getRow = ( position ) =>
+		this.listView.getByRole( 'link', {
+			name: `Paragraph ${ position }`,
+			exact: true,
+		} );
+
+	/**
+	 * Samples what the user sees in the visible part of the list.
+	 *
+	 * @return {Promise<number>} How many sampled points show no row.
+	 */
+	countBlankRowsInView = () =>
+		this.listView.evaluate( ( list ) => {
+			const { ownerDocument, parentElement } = list;
+			let container = parentElement;
+			while (
+				container &&
+				! (
+					container.scrollHeight > container.clientHeight &&
+					/auto|scroll/.test(
+						window.getComputedStyle( container ).overflowY
+					)
+				)
+			) {
+				container = container.parentElement;
+			}
+			const listRect = list.getBoundingClientRect();
+			const containerRect = container?.getBoundingClientRect();
+			const top = Math.max( listRect.top, containerRect?.top ?? 0 );
+			const bottom = Math.min(
+				listRect.bottom,
+				containerRect?.bottom ?? window.innerHeight,
+				window.innerHeight
+			);
+			const x = listRect.left + listRect.width / 2;
+			let blankRows = 0;
+			for ( let y = top + 1; y < bottom; y += 16 ) {
+				if (
+					ownerDocument
+						.elementFromPoint( x, y )
+						?.closest( '.block-editor-list-view-placeholder' )
+				) {
+					blankRows++;
+				}
+			}
+			return blankRows;
+		} );
 
 	/**
 	 * Drags a List View row onto the bottom half of another row, with the
