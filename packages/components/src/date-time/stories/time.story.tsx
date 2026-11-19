@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState, useEffect } from '@wordpress/element';
+import { getSettings, setSettings } from '@wordpress/date';
 import TimePicker from '../time-picker';
 
 const meta: Meta< typeof TimePicker > = {
@@ -47,6 +48,43 @@ const Template: StoryFn< typeof TimePicker > = ( {
 export const Default: StoryFn< typeof TimePicker > = Template.bind( {} );
 Default.args = {
 	currentTime: new Date(),
+};
+
+/**
+ * When the site time zone from the `@wordpress/date` settings differs from the
+ * user's, the time picker shows the site time zone's abbreviation. Hovering or
+ * activating the abbreviation shows the full time zone name.
+ *
+ * This story sets a site time zone that differs from your browser's.
+ */
+export const WithSiteTimeZone = Template.bind( {} );
+WithSiteTimeZone.args = {
+	currentTime: new Date(),
+};
+// The settings are global, so keep this story off the docs page, where they
+// would also apply to the other stories.
+WithSiteTimeZone.tags = [ '!autodocs' ];
+WithSiteTimeZone.beforeEach = () => {
+	const settings = getSettings();
+	const browserOffset = -new Date().getTimezoneOffset() / 60;
+	setSettings( {
+		...settings,
+		timezone:
+			browserOffset === -4
+				? {
+						offset: 9,
+						offsetFormatted: '9',
+						string: 'Asia/Tokyo',
+						abbr: 'JST',
+					}
+				: {
+						offset: -4,
+						offsetFormatted: '-4',
+						string: 'America/Port_of_Spain',
+						abbr: 'AST',
+					},
+	} );
+	return () => setSettings( settings );
 };
 
 const TimeInputTemplate: StoryFn< typeof TimePicker.TimeInput > = ( args ) => {
