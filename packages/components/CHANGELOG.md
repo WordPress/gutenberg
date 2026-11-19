@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
+
 ### Bug Fixes
 
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
@@ -14,7 +18,6 @@
 
 ### Enhancements
 
--   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 -   `ColorPicker`: Keep the copy button named "Copy", show a check or error icon for two seconds after copying, and announce whether the copy succeeded. Its tooltip now shows above `@wordpress/ui` overlays ([#86808](https://github.com/WordPress/gutenberg/pull/86808)).
 -   `BaseControl`, `FocalPointPicker`, and `Tabs`: Use the `--wpds-typography-font-family-body` token for their font family ([#86761](https://github.com/WordPress/gutenberg/pull/86761)).
 -   `CustomSelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#86663](https://github.com/WordPress/gutenberg/pull/86663)).
