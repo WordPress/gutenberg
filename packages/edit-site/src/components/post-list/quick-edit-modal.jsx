@@ -46,7 +46,7 @@ export function QuickEditModal( {
 
 	const [ modalElement, setModalElement ] = useState( null );
 	const [ localEdits, setLocalEdits ] = useState( {} );
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -62,24 +62,12 @@ export function QuickEditModal( {
 
 			const args = [ 'postType', postType, postId[ 0 ] ];
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -87,21 +75,7 @@ export function QuickEditModal( {
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
-	const _fields = usePostFields( { postType } );
-	const fields = useMemo(
-		() =>
-			_fields?.map( ( field ) => {
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
-
-				return field;
-			} ),
-		[ _fields, canSwitchTemplate ]
-	);
+	const fields = usePostFields( { postType } );
 
 	const { inlineForm, panelForm } = useMemo( () => {
 		if ( ! quickEditForm ) {
