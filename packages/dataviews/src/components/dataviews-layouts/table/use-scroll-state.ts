@@ -37,11 +37,12 @@ export function useScrollState( {
 }: {
 	scrollContainerRef: RefObject< HTMLDivElement | null >;
 } ): {
-	isVerticallyScrolled: boolean;
+	hasVerticalScrollStart: boolean;
 	hasHorizontalScrollStart: boolean;
 	hasHorizontalScrollEnd: boolean;
 } {
-	const [ isVerticallyScrolled, setIsVerticallyScrolled ] = useState( false );
+	const [ hasVerticalScrollStart, setHasVerticalScrollStart ] =
+		useState( false );
 	const [ hasHorizontalScrollStart, setHasHorizontalScrollStart ] =
 		useState( false );
 	const [ hasHorizontalScrollEnd, setHasHorizontalScrollEnd ] =
@@ -55,7 +56,7 @@ export function useScrollState( {
 
 		if ( supportsScrollTimeline() ) {
 			const handleScroll = () =>
-				setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
+				setHasVerticalScrollStart( scrollContainer.scrollTop > 0 );
 
 			// A resize that clamps the scroll position also fires `scroll`.
 			handleScroll();
@@ -67,7 +68,7 @@ export function useScrollState( {
 		}
 
 		const update = () => {
-			setIsVerticallyScrolled( scrollContainer.scrollTop > 0 );
+			setHasVerticalScrollStart( scrollContainer.scrollTop > 0 );
 
 			// In RTL, `scrollLeft` runs from 0 down to negative values.
 			const scrolled = Math.abs( scrollContainer.scrollLeft );
@@ -101,7 +102,7 @@ export function useScrollState( {
 	}, [ scrollContainerRef ] );
 
 	return {
-		isVerticallyScrolled,
+		hasVerticalScrollStart,
 		hasHorizontalScrollStart,
 		hasHorizontalScrollEnd,
 	};

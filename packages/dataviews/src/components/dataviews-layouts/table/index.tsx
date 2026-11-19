@@ -349,7 +349,7 @@ function ViewTable< Item >( {
 	} );
 
 	const {
-		isVerticallyScrolled,
+		hasVerticalScrollStart,
 		hasHorizontalScrollStart,
 		hasHorizontalScrollEnd,
 	} = useScrollState( {
@@ -543,7 +543,7 @@ function ViewTable< Item >( {
 					ref={ tableHeaderRefs }
 					className={ clsx( {
 						'dataviews-view-table__thead--stuck':
-							isVerticallyScrolled,
+							hasVerticalScrollStart,
 					} ) }
 					onContextMenu={ handleHeaderContextMenu }
 				>
