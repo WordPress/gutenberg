@@ -266,61 +266,136 @@ function getOwnTransform( element: HTMLElement, style: CSSStyleDeclaration ) {
 
 	matrix.translateSelf( -originX, -originY );
 
-	return Array.from( matrix.toFloat64Array() ).every( Number.isFinite )
-		? matrix
+	// The page is painted flat, so only the 2D part reaches the screen.
+	const { a, b, c, d, e, f } = matrix;
+	return [ a, b, c, d, e, f ].every( Number.isFinite )
+		? new window.DOMMatrix( [ a, b, c, d, e, f ] )
 		: undefined;
 }
 
-/**
- * Returns the rectangle an element takes up in the layout, before its own
- * transform moves, turns or resizes it. Transforms only change how an
- * element is painted, so this is where neighbouring blocks and a newly
- * inserted block line up. An untransformed element gets its bounding
- * client rect.
- *
- * @param element Element.
- * @return The element's untransformed rect in client coordinates.
- */
-export function getLayoutRect( element: Element ) {
-	const rect = element.getBoundingClientRect();
+function getElementTransform( element: Element ) {
 	const view = element.ownerDocument.defaultView;
 
 	if ( ! view || ! ( 'offsetWidth' in element ) ) {
-		return rect;
+		return;
 	}
 
-	const htmlElement = element as HTMLElement;
-	const matrix = getOwnTransform(
-		htmlElement,
-		view.getComputedStyle( htmlElement )
+	return getOwnTransform(
+		element as HTMLElement,
+		view.getComputedStyle( element )
 	);
+}
 
-	if ( ! matrix ) {
+/**
+ * Returns the matrix that maps the untransformed layout of the nearest
+ * transformed element, from `element` up, to client coordinates. Blocks
+ * inside that element keep their layout in this space, however it is
+ * moved, turned or resized on screen.
+ *
+ * @param element Element to start from, usually a block's parent.
+ * @return The matrix, or the identity matrix when nothing is transformed.
+ */
+export function getLayoutFrame( element: Element | null ): DOMMatrix {
+	for ( let current = element; current; current = current.parentElement ) {
+		const transform = getElementTransform( current );
+
+		if ( ! transform ) {
+			continue;
+		}
+
+		const frame = getLayoutFrame( current.parentElement );
+		const { left, top } = getLayoutRect( current, frame );
+		const matrix = frame.translate( left, top ).multiply( transform );
+
+		return matrix.a * matrix.d - matrix.b * matrix.c
+			? matrix
+			: new window.DOMMatrix();
+	}
+
+	return new window.DOMMatrix();
+}
+
+/**
+ * Returns the rectangle an element takes up in the layout, before any
+ * transform moves, turns or resizes it or its ancestors. Transforms only
+ * change how an element is painted, so this is where neighbouring blocks
+ * and a newly inserted block line up. An untransformed element outside
+ * transformed ancestors gets its bounding client rect.
+ *
+ * @param element Element.
+ * @param frame   Layout frame of the element's parent, see `getLayoutFrame`.
+ * @return The element's untransformed rect in the frame's coordinates.
+ */
+export function getLayoutRect(
+	element: Element,
+	frame = getLayoutFrame( element.parentElement )
+) {
+	const rect = element.getBoundingClientRect();
+	const transform = getElementTransform( element );
+
+	if ( ! transform && frame.isIdentity ) {
 		return rect;
 	}
 
-	const { offsetWidth: width, offsetHeight: height } = htmlElement;
-	const corners = [
-		[ 0, 0 ],
-		[ width, 0 ],
-		[ 0, height ],
-		[ width, height ],
-	].map( ( [ x, y ] ) => matrix.transformPoint( { x, y } ) );
-	const xs = corners.map( ( { x } ) => x );
-	const ys = corners.map( ( { y } ) => y );
-	const minX = Math.min( ...xs );
-	const minY = Math.min( ...ys );
-	const spanX = Math.max( ...xs ) - minX;
-	const spanY = Math.max( ...ys ) - minY;
-	// Ancestors, such as the zoomed out canvas, can scale the whole block.
-	const scaleX = spanX > 0 ? rect.width / spanX : 1;
-	const scaleY = spanY > 0 ? rect.height / spanY : 1;
+	const { offsetWidth: width, offsetHeight: height } = element as HTMLElement;
+	// An affine map takes a box's centre to the centre of its bounding rect.
+	const center = frame.inverse().transformPoint( {
+		x: rect.left + rect.width / 2,
+		y: rect.top + rect.height / 2,
+	} );
+	const painted = ( transform ?? new window.DOMMatrix() ).transformPoint( {
+		x: width / 2,
+		y: height / 2,
+	} );
 
 	return new window.DOMRect(
-		rect.left - minX * scaleX,
-		rect.top - minY * scaleY,
-		width * scaleX,
-		height * scaleY
+		center.x - painted.x,
+		center.y - painted.y,
+		width,
+		height
+	);
+}
+
+/**
+ * Maps a point in client coordinates into a layout frame.
+ *
+ * @param frame Layout frame, see `getLayoutFrame`.
+ * @param x     Client x coordinate.
+ * @param y     Client y coordinate.
+ * @return The point in the frame's coordinates.
+ */
+export function toLayoutPoint( frame: DOMMatrix, x: number, y: number ) {
+	return frame.isIdentity
+		? new window.DOMPoint( x, y )
+		: frame.inverse().transformPoint( { x, y } );
+}
+
+/**
+ * Maps a rect in a layout frame to client coordinates. The result stays
+ * level: it is centred on the rect's place on screen and scaled with the
+ * frame, but never turned.
+ *
+ * @param frame Layout frame, see `getLayoutFrame`.
+ * @param rect  Rect in the frame's coordinates.
+ * @return The rect in client coordinates.
+ */
+export function toClientRect( frame: DOMMatrix, rect: DOMRect ) {
+	if ( frame.isIdentity ) {
+		return rect;
+	}
+
+	const center = frame.transformPoint( {
+		x: rect.left + rect.width / 2,
+		y: rect.top + rect.height / 2,
+	} );
+	const width = rect.width * Math.hypot( frame.a, frame.b );
+	const height = rect.height * Math.hypot( frame.c, frame.d );
+
+	return new window.DOMRect(
+		center.x - width / 2,
+		center.y - height / 2,
+		width,
+		height
 	);
 }
 

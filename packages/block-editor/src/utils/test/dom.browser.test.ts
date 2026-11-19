@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+	getLayoutFrame,
 	getLayoutRect,
 	getOutermostRotatedAncestorBlock,
+	toClientRect,
+	toLayoutPoint,
 } from '../dom';
 
 function createBlock(
@@ -111,11 +114,135 @@ describe( 'getLayoutRect', () => {
 			'rotate: 30deg;',
 			'transform: scale(0.5); transform-origin: 0 0;'
 		);
-		expect( round( getLayoutRect( element ) ) ).toEqual( {
+		const frame = getLayoutFrame( element.parentElement );
+		expect(
+			round( toClientRect( frame, getLayoutRect( element, frame ) ) )
+		).toEqual( {
 			left: 70,
 			top: 45,
 			width: 100,
 			height: 50,
 		} );
+	} );
+
+	it.each( [
+		[ 'rotated', 'rotate: 30deg;' ],
+		[ 'translated', 'translate: 30px -20px;' ],
+		[ 'scaled', 'scale: 1.5;' ],
+		[ 'transformed', 'transform: rotate(-15deg) scale(0.8);' ],
+	] )( 'measures a child of a %s parent in its layout', ( _name, style ) => {
+		const element = createLayoutElement( '', style );
+		const frame = getLayoutFrame( element.parentElement );
+		const rect = getLayoutRect( element, frame );
+		const clientRect = element.getBoundingClientRect();
+
+		expect( round( rect ) ).toEqual( {
+			left: 20,
+			top: 10,
+			width: 200,
+			height: 100,
+		} );
+		expect(
+			toLayoutPoint(
+				frame,
+				clientRect.left + clientRect.width / 2,
+				clientRect.top + clientRect.height / 2
+			)
+		).toMatchObject( {
+			x: expect.closeTo( 120 ),
+			y: expect.closeTo( 60 ),
+		} );
+	} );
+
+	it( 'finds the gap between children of a rotated parent', () => {
+		const first = createLayoutElement( '', 'rotate: -20deg;' );
+		const second = first.cloneNode() as HTMLElement;
+		first.after( second );
+		const frame = getLayoutFrame( first.parentElement );
+		const firstRect = getLayoutRect( first, frame );
+		const secondRect = getLayoutRect( second, frame );
+		const gap = new window.DOMRect(
+			firstRect.left,
+			firstRect.bottom,
+			firstRect.width,
+			secondRect.top - firstRect.bottom
+		);
+		const firstClient = first.getBoundingClientRect();
+		const secondClient = second.getBoundingClientRect();
+		// The pair is symmetric about the gap, so their union centres on it.
+		const gapCenter = {
+			x:
+				( Math.min( firstClient.left, secondClient.left ) +
+					Math.max( firstClient.right, secondClient.right ) ) /
+				2,
+			y: ( firstClient.top + secondClient.bottom ) / 2,
+		};
+		const clientGap = toClientRect( frame, gap );
+
+		expect( round( gap ) ).toEqual( {
+			left: 20,
+			top: 110,
+			width: 200,
+			height: 10,
+		} );
+		expect( clientGap.left + clientGap.width / 2 ).toBeCloseTo(
+			gapCenter.x
+		);
+		expect( clientGap.top + clientGap.height / 2 ).toBeCloseTo(
+			gapCenter.y
+		);
+		expect( round( clientGap ) ).toMatchObject( {
+			width: 200,
+			height: 10,
+		} );
+	} );
+
+	it( 'measures a transformed child two transformed levels deep', () => {
+		const element = createLayoutElement(
+			'rotate: 10deg;',
+			'rotate: -45deg; scale: 0.8;'
+		);
+		const parent = element.parentElement!;
+		const outer = document.createElement( 'div' );
+		outer.style.cssText =
+			'position: absolute; top: 100px; left: 100px; padding: 30px; rotate: 20deg;';
+		outer.setAttribute( 'data-test-parent', '' );
+		parent.style.position = 'static';
+		parent.style.width = 'fit-content';
+		parent.style.display = 'flow-root';
+		parent.replaceWith( outer );
+		outer.appendChild( parent );
+		const frame = getLayoutFrame( parent );
+		const clientRect = element.getBoundingClientRect();
+
+		expect( round( getLayoutRect( element, frame ) ) ).toEqual( {
+			left: 20,
+			top: 10,
+			width: 200,
+			height: 100,
+		} );
+		expect(
+			toLayoutPoint(
+				frame,
+				clientRect.left + clientRect.width / 2,
+				clientRect.top + clientRect.height / 2
+			)
+		).toMatchObject( {
+			x: expect.closeTo( 120 ),
+			y: expect.closeTo( 60 ),
+		} );
+	} );
+
+	it( 'returns client rects when nothing is transformed', () => {
+		const element = createLayoutElement( '' );
+		const frame = getLayoutFrame( element.parentElement );
+		const rect = element.getBoundingClientRect();
+
+		expect( frame.isIdentity ).toBe( true );
+		expect( toLayoutPoint( frame, 5, 7 ) ).toMatchObject( {
+			x: 5,
+			y: 7,
+		} );
+		expect( toClientRect( frame, rect ) ).toBe( rect );
 	} );
 } );

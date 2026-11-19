@@ -6,7 +6,7 @@ import { store as blockEditorStore } from '../../store';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 import { unlock } from '../../lock-unlock';
-import { getLayoutRect } from '../../utils/dom';
+import { getLayoutFrame, getLayoutRect, toLayoutPoint } from '../../utils/dom';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
@@ -94,8 +94,14 @@ export function useInBetweenInserter() {
 					blockListSettings?.orientation || 'vertical';
 				const captureToolbars =
 					!! blockListSettings?.__experimentalCaptureToolbars;
-				const offsetTop = event.clientY;
-				const offsetLeft = event.clientX;
+				// Measure in the layout of a transformed container, so the
+				// gaps between its children line up with the pointer.
+				const frame = getLayoutFrame( target );
+				const { x: offsetLeft, y: offsetTop } = toLayoutPoint(
+					frame,
+					event.clientX,
+					event.clientY
+				);
 
 				// Use block refs, not the container's DOM children: a block
 				// can render its block props on an inner element.
@@ -107,7 +113,7 @@ export function useInBetweenInserter() {
 							return false;
 						}
 
-						const blockElRect = getLayoutRect( blockEl );
+						const blockElRect = getLayoutRect( blockEl, frame );
 
 						if ( orientation === 'vertical' ) {
 							return blockElRect.top > offsetTop;
@@ -163,11 +169,11 @@ export function useInBetweenInserter() {
 				// Don't show the insertion point when the pointer sits beside
 				// the block rather than before it.
 				if ( orientation === 'vertical' ) {
-					const elementRect = getLayoutRect( element );
+					const elementRect = getLayoutRect( element, frame );
 
 					if (
-						event.clientX > elementRect.right ||
-						event.clientX < elementRect.left
+						offsetLeft > elementRect.right ||
+						offsetLeft < elementRect.left
 					) {
 						hideInsertionPoint();
 						return;
