@@ -38,6 +38,38 @@ export const VIEWPORT_STATE_BY_DEVICE_TYPE = {
 };
 
 /**
+ * Gets the device types the device preview offers, in the order they're listed.
+ * Tablet and Mobile are only offered when their viewport breakpoint is set.
+ *
+ * @param {Object} viewportSettings Optional viewport breakpoint settings.
+ * @return {string[]} The available device types.
+ */
+export function getAvailableDeviceTypes( viewportSettings ) {
+	const breakpoints = getViewportBreakpoints( viewportSettings );
+
+	return [
+		DESKTOP_DEVICE_TYPE,
+		...( breakpoints.tablet !== undefined ? [ TABLET_DEVICE_TYPE ] : [] ),
+		...( breakpoints.mobile !== undefined ? [ MOBILE_DEVICE_TYPE ] : [] ),
+	];
+}
+
+/**
+ * Gets the device type that follows the given one in the device preview,
+ * wrapping around from the last to the first.
+ *
+ * @param {string} deviceType       The current device type.
+ * @param {Object} viewportSettings Optional viewport breakpoint settings.
+ * @return {string} The next device type.
+ */
+export function getNextDeviceType( deviceType, viewportSettings ) {
+	const deviceTypes = getAvailableDeviceTypes( viewportSettings );
+	const index = deviceTypes.indexOf( deviceType );
+
+	return deviceTypes[ ( index + 1 ) % deviceTypes.length ];
+}
+
+/**
  * Gets the most appropriate device type based on the canvas width.
  *
  * @param {number|string|undefined} canvasWidth      The canvas width.

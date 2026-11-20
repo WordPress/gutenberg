@@ -97,6 +97,18 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/cycle-device-type',
+			category: 'global',
+			description: __(
+				'Switch between Desktop, Tablet, and Mobile views.'
+			),
+			keyCombination: {
+				modifier: 'access',
+				character: 'v',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/keyboard-shortcuts',
 			category: 'main',
 			description: __( 'Display these keyboard shortcuts.' ),
