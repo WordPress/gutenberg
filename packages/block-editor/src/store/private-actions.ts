@@ -7,6 +7,7 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
+import { doBlocksMatchTemplateWithSettings } from './templates';
 import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
@@ -24,6 +25,32 @@ const { isContentBlock } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
+
+/**
+ * Rechecks root template validity after rendered inner block settings resolve.
+ * Unlike an explicit validation request, this preserves the user's decision to
+ * keep content which does not match the root template.
+ */
+export const validateTemplate =
+	() =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const template = select.getTemplate();
+		const isValid =
+			! template ||
+			select.getTemplateLock() !== 'all' ||
+			doBlocksMatchTemplateWithSettings(
+				select.getBlocks(),
+				template,
+				select
+			);
+
+		if ( isValid !== select.isValidTemplate() ) {
+			dispatch( {
+				type: 'VALIDATE_TEMPLATE',
+				isValid,
+			} );
+		}
+	};
 
 /**
  * A list of private/experimental block editor settings that

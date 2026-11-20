@@ -3984,7 +3984,11 @@ describe( 'state', () => {
 				isValid: true,
 			} );
 
-			expect( state ).toEqual( { isValid: true, template: [] } );
+			expect( state ).toEqual( {
+				isValid: true,
+				template: [],
+				isValidationIgnored: true,
+			} );
 		} );
 	} );
 
