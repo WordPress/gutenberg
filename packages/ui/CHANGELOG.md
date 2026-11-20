@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Ship `wp-ui`, `wp-ui-migration` and `wp-ui-setup` agent skills with the package, for agents building with the components, migrating from `@wordpress/components` and setting up a project ([#86737](https://github.com/WordPress/gutenberg/pull/86737)).
+
 ### Enhancements
 
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
