@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `wpPlugin.externals` to read individual packages from a classic script's global instead of bundling them, in both scripts and script modules ([#86985](https://github.com/WordPress/gutenberg/pull/86985)).
+
+### Bug Fixes
+
+-   Load the classic scripts listed in a route's asset files. They were never enqueued, so a route importing one that `@wordpress/boot` doesn't already load, such as `lodash`, failed to render ([#86985](https://github.com/WordPress/gutenberg/pull/86985)).
+
 ## 0.28.0 (2026-11-18)
 
 ### Enhancements
