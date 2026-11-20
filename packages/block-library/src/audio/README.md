@@ -6,7 +6,7 @@ Embed a simple audio player.
 - **Name:** `core/audio`
 - **Category:** [media](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-media/)
 - **API Version:** [3](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/)
-- **Block Type:** [Static](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (saved in post content)
+- **Block Type:** [Hybrid](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/) (static save + server enhancements)
 - **Keywords:** `music`, `sound`, `podcast`, `recording`
 
 ## Attributes
@@ -38,10 +38,11 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `padding`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
+  - `interactive`: `true`
 
 ## Block Markup
 
-This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
+This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.
 
 ```html
 <!-- wp:core/audio {"align":"right"} -->

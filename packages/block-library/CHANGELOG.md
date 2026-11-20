@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Audio: Pause the Audio block that is playing when another one starts, so two never play at once ([#86453](https://github.com/WordPress/gutenberg/issues/86453)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
