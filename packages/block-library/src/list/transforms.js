@@ -15,6 +15,7 @@ function getListContentSchema( { phrasingContentSchema } ) {
 	[ 'ul', 'ol' ].forEach( ( tag ) => {
 		listContentSchema[ tag ].children = {
 			li: {
+				attributes: [ 'value' ],
 				children: listContentSchema,
 			},
 		};

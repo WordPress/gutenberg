@@ -1,0 +1,30 @@
+[
+	{
+		"name": "core/list",
+		"isValid": true,
+		"attributes": {
+			"ordered": true,
+			"values": ""
+		},
+		"innerBlocks": [
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Five",
+					"value": "5"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/list-item",
+				"isValid": true,
+				"attributes": {
+					"content": "Eight",
+					"value": "8"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
