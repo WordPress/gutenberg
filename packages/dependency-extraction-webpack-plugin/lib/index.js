@@ -56,6 +56,48 @@ class DependencyExtractionWebpackPlugin {
 	}
 
 	/**
+	 * Map a request to the external that the plugin externalizes it to.
+	 *
+	 * @param {string} request Requested module.
+	 * @return {string|string[]|undefined} The external, or `undefined` when the
+	 *   plugin does not externalize the request.
+	 * @throws {Error} When the request can't be used, like a WordPress script in a script module.
+	 */
+	mapRequestToExternal( request ) {
+		let externalRequest;
+
+		// Handle via options.requestToExternal(Module)  first.
+		if ( this.useModules ) {
+			if ( typeof this.options.requestToExternalModule === 'function' ) {
+				externalRequest =
+					this.options.requestToExternalModule( request );
+
+				// requestToExternalModule allows a boolean shorthand
+				if ( externalRequest === false ) {
+					externalRequest = undefined;
+				}
+				if ( externalRequest === true ) {
+					externalRequest = request;
+				}
+			}
+		} else if ( typeof this.options.requestToExternal === 'function' ) {
+			externalRequest = this.options.requestToExternal( request );
+		}
+
+		// Cascade to default if unhandled and enabled.
+		if (
+			typeof externalRequest === 'undefined' &&
+			this.options.useDefaults
+		) {
+			externalRequest = this.useModules
+				? defaultRequestToExternalModule( request )
+				: defaultRequestToExternal( request );
+		}
+
+		return externalRequest;
+	}
+
+	/**
 	 * @param {webpack.ExternalItemFunctionData}                             data
 	 * @param { ( err?: null | Error, result?: string | string[] ) => void } callback
 	 */
@@ -63,35 +105,7 @@ class DependencyExtractionWebpackPlugin {
 		let externalRequest;
 
 		try {
-			// Handle via options.requestToExternal(Module)  first.
-			if ( this.useModules ) {
-				if (
-					typeof this.options.requestToExternalModule === 'function'
-				) {
-					externalRequest =
-						this.options.requestToExternalModule( request );
-
-					// requestToExternalModule allows a boolean shorthand
-					if ( externalRequest === false ) {
-						externalRequest = undefined;
-					}
-					if ( externalRequest === true ) {
-						externalRequest = request;
-					}
-				}
-			} else if ( typeof this.options.requestToExternal === 'function' ) {
-				externalRequest = this.options.requestToExternal( request );
-			}
-
-			// Cascade to default if unhandled and enabled.
-			if (
-				typeof externalRequest === 'undefined' &&
-				this.options.useDefaults
-			) {
-				externalRequest = this.useModules
-					? defaultRequestToExternalModule( request )
-					: defaultRequestToExternal( request );
-			}
+			externalRequest = this.mapRequestToExternal( request );
 		} catch ( err ) {
 			return callback( err );
 		}
@@ -103,6 +117,63 @@ class DependencyExtractionWebpackPlugin {
 		}
 
 		return callback();
+	}
+
+	/**
+	 * Keep each `import()` of an externalized request in a module apart from
+	 * the module's static imports of the same request.
+	 *
+	 * Webpack externalizes the dependencies of one module that share a
+	 * resource identifier together, with the kind of the first one, so a
+	 * static import and an `import()` of one request would get one kind.
+	 * Giving the `import()` its own resource identifier makes webpack
+	 * externalize it on its own, with the dynamic kind. The dependency keeps
+	 * that identifier when a rebuild reuses the module from the memory cache.
+	 *
+	 * A `webpackMode: "weak"` `import()` stays with the static imports: on its
+	 * own, it would point to an external that no chunk loads, so it would
+	 * always reject. Grouped, it comes first, so the group, the file's static
+	 * imports of the request included, gets the dynamic kind.
+	 *
+	 * @param {webpack.Module} module Module whose dependencies webpack is about to resolve.
+	 */
+	separateDynamicImports( module ) {
+		const blocks = [ module ];
+		while ( blocks.length ) {
+			const block = blocks.pop();
+			blocks.push( ...block.blocks );
+
+			for ( const dependency of block.dependencies ) {
+				// Webpack types the dependency of an `import()` of a string as
+				// `import()`, or as `import() eager` in eager mode, where the
+				// module holds it instead of an async block.
+				if (
+					! [ 'import()', 'import() eager' ].includes(
+						dependency.type
+					) ||
+					! this.isExternalized( dependency.request )
+				) {
+					continue;
+				}
+
+				const resourceIdentifier = dependency.getResourceIdentifier();
+				dependency.getResourceIdentifier = () =>
+					`${ resourceIdentifier }|import()`;
+			}
+		}
+	}
+
+	/**
+	 * @param {string} request Requested module.
+	 * @return {boolean} Whether the plugin externalizes the request.
+	 */
+	isExternalized( request ) {
+		try {
+			return Boolean( this.mapRequestToExternal( request ) );
+		} catch {
+			// Webpack reports the error when it resolves the request.
+			return false;
+		}
 	}
 
 	/**
@@ -156,10 +227,15 @@ class DependencyExtractionWebpackPlugin {
 
 		/**
 		 * Offload externalization work to the ExternalsPlugin.
+		 *
+		 * Script modules use the `module-import` type, so a static `import`
+		 * declaration of an external stays static and an `import()` of it stays
+		 * dynamic (see `separateDynamicImports` for a file that has both).
+		 *
 		 * @type {webpack.ExternalsPlugin}
 		 */
 		this.externalsPlugin = new webpack.ExternalsPlugin(
-			this.useModules ? 'import' : 'window',
+			this.useModules ? 'module-import' : 'window',
 			this.externalizeWpDeps.bind( this )
 		);
 
@@ -168,6 +244,15 @@ class DependencyExtractionWebpackPlugin {
 		compiler.hooks.thisCompilation.tap(
 			this.constructor.name,
 			( compilation ) => {
+				if ( this.useModules ) {
+					// Runs after webpack parses a module and before it resolves
+					// the module's dependencies.
+					compilation.hooks.succeedModule.tap(
+						this.constructor.name,
+						( module ) => this.separateDynamicImports( module )
+					);
+				}
+
 				compilation.hooks.processAssets.tap(
 					{
 						name: this.constructor.name,
@@ -337,13 +422,6 @@ class DependencyExtractionWebpackPlugin {
 				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
 					if ( this.useModules ) {
-						// A static occurrence (in the entry chunk) wins.
-						if (
-							fromAsyncChunk &&
-							chunkStaticDeps.has( m.request )
-						) {
-							return;
-						}
 						// Externals in an async chunk are reached via a dynamic
 						// import by definition.
 						const isStatic =
@@ -466,6 +544,8 @@ class DependencyExtractionWebpackPlugin {
 					// Sort these so we can produce a stable, stringified representation.
 					...Array.from( chunkStaticDeps ).sort(),
 					...Array.from( chunkDynamicDeps )
+						// A static occurrence of a script module wins.
+						.filter( ( id ) => ! chunkStaticDeps.has( id ) )
 						.sort()
 						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
 				],
