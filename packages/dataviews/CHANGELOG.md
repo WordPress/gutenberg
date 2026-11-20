@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Fade the edges of a table layout, including the lines between rows, into each row's background while there are more columns to scroll to on that side, including tables without actions. The divider before the sticky actions column is now shown with CSS, and the `dataviews-view-table__actions-column--stuck` and `dataviews-view-table__actions-column--sticky` classes are removed: target `dataviews-view-table__actions-column` instead ([#86829](https://github.com/WordPress/gutenberg/pull/86829)).
+
+### Bug Fixes
+
+-   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+
+## 22.1.0 (2026-11-18)
+
+### Enhancements
+
+-   DataForm: Don't show the missing-value message when focus leaves an empty required field, except in date fields ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
+-   DataForm: Tighten the line height of field values in the `panel` layout to 16px, so values that wrap take less room ([#86389](https://github.com/WordPress/gutenberg/pull/86389)).
+
+### Bug Fixes
+
+-   DataForm: Include validation errors in the accessible description of the `array` and `toggleGroup` controls, so screen readers announce them on the control users focus ([#86254](https://github.com/WordPress/gutenberg/pull/86254)).
+-   DataForm: Hide the validation inputs of the `array` and `toggleGroup` controls from assistive technology, so screen readers no longer stop on an unlabeled field next to the control ([#86255](https://github.com/WordPress/gutenberg/pull/86255)).
+-   DataForm: Stop clipping the focus ring of a link or button shown as a field value in the `panel` layout ([#86361](https://github.com/WordPress/gutenberg/pull/86361)).
+-   Let a filter popover grow to fit a field's custom control, instead of overflowing ([#86065](https://github.com/WordPress/gutenberg/pull/86065)).
+
+### Internal
+
+-   Update the `@ariakit/react` dependency to 0.4.43 ([#86887](https://github.com/WordPress/gutenberg/pull/86887)).
+-   Update the `@daypicker/react` dependency to 10.0.2 ([#86886](https://github.com/WordPress/gutenberg/pull/86886)).
+-   Update the Storybook development dependencies to 10.6.6 ([#86507](https://github.com/WordPress/gutenberg/pull/86507)).
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 22.0.0 (2026-11-04)
+
 ### Breaking Changes
 
 -   Action labels should omit ellipses. Menu items for actions with `RenderModal` now add a translated ellipsis. Common trailing ellipses in existing labels remain supported as a best-effort fallback ([#85396](https://github.com/WordPress/gutenberg/pull/85396)).
@@ -18,6 +49,8 @@
 -   Use the design system outline for keyboard focus on grid cards ([#85364](https://github.com/WordPress/gutenberg/pull/85364)).
 -   Simplify filter selection indicators and remove their hover colors ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
 -   Use design system focus ring for filter chips & prevent text from touching remove button ([#85374](https://github.com/WordPress/gutenberg/pull/85374)).
+-   DataForm: Mute the placeholder that the `panel` layout shows for an empty value, so it no longer looks like a value ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
+-   DataForm: The `showPlaceholderIfEmpty` option of the `panel` layout also shows the placeholder when the field's `render` output is empty, like for an id matching no record ([#85842](https://github.com/WordPress/gutenberg/pull/85842)).
 
 ### Bug Fixes
 

@@ -1,6 +1,8 @@
 import { Canvas, Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as CopyFromFieldStories from './copy-from-field.story';
 import * as CopyFromMenuStories from './copy-from-menu.story';
 import * as CopyToClipboardStories from './copy-to-clipboard.story';
+import CopyFromFieldSource from './copy-from-field.tsx?raw';
 import CopyToClipboardSource from './copy-to-clipboard.tsx?raw';
 import CopyFromMenuSource from './copy-from-menu.tsx?raw';
 
@@ -25,7 +27,18 @@ For an icon-only control, use `IconButton` with the same variant, tone, and size
 
 Copying is a one-time action. `aria-pressed` describes a toggle that stays on or off, so this button does not use it.
 
-Restart the feedback timeout after each copy result, including repeated successes or failures, so the icon remains visible for the full duration after the latest attempt completes.
+Restart the two-second feedback timeout after each copy result, including repeated successes or failures, so the icon remains visible for the full two seconds after the latest attempt completes.
+
+## Text field
+
+When the value is in a text field, put the copy action in the field's suffix so it stays with the value. Don't use a snackbar here: the button is still visible.
+
+<Canvas
+	of={ CopyFromFieldStories.CopyFromField }
+	source={ { code: CopyFromFieldSource, language: 'tsx', type: 'code' } }
+/>
+
+Copy the field's current value, so an edit is what gets copied. Use `readOnly: true` to disallow editing the field. A read-only input with a copy suffix might indicate that the design needs inline text and a copy button instead of an input. Use `IconButton` and keep `label="Copy"`. That label is the accessible name and the tooltip. A check icon shows success, and an error icon shows failure. Call `speak()` with "Copied to clipboard", or "Couldn't copy to clipboard." if copying fails.
 
 ## Copying from a menu
 
@@ -48,10 +61,12 @@ The local `SnackbarList` and its positioning styles keep this preview self-conta
 | Context | Recommended feedback | Rationale |
 | --- | --- | --- |
 | Standalone copy button | Temporary check or error icon; the label stays "Copy" | The control remains visible. The name stays the action, and the icon shows success or failure. |
+| Text field suffix | Temporary check or error icon on the suffix button; the accessible name stays "Copy" | The button remains visible beside the value. Copy the field's current value. |
 | Copy action in a menu | The screen's existing snackbar region | The confirmation remains visible after the menu closes; assess its placement and timing. |
 ` }</Markdown>
 
 - **Keep standalone feedback on the button.** A snackbar isn't needed when the button can show the result.
+- **Keep field feedback on the suffix button.** The button stays visible beside the value, so it shows the result. Copy the field's current value.
 - **Keep menu feedback visible after closing.** Use the screen's existing snackbar region and assess its placement and timing.
 - **Always announce the outcome accessibly.** Visual feedback alone isn't sufficient.
 - **Avoid redundant feedback.** Don't show both inline confirmation and a snackbar for the same action unless there's a compelling reason.

@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 2.2.0 (2026-11-18)
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
+## 2.1.0 (2026-11-04)
+
 ### Internal
 
 -   Update the Vitest development dependency to 5.0.5 ([#86173](https://github.com/WordPress/gutenberg/pull/86173)).

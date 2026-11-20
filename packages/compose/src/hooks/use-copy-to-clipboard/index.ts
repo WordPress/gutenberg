@@ -93,6 +93,10 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 		// Tracks whether the node is still mounted when the Promise resolves.
 		let isActive = true;
 		const handleClick = async () => {
+			// Honor `aria-disabled`, which doesn't block native clicks like `disabled` does.
+			if ( node.getAttribute( 'aria-disabled' ) === 'true' ) {
+				return;
+			}
 			const textToCopy =
 				typeof textRef.current === 'function'
 					? textRef.current()

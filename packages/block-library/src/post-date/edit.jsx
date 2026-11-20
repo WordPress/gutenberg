@@ -100,7 +100,12 @@ export default function PostDateEdit( props ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
-	const validDatetime = datetime || new Date();
+	// The `datetime` attribute is not always a valid date. For example, when it
+	// is bound to the post date and there is no post to read it from, as when
+	// editing a template, the binding source returns the field's label instead.
+	// Fall back to the current date in that case, so as not to display
+	// "Invalid date".
+	const validDatetime = isValidDatetime( datetime ) ? datetime : new Date();
 	let postDate = (
 		<time
 			dateTime={ dateI18n( 'c', validDatetime ) }
@@ -286,6 +291,16 @@ export function getInitialAttributes(
 	}
 
 	return { datetime: new Date() };
+}
+
+/**
+ * Checks whether a value can be parsed as a valid date.
+ *
+ * @param {Date|string|undefined} datetime The value to check.
+ * @return {boolean} Whether the value is a valid date.
+ */
+export function isValidDatetime( datetime ) {
+	return !! datetime && ! Number.isNaN( new Date( datetime ).getTime() );
 }
 
 export function is12HourFormat( format ) {

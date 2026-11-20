@@ -1,34 +1,3 @@
-export const CUSTOM_VALUE_SETTINGS = {
-	px: { max: 20, step: 1 },
-	'%': { max: 100, step: 1 },
-	vw: { max: 100, step: 1 },
-	vh: { max: 100, step: 1 },
-	em: { max: 10, step: 0.1 },
-	rm: { max: 10, step: 0.1 },
-	svw: { max: 100, step: 1 },
-	lvw: { max: 100, step: 1 },
-	dvw: { max: 100, step: 1 },
-	svh: { max: 100, step: 1 },
-	lvh: { max: 100, step: 1 },
-	dvh: { max: 100, step: 1 },
-	vi: { max: 100, step: 1 },
-	svi: { max: 100, step: 1 },
-	lvi: { max: 100, step: 1 },
-	dvi: { max: 100, step: 1 },
-	vb: { max: 100, step: 1 },
-	svb: { max: 100, step: 1 },
-	lvb: { max: 100, step: 1 },
-	dvb: { max: 100, step: 1 },
-	vmin: { max: 100, step: 1 },
-	svmin: { max: 100, step: 1 },
-	lvmin: { max: 100, step: 1 },
-	dvmin: { max: 100, step: 1 },
-	vmax: { max: 100, step: 1 },
-	svmax: { max: 100, step: 1 },
-	lvmax: { max: 100, step: 1 },
-	dvmax: { max: 100, step: 1 },
-};
-
 export interface ShadowObject {
 	x: string;
 	y: string;
