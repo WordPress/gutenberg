@@ -29,7 +29,7 @@ status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
 
 status "Building block..."
-../node_modules/.bin/wp-scripts build
+../node_modules/.bin/cross-env NODE_OPTIONS=--openssl-legacy-provider ../node_modules/.bin/wp-scripts build
 
 status "Lintig CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
