@@ -7,7 +7,7 @@ import { parseSync, Visitor } from 'rolldown/utils';
  *
  * A `--no-script-debug` build ships only the minified `*.min.js` files, which
  * `wp i18n make-pot` skips. This plugin collects every i18n call of the
- * modules that end up in a bundle, with its translator comment, from the
+ * modules that end up in a bundle, with its translator comments, from the
  * original sources, and writes them next to the bundle as a small stub at the
  * unminified path (`index.min.js` -> `index.js`). `make-pot` then extracts the
  * strings with references to the unminified path, which is the path that
@@ -16,81 +16,162 @@ import { parseSync, Visitor } from 'rolldown/utils';
  */
 
 /**
- * Argument layout of the i18n functions: which arguments are translatable
- * strings that must be literals, and where the text domain is.
+ * The i18n functions, with how many arguments `make-pot` reads and the
+ * position of the number argument, which it ignores.
  */
 const I18N_FUNCTIONS = {
-	__: { strings: [ 0 ], domain: 1 },
-	_x: { strings: [ 0, 1 ], domain: 2 },
-	_n: { strings: [ 0, 1 ], number: 2, domain: 3 },
-	_nx: { strings: [ 0, 1, 3 ], number: 2, domain: 4 },
+	__: { length: 2 },
+	_x: { length: 3 },
+	_n: { length: 4, number: 2 },
+	_nx: { length: 5, number: 2 },
 };
 
-const I18N_CALL_HINT = /\b_(?:_|x|n|nx)\b/;
-const TRANSLATORS_COMMENT = /^[\s*]*translators:/i;
+const I18N_CALL_HINT = /(?<![\w$])(?:__|_x|_n|_nx)(?![\w$])/;
+// The comment prefixes of `make-pot` (`JsCodeExtractor::$options`).
+const TRANSLATOR_COMMENT_PREFIXES = [ 'translators', 'Translators' ];
 
-/** @type {Map<string, Array<{ fn: string, args: Array<string|null>, comment?: string }>>} */
+/**
+ * @typedef {Object} I18nCall
+ * @property {string}             fn       Function name.
+ * @property {Array<string|null>} args     Arguments: strings, or null for the
+ *                                         number argument of `_n()`/`_nx()`.
+ * @property {string[]}           comments Normalized translator comments.
+ */
+
+/** @typedef {import('rolldown/utils').ESTree.CallExpression} CallExpression */
+/** @typedef {import('rolldown/utils').ESTree.Argument} Argument */
+/** @typedef {import('rolldown/utils').ESTree.Span} Span */
+/** @typedef {import('rolldown/utils').ParseResult['comments'][number]} Comment */
+/** @typedef {keyof typeof I18N_FUNCTIONS} I18nFunctionName */
+
+/** @type {Map<string, I18nCall[]>} */
 const extractionCache = new Map();
 
 /**
- * Get the name of the called function for `__()`, `i18n.__()`, `( 0, i18n.__ )()`.
+ * Resolve the name of the called function, as `make-pot` does
+ * (`JsFunctionsScanner::resolveExpressionCallee()`): `__()`, `i18n.__()`,
+ * `Object( i18n.__ )()` and `( 0, i18n.__ )()`.
  *
- * @param {Object} callee Callee node.
+ * @param {CallExpression} node Call expression node.
  * @return {string|undefined} Function name.
  */
-function getCalleeName( callee ) {
-	while ( callee ) {
-		switch ( callee.type ) {
-			case 'Identifier':
-				return callee.name;
-			case 'MemberExpression':
-				return callee.computed ? undefined : callee.property.name;
-			case 'ParenthesizedExpression':
-			case 'TSAsExpression':
-			case 'TSNonNullExpression':
-				callee = callee.expression;
-				break;
-			case 'SequenceExpression':
-				callee = callee.expressions.at( -1 );
-				break;
-			default:
-				return undefined;
+function resolveCalleeName( node ) {
+	const { callee } = node;
+	if ( callee.type === 'Identifier' ) {
+		return callee.name;
+	}
+	if (
+		callee.type === 'MemberExpression' &&
+		callee.property.type === 'Identifier'
+	) {
+		return callee.property.name;
+	}
+	if (
+		callee.type === 'CallExpression' &&
+		callee.callee.type === 'Identifier' &&
+		callee.callee.name === 'Object'
+	) {
+		const object = callee.arguments[ 0 ];
+		if ( object?.type === 'MemberExpression' ) {
+			const { property } = object;
+			if ( property.type === 'Identifier' ) {
+				return property.name;
+			}
+			if ( property.type === 'Literal' ) {
+				return String( property.value );
+			}
+		}
+	}
+	if (
+		callee.type === 'ParenthesizedExpression' &&
+		callee.expression.type === 'SequenceExpression' &&
+		callee.expression.expressions.length === 2 &&
+		callee.expression.expressions[ 0 ].type === 'Literal' &&
+		node.arguments.length > 0
+	) {
+		const target = callee.expression.expressions[ 1 ];
+		if ( target.type === 'Identifier' ) {
+			return target.name;
+		}
+		if (
+			target.type === 'MemberExpression' &&
+			target.property.type === 'Identifier'
+		) {
+			return target.property.name;
 		}
 	}
 	return undefined;
 }
 
 /**
- * Get the value of a string argument, if it is static.
+ * Read the arguments of an i18n call the way `make-pot` does: string literals
+ * and template literals without expressions keep their value, identifiers and
+ * other expressions count as an empty string, and any other argument (such as
+ * a spread element or a JSX element) makes `make-pot` skip the call.
  *
- * @param {Object} node Argument node.
- * @return {string|null} String value, or null when it is not static.
+ * @param {Argument[]} nodes Argument nodes.
+ * @return {Array<string|null>|null} Argument values (null for literals that
+ *                                   are not strings), or null to skip the call.
  */
-function getStaticString( node ) {
-	if ( ! node ) {
-		return null;
-	}
-	switch ( node.type ) {
-		case 'Literal':
-			return typeof node.value === 'string' ? node.value : null;
-		case 'TemplateLiteral':
-			return node.expressions.length === 0
-				? node.quasis.map( ( quasi ) => quasi.value.cooked ).join( '' )
-				: null;
-		case 'BinaryExpression': {
-			if ( node.operator !== '+' ) {
-				return null;
-			}
-			const left = getStaticString( node.left );
-			const right = getStaticString( node.right );
-			return left === null || right === null ? null : left + right;
-		}
-		case 'ParenthesizedExpression':
-		case 'TSAsExpression':
-			return getStaticString( node.expression );
-		default:
+function readArguments( nodes ) {
+	/** @type {Array<string|null>} */
+	const values = [];
+	for ( const node of nodes ) {
+		if ( node.type === 'Literal' ) {
+			values.push( typeof node.value === 'string' ? node.value : null );
+		} else if (
+			node.type === 'TemplateLiteral' &&
+			node.expressions.length === 0
+		) {
+			values.push( node.quasis[ 0 ].value.cooked ?? '' );
+		} else if (
+			node.type === 'Identifier' ||
+			node.type.endsWith( 'Expression' )
+		) {
+			values.push( '' );
+		} else {
 			return null;
+		}
 	}
+	return values;
+}
+
+/**
+ * Normalize a comment the way `make-pot` does (`Gettext\Utils\ParsedComment`):
+ * strip `#`, `*`, `/` and whitespace from both ends of each line, drop empty
+ * lines, and join the rest with spaces.
+ *
+ * @param {string} rawText Comment, with its delimiters.
+ * @return {string} Normalized comment.
+ */
+export function normalizeComment( rawText ) {
+	return rawText
+		.split( '\n' )
+		.map( ( line ) =>
+			line
+				.replace( /^[#*/ \t]+/, '' )
+				.replace( /[#*/ \t]+$/, '' )
+				.trim()
+		)
+		.filter( Boolean )
+		.join( ' ' );
+}
+
+/**
+ * Get the parser language for a file. JavaScript is parsed with JSX enabled,
+ * as `make-pot` does, since `.js` files often contain JSX.
+ *
+ * @param {string} filename File name.
+ * @return {'js'|'jsx'|'ts'|'tsx'} Parser language.
+ */
+function getParserLanguage( filename ) {
+	if ( /\.[cm]?ts$/.test( filename ) ) {
+		return 'ts';
+	}
+	if ( filename.endsWith( '.tsx' ) ) {
+		return 'tsx';
+	}
+	return 'jsx';
 }
 
 /**
@@ -136,54 +217,89 @@ function getOriginalSource( id, code ) {
 /**
  * Extract the i18n calls of a source file with their translator comments.
  *
- * A translator comment belongs to the first i18n call that follows it within
- * a few lines, which matches how translator comments are written in practice
- * (directly above the call, or above the statement that contains it).
+ * Mirrors how `make-pot` (`JsFunctionsScanner`) attaches comments, so that a
+ * stub carries the comments `make-pot` would have found in the original
+ * source. While walking the AST, `make-pot` collects the comments in front of
+ * each node, plus those in front of the arguments of an i18n call. At each
+ * i18n call, it takes the collected comments that end on the line of the call
+ * or the line before (and, on the same line, start before the call), and
+ * attaches those that start with `translators` or `Translators` and were not
+ * attached to an earlier call.
  *
  * @param {string} filename File name, which determines the parser language.
  * @param {string} code     Source code.
- * @return {Array<{ fn: string, args: Array<string|null>, comment?: string }>} Calls.
+ * @return {I18nCall[]} Calls, in source order.
  */
 export function extractI18nCalls( filename, code ) {
 	if ( ! I18N_CALL_HINT.test( code ) ) {
 		return [];
 	}
 
-	const { program, comments, errors } = parseSync( filename, code );
-	if ( errors.some( ( error ) => error.severity === 'Error' ) && ! program ) {
-		return [];
+	const {
+		program,
+		comments: allComments,
+		errors,
+	} = parseSync( filename, code, { lang: getParserLanguage( filename ) } );
+	const error = errors.find( ( { severity } ) => severity === 'Error' );
+	if ( error ) {
+		throw new Error(
+			`Could not parse ${ filename } for translation stubs: ${ error.message }`
+		);
 	}
 
+	/** @type {Array<I18nCall & { node: CallExpression }>} */
 	const calls = [];
+	/** @type {Span[]} */
+	const emptyJsxExpressions = [];
 	new Visitor( {
+		JSXEmptyExpression( node ) {
+			emptyJsxExpressions.push( node );
+		},
 		CallExpression( node ) {
-			const fn = getCalleeName( node.callee );
-			const layout =
-				Object.hasOwn( I18N_FUNCTIONS, fn ) && I18N_FUNCTIONS[ fn ];
-			if ( ! layout ) {
+			const fn = resolveCalleeName( node );
+			if (
+				! fn ||
+				! Object.prototype.hasOwnProperty.call( I18N_FUNCTIONS, fn )
+			) {
 				return;
 			}
-			const args = [];
-			for ( const index of layout.strings ) {
-				const value = getStaticString( node.arguments[ index ] );
-				if ( value === null ) {
-					// Not extractable by make-pot either.
-					return;
-				}
-				args[ index ] = value;
+			const values = readArguments( node.arguments );
+			// `make-pot` needs a non-empty string as the first argument.
+			if ( ! values || ! values[ 0 ] ) {
+				return;
 			}
-			if ( layout.number !== undefined ) {
-				args[ layout.number ] = null;
-			}
-			const domain = getStaticString( node.arguments[ layout.domain ] );
-			if ( domain !== null ) {
-				args[ layout.domain ] = domain;
-			}
-			calls.push( { fn, args, start: node.start } );
+			/** @type {{ length: number, number?: number }} */
+			const layout =
+				I18N_FUNCTIONS[ /** @type {I18nFunctionName} */ ( fn ) ];
+			const { length, number } = layout;
+			const args = values
+				.slice( 0, length )
+				.map( ( value, index ) =>
+					index === number ? null : ( value ?? '' )
+				);
+			calls.push( { fn, args, node, comments: [] } );
 		},
 	} ).visit( program );
 
-	calls.sort( ( a, b ) => a.start - b.start );
+	if ( ! calls.length ) {
+		return [];
+	}
+
+	/*
+	 * `make-pot` never sees a comment that is alone in a JSX expression
+	 * container, like `{ /* translators: … *\/ }`, as it is not in front of
+	 * any node.
+	 */
+	const comments = allComments.filter(
+		( comment ) =>
+			! emptyJsxExpressions.some(
+				( node ) =>
+					comment.start >= node.start && comment.end <= node.end
+			)
+	);
+
+	// Parents before children, then source order, like `make-pot`'s traverser.
+	calls.sort( ( a, b ) => a.node.start - b.node.start );
 
 	const lineStarts = [ 0 ];
 	for ( let i = 0; i < code.length; i++ ) {
@@ -191,6 +307,7 @@ export function extractI18nCalls( filename, code ) {
 			lineStarts.push( i + 1 );
 		}
 	}
+	/** @param {number} offset Offset in the code. */
 	const lineAt = ( offset ) => {
 		let low = 0;
 		let high = lineStarts.length - 1;
@@ -205,39 +322,88 @@ export function extractI18nCalls( filename, code ) {
 		return low + 1;
 	};
 
-	let callIndex = 0;
-	for ( const comment of comments ) {
-		if ( ! TRANSLATORS_COMMENT.test( comment.value ) ) {
-			continue;
+	/*
+	 * Comments in front of the arguments of a call: those between the end of
+	 * the callee (or of the previous argument) and the start of an argument.
+	 */
+	/** @param {CallExpression} node Call expression node. */
+	const getArgumentComments = ( node ) => {
+		/** @type {Comment[]} */
+		const result = [];
+		let from = node.callee.end;
+		for ( const argument of node.arguments ) {
+			for ( const comment of comments ) {
+				if ( comment.start >= from && comment.end <= argument.start ) {
+					result.push( comment );
+				}
+			}
+			from = argument.end;
 		}
-		while (
-			callIndex < calls.length &&
-			calls[ callIndex ].start < comment.end
-		) {
-			callIndex++;
+		return result;
+	};
+
+	const used = new Set();
+	/** @type {Comment[]} */
+	let collected = [];
+	let next = 0;
+	for ( const call of calls ) {
+		const callStart = call.node.start;
+		const callLine = lineAt( callStart );
+		while ( next < comments.length && comments[ next ].end <= callStart ) {
+			collected.push( comments[ next++ ] );
 		}
-		const call = calls[ callIndex ];
-		if (
-			call &&
-			call.comment === undefined &&
-			lineAt( call.start ) - lineAt( comment.end ) <= 3
-		) {
-			call.comment = comment.value.trim();
+		/*
+		 * Only comments that end on the line of the call or the line before
+		 * count. Comments in front of arguments are never above the call.
+		 */
+		collected = collected.filter(
+			( comment ) => lineAt( comment.end ) >= callLine - 1
+		);
+		for ( const comment of [
+			...collected,
+			...getArgumentComments( call.node ),
+		] ) {
+			// On the line of the call, the comment must start before it.
+			if (
+				( lineAt( comment.end ) === callLine &&
+					callStart < comment.start ) ||
+				used.has( comment )
+			) {
+				continue;
+			}
+			const text = normalizeComment(
+				code.slice( comment.start, comment.end )
+			);
+			if (
+				TRANSLATOR_COMMENT_PREFIXES.some( ( prefix ) =>
+					text.startsWith( prefix )
+				)
+			) {
+				call.comments.push( text );
+				used.add( comment );
+			}
 		}
 	}
 
-	return calls.map( ( { fn, args, comment } ) => ( { fn, args, comment } ) );
+	return calls.map( ( { fn, args, comments: callComments } ) => ( {
+		fn,
+		args,
+		comments: callComments,
+	} ) );
 }
 
 /**
  * Render a stub file.
  *
- * @param {string} stubName   File name of the stub.
- * @param {string} bundleName File name of the real bundle.
- * @param {Array}  calls      i18n calls.
+ * Each call goes on its own line, with its translator comments on the line
+ * before, where `make-pot` looks for them.
+ *
+ * @param {string}     stubName   File name of the stub.
+ * @param {string}     bundleName File name of the real bundle.
+ * @param {I18nCall[]} calls      i18n calls.
  * @return {string} Stub source.
  */
-function renderStub( stubName, bundleName, calls ) {
+export function renderStub( stubName, bundleName, calls ) {
 	const lines = [
 		'/*',
 		` * Translation stub generated by @wordpress/build for ${ bundleName }.`,
@@ -249,16 +415,18 @@ function renderStub( stubName, bundleName, calls ) {
 		) } );`,
 	];
 	const seen = new Set();
-	for ( const { fn, args, comment } of calls ) {
-		const renderedArgs = [];
-		for ( const arg of args ) {
-			// The number argument of `_n()` and `_nx()` is not extracted.
-			renderedArgs.push( arg === null ? '0' : JSON.stringify( arg ) );
+	for ( const { fn, args, comments } of calls ) {
+		// The number argument of `_n()` and `_nx()` is not extracted.
+		const renderedArgs = args.map( ( arg ) =>
+			arg === null ? '0' : JSON.stringify( arg )
+		);
+		let entry = `${ fn }(${ renderedArgs.join( ',' ) });`;
+		if ( comments.length ) {
+			const renderedComments = comments.map(
+				( comment ) => `/* ${ comment.replaceAll( '*/', '*\\/' ) } */`
+			);
+			entry = `${ renderedComments.join( ' ' ) }\n${ entry }`;
 		}
-		const statement = `${ fn }(${ renderedArgs.join( ',' ) });`;
-		const entry = comment
-			? `/* ${ comment.replace( /\*\//g, '* /' ) } */\n${ statement }`
-			: statement;
 		if ( ! seen.has( entry ) ) {
 			seen.add( entry );
 			lines.push( entry );
@@ -268,12 +436,25 @@ function renderStub( stubName, bundleName, calls ) {
 }
 
 /**
+ * Get the path of the stub for a bundle: `index.min.js` -> `index.js`.
+ *
+ * @param {string} fileName File name of the bundle.
+ * @return {string|null} File name of the stub, or null if the bundle is not
+ *                       minified.
+ */
+export function getStubFileName( fileName ) {
+	return fileName.endsWith( '.min.js' )
+		? fileName.slice( 0, -'.min.js'.length ) + '.js'
+		: null;
+}
+
+/**
  * Rolldown plugin that writes a translation stub next to each bundle.
  *
  * @return {import('rolldown').Plugin} Rolldown plugin.
  */
 export function i18nStubPlugin() {
-	/** @type {Map<string, Array>} */
+	/** @type {Map<string, I18nCall[]>} */
 	const moduleCalls = new Map();
 
 	return {
@@ -287,10 +468,27 @@ export function i18nStubPlugin() {
 				let calls = extractionCache.get( id );
 				if ( ! calls ) {
 					const original = getOriginalSource( id, code );
-					calls = extractI18nCalls(
-						original.filename,
-						original.code
-					);
+					try {
+						calls = extractI18nCalls(
+							original.filename,
+							original.code
+						);
+					} catch ( error ) {
+						if ( original.filename === id ) {
+							throw error;
+						}
+						/*
+						 * The original source could not be parsed: use the
+						 * module itself, which keeps the strings but may
+						 * have lost the translator comments.
+						 */
+						this.warn(
+							error instanceof Error
+								? error.message
+								: String( error )
+						);
+						calls = extractI18nCalls( id, code );
+					}
 					extractionCache.set( id, calls );
 				}
 				if ( calls.length ) {
@@ -304,21 +502,20 @@ export function i18nStubPlugin() {
 				if ( chunk.type !== 'chunk' ) {
 					continue;
 				}
+				const stubName = getStubFileName( chunk.fileName );
+				if ( ! stubName ) {
+					continue;
+				}
+				/** @type {I18nCall[]} */
 				const calls = [];
 				for ( const [ id, info ] of Object.entries( chunk.modules ) ) {
+					const moduleCallList = moduleCalls.get( id );
 					// Skip modules that were tree-shaken out entirely.
-					if ( info.renderedLength > 0 && moduleCalls.has( id ) ) {
-						calls.push( ...moduleCalls.get( id ) );
+					if ( info.renderedLength > 0 && moduleCallList ) {
+						calls.push( ...moduleCallList );
 					}
 				}
 				if ( ! calls.length ) {
-					continue;
-				}
-				const stubName = chunk.fileName.replace(
-					/(?:\.min)?\.js$/,
-					'.js'
-				);
-				if ( stubName === chunk.fileName ) {
 					continue;
 				}
 				this.emitFile( {
