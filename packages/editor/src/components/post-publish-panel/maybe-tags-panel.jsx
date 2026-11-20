@@ -1,6 +1,7 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 import { PanelBody } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import FlatTermSelector from '../post-taxonomies/flat-term-selector';
@@ -23,7 +24,14 @@ const TagsPanel = () => {
 	];
 
 	return (
-		<PanelBody initialOpen={ false } title={ panelBodyTitle }>
+		<PanelBody
+			initialOpen={ applyFilters(
+				'editor.PrePublishPanel.suggestionInitialOpen',
+				false,
+				'tags'
+			) }
+			title={ panelBodyTitle }
+		>
 			<p>
 				{ sprintf(
 					// translators: %s is the taxonomy name (e.g., "Tags").
@@ -75,9 +83,16 @@ const MaybeTagsPanel = () => {
 
 	/**
 	 * We only want to show the tag panel if the post type supports
-	 * tags and the site has tags.
+	 * tags and the site has tags, or a filter shows it anyway.
 	 */
-	if ( ! isPostTypeSupported || ! siteHasTags ) {
+	if (
+		! isPostTypeSupported ||
+		! applyFilters(
+			'editor.PrePublishPanel.showSuggestion',
+			siteHasTags,
+			'tags'
+		)
+	) {
 		return null;
 	}
 
