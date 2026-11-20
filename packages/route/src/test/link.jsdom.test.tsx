@@ -36,6 +36,25 @@ describe( 'Link', () => {
 		).not.toHaveAttribute( 'aria-current' );
 	} );
 
+	it( 'should mark only a link whose query string matches the current URL', async () => {
+		renderAtPath(
+			'/settings/privacy?filter=active',
+			<>
+				<Link to="/settings/privacy">All</Link>
+				<Link to="/settings/privacy" search={ { filter: 'active' } }>
+					Active
+				</Link>
+			</>
+		);
+
+		expect(
+			await screen.findByRole( 'link', { name: 'Active' } )
+		).toHaveAttribute( 'aria-current', 'page' );
+		expect(
+			screen.getByRole( 'link', { name: 'All' } )
+		).not.toHaveAttribute( 'aria-current' );
+	} );
+
 	it( 'should match a parent path when `activeOptions.exact` is false', async () => {
 		renderAtPath(
 			'/settings/general',
