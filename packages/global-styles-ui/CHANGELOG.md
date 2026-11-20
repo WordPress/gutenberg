@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Style variations: switching back to Default no longer keeps the custom CSS (`styles.css`) of the previously selected variation.
+
 ### Enhancements
 
 -   Show the Transform panel on block screens for blocks that support a rotation ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).

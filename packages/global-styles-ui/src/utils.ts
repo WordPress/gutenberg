@@ -394,3 +394,32 @@ export function getOverridingBlockTypes(
 		);
 	} );
 }
+
+/**
+ * Removes the custom CSS that was copied from a theme style variation into
+ * the user's custom CSS when that variation was selected, so that only CSS the
+ * user wrote themselves is left.
+ *
+ * @param css        Custom CSS from the user's styles.
+ * @param variations Theme style variations.
+ * @param blockName  Optional block name, to read block level custom CSS.
+ * @return The user's custom CSS without any theme variation custom CSS.
+ */
+export function removeVariationCss(
+	css: string | undefined,
+	variations: GlobalStylesConfig[],
+	blockName?: string
+): string {
+	let result = css ?? '';
+	for ( const variation of variations ) {
+		const variationCss = (
+			blockName
+				? variation?.styles?.blocks?.[ blockName ]?.css
+				: variation?.styles?.css
+		)?.trim();
+		if ( variationCss ) {
+			result = result.split( variationCss ).join( '' );
+		}
+	}
+	return result.trim();
+}
