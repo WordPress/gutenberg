@@ -429,6 +429,9 @@ test.describe( 'Draggable block', () => {
 			const { dragOver, drop } =
 				await pageUtils.dragFiles( testImagePath );
 
+			const columnsBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Columns',
+			} );
 			const columnAppender = editor.canvas
 				.getByRole( 'document', {
 					name: 'Block: Column',
@@ -438,6 +441,10 @@ test.describe( 'Draggable block', () => {
 					includeHidden: true,
 				} );
 
+			// Enter the visible parent first so the file drag reveals the
+			// inactive empty column's appender before measuring its position.
+			await dragOver( columnsBlock );
+			await expect( columnAppender ).toBeVisible();
 			await dragOver( columnAppender );
 			// Expect to show the drop indicator blue background.
 			// This is technically an implementation detail but easier to test in this case.

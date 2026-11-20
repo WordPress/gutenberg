@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 // This max-width is used to constrain the main editor column, it should not
 // cascade into columns.
 // We use :where to provide minimum specificity, so that intentional margins,
@@ -15,4 +17,16 @@
 html :where(.wp-block-column) {
 	margin-top: 0;
 	margin-bottom: 0;
+}
+
+@media (max-width: #{ ($break-medium - 1) }) {
+	.wp-block-columns:not(.is-not-stacked-on-mobile) {
+		> .wp-block-column.has-collapsible-appender:not(:focus-within) {
+			> .block-list-appender {
+				// Keep the column available to selection and drop zones without the
+				// empty appender adding editor-only height to the stacked layout.
+				display: none;
+			}
+		}
+	}
 }
