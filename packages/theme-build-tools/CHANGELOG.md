@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support Stylelint 18 in the design token Stylelint plugins by widening the optional `stylelint` peer dependency to `^16 || ^17 || ^18`.
+
 ## 1.1.0 (2026-11-18)
 
 ### Bug Fixes

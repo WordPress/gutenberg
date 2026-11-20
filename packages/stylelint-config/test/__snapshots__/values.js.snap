@@ -3,6 +3,15 @@
 exports[`flags warnings with invalid values css > snapshot matches warnings 1`] = `
 [
   {
+    "column": 17,
+    "endColumn": 18,
+    "endLine": 2,
+    "line": 2,
+    "rule": "@stylistic/block-closing-brace-newline-before",
+    "severity": "error",
+    "text": "Expected newline before "}" (@stylistic/block-closing-brace-newline-before)",
+  },
+  {
     "column": 16,
     "endColumn": 17,
     "endLine": 2,
