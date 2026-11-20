@@ -11,7 +11,7 @@
 
 	@supports (position: sticky) {
 		[poster] {
-			object-fit: cover;
+			object-fit: contain;
 		}
 	}
 
