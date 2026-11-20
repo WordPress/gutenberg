@@ -7,6 +7,8 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { SwitchControl } from '@wordpress/ui';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
@@ -45,6 +47,52 @@ function GroupEditControls( { tagName, onSelectTagName, clientId } ) {
 	);
 }
 
+/**
+ * Render the control that clips nested blocks to the border radius.
+ *
+ * @param {Object}                   props                   Component props.
+ * @param {boolean}                  props.hasClippedContent Whether the content is clipped.
+ * @param {boolean}                  props.hasBorderRadius   Whether the block has a border radius.
+ * @param {( value: boolean )=>void} props.onChange          Called with the new value.
+ * @param {string}                   props.clientId          The client ID of the current block.
+ *
+ * @return {React.JSX.Element|null} The control, or null when there is no radius.
+ */
+function GroupClipControl( {
+	hasClippedContent,
+	hasBorderRadius,
+	onChange,
+	clientId,
+} ) {
+	if ( ! hasBorderRadius && ! hasClippedContent ) {
+		return null;
+	}
+
+	return (
+		<InspectorControls
+			group="border"
+			resetAllFilter={ () => ( { hasClippedContent: false } ) }
+		>
+			<ToolsPanelItem
+				label={ __( 'Clip content' ) }
+				isShownByDefault
+				hasValue={ () => !! hasClippedContent }
+				onDeselect={ () => onChange( false ) }
+				panelId={ clientId }
+			>
+				<SwitchControl
+					label={ __( 'Clip content to rounded corners' ) }
+					description={ __(
+						'Hides parts of nested blocks that go outside the corners.'
+					) }
+					checked={ !! hasClippedContent }
+					onCheckedChange={ onChange }
+				/>
+			</ToolsPanelItem>
+		</InspectorControls>
+	);
+}
+
 function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
@@ -60,6 +108,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 
 	const {
 		tagName: TagName = 'div',
+		hasClippedContent,
 		templateLock,
 		allowedBlocks,
 		layout = {},
@@ -120,6 +169,14 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 				tagName={ TagName }
 				onSelectTagName={ ( value ) =>
 					setAttributes( { tagName: value } )
+				}
+				clientId={ clientId }
+			/>
+			<GroupClipControl
+				hasClippedContent={ hasClippedContent }
+				hasBorderRadius={ !! attributes.style?.border?.radius }
+				onChange={ ( value ) =>
+					setAttributes( { hasClippedContent: value } )
 				}
 				clientId={ clientId }
 			/>

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Group: Add an opt-in "Clip content to rounded corners" setting, so nested blocks follow the border radius ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ### Bug Fixes
 
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
