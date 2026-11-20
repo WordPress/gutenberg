@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Use the versioned WordPress.org zip file for the default core source to speed up fresh environment creation while preserving version-based cache invalidation. ([#78942](https://github.com/WordPress/gutenberg/pull/78942))
+
 ### Bug Fixes
 
 -   `wp-env reset` and `wp-env clean` now report a failed database reset or WordPress configuration and exit with a non-zero code instead of reporting success ([#84495](https://github.com/WordPress/gutenberg/pull/84495)).
