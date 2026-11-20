@@ -64,7 +64,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		).toBeVisible();
 
 		// The appender button should be present to allow adding new items.
-		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		const appender = listView.getByRole( 'button', {
+			name: 'Add menu item',
+		} );
 		await expect( appender ).toBeVisible();
 
 		const linkControlSearch = linkControl.getLinkControlSearch();
@@ -175,7 +177,13 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		// Select an item, then add a new one from the appender. The edit is
 		// what carries the sidebar's selection over to the entity.
 		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		// The click opens the Settings popover, which takes focus as it
+		// opens. Let it open before adding, or its focus can close the Link
+		// UI the appender opens.
+		await expect(
+			page.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
+		await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
 			listView.getByRole( 'link', { name: 'Test Page 2' } )
@@ -338,7 +346,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
 		await expect(
-			listView.getByRole( 'button', { name: 'Add page' } )
+			listView.getByRole( 'button', { name: 'Add menu item' } )
 		).toBeVisible();
 	} );
 
@@ -362,7 +370,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			name: 'Block navigation structure',
 		} );
 
-		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await listView.getByRole( 'button', { name: 'Add menu item' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 1' );
 
 		await expect(
@@ -398,6 +406,310 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			listView.getByRole( 'row', { name: 'Test Page 2' } )
 		).toBeVisible();
+	} );
+
+	test.describe( 'nested appender', () => {
+		const nestedMenuFixture = {
+			title: 'Nested Menu',
+			content: `<!-- wp:navigation-submenu {"label":"Top Level Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->
+<!-- wp:navigation-submenu {"label":"Nested Submenu","type":"custom","url":"https://wordpress.org/nested","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Nested Item","type":"custom","url":"https://wordpress.org/nested-item","kind":"custom"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation-submenu -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+		};
+
+		const openSidebarListView = async (
+			{ admin, page, requestUtils },
+			fixture
+		) => {
+			const menu = await requestUtils.createNavigationMenu( fixture );
+			await admin.visitSiteEditor( {
+				postId: menu?.id,
+				postType: 'wp_navigation',
+			} );
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			await expect(
+				listView.getByRole( 'gridcell', {
+					name: 'Top Level Item 2',
+					exact: true,
+				} )
+			).toBeVisible();
+			return listView;
+		};
+
+		// The nesting levels of the appender rows, top to bottom. The
+		// top-level appender is always present, so `[ 1 ]` means no nested
+		// appender is shown.
+		const appenderLevels = ( listView ) =>
+			listView
+				.getByRole( 'row' )
+				.filter( {
+					has: listView
+						.page()
+						.getByRole( 'button', { name: /^Add / } ),
+				} )
+				.evaluateAll( ( rows ) =>
+					rows.map( ( row ) =>
+						Number( row.getAttribute( 'aria-level' ) )
+					)
+				);
+
+		test( 'shows an appender for every expanded submenu', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const item = ( name ) =>
+				listView.getByRole( 'gridcell', { name, exact: true } );
+
+			// The sidebar expands every submenu, so each one has its appender
+			// from the start, deepest first.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 3, 2, 1 ] );
+
+			await test.step( 'selection does not change them', async () => {
+				await item( 'Top Level Item 2' ).click();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 3, 2, 1 ] );
+
+				// Close the Settings popover the click opened, so it cannot
+				// take focus from the rows in the next step.
+				await page.getByRole( 'textbox', { name: 'Text' } ).focus();
+				await page.keyboard.press( 'Escape' );
+				await expect(
+					page.getByRole( 'heading', { name: 'Settings' } )
+				).toBeHidden();
+			} );
+
+			await test.step( 'a collapsed submenu hides its appender', async () => {
+				// Focus the row without clicking it, since a click opens the
+				// Settings popover, which takes focus from the row. The arrow
+				// keys then collapse and expand the focused row.
+				await item( 'Nested Submenu' ).getByRole( 'link' ).focus();
+				await page.keyboard.press( 'ArrowLeft' );
+				await expect( item( 'Nested Item' ) ).toBeHidden();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 2, 1 ] );
+
+				await item( 'Top Level Item 1' ).getByRole( 'link' ).focus();
+				await page.keyboard.press( 'ArrowLeft' );
+				await expect( item( 'Submenu Item' ) ).toBeHidden();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 1 ] );
+
+				await page.keyboard.press( 'ArrowRight' );
+				await expect( item( 'Submenu Item' ) ).toBeVisible();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 2, 1 ] );
+			} );
+
+			await test.step( 'a submenu appender is a plain + that turns blue on hover, the menu appender is a filled +', async () => {
+				const transparent = 'rgba(0, 0, 0, 0)';
+				// The submenu's appender keeps "Add page" as its accessible
+				// name, but shows only its icon, with no fill.
+				const submenuAppender = listView.getByRole( 'button', {
+					name: 'Add page',
+				} );
+				await expect( submenuAppender ).toHaveCount( 1 );
+				await expect( submenuAppender ).toHaveText( '' );
+				await expect( submenuAppender ).toHaveCSS(
+					'background-color',
+					transparent
+				);
+				// On hover the + turns blue, still with no fill.
+				await submenuAppender.hover();
+				await expect( submenuAppender ).toHaveCSS(
+					'background-color',
+					transparent
+				);
+				await expect
+					.poll( async () => {
+						const [ red, green, blue ] = (
+							await submenuAppender.evaluate(
+								( element ) =>
+									element.ownerDocument.defaultView.getComputedStyle(
+										element
+									).color
+							)
+						)
+							.match( /\d+/g )
+							.map( Number );
+						return blue > red + 50 && blue > green;
+					} )
+					.toBe( true );
+
+				// The menu's own appender is the filled + it is on trunk,
+				// named "Add menu item" but showing only its icon.
+				const menuAppender = listView.getByRole( 'button', {
+					name: 'Add menu item',
+				} );
+				await expect( menuAppender ).toHaveText( '' );
+				await expect( menuAppender ).not.toHaveCSS(
+					'background-color',
+					transparent
+				);
+			} );
+
+			await test.step( 'each appender is inset with its level', async () => {
+				// Compare the + icons, since the top-level appender is as
+				// wide as a row.
+				const icons = listView.locator(
+					'.block-editor-list-view-appender-row .block-editor-inserter__toggle svg'
+				);
+				const left = async ( locator ) =>
+					( await locator.boundingBox() ).x;
+				const itemIcon = ( name ) =>
+					item( name ).locator( '.block-editor-block-icon' );
+				// Each + sits under the icons of the items it adds to, to
+				// within the cell's 1px.
+				expect(
+					Math.abs(
+						( await left( icons.nth( 0 ) ) ) -
+							( await left( itemIcon( 'Submenu Item' ) ) )
+					)
+				).toBeLessThanOrEqual( 1 );
+				expect(
+					Math.abs(
+						( await left( icons.nth( 1 ) ) ) -
+							( await left( itemIcon( 'Top Level Item 2' ) ) )
+					)
+				).toBeLessThanOrEqual( 1 );
+			} );
+
+			await test.step( 'the submenu appender adds a link inside the submenu', async () => {
+				// The nested appender row comes before the top-level one.
+				await listView
+					.getByRole( 'button', { name: 'Add page' } )
+					.first()
+					.click();
+
+				// The Link UI opens for the new item, as it does at the top level.
+				await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+				await expect(
+					item( 'Test Page 1' ).filter( {
+						hasText: 'Block 3 of 3, Level 2.',
+					} )
+				).toBeVisible();
+			} );
+		} );
+
+		test( 'adds a button from the appender of a Buttons block in the menu', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Buttons Menu',
+					content: `<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">First</a></div><!-- /wp:button --></div><!-- /wp:buttons -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+				}
+			);
+
+			// The Buttons block is expanded, so its appender is there without
+			// selecting anything. It is a plain +, named for what it adds.
+			const appender = listView.getByRole( 'button', {
+				name: 'Add Button',
+			} );
+			await expect( appender ).toHaveText( '' );
+			await appender.click();
+
+			// The new Button follows the first one inside the Buttons block.
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'Button', exact: true } )
+					.filter( {
+						hasText: 'Block 2 of 2, Level 2.',
+					} )
+			).toBeVisible();
+		} );
+
+		test( 'adds the first icon to an empty Social Icons block', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Empty Social Icons Menu',
+					content: `<!-- wp:social-links --><ul class="wp-block-social-links"></ul><!-- /wp:social-links -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+				}
+			);
+
+			// The empty Social Icons block gets an appender one level in. The
+			// link could hold a submenu, but shows no appender of its own on
+			// the canvas, so it gets none either.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 2, 1 ] );
+
+			await listView
+				.getByRole( 'row', { level: 2 } )
+				.getByRole( 'button', { name: /^Add / } )
+				.click();
+			await page.getByRole( 'option', { name: 'WordPress' } ).click();
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', { name: 'WordPress', exact: true } )
+					.filter( {
+						hasText: 'Block 1 of 1, Level 2.',
+					} )
+			).toBeVisible();
+		} );
+
+		test( 'turns a link into a submenu from its Options menu', async ( {
+			admin,
+			page,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const linkRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'link', {
+					name: 'Top Level Item 2',
+					exact: true,
+				} ),
+			} );
+
+			await linkRow.getByRole( 'gridcell' ).first().hover();
+			await linkRow.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+			// The link is now a submenu holding the new page link.
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: 'Test Page 1',
+						exact: true,
+					} )
+					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
 	} );
 } );
 

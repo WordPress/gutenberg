@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Enhancements
+
+-   List View: Show an appender at the end of every expanded nested list, so items can be added to a submenu or a Buttons block from the List View. An empty container, such as an empty Social Icons block, gets an appender too, unless it shows no appender on the canvas. A nested appender is a plain + that turns blue while hovered or focused. `PrivateListView` can name the top-level one with `appenderLabel` ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
