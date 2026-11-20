@@ -119,6 +119,15 @@ const restorePost: ActionScriptParts< PostWithPermissions > = {
 			createErrorNotice( errorMessage, {
 				type: 'snackbar',
 			} );
+
+			// Some posts may still have been restored, so report those.
+			const restoredPosts = posts.filter(
+				( _post, index ) =>
+					promiseResult[ index ].status === 'fulfilled'
+			);
+			if ( restoredPosts.length > 0 && onActionPerformed ) {
+				onActionPerformed( restoredPosts );
+			}
 		}
 	},
 };
