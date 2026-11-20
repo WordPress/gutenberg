@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PostTitle`: Preserve literal Markdown characters when pasting text into the post title ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
+
 ### Documentation
 
 -   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).

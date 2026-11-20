@@ -6,6 +6,10 @@
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   `pasteHandler`: Add a `convertMarkdown` option to preserve literal Markdown while retaining paragraph boundaries ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
+
 ## 17.2.0 (2026-11-18)
 
 ### Enhancements

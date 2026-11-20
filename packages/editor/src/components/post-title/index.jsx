@@ -135,6 +135,7 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		const content = pasteHandler( {
 			HTML: html,
 			plainText,
+			convertMarkdown: false,
 		} );
 
 		event.preventDefault();
