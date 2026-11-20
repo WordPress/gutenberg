@@ -22,6 +22,7 @@ module.exports = async (
 		namespace,
 		slug,
 		title,
+		includeTests,
 		description,
 		dashicon,
 		category,
@@ -73,6 +74,7 @@ module.exports = async (
 		slug,
 		title,
 		description,
+		includeTests,
 		dashicon,
 		category,
 		attributes,
@@ -205,6 +207,22 @@ module.exports = async (
 	);
 
 	await initBlock( blockOutputTemplates, view );
+
+	if ( view.includeTests ) {
+		const testTemplate = blockOutputTemplates[ 'test/edit.test.js' ];
+		if ( testTemplate ) {
+			const testFilePath = require( 'path' ).join(
+				view.plugin ? view.folderName : '',
+				'test',
+				'edit.test.js'
+			);
+			await require( './output' ).writeOutputTemplate(
+				testTemplate,
+				testFilePath,
+				view
+			);
+		}
+	}
 
 	if ( plugin ) {
 		await initPackageJSON( view );

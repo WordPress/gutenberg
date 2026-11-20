@@ -1,0 +1,28 @@
+/**
+ * External dependencies
+ */
+import { render } from '@testing-library/react';
+
+/**
+ * Internal dependencies
+ */
+import { name } from '../index';
+import BlockEditComponent from '../edit';
+
+describe( 'Render block', () => {
+	const getTestComponent = ( attributes = {} ) =>
+		render(
+			<BlockEditComponent
+				name={ name }
+				attributes={ attributes }
+				setAttributes={ jest.fn() }
+			/>
+		);
+
+	it( 'renders without crashing', () => {
+		const { container } = getTestComponent();
+		expect( container ).toBeTruthy();
+	});
+
+	// Add more block-specific tests here as needed
+});
