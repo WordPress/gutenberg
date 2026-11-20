@@ -20,15 +20,20 @@ const ajv = new Ajv( {
 	allowUnionTypes: true, // Allow anyOf without explicit type
 } );
 
-addFormats( ajv, [
-	'date-time',
-	'email',
-	'hostname',
-	'ipv4',
-	'ipv6',
-	'uri',
-	'uuid',
-] );
+addFormats( ajv, [ 'email', 'hostname', 'ipv4', 'ipv6', 'uri', 'uuid' ] );
+
+/*
+ * The `date-time` format is checked with the `iso-date-time` check of
+ * ajv-formats, which is the `date-time` check with the time zone offset made
+ * optional.
+ *
+ * The `date-time` check requires the offset, as RFC 3339 does. WordPress does
+ * not: `rest_parse_date()`, which validates the format on the server, accepts
+ * `2026-10-21T09:30:00`, and the REST API returns `date` and `date_gmt` in
+ * that form. With the strict check, a date that the server accepts and
+ * returns fails validation on the client.
+ */
+ajv.addFormat( 'date-time', addFormats.get( 'iso-date-time' ) );
 
 /**
  * Formats AJV errors into a simple error message.

@@ -221,13 +221,14 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'textColumns'    => '2',
 						'textDecoration' => 'underline',
 						'textTransform'  => 'uppercase',
+						'textWrap'       => 'balance',
 						'letterSpacing'  => '2',
 						'writingMode'    => 'vertical-rl',
 					),
 				),
 				'options'         => null,
 				'expected_output' => array(
-					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;letter-spacing:2;writing-mode:vertical-rl;',
+					'css'          => 'font-size:clamp(2em, 2vw, 4em);font-family:Roboto,Oxygen-Sans,Ubuntu,sans-serif;font-style:italic;font-weight:800;line-height:1.3;column-count:2;text-decoration:underline;text-transform:uppercase;text-wrap:balance;letter-spacing:2;writing-mode:vertical-rl;',
 					'declarations' => array(
 						'font-size'       => 'clamp(2em, 2vw, 4em)',
 						'font-family'     => 'Roboto,Oxygen-Sans,Ubuntu,sans-serif',
@@ -237,6 +238,7 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 						'column-count'    => '2',
 						'text-decoration' => 'underline',
 						'text-transform'  => 'uppercase',
+						'text-wrap'       => 'balance',
 						'letter-spacing'  => '2',
 						'writing-mode'    => 'vertical-rl',
 					),
@@ -301,6 +303,41 @@ class WP_Style_Engine_Test extends WP_UnitTestCase {
 				'expected_output' => array(
 					'classnames' => 'has-text-color',
 				),
+			),
+
+			'inline_valid_transform_rotate_style'          => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(
+					'css'          => 'rotate:-0.25turn;',
+					'declarations' => array(
+						'rotate' => '-0.25turn',
+					),
+				),
+			),
+
+			'inline_invalid_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => '1 0 0 45deg',
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
+			),
+
+			'inline_newline_transform_rotate_style'        => array(
+				'block_styles'    => array(
+					'transform' => array(
+						'rotate' => "45deg\n",
+					),
+				),
+				'options'         => null,
+				'expected_output' => array(),
 			),
 
 			'valid_classnames_deduped'                     => array(

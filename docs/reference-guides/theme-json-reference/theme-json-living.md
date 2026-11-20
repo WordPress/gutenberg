@@ -49,6 +49,7 @@ Setting that enables the following UI tools:
 - dimensions: aspectRatio, height, minHeight, minWidth, width
 - position: sticky
 - spacing: blockGap, margin, padding
+- transform: rotate
 - typography: lineHeight, textColumns
 
 ---
@@ -190,6 +191,16 @@ Settings related to spacing.
 | defaultSpacingSizes | Allow users to choose space sizes from the default space size presets. | `boolean` | `true` |
 | spacingSizes | Space size presets for the space size selector. | `[ { name, slug, size } ]` |  |
 | spacingScale | Settings to auto-generate space size presets for the space size selector. | `{ operator, increment, steps, mediumStep, unit }` |  |
+
+---
+
+### transform
+
+Settings related to transforms.
+
+| Property | Description | Type | Default |
+| -------- | ----------- | ---- | ------- |
+| rotate | Allow users to set a rotation. | `boolean` | `false` |
 
 ---
 
@@ -350,6 +361,16 @@ Spacing styles.
 
 ---
 
+### transform
+
+Transform styles. Only blocks and block style variations support them.
+
+| Property | Description | Type |
+| -------- | ----------- | ---- |
+| rotate | Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`. | `string` |
+
+---
+
 ### typography
 
 Typography styles.
@@ -369,6 +390,7 @@ Typography styles.
 | textShadow | Sets the `text-shadow` CSS property. | `string`, `{ ref }` |
 | writingMode | Sets the `writing-mode` CSS property. | `string`, `{ ref }` |
 | textTransform | Sets the `text-transform` CSS property. | `string`, `{ ref }` |
+| textWrap | Sets the `text-wrap` CSS property. | `string`, `{ ref }` |
 
 ---
 
