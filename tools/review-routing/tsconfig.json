@@ -1,5 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/node.base.json",
-	"include": [ "src" ]
+	"compilerOptions": {
+		// The `.mts` files of the routing rules are outside this directory.
+		"rootDir": "../.."
+	},
+	"include": [ "src", "../../.github/review-routing/*.mts" ]
 }

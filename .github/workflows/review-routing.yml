@@ -35,11 +35,13 @@ jobs:
         steps:
             # On `pull_request_target`, this checks out the base branch. The
             # tool has no runtime dependencies, so `npm run` needs no install.
+            # Add the paths that the `.mts` files of the rules read.
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   sparse-checkout: |
                       tools/review-routing
                       .github/review-routing
+                      storybook/stories/design-system/patterns
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 

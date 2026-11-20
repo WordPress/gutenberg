@@ -22,6 +22,19 @@ describe( 'buildRequest', () => {
 			},
 		} );
 	} );
+
+	it( 'puts the question and the context of a rule in an object', () => {
+		const rule = { ...RULE, context: { components: [ 'Button' ] } };
+
+		expect(
+			buildRequest( 'state', [ rule ], 'jev' ).questions[
+				'design-system'
+			].instructions
+		).toEqual( {
+			question: 'Ask when UI changes.',
+			components: [ 'Button' ],
+		} );
+	} );
 } );
 
 describe( 'readProbability', () => {
