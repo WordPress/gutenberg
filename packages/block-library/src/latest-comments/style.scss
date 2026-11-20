@@ -46,6 +46,18 @@ ol.wp-block-latest-comments {
 			margin-left: 3.25em;
 		}
 	}
+
+	.aligncenter & {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: start;
+
+		.wp-block-latest-comments__comment-meta,
+		.wp-block-latest-comments__comment-excerpt {
+			margin-left: 0;
+		}
+	}
 }
 
 .wp-block-latest-comments__comment-excerpt p {
