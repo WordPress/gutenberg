@@ -11,6 +11,14 @@
 		@include composite-item.menu-item;
 	}
 
+	[role="menuitem"] {
+		white-space: nowrap;
+	}
+}
+
+// Menu group spacing for a plain `Dropdown`. `DropdownMenu` sets its own.
+// `:where()` keeps the specificity these rules had before the exclusion.
+.components-dropdown__content:where(:not(.components-dropdown-menu__popover)) {
 	.components-popover__content {
 		padding: $grid-unit-10;
 
@@ -24,10 +32,6 @@
 			}
 		}
 
-	}
-
-	[role="menuitem"] {
-		white-space: nowrap;
 	}
 
 	.components-menu-group {

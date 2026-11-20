@@ -7,56 +7,35 @@
 }
 
 // Match the spacing and dividers of the `Menu` component in `@wordpress/ui`.
-// Scoped to the DropdownMenu popover, since `Dropdown` doesn't always hold a
-// menu. The class pair outranks the `Dropdown` rules for menu groups.
-.components-dropdown-menu__popover.components-dropdown__content {
+// The `Dropdown` rules for menu groups skip this popover, so it sets its own.
+.components-dropdown-menu__popover {
 	// The popover pads the menu, so groups don't need their own padding.
-	.components-popover__content,
-	.components-popover__content:has(.components-menu-group) {
+	.components-popover__content {
 		padding: var(--wpds-dimension-padding-xs);
-
-		.components-dropdown-menu__menu > .components-menu-item__button,
-		> .components-menu-item__button {
-			margin: 0;
-			width: 100%;
-		}
 	}
 
-	.components-menu-group {
-		padding: 0;
-	}
-
+	// Override the `MenuGroup` defaults.
 	.components-menu-group + .components-menu-group {
-		position: relative;
-		margin-top: calc(2 * var(--wpds-dimension-gap-xs) + var(--wpds-border-width-xs));
-		padding: 0;
+		padding-top: 0;
 		border-top: none;
 
-		// Inset the divider so it lines up with the item labels.
+		// Draw the divider in normal flow, so the group doesn't become the
+		// containing block of absolutely positioned children. Inset it so it
+		// lines up with the item labels. A border stays visible in forced colors.
 		&::before {
 			content: "";
-			position: absolute;
-			top: calc(-1 * (var(--wpds-dimension-gap-xs) + var(--wpds-border-width-xs)));
-			inset-inline: var(--wpds-dimension-padding-sm);
-			height: var(--wpds-border-width-xs);
-			background-color: var(--wpds-color-stroke-surface-neutral-weak);
-
-			@media ( forced-colors: active ) {
-				background-color: CanvasText;
-			}
+			display: block;
+			margin: var(--wpds-dimension-gap-xs) var(--wpds-dimension-padding-sm);
+			border-top: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak);
 		}
 
-		&.has-hidden-separator {
-			margin-top: 0;
-
-			&::before {
-				content: none;
-			}
+		&.has-hidden-separator::before {
+			content: none;
 		}
 	}
 
 	&.is-alternate .components-menu-group + .components-menu-group::before {
-		background-color: $gray-900;
+		border-top-color: $gray-900;
 	}
 
 	.components-menu-group__label {
