@@ -6,6 +6,10 @@
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   Validate registered direct-parent relationships for structural block wrapping ([#85261](https://github.com/WordPress/gutenberg/pull/85261)).
+
 ## 17.2.0 (2026-11-18)
 
 ### Enhancements

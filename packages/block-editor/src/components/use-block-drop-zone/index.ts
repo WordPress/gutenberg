@@ -512,7 +512,7 @@ export default function useBlockDropZone( {
 					);
 					const areGroupableBlocks = isGroupable( [
 						targetBlock.clientId,
-						getDraggedBlockClientIds(),
+						...getDraggedBlockClientIds(),
 					] );
 					const groupBlockVariations = getBlockVariations(
 						// A grouping block type is registered.

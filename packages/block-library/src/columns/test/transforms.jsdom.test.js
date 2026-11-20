@@ -1,11 +1,29 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import {
+	afterAll,
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+} from 'vitest';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { dispatch, select } from '@wordpress/data';
 import {
 	createBlock,
 	getBlockTypes,
+	getPossibleBlockTransformations,
+	setGroupingBlockName,
 	registerBlockType,
 	switchToBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import groupTransforms from '../../group/transforms';
+import columnsTransforms from '../transforms';
+import detailsMetadata from '../../details/block.json';
+import detailsTransforms from '../../details/transforms';
+import quoteMetadata from '../../quote/block.json';
+import quoteTransforms from '../../quote/transforms';
 import {
 	metadata as columnsMetadata,
 	settings as columnsSettings,
@@ -671,4 +689,255 @@ describe( 'transforms', () => {
 			} ),
 		] );
 	} );
+} );
+
+const wrappers = [
+	[ 'core/group', 'core/group' ],
+	[ 'core/columns', 'core/column' ],
+	[ 'core/details', 'core/details' ],
+];
+
+const groupConstraints = [
+	[ { parent: [ 'core/cover' ] }, false ],
+	[ { parent: [ 'core/group' ] }, true ],
+	[ { ancestor: [ 'core/cover' ] }, true ],
+	[ { parent: [ 'core/group' ], ancestor: [ 'core/cover' ] }, true ],
+];
+
+function registerSource( settings = {} ) {
+	registerBlockType( 'test/child', {
+		apiVersion: 3,
+		title: 'Child',
+		category: 'text',
+		attributes: { content: { type: 'string' } },
+		save: () => null,
+		...settings,
+	} );
+	return createBlock( 'test/child', { content: 'Preserved content' } );
+}
+
+describe( 'wrapping transforms', () => {
+	beforeEach( () => {
+		setGroupingBlockName( 'core/group' );
+		for ( const [ metadata, transforms ] of [
+			[ groupMetadata, groupTransforms ],
+			[ columnsMetadata, columnsTransforms ],
+			[ columnMetadata, undefined ],
+			[ detailsMetadata, detailsTransforms ],
+			[ quoteMetadata, quoteTransforms ],
+		] ) {
+			registerBlockType( metadata, {
+				save: () => null,
+				transforms,
+			} );
+		}
+		registerBlockType( 'core/paragraph', {
+			apiVersion: 3,
+			title: 'Paragraph',
+			category: 'text',
+			attributes: {},
+			save: () => null,
+		} );
+	} );
+
+	afterEach( () => {
+		dispatch( blockEditorStore ).resetBlocks( [] );
+		getBlockTypes().forEach( ( { name } ) => unregisterBlockType( name ) );
+	} );
+
+	it.each( groupConstraints )(
+		'validates Group actions for %j inside Cover',
+		( settings, expected ) => {
+			registerBlockType( 'core/cover', {
+				apiVersion: 3,
+				title: 'Cover',
+				category: 'design',
+				attributes: {},
+				save: () => null,
+			} );
+			const child = registerSource( settings );
+			const initialParent = settings.parent?.includes( 'core/group' )
+				? createBlock( 'core/group', {}, [ child ] )
+				: child;
+			const cover = createBlock( 'core/cover', {}, [ initialParent ] );
+			dispatch( blockEditorStore ).updateSettings( {
+				allowedBlockTypes: true,
+			} );
+			dispatch( blockEditorStore ).resetBlocks( [ cover ] );
+			dispatch( blockEditorStore ).updateBlockListSettings(
+				cover.clientId,
+				{}
+			);
+			if ( initialParent !== child ) {
+				dispatch( blockEditorStore ).updateBlockListSettings(
+					initialParent.clientId,
+					{}
+				);
+			}
+			const selectors = select( blockEditorStore );
+			const rootClientId = selectors.getBlockRootClientId(
+				child.clientId
+			);
+			expect(
+				selectors.canInsertBlockType( 'test/child', rootClientId )
+			).toBe( true );
+			expect(
+				selectors.canInsertBlockType( 'core/group', rootClientId )
+			).toBe( true );
+			expect( selectors.canRemoveBlocks( [ child.clientId ] ) ).toBe(
+				true
+			);
+			expect( selectors.isGroupable( [ child.clientId ] ) ).toBe(
+				expected
+			);
+			const paragraph = createBlock( 'core/paragraph' );
+			dispatch( blockEditorStore ).insertBlocks(
+				[ paragraph ],
+				undefined,
+				rootClientId
+			);
+			expect(
+				selectors.isGroupable( [ child.clientId, paragraph.clientId ] )
+			).toBe( expected );
+			expect(
+				selectors.isGroupable( [ child.clientId, 'missing-block' ] )
+			).toBe( false );
+		}
+	);
+
+	it( 'retains the required Cover ancestor after wrapping', () => {
+		registerBlockType( 'core/cover', {
+			apiVersion: 3,
+			title: 'Cover',
+			category: 'design',
+			attributes: {},
+			save: () => null,
+		} );
+		const child = registerSource( { ancestor: [ 'core/cover' ] } );
+		const cover = createBlock( 'core/cover', {}, [ child ] );
+		dispatch( blockEditorStore ).resetBlocks( [ cover ] );
+		dispatch( blockEditorStore ).updateBlockListSettings(
+			cover.clientId,
+			{}
+		);
+		const converted = switchToBlockType( child, 'core/group' );
+		dispatch( blockEditorStore ).replaceBlocks(
+			[ child.clientId ],
+			converted
+		);
+		const selectors = select( blockEditorStore );
+		const wrappedChild = converted[ 0 ].innerBlocks[ 0 ];
+		expect( selectors.getBlockParents( wrappedChild.clientId ) ).toContain(
+			cover.clientId
+		);
+		expect(
+			selectors.getBlockName(
+				selectors.getBlockRootClientId( wrappedChild.clientId )
+			)
+		).toBe( 'core/group' );
+	} );
+
+	it.each( wrappers )(
+		'does not offer %s when its immediate parent is disallowed',
+		( destination ) => {
+			const block = registerSource( { parent: [ 'core/cover' ] } );
+			expect(
+				getPossibleBlockTransformations( [ block ] ).map(
+					( { name } ) => name
+				)
+			).not.toContain( destination );
+		}
+	);
+
+	it.each( wrappers )(
+		'does not convert to %s when its immediate parent is disallowed',
+		( destination ) => {
+			const block = registerSource( { parent: [ 'core/cover' ] } );
+			expect( switchToBlockType( block, destination ) ).toBeNull();
+		}
+	);
+
+	it.each( wrappers )(
+		'preserves a child whose allowed parent matches %s',
+		( destination, parent ) => {
+			const block = registerSource( { parent: [ parent ] } );
+			const converted = switchToBlockType( block, destination );
+			const immediateParent =
+				destination === 'core/columns'
+					? converted[ 0 ].innerBlocks[ 0 ]
+					: converted[ 0 ];
+			expect( immediateParent.name ).toBe( parent );
+			expect( immediateParent.innerBlocks[ 0 ] ).toMatchObject( {
+				name: block.name,
+				attributes: block.attributes,
+			} );
+		}
+	);
+
+	it.each( wrappers )(
+		'allows ancestor-only restrictions when wrapping in %s',
+		( destination ) => {
+			const block = registerSource( { ancestor: [ 'core/cover' ] } );
+			expect( switchToBlockType( block, destination ) ).not.toBeNull();
+		}
+	);
+
+	it.each( [ ...wrappers, [ 'core/quote', 'core/quote' ] ] )(
+		'rejects a mixed selection with a disallowed child for %s',
+		( destination ) => {
+			const block = registerSource( { parent: [ 'core/cover' ] } );
+			expect(
+				switchToBlockType(
+					[ block, createBlock( 'core/paragraph' ) ],
+					destination
+				)
+			).toBeNull();
+		}
+	);
+
+	it.each( wrappers )(
+		'allows an ordinary Paragraph to be wrapped in %s',
+		( destination ) => {
+			const block = createBlock( 'core/paragraph' );
+			expect(
+				getPossibleBlockTransformations( [ block ] ).map(
+					( { name } ) => name
+				)
+			).toContain( destination );
+			expect( switchToBlockType( block, destination ) ).not.toBeNull();
+		}
+	);
+
+	it.each( wrappers )(
+		'allows matching parent and retained ancestor restrictions for %s',
+		( destination, parent ) => {
+			const block = registerSource( {
+				parent: [ parent ],
+				ancestor: [ 'core/cover' ],
+			} );
+			expect( switchToBlockType( block, destination ) ).not.toBeNull();
+		}
+	);
+
+	it( 'validates Columns against Column rather than Columns', () => {
+		const block = registerSource( { parent: [ 'core/columns' ] } );
+		expect( switchToBlockType( block, 'core/columns' ) ).toBeNull();
+	} );
+
+	it( 'retains the Columns selection limit', () => {
+		const blocks = Array.from( { length: 7 }, () =>
+			createBlock( 'core/paragraph' )
+		);
+		expect( switchToBlockType( blocks, 'core/columns' ) ).toBeNull();
+		expect(
+			switchToBlockType( blocks.slice( 0, 6 ), 'core/columns' )
+		).not.toBeNull();
+	} );
+
+	it.each( [ 'core/columns', 'core/details' ] )(
+		'does not introduce a single nested %s',
+		( name ) => {
+			expect( switchToBlockType( createBlock( name ), name ) ).toBeNull();
+		}
+	);
 } );

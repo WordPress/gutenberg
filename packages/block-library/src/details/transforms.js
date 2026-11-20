@@ -1,4 +1,11 @@
-import { createBlock, cloneSanitizedBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	cloneSanitizedBlock,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
+
+const { isBlockAllowedInParent } = unlock( blocksPrivateApis );
 
 export default {
 	from: [
@@ -7,8 +14,14 @@ export default {
 			isMultiBlock: true,
 			blocks: [ '*' ],
 			isMatch( {}, blocks ) {
-				return ! (
-					blocks.length === 1 && blocks[ 0 ].name === 'core/details'
+				return (
+					! (
+						blocks.length === 1 &&
+						blocks[ 0 ].name === 'core/details'
+					) &&
+					blocks.every( ( { name } ) =>
+						isBlockAllowedInParent( name, 'core/details' )
+					)
 				);
 			},
 			__experimentalConvert( blocks ) {
