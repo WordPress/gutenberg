@@ -264,6 +264,8 @@ class MediaUpload extends Component< MediaUploadProps > {
 	declare frame: MediaFrame;
 	declare lastGalleryValue: number[] | undefined;
 	declare GalleryDetailsMediaFrame: MediaFrameConstructor | undefined;
+	isFrameOpen = false;
+	isUnmounted = false;
 	constructor( ...args: [ props: MediaUploadProps, context?: unknown ] ) {
 		super( ...args );
 		this.openModal = this.openModal.bind( this );
@@ -423,8 +425,20 @@ class MediaUpload extends Component< MediaUploadProps > {
 	}
 
 	componentWillUnmount() {
+		this.isUnmounted = true;
+
+		// The component may remount elsewhere mid-use (e.g. the block toolbar
+		// moving on viewport resize), so keep an open modal and clean up on close.
+		if ( this.isFrameOpen ) {
+			return;
+		}
+
 		this.detachUndoRedoGuard();
 		this.frame?.close();
+		this.removeFrame();
+	}
+
+	removeFrame() {
 		this.frame?.modal?.remove();
 		this.frame?.remove();
 	}
@@ -469,6 +483,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 	onOpen() {
 		const { wp } = window as unknown as MediaWindow;
 		const { value } = this.props;
+		this.isFrameOpen = true;
 		this.updateCollection();
 
 		if ( this.frame?.modal?.el ) {
@@ -515,6 +530,7 @@ class MediaUpload extends Component< MediaUploadProps > {
 
 	onClose() {
 		const { onClose } = this.props;
+		this.isFrameOpen = false;
 		this.detachUndoRedoGuard();
 
 		if ( onClose ) {
@@ -540,6 +556,11 @@ class MediaUpload extends Component< MediaUploadProps > {
 			DataRegistry,
 			'select' | 'dispatch'
 		> );
+
+		if ( this.isUnmounted ) {
+			this.removeFrame();
+			return;
+		}
 
 		this.frame.detach();
 	}

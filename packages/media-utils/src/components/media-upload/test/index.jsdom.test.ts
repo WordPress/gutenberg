@@ -62,4 +62,44 @@ describe( 'MediaUpload', () => {
 			expect( instance.frame.detach ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
+
+	describe( 'componentWillUnmount', () => {
+		const createFrame = () =>
+			( {
+				close: vi.fn(),
+				detach: vi.fn(),
+				remove: vi.fn(),
+				modal: { remove: vi.fn() },
+			} ) as unknown as MediaFrame;
+
+		it( 'removes the frame when the modal is closed', () => {
+			const instance = new MediaUpload( props );
+			const frame = createFrame();
+			instance.frame = frame;
+
+			instance.componentWillUnmount();
+
+			expect( frame.close ).toHaveBeenCalledTimes( 1 );
+			expect( frame.modal!.remove ).toHaveBeenCalledTimes( 1 );
+			expect( frame.remove ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'keeps an open modal until it closes, then removes the frame', () => {
+			const instance = new MediaUpload( props );
+			const frame = createFrame();
+			instance.frame = frame;
+			instance.isFrameOpen = true;
+
+			instance.componentWillUnmount();
+
+			expect( frame.close ).not.toHaveBeenCalled();
+			expect( frame.remove ).not.toHaveBeenCalled();
+
+			instance.onClose();
+
+			expect( frame.modal!.remove ).toHaveBeenCalledTimes( 1 );
+			expect( frame.remove ).toHaveBeenCalledTimes( 1 );
+			expect( frame.detach ).not.toHaveBeenCalled();
+		} );
+	} );
 } );
