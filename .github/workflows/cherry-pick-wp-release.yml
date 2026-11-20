@@ -135,7 +135,7 @@ jobs:
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}`
+                        body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}\n\nWorkflow run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`
                       });
 
             - name: Comment on the PR about conflict
@@ -181,5 +181,6 @@ jobs:
                         # Create a PR and set the base to the ${targetBranch} branch.
                         # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
                         \`\`\`
+                        Workflow run: ${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}
                         `
                       });
