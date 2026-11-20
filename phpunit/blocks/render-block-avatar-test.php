@@ -117,6 +117,7 @@ class Render_Block_Avatar_Test extends WP_UnitTestCase {
 		$this->assertMatchesRegularExpression( '/\bwp-states-[a-f0-9]{8}\b/', $class_attribute );
 
 		$stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		$this->assertStringContainsString( '@media', $stylesheet );
 		$this->assertStringContainsString( 'width:48px !important;', $stylesheet );
 		$this->assertStringContainsString( 'height:48px !important;', $stylesheet );
 	}

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import {
 	store as blockEditorStore,
@@ -105,8 +106,37 @@ describe( 'Avatar block', () => {
 		// eslint-disable-next-line testing-library/no-node-access
 		const styleElements = document.querySelectorAll( 'style' );
 		expect(
-			Array.from( styleElements ).some( ( element ) =>
-				element.textContent?.includes( 'width: 48px !important' )
+			Array.from( styleElements ).some(
+				( element ) =>
+					element.textContent?.includes( '@media' ) &&
+					element.textContent?.includes( 'width: 48px !important' ) &&
+					element.textContent?.includes( 'height: 48px !important' )
+			)
+		).toBe( true );
+	} );
+
+	test( 'updates scoped responsive stylesheet when changing image size in viewport state', async () => {
+		const user = userEvent.setup();
+		await setup( [
+			createBlock( 'core/avatar', { size: 96 } ),
+			createBlock( VIEWPORT_STATE_INITIALIZER ),
+		] );
+		await selectBlock( 'Block: Avatar' );
+
+		const input = await screen.findByRole( 'spinbutton', {
+			name: 'Image size',
+		} );
+		await user.clear( input );
+		await user.type( input, '64' );
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const styleElements = document.querySelectorAll( 'style' );
+		expect(
+			Array.from( styleElements ).some(
+				( element ) =>
+					element.textContent?.includes( '@media' ) &&
+					element.textContent?.includes( 'width: 64px !important' ) &&
+					element.textContent?.includes( 'height: 64px !important' )
 			)
 		).toBe( true );
 	} );
