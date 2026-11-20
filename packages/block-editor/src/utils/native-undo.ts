@@ -82,7 +82,14 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 
 			// Enter in a single line field submits or commits rather than
 			// types, so a history edit following it is not the field's own.
-			if ( event.key === 'Enter' && field.nodeName === 'INPUT' ) {
+			// An Enter confirming an IME composition types; Safari reports
+			// it as not composing, so it is detected by its key code.
+			if (
+				event.key === 'Enter' &&
+				field.nodeName === 'INPUT' &&
+				! event.isComposing &&
+				event.keyCode !== 229
+			) {
 				return;
 			}
 
