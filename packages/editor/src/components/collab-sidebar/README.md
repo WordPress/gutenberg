@@ -29,7 +29,7 @@ The components are in the hierarchy below. Besides them:
 | `metadata` | `metadata.noteId` |
 | `dom` | Marker selectors, anchor rects, focusing and scrolling threads |
 | `layout` | Floating thread positions, see "Floating board" |
-| `display` | Excerpts and avatar colors |
+| `display` | Note content and avatar colors |
 
 ## Component hierarchy
 
