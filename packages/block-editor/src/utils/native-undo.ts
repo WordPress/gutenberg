@@ -32,23 +32,6 @@ function getEventTarget( event: Event ): Element | null | undefined {
 	return target;
 }
 
-/**
- * Returns the text field an event originates from, if any.
- *
- * @param event Keyboard event.
- *
- * @return The text field, or null.
- */
-function getTextField( event: Event ): HTMLElement | null {
-	const target = getEventTarget( event );
-
-	if ( ! target || ! isTextField( target ) ) {
-		return null;
-	}
-
-	return target as HTMLElement;
-}
-
 function getFieldValue( field: HTMLElement ): string | null {
 	if ( 'value' in field ) {
 		return ( field as HTMLInputElement ).value;
@@ -76,12 +59,13 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 				return;
 			}
 
-			const field = getTextField( event );
+			const field = getEventTarget( event );
 
 			// A field known to edit the history stays so, and block rich text
 			// always does, so neither needs observing.
 			if (
 				! field ||
+				! isTextField( field ) ||
 				fieldHistory.get( field ) ||
 				field.classList.contains( 'block-editor-rich-text__editable' )
 			) {
@@ -137,9 +121,9 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
  * @return Whether the element relies on the browser's own undo.
  */
 export function usesNativeUndo( event: KeyboardEvent ): boolean {
-	const field = getTextField( event );
+	const field = getEventTarget( event );
 
-	if ( ! field ) {
+	if ( ! field || ! isTextField( field ) ) {
 		return false;
 	}
 
