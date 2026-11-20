@@ -45,6 +45,75 @@ const ControlledColorPalette = ( {
 };
 
 describe( 'ColorPalette', () => {
+	it.each( [ false, true ] )(
+		'keeps focus and current keyboard actions after reordering colors with slugs=%s',
+		async ( withSlugs ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			const red = {
+				name: 'Red',
+				color: '#ff0000',
+				...( withSlugs ? { slug: 'red' } : {} ),
+			};
+			const secondRed = {
+				name: 'Second red',
+				color: '#ff0000',
+				...( withSlugs ? { slug: 'second-red' } : {} ),
+			};
+			const blue = {
+				name: 'Blue',
+				color: '#0000ff',
+				...( withSlugs ? { slug: 'blue' } : {} ),
+			};
+			const green = {
+				name: 'Green',
+				color: '#00ff00',
+				...( withSlugs ? { slug: 'green' } : {} ),
+			};
+			const props = {
+				'aria-label': 'Colors',
+				onChange,
+				disableCustomColors: true,
+				clearable: false,
+			};
+			const view = await render(
+				<ColorPalette
+					{ ...props }
+					colors={ [ red, blue, secondRed, green ] }
+				/>
+			);
+			await user.click( screen.getByRole( 'option', { name: 'Blue' } ) );
+			onChange.mockClear();
+
+			const updatedBlue = {
+				...blue,
+				name: 'Sky blue',
+				color: withSlugs ? '#00ffff' : blue.color,
+			};
+			await view.rerender(
+				<ColorPalette
+					{ ...props }
+					colors={ [ updatedBlue, green, red, secondRed ] }
+				/>
+			);
+
+			expect( screen.getAllByRole( 'option' ) ).toHaveLength( 4 );
+			expect(
+				screen.getByRole( 'option', { name: 'Sky blue' } )
+			).toHaveFocus();
+			await user.keyboard( '{ArrowRight}' );
+			expect(
+				screen.getByRole( 'option', { name: 'Green' } )
+			).toHaveFocus();
+			await user.keyboard( '{ArrowLeft}{Enter}' );
+			expect( onChange ).toHaveBeenLastCalledWith(
+				updatedBlue.color,
+				0,
+				withSlugs ? 'blue' : undefined
+			);
+		}
+	);
+
 	it( 'should use matching values only for display in command button presentation', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();

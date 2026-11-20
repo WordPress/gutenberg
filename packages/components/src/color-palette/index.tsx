@@ -46,7 +46,14 @@ function SinglePalette( {
 	...additionalProps
 }: SinglePaletteProps ) {
 	const colorOptions = useMemo( () => {
+		const occurrences = new Map< string, number >();
 		return colors.map( ( { color, name, slug }, index ) => {
+			const identity = JSON.stringify( [
+				slug === undefined || slug === null ? 'color' : 'slug',
+				slug ?? color,
+			] );
+			const occurrence = occurrences.get( identity ) ?? 0;
+			occurrences.set( identity, occurrence + 1 );
 			const colordColor = colord( color );
 			// When a non-empty selectedSlug is provided, selection is decided
 			// strictly by slug — entries without a slug or with a different slug
@@ -60,7 +67,7 @@ function SinglePalette( {
 
 			return (
 				<CircularOptionPicker.Option
-					key={ slug ?? `${ color }-${ index }` }
+					key={ `${ identity }:${ occurrence }` }
 					isSelected={ isSelected }
 					selectedIconProps={
 						isSelected
