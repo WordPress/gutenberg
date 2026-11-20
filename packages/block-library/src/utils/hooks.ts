@@ -1,4 +1,5 @@
 import { useSelect } from '@wordpress/data';
+import type { SelectFunction } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -47,13 +48,17 @@ export function useCanEditEntity(
  *
  * Both `canUser` calls resolve from a single OPTIONS request.
  *
- * @param {Function}      select   Registry `select` function.
- * @param {string}        postType Post type from block context.
- * @param {number|string} postId   Post ID from block context.
- * @return {boolean|undefined} Whether the post can be edited, or `undefined`
- *                             when it can't be determined.
+ * @param select   Registry `select` function.
+ * @param postType Post type from block context.
+ * @param postId   Post ID from block context.
+ * @return Whether the post can be edited, or `undefined` when it can't be
+ *         determined.
  */
-export function canUserEditPostContext( select, postType, postId ) {
+export function canUserEditPostContext(
+	select: SelectFunction,
+	postType: string | undefined,
+	postId: number | string | undefined
+): boolean | undefined {
 	if ( ! postType || ! postId ) {
 		return undefined;
 	}
@@ -68,12 +73,15 @@ export function canUserEditPostContext( select, postType, postId ) {
 /**
  * Hook version of `canUserEditPostContext`.
  *
- * @param {string}        postType Post type from block context.
- * @param {number|string} postId   Post ID from block context.
- * @return {boolean|undefined} Whether the post can be edited, or `undefined`
- *                             when it can't be determined.
+ * @param postType Post type from block context.
+ * @param postId   Post ID from block context.
+ * @return Whether the post can be edited, or `undefined` when it can't be
+ *         determined.
  */
-export function useCanEditPostContext( postType, postId ) {
+export function useCanEditPostContext(
+	postType: string | undefined,
+	postId: number | string | undefined
+): boolean | undefined {
 	return useSelect(
 		( select ) => canUserEditPostContext( select, postType, postId ),
 		[ postType, postId ]
