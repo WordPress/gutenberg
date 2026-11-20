@@ -84,28 +84,35 @@ export const Sizes: Story = {
 	),
 };
 
-/** The button owns keyboard focus and the tooltip; Avatar's activity ring remains independent. */
+/** Use a circle for a person's portrait and a square to preserve the corners of a site logo. */
+export const Shapes: Story = {
+	render: ( args ) => (
+		<Stack gap="md" align="center">
+			<Avatar { ...args } src={ IMAGE_SRC } shape="circle" />
+			<Avatar
+				{ ...args }
+				name="WordPress"
+				src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+				shape="square"
+			/>
+		</Stack>
+	),
+};
+
+/** Render the Avatar as the button so the focus ring follows its shape. */
 export const Interactive: Story = {
 	args: { color: '#008a20', active: true },
 	render: ( args ) => (
 		<Tooltip.Root>
 			<Tooltip.Trigger
 				render={
-					<Button
-						variant="unstyled"
-						aria-label={ args.name }
-						style={ {
-							display: 'inline-flex',
-							borderRadius:
-								args.shape === 'square'
-									? 'calc(var(--wpds-border-radius-sm) + var(--wpds-border-width-focus))'
-									: '50%',
-						} }
+					<Avatar
+						{ ...args }
+						render={ <Button variant="unstyled" /> }
+						role="button"
 					/>
 				}
-			>
-				<Avatar { ...args } aria-hidden="true" />
-			</Tooltip.Trigger>
+			/>
 			<Tooltip.Popup>{ args.name }</Tooltip.Popup>
 		</Tooltip.Root>
 	),

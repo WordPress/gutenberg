@@ -13,15 +13,19 @@ export function getInitials(
 	const words = ( name ?? '' )
 		.trim()
 		.split( /\s+/ )
-		.map( ( word ) =>
-			Array.from( segmenter.segment( word ) ).find( ( { segment } ) =>
-				// Check visibility without removing joiners from complete emoji.
-				segment.replace(
-					/[\p{C}\p{Z}\p{Default_Ignorable_Code_Point}]/gu,
-					''
-				)
-			)
-		)
+		.map( ( word ) => {
+			for ( const { segment } of segmenter.segment( word ) ) {
+				// Keep joiners within a visible grapheme, including emoji.
+				if (
+					/[^\p{C}\p{Z}\p{Default_Ignorable_Code_Point}]/u.test(
+						segment
+					)
+				) {
+					return segment;
+				}
+			}
+			return undefined;
+		} )
 		.filter( ( word ) => word !== undefined );
 
 	return words
@@ -30,7 +34,7 @@ export function getInitials(
 			( word ) =>
 				// Casing can expand a character; keep one complete initial per word.
 				segmenter
-					.segment( word.segment.toLocaleUpperCase( locale ) )
+					.segment( word.toLocaleUpperCase( locale ) )
 					.containing( 0 )!.segment
 		);
 }

@@ -1,7 +1,7 @@
 import warning from '@wordpress/warning';
 import type { AvatarProps } from './types';
 
-function getColorWarning( color: string ): string | undefined {
+function getDisallowedColorWarning( color: string ): string | undefined {
 	// Skip comments and strings, and keep custom-property names as whole tokens.
 	// This is a best-effort scan; it does not decode CSS escapes or resolve var().
 	const tokens = color.match(
@@ -17,19 +17,6 @@ function getColorWarning( color: string ): string | undefined {
 		return 'Avatar: `color` cannot be used as a colored fallback fill. Use an explicit CSS color instead of a CSS-wide keyword such as `inherit`.';
 	}
 
-	if ( typeof CSS === 'undefined' || ! CSS.supports ) {
-		return;
-	}
-
-	if ( ! CSS.supports( 'color', color ) ) {
-		return 'Avatar: The browser does not support the `color` value. Use a valid CSS color supported by this browser.';
-	} else if (
-		// Browsers without relative colors retain the neutral fallback.
-		CSS.supports( 'color', 'rgb(from red r g b / 1)' ) &&
-		! CSS.supports( 'color', `rgb(from ${ color } r g b / 1)` )
-	) {
-		return 'Avatar: `color` cannot be used as a colored fallback fill. Use an explicit CSS color instead of a CSS-wide keyword such as `inherit`.';
-	}
 	return undefined;
 }
 
@@ -44,12 +31,24 @@ export function getAvatarColor(
 	if ( color === undefined ) {
 		return;
 	}
-	const message = getColorWarning( color );
+	const message = getDisallowedColorWarning( color );
 	if ( message ) {
 		if ( process.env.NODE_ENV !== 'production' ) {
 			warning( message );
 		}
 		return;
+	}
+	// Keep server and client markup identical. CSS supplies the neutral colors
+	// when the browser cannot resolve the value.
+	if (
+		process.env.NODE_ENV !== 'production' &&
+		typeof CSS !== 'undefined' &&
+		CSS.supports &&
+		! CSS.supports( 'color', color )
+	) {
+		warning(
+			'Avatar: The browser does not support the `color` value. Use a valid CSS color supported by this browser.'
+		);
 	}
 	return color;
 }

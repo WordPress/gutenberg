@@ -19,21 +19,9 @@ export type AvatarProps = Omit<
 	 */
 	src?: React.ComponentProps< typeof _Avatar.Image >[ 'src' ];
 	/**
-	 * Image configuration, including native image props, custom rendering,
-	 * and loading-status callbacks. The image loads in place to support lazy
-	 * loading and optimized image components. Custom renderers must forward
-	 * their ref, image props, and load/error handlers to the image element.
-	 * The accessible label comes from `name`; the image itself is decorative.
+	 * The CORS setting for the profile image request.
 	 */
-	imageProps?: Omit<
-		ComponentProps< typeof _Avatar.Image >,
-		| 'src'
-		| 'alt'
-		| 'keepMounted'
-		| 'aria-label'
-		| 'aria-labelledby'
-		| 'aria-hidden'
-	>;
+	crossOrigin?: React.ComponentProps< 'img' >[ 'crossOrigin' ];
 	/**
 	 * Locale used for character segmentation and uppercase conversion.
 	 * Defaults to the runtime's locale.

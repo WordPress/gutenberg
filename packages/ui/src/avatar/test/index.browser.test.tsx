@@ -4,6 +4,7 @@ import { createRef } from '@wordpress/element';
 import { render } from 'vitest-browser-react';
 import '@wordpress/theme/design-tokens.css';
 import { Avatar } from '../index';
+import { Button } from '../../button';
 import { ThemeProvider } from '../../utils/theme-provider';
 
 function luminance( color: string ) {
@@ -24,6 +25,27 @@ function luminance( color: string ) {
 }
 
 describe( 'Avatar colors', () => {
+	it( 'uses the neutral fallback colors for invalid or unresolved colors', async () => {
+		await render(
+			<>
+				<Avatar name="Reference" />
+				<Avatar name="Missing" color="var(--missing-avatar-color)" />
+				<Avatar name="Invalid" color="not-a-color" />
+			</>
+		);
+		expect( console ).toHaveWarnedWith(
+			'Avatar: The browser does not support the `color` value. Use a valid CSS color supported by this browser.'
+		);
+		const reference = getComputedStyle( screen.getByText( 'R' ) );
+		for ( const initial of [ 'M', 'I' ] ) {
+			const fallback = getComputedStyle( screen.getByText( initial ) );
+			expect( fallback.backgroundColor ).toBe(
+				reference.backgroundColor
+			);
+			expect( fallback.color ).toBe( reference.color );
+		}
+	} );
+
 	it( 'keeps initials readable across colors and contrast boundaries', async () => {
 		const crossover = ( Math.sqrt( 21 ) - 1 ) / 20;
 		const colors = [
@@ -163,6 +185,44 @@ describe( 'Avatar colors', () => {
 } );
 
 describe( 'Avatar layout', () => {
+	it( 'centers initials inside the activity ring in RTL', async () => {
+		await render(
+			<div dir="rtl">
+				<Avatar name="Alex Morgan" active />
+			</div>
+		);
+		const avatar = screen.getByRole( 'img', { name: 'Alex Morgan' } );
+		const outer = avatar.getBoundingClientRect();
+		const inner = screen.getByText( 'AM' ).getBoundingClientRect();
+		expect( inner.left - outer.left ).toBe( outer.right - inner.right );
+		expect( inner.left ).toBeGreaterThan( outer.left );
+	} );
+
+	it( 'keeps the initials typography when rendered as a button', async () => {
+		await render(
+			<>
+				<Avatar name="Alex Morgan" size="xs" />
+				<Avatar
+					name="Alex Morgan"
+					size="xs"
+					render={ <Button variant="unstyled" /> }
+					role="button"
+				/>
+			</>
+		);
+		const initialsStyle = ( role: 'img' | 'button' ) =>
+			getComputedStyle(
+				within(
+					screen.getByRole( role, { name: 'Alex Morgan' } )
+				).getByText( 'AM' )
+			);
+		const reference = initialsStyle( 'img' );
+		const button = initialsStyle( 'button' );
+		expect( button.fontSize ).toBe( reference.fontSize );
+		expect( button.fontFamily ).toBe( reference.fontFamily );
+		expect( button.fontWeight ).toBe( reference.fontWeight );
+	} );
+
 	it( 'keeps decorative avatars in flow with their typography inside wp-admin trees', async () => {
 		const avatarRef = createRef< HTMLSpanElement >();
 		await render(

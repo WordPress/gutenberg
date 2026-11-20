@@ -14,7 +14,7 @@ import styles from './style.module.css';
  * Displays a profile image with initials as its fallback.
  * The required name supplies both the initials and the default accessible label.
  * Use `aria-hidden` when nearby text or a surrounding control supplies the name.
- * Avatar is non-interactive; wrap it in a Button or link when it performs an action.
+ * For an action, render an unstyled Button with role="button" on Avatar.
  *
  * ```jsx
  * <Avatar name="Alex Morgan" src="/alex.jpg" color="#008a20" active />
@@ -25,7 +25,7 @@ export const Avatar = forwardRef< HTMLSpanElement, AvatarProps >(
 		{
 			name,
 			src,
-			imageProps,
+			crossOrigin,
 			locale,
 			size = 'md',
 			shape = 'circle',
@@ -75,7 +75,6 @@ export const Avatar = forwardRef< HTMLSpanElement, AvatarProps >(
 			>
 				<span className={ clsx( styles.content, defenseStyles.span ) }>
 					<FallbackWithLoadingDelay
-						delay={ 300 }
 						className={ clsx(
 							styles.fallback,
 							defenseStyles.span
@@ -83,17 +82,14 @@ export const Avatar = forwardRef< HTMLSpanElement, AvatarProps >(
 					>
 						{ initials.join( '' ) }
 					</FallbackWithLoadingDelay>
-					{ ( src || imageProps?.srcSet || imageProps?.render ) && (
+					{ src && (
 						<_Avatar.Image
-							{ ...imageProps }
+							crossOrigin={ crossOrigin }
 							src={ src }
 							alt=""
 							aria-hidden="true"
 							keepMounted
-							className={ clsx(
-								styles.image,
-								imageProps?.className
-							) }
+							className={ styles.image }
 						/>
 					) }
 				</span>

@@ -49,6 +49,8 @@ describe( 'Avatar initials', () => {
 		[ '  Alex   Morgan  ', 'AM' ],
 		[ 'Alex', 'A' ],
 		[ 'Alex Morgan Smith', 'AS' ],
+		[ '\u200BAlex Morgan', 'AM' ],
+		[ 'ßeta Jones', 'SJ' ],
 		[ 'e\u0301lodie Marie Dubois', 'E\u0301D' ],
 		[ '李 小龙', '李小' ],
 		[ '👩🏽‍💻 Alex Morgan', '👩🏽‍💻M' ],
@@ -60,7 +62,7 @@ describe( 'Avatar initials', () => {
 		}
 	);
 
-	it.each( [ undefined, '', '   ' ] )(
+	it.each( [ undefined, '', '   ', '\u200B' ] )(
 		'leaves the fallback empty and warns for a blank name %s',
 		( name ) => {
 			// Missing names can still reach the component from JavaScript consumers.
