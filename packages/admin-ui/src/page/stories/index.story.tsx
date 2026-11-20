@@ -14,6 +14,7 @@ import {
 } from '@wordpress/route';
 import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
+// eslint-disable-next-line no-restricted-imports -- Stories are not shipped in the package
 import { unlock } from '../../lock-unlock';
 import { withRouter } from '../../stories/with-router';
 
