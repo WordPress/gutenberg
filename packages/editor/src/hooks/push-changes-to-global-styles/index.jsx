@@ -1,5 +1,3 @@
-import { addFilter } from '@wordpress/hooks';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	InspectorAdvancedControls,
 	store as blockEditorStore,
@@ -548,7 +546,7 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-function PushChangesToGlobalStyles( props ) {
+export default function PushChangesToGlobalStyles( props ) {
 	const blockEditingMode = useBlockEditingMode();
 	const isBlockBasedTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
@@ -570,18 +568,3 @@ function PushChangesToGlobalStyles( props ) {
 		</InspectorAdvancedControls>
 	);
 }
-
-const withPushChangesToGlobalStyles = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => (
-		<>
-			<BlockEdit key="edit" { ...props } />
-			{ props.isSelected && <PushChangesToGlobalStyles { ...props } /> }
-		</>
-	)
-);
-
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/push-changes-to-global-styles',
-	withPushChangesToGlobalStyles
-);

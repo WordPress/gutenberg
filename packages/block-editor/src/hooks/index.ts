@@ -1,8 +1,5 @@
-import {
-	createBlockEditFilter,
-	createBlockListBlockFilter,
-	createBlockSaveFilter,
-} from './utils';
+import { createBlockListBlockFilter, createBlockSaveFilter } from './utils';
+import { setBlockEditFeatures } from '../components/block-edit/features';
 import './compat';
 import align from './align';
 import background from './background';
@@ -33,10 +30,10 @@ import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import listView from './list-view';
 import './block-renaming';
-import './grid-visualizer';
+import gridVisualizer from './grid-visualizer';
 import AutoRegisterControls from './auto-inspector-controls';
 
-createBlockEditFilter(
+setBlockEditFeatures(
 	[
 		align,
 		textAlign,
@@ -54,6 +51,7 @@ createBlockEditFilter(
 		allowedBlocks,
 		listView,
 		AutoRegisterControls,
+		gridVisualizer,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [

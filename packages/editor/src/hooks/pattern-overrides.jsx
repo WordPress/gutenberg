@@ -1,6 +1,4 @@
-import { addFilter } from '@wordpress/hooks';
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	store as blockEditorStore,
 	useBlockEditingMode,
@@ -19,29 +17,9 @@ const {
 	PATTERN_SYNC_TYPES,
 } = unlock( patternsPrivateApis );
 
-/**
- * Override the default edit UI to include a new block inspector control for
- * assigning a partial syncing controls to supported blocks in the pattern editor.
- *
- * @param {Component} BlockEdit Original component.
- *
- * @return {Component} Wrapped component.
- */
-const withPatternOverrideControls = createHigherOrderComponent(
-	( BlockEdit ) => ( props ) => (
-		<>
-			<BlockEdit key="edit" { ...props } />
-			{ props.isSelected && (
-				<ControlsWithStoreSubscription { ...props } />
-			) }
-		</>
-	),
-	'withPatternOverrideControls'
-);
-
 // Split into a separate component to avoid a store subscription
 // on every block.
-function ControlsWithStoreSubscription( props ) {
+export default function ControlsWithStoreSubscription( props ) {
 	const blockEditingMode = useBlockEditingMode();
 	const {
 		isSupportedBlock,
@@ -104,9 +82,3 @@ function ControlsWithStoreSubscription( props ) {
 		</>
 	);
 }
-
-addFilter(
-	'editor.BlockEdit',
-	'core/editor/with-pattern-override-controls',
-	withPatternOverrideControls
-);
