@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   `MenuItem`: Give the `info` text of pressed items the same color as the label, so it stays readable on the pressed fill, including in forced colors mode ([#87153](https://github.com/WordPress/gutenberg/pull/87153)).
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 
 ## 45.0.0 (2026-11-18)
