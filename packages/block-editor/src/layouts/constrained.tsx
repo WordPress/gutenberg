@@ -38,29 +38,6 @@ import type { BlockGapValue } from '../hooks/types';
 const GLOBAL_CONTENT_SIZE = 'var(--wp--style--global--content-size, none)';
 const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
 
-/**
- * Returns the custom properties that describe where the content column sits
- * inside the container. Children that set their own horizontal margins use
- * them, so that their margins are measured from the content column instead of
- * the container edge.
- *
- * @param contentSize    The width of the content column.
- * @param justifyContent The justification of the content column.
- * @return CSS declarations.
- */
-function getContentOffsetDeclarations(
-	contentSize: string,
-	justifyContent: string | undefined
-): string {
-	const freeSpace = `max(0px, 100% - ${ contentSize })`;
-	const halfSpace = `max(0px, (100% - ${ contentSize }) / 2)`;
-	const offsets = {
-		left: { left: '0px', right: freeSpace },
-		right: { left: freeSpace, right: '0px' },
-	}[ justifyContent as string ] ?? { left: halfSpace, right: halfSpace };
-	return `--wp--style--layout--content-offset-left: ${ offsets.left }; --wp--style--layout--content-offset-right: ${ offsets.right };`;
-}
-
 export default {
 	name: 'constrained',
 	label: __( 'Constrained' ),
@@ -350,41 +327,33 @@ export default {
 			( contentSize && ! hasWideSizeOverride
 				? contentSize
 				: GLOBAL_WIDE_SIZE );
-		const constrainedSizeDeclarations = [
-			`max-width: ${ contentMaxWidth }`,
-		];
-		if ( ! hasViewportOverrides || hasJustificationOverride ) {
-			constrainedSizeDeclarations.push(
-				`margin-left: ${ marginLeft }`,
-				`margin-right: ${ marginRight }`
-			);
-		}
-		const shouldOutputContentOffsets =
-			( shouldOutputConstrainedSizes &&
-				( !! contentSize ||
-					!! wideSize ||
-					isResettingConstrainedSizes ) ) ||
-			hasJustificationOverride ||
-			( ! hasViewportOverrides &&
-				( justifyContent === 'left' || justifyContent === 'right' ) );
-		let output = shouldOutputContentOffsets
-			? `${ selector } { ${ getContentOffsetDeclarations(
-					contentMaxWidth === GLOBAL_CONTENT_SIZE
-						? 'var(--wp--style--global--content-size, 100%)'
-						: contentMaxWidth,
-					justifyContent
-				) } }`
-			: '';
-		output +=
+		// Children with their own horizontal margin (set inline by the margin
+		// block support) keep it instead of having it overridden by the
+		// layout's alignment margins.
+		const childSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
+		);
+		const marginLeftSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))'
+		);
+		const marginRightSelector = appendSelectors(
+			selector,
+			'> :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))'
+		);
+		const marginStyles = `
+			${ marginLeftSelector } { margin-left: ${ marginLeft }; }
+			${ marginRightSelector } { margin-right: ${ marginRight }; }
+		`;
+		let output =
 			shouldOutputConstrainedSizes &&
 			( !! contentSize || !! wideSize || isResettingConstrainedSizes )
 				? `
-						${ appendSelectors(
-							selector,
-							'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-						) } {
-						${ constrainedSizeDeclarations.join( '; ' ) };
+					${ childSelector } {
+						max-width: ${ contentMaxWidth };
 					}
+					${ ! hasViewportOverrides || hasJustificationOverride ? marginStyles : '' }
 					${ appendSelectors( selector, '> .alignwide' ) }  {
 						max-width: ${ wideMaxWidth };
 					}
@@ -395,24 +364,12 @@ export default {
 				: '';
 
 		if ( hasJustificationOverride && ! shouldOutputConstrainedSizes ) {
-			output += `${ appendSelectors(
-				selector,
-				'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-			) }
-				{ margin-left: ${ marginLeft }; margin-right: ${ marginRight }; }`;
+			output += marginStyles;
 		} else if ( ! hasViewportOverrides ) {
 			if ( justifyContent === 'left' ) {
-				output += `${ appendSelectors(
-					selector,
-					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-				) }
-			{ margin-left: ${ marginLeft }; }`;
+				output += `${ marginLeftSelector } { margin-left: ${ marginLeft }; }`;
 			} else if ( justifyContent === 'right' ) {
-				output += `${ appendSelectors(
-					selector,
-					'> :where(:not(.alignleft):not(.alignright):not(.alignfull))'
-				) }
-			{ margin-right: ${ marginRight }; }`;
+				output += `${ marginRightSelector } { margin-right: ${ marginRight }; }`;
 			}
 		}
 

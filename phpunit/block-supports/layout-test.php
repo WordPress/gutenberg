@@ -289,7 +289,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'wideSize'    => '1200px',
 					),
 				),
-				'expected_output' => '.wp-layout{--wp--style--layout--content-offset-left:max(0px, (100% - 800px) / 2);--wp--style--layout--content-offset-right:max(0px, (100% - 800px) / 2);}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}',
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:auto !important;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])){margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with sizes and block spacing' => array(
 				'args'            => array(
@@ -306,7 +306,17 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '.wp-layout{--wp--style--layout--content-offset-left:max(0px, (100% - 800px) / 2);--wp--style--layout--content-offset-right:max(0px, (100% - 800px) / 2);}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;margin-left:auto !important;margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:800px;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:auto !important;}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])){margin-right:auto !important;}.wp-layout > .alignwide{max-width:1200px;}.wp-layout .alignfull{max-width:none;}.wp-layout > .alignfull{margin-right:calc(10px * -1);margin-left:calc(20px * -1);}',
+			),
+			'constrained layout with left justification'   => array(
+				'args'            => array(
+					'selector' => '.wp-layout',
+					'layout'   => array(
+						'type'           => 'constrained',
+						'justifyContent' => 'left',
+					),
+				),
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])){margin-left:0 !important;}',
 			),
 			'constrained layout with content size unset in viewport' => array(
 				'args'            => array(
@@ -321,7 +331,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '.wp-layout{--wp--style--layout--content-offset-left:max(0px, (100% - var(--wp--style--global--content-size, 100%)) / 2);--wp--style--layout--content-offset-right:max(0px, (100% - var(--wp--style--global--content-size, 100%)) / 2);}.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size, none);}.wp-layout > .alignwide{max-width:var(--wp--style--global--wide-size, none);}.wp-layout .alignfull{max-width:none;}',
+				'expected_output' => '.wp-layout > :where(:not(.alignleft):not(.alignright):not(.alignfull)){max-width:var(--wp--style--global--content-size, none);}.wp-layout > .alignwide{max-width:var(--wp--style--global--wide-size, none);}.wp-layout .alignfull{max-width:none;}',
 			),
 			'constrained layout with block gap support'    => array(
 				'args'            => array(
@@ -818,65 +828,6 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				)
 			)
 		);
-	}
-
-	/**
-	 * Tests that a block's horizontal margins are measured from the content column of a
-	 * constrained parent, instead of being overridden by the layout's auto margins.
-	 *
-	 * @covers ::gutenberg_get_constrained_child_margin_declarations
-	 * @covers ::gutenberg_render_layout_support_flag
-	 */
-	public function test_horizontal_margins_are_measured_from_the_content_column() {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/paragraph' );
-		$style_attr = array(
-			'spacing' => array(
-				'margin' => array(
-					'top'  => '1rem',
-					'left' => '0',
-				),
-			),
-		);
-
-		$this->assertSame(
-			array(
-				'margin-left'  => 'calc(var(--wp--style--layout--content-offset-left, 0px) + 0px) !important',
-				'margin-right' => 'var(--wp--style--layout--content-offset-right, 0px) !important',
-			),
-			gutenberg_get_constrained_child_margin_declarations( $block_type, $style_attr )
-		);
-
-		$block_content = gutenberg_render_layout_support_flag(
-			'<p style="margin-top:1rem;margin-left:0">Some text.</p>',
-			array(
-				'blockName' => 'core/paragraph',
-				'attrs'     => array( 'style' => $style_attr ),
-			)
-		);
-		$this->assertMatchesRegularExpression( '/^<p class="wp-container-content-[a-z0-9]+" style="margin-top:1rem;margin-left:0">/', $block_content );
-		preg_match( '/wp-container-content-[a-z0-9]+/', $block_content, $matches );
-		$this->assertStringContainsString(
-			".is-layout-constrained > .{$matches[0]}:not(.alignleft):not(.alignright):not(.aligncenter):not(.alignwide):not(.alignfull){margin-left:calc(var(--wp--style--layout--content-offset-left, 0px) + 0px) !important;margin-right:var(--wp--style--layout--content-offset-right, 0px) !important;}",
-			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
-		);
-	}
-
-	/**
-	 * Tests that a block without horizontal margins gets no content column margins.
-	 *
-	 * @covers ::gutenberg_get_constrained_child_margin_declarations
-	 */
-	public function test_no_content_column_margins_without_horizontal_margins() {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( 'core/paragraph' );
-
-		$this->assertSame(
-			array(),
-			gutenberg_get_constrained_child_margin_declarations(
-				$block_type,
-				array( 'spacing' => array( 'margin' => array( 'top' => '1rem' ) ) )
-			)
-		);
-		$this->assertSame( array(), gutenberg_get_constrained_child_margin_declarations( null, array() ) );
 	}
 
 	/**
