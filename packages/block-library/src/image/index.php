@@ -207,6 +207,7 @@ function block_core_image_render_lightbox( $block_content, array $block, WP_Bloc
 			'closeButtonText'  => esc_html__( 'Close' ),
 			'prevButtonText'   => esc_html_x( 'Previous', 'previous image in lightbox' ),
 			'nextButtonText'   => esc_html_x( 'Next', 'next image in lightbox' ),
+			'isRTL'            => is_rtl(),
 		)
 	);
 

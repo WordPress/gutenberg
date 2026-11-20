@@ -419,11 +419,15 @@ const { state, actions, callbacks } = store(
 			} ),
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
+					const { isRTL } = getConfig();
+					const previousKey = isRTL ? 'ArrowRight' : 'ArrowLeft';
+					const nextKey = isRTL ? 'ArrowLeft' : 'ArrowRight';
+
 					if ( event.key === 'Escape' ) {
 						actions.hideLightbox();
-					} else if ( event.key === 'ArrowLeft' ) {
+					} else if ( event.key === previousKey ) {
 						actions.showPreviousImage( event );
-					} else if ( event.key === 'ArrowRight' ) {
+					} else if ( event.key === nextKey ) {
 						actions.showNextImage( event );
 					} else if ( event.key === 'Tab' ) {
 						// Traps focus within the overlay.
