@@ -12,7 +12,7 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
-/** @typedef {import('@wordpress/blocks').BlockInstance} BlockInstance */
+/** @typedef {import('@wordpress/blocks').Block} BlockInstance */
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
