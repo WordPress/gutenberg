@@ -236,7 +236,7 @@ Contains the block elements used to display a comment, like the title, date, aut
 -	**Name:** [core/comment-template](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-comment-template/)
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Parent:** core/comments
--	**Supports:** align, anchor, interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
+-	**Supports:** align, anchor, interactivity (clientNavigation), layout, spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~reusable~~
 
 ## Comments
 
