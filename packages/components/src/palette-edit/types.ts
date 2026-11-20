@@ -157,6 +157,8 @@ export type OptionProps< T extends PaletteElement > = {
 
 export type PaletteEditListViewProps< T extends PaletteElement > = {
 	elements: T[];
+	elementKeys: string[];
+	onEdit: ( updatedElements: T[], elementKeys: string[] ) => void;
 	onChange: ( newElements?: T[] ) => void;
 	variant: PaletteVariant;
 	colorPalette?: Color[];

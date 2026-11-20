@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import clsx from 'clsx';
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
@@ -261,6 +262,92 @@ export function deduplicateElementSlugs< T extends PaletteElement >(
 
 		return { ...element, slug: newSlug };
 	} );
+}
+
+function getPaletteElementKey( slug: string, occurrence = 0, generation = 0 ) {
+	return JSON.stringify( [ slug, occurrence, generation ] );
+}
+
+function usePaletteElementKeys( elements: PaletteElement[] ) {
+	const info = useMemo( () => {
+		const counts = new Map< string, number >();
+		const occurrences = elements.map( ( { slug } ) => {
+			const occurrence = counts.get( slug ) ?? 0;
+			counts.set( slug, occurrence + 1 );
+			return occurrence;
+		} );
+		return {
+			occurrences,
+			rawKeys: elements.map( ( { slug }, index ) =>
+				JSON.stringify( [ slug, occurrences[ index ] ] )
+			),
+		};
+	}, [ elements ] );
+	const [ previous, setPrevious ] = useState< {
+		info: typeof info;
+		keys: string[];
+		normalization?: { elements: PaletteElement[]; keys: string[] };
+	} >( () => ( {
+		info,
+		keys: elements.map( ( { slug }, index ) =>
+			getPaletteElementKey( slug, info.occurrences[ index ] )
+		),
+	} ) );
+	const rememberNormalization = useCallback(
+		( normalizedElements: PaletteElement[], keys: string[] ) => {
+			setPrevious( ( current ) => ( {
+				...current,
+				normalization: {
+					elements: normalizedElements,
+					keys,
+				},
+			} ) );
+		},
+		[]
+	);
+	if (
+		info.rawKeys.length === previous.info.rawKeys.length &&
+		info.rawKeys.every(
+			( key, index ) => key === previous.info.rawKeys[ index ]
+		)
+	) {
+		return { elementKeys: previous.keys, rememberNormalization };
+	}
+	// Only an edit emitted by this component can establish a normalization alias.
+	// An unrelated incoming slug may instead identify a replacement preset.
+	const normalization = previous.normalization;
+	const keys: Array< string | undefined > =
+		normalization && fastDeepEqual( elements, normalization.elements )
+			? normalization.keys
+			: info.rawKeys.map( ( key ) => {
+					const oldIndex = previous.info.rawKeys.indexOf( key );
+					return oldIndex < 0 ? undefined : previous.keys[ oldIndex ];
+				} );
+	// Reserve removed keys too, so a replacement cannot inherit an open editor.
+	const reserved = new Set( previous.keys );
+	const nextKeys = keys.map( ( key, index ) => {
+		if ( key !== undefined ) {
+			return key;
+		}
+		let generation = 0;
+		let nextKey = getPaletteElementKey(
+			elements[ index ].slug,
+			info.occurrences[ index ],
+			generation
+		);
+		while ( reserved.has( nextKey ) ) {
+			generation++;
+			nextKey = getPaletteElementKey(
+				elements[ index ].slug,
+				info.occurrences[ index ],
+				generation
+			);
+		}
+		reserved.add( nextKey );
+		return nextKey;
+	} );
+	setPrevious( { info, keys: nextKeys } );
+	return { elementKeys: nextKeys, rememberNormalization };
 }
 
 /**
@@ -537,6 +624,8 @@ function Option< T extends PaletteElement >( {
 
 function PaletteEditListView< T extends PaletteElement >( {
 	elements,
+	elementKeys,
+	onEdit,
 	onChange,
 	canOnlyChangeValues,
 	variant,
@@ -550,11 +639,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce(
-		( updatedElements: T[] ) =>
-			onChange( deduplicateElementSlugs( updatedElements ) ),
-		100
-	);
+	const debounceOnChange = useDebounce( onEdit, 100 );
 
 	return (
 		<VStack spacing={ 3 }>
@@ -564,7 +649,7 @@ function PaletteEditListView< T extends PaletteElement >( {
 						variant={ variant }
 						colorPalette={ colorPalette }
 						canOnlyChangeValues={ canOnlyChangeValues }
-						key={ index }
+						key={ elementKeys[ index ] }
 						element={ element }
 						onChange={ ( newElement ) => {
 							debounceOnChange(
@@ -575,7 +660,8 @@ function PaletteEditListView< T extends PaletteElement >( {
 										}
 										return currentElement;
 									}
-								)
+								),
+								elementKeys
 							);
 						} }
 						onRemove={ () => {
@@ -647,6 +733,8 @@ export function PaletteEdit( {
 		variant = 'duotone';
 	}
 	const elements = gradients ?? duotones ?? colors;
+	const { elementKeys, rememberNormalization } =
+		usePaletteElementKeys( elements );
 	// Filtered once here so every duotone path — the swatches, the shadows and
 	// highlights pickers, and the value a newly added duotone starts from —
 	// works from colors a duotone can actually be built with.
@@ -655,9 +743,16 @@ export function PaletteEdit( {
 		[ colorPalette ]
 	);
 	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingElement, setEditingElement ] = useState<
-		number | null | undefined
+	const [ editingElementKey, setEditingElementKey ] = useState<
+		string | null
 	>( null );
+	const editingElement =
+		editingElementKey === null
+			? -1
+			: elementKeys.indexOf( editingElementKey );
+	if ( editingElementKey !== null && editingElement < 0 ) {
+		setEditingElementKey( null );
+	}
 	const isAdding =
 		isEditing &&
 		!! editingElement &&
@@ -665,7 +760,21 @@ export function PaletteEdit( {
 		! elements[ editingElement ].slug;
 	const elementsLength = elements.length;
 	const hasElements = elementsLength > 0;
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const onEdit = useCallback(
+		(
+			updatedElements: PaletteElement[],
+			updatedKeys: string[],
+			normalizeSlugs = false
+		) => {
+			const normalizedElements =
+				deduplicateElementSlugs( updatedElements );
+			rememberNormalization( normalizedElements, updatedKeys );
+			// @ts-expect-error TODO: Don't know how to resolve
+			onChange( normalizeSlugs ? normalizedElements : updatedElements );
+		},
+		[ onChange, rememberNormalization ]
+	);
+	const debounceOnChange = useDebounce( onEdit, 100 );
 	const onSelectPaletteItem = useCallback(
 		(
 			value?: PaletteElement[ keyof PaletteElement ],
@@ -677,13 +786,17 @@ export function PaletteEdit( {
 					: elements[ newEditingElementIndex ];
 			const key = variant === 'gradient' ? 'gradient' : 'color';
 			// Ensures that the index returned matches a known element value.
-			if ( !! selectedElement && selectedElement[ key ] === value ) {
-				setEditingElement( newEditingElementIndex );
+			if (
+				newEditingElementIndex !== undefined &&
+				!! selectedElement &&
+				selectedElement[ key ] === value
+			) {
+				setEditingElementKey( elementKeys[ newEditingElementIndex ] );
 			} else {
 				setIsEditing( true );
 			}
 		},
-		[ variant, elements ]
+		[ variant, elements, elementKeys ]
 	);
 
 	// Two duotones can hold the same pair of colors, so the picker's reported
@@ -695,12 +808,12 @@ export function PaletteEdit( {
 				newEditingElementIndex !== undefined &&
 				( duotones ?? [] )[ newEditingElementIndex ]
 			) {
-				setEditingElement( newEditingElementIndex );
+				setEditingElementKey( elementKeys[ newEditingElementIndex ] );
 			} else {
 				setIsEditing( true );
 			}
 		},
-		[ duotones ]
+		[ duotones, elementKeys ]
 	);
 
 	const addColorRef = useRef< HTMLButtonElement >( null );
@@ -729,7 +842,7 @@ export function PaletteEdit( {
 							size="small"
 							onClick={ () => {
 								setIsEditing( false );
-								setEditingElement( null );
+								setEditingElementKey( null );
 							} }
 						>
 							{ __( 'Done' ) }
@@ -781,7 +894,9 @@ export function PaletteEdit( {
 									] );
 								}
 								setIsEditing( true );
-								setEditingElement( elements.length );
+								setEditingElementKey(
+									getPaletteElementKey( slug )
+								);
 							} }
 						/>
 					) }
@@ -820,7 +935,7 @@ export function PaletteEdit( {
 									{ ! canOnlyChangeValues && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingElementKey( null );
 												setIsEditing( false );
 												onChange();
 											} }
@@ -833,7 +948,7 @@ export function PaletteEdit( {
 									{ canReset && (
 										<Menu.Item
 											onClick={ () => {
-												setEditingElement( null );
+												setEditingElementKey( null );
 												onChange();
 											} }
 										>
@@ -853,6 +968,10 @@ export function PaletteEdit( {
 						<PaletteEditListView< ( typeof elements )[ number ] >
 							canOnlyChangeValues={ canOnlyChangeValues }
 							elements={ elements }
+							elementKeys={ elementKeys }
+							onEdit={ ( updatedElements, updatedKeys ) =>
+								onEdit( updatedElements, updatedKeys, true )
+							}
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
 							variant={ variant }
@@ -861,16 +980,15 @@ export function PaletteEdit( {
 							addColorRef={ addColorRef }
 						/>
 					) }
-					{ ! isEditing && editingElement !== null && (
+					{ ! isEditing && editingElement >= 0 && (
 						<ColorPickerPopover
 							variant={ variant }
 							colorPalette={ duotoneColorPalette }
-							onClose={ () => setEditingElement( null ) }
+							onClose={ () => setEditingElementKey( null ) }
 							onChange={ (
 								newElement: ( typeof elements )[ number ]
 							) => {
 								debounceOnChange(
-									// @ts-expect-error TODO: Don't know how to resolve
 									elements.map(
 										(
 											currentElement: ( typeof elements )[ number ],
@@ -883,10 +1001,11 @@ export function PaletteEdit( {
 											}
 											return currentElement;
 										}
-									)
+									),
+									elementKeys
 								);
 							} }
-							element={ elements[ editingElement ?? -1 ] }
+							element={ elements[ editingElement ] }
 							popoverProps={ popoverProps }
 						/>
 					) }
@@ -917,7 +1036,10 @@ export function PaletteEdit( {
 						<ColorPalette
 							presentation="command-buttons"
 							aria-labelledby={ paletteLabelId }
-							colors={ colors }
+							colors={ colors.map( ( color, index ) => ( {
+								...color,
+								slug: elementKeys[ index ],
+							} ) ) }
 							onChange={ onSelectPaletteItem }
 							clearable={ false }
 							disableCustomColors
