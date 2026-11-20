@@ -85,9 +85,11 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									scope="core"
 									featureName="showListViewByDefault"
 									help={ __(
-										'Opens the List View panel by default.'
+										'Opens the List View panel when the editor loads.'
 									) }
-									label={ __( 'Always open List View' ) }
+									label={ __(
+										'Open List View automatically'
+									) }
 								/>
 								{ showFooterOptions && (
 									<PreferenceToggleControl
