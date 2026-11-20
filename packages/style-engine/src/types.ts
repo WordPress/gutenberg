@@ -70,6 +70,7 @@ export interface Style {
 	spacing?: {
 		margin?: CSSProperties[ 'margin' ] | Box< 'margin' >;
 		padding?: CSSProperties[ 'padding' ] | Box< 'padding' >;
+		blockGap?: CSSProperties[ 'gap' ];
 	};
 	transform?: {
 		rotate?: CSSProperties[ 'rotate' ];
