@@ -88,6 +88,35 @@
 	background: var(--wpds-color-background-surface-neutral-weak);
 }
 
+// Content, while one of its post types is open. The post type is the
+// selected tab, so Content shows as open rather than selected.
+.navigation-add-items-modal__tab.is-open .navigation-add-items-modal__tab-label {
+	font-weight: 600;
+}
+
+// Content shows a down chevron while it's open.
+.navigation-add-items-modal__tab.is-open .navigation-add-items-modal__tab-chevron {
+	display: inline-flex;
+}
+
+// A post type under Content, indented like a WP Admin submenu item.
+.navigation-add-items-modal__tab.is-sub {
+	height: 36px;
+	min-height: 36px;
+	// Lines up with the parent's label: its padding, icon and gap.
+	padding-inline-start: 18px + 24px + 12px;
+}
+
+.navigation-add-items-modal__tab.is-sub .navigation-add-items-modal__tab-label {
+	font-weight: 400;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.navigation-add-items-modal__tab.is-sub[aria-selected="true"] .navigation-add-items-modal__tab-label {
+	font-weight: 500;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
 .navigation-add-items-modal__tab-icon,
 .navigation-add-items-modal__more-tab-icon {
 	display: inline-flex;

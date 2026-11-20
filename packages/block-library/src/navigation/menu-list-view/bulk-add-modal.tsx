@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
@@ -8,7 +9,7 @@ import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import type { Field, View } from '@wordpress/dataviews';
 import type { ComponentProps } from 'react';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { Fragment, useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __, _n, isRTL, sprintf } from '@wordpress/i18n';
 import {
@@ -68,13 +69,7 @@ const EMPTY_ARRAY: EntityRecord[] = [];
 
 const MENU_ITEM_GROUPS = [
 	{
-		description: __( 'Site pages and page-like content.' ),
-		icon: pageIcon,
-		id: 'pages',
-		title: __( 'Pages' ),
-	},
-	{
-		description: __( 'Posts and other individual content.' ),
+		description: __( 'Posts, pages and other content on your site.' ),
 		icon: postListIcon,
 		id: 'content',
 		title: __( 'Content' ),
@@ -112,40 +107,91 @@ const MENU_ITEM_GROUPS = [
 		title: __( 'Custom link' ),
 	},
 ];
-const PRIMARY_MENU_ITEM_GROUPS = new Set( [ 'pages', 'content', 'blocks' ] );
+// Content opens out into one sub-item per post type, like a WP Admin
+// submenu. Each sub-item is a tab of its own, with a value such as
+// `content:page`.
+const CONTENT_GROUP = 'content';
+const CONTENT_PREFIX = `${ CONTENT_GROUP }:`;
+// Posts come first, so "More…" doesn't open on pages, which the "+" menu
+// already offers.
+const POST_TYPE_ORDER = [ 'post', 'page' ];
 const EXCLUDED_BLOCK_INSERTIONS = new Set( [
 	'core/navigation-link',
 	'core/navigation-submenu',
 	'core/home-link',
 ] );
+// The search field names what it searches.
+const SEARCH_LABELS: Record< string, string > = {
+	blocks: __( 'Search blocks' ),
+	taxonomy: __( 'Search categories and tags' ),
+	archives: __( 'Search archives' ),
+	media: __( 'Search media' ),
+};
+
 const MENU_ITEM_GROUPS_BY_ID = Object.fromEntries(
 	MENU_ITEM_GROUPS.map( ( group ) => [ group.id, group ] )
 );
 
-const PAGE_ARGS: EntityRecordsArgs = [
-	'postType',
-	'page',
-	{
-		context: 'edit',
-		order: 'asc',
-		orderby: 'menu_order',
-		per_page: 100,
-		status: 'publish',
-		_fields: 'id,link,menu_order,parent,status,title,type',
-	},
-];
-const POST_ARGS: EntityRecordsArgs = [
-	'postType',
-	'post',
-	{
-		context: 'edit',
-		order: 'desc',
-		orderby: 'date',
-		per_page: 25,
-		status: 'publish,draft,pending,private',
-		_fields: 'id,link,status,title,type',
-	},
-];
+/**
+ * The records query for a post type's sub-item. Hierarchical types, like
+ * pages, are listed in menu order, and the rest newest first.
+ *
+ * @param postType       The post type's name.
+ * @param isHierarchical Whether the post type is hierarchical.
+ * @return Arguments for `getEntityRecords`.
+ */
+function getContentArgs(
+	postType: string,
+	isHierarchical: boolean
+): EntityRecordsArgs {
+	return [
+		'postType',
+		postType,
+		isHierarchical
+			? {
+					context: 'edit',
+					order: 'asc',
+					orderby: 'menu_order',
+					per_page: 100,
+					status: 'publish',
+					_fields: 'id,link,menu_order,parent,status,title,type',
+				}
+			: {
+					context: 'edit',
+					order: 'desc',
+					orderby: 'date',
+					per_page: 25,
+					status: 'publish,draft,pending,private',
+					_fields: 'id,link,status,title,type',
+				},
+	];
+}
+
+/**
+ * Post types that can go in a menu: those with a page on the site, leaving
+ * out media (which has its own tab) and WordPress's own types.
+ *
+ * @param postType A post type from `getPostTypes`.
+ * @return Whether it gets a sub-item under Content.
+ */
+function isMenuPostType( postType: EntityRecord ) {
+	return (
+		postType.viewable &&
+		postType.slug !== 'attachment' &&
+		! postType.slug.startsWith( 'wp_' )
+	);
+}
+
+function sortPostTypes( a: EntityRecord, b: EntityRecord ) {
+	const rank = ( slug: string ) => {
+		const index = POST_TYPE_ORDER.indexOf( slug );
+		return index === -1 ? POST_TYPE_ORDER.length : index;
+	};
+	return (
+		rank( a.slug ) - rank( b.slug ) ||
+		( a.name as string ).localeCompare( b.name )
+	);
+}
 const CATEGORY_ARGS: EntityRecordsArgs = [
 	'taxonomy',
 	'category',
@@ -194,7 +240,7 @@ function getRecordTitle( record: EntityRecord ) {
 function createPickerView( group: string ): View {
 	let fields = [ 'typeLabel', 'linkLabel', 'inThisMenu' ];
 
-	if ( group === 'pages' ) {
+	if ( group === `${ CONTENT_PREFIX }page` ) {
 		fields = [ 'status', 'inThisMenu' ];
 	} else if ( group === 'blocks' ) {
 		fields = [ 'description' ];
@@ -296,8 +342,8 @@ function isPickerItemInMenu(
  * Bulk add modal for menu items (#86179).
  *
  * People tick several pages, posts or blocks and add them to the menu in one
- * go. Less common content (categories and tags, archives, media and custom
- * links) sits behind "More", so the main flow stays simple.
+ * go. Content opens out into a sub-item for each post type, and opens on
+ * posts, as pages are already in the "+" menu.
  *
  * @param props              Component props.
  * @param props.rootClientId Client id of the block to add items into (the Navigation block or a sub menu).
@@ -310,55 +356,74 @@ export default function BulkAddModal( {
 	rootClientId: string;
 	onClose: () => void;
 } ) {
-	const [ activeGroup, setActiveGroup ] = useState( 'pages' );
-	const [ areMoreGroupsVisible, setAreMoreGroupsVisible ] = useState( false );
+	const [ activeGroup, setActiveGroup ] = useState(
+		`${ CONTENT_PREFIX }${ POST_TYPE_ORDER[ 0 ] }`
+	);
 	const [ customLabel, setCustomLabel ] = useState( '' );
 	const [ customUrl, setCustomUrl ] = useState( '' );
 	const [ error, setError ] = useState( '' );
 	const [ selection, setSelection ] = useState< string[] >( [] );
 	const [ view, setView ] = useState< View >( () =>
-		createPickerView( 'pages' )
+		createPickerView( `${ CONTENT_PREFIX }${ POST_TYPE_ORDER[ 0 ] }` )
+	);
+	const isContentActive = activeGroup.startsWith( CONTENT_PREFIX );
+	const activePostType = isContentActive
+		? activeGroup.slice( CONTENT_PREFIX.length )
+		: POST_TYPE_ORDER[ 0 ];
+	const postTypes = useSelect( ( select ) => {
+		const records = select( coreDataStore ).getPostTypes( {
+			per_page: -1,
+		} ) as EntityRecord[] | null;
+		return records ?? EMPTY_ARRAY;
+	}, [] );
+	const menuPostTypes = useMemo(
+		() => postTypes.filter( isMenuPostType ).sort( sortPostTypes ),
+		[ postTypes ]
+	);
+	const activePostTypeObject = menuPostTypes.find(
+		( postType ) => postType.slug === activePostType
+	);
+	const isHierarchical = !! activePostTypeObject?.hierarchical;
+	const contentArgs = useMemo(
+		() => getContentArgs( activePostType, isHierarchical ),
+		[ activePostType, isHierarchical ]
 	);
 	const linksInMenu = useLinksInMenu( rootClientId );
 	const { insertBlocks } = useDispatch( blockEditorStore );
 	const {
 		categories,
+		contentRecords,
 		isResolvingContent,
 		isResolvingMedia,
-		isResolvingPages,
 		isResolvingTerms,
 		media,
-		pages,
-		posts,
 		tags,
-	} = useSelect( ( select ) => {
-		const store = select( coreDataStore );
-		const getRecords = ( ...args: EntityRecordsArgs ) =>
-			store.getEntityRecords( ...args ) as EntityRecord[] | null;
+	} = useSelect(
+		( select ) => {
+			const store = select( coreDataStore );
+			const getRecords = ( ...args: EntityRecordsArgs ) =>
+				store.getEntityRecords( ...args ) as EntityRecord[] | null;
 
-		return {
-			isResolvingContent: store.isResolving(
-				'getEntityRecords',
-				POST_ARGS
-			),
-			isResolvingMedia: store.isResolving(
-				'getEntityRecords',
-				MEDIA_ARGS
-			),
-			isResolvingPages: store.isResolving(
-				'getEntityRecords',
-				PAGE_ARGS
-			),
-			isResolvingTerms:
-				store.isResolving( 'getEntityRecords', CATEGORY_ARGS ) ||
-				store.isResolving( 'getEntityRecords', TAG_ARGS ),
-			media: getRecords( ...MEDIA_ARGS ) || EMPTY_ARRAY,
-			pages: getRecords( ...PAGE_ARGS ) || EMPTY_ARRAY,
-			posts: getRecords( ...POST_ARGS ) || EMPTY_ARRAY,
-			categories: getRecords( ...CATEGORY_ARGS ) || EMPTY_ARRAY,
-			tags: getRecords( ...TAG_ARGS ) || EMPTY_ARRAY,
-		};
-	}, [] );
+			return {
+				isResolvingContent: store.isResolving(
+					'getEntityRecords',
+					contentArgs
+				),
+				isResolvingMedia: store.isResolving(
+					'getEntityRecords',
+					MEDIA_ARGS
+				),
+				isResolvingTerms:
+					store.isResolving( 'getEntityRecords', CATEGORY_ARGS ) ||
+					store.isResolving( 'getEntityRecords', TAG_ARGS ),
+				media: getRecords( ...MEDIA_ARGS ) || EMPTY_ARRAY,
+				contentRecords: getRecords( ...contentArgs ) || EMPTY_ARRAY,
+				categories: getRecords( ...CATEGORY_ARGS ) || EMPTY_ARRAY,
+				tags: getRecords( ...TAG_ARGS ) || EMPTY_ARRAY,
+			};
+		},
+		[ contentArgs ]
+	);
 	// Built here rather than in the selectors, which would hand back new
 	// arrays, and re-render the modal, on every change to any store.
 	const terms = useMemo(
@@ -404,29 +469,19 @@ export default function BulkAddModal( {
 	);
 	const items = useMemo( (): PickerItem[] => {
 		const nextItems: Omit< PickerItem, 'inThisMenu' >[] = [
-			...pages.map( ( page ) => ( {
-				group: 'pages',
-				id: `post-type:page:${ page.id }`,
-				linkLabel: page.link || '',
-				objectId: page.id,
+			...contentRecords.map( ( record ) => ( {
+				group: `${ CONTENT_PREFIX }${ activePostType }`,
+				id: `post-type:${ activePostType }:${ record.id }`,
+				linkLabel: record.link || '',
+				objectId: record.id,
 				sourceKind: 'post-type',
-				sourceType: 'page',
-				status: page.status || 'publish',
-				title: getRecordTitle( page ),
-				typeLabel: __( 'Page' ),
-				url: page.link || '',
-			} ) ),
-			...posts.map( ( post ) => ( {
-				group: 'content',
-				id: `post-type:post:${ post.id }`,
-				linkLabel: post.link || '',
-				objectId: post.id,
-				sourceKind: 'post-type',
-				sourceType: post.type || 'post',
-				status: post.status || 'publish',
-				title: getRecordTitle( post ),
-				typeLabel: __( 'Post' ),
-				url: post.link || '',
+				sourceType: record.type || activePostType,
+				status: record.status || 'publish',
+				title: getRecordTitle( record ),
+				typeLabel:
+					activePostTypeObject?.labels?.singular_name ||
+					activePostType,
+				url: record.link || '',
 			} ) ),
 			...blockItems.map( ( blockType ) => ( {
 				blockIcon: blockType.icon?.src,
@@ -485,8 +540,27 @@ export default function BulkAddModal( {
 			...item,
 			inThisMenu: isPickerItemInMenu( item, linksInMenu ),
 		} ) );
-	}, [ blockItems, linksInMenu, media, pages, posts, terms ] );
-	const group = MENU_ITEM_GROUPS_BY_ID[ activeGroup ];
+	}, [
+		activePostType,
+		activePostTypeObject,
+		blockItems,
+		contentRecords,
+		linksInMenu,
+		media,
+		terms,
+	] );
+	const searchLabel =
+		( isContentActive
+			? activePostTypeObject?.labels?.search_items
+			: SEARCH_LABELS[ activeGroup ] ) || __( 'Search menu items' );
+	const group = isContentActive
+		? {
+				title: activePostTypeObject?.name ?? __( 'Content' ),
+				description:
+					activePostTypeObject?.description ||
+					MENU_ITEM_GROUPS_BY_ID[ CONTENT_GROUP ].description,
+			}
+		: MENU_ITEM_GROUPS_BY_ID[ activeGroup ];
 	const activeItems = useMemo(
 		() => items.filter( ( item ) => item.group === activeGroup ),
 		[ activeGroup, items ]
@@ -499,11 +573,17 @@ export default function BulkAddModal( {
 		selection.includes( item.id )
 	);
 	const isResolving =
-		( activeGroup === 'pages' && isResolvingPages ) ||
-		( activeGroup === 'content' && isResolvingContent ) ||
+		( isContentActive && isResolvingContent ) ||
 		( activeGroup === 'taxonomy' && isResolvingTerms ) ||
 		( activeGroup === 'media' && isResolvingMedia );
-	const selectGroup = ( nextGroup: string ) => {
+	const selectGroup = ( value: unknown ) => {
+		// Content itself opens its first post type.
+		const nextGroup =
+			value === CONTENT_GROUP
+				? `${ CONTENT_PREFIX }${
+						menuPostTypes[ 0 ]?.slug ?? POST_TYPE_ORDER[ 0 ]
+					}`
+				: ( value as string );
 		setActiveGroup( nextGroup );
 		setError( '' );
 		setSelection( [] );
@@ -572,50 +652,56 @@ export default function BulkAddModal( {
 					value={ activeGroup }
 				>
 					<Tabs.List className="navigation-add-items-modal__tablist">
-						{ MENU_ITEM_GROUPS.filter(
-							( itemGroup ) =>
-								PRIMARY_MENU_ITEM_GROUPS.has( itemGroup.id ) ||
-								areMoreGroupsVisible
-						).map( ( itemGroup ) => (
-							<Tabs.Tab
-								className="navigation-add-items-modal__tab"
-								key={ itemGroup.id }
-								value={ itemGroup.id }
-							>
-								<span className="navigation-add-items-modal__tab-icon">
-									<Icon icon={ itemGroup.icon } />
-								</span>
-								<span className="navigation-add-items-modal__tab-label">
-									{ itemGroup.title }
-								</span>
-								<span className="navigation-add-items-modal__tab-chevron">
-									<Icon
-										icon={
-											isRTL()
-												? chevronLeftIcon
-												: chevronRightIcon
-										}
-									/>
-								</span>
-							</Tabs.Tab>
-						) ) }
-						{ ! areMoreGroupsVisible && (
-							<Button
-								__next40pxDefaultSize
-								className="navigation-add-items-modal__more-tab"
-								onClick={ () =>
-									setAreMoreGroupsVisible( true )
-								}
-								variant="tertiary"
-							>
-								<span className="navigation-add-items-modal__more-tab-icon">
-									<Icon icon={ chevronDownIcon } />
-								</span>
-								<span className="navigation-add-items-modal__tab-label">
-									{ __( 'More' ) }
-								</span>
-							</Button>
-						) }
+						{ MENU_ITEM_GROUPS.map( ( itemGroup ) => {
+							const isContent = itemGroup.id === CONTENT_GROUP;
+							return (
+								<Fragment key={ itemGroup.id }>
+									<Tabs.Tab
+										className={ clsx(
+											'navigation-add-items-modal__tab',
+											{
+												'is-open':
+													isContent &&
+													isContentActive,
+											}
+										) }
+										value={ itemGroup.id }
+									>
+										<span className="navigation-add-items-modal__tab-icon">
+											<Icon icon={ itemGroup.icon } />
+										</span>
+										<span className="navigation-add-items-modal__tab-label">
+											{ itemGroup.title }
+										</span>
+										<span className="navigation-add-items-modal__tab-chevron">
+											<Icon
+												icon={
+													( isContent &&
+														isContentActive &&
+														chevronDownIcon ) ||
+													( isRTL()
+														? chevronLeftIcon
+														: chevronRightIcon )
+												}
+											/>
+										</span>
+									</Tabs.Tab>
+									{ isContent &&
+										isContentActive &&
+										menuPostTypes.map( ( postType ) => (
+											<Tabs.Tab
+												key={ postType.slug }
+												className="navigation-add-items-modal__tab is-sub"
+												value={ `${ CONTENT_PREFIX }${ postType.slug }` }
+											>
+												<span className="navigation-add-items-modal__tab-label">
+													{ postType.name }
+												</span>
+											</Tabs.Tab>
+										) ) }
+								</Fragment>
+							);
+						} ) }
 					</Tabs.List>
 					<Tabs.Panel
 						className="navigation-add-items-modal__panel"
@@ -698,7 +784,7 @@ export default function BulkAddModal( {
 							>
 								<div className="navigation-add-items-modal__toolbar">
 									<DataViewsPicker.Search
-										label={ __( 'Search menu items' ) }
+										label={ searchLabel }
 									/>
 									<div className="navigation-add-items-modal__toolbar-actions">
 										<DataViewsPicker.FiltersToggle />
@@ -755,7 +841,7 @@ function PickerSourceIcon( { item }: { item: PickerItem } ) {
 		icon = customLinkIcon;
 	} else if ( item.group === 'archives' ) {
 		icon = archiveIcon;
-	} else if ( item.group === 'content' ) {
+	} else if ( item.group === `${ CONTENT_PREFIX }post` ) {
 		icon = postListIcon;
 	}
 
