@@ -258,3 +258,25 @@ describe( 'URL normalization consistency', () => {
 		);
 	} );
 } );
+
+describe( 'Apply without an existing link', () => {
+	it( 'should submit the normalized URL', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = vi.fn();
+
+		renderWithProvider(
+			<LinkControl forceIsEditingLink onChange={ mockOnChange } />
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.type( searchInput, 'wordpress.org' );
+		await screen.findByRole( 'option' );
+
+		await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+
+		expect( mockOnChange ).toHaveBeenCalledTimes( 1 );
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( { url: 'https://wordpress.org' } )
+		);
+	} );
+} );

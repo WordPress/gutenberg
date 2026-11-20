@@ -7,6 +7,7 @@ import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
 import type { LinkSuggestionsQuery } from '../../link-control/types';
+import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockScrollIntoView();
@@ -386,6 +387,63 @@ describe( 'LinkPicker', () => {
 
 			// Focus should return to the button
 			expect( button ).toHaveFocus();
+		} );
+	} );
+
+	describe( 'Apply', () => {
+		async function typeAndApply( typedValue: string ) {
+			const user = userEvent.setup();
+			const onSelect = vi.fn();
+
+			render(
+				<LinkPicker
+					preview={ createMockPreview() }
+					onSelect={ onSelect }
+					label="Link"
+				/>
+			);
+
+			const button = screen.getByRole( 'button' );
+			await user.click( button );
+			const searchInput = await screen.findByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+			await user.type( searchInput, typedValue );
+			await user.click( screen.getByRole( 'button', { name: 'Apply' } ) );
+
+			return { button, onSelect };
+		}
+
+		it.each( [ 'https://wordpress.org', 'wordpress.org' ] )(
+			'should save "%s" as https://wordpress.org and close the URL edit popover',
+			async ( typedValue ) => {
+				const { button, onSelect } = await typeAndApply( typedValue );
+
+				expect( onSelect ).toHaveBeenCalledTimes( 1 );
+				expect( onSelect ).toHaveBeenCalledWith(
+					expect.objectContaining( { url: 'https://wordpress.org' } )
+				);
+				expect(
+					screen.queryByRole( 'combobox', {
+						name: 'Search or type URL',
+					} )
+				).not.toBeInTheDocument();
+				expect( button ).toHaveFocus();
+			}
+		);
+
+		it( 'should keep the URL edit popover open with an invalid URL', async () => {
+			const { onSelect } = await typeAndApply( 'invalid url' );
+
+			expect( onSelect ).not.toHaveBeenCalled();
+			// The input remounts once validation fails, so query it again.
+			expect(
+				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
+			).toBeInTheDocument();
+			expect(
+				await screen.findByText( 'Please enter a valid URL.' )
+			).toBeVisible();
+			expectValidatedInputControlDeprecationIfCalled();
 		} );
 	} );
 

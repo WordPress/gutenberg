@@ -188,9 +188,11 @@ function LinkControl( {
 	const baseId = useInstanceId( LinkControl, 'link-control' );
 	const helpTextId = isEntity ? `${ baseId }__help` : null;
 
+	// Without a value, anything entered is a new link.
 	const valueHasChanges =
+		! value ||
 		// The internal value follows `value`, which is set here.
-		value && ! isShallowEqualObjects( internalControlValue!, value );
+		! isShallowEqualObjects( internalControlValue!, value );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -562,8 +564,7 @@ function LinkControl( {
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
 	// When creating a new link (no existing value), allow submission if input is not empty and URL is valid
 	// When editing an existing link, also require that the value has changed
-	const isDisabled =
-		currentInputIsEmpty || ! isUrlValid || ( value && ! valueHasChanges );
+	const isDisabled = currentInputIsEmpty || ! isUrlValid || ! valueHasChanges;
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	const previewValue = useMemo( () => {
