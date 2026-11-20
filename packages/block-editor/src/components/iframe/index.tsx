@@ -123,12 +123,11 @@ function getPortalBoundaryEventProps( props: IframeProps ) {
  * Pair with `getPortalBoundaryEventProps` so React ancestors do not also
  * receive the portal-bubbled synthetic event for those same interactions.
  *
- * The listeners belong on the document rather than on `documentElement`, so
- * that the canvas is done with an event before the parent sees it. The canvas
- * root drop zone sits on `documentElement`, and a drop zone ignores an event
- * that is already default prevented. Redispatching from that same element
- * would race it, and a `preventDefault` relayed back from the parent would
- * reach the original event first.
+ * Forward `mousemove` during capture so the parent document's pointer
+ * tracking is current when tooltip anchors inside the canvas handle the event.
+ * The other events bubble to the document after canvas handlers run. In
+ * particular, the canvas drop zone on `documentElement` must see `dragover`
+ * before an outer handler can cancel it.
  *
  * Ideally, we should remove the `keydown` event bubbling in the future.
  * Keyboard shortcuts should be context dependent, e.g. actions on blocks
@@ -150,14 +149,19 @@ function useBubbleEvents( iframeDocument: Document | undefined ) {
 			handlers[ native ] = ( event ) => {
 				bubbleEvent( event, frameElement as HTMLIFrameElement );
 			};
-			iframeDocument!.addEventListener( native, handlers[ native ] );
+			iframeDocument!.addEventListener(
+				native,
+				handlers[ native ],
+				native === 'mousemove'
+			);
 		}
 
 		return () => {
 			for ( const { native } of BRIDGED_EVENTS ) {
 				iframeDocument!.removeEventListener(
 					native,
-					handlers[ native ]
+					handlers[ native ],
+					native === 'mousemove'
 				);
 			}
 		};
