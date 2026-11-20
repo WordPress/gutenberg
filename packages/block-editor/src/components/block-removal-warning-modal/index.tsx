@@ -8,6 +8,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { Stack, Text } from '@wordpress/ui';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import type { BlockRemovalWarningModalProps } from './types';
@@ -61,19 +62,19 @@ export function BlockRemovalWarningModal( {
 			size="medium"
 		>
 			<VStack spacing={ 4 }>
-				<div>
-					<p>{ description }</p>
+				<Stack direction="column" gap="md">
+					<Text render={ <p /> }>{ description }</Text>
 					{ isStructured &&
 						( message.warning || message.subtext ) && (
-							<p>
+							<Text render={ <p /> }>
 								{ message.warning && (
 									<strong>{ message.warning }</strong>
 								) }
 								{ message.warning && message.subtext && ' ' }
 								{ message.subtext }
-							</p>
+							</Text>
 						) }
-				</div>
+				</Stack>
 				{ requireConfirmation && (
 					<WCCheckboxControl
 						label={ __( 'I understand the consequences' ) }
