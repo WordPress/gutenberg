@@ -17,6 +17,7 @@ import { Notice } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import './style.scss';
 import { AiPluginCallout } from './ai-plugin-callout';
+import { McpAccessPanel } from './mcp-access-panel';
 import {
 	getIsFileModDisabled,
 	registerDefaultConnectors,
@@ -144,6 +145,7 @@ function ConnectorsPage() {
 				) : (
 					<VStack spacing={ 3 }>
 						<AiPluginCallout />
+						<McpAccessPanel />
 						<VStack spacing={ 3 } role="list">
 							{ connectors.map(
 								( connector: ConnectorConfig ) => {

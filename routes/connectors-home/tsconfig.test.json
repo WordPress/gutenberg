@@ -15,6 +15,7 @@
 		{ "path": "../../packages/connectors/tsconfig.build.json" },
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data/tsconfig.build.json" },
+		{ "path": "../../packages/dataviews/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/notices/tsconfig.build.json" },
