@@ -3025,11 +3025,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation/constants.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -3368,11 +3363,6 @@
 		}
 	},
 	"packages/block-library/src/navigation/edit/use-generate-default-navigation-title.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation/edit/use-inner-blocks.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6192,23 +6182,12 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/deprecated-text-align-attributes.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/utils/deprecated-text-align-attributes.ts": {
 		"no-restricted-syntax": {
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/get-transformed-attributes.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/hooks.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-library/src/utils/hooks.ts": {
 		"no-restricted-syntax": {
 			"count": 1
 		}
@@ -6218,21 +6197,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/init-block.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/is-block-metadata-experimental.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/is-within-overlay.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -6247,16 +6211,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/utils/migrate-font-family.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/migrate-text-align.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/utils/poster-image.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -6265,36 +6219,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/reduced-motion.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/remove-anchor-tag.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/search-patterns.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/style-state.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/search-patterns.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/utils/test/style-state.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -6495,72 +6419,7 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/blockquote-normaliser.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/comment-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/figure-content-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/html-formatting-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/image-corrector.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/latex-to-math.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/list-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/markdown-converter.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/ms-list-converter.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/non-breaking-space-corrector.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/normalise-blocks.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/paste-handler.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/phrasing-content-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/special-comment-converter.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -10447,11 +10306,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/unsaved-changes-warning/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/upload-progress-snackbar/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -11021,11 +10875,6 @@
 			"count": 4
 		}
 	},
-	"packages/global-styles-ui/src/font-library/utils/test/preview-styles.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -11194,34 +11043,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/test/screen-block-list.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/screen-header.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/shadow-utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/use-presets.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -11229,11 +11050,6 @@
 	},
 	"packages/global-styles-ui/src/utils.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/variations/test/variations-panel.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
