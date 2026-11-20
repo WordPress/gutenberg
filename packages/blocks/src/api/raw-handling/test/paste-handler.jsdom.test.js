@@ -1,5 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 import { pasteHandler, serialize } from '@wordpress/blocks';
+import { init as initAndRegisterHeadingBlock } from '../../../../../block-library/src/heading';
 import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
@@ -79,6 +80,7 @@ const tableWithCellAlignments = `
 
 describe( 'pasteHandler', () => {
 	beforeAll( () => {
+		initAndRegisterHeadingBlock();
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
 	} );
@@ -311,6 +313,17 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+
+	it( 'drops empty Word bookmark anchors from headings', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<h3><a name="_Toc123"></a>Heading</h3>',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toBe( 'core/heading' );
+		expect( result.attributes.content.toString() ).toBe( 'Heading' );
 	} );
 } );
 
