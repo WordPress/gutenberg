@@ -347,6 +347,7 @@ function MediaTextEdit( {
 					<MediaControl
 						mediaId={ mediaId }
 						mediaUrl={ mediaUrl || featuredImageURL }
+						mediaType={ mediaType }
 						filename={
 							image?.media_details?.sizes?.full?.file ||
 							image?.slug ||

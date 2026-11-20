@@ -15,8 +15,20 @@ import { focus } from '@wordpress/dom';
 import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { reset as resetIcon } from '@wordpress/icons';
+import {
+	Icon,
+	audio as audioIcon,
+	file as fileIcon,
+	plus as plusIcon,
+	reset as resetIcon,
+	video as videoIcon,
+} from '@wordpress/icons';
 import { getFilename } from '@wordpress/url';
+
+const MEDIA_TYPE_ICONS = {
+	audio: audioIcon,
+	video: videoIcon,
+};
 
 /**
  * Focuses the toggle button.
@@ -36,10 +48,39 @@ const focusToggleButton = ( containerRef ) => {
 };
 
 /**
+ * MediaControlIndicator - The slot left of the label: a `+` when no media is
+ * set, a thumbnail for an image, and an icon for any other media type.
+ *
+ * @param {Object} props
+ * @param {string} props.url       Media URL
+ * @param {string} props.mediaType Media type
+ * @return {Element} Indicator component
+ */
+function MediaControlIndicator( { url, mediaType } ) {
+	if ( url && mediaType === 'image' ) {
+		return (
+			<span
+				className="block-library-utils__media-control__inspector-image-indicator"
+				style={ { backgroundImage: `url(${ url })` } }
+			/>
+		);
+	}
+
+	const typeIcon = MEDIA_TYPE_ICONS[ mediaType ] ?? fileIcon;
+
+	return (
+		<span className="block-library-utils__media-control__inspector-icon-indicator">
+			<Icon icon={ url ? typeIcon : plusIcon } />
+		</span>
+	);
+}
+
+/**
  * MediaControlPreview - Preview component showing media thumbnail and filename
  *
  * @param {Object} props
  * @param {string} props.url            Media URL for thumbnail
+ * @param {string} props.mediaType      Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
  * @param {string} props.filename       Filename to display
  * @param {Object} props.itemGroupProps Optional props to pass to ItemGroup
  * @param {string} props.className      Optional className for Truncate
@@ -48,6 +89,7 @@ const focusToggleButton = ( containerRef ) => {
  */
 export function MediaControlPreview( {
 	url,
+	mediaType = 'image',
 	filename,
 	itemGroupProps,
 	className,
@@ -56,12 +98,7 @@ export function MediaControlPreview( {
 	return (
 		<ItemGroup { ...itemGroupProps } as="span">
 			<HStack justify="flex-start">
-				<span
-					className="block-library-utils__media-control__inspector-image-indicator"
-					style={ {
-						backgroundImage: url ? `url(${ url })` : undefined,
-					} }
-				/>
+				<MediaControlIndicator url={ url } mediaType={ mediaType } />
 				<FlexBlock>
 					<Truncate numberOfLines={ 1 } className={ className }>
 						{ filename ?? label }
@@ -78,6 +115,7 @@ export function MediaControlPreview( {
  * @param {Object}   props
  * @param {number}   props.mediaId               Media attachment ID
  * @param {string}   props.mediaUrl              Media URL
+ * @param {string}   props.mediaType             Media type: 'image', 'video', 'audio', or any other type for a generic file (default: 'image')
  * @param {string}   props.filename              Filename to display
  * @param {Array}    props.allowedTypes          Allowed media types
  * @param {Function} props.onSelect              Callback when media selected
@@ -93,6 +131,7 @@ export function MediaControlPreview( {
 export function MediaControl( {
 	mediaId,
 	mediaUrl,
+	mediaType,
 	filename,
 	allowedTypes,
 	onSelect,
@@ -140,6 +179,7 @@ export function MediaControl( {
 				name={
 					<MediaControlPreview
 						url={ mediaUrl }
+						mediaType={ mediaType }
 						filename={ filename }
 						className="block-library-utils__media-control__inspector-media-replace-title"
 						label={
