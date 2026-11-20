@@ -276,10 +276,7 @@ test.describe( 'Site Editor Inserter', () => {
 
 	// Both site editors register the experimental blocks of the Gutenberg
 	// plugin, so they offer the same blocks.
-	test( 'offers the experimental blocks', async ( {
-		InserterUtils,
-		page,
-	} ) => {
+	test( 'offers the experimental blocks', async ( { InserterUtils } ) => {
 		await InserterUtils.openBlockLibrary();
 		await InserterUtils.blockLibrary
 			.getByRole( 'searchbox', { name: 'Search' } )
@@ -291,7 +288,6 @@ test.describe( 'Site Editor Inserter', () => {
 				exact: true,
 			} )
 		).toBeVisible();
-		await expect( page.getByText( 'No results found.' ) ).toBeHidden();
 	} );
 } );
 

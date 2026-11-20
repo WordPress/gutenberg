@@ -407,7 +407,7 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			}
 
 			/*
-			 * The experimental blocks are registered as the site editor
+			 * The experimental blocks are registered as the classic site editor
 			 * registers them, so that both site editors offer the same blocks.
 			 * The function is only defined in the Gutenberg plugin.
 			 */
