@@ -184,16 +184,18 @@ export default function ElementPreview( {
 	}
 
 	return (
-		<div className="global-styles-ui-element-preview">
-			<Iframe
-				tabIndex={ -1 }
-				readonly
-				title={ __( 'Element preview' ) }
-				aria-hidden="true"
-			>
-				<EditorStyles styles={ editorStyles } />
-				{ sample }
-			</Iframe>
+		<div className="global-styles-ui__sticky-preview">
+			<div className="global-styles-ui-element-preview">
+				<Iframe
+					tabIndex={ -1 }
+					readonly
+					title={ __( 'Element preview' ) }
+					aria-hidden="true"
+				>
+					<EditorStyles styles={ editorStyles } />
+					{ sample }
+				</Iframe>
+			</div>
 		</div>
 	);
 }

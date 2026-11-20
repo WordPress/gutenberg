@@ -129,7 +129,11 @@ const BlockPreviewPanel = ( {
 			: previewHeight;
 
 	return (
-		<Spacer marginX={ 4 } marginBottom={ 4 }>
+		<Spacer
+			className="global-styles-ui__sticky-preview"
+			marginX={ 4 }
+			marginBottom={ 4 }
+		>
 			<div
 				className="global-styles-ui__block-preview-panel"
 				style={ { maxHeight: previewHeight, boxSizing: 'initial' } }
