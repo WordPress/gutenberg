@@ -54,7 +54,7 @@ export function MediaControlPreview( {
 	label,
 } ) {
 	return (
-		<ItemGroup { ...itemGroupProps } as="span">
+		<ItemGroup { ...itemGroupProps } as="span" role="none">
 			<HStack justify="flex-start">
 				<span
 					className="block-library-utils__media-control__inspector-image-indicator"
