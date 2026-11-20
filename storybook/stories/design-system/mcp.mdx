@@ -1,6 +1,15 @@
 import { Meta, Markdown } from '@storybook/addon-docs/blocks';
 import Readme from '../../../packages/design-system-mcp/README.md?raw';
+import { InstallGrid } from '../../components/install-grid';
 
 <Meta title="Design System/Using with AI" />
 
-<Markdown>{ Readme }</Markdown>
+export const [ beforeSetup, afterSetup ] = Readme.split( /^## Setup[\s\S]*?(?=^## Importing the package)/m );
+
+<Markdown>{ beforeSetup }</Markdown>
+
+## Setup
+
+<InstallGrid />
+
+<Markdown>{ afterSetup }</Markdown>

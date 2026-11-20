@@ -17,7 +17,11 @@ Without the MCP server, an AI agent may produce a functional and convincing resu
 
 ## Setup
 
+See installing instructions also in [Storybook](https://wordpress.github.io/gutenberg/?path=/docs/design-system-using-with-ai--docs#setup).
+
 ### Claude Code
+
+See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp).
 
 ```bash
 claude mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-age=2 @wordpress/design-system-mcp@latest
@@ -33,11 +37,13 @@ codex mcp add wordpress-design-system -- npx -y --ignore-scripts --min-release-a
 
 ### Cursor
 
+See the [Cursor MCP documentation](https://cursor.com/docs/mcp).
+
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=wordpress-design-system&config=eyJjb21tYW5kIjoibnB4IC15IC0taWdub3JlLXNjcmlwdHMgLS1taW4tcmVsZWFzZS1hZ2U9MiBAd29yZHByZXNzL2Rlc2lnbi1zeXN0ZW0tbWNwQGxhdGVzdCJ9)
 
-### Other (Claude Desktop, VS Code)
+### Other clients
 
-Add to your MCP client configuration (`mcp.json` or equivalent):
+Most clients accept the same `mcpServers` configuration:
 
 ```json
 {
@@ -55,11 +61,17 @@ Add to your MCP client configuration (`mcp.json` or equivalent):
 }
 ```
 
-Configuration instructions for common clients:
+Where it goes, and what changes for each client:
 
-- [VSCode](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file)
-- [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server)
-    - This guide is for the "filesystem" server, but you can substitute the `mcpServers` entry from the snippet above and the rest of the instructions still apply.
+| Client | Where | Notes |
+| --- | --- | --- |
+| [Claude Desktop](https://modelcontextprotocol.io/docs/develop/connect-local-servers#installing-the-filesystem-server) | `claude_desktop_config.json` (Settings, Developer, Edit Config) | Restart the app. The guide is for the "filesystem" server, so substitute the entry above. |
+| [VS Code](https://code.visualstudio.com/docs/agent-customization/mcp-servers#_configure-the-mcpjson-file) | `.vscode/mcp.json`, or [install in VS Code](https://vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%257B%2522name%2522%253A%2522wordpress-design-system%2522%252C%2522command%2522%253A%2522npx%2522%252C%2522args%2522%253A%255B%2522-y%2522%252C%2522--ignore-scripts%2522%252C%2522--min-release-age%253D2%2522%252C%2522%2540wordpress%252Fdesign-system-mcp%2540latest%2522%255D%257D) | Use `servers` instead of `mcpServers`. |
+| [JetBrains](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html) | Settings, Tools, AI Assistant, Model Context Protocol (MCP), Add | Paste it into the JSON configuration field. |
+| [Antigravity](https://antigravity.google/docs/mcp) | `~/.gemini/config/mcp_config.json`, or Agent panel, MCP Servers, Manage MCP Servers, View raw config | Replaces Gemini CLI. |
+| [Zed](https://zed.dev/docs/ai/mcp#as-custom-servers) | `settings.json` | Use `context_servers` instead of `mcpServers`. |
+| [OpenCode](https://opencode.ai/docs/mcp-servers/) | `opencode.json` | Use `mcp.servers`, add `"type": "local"`, and join `command` and `args` into one `command` array. |
+| [Raycast](https://manual.raycast.com/ai/model-context-protocol) | The "Install MCP Server" command | Choose Standard Input/Output, then enter `command` as the Command and `args` as the Arguments. |
 
 ## Importing the package
 
