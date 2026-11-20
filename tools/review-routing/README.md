@@ -33,7 +33,7 @@ export default async function () {
 
 The model then reads the question and the data as one object, `{ "question": "...", "stores": [ ... ] }`, so the question can name the field: "Does this change add an action to one of the stores in `stores`?" `--dry-run` prints this object.
 
-The file runs with Node.js, from the base branch in CI, so it can use only Node.js built-in modules. To read a file of the repository, make its path from `import.meta.url`, and add its directory to the sparse checkout in `.github/workflows/review-routing.yml`.
+The tool runs this file each time that it loads the rules, also with `--dry-run`, so treat it like any other code that you run from a checkout. It runs with Node.js, from the base branch in CI, and can use only Node.js built-in modules. To read a file of the repository, make its path from `import.meta.url`, and add its directory to the sparse checkout in `.github/workflows/review-routing.yml`.
 
 ## What the model reads
 
