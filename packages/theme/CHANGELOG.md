@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the WCAG sRGB luminance coefficients when checking generated colors against contrast thresholds ([#87174](https://github.com/WordPress/gutenberg/pull/87174)).
+
 ### Internal
 
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).
@@ -27,8 +31,6 @@
 -   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
 
 ### Bug Fixes
-
--   Use the WCAG sRGB luminance coefficients when checking generated colors against contrast thresholds ([#87174](https://github.com/WordPress/gutenberg/pull/87174)).
 
 -   `ThemeProvider`: Carry near-gray background tints into generated neutral surfaces and strokes with a smooth chroma ceiling that stays close to the seed for faint tints ([#86052](https://github.com/WordPress/gutenberg/pull/86052)).
 -   Preserve generated color contrast after rounding, slightly shifting default color token values, and report remaining failures from the emitted `ThemeProvider` colors ([#86189](https://github.com/WordPress/gutenberg/pull/86189)).
