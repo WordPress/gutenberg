@@ -2306,6 +2306,253 @@ function updateConfigWithSeparator(
 	return config;
 }
 
+/**
+ * Returns whether a character is CSS whitespace.
+ *
+ * @param char The character to check.
+ * @return Whether the character is a space, tab, line feed, carriage return
+ *         or form feed.
+ */
+function isCSSWhitespace( char: string ) {
+	return (
+		char === ' ' ||
+		char === '\t' ||
+		char === '\n' ||
+		char === '\r' ||
+		char === '\f'
+	);
+}
+
+/**
+ * Returns the index after the comment that starts at `start`, or the length of
+ * the CSS when the comment isn't closed.
+ *
+ * @param css   The CSS to search.
+ * @param start The index of the `/` that opens the comment.
+ * @return The index after the closing `*` and `/`.
+ */
+function findCommentEnd( css: string, start: number ) {
+	const end = css.indexOf( '*/', start + 2 );
+	return end === -1 ? css.length : end + 2;
+}
+
+/**
+ * Returns whether a comment starts at the given index.
+ *
+ * @param css   The CSS to check.
+ * @param index The index to check.
+ * @return Whether `/*` starts at the index.
+ */
+function isCommentStart( css: string, index: number ) {
+	return css[ index ] === '/' && css[ index + 1 ] === '*';
+}
+
+/**
+ * Returns the index of the first character from `start` that isn't whitespace
+ * or part of a comment.
+ *
+ * @param css   The CSS to search.
+ * @param start The index to start from.
+ * @return The index of the character, or the length of the CSS.
+ */
+function skipWhitespaceAndComments( css: string, start: number ) {
+	let i = start;
+	while ( i < css.length ) {
+		if ( isCSSWhitespace( css[ i ] ) ) {
+			i++;
+		} else if ( isCommentStart( css, i ) ) {
+			i = findCommentEnd( css, i );
+		} else {
+			break;
+		}
+	}
+	return i;
+}
+
+/**
+ * Returns the index of the next `{`, `;` or `}` outside a string or comment,
+ * or -1.
+ *
+ * @param css   The CSS to search.
+ * @param start The index to start from.
+ * @return The index of the delimiter, or -1 when there is none.
+ */
+function findNextDelimiter( css: string, start: number ) {
+	let quote = '';
+	for ( let i = start; i < css.length; i++ ) {
+		const char = css[ i ];
+		if ( quote ) {
+			if ( char === '\\' ) {
+				i++;
+			} else if ( char === quote ) {
+				quote = '';
+			}
+		} else if ( char === '"' || char === "'" ) {
+			quote = char;
+		} else if ( isCommentStart( css, i ) ) {
+			i = findCommentEnd( css, i ) - 1;
+		} else if ( char === '{' || char === ';' || char === '}' ) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+/**
+ * Rewrites custom CSS so that `processCSSNesting` can split it on `&`.
+ *
+ * - Comments are kept as they are, and skipped like strings, so `;`, `{` or
+ *   `}` inside them are ignored. `&` inside a comment still splits the CSS,
+ *   as before.
+ * - A nested rule without `&` is treated as `& selector`, matching native CSS
+ *   nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
+ * - A rule at the very start is only rewritten when it starts with a type
+ *   selector, as other selectors there, e.g. `:hover {}`, are already
+ *   appended to the block selector.
+ * - Declarations after a rewritten rule are moved back to the block, e.g.
+ *   `img {} color: blue;` becomes `& img {} & color: blue;`. After a rule
+ *   that already has `&`, they are left as is, as before.
+ * - A bare `& {}` block is unwrapped, as it is the block itself.
+ * - Rules nested in any other rule, e.g. `figure { img {} }`, are left as is,
+ *   as they can't be flattened.
+ *
+ * This must stay in sync with `normalize_nested_custom_css()` in PHP.
+ *
+ * @param css The custom CSS.
+ * @return The rewritten CSS.
+ */
+function normalizeNestedRules( css: string ) {
+	let result = '';
+	// One entry per open brace: true for an unwrapped bare `& {}` block.
+	const blocks: boolean[] = [];
+	// The number of open braces that aren't unwrapped `& {}` blocks.
+	let nestedRules = 0;
+	let quote = '';
+	let isStatementStart = true;
+	let isFirstStatement = true;
+	let isAfterRule = false;
+	// Whether the current statement, and the open rule at the block level,
+	// were rewritten with `& `.
+	let isRewrittenStatement = false;
+	let isRewrittenRule = false;
+	// Index in `css` of the first character of the current statement that
+	// isn't whitespace or a comment, and its position in `result`.
+	let statementIndex = -1;
+	let statementStart = 0;
+
+	for ( let i = 0; i < css.length; i++ ) {
+		const char = css[ i ];
+
+		if ( quote ) {
+			result += char;
+			if ( char === '\\' && i + 1 < css.length ) {
+				result += css[ ++i ];
+			} else if ( char === quote ) {
+				quote = '';
+			}
+			continue;
+		}
+
+		// Rules can only be rewritten at the block level.
+		const isBlockLevel = nestedRules === 0;
+
+		if ( isStatementStart && ! isCSSWhitespace( char ) ) {
+			isStatementStart = false;
+			isRewrittenStatement = false;
+			// Leading comments are part of the statement, so `& ` goes before
+			// them, but the selector decides whether it is needed.
+			statementIndex = skipWhitespaceAndComments( css, i );
+			const first = css[ statementIndex ];
+			if (
+				isBlockLevel &&
+				first !== undefined &&
+				first !== '&' &&
+				first !== '@' &&
+				first !== ';' &&
+				first !== '}'
+			) {
+				const delimiter = findNextDelimiter( css, statementIndex );
+				const isRule = delimiter !== -1 && css[ delimiter ] === '{';
+				const shouldPrefix = isRule
+					? ! isFirstStatement || /[a-zA-Z*]/.test( first )
+					: isAfterRule;
+				if ( shouldPrefix ) {
+					result += '& ';
+					isRewrittenStatement = isRule;
+				}
+			}
+			isFirstStatement = false;
+		}
+
+		if ( i === statementIndex ) {
+			statementStart = result.length;
+		}
+
+		if ( isCommentStart( css, i ) ) {
+			const end = findCommentEnd( css, i );
+			result += css.slice( i, end );
+			i = end - 1;
+			continue;
+		}
+
+		if ( char === '"' || char === "'" ) {
+			quote = char;
+		} else if ( char === '{' ) {
+			if ( isBlockLevel && isBareAmpersand( result, statementStart ) ) {
+				result = result.slice( 0, statementStart );
+				blocks.push( true );
+				isStatementStart = true;
+				continue;
+			}
+			if ( isBlockLevel ) {
+				isRewrittenRule = isRewrittenStatement;
+			}
+			blocks.push( false );
+			nestedRules++;
+		} else if ( char === '}' ) {
+			if ( blocks.length && blocks[ blocks.length - 1 ] ) {
+				blocks.pop();
+				isStatementStart = true;
+				continue;
+			}
+			if ( blocks.pop() === false ) {
+				nestedRules--;
+			}
+			if ( nestedRules === 0 ) {
+				isAfterRule = isRewrittenRule;
+				isStatementStart = true;
+			}
+		} else if ( char === ';' && isBlockLevel ) {
+			isAfterRule = false;
+			isStatementStart = true;
+		}
+
+		result += char;
+	}
+
+	return result;
+}
+
+/**
+ * Returns whether the statement from `start` is a bare `&`, optionally
+ * followed by whitespace.
+ *
+ * @param css   The CSS to check.
+ * @param start The index the statement starts at.
+ * @return Whether the statement is a bare `&`.
+ */
+function isBareAmpersand( css: string, start: number ) {
+	if ( css[ start ] !== '&' ) {
+		return false;
+	}
+	for ( let i = start + 1; i < css.length; i++ ) {
+		if ( ! isCSSWhitespace( css[ i ] ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
 export function processCSSNesting( css: string, blockSelector: string ) {
 	let processedCSS = '';
 
@@ -2313,8 +2560,10 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 		return processedCSS;
 	}
 
+	const normalizedCSS = normalizeNestedRules( css );
+
 	// Split CSS nested rules.
-	const parts = css.split( '&' );
+	const parts = normalizedCSS.split( '&' );
 	parts.forEach( ( part: string ) => {
 		if ( ! part || part.trim() === '' ) {
 			return;
@@ -2326,7 +2575,7 @@ export function processCSSNesting( css: string, blockSelector: string ) {
 			processedCSS += `:root :where(${ blockSelector }){${ part.trim() }}`;
 		} else {
 			// If the part contains braces, it's a nested CSS rule.
-			const splitPart = part.replace( '}', '' ).split( '{' );
+			const splitPart = part.replaceAll( '}', '' ).split( '{' );
 			if ( splitPart.length !== 2 ) {
 				return;
 			}
