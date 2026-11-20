@@ -5,6 +5,7 @@ import background from './background';
 import shadow from './shadow';
 import outline from './outline';
 import spacing from './spacing';
+import transform from './transform';
 import typography from './typography';
 
 export const styleDefinitions = [
@@ -16,4 +17,5 @@ export const styleDefinitions = [
 	...typography,
 	...shadow,
 	...background,
+	...transform,
 ];
