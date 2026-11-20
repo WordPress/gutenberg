@@ -126,7 +126,11 @@ function block_core_archives_build_dropdown_script( $dropdown_id ) {
 	<script>
 	( ( [ dropdownId, homeUrl ] ) => {
 		const dropdown = document.getElementById( dropdownId );
+		let changedByKey = false;
 		function onSelectChange() {
+			if ( changedByKey ) {
+				return;
+			}
 			setTimeout( () => {
 				if ( 'escape' === dropdown.dataset.lastkey ) {
 					return;
@@ -136,7 +140,20 @@ function block_core_archives_build_dropdown_script( $dropdown_id ) {
 				}
 			}, 250 );
 		}
+		function onKeyDown( event ) {
+			if ( event.altKey || event.ctrlKey || event.metaKey ) {
+				return;
+			}
+			if ( 'Enter' === event.key ) {
+				if ( dropdown.value ) {
+					location.href = dropdown.value;
+				}
+				return;
+			}
+			changedByKey = [ 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Home', 'End', 'PageUp', 'PageDown' ].includes( event.key ) || ( 1 === event.key.length && ' ' !== event.key );
+		}
 		function onKeyUp( event ) {
+			changedByKey = false;
 			if ( 'Escape' === event.key ) {
 				dropdown.dataset.lastkey = 'escape';
 			} else {
@@ -146,6 +163,7 @@ function block_core_archives_build_dropdown_script( $dropdown_id ) {
 		function onClick() {
 			delete dropdown.dataset.lastkey;
 		}
+		dropdown.addEventListener( 'keydown', onKeyDown );
 		dropdown.addEventListener( 'keyup', onKeyUp );
 		dropdown.addEventListener( 'click', onClick );
 		dropdown.addEventListener( 'change', onSelectChange );
