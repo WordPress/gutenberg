@@ -75,6 +75,46 @@ END;
 	 * Tests that the `core/post-template` block triggers the main query loop when rendering within a corresponding
 	 * `core/query` block.
 	 */
+	public function test_item_filter_receives_each_post_item() {
+		$calls    = array();
+		$callback = static function ( $item, $block_content, $post_id, $block ) use ( &$calls ) {
+			$calls[] = compact( 'item', 'block_content', 'post_id', 'block' );
+			return $item;
+		};
+		add_filter( 'query_loop_block_item_html', $callback, 10, 4 );
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template -->'
+		);
+		( new WP_Block( $parsed_blocks[0] ) )->render();
+
+		remove_filter( 'query_loop_block_item_html', $callback, 10 );
+
+		$this->assertCount( 2, $calls, 'The filter should run once per post.' );
+		$this->assertSame( self::$other_post->ID, $calls[0]['post_id'] );
+		$this->assertSame( self::$post->ID, $calls[1]['post_id'] );
+		$this->assertStringStartsWith( '<li class="wp-block-post', $calls[1]['item'] );
+		$this->assertStringContainsString( $calls[1]['block_content'], $calls[1]['item'] );
+		$this->assertStringContainsString( 'Metal Dog', $calls[1]['block_content'] );
+		$this->assertSame( 'core/post-template', $calls[1]['block']->name );
+	}
+
+	public function test_item_filter_can_change_the_item() {
+		$callback = static function ( $item ) {
+			return str_replace( '<li ', '<li data-filtered="yes" ', $item );
+		};
+		add_filter( 'query_loop_block_item_html', $callback );
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:post-template --><!-- wp:post-title /--><!-- /wp:post-template -->'
+		);
+		$markup        = ( new WP_Block( $parsed_blocks[0] ) )->render();
+
+		remove_filter( 'query_loop_block_item_html', $callback );
+
+		$this->assertSame( 2, substr_count( $markup, '<li data-filtered="yes" ' ) );
+	}
+
 	public function test_rendering_post_template_with_main_query_loop() {
 		global $wp_query, $wp_the_query;
 
