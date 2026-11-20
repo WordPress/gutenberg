@@ -235,6 +235,7 @@ function StyleBook(
 		onClick,
 		onSelect,
 		showTabs = true,
+		headerActions = /** @type {React.ReactNode} */ ( null ),
 		userConfig = {},
 		path = '',
 	},
@@ -308,6 +309,7 @@ function StyleBook(
 								</Tabs.Tab>
 							) ) }
 						</Tabs.List>
+						{ headerActions }
 					</div>
 					{ tabs.map( ( tab ) => {
 						const categoryDefinition = tab.slug
@@ -342,14 +344,17 @@ function StyleBook(
 					} ) }
 				</Tabs.Root>
 			) : (
-				<StyleBookBody
-					examples={ { examples: examplesForSinglePageUse } }
-					isSelected={ isSelected }
-					onClick={ onClick }
-					onSelect={ onSelect }
-					settings={ settings }
-					goTo={ goTo }
-				/>
+				<>
+					{ headerActions }
+					<StyleBookBody
+						examples={ { examples: examplesForSinglePageUse } }
+						isSelected={ isSelected }
+						onClick={ onClick }
+						onSelect={ onSelect }
+						settings={ settings }
+						goTo={ goTo }
+					/>
+				</>
 			) }
 		</div>
 	);
