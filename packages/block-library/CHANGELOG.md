@@ -6,6 +6,7 @@
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Latest Posts: Keep same-named categories selectable independently and preserve their IDs when removing a category filter ([#84840](https://github.com/WordPress/gutenberg/pull/84840)).
 
 ## 12.2.0 (2026-11-18)
 
