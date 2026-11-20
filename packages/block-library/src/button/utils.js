@@ -1,3 +1,66 @@
+import { getProtocol } from '@wordpress/url';
+
+// Matches wp_allowed_protocols() in wp-includes/functions.php, so this
+// doesn't reject a link the rest of WordPress already treats as safe.
+const ALLOWED_LINK_PROTOCOLS = [
+	'http:',
+	'https:',
+	'ftp:',
+	'ftps:',
+	'mailto:',
+	'news:',
+	'irc:',
+	'irc6:',
+	'ircs:',
+	'gopher:',
+	'nntp:',
+	'feed:',
+	'telnet:',
+	'mms:',
+	'rtsp:',
+	'sms:',
+	'svn:',
+	'tel:',
+	'fax:',
+	'xmpp:',
+	'webcal:',
+	'urn:',
+];
+
+/**
+ * Returns the given link URL only if its protocol is on the safe allowlist
+ * (or the URL is relative, i.e. has no protocol), otherwise null. Blocks
+ * `javascript:` and other unsafe schemes from being written into the saved
+ * `href`, including ones hidden behind a leading/embedded tab, newline, or
+ * control character that browsers strip before resolving the scheme
+ * themselves.
+ *
+ * @param {?string} url - The raw link URL to check.
+ * @return {?string} The URL if safe, otherwise null.
+ */
+export function getSafeButtonUrl( url ) {
+	if ( ! url || typeof url !== 'string' ) {
+		return null;
+	}
+
+	const normalized = url
+		.replace( /[\t\n\r]/g, '' )
+		.replace( /^[\x00-\x20]+|[\x00-\x20]+$/g, '' );
+
+	// A leading "/", "?", or "#" is unambiguously relative, so a later
+	// colon (e.g. "/2024/03/10:special-post") isn't mistaken for a scheme.
+	if ( /^[/?#]/.test( normalized ) ) {
+		return url;
+	}
+
+	const protocol = getProtocol( normalized )?.toLowerCase();
+	if ( protocol && ! ALLOWED_LINK_PROTOCOLS.includes( protocol ) ) {
+		return null;
+	}
+
+	return url;
+}
+
 /**
  * Returns whether the given width value is a percentage.
  *
