@@ -36,14 +36,9 @@ type Link = {
 	image?: string;
 };
 
-type Tool = {
+type ToolBase = {
 	id: string;
 	label: string;
-	/** Domain whose favicon is used as the logo. */
-	domain?: string;
-	/** Fallback badge for tools without a favicon. */
-	mark: string;
-	color: string;
 	/** File the configuration belongs in, shown above the code block. */
 	file?: string;
 	command?: string;
@@ -51,6 +46,13 @@ type Tool = {
 	install?: Link;
 	steps: string[];
 };
+
+/** A tool shows either its favicon (from `domain`) or a text badge (`mark` and `color`). */
+type Tool = ToolBase &
+	(
+		| { domain: string; mark?: never; color?: never }
+		| { domain?: never; mark: string; color: string }
+	);
 
 const CLI_ARGS = `wordpress-design-system -- npx ${ PACKAGE_ARGS.join( ' ' ) }`;
 
@@ -61,8 +63,6 @@ const TOOLS: Tool[] = [
 		id: 'claude-code',
 		label: 'Claude Code',
 		domain: 'claude.ai',
-		mark: 'CC',
-		color: '#d97757',
 		command: `claude mcp add ${ CLI_ARGS }`,
 		steps: [
 			'Open a terminal and run the command above. See the [Claude Code MCP documentation](https://code.claude.com/docs/en/mcp) for more options.',
@@ -73,8 +73,6 @@ const TOOLS: Tool[] = [
 		id: 'codex',
 		label: 'OpenAI Codex',
 		domain: 'openai.com',
-		mark: 'Cx',
-		color: '#10a37f',
 		command: `codex mcp add ${ CLI_ARGS }`,
 		steps: [
 			'Install the [Codex CLI](https://developers.openai.com/codex/cli) if you have not already.',
@@ -86,8 +84,6 @@ const TOOLS: Tool[] = [
 		id: 'cursor',
 		label: 'Cursor',
 		domain: 'cursor.com',
-		mark: 'Cu',
-		color: '#1f2937',
 		file: '~/.cursor/mcp.json',
 		config: JSON_CONFIG,
 		install: {
@@ -104,8 +100,6 @@ const TOOLS: Tool[] = [
 		id: 'vscode',
 		label: 'VS Code',
 		domain: 'code.visualstudio.com',
-		mark: 'VS',
-		color: '#0078d4',
 		file: '.vscode/mcp.json',
 		config: toJson( { servers: { [ SERVER_NAME ]: SERVER_ENTRY } } ),
 		install: { href: VSCODE_URL, label: 'Install in VS Code' },
@@ -118,8 +112,6 @@ const TOOLS: Tool[] = [
 		id: 'jetbrains',
 		label: 'JetBrains',
 		domain: 'jetbrains.com',
-		mark: 'JB',
-		color: '#000000',
 		config: JSON_CONFIG,
 		steps: [
 			'In PhpStorm or another JetBrains IDE, open Settings, Tools, AI Assistant, [Model Context Protocol (MCP)](https://www.jetbrains.com/help/ai-assistant/configure-an-mcp-server.html), and click Add.',
@@ -131,8 +123,6 @@ const TOOLS: Tool[] = [
 		id: 'claude-desktop',
 		label: 'Claude Desktop',
 		domain: 'anthropic.com',
-		mark: 'CD',
-		color: '#c15f3c',
 		file: 'claude_desktop_config.json',
 		config: JSON_CONFIG,
 		steps: [
@@ -145,8 +135,6 @@ const TOOLS: Tool[] = [
 		id: 'antigravity',
 		label: 'Antigravity',
 		domain: 'antigravity.google',
-		mark: 'Ag',
-		color: '#4285f4',
 		file: '~/.gemini/config/mcp_config.json',
 		config: JSON_CONFIG,
 		steps: [
@@ -157,8 +145,6 @@ const TOOLS: Tool[] = [
 		id: 'opencode',
 		label: 'OpenCode',
 		domain: 'opencode.ai',
-		mark: 'Oc',
-		color: '#211e1e',
 		file: 'opencode.json',
 		config: toJson( {
 			mcp: {
@@ -179,8 +165,6 @@ const TOOLS: Tool[] = [
 		id: 'zed',
 		label: 'Zed',
 		domain: 'zed.dev',
-		mark: 'Zd',
-		color: '#084ccf',
 		file: 'settings.json',
 		config: toJson( {
 			context_servers: { [ SERVER_NAME ]: SERVER_ENTRY },
@@ -194,8 +178,6 @@ const TOOLS: Tool[] = [
 		id: 'raycast',
 		label: 'Raycast',
 		domain: 'raycast.com',
-		mark: 'Rc',
-		color: '#ff6363',
 		config: toJson( SERVER_ENTRY ),
 		install: { href: RAYCAST_URL, label: 'Install in Raycast' },
 		steps: [
