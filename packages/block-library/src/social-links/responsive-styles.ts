@@ -8,13 +8,22 @@ import { unlock } from '../lock-unlock';
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 export const SIZE_TO_FONT_SIZE: Record< string, string > = {
-	'has-small-icon-size': '16px',
-	'has-normal-icon-size': '24px',
-	'has-large-icon-size': '36px',
-	'has-huge-icon-size': '48px',
+	'has-small-icon-size': 'var(--wp--social-icons--size--small, 16px)',
+	'has-normal-icon-size': 'var(--wp--social-icons--size--normal, 24px)',
+	'has-large-icon-size': 'var(--wp--social-icons--size--large, 36px)',
+	'has-huge-icon-size': 'var(--wp--social-icons--size--huge, 48px)',
 };
 
 export const FONT_SIZE_TO_SIZE: Record< string, string > = {
+	'var(--wp--social-icons--size--small, 16px)': 'has-small-icon-size',
+	'var(--wp--social-icons--size--normal, 24px)': 'has-normal-icon-size',
+	'var(--wp--social-icons--size--large, 36px)': 'has-large-icon-size',
+	'var(--wp--social-icons--size--huge, 48px)': 'has-huge-icon-size',
+	'var(--wp--social-icons--size--small)': 'has-small-icon-size',
+	'var(--wp--social-icons--size--normal)': 'has-normal-icon-size',
+	'var(--wp--social-icons--size--large)': 'has-large-icon-size',
+	'var(--wp--social-icons--size--huge)': 'has-huge-icon-size',
+	// Fallback for legacy or direct pixel values.
 	'16px': 'has-small-icon-size',
 	'24px': 'has-normal-icon-size',
 	'36px': 'has-large-icon-size',

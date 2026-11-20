@@ -154,8 +154,12 @@ describe( 'Social Links block', () => {
 		// eslint-disable-next-line testing-library/no-node-access
 		const styleElements = document.querySelectorAll( 'style' );
 		expect(
-			Array.from( styleElements ).some( ( element ) =>
-				element.textContent?.includes( 'font-size: 16px !important' )
+			Array.from( styleElements ).some(
+				( element ) =>
+					element.textContent?.includes( '@media' ) &&
+					element.textContent?.includes(
+						'font-size: var(--wp--social-icons--size--small, 16px) !important'
+					)
 			)
 		).toBe( true );
 	} );

@@ -24,6 +24,22 @@ describe( 'Social Links responsive styles', () => {
 		} );
 
 		it.each( [
+			[
+				'var(--wp--social-icons--size--small, 16px)',
+				'has-small-icon-size',
+			],
+			[
+				'var(--wp--social-icons--size--normal, 24px)',
+				'has-normal-icon-size',
+			],
+			[
+				'var(--wp--social-icons--size--large, 36px)',
+				'has-large-icon-size',
+			],
+			[
+				'var(--wp--social-icons--size--huge, 48px)',
+				'has-huge-icon-size',
+			],
 			[ '16px', 'has-small-icon-size' ],
 			[ '24px', 'has-normal-icon-size' ],
 			[ '36px', 'has-large-icon-size' ],
@@ -163,7 +179,10 @@ describe( 'Social Links responsive styles', () => {
 			).toEqual( {
 				style: {
 					'@mobile': {
-						typography: { fontSize: '16px' },
+						typography: {
+							fontSize:
+								'var(--wp--social-icons--size--small, 16px)',
+						},
 					},
 				},
 			} );
@@ -190,7 +209,8 @@ describe( 'Social Links responsive styles', () => {
 						spacing: { padding: '20px' },
 						typography: {
 							fontStyle: 'italic',
-							fontSize: '48px',
+							fontSize:
+								'var(--wp--social-icons--size--huge, 48px)',
 						},
 					},
 				},
@@ -203,7 +223,10 @@ describe( 'Social Links responsive styles', () => {
 					attributes: {
 						style: {
 							'@tablet': {
-								typography: { fontSize: '36px' },
+								typography: {
+									fontSize:
+										'var(--wp--social-icons--size--large, 36px)',
+								},
 							},
 						},
 					},
@@ -214,10 +237,16 @@ describe( 'Social Links responsive styles', () => {
 			).toEqual( {
 				style: {
 					'@tablet': {
-						typography: { fontSize: '36px' },
+						typography: {
+							fontSize:
+								'var(--wp--social-icons--size--large, 36px)',
+						},
 					},
 					'@mobile': {
-						typography: { fontSize: '16px' },
+						typography: {
+							fontSize:
+								'var(--wp--social-icons--size--small, 16px)',
+						},
 					},
 				},
 			} );
@@ -229,7 +258,10 @@ describe( 'Social Links responsive styles', () => {
 					attributes: {
 						style: {
 							'@mobile': {
-								typography: { fontSize: '16px' },
+								typography: {
+									fontSize:
+										'var(--wp--social-icons--size--small, 16px)',
+								},
 							},
 						},
 					},
@@ -247,7 +279,10 @@ describe( 'Social Links responsive styles', () => {
 						style: {
 							'@mobile': {
 								spacing: { padding: '15px' },
-								typography: { fontSize: '16px' },
+								typography: {
+									fontSize:
+										'var(--wp--social-icons--size--small, 16px)',
+								},
 							},
 						},
 					},
