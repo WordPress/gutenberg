@@ -4,6 +4,7 @@
 
 ### Enhancements
 
+-   Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Preserve saturated background colors in neighboring surfaces and neutral strokes, including page and menu dividers ([#87175](https://github.com/WordPress/gutenberg/pull/87175)).
 
 ### Bug Fixes
@@ -26,7 +27,6 @@
 ### Enhancements
 
 -   Check `--wpds-color-foreground-content-neutral-weak` text on `--wpds-color-background-surface-neutral-weak` and `--wpds-color-background-surface-neutral-strong` for WCAG AA contrast in the token build and `ThemeProvider` color warnings ([#86750](https://github.com/WordPress/gutenberg/pull/86750)).
--   `ThemeProvider`: Adjust brand colors to meet focus, strong-fill, and text contrast targets against neutral and brand surfaces ([#86614](https://github.com/WordPress/gutenberg/pull/86614)).
 -   Generate Figma-compatible typography exports with single font families, numeric font weights, and typography scopes ([#86211](https://github.com/WordPress/gutenberg/pull/86211)).
 
 ### Bug Fixes
