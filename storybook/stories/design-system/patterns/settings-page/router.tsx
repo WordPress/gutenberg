@@ -195,6 +195,10 @@ function createSettingsRouter( initialPath: string ) {
 		routeTree,
 		history: createBlockingMemoryHistory( initialPath ),
 		defaultNotFoundComponent: () => null,
+		// The router scrolls the window to the top after each navigation,
+		// which here is the docs page around the example. Returning false
+		// skips that, and `Page` keeps its own scroll inside the example.
+		scrollRestoration: () => false,
 	} );
 }
 
