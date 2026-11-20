@@ -32,6 +32,7 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$classes[] = 'has-link-color';
 	}
 
+	$has_items = in_array( $attributes['layout']['type'] ?? null, array( 'flex', 'grid' ), true );
 	$separator = empty( $attributes['separator'] ) ? ' ' : $attributes['separator'];
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
@@ -50,7 +51,8 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 		$block->context['postId'],
 		$attributes['term'],
 		wp_kses_post( $prefix ),
-		'<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
+		// In a flex or grid layout each term is an item and the gap spaces them, so a separator would be an item of its own.
+		$has_items ? '' : '<span class="wp-block-post-terms__separator">' . esc_html( $separator ) . '</span>',
 		wp_kses_post( $suffix )
 	);
 
@@ -60,6 +62,61 @@ function render_block_core_post_terms( $attributes, $content, $block ) {
 
 	return $post_terms;
 }
+
+/**
+ * Removes the flow layout classes from blocks that have no saved layout.
+ *
+ * The layout support adds them to every block that supports layout, but Post
+ * Terms blocks saved before it was supported must keep rendering as they did.
+ *
+ * @since 7.2.0
+ *
+ * @param string $block_content The block content.
+ * @param array  $block         The parsed block.
+ * @return string The block content without the unused layout classes.
+ */
+function block_core_post_terms_remove_unused_layout_classes( $block_content, $block ) {
+	if ( isset( $block['attrs']['layout'] ) ) {
+		return $block_content;
+	}
+
+	$processor = new WP_HTML_Tag_Processor( $block_content );
+	if ( $processor->next_tag() ) {
+		$processor->remove_class( 'is-layout-flow' );
+		$processor->remove_class( 'wp-block-post-terms-is-layout-flow' );
+	}
+
+	return $processor->get_updated_html();
+}
+add_filter( 'render_block_core/post-terms', 'block_core_post_terms_remove_unused_layout_classes', 10, 2 );
+
+/**
+ * Ignores a saved Block spacing value unless the layout is Flex or Grid.
+ *
+ * Block spacing is only offered with those layouts, so a value left over from
+ * another layout is not output.
+ *
+ * @since 7.2.0
+ *
+ * @param array $parsed_block The parsed block.
+ * @return array The parsed block.
+ */
+function block_core_post_terms_ignore_unused_block_gap( $parsed_block ) {
+	if (
+		'core/post-terms' !== $parsed_block['blockName'] ||
+		! isset( $parsed_block['attrs']['style']['spacing']['blockGap'] )
+	) {
+		return $parsed_block;
+	}
+
+	$layout_type = $parsed_block['attrs']['layout']['type'] ?? null;
+	if ( ! in_array( $layout_type, array( 'flex', 'grid' ), true ) ) {
+		unset( $parsed_block['attrs']['style']['spacing']['blockGap'] );
+	}
+
+	return $parsed_block;
+}
+add_filter( 'render_block_data', 'block_core_post_terms_ignore_unused_block_gap' );
 
 /**
  * Returns the available variations for the `core/post-terms` block.

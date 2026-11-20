@@ -36,7 +36,11 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `minHeight`: `true`
   - `minWidth`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`layout`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout):
+  - [`allowSwitching`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowswitching): `true`
+  - [`allowInheriting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#layout-allowinheriting): `false`
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
+  - `blockGap`: `["horizontal","vertical"]`
   - `margin`: `true`
   - `padding`: `true`
 - [`typography`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography):
