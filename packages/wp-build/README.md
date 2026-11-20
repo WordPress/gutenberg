@@ -9,6 +9,7 @@ Build tool for WordPress plugins.
 - **Transpilation**: Converts TypeScript/JSX source code to both CommonJS (`build/`) and ESM (`build-module/`) formats using Rolldown
 - **Style Compilation**: Processes SCSS files and CSS modules, generating LTR and RTL versions
 - **Bundling**: Creates browser-ready bundles for WordPress scripts and modules
+- **Translator Comments**: Keeps `translators:` comments next to the `__()`, `_x()`, `_n()` and `_nx()` calls they describe in the transpiled and unminified output, so `wp i18n make-pot` can extract them from the built files
 - **PHP Generation**: Automatically generates PHP registration files for scripts, modules, and styles
 - **Watch Mode**: Incremental rebuilds during development
 
