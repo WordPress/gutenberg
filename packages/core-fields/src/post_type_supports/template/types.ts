@@ -2,7 +2,10 @@
  * The properties of a post the template field reads.
  */
 export interface PostWithTemplate {
-	id: number | string;
+	/**
+	 * Missing when the record stands for several posts edited at once.
+	 */
+	id?: number | string;
 	type: string;
 	slug?: string;
 	template?: string;
