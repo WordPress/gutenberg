@@ -183,15 +183,15 @@ type ElementName = keyof typeof ELEMENTS;
 // Keep in sync with the Link element override in WP_Theme_JSON_Gutenberg::get_block_nodes().
 function getRootLinkElementSelector(
 	blockName: string,
-	blockSelector: string,
+	blockSelector: string | undefined,
 	elementName: string
 ): string | undefined {
 	if (
 		elementName === 'link' &&
+		blockSelector &&
 		( blockName === 'core/query-pagination-next' ||
 			blockName === 'core/query-pagination-previous' )
 	) {
-		// The block root is the anchor. Keep the Link element's exclusions.
 		return appendToSelector( blockSelector, `:where(${ ELEMENTS.link })` );
 	}
 	return undefined;
