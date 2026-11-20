@@ -12,20 +12,22 @@
  * @param array  $block         Block object.
  * @return string Filtered block content.
  */
-function gutenberg_render_block_visibility_support( $block_content, $block ) {
+function gutenberg_render_block_visibility_support( $block_content, $block, $block_instance = null ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-
 	if ( ! $block_type ) {
 		return $block_content;
 	}
 
-	$block_visibility = $block['attrs']['metadata']['blockVisibility'] ?? null;
+	if ( $block_instance && isset( $block_instance->attributes['visibility'] ) ) {
+		$block_visibility = $block_instance->attributes['visibility'];
+	} else {
+		$block_visibility = $block['attrs']['metadata']['blockVisibility']
+			?? $block['attrs']['visibility']
+			?? null;
+	}
 
-	// Hide the block whenever the value is boolean false, regardless of the
-	// block's current visibility support. This prevents blocks that previously
-	// supported visibility from unintentionally appearing on the front end
-	// after their support was disabled.
-	if ( false === $block_visibility ) {
+	// Hide the block whenever the value is boolean false or 'hidden'
+	if ( false === $block_visibility || 'hidden' === $block_visibility ) {
 		return '';
 	}
 
@@ -130,4 +132,4 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 if ( function_exists( 'wp_render_block_visibility_support' ) ) {
 	remove_filter( 'render_block', 'wp_render_block_visibility_support' );
 }
-add_filter( 'render_block', 'gutenberg_render_block_visibility_support', 10, 2 );
+add_filter( 'render_block', 'gutenberg_render_block_visibility_support', 10, 3 );
