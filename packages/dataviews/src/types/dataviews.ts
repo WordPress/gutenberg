@@ -150,6 +150,25 @@ export type DataViewsProps< Item > = {
 	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 
 	/**
+	 * Returns whether an item has children. Return `undefined` when this is not
+	 * known yet. Together with `expandedItemIds` and
+	 * `onChangeExpandedItemIds`, this enables disclosure controls in ungrouped
+	 * hierarchical tables.
+	 */
+	getItemHasChildren?: ( item: Item ) => boolean | undefined;
+
+	/**
+	 * The expanded item ids in a hierarchical table.
+	 */
+	expandedItemIds?: string[];
+
+	/**
+	 * Callback invoked with the expanded item ids when a hierarchy disclosure
+	 * control is used.
+	 */
+	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
+
+	/**
 	 * Custom component tree rendered instead of the default layout
 	 * composition, using the internal `DataViews.*` sub-components.
 	 */
@@ -807,6 +826,21 @@ export interface ViewBaseProps< Item > {
 	getItemParentId?: ( item: Item ) => string | number | null | undefined;
 
 	/**
+	 * Returns whether an item has children, or `undefined` when unknown.
+	 */
+	getItemHasChildren?: ( item: Item ) => boolean | undefined;
+
+	/**
+	 * The expanded item ids in a hierarchical table.
+	 */
+	expandedItemIds?: string[];
+
+	/**
+	 * Callback invoked with the expanded item ids.
+	 */
+	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
+
+	/**
 	 * Whether the data is loading, in which case a loading state is shown.
 	 */
 	isLoading?: boolean;
@@ -870,7 +904,8 @@ export interface ViewBaseProps< Item > {
  * The props passed to every picker layout component. Same as
  * `ViewBaseProps`, minus the props pickers don't support: the item-click
  * ones (`onClickItem`, `renderItemLink`, `isItemClickable`) and the
- * hierarchy ones (`getItemLevel`, `getItemParentId`).
+ * hierarchy ones (`getItemLevel`, `getItemParentId`,
+ * `getItemHasChildren`, `expandedItemIds`, `onChangeExpandedItemIds`).
  */
 export type ViewPickerBaseProps< Item > = Omit<
 	ViewBaseProps< Item >,
@@ -882,6 +917,9 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'renderItemLink'
 	| 'getItemLevel'
 	| 'getItemParentId'
+	| 'getItemHasChildren'
+	| 'expandedItemIds'
+	| 'onChangeExpandedItemIds'
 > & {
 	/**
 	 * The current view configuration.
