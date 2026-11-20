@@ -16,6 +16,11 @@
 	}
 }
 
+// When inside a group block, make sure the embed is not collapsed.
+.wp-block-group .wp-block-embed {
+	width: 100%;
+}
+
 // Supply a min-width when inside a cover block, to prevent it from collapsing.
 // :root :where() matches Global Styles specificity so a minimum set there can
 // win, since block library styles load first.
