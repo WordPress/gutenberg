@@ -6,6 +6,7 @@
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Spacer: Clear the unused height when editing a fixed-width spacer in a Row so it does not make the Row taller on the front end ([#85514](https://github.com/WordPress/gutenberg/pull/85514)).
 
 ## 12.2.0 (2026-11-18)
 
