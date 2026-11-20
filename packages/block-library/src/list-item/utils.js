@@ -211,7 +211,7 @@ export function outdentListItems( registry, clientIds ) {
 				registry,
 				followingListItems,
 				parentListId,
-				firstClientId
+				lastClientId
 			);
 		}
 		moveBlocksToPosition(
