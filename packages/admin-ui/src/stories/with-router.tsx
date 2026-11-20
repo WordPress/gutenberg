@@ -1,4 +1,5 @@
 import { privateApis as routePrivateApis } from '@wordpress/route';
+// eslint-disable-next-line no-restricted-imports -- Storybook only, so it isn't shipped. Remove once #77040 decouples Page from @wordpress/route.
 import { unlock } from '../lock-unlock';
 
 const { createMemoryHistory, createRootRoute, createRouter, RouterProvider } =

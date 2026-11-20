@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- Exists solely for the Storybook router decorator in stories/with-router.tsx, which isn't shipped. Remove once #77040 decouples Page from @wordpress/route.
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 
 export const { lock, unlock } =
