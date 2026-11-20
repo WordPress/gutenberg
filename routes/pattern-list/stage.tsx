@@ -239,6 +239,7 @@ function PatternListView( {
 		onActionPerformed: ( actionId: string, items: NormalizedPattern[] ) => {
 			// Clean up URL when delete actions are performed
 			if (
+				actionId === 'delete-post' ||
 				actionId === 'move-to-trash' ||
 				actionId === 'permanently-delete'
 			) {
