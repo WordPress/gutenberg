@@ -63,11 +63,15 @@ function PostList() {
 		default_view: defaultView,
 		default_layouts: defaultLayouts,
 		view_list: viewList,
-		form: quickEditForm,
+		form,
+		quick_edit_form: quickEditFormConfig,
 	} = useViewConfig( {
 		kind: 'postType',
 		name: postType,
 	} );
+	const quickEditForm = quickEditFormConfig?.fields?.length
+		? quickEditFormConfig
+		: form;
 	const activeViewOverrides = useMemo(
 		() => getActiveViewOverrides( viewList, slug ),
 		[ viewList, slug ]

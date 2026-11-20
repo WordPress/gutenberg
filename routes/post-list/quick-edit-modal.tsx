@@ -56,6 +56,26 @@ function withEditorAssets( FieldEdit: any ) {
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
+/*
+ * The fields with a regular layout render their controls inline, and the
+ * fields with a panel are pinned below them, above the modal's buttons.
+ */
+function splitQuickEditForm( form: Form ) {
+	const formFields = form.fields ?? [];
+	const isRegular = ( field: ( typeof formFields )[ number ] ) =>
+		( typeof field === 'string'
+			? form.layout
+			: ( field.layout ?? form.layout )
+		)?.type === 'regular';
+	return {
+		inlineForm: { ...form, fields: formFields.filter( isRegular ) },
+		panelForm: {
+			...form,
+			fields: formFields.filter( ( field ) => ! isRegular( field ) ),
+		},
+	};
+}
+
 interface QuickEditModalProps {
 	postType: string;
 	postId: string[];
@@ -77,7 +97,7 @@ export function QuickEditModal( {
 	const [ localEdits, setLocalEdits ] = useState< Record< string, any > >(
 		{}
 	);
-	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
+	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const store = select( coreDataStore );
 			const { getEditedEntityRecord } = store;
@@ -91,24 +111,12 @@ export function QuickEditModal( {
 
 			const args = [ 'postType', postType, postId[ 0 ] ] as const;
 
-			const { getHomePage, getPostsPageId } = unlock(
-				select( coreDataStore )
-			);
-			const singlePostId = String( postId[ 0 ] );
-			const isPostsPage =
-				singlePostId !== undefined && getPostsPageId() === singlePostId;
-			const isFrontPage =
-				singlePostId !== undefined &&
-				postType === 'page' &&
-				getHomePage()?.postId === singlePostId;
-
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: ( store as any ).hasFinishedResolution(
 					'getEditedEntityRecord',
 					args
 				),
-				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -120,22 +128,6 @@ export function QuickEditModal( {
 	const fields = useMemo(
 		() =>
 			_fields?.map( ( field: any ) => {
-				if ( field.id === 'status' ) {
-					return {
-						...field,
-						elements: field.elements.filter(
-							( element: { value: string } ) =>
-								element.value !== 'trash'
-						),
-					};
-				}
-
-				if ( field.id === 'template' ) {
-					return {
-						...field,
-						readOnly: ! canSwitchTemplate,
-					};
-				}
 				if ( field.id === 'featured_media' && field.Edit ) {
 					return {
 						...field,
@@ -145,24 +137,22 @@ export function QuickEditModal( {
 
 				return field;
 			} ),
-		[ _fields, canSwitchTemplate ]
+		[ _fields ]
 	);
 
-	const form = useMemo( (): Form => {
+	const { inlineForm, panelForm } = useMemo( () => {
 		if ( ! quickEditForm ) {
-			return { layout: { type: 'panel' }, fields: [] };
+			const emptyForm: Form = { layout: { type: 'panel' }, fields: [] };
+			return { inlineForm: emptyForm, panelForm: emptyForm };
 		}
-		if ( ! isBulk ) {
-			return quickEditForm;
-		}
-		return {
-			...quickEditForm,
-			fields: ( quickEditForm.fields ?? [] ).filter( ( field ) =>
-				fieldsWithBulkEditSupport.includes(
-					typeof field === 'string' ? field : field.id
+		const formFields = isBulk
+			? ( quickEditForm.fields ?? [] ).filter( ( field ) =>
+					fieldsWithBulkEditSupport.includes(
+						typeof field === 'string' ? field : field.id
+					)
 				)
-			),
-		};
+			: quickEditForm.fields;
+		return splitQuickEditForm( { ...quickEditForm, fields: formFields } );
 	}, [ isBulk, quickEditForm ] );
 
 	const onChange = ( edits: Record< string, any > ) => {
@@ -231,11 +221,21 @@ export function QuickEditModal( {
 					<DataForm
 						data={ { ...record, ...localEdits } }
 						fields={ fields }
-						form={ form }
+						form={ inlineForm }
 						onChange={ onChange }
 					/>
 				) }
 			</div>
+			{ hasFinishedResolution && !! panelForm.fields?.length && (
+				<div className="dataviews-action-modal__quick-edit-panels">
+					<DataForm
+						data={ { ...record, ...localEdits } }
+						fields={ fields }
+						form={ panelForm }
+						onChange={ onChange }
+					/>
+				</div>
+			) }
 			<HStack className="dataviews-action-modal__quick-edit-footer">
 				<Button
 					__next40pxDefaultSize

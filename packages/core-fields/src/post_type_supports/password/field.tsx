@@ -1,6 +1,7 @@
 import type { FieldsScriptParts } from '../../types';
 import { hasActionLink } from '../../shared/has-action-link';
 import PasswordEdit from './edit';
+import PasswordView from './view';
 import type { PostWithPassword } from './types';
 
 /**
@@ -9,6 +10,7 @@ import type { PostWithPassword } from './types';
 export const fieldExtensions: FieldsScriptParts< PostWithPassword >[ string ] =
 	{
 		Edit: PasswordEdit,
+		render: PasswordView,
 		// Private posts cannot have a password, and only the users who can
 		// publish the post see the control.
 		isVisible: ( item ) =>

@@ -127,6 +127,7 @@ function _gutenberg_get_default_posttype_form() {
  *     @type array $default_layouts Default layouts configuration.
  *     @type array $view_list       List of available views.
  *     @type array $form            Form configuration.
+ *     @type array $quick_edit_form Form configuration of the quick edit drawer. Since 7.3.0.
  * }
  */
 function gutenberg_get_entity_view_config( $kind, $name ) {
@@ -165,6 +166,7 @@ function gutenberg_get_entity_view_config( $kind, $name ) {
 		'default_layouts' => $default_layouts,
 		'view_list'       => $view_list,
 		'form'            => 'postType' === $kind ? _gutenberg_get_default_posttype_form() : array(),
+		'quick_edit_form' => array(),
 	);
 
 	$data = new Gutenberg_View_Config_Data( $config );

@@ -108,6 +108,7 @@ export default function FormRegularField< Item >( {
 								hideLabelFromVision
 								markWhenOptional={ markWhenOptional }
 								validity={ validity }
+								config={ field.config }
 							/>
 						)
 					) }
@@ -145,6 +146,7 @@ export default function FormRegularField< Item >( {
 						}
 						markWhenOptional={ markWhenOptional }
 						validity={ validity }
+						config={ field.config }
 					/>
 				)
 			) }
