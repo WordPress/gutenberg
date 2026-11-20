@@ -5,7 +5,7 @@ export function isPreviewingTheme() {
 }
 
 /**
- * @return {string | string[] | null} Currently previewing theme.
+ * @return {ReturnType<typeof getQueryArg> | null} Currently previewing theme.
  */
 export function currentlyPreviewingTheme() {
 	if ( isPreviewingTheme() ) {
