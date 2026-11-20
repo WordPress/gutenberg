@@ -106,13 +106,11 @@ describe( 'loadRoutingRules', () => {
 	} );
 
 	it( 'reads the context of a rule from its .mts file', async () => {
-		const rules = await loadRoutingRules();
-		const patterns = rules.find(
-			( rule ) => rule.id === 'design-system-patterns'
+		const [ withContext, withoutContext ] = await loadRoutingRules(
+			new URL( './fixtures/routing-rules/', import.meta.url )
 		);
-		const api = rules.find( ( rule ) => rule.id === 'design-system-api' );
 
-		expect( patterns?.context?.patterns ).toContain( 'Copy to Clipboard' );
-		expect( api?.context ).toBeUndefined();
+		expect( withContext.context ).toEqual( { stores: [ 'core' ] } );
+		expect( withoutContext.context ).toBeUndefined();
 	} );
 } );
