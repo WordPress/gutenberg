@@ -47,6 +47,9 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  */
 remove_filter( 'render_block_context', 'block_core_tabs_provide_context', 10 );
 
+// Use Gutenberg's Query pagination observer instead of running both copies.
+remove_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10 );
+
 /**
  * Adds the defer loading strategy to all registered blocks.
  *
