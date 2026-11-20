@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import {
 	FlexBlock,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 	__unstableMotion as motion,
@@ -69,7 +69,7 @@ export default function DropdownItem( {
 	const disableMotion = useReducedMotion();
 	return (
 		<div className={ styles.dropdown }>
-			<Item
+			<WCItem
 				className={ clsx( navigationItemStyles.item, className ) }
 				onClick={ ( e ) => {
 					e.preventDefault();
@@ -92,7 +92,7 @@ export default function DropdownItem( {
 						} ) }
 					/>
 				</HStack>
-			</Item>
+			</WCItem>
 			<AnimatePresence initial={ false }>
 				{ isExpanded && (
 					<motion.div

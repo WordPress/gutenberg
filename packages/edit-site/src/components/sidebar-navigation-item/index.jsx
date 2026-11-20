@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { __experimentalItem as Item, FlexBlock } from '@wordpress/components';
+import { __experimentalItem as WCItem, FlexBlock } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { isRTL } from '@wordpress/i18n';
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
@@ -52,7 +52,7 @@ function SidebarNavigationItemContent( {
 	}
 
 	return (
-		<Item
+		<WCItem
 			className={ clsx(
 				'edit-site-sidebar-navigation-item',
 				{ 'with-suffix': ! withChevron && suffix },
@@ -76,6 +76,6 @@ function SidebarNavigationItemContent( {
 				) }
 				{ ! withChevron && suffix }
 			</Stack>
-		</Item>
+		</WCItem>
 	);
 }

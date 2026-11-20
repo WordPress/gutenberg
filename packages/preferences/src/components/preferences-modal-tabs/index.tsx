@@ -2,7 +2,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import {
 	Navigator,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
+	__experimentalItem as WCItem,
 	__experimentalHStack as HStack,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
@@ -106,7 +106,7 @@ export default function PreferencesModalTabs( {
 										<Navigator.Button
 											key={ tab.name }
 											path={ `/${ tab.name }` }
-											as={ Item }
+											as={ WCItem }
 										>
 											<HStack justify="space-between">
 												<FlexItem>

@@ -14,6 +14,7 @@ export default {
 	Icon: 'WCIcon',
 	IconButton: 'WCIconButton',
 	__experimentalInputControl: 'WCInputControl',
+	__experimentalItem: 'WCItem',
 	Menu: 'WCMenu',
 	Notice: 'WCNotice',
 	Popover: 'WCPopover',
