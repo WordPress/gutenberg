@@ -4789,25 +4789,20 @@ class WP_Theme_JSON_Gutenberg {
 		$incoming_data = $incoming->get_raw_data();
 
 		/*
-		 * `array_replace_recursive` merges sequential arrays by numeric index,
-		 * so a list of objects is merged by position: an incoming list that is
-		 * shorter than, or ordered differently from, the existing one overwrites
-		 * unrelated entries and drops the ones it does not reach. The lists whose
-		 * entries are identified by a `name` are reconciled by that name instead,
-		 * and the result overwrites the positional merge below.
+		 * `array_replace_recursive` merges sequential arrays by numeric index, so
+		 * a list of objects is merged by position: an incoming list that is shorter
+		 * than, or ordered differently from, the existing one overwrites unrelated
+		 * entries and drops the ones it does not reach. Merge the lists whose entries
+		 * carry a `name` by that name, and take them out of the positional merge.
 		 */
-		$lists_merged_by_name = array();
 		foreach ( static::TOP_LEVEL_KEYS_MERGED_BY_NAME as $key ) {
 			if ( isset( $this->theme_json[ $key ], $incoming_data[ $key ] ) ) {
-				$lists_merged_by_name[ $key ] = self::merge_lists_by_name( $this->theme_json[ $key ], $incoming_data[ $key ] );
+				$this->theme_json[ $key ] = self::merge_lists_by_name( $this->theme_json[ $key ], $incoming_data[ $key ] );
+				unset( $incoming_data[ $key ] );
 			}
 		}
 
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
-
-		foreach ( $lists_merged_by_name as $key => $merged_list ) {
-			$this->theme_json[ $key ] = $merged_list;
-		}
 
 		/*
 		 * Recompute all the spacing sizes based on the new hierarchy of data. In the constructor
@@ -5885,11 +5880,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return array The merged list.
 	 */
 	private static function merge_lists_by_name( $existing, $incoming ) {
-		if ( ! is_array( $existing ) ) {
-			return is_array( $incoming ) ? $incoming : array();
-		}
-		if ( ! is_array( $incoming ) ) {
-			return $existing;
+		// Without two lists there is nothing to match on, so the incoming value wins.
+		if ( ! is_array( $existing ) || ! is_array( $incoming ) ) {
+			return $incoming;
 		}
 
 		$named   = array();
