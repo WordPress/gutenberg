@@ -215,4 +215,83 @@ class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
 			'invalid rotation'     => array( array( 'style' => array( 'transform' => array( 'rotate' => '15' ) ) ) ),
 		);
 	}
+
+	/**
+	 * @dataProvider data_scale_styles
+	 *
+	 * @param array  $transform    Transform styles.
+	 * @param string $expected_css Expected inline CSS.
+	 */
+	public function test_scale_is_returned_as_a_wrapper_inline_style( $transform, $expected_css ) {
+		$block_type = $this->register_transform_block(
+			array(
+				'rotate'    => true,
+				'translate' => true,
+				'scale'     => true,
+			)
+		);
+
+		$this->assertSame(
+			array( 'style' => $expected_css ),
+			gutenberg_apply_transform_support( $block_type, array( 'style' => array( 'transform' => $transform ) ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_scale_styles() {
+		return array(
+			'number'                     => array( array( 'scale' => 1.2 ), 'scale:1.2;' ),
+			'zero'                       => array( array( 'scale' => 0 ), 'scale:0;' ),
+			'percentage'                 => array( array( 'scale' => '120%' ), 'scale:120%;' ),
+			'with a rotation and offset' => array(
+				array(
+					'rotate'    => '15deg',
+					'translate' => array( 'x' => '1em' ),
+					'scale'     => '0.5',
+				),
+				'rotate:15deg;--wp--style--translate-x:1em;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);scale:0.5;',
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider data_no_scale_styles
+	 *
+	 * @param array $supports Transform block support configuration.
+	 * @param mixed $scale    Scale value.
+	 */
+	public function test_no_scale_styles( $supports, $scale ) {
+		$block_type = $this->register_transform_block( $supports );
+
+		$this->assertSame(
+			array(),
+			gutenberg_apply_transform_support( $block_type, array( 'style' => array( 'transform' => array( 'scale' => $scale ) ) ) )
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_no_scale_styles() {
+		return array(
+			'no scale support'   => array( array( 'rotate' => true ), 1.2 ),
+			'skip serialization' => array(
+				array(
+					'scale'                           => true,
+					'__experimentalSkipSerialization' => array( 'scale' ),
+				),
+				1.2,
+			),
+			'negative'           => array( array( 'scale' => true ), -1 ),
+			'two values'         => array( array( 'scale' => true ), '1.2 1.5' ),
+			'var()'              => array( array( 'scale' => true ), 'var(--scale)' ),
+			'object'             => array( array( 'scale' => true ), array( 'x' => 1.2 ) ),
+		);
+	}
 }

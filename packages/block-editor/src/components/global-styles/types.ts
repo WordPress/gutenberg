@@ -104,6 +104,7 @@ export interface StyleSettings {
 	transform?: Record< string, unknown > & {
 		rotate?: boolean;
 		translate?: boolean;
+		scale?: boolean;
 	};
 	typography?: TypographyStyleSettings;
 }
@@ -213,6 +214,7 @@ export interface PanelStyle {
 	transform?: {
 		rotate?: StyleValue;
 		translate?: { x?: string; y?: string };
+		scale?: number | string;
 	};
 	elements?: Record< string, PanelStyle >;
 	css?: string;

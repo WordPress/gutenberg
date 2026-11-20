@@ -202,6 +202,7 @@ Settings related to transforms.
 | -------- | ----------- | ---- | ------- |
 | rotate | Allow users to set a rotation. | `boolean` | `false` |
 | translate | Allow users to set an X and Y offset. | `boolean` | `false` |
+| scale | Allow users to set a uniform scale. | `boolean` | `false` |
 
 ---
 
@@ -370,6 +371,7 @@ Transform styles. Only blocks and block style variations support them.
 | -------- | ----------- | ---- |
 | rotate | Sets the `rotate` CSS property. Accepts a single angle, such as `15deg` or `0.25turn`. | `string` |
 | translate | Sets the `translate` CSS property. Each axis accepts a single length or percentage, such as `10px` or `-50%`. A missing axis is `0`. | `{ x, y }` |
+| scale | Sets the `scale` CSS property. Accepts a single non-negative number, such as `1.2`, or percentage, such as `120%`. One value scales both axes. | `number`, `string` |
 
 ---
 
