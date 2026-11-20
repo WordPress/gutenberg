@@ -1,0 +1,44 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as FilePickerButtonStories from './file-picker-button.story';
+import * as FilePickerMenuStories from './file-picker-menu.story';
+import * as FilePickerDropZoneStories from './file-picker-drop-zone.story';
+import FilePickerButtonSource from './file-picker-button.tsx?raw';
+import FilePickerMenuSource from './file-picker-menu.tsx?raw';
+import FilePickerDropZoneSource from './file-picker-drop-zone.tsx?raw';
+
+<Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
+
+# Selecting local files
+
+Use `FormFileUpload` from `@wordpress/components` to open the native file picker. It provides a button and a hidden file input, and handles browser-specific picker hints such as `accept="audio/*"`.
+
+## From a button
+
+Read the selected `File` from `event.currentTarget.files`. Keep the result visible beside the button. Once you have the file, clear the input so choosing the same file again triggers another change. Leave the previous result in place when the picker closes without a selection. If a form has a separate submit button, keep the selected `File` in state and pass it to the submit handler.
+
+<Canvas
+	of={ FilePickerButtonStories.ChooseFile }
+	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
+/>
+
+## From a menu item
+
+Wrap the whole menu in `FormFileUpload`. Its `render` prop supplies `openFileDialog` to the menu item. The item closes the popup when activated. Both the input and the selection feedback stay mounted.
+
+<Canvas
+	of={ FilePickerMenuStories.ChooseFile }
+	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
+/>
+
+## From a drop area
+
+Pair `DropZone` with a button so people can choose a file with a keyboard or a single click. Position the drop area’s container so the overlay covers that area. Send picked and dropped files through the same handler. Here the picker suggests PNG files, and the handler checks the number of files and their filename extension. Show the error beside the control and keep the last accepted file visible.
+
+<Canvas
+	of={ FilePickerDropZoneStories.ChooseFile }
+	source={ { code: FilePickerDropZoneSource, language: 'tsx', type: 'code' } }
+/>
+
+Disable the fieldset to disable the native file input as well as the button. Remove the active drop target and prevent a dropped file from navigating away from the page.
+
+<Canvas of={ FilePickerDropZoneStories.Disabled } sourceState="none" />
