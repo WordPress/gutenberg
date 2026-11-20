@@ -1297,4 +1297,76 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			{ name: 'core/paragraph', attributes: { content: 'x' } },
 		] );
 	} );
+
+	test( 'should merge on Backspace at the start of a block with an active format', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>Bold</strong> text' },
+		} );
+
+		await editor.canvas.getByText( 'text' ).click();
+		await page.keyboard.press( 'Home' );
+		// Enters the bold format boundary without moving the caret.
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First<strong>Bold</strong> text' },
+			},
+		] );
+		// The canvas must stay in step with the block list.
+		await expect( editor.canvas.locator( '[data-block]' ) ).toHaveCount(
+			1
+		);
+	} );
+
+	test( 'should merge on a delete at the start of a block without a key press', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		await editor.canvas.getByText( 'Second' ).click();
+		await page.keyboard.press( 'Home' );
+		// A backward delete with no Backspace key press, as Ctrl+H sends on
+		// macOS.
+		await page.evaluate( () => {
+			const { activeElement } = document.querySelector(
+				'iframe[name="editor-canvas"]'
+			).contentDocument;
+			activeElement.dispatchEvent(
+				new InputEvent( 'beforeinput', {
+					inputType: 'deleteContentBackward',
+					bubbles: true,
+					cancelable: true,
+				} )
+			);
+		} );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'FirstSecond' },
+			},
+		] );
+		await expect( editor.canvas.locator( '[data-block]' ) ).toHaveCount(
+			1
+		);
+	} );
 } );
