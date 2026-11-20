@@ -1,14 +1,9 @@
 import { createRequire } from 'node:module';
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const require = createRequire( import.meta.url );
 const fs = require( 'node:fs' );
-let readFile = vi
-	.spyOn( fs.promises, 'readFile' )
-	.mockImplementation( () => undefined );
-let writeFile = vi
-	.spyOn( fs.promises, 'writeFile' )
-	.mockImplementation( () => undefined );
-let mkdir = vi.spyOn( fs.promises, 'mkdir' ).mockResolvedValue();
+const os = require( 'node:os' );
+const path = require( 'node:path' );
 const {
 	didCacheChange,
 	setCache,
@@ -16,40 +11,34 @@ const {
 	getCacheFile,
 } = require( '../cache' );
 
-afterAll( () => {
-	vi.restoreAllMocks();
-} );
+const cacheOptions = {};
+let tempDirectoryPath;
 
-const cacheOptions = {
-	workDirectoryPath: '/a/b/c',
-};
+function getCacheFilePath() {
+	return path.join( cacheOptions.workDirectoryPath, 'wp-env-cache.json' );
+}
 
 function deleteCacheFile() {
-	readFile.mockImplementation( () => Promise.reject( 'No file!' ) );
+	fs.rmSync( getCacheFilePath(), { force: true } );
 }
 
 function setCacheFile( data ) {
-	readFile.mockImplementation( () =>
-		Promise.resolve( JSON.stringify( data ) )
-	);
-}
-
-function setupWriteFile() {
-	writeFile.mockImplementation( ( fileName, data ) => {
-		readFile.mockClear();
-		readFile.mockImplementation( () => Promise.resolve( data ) );
-	} );
+	fs.writeFileSync( getCacheFilePath(), JSON.stringify( data ) );
 }
 
 describe( 'cache file', () => {
 	beforeEach( () => {
-		readFile = vi.spyOn( fs.promises, 'readFile' );
-		writeFile = vi.spyOn( fs.promises, 'writeFile' );
-		mkdir = vi.spyOn( fs.promises, 'mkdir' );
-		readFile.mockReset().mockImplementation( () => undefined );
-		writeFile.mockReset().mockImplementation( () => undefined );
-		mkdir.mockReset().mockResolvedValue();
-		setupWriteFile();
+		tempDirectoryPath = fs.mkdtempSync(
+			path.join( os.tmpdir(), 'wp-env-cache-' )
+		);
+		cacheOptions.workDirectoryPath = tempDirectoryPath;
+	} );
+
+	afterEach( () => {
+		fs.rmSync( tempDirectoryPath, {
+			recursive: true,
+			force: true,
+		} );
 	} );
 
 	describe( 'didCacheChange', () => {
@@ -107,6 +96,43 @@ describe( 'cache file', () => {
 			const result = await getCacheFile( cacheOptions );
 			expect( result ).toEqual( { test: 'abc', test2: 1234 } );
 		} );
+		it( 'does not change what a parallel reader of the file sees', async () => {
+			setCacheFile( { test: 'abc' } );
+			const reader = await fs.promises.open( getCacheFilePath(), 'r' );
+
+			await setCache( 'test2', 1234, cacheOptions );
+			const seen = await reader.readFile( 'utf8' );
+			await reader.close();
+
+			expect( JSON.parse( seen ) ).toEqual( { test: 'abc' } );
+			expect( fs.readdirSync( cacheOptions.workDirectoryPath ) ).toEqual(
+				[ 'wp-env-cache.json' ]
+			);
+		} );
+		it( 'does not rewrite the file if the value is unchanged', async () => {
+			setCacheFile( { test: 'abc', ports: { development: 8888 } } );
+			const { ino } = fs.statSync( getCacheFilePath() );
+
+			await setCache( 'test', 'abc', cacheOptions );
+			await setCache( 'ports', { development: 8888 }, cacheOptions );
+
+			expect( fs.statSync( getCacheFilePath() ).ino ).toBe( ino );
+		} );
+		it( 'writes the file directly if it cannot be replaced', async () => {
+			setCacheFile( { test: 'abc' } );
+			const rename = vi
+				.spyOn( fs.promises, 'rename' )
+				.mockRejectedValue( { code: 'EPERM' } );
+
+			await setCache( 'test2', 1234, cacheOptions );
+			rename.mockRestore();
+
+			const result = await getCacheFile( cacheOptions );
+			expect( result ).toEqual( { test: 'abc', test2: 1234 } );
+			expect( fs.readdirSync( cacheOptions.workDirectoryPath ) ).toEqual(
+				[ 'wp-env-cache.json' ]
+			);
+		} );
 	} );
 
 	describe( 'getCache', () => {
@@ -150,7 +176,7 @@ describe( 'cache file', () => {
 			expect( result ).toEqual( {} );
 		} );
 		it( 'returns an empty object if the file is invalid', async () => {
-			readFile.mockImplementation( () => Promise.resolve( '{' ) );
+			fs.writeFileSync( getCacheFilePath(), '{' );
 			const result = await getCacheFile( cacheOptions );
 			expect( result ).toEqual( {} );
 		} );

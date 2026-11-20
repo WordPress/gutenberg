@@ -1,6 +1,7 @@
 'use strict';
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
+const { randomUUID } = require( 'crypto' );
 
 /**
  * Options for cache parsing.
@@ -41,12 +42,39 @@ async function setCache( key, value, options ) {
 	await fs.mkdir( options.workDirectoryPath, { recursive: true } );
 
 	const existingCache = await getCacheFile( options );
+	if ( JSON.stringify( existingCache[ key ] ) === JSON.stringify( value ) ) {
+		return;
+	}
 	existingCache[ key ] = value;
 
-	await fs.writeFile(
-		getPathToCacheFile( options.workDirectoryPath ),
-		JSON.stringify( existingCache )
-	);
+	// Write to a temporary file and rename it over the cache file, so that a
+	// parallel command never reads a partly written file. Windows can refuse
+	// the rename while the file is open: retry, then write the file directly.
+	const cacheFile = getPathToCacheFile( options.workDirectoryPath );
+	const tempFile = `${ cacheFile }.${ process.pid }.${ randomUUID() }.tmp`;
+	const data = JSON.stringify( existingCache );
+	const isBusy = ( error ) =>
+		[ 'EPERM', 'EACCES', 'EBUSY' ].includes( error.code );
+	try {
+		await fs.writeFile( tempFile, data );
+		for ( let attempt = 1; ; attempt++ ) {
+			try {
+				await fs.rename( tempFile, cacheFile );
+				break;
+			} catch ( error ) {
+				if ( attempt === 3 || ! isBusy( error ) ) {
+					throw error;
+				}
+				await new Promise( ( resolve ) => setTimeout( resolve, 20 ) );
+			}
+		}
+	} catch ( error ) {
+		await fs.rm( tempFile, { force: true } );
+		if ( ! isBusy( error ) ) {
+			throw error;
+		}
+		await fs.writeFile( cacheFile, data );
+	}
 }
 
 /**
