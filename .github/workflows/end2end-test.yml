@@ -2,6 +2,17 @@ name: End-to-End Tests
 
 on:
     pull_request:
+        paths:
+            - 'packages/**'
+            - 'test/e2e/**'
+            - 'lib/**'
+            - 'phpunit/**'
+            - '.wp-env.json'
+            - 'package.json'
+            - 'package-lock.json'
+            - '.github/workflows/end2end-test.yml'
+            - '.github/setup-node/**'
+
     push:
         branches:
             - trunk
