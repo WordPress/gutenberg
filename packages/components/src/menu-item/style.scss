@@ -53,6 +53,10 @@
 		@media ( forced-colors: active ) {
 			// Unlike `:disabled`, `aria-disabled` gets no system disabled color.
 			color: GrayText !important;
+
+			.components-menu-item__info {
+				color: inherit;
+			}
 		}
 	}
 }
