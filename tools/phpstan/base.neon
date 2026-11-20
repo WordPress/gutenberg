@@ -22,6 +22,7 @@ parameters:
 	treatPhpDocTypesAsCertain: false
 
 	# What directories and files should be analyzed.
+	# When changing these, update the `scanFiles` and `scanDirectories` of phpstan-strict.neon.dist to match.
 	paths:
 		- ../../gutenberg.php
 		- ../../lib

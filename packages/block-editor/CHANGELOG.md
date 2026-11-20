@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
+## 20.1.0 (2026-11-18)
+
 ### Enhancements
 
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
@@ -10,6 +17,7 @@
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   Export the `BlockStyle`, `BlockStyleState`, `MediaUploadFunction` and `MediaUploadOptions` types ([#87018](https://github.com/WordPress/gutenberg/pull/87018)).
 
 ### Bug Fixes
 
