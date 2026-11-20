@@ -757,18 +757,36 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 			$wp_key = $processor->get_attribute( 'data-wp-key' );
 			if ( $wp_key && isset( $state['metadata'][ $wp_key ] ) ) {
 				$alt = $state['metadata'][ $wp_key ]['alt'];
+
+				if ( empty( $alt ) ) {
+					$custom_aria_label = sprintf(
+						/* translators: %1$s: current image index, %2$s: total number of images */
+						__( 'Enlarged image %1$s of %2$s' ),
+						$lightbox_index + 1,
+						$total
+					);
+				} else {
+					$custom_aria_label = sprintf(
+						/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
+						__( 'Enlarged image %1$s of %2$s: %3$s' ),
+						$lightbox_index + 1,
+						$total,
+						$alt
+					);
+				}
+
 				wp_interactivity_state(
 					'core/image',
 					array(
 						'metadata' => array(
 							$wp_key => array(
-								'customAriaLabel'        => empty( $alt )
+								'customAriaLabel'        => $custom_aria_label,
+								'triggerButtonAriaLabel' => sprintf(
 									/* translators: %1$s: current image index, %2$s: total number of images */
-									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $lightbox_index + 1, $total )
-									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
-									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, $alt ),
-								/* translators: %1$s: current image index, %2$s: total number of images */
-								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $lightbox_index + 1, $total ),
+									__( 'Enlarge %1$s of %2$s' ),
+									$lightbox_index + 1,
+									$total
+								),
 								'order'                  => $lightbox_index,
 							),
 						),
