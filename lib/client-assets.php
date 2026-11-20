@@ -44,14 +44,23 @@ function gutenberg_url( $path ) {
  *
  * @since 24.6.0
  *
+ * @param bool|null $script_debug     Whether `SCRIPT_DEBUG` is on. Defaults to
+ *                                    the `SCRIPT_DEBUG` constant.
+ * @param bool|null $has_debug_assets Whether the build includes the
+ *                                    non-minified files. Defaults to the
+ *                                    `has_debug_assets` value of
+ *                                    `build/constants.php`, read by load.php.
  * @return bool True when the non-minified build files should load.
  */
-function gutenberg_should_load_debug_assets() {
-	if ( ! SCRIPT_DEBUG ) {
-		return false;
+function gutenberg_should_load_debug_assets( $script_debug = null, $has_debug_assets = null ) {
+	if ( null === $script_debug ) {
+		$script_debug = SCRIPT_DEBUG;
+	}
+	if ( null === $has_debug_assets ) {
+		$has_debug_assets = ! defined( 'GUTENBERG_HAS_DEBUG_ASSETS' ) || GUTENBERG_HAS_DEBUG_ASSETS;
 	}
 
-	return ! defined( 'GUTENBERG_HAS_DEBUG_ASSETS' ) || GUTENBERG_HAS_DEBUG_ASSETS;
+	return $script_debug && $has_debug_assets;
 }
 
 /**

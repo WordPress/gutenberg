@@ -2,40 +2,66 @@
 /**
  * Tests the assets that Gutenberg registers by hand from its build directory.
  *
- * A build made with `--no-script-debug` leaves out the non-minified files, so
- * these tests check that every registered file exists on disk, whichever way
- * the plugin was built and whatever the value of `SCRIPT_DEBUG`.
+ * A build made with `--no-script-debug` leaves out the non-minified files.
+ * `SCRIPT_DEBUG` is a constant, so these tests pass the value they need to
+ * gutenberg_should_load_debug_assets() rather than depend on the environment.
  *
  * @package gutenberg
  */
 
 class Gutenberg_Client_Assets_Test extends WP_UnitTestCase {
 	/**
+	 * Build files that the stylesheets registered by hand load, without the
+	 * suffix and extension, keyed by style handle.
+	 *
+	 * @var string[]
+	 */
+	const STYLE_FILES = array(
+		'wp-theme'                        => 'build/styles/theme/design-tokens',
+		'wp-base-styles'                  => 'build/styles/base-styles/admin-schemes',
+		'wp-block-editor-content'         => 'build/styles/block-editor/content',
+		'wp-block-library'                => 'build/styles/block-library/style',
+		'wp-reset-editor-styles'          => 'build/styles/block-library/reset',
+		'wp-editor-classic-layout-styles' => 'build/styles/edit-post/classic',
+		'wp-block-library-editor'         => 'build/styles/block-library/editor',
+		'wp-edit-blocks'                  => 'build/styles/block-library/editor',
+		'wp-block-library-theme'          => 'build/styles/block-library/theme',
+		'classic-theme-styles'            => 'build/styles/block-library/classic',
+		'wp-block-paragraph'              => 'build/styles/block-library/paragraph/style',
+	);
+
+	/**
 	 * Cleans up global scope.
 	 *
-	 * @global WP_Styles  $wp_styles
-	 * @global WP_Scripts $wp_scripts
+	 * @global WP_Styles $wp_styles
 	 */
 	public function clean_up_global_scope() {
-		global $wp_styles, $wp_scripts; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		global $wp_styles; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		parent::clean_up_global_scope();
-		$wp_styles  = null;
-		$wp_scripts = null;
+		$wp_styles = null;
 	}
 
 	/**
-	 * Converts a URL inside the plugin's build directory to a file path.
+	 * Returns the array that the current build's `build/constants.php` returns.
 	 *
-	 * @param string $url URL of a file in the build directory.
-	 * @return string Absolute path to the file.
+	 * @return array Build constants.
 	 */
-	private function get_build_file_path( $url ) {
-		$build_url = gutenberg_url( 'build/' );
+	private function get_build_constants() {
+		$constants_file = gutenberg_dir_path() . 'build/constants.php';
+		$this->assertFileExists( $constants_file, 'The plugin should be built.' );
 
-		$this->assertIsString( $url, 'The asset should be registered with a URL.' );
-		$this->assertStringStartsWith( $build_url, $url, 'The asset should load from the build directory.' );
+		return require $constants_file;
+	}
 
-		return gutenberg_dir_path() . 'build/' . substr( $url, strlen( $build_url ) );
+	/**
+	 * Returns the suffix the registration code adds before the extension.
+	 *
+	 * @param bool|null $script_debug     Whether `SCRIPT_DEBUG` is on.
+	 * @param bool|null $has_debug_assets Whether the build has non-minified files.
+	 * @return string Either an empty string or `.min`.
+	 */
+	private function get_suffix( $script_debug = null, $has_debug_assets = null ) {
+		return gutenberg_should_load_debug_assets( $script_debug, $has_debug_assets ) ? '' : '.min';
 	}
 
 	/**
@@ -43,62 +69,105 @@ class Gutenberg_Client_Assets_Test extends WP_UnitTestCase {
 	 *
 	 * @return array[]
 	 */
-	public function data_style_handles() {
+	public function data_should_load_debug_assets() {
 		return array(
-			array( 'wp-theme' ),
-			array( 'wp-base-styles' ),
-			array( 'wp-block-editor-content' ),
-			array( 'wp-block-library' ),
-			array( 'wp-reset-editor-styles' ),
-			array( 'wp-editor-classic-layout-styles' ),
-			array( 'wp-block-library-editor' ),
-			array( 'wp-edit-blocks' ),
-			array( 'wp-block-library-theme' ),
-			array( 'classic-theme-styles' ),
+			'SCRIPT_DEBUG on, debug files built'  => array( true, true, true ),
+			'SCRIPT_DEBUG on, no debug files'     => array( true, false, false ),
+			'SCRIPT_DEBUG off, debug files built' => array( false, true, false ),
+			'SCRIPT_DEBUG off, no debug files'    => array( false, false, false ),
 		);
 	}
 
 	/**
-	 * Tests that the stylesheets registered by hand load files that exist.
+	 * Tests that the non-minified files load only when `SCRIPT_DEBUG` is on and
+	 * the build includes them.
 	 *
-	 * @dataProvider data_style_handles
+	 * @dataProvider data_should_load_debug_assets
 	 *
-	 * @covers ::gutenberg_register_packages_styles
 	 * @covers ::gutenberg_should_load_debug_assets
 	 *
-	 * @param string $handle Style handle.
+	 * @param bool $script_debug     Whether `SCRIPT_DEBUG` is on.
+	 * @param bool $has_debug_assets Whether the build has non-minified files.
+	 * @param bool $expected         Expected result.
 	 */
-	public function test_registered_style_files_exist( $handle ) {
-		$style = wp_styles()->query( $handle, 'registered' );
+	public function test_should_load_debug_assets( $script_debug, $has_debug_assets, $expected ) {
+		$this->assertSame( $expected, gutenberg_should_load_debug_assets( $script_debug, $has_debug_assets ) );
+	}
 
-		$this->assertInstanceOf( _WP_Dependency::class, $style, "The $handle style should be registered." );
+	/**
+	 * Tests that the plugin reads `has_debug_assets` from the current build.
+	 *
+	 * @covers ::gutenberg_should_load_debug_assets
+	 */
+	public function test_has_debug_assets_comes_from_the_build() {
+		$build_constants = $this->get_build_constants();
 
-		$path = $this->get_build_file_path( $style->src );
-		$this->assertFileExists( $path );
+		$this->assertTrue( defined( 'GUTENBERG_HAS_DEBUG_ASSETS' ), 'GUTENBERG_HAS_DEBUG_ASSETS should be defined.' );
+		$this->assertSame( (bool) $build_constants['has_debug_assets'], GUTENBERG_HAS_DEBUG_ASSETS );
+		$this->assertSame(
+			gutenberg_should_load_debug_assets( true, $build_constants['has_debug_assets'] ),
+			gutenberg_should_load_debug_assets( true ),
+			'The default should match the current build.'
+		);
+	}
 
-		// `WP_Styles` builds the RTL URL from the suffix the same way.
-		$suffix = $style->extra['suffix'] ?? '';
-		$this->assertFileExists( str_replace( "{$suffix}.css", "-rtl{$suffix}.css", $path ) );
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_script_debug() {
+		return array(
+			'SCRIPT_DEBUG on'  => array( true ),
+			'SCRIPT_DEBUG off' => array( false ),
+		);
+	}
 
-		if ( isset( $style->extra['path'] ) ) {
-			$this->assertSame( $path, $style->extra['path'], 'The path used for inlining should match the URL.' );
+	/**
+	 * Tests that, for the current build, every stylesheet registered by hand
+	 * resolves to a file that exists, with `SCRIPT_DEBUG` on or off.
+	 *
+	 * Fails on a `--no-script-debug` build if the suffix ignores the
+	 * `has_debug_assets` value of that build.
+	 *
+	 * @dataProvider data_script_debug
+	 *
+	 * @covers ::gutenberg_should_load_debug_assets
+	 *
+	 * @param bool $script_debug Whether `SCRIPT_DEBUG` is on.
+	 */
+	public function test_build_has_files_for_suffix( $script_debug ) {
+		$suffix = $this->get_suffix( $script_debug );
+
+		foreach ( array_unique( self::STYLE_FILES ) as $file ) {
+			$this->assertFileExists( gutenberg_dir_path() . $file . $suffix . '.css' );
+			$this->assertFileExists( gutenberg_dir_path() . $file . '-rtl' . $suffix . '.css' );
 		}
 	}
 
 	/**
-	 * Tests that the per-block stylesheets registered by hand load files that exist.
+	 * Tests that the stylesheets registered by hand use the suffix from
+	 * gutenberg_should_load_debug_assets().
 	 *
+	 * @covers ::gutenberg_register_packages_styles
 	 * @covers ::gutenberg_register_core_block_assets
-	 * @covers ::gutenberg_should_load_debug_assets
 	 */
-	public function test_registered_block_style_files_exist() {
-		add_filter( 'should_load_separate_core_block_assets', '__return_true' );
+	public function test_registered_styles_use_suffix() {
+		$suffix = $this->get_suffix();
 
+		add_filter( 'should_load_separate_core_block_assets', '__return_false' );
+		$GLOBALS['wp_styles'] = null;
+		wp_styles();
+
+		add_filter( 'should_load_separate_core_block_assets', '__return_true', 11 );
 		gutenberg_register_core_block_assets( 'core/paragraph' );
-		$style = wp_styles()->query( 'wp-block-paragraph', 'registered' );
 
-		$this->assertInstanceOf( _WP_Dependency::class, $style, 'The paragraph block style should be registered.' );
-		$this->assertFileExists( $this->get_build_file_path( $style->src ) );
-		$this->assertSame( $this->get_build_file_path( $style->src ), $style->extra['path'], 'The path used for inlining should match the URL.' );
+		foreach ( self::STYLE_FILES as $handle => $file ) {
+			$style = wp_styles()->query( $handle, 'registered' );
+
+			$this->assertInstanceOf( _WP_Dependency::class, $style, "The $handle style should be registered." );
+			$this->assertSame( gutenberg_url( $file . $suffix . '.css' ), $style->src, "The $handle style should load the file for the current suffix." );
+			$this->assertSame( $suffix, $style->extra['suffix'] ?? null, "The $handle style should carry the suffix for its RTL file." );
+		}
 	}
 }
