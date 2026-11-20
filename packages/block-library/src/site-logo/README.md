@@ -51,6 +51,7 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
+- **border**: `.wp-block-site-logo img, .wp-block-site-logo .components-placeholder`
 - **filter**:
   - duotone: `.wp-block-site-logo img, .wp-block-site-logo .components-placeholder__illustration, .wp-block-site-logo .components-placeholder::before`
 
