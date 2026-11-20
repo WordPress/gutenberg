@@ -5,7 +5,7 @@ import { check, plus } from '@wordpress/icons';
 import { Icon } from '../../../icon';
 import { useItemContent } from '../../../utils/item-popup';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 import resetStyles from '../../../utils/css/resets.module.css';
 import {
 	ITEM_DESCRIPTION_DIRECT_CHILD,
@@ -64,7 +64,7 @@ export const Item = forwardRef< HTMLDivElement, ComboboxItemProps >(
 							variant !== 'creatable' &&
 								itemPopupStyles[ 'item-indicator-icon' ]
 						) }
-						size={ 16 }
+						size={ variant === 'creatable' ? 16 : 20 }
 					/>
 				</span>
 				<div className={ itemPopupStyles[ 'item-text' ] }>
