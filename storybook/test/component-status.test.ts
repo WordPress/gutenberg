@@ -1,7 +1,7 @@
 import { globSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
-import { sanitize, toId } from 'storybook/internal/csf';
+import { combineTags, sanitize, toId } from 'storybook/internal/csf';
 import { loadCsf } from 'storybook/internal/csf-tools';
 import { describe, expect, it } from 'vitest';
 import { readComponentStatus } from '../status-indexer';
@@ -25,7 +25,7 @@ type Story = {
 	id: string;
 	component?: string;
 	status?: string;
-	tags: string[];
+	isInManifest: boolean;
 };
 
 type MigrationGuide = {
@@ -50,7 +50,9 @@ function readStories(): Story[] {
 				id: csf.meta.id ?? sanitize( csf.meta.title ?? file ),
 				component: readLocalComponentName( csf ),
 				status: readComponentStatus( csf._metaAnnotations.parameters ),
-				tags: csf.meta.tags ?? [],
+				isInManifest: csf.indexInputs.some( ( { tags } ) =>
+					combineTags( ...( tags ?? [] ) ).includes( 'manifest' )
+				),
 			};
 		} );
 }
@@ -148,10 +150,11 @@ function findStatusMismatches(): StatusMismatch[] {
 	return mismatches;
 }
 
-function readLinkedDocsIds( message: string ): string[] {
-	return [ ...message.matchAll( /\?path=\/docs\/([\w-]+)/g ) ].map(
-		( [ , docsId ] ) => docsId
-	);
+function readStorybookPaths( message: string ): string[] {
+	return (
+		message.match( /https:\/\/wordpress\.github\.io\/gutenberg\/\S*/g ) ??
+		[]
+	).map( ( url ) => new URL( url ).searchParams.get( 'path' ) ?? url );
 }
 
 describe( '@wordpress/components recommendation status', () => {
@@ -209,12 +212,12 @@ describe( '@wordpress/components recommendation status', () => {
 	it( 'leaves "not-recommended" stories out of the manifest', () => {
 		const manifestStories = componentStories
 			.filter(
-				( { status, tags } ) =>
-					status === 'not-recommended' && tags.includes( 'manifest' )
+				( { status, isInManifest } ) =>
+					status === 'not-recommended' && isInManifest
 			)
 			.map(
 				( { file } ) =>
-					`${ file } is "not-recommended" but has the \`manifest\` tag. Remove the tag, then run \`npm run storybook:build\` and \`npm run storybook:manifest-snapshot\`.`
+					`${ file } is "not-recommended" but has the \`manifest\` tag on its meta or a story. Remove the tag, then run \`npm run storybook:build\` and \`npm run storybook:manifest-snapshot\`.`
 			);
 
 		expect( manifestStories ).toEqual( [] );
@@ -232,7 +235,9 @@ describe( '@wordpress/components recommendation status', () => {
 				const entry = denylistEntriesByComponent.get( story.component );
 				if (
 					! entry ||
-					readLinkedDocsIds( entry.message ).includes( docsId )
+					readStorybookPaths( entry.message ).includes(
+						`/docs/${ docsId }`
+					)
 				) {
 					return [];
 				}
@@ -245,21 +250,19 @@ describe( '@wordpress/components recommendation status', () => {
 		expect( unlinkedGuides ).toEqual( [] );
 	} );
 
-	it( 'links only migration guides that exist', () => {
-		const guideIds = new Set(
-			migrationGuides.map( ( { docsId } ) => docsId )
+	it( 'links Storybook only to migration guides that exist', () => {
+		const guidePaths = new Set(
+			migrationGuides.map( ( { docsId } ) => `/docs/${ docsId }` )
 		);
 		const brokenLinks = Object.entries( denylist ).flatMap(
 			( [ key, message ] ) =>
-				readLinkedDocsIds( message )
+				readStorybookPaths( message )
 					.filter(
-						( id ) =>
-							id.includes( '--migration-guide' ) &&
-							! guideIds.has( id )
+						( storybookPath ) => ! guidePaths.has( storybookPath )
 					)
 					.map(
-						( id ) =>
-							`The ${ key } message in DENYLIST in ${ RULE_FILE } links ${ id }, which is not the ID of any migration-guide.mdx under packages/components. Fix the link, or the guide's story \`id\` or <Meta name>.`
+						( storybookPath ) =>
+							`The ${ key } message in DENYLIST in ${ RULE_FILE } links ${ storybookPath }, which is not the path of any migration-guide.mdx under packages/components. Fix the link, or the guide's story \`id\` or <Meta name>.`
 					)
 		);
 
