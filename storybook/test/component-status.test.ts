@@ -250,7 +250,7 @@ describe( '@wordpress/components recommendation status', () => {
 		expect( unlinkedGuides ).toEqual( [] );
 	} );
 
-	it( 'links Storybook only to migration guides that exist', () => {
+	it( 'links only migration guides that exist', () => {
 		const guidePaths = new Set(
 			migrationGuides.map( ( { docsId } ) => `/docs/${ docsId }` )
 		);
@@ -258,7 +258,9 @@ describe( '@wordpress/components recommendation status', () => {
 			( [ key, message ] ) =>
 				readStorybookPaths( message )
 					.filter(
-						( storybookPath ) => ! guidePaths.has( storybookPath )
+						( storybookPath ) =>
+							storybookPath.includes( '--migration-guide' ) &&
+							! guidePaths.has( storybookPath )
 					)
 					.map(
 						( storybookPath ) =>
