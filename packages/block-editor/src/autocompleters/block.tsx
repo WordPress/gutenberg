@@ -8,7 +8,9 @@ import {
 import { useMemo } from '@wordpress/element';
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
+import { useBlockEditContext } from '../components/block-edit/context';
 import BlockIcon from '../components/block-icon';
+import { useVisibleSlashInserter } from '../components/block-tools/slash-inserter-context';
 import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
 import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
@@ -30,6 +32,7 @@ function createBlockCompleter(): BlockCompleter {
 		triggerPrefix: '/',
 
 		useItems( filterValue: string ) {
+			const { clientId } = useBlockEditContext();
 			const { rootClientId, selectedBlockId, prioritizedBlocks } =
 				useSelect( ( select ) => {
 					const {
@@ -115,6 +118,8 @@ function createBlockCompleter(): BlockCompleter {
 					} ),
 				[ filteredItems ]
 			);
+
+			useVisibleSlashInserter( clientId, options.length > 0 );
 
 			return [ options ];
 		},
