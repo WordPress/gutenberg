@@ -158,6 +158,26 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await pageUtils.pressKeys( 'secondary+M' );
 	} );
 
+	test( 'focuses the title when switching to the Code Editor', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.focus();
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		try {
+			await expect(
+				page.getByRole( 'textbox', { name: 'Add title' } )
+			).toBeFocused();
+		} finally {
+			await pageUtils.pressKeys( 'secondary+M' );
+		}
+	} );
+
 	// Test for regressions of https://github.com/WordPress/gutenberg/issues/24054.
 	test( 'saves content when using the shortcut in the Code Editor', async ( {
 		editor,

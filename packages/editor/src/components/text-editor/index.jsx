@@ -21,7 +21,7 @@ export default function TextEditor( { autoFocus = false } ) {
 
 	const titleRef = useRef();
 	useEffect( () => {
-		if ( autoFocus ) {
+		if ( ! autoFocus ) {
 			return;
 		}
 		titleRef?.current?.focus();
