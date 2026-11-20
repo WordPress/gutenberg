@@ -77,4 +77,44 @@ describe( 'fromDOM', () => {
 			},
 		} );
 	} );
+
+	it( 'should return an equivalent block node for deeply nested elements', () => {
+		const node = document.createElement( 'p' );
+		node.innerHTML =
+			'Deep <span>nested <strong><em>text</em></strong></span> node';
+
+		const blockNode = fromDOM( node );
+
+		expect( console ).toHaveWarned();
+		expect( blockNode ).toEqual( {
+			type: 'p',
+			props: {
+				children: [
+					'Deep ',
+					{
+						type: 'span',
+						props: {
+							children: [
+								'nested ',
+								{
+									type: 'strong',
+									props: {
+										children: [
+											{
+												type: 'em',
+												props: {
+													children: [ 'text' ],
+												},
+											},
+										],
+									},
+								},
+							],
+						},
+					},
+					' node',
+				],
+			},
+		} );
+	} );
 } );
