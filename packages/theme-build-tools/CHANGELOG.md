@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Support Stylelint 18 in the design token Stylelint plugins by widening the optional `stylelint` peer dependency to `^16 || ^17 || ^18`.
+
 ### Internal
 
 -   Update `@types/node` development dependency to 24.19.2 ([#87251](https://github.com/WordPress/gutenberg/pull/87251)).

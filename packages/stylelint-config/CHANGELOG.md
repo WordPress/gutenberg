@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Require Stylelint 18: the `stylelint` peer dependency is now `^18.0.0`, and `stylelint-scss` is now `^7.5.0`. Stylelint 17 is no longer supported.
+-   Raise the minimum required Node.js version to `^22.22.2 || ^24.15.0 || >=26.0.0`, matching Stylelint 18.
+-   Update `stylelint-config-recommended` to 19, which enables `at-charset-rule-no-invalid`, `selector-no-deprecated`, `selector-no-invalid`, `selector-no-unmatchable` and `value-no-invalid`. The SCSS presets keep all of them off except `selector-no-deprecated`, following `stylelint-config-recommended-scss` 18.
+-   Update `@stylistic/stylelint-plugin` to 6. The SCSS Stylistic preset now configures the stylistic rules under the `@stylistic/scss/` namespace, which is the only one the plugin uses to check SCSS. Rename `@stylistic/*` rules to `@stylistic/scss/*` in your overrides and `stylelint-disable` comments for SCSS. The `indentation` rule also checks the lines of a selector that continues inside a multi-line pseudo-class such as `:where(`, and expects them one level shallower than before.
+
+### Enhancements
+
+-   Export the stylistic rules by their short names as `stylisticRules` from `@wordpress/stylelint-config/stylistic`, so a JavaScript config can pass them to `defineStylistic` from `@stylistic/stylelint-plugin` for another syntax.
+
 ### Internal
 
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).

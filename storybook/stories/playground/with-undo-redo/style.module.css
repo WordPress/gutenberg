@@ -10,8 +10,8 @@
 }
 
 .toolbar
-	:global(
-		.components-accessible-toolbar.block-editor-block-contextual-toolbar
-	) {
+:global(
+	.components-accessible-toolbar.block-editor-block-contextual-toolbar
+) {
 	border-bottom: none;
 }

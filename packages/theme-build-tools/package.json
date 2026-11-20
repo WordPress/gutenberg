@@ -86,7 +86,7 @@
 		"postcss": "^8.5.33",
 		"postcss-scss": "^4.0.9",
 		"source-map": "^0.6.1",
-		"stylelint": "^17.14.1",
+		"stylelint": "^18.0.0",
 		"vite": "^8.3.8",
 		"vitest": "^5.1.1"
 	},
@@ -95,7 +95,7 @@
 		"esbuild": ">=0.27.2 <1.0.0",
 		"lightningcss": ">=1.33.0 <2.0.0",
 		"postcss": "^8.0.0",
-		"stylelint": "^16 || ^17",
+		"stylelint": "^16 || ^17 || ^18",
 		"vite": "^7 || ^8"
 	},
 	"peerDependenciesMeta": {

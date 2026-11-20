@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `lint-style`: Update Stylelint to 18 and the default config to the matching `@wordpress/stylelint-config`. The default config enables new rules, and SCSS files are now checked by the `@stylistic/scss/*` rules, so `@stylistic/*` overrides and `stylelint-disable` comments for SCSS need the new names. Stylelint 18 also parses command-line arguments more strictly: pass flag values with `=` (`--fix=lax`), use kebab-case flags, use `--no-cache` instead of `--cache=false`, and use full flag names instead of short aliases such as `--aei`. See the [Stylelint 18 migration guide](https://stylelint.io/migration-guide/to-18).
+
 ### Bug Fixes
 
 -   `check-licenses`: Accept the `PSF-2.0` license outside GPL-2.0-only mode, as `Python-2.0` already is. `argparse` 3, which Stylelint 18 depends on through `cosmiconfig` 10 and `js-yaml` 5, uses it ([#87151](https://github.com/WordPress/gutenberg/pull/87151)).
