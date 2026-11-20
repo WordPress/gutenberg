@@ -1,6 +1,13 @@
+import type {
+	GlobalStylesConfig,
+	GlobalStylesStyles,
+} from '@wordpress/global-styles-engine';
 import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
+
+type ElementStyles = NonNullable< GlobalStylesStyles[ 'elements' ] >[ string ];
+type BlockStyles = NonNullable< GlobalStylesStyles[ 'blocks' ] >[ string ];
 
 describe( 'hasUserStylesForBlock', () => {
 	it( 'returns false when there is no user config', () => {
@@ -27,11 +34,15 @@ describe( 'hasUserStylesForBlock', () => {
 	} );
 
 	it( 'returns true for a settings-only entry', () => {
-		const user = {
+		const user: GlobalStylesConfig = {
 			settings: {
 				blocks: {
 					'core/quote': {
-						color: { palette: [ { slug: 'a', color: '#fff' } ] },
+						color: {
+							palette: [
+								{ name: 'A', slug: 'a', color: '#fff' },
+							],
+						},
 					},
 				},
 			},
@@ -76,11 +87,15 @@ describe( 'hasUserStylesForBlock', () => {
 			false
 		);
 
-		const fullPalette = {
+		const fullPalette: GlobalStylesConfig = {
 			settings: {
 				blocks: {
 					'core/quote': {
-						color: { palette: [ { slug: 'a', color: '#fff' } ] },
+						color: {
+							palette: [
+								{ name: 'A', slug: 'a', color: '#fff' },
+							],
+						},
 					},
 				},
 			},
@@ -105,13 +120,17 @@ describe( 'hasUserStylesForBlock', () => {
 	} );
 
 	it( 'returns true when only one of the two roots has a real value', () => {
-		const user = {
+		const user: GlobalStylesConfig = {
 			styles: {
 				blocks: { 'core/quote': { color: { text: undefined } } },
 			},
 			settings: {
 				blocks: {
-					'core/quote': { typography: { customFontSize: true } },
+					'core/quote': {
+						typography: {
+							customFontSize: true,
+						},
+					},
 				},
 			},
 		};
@@ -120,9 +139,15 @@ describe( 'hasUserStylesForBlock', () => {
 } );
 
 describe( 'getOverridingBlockTypes', () => {
-	function getConfig( blocks ) {
+	function getConfig(
+		blocks?: GlobalStylesStyles[ 'blocks' ]
+	): GlobalStylesConfig {
 		return {
-			settings: { typography: { lineHeight: true } },
+			settings: {
+				typography: {
+					lineHeight: true,
+				},
+			},
 			styles: {
 				typography: { fontWeight: '300' },
 				elements: {
@@ -163,7 +188,9 @@ describe( 'getOverridingBlockTypes', () => {
 			{ variations: { plain: { typography: { fontWeight: '700' } } } },
 		],
 	] )( 'skips %s', ( _, style ) => {
-		const config = getConfig( { 'core/post-title': style } );
+		const config = getConfig( {
+			'core/post-title': style,
+		} );
 		expect(
 			getOverridingBlockTypes( config, 'heading', [ 'core/post-title' ] )
 		).toEqual( [] );
@@ -195,11 +222,14 @@ describe( 'getOverridingBlockTypes', () => {
 		).toEqual( [ 'core/heading', 'core/post-title' ] );
 	} );
 
-	function getButtonConfig( elementStyle, blockStyle ) {
+	function getButtonConfig(
+		elementStyle?: ElementStyles,
+		blockStyle?: BlockStyles
+	): GlobalStylesConfig {
 		return {
 			styles: {
-				elements: { button: elementStyle },
-				blocks: { 'core/button': blockStyle },
+				...( elementStyle && { elements: { button: elementStyle } } ),
+				...( blockStyle && { blocks: { 'core/button': blockStyle } } ),
 			},
 		};
 	}

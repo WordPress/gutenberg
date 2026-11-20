@@ -27,7 +27,13 @@ describe( 'getFamilyPreviewStyle', () => {
 		expect(
 			getFamilyPreviewStyle( {
 				fontFamily: 'Inter',
-				fontFace: [ { fontStyle: 'normal', fontWeight: '150 700' } ],
+				fontFace: [
+					{
+						fontFamily: 'Inter',
+						fontStyle: 'normal',
+						fontWeight: '150 700',
+					},
+				],
 			} )
 		).toEqual( expect.objectContaining( { fontWeight: '400' } ) );
 	} );
@@ -37,8 +43,16 @@ describe( 'getFamilyPreviewStyle', () => {
 			getFamilyPreviewStyle( {
 				fontFamily: 'Inter',
 				fontFace: [
-					{ fontStyle: 'normal', fontWeight: '700' },
-					{ fontStyle: 'normal', fontWeight: '500' },
+					{
+						fontFamily: 'Inter',
+						fontStyle: 'normal',
+						fontWeight: '700',
+					},
+					{
+						fontFamily: 'Inter',
+						fontStyle: 'normal',
+						fontWeight: '500',
+					},
 				],
 			} )
 		).toEqual( expect.objectContaining( { fontWeight: '500' } ) );
@@ -48,7 +62,13 @@ describe( 'getFamilyPreviewStyle', () => {
 		expect(
 			getFamilyPreviewStyle( {
 				fontFamily: 'Inter',
-				fontFace: [ { fontStyle: 'italic', fontWeight: '200 900' } ],
+				fontFace: [
+					{
+						fontFamily: 'Inter',
+						fontStyle: 'italic',
+						fontWeight: '200 900',
+					},
+				],
 			} )
 		).toEqual(
 			expect.objectContaining( {

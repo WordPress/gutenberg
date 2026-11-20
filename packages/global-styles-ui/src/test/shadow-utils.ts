@@ -100,7 +100,10 @@ const shadowUnits = {
 };
 
 // Data helper functions
-function getShadowString( formatString, values ) {
+function getShadowString(
+	formatString: string,
+	values: Record< string, string >
+) {
 	return formatString.replace( /\{(\w+)\}/g, ( match, placeholder ) => {
 		if ( values.hasOwnProperty( placeholder ) ) {
 			return values[ placeholder ];
@@ -108,7 +111,7 @@ function getShadowString( formatString, values ) {
 		return match;
 	} );
 }
-function getCombinedShadowString( format, parts ) {
+function getCombinedShadowString( format: string, parts: string[] ) {
 	return format.replace( /{(\d+)}/g, ( _, index ) => parts[ index - 1 ] );
 }
 
