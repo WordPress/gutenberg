@@ -12,7 +12,7 @@ import {
 } from './utils';
 import { STORE_NAME as editWidgetsStoreName } from './constants';
 
-/** @typedef {import('@wordpress/blocks').Block} BlockInstance */
+/** @typedef {import('@wordpress/blocks').Block} Block */
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -110,8 +110,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  *
  * @param {string} clientId The client id of a block in a widget area.
  *
- * @return {BlockInstance | null} The widget area block.
- * @type {(state: Record<string, unknown>, clientId: string) => BlockInstance | null}
+ * @return {Block | null} The widget area block.
+ * @type {(state: Record<string, unknown>, clientId: string) => Block | null}
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
