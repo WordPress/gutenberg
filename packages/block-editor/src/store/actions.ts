@@ -2291,7 +2291,7 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * @property {Object}                                                                       labels                         Labels for the media category.
  * @property {string}                                                                       labels.name                    General name of the media category. It's used in the inserter media items list.
  * @property {string}                                                                       [labels.search_items='Search'] Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
- * @property {('image'|'audio'|'video')}                                                    mediaType                      The media type of the media category.
+ * @property {('image'|'audio'|'video'|'application')}                                      mediaType                      The media type of the media category. `application` covers documents such as PDFs, which are inserted as File blocks.
  * @property {(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>} fetch                          The function to fetch media items for the category. Returning an
  *                                                                                                                         `InserterMediaResponse` instead of a plain array opts the category into
  *                                                                                                                         pagination.
@@ -2321,9 +2321,13 @@ export const registerInserterMediaCategory =
 			console.error( 'Category should have a `labels.name`.' );
 			return;
 		}
-		if ( ! [ 'image', 'audio', 'video' ].includes( category.mediaType ) ) {
+		if (
+			! [ 'image', 'audio', 'video', 'application' ].includes(
+				category.mediaType
+			)
+		) {
 			console.error(
-				'Category should have `mediaType` property that is one of `image|audio|video`.'
+				'Category should have `mediaType` property that is one of `image|audio|video|application`.'
 			);
 			return;
 		}
