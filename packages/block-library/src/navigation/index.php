@@ -278,14 +278,7 @@ class WP_Navigation_Block_Renderer {
 		$has_submenus   = self::has_submenus( $inner_blocks );
 		$is_interactive = self::is_interactive( $attributes, $inner_blocks );
 
-		$style                = self::get_styles( $attributes );
-		$class                = self::get_classes( $attributes );
-		$container_attributes = get_block_wrapper_attributes(
-			array(
-				'class' => 'wp-block-navigation__container ' . $class,
-				'style' => $style,
-			)
-		);
+		$container_attributes = 'class="wp-block-navigation__container"';
 
 		$inner_blocks_html = '';
 		$is_list_open      = false;
