@@ -3,14 +3,17 @@ import { useEffect, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import type { DeprecatedTextAlignProps } from './types';
 
 /**
  * If a plugin is still using the old textAlign attribute, we need to migrate its value
  * to the new style.typography.textAlign attribute.
  *
- * @param {Object} props Block props.
+ * @param props Block props.
  */
-export default function useDeprecatedTextAlign( props ) {
+export default function useDeprecatedTextAlign(
+	props: DeprecatedTextAlignProps
+): void {
 	const { name, attributes, setAttributes } = props;
 	const { textAlign } = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } =
@@ -31,7 +34,7 @@ export default function useDeprecatedTextAlign( props ) {
 			},
 		} ) );
 	} );
-	const lastUpdatedAlignRef = useRef();
+	const lastUpdatedAlignRef = useRef< string | undefined >( undefined );
 	useEffect( () => {
 		if ( textAlign === lastUpdatedAlignRef.current ) {
 			return;

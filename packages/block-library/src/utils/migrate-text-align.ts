@@ -1,10 +1,14 @@
+import type { StyledBlockAttributes } from './types';
+
 /**
  * Migrates the current textAlign attribute,
  *
- * @param {Object} attributes The current attributes
- * @return {Object} The updated attributes.
+ * @param attributes The current attributes
+ * @return The updated attributes.
  */
-export default function ( attributes ) {
+export default function (
+	attributes: StyledBlockAttributes
+): StyledBlockAttributes {
 	const { textAlign, ...restAttributes } = attributes;
 	if ( ! textAlign ) {
 		return attributes;

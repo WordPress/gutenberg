@@ -1,18 +1,20 @@
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockBindings, TransformedAttributes } from './types';
 
 /**
  * Transform block support attributes and metadata during block transforms.
  *
- * @param {Object}   attributes       Original attributes from the block being transformed.
- * @param {string}   newBlockName     Name of the target block after transformation.
- * @param {Function} bindingsCallback Optional callback to transform the `bindings` property object.
- * @return {Object} New attributes object with preserved block support attributes and metadata.
+ * @param attributes       Original attributes from the block being transformed.
+ * @param newBlockName     Name of the target block after transformation.
+ * @param bindingsCallback Optional callback to transform the `bindings` property object.
+ * @return New attributes object with preserved block support attributes and metadata.
  */
 export function getTransformedAttributes(
-	attributes,
-	newBlockName,
-	bindingsCallback = null
-) {
+	attributes: TransformedAttributes | undefined,
+	newBlockName: string,
+	bindingsCallback:
+		( ( bindings: BlockBindings ) => BlockBindings ) | null = null
+): TransformedAttributes | undefined {
 	if ( ! attributes ) {
 		return undefined;
 	}
@@ -22,7 +24,7 @@ export function getTransformedAttributes(
 		return undefined;
 	}
 
-	const transformedAttributes = {};
+	const transformedAttributes: TransformedAttributes = {};
 
 	// Handle attributes derived from block support. The custom class name and
 	// allowed blocks attribute is handled separately.
@@ -41,7 +43,7 @@ export function getTransformedAttributes(
 		// The metadata properties that should be preserved after the transform.
 		// The noteId, name, and blockVisibility properties are separately handled
 		// in the `core/metadata/addTransforms` hook.
-		const transformedMetadata = [];
+		const transformedMetadata: string[] = [];
 
 		// If there is a transform bindings callback, add the `id` and `bindings` properties.
 		if ( bindingsCallback ) {
@@ -50,18 +52,19 @@ export function getTransformedAttributes(
 
 		// Only process metadata if there are supported properties.
 		if ( transformedMetadata.length > 0 ) {
-			const newMetadata = Object.entries( attributes.metadata ).reduce(
-				( obj, [ prop, value ] ) => {
-					// If prop is not supported, don't add it to the new metadata object.
-					if ( ! transformedMetadata.includes( prop ) ) {
-						return obj;
-					}
-					obj[ prop ] =
-						prop === 'bindings' ? bindingsCallback( value ) : value;
+			const newMetadata = Object.entries( attributes.metadata ).reduce<
+				Record< string, unknown >
+			>( ( obj, [ prop, value ] ) => {
+				// If prop is not supported, don't add it to the new metadata object.
+				if ( ! transformedMetadata.includes( prop ) ) {
 					return obj;
-				},
-				{}
-			);
+				}
+				obj[ prop ] =
+					prop === 'bindings'
+						? bindingsCallback!( value as BlockBindings )
+						: value;
+				return obj;
+			}, {} );
 
 			// Only add metadata if object is not empty.
 			if ( Object.keys( newMetadata ).length > 0 ) {

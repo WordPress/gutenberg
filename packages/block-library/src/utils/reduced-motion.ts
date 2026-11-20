@@ -6,9 +6,9 @@
  * reads the preference once; callers that need to react to it changing should
  * watch the media query themselves.
  *
- * @return {boolean} Whether reduced motion is preferred.
+ * @return Whether reduced motion is preferred.
  */
-export function prefersReducedMotion() {
+export function prefersReducedMotion(): boolean {
 	return (
 		window.matchMedia?.( '(prefers-reduced-motion: reduce)' )?.matches ===
 		true
