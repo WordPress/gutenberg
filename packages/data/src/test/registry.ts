@@ -409,14 +409,9 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					(
-						registry.select( coreDataStore ) as unknown as {
-							hasFinishedResolution: (
-								storeName: string,
-								selectorName: string
-							) => boolean;
-						}
-					 ).hasFinishedResolution( 'demo', 'getValue' ),
+					registry
+						.select( coreDataStore )
+						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();
@@ -442,14 +437,9 @@ describe( 'createRegistry', () => {
 			const promise = subscribeUntil( [
 				() => registry.select( 'demo' ).getValue() === 'OK',
 				() =>
-					(
-						registry.select( coreDataStore ) as unknown as {
-							hasFinishedResolution: (
-								storeName: string,
-								selectorName: string
-							) => boolean;
-						}
-					 ).hasFinishedResolution( 'demo', 'getValue' ),
+					registry
+						.select( coreDataStore )
+						.hasFinishedResolution( 'demo', 'getValue' ),
 			] );
 
 			registry.select( 'demo' ).getValue();
@@ -576,6 +566,70 @@ describe( 'createRegistry', () => {
 			expect( console ).toHaveErroredWith(
 				'Store "demo" is already registered.'
 			);
+		} );
+	} );
+
+	describe( 'coreDataStore', () => {
+		it( 'should select and dispatch using coreDataStore without type casts', async () => {
+			registry.registerStore( 'demo', {
+				reducer: ( state = 'NOTOK', action: AnyAction ) =>
+					action.type === 'SET_OK' ? 'OK' : state,
+				selectors: {
+					getValue: ( state: string ) => state,
+				},
+				resolvers: {
+					getValue: () => ( { type: 'SET_OK' } ),
+				},
+			} );
+
+			expect(
+				registry
+					.select( coreDataStore )
+					.hasStartedResolution( 'demo', 'getValue' )
+			).toBe( false );
+			expect(
+				registry
+					.select( coreDataStore )
+					.hasFinishedResolution( 'demo', 'getValue' )
+			).toBe( false );
+			expect(
+				registry
+					.select( coreDataStore )
+					.isResolving( 'demo', 'getValue' )
+			).toBe( false );
+
+			const promise = subscribeUntil( [
+				() => registry.select( 'demo' ).getValue() === 'OK',
+				() =>
+					registry
+						.select( coreDataStore )
+						.hasFinishedResolution( 'demo', 'getValue' ),
+			] );
+
+			registry.select( 'demo' ).getValue();
+			vi.runAllTimers();
+			await promise;
+
+			expect(
+				registry
+					.select( coreDataStore )
+					.hasFinishedResolution( 'demo', 'getValue' )
+			).toBe( true );
+
+			const cached = registry
+				.select( coreDataStore )
+				.getCachedResolvers( 'demo' );
+			expect( cached ).toBeDefined();
+
+			await registry
+				.dispatch( coreDataStore )
+				.invalidateResolution( 'demo', 'getValue' );
+
+			expect(
+				registry
+					.select( coreDataStore )
+					.hasFinishedResolution( 'demo', 'getValue' )
+			).toBe( false );
 		} );
 	} );
 
