@@ -24,7 +24,10 @@ export function translatorCommentsPlugin() {
 			},
 			handler( code, id, { moduleType } ) {
 				const { comments } = parseSync( id, code, {
-					lang: moduleType,
+					// The filter above limits `moduleType` to languages the parser accepts.
+					lang: /** @type {import('rolldown/utils').ParserOptions['lang']} */ (
+						moduleType
+					),
 				} );
 				const magicString = new RolldownMagicString( code );
 				let hasChanged = false;
