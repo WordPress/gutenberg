@@ -6419,27 +6419,12 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/blockquote-normaliser.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/comment-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/figure-content-reducer.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/blocks/src/api/raw-handling/test/html-formatting-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/image-corrector.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -6464,27 +6449,12 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/non-breaking-space-corrector.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/normalise-blocks.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/paste-handler.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/blocks/src/api/raw-handling/test/phrasing-content-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/special-comment-converter.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
