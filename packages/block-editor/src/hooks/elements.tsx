@@ -152,7 +152,11 @@ export function ElementsEdit( {
 			onChange={ onChange }
 			defaultControls={ defaultControls }
 			label={ label }
-			contrastWarning={ contrastWarning }
+			// An empty warning keeps the notice's space reserved while contrast
+			// is being checked, so the color popover doesn't resize and jump.
+			contrastWarning={
+				enableContrastChecking ? ( contrastWarning ?? '' ) : undefined
+			}
 			inheritedValue={ inheritedValue }
 		/>
 	);

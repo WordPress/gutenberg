@@ -81,6 +81,13 @@ $swatch-gap: 12px;
 // Space the in-popover contrast notice away from the color palette above it.
 .block-editor-panel-color-gradient-settings__contrast-notice {
 	margin-top: $grid-unit-20;
+
+	// Holds the space of the notice while there is no warning, so the popover
+	// keeps its height. Sized for the notice's three lines of text.
+	&.is-placeholder {
+		visibility: hidden;
+		min-height: 90px;
+	}
 }
 
 /**
