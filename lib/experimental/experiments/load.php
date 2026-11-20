@@ -103,6 +103,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'React 19', 'gutenberg' ),
 					'description' => __( 'Uses React 19 for the registered React scripts, instead of the legacy React 18 version. Can be disabled when the new React 19 script cause compatibility issues with plugins and themes.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-pattern-blocks',
+					'label'       => __( 'Pattern-based PHP blocks', 'gutenberg' ),
+					'description' => __( 'Lets PHP-only blocks use a block pattern as their content: only bound fields are editable per instance, and pattern updates reach existing posts.', 'gutenberg' ),
+				),
 			),
 		),
 	);
