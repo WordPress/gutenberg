@@ -26,6 +26,7 @@
 
 ### Bug Fixes
 
+-   Position: A header, such as a header template part or a Group block using the header element, now sticks to the page when its only child block is sticky, instead of scrolling away with it, in the editor and on the front end ([#86901](https://github.com/WordPress/gutenberg/pull/86901)).
 -   Embed: Keep the Amazon Kindle title and icon after a URL is embedded, and stop the provider slug changing on each save ([#87016](https://github.com/WordPress/gutenberg/pull/87016)).
 -   Embed: Match `legacy.reverbnation.com` in the ReverbNation variation, so URLs copied after ReverbNation's redirect resolve as ReverbNation embeds instead of generic ones ([#82757](https://github.com/WordPress/gutenberg/pull/82757)).
 -   Tag Cloud: Keep the taxonomy and the post counts setting when transforming to or from the Terms List block ([#86962](https://github.com/WordPress/gutenberg/pull/86962)).
