@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Navigation: Keep selected links readable on hover and keyboard focus when a custom theme changes the selection color.
+
 ## 8.2.0 (2026-11-18)
 
 ### Enhancements
