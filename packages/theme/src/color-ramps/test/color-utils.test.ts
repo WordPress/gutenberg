@@ -1,36 +1,36 @@
-import { contrastWCAG21, sRGB, type PlainColorObject } from 'colorjs.io/fn';
+import { sRGB, type PlainColorObject } from 'colorjs.io/fn';
 import { describe, expect, it } from 'vitest';
 import { getContrast } from '../lib/color-utils';
 
 describe( 'getContrast', () => {
 	it.each( [
-		[ '#000000', '#ffffff' ],
-		[ '#3858e9', '#f6f7f7' ],
-		[ '#1e1e1e', '#1e1e1e' ],
-	] )( 'matches Color.js for string colors %s and %s', ( first, second ) => {
-		const actual = getContrast( first, second );
-		const expected = contrastWCAG21( first, second );
+		[ '#000000', '#ffffff', 21 ],
+		[ '#ff0000', '#000000', 5.252 ],
+		[ '#00ff00', '#000000', 15.304 ],
+		[ '#0000ff', '#000000', 2.444 ],
+		[ '#4569fb', '#ffffff', 4.4999882584708395 ],
+	] )(
+		'uses the WCAG sRGB formula for %s and %s',
+		( first, second, expected ) => {
+			expect( getContrast( first, second ) ).toBeCloseTo( expected, 10 );
+		}
+	);
 
-		expect( actual ).toBe( expected );
-	} );
-
-	it( 'matches Color.js for color objects', () => {
+	it( 'uses the same WCAG formula for cached color objects', () => {
 		const first: PlainColorObject = {
 			space: sRGB,
-			coords: [ 0.22, 0.35, 0.91 ],
+			coords: [ 1, 0, 0 ],
 			alpha: 1,
 		};
 		const second: PlainColorObject = {
 			space: sRGB,
-			coords: [ 0.96, 0.97, 0.97 ],
+			coords: [ 0, 0, 0 ],
 			alpha: 1,
 		};
 
 		const actual = getContrast( first, second );
-		const expected = contrastWCAG21( first, second );
-
-		expect( actual ).toBe( expected );
-		expect( getContrast( first, second ) ).toBe( expected );
+		expect( actual ).toBeCloseTo( 5.252, 10 );
+		expect( getContrast( first, second ) ).toBe( actual );
 	} );
 
 	it( 'recalculates contrast after a color object is mutated', () => {
