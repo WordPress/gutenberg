@@ -163,8 +163,26 @@ const schema = ( { phrasingContentSchema } ) => ( {
 	},
 } );
 
+/**
+ * Image file extensions that indicate a URL points directly to an image.
+ */
+const IMAGE_EXTENSIONS = /\.(?:jpe?g|png|gif|webp|avif|ico|bmp)(?:\?.*)?$/i;
+
 const transforms = {
 	from: [
+		{
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
+				node.textContent?.match( /https/gi )?.length === 1 &&
+				IMAGE_EXTENSIONS.test( node.textContent.trim() ),
+			transform: ( node ) => {
+				return createBlock( 'core/image', {
+					url: node.textContent.trim(),
+				} );
+			},
+		},
 		{
 			type: 'raw',
 			isMatch: ( node ) =>
