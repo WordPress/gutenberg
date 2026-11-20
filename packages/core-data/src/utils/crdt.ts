@@ -411,7 +411,9 @@ export function getPostChangesFromCRDTDoc(
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+						const blocksJson = deserializeBlockAttributes(
+							ymap.get( 'blocks' )?.toJSON() ?? []
+						);
 
 						// Missing and invalid blocks serialize back to the markup
 						// they were loaded from, so the content comparison below
@@ -424,8 +426,9 @@ export function getPostChangesFromCRDTDoc(
 						}
 
 						return (
-							__unstableSerializeAndClean( blocksJson ).trim() !==
-							getRawValue( editedRecord.content )
+							__unstableSerializeAndClean(
+								blocksJson as WPBlock[]
+							).trim() !== getRawValue( editedRecord.content )
 						);
 					}
 

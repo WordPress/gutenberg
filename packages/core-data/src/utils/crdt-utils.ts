@@ -77,6 +77,16 @@ export function isYMap< T extends YMapRecord >(
 	return value instanceof Y.Map;
 }
 
+/**
+ * Type guard that narrows `unknown` to `Record< string, unknown >`.
+ *
+ * @param value Value to check.
+ * @return True if `value` is a non-null, non-array object.
+ */
+export function isRecord( value: unknown ): value is Record< string, unknown > {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
 declare const richTextOffsetBrand: unique symbol;
 declare const htmlStringIndexBrand: unique symbol;
 
