@@ -6,6 +6,8 @@ import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import NavigationMenuSelector from './navigation-menu-selector';
 import { unlock } from '../../lock-unlock';
+import useNavigationMenu from '../use-navigation-menu';
+import NavigationDraftBadge from './navigation-draft-badge';
 
 const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
 
@@ -26,14 +28,20 @@ export default function NavigationListViewHeader( {
 		context: 'list-view',
 	} );
 
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
+	const isDraft = navigationMenu?.status === 'draft';
+
 	return (
 		<HStack className="wp-block-navigation-off-canvas-editor__header">
-			<Heading
-				className="wp-block-navigation-off-canvas-editor__title"
-				level={ 2 }
-			>
-				{ blockTitle }
-			</Heading>
+			<HStack alignment="left" spacing={ 2 }>
+				<Heading
+					className="wp-block-navigation-off-canvas-editor__title"
+					level={ 2 }
+				>
+					{ blockTitle }
+				</Heading>
+				{ isDraft && <NavigationDraftBadge /> }
+			</HStack>
 			{ blockEditingMode === 'default' && (
 				<NavigationMenuSelector
 					currentMenuId={ currentMenuId }
