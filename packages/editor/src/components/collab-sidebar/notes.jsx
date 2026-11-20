@@ -10,7 +10,7 @@ import {
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { NoteThread } from './note-thread';
-import { focusNoteThread } from './utils';
+import { focusNoteThread } from './utils/dom';
 import {
 	NoteDraftsContext,
 	useFloatingBoard,

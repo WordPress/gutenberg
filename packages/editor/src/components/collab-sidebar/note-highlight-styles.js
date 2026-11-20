@@ -4,12 +4,10 @@ import {
 	useStyleOverride,
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import {
-	getAvatarBorderColor,
-	getNoteMarkerSelector,
-	getBlockLevelClientIds,
-	getSoleRichTextAttributeKey,
-} from './utils';
+import { getAvatarBorderColor } from './utils/display';
+import { getTextAttributeKey } from './utils/rich-text';
+import { getBlockLevelClientIds } from './utils/note-anchor';
+import { getNoteMarkerSelector } from './utils/dom';
 
 // Hex alpha (~25%) for the note tint, kept low to preserve text contrast.
 const TINT_ALPHA = '40';
@@ -78,7 +76,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
  *
  * @param {Array}                         threads            Unresolved note threads (each with `id`, `author` and `blockClientIds`).
  * @param {(clientId: string) => ?Object} getBlockAttributes Block-editor selector.
- * @param {(clientId: string) => boolean} isTextBlock        Whether the block's only content is one rich text field, see `getSoleRichTextAttributeKey`.
+ * @param {(clientId: string) => boolean} isTextBlock        Whether the block is only one rich text field, see `getTextAttributeKey`.
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
  */
 export function buildBlockHighlightCss(
@@ -155,8 +153,11 @@ export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 				threads,
 				getBlockAttributes,
 				( clientId ) =>
-					! getBlockCount( clientId ) &&
-					!! getSoleRichTextAttributeKey( getBlockName( clientId ) )
+					!! getTextAttributeKey(
+						clientId,
+						getBlockName,
+						getBlockCount
+					)
 			);
 		},
 		[ threads, isHidden ]

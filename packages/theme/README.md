@@ -190,7 +190,7 @@ The callback reports failures from the generated ramp checks and a defined set o
 
 The contrast warnings also cover the focus-ring color and the resting and active strong brand fills against all three neutral surfaces and the brand surface at a 3:1 minimum. They use the final generated colors after seed adjustments. These checks report failures without adjusting the colors. Text pairs retain their 4.5:1 minimum.
 
-For example, with the default primary `#3858e9` and background `#1e1e1e`, the resting strong brand fill has 2.97:1 contrast against `background.surface.neutral` and 2.76:1 against `background.surface.neutral-strong`. The focus ring, active fill, and text pairs still meet their targets. Choose a different primary or background seed to resolve the reported pair; for example, the default primary with background `#000000` meets these checked contrast targets.
+For example, with the default primary `#3858e9` and background `#1e1e1e`, the resting strong brand fill has 2.93:1 contrast against `background.surface.neutral` and 2.69:1 against `background.surface.neutral-strong`. The focus ring, active fill, and text pairs still meet their targets. Choose a different primary or background seed to resolve the reported pair; for example, the default primary with background `#000000` meets these checked contrast targets.
 
 ### TypeScript props and warnings
 
@@ -315,7 +315,7 @@ This step will:
 2. Generate primitive tokens.
 3. Build CSS and JavaScript token files.
 4. Update the design tokens documentation.
-5. Generate complete Figma border collection mode files in `prebuilt/figma`.
+5. Generate Figma-compatible token files in `prebuilt/figma`.
 6. Format all generated files.
 
 The files generated in this step will all be committed to the repo.

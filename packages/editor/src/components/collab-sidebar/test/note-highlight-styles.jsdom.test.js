@@ -9,7 +9,7 @@ import {
 	buildBlockHighlightCss,
 	buildHighlightCss,
 } from '../note-highlight-styles';
-import { getAvatarBorderColor } from '../utils';
+import { getAvatarBorderColor } from '../utils/display';
 
 const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 const FORCED_COLORS_RESET =

@@ -14,6 +14,7 @@ describe( 'post_type_supports', () => {
 			'password',
 			'ping_status',
 			'post-content-info',
+			'publish_date',
 			'scheduled_date',
 			'slug',
 			'status',
