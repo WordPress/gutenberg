@@ -188,10 +188,10 @@ function getRootLinkElementSelector(
 ): string | undefined {
 	if (
 		elementName === 'link' &&
+		Boolean( blockSelector ) &&
 		( blockName === 'core/comments-pagination-next' ||
 			blockName === 'core/comments-pagination-previous' )
 	) {
-		// The block root is the anchor. Keep the Link element's exclusions.
 		return appendToSelector( blockSelector, `:where(${ ELEMENTS.link })` );
 	}
 	return undefined;
