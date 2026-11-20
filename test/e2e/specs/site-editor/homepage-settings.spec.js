@@ -9,6 +9,7 @@ const getPageRow = ( page, title ) =>
 
 test.describe( 'Homepage Settings via Editor', () => {
 	let aboutId;
+	let postsPageId;
 
 	test.beforeAll( async ( { requestUtils } ) => {
 		await Promise.all( [ requestUtils.activateTheme( 'emptytheme' ) ] );
@@ -16,10 +17,11 @@ test.describe( 'Homepage Settings via Editor', () => {
 			title: 'Homepage',
 			status: 'publish',
 		} );
-		await requestUtils.createPage( {
+		const postsPage = await requestUtils.createPage( {
 			title: 'Posts page',
 			status: 'publish',
 		} );
+		postsPageId = postsPage.id;
 		await requestUtils.createPage( {
 			title: 'Draft page',
 			status: 'draft',
@@ -156,5 +158,38 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await expect(
 			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
 		).toBeVisible();
+	} );
+
+	test( 'should show a notice while editing the posts page', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.updateSiteSettings( {
+			show_on_front: 'page',
+			page_on_front: aboutId,
+			page_for_posts: postsPageId,
+		} );
+		const editorContent = page.getByRole( 'region', {
+			name: 'Editor content',
+		} );
+		const notice = editorContent.getByText(
+			'You are currently editing the page that shows your latest posts.'
+		);
+
+		await admin.visitSiteEditor( {
+			postId: postsPageId,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+		await expect( notice ).toBeVisible();
+
+		await admin.visitSiteEditor( {
+			postId: aboutId,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+		await expect( editorContent ).toBeVisible();
+		await expect( notice ).toBeHidden();
 	} );
 } );
