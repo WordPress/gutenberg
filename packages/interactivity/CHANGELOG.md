@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Warn about invalid Interactivity API namespaces when `SCRIPT_DEBUG` is enabled ([#86357](https://github.com/WordPress/gutenberg/pull/86357)).
+
 ## 8.2.0 (2026-11-18)
 
 ### Bug Fixes
