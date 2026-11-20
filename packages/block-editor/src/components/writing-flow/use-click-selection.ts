@@ -29,12 +29,17 @@ export default function useClickSelection() {
 	return useRefEffect< HTMLElement >(
 		( node ) => {
 			let pointerType: string | undefined;
+			let isFocusedOnPointerDown = false;
 			// The block to collapse a multi-selection to on click, recorded
 			// on mousedown. See the comment in `onMouseDown`.
 			let clickCollapseClientId: string | undefined;
 
 			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
+				// iOS places the caret on a tap only in a focused page. A tap
+				// on a page that lost focus, as when the keyboard is swiped
+				// away, focuses it again before mousedown.
+				isFocusedOnPointerDown = node.matches( ':focus' );
 
 				if ( node.contentEditable !== 'true' ) {
 					return;
@@ -119,7 +124,7 @@ export default function useClickSelection() {
 					// Not `activeElement`: with nothing focused, as after the
 					// keyboard is hidden, it falls back to the body, which in
 					// the iframe is this wrapper.
-					node.matches( ':focus' )
+					isFocusedOnPointerDown
 				) {
 					event.preventDefault();
 					return;
