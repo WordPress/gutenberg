@@ -27,6 +27,7 @@ type Data = {
 	title: string;
 	author?: number;
 	order?: number;
+	parentId?: number;
 };
 
 const DEFAULT_VIEW = {
@@ -382,6 +383,80 @@ describe( 'DataViews component', () => {
 	it( 'should show "No results" if data is empty', () => {
 		render( <DataViewWrapper data={ [] } /> );
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
+	} );
+
+	it( 'orders and indents loaded items from their parent ids while preserving sibling order', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 3, title: 'Child 2', parentId: 1 },
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child 1', parentId: 1 },
+					{ id: 4, title: 'Grandchild', parentId: 2 },
+					{ id: 5, title: 'Other parent' },
+				] }
+				getItemParentId={ ( item ) => item.parentId }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		const rows = screen.getAllByRole( 'row' ).slice( 1 );
+		expect( rows ).toHaveLength( 5 );
+		expect( rows[ 0 ] ).toHaveTextContent( /^Parent$/ );
+		expect( rows[ 1 ] ).toHaveTextContent( /^— Child 2$/ );
+		expect( rows[ 2 ] ).toHaveTextContent( /^— Child 1$/ );
+		expect( rows[ 3 ] ).toHaveTextContent( /^— — Grandchild$/ );
+		expect( rows[ 4 ] ).toHaveTextContent( /^Other parent$/ );
+	} );
+
+	it( 'renders missing-parent, self-parenting, and cyclic items exactly once', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Orphan', parentId: 99 },
+					{ id: 2, title: 'Self', parentId: 2 },
+					{ id: 3, title: 'Cycle A', parentId: 4 },
+					{ id: 4, title: 'Cycle B', parentId: 3 },
+				] }
+				getItemParentId={ ( item ) => item.parentId }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect( screen.getAllByRole( 'row' ).slice( 1 ) ).toHaveLength( 4 );
+		for ( const title of [ 'Orphan', 'Self', 'Cycle A', 'Cycle B' ] ) {
+			expect( screen.getByText( title ) ).toBeVisible();
+		}
+	} );
+
+	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
+		render(
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+				] }
+				getItemLevel={ ( item ) => item.id - 1 }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					showLevels: true,
+					titleField: 'title',
+				} }
+			/>
+		);
+
+		expect( screen.getByText( '—' ) ).toBeInTheDocument();
 	} );
 
 	it( 'should filter results by "search" text, if field has enableGlobalSearch set to true', async () => {
