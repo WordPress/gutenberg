@@ -10,6 +10,8 @@
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
 ![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/100067796-fc3e8700-2e36-11eb-993b-6b80b4310b87.png)
+> Note: This repository contains the Gutenberg block editor for WordPress, which can also be tested locally using the official development environment.
+
 
 Welcome to the development hub for the WordPress Gutenberg project!
 
