@@ -1,0 +1,27 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "{{landingPage}}",
+  {{#description}}"description": "{{description}}",{{/description}}
+  {{#meta}}
+  "meta": {
+    {{#meta.title}}"title": "{{meta.title}}"{{/meta.title}}{{#meta.description}},
+    "description": "{{meta.description}}"{{/meta.description}}{{#meta.author}},
+    "author": "{{meta.author}}"{{/meta.author}}{{#meta.categories}},
+    "categories": {{{meta.categoriesJson}}}{{/meta.categories}}
+  },
+  {{/meta}}
+  "preferredVersions": {
+    "php": "{{preferredVersions.php}}",
+    "wp": "{{preferredVersions.wp}}"
+  },
+  "features": {
+    "networking": {{features.networking}}{{#features.intl}},
+    "intl": {{features.intl}}{{/features.intl}}
+  },
+  {{#extraLibrariesJson}}"extraLibraries": {{{extraLibrariesJson}}},{{/extraLibrariesJson}}
+  {{#constantsJson}}"constants": {{{constantsJson}}},{{/constantsJson}}
+  "plugins": {{{pluginsJson}}},
+  {{#siteOptionsJson}}"siteOptions": {{{siteOptionsJson}}},{{/siteOptionsJson}}
+  "login": {{login}},
+  "steps": {{{stepsJson}}}
+}

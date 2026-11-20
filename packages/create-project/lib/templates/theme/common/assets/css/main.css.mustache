@@ -1,0 +1,150 @@
+/* Reset and Base Styles */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	line-height: 1.6;
+	color: #333;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+	margin: 0 0 1rem 0;
+	line-height: 1.2;
+}
+
+p {
+	margin: 0 0 1rem 0;
+}
+
+a {
+	color: #0073aa;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/* Layout */
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 1rem;
+}
+
+/* Header */
+.site-header {
+	background: #fff;
+	border-bottom: 1px solid #eee;
+	padding: 1rem 0;
+}
+
+.site-title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.site-title a {
+	color: inherit;
+	text-decoration: none;
+}
+
+/* Navigation */
+.main-navigation ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	gap: 1rem;
+}
+
+.main-navigation a {
+	padding: 0.5rem;
+	display: block;
+}
+
+/* Content */
+.site-content {
+	padding: 2rem 0;
+}
+
+.content-area {
+	max-width: 800px;
+}
+
+/* Posts */
+.entry-header {
+	margin-bottom: 1rem;
+}
+
+.entry-title {
+	margin: 0;
+}
+
+.entry-meta {
+	color: #666;
+	font-size: 0.9rem;
+	margin-bottom: 1rem;
+}
+
+.entry-content {
+	margin-bottom: 2rem;
+}
+
+/* Footer */
+.site-footer {
+	background: #f9f9f9;
+	border-top: 1px solid #eee;
+	padding: 2rem 0;
+	text-align: center;
+	color: #666;
+}
+
+/* Utility Classes */
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.alignleft {
+	float: left;
+	margin-right: 1rem;
+}
+
+.alignright {
+	float: right;
+	margin-left: 1rem;
+}
+
+.aligncenter {
+	clear: both;
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	.main-navigation ul {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.container {
+		padding: 0 0.5rem;
+	}
+}
