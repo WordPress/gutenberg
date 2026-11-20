@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Keep `translators:` comments next to their `__()`, `_x()`, `_n()` and `_nx()` calls in the transpiled and unminified output, so `wp i18n make-pot` extracts them from the built files ([#87189](https://github.com/WordPress/gutenberg/pull/87189)).
 
 ## 0.28.0 (2026-11-18)
 
