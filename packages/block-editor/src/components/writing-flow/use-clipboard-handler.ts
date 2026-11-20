@@ -18,6 +18,7 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
+import { replacePatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { getTextDropPoint } from '../rich-text/event-listeners/drag-and-drop';
 import type { WritingFlowClipboardEvent } from './types';
 
@@ -108,12 +109,26 @@ export default function useClipboardHandler() {
 		// A bound field's text belongs to its source, not to the block.
 		function isSelectedFieldBound() {
 			const { clientId, attributeKey } = getSelectionStart();
-			const bindings = clientId
-				? getBlockAttributes( clientId )?.metadata?.bindings
-				: undefined;
-			return !! (
-				( attributeKey && bindings?.[ attributeKey ] ) ||
-				bindings?.__default
+			if ( ! clientId || ! attributeKey ) {
+				return false;
+			}
+			const blockName = getBlockName( clientId );
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				getSettings();
+			const supportedAttributes =
+				( blockName &&
+					(
+						__experimentalBlockBindingsSupportedAttributes as
+							Record< string, string[] > | undefined
+					 )?.[ blockName ] ) ||
+				[];
+			const bindings = replacePatternOverridesDefaultBinding(
+				getBlockAttributes( clientId )?.metadata?.bindings,
+				supportedAttributes
+			);
+			return (
+				supportedAttributes.includes( attributeKey ) &&
+				!! bindings?.[ attributeKey ]
 			);
 		}
 
