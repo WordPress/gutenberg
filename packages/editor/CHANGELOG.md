@@ -6,6 +6,7 @@
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
+-   `EditorProvider`: Render the post on its own when the rendering mode shows a template but there is none, so the site editor no longer keeps the template of the last page on Home, Styles and Identity ([#87170](https://github.com/WordPress/gutenberg/pull/87170)).
 
 ### Internal
 
