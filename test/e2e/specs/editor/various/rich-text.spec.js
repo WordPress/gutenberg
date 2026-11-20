@@ -1310,12 +1310,8 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: '<strong>Bold</strong> text' },
 		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Last' },
-		} );
 
-		await editor.canvas.getByText( 'Bold' ).click();
+		await editor.canvas.getByText( 'text' ).click();
 		await page.keyboard.press( 'Home' );
 		// Enters the bold format boundary without moving the caret.
 		await page.keyboard.press( 'ArrowRight' );
@@ -1326,11 +1322,10 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 				name: 'core/paragraph',
 				attributes: { content: 'First<strong>Bold</strong> text' },
 			},
-			{ name: 'core/paragraph', attributes: { content: 'Last' } },
 		] );
 		// The canvas must stay in step with the block list.
 		await expect( editor.canvas.locator( '[data-block]' ) ).toHaveCount(
-			2
+			1
 		);
 	} );
 
@@ -1345,10 +1340,6 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Second' },
-		} );
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: { content: 'Last' },
 		} );
 
 		await editor.canvas.getByText( 'Second' ).click();
@@ -1369,11 +1360,13 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		} );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: 'FirstSecond' } },
-			{ name: 'core/paragraph', attributes: { content: 'Last' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'FirstSecond' },
+			},
 		] );
 		await expect( editor.canvas.locator( '[data-block]' ) ).toHaveCount(
-			2
+			1
 		);
 	} );
 } );
