@@ -35,4 +35,26 @@
 	flex-direction: column;
 	overflow-y: auto;
 	scrollbar-gutter: auto;
+
+	// Some browsers (notably Firefox) make scrollable containers keyboard
+	// focusable so the panel can be scrolled with the arrow keys. That adds a
+	// tab stop on the panel itself, which is otherwise invisible to sighted
+	// keyboard users because the `Tabs` component only shows a focus ring via
+	// its Ariakit-managed `[data-focus-visible]` state (unset here, as the
+	// panel is rendered with `focusable={ false }`) while still resetting
+	// `:focus { outline: none }`. Provide a visible focus indicator for it.
+	//
+	// Notes:
+	// - Scoped to the parent so it out-specifies the `Tabs` `:focus` reset,
+	//   which Emotion injects later at equal specificity.
+	// - Longhands are used because Firefox drops the `outline` shorthand when
+	//   its value is built from `var()` custom properties.
+	// - The outline is inset because the parent container is `overflow: hidden`.
+	// See https://github.com/WordPress/gutenberg/issues/47013.
+	.block-editor-tabbed-sidebar &:focus-visible {
+		outline-width: var(--wp-admin-border-width-focus);
+		outline-style: solid;
+		outline-color: var(--wp-admin-theme-color);
+		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	}
 }
