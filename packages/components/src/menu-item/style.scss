@@ -59,6 +59,14 @@
 			opacity: 0.3;
 		}
 	}
+
+	// Pressed buttons opt out of forced colors, so without this rule the info
+	// text keeps its own color on the pressed fill.
+	&.is-pressed .components-menu-item__info {
+		@media ( forced-colors: active ) {
+			color: inherit;
+		}
+	}
 }
 
 .components-menu-item__info-wrapper {
