@@ -128,7 +128,6 @@ describe( 'hasUserStylesForBlock', () => {
 				blocks: {
 					'core/quote': {
 						typography: {
-							// @ts-expect-error customFontSize is a valid theme.json setting but omitted from TypographySettings.
 							customFontSize: true,
 						},
 					},
@@ -146,7 +145,6 @@ describe( 'getOverridingBlockTypes', () => {
 		return {
 			settings: {
 				typography: {
-					// @ts-expect-error lineHeight toggle is omitted from TypographySettings.
 					lineHeight: true,
 				},
 			},
@@ -191,7 +189,6 @@ describe( 'getOverridingBlockTypes', () => {
 		],
 	] )( 'skips %s', ( _, style ) => {
 		const config = getConfig( {
-			// @ts-expect-error ':hover' pseudo state on blocks is supported at runtime but omitted from GlobalStylesStyles.
 			'core/post-title': style,
 		} );
 		expect(
@@ -316,11 +313,7 @@ describe( 'getOverridingBlockTypes', () => {
 	] )( 'lists %s', ( _, elementStyle, blockStyle ) => {
 		expect(
 			getOverridingBlockTypes(
-				getButtonConfig(
-					// @ts-expect-error color.gradient is supported at runtime but omitted from GlobalStylesStyles.
-					elementStyle,
-					blockStyle
-				),
+				getButtonConfig( elementStyle, blockStyle ),
 				'button',
 				[ 'core/button' ]
 			)
@@ -356,11 +349,7 @@ describe( 'getOverridingBlockTypes', () => {
 	] )( 'skips %s', ( _, elementStyle, blockStyle ) => {
 		expect(
 			getOverridingBlockTypes(
-				getButtonConfig(
-					// @ts-expect-error color.gradient is supported at runtime but omitted from GlobalStylesStyles.
-					elementStyle,
-					blockStyle
-				),
+				getButtonConfig( elementStyle, blockStyle ),
 				'button',
 				[ 'core/button' ]
 			)

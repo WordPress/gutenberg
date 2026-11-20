@@ -105,17 +105,14 @@ function getShadowString(
 	values: Record< string, string >
 ) {
 	return formatString.replace( /\{(\w+)\}/g, ( match, placeholder ) => {
-		if ( Object.prototype.hasOwnProperty.call( values, placeholder ) ) {
+		if ( values.hasOwnProperty( placeholder ) ) {
 			return values[ placeholder ];
 		}
 		return match;
 	} );
 }
 function getCombinedShadowString( format: string, parts: string[] ) {
-	return format.replace(
-		/{(\d+)}/g,
-		( _, index ) => parts[ Number( index ) - 1 ]
-	);
+	return format.replace( /{(\d+)}/g, ( _, index ) => parts[ index - 1 ] );
 }
 
 describe( 'getShadowParts', () => {

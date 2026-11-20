@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockStyle } from '@wordpress/blocks';
 import { useStyle } from '../../hooks';
 import { useBlockVariations } from '../variations-panel';
 
@@ -34,11 +35,7 @@ describe( 'useBlockVariations', () => {
 
 	function registerBlockStyles(
 		blockName: string,
-		styles: Parameters<
-			ReturnType<
-				typeof registry.dispatch< typeof blocksStore >
-			>[ 'addBlockStyles' ]
-		>[ 1 ]
+		styles: BlockStyle | BlockStyle[]
 	) {
 		registry.dispatch( blocksStore ).addBlockStyles( blockName, styles );
 	}

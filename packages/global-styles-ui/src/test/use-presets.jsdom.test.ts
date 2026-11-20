@@ -1,5 +1,6 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { useSetting } from '../hooks';
 import { usePresets } from '../presets/use-presets';
 
@@ -19,7 +20,7 @@ describe( 'usePresets', () => {
 		{ name: 'Medium', slug: 'medium', size: '14px' },
 	];
 
-	let setPresets: ReturnType< typeof vi.fn< ( newValue: unknown ) => void > >;
+	let setPresets: Mock< ( newValue: unknown ) => void >;
 
 	beforeEach( () => {
 		setPresets = vi.fn< ( newValue: unknown ) => void >();
