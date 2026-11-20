@@ -112,7 +112,6 @@
 	}
 
 	&:where(.is-today) {
-		background: var(--wpds-color-background-interactive-neutral-weak);
 		border-color: var(--wpds-color-stroke-interactive-neutral);
 
 		&:is(:hover, :active, :focus):not(:disabled) {
@@ -122,7 +121,6 @@
 		}
 
 		&:disabled {
-			background: var(--wpds-color-background-interactive-neutral-weak-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 		}
 	}
