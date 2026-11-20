@@ -83,6 +83,14 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 | `logos-only` | Logos Only | No |
 | `pill-shape` | Pill Shape | No |
 
+## CSS Selectors
+
+_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
+
+- **root**: `.wp-block-social-links`
+- **color**:
+  - text: `.wp-block-social-links .wp-social-link`
+
 ## Block Markup
 
 This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
