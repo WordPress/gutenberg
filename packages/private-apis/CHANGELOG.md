@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0 (2026-11-18)
+
 ### Internal
 
 -   Remove `@wordpress/views` from the list of core modules allowed to use private APIs ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).

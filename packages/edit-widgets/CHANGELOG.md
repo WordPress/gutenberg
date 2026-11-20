@@ -2,9 +2,14 @@
 
 ## Unreleased
 
+## 7.2.0 (2026-11-18)
+
 ### Bug Fixes
 
+-   Use matching theme-aware colors for pressed header buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   Keyboard shortcuts help modal: Show key combinations left to right on right-to-left pages ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
+-   Use semantic colors for the header background and toolbar dividers ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+-   Show the Settings button as text instead of a check icon when "Show button text labels" is on ([#86827](https://github.com/WordPress/gutenberg/pull/86827)).
 
 ## 7.1.0 (2026-11-04)
 

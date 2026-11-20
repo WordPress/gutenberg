@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.2.0 (2026-11-18)
+
 ### Internal
 
 -   Remove `@wordpress/private-apis` dependency and call `getViewConfig` directly from `@wordpress/core-data` ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
