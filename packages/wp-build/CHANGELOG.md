@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   Style registration: infer a package's style dependencies from the styles the build registers, after every package is bundled. A script dependency that the package only reaches through a bundled package, or whose stylesheet finished building later, is no longer dropped.
 
 ## 0.28.0 (2026-11-18)
 
