@@ -58,6 +58,7 @@ function useShallowMemo< T >( value: T ) {
  * @param orientation                The direction in which the block
  *                                   should face.
  * @param layout                     The layout object for the block container.
+ * @param renderAppender             The block's appender, or `false` when it shows none.
  */
 export default function useNestedSettingsUpdate(
 	clientId: string,
@@ -71,7 +72,8 @@ export default function useNestedSettingsUpdate(
 	templateLock: string | false | undefined,
 	captureToolbars: boolean | undefined,
 	orientation: 'horizontal' | 'vertical' | undefined,
-	layout: Layout | null | undefined
+	layout: Layout | null | undefined,
+	renderAppender?: unknown
 ) {
 	// Instead of adding a useSelect mapping here, please add to the useSelect
 	// mapping in InnerBlocks! Every subscription impacts performance.
@@ -93,6 +95,8 @@ export default function useNestedSettingsUpdate(
 			? parentLock
 			: templateLock;
 
+	const hidesAppender = renderAppender === false;
+
 	useLayoutEffect( () => {
 		const newSettings: BlockListSettings = {
 			allowedBlocks: _allowedBlocks,
@@ -109,6 +113,12 @@ export default function useNestedSettingsUpdate(
 			newSettings.__experimentalCaptureToolbars =
 				captureToolbars ||
 				!! layoutType?.capturesToolbars?.( layout ?? undefined );
+		}
+
+		// Record that the block shows no appender for its inner blocks, so
+		// other views, such as the List View, can follow the canvas.
+		if ( hidesAppender ) {
+			newSettings.hidesAppender = true;
 		}
 
 		// Orientation depends on layout,
@@ -194,6 +204,7 @@ export default function useNestedSettingsUpdate(
 		captureToolbars,
 		orientation,
 		layout,
+		hidesAppender,
 		registry,
 	] );
 }

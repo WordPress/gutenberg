@@ -19,6 +19,59 @@ import type { ClientIdsTreeNode } from '../../store/types';
 import type { ListViewBranchProps, ListViewExpansionState } from './types';
 
 /**
+ * The appender row for an empty container, one level in from its block, so
+ * the first item can be added where it will appear. A block counts as a
+ * container when it holds inner blocks and shows an appender for them on the
+ * canvas; a block that hides its appender there, like a link that could hold
+ * a submenu, gets no row.
+ *
+ * @param props
+ * @param props.clientId The empty block.
+ * @param props.level    The block's nesting level.
+ */
+function ListViewEmptyContainerAppender( {
+	clientId,
+	level,
+}: {
+	clientId: string;
+	level: number;
+} ) {
+	const isContainer = useSelect(
+		( select ) => {
+			const listSettings =
+				select( blockEditorStore ).getBlockListSettings( clientId );
+			return !! listSettings && ! listSettings.hidesAppender;
+		},
+		[ clientId ]
+	);
+
+	if ( ! isContainer ) {
+		return null;
+	}
+
+	return (
+		<TreeGridRow
+			className="block-editor-list-view-appender-row"
+			level={ level + 1 }
+			setSize={ 1 }
+			positionInSet={ 1 }
+			isExpanded
+		>
+			<TreeGridCell>
+				{ ( treeGridCellProps ) => (
+					<Appender
+						clientId={ clientId }
+						nestingLevel={ level + 1 }
+						blockCount={ 0 }
+						{ ...treeGridCellProps }
+					/>
+				) }
+			</TreeGridCell>
+		</TreeGridRow>
+	);
+}
+
+/**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
  * the list position of a block.
  *
@@ -75,7 +128,12 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		appenderLabel,
 	} = props;
+
+	// Only the top-level appender takes the given label. A nested appender
+	// keeps the label that names what it adds.
+	const isTopLevel = level === 1;
 
 	const { canParentExpand, isParentSynced } = useSelect(
 		( select ) => {
@@ -109,9 +167,10 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
 	const filteredBlocks = blocks.filter( Boolean );
+	// Every rendered list ends with an appender. A collapsed list renders no
+	// branch, so expanding a block is what shows the appender for its items.
+	const showAppender = showAppenderProp;
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -244,6 +303,15 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						isNesting={ isNesting }
 					/>
 				) }
+				{ showAppenderProp &&
+					showBlock &&
+					! hasNestedBlocks &&
+					! isDragged && (
+						<ListViewEmptyContainerAppender
+							clientId={ clientId }
+							level={ level }
+						/>
+					) }
 				{ showNestedBlocks && (
 					<ListViewBranch
 						parentId={ clientId }
@@ -258,6 +326,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						showAppender={ showAppenderProp }
 					/>
 				) }
 			</AsyncModeProvider>
@@ -271,6 +340,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
+					className="block-editor-list-view-appender-row"
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
@@ -282,6 +352,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
+								label={ isTopLevel ? appenderLabel : undefined }
 								{ ...treeGridCellProps }
 							/>
 						) }
