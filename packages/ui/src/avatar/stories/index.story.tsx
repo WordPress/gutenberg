@@ -109,7 +109,6 @@ export const Interactive: Story = {
 					<Avatar
 						{ ...args }
 						render={ <Button variant="unstyled" /> }
-						role="button"
 					/>
 				}
 			/>

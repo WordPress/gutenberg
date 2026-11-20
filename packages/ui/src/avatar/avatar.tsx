@@ -14,7 +14,9 @@ import styles from './style.module.css';
  * Displays a profile image with initials as its fallback.
  * The required name supplies both the initials and the default accessible label.
  * Use `aria-hidden` when nearby text or a surrounding control supplies the name.
- * For an action, render an unstyled Button with role="button" on Avatar.
+ * Avatar has the image role by default. A custom `render` element supplies its
+ * own role. For an action, render an unstyled Button. If you render a custom
+ * `span` as an image, set `role="img"` on Avatar.
  *
  * ```jsx
  * <Avatar name="Alex Morgan" src="/alex.jpg" color="#008a20" active />
@@ -53,7 +55,7 @@ export const Avatar = forwardRef< HTMLSpanElement, AvatarProps >(
 		return (
 			<_Avatar.Root
 				ref={ ref }
-				role="img"
+				role={ props.render ? undefined : 'img' }
 				aria-label={ name }
 				style={
 					avatarColor === undefined

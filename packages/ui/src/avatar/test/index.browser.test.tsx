@@ -206,7 +206,6 @@ describe( 'Avatar layout', () => {
 					name="Alex Morgan"
 					size="xs"
 					render={ <Button variant="unstyled" /> }
-					role="button"
 				/>
 			</>
 		);
@@ -246,6 +245,9 @@ describe( 'Avatar layout', () => {
 			</ThemeProvider>
 		);
 		const avatar = avatarRef.current!;
+		expect(
+			screen.queryByRole( 'img', { name: 'Alex Morgan' } )
+		).not.toBeInTheDocument();
 		const styles = getComputedStyle( avatar );
 		const reference = getComputedStyle(
 			screen.getByRole( 'img', { name: 'Reference' } )

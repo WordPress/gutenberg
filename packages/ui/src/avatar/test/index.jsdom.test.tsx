@@ -7,6 +7,23 @@ vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 afterEach( () => vi.useRealTimers() );
 
+it( 'uses the action label when rendered as a link', () => {
+	render(
+		<Avatar
+			name="Alex Morgan"
+			aria-label="Open profile"
+			render={ ( { children, ...props } ) => (
+				<a { ...props } href="/profile">
+					{ children }
+				</a>
+			) }
+		/>
+	);
+	expect(
+		screen.getByRole( 'link', { name: 'Open profile' } )
+	).toBeInTheDocument();
+} );
+
 describe( 'Avatar fallback', () => {
 	it.each( [ undefined, '' ] )(
 		'shows the fallback immediately with src=%s despite the internal delay',
