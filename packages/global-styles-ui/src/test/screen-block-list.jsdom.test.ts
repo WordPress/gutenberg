@@ -1,7 +1,13 @@
-import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import type {
+	GlobalStylesConfig,
+	GlobalStylesStyles,
+} from '@wordpress/global-styles-engine';
 import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
+
+type ElementStyles = NonNullable< GlobalStylesStyles[ 'elements' ] >[ string ];
+type BlockStyles = NonNullable< GlobalStylesStyles[ 'blocks' ] >[ string ];
 
 describe( 'hasUserStylesForBlock', () => {
 	it( 'returns false when there is no user config', () => {
@@ -28,15 +34,19 @@ describe( 'hasUserStylesForBlock', () => {
 	} );
 
 	it( 'returns true for a settings-only entry', () => {
-		const user = {
+		const user: GlobalStylesConfig = {
 			settings: {
 				blocks: {
 					'core/quote': {
-						color: { palette: [ { slug: 'a', color: '#fff' } ] },
+						color: {
+							palette: [
+								{ name: 'A', slug: 'a', color: '#fff' },
+							],
+						},
 					},
 				},
 			},
-		} as unknown as GlobalStylesConfig;
+		};
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
 	} );
 
@@ -77,15 +87,19 @@ describe( 'hasUserStylesForBlock', () => {
 			false
 		);
 
-		const fullPalette = {
+		const fullPalette: GlobalStylesConfig = {
 			settings: {
 				blocks: {
 					'core/quote': {
-						color: { palette: [ { slug: 'a', color: '#fff' } ] },
+						color: {
+							palette: [
+								{ name: 'A', slug: 'a', color: '#fff' },
+							],
+						},
 					},
 				},
 			},
-		} as unknown as GlobalStylesConfig;
+		};
 		expect( hasUserStylesForBlock( fullPalette, 'core/quote' ) ).toBe(
 			true
 		);
@@ -106,24 +120,36 @@ describe( 'hasUserStylesForBlock', () => {
 	} );
 
 	it( 'returns true when only one of the two roots has a real value', () => {
-		const user = {
+		const user: GlobalStylesConfig = {
 			styles: {
 				blocks: { 'core/quote': { color: { text: undefined } } },
 			},
 			settings: {
 				blocks: {
-					'core/quote': { typography: { customFontSize: true } },
+					'core/quote': {
+						typography: {
+							// @ts-expect-error customFontSize is a valid theme.json setting but omitted from TypographySettings.
+							customFontSize: true,
+						},
+					},
 				},
 			},
-		} as unknown as GlobalStylesConfig;
+		};
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
 	} );
 } );
 
 describe( 'getOverridingBlockTypes', () => {
-	function getConfig( blocks?: Record< string, any > ): GlobalStylesConfig {
+	function getConfig(
+		blocks?: GlobalStylesStyles[ 'blocks' ]
+	): GlobalStylesConfig {
 		return {
-			settings: { typography: { lineHeight: true } },
+			settings: {
+				typography: {
+					// @ts-expect-error lineHeight toggle is omitted from TypographySettings.
+					lineHeight: true,
+				},
+			},
 			styles: {
 				typography: { fontWeight: '300' },
 				elements: {
@@ -135,7 +161,7 @@ describe( 'getOverridingBlockTypes', () => {
 				},
 				blocks,
 			},
-		} as unknown as GlobalStylesConfig;
+		};
 	}
 
 	it.each( [ 'heading', 'h5' ] )(
@@ -164,7 +190,10 @@ describe( 'getOverridingBlockTypes', () => {
 			{ variations: { plain: { typography: { fontWeight: '700' } } } },
 		],
 	] )( 'skips %s', ( _, style ) => {
-		const config = getConfig( { 'core/post-title': style } );
+		const config = getConfig( {
+			// @ts-expect-error ':hover' pseudo state on blocks is supported at runtime but omitted from GlobalStylesStyles.
+			'core/post-title': style,
+		} );
 		expect(
 			getOverridingBlockTypes( config, 'heading', [ 'core/post-title' ] )
 		).toEqual( [] );
@@ -197,15 +226,15 @@ describe( 'getOverridingBlockTypes', () => {
 	} );
 
 	function getButtonConfig(
-		elementStyle?: Record< string, any >,
-		blockStyle?: Record< string, any >
+		elementStyle?: ElementStyles,
+		blockStyle?: BlockStyles
 	): GlobalStylesConfig {
 		return {
 			styles: {
-				elements: { button: elementStyle },
-				blocks: { 'core/button': blockStyle },
+				...( elementStyle && { elements: { button: elementStyle } } ),
+				...( blockStyle && { blocks: { 'core/button': blockStyle } } ),
 			},
-		} as unknown as GlobalStylesConfig;
+		};
 	}
 
 	it.each( [
@@ -287,7 +316,11 @@ describe( 'getOverridingBlockTypes', () => {
 	] )( 'lists %s', ( _, elementStyle, blockStyle ) => {
 		expect(
 			getOverridingBlockTypes(
-				getButtonConfig( elementStyle, blockStyle ),
+				getButtonConfig(
+					// @ts-expect-error color.gradient is supported at runtime but omitted from GlobalStylesStyles.
+					elementStyle,
+					blockStyle
+				),
 				'button',
 				[ 'core/button' ]
 			)
@@ -323,7 +356,11 @@ describe( 'getOverridingBlockTypes', () => {
 	] )( 'skips %s', ( _, elementStyle, blockStyle ) => {
 		expect(
 			getOverridingBlockTypes(
-				getButtonConfig( elementStyle, blockStyle ),
+				getButtonConfig(
+					// @ts-expect-error color.gradient is supported at runtime but omitted from GlobalStylesStyles.
+					elementStyle,
+					blockStyle
+				),
 				'button',
 				[ 'core/button' ]
 			)
