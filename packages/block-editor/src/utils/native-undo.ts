@@ -19,33 +19,6 @@ const fieldHistory = new WeakMap< Element, boolean >();
 const pendingChecks = new WeakMap< Element, () => void >();
 
 /**
- * Resolves the element an event really originates from. Events coming from
- * the editor canvas are re-dispatched on the iframe element, so the real
- * target is the frame's focused element.
- *
- * @param event Keyboard event.
- *
- * @return The originating element.
- */
-function getEventTarget( event: Event ): Element | null | undefined {
-	const target = event.target as Element | null | undefined;
-
-	if ( target?.nodeName === 'IFRAME' ) {
-		return ( target as HTMLIFrameElement ).contentDocument?.activeElement;
-	}
-
-	return target;
-}
-
-function getFieldValue( field: HTMLElement ): string | null {
-	if ( 'value' in field ) {
-		return ( field as HTMLInputElement ).value;
-	}
-
-	return field.textContent;
-}
-
-/**
  * Observes typing in text fields to learn, per field, whether its text is
  * part of the editor history. A keystroke that changes a field's value
  * without changing the history means the field keeps its text locally (a
@@ -64,7 +37,14 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 				return;
 			}
 
-			const field = getEventTarget( event );
+			const target = event.target as Element | null | undefined;
+			// Canvas key events are re-dispatched on the iframe element, so
+			// the real target is the frame's focused element.
+			const field =
+				target?.nodeName === 'IFRAME'
+					? ( target as HTMLIFrameElement ).contentDocument
+							?.activeElement
+					: target;
 
 			// A field known to edit the history stays so, and block rich text
 			// always does, so neither needs observing.
@@ -93,14 +73,18 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 				return;
 			}
 
-			const value = getFieldValue( field );
+			const value =
+				( field as HTMLInputElement ).value ?? field.textContent;
 			const revision = getRevision();
 			const { defaultView } = field.ownerDocument;
 
 			// React applies the change within the input event, so the history
 			// has already moved by the next task if the field edits it.
 			defaultView?.setTimeout( () => {
-				if ( getFieldValue( field ) === value ) {
+				if (
+					( ( field as HTMLInputElement ).value ??
+						field.textContent ) === value
+				) {
 					return;
 				}
 
@@ -114,12 +98,14 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 				// A field that commits on a debounce edits the history later,
 				// while it keeps the typed value and focus. A history edit
 				// after leaving the field is not its own.
-				const typedValue = getFieldValue( field );
+				const typedValue =
+					( field as HTMLInputElement ).value ?? field.textContent;
 				const timeout = defaultView.setTimeout( () => {
 					cancel();
 					if (
 						getRevision() !== revision &&
-						getFieldValue( field ) === typedValue
+						( ( field as HTMLInputElement ).value ??
+							field.textContent ) === typedValue
 					) {
 						fieldHistory.set( field, true );
 					}
@@ -156,7 +142,13 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
  * @return Whether the element relies on the browser's own undo.
  */
 export function usesNativeUndo( event: KeyboardEvent ): boolean {
-	const field = getEventTarget( event );
+	const target = event.target as Element | null | undefined;
+	// Canvas key events are re-dispatched on the iframe element, so the real
+	// target is the frame's focused element.
+	const field =
+		target?.nodeName === 'IFRAME'
+			? ( target as HTMLIFrameElement ).contentDocument?.activeElement
+			: target;
 
 	if ( ! field || ! isTextField( field ) ) {
 		return false;
