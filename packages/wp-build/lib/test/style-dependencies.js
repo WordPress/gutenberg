@@ -11,6 +11,15 @@ describe( 'inferStyleDependencies()', () => {
 		expect( deps ).toEqual( [ 'wp-components', 'wp-media-utils' ] );
 	} );
 
+	it( 'keeps dependencies on handles with any prefix', () => {
+		const deps = inferStyleDependencies(
+			[ 'wp-components', 'acme-forms', 'acme-utils' ],
+			new Set( [ 'acme-dashboard', 'acme-forms' ] )
+		);
+
+		expect( deps ).toEqual( [ 'acme-forms' ] );
+	} );
+
 	it( 'returns no dependencies without script dependencies', () => {
 		expect(
 			inferStyleDependencies( undefined, new Set( [ 'wp-components' ] ) )
