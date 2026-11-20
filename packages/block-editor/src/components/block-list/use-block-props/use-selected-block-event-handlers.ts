@@ -468,9 +468,10 @@ export function useEventHandlers( {
 				node.style.transform = `scale(${ dragScale })`;
 				node.style.opacity = '0.9';
 
-				// If the block has no background color, use the parent's
-				// background color.
+				// Give multi-selection cards a solid backdrop. Direct drags retain
+				// the block's own background, including transparency.
 				if (
+					isMultiSelectionDrag &&
 					isColorTransparent(
 						defaultView.getComputedStyle( node ).backgroundColor
 					)

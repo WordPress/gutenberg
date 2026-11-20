@@ -2,10 +2,12 @@ import { isPlainObject } from '../../utils/object';
 import { getGridMeasurement, GridRect } from './utils';
 import { getGridSpan, measureGridItemAtWidth } from './grid-item-size';
 
+function isPositiveInteger( value: unknown ): value is number {
+	return typeof value === 'number' && Number.isInteger( value ) && value > 0;
+}
+
 function getSpan( value: unknown ): number {
-	return typeof value === 'number' && Number.isInteger( value ) && value > 0
-		? value
-		: 1;
+	return isPositiveInteger( value ) ? value : 1;
 }
 
 /**
@@ -127,4 +129,92 @@ export function getManualGridDropRect(
 		)
 	);
 	return getRect();
+}
+
+/**
+ * Places a selection within the grid's columns, allowing additional rows.
+ * Existing manual placements move together; other selections fill rows in order.
+ *
+ * @param items                     Measured footprints and source layouts.
+ * @param column                    Hovered column.
+ * @param row                       Hovered row.
+ * @param columnCount               Number of destination columns.
+ * @param preserveRelativePositions Whether the source uses manual placement.
+ * @return A placement for every dragged block, in selection order.
+ */
+export function getManualGridDropRects(
+	items: { rect: GridRect; layout: unknown }[],
+	column: number,
+	row: number,
+	columnCount: number,
+	preserveRelativePositions: boolean
+): GridRect[] {
+	if ( ! items.length ) {
+		return [];
+	}
+
+	if ( preserveRelativePositions ) {
+		const sourceRects = items.map( ( { rect, layout } ) => {
+			if (
+				! isPlainObject( layout ) ||
+				! isPositiveInteger( layout.columnStart ) ||
+				! isPositiveInteger( layout.rowStart )
+			) {
+				return null;
+			}
+			return new GridRect( {
+				columnStart: layout.columnStart,
+				rowStart: layout.rowStart,
+				columnSpan: rect.columnSpan,
+				rowSpan: rect.rowSpan,
+			} );
+		} );
+		if ( sourceRects.every( ( rect ) => rect !== null ) ) {
+			let left = Infinity;
+			let top = Infinity;
+			let right = 0;
+			for ( const rect of sourceRects ) {
+				left = Math.min( left, rect.columnStart );
+				top = Math.min( top, rect.rowStart );
+				right = Math.max( right, rect.columnEnd );
+			}
+			const width = right - left + 1;
+			if ( width <= columnCount ) {
+				const columnOffset =
+					Math.min( column, columnCount - width + 1 ) - left;
+				return sourceRects.map(
+					( rect ) =>
+						new GridRect( {
+							columnStart: rect.columnStart + columnOffset,
+							rowStart: rect.rowStart + row - top,
+							columnSpan: rect.columnSpan,
+							rowSpan: rect.rowSpan,
+						} )
+				);
+			}
+		}
+	}
+
+	let nextColumn = Math.min(
+		column,
+		columnCount - items[ 0 ].rect.columnSpan + 1
+	);
+	let nextRow = row;
+	let rowSpan = 0;
+	return items.map( ( { rect } ) => {
+		if ( nextColumn + rect.columnSpan - 1 > columnCount ) {
+			nextColumn = 1;
+			nextRow += rowSpan;
+			rowSpan = 0;
+		}
+		const placement = new GridRect( {
+			columnStart: nextColumn,
+			rowStart: nextRow,
+			columnSpan: rect.columnSpan,
+			rowSpan: rect.rowSpan,
+		} );
+		nextColumn += rect.columnSpan;
+		rowSpan = Math.max( rowSpan, rect.rowSpan );
+		return placement;
+	} );
 }
