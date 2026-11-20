@@ -61,9 +61,7 @@
 	}
 
 	&.is-pressed .components-menu-item__info {
-		@media ( forced-colors: active ) {
-			color: inherit;
-		}
+		color: inherit;
 	}
 }
 
