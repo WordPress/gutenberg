@@ -249,7 +249,7 @@
 		}
 
 		.item-indicator-icon {
-			translate: 0 1px;
+			flex-shrink: 0;
 		}
 
 		.item-content {
