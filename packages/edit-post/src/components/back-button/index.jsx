@@ -18,6 +18,11 @@ function BackButton( { initialPost } ) {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
+	// The admin menu stays in view as a rail, and leads back to the admin.
+	if ( window.__experimentalAdminNavigationRail ) {
+		return null;
+	}
+
 	return (
 		<BackButtonFill>
 			{ ( { length } ) =>

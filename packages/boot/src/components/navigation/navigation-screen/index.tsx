@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ReactNode, RefObject } from 'react';
 import {
 	__experimentalHeading as Heading,
@@ -9,6 +10,7 @@ import {
 import { isRTL, __ } from '@wordpress/i18n';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
 import { useReducedMotion } from '@wordpress/compose';
+import { isAdminNavigationRailEnabled } from '../../../admin-navigation-rail';
 import styles from './style.module.scss';
 
 const ANIMATION_DURATION = 0.3;
@@ -58,6 +60,10 @@ export default function NavigationScreen( {
 } ) {
 	const icon = isRTL() ? chevronRight : chevronLeft;
 	const disableMotion = useReducedMotion();
+	// Next to the admin navigation rail, an untitled root has no header, like
+	// the admin submenu column it stands in for.
+	const hasHeader =
+		! isAdminNavigationRailEnabled() || ! isRoot || !! title || !! actions;
 
 	const handleBackClick = ( e: React.MouseEvent ) => {
 		e.preventDefault();
@@ -66,7 +72,9 @@ export default function NavigationScreen( {
 
 	return (
 		<div
-			className={ styles.screen }
+			className={ clsx( styles.screen, {
+				[ styles[ 'has-no-header' ] ]: ! hasHeader,
+			} ) }
 			style={ {
 				overflow: 'hidden',
 				position: 'relative',
@@ -94,28 +102,35 @@ export default function NavigationScreen( {
 						gridRow: '1',
 					} }
 				>
-					<HStack spacing={ 2 } className={ styles[ 'title-icon' ] }>
-						{ ! isRoot && (
-							<Button
-								ref={ backButtonRef }
-								icon={ icon }
-								onClick={ handleBackClick }
-								label={ __( 'Back' ) }
-								size="small"
-								variant="tertiary"
-							/>
-						) }
-						<Heading
-							className={ styles.title }
-							level={ 1 }
-							size="15px"
+					{ hasHeader && (
+						<HStack
+							spacing={ 2 }
+							className={ styles[ 'title-icon' ] }
 						>
-							{ title }
-						</Heading>
-						{ actions && (
-							<div className={ styles.actions }>{ actions }</div>
-						) }
-					</HStack>
+							{ ! isRoot && (
+								<Button
+									ref={ backButtonRef }
+									icon={ icon }
+									onClick={ handleBackClick }
+									label={ __( 'Back' ) }
+									size="small"
+									variant="tertiary"
+								/>
+							) }
+							<Heading
+								className={ styles.title }
+								level={ 1 }
+								size="15px"
+							>
+								{ title }
+							</Heading>
+							{ actions && (
+								<div className={ styles.actions }>
+									{ actions }
+								</div>
+							) }
+						</HStack>
+					) }
 
 					{ description && <div>{ description }</div> }
 

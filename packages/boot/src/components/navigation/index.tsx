@@ -6,6 +6,7 @@ import DrilldownItem from './drilldown-item';
 import DropdownItem from './dropdown-item';
 import NavigationScreen from './navigation-screen';
 import { useSidebarParent } from './use-sidebar-parent';
+import { isAdminNavigationRailEnabled } from '../../admin-navigation-rail';
 import type { MenuItem } from '../../store/types';
 
 function Navigation() {
@@ -53,7 +54,9 @@ function Navigation() {
 		[ menuItems, parentId ]
 	);
 
-	const hasRealIcons = items.some( ( item ) => !! item.icon );
+	// Next to the admin navigation rail, the items read as a submenu of it.
+	const showIcons = ! isAdminNavigationRailEnabled();
+	const hasRealIcons = showIcons && items.some( ( item ) => !! item.icon );
 
 	return (
 		<NavigationScreen
@@ -72,7 +75,7 @@ function Navigation() {
 								<DropdownItem
 									key={ item.id }
 									id={ item.id }
-									icon={ item.icon }
+									icon={ showIcons ? item.icon : undefined }
 									shouldShowPlaceholder={ hasRealIcons }
 									isExpanded={ parentDropdownId === item.id }
 									onToggle={ () =>
@@ -89,7 +92,7 @@ function Navigation() {
 								<DrilldownItem
 									key={ item.id }
 									id={ item.id }
-									icon={ item.icon }
+									icon={ showIcons ? item.icon : undefined }
 									shouldShowPlaceholder={ hasRealIcons }
 									onNavigate={ handleNavigate }
 								>
@@ -102,7 +105,7 @@ function Navigation() {
 							<NavigationItem
 								key={ item.id }
 								to={ item.to }
-								icon={ item.icon }
+								icon={ showIcons ? item.icon : undefined }
 								shouldShowPlaceholder={ hasRealIcons }
 							>
 								{ item.label }

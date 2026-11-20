@@ -23,6 +23,7 @@ import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
 import useRouteFocus from '../app/use-route-focus';
 import { unlock } from '../../lock-unlock';
+import { isAdminNavigationRailEnabled } from '../../admin-navigation-rail';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
 import styles from './style.module.scss';
@@ -67,6 +68,9 @@ export default function Root() {
 					<ThemeProvider color={ themeColors }>
 						<div
 							ref={ layoutRef }
+							data-admin-navigation-rail={
+								isAdminNavigationRailEnabled() || undefined
+							}
 							className={ clsx( styles.layout, {
 								[ styles[ 'has-canvas' ] ]:
 									!! canvas || canvas === null,

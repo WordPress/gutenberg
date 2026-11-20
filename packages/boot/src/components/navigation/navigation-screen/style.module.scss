@@ -5,6 +5,10 @@
 	padding-block-end: variables.$grid-unit-05;
 }
 
+.has-no-header {
+	padding-block-start: var(--wpds-dimension-padding-md);
+}
+
 .screen :global(.components-text) {
 	color: var(--wpds-color-foreground-content-neutral);
 }
@@ -16,6 +20,10 @@
 	padding-inline-end: variables.$grid-unit-20;
 	padding-block-end: variables.$grid-unit-10;
 	padding-inline-start: variables.$grid-unit-20;
+}
+
+[data-admin-navigation-rail] .title-icon {
+	padding-inline: var(--wpds-dimension-padding-sm);
 }
 
 .title {
