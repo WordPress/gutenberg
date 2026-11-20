@@ -148,6 +148,125 @@ export function isCellSelected( cellLocation, selection ) {
 }
 
 /**
+ * Parses a `colspan` or `rowspan` value, falling back to 1 when it's missing
+ * or invalid.
+ *
+ * @param {string|number|undefined} value The span value.
+ *
+ * @return {number} The span as a positive integer.
+ */
+function getSpan( value ) {
+	return Math.max( parseInt( value, 10 ) || 1, 1 );
+}
+
+/**
+ * Returns a copy of the cell with the given rowspan, omitting the attribute
+ * when the cell no longer spans multiple rows.
+ *
+ * @param {Object} cell    The cell attributes.
+ * @param {number} rowspan The new rowspan.
+ *
+ * @return {Object} The updated cell attributes.
+ */
+function setCellRowspan( cell, rowspan ) {
+	const newCell = { ...cell };
+	if ( rowspan > 1 ) {
+		newCell.rowspan = String( rowspan );
+	} else {
+		delete newCell.rowspan;
+	}
+	return newCell;
+}
+
+/**
+ * Calculates the effective column count in a row, accounting for colspan values.
+ *
+ * @param {Object} row The row object containing cells.
+ *
+ * @return {number} The effective column count.
+ */
+function getRowColumnCount( row ) {
+	if ( ! row?.cells?.length ) {
+		return 0;
+	}
+
+	return row.cells.reduce(
+		( columnCount, cell ) => columnCount + getSpan( cell.colspan ),
+		0
+	);
+}
+
+/**
+ * Gets the cell that covers a specific logical column in a row.
+ *
+ * @param {Object} row         The row object containing cells.
+ * @param {number} columnIndex The logical column index.
+ *
+ * @return {Object} The cell that covers the specified column, or an empty object.
+ */
+function getCellAtColumnIndex( row, columnIndex ) {
+	if ( ! row?.cells?.length ) {
+		return {};
+	}
+
+	let currentColumn = 0;
+
+	for ( const cell of row.cells ) {
+		const columnEnd = currentColumn + getSpan( cell.colspan );
+
+		if ( columnIndex < columnEnd ) {
+			return cell;
+		}
+
+		currentColumn = columnEnd;
+	}
+
+	return {};
+}
+
+/**
+ * Computes the logical position of every cell in a table section, taking into
+ * account columns occupied by cells spanning down from the rows above.
+ *
+ * The rowspan is clamped to the end of the section, since a cell can't span
+ * across sections.
+ *
+ * @param {Array} section The table section.
+ *
+ * @return {Array} For each row, an array with the `columnIndex`, `colspan` and
+ *                 `rowspan` of each of its cells.
+ */
+function getSectionCellPositions( section ) {
+	const occupiedColumns = section.map( () => new Set() );
+
+	return section.map( ( row, rowIndex ) => {
+		let columnIndex = 0;
+
+		return ( row.cells ?? [] ).map( ( cell ) => {
+			while ( occupiedColumns[ rowIndex ].has( columnIndex ) ) {
+				columnIndex++;
+			}
+
+			const colspan = getSpan( cell.colspan );
+			const rowspan = Math.min(
+				getSpan( cell.rowspan ),
+				section.length - rowIndex
+			);
+
+			for ( let r = rowIndex + 1; r < rowIndex + rowspan; r++ ) {
+				for ( let c = columnIndex; c < columnIndex + colspan; c++ ) {
+					occupiedColumns[ r ].add( c );
+				}
+			}
+
+			const position = { columnIndex, colspan, rowspan };
+			columnIndex += colspan;
+			return position;
+		} );
+	} );
+}
+
+/**
  * Inserts a row in the table state.
  *
  * @param {Object} state               Current table state.
@@ -161,21 +280,47 @@ export function isCellSelected( cellLocation, selection ) {
 export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 	const firstRow = getFirstRow( state );
 	const cellCount =
-		columnCount === undefined ? firstRow?.cells?.length : columnCount;
+		columnCount === undefined ? getRowColumnCount( firstRow ) : columnCount;
 
 	// Bail early if the function cannot determine how many cells to add.
 	if ( ! cellCount ) {
 		return state;
 	}
 
+	const section = state[ sectionName ];
+	const positions = getSectionCellPositions( section );
+
+	// Cells in the rows above that span across the insertion point grow by
+	// one row, and the new row skips the columns they cover.
+	const coveredColumns = new Set();
+	const rowsBefore = section.slice( 0, rowIndex ).map( ( row, index ) => ( {
+		...row,
+		cells: row.cells.map( ( cell, cellIndex ) => {
+			const { columnIndex, colspan, rowspan } =
+				positions[ index ][ cellIndex ];
+
+			if ( index + rowspan <= rowIndex ) {
+				return cell;
+			}
+
+			for ( let c = columnIndex; c < columnIndex + colspan; c++ ) {
+				coveredColumns.add( c );
+			}
+
+			return { ...cell, rowspan: String( rowspan + 1 ) };
+		} ),
+	} ) );
+
 	return {
 		[ sectionName ]: [
-			...state[ sectionName ].slice( 0, rowIndex ),
+			...rowsBefore,
 			{
-				cells: Array.from( { length: cellCount } ).map(
-					( _, index ) => {
-						const firstCellInColumn =
-							firstRow?.cells?.[ index ] ?? {};
+				cells: Array.from( { length: cellCount } )
+					.map( ( _, index ) => {
+						const firstCellInColumn = getCellAtColumnIndex(
+							firstRow,
+							index
+						);
 
 						const inheritedAttributes = Object.fromEntries(
 							Object.entries( firstCellInColumn ).filter(
@@ -189,10 +334,10 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
 							content: '',
 							tag: sectionName === 'head' ? 'th' : 'td',
 						};
-					}
-				),
+					} )
+					.filter( ( _, index ) => ! coveredColumns.has( index ) ),
 			},
-			...state[ sectionName ].slice( rowIndex ),
+			...section.slice( rowIndex ),
 		],
 	};
 }
@@ -208,10 +353,54 @@ export function insertRow( state, { sectionName, rowIndex, columnCount } ) {
  * @return {Object} New table state.
  */
 export function deleteRow( state, { sectionName, rowIndex } ) {
+	const section = state[ sectionName ];
+	const positions = getSectionCellPositions( section );
+
+	// Cells that start in the deleted row and span down move to the next row.
+	const movedCells = ( section[ rowIndex ]?.cells ?? [] ).flatMap(
+		( cell, cellIndex ) => {
+			const { columnIndex, rowspan } = positions[ rowIndex ][ cellIndex ];
+			return rowspan > 1
+				? [ { columnIndex, cell: setCellRowspan( cell, rowspan - 1 ) } ]
+				: [];
+		}
+	);
+
 	return {
-		[ sectionName ]: state[ sectionName ].filter(
-			( row, index ) => index !== rowIndex
-		),
+		[ sectionName ]: section
+			.map( ( row, index ) => {
+				// Cells in the rows above that span into the deleted row shrink by one row.
+				if ( index < rowIndex ) {
+					return {
+						...row,
+						cells: row.cells.map( ( cell, cellIndex ) => {
+							const { rowspan } = positions[ index ][ cellIndex ];
+							return index + rowspan > rowIndex
+								? setCellRowspan( cell, rowspan - 1 )
+								: cell;
+						} ),
+					};
+				}
+
+				// Place the moved cells among the next row's cells by column.
+				if ( index === rowIndex + 1 && movedCells.length ) {
+					const cells = row.cells.map( ( cell, cellIndex ) => ( {
+						columnIndex:
+							positions[ index ][ cellIndex ].columnIndex,
+						cell,
+					} ) );
+
+					return {
+						...row,
+						cells: [ ...movedCells, ...cells ]
+							.sort( ( a, b ) => a.columnIndex - b.columnIndex )
+							.map( ( { cell } ) => cell ),
+					};
+				}
+
+				return row;
+			} )
+			.filter( ( row, index ) => index !== rowIndex ),
 	};
 }
 
@@ -317,8 +506,8 @@ export function toggleSection( state, sectionName ) {
 		return { [ sectionName ]: [] };
 	}
 
-	// Get the length of the first row of the body to use when creating the header.
-	const columnCount = state.body?.[ 0 ]?.cells?.length ?? 1;
+	// Get the column count of the first row of the body to use when creating the header.
+	const columnCount = getRowColumnCount( state.body?.[ 0 ] ) || 1;
 
 	// Section doesn't exist, insert an empty row to create the section.
 	return insertRow( state, { sectionName, rowIndex: 0, columnCount } );
