@@ -25,11 +25,13 @@
 		"@wordpress/i18n": "file:../../packages/i18n",
 		"@wordpress/icons": "file:../../packages/icons",
 		"@wordpress/lazy-editor": "file:../../packages/lazy-editor",
+		"@wordpress/preferences": "file:../../packages/preferences",
 		"@wordpress/routes-lock-unlock": "file:../lock-unlock",
 		"@wordpress/route": "file:../../packages/route",
 		"@wordpress/url": "file:../../packages/url"
 	},
 	"devDependencies": {
-		"@types/react": "^19.3.0"
+		"@types/react": "^19.3.0",
+		"vitest": "^5.0.3"
 	}
 }
