@@ -12,7 +12,9 @@ Use a standalone `Notice.Root` for information that's already on the page, such 
 
 ## Announce new or updated notices
 
-Keep `Notice.List` mounted, even when it's empty. Notices already in the list when it mounts stay silent. After that, adding a notice or changing its message announces it without moving focus.
+Keep `Notice.List` mounted, even when it's empty. Notices already in the list when it mounts stay silent. After that, adding a notice or changing its message announces it without moving focus. Dismissing a notice is silent.
+
+When migrating a dynamic notice to `@wordpress/ui`, put `Notice.Root` inside the list and carry over any custom `spokenMessage` or `politeness`. These props only take effect inside `Notice.List`.
 
 Give each notice a stable key. Keep the key when updating that notice. Use a new key for a new notification, even if it repeats an earlier message.
 
@@ -20,7 +22,7 @@ Give each notice a stable key. Keep the key when updating that notice. Use a new
 
 ### Choose the message
 
-By default, the list announces the visible text of `Notice.Title` and `Notice.Description`, preserving paragraph and line breaks and leaving out action labels. Set `spokenMessage` on `Notice.Root` when a shorter message would be clearer, such as “Save failed. Check your connection and try again.”
+By default, the list announces the text of `Notice.Title` and `Notice.Description`, preserving paragraph and line breaks. It skips action labels and hidden text, including visible decorations marked `aria-hidden="true"`. Set `spokenMessage` on `Notice.Root` when a shorter message would be clearer, such as “Save failed. Check your connection and try again.”
 
 <Canvas of={ AnnouncementStories.FormattedMessage } />
 
@@ -36,7 +38,7 @@ If a background update needs to reach someone using a dialog, pass the app's doc
 
 ## Announce an application event
 
-If your app uses a standalone notice and needs to announce each save attempt, call `speak()` from the handler that receives the result. If a list already announces the result, a separate call to `speak()` would repeat it. See the [`@wordpress/a11y` API](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#api).
+If your app already announces a result through `speak()`, `role="status"`, or `role="alert"`, keep the corresponding visual notice standalone so users hear the result once. To announce each save attempt with `speak()`, call it from the handler that receives the result. See [setting up announcements with `@wordpress/a11y`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#setting-up-announcements).
 
 For an urgent failure, **Save changes** shows the error and calls `speak( message, 'assertive' )`.
 
@@ -45,3 +47,5 @@ For an urgent failure, **Save changes** shows the error and calls `speak( messag
 For a routine confirmation, **Save draft** uses a polite announcement.
 
 <Canvas of={ AnnouncementStories.PoliteStatus } />
+
+Test with a browser and screen reader your app supports. Automated tests can check the message text. Listen for the full message and check that each update is announced only once.
