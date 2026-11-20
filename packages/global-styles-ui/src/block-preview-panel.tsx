@@ -9,9 +9,11 @@ import {
 import { getVariationClassName } from './utils';
 import { unlock } from './lock-unlock';
 
-const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
-	globalStylesEnginePrivateApis
-);
+const {
+	getViewportBreakpoints,
+	getViewportBreakpointValueInPixels,
+	getViewportPreviewSizes,
+} = unlock( globalStylesEnginePrivateApis );
 
 interface BlockPreviewPanelProps {
 	name: string;
@@ -20,8 +22,8 @@ interface BlockPreviewPanelProps {
 	selectedState?: string;
 	stateStyles?: any;
 	viewportSettings?: {
-		mobile?: string;
-		tablet?: string;
+		mobile?: string | { breakpoint?: string; preview?: string };
+		tablet?: string | { breakpoint?: string; preview?: string };
 	};
 }
 
@@ -35,6 +37,16 @@ function getPreviewWidthByViewport(
 	selectedViewport: string,
 	viewportSettings: BlockPreviewPanelProps[ 'viewportSettings' ]
 ) {
+	const previewSizes = getViewportPreviewSizes( viewportSettings );
+
+	if ( selectedViewport === '@mobile' && previewSizes.mobile ) {
+		return getViewportBreakpointValueInPixels( previewSizes.mobile );
+	}
+
+	if ( selectedViewport === '@tablet' && previewSizes.tablet ) {
+		return getViewportBreakpointValueInPixels( previewSizes.tablet );
+	}
+
 	const breakpoints = getViewportBreakpoints( viewportSettings );
 	const mobileWidth = getViewportBreakpointValueInPixels(
 		breakpoints.mobile
