@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { BlockType } from '../../../types';
 import {
 	fixCustomClassname,
 	getHTMLRootElementClasses,
@@ -6,16 +7,18 @@ import {
 
 describe( 'Fix custom className', () => {
 	const blockSettings = {
+		name: 'core/test-block',
 		save: () => <div className="default" />,
 		category: 'text',
 		title: 'block title',
-	};
+	} as unknown as BlockType;
 
 	const dynamicBlockSettings = {
+		name: 'core/test-block',
 		save: () => null,
 		category: 'text',
 		title: 'block title',
-	};
+	} as unknown as BlockType;
 
 	it( 'should do nothing if the block settings do not define custom className support', () => {
 		const attributes = fixCustomClassname(
@@ -25,7 +28,7 @@ describe( 'Fix custom className', () => {
 				supports: {
 					customClassName: false,
 				},
-			},
+			} as unknown as BlockType,
 			'<div class="bar baz"></div>'
 		);
 
@@ -96,7 +99,7 @@ describe( 'Fix custom className', () => {
 		const attributes = fixCustomClassname(
 			{ className: 'custom1' },
 			dynamicBlockSettings,
-			null
+			null as unknown as string
 		);
 
 		expect( attributes.className ).toBe( 'custom1' );

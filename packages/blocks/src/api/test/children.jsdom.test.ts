@@ -26,7 +26,7 @@ describe( 'getSerializeCapableElement', () => {
 
 		// Intentionally avoid introspecting the shape of the generated element
 		// since all that is cared about is that it can be serialized.
-		const html = renderToString( element );
+		const html = renderToString( element as React.ReactNode );
 
 		expect( html ).toBe(
 			'This <strong class="is-extra-strong">is</strong> a test'
@@ -42,14 +42,14 @@ describe( 'concat', () => {
 				props: {
 					children: [ 'Hello' ],
 				},
-			},
+			} as unknown as string,
 			' ',
 			{
 				type: 'em',
 				props: {
 					children: [ 'world' ],
 				},
-			}
+			} as unknown as string
 		);
 
 		expect( console ).toHaveWarned();
@@ -76,7 +76,7 @@ describe( 'concat', () => {
 			props: {
 				children: [ 'World' ],
 			},
-		} );
+		} as unknown as string );
 
 		expect( console ).toHaveWarned();
 		expect( result ).toEqual( [

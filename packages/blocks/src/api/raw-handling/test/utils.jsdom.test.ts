@@ -57,6 +57,8 @@ describe( 'getBlockContentSchema', () => {
 		registerBlockType( 'core/paragraph', {
 			apiVersion: 3,
 			title: 'Paragraph',
+			category: 'text',
+			attributes: {},
 			supports: {
 				anchor: true,
 			},
@@ -92,13 +94,13 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: undefined,
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should handle multiple raw transforms', () => {
-		const preformattedIsMatch = ( input ) => {
+		const preformattedIsMatch = ( input: unknown ) => {
 			return input === 4;
 		};
 		const transforms = deepFreeze( [
@@ -134,9 +136,9 @@ describe( 'getBlockContentSchema', () => {
 				isMatch: preformattedIsMatch,
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should correctly merge the children', () => {
@@ -178,9 +180,9 @@ describe( 'getBlockContentSchema', () => {
 				},
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should correctly merge the attributes', () => {
@@ -212,9 +214,9 @@ describe( 'getBlockContentSchema', () => {
 				attributes: [ 'data-chicken', 'data-ribs' ],
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should handle proper merging of classes and attributes', () => {
@@ -249,9 +251,9 @@ describe( 'getBlockContentSchema', () => {
 				classes: [ 'class1', 'my-class', 'another-class' ],
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should handle proper merging of classes when first transform has no classes', () => {
@@ -285,9 +287,9 @@ describe( 'getBlockContentSchema', () => {
 				classes: [ 'my-class', 'another-class' ],
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should handle proper merging of classes when second transform has no classes', () => {
@@ -321,9 +323,9 @@ describe( 'getBlockContentSchema', () => {
 				classes: [ 'my-class', 'another-class' ],
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 
 	it( 'should handle merging of classes when both transforms have same classes', () => {
@@ -365,8 +367,8 @@ describe( 'getBlockContentSchema', () => {
 				],
 			},
 		};
-		expect( getBlockContentSchemaFromTransforms( transforms ) ).toEqual(
-			output
-		);
+		expect(
+			getBlockContentSchemaFromTransforms( [ ...transforms ] )
+		).toEqual( output );
 	} );
 } );

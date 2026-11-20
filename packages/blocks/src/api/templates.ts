@@ -4,7 +4,11 @@ import { createBlock } from './factory';
 import { getBlockType } from './registration';
 import type { Block, BlockAttribute } from '../types';
 
-type TemplateItem = [ string, Record< string, unknown >?, TemplateItem[]? ];
+export type TemplateItem = [
+	string,
+	Record< string, unknown >?,
+	TemplateItem[]?,
+];
 
 /**
  * Checks whether a list of blocks matches a template by comparing the block names.

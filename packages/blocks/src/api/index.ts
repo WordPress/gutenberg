@@ -159,6 +159,10 @@ export {
 export {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
+	/**
+	 * A block template entry: the block name, then optional attributes and inner block template.
+	 */
+	type TemplateItem,
 } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';

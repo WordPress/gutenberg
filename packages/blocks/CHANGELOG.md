@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Export the `TemplateItem` type ([#87140](https://github.com/WordPress/gutenberg/pull/87140)).
 
 ## 17.2.0 (2026-11-18)
 

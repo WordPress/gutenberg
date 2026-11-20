@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
+import type {
+	Block,
+	BlockDeprecation,
+	BlockSaveProps,
+	RawBlock,
+} from '../../../types';
 import '../../../store';
 import { applyBlockDeprecatedVersions } from '../apply-block-deprecated-versions';
 import {
@@ -18,14 +24,15 @@ describe( 'applyBlockDeprecatedVersions', () => {
 				type: 'string',
 			},
 		},
-		save: ( { attributes } ) => attributes.fruit || null,
+		save: ( { attributes }: BlockSaveProps< { fruit?: string } > ) =>
+			attributes.fruit || null,
 		category: 'text',
 		title: 'block title',
 	};
 
 	afterEach( () => {
-		setFreeformContentHandlerName( undefined );
-		setUnregisteredTypeHandlerName( undefined );
+		setFreeformContentHandlerName( '' );
+		setUnregisteredTypeHandlerName( '' );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -45,9 +52,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		);
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 
 		expect( migratedBlock ).toBe( block );
@@ -65,6 +72,7 @@ describe( 'applyBlockDeprecatedVersions', () => {
 			...defaultBlockSettings,
 			deprecated: [
 				{
+					attributes: {},
 					save() {
 						return 'nothing';
 					},
@@ -73,9 +81,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 
 		expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
@@ -91,7 +99,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 		const blockType = registerBlockType( 'core/test-block', {
 			...defaultBlockSettings,
-			save: ( props ) => <div>{ props.attributes.fruit }</div>,
+			save: ( { attributes }: BlockSaveProps< { fruit?: string } > ) => (
+				<div>{ attributes.fruit }</div>
+			),
 			deprecated: [
 				{
 					attributes: {
@@ -101,15 +111,19 @@ describe( 'applyBlockDeprecatedVersions', () => {
 							selector: 'span',
 						},
 					},
-					save: ( props ) => <span>{ props.attributes.fruit }</span>,
+					save: ( {
+						attributes,
+					}: BlockSaveProps< { fruit?: string } > ) => (
+						<span>{ attributes.fruit }</span>
+					),
 				},
 			],
 		} );
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 
 		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
@@ -125,7 +139,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 		const blockType = registerBlockType( 'core/test-block', {
 			...defaultBlockSettings,
-			save: ( props ) => <div>{ props.attributes.fruit }</div>,
+			save: ( { attributes }: BlockSaveProps< { fruit?: string } > ) => (
+				<div>{ attributes.fruit }</div>
+			),
 			deprecated: [
 				{
 					attributes: {
@@ -135,8 +151,12 @@ describe( 'applyBlockDeprecatedVersions', () => {
 							selector: 'span',
 						},
 					},
-					save: ( props ) => <span>{ props.attributes.fruit }</span>,
-					migrate: ( attributes ) => {
+					save: ( {
+						attributes,
+					}: BlockSaveProps< { fruit?: string } > ) => (
+						<span>{ attributes.fruit }</span>
+					),
+					migrate: ( ( attributes: { fruit?: string } ) => {
 						return [
 							{ newFruit: attributes.fruit },
 							[
@@ -146,15 +166,15 @@ describe( 'applyBlockDeprecatedVersions', () => {
 								},
 							],
 						];
-					},
+					} ) as unknown as BlockDeprecation[ 'migrate' ],
 				},
 			],
 		} );
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 		expect( migratedBlock.attributes ).toEqual( {
 			newFruit: 'Bananas',
@@ -192,9 +212,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 
 		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
@@ -228,9 +248,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		} );
 
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
 	} );
@@ -278,9 +298,9 @@ describe( 'applyBlockDeprecatedVersions', () => {
 		// The migrated block successfully falls back to the old value of 'Bananas', allowing the block to
 		// continue to be used.
 		const migratedBlock = applyBlockDeprecatedVersions(
-			block,
-			rawBlock,
-			blockType
+			block as unknown as Block,
+			rawBlock as unknown as RawBlock,
+			blockType!
 		);
 
 		expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );

@@ -20,7 +20,11 @@ describe( 'matchers', () => {
 			const match = parse( html, sources.children() );
 
 			expect( console ).toHaveWarned();
-			expect( renderToString( match ) ).toBe( html );
+			expect(
+				renderToString(
+					match as unknown as Parameters< typeof renderToString >[ 0 ]
+				)
+			).toBe( html );
 		} );
 	} );
 
@@ -40,7 +44,11 @@ describe( 'matchers', () => {
 			const match = parse( html, sources.node() );
 
 			expect( console ).toHaveWarned();
-			expect( renderToString( match ) ).toBe( `<body>${ html }</body>` );
+			expect(
+				renderToString(
+					match as unknown as Parameters< typeof renderToString >[ 0 ]
+				)
+			).toBe( `<body>${ html }</body>` );
 		} );
 	} );
 } );

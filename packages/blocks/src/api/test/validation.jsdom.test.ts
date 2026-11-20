@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import '../../store';
+import type { Block, BlockSaveProps } from '../../types';
 import {
 	isValidCharacterReference,
 	DecodeEntityParser,
@@ -27,7 +28,13 @@ import {
 describe( 'validation', () => {
 	const defaultBlockSettings = {
 		apiVersion: 3,
-		save: ( { attributes } ) => attributes.fruit,
+		attributes: {
+			fruit: {
+				type: 'string',
+			},
+		},
+		save: ( { attributes }: BlockSaveProps< { fruit?: string } > ) =>
+			attributes.fruit || null,
 		category: 'text',
 		title: 'block title',
 	};
@@ -96,6 +103,7 @@ describe( 'validation', () => {
 	describe( 'getMeaningfulAttributePairs()', () => {
 		it( 'returns with non-empty attributes', () => {
 			const pairs = getMeaningfulAttributePairs( {
+				type: 'StartTag',
 				attributes: [ [ 'class', 'a' ] ],
 			} );
 
@@ -104,6 +112,7 @@ describe( 'validation', () => {
 
 		it( 'returns without empty non-boolean, non-enumerated attributes', () => {
 			const pairs = getMeaningfulAttributePairs( {
+				type: 'StartTag',
 				attributes: [ [ 'class', '' ] ],
 			} );
 
@@ -112,6 +121,7 @@ describe( 'validation', () => {
 
 		it( 'returns with empty boolean attributes', () => {
 			const pairs = getMeaningfulAttributePairs( {
+				type: 'StartTag',
 				attributes: [ [ 'disabled', '' ] ],
 			} );
 
@@ -120,6 +130,7 @@ describe( 'validation', () => {
 
 		it( 'returns with empty enumerated attributes', () => {
 			const pairs = getMeaningfulAttributePairs( {
+				type: 'StartTag',
 				attributes: [ [ 'contenteditable', '' ] ],
 			} );
 
@@ -128,6 +139,7 @@ describe( 'validation', () => {
 
 		it( 'returns with empty data- attributes', () => {
 			const pairs = getMeaningfulAttributePairs( {
+				type: 'StartTag',
 				attributes: [ [ 'data-foo', '' ] ],
 			} );
 
@@ -138,8 +150,8 @@ describe( 'validation', () => {
 	describe( 'isEquivalentTextTokens()', () => {
 		it( 'should return false if not equal with collapsed whitespace', () => {
 			const isEqual = isEquivalentTextTokens(
-				{ chars: '  a \t  b \n c' },
-				{ chars: 'a \n c \t b  ' }
+				{ type: 'Chars', chars: '  a \t  b \n c' },
+				{ type: 'Chars', chars: 'a \n c \t b  ' }
 			);
 
 			expect( console ).toHaveWarned();
@@ -148,8 +160,8 @@ describe( 'validation', () => {
 
 		it( 'should return true if equal with collapsed whitespace', () => {
 			const isEqual = isEquivalentTextTokens(
-				{ chars: '  a \t  b \n c' },
-				{ chars: 'a \n b \t c  ' }
+				{ type: 'Chars', chars: '  a \t  b \n c' },
+				{ type: 'Chars', chars: 'a \n b \t c  ' }
 			);
 
 			expect( isEqual ).toBe( true );
@@ -354,8 +366,8 @@ describe( 'validation', () => {
 		describe( '.StartTag()', () => {
 			it( 'returns false if tag name not the same', () => {
 				const isEqual = isEqualTokensOfType.StartTag(
-					{ tagName: 'p' },
-					{ tagName: 'section' }
+					{ type: 'StartTag', tagName: 'p' },
+					{ type: 'StartTag', tagName: 'section' }
 				);
 
 				expect( console ).toHaveWarned();
@@ -365,10 +377,12 @@ describe( 'validation', () => {
 			it( 'returns false if tag name the same but attributes not', () => {
 				const isEqual = isEqualTokensOfType.StartTag(
 					{
+						type: 'StartTag',
 						tagName: 'p',
 						attributes: [ [ 'class', 'b   a c' ] ],
 					},
 					{
+						type: 'StartTag',
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
@@ -387,6 +401,7 @@ describe( 'validation', () => {
 			it( 'returns true if tag name the same and attributes the same', () => {
 				const isEqual = isEqualTokensOfType.StartTag(
 					{
+						type: 'StartTag',
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'b   a c' ],
@@ -397,6 +412,7 @@ describe( 'validation', () => {
 						],
 					},
 					{
+						type: 'StartTag',
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
@@ -414,6 +430,7 @@ describe( 'validation', () => {
 			it( 'returns true if tag and attributes names are case insensitive the same', () => {
 				const isEqual = isEqualTokensOfType.StartTag(
 					{
+						type: 'StartTag',
 						tagName: 'P',
 						attributes: [
 							[ 'CLASS', 'a b' ],
@@ -421,6 +438,7 @@ describe( 'validation', () => {
 						],
 					},
 					{
+						type: 'StartTag',
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'a b' ],
@@ -709,16 +727,24 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'validateBlock()', () => {
+		const createTestBlock = (
+			attributes: { fruit?: string } = {},
+			originalContent = ''
+		): Block< { fruit?: string } > => ( {
+			clientId: 'test-client-id',
+			name: 'core/test-block',
+			isValid: true,
+			attributes,
+			innerBlocks: [],
+			originalContent,
+		} );
+
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attrs: {
-					fruit: 'Bananas',
-				},
-				originalContent: 'Apples',
-			} );
+			const [ isValid ] = validateBlock(
+				createTestBlock( { fruit: 'Bananas' }, 'Apples' )
+			);
 
 			expect( isValid ).toBe( false );
 		} );
@@ -731,13 +757,9 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attrs: {
-					fruit: 'Bananas',
-				},
-				originalContent: 'Bananas',
-			} );
+			const [ isValid ] = validateBlock(
+				createTestBlock( { fruit: 'Bananas' }, 'Bananas' )
+			);
 
 			expect( isValid ).toBe( false );
 		} );
@@ -745,11 +767,9 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const [ isValid ] = validateBlock( {
-				name: 'core/test-block',
-				attributes: { fruit: 'Bananas' },
-				originalContent: 'Bananas',
-			} );
+			const [ isValid ] = validateBlock(
+				createTestBlock( { fruit: 'Bananas' }, 'Bananas' )
+			);
 
 			expect( isValid ).toBe( true );
 		} );

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { attr } from 'hpq';
+import type { BlockAttribute, BlockType } from '../../../types';
 import {
 	getBlockAttribute,
 	getBlockAttributes,
@@ -91,7 +92,7 @@ describe( 'attributes parsing', () => {
 
 	describe( 'isValidByType', () => {
 		it( 'returns true if type undefined', () => {
-			expect( isValidByType( null ) ).toBe( true );
+			expect( isValidByType( null, undefined ) ).toBe( true );
 		} );
 
 		it( 'returns false if value is not one of types array', () => {
@@ -113,7 +114,7 @@ describe( 'attributes parsing', () => {
 
 	describe( 'isValidByEnum', () => {
 		it( 'returns true if enum set undefined', () => {
-			expect( isValidByEnum( 2 ) ).toBe( true );
+			expect( isValidByEnum( 2, undefined ) ).toBe( true );
 		} );
 
 		it( 'returns false if value is not of enum set', () => {
@@ -203,14 +204,19 @@ describe( 'attributes parsing', () => {
 	} );
 
 	describe( 'getBlockAttribute', () => {
+		const emptyNode = document.createElement( 'div' );
+		const chickenNode = document.createElement( 'div' );
+		chickenNode.innerHTML = '<div>chicken</div>';
+
 		it( 'should return the comment attribute value', () => {
 			const value = getBlockAttribute(
 				'number',
 				{
 					type: 'number',
 				},
-				'',
-				{ number: 10 }
+				emptyNode,
+				{ number: 10 },
+				undefined
 			);
 
 			expect( value ).toBe( 10 );
@@ -223,10 +229,11 @@ describe( 'attributes parsing', () => {
 					type: [ 'string', 'boolean' ],
 					enum: [ 'all', 'insert', false ],
 				},
-				'',
+				emptyNode,
 				{
 					templateLock: false,
-				}
+				},
+				undefined
 			);
 
 			expect( value ).toBe( false );
@@ -239,8 +246,9 @@ describe( 'attributes parsing', () => {
 					type: 'string',
 					default: 5,
 				},
-				'',
-				{ number: 10 }
+				emptyNode,
+				{ number: 10 },
+				undefined
 			);
 
 			expect( value ).toBe( 5 );
@@ -252,8 +260,9 @@ describe( 'attributes parsing', () => {
 				{
 					type: 'string',
 				},
-				'',
-				{ number: 10 }
+				emptyNode,
+				{ number: 10 },
+				undefined
 			);
 
 			expect( value ).toBe( undefined );
@@ -267,8 +276,9 @@ describe( 'attributes parsing', () => {
 					enum: [ 4, 5, 6 ],
 					default: 5,
 				},
-				'',
-				{ number: 10 }
+				emptyNode,
+				{ number: 10 },
+				undefined
 			);
 
 			expect( value ).toBe( 5 );
@@ -281,8 +291,9 @@ describe( 'attributes parsing', () => {
 					type: 'number',
 					enum: [ 4, 5, 6 ],
 				},
-				'',
-				{ number: 10 }
+				emptyNode,
+				{ number: 10 },
+				undefined
 			);
 
 			expect( value ).toBe( undefined );
@@ -296,8 +307,9 @@ describe( 'attributes parsing', () => {
 					source: 'text',
 					selector: 'div',
 				},
-				'<div>chicken</div>',
-				{}
+				chickenNode,
+				{},
+				undefined
 			);
 			expect( value ).toBe( 'chicken' );
 		} );
@@ -309,9 +321,10 @@ describe( 'attributes parsing', () => {
 					type: 'string',
 					source: 'meta',
 					meta: 'content',
-				},
-				'<div>chicken</div>',
-				{}
+				} as unknown as BlockAttribute,
+				chickenNode,
+				{},
+				undefined
 			);
 			expect( value ).toBeUndefined();
 		} );
@@ -328,7 +341,7 @@ describe( 'attributes parsing', () => {
 						selector: 'div',
 					},
 				},
-			};
+			} as unknown as BlockType;
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
 
@@ -359,7 +372,7 @@ describe( 'attributes parsing', () => {
 						default: 'ok',
 					},
 				},
-			};
+			} as unknown as BlockType;
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: null, invalid: true };
