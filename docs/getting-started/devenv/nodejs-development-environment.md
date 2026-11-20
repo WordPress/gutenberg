@@ -28,16 +28,17 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.4/install.sh | bash
 If needed, you can also install specific versions of `node`. For example, install version 18 by running `nvm install 18`, and switch between different versions by running `nvm use [version-number]`. See the `nvm` [usage guide](https://github.com/nvm-sh/nvm#usage) for more details.
 
 Some projects, like Gutenberg, include an [`.nvmrc`](https://github.com/WordPress/gutenberg/blob/trunk/.nvmrc) file which specifies the version of `node` that should be used. In this case, running `nvm use` will automatically select the correct version. If the version is not yet installed, you will get an error that tells you what version needs to be added. Run `nvm install [version-number]` followed by `nvm use`.
+On Windows OS, .nvmrc may not be loaded, so please check the version listed in .nvmrc and run `nvm use [version_number]`. For example, the .nvmrc file contains `20` version number then run the `nvm use 20`.
 
 ## Node.js installation on Windows and others
 
-You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux. 
+You can [download a Node.js installer](https://nodejs.org/en/download/) directly from the main Node.js website. The latest version is recommended. Installers are available for Windows and Mac, and binaries are available for Linux.
 
 Microsoft also provides a [detailed guide](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-windows#install-nvm-windows-nodejs-and-npm) on how to install `nvm` and Node.js on Windows and WSL.
 
 ## Troubleshooting
 
-If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file. 
+If you encounter the error `zsh: command not found: nvm` when attempting to install `node`, you might need to create the default profile file.
 
 The default shell is `zsh` on macOS, so create the profile file by running `touch ~/.zshrc` in the terminal. It's fine to run if the file already exists. The default profile is `bash` for Ubuntu, including WSL, so use `touch ~/.bashrc` instead. Then repeat steps 2-4.
 
