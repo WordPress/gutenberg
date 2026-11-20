@@ -8,14 +8,19 @@
 
 // Match the spacing and dividers of the `Menu` component in `@wordpress/ui`.
 // The `Dropdown` rules for menu groups skip this popover, so it sets its own.
+// Groups inside another popover rendered inline in this menu, such as a plain
+// `Dropdown`, belong to that popover and keep its styles. `:where()` keeps
+// the exclusion from adding specificity.
+$owned-by-menu: ":where(:not(.components-dropdown-menu__popover .components-popover:not(.components-dropdown-menu__popover) *))";
+
 .components-dropdown-menu__popover {
 	// The popover pads the menu, so groups don't need their own padding.
-	.components-popover__content {
+	> .components-popover__content {
 		padding: var(--wpds-dimension-padding-xs);
 	}
 
 	// Override the `MenuGroup` defaults.
-	.components-menu-group + .components-menu-group {
+	.components-menu-group + .components-menu-group#{$owned-by-menu} {
 		padding-top: 0;
 		border-top: none;
 
@@ -34,11 +39,11 @@
 		}
 	}
 
-	&.is-alternate .components-menu-group + .components-menu-group::before {
+	&.is-alternate .components-menu-group + .components-menu-group#{$owned-by-menu}::before {
 		border-top-color: $gray-900;
 	}
 
-	.components-menu-group__label {
+	.components-menu-group__label#{$owned-by-menu} {
 		display: flex;
 		align-items: center;
 		min-height: var(--wpds-dimension-size-sm);
