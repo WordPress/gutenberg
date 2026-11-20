@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   Clipboard: Include resolved bound content when copying blocks, preserving bindings and inline formatting ([#84428](https://github.com/WordPress/gutenberg/pull/84428)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements

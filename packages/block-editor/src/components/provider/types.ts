@@ -25,7 +25,20 @@ declare global {
 export interface BlockRefsContextValue {
 	refsMap: ObservableMap< string, Element | null >;
 	eventHandlers: Map< string, { current?: BlockEventHandlers } >;
+	attributesForCopy?: AttributesForCopy;
 }
+
+/** Resolved bound attributes registered by each mounted block instance. */
+export interface BoundAttributesForCopy {
+	attributes: Block[ 'attributes' ];
+	computedAttributes: Record< string, unknown >;
+	boundAttributeNames: string[];
+}
+
+export type AttributesForCopy = Map<
+	string,
+	Map< object, BoundAttributesForCopy >
+>;
 
 /**
  * Props of `BlockRefsProvider`.

@@ -1,9 +1,11 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
+import { BlockRefs } from '../provider/block-refs-provider';
 import type { TreeBlock } from '../../store/types';
 import type { ListViewSelectBlock } from './types';
 
@@ -15,6 +17,7 @@ export default function useClipboardHandler( {
 	selectBlock: ListViewSelectBlock;
 } ) {
 	const registry = useRegistry();
+	const { attributesForCopy } = useContext( BlockRefs );
 	const {
 		getBlockOrder,
 		getBlockRootClientId,
@@ -118,7 +121,12 @@ export default function useClipboardHandler( {
 				const blocks = getBlocksByClientId(
 					selectedBlockClientIds
 				) as TreeBlock[];
-				setClipboardBlocks( event, blocks, registry );
+				setClipboardBlocks(
+					event,
+					blocks,
+					registry,
+					attributesForCopy
+				);
 			}
 
 			if ( event.type === 'cut' ) {

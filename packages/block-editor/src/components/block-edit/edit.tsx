@@ -6,7 +6,13 @@ import {
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useCallback, useContext, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import type { ComponentType } from 'react';
 import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
@@ -17,6 +23,8 @@ import {
 	replacePatternOverridesDefaultBinding,
 } from '../../utils/block-bindings';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import { BlockRefs } from '../provider/block-refs-provider';
+import { isPreviewModeKey, useBlockEditContext } from './context';
 import type { BlockEditPublicProps } from './types';
 
 const Edit = ( props: BlockEditPublicProps ) => {
@@ -54,6 +62,9 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 		bindableAttributes,
 		blockBindingsSources: registeredSources = NO_SOURCES,
 	} = useContext( PrivateBlockContext );
+	const { attributesForCopy } = useContext( BlockRefs );
+	const { [ isPreviewModeKey ]: isPreviewMode } = useBlockEditContext();
+	const instanceToken = useRef( {} ).current;
 
 	const { blockBindings, context, hasPatternOverrides } = useMemo( () => {
 		return {
@@ -169,6 +180,56 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 			registeredSources,
 		]
 	);
+
+	const boundAttributeNames = useMemo(
+		() =>
+			Object.entries( blockBindings ?? {} )
+				.filter(
+					( [ attributeName, binding ] ) =>
+						bindableAttributes?.includes( attributeName ) &&
+						registeredSources[ binding?.source as string ]
+				)
+				.map( ( [ attributeName ] ) => attributeName ),
+		[ bindableAttributes, blockBindings, registeredSources ]
+	);
+	useLayoutEffect( () => {
+		if (
+			! clientId ||
+			! attributesForCopy ||
+			! boundAttributeNames.length ||
+			isPreviewMode ||
+			blockContext.query !== undefined ||
+			blockContext.queryId !== undefined
+		) {
+			return;
+		}
+		const instances = attributesForCopy.get( clientId ) ?? new Map();
+		instances.set( instanceToken, {
+			attributes,
+			computedAttributes,
+			boundAttributeNames,
+		} );
+		attributesForCopy.set( clientId, instances );
+		return () => {
+			instances.delete( instanceToken );
+			if (
+				! instances.size &&
+				attributesForCopy.get( clientId ) === instances
+			) {
+				attributesForCopy.delete( clientId );
+			}
+		};
+	}, [
+		attributes,
+		attributesForCopy,
+		blockContext.query,
+		blockContext.queryId,
+		boundAttributeNames,
+		clientId,
+		computedAttributes,
+		instanceToken,
+		isPreviewMode,
+	] );
 
 	const setBoundAttributes = useCallback(
 		( nextAttributes: Record< string, unknown > ) => {
