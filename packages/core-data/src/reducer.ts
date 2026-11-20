@@ -166,6 +166,7 @@ export function themeGlobalStyleVariations(
 }
 
 const withMultiEntityRecordEdits =
+	( entityConfig: EntityConfig ) =>
 	(
 		reducer: (
 			state: EntityRecordsState | undefined,
@@ -186,6 +187,11 @@ const withMultiEntityRecordEdits =
 				};
 				const persistedRecord =
 					state?.queriedData?.items?.default?.[ recordId ];
+				const saving = state?.saving?.[ recordId ];
+				const pendingEdits =
+					saving?.pending && ! saving.isAutosave
+						? state?.edits?.[ recordId ]
+						: undefined;
 				const edits = Object.fromEntries(
 					Object.entries( changes ).map( ( [ key, value ] ) => [
 						key,
@@ -200,7 +206,12 @@ const withMultiEntityRecordEdits =
 					recordId,
 					// Clear edits matching the persisted record so the entity is
 					// no longer dirty after undoing back to its saved state.
-					edits: clearUnchangedEdits( edits, persistedRecord ),
+					edits: clearUnchangedEdits(
+						edits,
+						persistedRecord,
+						entityConfig.partialEdits,
+						pendingEdits
+					),
 				} );
 			} );
 			return newState;
@@ -223,7 +234,7 @@ const withMultiEntityRecordEdits =
 function entity( entityConfig: EntityConfig ) {
 	// `compose` returns an untyped function, cast to the reducer it builds.
 	return compose( [
-		withMultiEntityRecordEdits,
+		withMultiEntityRecordEdits( entityConfig ),
 
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
@@ -272,6 +283,55 @@ function entity( entityConfig: EntityConfig ) {
 							const nextEdits = Object.keys( edits ).reduce<
 								Record< string, unknown >
 							>( ( acc, key ) => {
+								if ( entityConfig.partialEdits?.[ key ] ) {
+									const partial = edits[ key ] as Record<
+										string,
+										unknown
+									>;
+									const remaining = Object.fromEntries(
+										Object.entries( partial ).filter(
+											( [ itemKey, value ] ) =>
+												! fastDeepEqual(
+													value,
+													(
+														record[ key ] as
+															| Record<
+																	string,
+																	unknown
+															  >
+															| undefined
+													 )?.[ itemKey ]
+												) &&
+												( ! action.persistedEdits?.[
+													key
+												] ||
+													! fastDeepEqual(
+														value,
+														(
+															action
+																.persistedEdits[
+																key
+															] as Record<
+																string,
+																unknown
+															>
+														 )[ itemKey ]
+													) )
+										)
+									);
+									const remainingCount =
+										Object.keys( remaining ).length;
+									if ( remainingCount ) {
+										// Filtering only removes keys, so keep the original
+										// object when receiving data clears no partial edits.
+										acc[ key ] =
+											remainingCount ===
+											Object.keys( partial ).length
+												? partial
+												: remaining;
+									}
+									return acc;
+								}
 								// If the edited value is still different to the persisted value,
 								// keep the edited value in edits.
 								if (
@@ -314,6 +374,29 @@ function entity( entityConfig: EntityConfig ) {
 							...state[ action.recordId as ItemId ],
 							...action.edits,
 						};
+						for ( const key of Object.keys( action.edits ) ) {
+							if (
+								entityConfig.partialEdits?.[ key ] &&
+								action.edits[ key ] !== undefined
+							) {
+								const partial: Record< string, unknown > = {
+									...( state[ action.recordId as ItemId ]?.[
+										key
+									] as object ),
+									...( action.edits[ key ] as object ),
+								};
+								for ( const itemKey of Object.keys(
+									partial
+								) ) {
+									if ( partial[ itemKey ] === undefined ) {
+										delete partial[ itemKey ];
+									}
+								}
+								nextEdits[ key ] = Object.keys( partial ).length
+									? partial
+									: undefined;
+							}
+						}
 						Object.keys( nextEdits ).forEach( ( key ) => {
 							// Delete cleared edits so that the properties
 							// are not considered dirty.
