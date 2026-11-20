@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=10.0.0",
-		"npm": ">=6.9.0 <7"
+		"npm": ">=6.9.0"
 	},
 	"config": {
 		"IS_GUTENBERG_PLUGIN": true
@@ -242,12 +242,12 @@
 		"build:packages": "npm run build:package-types && node ./bin/packages/build.js",
 		"build:package-types": "node ./bin/packages/validate-typescript-version.js && tsc --build",
 		"build:plugin-zip": "./bin/build-plugin-zip.sh",
-		"build": "npm run build:packages && wp-scripts build",
+		"build": "npm run build:packages && cross-env NODE_OPTIONS=--openssl-legacy-provider wp-scripts build",
 		"changelog": "./bin/plugin/cli.js changelog",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2 --ignore=@react-native-community/cli,@react-native-community/cli-platform-ios\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
-		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
+		"dev": "npm run build:packages && concurrently \"cross-env NODE_OPTIONS=--openssl-legacy-provider wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "concurrently \"node ./bin/packages/watch.js\" \"tsc --build --watch\"",
 		"distclean": "rimraf node_modules packages/*/node_modules",
 		"docs:gen": "node ./docs/tool/index.js",
@@ -282,7 +282,7 @@
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
-		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
+		"test-unit": "cross-env NODE_OPTIONS=--openssl-legacy-provider wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test-unit:date": "./bin/unit-test-date.sh",
 		"test-unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
