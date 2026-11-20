@@ -449,11 +449,12 @@
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: var(--wpds-color-background-interactive-brand-strong-active);
-		color: inherit;
+		background: var(--wpds-color-background-surface-neutral);
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 	&.is-selected.is-synced .block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.3);
+		color: $white;
 	}
 
 	.block-editor-list-view-block-select-button__block-visibility,
