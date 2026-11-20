@@ -1,10 +1,4 @@
-import type {
-	CSSProperties,
-	Dispatch,
-	ReactNode,
-	Ref,
-	SetStateAction,
-} from 'react';
+import type { CSSProperties, ReactNode, Ref } from 'react';
 import type { Layout } from '../../layouts/types';
 import type { GridRect } from './utils';
 import type { BlockStyleState, ChildLayoutBlockStyle } from '../../hooks/types';
@@ -26,6 +20,13 @@ export interface GridItemLayout {
 export interface GridItemAttributes {
 	style?: { layout?: GridItemLayout; [ key: string ]: unknown };
 	[ key: string ]: unknown;
+}
+
+export interface GridItemDimensions {
+	offsetWidth: number;
+	offsetHeight: number;
+	scrollWidth: number;
+	scrollHeight: number;
 }
 
 /**
@@ -138,28 +139,44 @@ export interface GridVisualizerCellProps {
 	color: string;
 	children?: ReactNode;
 	className?: string | false;
+	column?: number;
+	row?: number;
 }
 
 /**
- * A cell of a manual grid, and how it highlights the area a drag covers.
+ * An appender's position in a manual grid.
  */
 export interface GridVisualizerCellPosition {
 	column: number;
 	row: number;
 	gridClientId: string;
 	gridInfo: GridInfo;
-	setHighlightedRect: Dispatch< SetStateAction< GridRect | null > >;
 }
 
 /**
- * Drop zone handlers, called with the dragged block when it may drop.
+ * A dragged block and its resolved layout style.
  */
-export interface DropZoneWithValidationOptions {
-	validateDrag: ( srcClientId: string ) => boolean;
-	onDragEnter: ( srcClientId: string ) => void;
-	onDragLeave: () => void;
-	onDrop: ( srcClientId: string ) => void;
+export interface GridDropBlock {
+	clientId: string;
+	attributes: Record< string, unknown >;
+	selectedState: BlockStyleState | undefined;
+	layout: Record< string, unknown >;
 }
+
+export interface GridDropPlacement {
+	clientId: string;
+	rect: GridRect;
+}
+
+/**
+ * Measures dragged blocks once and places their footprints at the hovered cell.
+ */
+export type GetGridDropRects = (
+	blocks: GridDropBlock[],
+	column: number,
+	row: number,
+	preserveRelativePositions: boolean
+) => GridRect[];
 
 export interface AutoGridVisualizerProps {
 	gridInfo: GridInfo;
@@ -168,4 +185,5 @@ export interface AutoGridVisualizerProps {
 
 export interface ManualGridVisualizerProps extends AutoGridVisualizerProps {
 	gridClientId: string;
+	gridElement: Element;
 }
