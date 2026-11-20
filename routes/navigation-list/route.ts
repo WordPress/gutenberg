@@ -22,7 +22,10 @@ export const route = {
 			throw notFound();
 		}
 	},
-	title: () => __( 'Navigation' ),
+	title: () =>
+		( window as any ).__experimentalNavigationMenuEditing
+			? __( 'Menus' )
+			: __( 'Navigation' ),
 	canvas: async ( {
 		search,
 	}: {

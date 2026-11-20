@@ -6,14 +6,23 @@ import {
 	__experimentalItemGroup as ItemGroup,
 	Spinner as WCSpinner,
 } from '@wordpress/components';
-import { navigation } from '@wordpress/icons';
+import { navigation, plus } from '@wordpress/icons';
+import { cloneElement, useState } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { PRELOADED_NAVIGATION_MENUS_QUERY } from './constants';
+import MenuItemLabel from './menu-item-label';
+import AddMenuModal from './add-menu-modal';
+import SidebarButton from '../sidebar-button';
 import SingleNavigationMenu from '../sidebar-navigation-screen-navigation-menu/single-navigation-menu';
 import useNavigationMenuHandlers from '../sidebar-navigation-screen-navigation-menu/use-navigation-menu-handlers';
 import { unlock } from '../../lock-unlock';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
+
+const { useNavigationLocations } = unlock( blockLibraryPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 function buildMenuLabel( title, id, status ) {
@@ -34,7 +43,37 @@ function buildMenuLabel( title, id, status ) {
 	);
 }
 
+/**
+ * "Add menu", with the experiment on: opens a modal that creates a menu,
+ * then shows it.
+ */
+function AddMenuAction() {
+	const history = useHistory();
+	const [ isOpen, setIsOpen ] = useState( false );
+	return (
+		<>
+			<SidebarButton
+				icon={ plus }
+				label={ __( 'Add menu' ) }
+				onClick={ () => setIsOpen( true ) }
+			/>
+			{ isOpen && (
+				<AddMenuModal
+					onClose={ () => setIsOpen( false ) }
+					onCreated={ ( id ) =>
+						history.navigate( `/wp_navigation/${ id }` )
+					}
+				/>
+			) }
+		</>
+	);
+}
+
 export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
+	const isMenuEditing = !! globalThis.__experimentalNavigationMenuEditing;
+	// The menu open beside the list, if any.
+	const currentMenuId = useLocation().params?.postId;
+	const addMenu = isMenuEditing ? <AddMenuAction /> : undefined;
 	const {
 		records: navigationMenus,
 		isResolving: isResolvingNavigationMenus,
@@ -85,14 +124,24 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	if ( ! isLoading && ! hasNavigationMenus ) {
 		return (
 			<SidebarNavigationScreenWrapper
-				description={ __( 'No Navigation Menus found.' ) }
+				description={
+					globalThis.__experimentalNavigationMenuEditing
+						? __( 'No menus found.' )
+						: __( 'No Navigation Menus found.' )
+				}
 				backPath={ backPath }
+				actions={ addMenu }
 			/>
 		);
 	}
 
 	// if single menu then render it
-	if ( navigationMenus?.length === 1 ) {
+	// With the experiment on, the list always shows, so there's always a way
+	// back to all your menus.
+	if (
+		navigationMenus?.length === 1 &&
+		! globalThis.__experimentalNavigationMenuEditing
+	) {
 		return (
 			<SingleNavigationMenu
 				navigationMenu={ firstNavigationMenu }
@@ -107,17 +156,31 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 	}
 
 	return (
-		<SidebarNavigationScreenWrapper backPath={ backPath }>
+		<SidebarNavigationScreenWrapper
+			backPath={ backPath }
+			actions={ addMenu }
+		>
 			<ItemGroup className="edit-site-sidebar-navigation-screen-navigation-menus">
 				{ navigationMenus?.map( ( { id, title, status }, index ) => (
-					<NavMenuItem
+					<MenuListItem
 						postId={ id }
 						key={ id }
-						withChevron
+						withChevron={ ! isMenuEditing }
 						icon={ navigation }
+						aria-current={
+							isMenuEditing && String( id ) === currentMenuId
+								? true
+								: undefined
+						}
 					>
-						{ buildMenuLabel( title?.rendered, index + 1, status ) }
-					</NavMenuItem>
+						<MenuItemLabel navigationId={ id }>
+							{ buildMenuLabel(
+								title?.rendered,
+								index + 1,
+								status
+							) }
+						</MenuItemLabel>
+					</MenuListItem>
 				) ) }
 			</ItemGroup>
 		</SidebarNavigationScreenWrapper>
@@ -133,19 +196,57 @@ export function SidebarNavigationScreenWrapper( {
 } ) {
 	return (
 		<SidebarNavigationScreen
-			title={ title || __( 'Navigation' ) }
+			title={
+				title ||
+				( globalThis.__experimentalNavigationMenuEditing
+					? __( 'Menus' )
+					: __( 'Navigation' ) )
+			}
 			actions={ actions }
 			description={
-				description ||
-				__(
-					'Manage the menus that help visitors find their way around your site.'
-				)
+				// `null` for none.
+				description === null
+					? undefined
+					: description ||
+						__(
+							'Manage the menus that help visitors find their way around your site.'
+						)
 			}
 			backPath={ backPath }
 			content={ children }
 		/>
 	);
 }
+
+// The menu icon, faded, for a menu that isn't used anywhere.
+const UNUSED_MENU_ICON = cloneElement( navigation, {
+	style: { ...navigation.props.style, opacity: 0.4 },
+} );
+
+/**
+ * A menu in the list, whose icon is faded when it isn't used anywhere.
+ *
+ * @param {Object} props
+ * @param {number} props.postId The menu's ID.
+ */
+function UsageAwareMenuItem( { postId, ...props } ) {
+	const { locations, isResolving } = useNavigationLocations();
+	const isUnused =
+		! isResolving &&
+		! locations.some( ( location ) => location.menuIds.includes( postId ) );
+
+	return (
+		<NavMenuItem
+			postId={ postId }
+			{ ...props }
+			icon={ isUnused ? UNUSED_MENU_ICON : props.icon }
+		/>
+	);
+}
+
+const MenuListItem = globalThis.__experimentalNavigationMenuEditing
+	? UsageAwareMenuItem
+	: ( props ) => <NavMenuItem { ...props } />;
 
 const NavMenuItem = ( { postId, ...props } ) => {
 	return (

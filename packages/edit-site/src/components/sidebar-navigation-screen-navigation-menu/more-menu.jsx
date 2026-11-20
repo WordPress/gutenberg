@@ -48,15 +48,19 @@ export default function ScreenNavigationMoreMenu( props ) {
 						>
 							{ __( 'Rename' ) }
 						</MenuItem>
-						<MenuItem
-							onClick={ () => {
-								history.navigate(
-									`/wp_navigation/${ menuId }?canvas=edit`
-								);
-							} }
-						>
-							{ __( 'Edit' ) }
-						</MenuItem>
+						{ /* The menu screen is where a menu is edited with the
+						experiment on, so it has no "Edit". */ }
+						{ ! globalThis.__experimentalNavigationMenuEditing && (
+							<MenuItem
+								onClick={ () => {
+									history.navigate(
+										`/wp_navigation/${ menuId }?canvas=edit`
+									);
+								} }
+							>
+								{ __( 'Edit' ) }
+							</MenuItem>
+						) }
 						<MenuItem
 							onClick={ () => {
 								onDuplicate();

@@ -58,7 +58,11 @@ import { useInnerBlocks } from './use-inner-blocks';
 import { detectColors } from './utils';
 import ManageMenusButton from './manage-menus-button';
 import MenuInspectorControls from './menu-inspector-controls';
+import AutoMenuBlockControls from '../menu-list-view/auto-menu-block-controls';
+import { useIsAutoMenu } from '../menu-list-view/auto-menu';
 import DeletedNavigationWarning from './deleted-navigation-warning';
+import NoMenuWarning from './no-menu-warning';
+import NavigationMenuSelector from './navigation-menu-selector';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
@@ -72,6 +76,11 @@ import {
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 
+const CHOOSE_MENU_TOGGLE_PROPS = {
+	variant: 'secondary',
+	__next40pxDefaultSize: true,
+};
+
 /**
  * Component that renders the Add page button for the Navigation block.
  *
@@ -82,6 +91,8 @@ const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const { getBlockCount } = useSelect( blockEditorStore );
+	// An Auto menu is customized first, so pages aren't listed twice.
+	const isAutoMenu = useIsAutoMenu( clientId );
 
 	const onAddPage = useCallback( () => {
 		// Get the current number of blocks to insert at the end
@@ -96,6 +107,10 @@ function NavigationAddPageButton( { clientId } ) {
 		// Insert the block at the end of the navigation
 		insertBlock( newBlock, blockCount, clientId );
 	}, [ clientId, insertBlock, getBlockCount ] );
+
+	if ( isAutoMenu ) {
+		return null;
+	}
 
 	return (
 		<BlockControls>
@@ -279,7 +294,10 @@ function Navigation( {
 
 	const setRef = useCallback(
 		( postId ) => {
-			setAttributes( { ref: postId } );
+			// Choosing a menu ends a "no menu" state.
+			setAttributes(
+				postId ? { ref: postId, noFallback: false } : { ref: postId }
+			);
 		},
 		[ setAttributes ]
 	);
@@ -496,7 +514,13 @@ function Navigation( {
 
 	const { getNavigationFallbackId } = unlock( useSelect( coreStore ) );
 
-	const navigationFallbackId = ! ( ref || hasUnsavedBlocks )
+	// A block told to show no menu doesn't get the site's fallback menu, and
+	// shows the placeholder for choosing one instead.
+	const navigationFallbackId = ! (
+		ref ||
+		hasUnsavedBlocks ||
+		attributes.noFallback
+	)
 		? getNavigationFallbackId()
 		: null;
 
@@ -1051,6 +1075,45 @@ function Navigation( {
 	 *
 	 */
 
+	// Told to show no menu: say so and offer the choice of a menu, rather
+	// than falling back to the site's newest menu.
+	if ( attributes.noFallback && ! ref && ! hasUncontrolledInnerBlocks ) {
+		return (
+			<>
+				<MenuInspectorControls
+					clientId={ clientId }
+					currentMenuId={ ref }
+					isNavigationMenuMissing={ isNavigationMenuMissing }
+					isManageMenusButtonDisabled={ isManageMenusButtonDisabled }
+					onCreateNew={ createUntitledEmptyNavigationMenu }
+					onSelectClassicMenu={ onSelectClassicMenu }
+					onSelectNavigationMenu={ onSelectNavigationMenu }
+					isLoading={ isLoading }
+					blockEditingMode={ blockEditingMode }
+				/>
+				<TagName { ...blockProps }>
+					<NoMenuWarning
+						chooseMenu={
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onCreateNew={
+									createUntitledEmptyNavigationMenu
+								}
+								icon={ null }
+								text={ __( 'Choose a menu' ) }
+								toggleProps={ CHOOSE_MENU_TOGGLE_PROPS }
+							/>
+						}
+					/>
+				</TagName>
+			</>
+		);
+	}
+
 	if ( isPlaceholder && CustomPlaceholder ) {
 		return (
 			<TagName { ...blockProps }>
@@ -1088,6 +1151,7 @@ function Navigation( {
 			{ blockEditingMode === 'default' && stylingInspectorControls }
 			<EntityProvider kind="postType" type="wp_navigation" id={ ref }>
 				<RecursionProvider uniqueId={ recursionId }>
+					<AutoMenuBlockControls clientId={ clientId } />
 					{ blockEditingMode === 'contentOnly' &&
 						isEntityAvailable && (
 							<NavigationAddPageButton clientId={ clientId } />

@@ -1,0 +1,52 @@
+// Auto menu (#86934), shown in place of the menu's list view.
+.wp-block-navigation-auto-menu {
+	padding-block: var(--wpds-dimension-padding-xs);
+
+	h3,
+	h4,
+	p {
+		margin: 0;
+	}
+
+	.wp-block-navigation-auto-menu__customize {
+		justify-content: center;
+	}
+
+	.wp-block-navigation-auto-menu__pages-heading {
+		margin-block-start: var(--wpds-dimension-gap-sm);
+		color: var(--wpds-color-foreground-content-neutral-weak);
+		text-transform: uppercase;
+		font-weight: 500;
+		font-size: 11px;
+	}
+}
+
+// Read only: the pages are listed, not editable.
+.wp-block-navigation-auto-menu__pages {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+
+	.wp-block-navigation-auto-menu__pages {
+		padding-inline-start: var(--wpds-dimension-padding-lg);
+	}
+
+	li {
+		margin: 0;
+	}
+}
+
+.wp-block-navigation-auto-menu__page {
+	display: block;
+	padding-block: 6px;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+.wp-block-navigation-auto-menu__toolbar-popover {
+	width: 240px;
+
+	h3,
+	p {
+		margin: 0;
+	}
+}

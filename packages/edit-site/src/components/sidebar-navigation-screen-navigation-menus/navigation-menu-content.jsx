@@ -1,17 +1,18 @@
-import {
-	privateApis as blockEditorPrivateApis,
-	store as blockEditorStore,
-	BlockList,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore, BlockList } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
+import { useState } from '@wordpress/element';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { unlock } from '../../lock-unlock';
+import AddNewPostModal from '../add-new-post';
 import LeafMoreMenu from './leaf-more-menu';
 
-const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
+const { NavigationLinkUI, NavigationMenuListView } = unlock(
+	blockLibraryPrivateApis
+);
+const { useHistory } = unlock( routerPrivateApis );
 
 // The sidebar's link search lists only these blocks, which work as menu items
 // without editing them from the sidebar, which is not available yet. The other
@@ -92,6 +93,10 @@ export default function NavigationMenuContent( { rootClientId } ) {
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const history = useHistory();
+	// An Auto menu's "Add a page" opens the same dialog as the Pages screen,
+	// and then the new page, as the Pages screen does.
+	const [ isAddingPage, setIsAddingPage ] = useState( false );
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -99,18 +104,33 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		<>
 			{ ! isLoading && ! hasChildren && (
 				<p className="edit-site-sidebar-navigation-screen-navigation-menus__empty-message">
-					{ __( 'This Navigation Menu is empty.' ) }
+					{ globalThis.__experimentalNavigationMenuEditing
+						? __( 'This menu is empty.' )
+						: __( 'This Navigation Menu is empty.' ) }
 				</p>
 			) }
 			{ ! isLoading && (
-				<PrivateListView
+				<NavigationMenuListView
 					rootClientId={ listViewRootClientId }
+					navigationClientId={ rootClientId }
+					// The screen's description says it's an Auto menu.
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					additionalBlockContent={ SidebarNavigationLinkUI }
 					showContentPopover
 					isExpanded
+					onAddPage={ () => setIsAddingPage( true ) }
+				/>
+			) }
+			{ isAddingPage && (
+				<AddNewPostModal
+					postType="page"
+					onSave={ ( { type, id } ) => {
+						setIsAddingPage( false );
+						history.navigate( `/${ type }/${ id }?canvas=edit` );
+					} }
+					onClose={ () => setIsAddingPage( false ) }
 				/>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">

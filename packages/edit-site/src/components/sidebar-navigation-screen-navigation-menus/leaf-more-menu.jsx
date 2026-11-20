@@ -5,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
@@ -12,6 +13,7 @@ const POPOVER_PROPS = {
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { CreateSubmenuMenuGroup } = unlock( blockLibraryPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
@@ -108,6 +110,14 @@ export default function LeafMoreMenu( props ) {
 							</MenuItem>
 						) }
 					</MenuGroup>
+					<CreateSubmenuMenuGroup
+						clientId={ clientId }
+						onClose={ onClose }
+						updateExpansion={ props.updateExpansion }
+						setInsertedBlockClientId={
+							props.setInsertedBlockClientId
+						}
+					/>
 					<MenuGroup>
 						<MenuItem
 							onClick={ () => {

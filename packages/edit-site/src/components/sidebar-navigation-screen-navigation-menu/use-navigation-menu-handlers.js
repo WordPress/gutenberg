@@ -30,7 +30,9 @@ function useDeleteNavigationMenu() {
 				}
 			);
 			createSuccessNotice(
-				__( 'Navigation Menu successfully deleted.' ),
+				globalThis.__experimentalNavigationMenuEditing
+					? __( 'Menu deleted.' )
+					: __( 'Navigation Menu successfully deleted.' ),
 				{
 					type: 'snackbar',
 				}
@@ -101,9 +103,14 @@ function useSaveNavigationMenu() {
 					throwOnError: true,
 				}
 			);
-			createSuccessNotice( __( 'Renamed Navigation Menu' ), {
-				type: 'snackbar',
-			} );
+			createSuccessNotice(
+				globalThis.__experimentalNavigationMenuEditing
+					? __( 'Menu renamed.' )
+					: __( 'Renamed Navigation Menu' ),
+				{
+					type: 'snackbar',
+				}
+			);
 		} catch ( error ) {
 			// Revert to original in case of error.
 			editEntityRecord( 'postType', postType, postId, originalRecord );
@@ -155,9 +162,14 @@ function useDuplicateNavigationMenu() {
 			);
 
 			if ( savedRecord ) {
-				createSuccessNotice( __( 'Duplicated Navigation Menu' ), {
-					type: 'snackbar',
-				} );
+				createSuccessNotice(
+					globalThis.__experimentalNavigationMenuEditing
+						? __( 'Menu duplicated.' )
+						: __( 'Duplicated Navigation Menu' ),
+					{
+						type: 'snackbar',
+					}
+				);
 				history.navigate( `/wp_navigation/${ savedRecord.id }` );
 			}
 		} catch ( error ) {

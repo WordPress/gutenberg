@@ -39,7 +39,9 @@ export const POST_TYPE_LABELS = {
 	[ TEMPLATE_POST_TYPE ]: __( 'Template' ),
 	[ TEMPLATE_PART_POST_TYPE ]: __( 'Template part' ),
 	[ PATTERN_TYPES.user ]: __( 'Pattern' ),
-	[ NAVIGATION_POST_TYPE ]: __( 'Navigation' ),
+	[ NAVIGATION_POST_TYPE ]: globalThis.__experimentalNavigationMenuEditing
+		? __( 'Menu' )
+		: __( 'Navigation' ),
 };
 
 // DataViews constants

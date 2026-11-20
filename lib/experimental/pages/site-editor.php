@@ -31,7 +31,12 @@ function gutenberg_site_editor_register_default_menu_items() {
 	// The screen edits `wp_navigation` posts, which only block themes render.
 	// Classic themes manage their menus through Appearance > Menus instead.
 	if ( wp_is_block_theme() ) {
-		gutenberg_register_site_editor_v2_menu_item( 'navigation', __( 'Navigation', 'gutenberg' ), '/navigation', '' );
+		gutenberg_register_site_editor_v2_menu_item(
+			'navigation',
+			gutenberg_is_experiment_enabled( 'gutenberg-navigation-menu-editing' ) ? __( 'Menus', 'gutenberg' ) : __( 'Navigation', 'gutenberg' ),
+			'/navigation',
+			''
+		);
 	}
 
 	gutenberg_register_site_editor_v2_menu_item( 'pages', __( 'Pages', 'gutenberg' ), '/types/page', '' );

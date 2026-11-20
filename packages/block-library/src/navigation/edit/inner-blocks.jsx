@@ -8,6 +8,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
+import isNavigationMenuEditingEnabled from '../menu-list-view/is-enabled';
 
 export default function NavigationInnerBlocks( {
 	clientId,
@@ -73,8 +74,16 @@ export default function NavigationInnerBlocks( {
 	// As an exception to other blocks which feature nesting, the appender stays
 	// visible even when a child block (or a submenu item) is selected.
 	// See https://github.com/WordPress/gutenberg/issues/37572.
+	// An Auto menu is only its Page List: pages are added to it by publishing
+	// them, so there's no appender to add anything alongside it.
+	const isAutoMenu =
+		isNavigationMenuEditingEnabled() &&
+		blocks?.length === 1 &&
+		blocks[ 0 ].name === 'core/page-list';
 	let renderAppender = false;
-	if ( isSelected && ! hasMenuItems ) {
+	if ( isAutoMenu ) {
+		renderAppender = false;
+	} else if ( isSelected && ! hasMenuItems ) {
 		renderAppender = InnerBlocks.ButtonBlockAppender;
 	} else if ( parentOrChildHasSelection || hasSelectedDescendant ) {
 		renderAppender = InnerBlocks.DefaultBlockAppender;

@@ -29,7 +29,11 @@ export default function RenameModal( { menuTitle, onClose, onSave } ) {
 				<VStack spacing="3">
 					<TextControl
 						value={ editedMenuTitle }
-						placeholder={ __( 'Navigation title' ) }
+						placeholder={
+							globalThis.__experimentalNavigationMenuEditing
+								? __( 'Menu name' )
+								: __( 'Navigation title' )
+						}
 						onChange={ setEditedMenuTitle }
 						label={ __( 'Name' ) }
 					/>

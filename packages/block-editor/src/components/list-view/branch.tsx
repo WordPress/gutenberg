@@ -7,7 +7,11 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useInsertedBlockClientId, useListViewTreeState } from './context';
+import {
+	useInsertedBlockClientId,
+	useListViewContext,
+	useListViewTreeState,
+} from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -104,13 +108,19 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		draggedClientIds,
 	} = useListViewTreeState();
 	const insertedBlockClientId = useInsertedBlockClientId();
+	const { appenderParentClientIds } = useListViewContext();
 
 	if ( ! canParentExpand ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
+	// Only show the appender at the first level, unless a consumer asks for
+	// one inside a specific nested branch.
+	const showAppender =
+		showAppenderProp &&
+		( level === 1 ||
+			( !! parentId &&
+				!! appenderParentClientIds?.includes( parentId ) ) );
 	const filteredBlocks = blocks.filter( Boolean );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
@@ -194,7 +204,14 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			index === 0 ||
 			index === blockCount - 1;
 
-		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
+		// A block that has its own appender row shows its branch even when
+		// it is empty, so the appender is reachable.
+		const hasNestedAppender =
+			!! appenderParentClientIds?.includes( clientId );
+		const showNestedBlocks =
+			( ( hasNestedBlocks && shouldExpand ) ||
+				( hasNestedAppender && ! hasNestedBlocks ) ) &&
+			! isDragged;
 
 		if ( ! showBlock ) {
 			placeholderRows += 1;
@@ -247,7 +264,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 				{ showNestedBlocks && (
 					<ListViewBranch
 						parentId={ clientId }
-						blocks={ innerBlocks }
+						blocks={ innerBlocks ?? [] }
 						selectBlock={ selectBlock }
 						showBlockMovers={ showBlockMovers }
 						level={ level + 1 }
@@ -258,6 +275,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						showAppender={ showAppenderProp }
 					/>
 				) }
 			</AsyncModeProvider>

@@ -35,6 +35,9 @@ function NavigationMenuSelector( {
 	onSelectClassicMenu,
 	onCreateNew,
 	actionLabel,
+	icon = moreVertical,
+	text,
+	toggleProps = { size: 'small' },
 } ) {
 	/* translators: %s: The name of a menu. */
 	const createActionLabel = __( "Create from '%s'" );
@@ -123,8 +126,9 @@ function NavigationMenuSelector( {
 	const NavigationMenuSelectorDropdown = (
 		<DropdownMenu
 			label={ selectorLabel }
-			icon={ moreVertical }
-			toggleProps={ { size: 'small' } }
+			icon={ icon }
+			text={ text }
+			toggleProps={ toggleProps }
 		>
 			{ ( { onClose } ) => (
 				<>
