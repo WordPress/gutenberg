@@ -484,6 +484,39 @@ describe( 'block parser', () => {
 			const parsed = parse( serialized );
 			expect( parsed[ 0 ].attributes.content ).toBe( content );
 		} );
+
+		describe( 'untouched blocks', () => {
+			// `save` writes `&amp;`, which validates as the same text.
+			const content =
+				'<!-- wp:test-block -->\n<p>Ribs &#38; Chicken</p>\n<!-- /wp:test-block -->';
+
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+					attributes: {
+						content: {
+							type: 'string',
+							source: 'text',
+							selector: 'p',
+						},
+					},
+					save: ( { attributes } ) => <p>{ attributes.content }</p>,
+				} );
+			} );
+
+			it( 'should serialize with the loaded markup', () => {
+				expect( serialize( parse( content ) ) ).toBe( content );
+			} );
+
+			it( 'should serialize with `save` after an attribute changed in place', () => {
+				const [ block ] = parse( content );
+				block.attributes.content = 'Ribs';
+
+				expect( serialize( block ) ).toBe(
+					'<!-- wp:test-block -->\n<p>Ribs</p>\n<!-- /wp:test-block -->'
+				);
+			} );
+		} );
 	} );
 
 	describe( 'Custom HTML block static inner content', () => {
