@@ -45,17 +45,19 @@ const MyPopover = () => {
 	};
 
 	return (
-		<p ref={ setPopoverAnchor }>Popover s anchor</p>
-		<Button variant="secondary" onClick={ toggleVisible }>
-			Toggle Popover!
-		</Button>
-		{ isVisible && (
-			<Popover
-				anchor={ popoverAnchor }
-			>
-				Popover is toggled!
-			</Popover>
-		) }
+		<>
+			<p ref={ setPopoverAnchor }>Popover s anchor</p>
+			<Button variant="secondary" onClick={ toggleVisible }>
+				Toggle Popover!
+			</Button>
+			{ isVisible && (
+				<Popover
+					anchor={ popoverAnchor }
+				>
+					Popover is toggled!
+				</Popover>
+			) }
+		</>
 	);
 };
 ```
