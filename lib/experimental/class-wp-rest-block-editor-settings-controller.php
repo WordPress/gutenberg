@@ -418,6 +418,8 @@ if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
 			wp_enqueue_script( 'wp-block-library' );
 			wp_enqueue_style( 'wp-editor' );
 			wp_enqueue_style( 'wp-block-library' );
+			// Block editor UI outside the canvas, such as inspector controls.
+			wp_enqueue_style( 'wp-block-library-editor' );
 			wp_enqueue_style( 'wp-format-library' );
 			wp_enqueue_media();
 
