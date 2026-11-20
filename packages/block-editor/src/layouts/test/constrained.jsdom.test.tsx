@@ -64,6 +64,38 @@ describe( 'getLayoutStyle', () => {
 		);
 	} );
 
+	it( 'should not override horizontal margins set on child blocks', () => {
+		const result = constrained.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { type: 'constrained', contentSize: '600px' },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result.replace( /\s+/g, ' ' ) ).toContain(
+			'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: 600px; } ' +
+				'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])) { margin-left: auto !important; } ' +
+				'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])) { margin-right: auto !important; }'
+		);
+	} );
+
+	it( 'should not override the justified margin set on child blocks', () => {
+		const result = constrained.getLayoutStyle( {
+			selector: '.my-container',
+			layout: { type: 'constrained', justifyContent: 'left' },
+			style: {},
+			blockName: 'test-block',
+			hasBlockGapSupport: false,
+			layoutDefinitions: undefined,
+		} );
+
+		expect( result ).toBe(
+			'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])) { margin-left: 0 !important; }'
+		);
+	} );
+
 	it( 'should reset constrained sizes when content width is unset in a viewport', () => {
 		const result = constrained.getLayoutStyle( {
 			selector: '.my-container',
