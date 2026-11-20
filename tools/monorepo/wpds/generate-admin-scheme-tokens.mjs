@@ -68,7 +68,7 @@ function deriveTokens( primary ) {
 		const { ramp } =
 			rampName === 'background'
 				? bgRamp
-				: buildAccentRamp( seed, bgRamp );
+				: buildAccentRamp( rampName, seed, bgRamp );
 		const primitive = rampName === 'background' ? 'bg' : rampName;
 
 		for ( const [ step, value ] of Object.entries( ramp ) ) {

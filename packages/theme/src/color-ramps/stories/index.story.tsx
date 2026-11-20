@@ -96,7 +96,7 @@ function buildDisplayedRamps( {
 				name: 'bgFill1',
 				value,
 			},
-			ramp: buildAccentRamp( value, bgRamp ).ramp,
+			ramp: buildAccentRamp( name, value, bgRamp ).ramp,
 		} );
 	}
 

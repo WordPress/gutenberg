@@ -67,7 +67,7 @@ describe( 'buildBgRamp', () => {
 } );
 
 describe( 'buildAccentRamp', () => {
-	testSeedColorContract( ( seed ) => buildAccentRamp( seed ) );
+	testSeedColorContract( ( seed ) => buildAccentRamp( 'primary', seed ) );
 } );
 
 describe( 'buildRamp', () => {

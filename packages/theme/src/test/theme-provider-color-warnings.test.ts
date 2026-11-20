@@ -75,7 +75,7 @@ describe( 'collectThemeProviderColorWarnings', () => {
 	it( 'checks the final fill after seed adjustment', () => {
 		const seed = '#1c7c64';
 		const background = buildBgRamp( '#1e1e1e' );
-		const primary = buildAccentRamp( seed, background );
+		const primary = buildAccentRamp( 'info', seed, background );
 		const colorValues = new Map( [
 			[
 				'--wpds-color-background-interactive-brand-strong',
@@ -101,7 +101,7 @@ describe( 'collectThemeProviderColorWarnings', () => {
 				foregroundToken: 'background.interactive.brand-strong',
 				foregroundColor: '#0f755d',
 				requiredContrast: 3,
-				achievedContrast: expect.closeTo( 2.7173, 4 ),
+				achievedContrast: expect.closeTo( 2.7174, 4 ),
 			},
 		] );
 	} );
