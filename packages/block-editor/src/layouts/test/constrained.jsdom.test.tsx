@@ -64,7 +64,7 @@ describe( 'getLayoutStyle', () => {
 		);
 	} );
 
-	it( 'should not override horizontal margins set on child blocks', () => {
+	it( 'should output the content column offsets for a custom content size', () => {
 		const result = constrained.getLayoutStyle( {
 			selector: '.my-container',
 			layout: { type: 'constrained', contentSize: '600px' },
@@ -74,14 +74,12 @@ describe( 'getLayoutStyle', () => {
 			layoutDefinitions: undefined,
 		} );
 
-		expect( result.replace( /\s+/g, ' ' ) ).toContain(
-			'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: 600px; } ' +
-				'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])) { margin-left: auto !important; } ' +
-				'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right])) { margin-right: auto !important; }'
+		expect( result ).toContain(
+			'.my-container { --wp--style--layout--content-offset-left: max(0px, (100% - 600px) / 2); --wp--style--layout--content-offset-right: max(0px, (100% - 600px) / 2); }'
 		);
 	} );
 
-	it( 'should not override the justified margin set on child blocks', () => {
+	it( 'should output the content column offsets for a justified layout', () => {
 		const result = constrained.getLayoutStyle( {
 			selector: '.my-container',
 			layout: { type: 'constrained', justifyContent: 'left' },
@@ -91,8 +89,8 @@ describe( 'getLayoutStyle', () => {
 			layoutDefinitions: undefined,
 		} );
 
-		expect( result ).toBe(
-			'.my-container > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left])) { margin-left: 0 !important; }'
+		expect( result ).toContain(
+			'.my-container { --wp--style--layout--content-offset-left: 0px; --wp--style--layout--content-offset-right: max(0px, 100% - var(--wp--style--global--content-size, 100%)); }'
 		);
 	} );
 

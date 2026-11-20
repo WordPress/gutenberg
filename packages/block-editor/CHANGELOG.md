@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   Constrained layout: Children with a left or right margin set through the margin block support keep that margin instead of being overridden by the layout's centering or justification margins.
+-   Constrained layout: A child block's left and right margins are no longer overridden by the layout's centering or justification margins, and are measured from the content column instead.
 
 ## 20.1.0 (2026-11-18)
 

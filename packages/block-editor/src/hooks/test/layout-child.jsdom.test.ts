@@ -10,6 +10,7 @@ import type { Block } from '@wordpress/blocks';
 import {
 	addTransforms,
 	getChildLayoutStyleRules,
+	getConstrainedChildMarginStyles,
 	getChildLayoutStyles,
 	getResponsiveChildLayoutStyles,
 } from '../layout-child';
@@ -456,6 +457,101 @@ describe( 'layout child', () => {
 					[ result ]
 				).attributes.style
 			).toBeUndefined();
+		} );
+	} );
+
+	describe( 'getConstrainedChildMarginStyles()', () => {
+		const selector = '.wp-container-content-test';
+		const childSelector = `.is-layout-constrained > ${ selector }:not(.alignleft):not(.alignright):not(.aligncenter):not(.alignwide):not(.alignfull)`;
+
+		afterEach( () => {
+			if (
+				getBlockTypes().some( ( { name } ) => name === 'test/margin' )
+			) {
+				unregisterBlockType( 'test/margin' );
+			}
+		} );
+
+		function registerMarginBlock( margin: unknown = true ) {
+			registerBlockType( 'test/margin', {
+				apiVersion: 3,
+				title: 'Margin',
+				category: 'text',
+				supports: { spacing: { margin } },
+				save: () => null,
+			} );
+		}
+
+		it( 'measures horizontal margins from the content column', () => {
+			registerMarginBlock();
+
+			expect(
+				getConstrainedChildMarginStyles( {
+					selector,
+					name: 'test/margin',
+					style: {
+						spacing: {
+							margin: {
+								left: '0',
+								right: 'var:preset|spacing|30',
+							},
+						},
+					},
+				} )
+			).toBe(
+				`${ childSelector } { margin-left: calc(var(--wp--style--layout--content-offset-left, 0px) + 0px) !important; margin-right: calc(var(--wp--style--layout--content-offset-right, 0px) + var(--wp--preset--spacing--30)) !important; }`
+			);
+		} );
+
+		it( 'keeps the unset side on the content column', () => {
+			registerMarginBlock();
+
+			expect(
+				getConstrainedChildMarginStyles( {
+					selector,
+					name: 'test/margin',
+					style: { spacing: { margin: { left: '2rem' } } },
+				} )
+			).toBe(
+				`${ childSelector } { margin-left: calc(var(--wp--style--layout--content-offset-left, 0px) + 2rem) !important; margin-right: var(--wp--style--layout--content-offset-right, 0px) !important; }`
+			);
+		} );
+
+		it( 'returns nothing without a horizontal margin', () => {
+			registerMarginBlock();
+
+			expect(
+				getConstrainedChildMarginStyles( {
+					selector,
+					name: 'test/margin',
+					style: { spacing: { margin: { top: '1rem' } } },
+				} )
+			).toBe( '' );
+		} );
+
+		it( 'returns nothing when margin serialization is skipped', () => {
+			registerMarginBlock();
+			unregisterBlockType( 'test/margin' );
+			registerBlockType( 'test/margin', {
+				apiVersion: 3,
+				title: 'Margin',
+				category: 'text',
+				supports: {
+					spacing: {
+						margin: true,
+						__experimentalSkipSerialization: [ 'margin' ],
+					},
+				},
+				save: () => null,
+			} );
+
+			expect(
+				getConstrainedChildMarginStyles( {
+					selector,
+					name: 'test/margin',
+					style: { spacing: { margin: { left: '2rem' } } },
+				} )
+			).toBe( '' );
 		} );
 	} );
 } );

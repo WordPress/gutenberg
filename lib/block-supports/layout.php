@@ -125,24 +125,17 @@ function gutenberg_get_layout_definitions() {
 					),
 				),
 				array(
+					'selector' => '',
+					'rules'    => array(
+						'--wp--style--layout--content-offset-left'  => 'max(0px, (100% - var(--wp--style--global--content-size)) / 2)',
+						'--wp--style--layout--content-offset-right' => 'max(0px, (100% - var(--wp--style--global--content-size)) / 2)',
+					),
+				),
+				array(
 					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull))',
 					'rules'    => array(
-						'max-width' => 'var(--wp--style--global--content-size)',
-					),
-				),
-				/*
-				 * Children with their own horizontal margin (set inline by the margin block support)
-				 * keep it instead of being centered.
-				 */
-				array(
-					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))',
-					'rules'    => array(
-						'margin-left' => 'auto !important',
-					),
-				),
-				array(
-					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))',
-					'rules'    => array(
+						'max-width'    => 'var(--wp--style--global--content-size)',
+						'margin-left'  => 'auto !important',
 						'margin-right' => 'auto !important',
 					),
 				),
@@ -513,6 +506,76 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 }
 
 /**
+ * Returns the custom properties that describe where the content column of a constrained
+ * layout sits inside its container.
+ *
+ * Children that set their own horizontal margins use these offsets, so that their margins
+ * are measured from the content column instead of the container edge.
+ *
+ * @param string $content_size    The width of the content column.
+ * @param string $justify_content The justification of the content column: left, center or right.
+ * @return array<string, string> CSS declarations.
+ */
+function gutenberg_get_constrained_content_offsets( $content_size, $justify_content ) {
+	$free_space = "max(0px, 100% - $content_size)";
+	$half_space = "max(0px, (100% - $content_size) / 2)";
+
+	return array(
+		'--wp--style--layout--content-offset-left'  => 'left' === $justify_content ? '0px' : ( 'right' === $justify_content ? $free_space : $half_space ),
+		'--wp--style--layout--content-offset-right' => 'right' === $justify_content ? '0px' : ( 'left' === $justify_content ? $free_space : $half_space ),
+	);
+}
+
+/**
+ * Returns the margin declarations that measure a block's own horizontal margins from the
+ * content column of a parent constrained layout, instead of the container edge.
+ *
+ * Without them the layout's `!important` auto margins override the block's margins.
+ *
+ * @param WP_Block_Type|null $block_type Block type.
+ * @param array              $style_attr The block's style attribute.
+ * @return array<string, string> CSS declarations, empty if the block sets no horizontal margin.
+ */
+function gutenberg_get_constrained_child_margin_declarations( $block_type, $style_attr ) {
+	if (
+		! $block_type ||
+		! block_has_support( $block_type, array( 'spacing', 'margin' ), false ) ||
+		wp_should_skip_block_supports_serialization( $block_type, 'spacing', 'margin' )
+	) {
+		return array();
+	}
+
+	$margin = $style_attr['spacing']['margin'] ?? null;
+	if ( ! is_array( $margin ) ) {
+		return array();
+	}
+
+	$margin_styles = gutenberg_style_engine_get_styles(
+		array(
+			'spacing' => array(
+				'margin' => array_intersect_key( $margin, array_flip( array( 'left', 'right' ) ) ),
+			),
+		)
+	);
+	if ( ! isset( $margin_styles['declarations']['margin-left'] ) && ! isset( $margin_styles['declarations']['margin-right'] ) ) {
+		return array();
+	}
+
+	$declarations = array();
+	foreach ( array( 'left', 'right' ) as $side ) {
+		$offset = "var(--wp--style--layout--content-offset-$side, 0px)";
+		$value  = $margin_styles['declarations'][ "margin-$side" ] ?? null;
+		// Add unit if 0, to avoid an invalid calc().
+		if ( '0' === $value ) {
+			$value = '0px';
+		}
+		$declarations[ "margin-$side" ] = ( $value ? "calc($offset + $value)" : $offset ) . ' !important';
+	}
+
+	return $declarations;
+}
+
+/**
  * Generates the CSS corresponding to the provided layout.
  *
  * @param string                         $selector                      CSS selector.
@@ -622,35 +685,39 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
 
 		/*
-		 * Children with their own horizontal margin (set inline by the margin block support)
-		 * keep it instead of having it overridden by the layout's alignment margins.
+		 * Where the content column sits inside the container, for children that set their own
+		 * horizontal margins. See gutenberg_get_constrained_child_margin_declarations().
 		 */
-		$child_selector        = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))";
-		$margin_left_selector  = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))";
-		$margin_right_selector = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))";
+		$should_output_content_offsets =
+			( $should_output_constrained_sizes && ( $content_size || $wide_size || $is_resetting_constrained_sizes ) ) ||
+			$has_justify_content_override ||
+			( null === $viewport_overrides && in_array( $justify_content, array( 'left', 'right' ), true ) );
+		if ( $should_output_content_offsets ) {
+			$layout_styles[] = array(
+				'selector'     => $selector,
+				'declarations' => gutenberg_get_constrained_content_offsets(
+					'var(--wp--style--global--content-size, none)' === $all_max_width_value ? 'var(--wp--style--global--content-size, 100%)' : $all_max_width_value,
+					$justify_content
+				),
+			);
+		}
 
 		if ( $should_output_constrained_sizes && ( $content_size || $wide_size || $is_resetting_constrained_sizes ) ) {
-			$layout_styles[] = array(
-				'selector'     => $child_selector,
-				'declarations' => array( 'max-width' => $all_max_width_value ),
+			$content_size_declarations = array(
+				'max-width' => $all_max_width_value,
 			);
 
 			if ( null === $viewport_overrides || $has_justify_content_override ) {
-				array_push(
-					$layout_styles,
-					array(
-						'selector'     => $margin_left_selector,
-						'declarations' => array( 'margin-left' => $margin_left ),
-					),
-					array(
-						'selector'     => $margin_right_selector,
-						'declarations' => array( 'margin-right' => $margin_right ),
-					)
-				);
+				$content_size_declarations['margin-left']  = $margin_left;
+				$content_size_declarations['margin-right'] = $margin_right;
 			}
 
 			array_push(
 				$layout_styles,
+				array(
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'declarations' => $content_size_declarations,
+				),
 				array(
 					'selector'     => "$selector > .alignwide",
 					'declarations' => array( 'max-width' => $wide_max_width_value ),
@@ -698,28 +765,24 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( $has_justify_content_override && ! $should_output_constrained_sizes ) {
-			array_push(
-				$layout_styles,
-				array(
-					'selector'     => $margin_left_selector,
-					'declarations' => array( 'margin-left' => $margin_left ),
+			$layout_styles[] = array(
+				'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+				'declarations' => array(
+					'margin-left'  => $margin_left,
+					'margin-right' => $margin_right,
 				),
-				array(
-					'selector'     => $margin_right_selector,
-					'declarations' => array( 'margin-right' => $margin_right ),
-				)
 			);
 		} elseif ( null === $viewport_overrides ) {
 			if ( 'left' === $justify_content ) {
 				$layout_styles[] = array(
-					'selector'     => $margin_left_selector,
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
 					'declarations' => array( 'margin-left' => '0 !important' ),
 				);
 			}
 
 			if ( 'right' === $justify_content ) {
 				$layout_styles[] = array(
-					'selector'     => $margin_right_selector,
+					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
 					'declarations' => array( 'margin-right' => '0 !important' ),
 				);
 			}
@@ -1107,14 +1170,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		}
 	}
 
-	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) ) {
+	$child_margin_declarations = gutenberg_get_constrained_child_margin_declarations( $block_type, $style_attr );
+
+	if ( ! $block_supports_layout && ! $child_layout && empty( $viewport_child_layouts ) && empty( $child_margin_declarations ) ) {
 		return $block_content;
 	}
 
 	$outer_class_names = array();
 
 	// Child layout specific logic.
-	if ( $child_layout || ! empty( $viewport_child_layouts ) ) {
+	if ( $child_layout || ! empty( $viewport_child_layouts ) || ! empty( $child_margin_declarations ) ) {
 		$base_child_layout = gutenberg_get_layout_child_values( $child_layout );
 		$parent_layout     = $block['parentLayout'] ?? array();
 
@@ -1138,6 +1203,9 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		);
 		foreach ( $viewport_child_layouts as $breakpoint => $viewport_data ) {
 			$container_content_hash_input[ $breakpoint ] = $viewport_data['child_layout'];
+		}
+		if ( ! empty( $child_margin_declarations ) ) {
+			$container_content_hash_input['margin'] = $child_margin_declarations;
 		}
 		$container_content_class = gutenberg_unique_id_from_values(
 			$container_content_hash_input,
@@ -1164,6 +1232,14 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			}
 
 			$child_layout_styles = array_merge( $child_layout_styles, $viewport_child_styles );
+		}
+
+		// Measure the block's horizontal margins from the content column of a constrained parent.
+		if ( ! empty( $child_margin_declarations ) ) {
+			$child_layout_styles[] = array(
+				'selector'     => ".is-layout-constrained > .$container_content_class:not(.alignleft):not(.alignright):not(.aligncenter):not(.alignwide):not(.alignfull)",
+				'declarations' => $child_margin_declarations,
+			);
 		}
 
 		/*

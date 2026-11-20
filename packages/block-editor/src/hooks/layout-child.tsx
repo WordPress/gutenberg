@@ -2,6 +2,9 @@ import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { hasBlockSupport } from '@wordpress/blocks';
+import { getCSSRules } from '@wordpress/style-engine';
+import type { Style } from '@wordpress/style-engine';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../store';
@@ -11,7 +14,7 @@ import {
 	isPlainObject,
 	setImmutably,
 } from '../utils/object';
-import { useStyleOverride } from './utils';
+import { shouldSkipSerialization, useStyleOverride } from './utils';
 import { useLayout } from '../components/block-list/layout';
 import {
 	GridVisualizer,
@@ -306,7 +309,64 @@ export function getResponsiveChildLayoutStyles( {
 		.join( '' );
 }
 
+/**
+ * Returns CSS that measures a block's own horizontal margins from the content
+ * column of a parent constrained layout, instead of the container edge.
+ * Without it, the layout's `!important` auto margins override the block's
+ * margins.
+ *
+ * @param options          Options.
+ * @param options.selector The selector of the block.
+ * @param options.name     The block name.
+ * @param options.style    The block's style attribute.
+ * @return CSS, empty if the block sets no horizontal margin.
+ */
+export function getConstrainedChildMarginStyles( {
+	selector,
+	name,
+	style,
+}: {
+	selector: string;
+	name: string;
+	style?: ChildLayoutBlockStyle;
+} ): string {
+	const margin = getValueFromObjectPath( style, 'spacing.margin' );
+	if (
+		! isPlainObject( margin ) ||
+		! hasBlockSupport( name, [ 'spacing', 'margin' ] ) ||
+		shouldSkipSerialization( name, 'spacing', 'margin' )
+	) {
+		return '';
+	}
+
+	const { left, right } = margin as Record< string, unknown >;
+	const values: Record< string, string > = {};
+	getCSSRules( { spacing: { margin: { left, right } } } as Style ).forEach(
+		( rule ) => {
+			// Add unit if 0, to avoid an invalid calc().
+			values[ rule.key ] =
+				rule.value === '0' ? '0px' : String( rule.value );
+		}
+	);
+	if ( ! values.marginLeft && ! values.marginRight ) {
+		return '';
+	}
+
+	const declarations = [ 'left', 'right' ].map( ( side ) => {
+		const offset = `var(--wp--style--layout--content-offset-${ side }, 0px)`;
+		const value = values[ side === 'left' ? 'marginLeft' : 'marginRight' ];
+		return `margin-${ side }: ${
+			value ? `calc(${ offset } + ${ value })` : offset
+		} !important;`;
+	} );
+
+	return `.is-layout-constrained > ${ selector }:not(.alignleft):not(.alignright):not(.aligncenter):not(.alignwide):not(.alignfull) { ${ declarations.join(
+		' '
+	) } }`;
+}
+
 function useBlockPropsChildLayoutStyles( {
+	name,
 	style,
 }: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
 	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
@@ -358,6 +418,7 @@ function useBlockPropsChildLayoutStyles( {
 				parentLayout,
 				viewportSettings,
 			} ),
+			getConstrainedChildMarginStyles( { selector, name, style } ),
 		].join( '' );
 	}
 
