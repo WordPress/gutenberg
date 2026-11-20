@@ -807,6 +807,42 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a Navigation responsive text decoration reaches its menu links.
+	 *
+	 * The base value is applied to the links through a class, so the state
+	 * value has to target them too, or it can't override or remove it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_navigation_text_decoration_targets_menu_links() {
+		$block = array(
+			'blockName' => 'core/navigation',
+			'attrs'     => array(
+				'style' => array(
+					'typography' => array(
+						'textDecoration' => 'underline',
+					),
+					'@mobile'    => array(
+						'typography' => array(
+							'textDecoration' => 'none',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( '<nav class="wp-block-navigation">Menu</nav>', $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ', .' . $matches[0] . ' .wp-block-navigation-item__content{text-decoration:none !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that preset values are converted to CSS custom property references.
 	 *
 	 * @covers ::gutenberg_normalize_state_preset_vars

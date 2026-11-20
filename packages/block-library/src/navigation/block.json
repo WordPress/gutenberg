@@ -149,7 +149,10 @@
 		"renaming": false
 	},
 	"selectors": {
-		"css": ".wp-block-navigation:not(.wp-block-navigation__container)"
+		"css": ".wp-block-navigation:not(.wp-block-navigation__container)",
+		"typography": {
+			"textDecoration": ".wp-block-navigation, .wp-block-navigation .wp-block-navigation-item__content"
+		}
 	},
 	"editorStyle": "wp-block-navigation-editor",
 	"style": "wp-block-navigation"
