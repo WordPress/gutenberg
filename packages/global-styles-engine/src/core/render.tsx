@@ -2408,8 +2408,9 @@ function findNextDelimiter( css: string, start: number ) {
  * - A rule at the very start is only rewritten when it starts with a type
  *   selector, as other selectors there, e.g. `:hover {}`, are already
  *   appended to the block selector.
- * - Declarations after a nested rule are moved back to the block, e.g.
- *   `img {} color: blue;` becomes `& img {} & color: blue;`.
+ * - Declarations after a rewritten rule are moved back to the block, e.g.
+ *   `img {} color: blue;` becomes `& img {} & color: blue;`. After a rule
+ *   that already has `&`, they are left as is, as before.
  * - A bare `& {}` block is unwrapped, as it is the block itself.
  * - Rules nested in any other rule, e.g. `figure { img {} }`, are left as is,
  *   as they can't be flattened.
@@ -2429,6 +2430,10 @@ function normalizeNestedRules( css: string ) {
 	let isStatementStart = true;
 	let isFirstStatement = true;
 	let isAfterRule = false;
+	// Whether the current statement, and the open rule at the block level,
+	// were rewritten with `& `.
+	let isRewrittenStatement = false;
+	let isRewrittenRule = false;
 	// Index in `css` of the first character of the current statement that
 	// isn't whitespace or a comment, and its position in `result`.
 	let statementIndex = -1;
@@ -2452,6 +2457,7 @@ function normalizeNestedRules( css: string ) {
 
 		if ( isStatementStart && ! isCSSWhitespace( char ) ) {
 			isStatementStart = false;
+			isRewrittenStatement = false;
 			// Leading comments are part of the statement, so `& ` goes before
 			// them, but the selector decides whether it is needed.
 			statementIndex = skipWhitespaceAndComments( css, i );
@@ -2471,6 +2477,7 @@ function normalizeNestedRules( css: string ) {
 					: isAfterRule;
 				if ( shouldPrefix ) {
 					result += '& ';
+					isRewrittenStatement = isRule;
 				}
 			}
 			isFirstStatement = false;
@@ -2496,6 +2503,9 @@ function normalizeNestedRules( css: string ) {
 				isStatementStart = true;
 				continue;
 			}
+			if ( isBlockLevel ) {
+				isRewrittenRule = isRewrittenStatement;
+			}
 			blocks.push( false );
 			nestedRules++;
 		} else if ( char === '}' ) {
@@ -2508,7 +2518,7 @@ function normalizeNestedRules( css: string ) {
 				nestedRules--;
 			}
 			if ( nestedRules === 0 ) {
-				isAfterRule = true;
+				isAfterRule = isRewrittenRule;
 				isStatementStart = true;
 			}
 		} else if ( char === ';' && isBlockLevel ) {

@@ -2314,8 +2314,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * - A rule at the very start is only rewritten when it starts with a type
 	 *   selector, as other selectors there, e.g. `:hover {}`, are already
 	 *   appended to the block selector.
-	 * - Declarations after a nested rule are moved back to the block, e.g.
-	 *   `img {} color: blue;` becomes `& img {} & color: blue;`.
+	 * - Declarations after a rewritten rule are moved back to the block, e.g.
+	 *   `img {} color: blue;` becomes `& img {} & color: blue;`. After a rule
+	 *   that already has `&`, they are left as is, as before.
 	 * - A bare `& {}` block is unwrapped, as it is the block itself.
 	 * - Rules nested in any other rule, e.g. `figure { img {} }`, are left as
 	 *   is, as they can't be flattened.
@@ -2338,6 +2339,10 @@ class WP_Theme_JSON_Gutenberg {
 		$is_statement_start = true;
 		$is_first_statement = true;
 		$is_after_rule      = false;
+		// Whether the current statement, and the open rule at the block level,
+		// were rewritten with `& `.
+		$is_rewritten_statement = false;
+		$is_rewritten_rule      = false;
 		// Position in `$css` of the first character of the current statement
 		// that isn't whitespace or a comment, and its position in `$result`.
 		$statement_index = -1;
@@ -2361,7 +2366,8 @@ class WP_Theme_JSON_Gutenberg {
 			$is_block_level = 0 === $nested_rules;
 
 			if ( $is_statement_start && ! static::is_custom_css_whitespace( $char ) ) {
-				$is_statement_start = false;
+				$is_statement_start     = false;
+				$is_rewritten_statement = false;
 				// Leading comments are part of the statement, so `& ` goes before
 				// them, but the selector decides whether it is needed.
 				$statement_index = static::skip_custom_css_whitespace_and_comments( $css, $i );
@@ -2373,7 +2379,8 @@ class WP_Theme_JSON_Gutenberg {
 						? ( ! $is_first_statement || 1 === strspn( $first, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*' ) )
 						: $is_after_rule;
 					if ( $should_prefix ) {
-						$result .= '& ';
+						$result                .= '& ';
+						$is_rewritten_statement = $is_rule;
 					}
 				}
 				$is_first_statement = false;
@@ -2399,6 +2406,9 @@ class WP_Theme_JSON_Gutenberg {
 					$is_statement_start = true;
 					continue;
 				}
+				if ( $is_block_level ) {
+					$is_rewritten_rule = $is_rewritten_statement;
+				}
 				$blocks[] = false;
 				++$nested_rules;
 			} elseif ( '}' === $char ) {
@@ -2411,7 +2421,7 @@ class WP_Theme_JSON_Gutenberg {
 					--$nested_rules;
 				}
 				if ( 0 === $nested_rules ) {
-					$is_after_rule      = true;
+					$is_after_rule      = $is_rewritten_rule;
 					$is_statement_start = true;
 				}
 			} elseif ( ';' === $char && $is_block_level ) {

@@ -2870,6 +2870,11 @@ describe( 'global styles renderer', () => {
 				':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
 			],
 			[
+				'declarations after a rule with & keep their existing output',
+				'&.x{margin: 0;} color: red;',
+				':root :where(.foo.x){margin: 0; color: red;}',
+			],
+			[
 				'rule nested in a rule without & is not flattened',
 				'figure { img { color: blue; } }',
 				'',

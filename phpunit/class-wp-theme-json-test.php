@@ -8595,6 +8595,13 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo img){color: blue;}:root :where(.foo){color: red;}',
 			),
+			'declarations after & rule'    => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => '&.x{margin: 0;} color: red;',
+				),
+				'expected' => ':root :where(.foo.x){margin: 0; color: red;}',
+			),
 			// Rules nested in a rule without `&` aren't flattened.
 			'nested in rule'               => array(
 				'input'    => array(
