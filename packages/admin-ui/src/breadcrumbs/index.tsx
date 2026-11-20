@@ -80,6 +80,10 @@ export const Breadcrumbs = ( { items }: BreadcrumbsProps ) => {
 							render={
 								<Link
 									tone="neutral"
+									// The router marks a link as current only
+									// when the URL matches it exactly, but the
+									// last item is always the current page.
+									aria-current="page"
 									render={ <RouterLink to={ lastItem.to } /> }
 								/>
 							}

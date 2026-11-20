@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 import { Breadcrumbs } from '..';
 
 vi.mock( import( '@wordpress/route' ), async ( importOriginal ) => {
@@ -8,8 +8,14 @@ vi.mock( import( '@wordpress/route' ), async ( importOriginal ) => {
 
 	return {
 		...original,
-		Link: ( ( { to, children }: { to: string; children: ReactNode } ) => (
-			<a href={ to }>{ children }</a>
+		Link: ( ( {
+			to,
+			children,
+			...props
+		}: ComponentProps< 'a' > & { to: string } ) => (
+			<a href={ to } { ...props }>
+				{ children }
+			</a>
 		) ) as typeof original.Link,
 	};
 } );
@@ -110,6 +116,8 @@ describe( 'Breadcrumbs', () => {
 			expect( links ).toHaveLength( 2 );
 			expect( links[ 1 ] ).toHaveTextContent( 'Settings' );
 			expect( links[ 1 ] ).toHaveAttribute( 'href', '/settings' );
+			expect( links[ 1 ] ).toHaveAttribute( 'aria-current', 'page' );
+			expect( links[ 0 ] ).not.toHaveAttribute( 'aria-current' );
 		} );
 
 		it( 'should render preceding items as links', () => {
