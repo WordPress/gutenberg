@@ -20,6 +20,11 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { SelectControl } from '@wordpress/ui';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	getActiveIconSize,
+	getUpdatedIconSizeAttributes,
+	hasViewportIconSize,
+} from './responsive-styles';
 
 const sizeItems = [
 	{ label: __( 'Default' ), value: null },
@@ -49,23 +54,45 @@ export function SocialLinksEdit( props ) {
 		size,
 	} = attributes;
 
-	const { hasSocialIcons, hasSelectedChild, hasSelectedStyleState } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockCount,
-					hasSelectedInnerBlock,
-					hasSelectedBlockStyleState,
-				} = select( blockEditorStore );
-				return {
-					hasSocialIcons: getBlockCount( clientId ) > 0,
-					hasSelectedChild: hasSelectedInnerBlock( clientId ),
-					hasSelectedStyleState:
-						hasSelectedBlockStyleState( clientId ),
-				};
-			},
-			[ clientId ]
-		);
+	const {
+		hasSocialIcons,
+		hasSelectedChild,
+		selectedStyleState,
+		hasSelectedStyleState,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockCount,
+				hasSelectedInnerBlock,
+				getSelectedBlockStyleState,
+				hasSelectedBlockStyleState,
+			} = select( blockEditorStore );
+			return {
+				hasSocialIcons: getBlockCount( clientId ) > 0,
+				hasSelectedChild: hasSelectedInnerBlock( clientId ),
+				selectedStyleState: getSelectedBlockStyleState( clientId ),
+				hasSelectedStyleState: hasSelectedBlockStyleState( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const isViewportStyleState =
+		selectedStyleState?.viewport &&
+		selectedStyleState.viewport !== 'default';
+
+	const activeSize = getActiveIconSize( {
+		attributes,
+		isViewportStyleState,
+		viewport: selectedStyleState?.viewport,
+	} );
+
+	const hasActiveIconSize = isViewportStyleState
+		? hasViewportIconSize( {
+				attributes,
+				viewport: selectedStyleState?.viewport,
+			} )
+		: !! size;
 
 	const hasAnySelected = isSelected || hasSelectedChild;
 
@@ -157,10 +184,24 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<>
-			<InspectorControls>
+			<InspectorControls
+				group={ isViewportStyleState ? 'style-state' : 'default' }
+			>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
+						if ( isViewportStyleState ) {
+							setAttributes(
+								getUpdatedIconSizeAttributes( {
+									attributes,
+									isViewportStyleState: true,
+									viewport: selectedStyleState?.viewport,
+									newSize: null,
+								} )
+							);
+							return;
+						}
+
 						setAttributes( {
 							openInNewTab: false,
 							showLabels: false,
@@ -171,62 +212,81 @@ export function SocialLinksEdit( props ) {
 				>
 					<ToolsPanelItem
 						isShownByDefault
-						hasValue={ () => !! size }
+						hasValue={ () => hasActiveIconSize }
 						label={ __( 'Icon size' ) }
 						onDeselect={ () =>
-							setAttributes( { size: undefined } )
+							setAttributes(
+								getUpdatedIconSizeAttributes( {
+									attributes,
+									isViewportStyleState,
+									viewport: selectedStyleState?.viewport,
+									newSize: null,
+								} )
+							)
 						}
 					>
 						<SelectControl
 							label={ __( 'Icon size' ) }
 							onValueChange={ ( item ) =>
 								item &&
-								setAttributes( {
-									size: item.value ?? undefined,
-								} )
+								setAttributes(
+									getUpdatedIconSizeAttributes( {
+										attributes,
+										isViewportStyleState,
+										viewport: selectedStyleState?.viewport,
+										newSize: item.value,
+									} )
+								)
 							}
 							value={
 								sizeItems.find(
-									( item ) => item.value === ( size || null )
+									( item ) =>
+										item.value === ( activeSize || null )
 								) ?? sizeItems[ 0 ]
 							}
 							items={ sizeItems }
 						/>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Show text' ) }
-						hasValue={ () => !! showLabels }
-						onDeselect={ () =>
-							setAttributes( { showLabels: false } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Show text' ) }
-							checked={ showLabels }
-							onChange={ () =>
-								setAttributes( { showLabels: ! showLabels } )
-							}
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						isShownByDefault
-						label={ __( 'Open links in new tab' ) }
-						hasValue={ () => !! openInNewTab }
-						onDeselect={ () =>
-							setAttributes( { openInNewTab: false } )
-						}
-					>
-						<ToggleControl
-							label={ __( 'Open links in new tab' ) }
-							checked={ openInNewTab }
-							onChange={ () =>
-								setAttributes( {
-									openInNewTab: ! openInNewTab,
-								} )
-							}
-						/>
-					</ToolsPanelItem>
+					{ ! isViewportStyleState && (
+						<>
+							<ToolsPanelItem
+								isShownByDefault
+								label={ __( 'Show text' ) }
+								hasValue={ () => !! showLabels }
+								onDeselect={ () =>
+									setAttributes( { showLabels: false } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Show text' ) }
+									checked={ showLabels }
+									onChange={ () =>
+										setAttributes( {
+											showLabels: ! showLabels,
+										} )
+									}
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
+								isShownByDefault
+								label={ __( 'Open links in new tab' ) }
+								hasValue={ () => !! openInNewTab }
+								onDeselect={ () =>
+									setAttributes( { openInNewTab: false } )
+								}
+							>
+								<ToggleControl
+									label={ __( 'Open links in new tab' ) }
+									checked={ openInNewTab }
+									onChange={ () =>
+										setAttributes( {
+											openInNewTab: ! openInNewTab,
+										} )
+									}
+								/>
+							</ToolsPanelItem>
+						</>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			{ showColorControls && (
