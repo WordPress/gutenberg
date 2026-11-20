@@ -8,6 +8,7 @@ import {
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
+	ContrastChecker,
 	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
@@ -43,6 +44,7 @@ interface ColorPickerProps {
 	property: ColorProperty;
 	value: RichTextValue;
 	onChange: ( value: RichTextValue ) => void;
+	fontSize?: number;
 }
 
 function parseCSS( css = '' ): { color?: string; backgroundColor?: string } {
@@ -167,7 +169,13 @@ export function setColors(
 	return applyFormat( value, { type: name, attributes } );
 }
 
-function ColorPicker( { name, property, value, onChange }: ColorPickerProps ) {
+function ColorPicker( {
+	name,
+	property,
+	value,
+	onChange,
+	fontSize,
+}: ColorPickerProps ) {
 	const colors = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().colors ?? [];
@@ -178,17 +186,26 @@ function ColorPicker( { name, property, value, onChange }: ColorPickerProps ) {
 	);
 
 	return (
-		<ColorPalette
-			value={ activeColors[ property ] }
-			onChange={ ( color: string | undefined ) => {
-				onChange(
-					setColors( value, name, colors, { [ property ]: color } )
-				);
-			} }
-			enableAlpha
-			// Prevent the text and color picker from overlapping.
-			__experimentalIsRenderedInSidebar
-		/>
+		<>
+			<ColorPalette
+				value={ activeColors[ property ] }
+				onChange={ ( color: string | undefined ) => {
+					onChange(
+						setColors( value, name, colors, {
+							[ property ]: color,
+						} )
+					);
+				} }
+				enableAlpha
+				// Prevent the text and color picker from overlapping.
+				__experimentalIsRenderedInSidebar
+			/>
+			<ContrastChecker
+				textColor={ activeColors.color }
+				backgroundColor={ activeColors.backgroundColor }
+				fontSize={ fontSize }
+			/>
+		</>
 	);
 }
 
@@ -212,6 +229,14 @@ export default function InlineColorUI( {
 		editableContentElement: contentRef.current,
 		settings: anchorSettings,
 	} );
+	const fontElement =
+		popoverAnchor && 'contextElement' in popoverAnchor
+			? popoverAnchor.contextElement
+			: popoverAnchor;
+	const fontSize =
+		fontElement?.ownerDocument.defaultView?.getComputedStyle(
+			fontElement
+		).fontSize;
 
 	return (
 		<WCPopover
@@ -224,6 +249,7 @@ export default function InlineColorUI( {
 				property={ property }
 				value={ value }
 				onChange={ onChange }
+				fontSize={ fontSize ? parseFloat( fontSize ) : undefined }
 			/>
 		</WCPopover>
 	);
