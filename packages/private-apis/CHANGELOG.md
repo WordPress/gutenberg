@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Document `@wordpress/views` allowlist retention for backwards compatibility with older published versions ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
+
 ## 3.2.0 (2026-11-18)
 
 ### Internal
