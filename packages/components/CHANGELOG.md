@@ -10,6 +10,10 @@
 
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 
+### Internal
+
+-   `ItemGroup`: Mark the deprecated `marquee` selector, which only raises specificity, as intentional for the `selector-no-deprecated` rule in Stylelint 18 ([#87149](https://github.com/WordPress/gutenberg/pull/87149)).
+
 ## 45.0.0 (2026-11-18)
 
 ### Breaking Changes
