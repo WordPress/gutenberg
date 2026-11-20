@@ -59,6 +59,7 @@ junit.xml
 playwright.config.override.ts
 phpcs.xml
 phpstan.neon
+phpstan-strict.neon
 phpunit.xml
 phpunit-watcher.yml
 .tool-versions
