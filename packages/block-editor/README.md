@@ -275,7 +275,7 @@ _Returns_
 
 ### BlockStyle
 
-Undocumented declaration.
+A block's `style` attribute, or a part of it.
 
 ### BlockStyles
 
@@ -283,7 +283,7 @@ Undocumented declaration.
 
 ### BlockStyleState
 
-Undocumented declaration.
+The viewport and pseudo state whose styles a block's controls edit.
 
 ### BlockTitle
 
@@ -826,11 +826,11 @@ _Related_
 
 ### MediaUploadFunction
 
-Undocumented declaration.
+A media upload function, flagged when it is the provider's interceptor.
 
 ### MediaUploadOptions
 
-Undocumented declaration.
+Parameters of the media upload function.
 
 ### MultiSelectScrollIntoView
 

@@ -70,8 +70,6 @@ export type BlockBindings = Record< string, unknown >;
  * Block attributes that survive a block transform.
  */
 export interface TransformedAttributes {
-	anchor?: unknown;
-	ariaLabel?: unknown;
 	metadata?: Record< string, unknown >;
 	[ key: string ]: unknown;
 }
