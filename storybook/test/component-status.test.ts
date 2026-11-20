@@ -24,6 +24,7 @@ type Story = {
 	file: string;
 	id: string;
 	component?: string;
+	subcomponents: string[];
 	status?: string;
 	isInManifest: boolean;
 };
@@ -49,6 +50,7 @@ function readStories(): Story[] {
 				file,
 				id: csf.meta.id ?? sanitize( csf.meta.title ?? file ),
 				component: readLocalComponentName( csf ),
+				subcomponents: readSubcomponentNames( csf ),
 				status: readComponentStatus( csf._metaAnnotations.parameters ),
 				isInManifest: csf.indexInputs.some( ( { tags } ) =>
 					combineTags( ...( tags ?? [] ) ).includes( 'manifest' )
@@ -75,6 +77,21 @@ function readLocalComponentName(
 	);
 
 	return isImportedFromPackage ? undefined : component.name;
+}
+
+function readSubcomponentNames(
+	csf: ReturnType< ReturnType< typeof loadCsf >[ 'parse' ] >
+): string[] {
+	const subcomponents = csf._metaAnnotations.subcomponents;
+	if ( subcomponents?.type !== 'ObjectExpression' ) {
+		return [];
+	}
+
+	return subcomponents.properties.flatMap( ( property ) =>
+		property.type === 'ObjectProperty' && property.key.type === 'Identifier'
+			? [ property.key.name ]
+			: []
+	);
 }
 
 function readMigrationGuides( stories: Story[] ): MigrationGuide[] {
@@ -250,24 +267,22 @@ describe( '@wordpress/components recommendation status', () => {
 		expect( unlinkedGuides ).toEqual( [] );
 	} );
 
-	it( 'links only migration guides that exist', () => {
-		const guidePaths = new Set(
-			migrationGuides.map( ( { docsId } ) => `/docs/${ docsId }` )
+	it( 'has a story for each denylisted component', () => {
+		const componentsWithStories = new Set(
+			componentStories.flatMap( ( { component, subcomponents } ) => [
+				component,
+				...subcomponents,
+			] )
 		);
-		const brokenLinks = Object.entries( denylist ).flatMap(
-			( [ key, message ] ) =>
-				readStorybookPaths( message )
-					.filter(
-						( storybookPath ) =>
-							storybookPath.includes( '--migration-guide' ) &&
-							! guidePaths.has( storybookPath )
-					)
-					.map(
-						( storybookPath ) =>
-							`The ${ key } message in DENYLIST in ${ RULE_FILE } links ${ storybookPath }, which is not the path of any migration-guide.mdx under packages/components. Fix the link, or the guide's story \`id\` or <Meta name>.`
-					)
-		);
+		const entriesWithoutStories = [ ...denylistEntriesByComponent ]
+			.filter(
+				( [ component ] ) => ! componentsWithStories.has( component )
+			)
+			.map(
+				( [ , { key } ] ) =>
+					`${ key } is in DENYLIST in ${ RULE_FILE }, but no story under packages/components has it as its \`component\` or lists it in \`subcomponents\`. Keep a "not-recommended" story for it, list it in its parent story's \`subcomponents\`, or remove the denylist entry if the component no longer exists.`
+			);
 
-		expect( brokenLinks ).toEqual( [] );
+		expect( entriesWithoutStories ).toEqual( [] );
 	} );
 } );
