@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+-   Fit a block or block style variation rotated in Global Styles to its content, unless it sets a width ([#86891](https://github.com/WordPress/gutenberg/pull/86891)).
 
 ### Bug Fixes
 

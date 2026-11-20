@@ -6,15 +6,19 @@ import type { StyleAttributes } from './types';
 // still need to be generated so they can be applied to inner elements.
 
 /**
- * Provides the inline styles for a block's transform support attributes.
+ * Provides the class name and inline styles for a block's transform support
+ * attributes.
  *
  * @param attributes Block attributes.
- * @return Transform block support derived inline styles.
+ * @return Transform block support derived class name and inline styles.
  */
 export function getTransformClassesAndStyles( attributes: StyleAttributes ) {
 	const transform = attributes.style?.transform || {};
+	const style = getInlineStyles( { transform } );
 
 	return {
-		style: getInlineStyles( { transform } ),
+		// Lets the shared stylesheet fit a rotated block to its content.
+		className: style.rotate ? 'has-rotation' : undefined,
+		style,
 	};
 }
