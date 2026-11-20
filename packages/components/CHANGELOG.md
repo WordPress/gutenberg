@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
+-   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 
 ## 45.0.0 (2026-11-18)
 
