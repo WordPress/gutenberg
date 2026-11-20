@@ -63,7 +63,7 @@ function partial< T >( fixture: DeepPartial< T > | unknown ) {
 const noop = () => null;
 
 const pick = ( obj: Record< string, any >, keys: string[] ) =>
-	Object.fromEntries(
+const pick = ( obj: object, keys: Array< string > ) =>
 		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
 	);
 
