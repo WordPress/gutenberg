@@ -212,44 +212,82 @@ function getParserLanguage( filename ) {
 	return 'jsx';
 }
 
+const SOURCE_FILE = /\.[cm]?[jt]sx?$/;
+
 /**
- * Find the original source of a module: the file its source map points to
- * (e.g. `src/foo.ts` for a transpiled `build-module/foo.mjs`), or the module
- * itself.
- *
- * @param {string} id   Module id (absolute path).
- * @param {string} code Module code, as passed to the transform hook.
- * @return {{ filename: string, code: string }} Original source.
+ * @typedef {Object} OriginalSources
+ * @property {Array<{ filename: string, code: string }>} sources  Original
+ *                                                                JS/TS sources.
+ * @property {string[]}                                  warnings Problems with
+ *                                                                the source map.
  */
-function getOriginalSource( id, code ) {
+
+/**
+ * Find the original sources of a module through its source map: for a
+ * transpiled `build-module/foo.mjs`, `src/foo.tsx` and the files bundled into
+ * it, such as the style runtime of a CSS module. Each source is read from
+ * disk, or else from the map's `sourcesContent`. Sources that are not
+ * JavaScript or TypeScript, like stylesheets, are skipped.
+ *
+ * @param {string} id Module id (absolute path).
+ * @return {OriginalSources|null} Original sources, or null when the module
+ *                                has no source map.
+ */
+export function getOriginalSources( id ) {
 	const mapFile = `${ id }.map`;
-	if ( existsSync( mapFile ) ) {
-		try {
-			const map = JSON.parse( readFileSync( mapFile, 'utf8' ) );
-			if ( map.sources?.length === 1 ) {
-				const sourceFile = path.resolve(
-					path.dirname( mapFile ),
-					map.sourceRoot || '',
-					map.sources[ 0 ]
-				);
-				if ( existsSync( sourceFile ) ) {
-					return {
-						filename: sourceFile,
-						code: readFileSync( sourceFile, 'utf8' ),
-					};
-				}
-				if ( typeof map.sourcesContent?.[ 0 ] === 'string' ) {
-					return {
-						filename: sourceFile,
-						code: map.sourcesContent[ 0 ],
-					};
-				}
-			}
-		} catch {
-			// Fall back to the module itself.
-		}
+	if ( ! existsSync( mapFile ) ) {
+		return null;
 	}
-	return { filename: id, code };
+
+	/** @type {OriginalSources} */
+	const result = { sources: [], warnings: [] };
+	let map;
+	try {
+		map = JSON.parse( readFileSync( mapFile, 'utf8' ) );
+	} catch ( error ) {
+		result.warnings.push(
+			`Could not read the source map ${ mapFile }: ${
+				error instanceof Error ? error.message : String( error )
+			}`
+		);
+		return result;
+	}
+
+	const sources = Array.isArray( map?.sources ) ? map.sources : [];
+	sources.forEach(
+		( /** @type {unknown} */ source, /** @type {number} */ index ) => {
+			if ( typeof source !== 'string' || ! SOURCE_FILE.test( source ) ) {
+				return;
+			}
+			const filename = path.resolve(
+				path.dirname( mapFile ),
+				typeof map.sourceRoot === 'string' ? map.sourceRoot : '',
+				source
+			);
+			if ( existsSync( filename ) ) {
+				result.sources.push( {
+					filename,
+					code: readFileSync( filename, 'utf8' ),
+				} );
+			} else if ( typeof map.sourcesContent?.[ index ] === 'string' ) {
+				result.sources.push( {
+					filename,
+					code: map.sourcesContent[ index ],
+				} );
+			} else {
+				result.warnings.push(
+					`${ filename }, a source of ${ mapFile }, does not exist and the map does not embed it.`
+				);
+			}
+		}
+	);
+
+	if ( ! result.sources.length && ! result.warnings.length ) {
+		result.warnings.push(
+			`The source map ${ mapFile } has no JavaScript or TypeScript source.`
+		);
+	}
+	return result;
 }
 
 /**
@@ -487,6 +525,41 @@ export function getStubFileName( fileName ) {
 }
 
 /**
+ * Extract the i18n calls of a bundled module from its original sources, so
+ * that the translator comments, which transpiling strips, are kept. When the
+ * original sources cannot be used, extract them from the module code itself,
+ * which keeps the strings but may have lost the comments.
+ *
+ * @param {string}                      id   Module id (absolute path).
+ * @param {string}                      code Module code.
+ * @param {( message: string ) => void} warn Reports a problem.
+ * @return {I18nCall[]} Calls.
+ */
+export function extractModuleCalls( id, code, warn ) {
+	const original = getOriginalSources( id );
+	if ( original ) {
+		original.warnings.forEach( warn );
+		// Skip partial sources, which would drop the strings of missing ones.
+		if ( original.sources.length && ! original.warnings.length ) {
+			try {
+				return original.sources.flatMap( ( source ) =>
+					extractI18nCalls( source.filename, source.code )
+				);
+			} catch ( error ) {
+				warn(
+					error instanceof Error ? error.message : String( error )
+				);
+			}
+		}
+		warn(
+			`Reading the translatable strings of ${ id } from the module itself; their translator comments may be lost.`
+		);
+	}
+	// Without usable original sources, a module that does not parse fails the build.
+	return extractI18nCalls( id, code );
+}
+
+/**
  * Rolldown plugin that writes a translation stub next to each bundle.
  *
  * @return {import('rolldown').Plugin} Rolldown plugin.
@@ -505,28 +578,11 @@ export function i18nStubPlugin() {
 				}
 				let calls = extractionCache.get( id );
 				if ( ! calls ) {
-					const original = getOriginalSource( id, code );
-					try {
-						calls = extractI18nCalls(
-							original.filename,
-							original.code
-						);
-					} catch ( error ) {
-						if ( original.filename === id ) {
-							throw error;
-						}
-						/*
-						 * The original source could not be parsed: use the
-						 * module itself, which keeps the strings but may
-						 * have lost the translator comments.
-						 */
-						this.warn(
-							error instanceof Error
-								? error.message
-								: String( error )
-						);
-						calls = extractI18nCalls( id, code );
-					}
+					calls = I18N_CALL_HINT.test( code )
+						? extractModuleCalls( id, code, ( message ) =>
+								this.warn( message )
+							)
+						: [];
 					extractionCache.set( id, calls );
 				}
 				if ( calls.length ) {

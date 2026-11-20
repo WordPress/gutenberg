@@ -1,5 +1,4 @@
 import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import vm from 'node:vm';
@@ -8,6 +7,7 @@ import { parseSync } from 'rolldown/utils';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
 	extractI18nCalls,
+	extractModuleCalls,
 	getStubFileName,
 	i18nStubPlugin,
 	normalizeComment,
@@ -410,15 +410,215 @@ describe( 'i18nStubPlugin', () => {
 		expect( stub ).not.toContain( 'Unused' );
 	} );
 
-	it( 'writes no stub next to an unminified bundle', async () => {
-		await bundle( 'index.js' );
-		const output = await readFile(
+	it( 'writes no stub next to an unminified bundle, so the real bundle is not replaced', async () => {
+		const { output } = await bundle( 'index.js' );
+		expect( output.map( ( { fileName } ) => fileName ) ).toEqual( [
+			'index.js',
+		] );
+		const written = await readFile(
 			path.join( dir, 'out', 'index.js' ),
 			'utf8'
 		);
-		expect( output ).not.toContain( 'Translation stub' );
-		expect( existsSync( path.join( dir, 'out', 'index.min.js' ) ) ).toBe(
-			false
+		expect( written ).toContain( 'console.log' );
+		expect( written ).not.toContain( 'Translation stub' );
+	} );
+
+	it( 'reads every JS/TS source of a multi-source map, so modules importing a CSS module keep their comments', async () => {
+		await mkdir( path.join( dir, 'style-runtime' ) );
+		await writeFile(
+			path.join( dir, 'style-runtime', 'index.ts' ),
+			`export const injectStyle = ( css: string ) => css;\n`
 		);
+		await writeFile(
+			path.join( dir, 'src', 'style.module.scss' ),
+			`.panel { color: red; }\n`
+		);
+		await writeFile(
+			path.join( dir, 'src', 'panel.tsx' ),
+			`import { __ } from '@wordpress/i18n';\nimport styles from './style.module.scss';\n/* translators: Panel title. */\nexport const Panel = () => <h2 className={ styles.panel }>{ __( 'Panel' ) }</h2>;\n`
+		);
+		await writeFile(
+			path.join( dir, 'build-module', 'panel.mjs' ),
+			`import { __ } from '@wordpress/i18n';\nconst injectStyle = ( css ) => css;\nconst styles = { panel: injectStyle( 'panel' ) };\nexport const Panel = () => __( 'Panel' ) + styles.panel;\n`
+		);
+		await writeFile(
+			path.join( dir, 'build-module', 'panel.mjs.map' ),
+			JSON.stringify( {
+				version: 3,
+				sources: [
+					'../style-runtime/index.ts',
+					'../src/style.module.scss',
+					'../src/panel.tsx',
+				],
+				names: [],
+				mappings: '',
+			} )
+		);
+		await writeFile(
+			path.join( dir, 'build-module', 'index.mjs' ),
+			`import { used } from './used.mjs';\nimport { Panel } from './panel.mjs';\nconsole.log( used( 'you' ), Panel() );\n`
+		);
+
+		await bundle( 'index.min.js' );
+		const stub = await readFile(
+			path.join( dir, 'out', 'index.js' ),
+			'utf8'
+		);
+		expect( stub ).toContain(
+			'/* translators: Panel title. */\n__("Panel");'
+		);
+		expect( stub ).toContain(
+			'/* translators: %s: Name. */\n__("Hi %s");'
+		);
+	} );
+
+	it( 'rejects the build when a module without a source map does not parse, instead of dropping its strings', async () => {
+		await writeFile(
+			path.join( dir, 'build-module', 'index.mjs' ),
+			`import { __ } from '@wordpress/i18n';\nconsole.log( __( 'Broken' );\n`
+		);
+		await expect( bundle( 'index.min.js' ) ).rejects.toThrow(
+			/Could not parse .*index\.mjs for translation stubs/
+		);
+	} );
+} );
+
+describe( 'extractModuleCalls', () => {
+	let dir;
+	/** @type {string[]} */
+	let warnings;
+	const warn = ( /** @type {string} */ message ) => warnings.push( message );
+	const moduleCode = `import { __ } from '@wordpress/i18n';\nexport const label = __( 'Label' );\n`;
+	const sourceCode = `import { __ } from '@wordpress/i18n';\n// translators: A label.\nexport const label: string = __( 'Label' );\n`;
+
+	beforeEach( async () => {
+		dir = await mkdtemp( path.join( tmpdir(), 'wp-build-i18n-' ) );
+		warnings = [];
+	} );
+
+	afterEach( async () => {
+		await rm( dir, { recursive: true, force: true } );
+	} );
+
+	const writeMap = ( map ) =>
+		writeFile(
+			path.join( dir, 'label.mjs.map' ),
+			typeof map === 'string' ? map : JSON.stringify( map )
+		);
+
+	it( 'reads the source from sourcesContent when it is missing on disk, so its comments are kept', async () => {
+		await writeMap( {
+			version: 3,
+			sources: [ '../src/label.ts' ],
+			sourcesContent: [ sourceCode ],
+			mappings: '',
+		} );
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [
+			{
+				fn: '__',
+				args: [ 'Label' ],
+				comments: [ 'translators: A label.' ],
+			},
+		] );
+		expect( warnings ).toEqual( [] );
+	} );
+
+	it( 'warns about a malformed map and still extracts the strings from the module', async () => {
+		await writeMap( '{ not json' );
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [ { fn: '__', args: [ 'Label' ], comments: [] } ] );
+		expect( warnings[ 0 ] ).toMatch( /Could not read the source map/ );
+	} );
+
+	it( 'warns about a source missing on disk and not embedded, and falls back to the module', async () => {
+		await writeMap( {
+			version: 3,
+			sources: [ '../src/label.ts' ],
+			mappings: '',
+		} );
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [ { fn: '__', args: [ 'Label' ], comments: [] } ] );
+		expect( warnings[ 0 ] ).toMatch(
+			/does not exist and the map does not embed it/
+		);
+	} );
+
+	it( 'falls back to the module when only some sources are usable, so the strings of a missing one are kept', async () => {
+		await writeMap( {
+			version: 3,
+			sources: [ '../src/label.ts', '../src/missing-helper.ts' ],
+			sourcesContent: [ sourceCode ],
+			mappings: '',
+		} );
+		const code = `${ moduleCode }export const help = __( 'Help' );\n`;
+		expect(
+			extractModuleCalls( path.join( dir, 'label.mjs' ), code, warn )
+		).toEqual( [
+			{ fn: '__', args: [ 'Label' ], comments: [] },
+			{ fn: '__', args: [ 'Help' ], comments: [] },
+		] );
+		expect( warnings[ 0 ] ).toMatch( /missing-helper\.ts/ );
+	} );
+
+	it( 'warns about a map without JS/TS sources and falls back to the module', async () => {
+		await writeMap( {
+			version: 3,
+			sources: [ '../src/style.scss' ],
+			mappings: '',
+		} );
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [ { fn: '__', args: [ 'Label' ], comments: [] } ] );
+		expect( warnings[ 0 ] ).toMatch(
+			/has no JavaScript or TypeScript source/
+		);
+	} );
+
+	it( 'warns when the original source does not parse and falls back to the module', async () => {
+		await writeMap( {
+			version: 3,
+			sources: [ '../src/label.ts' ],
+			sourcesContent: [ `export const label = __( 'Label' ` ],
+			mappings: '',
+		} );
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [ { fn: '__', args: [ 'Label' ], comments: [] } ] );
+		expect( warnings[ 0 ] ).toMatch( /Could not parse .*label\.ts/ );
+	} );
+
+	it( 'reads the module silently when it has no source map', () => {
+		expect(
+			extractModuleCalls(
+				path.join( dir, 'label.mjs' ),
+				moduleCode,
+				warn
+			)
+		).toEqual( [ { fn: '__', args: [ 'Label' ], comments: [] } ] );
+		expect( warnings ).toEqual( [] );
 	} );
 } );
