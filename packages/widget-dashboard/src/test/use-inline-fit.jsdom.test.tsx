@@ -29,6 +29,34 @@ function measureFields( width: number ) {
 }
 
 describe( 'useInlineFit', () => {
+	it( 'keeps inline controls at an exact fit and requires spare space to expand', () => {
+		availableSize = 100;
+		const { result, rerender } = renderHook( () => useInlineFit(), {
+			wrapper,
+		} );
+
+		measureFields( 100 );
+		expect( result.current.collapsed ).toBe( false );
+
+		availableSize = 99;
+		rerender();
+		expect( result.current.collapsed ).toBe( true );
+
+		for ( const width of [ 100, 115, 99, 115 ] ) {
+			availableSize = width;
+			rerender();
+			expect( result.current.collapsed ).toBe( true );
+		}
+
+		availableSize = 116;
+		rerender();
+		expect( result.current.collapsed ).toBe( false );
+
+		availableSize = 100;
+		rerender();
+		expect( result.current.collapsed ).toBe( false );
+	} );
+
 	it( 'collapses when the fields exceed the budget and expands back', () => {
 		availableSize = 200;
 		const { result, rerender } = renderHook(
@@ -81,7 +109,16 @@ describe( 'useInlineFit', () => {
 
 		// The user opens the dropdown; space grows meanwhile.
 		rerender( { locked: true } );
-		availableSize = 200;
+		availableSize = 115;
+		rerender( { locked: true } );
+		expect( result.current.collapsed ).toBe( true );
+
+		// Closing inside the buffer keeps the controls collapsed.
+		rerender( { locked: false } );
+		expect( result.current.collapsed ).toBe( true );
+
+		rerender( { locked: true } );
+		availableSize = 116;
 		rerender( { locked: true } );
 		expect( result.current.collapsed ).toBe( true );
 

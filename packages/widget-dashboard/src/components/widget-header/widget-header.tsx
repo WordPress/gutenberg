@@ -7,6 +7,7 @@ import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
+import { measureTextOverflow } from './measure-text-overflow';
 import {
 	WidgetHeaderAvailableSizeProvider,
 	WidgetHeaderReserveProvider,
@@ -68,9 +69,11 @@ export function WidgetHeader( {
 		( [ entry ] ) => setHeaderWidth( entry.contentRect.width )
 	);
 
-	// Actual footprint of the identity cluster plus the gap before the toolbar.
-	// Measured, so whatever identity holds (a help tip, a future badge) is
-	// reserved without a per-element constant.
+	// Natural footprint of the identity cluster plus the gap before the
+	// toolbar. Measured, so whatever identity holds (a help tip, a future
+	// badge) is reserved without a per-element constant. The title's clipped
+	// overflow is added back, so the inline controls give way before the
+	// title truncates and return at the same width.
 	const [ identityReserve, setIdentityReserve ] = useState( 0 );
 	const identityMeasureRef = useResizeObserver< HTMLDivElement >(
 		( [ entry ] ) => {
@@ -78,8 +81,15 @@ export function WidgetHeader( {
 				entry.target.parentElement as HTMLElement
 			);
 
+			const title = entry.target.querySelector( 'h2' );
+			const titleOverflow = title
+				? Math.max( 0, measureTextOverflow( title ) )
+				: 0;
+
 			setIdentityReserve(
-				entry.contentRect.width + ( parseFloat( columnGap ) || 0 )
+				entry.contentRect.width +
+					titleOverflow +
+					( parseFloat( columnGap ) || 0 )
 			);
 		}
 	);
