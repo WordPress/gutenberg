@@ -150,7 +150,7 @@ function inheritNavigationStyles( blocks, inheritedAttributes ) {
 				? inheritNavigationBlockAttributes(
 						block.attributes,
 						inheritedAttributes
-				  )
+					)
 				: block.attributes,
 		innerBlocks: block.innerBlocks
 			? inheritNavigationStyles( block.innerBlocks, inheritedAttributes )
