@@ -1,0 +1,15 @@
+@use "@wordpress/base-styles/z-index" as *;
+
+.block-editor-grid-visualizer__drop-preview-container {
+	display: grid;
+	position: absolute;
+	// Align with the grid's tracks, inside its padding and borders.
+	grid-area: 1 / 1 / -1 / -1;
+	pointer-events: none;
+	z-index: z-index(".block-editor-grid-visualizer");
+}
+
+.block-editor-grid-visualizer__drop-preview {
+	background: var(--wp-admin-theme-color);
+	opacity: 0.2;
+}
