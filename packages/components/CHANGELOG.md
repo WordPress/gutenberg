@@ -23,6 +23,7 @@
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 -   `ToggleGroupControl`: Show option tooltips above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86804](https://github.com/WordPress/gutenberg/pull/86804)).
 -   `ColorPicker`: Show the typed alpha value in the RGB and HSL Alpha fields. Before, some values such as `29` showed one less ([#87291](https://github.com/WordPress/gutenberg/pull/87291)).
+-   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 
 ### Internal
 
@@ -72,7 +73,6 @@
 -   `Autocomplete`: Use the last committed completion callback when a background update suspends ([#86738](https://github.com/WordPress/gutenberg/pull/86738)).
 -   `ContentEditableControl`: Stop a click on a disabled field or its label from focusing the field ([#86613](https://github.com/WordPress/gutenberg/pull/86613)).
 -   `ResizableBox`: Clear the resize tooltip's pending fade timer on unmount ([#86758](https://github.com/WordPress/gutenberg/pull/86758)).
--   `ResizableBox`: When the box or an ancestor is rotated or scaled, keep the dragged handle under the pointer, turn the resize cursor with the handle and keep the handles the same size on screen ([#86884](https://github.com/WordPress/gutenberg/pull/86884)).
 -   `Snackbar`: Run the action when its button is activated with Enter or Space, instead of dismissing the snackbar without running it ([#86670](https://github.com/WordPress/gutenberg/pull/86670)).
 -   `FormToggle`, `ToggleControl`: Show the current state when `checked` isn't passed, so an uncontrolled toggle no longer looks off after it's turned on ([#86678](https://github.com/WordPress/gutenberg/pull/86678)).
 -   `Shortcut`: Show keyboard shortcuts left to right on right-to-left pages, so `⌘K` no longer appears as `K⌘` in tooltips and menu items ([#86606](https://github.com/WordPress/gutenberg/pull/86606)).
