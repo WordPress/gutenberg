@@ -80,12 +80,17 @@
 				"fontSize": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"renaming": false,
 		"interactivity": {
 			"clientNavigation": true
 		}
 	},
 	"selectors": {
+		"dimensions": ".wp-block-navigation-link:not(.wp-block-navigation__responsive-container.is-menu-open *)",
 		"states": {
 			"-current": ".wp-block-navigation .current-menu-item"
 		}
