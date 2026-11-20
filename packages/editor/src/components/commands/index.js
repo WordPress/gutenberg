@@ -13,6 +13,7 @@ import {
 	layout,
 	rotateRight,
 	rotateLeft,
+	gallery,
 } from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -149,6 +150,7 @@ const getEditorCommandLoader = () =>
 		const { getCurrentPostId } = useSelect( editorStore );
 		const allowSwitchEditorMode =
 			isCodeEditingEnabled && isRichEditingEnabled;
+		const { wp } = window;
 
 		if ( isPreviewMode ) {
 			return { commands: [], isLoading: false };
@@ -333,6 +335,78 @@ const getEditorCommandLoader = () =>
 						type: 'snackbar',
 					}
 				);
+			},
+		} );
+
+		commands.push( {
+			name: 'core/open-media-library',
+			label: __( 'Open Media Library' ),
+			icon: gallery,
+			callback: ( { close } ) => {
+				close();
+
+				const frame = wp.media( {
+					title: __( 'Select or Upload Media' ),
+					button: {
+						text: __( 'Select' ),
+					},
+					multiple: false,
+				} );
+
+				// Handle the selected media
+				frame.on( 'select', () => {
+					const attachment = frame
+						.state()
+						.get( 'selection' )
+						.first()
+						.toJSON();
+
+					// If you want to insert into the block editor, use the blockEditorStore
+					const { insertBlocks } =
+						wp.data.dispatch( 'core/block-editor' );
+					const { createBlock } = wp.blocks;
+
+					// Create an image block with the selected media URL
+					const imageBlock = createBlock( 'core/image', {
+						url: attachment.url,
+						alt: attachment.alt,
+					} );
+
+					// Get the selected block client ID
+					const selectedBlockClientId = wp.data
+						.select( 'core/block-editor' )
+						.getSelectedBlockClientId();
+
+					// Get the parent block client ID
+					const parentBlockClientId = wp.data
+						.select( 'core/block-editor' )
+						.getBlockRootClientId( selectedBlockClientId );
+
+					// Get the order of blocks within the parent block
+					const blockOrder = wp.data
+						.select( 'core/block-editor' )
+						.getBlockOrder( parentBlockClientId );
+
+					// Find the index of the selected block within the parent block
+					const blockIndex = blockOrder.indexOf(
+						selectedBlockClientId
+					);
+
+					if ( selectedBlockClientId !== null && blockIndex !== -1 ) {
+						// Insert the image block after the selected block within the parent block
+						insertBlocks(
+							imageBlock,
+							blockIndex + 1,
+							parentBlockClientId
+						);
+					} else {
+						// If no block is selected, insert the image block at the end
+						insertBlocks( imageBlock );
+					}
+				} );
+
+				// Open the frame
+				frame.open();
 			},
 		} );
 
