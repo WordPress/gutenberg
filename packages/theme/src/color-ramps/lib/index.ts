@@ -28,6 +28,19 @@ import {
 } from '../../semantic-color-contrast-pairs.ts';
 import { BLACK, WHITE, CONTRAST_EPSILON } from './constants.ts';
 
+// Surface steps are swapped for darker ramps before exposing the public tokens.
+function getBrandSurfaceContrast( ramp: Ramp, mainDir: RampDirection ) {
+	const brandSurface = mainDir === 'lighter' ? ramp.surface1 : ramp.surface3;
+	const focusSteps = Object.keys(
+		BRAND_FOCUS_STEPS
+	) as ( keyof typeof BRAND_FOCUS_STEPS )[];
+	return Math.min(
+		...focusSteps.map( ( step ) =>
+			getContrast( ramp[ step ], brandSurface )
+		)
+	);
+}
+
 /**
  * Calculate a complete color ramp based on the provided configuration.
  *
@@ -224,16 +237,7 @@ function calculateRamp( {
 	// The brand surface depends on the fill seed. Check their relationship
 	// after both exist so seed bisection can resolve it without a cycle.
 	if ( neutralSurface ) {
-		const brandSurface =
-			mainDir === 'lighter' ? rampResults.surface1 : rampResults.surface3;
-		const focusSteps = Object.keys(
-			BRAND_FOCUS_STEPS
-		) as ( keyof typeof BRAND_FOCUS_STEPS )[];
-		const contrast = Math.min(
-			...focusSteps.map( ( step ) =>
-				getContrast( rampResults[ step ], brandSurface )
-			)
-		);
+		const contrast = getBrandSurfaceContrast( rampResults, mainDir );
 		const deficit = Math.log(
 			adjustContrastTarget( MINIMUM_NON_TEXT_CONTRAST ) / contrast
 		);
@@ -314,9 +318,37 @@ export function buildRamp(
 			pinLightness,
 		} );
 
+	function getWarnings( ramp: Ramp, candidate: PlainColorObject ) {
+		const emitted = {
+			...ramp,
+			seed: getColorString( candidate ),
+			neutralSurface: neutralSurfaceColor,
+		};
+		return sortedSteps.filter( ( stepName ) => {
+			const { contrast } = config[ stepName ];
+			return (
+				! contrast.ignoreWhenAdjustingSeed &&
+				getContrastReferences( contrast ).some(
+					( { reference, target } ) =>
+						getContrast( ramp[ stepName ], emitted[ reference ]! ) <
+						target
+				)
+			);
+		} );
+	}
+
 	let bestRamp = rampResults;
 
-	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
+	if (
+		maxDeficit > CONTRAST_EPSILON &&
+		rescaleToFitContrastTargets &&
+		// A rounding reserve helps the numerical search. An already emitted
+		// primary ramp only needs to meet the actual contrast targets.
+		( ! neutralSurface ||
+			getBrandSurfaceContrast( rampResults, mainDir ) <
+				MINIMUM_NON_TEXT_CONTRAST ||
+			getWarnings( rampResults, seed ).length > 0 )
+	) {
 		const iterSteps = neutralSurface
 			? sortedSteps
 			: stepsForStep( maxDeficitStep!, config );
@@ -377,22 +409,7 @@ export function buildRamp(
 
 	// Check emitted colors, including reused steps. Numerical search results
 	// alone cannot establish their contrast after serialization.
-	const emitted = {
-		...bestRamp,
-		seed: getColorString( seed ),
-		neutralSurface: neutralSurfaceColor,
-	};
-	const warnings = sortedSteps.filter( ( stepName ) => {
-		const { contrast } = config[ stepName ];
-		return (
-			! contrast.ignoreWhenAdjustingSeed &&
-			getContrastReferences( contrast ).some(
-				( { reference, target } ) =>
-					getContrast( bestRamp[ stepName ], emitted[ reference ]! ) <
-					target
-			)
-		);
-	} );
+	const warnings = getWarnings( bestRamp, seed );
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",

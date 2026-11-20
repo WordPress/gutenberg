@@ -55,6 +55,16 @@ describe( 'accent focus contrast', () => {
 		}
 	);
 
+	it.each( [ '#007cba', '#437aa8' ] )(
+		'keeps the supplied brand fill %s when the emitted colors meet the targets',
+		( seed ) => {
+			const neutral = buildBgRamp( '#fcfcfc' );
+			expect(
+				buildAccentRamp( 'primary', seed, neutral ).ramp.bgFill1
+			).toBe( seed );
+		}
+	);
+
 	it( 'retains a primary ramp that already meets the focus constraints', () => {
 		const neutral = buildBgRamp( '#fcfcfc' );
 		expect( buildAccentRamp( 'primary', '#3858e9', neutral ) ).toEqual(
