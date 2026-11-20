@@ -7,10 +7,6 @@ export const previewStyle: CSSProperties = {
 	color: 'var(--wpds-color-foreground-content-neutral)',
 };
 
-export const headingStyle: CSSProperties = {
-	marginBlockEnd: 'var(--wpds-dimension-gap-xs)',
-};
-
 export const listStyle: CSSProperties = {
 	display: 'flex',
 	flexDirection: 'column',
@@ -54,4 +50,9 @@ export const textStyle: CSSProperties = {
 	gap: 'var(--wpds-dimension-gap-xs)',
 	minWidth: 0,
 	margin: 0,
+};
+
+export const valueStyle: CSSProperties = {
+	...tokenNameStyle,
+	overflowWrap: 'anywhere',
 };

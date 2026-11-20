@@ -1,14 +1,8 @@
 import type { CSSProperties } from 'react';
 import { GroupTitle } from './group-title';
-import {
-	descriptionStyle,
-	itemStyle as sharedItemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { TokenTable } from './token-table';
+import { previewStyle } from './token-preview-styles';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
 	sampleLines: string[];
@@ -59,15 +53,6 @@ const typographyConfig: Record< TypographyGroupKey, TypographyTokenGroup > = {
 	},
 };
 
-// Stack the token name and description above the sample.
-const itemStyle: CSSProperties = {
-	...sharedItemStyle,
-	display: 'flex',
-	flexDirection: 'column',
-	alignItems: 'stretch',
-	gap: 'var(--wpds-dimension-gap-md)',
-};
-
 const sampleStyle: CSSProperties = {
 	margin: 0,
 };
@@ -88,47 +73,39 @@ function TypographyTokenSection( {
 	getSampleStyle,
 }: TypographyTokenGroup & {
 	groupKey: string;
-	tokenNames: readonly ( keyof typeof tokens )[];
+	tokenNames: readonly string[];
 } ) {
 	const sectionTokens = tokenNames;
 
 	return (
 		<section>
-			<GroupTitle name={ groupKey } />
-			<dl style={ listStyle }>
-				{ sectionTokens.map( ( tokenName ) => {
-					const tokenValue = getTokenValue( tokenName );
-					const tokenStyle = getSampleStyle( tokenValue, tokenName );
-
-					return (
-						<div key={ tokenName } style={ itemStyle }>
-							<dt style={ textStyle }>
-								<code style={ tokenNameStyle }>
-									{ tokenName }
-								</code>
-								<span style={ descriptionStyle }>
-									{ tokens[ tokenName ].$description }
-								</span>
-							</dt>
-							<dd style={ { margin: 0 } }>
-								<p style={ sampleStyle }>
-									{ sampleLines.map( ( line ) => (
-										<span
-											key={ line }
-											style={ {
-												...sampleLineStyle,
-												...tokenStyle,
-											} }
-										>
-											{ line }
-										</span>
-									) ) }
-								</p>
-							</dd>
-						</div>
+			<GroupTitle name={ groupKey } id={ `typography-${ groupKey }` } />
+			<TokenTable
+				names={ sectionTokens }
+				sampleWidth="32%"
+				tokenWidth="36%"
+				renderSample={ ( tokenName ) => {
+					const tokenStyle = getSampleStyle(
+						getTokenValue( tokenName ),
+						tokenName
 					);
-				} ) }
-			</dl>
+					return (
+						<p style={ sampleStyle }>
+							{ sampleLines.map( ( line ) => (
+								<span
+									key={ line }
+									style={ {
+										...sampleLineStyle,
+										...tokenStyle,
+									} }
+								>
+									{ line }
+								</span>
+							) ) }
+						</p>
+					);
+				} }
+			/>
 		</section>
 	);
 }
