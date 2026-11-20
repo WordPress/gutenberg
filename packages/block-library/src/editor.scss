@@ -89,3 +89,10 @@
 :where(.editor-styles-wrapper) iframe:not([frameborder]) {
 	border: 0;
 }
+
+// A header whose only child is sticky sticks in place of that child (see common.scss).
+// The editor gives every block `position: relative`, which wins over the zero-specificity
+// rule in common.scss, so set the position again here.
+.block-editor-block-list__block:is(header):has(> .is-position-sticky:only-child:not(.is-position-fixed)) {
+	position: sticky;
+}
