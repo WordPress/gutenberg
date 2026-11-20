@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height
+-   `Badge`: Use the `--wpds-typography-line-height-sm` token for its line height ([#87154](https://github.com/WordPress/gutenberg/pull/87154)).
 -   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
 
 ### Bug Fixes
