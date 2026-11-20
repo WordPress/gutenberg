@@ -14,6 +14,11 @@ const SETTLE_DELAY = 500;
 const fieldHistory = new WeakMap< Element, boolean >();
 
 /**
+ * Cancels the pending debounce check of a field judged local.
+ */
+const pendingChecks = new WeakMap< Element, () => void >();
+
+/**
  * Resolves the element an event really originates from. Events coming from
  * the editor canvas are re-dispatched on the iframe element, so the real
  * target is the frame's focused element.
@@ -72,6 +77,15 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 				return;
 			}
 
+			// A later keystroke starts its own check.
+			pendingChecks.get( field )?.();
+
+			// Enter in a single line field submits or commits rather than
+			// types, so a history edit following it is not the field's own.
+			if ( event.key === 'Enter' && field.nodeName === 'INPUT' ) {
+				return;
+			}
+
 			const value = getFieldValue( field );
 			const revision = getRevision();
 			const { defaultView } = field.ownerDocument;
@@ -90,12 +104,26 @@ export function useFieldHistoryTracking( getRevision: () => unknown ) {
 
 				fieldHistory.set( field, false );
 
-				// A field that commits on a debounce edits the history later.
-				defaultView.setTimeout( () => {
-					if ( getRevision() !== revision ) {
+				// A field that commits on a debounce edits the history later,
+				// while it keeps the typed value and focus. A history edit
+				// after leaving the field is not its own.
+				const typedValue = getFieldValue( field );
+				const timeout = defaultView.setTimeout( () => {
+					cancel();
+					if (
+						getRevision() !== revision &&
+						getFieldValue( field ) === typedValue
+					) {
 						fieldHistory.set( field, true );
 					}
 				}, SETTLE_DELAY );
+				const cancel = () => {
+					defaultView.clearTimeout( timeout );
+					field.removeEventListener( 'blur', cancel );
+					pendingChecks.delete( field );
+				};
+				field.addEventListener( 'blur', cancel );
+				pendingChecks.set( field, cancel );
 			} );
 		}
 
