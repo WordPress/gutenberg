@@ -167,6 +167,10 @@
 			"duotone": ".wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background"
 		}
 	},
+	"styles": [
+		{ "name": "default", "label": "Default", "isDefault": true },
+		{ "name": "hover-reveal", "label": "Hover reveal" }
+	],
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"
 }

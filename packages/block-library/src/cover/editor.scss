@@ -69,6 +69,12 @@
 		margin-right: 0;
 	}
 
+	// Keep the hover reveal content visible while the block is being edited.
+	&.is-style-hover-reveal.is-selected .wp-block-cover__inner-container,
+	&.is-style-hover-reveal.has-child-selected .wp-block-cover__inner-container {
+		opacity: 1;
+	}
+
 	.wp-block-cover__placeholder-background-options {
 		width: 100%;
 	}
