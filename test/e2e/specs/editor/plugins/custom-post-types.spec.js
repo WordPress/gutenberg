@@ -100,6 +100,32 @@ test.describe( 'Test Custom Post Types', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'shows the parent control for a hierarchical post type that is not viewable', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const postType = await requestUtils.rest( {
+			path: '/wp/v2/types/hierar-private?context=edit',
+		} );
+		expect( postType.hierarchical ).toBe( true );
+		expect( postType.viewable ).toBe( false );
+
+		await admin.createNewPost( { postType: 'hierar-private' } );
+		const summary = await openPostSummary( {
+			editor,
+			page,
+			tab: 'Hierarchical Private',
+		} );
+
+		await summary.getByRole( 'button', { name: 'Edit Parent' } ).click();
+
+		await expect(
+			page.getByRole( 'combobox', { name: 'Parent' } )
+		).toBeVisible();
+	} );
+
 	test( 'should not be able to rename a post that lacks title support', async ( {
 		admin,
 		editor,

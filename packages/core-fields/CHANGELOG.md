@@ -9,3 +9,4 @@
 ### Bug Fixes
 
 - Only register the parent field for hierarchical post types supporting page attributes ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+- Show the parent field's control for hierarchical post types that are not publicly viewable, instead of an empty popover ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
