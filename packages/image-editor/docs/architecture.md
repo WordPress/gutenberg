@@ -6,7 +6,7 @@ How the image editor works inside, for people changing this package. To use it, 
 
 | Layer | Files | Responsibility |
 | --- | --- | --- |
-| Core | `src/core/` | Pure state, camera math, containment, source-region, transforms, and canvas export. |
+| Core | `src/core/` | Pure state, camera math, containment, source-region, and canvas export. |
 | React | `src/react/` | The canvas (`ImageEditorCanvas`), DOM measurement, interaction hooks, overlays, stencil rendering, and the `useImageEditor` hook. |
 | Saving | `src/get-image-edit.ts`, `src/get-output-size.ts`, `src/export-image.ts` | Describe the edit against the loaded image and the size it produces, and export the edited image in the browser. |
 
@@ -58,6 +58,7 @@ Viewport pan and zoom let the person look closer at the crop area without changi
 | Task | API |
 | --- | --- |
 | Describe the edit to apply to the loaded image when saving | `getImageEdit()`. |
+| Turn the edit into instructions in the order they apply | `mapImageEdit()`. |
 | Keep the edit in your own undo history | `useImageEditor( { state, onChange } )`, `createImageEditorState()` and `areImageEditorStatesEqual()`. |
 | Build zoom and rotation controls | `controller.minZoom`, `controller.maxZoom` and `controller.maxRotationOffset`. |
 

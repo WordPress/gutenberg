@@ -970,6 +970,15 @@
             - render
             - style
             - variant
+      - name: Notice.ActionButtonLink
+        props:
+            - children
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+            - variant
       - name: Notice.ActionLink
         props:
             - children
