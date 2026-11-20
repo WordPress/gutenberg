@@ -36,15 +36,19 @@
 		padding-right: $grid-unit-30;
 	}
 
-	// Keeps extra scrollbars from appearing when block toolbars overflow.
-	overflow: hidden;
+	// Keeps extra scrollbars from appearing when block toolbars overflow. Unlike
+	// `hidden`, `clip` isn't a scroll container, so scrolling a block into view
+	// can't move the canvas. It keeps the automatic minimum height, though, which
+	// would stop the canvas from shrinking when resizing meta boxes.
+	overflow: clip;
+	min-height: 0;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
 	& .components-button {
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		padding: 6px 12px;
 
 		&.is-tertiary,

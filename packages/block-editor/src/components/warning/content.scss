@@ -17,7 +17,7 @@
 	.block-editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 		color: $gray-900;
 		margin: 0;
 	}

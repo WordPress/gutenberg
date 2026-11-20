@@ -434,39 +434,52 @@ async function beforeSave(
 		);
 	}
 
+	const syncEdits: EntitySyncRecord = {};
+
 	if ( isAutosave ) {
 		// Capture the CRDT snapshot in the same tick as the payload so it
 		// describes exactly the content being autosaved.
 		const snapshot = manager.getEntitySnapshot( objectType, objectId );
 
-		return snapshot
-			? { [ CRDT_AUTOSAVE_SNAPSHOT_KEY ]: snapshot }
-			: undefined;
+		if ( snapshot ) {
+			syncEdits[ CRDT_AUTOSAVE_SNAPSHOT_KEY ] = snapshot;
+		}
 	}
 
-	// Add meta for the persisted CRDT document during real post saves so the
-	// saved post and CRDT snapshot are committed in the same request. We don't
-	// want a post save to fail but a CRDT update to succeed or vice versa.
-	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( 'postType' !== kind || ! persistedRecord ) {
+	// Send the persisted CRDT document in `meta` with every request that
+	// writes the parent post, so the post content and the document are
+	// committed together. We don't want a post save to fail but a CRDT update
+	// to succeed or vice versa. CRDT repair uses /wp-sync/v1/save to avoid
+	// post-save side effects.
+	//
+	// A regular save always writes the parent post. An autosave only does so
+	// when it promotes an auto-draft to a draft. Later autosaves only create
+	// revisions. Without the document in that first autosave, a post that is
+	// never saved manually would have parent content but no persisted
+	// document. A peer loading such a post builds a new document from the
+	// parent content, and that document can replace the live one on sync.
+	const writesParentPost =
+		! isAutosave || 'auto-draft' === persistedRecord?.status;
+
+	if ( 'postType' === kind && persistedRecord && writesParentPost ) {
+		const serializedDoc = await manager.createPersistedCRDTDoc(
+			objectType,
+			objectId
+		);
+
+		if ( serializedDoc ) {
+			syncEdits.meta = {
+				...( edits.meta as EntitySyncRecord | undefined ),
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+			};
+		}
+	}
+
+	if ( 0 === Object.keys( syncEdits ).length ) {
 		return;
 	}
 
-	const serializedDoc = await manager.createPersistedCRDTDoc(
-		objectType,
-		toObjectId( persistedRecord.id as EntitySyncRecordId )
-	);
-
-	if ( ! serializedDoc ) {
-		return;
-	}
-
-	return {
-		meta: {
-			...( edits.meta as EntitySyncRecord | undefined ),
-			[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
-		},
-	};
+	return syncEdits;
 }
 
 function createRecordHandlers(
