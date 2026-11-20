@@ -21,7 +21,7 @@ const CommentsFormPlaceholder = () => {
 				className="comment-form"
 				onSubmit={ ( event ) => event.preventDefault() }
 			>
-				<p>
+				<p className="comment-form-comment">
 					<label htmlFor={ `comment-${ instanceId }` }>
 						{ __( 'Comment' ) }
 					</label>
