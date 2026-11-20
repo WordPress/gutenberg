@@ -101,6 +101,7 @@ export interface MediaUploadOptions {
 	onFileChange?: ( attachments: Array< Record< string, unknown > > ) => void;
 	onSuccess?: ( attachments: Array< Record< string, unknown > > ) => void;
 	onBatchSuccess?: () => void;
+	uploadId?: string;
 	multiple?: boolean;
 }
 

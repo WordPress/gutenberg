@@ -22,6 +22,9 @@
 			"type": "string",
 			"role": "local"
 		},
+		"uploadId": {
+			"type": "string"
+		},
 		"url": {
 			"type": "string",
 			"source": "attribute",
