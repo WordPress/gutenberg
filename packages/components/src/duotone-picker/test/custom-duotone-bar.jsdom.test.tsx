@@ -8,6 +8,16 @@ globalThis.wpVitest.mockMatchMedia();
 const VALUE = [ '#000000', '#ffffff' ];
 
 describe( 'CustomDuotoneBar', () => {
+	it( 'renders a single-color value', () => {
+		render(
+			<CustomDuotoneBar value={ [ '#008000' ] } onChange={ vi.fn() } />
+		);
+
+		expect(
+			screen.getByRole( 'button', { name: /color code #008000/ } )
+		).toBeInTheDocument();
+	} );
+
 	it( 'does not offer to reposition control points, since a duotone has no positions to save', () => {
 		render( <CustomDuotoneBar value={ VALUE } onChange={ vi.fn() } /> );
 
