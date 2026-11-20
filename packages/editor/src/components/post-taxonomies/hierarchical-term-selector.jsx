@@ -176,9 +176,11 @@ export function getFilterMatcher( filterValue ) {
 
 		// If the term's name contains the filterValue, or it has children
 		// (i.e. some child matched at some point in the tree) then return it.
+		// Term names come from the API with HTML entities (e.g. `&amp;`), so
+		// decode them to match what the user sees.
 		if (
 			-1 !==
-				normalizeTextString( term.name ).indexOf(
+				normalizeTextString( decodeEntities( term.name ) ).indexOf(
 					normalizedFilterValue
 				) ||
 			term.children.length > 0
