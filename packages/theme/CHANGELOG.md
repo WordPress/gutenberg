@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use the WCAG sRGB luminance coefficients when checking generated colors against contrast thresholds ([#87174](https://github.com/WordPress/gutenberg/pull/87174)).
+
 ## 5.0.0 (2026-11-18)
 
 ### Breaking Changes
