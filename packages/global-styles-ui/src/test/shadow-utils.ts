@@ -100,16 +100,22 @@ const shadowUnits = {
 };
 
 // Data helper functions
-function getShadowString( formatString, values ) {
+function getShadowString(
+	formatString: string,
+	values: Record< string, string >
+) {
 	return formatString.replace( /\{(\w+)\}/g, ( match, placeholder ) => {
-		if ( values.hasOwnProperty( placeholder ) ) {
+		if ( Object.prototype.hasOwnProperty.call( values, placeholder ) ) {
 			return values[ placeholder ];
 		}
 		return match;
 	} );
 }
-function getCombinedShadowString( format, parts ) {
-	return format.replace( /{(\d+)}/g, ( _, index ) => parts[ index - 1 ] );
+function getCombinedShadowString( format: string, parts: string[] ) {
+	return format.replace(
+		/{(\d+)}/g,
+		( _, index ) => parts[ Number( index ) - 1 ]
+	);
 }
 
 describe( 'getShadowParts', () => {

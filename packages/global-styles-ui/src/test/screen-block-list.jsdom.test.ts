@@ -1,3 +1,4 @@
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { describe, expect, it } from 'vitest';
 import { hasUserStylesForBlock } from '../screen-block-list';
 import { getOverridingBlockTypes } from '../utils';
@@ -35,7 +36,7 @@ describe( 'hasUserStylesForBlock', () => {
 					},
 				},
 			},
-		};
+		} as unknown as GlobalStylesConfig;
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
 	} );
 
@@ -84,7 +85,7 @@ describe( 'hasUserStylesForBlock', () => {
 					},
 				},
 			},
-		};
+		} as unknown as GlobalStylesConfig;
 		expect( hasUserStylesForBlock( fullPalette, 'core/quote' ) ).toBe(
 			true
 		);
@@ -114,13 +115,13 @@ describe( 'hasUserStylesForBlock', () => {
 					'core/quote': { typography: { customFontSize: true } },
 				},
 			},
-		};
+		} as unknown as GlobalStylesConfig;
 		expect( hasUserStylesForBlock( user, 'core/quote' ) ).toBe( true );
 	} );
 } );
 
 describe( 'getOverridingBlockTypes', () => {
-	function getConfig( blocks ) {
+	function getConfig( blocks?: Record< string, any > ): GlobalStylesConfig {
 		return {
 			settings: { typography: { lineHeight: true } },
 			styles: {
@@ -134,7 +135,7 @@ describe( 'getOverridingBlockTypes', () => {
 				},
 				blocks,
 			},
-		};
+		} as unknown as GlobalStylesConfig;
 	}
 
 	it.each( [ 'heading', 'h5' ] )(
@@ -195,13 +196,16 @@ describe( 'getOverridingBlockTypes', () => {
 		).toEqual( [ 'core/heading', 'core/post-title' ] );
 	} );
 
-	function getButtonConfig( elementStyle, blockStyle ) {
+	function getButtonConfig(
+		elementStyle?: Record< string, any >,
+		blockStyle?: Record< string, any >
+	): GlobalStylesConfig {
 		return {
 			styles: {
 				elements: { button: elementStyle },
 				blocks: { 'core/button': blockStyle },
 			},
-		};
+		} as unknown as GlobalStylesConfig;
 	}
 
 	it.each( [

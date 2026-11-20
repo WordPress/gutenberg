@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { Navigator, useNavigator } from '@wordpress/components';
@@ -10,7 +11,9 @@ function CurrentPath() {
 	return <span data-testid="path">{ location.path }</span>;
 }
 
-function renderAtRevision( headerProps ) {
+function renderAtRevision(
+	headerProps?: Partial< ComponentProps< typeof ScreenHeader > >
+) {
 	return render(
 		<Navigator initialPath="/revisions/10">
 			<CurrentPath />
