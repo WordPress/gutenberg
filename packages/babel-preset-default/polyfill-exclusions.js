@@ -33,4 +33,25 @@ module.exports = [
 	//
 	// @see https://github.com/WordPress/wordpress-develop/pull/8224#issuecomment-2636390007.
 	/^es(next)?\.iterator\./,
+	// Recently standardized features that are not used in WordPress code and
+	// would only bloat the polyfill.
+	'es.symbol.async-dispose',
+	'es.symbol.dispose',
+	'es.error.is-error',
+	'es.suppressed-error.constructor',
+	'es.disposable-stack.constructor',
+	'es.async-disposable-stack.constructor',
+	'es.async-iterator.async-dispose',
+	'es.map.get-or-insert',
+	'es.map.get-or-insert-computed',
+	'es.weak-map.get-or-insert',
+	'es.weak-map.get-or-insert-computed',
+	'es.math.sum-precise',
+	'es.regexp.escape',
+	'es.typed-array.with',
+	'es.uint8-array.from-base64',
+	'es.uint8-array.set-from-base64',
+	'es.uint8-array.set-from-hex',
+	// Polyfilled for Safari only to fix an obscure spec compliance bug.
+	'es.array.includes',
 ];
