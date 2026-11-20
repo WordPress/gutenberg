@@ -2183,7 +2183,74 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
-	 * Returns the position of the next `{`, `;` or `}` outside a string.
+	 * Returns whether a character is CSS whitespace.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $char The character to check.
+	 * @return bool Whether the character is a space, tab, line feed, carriage
+	 *              return or form feed.
+	 */
+	protected static function is_custom_css_whitespace( $char ) {
+		return ' ' === $char || "\t" === $char || "\n" === $char || "\r" === $char || "\f" === $char;
+	}
+
+	/**
+	 * Returns whether a comment starts at the given position.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css   The CSS to check.
+	 * @param int    $index The position to check.
+	 * @return bool Whether `/*` starts at the position.
+	 */
+	protected static function is_custom_css_comment_start( $css, $index ) {
+		return '/' === ( $css[ $index ] ?? '' ) && '*' === ( $css[ $index + 1 ] ?? '' );
+	}
+
+	/**
+	 * Returns the position after the comment that starts at `$start`, or the
+	 * length of the CSS when the comment isn't closed.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css   The CSS to search.
+	 * @param int    $start The position of the `/` that opens the comment.
+	 * @return int The position after the closing `*` and `/`.
+	 */
+	protected static function find_custom_css_comment_end( $css, $start ) {
+		$end = strpos( $css, '*/', $start + 2 );
+		return false === $end ? strlen( $css ) : $end + 2;
+	}
+
+	/**
+	 * Returns the position of the first character from `$start` that isn't
+	 * whitespace or part of a comment.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css   The CSS to search.
+	 * @param int    $start The position to start from.
+	 * @return int The position of the character, or the length of the CSS.
+	 */
+	protected static function skip_custom_css_whitespace_and_comments( $css, $start ) {
+		$i      = $start;
+		$length = strlen( $css );
+		while ( $i < $length ) {
+			if ( static::is_custom_css_whitespace( $css[ $i ] ) ) {
+				++$i;
+			} elseif ( static::is_custom_css_comment_start( $css, $i ) ) {
+				$i = static::find_custom_css_comment_end( $css, $i );
+			} else {
+				break;
+			}
+		}
+		return $i;
+	}
+
+	/**
+	 * Returns the position of the next `{`, `;` or `}` outside a string or
+	 * comment.
 	 *
 	 * @since 7.1.0
 	 *
@@ -2204,6 +2271,8 @@ class WP_Theme_JSON_Gutenberg {
 				}
 			} elseif ( '"' === $char || "'" === $char ) {
 				$quote = $char;
+			} elseif ( static::is_custom_css_comment_start( $css, $i ) ) {
+				$i = static::find_custom_css_comment_end( $css, $i ) - 1;
 			} elseif ( '{' === $char || ';' === $char || '}' === $char ) {
 				return $i;
 			}
@@ -2212,10 +2281,34 @@ class WP_Theme_JSON_Gutenberg {
 	}
 
 	/**
+	 * Returns whether the statement from `$start` is a bare `&`, optionally
+	 * followed by whitespace.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $css   The CSS to check.
+	 * @param int    $start The position the statement starts at.
+	 * @return bool Whether the statement is a bare `&`.
+	 */
+	protected static function is_bare_custom_css_ampersand( $css, $start ) {
+		if ( '&' !== ( $css[ $start ] ?? '' ) ) {
+			return false;
+		}
+		$length = strlen( $css );
+		for ( $i = $start + 1; $i < $length; $i++ ) {
+			if ( ! static::is_custom_css_whitespace( $css[ $i ] ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Rewrites custom CSS so that it can be split on `&`.
 	 *
-	 * - Comments are replaced with a space, so `;`, `{`, `}` or `&` inside them
-	 *   are ignored, and a comment still separates what is around it.
+	 * - Comments are kept as they are, and skipped like strings, so `;`, `{` or
+	 *   `}` inside them are ignored. `&` inside a comment still splits the CSS,
+	 *   as before.
 	 * - A nested rule without `&` is treated as `& selector`, matching native
 	 *   CSS nesting, e.g. `img {}` becomes `& img {}`. At-rules are left as is.
 	 * - A rule at the very start is only rewritten when it starts with a type
@@ -2236,24 +2329,20 @@ class WP_Theme_JSON_Gutenberg {
 	 * @return string The rewritten CSS.
 	 */
 	protected static function normalize_nested_custom_css( $css ) {
-		// Replace comments with a space, but keep strings that look like comments.
-		$css = preg_replace_callback(
-			'/("(?:[^"\\\\]|\\\\.)*"|\'(?:[^\'\\\\]|\\\\.)*\')|\/\*.*?\*\//s',
-			static function ( $matches ) {
-				return $matches[1] ?? ' ';
-			},
-			$css
-		);
-
 		$result = '';
 		// One entry per open brace: true for an unwrapped bare `& {}` block.
-		$blocks             = array();
+		$blocks = array();
+		// The number of open braces that aren't unwrapped `& {}` blocks.
+		$nested_rules       = 0;
 		$quote              = '';
 		$is_statement_start = true;
 		$is_first_statement = true;
 		$is_after_rule      = false;
-		$statement_start    = 0;
-		$length             = strlen( $css );
+		// Position in `$css` of the first character of the current statement
+		// that isn't whitespace or a comment, and its position in `$result`.
+		$statement_index = -1;
+		$statement_start = 0;
+		$length          = strlen( $css );
 
 		for ( $i = 0; $i < $length; $i++ ) {
 			$char = $css[ $i ];
@@ -2269,42 +2358,59 @@ class WP_Theme_JSON_Gutenberg {
 			}
 
 			// Rules can only be rewritten at the block level.
-			$is_block_level = ! in_array( false, $blocks, true );
+			$is_block_level = 0 === $nested_rules;
 
-			if ( $is_statement_start && ! ctype_space( $char ) ) {
+			if ( $is_statement_start && ! static::is_custom_css_whitespace( $char ) ) {
 				$is_statement_start = false;
-				if ( $is_block_level && ! in_array( $char, array( '&', '@', ';', '}' ), true ) ) {
-					$delimiter     = static::find_next_custom_css_delimiter( $css, $i );
+				// Leading comments are part of the statement, so `& ` goes before
+				// them, but the selector decides whether it is needed.
+				$statement_index = static::skip_custom_css_whitespace_and_comments( $css, $i );
+				$first           = $statement_index < $length ? $css[ $statement_index ] : '';
+				if ( $is_block_level && '' !== $first && ! in_array( $first, array( '&', '@', ';', '}' ), true ) ) {
+					$delimiter     = static::find_next_custom_css_delimiter( $css, $statement_index );
 					$is_rule       = -1 !== $delimiter && '{' === $css[ $delimiter ];
 					$should_prefix = $is_rule
-						? ( ! $is_first_statement || ctype_alpha( $char ) || '*' === $char )
+						? ( ! $is_first_statement || 1 === strspn( $first, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ*' ) )
 						: $is_after_rule;
 					if ( $should_prefix ) {
 						$result .= '& ';
 					}
 				}
 				$is_first_statement = false;
-				$statement_start    = strlen( $result );
+			}
+
+			if ( $i === $statement_index ) {
+				$statement_start = strlen( $result );
+			}
+
+			if ( static::is_custom_css_comment_start( $css, $i ) ) {
+				$end     = static::find_custom_css_comment_end( $css, $i );
+				$result .= substr( $css, $i, $end - $i );
+				$i       = $end - 1;
+				continue;
 			}
 
 			if ( '"' === $char || "'" === $char ) {
 				$quote = $char;
 			} elseif ( '{' === $char ) {
-				if ( $is_block_level && '&' === trim( substr( $result, $statement_start ) ) ) {
+				if ( $is_block_level && static::is_bare_custom_css_ampersand( $result, $statement_start ) ) {
 					$result             = substr( $result, 0, $statement_start );
 					$blocks[]           = true;
 					$is_statement_start = true;
 					continue;
 				}
 				$blocks[] = false;
+				++$nested_rules;
 			} elseif ( '}' === $char ) {
 				if ( ! empty( $blocks ) && end( $blocks ) ) {
 					array_pop( $blocks );
 					$is_statement_start = true;
 					continue;
 				}
-				array_pop( $blocks );
-				if ( ! in_array( false, $blocks, true ) ) {
+				if ( false === array_pop( $blocks ) ) {
+					--$nested_rules;
+				}
+				if ( 0 === $nested_rules ) {
 					$is_after_rule      = true;
 					$is_statement_start = true;
 				}

@@ -2837,17 +2837,22 @@ describe( 'global styles renderer', () => {
 			[
 				'comment with ; before a leading rule',
 				'/* note; see docs */ .is-style-x{color: red;}',
-				':root :where(.foo .is-style-x){color: red;}',
+				':root :where(.foo/* note; see docs */ .is-style-x){color: red;}',
 			],
 			[
 				'comment before a leading pseudo-class',
 				'/* hover; state */\n:hover{color: red;}',
-				':root :where(.foo :hover){color: red;}',
+				':root :where(.foo/* hover; state */\n:hover){color: red;}',
 			],
 			[
-				'comment with braces and & between rules',
-				'color: red; /* & img { } */ img{color: blue;}',
-				':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+				'comment touching a leading class',
+				'/* x */.is-style-x{color: red;}',
+				':root :where(.foo/* x */.is-style-x){color: red;}',
+			],
+			[
+				'comment with ; and } between rules',
+				'color: red; /* a; } */ img{color: blue;}',
+				':root :where(.foo){color: red;}:root :where(.foo /* a;  */ img){color: blue;}',
 			],
 			[
 				'comment-like string is kept',
@@ -2876,6 +2881,13 @@ describe( 'global styles renderer', () => {
 			],
 		] )( '%s', ( _description, css, expected ) => {
 			expect( processCSSNesting( css, '.foo' ) ).toBe( expected );
+		} );
+
+		it( 'keeps a long quoted string', () => {
+			const url = `url("data:image/png;base64,${ 'A'.repeat( 10000 ) }")`;
+			expect(
+				processCSSNesting( `img{background: ${ url };}`, '.foo' )
+			).toBe( `:root :where(.foo img){background: ${ url };}` );
 		} );
 
 		it( 'keeps the existing output for the Twenty Twenty-Four Calendar CSS', () => {

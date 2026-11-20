@@ -8401,6 +8401,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a long quoted string, such as a data URI, is kept.
+	 */
+	public function test_process_blocks_custom_css_long_string() {
+		$url = 'url("data:image/png;base64,' . str_repeat( 'A', 10000 ) . '")';
+
+		$this->assertSame(
+			':root :where(.foo img){background: ' . $url . ';}',
+			WP_Theme_JSON_Gutenberg::process_blocks_custom_css( 'img{background: ' . $url . ';}', '.foo' )
+		);
+	}
+
+	/**
 	 * Data provider.
 	 *
 	 * @return array[]
@@ -8532,27 +8544,34 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected' => ':root :where(.foo img){color: red;}',
 			),
-			// Comments are removed before nested rules are rewritten.
+			// Comments are kept and skipped like strings.
 			'comment with ;'               => array(
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => '/* note; see docs */ .is-style-x{color: red;}',
 				),
-				'expected' => ':root :where(.foo .is-style-x){color: red;}',
+				'expected' => ':root :where(.foo/* note; see docs */ .is-style-x){color: red;}',
 			),
 			'comment before :hover'        => array(
 				'input'    => array(
 					'selector' => '.foo',
 					'css'      => "/* hover; state */\n:hover{color: red;}",
 				),
-				'expected' => ':root :where(.foo :hover){color: red;}',
+				'expected' => ":root :where(.foo/* hover; state */\n:hover){color: red;}",
 			),
-			'comment with braces and &'    => array(
+			'comment touching class'       => array(
 				'input'    => array(
 					'selector' => '.foo',
-					'css'      => 'color: red; /* & img { } */ img{color: blue;}',
+					'css'      => '/* x */.is-style-x{color: red;}',
 				),
-				'expected' => ':root :where(.foo){color: red;}:root :where(.foo img){color: blue;}',
+				'expected' => ':root :where(.foo/* x */.is-style-x){color: red;}',
+			),
+			'comment with ; and }'         => array(
+				'input'    => array(
+					'selector' => '.foo',
+					'css'      => 'color: red; /* a; } */ img{color: blue;}',
+				),
+				'expected' => ':root :where(.foo){color: red;}:root :where(.foo /* a;  */ img){color: blue;}',
 			),
 			'comment-like string'          => array(
 				'input'    => array(

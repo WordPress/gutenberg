@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `processCSSNesting`: Treat a nested rule without `&` as `& selector`, matching native CSS nesting, so rules such as `img { … }` in custom CSS are no longer dropped ([#86353](https://github.com/WordPress/gutenberg/pull/86353)).
+
 ## 2.2.0 (2026-11-18)
 
 ### Bug Fixes
@@ -17,7 +21,6 @@
 
 ### Bug Fixes
 
--   `processCSSNesting`: Treat a nested rule without `&` as `& selector`, matching native CSS nesting, so rules such as `img { … }` in custom CSS are no longer dropped ([#81223](https://github.com/WordPress/gutenberg/issues/81223)).
 -   Layout: Pair the physical `float` on `.alignleft` and `.alignright` with physical margins, so the gap beside a floated block falls between it and the wrapping text in RTL languages instead of against the container edge ([#83520](https://github.com/WordPress/gutenberg/pull/83520)).
 
 ### Internal
