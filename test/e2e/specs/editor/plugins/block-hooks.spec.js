@@ -343,7 +343,7 @@ test.describe( 'Block Hooks API', () => {
 			).toHaveClass( [
 				'wp-block-navigation-item wp-block-home-link',
 				'wp-block-navigation-item wp-block-navigation-link',
-				'wp-block-page-list',
+				'wp-block-pages-list__item current-menu-item wp-block-navigation-item open-on-hover-click',
 			] );
 		} );
 
@@ -422,7 +422,7 @@ test.describe( 'Block Hooks API', () => {
 			).toHaveClass( [
 				'wp-block-navigation-item wp-block-navigation-link',
 				'wp-block-navigation-item wp-block-home-link',
-				'wp-block-page-list',
+				'wp-block-pages-list__item current-menu-item wp-block-navigation-item open-on-hover-click',
 			] );
 		} );
 	} );
