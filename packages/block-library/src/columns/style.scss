@@ -90,6 +90,8 @@
 
 .wp-block-column {
 	flex-grow: 1;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	// Prevent the columns from growing wider than their distributed sizes.
 	min-width: 0;
