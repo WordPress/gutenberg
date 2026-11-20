@@ -1,8 +1,21 @@
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	useBlockProps,
+	useInnerBlocksProps,
+} from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
+import { SwitchControl } from '@wordpress/ui';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import TabToolbarControls from './tab-toolbar-controls';
 import useTabListItemsSync from './use-tab-list-items-sync';
 
-function Edit( { clientId } ) {
+function Edit( { attributes, setAttributes, clientId } ) {
+	const { autoActivate } = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	useTabListItemsSync( clientId );
 
 	const blockProps = useBlockProps();
@@ -26,10 +39,43 @@ function Edit( { clientId } ) {
 	} );
 
 	return (
-		<div { ...innerBlockProps }>
-			<TabToolbarControls tabsClientId={ clientId } />
-			{ innerBlockProps.children }
-		</div>
+		<>
+			<InspectorControls>
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => setAttributes( { autoActivate: false } ) }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __(
+							'Auto-activate tabs on keyboard navigation'
+						) }
+						hasValue={ () => autoActivate }
+						onDeselect={ () =>
+							setAttributes( { autoActivate: false } )
+						}
+					>
+						<SwitchControl
+							label={ __(
+								'Auto-activate tabs on keyboard navigation'
+							) }
+							description={ __(
+								'Select a tab when the arrow, Home, or End keys move focus to it on your site.'
+							) }
+							checked={ autoActivate }
+							onCheckedChange={ ( value ) =>
+								setAttributes( { autoActivate: value } )
+							}
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
+			</InspectorControls>
+			<div { ...innerBlockProps }>
+				<TabToolbarControls tabsClientId={ clientId } />
+				{ innerBlockProps.children }
+			</div>
+		</>
 	);
 }
 

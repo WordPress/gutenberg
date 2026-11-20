@@ -3,7 +3,8 @@
 		"name": "core/tabs",
 		"isValid": true,
 		"attributes": {
-			"activeTabIndex": 0
+			"activeTabIndex": 0,
+			"autoActivate": false
 		},
 		"innerBlocks": [
 			{
