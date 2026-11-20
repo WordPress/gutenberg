@@ -362,7 +362,7 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			return;
 		}
 		const view = gridElement.ownerDocument.defaultView;
-		if ( ! view ) {
+		if ( ! view || ! ( gridElement instanceof view.HTMLElement ) ) {
 			return;
 		}
 
@@ -412,18 +412,14 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			if ( gridWidth <= 0 ) {
 				return false;
 			}
-			const rowGap = getCSSPixelValue( computedStyle.rowGap );
-			const columnGap = getCSSPixelValue( computedStyle.columnGap );
 			// Responsive styles can change the number and size of tracks without
 			// changing the layout attributes.
-			const gridRowTracks = getGridTracks(
-				computedStyle.gridTemplateRows,
-				rowGap
-			);
-			const gridColumnTracks = getGridTracks(
-				computedStyle.gridTemplateColumns,
-				columnGap
-			);
+			const gridRowTracks = getGridTracks( gridElement, 'row', {
+				computedStyle,
+			} );
+			const gridColumnTracks = getGridTracks( gridElement, 'column', {
+				computedStyle,
+			} );
 			const rowHeight = gridRowTracks[ 0 ].end - gridRowTracks[ 0 ].start;
 			const columnWidth =
 				gridColumnTracks[ 0 ].end - gridColumnTracks[ 0 ].start;
@@ -435,6 +431,8 @@ export function useGridAutoSpan( { clientId }: { clientId: string } ) {
 			) {
 				return false;
 			}
+			const rowGap = getCSSPixelValue( computedStyle.rowGap );
+			const columnGap = getCSSPixelValue( computedStyle.columnGap );
 			const columnCount = gridColumnTracks.length;
 			const rowPitch = rowHeight + rowGap;
 			const columnPitch = columnWidth + columnGap;
