@@ -46,7 +46,7 @@ Given a child client id, returns the parent widget area block.
 
 _Type_
 
-- `(state: Record<string, unknown>, clientId: string) => import('@wordpress/blocks').BlockInstance | null`
+- `(state: Record<string, unknown>, clientId: string) => BlockInstance | null`
 
 _Parameters_
 
@@ -54,7 +54,7 @@ _Parameters_
 
 _Returns_
 
-- `import('@wordpress/blocks').BlockInstance | null`: The widget area block.
+- `BlockInstance | null`: The widget area block.
 
 ### getReferenceWidgetBlocks
 
