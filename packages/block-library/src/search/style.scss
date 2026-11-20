@@ -35,6 +35,15 @@ $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 	flex: auto;
 	flex-wrap: nowrap;
 	max-width: 100%;
+	min-width: 220px;
+
+	button.wp-block-search__button {
+		// !important used to forcibly prevent undesired padding of
+		// various different active themes.
+		padding-left: 10px !important;
+		padding-right: 10px !important;
+		max-width: 7vw;
+	}
 }
 
 :where(.wp-block-search__label) {
