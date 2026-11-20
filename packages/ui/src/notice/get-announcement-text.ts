@@ -1,83 +1,90 @@
+import { getComposedParent } from './get-composed-parent';
+
 const HIDDEN_CONTENT = '[hidden], [aria-hidden="true"]';
 
-// Read around aria-hidden descendants, which innerText includes.
-function readText( element: HTMLElement, useInnerText = true ): string {
-	if (
-		useInnerText &&
-		! element.querySelector( HIDDEN_CONTENT ) &&
-		element.getClientRects().length > 0 &&
-		typeof element.innerText === 'string'
-	) {
-		return element.innerText;
-	}
-
-	const view = element.ownerDocument.defaultView;
-	const visibility = view?.getComputedStyle( element ).visibility;
-	let text = '';
-	for ( const node of element.childNodes ) {
-		if ( node.nodeType === Node.TEXT_NODE ) {
-			if ( visibility !== 'hidden' && visibility !== 'collapse' ) {
-				text += node.textContent ?? '';
-			}
-		} else if ( node.nodeType === Node.ELEMENT_NODE ) {
-			const child = node as HTMLElement;
-			const display = view?.getComputedStyle( child ).display;
-			if ( child.matches( HIDDEN_CONTENT ) || display === 'none' ) {
-				continue;
-			}
-			if ( child.tagName === 'BR' ) {
-				text += '\n';
-				continue;
-			}
-			const childText = readText( child, useInnerText );
-			const inline =
-				! display ||
-				display.startsWith( 'inline' ) ||
-				display === 'contents';
-			text += inline || ! childText ? childText : `\n${ childText }\n`;
-		}
-	}
-	return text;
-}
-
-function getText( element: HTMLElement, list?: HTMLElement ): string {
-	if ( element.matches( HIDDEN_CONTENT ) ) {
-		return '';
-	}
+// innerText preserves rendered whitespace, but includes aria-hidden descendants.
+export function getAnnouncementText( element: HTMLElement ): string {
 	const view = element.ownerDocument.defaultView;
 	for (
-		let current: HTMLElement | null = element;
-		current && current !== list;
-		current = current.parentElement
+		let current: Element | null = element;
+		current;
+		current = getComposedParent( current )
 	) {
 		if (
-			current.hidden ||
-			view?.getComputedStyle( current ).display === 'none'
+			view?.getComputedStyle( current ).display === 'none' ||
+			( current !== element &&
+				current.matches( 'details:not([open])' ) &&
+				! current
+					.querySelector( ':scope > summary' )
+					?.contains( element ) )
 		) {
 			return '';
 		}
 	}
-	return readText( element, ! list ).trim();
-}
 
-// List comparisons must stay readable under a hidden list. Always use the
-// recursive reader: innerText changes its formatting when an element is hidden.
-export function getAnnouncementComparisonText(
-	element: HTMLElement,
-	list: HTMLElement
-): string {
-	return getText( element, list );
-}
+	let text = '';
+	let pendingBreaks = 0;
+	function append( value: string ) {
+		if ( value ) {
+			text += '\n'.repeat( pendingBreaks ) + value;
+			pendingBreaks = 0;
+		}
+	}
 
-/**
- * Read a mounted notice title or description for an explicit spoken message.
- * Preserves rendered line breaks, omits hidden descendants, and trims the result.
- * Only the supplied element's contents are read. Ancestor aria-hidden is ignored
- * so an application can prepare a message while a dialog hides its background.
- *
- * @param element The element containing the message, excluding actions and details.
- * @return The text to announce.
- */
-export function getAnnouncementText( element: HTMLElement ): string {
-	return getText( element );
+	function read( node: HTMLElement ) {
+		const style = view?.getComputedStyle( node );
+		if ( node.matches( HIDDEN_CONTENT ) || style?.display === 'none' ) {
+			return;
+		}
+
+		const visible =
+			style?.visibility !== 'hidden' && style?.visibility !== 'collapse';
+		if ( node.tagName === 'BR' ) {
+			if ( visible ) {
+				append( '\n' );
+			}
+			return;
+		}
+
+		// Adjacent blocks share a line break. Paragraphs need two.
+		const block =
+			style?.display &&
+			! style.display.startsWith( 'inline' ) &&
+			style.display !== 'contents';
+		let breaks = 0;
+		if ( visible && block ) {
+			breaks = node.tagName === 'P' ? 2 : 1;
+		}
+		pendingBreaks = Math.max( pendingBreaks, breaks );
+		if (
+			node.getClientRects().length &&
+			typeof node.innerText === 'string' &&
+			! node.querySelector( HIDDEN_CONTENT )
+		) {
+			append( node.innerText );
+		} else if ( node.matches( 'details:not([open])' ) ) {
+			const summary =
+				node.querySelector< HTMLElement >( ':scope > summary' );
+			if ( summary ) {
+				read( summary );
+			}
+		} else {
+			for ( const child of node.childNodes ) {
+				if ( child.nodeType === Node.ELEMENT_NODE ) {
+					read( child as HTMLElement );
+				} else if ( visible && child.nodeType === Node.TEXT_NODE ) {
+					const value = child.textContent ?? '';
+					append(
+						style?.whiteSpaceCollapse === 'collapse'
+							? value.replace( /[\t\n\f\r ]+/g, ' ' )
+							: value
+					);
+				}
+			}
+		}
+		pendingBreaks = Math.max( pendingBreaks, breaks );
+	}
+
+	read( element );
+	return text.trim();
 }

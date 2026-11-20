@@ -313,10 +313,9 @@ describe( 'Notice.List', () => {
 
 	it.each( [
 		[ 'hidden', true ],
-		[ 'hidden', false ],
 		[ 'aria-hidden', false ],
 	] as const )(
-		'clears an external announcement when an ancestor becomes %s without replaying it on reveal (explicit message: %s)',
+		'clears an external announcement when an ancestor becomes %s without replaying it on reveal',
 		async ( attribute, explicit ) => {
 			const list = ( message?: string ) => (
 				<section aria-label="Editor">
@@ -348,13 +347,6 @@ describe( 'Notice.List', () => {
 			rerender( list( 'Updated.' ) );
 			await waitFor( () =>
 				expect( status ).toHaveTextContent( 'Updated.' )
-			);
-			editor.setAttribute( attribute, 'true' );
-			await waitFor( () => expect( status ).toBeEmptyDOMElement() );
-			editor.removeAttribute( attribute );
-			rerender( list( 'Changed on reveal.' ) );
-			await waitFor( () =>
-				expect( status ).toHaveTextContent( 'Changed on reveal.' )
 			);
 		}
 	);

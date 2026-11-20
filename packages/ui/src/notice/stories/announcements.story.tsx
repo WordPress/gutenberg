@@ -28,16 +28,10 @@ export const FormattedMessage: Story = {
 					{ hasError && (
 						<Notice.Root intent="error">
 							<Notice.Title>Changes not saved</Notice.Title>
-							<Notice.Description render={ <div /> }>
-								<p>
-									Check your connection.
-									<br />
-									Try saving again.
-								</p>
-								<span aria-hidden="true">Decoration</span>
-								<span style={ { display: 'none' } }>
-									Hidden text
-								</span>
+							<Notice.Description>
+								Check your connection.
+								<br />
+								Try saving again.
 							</Notice.Description>
 						</Notice.Root>
 					) }
