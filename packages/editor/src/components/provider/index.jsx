@@ -3,6 +3,7 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useMemo,
+	useRef,
 } from '@wordpress/element';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import {
@@ -35,6 +36,7 @@ import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import StartTemplateOptions from '../start-template-options';
 import EditorKeyboardShortcuts from '../global-keyboard-shortcuts';
+import { SaveShortcutContext } from '../global-keyboard-shortcuts/save-shortcut-context';
 import EditorKeyboardShortcutsRegister from '../global-keyboard-shortcuts/register-shortcuts';
 import PatternRenameModal from '../pattern-rename-modal';
 import PatternDuplicateModal from '../pattern-duplicate-modal';
@@ -330,6 +332,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		} = unlock( useDispatch( editorStore ) );
 		const { editEntityRecord } = useDispatch( coreStore );
 		const registry = useRegistry();
+		const saveShortcutHandlerRef = useRef( null );
 
 		const onChangeSelection = useCallback(
 			( newSelection ) => {
@@ -456,28 +459,32 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							{ children }
-							{ ! settings.isPreviewMode && (
-								<>
-									<PatternsMenuItems />
-									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
-									{ type === 'wp_navigation' && (
-										<NavigationBlockEditingMode />
-									) }
-									<EditorKeyboardShortcutsRegister />
-									<EditorKeyboardShortcuts />
-									<KeyboardShortcutHelpModal />
-									<BlockRemovalWarnings />
-									<StartPageOptions />
-									<StartTemplateOptions />
-									<PatternRenameModal />
-									<PatternDuplicateModal />
-									<MediaEditorModalMount />
-								</>
-							) }
+							<SaveShortcutContext.Provider
+								value={ saveShortcutHandlerRef }
+							>
+								{ children }
+								{ ! settings.isPreviewMode && (
+									<>
+										<PatternsMenuItems />
+										<TemplatePartMenuItems />
+										{ mode === 'template-locked' && (
+											<DisableNonPageContentBlocks />
+										) }
+										{ type === 'wp_navigation' && (
+											<NavigationBlockEditingMode />
+										) }
+										<EditorKeyboardShortcutsRegister />
+										<EditorKeyboardShortcuts />
+										<KeyboardShortcutHelpModal />
+										<BlockRemovalWarnings />
+										<StartPageOptions />
+										<StartTemplateOptions />
+										<PatternRenameModal />
+										<PatternDuplicateModal />
+										<MediaEditorModalMount />
+									</>
+								) }
+							</SaveShortcutContext.Provider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</PrivateEntityProvider>
