@@ -22,6 +22,7 @@ describe( 'useThemeProviderStyles with prebuilt ramps', () => {
 			styles[ '--wpds-color-background-interactive-brand-strong' ]
 		).toBe(
 			buildAccentRamp(
+				'primary',
 				'#cf4339',
 				buildBgRamp( DEFAULT_SEED_COLORS.background )
 			).ramp.bgFill1

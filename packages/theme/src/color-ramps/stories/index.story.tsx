@@ -7,7 +7,7 @@ import type {
 } from '../../theme-provider-color-warnings';
 import { ColorWarningDetails } from './color-warning-details';
 import { hasColorWarningForRamp, RampTable } from './ramp-table';
-import { buildBgRamp, buildAccentRamp, buildPrimaryRamp } from '..';
+import { buildBgRamp, buildAccentRamp } from '..';
 import { DEFAULT_SEED_COLORS } from '../lib/constants';
 
 const ColorGen = ( props: {
@@ -96,10 +96,7 @@ function buildDisplayedRamps( {
 				name: 'bgFill1',
 				value,
 			},
-			ramp: ( name === 'primary'
-				? buildPrimaryRamp( value, bgRamp )
-				: buildAccentRamp( value, bgRamp )
-			).ramp,
+			ramp: buildAccentRamp( name, value, bgRamp ).ramp,
 		} );
 	}
 

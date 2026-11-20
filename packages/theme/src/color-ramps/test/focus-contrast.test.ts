@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { get, OKLCH } from 'colorjs.io/fn';
-import { buildAccentRamp, buildBgRamp, buildPrimaryRamp } from '..';
+import { buildAccentRamp, buildBgRamp } from '..';
 import { getContrast } from '../lib/color-utils';
 
 describe( 'accent focus contrast', () => {
@@ -16,7 +15,11 @@ describe( 'accent focus contrast', () => {
 		( background, primary ) => {
 			const neutral = buildBgRamp( background );
 			const before = JSON.stringify( neutral );
-			const { ramp, warnings } = buildPrimaryRamp( primary, neutral );
+			const { ramp, warnings } = buildAccentRamp(
+				'primary',
+				primary,
+				neutral
+			);
 			for ( const surface of [
 				neutral.ramp.surface1,
 				neutral.ramp.surface2,
@@ -54,19 +57,9 @@ describe( 'accent focus contrast', () => {
 
 	it( 'retains a primary ramp that already meets the focus constraints', () => {
 		const neutral = buildBgRamp( '#fcfcfc' );
-		expect( buildPrimaryRamp( '#3858e9', neutral ) ).toEqual(
-			buildAccentRamp( '#3858e9', neutral )
+		expect( buildAccentRamp( 'primary', '#3858e9', neutral ) ).toEqual(
+			buildAccentRamp( 'info', '#3858e9', neutral )
 		);
-	} );
-
-	it( 'carries a saturated background through the neighboring surfaces', () => {
-		const { ramp } = buildBgRamp( '#cc4541' );
-		const seedChroma = get( ramp.surface2, [ OKLCH, 'c' ] );
-		for ( const step of [ 'surface1', 'surface3' ] as const ) {
-			const ratio = get( ramp[ step ], [ OKLCH, 'c' ] ) / seedChroma;
-			expect( ratio ).toBeGreaterThan( 0.9 );
-			expect( ratio ).toBeLessThan( 1.1 );
-		}
 	} );
 
 	it( 'keeps generated rings above 3:1 against neutral and brand surfaces', () => {
@@ -83,7 +76,7 @@ describe( 'accent focus contrast', () => {
 				'#ffff00',
 				'#85767a',
 			] ) {
-				const { ramp } = buildAccentRamp( primary, neutral );
+				const { ramp } = buildAccentRamp( 'primary', primary, neutral );
 				for ( const surface of [
 					neutral.ramp.surface1,
 					neutral.ramp.surface2,

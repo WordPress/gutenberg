@@ -27,7 +27,6 @@ import { fileURLToPath } from 'node:url';
 import {
 	buildBgRamp,
 	buildAccentRamp,
-	buildPrimaryRamp,
 	DEFAULT_SEED_COLORS,
 } from '../../../packages/theme/src/color-ramps/index.ts';
 import colorTokens from '../../../packages/theme/src/prebuilt/ts/color-tokens.ts';
@@ -66,10 +65,10 @@ function deriveTokens( primary ) {
 	const tokens = new Map();
 
 	for ( const [ rampName, seed ] of Object.entries( seeds ) ) {
-		const buildAccent =
-			rampName === 'primary' ? buildPrimaryRamp : buildAccentRamp;
 		const { ramp } =
-			rampName === 'background' ? bgRamp : buildAccent( seed, bgRamp );
+			rampName === 'background'
+				? bgRamp
+				: buildAccentRamp( rampName, seed, bgRamp );
 		const primitive = rampName === 'background' ? 'bg' : rampName;
 
 		for ( const [ step, value ] of Object.entries( ramp ) ) {
