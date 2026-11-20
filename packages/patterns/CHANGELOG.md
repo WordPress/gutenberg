@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `CreateTemplatePartModal`: Show the reason from the server when creating a template part fails, instead of always showing a generic message ([#87181](https://github.com/WordPress/gutenberg/pull/87181)).
+
 ## 3.2.0 (2026-11-18)
 
 ## 3.1.0 (2026-11-04)
