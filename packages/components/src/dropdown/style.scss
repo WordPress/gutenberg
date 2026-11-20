@@ -17,33 +17,35 @@
 }
 
 // Menu group spacing for a plain `Dropdown`. `DropdownMenu` sets its own.
-// `:where()` keeps the specificity these rules had before the exclusion.
+// The rules stop at a `DropdownMenu` rendered inline inside the dropdown, so
+// the menu keeps its own spacing. `:where()` keeps the specificity these rules
+// had before the exclusions.
+$outside-nested-menu: ":where(:not(.components-dropdown__content:not(.components-dropdown-menu__popover) .components-dropdown-menu__popover *))";
+
 .components-dropdown__content:where(:not(.components-dropdown-menu__popover)) {
-	.components-popover__content {
+	> .components-popover__content {
 		padding: $grid-unit-10;
 
 		&:has(.components-menu-group) {
 			padding: 0;
 
-			.components-dropdown-menu__menu > .components-menu-item__button,
 			> .components-menu-item__button {
 				margin: $grid-unit-10;
 				width: auto;
 			}
 		}
-
 	}
 
-	.components-menu-group {
+	.components-menu-group#{$outside-nested-menu} {
 		padding: $grid-unit-10;
 	}
 
-	.components-menu-group + .components-menu-group {
+	.components-menu-group + .components-menu-group#{$outside-nested-menu} {
 		border-top: $border-width solid $gray-400;
 		padding: $grid-unit-10;
 	}
 
-	&.is-alternate .components-menu-group + .components-menu-group {
+	&.is-alternate .components-menu-group + .components-menu-group#{$outside-nested-menu} {
 		border-color: $gray-900;
 	}
 }
