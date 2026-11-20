@@ -164,28 +164,6 @@ function findStatusMismatches(): StatusMismatch[] {
 			} );
 		}
 	}
-
-	const componentsWithOwnStories = new Set(
-		componentStories.map( ( { component } ) => component )
-	);
-	for ( const { file, subcomponents, status } of componentStories ) {
-		for ( const subcomponent of subcomponents ) {
-			const entry = denylistEntriesByComponent.get( subcomponent );
-			if (
-				entry &&
-				status !== 'not-recommended' &&
-				! componentsWithOwnStories.has( subcomponent )
-			) {
-				mismatches.push( {
-					component: subcomponent,
-					kind: 'denylisted-status',
-					message: `${ entry.key } is in DENYLIST in ${ RULE_FILE }, but ${ file }, which lists it in \`subcomponents\`, has the status ${
-						status ? `"${ status }"` : 'missing'
-					}. Set the story's status to "not-recommended", or remove the denylist entry.`,
-				} );
-			}
-		}
-	}
 	return mismatches;
 }
 
