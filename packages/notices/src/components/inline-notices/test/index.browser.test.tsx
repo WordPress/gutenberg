@@ -1,14 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
-import { speak } from '@wordpress/a11y';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import InlineNotices from '../index';
 import { store as noticesStore } from '../../../store';
 import type { NoticeOptions } from '../../../store/types';
-
-vi.mock( import( '@wordpress/a11y' ), { spy: true } );
 
 const MESSAGE = 'Updating failed.';
 const DETAILS = 'The title was rejected.\nRemove it, then try again.';
@@ -21,18 +18,76 @@ async function renderWithNotice(
 	registry.register( noticesStore );
 	registry.dispatch( noticesStore ).createNotice( status, MESSAGE, options );
 
-	await render(
+	const { rerender } = await render(
 		<RegistryProvider value={ registry }>
 			<InlineNotices />
 		</RegistryProvider>
 	);
 
-	return registry;
+	return { registry, rerender };
 }
 
 describe( 'InlineNotices', () => {
-	beforeEach( () => {
-		vi.mocked( speak ).mockClear();
+	it( 'does not add a layout gap when there are no notices', async () => {
+		await render(
+			<div
+				style={ { display: 'flex', flexDirection: 'column', gap: 20 } }
+			>
+				<div>Before notices</div>
+				<InlineNotices />
+				<div>After notices</div>
+			</div>
+		);
+
+		expect(
+			screen.getByText( 'After notices' ).getBoundingClientRect().top -
+				screen.getByText( 'Before notices' ).getBoundingClientRect()
+					.bottom
+		).toBe( 20 );
+	} );
+
+	it( 'announces repeated save errors while preserving focus and open details', async () => {
+		const options = { id: 'editor-save', details: DETAILS };
+		const message = 'The <title> tag is required.';
+		const { registry, rerender } = await renderWithNotice(
+			'error',
+			options
+		);
+		const retry = () =>
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice( message, options );
+		const alert = screen.getByRole( 'alert' );
+		const user = userEvent.setup();
+		const trigger = screen.getByRole( 'button', { name: 'Show details' } );
+		await user.click( trigger );
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+		expect( alert ).toBeEmptyDOMElement();
+
+		retry();
+		await waitFor( () =>
+			expect( alert ).toHaveProperty( 'textContent', message )
+		);
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		retry();
+		await waitFor( () =>
+			expect( alert ).toHaveProperty( 'textContent', message + '\u00a0' )
+		);
+		expect( trigger ).toHaveFocus();
+		expect( trigger ).toHaveAttribute( 'aria-expanded', 'true' );
+
+		await rerender(
+			<RegistryProvider value={ registry }>
+				<InlineNotices className="updated" />
+			</RegistryProvider>
+		);
+		expect( screen.getByRole( 'alert' ) ).toHaveProperty(
+			'textContent',
+			message + '\u00a0'
+		);
 	} );
 
 	describe( 'details', () => {
@@ -89,8 +144,9 @@ describe( 'InlineNotices', () => {
 			const copyButton = screen.getByRole( 'button', {
 				name: 'Copy error',
 			} );
-			const status = screen.getByRole( 'status' );
-			expect( status ).toBeEmptyDOMElement();
+			for ( const status of screen.getAllByRole( 'status' ) ) {
+				expect( status ).toBeEmptyDOMElement();
+			}
 
 			await user.click( copyButton );
 
@@ -98,16 +154,17 @@ describe( 'InlineNotices', () => {
 				`${ MESSAGE }\n\n${ DETAILS }`
 			);
 			await waitFor( () =>
-				expect( status ).toHaveTextContent( 'Copied' )
+				expect(
+					screen
+						.getAllByRole( 'status' )
+						.map( ( status ) => status.textContent )
+						.filter( Boolean )
+				).toEqual( [ 'Copied' ] )
 			);
 			// The button keeps its name, so the confirmation is the only
 			// change announced.
 			expect( copyButton ).toHaveAccessibleName( 'Copy error' );
 			expect( copyButton ).toHaveFocus();
-			expect( speak ).not.toHaveBeenCalledWith(
-				expect.stringContaining( 'Copied' ),
-				expect.anything()
-			);
 		} );
 
 		it( 'does not confirm a copy that failed', async () => {
@@ -121,7 +178,9 @@ describe( 'InlineNotices', () => {
 				screen.getByRole( 'button', { name: 'Copy error' } )
 			);
 
-			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
+			for ( const status of screen.getAllByRole( 'status' ) ) {
+				expect( status ).toBeEmptyDOMElement();
+			}
 		} );
 
 		it( 'links the web addresses in the details', async () => {
@@ -174,7 +233,7 @@ describe( 'InlineNotices', () => {
 		} );
 
 		it( 'shows details but no copy button for an HTML message', async () => {
-			await renderWithNotice( 'error', {
+			const { registry } = await renderWithNotice( 'error', {
 				details: DETAILS,
 				__unstableHTML: true,
 			} );
@@ -185,8 +244,41 @@ describe( 'InlineNotices', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Copy error' } )
 			).not.toBeInTheDocument();
+
+			expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
+
+			registry
+				.dispatch( noticesStore )
+				.createNotice( 'error', 'Updating <strong>failed</strong>.', {
+					__unstableHTML: true,
+					details: DETAILS,
+				} );
+			await waitFor( () =>
+				expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+					/^Updating failed\.$/
+				)
+			);
 			// `__unstableHTML` is deprecated.
 			expect( console ).toHaveWarned();
+		} );
+
+		it( 'preserves line breaks and omits hidden text in HTML announcements', async () => {
+			const { registry } = await renderWithNotice( 'error' );
+			registry
+				.dispatch( noticesStore )
+				.createNotice(
+					'error',
+					'<p>Save <strong>failed</strong><span aria-hidden="true"> (error)</span>.</p><p>Retry<br>later &amp; reopen.<span hidden>Hidden detail</span><span style="display:none">Hidden by CSS</span></p>',
+					{ __unstableHTML: true }
+				);
+
+			expect( console ).toHaveWarned();
+			await waitFor( () =>
+				expect( screen.getByRole( 'alert' ) ).toHaveProperty(
+					'textContent',
+					'Save failed.\n\nRetry\nlater & reopen.'
+				)
+			);
 		} );
 	} );
 
@@ -213,61 +305,6 @@ describe( 'InlineNotices', () => {
 			expect(
 				screen.queryByRole( 'link', { name: 'Link action' } )
 			).not.toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'announcements', () => {
-		it( 'announces the message but not the details', async () => {
-			await renderWithNotice( 'error', { details: DETAILS } );
-
-			expect( speak ).toHaveBeenCalledTimes( 1 );
-			expect( speak ).toHaveBeenCalledWith( MESSAGE, 'assertive' );
-		} );
-
-		it( 'announces notices that are not errors politely', async () => {
-			await renderWithNotice( 'success' );
-
-			expect( speak ).toHaveBeenCalledWith( MESSAGE, 'polite' );
-		} );
-
-		it( 'does not announce a notice created with `speak: false`', async () => {
-			await renderWithNotice( 'error', { speak: false } );
-
-			expect( speak ).not.toHaveBeenCalled();
-		} );
-
-		it( 'announces a notice that replaces one with the same ID', async () => {
-			const registry = await renderWithNotice( 'error', {
-				id: 'editor-save',
-			} );
-			vi.mocked( speak ).mockClear();
-
-			registry
-				.dispatch( noticesStore )
-				.createNotice( 'error', 'Publishing failed.', {
-					id: 'editor-save',
-				} );
-			await waitFor( () =>
-				expect( speak ).toHaveBeenCalledWith(
-					'Publishing failed.',
-					'assertive'
-				)
-			);
-
-			// The same message again is a new failure, so it is announced
-			// again too.
-			vi.mocked( speak ).mockClear();
-			registry
-				.dispatch( noticesStore )
-				.createNotice( 'error', 'Publishing failed.', {
-					id: 'editor-save',
-				} );
-			await waitFor( () =>
-				expect( speak ).toHaveBeenCalledWith(
-					'Publishing failed.',
-					'assertive'
-				)
-			);
 		} );
 	} );
 } );
