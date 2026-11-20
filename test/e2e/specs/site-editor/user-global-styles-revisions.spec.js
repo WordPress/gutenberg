@@ -184,6 +184,50 @@ test.describe( 'Style Revisions', () => {
 		).toBeVisible();
 	} );
 
+	test( 'should preview revisions from the Styles panel without leaving it', async ( {
+		admin,
+		page,
+		userGlobalStylesRevisions,
+	} ) => {
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'blue' },
+		} );
+		await userGlobalStylesRevisions.saveRevision( stylesPostId, {
+			color: { background: 'red' },
+		} );
+
+		await admin.visitSiteEditor();
+		if ( isSiteEditorV2 ) {
+			await page.getByRole( 'link', { name: 'Styles' } ).click();
+		} else {
+			await page
+				.getByRole( 'region', { name: 'Navigation' } )
+				.getByRole( 'button', { name: 'Styles' } )
+				.click();
+		}
+		await page
+			.getByRole( 'region', { name: 'Styles' } )
+			.getByRole( 'button', { name: 'Revisions', exact: true } )
+			.click();
+		await expect(
+			page.getByLabel( 'Global styles revisions list' )
+		).toBeVisible();
+
+		// Revisions are listed newest first, so the second one is the blue
+		// background saved before the current red one.
+		await page
+			.getByRole( 'option', { name: /^Changes saved by / } )
+			.nth( 1 )
+			.click();
+		await expect(
+			page.frameLocator( '[name="revisions"]' ).locator( 'body' )
+		).toHaveCSS( 'background-color', 'rgb(0, 0, 255)' );
+
+		// The revisions stay in the Styles panel rather than opening the
+		// editor.
+		await expect( page ).not.toHaveURL( /canvas=edit/ );
+	} );
+
 	test( 'should access from the site editor sidebar with a static front page', async ( {
 		admin,
 		editor,
