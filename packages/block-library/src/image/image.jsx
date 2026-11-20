@@ -181,7 +181,6 @@ function ContentOnlyControls( {
 					anchor={ popoverAnchor }
 					onClose={ () => setIsAltDialogOpen( false ) }
 					offset={ 13 }
-					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<WCTextareaControl
@@ -224,7 +223,6 @@ function ContentOnlyControls( {
 					anchor={ popoverAnchor }
 					onClose={ () => setIsTitleDialogOpen( false ) }
 					offset={ 13 }
-					variant="toolbar"
 				>
 					<div className="wp-block-image__toolbar_content_textarea__container">
 						<TextControl
@@ -890,7 +888,6 @@ export default function Image( {
 					onError={ onUploadError }
 					name={ ! url ? __( 'Add image' ) : __( 'Replace' ) }
 					onReset={ onResetImage }
-					variant="toolbar"
 				/>
 			</BlockControls>
 		</>

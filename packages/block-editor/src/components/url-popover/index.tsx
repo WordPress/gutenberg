@@ -73,7 +73,6 @@ const URLPopover = forwardRef< HTMLDivElement, URLPopoverProps >(
 				focusOnMount={ focusOnMount }
 				placement={ computedPlacement }
 				shift
-				variant="toolbar"
 				{ ...popoverProps }
 			>
 				<div className="block-editor-url-popover__input-container">

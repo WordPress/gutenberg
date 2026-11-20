@@ -484,7 +484,6 @@ export default function GalleryEdit( props ) {
 							.filter( ( block ) => block.attributes.id )
 							.map( ( block ) => block.attributes.id ) }
 						addToGallery={ hasImageIds }
-						variant="toolbar"
 					/>
 				</BlockControls>
 			) }

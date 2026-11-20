@@ -196,7 +196,6 @@ const PlaylistTrackEdit = ( {
 						mediaURL={ src }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						onError={ onUploadError }
-						variant="toolbar"
 					/>
 				</BlockControls>
 			) }

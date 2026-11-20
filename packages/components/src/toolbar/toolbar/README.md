@@ -69,7 +69,7 @@ An accessible label for the toolbar.
 
 Specifies the toolbar's style.
 
-Leave undefined for the default style. Or `'unstyled'` which removes the border from the toolbar, but keeps the default popover style.
+Leave undefined for the default style. `'unstyled'` removes the border and shadow from the toolbar.
 
 -   Required: No
 -   Default: `undefined`
