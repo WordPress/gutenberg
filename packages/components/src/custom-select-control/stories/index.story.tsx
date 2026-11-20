@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
-import CustomSelectControl from '../deprecated';
+import CustomSelectControl from '..';
 
 const meta: Meta< typeof CustomSelectControl > = {
 	title: 'Components/@wordpress-components/Deprecated/CustomSelectControl',

@@ -71,7 +71,7 @@ export {
 } from './composite/legacy';
 export { Composite } from './composite';
 export { ConfirmDialog as __experimentalConfirmDialog } from './confirm-dialog';
-export { default as CustomSelectControl } from './custom-select-control/deprecated';
+export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as Disabled } from './disabled';
