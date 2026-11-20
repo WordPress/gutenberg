@@ -26,6 +26,10 @@ const PREVENT_SCROLL_ON_FOCUS: CSSProperties = {
 	inset: 0,
 	pointerEvents: 'none',
 	outline: 'none',
+	// iOS places the caret at a tap ignoring `pointer-events`, so without this
+	// a tap into the post title of a non-iframed canvas lands in the stop.
+	WebkitUserSelect: 'none',
+	userSelect: 'none',
 };
 
 // Keys that move focus from the canvas stop into the canvas.
