@@ -3,6 +3,8 @@ import { createPortal, forwardRef, useRef, useState } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
 import type { ListProps, RootProps } from './types';
+import { getComposedParent } from './get-composed-parent';
+import { getAnnouncementText } from './get-announcement-text';
 import styles from './style.module.css';
 
 const LIST_SELECTOR = '[data-wp-ui-notice-list]';
@@ -15,16 +17,10 @@ type Announcement = {
 	politeness: NonNullable< RootProps[ 'politeness' ] >;
 };
 
-function getComposedParent( element: Element ): Element | null {
-	const ShadowRoot = element.ownerDocument.defaultView?.ShadowRoot;
-	return (
-		element.assignedSlot ??
-		element.parentElement ??
-		( ShadowRoot && element.parentNode instanceof ShadowRoot
-			? element.parentNode.host
-			: null )
-	);
-}
+type NoticeSnapshot = Announcement & {
+	listHidden: boolean;
+	spokenMessage?: string;
+};
 
 function isHidden( element: Element, root: Element ) {
 	for (
@@ -42,7 +38,27 @@ function isHidden( element: Element, root: Element ) {
 	return false;
 }
 
-function readMessage( root: HTMLElement ) {
+function getComparisonText( element: HTMLElement ) {
+	const walker = element.ownerDocument.createTreeWalker(
+		element,
+		NodeFilter.SHOW_TEXT,
+		{
+			acceptNode( node ) {
+				return node.parentElement &&
+					isHidden( node.parentElement, element )
+					? NodeFilter.FILTER_REJECT
+					: NodeFilter.FILTER_ACCEPT;
+			},
+		}
+	);
+	let text = '';
+	while ( walker.nextNode() ) {
+		text += walker.currentNode.textContent;
+	}
+	return text.trim();
+}
+
+function readMessage( root: HTMLElement, getText = getComparisonText ) {
 	function readText( kind: 'title' | 'description' ) {
 		return Array.from(
 			root.querySelectorAll< HTMLElement >( `.${ styles[ kind ] }` )
@@ -52,25 +68,7 @@ function readMessage( root: HTMLElement ) {
 					element.closest( CONTENT_BOUNDARY ) === root &&
 					! isHidden( element, root )
 			)
-			.map( ( element ) => {
-				const walker = element.ownerDocument.createTreeWalker(
-					element,
-					NodeFilter.SHOW_TEXT,
-					{
-						acceptNode( node ) {
-							return node.parentElement &&
-								isHidden( node.parentElement, root )
-								? NodeFilter.FILTER_REJECT
-								: NodeFilter.FILTER_ACCEPT;
-						},
-					}
-				);
-				let text = '';
-				while ( walker.nextNode() ) {
-					text += walker.currentNode.textContent;
-				}
-				return text.trim();
-			} )
+			.map( getText )
 			.filter( Boolean )
 			.join( ' ' );
 	}
@@ -120,12 +118,9 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		const observerRef = useRefEffect< HTMLDivElement >(
 			( element ) => {
 				let nextId = 0;
-				let previous = new Map< HTMLElement, Announcement >();
+				let previous = new Map< HTMLElement, NoticeSnapshot >();
 				const readNotices = () => {
-					const current = new Map<
-						HTMLElement,
-						Announcement & { listHidden: boolean }
-					>();
+					const current = new Map< HTMLElement, NoticeSnapshot >();
 					for ( const notice of element.querySelectorAll< HTMLElement >(
 						`.${ styles.notice }`
 					) ) {
@@ -141,11 +136,12 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 						}
 						// Keep the message in the comparison while its list is hidden.
 						// Revealing the list alone must not replay it.
+						const spokenMessage =
+							notice.dataset.wpUiNoticeSpokenMessage;
 						current.set( notice, {
 							id: previous.get( notice )?.id ?? nextId++,
-							message:
-								notice.dataset.wpUiNoticeSpokenMessage ??
-								readMessage( notice ),
+							spokenMessage,
+							message: spokenMessage ?? readMessage( notice ),
 							politeness: notice.dataset
 								.wpUiNoticePoliteness as Announcement[ 'politeness' ],
 							listHidden: visibility === 'list-hidden',
@@ -162,18 +158,35 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				// Notice.Root. Observe message props and content in the same DOM batch.
 				const refresh = () => {
 					const current = readNotices();
-					const changed = new Map< HTMLElement, Announcement >();
+					const changed = new Map<
+						HTMLElement,
+						Announcement & { updateOnly: boolean }
+					>();
 					for ( const [ notice, announcement ] of current ) {
 						const before = previous.get( notice );
+						const textOrUrgencyChanged =
+							announcement.message !== before?.message ||
+							announcement.politeness !== before?.politeness;
 						if (
-							announcement.message &&
-							! announcement.listHidden &&
-							announcement.politeness !== 'off' &&
-							( announcement.message !== before?.message ||
-								announcement.politeness !== before?.politeness )
+							! announcement.message ||
+							announcement.listHidden ||
+							announcement.politeness === 'off' ||
+							( ! textOrUrgencyChanged &&
+								announcement.spokenMessage ===
+									before?.spokenMessage )
 						) {
-							changed.set( notice, announcement );
+							continue;
 						}
+
+						changed.set( notice, {
+							...announcement,
+							message:
+								announcement.spokenMessage ??
+								readMessage( notice, getAnnouncementText ),
+							// A source switch alone can reformat an existing announcement.
+							// Keep initial notices and cleared announcements silent.
+							updateOnly: ! textOrUrgencyChanged,
+						} );
 					}
 					previous = current;
 					setAnnouncements( ( existing ) => {
@@ -189,7 +202,17 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 							}
 						}
 						for ( const [ notice, announcement ] of changed ) {
-							next.set( notice, announcement );
+							if (
+								announcement.updateOnly &&
+								! next.has( notice )
+							) {
+								continue;
+							}
+							if ( announcement.message ) {
+								next.set( notice, announcement );
+							} else {
+								next.delete( notice );
+							}
 						}
 						return changed.size || next.size !== existing.size
 							? next
