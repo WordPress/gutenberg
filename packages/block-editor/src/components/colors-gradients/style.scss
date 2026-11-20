@@ -83,6 +83,14 @@ $swatch-gap: 12px;
 	margin-top: $grid-unit-20;
 }
 
+.block-editor-color-gradient-control__notice-container {
+	margin-top: $grid-unit-20;
+
+	.block-editor-panel-color-gradient-settings__contrast-notice {
+		margin-top: 0;
+	}
+}
+
 /**
 * The following styles replicate the separated border of the
 * `ItemGroup` component but allows for hidden items. This is because
