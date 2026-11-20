@@ -7,10 +7,12 @@
  */
 
 import type { ActionScriptParts } from '../shared/types';
+import quickEdit from './quick-edit/action';
 import setAsHomepage from './set-as-homepage/action';
 import setAsPostsPage from './set-as-posts-page/action';
 
 const actions = {
+	'quick-edit': quickEdit,
 	'set-as-homepage': setAsHomepage,
 	'set-as-posts-page': setAsPostsPage,
 } satisfies Record< string, ActionScriptParts< any > >;
