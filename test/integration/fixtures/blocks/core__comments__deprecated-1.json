@@ -101,6 +101,7 @@
 												"isValid": true,
 												"attributes": {
 													"linkTarget": "_self",
+													"showModerationLinks": false,
 													"fontSize": "small"
 												},
 												"innerBlocks": []
