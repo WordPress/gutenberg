@@ -4,10 +4,16 @@ import { render } from 'vitest-browser-react';
 import { useState } from '@wordpress/element';
 import NumberControl from '..';
 
-function StatefulNumberControl() {
+function StatefulNumberControl( { disabled }: { disabled?: boolean } ) {
 	const [ value, setValue ] = useState< string | undefined >( '5' );
 
-	return <NumberControl value={ value } onChange={ setValue } />;
+	return (
+		<NumberControl
+			disabled={ disabled }
+			value={ value }
+			onChange={ setValue }
+		/>
+	);
 }
 
 function dragInput( input: Element, pointerType: 'touch' | 'mouse' ) {
@@ -43,6 +49,15 @@ describe( 'NumberControl drag to change value', () => {
 		dragInput( input.element(), 'mouse' );
 
 		await expect.element( input ).toHaveValue( 55 );
+	} );
+
+	it( 'does not change the value when dragged with mouse while disabled', async () => {
+		const screen = await render( <StatefulNumberControl disabled /> );
+		const input = screen.getByRole( 'spinbutton' );
+
+		dragInput( input.element(), 'mouse' );
+
+		await expect.element( input ).toHaveValue( 5 );
 	} );
 
 	it( 'normalizes drag multiplication for fractional values with spinFactor without floating-point inaccuracies', async () => {
