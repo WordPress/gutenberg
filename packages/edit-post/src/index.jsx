@@ -51,6 +51,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core/edit-post', {
 		fullscreenMode: true,
+		metaBoxesMainIsOpen: true,
 		themeStyles: true,
 		welcomeGuide: true,
 		welcomeGuideTemplate: true,
