@@ -6,6 +6,7 @@
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Navigation Link: Open the link UI when Enter is pressed on a link that still needs a URL, instead of inserting a duplicate link next to it ([#85865](https://github.com/WordPress/gutenberg/pull/85865)).
 
 ## 12.2.0 (2026-11-18)
 
