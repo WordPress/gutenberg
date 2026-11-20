@@ -651,6 +651,18 @@ _Returns_
 
 - `Object`: The style object for the selected state, if found.
 
+### getTransformClassesAndStyles
+
+Provides the inline styles for a block's transform support attributes.
+
+_Parameters_
+
+- _attributes_ `StyleAttributes`: Block attributes.
+
+_Returns_
+
+- Transform block support derived inline styles.
+
 ### getTypographyClassesAndStyles
 
 Provides the CSS class names and inline styles for a block's typography support attributes.

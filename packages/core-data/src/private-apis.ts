@@ -14,6 +14,7 @@ import {
 	default as EntitiesSavedStates,
 } from './components/entities-saved-states';
 import { useIsDirty as useEntitiesSavedStatesIsDirty } from './components/entities-saved-states/hooks/use-is-dirty';
+import UnsavedChangesWarning from './components/unsaved-changes-warning';
 import { PrivateEntityProvider } from './entity-provider';
 import { lock } from './lock-unlock';
 import {
@@ -34,6 +35,7 @@ const lockedApis = {
 	getTemplateInfo,
 	getTemplatePartIcon,
 	useEntitiesSavedStatesIsDirty,
+	UnsavedChangesWarning,
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	CRDT_AUTOSAVE_SNAPSHOT_KEY,
