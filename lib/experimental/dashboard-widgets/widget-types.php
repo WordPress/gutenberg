@@ -115,10 +115,12 @@ function gutenberg_sanitize_widget_help( $help ) {
  * Resolves a widget-local file href to a plugin URL.
  *
  * Leaves absolute, scheme-relative, root-relative, and single-segment admin
- * `.php` hrefs unchanged. Returns '' for local path traversal and for
- * relative hrefs that are not a file under `widgets/{dir}/` (so
- * `esc_url_raw()` cannot invent `http://filename`). Query strings on local
- * filenames are not stripped: `report.csv?v=2` will not resolve as a file.
+ * `.php` hrefs unchanged. Returns '' for path traversal and for relative
+ * hrefs that are not a file under `widgets/{dir}/`. Both the traversal and
+ * the `.php` test look at the path, so a query may carry `..` or a colon;
+ * `gutenberg_sanitize_widget_action_url()` sanitizes whatever survives.
+ * Query strings on local filenames are not stripped: `report.csv?v=2` will
+ * not resolve as a file.
  *
  * @param string $href     Action href.
  * @param string $dir_name Widget directory name.
@@ -129,8 +131,12 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 		return '';
 	}
 
-	// Absolute, scheme-relative, or schemed — including URLs with `..` in the path.
-	if ( preg_match( '#^([a-z][a-z0-9+.-]*:)?//#i', $href ) || str_contains( $href, ':' ) ) {
+	/*
+	 * Absolute, scheme-relative, or schemed — including URLs with `..` in
+	 * the path. A colon delimits a scheme only in scheme position: query
+	 * values carry them legitimately, an ISO timestamp for one.
+	 */
+	if ( preg_match( '#^(?:[a-z][a-z0-9+.-]*:|//)#i', $href ) ) {
 		return $href;
 	}
 
@@ -139,15 +145,18 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 		return $href;
 	}
 
-	if ( str_contains( $href, '..' ) ) {
+	$path_only = preg_split( '/[?#]/', $href, 2 )[0];
+
+	// Traversal is a property of the path: a `2024-01-01..2024-01-31`
+	// range in the query is not one.
+	if ( str_contains( $path_only, '..' ) ) {
 		return '';
 	}
 
-	$path_only = preg_split( '/[?#]/', $href, 2 )[0];
 	if ( str_ends_with( strtolower( $path_only ), '.php' ) ) {
-		// Single-segment admin entry points stay as-is. Deeper relative
-		// paths would come out of `esc_url_raw()` as `http://` URLs, and
-		// PHP files never resolve as local widget assets.
+		// Single-segment admin entry points stay relative. Deeper relative
+		// paths have no admin meaning, and PHP files never resolve as local
+		// widget assets.
 		return str_contains( $path_only, '/' ) ? '' : $href;
 	}
 
@@ -165,7 +174,44 @@ function gutenberg_resolve_widget_action_href( $href, $dir_name ) {
 }
 
 /**
- * Sanitizes widget actions to `id` / `label` / `href` (via `esc_url_raw()`),
+ * Sanitizes a resolved action href, keeping admin-relative hrefs relative.
+ *
+ * `esc_url_raw()` cannot sanitize a relative href on its own. With no scheme
+ * to go by it prefixes `http://` to anything outside its `[a-z0-9-]+\.php`
+ * exemption — narrower than the admin entry points a widget may link to, so
+ * `export_report.php` becomes `http://export_report.php` — and it reads the
+ * first colon in the query as a scheme delimiter, dropping the href. Passing
+ * it a URL under `admin_url()` and stripping the base back off avoids both
+ * while leaving the record relative.
+ *
+ * @param string $href Resolved action href.
+ * @return string Sanitized href, or ''.
+ */
+function gutenberg_sanitize_widget_action_url( $href ) {
+	if ( ! is_string( $href ) || '' === $href ) {
+		return '';
+	}
+
+	// Schemed, scheme-relative, and root-relative hrefs sanitize as they are.
+	if ( preg_match( '#^(?:[a-z][a-z0-9+.-]*:|/)#i', $href ) ) {
+		return esc_url_raw( $href );
+	}
+
+	$base      = admin_url();
+	$sanitized = esc_url_raw( $base . $href );
+
+	// Anything that does not come back under the base is not a href we can
+	// vouch for; the caller reports it.
+	if ( '' === $sanitized || ! str_starts_with( $sanitized, $base ) ) {
+		return '';
+	}
+
+	return substr( $sanitized, strlen( $base ) );
+}
+
+/**
+ * Sanitizes widget actions to `id` / `label` / `href` (via
+ * `gutenberg_sanitize_widget_action_url()`),
  * plus optional `download` / `openInNewTab` / `icon` / `relevance`. Drops
  * incomplete or unsafe entries; dropped hrefs are reported through
  * `_doing_it_wrong()`. With `$dir_name`, resolves widget-local file hrefs
@@ -202,7 +248,7 @@ function gutenberg_sanitize_widget_actions( $actions, $dir_name = '' ) {
 		}
 
 		$href = gutenberg_resolve_widget_action_href( $action['href'], $dir_name );
-		$href = esc_url_raw( $href );
+		$href = gutenberg_sanitize_widget_action_url( $href );
 		if ( ! $href ) {
 			_doing_it_wrong(
 				__FUNCTION__,
