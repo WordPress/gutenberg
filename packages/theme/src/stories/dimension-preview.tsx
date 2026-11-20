@@ -1,14 +1,8 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
 import { GroupTitle } from './group-title';
-import {
-	descriptionStyle,
-	itemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
+import { TokenText, tokenCardProps } from './token-item';
+import { itemStyle, listStyle, previewStyle } from './token-preview-styles';
 
 const boxStyle: CSSProperties = {
 	backgroundColor: 'var(--wpds-color-background-surface-brand)',
@@ -111,12 +105,13 @@ export function DimensionTokenPreview() {
 				const { example } = dimensionConfig[ key ];
 				return (
 					<section key={ key }>
-						<GroupTitle name={ key } />
+						<GroupTitle name={ key } id={ `dimension-${ key }` } />
 						<p>{ group.$description }</p>
 						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
 							{ group.tokens.map( ( name ) => (
 								<div
 									key={ name }
+									{ ...tokenCardProps( name ) }
 									style={ {
 										...itemStyle,
 										gridTemplateColumns:
@@ -125,14 +120,7 @@ export function DimensionTokenPreview() {
 												: 'minmax(96px, 1fr) 2fr',
 									} }
 								>
-									<dt style={ textStyle }>
-										<code style={ tokenNameStyle }>
-											{ name }
-										</code>
-										<span style={ descriptionStyle }>
-											{ tokens[ name ].$description }
-										</span>
-									</dt>
+									<TokenText name={ name } />
 									<dd
 										style={ {
 											margin: 0,

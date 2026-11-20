@@ -1,14 +1,8 @@
 import type { CSSProperties } from 'react';
-import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
+import { groups } from '../../prebuilt/js/design-tokens.mjs';
 import { GroupTitle } from './group-title';
-import {
-	descriptionStyle,
-	itemStyle,
-	listStyle,
-	previewStyle,
-	textStyle,
-	tokenNameStyle,
-} from './token-preview-styles';
+import { TokenText, tokenCardProps } from './token-item';
+import { itemStyle, listStyle, previewStyle } from './token-preview-styles';
 
 const widthExampleStyle = ( name: string ): CSSProperties => ( {
 	display: 'block',
@@ -53,12 +47,16 @@ export function BorderTokenPreview() {
 					const { example } = borderGroupConfig[ kind ];
 					return (
 						<section key={ kind }>
-							<GroupTitle name={ kind } />
+							<GroupTitle
+								name={ kind }
+								id={ `border-${ kind }` }
+							/>
 							<p>{ group.$description }</p>
 							<dl style={ listStyle }>
 								{ group.tokens.map( ( name ) => (
 									<div
 										key={ name }
+										{ ...tokenCardProps( name ) }
 										style={ {
 											...itemStyle,
 											gridTemplateColumns: '80px 1fr',
@@ -70,14 +68,7 @@ export function BorderTokenPreview() {
 										>
 											<span style={ example( name ) } />
 										</dd>
-										<dt style={ textStyle }>
-											<code style={ tokenNameStyle }>
-												{ name }
-											</code>
-											<span style={ descriptionStyle }>
-												{ tokens[ name ].$description }
-											</span>
-										</dt>
+										<TokenText name={ name } />
 									</div>
 								) ) }
 							</dl>
