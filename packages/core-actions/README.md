@@ -11,6 +11,7 @@ The actions of this package live in folders of `src`, one per collection:
 -   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
 -   `page`: the actions pages have on top of the defaults (`set-as-homepage` and `set-as-posts-page`).
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
+-   `wp_template`: the actions templates have on top of the defaults (`duplicate-template`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
 Each action has a folder named after its id, with the data of the action in `action.php` and its JavaScript parts in `action.tsx`. The `index.ts` of each collection is its script module, whose default export maps the id of each action to its JavaScript parts.
@@ -20,6 +21,7 @@ Each action has a folder named after its id, with the data of the action in `act
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
 -   `duplicate-post`, for the post types the user can create, except templates, template parts, and patterns. Only in the Gutenberg plugin.
+-   `duplicate-template`, for templates, when the user can create them and the theme is a block theme. It applies to the custom templates only: the theme's templates, such as `index` or `single`, cannot be duplicated.
 -   `duplicate-template-part`, for template parts, when the user can create them and the theme is a block theme.
 -   `duplicate-pattern`, for patterns, when the user can create them.
 -   `rename-post`, for the post types supporting `title`.
@@ -36,7 +38,7 @@ The modules use the `wp.*` globals the `wp-editor` script loads, such as `wp.dat
 
 ## Usage
 
-The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/page`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
+The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/page`, `@wordpress/core-actions/wp_block`, `@wordpress/core-actions/wp_template`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
 
 ```js
 const { default: actions } = await import(
