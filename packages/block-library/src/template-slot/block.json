@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"__experimental": true,
+	"name": "core/template-slot",
+	"title": "Template Slot",
+	"category": "theme",
+	"description": "Where the templates rendered inside this template go. What it holds is shown when the template is rendered on its own.",
+	"textdomain": "default",
+	"usesContext": [ "templateSlotId" ],
+	"supports": {
+		"anchor": true,
+		"align": [ "wide", "full" ],
+		"html": false,
+		"layout": true,
+		"spacing": {
+			"blockGap": true,
+			"padding": true,
+			"margin": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		}
+	}
+}
