@@ -71,18 +71,12 @@
 		}
 	}
 
-	&.is-selected {
-		--list-view-selected-background: var(--wpds-color-background-interactive-brand-strong);
-		--list-view-selected-color: var(--wpds-color-foreground-interactive-brand-strong);
-
-		// Border radius only works when the cells paint the background.
-		td {
-			background: var(--list-view-selected-background);
-		}
+	// The background has to be applied to the td, not tr, or border-radius won't work.
+	&.is-selected td {
+		background: var(--wp-admin-theme-color);
 	}
-	&.is-selected.is-synced {
-		--list-view-selected-background: var(--wp-block-synced-color);
-		--list-view-selected-color: #{$white};
+	&.is-selected.is-synced td {
+		background: var(--wp-block-synced-color);
 	}
 	&.is-synced:not(.is-selected) .block-editor-list-view-block-contents {
 		&:hover,
@@ -100,10 +94,10 @@
 	}
 	&.is-selected .block-editor-list-view-block-contents,
 	&.is-selected .components-button.has-icon {
-		color: var(--list-view-selected-color);
+		color: $white;
 	}
-	&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
-		--focus-color: currentColor;
+	&.is-selected .block-editor-list-view-block__menu:focus {
+		--focus-color: var(--wpds-color-foreground-interactive-brand-strong);
 		@include outset-ring__focus();
 		outline-offset: calc(-1 * var(--wpds-border-width-focus));
 	}
@@ -134,8 +128,8 @@
 			--focus-color: CanvasText;
 		}
 
-		// The action buttons' rings are inset over the selected background.
-		&.is-selected :is(.block-editor-list-view-block__menu, .block-editor-block-mover-button):focus {
+		// The menu ring is inset over the selected background.
+		&.is-selected .block-editor-list-view-block__menu:focus {
 			--focus-color: SelectedItemText;
 		}
 	}
@@ -449,10 +443,6 @@
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
-		background: var(--wpds-color-background-surface-neutral);
-		color: var(--wpds-color-foreground-content-neutral);
-	}
-	&.is-selected.is-synced .block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.3);
 		color: $white;
 	}
@@ -484,7 +474,7 @@
 
 	&.is-selected .block-editor-list-view-block-select-button__image {
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-small var(--list-view-selected-background);
+			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 		}
 	}
 
