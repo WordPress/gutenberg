@@ -6,6 +6,12 @@ import {
 import { toTree } from './to-tree';
 import type { HTMLTreeNode, RichTextValue } from './types';
 
+/**
+ * Elements that serialize as void in HTML, including obsolete elements.
+ *
+ * @see {@link https://html.spec.whatwg.org/#void-elements}
+ * @see {@link https://html.spec.whatwg.org/#serialising-html-fragments}
+ */
 const VOID_ELEMENTS = new Set( [
 	'area',
 	'base',

@@ -26,7 +26,7 @@ describe( 'toHTMLString object elements', () => {
 		unregisterFormatType( FORMAT_NAME );
 	} );
 
-	it.each( [ 'span', 'a', 'custom-object', 'SPAN' ] )(
+	it.each( [ 'span', 'a', 'custom-object', 'SPAN', 'CuStOm-Object' ] )(
 		'closes a non-void %s object before following text',
 		( tagName ) => {
 			registerObjectFormat( tagName );
@@ -96,6 +96,7 @@ describe( 'toHTMLString object elements', () => {
 		'br',
 		'input',
 		'IMG',
+		'iMg',
 		'param',
 		'keygen',
 		'frame',
