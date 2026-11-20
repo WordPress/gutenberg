@@ -1,6 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { BlockType } from '@wordpress/blocks';
-import { getBlockElementColors } from '../contrast-checker';
+import {
+	getBlockContrastMeasurements,
+	getBlockContrastWarning,
+	getBlockElementColors,
+	getBlockElementFontSize,
+} from '../contrast-checker';
 
 const blockType = { name: 'core/paragraph' } as BlockType;
 
@@ -95,5 +100,194 @@ describe( 'getBlockElementColors()', () => {
 		expect( getBlockElementColors( blockEl, blockType ).linkColor ).toBe(
 			'rgb(255, 255, 0)'
 		);
+	} );
+} );
+
+describe( 'getBlockElementFontSize()', () => {
+	afterEach( () => {
+		document.body.replaceChildren();
+	} );
+
+	it( 'returns undefined when block element or block type is missing', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 24px">Text</p>'
+		);
+
+		expect( getBlockElementFontSize( null, blockType ) ).toBeUndefined();
+		expect( getBlockElementFontSize( blockEl, null ) ).toBeUndefined();
+	} );
+
+	it( 'reads the computed font size in pixels from the block element', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 28px">Text</p>'
+		);
+
+		expect( getBlockElementFontSize( blockEl, blockType ) ).toBe( 28 );
+	} );
+
+	it( 'prefers the block typography fontSize selector when configured', () => {
+		const blockEl = renderBlock(
+			'<div class="wp-block-paragraph" style="font-size: 16px"><span class="title" style="font-size: 32px">Heading</span></div>'
+		);
+		const customBlockType = {
+			name: 'core/paragraph',
+			selectors: {
+				root: '.wp-block-paragraph',
+				typography: {
+					fontSize: '.title',
+				},
+			},
+		} as unknown as BlockType;
+
+		expect( getBlockElementFontSize( blockEl, customBlockType ) ).toBe(
+			32
+		);
+	} );
+
+	it( 'ignores object typography selectors when resolving font size', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 20px">Text</p>'
+		);
+		const type = {
+			name: 'core/paragraph',
+			selectors: {
+				root: 'p',
+				typography: {
+					textIndent: '.wp-block-paragraph + .wp-block-paragraph',
+				},
+			},
+		} as unknown as BlockType;
+
+		expect( getBlockElementFontSize( blockEl, type ) ).toBe( 20 );
+	} );
+
+	it( 'reads the link font size when only link contrast is checked', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="font-size: 16px"><a href="#test" style="font-size: 26px">Large link</a></p>'
+		);
+
+		expect(
+			getBlockElementFontSize( blockEl, blockType, {
+				checkTextColor: false,
+				checkLinkColor: true,
+			} )
+		).toBe( 26 );
+	} );
+} );
+
+describe( 'getBlockContrastWarning()', () => {
+	afterEach( () => {
+		document.body.replaceChildren();
+	} );
+
+	it( 'evaluates text and link colors against their own font sizes', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="background-color: #c44b4b; color: #000; font-size: 28px">Large text <a href="#test" style="color: #000; font-size: 16px">Small link</a></p>'
+		);
+		const measurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			true,
+			true
+		);
+
+		expect( measurements ).toMatchObject( {
+			textFontSize: 28,
+			linkFontSize: 16,
+		} );
+		expect(
+			getBlockContrastWarning( measurements, {
+				checkTextColor: true,
+				checkLinkColor: true,
+			} )?.message
+		).toContain( 'link color' );
+	} );
+
+	it( 'checks text at its own size when link text is larger', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="background-color: #c44b4b; color: #000; font-size: 16px">Small text <a href="#test" style="color: #000; font-size: 28px">Large link</a></p>'
+		);
+		const measurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			true,
+			true
+		);
+
+		expect(
+			getBlockContrastWarning( measurements, {
+				checkTextColor: true,
+				checkLinkColor: true,
+			} )?.message
+		).toContain( 'text color' );
+		const linkOnlyMeasurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			false,
+			true
+		);
+		expect(
+			getBlockContrastWarning( linkOnlyMeasurements, {
+				checkTextColor: false,
+				checkLinkColor: true,
+			} )
+		).toBeNull();
+	} );
+
+	it( 'passes when both large text and large link meet AA ratio', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="background-color: #c44b4b; color: #000; font-size: 28px">Large text <a href="#test" style="color: #000; font-size: 28px">Large link</a></p>'
+		);
+		const measurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			true,
+			true
+		);
+
+		expect(
+			getBlockContrastWarning( measurements, {
+				checkTextColor: true,
+				checkLinkColor: true,
+			} )
+		).toBeNull();
+	} );
+
+	it( 'prioritizes link contrast failure over text transparency', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="background-color: #c44b4b; color: rgba(0, 0, 0, 0.5); font-size: 28px">Transparent text <a href="#test" style="color: #000; font-size: 16px">Small link</a></p>'
+		);
+		const measurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			true,
+			true
+		);
+
+		expect(
+			getBlockContrastWarning( measurements, {
+				checkTextColor: true,
+				checkLinkColor: true,
+			} )?.message
+		).toContain( 'link color' );
+	} );
+
+	it( 'warns on transparent text when no pair fails contrast', () => {
+		const blockEl = renderBlock(
+			'<p class="wp-block-paragraph" style="background-color: #c44b4b; color: rgba(0, 0, 0, 0.5); font-size: 28px">Transparent text <a href="#test" style="color: #fff; font-size: 16px">Readable link</a></p>'
+		);
+		const measurements = getBlockContrastMeasurements(
+			blockEl,
+			blockType,
+			true,
+			true
+		);
+
+		expect(
+			getBlockContrastWarning( measurements, {
+				checkTextColor: true,
+				checkLinkColor: true,
+			} )?.message
+		).toContain( 'Transparent text' );
 	} );
 } );
