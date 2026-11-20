@@ -735,6 +735,8 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 				__unstableSelectionHasUnmergeableBlock,
 				isBlockBeingDragged,
 				isDragging,
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
 			} = unlock( select( blockEditorStore ) );
@@ -884,6 +886,13 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
 				isDragging: isBlockBeingDragged( clientId ),
+				// An empty block list shows its insertion point on the
+				// ghost, as there is no block to show it between.
+				isGhostDropTarget:
+					clientId === ghostBlock?.clientId &&
+					isBlockInsertionPointVisible() &&
+					( getBlockInsertionPoint().rootClientId ?? '' ) ===
+						( rootClientId ?? '' ),
 				hasChildSelected: isAncestorOfSelectedBlock,
 				isEditingDisabled: blockEditingMode === 'disabled',
 				hasEditableOutline:
@@ -954,6 +963,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isPartiallySelected,
 		isReusable,
 		isDragging,
+		isGhostDropTarget,
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
@@ -995,6 +1005,7 @@ function BlockListBlockProvider( props: BlockListBlockProviderProps ) {
 		isPartiallySelected,
 		isReusable,
 		isDragging,
+		isGhostDropTarget,
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
