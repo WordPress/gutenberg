@@ -91,7 +91,7 @@ describe( 'validateCollection', () => {
 			for ( const { slug } of icons ) {
 				await writeFile(
 					path.join( iconLibraryDir, `${ slug }.svg` ),
-					'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12L10 18L20 6" /></svg>'
+					'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M4 12L10 18L20 6" />\n</svg>\n'
 				);
 			}
 		}
@@ -184,7 +184,7 @@ describe( 'validateCollection', () => {
 			for ( const { slug } of icons ) {
 				await writeFile(
 					path.join( iconLibraryDir, `${ slug }.svg` ),
-					'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 12L10 18L20 6" /></svg>'
+					'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">\n\t<path d="M4 12L10 18L20 6" />\n</svg>\n'
 				);
 			}
 		}
