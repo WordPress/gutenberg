@@ -34,6 +34,7 @@ import {
 } from '../../dataviews-bulk-actions';
 import type {
 	Action,
+	HierarchyPaginationInfo,
 	MediaAspectRatio,
 	NormalizedField,
 	ViewTable as ViewTableType,
@@ -51,6 +52,12 @@ import {
 	HierarchyHeaderCell,
 	getHierarchyBulkActionsStart,
 } from './hierarchy-cell';
+import getHierarchyContinuations, {
+	hasHierarchyContinuation,
+	type HierarchyContinuation,
+} from './get-hierarchy-continuations';
+import HierarchyPaginationRow from './hierarchy-pagination-row';
+import useHierarchyFocus from './use-hierarchy-focus';
 import { useScrollState } from './use-scroll-state';
 import useBulkActionsFocus from '../utils/use-bulk-actions-focus';
 import getDataByGroup from '../utils/get-data-by-group';
@@ -98,6 +105,15 @@ interface TableColumnFieldProps< Item > {
 	align?: 'start' | 'center' | 'end';
 }
 
+function getItemLabel< Item >(
+	item: Item,
+	id: string,
+	titleField?: NormalizedField< Item >
+): string {
+	const title = titleField?.getValue?.( { item } );
+	return typeof title === 'string' && title ? title : id;
+}
+
 interface TableRowProps< Item > {
 	hasBulkActions: boolean;
 	item: Item;
@@ -122,12 +138,14 @@ interface TableRowProps< Item > {
 			item: Item;
 		} & ComponentProps< 'a' >
 	) => ReactElement;
+	isInfiniteScroll?: boolean;
 	posinset?: number;
 	isTreeHierarchy?: boolean;
 	hierarchyLevel?: number;
 	hasChildren?: boolean;
 	isExpanded?: boolean;
 	onToggleExpanded?: ( id: string ) => void;
+	rowRef?: ( element: HTMLTableRowElement | null ) => void;
 }
 
 function TableColumnField< Item >( {
@@ -174,30 +192,26 @@ function TableRow< Item >( {
 	onChangeSelection,
 	onMouseDown,
 	onClickCapture,
+	isInfiniteScroll,
 	posinset,
 	isTreeHierarchy,
 	hierarchyLevel = 0,
 	hasChildren,
 	isExpanded,
 	onToggleExpanded,
+	rowRef,
 }: TableRowProps< Item > ) {
-	const { paginationInfo } = useContext( DataViewsContext );
+	const { paginationInfo, isHierarchyPaginationActive } =
+		useContext( DataViewsContext );
 	const hasPossibleBulkAction = useHasAPossibleBulkAction( actions, item );
 	const isSelected = hasPossibleBulkAction && selection.includes( id );
-	const {
-		showTitle = true,
-		showMedia = true,
-		showDescription = true,
-		infiniteScrollEnabled,
-	} = view;
+	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const columns = getTableColumns( view, fields );
 	const hasPrimaryColumn =
 		( titleField && showTitle ) ||
 		( mediaField && showMedia ) ||
 		( descriptionField && showDescription );
-	const itemTitle = titleField?.getValue?.( { item } );
-	const itemLabel =
-		typeof itemTitle === 'string' && itemTitle ? itemTitle : id;
+	const itemLabel = getItemLabel( item, id, titleField );
 
 	const selectionCheckbox = (
 		<DataViewsSelectionCheckbox
@@ -230,6 +244,9 @@ function TableRow< Item >( {
 
 	return (
 		<tr
+			ref={ rowRef }
+			// Load more moves focus to the first new row, so rows must take focus.
+			tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 			className={ clsx( 'dataviews-view-table__row', {
 				'is-selected': hasPossibleBulkAction && isSelected,
 				'has-bulk-actions': hasPossibleBulkAction,
@@ -243,10 +260,10 @@ function TableRow< Item >( {
 					: undefined
 			}
 			aria-setsize={
-				infiniteScrollEnabled ? paginationInfo.totalItems : undefined
+				isInfiniteScroll ? paginationInfo.totalItems : undefined
 			}
 			aria-posinset={ posinset }
-			role={ infiniteScrollEnabled ? 'article' : undefined }
+			role={ isInfiniteScroll ? 'article' : undefined }
 			onClickCapture={ onClickCapture }
 			onMouseDown={ ( event ) => {
 				// Firefox has a unique feature where ctrl/cmd + click selects a
@@ -358,6 +375,7 @@ function ViewTable< Item >( {
 	getItemHasChildren,
 	expandedItemIds,
 	onChangeExpandedItemIds,
+	hierarchyPagination,
 	isLoading = false,
 	onChangeView,
 	onChangeSelection,
@@ -370,7 +388,12 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const {
+		containerRef,
+		isTreeHierarchy,
+		isHierarchyPaginationActive,
+		isInfiniteScroll: isInfiniteScrollView,
+	} = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -386,9 +409,7 @@ function ViewTable< Item >( {
 				view.showLevels
 			);
 	const tree =
-		! dataByGroup &&
-		view.showLevels &&
-		getItemParentId &&
+		isTreeHierarchy &&
 		getItemHasChildren &&
 		expandedItemIds &&
 		onChangeExpandedItemIds
@@ -399,8 +420,10 @@ function ViewTable< Item >( {
 					onChangeExpandedItemIds
 				)
 			: undefined;
-	const isTreeHierarchy = !! tree;
 	const renderedRows = tree ? tree.visibleRows : rows;
+	const activeHierarchyPagination = isHierarchyPaginationActive
+		? hierarchyPagination
+		: undefined;
 	// Selection ranges follow the rendered hierarchy and group order.
 	const orderedData = dataByGroup
 		? Array.from( dataByGroup.values() ).flat()
@@ -418,6 +441,12 @@ function ViewTable< Item >( {
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
 	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
+	const {
+		tableRef: hierarchyTableRef,
+		emptyRef: hierarchyEmptyRef,
+		getRowRef: getHierarchyRowRef,
+		moveFocus: moveHierarchyFocus,
+	} = useHierarchyFocus( renderedRows );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const [ contextMenuAnchor, setContextMenuAnchor ] = useState< {
@@ -509,6 +538,16 @@ function ViewTable< Item >( {
 		return;
 	}
 
+	const hierarchyContinuations = activeHierarchyPagination
+		? getHierarchyContinuations(
+				renderedRows as TreeRow< Item >[],
+				activeHierarchyPagination
+			)
+		: new Map< number, HierarchyContinuation< Item >[] >();
+	const rootPaginationInfo =
+		activeHierarchyPagination?.getPaginationInfo( null );
+	const hasRootContinuation = hasHierarchyContinuation( rootPaginationInfo );
+
 	const onHide = ( field: NormalizedField< Item > ) => {
 		const hidden = headerMenuRefs.current.get( field.id );
 		const fallback = hidden
@@ -558,8 +597,31 @@ function ViewTable< Item >( {
 	const columnCount =
 		columns.length +
 		( hasPrimaryColumn ? 1 : 0 ) +
-		( hasBulkActions ? 1 : 0 ) +
+		( hasBulkActions && ! isTreeHierarchy ? 1 : 0 ) +
 		( actions?.length ? 1 : 0 );
+	const renderContinuation = (
+		parent: TreeRow< Item > | null,
+		previousRowId: string | undefined,
+		paginationInfo: HierarchyPaginationInfo
+	) => (
+		<HierarchyPaginationRow
+			key={ `pagination-${ parent?.id ?? 'root' }` }
+			columnCount={ columnCount }
+			level={ parent ? parent.level + 1 : 0 }
+			parentId={ parent?.id ?? null }
+			parentLabel={
+				parent
+					? getItemLabel( parent.item, parent.id, titleField )
+					: undefined
+			}
+			previousRowId={ previousRowId }
+			paginationInfo={ paginationInfo }
+			onLoadMore={ activeHierarchyPagination!.onLoadMore }
+			moveFocus={ ( nextPreviousRowId ) =>
+				moveHierarchyFocus( parent?.id ?? null, nextPreviousRowId )
+			}
+		/>
+	);
 	const headerMenuRef =
 		( column: string, index: number ) => ( node: HTMLButtonElement ) => {
 			if ( node ) {
@@ -571,7 +633,7 @@ function ViewTable< Item >( {
 				headerMenuRefs.current.delete( column );
 			}
 		};
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll = isInfiniteScrollView && ! dataByGroup;
 	const isRtl = isRTL();
 	// Consumer-configured aspect ratio for the primary column's media preview,
 	// validated against the presets (like `density`) so arbitrary values are
@@ -588,9 +650,12 @@ function ViewTable< Item >( {
 	const tableStyle = {
 		'--wp-dataviews-media-aspect-ratio': mediaAspectRatio ?? '1/1',
 	} as CSSProperties;
-	if ( ! hasData && ! isActionInProgress ) {
+	if ( ! hasData && ! isActionInProgress && ! hasRootContinuation ) {
 		return (
 			<div
+				ref={ hierarchyEmptyRef }
+				role={ isHierarchyPaginationActive ? 'status' : undefined }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-no-results', {
 					'is-refreshing': isDelayedLoading,
 				} ) }
@@ -662,6 +727,8 @@ function ViewTable< Item >( {
 				</div>
 			) }
 			<table
+				ref={ hierarchyTableRef }
+				tabIndex={ isHierarchyPaginationActive ? -1 : undefined }
 				className={ clsx( 'dataviews-view-table', className, {
 					[ `has-${ view.layout?.density }-density` ]:
 						view.layout?.density &&
@@ -916,6 +983,9 @@ function ViewTable< Item >( {
 											onClickItem={ onClickItem }
 											renderItemLink={ renderItemLink }
 											isItemClickable={ isItemClickable }
+											isInfiniteScroll={
+												isInfiniteScrollView
+											}
 										/>
 									);
 								} ) }
@@ -925,14 +995,16 @@ function ViewTable< Item >( {
 				) : (
 					<tbody>
 						{ hasData &&
-							renderedRows.map( ( row, index ) => {
+							renderedRows.flatMap( ( row, index ) => {
 								const { id, item, level } = row;
 								const treeRow = isTreeHierarchy
 									? ( row as TreeRow< Item > )
 									: undefined;
-								return (
+								const continuations =
+									hierarchyContinuations.get( index ) ?? [];
+								return [
 									<TableRow
-										key={ id }
+										key={ `item-${ id }` }
 										item={ item }
 										level={
 											isTreeHierarchy ? undefined : level
@@ -953,19 +1025,36 @@ function ViewTable< Item >( {
 										onClickItem={ onClickItem }
 										renderItemLink={ renderItemLink }
 										isItemClickable={ isItemClickable }
+										isInfiniteScroll={ isInfiniteScroll }
 										isTreeHierarchy={ isTreeHierarchy }
 										hierarchyLevel={ level }
 										hasChildren={ treeRow?.hasChildren }
 										isExpanded={ treeRow?.isExpanded }
 										onToggleExpanded={ tree?.onToggle }
+										rowRef={ getHierarchyRowRef( id ) }
 										posinset={
 											isInfiniteScroll
 												? index + 1
 												: undefined
 										}
-									/>
-								);
+									/>,
+									...continuations.map(
+										( { parent, paginationInfo } ) =>
+											renderContinuation(
+												parent,
+												id,
+												paginationInfo
+											)
+									),
+								];
 							} ) }
+						{ hasRootContinuation &&
+							rootPaginationInfo &&
+							renderContinuation(
+								null,
+								renderedRows[ renderedRows.length - 1 ]?.id,
+								rootPaginationInfo
+							) }
 					</tbody>
 				) }
 			</table>
