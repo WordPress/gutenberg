@@ -1,5 +1,6 @@
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../lock-unlock';
+import type { StyledBlockAttributes } from './types';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -8,10 +9,12 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  * whose value was "var:preset|font-family|helvetica-arial",
  * to the style.fontFamily attribute, whose value will be "helvetica-arial".
  *
- * @param {Object} attributes The current attributes
- * @return {Object} The updated attributes.
+ * @param attributes The current attributes
+ * @return The updated attributes.
  */
-export default function ( attributes ) {
+export default function (
+	attributes: StyledBlockAttributes
+): StyledBlockAttributes {
 	if ( ! attributes?.style?.typography?.fontFamily ) {
 		return attributes;
 	}
