@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `check-licenses`: Accept the `PSF-2.0` license outside GPL-2.0-only mode, as `Python-2.0` already is. `argparse` 3, which Stylelint 18 depends on through `cosmiconfig` 10 and `js-yaml` 5, uses it.
+-   `check-licenses`: Accept the `PSF-2.0` license outside GPL-2.0-only mode, as `Python-2.0` already is. `argparse` 3, which Stylelint 18 depends on through `cosmiconfig` 10 and `js-yaml` 5, uses it ([#87151](https://github.com/WordPress/gutenberg/pull/87151)).
 
 ## 37.2.0 (2026-11-18)
 
