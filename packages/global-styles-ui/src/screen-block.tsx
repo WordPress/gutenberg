@@ -242,6 +242,8 @@ function ScreenBlock( {
 		disableAspectRatio = true;
 	}
 
+	const disableTypography = name === 'core/buttons';
+
 	const settings = useMemo( () => {
 		const updatedSettings = structuredClone( settingsForBlockElement );
 		if ( disableBlockGap ) {
@@ -250,8 +252,16 @@ function ScreenBlock( {
 		if ( disableAspectRatio ) {
 			updatedSettings.dimensions.aspectRatio = false;
 		}
+		if ( disableTypography ) {
+			updatedSettings.typography = {};
+		}
 		return updatedSettings;
-	}, [ settingsForBlockElement, disableBlockGap, disableAspectRatio ] );
+	}, [
+		settingsForBlockElement,
+		disableBlockGap,
+		disableAspectRatio,
+		disableTypography,
+	] );
 
 	const blockVariations = useBlockVariations( name );
 	const hasBackgroundPanel = useHasBackgroundPanel( settings );
