@@ -5,6 +5,7 @@ import type {
 	CanPerformDashboardOperation,
 	DashboardInstanceOperation,
 	DashboardWidget,
+	DashboardWidthOption,
 } from '../types';
 
 const widgetTypes: WidgetType[] = [
@@ -515,5 +516,151 @@ describe( 'enforceLayoutPolicy', () => {
 
 		expect( uuids( result ) ).toEqual( [ 'a', 'b' ] );
 		expect( result[ 0 ].placement ).toEqual( { width: 3, height: 1 } );
+	} );
+
+	describe( 'width choices', () => {
+		const choices: {
+			kind: 'custom';
+			options: readonly DashboardWidthOption[];
+		} = {
+			kind: 'custom',
+			options: [
+				{ value: 1, label: 'Half width' },
+				{ value: 'full', label: 'Full width' },
+			],
+		};
+
+		it( 'lets a changed width through when it is a choice', () => {
+			const previous = [
+				widget( 'a', { placement: { width: 1, height: 1 } } ),
+			];
+			const next: DashboardWidget[] = [
+				{
+					...previous[ 0 ],
+					placement: { width: 'full', height: 1 },
+				},
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: choices,
+			} );
+
+			expect( result ).toBe( next );
+		} );
+
+		it( 'restores only the width when a staged width is not a choice', () => {
+			const previous = [
+				widget( 'a', { placement: { width: 1, height: 1 } } ),
+			];
+			const next = [
+				{
+					...previous[ 0 ],
+					placement: { width: 3, height: 5 },
+				},
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: choices,
+			} );
+
+			expect( result[ 0 ].placement ).toEqual( {
+				width: 1,
+				height: 5,
+			} );
+		} );
+
+		it( 'leaves an unchanged unsupported width visible', () => {
+			const previous = [
+				widget( 'a', { placement: { width: 4, height: 1 } } ),
+			];
+			const next = [
+				{
+					...previous[ 0 ],
+					placement: { width: 4, height: 3 },
+				},
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: choices,
+			} );
+
+			expect( result ).toBe( next );
+		} );
+
+		it( 'accepts an insertion that carries a choice', () => {
+			const previous = [ widget( 'a' ) ];
+			const next = [
+				previous[ 0 ],
+				widget( 'b', { placement: { width: 1, height: 1 } } ),
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: choices,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'a', 'b' ] );
+		} );
+
+		it( 'rejects an insertion with no committed width to restore', () => {
+			const previous = [ widget( 'a' ) ];
+			const next = [
+				previous[ 0 ],
+				widget( 'b', { placement: { height: 1 } } ),
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: choices,
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'a' ] );
+		} );
+
+		it( 'fails closed for width changes and insertions on an invalid configuration', () => {
+			const previous = [
+				widget( 'a', { placement: { width: 1, height: 1 } } ),
+			];
+			const next = [
+				{
+					...previous[ 0 ],
+					placement: { width: 1, height: 2 },
+				},
+				widget( 'b', { placement: { width: 1, height: 1 } } ),
+			];
+
+			const result = enforceLayoutPolicy( {
+				previous,
+				next,
+				canPerform: allowAll,
+				widgetTypes,
+				widthOptions: { kind: 'invalid' },
+			} );
+
+			expect( uuids( result ) ).toEqual( [ 'a' ] );
+			// The height is an independent allowed edit.
+			expect( result[ 0 ].placement ).toEqual( {
+				width: 1,
+				height: 2,
+			} );
+		} );
 	} );
 } );

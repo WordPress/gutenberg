@@ -122,6 +122,10 @@ Optional. Maps a `WidgetType.renderModule` id to the React component that render
 
 Optional. Grid model configuration; see [Grid settings](#grid-settings). Defaults to `DEFAULT_GRID`.
 
+#### `widthOptions`: `readonly DashboardWidthOption[]`
+
+Optional. The widths the `'grid'` model may store from its width affordances, in display order. Each entry is `{ value: number | 'fill' | 'full', label: string }`, with a host-translated label; the first choice is the insertion default. See [Width choices](#width-choices).
+
 #### `children`: `ReactNode`
 
 Optional. Composition slot for the dashboard's triggers and chrome. When omitted, the engine renders the default arrangement: the empty state, the actions, the widgets grid, and the command palette integration. The engine-mounted overlays are present either way.
@@ -270,6 +274,37 @@ The column policy is the host's, and it travels to the `@wordpress/grid` surface
 	gridSettings={ { model: 'masonry' } }
 />
 ```
+
+## Width choices
+
+A host can narrow the widths its stored layout supports. `widthOptions` lists the choices in display order, with host-translated labels:
+
+```tsx
+const widthOptions = [
+	{ value: 1, label: __( 'Half width' ) },
+	{ value: 'full', label: __( 'Full width' ) },
+];
+
+<WidgetDashboard
+	layout={ layout }
+	onLayoutChange={ setLayout }
+	widgetTypes={ widgetTypes }
+	gridSettings={ { model: 'grid', columns: 2 } }
+	widthOptions={ widthOptions }
+/>;
+```
+
+Each `value` is a positive integer column span, `'fill'` (the remaining columns in the row), or `'full'` (all columns). Values must be unique and every label nonempty. The list governs the `'grid'` model only: `DashboardLanes` stores numeric widths, so a masonry dashboard ignores the prop with a development warning.
+
+- **Menu.** The widget options menu offers exactly these choices under the `resize` policy, even when two choices render identically in a narrow container, so the menu can switch between them. `'fill'` is a menu choice, not an automatic resize target.
+- **Insertion.** New widgets start at the first choice, so every insertion carries a width the dashboard can store.
+- **Resize.** Pointer and keyboard gestures snap to the resolved spans of the non-`'fill'` choices and commit their tokens. A `'full'`-only list still resizes; a `'fill'`-only list freezes the width axis while height resizing continues. An unchanged horizontal span keeps the stored token; ties prefer it when eligible, then the declared order.
+- **Staging.** The staging layer revalidates widths when the choices change and at commit. A staged width outside the list is restored to the committed width, keeping independent edits (height, attributes, position); a new insertion with no committed width to restore is rejected.
+- **Existing data.** The dashboard never rewrites the committed layout. Widths stored before the choices existed stay visible and can be changed to a listed token, but no new unsupported width can be introduced. Hosts validate their own stored documents and reset results.
+
+Omitting `widthOptions` keeps the current behavior everywhere: the native "Use available width" / "Make full width" menu and whole-column resize snapping.
+
+An invalid list — empty, duplicate or malformed values, or a missing label — fails closed rather than restoring the unrestricted choices: the width menu is not offered, width changes are denied, and insertions are rejected.
 
 ## Tile spacing
 

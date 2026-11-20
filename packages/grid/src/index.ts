@@ -2,6 +2,7 @@ export { DashboardGrid } from './dashboard-grid';
 export { DashboardLanes } from './dashboard-lanes';
 
 export type {
+	DashboardGridItemResizeWidths,
 	DashboardGridLayoutItem,
 	DashboardGridProps,
 } from './dashboard-grid/types';

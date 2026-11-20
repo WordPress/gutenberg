@@ -73,6 +73,16 @@ export type GridItemProps = {
 	maxColumns: number;
 
 	/**
+	 * Whether the width axis is locked for this gesture: the horizontal
+	 * delta is zeroed at the handle so the tile content cannot track
+	 * horizontally, while the height keeps resizing. Used when the item
+	 * declares no allowed width choices.
+	 *
+	 * @default false
+	 */
+	widthLocked?: boolean;
+
+	/**
 	 * Whether drag and resize interactions are disabled.
 	 *
 	 * @default false
@@ -182,6 +192,17 @@ export type GridItemProps = {
 	 */
 	renderResizeHandle?: React.ComponentType< ResizeHandleRenderProps >;
 };
+
+/**
+ * Per-item width tokens the resize gesture may commit, keyed by layout
+ * item `key`: a column span, or `'full'` for all columns. `'fill'` cannot
+ * be a gesture target — it is a menu choice, not a horizontal target, as
+ * its span depends on the row.
+ */
+export type DashboardGridItemResizeWidths = Record<
+	string,
+	readonly ( number | 'full' )[]
+>;
 
 /**
  * Props for `DashboardGrid`. Extends the standard div props so consumers
@@ -318,4 +339,25 @@ export interface DashboardGridProps extends Omit<
 	 * respect a maximum.
 	 */
 	itemLimits?: Record< string, GridItemLimits >;
+
+	/**
+	 * Width choices the resize gesture may commit, keyed by layout item
+	 * `key`. A choice is a column span or `'full'`; each resolves for the
+	 * current column count and the item's span bounds, and the resolved
+	 * choices are both the snap targets of the pointer and keyboard
+	 * gestures and the values that commit: the item's stored token only
+	 * changes to a listed token (the gesture-start token survives when
+	 * the horizontal span does not change, and ties prefer it when
+	 * eligible, then the declared order). `'fill'` cannot be a gesture
+	 * target; it stays a menu choice.
+	 *
+	 * An entry the surface declares makes the whole horizontal axis of
+	 * that item conform:
+	 * - A missing entry keeps the current snapping: whole column tracks,
+	 *   with named widths materializing to numbers as the gesture starts.
+	 * - An empty entry freezes the width: horizontal tracking and commits
+	 *   are locked to the gesture-start token while height resizing
+	 *   passes through.
+	 */
+	itemResizeWidths?: DashboardGridItemResizeWidths;
 }
