@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   A breakpoint pseudo-state, such as `@mobile` `:hover`, undoes a text gradient set by the default pseudo-state when it sets a box clip or text color ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
+
 ## 2.2.0 (2026-11-18)
 
 ### Bug Fixes

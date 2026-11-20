@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Block states: Undo a text gradient set in Global Styles, for the block type or an applied block style variation, when a state or breakpoint sets a box clip or text color. A breakpoint pseudo-state now also undoes one set by the default pseudo-state ([#86245](https://github.com/WordPress/gutenberg/pull/86245)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements

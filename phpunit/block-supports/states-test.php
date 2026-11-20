@@ -445,6 +445,303 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Renders a block instance over the given Global Styles for its block type.
+	 *
+	 * @param string $block_name     Block name.
+	 * @param array  $global_styles  Global Styles for the block type.
+	 * @param array  $instance_style The instance's `style` attribute.
+	 * @param string $markup         Block markup.
+	 * @param string $class_name     Optional block class name.
+	 * @return string Generated block-supports stylesheet.
+	 */
+	private function get_stylesheet_over_global_styles( $block_name, $global_styles, $instance_style, $markup, $class_name = '' ) {
+		$block_type = $this->ensure_block_registered(
+			$block_name,
+			array(),
+			array( 'background' => array( 'backgroundClip' => true ) )
+		);
+		$supports   = $block_type->supports;
+
+		$block_type->supports['background']['backgroundClip'] = true;
+
+		$filter = static function ( $theme_json ) use ( $block_name, $global_styles ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array( $block_name => $global_styles ),
+					),
+				)
+			);
+		};
+
+		add_filter( 'wp_theme_json_data_theme', $filter );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+
+		try {
+			$block = array(
+				'blockName' => $block_name,
+				'attrs'     => array(
+					'className' => $class_name,
+					'style'     => $instance_style,
+				),
+			);
+
+			gutenberg_render_block_states_support( $markup, $block );
+
+			return gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+		} finally {
+			$block_type->supports = $supports;
+			remove_filter( 'wp_theme_json_data_theme', $filter );
+			WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		}
+	}
+
+	/**
+	 * Renders a Paragraph with a mobile box clip over the given Global Styles
+	 * for Paragraph.
+	 *
+	 * @param array  $paragraph_styles Global Styles for Paragraph.
+	 * @param string $class_name       Optional block class name.
+	 * @return string Generated block-supports stylesheet.
+	 */
+	private function get_box_clip_over_global_styles_stylesheet( $paragraph_styles, $class_name = '' ) {
+		return $this->get_stylesheet_over_global_styles(
+			'core/paragraph',
+			$paragraph_styles,
+			array(
+				'@mobile' => array(
+					'background' => array( 'backgroundClip' => 'border-box' ),
+				),
+			),
+			'<p>Text</p>',
+			$class_name
+		);
+	}
+
+	/**
+	 * Tests that a block instance state escapes a text clip set for its block
+	 * type in Global Styles.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_instance_state_escapes_a_global_styles_text_clip() {
+		$actual_stylesheet = $this->get_box_clip_over_global_styles_stylesheet(
+			array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+					'backgroundClip' => 'text',
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'background-clip:border-box !important;-webkit-text-fill-color:currentColor !important;background-image:unset !important;', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a block instance state escapes a text clip set by the block
+	 * style variation applied to it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_instance_state_escapes_a_block_style_variation_text_clip() {
+		register_block_style(
+			'core/paragraph',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		try {
+			$actual_stylesheet = $this->get_box_clip_over_global_styles_stylesheet(
+				array(
+					'variations' => array(
+						'flashy' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+						),
+					),
+				),
+				'is-style-flashy'
+			);
+		} finally {
+			unregister_block_style( 'core/paragraph', 'flashy' );
+		}
+
+		$this->assertStringContainsString( 'background-clip:border-box !important;-webkit-text-fill-color:currentColor !important;background-image:unset !important;', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a breakpoint state keeps a gradient Global Styles sets for
+	 * the same breakpoint, over a text clip set outside it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_breakpoint_state_keeps_a_global_styles_gradient_for_the_same_breakpoint() {
+		$actual_stylesheet = $this->get_box_clip_over_global_styles_stylesheet(
+			array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+					'backgroundClip' => 'text',
+				),
+				'@mobile'    => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,#11998e,#38ef7d)',
+						'backgroundClip' => 'border-box',
+					),
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'background-clip:border-box !important;', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'background-image:unset', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a breakpoint state escapes a text clip Global Styles sets
+	 * for the same breakpoint.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_breakpoint_state_escapes_a_global_styles_text_clip_for_the_same_breakpoint() {
+		$actual_stylesheet = $this->get_box_clip_over_global_styles_stylesheet(
+			array(
+				'@mobile' => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+						'backgroundClip' => 'text',
+					),
+				),
+			)
+		);
+
+		$this->assertStringContainsString( 'background-image:unset !important;', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a pseudo-state keeps a gradient Global Styles sets for the
+	 * same pseudo-state, over a text clip set outside it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_pseudo_state_keeps_a_global_styles_gradient_for_the_same_pseudo_state() {
+		$actual_stylesheet = $this->get_stylesheet_over_global_styles(
+			'core/button',
+			array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+					'backgroundClip' => 'text',
+				),
+				':hover'     => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,#11998e,#38ef7d)',
+						'backgroundClip' => 'border-box',
+					),
+				),
+			),
+			array(
+				':hover' => array(
+					'background' => array( 'backgroundClip' => 'border-box' ),
+				),
+			),
+			'<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>'
+		);
+
+		$this->assertStringContainsString( 'background-clip:border-box !important;', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'background-image:unset', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a breakpoint pseudo-state keeps a gradient Global Styles
+	 * sets for the same breakpoint pseudo-state.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_breakpoint_pseudo_state_keeps_a_global_styles_gradient_for_the_same_state() {
+		$actual_stylesheet = $this->get_stylesheet_over_global_styles(
+			'core/button',
+			array(
+				'background' => array(
+					'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+					'backgroundClip' => 'text',
+				),
+				'@mobile'    => array(
+					':hover' => array(
+						'background' => array(
+							'gradient'       => 'linear-gradient(135deg,#11998e,#38ef7d)',
+							'backgroundClip' => 'border-box',
+						),
+					),
+				),
+			),
+			array(
+				'@mobile' => array(
+					':hover' => array(
+						'background' => array( 'backgroundClip' => 'border-box' ),
+					),
+				),
+			),
+			'<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>'
+		);
+
+		$this->assertStringContainsString( 'background-clip:border-box !important;', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'background-image:unset', $actual_stylesheet );
+	}
+
+	/**
+	 * Tests that a responsive pseudo-state escapes a text clip set by the
+	 * default pseudo-state.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_pseudo_state_escapes_the_default_pseudo_state_text_clip() {
+		$block_type = $this->ensure_block_registered(
+			'core/button',
+			array( 'root' => '.wp-block-button .wp-block-button__link' ),
+			array( 'background' => array( 'backgroundClip' => true ) )
+		);
+		$supports   = $block_type->supports;
+
+		$block_type->supports['background']['backgroundClip'] = true;
+
+		try {
+			$block = array(
+				'blockName' => 'core/button',
+				'attrs'     => array(
+					'style' => array(
+						':hover'  => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+						),
+						'@mobile' => array(
+							':hover' => array(
+								'background' => array( 'backgroundClip' => 'border-box' ),
+							),
+						),
+					),
+				),
+			);
+
+			$actual = gutenberg_render_block_states_support( '<div class="wp-block-button"><a class="wp-block-button__link">Click me</a></div>', $block );
+		} finally {
+			$block_type->supports = $supports;
+		}
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . ' .wp-block-button__link:hover{background-clip:border-box !important;-webkit-text-fill-color:currentColor !important;background-image:unset !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
 	 * Tests that background-image reset is not added when the state also sets a legacy gradient.
 	 *
 	 * @covers ::gutenberg_get_state_declarations_with_background_resets
