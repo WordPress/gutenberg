@@ -104,10 +104,50 @@ function resolveCalleeName( node ) {
 }
 
 /**
- * Read the arguments of an i18n call the way `make-pot` does: string literals
- * and template literals without expressions keep their value, identifiers and
- * other expressions count as an empty string, and any other argument (such as
- * a spread element or a JSX element) makes `make-pot` skip the call.
+ * Get the value of a string the bundler turns into a single literal: a
+ * concatenation of string literals (`'a' + 'b'`), in parentheses or wrapped in
+ * a TypeScript type assertion.
+ *
+ * @param {Argument} node Argument node.
+ * @return {string|undefined} String value, or undefined if it is not one.
+ */
+function getFoldedString( node ) {
+	switch ( node.type ) {
+		case 'Literal':
+			return typeof node.value === 'string' ? node.value : undefined;
+		case 'TemplateLiteral':
+			return node.expressions.length === 0
+				? ( node.quasis[ 0 ].value.cooked ?? undefined )
+				: undefined;
+		case 'BinaryExpression': {
+			if ( node.operator !== '+' ) {
+				return undefined;
+			}
+			const left = getFoldedString( node.left );
+			const right = getFoldedString( node.right );
+			return left === undefined || right === undefined
+				? undefined
+				: left + right;
+		}
+		case 'ParenthesizedExpression':
+		case 'TSAsExpression':
+		case 'TSSatisfiesExpression':
+		case 'TSNonNullExpression':
+		case 'TSTypeAssertion':
+			return getFoldedString( node.expression );
+		default:
+			return undefined;
+	}
+}
+
+/**
+ * Read the arguments of an i18n call the way `make-pot` reads them in the
+ * bundle: string literals and template literals without expressions keep
+ * their value, identifiers and other expressions count as an empty string,
+ * and any other argument (such as a spread element or a JSX element) makes
+ * `make-pot` skip the call. Strings that the bundler folds into a single
+ * literal, like `'a' + 'b'`, are read as that literal, as `make-pot` finds
+ * them in the non-minified bundle.
  *
  * @param {Argument[]} nodes Argument nodes.
  * @return {Array<string|null>|null} Argument values (null for literals that
@@ -117,13 +157,11 @@ function readArguments( nodes ) {
 	/** @type {Array<string|null>} */
 	const values = [];
 	for ( const node of nodes ) {
-		if ( node.type === 'Literal' ) {
-			values.push( typeof node.value === 'string' ? node.value : null );
-		} else if (
-			node.type === 'TemplateLiteral' &&
-			node.expressions.length === 0
-		) {
-			values.push( node.quasis[ 0 ].value.cooked ?? '' );
+		const folded = getFoldedString( node );
+		if ( folded !== undefined ) {
+			values.push( folded );
+		} else if ( node.type === 'Literal' ) {
+			values.push( null );
 		} else if (
 			node.type === 'Identifier' ||
 			node.type.endsWith( 'Expression' )

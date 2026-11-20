@@ -120,13 +120,29 @@ describe( 'extractI18nCalls', () => {
 				extract(
 					[
 						`__( variable );`,
-						`__( 'a' + 'b' );`,
+						`__( 'a' + variable );`,
 						`__( \`\${ x } template\` );`,
 						`__( ...spread );`,
 						`__( '' );`,
+						`__( 5 );`,
 					].join( '\n' )
 				)
 			).toEqual( [] );
+		} );
+
+		it( 'folds concatenated literals like the bundler, so strings that make-pot finds in a normal build are not lost', () => {
+			expect(
+				extract(
+					`_x( 'First part. ' + ( 'Second part.' as string ), 'ctx' );`,
+					'file.ts'
+				)
+			).toEqual( [
+				{
+					fn: '_x',
+					args: [ 'First part. Second part.', 'ctx' ],
+					comments: [],
+				},
+			] );
 		} );
 
 		it( 'keeps template literals without expressions', () => {
