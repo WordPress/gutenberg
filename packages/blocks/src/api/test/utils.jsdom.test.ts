@@ -22,7 +22,27 @@ import {
 
 const noop = () => null;
 
-function partial< T >( fixture: unknown ): T {
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
+
+function partial< T >( fixture: DeepPartial< T > ): T {
 	return fixture as T;
 }
 
@@ -116,7 +136,7 @@ describe( 'block helpers', () => {
 
 describe( 'getBlockLabel', () => {
 	it( 'returns only the block title when the block has no `getLabel` function', () => {
-		const blockType = { title: 'Recipe' } as unknown as BlockType;
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Recipe' );
@@ -159,7 +179,7 @@ describe( 'getBlockLabel', () => {
 
 describe( 'getAccessibleBlockLabel', () => {
 	it( 'returns only the block title when the block has no `getLabel` function', () => {
-		const blockType = { title: 'Recipe' } as unknown as BlockType;
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
@@ -221,7 +241,7 @@ describe( 'getAccessibleBlockLabel', () => {
 	} );
 
 	it( 'outputs just the block title and row number when there no label is available for the block', () => {
-		const blockType = { title: 'Recipe' } as unknown as BlockType;
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(

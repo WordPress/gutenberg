@@ -85,7 +85,7 @@ describe( 'block parser', () => {
 			);
 
 			expect( block?.name ).toEqual( 'core/test-block' );
-			expect( block!.attributes ).toEqual( {
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				className: 'custom-class another-custom-class',
 			} );
@@ -124,8 +124,8 @@ describe( 'block parser', () => {
 				} )
 			);
 
-			expect( block!.name ).toEqual( 'core/test-block' );
-			expect( block!.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				ariaLabel: 'custom-label',
 			} );
@@ -159,8 +159,8 @@ describe( 'block parser', () => {
 				} )
 			);
 
-			expect( block!.name ).toEqual( 'core/test-block' );
-			expect( block!.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {
 				fruit: 'Bananas',
 				anchor: 'custom-anchor',
 			} );
@@ -176,8 +176,8 @@ describe( 'block parser', () => {
 					attrs: { fruit: 'Bananas' },
 				} )
 			);
-			expect( block!.name ).toEqual( 'core/test-block' );
-			expect( block!.attributes ).toEqual( { fruit: 'Bananas' } );
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should create the requested block with no attributes if it exists', () => {
@@ -189,8 +189,8 @@ describe( 'block parser', () => {
 					innerHTML: '',
 				} )
 			);
-			expect( block!.name ).toEqual( 'core/test-block' );
-			expect( block!.attributes ).toEqual( {} );
+			expect( block?.name ).toEqual( 'core/test-block' );
+			expect( block?.attributes ).toEqual( {} );
 		} );
 
 		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
@@ -207,9 +207,9 @@ describe( 'block parser', () => {
 					attrs: { fruit: 'Bananas' },
 				} )
 			);
-			expect( block!.name ).toBe( 'core/unregistered-block' );
+			expect( block?.name ).toBe( 'core/unregistered-block' );
 			expect(
-				( block!.attributes as Record< string, string > ).content
+				( block?.attributes as Record< string, string > ).content
 			).toContain( 'wp:test-block' );
 		} );
 
@@ -222,8 +222,8 @@ describe( 'block parser', () => {
 					innerHTML: 'content',
 				} )
 			);
-			expect( block!.name ).toEqual( 'core/freeform' );
-			expect( block!.attributes ).toEqual( {
+			expect( block?.name ).toEqual( 'core/freeform' );
+			expect( block?.attributes ).toEqual( {
 				content: '<p>content</p>',
 			} );
 		} );
@@ -237,8 +237,8 @@ describe( 'block parser', () => {
 					innerHTML: 'content',
 				} )
 			);
-			expect( block!.name ).toEqual( 'core/html' );
-			expect( block!.attributes ).toEqual( { content: 'content' } );
+			expect( block?.name ).toEqual( 'core/html' );
+			expect( block?.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'skips adding paragraph tags if __unstableSkipAutop is passed as an option', () => {
@@ -253,8 +253,8 @@ describe( 'block parser', () => {
 					__unstableSkipAutop: true,
 				}
 			);
-			expect( block!.name ).toEqual( 'core/freeform' );
-			expect( block!.attributes ).toEqual( { content: 'content' } );
+			expect( block?.name ).toEqual( 'core/freeform' );
+			expect( block?.attributes ).toEqual( { content: 'content' } );
 		} );
 
 		it( 'should not create a block if no unknown type handler', () => {
@@ -311,11 +311,11 @@ describe( 'block parser', () => {
 						attrs: { fruit: 'Bananas' },
 					} )
 				);
-				expect( block!.name ).toEqual( 'core/test-block' );
-				expect( block!.attributes ).toEqual( {
+				expect( block?.name ).toEqual( 'core/test-block' );
+				expect( block?.attributes ).toEqual( {
 					fruit: 'Big Bananas',
 				} );
-				expect( block!.isValid ).toBe( true );
+				expect( block?.isValid ).toBe( true );
 				expect( console ).toHaveInformed();
 				expect( console ).toHaveLoggedWith(
 					'Updated Block: %s',
@@ -331,11 +331,11 @@ describe( 'block parser', () => {
 					} ),
 					{ __unstableSkipMigrationLogs: true }
 				);
-				expect( block!.name ).toEqual( 'core/test-block' );
-				expect( block!.attributes ).toEqual( {
+				expect( block?.name ).toEqual( 'core/test-block' );
+				expect( block?.attributes ).toEqual( {
 					fruit: 'Big Bananas',
 				} );
-				expect( block!.isValid ).toBe( true );
+				expect( block?.isValid ).toBe( true );
 				expect( console ).not.toHaveInformed();
 			} );
 		} );

@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import type { Action } from '../types';
+import type {
+	BlockCategory,
+	BlockStyle,
+	BlockType,
+	BlockVariation,
+} from '../../types';
 import {
 	addBlockVariations,
 	addBlockTypes,
@@ -31,17 +37,19 @@ type DeepPartial<
 			? T
 			: T extends Map< infer K, infer V >
 				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
-				: T extends object
-					? {
-							[ P in keyof T ]?: DeepPartial<
-								T[ P ],
-								[ ...Depth, unknown ]
-							>;
-						}
-					: T;
+				: T extends readonly ( infer U )[]
+					? readonly DeepPartial< U, [ ...Depth, unknown ] >[]
+					: T extends object
+						? {
+								[ P in keyof T ]?: DeepPartial<
+									T[ P ],
+									[ ...Depth, unknown ]
+								>;
+							}
+						: T;
 
-function partial< T >( fixture: DeepPartial< T > | unknown ) {
-	return fixture as unknown as T;
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
 }
 
 const emptyAction = {} as Action;
@@ -74,10 +82,13 @@ describe( 'unprocessedBlockTypes', () => {
 			'core/code': { title: 'Code' },
 		} );
 
-		const state = blockTypes( partial( original ), {
-			type: 'REMOVE_BLOCK_TYPES',
-			names: [ 'core/code' ],
-		} );
+		const state = blockTypes(
+			partial< Record< string, BlockType > >( original ),
+			{
+				type: 'REMOVE_BLOCK_TYPES',
+				names: [ 'core/code' ],
+			}
+		);
 
 		expect( state ).toEqual( {
 			'core/paragraph': { title: 'Paragraph' },
@@ -95,10 +106,13 @@ describe( 'blockTypes', () => {
 			'core/paragraph': { name: 'core/paragraph' },
 		} );
 
-		const state = blockTypes( partial( original ), {
-			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [ partial( { name: 'core/code' } ) ],
-		} );
+		const state = blockTypes(
+			partial< Record< string, BlockType > >( original ),
+			{
+				type: 'ADD_BLOCK_TYPES',
+				blockTypes: [ partial< BlockType >( { name: 'core/code' } ) ],
+			}
+		);
 
 		expect( state ).toEqual( {
 			'core/paragraph': { name: 'core/paragraph' },
@@ -112,10 +126,13 @@ describe( 'blockTypes', () => {
 			'core/code': { name: 'core/code' },
 		} );
 
-		const state = blockTypes( partial( original ), {
-			type: 'REMOVE_BLOCK_TYPES',
-			names: [ 'core/code' ],
-		} );
+		const state = blockTypes(
+			partial< Record< string, BlockType > >( original ),
+			{
+				type: 'REMOVE_BLOCK_TYPES',
+				names: [ 'core/code' ],
+			}
+		);
 
 		expect( state ).toEqual( {
 			'core/paragraph': { name: 'core/paragraph' },
@@ -184,15 +201,18 @@ describe( 'blockStyles', () => {
 			[ blockName ]: [ { name: 'fancy' } ],
 		} );
 
-		const state = blockStyles( partial( original ), {
-			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [
-				partial( {
-					name: blockName,
-					styles: [ { name: 'original' } ],
-				} ),
-			],
-		} );
+		const state = blockStyles(
+			partial< Record< string, BlockStyle[] > >( original ),
+			{
+				type: 'ADD_BLOCK_TYPES',
+				blockTypes: [
+					partial< BlockType >( {
+						name: blockName,
+						styles: [ { name: 'original' } ],
+					} ),
+				],
+			}
+		);
 
 		expect( state ).toEqual( {
 			[ blockName ]: [
@@ -207,15 +227,24 @@ describe( 'blockStyles', () => {
 			[ blockName ]: [ { name: 'original', source: 'block' } ],
 		} );
 
-		const state = blockStyles( partial( original ), {
-			type: 'ADD_BLOCK_TYPES',
-			blockTypes: [
-				partial( {
-					name: blockName,
-					styles: [ { name: 'original', value: 'replace' } ],
-				} ),
-			],
-		} );
+		const state = blockStyles(
+			partial< Record< string, BlockStyle[] > >( original ),
+			{
+				type: 'ADD_BLOCK_TYPES',
+				blockTypes: [
+					partial< BlockType >( {
+						name: blockName,
+						styles: [
+							{
+								name: 'original',
+								// @ts-expect-error Custom property on style.
+								value: 'replace',
+							},
+						],
+					} ),
+				],
+			}
+		);
 
 		expect( state ).toEqual( {
 			[ blockName ]: [
@@ -229,11 +258,14 @@ describe( 'blockStyles', () => {
 			[ blockName ]: [ { name: 'fancy' }, { name: 'lightbox' } ],
 		} );
 
-		const state = blockStyles( partial( original ), {
-			type: 'REMOVE_BLOCK_STYLES',
-			blockName,
-			styleNames: [ 'fancy' ],
-		} );
+		const state = blockStyles(
+			partial< Record< string, BlockStyle[] > >( original ),
+			{
+				type: 'REMOVE_BLOCK_STYLES',
+				blockName,
+				styleNames: [ 'fancy' ],
+			}
+		);
 
 		expect( state ).toEqual( {
 			[ blockName ]: [ { name: 'lightbox' } ],
@@ -268,7 +300,7 @@ describe( 'blockVariations', () => {
 		const initialState = deepFreeze( {} );
 
 		const state = blockVariations(
-			partial( initialState ),
+			partial< Record< string, BlockVariation[] > >( initialState ),
 			addBlockVariations( blockName, blockVariation )
 		);
 
@@ -283,7 +315,7 @@ describe( 'blockVariations', () => {
 		} );
 
 		const state = blockVariations(
-			partial( initialState ),
+			partial< Record< string, BlockVariation[] > >( initialState ),
 			addBlockVariations( blockName, secondBlockVariation )
 		);
 
@@ -298,9 +330,9 @@ describe( 'blockVariations', () => {
 		} );
 
 		const state = blockVariations(
-			partial( initialState ),
+			partial< Record< string, BlockVariation[] > >( initialState ),
 			addBlockTypes( [
-				partial( {
+				partial< BlockType >( {
 					name: blockName,
 					variations: [ blockVariation ],
 				} ),
@@ -321,7 +353,7 @@ describe( 'blockVariations', () => {
 		} );
 
 		const state = blockVariations(
-			partial( initialState ),
+			partial< Record< string, BlockVariation[] > >( initialState ),
 			removeBlockVariations( blockName, blockVariationName )
 		);
 
@@ -443,7 +475,7 @@ describe( 'categories', () => {
 			{ slug: 'chicken', title: 'Chicken' },
 		] );
 
-		const state = categories( partial( original ), {
+		const state = categories( partial< BlockCategory[] >( original ), {
 			type: 'SET_CATEGORIES',
 			categories: [ { slug: 'wings', title: 'Wings' } ],
 		} );
@@ -456,7 +488,7 @@ describe( 'categories', () => {
 			{ slug: 'chicken', title: 'Chicken' },
 		] );
 
-		const state = categories( partial( original ), {
+		const state = categories( partial< BlockCategory[] >( original ), {
 			type: 'SET_CATEGORIES',
 			categories: [ { slug: 'chicken', title: 'Another chicken' } ],
 		} );
@@ -475,10 +507,11 @@ describe( 'categories', () => {
 			},
 		] );
 
-		const state = categories( partial( original ), {
+		const state = categories( partial< BlockCategory[] >( original ), {
 			type: 'UPDATE_CATEGORY',
 			slug: 'chicken',
-			category: partial( {
+			category: partial< BlockCategory >( {
+				// @ts-expect-error Custom icon property on category.
 				icon: 'new-icon',
 			} ),
 		} );
@@ -506,10 +539,11 @@ describe( 'categories', () => {
 			},
 		] );
 
-		const state = categories( partial( original ), {
+		const state = categories( partial< BlockCategory[] >( original ), {
 			type: 'UPDATE_CATEGORY',
 			slug: 'chicken',
-			category: partial( {
+			category: partial< BlockCategory >( {
+				// @ts-expect-error Custom icon property on category.
 				icon: 'new-icon',
 			} ),
 		} );
@@ -542,11 +576,12 @@ describe( 'categories', () => {
 			},
 		] );
 
-		const state = categories( partial( original ), {
+		const state = categories( partial< BlockCategory[] >( original ), {
 			type: 'UPDATE_CATEGORY',
 			slug: 'wings',
-			category: partial( {
+			category: partial< BlockCategory >( {
 				title: 'New Wings',
+				// @ts-expect-error Deliberately testing extra property.
 				chicken: 'ribs',
 			} ),
 		} );

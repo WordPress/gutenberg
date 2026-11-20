@@ -56,14 +56,14 @@ type DeepPartial<
 						}
 					: T;
 
-function partial< T >( fixture: DeepPartial< T > | unknown ) {
-	return fixture as unknown as T;
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
 }
 
 const noop = () => null;
 
-const pick = ( obj: Record< string, any >, keys: string[] ) =>
 const pick = ( obj: object, keys: Array< string > ) =>
+	Object.fromEntries(
 		Object.entries( obj ).filter( ( [ key ] ) => keys.includes( key ) )
 	);
 
@@ -218,6 +218,7 @@ describe( 'blocks', () => {
 					...defaultBlockSettings,
 					attributes: {},
 					keywords: [],
+					// @ts-expect-error Deliberately invalid save property.
 					save: 'invalid',
 				} )
 			);
@@ -258,7 +259,7 @@ describe( 'blocks', () => {
 					'my-plugin/fancy-block-9',
 					blockType
 				);
-			expect( block!.category ).toBe( 'text' );
+			expect( block?.category ).toBe( 'text' );
 		} );
 
 		it( 'should unset category of blocks with non registered category.', () => {
@@ -277,7 +278,7 @@ describe( 'blocks', () => {
 				'The block "my-plugin/fancy-block-9" is registered with an invalid category "custom-category-slug".'
 			);
 			expect( block ).not.toBeUndefined();
-			expect( block!.category ).toBeUndefined();
+			expect( block?.category ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without title', () => {
@@ -316,16 +317,17 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should reject titles which are not strings', () => {
-			const blockType = {
+			const blockType = partial< BlockSettings >( {
 					apiVersion: 3,
 					settingName: 'settingValue',
 					save: noop,
 					category: 'text',
+					// @ts-expect-error Deliberately invalid non-string title.
 					title: 12345,
-				},
+				} ),
 				block = registerBlockType(
 					'my-plugin/fancy-block-11',
-					partial< BlockSettings >( blockType )
+					blockType
 				);
 			expect( console ).toHaveWarnedWith(
 				'Block titles must be strings.'
@@ -382,7 +384,7 @@ describe( 'blocks', () => {
 			const blockType = getBlockType(
 				'core/test-block-omitted-attributes'
 			);
-			expect( blockType!.attributes ).toEqual( {} );
+			expect( blockType?.attributes ).toEqual( {} );
 		} );
 
 		it.each( [
@@ -398,6 +400,7 @@ describe( 'blocks', () => {
 						title: 'block title',
 						category: 'text',
 						save: noop,
+						// @ts-expect-error Deliberately testing null/undefined attributes.
 						attributes: value,
 					} )
 				);
@@ -409,7 +412,7 @@ describe( 'blocks', () => {
 				const blockType = getBlockType(
 					'core/test-block-null-attributes'
 				);
-				expect( blockType!.attributes ).toEqual( {} );
+				expect( blockType?.attributes ).toEqual( {} );
 			}
 		);
 
@@ -589,15 +592,16 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should validate the icon', () => {
-			const blockType = {
+			const blockType = partial< BlockSettings >( {
 				save: noop,
 				category: 'text',
 				title: 'block title',
+				// @ts-expect-error Deliberately invalid icon property.
 				icon: { chicken: 'ribs' },
-			};
+			} );
 			const block = registerBlockType(
 				'core/test-block-icon-normalize-element',
-				partial< BlockSettings >( blockType )
+				blockType
 			);
 			expect( console ).toHaveWarned();
 			expect( block ).toBeUndefined();
@@ -845,17 +849,18 @@ describe( 'blocks', () => {
 		} );
 
 		it( 'should transform parent string to array', () => {
-			const blockType = {
+			const blockType = partial< BlockSettings >( {
 				apiVersion: 3,
 				save: noop,
 				category: 'text',
 				title: 'block title',
 				attributes: {},
+				// @ts-expect-error Deliberately testing parent as string.
 				parent: 'core/paragraph',
-			};
+			} );
 			const block = registerBlockType(
 				'core/test-block-parent-string',
-				partial< BlockSettings >( blockType )
+				blockType
 			);
 			expect( console ).toHaveWarnedWith(
 				'Parent must be undefined or an array of strings (block types), but it is a string.'
@@ -932,13 +937,13 @@ describe( 'blocks', () => {
 						{
 							attributes: {},
 							save(): React.ReactNode {
-								return 1 as unknown as React.ReactNode;
+								return 1;
 							},
 						},
 						{
 							attributes: {},
 							save(): React.ReactNode {
-								return 2 as unknown as React.ReactNode;
+								return 2;
 							},
 						},
 					],
@@ -994,9 +999,9 @@ describe( 'blocks', () => {
 					}
 				);
 
-				expect( block!.attributes.id ).toEqual( { type: 'string' } );
-				block!.deprecated!.forEach( ( deprecation ) => {
-					expect( deprecation.attributes!.id ).toEqual( {
+				expect( block?.attributes.id ).toEqual( { type: 'string' } );
+				block?.deprecated?.forEach( ( deprecation ) => {
+					expect( deprecation.attributes?.id ).toEqual( {
 						type: 'string',
 					} );
 					// Verify that the deprecation's keys are a subset of deprecation keys.
@@ -1028,7 +1033,7 @@ describe( 'blocks', () => {
 					defaultBlockSettings
 				);
 				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
-				expect( block1!.attributes ).not.toEqual( block2!.attributes );
+				expect( block1?.attributes ).not.toEqual( block2?.attributes );
 			} );
 
 			it( 'should allow non-string descriptions at registration but warn for undesired usage.', () => {
@@ -1038,11 +1043,12 @@ describe( 'blocks', () => {
 					'my-plugin/test-block-1',
 					partial< BlockSettings >( {
 						...defaultBlockSettings,
+						// @ts-expect-error Declaring non-string block descriptions is deprecated.
 						description: newDescription,
 					} )
 				);
 
-				expect( block!.description ).toBe( newDescription );
+				expect( block?.description ).toBe( newDescription );
 				expect( console ).toHaveWarnedWith(
 					'Declaring non-string block descriptions is deprecated since version 6.2.'
 				);
@@ -1063,7 +1069,7 @@ describe( 'blocks', () => {
 					defaultBlockSettings
 				);
 
-				expect( block!.description ).toBe( newDescription );
+				expect( block?.description ).toBe( newDescription );
 				expect( console ).toHaveWarnedWith(
 					'Declaring non-string block descriptions is deprecated since version 6.2.'
 				);
@@ -1084,7 +1090,7 @@ describe( 'blocks', () => {
 				);
 
 				// check that block type has unfiltered values
-				expect( getBlockType( 'test/block' )!.title ).toBe(
+				expect( getBlockType( 'test/block' )?.title ).toBe(
 					'block title'
 				);
 
@@ -1092,7 +1098,7 @@ describe( 'blocks', () => {
 				dispatch( blocksStore ).reapplyBlockTypeFilters();
 
 				// check that block type has filtered values
-				expect( getBlockType( 'test/block' )!.title ).toBe(
+				expect( getBlockType( 'test/block' )?.title ).toBe(
 					'block title filtered'
 				);
 			} );
@@ -1706,7 +1712,7 @@ describe( 'blocks', () => {
 			);
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
-			expect( source!.label ).toEqual( 'Client label' );
+			expect( source?.label ).toEqual( 'Client label' );
 		} );
 
 		it( 'should keep label from the server when not defined in the client', () => {
@@ -1721,7 +1727,7 @@ describe( 'blocks', () => {
 			} );
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
-			expect( source!.label ).toEqual( 'Server label' );
+			expect( source?.label ).toEqual( 'Server label' );
 		} );
 
 		// Check the `usesContext` array is correct.
@@ -1751,7 +1757,7 @@ describe( 'blocks', () => {
 			} );
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
-			expect( source!.usesContext ).toEqual( [ 'postId', 'postType' ] );
+			expect( source?.usesContext ).toEqual( [ 'postId', 'postType' ] );
 		} );
 
 		it( 'should add usesContext when only defined in the client', () => {
@@ -1768,7 +1774,7 @@ describe( 'blocks', () => {
 			} );
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
-			expect( source!.usesContext ).toEqual( [ 'postId', 'postType' ] );
+			expect( source?.usesContext ).toEqual( [ 'postId', 'postType' ] );
 		} );
 
 		it( 'should merge usesContext from server and client without duplicates', () => {
@@ -1786,7 +1792,7 @@ describe( 'blocks', () => {
 			} );
 			const source = getBlockBindingsSource( 'core/testing' );
 			unregisterBlockBindingsSource( 'core/testing' );
-			expect( source!.usesContext ).toEqual( [
+			expect( source?.usesContext ).toEqual( [
 				'postId',
 				'postType',
 				'clientContext',
@@ -1874,11 +1880,11 @@ describe( 'blocks', () => {
 				label: 'Valid Source',
 			} );
 			const source = getBlockBindingsSource( 'core/valid-source' );
-			expect( source!.usesContext ).toBeUndefined();
-			expect( source!.getValues ).toBeUndefined();
-			expect( source!.setValues ).toBeUndefined();
-			expect( source!.canUserEditValue ).toBeUndefined();
-			expect( source!.getFieldsList ).toBeUndefined();
+			expect( source?.usesContext ).toBeUndefined();
+			expect( source?.getValues ).toBeUndefined();
+			expect( source?.setValues ).toBeUndefined();
+			expect( source?.canUserEditValue ).toBeUndefined();
+			expect( source?.getFieldsList ).toBeUndefined();
 			unregisterBlockBindingsSource( 'core/valid-source' );
 		} );
 

@@ -877,7 +877,7 @@ _Returns_
 
 ### TemplateItem
 
-Undocumented declaration.
+A block template entry: the block name, then optional attributes and inner block template.
 
 ### unregisterBlockBindingsSource
 

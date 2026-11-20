@@ -14,18 +14,38 @@ import {
 	getActiveBlockVariation,
 } from '../selectors';
 
-type DeepPartial< T > = {
-	[ P in keyof T ]?: DeepPartial< T[ P ] >;
-};
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends readonly ( infer U )[]
+					? readonly DeepPartial< U, [ ...Depth, unknown ] >[]
+					: T extends object
+						? {
+								[ P in keyof T ]?: DeepPartial<
+									T[ P ],
+									[ ...Depth, unknown ]
+								>;
+							}
+						: T;
 
-function partial< T >( fixture: DeepPartial< T > | unknown ): T {
-	return fixture as unknown as T;
+function partial< T >( fixture: DeepPartial< T > ): T {
+	return fixture as T;
 }
 
 const keyBlocksByName = (
 	blocks: Array< { name: string; [ key: string ]: unknown } >
 ) =>
-	blocks.reduce< Record< string, unknown > >(
+	blocks.reduce<
+		Record< string, { name: string; [ key: string ]: unknown } >
+	>(
 		( result, block ) => ( {
 			...result,
 			[ block.name ]: block,
@@ -33,8 +53,7 @@ const keyBlocksByName = (
 		{}
 	);
 
-const asState = ( state: unknown ): BlockStoreState =>
-	state as unknown as BlockStoreState;
+const asState = ( state: unknown ): BlockStoreState => state as BlockStoreState;
 
 describe( 'selectors', () => {
 	describe( 'getBlockSupport', () => {
@@ -297,7 +316,7 @@ describe( 'selectors', () => {
 				const state = createBlockVariationsState( variations );
 				const result = getBlockVariations( state, blockName, 'block' );
 				expect( result ).toHaveLength( 3 );
-				expect( result!.map( ( { name } ) => name ) ).toEqual(
+				expect( result?.map( ( { name } ) => name ) ).toEqual(
 					expect.arrayContaining( [
 						'only-block',
 						'multiple-scopes-with-block',
@@ -1112,7 +1131,10 @@ describe( 'selectors', () => {
 			const nameOrType =
 				typeof fixture === 'string'
 					? fixture
-					: partial< BlockType >( fixture );
+					: partial< BlockType >(
+							// @ts-expect-error Fixture may have non-string description.
+							fixture
+						);
 
 			it( 'should return false if not match', () => {
 				const result = isMatchingSearchTerm(

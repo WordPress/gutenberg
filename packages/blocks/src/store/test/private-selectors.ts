@@ -6,18 +6,38 @@ import {
 	getSupportedStyles,
 } from '../private-selectors';
 
-type DeepPartial< T > = {
-	[ P in keyof T ]?: DeepPartial< T[ P ] >;
-};
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends readonly ( infer U )[]
+					? readonly DeepPartial< U, [ ...Depth, unknown ] >[]
+					: T extends object
+						? {
+								[ P in keyof T ]?: DeepPartial<
+									T[ P ],
+									[ ...Depth, unknown ]
+								>;
+							}
+						: T;
 
-function partial< T >( fixture: DeepPartial< T > | unknown ): T {
-	return fixture as unknown as T;
+function partial< T >( fixture: DeepPartial< T > ): T {
+	return fixture as T;
 }
 
 const keyBlocksByName = (
 	blocks: Array< { name: string; [ key: string ]: unknown } >
 ) =>
-	blocks.reduce< Record< string, unknown > >(
+	blocks.reduce<
+		Record< string, { name: string; [ key: string ]: unknown } >
+	>(
 		( result, block ) => ( {
 			...result,
 			[ block.name ]: block,
@@ -256,7 +276,7 @@ describe( 'private selectors', () => {
 		const shortcut = {
 			name: 'test/shortcut',
 			description: 'Test shortcut.',
-			keyCombination: { modifier: 'access', character: '1' },
+			keyCombination: { modifier: 'access' as const, character: '1' },
 		};
 
 		const getState = ( {
@@ -264,7 +284,9 @@ describe( 'private selectors', () => {
 			blockVariations = {},
 		}: {
 			blockTypes?: Array< { name: string; [ key: string ]: unknown } >;
-			blockVariations?: Record< string, unknown >;
+			blockVariations?: DeepPartial<
+				BlockStoreState[ 'blockVariations' ]
+			>;
 		} = {} ) =>
 			partial< BlockStoreState >(
 				deepFreeze( {

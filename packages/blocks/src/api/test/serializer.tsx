@@ -91,10 +91,7 @@ describe( 'block serializer', () => {
 
 	describe( 'getCommentAttributes()', () => {
 		it( 'should return an empty set if no attributes provided', () => {
-			const attributes = getCommentAttributes(
-				{} as unknown as BlockType,
-				{}
-			);
+			const attributes = getCommentAttributes( {} as BlockType, {} );
 
 			expect( attributes ).toEqual( {} );
 		} );

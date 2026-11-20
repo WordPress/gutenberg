@@ -25,7 +25,27 @@ import {
 } from '../registration';
 import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
-function partial< T >( fixture: unknown ): T {
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
+
+function partial< T >( fixture: DeepPartial< T > ): T {
 	return fixture as T;
 }
 
@@ -1256,6 +1276,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
+							// @ts-expect-error Simplified transform callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1307,6 +1328,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified transform callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1436,6 +1458,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
+							// @ts-expect-error Deliberately returning null from transform.
 							transform: () => null,
 						} ),
 					],
@@ -1479,8 +1502,10 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified callback signature.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
+							// @ts-expect-error Simplified callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1527,8 +1552,10 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified callback signature.
 							isMatch: ( { matches }: { matches?: boolean } ) =>
 								matches === true,
+							// @ts-expect-error Simplified callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
@@ -1602,6 +1629,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
+							// @ts-expect-error Deliberately returning object without Block properties.
 							transform: ( { value }: { value: string } ) => {
 								return {
 									attributes: {
@@ -1643,6 +1671,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
+							// @ts-expect-error Deliberately returning non-block object in array.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/updated-text-block', {
@@ -1693,6 +1722,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/text-block', {
 									value: 'chicken ' + value,
@@ -1735,6 +1765,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
@@ -1782,6 +1813,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
+							// @ts-expect-error Simplified callback signature.
 							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
@@ -1842,6 +1874,7 @@ describe( 'block factory', () => {
 						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
+							// @ts-expect-error Transform callback expects single block attributes and innerBlocks.
 							transform(
 								attributes: Record< string, unknown >,
 								innerBlocks: Block[]
@@ -1900,6 +1933,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
 							isMultiBlock: true,
+							// @ts-expect-error Multi-block transform callback expects array parameters.
 							transform(
 								blocksAttributes: Array<
 									Record< string, unknown >
@@ -1982,6 +2016,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert( blocks: Block[] ) {
 								const groupInnerBlocks = blocks.map(
 									( { name, attributes, innerBlocks } ) => {
@@ -2061,6 +2096,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2125,6 +2161,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2186,6 +2223,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/image-block' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2247,6 +2285,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
 						} ),
@@ -2376,7 +2415,9 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'findTransform', () => {
-		const transforms = partial< BlockTransform[] >( [
+		const transforms = partial<
+			Array< BlockTransform & { blockName: string } >
+		>( [
 			{
 				blocks: [ 'core/text-block' ],
 				priority: 20,
@@ -2423,7 +2464,7 @@ describe( 'block factory', () => {
 
 			expect(
 				isWildcardBlockTransform(
-					validWildcardBlockTransform as unknown as BlockTransform
+					validWildcardBlockTransform as BlockTransform
 				)
 			).toBe( true );
 		} );
@@ -2437,7 +2478,7 @@ describe( 'block factory', () => {
 
 			expect(
 				isWildcardBlockTransform(
-					invalidWildcardBlockTransform as unknown as BlockTransform
+					invalidWildcardBlockTransform as BlockTransform
 				)
 			).toBe( false );
 		} );
@@ -2451,7 +2492,7 @@ describe( 'block factory', () => {
 
 			expect(
 				isWildcardBlockTransform(
-					invalidWildcardBlockTransform as unknown as BlockTransform
+					invalidWildcardBlockTransform as BlockTransform
 				)
 			).toBe( false );
 		} );
@@ -2465,7 +2506,7 @@ describe( 'block factory', () => {
 
 			expect(
 				isWildcardBlockTransform(
-					invalidWildcardBlockTransform as unknown as BlockTransform
+					invalidWildcardBlockTransform as BlockTransform
 				)
 			).toBe( false );
 		} );
