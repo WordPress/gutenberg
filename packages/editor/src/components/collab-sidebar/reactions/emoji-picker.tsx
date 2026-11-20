@@ -19,6 +19,7 @@ import {
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
+import { filterSupportedEmojis } from './emoji-support';
 import { useFrequentEmojis } from './frequent-emojis';
 import { getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
@@ -248,7 +249,10 @@ export default function EmojiPicker( {
 		error,
 		retry,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
-	const data = useMemo( () => dataset ?? [], [ dataset ] );
+	const data = useMemo(
+		() => filterSupportedEmojis( dataset ?? [] ),
+		[ dataset ]
+	);
 	const [ query, setQuery ] = useState( '' );
 
 	/*

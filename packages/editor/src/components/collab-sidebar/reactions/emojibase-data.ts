@@ -57,6 +57,8 @@ export interface EmojibaseEntry {
 	tags?: string[];
 	group?: number;
 	order?: number;
+	// The Emoji version that introduced it.
+	version?: number;
 	skins?: EmojibaseSkin[];
 }
 
