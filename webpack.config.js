@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
@@ -105,11 +104,6 @@ const config = {
 		],
 	},
 	plugins: [
-		// Create RTL files with a -rtl suffix
-		new WebpackRTLPlugin( {
-			suffix: '-rtl',
-			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
-		} ),
 		new CustomTemplatedPathPlugin( {
 			basename( path, data ) {
 				let rawRequest;
