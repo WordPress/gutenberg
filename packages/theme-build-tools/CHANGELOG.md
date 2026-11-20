@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Support Stylelint 18 in the design token Stylelint plugins by widening the optional `stylelint` peer dependency to `^16 || ^17 || ^18`.
+-   Support Stylelint 18 in the design token Stylelint plugins by widening the optional `stylelint` peer dependency to `^16 || ^17 || ^18` ([#87149](https://github.com/WordPress/gutenberg/pull/87149)).
 
 ### Internal
 

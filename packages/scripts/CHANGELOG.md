@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `lint-style`: Update Stylelint to 18 and the default config to the matching `@wordpress/stylelint-config`. The default config enables new rules, and SCSS files are now checked by the `@stylistic/scss/*` rules, so `@stylistic/*` overrides and `stylelint-disable` comments for SCSS need the new names. Stylelint 18 also parses command-line arguments more strictly: pass flag values with `=` (`--fix=lax`), use kebab-case flags, use `--no-cache` instead of `--cache=false`, and use full flag names instead of short aliases such as `--aei`. See the [Stylelint 18 migration guide](https://stylelint.io/migration-guide/to-18).
+-   `lint-style`: Update Stylelint to 18 and the default config to the matching `@wordpress/stylelint-config`. The default config enables new rules, and SCSS files are now checked by the `@stylistic/scss/*` rules, so `@stylistic/*` overrides and `stylelint-disable` comments for SCSS need the new names. Stylelint 18 also parses command-line arguments more strictly: pass flag values with `=` (`--fix=lax`), use kebab-case flags, use `--no-cache` instead of `--cache=false`, and use full flag names instead of short aliases such as `--aei`. See the [Stylelint 18 migration guide](https://stylelint.io/migration-guide/to-18) ([#87149](https://github.com/WordPress/gutenberg/pull/87149)).
 
 ### Bug Fixes
 
