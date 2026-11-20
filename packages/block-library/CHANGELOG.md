@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Post Title: Keep the title editable inside synced patterns ([#71981](https://github.com/WordPress/gutenberg/issues/71981)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
