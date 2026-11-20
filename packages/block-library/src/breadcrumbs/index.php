@@ -44,7 +44,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	if ( $is_home ) {
 		// These checks are explicitly nested in order not to execute the `else` branch.
 		if ( $page_for_posts ) {
-			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged() );
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged() ) + array( 'allow_html' => true );
 		}
 		if ( block_core_breadcrumbs_is_paged() ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
@@ -119,13 +119,16 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		$post_type_object = get_post_type_object( $post_type );
 		$archive_link     = get_post_type_archive_link( $post_type );
 		if ( $archive_link && untrailingslashit( home_url() ) !== untrailingslashit( $archive_link ) ) {
-			$label = $post_type_object->labels->archives;
+			$label      = $post_type_object->labels->archives;
+			$allow_html = false;
 			if ( 'post' === $post_type && $page_for_posts ) {
-				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				$label      = block_core_breadcrumbs_get_post_title( $page_for_posts );
+				$allow_html = true;
 			}
 			$breadcrumb_items[] = array(
-				'label' => $label,
-				'url'   => $archive_link,
+				'label'      => $label,
+				'url'        => $archive_link,
+				'allow_html' => $allow_html,
 			);
 		}
 		// Build breadcrumb trail based on hierarchical structure or taxonomy terms.
