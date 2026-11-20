@@ -6419,72 +6419,7 @@
 			"count": 1
 		}
 	},
-	"packages/blocks/src/api/raw-handling/test/blockquote-normaliser.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/comment-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/figure-content-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/html-formatting-remover.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/image-corrector.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/latex-to-math.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/list-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/markdown-converter.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/ms-list-converter.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/non-breaking-space-corrector.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/normalise-blocks.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/blocks/src/api/raw-handling/test/paste-handler.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/phrasing-content-reducer.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/blocks/src/api/raw-handling/test/special-comment-converter.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -10940,11 +10875,6 @@
 			"count": 4
 		}
 	},
-	"packages/global-styles-ui/src/font-library/utils/test/preview-styles.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/font-sizes/font-size.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -11113,34 +11043,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/test/screen-block-list.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/screen-header.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/shadow-utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/use-presets.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -11148,11 +11050,6 @@
 	},
 	"packages/global-styles-ui/src/utils.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/variations/test/variations-panel.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { getNewIndexFromPresets, getValidPseudoStates } from '../utils';
 
-const validPresets = {
+const validPresets: Record< string, Array< { slug?: unknown } > > = {
 	single: [ { slug: 'preset-1' } ],
 	multiple: [ { slug: 'preset-1' }, { slug: 'preset-2' } ],
 	withGaps: [ { slug: 'preset-1' }, { slug: 'preset-3' } ],
@@ -14,7 +14,7 @@ const validPresets = {
 	emptyArray: [],
 };
 
-const invalidPresets = {
+const invalidPresets: Record< string, unknown[] > = {
 	noMatch: [ { slug: 'preset-alpha' }, { slug: 'preset-beta' } ],
 	emptySlug: [ { slug: '' } ],
 	nullSlug: [ { slug: null } ],
@@ -22,7 +22,10 @@ const invalidPresets = {
 	nonObjectElements: [ 'preset-1' ],
 };
 
-const getExpectedIndex = ( presetKey, presets ) => {
+const getExpectedIndex = (
+	presetKey: string,
+	presets: Array< { slug?: unknown } >
+) => {
 	if ( presetKey === 'withGaps' ) {
 		return 4;
 	}
