@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { CSSProperties } from 'react';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { isValueDefined } from '../utils/values';
 import type { ElevationProps } from './types';
@@ -30,7 +30,17 @@ function hasValidShadow( value: number | undefined ): value is number {
 
 export function useElevation(
 	props: WordPressComponentProps< ElevationProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ElevationProps, 'div' >,
+	| 'active'
+	| 'borderRadius'
+	| 'focus'
+	| 'hover'
+	| 'isInteractive'
+	| 'offset'
+	| 'value',
+	{ className: string; style: React.CSSProperties; 'aria-hidden': true }
+> {
 	const {
 		active,
 		borderRadius = 'inherit',

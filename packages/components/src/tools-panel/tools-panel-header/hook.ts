@@ -1,13 +1,27 @@
 import clsx from 'clsx';
 import styles from '../style.module.scss';
 import { useToolsPanelContext } from '../context';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import type { ToolsPanelHeaderProps } from '../types';
+import type { HeadingSize } from '../../heading/types';
+import type { ToolsPanelHeaderProps, ToolsPanelMenuItems } from '../types';
 
 export function useToolsPanelHeader(
 	props: WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< ToolsPanelHeaderProps, 'h2' >,
+	never,
+	{
+		className: string;
+		areAllOptionalControlsHidden: boolean;
+		defaultControlsItemClassName: string;
+		dropdownMenuClassName: string;
+		hasMenuItems: boolean;
+		headingClassName: string;
+		headingLevel: HeadingSize;
+		menuItems: ToolsPanelMenuItems;
+	}
+> {
 	const {
 		className,
 		headingLevel = 2,

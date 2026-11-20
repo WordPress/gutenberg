@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import deprecated from '@wordpress/deprecated';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useResponsiveValue } from '../../utils/use-responsive-value';
 import { space } from '../../utils/space';
@@ -26,7 +26,13 @@ function useDeprecatedProps(
 	return otherProps;
 }
 
-export function useFlex( props: WordPressComponentProps< FlexProps, 'div' > ) {
+export function useFlex(
+	props: WordPressComponentProps< FlexProps, 'div' >
+): HookReturnProps<
+	WordPressComponentProps< FlexProps, 'div' >,
+	'align' | 'direction' | 'expanded' | 'gap' | 'justify' | 'wrap',
+	{ className: string; style: React.CSSProperties; isColumn: boolean }
+> {
 	const {
 		align,
 		className,

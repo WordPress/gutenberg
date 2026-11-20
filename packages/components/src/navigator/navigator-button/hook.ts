@@ -1,6 +1,6 @@
 import { useCallback } from '@wordpress/element';
 import { escapeAttribute } from '@wordpress/escape-html';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import Button from '../../button';
 import { useNavigator } from '../use-navigator';
@@ -11,7 +11,21 @@ const cssSelectorForAttribute = ( attrName: string, attrValue: string ) =>
 
 export function useNavigatorButton(
 	props: WordPressComponentProps< NavigatorButtonProps, 'button' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< NavigatorButtonProps, 'button' >,
+	'path' | 'attributeName',
+	{
+		as:
+			| NonNullable<
+					WordPressComponentProps<
+						NavigatorButtonProps,
+						'button'
+					>[ 'as' ]
+			  >
+			| typeof Button;
+		onClick: React.MouseEventHandler< HTMLButtonElement >;
+	}
+> {
 	const {
 		path,
 		onClick,

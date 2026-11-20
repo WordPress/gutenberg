@@ -5,8 +5,11 @@ import type * as React from 'react';
  * with an `as` prop. Previous implementations enabled precise typings for the
  * given `as` element (e.g. `as="label"` unlocks `htmlFor`), but doing so
  * contributed to high memory usage and slow compilation times.
+ *
+ * Exported so emitted declarations can reference it by name instead of
+ * inlining the attributes of the `@types/react` version used at build time.
  */
-type PolymorphicIntrinsicProps = Omit<
+export type PolymorphicIntrinsicProps = Omit<
 	React.AllHTMLAttributes< Element > & React.SVGAttributes< Element >,
 	'as' | 'children'
 >;
@@ -38,6 +41,22 @@ export type WordPressComponentProps<
 					| React.JSXElementConstructor< any >;
 			}
 		: {} );
+
+/**
+ * The props a component hook returns: the props `P` it receives, minus the
+ * `Consumed` ones it handles itself, plus the `Added` ones it sets or
+ * overrides.
+ *
+ * Annotate hooks that spread their remaining props with this type. Without an
+ * explicit return type, TypeScript writes every DOM attribute from the
+ * `@types/react` version used at build time into the emitted declarations,
+ * which breaks consumers on another major version of the React types.
+ */
+export type HookReturnProps<
+	P,
+	Consumed extends PropertyKey,
+	Added extends object,
+> = Omit< P, Consumed | keyof Added > & Added;
 
 export type WordPressComponent<
 	T extends React.ElementType | null,

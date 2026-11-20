@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../../context';
+import type { HookReturnProps, WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';
 import type { FlexItemProps } from '../types';
@@ -7,7 +7,11 @@ import styles from '../style.module.scss';
 
 export function useFlexItem(
 	props: WordPressComponentProps< FlexItemProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< FlexItemProps, 'div' >,
+	'display' | 'isBlock',
+	{ className: string; style: React.CSSProperties }
+> {
 	const {
 		className,
 		display: displayProp,

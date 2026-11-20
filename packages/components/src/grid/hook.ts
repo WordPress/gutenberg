@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import type { WordPressComponentProps } from '../context';
+import type { HookReturnProps, WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
 import { useResponsiveValue } from '../utils/use-responsive-value';
@@ -22,7 +22,21 @@ function toCSSValue( value: string | number | undefined ) {
 
 export default function useGrid(
 	props: WordPressComponentProps< GridProps, 'div' >
-) {
+): HookReturnProps<
+	WordPressComponentProps< GridProps, 'div' >,
+	| 'align'
+	| 'alignment'
+	| 'columnGap'
+	| 'columns'
+	| 'gap'
+	| 'isInline'
+	| 'justify'
+	| 'rowGap'
+	| 'rows'
+	| 'templateColumns'
+	| 'templateRows',
+	{ className: string; style: React.CSSProperties }
+> {
 	const {
 		align,
 		alignment,
