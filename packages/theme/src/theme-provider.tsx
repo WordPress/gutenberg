@@ -20,6 +20,7 @@ export const ThemeProvider = ( {
 	color = {},
 	cursor,
 	cornerRadius,
+	contrast,
 	isRoot = false,
 	onColorWarnings,
 }: ThemeProviderProps ) => {
@@ -28,6 +29,7 @@ export const ThemeProvider = ( {
 			color,
 			cursor,
 			cornerRadius,
+			contrast,
 		} );
 
 	const cornerRadiusPreset = resolvedSettings.cornerRadius ?? 'subtle';

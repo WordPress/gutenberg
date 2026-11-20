@@ -9,7 +9,7 @@ import {
 	type PlainColorObject,
 } from 'colorjs.io/fn';
 import memoize from 'memize';
-import { useMemo, useContext } from '@wordpress/element';
+import { useMemo, useContext, useDeferredValue } from '@wordpress/element';
 import { ThemeContext } from './context.ts';
 import colorTokens from './prebuilt/ts/color-tokens.ts';
 import {
@@ -20,6 +20,10 @@ import {
 } from './color-ramps/index.ts';
 import { getColorString } from './color-ramps/lib/color-utils.ts';
 import { DEFAULT_RAMPS } from './color-ramps/lib/default-ramps.ts';
+import {
+	getContrastThresholds,
+	quantizeContrast,
+} from './color-ramps/lib/contrast-scale.ts';
 import type { ThemeProviderProps } from './types.ts';
 import {
 	collectThemeProviderColorWarnings,
@@ -31,29 +35,35 @@ type Entry = [ string, string ];
 
 // `getCachedAccentRamp` includes the `bgRamp` object reference in its cache key.
 // Without memoizing background ramps, accent ramp memoization would not work at all.
-const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 10 } );
-const getCachedAccentRamp = memoize( buildAccentRamp, { maxSize: 10 } );
+// The caches hold one set of seeds across all 21 contrast values, so dragging
+// a contrast control back and forth doesn't rebuild ramps.
+const ACCENT_RAMP_COUNT = Object.keys( DEFAULT_SEED_COLORS ).length - 1;
+const getCachedBgRamp = memoize( buildBgRamp, { maxSize: 25 } );
+const getCachedAccentRamp = memoize( buildAccentRamp, {
+	maxSize: 25 * ACCENT_RAMP_COUNT,
+} );
 
 /*
  * Building a ramp is costly, and the ramps of the default seeds are prebuilt,
  * so use them when a seed is the default: with the default background, and
  * the default admin color scheme, no ramp is built at all.
  */
-function getBgRamp( seed: string ): RampResult {
-	return seed === DEFAULT_SEED_COLORS.background
+function getBgRamp( seed: string, contrast: number ): RampResult {
+	return contrast === 0 && seed === DEFAULT_SEED_COLORS.background
 		? DEFAULT_RAMPS.background
-		: getCachedBgRamp( seed );
+		: getCachedBgRamp( seed, contrast );
 }
 
 function getAccentRamp(
 	rampName: Exclude< ThemeProviderColorRampName, 'background' >,
 	seed: string,
-	bgRamp: RampResult
+	bgRamp: RampResult,
+	contrast: number
 ): RampResult {
 	return bgRamp === DEFAULT_RAMPS.background &&
 		seed === DEFAULT_SEED_COLORS[ rampName ]
 		? DEFAULT_RAMPS[ rampName ]
-		: getCachedAccentRamp( seed, bgRamp );
+		: getCachedAccentRamp( seed, bgRamp, contrast );
 }
 
 const legacyWpComponentsOverridesCSS: Entry[] = [
@@ -192,7 +202,8 @@ function generateStyles( {
 
 function generateThemeProviderColors(
 	primary: string,
-	background: string
+	background: string,
+	contrast: number
 ): {
 	styles: CSSProperties;
 	warnings: ThemeProviderColorWarning[];
@@ -206,7 +217,7 @@ function generateThemeProviderColors(
 		ThemeProviderColorRampName,
 		RampResult
 	>();
-	const bgRamp = getBgRamp( seeds.background );
+	const bgRamp = getBgRamp( seeds.background, contrast );
 
 	for ( const [ rawRampName, seed ] of Object.entries( seeds ) ) {
 		const rampName = rawRampName as ThemeProviderColorRampName;
@@ -214,7 +225,7 @@ function generateThemeProviderColors(
 			rampName,
 			rampName === 'background'
 				? bgRamp
-				: getAccentRamp( rampName, seed, bgRamp )
+				: getAccentRamp( rampName, seed, bgRamp, contrast )
 		);
 	}
 	const colorEntries = colorTokensCSS( computedColorRamps );
@@ -226,7 +237,8 @@ function generateThemeProviderColors(
 		} ),
 		warnings: collectThemeProviderColorWarnings(
 			computedColorRamps,
-			new Map( colorEntries )
+			new Map( colorEntries ),
+			getContrastThresholds( contrast )
 		),
 	};
 }
@@ -235,23 +247,31 @@ export function useThemeProviderStyles( {
 	color = {},
 	cursor,
 	cornerRadius,
+	contrast,
 }: {
 	color?: ThemeProviderProps[ 'color' ];
 	cursor?: ThemeProviderProps[ 'cursor' ];
 	cornerRadius?: ThemeProviderProps[ 'cornerRadius' ];
+	contrast?: ThemeProviderProps[ 'contrast' ];
 } = {} ) {
 	const { resolvedSettings: inheritedSettings } = useContext( ThemeContext );
 
-	// Color styles are only emitted when seeds are either applied locally or
-	// inherited from an ancestor. Otherwise, the expectation is that static CSS
-	// stylesheet, build fallbacks, or CSS properties defined elsewhere apply
-	// (e.g. `@wordpress/base-styles`). Inherited seed values must always be
-	// reapplied so portaled subtrees retain the values.
+	const resolvedContrast = quantizeContrast(
+		contrast ?? inheritedSettings.contrast ?? 0
+	);
+
+	// Color styles are only emitted when seeds or a non-zero contrast are
+	// either applied locally or inherited from an ancestor. Otherwise, the
+	// expectation is that static CSS stylesheet, build fallbacks, or CSS
+	// properties defined elsewhere apply (e.g. `@wordpress/base-styles`).
+	// Inherited values must always be reapplied so portaled subtrees retain
+	// them.
 	const hasColor =
 		color.primary !== undefined ||
 		color.background !== undefined ||
 		inheritedSettings.color?.primary !== undefined ||
-		inheritedSettings.color?.background !== undefined;
+		inheritedSettings.color?.background !== undefined ||
+		resolvedContrast !== 0;
 
 	// Compute settings:
 	// - used provided prop value;
@@ -279,9 +299,20 @@ export function useThemeProviderStyles( {
 			},
 			cursor: cursorControl ? { control: cursorControl } : undefined,
 			cornerRadius: cornerRadiusPreset,
+			contrast: resolvedContrast,
 		} ),
-		[ primary, background, cursorControl, cornerRadiusPreset ]
+		[
+			primary,
+			background,
+			cursorControl,
+			cornerRadiusPreset,
+			resolvedContrast,
+		]
 	);
+
+	// Rebuilding every ramp takes longer than a frame, so let a contrast
+	// control stay responsive while the colors catch up.
+	const deferredContrast = useDeferredValue( resolvedContrast );
 
 	const generatedColors = useMemo( () => {
 		if ( primary === undefined || background === undefined ) {
@@ -291,8 +322,12 @@ export function useThemeProviderStyles( {
 			};
 		}
 
-		return generateThemeProviderColors( primary, background );
-	}, [ primary, background ] );
+		return generateThemeProviderColors(
+			primary,
+			background,
+			deferredContrast
+		);
+	}, [ primary, background, deferredContrast ] );
 
 	const themeProviderStyles: CSSProperties = useMemo(
 		() => ( {

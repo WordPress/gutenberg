@@ -106,6 +106,33 @@ describe( 'collectThemeProviderColorWarnings', () => {
 		] );
 	} );
 
+	it( 'checks pairs against the given thresholds', () => {
+		const colorValues = new Map( [
+			[ '--wpds-color-background-surface-neutral', '#ffffff' ],
+			[ '--wpds-color-foreground-content-neutral-weak', '#959595' ],
+			[ '--wpds-color-background-interactive-neutral-strong', '#555555' ],
+			[ '--wpds-color-foreground-interactive-neutral-strong', '#959595' ],
+		] );
+		const thresholds = { text: 2.5, fillText: 4.5, focus: 3 };
+
+		// #959595 is about 3:1 on white and 2.4:1 on #555: the softened text
+		// threshold passes the first pair, the held fill text one fails the
+		// second.
+		expect(
+			collectThemeProviderColorWarnings(
+				new Map(),
+				colorValues,
+				thresholds
+			)
+		).toEqual( [
+			expect.objectContaining( {
+				backgroundToken: 'background.interactive.neutral-strong',
+				foregroundToken: 'foreground.interactive.neutral-strong',
+				requiredContrast: 4.5,
+			} ),
+		] );
+	} );
+
 	it( 'reports ramp-generation warnings', () => {
 		const backgroundRamp: RampResult = {
 			...buildBgRamp( '#fcfcfc' ),
