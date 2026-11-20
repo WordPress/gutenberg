@@ -1687,6 +1687,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @param string $expected_css  Expected CSS, with `%s` for the state class.
 	 */
 	public function test_rotation_state_generates_rotate_css( $block_name, $block_content, $style, $expected_css ) {
+		$this->ensure_block_registered( $block_name );
+
 		$actual = gutenberg_render_block_states_support(
 			$block_content,
 			array(
@@ -1709,6 +1711,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 */
 	public function data_rotation_states() {
 		$button = '<div class="wp-block-button"><a class="wp-block-button__link">Click</a></div>';
+		$image  = '<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>';
 
 		return array(
 			'hover'          => array(
@@ -1729,6 +1732,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
 				'@media (width <= 480px){.%s{rotate:0 !important;}}',
 			),
+			'image viewport' => array(
+				'core/image',
+				$image,
+				array( '@mobile' => array( 'transform' => array( 'rotate' => '0' ) ) ),
+				'@media (width <= 480px){.%1$s img, .%1$s .components-resizable-box__container{rotate:0 !important;}}',
+			),
 		);
 	}
 
@@ -1747,6 +1756,8 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * @param string $expected_css  Expected CSS, with `%s` for the state class.
 	 */
 	public function test_translation_state_generates_translate_css( $block_name, $block_content, $style, $expected_css ) {
+		$this->ensure_block_registered( $block_name );
+
 		$actual = gutenberg_render_block_states_support(
 			$block_content,
 			array(
@@ -1769,6 +1780,17 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 */
 	public function data_translation_states() {
 		$button = '<div class="wp-block-button"><a class="wp-block-button__link">Click</a></div>';
+		$image  = '<figure class="wp-block-image"><img src="x.png" /><figcaption>Caption</figcaption></figure>';
+		$offset = array(
+			'@mobile' => array(
+				'transform' => array(
+					'translate' => array(
+						'x' => '0',
+						'y' => '10%',
+					),
+				),
+			),
+		);
 
 		return array(
 			'hover'          => array(
@@ -1806,6 +1828,12 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 					),
 				),
 				'@media (width <= 480px){.%s{--wp--style--translate-x:0 !important;--wp--style--translate-y:10%% !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
+			),
+			'image viewport' => array(
+				'core/image',
+				$image,
+				$offset,
+				'@media (width <= 480px){.%1$s img, .%1$s .components-resizable-box__container{--wp--style--translate-x:0 !important;--wp--style--translate-y:10%% !important;translate:var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0) !important;}}',
 			),
 		);
 	}

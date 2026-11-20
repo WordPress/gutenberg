@@ -5,6 +5,7 @@ import {
 	__experimentalGetElementClassName,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	getTransformClassesAndStyles,
 } from '@wordpress/block-editor';
 import { mediaPosition } from './utils';
 
@@ -33,6 +34,7 @@ export default function save( { attributes } ) {
 	const newRel = ! rel ? undefined : rel;
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
+	const transformProps = getTransformClassesAndStyles( attributes );
 
 	const classes = clsx( {
 		// All other align classes are handled by block supports.
@@ -59,6 +61,7 @@ export default function save( { attributes } ) {
 				const style = {
 					...borderProps.style,
 					...shadowProps.style,
+					...transformProps.style,
 					aspectRatio,
 					objectFit: scale,
 					objectPosition:

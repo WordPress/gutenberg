@@ -1,5 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 const getRotate = ( locator: Locator ) =>
 	locator.evaluate(
@@ -352,5 +353,147 @@ test.describe( 'Transform block support', () => {
 		expect( await getScale( heading ) ).toBe( 'none' );
 		await page.setViewportSize( { width: 400, height: 800 } );
 		await expect.poll( () => getScale( heading ) ).toBe( '0.9' );
+	} );
+
+	test.describe( 'Image', () => {
+		let uploadedMedia: Awaited<
+			ReturnType< RequestUtils[ 'uploadMedia' ] >
+		>;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+			uploadedMedia = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
+			);
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+		} );
+
+		test( 'transforms the image and resize box but not the caption or enlarged image', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					url: uploadedMedia.source_url,
+					caption: 'Caption',
+					lightbox: { enabled: true },
+					style: {
+						transform: {
+							rotate: '10deg',
+							translate: { x: '12px', y: '-6px' },
+							scale: 1.5,
+						},
+					},
+				},
+			} );
+
+			const editorFigure = editor.canvas.locator(
+				'figure.wp-block-image'
+			);
+			const editorImage = editorFigure.locator( 'img' );
+			await expect.poll( () => getRotate( editorImage ) ).toBe( '10deg' );
+			expect( await getTranslate( editorImage ) ).toBe( '12px -6px' );
+			expect( await getScale( editorImage ) ).toBe( '1.5' );
+			expect( await getRotate( editorFigure ) ).toBe( 'none' );
+
+			const resizeBox = editorFigure.locator(
+				'.components-resizable-box__container'
+			);
+			await expect( resizeBox ).toBeVisible();
+			expect( await getRotate( resizeBox ) ).toBe( '10deg' );
+			expect( await getTranslate( resizeBox ) ).toBe( '12px -6px' );
+			expect( await getScale( resizeBox ) ).toBe( '1.5' );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const figure = page.locator( '.wp-lightbox-container' );
+			const image = figure.locator( 'img' );
+			expect( await getRotate( image ) ).toBe( '10deg' );
+			expect( await getTranslate( image ) ).toBe( '12px -6px' );
+			expect( await getScale( image ) ).toBe( '1.5' );
+			expect( await getRotate( figure ) ).toBe( 'none' );
+			expect(
+				await getRotate( page.locator( 'figure.wp-block-image' ) )
+			).toBe( 'none' );
+			await expect(
+				page.locator( 'figure.wp-block-image figcaption' )
+			).toBeVisible();
+
+			await image.click();
+			const enlargedImage = page
+				.locator( '.wp-lightbox-overlay .wp-block-image img' )
+				.last();
+			await expect( enlargedImage ).toBeVisible();
+			expect( await getRotate( enlargedImage ) ).toBe( 'none' );
+			expect( await getTranslate( enlargedImage ) ).toBe( 'none' );
+			expect( await getScale( enlargedImage ) ).toBe( 'none' );
+		} );
+
+		test( 'applies a Global Styles rotation to the image and resize box', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const stylesPostId =
+				await requestUtils.getCurrentThemeGlobalStylesPostId();
+			await requestUtils.rest( {
+				method: 'POST',
+				path: `/wp/v2/global-styles/${ stylesPostId }`,
+				data: {
+					id: stylesPostId,
+					settings: {},
+					styles: {
+						blocks: {
+							'core/image': { transform: { rotate: '5deg' } },
+						},
+					},
+				},
+			} );
+
+			try {
+				// Global Styles reach the editor when it loads.
+				await page.reload();
+				await editor.insertBlock( {
+					name: 'core/image',
+					attributes: {
+						id: uploadedMedia.id,
+						url: uploadedMedia.source_url,
+						caption: 'Caption',
+					},
+				} );
+
+				const editorFigure = editor.canvas.locator(
+					'figure.wp-block-image'
+				);
+				await expect
+					.poll( () => getRotate( editorFigure.locator( 'img' ) ) )
+					.toBe( '5deg' );
+				expect( await getRotate( editorFigure ) ).toBe( 'none' );
+				expect(
+					await getRotate(
+						editorFigure.locator(
+							'.components-resizable-box__container'
+						)
+					)
+				).toBe( '5deg' );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				const figure = page.locator( 'figure.wp-block-image' );
+				expect( await getRotate( figure.locator( 'img' ) ) ).toBe(
+					'5deg'
+				);
+				expect( await getRotate( figure ) ).toBe( 'none' );
+			} finally {
+				await requestUtils.resetThemeGlobalStyles();
+			}
+		} );
 	} );
 } );

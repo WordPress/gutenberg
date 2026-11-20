@@ -3478,6 +3478,35 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that the Image block outputs its transform under its transform
+	 * feature selector, so it applies to the image and not the caption.
+	 */
+	public function test_get_stylesheet_outputs_image_transform_under_feature_selector() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image' => array(
+							'transform' => array( 'rotate' => '5deg' ),
+							'@mobile'   => array(
+								'transform' => array( 'translate' => array( 'y' => '1rem' ) ),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-image img, .wp-block-image .components-resizable-box__container){rotate: 5deg;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-image img, .wp-block-image .components-resizable-box__container){--wp--style--translate-y: 1rem;translate: var(--wp--style--translate-x, 0) var(--wp--style--translate-y, 0);}}', $css );
+		$this->assertStringNotContainsString( ':root :where(.wp-block-image){', $css );
+	}
+
+	/**
 	 * Tests that an offset with an axis that is not a single length or percentage is not output.
 	 *
 	 * @dataProvider data_invalid_translate_values
