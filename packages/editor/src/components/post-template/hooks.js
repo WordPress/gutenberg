@@ -3,6 +3,7 @@ import { useMemo } from '@wordpress/element';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
+import { TEMPLATE_POST_TYPE } from '../../store/constants';
 
 export function useEditedPostContext() {
 	return useSelect( ( select ) => {
@@ -144,9 +145,20 @@ export function usePostTemplatePanelMode() {
 			select( editorStore );
 		const { getPostType, canUser } = select( coreStore );
 		const postTypeSlug = getCurrentPostType();
-		const postType = getPostType( postTypeSlug );
 		const settings = getEditorSettings();
 		const isBlockTheme = settings.__unstableIsBlockBasedTheme;
+		/*
+		 * The panels are for a post that picks the template it is rendered
+		 * inside, which a template is not, even though a canvas editing one
+		 * names a template for it too: the template itself where the canvas
+		 * stands for it, as in the extensible site editor, or the template it
+		 * is rendered inside, with the templates inside templates experiment,
+		 * which picks that one from a field of its own.
+		 */
+		if ( postTypeSlug === TEMPLATE_POST_TYPE ) {
+			return null;
+		}
+		const postType = getPostType( postTypeSlug );
 		const hasTemplates =
 			!! settings.availableTemplates &&
 			Object.keys( settings.availableTemplates ).length > 0;
