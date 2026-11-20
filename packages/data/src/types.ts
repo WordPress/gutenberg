@@ -35,6 +35,62 @@ export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	instantiate: ( registry: DataRegistry ) => StoreInstance< Config >;
 }
 
+export type CoreDataStoreSelectors = {
+	getIsResolving: (
+		storeName: string,
+		selectorName: string,
+		args?: unknown[] | null
+	) => boolean | undefined;
+	hasStartedResolution: (
+		storeName: string,
+		selectorName: string,
+		args?: unknown[] | null
+	) => boolean;
+	hasFinishedResolution: (
+		storeName: string,
+		selectorName: string,
+		args?: unknown[] | null
+	) => boolean;
+	isResolving: (
+		storeName: string,
+		selectorName: string,
+		args?: unknown[] | null
+	) => boolean;
+	getCachedResolvers: ( storeName: string ) => Record< string, unknown >;
+};
+
+export type CoreDataStoreActions = {
+	startResolution: (
+		storeName: string,
+		selectorName: string,
+		args: unknown[]
+	) => Promise< void >;
+	finishResolution: (
+		storeName: string,
+		selectorName: string,
+		args: unknown[]
+	) => Promise< void >;
+	invalidateResolution: (
+		storeName: string,
+		selectorName: string,
+		args?: unknown[] | null
+	) => Promise< void >;
+	invalidateResolutionForStore: ( storeName: string ) => Promise< void >;
+	invalidateResolutionForStoreSelector: (
+		storeName: string,
+		selectorName: string
+	) => Promise< void >;
+};
+
+export interface CoreDataStoreDescriptor extends StoreDescriptor {
+	name: 'core/data';
+	instantiate: ( registry: DataRegistry ) => {
+		getSelectors: () => CoreDataStoreSelectors;
+		getActions: () => CoreDataStoreActions;
+		subscribe: ( listener: () => void ) => () => void;
+	};
+}
+
 export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
@@ -82,8 +138,9 @@ export type SelectFunction = < S >( store: S ) => CurriedSelectorsOf< S >;
  */
 export type ListenerFunction = () => void;
 
-export type CurriedSelectorsOf< S > =
-	S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
+export type CurriedSelectorsOf< S > = S extends CoreDataStoreDescriptor
+	? CoreDataStoreSelectors
+	: S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
 		? {
 				[ key in keyof Selectors ]: CurriedState< Selectors[ key ] >;
 			} & MetadataSelectors< S >
@@ -114,8 +171,9 @@ type CurriedStateWithPromise< F > =
  * Like CurriedSelectorsOf but each selector returns a Promise.
  * Used for resolveSelect.
  */
-export type CurriedSelectorsResolveOf< S > =
-	S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
+export type CurriedSelectorsResolveOf< S > = S extends CoreDataStoreDescriptor
+	? CoreDataStoreSelectors
+	: S extends StoreDescriptor< ReduxStoreConfig< any, any, infer Selectors > >
 		? {
 				[ key in keyof Selectors ]: CurriedStateWithPromise<
 					Selectors[ key ]
@@ -413,10 +471,11 @@ export interface StorageInterface {
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
-export type ActionCreatorsOf< T > =
-	T extends StoreDescriptor<
-		ReduxStoreConfig< any, infer ActionCreators, any >
-	>
+export type ActionCreatorsOf< T > = T extends CoreDataStoreDescriptor
+	? CoreDataStoreActions
+	: T extends StoreDescriptor<
+				ReduxStoreConfig< any, infer ActionCreators, any >
+		  >
 		? PromisifiedActionCreators< ActionCreators > & MetadataActions< T >
 		: T extends ReduxStoreConfig< any, infer ActionCreators, any >
 			? PromisifiedActionCreators< ActionCreators >

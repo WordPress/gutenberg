@@ -1,4 +1,4 @@
-import type { AnyConfig, StoreDescriptor, DispatchReturn } from './types';
+import type { StoreDescriptor, DispatchReturn } from './types';
 import defaultRegistry from './default-registry';
 
 /**
@@ -25,7 +25,7 @@ import defaultRegistry from './default-registry';
  * @return Object containing the action creators.
  */
 export function dispatch<
-	StoreNameOrDescriptor extends StoreDescriptor< AnyConfig > | string,
+	StoreNameOrDescriptor extends StoreDescriptor | string = StoreDescriptor,
 >(
 	storeNameOrDescriptor: StoreNameOrDescriptor
 ): DispatchReturn< StoreNameOrDescriptor > {

@@ -5,7 +5,6 @@ import type {
 	StoreDescriptor,
 	ReduxStoreConfig,
 	combineReducers as CombineReducers,
-	AnyConfig,
 	CurriedSelectorsResolveOf,
 } from './types';
 
@@ -104,7 +103,7 @@ export const combineReducers =
  *
  * @return Object containing the store's promise-wrapped selectors.
  */
-export function resolveSelect< T extends StoreDescriptor< AnyConfig > >(
+export function resolveSelect< T extends StoreDescriptor = StoreDescriptor >(
 	storeNameOrDescriptor: T | string
 ): CurriedSelectorsResolveOf< T > {
 	return defaultRegistry.resolveSelect(
