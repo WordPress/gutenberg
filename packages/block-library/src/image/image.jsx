@@ -3,6 +3,7 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
+	SelectControl as WCSelectControl,
 	Spinner as WCSpinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
@@ -776,6 +777,30 @@ export default function Image( {
 			/>
 		) );
 
+	const animationControl = isSingleSelected && (
+		<ToolsPanelItem
+			label={ __( 'Animation' ) }
+			isShownByDefault
+			hasValue={ () => attributes.animation !== '' }
+			onDeselect={ () => setAttributes( { animation: '' } ) }
+		>
+			<WCSelectControl
+				label={ __( 'Animation' ) }
+				value={ attributes.animation || '' }
+				options={ [
+					{ label: __( 'None' ), value: '' },
+					{
+						label: __( 'Fade in' ),
+						value: 'fade-in',
+					},
+				] }
+				onChange={ ( value ) => {
+					setAttributes( { animation: value } );
+				} }
+			/>
+		</ToolsPanelItem>
+	);
+
 	const resetSettings = () => {
 		setAttributes( {
 			lightbox: undefined,
@@ -1105,19 +1130,22 @@ export default function Image( {
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>
-			{ !! imageSizeOptions.length && (
+			{ ( !! imageSizeOptions.length || animationControl ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
 						resetAll={ resetSettings }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						<ResolutionTool
-							value={ sizeSlug }
-							defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
-							onChange={ updateImage }
-							options={ imageSizeOptions }
-						/>
+						{ animationControl }
+						{ !! imageSizeOptions.length && (
+							<ResolutionTool
+								value={ sizeSlug }
+								defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+								onChange={ updateImage }
+								options={ imageSizeOptions }
+							/>
+						) }
 					</ToolsPanel>
 				</InspectorControls>
 			) }
