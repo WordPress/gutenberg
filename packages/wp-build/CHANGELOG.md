@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the experimental `wp-build-shared` command, which builds the libraries listed in a package's `wpSharedModules` once, as script modules pruned to a committed export list, and writes their dependencies and version to `modules.php` ([#86694](https://github.com/WordPress/gutenberg/pull/86694)).
+
 ## 0.28.0 (2026-11-18)
 
 ### Enhancements
