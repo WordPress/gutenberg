@@ -99,6 +99,18 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			} );
 		}
 	);
+	it( 'uses the item_draft_saved label when saving a draft', () => {
+		expect(
+			getNotificationArgumentsForSaveSuccess( {
+				previousPost: { status: 'draft' },
+				post: { status: 'draft' },
+				postType: {
+					labels: { ...postType.labels, item_draft_saved: 'drafted' },
+					viewable: false,
+				},
+			} )
+		).toEqual( [ 'drafted', defaultExpectedAction ] );
+	} );
 } );
 describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42', message: 'Something went wrong.' };
