@@ -22,9 +22,9 @@ import { __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
+import { isPdfUrl } from './utils/is-pdf-url';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
@@ -111,7 +111,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 		const isPdf =
 			// Media Library and REST API use different properties for mime type.
 			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
-			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
+			isPdfUrl( newMedia.url );
 		const pdfAttributes = {
 			displayPreview: isPdf
 				? ( attributes.displayPreview ?? true )
