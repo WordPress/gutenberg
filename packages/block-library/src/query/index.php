@@ -87,6 +87,11 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	static $dirty_enhanced_queries = array();
 	static $render_query_callback  = null;
 
+	// Do not disable enhanced pagination for blocks rendered during excerpt generation.
+	if ( doing_filter( 'get_the_excerpt' ) || doing_filter( 'wp_trim_excerpt' ) ) {
+		return $parsed_block;
+	}
+
 	$block_name              = $parsed_block['blockName'];
 	$block_type              = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 	$has_enhanced_pagination = isset( $parsed_block['attrs']['enhancedPagination'] ) && true === $parsed_block['attrs']['enhancedPagination'] && isset( $parsed_block['attrs']['queryId'] ) && is_scalar( $parsed_block['attrs']['queryId'] );
@@ -150,4 +155,6 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 	return $parsed_block;
 }
 
+// Remove core filter when Gutenberg is loaded to prevent running both versions.
+remove_filter( 'render_block_data', 'block_' . 'core_query_disable_enhanced_pagination', 10 );
 add_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10, 1 );

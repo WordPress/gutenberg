@@ -66,6 +66,9 @@ class Tests_Blocks_RenderQueryBlock extends WP_UnitTestCase {
 		global $wp_interactivity;
 		$this->original_wp_interactivity = $wp_interactivity;
 		$wp_interactivity                = new WP_Interactivity_API();
+
+		// Avoid core's version of the filter interfering when testing Gutenberg's version.
+		remove_filter( 'render_block_data', 'block_core_query_disable_enhanced_pagination', 10 );
 	}
 
 	public function tear_down() {
@@ -296,6 +299,52 @@ HTML;
 		$output = do_blocks( $content );
 
 		$paged = $prev_paged;
+
+		$p = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
+		$this->assertSame( 'query-0', $p->get_attribute( 'data-wp-router-region' ) );
+		$router_config = wp_interactivity_config( 'core/router' );
+		$this->assertArrayNotHasKey( 'clientNavigationDisabled', $router_config );
+	}
+
+	/**
+	 * Tests that `clientNavigationDisabled` is not enabled when
+	 * a post excerpt renders in a Query block with enhanced pagination,
+	 * even if the post content contains an incompatible block.
+	 *
+	 * @ticket 86543
+	 */
+	public function test_rendering_query_with_enhanced_pagination_not_disabled_with_post_excerpt() {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_title'   => 'Post With Classic Block',
+				'post_excerpt' => '',
+				'post_content' => '<!-- wp:freeform --><p>Classic content</p><!-- /wp:freeform -->',
+			)
+		);
+
+		$content = <<<HTML
+		<!-- wp:query {"queryId":0,"query":{"inherit":true},"enhancedPagination":true} -->
+		<div class="wp-block-query">
+			<!-- wp:post-template {"align":"wide"} -->
+				<!-- wp:post-title /-->
+				<!-- wp:post-excerpt /-->
+			<!-- /wp:post-template -->
+		</div>
+		<!-- /wp:query -->
+HTML;
+
+		global $wp_query, $wp_the_query;
+		$wp_query     = new WP_Query(
+			array(
+				'p' => $post_id,
+			)
+		);
+		$wp_the_query = $wp_query;
+
+		$output = do_blocks( $content );
 
 		$p = new WP_HTML_Tag_Processor( $output );
 		$p->next_tag( array( 'class_name' => 'wp-block-query' ) );
