@@ -44,9 +44,9 @@
 	],
 	"templateParts": [
 		{
-			"name": "small-header",
-			"title": "Small Header",
-			"area": "header"
+			"name": "small-footer",
+			"title": "Small Footer",
+			"area": "footer"
 		}
 	]
 }
