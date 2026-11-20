@@ -46,6 +46,6 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "./bin/index.js"
+		"build": "node --openssl-legacy-provider ./bin/index.js"
 	}
 }
