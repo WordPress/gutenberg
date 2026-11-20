@@ -31,7 +31,18 @@ vi.mock( import( '@wordpress/blocks' ), () => ( {
 				{
 					name: 'core/group',
 					attributes: {},
-					innerBlocks: [],
+					innerBlocks: [
+						{
+							name: 'core/navigation',
+							attributes: {
+								layout: {
+									type: 'flex',
+									orientation: 'vertical',
+								},
+							},
+							innerBlocks: [],
+						},
+					],
 				},
 			];
 		}
@@ -259,5 +270,154 @@ describe( 'useCreateOverlayTemplatePart', () => {
 			expect.any( Object ),
 			{ throwOnError: true }
 		);
+	} );
+
+	it( 'should seed overlay navigation blocks with inherited parent navigation styles', async () => {
+		const overlayTemplateParts = [];
+		const createdOverlay = {
+			id: 'twentytwentyfive//navigation-overlay',
+			theme: 'twentytwentyfive',
+			slug: 'navigation-overlay',
+			title: {
+				rendered: 'Navigation Overlay',
+			},
+			area: 'navigation-overlay',
+		};
+		const navigationAttributes = {
+			textColor: 'primary',
+			fontSize: 'large',
+			fontFamily: 'heading',
+			style: {
+				typography: {
+					fontStyle: 'italic',
+					fontWeight: '700',
+					lineHeight: '1.2',
+					textTransform: 'uppercase',
+					letterSpacing: '0.08em',
+					textDecoration: 'underline',
+				},
+			},
+		};
+
+		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
+
+		const { result: createOverlayTemplatePart } = renderHook( () =>
+			useCreateOverlayTemplatePart(
+				overlayTemplateParts,
+				navigationAttributes
+			)
+		);
+
+		await act( async () => {
+			await createOverlayTemplatePart.current();
+		} );
+
+		const savedBlocks = serialize.mock.calls[ 0 ][ 0 ];
+		const navigationBlock = savedBlocks[ 0 ].innerBlocks[ 0 ];
+
+		expect( navigationBlock.attributes ).toEqual(
+			expect.objectContaining( {
+				textColor: 'primary',
+				fontSize: 'large',
+				fontFamily: 'heading',
+				layout: {
+					type: 'flex',
+					orientation: 'vertical',
+				},
+				style: {
+					typography: {
+						fontStyle: 'italic',
+						fontWeight: '700',
+						lineHeight: '1.2',
+						textTransform: 'uppercase',
+						letterSpacing: '0.08em',
+						textDecoration: 'underline',
+					},
+				},
+			} )
+		);
+	} );
+
+	it( 'should not overwrite explicit overlay navigation styles', async () => {
+		const overlayTemplateParts = [];
+		const createdOverlay = {
+			id: 'twentytwentyfive//navigation-overlay',
+			theme: 'twentytwentyfive',
+			slug: 'navigation-overlay',
+			title: {
+				rendered: 'Navigation Overlay',
+			},
+			area: 'navigation-overlay',
+		};
+		const navigationAttributes = {
+			textColor: 'primary',
+			fontSize: 'large',
+			fontFamily: 'heading',
+			style: {
+				typography: {
+					fontWeight: '700',
+					textTransform: 'uppercase',
+				},
+			},
+		};
+
+		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
+
+		parse.mockImplementationOnce( () => [
+			{
+				name: 'core/group',
+				attributes: {},
+				innerBlocks: [
+					{
+						name: 'core/navigation',
+						attributes: {
+							fontFamily: 'body',
+							style: {
+								color: {
+									text: '#654321',
+								},
+								typography: {
+									fontSize: '20px',
+									fontWeight: '400',
+								},
+							},
+						},
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+
+		const { result: createOverlayTemplatePart } = renderHook( () =>
+			useCreateOverlayTemplatePart(
+				overlayTemplateParts,
+				navigationAttributes
+			)
+		);
+
+		await act( async () => {
+			await createOverlayTemplatePart.current();
+		} );
+
+		const savedBlocks = serialize.mock.calls[ 0 ][ 0 ];
+		const navigationBlock = savedBlocks[ 0 ].innerBlocks[ 0 ];
+
+		expect( navigationBlock.attributes ).toEqual(
+			expect.objectContaining( {
+				fontFamily: 'body',
+				style: {
+					color: {
+						text: '#654321',
+					},
+					typography: {
+						fontSize: '20px',
+						fontWeight: '400',
+						textTransform: 'uppercase',
+					},
+				},
+			} )
+		);
+		expect( navigationBlock.attributes ).not.toHaveProperty( 'textColor' );
+		expect( navigationBlock.attributes ).not.toHaveProperty( 'fontSize' );
 	} );
 } );

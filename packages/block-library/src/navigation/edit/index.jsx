@@ -570,7 +570,7 @@ function Navigation( {
 	);
 
 	// Configure navigation blocks in overlay templates.
-	const hasSetOverlayDefault = useRef( false );
+	const hasSetOverlayDefaultRef = useRef( false );
 	useEffect( () => {
 		if ( ! isWithinOverlay ) {
 			return;
@@ -582,8 +582,8 @@ function Navigation( {
 		}
 
 		// Set vertical orientation and always-open submenus for new blocks.
-		if ( ! hasSetOverlayDefault.current && ! ref ) {
-			hasSetOverlayDefault.current = true;
+		if ( ! hasSetOverlayDefaultRef.current && ! ref ) {
+			hasSetOverlayDefaultRef.current = true;
 			setAttributes( {
 				submenuVisibility: 'always',
 				layout: {
@@ -770,12 +770,12 @@ function Navigation( {
 				)
 			: '';
 
-	const isFirstRender = useRef( true ); // Don't speak on first render.
+	const isFirstRenderRef = useRef( true ); // Don't speak on first render.
 	useEffect( () => {
-		if ( ! isFirstRender.current && submenuAccessibilityNotice ) {
+		if ( ! isFirstRenderRef.current && submenuAccessibilityNotice ) {
 			speak( submenuAccessibilityNotice );
 		}
-		isFirstRender.current = false;
+		isFirstRenderRef.current = false;
 	}, [ submenuAccessibilityNotice ] );
 
 	const overlayMenuPreviewId = useInstanceId(
@@ -921,6 +921,7 @@ function Navigation( {
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
 						hasOverlays={ hasOverlays }
+						navigationAttributes={ attributes }
 					/>
 				</InspectorControls>
 			) }
