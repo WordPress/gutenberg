@@ -287,6 +287,13 @@ When `parent` is omitted, the block is not restricted by parent block type. Sett
 parent: [ 'core/columns' ],
 ```
 
+An empty array is not the same as omitting the property. It matches no parent, including the root, so the block cannot be inserted anywhere and does not appear in the inserter. The only exception is a container that explicitly lists the block in its own [`allowedBlocks`](#allowedblocks-optional), which takes precedence.
+
+```js
+// The block cannot be inserted anywhere.
+parent: [],
+```
+
 #### ancestor (optional)
 
 -   **Type:** `Array`
