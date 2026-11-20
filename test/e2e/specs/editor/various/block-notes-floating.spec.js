@@ -1303,4 +1303,126 @@ test.describe( 'Block Notes: floating notes', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	// A block hidden at the current viewport renders nothing once it is
+	// deselected, leaving its thread without an anchor element (#73565).
+	test.describe( 'Hidden blocks', () => {
+		// 'Hide' and 'Show' open the same dialog.
+		async function setDesktopVisibility( { editor, page, item, hide } ) {
+			await editor.clickBlockOptionsMenuItem( item );
+			const dialog = page.getByRole( 'dialog', { name: 'Hide block' } );
+			const checkbox = dialog.getByRole( 'checkbox', {
+				name: 'Hide on Desktop',
+			} );
+			await checkbox.setChecked( hide );
+			await dialog.getByRole( 'button', { name: 'Apply' } ).click();
+			// Applying leaves the options menu open, where it would swallow
+			// the next click on the canvas.
+			await page.keyboard.press( 'Escape' );
+		}
+
+		// Adds a long paragraph and then one per given content, the first of
+		// which gets a note and is hidden. The noted block is never the first
+		// one, so a thread parked at the top of the panel can't pass.
+		async function addHiddenNotedBlock( {
+			editor,
+			page,
+			blockNoteUtils,
+			contents,
+		} ) {
+			for ( const content of [ SPACER_TEXT, ...contents ] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+			const spacer = getParagraph( editor, 'Lorem ipsum' );
+			const noted = getParagraph( editor, contents[ 0 ] );
+
+			await editor.selectBlocks( noted );
+			await blockNoteUtils.addNote( 'Hidden block note' );
+			// Located by content: the accessible name changes with the block.
+			const thread = getFloatingNotes( page )
+				.getByRole( 'treeitem' )
+				.filter( { hasText: 'Hidden block note' } );
+			await expectAligned( thread, noted );
+
+			await editor.selectBlocks( noted );
+			await setDesktopVisibility( {
+				editor,
+				page,
+				item: 'Hide',
+				hide: true,
+			} );
+			// A hidden block stays rendered while selected.
+			await editor.selectBlocks( spacer );
+			await expect( noted ).toBeHidden();
+
+			return { spacer, noted, thread };
+		}
+
+		test( 'keeps the thread where the block would be until the block is shown', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			const { spacer, noted, thread } = await addHiddenNotedBlock( {
+				editor,
+				page,
+				blockNoteUtils,
+				contents: [ 'Noted paragraph', 'Trailing paragraph' ],
+			} );
+			const trailing = getParagraph( editor, 'Trailing paragraph' );
+			const notice = thread.getByText( 'Block is hidden.' );
+
+			await expectAligned( thread, trailing );
+			await expect( notice ).toBeVisible();
+			await expect( thread ).toHaveAccessibleName(
+				'Note on hidden block: Hidden block note'
+			);
+
+			// Selecting the thread selects the block, which renders it again,
+			// collapsed and still invisible, right where the thread is.
+			const top = await getTop( thread );
+			await thread.click();
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+			await expect( noted ).toBeHidden();
+			await expect( notice ).toBeVisible();
+			await expectAligned( thread, () => top, { tolerance: 2 } );
+
+			// The block is still selected, so its options menu is at hand.
+			await setDesktopVisibility( {
+				editor,
+				page,
+				item: 'Show',
+				hide: false,
+			} );
+			await editor.selectBlocks( spacer );
+			await expect( noted ).toBeVisible();
+			await expect( notice ).toBeHidden();
+			await expectAligned( thread, noted );
+		} );
+
+		test( 'places the thread of a hidden last block below the block before it', async ( {
+			editor,
+			page,
+			blockNoteUtils,
+		} ) => {
+			// The only noted block is hidden, so nothing registers the canvas.
+			const { spacer, thread } = await addHiddenNotedBlock( {
+				editor,
+				page,
+				blockNoteUtils,
+				contents: [ 'Last paragraph' ],
+			} );
+
+			await expect(
+				thread.getByText( 'Block is hidden.' )
+			).toBeVisible();
+			await expectAligned( thread, async () => {
+				const box = await spacer.boundingBox();
+				return box.y + box.height;
+			} );
+		} );
+	} );
 } );

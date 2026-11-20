@@ -69,6 +69,49 @@ export function getNoteAnchorRect(
 }
 
 /**
+ * Measure where the thread of a block with no element should line up. A block
+ * hidden at the current viewport renders nothing once it is deselected, so
+ * its thread takes the block's place in the document: the top of the next
+ * rendered block, or the bottom of the previous one after the last block.
+ *
+ * @param clientId         Client ID of the block with no element, if it still exists.
+ * @param orderedClientIds Client IDs of every block, in document order.
+ * @param doc              Document of the editor canvas, once known.
+ * @return Anchor top in viewport coordinates, or `null` without a rendered block.
+ */
+export function getHiddenBlockAnchorTop(
+	clientId: string | undefined,
+	orderedClientIds: string[],
+	doc: Document | undefined
+): number | null {
+	const index = orderedClientIds.indexOf( clientId! );
+	if ( ! doc || index === -1 ) {
+		return null;
+	}
+	// Collapsed content (e.g. a closed Details) still reports the box it
+	// would have when expanded, so it doesn't count as rendered.
+	const getRect = ( id: string ) => {
+		const element = doc.getElementById( `block-${ id }` );
+		return element?.checkVisibility?.() === false
+			? undefined
+			: element?.getBoundingClientRect();
+	};
+	for ( const id of orderedClientIds.slice( index + 1 ) ) {
+		const rect = getRect( id );
+		if ( rect ) {
+			return rect.top;
+		}
+	}
+	for ( const id of orderedClientIds.slice( 0, index ).reverse() ) {
+		const rect = getRect( id );
+		if ( rect ) {
+			return rect.bottom;
+		}
+	}
+	return null;
+}
+
+/**
  * Whether one of the blocks holds focus. When the selected block supports
  * `editableRoot`, the canvas is the editing host and holds focus itself, so
  * the block of the editable owning the selection holds it.
