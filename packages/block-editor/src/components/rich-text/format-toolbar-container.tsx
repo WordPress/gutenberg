@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, ToolbarGroup } from '@wordpress/components';
+import { Popover as WCPopover, ToolbarGroup } from '@wordpress/components';
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 import NavigableToolbar from '../navigable-toolbar';
@@ -11,7 +11,7 @@ function InlineToolbar( {
 	popoverAnchor?: HTMLElement | null;
 } ) {
 	return (
-		<Popover
+		<WCPopover
 			placement="top"
 			focusOnMount={ false }
 			anchor={ popoverAnchor }
@@ -27,7 +27,7 @@ function InlineToolbar( {
 					<FormatToolbar />
 				</ToolbarGroup>
 			</NavigableToolbar>
-		</Popover>
+		</WCPopover>
 	);
 }
 

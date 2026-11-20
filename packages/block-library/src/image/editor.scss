@@ -57,6 +57,12 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+// The resize handles extend past the image, which adds a horizontal
+// scrollbar when the image spans the canvas.
+.is-root-container:has(.wp-block-image .components-resizable-box__container) {
+	overflow-x: clip;
+}
+
 // Shown while image is being uploaded but cannot be previewed.
 .wp-block-image__placeholder {
 	aspect-ratio: 4 / 3;

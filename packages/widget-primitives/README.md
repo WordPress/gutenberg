@@ -45,9 +45,13 @@ the hook in its loading state: `widgetTypes` is empty and
 
 ### `<WidgetRender>`
 
-It's the entry point for any host that mounts a widget. It resolves the render module via a host-provided `resolveWidgetModule` and mounts the component using the `attributes` / `setAttributes` contract.
+It's the entry point for any host that mounts a widget. It resolves the render module via a host-provided `resolveWidgetModule` and mounts the component using the `attributes` / `setAttributes` contract. It also lends the subtree the type's identity for `useWidgetIdentity`.
 
 Error handling and chrome stay with the host, which wraps the lazy render in a `Suspense` boundary.
+
+### `useWidgetIdentity()`
+
+It is how a mounted widget reads its type's identity consistently — today the translated `title`. `WidgetRender` provides it from the `widgetType` it already holds, so any host that mounts through that entry point needs no extra wiring. Absent a provider, the hook returns `{}`. The Widget Identity Storybook page covers the contract and the flow.
 
 ### `useWidgetTypes( records )`
 

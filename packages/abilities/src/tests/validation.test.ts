@@ -196,6 +196,144 @@ describe( 'validateValueFromSchema', () => {
 			);
 		} );
 
+		// The forms of a date that `rest_parse_date()` accepts on the server.
+		it.each( [
+			[ 'a date in UTC', '2026-10-21T08:30:00Z' ],
+			[ 'a date with an offset', '2026-10-21T09:30:00+01:00' ],
+			[ 'a date with a negative offset', '2026-10-21T05:00:00-03:30' ],
+			[
+				'a date with a fraction of a second',
+				'2026-10-21T08:30:00.123Z',
+			],
+			[ 'a date without an offset', '2026-10-21T09:30:00' ],
+			[
+				'a date without an offset, with a fraction of a second',
+				'2026-10-21T09:30:00.123',
+			],
+			[
+				'a date without an offset, with a space before the time',
+				'2026-10-21 09:30:00',
+			],
+		] )( 'should accept %s as a date-time', ( _description, value ) => {
+			const schema = { type: 'string', format: 'date-time' };
+			expect( validateValueFromSchema( value, schema ) ).toBe( true );
+		} );
+
+		it.each( [
+			[ 'an empty string', '' ],
+			[ 'a date without a time', '2026-10-21' ],
+			[ 'a time without a date', '09:30:00' ],
+			[ 'a time without seconds', '2026-10-21T09:30' ],
+			[ 'a month that does not exist', '2026-13-01T09:30:00' ],
+			[ 'a day that does not exist', '2026-02-30T09:30:00' ],
+			[ 'an hour that does not exist', '2026-10-21T25:00:00' ],
+			[ 'a date in words', 'October 21, 2026' ],
+		] )( 'should reject %s as a date-time', ( _description, value ) => {
+			const schema = { type: 'string', format: 'date-time' };
+			expect( validateValueFromSchema( value, schema ) ).toBe(
+				'Invalid date.'
+			);
+		} );
+
+		it( 'should validate the dates in an input shaped like the input of a core ability', () => {
+			// The shape proposed for `core/content-create`: a date in the site's time, in GMT, or both.
+			const schema = {
+				type: 'object',
+				required: [ 'data' ],
+				properties: {
+					data: {
+						type: 'object',
+						properties: {
+							title: { type: 'string' },
+							date: {
+								type: 'object',
+								additionalProperties: false,
+								minProperties: 1,
+								properties: {
+									site: {
+										type: 'string',
+										format: 'date-time',
+									},
+									gmt: {
+										type: 'string',
+										format: 'date-time',
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			// Without an offset: 09:30 in the site's time, as `date` is read in the REST API.
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: { site: '2026-10-21T09:30:00' },
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( true );
+
+			// With an offset: the same moment, whatever the time zone of the site.
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: {
+								site: '2026-10-21T09:30:00+01:00',
+								gmt: '2026-10-21T08:30:00Z',
+							},
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( true );
+
+			expect(
+				validateValueFromSchema(
+					{
+						data: {
+							title: 'Launch notes',
+							date: { site: '2026-10-21' },
+						},
+					},
+					schema,
+					'input'
+				)
+			).toBe( 'Invalid date.' );
+		} );
+
+		it( 'should validate the dates in a result that has them in the form the REST API returns', () => {
+			// `date` and `date_gmt` of a post in the REST API have no offset.
+			const schema = {
+				type: 'object',
+				properties: {
+					id: { type: 'integer' },
+					date: { type: 'string', format: 'date-time' },
+					date_gmt: { type: 'string', format: 'date-time' },
+				},
+			};
+
+			expect(
+				validateValueFromSchema(
+					{
+						id: 1,
+						date: '2026-10-21T09:30:00',
+						date_gmt: '2026-10-21T08:30:00',
+					},
+					schema,
+					'output'
+				)
+			).toBe( true );
+		} );
+
 		it( 'should validate UUID format', () => {
 			const schema = { type: 'string', format: 'uuid' };
 			expect(

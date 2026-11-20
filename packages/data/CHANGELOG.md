@@ -4,6 +4,18 @@
 
 ### Bug Fixes
 
+-   `plugins.persistence`: Allow calling `createPersistenceInterface` and registering the plugin without options ([#87060](https://github.com/WordPress/gutenberg/pull/87060)).
+
+## 11.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   `Resolver`: Accept `NormalizedResolver` in the resolver types ([#86847](https://github.com/WordPress/gutenberg/pull/86847)).
+
+## 11.1.0 (2026-11-04)
+
+### Bug Fixes
+
 -   `invalidateResolution`: Make `args` optional in the types, since a selector without arguments is invalidated without them ([#85254](https://github.com/WordPress/gutenberg/pull/85254)).
 
 ### Internal

@@ -1,6 +1,18 @@
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
+import type { ComponentProps } from 'react';
+import { TOOLBAR_FORMATS } from './format-toolbar/formats';
 import type { RichTextToolbarButtonProps } from './types';
+
+// We need the `RichText.ToolbarControls` slot handler to identify core fills
+// by their `name` props, even though `name` isn't propagated to the actually
+// rendered elements.
+function NamedToolbarButton( {
+	name,
+	...props
+}: ComponentProps< typeof ToolbarButton > & { name?: string } ) {
+	return <ToolbarButton { ...props } />;
+}
 
 export function RichTextToolbarButton( {
 	name,
@@ -11,7 +23,9 @@ export function RichTextToolbarButton( {
 	let shortcut: string | undefined;
 	let fillName = 'RichText.ToolbarControls';
 
-	if ( name ) {
+	// Only the formats shown as their own button in the toolbar have a slot of
+	// their own. Other formats go in the "More" dropdown.
+	if ( name && TOOLBAR_FORMATS.includes( name ) ) {
 		fillName += `.${ name }`;
 	}
 
@@ -21,7 +35,11 @@ export function RichTextToolbarButton( {
 
 	return (
 		<Fill name={ fillName }>
-			<ToolbarButton { ...props } shortcut={ shortcut } />
+			<NamedToolbarButton
+				{ ...props }
+				name={ name }
+				shortcut={ shortcut }
+			/>
 		</Fill>
 	);
 }
