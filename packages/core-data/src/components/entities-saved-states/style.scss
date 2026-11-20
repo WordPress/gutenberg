@@ -35,7 +35,7 @@
 			margin-bottom: 0;
 
 			button {
-				font-size: $font-size-x-small;
+				font-size: var(--wpds-typography-font-size-xs);
 				text-transform: uppercase;
 			}
 		}
@@ -60,7 +60,7 @@
 }
 
 .entities-saved-states__changes {
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	margin: $grid-unit-05 $grid-unit-20 0 $grid-unit-30;
 	list-style: disc;
 
