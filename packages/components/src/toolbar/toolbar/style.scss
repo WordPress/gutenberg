@@ -1,4 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../../utils/theme-variables" as *;
@@ -75,14 +74,37 @@
 
 		// Toggled style.
 		&.is-pressed {
-			background: transparent;
-
-			&:hover {
+			&,
+			&:is(:disabled, [aria-disabled="true"]) {
 				background: transparent;
 			}
 
 			&::before {
-				background: $components-color-foreground;
+				background: var(--_wp-components-button-pressed-background);
+				background-position: inherit;
+			}
+
+			// The fill stays on the `::before`, which is inset from the button. A
+			// consumer that hides the `::before` has to fill the button itself, or
+			// `SelectedItemText` ends up on the toolbar's background.
+			// TODO: Add a way to opt out of the toolbar's `::before` treatment, so
+			// that consumers don't have to undo it and restore the fill themselves.
+			@media ( forced-colors: active ) {
+				background: transparent !important;
+
+				&::before {
+					background: SelectedItem;
+				}
+
+				&:disabled::before,
+				&[aria-disabled="true"]::before {
+					background: GrayText;
+				}
+
+				&:focus::before {
+					outline-color: CanvasText;
+					box-shadow: none;
+				}
 			}
 		}
 

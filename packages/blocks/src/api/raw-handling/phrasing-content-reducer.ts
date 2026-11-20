@@ -48,12 +48,10 @@ export default function phrasingContentReducer(
 		const anchor = node as HTMLAnchorElement;
 		// In jsdom-jscore, 'node.target' can be null.
 		// TODO: Explore fixing this by patching jsdom-jscore.
-		if ( anchor.target && anchor.target.toLowerCase() === '_blank' ) {
-			anchor.rel = 'noopener';
-		} else {
+		if ( ! anchor.target || anchor.target.toLowerCase() !== '_blank' ) {
 			anchor.removeAttribute( 'target' );
-			anchor.removeAttribute( 'rel' );
 		}
+		anchor.removeAttribute( 'rel' );
 
 		// Saves anchor elements name attribute as id
 		if ( anchor.name && ! anchor.id ) {

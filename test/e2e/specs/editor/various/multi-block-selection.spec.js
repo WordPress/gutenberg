@@ -402,7 +402,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 	} );
 
 	// @see https://github.com/WordPress/gutenberg/issues/34118
-	test( 'should properly select a single block even if `shift` was held for the selection (-firefox)', async ( {
+	test( 'should properly select a single block even if `shift` was held for the selection', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -463,7 +463,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 4 ] );
 	} );
 
-	test( 'should properly select part of nested rich text block while holding shift (-firefox)', async ( {
+	test( 'should properly select part of nested rich text block while holding shift', async ( {
 		page,
 		editor,
 	} ) => {
@@ -724,7 +724,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should keep correct selection when dragging outside block (-firefox)', async ( {
+	test( 'should keep correct selection when dragging outside block', async ( {
 		page,
 		editor,
 	} ) => {
