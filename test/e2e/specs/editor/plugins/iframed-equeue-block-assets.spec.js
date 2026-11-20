@@ -39,4 +39,29 @@ test.describe( 'iframed enqueue block assets', () => {
 			'Iframed Enqueue Block Assets!'
 		);
 	} );
+
+	test( 'should run script modules added through enqueue_block_assets', async ( {
+		editor,
+	} ) => {
+		await expect( editor.canvas.locator( 'html' ) ).toHaveAttribute(
+			'data-iframed-enqueue-block-assets-module',
+			'Iframed Enqueue Block Assets Module!'
+		);
+	} );
+
+	test( 'should run script modules added through enqueue_block_assets in the site editor', async ( {
+		admin,
+		editor,
+	} ) => {
+		await admin.visitSiteEditor( {
+			postId: 'emptytheme//index',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await expect( editor.canvas.locator( 'html' ) ).toHaveAttribute(
+			'data-iframed-enqueue-block-assets-module',
+			'Iframed Enqueue Block Assets Module!'
+		);
+	} );
 } );
