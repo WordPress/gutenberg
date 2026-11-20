@@ -4,6 +4,9 @@ export function isPreviewingTheme() {
 	return !! getQueryArg( window.location.href, 'wp_theme_preview' );
 }
 
+/**
+ * @return {string | string[] | null} Currently previewing theme.
+ */
 export function currentlyPreviewingTheme() {
 	if ( isPreviewingTheme() ) {
 		return getQueryArg( window.location.href, 'wp_theme_preview' );

@@ -6817,6 +6817,11 @@
 			"count": 1
 		}
 	},
+	"packages/customize-widgets/src/utils.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/data/src/components/use-select/index.ts": {
 		"react-hooks/refs": {
 			"count": 2
@@ -8167,6 +8172,11 @@
 	},
 	"packages/edit-widgets/src/index.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/edit-widgets/src/store/selectors.js": {
+		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

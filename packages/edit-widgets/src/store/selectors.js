@@ -108,7 +108,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
  *
  * @param {string} clientId The client id of a block in a widget area.
  *
- * @return {WPBlock} The widget area block.
+ * @return {import('@wordpress/blocks').BlockInstance | null} The widget area block.
+ * @type {(state: Record<string, unknown>, clientId: string) => import('@wordpress/blocks').BlockInstance | null}
  */
 export const getParentWidgetAreaBlock = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
