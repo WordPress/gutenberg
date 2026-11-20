@@ -46,6 +46,7 @@ import {
 	createTable,
 	updateSelectedCell,
 	getCellAttribute,
+	getCellColumnRange,
 	insertRow,
 	deleteRow,
 	insertColumn,
@@ -194,10 +195,16 @@ function TableEdit( {
 		}
 
 		// Convert the cell selection to a column selection so that alignment
-		// is applied to the entire column.
+		// is applied to the entire column. Use the logical columns the cell
+		// covers, so that merged cells align every column under them.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
 		const columnSelection = {
 			type: 'column',
-			columnIndex: selectedCell.columnIndex,
+			columnIndex,
+			colspan,
 		};
 
 		const newAttributes = updateSelectedCell(
@@ -304,8 +311,13 @@ function TableEdit( {
 			return;
 		}
 
-		const { columnIndex } = selectedCell;
-		const newColumnIndex = columnIndex + delta;
+		// Use the logical columns the selected cell covers, so that a column
+		// inserted after a cell with colspan lands after all of its columns.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		const newColumnIndex = delta > 0 ? columnIndex + colspan : columnIndex;
 
 		setAttributes(
 			insertColumn( attributes, {
@@ -342,12 +354,26 @@ function TableEdit( {
 			return;
 		}
 
-		const { sectionName, columnIndex } = selectedCell;
+		// Delete every logical column the selected cell covers, from the last
+		// one, so that the indexes of the remaining ones don't shift.
+		const { columnIndex, colspan } = getCellColumnRange(
+			attributes,
+			selectedCell
+		);
+		let newAttributes = attributes;
+		for (
+			let index = columnIndex + colspan - 1;
+			index >= columnIndex;
+			index--
+		) {
+			newAttributes = {
+				...newAttributes,
+				...deleteColumn( newAttributes, { columnIndex: index } ),
+			};
+		}
 
 		setSelectedCell();
-		setAttributes(
-			deleteColumn( attributes, { sectionName, columnIndex } )
-		);
+		setAttributes( newAttributes );
 	}
 
 	// Clear the selected cell when the block is deselected. Only react to the
