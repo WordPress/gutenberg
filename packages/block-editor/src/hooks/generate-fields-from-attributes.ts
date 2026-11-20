@@ -73,5 +73,22 @@ function createFieldFromAttribute(
 		} ) );
 	}
 
+	// Mirror the schema constraints that the REST block renderer validates,
+	// so that invalid values are flagged in the inspector. Enums are already
+	// validated by DataForm through `elements`. DataForm ignores the rules
+	// that the field type doesn't support.
+	const isValid = Object.fromEntries(
+		Object.entries( {
+			min: def.minimum,
+			max: def.maximum,
+			minLength: def.minLength,
+			maxLength: def.maxLength,
+			pattern: def.pattern,
+		} ).filter( ( [ , rule ] ) => rule !== undefined )
+	);
+	if ( Object.keys( isValid ).length > 0 ) {
+		field.isValid = isValid;
+	}
+
 	return field;
 }
