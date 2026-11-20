@@ -6,6 +6,7 @@
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
 -   Shortcode: Only offer a transform in the block switcher when the shortcode meets the target block's conditions, so Gallery is no longer offered for `[gallery]` without `ids` ([#87063](https://github.com/WordPress/gutenberg/pull/87063)).
+-   Cover: Preserve em, rem, vw, and vh units when dragging the height resize handle ([#85537](https://github.com/WordPress/gutenberg/pull/85537)).
 
 ## 12.2.0 (2026-11-18)
 
