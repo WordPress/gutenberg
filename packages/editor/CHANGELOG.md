@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Post Author: Show the search loading message in the same layout as the suggestions, with a smaller spinner ([#86501](https://github.com/WordPress/gutenberg/pull/86501)).
 -   Align the Tags field loading status with its suggestions and creation action ([#86303](https://github.com/WordPress/gutenberg/pull/86303)).
 -   `PostTaxonomiesHierarchicalTermSelector`: Vertically center the loading spinner ([#85563](https://github.com/WordPress/gutenberg/pull/85563)).
