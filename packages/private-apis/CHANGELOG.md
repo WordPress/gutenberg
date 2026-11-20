@@ -2,11 +2,14 @@
 
 ## Unreleased
 
+### Internal
+
+-   Document `@wordpress/views` allowlist retention for backwards compatibility with older published versions ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
+
 ## 3.2.0 (2026-11-18)
 
 ### Internal
 
--   Remove `@wordpress/views` from the list of core modules allowed to use private APIs ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
 -   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
 
 ## 3.1.0 (2026-11-04)

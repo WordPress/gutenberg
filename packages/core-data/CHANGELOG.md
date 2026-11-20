@@ -7,6 +7,10 @@
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 
+### Internal
+
+-   Export 'getViewConfig' as a public selector on the core data store ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
+
 ## 9.2.0 (2026-11-18)
 
 ### Bug Fixes
@@ -17,9 +21,6 @@
 -   Real-time collaboration: Re-parse blocks of persisted CRDT documents that hold missing or invalid blocks, so a block does not stay missing after its plugin is reactivated or stay invalid after its block type accepts its markup again ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
 -   Core Data: Reject unsafe entity record keys.
 
-### Internal
-
--   Export 'getViewConfig' as a public selector on the core data store ([#86116](https://github.com/WordPress/gutenberg/pull/86116)).
 
 ## 9.1.0 (2026-11-04)
 
