@@ -404,6 +404,8 @@ export default function useBlockSync( {
 				pendingChangesRef.current.incoming = null;
 				isPersistent = newIsPersistent;
 				blockHistoryMode = newBlockHistoryMode;
+				// An incoming reset is not a local change to persist later.
+				previousAreBlocksDifferent = false;
 				return;
 			}
 

@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   `BlockEditorProvider`: Keep Redo when the last change is marked persistent, for example by saving, right after an undo or redo ([#87119](https://github.com/WordPress/gutenberg/pull/87119)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements

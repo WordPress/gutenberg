@@ -567,6 +567,78 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 	} );
 
+	// See https://github.com/WordPress/gutenberg/issues/87052.
+	test( 'should keep redo when saving after undoing a change made right after a redo', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Hello' },
+		} );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'button', { name: 'Typography options', exact: true } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', {
+				name: 'Drop cap, show',
+				exact: true,
+			} )
+			.click();
+		await page.keyboard.press( 'Escape' );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph', exact: true } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' world' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'Hello' } },
+			] );
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world' },
+			},
+		] );
+
+		await page
+			.getByRole( 'checkbox', { name: 'Drop cap', exact: true } )
+			.focus();
+		await page.keyboard.press( 'Space' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world', dropCap: true },
+			},
+		] );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world', dropCap: false },
+			},
+		] );
+
+		await editor.saveDraft();
+		await expect(
+			page.getByRole( 'button', { name: 'Redo', exact: true } )
+		).toBeEnabled();
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Hello world', dropCap: true },
+			},
+		] );
+	} );
+
 	test( 'should immediately create an undo level on typing', async ( {
 		editor,
 		page,
