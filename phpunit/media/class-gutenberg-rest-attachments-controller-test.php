@@ -2447,12 +2447,9 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( 'image_output_format', $data );
 		$this->assertSame( 'image/webp', $data['image_output_format'] );
 
-		// The main file on disk should be the converted WebP so
-		// wp_get_attachment_url() returns the WebP. This is what the
-		// client-side editor flow relies on when it lets the server
-		// handle main-file conversion (convert_format default = true).
+		// The client sideloads the converted main file.
 		$attached_file = get_attached_file( $data['id'], true );
-		$this->assertStringEndsWith( '.webp', (string) $attached_file );
+		$this->assertStringEndsWith( '.jpg', (string) $attached_file );
 	}
 
 	/**
