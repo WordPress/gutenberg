@@ -30,6 +30,7 @@ import { useRevisionBlocks } from './use-revision-blocks';
 import useCommands from '../commands';
 import useUploadSaveLock from './use-upload-save-lock';
 import useNetworkReconnect from './use-network-reconnect';
+import { getStartingRenderingMode, getTemplateAround } from './template-around';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -77,7 +78,15 @@ const NON_CONTEXTUAL_POST_TYPES = [
  */
 function useBlockEditorProps( post, template, mode ) {
 	const revisionBlocks = useRevisionBlocks();
-	const rootLevelPost = mode === 'template-locked' ? 'template' : 'post';
+	// The rendering mode is the editor's rather than the canvas's, so it can
+	// be the one that shows the template when this canvas has none to show:
+	// a route can ask for that mode whatever its canvas resolves to, a
+	// template that stands for itself included, and the mode of the last
+	// canvas stays until this one settles its own. The post is rendered on
+	// its own then, rather than the blocks of a template that is not there,
+	// which would leave the last canvas in place.
+	const rootLevelPost =
+		mode === 'template-locked' && template ? 'template' : 'post';
 	const [ postBlocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		post.type,
@@ -138,6 +147,51 @@ function useBlockEditorProps( post, template, mode ) {
 }
 
 /**
+ * Returns the template the template of a post is rendered inside, if any.
+ *
+ * With the templates inside templates experiment a template can name another
+ * template to be rendered inside, in that one's template slot block, so the
+ * front end renders a post inside its template and that template inside the
+ * one it names. The canvas renders the same when it shows the template.
+ *
+ * @param {Object}  post     The post being edited.
+ * @param {?Object} template The template of the post.
+ * @return {?Object|undefined} The template, `null` when there is none, or `undefined` while it resolves.
+ */
+function useTemplateAroundTemplate( post, template ) {
+	return useSelect(
+		( select ) => {
+			// A template rendered inside another is the template being
+			// edited, which the host already names the other one for.
+			if (
+				! template ||
+				post.type === 'wp_template' ||
+				template.type !== 'wp_template'
+			) {
+				return null;
+			}
+
+			const outerTemplateId = unlock( select( coreStore ) ).getTemplateId(
+				'wp_template',
+				template.id
+			);
+			if ( ! outerTemplateId ) {
+				return outerTemplateId;
+			}
+
+			return (
+				select( coreStore ).getEditedEntityRecord(
+					'postType',
+					'wp_template',
+					outerTemplateId
+				) || undefined
+			);
+		},
+		[ post.type, template ]
+	);
+}
+
+/**
  * This component provides the editor context and manages the state of the block editor.
  *
  * @param {Object}  props                                The component props.
@@ -175,9 +229,17 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		renderingMode,
 		children,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
-		__unstableTemplate: template,
+		__unstableTemplate: _template,
 	} ) => {
+		const template = getTemplateAround( post, _template );
+		const standsForOwnTemplate = !! _template && ! template;
 		const hasTemplate = !! template;
+		const outerTemplate = useTemplateAroundTemplate( post, template );
+		// The template the canvas renders at its root when it shows the
+		// template: the one the post's template is rendered inside, if any.
+		const canvasTemplate = outerTemplate || template;
+		const hasResolvedCanvasTemplate =
+			hasTemplate && outerTemplate !== undefined;
 		const {
 			editorSettings,
 			selection,
@@ -206,8 +268,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// A caller that names the mode is stating what this context
 				// is for, so it wins over the post type default and the
 				// user's saved preference.
-				const _defaultMode =
-					renderingMode ?? getDefaultRenderingMode( post.type );
+				//
+				// A canvas that stands for the template it is editing has
+				// nothing to render around it, so the mode that renders a
+				// post inside its template has nothing to show: the template
+				// is edited on its own however the preference for the post
+				// type reads, and the mode is settled rather than pending.
+				const _defaultMode = getStartingRenderingMode( {
+					renderingMode,
+					standsForOwnTemplate,
+					getPostTypeDefaultMode: () =>
+						getDefaultRenderingMode( post.type ),
+				} );
 				/**
 				 * To avoid content "flash", wait until rendering mode has been resolved.
 				 * This is important for the initial render of the editor.
@@ -217,7 +289,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				 */
 				const hasResolvedDefaultMode =
 					_defaultMode === 'template-locked'
-						? hasTemplate
+						? hasResolvedCanvasTemplate
 						: _defaultMode !== undefined;
 				// Wait until the default mode is retrieved and start rendering canvas.
 				const isRenderingModeReady = _defaultMode !== undefined;
@@ -247,14 +319,43 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					browserBackup: _getBrowserBackup(),
 				};
 			},
-			[ post.type, post.id, hasTemplate, renderingMode ]
+			[
+				post.type,
+				post.id,
+				hasResolvedCanvasTemplate,
+				standsForOwnTemplate,
+				renderingMode,
+			]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
-		const rootLevelPost = shouldRenderTemplate ? template : post;
+		const rootLevelPost = shouldRenderTemplate ? canvasTemplate : post;
+		/*
+		 * A template can name the template it is rendered inside, in which case
+		 * the canvas shows that one around it and the template being edited is
+		 * what its template slot block renders, the way a page is what the
+		 * post content block of its template renders.
+		 */
+		const isTemplateInsideTemplate =
+			shouldRenderTemplate &&
+			post.type === 'wp_template' &&
+			template.id !== post.id;
+		/*
+		 * The template of a post can name a template too, in which case the
+		 * canvas shows that one at its root, the post's template in its slot,
+		 * and the post in the content block of its template, as the front end
+		 * renders it.
+		 */
+		const isPostTemplateInsideTemplate =
+			shouldRenderTemplate && !! outerTemplate;
 		const defaultBlockContext = useMemo( () => {
 			const postContext = {};
 			// If it is a template, try to inherit the post type from the name.
+			// A template rendered inside another is given the same context, so
+			// that the blocks of the template around it, such as a title block
+			// in its header, stand for the post that template renders rather
+			// than for the template; its template slot block is told which
+			// template to render through `templateSlotId`.
 			if ( post.type === 'wp_template' ) {
 				if ( post.slug === 'page' ) {
 					postContext.postType = 'page';
@@ -280,14 +381,35 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				postContext.postType = post.type;
 			}
 
+			/*
+			 * The template the blocks being edited belong to. For a template
+			 * rendered inside another that is the template itself: the blocks
+			 * in the slot are its own, and what they stand for — an archive, a
+			 * category, an author — follows from its slug rather than from the
+			 * slug of the template around them.
+			 */
+			let templateSlug;
+			let templateSlotId;
+			if ( isTemplateInsideTemplate ) {
+				templateSlug = post.slug;
+				templateSlotId = post.id;
+			} else if ( isPostTemplateInsideTemplate ) {
+				templateSlug = template.slug;
+				templateSlotId = template.id;
+			} else if ( rootLevelPost.type === 'wp_template' ) {
+				templateSlug = rootLevelPost.slug;
+			}
+
 			return {
 				...postContext,
-				templateSlug:
-					rootLevelPost.type === 'wp_template'
-						? rootLevelPost.slug
-						: undefined,
+				templateSlug,
+				templateSlotId,
 			};
 		}, [
+			isTemplateInsideTemplate,
+			isPostTemplateInsideTemplate,
+			template?.id,
+			template?.slug,
 			shouldRenderTemplate,
 			post.id,
 			post.type,
@@ -305,7 +427,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		);
 		const [ blocks, onInput, onChange ] = useBlockEditorProps(
 			post,
-			template,
+			canvasTemplate,
 			mode
 		);
 
@@ -402,10 +524,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return () => updateEditorSettings( { renderingMode: undefined } );
 		}, [ settings, renderingMode, updateEditorSettings ] );
 
-		// Synchronizes the active template with the state.
+		// Synchronizes the active template with the state. Named from the prop
+		// rather than the template to render around the post, so a canvas that
+		// stands for a template still reports which one it is editing.
 		useEffect( () => {
-			setCurrentTemplateId( template?.id );
-		}, [ template?.id, setCurrentTemplateId ] );
+			setCurrentTemplateId( _template?.id );
+		}, [ _template?.id, setCurrentTemplateId ] );
 
 		// Sets the right rendering mode when loading the editor.
 		useEffect( () => {
@@ -461,8 +585,18 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
+									{ /*
+									   Only while a template is rendered
+									   around the post: a canvas with none
+									   has nothing to lock, whatever mode
+									   the editor was left in.
+									 */ }
+									{ shouldRenderTemplate && (
+										<DisableNonPageContentBlocks
+											isTemplateInsideTemplate={
+												isTemplateInsideTemplate
+											}
+										/>
 									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />

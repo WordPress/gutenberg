@@ -44,7 +44,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 		showIconLabels,
 		isTemplateHidden,
 		hasRenderingMode,
-		templateId,
+		hasTemplateToShow,
 		isResponsiveEditing,
 		isResponsiveEditingEnabled,
 		hasBlockSelection,
@@ -52,6 +52,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 	} = useSelect( ( select ) => {
 		const {
 			getCurrentPostType,
+			getCurrentPostId,
 			getCurrentTemplateId,
 			getRenderingMode,
 			getDeviceType,
@@ -74,11 +75,19 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 			hasMobileViewport: viewportBreakpoints.mobile !== undefined,
 			hasTabletViewport: viewportBreakpoints.tablet !== undefined,
 			isTemplate: _currentPostType === 'wp_template',
+			/*
+			 * A template that names the template it is rendered inside has one
+			 * to show, like a post does. A canvas that stands for a template
+			 * names that template as its own, and there is nothing to show
+			 * around it.
+			 */
+			hasTemplateToShow:
+				!! getCurrentTemplateId() &&
+				getCurrentTemplateId() !== getCurrentPostId(),
 			isViewable: getPostType( _currentPostType )?.viewable ?? false,
 			showIconLabels: get( 'core', 'showIconLabels' ),
 			isTemplateHidden: getRenderingMode() === 'post-only',
 			hasRenderingMode: !! getEditorSettings().renderingMode,
-			templateId: getCurrentTemplateId(),
 			isResponsiveEditing: _isResponsiveEditing(),
 			isResponsiveEditingEnabled:
 				getEditorSettings().responsiveEditingEnabled,
@@ -239,7 +248,7 @@ function PreviewMenu( { forceIsAutosaveable, disabled } ) {
 						</Menu.Group>
 					</>
 				) }
-				{ ! isTemplate && !! templateId && ! hasRenderingMode && (
+				{ hasTemplateToShow && ! hasRenderingMode && (
 					<>
 						<Menu.Separator />
 						<Menu.Group>

@@ -1,6 +1,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as interfaceStore } from '@wordpress/interface';
 import { unlock } from '../../lock-unlock';
@@ -11,20 +12,49 @@ import usePostContentBlockTypes from '../provider/use-post-content-block-types';
 const { BlockQuickNavigation } = unlock( blockEditorPrivateApis );
 
 const TEMPLATE_PART_BLOCK = 'core/template-part';
+const TEMPLATE_SLOT_BLOCK = 'core/template-slot';
 
 function TemplateContentPanelInner( { postType } ) {
 	const postContentBlockTypes = usePostContentBlockTypes();
 
-	const clientIds = useSelect(
+	const { contentBlocks, templatePartsAround } = useSelect(
 		( select ) => {
-			const { getPostBlocksByName } = unlock( select( editorStore ) );
-			return getPostBlocksByName(
-				TEMPLATE_POST_TYPE === postType
-					? TEMPLATE_PART_BLOCK
-					: postContentBlockTypes
-			);
+			const { getPostBlocksByName, getTemplatePartsOutsidePostBlocks } =
+				unlock( select( editorStore ) );
+			if ( TEMPLATE_POST_TYPE !== postType ) {
+				return {
+					contentBlocks: getPostBlocksByName( postContentBlockTypes ),
+				};
+			}
+
+			return {
+				contentBlocks: getPostBlocksByName( TEMPLATE_PART_BLOCK ),
+				// A template shown inside the template it names is rendered
+				// by the slot of that template, whose own template parts are
+				// on the canvas too. They belong to that template, which is
+				// edited on its own screen.
+				templatePartsAround: getPostBlocksByName(
+					TEMPLATE_SLOT_BLOCK,
+					true
+				).length
+					? getTemplatePartsOutsidePostBlocks(
+							TEMPLATE_SLOT_BLOCK,
+							true
+						)
+					: undefined,
+			};
 		},
 		[ postType, postContentBlockTypes ]
+	);
+	const clientIds = useMemo(
+		() =>
+			templatePartsAround
+				? contentBlocks.filter(
+						( clientId ) =>
+							! templatePartsAround.includes( clientId )
+					)
+				: contentBlocks,
+		[ contentBlocks, templatePartsAround ]
 	);
 
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
