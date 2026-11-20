@@ -3,6 +3,6 @@
 // Raw Text Variant
 .editor-post-title.is-raw-text {
 	margin-bottom: $grid-unit-30;
-	margin-top: 2px; // space for focus outline to appear.
+	margin-top: calc(2 * var(--wpds-border-width-focus)); // space for focus outline to appear.
 	max-width: none;
 }
