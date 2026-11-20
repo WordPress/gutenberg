@@ -2,6 +2,13 @@
 	width: 100%;
 }
 
+.wp-block-avatar.is-resizing {
+	img.wp-block-avatar__image {
+		height: auto !important;
+		width: inherit !important;
+	}
+}
+
 .wp-block-avatar.aligncenter {
 	.components-resizable-box__container {
 		margin: 0 auto;

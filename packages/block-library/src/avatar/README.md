@@ -57,6 +57,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 - **shadow**: `.wp-block-avatar img`
 - **filter**:
   - duotone: `.wp-block-avatar img`
+- **dimensions**: `.wp-block-avatar img`
 
 ## Block Markup
 
