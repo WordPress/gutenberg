@@ -50,7 +50,7 @@ if ( values.types ) {
 
 if ( values.packages ) {
 	await remove( [
-		'packages/*/{build,build-module,build-wp,build-style}',
+		'packages/*/{build,build-module,build-wp,build-style,build-php}',
 		'build',
 	] );
 }
