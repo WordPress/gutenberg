@@ -168,4 +168,25 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 
 		remove_all_filters( 'render_block_core/image' );
 	}
+
+	/**
+	 * An id copied from another site can belong to a different file here, so
+	 * the lightbox must enlarge the image's own file, not the attachment.
+	 *
+	 * @covers ::block_core_image_render_lightbox
+	 */
+	public function test_lightbox_ignores_an_attachment_that_is_a_different_file() {
+		$attachment_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+		$src           = 'https://example.org/wp-content/uploads/2021/04/other.jpg';
+		$content       = '<figure class="wp-block-image"><img src="' . $src . '" alt=""/></figure>';
+		$parsed_blocks = parse_blocks( '<!-- wp:image {"id":' . $attachment_id . ',"lightbox":{"enabled":true}} -->' . $content . '<!-- /wp:image -->' );
+		$block         = new WP_Block( $parsed_blocks[0] );
+
+		$block->render();
+
+		$metadata = wp_interactivity_state( 'core/image' )['metadata'];
+		$this->assertSame( $src, end( $metadata )['uploadedSrc'] );
+
+		remove_all_filters( 'render_block_core/image' );
+	}
 }
