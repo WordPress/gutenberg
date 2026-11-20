@@ -2,11 +2,7 @@ import clsx from 'clsx';
 import { useRef, useLayoutEffect } from '@wordpress/element';
 import { Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../../store';
-import { unlock } from '../../../lock-unlock';
-
-const { useNativeUndo } = unlock( blockEditorPrivateApis );
 
 /**
  * Moves `node` to the end of `parent`.
@@ -65,10 +61,9 @@ function MetaBoxesArea( { location } ) {
 
 	// Meta box fields are not part of the editor history, so undo and redo
 	// within them must remain the browser's own.
-	const nativeUndoRef = useNativeUndo();
 
 	return (
-		<div className={ classes } ref={ nativeUndoRef }>
+		<div className={ classes }>
 			{ isSaving && (
 				<WCSpinner className="edit-post-meta-boxes-area__spinner" />
 			) }

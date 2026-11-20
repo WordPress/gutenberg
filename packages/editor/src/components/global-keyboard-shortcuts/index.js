@@ -1,6 +1,7 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -8,7 +9,9 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { usesNativeUndo } = unlock( blockEditorPrivateApis );
+const { useFieldHistoryTracking, usesNativeUndo } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Handles the keyboard shortcuts for the editor.
@@ -24,6 +27,8 @@ export default function EditorKeyboardShortcuts() {
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );
 	const { getBlockSelectionStart } = useSelect( blockEditorStore );
+	const { getReferenceByDistinctEdits } = useSelect( coreStore );
+	useFieldHistoryTracking( getReferenceByDistinctEdits );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );

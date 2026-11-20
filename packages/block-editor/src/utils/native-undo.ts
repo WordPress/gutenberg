@@ -1,53 +1,153 @@
-import { useRefEffect } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
+import { isTextField } from '@wordpress/dom';
 
 /**
- * Elements whose content the browser's own undo acts on (a dialog input, an
- * HTML editing field, a search field), registered through `useNativeUndo`.
- * The editor history must not act on events originating within them.
+ * How long after a keystroke a field's history edit is still attributed to
+ * it. Covers fields that commit to the history on a short debounce.
  */
-const nativeUndoNodes = new WeakSet< Element >();
+const SETTLE_DELAY = 500;
 
 /**
- * Returns a ref that marks an element (and its descendants) as relying on
- * the browser's own undo, so the editor history leaves the undo and redo
- * shortcuts alone within it.
+ * Text fields observed while typing, mapped to whether their typing reached
+ * the editor history (`true`) or stayed in the field (`false`).
+ */
+const fieldHistory = new WeakMap< Element, boolean >();
+
+/**
+ * Resolves the element an event really originates from. Events coming from
+ * the editor canvas are re-dispatched on the iframe element, so the real
+ * target is the frame's focused element.
  *
- * @return Ref callback.
+ * @param event Keyboard event.
+ *
+ * @return The originating element.
  */
-export function useNativeUndo() {
-	return useRefEffect< Element >( ( node ) => {
-		nativeUndoNodes.add( node );
-		return () => {
-			nativeUndoNodes.delete( node );
-		};
-	}, [] );
+function getEventTarget( event: Event ): Element | null | undefined {
+	const target = event.target as Element | null | undefined;
+
+	if ( target?.nodeName === 'IFRAME' ) {
+		return ( target as HTMLIFrameElement ).contentDocument?.activeElement;
+	}
+
+	return target;
 }
 
 /**
- * Returns true when the event originates from an element registered through
- * `useNativeUndo`.
+ * Returns the text field an event originates from, if any.
  *
- * Events coming from the editor canvas are re-dispatched on the iframe
- * element, so the real target is resolved through the frame's focused
- * element.
+ * @param event Keyboard event.
+ *
+ * @return The text field, or null.
+ */
+function getTextField( event: Event ): HTMLElement | null {
+	const target = getEventTarget( event );
+
+	if ( ! target || ! isTextField( target ) ) {
+		return null;
+	}
+
+	return target as HTMLElement;
+}
+
+function getFieldValue( field: HTMLElement ): string | null {
+	if ( 'value' in field ) {
+		return ( field as HTMLInputElement ).value;
+	}
+
+	return field.textContent;
+}
+
+/**
+ * Observes typing in text fields to learn, per field, whether its text is
+ * part of the editor history. A keystroke that changes a field's value
+ * without changing the history means the field keeps its text locally (a
+ * dialog input, a search field), so the browser's own undo must act on it.
+ *
+ * Mount once, where the undo and redo shortcuts are handled.
+ *
+ * @param getRevision Returns a value that changes whenever the history does.
+ */
+export function useFieldHistoryTracking( getRevision: () => unknown ) {
+	useEffect( () => {
+		function onKeyDown( event: KeyboardEvent ) {
+			// Shortcuts do not type. Undo and redo themselves change the value
+			// and must not reclassify the field.
+			if ( event.metaKey || event.ctrlKey ) {
+				return;
+			}
+
+			const field = getTextField( event );
+
+			// A field known to edit the history stays so, and block rich text
+			// always does, so neither needs observing.
+			if (
+				! field ||
+				fieldHistory.get( field ) ||
+				field.classList.contains( 'block-editor-rich-text__editable' )
+			) {
+				return;
+			}
+
+			const value = getFieldValue( field );
+			const revision = getRevision();
+			const { defaultView } = field.ownerDocument;
+
+			// React applies the change within the input event, so the history
+			// has already moved by the next task if the field edits it.
+			defaultView?.setTimeout( () => {
+				if ( getFieldValue( field ) === value ) {
+					return;
+				}
+
+				if ( getRevision() !== revision ) {
+					fieldHistory.set( field, true );
+					return;
+				}
+
+				fieldHistory.set( field, false );
+
+				// A field that commits on a debounce edits the history later.
+				defaultView.setTimeout( () => {
+					if ( getRevision() !== revision ) {
+						fieldHistory.set( field, true );
+					}
+				}, SETTLE_DELAY );
+			} );
+		}
+
+		// Capture, so fields that stop propagation are still observed. Canvas
+		// key events arrive here re-dispatched on the iframe element.
+		document.addEventListener( 'keydown', onKeyDown, true );
+		return () => {
+			document.removeEventListener( 'keydown', onKeyDown, true );
+		};
+	}, [ getRevision ] );
+}
+
+/**
+ * Returns true when the editor history must leave the undo or redo shortcut
+ * of this event to the browser: the event comes from a text field whose
+ * typing does not reach the editor history.
+ *
+ * A text field not typed in yet is left to the browser, except an editable
+ * region (rich text), which edits the history directly.
  *
  * @param event Keyboard event.
  *
  * @return Whether the element relies on the browser's own undo.
  */
 export function usesNativeUndo( event: KeyboardEvent ): boolean {
-	let target = event.target as Element | null | undefined;
+	const field = getTextField( event );
 
-	if ( target?.nodeName === 'IFRAME' ) {
-		target = ( target as HTMLIFrameElement ).contentDocument?.activeElement;
+	if ( ! field ) {
+		return false;
 	}
 
-	while ( target ) {
-		if ( nativeUndoNodes.has( target ) ) {
-			return true;
-		}
-		target = target.parentElement;
+	const isInHistory = fieldHistory.get( field );
+
+	if ( isInHistory !== undefined ) {
+		return ! isInHistory;
 	}
 
-	return false;
+	return field.nodeName === 'INPUT' || field.nodeName === 'TEXTAREA';
 }
