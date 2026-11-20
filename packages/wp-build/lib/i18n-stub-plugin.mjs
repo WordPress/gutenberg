@@ -44,6 +44,11 @@ const TRANSLATOR_COMMENT_PREFIXES = [ 'translators', 'Translators' ];
 /** @typedef {import('rolldown/utils').ParseResult['comments'][number]} Comment */
 /** @typedef {keyof typeof I18N_FUNCTIONS} I18nFunctionName */
 
+/*
+ * The calls of each module, shared by all the bundles of a build. Entries are
+ * never invalidated, which is safe because a build runs once: watch mode
+ * ignores `--no-script-debug`, so it never uses this plugin.
+ */
 /** @type {Map<string, I18nCall[]>} */
 const extractionCache = new Map();
 
