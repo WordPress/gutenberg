@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   List View: Keep anchor badges distinct and focus rings visible on selected blocks and synced patterns ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
