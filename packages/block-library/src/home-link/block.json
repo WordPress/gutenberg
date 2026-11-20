@@ -80,6 +80,9 @@
 			"clientNavigation": true
 		}
 	},
+	"selectors": {
+		"dimensions": ".wp-block-home-link:not(.wp-block-navigation__responsive-container.is-menu-open *)"
+	},
 	"editorStyle": "wp-block-home-link-editor",
 	"style": "wp-block-home-link"
 }
