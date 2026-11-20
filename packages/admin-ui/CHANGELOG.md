@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Breadcrumbs`: A last item with a `to` link now has `aria-current="page"` ([#87050](https://github.com/WordPress/gutenberg/pull/87050)).
+
 ## 3.2.0 (2026-11-18)
 
 ### Internal
