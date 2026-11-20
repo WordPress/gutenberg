@@ -30,3 +30,11 @@ function gutenberg_test_default_excerpt() {
 	return 'My default excerpt';
 }
 add_filter( 'default_excerpt', 'gutenberg_test_default_excerpt' );
+
+/**
+ * Change the empty post placeholder.
+ */
+function gutenberg_test_write_your_story() {
+	return 'My default placeholder';
+}
+add_filter( 'write_your_story', 'gutenberg_test_write_your_story' );
