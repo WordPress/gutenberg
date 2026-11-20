@@ -30,16 +30,19 @@ function renderAppender(
  * @param props.rootClientId            Client id of the Navigation block.
  * @param props.navigationClientId      Client id of the Navigation block, when `rootClientId` points elsewhere (for example a Page List).
  * @param props.showAutoMenuDescription Whether an Auto menu says what it is.
+ * @param props.onAddPage               Adds a page from an Auto menu, where the screen has its own way to. Otherwise the Pages screen opens.
  */
 export default function NavigationMenuListView( {
 	rootClientId,
 	navigationClientId = rootClientId,
 	showAutoMenuDescription = true,
+	onAddPage,
 	...listViewProps
 }: {
 	rootClientId: string;
 	navigationClientId?: string;
 	showAutoMenuDescription?: boolean;
+	onAddPage?: () => void;
 	// Remaining props, passed to `PrivateListView`, whose props aren't
 	// exported.
 	[ key: string ]: any;
@@ -64,6 +67,7 @@ export default function NavigationMenuListView( {
 			<AutoMenu
 				navigationClientId={ navigationClientId }
 				showDescription={ showAutoMenuDescription }
+				onAddPage={ onAddPage }
 			/>
 		);
 	}

@@ -255,10 +255,9 @@ function NavigationMenuAppender(
 
 	const dropdown = (
 		<DropdownMenu
-			// Inside a submenu, the button uses the Submenu block's own icon,
-			// whose arrow points inwards, so it reads as "add into this
-			// submenu" rather than the "+" that adds to the whole menu.
-			icon={ isSubmenu ? addSubmenu : plus }
+			// A "+" everywhere: the indent and the submenu's tint show where
+			// it adds to.
+			icon={ plus }
 			label={ label }
 			onToggle={ ( isOpen ) => {
 				if ( ! isOpen ) {

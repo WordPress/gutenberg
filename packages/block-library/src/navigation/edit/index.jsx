@@ -62,6 +62,7 @@ import AutoMenuBlockControls from '../menu-list-view/auto-menu-block-controls';
 import { useIsAutoMenu } from '../menu-list-view/auto-menu';
 import DeletedNavigationWarning from './deleted-navigation-warning';
 import NoMenuWarning from './no-menu-warning';
+import NavigationMenuSelector from './navigation-menu-selector';
 import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
@@ -74,6 +75,11 @@ import {
 } from '../constants';
 
 const { isNavigationPostEditorKey } = unlock( blockEditorPrivateApis );
+
+const CHOOSE_MENU_TOGGLE_PROPS = {
+	variant: 'secondary',
+	__next40pxDefaultSize: true,
+};
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -1091,10 +1097,21 @@ function Navigation( {
 				/>
 				<TagName { ...blockProps }>
 					<NoMenuWarning
-						currentMenuId={ ref }
-						onSelectNavigationMenu={ onSelectNavigationMenu }
-						onSelectClassicMenu={ onSelectClassicMenu }
-						onCreateNew={ createUntitledEmptyNavigationMenu }
+						chooseMenu={
+							<NavigationMenuSelector
+								currentMenuId={ ref }
+								onSelectNavigationMenu={
+									onSelectNavigationMenu
+								}
+								onSelectClassicMenu={ onSelectClassicMenu }
+								onCreateNew={
+									createUntitledEmptyNavigationMenu
+								}
+								icon={ null }
+								text={ __( 'Choose a menu' ) }
+								toggleProps={ CHOOSE_MENU_TOGGLE_PROPS }
+							/>
+						}
 					/>
 				</TagName>
 			</>

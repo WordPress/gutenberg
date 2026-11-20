@@ -86,12 +86,16 @@ function PageTree( { pages }: { pages: AutoMenuPage[] } ) {
  * @param props                    Component props.
  * @param props.navigationClientId Client id of the Navigation block.
  * @param props.showDescription    Whether to say what an Auto menu is.
+ * @param props.onAddPage          Opens the screen's own way to add a page.
+ *                                 Without it, the Pages screen opens.
  */
 export default function AutoMenu( {
 	navigationClientId,
 	showDescription = true,
+	onAddPage,
 }: {
 	navigationClientId: string;
+	onAddPage?: () => void;
 	// Off where the screen around it already says what an Auto menu is.
 	showDescription?: boolean;
 } ) {
@@ -170,7 +174,14 @@ export default function AutoMenu( {
 					<Button
 						__next40pxDefaultSize
 						variant="secondary"
-						href={ PAGES_SCREEN_URL }
+						{ ...( onAddPage
+							? { onClick: onAddPage }
+							: {
+									href: PAGES_SCREEN_URL,
+									description: __(
+										'Opens the Pages screen. New pages are added to this menu.'
+									),
+								} ) }
 						icon={ plus }
 						className="wp-block-navigation-auto-menu__add-page"
 						// Inline, as the route editor doesn't load block styles.
@@ -178,14 +189,13 @@ export default function AutoMenu( {
 							justifyContent: 'flex-start',
 							borderStyle: 'dashed',
 						} }
-						description={ __(
-							'Opens the Pages screen. New pages are added to this menu.'
-						) }
 					>
 						<span style={ { flex: 1, textAlign: 'start' } }>
 							{ __( 'Add a page' ) }
 						</span>
-						<WCIcon icon={ arrowRight } size={ 20 } />
+						{ ! onAddPage && (
+							<WCIcon icon={ arrowRight } size={ 20 } />
+						) }
 					</Button>
 				</Stack>
 			</Stack>

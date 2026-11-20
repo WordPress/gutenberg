@@ -2,6 +2,7 @@ import { store as blockEditorStore, BlockList } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { useNavigate } from '@wordpress/route';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
@@ -78,6 +79,7 @@ export default function NavigationMenuContent( {
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const navigate = useNavigate();
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
@@ -98,6 +100,8 @@ export default function NavigationMenuContent( {
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					additionalBlockContent={ NavigationLinkUI }
+					// The same as Add Page on the Pages screen.
+					onAddPage={ () => navigate( { to: '/types/page/new' } ) }
 					showContentPopover
 					isExpanded
 				/>

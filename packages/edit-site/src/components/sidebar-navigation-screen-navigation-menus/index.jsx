@@ -22,7 +22,7 @@ import { unlock } from '../../lock-unlock';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 
 const { useNavigationLocations } = unlock( blockLibraryPrivateApis );
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 // Copied from packages/block-library/src/navigation/edit/navigation-menu-selector.jsx.
 function buildMenuLabel( title, id, status ) {
@@ -70,9 +70,10 @@ function AddMenuAction() {
 }
 
 export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
-	const addMenu = globalThis.__experimentalNavigationMenuEditing ? (
-		<AddMenuAction />
-	) : undefined;
+	const isMenuEditing = !! globalThis.__experimentalNavigationMenuEditing;
+	// The menu open beside the list, if any.
+	const currentMenuId = useLocation().params?.postId;
+	const addMenu = isMenuEditing ? <AddMenuAction /> : undefined;
 	const {
 		records: navigationMenus,
 		isResolving: isResolvingNavigationMenus,
@@ -164,8 +165,13 @@ export default function SidebarNavigationScreenNavigationMenus( { backPath } ) {
 					<MenuListItem
 						postId={ id }
 						key={ id }
-						withChevron
+						withChevron={ ! isMenuEditing }
 						icon={ navigation }
+						aria-current={
+							isMenuEditing && String( id ) === currentMenuId
+								? true
+								: undefined
+						}
 					>
 						<MenuItemLabel navigationId={ id }>
 							{ buildMenuLabel(

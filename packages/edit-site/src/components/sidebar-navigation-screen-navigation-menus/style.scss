@@ -74,3 +74,13 @@
 	font-size: $helptext-font-size;
 	opacity: 0.7;
 }
+
+// On the white menu page, the items take the normal text colour. The weak
+// colour above is for the dark sidebar, and left expanded items, which the
+// list view colours itself, darker than the rest.
+.edit-site-navigation-menu-page .edit-site-sidebar-navigation-screen-navigation-menus__content {
+	.block-editor-list-view-block-select-button,
+	.block-editor-list-view-block__menu {
+		color: var(--wpds-color-foreground-interactive-neutral);
+	}
+}

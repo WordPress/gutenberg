@@ -110,12 +110,7 @@ export function AutoMenuCustomizeDialog( {
 		>
 			<p>
 				{ __(
-					'Your menu shows your published pages and adds new ones automatically.'
-				) }
-			</p>
-			<p>
-				{ __(
-					'If you customize it, its pages become links you can add to, remove, and reorder. New pages won’t be added to it automatically anymore.'
+					'You’ll be able to edit this menu, but new pages won’t be added to it automatically.'
 				) }
 			</p>
 		</ConfirmDialog>
