@@ -84,7 +84,7 @@ describe( 'block parser', () => {
 				} )
 			);
 
-			expect( block!.name ).toEqual( 'core/test-block' );
+			expect( block?.name ).toEqual( 'core/test-block' );
 			expect( block!.attributes ).toEqual( {
 				fruit: 'Bananas',
 				className: 'custom-class another-custom-class',
