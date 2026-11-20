@@ -4,6 +4,9 @@
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
 	white-space: pre-wrap;
+	// Scroll long unbroken lines (URLs, hashes, code) instead of letting them
+	// overflow the content area.
+	overflow-x: auto;
 }
 
 // Add low specificity default padding when a background is used.
