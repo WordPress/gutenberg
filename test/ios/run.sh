@@ -140,9 +140,14 @@ xcrun simctl bootstatus "$UDID" -b
 xcrun simctl spawn "$UDID" defaults write com.apple.keyboard.preferences DidShowContinuousPathIntroduction -bool true
 # The first suggestions a fresh simulator's keyboard computes, e.g. for a
 # double tapped word, block the app for up to 24 seconds, and the edit
-# menu for the selection then never shows. Turn suggestions off.
+# menu for the selection then never shows. Turn suggestions off where the
+# keyboard reads them: the iOS 26 keyboard ignores com.apple.Preferences.
 for KEY in KeyboardPrediction KeyboardAutocorrection KeyboardCheckSpelling; do
-	xcrun simctl spawn "$UDID" defaults write com.apple.Preferences "$KEY" -bool false
+	xcrun simctl spawn "$UDID" defaults write com.apple.keyboard.preferences "$KEY" -bool false
+	if [ "$( xcrun simctl spawn "$UDID" defaults read com.apple.keyboard.preferences "$KEY" )" != 0 ]; then
+		echo "Could not turn off $KEY in the simulator"
+		exit 1
+	fi
 done
 
 step "Generating the Xcode project"
