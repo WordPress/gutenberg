@@ -16,7 +16,7 @@
 
 ### Bug Fixes
 
--   List View: Keep focus rings visible on the Options and Move buttons of selected blocks and synced patterns when a custom theme adjusts its brand colors.
+-   List View: Keep focus rings visible on the Options and Move buttons of selected blocks and synced patterns when a custom theme adjusts its brand colors ([#87177](https://github.com/WordPress/gutenberg/pull/87177)).
 -   Block tools: Ignore keyboard shortcuts and Escape to exit pattern editing during IME composition ([#87355](https://github.com/WordPress/gutenberg/pull/87355)).
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
