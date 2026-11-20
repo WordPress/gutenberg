@@ -237,6 +237,9 @@ const withNearGrayChromaLimit = ( step: RampStepConfig ): RampStepConfig =>
 				taperChromaOptions: {
 					...step.taperChromaOptions,
 					preserveNearGrayTint: true,
+					preserveSeedSaturation:
+						step.taperChromaOptions === BG_SURFACE_TAPER_CHROMA ||
+						step.taperChromaOptions === STROKE_TAPER_CHROMA,
 				},
 			}
 		: step;
