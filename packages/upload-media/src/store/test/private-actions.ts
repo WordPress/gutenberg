@@ -379,13 +379,13 @@ describe( 'private actions', () => {
 				'the storage limit',
 				{ code: ErrorCode.STORAGE_LIMIT_REACHED },
 				ErrorCode.STORAGE_LIMIT_REACHED,
-				'"photo.jpg" was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
 			],
 			[
 				'another failure',
 				new Error( 'Network request failed' ),
 				ErrorCode.GENERAL,
-				'"photo.jpg" was uploaded, but some of the sub-sized images could not be saved.',
+				'"photo.jpg" was uploaded, but some of the image sizes could not be saved.',
 			],
 		] )(
 			'should warn when %s left a sub-size out',
@@ -438,7 +438,7 @@ describe( 'private actions', () => {
 					id: 'test-id',
 					code: ErrorCode.GENERAL,
 					message:
-						'"photo.heic" was uploaded, but some of the sub-sized images could not be saved.',
+						'"photo.heic" was uploaded, but some of the image sizes could not be saved.',
 				},
 			} );
 		} );

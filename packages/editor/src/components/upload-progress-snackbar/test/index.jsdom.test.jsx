@@ -341,7 +341,7 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
 		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
 			'warning',
-			'2 images were uploaded, but some of the sub-sized images could not be saved.',
+			'2 images were uploaded, but some of the image sizes could not be saved.',
 			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );
@@ -362,7 +362,7 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
-			'3 images were uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+			'3 images were uploaded, but some of the image sizes could not be saved because this site is out of storage space.',
 			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );
@@ -409,7 +409,7 @@ describe( 'UploadProgressSnackbar', () => {
 
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
-			'2 images were uploaded, but some of the sub-sized images could not be saved.',
+			'2 images were uploaded, but some of the image sizes could not be saved.',
 			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );

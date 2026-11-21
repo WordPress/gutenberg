@@ -149,7 +149,7 @@ export function getErrorMessage(
 }
 
 /**
- * Gets the message for an image that uploaded without all of its files.
+ * Gets the message for an image that uploaded without all of its image sizes.
  *
  * @param code     The error code of the failure that left a file out.
  * @param fileName The name of the uploaded file.
@@ -163,7 +163,7 @@ export function getIncompleteUploadMessage(
 		return sprintf(
 			/* translators: %s: file name */
 			__(
-				'"%s" was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.'
+				'"%s" was uploaded, but some of the image sizes could not be saved because this site is out of storage space.'
 			),
 			fileName
 		);
@@ -172,7 +172,7 @@ export function getIncompleteUploadMessage(
 	return sprintf(
 		/* translators: %s: file name */
 		__(
-			'"%s" was uploaded, but some of the sub-sized images could not be saved.'
+			'"%s" was uploaded, but some of the image sizes could not be saved.'
 		),
 		fileName
 	);
