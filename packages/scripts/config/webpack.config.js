@@ -1,6 +1,7 @@
 const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const { realpathSync } = require( 'fs' );
-const { exec } = require( 'child_process' );
+const { execFile } = require( 'child_process' );
+const { promisify } = require( 'util' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
@@ -281,13 +282,24 @@ class BlocksManifestPlugin {
 	 * @param {webpack.Compiler} compiler The compiler instance.
 	 */
 	apply( compiler ) {
-		compiler.hooks.afterEmit.tap( 'BlocksManifest', () => {
-			exec(
-				`node "${ fromScriptsRoot(
-					'build-blocks-manifest'
-				) }" --input="${ compiler.options.output.path }"`
-			);
-		} );
+		compiler.hooks.afterEmit.tapPromise(
+			'BlocksManifest',
+			async ( compilation ) => {
+				try {
+					await promisify( execFile )( process.execPath, [
+						fromScriptsRoot( 'build-blocks-manifest' ),
+						`--input=${ compiler.options.output.path }`,
+					] );
+				} catch ( error ) {
+					compilation.errors.push(
+						new webpack.WebpackError(
+							( error.stdout + error.stderr ).trim() ||
+								error.message
+						)
+					);
+				}
+			}
+		);
 	}
 }
 
