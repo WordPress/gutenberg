@@ -98,6 +98,8 @@ export type ReceiveItemsAction = {
 	query?: Query | null;
 	key?: string;
 	invalidateCache?: boolean;
+	// Whether a REST read by a record resolver returned the items.
+	isFetched?: boolean;
 };
 
 /**

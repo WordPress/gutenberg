@@ -5,6 +5,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import type { ConnectionStatus } from '@wordpress/sync';
 import { STORE_NAME } from './name';
+import { receiveEntityRecords } from './actions';
 import { getEntitySyncManager } from './entity-sync';
 import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
@@ -16,6 +17,7 @@ import type {
 	SaveDirtyEntitiesOptions,
 } from './private-types';
 import type { DeleteEntityRecordOptions, EntityConfig } from './types';
+import isSafeEntityKey from './utils/is-safe-entity-key';
 
 /**
  * Returns an action object used in signalling that the registered post meta
@@ -35,6 +37,22 @@ export function receiveRegisteredPostMeta(
 		postType,
 		registeredPostMeta,
 	};
+}
+
+/**
+ * Returns an action object used in signalling that entity records read by a
+ * `getEntityRecord` or `getEntityRecords` request have been received. Such a
+ * read may be older than a record received directly, so it does not count as
+ * a direct receipt.
+ *
+ * @param args The arguments of `receiveEntityRecords`.
+ *
+ * @return Action object.
+ */
+export function receiveFetchedEntityRecords(
+	...args: Parameters< typeof receiveEntityRecords >
+) {
+	return { ...receiveEntityRecords( ...args ), isFetched: true };
 }
 
 /**
@@ -95,6 +113,9 @@ export const editMediaEntity =
 			} );
 
 			try {
+				if ( ! isSafeEntityKey( recordId ) ) {
+					throw new Error( 'Invalid entity record key.' );
+				}
 				const path = `${ entityConfig.baseURL }/${ recordId }/edit`;
 				// The REST API responds with the duplicated attachment.
 				const newRecord = ( await __unstableFetch( {

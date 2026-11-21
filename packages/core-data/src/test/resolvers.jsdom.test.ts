@@ -60,7 +60,7 @@ describe( 'getEntityRecord', () => {
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
 	let dispatch: DispatchMock<
-		| 'receiveEntityRecords'
+		| 'receiveFetchedEntityRecords'
 		| '__unstableAcquireStoreLock'
 		| '__unstableReleaseStoreLock'
 		| 'recordSyncUndoLevel'
@@ -68,10 +68,12 @@ describe( 'getEntityRecord', () => {
 		| 'finishResolutions'
 	>;
 	let syncManager: Record< string, Mock >;
+	let select: { getDirectReceiptCount: Mock };
 
 	beforeEach( async () => {
+		select = { getDirectReceiptCount: vi.fn( () => 0 ) };
 		dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 			recordSyncUndoLevel: vi.fn(),
@@ -97,7 +99,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -106,7 +108,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST_TYPE,
@@ -133,7 +135,7 @@ describe( 'getEntityRecord', () => {
 			'postType',
 			'post',
 			query
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -142,7 +144,7 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST_TYPE,
@@ -180,7 +182,7 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		// ...while the resolution is invalidated and requested again.
@@ -188,9 +190,9 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			FRESH_POST_TYPE,
@@ -201,7 +203,9 @@ describe( 'getEntityRecord', () => {
 		deliverStaleResponse();
 		await staleRequest;
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			1
+		);
 
 		// The lock is still released for the discarded request.
 		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
@@ -232,31 +236,138 @@ describe( 'getEntityRecord', () => {
 			'root',
 			'postType',
 			'post'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'page'
-		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
 
 		deliverPostResponse();
 		await postRequest;
 
 		// Records are only superseded by a newer response for the same
 		// request, so both are received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			2
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			PAGE,
 			undefined
 		);
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			POST,
+			undefined
+		);
+	} );
+
+	it( 'requests the record again when it was received directly during the request', async () => {
+		const STALE_POST_TYPE = { slug: 'post', name: 'stale' };
+		const FRESH_POST_TYPE = { slug: 'post', name: 'fresh' };
+
+		let deliverStaleResponse: ( value?: unknown ) => void = () => {};
+		const staleResponseGate = new Promise( ( resolve ) => {
+			deliverStaleResponse = resolve;
+		} );
+
+		apiFetchMock
+			.mockImplementationOnce( () => ( {
+				json: () => staleResponseGate.then( () => STALE_POST_TYPE ),
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => Promise.resolve( FRESH_POST_TYPE ),
+			} ) );
+
+		const query = { context: 'view' };
+		const request = getEntityRecord(
+			'root',
+			'postType',
+			'post',
+			query
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// The record is received outside the resolver while the request is
+		// in flight, as the editor does with an upload's finalize response.
+		select.getDirectReceiptCount.mockReturnValue( 1 );
+
+		deliverStaleResponse();
+		await request;
+
+		expect( select.getDirectReceiptCount ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			'post',
+			'view'
+		);
+		expect( triggerFetch ).toHaveBeenCalledTimes( 2 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			1
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
+			'root',
+			'postType',
+			FRESH_POST_TYPE,
+			query
+		);
+		expect( dispatch.__unstableReleaseStoreLock ).toHaveBeenCalledTimes(
+			1
+		);
+	} );
+
+	it( 'keeps a newer response delivered after an older one was received', async () => {
+		const OLDER_POST_TYPE = { slug: 'post', name: 'older' };
+		const NEWER_POST_TYPE = { slug: 'post', name: 'newer' };
+
+		let deliverOlderResponse: ( value?: unknown ) => void = () => {};
+		const olderResponseGate = new Promise( ( resolve ) => {
+			deliverOlderResponse = resolve;
+		} );
+		let deliverNewerResponse: ( value?: unknown ) => void = () => {};
+		const newerResponseGate = new Promise( ( resolve ) => {
+			deliverNewerResponse = resolve;
+		} );
+
+		apiFetchMock
+			.mockImplementationOnce( () => ( {
+				json: () => olderResponseGate.then( () => OLDER_POST_TYPE ),
+			} ) )
+			.mockImplementationOnce( () => ( {
+				json: () => newerResponseGate.then( () => NEWER_POST_TYPE ),
+			} ) );
+
+		const olderRequest = getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		const newerRequest = getEntityRecord(
+			'root',
+			'postType',
+			'post'
+		)( thunkArgs( { dispatch, registry, resolveSelect, select } ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		// Responses arrive in the order the requests were made.
+		deliverOlderResponse();
+		await olderRequest;
+		deliverNewerResponse();
+		await newerRequest;
+
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			2
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenLastCalledWith(
+			'root',
+			'postType',
+			NEWER_POST_TYPE,
 			undefined
 		);
 	} );
@@ -288,6 +399,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -335,6 +447,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -366,7 +479,8 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
 		};
-		const select = {
+		const selectWithoutCollaboration = {
+			...select,
 			isCollaborationSupported: vi.fn( () => false ),
 		};
 
@@ -378,7 +492,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
-				select,
+				select: selectWithoutCollaboration,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -386,8 +500,10 @@ describe( 'getEntityRecord', () => {
 		);
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
-		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect(
+			selectWithoutCollaboration.isCollaborationSupported
+		).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'post',
 			POST_RECORD,
@@ -422,6 +538,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -467,6 +584,7 @@ describe( 'getEntityRecord', () => {
 			1
 		)(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -512,6 +630,7 @@ describe( 'getEntityRecord', () => {
 		// Call with a query parameter
 		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )(
 			thunkArgs( {
+				select,
 				dispatch,
 				registry,
 				resolveSelect: resolveSelectWithSync,
@@ -561,7 +680,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'dispatches the requested post type', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -580,7 +699,7 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// The record should have been received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'root',
 			'postType',
 			Object.values( POST_TYPES ),
@@ -593,7 +712,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'Uses state locks', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -625,7 +744,7 @@ describe( 'getEntityRecords', () => {
 	it( 'marks specific entity records as resolved', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -654,7 +773,7 @@ describe( 'getEntityRecords', () => {
 	it( 'caches permissions and marks entity records as resolved when using _fields', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -706,7 +825,7 @@ describe( 'getEntityRecords', () => {
 	it( 'does not cache permissions when _links field is missing from response', async () => {
 		const finishResolutions = vi.fn();
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -748,7 +867,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'provides pagination metadata and progressive loading during intermediate results fetching', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
 			finishResolutions: vi.fn(),
@@ -779,10 +898,12 @@ describe( 'getEntityRecords', () => {
 		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			4
+		);
 
 		// Check that the first call already includes pagination metadata
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			expect.any( Array ),
@@ -793,7 +914,7 @@ describe( 'getEntityRecords', () => {
 		);
 
 		// Check that all calls include pagination metadata
-		dispatch.receiveEntityRecords.mock.calls.forEach( ( call ) => {
+		dispatch.receiveFetchedEntityRecords.mock.calls.forEach( ( call ) => {
 			// 7th parameter is the pagination metadata
 			expect( call[ 6 ] ).toEqual(
 				expect.objectContaining( { totalItems: 5, totalPages: 1 } )
@@ -801,7 +922,7 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// Should process all the data from the 3 mock pages (2+2+1=5 records total)
-		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenLastCalledWith(
 			'postType',
 			'attachment',
 			expect.arrayContaining( [
@@ -1045,7 +1166,7 @@ describe( 'getEntityRecords', () => {
 describe( 'taxonomy pagination', () => {
 	const registry = { batch: ( callback: () => void ) => callback() };
 	let dispatch: DispatchMock<
-			| 'receiveEntityRecords'
+			| 'receiveFetchedEntityRecords'
 			| '__unstableAcquireStoreLock'
 			| '__unstableReleaseStoreLock'
 		>,
@@ -1053,7 +1174,7 @@ describe( 'taxonomy pagination', () => {
 
 	beforeEach( async () => {
 		dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn().mockResolvedValue( 'lock' ),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
@@ -1132,7 +1253,7 @@ describe( 'taxonomy pagination', () => {
 			page: 1,
 		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',
 			'category',
 			[
