@@ -29,7 +29,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 	const [ Editor, setEditor ] = useState< any >( null );
 	const navigate = useNavigate();
 	const { onNavigateToEntityRecord, onNavigateToPreviousEntityRecord } =
-		useNavigateToEntityRecord();
+		useNavigateToEntityRecord( canvas.postType, canvas.postId );
 	const onActionPerformed = useActionPerformed( canvas.postType );
 
 	/*
