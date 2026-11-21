@@ -6,6 +6,12 @@
 
 -   Support HEIC/HEIF image sequences (Apple Live Photos, Android bursts). The sequence's first frame is decoded to a JPEG and uploaded as the attachment, and its motion is re-encoded to a web-safe video (MP4/WebM) sideloaded as an `animated_video` companion — the same model animated GIFs use. Sequences are detected by sniffing the container, since exported Live Photos routinely arrive typed as ordinary `image/heic` stills. Falls back to uploading the original untouched when the platform cannot decode HEVC ([#79642](https://github.com/WordPress/gutenberg/issues/79642), [#79647](https://github.com/WordPress/gutenberg/pull/79647)).
 
+## 0.45.0 (2026-11-18)
+
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

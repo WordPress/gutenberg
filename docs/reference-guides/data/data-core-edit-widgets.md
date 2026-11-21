@@ -44,13 +44,17 @@ _Returns_
 
 Given a child client id, returns the parent widget area block.
 
+_Type_
+
+- `(state: Record<string, unknown>, clientId: string) => Block | null`
+
 _Parameters_
 
 - _clientId_ `string`: The client id of a block in a widget area.
 
 _Returns_
 
-- `WPBlock`: The widget area block.
+- `Block | null`: The widget area block.
 
 ### getReferenceWidgetBlocks
 

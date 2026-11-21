@@ -10,6 +10,8 @@
 
 -   Add `convertHeicSequenceToVideo` to re-encode a demuxed HEIC/HEIF image sequence (Live Photo / burst) to a web-safe video, decoding its HEVC frames with the WebCodecs `VideoDecoder`. Any display rotation carried by the sequence is baked into the encoded frames, and the same total-pixel budget as the GIF path applies ([#79642](https://github.com/WordPress/gutenberg/issues/79642), [#79647](https://github.com/WordPress/gutenberg/pull/79647)).
 
+## 0.11.0 (2026-11-18)
+
 ## 0.10.0 (2026-11-04)
 
 ## 0.9.0 (2026-10-20)

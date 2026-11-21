@@ -633,8 +633,9 @@ const withBlockReset =
 			 * If there are old and new blocks that:
 			 * - have the same `clientId`
 			 * - have the `controlledInnerBlocks` flag
-			 * - don't have any own, uncontrolled children
 			 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
+			 * The controller owns the inner blocks, so any inner blocks the action
+			 * gives such a block are replaced.
 			 * Nested controllers (e.g., `post-content`, patterns) don't lose their
 			 * controlled status and don't unnecessarily re-clone blocks.
 			 */
@@ -659,10 +660,9 @@ const withBlockReset =
 						continue;
 					}
 					newState.controlledInnerBlocks.add( clientId );
-					const oldOrder = state.order.get( clientId );
-					if ( ! oldOrder?.length ) {
-						continue;
-					}
+					// The controller owns its inner blocks, even when it has
+					// none, so they replace any the action gives it.
+					const oldOrder = state.order.get( clientId ) ?? [];
 					newState.order.set( clientId, oldOrder );
 					const preserveBlock = (
 						blockId: string,
@@ -693,12 +693,12 @@ const withBlockReset =
 			// (entity-level IDs), but we need them to reference the preserved
 			// cloned inner blocks instead. The entries are the blocks from the
 			// action, so they are replaced, and their ancestors after them.
+			// Controlled inner blocks live only under the `controlled||` key,
+			// so the controller's own entry has none, as it does outside a
+			// reset.
 			const fixedClientIds: string[] = [];
 			for ( const clientId of newState.controlledInnerBlocks ) {
-				const controlledOrder = newState.order.get( clientId );
-				if ( ! controlledOrder?.length ) {
-					continue;
-				}
+				const controlledOrder = newState.order.get( clientId )!;
 				const innerBlocks = controlledOrder.map(
 					( id ) => state!.tree.get( id ) as TreeBlock
 				);
@@ -706,7 +706,7 @@ const withBlockReset =
 				if ( existingEntry ) {
 					newState.tree.set( clientId, {
 						...existingEntry,
-						innerBlocks,
+						innerBlocks: [],
 					} );
 					fixedClientIds.push( clientId );
 				}
@@ -1054,15 +1054,12 @@ export const blocks = pipe(
 				} );
 				newState.set(
 					'',
-					( state.get( '' ) ?? [] ).concat(
-						// @ts-expect-error `blockOrder` is a `Map`, so this reads `undefined`.
-						blockOrder[ '' ]
-					)
+					( state.get( '' ) ?? [] ).concat( blockOrder.get( '' )! )
 				);
 				return newState;
 			}
 			case 'INSERT_BLOCKS': {
-				const { rootClientId = '' } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const subState = state.get( rootClientId ) || [];
 				const mappedBlocks = mapBlockOrder(
 					action.blocks,
@@ -1085,11 +1082,9 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_TO_POSITION': {
-				const {
-					fromRootClientId = '',
-					toRootClientId = '',
-					clientIds,
-				} = action;
+				const { clientIds } = action;
+				const fromRootClientId = action.fromRootClientId ?? '';
+				const toRootClientId = action.toRootClientId ?? '';
 				const { index = state.get( toRootClientId )!.length } = action;
 
 				// Moving inside the same parent block.
@@ -1128,7 +1123,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_UP': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const subState = state.get( rootClientId )!;
 
@@ -1151,7 +1147,8 @@ export const blocks = pipe(
 			}
 
 			case 'MOVE_BLOCKS_DOWN': {
-				const { clientIds, rootClientId = '' } = action;
+				const { clientIds } = action;
+				const rootClientId = action.rootClientId ?? '';
 				const firstClientId = clientIds[ 0 ];
 				const lastClientId = clientIds[ clientIds.length - 1 ];
 				const subState = state.get( rootClientId )!;
@@ -1924,10 +1921,14 @@ export function preferences(
 					let id = blockName;
 					// If a block variation match is found change the name to be the same with the
 					// one that is used for block variations in the Inserter (`getItemFromVariation`).
-					const match = select( blocksStore ).getActiveBlockVariation(
-						blockName,
-						attributes
-					);
+					const { getActiveBlockVariation, getBlockVariations } =
+						select( blocksStore );
+					// Fall back to the default variation, which replaces the block in the Inserter.
+					const match =
+						getActiveBlockVariation( blockName, attributes ) ??
+						getBlockVariations( blockName, 'inserter' )?.find(
+							( { isDefault } ) => isDefault
+						);
 					if ( match?.name ) {
 						id += '/' + match.name;
 					}
