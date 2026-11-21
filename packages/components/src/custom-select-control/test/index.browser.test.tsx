@@ -1,9 +1,17 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { page, userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { logged } from '@wordpress/deprecated';
 import { useState } from '@wordpress/element';
 import _CustomSelectControl from '..';
+
+const DEPRECATION_MESSAGE =
+	'wp.components.CustomSelectControl is deprecated since version 7.3 and will be removed in version 7.6. Please use SelectControl from @wordpress/ui instead. See: https://wordpress.github.io/gutenberg/?path=/docs/components-customselectcontrol--migration-guide';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 const UncontrolledCustomSelectControl = (
 	props: React.ComponentProps< typeof _CustomSelectControl >
@@ -87,6 +95,12 @@ const ControlledCustomSelectControl = ( {
 		/>
 	);
 };
+
+it( 'warns with a link to the migration guide', async () => {
+	delete logged[ DEPRECATION_MESSAGE ];
+	await render( <UncontrolledCustomSelectControl { ...props } /> );
+	expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
+} );
 
 it( 'Should apply external controlled updates', async () => {
 	const mockOnChange = vi.fn();

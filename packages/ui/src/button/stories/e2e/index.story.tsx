@@ -149,3 +149,15 @@ export const TextOverflow: Story = {
 		textOverflowContainers: true,
 	},
 };
+
+export const TextOverflowWithIcon: Story = {
+	args: {
+		children: [
+			<Button.Icon icon={ wordpress } key="icon" />,
+			'This is an extremely long label thatshoulddemonstratetextoverflow behavior',
+		],
+	},
+	parameters: {
+		textOverflowContainers: true,
+	},
+};
