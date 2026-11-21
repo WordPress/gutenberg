@@ -97,6 +97,8 @@ When you change a component's Storybook `parameters.componentStatus.status` or i
 
 The Design System MCP catalog uses a curated Storybook manifest. Add `tags: [ 'manifest' ]` to a recommended component's story metadata, and remove the tag from the component it replaces. The tag is independent of `componentStatus`, so update both when changing the recommendation. Update the ESLint rule's replacement guidance and any migration documentation as needed. Run `npm run storybook:build` and `npm run storybook:manifest-snapshot`, then review and commit the generated snapshot and any allowlist reductions. See [Manifest snapshot regression testing](../../storybook/README.md#manifest-snapshot-regression-testing).
 
+When the component replaces one from `@wordpress/components`, the status change is one stage of [Replace a legacy component](../../docs/contributors/design/design-system-packages.md#replace-a-legacy-component).
+
 ## Compound Components
 
 This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
@@ -366,7 +368,7 @@ When the override also `composes` the primitive it extends, keep the override in
 
 Do not add new `--wp-ui-*` custom properties. Names in that prefix are public API. Existing ones remain supported; renaming or removing them is a breaking change.
 
-Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-elevation-lg`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
+Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-switch-height`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
 
 Style with semantic `--wpds-*` tokens, existing `--wp-ui-*` variables, props, or class composition. Do not introduce a new public CSS variable to make a value themeable.
 

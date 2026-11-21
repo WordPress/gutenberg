@@ -30,6 +30,7 @@ import {
 	TYPOGRAPHY_SUPPORT_KEY,
 	TYPOGRAPHY_SUPPORT_KEYS,
 } from './typography';
+import { TRANSFORM_SUPPORT_KEY, TransformPanel } from './transform';
 import {
 	DIMENSIONS_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
@@ -88,6 +89,7 @@ const styleSupportKeys = [
 	BACKGROUND_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 	SHADOW_SUPPORT_KEY,
+	TRANSFORM_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( nameOrType: string | BlockType ) =>
@@ -831,6 +833,9 @@ const skipSerializationPathsEdit: Record< string, string[] > = {
 	[ `${ BACKGROUND_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		BACKGROUND_SUPPORT_KEY,
 	],
+	[ `${ TRANSFORM_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		TRANSFORM_SUPPORT_KEY,
+	],
 };
 
 /**
@@ -1162,6 +1167,7 @@ function BlockStyleControls( {
 			<TypographyPanel { ...passedProps } />
 			<BorderPanel { ...passedProps } />
 			<DimensionsPanel { ...passedProps } />
+			<TransformPanel { ...passedProps } />
 		</BlockStyleStateProvider>
 	);
 }
@@ -1190,6 +1196,23 @@ const elementTypes = [
 const STYLE_BLOCK_PROPS_REFERENCE = {};
 
 /**
+ * Removes transform styles from an element style object and its pseudo
+ * selector styles, as transforms are for blocks only. Mirror of
+ * `gutenberg_remove_element_transform_styles()` in PHP.
+ *
+ * @param style Element style object.
+ * @return Element style object without transform styles.
+ */
+function omitElementTransformStyles( style: PanelStyle ): PanelStyle {
+	return omitStyle( style as BlockStyle, [
+		TRANSFORM_SUPPORT_KEY,
+		...Object.keys( style )
+			.filter( ( key ) => key.startsWith( ':' ) )
+			.map( ( key ) => [ key, TRANSFORM_SUPPORT_KEY ] ),
+	] ) as PanelStyle;
+}
+
+/**
  * Generates CSS rules for block element styles (buttons, links, headings, etc.).
  *
  * Iterates over supported element types and compiles their styles, including
@@ -1209,6 +1232,13 @@ function getElementCSSRules(
 	if ( ! blockElementStyles ) {
 		return;
 	}
+
+	blockElementStyles = Object.fromEntries(
+		Object.entries( blockElementStyles ).map( ( [ element, style ] ) => [
+			element,
+			omitElementTransformStyles( style ),
+		] )
+	);
 
 	const rules: string[] = [];
 

@@ -19,6 +19,28 @@ function gutenberg_render_elements_support( $block_content ) {
 }
 
 /**
+ * Removes transform styles from an element style object and its pseudo
+ * selector styles, as transforms are for blocks only.
+ *
+ * @param mixed $element_style Element style object.
+ * @return mixed Element style object without transform styles.
+ */
+function gutenberg_remove_element_transform_styles( $element_style ) {
+	if ( ! is_array( $element_style ) ) {
+		return $element_style;
+	}
+
+	unset( $element_style['transform'] );
+	foreach ( $element_style as $key => $value ) {
+		if ( is_string( $key ) && str_starts_with( $key, ':' ) && is_array( $value ) ) {
+			unset( $element_style[ $key ]['transform'] );
+		}
+	}
+
+	return $element_style;
+}
+
+/**
  * Determines whether an elements class name should be added to the block.
  *
  * @param array $block   Block object.
@@ -131,6 +153,10 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	if ( is_array( $element_block_styles ) ) {
+		$element_block_styles = array_map( 'gutenberg_remove_element_transform_styles', $element_block_styles );
+	}
+
 	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 	$skip_heading_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
 	$skip_button_color_serialization       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' );
@@ -152,6 +178,7 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	// @phpstan-ignore arguments.count (WordPress 7.0 requires the block, which 7.1 no longer takes and ignores.)
 	$class_name         = wp_get_elements_class_name( $parsed_block );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] ) ? $parsed_block['attrs']['className'] . " $class_name" : $class_name;
 

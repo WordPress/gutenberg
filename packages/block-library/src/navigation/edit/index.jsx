@@ -29,7 +29,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner as WCSpinner,
-	Notice,
+	Notice as WCNotice,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -357,12 +357,8 @@ function Navigation( {
 		await createNavigationMenu( '' );
 	};
 
-	const {
-		hasUncontrolledInnerBlocks,
-		uncontrolledInnerBlocks,
-		isInnerBlockSelected,
-		innerBlocks,
-	} = useInnerBlocks( clientId );
+	const { hasUncontrolledInnerBlocks, isInnerBlockSelected, innerBlocks } =
+		useInnerBlocks( clientId );
 
 	const {
 		replaceInnerBlocks,
@@ -895,14 +891,14 @@ function Navigation( {
 								</ToolsPanelItem>
 
 								{ submenuAccessibilityNotice && (
-									<Notice
+									<WCNotice
 										spokenMessage={ null }
 										status="warning"
 										isDismissible={ false }
 										className="wp-block-navigation__submenu-accessibility-notice"
 									>
 										{ submenuAccessibilityNotice }
-									</Notice>
+									</WCNotice>
 								) }
 							</>
 						) }
@@ -997,7 +993,7 @@ function Navigation( {
 					>
 						<UnsavedInnerBlocks
 							createNavigationMenu={ createNavigationMenu }
-							blocks={ uncontrolledInnerBlocks }
+							blocks={ innerBlocks }
 							hasSelection={ isSelected || isInnerBlockSelected }
 						/>
 					</ResponsiveWrapper>
