@@ -877,15 +877,15 @@ async function bundlePackage( packageName, options = {} ) {
 					?.map( ( d ) => d.replace( /'/g, '' ) ) || [];
 		}
 
-		const styleDeps = await inferStyleDependencies( scriptDependencies, {
-			resolveDir: path.join( PACKAGES_DIR, packageName ),
-			buildDir: BUILD_DIR,
-		} );
-
+		/*
+		 * Style dependencies are resolved by `resolveStyleDependencies()` once
+		 * every package is bundled, since they depend on which styles the
+		 * other packages register.
+		 */
 		builtStyles.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
 			path: `${ packageName }/style`,
-			dependencies: styleDeps,
+			scriptDependencies,
 		} );
 	}
 
@@ -894,6 +894,26 @@ async function bundlePackage( packageName, options = {} ) {
 		scripts: builtScripts,
 		styles: builtStyles,
 	};
+}
+
+/**
+ * Infer each style's dependencies from its package's script dependencies.
+ *
+ * Call this with the styles of every bundled package: a script dependency
+ * only becomes a style dependency when this build registers that style.
+ *
+ * @param {Array} styles Style info objects returned by `bundlePackage()`.
+ * @return {Array} Style info objects with their `dependencies`.
+ */
+function resolveStyleDependencies( styles ) {
+	const styleHandles = new Set( styles.map( ( { handle } ) => handle ) );
+	return styles.map( ( { scriptDependencies, ...style } ) => ( {
+		...style,
+		dependencies: inferStyleDependencies(
+			scriptDependencies,
+			styleHandles
+		),
+	} ) );
 }
 
 /**
@@ -2394,6 +2414,7 @@ async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 			}
 		} )
 	);
+	const resolvedStyles = resolveStyleDependencies( styles );
 
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {
@@ -2494,7 +2515,7 @@ async function buildAll( baseUrlExpression, { noScriptDebug = false } = {} ) {
 		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
-		generateStyleRegistrationPhp( styles, phpReplacements ),
+		generateStyleRegistrationPhp( resolvedStyles, phpReplacements ),
 		generateConstantsPhp( phpReplacements ),
 		generateRoutesRegistry( activeRoutes, phpReplacements ),
 		generateRoutesPhp( activeRoutes, phpReplacements ),
