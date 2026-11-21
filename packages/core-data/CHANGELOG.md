@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `getEntityRecord`: Fix a REST response that is delivered late overwriting a newer copy of the record ([#81846](https://github.com/WordPress/gutenberg/pull/81846)).
+-   `getEntityRecords`: Discard a list response that is delivered after a newer response for the same query, so a list read from the database before an update — as happens when a batch upload invalidates the attachment list once per file — can no longer replace a fresher one, overwrite the records it contains, or mark their resolutions finished ([#81886](https://github.com/WordPress/gutenberg/pull/81886)).
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 
