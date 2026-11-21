@@ -511,24 +511,6 @@
       - onConfirm
       - size
       - title
-- name: CustomSelectControl
-  props:
-      - __experimentalShowSelectedHint
-      - __next40pxDefaultSize
-      - __nextUnconstrainedWidth
-      - className
-      - describedBy
-      - hideLabelFromVision
-      - label
-      - onBlur
-      - onChange
-      - onFocus
-      - onMouseOut
-      - onMouseOver
-      - options
-      - showSelectedHint
-      - size
-      - value
 - name: DataForm
   props:
       - data
@@ -995,6 +977,15 @@
             - render
             - style
             - variant
+      - name: Notice.ActionButtonLink
+        props:
+            - children
+            - className
+            - openInNewTab
+            - render
+            - style
+            - target
+            - variant
       - name: Notice.ActionLink
         props:
             - children
@@ -1032,6 +1023,7 @@
         props:
             - children
             - className
+            - liveRegionContainer
             - render
             - style
       - name: Notice.Title
@@ -1040,6 +1032,22 @@
             - className
             - render
             - style
+- name: Page
+  props:
+      - actions
+      - ariaLabel
+      - badges
+      - breadcrumbs
+      - children
+      - className
+      - components
+      - hasPadding
+      - headingLevel
+      - navigation
+      - showSidebarToggle
+      - subTitle
+      - title
+      - visual
 - name: Popover
   props:
       - __unstableForcePosition

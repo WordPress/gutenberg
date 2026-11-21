@@ -19,8 +19,9 @@ import {
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
+import { filterSupportedEmojis } from './emoji-support';
 import { useFrequentEmojis } from './frequent-emojis';
-import { emojiToHexKey, getCuratedLabel } from './reaction-emojis';
+import { getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
 import EmojiPickerFooter, { createHighlightStore } from './emoji-picker-footer';
 
@@ -46,6 +47,8 @@ interface EmojiOption {
 	name: string;
 	// Normalized hexcode of the base record, used for usage tracking.
 	hexKey: string;
+	// The key a reaction with `value` is stored under.
+	reactionKey: string;
 }
 
 /**
@@ -63,10 +66,6 @@ interface EmojiPickerProps {
 	 * as its `render` element.
 	 */
 	trigger: ReactElement< Record< string, unknown > >;
-	/**
-	 * Whether the trigger is disabled.
-	 */
-	disabled?: boolean;
 	/**
 	 * Accessible name for the picker popup.
 	 */
@@ -228,14 +227,12 @@ export function searchEmojis(
  *
  * @param props                Component props.
  * @param props.trigger        The button that opens the picker.
- * @param props.disabled       Whether the trigger is disabled.
  * @param props.label          Accessible name for the popup.
  * @param props.reactedHexKeys Hex keys of the user's own reactions.
  * @param props.onSelect       Called with the selected emoji character.
  */
 export default function EmojiPicker( {
 	trigger,
-	disabled = false,
 	label,
 	reactedHexKeys = EMPTY_HEX_KEYS,
 	onSelect,
@@ -256,7 +253,10 @@ export default function EmojiPicker( {
 		error,
 		retry,
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
-	const data = useMemo( () => dataset ?? [], [ dataset ] );
+	const data = useMemo(
+		() => filterSupportedEmojis( dataset ?? [] ),
+		[ dataset ]
+	);
 	const [ query, setQuery ] = useState( '' );
 	const [ highlightStore ] = useState( createHighlightStore );
 
@@ -317,10 +317,9 @@ export default function EmojiPicker( {
 			 */
 			const display = applySkinTone( entry, skinTone );
 			const hexKey = normalizeHexcode( entry.hexcode );
+			const reactionKey = normalizeHexcode( display.hexcode );
 			const displayLabel =
-				getCuratedLabel( normalizeHexcode( display.hexcode ) ) ||
-				display.label ||
-				'';
+				getCuratedLabel( reactionKey ) || display.label || '';
 			return {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
@@ -332,6 +331,7 @@ export default function EmojiPicker( {
 							entry.label ||
 							displayLabel,
 				hexKey,
+				reactionKey,
 			};
 		};
 
@@ -369,6 +369,11 @@ export default function EmojiPicker( {
 		].filter( ( group ) => group.items.length > 0 );
 	}, [ groups, isSearching, query, frequentKeys, recordByHexKey, skinTone ] );
 
+	const reactedKeys = useMemo(
+		() => new Set( reactedHexKeys ),
+		[ reactedHexKeys ]
+	);
+
 	/**
 	 * Render grid rows of emoji cells, recording usage on selection.
 	 *
@@ -382,9 +387,7 @@ export default function EmojiPicker( {
 				className="editor-collab-sidebar-panel__picker-row"
 			>
 				{ row.map( ( option ) => {
-					const isReacted = reactedHexKeys.includes(
-						emojiToHexKey( option.value )
-					);
+					const isReacted = reactedKeys.has( option.reactionKey );
 					return (
 						<Autocomplete.Item
 							key={ option.key }
@@ -490,7 +493,6 @@ export default function EmojiPicker( {
 		>
 			<Autocomplete.Trigger
 				render={ trigger }
-				disabled={ disabled }
 				onMouseEnter={ warm }
 				onFocus={ warm }
 			/>

@@ -33,9 +33,11 @@
 			min-width: var(--wpds-dimension-size-sm); // This is the optimal icon size, and we size the whole button after this.
 		}
 
+		// Offsets are measured from the padding box, so subtract the
+		// button's reserved border to keep the 32px square.
 		&::before {
-			left: 2px;
-			right: 2px;
+			left: 2px - $border-width;
+			right: 2px - $border-width;
 		}
 	}
 }

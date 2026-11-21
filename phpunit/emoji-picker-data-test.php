@@ -17,7 +17,7 @@ class Emoji_Picker_Data_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_add_emojibase_settings
 	 */
-	public function test_emojibase_settings_injected() {
+	public function test_emojibase_settings_injected(): void {
 		$settings = gutenberg_add_emojibase_settings( array( 'existing' => true ) );
 
 		$this->assertTrue( $settings['existing'] );

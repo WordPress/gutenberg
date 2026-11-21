@@ -45,6 +45,8 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - `clientNavigation`: `true`
   - `interactive`: `true`
 - [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
+- [`transform`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#transform):
+  - `rotate`: `true`
 - [`dimensions`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#dimensions):
   - `minWidth`: `true`
   - `minHeight`: `true`
