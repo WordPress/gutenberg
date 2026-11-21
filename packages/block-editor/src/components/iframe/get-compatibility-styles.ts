@@ -47,6 +47,15 @@ export function getCompatibilityStyles(): Node[] {
 				return accumulator;
 			}
 
+			// Don't treat global styles custom properties as compatibility styles.
+			// They contain `.wp-block-*` selectors but are not editor canvas styles.
+			if (
+				( ownerNode as Element ).id ===
+				'global-styles-css-custom-properties-inline-css'
+			) {
+				return accumulator;
+			}
+
 			// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
 			if ( ! ( ownerNode as Element ).id ) {
 				return accumulator;

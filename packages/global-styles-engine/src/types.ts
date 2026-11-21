@@ -156,6 +156,8 @@ export interface TextShadowPreset extends BasePreset {
 }
 
 export interface TypographySettings {
+	customFontSize?: boolean;
+	lineHeight?: boolean;
 	fluid?: boolean | FluidTypographySettings;
 	fontSizes?: TypographyPreset[] | Record< string, TypographyPreset[] >;
 	fontFamilies?: Record< string, FontFamilyPreset[] >;
@@ -223,6 +225,26 @@ export interface BorderSettings {
 	radiusSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
+/**
+ * Aspect ratio preset definition
+ */
+export interface AspectRatioPreset extends BasePreset {
+	ratio: string;
+}
+
+/**
+ * Dimensions settings
+ */
+export interface DimensionsSettings {
+	aspectRatio?: boolean;
+	defaultAspectRatios?: boolean;
+	aspectRatios?: AspectRatioPreset[] | Record< string, AspectRatioPreset[] >;
+	height?: boolean;
+	minHeight?: boolean;
+	minWidth?: boolean;
+	width?: boolean;
+}
+
 // =============================================================================
 // GLOBAL STYLES STRUCTURE TYPES
 // =============================================================================
@@ -240,6 +262,7 @@ export interface GlobalStylesSettings {
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
 	border?: BorderSettings;
+	dimensions?: DimensionsSettings;
 	color?: {
 		palette?:
 			| Color[]
@@ -280,6 +303,7 @@ export interface GlobalStylesStyles {
 	color?: {
 		background?: UnresolvedValue;
 		text?: UnresolvedValue;
+		gradient?: UnresolvedValue;
 	};
 	typography?: {
 		fontFamily?: UnresolvedValue;
@@ -350,7 +374,12 @@ export interface GlobalStylesStyles {
 			>;
 		}
 	>;
-	blocks?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
+	blocks?: Record<
+		string,
+		Omit< GlobalStylesStyles, 'blocks' > & {
+			':hover'?: Omit< GlobalStylesStyles, 'blocks' >;
+		}
+	>;
 	variations?: Record< string, Omit< GlobalStylesStyles, 'blocks' > >;
 	css?: string;
 }

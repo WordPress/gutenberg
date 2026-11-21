@@ -30,6 +30,9 @@
 /bin                                            @manzoorwanijk
 /tools                                          @manzoorwanijk
 /test/php/gutenberg-coding-standards            @anton-vlasenko
+/tools/phpstan                                  @westonruter
+/phpstan.neon.dist                              @westonruter
+/phpstan-strict.neon.dist                       @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
@@ -37,9 +40,14 @@
 /packages/nux                                   @peterwilsoncc
 /packages/dataviews                             @oandregal @gigitux @ntsekouras
 /packages/theme                                 @WordPress/gutenberg-components
+/packages/theme-build-tools                     @WordPress/gutenberg-components
 /packages/ui                                    @WordPress/gutenberg-components
 /packages/widget-dashboard                      @retrofox
 /packages/grid                                  @retrofox
+
+# Icons
+/packages/icons/src/library                     @jasmussen
+/packages/icons/src/manifest.json               @jasmussen
 
 # Utilities
 /packages/dom                                   @ellatrix
@@ -55,6 +63,10 @@
 
 # Project Management
 /.github                                        @desrosj
+
+# Review routing
+/.github/review-routing                         @aduth
+/tools/review-routing                           @aduth
 
 # wp-env
 /packages/env                                   @t-hamano

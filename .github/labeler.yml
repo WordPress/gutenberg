@@ -158,6 +158,10 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/image-cropper/**'
 
+'[Package] Image Editor':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/image-editor/**'
+
 '[Package] Interactivity':
     - changed-files:
           - any-glob-to-any-file: 'packages/interactivity/**'
@@ -245,6 +249,10 @@
 '[Package] Theme':
     - changed-files:
           - any-glob-to-any-file: 'packages/theme/**'
+
+'[Package] Theme Build Tools':
+    - changed-files:
+          - any-glob-to-any-file: 'packages/theme-build-tools/**'
 
 '[Package] Token List':
     - changed-files:

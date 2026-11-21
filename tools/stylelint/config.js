@@ -1,16 +1,37 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
+// Sass treats hyphens and underscores in identifiers as equivalent.
+const FONT_FAMILY_VARIABLE =
+	/\$font[-_]family[-_](body|headings|mono)(?![\w-])/;
+
+const FONT_FAMILY_VARIABLE_REPLACEMENTS = {
+	body: 'var(--wpds-typography-font-family-body)',
+	headings: 'var(--wpds-typography-font-family-heading)',
+	mono: 'var(--wpds-typography-font-family-mono)',
+};
+
+const FONT_SIZE_VARIABLE =
+	/\$(?:font[-_]size[-_](x[-_]small|small|medium|large|x[-_]large|2x[-_]large)|default[-_]font[-_]size)(?![\w-])/;
+
+const FONT_SIZE_VARIABLE_REPLACEMENTS = {
+	'x-small': 'var(--wpds-typography-font-size-xs)',
+	small: 'var(--wpds-typography-font-size-sm)',
+	medium: 'var(--wpds-typography-font-size-md)',
+	large: 'var(--wpds-typography-font-size-lg)',
+	'x-large': 'var(--wpds-typography-font-size-xl)',
+	'2x-large': 'var(--wpds-typography-font-size-2xl)',
+};
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
 	plugins: [
 		'stylelint-plugin-logical-css',
-		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
+		'@wordpress/theme-build-tools/stylelint-plugins/no-token-fallback-values',
 	],
 	reportNeedlessDisables: true,
 	rules: {
-		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
 		'declaration-property-value-disallowed-list': [
@@ -19,6 +40,8 @@ module.exports = {
 					'/--wp-components-color-/',
 					'/\\$font-weight-regular/',
 					'/\\$font-weight-medium/',
+					`/${ FONT_FAMILY_VARIABLE.source }/`,
+					`/${ FONT_SIZE_VARIABLE.source }/`,
 				],
 				cursor: [ 'pointer' ],
 				'flex-direction': [ '/^(row|column)-reverse/' ],
@@ -43,7 +66,20 @@ module.exports = {
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
 					}
-					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
+					const [ , fontFamily ] =
+						value.match( FONT_FAMILY_VARIABLE ) ?? [];
+					if ( fontFamily ) {
+						return `Avoid using the \`$font-family-${ fontFamily }\` Sass variable. Use \`${ FONT_FAMILY_VARIABLE_REPLACEMENTS[ fontFamily ] }\` instead.`;
+					}
+					const fontSizeMatch = value.match( FONT_SIZE_VARIABLE );
+					if ( fontSizeMatch ) {
+						const size = fontSizeMatch[ 1 ]?.replace( /_/g, '-' );
+						const variable = size
+							? `$font-size-${ size }`
+							: '$default-font-size';
+						return `Avoid using the \`${ variable }\` Sass variable. Use \`${ FONT_SIZE_VARIABLE_REPLACEMENTS[ size ?? 'medium' ] }\` instead.`;
+					}
+					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are being removed from the components package.`;
 				},
 			},
 		],

@@ -1462,8 +1462,10 @@ test.describe( 'List View', () => {
 		await optionsForFileToggle.click();
 		await expect(
 			optionsForFileMenu,
-			'Pressing Space should also open the menu dropdown'
+			'Clicking should also open the menu dropdown'
 		).toBeVisible();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' ); // Keyboard shortcut for Delete.
 		await expect
@@ -1485,6 +1487,8 @@ test.describe( 'List View', () => {
 			optionsForFileMenu.getByRole( 'menuitem', { name: 'Delete' } ),
 			'The delete menu item should be hidden for locked blocks'
 		).toBeHidden();
+		await expect( optionsForFileMenu ).toBeFocused();
+		await page.keyboard.press( 'ArrowDown' );
 		await expect( firstMenuItem ).toBeFocused();
 		await pageUtils.pressKeys( 'access+z' );
 		await expect
@@ -1599,6 +1603,38 @@ test.describe( 'List View', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'keeps the canvas in place while scrolling to the selected block', async ( {
+		editor,
+		listViewUtils,
+		page,
+	} ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '2000px' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'link', { name: 'Spacer' } ).click();
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( () => ( document.scrollingElement.scrollTop = 0 ) );
+
+		const canvas = page.locator( '.editor-visual-editor' );
+		await canvas.evaluate( ( node ) =>
+			node.addEventListener( 'scroll', () =>
+				node.setAttribute( 'data-scrolled', '' )
+			)
+		);
+		await listView.getByRole( 'link', { name: 'Paragraph' } ).click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
+		).toBeInViewport( { ratio: 1 } );
+		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
 	} );
 } );
 

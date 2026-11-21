@@ -1,7 +1,11 @@
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
+import {
+	getBlockType,
+	isUnmodifiedBlock,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import type { Block } from '@wordpress/blocks';
 import type {
 	BlockEditorThunkArgs,
@@ -14,6 +18,9 @@ import type {
 	StyleOverride,
 	TreeBlock,
 } from './types';
+import { unlock } from '../lock-unlock';
+
+const { isContentBlock } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -411,22 +418,66 @@ export function setInsertionPoint( value: InsertionPoint | null ) {
  * Mark a contentOnly section as being edited.
  *
  * @param clientId The client id of the block.
+ * @return Thunk action.
  */
-export function editContentOnlySection( clientId?: string | null ) {
-	return {
-		type: 'EDIT_CONTENT_ONLY_SECTION',
-		clientId,
+export const editContentOnlySection =
+	( clientId?: string | null ) =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		if ( ! clientId ) {
+			dispatch( {
+				type: 'EDIT_CONTENT_ONLY_SECTION',
+				clientId,
+			} );
+			return;
+		}
+
+		const sectionClientId = select.isSectionBlock( clientId )
+			? clientId
+			: ( select.getParentSectionBlock( clientId ) ?? clientId );
+
+		if ( select.getSelectedBlockClientId() !== clientId ) {
+			dispatch.selectBlock( clientId );
+		}
+
+		dispatch( {
+			type: 'EDIT_CONTENT_ONLY_SECTION',
+			clientId: sectionClientId,
+		} );
 	};
-}
 
 /**
  * Action that stops editing a contentOnly section.
+ *
+ * @return Thunk action.
  */
-export function stopEditingContentOnlySection() {
-	return {
-		type: 'EDIT_CONTENT_ONLY_SECTION',
+export const stopEditingContentOnlySection =
+	() =>
+	( { select, dispatch }: BlockEditorThunkArgs ) => {
+		const editedSectionClientId = select.getEditedContentOnlySection();
+		if ( ! editedSectionClientId ) {
+			return;
+		}
+
+		const selectedClientId = select.getSelectedBlockClientId();
+		if ( selectedClientId ) {
+			const isWithinEditedSection =
+				selectedClientId === editedSectionClientId ||
+				select
+					.getBlockParents( selectedClientId )
+					.includes( editedSectionClientId );
+
+			if (
+				isWithinEditedSection &&
+				! isContentBlock( select.getBlockName( selectedClientId ) )
+			) {
+				dispatch.selectBlock( editedSectionClientId );
+			}
+		}
+
+		dispatch( {
+			type: 'EDIT_CONTENT_ONLY_SECTION',
+		} );
 	};
-}
 
 /**
  * Sets the zoom level.

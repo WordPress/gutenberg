@@ -19,12 +19,12 @@ const meta: Meta< typeof DashboardLanes > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 12, step: 1 },
-			description: 'Total lanes in fixed mode.',
+			description: 'Lane count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-lane lower bound in pixels.',
+				'Per-lane floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -233,45 +233,13 @@ export const InteractiveContent: Story = {
 };
 
 /**
- * Responsive lane count: derived from container width using
- * `minColumnWidth` as the per-lane lower bound. Resize the preview
- * frame to see the lane count adapt.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the lane
+ * count. `minColumnWidth` alone fits as many lanes of at least that width
+ * as the container allows. Together, `columns` caps what the floor fits:
+ * up to four lanes here, none narrower than 200px, down to one. Open the
+ * story full screen and resize the browser to walk the counts.
  */
-export const Responsive: Story = {
-	parameters: {
-		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
-	args: {
-		minColumnWidth: 200,
-		layout: [
-			{ key: 'a' },
-			{ key: 'b' },
-			{ key: 'c' },
-			{ key: 'd' },
-			{ key: 'e' },
-			{ key: 'f' },
-		],
-		children: [
-			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
-			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
-			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
-			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
-			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
-			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
-		],
-	},
-};
-
-/**
- * Layered configuration: `columns` caps the lane count and
- * `minColumnWidth` enforces a per-tile width floor. The surface
- * renders up to `columns` lanes on wide containers and reduces the
- * count on narrow ones whenever fitting all of them would push
- * tiles below `minColumnWidth`.
- */
-export const Layered: Story = {
+export const Columns: Story = {
 	parameters: {
 		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
@@ -296,6 +264,78 @@ export const Layered: Story = {
 			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
 			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
 		],
+	},
+};
+
+/**
+ * `columns` as a map: one lane from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each lane ends up; add `minColumnWidth` to lower it further.
+ */
+export const ColumnSteps: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		columns: { 0: 1, 600: 2, 960: 4 },
+		layout: [
+			{ key: 'fixed-1', width: 1 },
+			{ key: 'fixed-2', width: 2 },
+			{ key: 'fill-1', width: 2 },
+			{ key: 'fixed-3', width: 1 },
+			{ key: 'fixed-4', width: 1 },
+			{ key: 'fixed-5', width: 2 },
+			{ key: 'fill-2', width: 3 },
+			{ key: 'full-1', width: 1 },
+		],
+		children: [
+			<Tile key="fixed-1" tone="brand" height={ 120 } index={ 1 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-2" tone="info" height={ 200 } index={ 2 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-1" tone="success" height={ 80 } index={ 3 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fixed-3" tone="warning" height={ 160 } index={ 4 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-4" tone="error" height={ 100 } index={ 5 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-5" tone="neutral" height={ 240 } index={ 6 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="neutral" height={ 240 } index={ 7 }>
+				width: <strong>3</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral" height={ 240 } index={ 8 }>
+				width: <strong>1</strong>
+			</Tile>,
+		],
+	},
+};
+
+/**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two lanes
+ * below 960px, and 200px lanes fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	parameters: ColumnSteps.parameters,
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 200,
 	},
 };
 

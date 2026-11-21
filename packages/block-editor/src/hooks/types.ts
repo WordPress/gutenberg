@@ -193,7 +193,6 @@ export type BlockGapValue = string | { top?: string; left?: string };
  */
 export interface BlockMetadata {
 	name?: string;
-	noteId?: unknown;
 	blockVisibility?: BlockVisibility;
 	[ key: string ]: unknown;
 }
@@ -251,6 +250,7 @@ export interface AlignAttributes {
 export interface AlignEditProps {
 	name: string;
 	align?: string;
+	clientId: string;
 	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
 }
 
@@ -710,6 +710,21 @@ export type DimensionsAttributes = {
 };
 
 export interface DimensionsHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+}
+
+/**
+ * The block attributes the transform support reads.
+ */
+export type TransformAttributes = {
+	style?: PanelStyle;
+	className?: string;
+};
+
+export interface TransformHookPanelProps {
 	clientId: string;
 	name: string;
 	setAttributes: ( attributes: Record< string, unknown > ) => void;

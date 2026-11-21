@@ -6,7 +6,7 @@ import type { Form } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
-	Popover,
+	Popover as WCPopover,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { createPortal, useEffect, useMemo, useState } from '@wordpress/element';
@@ -254,7 +254,7 @@ export function QuickEditModal( {
 			</HStack>
 			{ modalElement &&
 				// Keep popovers inside modal isolation but outside the clipped frame.
-				createPortal( <Popover.Slot />, modalElement ) }
+				createPortal( <WCPopover.Slot />, modalElement ) }
 		</Modal>
 	);
 }

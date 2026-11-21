@@ -29,6 +29,12 @@ export type {
 } from './widget-host';
 
 /**
+ * Widget identity (type fields a render may read)
+ */
+export { useWidgetIdentity } from './widget-identity';
+export type { WidgetIdentity } from './widget-identity';
+
+/**
  * Types
  */
 export type {

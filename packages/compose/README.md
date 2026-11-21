@@ -239,7 +239,8 @@ Copies the given text to the clipboard when the element is clicked.
 _Parameters_
 
 - _text_ `string | ( () => string )`: The text to copy. Use a function if not already available and expensive to compute.
-- _onSuccess_ `() => void`: Called when to text is copied.
+- _onSuccess_ `() => void`: Called when the text is copied. Runs even after the element unmounts, so other UI can update.
+- _onError_ `() => void`: Called when copying fails. Runs even after the element unmounts, so other UI can update.
 
 _Returns_
 

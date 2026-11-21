@@ -14,7 +14,6 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
 import type {
 	ColorGradientDropdownItemProps,
 	ColorGradientTabConfig,
@@ -123,7 +122,6 @@ export function ColorToolsPanel( {
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
-			headingLevel={ 3 }
 			className="color-block-support-panel"
 			__experimentalFirstVisibleItemClass="first"
 			__experimentalLastVisibleItemClass="last"
@@ -155,7 +153,6 @@ export default function ColorPanel( {
 	children,
 	contrastWarning,
 	additionalElements,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: ColorPanelProps ) {
 	const {
 		colors,
@@ -331,12 +328,6 @@ export default function ColorPanel( {
 				userLinkColor ?? linkColor,
 				userHoverLinkColor ?? hoverLinkColor,
 			],
-			isPlaceholder:
-				userLinkColor === undefined &&
-				userHoverLinkColor === undefined &&
-				( linkColor !== undefined || hoverLinkColor !== undefined ),
-			hasInheritedValue:
-				linkColor !== undefined || hoverLinkColor !== undefined,
 			contrastWarning,
 			tabs: [
 				{
@@ -476,8 +467,6 @@ export default function ColorPanel( {
 		// as there isn't yet a way to set padding for the element.
 		const supportsBackground = name !== 'caption';
 
-		// Per-tab placeholder flags. The item-level placeholder is active when
-		// there is no local color on any axis and at least one inherited color.
 		const isElementTextPlaceholder =
 			elementTextUserColor === undefined &&
 			elementTextColor !== undefined;
@@ -486,17 +475,6 @@ export default function ColorPanel( {
 			elementBackgroundColor !== undefined;
 		const isElementGradientPlaceholder =
 			elementGradientUserColor === undefined &&
-			elementGradient !== undefined;
-		const isElementPlaceholder =
-			elementTextUserColor === undefined &&
-			elementBackgroundUserColor === undefined &&
-			elementGradientUserColor === undefined &&
-			( elementTextColor !== undefined ||
-				elementBackgroundColor !== undefined ||
-				elementGradient !== undefined );
-		const hasElementInheritedValue =
-			elementTextColor !== undefined ||
-			elementBackgroundColor !== undefined ||
 			elementGradient !== undefined;
 
 		items.push( {
@@ -514,8 +492,6 @@ export default function ColorPanel( {
 							elementBackgroundColor,
 					]
 				: [ elementTextUserColor ?? elementTextColor ],
-			isPlaceholder: isElementPlaceholder,
-			hasInheritedValue: hasElementInheritedValue,
 			tabs: [
 				hasSolidColors && {
 					key: 'text',
@@ -588,9 +564,6 @@ export default function ColorPanel( {
 					<ColorGradientDropdownItem
 						key={ key }
 						{ ...restItem }
-						showInheritanceLabelIndicators={
-							showInheritanceLabelIndicators
-						}
 						colorGradientControlSettings={ {
 							colors,
 							disableCustomColors: ! areCustomSolidsEnabled,
