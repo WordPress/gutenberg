@@ -16,18 +16,10 @@ import { unlock } from '../../lock-unlock';
 export default function useEditableRoot() {
 	const registry = useRegistry();
 	const enabled = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getSelectionStart,
-			canHostEditableRoot,
-			isZoomOut,
-		} = unlock( select( blockEditorStore ) );
-		// Not for a block selected as a whole, such as by pressing a list
-		// item's bullet: it keeps focus on its own element to be dragged.
+		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
+			unlock( select( blockEditorStore ) );
 		return (
-			! isZoomOut() &&
-			!! getSelectionStart().attributeKey &&
-			canHostEditableRoot( getSelectedBlockClientId() )
+			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
 		);
 	}, [] );
 
@@ -42,6 +34,26 @@ export default function useEditableRoot() {
 				hasMultiSelection,
 				isMultiSelecting,
 			} = registry.select( blockEditorStore );
+
+			const { activeElement } = node.ownerDocument;
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
+			const isFieldFocused =
+				activeElement !== node &&
+				( activeElement as HTMLElement | null )?.isContentEditable &&
+				node.contains( activeElement ) &&
+				getBlockClientId( activeElement ) ===
+					getSelectedBlockClientId();
+			// A tap focused the field while the caret is still in another
+			// block. Drop that caret: with the wrapper as the editing host,
+			// iOS would keep it instead of placing one at the tap.
+			if (
+				isFieldFocused &&
+				selection.anchorNode &&
+				! activeElement!.contains( selection.anchorNode )
+			) {
+				selection.removeAllRanges();
+			}
 
 			// Focus is moved separately below, only when an editable
 			// element belonging to the selected block holds it.
@@ -59,15 +71,8 @@ export default function useEditableRoot() {
 			// placed the caret yet; moving focus now would cancel the
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
-			const { activeElement } = node.ownerDocument;
-			// A mounted element's window has a selection.
-			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			if (
-				activeElement !== node &&
-				( activeElement as HTMLElement | null )?.isContentEditable &&
-				node.contains( activeElement ) &&
-				getBlockClientId( activeElement ) ===
-					getSelectedBlockClientId() &&
+				isFieldFocused &&
 				selection.anchorNode &&
 				activeElement!.contains( selection.anchorNode )
 			) {

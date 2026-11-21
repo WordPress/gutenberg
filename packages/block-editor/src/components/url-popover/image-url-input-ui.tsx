@@ -101,13 +101,7 @@ const ImageURLInputUI = ( {
 
 		let updatedRel;
 		if ( newLinkTarget ) {
-			const rels = ( rel ?? '' ).split( ' ' );
-			NEW_TAB_REL.forEach( ( relVal ) => {
-				if ( ! rels.includes( relVal ) ) {
-					rels.push( relVal );
-				}
-			} );
-			updatedRel = rels.join( ' ' );
+			updatedRel = rel || undefined;
 		} else {
 			const rels = ( rel ?? '' )
 				.split( ' ' )

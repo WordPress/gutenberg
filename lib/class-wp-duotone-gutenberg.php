@@ -268,9 +268,7 @@ class WP_Duotone_Gutenberg {
 		// For some reason, preg_match doesn't include empty matches at the end
 		// of the array, so we add them manually to make things easier later.
 		for ( $i = 1; $i <= 8; $i++ ) {
-			if ( ! isset( $match[ $i ] ) ) {
-				$match[ $i ] = '';
-			}
+			$match[ $i ] ??= '';
 		}
 
 		if ( $match[2] !== $match[4] || $match[4] !== $match[6] ) {
@@ -400,9 +398,7 @@ class WP_Duotone_Gutenberg {
 		// For some reason, preg_match doesn't include empty matches at the end
 		// of the array, so we add them manually to make things easier later.
 		for ( $i = 1; $i <= 6; $i++ ) {
-			if ( ! isset( $match[ $i ] ) ) {
-				$match[ $i ] = '';
-			}
+			$match[ $i ] ??= '';
 		}
 
 		$hsla = self::colord_clamp_hsla(
@@ -814,7 +810,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @return null|array<string, string> An array of global style block slugs, keyed on the block name.
+	 * @return array<string, string> An array of global style block slugs, keyed on the block name.
 	 */
 	private static function get_all_global_style_block_names() {
 		if ( isset( self::$global_styles_block_names ) ) {
@@ -1064,9 +1060,7 @@ class WP_Duotone_Gutenberg {
 	public static function add_editor_settings( $settings ) {
 		$global_styles_presets = self::get_all_global_styles_presets();
 		if ( ! empty( $global_styles_presets ) ) {
-			if ( ! isset( $settings['styles'] ) ) {
-				$settings['styles'] = array();
-			}
+			$settings['styles'] ??= array();
 
 			$settings['styles'][] = array(
 				// For the editor we can add all of the presets by default.

@@ -1,5 +1,5 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { openPostSummary } = require( './post-summary/utils' );
+const { openPostSummary, setPublishDate } = require( './post-summary/utils' );
 
 // Set browser to a timezone that's different to `timezone`.
 test.use( {
@@ -38,16 +38,22 @@ TIMEZONES.forEach( ( timezone ) => {
 			await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
 			const lastYear = new Date().getFullYear() - 1;
-			await page
-				.getByLabel( 'Date time' )
-				.fill( `${ lastYear }-03-15T10:00` );
+			await setPublishDate( page, {
+				year: lastYear,
+				month: 3,
+				day: 15,
+				hours: 10,
+				minutes: 0,
+			} );
 			await page.keyboard.press( 'Escape' );
 
 			// The row renders the date in the site timezone, so the wall time
 			// entered above must come back unshifted regardless of the
-			// browser timezone.
+			// browser timezone. As the browser timezone differs from the
+			// site's, the row reads the full date, followed by the site
+			// timezone.
 			await expect(
-				summary.getByText( `Mar 15, ${ lastYear } 10:00 am` )
+				summary.getByText( `March 15, ${ lastYear } 10:00 am` )
 			).toBeVisible();
 		} );
 
@@ -59,13 +65,17 @@ TIMEZONES.forEach( ( timezone ) => {
 			await summary.getByRole( 'button', { name: 'Edit Date' } ).click();
 
 			const nextYear = new Date().getFullYear() + 1;
-			await page
-				.getByLabel( 'Date time' )
-				.fill( `${ nextYear }-03-15T10:00` );
+			await setPublishDate( page, {
+				year: nextYear,
+				month: 3,
+				day: 15,
+				hours: 10,
+				minutes: 0,
+			} );
 			await page.keyboard.press( 'Escape' );
 
 			await expect(
-				summary.getByText( `Mar 15, ${ nextYear } 10:00 am` )
+				summary.getByText( `March 15, ${ nextYear } 10:00 am` )
 			).toBeVisible();
 		} );
 	} );

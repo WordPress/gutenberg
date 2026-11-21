@@ -51,8 +51,13 @@
 		// canvas takes whatever the 320px panel leaves — about 200px at
 		// 600px, 380px at 782px. Cramped, but a cramped preview beside
 		// reachable controls beats a panel that hides the image outright.
+		// The right gutter goes when the sidebar opens beside the canvas. It
+		// moves with the sidebar's width animation, so it uses the same
+		// duration and easing.
 		@include break-small() {
 			margin: 0 $grid-unit-30;
+			transition: margin-right 0.3s cubic-bezier(0.6, 0, 0.4, 1);
+			@include reduce-motion("transition");
 		}
 
 		// Promise the canvas a floor only where the body is wide enough to
@@ -120,6 +125,20 @@
 			max-width: 100%;
 			max-height: 100%;
 			object-fit: contain;
+		}
+	}
+
+	// Animates its width when the sidebar opens or closes. The sidebar keeps
+	// its own width inside, so its contents are clipped rather than reflowed.
+	.media-editor__sidebar-container {
+		display: flex;
+		flex: 1;
+		min-width: 0;
+		min-height: 0;
+		overflow: hidden;
+
+		@include break-small() {
+			flex: none;
 		}
 	}
 

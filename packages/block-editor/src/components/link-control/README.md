@@ -356,7 +356,7 @@ If passed, children are rendered after the input.
 	<Stack justify="flex-end">
 		<Button
 			type="submit"
-			label={ __( 'Submit' ) }
+			label={ __( 'Apply' ) }
 			icon={ keyboardReturn }
 			className="block-editor-link-control__search-submit"
 		/>

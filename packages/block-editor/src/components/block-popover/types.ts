@@ -4,10 +4,10 @@ import type {
 	ReactNode,
 	RefObject,
 } from 'react';
-import type { Popover } from '@wordpress/components';
+import type { Popover as WCPopover } from '@wordpress/components';
 
 type PopoverProps = Omit<
-	ComponentPropsWithoutRef< typeof Popover >,
+	ComponentPropsWithoutRef< typeof WCPopover >,
 	'children'
 >;
 

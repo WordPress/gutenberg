@@ -109,6 +109,9 @@
 		"shadow": {
 			"__experimentalSkipSerialization": true
 		},
+		"transform": {
+			"rotate": true
+		},
 		"dimensions": {
 			"minWidth": true,
 			"minHeight": true,

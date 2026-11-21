@@ -1,4 +1,7 @@
-import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { Notice } from '@wordpress/ui';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -14,11 +17,6 @@ import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
-import {
-	getInheritanceProps,
-	InheritanceToolsPanelItem,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
-} from './inheritance';
 import type {
 	BackgroundPanelProps,
 	PanelResetAllFilter,
@@ -233,7 +231,6 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 }: BackgroundPanelProps ) {
 	const {
 		colors,
@@ -456,25 +453,6 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
-	const inheritanceProps = (
-		isInherited: boolean,
-		hasLocalOverride: boolean,
-		classNames: string
-	) =>
-		showInheritanceLabelIndicators
-			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
-			: { className: classNames };
-
-	// The inherited value arrives already resolved (refs + theme-file pointers)
-	// with non-cascading root values dropped, so a presence check drives the
-	// label affordance and matches what `BackgroundImageControl` renders.
-	const inheritedBackgroundImage = hasBackgroundImageValue( {
-		background: {
-			backgroundImage: inheritedValue?.background?.backgroundImage,
-		},
-	} );
-	const hasLocalBackgroundImage = hasBackgroundImageValue( value );
-
 	return (
 		<Wrapper
 			resetAllFilter={ resetAllFilter }
@@ -484,13 +462,8 @@ export default function BackgroundImagePanel( {
 			headerLabel={ headerLabel }
 		>
 			{ showBackgroundImageControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						inheritedBackgroundImage && ! hasLocalBackgroundImage,
-						hasLocalBackgroundImage && inheritedBackgroundImage,
-						'block-editor-color-gradient-item'
-					) }
-					showLocalOverrideActionsInLabel={ false }
+				<ToolsPanelItem
+					className="block-editor-color-gradient-item"
 					hasValue={ () => hasBackgroundImageValue( value ) }
 					label={ __( 'Image' ) }
 					onDeselect={ resetBackground }
@@ -505,11 +478,8 @@ export default function BackgroundImagePanel( {
 						// @ts-expect-error BackgroundImageControl takes no default controls.
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
-						showInheritanceLabelIndicators={
-							showInheritanceLabelIndicators
-						}
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ showBackgroundColorControl && (
 				<ColorGradientDropdownItem
@@ -519,14 +489,6 @@ export default function BackgroundImagePanel( {
 					isShownByDefault={ defaultControls.backgroundColor }
 					indicators={ [ userBackgroundColor ?? backgroundColor ] }
 					contrastWarning={ contrastWarning }
-					showInheritanceLabelIndicators={
-						showInheritanceLabelIndicators
-					}
-					isPlaceholder={
-						userBackgroundColor === undefined &&
-						backgroundColor !== undefined
-					}
-					hasInheritedValue={ backgroundColor !== undefined }
 					tabs={ [
 						{
 							key: 'background',
@@ -567,14 +529,6 @@ export default function BackgroundImagePanel( {
 					resetValue={ resetGradient }
 					isShownByDefault={ defaultControls.gradient }
 					indicators={ [ currentGradient ?? inheritedGradient ] }
-					showInheritanceLabelIndicators={
-						showInheritanceLabelIndicators
-					}
-					isPlaceholder={
-						currentGradient === undefined &&
-						inheritedGradient !== undefined
-					}
-					hasInheritedValue={ inheritedGradient !== undefined }
 					tabs={ [
 						{
 							key: 'gradient',
@@ -612,14 +566,6 @@ export default function BackgroundImagePanel( {
 					indicators={ [
 						userLegacyColorGradient ?? legacyColorGradient,
 					] }
-					showInheritanceLabelIndicators={
-						showInheritanceLabelIndicators
-					}
-					isPlaceholder={
-						userLegacyColorGradient === undefined &&
-						legacyColorGradient !== undefined
-					}
-					hasInheritedValue={ legacyColorGradient !== undefined }
 					tabs={ [
 						{
 							key: 'gradient',
@@ -649,12 +595,8 @@ export default function BackgroundImagePanel( {
 				/>
 			) }
 			{ showBackgroundClipControl && (
-				<InheritanceToolsPanelItem
-					{ ...inheritanceProps(
-						!! inheritedClip && ! hasLocalClip,
-						hasLocalClip && inheritedClip !== undefined,
-						'block-editor-background-panel__clip-item'
-					) }
+				<ToolsPanelItem
+					className="block-editor-background-panel__clip-item"
 					label={ __( 'Clip' ) }
 					// Keeps a text gradient from surfacing this control.
 					hasValue={ () => hasLocalClip && ! isTextGradient }
@@ -679,7 +621,7 @@ export default function BackgroundImagePanel( {
 						}
 						allowedValues={ allowedClipValues }
 					/>
-				</InheritanceToolsPanelItem>
+				</ToolsPanelItem>
 			) }
 			{ clipsToText && (
 				<Notice.Root

@@ -12,11 +12,11 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	usePostCommentsCount,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 
 export default function Edit( props ) {
@@ -30,7 +30,6 @@ export default function Edit( props ) {
 	} = attributes;
 	const { postId, postType } = context;
 	const TagName = 'h' + level;
-	const [ commentsCount, setCommentsCount ] = useState();
 	const [ rawTitle ] = useEntityProp( 'postType', postType, 'title', postId );
 	const isSiteEditor = typeof postId === 'undefined';
 	const blockProps = useBlockProps();
@@ -47,43 +46,25 @@ export default function Edit( props ) {
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	useEffect( () => {
-		if ( isSiteEditor ) {
-			// Match the number of comments that will be shown in the comment-template/edit.js placeholder
+	const { totalItems, hasResolved } = usePostCommentsCount( postId );
+	let commentsCount;
+	if ( isSiteEditor ) {
+		// Match the number of comments that will be shown in the comment-template/edit.js placeholder
 
-			const nestedCommentsNumber = threadComments
-				? Math.min( threadCommentsDepth, 3 ) - 1
-				: 0;
-			const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
+		const nestedCommentsNumber = threadComments
+			? Math.min( threadCommentsDepth, 3 ) - 1
+			: 0;
+		const topLevelCommentsNumber = pageComments ? commentsPerPage : 3;
 
-			const commentsNumber =
-				parseInt( nestedCommentsNumber ) +
-				parseInt( topLevelCommentsNumber );
+		const commentsNumber =
+			parseInt( nestedCommentsNumber ) +
+			parseInt( topLevelCommentsNumber );
 
-			setCommentsCount( Math.min( commentsNumber, 3 ) );
-			return;
-		}
-		const currentPostId = postId;
-		apiFetch( {
-			path: addQueryArgs( '/wp/v2/comments', {
-				post: postId,
-				_fields: 'id',
-			} ),
-			method: 'HEAD',
-			parse: false,
-		} )
-			.then( ( res ) => {
-				// Stale requests will have the `currentPostId` of an older closure.
-				if ( currentPostId === postId ) {
-					setCommentsCount(
-						parseInt( res.headers.get( 'X-WP-Total' ) )
-					);
-				}
-			} )
-			.catch( () => {
-				setCommentsCount( 0 );
-			} );
-	}, [ postId ] );
+		commentsCount = Math.min( commentsNumber, 3 );
+	} else {
+		// A failed request has no total.
+		commentsCount = totalItems ?? ( hasResolved ? 0 : undefined );
+	}
 
 	const blockControls = (
 		<BlockControls group="block">

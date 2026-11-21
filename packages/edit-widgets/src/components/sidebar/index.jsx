@@ -20,20 +20,20 @@ import WidgetAreas from './widget-areas';
 import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { Tabs } = unlock( componentsPrivateApis );
+const { Tabs: WCTabs } = unlock( componentsPrivateApis );
 
 function SidebarHeader( { selectedWidgetAreaBlock } ) {
 	return (
-		<Tabs.TabList>
-			<Tabs.Tab tabId={ WIDGET_AREAS_IDENTIFIER }>
+		<WCTabs.TabList>
+			<WCTabs.Tab tabId={ WIDGET_AREAS_IDENTIFIER }>
 				{ selectedWidgetAreaBlock
 					? selectedWidgetAreaBlock.attributes.name
 					: __( 'Widget Areas' ) }
-			</Tabs.Tab>
-			<Tabs.Tab tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
+			</WCTabs.Tab>
+			<WCTabs.Tab tabId={ BLOCK_INSPECTOR_IDENTIFIER }>
 				{ __( 'Block' ) }
-			</Tabs.Tab>
-		</Tabs.TabList>
+			</WCTabs.Tab>
+		</WCTabs.TabList>
 	);
 }
 
@@ -71,17 +71,17 @@ function SidebarContent( {
 		// block selection changes, not sidebar state changes.
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
 
-	const tabsContextValue = useContext( Tabs.Context );
+	const tabsContextValue = useContext( WCTabs.Context );
 
 	return (
 		<ComplementaryArea
 			className="edit-widgets-sidebar"
 			header={
-				<Tabs.Context.Provider value={ tabsContextValue }>
+				<WCTabs.Context.Provider value={ tabsContextValue }>
 					<SidebarHeader
 						selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
 					/>
-				</Tabs.Context.Provider>
+				</WCTabs.Context.Provider>
 			}
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
@@ -92,8 +92,8 @@ function SidebarContent( {
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			<Tabs.Context.Provider value={ tabsContextValue }>
-				<Tabs.TabPanel
+			<WCTabs.Context.Provider value={ tabsContextValue }>
+				<WCTabs.TabPanel
 					tabId={ WIDGET_AREAS_IDENTIFIER }
 					focusable={ false }
 				>
@@ -102,8 +102,8 @@ function SidebarContent( {
 							selectedWidgetAreaBlock?.attributes.id
 						}
 					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel
+				</WCTabs.TabPanel>
+				<WCTabs.TabPanel
 					tabId={ BLOCK_INSPECTOR_IDENTIFIER }
 					focusable={ false }
 				>
@@ -116,8 +116,8 @@ function SidebarContent( {
 							{ __( 'No block selected.' ) }
 						</span>
 					) }
-				</Tabs.TabPanel>
-			</Tabs.Context.Provider>
+				</WCTabs.TabPanel>
+			</WCTabs.Context.Provider>
 		</ComplementaryArea>
 	);
 }
@@ -189,7 +189,7 @@ export default function Sidebar() {
 	);
 
 	return (
-		<Tabs
+		<WCTabs
 			// Due to how this component is controlled (via a value from the
 			// `interfaceStore`), when the sidebar closes the currently selected
 			// tab can't be found. This causes the component to continuously reset
@@ -205,6 +205,6 @@ export default function Sidebar() {
 				isGeneralSidebarOpen={ isGeneralSidebarOpen }
 				selectedWidgetAreaBlock={ selectedWidgetAreaBlock }
 			/>
-		</Tabs>
+		</WCTabs>
 	);
 }

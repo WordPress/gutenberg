@@ -1,4 +1,4 @@
-import itemPopupStyles from './item-popup.module.css';
+import itemPopupStyles from './item-popup.module.scss';
 
 /**
  * Preset width constraints for item popups.
