@@ -91,6 +91,7 @@ _Parameters_
 - _$0.id_ `OptimizeExistingItemArgs[ 'id' ]`: Attachment ID of the existing media.
 - _$0.url_ `OptimizeExistingItemArgs[ 'url' ]`: URL of the existing file to re-process.
 - _$0.fileName_ `[OptimizeExistingItemArgs[ 'fileName' ]]`: File name. Defaults to the name derived from the URL.
+- _$0.outputQuality_ `[OptimizeExistingItemArgs[ 'outputQuality' ]]`: Encode quality (0-1). Defaults to the `imageQuality` setting.
 - _$0.onChange_ `[OptimizeExistingItemArgs[ 'onChange' ]]`: Function called each time a representation of the file is available.
 - _$0.onSuccess_ `[OptimizeExistingItemArgs[ 'onSuccess' ]]`: Function called after the optimized file is uploaded.
 - _$0.onError_ `[OptimizeExistingItemArgs[ 'onError' ]]`: Function called when an error happens.

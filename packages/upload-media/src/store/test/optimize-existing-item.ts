@@ -14,6 +14,7 @@ import { OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
 import { StubFile } from '../../stub-file';
 import { ErrorCode } from '../../upload-error';
+import { vipsCancelOperations, vipsConvertImageFormat } from '../utils';
 import { isClientSideMediaSupported } from '../../feature-detection';
 
 vi.mock(
@@ -102,6 +103,20 @@ describe( 'optimizeExistingItem', () => {
 			OperationType.Upload,
 			OperationType.ThumbnailGeneration,
 			OperationType.Finalize,
+		] );
+	} );
+
+	it( 'uses the requested output quality over the setting', async () => {
+		await registry.dispatch( uploadStore ).optimizeExistingItem( {
+			id: 42,
+			url: 'https://example.com/wp-content/uploads/photo.jpg',
+			outputQuality: 0.3,
+		} );
+
+		const [ item ] = unlock( registry.select( uploadStore ) ).getAllItems();
+		expect( item.operations[ 1 ] ).toEqual( [
+			OperationType.TranscodeImage,
+			{ outputFormat: 'jpeg', outputQuality: 0.3, interlaced: false },
 		] );
 	} );
 
@@ -238,5 +253,76 @@ describe( 'fetchRemoteFile', () => {
 		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe(
 			ErrorCode.FETCH_REMOTE_FILE_ERROR
 		);
+	} );
+} );
+
+describe( 'compressImagePreview', () => {
+	let registry: WPDataRegistry;
+	beforeEach( () => {
+		vi.clearAllMocks();
+		registry = createRegistryWithStores();
+	} );
+
+	it( 're-encodes the file in its own format at the given quality', async () => {
+		const file = new File( [ 'x' ], 'photo.jpg', { type: 'image/jpeg' } );
+		const encoded = new File( [ 'y' ], 'photo.jpg', {
+			type: 'image/jpeg',
+		} );
+		( vipsConvertImageFormat as Mock ).mockResolvedValue( encoded );
+
+		const result = await unlock(
+			registry.dispatch( uploadStore )
+		).compressImagePreview( file, 0.4 );
+
+		expect( result ).toBe( encoded );
+		expect( vipsConvertImageFormat ).toHaveBeenCalledWith(
+			expect.any( String ),
+			file,
+			'image/jpeg',
+			expect.objectContaining( { quality: 0.4 } )
+		);
+	} );
+
+	it( 'cancels the preview still in flight and resolves it to null', async () => {
+		const file = new File( [ 'x' ], 'photo.jpg', { type: 'image/jpeg' } );
+		const encoded = new File( [ 'y' ], 'photo.jpg', {
+			type: 'image/jpeg',
+		} );
+		let rejectFirst: ( error: Error ) => void = () => {};
+		( vipsConvertImageFormat as Mock )
+			.mockImplementationOnce(
+				() =>
+					new Promise( ( _resolve, reject ) => {
+						rejectFirst = reject;
+					} )
+			)
+			.mockResolvedValueOnce( encoded );
+		( vipsCancelOperations as Mock ).mockImplementation( async () => {
+			rejectFirst( new Error( 'cancelled' ) );
+			return true;
+		} );
+
+		const { compressImagePreview } = unlock(
+			registry.dispatch( uploadStore )
+		);
+		const first = compressImagePreview( file, 0.8 );
+		const second = compressImagePreview( file, 0.2 );
+
+		await expect( first ).resolves.toBeNull();
+		await expect( second ).resolves.toBe( encoded );
+	} );
+
+	it( 'rejects file types it cannot re-encode', async () => {
+		const file = new File( [ 'x' ], 'anim.gif', { type: 'image/gif' } );
+
+		await expect(
+			unlock( registry.dispatch( uploadStore ) ).compressImagePreview(
+				file,
+				0.5
+			)
+		).rejects.toMatchObject( {
+			code: ErrorCode.MIME_TYPE_NOT_SUPPORTED,
+		} );
+		expect( vipsConvertImageFormat ).not.toHaveBeenCalled();
 	} );
 } );

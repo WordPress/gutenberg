@@ -187,6 +187,8 @@ interface OptimizeExistingItemArgs {
 	url: string;
 	/** Optional file name. Defaults to the name derived from the URL. */
 	fileName?: string;
+	/** Optional encode quality (0-1). Defaults to the `imageQuality` setting. */
+	outputQuality?: number;
 	onChange?: OnChangeHandler;
 	onSuccess?: OnSuccessHandler;
 	onError?: OnErrorHandler;
@@ -209,6 +211,7 @@ interface OptimizeExistingItemArgs {
  * @param $0.id               Attachment ID of the existing media.
  * @param $0.url              URL of the existing file to re-process.
  * @param [$0.fileName]       File name. Defaults to the name derived from the URL.
+ * @param [$0.outputQuality]  Encode quality (0-1). Defaults to the `imageQuality` setting.
  * @param [$0.onChange]       Function called each time a representation of the file is available.
  * @param [$0.onSuccess]      Function called after the optimized file is uploaded.
  * @param [$0.onError]        Function called when an error happens.
@@ -218,6 +221,7 @@ export function optimizeExistingItem( {
 	id,
 	url,
 	fileName,
+	outputQuality,
 	onChange,
 	onSuccess,
 	onError,
@@ -265,8 +269,10 @@ export function optimizeExistingItem( {
 			resolvedFileName
 		) }-optimized.${ extension }`;
 
-		const outputQuality =
-			select.getSettings().imageQuality ?? DEFAULT_OUTPUT_QUALITY;
+		const quality =
+			outputQuality ??
+			select.getSettings().imageQuality ??
+			DEFAULT_OUTPUT_QUALITY;
 
 		const operations: Operation[] = [
 			[
@@ -275,7 +281,7 @@ export function optimizeExistingItem( {
 			],
 			[
 				OperationType.TranscodeImage,
-				{ outputFormat, outputQuality, interlaced: false },
+				{ outputFormat, outputQuality: quality, interlaced: false },
 			],
 			OperationType.Upload,
 			OperationType.ThumbnailGeneration,
