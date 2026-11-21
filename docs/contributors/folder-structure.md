@@ -18,6 +18,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     ├── .npmpackagejsonlintrc.json
     ├── phpcs.xml.dist
     ├── phpstan.neon.dist
+    ├── phpstan-strict.neon.dist
     │   Dot files and config files used to configure the various linting tools
     │   used in the repository (PHP, JS, styles...).
     │

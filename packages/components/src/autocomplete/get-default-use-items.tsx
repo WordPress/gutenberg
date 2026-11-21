@@ -2,11 +2,7 @@ import removeAccents from 'remove-accents';
 import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
 import { escapeRegExp } from '../utils/strings';
-import type {
-	CancelablePromise,
-	KeyedOption,
-	ListedOptionCompleter,
-} from './types';
+import type { KeyedOption, ListedOptionCompleter } from './types';
 
 function filterOptions(
 	search: RegExp,
@@ -46,27 +42,18 @@ export default function getDefaultUseItems(
 ) {
 	return ( filterValue: string ) => {
 		const [ items, setItems ] = useState< Array< KeyedOption > >( [] );
-		/*
-		 * We support both synchronous and asynchronous retrieval of completer options
-		 * but internally treat all as async so we maintain a single, consistent code path.
-		 *
-		 * Because networks can be slow, and the internet is wonderfully unpredictable,
-		 * we don't want two promises updating the state at once. This ensures that only
-		 * the most recent promise will act on `optionsData`. This doesn't use the state
-		 * because `setState` is batched, and so there's no guarantee that setting
-		 * `activePromise` in the state would result in it actually being in `this.state`
-		 * before the promise resolves and we check to see if this is the active promise or not.
-		 */
+		// Cleanup invalidates in-flight requests as well as the pending debounce.
 		useLayoutEffect( () => {
+			let isCanceled = false;
 			const { options, isDebounced } = autocompleter;
 			const loadOptions = debounce(
 				() => {
-					const promise: CancelablePromise = Promise.resolve(
+					return Promise.resolve(
 						typeof options === 'function'
 							? options( filterValue )
 							: options
 					).then( ( optionsData ) => {
-						if ( promise.canceled ) {
+						if ( isCanceled ) {
 							return;
 						}
 						const keyedOptions = optionsData.map(
@@ -96,19 +83,15 @@ export default function getDefaultUseItems(
 						);
 						setItems( filterOptions( search, keyedOptions ) );
 					} );
-
-					return promise;
 				},
 				isDebounced ? 250 : 0
 			);
 
-			const promise = loadOptions();
+			loadOptions();
 
 			return () => {
+				isCanceled = true;
 				loadOptions.cancel();
-				if ( promise ) {
-					promise.canceled = true;
-				}
 			};
 		}, [ filterValue ] );
 

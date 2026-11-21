@@ -70,13 +70,10 @@ function render_block_core_rss( $attributes ) {
 			$timestamp = $item->get_date( 'U' );
 
 			if ( $timestamp ) {
-				$gmt_offset = get_option( 'gmt_offset' );
-				$timestamp += (int) ( (float) $gmt_offset * HOUR_IN_SECONDS );
-
 				$date_markup = sprintf(
 					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
-					esc_attr( date_i18n( 'c', $timestamp ) ),
-					esc_html( date_i18n( get_option( 'date_format' ), $timestamp ) )
+					esc_attr( wp_date( 'c', $timestamp ) ),
+					esc_html( wp_date( get_option( 'date_format' ), $timestamp ) )
 				);
 			}
 		}
