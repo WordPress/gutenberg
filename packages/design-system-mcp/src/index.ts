@@ -15,7 +15,7 @@ export function createServer() {
 				'Provides guidance for building interfaces with the WordPress Design System, at three levels:',
 				[
 					'- Patterns describe how to approach a kind of interaction, such as confirming a destructive action or saving a form. A pattern says which components to choose for the situation and how to configure them.',
-					'- Components are the building blocks in `@wordpress/ui` and `@wordpress/components`, documented with their props, examples, and import statements.',
+					'- Components are the building blocks in design system packages such as `@wordpress/ui`, `@wordpress/components`, and `@wordpress/admin-ui`, documented with their props, examples, and import statements.',
 					'- Design tokens are the themeable `--wpds-*` CSS custom properties from `@wordpress/theme` that the components are built on, for styling that no component covers.',
 				].join( '\n' ),
 				'Use the appropriate tool for each request:',

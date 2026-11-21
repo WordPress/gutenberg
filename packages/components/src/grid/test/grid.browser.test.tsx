@@ -83,7 +83,7 @@ describe( 'props', () => {
 		);
 
 		const style = readStyle();
-		expect( style.alignItems ).toBe( 'flex-start' );
+		expect( style.alignItems ).toBe( 'flow-start' );
 		expect( style.display ).toBe( 'grid' );
 	} );
 
@@ -113,8 +113,8 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( style.alignItems ).toBe( 'flex-end' );
-		expect( style.justifyContent ).toBe( 'flex-start' );
+		expect( style.alignItems ).toBe( 'flow-end' );
+		expect( style.justifyContent ).toBe( 'flow-start' );
 	} );
 
 	test( 'should ignore unsupported runtime alignment values', async () => {
@@ -144,7 +144,7 @@ describe( 'props', () => {
 
 		const style = readStyle();
 		expect( style.display ).toBe( 'grid' );
-		expect( style.justifyContent ).toBe( 'flex-start' );
+		expect( style.justifyContent ).toBe( 'flow-start' );
 	} );
 
 	test( 'should render isInline', async () => {

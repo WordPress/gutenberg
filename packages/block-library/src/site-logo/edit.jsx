@@ -28,6 +28,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	useBlockEditingMode,
+	__experimentalUseBorderProps as useBorderProps,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -47,6 +48,7 @@ const { mediaEditKey, openMediaEditorModalKey } = unlock(
 const SiteLogo = ( {
 	alt,
 	attributes: { align, width, height, isLink, linkTarget, shouldSyncIcon },
+	borderProps,
 	isSelected,
 	setAttributes,
 	setLogo,
@@ -119,7 +121,8 @@ const SiteLogo = ( {
 	const img = (
 		<>
 			<img
-				className="custom-logo"
+				className={ clsx( 'custom-logo', borderProps.className ) }
+				style={ borderProps.style }
 				src={ logoUrl }
 				alt={ alt }
 				onLoad={ ( event ) => {
@@ -229,11 +232,7 @@ const SiteLogo = ( {
 		{
 			a: (
 				// eslint-disable-next-line jsx-a11y/anchor-has-content, react/jsx-no-target-blank
-				<a
-					href={ siteIconSettingsUrl }
-					target="_blank"
-					rel="noopener"
-				/>
+				<a href={ siteIconSettingsUrl } target="_blank" />
 			),
 		}
 	);
@@ -388,6 +387,7 @@ export default function LogoEdit( {
 	isSelected,
 } ) {
 	const { width, shouldSyncIcon } = attributes;
+	const borderProps = useBorderProps( attributes );
 	const {
 		siteLogoId,
 		canUserEdit,
@@ -556,6 +556,7 @@ export default function LogoEdit( {
 				<SiteLogo
 					alt={ alt }
 					attributes={ attributes }
+					borderProps={ borderProps }
 					className={ className }
 					isSelected={ isSelected }
 					setAttributes={ setAttributes }
@@ -574,7 +575,11 @@ export default function LogoEdit( {
 	const placeholder = ( content ) => {
 		const placeholderClassName = clsx(
 			'block-editor-media-placeholder',
-			className
+			className,
+			{
+				[ borderProps.className ]:
+					!! borderProps.className && ! isSelected,
+			}
 		);
 
 		return (
@@ -584,6 +589,7 @@ export default function LogoEdit( {
 				withIllustration
 				style={ {
 					width,
+					...borderProps.style,
 				} }
 			>
 				{ content }
@@ -656,7 +662,14 @@ export default function LogoEdit( {
 			{ ( !! logoUrl || !! temporaryURL ) && logoImage }
 			{ ( isLoading ||
 				( ! temporaryURL && ! logoUrl && ! canUserEdit ) ) && (
-				<Placeholder className="site-logo_placeholder" withIllustration>
+				<Placeholder
+					className={ clsx(
+						'site-logo_placeholder',
+						borderProps.className
+					) }
+					style={ borderProps.style }
+					withIllustration
+				>
 					{ isLoading && (
 						<span className="components-placeholder__preview">
 							<WCSpinner />

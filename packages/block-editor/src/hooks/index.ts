@@ -102,6 +102,7 @@ export { getShadowClassesAndStyles } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
+export { getTransformClassesAndStyles } from './use-transform-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
 export { setBackgroundStyleDefaults } from './background';

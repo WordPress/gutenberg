@@ -6,6 +6,12 @@
 
 -   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a dot over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
+## 11.2.0 (2026-11-18)
+
+### Internal
+
+-   Update the Vitest development dependency to 5.1.0 ([#86509](https://github.com/WordPress/gutenberg/pull/86509)).
+
 ## 11.1.0 (2026-11-04)
 
 ### Internal
