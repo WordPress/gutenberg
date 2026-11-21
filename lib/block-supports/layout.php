@@ -127,8 +127,22 @@ function gutenberg_get_layout_definitions() {
 				array(
 					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull))',
 					'rules'    => array(
-						'max-width'    => 'var(--wp--style--global--content-size)',
-						'margin-left'  => 'auto !important',
+						'max-width' => 'var(--wp--style--global--content-size)',
+					),
+				),
+				/*
+				 * Children with their own horizontal margin (set inline by the margin block support)
+				 * keep it instead of being centered.
+				 */
+				array(
+					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))',
+					'rules'    => array(
+						'margin-left' => 'auto !important',
+					),
+				),
+				array(
+					'selector' => ' > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))',
+					'rules'    => array(
 						'margin-right' => 'auto !important',
 					),
 				),
@@ -607,22 +621,36 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		$margin_left  = 'left' === $justify_content ? '0 !important' : 'auto !important';
 		$margin_right = 'right' === $justify_content ? '0 !important' : 'auto !important';
 
+		/*
+		 * Children with their own horizontal margin (set inline by the margin block support)
+		 * keep it instead of having it overridden by the layout's alignment margins.
+		 */
+		$child_selector        = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))";
+		$margin_left_selector  = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-left]))";
+		$margin_right_selector = "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull):not([style*=margin-right]))";
+
 		if ( $should_output_constrained_sizes && ( $content_size || $wide_size || $is_resetting_constrained_sizes ) ) {
-			$content_size_declarations = array(
-				'max-width' => $all_max_width_value,
+			$layout_styles[] = array(
+				'selector'     => $child_selector,
+				'declarations' => array( 'max-width' => $all_max_width_value ),
 			);
 
 			if ( null === $viewport_overrides || $has_justify_content_override ) {
-				$content_size_declarations['margin-left']  = $margin_left;
-				$content_size_declarations['margin-right'] = $margin_right;
+				array_push(
+					$layout_styles,
+					array(
+						'selector'     => $margin_left_selector,
+						'declarations' => array( 'margin-left' => $margin_left ),
+					),
+					array(
+						'selector'     => $margin_right_selector,
+						'declarations' => array( 'margin-right' => $margin_right ),
+					)
+				);
 			}
 
 			array_push(
 				$layout_styles,
-				array(
-					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-					'declarations' => $content_size_declarations,
-				),
 				array(
 					'selector'     => "$selector > .alignwide",
 					'declarations' => array( 'max-width' => $wide_max_width_value ),
@@ -670,24 +698,28 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( $has_justify_content_override && ! $should_output_constrained_sizes ) {
-			$layout_styles[] = array(
-				'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
-				'declarations' => array(
-					'margin-left'  => $margin_left,
-					'margin-right' => $margin_right,
+			array_push(
+				$layout_styles,
+				array(
+					'selector'     => $margin_left_selector,
+					'declarations' => array( 'margin-left' => $margin_left ),
 				),
+				array(
+					'selector'     => $margin_right_selector,
+					'declarations' => array( 'margin-right' => $margin_right ),
+				)
 			);
 		} elseif ( null === $viewport_overrides ) {
 			if ( 'left' === $justify_content ) {
 				$layout_styles[] = array(
-					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'selector'     => $margin_left_selector,
 					'declarations' => array( 'margin-left' => '0 !important' ),
 				);
 			}
 
 			if ( 'right' === $justify_content ) {
 				$layout_styles[] = array(
-					'selector'     => "$selector > :where(:not(.alignleft):not(.alignright):not(.alignfull))",
+					'selector'     => $margin_right_selector,
 					'declarations' => array( 'margin-right' => '0 !important' ),
 				);
 			}
