@@ -46,7 +46,7 @@
 
 	.components-flex__item {
 		font-family: $default-font;
-		font-size: $default-font-size;
+		font-size: var(--wpds-typography-font-size-md);
 	}
 }
 
