@@ -11,6 +11,9 @@ const FONT_FAMILY_VARIABLE_REPLACEMENTS = {
 	mono: 'var(--wpds-typography-font-family-mono)',
 };
 
+// System colors that Chromium does not map to the forced colors palette.
+const SELECTED_ITEM_SYSTEM_COLOR = /(?<![\w$-])SelectedItem(?:Text)?(?![\w-])/i;
+
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -29,6 +32,7 @@ module.exports = {
 					'/\\$font-weight-regular/',
 					'/\\$font-weight-medium/',
 					`/${ FONT_FAMILY_VARIABLE.source }/`,
+					`/${ SELECTED_ITEM_SYSTEM_COLOR.source }/i`,
 				],
 				cursor: [ 'pointer' ],
 				'flex-direction': [ '/^(row|column)-reverse/' ],
@@ -52,6 +56,14 @@ module.exports = {
 							? '$font-weight-regular'
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
+					const [ selectedItem ] =
+						value.match( SELECTED_ITEM_SYSTEM_COLOR ) ?? [];
+					if ( selectedItem ) {
+						const replacement = /text$/i.test( selectedItem )
+							? 'HighlightText'
+							: 'Highlight';
+						return `Avoid the \`${ selectedItem }\` system color. Chromium does not map it to the forced colors palette (https://issues.chromium.org/issues/40857613). Use \`${ replacement }\` instead.`;
 					}
 					const [ , fontFamily ] =
 						value.match( FONT_FAMILY_VARIABLE ) ?? [];
