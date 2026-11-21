@@ -1,5 +1,29 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+/**
+ * Inserts an Accordion block with one item whose heading has the given attributes.
+ *
+ * @param {Object} editor            The editor fixture.
+ * @param {Object} headingAttributes The Accordion Heading attributes.
+ */
+async function insertAccordionWithHeading( editor, headingAttributes ) {
+	await editor.insertBlock( {
+		name: 'core/accordion',
+		innerBlocks: [
+			{
+				name: 'core/accordion-item',
+				innerBlocks: [
+					{
+						name: 'core/accordion-heading',
+						attributes: headingAttributes,
+					},
+					{ name: 'core/accordion-panel' },
+				],
+			},
+		],
+	} );
+}
+
 test.describe( 'Registered sources', () => {
 	let imagePlaceholderSrc;
 	let testingImgSrc;
@@ -155,6 +179,35 @@ test.describe( 'Registered sources', () => {
 			await expect(
 				previewPage.locator( '#connected-heading' )
 			).toHaveText( 'Text Field Value' );
+		} );
+
+		test( 'should show the returned value in accordion heading title', async ( {
+			editor,
+		} ) => {
+			await insertAccordionWithHeading( editor, {
+				title: 'accordion heading default title',
+				metadata: {
+					bindings: {
+						title: {
+							source: 'testing/complete-source',
+							args: { key: 'text_field' },
+						},
+					},
+				},
+			} );
+			const accordionTitle = editor.canvas.getByRole( 'textbox', {
+				name: 'Accordion title',
+			} );
+			await expect( accordionTitle ).toHaveText( 'Text Field Value' );
+
+			// Check the frontend shows the value of the custom field.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.getByRole( 'button', {
+					name: 'Text Field Value',
+					exact: true,
+				} )
+			).toBeVisible();
 		} );
 
 		test( 'should show the returned values in button attributes', async ( {
@@ -415,6 +468,41 @@ test.describe( 'Registered sources', () => {
 
 				// Heading is not editable.
 				await expect( headingBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+
+			test( 'accordion heading', async ( { editor, page } ) => {
+				await insertAccordionWithHeading( editor, {
+					title: 'accordion heading default title',
+					metadata: {
+						bindings: {
+							title: {
+								source: 'testing/can-user-edit-false',
+								args: { key: 'text_field' },
+							},
+						},
+					},
+				} );
+				const accordionTitle = editor.canvas.getByRole( 'textbox', {
+					name: 'Accordion title',
+				} );
+				await accordionTitle.click();
+
+				const blockToolbar = page.getByRole( 'toolbar', {
+					name: 'Block tools',
+				} );
+				await expect( blockToolbar ).toBeVisible();
+
+				// Format controls don't exist.
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Bold' } )
+				).toBeHidden();
+
+				// Accordion heading title is not editable.
+				await expect( accordionTitle ).toHaveText( 'Text Field Value' );
+				await expect( accordionTitle ).toHaveAttribute(
 					'contenteditable',
 					'false'
 				);
@@ -833,6 +921,45 @@ test.describe( 'Registered sources', () => {
 			).toHaveText( 'new list item value' );
 		} );
 
+		test( 'should be possible to edit the value from accordion heading title', async ( {
+			editor,
+		} ) => {
+			await insertAccordionWithHeading( editor, {
+				title: 'accordion heading default title',
+				metadata: {
+					bindings: {
+						title: {
+							source: 'core/post-meta',
+							args: { key: 'text_custom_field' },
+						},
+					},
+				},
+			} );
+			const accordionTitle = editor.canvas.getByRole( 'textbox', {
+				name: 'Accordion title',
+			} );
+
+			await expect( accordionTitle ).toHaveAttribute(
+				'contenteditable',
+				'true'
+			);
+			await accordionTitle.fill( 'new accordion title value' );
+			// Check that the accordion heading title attribute didn't change.
+			const [ accordionBlock ] = await editor.getBlocks();
+			expect(
+				accordionBlock.innerBlocks[ 0 ].innerBlocks[ 0 ].attributes
+					.title
+			).toBe( 'accordion heading default title' );
+			// Check the value of the custom field is being updated by visiting the frontend.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.getByRole( 'button', {
+					name: 'new accordion title value',
+					exact: true,
+				} )
+			).toBeVisible();
+		} );
+
 		test( 'should preserve nested list inner blocks when list item content is bound', async ( {
 			editor,
 		} ) => {
@@ -1149,6 +1276,23 @@ test.describe( 'Registered sources', () => {
 				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
+		} );
+
+		test( 'should be possible to connect the accordion heading title', async ( {
+			editor,
+			page,
+		} ) => {
+			await insertAccordionWithHeading( editor, {} );
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Accordion Heading',
+				} )
+			);
+			await page.getByLabel( 'Attributes options' ).click();
+			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'title, show',
+			} );
+			await expect( titleAttribute ).toBeVisible();
 		} );
 
 		test( 'should be possible to connect the icon block icon', async ( {

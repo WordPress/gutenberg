@@ -867,4 +867,320 @@ HTML;
 			'The __default binding should be updated with the list item content binding metadata.'
 		);
 	}
+
+	/**
+	 * Returns the saved HTML of an Accordion Heading block.
+	 *
+	 * @param string $title         The title markup.
+	 * @param string $icon_position Where the icon is rendered: 'left', 'right' or 'none'.
+	 * @return string The block HTML.
+	 */
+	private function get_accordion_heading_html( $title, $icon_position = 'right' ) {
+		$icon       = '<span class="wp-block-accordion-heading__toggle-icon" aria-hidden="true">+</span>';
+		$title_html = '<span class="wp-block-accordion-heading__toggle-title">' . $title . '</span>';
+
+		if ( 'left' === $icon_position ) {
+			$class_name = 'wp-block-accordion-heading has-icon has-icon-left';
+			$contents   = $icon . $title_html;
+		} elseif ( 'right' === $icon_position ) {
+			$class_name = 'wp-block-accordion-heading has-icon has-icon-right';
+			$contents   = $title_html . $icon;
+		} else {
+			$class_name = 'wp-block-accordion-heading';
+			$contents   = $title_html;
+		}
+
+		return '<h3 class="' . $class_name . '"><button type="button" class="wp-block-accordion-heading__toggle">' . $contents . '</button></h3>';
+	}
+
+	/**
+	 * Renders an Accordion Heading with a source value bound to its title.
+	 *
+	 * @param mixed  $source_value  The source value.
+	 * @param string $saved_title   The saved title markup.
+	 * @param string $icon_position Where the icon is rendered: 'left', 'right' or 'none'.
+	 * @return array The rendered block instance and its trimmed output.
+	 */
+	private function render_accordion_heading_with_source_value( $source_value, $saved_title, $icon_position = 'right' ) {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () use ( $source_value ) {
+					return $source_value;
+				},
+			)
+		);
+
+		$attributes = array(
+			'metadata' => array(
+				'bindings' => array(
+					'title' => array( 'source' => self::SOURCE_NAME ),
+				),
+			),
+		);
+		if ( 'left' === $icon_position ) {
+			$attributes['iconPosition'] = 'left';
+		} elseif ( 'none' === $icon_position ) {
+			$attributes['showIcon'] = false;
+		}
+
+		$block_content = get_comment_delimited_block_content(
+			'core/accordion-heading',
+			$attributes,
+			$this->get_accordion_heading_html( $saved_title, $icon_position )
+		);
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+		$result        = trim( $block->render() );
+
+		return array( $block, $result );
+	}
+
+	/**
+	 * Tests if the Accordion Heading title is a supported block bindings attribute.
+	 *
+	 * @covers ::get_block_bindings_supported_attributes
+	 */
+	public function test_accordion_heading_title_is_a_supported_binding_attribute() {
+		$this->assertContains(
+			'title',
+			get_block_bindings_supported_attributes( 'core/accordion-heading' ),
+			'The Accordion Heading title should be a supported block bindings attribute.'
+		);
+	}
+
+	public function data_accordion_heading_icon_positions() {
+		return array(
+			'icon on the right' => array( 'right' ),
+			'icon on the left'  => array( 'left' ),
+			'no icon'           => array( 'none' ),
+		);
+	}
+
+	/**
+	 * Tests if the Accordion Heading title is updated with the value returned by the source.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 *
+	 * @dataProvider data_accordion_heading_icon_positions
+	 *
+	 * @param string $icon_position Where the icon is rendered.
+	 */
+	public function test_update_accordion_heading_title_with_value_from_source( $icon_position ) {
+		list( $block, $result ) = $this->render_accordion_heading_with_source_value( 'test source value', 'This should not appear', $icon_position );
+
+		$this->assertSame(
+			'test source value',
+			$block->attributes['title'],
+			"The 'title' attribute should be updated with the value returned by the source."
+		);
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'test source value', $icon_position ),
+			$result,
+			'Only the title should be replaced with the value returned by the source.'
+		);
+	}
+
+	/**
+	 * Tests if a saved title with nested formatting is fully replaced.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 */
+	public function test_update_accordion_heading_title_replaces_nested_formatting() {
+		list( , $result ) = $this->render_accordion_heading_with_source_value(
+			'Bound <em>title</em>',
+			'Saved <strong>bold <span lang="fr">mot</span></strong> title'
+		);
+
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'Bound <em>title</em>' ),
+			$result,
+			'The whole saved title, including nested formatting, should be replaced.'
+		);
+	}
+
+	/**
+	 * Tests if unsafe source markup is sanitized from the Accordion Heading title.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 */
+	public function test_update_accordion_heading_title_unsafe_markup_is_sanitized() {
+		list( , $result ) = $this->render_accordion_heading_with_source_value(
+			'Bound <em onclick="alert(1)">title</em><script>alert("Unsafe HTML")</script>',
+			'This should not appear'
+		);
+
+		$this->assertStringNotContainsString(
+			'<script',
+			$result,
+			'Script tags should be stripped from the bound title.'
+		);
+		$this->assertStringNotContainsString(
+			'onclick',
+			$result,
+			'Event handler attributes should be stripped from the bound title.'
+		);
+		$this->assertStringContainsString(
+			'<span class="wp-block-accordion-heading__toggle-title">Bound <em>title</em>',
+			$result,
+			'Safe formatting should remain in the bound title.'
+		);
+	}
+
+	public function data_accordion_heading_title_markup() {
+		return array(
+			'link'                   => array(
+				'Read <a href="https://example.com">more</a>',
+				'Read more',
+			),
+			'block-level markup'     => array(
+				'<div><p>Block</p></div> text <br>here',
+				'Block text here',
+			),
+			'interactive elements'   => array(
+				'Press <button type="button">this</button> now',
+				'Press this now',
+			),
+			'interactive attributes' => array(
+				'<span role="button" tabindex="0" data-wp-on--click="actions.toggle">Fake</span> title',
+				'<span>Fake</span> title',
+			),
+			'inline formatting'      => array(
+				'<strong>Bold</strong> <code>code</code> <mark class="has-inline-color" style="color:#f00">mark</mark> H<sub>2</sub>O <span lang="fr">mot</span>',
+				'<strong>Bold</strong> <code>code</code> <mark class="has-inline-color" style="color:#f00">mark</mark> H<sub>2</sub>O <span lang="fr">mot</span>',
+			),
+			'inline image'           => array(
+				'Logo <img class="wp-image-7" src="https://example.com/logo.png" alt="Logo" usemap="#map">',
+				'Logo <img class="wp-image-7" src="https://example.com/logo.png" alt="Logo">',
+			),
+		);
+	}
+
+	/**
+	 * Tests if a bound title keeps only the inline formatting a button can contain.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 * @covers ::gutenberg_get_accordion_heading_title_allowed_html
+	 *
+	 * @dataProvider data_accordion_heading_title_markup
+	 *
+	 * @param string $source_value   The value returned by the source.
+	 * @param string $expected_title The expected title markup.
+	 */
+	public function test_update_accordion_heading_title_keeps_only_inline_markup( $source_value, $expected_title ) {
+		list( , $result ) = $this->render_accordion_heading_with_source_value( $source_value, 'This should not appear' );
+
+		$this->assertEqualHTML(
+			$this->get_accordion_heading_html( $expected_title ),
+			$result,
+			'<body>',
+			'The bound title should keep only inline, non-interactive formatting.'
+		);
+	}
+
+	/**
+	 * Tests if the saved title is kept when the source returns no value.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 */
+	public function test_accordion_heading_title_keeps_saved_value_when_source_returns_null() {
+		list( $block, $result ) = $this->render_accordion_heading_with_source_value( null, 'Saved title' );
+
+		$this->assertArrayNotHasKey(
+			'title',
+			$block->attributes,
+			"The 'title' attribute should not be set when the source returns no value."
+		);
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'Saved title' ),
+			$result,
+			'The saved title should be rendered when the source returns no value.'
+		);
+	}
+
+	/**
+	 * Tests if a title saved in the block comment is not rendered as a bound value.
+	 *
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 *
+	 * @expectedIncorrectUsage rest_validate_value_from_schema
+	 */
+	public function test_accordion_heading_title_ignores_title_in_block_comment() {
+		register_block_bindings_source(
+			self::SOURCE_NAME,
+			array(
+				'label'              => self::SOURCE_LABEL,
+				'get_value_callback' => function () {
+					return null;
+				},
+			)
+		);
+
+		$block_content = get_comment_delimited_block_content(
+			'core/accordion-heading',
+			array(
+				'title'    => '<em>From the block comment</em>',
+				'metadata' => array(
+					'bindings' => array(
+						'title' => array( 'source' => self::SOURCE_NAME ),
+					),
+				),
+			),
+			$this->get_accordion_heading_html( 'Saved title' )
+		);
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block( $parsed_blocks[0] );
+
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'Saved title' ),
+			trim( $block->render() ),
+			'A title saved in the block comment should not replace the saved title.'
+		);
+	}
+
+	/**
+	 * Tests if pattern overrides update the Accordion Heading title.
+	 *
+	 * @covers WP_Block::process_block_bindings
+	 * @covers ::gutenberg_render_block_accordion_heading_title_binding
+	 */
+	public function test_default_binding_for_accordion_heading_pattern_overrides() {
+		$block_name    = 'Question';
+		$block_content = get_comment_delimited_block_content(
+			'core/accordion-heading',
+			array(
+				'metadata' => array(
+					'bindings' => array(
+						'__default' => array( 'source' => 'core/pattern-overrides' ),
+					),
+					'name'     => $block_name,
+				),
+			),
+			$this->get_accordion_heading_html( 'Default title' )
+		);
+		$parsed_blocks = parse_blocks( $block_content );
+		$block         = new WP_Block(
+			$parsed_blocks[0],
+			array(
+				'pattern/overrides' => array(
+					$block_name => array( 'title' => 'Overridden <em>title</em>' ),
+				),
+			)
+		);
+		$result        = trim( $block->render() );
+
+		$this->assertSame(
+			$this->get_accordion_heading_html( 'Overridden <em>title</em>' ),
+			$result,
+			'The title should be replaced by the pattern override.'
+		);
+		$this->assertSame(
+			array(
+				'title' => array( 'source' => 'core/pattern-overrides' ),
+			),
+			$block->attributes['metadata']['bindings'],
+			'The __default binding should be updated with the title binding metadata.'
+		);
+	}
 }
