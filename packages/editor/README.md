@@ -1703,7 +1703,7 @@ Warns the user if there are unsaved changes before leaving the editor. Compatibl
 
 _Returns_
 
-- `React.ReactNode`: The component.
+- The component.
 
 ### URLInput
 
