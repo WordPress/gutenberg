@@ -10,6 +10,7 @@ import {
 	type Mock,
 } from 'vitest';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+import type { Field } from '@wordpress/dataviews';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -29,7 +30,10 @@ const POST_TYPES: Record< string, unknown > = {
 	page: { labels: { uploaded_to_this_item: 'Uploaded to this page' } },
 	// A post type that never set the label.
 	cpt: { labels: {} },
+	attachment: { labels: {}, taxonomies: [ 'genre' ] },
 };
+
+const TAXONOMIES = [ { slug: 'genre', rest_base: 'genres' } ];
 
 vi.mock( import( '@wordpress/core-data' ), async () => {
 	const { __dangerousOptInToUnstableAPIsOnlyForCoreModules } =
@@ -88,10 +92,17 @@ type ModalProps = {
 	value?: number | number[];
 	postId?: number;
 	postType?: string;
+	fields?: Field< any >[];
 };
 
 function renderModal(
-	{ isOpen = true, value, postId, postType }: Partial< ModalProps > = {},
+	{
+		isOpen = true,
+		value,
+		postId,
+		postType,
+		fields,
+	}: Partial< ModalProps > = {},
 	persistedView?: Record< string, unknown >
 ) {
 	const registry = createRegistry();
@@ -101,6 +112,7 @@ function renderModal(
 		reducer: ( state = {} ) => state,
 		selectors: {
 			getPostType: ( state: unknown, slug: string ) => POST_TYPES[ slug ],
+			getTaxonomies: () => TAXONOMIES,
 		},
 	} );
 
@@ -120,6 +132,7 @@ function renderModal(
 				value={ value }
 				postId={ postId }
 				postType={ postType }
+				fields={ fields }
 				onSelect={ onSelect }
 				onClose={ onClose }
 			/>
@@ -619,6 +632,98 @@ describe( 'MediaUploadModal', () => {
 			);
 			expect(
 				screen.queryByRole( 'button', { name: /Attached to/ } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	it( 'queries a filter on a taxonomy field by the taxonomy', async () => {
+		renderModal(
+			{},
+			{
+				filters: [
+					{ field: 'genres', operator: 'isNone', value: [ 3 ] },
+				],
+			}
+		);
+
+		await waitFor( () => {
+			expect(
+				mockUseEntityRecordsWithPermissions
+			).toHaveBeenLastCalledWith(
+				'postType',
+				'attachment',
+				expect.objectContaining( { genres_exclude: [ 3 ] } )
+			);
+		} );
+	} );
+
+	describe( 'registered fields', () => {
+		const genreField = {
+			id: 'genre',
+			type: 'array',
+			label: 'Genre',
+			elements: [
+				{ value: 3, label: 'Portrait' },
+				{ value: 4, label: 'Landscape' },
+			],
+			filterBy: { operators: [ 'isAny' ] },
+		} as Field< any >;
+
+		it( 'shows a registered field as a column', async () => {
+			mockRecords( IMAGE_RECORDS );
+			renderModal(
+				{ fields: [ genreField ] },
+				{ type: 'pickerTable', fields: [ 'genre' ] }
+			);
+
+			expect(
+				await screen.findByRole( 'columnheader', { name: /Genre/ } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'offers a registered field as a filter', async () => {
+			const user = userEvent.setup();
+			renderModal( { fields: [ genreField ] } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Add filter' } )
+			);
+			await user.click(
+				await screen.findByRole( 'menuitem', { name: 'Genre' } )
+			);
+
+			expect(
+				await screen.findByRole( 'option', { name: 'Portrait' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'option', { name: 'Landscape' } )
+			).toBeVisible();
+		} );
+
+		it( "keeps the modal's own field when one is registered with its ID", async () => {
+			mockRecords( IMAGE_RECORDS );
+			renderModal(
+				{
+					fields: [
+						{
+							id: 'filename',
+							type: 'text',
+							label: 'Registered file name',
+						} as Field< any >,
+					],
+				},
+				{ type: 'pickerTable', fields: [ 'filename' ] }
+			);
+
+			expect(
+				await screen.findByRole( 'columnheader', {
+					name: /^File name/,
+				} )
+			).toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'columnheader', {
+					name: /Registered file name/,
+				} )
 			).not.toBeInTheDocument();
 		} );
 	} );

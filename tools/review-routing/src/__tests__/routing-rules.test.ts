@@ -6,37 +6,67 @@ import {
 } from '../routing-rules.ts';
 
 describe( 'parseRoutingRule', () => {
-	it( 'reads the team, the threshold and the instructions', () => {
+	it( 'reads the reviewer, the threshold and the instructions', () => {
 		expect(
 			parseRoutingRule(
 				'data',
-				'---\nteam: WordPress/data\nthreshold: 0.8\n---\n\nAsk when stores change.\n'
+				'---\nreviewer: WordPress/data\nthreshold: 0.8\n---\n\nAsk when stores change.\n'
 			)
 		).toEqual( {
 			id: 'data',
-			team: 'WordPress/data',
+			reviewers: [ 'WordPress/data' ],
 			threshold: 0.8,
 			instructions: 'Ask when stores change.',
 		} );
 	} );
 
+	it( 'reads several reviewers as a flow sequence', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: [ octocat, WordPress/data ]\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat', 'WordPress/data' ] );
+	} );
+
+	it( 'removes a leading @ from each reviewer', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: [ @octocat, @WordPress/data ]\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat', 'WordPress/data' ] );
+	} );
+
+	it( 'splits reviewers only inside brackets', () => {
+		expect(
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: octocat, WordPress/data\n---\nAsk.'
+			).reviewers
+		).toEqual( [ 'octocat, WordPress/data' ] );
+	} );
+
 	it( 'uses the default threshold when none is set', () => {
 		expect(
-			parseRoutingRule( 'data', '---\nteam: WordPress/data\n---\nAsk.' )
-				.threshold
+			parseRoutingRule(
+				'data',
+				'---\nreviewer: WordPress/data\n---\nAsk.'
+			).threshold
 		).toBe( DEFAULT_THRESHOLD );
 	} );
 
 	it.each( [
 		[ 'no front matter', 'data', 'Ask.' ],
-		[ 'no team', 'data', '---\nthreshold: 0.5\n---\nAsk.' ],
+		[ 'no reviewer', 'data', '---\nthreshold: 0.5\n---\nAsk.' ],
+		[ 'an empty reviewer list', 'data', '---\nreviewer: []\n---\nAsk.' ],
 		[
 			'a bad threshold',
 			'data',
-			'---\nteam: a/b\nthreshold: 2\n---\nAsk.',
+			'---\nreviewer: a/b\nthreshold: 2\n---\nAsk.',
 		],
-		[ 'no instructions', 'data', '---\nteam: a/b\n---\n' ],
-		[ 'a bad id', 'data team', '---\nteam: a/b\n---\nAsk.' ],
+		[ 'no instructions', 'data', '---\nreviewer: a/b\n---\n' ],
+		[ 'a bad id', 'data team', '---\nreviewer: a/b\n---\nAsk.' ],
 	] )( 'rejects a file with %s', ( _, id, source ) => {
 		expect( () => parseRoutingRule( id, source ) ).toThrow();
 	} );

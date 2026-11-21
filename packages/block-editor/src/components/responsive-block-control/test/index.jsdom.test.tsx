@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Fragment, useState } from '@wordpress/element';
-import { SelectControl as WCSelectControl } from '@wordpress/components';
 import type { ReactNode } from 'react';
 import ResponsiveBlockControl from '../index';
 import type { ResponsiveBlockControlViewport } from '../types';
@@ -13,32 +12,16 @@ const inputId = 'input-12345678';
 
 const noop = () => {};
 
-const sizeOptions = [
-	{
-		label: 'Please select',
-		value: '',
-	},
-	{
-		label: 'Small',
-		value: 'small',
-	},
-	{
-		label: 'Medium',
-		value: 'medium',
-	},
-	{
-		label: 'Large',
-		value: 'large',
-	},
-];
-
 const renderTestDefaultControlComponent = (
 	labelComponent: ReactNode,
 	device: ResponsiveBlockControlViewport
 ) => {
 	return (
 		<>
-			<WCSelectControl label={ labelComponent } options={ sizeOptions } />
+			<label htmlFor={ `${ inputId }-${ device.id }` }>
+				{ labelComponent }
+				<input id={ `${ inputId }-${ device.id }` } type="text" />
+			</label>
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we
 				have access to details about the device.
@@ -76,7 +59,7 @@ describe( 'Basic rendering', () => {
 			name: 'Padding',
 		} );
 
-		const defaultControl = screen.getByRole( 'combobox', {
+		const defaultControl = screen.getByRole( 'textbox', {
 			// TODO: jsdom-only name; browsers separate label and help text with a space.
 			name: 'AllControls the padding property for All viewports.',
 		} );
@@ -175,7 +158,7 @@ describe( 'Basic rendering', () => {
 			/>
 		);
 
-		const defaultControlLabel = screen.getByRole( 'combobox', {
+		const defaultControlLabel = screen.getByRole( 'textbox', {
 			// TODO: jsdom-only name; browsers separate label and help text with a space.
 			name: 'EverythingControls the padding property for Everything viewports.',
 		} );
@@ -244,7 +227,7 @@ describe( 'Default and Responsive modes', () => {
 		const responsiveViewportsLabels: HTMLElement[] = [];
 		customViewportSet.forEach( ( { label } ) => {
 			responsiveViewportsLabels.push(
-				screen.getByRole( 'combobox', {
+				screen.getByRole( 'textbox', {
 					// TODO: jsdom-only name; browsers separate label and help text with a space.
 					name: `${ label }Controls the padding property for ${ label } viewports.`,
 				} )

@@ -118,6 +118,7 @@
 		}
 
 		.icon {
+			flex-shrink: 0;
 			margin: var(--wp-ui-button-icon-margin);
 		}
 
