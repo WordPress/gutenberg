@@ -23,6 +23,19 @@ describe( 'UnitControl utils', () => {
 			expect( units ).toEqual( [ { value: 'px', label: 'pixel' } ] );
 		} );
 
+		it( 'should support opting into container query units', () => {
+			const units = useCustomUnits( {
+				availableUnits: [ 'px', 'cqi', 'cqw' ],
+			} );
+
+			// Units are returned in the order of `ALL_CSS_UNITS`.
+			expect( units.map( ( { value } ) => value ) ).toEqual( [
+				'px',
+				'cqw',
+				'cqi',
+			] );
+		} );
+
 		it( 'should add default values to available units', () => {
 			const cssUnits = [
 				{ value: 'px', label: 'pixel' },
@@ -298,6 +311,8 @@ describe( 'UnitControl utils', () => {
 			[ '2rem', 2, 'rem' ],
 			[ '1.4vw', 1.4, 'vw' ],
 			[ '0.4vh', 0.4, 'vh' ],
+			[ '50cqi', 50, 'cqi' ],
+			[ '12.5cqmin', 12.5, 'cqmin' ],
 			[ '-5px', -5, 'px' ],
 			// Complex CSS values that shouldn't parse.
 			[ 'abs(-15px)', undefined, undefined ],
