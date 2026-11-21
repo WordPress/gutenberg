@@ -6,6 +6,16 @@
 
 -   Add `waitForTransition`, which returns a Promise that resolves once a store-derived predicate goes from `true` to `false`, such as when a post finishes saving ([#41169](https://github.com/WordPress/gutenberg/pull/41169)).
 
+### Bug Fixes
+
+-   `plugins.persistence`: Allow calling `createPersistenceInterface` and registering the plugin without options ([#87060](https://github.com/WordPress/gutenberg/pull/87060)).
+
+## 11.2.0 (2026-11-18)
+
+### Bug Fixes
+
+-   `Resolver`: Accept `NormalizedResolver` in the resolver types ([#86847](https://github.com/WordPress/gutenberg/pull/86847)).
+
 ## 11.1.0 (2026-11-04)
 
 ### Bug Fixes
