@@ -61,6 +61,24 @@ const { state } = store(
 					return;
 				}
 
+				const existing = playerState.get( ref );
+
+				// Start from the first track visible in the current viewport.
+				if (
+					! existing &&
+					! isTrackVisible( ref, context.tracks, context.currentId )
+				) {
+					const firstVisibleTrack = context.tracks.find(
+						( trackId ) =>
+							isTrackVisible( ref, context.tracks, trackId )
+					);
+					// Don't load a hidden track when none are visible.
+					if ( ! firstVisibleTrack ) {
+						return;
+					}
+					context.currentId = firstVisibleTrack;
+				}
+
 				const track =
 					state.playlists[ context.playlistId ]?.tracks[
 						context.currentId
@@ -68,8 +86,6 @@ const { state } = store(
 				if ( ! track?.url ) {
 					return;
 				}
-
-				const existing = playerState.get( ref );
 
 				// Skip if we already initialized with this exact URL.
 				if ( existing?.url === track.url ) {
@@ -86,6 +102,25 @@ const { state } = store(
 	},
 	{ lock: true }
 );
+
+/**
+ * Check whether a track is visible in the current viewport. Tracks hidden on
+ * some viewports still render their button, hidden with CSS.
+ *
+ * @param {Element}  ref      - The waveform player container.
+ * @param {string[]} trackIds - The playlist's track IDs, in button order.
+ * @param {string}   trackId  - The track ID to check.
+ * @return {boolean} Whether the track is visible.
+ */
+function isTrackVisible( ref, trackIds, trackId ) {
+	const button = ref
+		.closest( '.wp-block-playlist' )
+		?.querySelectorAll( '.wp-block-playlist-track__button' )[
+		trackIds.indexOf( trackId )
+	];
+	const track = button?.closest( '.wp-block-playlist-track' );
+	return ! track || window.getComputedStyle( track ).display !== 'none';
+}
 
 /**
  * Initialize the waveform player for a given element.
@@ -164,11 +199,15 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		waveformStyle: context.waveformStyle,
 		showPlayButtonArtwork,
 		onEnded: () => {
-			// Advance to next track (autoPlay handles playback).
+			// Advance to the next visible track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
 				( trackId ) => trackId === context.currentId
 			);
-			const nextTrack = context.tracks[ currentIndex + 1 ];
+			const nextTrack = context.tracks
+				.slice( currentIndex + 1 )
+				.find( ( trackId ) =>
+					isTrackVisible( ref, context.tracks, trackId )
+				);
 			if ( nextTrack ) {
 				context.currentId = nextTrack;
 			}

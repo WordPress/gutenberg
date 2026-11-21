@@ -525,6 +525,49 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 
 	/**
 	 * @covers ::render_block_core_playlist
+	 */
+	public function test_skips_hidden_tracks() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'title'    => 'Song One',
+					'src'      => 'http://example.com/song1.mp3',
+					'metadata' => array( 'blockVisibility' => false ),
+				),
+				array(
+					'title' => 'Song Two',
+					'src'   => 'http://example.com/song2.mp3',
+				),
+				array(
+					'title'    => 'Song Three',
+					'src'      => 'http://example.com/song3.mp3',
+					'metadata' => array(
+						'blockVisibility' => array(
+							'viewport' => array( 'mobile' => false ),
+						),
+					),
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$p      = new WP_HTML_Tag_Processor( $output );
+		$p->next_tag( 'figure' );
+		$context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( array( 'track-0', 'track-1' ), $context['tracks'] );
+
+		$p->next_tag( array( 'class_name' => 'wp-block-playlist-track__button' ) );
+		$button_context = json_decode( $p->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( 'track-0', $button_context['trackId'] );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$this->assertSame( 'http://example.com/song2.mp3', $playlist['tracks']['track-0']['url'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
 	 * @covers ::render_block_core_playlist_track
 	 */
 	public function test_renders_when_tracks_have_src_without_id() {

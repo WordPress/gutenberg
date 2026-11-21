@@ -381,6 +381,106 @@ test.describe( 'Playlist block', () => {
 		await expect( playerArtwork ).toHaveCount( 0 );
 	} );
 
+	test( 'skips hidden tracks on the frontend', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const tracks = [
+			{
+				id: uploadedSecondAudio.id,
+				src: uploadedSecondAudio.source_url,
+				title: 'Hidden track',
+				metadata: { blockVisibility: false },
+			},
+			{
+				id: uploadedSecondAudio.id,
+				src: uploadedSecondAudio.source_url,
+				title: 'Viewport hidden track',
+				metadata: {
+					blockVisibility: {
+						viewport: {
+							mobile: false,
+							tablet: false,
+							desktop: false,
+						},
+					},
+				},
+			},
+			{
+				id: uploadedAudio.id,
+				src: uploadedAudio.source_url,
+				title: 'First visible track',
+			},
+			{
+				id: uploadedSecondAudio.id,
+				src: uploadedSecondAudio.source_url,
+				title: 'Second visible track',
+			},
+		];
+		const trackComments = tracks.map(
+			( track ) =>
+				`<!-- wp:playlist-track ${ JSON.stringify( track ) } /-->`
+		);
+		const post = await requestUtils.createPost( {
+			title: 'Playlist hidden tracks',
+			status: 'publish',
+			content: [
+				'<!-- wp:playlist -->',
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist">',
+				...trackComments,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+				'<!-- wp:playlist {"showTracklist":false} -->',
+				'<figure class="wp-block-playlist">',
+				'<ol class="wp-block-playlist__tracklist wp-block-playlist__tracklist-is-hidden">',
+				...trackComments,
+				'</ol></figure>',
+				'<!-- /wp:playlist -->',
+			].join( '' ),
+		} );
+
+		await page.goto( post.link );
+
+		const [ playlist, playlistWithoutTracklist ] = await page
+			.locator( '.wp-block-playlist' )
+			.all();
+		const player = playlist.locator(
+			'.wp-block-playlist__waveform-player'
+		);
+
+		await expect(
+			playlist.getByRole( 'button', {
+				name: /Hidden track/,
+				includeHidden: true,
+			} )
+		).toHaveCount( 0 );
+		await expect(
+			playlist.getByRole( 'button', {
+				name: /Viewport hidden track/,
+				includeHidden: true,
+			} )
+		).toBeHidden();
+		await expect(
+			player.getByRole( 'slider', { name: 'First visible track' } )
+		).toBeVisible();
+
+		await playlist
+			.getByRole( 'button', { name: /Second visible track/ } )
+			.click();
+
+		await expect(
+			player.getByRole( 'slider', { name: 'Second visible track' } )
+		).toBeVisible();
+
+		// Hiding the tracklist doesn't hide its tracks.
+		await expect(
+			playlistWithoutTracklist
+				.locator( '.wp-block-playlist__waveform-player' )
+				.getByRole( 'slider', { name: 'First visible track' } )
+		).toBeVisible();
+	} );
+
 	test( 'sets and removes the track image from the block settings sidebar', async ( {
 		admin,
 		editor,
