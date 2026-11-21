@@ -10,8 +10,13 @@ import { Placeholder } from '@wordpress/components';
 import { group as groupIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import type { BlockEditProps } from '@wordpress/blocks';
 
-export default function Edit( props ) {
+interface Attributes extends Record< string, unknown > {
+	title?: string;
+}
+
+export default function Edit( props: BlockEditProps< Attributes > ) {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlockCount( clientId ) > 0,
@@ -29,7 +34,9 @@ export default function Edit( props ) {
 	);
 }
 
-function PlaceholderContent( { clientId } ) {
+function PlaceholderContent( {
+	clientId,
+}: Pick< BlockEditProps< Attributes >, 'clientId' > ) {
 	return (
 		<>
 			<Placeholder
@@ -44,7 +51,10 @@ function PlaceholderContent( { clientId } ) {
 	);
 }
 
-function PreviewContent( { attributes, setAttributes } ) {
+function PreviewContent( {
+	attributes,
+	setAttributes,
+}: Pick< BlockEditProps< Attributes >, 'attributes' | 'setAttributes' > ) {
 	return (
 		<>
 			<RichText

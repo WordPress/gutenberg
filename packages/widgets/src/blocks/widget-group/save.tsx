@@ -1,6 +1,11 @@
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
+import type { BlockSaveProps } from '@wordpress/blocks';
 
-export default function save( { attributes } ) {
+interface Attributes extends Record< string, unknown > {
+	title?: string;
+}
+
+export default function save( { attributes }: BlockSaveProps< Attributes > ) {
 	return (
 		<>
 			<RichText.Content
