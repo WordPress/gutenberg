@@ -2,7 +2,11 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
-import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import {
+	getBlockClientId,
+	getSelectionEditableElement,
+	isBlockElementOutsideFields,
+} from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -36,6 +40,12 @@ export default function useEditableRoot() {
 			} = registry.select( blockEditorStore );
 
 			const { activeElement } = node.ownerDocument;
+
+			// Not while a block's own element outside its fields has focus, as
+			// after a press on a list item's bullet: it is dragged from there.
+			if ( isBlockElementOutsideFields( activeElement ) ) {
+				return;
+			}
 			// A mounted element's window has a selection.
 			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			const isFieldFocused =
