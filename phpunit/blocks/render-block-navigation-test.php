@@ -379,6 +379,128 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The font size must only be applied to the wrapper, so that relative units are not multiplied by the inner list.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_inner_blocks_html
+	 *
+	 * @dataProvider data_font_size_attributes
+	 *
+	 * @param array  $attributes   Navigation block attributes.
+	 * @param string $wrapper_pattern Pattern the wrapper must match.
+	 */
+	public function test_font_size_is_applied_only_to_the_navigation_wrapper( $attributes, $wrapper_pattern ) {
+		$attributes['overlayMenu'] = 'never';
+		$markup                    = do_blocks(
+			'<!-- wp:navigation ' . wp_json_encode( $attributes ) . ' --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertMatchesRegularExpression( $wrapper_pattern, $processor->get_attribute( 'class' ) . ' ' . $processor->get_attribute( 'style' ) );
+
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation__container' ) );
+		$this->assertDoesNotMatchRegularExpression( '/has-[\w-]+-font-size/', (string) $processor->get_attribute( 'class' ) );
+		$this->assertStringNotContainsString( 'font-size', (string) $processor->get_attribute( 'style' ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public static function data_font_size_attributes() {
+		return array(
+			'custom relative size' => array(
+				array( 'style' => array( 'typography' => array( 'fontSize' => '2em' ) ) ),
+				'/font-size:\s*2em/',
+			),
+			'preset size'          => array(
+				array( 'fontSize' => 'large' ),
+				'/has-large-font-size/',
+			),
+			'legacy custom size'   => array(
+				array( 'customFontSize' => 24 ),
+				'/font-size:\s*24px/',
+			),
+			'fluid clamp size'     => array(
+				array( 'style' => array( 'typography' => array( 'fontSize' => 'clamp(1.25em, 1.25rem + ((1vw - 0.2em) * 1.176), 2em)' ) ) ),
+				'/font-size:\s*clamp\(1\.25em/',
+			),
+			'rem size'             => array(
+				array( 'style' => array( 'typography' => array( 'fontSize' => '1.5rem' ) ) ),
+				'/font-size:\s*1\.5rem/',
+			),
+		);
+	}
+
+	/**
+	 * Other typography and color output must stay on the inner list when the font size is removed.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_inner_blocks_html
+	 */
+	public function test_font_size_removal_preserves_other_container_attributes() {
+		$markup = do_blocks(
+			'<!-- wp:navigation {"overlayMenu":"never","textColor":"vivid-red","fontSize":"large","style":{"typography":{"lineHeight":"1.8","letterSpacing":"2px"}}} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertTrue( $processor->has_class( 'has-large-font-size' ), 'The wrapper keeps the font size class.' );
+
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation__container' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation' ) );
+		$this->assertTrue( $processor->has_class( 'has-vivid-red-color' ) );
+		$this->assertFalse( $processor->has_class( 'has-large-font-size' ) );
+
+		$style = (string) $processor->get_attribute( 'style' );
+		$this->assertStringContainsString( 'line-height:1.8', $style );
+		$this->assertStringContainsString( 'letter-spacing:2px', $style );
+		$this->assertStringNotContainsString( 'font-size', $style );
+	}
+
+	/**
+	 * A list without a font size keeps its attributes and gets no empty style attribute.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_inner_blocks_html
+	 */
+	public function test_container_without_font_size_is_unchanged() {
+		$markup = do_blocks(
+			'<!-- wp:navigation {"overlayMenu":"never"} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->'
+		);
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation__container' ) );
+		$this->assertTrue( $processor->has_class( 'wp-block-navigation' ) );
+		$this->assertNull( $processor->get_attribute( 'style' ) );
+		$this->assertStringNotContainsString( '<ul  ', $markup, 'No stray whitespace in the list attributes.' );
+	}
+
+	/**
+	 * Every list container is cleaned, including a second list after a non list item, and submenu lists are untouched.
+	 *
+	 * @covers WP_Navigation_Block_Renderer_Gutenberg::get_inner_blocks_html
+	 */
+	public function test_font_size_is_removed_from_each_container_list() {
+		$markup = do_blocks(
+			'<!-- wp:navigation {"overlayMenu":"never","style":{"typography":{"fontSize":"2em"}}} --><!-- wp:navigation-link {"label":"One","url":"/","kind":"custom"} /--><!-- wp:navigation-submenu {"label":"Two","url":"/two","kind":"custom"} --><!-- wp:navigation-link {"label":"Child","url":"/child","kind":"custom"} /--><!-- /wp:navigation-submenu --><!-- /wp:navigation -->'
+		);
+
+		$processor  = new WP_HTML_Tag_Processor( $markup );
+		$containers = 0;
+		while ( $processor->next_tag( 'ul' ) ) {
+			if ( $processor->has_class( 'wp-block-navigation__container' ) ) {
+				++$containers;
+				$this->assertStringNotContainsString( 'font-size', (string) $processor->get_attribute( 'style' ) );
+			}
+		}
+		$this->assertGreaterThan( 0, $containers );
+	}
+
+	/**
 	 * @covers WP_Theme_JSON_Gutenberg::get_styles_for_block
 	 */
 	public function test_global_styles_custom_css_targets_only_the_navigation_wrapper() {

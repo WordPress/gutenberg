@@ -266,6 +266,45 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Removes font size classes and declarations from container attributes.
+	 *
+	 * The inner lists are built with `get_block_wrapper_attributes()`, so they
+	 * receive the same font size as the outer wrapper. The font size is already
+	 * applied to the wrapper and inherited by the lists. Repeating it would
+	 * multiply relative values such as `em`, `%` or `rem` based presets.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param string $attributes Serialized HTML attributes.
+	 * @return string The attributes without font size classes or styles.
+	 */
+	private static function remove_font_size_from_container_attributes( $attributes ) {
+		$processor = new WP_HTML_Tag_Processor( '<ul ' . $attributes . '>' );
+		if ( ! $processor->next_tag( 'UL' ) ) {
+			return $attributes;
+		}
+
+		foreach ( iterator_to_array( $processor->class_list() ) as $class_name ) {
+			if ( 1 === preg_match( '/^has-.+-font-size$/', $class_name ) ) {
+				$processor->remove_class( $class_name );
+			}
+		}
+
+		$style = $processor->get_attribute( 'style' );
+		if ( is_string( $style ) ) {
+			$style = trim( preg_replace( '/(?<![\w-])font-size\s*:[^;]*;?/i', '', $style ) );
+			if ( '' === $style ) {
+				$processor->remove_attribute( 'style' );
+			} else {
+				$processor->set_attribute( 'style', $style );
+			}
+		}
+
+		$html = $processor->get_updated_html();
+		return ltrim( substr( $html, 4, -1 ) );
+	}
+
+	/**
 	 * Returns the html for the inner blocks of the navigation block.
 	 *
 	 * @since 6.5.0
@@ -286,6 +325,7 @@ class WP_Navigation_Block_Renderer {
 				'style' => $style,
 			)
 		);
+		$container_attributes = self::remove_font_size_from_container_attributes( $container_attributes );
 
 		$inner_blocks_html = '';
 		$is_list_open      = false;
