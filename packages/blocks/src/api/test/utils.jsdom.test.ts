@@ -1,4 +1,5 @@
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import type { BlockType } from '../../types';
 import '../../store';
 import { createBlock } from '../factory';
 import {
@@ -19,11 +20,35 @@ import {
 	isContentBlock,
 } from '../utils';
 
-const noop = () => {};
+const noop = () => null;
+
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
+
+function partial< T >( fixture: DeepPartial< T > ): T {
+	return fixture as T;
+}
 
 describe( 'block helpers', () => {
 	afterEach( () => {
-		setDefaultBlockName( undefined );
+		setDefaultBlockName( '' );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -111,14 +136,17 @@ describe( 'block helpers', () => {
 
 describe( 'getBlockLabel', () => {
 	it( 'returns only the block title when the block has no `getLabel` function', () => {
-		const blockType = { title: 'Recipe' };
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Recipe' );
 	} );
 
 	it( 'returns only the block title when the block has a `getLabel` function, but it returns a falsey value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: () => '' };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: () => '',
+		} as unknown as BlockType;
 		const attributes = {};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Recipe' );
@@ -127,8 +155,9 @@ describe( 'getBlockLabel', () => {
 	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
-		};
+			__experimentalLabel: ( { heading }: { heading?: string } ) =>
+				heading,
+		} as unknown as BlockType;
 		const attributes = { heading: 'Cupcakes!' };
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Cupcakes!' );
@@ -137,8 +166,9 @@ describe( 'getBlockLabel', () => {
 	it( 'removes any html elements from the output of the `getLabel` function', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
-		};
+			__experimentalLabel: ( { heading }: { heading?: string } ) =>
+				heading,
+		} as unknown as BlockType;
 		const attributes = {
 			heading: '<b><span class="my-class">Cupcakes!</span></b>',
 		};
@@ -149,7 +179,7 @@ describe( 'getBlockLabel', () => {
 
 describe( 'getAccessibleBlockLabel', () => {
 	it( 'returns only the block title when the block has no `getLabel` function', () => {
-		const blockType = { title: 'Recipe' };
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
@@ -158,7 +188,10 @@ describe( 'getAccessibleBlockLabel', () => {
 	} );
 
 	it( 'returns only the block title when the block has a `getLabel` function, but it returns a falsey value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: () => '' };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: () => '',
+		} as unknown as BlockType;
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
@@ -169,8 +202,9 @@ describe( 'getAccessibleBlockLabel', () => {
 	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
-		};
+			__experimentalLabel: ( { heading }: { heading?: string } ) =>
+				heading,
+		} as unknown as BlockType;
 		const attributes = { heading: 'Cupcakes!' };
 
 		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
@@ -181,8 +215,9 @@ describe( 'getAccessibleBlockLabel', () => {
 	it( 'removes any html elements from the output of the `getLabel` function', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
-		};
+			__experimentalLabel: ( { heading }: { heading?: string } ) =>
+				heading,
+		} as unknown as BlockType;
 		const attributes = {
 			heading: '<b><span class="my-class">Cupcakes!</span></b>',
 		};
@@ -195,8 +230,9 @@ describe( 'getAccessibleBlockLabel', () => {
 	it( 'outputs the block title and label with a row number indicating the position of the block, when the optional third parameter is provided', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
-		};
+			__experimentalLabel: ( { heading }: { heading?: string } ) =>
+				heading,
+		} as unknown as BlockType;
 		const attributes = { heading: 'Cupcakes!' };
 
 		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
@@ -205,7 +241,7 @@ describe( 'getAccessibleBlockLabel', () => {
 	} );
 
 	it( 'outputs just the block title and row number when there no label is available for the block', () => {
-		const blockType = { title: 'Recipe' };
+		const blockType = { title: 'Recipe' } as BlockType;
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
@@ -218,7 +254,10 @@ describe( 'isBlockRegistered', () => {
 	it( 'returns true if the block is registered', () => {
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
+			category: 'text',
 			title: 'Test block',
+			attributes: {},
+			save: () => null,
 		} );
 		expect( isBlockRegistered( 'core/test-block' ) ).toBe( true );
 		unregisterBlockType( 'core/test-block' );
@@ -241,6 +280,7 @@ describe( 'sanitizeBlockAttributes', () => {
 	it( 'sanitize block attributes not defined in the block type', () => {
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
+			category: 'text',
 			attributes: {
 				defined: {
 					type: 'string',
@@ -270,6 +310,7 @@ describe( 'sanitizeBlockAttributes', () => {
 	it( 'handles undefined values and default values', () => {
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
+			category: 'text',
 			attributes: {
 				hasDefaultValue: {
 					type: 'string',
@@ -292,6 +333,7 @@ describe( 'sanitizeBlockAttributes', () => {
 	it( 'handles node and children sources as arrays', () => {
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
+			category: 'text',
 			attributes: {
 				nodeContent: {
 					source: 'node',
@@ -321,6 +363,7 @@ describe( 'sanitizeBlockAttributes', () => {
 	it( 'keeps the experimental function as a deprecated alias', () => {
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
+			category: 'text',
 			attributes: {
 				defined: {
 					type: 'string',
@@ -382,12 +425,15 @@ describe( 'getBlockAttributesNamesByRole', () => {
 			category: 'text',
 			title: 'test block 2',
 		} );
-		registerBlockType( 'core/test-block-3', {
-			apiVersion: 3,
-			save: noop,
-			category: 'text',
-			title: 'test block 3',
-		} );
+		registerBlockType(
+			'core/test-block-3',
+			partial< Parameters< typeof registerBlockType >[ 1 ] >( {
+				apiVersion: 3,
+				save: noop,
+				category: 'text',
+				title: 'test block 3',
+			} )
+		);
 	} );
 	afterAll( () => {
 		[

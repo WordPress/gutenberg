@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
+import type { Block, BlockTransform } from '../../types';
 import '../../store';
 import {
 	createBlock,
@@ -24,7 +25,32 @@ import {
 } from '../registration';
 import { logged as warningLoggedSet } from '../../../../warning/src/utils';
 
-const noop = () => {};
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
+
+function partial< T >( fixture: DeepPartial< T > ): T {
+	return fixture as T;
+}
+
+const noop = () => null;
+const transformNoop = () => [] as Block[];
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -227,7 +253,6 @@ describe( 'block factory', () => {
 					...defaultBlockSettings,
 				} );
 				registerBlockType( 'core/test-paragraph', {
-					apiVersion: 3,
 					...defaultBlockSettings,
 					attributes: {
 						content: {
@@ -353,7 +378,7 @@ describe( 'block factory', () => {
 				] )
 			);
 
-			const clonedBlock = cloneBlock( block, {
+			const clonedBlock = cloneBlock( block as Block, {
 				isDifferent: true,
 				htmlContent: 'test',
 			} );
@@ -396,7 +421,7 @@ describe( 'block factory', () => {
 				] )
 			);
 
-			const clonedBlock = cloneBlock( block, undefined, [
+			const clonedBlock = cloneBlock( block as Block, undefined, [
 				createBlock( 'core/test-block' ),
 			] );
 
@@ -429,7 +454,7 @@ describe( 'block factory', () => {
 				] )
 			);
 
-			const clonedBlock = cloneBlock( block );
+			const clonedBlock = cloneBlock( block as Block );
 
 			expect( clonedBlock.innerBlocks ).toHaveLength( 2 );
 			expect( clonedBlock.innerBlocks[ 0 ].clientId ).not.toBe(
@@ -507,7 +532,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -544,7 +569,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -580,7 +605,7 @@ describe( 'block factory', () => {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
 							variationName: 'grid',
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -618,7 +643,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -657,7 +682,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -699,7 +724,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 						},
 					],
@@ -742,7 +767,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 						},
 					],
@@ -788,13 +813,13 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 						},
 						{
 							type: 'block',
 							blocks: [ 'core/another-text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 						},
 					],
@@ -837,7 +862,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: false,
 						},
 					],
@@ -858,7 +883,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 						},
 					],
@@ -902,7 +927,7 @@ describe( 'block factory', () => {
 								'core/text-block',
 								'core/another-text-block',
 							],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -944,7 +969,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMatch: () => true,
 						},
 					],
@@ -982,7 +1007,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMatch: () => false,
 						},
 					],
@@ -1017,7 +1042,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMatch: () => true,
 						},
 					],
@@ -1053,7 +1078,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMatch: () => false,
 						},
 					],
@@ -1090,7 +1115,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMatch,
 						},
 					],
@@ -1125,7 +1150,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: noop,
+							transform: transformNoop,
 							isMultiBlock: true,
 							isMatch,
 						},
@@ -1167,7 +1192,7 @@ describe( 'block factory', () => {
 							{
 								type: 'block',
 								blocks: [ '*' ],
-								transform: noop,
+								transform: transformNoop,
 							},
 						],
 					},
@@ -1248,15 +1273,16 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified transform callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
 								} );
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1275,12 +1301,12 @@ describe( 'block factory', () => {
 			);
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].name ).toBe(
+			expect( transformedBlocks![ 0 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks![ 0 ].name ).toBe(
 				'core/updated-text-block'
 			);
-			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
-			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+			expect( transformedBlocks![ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks![ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
 		} );
@@ -1299,15 +1325,16 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified transform callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
 								} );
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1325,12 +1352,12 @@ describe( 'block factory', () => {
 			);
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].name ).toBe(
+			expect( transformedBlocks![ 0 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks![ 0 ].name ).toBe(
 				'core/updated-text-block'
 			);
-			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
-			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+			expect( transformedBlocks![ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks![ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
 		} );
@@ -1391,10 +1418,10 @@ describe( 'block factory', () => {
 				'core/group-block'
 			);
 
-			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+			expect( transformedBlocks![ 0 ].attributes ).toEqual( {
 				layout: { type: 'grid' },
 			} );
-			expect( defaultTransformedBlocks[ 0 ].attributes ).toEqual( {
+			expect( defaultTransformedBlocks![ 0 ].attributes ).toEqual( {
 				layout: { type: 'constrained' },
 			} );
 		} );
@@ -1428,10 +1455,12 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
+							type: 'block',
 							blocks: [ 'core/text-block' ],
+							// @ts-expect-error Deliberately returning null from transform.
 							transform: () => null,
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1470,16 +1499,19 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							isMatch: ( { matches } ) => matches === true,
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified callback signature.
+							isMatch: ( { matches }: { matches?: boolean } ) =>
+								matches === true,
+							// @ts-expect-error Simplified callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
 								} );
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1517,16 +1549,19 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							isMatch: ( { matches } ) => matches === true,
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified callback signature.
+							isMatch: ( { matches }: { matches?: boolean } ) =>
+								matches === true,
+							// @ts-expect-error Simplified callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/updated-text-block', {
 									value: 'chicken ' + value,
 								} );
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1557,6 +1592,7 @@ describe( 'block factory', () => {
 				transforms: {
 					from: [
 						{
+							type: 'block',
 							blocks: [ 'core/text-block' ],
 							transform: () => [],
 						},
@@ -1590,16 +1626,18 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
+							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Deliberately returning object without Block properties.
+							transform: ( { value }: { value: string } ) => {
 								return {
 									attributes: {
 										value: 'chicken ' + value,
 									},
 								};
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1630,9 +1668,11 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
+							type: 'block',
 							blocks: [ 'core/text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Deliberately returning non-block object in array.
+							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/updated-text-block', {
 										value: 'chicken ' + value,
@@ -1644,7 +1684,7 @@ describe( 'block factory', () => {
 									},
 								];
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1679,14 +1719,16 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
+							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return createBlock( 'core/text-block', {
 									value: 'chicken ' + value,
 								} );
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1720,9 +1762,11 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
+							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
 										value: 'chicken ' + value,
@@ -1732,7 +1776,7 @@ describe( 'block factory', () => {
 									} ),
 								];
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1766,10 +1810,11 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					to: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/updated-text-block' ],
-							transform: ( { value } ) => {
+							// @ts-expect-error Simplified callback signature.
+							transform: ( { value }: { value: string } ) => {
 								return [
 									createBlock( 'core/text-block', {
 										value: 'chicken ' + value,
@@ -1779,7 +1824,7 @@ describe( 'block factory', () => {
 									} ),
 								];
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1800,18 +1845,18 @@ describe( 'block factory', () => {
 			// transformed block whose type matches the "destination" type gets
 			// to keep the existing block's client ID.
 			expect( transformedBlocks ).toHaveLength( 2 );
-			expect( transformedBlocks[ 0 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 0 ].name ).toBe( 'core/text-block' );
-			expect( transformedBlocks[ 0 ].isValid ).toBe( true );
-			expect( transformedBlocks[ 0 ].attributes ).toEqual( {
+			expect( transformedBlocks![ 0 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks![ 0 ].name ).toBe( 'core/text-block' );
+			expect( transformedBlocks![ 0 ].isValid ).toBe( true );
+			expect( transformedBlocks![ 0 ].attributes ).toEqual( {
 				value: 'chicken ribs',
 			} );
-			expect( transformedBlocks[ 1 ] ).toHaveProperty( 'clientId' );
-			expect( transformedBlocks[ 1 ].name ).toBe(
+			expect( transformedBlocks![ 1 ] ).toHaveProperty( 'clientId' );
+			expect( transformedBlocks![ 1 ].name ).toBe(
 				'core/updated-text-block'
 			);
-			expect( transformedBlocks[ 1 ].isValid ).toBe( true );
-			expect( transformedBlocks[ 1 ].attributes ).toEqual( {
+			expect( transformedBlocks![ 1 ].isValid ).toBe( true );
+			expect( transformedBlocks![ 1 ].attributes ).toEqual( {
 				value: 'smoked ribs',
 			} );
 		} );
@@ -1826,10 +1871,14 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
-							transform( attributes, innerBlocks ) {
+							// @ts-expect-error Transform callback expects single block attributes and innerBlocks.
+							transform(
+								attributes: Record< string, unknown >,
+								innerBlocks: Block[]
+							) {
 								return createBlock(
 									'core/updated-columns-block',
 									attributes,
@@ -1840,7 +1889,7 @@ describe( 'block factory', () => {
 									} )
 								);
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1860,9 +1909,13 @@ describe( 'block factory', () => {
 			);
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks![ 0 ].innerBlocks ).toHaveLength( 1 );
 			expect(
-				transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value
+				(
+					transformedBlocks![ 0 ].innerBlocks[ 0 ].attributes as {
+						value?: string;
+					}
+				 ).value
 			).toBe( 'after' );
 		} );
 
@@ -1876,11 +1929,17 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/columns-block' ],
 							isMultiBlock: true,
-							transform( blocksAttributes, blocksInnerBlocks ) {
+							// @ts-expect-error Multi-block transform callback expects array parameters.
+							transform(
+								blocksAttributes: Array<
+									Record< string, unknown >
+								>,
+								blocksInnerBlocks: Block[][]
+							) {
 								return blocksAttributes.map(
 									( attributes, i ) => {
 										return createBlock(
@@ -1900,7 +1959,7 @@ describe( 'block factory', () => {
 									}
 								);
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1925,13 +1984,21 @@ describe( 'block factory', () => {
 			);
 
 			expect( transformedBlocks ).toHaveLength( 2 );
-			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks![ 0 ].innerBlocks ).toHaveLength( 1 );
 			expect(
-				transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value
+				(
+					transformedBlocks![ 0 ].innerBlocks[ 0 ].attributes as {
+						value?: string;
+					}
+				 ).value
 			).toBe( 'after0' );
-			expect( transformedBlocks[ 1 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks![ 1 ].innerBlocks ).toHaveLength( 1 );
 			expect(
-				transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value
+				(
+					transformedBlocks![ 1 ].innerBlocks[ 0 ].attributes as {
+						value?: string;
+					}
+				 ).value
 			).toBe( 'after1' );
 		} );
 
@@ -1945,11 +2012,12 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
-							__experimentalConvert( blocks ) {
+							// @ts-expect-error Convert callback expects Block | Block[].
+							__experimentalConvert( blocks: Block[] ) {
 								const groupInnerBlocks = blocks.map(
 									( { name, attributes, innerBlocks } ) => {
 										return createBlock(
@@ -1966,7 +2034,7 @@ describe( 'block factory', () => {
 									groupInnerBlocks
 								);
 							},
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -1991,16 +2059,16 @@ describe( 'block factory', () => {
 			);
 
 			expect( transformedBlocks ).toHaveLength( 1 );
-			expect( transformedBlocks[ 0 ].name ).toBe(
+			expect( transformedBlocks![ 0 ].name ).toBe(
 				'core/test-group-block'
 			);
-			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength(
+			expect( transformedBlocks![ 0 ].innerBlocks ).toHaveLength(
 				numOfBlocksToGroup
 			);
 		} );
 
 		it( 'should call "__experimentalConvert" with mixed block types and wildcard', () => {
-			const convertSpy = vi.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks: Block[] ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2024,13 +2092,14 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -2064,7 +2133,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should call "__experimentalConvert" with same block types', () => {
-			const convertSpy = vi.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks: Block[] ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2088,13 +2157,14 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/text-block' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -2125,7 +2195,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should not call "__experimentalConvert" with non-matching block types', () => {
-			const convertSpy = vi.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks: Block[] ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2149,13 +2219,14 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ 'core/image-block' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -2186,7 +2257,7 @@ describe( 'block factory', () => {
 		} );
 
 		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
-			const convertSpy = vi.fn( ( blocks ) => {
+			const convertSpy = vi.fn( ( blocks: Block[] ) => {
 				const groupInnerBlocks = blocks.map(
 					( { name, attributes, innerBlocks } ) => {
 						return createBlock( name, attributes, innerBlocks );
@@ -2210,13 +2281,14 @@ describe( 'block factory', () => {
 				},
 				transforms: {
 					from: [
-						{
+						partial< BlockTransform >( {
 							type: 'block',
 							blocks: [ '*' ],
 							isMultiBlock: true,
+							// @ts-expect-error Convert callback expects Block | Block[].
 							__experimentalConvert: convertSpy,
 							transform: transformSpy,
-						},
+						} ),
 					],
 				},
 				save: noop,
@@ -2249,32 +2321,38 @@ describe( 'block factory', () => {
 	describe( 'getBlockTransforms', () => {
 		beforeEach( () => {
 			registerBlockType( 'core/text-block', defaultBlockSettings );
-			registerBlockType( 'core/transform-from-text-block-1', {
-				apiVersion: 3,
-				transforms: {
-					from: [
-						{
-							blocks: [ 'core/text-block' ],
-						},
-					],
-				},
-				save: noop,
-				category: 'text',
-				title: 'updated text block',
-			} );
-			registerBlockType( 'core/transform-from-text-block-2', {
-				apiVersion: 3,
-				transforms: {
-					from: [
-						{
-							blocks: [ 'core/text-block' ],
-						},
-					],
-				},
-				save: noop,
-				category: 'text',
-				title: 'updated text block',
-			} );
+			registerBlockType(
+				'core/transform-from-text-block-1',
+				partial< Parameters< typeof registerBlockType >[ 1 ] >( {
+					apiVersion: 3,
+					transforms: {
+						from: [
+							{
+								blocks: [ 'core/text-block' ],
+							},
+						],
+					},
+					save: noop,
+					category: 'text',
+					title: 'updated text block',
+				} )
+			);
+			registerBlockType(
+				'core/transform-from-text-block-2',
+				partial< Parameters< typeof registerBlockType >[ 1 ] >( {
+					apiVersion: 3,
+					transforms: {
+						from: [
+							{
+								blocks: [ 'core/text-block' ],
+							},
+						],
+					},
+					save: noop,
+					category: 'text',
+					title: 'updated text block',
+				} )
+			);
 		} );
 
 		it( 'should return all block types of direction', () => {
@@ -2337,7 +2415,9 @@ describe( 'block factory', () => {
 	} );
 
 	describe( 'findTransform', () => {
-		const transforms = [
+		const transforms = partial<
+			Array< BlockTransform & { blockName: string } >
+		>( [
 			{
 				blocks: [ 'core/text-block' ],
 				priority: 20,
@@ -2352,7 +2432,7 @@ describe( 'block factory', () => {
 				blocks: [ 'core/text-block' ],
 				blockName: 'core/transform-from-text-block-2',
 			},
-		];
+		] );
 
 		it( 'should return highest priority (lowest numeric value) transform', () => {
 			const transform = findTransform( transforms, () => true );
@@ -2383,7 +2463,9 @@ describe( 'block factory', () => {
 			};
 
 			expect(
-				isWildcardBlockTransform( validWildcardBlockTransform )
+				isWildcardBlockTransform(
+					validWildcardBlockTransform as BlockTransform
+				)
 			).toBe( true );
 		} );
 
@@ -2395,7 +2477,9 @@ describe( 'block factory', () => {
 			};
 
 			expect(
-				isWildcardBlockTransform( invalidWildcardBlockTransform )
+				isWildcardBlockTransform(
+					invalidWildcardBlockTransform as BlockTransform
+				)
 			).toBe( false );
 		} );
 
@@ -2407,7 +2491,9 @@ describe( 'block factory', () => {
 			};
 
 			expect(
-				isWildcardBlockTransform( invalidWildcardBlockTransform )
+				isWildcardBlockTransform(
+					invalidWildcardBlockTransform as BlockTransform
+				)
 			).toBe( false );
 		} );
 
@@ -2419,7 +2505,9 @@ describe( 'block factory', () => {
 			};
 
 			expect(
-				isWildcardBlockTransform( invalidWildcardBlockTransform )
+				isWildcardBlockTransform(
+					invalidWildcardBlockTransform as BlockTransform
+				)
 			).toBe( false );
 		} );
 	} );
@@ -2438,7 +2526,7 @@ describe( 'block factory', () => {
 						{
 							type: 'block',
 							blocks: [ '*' ],
-							transform: noop,
+							transform: transformNoop,
 						},
 					],
 				},
@@ -2466,14 +2554,23 @@ describe( 'block factory', () => {
 			registerBlockType( 'core/missing', {
 				apiVersion: 3,
 				title: 'Unsupported',
+				category: 'text',
+				attributes: {},
+				save: () => null,
 			} );
 			registerBlockType( 'core/paragraph', {
 				apiVersion: 3,
 				title: 'Paragraph',
+				category: 'text',
+				attributes: {},
+				save: () => null,
 			} );
 			registerBlockType( 'core/group', {
 				apiVersion: 3,
 				title: 'A block that groups other blocks.',
+				category: 'text',
+				attributes: {},
+				save: () => null,
 			} );
 			const example = {
 				innerBlocks: [
