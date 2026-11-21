@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 10.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   `createInterpolateElement`: Treat a tag named after an `Object.prototype` member as an unknown tag instead of crashing ([#86401](https://github.com/WordPress/gutenberg/pull/86401)).
