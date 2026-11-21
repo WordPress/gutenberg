@@ -169,7 +169,7 @@
 .global-styles-ui__palette-preview {
 	display: inline-flex;
 
-	> * + * {
+	> :where(:not(:first-child)) {
 		margin-inline-start: calc(-1 * variables.$grid-unit);
 	}
 }

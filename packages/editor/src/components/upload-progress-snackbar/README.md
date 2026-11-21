@@ -17,7 +17,7 @@ Files leave both sources the same way whether they uploaded or failed, so each s
 
 An image can also upload without all of its files (its sizes, or a copy of the original), for example when a multisite network's storage limit rejects some of them. That still counts as an upload, so the snackbar above reports it as complete. The upload-media store lists those uploads in `getWarnings`, and the component shows one warning snackbar for them: it names the file when there is one, and gives a count when there are several. It stays until dismissed.
 
-The component renders nothing itself — it is a controller that manages a notice.
+The component renders nothing itself — it is a controller that manages a notice. It removes the notice when it unmounts, so a host that unmounts it during an upload doesn't leave the notice stuck. Uploads carry on, and the snackbar shows them again once it is mounted again.
 
 ## Usage
 

@@ -130,13 +130,18 @@ export default function UploadProgressSnackbar() {
 	// Timeout that removes the completion-state (checkmark) notice after a
 	// brief display. Held so a new upload can cancel it.
 	const completionTimeoutRef = useRef( null );
+
+	// Remove the notice on unmount. Nothing would update it after that, so an
+	// in-progress notice would be left showing the spinner. Uploads keep
+	// running, and a remount picks them up again.
 	useEffect( () => {
 		return () => {
 			if ( completionTimeoutRef.current ) {
 				clearTimeout( completionTimeoutRef.current );
 			}
+			removeNotice( NOTICE_ID );
 		};
-	}, [] );
+	}, [ removeNotice ] );
 
 	// An image that uploaded without all of its files counts as uploaded, so
 	// nothing above reports it. One snackbar covers every warning added since
