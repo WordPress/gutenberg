@@ -5,6 +5,7 @@ import { Description } from './description';
 import { Actions } from './actions';
 import { CloseIconButton } from './close-icon-button';
 import { ActionButton } from './action-button';
+import { ActionButtonLink } from './action-button-link';
 import { ActionLink } from './action-link';
 
 export {
@@ -15,5 +16,6 @@ export {
 	Actions,
 	CloseIconButton,
 	ActionButton,
+	ActionButtonLink,
 	ActionLink,
 };

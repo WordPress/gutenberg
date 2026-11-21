@@ -1604,6 +1604,38 @@ test.describe( 'List View', () => {
 			},
 		] );
 	} );
+
+	test( 'keeps the canvas in place while scrolling to the selected block', async ( {
+		editor,
+		listViewUtils,
+		page,
+	} ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '2000px' },
+		} );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+
+		const listView = await listViewUtils.openListView();
+		await listView.getByRole( 'link', { name: 'Spacer' } ).click();
+		await editor.canvas
+			.locator( 'body' )
+			.evaluate( () => ( document.scrollingElement.scrollTop = 0 ) );
+
+		const canvas = page.locator( '.editor-visual-editor' );
+		await canvas.evaluate( ( node ) =>
+			node.addEventListener( 'scroll', () =>
+				node.setAttribute( 'data-scrolled', '' )
+			)
+		);
+		await listView.getByRole( 'link', { name: 'Paragraph' } ).click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Empty block' } )
+		).toBeInViewport( { ratio: 1 } );
+		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
+	} );
 } );
 
 /** @typedef {import('@playwright/test').Locator} Locator */
