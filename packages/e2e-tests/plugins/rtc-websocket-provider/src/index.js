@@ -38,7 +38,14 @@ function updateDebugState( room, patch ) {
 }
 
 function createWebSocketProvider() {
-	return async ( { awareness, objectType, objectId, ydoc, Y } ) => {
+	return async ( {
+		awareness,
+		flushLocalUpdates,
+		objectType,
+		objectId,
+		ydoc,
+		Y,
+	} ) => {
 		// Point the bundled y-websocket and y-protocols modules at the Yjs
 		// instance used by the editor. See yjs-external.js.
 		setYjsModule( Y );
@@ -57,6 +64,15 @@ function createWebSocketProvider() {
 			// the WebSocket. Tests need to exercise the wire transport.
 			disableBc: true,
 		} );
+
+		// Apply the local updates that the sync manager holds back before
+		// each sync message, which can carry a remote update. The sync
+		// message type of y-websocket is 0.
+		const handleSyncMessage = provider.messageHandlers[ 0 ];
+		provider.messageHandlers[ 0 ] = ( ...args ) => {
+			flushLocalUpdates?.();
+			return handleSyncMessage( ...args );
+		};
 
 		const statusListeners = new Set();
 
@@ -105,6 +121,7 @@ function createWebSocketProvider() {
 					synced: false,
 				} );
 			},
+			supportsDeferredUpdates: true,
 			on: ( event, callback ) => {
 				if ( event === 'status' ) {
 					statusListeners.add( callback );

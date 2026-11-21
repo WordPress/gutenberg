@@ -168,6 +168,46 @@ describe( 'useMetaBoxInitialization', () => {
 		expect( setCollaborationSupported ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does not disable collaboration when an rtcCompatible metabox was moved to another location', () => {
+		// A moved meta box is listed twice: once with the flag under the
+		// location it was registered in, and once without the flag under
+		// the location the user moved it to.
+		const mockStores = createMockStores( {
+			metaBoxes: [
+				{
+					id: 'moved-metabox',
+					title: 'Moved',
+					__rtc_compatible: true,
+				},
+				{ id: 'moved-metabox', title: 'Moved' },
+			],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( setCollaborationSupported ).not.toHaveBeenCalled();
+	} );
+
+	it( 'disables collaboration when an incompatible metabox sits next to a moved rtcCompatible metabox', () => {
+		const mockStores = createMockStores( {
+			metaBoxes: [
+				{
+					id: 'moved-metabox',
+					title: 'Moved',
+					__rtc_compatible: true,
+				},
+				{ id: 'moved-metabox', title: 'Moved' },
+				{ id: 'incompatible-metabox', title: 'Incompatible' },
+			],
+		} );
+		const registry = createRegistry( mockStores );
+
+		renderHook( registry );
+
+		expect( setCollaborationSupported ).toHaveBeenCalledWith( false );
+	} );
+
 	it( 'does not disable collaboration when there are no metaboxes', () => {
 		const mockStores = createMockStores( {
 			metaBoxes: [],

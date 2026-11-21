@@ -2,8 +2,14 @@ import { describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { useRef } from '@wordpress/element';
-import { useAutocomplete } from '..';
+import {
+	Suspense,
+	startTransition,
+	useRef,
+	useState,
+} from '@wordpress/element';
+import { useAutocomplete, useAutocompleteProps } from '..';
+import type { UseAutocompleteProps } from '../types';
 import '../../style.scss';
 
 function makeRecord( text: string ) {
@@ -58,6 +64,8 @@ describe( 'Autocomplete hover navigation', () => {
 			return (
 				<>
 					<input
+						// eslint-disable-next-line jsx-a11y/no-autofocus -- Set initial focus independently of test order.
+						autoFocus
 						aria-label="Complete a fruit"
 						aria-activedescendant={ activeId ?? undefined }
 						defaultValue="~"
@@ -73,7 +81,6 @@ describe( 'Autocomplete hover navigation', () => {
 
 		await render( <AutocompleteInput /> );
 		const input = screen.getByRole( 'textbox' );
-		await user.tab();
 		const orange = await screen.findByRole( 'option', { name: 'Orange' } );
 		await user.hover( orange );
 		expect( orange ).toHaveAttribute( 'aria-selected', 'true' );
@@ -87,6 +94,102 @@ describe( 'Autocomplete hover navigation', () => {
 		await user.keyboard( '[Enter]' );
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( { text: 'Grapes' } )
+		);
+	} );
+} );
+
+describe( 'useAutocompleteProps', () => {
+	it( 'uses the committed completion callback while an update is suspended', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn< UseAutocompleteProps[ 'onChange' ] >();
+		const pendingOnChange = vi.fn< UseAutocompleteProps[ 'onChange' ] >();
+		const suspend = vi.fn();
+		const pending = new Promise< never >( () => {} );
+		const items = [
+			{
+				key: 'apple',
+				value: 'Apple',
+				label: 'Apple',
+				keywords: [],
+				isDisabled: false,
+			},
+		];
+		const completers = [
+			{
+				name: 'fruit',
+				triggerPrefix: '~',
+				options: [],
+				useItems: () => [ items ] as const,
+				getOptionLabel: ( value: string ) => value,
+				getOptionCompletion: ( value: string ) => value,
+			},
+		];
+
+		function AutocompleteInput( {
+			onComplete,
+		}: {
+			onComplete: UseAutocompleteProps[ 'onChange' ];
+		} ) {
+			const [ record, setRecord ] = useState( makeRecord( '' ) );
+			const { children, ...props } = useAutocompleteProps( {
+				record,
+				onChange: onComplete,
+				onReplace: () => {},
+				completers,
+			} );
+
+			return (
+				<>
+					<div
+						{ ...props }
+						role="textbox"
+						aria-label="Complete a fruit"
+						contentEditable
+						onInput={ ( event ) =>
+							setRecord(
+								makeRecord(
+									event.currentTarget.textContent ?? ''
+								)
+							)
+						}
+					/>
+					{ children }
+				</>
+			);
+		}
+
+		function PendingUpdate(): never {
+			suspend();
+			throw pending;
+		}
+
+		const { rerender } = await render(
+			<Suspense fallback="Loading">
+				<AutocompleteInput onComplete={ onChange } />
+			</Suspense>
+		);
+		await user.click( screen.getByRole( 'textbox' ) );
+		await user.keyboard( '~' );
+		await screen.findByRole( 'option', { name: 'Apple' } );
+
+		let update: ReturnType< typeof rerender > | undefined;
+		startTransition( () => {
+			update = rerender(
+				<Suspense fallback="Loading">
+					<AutocompleteInput onComplete={ pendingOnChange } />
+					<PendingUpdate />
+				</Suspense>
+			);
+		} );
+		await update;
+		expect( suspend ).toHaveBeenCalled();
+		expect( screen.queryByText( 'Loading' ) ).not.toBeInTheDocument();
+
+		await user.keyboard( '[Enter]' );
+
+		expect( pendingOnChange ).not.toHaveBeenCalled();
+		expect( onChange ).toHaveBeenCalledWith(
+			expect.objectContaining( { text: 'Apple' } )
 		);
 	} );
 } );

@@ -732,6 +732,66 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'keeps focus moved into the canvas right after inserting from the main inserter', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		// Move focus in the same task as the insertion, before the inserter
+		// checks for focus loss on the next frame.
+		await page
+			.getByRole( 'region', { name: 'Block Library' } )
+			.getByRole( 'option', { name: 'Paragraph', exact: true } )
+			.evaluate( ( option ) => {
+				option.click();
+				document
+					.querySelector( 'iframe[name="editor-canvas"]' )
+					.contentDocument.querySelector( '[aria-label="Add title"]' )
+					.focus();
+			} );
+		await page.evaluate(
+			() =>
+				new Promise( ( resolve ) =>
+					window.requestAnimationFrame( () =>
+						window.requestAnimationFrame( resolve )
+					)
+				)
+		);
+		await page.keyboard.type( 'Title' );
+
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toHaveText( 'Title' );
+	} );
+
+	test( 'keeps focus in the main inserter when the inserted block removes the focused option', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Block Inserter' } )
+			.click();
+		const blockLibrary = page.getByRole( 'region', {
+			name: 'Block Library',
+		} );
+		await blockLibrary
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'List', exact: true } )
+			.focus();
+		await page.keyboard.press( 'Enter' );
+
+		await expect(
+			blockLibrary.getByRole( 'option', { name: 'List Item' } )
+		).toBeFocused();
+	} );
+
 	test( 'passes the search value in the main inserter when clicking `Browse all`', async ( {
 		admin,
 		editor,
@@ -815,7 +875,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			.hover();
 
 		await expect(
-			page.locator( '.block-editor-inserter__preview' )
+			page.locator( '.block-editor-inserter__preview-content' )
 		).toBeInViewport();
 	} );
 
@@ -891,6 +951,39 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			// Restore the viewport.
 			await pageUtils.setBrowserViewport( 'large' );
 		} );
+	} );
+
+	test( 'keeps the canvas in place while scrolling to a block inserted at the end of the post', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await page.emulateMedia( { reducedMotion: 'no-preference' } );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/spacer',
+			attributes: { height: '2000px' },
+		} );
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+
+		const canvas = page.locator( '.editor-visual-editor' );
+		await canvas.evaluate( ( node ) =>
+			node.addEventListener( 'scroll', () =>
+				node.setAttribute( 'data-scrolled', '' )
+			)
+		);
+		await page
+			.getByRole( 'listbox', { name: 'Text' } )
+			.getByRole( 'option', { name: 'Heading', exact: true } )
+			.click();
+
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Heading' } )
+		).toBeInViewport( { ratio: 1 } );
+		await expect( canvas ).not.toHaveAttribute( 'data-scrolled' );
 	} );
 } );
 
@@ -1085,6 +1178,7 @@ class InsertingBlocksUtils {
 			'data-testid=block-draggable-chip >> visible=true'
 		);
 	}
+
 	async dragOver( boundingBox ) {
 		// Hover on the right side of the block to avoid collapsing with the preview.
 		// But not too far to avoid triggering the grouping block inserter.
