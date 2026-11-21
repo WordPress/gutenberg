@@ -49,6 +49,39 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 }
 
 /**
+ * Calls a vips function in the worker.
+ *
+ * wasm-vips can crash, for example when its memory runs out, and every later
+ * call in that worker then fails too. So a crashed worker is replaced and the
+ * call is retried once in a fresh one.
+ *
+ * @param select Picks the worker function from the worker API.
+ * @param args   Arguments for the worker function.
+ * @return The worker function's result.
+ */
+async function callWorker< A extends unknown[], R >(
+	select: ( api: Remote< WorkerAPI > ) => ( ...args: A ) => Promise< R >,
+	...args: A
+): Promise< R > {
+	const api = getWorkerAPI();
+	try {
+		// Buffers are transferred to the worker, so send copies and keep the
+		// originals for a retry.
+		return await select( api )( ...structuredClone( args ) );
+	} catch ( error ) {
+		const crashed =
+			api !== workerAPI || ( await api.hasCrashed().catch( () => true ) );
+		if ( ! crashed ) {
+			throw error;
+		}
+		if ( api === workerAPI ) {
+			terminateVipsWorker();
+		}
+		return select( getWorkerAPI() )( ...args );
+	}
+}
+
+/**
  * Converts an image to a different format using vips in a worker.
  *
  * @param id         Item ID.
@@ -65,8 +98,14 @@ export async function vipsConvertImageFormat(
 	outputType: string,
 	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const api = getWorkerAPI();
-	return api.convertImageFormat( id, buffer, inputType, outputType, options );
+	return callWorker(
+		( api ) => api.convertImageFormat,
+		id,
+		buffer,
+		inputType,
+		outputType,
+		options
+	);
 }
 
 /**
@@ -84,8 +123,13 @@ export async function vipsCompressImage(
 	type: string,
 	options: ConvertImageOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const api = getWorkerAPI();
-	return api.compressImage( id, buffer, type, options );
+	return callWorker(
+		( api ) => api.compressImage,
+		id,
+		buffer,
+		type,
+		options
+	);
 }
 
 /**
@@ -114,8 +158,14 @@ export async function vipsResizeImage(
 	originalWidth: number;
 	originalHeight: number;
 } > {
-	const api = getWorkerAPI();
-	return api.resizeImage( id, buffer, type, resize, options );
+	return callWorker(
+		( api ) => api.resizeImage,
+		id,
+		buffer,
+		type,
+		resize,
+		options
+	);
 }
 
 /**
@@ -127,8 +177,7 @@ export async function vipsResizeImage(
 export async function vipsHasTransparency(
 	buffer: ArrayBuffer
 ): Promise< boolean > {
-	const api = getWorkerAPI();
-	return api.hasTransparency( buffer );
+	return callWorker( ( api ) => api.hasTransparency, buffer );
 }
 
 /**
@@ -144,8 +193,7 @@ export async function vipsGetUltraHdrInfo( buffer: ArrayBuffer ): Promise< {
 	height: number;
 	hdrCapacity: number;
 } | null > {
-	const api = getWorkerAPI();
-	return api.getUltraHdrInfo( buffer );
+	return callWorker( ( api ) => api.getUltraHdrInfo, buffer );
 }
 
 /**
@@ -167,8 +215,13 @@ export async function vipsRotateImage(
 	width: number;
 	height: number;
 } > {
-	const api = getWorkerAPI();
-	return api.rotateImage( id, buffer, type, orientation );
+	return callWorker(
+		( api ) => api.rotateImage,
+		id,
+		buffer,
+		type,
+		orientation
+	);
 }
 
 /**
@@ -189,8 +242,14 @@ export async function vipsEncodePixelsAsJpeg(
 	height: number,
 	options: EncodePixelsOptions = {}
 ): Promise< ArrayBuffer | ArrayBufferLike > {
-	const api = getWorkerAPI();
-	return api.encodePixelsAsJpeg( id, pixels, width, height, options );
+	return callWorker(
+		( api ) => api.encodePixelsAsJpeg,
+		id,
+		pixels,
+		width,
+		height,
+		options
+	);
 }
 
 /**
