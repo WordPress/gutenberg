@@ -69,7 +69,11 @@
 			"__experimentalLetterSpacing": true
 		}
 	},
-	"usesContext": [ "core/tabs-list", "core/tabs-id" ],
+	"usesContext": [
+		"core/tabs-list",
+		"core/tabs-id",
+		"core/tabs-active-tab-index"
+	],
 	"style": "wp-block-tabs",
 	"viewScriptModule": "@wordpress/block-library/tabs/view"
 }

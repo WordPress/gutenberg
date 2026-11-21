@@ -749,6 +749,11 @@ test.describe( 'Tabs', () => {
 			await admin.createNewPost();
 		} );
 
+		// Some of these tests upload images.
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMedia();
+		} );
+
 		test( 'keeps the content of inactive panels available to find-in-page', async ( {
 			editor,
 			page,
@@ -973,6 +978,167 @@ test.describe( 'Tabs', () => {
 				page.getByRole( 'tab', { name: 'Tab 2' } )
 			).toHaveAttribute( 'aria-selected', 'true' );
 			await expect( target ).toBeInViewport();
+		} );
+
+		// Publishes a Tabs block with an image in each of its two panels, and
+		// opens the post while recording the requests it makes. The block is
+		// far enough below the fold that no browser loads a lazy image in it
+		// on its own, however slow it judges the connection to be.
+		async function openPostWithImagesInTabsBelowTheFold( {
+			editor,
+			page,
+			requestUtils,
+		} ) {
+			const activeMedia = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_z9T8jK.png'
+			);
+			const inactiveMedia = await requestUtils.uploadMedia(
+				'./assets/10x10_e2e_test_image_green.png'
+			);
+
+			await editor.insertBlock( {
+				name: 'core/spacer',
+				attributes: { height: '10000px' },
+			} );
+			await editor.insertBlock( {
+				name: 'core/tabs',
+				innerBlocks: [
+					{ name: 'core/tab-list' },
+					{
+						name: 'core/tab-panels',
+						innerBlocks: [
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 1' },
+								innerBlocks: [
+									{
+										name: 'core/image',
+										attributes: {
+											id: activeMedia.id,
+											url: activeMedia.source_url,
+										},
+									},
+								],
+							},
+							{
+								name: 'core/tab-panel',
+								attributes: { label: 'Tab 2' },
+								innerBlocks: [
+									{
+										name: 'core/image',
+										attributes: {
+											id: inactiveMedia.id,
+											url: inactiveMedia.source_url,
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			await expect(
+				editor.canvas.getByRole( 'tab', { name: 'Tab 2' } )
+			).toBeVisible();
+
+			const postId = await editor.publishPost();
+
+			const requestedUrls = [];
+			page.on( 'request', ( request ) =>
+				requestedUrls.push( request.url() )
+			);
+			await page.goto( `/?p=${ postId }` );
+
+			// The view script has run once it has hidden the inactive panel.
+			const inactivePanel = page.locator( '.wp-block-tab-panel' ).last();
+			await expect( inactivePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+
+			return {
+				activeImageUrl: activeMedia.source_url,
+				inactiveImageUrl: inactiveMedia.source_url,
+				inactivePanel,
+				requestedUrls,
+			};
+		}
+
+		test( 'loads the images in inactive panels when the block nears the viewport', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const {
+				activeImageUrl,
+				inactiveImageUrl,
+				inactivePanel,
+				requestedUrls,
+			} = await openPostWithImagesInTabsBelowTheFold( {
+				editor,
+				page,
+				requestUtils,
+			} );
+			const inactiveImage = inactivePanel.locator( 'img' );
+
+			expect( requestedUrls ).toContain( activeImageUrl );
+			expect( requestedUrls ).not.toContain( inactiveImageUrl );
+
+			// Stop half a screen short of the block, so that it is near the
+			// viewport without being in it.
+			const tabList = page.getByRole( 'tablist' );
+			await tabList.evaluate( ( element ) =>
+				window.scrollTo(
+					0,
+					element.getBoundingClientRect().top +
+						window.scrollY -
+						1.5 * window.innerHeight
+				)
+			);
+			await expect( tabList ).not.toBeInViewport();
+
+			// The image is loaded while its panel is still hidden.
+			await expect
+				.poll( () =>
+					inactiveImage.evaluate( ( image ) => image.naturalWidth )
+				)
+				.toBeGreaterThan( 0 );
+			expect( requestedUrls ).toContain( inactiveImageUrl );
+			await expect( inactivePanel ).toHaveAttribute(
+				'hidden',
+				'until-found'
+			);
+
+			// So it is there as soon as its tab is opened.
+			await page.getByRole( 'tab', { name: 'Tab 2' } ).click();
+			await expect( inactiveImage ).toBeVisible();
+		} );
+
+		test( 'loads the images of a panel that is revealed before the block nears the viewport', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const { inactiveImageUrl, inactivePanel, requestedUrls } =
+				await openPostWithImagesInTabsBelowTheFold( {
+					editor,
+					page,
+					requestUtils,
+				} );
+
+			expect( requestedUrls ).not.toContain( inactiveImageUrl );
+
+			// Revealing the panel, as find-in-page does, activates its tab.
+			await inactivePanel.dispatchEvent( 'beforematch' );
+
+			await expect( inactivePanel ).not.toHaveAttribute( 'hidden' );
+			await expect
+				.poll( () => requestedUrls )
+				.toContain( inactiveImageUrl );
+
+			// The page was not scrolled, so the block is still far away.
+			expect( await page.evaluate( () => window.scrollY ) ).toBe( 0 );
 		} );
 	} );
 } );

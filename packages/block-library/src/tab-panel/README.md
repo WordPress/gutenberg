@@ -54,6 +54,8 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 **Uses context:**
 
 - `core/tabs-id`
+- `core/tabs-list`
+- `core/tabs-active-tab-index`
 
 **Provides context:**
 

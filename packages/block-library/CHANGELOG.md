@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Tabs: Load the images in the panels that are not shown first only once the block is near the viewport, instead of with the page ([#87114](https://github.com/WordPress/gutenberg/pull/87114)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
