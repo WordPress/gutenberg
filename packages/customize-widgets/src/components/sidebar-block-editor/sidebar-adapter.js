@@ -88,6 +88,7 @@ export default class SidebarAdapter {
 		this.undo = this.undo.bind( this );
 		this.redo = this.redo.bind( this );
 		this.save = this.save.bind( this );
+		this.getWidgets = this.getWidgets.bind( this );
 	}
 
 	subscribe( callback ) {

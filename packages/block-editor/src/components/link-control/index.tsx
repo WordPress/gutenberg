@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useRef, useState, useEffect, useMemo } from '@wordpress/element';
-import { useInstanceId, useMergeRefs } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
 import { ENTER } from '@wordpress/keycodes';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
@@ -19,7 +19,6 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { isURL, prependHTTPS } from '@wordpress/url';
-import { useNativeUndo } from '../../utils/native-undo';
 import LinkControlSettingsDrawer from './settings-drawer';
 import LinkControlSearchInput from './search-input';
 import LinkPreview from './link-preview';
@@ -152,7 +151,6 @@ function LinkControl( {
 
 	const isMountingRef = useRef( true );
 	const wrapperNode = useRef< HTMLDivElement >( null );
-	const wrapperRef = useMergeRefs( [ wrapperNode, useNativeUndo() ] );
 	const textInputRef = useRef< HTMLInputElement >( null );
 	const searchInputRef = useRef< HTMLInputElement >( null );
 	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after taxonomy entity binding
@@ -590,7 +588,7 @@ function LinkControl( {
 			// The dialog holds local state that is only committed when the
 			// link is applied, so undo and redo within it must remain the
 			// browser's own.
-			ref={ wrapperRef }
+			ref={ wrapperNode }
 			className="block-editor-link-control"
 		>
 			{ isCreatingPage && (

@@ -9,9 +9,13 @@ import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 
-const { usesNativeUndo } = unlock( blockEditorPrivateApis );
+const { useFieldHistoryTracking, usesNativeUndo } = unlock(
+	blockEditorPrivateApis
+);
 
-function KeyboardShortcuts( { undo, redo, save } ) {
+function KeyboardShortcuts( { undo, redo, save, getRevision } ) {
+	useFieldHistoryTracking( getRevision );
+
 	useShortcut( 'core/customize-widgets/undo', ( event ) => {
 		if ( usesNativeUndo( event ) ) {
 			return;

@@ -4,18 +4,22 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editWidgetsStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { usesNativeUndo } = unlock( blockEditorPrivateApis );
+const { useFieldHistoryTracking, usesNativeUndo } = unlock(
+	blockEditorPrivateApis
+);
 
 function KeyboardShortcuts() {
 	const { redo, undo } = useDispatch( coreStore );
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
+	const { getReferenceByDistinctEdits } = useSelect( coreStore );
+	useFieldHistoryTracking( getReferenceByDistinctEdits );
 
 	useShortcut( 'core/edit-widgets/undo', ( event ) => {
 		if ( usesNativeUndo( event ) ) {
