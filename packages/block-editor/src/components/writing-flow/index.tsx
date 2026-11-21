@@ -17,6 +17,7 @@ import useSelectionObserver from './use-selection-observer';
 import usePreventFocusCapture from './use-prevent-focus-capture';
 import useEditableRootEventHandlers from './use-editable-root-event-handlers';
 import useClickSelection from './use-click-selection';
+import useKeepCaretAboveKeyboard from './use-keep-caret-above-keyboard';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
@@ -50,6 +51,7 @@ export function useWritingFlow(): [
 			useHomeEnd(),
 			useDragSelection(),
 			useSelectionObserver(),
+			useKeepCaretAboveKeyboard(),
 			usePreventFocusCapture(),
 			useClickSelection(),
 			useMultiSelection(),

@@ -200,6 +200,49 @@ final class SelectionTests: XCTestCase {
 		XCTAssertEqual( editor.getBlocks().count, 2 )
 	}
 
+	/// Opens a post with these blocks and taps the lowest of these fields
+	/// on the screen, where the keyboard opens. iOS slides the whole page
+	/// up to reveal a field under the keyboard, taking the block toolbar off
+	/// the top.
+	func tapLowAndExpectToolbarOnScreen( content: String, fields: [ XCUIElement ] ) throws {
+		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
+		var url = URLComponents( string: base + "/wp-admin/post-new.php" )!
+		url.queryItems = [ URLQueryItem( name: "content", value: content ) ]
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
+
+		XCTAssertTrue( fields[ 0 ].waitForExistence( timeout: 240 ), "The post did not load" )
+
+		let bottom = web.frame.maxY
+		// The lowest one that is still fully on screen.
+		let low = try XCTUnwrap( fields
+			.filter { $0.exists && $0.frame.midY < bottom * 0.9 }
+			.max { $0.frame.midY < $1.frame.midY }, "No field on the screen" )
+		XCTAssertGreaterThan( low.frame.midY, bottom * 0.6, "The field is not low enough for the keyboard to cover it" )
+		low.coordinate( withNormalizedOffset: CGVector( dx: 0.9, dy: 0.5 ) ).tap()
+		XCTAssertTrue( app.keyboards.firstMatch.waitForExistence( timeout: 10 ), "The tap did not open the keyboard" )
+
+		let moveUp = app.buttons[ "Move up" ]
+		XCTAssertTrue( moveUp.waitForExistence( timeout: 5 ), "The block toolbar did not show" )
+		XCTAssertGreaterThanOrEqual( stableFrame( of: moveUp ).minY, 0, "The block toolbar is off the screen" )
+	}
+
+	func testTapParagraphLowInLongPostKeepsToolbarOnScreen() throws {
+		try tapLowAndExpectToolbarOnScreen(
+			content: ( 1...20 ).map { "<!-- wp:paragraph --><p>Paragraph \( $0 )</p><!-- /wp:paragraph -->" }.joined(),
+			fields: ( 1...20 ).map { editor.block( title: "Paragraph", content: "Paragraph \( $0 )" ) }
+		)
+	}
+
+	func testTapCaptionLowInLongPostKeepsToolbarOnScreen() throws {
+		let paragraph = "<!-- wp:paragraph --><p>Paragraph</p><!-- /wp:paragraph -->"
+		let image = "<!-- wp:image --><figure class=\"wp-block-image\"><img src=\"https://cldup.com/cXyG__fTLN.jpg\" alt=\"\"/><figcaption class=\"wp-element-caption\">Caption here</figcaption></figure><!-- /wp:image -->"
+		try tapLowAndExpectToolbarOnScreen(
+			content: String( repeating: paragraph, count: 3 ) + image + String( repeating: paragraph, count: 10 ),
+			fields: [ editor.canvas.descendants( matching: .any ).matching( NSPredicate( format: "label == %@ AND value == %@", "Image caption text", "Caption here" ) ).firstMatch ]
+		)
+	}
+
 	/// Opens the block editor that is not in an iframe, like GutenbergKit's,
 	/// with these blocks.
 	func openStandaloneEditor( content: String ) {
