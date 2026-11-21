@@ -1,4 +1,3 @@
-// @ts-check
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { addWidgetIdToBlock } from '@wordpress/widgets';
 

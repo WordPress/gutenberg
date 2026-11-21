@@ -3,7 +3,7 @@ import { useId, useState } from '@wordpress/element';
 import { Field, Select, SelectControl, VisuallyHidden } from '@wordpress/ui';
 
 const meta: Meta< typeof SelectControl > = {
-	title: 'Components/@wordpress-components/Selection & Input/Common/CustomSelectControl/Migration examples',
+	title: 'Components/@wordpress-components/Deprecated/CustomSelectControl/Migration examples',
 	id: 'components-customselectcontrol-migration-examples',
 	component: SelectControl,
 	tags: [ 'docs-only' ],

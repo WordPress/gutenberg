@@ -435,7 +435,7 @@
 		border-radius: $radius-small;
 		background: $gray-100;
 		color: $gray-800;
-		font-size: $font-size-small;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: $font-line-height-small;
 		overflow: hidden;
 		text-overflow: ellipsis;

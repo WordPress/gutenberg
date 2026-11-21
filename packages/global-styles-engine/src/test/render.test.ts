@@ -1872,6 +1872,49 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'outputs a rotation under the transform feature selector', () => {
+			const tree = {
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							transform: {
+								rotate: '0.25turn',
+							},
+							'@mobile': {
+								transform: {
+									rotate: '-15deg',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/button': {
+					selector: '.wp-block-button',
+					featureSelectors: {
+						transform: '.wp-block-button .wp-block-button__link',
+					},
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				':root :where(.wp-block-button .wp-block-button__link){rotate: 0.25turn;}@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link){rotate: -15deg;}}'
+			);
+		} );
+
 		it( 'handles responsive feature selector styles', () => {
 			const tree = {
 				settings: {},
