@@ -16,18 +16,10 @@ import { unlock } from '../../lock-unlock';
 export default function useEditableRoot() {
 	const registry = useRegistry();
 	const enabled = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getSelectionStart,
-			canHostEditableRoot,
-			isZoomOut,
-		} = unlock( select( blockEditorStore ) );
-		// Not for a block selected as a whole, such as by pressing a list
-		// item's bullet: it keeps focus on its own element to be dragged.
+		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
+			unlock( select( blockEditorStore ) );
 		return (
-			! isZoomOut() &&
-			!! getSelectionStart().attributeKey &&
-			canHostEditableRoot( getSelectedBlockClientId() )
+			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
 		);
 	}, [] );
 
@@ -44,6 +36,16 @@ export default function useEditableRoot() {
 			} = registry.select( blockEditorStore );
 
 			const { activeElement } = node.ownerDocument;
+
+			// Not while a block's own element outside its fields has focus, as
+			// after a press on a list item's bullet: it is dragged from there.
+			if (
+				( activeElement as HTMLElement | null )?.contentEditable ===
+					'inherit' &&
+				activeElement!.hasAttribute( 'data-block' )
+			) {
+				return;
+			}
 			// A mounted element's window has a selection.
 			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			const isFieldFocused =
