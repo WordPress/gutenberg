@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Templates: Clear the selection after deleting the selected template in the list layout, so the preview no longer shows "You attempted to edit an item that doesn't exist".
+
 ## 8.2.0 (2026-11-18)
 
 ### Enhancements

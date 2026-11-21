@@ -88,9 +88,24 @@ export default function PageTemplates() {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			// Clear the selection when the selected template is deleted, so
+			// that the preview doesn't try to load a template that is gone.
+			if (
+				actionId === 'delete-post' &&
+				items.some( ( item ) => item.id === postId )
+			) {
+				setSelection( [] );
+				history.navigate( addQueryArgs( path, { postId: undefined } ) );
+			}
+		},
+		[ history, path, postId ]
+	);
 	const postTypeActions = usePostActions( {
 		postType: TEMPLATE_POST_TYPE,
 		context: 'list',
+		onActionPerformed,
 	} );
 	const editAction = useEditPostAction();
 	const actions = useMemo(
