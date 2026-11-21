@@ -2,17 +2,13 @@
  * Returns the value an image block is ordered by, or `undefined` when it has no
  * resolved attachment record to take it from.
  *
- * @param {Object} block   A `core/image` inner block.
- * @param {Array}  media   Attachment records for the gallery's images.
- * @param {string} orderby `date` or `title`.
+ * @param {Object} block     A `core/image` inner block.
+ * @param {Map}    mediaById Attachment records for the gallery's images, by id.
+ * @param {string} orderby   `date` or `title`.
  * @return {?string} The sort key.
  */
-function getSortKey( block, media, orderby ) {
-	const { id } = block.attributes;
-	if ( id === undefined ) {
-		return undefined;
-	}
-	const record = media.find( ( item ) => item.id === id );
+function getSortKey( block, mediaById, orderby ) {
+	const record = mediaById.get( block.attributes.id );
 	if ( ! record ) {
 		return undefined;
 	}
@@ -29,16 +25,14 @@ function getSortKey( block, media, orderby ) {
  * attachment record. With fewer, sorting is a no-op, so the sort options are
  * disabled.
  *
- * @param {Array} blocks The gallery's `core/image` inner blocks.
- * @param {Array} media  Attachment records for the gallery's images.
+ * @param {Array} blocks    The gallery's `core/image` inner blocks.
+ * @param {Map}   mediaById Attachment records for the gallery's images, by id.
  * @return {boolean} Whether the images can be sorted.
  */
-export function hasSortableImages( blocks, media ) {
-	// Runs on every render, so avoid scanning `media` once per block.
-	const mediaIds = new Set( media.map( ( item ) => item.id ) );
+export function hasSortableImages( blocks, mediaById ) {
 	let sortableCount = 0;
 	for ( const block of blocks ) {
-		if ( ! mediaIds.has( block.attributes.id ) ) {
+		if ( ! mediaById.has( block.attributes.id ) ) {
 			continue;
 		}
 		sortableCount++;
@@ -75,25 +69,25 @@ function compareKeys( a, b, orderby ) {
 /**
  * Sorts a static gallery's image blocks by an attachment field.
  *
- * Blocks without an `id`, or whose attachment record isn't in `media` (still
+ * Blocks without an `id`, or whose attachment record isn't in `mediaById` (still
  * loading, or deleted from the library), can't be placed, so they keep their
  * relative order and move to the end. Blocks with equal keys likewise keep
  * their relative order (`Array.prototype.sort` is stable), so re-applying the
  * current order is a no-op.
  *
  * @param {Array}  blocks        The gallery's `core/image` inner blocks.
- * @param {Array}  media         Attachment records for the gallery's images.
+ * @param {Map}    mediaById     Attachment records for the gallery's images, by id.
  * @param {Object} order         The order to apply.
  * @param {string} order.orderby `date` or `title`.
  * @param {string} order.order   `asc` or `desc`.
  * @return {Array} A new array holding the same block objects, sorted.
  */
-export function sortImageBlocks( blocks, media, { orderby, order } ) {
+export function sortImageBlocks( blocks, mediaById, { orderby, order } ) {
 	const direction = order === 'desc' ? -1 : 1;
 	const keys = new Map(
 		blocks.map( ( block ) => [
 			block,
-			getSortKey( block, media, orderby ),
+			getSortKey( block, mediaById, orderby ),
 		] )
 	);
 
