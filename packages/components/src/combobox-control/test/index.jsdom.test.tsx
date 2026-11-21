@@ -1,9 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import _ComboboxControl from '..';
+import Dropdown from '../../dropdown';
+import Modal from '../../modal';
 import type { ComboboxControlOption, ComboboxControlProps } from '../types';
+
+globalThis.wpVitest.mockCSSSupports();
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -128,6 +132,91 @@ describe( 'ComboboxControl popup relationship', () => {
 		expect( input ).not.toHaveAttribute( 'aria-controls' );
 		expect( input ).not.toHaveAttribute( 'aria-owns' );
 		expect( input ).not.toHaveAttribute( 'aria-activedescendant' );
+	} );
+} );
+
+describe( 'ComboboxControl Escape key', () => {
+	it( 'closes the suggestions list first, and then a parent Modal', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( onRequestClose ).not.toHaveBeenCalled();
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes the suggestions list first, and then a parent Dropdown', async () => {
+		const user = userEvent.setup();
+		const { unmount } = render(
+			<Dropdown
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggle
+					</button>
+				) }
+				renderContent={ () => (
+					<ComboboxControl
+						options={ timezones }
+						label={ defaultLabelText }
+					/>
+				) }
+			/>
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Toggle' } ) );
+		const input = await screen.findByRole( 'combobox', {
+			name: defaultLabelText,
+		} );
+
+		await user.click( input );
+		expect( screen.getByRole( 'listbox' ) ).toBeVisible();
+
+		await user.keyboard( '[Escape]' );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toBeInTheDocument();
+
+		await user.keyboard( '[Escape]' );
+		await waitFor( () => expect( input ).not.toBeInTheDocument() );
+
+		// Clean up remaining effects, like the delayed popover positioning.
+		unmount();
+	} );
+
+	it( 'closes a parent Modal while the suggestions list is not shown because it is loading', async () => {
+		const user = userEvent.setup();
+		const onRequestClose = vi.fn();
+		render(
+			<Modal title="Modal" onRequestClose={ onRequestClose }>
+				<ComboboxControl
+					options={ timezones }
+					label={ defaultLabelText }
+					isLoading
+				/>
+			</Modal>
+		);
+		const input = getInput( defaultLabelText );
+
+		await user.click( input );
+		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+		expect( input ).toHaveAttribute( 'aria-expanded', 'false' );
+
+		await user.keyboard( '[Escape]' );
+		expect( onRequestClose ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
 

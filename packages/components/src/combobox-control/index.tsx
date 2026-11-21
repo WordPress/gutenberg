@@ -183,6 +183,8 @@ function ComboboxControl( props: ComboboxControlProps ) {
 		setIsExpanded( true );
 	};
 
+	const isSuggestionsListVisible = isExpanded && ! isLoading;
+
 	const onKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
 		withIgnoreIMEEvents( ( event ) => {
 			let preventDefault = false;
@@ -207,9 +209,12 @@ function ComboboxControl( props: ComboboxControlProps ) {
 					preventDefault = true;
 					break;
 				case 'Escape':
+					// Only consume Escape while the suggestions list is shown,
+					// so that a parent dialog (e.g. `Modal`, `Popover`) can
+					// close when the list is already collapsed.
+					preventDefault = isSuggestionsListVisible;
 					setIsExpanded( false );
 					setSelectedSuggestion( null );
-					preventDefault = true;
 					break;
 				default:
 					break;
@@ -299,8 +304,6 @@ function ComboboxControl( props: ComboboxControlProps ) {
 			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
-
-	const isSuggestionsListVisible = isExpanded && ! isLoading;
 
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.

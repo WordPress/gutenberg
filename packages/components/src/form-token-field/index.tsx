@@ -444,7 +444,11 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 
 	function handleEscapeKey( event: KeyboardEvent ) {
 		collapseSuggestionsList( event );
-		return true; // PreventDefault.
+		// Only prevent the default behavior while the suggestions list is
+		// shown, so that a parent dialog (e.g. `Modal`, `Popover`) can close
+		// when the list is already collapsed. `isExpanded` still holds the
+		// value from before the collapse.
+		return isExpanded;
 	}
 
 	function handleTabKey( event: KeyboardEvent ) {
