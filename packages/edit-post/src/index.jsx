@@ -14,16 +14,15 @@ import {
 import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
+	registerCoreBlockBindingsSources,
 } from '@wordpress/editor';
 import { store as coreDataStore } from '@wordpress/core-data';
 import apiFetch from '@wordpress/api-fetch';
 import Layout from './components/layout';
 import { unlock } from './lock-unlock';
 
-const {
-	BackButton: __experimentalMainDashboardButton,
-	registerCoreBlockBindingsSources,
-} = unlock( editorPrivateApis );
+const { BackButton: __experimentalMainDashboardButton } =
+	unlock( editorPrivateApis );
 
 const { enablePreloadMultiUse, clearPreloadedData } = unlock(
 	apiFetch.privateApis
@@ -70,6 +69,7 @@ export function initializeEditor(
 		enableChoosePatternModal: true,
 		isPublishSidebarEnabled: true,
 		showCollaborationCursor: false,
+		showCollaborationBlockHighlight: false,
 		showCollaborationJoinNotifications: true,
 		showCollaborationLeaveNotifications: true,
 		showCollaborationPostSaveNotifications: true,

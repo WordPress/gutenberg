@@ -6,10 +6,10 @@ import {
 	useState,
 } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { safeHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import BlockListBlock from '../block-list/block';
 import { LayoutProvider } from '../block-list/layout';
+import { setSafeHTML } from '../safe-raw-html';
 
 const SLOT_TAG_NAME = 'wp-inner-block-slot';
 
@@ -66,10 +66,8 @@ export default function InnerContent( { clientId }: { clientId: string } ) {
 		// The container renders before the layout effect runs.
 		const container = containerRef.current!;
 
-		// Sanitize before injecting into the canvas: `safeHTML` removes
-		// `<script>` elements and inline event handlers, matching how block
-		// save content is rendered elsewhere in the editor.
-		container.innerHTML = safeHTML( html );
+		// The canvas shares the editor's origin, so nothing else isolates this.
+		setSafeHTML( container, html );
 
 		setSlots(
 			Array.from(

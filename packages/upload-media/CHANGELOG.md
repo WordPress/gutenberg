@@ -6,6 +6,12 @@
 
 -   Add JPEG XL (JXL) support. A JXL upload keeps its format, and its sub-sizes are generated as JXL client-side via vips. The vips-jxl.wasm module is loaded lazily on first use, keeping it out of the default bundle ([#77584](https://github.com/WordPress/gutenberg/pull/77584)).
 
+## 0.45.0 (2026-11-18)
+
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes
