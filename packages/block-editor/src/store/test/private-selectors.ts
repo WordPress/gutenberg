@@ -28,6 +28,10 @@ import {
 	isMoveLockedBlock,
 	isRemoveLockedBlock,
 	isLockedBlock,
+	isLayoutLockedBlock,
+	canLayoutLockBlock,
+	getBlockLockType,
+	hasOwnBlockLock,
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
@@ -1688,6 +1692,173 @@ describe( 'private selectors', () => {
 		it( 'prioritizes block lock over template lock', () => {
 			const state = createState( 'all', { remove: false } );
 			expect( isRemoveLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'layout lock', () => {
+		const containerBlock = 'test/lock-container';
+		const leafBlock = 'test/lock-leaf';
+
+		beforeAll( () => {
+			registerBlockType(
+				containerBlock,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Lock container',
+					category: 'design',
+					attributes: {
+						templateLock: { type: [ 'string', 'boolean' ] },
+					},
+				} )
+			);
+			registerBlockType(
+				leafBlock,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Lock leaf',
+					category: 'text',
+				} )
+			);
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( containerBlock );
+			unregisterBlockType( leafBlock );
+		} );
+
+		// A container with a leaf inside it.
+		const createState = (
+			containerAttributes: BlockAttributes,
+			leafAttributes: BlockAttributes = {}
+		) =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'container',
+							{ clientId: 'container', name: containerBlock },
+						],
+						[ 'leaf', { clientId: 'leaf', name: leafBlock } ],
+					] ),
+					attributes: new Map( [
+						[ 'container', containerAttributes ],
+						[ 'leaf', leafAttributes ],
+					] ),
+					parents: new Map( [
+						[ 'container', '' ],
+						[ 'leaf', 'container' ],
+					] ),
+					order: new Map( [
+						[ '', [ 'container' ] ],
+						[ 'container', [ 'leaf' ] ],
+						[ 'leaf', [] ],
+					] ),
+				},
+				settings: {},
+				blockListSettings: new Map(),
+			} );
+
+		it.each( [ 'all', 'contentOnly' ] )(
+			'locks the layout of a block with an "%s" template lock',
+			( templateLock ) => {
+				const state = createState( { templateLock } );
+				expect( isLayoutLockedBlock( state, 'container' ) ).toBe(
+					true
+				);
+				expect( isLockedBlock( state, 'container' ) ).toBe( true );
+			}
+		);
+
+		it( 'does not lock the layout for an "insert" template lock', () => {
+			const state = createState( { templateLock: 'insert' } );
+			expect( isLayoutLockedBlock( state, 'container' ) ).toBe( false );
+		} );
+
+		it( 'only allows layout locking for blocks with a template lock attribute', () => {
+			const state = createState( {} );
+			expect( canLayoutLockBlock( state, 'container' ) ).toBe( true );
+			expect( canLayoutLockBlock( state, 'leaf' ) ).toBe( false );
+		} );
+
+		it( 'returns a full lock only when movement, deletion, layout and styles are locked', () => {
+			expect(
+				getBlockLockType(
+					createState( {
+						lock: { move: true, remove: true, edit: true },
+						templateLock: 'all',
+					} ),
+					'container'
+				)
+			).toBe( 'full' );
+			expect(
+				getBlockLockType(
+					createState( {
+						lock: { move: true, remove: true },
+						templateLock: 'all',
+					} ),
+					'container'
+				)
+			).toBe( 'partial' );
+			expect(
+				getBlockLockType(
+					createState( { lock: { move: true, remove: true } } ),
+					'container'
+				)
+			).toBe( 'partial' );
+			expect(
+				getBlockLockType(
+					createState( { templateLock: 'contentOnly' } ),
+					'container'
+				)
+			).toBe( 'partial' );
+			expect( getBlockLockType( createState( {} ), 'container' ) ).toBe(
+				'none'
+			);
+		} );
+
+		it( 'returns a full lock for a block without layout locking when movement, deletion and styles are locked', () => {
+			expect(
+				getBlockLockType(
+					createState(
+						{},
+						{ lock: { move: true, remove: true, edit: true } }
+					),
+					'leaf'
+				)
+			).toBe( 'full' );
+			expect(
+				getBlockLockType(
+					createState( {}, { lock: { move: true } } ),
+					'leaf'
+				)
+			).toBe( 'partial' );
+		} );
+
+		it( 'counts a lock of the block itself as its own lock', () => {
+			expect(
+				hasOwnBlockLock(
+					createState( { templateLock: 'all' } ),
+					'container'
+				)
+			).toBe( true );
+			expect(
+				hasOwnBlockLock(
+					createState( {}, { lock: { move: true } } ),
+					'leaf'
+				)
+			).toBe( true );
+			expect( hasOwnBlockLock( createState( {} ), 'container' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'returns a partial lock when only the styles are locked', () => {
+			expect(
+				getBlockLockType(
+					createState( {}, { lock: { edit: true } } ),
+					'leaf'
+				)
+			).toBe( 'partial' );
 		} );
 	} );
 

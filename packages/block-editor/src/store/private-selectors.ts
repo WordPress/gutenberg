@@ -37,6 +37,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { LAYOUT_TEMPLATE_LOCKS } from '../components/block-lock/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -1293,7 +1294,119 @@ export function isLockedBlock( state: State, clientId: string ) {
 	return (
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
-		isRemoveLockedBlock( state, clientId )
+		isRemoveLockedBlock( state, clientId ) ||
+		isLayoutLockedBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the layout of a block is locked by its pattern: the block is
+ * an unsynced pattern section. The lock is the pattern's, so it is changed by
+ * editing or detaching the pattern, not from the lock controls. A pattern being
+ * edited is temporarily not a section, so it is not locked meanwhile.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout is locked by its pattern.
+ */
+export function isPatternLockedBlock( state: State, clientId: string ) {
+	return (
+		!! getBlockAttributes( state, clientId )?.metadata?.patternName &&
+		isSectionBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block is locked: the block's own
+ * `templateLock` is `all` or `contentOnly`, or it is an unsynced pattern
+ * section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout is locked.
+ */
+export function isLayoutLockedBlock( state: State, clientId: string ) {
+	return (
+		LAYOUT_TEMPLATE_LOCKS.includes(
+			getBlockAttributes( state, clientId )?.templateLock as string
+		) || isPatternLockedBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the inner layout of a block can be locked: its block type
+ * has a `templateLock` attribute, or it is an unsynced pattern section.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return Whether the block's layout can be locked.
+ */
+export function canLayoutLockBlock( state: State, clientId: string ) {
+	const blockName = getBlockName( state, clientId );
+	return (
+		( !! blockName &&
+			!! getBlockType( blockName )?.attributes?.templateLock ) ||
+		isPatternLockedBlock( state, clientId )
+	);
+}
+
+/**
+ * Returns how much of a block is locked. A block has up to four lock
+ * properties: movement, deletion, styles (editing its content and styles)
+ * and, where it can be locked, layout.
+ *
+ * - `full`: every property the block supports is locked.
+ * - `partial`: some, but not all, of them are locked.
+ * - `none`: the block is not locked.
+ *
+ * @param state    Global application state.
+ * @param clientId ClientId of the block.
+ *
+ * @return The lock type of the block.
+ */
+export function getBlockLockType(
+	state: State,
+	clientId: string
+): 'none' | 'partial' | 'full' {
+	const locks = [
+		isMoveLockedBlock( state, clientId ),
+		isRemoveLockedBlock( state, clientId ),
+		isEditLockedBlock( state, clientId ),
+	];
+	if ( canLayoutLockBlock( state, clientId ) ) {
+		locks.push( isLayoutLockedBlock( state, clientId ) );
+	}
+
+	if ( locks.every( Boolean ) ) {
+		return 'full';
+	}
+
+	if ( locks.some( Boolean ) ) {
+		return 'partial';
+	}
+
+	return 'none';
+}
+
+/**
+ * Returns whether a block has a lock of its own. The layout of a pattern is
+ * the pattern's, so it doesn't count.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block has a lock of its own.
+ */
+export function hasOwnBlockLock( state: State, clientId: string ): boolean {
+	return (
+		isMoveLockedBlock( state, clientId ) ||
+		isRemoveLockedBlock( state, clientId ) ||
+		isEditLockedBlock( state, clientId ) ||
+		( isLayoutLockedBlock( state, clientId ) &&
+			! isPatternLockedBlock( state, clientId ) )
 	);
 }
 

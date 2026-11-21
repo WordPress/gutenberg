@@ -14,6 +14,7 @@ import {
 	isClientIdSelected,
 } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { ALLOWS_EDIT_LOCKING } from '../block-lock/constants';
 import { unlock } from '../../lock-unlock';
 import type { ClientIdsTreeNode } from '../../store/types';
 import type { ListViewBranchProps, ListViewExpansionState } from './types';
@@ -82,11 +83,19 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			if ( ! parentId ) {
 				return { canParentExpand: true, isParentSynced: false };
 			}
-			const { canEditBlock, isSyncedBlock } = unlock(
+			const { canEditBlock, isSyncedBlock, getBlockName } = unlock(
 				select( blockEditorStore )
 			);
 			return {
-				canParentExpand: canEditBlock( parentId ),
+				// With the lock menu, the blocks inside a styles-locked block
+				// stay listed, as each one controls its own lock. Blocks with
+				// their own edit lock, like Navigation, keep them hidden.
+				canParentExpand:
+					canEditBlock( parentId ) ||
+					( !! window.__experimentalBlockLockMenu &&
+						! ALLOWS_EDIT_LOCKING.includes(
+							getBlockName( parentId ) ?? ''
+						) ),
 				isParentSynced: isSyncedBlock( parentId ),
 			};
 		},

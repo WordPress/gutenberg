@@ -21,6 +21,7 @@
 
 ### New Features
 
+-   Add the `lockOpen` and `lockDashed` icons, the open and partly locked counterparts of `lock` ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
 -   Add the `getAspectRatioIcon` function, which returns an icon that draws the shape of an aspect ratio, to pass to `Icon` ([#86348](https://github.com/WordPress/gutenberg/pull/86348)).
 
 ### Enhancements

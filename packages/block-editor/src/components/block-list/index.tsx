@@ -240,6 +240,7 @@ function Items( {
 				getBlockListSettings,
 				isZoomOut: _isZoomOut,
 				canInsertBlockType,
+				getBlockAttributes,
 			} = unlock( select( blockEditorStore ) );
 
 			const _order = getBlockOrder( rootClientId );
@@ -297,6 +298,13 @@ function Items( {
 					) ) &&
 				getBlockEditingMode( rootClientId ) !== 'disabled' &&
 				( ! templateLock || templateLock === 'contentOnly' ) &&
+				// With the block lock menu, a block whose styles are locked
+				// takes no new inner blocks.
+				! (
+					window.__experimentalBlockLockMenu &&
+					rootClientId &&
+					getBlockAttributes( rootClientId )?.lock?.edit
+				) &&
 				hasAppender &&
 				! _isZoomOut();
 

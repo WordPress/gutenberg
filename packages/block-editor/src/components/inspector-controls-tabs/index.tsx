@@ -12,6 +12,7 @@ import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
+import DisabledWhenStylesLocked from '../block-lock/disabled-when-styles-locked';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import type { InspectorControlsTabsProps } from './types';
@@ -183,12 +184,14 @@ export default function InspectorControlsTabs( {
 					) }
 				</WCTabs.TabList>
 				<WCTabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<ContentTab
-						contentClientIds={ contentClientIds }
-						onSwitchToListView={ switchToListView }
-						hasListViewTab={ hasListViewTab }
-					/>
-					<InspectorControls.Slot group="content" />
+					<DisabledWhenStylesLocked clientId={ clientId }>
+						<ContentTab
+							contentClientIds={ contentClientIds }
+							onSwitchToListView={ switchToListView }
+							hasListViewTab={ hasListViewTab }
+						/>
+						<InspectorControls.Slot group="content" />
+					</DisabledWhenStylesLocked>
 				</WCTabs.TabPanel>
 				<WCTabs.TabPanel
 					tabId={ TAB_LIST_VIEW.name }
@@ -201,16 +204,20 @@ export default function InspectorControlsTabs( {
 					tabId={ TAB_SETTINGS.name }
 					focusable={ false }
 				>
-					<SettingsTab showAdvancedControls={ !! blockName } />
+					<DisabledWhenStylesLocked clientId={ clientId }>
+						<SettingsTab showAdvancedControls={ !! blockName } />
+					</DisabledWhenStylesLocked>
 				</WCTabs.TabPanel>
 				<WCTabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
-					<StylesTab
-						blockName={ blockName }
-						clientId={ clientId }
-						hasBlockStyles={ hasBlockStyles }
-						isSectionBlock={ isSectionBlock }
-						contentClientIds={ contentClientIds }
-					/>
+					<DisabledWhenStylesLocked clientId={ clientId }>
+						<StylesTab
+							blockName={ blockName }
+							clientId={ clientId }
+							hasBlockStyles={ hasBlockStyles }
+							isSectionBlock={ isSectionBlock }
+							contentClientIds={ contentClientIds }
+						/>
+					</DisabledWhenStylesLocked>
 				</WCTabs.TabPanel>
 			</WCTabs>
 		</div>

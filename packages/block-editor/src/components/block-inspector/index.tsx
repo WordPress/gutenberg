@@ -21,6 +21,7 @@ import MultiSelectionInspector from '../multi-selection-inspector';
 import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+import DisabledWhenStylesLocked from '../block-lock/disabled-when-styles-locked';
 import BlockStyles from '../block-styles';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
@@ -564,9 +565,11 @@ const BlockInspectorSingleBlock = ( {
 				fillProps={ { clientId: renderedBlockClientId } }
 			/>
 			{ ! isEditingStyleState && (
-				<BlockVariationTransforms
-					blockClientId={ renderedBlockClientId }
-				/>
+				<DisabledWhenStylesLocked clientId={ renderedBlockClientId }>
+					<BlockVariationTransforms
+						blockClientId={ renderedBlockClientId }
+					/>
+				</DisabledWhenStylesLocked>
 			) }
 			<BlockInspectorPreTabsSlot />
 			{ isEditingStyleState && (
@@ -591,7 +594,7 @@ const BlockInspectorSingleBlock = ( {
 				</>
 			) }
 			{ ! isEditingStyleState && ! hasMultipleTabs && (
-				<>
+				<DisabledWhenStylesLocked clientId={ renderedBlockClientId }>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
@@ -600,7 +603,7 @@ const BlockInspectorSingleBlock = ( {
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && <StyleInspectorSlots /> }
-				</>
+				</DisabledWhenStylesLocked>
 			) }
 			{ ! isEditingStyleState && <InspectorControlsLastItem.Slot /> }
 			<SkipToSelectedBlock key="back" />

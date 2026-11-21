@@ -38,6 +38,7 @@ import { groupBlocks } from '../../utils/group-blocks';
 import { getPositionTypeLabel } from '../use-block-display-information';
 import { BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
+import ListViewLockButton from './lock-button';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
@@ -122,6 +123,9 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		isInLockingSection,
+		canLock,
+		hasOwnLock,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -132,6 +136,9 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				getParentSectionBlock,
+				canLockBlockType,
+				hasOwnBlockLock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -149,6 +156,11 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				isInLockingSection:
+					!! window.__experimentalBlockLockMenu &&
+					!! getParentSectionBlock( clientId ),
+				canLock: canLockBlockType( getBlockName( clientId ) ),
+				hasOwnLock: hasOwnBlockLock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -568,6 +580,20 @@ function ListViewBlock( {
 	);
 
 	const hasSiblings = siblingBlockCount > 0;
+	const isLockMenuEnabled = !! window.__experimentalBlockLockMenu;
+	// With the lock menu, a block that can be locked has a lock button in its
+	// own cell, and so does a locked block or a block inside a pattern, whose
+	// lock it can't change. A pattern being edited is temporarily unlocked, so
+	// it shows none.
+	const hasLockCell =
+		isLockMenuEnabled &&
+		clientId !== editedSection &&
+		( canLock || isLocked || isInLockingSection );
+	// The lock of an unlocked block or pattern only shows while the pointer is
+	// over the row, or the button has keyboard focus.
+	const lockCellClassName = clsx( 'block-editor-list-view-block__lock-cell', {
+		'is-visible': hasOwnLock || isInLockingSection || isHovered,
+	} );
 	const canShowBlockActions = showBlockActions && ! isDisabled;
 	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
 	const moverCellClassName = clsx(
@@ -585,6 +611,11 @@ function ListViewBlock( {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
+	}
+	// Rows with a lock cell have one more column, so the contents of the other
+	// rows span it to keep every row the full width of the tree.
+	if ( isLockMenuEnabled && ! hasLockCell ) {
+		colSpan = ( colSpan ?? 1 ) + 1;
 	}
 
 	const classes = clsx( {
@@ -727,6 +758,21 @@ function ListViewBlock( {
 				</>
 			) }
 
+			{ hasLockCell && (
+				<TreeGridCell
+					className={ lockCellClassName }
+					aria-selected={ !! isSelected }
+				>
+					{ ( { ref, tabIndex, onFocus } ) => (
+						<ListViewLockButton
+							clientId={ clientId }
+							ref={ ref }
+							tabIndex={ tabIndex }
+							onFocus={ onFocus }
+						/>
+					) }
+				</TreeGridCell>
+			) }
 			{ canShowBlockActions && BlockSettingsMenu && (
 				<TreeGridCell
 					className={ listViewBlockSettingsClassName }
