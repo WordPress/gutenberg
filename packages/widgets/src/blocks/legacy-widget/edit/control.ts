@@ -2,28 +2,79 @@ import apiFetch from '@wordpress/api-fetch';
 import { debounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
+interface JQueryWrapper {
+	on: {
+		(
+			event: string,
+			selector: string | null,
+			handler: ( event: Event ) => void
+		): void;
+		( event: string, handler: ( event: Event ) => void ): void;
+	};
+	off: {
+		(
+			event: string,
+			selector: string | null,
+			handler: ( event: Event ) => void
+		): void;
+		( event: string, handler: ( event: Event ) => void ): void;
+	};
+	trigger: ( event: string, extra?: unknown[] ) => void;
+}
+
+declare global {
+	interface Window {
+		jQuery?: (
+			element: Document | Element | JQueryWrapper
+		) => JQueryWrapper;
+	}
+}
+
+interface ControlParams {
+	id?: string | null;
+	idBase?: string | null;
+	instance?: Record< string, unknown > | null;
+	onChangeInstance: ( instance: Record< string, unknown > ) => void;
+	onChangeHasPreview: ( hasPreview: boolean ) => void;
+	onError: ( error: unknown ) => void;
+}
+
+interface WidgetResponse {
+	rendered_form: string;
+}
+
+interface EncodeWidgetResponse {
+	instance: Record< string, unknown >;
+	form: string;
+	preview: string;
+}
+
 /**
  * An API for creating and loading a widget control (a <div class="widget">
  * element) that is compatible with most third party widget scripts. By not
  * using React for this, we ensure that we have complete control over the DOM
  * and do not accidentally remove any elements that a third party widget script
  * has attached an event listener to.
- *
- * @property {Element} element The control's DOM element.
  */
 export default class Control {
-	/**
-	 * Creates and loads a new control.
-	 *
-	 * @access public
-	 * @param {Object}   params
-	 * @param {string}   params.id
-	 * @param {string}   params.idBase
-	 * @param {Object}   params.instance
-	 * @param {Function} params.onChangeInstance
-	 * @param {Function} params.onChangeHasPreview
-	 * @param {Function} params.onError
-	 */
+	id?: string | null;
+	idBase?: string | null;
+	private _instance?: Record< string, unknown > | null;
+	private _hasPreview: boolean | null;
+	onChangeInstance: ( instance: Record< string, unknown > ) => void;
+	onChangeHasPreview: ( hasPreview: boolean ) => void;
+	onError: ( error: unknown ) => void;
+	number: number;
+	element!: HTMLDivElement;
+	form!: HTMLFormElement;
+	content!: HTMLDivElement;
+
+	handleFormChange = debounce( () => {
+		if ( this.idBase ) {
+			this.saveForm();
+		}
+	}, 200 );
+
 	constructor( {
 		id,
 		idBase,
@@ -31,7 +82,7 @@ export default class Control {
 		onChangeInstance,
 		onChangeHasPreview,
 		onError,
-	} ) {
+	}: ControlParams ) {
 		this.id = id;
 		this.idBase = idBase;
 		this._instance = instance;
@@ -45,10 +96,6 @@ export default class Control {
 		// a fake but unique number.
 		this.number = ++lastNumber;
 
-		this.handleFormChange = debounce(
-			this.handleFormChange.bind( this ),
-			200
-		);
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 
 		this.initDOM();
@@ -58,8 +105,6 @@ export default class Control {
 
 	/**
 	 * Clean up the control so that it can be garbage collected.
-	 *
-	 * @access public
 	 */
 	destroy() {
 		this.unbindEvents();
@@ -70,8 +115,6 @@ export default class Control {
 
 	/**
 	 * Creates the control's DOM structure.
-	 *
-	 * @access private
 	 */
 	initDOM() {
 		this.element = el( 'div', { class: 'widget open' }, [
@@ -89,7 +132,7 @@ export default class Control {
 						class: 'id_base',
 						type: 'hidden',
 						name: 'id_base',
-						value: this.idBase ?? this.id,
+						value: this.idBase ?? this.id ?? '',
 					} ),
 					el( 'input', {
 						class: 'widget-width',
@@ -111,15 +154,16 @@ export default class Control {
 					} ),
 					( this.content = el( 'div', { class: 'widget-content' } ) ),
 					// Non-multi widgets can be saved via a Save button.
-					this.id &&
-						el(
-							'button',
-							{
-								class: 'button is-primary',
-								type: 'submit',
-							},
-							__( 'Save' )
-						),
+					this.id
+						? el(
+								'button',
+								{
+									class: 'button is-primary',
+									type: 'submit',
+								},
+								__( 'Save' )
+							)
+						: null,
 				] ) ),
 			] ),
 		] );
@@ -127,8 +171,6 @@ export default class Control {
 
 	/**
 	 * Adds the control's event listeners.
-	 *
-	 * @access private
 	 */
 	bindEvents() {
 		// Prefer jQuery 'change' event instead of the native 'change' event
@@ -147,8 +189,6 @@ export default class Control {
 
 	/**
 	 * Removes the control's event listeners.
-	 *
-	 * @access private
 	 */
 	unbindEvents() {
 		if ( window.jQuery ) {
@@ -166,8 +206,6 @@ export default class Control {
 	/**
 	 * Fetches the widget's form HTML from the REST API and loads it into the
 	 * control's form.
-	 *
-	 * @access private
 	 */
 	async loadContent() {
 		try {
@@ -185,7 +223,7 @@ export default class Control {
 
 				// If we don't have an instance, perform a save right away. This
 				// happens when creating a new Legacy Widget block.
-				if ( ! this.instance.hash ) {
+				if ( ! this.instance?.hash ) {
 					const { instance } = await encodeWidget( {
 						idBase: this.idBase,
 						instance: this.instance,
@@ -211,24 +249,11 @@ export default class Control {
 	}
 
 	/**
-	 * Perform a save when a multi widget's form is changed. Non-multi widgets
-	 * are saved manually.
-	 *
-	 * @access private
-	 */
-	handleFormChange() {
-		if ( this.idBase ) {
-			this.saveForm();
-		}
-	}
-
-	/**
 	 * Perform a save when the control's form is manually submitted.
 	 *
-	 * @access private
-	 * @param {Event} event
+	 * @param event Form submit event.
 	 */
-	handleFormSubmit( event ) {
+	handleFormSubmit( event: Event ) {
 		event.preventDefault();
 		this.saveForm();
 	}
@@ -236,8 +261,6 @@ export default class Control {
 	/**
 	 * Serialize the control's form, send it to the REST API, and update the
 	 * instance with the encoded instance that the REST API returns.
-	 *
-	 * @access private
 	 */
 	async saveForm() {
 		const formData = serializeForm( this.form );
@@ -270,8 +293,6 @@ export default class Control {
 
 	/**
 	 * The widget's instance object.
-	 *
-	 * @access private
 	 */
 	get instance() {
 		return this._instance;
@@ -279,20 +300,18 @@ export default class Control {
 
 	/**
 	 * The widget's instance object.
-	 *
-	 * @access private
 	 */
 	set instance( instance ) {
 		if ( this._instance !== instance ) {
 			this._instance = instance;
-			this.onChangeInstance( instance );
+			if ( instance ) {
+				this.onChangeInstance( instance );
+			}
 		}
 	}
 
 	/**
 	 * Whether or not the widget can be previewed.
-	 *
-	 * @access public
 	 */
 	get hasPreview() {
 		return this._hasPreview;
@@ -300,20 +319,24 @@ export default class Control {
 
 	/**
 	 * Whether or not the widget can be previewed.
-	 *
-	 * @access private
 	 */
 	set hasPreview( hasPreview ) {
 		if ( this._hasPreview !== hasPreview ) {
 			this._hasPreview = hasPreview;
-			this.onChangeHasPreview( hasPreview );
+			if ( hasPreview !== null ) {
+				this.onChangeHasPreview( hasPreview );
+			}
 		}
 	}
 }
 
 let lastNumber = 0;
 
-function el( tagName, attributes = {}, content = null ) {
+function el< K extends keyof HTMLElementTagNameMap >(
+	tagName: K,
+	attributes: Record< string, string > = {},
+	content: Array< Node | null | undefined | false > | string | null = null
+): HTMLElementTagNameMap[ K ] {
 	const element = document.createElement( tagName );
 	for ( const [ attribute, value ] of Object.entries( attributes ) ) {
 		element.setAttribute( attribute, value );
@@ -330,10 +353,10 @@ function el( tagName, attributes = {}, content = null ) {
 	return element;
 }
 
-async function saveWidget( id, formData = null ) {
-	let widget;
+async function saveWidget( id: string, formData: string | null = null ) {
+	let widget: WidgetResponse;
 	if ( formData ) {
-		widget = await apiFetch( {
+		widget = await apiFetch< WidgetResponse >( {
 			path: `/wp/v2/widgets/${ id }?context=edit`,
 			method: 'PUT',
 			data: {
@@ -341,7 +364,7 @@ async function saveWidget( id, formData = null ) {
 			},
 		} );
 	} else {
-		widget = await apiFetch( {
+		widget = await apiFetch< WidgetResponse >( {
 			path: `/wp/v2/widgets/${ id }?context=edit`,
 			method: 'GET',
 		} );
@@ -349,8 +372,18 @@ async function saveWidget( id, formData = null ) {
 	return { form: widget.rendered_form };
 }
 
-async function encodeWidget( { idBase, instance, number, formData = null } ) {
-	const response = await apiFetch( {
+async function encodeWidget( {
+	idBase,
+	instance,
+	number,
+	formData = null,
+}: {
+	idBase: string;
+	instance?: Record< string, unknown > | null;
+	number: number;
+	formData?: string | null;
+} ) {
+	const response = await apiFetch< EncodeWidgetResponse >( {
 		path: `/wp/v2/widget-types/${ idBase }/encode`,
 		method: 'POST',
 		data: {
@@ -366,20 +399,21 @@ async function encodeWidget( { idBase, instance, number, formData = null } ) {
 	};
 }
 
-function isEmptyHTML( html ) {
+function isEmptyHTML( html: string ) {
 	const element = document.createElement( 'div' );
 	element.innerHTML = html;
 	return isEmptyNode( element );
 }
 
-function isEmptyNode( node ) {
+function isEmptyNode( node: Node ): boolean {
 	switch ( node.nodeType ) {
-		case node.TEXT_NODE:
+		case Node.TEXT_NODE:
 			// Text nodes are empty if it's entirely whitespace.
-			return node.nodeValue.trim() === '';
-		case node.ELEMENT_NODE:
+			return ( node.nodeValue ?? '' ).trim() === '';
+		case Node.ELEMENT_NODE: {
 			// Elements that are "embedded content" are not empty.
 			// https://dev.w3.org/html5/spec-LC/content-models.html#embedded-content-0
+			const element = node as Element;
 			if (
 				[
 					'AUDIO',
@@ -391,23 +425,24 @@ function isEmptyNode( node ) {
 					'OBJECT',
 					'SVG',
 					'VIDEO',
-				].includes( node.tagName )
+				].includes( element.tagName )
 			) {
 				return false;
 			}
 			// Elements with no children are empty.
-			if ( ! node.hasChildNodes() ) {
+			if ( ! element.hasChildNodes() ) {
 				return true;
 			}
 			// Elements with children are empty if all their children are empty.
-			return Array.from( node.childNodes ).every( isEmptyNode );
+			return Array.from( element.childNodes ).every( isEmptyNode );
+		}
 		default:
 			return true;
 	}
 }
 
-function serializeForm( form ) {
+function serializeForm( form: HTMLFormElement ) {
 	return new window.URLSearchParams(
-		Array.from( new window.FormData( form ) )
+		Array.from( new window.FormData( form ) ) as string[][]
 	).toString();
 }
