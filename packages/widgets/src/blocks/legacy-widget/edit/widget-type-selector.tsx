@@ -5,11 +5,25 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
-export default function WidgetTypeSelector( { selectedId, onSelect } ) {
+interface WidgetTypeSelection {
+	selectedId: string | null;
+	isMulti?: boolean;
+}
+
+interface WidgetTypeSelectorProps {
+	selectedId?: string | null;
+	onSelect: ( selection: WidgetTypeSelection ) => void;
+}
+
+export default function WidgetTypeSelector( {
+	selectedId,
+	onSelect,
+}: WidgetTypeSelectorProps ) {
 	const widgetTypes = useSelect( ( select ) => {
+		const blockEditorSettings = select( blockEditorStore ).getSettings() as
+			{ widgetTypesToHideFromLegacyWidgetBlock?: string[] } | undefined;
 		const hiddenIds =
-			select( blockEditorStore ).getSettings()
-				?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
+			blockEditorSettings?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
 		return select( coreStore )
 			.getWidgetTypes( { per_page: -1 } )
 			?.filter( ( widgetType ) => ! hiddenIds.includes( widgetType.id ) );
@@ -20,7 +34,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}
 
 	if ( widgetTypes.length === 0 ) {
-		return __( 'There are no widgets available.' );
+		return <>{ __( 'There are no widgets available.' ) }</>;
 	}
 
 	const items = [
@@ -46,10 +60,12 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 					const selected = widgetTypes.find(
 						( widgetType ) => widgetType.id === value
 					);
-					onSelect( {
-						selectedId: selected.id,
-						isMulti: selected.is_multi,
-					} );
+					if ( selected ) {
+						onSelect( {
+							selectedId: selected.id,
+							isMulti: selected.is_multi,
+						} );
+					}
 				} else {
 					onSelect( { selectedId: null } );
 				}

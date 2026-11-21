@@ -1,6 +1,44 @@
 import { createBlock } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
+import type { LegacyWidgetAttributes } from './index';
 
-const legacyWidgetTransforms = [
+interface RawInstance extends Record< string, unknown > {
+	content?: string;
+	count?: number | boolean;
+	dropdown?: boolean;
+	show_date?: boolean;
+	number?: number;
+	taxonomy?: string;
+	hierarchical?: boolean;
+	url?: string;
+	preload?: string;
+	loop?: boolean;
+	attachment_id?: number;
+	alt?: string;
+	caption?: string;
+	height?: number;
+	link_classes?: string;
+	link_rel?: string;
+	link_target_blank?: boolean;
+	link_type?: string;
+	link_url?: string;
+	size?: string;
+	width?: number;
+	ids?: number[];
+	show_author?: boolean;
+	show_summary?: boolean;
+	items?: number;
+	title?: string;
+}
+
+interface LegacyWidgetTransformItem {
+	block: string;
+	widget: string;
+	transform?: ( raw: RawInstance ) => Record< string, unknown >;
+	transformBlock?: ( raw: RawInstance ) => Block;
+}
+
+const legacyWidgetTransforms: LegacyWidgetTransformItem[] = [
 	{
 		block: 'core/calendar',
 		widget: 'calendar',
@@ -13,7 +51,7 @@ const legacyWidgetTransforms = [
 		block: 'core/html',
 		widget: 'custom_html',
 		transformBlock: ( { content } ) =>
-			createBlock( 'core/html', {}, [], [ content ] ),
+			createBlock( 'core/html', {}, [], [ content ?? null ] ),
 	},
 	{
 		block: 'core/archives',
@@ -125,7 +163,7 @@ const legacyWidgetTransforms = [
 	{
 		block: 'core/gallery',
 		widget: 'media_gallery',
-		transform: ( { ids, link_type: linkTo, size, number } ) => {
+		transform: ( { ids = [], link_type: linkTo, size, number } ) => {
 			return {
 				ids,
 				columns: number,
@@ -156,35 +194,53 @@ const legacyWidgetTransforms = [
 			};
 		},
 	},
-].map( ( { block, widget, transform, transformBlock } ) => {
-	return {
-		type: 'block',
-		blocks: [ block ],
-		isMatch: ( { idBase, instance } ) => {
-			return idBase === widget && !! instance?.raw;
-		},
-		transform: ( { instance } ) => {
-			const transformedBlock = transformBlock
-				? transformBlock( instance.raw )
-				: createBlock(
-						block,
-						transform ? transform( instance.raw ) : undefined
-					);
-			if ( ! instance.raw?.title ) {
-				return transformedBlock;
-			}
-			return [
-				createBlock( 'core/heading', {
-					content: instance.raw.title,
-				} ),
-				transformedBlock,
-			];
-		},
-	};
-} );
+];
 
-const transforms = {
-	to: legacyWidgetTransforms,
+const transforms: NonNullable< BlockConfiguration[ 'transforms' ] > = {
+	to: legacyWidgetTransforms.map(
+		( { block, widget, transform, transformBlock } ) => ( {
+			type: 'block',
+			blocks: [ block ],
+			isMatch: (
+				attributes:
+					Record< string, unknown > | Record< string, unknown >[]
+			) => {
+				const attrs = (
+					Array.isArray( attributes ) ? attributes[ 0 ] : attributes
+				) as LegacyWidgetAttributes | undefined;
+				const raw = (
+					attrs?.instance as { raw?: RawInstance } | null | undefined
+				 )?.raw;
+				return attrs?.idBase === widget && !! raw;
+			},
+			transform: (
+				attributes:
+					Record< string, unknown > | Record< string, unknown >[]
+			) => {
+				const attrs = (
+					Array.isArray( attributes ) ? attributes[ 0 ] : attributes
+				) as LegacyWidgetAttributes | undefined;
+				const raw = (
+					attrs?.instance as { raw?: RawInstance } | null | undefined
+				 )?.raw;
+				const transformedBlock = transformBlock
+					? transformBlock( raw ?? {} )
+					: createBlock(
+							block,
+							transform ? transform( raw ?? {} ) : undefined
+						);
+				if ( ! raw?.title ) {
+					return transformedBlock;
+				}
+				return [
+					createBlock( 'core/heading', {
+						content: raw.title,
+					} ),
+					transformedBlock,
+				];
+			},
+		} )
+	),
 };
 
 export default transforms;

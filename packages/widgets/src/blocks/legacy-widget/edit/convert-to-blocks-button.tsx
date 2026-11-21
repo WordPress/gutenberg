@@ -4,23 +4,39 @@ import { ToolbarButton } from '@wordpress/components';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
-export default function ConvertToBlocksButton( { clientId, rawInstance } ) {
+interface RawInstance extends Record< string, unknown > {
+	title?: string;
+	text?: string;
+}
+
+interface ConvertToBlocksButtonProps {
+	clientId: string;
+	rawInstance?: RawInstance;
+}
+
+export default function ConvertToBlocksButton( {
+	clientId,
+	rawInstance,
+}: ConvertToBlocksButtonProps ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	return (
 		<ToolbarButton
 			onClick={ () => {
+				if ( ! rawInstance ) {
+					return;
+				}
 				if ( rawInstance.title ) {
 					replaceBlocks( clientId, [
 						createBlock( 'core/heading', {
 							content: rawInstance.title,
 						} ),
-						...rawHandler( { HTML: rawInstance.text } ),
+						...rawHandler( { HTML: rawInstance.text ?? '' } ),
 					] );
 				} else {
 					replaceBlocks(
 						clientId,
-						rawHandler( { HTML: rawInstance.text } )
+						rawHandler( { HTML: rawInstance.text ?? '' } )
 					);
 				}
 			} }
