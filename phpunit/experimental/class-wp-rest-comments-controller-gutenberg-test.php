@@ -386,7 +386,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		if ( $can_read ) {
 			$comments = $response->get_data();
-			$this->assertEquals( self::$num_notes, count( $comments ) );
+			$this->assertCount( self::$num_notes, $comments );
 
 		} else {
 			$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );
@@ -446,7 +446,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		if ( $can_read ) {
 			$comment = $response->get_data();
-			$this->assertEquals( $comment_id, $comment['id'] );
+			$this->assertSame( $comment_id, $comment['id'] );
 
 		} else {
 			$this->assertErrorResponse( 'rest_forbidden_context', $response, 403 );

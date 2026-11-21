@@ -20,6 +20,7 @@ import {
 	useEmojibaseData,
 } from './emojibase-data';
 import type { EmojibaseEntry } from './emojibase-data';
+import { filterSupportedEmojis } from './emoji-support';
 import { useFrequentEmojis } from './frequent-emojis';
 import {
 	getCuratedLabel,
@@ -261,17 +262,20 @@ export default function EmojiPicker( {
 	} = useEmojibaseData( isWarm ? baseUrl : null, locale );
 	const namedEmojis = useReactionEmojis();
 	const rules = useReactionEmojiRules();
-	// Offer only what the REST API accepts under the site's emoji rules.
+	// Offer only what the REST API accepts under the site's emoji rules, and
+	// leave out emoji the system can't draw.
 	const data = useMemo( () => {
 		if ( ! dataset ) {
 			return [];
 		}
 		const namedKeys = getNamedHexKeys( namedEmojis );
-		return dataset.filter( ( entry ) =>
-			isReactionEmojiAllowed(
-				normalizeHexcode( entry.hexcode ),
-				rules,
-				namedKeys
+		return filterSupportedEmojis(
+			dataset.filter( ( entry ) =>
+				isReactionEmojiAllowed(
+					normalizeHexcode( entry.hexcode ),
+					rules,
+					namedKeys
+				)
 			)
 		);
 	}, [ dataset, namedEmojis, rules ] );

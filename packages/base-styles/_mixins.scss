@@ -10,6 +10,11 @@
 @use "./functions";
 @use "./long-content-fade";
 
+// The `Text` component in `@wordpress/ui` turns the declarations of the
+// `heading-*` and `body-*` mixins into custom properties, and reads only
+// `font-family`, `font-weight`, `font-size`, and `line-height` from them.
+// If one of these mixins gains another property, update
+// `packages/ui/src/text/style.module.scss` to read it too.
 @mixin _text-heading() {
 	font-family: wpds.var("--wpds-typography-font-family-heading");
 	font-weight: wpds.var("--wpds-typography-font-weight-emphasis");
@@ -245,7 +250,8 @@
 
 @mixin caption-style-theme() {
 	color: #555;
-	font-size: variables.$default-font-size;
+	// Block theme styles apply to content, not admin UI, so they do not use the design tokens.
+	font-size: 13px;
 	text-align: center;
 
 	.is-dark-theme & {
@@ -289,7 +295,7 @@
 	@include input-style__neutral();
 
 	@include break-small {
-		font-size: variables.$default-font-size;
+		font-size: wpds.var("--wpds-typography-font-size-md");
 		/* Override core line-height. To be reviewed. */
 		line-height: normal;
 	}
@@ -348,7 +354,7 @@
 	// Fonts smaller than 16px causes mobile safari to zoom.
 	font-size: variables.$mobile-text-min-font-size !important;
 	@include break-small {
-		font-size: variables.$default-font-size !important;
+		font-size: wpds.var("--wpds-typography-font-size-md") !important;
 	}
 
 	&:focus {
