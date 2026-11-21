@@ -9,6 +9,7 @@ export const userPatternCategoriesSelectKey = Symbol(
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
 export const getMediaSelectKey = Symbol( 'getMediaSelect' );
+export const featuredImageSelectKey = Symbol( 'featuredImageSelect' );
 export const isIsolatedEditorKey = Symbol( 'isIsolatedEditor' );
 export const deviceTypeKey = Symbol( 'deviceTypeKey' );
 export const isNavigationOverlayContextKey = Symbol(

@@ -13,6 +13,7 @@ import { useHasBackgroundColorPanel } from './color-panel';
 import { useColorGradientSettings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
+import { isFeaturedImageBackground } from '../../hooks/use-featured-image-background';
 import {
 	extractPresetSlug,
 	encodeColorValueWithPalette,
@@ -142,6 +143,8 @@ export function hasBackgroundImageValue( style: PanelStyle | undefined ) {
 		{ id?: number; url?: string } | undefined;
 	return (
 		!! backgroundImage?.id ||
+		// The featured image is looked up when the block renders.
+		isFeaturedImageBackground( backgroundImage ) ||
 		// Supports url() string values in theme.json.
 		'string' === typeof style?.background?.backgroundImage ||
 		!! backgroundImage?.url
@@ -231,6 +234,7 @@ export default function BackgroundImagePanel( {
 	defaultValues = {},
 	headerLabel = __( 'Background' ),
 	contrastWarning,
+	featuredImage,
 }: BackgroundPanelProps ) {
 	const {
 		colors,
@@ -475,6 +479,7 @@ export default function BackgroundImagePanel( {
 						onChange={ onChange }
 						settings={ settings }
 						inheritedValue={ inheritedValue }
+						featuredImage={ featuredImage }
 						// @ts-expect-error BackgroundImageControl takes no default controls.
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }

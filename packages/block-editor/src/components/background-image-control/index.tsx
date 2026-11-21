@@ -289,6 +289,7 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
+	featuredImage,
 }: BackgroundImageControlsProps ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
@@ -415,6 +416,7 @@ function BackgroundImageControls( {
 			} )
 		);
 	const canRemove = ! hasValue && hasBackgroundImageValue( inheritedValue );
+	const isFeaturedImage = !! featuredImage?.isActive;
 	// theme.json accepts a plain string for `backgroundImage`; the editor
 	// stores an object with a `url`. Resolve either for the URL field.
 	const rawURL =
@@ -427,7 +429,9 @@ function BackgroundImageControls( {
 	// an inherited image stores the `'none'` sentinel string.
 	const currentURL = /^https?:\/\//.test( rawURL ?? '' ) ? rawURL : undefined;
 	// `getFilename` returns nothing for a missing URL.
-	const imgLabel = title || getFilename( url as string ) || __( 'Image' );
+	const imgLabel = isFeaturedImage
+		? __( 'Featured image' )
+		: title || getFilename( url as string ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
@@ -439,6 +443,15 @@ function BackgroundImageControls( {
 				accept="image/*"
 				onSelect={ onSelectMedia }
 				onSelectURL={ onSelectURL }
+				useFeaturedImage={ isFeaturedImage }
+				onToggleFeaturedImage={
+					featuredImage
+						? () => {
+								focusToggleButton( containerRef );
+								featuredImage.onToggle();
+							}
+						: undefined
+				}
 				popoverProps={ {
 					className: clsx( {
 						'block-editor-global-styles-background-panel__media-replace-popover':
@@ -447,8 +460,10 @@ function BackgroundImageControls( {
 				} }
 				name={
 					<InspectorImagePreviewItem
-						imgUrl={ url }
-						filename={ title }
+						imgUrl={ isFeaturedImage ? featuredImage?.url : url }
+						filename={
+							isFeaturedImage ? featuredImage?.title : title
+						}
 						label={ imgLabel }
 					/>
 				}
@@ -486,6 +501,7 @@ function BackgroundSizeControls( {
 	style,
 	inheritedValue,
 	defaultValues,
+	featuredImageURL,
 }: BackgroundSizeControlsProps ) {
 	/*
 	 * Read local and inherited values separately so each sub-control can
@@ -506,6 +522,7 @@ function BackgroundSizeControls( {
 	const repeatValue = localRepeatValue || inheritedRepeatValue;
 	// A theme.json string has no media properties.
 	const imageValue =
+		featuredImageURL ||
 		( style?.background?.backgroundImage as BackgroundImageMedia )?.url ||
 		( inheritedValue?.background?.backgroundImage as BackgroundImageMedia )
 			?.url;
@@ -720,6 +737,7 @@ export default function BackgroundImagePanel( {
 	inheritedValue = value,
 	settings,
 	defaultValues = {},
+	featuredImage,
 }: BackgroundImageControlProps ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
@@ -766,10 +784,12 @@ export default function BackgroundImagePanel( {
 		);
 
 	// A theme.json string has no media properties.
-	const { title, url } = ( value?.background?.backgroundImage || {
-		...( resolvedInheritedValue?.background
-			?.backgroundImage as BackgroundImageMedia ),
-	} ) as BackgroundImageMedia;
+	const { title, url } = featuredImage?.isActive
+		? { title: __( 'Featured image' ), url: featuredImage.url }
+		: ( ( value?.background?.backgroundImage || {
+				...( resolvedInheritedValue?.background
+					?.backgroundImage as BackgroundImageMedia ),
+			} ) as BackgroundImageMedia );
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
@@ -821,12 +841,18 @@ export default function BackgroundImagePanel( {
 							onRemoveImage={ () => setIsDropDownOpen( false ) }
 							defaultValues={ defaultValues }
 							containerRef={ containerRef }
+							featuredImage={ featuredImage }
 						/>
 						<BackgroundSizeControls
 							onChange={ onChange }
 							style={ value }
 							defaultValues={ defaultValues }
 							inheritedValue={ resolvedInheritedValue }
+							featuredImageURL={
+								featuredImage?.isActive
+									? featuredImage.url
+									: undefined
+							}
 						/>
 					</VStack>
 				</BackgroundControlsPanel>
@@ -842,6 +868,7 @@ export default function BackgroundImagePanel( {
 					} }
 					onRemoveImage={ () => setIsDropDownOpen( false ) }
 					containerRef={ containerRef }
+					featuredImage={ featuredImage }
 				/>
 			) }
 		</div>
