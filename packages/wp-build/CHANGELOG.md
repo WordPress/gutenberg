@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a `--no-script-debug` flag that skips generating the unminified debug assets, for plugins that would rather not ship them ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
+-   With `--no-script-debug`, write a translation stub at the non-minified path of each bundle, such as `index.js` next to `index.min.js`. It lists the bundle's translatable strings with their translator comments, so `wp i18n make-pot` and the WordPress.org string import find them without source maps ([#87183](https://github.com/WordPress/gutenberg/pull/87183)).
 
 ### Bug Fixes
 
