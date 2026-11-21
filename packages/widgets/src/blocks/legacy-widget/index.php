@@ -37,8 +37,13 @@ function render_block_core_legacy_widget( $attributes ) {
 	}
 
 	if ( isset( $attributes['instance']['encoded'], $attributes['instance']['hash'] ) ) {
-		$serialized_instance = base64_decode( $attributes['instance']['encoded'] );
-		if ( ! hash_equals( wp_hash( $serialized_instance ), (string) $attributes['instance']['hash'] ) ) {
+		$encoded = $attributes['instance']['encoded'];
+		$hash    = $attributes['instance']['hash'];
+		if ( ! is_string( $encoded ) || ! is_string( $hash ) ) {
+			return '';
+		}
+		$serialized_instance = base64_decode( $encoded, true );
+		if ( false === $serialized_instance || ! hash_equals( wp_hash( $serialized_instance ), $hash ) ) {
 			return '';
 		}
 		$instance = unserialize( $serialized_instance );

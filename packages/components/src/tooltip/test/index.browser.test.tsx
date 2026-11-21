@@ -1,10 +1,16 @@
 import { describe, expect, it, vi } from 'vitest';
-import { userEvent } from 'vitest/browser';
+import { page, server, userEvent } from 'vitest/browser';
 import { act, screen, waitFor } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
 import Modal from '../../modal';
 import Tooltip, { TOOLTIP_DELAY } from '..';
+
+declare module 'vitest/browser' {
+	interface BrowserCommands {
+		hoverWithManualTimers: ( selector: string ) => Promise< void >;
+	}
+}
 
 const props = {
 	children: <button>Tooltip anchor</button>,
@@ -31,8 +37,11 @@ const hoverOutside = async () => {
 	await userEvent.hover( document.body );
 };
 
-const sleep = ( milliseconds: number ) =>
-	new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
+const hoverWithManualTimers = async ( element: Element ) => {
+	await server.commands.hoverWithManualTimers(
+		page.elementLocator( element ).selector
+	);
+};
 
 describe( 'Tooltip', () => {
 	describe( 'basic behavior', () => {
@@ -284,10 +293,21 @@ describe( 'Tooltip', () => {
 			const ADDITIONAL_DELAY = 500;
 
 			await render(
-				<Tooltip
-					{ ...props }
-					delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY }
-				/>
+				<>
+					<button
+						style={ {
+							position: 'fixed',
+							right: 0,
+							bottom: 0,
+						} }
+					>
+						Pointer parking target
+					</button>
+					<Tooltip
+						{ ...props }
+						delay={ TOOLTIP_DELAY + ADDITIONAL_DELAY }
+					/>
+				</>
 			);
 
 			const anchor = screen.getByRole( 'button', {
@@ -295,30 +315,35 @@ describe( 'Tooltip', () => {
 			} );
 			expect( anchor ).toBeVisible();
 
-			// Hover over the anchor
-			await userEvent.hover( anchor );
-			expectTooltipToBeHidden();
+			await userEvent.hover(
+				screen.getByRole( 'button', {
+					name: 'Pointer parking target',
+				} )
+			);
+			// Keep browser command latency from consuming the hover delay.
+			vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+			try {
+				await hoverWithManualTimers( anchor );
+				expectTooltipToBeHidden();
 
-			// Advance time by default delay, which is still well before the
-			// custom delay even when CI is slow to resolve the hover event.
-			await sleep( TOOLTIP_DELAY );
+				// One millisecond short of the custom delay, which is past the
+				// default one: the tooltip hasn't appeared yet.
+				await act( async () => {
+					vi.advanceTimersByTime(
+						TOOLTIP_DELAY + ADDITIONAL_DELAY - 1
+					);
+				} );
+				expectTooltipToBeHidden();
 
-			// Tooltip hasn't appeared yet
-			expectTooltipToBeHidden();
-
-			// Wait for additional delay for tooltip to appear
-			await sleep( ADDITIONAL_DELAY );
-			await waitExpectTooltipToShow();
-
-			// Hover outside of the anchor, tooltip should hide
-			await hoverOutside();
-			await waitExpectTooltipToHide();
-
-			// Prevent this test from interfering with the next one.
-			// "Tooltips appear instantly if another tooltip has just been hidden."
-			// See: https://github.com/WordPress/gutenberg/pull/57345#discussion_r1435495655
-			await sleep( 3000 );
-		}, 10_000 );
+				// The custom delay has elapsed: the tooltip appears.
+				await act( async () => {
+					vi.advanceTimersByTime( 1 );
+				} );
+				expectTooltipToBeVisible();
+			} finally {
+				vi.useRealTimers();
+			}
+		} );
 
 		it( 'should not show tooltip if the mouse leaves the tooltip anchor before set delay', async () => {
 			const onMouseEnterMock = vi.fn();
@@ -362,7 +387,7 @@ describe( 'Tooltip', () => {
 			// Keep browser command latency from consuming the hover delay.
 			vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
 			try {
-				await userEvent.hover( anchor );
+				await hoverWithManualTimers( anchor );
 				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 				expectTooltipToBeHidden();
 
@@ -373,7 +398,7 @@ describe( 'Tooltip', () => {
 				} );
 				expectTooltipToBeHidden();
 
-				await hoverOutside();
+				await hoverWithManualTimers( document.body );
 				expectTooltipToBeHidden();
 				expect( onMouseEnterMock ).toHaveBeenCalledTimes( 1 );
 				expect( onMouseLeaveMock ).toHaveBeenCalledTimes( 1 );

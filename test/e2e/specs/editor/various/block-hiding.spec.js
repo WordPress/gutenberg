@@ -67,6 +67,29 @@ test.describe( 'Block Hiding', () => {
 		).toBeVisible();
 	} );
 
+	test( 'can show a block from toolbar', async ( { page, editor } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Test paragraph',
+				metadata: { blockVisibility: false },
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Hidden' );
+		const modal = page.getByRole( 'dialog', { name: 'Hide block' } );
+		await modal
+			.getByRole( 'checkbox', { name: 'Omit from published content' } )
+			.uncheck();
+		await modal.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Visible', exact: true } )
+		).toBeFocused();
+	} );
+
 	test( 'should not allow block visibility shortcut on children of a content-only locked section, but should after editing section', async ( {
 		editor,
 		page,
