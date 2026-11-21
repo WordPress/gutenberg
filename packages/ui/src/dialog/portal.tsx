@@ -1,6 +1,6 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import { forwardRef } from '@wordpress/element';
-import { getWpCompatOverlaySlot } from '../utils/wp-compat-overlay-slot';
+import { wpCompatOverlaySlotContainer } from '../utils/wp-compat-overlay-slot';
 import type { PortalProps } from './types';
 
 /**
@@ -14,7 +14,9 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >( function DialogPortal(
 		<_Dialog.Portal
 			ref={ ref }
 			container={
-				container === undefined ? getWpCompatOverlaySlot() : container
+				container === undefined
+					? wpCompatOverlaySlotContainer
+					: container
 			}
 			{ ...restProps }
 		/>

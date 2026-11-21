@@ -1,7 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import { forwardRef } from '@wordpress/element';
 import type { PortalProps } from './types';
-import { getWpCompatOverlaySlot } from '../../../utils/wp-compat-overlay-slot';
+import { wpCompatOverlaySlotContainer } from '../../../utils/wp-compat-overlay-slot';
 
 /**
  * Root element that portals `Combobox` popup content. Pass to
@@ -15,7 +15,7 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 			<_Combobox.Portal
 				container={
 					container === undefined
-						? getWpCompatOverlaySlot()
+						? wpCompatOverlaySlotContainer
 						: container
 				}
 				{ ...restProps }

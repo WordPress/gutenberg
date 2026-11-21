@@ -9,6 +9,7 @@ import {
 	getWpCompatOverlaySlot,
 	__resetWpCompatOverlaySlotCacheForTests,
 } from '../../utils/wp-compat-overlay-slot';
+import { useEnableWpCompatOverlaySlot } from '../../utils/use-enable-wp-compat-overlay-slot';
 
 type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
 
@@ -785,6 +786,57 @@ describe( 'Dialog.Portal', () => {
 
 		expect(
 			await within( target ).findByText( 'Portal content' )
+		).toBeVisible();
+	} );
+} );
+
+describe( 'Dialog.Portal when the compatibility overlay slot is enabled later', () => {
+	function EnableSlot() {
+		useEnableWpCompatOverlaySlot();
+		return null;
+	}
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		delete ( window as { __wpUiCompatOverlaySlotEnabled?: boolean } )
+			.__wpUiCompatOverlaySlotEnabled;
+	} );
+
+	it( 'keeps an open popup and its state in place, and uses the slot when reopened', async () => {
+		const user = userEvent.setup();
+		const content = ( enableSlot: boolean ) => (
+			<>
+				{ enableSlot && <EnableSlot /> }
+				<Dialog.Root defaultOpen modal={ false }>
+					<Dialog.Trigger>Open</Dialog.Trigger>
+					<Dialog.Popup>
+						<Dialog.Title>Title</Dialog.Title>
+						<input aria-label="Name" />
+						<Dialog.CloseIconButton />
+					</Dialog.Popup>
+				</Dialog.Root>
+			</>
+		);
+
+		const { rerender } = render( content( false ) );
+		const input = await screen.findByRole( 'textbox', { name: 'Name' } );
+		await user.type( input, 'Unsaved' );
+
+		rerender( content( true ) );
+
+		expect( screen.getByRole( 'textbox', { name: 'Name' } ) ).toBe( input );
+		expect( input ).toHaveValue( 'Unsaved' );
+		expect( getWpCompatOverlaySlot() ).not.toContainElement( input );
+
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+		await waitFor( () =>
+			expect( screen.queryByRole( 'dialog' ) ).not.toBeInTheDocument()
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+		expect(
+			within( getWpCompatOverlaySlot()! ).getByRole( 'dialog' )
 		).toBeVisible();
 	} );
 } );
