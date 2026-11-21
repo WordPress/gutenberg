@@ -941,7 +941,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'ignores a list response delivered after a newer one for the same query', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			finishResolutions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
@@ -986,7 +986,7 @@ describe( 'getEntityRecords', () => {
 			QUERY
 		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			FRESH_RECORDS,
@@ -1001,7 +1001,9 @@ describe( 'getEntityRecords', () => {
 		deliverStaleResponse();
 		await staleRequest;
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 1 );
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			1
+		);
 		expect( dispatch.finishResolutions ).toHaveBeenCalledTimes( 1 );
 
 		// The lock is still released for the discarded request.
@@ -1012,7 +1014,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'does not discard a list response because a different query was received', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			finishResolutions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
@@ -1056,8 +1058,10 @@ describe( 'getEntityRecords', () => {
 
 		// Lists are only superseded by a newer response for the same query,
 		// so both are received.
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 2 );
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
+			2
+		);
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			VIDEOS,
@@ -1066,7 +1070,7 @@ describe( 'getEntityRecords', () => {
 			undefined,
 			{ totalItems: 1, totalPages: 1 }
 		);
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledWith(
 			'postType',
 			'attachment',
 			IMAGES,
@@ -1079,7 +1083,7 @@ describe( 'getEntityRecords', () => {
 
 	it( 'stops delivering intermediate pages once a newer response for the same query arrives', async () => {
 		const dispatch = Object.assign( vi.fn(), {
-			receiveEntityRecords: vi.fn(),
+			receiveFetchedEntityRecords: vi.fn(),
 			finishResolutions: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
@@ -1137,16 +1141,16 @@ describe( 'getEntityRecords', () => {
 		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		const callsBeforeStalePage =
-			dispatch.receiveEntityRecords.mock.calls.length;
+			dispatch.receiveFetchedEntityRecords.mock.calls.length;
 
 		// The stale run's remaining pages must not be delivered.
 		deliverStalePage();
 		await staleRequest;
 
-		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenCalledTimes(
 			callsBeforeStalePage
 		);
-		expect( dispatch.receiveEntityRecords ).toHaveBeenLastCalledWith(
+		expect( dispatch.receiveFetchedEntityRecords ).toHaveBeenLastCalledWith(
 			'postType',
 			'attachment',
 			[ { id: 10 } ],
