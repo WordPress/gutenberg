@@ -23,9 +23,19 @@ if ( file_exists( $build_registration ) ) {
 // Define version constant for backwards compatibility.
 // The constants.php file returns an array but doesn't define constants to avoid conflicts.
 $constants_file = plugin_dir_path( __DIR__ ) . 'build/constants.php';
-if ( file_exists( $constants_file ) && ! defined( 'GUTENBERG_VERSION' ) ) {
+if ( file_exists( $constants_file ) ) {
 	$build_constants = require $constants_file;
-	define( 'GUTENBERG_VERSION', $build_constants['version'] );
+	if ( ! defined( 'GUTENBERG_VERSION' ) ) {
+		define( 'GUTENBERG_VERSION', $build_constants['version'] );
+	}
+	/*
+	 * A build made with `--no-script-debug` ships only the minified files, so
+	 * the assets registered by hand must not switch to the non-minified ones
+	 * when `SCRIPT_DEBUG` is on. See gutenberg_should_load_debug_assets().
+	 */
+	if ( ! defined( 'GUTENBERG_HAS_DEBUG_ASSETS' ) ) {
+		define( 'GUTENBERG_HAS_DEBUG_ASSETS', (bool) ( $build_constants['has_debug_assets'] ?? true ) );
+	}
 }
 
 /**
