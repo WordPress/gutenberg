@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Table: Let themes set the row color of the Stripes style with the `--wp--style--table-stripe-color` custom property, so it stays readable on dark backgrounds ([#87120](https://github.com/WordPress/gutenberg/pull/87120)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
