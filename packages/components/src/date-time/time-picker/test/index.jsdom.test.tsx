@@ -8,10 +8,15 @@ import {
 	it,
 	vi,
 } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import timezoneMock from 'timezone-mock';
-import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
+import {
+	date as formatDate,
+	getSettings,
+	setSettings,
+	type DateSettings,
+} from '@wordpress/date';
 import TimePicker from '..';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -32,14 +37,17 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const monthInput = screen.getByLabelText( 'Month' );
+		const monthInput = screen.getByRole( 'combobox', { name: 'Month' } );
 		const dayInput = screen.getByLabelText( 'Day' );
 		const yearInput = screen.getByLabelText( 'Year' );
 		const hoursInput = screen.getByLabelText( 'Hours' );
 		const minutesInput = screen.getByLabelText( 'Minutes' );
 
-		await user.selectOptions( monthInput, '12' );
-		await user.keyboard( '{Tab}' );
+		act( () => monthInput.focus() );
+		await user.keyboard( '{Enter}' );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'December' } )
+		);
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '1986-12-18T11:00:00' );
 		onChangeSpy.mockClear();
@@ -197,13 +205,39 @@ describe( 'TimePicker', () => {
 			/>
 		);
 
-		const monthSelect = screen.getByLabelText( 'Month' );
+		const monthSelect = screen.getByRole( 'combobox', { name: 'Month' } );
 		const dayInput = screen.getByLabelText( 'Day' );
 
-		await user.selectOptions( monthSelect, '02' );
+		act( () => monthSelect.focus() );
+		await user.keyboard( '{Enter}' );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'February' } )
+		);
 
 		expect( onChangeSpy ).toHaveBeenCalledWith( '2026-02-28T00:00:00' );
 		expect( dayInput ).toHaveValue( 28 );
+	} );
+
+	it( 'should keep the current date when reselecting the same month', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+
+		render(
+			<TimePicker
+				currentTime="2026-03-31T00:00:00"
+				onChange={ onChange }
+			/>
+		);
+
+		const month = screen.getByRole( 'combobox', { name: 'Month' } );
+		act( () => month.focus() );
+		await user.keyboard( '{Enter}' );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'March' } )
+		);
+
+		expect( month ).toHaveTextContent( 'March' );
+		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should clamp day when switching year from leap to non-leap', async () => {
@@ -348,8 +382,8 @@ describe( 'TimePicker', () => {
 		);
 
 		expect(
-			( screen.getByLabelText( 'Month' ) as HTMLInputElement ).value
-		).toBe( '07' );
+			screen.getByRole( 'combobox', { name: 'Month' } )
+		).toHaveTextContent( 'July' );
 		expect(
 			( screen.getByLabelText( 'Day' ) as HTMLInputElement ).value
 		).toBe( '13' );
@@ -492,9 +526,7 @@ describe( 'TimePicker', () => {
 			expect( screen.getByRole( 'radio', { name: 'AM' } ) ).toBeVisible()
 		);
 
-		const monthInput = (
-			screen.getByLabelText( 'Month' ) as HTMLInputElement
-		 ).value;
+		const monthInput = screen.getByRole( 'combobox', { name: 'Month' } );
 		const dayInput = ( screen.getByLabelText( 'Day' ) as HTMLInputElement )
 			.value;
 		const yearInput = (
@@ -507,7 +539,7 @@ describe( 'TimePicker', () => {
 			screen.getByLabelText( 'Minutes' ) as HTMLInputElement
 		 ).value;
 
-		expect( Number.isNaN( parseInt( monthInput, 10 ) ) ).toBe( false );
+		expect( monthInput ).toHaveTextContent( formatDate( 'F', new Date() ) );
 		expect( Number.isNaN( parseInt( dayInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( yearInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
