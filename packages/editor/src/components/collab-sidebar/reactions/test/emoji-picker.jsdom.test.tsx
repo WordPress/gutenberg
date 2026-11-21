@@ -19,7 +19,10 @@ vi.mock( import( '../emojibase-data' ), async ( importOriginal ) => {
 	const actual = ( await importOriginal() ) as typeof EmojibaseData;
 	return {
 		...actual,
-		useEmojibaseConfig: () => ( { baseUrl: 'https://example.org/' } ),
+		useEmojibaseConfig: () => ( {
+			baseUrl: 'https://example.org/',
+			labelOverrides: null,
+		} ),
 		useEmojibaseData: () => ( {
 			data: DATASET,
 			isLoading: false,

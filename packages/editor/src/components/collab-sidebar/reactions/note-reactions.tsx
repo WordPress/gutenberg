@@ -17,11 +17,17 @@ import { ThemeProvider } from '@wordpress/theme';
 import { reaction as reactionIcon } from '@wordpress/icons';
 import { store as editorStore } from '../../../store';
 import EmojiPicker from './emoji-picker';
-import { useEmojiLabel } from './emojibase-data';
+import {
+	getOverrideLabel,
+	useEmojibaseConfig,
+	useEmojiLabel,
+} from './emojibase-data';
 import {
 	emojiToHexKey,
 	getReactionEmoji,
 	hexKeyToEmoji,
+	useReactionEmojiRules,
+	useReactionEmojis,
 } from './reaction-emojis';
 import { useNoteReactions } from './use-note-reactions';
 
@@ -91,6 +97,7 @@ function ReactionButton( {
 	onToggle,
 }: ReactionButtonProps ) {
 	const [ isShowingNames, setIsShowingNames ] = useState( false );
+	const { labelOverrides } = useEmojibaseConfig();
 	// Fetched on hover or focus only; afterwards the cached records are read.
 	const reactions = useSelect(
 		( select ) => {
@@ -122,13 +129,19 @@ function ReactionButton( {
 	// label loads, the glyph stands in, which screen readers announce by
 	// its Unicode name.
 	const resolvedLabel = useEmojiLabel( hexKey, ! emoji, isShowingNames );
-	const emojiLabel = emoji?.label ?? resolvedLabel ?? glyph;
+	// A site's label override wins over the curated label.
+	const overrideLabel = getOverrideLabel( labelOverrides, hexKey );
+	const emojiLabel = overrideLabel || emoji?.label || resolvedLabel || glyph;
 	// Names that don't add up to the count are stale until the refetch lands.
 	const label =
 		names?.length === count
 			? formatReactorNames(
 					names,
-					emoji?.sentenceLabel ?? resolvedLabel ?? glyph
+					// A default emoji keeps its own mid-sentence form.
+					emoji?.sentenceLabel ||
+						overrideLabel ||
+						resolvedLabel ||
+						glyph
 				)
 			: sprintf(
 					/* translators: 1: emoji label, 2: count of reactions */
@@ -197,8 +210,13 @@ export function NoteReactions( {
 }: NoteReactionsProps ) {
 	const [ reactions, toggleReaction ] = useNoteReactions( noteId );
 	const entries = Object.entries( reactions ?? {} );
+	const emojis = useReactionEmojis();
+	const rules = useReactionEmojiRules();
+	// A site that empties the named list and allows nothing else leaves
+	// nothing to pick.
+	const canPick = canReact && ( !! emojis.length || rules.allowUnlisted );
 
-	if ( ! entries.length && ! canReact ) {
+	if ( ! entries.length && ! canPick ) {
 		return null;
 	}
 
@@ -232,7 +250,7 @@ export function NoteReactions( {
 				 * Same tree position with or without pills: moving it when the
 				 * first reaction lands would remount the open picker's trigger.
 				 */ }
-				{ canReact && (
+				{ canPick && (
 					<EmojiPicker
 						label={ __( 'Add reaction' ) }
 						trigger={
