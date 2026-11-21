@@ -235,11 +235,10 @@ final class SelectionTests: XCTestCase {
 	}
 
 	func testTapCaptionLowInLongPostKeepsToolbarOnScreen() throws {
-		let paragraph = "<!-- wp:paragraph --><p>Paragraph</p><!-- /wp:paragraph -->"
-		let image = "<!-- wp:image --><figure class=\"wp-block-image\"><img src=\"https://cldup.com/cXyG__fTLN.jpg\" alt=\"\"/><figcaption class=\"wp-element-caption\">Caption here</figcaption></figure><!-- /wp:image -->"
+		// Small images, so one of the captions is low on any screen.
 		try tapLowAndExpectToolbarOnScreen(
-			content: String( repeating: paragraph, count: 3 ) + image + String( repeating: paragraph, count: 10 ),
-			fields: [ editor.canvas.descendants( matching: .any ).matching( NSPredicate( format: "label == %@ AND value == %@", "Image caption text", "Caption here" ) ).firstMatch ]
+			content: ( 1...12 ).map { "<!-- wp:paragraph --><p>Paragraph \( $0 )</p><!-- /wp:paragraph --><!-- wp:image {\"width\":\"80px\"} --><figure class=\"wp-block-image is-resized\"><img src=\"https://cldup.com/cXyG__fTLN.jpg\" alt=\"\" style=\"width:80px\"/><figcaption class=\"wp-element-caption\">Caption \( $0 )</figcaption></figure><!-- /wp:image -->" }.joined(),
+			fields: ( 1...12 ).map { editor.canvas.descendants( matching: .any ).matching( NSPredicate( format: "label == %@ AND value == %@", "Image caption text", "Caption \( $0 )" ) ).firstMatch }
 		)
 	}
 

@@ -26,8 +26,12 @@ export default function useKeepCaretAboveKeyboard() {
 			if ( ! slide || visualViewport!.scale !== 1 ) {
 				return;
 			}
-			getScrollContainer( node )!.scrollTop += slide;
-			view.scrollTo( 0, 0 );
+			const canvas = getScrollContainer( node )!;
+			const { scrollTop } = canvas;
+			canvas.scrollTop += slide;
+			// Near its end, the canvas can't take all of it: the page keeps the
+			// rest, so the caret stays above the keyboard.
+			view.scrollBy( 0, scrollTop - canvas.scrollTop );
 		}
 
 		visualViewport.addEventListener( 'scroll', onScroll );
