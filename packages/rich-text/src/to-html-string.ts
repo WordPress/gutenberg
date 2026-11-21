@@ -152,12 +152,19 @@ function createElementHTML( {
 	children,
 }: HTMLTreeNode ) {
 	if ( type === '#comment' ) {
+		const comment = String( attributes![ 'data-rich-text-comment' ] );
+
+		// Omit comments whose data would close the comment prematurely.
+		if ( /^>|^->|--!?>/.test( comment ) ) {
+			return '';
+		}
+
 		// We can't restore the original comment delimiters, because once parsed
 		// into DOM nodes, we don't have the information. But in the future we
 		// could allow comment handlers to specify custom delimiters, for
 		// example `</{comment-content}>` for Bits, where `comment-content`
 		// would be `/{bit-name}` or `__{translatable-string}` (TBD).
-		return `<!--${ attributes![ 'data-rich-text-comment' ] }-->`;
+		return `<!--${ comment }-->`;
 	}
 
 	let attributeString = '';

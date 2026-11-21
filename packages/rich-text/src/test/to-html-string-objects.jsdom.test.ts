@@ -9,13 +9,14 @@ import { toHTMLString } from '../to-html-string';
 import { OBJECT_REPLACEMENT_CHARACTER } from '../special-characters';
 
 const FORMAT_NAME = 'test/serialization-object';
-const CLASS_NAME = 'test-serialization-object';
+const FORMAT_CLASS_NAME = 'test-serialization-object';
+const CLASS_NAME = '1&</div>';
 
 function registerObjectFormat( tagName: string, contentEditable?: boolean ) {
 	registerFormatType( FORMAT_NAME, {
 		title: 'Serialization object',
 		tagName,
-		className: CLASS_NAME,
+		className: FORMAT_CLASS_NAME,
 		object: true,
 		contentEditable,
 	} );
@@ -39,7 +40,7 @@ describe( 'toHTMLString object elements', () => {
 			const html = toHTMLString( { value } );
 
 			expect( html ).toBe(
-				`before <${ tagName } class="${ CLASS_NAME }"></${ tagName }>after`
+				`before <${ tagName } class="${ FORMAT_CLASS_NAME }"></${ tagName }>after`
 			);
 
 			const element = document.createElement( 'div' );
@@ -49,11 +50,45 @@ describe( 'toHTMLString object elements', () => {
 		}
 	);
 
+	it( 'escapes an object class attribute without changing the surrounding HTML', () => {
+		registerFormatType( FORMAT_NAME, {
+			title: 'Escaped object',
+			tagName: 'span',
+			className: null,
+			object: true,
+			attributes: { class: 'class' },
+		} );
+		const value = insertObject(
+			create( { text: 'before after' } ),
+			{ type: FORMAT_NAME, attributes: { class: CLASS_NAME } },
+			7,
+			7
+		);
+		const html = toHTMLString( { value } );
+
+		expect( html ).toBe(
+			'before <span class="1&amp;&lt;/div&gt;"></span>after'
+		);
+		const element = document.createElement( 'div' );
+		element.innerHTML = html;
+		expect( element.childNodes ).toHaveLength( 3 );
+		expect( element.querySelector( 'span' )?.getAttribute( 'class' ) ).toBe(
+			CLASS_NAME
+		);
+		expect( element.querySelector( 'span' )?.textContent ).toBe( '' );
+		expect( element.firstChild?.textContent ).toBe( 'before ' );
+		expect( element.lastChild?.textContent ).toBe( 'after' );
+		expect( create( { element } ).replacements[ 7 ] ).toMatchObject( {
+			type: FORMAT_NAME,
+			attributes: { class: CLASS_NAME },
+		} );
+	} );
+
 	it( 'round-trips an empty object with registered attributes', () => {
 		registerFormatType( FORMAT_NAME, {
 			title: 'Inline token',
 			tagName: 'span',
-			className: CLASS_NAME,
+			className: FORMAT_CLASS_NAME,
 			object: true,
 			attributes: { id: 'data-id' },
 		} );
@@ -66,7 +101,7 @@ describe( 'toHTMLString object elements', () => {
 		const html = toHTMLString( { value } );
 
 		expect( html ).toBe(
-			`before <span data-id="sample" class="${ CLASS_NAME }"></span>after`
+			`before <span data-id="sample" class="${ FORMAT_CLASS_NAME }"></span>after`
 		);
 		const parsed = create( { html } );
 
@@ -79,7 +114,7 @@ describe( 'toHTMLString object elements', () => {
 
 	it( 'preserves the children of a non-editable object and the following text', () => {
 		registerObjectFormat( 'span', false );
-		const html = `before <span class="${ CLASS_NAME }"><em>Token</em></span>after`;
+		const html = `before <span class="${ FORMAT_CLASS_NAME }"><em>Token</em></span>after`;
 		const value = create( { html } );
 
 		expect( value.text ).toBe(
@@ -112,7 +147,7 @@ describe( 'toHTMLString object elements', () => {
 		);
 
 		expect( toHTMLString( { value } ) ).toBe(
-			`before <${ tagName } class="${ CLASS_NAME }">after`
+			`before <${ tagName } class="${ FORMAT_CLASS_NAME }">after`
 		);
 	} );
 
@@ -120,7 +155,7 @@ describe( 'toHTMLString object elements', () => {
 		registerFormatType( FORMAT_NAME, {
 			title: 'Image wrapper',
 			tagName: 'img',
-			className: CLASS_NAME,
+			className: FORMAT_CLASS_NAME,
 		} );
 		const value = applyFormat(
 			create( { text: 'selected' } ),
@@ -130,7 +165,7 @@ describe( 'toHTMLString object elements', () => {
 		);
 
 		expect( toHTMLString( { value } ) ).toBe(
-			`<img class="${ CLASS_NAME }">selected</img>`
+			`<img class="${ FORMAT_CLASS_NAME }">selected</img>`
 		);
 	} );
 } );
