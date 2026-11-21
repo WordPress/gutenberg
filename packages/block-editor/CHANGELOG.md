@@ -13,6 +13,7 @@
 
 ### Bug Fixes
 
+-   Writing flow: Keep the editor header and block toolbar on screen when the on-screen keyboard opens on iOS, by moving the page's slide into the canvas's scroll ([#87192](https://github.com/WordPress/gutenberg/pull/87192)).
 -   Style states: Open the Global Styles state menu beside the editor sidebar ([#86821](https://github.com/WordPress/gutenberg/pull/86821)).
 -   Style transformation: Require PostCSS `^8.5.33` for URL parsing and diagnostic fixes ([#86899](https://github.com/WordPress/gutenberg/pull/86899)).
 -   Block Hooks: Turning on a hooked block whose type has no `blockHooks` in the Plugins panel now inserts it after the anchor block instead of throwing ([#86452](https://github.com/WordPress/gutenberg/pull/86452)).
