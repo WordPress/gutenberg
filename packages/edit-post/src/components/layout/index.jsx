@@ -503,6 +503,13 @@ function Layout( {
 						} );
 					}
 					break;
+				case 'delete-post':
+					{
+						// The deleted entity was reached by navigating from
+						// another one (e.g. a post), so go back to it.
+						onNavigateToPreviousEntityRecord?.();
+					}
+					break;
 				case 'duplicate-post':
 					{
 						const newItem = items[ 0 ];
@@ -538,7 +545,7 @@ function Layout( {
 					break;
 			}
 		},
-		[ createSuccessNotice ]
+		[ createSuccessNotice, onNavigateToPreviousEntityRecord ]
 	);
 
 	const initialPost = useMemo( () => {
