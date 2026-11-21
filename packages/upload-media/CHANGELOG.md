@@ -7,6 +7,12 @@
 -   Add `optimizeExistingItem` action and a `FetchRemoteFile` operation (with a `fetchFile` utility) to re-process an already-uploaded attachment client-side: fetch the original, re-compress it, regenerate sub-sizes, and upload the result as a new attachment ([#79509](https://github.com/WordPress/gutenberg/pull/79509)).
 -   `optimizeExistingItem` accepts an `outputQuality` to override the `imageQuality` setting ([#83411](https://github.com/WordPress/gutenberg/pull/83411)).
 
+## 0.45.0 (2026-11-18)
+
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

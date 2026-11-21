@@ -48,6 +48,13 @@
 				"padding": false
 			}
 		},
+		"__experimentalBorder": {
+			"__experimentalSkipSerialization": true,
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		},
@@ -64,6 +71,7 @@
 		{ "name": "rounded", "label": "Rounded" }
 	],
 	"selectors": {
+		"border": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder",
 		"filter": {
 			"duotone": ".wp-block-site-logo img, .wp-block-site-logo .components-placeholder__illustration, .wp-block-site-logo .components-placeholder::before"
 		}

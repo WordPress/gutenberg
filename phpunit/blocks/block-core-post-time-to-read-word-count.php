@@ -57,9 +57,21 @@ class Block_Post_Time_To_Read_Word_Count_Test extends WP_UnitTestCase {
 			),
 			'Punctuation'    => array(
 				'string'                      => "It's two three " . json_decode( '"\u2026"' ) . ' 4?',
-				'words'                       => 3,
+				'words'                       => 4,
 				'characters_excluding_spaces' => 15,
 				'characters_including_spaces' => 19,
+			),
+			'Numbers'        => array(
+				'string'                      => 'Should be 4 words',
+				'words'                       => 4,
+				'characters_excluding_spaces' => 14,
+				'characters_including_spaces' => 17,
+			),
+			'Number formats' => array(
+				'string'                      => 'In 2026 we sold 1,500 units for $5 each',
+				'words'                       => 9,
+				'characters_excluding_spaces' => 31,
+				'characters_including_spaces' => 39,
 			),
 			'Em dash'        => array(
 				'string'                      => 'one' . json_decode( '"\u2014"' ) . 'two--three',
