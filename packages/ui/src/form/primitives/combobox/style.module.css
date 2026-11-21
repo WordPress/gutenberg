@@ -44,6 +44,13 @@
 						forced-color-adjust: none;
 					}
 
+					/* The opt-out is inherited, so a descendant with its own color
+					   would keep it and could be unreadable on `Highlight`. Consumer
+					   styles are unlayered, so only `!important` wins over them. */
+					.chip-content * {
+						color: inherit !important;
+					}
+
 					/* A read-only combobox disables the remove button but not the chip. */
 					.chip-remove:not([data-disabled]) {
 						background-color: transparent;
