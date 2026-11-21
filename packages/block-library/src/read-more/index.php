@@ -36,7 +36,7 @@ function render_block_core_read_more( $attributes, $content, $block ) {
 	);
 	$justify_class_name = empty( $attributes['justifyContent'] ) ? '' : "is-justified-{$attributes['justifyContent']}";
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $justify_class_name ) );
-	$more_text          = ! empty( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
+	$more_text          = ! empty( $attributes['content'] ) && is_string( $attributes['content'] ) ? wp_kses_post( $attributes['content'] ) : __( 'Read more' );
 	return sprintf(
 		'<a %1$s href="%2$s" target="%3$s">%4$s<span class="screen-reader-text">%5$s</span></a>',
 		$wrapper_attributes,

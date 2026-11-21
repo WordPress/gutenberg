@@ -420,6 +420,33 @@ test.describe( 'Registered sources', () => {
 				);
 			} );
 
+			test( 'read more', async ( { editor } ) => {
+				await editor.insertBlock( {
+					name: 'core/read-more',
+					attributes: {
+						content: 'read more default content',
+						metadata: {
+							bindings: {
+								content: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'text_field' },
+								},
+							},
+						},
+					},
+				} );
+				const readMoreBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Read More',
+				} );
+				await expect( readMoreBlock ).toHaveText( 'Text Field Value' );
+
+				// Read More is not editable.
+				await expect( readMoreBlock ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
+
 			test( 'icon', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/icon',
@@ -1143,6 +1170,20 @@ test.describe( 'Registered sources', () => {
 		} ) => {
 			await editor.insertBlock( {
 				name: 'core/heading',
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'content, show',
+			} );
+			await expect( contentAttribute ).toBeVisible();
+		} );
+
+		test( 'should be possible to connect the read more content', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/read-more',
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
