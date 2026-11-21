@@ -7,7 +7,7 @@ import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attribu
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
-import styles from './style.module.css';
+import styles from './style.module.scss';
 import type { PopupProps } from './types';
 
 const CLOSE_ICON_ATTR = 'data-wp-ui-drawer-close-icon';

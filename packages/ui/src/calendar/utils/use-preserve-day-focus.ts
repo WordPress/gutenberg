@@ -6,13 +6,17 @@ import type { Ref } from 'react';
 type DayFocusHandler = NonNullable< DayPickerProps[ 'onDayFocus' ] >;
 
 /**
- * Keeps keyboard focus inside the calendar when a controlled month change
- * removes the focused day from the DOM.
+ * Falls back to a navigation button when a controlled month change removes
+ * the focused day and the new month has no enabled day. DayPicker preserves
+ * focus itself when an enabled day is available.
+ *
+ * TODO: Remove this hook after adopting the upstream disabled-calendar focus fix.
+ * @see https://github.com/gpbl/react-day-picker/pull/3036
  *
  * @param forwardedRef Ref forwarded to the calendar root.
  * @param month        The controlled first displayed month.
  *
- * @see https://github.com/gpbl/react-day-picker/issues/3009
+ * @see https://github.com/gpbl/react-day-picker/pull/3010
  */
 export function usePreserveDayFocus(
 	forwardedRef: Ref< HTMLDivElement >,
@@ -49,9 +53,9 @@ export function usePreserveDayFocus(
 		}
 		hadDayFocusRef.current = false;
 
-		const focusTarget = root.querySelector< HTMLButtonElement >(
-			'[role="grid"] button[tabindex="0"]:not(:disabled)'
-		);
+		if ( root.querySelector( '[role="grid"] button:not(:disabled)' ) ) {
+			return;
+		}
 		const enabledControl = root.querySelector< HTMLButtonElement >(
 			'button:not(:disabled):not([aria-disabled="true"])'
 		);
@@ -59,7 +63,7 @@ export function usePreserveDayFocus(
 			'button:not(:disabled)'
 		);
 
-		( focusTarget ?? enabledControl ?? focusableControl )?.focus();
+		( enabledControl ?? focusableControl )?.focus();
 	}, [ monthIndex ] );
 
 	return { ref: mergedRef, onDayFocus, onDayBlur };
