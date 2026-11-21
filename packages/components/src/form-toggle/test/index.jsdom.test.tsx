@@ -102,5 +102,19 @@ describe( 'FormToggle', () => {
 
 			expect( onChange ).toHaveBeenCalledTimes( 2 );
 		} );
+
+		it( 'should flip the checked property when uncontrolled', async () => {
+			const user = userEvent.setup();
+
+			render( <FormToggle onChange={ noop } /> );
+
+			const input = getInput();
+
+			await user.click( input );
+			expect( input ).toBeChecked();
+
+			await user.click( input );
+			expect( input ).not.toBeChecked();
+		} );
 	} );
 } );

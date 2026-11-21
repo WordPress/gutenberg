@@ -1,8 +1,6 @@
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
-import {
-	SelectControl as WCSelectControl,
-	TextControl,
-} from '@wordpress/components';
+import { TextControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -64,12 +62,19 @@ export function TemplatePartAdvancedControls( {
 						} }
 						onFocus={ ( event ) => event.target.select() }
 					/>
-					<WCSelectControl
+					<SelectControl
 						label={ __( 'Area' ) }
-						labelPosition="top"
-						options={ areaOptions }
-						value={ area }
-						onChange={ setArea }
+						items={ areaOptions }
+						value={
+							areaOptions.find(
+								( item ) => item.value === area
+							) ?? null
+						}
+						onValueChange={ ( item ) => {
+							if ( item && item.value !== area ) {
+								setArea( item.value );
+							}
+						} }
 					/>
 				</>
 			) }
