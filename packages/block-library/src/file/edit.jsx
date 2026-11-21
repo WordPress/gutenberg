@@ -22,9 +22,8 @@ import { __ } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
-import { browserSupportsPdfs } from './utils';
+import { browserSupportsPdfs, isPdfFile } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useUploadMediaFromBlobURL } from '../utils/hooks';
 
@@ -108,10 +107,11 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 			return;
 		}
 
-		const isPdf =
+		const isPdf = isPdfFile( {
 			// Media Library and REST API use different properties for mime type.
-			( newMedia.mime || newMedia.mime_type ) === 'application/pdf' ||
-			getFilename( newMedia.url ).toLowerCase().endsWith( '.pdf' );
+			mimeType: newMedia.mime || newMedia.mime_type,
+			url: newMedia.url,
+		} );
 		const pdfAttributes = {
 			displayPreview: isPdf
 				? ( attributes.displayPreview ?? true )
@@ -173,6 +173,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	}
 
 	const attachmentPage = media && media.link;
+	const isPdf = isPdfFile( { mimeType: media?.mime_type, url: href } );
 
 	const blockProps = useBlockProps( {
 		className: clsx(
@@ -207,6 +208,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	return (
 		<>
 			<FileBlockInspector
+				isPdf={ isPdf }
 				hrefs={ {
 					href: href || temporaryURL,
 					textLinkHref,
