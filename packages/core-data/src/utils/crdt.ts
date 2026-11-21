@@ -16,6 +16,7 @@ import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	type Block,
 	deserializeBlockAttributes,
+	shouldReparseBlocks,
 	mergeCrdtBlocks,
 	type MergeCursorPosition,
 	mergeRichTextUpdate,
@@ -28,7 +29,7 @@ import type { WPSelection } from '../types';
 import {
 	getSelectionHistory,
 	getShiftedSelection,
-	updateSelectionHistory,
+	scheduleSelectionHistory,
 } from './crdt-selection';
 import {
 	asRichTextOffset,
@@ -278,15 +279,9 @@ export function applyPostChangesToCRDTDoc(
 
 	// Process changes that we don't want to persist to the CRDT document.
 	if ( changes.selection ) {
-		const selection = changes.selection;
-		// Persist selection changes at the end of the current event loop.
-		// This allows undo meta to be saved with the current selection before
-		// it is overwritten by the new selection from Gutenberg.
-		// Without this, selection history will already contain the latest
-		// selection (after this change) when the undo stack is saved.
-		setTimeout( () => {
-			updateSelectionHistory( ydoc, selection );
-		}, 0 );
+		// Record the new selection after undo metadata captures the old one,
+		// before a remote update can reconcile against the selection history.
+		scheduleSelectionHistory( ydoc, changes.selection );
 	}
 }
 
@@ -417,6 +412,16 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocksJson = ymap.get( 'blocks' )?.toJSON() ?? [];
+
+						// Missing and invalid blocks serialize back to the markup
+						// they were loaded from, so the content comparison below
+						// cannot tell that the parser would now build a different
+						// block from that markup (for example, after a plugin is
+						// reactivated or updated). Check for those blocks first so
+						// the blocks are re-parsed from the content in that case.
+						if ( shouldReparseBlocks( blocksJson ) ) {
+							return true;
+						}
 
 						return (
 							__unstableSerializeAndClean( blocksJson ).trim() !==
