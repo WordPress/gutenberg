@@ -44,6 +44,15 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 		rel,
 	} = attributes;
 
+	// The typed URL is written to `feedURL` only on Apply. Reset it when
+	// `feedURL` changes outside the form, such as on undo.
+	const [ url, setURL ] = useState( feedURL );
+	const [ prevFeedURL, setPrevFeedURL ] = useState( feedURL );
+	if ( feedURL !== prevFeedURL ) {
+		setPrevFeedURL( feedURL );
+		setURL( feedURL );
+	}
+
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	function toggleAttribute( propName ) {
@@ -57,8 +66,8 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 	function onSubmitURL( event ) {
 		event.preventDefault();
 
-		if ( feedURL ) {
-			setAttributes( { feedURL: prependHTTPS( feedURL ) } );
+		if ( url ) {
+			setAttributes( { feedURL: prependHTTPS( url ) } );
 			setIsEditing( false );
 		}
 	}
@@ -93,10 +102,8 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 							type="url"
 							hideLabelFromVision
 							placeholder={ __( 'Enter URL here…' ) }
-							value={ feedURL }
-							onChange={ ( value ) =>
-								setAttributes( { feedURL: value } )
-							}
+							value={ url }
+							onChange={ ( value ) => setURL( value ) }
 							className="wp-block-rss__placeholder-input"
 						/>
 						<Button

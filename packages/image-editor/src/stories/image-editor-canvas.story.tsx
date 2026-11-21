@@ -20,6 +20,7 @@ import {
 import {
 	ImageEditorCanvas,
 	createImageEditorState,
+	exportImage,
 	getOutputSize,
 	useImageEditor,
 } from '..';
@@ -31,7 +32,6 @@ import {
 	loadImage,
 	renderToCanvas,
 	canvasToDataURL,
-	downloadCroppedImage,
 } from '../core/export/canvas-renderer';
 import {
 	createCamera,
@@ -208,8 +208,7 @@ const WithControlsComponent = () => {
 	// The base cardinal angle (nearest 90° step) and the fine offset.
 	// `setRotation` is a raw state setter (absolute-angle assignment), so
 	// sliders need to flip the offset sign when a single flip is active to
-	// stay visually consistent. `snapRotate90` and the pipeline `rotate`
-	// op already handle this internally.
+	// stay visually consistent. `snapRotate90` already handles this.
 	const baseAngle = Math.round( state.rotation / 90 ) * 90;
 	const singleFlip = state.flip.horizontal !== state.flip.vertical;
 	const visualDir = singleFlip ? -1 : 1;
@@ -814,15 +813,21 @@ const DebugComponent = () => {
 							__next40pxDefaultSize
 							variant="primary"
 							icon={ downloadIcon }
-							onClick={ () =>
-								downloadCroppedImage(
-									src,
-									state,
-									'cropped',
-									exportFormat,
-									0.9
-								)
-							}
+							onClick={ async () => {
+								// The public export, as a consumer would call it.
+								const blob = await exportImage( state, {
+									type: exportFormat,
+									quality: 0.9,
+								} );
+								const url = URL.createObjectURL( blob );
+								const link = document.createElement( 'a' );
+								link.href = url;
+								link.download = `cropped.${
+									exportFormat.split( '/' )[ 1 ] ?? 'png'
+								}`;
+								link.click();
+								URL.revokeObjectURL( url );
+							} }
 						>
 							Download
 						</Button>

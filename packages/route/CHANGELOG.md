@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update `@tanstack/react-router` and `@tanstack/history` to fix a memory leak that retained previous navigation state in `@tanstack/router-core` ([#87066](https://github.com/WordPress/gutenberg/pull/87066)).
+
+## 0.26.0 (2026-11-18)
+
 ## 0.25.0 (2026-11-04)
 
 ## 0.24.0 (2026-10-20)
