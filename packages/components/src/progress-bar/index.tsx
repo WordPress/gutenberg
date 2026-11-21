@@ -36,7 +36,7 @@ function UnforwardedProgressBar(
 				className={ styles[ 'progress-element' ] }
 				max={ 100 }
 				value={ value }
-				aria-label={ __( 'Loading …' ) }
+				aria-label={ __( 'Loading…' ) }
 				ref={ ref }
 				{ ...progressProps }
 			/>

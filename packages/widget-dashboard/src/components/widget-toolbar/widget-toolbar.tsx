@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { Stack } from '@wordpress/ui';
 import { useReserveHeaderPadding } from '../widget-header/widget-header-fit';
-import styles from './widget-toolbar.module.css';
+import styles from './widget-toolbar.module.scss';
 
 export interface WidgetToolbarProps {
 	/**
