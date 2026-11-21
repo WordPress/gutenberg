@@ -1,9 +1,12 @@
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { Link } from '@wordpress/route';
+import { SECTIONS, SectionLink } from './section-navigation';
 
 export const stage = () => (
 	<Page
 		ariaLabel="General"
+		navigation={ { items: SECTIONS, currentHref: '/settings/general' } }
+		components={ { link: SectionLink } }
 		breadcrumbs={
 			<Breadcrumbs
 				items={ [

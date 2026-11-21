@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   When a navigation removes the focused element, move focus to the element on the new page that has the same `data-focus-key` attribute, such as the same link in a section navigation.
+
 ### Bug Fixes
 
 -   Move focus to the new page when an in-app navigation removes the focused element, such as a breadcrumb link. Before, focus moved to the document body ([#86701](https://github.com/WordPress/gutenberg/pull/86701)).

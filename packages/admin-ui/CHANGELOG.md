@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Page`: Give each link in the section navigation a `data-focus-key` attribute, so that `@wordpress/boot` keeps focus on the same link when the section changes.
+
 ## 3.2.0 (2026-11-18)
 
 ### Internal

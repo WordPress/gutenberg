@@ -59,6 +59,16 @@ Boot's internal shell is private. Consumers can style the mount element and
 their own route content. Boot does not provide stable styling hooks or
 replacement hooks for its internal layout, navigation, and surface elements.
 
+## Focus after navigation
+
+When a navigation within the application removes the element that has focus, boot moves focus, so that keyboard and screen reader users do not lose their place:
+
+1. If the new page moves focus itself, for example in an effect, boot does nothing.
+2. Otherwise, if the element that had focus when the navigation started, or one of its ancestors, has a `data-focus-key` attribute, boot focuses the element on the new page that has the same `data-focus-key`. Use it for a control that each page renders again, such as a link in a section navigation. Each value must be unique on a page.
+3. Otherwise, boot focuses the region of the new page that the `Page` component from `@wordpress/admin-ui` renders.
+
+Boot does not move focus on the initial page load.
+
 ## Init modules
 
 Init modules are script modules that run a one-time setup step at page startup, after menu items and routes are registered and before the app renders. They are useful for tasks that cannot be expressed in the page's static PHP configuration, such as assigning menu-item icons or registering core-data entities.
