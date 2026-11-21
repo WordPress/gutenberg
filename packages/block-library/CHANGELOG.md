@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Group: Add an opt-in "Clip content to rounded corners" setting, so nested blocks follow the border radius ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ### Bug Fixes
 
 -   Playlist Track: Use the same media control as the Image block for the Track image in the block settings sidebar ([#86258](https://github.com/WordPress/gutenberg/pull/86258)).
