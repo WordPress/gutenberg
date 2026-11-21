@@ -2,7 +2,12 @@ import { subscribe, select, dispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blocksStore } from '@wordpress/blocks';
 
-export default function registerLegacyWidgetVariations( settings ) {
+interface Settings {
+	widgetTypesToHideFromLegacyWidgetBlock?: string[];
+	[ key: string ]: unknown;
+}
+
+export default function registerLegacyWidgetVariations( settings?: Settings ) {
 	const unsubscribe = subscribe( () => {
 		const hiddenIds =
 			settings?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
