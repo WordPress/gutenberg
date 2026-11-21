@@ -23,6 +23,7 @@ import { filterSupportedEmojis } from './emoji-support';
 import { useFrequentEmojis } from './frequent-emojis';
 import { getCuratedLabel } from './reaction-emojis';
 import SkinTonePicker, { applySkinTone } from './skin-tone-picker';
+import EmojiPickerFooter, { createHighlightStore } from './emoji-picker-footer';
 
 /**
  * A category bucket of emoji records keyed by its Emojibase `group`.
@@ -41,6 +42,9 @@ interface EmojiOption {
 	// The emoji character, with the user's skin tone applied.
 	value: string;
 	label: string;
+	// The base record's label, for the footer: the cell already shows the
+	// skin tone, so its name doesn't need to spell it out.
+	name: string;
 	// Normalized hexcode of the base record, used for usage tracking.
 	hexKey: string;
 	// The key a reaction with `value` is stored under.
@@ -254,6 +258,7 @@ export default function EmojiPicker( {
 		[ dataset ]
 	);
 	const [ query, setQuery ] = useState( '' );
+	const [ highlightStore ] = useState( createHighlightStore );
 
 	/*
 	 * Announce once when a pending load fills the grid. A cached dataset
@@ -311,12 +316,21 @@ export default function EmojiPicker( {
 			 * drives search, usage, and the grid key.
 			 */
 			const display = applySkinTone( entry, skinTone );
+			const hexKey = normalizeHexcode( entry.hexcode );
 			const reactionKey = normalizeHexcode( display.hexcode );
+			const displayLabel =
+				getCuratedLabel( reactionKey ) || display.label || '';
 			return {
 				key: `${ prefix }-${ entry.hexcode }`,
 				value: display.emoji,
-				label: getCuratedLabel( reactionKey ) || display.label || '',
-				hexKey: normalizeHexcode( entry.hexcode ),
+				label: displayLabel,
+				name:
+					display === entry
+						? displayLabel
+						: getCuratedLabel( hexKey ) ||
+							entry.label ||
+							displayLabel,
+				hexKey,
 				reactionKey,
 			};
 		};
@@ -460,6 +474,12 @@ export default function EmojiPicker( {
 			filter={ null }
 			// Enter picks the top hit once the user has typed.
 			autoHighlight
+			// Every highlightable value is an `EmojiOption` cell. Base UI clears
+			// the highlight once the popup has closed, so the footer keeps its
+			// emoji through the exit animation.
+			onItemHighlighted={ ( option: unknown ) =>
+				highlightStore.set( option as EmojiOption | undefined )
+			}
 			value={ query }
 			onValueChange={ ( value: string, { reason } ) => {
 				// Picking a cell would otherwise fill the search field.
@@ -561,6 +581,10 @@ export default function EmojiPicker( {
 								) }
 					</Autocomplete.List>
 				</div>
+				{ /* With no grid to highlight, an empty footer is just a stray border. */ }
+				{ ! isLoading && ! loadFailed && (
+					<EmojiPickerFooter store={ highlightStore } />
+				) }
 			</Autocomplete.Popup>
 		</Autocomplete.Root>
 	);
