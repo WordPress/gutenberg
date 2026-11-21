@@ -6,6 +6,14 @@
 
 -   Add a session-scoped editor intent (`edit`, `suggest`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit) and +X (Suggest) on Windows, ⌘⌥⇧Z/X on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 
+### Bug Fixes
+
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
 ## 16.2.0 (2026-11-18)
 
 ### New Features
