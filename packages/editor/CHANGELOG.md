@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Notes: Keep a floating note thread at its block's place in the document when the block is hidden at the current viewport, and label the thread as hidden, instead of hiding it until the block is selected ([#81549](https://github.com/WordPress/gutenberg/pull/81549)).
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 
 ### Documentation
 
