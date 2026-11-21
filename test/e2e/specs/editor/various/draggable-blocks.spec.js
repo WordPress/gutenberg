@@ -568,7 +568,7 @@ test.describe( 'Draggable block', () => {
 			if ( caretIn ) {
 				await editor.canvas
 					.getByRole( 'textbox', { name: 'List text' } )
-					.filter( { hasText: caretIn } )
+					.getByText( caretIn, { exact: true } )
 					.click();
 			}
 			await expect(
@@ -584,8 +584,11 @@ test.describe( 'Draggable block', () => {
 				firstItemBox.y + firstItemBox.height / 2
 			);
 			await page.mouse.down();
-			// The press selects the item, which lets it be dragged.
-			await expect( items.nth( 0 ) ).toHaveClass( /is-selected/ );
+			// The press leaves the item draggable.
+			await expect( items.nth( 0 ) ).toHaveAttribute(
+				'draggable',
+				'true'
+			);
 			await dragTo(
 				page,
 				lastItemBox.x + lastItemBox.width / 2,

@@ -40,7 +40,19 @@ export default function useClickSelection() {
 					return;
 				}
 
-				const clientId = getBlockClientId( event.target as Element );
+				// A press on a block's own element outside its fields, such as
+				// a list item's bullet: stop editing so the browser drags the
+				// block instead of placing a caret.
+				const target = event.target as HTMLElement;
+				if (
+					target.contentEditable === 'inherit' &&
+					target.hasAttribute( 'data-block' )
+				) {
+					setContentEditableWrapper( node, false );
+					return;
+				}
+
+				const clientId = getBlockClientId( target );
 
 				// A press on a block that is edited on its own element: give
 				// focus back to the field with the caret before the browser

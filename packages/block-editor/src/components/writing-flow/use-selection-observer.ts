@@ -206,7 +206,12 @@ export default function useSelectionObserver() {
 					if (
 						! isMultiSelecting() &&
 						collapsedClientId &&
-						canHostEditableRoot( collapsedClientId )
+						canHostEditableRoot( collapsedClientId ) &&
+						// Not when a press on a block's own element, such as a
+						// list item's bullet, focused it: WebKit then leaves
+						// the caret in the nearest text.
+						( ownerDocument.activeElement as HTMLElement | null )
+							?.isContentEditable
 					) {
 						setContentEditableWrapper( node, true );
 
@@ -220,8 +225,6 @@ export default function useSelectionObserver() {
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
-							( activeElement as HTMLElement | null )
-								?.isContentEditable &&
 							node.contains( activeElement ) &&
 							getBlockClientId( activeElement ) ===
 								collapsedClientId

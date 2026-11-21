@@ -16,10 +16,18 @@ import { unlock } from '../../lock-unlock';
 export default function useEditableRoot() {
 	const registry = useRegistry();
 	const enabled = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, canHostEditableRoot, isZoomOut } =
-			unlock( select( blockEditorStore ) );
+		const {
+			getSelectedBlockClientId,
+			getSelectionStart,
+			canHostEditableRoot,
+			isZoomOut,
+		} = unlock( select( blockEditorStore ) );
+		// Not for a block selected as a whole, such as by pressing a list
+		// item's bullet: it keeps focus on its own element to be dragged.
 		return (
-			! isZoomOut() && canHostEditableRoot( getSelectedBlockClientId() )
+			! isZoomOut() &&
+			!! getSelectionStart().attributeKey &&
+			canHostEditableRoot( getSelectedBlockClientId() )
 		);
 	}, [] );
 
