@@ -52,6 +52,16 @@ or via npm script:
 }
 ```
 
+### Skipping Debug Assets
+
+```bash
+wp-build --no-script-debug
+```
+
+Builds only the minified `.min.js` and `.min.css` files, leaving out the non-minified copies used when `SCRIPT_DEBUG` is enabled. The generated registration code then loads the minified files even with `SCRIPT_DEBUG` on. Code that registers files from the build directory by hand should check the `has_debug_assets` key of the array that `build/constants.php` returns, the same way. The flag is ignored in watch mode.
+
+`wp-build` does not empty the build directory, so remove it first to drop non-minified files left by an earlier build.
+
 ### Build Concurrency
 
 By default, `wp-build` limits concurrent Rolldown build jobs to half of the available CPU parallelism, rounded up. This prevents large projects from starting every package, route, and widget bundle at once.
@@ -497,7 +507,7 @@ routes/
     stage.tsx       # Main content component
     inspector.tsx   # Optional sidebar component
     canvas.tsx      # Optional custom canvas component
-    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas)
+    route.tsx       # Optional lifecycle hooks (beforeLoad, loader, canvas, title)
 ```
 
 ### Route Configuration
@@ -567,6 +577,7 @@ Export a `route` object with optional hooks. Each hook receives `{ params, searc
     - `CanvasData` (`{ postType, postId, isPreview?, editLink? }`) → default WordPress editor canvas
     - `null` → custom `canvas.tsx` component (if provided)
     - `undefined` or omitted → no canvas
+- **`title`** — Runs in parallel with `loader`. Returns the page's title as a string, or a promise of a string. After each navigation within the application, the title is announced to screen readers and used to update the document title. Every route should define it: without it, screen reader users do not hear that the page changed, and the browser tab keeps the title of the previous page.
 
 ```tsx
 export const route = {
@@ -590,6 +601,10 @@ export const route = {
 
 		// Return undefined to show no canvas
 		// return undefined;
+	},
+	title: ( { params, search } ) => {
+		// Return the page title
+		return __( 'Settings', 'my-plugin' );
 	},
 };
 ```
@@ -743,7 +758,7 @@ The generated `widgets.php` registers each widget's entries as script modules vi
 {handlePrefix}/widgets/{widget-dir-name}/widget
 ```
 
-Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded. Builds made with `--no-script-debug` do not include the non-minified files, so they always load the minified ones.
 
 ### Watch Mode
 
