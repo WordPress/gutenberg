@@ -42,10 +42,10 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		/**
 		 * Constructor
 		 *
-		 * @param string                                    $selector     The CSS selector.
-		 * @param string[]|WP_Style_Engine_CSS_Declarations $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
-		 *                                                                or a WP_Style_Engine_CSS_Declarations object.
-		 * @param string                                    $rules_group  A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
+		 * @param string                                                 $selector     The CSS selector.
+		 * @param array<string, string>|WP_Style_Engine_CSS_Declarations $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ),
+		 *                                                                             or a WP_Style_Engine_CSS_Declarations object.
+		 * @param string                                                 $rules_group  A parent CSS selector in the case of nested CSS, or a CSS nested @rule, such as `@media (min-width: 80rem)` or `@layer module`.
 		 *
 		 */
 		public function __construct( $selector = '', $declarations = array(), $rules_group = '' ) {
@@ -69,8 +69,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Rule' ) ) {
 		/**
 		 * Sets the declarations.
 		 *
-		 * @param array|WP_Style_Engine_CSS_Declarations $declarations An array of declarations (property => value pairs),
-		 *                                                             or a WP_Style_Engine_CSS_Declarations object.
+		 * @param array<string, string>|WP_Style_Engine_CSS_Declarations $declarations An array of declarations (property => value pairs),
+		 *                                                                             or a WP_Style_Engine_CSS_Declarations object.
 		 *
 		 * @return WP_Style_Engine_CSS_Rule Returns the object to allow chaining of methods.
 		 */

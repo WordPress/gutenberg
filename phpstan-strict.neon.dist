@@ -40,7 +40,7 @@ parameters:
 		- packages/core-actions/src
 		- packages/core-fields/src
 		- packages/icons/src
-		- packages/style-engine/src/class-wp-style-engine-css-rules-store.php
+		- packages/style-engine/src
 
 	# The code outside the strict paths that they can use: the `paths` of tools/phpstan/base.neon, other than those
 	# entirely within the strict paths. Keep them in sync, since code a strict path uses from a path missing here is
@@ -51,5 +51,4 @@ parameters:
 		- lib
 		- packages/block-library/src
 		- packages/block-serialization-default-parser
-		- packages/style-engine/src
 		- packages/widgets/src

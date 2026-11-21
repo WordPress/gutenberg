@@ -13,19 +13,25 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 	 * Holds, sanitizes, processes and prints CSS declarations for the Style Engine.
 	 *
 	 * @access private
+	 *
+	 * @phpstan-type Declaration_Options array{
+	 *     important?: bool,
+	 * }
 	 */
 	class WP_Style_Engine_CSS_Declarations {
 		/**
 		 * An array of CSS declarations (property => value pairs).
 		 *
-		 * @var array
+		 * @var array<string, string>
+		 * @phpstan-var array<non-falsy-string, non-empty-string>
 		 */
 		protected $declarations = array();
 
 		/**
 		 * CSS declaration options keyed by property name.
 		 *
-		 * @var array
+		 * @var array<string, array<string, bool>>
+		 * @phpstan-var array<non-falsy-string, Declaration_Options>
 		 */
 		protected $declaration_options = array();
 
@@ -35,7 +41,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * If a `$declarations` array is passed, it will be used to populate
 		 * the initial $declarations prop of the object by calling add_declarations().
 		 *
-		 * @param string[] $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
+		 * @param array<string, string> $declarations An associative array of CSS definitions, e.g., array( "$property" => "$value", "$property" => "$value" ).
 		 */
 		public function __construct( $declarations = array() ) {
 			$this->add_declarations( $declarations );
@@ -53,6 +59,8 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * }
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
+		 *
+		 * @phpstan-param Declaration_Options $options
 		 */
 		public function add_declaration( $property, $value, $options = array() ) {
 			// Sanitizes the property.
@@ -71,13 +79,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 				return $this;
 			}
 
-			$options = wp_parse_args(
-				$options,
-				array(
-					'important' => false,
-				)
-			);
-
+			// Only options that are set are stored, so the default of `important` is left out.
 			$options = array_filter( $options );
 
 			// Adds the declaration property/value pair.
@@ -107,7 +109,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Adds multiple declarations.
 		 *
-		 * @param array $declarations An array of declarations.
+		 * @param array<string, string> $declarations An array of declarations (property => value pairs).
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
@@ -121,7 +123,7 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Removes multiple declarations.
 		 *
-		 * @param array $properties An array of properties.
+		 * @param string[] $properties An array of properties.
 		 *
 		 * @return WP_Style_Engine_CSS_Declarations Returns the object to allow chaining methods.
 		 */
@@ -135,7 +137,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Gets the declarations array.
 		 *
-		 * @return array
+		 * @return array<string, string>
+		 *
+		 * @phpstan-return array<non-falsy-string, non-empty-string>
 		 */
 		public function get_declarations() {
 			return $this->declarations;
@@ -144,7 +148,9 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		/**
 		 * Gets declaration options keyed by property name.
 		 *
-		 * @return array
+		 * @return array<string, array<string, bool>>
+		 *
+		 * @phpstan-return array<non-falsy-string, Declaration_Options>
 		 */
 		public function get_declaration_options() {
 			return $this->declaration_options;
@@ -163,22 +169,17 @@ if ( ! class_exists( 'WP_Style_Engine_CSS_Declarations' ) ) {
 		 * }
 		 *
 		 * @return string The filtered declaration or an empty string.
+		 *
+		 * @phpstan-param Declaration_Options $options
 		 */
 		protected static function filter_declaration( $property, $value, $spacer = '', $options = array() ) {
 			$filtered_value = wp_strip_all_tags( $value, true );
 
 			if ( '' !== $filtered_value ) {
-				$options = wp_parse_args(
-					$options,
-					array(
-						'important' => false,
-					)
-				);
-
 				$filtered_declaration = safecss_filter_attr( "{$property}:{$spacer}{$filtered_value}" );
 
 				// Only append !important in the presence of an option value and when sanitization returns a single declaration.
-				if ( true === $options['important'] && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
+				if ( true === ( $options['important'] ?? false ) && '' !== $filtered_declaration && ! str_contains( $filtered_declaration, ';' ) ) {
 					return "$filtered_declaration !important";
 				}
 
