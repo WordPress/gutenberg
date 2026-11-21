@@ -12,15 +12,6 @@ exports[`flags warnings with invalid properties css > snapshot matches warnings 
     "text": "Expected "#FFFFFF" to be "#ffffff" (@stylistic/color-hex-case)",
   },
   {
-    "column": 13,
-    "endColumn": 14,
-    "endLine": 2,
-    "line": 2,
-    "rule": "@stylistic/declaration-colon-space-after",
-    "severity": "error",
-    "text": "Expected single space after ":" with a single-line declaration (@stylistic/declaration-colon-space-after)",
-  },
-  {
     "column": 17,
     "endColumn": 19,
     "endLine": 4,
@@ -28,6 +19,15 @@ exports[`flags warnings with invalid properties css > snapshot matches warnings 
     "rule": "@stylistic/unit-case",
     "severity": "error",
     "text": "Expected "PX" to be "px" (@stylistic/unit-case)",
+  },
+  {
+    "column": 13,
+    "endColumn": 14,
+    "endLine": 2,
+    "line": 2,
+    "rule": "@stylistic/declaration-colon-space-after",
+    "severity": "error",
+    "text": "Expected single space after ":" with a single-line declaration (@stylistic/declaration-colon-space-after)",
   },
   {
     "column": 13,

@@ -10,6 +10,10 @@
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
 
+### Internal
+
+-   Re-indent a multi-line selector in the validated form controls styles for `@stylistic/stylelint-plugin` 6 ([#87149](https://github.com/WordPress/gutenberg/pull/87149)).
+
 ## 22.1.0 (2026-11-18)
 
 ### Enhancements
