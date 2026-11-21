@@ -1,3 +1,5 @@
+export { isPdfFile } from './is-pdf-file';
+
 /**
  * Uses a combination of user agent matching and feature detection to determine whether
  * the current browser supports rendering PDFs inline.
