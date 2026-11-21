@@ -1198,6 +1198,52 @@ test.describe( 'List (@firefox)', () => {
 		).toHaveCount( 2 );
 	} );
 
+	test( 'should keep following items under the last outdented item when multi-selecting', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// "a" with nested "b", "c", and "d".
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await editor.clickBlockToolbarButton( 'Indent' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'd' );
+
+		// Select across "b" and "c".
+		await pageUtils.pressKeys( 'ArrowLeft' );
+		await pageUtils.pressKeys( 'ArrowUp' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+
+		await page.keyboard.press( 'Shift+Tab' );
+
+		// "b" and "c" are outdented to the top level, and following item "d"
+		// remains nested under the last outdented item ("c"), not "b".
+		await expect.poll( editor.getEditedPostContent ).toBe(
+			`<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>a</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>b</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>c<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>d</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->`
+		);
+	} );
+
 	test( 'should insert a line break on shift+enter', async ( {
 		editor,
 		page,
