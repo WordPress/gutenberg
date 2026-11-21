@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function withIgnoreIMEEvents(e){return t=>{let{isComposing:n}=`nativeEvent`in t?t.nativeEvent:t;n||t.keyCode===229||e(t)}}function init_with_ignore_ime_events(){return(init_with_ignore_ime_events=e((()=>{})))()}export{withIgnoreIMEEvents as n,init_with_ignore_ime_events as t};

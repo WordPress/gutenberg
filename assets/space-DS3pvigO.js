@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function space(e){if(e===void 0)return;if(!e)return`0`;let n=typeof e==`number`?e:Number(e);return typeof window<`u`&&window.CSS?.supports?.(`margin`,e.toString())||Number.isNaN(n)?e.toString():`calc(${t} * ${e})`}var t;function init_space(){return(init_space=e((()=>{t=`4px`})))()}export{space as n,init_space as t};

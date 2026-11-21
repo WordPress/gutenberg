@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";var t;function init_utils(){return(init_utils=e((()=>{t=new Set})))()}function isDev(){return!1}function warning(e){if(isDev()&&!t.has(e)){console.warn(e);try{throw Error(e)}catch{}t.add(e)}}function init_build_module(){return(init_build_module=e((()=>{init_utils()})))()}export{warning as n,init_build_module as t};

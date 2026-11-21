@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function stringifyLocale(e){return Array.isArray(e)?e.map(e=>stringifyLocale(e)).join(`,`):e==null?``:String(e)}function init_stringifyLocale(){return(init_stringifyLocale=e((()=>{})))()}export{stringifyLocale as n,init_stringifyLocale as t};

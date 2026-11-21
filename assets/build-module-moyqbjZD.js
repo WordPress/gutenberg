@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./react-CfMABiEl.js";function inertValue(e){return r>=19?e:e?`true`:void 0}var n,r;function init_build_module(){return(init_build_module=e((()=>{n=t(),r=parseInt(n.version,10)})))()}export{init_build_module as n,inertValue as t};

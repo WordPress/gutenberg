@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function isURL(e){try{return new URL(e),!0}catch{return!1}}function init_is_url(){return(init_is_url=e((()=>{})))()}export{isURL as n,init_is_url as t};

@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{n as t,t as n}from"./debounce-YHVHjWU7.js";var throttle;function init_throttle(){return(init_throttle=e((()=>{t(),throttle=(e,t,r)=>{let i=!0,a=!0;return r&&(i=`leading`in r?!!r.leading:i,a=`trailing`in r?!!r.trailing:a),n(e,t,{leading:i,trailing:a,maxWait:t})}})))()}export{throttle as n,init_throttle as t};

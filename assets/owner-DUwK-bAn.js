@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function ownerDocument(e){return e?.ownerDocument||document}function init_owner(){return(init_owner=e((()=>{})))()}export{ownerDocument as n,init_owner as t};

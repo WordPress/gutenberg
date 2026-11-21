@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";function clamp(e,t=-(2**53-1),n=2**53-1){return Math.max(t,Math.min(e,n))}function init_clamp(){return(init_clamp=e((()=>{})))()}export{init_clamp as n,clamp as t};

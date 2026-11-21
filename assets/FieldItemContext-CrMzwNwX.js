@@ -1,0 +1,1 @@
+import{n as e,o as t}from"./rolldown-runtime-Db01ssZC.js";import{t as n}from"./react-CfMABiEl.js";function useFieldItemContext(){return r.useContext(i)}var r,i;function init_FieldItemContext(){return(init_FieldItemContext=e((()=>{r=t(n(),1),i=r.createContext({disabled:!1})})))()}export{init_FieldItemContext as n,useFieldItemContext as r,i as t};

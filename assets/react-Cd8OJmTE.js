@@ -1,0 +1,1 @@
+import{n as e}from"./rolldown-runtime-Db01ssZC.js";import{t}from"./react-CfMABiEl.js";var n;function init_react(){return(init_react=e((()=>{n=t()})))()}export{init_react as n,n as t};
