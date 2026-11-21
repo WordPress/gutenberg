@@ -4,9 +4,8 @@ import { getScrollContainer } from '@wordpress/dom';
 /**
  * Mobile browsers don't shrink the page for the on-screen keyboard: they
  * slide the whole page up to reveal the caret, taking the editor's header
- * and block toolbar off screen. When the keyboard opens, move that slide
- * into the canvas instead, so the caret stays where it is and the page
- * stays put.
+ * and block toolbar off screen. Move each slide into the canvas instead, so
+ * the caret stays where it is and the page stays put.
  */
 export default function useKeepCaretAboveKeyboard() {
 	return useRefEffect< HTMLElement >( ( node ) => {
@@ -21,18 +20,19 @@ export default function useKeepCaretAboveKeyboard() {
 			return;
 		}
 
-		function onResize() {
+		function onScroll() {
 			const slide = view.scrollY;
-			if ( ! slide ) {
+			// Panning a zoomed in page also scrolls: leave it.
+			if ( ! slide || visualViewport!.scale !== 1 ) {
 				return;
 			}
 			getScrollContainer( node )!.scrollTop += slide;
 			view.scrollTo( 0, 0 );
 		}
 
-		visualViewport.addEventListener( 'resize', onResize );
+		visualViewport.addEventListener( 'scroll', onScroll );
 		return () => {
-			visualViewport.removeEventListener( 'resize', onResize );
+			visualViewport.removeEventListener( 'scroll', onScroll );
 		};
 	}, [] );
 }
