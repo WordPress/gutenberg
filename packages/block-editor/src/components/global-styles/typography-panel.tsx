@@ -492,7 +492,10 @@ export default function TypographyPanel( {
 	// preset preselects its chip at rest while a local literal value
 	// renders as a literal in the custom-size input.
 	const rawLocalFontSize = value?.typography?.fontSize;
-	const rawInheritedFontSize = inheritedValue?.typography?.fontSize;
+	// While a state is selected, the block's default state style applies to
+	// it unless overridden, ahead of Global Styles.
+	const rawInheritedFontSize =
+		baseValue?.typography?.fontSize ?? inheritedValue?.typography?.fontSize;
 	const rawFontSizeForDisplay = rawLocalFontSize ?? rawInheritedFontSize;
 	const fontSize = decodeValue( rawFontSizeForDisplay );
 	const inheritedFontSizeDecoded = decodeValue( rawInheritedFontSize );
