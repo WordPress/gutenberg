@@ -7,6 +7,12 @@
 -   Add an `addEditedImage` action that applies flip, rotate and crop edits to an image with vips and uploads the result as a new attachment through the regular pipeline, the client-side counterpart of the REST `media/<id>/edit` endpoint. An image past the client memory budget fails with `IMAGE_EDIT_ERROR` before any decode is attempted, so the caller can hand the edit to the server ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
 -   Export `exceedsClientProcessingMemory` and the `ImageDimensions` type, so a caller that already knows an image's dimensions can route it to the server without downloading it ([#82362](https://github.com/WordPress/gutenberg/pull/82362)).
 
+## 0.45.0 (2026-11-18)
+
+### New Features
+
+-   Add `isClientSideSupportedFormat()` to tell whether client-side media processing supports a file's format, so callers outside the store, such as the core Media Library uploader, can route files without keeping their own list of formats ([#86541](https://github.com/WordPress/gutenberg/pull/86541)).
+
 ## 0.44.0 (2026-11-04)
 
 ### Bug Fixes

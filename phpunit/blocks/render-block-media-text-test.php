@@ -70,7 +70,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	 * Test gutenberg_render_block_core_media_text with the featured image on the left.
 	 */
 	public function test_render_block_core_media_text_featured_image() {
-		$this->setup_query();
+		self::setup_query();
 
 		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div>';
 
@@ -96,7 +96,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	 * and a second media & text block nested inside the content area.
 	 */
 	public function test_render_block_core_media_text_featured_image_nested() {
-		$this->setup_query();
+		self::setup_query();
 		$content = '<div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><figure class="wp-block-media-text__media"></figure><div class="wp-block-media-text__content"><p></p></div></div></div></div>';
 
 		// Assert that the rendered block contains the featured image.
@@ -120,7 +120,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	 * Test gutenberg_render_block_core_media_text with the featured image on the right.
 	 */
 	public function test_render_block_core_media_text_featured_image_media_on_right() {
-		$this->setup_query();
+		self::setup_query();
 
 		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div>';
 
@@ -148,7 +148,7 @@ class Render_Block_MediaText_Test extends WP_UnitTestCase {
 	 * and a second media & text block nested inside the content area.
 	 */
 	public function test_render_block_core_media_text_featured_image_media_on_right_nested() {
-		$this->setup_query();
+		self::setup_query();
 
 		$content = '<div class="wp-block-media-text has-media-on-the-right is-stacked-on-mobile"><div class="wp-block-media-text__content"><div class="wp-block-media-text is-stacked-on-mobile"><div class="wp-block-media-text__content"><p></p></div><figure class="wp-block-media-text__media"></figure></div></div><figure class="wp-block-media-text__media"></figure></div>';
 

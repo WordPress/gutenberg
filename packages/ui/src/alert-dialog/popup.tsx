@@ -5,7 +5,7 @@ import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
 import { Button } from '../button';
-import dialogStyles from '../dialog/style.module.css';
+import dialogStyles from '../dialog/style.module.scss';
 import focusStyles from '../utils/css/focus.module.scss';
 import overlayChromeStyles from '../utils/css/overlay-chrome.module.css';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';

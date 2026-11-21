@@ -95,7 +95,7 @@ Example:
 </div>
 ```
 
-Navigation ignores a router region inside the [inert content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) of a [`data-wp-html`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-html) element, whether that's the server-rendered fallback or HTML the directive inserted, as if the region had no `data-wp-router-region` attribute. `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence. See [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide.
+Navigation ignores a router region inside the [inert content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) of a supported [`data-wp-html`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-html) binding, whether that's the server-rendered fallback or HTML the directive inserted, as if the region had no `data-wp-router-region` attribute. [Ignored HTML entries and elements](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#unsupported-entries-and-elements) don't make otherwise-active content inert: eligible regions beneath them can update, and usable elements within their content can receive new regions through `attachTo`. `data-wp-html` on a router region itself doesn't make the region's content inert, because `data-wp-router-region` takes precedence. See [Where to place router regions](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#where-to-place-router-regions) in the Client-Side Navigation guide.
 
 The `attachTo` property is a CSS selector that points to the parent element where the new router region should be rendered. This is useful for regions that may not exist on the initial page but are present on subsequent pages, like a modal or an overlay. The router uses the first element on the current page that matches the selector, skipping any element with [inert `data-wp-html` content](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#inert-content) and anything inside that content.
 
@@ -128,7 +128,9 @@ Navigates to the specified page.
 
 This function normalizes the passed `href`, fetches the page HTML if needed, and updates any interactive regions whose contents have changed in the new page. It also creates a new entry in the browser session history.
 
-**Params**
+If another navigation starts before this one renders its page, whether another `navigate()` call or a back/forward traversal, this navigation is abandoned: it doesn't render its page, change the session history, or fall back to a full page load, and its promise resolves. See [Race condition protection](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/client-side-navigation/#race-condition-protection) in the Client-Side Navigation guide.
+
+##### Navigate parameters
 
 ```js
 navigate( href: string, options: NavigateOptions = {} )
@@ -150,7 +152,7 @@ Prefetches the page for the passed URL. The page is cached and can be used for n
 
 The function normalizes the URL and stores internally the fetch promise, to avoid triggering a second fetch for an ongoing request.
 
-**Params**
+##### Prefetch parameters
 
 ```js
 prefetch( url: string, options: PrefetchOptions = {} )

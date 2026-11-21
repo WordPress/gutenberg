@@ -1,0 +1,137 @@
+<?php
+/**
+ * Tests the transform block support.
+ *
+ * @package gutenberg
+ */
+
+class WP_Block_Supports_Transform_Test extends WP_UnitTestCase {
+	/**
+	 * @var string|null
+	 */
+	private $test_block_name;
+
+	public function set_up() {
+		parent::set_up();
+		$this->test_block_name = null;
+	}
+
+	public function tear_down() {
+		if ( $this->test_block_name ) {
+			unregister_block_type( $this->test_block_name );
+		}
+		$this->test_block_name = null;
+		parent::tear_down();
+	}
+
+	/**
+	 * Registers a block for testing transform support.
+	 *
+	 * @param array $supports Transform block support configuration.
+	 * @return WP_Block_Type The registered block type.
+	 */
+	private function register_transform_block( $supports ) {
+		$this->test_block_name = 'test/transform-block';
+		return register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array( 'transform' => $supports ),
+			)
+		);
+	}
+
+	public function test_rotation_is_returned_as_a_wrapper_inline_style() {
+		$block_type = $this->register_transform_block( array( 'rotate' => true ) );
+
+		$this->assertSame(
+			array( 'style' => 'rotate:15deg;' ),
+			gutenberg_apply_transform_support(
+				$block_type,
+				array( 'style' => array( 'transform' => array( 'rotate' => '15deg' ) ) )
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider data_no_wrapper_styles
+	 *
+	 * @param array $supports Transform block support configuration.
+	 * @param mixed $rotate   Rotation value.
+	 */
+	public function test_no_wrapper_styles( $supports, $rotate ) {
+		$block_type = $this->register_transform_block( $supports );
+
+		$this->assertSame(
+			array(),
+			gutenberg_apply_transform_support(
+				$block_type,
+				array( 'style' => array( 'transform' => array( 'rotate' => $rotate ) ) )
+			)
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_no_wrapper_styles() {
+		return array(
+			'no rotate support'                  => array( array( 'scale' => true ), '15deg' ),
+			'skip serialization'                 => array(
+				array(
+					'rotate'                          => true,
+					'__experimentalSkipSerialization' => true,
+				),
+				'15deg',
+			),
+			'skip serialization of the rotation' => array(
+				array(
+					'rotate'                          => true,
+					'__experimentalSkipSerialization' => array( 'rotate' ),
+				),
+				'15deg',
+			),
+			'no rotation'                        => array( array( 'rotate' => true ), null ),
+			'invalid rotation'                   => array( array( 'rotate' => true ), 'calc(10deg + 5deg)' ),
+		);
+	}
+
+	public function test_classes_and_styles_ignore_block_support() {
+		$this->assertSame(
+			array( 'style' => 'rotate:-0.25turn;' ),
+			gutenberg_get_transform_classes_and_styles(
+				array( 'style' => array( 'transform' => array( 'rotate' => '-0.25turn' ) ) )
+			)
+		);
+	}
+
+	/**
+	 * @dataProvider data_no_classes_and_styles
+	 *
+	 * @param mixed $block_attributes Block attributes.
+	 */
+	public function test_no_classes_and_styles( $block_attributes ) {
+		$this->assertSame( array(), gutenberg_get_transform_classes_and_styles( $block_attributes ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_no_classes_and_styles() {
+		return array(
+			'non-array attributes' => array( null ),
+			'no style'             => array( array() ),
+			'non-array transform'  => array( array( 'style' => array( 'transform' => '15deg' ) ) ),
+			'invalid rotation'     => array( array( 'style' => array( 'transform' => array( 'rotate' => '15' ) ) ) ),
+		);
+	}
+}
