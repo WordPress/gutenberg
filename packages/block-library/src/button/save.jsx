@@ -12,6 +12,7 @@ import {
 
 export default function save( { attributes } ) {
 	const {
+		ariaLabel,
 		tagName,
 		type,
 		fontSize,
@@ -68,6 +69,7 @@ export default function save( { attributes } ) {
 				value={ text }
 				target={ isButtonTag ? null : linkTarget }
 				rel={ isButtonTag ? null : rel }
+				aria-label={ ariaLabel || undefined }
 			/>
 		</div>
 	);
