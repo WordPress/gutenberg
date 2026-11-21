@@ -7,6 +7,34 @@ import { toTree } from './to-tree';
 import type { HTMLTreeNode, RichTextValue } from './types';
 
 /**
+ * Elements that serialize as void in HTML, including obsolete elements.
+ *
+ * @see {@link https://html.spec.whatwg.org/#void-elements}
+ * @see {@link https://html.spec.whatwg.org/#serialising-html-fragments}
+ */
+const VOID_ELEMENTS = new Set( [
+	'area',
+	'base',
+	'br',
+	'col',
+	'embed',
+	'hr',
+	'img',
+	'input',
+	'link',
+	'meta',
+	'source',
+	'track',
+	'wbr',
+	// Browsers also keep these obsolete elements void when parsing HTML.
+	'basefont',
+	'bgsound',
+	'frame',
+	'keygen',
+	'param',
+] );
+
+/**
  * Create an HTML string from a Rich Text value.
  *
  * @param options                      Named arguments.
@@ -124,12 +152,19 @@ function createElementHTML( {
 	children,
 }: HTMLTreeNode ) {
 	if ( type === '#comment' ) {
+		const comment = String( attributes![ 'data-rich-text-comment' ] );
+
+		// Omit comments whose data would close the comment prematurely.
+		if ( /^>|^->|--!?>/.test( comment ) ) {
+			return '';
+		}
+
 		// We can't restore the original comment delimiters, because once parsed
 		// into DOM nodes, we don't have the information. But in the future we
 		// could allow comment handlers to specify custom delimiters, for
 		// example `</{comment-content}>` for Bits, where `comment-content`
 		// would be `/{bit-name}` or `__{translatable-string}` (TBD).
-		return `<!--${ attributes![ 'data-rich-text-comment' ] }-->`;
+		return `<!--${ comment }-->`;
 	}
 
 	let attributeString = '';
@@ -146,7 +181,7 @@ function createElementHTML( {
 		) }"`;
 	}
 
-	if ( object ) {
+	if ( object && type && VOID_ELEMENTS.has( type.toLowerCase() ) ) {
 		return `<${ type }${ attributeString }>`;
 	}
 
