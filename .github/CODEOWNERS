@@ -32,6 +32,7 @@
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 /tools/phpstan                                  @westonruter
 /phpstan.neon.dist                              @westonruter
+/phpstan-strict.neon.dist                       @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
@@ -62,6 +63,10 @@
 
 # Project Management
 /.github                                        @desrosj
+
+# Review routing
+/.github/review-routing                         @aduth
+/tools/review-routing                           @aduth
 
 # wp-env
 /packages/env                                   @t-hamano

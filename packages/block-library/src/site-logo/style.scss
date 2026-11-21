@@ -16,14 +16,9 @@
 
 	// Constrain the image to its container.
 	img {
+		box-sizing: border-box;
 		height: auto;
 		max-width: 100%;
-	}
-
-	// Inherit border radius from style variations.
-	a,
-	img {
-		border-radius: inherit;
 	}
 
 	&.aligncenter {
@@ -31,6 +26,11 @@
 		margin-right: auto;
 		text-align: center;
 	}
+}
+
+// Inherit the Rounded radius. A Global Styles radius on the image loads later and wins.
+:root :where(.wp-block-site-logo a, .wp-block-site-logo img) {
+	border-radius: inherit;
 }
 
 // Style variations
