@@ -6,7 +6,7 @@ import {
 } from '@wordpress/rich-text';
 import { isSelectionForward } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
-import { getBlockClientId } from '../../utils/dom';
+import { getBlockClientId, isBlockElementOutsideFields } from '../../utils/dom';
 import { setContentEditableWrapper } from './utils';
 import { unlock } from '../../lock-unlock';
 
@@ -210,8 +210,9 @@ export default function useSelectionObserver() {
 						// Not when a press on a block's own element, such as a
 						// list item's bullet, focused it: WebKit then leaves
 						// the caret in the nearest text.
-						( ownerDocument.activeElement as HTMLElement | null )
-							?.isContentEditable
+						! isBlockElementOutsideFields(
+							ownerDocument.activeElement
+						)
 					) {
 						setContentEditableWrapper( node, true );
 
@@ -225,6 +226,8 @@ export default function useSelectionObserver() {
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
+							( activeElement as HTMLElement | null )
+								?.isContentEditable &&
 							node.contains( activeElement ) &&
 							getBlockClientId( activeElement ) ===
 								collapsedClientId
