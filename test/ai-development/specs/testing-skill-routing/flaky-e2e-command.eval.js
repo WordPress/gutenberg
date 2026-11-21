@@ -119,13 +119,11 @@ blob report with timings, and the shard's ordered test list available.`,
 				scenario: `Suppose CI artifacts have narrowed a failure to WebKit on
 Linux in test/e2e/specs/editor/various/editable-root.spec.js, in the existing
 suite "Click into a block edited on its own element (@firefox, @webkit)".
-Chromium passes. I need a local reproduction with a fresh failure trace.
-Use this checkout's WebKit configuration. The Linux test machine has Xvfb
-installed if a virtual display is needed.`,
+Chromium passes. I need a local reproduction with a fresh failure trace.`,
 				firstStep:
 					'Propose a command using npm run test:e2e with Playwright arguments after --, scoped to editable-root.spec.js and selecting --project=webkit. Accept shorter paths and either equals or space-separated flag values.',
 				conditions:
-					'Check test/e2e/playwright.config.ts and follow its WebKit mode: use xvfb-run when Linux WebKit is configured headed, or run directly when it is configured headless. A conditional command covering both configurations is also valid. Enable --trace=retain-on-failure or --trace=on. Select the provided suite, which is already tagged with lowercase @webkit. A grep pattern matching that suite name is valid and need not literally include @webkit; omitting grep is also valid. Do not substitute Chromium, override the configured browser mode, or require a visible GUI. No minimum repeat count is required.',
+					'Run WebKit headless; a virtual display is not needed. Enable --trace=retain-on-failure or --trace=on. Select the provided suite, which is already tagged with lowercase @webkit. A grep pattern matching that suite name is valid and need not literally include @webkit; omitting grep is also valid. Do not substitute Chromium, override the configured browser mode, or require a visible GUI. No minimum repeat count is required.',
 			},
 		},
 		{

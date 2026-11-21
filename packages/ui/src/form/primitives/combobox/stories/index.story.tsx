@@ -135,6 +135,10 @@ export const Compact: Story = {
  * In such cases, the selector UI can be detached and inlined into a modal dialog, for example.
  *
  * To do this, omit the `Popup` and enable the `inline` prop on the `Root`.
+ *
+ * To keep the items clear of a classic scrollbar, give `Combobox.ListBody` an
+ * inline-end padding. Also set `scrollbar-gutter: stable` on it, so that the
+ * items keep their width when the scrollbar appears or disappears.
  */
 export const DetachedInline: Story = {
 	parameters: {
@@ -144,6 +148,9 @@ export const DetachedInline: Story = {
 			config: {
 				rules: [
 					{ id: 'scrollable-region-focusable', enabled: false },
+					// axe flags the focusable ListBody, which is a generic wrapper.
+					// The listbox still owns its options.
+					{ id: 'aria-required-children', enabled: false },
 				],
 			},
 		},
@@ -161,26 +168,30 @@ export const DetachedInline: Story = {
 				placeholder="Search items"
 				key="input"
 			/>,
-			<div
-				style={ {
-					minHeight: '200px',
-					maxHeight: '200px',
-					marginTop: 8,
-					overflow: 'auto',
-				} }
-				key="div"
-			>
+			<div style={ { marginTop: 8 } } key="div">
 				<Combobox.Empty>No results found.</Combobox.Empty>
 				<Combobox.List>
-					<Combobox.Collection>
-						{ ( item: FixtureItem ) => (
-							<Combobox.Item key={ item.value } value={ item }>
-								<Combobox.ItemLabel>
-									{ item.label }
-								</Combobox.ItemLabel>
-							</Combobox.Item>
-						) }
-					</Combobox.Collection>
+					<Combobox.ListBody
+						style={ {
+							maxHeight: 200,
+							scrollbarGutter: 'stable',
+							paddingInlineEnd:
+								'var(--wpds-dimension-padding-xs)',
+						} }
+					>
+						<Combobox.Collection>
+							{ ( item: FixtureItem ) => (
+								<Combobox.Item
+									key={ item.value }
+									value={ item }
+								>
+									<Combobox.ItemLabel>
+										{ item.label }
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							) }
+						</Combobox.Collection>
+					</Combobox.ListBody>
 				</Combobox.List>
 			</div>,
 		],
