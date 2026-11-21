@@ -1,0 +1,13 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-site-sidebar-navigation-screen-site-parts__empty {
+	margin: 0 0 $grid-unit-20;
+}
+
+// Line the items' icons and text up with the screen's description, as the
+// main Design menu does.
+.edit-site-sidebar-navigation-screen-site-parts__list {
+	margin-left: -$grid-unit-20;
+	margin-right: -$grid-unit-20;
+}

@@ -1,4 +1,5 @@
 import {
+	header,
 	home,
 	siteLogo,
 	styles,
@@ -25,6 +26,7 @@ export async function init() {
 		navigation: { icon: navigation },
 		pages: { icon: page },
 		templateParts: { icon: symbolFilled },
+		siteParts: { icon: header },
 		patterns: { icon: symbol },
 		templates: { icon: layout },
 	};

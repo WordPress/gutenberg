@@ -4,6 +4,8 @@ import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';
 import { identityRoute } from './identity';
+import { sitePartsRoute } from './site-parts';
+import { sitePartItemRoute } from './site-part-item';
 import { stylesRoute } from './styles';
 import { navigationRoute } from './navigation';
 import { navigationItemRoute } from './navigation-item';
@@ -28,6 +30,10 @@ const routes = [
 	navigationItemRoute,
 	navigationRoute,
 	identityRoute,
+	// Behind the "Site parts" experiment while it's a prototype.
+	...( window.__experimentalSiteParts
+		? [ sitePartItemRoute, sitePartsRoute ]
+		: [] ),
 	stylesRoute,
 	homeRoute,
 	stylebookRoute,

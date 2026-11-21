@@ -18,6 +18,19 @@ import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
 import UploadProgressSnackbar from './components/upload-progress-snackbar';
+import {
+	SitePartPanelContent,
+	SitePartSyncedNotice,
+	getPartsInUse,
+	getSitePartArea,
+	getSitePartAreas,
+	getSitePartPanelTitle,
+	getSitePartPanels,
+	resolveSitePartsUsage,
+	useSitePart,
+	useSitePartsUsage,
+	useUsedOnLabel,
+} from './components/site-parts';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -37,6 +50,18 @@ lock( privateApis, {
 	ViewMoreMenuGroup,
 	ResizableEditor,
 	UploadProgressSnackbar,
+	// Site parts, behind the "Site parts" experiment.
+	SitePartPanelContent,
+	SitePartSyncedNotice,
+	getPartsInUse,
+	getSitePartArea,
+	getSitePartAreas,
+	getSitePartPanelTitle,
+	getSitePartPanels,
+	resolveSitePartsUsage,
+	useSitePart,
+	useSitePartsUsage,
+	useUsedOnLabel,
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,

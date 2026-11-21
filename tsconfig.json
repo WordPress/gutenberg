@@ -128,6 +128,8 @@
 		{ "path": "routes/post-list" },
 		{ "path": "routes/post-new" },
 		{ "path": "routes/site-health" },
+		{ "path": "routes/site-part" },
+		{ "path": "routes/site-parts" },
 		{ "path": "routes/styles" },
 		{ "path": "routes/template" },
 		{ "path": "routes/template-list" },

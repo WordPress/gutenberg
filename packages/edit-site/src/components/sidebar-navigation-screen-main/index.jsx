@@ -7,6 +7,7 @@ import {
 	styles,
 	page,
 	siteLogo,
+	header,
 } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -24,6 +25,17 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 				isHidden={ ! isBlockBasedTheme }
 			>
 				{ _x( 'Identity', 'site identity' ) }
+			</SidebarNavigationItem>
+			<SidebarNavigationItem
+				to="/site-parts"
+				uid="site-parts-navigation-item"
+				icon={ header }
+				withChevron
+				isHidden={
+					! isBlockBasedTheme || ! window.__experimentalSiteParts
+				}
+			>
+				{ __( 'Site parts' ) }
 			</SidebarNavigationItem>
 			<SidebarNavigationItem
 				to={ isBlockBasedTheme ? '/styles' : '/stylebook' }
