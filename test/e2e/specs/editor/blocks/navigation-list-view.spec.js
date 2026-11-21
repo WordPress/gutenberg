@@ -541,6 +541,89 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 	} );
 
+	test( `keeps focus on the menu item after adding a submenu link to a link`, async ( {
+		page,
+		editor,
+		requestUtils,
+		linkControl,
+	} ) => {
+		// Adding a submenu link to a link replaces the link with a submenu,
+		// which removed the Options button that the link UI returns focus to.
+		// See: https://github.com/WordPress/gutenberg/issues/51306
+		await requestUtils.createNavigationMenu( navMenuBlocksFixture );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+
+		// The options menu button is a sibling of the menu item gridcell.
+		const firstItemActions = listView
+			.getByRole( 'gridcell', {
+				name: 'Top Level Item 1',
+			} )
+			.filter( {
+				hasText: 'Block 1 of 2, Level 1.', // proxy for filtering by description.
+			} )
+			.locator( '..' ) // parent selector.
+			.getByRole( 'button', {
+				name: 'Options',
+			} );
+
+		const addSubmenuLink = async () => {
+			await firstItemActions.click();
+
+			// usage of `page` is required because the options menu is rendered into a slot
+			// outside of the treegrid.
+			await page
+				.getByRole( 'menu', {
+					name: 'Options',
+				} )
+				.getByRole( 'menuitem', {
+					name: 'Add submenu link',
+				} )
+				.click();
+
+			await expect( linkControl.getSearchInput() ).toBeFocused();
+		};
+
+		await test.step( 'closing the link UI without a link', async () => {
+			await addSubmenuLink();
+
+			await page.keyboard.press( 'Escape' );
+
+			// The submenu has no items, so it is a link again.
+			await expect(
+				listView.getByRole( 'gridcell', {
+					name: 'Page link',
+				} )
+			).toBeHidden();
+			await expect( firstItemActions ).toBeFocused();
+		} );
+
+		await test.step( 'choosing a link', async () => {
+			await addSubmenuLink();
+
+			await linkControl.searchFor( 'https://wordpress.org' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: 'wordpress.org',
+					} )
+					.filter( {
+						hasText: 'Block 1 of 1, Level 2.', // proxy for filtering by description.
+					} )
+			).toBeVisible();
+			await expect( firstItemActions ).toBeFocused();
+		} );
+	} );
+
 	test( `does not display link interface for blocks that have not just been inserted`, async ( {
 		page,
 		editor,
