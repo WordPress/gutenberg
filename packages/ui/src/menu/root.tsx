@@ -1,7 +1,9 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
 import { DirectionProvider } from '../utils/direction-provider';
-import { MenuContext } from './context';
+import { MenuContext, MenuGroupContext } from './context';
 import type { RootProps } from './types';
+
+const ROOT_CONTEXT_VALUE = { isSubmenu: false };
 
 /**
  * Groups all parts of a menu.
@@ -23,10 +25,10 @@ import type { RootProps } from './types';
  * ```
  */
 function Root( props: RootProps ) {
-	const { onOpenChange, ...rootProps } = props;
+	const { onOpenChange } = props;
 
 	const handleOpenChange: NonNullable< RootProps[ 'onOpenChange' ] > = (
-		open,
+		nextOpen,
 		eventDetails
 	) => {
 		const trigger = eventDetails.trigger;
@@ -40,10 +42,10 @@ function Root( props: RootProps ) {
 				? eventTarget.closest( '[role="menu"]' )
 				: null;
 
-		onOpenChange?.( open, eventDetails );
+		onOpenChange?.( nextOpen, eventDetails );
 
 		if (
-			! open &&
+			! nextOpen &&
 			eventDetails.reason === 'item-press' &&
 			! eventDetails.isCanceled &&
 			TriggerElement &&
@@ -64,11 +66,13 @@ function Root( props: RootProps ) {
 
 	return (
 		<DirectionProvider>
-			<MenuContext.Provider value={ { isSubmenu: false } }>
-				<_Menu.Root
-					{ ...rootProps }
-					onOpenChange={ handleOpenChange }
-				/>
+			<MenuContext.Provider value={ ROOT_CONTEXT_VALUE }>
+				<MenuGroupContext.Provider value={ null }>
+					<_Menu.Root
+						{ ...props }
+						onOpenChange={ handleOpenChange }
+					/>
+				</MenuGroupContext.Provider>
 			</MenuContext.Provider>
 		</DirectionProvider>
 	);

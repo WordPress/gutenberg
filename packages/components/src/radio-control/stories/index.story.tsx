@@ -3,9 +3,8 @@ import { useState } from '@wordpress/element';
 import RadioControl from '..';
 
 const meta: Meta< typeof RadioControl > = {
-	tags: [ 'manifest' ],
 	component: RadioControl,
-	title: 'Components/Selection & Input/Common/RadioControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/RadioControl',
 	id: 'components-radiocontrol',
 	argTypes: {
 		onChange: {
@@ -27,9 +26,9 @@ const meta: Meta< typeof RadioControl > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use [`RadioGroupControl`](?path=/docs/design-system-components-form-radiogroupcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-radiocontrol--migration-guide).',
 		},
 	},
 };
@@ -85,5 +84,17 @@ WithOptionDescriptions.args = {
 			value: 'password',
 			description: 'Protected by a password',
 		},
+	],
+};
+
+export const WithDisabledOption: StoryFn< typeof RadioControl > = Template.bind(
+	{}
+);
+WithDisabledOption.args = {
+	...Default.args,
+	options: [
+		{ label: 'Public', value: 'public' },
+		{ label: 'Private', value: 'private', disabled: true },
+		{ label: 'Password Protected', value: 'password' },
 	],
 };

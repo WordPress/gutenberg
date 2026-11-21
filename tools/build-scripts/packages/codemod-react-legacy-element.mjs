@@ -21,6 +21,10 @@
  * coerces any string `inert` value to `true` in the `case 'inert'` of the
  * attribute-setting switch.
  *
+ * A third React DOM patch restores `defaultProps` for the component inside a
+ * `memo()` wrapper. React 18 resolved those in `updateMemoComponent`, not at
+ * element creation, so the codemod puts them back in the same place.
+ *
  * Both patches also emit a one-time `console.warn` (prefixed
  * `[wordpress-react-19]`) when their compatibility path is exercised at runtime:
  * once when a legacy element is encountered, and once when an empty-string
@@ -47,10 +51,16 @@ const DEFAULT_LEGACY_NAME = 'REACT_LEGACY_ELEMENT_TYPE';
 // `inert`) at runtime, warning at most once per `key`.
 const WARN_HELPER_NAME = '__wpWarnCompat';
 
+// Name of the helper that resolves the `defaultProps` of the component inside a
+// `memo()` wrapper, injected into bundles that {@link patchMemoDefaultProps}
+// touches.
+const RESOLVE_MEMO_HELPER_NAME = '__wpResolveMemoDefaultProps';
+
 // Warning ids. Each id warns at most once; call sites pass only the id and the
 // message is looked up from the table embedded in the injected helper.
 const LEGACY_ELEMENT_WARNING = 'legacy-element';
 const INERT_WARNING = 'inert';
+const MEMO_DEFAULT_PROPS_WARNING = 'memo-default-props';
 
 // Warning messages keyed by id. Embedded once into the patched bundle by the
 // injected helper, so call sites never repeat the message text. The
@@ -60,10 +70,12 @@ const WARNING_MESSAGES = {
 		'A React element created by an older React runtime (React 17/18) was detected and is handled by a compatibility patch. This usually means a bundled package ships its own React; align it with React 19.',
 	[ INERT_WARNING ]:
 		'An empty-string `inert` attribute was used. React 19 treats `inert` as a boolean, so the value was coerced to `true` by a compatibility patch. Pass `inert={true}` instead.',
+	[ MEMO_DEFAULT_PROPS_WARNING ]:
+		'`defaultProps` on a component wrapped in `memo()` was removed in React 19 and is restored by a compatibility patch. Use default parameters instead.',
 };
 
 /**
- * Source for the compatibility-warning helper that {@link injectWarnHelper}
+ * Source for the compatibility-warning helper that {@link injectHelpers}
  * inserts into every patched bundle. It is a plain function declaration so it
  * hoists to the top of the enclosing scope and is reachable from the patched
  * call sites via closure. Call sites pass only a warning id; the message table
@@ -82,6 +94,28 @@ function warnHelperSource() {
 		`if (typeof console !== "undefined" && console.warn) {` +
 		`console.warn("[wordpress-react-19] " + messages[key]);` +
 		`}` +
+		`}\n`
+	);
+}
+
+/**
+ * Source for the helper that resolves `defaultProps` declared on the component
+ * inside a `memo()` wrapper. It mirrors React 18's
+ * `resolveDefaultPropsOnNonClassComponent`, which React 19 compiles away.
+ *
+ * @return {string} Helper source code.
+ */
+function resolveMemoHelperSource() {
+	return (
+		`function ${ RESOLVE_MEMO_HELPER_NAME }(type, props) {` +
+		`var defaultProps = type && type.defaultProps;` +
+		`if (!defaultProps) return props;` +
+		`${ WARN_HELPER_NAME }("${ MEMO_DEFAULT_PROPS_WARNING }");` +
+		`var resolved = Object.assign({}, props);` +
+		`for (var name in defaultProps) {` +
+		`if (resolved[name] === undefined) resolved[name] = defaultProps[name];` +
+		`}` +
+		`return resolved;` +
 		`}\n`
 	);
 }
@@ -126,28 +160,29 @@ function getIifeFunction( statement ) {
 }
 
 /**
- * Inserts the compatibility-warning helper at the start of the bundle's IIFE
- * body, so it stays scoped to the bundle instead of leaking a global (these
- * bundles run as classic scripts). The helper is reachable from the patched
- * call sites deeper in the same IIFE via closure.
+ * Inserts the compatibility helpers at the start of the bundle's IIFE body, so
+ * they stay scoped to the bundle instead of leaking globals (these bundles run
+ * as classic scripts). They are reachable from the patched call sites deeper in
+ * the same IIFE via closure.
  *
  * Falls back to prepending at the top of the file when no top-level IIFE is
- * found, which keeps the helper available regardless of the bundle shape.
+ * found, which keeps the helpers available regardless of the bundle shape.
  *
- * @param {Object}      ast Parsed AST (File node).
- * @param {MagicString} ms  Magic string for the source being edited.
+ * @param {Object}      ast    Parsed AST (File node).
+ * @param {MagicString} ms     Magic string for the source being edited.
+ * @param {string}      source Helper source code to insert.
  */
-function injectWarnHelper( ast, ms ) {
+function injectHelpers( ast, ms, source ) {
 	for ( const statement of ast.program.body ) {
 		const iife = getIifeFunction( statement );
 		if ( iife ) {
 			// `body.start` is the opening `{`; insert right after it.
-			ms.appendRight( iife.body.start + 1, `\n${ warnHelperSource() }` );
+			ms.appendRight( iife.body.start + 1, `\n${ source }` );
 			return;
 		}
 	}
 
-	ms.prepend( warnHelperSource() );
+	ms.prepend( source );
 }
 
 /**
@@ -558,9 +593,172 @@ function patchInertAttribute( ast, ms, filename ) {
 }
 
 /**
- * A patch pass operates on a shared AST and `magic-string` for a single source.
+ * Returns the object of a `<object>.<property> === <value>` comparison, in
+ * either operand order.
  *
- * @typedef {( ast: Object, ms: MagicString, filename: string ) => void} PatchPass
+ * @param {Object}                      node     AST node.
+ * @param {string}                      property Property name to match.
+ * @param {( node: Object ) => boolean} isValue  Predicate for the compared value.
+ * @return {Object|undefined} The object the property was read from, if matched.
+ */
+function getComparedMemberObject( node, property, isValue ) {
+	if (
+		! node ||
+		node.type !== 'BinaryExpression' ||
+		node.operator !== '==='
+	) {
+		return undefined;
+	}
+
+	for ( const [ member, value ] of [
+		[ node.left, node.right ],
+		[ node.right, node.left ],
+	] ) {
+		if (
+			member.type === 'MemberExpression' &&
+			! member.computed &&
+			member.property.type === 'Identifier' &&
+			member.property.name === property &&
+			isValue( value )
+		) {
+			return member.object;
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Flattens an `&&` chain into its operands.
+ *
+ * @param {Object}   node     AST node.
+ * @param {Object[]} operands Accumulator.
+ * @return {Object[]} The operands of the chain.
+ */
+function flattenLogicalAnd( node, operands = [] ) {
+	if ( node.type === 'LogicalExpression' && node.operator === '&&' ) {
+		flattenLogicalAnd( node.left, operands );
+		flattenLogicalAnd( node.right, operands );
+	} else {
+		operands.push( node );
+	}
+	return operands;
+}
+
+const isUndefinedValue = ( node ) =>
+	( node.type === 'UnaryExpression' && node.operator === 'void' ) ||
+	( node.type === 'Identifier' && node.name === 'undefined' );
+
+const isNullValue = ( node ) => node.type === 'NullLiteral';
+
+/**
+ * Restores `defaultProps` for the component inside a `memo()` wrapper.
+ *
+ * React 18 resolved these in the reconciler rather than at element creation:
+ * `beginWork`'s `MemoComponent` case resolved the wrapper's own `defaultProps`
+ * and then the inner component's before calling `updateMemoComponent`. React 19
+ * compiles both away, and the wrapper object that `createElement` and `jsx` see
+ * carries no `defaultProps` of its own, so patching element creation would miss
+ * every memo element built by a bundled React 17/18 runtime. Patching the
+ * reconciler catches them all.
+ *
+ * Only the inner resolution is restored. The wrapper's own `defaultProps` are
+ * still applied by React 19's `createElement`, and by the `jsx` shim in
+ * `tools/react-19`.
+ *
+ * `updateMemoComponent` is identified structurally, by the test that decides
+ * whether the memo can be upgraded to a `SimpleMemoComponent`: it is the only
+ * place that checks `<type>.defaultProps === undefined` and
+ * `<component>.compare === null` together. Exactly one such function is
+ * expected, so anything else is treated as an error.
+ *
+ * @param {Object}      ast      Parsed AST (File node).
+ * @param {MagicString} ms       Magic string for the source being edited.
+ * @param {string}      filename Source name, for error messages.
+ * @param {Set<string>} helpers  Helper sources to inject into the bundle.
+ */
+function patchMemoDefaultProps( ast, ms, filename, helpers ) {
+	const matches = [];
+
+	traverse( ast, {
+		LogicalExpression( path ) {
+			// Only inspect the outermost `&&` chain, so a chain is not matched
+			// once per nested `LogicalExpression`.
+			if (
+				path.node.operator !== '&&' ||
+				( path.parent.type === 'LogicalExpression' &&
+					path.parent.operator === '&&' )
+			) {
+				return;
+			}
+
+			let componentName;
+			let checksDefaultProps = false;
+			for ( const operand of flattenLogicalAnd( path.node ) ) {
+				if (
+					getComparedMemberObject(
+						operand,
+						'defaultProps',
+						isUndefinedValue
+					)
+				) {
+					checksDefaultProps = true;
+				}
+				const component = getComparedMemberObject(
+					operand,
+					'compare',
+					isNullValue
+				);
+				if ( component?.type === 'Identifier' ) {
+					componentName = component.name;
+				}
+			}
+
+			if ( ! checksDefaultProps || ! componentName ) {
+				return;
+			}
+
+			const fn = path.getFunctionParent();
+			if ( fn && fn.node.body.type === 'BlockStatement' ) {
+				matches.push( { fn: fn.node, componentName } );
+			}
+		},
+	} );
+
+	if ( matches.length !== 1 ) {
+		throw new Error(
+			`[react-patch] Expected exactly one \`updateMemoComponent\`-like function (testing \`defaultProps === undefined\` and \`compare === null\`) in ${ filename }, found ${ matches.length }.`
+		);
+	}
+
+	// `updateMemoComponent( current, workInProgress, Component, nextProps, … )`:
+	// the props to resolve are the parameter after the memo wrapper.
+	const { fn, componentName } = matches[ 0 ];
+	const componentIndex = fn.params.findIndex(
+		( param ) => param.type === 'Identifier' && param.name === componentName
+	);
+	const propsParam = fn.params[ componentIndex + 1 ];
+	if ( componentIndex === -1 || propsParam?.type !== 'Identifier' ) {
+		throw new Error(
+			`[react-patch] Could not locate the props parameter following \`${ componentName }\` in ${ filename }.`
+		);
+	}
+
+	helpers.add( resolveMemoHelperSource() );
+
+	// Resolving at the top of the function covers both the mount and the update
+	// branch, and `lazy( memo( … ) )`, which routes through here too.
+	ms.appendRight(
+		fn.body.start + 1,
+		`${ propsParam.name } = ${ RESOLVE_MEMO_HELPER_NAME }(${ componentName }.type, ${ propsParam.name });`
+	);
+}
+
+/**
+ * A patch pass operates on a shared AST and `magic-string` for a single source,
+ * and may add to the set of helper sources injected into the bundle.
+ *
+ * @typedef {( ast: Object, ms: MagicString, filename: string, helpers: Set< string > ) => void} PatchPass
  */
 
 /**
@@ -578,18 +776,24 @@ export function createPatcher( ...passes ) {
 	return ( code, filename = 'input.js' ) => {
 		const ast = parse( code, { sourceType: 'unambiguous' } );
 		const ms = new MagicString( code );
+		const helpers = new Set( [ warnHelperSource() ] );
 
 		for ( const pass of passes ) {
-			pass( ast, ms, filename );
+			pass( ast, ms, filename, helpers );
 		}
 
-		// Inject the compatibility-warning helper that the patches call at
-		// runtime. It is a hoisted function declaration, so it is reachable from
-		// the patched call sites (inside the bundle's IIFE) via closure.
-		injectWarnHelper( ast, ms );
+		// Inject the helpers that the patches call at runtime. They are hoisted
+		// function declarations, so they are reachable from the patched call
+		// sites (inside the bundle's IIFE) via closure.
+		injectHelpers( ast, ms, [ ...helpers ].join( '' ) );
 
 		return ms.toString();
 	};
 }
 
-export { patchTransitionalSymbols, patchCoerceRef, patchInertAttribute };
+export {
+	patchTransitionalSymbols,
+	patchCoerceRef,
+	patchInertAttribute,
+	patchMemoDefaultProps,
+};

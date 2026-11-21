@@ -27,7 +27,7 @@ Prefer reversible changes, and make both the change and the way back visible. An
 -   Irreversible confirms use `isDestructive` on the confirm button and say so in the label ("Delete permanently", not "Delete"). Follow the [destructive actions pattern](../../../storybook/stories/design-system/patterns/destructive-actions.mdx).
 -   Announce a mutation that succeeds, and offer Undo when the prior value is in scope. Capture that value explicitly rather than popping the undo stack, which would revert unrelated edits too.
 -   `Snackbar` renders one action only; more logs a warning and truncates to `actions[0]` (`packages/components/src/snackbar/index.tsx`). Undo or another button, not both.
--   A snackbar dismisses itself six seconds after appearing. Keep it readable in that time, and use `explicitDismiss` or a different notice for anything that must be read.
+-   A snackbar dismisses itself six seconds after appearing, so use `explicitDismiss` or a different notice for anything the user must finish reading. The copy guide covers how long the text itself can be.
 -   When a mutation fails, leave the user able to try again: keep their input, restore consistent state, release any control left busy, and make a retry safe.
 -   `saveEntityRecord` and `deleteEntityRecord` add nothing to the undo stack, so anything already persisted needs its own recovery path. `editEntityRecord` records an undo level unless called with `undoIgnore`.
 

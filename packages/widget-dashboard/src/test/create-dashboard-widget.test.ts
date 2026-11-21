@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { createDashboardWidget } from '../utils/create-dashboard-widget';
 

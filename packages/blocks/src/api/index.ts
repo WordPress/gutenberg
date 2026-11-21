@@ -167,10 +167,6 @@ export {
 	__EXPERIMENTAL_ELEMENTS,
 	__EXPERIMENTAL_PATHS_WITH_OVERRIDE,
 } from './constants';
-// Allows blocks to declare private keys (fields form)
-// that we can use to generate UI controls for them via DataForm.
-const fieldsKey = Symbol( 'fields' );
-const formKey = Symbol( 'form' );
 // A private block setting, opted into by core text blocks, that makes the
 // editor canvas the contentEditable editing host (see `useEditableRoot`). It's
 // a Symbol rather than a `supports` key so it stays private for now: it can't
@@ -178,12 +174,12 @@ const formKey = Symbol( 'form' );
 // become a public support once the feature has settled.
 const editableRootKey = Symbol( 'editableRoot' );
 import { parseRawBlock as _parseRawBlock } from './parser';
+import { applyBuiltInValidationFixes } from './parser/apply-built-in-validation-fixes';
 
 export const privateApis = {};
 lock( privateApis, {
 	isContentBlock,
-	fieldsKey,
-	formKey,
 	editableRootKey,
 	parseRawBlock: _parseRawBlock,
+	applyBuiltInValidationFixes,
 } );

@@ -26,7 +26,10 @@ function isEnvironmentInitialized( config ) {
 		return true;
 	}
 
-	return false;
+	// Check for the PHP runtime's site
+	return existsSync(
+		path.join( config.workDirectoryPath, 'php', 'wp-config.php' )
+	);
 }
 
 /**

@@ -3,13 +3,13 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ShortcutProvider } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
-import type { Field } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
+import type { AspectRatioPreset } from '../../state/aspect-ratio-presets';
 import MediaEditor from '../media-editor';
 import type { Media } from '../media-editor-provider';
 import { store as mediaEditorStore } from '../../store';
 import type { MediaEditorModalUpdate } from '../../store/actions';
-import type { AspectRatioPreset } from '../../image-editor/core/constants';
 
 interface MediaEditorModalProps {
 	/**
@@ -20,64 +20,55 @@ interface MediaEditorModalProps {
 	 */
 	fields?: Field< Media >[];
 	/**
+	 * Form the fields are laid out with in the Details tab. When omitted,
+	 * a default layout of the core attachment fields is used.
+	 */
+	form?: Form;
+	/**
 	 * Fixed aspect-ratio presets for image cropping. Free and Original are
 	 * always provided by the media editor.
 	 */
 	aspectRatioPresets?: AspectRatioPreset[];
 }
 
-interface ModalFooterProps {
-	layout: 'wide' | 'narrow';
-}
-
 /**
- * The modal's footer chrome. The fine-rotation ruler always lives under the
- * canvas (in `media-editor__content`), never here, so it stays constrained to
- * the canvas column at every viewport. One JSX tree per layout; DOM order
- * matches visual order.
+ * The modal's footer chrome. The fine-rotation ruler and the image controls
+ * both live under the canvas (in `media-editor__content`), never here, so the
+ * footer has one layout at every width: History on the left, Cancel/Save on
+ * the right.
  */
-function ModalFooter( { layout }: ModalFooterProps ) {
+function ModalFooter() {
 	return (
 		<div
-			className={ `media-editor-modal__footer is-${ layout }` }
+			className="media-editor-modal__footer"
 			role="region"
 			aria-label={ __( 'Editor actions' ) }
 		>
-			{ layout === 'wide' ? (
-				// Sidebar is a column: the image controls live in the Crop
-				// panel, so the footer is just History + Cancel/Save.
-				<>
-					<MediaEditor.HistoryActions />
-					<MediaEditor.SaveActions />
-				</>
-			) : (
-				// Sidebar collapsed: the image controls drop into the footer.
-				<>
-					<MediaEditor.ImageControls />
-					<div className="media-editor-modal__footer-row">
-						<MediaEditor.HistoryActions />
-						<MediaEditor.SaveActions />
-					</div>
-				</>
-			) }
+			<MediaEditor.HistoryActions />
+			<MediaEditor.SaveActions />
 		</div>
 	);
 }
 
 export function MediaEditorModal( {
 	fields = [],
+	form,
 	aspectRatioPresets,
 }: MediaEditorModalProps ) {
-	const { isModalOpen, id, onUpdate, onClose } = useSelect( ( select ) => {
-		const { isOpen, getId, getOnUpdate, getOnClose } =
-			select( mediaEditorStore );
-		return {
-			isModalOpen: isOpen(),
-			id: getId(),
-			onUpdate: getOnUpdate(),
-			onClose: getOnClose(),
-		};
-	}, [] );
+	const { isModalOpen, id, onUpdate, onUndo, onClose } = useSelect(
+		( select ) => {
+			const { isOpen, getId, getOnUpdate, getOnUndo, getOnClose } =
+				select( mediaEditorStore );
+			return {
+				isModalOpen: isOpen(),
+				id: getId(),
+				onUpdate: getOnUpdate(),
+				onUndo: getOnUndo(),
+				onClose: getOnClose(),
+			};
+		},
+		[]
+	);
 
 	const { closeMediaEditorModal } = useDispatch( mediaEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -108,6 +99,7 @@ export function MediaEditorModal( {
 		<MediaEditor
 			id={ id }
 			fields={ fields }
+			form={ form }
 			aspectRatioPresets={ aspectRatioPresets }
 			shouldCloseOnEsc
 			noticesClassName="media-editor-modal__snackbar"
@@ -132,6 +124,10 @@ export function MediaEditorModal( {
 							{
 								label: __( 'Undo' ),
 								onClick: () => {
+									if ( onUndo ) {
+										onUndo();
+										return;
+									}
 									onUpdate( {
 										id: previous.id,
 										url: previous.url,
@@ -144,7 +140,6 @@ export function MediaEditorModal( {
 			} }
 			renderFrame={ ( {
 				children,
-				layout,
 				onRequestClose,
 				onKeyDown,
 				shouldCloseOnClickOutside,
@@ -166,7 +161,7 @@ export function MediaEditorModal( {
 						}
 					>
 						{ children }
-						<ModalFooter layout={ layout } />
+						<ModalFooter />
 					</Modal>
 				</ShortcutProvider>
 			) }

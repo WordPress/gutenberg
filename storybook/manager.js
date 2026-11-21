@@ -6,8 +6,8 @@ import theme from './theme';
 addons.setConfig( {
 	sidebar,
 	tagBadges: Object.entries( badges ).map(
-		( [ key, { title, styles, tooltip } ] ) => ( {
-			tags: `status-${ key }`,
+		( [ tag, { title, styles, tooltip } ] ) => ( {
+			tags: tag,
 			badge: {
 				text: title,
 				...( styles && { style: styles } ),

@@ -4,19 +4,20 @@ import { forwardRef, useEffect, useId } from '@wordpress/element';
 import defenseStyles from '../../../utils/css/global-css-defense.module.css';
 import fieldStyles from '../../../utils/css/field.module.css';
 import { useFieldsetContext } from './context';
+import styles from './style.module.css';
 import type { FieldsetDescriptionProps } from './types';
 
 export const FieldsetDescription = forwardRef<
 	HTMLParagraphElement,
 	FieldsetDescriptionProps
->( function FieldsetDescription(
+>( function UnforwardedFieldsetDescription(
 	{ className, id: idProp, render, ...restProps },
 	ref
 ) {
 	const generatedId = useId();
 	const id = idProp ?? generatedId;
 	const { registerDescriptionId, unregisterDescriptionId } =
-		useFieldsetContext();
+		useFieldsetContext( 'Fieldset.Description' );
 
 	useEffect( () => {
 		registerDescriptionId( id );
@@ -31,6 +32,7 @@ export const FieldsetDescription = forwardRef<
 			{
 				className: clsx(
 					defenseStyles.p,
+					styles.description,
 					fieldStyles.description,
 					className
 				),

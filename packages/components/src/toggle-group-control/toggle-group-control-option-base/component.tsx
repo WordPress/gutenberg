@@ -63,6 +63,9 @@ function ToggleGroupControlOptionBase(
 		...otherButtonProps
 	} = buttonProps;
 
+	const isOptionDisabled = Boolean(
+		toggleGroupControlContext.disabled || disabled
+	);
 	const isPressed = toggleGroupControlContext.value === value;
 	const labelClasses = clsx(
 		styles.label,
@@ -93,6 +96,13 @@ function ToggleGroupControlOptionBase(
 		ref: forwardedRef,
 	};
 
+	// Text labels reserve the width of their emphasized (pressed) weight, so
+	// that pressing an option doesn't change the width of the control.
+	const buttonContentProps = {
+		className: styles[ 'button-content' ],
+		'data-label': typeof children === 'string' ? children : undefined,
+	};
+
 	const labelRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( isPressed && labelRef.current ) {
@@ -109,14 +119,12 @@ function ToggleGroupControlOptionBase(
 				{ isDeselectable ? (
 					<button
 						{ ...commonProps }
-						disabled={ disabled }
+						disabled={ isOptionDisabled }
 						aria-pressed={ isPressed }
 						type="button"
 						onClick={ buttonOnClick }
 					>
-						<div className={ styles[ 'button-content' ] }>
-							{ children }
-						</div>
+						<div { ...buttonContentProps }>{ children }</div>
 					</button>
 				) : (
 					<Ariakit.Radio
@@ -138,9 +146,7 @@ function ToggleGroupControlOptionBase(
 						render={ <button type="button" { ...commonProps } /> }
 						value={ value }
 					>
-						<div className={ styles[ 'button-content' ] }>
-							{ children }
-						</div>
+						<div { ...buttonContentProps }>{ children }</div>
 					</Ariakit.Radio>
 				) }
 			</WithToolTip>

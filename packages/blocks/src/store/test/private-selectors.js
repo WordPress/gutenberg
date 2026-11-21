@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import {
 	getBlockKeyboardShortcuts,
@@ -39,6 +40,7 @@ describe( 'private selectors', () => {
 				'wideSize',
 				'blockGap',
 				'textAlign',
+				'textShadow',
 			] );
 		} );
 
@@ -59,11 +61,19 @@ describe( 'private selectors', () => {
 				'fontWeight',
 				'lineHeight',
 				'padding',
-				'contentSize',
-				'wideSize',
-				'blockGap',
 				'textAlign',
 				'textDecoration',
+				'textShadow',
+				'backgroundGradient',
+				'backgroundImage',
+				'backgroundSize',
+				'borderColor',
+				'borderRadius',
+				'borderStyle',
+				'borderWidth',
+				'margin',
+				'shadow',
+				'writingMode',
 			] );
 		} );
 
@@ -87,12 +97,20 @@ describe( 'private selectors', () => {
 				'fontWeight',
 				'lineHeight',
 				'padding',
-				'contentSize',
-				'wideSize',
-				'blockGap',
 				'textAlign',
 				'textTransform',
+				'textShadow',
 				'letterSpacing',
+				'backgroundGradient',
+				'backgroundImage',
+				'backgroundSize',
+				'borderColor',
+				'borderRadius',
+				'borderStyle',
+				'borderWidth',
+				'margin',
+				'shadow',
+				'writingMode',
 			] );
 		} );
 
@@ -141,6 +159,7 @@ describe( 'private selectors', () => {
 				'blockGap',
 				'textAlign',
 				'textTransform',
+				'textShadow',
 				'letterSpacing',
 			] );
 		} );

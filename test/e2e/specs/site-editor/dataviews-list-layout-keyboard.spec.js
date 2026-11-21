@@ -1,5 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2).
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+// The list layout's inline primary action: "Edit" in the classic site editor,
+// "View" in the extensible one.
+const primaryActionLabel = isSiteEditorV2 ? 'View' : 'Edit';
+
 test.describe( 'Dataviews List Layout', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		// Activate a theme with permissions to access the site editor.
@@ -16,8 +23,14 @@ test.describe( 'Dataviews List Layout', () => {
 
 	test.beforeEach( async ( { admin, page } ) => {
 		// Go to the pages page, as it has the list layout enabled by default.
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await admin.visitSiteEditor( { postType: 'page' } );
+
+		// The extensible site editor's pages view defaults to the table
+		// layout; these tests exercise the list layout, so switch to it.
+		if ( isSiteEditorV2 ) {
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'List' } ).click();
+		}
 
 		// Wait for the pages dataviews UI to fully load including:
 		// - the "Add filter" button, enabled only after post type fields are loaded
@@ -27,13 +40,28 @@ test.describe( 'Dataviews List Layout', () => {
 			page.getByRole( 'button', { name: 'Add filter' } )
 		).toBeVisible();
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();
+
+		// Wait for Ariakit to auto-activate the first composite item; until
+		// then the items are not part of the tab sequence.
+		await expect(
+			page.getByRole( 'grid' ).locator( '[data-active-item]' )
+		).toBeVisible();
+
+		// The list layout previews the selected item in the editor canvas.
+		// Wait for it to mount so its load can't steal focus mid-test.
+		await expect(
+			page.locator( 'iframe[name="editor-canvas"]' )
+		).toBeVisible();
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		// Go back to the default theme.
+		// Go back to the default theme, and drop the persisted pages view so
+		// the layout switched to in `beforeEach` doesn't leak into other
+		// specs.
 		await Promise.all( [
 			requestUtils.activateTheme( 'twentytwentyone' ),
 			requestUtils.deleteAllPages(),
+			requestUtils.resetPreferences(),
 		] );
 	} );
 
@@ -63,7 +91,10 @@ test.describe( 'Dataviews List Layout', () => {
 		).toBeFocused();
 	} );
 
-	test( 'Navigates from items list to preview via TAB, and vice versa', async ( {
+	// In the extensible site editor the list's pagination footer sits between
+	// the items and the preview in the tab order, so the direct list ↔
+	// preview adjacency this test asserts only holds in the classic editor.
+	test( 'Navigates from items list to preview via TAB, and vice versa @site-editor-v1-only', async ( {
 		page,
 	} ) => {
 		// Start the sequence on the search component.
@@ -82,13 +113,16 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'Tab' );
 		await expect( firstItem ).toBeFocused();
 
-		// Go to the preview.
+		// Go to the preview. The classic editor's edit affordance is inside
+		// the "Editor content" region; the extensible editor renders its
+		// preview overlay next to it.
 		await page.keyboard.press( 'Tab' );
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor content' } )
-				.getByRole( 'button', { name: 'Edit' } )
-		).toBeFocused();
+		const previewEditButton = isSiteEditorV2
+			? page.getByRole( 'button', { name: 'Edit', exact: true } )
+			: page
+					.getByRole( 'region', { name: 'Editor content' } )
+					.getByRole( 'button', { name: 'Edit' } );
+		await expect( previewEditButton ).toBeFocused();
 
 		// Go back to the items list using SHIFT+TAB.
 		await page.keyboard.press( 'Shift+Tab' );
@@ -131,22 +165,28 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page One Edit Actions' } )
-				.getByRole( 'button', { name: 'Edit' } )
+				.getByRole( 'row', {
+					name: `Page One ${ primaryActionLabel } Actions`,
+				} )
+				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowRight' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page One Edit Actions' } )
+				.getByRole( 'row', {
+					name: `Page One ${ primaryActionLabel } Actions`,
+				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page One Edit Actions' } )
-				.getByRole( 'button', { name: 'Edit' } )
+				.getByRole( 'row', {
+					name: `Page One ${ primaryActionLabel } Actions`,
+				} )
+				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
@@ -196,15 +236,19 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page Two Edit Actions' } )
-				.getByRole( 'button', { name: 'Edit' } )
+				.getByRole( 'row', {
+					name: `Page Two ${ primaryActionLabel } Actions`,
+				} )
+				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page One Edit Actions' } )
-				.getByRole( 'button', { name: 'Edit' } )
+				.getByRole( 'row', {
+					name: `Page One ${ primaryActionLabel } Actions`,
+				} )
+				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
 
 		// Use arrow up/down to move through the list from the all actions button.
@@ -212,14 +256,18 @@ test.describe( 'Dataviews List Layout', () => {
 		await page.keyboard.press( 'ArrowDown' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page Two Edit Actions' } )
+				.getByRole( 'row', {
+					name: `Page Two ${ primaryActionLabel } Actions`,
+				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
 		await expect(
 			page
-				.getByRole( 'row', { name: 'Page One Edit Actions' } )
+				.getByRole( 'row', {
+					name: `Page One ${ primaryActionLabel } Actions`,
+				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
 	} );

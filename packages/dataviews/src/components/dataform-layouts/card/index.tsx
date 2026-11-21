@@ -11,6 +11,7 @@ import { __experimentalUseFocusOutside as useFocusOutside } from '@wordpress/com
 import { Card, CollapsibleCard, Stack } from '@wordpress/ui';
 import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -30,7 +31,7 @@ function isSummaryFieldVisible< Item >(
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
-	// If no summary config, dont't show any fields
+	// If no summary config, don't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -233,10 +234,10 @@ export default function FormCardField< Item >( {
 		hasFocusedContentRef.current = true;
 	}, [] );
 
-	// Reveal the errors of every field in the card once focus leaves the card,
-	// replicating at the card level how validated controls show errors on
-	// their first blur. Moving focus between fields within the card doesn't
-	// count, so the natural tab sequence is preserved.
+	// Reveal the errors of every field in the card once focus leaves the card.
+	// Unlike a validated control's own blur, this also reveals required fields
+	// left empty. Moving focus between fields within the card doesn't count,
+	// so the natural tab sequence is preserved.
 	const handleFocusOutside = useCallback( () => {
 		// Leaving without ever entering the fields — for instance tabbing past
 		// the header of a collapsed card — isn't an interaction to report on.
@@ -272,7 +273,7 @@ export default function FormCardField< Item >( {
 			( fieldDef ) => fieldDef.id === field.id
 		);
 
-		if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+		if ( ! canRenderField( fieldDefinition ) ) {
 			return null;
 		}
 

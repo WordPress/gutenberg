@@ -20,6 +20,7 @@ type SamplePost = {
 	password?: string;
 	filesize?: number;
 	dimensions?: string;
+	file_type?: string;
 	tags?: string[];
 	address1?: string;
 	address2?: string;
@@ -136,6 +137,12 @@ const fields: Field< SamplePost >[] = [
 		id: 'dimensions',
 		label: 'Dimensions',
 		type: 'text',
+		readOnly: true,
+	},
+	{
+		// No type and no Edit: a read-only field without an edit control.
+		id: 'file_type',
+		label: 'File type',
 		readOnly: true,
 	},
 	{
@@ -329,6 +336,7 @@ const LayoutRegularComponent = ( {
 		can_comment: false,
 		filesize: 1024,
 		dimensions: '1920x1080',
+		file_type: 'JPEG',
 		tags: [ 'photography' ],
 		description: 'This is a sample description.',
 	} );
@@ -366,6 +374,7 @@ const LayoutRegularComponent = ( {
 				'birthdate',
 				'filesize',
 				'dimensions',
+				'file_type',
 				'tags',
 				'description',
 				'longDescription',

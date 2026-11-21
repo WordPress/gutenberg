@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Day, Root, Chevron, NavButton } from './components';
+import { Day, Root, PreviousMonthButton, NextMonthButton } from './components';
 import styles from '../style.module.css';
 import resetStyles from '../../utils/css/resets.module.css';
 import focusStyles from '../../utils/css/focus.module.scss';
@@ -17,10 +17,10 @@ const CLASSNAMES = {
 	caption_label: styles[ 'caption-label' ],
 	button_next: styles[ 'nav-button' ],
 	button_previous: styles[ 'nav-button' ],
-	chevron: styles.chevron,
 	nav: styles.nav,
 	month_caption: styles[ 'month-caption' ],
 	months: styles.months,
+	month: styles.month,
 	month_grid: styles[ 'month-grid' ],
 	weekday: styles.weekday,
 	today: styles.today,
@@ -48,9 +48,7 @@ const CLASSNAMES = {
 };
 
 /*
- * Only `preview` carries styles — the shape of the dashed preview border is
- * picked by the `Day` component from the `preview_start` / `preview_end`
- * modifiers themselves, not from a class.
+ * The `Day` component exposes preview endpoints as data attributes on the SVG.
  */
 export const MODIFIER_CLASSNAMES = {
 	preview: styles.preview,
@@ -72,13 +70,10 @@ export const COMMON_PROPS = {
 	hideNavigation: false,
 	// Class names
 	classNames: CLASSNAMES,
-	// Default role
-	role: 'application',
 	components: {
 		Day,
 		Root,
-		Chevron,
-		PreviousMonthButton: NavButton,
-		NextMonthButton: NavButton,
+		PreviousMonthButton,
+		NextMonthButton,
 	},
 } as const;

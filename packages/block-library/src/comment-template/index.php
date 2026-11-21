@@ -12,8 +12,8 @@
  *
  * @global int $comment_depth
  *
- * @param WP_Comment[] $comments        The array of comments.
- * @param WP_Block     $block           Block instance.
+ * @param WP_Comment[] $comments The array of comments.
+ * @param WP_Block     $block    Block instance.
  * @return string
  */
 function block_core_comment_template_render_comments( $comments, $block ) {
@@ -108,7 +108,7 @@ function render_block_core_comment_template( $attributes, $content, $block ) {
 	}
 
 	if ( post_password_required( $block->context['postId'] ) ) {
-		return;
+		return '';
 	}
 
 	$comment_query = new WP_Comment_Query(

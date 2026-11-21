@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getImageDimensions } from '../get-image-dimensions';
 
 /**

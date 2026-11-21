@@ -1,38 +1,24 @@
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import * as github from '@actions/github';
 import * as core from '@actions/core';
-import type { PullRequestEvent } from '@octokit/webhooks-types';
-import { GitHubAPI } from './github-api.ts';
-import {
-	formatTestErrorMessage,
-	renderReportComment,
-	isReportComment,
-} from './markdown.ts';
+import { formatTestErrorMessage, renderReport } from './markdown.ts';
 import type { FlakyTestResult, ReportedFlakyTest } from './types.ts';
 
 async function run() {
-	// Flaky tests are only reported on pull requests. The workflow already
-	// filters other events out, so this is a safety net for reuse elsewhere.
-	if ( github.context.eventName !== 'pull_request' ) {
-		core.info(
-			`Flaky tests are only reported on pull requests, skipping the "${ github.context.eventName }" event.`
-		);
-		return;
-	}
+	const artifactPath = core.getInput( 'artifact-path', { required: true } );
 
-	const token = core.getInput( 'repo-token', { required: true } );
-	const artifactPath = core.getInput( 'artifact-path', {
-		required: true,
+	/*
+	 * A clean run produces no artifact at all, which is the ordinary case. Any
+	 * other failure has to surface: reporting it as clean would clear a report
+	 * that nothing had disproved.
+	 */
+	const flakyTestsDir = await fs.readdir( artifactPath ).catch( ( error ) => {
+		if ( error.code === 'ENOENT' ) {
+			return [] as string[];
+		}
+		throw error;
 	} );
 
-	const { runId: runID, repo } = github.context;
-	// Cast the payload type: https://github.com/actions/toolkit/tree/main/packages/github#webhook-payload-typescript-definitions
-	const payload = github.context.payload as PullRequestEvent;
-	const runURL = `https://github.com/${ repo.owner }/${ repo.repo }/actions/runs/${ runID }`;
-	const api = new GitHubAPI( token, repo );
-
-	const flakyTestsDir = await fs.readdir( artifactPath );
 	const flakyTests: FlakyTestResult[] = await Promise.all(
 		flakyTestsDir.map( ( filename ) =>
 			fs
@@ -41,8 +27,8 @@ async function run() {
 		)
 	);
 
-	if ( ! flakyTests || flakyTests.length === 0 ) {
-		// No flaky tests reported in this run.
+	if ( flakyTests.length === 0 ) {
+		core.info( 'No flaky tests to report.' );
 		return;
 	}
 
@@ -57,17 +43,16 @@ async function run() {
 		} )
 	);
 
-	const { html_url: commentUrl } = await api.createCommentOnPR(
-		payload.number,
-		renderReportComment( {
-			runURL,
-			reportedTests,
-			commitSHA: payload.pull_request.head.sha,
-		} ),
-		isReportComment
+	const outputPath = core.getInput( 'output-path', { required: true } );
+
+	await fs.mkdir( path.dirname( outputPath ), { recursive: true } );
+	await fs.writeFile(
+		outputPath,
+		renderReport( { reportedTests } ),
+		'utf-8'
 	);
 
-	core.info( `Reported the summary of the flaky tests to ${ commentUrl }` );
+	core.info( `Wrote a report of ${ reportedTests.length } flaky tests.` );
 }
 
 export { run };

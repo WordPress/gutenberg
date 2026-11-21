@@ -12,6 +12,10 @@ export function getOnUpdate( state: State ) {
 	return state.onUpdate;
 }
 
+export function getOnUndo( state: State ) {
+	return state.onUndo;
+}
+
 export function getOnClose( state: State ) {
 	return state.onClose;
 }

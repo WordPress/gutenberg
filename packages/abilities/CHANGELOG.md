@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Accept a date-time without a time zone offset, such as `2026-10-21T09:30:00`, in the `date-time` schema format, as the server does ([#86845](https://github.com/WordPress/gutenberg/pull/86845)).
+-   Validate the `uri` schema format with the URL parser of the platform, so that URLs with non-ASCII characters, such as a permalink under a non-ASCII permalink structure, are accepted ([#86844](https://github.com/WordPress/gutenberg/pull/86844)).
+
+## 0.26.0 (2026-11-18)
+
+## 0.25.0 (2026-11-04)
+
+## 0.24.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 0.23.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react`, `react-dom`, and their types as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 0.22.0 (2026-09-23)
+
+## 0.21.0 (2026-09-10)
+
+### Internal
+
+-   Remove tsconfig project references to packages that are not dependencies ([#82106](https://github.com/WordPress/gutenberg/pull/82106)).
+
+## 0.20.0 (2026-08-26)
+
 ### Internal
 
 -   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81517](https://github.com/WordPress/gutenberg/pull/81517))

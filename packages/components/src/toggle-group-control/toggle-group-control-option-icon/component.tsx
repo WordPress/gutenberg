@@ -3,6 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionIconProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+import { useToggleGroupControlContext } from '../context';
 import Icon from '../../icon';
 
 function UnforwardedToggleGroupControlOptionIcon(
@@ -13,6 +14,7 @@ function UnforwardedToggleGroupControlOptionIcon(
 	>,
 	ref: ForwardedRef< any >
 ) {
+	useToggleGroupControlContext( 'ToggleGroupControlOptionIcon' );
 	const { icon, label, ...restProps } = props;
 	return (
 		<ToggleGroupControlOptionBase

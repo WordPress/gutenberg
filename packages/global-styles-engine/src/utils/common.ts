@@ -42,6 +42,12 @@ export function splitSelectorList( selector: string ) {
 
 export const PRESET_METADATA = [
 	{
+		path: [ 'dimensions', 'aspectRatios' ],
+		valueKey: 'ratio',
+		cssVarInfix: 'aspect-ratio',
+		classes: [],
+	},
+	{
 		path: [ 'color', 'palette' ],
 		valueKey: 'color',
 		cssVarInfix: 'color',
@@ -98,6 +104,14 @@ export const PRESET_METADATA = [
 		cssVarInfix: 'font-family',
 		classes: [
 			{ classSuffix: 'font-family', propertyName: 'font-family' },
+		],
+	},
+	{
+		path: [ 'typography', 'textShadowPresets' ],
+		valueKey: 'textShadow',
+		cssVarInfix: 'text-shadow',
+		classes: [
+			{ classSuffix: 'text-shadow', propertyName: 'text-shadow' },
 		],
 	},
 	{
@@ -167,6 +181,7 @@ export const STYLE_PATH_TO_CSS_VAR_INFIX: Record< string, string > = {
 	shadow: 'shadow',
 	'typography.fontSize': 'font-size',
 	'typography.fontFamily': 'font-family',
+	'typography.textShadow': 'text-shadow',
 };
 
 /**
@@ -469,10 +484,18 @@ export function getResolvedValue(
 		'url' in resolvedValue &&
 		resolvedValue?.url
 	) {
-		resolvedValue.url = getResolvedThemeFilePath(
-			resolvedValue.url,
-			tree?._links?.[ 'wp:theme-file' ]
-		);
+		/*
+		 * Copy rather than write in place: `resolvedValue` is the caller's
+		 * own object or, when a `ref` was just resolved, the tree's — which
+		 * aliases the user or theme config.
+		 */
+		return {
+			...resolvedValue,
+			url: getResolvedThemeFilePath(
+				resolvedValue.url,
+				tree?._links?.[ 'wp:theme-file' ]
+			),
+		};
 	}
 
 	return resolvedValue;
@@ -492,7 +515,7 @@ function findInPresetsBy(
 					'blocks',
 					blockName,
 					...presetPath,
-			  ] )
+				] )
 			: undefined,
 		getValueFromObjectPath( settings, presetPath ),
 	].filter( Boolean );
@@ -579,7 +602,7 @@ function getValueFromCustomVariable(
 					blockName,
 					'custom',
 					...path,
-			  ] )
+				] )
 			: undefined ) ??
 		getValueFromObjectPath( features?.settings ?? {}, [
 			'custom',

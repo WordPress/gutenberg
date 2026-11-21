@@ -1,7 +1,10 @@
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { ComboboxControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type ComboboxControlProps = React.ComponentProps< typeof ComboboxControl >;
@@ -26,19 +29,24 @@ const UnforwardedValidatedComboboxControl = (
 
 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
 	// so we need to set it manually.
+	// The input holds the search text, which is empty while the combobox is
+	// focused even when an option is selected, so a selection satisfies
+	// `required` on its own.
+	const hasSelection = !! restProps.value;
 	useEffect( () => {
 		const input =
 			validityTargetRef.current?.querySelector< HTMLInputElement >(
 				'input[role="combobox"]'
 			);
 		if ( input ) {
-			input.required = required ?? false;
+			input.required = !! required && ! hasSelection;
 		}
-	}, [ required ] );
+	}, [ required, hasSelection ] );
 
 	return (
 		// TODO: Bug - Missing value error is not cleared immediately on change, waits for blur.
 		<ControlWithError
+			className="dataviews-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			ref={ mergedRefs }

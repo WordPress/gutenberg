@@ -1,4 +1,3 @@
-import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
 import type * as Y from 'yjs';
 import type { Awareness } from 'y-protocols/awareness';
 import type { ConnectionError } from './errors';
@@ -47,6 +46,14 @@ export type ProviderOn = < K extends keyof ProviderEventMap >(
 export interface ProviderCreatorResult {
 	destroy: () => void;
 	on: ProviderOn;
+
+	/**
+	 * Set to true when the provider calls `flushLocalUpdates` before it applies
+	 * each remote update to the document. The sync manager then keeps local
+	 * updates off the typing hot path while no remote peer is present. Without
+	 * it, the sync manager applies every local update at once.
+	 */
+	supportsDeferredUpdates?: boolean;
 }
 
 /**
@@ -96,6 +103,24 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
+
+	/**
+	 * Applies the local updates that the sync manager holds back while no
+	 * remote peer is present. A provider that calls this before it applies each
+	 * remote update to `ydoc` can set `supportsDeferredUpdates` on its result.
+	 * Otherwise a remote update that arrives first can be overwritten.
+	 * Older sync managers do not provide this callback.
+	 */
+	flushLocalUpdates?: () => void;
+
+	/**
+	 * The Yjs module used by the editor. Providers must use this instance
+	 * instead of bundling their own copy of Yjs. Two Yjs instances operating
+	 * on the same document cause silent data corruption:
+	 *
+	 * https://github.com/yjs/yjs/issues/438
+	 */
+	Y: typeof Y;
 }
 
 export type ProviderCreator = (
@@ -113,11 +138,6 @@ export interface SyncManagerUpdateOptions {
 	isNewUndoLevel?: boolean;
 }
 
-export interface SyncUndoStackState {
-	hasRedo: boolean;
-	hasUndo: boolean;
-}
-
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
@@ -129,7 +149,8 @@ export interface RecordHandlers {
 	persistCRDTDoc: () => void;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
-	onUndoStackChange?: ( state: SyncUndoStackState ) => void;
+	// Called when a local change to the record opened a new undo level.
+	onUndoLevelOpened?: () => void;
 }
 
 export interface SyncConfig {
@@ -171,6 +192,8 @@ export interface SyncManager {
 		objectId: ObjectID,
 		encodedSnapshot: string
 	) => boolean;
+	// Whether the entity was loaded for syncing and has not been unloaded.
+	isLoaded: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -183,8 +206,8 @@ export interface SyncManager {
 		objectType: ObjectType,
 		handlers: CollectionHandlers
 	) => Promise< void >;
-	// undoManager is undefined until the first entity is loaded.
-	undoManager: SyncUndoManager | undefined;
+	// The undo history of the loaded entities. See `SyncUndoManager`.
+	undoManager: SyncUndoManager;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	unloadAll: () => void;
 	update: (
@@ -196,13 +219,19 @@ export interface SyncManager {
 	) => void;
 }
 
-export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: (
-		ymap: Y.Map< any >,
-		handlers: Pick<
-			RecordHandlers,
-			'addUndoMeta' | 'restoreUndoMeta' | 'onUndoStackChange'
-		>
-	) => void;
+/**
+ * The undo history of the entities a sync manager has loaded, one Yjs undo
+ * manager per entity. Yjs tracks their changes, one level per stack item, and
+ * reports each new level through the record's `onUndoLevelOpened` handler. It
+ * is not an undo manager for the editor: the consumer keeps its own, in which
+ * each level names its entity, and delegates the level to that entity here
+ * when it is the one to undo or redo.
+ */
+export interface SyncUndoManager {
+	clearRedo: () => void;
+	hasRedo: () => boolean;
+	hasUndo: () => boolean;
+	redo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 	stopCapturing: () => void;
+	undo: ( objectType: ObjectType, objectId: ObjectID ) => boolean;
 }

@@ -1,0 +1,21 @@
+{
+	"version": 3,
+	"blockTypes": [ "core/preformatted" ],
+	"slug": "responsive-variation",
+	"title": "Responsive Variation",
+	"styles": {
+		"typography": {
+			"fontSize": "40px"
+		},
+		"@tablet": {
+			"typography": {
+				"fontSize": "28px"
+			}
+		},
+		"@mobile": {
+			"typography": {
+				"fontSize": "16px"
+			}
+		}
+	}
+}

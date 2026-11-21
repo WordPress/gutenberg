@@ -9,9 +9,13 @@ export const RovingTabIndexItem = forwardRef(
 	) {
 		const localRef = useRef< any >( null );
 		const ref = forwardedRef || localRef;
-		// @ts-expect-error - We actually want to throw an error if this is undefined.
-		const { lastFocusedElement, setLastFocusedElement } =
-			useRovingTabIndexContext();
+		const context = useRovingTabIndexContext();
+		if ( ! context ) {
+			throw new Error(
+				'TreeGridItem can only be rendered inside a TreeGrid component.'
+			);
+		}
+		const { lastFocusedElement, setLastFocusedElement } = context;
 		let tabIndex;
 
 		if ( lastFocusedElement ) {

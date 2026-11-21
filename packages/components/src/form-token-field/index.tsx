@@ -399,14 +399,14 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	function handleUpArrowKey() {
 		setSelectedSuggestionIndex( ( index ) => {
 			return (
-				( index === 0
+				( index <= 0
 					? getMatchingSuggestions(
 							incompleteTokenValue,
 							suggestions,
 							value,
 							maxSuggestions,
 							saveTransform
-					  ).length
+						).length
 					: index ) - 1
 			);
 		} );
@@ -682,7 +682,7 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 							matchingSuggestions.length
 						),
 						matchingSuggestions.length
-				  )
+					)
 				: __( 'No results.' );
 
 			debouncedSpeak( message, 'assertive' );

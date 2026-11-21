@@ -1,6 +1,10 @@
 import { forwardRef, useId, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalToggleGroupControl as ToggleGroupControl } from '@wordpress/components';
-import { ControlWithError } from './control-with-error';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	ControlWithError,
+} from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 
 type ToggleGroupControlProps = React.ComponentProps<
@@ -17,21 +21,27 @@ const UnforwardedValidatedToggleGroupControl = (
 		markWhenOptional,
 		...restProps
 	}: ValidatedToggleGroupControlProps,
-	forwardedRef: React.ForwardedRef< HTMLInputElement >
+	forwardedRef: React.ForwardedRef< HTMLDivElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
+	// The error describes the group, like its `help` text, because the item
+	// that receives focus changes with the selection.
+	const groupRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ groupRef, forwardedRef ] );
 
 	const nameAttr = useId();
 
 	return (
 		<div className="dataviews-validated-control__wrapper-with-error-delegate">
 			<ControlWithError
+				className="dataviews-validated-control"
 				required={ required }
 				markWhenOptional={ markWhenOptional }
 				customValidity={ customValidity }
 				getValidityTarget={ () => validityTargetRef.current }
+				getInteractiveTarget={ () => groupRef.current }
 			>
-				<ToggleGroupControl ref={ forwardedRef } { ...restProps } />
+				<ToggleGroupControl ref={ mergedRef } { ...restProps } />
 			</ControlWithError>
 			<input
 				className="dataviews-validated-control__error-delegate"
@@ -40,6 +50,7 @@ const UnforwardedValidatedToggleGroupControl = (
 				required={ required }
 				checked={ restProps.value !== undefined }
 				tabIndex={ -1 }
+				aria-hidden="true"
 				// A name attribute is needed for the `required` behavior to work.
 				name={ nameAttr }
 				onChange={ () => {} }
@@ -57,6 +68,6 @@ const UnforwardedValidatedToggleGroupControl = (
 
 export const ValidatedToggleGroupControl: React.ForwardRefExoticComponent<
 	React.PropsWithoutRef< ValidatedToggleGroupControlProps > &
-		React.RefAttributes< HTMLInputElement >
+		React.RefAttributes< HTMLDivElement >
 > = forwardRef( UnforwardedValidatedToggleGroupControl );
 ValidatedToggleGroupControl.displayName = 'ValidatedToggleGroupControl';

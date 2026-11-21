@@ -1,45 +1,46 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import mediaUpload from '../media-upload';
 import {
 	getState,
 	reset,
 } from '../../components/upload-progress-snackbar/tracker';
 
-jest.mock( '@wordpress/media-utils', () => ( {
-	uploadMedia: jest.fn(),
+vi.mock( import( '@wordpress/media-utils' ), () => ( {
+	uploadMedia: vi.fn(),
 } ) );
 
-jest.mock( '@wordpress/core-data', () => ( {
+vi.mock( import( '@wordpress/core-data' ), () => ( {
 	store: { name: 'core' },
 } ) );
 
-jest.mock( '../../store', () => ( {
+vi.mock( import( '../../store' ), () => ( {
 	store: { name: 'core/editor' },
 } ) );
 
-const mockLockPostSaving = jest.fn();
-const mockLockPostAutosaving = jest.fn();
+const mockLockPostSaving = vi.fn();
+const mockLockPostAutosaving = vi.fn();
 
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn( () => ( {
+vi.mock( import( '@wordpress/data' ), () => ( {
+	select: vi.fn( () => ( {
 		getCurrentPost: () => ( { id: 1 } ),
 		getEditorSettings: () => ( {
 			allowedMimeTypes: null,
 			maxUploadFileSize: 10 * 1024 * 1024,
 		} ),
 	} ) ),
-	dispatch: jest.fn( () => ( {
-		receiveEntityRecords: jest.fn(),
+	dispatch: vi.fn( () => ( {
+		receiveEntityRecords: vi.fn(),
 		lockPostSaving: mockLockPostSaving,
-		unlockPostSaving: jest.fn(),
+		unlockPostSaving: vi.fn(),
 		lockPostAutosaving: mockLockPostAutosaving,
-		unlockPostAutosaving: jest.fn(),
+		unlockPostAutosaving: vi.fn(),
 	} ) ),
 } ) );
 
 describe( 'mediaUpload', () => {
 	beforeEach( () => {
 		reset();
-		jest.clearAllMocks();
+		vi.clearAllMocks();
 	} );
 
 	it( 'registers files with the upload progress tracker and locks saving', () => {

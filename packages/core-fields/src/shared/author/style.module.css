@@ -1,0 +1,25 @@
+/*
+ * The avatar, icon and name of the author views of posts, media and
+ * templates.
+ */
+.avatar,
+.icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	inline-size: var(--wpds-dimension-size-2xs);
+	flex-shrink: 0;
+	/* One line of text tall, so it sits on the first line of a name that wraps. */
+	block-size: 1lh;
+}
+
+.icon svg {
+	/* Center the full icon while leaving its empty edges outside the column. */
+	flex-shrink: 0;
+	fill: currentColor;
+}
+
+.name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

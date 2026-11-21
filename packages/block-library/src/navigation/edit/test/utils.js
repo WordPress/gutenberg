@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { getUniqueTemplatePartTitle, getCleanTemplatePartSlug } from '../utils';
 
 describe( 'getUniqueTemplatePartTitle', () => {
@@ -56,6 +57,13 @@ describe( 'getCleanTemplatePartSlug', () => {
 	it( 'should return a slug with only latin chars', () => {
 		const title = 'Myɶ Template Partɮ';
 		expect( getCleanTemplatePartSlug( title ) ).toBe( 'my-template-part' );
+	} );
+
+	it( 'should replace accented letters with their unaccented forms', () => {
+		const title = 'Vyhľadávanie v portfóliu';
+		expect( getCleanTemplatePartSlug( title ) ).toBe(
+			'vyhladavanie-v-portfoliu'
+		);
 	} );
 
 	it( 'should return a slug with only latin chars and numbers', () => {

@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { get } from '../selectors';
 
 describe( 'selectors', () => {

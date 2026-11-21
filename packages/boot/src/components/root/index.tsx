@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -10,8 +11,7 @@ import {
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { UnsavedChangesWarning } from '@wordpress/editor';
+import { __, isRTL } from '@wordpress/i18n';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -19,22 +19,23 @@ import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
 import ErrorBoundary from '../error-boundary';
+import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
+import useRouteFocus from '../app/use-route-focus';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
 import styles from './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+const { UnsavedChangesWarning } = unlock( coreDataPrivateApis );
 
 export default function Root() {
 	const matches = useMatches();
 	const location = useLocation();
 	const currentMatch = matches[ matches.length - 1 ];
 	const canvas = ( currentMatch?.loaderData as any )?.canvas as
-		| CanvasData
-		| null
-		| undefined;
+		CanvasData | null | undefined;
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
@@ -53,10 +54,12 @@ export default function Root() {
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	const layoutRef = useSyncBodyBackground();
+	useRouteFocus( layoutRef );
 
 	return (
 		<SlotFillProvider>
 			<Tooltip.Provider>
+				<PluginArea />
 				<ThemeProvider
 					isRoot
 					color={ { ...themeColors, background: '#f8f8f8' } }
@@ -130,9 +133,13 @@ export default function Root() {
 									isMobileSidebarOpen &&
 									! isFullScreen && (
 										<motion.div
-											initial={ { x: '-100%' } }
+											initial={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											animate={ { x: 0 } }
-											exit={ { x: '-100%' } }
+											exit={ {
+												x: isRTL() ? '100%' : '-100%',
+											} }
 											transition={ {
 												type: 'tween',
 												duration: disableMotion
@@ -159,7 +166,8 @@ export default function Root() {
 								<ThemeProvider
 									color={ {
 										...themeColors,
-										background: '#ffffff',
+										// Reset to the default background color.
+										background: '#fcfcfc',
 									} }
 								>
 									<Outlet />
