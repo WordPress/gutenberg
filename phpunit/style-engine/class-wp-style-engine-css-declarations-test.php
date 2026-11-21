@@ -295,14 +295,44 @@ class WP_Style_Engine_CSS_Declarations_Test extends WP_UnitTestCase {
 		$css_declarations->add_declaration( 'padding-margin', array( 'top' => '10px' ) );
 
 		// Try to add other non-string values.
-		$css_declarations->add_declaration( 'font-size', 123 );
 		$css_declarations->add_declaration( 'margin', null );
+		$css_declarations->add_declaration( 'opacity', true );
+		$css_declarations->add_declaration( 'line-height', NAN );
+		$css_declarations->add_declaration( 'font-weight', INF );
 
 		// Only the valid string value should be stored.
 		$this->assertSame(
 			array( 'color' => 'red' ),
 			$css_declarations->get_declarations(),
 			'Non-string values should be rejected without causing errors.'
+		);
+	}
+
+	/**
+	 * Tests that numbers are converted to strings.
+	 *
+	 * @covers ::add_declaration
+	 */
+	public function test_should_convert_numbers_to_strings() {
+		$css_declarations = new WP_Style_Engine_CSS_Declarations_Gutenberg();
+
+		$css_declarations->add_declaration( 'line-height', 1.5 );
+		$css_declarations->add_declaration( 'font-weight', 300 );
+		$css_declarations->add_declaration( 'margin', 0 );
+
+		$this->assertSame(
+			array(
+				'line-height' => '1.5',
+				'font-weight' => '300',
+				'margin'      => '0',
+			),
+			$css_declarations->get_declarations(),
+			'Numbers should be stored as strings.'
+		);
+		$this->assertSame(
+			'line-height:1.5;font-weight:300;margin:0;',
+			$css_declarations->get_declarations_string(),
+			'Numbers should be output in the CSS declarations.'
 		);
 	}
 
