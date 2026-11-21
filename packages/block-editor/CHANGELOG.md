@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Bug Fixes
+
+-   Writing flow: Keep the editor header and block toolbar on screen when the on-screen keyboard opens on iOS, by moving the page's slide into the canvas's scroll ([#87192](https://github.com/WordPress/gutenberg/pull/87192)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
@@ -21,7 +25,6 @@
 
 ### Bug Fixes
 
--   Writing flow: Keep the editor header and block toolbar on screen when the on-screen keyboard opens on iOS, by moving the page's slide into the canvas's scroll ([#87192](https://github.com/WordPress/gutenberg/pull/87192)).
 -   Writing flow: Leave Tab with Ctrl, Cmd or Alt to the browser, so Ctrl+Shift+Tab no longer moves focus from the canvas to the "Editor canvas" stop ([#87011](https://github.com/WordPress/gutenberg/pull/87011)).
 -   `receiveBlocks`: Include the received blocks in `getBlocks()` and their client IDs in `getBlockOrder()`, instead of an `undefined` entry ([#85818](https://github.com/WordPress/gutenberg/pull/85818)).
 -   Inserter: Count inserts of blocks that match no variation toward the block's default variation, so blocks such as Group, Cover, File and Search can appear in Most used ([#86929](https://github.com/WordPress/gutenberg/pull/86929)).
