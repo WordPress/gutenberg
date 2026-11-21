@@ -37,12 +37,18 @@ export default function pluginTokenData( {
 	scssFilename = 'scss/design-token-fallbacks.scss',
 	additionalScssFilenames = [],
 }: PluginTokenDataOptions = {} ): Plugin {
+	let getFallback: ReturnType< typeof createTokenFallbackResolver >;
+
 	return {
 		name: '@wordpress/terrazzo-plugin-token-data',
+		enforce: 'pre',
+		transform( { tokens } ) {
+			// Capture aliases before the inline-alias plugin removes their targets.
+			getFallback = createTokenFallbackResolver( tokens );
+		},
 		async build( { getTransforms, outputFile } ) {
 			const tokens: Record< string, TokenMetadata > = {};
 			const groups: Record< string, TokenGroup > = {};
-			const getFallback = createTokenFallbackResolver();
 
 			// '.' is Terrazzo's identifier for the default (base) mode.
 			for ( const token of getTransforms( {

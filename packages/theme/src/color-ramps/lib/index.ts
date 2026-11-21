@@ -55,7 +55,6 @@ function calculateRamp( {
 	};
 } ) {
 	const rampResults = {} as Record< keyof Ramp, string >;
-	let warnings: ( keyof Ramp )[] | undefined;
 	let maxDeficit = -Infinity;
 	let maxDeficitDirection: RampDirection = 'lighter';
 	let maxDeficitStep;
@@ -190,16 +189,10 @@ function calculateRamp( {
 
 		// Add to results
 		rampResults[ stepName ] = getColorString( searchResults.color );
-
-		if ( ! searchResults.reached && ! contrast.ignoreWhenAdjustingSeed ) {
-			warnings ??= [];
-			warnings.push( stepName );
-		}
 	}
 
 	return {
 		rampResults,
-		warnings,
 		maxDeficit,
 		maxDeficitDirection,
 		maxDeficitStep,
@@ -252,23 +245,17 @@ export function buildRamp(
 	const sortedSteps = sortByDependency( config );
 
 	// Calculate the ramp with the initial seed.
-	const {
-		rampResults,
-		warnings,
-		maxDeficit,
-		maxDeficitDirection,
-		maxDeficitStep,
-	} = calculateRamp( {
-		seed,
-		sortedSteps,
-		config,
-		mainDir,
-		oppDir,
-		pinLightness,
-	} );
+	const { rampResults, maxDeficit, maxDeficitDirection, maxDeficitStep } =
+		calculateRamp( {
+			seed,
+			sortedSteps,
+			config,
+			mainDir,
+			oppDir,
+			pinLightness,
+		} );
 
 	let bestRamp = rampResults;
-	let bestWarnings = warnings;
 
 	if ( maxDeficit > CONTRAST_EPSILON && rescaleToFitContrastTargets ) {
 		const iterSteps = stepsForStep( maxDeficitStep!, config );
@@ -322,8 +309,31 @@ export function buildRamp(
 			pinLightness,
 		} );
 		bestRamp = finalResult.rampResults;
-		bestWarnings = finalResult.warnings;
+		seed = bestSeed;
 	}
+
+	// Check emitted colors, including reused steps. Numerical search results
+	// alone cannot establish their contrast after serialization.
+	const serializedSeed = getColorString( seed );
+	const warnings = sortedSteps.filter( ( stepName ) => {
+		const { contrast } = config[ stepName ];
+		if ( contrast.ignoreWhenAdjustingSeed ) {
+			return false;
+		}
+
+		return [
+			contrast.reference,
+			...( contrast.additionalReferences ?? [] ),
+		].some(
+			( referenceName ) =>
+				getContrast(
+					bestRamp[ stepName ],
+					referenceName === 'seed'
+						? serializedSeed
+						: bestRamp[ referenceName ]
+				) < contrast.target
+		);
+	} );
 
 	// Swap surface1 and surface3 for darker ramps to maintain visual elevation hierarchy.
 	// This ensures surface1 appears "behind" surface2, and surface3 appears "in front",
@@ -336,7 +346,7 @@ export function buildRamp(
 
 	return {
 		ramp: bestRamp,
-		warnings: bestWarnings,
+		warnings: warnings.length ? warnings : undefined,
 		direction: mainDir,
 	};
 }
