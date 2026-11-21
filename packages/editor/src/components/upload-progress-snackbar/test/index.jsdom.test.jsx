@@ -317,6 +317,7 @@ describe( 'UploadProgressSnackbar', () => {
 				id: 'upload-warning',
 				type: 'snackbar',
 				explicitDismiss: true,
+				onDismiss: expect.any( Function ),
 			}
 		);
 	} );
@@ -362,6 +363,53 @@ describe( 'UploadProgressSnackbar', () => {
 		expect( mockCreateNotice ).toHaveBeenCalledWith(
 			'warning',
 			'3 images were uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'starts the count again once the warning is dismissed', () => {
+		const warnings = [ 'a', 'b', 'c' ].map( ( id ) => ( {
+			id,
+			code: 'GENERAL',
+			message: `Warning ${ id }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings.slice( 0, 2 ) );
+		rerender( <UploadProgressSnackbar /> );
+
+		// The user dismisses the snackbar that reported two images.
+		mockCreateNotice.mock.lastCall[ 2 ].onDismiss();
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 2 );
+		expect( mockCreateNotice ).toHaveBeenLastCalledWith(
+			'warning',
+			'Warning c',
+			expect.objectContaining( { id: 'upload-warning' } )
+		);
+	} );
+
+	it( 'counts an upload once when it has several warnings', () => {
+		const warnings = [ 'a', 'a', 'b' ].map( ( id, index ) => ( {
+			id,
+			code: 'GENERAL',
+			message: `Warning ${ index }`,
+		} ) );
+
+		mockQueue( [] );
+		const { rerender } = render( <UploadProgressSnackbar /> );
+
+		mockQueue( [], 0, warnings );
+		rerender( <UploadProgressSnackbar /> );
+
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'warning',
+			'2 images were uploaded, but some of the sub-sized images could not be saved.',
 			expect.objectContaining( { id: 'upload-warning' } )
 		);
 	} );

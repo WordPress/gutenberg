@@ -143,20 +143,23 @@ export default function UploadProgressSnackbar() {
 		};
 	}, [ removeNotice ] );
 
-	// An image that uploaded without all of its files counts as uploaded, so
-	// nothing above reports it. One snackbar covers every warning added since
-	// mount, so a gallery on a full site does not stack one per image.
-	// Starting at the current length keeps a remount from bringing back
-	// warnings that were already dismissed.
-	const warningsAtMountRef = useRef( warnings.length );
+	// An image that uploaded without all of its image sizes counts as
+	// uploaded, so nothing above reports it. One snackbar covers every warning
+	// added since it was last dismissed, so a gallery on a full site does not
+	// stack one per image. Starting at the current length keeps a remount from
+	// bringing back warnings that were already shown.
+	const handledWarningsRef = useRef( warnings.length );
 	useEffect( () => {
-		const added = warnings.slice( warningsAtMountRef.current );
+		const added = warnings.slice( handledWarningsRef.current );
 		if ( added.length === 0 ) {
 			return;
 		}
 
+		// Count uploads, not warnings, in case one upload ever has several.
+		const count = new Set( added.map( ( { id } ) => id ) ).size;
+
 		let message = added[ 0 ].message;
-		if ( added.length > 1 ) {
+		if ( count > 1 ) {
 			const isOutOfStorage = added.every(
 				( { code } ) => code === ErrorCode.STORAGE_LIMIT_REACHED
 			);
@@ -166,18 +169,18 @@ export default function UploadProgressSnackbar() {
 						_n(
 							'%d image was uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
 							'%d images were uploaded, but some of the sub-sized images could not be saved because this site is out of storage space.',
-							added.length
+							count
 						),
-						added.length
+						count
 					)
 				: sprintf(
 						/* translators: %d: number of images */
 						_n(
 							'%d image was uploaded, but some of the sub-sized images could not be saved.',
 							'%d images were uploaded, but some of the sub-sized images could not be saved.',
-							added.length
+							count
 						),
-						added.length
+						count
 					);
 		}
 
@@ -185,6 +188,10 @@ export default function UploadProgressSnackbar() {
 			id: WARNING_NOTICE_ID,
 			type: 'snackbar',
 			explicitDismiss: true,
+			// Later warnings start a new snackbar and a new count.
+			onDismiss: () => {
+				handledWarningsRef.current = warnings.length;
+			},
 		} );
 	}, [ warnings, createNotice ] );
 
