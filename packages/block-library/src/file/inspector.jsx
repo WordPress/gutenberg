@@ -1,12 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import {
 	RangeControl,
-	SelectControl,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/ui';
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -25,9 +25,9 @@ export default function FileBlockInspector( {
 	const { href, textLinkHref, attachmentPage } = hrefs;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
+	let linkDestinationItems = [ { value: href, label: __( 'URL' ) } ];
 	if ( attachmentPage ) {
-		linkDestinationOptions = [
+		linkDestinationItems = [
 			{ value: href, label: __( 'Media file' ) },
 			{ value: attachmentPage, label: __( 'Attachment page' ) },
 		];
@@ -57,7 +57,7 @@ export default function FileBlockInspector( {
 									displayPreview
 										? __(
 												"Note: Most phone and tablet browsers won't display embedded PDFs."
-										  )
+											)
 										: null
 								}
 								checked={ !! displayPreview }
@@ -103,9 +103,16 @@ export default function FileBlockInspector( {
 					>
 						<SelectControl
 							label={ __( 'Link to' ) }
-							value={ textLinkHref }
-							options={ linkDestinationOptions }
-							onChange={ changeLinkDestinationOption }
+							value={
+								linkDestinationItems.find(
+									( item ) => item.value === textLinkHref
+								) ?? linkDestinationItems[ 0 ]
+							}
+							items={ linkDestinationItems }
+							onValueChange={ ( item ) =>
+								item &&
+								changeLinkDestinationOption( item.value )
+							}
 						/>
 					</ToolsPanelItem>
 					<ToolsPanelItem

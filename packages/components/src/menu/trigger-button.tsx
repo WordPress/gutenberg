@@ -7,7 +7,10 @@ import { Context } from './context';
 export const TriggerButton = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< TriggerButtonProps, 'button', false >
->( function TriggerButton( { children, disabled = false, ...props }, ref ) {
+>( function UnforwardedTriggerButton(
+	{ children, disabled = false, ...props },
+	ref
+) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

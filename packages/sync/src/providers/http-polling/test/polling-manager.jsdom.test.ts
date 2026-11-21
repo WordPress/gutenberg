@@ -7,7 +7,7 @@ import {
 	vi,
 	type Mock,
 } from 'vitest';
-import { type SyncPayload, type SyncResponse } from '../types';
+import { SyncUpdateType, type SyncPayload, type SyncResponse } from '../types';
 
 // Mock all external dependencies before imports.
 vi.mock( import( 'yjs' ), async ( importOriginal ) => ( {
@@ -19,11 +19,13 @@ vi.mock( import( 'yjs' ), async ( importOriginal ) => ( {
 
 vi.mock( import( 'lib0/encoding' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	createEncoder: vi.fn< typeof import('lib0/encoding').createEncoder >(
+	createEncoder: vi.fn< typeof import( 'lib0/encoding' ).createEncoder >(
 		() =>
-			( {} ) as ReturnType< typeof import('lib0/encoding').createEncoder >
+			( {} ) as ReturnType<
+				typeof import( 'lib0/encoding' ).createEncoder
+			>
 	),
-	toUint8Array: vi.fn< typeof import('lib0/encoding').toUint8Array >(
+	toUint8Array: vi.fn< typeof import( 'lib0/encoding' ).toUint8Array >(
 		() => new Uint8Array( [ 0 ] )
 	),
 } ) );
@@ -83,6 +85,7 @@ interface PollingManager {
 		room: string;
 		doc: unknown;
 		awareness: unknown;
+		flushLocalUpdates?: () => void;
 		log: () => void;
 		onStatusChange: () => void;
 	} ) => void;
@@ -178,9 +181,9 @@ function getServerAwareness(
 
 describe( 'polling-manager', () => {
 	let pollingManager: PollingManager;
-	let mockPostSyncUpdate: Mock< typeof import('../utils').postSyncUpdate >;
+	let mockPostSyncUpdate: Mock< typeof import( '../utils' ).postSyncUpdate >;
 	let mockPostSyncUpdateNonBlocking: Mock<
-		typeof import('../utils').postSyncUpdateNonBlocking
+		typeof import( '../utils' ).postSyncUpdateNonBlocking
 	>;
 	let mockApplyFilters: Mock;
 	let registeredRooms: Set< string >;
@@ -230,6 +233,44 @@ describe( 'polling-manager', () => {
 			configurable: true,
 			get: () => 'visible',
 		} );
+	} );
+
+	it.each( [
+		SyncUpdateType.UPDATE,
+		SyncUpdateType.SYNC_STEP_2,
+		SyncUpdateType.COMPACTION,
+	] )( 'flushes local edits before applying a remote %s', async ( type ) => {
+		const flushLocalUpdates = vi.fn();
+		const { applyUpdateV2 } = await import( 'yjs' );
+		const { readSyncMessage } = await import( 'y-protocols/sync' );
+		const applyRemoteUpdate = vi.mocked(
+			type === SyncUpdateType.SYNC_STEP_2
+				? readSyncMessage
+				: applyUpdateV2
+		);
+		mockPostSyncUpdate.mockResolvedValue( {
+			rooms: [
+				{
+					...syncResponse.rooms[ 0 ],
+					updates: [ { type, data: 'AA==' } ],
+				},
+			],
+		} );
+		pollingManager.registerRoom( {
+			room: 'test-room',
+			doc: createMockDoc(),
+			awareness: createMockAwareness(),
+			flushLocalUpdates,
+			log: vi.fn(),
+			onStatusChange: vi.fn(),
+		} );
+		await advancePollingTime( 0 );
+
+		expect( flushLocalUpdates ).toHaveBeenCalledTimes( 1 );
+		expect( applyRemoteUpdate ).toHaveBeenCalledTimes( 1 );
+		expect( flushLocalUpdates.mock.invocationCallOrder[ 0 ] ).toBeLessThan(
+			applyRemoteUpdate.mock.invocationCallOrder[ 0 ]
+		);
 	} );
 
 	describe( 'document size limit', () => {

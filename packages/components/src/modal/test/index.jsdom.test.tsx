@@ -19,7 +19,6 @@ describe( 'Modal', () => {
 				aria={ { describedby: 'description-id' } }
 				onRequestClose={ noop }
 			>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<p id="description-id">Description</p>
 			</Modal>
 		);
@@ -32,7 +31,6 @@ describe( 'Modal', () => {
 	it( 'applies the aria-labelledby attribute when provided', () => {
 		render(
 			<Modal aria={ { labelledby: 'title-id' } } onRequestClose={ noop }>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
@@ -48,12 +46,26 @@ describe( 'Modal', () => {
 				aria={ { labelledby: 'title-id' } }
 				onRequestClose={ noop }
 			>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
 		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
 			'Modal Title Attribute'
+		);
+	} );
+
+	it( 'keeps the title as the accessible name when the header is hidden', () => {
+		render(
+			<Modal
+				title="Test Title"
+				__experimentalHideHeader
+				onRequestClose={ noop }
+			>
+				<p>Modal content</p>
+			</Modal>
+		);
+		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
+			'Test Title'
 		);
 	} );
 
@@ -266,6 +278,70 @@ describe( 'Modal', () => {
 		// Closes outer modal > Unhides container.
 		await user.keyboard( '[Escape]' );
 		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+	} );
+
+	it( 'should keep the open modal accessible when a modal opened before it closes', async () => {
+		const user = userEvent.setup();
+
+		const OpenTogether = () => {
+			const [ isFirstShown, setIsFirstShown ] = useState( true );
+			const [ isSecondShown, setIsSecondShown ] = useState( true );
+			return (
+				<>
+					{ isFirstShown && (
+						<Modal
+							title="First"
+							onRequestClose={ () => setIsFirstShown( false ) }
+						>
+							<p>First modal content</p>
+						</Modal>
+					) }
+					{ isSecondShown && (
+						<Modal
+							title="Second"
+							onRequestClose={ () => setIsSecondShown( false ) }
+						>
+							<p>Second modal content</p>
+						</Modal>
+					) }
+				</>
+			);
+		};
+		const { container } = render( <OpenTogether /> );
+
+		// Second modal opens > closes first modal and stays accessible.
+		expect(
+			screen.queryByRole( 'dialog', { name: 'First' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'dialog', { name: 'Second' } )
+		).toBeVisible();
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
+
+		// Closes second modal > Unhides container.
+		await user.click( screen.getByRole( 'button', { name: 'Close' } ) );
+		expect( container ).not.toHaveAttribute( 'aria-hidden' );
+	} );
+
+	it( 'should keep the newest modal accessible when a modal opened before it stays open', () => {
+		const { container } = render(
+			<>
+				<Modal title="First" onRequestClose={ noop }>
+					<p>First modal content</p>
+				</Modal>
+				<Modal title="Second" onRequestClose={ noop }>
+					<p>Second modal content</p>
+				</Modal>
+			</>
+		);
+
+		expect(
+			screen.queryByRole( 'dialog', { name: 'First' } )
+		).not.toBeInTheDocument();
+		expect(
+			screen.getByRole( 'dialog', { name: 'Second' } )
+		).toBeVisible();
+		expect( container ).toHaveAttribute( 'aria-hidden', 'true' );
 	} );
 
 	it( 'keeps the @wordpress/ui compat overlay slot exposed while open', async () => {

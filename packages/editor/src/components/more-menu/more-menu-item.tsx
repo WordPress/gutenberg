@@ -1,8 +1,10 @@
 import { Icon as WCIcon } from '@wordpress/components';
 import { forwardRef, isValidElement } from '@wordpress/element';
 import { SVG } from '@wordpress/primitives';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Menu } from '@wordpress/ui';
+import {
+	// eslint-disable-next-line @wordpress/use-recommended-components
+	Menu,
+} from '@wordpress/ui';
 import type {
 	ComponentProps,
 	ForwardedRef,
@@ -19,9 +21,7 @@ type MenuShortcut = NonNullable<
  * Shortcut in any of the shapes the legacy `MenuItem` took.
  */
 type LegacyShortcut =
-	| string
-	| MenuShortcut
-	| { display: string; ariaLabel?: string };
+	string | MenuShortcut | { display: string; ariaLabel?: string };
 
 type MoreMenuItemProps = Omit<
 	HTMLAttributes< HTMLElement >,

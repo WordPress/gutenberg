@@ -88,4 +88,27 @@ describe( 'DropdownMenu', () => {
 
 		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 	} );
+
+	it( 'should not open menu when pressing arrow down on a disabled toggle that stays focusable', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<DropdownMenu
+				label="Open dropdown"
+				toggleProps={ { disabled: true, accessibleWhenDisabled: true } }
+				children={ () => <MenuItem>Item</MenuItem> }
+			/>
+		);
+
+		// Move focus on the toggle button
+		await user.tab();
+
+		const toggle = screen.getByRole( 'button', { name: 'Open dropdown' } );
+		expect( toggle ).toHaveFocus();
+
+		await user.keyboard( '[ArrowDown]' );
+
+		expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
+		expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
+	} );
 } );

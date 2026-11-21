@@ -1,5 +1,5 @@
 import memoize from 'memize';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { getBlockTypes } from '@wordpress/blocks';
 
 type TranslationMap = Record< string, string >;
@@ -36,25 +36,28 @@ const translationMap: TranslationMap = {
 	'styles.outline': __( 'Outline' ),
 	'styles.filter': __( 'Filter' ),
 	'styles.dimensions': __( 'Dimensions' ),
+	'styles.transform': _x(
+		'Transform',
+		'Visual transform styles such as rotate, move and scale'
+	),
 };
-const getBlockNames = memoize(
-	(): BlockNamesMap =>
-		getBlockTypes().reduce< BlockNamesMap >(
-			(
-				accumulator: BlockNamesMap,
-				{
-					name,
-					title,
-				}: {
-					name: string;
-					title: string;
-				}
-			) => {
-				accumulator[ name ] = title;
-				return accumulator;
-			},
-			{}
-		)
+const getBlockNames = memoize( (): BlockNamesMap =>
+	getBlockTypes().reduce< BlockNamesMap >(
+		(
+			accumulator: BlockNamesMap,
+			{
+				name,
+				title,
+			}: {
+				name: string;
+				title: string;
+			}
+		) => {
+			accumulator[ name ] = title;
+			return accumulator;
+		},
+		{}
+	)
 );
 const isObject = ( obj: any ): obj is Record< string, any > =>
 	obj !== null && typeof obj === 'object';
@@ -149,6 +152,7 @@ const COMPARED_STYLE_KEYS = [
 	'outline',
 	'filter',
 	'dimensions',
+	'transform',
 ] as const;
 
 /**

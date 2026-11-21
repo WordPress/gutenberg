@@ -62,8 +62,7 @@ export function ConnectorItem( {
 export type { ApiKeySource } from './types';
 
 type ConnectorHelpMessage =
-	| `${ string }%s${ string }`
-	| TransformedText< `${ string }%s${ string }` >;
+	`${ string }%s${ string }` | TransformedText< `${ string }%s${ string }` >;
 type ConnectorHelpInterpolatedMessage = `${ string }<a></a>${ string }`;
 
 function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
@@ -130,25 +129,9 @@ function useConnectorSettingsSave< TValue >(
 	};
 }
 
-function ConnectorSettingsFrame( {
-	readOnly,
-	children,
-}: {
-	readOnly: boolean;
-	children: ReactNode;
-} ) {
+function ConnectorSettingsFrame( { children }: { children: ReactNode } ) {
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-					  }
-					: undefined
-			}
-		>
+		<VStack spacing={ 4 } className="connector-settings">
 			{ children }
 		</VStack>
 	);
@@ -267,7 +250,7 @@ export function DefaultConnectorSettings( {
 						__(
 							'Your API key is stored securely. You can manage it at %s'
 						)
-				  )
+					)
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {
@@ -281,7 +264,7 @@ export function DefaultConnectorSettings( {
 	};
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'API Key' ) }
 				value={ apiKey }
@@ -383,7 +366,7 @@ export function ApplicationPasswordConnectorSettings( {
 	}
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
+		<ConnectorSettingsFrame>
 			<TextControl
 				label={ __( 'Username' ) }
 				value={ username }

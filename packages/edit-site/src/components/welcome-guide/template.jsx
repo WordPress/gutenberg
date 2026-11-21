@@ -5,7 +5,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '@wordpress/editor';
 
 export default function WelcomeGuideTemplate() {
-	const { toggle } = useDispatch( preferencesStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
@@ -30,7 +30,7 @@ export default function WelcomeGuideTemplate() {
 			contentLabel={ heading }
 			finishButtonText={ __( 'Continue' ) }
 			onFinish={ () =>
-				toggle( 'core/edit-site', 'welcomeGuideTemplate' )
+				setPreference( 'core/edit-site', 'welcomeGuideTemplate', false )
 			}
 			pages={ [
 				{

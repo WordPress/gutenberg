@@ -25,6 +25,11 @@ export const dateNumberFormatter = ( localeCode: string, timeZone?: string ) =>
 		timeZone,
 	} );
 
+export const formatDayNumber = ( date: Date, localeCode: string ) =>
+	dateNumberFormatter( localeCode )
+		.formatToParts( date )
+		.find( ( part ) => part.type === 'day' )?.value;
+
 export const weekdayFormatter = ( localeCode: string, timeZone?: string ) =>
 	new Intl.DateTimeFormat( localeCode, {
 		calendar: 'gregory',
@@ -48,7 +53,7 @@ export const getDateCell = (
 	locale = 'en-US'
 ) =>
 	screen.getByRole( 'gridcell', {
-		name: dateNumberFormatter( locale ).format( date ),
+		name: formatDayNumber( date, locale ),
 		...options,
 	} );
 
@@ -58,6 +63,6 @@ export const queryDateCell = (
 	locale = 'en-US'
 ) =>
 	screen.queryByRole( 'gridcell', {
-		name: dateNumberFormatter( locale ).format( date ),
+		name: formatDayNumber( date, locale ),
 		...options,
 	} );

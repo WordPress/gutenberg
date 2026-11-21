@@ -1,5 +1,5 @@
 /**
- * This filed is partially copied from @wordpress/keycodes to keep the package
+ * This filed is partially copied from `@wordpress/keycodes` to keep the package
  * (internal-)dependencies free.
  */
 

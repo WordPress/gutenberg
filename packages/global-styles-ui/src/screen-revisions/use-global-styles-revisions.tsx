@@ -76,7 +76,7 @@ export default function useGlobalStylesRevisions( {
 						'globalStyles',
 						globalStylesId,
 						_query
-				  ) || EMPTY_ARRAY
+					) || EMPTY_ARRAY
 				: EMPTY_ARRAY;
 			// @ts-expect-error - getUsers is not fully typed
 			const _authors: User[] =
@@ -87,7 +87,7 @@ export default function useGlobalStylesRevisions( {
 						'globalStyles',
 						globalStylesId,
 						_query,
-				  ] )
+					] )
 				: false;
 			return {
 				authors: _authors,

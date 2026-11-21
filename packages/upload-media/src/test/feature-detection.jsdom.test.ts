@@ -390,9 +390,9 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'applies a tighter budget to interlaced images', () => {
-			// ~150 MP: over the ~0.5 GiB interlaced budget but under the
-			// ~0.9 GiB baseline budget.
-			const dimensions = { width: 15000, height: 10000 };
+			// ~200 MP: over the ~0.75 GiB interlaced budget but under the
+			// ~1.5 GiB baseline budget.
+			const dimensions = { width: 17000, height: 12000 };
 
 			expect(
 				exceedsClientProcessingMemory( {
@@ -408,12 +408,23 @@ describe( 'feature-detection', () => {
 			).toBe( false );
 		} );
 
-		it( 'gates extremely large baseline images', () => {
-			// ~300 MP exceeds even the generous baseline budget.
+		it( 'allows a large interlaced image the 1 GiB budgets rejected', () => {
+			// ~150 MP interlaced exceeded the old ~0.5 GiB budget.
 			expect(
 				exceedsClientProcessingMemory( {
-					width: 20000,
-					height: 15000,
+					width: 15000,
+					height: 10000,
+					interlaced: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'gates extremely large baseline images', () => {
+			// ~450 MP exceeds even the generous baseline budget.
+			expect(
+				exceedsClientProcessingMemory( {
+					width: 25000,
+					height: 18000,
 					interlaced: false,
 				} )
 			).toBe( true );

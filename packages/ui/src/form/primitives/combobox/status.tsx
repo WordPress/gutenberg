@@ -2,7 +2,7 @@ import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { ComboboxStatusProps } from './types';
-import itemPopupStyles from '../../../utils/css/item-popup.module.css';
+import itemPopupStyles from '../../../utils/css/item-popup.module.scss';
 
 /**
  * Announces a status message politely to screen readers. Use it for the
@@ -13,7 +13,7 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
  * instead.
  */
 export const Status = forwardRef< HTMLDivElement, ComboboxStatusProps >(
-	function Status( { className, ...restProps }, ref ) {
+	function UnforwardedStatus( { className, ...restProps }, ref ) {
 		return (
 			<_Combobox.Status
 				className={ clsx( itemPopupStyles.status, className ) }

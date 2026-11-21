@@ -2,12 +2,23 @@ import { useSettings } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { privateApis as mediaEditorPrivateApis } from '@wordpress/media-editor';
+import { useViewConfig } from '@wordpress/views';
 import { unlock } from '../../lock-unlock';
 import usePostFields from '../post-fields';
 
 const { MediaEditorModal, store: mediaEditorStore } = unlock(
 	mediaEditorPrivateApis
 );
+
+/*
+ * The modal only renders a form, so it requests the `form` of the attachment
+ * view configuration alone.
+ */
+const VIEW_CONFIG = {
+	kind: 'postType',
+	name: 'attachment',
+	fields: [ 'form' ],
+};
 
 function ratioToNumber( ratio ) {
 	if ( ratio === undefined || ratio === null ) {
@@ -40,9 +51,9 @@ function aspectRatioPresetFromSettings( { name, ratio } = {} ) {
 /**
  * Mounts the MediaEditorModal alongside existing editor modals.
  *
- * Bridges `@wordpress/editor`'s `usePostFields('attachment')` hook
- * into the modal, since `@wordpress/media-editor` cannot depend on
- * `@wordpress/editor`.
+ * Bridges `@wordpress/editor`'s `usePostFields('attachment')` hook, and
+ * the form of the attachment view configuration, into the modal, since
+ * `@wordpress/media-editor` cannot depend on `@wordpress/editor`.
  *
  * Defers the attachment fields and settings reads until the modal
  * actually opens, so editor startup doesn't pay for them on every
@@ -63,6 +74,9 @@ export default function MediaEditorModalMount() {
 
 function MediaEditorModalContent() {
 	const fields = usePostFields( { postType: 'attachment' } );
+	// Until the form resolves, and if it fails to, the modal lays the fields
+	// out with its own default form.
+	const { form } = useViewConfig( VIEW_CONFIG );
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
 		'dimensions.aspectRatios.theme',
@@ -100,6 +114,7 @@ function MediaEditorModalContent() {
 	return (
 		<MediaEditorModal
 			fields={ fields }
+			form={ form }
 			aspectRatioPresets={ aspectRatioPresets }
 		/>
 	);

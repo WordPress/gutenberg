@@ -281,7 +281,7 @@ function getWebpackEntryPoints( buildType ) {
 
 					// Detects the proper file extension used in the defined source directory.
 					const [ entryFilepath ] = glob(
-						`${ entryName }.?(m)[jt]s?(x)`,
+						`${ entryName }.?([cm])[jt]s?(x)`,
 						{
 							absolute: true,
 							cwd: fromProjectRoot( getProjectSourcePath() ),
@@ -317,7 +317,7 @@ function getWebpackEntryPoints( buildType ) {
 
 		// 3. Checks whether a standard file name can be detected in the defined source directory,
 		//    and converts the discovered file to entry point.
-		const [ entryFile ] = glob( 'index.[jt]s?(x)', {
+		const [ entryFile ] = glob( 'index.@([cm]ts|js|jsx|ts|tsx)', {
 			absolute: true,
 			cwd: fromProjectRoot( getProjectSourcePath() ),
 		} );

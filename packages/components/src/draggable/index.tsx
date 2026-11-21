@@ -1,6 +1,6 @@
 import type { DragEvent } from 'react';
 import { throttle } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
+import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
 import { getWpCompatOverlaySlot } from '@wordpress/ui';
 import type { DraggableProps } from './types';
 import styles from './style.module.scss';
@@ -71,8 +71,13 @@ export function Draggable( {
 	__experimentalTransferDataType: transferDataType = 'text',
 	__experimentalDragComponent: dragComponent,
 }: DraggableProps ) {
-	const dragComponentRef = useRef< HTMLDivElement >( null );
 	const cleanupRef = useRef( () => {} );
+	// The clone wrapper `dragComponent` is portalled into while a drag is in
+	// progress. Nothing is rendered for it outside of a drag, so a long list
+	// of draggables (the inserter) does not pay for one hidden preview per
+	// item.
+	const [ dragComponentContainer, setDragComponentContainer ] =
+		useState< HTMLDivElement | null >( null );
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
@@ -82,10 +87,7 @@ export function Draggable( {
 	function end( event: DragEvent ) {
 		event.preventDefault();
 		cleanupRef.current();
-
-		if ( onDragEnd ) {
-			onDragEnd( event );
-		}
+		onDragEnd?.( event );
 	}
 
 	/**
@@ -140,19 +142,16 @@ export function Draggable( {
 
 		let x = 0;
 		let y = 0;
-		// If a dragComponent is defined, the following logic will clone the
-		// HTML node and inject it into the cloneWrapper.
-		if ( dragComponentRef.current ) {
-			// Position dragComponent at the same position as the cursor.
+		if ( dragComponent ) {
+			// Position dragComponent at the same position as the cursor. The
+			// component itself is rendered into the wrapper by the portal
+			// below.
 			x = event.clientX;
 			y = event.clientY;
 			cloneWrapper.style.transform = `translate( ${ x }px, ${ y }px )`;
 
-			const clonedDragComponent = ownerDocument.createElement( 'div' );
-			clonedDragComponent.innerHTML = dragComponentRef.current.innerHTML;
-			cloneWrapper.appendChild( clonedDragComponent );
-
 			( compatSlot ?? ownerDocument.body ).appendChild( cloneWrapper );
+			setDragComponentContainer( cloneWrapper );
 		} else {
 			const element = ownerDocument.getElementById(
 				elementId
@@ -208,9 +207,7 @@ export function Draggable( {
 			cursorTop = e.clientY;
 			x = nextX;
 			y = nextY;
-			if ( onDragOver ) {
-				onDragOver( e );
-			}
+			onDragOver?.( e );
 		}
 
 		// Aim for 60fps (16 ms per frame) for now. We can potentially use requestAnimationFrame (raf) instead,
@@ -223,33 +220,22 @@ export function Draggable( {
 		// Update cursor to 'grabbing', document wide.
 		ownerDocument.body.classList.add( bodyClass );
 
-		if ( onDragStart ) {
-			onDragStart( event );
-		}
+		onDragStart?.( event );
 
 		cleanupRef.current = () => {
-			// Remove drag clone.
-			if ( cloneWrapper && cloneWrapper.parentNode ) {
-				cloneWrapper.parentNode.removeChild( cloneWrapper );
-			}
-
-			if ( dragImage && dragImage.parentNode ) {
-				dragImage.parentNode.removeChild( dragImage );
-			}
+			cloneWrapper.remove();
+			dragImage.remove();
+			setDragComponentContainer( null );
 
 			// Reset cursor.
 			ownerDocument.body.classList.remove( bodyClass );
 
 			ownerDocument.removeEventListener( 'dragover', throttledDragOver );
+			cleanupRef.current = () => {};
 		};
 	}
 
-	useEffect(
-		() => () => {
-			cleanupRef.current();
-		},
-		[]
-	);
+	useEffect( () => () => cleanupRef.current(), [] );
 
 	return (
 		<>
@@ -257,15 +243,8 @@ export function Draggable( {
 				onDraggableStart: start,
 				onDraggableEnd: end,
 			} ) }
-			{ dragComponent && (
-				<div
-					className="components-draggable-drag-component-root"
-					style={ { display: 'none' } }
-					ref={ dragComponentRef }
-				>
-					{ dragComponent }
-				</div>
-			) }
+			{ dragComponentContainer &&
+				createPortal( dragComponent, dragComponentContainer ) }
 		</>
 	);
 }

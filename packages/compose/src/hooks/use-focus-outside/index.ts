@@ -12,9 +12,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  */
 type FocusNormalizedButton =
-	| HTMLButtonElement
-	| HTMLLinkElement
-	| HTMLInputElement;
+	HTMLButtonElement | HTMLLinkElement | HTMLInputElement;
 
 /**
  * Returns true if the given element is a button element subject to focus

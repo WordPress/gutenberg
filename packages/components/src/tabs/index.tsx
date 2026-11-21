@@ -35,7 +35,7 @@ function internalToExternalTabId(
  * It is responsible for managing the state of the tabs, and rendering one instance of the `Tabs.TabList` component and one or more instances of the `Tab.TabPanel` component.
  */
 export const Tabs = Object.assign(
-	function Tabs( {
+	function TabsRoot( {
 		selectOnMove = true,
 		defaultTabId,
 		orientation = 'horizontal',
@@ -46,7 +46,7 @@ export const Tabs = Object.assign(
 		defaultActiveTabId,
 		onActiveTabIdChange,
 	}: TabsProps ) {
-		const instanceId = useInstanceId( Tabs, 'tabs' );
+		const instanceId = useInstanceId( TabsRoot, 'tabs' );
 		const store = Ariakit.useTabStore( {
 			selectOnMove,
 			orientation,

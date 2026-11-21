@@ -9,14 +9,13 @@ import Tooltip from '../../tooltip';
 import Icon from '../../icon';
 
 const meta: Meta< typeof Tabs > = {
-	title: 'Components/Containers/Tabs',
+	title: 'Components/@wordpress-components/Containers/Tabs',
 	id: 'components-tabs',
 	component: Tabs,
 	subcomponents: {
 		'Tabs.TabList': Tabs.TabList,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.TabPanel': Tabs.TabPanel,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'Tabs.Context': Tabs.Context,
 	},
 	tags: [ 'status-private' ],

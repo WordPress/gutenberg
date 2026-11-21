@@ -1,0 +1,14 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as ComboboxStories from './index.story';
+
+<Meta of={ ComboboxStories } name="Usage guidelines" />
+
+# Combobox usage guidelines
+
+## Name the popup when it contains an input
+
+When `Combobox.Input` is inside `Combobox.Popup`, the popup renders with `role="dialog"` and needs its own accessible name. Give the popup an `aria-label` or an `aria-labelledby` that references an existing label element. Naming `Combobox.Trigger` or `Combobox.Input` does not name the popup dialog.
+
+The default example labels the trigger and popup as Fruit, and the input as Search. Preserve all three names when adapting the example.
+
+<Canvas of={ ComboboxStories.Default } />

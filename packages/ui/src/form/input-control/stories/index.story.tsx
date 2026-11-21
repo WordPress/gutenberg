@@ -16,7 +16,8 @@ import {
 
 const meta: Meta< typeof InputControl > = {
 	tags: [ 'manifest' ],
-	title: 'Design System/Components/Form/InputControl',
+	title: 'Components/@wordpress-ui/Form/InputControl',
+	id: 'design-system-components-form-inputcontrol',
 	component: InputControl,
 	argTypes: {
 		defaultValue: { control: false },
@@ -164,6 +165,15 @@ export const NumberWithSteppers: Story = {
 export const Disabled: Story = {
 	args: {
 		...Default.args,
+		defaultValue: 'Disabled value',
 		disabled: true,
+	},
+};
+
+export const ReadOnly: Story = {
+	args: {
+		...Default.args,
+		defaultValue: 'Read-only value',
+		readOnly: true,
 	},
 };

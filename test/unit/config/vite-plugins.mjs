@@ -1,10 +1,7 @@
-import { createRequire } from 'node:module';
 import path from 'node:path';
-import react from '@vitejs/plugin-react-swc';
+import react from '@vitejs/plugin-react';
 import { compileInlineStyle } from '../../../packages/wp-build/lib/compile-inline-style.mjs';
 
-const nodeRequire = createRequire( import.meta.url );
-const emotionPlugin = nodeRequire.resolve( '@swc/plugin-emotion' );
 const WP_BUILD_CSS_MODULE_STYLE_FIXTURE_ID = 'virtual:wp-build-style-injection';
 const WP_BUILD_ORDINARY_STYLE_FIXTURE_ID =
 	'virtual:wp-build-ordinary-style-injection';
@@ -55,20 +52,11 @@ export async function createVitePlugins( rootDir ) {
 			},
 			load( id ) {
 				return id.startsWith( '\0' )
-					? wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ?? null
+					? ( wpBuildStyleFixtureSources.get( id.slice( 1 ) ) ??
+							null )
 					: null;
 			},
 		},
-		react( {
-			plugins: [
-				[
-					emotionPlugin,
-					{
-						autoLabel: 'always',
-						labelFormat: '[local]',
-					},
-				],
-			],
-		} ),
+		react(),
 	];
 }

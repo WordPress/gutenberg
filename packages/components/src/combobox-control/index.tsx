@@ -293,12 +293,14 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							matchingSuggestions.length
 						),
 						matchingSuggestions.length
-				  )
+					)
 				: __( 'No results.' );
 
 			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
+
+	const isSuggestionsListVisible = isExpanded && ! isLoading;
 
 	// Disable reason: There is no appropriate role which describes the
 	// input container intended accessible usability.
@@ -329,7 +331,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								onFocus={ onFocus }
 								onBlur={ onBlur }
 								onClick={ onClick }
-								isExpanded={ isExpanded }
+								isExpanded={ isSuggestionsListVisible }
 								selectedSuggestionIndex={ getIndexOfMatchingSuggestion(
 									selectedSuggestion,
 									matchingSuggestions
@@ -338,7 +340,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 								aria-describedby={
 									help
 										? // TODO: Refactor `TokenInput` to not use hardcoded IDs.
-										  `components-form-token-input-${ instanceId }__help`
+											`components-form-token-input-${ instanceId }__help`
 										: undefined
 								}
 							/>
@@ -354,7 +356,7 @@ function ComboboxControl( props: ComboboxControlProps ) {
 							/>
 						) }
 					</Flex>
-					{ isExpanded && ! isLoading && (
+					{ isSuggestionsListVisible && (
 						<SuggestionsList
 							instanceId={ instanceId }
 							// The empty string for `value` here is not actually used, but is

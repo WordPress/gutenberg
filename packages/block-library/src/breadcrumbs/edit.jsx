@@ -3,17 +3,20 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	ToggleControl,
 	TextControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { useDisabled } from '@wordpress/compose';
-import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	canUserEditPostContext,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 
 const separatorDefaultValue = '/';
@@ -33,6 +36,7 @@ export default function BreadcrumbEdit( {
 	} = attributes;
 	const {
 		post,
+		canEditPost,
 		isPostTypeHierarchical,
 		postTypeHasTaxonomies,
 		hasTermsAssigned,
@@ -44,6 +48,18 @@ export default function BreadcrumbEdit( {
 			}
 			const _post = select( coreStore ).getEntityRecord(
 				'postType',
+				postType,
+				postId
+			);
+			const _canReadPost = postId
+				? select( coreStore ).canUser( 'read', {
+						kind: 'postType',
+						name: postType,
+						id: postId,
+					} )
+				: undefined;
+			const _canEditPost = canUserEditPostContext(
+				select,
 				postType,
 				postId
 			);
@@ -59,6 +75,7 @@ export default function BreadcrumbEdit( {
 			}
 			return {
 				post: _post,
+				canEditPost: _canEditPost,
 				isPostTypeHierarchical: postTypeObject?.hierarchical,
 				postTypeHasTaxonomies: _postTypeHasTaxonomies,
 				hasTermsAssigned:
@@ -71,7 +88,17 @@ export default function BreadcrumbEdit( {
 							return !! _post[ taxonomy.rest_base ]?.length;
 						} ),
 				isLoading:
-					( postId && ! _post ) ||
+					// Wait for the post record only while it can still be
+					// expected. The record is requested with `context=edit`,
+					// so it never arrives when the user can't edit the post
+					// (`_canEditPost === false`), nor when the post isn't
+					// readable under `postType` at all
+					// (`_canReadPost === false`) — the placeholder or the
+					// server-side render is shown instead.
+					( postId &&
+						_canEditPost !== false &&
+						_canReadPost !== false &&
+						! _post ) ||
 					! postTypeObject ||
 					( _postTypeHasTaxonomies && ! taxonomies ),
 			};
@@ -100,7 +127,18 @@ export default function BreadcrumbEdit( {
 		attributes,
 		skipBlockSupportAttributes: true,
 		block: name,
-		urlQueryArgs: { post_id: postId, invalidationKey },
+		urlQueryArgs: {
+			// The block-renderer endpoint requires `edit_post` permissions
+			// for the post referenced by `post_id`, and the `postId` block
+			// context can reference a post the current user can't edit (e.g.
+			// another author's post in a query-like block), which failed with
+			// a 403 error. Withhold `post_id` only when the post is confirmed
+			// non-editable; when that can't be determined (e.g. `postId` and
+			// `postType` coming from different providers don't designate a
+			// readable post), forward it and let the server decide, as before.
+			post_id: canEditPost === false ? undefined : postId,
+			invalidationKey,
+		},
 	} );
 	const prevContentRef = useRef( '' );
 	useEffect( () => {
@@ -127,7 +165,7 @@ export default function BreadcrumbEdit( {
 	if ( isLoading ) {
 		return (
 			<div { ...blockProps }>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
@@ -151,6 +189,9 @@ export default function BreadcrumbEdit( {
 	const showPlaceholder =
 		! postId ||
 		! postType ||
+		// Without `post_id`, the server can't render the real breadcrumbs,
+		// so show the placeholder for posts the user can't edit.
+		canEditPost === false ||
 		// When `templateSlug` is set only show placeholder if the post type is not.
 		// This is needed because when we are showing the template in post editor we
 		// want to show the real breadcrumbs if we have the post type.
@@ -275,7 +316,7 @@ export default function BreadcrumbEdit( {
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ __( 'Show on homepage' ) }
 					checked={ showOnHomePage }
 					onChange={ ( value ) =>
@@ -285,7 +326,7 @@ export default function BreadcrumbEdit( {
 						'If this Breadcrumbs block appears in a template or template part that’s shown on the homepage, enable this option to display the breadcrumb trail. Otherwise, this setting has no effect.'
 					) }
 				/>
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ __( 'Prefer taxonomy terms' ) }
 					checked={ prefersTaxonomy }
 					onChange={ ( value ) =>
@@ -311,7 +352,7 @@ export default function BreadcrumbEdit( {
 					/>
 				) : (
 					<div { ...blockProps }>
-						<Spinner />
+						<WCSpinner />
 					</div>
 				) ) }
 			{ status === 'error' && (

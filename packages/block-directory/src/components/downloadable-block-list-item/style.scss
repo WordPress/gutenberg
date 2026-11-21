@@ -18,11 +18,11 @@
 	appearance: none;
 	background: none;
 	border: 0;
+	border-radius: var(--wpds-border-radius-sm);
 	text-align: left;
 
-	@media not (prefers-reduced-motion) {
-		transition: box-shadow 0.1s linear;
-	}
+	// Keep the focus ring visible when keyboard navigation scrolls an item into view.
+	scroll-margin: $grid-unit-05;
 
 	// The item contains absolutely positioned items.
 	// Set `position: relative` on the parent to prevent overflow issues
@@ -35,12 +35,12 @@
 		cursor: var(--wpds-cursor-control);
 	}
 
-	&:hover {
-		@include button-style__focus();
+	&:hover:not([aria-disabled="true"]) {
+		background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 	}
 
 	&[data-focus-visible] {
-		@include button-style__focus();
+		@include outset-ring__focus();
 	}
 
 	&.is-installing {

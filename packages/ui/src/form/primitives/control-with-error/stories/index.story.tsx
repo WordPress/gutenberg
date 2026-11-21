@@ -5,11 +5,13 @@ import { InputControl } from '../../../input-control';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ControlWithError > = {
-	title: 'Design System/Components/Form/Primitives/ControlWithError',
+	title: 'Components/@wordpress-ui/Form/Primitives/ControlWithError',
+	id: 'design-system-components-form-primitives-controlwitherror',
 	component: ControlWithError,
 	argTypes: {
 		children: { control: false },
 		getValidityTarget: { control: false },
+		getInteractiveTarget: { control: false },
 		customValidity: { control: false },
 	},
 	decorators: [ formDecorator ],
@@ -25,10 +27,6 @@ export default meta;
 
 type Story = StoryObj< typeof ControlWithError >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
- */
 export const Default: Story = {
 	args: {
 		required: true,
@@ -70,7 +68,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 				getValidityTarget={ () => inputRef.current }

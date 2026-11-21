@@ -13,7 +13,11 @@ import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
-import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
+import {
+	useConnectorPlugin,
+	type InstallButtonClickEvent,
+	type PluginStatus,
+} from './use-connector-plugin';
 import {
 	OpenAILogo,
 	ClaudeLogo,
@@ -44,14 +48,14 @@ interface ConnectorScriptModuleData {
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
 	try {
-		return JSON.parse(
-			document.getElementById(
-				'wp-script-module-data-options-connectors-wp-admin'
-			)?.textContent ?? '{}'
+		const script = document.querySelector(
+			'script[id="wp-script-module-data-options-connectors-wp-admin"]'
 		);
-	} catch {
-		return {};
-	}
+		if ( script instanceof HTMLScriptElement ) {
+			return JSON.parse( script.text );
+		}
+	} catch {}
+	return {};
 }
 
 /**
@@ -127,7 +131,7 @@ interface ConnectorActionAreaProps {
 	actionButtonRef: {
 		current: HTMLButtonElement | null;
 	};
-	handleButtonClick: () => void;
+	handleButtonClick: ( event?: InstallButtonClickEvent ) => void;
 	getButtonLabel: () => string;
 }
 
@@ -216,6 +220,10 @@ function ApiKeyConnector( {
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';
+	// A stored key is only available masked, so it can't be edited, even when
+	// it can't be verified. It has to be removed before entering a new one.
+	const isReadOnly =
+		isConnected || isExternallyConfigured || !! currentApiKey;
 	const showUnavailableBadge =
 		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
 		( pluginStatus === 'inactive' && canActivatePlugins === false );
@@ -248,14 +256,14 @@ function ApiKeyConnector( {
 				pluginStatus === 'active' &&
 				hasResolvedSettings && (
 					<DefaultConnectorSettings
-						key={ isConnected ? 'connected' : 'setup' }
+						key={ isReadOnly ? 'read-only' : 'setup' }
 						initialValue={
 							isExternallyConfigured
 								? '••••••••••••••••'
 								: currentApiKey
 						}
 						helpUrl={ helpUrl }
-						readOnly={ isConnected || isExternallyConfigured }
+						readOnly={ isReadOnly }
 						keySource={ keySource }
 						onRemove={
 							isExternallyConfigured
@@ -263,7 +271,7 @@ function ApiKeyConnector( {
 								: async () => {
 										await removeApiKey();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( apiKey: string ) => {
 							await saveApiKey( apiKey );
@@ -364,7 +372,7 @@ function ApplicationPasswordConnector( {
 								: async () => {
 										await removeCredentials();
 										actionButtonRef.current?.focus();
-								  }
+									}
 						}
 						onSave={ async ( credentials ) => {
 							await saveCredentials( credentials );

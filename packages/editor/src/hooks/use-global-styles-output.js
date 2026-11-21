@@ -3,7 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { generateGlobalStyles } from '@wordpress/global-styles-engine';
 import { store as editorStore } from '../store';
-import { useSetting, useGlobalStyles } from '../components/global-styles';
+import { useGlobalStyles } from '../components/global-styles';
 
 /**
  * Returns the global styles output based on the provided global styles config.
@@ -17,10 +17,6 @@ export function useGlobalStylesOutputWithConfig(
 	mergedConfig = {},
 	disableRootPadding = false
 ) {
-	const blockGap = useSetting( 'spacing.blockGap' );
-	const hasBlockGapSupport = blockGap !== null;
-	const hasFallbackGapSupport = ! hasBlockGapSupport;
-
 	const { disableLayoutStyles, getBlockStyles } = useSelect( ( select ) => {
 		const { getEditorSettings } = select( editorStore );
 		const { getBlockStyles: getBlockStylesSelector } =
@@ -40,15 +36,11 @@ export function useGlobalStylesOutputWithConfig(
 		const blockTypes = getBlockTypes();
 
 		return generateGlobalStyles( mergedConfig, blockTypes, {
-			hasBlockGapSupport,
-			hasFallbackGapSupport,
 			disableLayoutStyles,
 			disableRootPadding,
 			getBlockStyles,
 		} );
 	}, [
-		hasBlockGapSupport,
-		hasFallbackGapSupport,
 		mergedConfig,
 		disableLayoutStyles,
 		disableRootPadding,

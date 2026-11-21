@@ -66,7 +66,9 @@ export function useItemContent(
 		children,
 		components
 	);
-	const resolvedLabelId = hasLabel ? labelId ?? generatedLabelId : undefined;
+	const resolvedLabelId = hasLabel
+		? ( labelId ?? generatedLabelId )
+		: undefined;
 	const resolvedDescriptionIds = descriptionIds.map(
 		( descriptionId, index ) =>
 			descriptionId ?? `${ generatedDescriptionId }-${ index }`

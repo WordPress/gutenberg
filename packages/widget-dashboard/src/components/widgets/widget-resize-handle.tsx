@@ -15,7 +15,7 @@ type WidgetResizeHandleProps = Omit< ResizeHandleRenderProps, 'ref' >;
 export const WidgetResizeHandle = forwardRef<
 	HTMLDivElement,
 	WidgetResizeHandleProps
->( function WidgetResizeHandle(
+>( function UnforwardedWidgetResizeHandle(
 	{ listeners, attributes, verticalResizable, isResizing },
 	ref
 ) {

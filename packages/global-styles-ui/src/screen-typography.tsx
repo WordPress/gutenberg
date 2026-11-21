@@ -23,7 +23,7 @@ function ScreenTypography() {
 			<ScreenHeader
 				title={ __( 'Typography' ) }
 				description={ __(
-					'Available fonts, typographic styles, and the application of those styles.'
+					'Manage the fonts and typographic styles available across the site.'
 				) }
 			/>
 			<ScreenBody>

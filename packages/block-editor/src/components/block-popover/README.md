@@ -45,12 +45,12 @@ The content rendered inside the popover.
 
 The client ID of the block before the popover.
 
--   Type: `String`
+-   Type: `String|null|undefined`
 -   Required: Yes
 
 #### nextClientId
 
 The client ID of the block after the popover.
 
--   Type: `String`
+-   Type: `String|null|undefined`
 -   Required: Yes

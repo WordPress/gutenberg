@@ -46,9 +46,9 @@ export default function useGenerateDefaultNavigationTitle( clientId ) {
 					// translators: %s: the name of a menu (e.g. Header menu).
 					__( '%s menu' ),
 					area
-			  )
+				)
 			: // translators: 'menu' as in website navigation menu.
-			  __( 'Menu' );
+				__( 'Menu' );
 
 		// Determine how many menus start with the automatic title.
 		const matchingMenuTitleCount = [

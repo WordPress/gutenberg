@@ -788,22 +788,23 @@ test.describe( 'Client-side media processing', () => {
 	// rotation.) Whether CSM should bake-in rotation like core, or intentionally
 	// preserve the EXIF tag, is a product decision for the feature owners.
 	// Marked fixme so it runs again once that behavior is settled.
-	test.fixme(
-		'auto-rotates images based on EXIF orientation',
-		async ( { editor, mediaProcessingUtils, requestUtils } ) => {
-			// EXIF orientation=6 means a 90° clockwise rotation. The asset is
-			// stored 1024x768 in pixels but should land 768x1024 after CSM
-			// applies the EXIF-driven rotation.
-			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
-				editor,
-				requestUtils,
-				'1024x768_e2e_test_image_rotated.jpeg'
-			);
+	test.fixme( 'auto-rotates images based on EXIF orientation', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// EXIF orientation=6 means a 90° clockwise rotation. The asset is
+		// stored 1024x768 in pixels but should land 768x1024 after CSM
+		// applies the EXIF-driven rotation.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			'1024x768_e2e_test_image_rotated.jpeg'
+		);
 
-			expect( media.media_details.width ).toBe( 768 );
-			expect( media.media_details.height ).toBe( 1024 );
-		}
-	);
+		expect( media.media_details.width ).toBe( 768 );
+		expect( media.media_details.height ).toBe( 1024 );
+	} );
 
 	test( 'rotates AVIF sub-sizes from EXIF-only orientation', async ( {
 		editor,

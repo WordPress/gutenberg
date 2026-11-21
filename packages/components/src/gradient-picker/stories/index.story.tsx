@@ -5,7 +5,7 @@ import GradientPicker from '..';
 
 const meta: Meta< typeof GradientPicker > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Color/GradientPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/GradientPicker',
 	id: 'components-gradientpicker',
 	component: GradientPicker,
 	parameters: {
@@ -114,6 +114,17 @@ export const WithNoExistingGradients: GradientPickerStory = {
 	render: Template,
 	args: {
 		gradients: [],
+	},
+};
+
+/**
+ * Without presets or a Clear button, only the custom gradient editor is shown.
+ * This replaces the deprecated `CustomGradientPicker`.
+ */
+export const CustomGradientOnly: GradientPickerStory = {
+	render: Template,
+	args: {
+		clearable: false,
 	},
 };
 

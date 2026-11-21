@@ -22,11 +22,12 @@ type SizeProps = {
 	style?: CSSProperties;
 };
 
-type AdditionalProps< T > = T extends ComponentType< infer U >
-	? U
-	: T extends DashiconIconKey
-	? SVGProps< SVGSVGElement >
-	: {};
+type AdditionalProps< T > =
+	T extends ComponentType< infer U >
+		? U
+		: T extends DashiconIconKey
+			? SVGProps< SVGSVGElement >
+			: {};
 
 export type Props = {
 	/**

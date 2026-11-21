@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, screen, waitFor } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { userEvent } from 'vitest/browser';
-import { createRef } from '@wordpress/element';
+import { createRef, useState } from '@wordpress/element';
 import warning from '@wordpress/warning';
 import type { Item, ItemGroup } from '../types';
 import { SearchableChipSelect } from '../index';
@@ -15,6 +15,82 @@ const mockedWarning = vi.mocked( warning );
 describe( 'SearchableChipSelect', () => {
 	beforeEach( () => {
 		mockedWarning.mockClear();
+	} );
+
+	it.each( [ 'controlled', 'uncontrolled' ] )(
+		'preserves selected chips when Escape is pressed with an empty search field (%s)',
+		async ( mode ) => {
+			const selectedItems = [ ITEMS[ 0 ], ITEMS[ 1 ] ];
+			const onValueChange = vi.fn();
+
+			function Example() {
+				const [ value, setValue ] = useState( selectedItems );
+
+				return (
+					<SearchableChipSelect
+						aria-label="Fruit"
+						items={ ITEMS }
+						{ ...( mode === 'controlled'
+							? { value }
+							: { defaultValue: selectedItems } ) }
+						onValueChange={ ( nextValue, eventDetails ) => {
+							onValueChange( nextValue, eventDetails );
+							setValue( nextValue );
+						} }
+					/>
+				);
+			}
+
+			await render( <Example /> );
+
+			const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+			await userEvent.click( input );
+			await expect.element( screen.getByRole( 'listbox' ) ).toBeVisible();
+			expect( input ).toHaveValue( '' );
+
+			await userEvent.keyboard( '{Escape}' );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'listbox', { hidden: true } )
+				).not.toBeInTheDocument();
+			} );
+			await userEvent.keyboard( '{Escape}' );
+
+			const chips = within( screen.getByRole( 'toolbar' ) );
+			expect( chips.getByText( 'Apple' ) ).toBeVisible();
+			expect( chips.getByText( 'Apricot' ) ).toBeVisible();
+			expect( input ).toHaveFocus();
+			expect( onValueChange ).not.toHaveBeenCalled();
+		}
+	);
+
+	it( 'describes default items without adding the description to a chip', async () => {
+		await render(
+			<SearchableChipSelect
+				aria-label="Fruit"
+				items={ [
+					{
+						value: 'apple',
+						label: 'Apple',
+						description: 'Fresh fruit.',
+					},
+				] }
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'combobox', { name: 'Fruit' } )
+		);
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		const chip = within( screen.getByRole( 'toolbar' ) ).getByText(
+			'Apple'
+		);
+		expect( chip ).toBeVisible();
+		expect( chip ).toHaveTextContent( 'Apple' );
+		expect( chip ).not.toHaveTextContent( 'Fresh fruit.' );
 	} );
 
 	it( 'forwards ref to the search input', async () => {
@@ -42,7 +118,6 @@ describe( 'SearchableChipSelect', () => {
 					aria-label="My label"
 					aria-describedby="searchable-chip-select-description"
 				/>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-chip-select-description">My description</p>
 			</>
 		);
@@ -60,7 +135,6 @@ describe( 'SearchableChipSelect', () => {
 	it( 'passes aria-labelledby prop to the appropriate component', async () => {
 		await render(
 			<>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-chip-select-label">My label</p>
 				<SearchableChipSelect aria-labelledby="searchable-chip-select-label" />
 			</>
@@ -116,7 +190,9 @@ describe( 'SearchableChipSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelect.ItemLabel>
+										{ item.label }
+									</SearchableChipSelect.ItemLabel>
 								</SearchableChipSelect.Item>
 							) }
 						</SearchableChipSelect.Collection>
@@ -157,7 +233,9 @@ describe( 'SearchableChipSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableChipSelect.ItemLabel>
+										{ item.label }
+									</SearchableChipSelect.ItemLabel>
 								</SearchableChipSelect.Item>
 							) }
 						</SearchableChipSelect.Collection>
@@ -182,8 +260,33 @@ describe( 'SearchableChipSelect', () => {
 			expect.anything()
 		);
 		await expect
-			.element( screen.getByRole( 'button', { name: 'Remove' } ) )
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
 			.toBeVisible();
+	} );
+
+	it( 'keeps the search input focused after selecting the first item', async () => {
+		const user = userEvent;
+
+		await render(
+			<SearchableChipSelect
+				aria-label="Fruit"
+				items={ ITEMS.slice( 0, 3 ) }
+			/>
+		);
+
+		const input = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await user.click( input );
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Apple' } )
+		);
+
+		await expect
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
+			.toBeVisible();
+		expect( screen.getByRole( 'combobox', { name: 'Fruit' } ) ).toBe(
+			input
+		);
+		await expect.element( input ).toHaveFocus();
 	} );
 
 	it( 'announces statusContent in a status live region', async () => {
@@ -239,7 +342,9 @@ describe( 'SearchableChipSelect', () => {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableChipSelect.ItemLabel>
+								{ item.label }
+							</SearchableChipSelect.ItemLabel>
 						</SearchableChipSelect.Item>
 					) }
 				/>
@@ -287,7 +392,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>
@@ -341,7 +448,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>
@@ -497,7 +606,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>

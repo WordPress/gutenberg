@@ -13,10 +13,7 @@ import type { KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { isAppleOS } from './platform';
 
 export type WPModifierPart =
-	| typeof ALT
-	| typeof CTRL
-	| typeof COMMAND
-	| typeof SHIFT;
+	typeof ALT | typeof CTRL | typeof COMMAND | typeof SHIFT;
 
 export type WPKeycodeModifier =
 	| 'primary'

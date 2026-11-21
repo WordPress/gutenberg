@@ -2,18 +2,20 @@ import { useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
+import { store as preferencesStore } from '@wordpress/preferences';
 import WelcomeGuideImage from './image';
-import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideDefault() {
-	const { toggleFeature } = useDispatch( editPostStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
 			contentLabel={ __( 'Welcome to the editor' ) }
 			finishButtonText={ __( 'Get started' ) }
-			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
+			onFinish={ () =>
+				setPreference( 'core/edit-post', 'welcomeGuide', false )
+			}
 			pages={ [
 				{
 					image: (

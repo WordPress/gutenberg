@@ -6,11 +6,10 @@ export type PortalProps = ComponentProps< typeof _Popover.Portal >;
 
 export type PositionerProps = ComponentProps< typeof _Popover.Positioner >;
 
-export interface RootProps
-	extends Pick<
-		_Popover.Root.Props,
-		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
-	> {
+export interface RootProps extends Pick<
+	_Popover.Root.Props,
+	'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+> {
 	/**
 	 * The popover sub-components (`Popover.Trigger`, `Popover.Popup`, etc.).
 	 */
@@ -30,7 +29,8 @@ export type TriggerProps = Omit<
 };
 
 export interface PopupProps
-	extends ComponentProps< 'div' >,
+	extends
+		ComponentProps< 'div' >,
 		Pick< _Popover.Popup.Props, 'initialFocus' | 'finalFocus' > {
 	/**
 	 * Whether to render a backdrop overlay behind the popover.

@@ -5,10 +5,10 @@ import {
 	Button,
 	FlexBlock,
 	FlexItem,
-	SelectControl,
 	__experimentalHStack as HStack,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { useCreateTemplatePartFromBlocks } from './utils/hooks';
@@ -60,7 +60,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 		}
 
 		return [
-			{ value: '', label: __( 'Select widget area' ) },
+			{ value: null, label: __( 'Select widget area' ) },
 			...sidebarOptions,
 		];
 	}, [ sidebars ] );
@@ -136,15 +136,21 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 				<FlexBlock>
 					<SelectControl
 						label={ __( 'Import widget area' ) }
-						value={ selectedSidebar }
-						options={ options }
-						onChange={ ( value ) => setSelectedSidebar( value ) }
+						value={
+							options.find(
+								( item ) =>
+									item.value === ( selectedSidebar || null )
+							) ?? null
+						}
+						items={ options }
+						onValueChange={ ( item ) =>
+							setSelectedSidebar( item?.value ?? '' )
+						}
 						disabled={ ! options.length }
 					/>
 				</FlexBlock>
 				<FlexItem
 					style={ {
-						marginBottom: '8px',
 						marginTop: 'auto',
 					} }
 				>

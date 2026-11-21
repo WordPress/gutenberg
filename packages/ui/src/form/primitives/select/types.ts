@@ -54,6 +54,11 @@ export type SelectGroupLabelProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type SelectSeparatorProps = Omit<
+	ComponentProps< typeof _Select.Separator >,
+	'orientation'
+>;
+
 export type SelectPopupProps = ComponentProps< typeof _Select.Popup > &
 	ItemPopupWidthProps & {
 		/**
@@ -88,9 +93,9 @@ export interface SelectItemLabelProps extends ComponentProps< 'div' > {
 
 export interface SelectItemDescriptionProps extends ComponentProps< 'span' > {
 	/**
-	 * Supplementary content displayed below a select item label. Use as a
-	 * direct child after `Select.ItemLabel`. Content should be text or
-	 * non-interactive inline markup.
+	 * Content that contributes to the select item's accessible description.
+	 * Use as a direct child after `Select.ItemLabel`. Content should be text
+	 * or non-interactive inline markup.
 	 */
 	children: ReactNode;
 }
@@ -113,6 +118,14 @@ export type SelectItemProps = Omit<
 > & {
 	/**
 	 * A unique value that identifies this select item.
+	 *
+	 * Empty string values are treated as empty selections by default.
+	 * Use `null` for an option that lets users clear the selection.
+	 *
+	 * To preserve an empty string as an application value, provide
+	 * `itemToStringValue` on `Select.Root` that returns a unique,
+	 * non-empty string. This changes the submitted form value, but not
+	 * the value passed to `onValueChange`.
 	 */
 	value?: unknown;
 	/**

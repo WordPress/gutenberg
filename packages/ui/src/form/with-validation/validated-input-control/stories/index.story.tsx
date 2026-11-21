@@ -7,7 +7,8 @@ import { InputLayout } from '../../../primitives/input-layout';
 import { formDecorator } from '../../../stories/shared';
 
 const meta: Meta< typeof ValidatedInputControl > = {
-	title: 'Design System/Components/Form/With Validation/ValidatedInputControl',
+	title: 'Components/@wordpress-ui/Form/With Validation/ValidatedInputControl',
+	id: 'design-system-components-form-with-validation-validatedinputcontrol',
 	component: ValidatedInputControl,
 	argTypes: {
 		customValidity: { control: false },
@@ -31,10 +32,6 @@ export default meta;
 
 type Story = StoryObj< typeof ValidatedInputControl >;
 
-/**
- * Native constraint validation (here, `required`) is reported inline when the
- * control is blurred or the form is submitted.
- */
 export const Default: Story = {
 	args: {
 		label: 'Text',
@@ -60,7 +57,7 @@ export const WithCustomValidity: Story = {
 						? {
 								type: 'invalid',
 								message: 'The word "error" is not allowed.',
-						  }
+							}
 						: undefined
 				}
 			/>

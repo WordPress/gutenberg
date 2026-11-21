@@ -33,9 +33,8 @@
 	min-height: $grid-unit-30;
 }
 
-.block-editor-global-styles-state-control__badge-tooltip-trigger {
-	display: inline-flex;
-	max-width: 100%;
+.block-editor-global-styles-state-control__badge-infotip-popup {
+	max-width: 240px;
 }
 
 .block-editor-global-styles-filters-panel__dropdown,
@@ -55,6 +54,15 @@
 	&.is-open {
 		background-color: $gray-100;
 	}
+}
+
+.block-editor-panel-duotone-settings__label-row {
+	width: 100%;
+	min-width: 0;
+}
+
+.block-editor-panel-duotone-settings__label {
+	min-width: 0;
 }
 
 .block-editor-global-styles__shadow-editor__remove-button {
@@ -213,4 +221,9 @@
 		// Show reset button on devices that do not support hover.
 		opacity: 1;
 	}
+}
+
+.block-editor-global-styles-unit-range-control__input,
+.block-editor-global-styles-unit-range-control__slider {
+	flex: 1;
 }

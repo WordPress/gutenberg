@@ -39,7 +39,7 @@ const parseLinkHeader = ( linkHeader: string | null ) => {
 	return match
 		? {
 				next: match[ 1 ],
-		  }
+			}
 		: {};
 };
 

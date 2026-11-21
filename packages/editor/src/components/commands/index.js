@@ -264,16 +264,16 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-breadcrumbs',
 			label: showBlockBreadcrumbs
-				? __( 'Hide block breadcrumbs' )
-				: __( 'Show block breadcrumbs' ),
+				? __( 'Hide editor footer' )
+				: __( 'Show editor footer' ),
 			category: 'command',
 			callback: ( { close } ) => {
 				toggle( 'core', 'showBlockBreadcrumbs' );
 				close();
 				createInfoNotice(
 					showBlockBreadcrumbs
-						? __( 'Breadcrumbs hidden.' )
-						: __( 'Breadcrumbs visible.' ),
+						? __( 'Editor footer hidden.' )
+						: __( 'Editor footer visible.' ),
 					{
 						id: 'core/editor/toggle-breadcrumbs/notice',
 						type: 'snackbar',
@@ -394,7 +394,7 @@ const getPatternEditingContextualCommands = () =>
 					? [
 							selectedBlockClientId,
 							...getBlockParents( selectedBlockClientId, true ),
-					  ]
+						]
 					: [];
 
 			return {
@@ -593,12 +593,12 @@ const getManipulateDocumentCommands = () =>
 							/* translators: %s: template title */
 							__( 'Reset template: %s' ),
 							decodeEntities( template.title )
-					  )
+						)
 					: sprintf(
 							/* translators: %s: template part title */
 							__( 'Reset template part: %s' ),
 							decodeEntities( template.title )
-					  );
+						);
 			commands.push( {
 				name: 'core/reset-template',
 				label,

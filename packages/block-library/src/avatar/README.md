@@ -35,6 +35,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`background`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-background): `false`
 - [`filter`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter):
   - [`duotone`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#filter-duotone): `true`
+- [`shadow`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#shadow): `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
@@ -53,6 +54,7 @@ _Defined via the [`usesContext` and `providesContext`](https://developer.wordpre
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
 - **border**: `.wp-block-avatar img`
+- **shadow**: `.wp-block-avatar img`
 - **filter**:
   - duotone: `.wp-block-avatar img`
 

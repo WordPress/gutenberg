@@ -353,7 +353,7 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large but the focus target small.
+	// Keep the tap target large.
 	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
@@ -379,14 +379,6 @@
 			svg {
 				top: -$grid-unit-05;
 			}
-		}
-
-		// Tweak size and position of focus ring.
-		&::before {
-			height: 16px;
-			min-width: 100%;
-			left: 0;
-			right: 0;
 		}
 	}
 
@@ -443,7 +435,7 @@
 		border-radius: $radius-small;
 		background: $gray-100;
 		color: $gray-800;
-		font-size: $font-size-small;
+		font-size: var(--wpds-typography-font-size-sm);
 		line-height: $font-line-height-small;
 		overflow: hidden;
 		text-overflow: ellipsis;

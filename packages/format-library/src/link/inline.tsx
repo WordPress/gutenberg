@@ -1,7 +1,7 @@
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
-import { Popover } from '@wordpress/components';
+import { Popover as WCPopover } from '@wordpress/components';
 import { prependHTTPS } from '@wordpress/url';
 import {
 	create,
@@ -14,22 +14,55 @@ import {
 	split,
 	concat,
 	useAnchor,
+	getActiveFormat,
 } from '@wordpress/rich-text';
 import {
 	LinkControl,
 	store as blockEditorStore,
-	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 import type { RichTextValue } from '@wordpress/rich-text';
-import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
+import {
+	createLinkFormat,
+	isValidHref,
+	getFormatBoundary,
+	hasNofollow,
+} from './utils';
+import type { LinkFormatAttributes } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
-import type {
-	InlineLinkUIProps,
-	LinkValue,
-	CSSClassesSettingProps,
-} from '../types';
+import type { CSSClassesSettingProps } from './css-classes-setting';
+
+interface LinkValue {
+	url?: string | null;
+	type?: string;
+	id?: string | number;
+	opensInNewTab?: boolean;
+	nofollow?: boolean;
+	title?: string;
+	cssClasses?: string;
+}
+
+/**
+ * A page the link UI created.
+ */
+interface CreatedPage {
+	id: number;
+	type: string;
+	title: { rendered: string };
+	link: string;
+}
+
+interface InlineLinkUIProps {
+	isActive: boolean;
+	activeAttributes: LinkFormatAttributes;
+	value: RichTextValue;
+	onChange: ( newValue: RichTextValue ) => void;
+	onFocusOutside: () => void;
+	stopAddingLink: () => void;
+	contentRef: React.RefObject< HTMLElement >;
+	focusOnMount?: 'firstElement' | false;
+}
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -42,12 +75,13 @@ const LINK_SETTINGS = [
 		title: __( 'Additional CSS class(es)' ),
 		render: (
 			setting: CSSClassesSettingProps[ 'setting' ],
-			value: CSSClassesSettingProps[ 'value' ],
+			value: Record< string, unknown > | undefined,
 			onChange: CSSClassesSettingProps[ 'onChange' ]
 		) => (
 			<CSSClassesSettingComponent
 				setting={ setting }
-				value={ value }
+				// The link format holds its CSS classes as a string.
+				value={ value as CSSClassesSettingProps[ 'value' ] }
 				onChange={ onChange }
 			/>
 		),
@@ -65,6 +99,7 @@ function InlineLinkUI( {
 	focusOnMount,
 }: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
+	const currentFormat = getActiveFormat( value, 'core/link' );
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
@@ -92,7 +127,7 @@ function InlineLinkUI( {
 			type: activeAttributes.type,
 			id: activeAttributes.id,
 			opensInNewTab: activeAttributes.target === '_blank',
-			nofollow: activeAttributes.rel?.includes( 'nofollow' ),
+			nofollow: hasNofollow( activeAttributes.rel ),
 			title: richTextText,
 			cssClasses: activeAttributes.class,
 		} ),
@@ -125,23 +160,26 @@ function InlineLinkUI( {
 		};
 
 		const newUrl = prependHTTPS( nextValue?.url ?? '' );
-		const linkFormat = createLinkFormat( {
-			url: newUrl,
-			type: nextValue.type,
-			id:
-				nextValue.id !== undefined && nextValue.id !== null
-					? String( nextValue.id )
-					: undefined,
-			opensInNewWindow: nextValue.opensInNewTab,
-			nofollow: nextValue.nofollow,
-			cssClasses: nextValue.cssClasses,
-		} );
+		const linkFormat = createLinkFormat(
+			{
+				url: newUrl,
+				type: nextValue.type,
+				id:
+					nextValue.id !== undefined && nextValue.id !== null
+						? String( nextValue.id )
+						: undefined,
+				opensInNewWindow: nextValue.opensInNewTab,
+				nofollow: nextValue.nofollow,
+				cssClasses: nextValue.cssClasses,
+			},
+			currentFormat
+		);
 
 		const newText = nextValue.title || newUrl;
 
 		// Scenario: we have any active text selection or an active format.
 		let newValue: RichTextValue;
-		if ( isCollapsed( value ) && ! isActive ) {
+		if ( isCollapsed( value ) && value.start !== undefined && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
 
@@ -162,6 +200,7 @@ function InlineLinkUI( {
 			selectionChange( {
 				clientId: selectionStart.clientId,
 				identifier: selectionStart.attributeKey,
+				// @ts-expect-error Bug: the action reads `attributeKey` and `startOffset`, not `identifier` and `start`.
 				start: value.start + newText.length + 1,
 			} );
 
@@ -266,7 +305,7 @@ function InlineLinkUI( {
 	}
 
 	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * `isActive` is not part of `FormatType`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property
 	 * checking, which only applies to object literals passed inline.
 	 */
@@ -278,7 +317,9 @@ function InlineLinkUI( {
 	} );
 
 	async function handleCreate( pageTitle: string ) {
-		const page = await createPageEntity( {
+		// The suggestion is offered only with the setting.
+		// @ts-expect-error Bug: a failed save resolves without a page, which this reads.
+		const page: CreatedPage = await createPageEntity!( {
 			title: pageTitle,
 			status: 'draft',
 		} );
@@ -304,7 +345,7 @@ function InlineLinkUI( {
 	}
 
 	return (
-		<Popover
+		<WCPopover
 			anchor={ popoverAnchor }
 			animate={ false }
 			onClose={ stopAddingLink }
@@ -335,7 +376,7 @@ function InlineLinkUI( {
 					},
 				} }
 			/>
-		</Popover>
+		</WCPopover>
 	);
 }
 

@@ -29,9 +29,7 @@ module.exports = [
 		settings: {
 			'import/extensions': [ '.js', '.jsx' ],
 			'import/resolver': {
-				[ require.resolve(
-					'eslint-import-resolver-typescript'
-				) ]: true,
+				[ require.resolve( 'eslint-import-resolver-typescript' ) ]: true,
 			},
 		},
 		rules: {
@@ -39,6 +37,7 @@ module.exports = [
 				'error',
 				{
 					peerDependencies: true,
+					includeTypes: true,
 				},
 			],
 			'import/no-unresolved': 'error',

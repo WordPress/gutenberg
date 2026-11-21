@@ -1,6 +1,10 @@
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { getBlockType, unregisterBlockVariation } from '@wordpress/blocks';
+import {
+	getBlockType,
+	unregisterBlockVariation,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -8,6 +12,9 @@ import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
 import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -15,6 +22,8 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately, like the paragraph.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
@@ -48,13 +57,13 @@ export const settings = {
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
 						level
-				  )
+					)
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
 						content
-				  );
+					);
 		}
 	},
 	transforms,
