@@ -32,6 +32,7 @@
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 /tools/phpstan                                  @westonruter
 /phpstan.neon.dist                              @westonruter
+/phpstan-strict.neon.dist                       @westonruter
 
 # UI Components
 /packages/components                            @WordPress/gutenberg-components
