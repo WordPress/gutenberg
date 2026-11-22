@@ -1,19 +1,21 @@
 export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-	overlayReducer,
-} from './overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+	useSuggestionSessionActions,
+} from './suggestion-session';
 export { default as SuggestionAutoSave } from './auto-save';
+export { useSuggestionsProvider } from './provider';
 export {
-	useSuggestionsProvider,
-	operationsFromOverlay,
+	operationsFromMarker,
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	findStructuralOp,
+	findPostAttributeOps,
+	postOperationsFromTitle,
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
-} from './provider';
+} from './operations';

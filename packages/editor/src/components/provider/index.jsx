@@ -44,7 +44,7 @@ import TemplatePartMenuItems from '../template-part-menu-items';
 import MediaEditorModalMount from '../media/media-editor-modal';
 import { getCanvasWidthByDeviceType } from '../../utils/device-type';
 import {
-	SuggestionOverlayProvider,
+	SuggestionSessionProvider,
 	SuggestionAutoSave,
 	isSuggestionModeEnabled,
 } from '../suggestion-mode';
@@ -58,8 +58,8 @@ const { PrivateEntityProvider } = unlock( coreDataPrivateApis );
  * subscriptions) never mounts; consumers fall back to the context default,
  * which is inert.
  */
-const MaybeSuggestionOverlayProvider = isSuggestionModeEnabled()
-	? SuggestionOverlayProvider
+const MaybeSuggestionSessionProvider = isSuggestionModeEnabled()
+	? SuggestionSessionProvider
 	: Fragment;
 
 const noop = () => {};
@@ -475,7 +475,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>
-							<MaybeSuggestionOverlayProvider>
+							<MaybeSuggestionSessionProvider>
 								{ children }
 								{ ! settings.isPreviewMode && (
 									<>
@@ -501,7 +501,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 										<MediaEditorModalMount />
 									</>
 								) }
-							</MaybeSuggestionOverlayProvider>
+							</MaybeSuggestionSessionProvider>
 						</BlockEditorProviderComponent>
 					</BlockContextProvider>
 				</PrivateEntityProvider>
