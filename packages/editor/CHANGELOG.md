@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Post Terms: Offer taxonomy variations only for compatible insertion post types ([#85438](https://github.com/WordPress/gutenberg/pull/85438)).
 
 ### Documentation
