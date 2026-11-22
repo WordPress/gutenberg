@@ -43,13 +43,13 @@
 	"dependencies": {
 		"@stylistic/stylelint-plugin": "^6.0.1",
 		"@wordpress/theme-build-tools": "file:../theme-build-tools",
-		"stylelint-config-recommended": "^19.0.0",
+		"stylelint-config-recommended": "^19.1.0",
 		"stylelint-config-recommended-scss": "^18.0.0"
 	},
 	"devDependencies": {
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
 		"@wordpress/theme": "file:../theme",
-		"stylelint": "^18.0.0",
+		"stylelint": "^18.1.0",
 		"stylelint-scss": "^7.5.0",
 		"vitest": "^5.1.1"
 	},

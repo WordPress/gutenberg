@@ -25,7 +25,7 @@
 	"dependencies": {
 		"@wordpress/stylelint-config": "file:../../packages/stylelint-config",
 		"@wordpress/theme-build-tools": "file:../../packages/theme-build-tools",
-		"stylelint": "^18.0.0",
+		"stylelint": "^18.1.0",
 		"stylelint-plugin-logical-css": "^2.1.1"
 	},
 	"devDependencies": {

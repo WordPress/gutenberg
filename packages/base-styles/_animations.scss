@@ -5,7 +5,7 @@
 }
 
 @mixin animation__fade-in($speed: 0.08s, $delay: 0s, $easing: linear) {
-	@include keyframes(__wp-base-styles-fade-in) {
+	@keyframes __wp-base-styles-fade-in {
 		from {
 			opacity: 0;
 		}
@@ -21,7 +21,7 @@
 }
 
 @mixin animation__fade-out($speed: 0.08s, $delay: 0s, $easing: linear) {
-	@include keyframes(__wp-base-styles-fade-out) {
+	@keyframes __wp-base-styles-fade-out {
 		from {
 			opacity: 1;
 		}
