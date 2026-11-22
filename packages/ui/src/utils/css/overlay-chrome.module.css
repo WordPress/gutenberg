@@ -92,6 +92,13 @@
 			overflow-block: auto;
 			overflow-inline: hidden;
 			padding: var(--wpds-dimension-padding-2xl);
+			/*
+			 * Follow the popup's corners where the scroll container meets them.
+			 * The popup clips to its rounded border, which would otherwise cut
+			 * the square corners off the inset focus ring below. Edges that end
+			 * above pinned chrome stay square, see the rules below.
+			 */
+			border-radius: inherit;
 
 			/*
 			 * The shared `outset-ring--focus-visible` utility (composed by
@@ -136,6 +143,8 @@
 
 		.header ~ .content {
 			padding-block-start: calc(var(--wpds-border-width-focus) * 2);
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
 		}
 
 		.content ~ .footer {
@@ -147,6 +156,8 @@
 
 		.content:has(~ .footer) {
 			padding-block-end: calc(var(--wpds-border-width-focus) * 2);
+			border-end-start-radius: 0;
+			border-end-end-radius: 0;
 		}
 
 		/*

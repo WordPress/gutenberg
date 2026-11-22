@@ -12,6 +12,10 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 
+### Bug Fixes
+
+-   `Dialog`, `Drawer`, `AlertDialog`: Round the corners of the scroll area where it meets the popup, so the popup no longer clips the square corners of its focus outline ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes
