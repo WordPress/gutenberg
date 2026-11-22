@@ -276,6 +276,9 @@
 				"unit": "rem"
 			}
 		},
+		"transform": {
+			"rotate": false
+		},
 		"typography": {
 			"customFontSize": true,
 			"defaultFontSizes": true,
