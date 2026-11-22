@@ -601,6 +601,81 @@ class Tests_Block_Bindings_Inner_Blocks extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Default', $output );
 	}
 
+	public function test_supplied_blocks_the_bound_block_allows_render() {
+		register_block_type(
+			'test/child',
+			array(
+				'parent'   => array( 'core/group' ),
+				'ancestor' => array( 'core/group' ),
+			)
+		);
+		$this->value = "<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph -->\n<!-- wp:test/child /-->";
+		$output      = do_blocks( '<!-- wp:group {"allowedBlocks":["core/paragraph","test/child"],"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+		$this->assertStringContainsString( '>One</p>', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
+	public function test_supplied_block_missing_from_the_allowed_blocks_attribute_keeps_own_inner_blocks() {
+		$this->value = '<!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --><!-- wp:heading --><h2>Two</h2><!-- /wp:heading -->';
+		$output      = do_blocks( '<!-- wp:group {"allowedBlocks":["core/paragraph"],"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'One', $output );
+		$this->assertStringNotContainsString( 'Two', $output );
+	}
+
+	public function test_supplied_block_missing_from_the_allowed_blocks_of_the_block_type_keeps_own_inner_blocks() {
+		register_block_type( 'test/host', array( 'allowed_blocks' => array( 'core/paragraph' ) ) );
+		$add_inner_blocks = static function ( $supported_attributes, $block_type ) {
+			return 'test/host' === $block_type ? array( 'innerBlocks' ) : $supported_attributes;
+		};
+		add_filter( 'block_bindings_supported_attributes', $add_inner_blocks, 10, 2 );
+		$this->value = '<!-- wp:heading --><h2>One</h2><!-- /wp:heading -->';
+		$output      = do_blocks( '<!-- wp:test/host {"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-test-host"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:test/host -->' );
+		remove_filter( 'block_bindings_supported_attributes', $add_inner_blocks );
+
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'One', $output );
+	}
+
+	public function test_supplied_block_whose_parent_is_another_block_keeps_own_inner_blocks() {
+		register_block_type(
+			'test/child',
+			array(
+				'parent'          => array( 'core/column' ),
+				'render_callback' => static function () {
+					return '<p>Child</p>';
+				},
+			)
+		);
+		$this->value = '<!-- wp:test/child /-->';
+		$output      = $this->render_group();
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'Child', $output );
+	}
+
+	public function test_supplied_block_whose_ancestor_is_another_block_keeps_own_inner_blocks() {
+		register_block_type(
+			'test/child',
+			array(
+				'ancestor'        => array( 'core/columns' ),
+				'render_callback' => static function () {
+					return '<p>Child</p>';
+				},
+			)
+		);
+		$this->value = '<!-- wp:test/child /-->';
+		$output      = $this->render_group();
+		$this->assertStringContainsString( '>Default</p>', $output );
+		$this->assertStringNotContainsString( 'Child', $output );
+	}
+
+	public function test_nested_supplied_blocks_are_not_checked() {
+		$this->value = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p>One</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+		$output      = do_blocks( '<!-- wp:group {"allowedBlocks":["core/group"],"metadata":{"bindings":{"innerBlocks":{"source":"test/inner-blocks"}}}} --><div class="wp-block-group"><!-- wp:paragraph --><p>Default</p><!-- /wp:paragraph --></div><!-- /wp:group -->' );
+		$this->assertStringContainsString( '>One</p>', $output );
+		$this->assertStringNotContainsString( 'Default', $output );
+	}
+
 	public function test_column_supports_inner_blocks_bindings() {
 		$this->assertContains( 'innerBlocks', get_block_bindings_supported_attributes( 'core/column' ) );
 		$this->assertContains( 'innerBlocks', get_block_bindings_supported_attributes( 'core/group' ) );

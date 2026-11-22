@@ -264,6 +264,47 @@ function gutenberg_block_bindings_prepare_bound_inner_blocks( $blocks ) {
 }
 
 /**
+ * Determines whether the bound block accepts the top-level blocks a source
+ * supplies.
+ *
+ * A block fails when the `allowedBlocks` of the bound block's type or
+ * attributes leaves it out, or when its own `parent` or `ancestor` leaves out
+ * the bound block. Inner blocks of the supplied blocks are not checked.
+ *
+ * @since 7.3.0
+ *
+ * @param array[]  $blocks         The parsed blocks.
+ * @param WP_Block $block_instance The bound block.
+ * @return bool Whether every block is allowed.
+ */
+function gutenberg_block_bindings_are_inner_blocks_allowed( $blocks, $block_instance ) {
+	$allowed_lists = array(
+		$block_instance->block_type->allowed_blocks ?? null,
+		$block_instance->attributes['allowedBlocks'] ?? null,
+	);
+	foreach ( $blocks as $block ) {
+		if ( null === $block['blockName'] ) {
+			continue;
+		}
+		foreach ( $allowed_lists as $allowed_blocks ) {
+			if ( is_array( $allowed_blocks ) && ! in_array( $block['blockName'], $allowed_blocks, true ) ) {
+				return false;
+			}
+		}
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+		if ( ! $block_type ) {
+			continue;
+		}
+		foreach ( array( $block_type->parent, $block_type->ancestor ) as $allowed_parents ) {
+			if ( is_array( $allowed_parents ) && ! in_array( $block_instance->name, $allowed_parents, true ) ) {
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+/**
  * Returns the inner content of a block with slots for the given number of
  * inner blocks.
  *
@@ -434,6 +475,9 @@ function gutenberg_block_bindings_find_sole_inner_container_closer( $tokens, $op
  * that ask a source something else still resolve, inside supplied inner blocks
  * too.
  *
+ * Nor when the block doesn't accept one of the top-level supplied blocks: it
+ * then keeps its own inner blocks.
+ *
  * Only within a budget, though: whoever writes a value writes the arguments of
  * the bindings inside it, and a value whose bindings ask for it again with
  * other arguments would otherwise render once for every order they can nest
@@ -492,7 +536,10 @@ function gutenberg_block_bindings_replace_inner_blocks( $value, $source_name, $s
 		}
 	}
 
-	$blocks        = gutenberg_block_bindings_parse_bound_inner_blocks( $value, $source_name, $source_args, $block_instance );
+	$blocks = gutenberg_block_bindings_parse_bound_inner_blocks( $value, $source_name, $source_args, $block_instance );
+	if ( ! gutenberg_block_bindings_are_inner_blocks_allowed( $blocks, $block_instance ) ) {
+		return null;
+	}
 	$inner_content = gutenberg_block_bindings_get_inner_content_with_slots( $block_instance->parsed_block['innerContent'] ?? null, count( $blocks ) );
 	if ( null === $inner_content ) {
 		return null;
