@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Focus the title when switching to the Code Editor ([#86850](https://github.com/WordPress/gutenberg/pull/86850)).
 
 ### Documentation
