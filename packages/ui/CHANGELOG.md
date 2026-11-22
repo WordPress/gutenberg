@@ -14,7 +14,7 @@
 
 ### Bug Fixes
 
--   `Dialog`, `Drawer`, `AlertDialog`: Round the corners of the scroll area where it meets the popup, so the popup no longer clips the square corners of its focus outline ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   `Dialog`, `Drawer`, `AlertDialog`: Round the corners of the scroll area where it meets the popup, so the popup no longer clips the square corners of its focus outline ([#87210](https://github.com/WordPress/gutenberg/pull/87210)).
 
 ## 0.27.0 (2026-11-18)
 
