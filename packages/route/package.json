@@ -40,8 +40,8 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@tanstack/history": "^1.133.28",
-		"@tanstack/react-router": "^1.120.5",
+		"@tanstack/history": "^1.162.5",
+		"@tanstack/react-router": "^1.170.46",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {
