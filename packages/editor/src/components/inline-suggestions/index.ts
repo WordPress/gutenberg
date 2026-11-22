@@ -101,6 +101,7 @@ export {
 	formatDeltaFromOriginal,
 	isEmptyFormatDelta,
 	rebaseFormatDelta,
+	sanitizeFormatDelta,
 } from './format-delta';
 export type {
 	FormatDelta,
