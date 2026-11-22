@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Keep the block bindings that don't come from pattern overrides, such as bindings to post meta, when detaching a synced pattern ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   Keep the block bindings that don't come from pattern overrides, such as bindings to post meta, when detaching a synced pattern ([#87214](https://github.com/WordPress/gutenberg/pull/87214)).
 
 ## 3.2.0 (2026-11-18)
 
