@@ -76,6 +76,11 @@ function gutenberg_generate_block_templates_export_file() {
 	// Load template parts into the zip file.
 	$template_parts = get_block_templates( array(), 'wp_template_part' );
 	foreach ( $template_parts as $template_part ) {
+		$template_part->content = traverse_and_serialize_blocks(
+			parse_blocks( $template_part->content ),
+			'_remove_theme_attribute_from_template_part_block'
+		);
+
 		$zip->addFromString(
 			'parts/' . $template_part->slug . '.html',
 			$template_part->content

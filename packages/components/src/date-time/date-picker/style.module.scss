@@ -112,6 +112,18 @@
 	}
 
 	&:where(.is-today) {
-		background: var(--wpds-color-background-surface-neutral-weak);
+		background: var(--wpds-color-background-interactive-neutral-weak);
+		border-color: var(--wpds-color-stroke-interactive-neutral);
+
+		&:is(:hover, :active, :focus):not(:disabled) {
+			background: var(--wpds-color-background-interactive-neutral-weak-active);
+			border-color: var(--wpds-color-stroke-interactive-neutral-active);
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+		}
+
+		&:disabled {
+			background: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
+		}
 	}
 }
