@@ -11,6 +11,7 @@ import { createElement, RawHTML } from '@wordpress/element';
 import type { Block } from '@wordpress/blocks';
 import { dispatch, select } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
+import { stripBlockClipboardWrapper } from '../../../utils/block-clipboard';
 import {
 	getClipboardBlocksContent,
 	requiresWrapperOnCopy,
@@ -258,7 +259,9 @@ describe( 'block clipboard content', () => {
 			new Map()
 		);
 
-		const [ pastedBlock ] = parse( clipboardContent.get( 'text/html' )! );
+		const [ pastedBlock ] = parse(
+			stripBlockClipboardWrapper( clipboardContent.get( 'text/html' )! )
+		);
 		expect( pastedBlock ).toMatchObject( {
 			name: 'core/list',
 			innerBlocks: [
@@ -293,7 +296,7 @@ describe( 'block clipboard content', () => {
 			{ addWrapper: 'bound' }
 		);
 		expect( html ).toContain( '<ol>' );
-		expect( parse( html ) ).toMatchObject( [
+		expect( parse( stripBlockClipboardWrapper( html ) ) ).toMatchObject( [
 			{
 				name: 'core/list',
 				isValid: true,

@@ -15,12 +15,19 @@ import {
 	serialize,
 	store as blocksStore,
 	unregisterBlockType,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
 } from '@wordpress/blocks';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { createElement, RawHTML } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import type { ReactNode } from 'react';
 import { store as blockEditorStore } from '../../../store';
+import {
+	getClipboardBlocksContent,
+	getPasteBlocks,
+	requiresWrapperOnCopy,
+} from '../../writing-flow/utils';
+import { BLOCK_CLIPBOARD_WRAPPER } from '../../../utils/block-clipboard';
 import usePasteStyles from '../';
 
 const blockName = 'core/paste-styles-test';
@@ -49,6 +56,51 @@ function clipboardItem( representations: Record< string, string | Error > ) {
 			return { text: async () => value } as Blob;
 		} ),
 	} as unknown as ClipboardItem;
+}
+
+function copiedListMarkup( copyWholeList = false ) {
+	const registry = createRegistry();
+	registry.register( blocksStore );
+	registry.register( blockEditorStore );
+	registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+	const item = createBlock( 'core/list-item', {
+		content: '',
+		fontSize: 'large',
+		metadata: { bindings: { content: { source: 'testing/copy' } } },
+	} );
+	const list = createBlock(
+		'core/list',
+		{
+			ordered: true,
+			fontSize: 'small',
+		},
+		[ item ]
+	);
+	registry.dispatch( blockEditorStore ).resetBlocks( [ list ] );
+	const attributesForCopy = new Map( [
+		[
+			item.clientId,
+			new Map( [
+				[
+					{},
+					{
+						attributes: item.attributes,
+						computedAttributes: {
+							...item.attributes,
+							content: 'Bound item',
+						},
+						boundAttributeNames: [ 'content' ],
+					},
+				],
+			] ),
+		],
+	] );
+	return getClipboardBlocksContent(
+		[ copyWholeList ? list : item ],
+		registry,
+		attributesForCopy,
+		{ addWrapper: 'bound' }
+	);
 }
 
 async function pasteStyles( clipboard: Partial< Clipboard > ) {
@@ -80,6 +132,7 @@ describe( 'usePasteStyles clipboard representations', () => {
 		registerBlockType< {
 			content: string;
 			style: Record< string, unknown >;
+			fontSize: string;
 			metadata: Record< string, unknown >;
 		} >( blockName, {
 			title: 'Paste styles test',
@@ -88,6 +141,7 @@ describe( 'usePasteStyles clipboard representations', () => {
 			attributes: {
 				content: { type: 'string', source: 'html', selector: 'p' },
 				style: { type: 'object' },
+				fontSize: { type: 'string' },
 				metadata: { type: 'object' },
 			},
 			supports: { typography: { fontSize: true } },
@@ -98,10 +152,136 @@ describe( 'usePasteStyles clipboard representations', () => {
 					createElement( RawHTML, null, attributes.content )
 				),
 		} );
+		for ( const name of [ 'core/list', 'core/list-item' ] ) {
+			registerBlockType< {
+				content: string;
+				ordered: boolean;
+				fontSize: string;
+				metadata: Record< string, unknown >;
+			} >( name, {
+				apiVersion: 3,
+				title: name,
+				category: 'text',
+				attributes: {
+					content: { type: 'string', source: 'html', selector: 'li' },
+					ordered: { type: 'boolean' },
+					fontSize: { type: 'string' },
+					metadata: { type: 'object' },
+				},
+				supports: { typography: { fontSize: true } },
+				...( name === 'core/list-item'
+					? { [ requiresWrapperOnCopy ]: true }
+					: {} ),
+				save: ( { attributes } ) =>
+					name === 'core/list-item'
+						? createElement(
+								'li',
+								null,
+								createElement(
+									RawHTML,
+									null,
+									attributes.content
+								)
+							)
+						: createElement(
+								attributes.ordered ? 'ol' : 'ul',
+								getInnerBlocksProps()
+							),
+			} );
+		}
 	} );
 
-	afterAll( () => unregisterBlockType( blockName ) );
+	afterAll( () => {
+		for ( const name of [ blockName, 'core/list', 'core/list-item' ] ) {
+			unregisterBlockType( name );
+		}
+	} );
 	afterEach( () => vi.unstubAllGlobals() );
+
+	it.each( [
+		[ 'html', '', '' ],
+		[ 'text', '', '' ],
+		[ 'html', ' \n\t', '' ],
+		[ 'html', `<meta charset='utf-8'>\n`, '' ],
+		[
+			'html',
+			'<html><body><!--StartFragment-->\n',
+			'\n<!--EndFragment--></body></html>',
+		],
+	] )(
+		'keeps the List wrapper for Paste and the selected item styles for Paste styles (%s, %s)',
+		async ( representation, prefix, suffix ) => {
+			const copied = copiedListMarkup();
+			const { plainText } = copied;
+			const html = prefix + copied.html + suffix;
+			const result = await pasteStyles(
+				representation === 'html'
+					? {
+							read: vi.fn().mockResolvedValue( [
+								clipboardItem( {
+									'text/html': html,
+									'text/plain': plainText,
+								} ),
+							] ),
+						}
+					: { readText: vi.fn().mockResolvedValue( html ) }
+			);
+			expect( result.attributes.fontSize ).toBe( 'large' );
+			expect( result.attributes.content ).toBe( 'Target text' );
+			expect( result.attributes.metadata ).toBeUndefined();
+			const representations: Record< string, string > =
+				representation === 'html'
+					? { 'text/html': html, 'text/plain': plainText }
+					: { 'text/plain': html };
+			const pasted = getPasteBlocks( {
+				clipboardData: {
+					getData: ( type: string ) => representations[ type ] ?? '',
+					files: [],
+					items: [],
+				} as unknown as DataTransfer,
+			} );
+			expect( console ).toHaveLogged();
+			expect( pasted ).toMatchObject( [
+				{
+					name: 'core/list',
+					isValid: true,
+					attributes: { ordered: true, fontSize: 'small' },
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							isValid: true,
+							attributes: {
+								content: 'Bound item',
+								fontSize: 'large',
+								metadata: {
+									bindings: {
+										content: { source: 'testing/copy' },
+									},
+								},
+							},
+						},
+					],
+				},
+			] );
+			expect( serialize( pasted ) ).not.toContain(
+				BLOCK_CLIPBOARD_WRAPPER
+			);
+			expect( plainText ).toBe( 'Bound item' );
+		}
+	);
+
+	it( 'keeps the styles of an actually selected List', async () => {
+		const { html } = copiedListMarkup( true );
+		expect( html ).not.toContain( BLOCK_CLIPBOARD_WRAPPER );
+		const result = await pasteStyles( {
+			read: vi
+				.fn()
+				.mockResolvedValue( [
+					clipboardItem( { 'text/html': html } ),
+				] ),
+		} );
+		expect( result.attributes.fontSize ).toBe( 'small' );
+	} );
 
 	it( 'uses serialized HTML and applies only its styles', async () => {
 		const readText = vi.fn();

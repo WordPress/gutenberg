@@ -15,6 +15,7 @@ import type { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { CopyMenuItem } from '../block-settings-dropdown';
 import { BlockRefs } from '../../provider/block-refs-provider';
+import { getPasteBlocks } from '../../writing-flow/utils';
 import type { BlockAttributes } from '../../../store/types';
 
 const { getBlocksByClientId, removeBlocks, notifyCopy } = vi.hoisted( () => ( {
@@ -46,8 +47,12 @@ describe( 'CopyMenuItem', () => {
 	let clipboardDescriptor: PropertyDescriptor | undefined;
 	let execCommandDescriptor: PropertyDescriptor | undefined;
 	let clipboard: {
-		write: Mock< () => Promise< void > >;
-		writeText: Mock< () => Promise< void > >;
+		write: Mock<
+			(
+				items: { representations: Record< string, Blob > }[]
+			) => Promise< void >
+		>;
+		writeText: Mock< ( text: string ) => Promise< void > >;
 	};
 	let block: Block< BlockAttributes >;
 	let attributesForCopy: NonNullable<
@@ -56,6 +61,7 @@ describe( 'CopyMenuItem', () => {
 
 	beforeEach( () => {
 		vi.clearAllMocks();
+		removeBlocks.mockReset();
 		registerBlockType< {
 			content: string;
 			metadata?: BlockAttributes[ 'metadata' ];
@@ -66,6 +72,17 @@ describe( 'CopyMenuItem', () => {
 			attributes: {
 				content: { type: 'string', source: 'html', selector: 'p' },
 				metadata: { type: 'object' },
+			},
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						selector: 'p',
+						schema: ( { phrasingContentSchema } ) => ( {
+							p: { children: phrasingContentSchema },
+						} ),
+					},
+				],
 			},
 			save,
 		} );
@@ -102,10 +119,14 @@ describe( 'CopyMenuItem', () => {
 		);
 		clipboard = {
 			write: vi
-				.fn< () => Promise< void > >()
+				.fn<
+					(
+						items: { representations: Record< string, Blob > }[]
+					) => Promise< void >
+				>()
 				.mockResolvedValue( undefined ),
 			writeText: vi
-				.fn< () => Promise< void > >()
+				.fn< ( text: string ) => Promise< void > >()
 				.mockResolvedValue( undefined ),
 		};
 		Object.defineProperty( navigator, 'clipboard', {
@@ -191,8 +212,8 @@ describe( 'CopyMenuItem', () => {
 				block.clientId,
 			] )
 		);
-		expect( clipboard.write ).toHaveBeenCalledTimes( 1 );
-		expect( clipboard.writeText ).not.toHaveBeenCalled();
+		expect( clipboard.writeText ).toHaveBeenCalledTimes( 1 );
+		expect( clipboard.write ).not.toHaveBeenCalled();
 		expect( onCopy ).toHaveBeenCalledTimes( 1 );
 		expect( removeBlocks ).not.toHaveBeenCalled();
 		expect( block.attributes.content ).toBe( '' );
@@ -203,7 +224,7 @@ describe( 'CopyMenuItem', () => {
 
 	it( 'removes cut blocks only after the clipboard write succeeds', async () => {
 		let finishWrite!: () => void;
-		clipboard.write.mockReturnValue(
+		clipboard.writeText.mockReturnValue(
 			new Promise< void >( ( resolve ) => {
 				finishWrite = resolve;
 			} )
@@ -226,7 +247,9 @@ describe( 'CopyMenuItem', () => {
 	} );
 
 	it( 'keeps cut blocks and omits notifications if copying fails', async () => {
-		clipboard.write.mockRejectedValue( new Error( 'Clipboard denied' ) );
+		clipboard.writeText.mockRejectedValue(
+			new Error( 'Clipboard denied' )
+		);
 		const { onCopy } = renderMenuItem( { eventType: 'cut' } );
 
 		await waitFor( () =>
@@ -235,6 +258,61 @@ describe( 'CopyMenuItem', () => {
 		expect( removeBlocks ).not.toHaveBeenCalled();
 		expect( notifyCopy ).not.toHaveBeenCalled();
 		expect( onCopy ).not.toHaveBeenCalled();
+	} );
+
+	it( 'preserves the binding when Cut uses the asynchronous clipboard fallback', async () => {
+		const copied = new Map< string, string >();
+		clipboard.write.mockImplementation( async ( items ) => {
+			for ( const [ type, blob ] of Object.entries(
+				items[ 0 ].representations
+			) ) {
+				const text = blob.text
+					? await blob.text()
+					: await new Promise< string >( ( resolve ) => {
+							const reader = new FileReader();
+							reader.onload = () =>
+								resolve( reader.result as string );
+							reader.readAsText( blob );
+						} );
+				// Model an HTML clipboard write that sanitizes block comments.
+				copied.set(
+					type,
+					type === 'text/html'
+						? text.replace( /<!--[\s\S]*?-->/g, '' )
+						: text
+				);
+			}
+		} );
+		clipboard.writeText.mockImplementation( async ( text ) => {
+			copied.set( 'text/plain', text );
+		} );
+		removeBlocks.mockImplementation( () => {
+			getBlocksByClientId.mockReturnValue( [] );
+			attributesForCopy.clear();
+		} );
+		renderMenuItem( { eventType: 'cut' } );
+		await waitFor( () =>
+			expect( removeBlocks ).toHaveBeenCalledTimes( 1 )
+		);
+		expect( document.execCommand ).toHaveBeenCalled();
+
+		const pasted = getPasteBlocks( {
+			clipboardData: {
+				getData: ( type: string ) => copied.get( type ) ?? '',
+				files: [],
+				items: [],
+			} as unknown as DataTransfer,
+		} );
+		expect( console ).toHaveLogged();
+		expect( pasted ).toMatchObject( [
+			{
+				isValid: true,
+				attributes: {
+					content: 'Bound text',
+					metadata: block.attributes.metadata,
+				},
+			},
+		] );
 	} );
 
 	it( 'keeps copy styles on the original serialization path', async () => {

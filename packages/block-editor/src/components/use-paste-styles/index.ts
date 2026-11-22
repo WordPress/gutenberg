@@ -6,6 +6,10 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import {
+	normalizeClipboardHTML,
+	stripBlockClipboardWrapper,
+} from '../../utils/block-clipboard';
+import {
 	hasAlignSupport,
 	hasBorderSupport,
 	hasBackgroundColorSupport,
@@ -27,12 +31,17 @@ import {
  */
 function getSerializedBlocks( text: string ): Block[] {
 	try {
-		const blocks = parse( text, {
+		const normalizedText = normalizeClipboardHTML( text );
+		const content = stripBlockClipboardWrapper( normalizedText );
+		const blocks = parse( content, {
 			__unstableSkipMigrationLogs: true,
 			__unstableSkipAutop: true,
 		} );
 		if ( blocks.length === 1 && blocks[ 0 ].name === 'core/freeform' ) {
 			return [];
+		}
+		if ( content !== normalizedText && blocks.length === 1 ) {
+			return blocks[ 0 ].innerBlocks;
 		}
 		return blocks;
 	} catch {

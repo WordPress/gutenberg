@@ -29,17 +29,6 @@ function CopyButton( {
 	return createElement( 'button', { ref }, 'Copy' );
 }
 
-function readBlob( blob: Blob ) {
-	if ( blob.text ) {
-		return blob.text();
-	}
-	return new Promise< string | ArrayBuffer | null >( ( resolve ) => {
-		const reader = new window.FileReader();
-		reader.onload = () => resolve( reader.result );
-		reader.readAsText( blob );
-	} );
-}
-
 describe( 'block clipboard writes', () => {
 	let clipboardDescriptor: PropertyDescriptor | undefined;
 	let execCommandDescriptor: PropertyDescriptor | undefined;
@@ -107,24 +96,14 @@ describe( 'block clipboard writes', () => {
 		vi.unstubAllGlobals();
 	} );
 
-	it( 'writes both clipboard representations and notifies on success', async () => {
+	it( 'preserves serialized block comments in the asynchronous text fallback', async () => {
 		const onSuccess = vi.fn();
 		render( createElement( CopyButton, { onSuccess } ) );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Copy' } ) );
 
 		await waitFor( () => expect( onSuccess ).toHaveBeenCalledTimes( 1 ) );
-		expect( clipboard.writeText ).not.toHaveBeenCalled();
-		const item = clipboard.write.mock.calls[ 0 ][ 0 ][ 0 ];
-		expect( Object.keys( item.representations ) ).toEqual( [
-			'text/html',
-			'text/plain',
-		] );
-		expect( await readBlob( item.representations[ 'text/html' ] ) ).toBe(
-			content.html
-		);
-		expect( await readBlob( item.representations[ 'text/plain' ] ) ).toBe(
-			content.plainText
-		);
+		expect( clipboard.writeText ).toHaveBeenCalledWith( content.html );
+		expect( clipboard.write ).not.toHaveBeenCalled();
 		expect( screen.getByRole( 'button', { name: 'Copy' } ) ).toHaveFocus();
 	} );
 
@@ -157,13 +136,16 @@ describe( 'block clipboard writes', () => {
 				onSuccess,
 			} )
 		);
-		currentContent = { ...content, plainText: 'Updated text' };
+		currentContent = {
+			...content,
+			html: '<!-- wp:paragraph --><p>Updated text</p><!-- /wp:paragraph -->',
+			plainText: 'Updated text',
+		};
 		fireEvent.click( screen.getByRole( 'button', { name: 'Copy' } ) );
 
 		await waitFor( () => expect( onSuccess ).toHaveBeenCalledTimes( 1 ) );
-		const item = clipboard.write.mock.calls[ 0 ][ 0 ][ 0 ];
-		expect( await readBlob( item.representations[ 'text/plain' ] ) ).toBe(
-			'Updated text'
+		expect( clipboard.writeText ).toHaveBeenCalledWith(
+			currentContent.html
 		);
 	} );
 
@@ -256,6 +238,9 @@ describe( 'block clipboard writes', () => {
 
 	it( 'restores an input selection when the fallback fails', async () => {
 		vi.stubGlobal( 'ClipboardItem', undefined );
+		clipboard.writeText.mockRejectedValue(
+			new Error( 'Clipboard denied' )
+		);
 		render(
 			createElement( 'input', {
 				'aria-label': 'Original input',
@@ -281,6 +266,9 @@ describe( 'block clipboard writes', () => {
 
 	it( 'does not report success when execCommand omits the copy event', async () => {
 		vi.stubGlobal( 'ClipboardItem', undefined );
+		clipboard.writeText.mockRejectedValue(
+			new Error( 'Clipboard denied' )
+		);
 		vi.mocked( document.execCommand ).mockReturnValue( true );
 		render( createElement( 'button', null, 'Trigger' ) );
 
@@ -293,7 +281,9 @@ describe( 'block clipboard writes', () => {
 	} );
 
 	it( 'does not run success callbacks if both clipboard methods fail', async () => {
-		clipboard.write.mockRejectedValue( new Error( 'Clipboard denied' ) );
+		clipboard.writeText.mockRejectedValue(
+			new Error( 'Clipboard denied' )
+		);
 		const onSuccess = vi.fn();
 		render( createElement( CopyButton, { onSuccess } ) );
 		fireEvent.click( screen.getByRole( 'button', { name: 'Copy' } ) );
@@ -334,7 +324,7 @@ describe( 'block clipboard writes', () => {
 
 	it( 'runs the success callback after unmount without restoring focus to the removed button', async () => {
 		let finishWrite!: () => void;
-		clipboard.write.mockReturnValue(
+		clipboard.writeText.mockReturnValue(
 			new Promise< void >( ( resolve ) => {
 				finishWrite = resolve;
 			} )

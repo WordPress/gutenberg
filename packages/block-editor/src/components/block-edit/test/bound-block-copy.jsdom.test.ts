@@ -87,6 +87,9 @@ describe( 'copying a rendered bound block', () => {
 		document.getSelection()!.removeAllRanges();
 		act( () => {
 			unregisterBlockBindingsSource( sourceName );
+			if ( source.name !== sourceName ) {
+				unregisterBlockBindingsSource( source.name );
+			}
 			unregisterBlockType( blockName );
 		} );
 	} );
@@ -163,6 +166,63 @@ describe( 'copying a rendered bound block', () => {
 			html: clipboard.get( 'text/html' )!,
 		};
 	}
+
+	it( 'keeps the saved fallback when a binding only has a server-side placeholder', () => {
+		source = {
+			name: 'testing/server-only-source',
+			label: 'Server Source',
+		};
+		registerBlockBindingsSource( source );
+		const registry = createRegistry();
+		registry.register( blocksStore );
+		registry.register( blockEditorStore );
+		registry.register( noticesStore );
+		registry.dispatch( blocksStore ).addBlockTypes( getBlockTypes() );
+		unlock( registry.dispatch( blocksStore ) ).addBlockBindingsSource(
+			source
+		);
+		const actions = registry.dispatch( blockEditorStore );
+		const serverBindings = { content: { source: source.name } };
+		const boundBlock = createBlock( blockName, {
+			content: 'paragraph default content',
+			metadata: { bindings: serverBindings },
+		} );
+		const normalBlock = createBlock( blockName, {
+			content: 'Normal paragraph',
+		} );
+		actions.resetBlocks( [ boundBlock, normalBlock ] );
+		actions.multiSelect( boundBlock.clientId, normalBlock.clientId );
+		render(
+			createElement(
+				RegistryProvider,
+				{ value: registry },
+				createElement(
+					BlockRefsProvider,
+					null,
+					createElement( Canvas, { clientId: boundBlock.clientId } )
+				)
+			)
+		);
+
+		const paragraph = screen.getByRole( 'textbox', {
+			name: 'Bound paragraph',
+		} );
+		expect( paragraph ).toHaveTextContent( 'Server Source' );
+		const copied = copyFrom( paragraph );
+		expect( copied.plainText ).toBe(
+			'paragraph default content\n\nNormal paragraph'
+		);
+		expect( parse( copied.html )[ 0 ] ).toMatchObject( {
+			isValid: true,
+			attributes: {
+				content: 'paragraph default content',
+				metadata: { bindings: serverBindings },
+			},
+		} );
+		expect( boundBlock.attributes.content ).toBe(
+			'paragraph default content'
+		);
+	} );
 
 	it.each( [ 'canvas', 'list view', 'canvas with RichText endpoints' ] )(
 		'copies current resolved content from the %s without changing the source',

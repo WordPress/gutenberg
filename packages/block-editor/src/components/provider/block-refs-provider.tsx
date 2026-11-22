@@ -29,18 +29,17 @@ export function getBoundAttributesForCopy(
 	const { attributes, computedAttributes, boundAttributeNames } = instances
 		.values()
 		.next().value!;
-	if (
-		attributes !== block.attributes ||
-		! boundAttributeNames.length ||
-		boundAttributeNames.some(
-			( attributeName ) =>
-				! Object.hasOwn( computedAttributes, attributeName )
-		)
-	) {
+	if ( attributes !== block.attributes ) {
+		return;
+	}
+	const availableAttributeNames = boundAttributeNames.filter(
+		( attributeName ) => Object.hasOwn( computedAttributes, attributeName )
+	);
+	if ( ! availableAttributeNames.length ) {
 		return;
 	}
 	return Object.fromEntries(
-		boundAttributeNames.map( ( attributeName ) => [
+		availableAttributeNames.map( ( attributeName ) => [
 			attributeName,
 			computedAttributes[ attributeName ],
 		] )

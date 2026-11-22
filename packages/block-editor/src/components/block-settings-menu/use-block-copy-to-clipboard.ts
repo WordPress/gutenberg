@@ -87,26 +87,9 @@ export async function writeBlocksToClipboard(
 	if ( copyBlocksWithEvent( content, ownerDocument ) ) {
 		return true;
 	}
-	const view = ownerDocument.defaultView as
-		( Window & typeof globalThis ) | null;
-	if ( view?.navigator.clipboard?.write && view.ClipboardItem ) {
-		try {
-			await view.navigator.clipboard.write( [
-				new view.ClipboardItem( {
-					'text/html': new view.Blob( [ content.html ], {
-						type: 'text/html',
-					} ),
-					'text/plain': new view.Blob( [ content.plainText ], {
-						type: 'text/plain',
-					} ),
-				} ),
-			] );
-			return true;
-		} catch {
-			return false;
-		}
-	}
-	return false;
+	// Keep the serialized block comments if the copy event is unavailable.
+	// A successful async HTML write can sanitize them and lose the bindings.
+	return writeTextToClipboard( content.html, trigger! );
 }
 
 async function writeTextToClipboard( text: string, trigger: HTMLElement ) {

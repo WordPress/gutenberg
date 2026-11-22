@@ -188,6 +188,7 @@ const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 					( [ attributeName, binding ] ) =>
 						bindableAttributes?.includes( attributeName ) &&
 						registeredSources[ binding?.source as string ]
+							?.getValues
 				)
 				.map( ( [ attributeName ] ) => attributeName ),
 		[ bindableAttributes, blockBindings, registeredSources ]

@@ -61,7 +61,9 @@ describe( 'Edit', () => {
 				category: 'text',
 				title: 'Copy test',
 				edit: ( { attributes } ) => (
-					<p>{ attributes.content as string }</p>
+					<p>
+						{ ( attributes.content ?? attributes.text ) as string }
+					</p>
 				),
 				save: noop,
 			} );
@@ -268,7 +270,43 @@ describe( 'Edit', () => {
 			expect( attributesForCopy.size ).toBe( 0 );
 		} );
 
-		it( 'omits partially resolved attributes', () => {
+		it.each( [ undefined, 'https://example.com/saved' ] )(
+			'keeps resolved Button text when its bound URL fallback is %s',
+			( url ) => {
+				registerBoundBlock( () => ( { text: 'Visible label' } ) );
+				const attributesForCopy = new Map();
+				const attributes = {
+					...( url ? { url } : {} ),
+					metadata: {
+						bindings: {
+							text: { source: 'testing/copy' },
+							url: { source: 'testing/copy' },
+						},
+					},
+				};
+				render(
+					<BoundEdit
+						attributesForCopy={ attributesForCopy }
+						attributes={ attributes }
+						bindableAttributes={ [ 'text', 'url' ] }
+					/>
+				);
+
+				expect( screen.getByText( 'Visible label' ) ).toBeVisible();
+				expect(
+					getBoundAttributesForCopy(
+						{ clientId: 'bound-block', attributes },
+						attributesForCopy
+					)
+				).toEqual( {
+					text: 'Visible label',
+					...( url ? { url } : {} ),
+				} );
+				expect( attributes ).not.toHaveProperty( 'text' );
+			}
+		);
+
+		it( 'omits attributes when none of the bound values is available', () => {
 			registerBoundBlock( () => ( {} ) );
 			const attributesForCopy = new Map();
 			const attributes = { metadata: { bindings } };
