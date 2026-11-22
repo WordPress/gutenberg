@@ -1,16 +1,14 @@
 /**
- * Suggest-mode overlay HOC.
+ * Suggestion mode attribute-proposal HOC.
  *
- * This HOC captures block edits made in Suggest intent: primitive attribute
- * changes (heading level, alignment) and content edits route through
- * `wrappedSetAttributes` into the overlay, a per-block store of the clean
- * proposed value that auto-save reads to build the suggestion's operations.
- * The block-editor store stays at the baseline until Accept/Reject, so the
- * document is never mutated in place. The HOC also renders the pending-
- * suggestion visual treatment: the green "bracket" for an attribute overlay,
- * and the strikethrough/dim/move overlays for a structural marker. See #77867
- * for the overlay tradeoff and #73411 for the feature. Inline text and
- * formatting markers are layered on top of this HOC in a later step.
+ * Captures block edits made in Suggest intent: attribute changes route
+ * through `wrappedSetAttributes` into the block's own
+ * `metadata.suggestion.after` (see `marker.ts`): a persistent change the
+ * undo stack owns, saved with the post and synced to peers, while the live
+ * attributes stay at the baseline until Accept. Auto-save reads the marker to
+ * build the suggestion's operations. The HOC also renders the pending
+ * proposal merged over the live attributes, and the visual treatment for
+ * proposals and structural markers.
  */
 import clsx from 'clsx';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -18,12 +16,16 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
+import { useSuggestionSessionActions } from './suggestion-session';
 import {
-	useOverlayEntry,
-	useSuggestionOverlayActions,
-} from './overlay-context';
+	mergeProposedAttributes,
+	proposedAttributes,
+	readSuggestionMarker,
+	withProposedAttributes,
+} from './marker';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
@@ -32,65 +34,40 @@ import useMoveGhosts from './use-move-ghosts';
 import {
 	isPartOfPendingInsertion,
 	isPartOfPendingInsertionCached,
-	type SuggestionMarker,
 } from './store-interceptor';
 
 /**
- * Attribute keys whose values are known to be object-valued and therefore
- * need a one-level-deep merge so the overlay preserves untouched fields.
- * `metadata` is the only one: the interceptor strips the system keys
- * (`noteId`, `suggestion`) from the metadata it routes into the overlay, so
- * the overlay copy is partial. Other attributes, `style` included, are
- * replaced wholesale, which matches `setAttributes` semantics: a style reset
- * sends a style object without the cleared fields.
- */
-const DEEP_MERGE_KEYS = new Set( [ 'metadata' ] );
-
-/**
- * Apply an overlay attribute set on top of the block's real attributes for
- * rendering. Keys in `DEEP_MERGE_KEYS` (currently `metadata`) are
- * one-level-merged so the system fields the overlay never carries survive.
- * Every other key is replaced wholesale, matching `setAttributes` semantics.
+ * The block's live attributes. `BlockListBlock` hands `BlockEdit` the
+ * proposal merged over them (see `withSuggestionBlockClassName`), so the
+ * baseline an edit is diffed against comes from the store.
  *
- * @param base    Block's real attributes from the block-editor store.
- * @param overlay Pending overlay attributes; `null` is a no-op.
- * @return Merged attributes for rendering. Returns `base` by reference
- * when there is no overlay to apply, so React's prop-identity bail-out fires.
+ * @param clientId Block client id.
+ * @param fallback Attributes from props, for a block missing from the store.
+ * @return Live attributes.
  */
-function mergeOverlayAttributes(
-	base: Record< string, any >,
-	overlay: Record< string, any > | null | undefined
+function useLiveAttributes(
+	clientId: string,
+	fallback: Record< string, any >
 ): Record< string, any > {
-	if ( ! overlay ) {
-		return base;
-	}
-	const merged = { ...base };
-	for ( const [ key, value ] of Object.entries( overlay ) ) {
-		if (
-			DEEP_MERGE_KEYS.has( key ) &&
-			value &&
-			typeof value === 'object' &&
-			! Array.isArray( value ) &&
-			merged[ key ] &&
-			typeof merged[ key ] === 'object' &&
-			! Array.isArray( merged[ key ] )
-		) {
-			merged[ key ] = { ...merged[ key ], ...value };
-		} else {
-			merged[ key ] = value;
-		}
-	}
-	return merged;
+	return (
+		useSelect(
+			( select ) =>
+				( select( blockEditorStore ) as any ).getBlockAttributes(
+					clientId
+				),
+			[ clientId ]
+		) ?? fallback
+	);
 }
 
 /**
- * Inner renderer that owns the suggestion overlay hooks. Only mounted when
- * the editor is in `suggest` intent, so the overlay's context lookup,
- * refs, and memoized merge don't run on every `BlockEdit` render for every
- * block across the entire editor when suggestions are inactive. This split
- * matters for large documents — in Edit intent the outer wrapper
- * executes a single `useSelect` and renders the original `BlockEdit`
- * untouched.
+ * Inner renderer that diverts edits into proposals. Only mounted when the
+ * editor is in `suggest` intent, so the session lookup, refs, and the edit
+ * handlers don't run on every `BlockEdit` render for every block across the
+ * entire editor when suggestions are inactive. This split matters for large
+ * documents: in Edit intent the outer wrapper executes a single
+ * `useSelect` and renders the original `BlockEdit` untouched unless the block
+ * carries a proposal (see `ProposedBlockEdit`).
  *
  * @param args           Arguments.
  * @param args.BlockEdit Wrapped edit component.
@@ -103,12 +80,10 @@ function SuggestingBlockEdit( {
 	BlockEdit: any;
 	props: any;
 } ) {
-	const { clientId, name, attributes, setAttributes } = props;
-	// Subscribes to this block's entry only, so another block's overlay
-	// write does not re-render every block in Suggest intent.
-	const { captureBaseline, setOverlayAttributes, isDeferredInsertion } =
-		useSuggestionOverlayActions();
-	const overlayEntry = useOverlayEntry( clientId );
+	const { clientId, setAttributes } = props;
+	const attributes = useLiveAttributes( clientId, props.attributes );
+	const { isDeferredInsertion, noteHistoryCapture } =
+		useSuggestionSessionActions();
 
 	// Registry handle for the write-through check below; the live block
 	// state is read at call time, not render time, so a block that was
@@ -127,11 +102,19 @@ function SuggestingBlockEdit( {
 		attributesRef.current = attributes;
 	}, [ attributes ] );
 
-	const overlayAttributes = overlayEntry?.overlayAttributes ?? null;
+	// The suggester's user id, recorded on a fresh marker. Defaults to `null`
+	// for anonymous / pre-collab edits.
+	const { authorId } = useSelect( ( select ) => {
+		const core = select( coreStore );
+		return { authorId: core?.getCurrentUser?.()?.id ?? null };
+	}, [] );
 
+	// The proposal is part of the attributes themselves, so it arrives with
+	// every attribute update (undo, RTC sync, a decision) at no extra cost.
+	const after = proposedAttributes( readSuggestionMarker( attributes ) );
 	const mergedAttributes = useMemo(
-		() => mergeOverlayAttributes( attributes, overlayAttributes ),
-		[ attributes, overlayAttributes ]
+		() => mergeProposedAttributes( attributes, after ),
+		[ attributes, after ]
 	);
 
 	// What the block sees, kept current between renders as well: an updater
@@ -141,13 +124,6 @@ function SuggestingBlockEdit( {
 	useEffect( () => {
 		mergedAttributesRef.current = mergedAttributes;
 	}, [ mergedAttributes ] );
-
-	// Does an overlay entry currently exist for this block? This is the
-	// source of truth; `captureBaseline` only creates an entry when there
-	// isn't one, so we can skip the dispatch when we already know there is.
-	// Relying on a local ref was fragile — it didn't reset after the entry
-	// was cleared (auto-save trash, orphan prune, intent-switch).
-	const entryExists = !! overlayEntry;
 
 	const wrappedSetAttributes = useCallback(
 		(
@@ -159,7 +135,7 @@ function SuggestingBlockEdit( {
 		) => {
 			/*
 			 * Edits inside a block that IS the suggestion write through to
-			 * the real attributes instead of the overlay:
+			 * the real attributes instead of a proposal:
 			 * - A deferred insertion (an empty default block the interceptor
 			 *   hasn't registered yet) receives its first content this way,
 			 *   which is what triggers the interceptor to register the whole
@@ -186,6 +162,8 @@ function SuggestingBlockEdit( {
 				setAttributes( nextAttributes );
 				return;
 			}
+			// An updater function builds on what the block sees now, overlay
+			// included, so resolve it before any handler inspects the edit.
 			const updates =
 				typeof nextAttributes === 'function'
 					? nextAttributes( mergedAttributesRef.current )
@@ -195,23 +173,29 @@ function SuggestingBlockEdit( {
 				...updates,
 			};
 			/*
-			 * First overlay write for this block snapshots the current
-			 * attributes as the baseline; subsequent writes only record
-			 * overlay deltas. This lets the diff renderer below compare
-			 * "what the block looked like when the suggestion started"
-			 * against "what the suggester is proposing now".
+			 * The proposal is written into the block's own marker, as a normal
+			 * persistent change: it is the user's edit, so Ctrl+Z withdraws
+			 * it, it saves with the post, and it syncs to peers. The live
+			 * attributes stay at the baseline.
 			 */
-			if ( ! entryExists ) {
-				captureBaseline( clientId, name, attributesRef.current );
-			}
-			setOverlayAttributes( clientId, updates );
+			const { metadata } = withProposedAttributes( {
+				metadata: attributesRef.current?.metadata,
+				liveAttributes: attributesRef.current ?? {},
+				changes: updates,
+				authorId,
+			} );
+			// Keep `attributesRef` ahead of the render so a second write in
+			// the same tick folds into this marker instead of replacing it.
+			attributesRef.current = { ...attributesRef.current, metadata };
+			noteHistoryCapture();
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { metadata } );
 		},
 		[
 			clientId,
-			name,
-			captureBaseline,
-			setOverlayAttributes,
-			entryExists,
+			authorId,
+			noteHistoryCapture,
 			isDeferredInsertion,
 			setAttributes,
 			registry,
@@ -228,26 +212,89 @@ function SuggestingBlockEdit( {
 }
 
 /**
- * HOC that diverts block edits to the suggestion overlay when the editor is
- * in the `suggest` intent. The block's real attributes are never mutated;
- * overlay attributes are merged into the `attributes` prop for rendering so
- * the user sees their in-progress change, but the block-editor store stays
- * at the baseline until the suggestion is committed.
+ * Render half of the HOC: a block that carries a proposal shows it in every
+ * intent, exactly as a pending removal or an inline marker does. Edits to
+ * attributes that are not proposed go to the real setter and move the
+ * baseline. An edit to a proposed attribute is declined: the canvas shows
+ * the proposal, so the write would land on a value the author cannot see,
+ * and a content proposal would be typed over into the live content. The
+ * author accepts or rejects the suggestion first.
  *
- * In any other intent the HOC is a pass-through and adds only a single
- * `useSelect` call per block.
+ * @param args           Arguments.
+ * @param args.BlockEdit Wrapped edit component.
+ * @param args.props     Props to forward to `BlockEdit`.
+ */
+function ProposedBlockEdit( {
+	BlockEdit,
+	props,
+}: {
+	BlockEdit: any;
+	props: any;
+} ) {
+	const { clientId, setAttributes } = props;
+	const attributes = useLiveAttributes( clientId, props.attributes );
+	const after = proposedAttributes( readSuggestionMarker( attributes ) );
+	const mergedAttributes = useMemo(
+		() => mergeProposedAttributes( attributes, after ),
+		[ attributes, after ]
+	);
+	const afterRef = useRef( after );
+	useEffect( () => {
+		afterRef.current = after;
+	}, [ after ] );
+	const guardedSetAttributes = useCallback(
+		(
+			nextAttributes:
+				| Record< string, any >
+				| ( (
+						current: Record< string, any >
+				  ) => Record< string, any > )
+		) => {
+			const proposed = afterRef.current;
+			if ( proposed && typeof nextAttributes === 'object' ) {
+				for ( const key of Object.keys( nextAttributes ) ) {
+					if (
+						Object.prototype.hasOwnProperty.call( proposed, key )
+					) {
+						return;
+					}
+				}
+			}
+			setAttributes( nextAttributes );
+		},
+		[ setAttributes ]
+	);
+	return (
+		<BlockEdit
+			{ ...props }
+			attributes={ mergedAttributes }
+			setAttributes={ guardedSetAttributes }
+		/>
+	);
+}
+
+/**
+ * HOC that diverts block edits into the block's proposal marker when the
+ * editor is in the `suggest` intent, and renders a pending proposal merged
+ * over the live attributes in every intent. The block's live attributes are
+ * never mutated by a suggester; the block-editor store stays at the baseline
+ * until the suggestion is accepted.
+ *
+ * For a block with no proposal in any other intent the HOC is a pass-through
+ * and adds only a single `useSelect` call per block.
  */
 const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
 			const { clientId } = props;
-			const { isSuggestMode, isPendingInsert } = useSelect(
+			const { isSuggestMode, isPendingInsert, hasProposal } = useSelect(
 				( select ) => {
 					// `getEditorIntent` is private while Suggest mode is
 					// experimental.
 					const suggesting =
 						unlock( select( STORE_NAME ) ).getEditorIntent() ===
 						EDITOR_INTENT_SUGGEST;
+					const blockEditor: any = select( blockEditorStore );
 					return {
 						isSuggestMode: suggesting,
 						// Only Suggest intent acts on it; skip the lookup
@@ -255,29 +302,42 @@ const withSuggestionOverlay = createHigherOrderComponent(
 						isPendingInsert:
 							suggesting &&
 							isPartOfPendingInsertionCached(
-								select( blockEditorStore ),
+								blockEditor,
 								clientId
 							),
+						hasProposal: !! proposedAttributes(
+							readSuggestionMarker(
+								blockEditor?.getBlockAttributes?.( clientId )
+							)
+						),
 					};
 				},
 				[ clientId ]
 			);
 
-			// A pending-insert block has no "before" state to preserve — the
+			// A pending-insert block has no "before" state to preserve: the
 			// block itself is the suggestion. Edits to it (and to blocks
-			// nested inside it — the children of a suggested-in Group are
+			// nested inside it; the children of a suggested-in Group are
 			// part of the Group's insertion) write through to the real
-			// attributes (skipping the overlay) so the content syncs via
-			// CRDT and renders on the reviewer's canvas as part of the
-			// preview, instead of being trapped in the suggester's local
-			// overlay.
-			if ( ! isSuggestMode || isPendingInsert ) {
-				return <BlockEdit { ...props } />;
+			// attributes so the content syncs via CRDT and renders on the
+			// reviewer's canvas as part of the preview.
+			if ( isSuggestMode && ! isPendingInsert ) {
+				return (
+					<SuggestingBlockEdit
+						BlockEdit={ BlockEdit }
+						props={ props }
+					/>
+				);
 			}
-
-			return (
-				<SuggestingBlockEdit BlockEdit={ BlockEdit } props={ props } />
-			);
+			if ( hasProposal ) {
+				return (
+					<ProposedBlockEdit
+						BlockEdit={ BlockEdit }
+						props={ props }
+					/>
+				);
+			}
+			return <BlockEdit { ...props } />;
 		},
 	'withSuggestionOverlay'
 );
@@ -307,24 +367,19 @@ function structuralMarkerClass( type: string | undefined ): string | null {
 
 /**
  * HOC that tags the rendered block list item with a class whenever it has a
- * pending suggestion — either an attribute overlay (renders the green
- * "bracket" treatment) or a structural marker stored in
- * `metadata.suggestion` (renders strikethrough/dim/move overlays).
+ * pending suggestion: an attribute proposal (renders the "bracket"
+ * treatment) or a structural marker (renders strikethrough/dim/move
+ * overlays), both stored in `metadata.suggestion`.
  *
- * The attribute "bracket" is suggest-mode-only — it represents the suggester's
- * uncommitted edits living in the local overlay, which other intents have no
- * way to interact with. Structural markers, by contrast, are persisted on the
- * live block (synced through the same path as block content), so reviewers in
- * Edit intent see and can act on them too — that's the visual cue a
- * post author needs to spot a pending removal/insertion/move at a glance.
+ * Both are persisted on the live block (synced through the same path as
+ * block content), so reviewers in Edit intent see and can act on
+ * them too; that's the visual cue a post author needs to spot a pending
+ * change at a glance.
  */
 const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
-			// Runs for every block in every intent: subscribe to this
-			// block's entry only.
-			const entry = useOverlayEntry( clientId );
 			const moveGhosts = useMoveGhosts();
 			const ghostsAfter = moveGhosts?.after?.get( clientId );
 			const ghostsBefore = moveGhosts?.before?.get( clientId );
@@ -333,29 +388,41 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				( ghostsAfter && ghostsAfter.length > 0 ) ||
 				( ghostsBefore && ghostsBefore.length > 0 ) ||
 				( ghostsInside && ghostsInside.length > 0 );
-			const { isSuggestMode, structuralClass, authorId } = useSelect(
-				( select ) => {
-					const editor = unlock( select( STORE_NAME ) );
-					const blockEditor = select( blockEditorStore );
-					const marker = blockEditor?.getBlockAttributes?.( clientId )
-						?.metadata?.suggestion as SuggestionMarker | undefined;
-					return {
-						isSuggestMode:
-							editor.getEditorIntent() === EDITOR_INTENT_SUGGEST,
-						structuralClass: structuralMarkerClass( marker?.type ),
-						authorId: marker?.authorId ?? null,
-					};
-				},
-				[ clientId ]
-			);
-			const hasPendingOverlay =
-				!! entry &&
-				Object.keys( entry.overlayAttributes ?? {} ).length > 0;
-			const showOverlayBracket = isSuggestMode && hasPendingOverlay;
+			const { structuralClass, showBracket, authorId, attributes } =
+				useSelect(
+					( select ) => {
+						const blockEditor: any = select( blockEditorStore );
+						const live =
+							blockEditor?.getBlockAttributes?.( clientId );
+						const marker = readSuggestionMarker( live );
+						return {
+							structuralClass: structuralMarkerClass(
+								marker?.type
+							),
+							showBracket: !! proposedAttributes( marker ),
+							authorId: marker?.authorId ?? null,
+							attributes: live,
+						};
+					},
+					[ clientId ]
+				);
+			/*
+			 * Block supports (font size, colors, duotone, alignment) build
+			 * the wrapper from these attributes, not from what `BlockEdit`
+			 * renders, so the proposal has to go in here to be previewed.
+			 */
+			const previewAttributes = useMemo( () => {
+				const proposal = showBracket
+					? proposedAttributes( readSuggestionMarker( attributes ) )
+					: null;
+				return proposal
+					? mergeProposedAttributes( attributes, proposal )
+					: null;
+			}, [ showBracket, attributes ] );
 			const isPendingMove =
 				structuralClass === 'is-suggestion-pending-move';
 
-			if ( ! showOverlayBracket && ! structuralClass && ! hasGhosts ) {
+			if ( ! showBracket && ! structuralClass && ! hasGhosts ) {
 				return <BlockListBlock { ...props } />;
 			}
 
@@ -384,10 +451,10 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					: props.wrapperProps?.style;
 
 			const blockClassName =
-				showOverlayBracket || structuralClass
+				showBracket || structuralClass
 					? clsx(
 							props.className,
-							showOverlayBracket && 'is-suggestion-pending',
+							showBracket && 'is-suggestion-pending',
 							structuralClass
 						)
 					: props.className;
@@ -402,6 +469,9 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 					) }
 					<BlockListBlock
 						{ ...props }
+						{ ...( previewAttributes && {
+							attributes: previewAttributes,
+						} ) }
 						className={ blockClassName }
 						wrapperProps={ {
 							...props.wrapperProps,
@@ -431,8 +501,8 @@ export { structuralMarkerClass, withSuggestionBlockClassName };
 let filterRegistered = false;
 
 /**
- * Register the overlay filters. Idempotent — safe to call multiple times
- * (hot reload, dynamic imports).
+ * Register the filters. Idempotent: safe to call multiple times (hot reload,
+ * dynamic imports).
  */
 export function registerSuggestionOverlayFilter() {
 	if ( filterRegistered ) {
@@ -451,5 +521,4 @@ export function registerSuggestionOverlayFilter() {
 	);
 }
 
-export { mergeOverlayAttributes };
 export default withSuggestionOverlay;
