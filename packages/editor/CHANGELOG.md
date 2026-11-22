@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   `PostTitle`: Preserve literal Markdown characters when pasting text into the post title ([#85365](https://github.com/WordPress/gutenberg/pull/85365)).
 
 ### Documentation
