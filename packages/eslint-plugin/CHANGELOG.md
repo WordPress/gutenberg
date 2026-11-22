@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Mark `CustomSelectControl` as deprecated and suggest composing `Select` for the small size ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
+-   `use-recommended-components`: Recommend `KeyboardShortcut` from `@wordpress/ui` for static shortcut displays ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
 ## 28.2.0 (2026-11-18)
 
 ### Enhancements

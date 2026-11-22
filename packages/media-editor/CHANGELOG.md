@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Expose readable text for shortcut keycaps, including arrow groups and the Plus and Minus zoom keys ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
+
 ## 0.23.0 (2026-11-18)
 
 ### Enhancements

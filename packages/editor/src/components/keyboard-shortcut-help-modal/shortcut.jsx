@@ -1,53 +1,7 @@
-import { VisuallyHidden } from '@wordpress/ui';
-import { Fragment } from '@wordpress/element';
-import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
-
-function KeyCombination( { keyCombination, forceAriaLabel } ) {
-	const shortcut = keyCombination.modifier
-		? displayShortcutList[ keyCombination.modifier ](
-				keyCombination.character
-			)
-		: keyCombination.character;
-	const ariaLabel = keyCombination.modifier
-		? shortcutAriaLabel[ keyCombination.modifier ](
-				keyCombination.character
-			)
-		: keyCombination.character;
-
-	return (
-		<kbd
-			className="editor-keyboard-shortcut-help-modal__shortcut-key-combination"
-			dir="ltr"
-		>
-			<VisuallyHidden render={ <span /> }>
-				{ forceAriaLabel || ariaLabel }
-			</VisuallyHidden>
-			<span aria-hidden="true">
-				{ ( Array.isArray( shortcut ) ? shortcut : [ shortcut ] ).map(
-					( character, index ) => {
-						if ( character === '+' ) {
-							return (
-								<Fragment key={ index }>{ character }</Fragment>
-							);
-						}
-
-						return (
-							<kbd
-								key={ index }
-								className="editor-keyboard-shortcut-help-modal__shortcut-key"
-							>
-								{ character }
-							</kbd>
-						);
-					}
-				) }
-			</span>
-		</kbd>
-	);
-}
+import { KeyboardShortcut } from '@wordpress/ui';
 
 /**
- * @typedef {{ character: string, modifier?: import('@wordpress/keycodes').WPKeycodeModifier }} KeyCombination
+ * @typedef {import('react').ComponentProps<typeof KeyboardShortcut>['keyCombination']} KeyCombination
  */
 
 /**
@@ -64,14 +18,18 @@ function Shortcut( { description, keyCombination, aliases = [], ariaLabel } ) {
 				{ description }
 			</div>
 			<div className="editor-keyboard-shortcut-help-modal__shortcut-term">
-				<KeyCombination
+				<KeyboardShortcut
 					keyCombination={ keyCombination }
-					forceAriaLabel={ ariaLabel }
+					label={ ariaLabel }
+					className="editor-keyboard-shortcut-help-modal__shortcut-key-combination"
+					keyClassName="editor-keyboard-shortcut-help-modal__shortcut-key"
 				/>
 				{ aliases.map( ( alias, index ) => (
-					<KeyCombination
+					<KeyboardShortcut
 						keyCombination={ alias }
-						forceAriaLabel={ ariaLabel }
+						label={ ariaLabel }
+						className="editor-keyboard-shortcut-help-modal__shortcut-key-combination"
+						keyClassName="editor-keyboard-shortcut-help-modal__shortcut-key"
 						key={ index }
 					/>
 				) ) }

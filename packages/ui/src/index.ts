@@ -1,4 +1,4 @@
-export * as Avatar from './avatar';
+export { Avatar } from './avatar';
 export * from './badge';
 export * as Breadcrumb from './breadcrumb';
 export * from './button';
@@ -14,6 +14,7 @@ export * as EmptyState from './empty-state';
 export * from './form';
 export * from './icon';
 export * from './icon-button';
+export * from './keyboard-shortcut';
 export * from './link';
 export * as Menu from './menu';
 export * as Meter from './meter';

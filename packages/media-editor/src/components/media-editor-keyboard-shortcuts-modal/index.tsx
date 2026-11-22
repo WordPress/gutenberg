@@ -1,11 +1,7 @@
 import { Modal } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import {
-	displayShortcutList,
-	shortcutAriaLabel,
-	type WPKeycodeModifier,
-} from '@wordpress/keycodes';
+import type { WPKeycodeModifier } from '@wordpress/keycodes';
+import { KeyboardShortcut } from '@wordpress/ui';
 
 interface KeyCombination {
 	/** Modifier for cross-platform display (e.g. 'primary', 'primaryShift', 'shift'). */
@@ -71,63 +67,6 @@ const SHORTCUTS: ShortcutEntry[] = [
 	},
 ];
 
-function KeyCombinationDisplay( {
-	keyCombination,
-}: {
-	keyCombination: KeyCombination;
-} ) {
-	const { modifier, character, ariaLabel } = keyCombination;
-
-	let keys: string[];
-	if ( Array.isArray( character ) ) {
-		if ( modifier ) {
-			// Get the modifier prefix (e.g. ['⇧', '+']) from the first char,
-			// then replace the last element with all the individual chars.
-			const sample = displayShortcutList[ modifier ]( character[ 0 ] );
-			keys = [ ...sample.slice( 0, -1 ), ...character ];
-		} else {
-			keys = character;
-		}
-	} else {
-		keys = modifier
-			? displayShortcutList[ modifier ]( character )
-			: [ character ];
-	}
-
-	const charString = Array.isArray( character )
-		? character.join( '' )
-		: character;
-	let label: string;
-	if ( ariaLabel ) {
-		label = ariaLabel;
-	} else if ( modifier ) {
-		label = shortcutAriaLabel[ modifier ]( charString );
-	} else {
-		label = charString;
-	}
-
-	return (
-		<kbd
-			className="media-editor-keyboard-shortcuts-modal__shortcut-term"
-			dir="ltr"
-			aria-label={ label }
-		>
-			{ keys.map( ( key, index ) =>
-				key === '+' && modifier ? (
-					<Fragment key={ index }>{ key }</Fragment>
-				) : (
-					<kbd
-						key={ index }
-						className="media-editor-keyboard-shortcuts-modal__shortcut-key"
-					>
-						{ key }
-					</kbd>
-				)
-			) }
-		</kbd>
-	);
-}
-
 interface MediaEditorKeyboardShortcutsModalProps {
 	onClose: () => void;
 }
@@ -163,8 +102,11 @@ export default function MediaEditorKeyboardShortcutsModal( {
 						<span className="media-editor-keyboard-shortcuts-modal__shortcut-description">
 							{ description }
 						</span>
-						<KeyCombinationDisplay
+						<KeyboardShortcut
 							keyCombination={ keyCombination }
+							label={ keyCombination.ariaLabel }
+							className="media-editor-keyboard-shortcuts-modal__shortcut-term"
+							keyClassName="media-editor-keyboard-shortcuts-modal__shortcut-key"
 						/>
 					</li>
 				) ) }

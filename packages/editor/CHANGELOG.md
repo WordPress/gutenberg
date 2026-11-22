@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Make punctuation keys in the keyboard shortcuts dialog readable by screen readers ([#85490](https://github.com/WordPress/gutenberg/pull/85490)).
 
 ### Documentation

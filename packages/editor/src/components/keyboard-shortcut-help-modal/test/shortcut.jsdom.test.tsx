@@ -1,77 +1,11 @@
 import { isInaccessible, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { shortcutAriaLabel } from '@wordpress/keycodes';
+import { textFormattingShortcuts } from '../config';
 import Shortcut from '../shortcut';
 
-describe( 'Shortcut', () => {
-	it.each( [ ',', '.', '`' ] )(
-		'exposes the readable name of the %s key as text',
-		( character ) => {
-			render(
-				<Shortcut
-					description="Move between blocks"
-					keyCombination={ { modifier: 'ctrl', character } }
-				/>
-			);
-
-			const label = screen.getByText(
-				shortcutAriaLabel.ctrl( character )
-			);
-			expect( isInaccessible( label ) ).toBe( false );
-			expect( isInaccessible( screen.getByText( character ) ) ).toBe(
-				true
-			);
-		}
-	);
-
-	it( 'keeps an unmodified character accessible only once', () => {
-		render(
-			<Shortcut
-				description="Select a block"
-				keyCombination={ { character: 'H' } }
-			/>
-		);
-
-		const characters = screen.getAllByText( 'H' );
-		expect(
-			characters.filter( ( element ) => ! isInaccessible( element ) )
-		).toHaveLength( 1 );
-		expect(
-			characters.filter( ( element ) => isInaccessible( element ) )
-		).toHaveLength( 1 );
-	} );
-
-	it( 'includes every modifier in the accessible text', () => {
-		render(
-			<Shortcut
-				description="Change the block"
-				keyCombination={ { modifier: 'ctrlShift', character: 'M' } }
-			/>
-		);
-
-		expect(
-			isInaccessible(
-				screen.getByText( shortcutAriaLabel.ctrlShift( 'M' ) )
-			)
-		).toBe( false );
-	} );
-
-	it( 'uses a supplied readable label instead of the key symbols', () => {
-		render(
-			<Shortcut
-				description="Insert a link"
-				keyCombination={ { character: '[[' } }
-				ariaLabel="Left bracket twice"
-			/>
-		);
-
-		expect(
-			isInaccessible( screen.getByText( 'Left bracket twice' ) )
-		).toBe( false );
-		expect( isInaccessible( screen.getByText( '[[' ) ) ).toBe( true );
-	} );
-
-	it( 'exposes each alternative shortcut without repeating its visual keys', () => {
+describe( 'Shortcut production entries', () => {
+	it( 'renders each alternative shortcut through the shared display', () => {
 		render(
 			<Shortcut
 				description="Change the block"
@@ -88,5 +22,22 @@ describe( 'Shortcut', () => {
 		}
 		expect( isInaccessible( screen.getByText( ',' ) ) ).toBe( true );
 		expect( isInaccessible( screen.getByText( '.' ) ) ).toBe( true );
+	} );
+
+	it( 'renders the readable label supplied by the real Insert Link entry', () => {
+		const entry = textFormattingShortcuts.find(
+			( { keyCombination } ) => keyCombination.character === '[['
+		);
+		expect( entry ).toBeDefined();
+
+		render( <Shortcut { ...entry! } /> );
+
+		expect(
+			isInaccessible( screen.getByText( 'Left bracket twice' ) )
+		).toBe( false );
+		expect( isInaccessible( screen.getByText( '[[' ) ) ).toBe( true );
+		expect(
+			screen.getByText( 'Insert a link to a post or page.' )
+		).toBeInTheDocument();
 	} );
 } );
