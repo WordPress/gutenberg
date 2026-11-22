@@ -47,7 +47,9 @@
 		"./build-style/*": "./build-style/*"
 	},
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"build-style/**"
+	],
 	"dependencies": {
 		"@ariakit/react": "^0.4.43",
 		"@base-ui/react": "^1.9.0",
