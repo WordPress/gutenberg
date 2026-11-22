@@ -9,7 +9,7 @@
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
--   List `build-style/**` in `sideEffects`, so that bundlers no longer drop `import '@wordpress/dataviews/build-style/style.css'` ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   List `build-style/**` in `sideEffects`, so that bundlers no longer drop `import '@wordpress/dataviews/build-style/style.css'` ([#87211](https://github.com/WordPress/gutenberg/pull/87211)).
 
 ## 22.1.0 (2026-11-18)
 

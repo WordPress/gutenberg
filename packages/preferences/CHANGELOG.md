@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   List `build-style/**` in `sideEffects`, so that bundlers no longer drop `import '@wordpress/preferences/build-style/style.css'` ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+-   List `build-style/**` in `sideEffects`, so that bundlers no longer drop `import '@wordpress/preferences/build-style/style.css'` ([#87211](https://github.com/WordPress/gutenberg/pull/87211)).
 
 ## 5.2.0 (2026-11-18)
 
