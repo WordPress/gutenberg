@@ -1,0 +1,187 @@
+{
+	"name": "format-in-add",
+	"phase": "current",
+	"users": {
+		"A": "overlap-anne",
+		"B": "overlap-bob"
+	},
+	"html": "Hi<mark data-suggestion-id=\"{{id:A}}\" data-suggestion-type=\"add\" data-author=\"{{author:A}}\" class=\"wp-suggestion-add\"> <mark data-suggestion-id=\"{{id:B}}\" data-suggestion-type=\"format\" data-author=\"{{author:B}}\" class=\"wp-suggestion-format\"><em>there</em></mark></mark>.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "add"
+			}
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"operation": {
+				"type": "inline-suggestion",
+				"attribute": "content",
+				"suggestionType": "format",
+				"beforeHTML": "there",
+				"afterHTML": "<em>there</em>",
+				"delta": [
+					{
+						"offset": 0,
+						"length": 5,
+						"added": [
+							{
+								"type": "core/italic"
+							}
+						],
+						"removed": []
+					}
+				]
+			}
+		}
+	],
+	"views": {
+		"displayed": "Hi <i>there</i>.",
+		"acceptedHTML": "Hi <em>there</em>.",
+		"rejectedHTML": "Hi."
+	},
+	"orders": {
+		"exhaustive": true,
+		"list": [
+			{
+				"label": "+A +B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					}
+				],
+				"published": "Hi <i>there</i>.",
+				"accepted": [ "A", "B" ],
+				"publishedHTML": "Hi <em>there</em>."
+			},
+			{
+				"label": "+A -B",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					},
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hi there.",
+						"outdated": []
+					}
+				],
+				"published": "Hi there.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Hi there."
+			},
+			{
+				"label": "-A",
+				"steps": [
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hi.",
+						"outdated": [ "B" ]
+					}
+				],
+				"published": "Hi.",
+				"accepted": [],
+				"publishedHTML": "Hi."
+			},
+			{
+				"label": "+B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					}
+				],
+				"published": "Hi <i>there</i>.",
+				"accepted": [ "B", "A" ],
+				"publishedHTML": "Hi <em>there</em>."
+			},
+			{
+				"label": "+B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "accept",
+						"displayed": "Hi <i>there</i>.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hi.",
+						"outdated": []
+					}
+				],
+				"published": "Hi.",
+				"accepted": [ "B" ],
+				"publishedHTML": "Hi."
+			},
+			{
+				"label": "-B +A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hi there.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "accept",
+						"displayed": "Hi there.",
+						"outdated": []
+					}
+				],
+				"published": "Hi there.",
+				"accepted": [ "A" ],
+				"publishedHTML": "Hi there."
+			},
+			{
+				"label": "-B -A",
+				"steps": [
+					{
+						"key": "B",
+						"decision": "reject",
+						"displayed": "Hi there.",
+						"outdated": []
+					},
+					{
+						"key": "A",
+						"decision": "reject",
+						"displayed": "Hi.",
+						"outdated": []
+					}
+				],
+				"published": "Hi.",
+				"accepted": [],
+				"publishedHTML": "Hi."
+			}
+		]
+	}
+}

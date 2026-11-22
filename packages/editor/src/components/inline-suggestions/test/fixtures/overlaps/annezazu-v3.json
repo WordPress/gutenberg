@@ -1,0 +1,32 @@
+{
+	"name": "annezazu-v3",
+	"description": "annezazu, with C's deletion spanning original text and A's addition, so rejecting A shrinks C instead of outdating it.",
+	"phase": "current",
+	"users": { "A": "overlap-anne", "B": "overlap-bob", "C": "overlap-carl" },
+	"base": "Intro.",
+	"suggestions": [
+		{
+			"key": "A",
+			"author": "A",
+			"kind": "add",
+			"text": " Bright red apples fell.",
+			"at": 6
+		},
+		{
+			"key": "B",
+			"author": "B",
+			"kind": "format",
+			"range": [ 14, 24 ],
+			"added": [ "core/bold" ],
+			"removed": []
+		},
+		{ "key": "C", "author": "C", "kind": "del", "range": [ 3, 13 ] }
+	],
+	"expect": {
+		"all-accepted": "Int <b>red apples</b> fell.",
+		"all-rejected": "Intro."
+	},
+	"cases": [
+		{ "decisions": { "A": "reject", "C": "accept" }, "published": "Int" }
+	]
+}
