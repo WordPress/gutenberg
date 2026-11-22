@@ -1,9 +1,9 @@
 export { isSuggestionModeEnabled, useCanSuggest } from './gate';
 export {
-	SuggestionOverlayProvider,
-	useSuggestionOverlay,
-	overlayReducer,
-} from './overlay-context';
+	SuggestionSessionProvider,
+	useSuggestionSession,
+	useSuggestionSessionActions,
+} from './suggestion-session';
 export {
 	default as withSuggestionOverlay,
 	registerSuggestionOverlayFilter,
@@ -12,18 +12,20 @@ export { MoveGhostsProvider } from './use-move-ghosts';
 export { default as SuggestionAutoSave } from './auto-save';
 export { default as SuggestionStoreInterceptor } from './store-interceptor';
 export { default as SuggestionUndoGuard } from './suggestion-undo-guard';
+export { useSuggestionsProvider } from './provider';
 export {
-	useSuggestionsProvider,
-	operationsFromOverlay,
+	operationsFromMarker,
 	applyOperations,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
 	findStructuralOp,
+	findPostAttributeOps,
+	postOperationsFromTitle,
 	clearSuggestionMarkerAttributes,
 	PAYLOAD_MAX_BYTES,
 	SCHEMA_VERSION,
-} from './provider';
+} from './operations';
 export { wordDiff } from './word-diff';
 export {
 	default as SuggestionSummary,

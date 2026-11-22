@@ -18,6 +18,11 @@ import {
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
 import {
+	REJECTED,
+	getDecision,
+	getSuggestionStatus,
+} from '../suggestion-mode/suggestion-status';
+import {
 	findSuggestionText,
 	stripSuggestionMarkers,
 } from '../inline-suggestions';
@@ -74,13 +79,6 @@ function readBlockText(
 }
 
 /**
- * Read-only status constants — keep in sync with `_wp_suggestion_status`
- * enum declared in `block-comments.php`.
- */
-const APPLIED = 'applied';
-const REJECTED = 'rejected';
-
-/**
  * Shared accept/reject wiring for a note that carries a suggestion payload.
  * `Note` calls it once and hands the result to both the header icon buttons
  * and the body, so their state never diverges and each note pays for one
@@ -94,7 +92,6 @@ export function useSuggestionDecision( thread: any ) {
 		() => parseSuggestionPayload( thread?.meta?._wp_suggestion ),
 		[ thread?.meta?._wp_suggestion ]
 	);
-	const suggestionStatus = thread?.meta?._wp_suggestion_status;
 	const { applySuggestion, rejectSuggestion } = useSuggestionsProvider();
 	const [ busy, setBusy ] = useState( false );
 	const [ showStaleDialog, setShowStaleDialog ] = useState( false );
@@ -131,8 +128,10 @@ export function useSuggestionDecision( thread: any ) {
 		return null;
 	}
 
-	const isResolved =
-		suggestionStatus === APPLIED || suggestionStatus === REJECTED;
+	const suggestionStatus = getSuggestionStatus( thread );
+	const decision = getDecision( suggestionStatus );
+	// Decided, whether or not the post has been saved since.
+	const isResolved = decision !== null;
 
 	// A block-switcher transform (any `replaceBlocks`) is captured as a
 	// removal plus an insertion, stamped with a shared group id. Either
@@ -190,6 +189,7 @@ export function useSuggestionDecision( thread: any ) {
 	return {
 		payload,
 		suggestionStatus,
+		decision,
 		isResolved,
 		isGrouped,
 		busy,
@@ -393,13 +393,7 @@ export default function SuggestionActions( {
 		return null;
 	}
 
-	const {
-		payload,
-		suggestionStatus,
-		isResolved,
-		isGrouped,
-		applyDisabledReason,
-	} = decision;
+	const { payload, isResolved, isGrouped, applyDisabledReason } = decision;
 
 	return (
 		<Stack
@@ -427,9 +421,9 @@ export default function SuggestionActions( {
 					variant="body-sm"
 					className="editor-collab-sidebar-panel__suggestion-status"
 				>
-					{ suggestionStatus === APPLIED
-						? __( 'Applied' )
-						: __( 'Rejected' ) }
+					{ decision.decision === REJECTED
+						? __( 'Rejected' )
+						: __( 'Applied' ) }
 				</Text>
 			) }
 			{ ! isResolved && applyDisabledReason && (
