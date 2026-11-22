@@ -101,6 +101,9 @@ export interface StyleSettings {
 		spacingSizes?: Record< string, SpacingSizePreset[] >;
 		defaultSpacingSizes?: boolean;
 	};
+	transform?: Record< string, unknown > & {
+		rotate?: boolean;
+	};
 	typography?: TypographyStyleSettings;
 }
 
@@ -206,6 +209,7 @@ export interface PanelStyle {
 	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
+	transform?: Record< string, StyleValue >;
 	elements?: Record< string, PanelStyle >;
 	css?: string;
 	[ state: `:${ string }` ]: PanelStyle | undefined;
@@ -486,6 +490,23 @@ export interface ShadowPopoverProps extends ShadowPopoverContainerProps {
 }
 
 export interface FiltersPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+}
+
+export interface TransformPanelProps {
 	/** The tools panel the controls render in. */
 	as?: ComponentType< StyleToolsPanelProps >;
 	/** The styles the panel edits. */
