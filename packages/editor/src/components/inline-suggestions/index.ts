@@ -43,8 +43,14 @@ export {
 	suggestionKindOf,
 	suggestionFormatNameFor,
 	suggestionMarkersAt,
+	suggestionMarkerListsAt,
 	suggestionMarkersIn,
+	suggestionMarkerId,
+	compareSuggestionIds,
 	canonicalizeSuggestionStack,
+	addSuggestionMarker,
+	removeSuggestionMarker,
+	removeAllSuggestionMarkers,
 	findSuggestionRange,
 	findSuggestionText,
 	getSuggestionMarkerSelector,
@@ -82,11 +88,26 @@ export {
 	suggestionsEmptiedBy,
 } from './resolution';
 export type { InlineSuggestionType, ResolutionEffect } from './resolution';
+export {
+	computeFormatDelta,
+	formatDeltaFromOriginal,
+	isEmptyFormatDelta,
+	rebaseFormatDelta,
+} from './format-delta';
+export type {
+	FormatDelta,
+	FormatDeltaRun,
+	FormatDescriptor,
+	FormatRevision,
+} from './format-delta';
 export { suggestionRelations } from './relations';
 export type { RelatedSuggestion, SuggestionRelations } from './relations';
 export {
 	normalizeSuggestionMarkers,
+	isCanonicalSuggestionStack,
 	guardMarkerIntegrity,
+	guardSyncedValue,
+	isWellFormedSuggestionId,
 } from './marker-integrity';
 export { computeDeleteRange } from './delete-range';
 export {

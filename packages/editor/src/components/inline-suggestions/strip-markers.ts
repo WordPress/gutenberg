@@ -1,9 +1,9 @@
-import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
+import { RichTextData, create } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
 import {
 	SUGGESTION_CLASS_PROBE,
-	SUGGESTION_FORMAT_NAMES,
 	isSuggestionFormat,
+	removeAllSuggestionMarkers,
 } from './format';
 
 /**
@@ -13,11 +13,7 @@ import {
  * @return The record without markers.
  */
 function removeAllMarkers( record: RichTextValue ): RichTextValue {
-	let result = record;
-	for ( const name of SUGGESTION_FORMAT_NAMES ) {
-		result = removeFormat( result, name, 0, result.text.length );
-	}
-	return result;
+	return removeAllSuggestionMarkers( record, 0, record.text.length );
 }
 
 /**
