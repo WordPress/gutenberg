@@ -27,6 +27,7 @@ import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import {
 	formatDeltaFromOriginal,
 	rebaseFormatDelta,
+	sanitizeFormatDelta,
 	rebaseFormatOriginal,
 	resolveInlineSuggestion,
 } from '../inline-suggestions';
@@ -348,7 +349,7 @@ export function useSuggestionDecisions() {
 				return null;
 			}
 			if ( Array.isArray( op.delta ) ) {
-				return op.delta as FormatDelta;
+				return sanitizeFormatDelta( op.delta );
 			}
 			const original =
 				rebasedOriginalsOf( registry ).get( formatId ) ?? op.beforeHTML;

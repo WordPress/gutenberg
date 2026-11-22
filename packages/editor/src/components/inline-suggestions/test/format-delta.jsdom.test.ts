@@ -20,6 +20,7 @@ import {
 	formatSuggestionIndices,
 	isEmptyFormatDelta,
 	rebaseFormatDelta,
+	sanitizeFormatDelta,
 } from '../format-delta';
 import type { FormatDelta } from '../format-delta';
 import { resolveInlineSuggestion } from '../resolution';
@@ -342,5 +343,80 @@ describe( 'formatting deltas', () => {
 		expect( effect.value.toHTMLString() ).toBe(
 			'a<strong data-x="y">bc</strong>d'
 		);
+	} );
+
+	describe( 'a stored delta', () => {
+		const run = ( formats: any[] ) => [
+			{ offset: 0, length: 2, added: [], removed: formats },
+		];
+
+		it( 'applies no suggestion marker or unregistered element', () => {
+			const value = rtd( `a${ mark( 'format', 6, 'bc' ) }d` );
+			const effect = decide(
+				value,
+				{
+					'6': run( [
+						{
+							type: 'core/suggestion-add',
+							attributes: { 'data-suggestion-id': '99' },
+						},
+						{ type: 'script' },
+						{ type: 'test/unregistered' },
+					] ),
+				},
+				6,
+				'reject'
+			);
+			expect( effect.value.toHTMLString() ).toBe( 'abcd' );
+		} );
+
+		it( 'drops attribute values with a disallowed protocol', () => {
+			const value = rtd( `a${ mark( 'format', 6, 'bc' ) }d` );
+			const effect = decide(
+				value,
+				{
+					'6': run( [
+						{
+							type: BOLD,
+							unregisteredAttributes: {
+								'data-url': ' java\tscript:alert(1)',
+								'data-safe': 'https://example.com',
+							},
+						},
+					] ),
+				},
+				6,
+				'reject'
+			);
+			expect( effect.value.toHTMLString() ).toBe(
+				'a<strong data-safe="https://example.com">bc</strong>d'
+			);
+		} );
+
+		it( 'keeps only whole, non-overlapping runs', () => {
+			const formats = [ bold ];
+			expect(
+				sanitizeFormatDelta( [
+					{ offset: 2, length: 2, added: formats, removed: [] },
+					{ offset: -1, length: 2, added: formats, removed: [] },
+					{ offset: 0, length: 1.5, added: formats, removed: [] },
+					{ offset: 0, length: 3, added: formats, removed: [] },
+					'run',
+				] )
+			).toEqual( [
+				{ offset: 0, length: 3, added: formats, removed: [] },
+			] );
+			expect( sanitizeFormatDelta( { offset: 0 } ) ).toBeNull();
+		} );
+
+		it( 'rebases a run with a huge length without expanding it', () => {
+			const rebased = rebaseFormatDelta(
+				[ { offset: 1e9, length: 1e9, added: [ bold ], removed: [] } ],
+				[ 0, 5 ]
+			);
+			expect( rebased ).toEqual( [
+				{ offset: 1e9 - 2, length: 1e9, added: [ bold ], removed: [] },
+			] );
+		} );
 	} );
 } );
