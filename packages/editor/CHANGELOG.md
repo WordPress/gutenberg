@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 -   Open the entity save dialog with the Save keyboard shortcut when a synced pattern has changed, including when the post itself is unchanged ([#85056](https://github.com/WordPress/gutenberg/pull/85056)).
 
 ### Documentation

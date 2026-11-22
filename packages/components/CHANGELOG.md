@@ -4,10 +4,17 @@
 
 ### Enhancements
 
+-   `TimePicker`: Use the WordPress UI select for choosing a month ([#87079](https://github.com/WordPress/gutenberg/pull/87079)).
+-   `QueryControls`: Use the WordPress UI select for the Order by field and show a placeholder when the current sort is missing or unavailable ([#87078](https://github.com/WordPress/gutenberg/pull/87078)).
 -   `Badge`, `Button`, `ColorPalette`, `CustomSelectControl`, `DropdownMenu`, `DropZone`, `FormTokenField`, `Menu`, `Placeholder`, `RadioControl`, `Snackbar`, `Tabs`, `TimePicker`, and `ToolbarButton`: Use the `--wpds-typography-font-size-*` tokens for their font sizes ([#86961](https://github.com/WordPress/gutenberg/pull/86961)).
+
+### Deprecations
+
+-   `CustomSelectControl`: Deprecate in favor of `SelectControl` from `@wordpress/ui` ([#87076](https://github.com/WordPress/gutenberg/pull/87076)).
 
 ### Bug Fixes
 
+-   `DatePicker`: Outline today's date when another date is selected ([#87172](https://github.com/WordPress/gutenberg/pull/87172)).
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
 
 ## 45.0.0 (2026-11-18)
