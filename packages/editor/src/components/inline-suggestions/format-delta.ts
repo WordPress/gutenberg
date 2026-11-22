@@ -18,7 +18,12 @@
  * document order, so a delta survives its run being split by other markers,
  * and losing characters only drops their offsets.
  */
-import { RichTextData, create } from '@wordpress/rich-text';
+import { select } from '@wordpress/data';
+import {
+	RichTextData,
+	create,
+	store as richTextStore,
+} from '@wordpress/rich-text';
 import {
 	SUGGESTION_A11Y_FORMAT_NAME,
 	compareSuggestionIds,
@@ -71,6 +76,35 @@ interface FormatRecord {
 
 const EMPTY_ENTRY: FormatDeltaEntry = { added: [], removed: [] };
 
+/*
+ * The protocols `wp_allowed_protocols()` allows by default, which the server
+ * also checks a stored delta's attribute values against.
+ */
+const ALLOWED_PROTOCOLS = new Set( [
+	'http',
+	'https',
+	'ftp',
+	'ftps',
+	'mailto',
+	'news',
+	'irc',
+	'irc6',
+	'ircs',
+	'gopher',
+	'nntp',
+	'feed',
+	'telnet',
+	'mms',
+	'rtsp',
+	'sms',
+	'svn',
+	'tel',
+	'fax',
+	'xmpp',
+	'webcal',
+	'urn',
+] );
+
 /**
  * Whether a format is part of the text's formatting, rather than a
  * suggestion marker or the screen-reader role format added on render.
@@ -117,23 +151,132 @@ function toDescriptor( format: any ): FormatDescriptor {
 }
 
 /**
- * Drops event handler and inline frame attributes from a stored descriptor,
- * which another author wrote and a reviewer's decision writes into content.
+ * Whether a stored descriptor may name a format type: a registered content
+ * format, never a suggestion marker. An unregistered type would serialize as
+ * an element of that name.
+ *
+ * @param type Format type.
+ * @return True when the type may be applied.
+ */
+function isAllowedFormatType( type: unknown ): type is string {
+	return (
+		typeof type === 'string' &&
+		/^[a-z0-9-]+\/[a-z0-9-]+$/.test( type ) &&
+		! type.startsWith( 'core/suggestion-' ) &&
+		!! select( richTextStore ).getFormatType( type )
+	);
+}
+
+/**
+ * Whether an attribute value names a protocol outside the allowed ones. Every
+ * value is checked, since a format type can map any attribute to `href`.
+ *
+ * @param value Attribute value.
+ * @return True when the value names a disallowed protocol.
+ */
+function hasDisallowedProtocol( value: string ): boolean {
+	// Browsers ignore control characters and whitespace inside a scheme.
+	const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(
+		value.replace( /[\u0000-\u0020\u007f]/g, '' )
+	);
+	return !! scheme && ! ALLOWED_PROTOCOLS.has( scheme[ 1 ].toLowerCase() );
+}
+
+/**
+ * Keeps the string attributes of a stored descriptor that cannot run script:
+ * no event handlers, inline frames or disallowed protocols. Another author
+ * wrote the descriptor, and a reviewer's decision writes it into content.
  *
  * @param attributes Descriptor attributes.
- * @return Attributes without script-running names.
+ * @return The safe attributes.
  */
-function safeAttributes(
-	attributes: Record< string, string >
-): Record< string, string > {
+function safeAttributes( attributes: unknown ): Record< string, string > {
+	if ( ! attributes || typeof attributes !== 'object' ) {
+		return {};
+	}
 	return Object.fromEntries(
 		Object.entries( attributes ).filter(
-			( [ name ] ) => ! /^(on|srcdoc$|formaction$)/i.test( name )
+			( entry ): entry is [ string, string ] =>
+				typeof entry[ 1 ] === 'string' &&
+				/^[a-z][a-z0-9_:.-]*$/i.test( entry[ 0 ] ) &&
+				! /^(on|srcdoc$|formaction$)/i.test( entry[ 0 ] ) &&
+				! hasDisallowedProtocol( entry[ 1 ] )
 		)
 	);
 }
 
+/**
+ * Rebuilds the descriptors of a stored delta run, dropping any that name a
+ * type a delta may not apply.
+ *
+ * @param formats Stored descriptors.
+ * @return The safe descriptors.
+ */
+function sanitizeDescriptors( formats: unknown ): FormatDescriptor[] {
+	if ( ! Array.isArray( formats ) ) {
+		return [];
+	}
+	return formats
+		.filter( ( format ) => isAllowedFormatType( format?.type ) )
+		.map( ( format ) => {
+			const descriptor: FormatDescriptor = { type: format.type };
+			const attributes = safeAttributes( format.attributes );
+			const unregistered = safeAttributes(
+				format.unregisteredAttributes
+			);
+			if ( Object.keys( attributes ).length ) {
+				descriptor.attributes = attributes;
+			}
+			if ( Object.keys( unregistered ).length ) {
+				descriptor.unregisteredAttributes = unregistered;
+			}
+			return descriptor;
+		} );
+}
+
+/**
+ * Validates a delta read from a note, which another author wrote: runs need
+ * whole, non-negative offsets and positive lengths and may not overlap, and
+ * their formats go through `sanitizeDescriptors`.
+ *
+ * @param delta Stored delta.
+ * @return The sanitized delta, or null when it is not a list.
+ */
+export function sanitizeFormatDelta( delta: unknown ): FormatDelta | null {
+	if ( ! Array.isArray( delta ) ) {
+		return null;
+	}
+	const runs: FormatDelta = [];
+	let end = 0;
+	const candidates = delta
+		.filter(
+			( run ) =>
+				Number.isSafeInteger( run?.offset ) &&
+				Number.isSafeInteger( run?.length ) &&
+				run.offset >= 0 &&
+				run.length > 0 &&
+				Number.isSafeInteger( run.offset + run.length )
+		)
+		.sort( ( a, b ) => a.offset - b.offset );
+	for ( const run of candidates ) {
+		if ( run.offset < end ) {
+			continue;
+		}
+		runs.push( {
+			offset: run.offset,
+			length: run.length,
+			added: sanitizeDescriptors( run.added ),
+			removed: sanitizeDescriptors( run.removed ),
+		} );
+		end = run.offset + run.length;
+	}
+	return runs;
+}
+
 function toFormat( descriptor: FormatDescriptor ): any {
+	if ( ! isAllowedFormatType( descriptor.type ) ) {
+		return null;
+	}
 	return {
 		type: descriptor.type,
 		...( descriptor.attributes && {
@@ -214,7 +357,8 @@ function applyEntry( stack: any[], entry: FormatDeltaEntry ): any[] {
 			.filter(
 				( format ) => ! present.has( formatDescriptorKey( format ) )
 			)
-			.map( toFormat ),
+			.map( toFormat )
+			.filter( Boolean ),
 	];
 }
 
@@ -303,15 +447,11 @@ export function expandFormatDelta(
 		{ length },
 		() => EMPTY_ENTRY
 	);
-	for ( const run of delta ?? [] ) {
-		for ( let k = 0; k < run.length; k++ ) {
-			const offset = run.offset + k;
-			if ( offset >= 0 && offset < length ) {
-				entries[ offset ] = {
-					added: run.added ?? [],
-					removed: run.removed ?? [],
-				};
-			}
+	for ( const run of sanitizeFormatDelta( delta ) ?? [] ) {
+		const entry = { added: run.added, removed: run.removed };
+		const end = Math.min( run.offset + run.length, length );
+		for ( let offset = run.offset; offset < end; offset++ ) {
+			entries[ offset ] = entry;
 		}
 	}
 	return entries;
@@ -326,9 +466,9 @@ export function expandFormatDelta(
 export function isEmptyFormatDelta(
 	delta: FormatDelta | null | undefined
 ): boolean {
-	return ! ( delta ?? [] ).some(
+	return ! ( Array.isArray( delta ) ? delta : [] ).some(
 		( run ) =>
-			run.length > 0 && ( run.added?.length || run.removed?.length )
+			run?.length > 0 && ( run.added?.length || run.removed?.length )
 	);
 }
 
@@ -344,20 +484,68 @@ export function rebaseFormatDelta(
 	delta: FormatDelta,
 	offsets: number[]
 ): FormatDelta {
-	if ( ! offsets.length ) {
-		return delta;
+	const runs = sanitizeFormatDelta( delta ) ?? [];
+	const gone = [ ...new Set( offsets ) ]
+		.filter( ( offset ) => Number.isSafeInteger( offset ) && offset >= 0 )
+		.sort( ( a, b ) => a - b );
+	if ( ! gone.length ) {
+		return runs;
 	}
-	const length = Math.max(
-		0,
-		...delta.map( ( run ) => run.offset + run.length ),
-		...offsets.map( ( offset ) => offset + 1 )
-	);
-	const gone = new Set( offsets );
-	return compressFormatDelta(
-		expandFormatDelta( delta, length ).filter(
-			( _entry, offset ) => ! gone.has( offset )
-		)
-	);
+	// How many removed offsets come before an offset.
+	const removedBefore = ( offset: number ) => {
+		let low = 0;
+		let high = gone.length;
+		while ( low < high ) {
+			const middle = Math.floor( ( low + high ) / 2 );
+			if ( gone[ middle ] < offset ) {
+				low = middle + 1;
+			} else {
+				high = middle;
+			}
+		}
+		return low;
+	};
+	/*
+	 * Split each run around the removed offsets and shift what is left, so the
+	 * work follows the runs and the removals, never the offsets a stored run
+	 * claims.
+	 */
+	const rebased: FormatDelta = [];
+	const push = ( run: FormatDeltaRun, start: number, end: number ) => {
+		if ( start >= end || isEmptyEntry( run ) ) {
+			return;
+		}
+		const offset = start - removedBefore( start );
+		const last = rebased[ rebased.length - 1 ];
+		if (
+			last &&
+			last.offset + last.length === offset &&
+			entryKey( last ) === entryKey( run )
+		) {
+			last.length += end - start;
+			return;
+		}
+		rebased.push( {
+			offset,
+			length: end - start,
+			added: run.added,
+			removed: run.removed,
+		} );
+	};
+	for ( const run of runs ) {
+		const end = run.offset + run.length;
+		let start = run.offset;
+		for (
+			let index = removedBefore( start );
+			index < gone.length && gone[ index ] < end;
+			index++
+		) {
+			push( run, start, gone[ index ] );
+			start = gone[ index ] + 1;
+		}
+		push( run, start, end );
+	}
+	return rebased;
 }
 
 /**

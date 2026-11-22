@@ -147,8 +147,9 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
  * counting the characters its marker covers, with the rich-text formats the
  * suggestion `added` and `removed` there, each a format `type` (`core/bold`)
  * with optional string `attributes` and `unregisteredAttributes`. Anything
- * else is dropped, as are event handler attributes; URL attributes lose
- * disallowed protocols and `style` keeps only safe CSS.
+ * else is dropped, as are suggestion marker types, event handler attributes
+ * and any attribute whose value names a disallowed protocol; `style` keeps
+ * only safe CSS.
  *
  * @param mixed $delta Delta from the payload.
  * @return list<array{offset: int, length: int, added: list<array<string, mixed>>, removed: list<array<string, mixed>>}>|null
@@ -162,6 +163,10 @@ function gutenberg_sanitize_suggestion_format_delta( $delta ): ?array {
 		$clean = array();
 		foreach ( is_array( $formats ) ? $formats : array() as $format ) {
 			if ( ! is_array( $format ) || ! isset( $format['type'] ) || ! is_string( $format['type'] ) || ! preg_match( '~^[a-z0-9-]+/[a-z0-9-]+$~', $format['type'] ) ) {
+				continue;
+			}
+			// Suggestion markers are written by the editor, never by a delta.
+			if ( str_starts_with( $format['type'], 'core/suggestion-' ) ) {
 				continue;
 			}
 			$descriptor = array( 'type' => $format['type'] );
@@ -182,8 +187,9 @@ function gutenberg_sanitize_suggestion_format_delta( $delta ): ?array {
 					$value = wp_strip_all_tags( (string) $value );
 					if ( 'style' === $lower ) {
 						$value = safecss_filter_attr( $value );
-					} elseif ( in_array( $lower, array( 'url', 'href', 'src', 'srcset', 'action', 'cite', 'data', 'poster', 'xlink:href' ), true ) ) {
-						$value = wp_kses_bad_protocol( $value, wp_allowed_protocols() );
+					} elseif ( wp_kses_bad_protocol( $value, wp_allowed_protocols() ) !== $value ) {
+						// A format type can map any attribute to `href`, so every value is checked.
+						continue;
 					}
 					$attributes[ $name ] = $value;
 				}
