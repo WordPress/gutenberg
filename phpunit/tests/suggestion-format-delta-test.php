@@ -201,6 +201,14 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 									),
 								),
 								array( 'type' => 'not a type' ),
+								array(
+									'type'       => 'core/suggestion-add',
+									'attributes' => array( 'data-suggestion-id' => '9' ),
+								),
+								array(
+									'type'       => 'core/link',
+									'attributes' => array( 'url' => 'https://example.com' ),
+								),
 							),
 							'removed' => array(
 								array( 'type' => 'core/bold' ),
@@ -212,6 +220,7 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 									'unregisteredAttributes' => array(
 										'OnMouseOver' => 'alert(1)',
 										'srcdoc'      => '<script>alert(1)</script>',
+										'data-href'   => ' java	script:alert(1)',
 										'data-x'      => 'kept',
 									),
 								),
@@ -235,10 +244,11 @@ class Tests_Suggestion_Format_Delta extends WP_UnitTestCase {
 					'offset'  => 0,
 					'length'  => 4,
 					'added'   => array(
+						array( 'type' => 'core/link' ),
 						array(
 							'type'       => 'core/link',
 							'attributes' => array(
-								'url' => 'alert(1)',
+								'url' => 'https://example.com',
 							),
 						),
 					),
