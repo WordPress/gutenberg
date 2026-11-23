@@ -156,6 +156,7 @@ describe( 'terms proposals with new terms', () => {
 	const state = ( editorIntent: string ) =>
 		( {
 			editorIntent,
+			editorIntentPost: { postType: 'post', postId: 1 },
 			postFieldProposals: proposals,
 			postId: 1,
 			postType: 'post',
