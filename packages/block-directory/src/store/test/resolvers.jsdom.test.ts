@@ -1,12 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createRegistry } from '@wordpress/data';
+import { createRegistry, type StoreDescriptor } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
-import { store as blockDirectoryStore } from '..';
+import { store } from '..';
 
-vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => ( {
-	...( await importOriginal() ),
-	default: vi.fn(),
-} ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
+
+const blockDirectoryStore = store as unknown as StoreDescriptor;
 
 describe( 'getDownloadableBlocks', () => {
 	it.each( [
@@ -17,7 +16,7 @@ describe( 'getDownloadableBlocks', () => {
 	] )(
 		'sends the search term "%s" encoded in the request path',
 		async ( term, encodedTerm ) => {
-			apiFetch.mockResolvedValue( [] );
+			vi.mocked( apiFetch ).mockResolvedValue( [] );
 			const registry = createRegistry();
 			registry.register( blockDirectoryStore );
 
