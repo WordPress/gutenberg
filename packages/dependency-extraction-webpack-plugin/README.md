@@ -21,7 +21,7 @@ Install the module
 npm install @wordpress/dependency-extraction-webpack-plugin --save-dev
 ```
 
-**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It also requires webpack 5.0.0 or newer. It is not compatible with older versions.
+**Note**: This package requires Node.js version with long-term support status (check [Active LTS or Maintenance LTS releases](https://nodejs.org/en/about/previous-releases)). It also requires webpack 5.95.0 or newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -68,7 +68,7 @@ The asset file name mirrors the emitted JavaScript file name, replacing the file
 
 For example, for an entry named `entrypoint`:
 
-```
+```text
 // Entry `entrypoint`
 import { Component } from 'react';
 
@@ -138,7 +138,7 @@ Each entry point in the webpack bundle will include an asset file that declares 
 
 For example, for an entry named `entrypoint`:
 
-```
+```text
 // Entry `entrypoint`
 import { store, getContext } from '@wordpress/interactivity';
 
@@ -152,11 +152,13 @@ import { store, getContext } from '@wordpress/interactivity';
 
 By default, the following script module requests are handled:
 
-| Request                      |
-| ---------------------------- |
-| `@wordpress/interactivity  ` |
+| Request                           |
+| --------------------------------- |
+| `@wordpress/a11y`                 |
+| `@wordpress/interactivity`        |
+| `@wordpress/interactivity-router` |
 
-(`@wordpress/interactivity` is currently the only available WordPress script module.)
+Imports of an externalized script module keep their kind in the bundle: a static `import` declaration stays a static import, and an `import()` stays an `import()` of the script module, which loads it when that code runs.
 
 **Note:** This plugin overlaps with the functionality provided by [webpack `externals`](https://webpack.js.org/configuration/externals). This plugin is intended to extract script module identifiers from bundle compilation so that a list of script module dependencies does not need to be manually maintained. If you don't need to extract a list of script module dependencies, use the `externals` option directly.
 
@@ -228,7 +230,7 @@ You can provide a filename, or set it to `true` to report to a default `external
 
 ##### `requestToExternal`
 
-**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requestToExternalModule) for module usage.
+**Note**: This option is not available with script modules. See [`requestToExternalModule`](#requesttoexternalmodule) for module usage.
 
 - Type: function
 
@@ -259,7 +261,7 @@ module.exports = {
 
 ##### `requestToExternalModule`
 
-**Note**: This option is only available with script modules. See [`requestToExternal`](#requestToExternal) for script usage.
+**Note**: This option is only available with script modules. See [`requestToExternal`](#requesttoexternal) for script usage.
 
 - Type: function
 
