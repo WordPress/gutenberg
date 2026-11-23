@@ -352,6 +352,39 @@ section.wp-block-cover-image > h2,
 	}
 }
 
+// Unstyled buttons need a stronger selector than theme.json element styles
+// (`:root :where(.wp-element-button)`). Skip buttons that set their own
+// colors, and restore the outline style after the fill invert.
+.wp-block-cover:not(.has-text-color):not(.is-light),
+.wp-block-cover-image:not(.has-text-color):not(.is-light) {
+	.wp-element-button:not(.has-text-color):not(.has-background),
+	.wp-block-button__link:not(.has-text-color):not(.has-background) {
+		color: $black;
+		background-color: $white;
+	}
+}
+
+.wp-block-cover.is-light:not(.has-text-color),
+.wp-block-cover-image.is-light:not(.has-text-color) {
+	.wp-element-button:not(.has-text-color):not(.has-background),
+	.wp-block-button__link:not(.has-text-color):not(.has-background) {
+		color: $white;
+		background-color: $black;
+	}
+}
+
+.wp-block-cover:not(.has-text-color),
+.wp-block-cover-image:not(.has-text-color) {
+	.wp-block-button.is-style-outline
+		.wp-element-button:not(.has-text-color):not(.has-background),
+	.wp-block-button
+		.wp-block-button__link.is-style-outline:not(.has-text-color):not(.has-background) {
+		color: inherit;
+		background-color: transparent;
+		background-image: none;
+	}
+}
+
 // Backward compatibility for v14 deprecation. Only applied to the frontend.
 // Regarding the `.wp-block-cover__background + .wp-block-cover__inner-container`
 // selector: When the `.wp-block-cover__inner-container` comes right after the
