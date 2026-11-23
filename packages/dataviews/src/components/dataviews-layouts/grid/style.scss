@@ -201,7 +201,8 @@
 }
 
 .dataviews-view-grid__field-value:empty,
-.dataviews-view-grid__field:empty {
+.dataviews-view-grid__field:empty,
+.dataviews-view-grid__badge-fields .dataviews-view-grid__field-value:has(> :only-child:empty) {
 	display: none;
 }
 

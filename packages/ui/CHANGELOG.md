@@ -15,6 +15,7 @@
 ### Bug Fixes
 
 -   `SearchableChipSelect`, `SearchableChipSelectControl`: Name the chips toolbar "Selected items" for any number of chips, so it translates correctly in languages that use the singular form for numbers other than one ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
+-   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 
 ### Internal
 

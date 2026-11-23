@@ -162,7 +162,8 @@
 }
 
 .dataviews-view-picker-grid__field-value:empty,
-.dataviews-view-picker-grid__field:empty {
+.dataviews-view-picker-grid__field:empty,
+.dataviews-view-picker-grid__badge-fields .dataviews-view-picker-grid__field-value:has(> :only-child:empty) {
 	display: none;
 }
 
