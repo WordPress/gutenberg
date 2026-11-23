@@ -42,7 +42,7 @@
 		"phpstan/extension-installer": "1.4.3",
 		"phpstan/phpstan": "2.3.7",
 		"phpstan/phpstan-phpunit": "2.1.2",
-		"phpstan/phpstan-strict-rules": "2.1.1",
+		"phpstan/phpstan-strict-rules": "2.1.2",
 		"php-stubs/wordpress-stubs": "@dev",
 		"php-stubs/wordpress-tests-stubs": "7.1.0",
 		"szepeviktor/phpstan-wordpress": "2.0.4"
