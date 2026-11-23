@@ -104,7 +104,7 @@
 		"@wordpress/wordcount": "file:../wordcount",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.4",
+		"colord": "^2.14.0",
 		"date-fns": "^4.4.0",
 		"diff": "^8.0.3",
 		"redux": "^5.0.1",

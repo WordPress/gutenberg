@@ -76,7 +76,7 @@
 		"@wordpress/warning": "file:../warning",
 		"change-case": "^4.1.2",
 		"clsx": "^2.1.1",
-		"colord": "^2.9.4",
+		"colord": "^2.14.0",
 		"csstype": "^3.2.3",
 		"date-fns": "^4.4.0",
 		"deepmerge": "^4.3.1",
