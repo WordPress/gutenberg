@@ -276,4 +276,51 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 			menu.getByRole( 'menuitem', { name: 'Delete', exact: true } )
 		).toBeHidden();
 	} );
+
+	test( 'opening the Template panel raises no refusal (F-68)', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// The classic default theme has no template to preview.
+		await requestUtils.activateTheme( 'twentytwentyfour' );
+		try {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'First paragraph' },
+			} );
+			await editor.saveDraft();
+			await page.reload();
+			await switchIntent( page, 'Suggesting' );
+
+			await editor.openDocumentSettingsSidebar();
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await settings.getByRole( 'tab', { name: 'Post' } ).click();
+			await settings
+				.getByRole( 'button', { name: /^Template:/ } )
+				.click();
+			/*
+			 * The previewed Navigation block attaches its menu once the
+			 * request for it resolves, by writing its `ref`: the write that
+			 * was refused. A named menu says it landed.
+			 */
+			await expect(
+				settings
+					.locator( '.editor-template-actions-panel__preview' )
+					.frameLocator( 'iframe' )
+					.locator( '.wp-block-navigation__description' )
+					.first()
+			).toHaveText( /Navigation Menu: ".+"/ );
+
+			await expect(
+				page
+					.locator( '.components-snackbar-list' )
+					.getByText( 'This block is saved outside this post' )
+			).toBeHidden();
+		} finally {
+			await requestUtils.activateTheme( 'twentytwentyone' );
+		}
+	} );
 } );
