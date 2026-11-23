@@ -192,6 +192,9 @@ async function pastDebounce() {
 	await flushPromises();
 }
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionAutoSave', () => {
 	it( 'POSTs a new suggestion after the debounce window and writes the note id onto the marker', async () => {
 		createSuggestion.mockResolvedValue( { id: 42 } );
