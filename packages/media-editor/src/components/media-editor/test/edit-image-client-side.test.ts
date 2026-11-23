@@ -137,6 +137,22 @@ describe( 'getEditedAttachmentData', () => {
 		} );
 	} );
 
+	it( 'sends 0 for an unattached source, which the REST API returns as null', () => {
+		expect(
+			getEditedAttachmentData( undefined, { ...media, post: null } )
+		).toMatchObject( { post: 0 } );
+		expect(
+			getEditedAttachmentData( { post: null }, media )
+		).toMatchObject( { post: 0 } );
+	} );
+
+	it( 'omits post when the source record has none', () => {
+		const { post, ...withoutPost } = media;
+		expect(
+			getEditedAttachmentData( undefined, withoutPost )
+		).not.toHaveProperty( 'post' );
+	} );
+
 	it( 'accepts plain string fields', () => {
 		expect(
 			getEditedAttachmentData( undefined, {

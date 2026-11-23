@@ -125,8 +125,8 @@ export function isOriginalTooLargeForClient( media: Media ): boolean {
  *
  * Pending Details-tab edits win; anything not edited is copied from the
  * source attachment, matching what the REST `/edit` endpoint does for its
- * new attachment. `post` is carried across explicitly so an explicit `0`
- * (unattached) is preserved.
+ * new attachment. `post` is carried across explicitly so an unattached
+ * source (`null` or `0`) stays unattached.
  *
  * @param pendingEdits Unsaved attachment edits from core-data.
  * @param media        Source attachment record.
@@ -149,7 +149,11 @@ export function getEditedAttachmentData(
 	}
 	const post =
 		pendingEdits && 'post' in pendingEdits ? pendingEdits.post : media.post;
-	if ( post !== undefined ) {
+	// The REST API returns `null` for an unattached attachment but only
+	// accepts an integer, so send the `0` it uses for "unattached".
+	if ( post === null || post === 0 ) {
+		data.post = 0;
+	} else if ( post !== undefined ) {
 		data.post = post;
 	}
 	// Relates the new attachment to its source, as the `/edit` endpoint's
