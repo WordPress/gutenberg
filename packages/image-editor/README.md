@@ -148,7 +148,7 @@ The edit has an optional `flip`, `rotation` and `crop`. Apply them in that order
 
 Use it to turn an edit into a list of instructions for something that applies them one at a time, such as the WordPress media REST endpoint. `handlers` has one function for each part, `flip`, `rotation` and `crop`; each is called only when the edit has that part, and the results come back in the order the parts apply. The order matters because `rotation` is measured after the flip and `crop` after both, so instructions applied in another order frame a different part of the image.
 
-### `applyImageEdit( state, edit )`
+### `applyImageEdit( state, edit, options? )`
 
 The reverse of `getImageEdit`: it turns an `ImageEdit` into an editor state, so code can set the edit. It returns `{ state }`, which you store like any other change.
 
@@ -166,18 +166,23 @@ The edit replaces the current one. It is not merged with it. Every part is optio
 
 -   No `flip`: the image is not flipped.
 -   No `rotation`: the image is not rotated.
--   No `crop`: the whole image is kept.
+-   No `crop`: the editor picks one, as when the image is rotated by hand. At a quarter turn that is the whole image.
 
 So `{ rotation: 90 }` on a cropped image gives a rotated image with no crop. To keep a part, pass it again. The crop is measured on the image after the flip and rotation, so the same crop numbers frame a different part of the image once either changes.
 
 From `state`, only the image and the locked ratio are kept. The pan and zoom are worked out again: the crop is centred and zoomed in, as after a resize.
 
-If the editor cannot hold the edit exactly, it does not adjust it. It returns `{ rejected }` with one of these reasons:
+The image always covers the crop. A crop it does not cover is fitted the way the editor fits one: it shrinks about its centre only as far as its shape needs, then moves the shortest way inside. Under a locked ratio, the crop keeps its centre and width and takes the height the ratio needs.
+
+It returns `{ rejected }` instead when it cannot apply the edit at all:
 
 -   `'no-image'`: no image with a usable size has loaded.
 -   `'invalid'`: a number is not finite, or the crop is under one pixel wide or high.
+
+Pass `{ strict: true }` to reject an edit that needs fitting, rather than fit it. Two more reasons are then possible:
+
 -   `'locked-ratio'`: the crop is not the shape of the locked ratio. Without the lock, the edit would apply.
--   `'outside-image'`: the crop reaches outside the image. `{ rotation: 10 }` on its own is rejected this way, because a tilted image's bounding box has empty corners, and with no crop the whole box is kept.
+-   `'outside-image'`: the crop reaches outside the image.
 
 ### `exportImage( state, options? )`
 

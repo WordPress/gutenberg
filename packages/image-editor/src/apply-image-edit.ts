@@ -11,12 +11,17 @@ import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
 /**
  * Why an edit was rejected. `no-image` means no image with a usable size
  * has loaded. `invalid` is a non-finite number or a crop under one pixel
- * wide or high. `locked-ratio` is an edit that would apply without the
- * locked ratio, but its crop is a different shape. `outside-image` is a
- * crop reaching outside the image.
+ * wide or high. In strict mode only, `locked-ratio` is a crop that fits
+ * the image but not the locked ratio, and `outside-image` is a crop
+ * reaching outside the image.
  */
 export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
+
+export interface ApplyImageEditOptions {
+	/** Reject an edit that needs fitting, instead of fitting it. */
+	strict?: boolean;
+}
 
 export type ApplyImageEditResult =
 	{ state: ImageEditorState } | { rejected: ImageEditRejection };
@@ -46,34 +51,37 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 }
 
 /**
- * The reverse of `getImageEdit`. The edit replaces the current one: a part
- * left out of `edit` is reset (no flip, no rotation, the whole image), and
- * only the image and locked ratio are kept from `state`.
+ * The reverse of `getImageEdit`. The edit replaces the current one: a
+ * missing flip or rotation means none, and a missing crop means the crop
+ * the editor picks, as when the image is rotated by hand. Only the image
+ * and locked ratio are kept from `state`.
  *
- * The pan and zoom are replaced: the crop is centred and zoomed in until
- * it meets an edge of the view or the zoom limit, as after a resize. An
- * edit the editor cannot hold is rejected, not adjusted.
+ * A crop the image does not cover is fitted as the editor fits one: it
+ * shrinks about its centre only as far as its shape needs, then moves the
+ * shortest way inside. Under a locked ratio it keeps its centre and width.
+ * The pan and zoom are replaced: the crop is centred and zoomed in, as
+ * after a resize.
  *
  * @param state
  * @param edit
+ * @param options
+ * @param options.strict
  */
 export function applyImageEdit(
 	state: ImageEditorState,
-	edit: ImageEdit
+	edit: ImageEdit,
+	{ strict = false }: ApplyImageEditOptions = {}
 ): ApplyImageEditResult {
 	const { image } = state;
 	if ( ! image || ! ( image.naturalWidth > 0 && image.naturalHeight > 0 ) ) {
 		return { rejected: 'no-image' };
 	}
 
-	const crop = edit.crop ?? WHOLE_IMAGE;
-	const numbers = [
-		edit.rotation ?? 0,
-		crop.x,
-		crop.y,
-		crop.width,
-		crop.height,
-	];
+	const { crop } = edit;
+	const numbers = [ edit.rotation ?? 0 ];
+	if ( crop ) {
+		numbers.push( crop.x, crop.y, crop.width, crop.height );
+	}
 	if ( ! numbers.every( Number.isFinite ) ) {
 		return { rejected: 'invalid' };
 	}
@@ -88,6 +96,22 @@ export function applyImageEdit(
 	const rotation =
 		flip.horizontal !== flip.vertical ? ( 360 - angle ) % 360 : angle;
 
+	const reset = (
+		payload: Partial< InternalImageEditorState >
+	): ImageEditorState =>
+		imageEditorReducer( withBaseValues( state ), {
+			type: 'RESET',
+			payload,
+		} );
+
+	// The reset starts from the full view, and containment zooms it in as
+	// the rotate control does.
+	if ( ! crop ) {
+		return {
+			state: reset( { rotation, flip, aspectRatio: state.aspectRatio } ),
+		};
+	}
+
 	// The crop is in the rotated image's bounds. The view is the bounds at
 	// the nearest quarter turn, on the same centre.
 	const rotated = getRotatedBBox(
@@ -98,6 +122,14 @@ export function applyImageEdit(
 	if ( crop.width * rotated.width < 1 || crop.height * rotated.height < 1 ) {
 		return { rejected: 'invalid' };
 	}
+	// Keep the crop's centre and width under a locked ratio, as the crop
+	// setter does. Containment then fits it if it has no room.
+	const ratio = state.aspectRatio;
+	let { y, height: cropHeight } = crop;
+	if ( ! strict && ratio && ratio > 0 ) {
+		cropHeight = ( crop.width * rotated.width ) / ratio / rotated.height;
+		y = crop.y + ( crop.height - cropHeight ) / 2;
+	}
 	const view = getRotatedBBox(
 		image.naturalWidth,
 		image.naturalHeight,
@@ -107,10 +139,10 @@ export function applyImageEdit(
 		( crop.x * rotated.width - ( rotated.width - view.width ) / 2 ) /
 		view.width;
 	const top =
-		( crop.y * rotated.height - ( rotated.height - view.height ) / 2 ) /
+		( y * rotated.height - ( rotated.height - view.height ) / 2 ) /
 		view.height;
 	const width = ( crop.width * rotated.width ) / view.width;
-	const height = ( crop.height * rotated.height ) / view.height;
+	const height = ( cropHeight * rotated.height ) / view.height;
 
 	const zoom = Math.min( 1 / Math.max( width, height ), MAX_ZOOM );
 	const cropRect = {
@@ -130,16 +162,8 @@ export function applyImageEdit(
 		cropRect,
 	};
 
-	const reset = (
-		payload: Partial< InternalImageEditorState >
-	): ImageEditorState =>
-		imageEditorReducer( withBaseValues( state ), {
-			type: 'RESET',
-			payload,
-		} );
-
 	const next = reset( { ...candidate, aspectRatio: state.aspectRatio } );
-	if ( holdsEdit( next, edit ) ) {
+	if ( ! strict || holdsEdit( next, edit ) ) {
 		return { state: next };
 	}
 	// If the edit holds without the lock, the lock rejected it.

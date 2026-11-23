@@ -328,8 +328,8 @@ describe( 'applyImageEdit ↔ Export-camera parity', () => {
 	}
 
 	it( 'never applies a hand-built state as a different edit', () => {
-		// Hand-built, so some frame regions the editor forbids. Each must
-		// come back unchanged or be rejected.
+		// Hand-built, so some frame regions the editor forbids. In strict
+		// mode each must come back unchanged or be rejected.
 		const states = buildRows()
 			.filter( ( { probeLabel } ) => probeLabel === 'center' )
 			.map( ( { state } ) => state );
@@ -342,7 +342,9 @@ describe( 'applyImageEdit ↔ Export-camera parity', () => {
 			if ( ! edit ) {
 				continue;
 			}
-			const result = applyImageEdit( makeState(), edit );
+			const result = applyImageEdit( makeState(), edit, {
+				strict: true,
+			} );
 			if ( ! ( 'state' in result ) ) {
 				rejected++;
 				continue;

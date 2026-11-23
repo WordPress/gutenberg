@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { applyImageEdit } from '../apply-image-edit';
+import {
+	applyImageEdit,
+	type ApplyImageEditOptions,
+} from '../apply-image-edit';
 import { getImageEdit, type ImageEdit } from '../get-image-edit';
 import {
 	areImageEditorStatesEqual,
@@ -11,8 +14,12 @@ import type { ImageEditorState } from '../core/types';
 
 const IMAGE = { src: 'wide.jpg', naturalWidth: 1600, naturalHeight: 900 };
 
-function apply( state: ImageEditorState, edit: ImageEdit ): ImageEditorState {
-	const result = applyImageEdit( state, edit );
+function apply(
+	state: ImageEditorState,
+	edit: ImageEdit,
+	options?: ApplyImageEditOptions
+): ImageEditorState {
+	const result = applyImageEdit( state, edit, options );
 	if ( ! ( 'state' in result ) ) {
 		throw new Error( `Rejected as ${ result.rejected }` );
 	}
@@ -21,6 +28,7 @@ function apply( state: ImageEditorState, edit: ImageEdit ): ImageEditorState {
 
 describe( 'applyImageEdit', () => {
 	const clean = createImageEditorState( { image: IMAGE } );
+	const square = createImageEditorState( { image: IMAGE, aspectRatio: 1 } );
 
 	it( 'returns the clean state for an empty edit', () => {
 		expect( areImageEditorStatesEqual( apply( clean, {} ), clean ) ).toBe(
@@ -72,16 +80,80 @@ describe( 'applyImageEdit', () => {
 	} );
 
 	it( 'keeps a locked ratio when the crop has that ratio', () => {
-		const square = createImageEditorState( {
-			image: IMAGE,
-			aspectRatio: 1,
-		} );
 		// 450 by 450 pixels.
 		const state = apply( square, {
 			crop: { x: 0.3, y: 0.25, width: 0.28125, height: 0.5 },
 		} );
 
 		expect( state.aspectRatio ).toBe( 1 );
+	} );
+
+	it.each( [
+		[ 'with no ratio locked', clean, {} ],
+		[ 'with a square locked', square, {} ],
+		[ 'in strict mode', clean, { strict: true } ],
+	] as [ string, ImageEditorState, ApplyImageEditOptions ][] )(
+		'gives a missing crop the crop the rotate control picks, %s',
+		( _, state, options ) => {
+			const rotated = imageEditorReducer( withBaseValues( state ), {
+				type: 'SET_ROTATION',
+				payload: 5,
+			} );
+
+			expect(
+				areImageEditorStatesEqual(
+					apply( state, { rotation: 5 }, options ),
+					rotated
+				)
+			).toBe( true );
+		}
+	);
+
+	it( 'slides a crop past the edge back inside, at the same size', () => {
+		const state = apply( clean, {
+			crop: { x: 0.8, y: 0, width: 0.5, height: 1 },
+		} );
+
+		expect( getImageEdit( state ) ).toEqual( {
+			crop: {
+				x: expect.closeTo( 0.5 ),
+				y: expect.closeTo( 0 ),
+				width: expect.closeTo( 0.5 ),
+				height: expect.closeTo( 1 ),
+			},
+		} );
+	} );
+
+	it( 'shrinks a crop the tilted image does not cover, keeping its shape, and moves it inside', () => {
+		// The left half of the bounding box reaches into its empty corners.
+		const state = apply( clean, {
+			rotation: 5,
+			crop: { x: 0, y: 0, width: 0.5, height: 1 },
+		} );
+
+		expect( getImageEdit( state ) ).toEqual( {
+			rotation: 5,
+			crop: {
+				x: expect.closeTo( 0.0943, 3 ),
+				y: expect.closeTo( 0.0642, 3 ),
+				width: expect.closeTo( 0.4073, 3 ),
+				height: expect.closeTo( 0.8145, 3 ),
+			},
+		} );
+	} );
+
+	it( 'keeps the width of a crop under a locked ratio when there is room', () => {
+		// 800 by 400 pixels centred 425 down, so an 800 pixel square.
+		const state = apply( square, {
+			crop: { x: 0.25, y: 0.25, width: 0.5, height: 4 / 9 },
+		} );
+
+		expect( getImageEdit( state )?.crop ).toEqual( {
+			x: expect.closeTo( 0.25 ),
+			y: expect.closeTo( 25 / 900 ),
+			width: expect.closeTo( 0.5 ),
+			height: expect.closeTo( 800 / 900 ),
+		} );
 	} );
 
 	it.each( [
@@ -102,29 +174,42 @@ describe( 'applyImageEdit', () => {
 			{ crop: { x: 0.5, y: 0.5, width: 0.5 / 1600, height: 0.5 } },
 		],
 		[ 'invalid', clean, { rotation: Number.NaN } ],
-		[
-			'outside-image',
-			clean,
-			{ crop: { x: 0.8, y: 0, width: 0.5, height: 1 } },
-		],
-		[
-			// A tilted image's bounds have empty corners.
-			'outside-image',
-			clean,
-			{ rotation: 10 },
-		],
-		[
-			// 800 by 400 pixels.
-			'locked-ratio',
-			createImageEditorState( { image: IMAGE, aspectRatio: 1 } ),
-			{ crop: { x: 0.25, y: 0.25, width: 0.5, height: 4 / 9 } },
-		],
 	] as [ string, ImageEditorState, ImageEdit ][] )(
 		'rejects as %s',
 		( cause, state, edit ) => {
 			const before = JSON.stringify( state );
 
 			expect( applyImageEdit( state, edit ) ).toEqual( {
+				rejected: cause,
+			} );
+			expect( JSON.stringify( state ) ).toBe( before );
+		}
+	);
+
+	it.each( [
+		[
+			'outside-image',
+			clean,
+			{ crop: { x: 0.8, y: 0, width: 0.5, height: 1 } },
+		],
+		[
+			// A tilted image's bounding box has empty corners.
+			'outside-image',
+			clean,
+			{ rotation: 10, crop: { x: 0, y: 0, width: 1, height: 1 } },
+		],
+		[
+			// 800 by 400 pixels.
+			'locked-ratio',
+			square,
+			{ crop: { x: 0.25, y: 0.25, width: 0.5, height: 4 / 9 } },
+		],
+	] as [ string, ImageEditorState, ImageEdit ][] )(
+		'rejects as %s in strict mode, rather than fit the crop',
+		( cause, state, edit ) => {
+			const before = JSON.stringify( state );
+
+			expect( applyImageEdit( state, edit, { strict: true } ) ).toEqual( {
 				rejected: cause,
 			} );
 			expect( JSON.stringify( state ) ).toBe( before );

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `applyImageEdit( state, edit, options? )`, which turns an `ImageEdit` into an editor state, fitting the crop to the image as the editor does unless `strict` is set ([#86665](https://github.com/WordPress/gutenberg/pull/86665)).
+
 ### Internal
 
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
@@ -18,8 +22,6 @@ Initial release ([#86223](https://github.com/WordPress/gutenberg/pull/86223)).
 -   Add `exportImage( state, options? )`, which exports the edited image as a `Blob` in the browser ([#86405](https://github.com/WordPress/gutenberg/pull/86405)).
 -   Describe the edit to apply when saving as one `ImageEdit` record, returned by `getImageEdit( state )` ([#86630](https://github.com/WordPress/gutenberg/pull/86630)).
 -   Add `mapImageEdit( edit, handlers )`, which turns each part of an `ImageEdit` into the consumer's own format in the order the parts apply ([#86704](https://github.com/WordPress/gutenberg/pull/86704)).
-
--   Add `applyImageEdit( state, edit )`, which turns an `ImageEdit` back into an editor state ([#86665](https://github.com/WordPress/gutenberg/pull/86665)).
 
 ### Bug Fixes
 
