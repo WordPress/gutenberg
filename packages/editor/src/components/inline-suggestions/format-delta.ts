@@ -31,6 +31,7 @@ import {
 	suggestionMarkerId,
 	suggestionMarkerListsAt,
 } from './format';
+import { hasDisallowedProtocol } from '../suggestion-mode/operations/url-scheme';
 
 /**
  * A rich-text format as a delta records it: its type and attributes.
@@ -75,35 +76,6 @@ interface FormatRecord {
 }
 
 const EMPTY_ENTRY: FormatDeltaEntry = { added: [], removed: [] };
-
-/*
- * The protocols `wp_allowed_protocols()` allows by default, which the server
- * also checks a stored delta's attribute values against.
- */
-const ALLOWED_PROTOCOLS = new Set( [
-	'http',
-	'https',
-	'ftp',
-	'ftps',
-	'mailto',
-	'news',
-	'irc',
-	'irc6',
-	'ircs',
-	'gopher',
-	'nntp',
-	'feed',
-	'telnet',
-	'mms',
-	'rtsp',
-	'sms',
-	'svn',
-	'tel',
-	'fax',
-	'xmpp',
-	'webcal',
-	'urn',
-] );
 
 /**
  * Whether a format is part of the text's formatting, rather than a
@@ -168,24 +140,11 @@ function isAllowedFormatType( type: unknown ): type is string {
 }
 
 /**
- * Whether an attribute value names a protocol outside the allowed ones. Every
- * value is checked, since a format type can map any attribute to `href`.
- *
- * @param value Attribute value.
- * @return True when the value names a disallowed protocol.
- */
-function hasDisallowedProtocol( value: string ): boolean {
-	// Browsers ignore control characters and whitespace inside a scheme.
-	const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(
-		value.replace( /[\u0000-\u0020\u007f]/g, '' )
-	);
-	return !! scheme && ! ALLOWED_PROTOCOLS.has( scheme[ 1 ].toLowerCase() );
-}
-
-/**
  * Keeps the string attributes of a stored descriptor that cannot run script:
  * no event handlers, inline frames or disallowed protocols. Another author
  * wrote the descriptor, and a reviewer's decision writes it into content.
+ * Every value is checked for its protocol, since a format type can map any
+ * attribute to `href`.
  *
  * @param attributes Descriptor attributes.
  * @return The safe attributes.
