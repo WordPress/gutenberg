@@ -24,7 +24,8 @@
  *                        ("heading level 3 → 4"); objects keep the bare name.
  *   - **Rename block:** — the one attribute change worth its own line: a
  *                        block renamed through `metadata.name`, reported
- *                        with the name being proposed.
+ *                        with the name being proposed. Any other metadata
+ *                        key the proposal changes is named on `Change:`.
  *   - **Add formatting: / Remove formatting:**
  *                      — pure inline-format changes (bold, italic, links).
  *                        Detected by tag-level diff of the serialized HTML
@@ -59,6 +60,7 @@ import { useMemo } from '@wordpress/element';
 import { __unstableStripHTML as wpStripHTML } from '@wordpress/dom';
 import { decodeEntities } from '@wordpress/html-entities';
 import { wordDiff, MAX_DIFF_LENGTH } from './word-diff';
+import { isAttributeEqual } from './operations';
 import type { SuggestionOperation } from './operations';
 import type { WordDiffSegment } from './word-diff';
 
@@ -130,6 +132,27 @@ function humanizeAttributeName( key: any ): string {
 function readBlockName( metadata: any ): string | null {
 	const name = metadata?.name;
 	return typeof name === 'string' && name.trim() !== '' ? name.trim() : null;
+}
+
+/**
+ * The keys a `metadata` proposal changes, other than the block name, which
+ * has a summary line of its own.
+ *
+ * @param op `attribute-set` operation on `metadata`.
+ * @return The changed keys.
+ */
+function changedMetadataKeys( op: any ): string[] {
+	if ( ! op.after || typeof op.after !== 'object' ) {
+		return [];
+	}
+	return Object.keys( op.after ).filter(
+		( key ) =>
+			key !== 'name' &&
+			! isAttributeEqual(
+				op.before?.[ key ] ?? null,
+				op.after[ key ] ?? null
+			)
+	);
 }
 
 /**
@@ -788,14 +811,13 @@ export function summarizeOperations(
 		if ( op.attribute === 'metadata' ) {
 			const beforeName = readBlockName( op.before );
 			const afterName = readBlockName( op.after );
+			let isRename = true;
 			if ( afterName && afterName !== beforeName ) {
 				lines.push( {
 					label: __( 'Rename block:' ),
 					value: `“${ ellipsize( afterName ) }”`,
 				} );
-				continue;
-			}
-			if ( beforeName && ! afterName ) {
+			} else if ( beforeName && ! afterName ) {
 				lines.push( {
 					label: __( 'Rename block:' ),
 					value: sprintf(
@@ -804,8 +826,28 @@ export function summarizeOperations(
 						ellipsize( beforeName )
 					),
 				} );
-				continue;
+			} else {
+				isRename = false;
 			}
+			/*
+			 * Accept writes every key the proposal holds, so each one is
+			 * named: a rename line alone would hide a binding or a lock
+			 * proposed with it.
+			 */
+			const otherSettings = changedMetadataKeys( op );
+			if ( otherSettings.length > 0 ) {
+				attributeLabels.push(
+					sprintf(
+						/* translators: 1: "block settings". 2: comma-separated list of setting names. */
+						__( '%1$s (%2$s)' ),
+						attributeLabel( op.attribute ),
+						otherSettings.map( humanizeAttributeName ).join( ', ' )
+					)
+				);
+			} else if ( ! isRename ) {
+				attributeLabels.push( attributeLabel( op.attribute ) );
+			}
+			continue;
 		}
 
 		const isContent = op.attribute === 'content';
