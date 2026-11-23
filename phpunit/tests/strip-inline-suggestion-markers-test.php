@@ -233,11 +233,12 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	}
 
 	public function test_unclosed_addition_is_removed_with_a_closed_inner_deletion() {
-		// The `</mark>` closes the inner deletion, leaving the addition open.
+		// The `</mark>` closes the inner deletion, leaving the addition open,
+		// so it is removed to the end of the block.
 		$html     = '<p>x<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add">a<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">b</mark>c</p><p>y</p>';
 		$stripped = gutenberg_strip_inline_suggestion_markers( $html );
 
-		$this->assertSame( '<p>x</p><p>y</p>', $stripped );
+		$this->assertSame( '<p>x</p>', $stripped );
 	}
 
 	public function test_unclosed_addition_runs_to_the_end_of_the_block() {
@@ -651,20 +652,40 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	/**
 	 * Data provider: additions whose lexical span and browser span differ.
+	 * Each is removed to the end of the block, and the elements around it that
+	 * the block went on to close are closed again.
 	 *
 	 * @return array[] Input HTML and expected output.
 	 */
 	public function data_unbalanced_additions() {
 		$add = '<mark class="wp-suggestion-add" data-suggestion-id="1" data-suggestion-type="add" data-author="3">';
+		$del = '<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">';
 		return array(
-			'crossing </p><p>'               => array( '<p>a' . $add . 'X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
-			'block-level start tag inside'   => array( '<p>a' . $add . 'X<div>Y</div></mark>b</p>', '<p>ab</p>' ),
-			'crossing </td> in a table cell' => array( '<table><tr><td>a' . $add . 'X</td><td>Y</mark>b</td></tr></table>', '<table><tr><td>ab</td></tr></table>' ),
-			'crossing </li> in a list item'  => array( '<ul><li>a' . $add . 'X</li><li>Y</mark>b</li></ul>', '<ul><li>ab</li></ul>' ),
-			'closer ignored inside a div'    => array( '<div>a' . $add . 'X<div>Y</mark>Z</div>W</div>c', '<div>a</div>c' ),
-			'closer ignored inside a table'  => array( '<div>a' . $add . '<table></mark>LEAK</table>Z</div>c', '<div>a</div>c' ),
-			'formatting closer past a div'   => array( '<p><b>a' . $add . 'X<div>Y</b>Z</div>W</p>', '<p><b>a</p>' ),
-			'format crossing </p><p>'        => array( '<p>a<mark class="wp-suggestion-format" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>ab</p>' ),
+			'crossing </p><p>'                    => array( '<p>a' . $add . 'X</p><p>Y</mark>b</p>', '<p>a</p>' ),
+			'block-level start tag inside'        => array( '<p>a' . $add . 'X<div>Y</div></mark>b</p>', '<p>ab</p>' ),
+			'crossing </td> in a table cell'      => array( '<table><tr><td>a' . $add . 'X</td><td>Y</mark>b</td></tr></table>', '<table><tr><td>a</td></tr></table>' ),
+			'crossing </li> in a list item'       => array( '<ul><li>a' . $add . 'X</li><li>Y</mark>b</li></ul>', '<ul><li>a</li></ul>' ),
+			'closer ignored inside a div'         => array( '<div>a' . $add . 'X<div>Y</mark>Z</div>W</div>c', '<div>a</div>' ),
+			'closer ignored inside a table'       => array( '<div>a' . $add . '<table></mark>LEAK</table>Z</div>c', '<div>a</div>' ),
+			'formatting closer past a div'        => array( '<p><b>a' . $add . 'X<div>Y</b>Z</div>W</p>', '<p><b>a</b></p>' ),
+			'format crossing </p><p>'             => array( '<p>a<mark class="wp-suggestion-format" data-suggestion-id="999999" data-suggestion-type="format">X</p><p>Y</mark>b</p>', '<p>a</p>' ),
+			// A browser ignores this `</li>` (the inner list is in the way),
+			// so it reads `LEAK` as part of the addition.
+			'</li> past a nested list'            => array( '<ul><li>a<ul>' . $add . 'X</li>LEAK</ul></li></ul>', '<ul><li>a<ul></ul></li></ul>' ),
+			// The `<dt>` already closed the `<dd>`, so a browser ignores
+			// the `</dd>`.
+			'closer of an implicitly closed item' => array( '<dl><dd>a<dt>b' . $add . 'X</dd>LEAK</dl>', '<dl><dd>a<dt>b</dt></dd></dl>' ),
+			// A browser ignores the table part and its closer outside a
+			// table, so the plain mark takes the first `</mark>`.
+			'own closer taken by an inner mark'   => array( '<p>a' . $add . 'X<caption><mark>Y</caption>Z</mark>LEAK</p>', '<p>a</p>' ),
+			// A browser ignores the table part and its closer, so the `<div>`
+			// stays open and keeps the `</mark>` from reaching the addition.
+			'special element left open inside'    => array( '<p>a' . $add . 'X<td><div>Y</td>Z</mark>LEAK</p>', '<p>a</p>' ),
+			'</form> past an open element'        => array( '<section>a' . $add . 'X<form><div>Y</form>Z</mark>LEAK</section>', '<section>a</section>' ),
+			// An unclosed formatting element does not hold a `</mark>` back.
+			'formatting element left open inside' => array( '<p>a' . $add . 'X<b>Y</mark>b</p>', '<p>ab</p>' ),
+			'inside a deletion'                   => array( '<p>' . $del . 'a' . $add . 'X</p>', '<p>a</p>' ),
+			'open at the end of the block'        => array( '<div><p>a' . $add . 'X</p>Y', '<div><p>a</p>' ),
 		);
 	}
 
@@ -676,6 +697,21 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	 */
 	public function test_unbalanced_addition_fails_closed( $html, $expected ) {
 		$this->assertSame( $expected, gutenberg_strip_inline_suggestion_markers( $html ) );
+	}
+
+	public function test_view_removes_an_unbalanced_addition_to_the_end_even_when_accepted(): void {
+		$html = '<ul><li>a<ul><mark class="wp-suggestion-add" data-suggestion-id="1">X</li>LEAK</ul></li></ul>';
+
+		$this->assertSame( '<ul><li>a<ul></ul></li></ul>', gutenberg_get_inline_suggestion_view( $html, array( 1 ) ) );
+	}
+
+	public function test_only_the_first_unbalanced_addition_lists_the_closers_around_it(): void {
+		$add = '<mark class="wp-suggestion-add" data-suggestion-id="1">';
+		// The second addition is inside the run removed for the first.
+		$markers = gutenberg_pair_inline_suggestion_markers( "<div><p>a{$add}X</p><p>{$add}Y</p></div><p>{$add}Z</mark></p>" );
+
+		$this->assertIsArray( $markers );
+		$this->assertSame( array( '</p></div>', null, null ), array_column( $markers, 'enclosing_closers' ) );
 	}
 
 	public function test_unbalanced_deletion_keeps_its_text() {
