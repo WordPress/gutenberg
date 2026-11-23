@@ -47,6 +47,7 @@ import {
 	createPostOwnershipCheck,
 	notifyForeignEditRefused,
 } from './block-ownership';
+import { findAttributeOperationProblem } from './operations';
 import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
@@ -199,8 +200,12 @@ function SuggestingBlockEdit( {
 	// Every author's proposal on the block, later notes on top.
 	const after = useMemo( () => displayedProposal( marker ), [ marker ] );
 	const mergedAttributes = useMemo(
-		() => mergeProposedAttributes( attributes, after ),
-		[ attributes, after ]
+		() =>
+			mergeProposedAttributes(
+				attributes,
+				displayableProposal( props.name, attributes, after )
+			),
+		[ props.name, attributes, after ]
 	);
 
 	// What the block sees, kept current between renders as well: an updater
@@ -481,8 +486,12 @@ function ProposedBlockEdit( {
 	// Every author's proposal on the block, later notes on top.
 	const after = useMemo( () => displayedProposal( marker ), [ marker ] );
 	const mergedAttributes = useMemo(
-		() => mergeProposedAttributes( attributes, after ),
-		[ attributes, after ]
+		() =>
+			mergeProposedAttributes(
+				attributes,
+				displayableProposal( props.name, attributes, after )
+			),
+		[ props.name, attributes, after ]
 	);
 	const afterRef = useRef( after );
 	useEffect( () => {
@@ -679,6 +688,40 @@ function structuralMarkerClass( type: string | undefined ): string | null {
 }
 
 /**
+ * The part of a proposal the canvas shows: the values accept would apply.
+ * Any author of the post can write a marker, and the block's edit component
+ * renders what it is handed, so a value accept refuses (an element name, a
+ * URL scheme, an attribute the block type lacks) is left at its baseline.
+ * The note still describes it, and accepting it is still refused.
+ *
+ * @param blockName  The block's name.
+ * @param attributes The block's live attributes.
+ * @param proposal   The proposal to display, if any.
+ * @return The proposal without the values that fail, or null when none pass.
+ */
+function displayableProposal(
+	blockName: string | null | undefined,
+	attributes: Record< string, any >,
+	proposal: Record< string, unknown > | null
+): Record< string, unknown > | null {
+	if ( ! proposal ) {
+		return proposal;
+	}
+	const allowed = Object.entries( proposal ).filter(
+		( [ attribute, after ] ) =>
+			! findAttributeOperationProblem(
+				blockName,
+				[ { type: 'attribute-set', attribute, after } ],
+				attributes
+			)
+	);
+	if ( allowed.length === Object.keys( proposal ).length ) {
+		return proposal;
+	}
+	return allowed.length > 0 ? Object.fromEntries( allowed ) : null;
+}
+
+/**
  * HOC that tags the rendered block list item with a class whenever it has a
  * pending suggestion: an attribute proposal (renders the "bracket"
  * treatment) or a structural marker (renders strikethrough/dim/move
@@ -693,6 +736,7 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 	( BlockListBlock ) =>
 		function BlockListBlockWithSuggestionClass( props ) {
 			const { clientId } = props;
+			const registry = useRegistry();
 			const moveGhosts = useMoveGhosts();
 			const ghostsAfter = moveGhosts?.after?.get( clientId );
 			const ghostsBefore = moveGhosts?.before?.get( clientId );
@@ -731,12 +775,21 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 			 */
 			const previewAttributes = useMemo( () => {
 				const proposal = showBracket
-					? displayedProposal( readSuggestionMarker( attributes ) )
+					? displayableProposal(
+							props.name ??
+								registry
+									.select( blockEditorStore )
+									.getBlockName( clientId ),
+							attributes,
+							displayedProposal(
+								readSuggestionMarker( attributes )
+							)
+						)
 					: null;
 				return proposal
 					? mergeProposedAttributes( attributes, proposal )
 					: null;
-			}, [ showBracket, attributes ] );
+			}, [ showBracket, attributes, props.name, registry, clientId ] );
 			const isPendingMove =
 				structuralClass === 'is-suggestion-pending-move';
 
