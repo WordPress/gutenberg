@@ -23,6 +23,7 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { withoutSuggestPostEditGuard } from './suggest-post-edit-guard';
+import { isSuggestIntentAvailable } from '../components/suggestion-mode/gate';
 import { unlock } from '../lock-unlock';
 export * from '../dataviews/store/private-actions';
 
@@ -1187,12 +1188,25 @@ export function selectNote( noteId, options = { focus: false } ) {
  * has nowhere to suggest. Refusing here covers the keyboard shortcut and any
  * programmatic dispatch; the intent menu offers the choice disabled.
  *
+ * `suggest` is also refused, silently, without the Suggestion mode experiment
+ * or on a post type that does not support notes: neither offers the intent.
+ *
  * @param {'edit'|'suggest'} intent The editor intent to set.
  */
 export const setEditorIntent =
 	( intent ) =>
 	( { select, dispatch, registry } ) => {
 		if ( ! EDITOR_INTENTS.includes( intent ) ) {
+			return;
+		}
+
+		// A suggestion is a note, and the capture only runs with the
+		// experiment on, so anywhere else the intent would lock the editor
+		// with no menu to leave it.
+		if (
+			intent === EDITOR_INTENT_SUGGEST &&
+			! isSuggestIntentAvailable( registry.select )
+		) {
 			return;
 		}
 

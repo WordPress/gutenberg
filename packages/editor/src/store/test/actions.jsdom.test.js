@@ -41,6 +41,7 @@ const postTypeConfig = {
 const postTypeEntity = {
 	slug: 'post',
 	rest_base: 'posts',
+	supports: { editor: [ { notes: true } ] },
 	labels: {
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
@@ -90,6 +91,11 @@ const unknownPath = ( method, path ) => {
 		message: `Unknown path: ${ method } ${ path }`,
 	};
 };
+
+// Suggesting is only offered with the Suggestion mode experiment on.
+beforeEach( () => {
+	window.__experimentalSuggestionMode = true;
+} );
 
 describe( 'Post actions', () => {
 	describe( 'setCanvasWidth', () => {
@@ -2113,6 +2119,40 @@ describe( 'Editor actions', () => {
 			).toEqual( 'text' );
 		} );
 
+		it( 'leaves the code editor alone on a post with markers when the experiment is off', () => {
+			delete window.__experimentalSuggestionMode;
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'editorMode', 'text' );
+
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Nothing can resolve the markers without the experiment, so
+			// masking the preference would withhold the code editor for good.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			expect(
+				unlock(
+					registry.select( editorStore )
+				).getCodeEditorUnavailableReason( {
+					checkPendingSuggestions: true,
+				} )
+			).toBeNull();
+		} );
+
 		it( 'keeps the code editor masked when leaving Suggesting with markers pending', () => {
 			const post = {
 				id: postId,
@@ -2205,6 +2245,51 @@ describe( 'Editor actions', () => {
 		beforeEach( () => {
 			registry = createRegistryWithStores();
 			speak.mockClear();
+		} );
+
+		it( 'refuses the suggest intent when the experiment is off', () => {
+			delete window.__experimentalSuggestionMode;
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'refuses the suggest intent on a post type without notes support', () => {
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', [
+					{ slug: 'wp_template', supports: { editor: true } },
+				] );
+			registry.dispatch( editorStore ).setEditedPost( 'wp_template', 7 );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'returns to edit when another post is edited', () => {
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
+
+			registry.dispatch( editorStore ).setEditedPost( 'wp_template', 7 );
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
 		} );
 
 		it( 'defaults to edit', () => {

@@ -253,6 +253,9 @@ function boldPlan() {
 	};
 }
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionFormatKeyboard', () => {
 	it( 'writes a single format marker when the content is unchanged (happy path)', async () => {
 		const { clientId, getContent } = setup();

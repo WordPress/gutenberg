@@ -20,6 +20,7 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 import { isAttributeEqual } from '../suggestion-mode/operations';
 import { readSuggestionMarkers } from '../suggestion-mode/marker';
 import { unlock } from '../../lock-unlock';
@@ -469,7 +470,9 @@ export function SuggestionActionButtons( {
 }: {
 	decision: SuggestionDecision | null;
 } ) {
-	if ( ! decision || decision.isResolved ) {
+	// Without the experiment the capture and the save pass that a decision
+	// relies on do not run, so there is nothing to decide with.
+	if ( ! decision || decision.isResolved || ! isSuggestionModeEnabled() ) {
 		return null;
 	}
 
@@ -759,7 +762,9 @@ export default function SuggestionActions( {
 		status = outdatedLabel( decision.anchorKind );
 	}
 
+	const canDecide = isSuggestionModeEnabled();
 	const canReopen =
+		canDecide &&
 		!! onReopen &&
 		( presentation === 'stuck' || presentation === 'outdated' );
 
@@ -809,7 +814,17 @@ export default function SuggestionActions( {
 					{ hint }
 				</Text>
 			) }
-			{ ! isResolved && applyDisabledReason && (
+			{ ! canDecide && ! isResolved && (
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status"
+				>
+					{ __(
+						'Turn on the Suggestion Mode experiment to accept or reject this suggestion.'
+					) }
+				</Text>
+			) }
+			{ canDecide && ! isResolved && applyDisabledReason && (
 				<Text
 					variant="body-sm"
 					className="editor-collab-sidebar-panel__suggestion-status"
@@ -817,7 +832,7 @@ export default function SuggestionActions( {
 					{ applyDisabledReason }
 				</Text>
 			) }
-			{ ( presentation === 'stuck' || canReopen ) && (
+			{ canDecide && ( presentation === 'stuck' || canReopen ) && (
 				<Stack
 					direction="row"
 					gap="sm"

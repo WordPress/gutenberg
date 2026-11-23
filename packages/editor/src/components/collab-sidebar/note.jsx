@@ -19,6 +19,7 @@ import SuggestionActions, {
 	useSuggestionDecision,
 } from './suggestion-actions';
 import { NoteReactions } from './reactions/note-reactions';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -116,10 +117,13 @@ export function Note( {
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
 			// A decided suggestion can be reopened too; its own Accept and
-			// Reject replace Resolve, but not Reopen.
+			// Reject replace Resolve, but not Reopen. Only with the
+			// experiment on, like every other decision on a suggestion.
 			isEligible: ( { status } ) =>
 				( canResolve ||
-					( note.parent === 0 && hasSuggestionPayload ) ) &&
+					( note.parent === 0 &&
+						hasSuggestionPayload &&
+						isSuggestionModeEnabled() ) ) &&
 				hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},

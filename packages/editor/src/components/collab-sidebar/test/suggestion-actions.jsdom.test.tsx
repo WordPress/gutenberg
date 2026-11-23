@@ -1,4 +1,12 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { RegistryProvider, createRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -178,6 +186,35 @@ async function setup( {
 const button = ( name: string ) => screen.queryByRole( 'button', { name } );
 
 describe( 'SuggestionActions states', () => {
+	// Deciding is only offered with the Suggestion mode experiment on.
+	beforeEach( () => {
+		window.__experimentalSuggestionMode = true;
+	} );
+
+	it( 'without the experiment: the summary and a hint, nothing to decide with', async () => {
+		delete window.__experimentalSuggestionMode;
+		await setup( { anchored: true } );
+
+		expect( button( 'Accept suggestion' ) ).toBeNull();
+		expect( button( 'Reject suggestion' ) ).toBeNull();
+		expect(
+			screen.getByText(
+				'Turn on the Suggestion Mode experiment to accept or reject this suggestion.'
+			)
+		).toBeInTheDocument();
+	} );
+
+	it( 'without the experiment: a decided suggestion cannot be reopened', async () => {
+		delete window.__experimentalSuggestionMode;
+		await setup( {
+			status: 'outdated',
+			commentStatus: 'approved',
+			anchored: false,
+		} );
+
+		expect( button( 'Reopen' ) ).toBeNull();
+	} );
+
 	it( 'pending, anchor present: Accept and Reject', async () => {
 		await setup( { anchored: true } );
 

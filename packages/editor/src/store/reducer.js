@@ -542,6 +542,10 @@ export function editorIntent( state = 'edit', action ) {
 	switch ( action.type ) {
 		case 'SET_EDITOR_INTENT':
 			return action.intent;
+		// Suggesting belongs to the post it was chosen on: the next entity
+		// (a template opened from the post, say) may not support it.
+		case 'SET_EDITED_POST':
+			return 'edit';
 	}
 	return state;
 }

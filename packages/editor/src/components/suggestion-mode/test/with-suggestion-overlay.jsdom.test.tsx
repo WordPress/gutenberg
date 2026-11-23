@@ -189,6 +189,9 @@ function Connected( {
 const markerOf = ( registry: any, clientId: string ) =>
 	attributesOf( registry, clientId )?.metadata?.suggestion;
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'withSuggestionOverlay', () => {
 	it( 'passes through unchanged in Edit intent', () => {
 		const setAttributes = vi.fn();

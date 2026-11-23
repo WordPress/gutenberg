@@ -35,6 +35,12 @@ const STRUCTURAL_MARKER_PROBE =
 	/<!-- wp:[a-z0-9/_-]+ \{[^\n]*"suggestion":\{[^{}\n]*"type":"pending-(?:remove|insert|move)"/;
 
 /**
+ * The void block the save pass leaves where a suggested block goes. Without
+ * the experiment the editor loads it as stored.
+ */
+const PLACEHOLDER_PROBE = '<!-- wp:suggestion-placeholder ';
+
+/**
  * Whether saved post content carries suggestion state of any kind.
  *
  * @param content Raw post content.
@@ -46,31 +52,23 @@ export function hasSuggestionMarkers( content: any ): boolean {
 	}
 	return (
 		INLINE_MARKER_PROBE.test( content ) ||
-		STRUCTURAL_MARKER_PROBE.test( content )
+		STRUCTURAL_MARKER_PROBE.test( content ) ||
+		content.includes( PLACEHOLDER_PROBE )
 	);
 }
 
 /**
- * Explains suggestion markers to a user who does not have Suggest mode.
+ * Explains suggestion markers to a user who does not have Suggestion mode.
  *
- * Suggestion state outlives the experiment flag by design: the marker
- * formats are registered unconditionally so a `<mark
- * class="wp-suggestion-add">` survives a load-and-save byte for byte, which is
- * what keeps content safe when the experiment is toggled off on a site that
- * has been using it. The cost is comprehension. With the experiment off the
- * intent switcher, the marker tooltips and the per-author tinting are all
- * absent, so a proposed insertion reads as ordinary green underlined text
- * with nothing to say what it is or where to act on it.
+ * A post that carries suggestions keeps them when the experiment is turned
+ * off: the save pass has left an anchor where each one goes, and the marker
+ * formats stay registered so an anchor survives a load and a save. Nothing
+ * else of the feature runs, though. The proposed text is not loaded, and the
+ * notes sidebar lists the suggestions without Accept or Reject, so this
+ * notice says what they are and what brings the controls back.
  *
- * The controls are not actually missing — a suggestion is a note comment, the
- * notes sidebar ships in core, and its Accept/Reject buttons render whether or
- * not the experiment is on. What is missing is any sign that they exist. This
- * notice supplies it, and its action opens the sidebar.
- *
- * Stripping the markers instead would be the destructive answer: a pending
- * addition's text is not public content until it is accepted, so dropping the
- * wrapper on load and saving would silently promote every proposal and orphan
- * its note.
+ * Stripping the anchors instead would be the destructive answer: their notes
+ * would have nothing left to apply once the experiment is back on.
  */
 export default function useSuggestionReviewNotice() {
 	const { createInfoNotice } = useDispatch( noticesStore );
@@ -114,7 +112,7 @@ export default function useSuggestionReviewNotice() {
 		}
 		createInfoNotice(
 			__(
-				'This post has suggested edits, shown as highlighted text in the content. Open the notes to accept or reject them.'
+				'This post has suggested edits. Turn on the Suggestion Mode experiment to review them.'
 			),
 			{
 				id: NOTICE_ID,
