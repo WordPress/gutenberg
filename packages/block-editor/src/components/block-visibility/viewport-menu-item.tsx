@@ -11,12 +11,13 @@ export default function BlockVisibilityViewportMenuItem( {
 	clientIds,
 }: BlockVisibilityClientIdsProps ) {
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
-	const { areBlocksHiddenAnywhere, shortcut } = useSelect(
+	const { areBlocksHiddenAnywhere, shortcut, canEditVisibility } = useSelect(
 		( select ) => {
-			const { isBlockHiddenAnywhere } = unlock(
+			const { isBlockHiddenAnywhere, canEditBlocksVisibility } = unlock(
 				select( blockEditorStore )
 			);
 			return {
+				canEditVisibility: canEditBlocksVisibility( clientIds ),
 				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
 					isBlockHiddenAnywhere( clientId )
 				),
@@ -31,7 +32,7 @@ export default function BlockVisibilityViewportMenuItem( {
 	);
 	const dispatch = useDispatch( blockEditorStore );
 
-	if ( blockVisibility === false ) {
+	if ( blockVisibility === false || ! canEditVisibility ) {
 		return null;
 	}
 

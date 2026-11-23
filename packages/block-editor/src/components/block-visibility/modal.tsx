@@ -14,7 +14,7 @@ import {
 	Icon as WCIcon,
 	Modal,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
 import type { FormEvent } from 'react';
@@ -29,6 +29,7 @@ import {
 import type { TreeBlock } from '../../store/types';
 import type { BlockVisibilityModalProps } from './types';
 import type { ViewportBreakpoints } from './use-block-visibility';
+import { unlock } from '../../lock-unlock';
 
 type CheckboxStates = Record< string, boolean | null >;
 
@@ -56,15 +57,25 @@ export default function BlockVisibilityModal( {
 	clientIds,
 	onClose,
 }: BlockVisibilityModalProps ) {
+	const registry = useRegistry();
+	const canEditVisibility = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).canEditBlocksVisibility(
+				clientIds
+			),
+		[ clientIds ]
+	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const blocks = useSelect(
 		( select ) =>
 			// The modal is opened for existing blocks.
-			( select( blockEditorStore ).getBlocksByClientId(
-				clientIds
-			) as TreeBlock[] ) ?? EMPTY_BLOCKS,
+			(
+				select( blockEditorStore ).getBlocksByClientId(
+					clientIds
+				) as TreeBlock[]
+			 )?.filter( Boolean ) ?? EMPTY_BLOCKS,
 		[ clientIds ]
 	);
 	const listViewShortcut = useSelect( ( select ) => {
@@ -184,6 +195,15 @@ export default function BlockVisibilityModal( {
 	const handleSubmit = useCallback(
 		( event: FormEvent ) => {
 			event.preventDefault();
+			// Permissions can change while the dialog is open. Recheck every target
+			// before writing so a mixed selection cannot edit content-only blocks.
+			if (
+				! unlock(
+					registry.select( blockEditorStore )
+				).canEditBlocksVisibility( clientIds )
+			) {
+				return;
+			}
 			const newVisibility = hideEverywhere
 				? false
 				: {
@@ -226,6 +246,7 @@ export default function BlockVisibilityModal( {
 		},
 		[
 			blocks,
+			registry,
 			clientIds,
 			createSuccessNotice,
 			hideEverywhere,
@@ -376,7 +397,7 @@ export default function BlockVisibilityModal( {
 						<Button
 							variant="primary"
 							type="submit"
-							disabled={ ! isDirty }
+							disabled={ ! isDirty || ! canEditVisibility }
 							accessibleWhenDisabled
 							__next40pxDefaultSize
 						>

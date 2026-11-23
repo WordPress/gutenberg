@@ -3,10 +3,8 @@ import {
 	MenuGroup,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
-import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import type { ComponentProps } from 'react';
-import type { Block } from '@wordpress/blocks';
 import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
@@ -20,6 +18,7 @@ import type {
 	BlockSettingsMenuControlsProps,
 	BlockSettingsMenuControlsSlotProps,
 } from './types';
+import { unlock } from '../../lock-unlock';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -36,7 +35,6 @@ const BlockSettingsMenuControlsSlot = ( {
 	} = useSelect(
 		( select ) => {
 			const {
-				getBlocksByClientId,
 				getBlockNamesByClientId,
 				getSelectedBlockClientIds,
 				getBlockEditingMode,
@@ -49,12 +47,9 @@ const BlockSettingsMenuControlsSlot = ( {
 				selectedClientIds: ids,
 				isContentOnly:
 					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
-				// The selected blocks exist.
-				canToggleSelectedBlocksVisibility: (
-					getBlocksByClientId( ids ) as Block[]
-				 ).every( ( block ) =>
-					hasBlockSupport( block.name, 'visibility', true )
-				),
+				canToggleSelectedBlocksVisibility: unlock(
+					select( blockEditorStore )
+				).canEditBlocksVisibility( ids ),
 				canEdit: canEditBlock( ids[ 0 ] ),
 			};
 		},
