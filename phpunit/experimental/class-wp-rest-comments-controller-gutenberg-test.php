@@ -1621,6 +1621,78 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that the size limit applies to the payload as it is stored: KSES
+	 * encodes a bare ampersand, so a filtered payload can outgrow the limit
+	 * its raw form met.
+	 */
+	public function test_create_rejects_suggestion_payload_oversized_once_filtered(): void {
+		wp_set_current_user( self::$contributor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author' => self::$contributor_id,
+				'post_status' => 'draft',
+			)
+		);
+		$payload = wp_json_encode(
+			array(
+				'operations' => array(
+					array(
+						'type'      => 'attribute-set',
+						'attribute' => 'content',
+						'after'     => str_repeat( '&', (int) ( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES / 2 ) ),
+					),
+				),
+			)
+		);
+		$this->assertLessThan( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES, strlen( $payload ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'   => $post_id,
+					'type'   => 'note',
+					'status' => 'hold',
+					'meta'   => array( '_wp_suggestion' => $payload ),
+				)
+			)
+		);
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_suggestion_too_large', $response, 413 );
+
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+		$this->assertSame( '', get_comment_meta( $comment_id, '_wp_suggestion', true ), 'The same payload is not stored outside REST either.' );
+	}
+
+	/**
+	 * Test that filtering does not grow a payload of non-ASCII text, which
+	 * would count it against the size limit several times over.
+	 */
+	public function test_filtered_suggestion_payload_keeps_non_ascii_text_unescaped(): void {
+		wp_set_current_user( self::$contributor_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => self::$contributor_id ) );
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$payload    = '{"operations":[{"type":"attribute-set","attribute":"content","after":"' . str_repeat( 'я', 15000 ) . ' a/b"}]}';
+
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$this->assertSame( $payload, get_comment_meta( $comment_id, '_wp_suggestion', true ) );
+	}
+
+	/**
 	 * Helper to create a note on a post.
 	 *
 	 * @param int $post_id Post ID.

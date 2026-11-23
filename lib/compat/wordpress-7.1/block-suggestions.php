@@ -120,7 +120,9 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
 		}
 	}
 
-	$encoded = wp_json_encode( $decoded );
+	// Unescaped, like the JSON the editor sends, so filtering does not grow
+	// the payload past the size limit.
+	$encoded = wp_json_encode( $decoded, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 	return false === $encoded ? '' : $encoded;
 }
 
@@ -194,7 +196,10 @@ function gutenberg_register_suggestion_meta() {
 				}
 				// Capability-matched KSES filtering; runs as the writing user
 				// (the suggester) on create/update.
-				return gutenberg_sanitize_suggestion_payload( $value );
+				$value = gutenberg_sanitize_suggestion_payload( $value );
+				// KSES encodes some characters, so the limit is checked again
+				// on what is stored.
+				return strlen( $value ) > $max_suggestion_payload_bytes ? '' : $value;
 			},
 			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
 				// During comment creation the comment does not yet exist, so
