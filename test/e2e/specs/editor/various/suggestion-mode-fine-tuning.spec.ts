@@ -323,4 +323,53 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 			await requestUtils.activateTheme( 'twentytwentyone' );
 		}
 	} );
+
+	test( 'a synced pattern opened from a post requests no notes (F-69)', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// Requests, not responses: a request is on record as soon as it is
+		// sent, so nothing has to wait for the refusal.
+		const noteRequests: string[] = [];
+		const { id } = await requestUtils.createBlock( {
+			title: 'Synced pattern',
+			status: 'publish',
+			content:
+				'<!-- wp:paragraph --><p>In the pattern</p><!-- /wp:paragraph -->',
+		} );
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.showBlockToolbar();
+		page.on( 'request', ( request: any ) => {
+			const url = new URL( request.url() );
+			if (
+				/\/wp\/v2\/comments/.test( url.pathname + url.search ) &&
+				url.searchParams.get( 'post' ) === String( id )
+			) {
+				noteRequests.push( request.url() );
+			}
+		} );
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		// The editor now holds the pattern.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+		).toBeVisible();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).toHaveText( 'In the pattern' );
+		expect( noteRequests ).toEqual( [] );
+	} );
 } );
