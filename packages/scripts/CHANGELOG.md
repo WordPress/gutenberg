@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `--blocks-manifest`: Wait for the manifest to be written before the compilation ends, and report a failure to generate it as a compilation error, so `build` no longer exits 0 with a missing or stale manifest ([#87194](https://github.com/WordPress/gutenberg/pull/87194)).
+
 ## 37.2.0 (2026-11-18)
 
 ### Bug Fixes
