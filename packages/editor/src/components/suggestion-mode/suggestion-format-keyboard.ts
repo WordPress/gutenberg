@@ -13,6 +13,7 @@ import {
 	parseSuggestionPayload,
 } from './operations';
 import { useSuggestionsProvider } from './provider';
+import { isBlockOwnedByCurrentPost } from './block-ownership';
 import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import {
 	SUGGESTION_TYPE_FORMAT,
@@ -444,6 +445,7 @@ export default function SuggestionFormatKeyboard() {
 		( request: any ) => {
 			if (
 				! request?.clientId ||
+				! isBlockOwnedByCurrentPost( registry, request.clientId ) ||
 				! request?.plan ||
 				( request.plan.kind !== 'format' &&
 					request.plan.kind !== 'merge-own' ) ||
@@ -456,7 +458,7 @@ export default function SuggestionFormatKeyboard() {
 			);
 			return true;
 		},
-		[ enqueueSuggestionWrite, runFormatEdit ]
+		[ enqueueSuggestionWrite, registry, runFormatEdit ]
 	);
 
 	// Register the handler with the overlay context so the per-block HOC can

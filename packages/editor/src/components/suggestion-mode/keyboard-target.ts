@@ -1,4 +1,8 @@
 import { create } from '@wordpress/rich-text';
+import {
+	isBlockOwnedByCurrentPost,
+	notifyForeignEditRefused,
+} from './block-ownership';
 
 /**
  * Shared DOM-target helpers for the suggest-mode keyboard interceptors
@@ -116,6 +120,38 @@ export function isEventTargetSelectedRichText(
 	) {
 		return false;
 	}
+	return true;
+}
+
+/**
+ * Decline an input, clipboard or key event aimed at the rich text of a block
+ * the current post does not own (see `block-ownership.ts`), before the
+ * browser or the editor applies it. The event is stopped as well as
+ * cancelled, so no later listener writes a marker or edits the block for it.
+ *
+ * An event that cannot be cancelled (a composition) is left alone; the
+ * overlay HOC declines the value it commits.
+ *
+ * @param event          Input, clipboard or keyboard event.
+ * @param registry       Data registry.
+ * @param selectionStart Block-editor `getSelectionStart()` value.
+ * @return True when the event was declined.
+ */
+export function refuseForeignBlockInput(
+	event: any,
+	registry: any,
+	selectionStart: any
+): boolean {
+	if (
+		event?.cancelable === false ||
+		! isEventTargetSelectedRichText( event, selectionStart ) ||
+		isBlockOwnedByCurrentPost( registry, selectionStart.clientId )
+	) {
+		return false;
+	}
+	event.preventDefault();
+	event.stopImmediatePropagation?.();
+	notifyForeignEditRefused( registry );
 	return true;
 }
 

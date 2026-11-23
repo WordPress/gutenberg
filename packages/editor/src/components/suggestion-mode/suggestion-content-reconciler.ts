@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -8,6 +8,7 @@ import { useSuggestionSession } from './suggestion-session';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { INLINE_OP_TYPE } from './operations';
 import { useSuggestionsProvider } from './provider';
+import { isBlockOwnedByCurrentPost } from './block-ownership';
 import {
 	SUGGESTION_TYPE_ADDITION,
 	SUGGESTION_TYPE_DELETION,
@@ -75,6 +76,7 @@ export default function SuggestionContentReconciler() {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { createNotice } = useDispatch( noticesStore );
+	const registry = useRegistry();
 	const {
 		registerContentHandler,
 		requestInterceptorBypass,
@@ -207,6 +209,7 @@ export default function SuggestionContentReconciler() {
 			const actions = request?.plan?.actions ?? [];
 			if (
 				! request?.clientId ||
+				! isBlockOwnedByCurrentPost( registry, request.clientId ) ||
 				actions.length === 0 ||
 				! actions.every(
 					( action: any ) =>
@@ -221,7 +224,7 @@ export default function SuggestionContentReconciler() {
 			);
 			return true;
 		},
-		[ enqueueSuggestionWrite, runContentEdit ]
+		[ enqueueSuggestionWrite, registry, runContentEdit ]
 	);
 
 	// Register the handler with the overlay context so the per-block HOC can
