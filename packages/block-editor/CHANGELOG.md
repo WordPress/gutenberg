@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Block actions: Check Add before and Add after against their own insertion destinations, including configured default blocks.
 -   Selection: Expand Select All through the nearest common parent when selected blocks have different parents.
 -   Visibility: Check every selected block's editing mode and permission before offering or applying visibility changes.
 -   Block hover outline: Stop the outline from flickering when the pointer moves between elements inside a block, such as the buttons and inputs of a placeholder ([#86852](https://github.com/WordPress/gutenberg/pull/86852)).

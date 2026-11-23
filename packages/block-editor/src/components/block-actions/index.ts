@@ -23,6 +23,7 @@ export default function BlockActions( {
 				getDirectInsertBlock,
 				canRemoveBlocks,
 				canDuplicateBlocks,
+				canInsertDefaultBlockAt,
 			} = unlock( select( blockEditorStore ) );
 
 			// The blocks to act on exist.
@@ -37,6 +38,10 @@ export default function BlockActions( {
 				: null;
 
 			return {
+				canInsertBefore: canInsertDefaultBlockAt( clientIds[ 0 ] ),
+				canInsertAfter: canInsertDefaultBlockAt(
+					clientIds[ clientIds.length - 1 ]
+				),
 				canRemove: canRemoveBlocks( clientIds ),
 				canInsertBlock: blocks.every( ( block ) => {
 					return (
@@ -60,7 +65,14 @@ export default function BlockActions( {
 		useSelect( blockEditorStore )
 	);
 
-	const { canRemove, canInsertBlock, canCopyStyles, canDuplicate } = selected;
+	const {
+		canRemove,
+		canInsertBlock,
+		canInsertBefore,
+		canInsertAfter,
+		canCopyStyles,
+		canDuplicate,
+	} = selected;
 
 	const {
 		removeBlocks,
@@ -77,6 +89,8 @@ export default function BlockActions( {
 		canCopyStyles,
 		canDuplicate,
 		canInsertBlock,
+		canInsertBefore,
+		canInsertAfter,
 		canRemove,
 		onDuplicate() {
 			return duplicateBlocks( clientIds, updateSelection );

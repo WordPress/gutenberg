@@ -1,6 +1,7 @@
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getBlockType,
+	getDefaultBlockName,
 	hasBlockSupport,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
@@ -57,6 +58,25 @@ const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
+
+/**
+ * Checks insertion beside a block using its parent's configured default block.
+ *
+ * @param state    Editor state.
+ * @param clientId Block beside which the default block would be inserted.
+ * @return Whether that destination accepts its default block.
+ */
+export function canInsertDefaultBlockAt( state: State, clientId: string ) {
+	if ( ! getBlock( state, clientId ) ) {
+		return false;
+	}
+	const parent = getBlockRootClientId( state, clientId );
+	const defaultBlock = parent
+		? getBlockListSettings( state, parent )?.defaultBlock
+		: undefined;
+	const name = defaultBlock?.name ?? getDefaultBlockName();
+	return !! name && canInsertBlockType( state, name, parent );
+}
 
 /**
  * Checks that every target permits visibility edits, including mixed-parent selections.

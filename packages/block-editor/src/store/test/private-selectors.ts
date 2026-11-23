@@ -9,10 +9,16 @@ import {
 	vi,
 } from 'vitest';
 import {
+	createBlock,
+	getBlockType,
+	getDefaultBlockName,
 	registerBlockType,
+	setDefaultBlockName,
 	unregisterBlockType,
 	privateApis as blocksPrivateApis,
+	store as blocksStore,
 } from '@wordpress/blocks';
+import { createRegistry } from '@wordpress/data';
 import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import {
 	isBlockInterfaceHidden,
@@ -42,6 +48,7 @@ import {
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
 import reducer from '../reducer';
+import { store } from '..';
 import { unlock } from '../../lock-unlock';
 import type { BlockVisibility } from '../../components/block-visibility/use-block-visibility';
 import type { BlockAttributes, BlockWithoutAttributes, State } from '../types';
@@ -78,6 +85,147 @@ function partial< T >( fixture: DeepPartial< T > ) {
 }
 
 describe( 'private selectors', () => {
+	describe( 'canInsertDefaultBlockAt', () => {
+		const parentName = 'test/default-insertion-parent';
+		const sharedDefaultName = 'test/default-insertion-shared';
+		const configuredDefaultName = 'test/default-insertion-configured';
+		let previousDefaultBlockName: ReturnType< typeof getDefaultBlockName >;
+		let registry: ReturnType< typeof createRegistry >;
+		let parentClientId: string;
+		let nestedClientId: string;
+		let rootBlockClientId: string;
+
+		beforeAll( () => {
+			for ( const name of [
+				parentName,
+				sharedDefaultName,
+				configuredDefaultName,
+			] ) {
+				registerBlockType( name, {
+					apiVersion: 3,
+					title: name,
+					category: 'text',
+					attributes: {},
+					save: () => null,
+				} );
+			}
+		} );
+		afterAll( () => {
+			for ( const name of [
+				parentName,
+				sharedDefaultName,
+				configuredDefaultName,
+			] ) {
+				unregisterBlockType( name );
+			}
+		} );
+		beforeEach( () => {
+			previousDefaultBlockName = getDefaultBlockName();
+			setDefaultBlockName( sharedDefaultName );
+			registry = createRegistry();
+			registry.register( blocksStore );
+			registry.register( store );
+			registry
+				.dispatch( blocksStore )
+				.addBlockTypes(
+					[
+						parentName,
+						sharedDefaultName,
+						configuredDefaultName,
+					].map( ( name ) => getBlockType( name )! )
+				);
+			const nestedBlock = createBlock( sharedDefaultName );
+			const parentBlock = createBlock( parentName, {}, [ nestedBlock ] );
+			const rootBlock = createBlock( sharedDefaultName );
+			parentClientId = parentBlock.clientId;
+			nestedClientId = nestedBlock.clientId;
+			rootBlockClientId = rootBlock.clientId;
+			registry
+				.dispatch( store )
+				.resetBlocks( [ parentBlock, rootBlock ] );
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parentClientId, {} );
+		} );
+		afterEach( () => {
+			setDefaultBlockName( previousDefaultBlockName ?? '' );
+		} );
+
+		it( 'returns false when the target block does not exist', () => {
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					'missing-block'
+				)
+			).toBe( false );
+		} );
+
+		it( 'uses the parent configured default block', () => {
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parentClientId, {
+					allowedBlocks: [ configuredDefaultName ],
+					defaultBlock: { name: configuredDefaultName },
+				} );
+
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					nestedClientId
+				)
+			).toBe( true );
+		} );
+
+		it( 'uses the shared default when the parent has no configured default', () => {
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parentClientId, {
+					allowedBlocks: [ sharedDefaultName ],
+				} );
+
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					nestedClientId
+				)
+			).toBe( true );
+		} );
+
+		it( 'uses the shared default at the document root instead of its configured default', () => {
+			registry.dispatch( store ).updateBlockListSettings( '', {
+				allowedBlocks: [ sharedDefaultName ],
+				defaultBlock: { name: configuredDefaultName },
+			} );
+
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					rootBlockClientId
+				)
+			).toBe( true );
+		} );
+
+		it( 'returns false when no default block is configured', () => {
+			setDefaultBlockName( '' );
+
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					nestedClientId
+				)
+			).toBe( false );
+		} );
+
+		it( 'returns false when the parent disallows the default block', () => {
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( parentClientId, {
+					allowedBlocks: [],
+				} );
+
+			expect(
+				unlock( registry.select( store ) ).canInsertDefaultBlockAt(
+					nestedClientId
+				)
+			).toBe( false );
+		} );
+	} );
+
 	describe( 'isBlockInterfaceHidden', () => {
 		it( 'should return the true if toggled true in state', () => {
 			const state = partial< State >( {

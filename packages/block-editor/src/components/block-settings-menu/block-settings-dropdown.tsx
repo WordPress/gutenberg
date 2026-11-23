@@ -217,6 +217,8 @@ export function BlockSettingsDropdown( {
 				canCopyStyles,
 				canDuplicate,
 				canInsertBlock,
+				canInsertBefore = canInsertBlock,
+				canInsertAfter = canInsertBlock,
 				canRemove,
 				onDuplicate,
 				onInsertAfter,
@@ -232,7 +234,8 @@ export function BlockSettingsDropdown( {
 				const isEmpty =
 					! canRemove &&
 					! canDuplicate &&
-					! canInsertBlock &&
+					! canInsertBefore &&
+					! canInsertAfter &&
 					isContentOnly;
 
 				if ( isEmpty ) {
@@ -327,31 +330,27 @@ export function BlockSettingsDropdown( {
 											{ __( 'Duplicate' ) }
 										</MenuItem>
 									) }
-									{ canInsertBlock && ! isZoomOut && (
-										<>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertBefore
-												) }
-												shortcut={
-													shortcuts.insertBefore
-												}
-											>
-												{ __( 'Add before' ) }
-											</MenuItem>
-											<MenuItem
-												onClick={ pipe(
-													onClose,
-													onInsertAfter
-												) }
-												shortcut={
-													shortcuts.insertAfter
-												}
-											>
-												{ __( 'Add after' ) }
-											</MenuItem>
-										</>
+									{ canInsertBefore && ! isZoomOut && (
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertBefore
+											) }
+											shortcut={ shortcuts.insertBefore }
+										>
+											{ __( 'Add before' ) }
+										</MenuItem>
+									) }
+									{ canInsertAfter && ! isZoomOut && (
+										<MenuItem
+											onClick={ pipe(
+												onClose,
+												onInsertAfter
+											) }
+											shortcut={ shortcuts.insertAfter }
+										>
+											{ __( 'Add after' ) }
+										</MenuItem>
 									) }
 									{ canEdit && (
 										<NoteIconSlotFill.Slot
