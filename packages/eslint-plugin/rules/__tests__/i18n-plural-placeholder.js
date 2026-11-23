@@ -31,6 +31,12 @@ ruleTester.run( 'i18n-plural-placeholder', rule, {
 			code: `_n( singular, plural, count )`,
 		},
 		{
+			code: `_n( null, 'items', count )`,
+		},
+		{
+			code: `_n( 1, 'items', count )`,
+		},
+		{
 			code: `__( 'This block' )`,
 		},
 	],

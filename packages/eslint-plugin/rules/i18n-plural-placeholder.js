@@ -48,7 +48,9 @@ module.exports = {
 
 				const strings = candidates.map( getTextContentFromNode );
 
-				if ( strings.some( ( string ) => string === false ) ) {
+				if (
+					strings.some( ( string ) => typeof string !== 'string' )
+				) {
 					return;
 				}
 
