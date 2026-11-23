@@ -199,3 +199,73 @@ function gutenberg_refuse_resolving_undecided_suggestion( $prepared_comment, $re
 	);
 }
 add_filter( 'rest_preprocess_comment', 'gutenberg_refuse_resolving_undecided_suggestion', 10, 2 );
+
+/**
+ * Whether a write would change the payload of a suggestion with a final
+ * status.
+ *
+ * @param int   $note_id Note ID.
+ * @param mixed $payload Payload about to be stored, or null when it is being deleted.
+ * @return bool Whether the note is decided and the payload differs from the stored one.
+ */
+function gutenberg_changes_decided_suggestion_payload( int $note_id, $payload ): bool {
+	if ( ! in_array( get_comment_meta( $note_id, '_wp_suggestion_status', true ), gutenberg_get_final_suggestion_statuses(), true ) ) {
+		return false;
+	}
+	return get_comment_meta( $note_id, '_wp_suggestion', true ) !== $payload;
+}
+
+/**
+ * Refuses a REST write that changes the payload of a decided suggestion.
+ *
+ * A final status records what was applied to, or kept out of, the saved
+ * post, so the proposal it refers to stays as it was. Reopening the
+ * suggestion makes it editable again.
+ *
+ * @param array<string, mixed>|WP_Error $prepared_comment Comment data about to be written.
+ * @param WP_REST_Request                $request          Request.
+ * @return array<string, mixed>|WP_Error The comment data, or an error for a decided suggestion.
+ */
+function gutenberg_refuse_rewriting_decided_suggestion( $prepared_comment, $request ) {
+	if ( is_wp_error( $prepared_comment ) || ! isset( $request['id'] ) ) {
+		return $prepared_comment;
+	}
+	$meta = $request['meta'];
+	if ( ! is_array( $meta ) || ! array_key_exists( '_wp_suggestion', $meta ) ) {
+		return $prepared_comment;
+	}
+	$payload = $meta['_wp_suggestion'];
+	$note_id = absint( $request['id'] );
+	if (
+		! gutenberg_changes_decided_suggestion_payload( $note_id, $payload ) ||
+		( is_string( $payload ) && ! gutenberg_changes_decided_suggestion_payload( $note_id, sanitize_meta( '_wp_suggestion', $payload, 'comment' ) ) )
+	) {
+		return $prepared_comment;
+	}
+	return new WP_Error(
+		'rest_suggestion_decided',
+		__( 'This suggestion was already decided. Reopen it to change it.', 'gutenberg' ),
+		array( 'status' => 409 )
+	);
+}
+add_filter( 'rest_preprocess_comment', 'gutenberg_refuse_rewriting_decided_suggestion', 10, 2 );
+
+/**
+ * Holds a write outside REST to the same rule: a decided suggestion keeps its
+ * payload.
+ *
+ * @param bool|null $check      Whether to short-circuit the write. Null lets it proceed.
+ * @param int       $note_id    Comment ID.
+ * @param string    $meta_key   Meta key.
+ * @param mixed     $meta_value Meta value. Unused when the meta is being deleted.
+ * @return bool|null False to refuse the write, the incoming value otherwise.
+ */
+function gutenberg_guard_decided_suggestion_payload_meta( $check, $note_id, $meta_key, $meta_value ) {
+	if ( null !== $check || '_wp_suggestion' !== $meta_key || gutenberg_suggestion_server_write() ) {
+		return $check;
+	}
+	$payload = 'delete_comment_metadata' === current_filter() ? null : $meta_value;
+	return gutenberg_changes_decided_suggestion_payload( (int) $note_id, $payload ) ? false : $check;
+}
+add_filter( 'update_comment_metadata', 'gutenberg_guard_decided_suggestion_payload_meta', 10, 4 );
+add_filter( 'delete_comment_metadata', 'gutenberg_guard_decided_suggestion_payload_meta', 10, 4 );
