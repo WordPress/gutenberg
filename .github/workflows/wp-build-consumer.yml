@@ -1,0 +1,43 @@
+name: Build tool consumer
+
+on:
+    pull_request:
+        paths:
+            - 'packages/wp-build/**'
+            - 'packages/browserslist-config/package.json'
+            - 'packages/style-runtime/package.json'
+            - 'packages/theme-build-tools/package.json'
+            - 'tools/validation/fixtures/wp-build-consumer/**'
+            - 'tools/validation/pack-workspace-package.ts'
+            - 'tools/validation/read-npm-pack-result.mjs'
+            - 'tools/validation/test-wp-build-consumer.ts'
+            - '.github/workflows/wp-build-consumer.yml'
+    workflow_dispatch:
+
+permissions: {}
+
+jobs:
+    consumer:
+        name: Build a plugin on Node.js ${{ matrix.node }}
+        runs-on: ubuntu-24.04
+        timeout-minutes: 10
+        permissions:
+            contents: read
+        strategy:
+            fail-fast: false
+            matrix:
+                node: ['minimum', '24']
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - name: Read the package's minimum Node.js version
+              id: minimum
+              if: matrix.node == 'minimum'
+              run: node -p '"version=" + require("./packages/wp-build/package.json").engines.node.match(/^>=(\d+\.\d+\.\d+)$/)[1]' >> "$GITHUB_OUTPUT"
+            - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version: ${{ steps.minimum.outputs.version || matrix.node }}
+                  package-manager-cache: false
+            - name: Build with the packed CLI
+              run: node --experimental-strip-types tools/validation/test-wp-build-consumer.ts
