@@ -7,7 +7,7 @@ import DataViewsPagination, {
 	hasPaginationControls,
 } from '../dataviews-pagination';
 import { useSomeItemHasAPossibleBulkAction } from '../dataviews-bulk-actions';
-import { LAYOUT_GRID, LAYOUT_TABLE } from '../../constants';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import { useDelayedLoading } from '../../hooks/use-delayed-loading';
 import DataViewsItemCount from './item-count';
 
@@ -29,7 +29,8 @@ export default function DataViewsFooter() {
 
 	const hasBulkActions =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
-		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
+		!! VIEW_LAYOUTS.find( ( layout ) => layout.type === view.type )
+			?.hasBulkActions;
 
 	const hasPagination = hasPaginationControls( view, {
 		totalItems,

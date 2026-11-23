@@ -32,6 +32,8 @@ export const VIEW_LAYOUTS = [
 		component: ViewTable,
 		icon: blockTable,
 		viewConfigOptions: DensityPicker,
+		// Renders the bulk actions toolbar.
+		hasBulkActions: true,
 	},
 	{
 		type: LAYOUT_GRID,
@@ -39,6 +41,7 @@ export const VIEW_LAYOUTS = [
 		component: ViewGrid,
 		icon: category,
 		viewConfigOptions: GridConfigOptions,
+		hasBulkActions: true,
 	},
 	{
 		type: LAYOUT_LIST,
