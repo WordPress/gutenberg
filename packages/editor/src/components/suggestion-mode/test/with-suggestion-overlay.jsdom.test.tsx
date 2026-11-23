@@ -711,6 +711,72 @@ describe( 'withSuggestionOverlay', () => {
 	} );
 } );
 
+describe( 'a proposal the block type does not allow', () => {
+	const UNSAFE_BLOCK = 'core/test-suggestion-unsafe';
+
+	beforeAll( () => {
+		// Suggesting is only offered with the Suggestion mode experiment on.
+		( window as any ).__experimentalSuggestionMode = true;
+		registerBlockType( UNSAFE_BLOCK, {
+			apiVersion: 3,
+			title: 'Test Unsafe',
+			category: 'text',
+			attributes: {
+				content: { type: 'string', default: '' },
+				tagName: { type: 'string', default: 'div' },
+				url: { type: 'string' },
+				metadata: { type: 'object' },
+			},
+			save() {
+				return null;
+			},
+		} );
+	} );
+
+	function ShownAttributes( { attributes }: any ) {
+		return <div data-testid="shown">{ JSON.stringify( attributes ) }</div>;
+	}
+	const WrappedShown = withSuggestionOverlay( ShownAttributes );
+	const shown = () =>
+		JSON.parse( screen.getByTestId( 'shown' ).textContent ?? '{}' );
+
+	it.each( [ 'edit', 'suggest' ] )(
+		'shows the baseline for the values accept would refuse, in %s intent',
+		( intent ) => {
+			const block = createBlock( UNSAFE_BLOCK, {
+				content: 'Hello',
+				url: '/about',
+				metadata: {
+					suggestion: {
+						type: 'pending-attributes',
+						authorId: 9,
+						after: {
+							content: 'Proposed',
+							tagName: 'script',
+							url: 'javascript:alert(1)',
+							notDeclared: 'x',
+						},
+					},
+				},
+			} );
+			renderWithProviders(
+				<Connected
+					clientId={ block.clientId }
+					setAttributes={ vi.fn() }
+					Component={ WrappedShown }
+				/>,
+				{ intent, blocks: [ block ] }
+			);
+			const attributes = shown();
+			// The part of the proposal that can be applied is still previewed.
+			expect( attributes.content ).toBe( 'Proposed' );
+			expect( attributes.tagName ).toBe( 'div' );
+			expect( attributes.url ).toBe( '/about' );
+			expect( attributes ).not.toHaveProperty( 'notDeclared' );
+		}
+	);
+} );
+
 describe( 'structuralMarkerClass', () => {
 	it( 'maps each known marker type to its class', () => {
 		expect( structuralMarkerClass( 'pending-remove' ) ).toBe(
@@ -893,6 +959,24 @@ describe( 'withSuggestionBlockClassName', () => {
 			},
 		} );
 		expect( node ).toHaveAttribute( 'data-content', 'Proposed' );
+	} );
+
+	it( 'does not hand the block a proposed value accept would refuse', () => {
+		const node = setup( {
+			intent: 'edit',
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: {
+						content: [ 'not text' ],
+						metadata: { name: 'Lead' },
+					},
+				},
+			},
+		} );
+		expect( node ).toHaveAttribute( 'data-content', 'Hello' );
+		// The block still reads as carrying a suggestion.
+		expect( node.className ).toContain( 'is-suggestion-pending' );
 	} );
 
 	it( 'leaves the attributes alone when the block has no proposal', () => {
