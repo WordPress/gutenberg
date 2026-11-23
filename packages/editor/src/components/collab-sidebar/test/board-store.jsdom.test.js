@@ -69,4 +69,24 @@ describe( 'createBoardStore', () => {
 		expect( listener ).toHaveBeenCalled();
 		expect( store.getSnapshot().heights ).toEqual( { 1: 80 } );
 	} );
+	it( 'finds the block list from an anchor outside it', () => {
+		const store = createBoardStore();
+		const title = document.createElement( 'h1' );
+		const root = document.createElement( 'div' );
+		root.className = 'is-root-container';
+		document.body.append( title, root );
+		title.getBoundingClientRect = () => ( { top: 40 } );
+		const floatingEl = document.createElement( 'div' );
+
+		const unsubscribe = store.subscribe( () => {} );
+		store.registerThread( 1, title, floatingEl );
+		resize( root, 0 );
+
+		expect( getScrollContainer ).toHaveBeenLastCalledWith( root );
+		expect( store.getSnapshot().anchorRects[ 1 ] ).toEqual( { top: 40 } );
+
+		unsubscribe();
+		title.remove();
+		root.remove();
+	} );
 } );

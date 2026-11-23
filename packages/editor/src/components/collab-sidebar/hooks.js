@@ -45,6 +45,7 @@ import {
 } from './utils/note-selection';
 import { focusNoteThread } from './utils/dom';
 import { getThreadLayout } from './utils/layout';
+import { isOpenPostFieldSuggestion } from './utils/post-field-suggestion';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -187,16 +188,33 @@ export function useNoteThreads( postId ) {
 			}
 		}
 
+		// Open post field suggestions (the title, the excerpt...) have no
+		// block by design. They lead the unresolved notes, since the fields
+		// sit above the content.
+		const postFieldSuggestions = [];
 		// Orphans: root threads without a linked block. They stay with the
 		// active notes (above the "Resolved" separator) since they may still
 		// need attention even though their associated block is gone.
-		const orphans = rootThreads.filter(
-			( thread ) => ! thread.blockClientId
-		);
+		const orphans = [];
+		for ( const thread of rootThreads ) {
+			if ( thread.blockClientId ) {
+				continue;
+			}
+			if ( isOpenPostFieldSuggestion( thread ) ) {
+				postFieldSuggestions.push( thread );
+			} else {
+				orphans.push( thread );
+			}
+		}
 
 		return {
-			notes: [ ...unresolved, ...orphans, ...resolved ],
-			unresolvedNotes: unresolved,
+			notes: [
+				...postFieldSuggestions,
+				...unresolved,
+				...orphans,
+				...resolved,
+			],
+			unresolvedNotes: [ ...postFieldSuggestions, ...unresolved ],
 		};
 	}, [ clientIds, threads, getBlockAttributes ] );
 
