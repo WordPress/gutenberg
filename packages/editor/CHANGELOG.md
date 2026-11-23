@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+-   Hide the decorative author avatar in the revisions timeline from assistive technologies, as the name of the author is next to it ([#87222](https://github.com/WordPress/gutenberg/pull/87222)).
 
 ### Documentation
 
