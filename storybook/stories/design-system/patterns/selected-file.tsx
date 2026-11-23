@@ -59,10 +59,13 @@ function usePreviewUrl( file: File ) {
 export function FileSummary( {
 	file,
 	showDetails = true,
+	status,
 }: {
 	file: File;
 	/** Whether to show the file type and size below the name. */
 	showDetails?: boolean;
+	/** Text after the type and size, such as "Uploaded". */
+	status?: React.ReactNode;
 } ) {
 	const previewUrl = usePreviewUrl( file );
 	const extension = getExtension( file.name );
@@ -93,6 +96,11 @@ export function FileSummary( {
 						{ extension.slice( 1 ).toUpperCase() || 'File' }
 						<span aria-hidden="true"> ·</span>{ ' ' }
 						{ formatFileSize( file.size ) }
+						{ status && (
+							<>
+								<span aria-hidden="true"> ·</span> { status }
+							</>
+						) }
 					</Text>
 				) }
 			</Stack>
@@ -108,8 +116,22 @@ export function FileSummary( {
  */
 export const SelectedFile = forwardRef<
 	HTMLButtonElement,
-	{ file: File; onRemove: () => void }
->( function UnforwardedSelectedFile( { file, onRemove }, ref ) {
+	{
+		file: File;
+		onRemove: () => void;
+		/** The remove button's label. Defaults to "Remove" and the filename. */
+		removeLabel?: string;
+		/** Text after the type and size, such as "Uploaded". */
+		status?: React.ReactNode;
+		/** Content below the file details, such as a progress bar. */
+		footer?: React.ReactNode;
+		/** Buttons before the remove button, such as "Retry". */
+		actions?: React.ReactNode;
+	}
+>( function UnforwardedSelectedFile(
+	{ file, onRemove, removeLabel, status, footer, actions },
+	ref
+) {
 	return (
 		<Stack
 			direction="row"
@@ -118,11 +140,15 @@ export const SelectedFile = forwardRef<
 			gap="sm"
 			className={ `${ styles.surface } ${ styles.row }` }
 		>
-			<FileSummary file={ file } />
+			<Stack direction="column" gap="sm" className={ styles.grow }>
+				<FileSummary file={ file } status={ status } />
+				{ footer }
+			</Stack>
+			{ actions }
 			<IconButton
 				ref={ ref }
 				icon={ closeSmall }
-				label={ `Remove ${ file.name }` }
+				label={ removeLabel ?? `Remove ${ file.name }` }
 				variant="minimal"
 				tone="neutral"
 				size="compact"

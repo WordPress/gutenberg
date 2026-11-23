@@ -1,0 +1,169 @@
+import { speak } from '@wordpress/a11y';
+import { DropZone, FormFileUpload } from '@wordpress/components';
+import { useId, useRef, useState } from '@wordpress/element';
+import { upload } from '@wordpress/icons';
+import {
+	Button,
+	Card,
+	EmptyState,
+	Stack,
+	ValidityIndicator,
+} from '@wordpress/ui';
+import { getExtension, SelectedFile } from './selected-file';
+import styles from './file-picker.module.css';
+
+const FONT_EXTENSIONS = [ '.ttf', '.otf', '.woff', '.woff2' ];
+
+type Entry = { id: string; file: File };
+
+export function FilePickerPanel() {
+	const [ entries, setEntries ] = useState< Entry[] >( [] );
+	const [ error, setError ] = useState( '' );
+	const chooseRef = useRef< HTMLButtonElement >( null );
+	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
+	const errorId = useId();
+
+	function addFiles( files: File[] ) {
+		const isFont = ( file: File ) =>
+			FONT_EXTENSIONS.includes( getExtension( file.name ).toLowerCase() );
+		const fonts = files.filter( isFont );
+		const rejected = files.filter( ( file ) => ! isFont( file ) );
+		setEntries( ( current ) => [
+			...current,
+			...fonts.map( ( file ) => ( { id: crypto.randomUUID(), file } ) ),
+		] );
+		setError(
+			rejected.length
+				? `Couldn’t add ${ rejected
+						.map( ( file ) => file.name )
+						.join(
+							', '
+						) }. Choose .ttf, .otf, .woff, or .woff2 files.`
+				: ''
+		);
+		if ( fonts.length ) {
+			speak(
+				fonts.length === 1
+					? `${ fonts[ 0 ].name } added.`
+					: `${ fonts.length } fonts added.`
+			);
+		}
+	}
+
+	function removeEntry( entry: Entry ) {
+		const index = entries.indexOf( entry );
+		const remaining = entries.filter( ( item ) => item !== entry );
+		setEntries( remaining );
+		speak( `${ entry.file.name } removed.` );
+		const next = remaining[ index ] ?? remaining[ index - 1 ];
+		( next
+			? removeRefs.current.get( next.id )
+			: chooseRef.current
+		)?.focus();
+	}
+
+	return (
+		// Wrap the whole card, so the input stays mounted while the button
+		// moves from the empty state to the header.
+		<FormFileUpload
+			multiple
+			accept={ FONT_EXTENSIONS.join( ',' ) }
+			onChange={ ( { currentTarget } ) => {
+				addFiles( Array.from( currentTarget.files ?? [] ) );
+				currentTarget.value = '';
+			} }
+			render={ ( { openFileDialog } ) => {
+				const chooseButton = (
+					<Button
+						ref={ chooseRef }
+						variant="outline"
+						tone="neutral"
+						aria-describedby={ error ? errorId : undefined }
+						onClick={ openFileDialog }
+					>
+						Choose files…
+					</Button>
+				);
+				return (
+					<Card.Root className={ styles.panel }>
+						<Card.Header>
+							<Stack
+								direction="row"
+								align="center"
+								justify="space-between"
+								gap="sm"
+							>
+								<Card.Title>Fonts</Card.Title>
+								{ entries.length > 0 && chooseButton }
+							</Stack>
+						</Card.Header>
+						<Card.Content>
+							<Stack direction="column" gap="md">
+								{ entries.length > 0 ? (
+									<Stack
+										render={ <ul /> }
+										direction="column"
+										gap="sm"
+										className={ styles.list }
+									>
+										{ entries.map( ( entry ) => (
+											<li key={ entry.id }>
+												<SelectedFile
+													ref={ ( element ) => {
+														if ( element ) {
+															removeRefs.current.set(
+																entry.id,
+																element
+															);
+														} else {
+															removeRefs.current.delete(
+																entry.id
+															);
+														}
+													} }
+													file={ entry.file }
+													onRemove={ () =>
+														removeEntry( entry )
+													}
+												/>
+											</li>
+										) ) }
+									</Stack>
+								) : (
+									<EmptyState.Root>
+										<EmptyState.Icon icon={ upload } />
+										<EmptyState.Title>
+											Upload fonts
+										</EmptyState.Title>
+										<EmptyState.Description>
+											Drop font files anywhere in this
+											panel, or choose them. Supported
+											formats: .ttf, .otf, .woff, and
+											.woff2.
+										</EmptyState.Description>
+										<EmptyState.Actions>
+											{ chooseButton }
+										</EmptyState.Actions>
+									</EmptyState.Root>
+								) }
+								<div aria-live="polite">
+									{ error && (
+										<ValidityIndicator
+											id={ errorId }
+											type="invalid"
+											message={ error }
+										/>
+									) }
+								</div>
+							</Stack>
+						</Card.Content>
+						<DropZone
+							label="Drop to add fonts"
+							onFilesDrop={ addFiles }
+						/>
+					</Card.Root>
+				);
+			} }
+		/>
+	);
+}

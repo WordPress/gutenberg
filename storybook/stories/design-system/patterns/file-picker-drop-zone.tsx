@@ -71,7 +71,9 @@ export function FilePickerDropZone( { disabled = false } ) {
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }
 		>
-			<Fieldset.Legend>Cover image</Fieldset.Legend>
+			<Fieldset.Legend>
+				Cover image <span className={ styles.marker }>(Optional)</span>
+			</Fieldset.Legend>
 			<FormFileUpload
 				accept=".png,image/png"
 				onChange={ ( { currentTarget } ) => {

@@ -1,98 +1,138 @@
 import { speak } from '@wordpress/a11y';
 import { FormFileUpload } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { trash, upload } from '@wordpress/icons';
-import { Button, Fieldset, Menu, Stack, Text } from '@wordpress/ui';
-import { FileSummary } from './selected-file';
+import { useRef, useState } from '@wordpress/element';
+import { chevronDown, media, upload } from '@wordpress/icons';
+import { Button, Dialog, Fieldset, Icon, Menu, Stack } from '@wordpress/ui';
+import { FileSummary, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
+
+function sampleImage( name: string, from: string, to: string ) {
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${ from }"/><stop offset="1" stop-color="${ to }"/></linearGradient></defs><rect width="64" height="64" fill="url(#g)"/></svg>`;
+	return new File( [ svg ], name, { type: 'image/svg+xml' } );
+}
+
+// Stand-ins for Media Library items, so the preview works without a site.
+const LIBRARY = [
+	sampleImage( 'harbor-at-dawn.svg', '#f6c28b', '#3d6c8c' ),
+	sampleImage( 'forest-trail.svg', '#a7c957', '#1b4332' ),
+	sampleImage( 'city-lights.svg', '#5a189a', '#ff9e00' ),
+];
 
 export function FilePickerMenu() {
 	const [ file, setFile ] = useState< File >();
+	const [ isLibraryOpen, setIsLibraryOpen ] = useState( false );
+	const triggerRef = useRef< HTMLButtonElement >( null );
+
+	function choose( chosen: File ) {
+		setFile( chosen );
+		speak( `${ chosen.name } selected.` );
+	}
 
 	return (
 		<Fieldset.Root>
-			<Fieldset.Legend>Logo</Fieldset.Legend>
+			<Fieldset.Legend>Featured image</Fieldset.Legend>
 			{ /*
 			 * Wrap the whole menu, not the item: the item unmounts when the
 			 * menu closes, and the input must stay mounted to report the
 			 * selection.
 			 */ }
 			<FormFileUpload
-				accept=".png,.svg,image/png,image/svg+xml"
+				accept="image/*"
 				onChange={ ( { currentTarget } ) => {
 					const chosen = currentTarget.files?.[ 0 ];
-					if ( chosen ) {
-						setFile( chosen );
-						speak( `${ chosen.name } selected.` );
-					}
 					currentTarget.value = '';
+					if ( chosen ) {
+						choose( chosen );
+					}
 				} }
 				render={ ( { openFileDialog } ) => (
-					<Stack
-						direction="row"
-						align="center"
-						justify="space-between"
-						gap="sm"
-						className={ `${ styles.surface } ${ styles.row }` }
-					>
-						{ file ? (
-							<FileSummary file={ file } />
-						) : (
-							<Text className={ styles.weak }>No logo</Text>
-						) }
+					<Stack direction="column" gap="sm">
 						<Menu.Root>
 							<Menu.Trigger
+								ref={ triggerRef }
 								render={
 									<Button
 										variant="outline"
 										tone="neutral"
-										size="compact"
+										className={ styles.select }
 									/>
 								}
 							>
-								{ file ? 'Replace' : 'Add' }
+								Select or add image
+								<Icon icon={ chevronDown } />
 							</Menu.Trigger>
-							<Menu.Popup>
+							<Menu.Popup width="anchor">
+								<Menu.Item
+									prefix={
+										<Menu.PrefixIcon icon={ media } />
+									}
+									onClick={ () => setIsLibraryOpen( true ) }
+								>
+									<Menu.ItemLabel>
+										Open Media Library…
+									</Menu.ItemLabel>
+								</Menu.Item>
 								<Menu.Item
 									prefix={
 										<Menu.PrefixIcon icon={ upload } />
 									}
 									onClick={ openFileDialog }
 								>
-									<Menu.ItemLabel>
-										Choose file…
-									</Menu.ItemLabel>
+									<Menu.ItemLabel>Upload…</Menu.ItemLabel>
 								</Menu.Item>
-								{ file && (
-									<>
-										<Menu.Separator />
-										<Menu.Item
-											prefix={
-												<Menu.PrefixIcon
-													icon={ trash }
-												/>
-											}
-											onClick={ () => {
-												speak(
-													`${ file.name } removed.`
-												);
-												setFile( undefined );
-											} }
-										>
-											<Menu.ItemLabel>
-												Remove
-											</Menu.ItemLabel>
-										</Menu.Item>
-									</>
-								) }
 							</Menu.Popup>
 						</Menu.Root>
+						{ file && (
+							<SelectedFile
+								file={ file }
+								onRemove={ () => {
+									speak( `${ file.name } removed.` );
+									setFile( undefined );
+									triggerRef.current?.focus();
+								} }
+							/>
+						) }
 					</Stack>
 				) }
 			/>
 			<Fieldset.Description>
-				PNG or SVG, at least 512 pixels wide.
+				Choose an image from the Media Library, or upload one.
 			</Fieldset.Description>
+			<Dialog.Root
+				open={ isLibraryOpen }
+				onOpenChange={ setIsLibraryOpen }
+			>
+				{ /* The menu item that opened the dialog is gone, so return focus to the menu's trigger. */ }
+				<Dialog.Popup finalFocus={ triggerRef } size="small">
+					<Dialog.Header>
+						<Dialog.Title>Media Library</Dialog.Title>
+						<Dialog.CloseIconButton />
+					</Dialog.Header>
+					<Dialog.Content>
+						<Stack
+							render={ <ul /> }
+							direction="column"
+							gap="sm"
+							className={ styles.list }
+						>
+							{ LIBRARY.map( ( item ) => (
+								<li key={ item.name }>
+									<Button
+										variant="unstyled"
+										className={ `${ styles.surface } ${ styles.choose } ${ styles.option }` }
+										onClick={ () => {
+											choose( item );
+											setIsLibraryOpen( false );
+										} }
+									>
+										<FileSummary file={ item } />
+									</Button>
+								</li>
+							) ) }
+						</Stack>
+					</Dialog.Content>
+				</Dialog.Popup>
+			</Dialog.Root>
 		</Fieldset.Root>
 	);
 }

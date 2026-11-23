@@ -14,43 +14,76 @@ import { getExtension, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 
 const ACCEPTED_EXTENSIONS = [ '.pdf', '.jpg', '.jpeg', '.png' ];
+const MAX_FILES = 5;
+const MAX_FILE_SIZE = 2_000_000;
 
-type Entry = { id: number; file: File };
+type Entry = { id: string; file: File };
+
+function getPrompt( count: number ) {
+	if ( count >= MAX_FILES ) {
+		return `${ MAX_FILES } of ${ MAX_FILES } files added`;
+	}
+	return count ? 'Add more files' : 'Add files';
+}
 
 export function FilePickerMultiple() {
 	const [ entries, setEntries ] = useState< Entry[] >( [] );
 	const [ error, setError ] = useState( '' );
 	const chooseRef = useRef< HTMLButtonElement >( null );
-	const removeRefs = useRef( new Map< number, HTMLButtonElement >() );
-	const nextId = useRef( 0 );
+	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const errorId = useId();
+	const isFull = entries.length >= MAX_FILES;
 
 	function addFiles( added: File[] ) {
 		if ( ! added.length ) {
 			return;
 		}
-		const accepted = added.filter( ( file ) =>
-			ACCEPTED_EXTENSIONS.includes(
-				getExtension( file.name ).toLowerCase()
-			)
-		);
-		const rejected = added.filter(
-			( file ) => ! accepted.includes( file )
+		// Check each file, then keep only as many as the field has room for.
+		const wrongType: File[] = [];
+		const tooLarge: File[] = [];
+		const accepted: File[] = [];
+		for ( const file of added ) {
+			if (
+				! ACCEPTED_EXTENSIONS.includes(
+					getExtension( file.name ).toLowerCase()
+				)
+			) {
+				wrongType.push( file );
+			} else if ( file.size > MAX_FILE_SIZE ) {
+				tooLarge.push( file );
+			} else {
+				accepted.push( file );
+			}
+		}
+		const overLimit = accepted.splice(
+			Math.max( 0, MAX_FILES - entries.length )
 		);
 
 		// A file can be chosen twice, so give each entry its own key.
 		const newEntries = accepted.map( ( file ) => ( {
-			id: nextId.current++,
+			id: crypto.randomUUID(),
 			file,
 		} ) );
 		setEntries( ( current ) => [ ...current, ...newEntries ] );
-		setError(
-			rejected.length
-				? `Couldn’t add ${ rejected
-						.map( ( file ) => file.name )
-						.join( ', ' ) }. Choose PDF, JPEG, or PNG files.`
-				: ''
-		);
+		const names = ( files: File[] ) =>
+			files.map( ( file ) => file.name ).join( ', ' );
+		const messages = [];
+		if ( wrongType.length ) {
+			messages.push(
+				`Couldn’t add ${ names( wrongType ) }. Choose PDF, JPEG, or PNG files.`
+			);
+		}
+		if ( tooLarge.length ) {
+			messages.push(
+				`Couldn’t add ${ names( tooLarge ) }. Each file can be up to 2 MB.`
+			);
+		}
+		if ( overLimit.length ) {
+			messages.push(
+				`Couldn’t add ${ names( overLimit ) }. You can add up to ${ MAX_FILES } files.`
+			);
+		}
+		setError( messages.join( ' ' ) );
 		if ( accepted.length ) {
 			speak(
 				accepted.length === 1
@@ -125,6 +158,7 @@ export function FilePickerMultiple() {
 								ref={ chooseRef }
 								variant="unstyled"
 								className={ styles.choose }
+								disabled={ isFull }
 								aria-describedby={ error ? errorId : undefined }
 								onClick={ openFileDialog }
 							>
@@ -138,9 +172,7 @@ export function FilePickerMultiple() {
 										<Icon icon={ plus } />
 									</span>
 									<Text className={ styles.prompt }>
-										{ entries.length
-											? 'Add more files'
-											: 'Add files' }
+										{ getPrompt( entries.length ) }
 									</Text>
 								</Stack>
 							</Button>
@@ -150,7 +182,8 @@ export function FilePickerMultiple() {
 				<DropZone label="Drop to add files" onFilesDrop={ addFiles } />
 			</Stack>
 			<Fieldset.Description>
-				Drop PDF, JPEG, or PNG files here, or choose them.
+				Drop up to 5 PDF, JPEG, or PNG files here, or choose them. Each
+				file can be up to 2 MB.
 			</Fieldset.Description>
 			<div aria-live="polite">
 				{ error && (

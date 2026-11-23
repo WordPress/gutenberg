@@ -74,6 +74,56 @@
 	min-inline-size: 0;
 }
 
+.grow {
+	flex: 1;
+	min-inline-size: 0;
+}
+
+/* Marks a field as required or optional, after the legend text. */
+.marker {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	font-weight: var(--wpds-typography-font-weight-default);
+}
+
+/* A progress bar spans its row. */
+.progress {
+	inline-size: 100%;
+}
+
+.success {
+	color: var(--wpds-color-foreground-content-success);
+}
+
+.error {
+	color: var(--wpds-color-foreground-content-error);
+}
+
+/* The panel is the drop target, so its card needs a containing block. */
+.panel {
+	position: relative;
+}
+
+/* Keeps the preview's snackbars inside the example's frame. */
+.snackbars:global(.components-snackbar-list) {
+	inset-block-start: auto;
+	inset-inline-end: 0;
+	inset-block-end: 0;
+	inset-inline-start: 0;
+	width: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.snackbars :global(.components-snackbar) {
+	margin-inline: auto;
+}
+
+.with-snackbars {
+	position: relative;
+	min-block-size: 14rem;
+}
+
 /*
  * The details line shows the file type, so the name can be cut at the end
  * without hiding what kind of file it is.
@@ -102,4 +152,22 @@
 /* Covers the rows and the drop area of a field that accepts several files. */
 .drop-target {
 	position: relative;
+}
+
+/* A menu trigger that reads like a select, as in the source menu design. */
+.select {
+	inline-size: 100%;
+	justify-content: space-between;
+}
+
+/* A Media Library item: the whole row picks the image. */
+.option {
+	display: flex;
+	inline-size: 100%;
+	border-style: solid;
+	border-color: var(--wpds-color-stroke-surface-neutral);
+
+	&:hover {
+		background: var(--wpds-color-background-surface-neutral-weak);
+	}
 }

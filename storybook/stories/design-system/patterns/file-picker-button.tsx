@@ -1,79 +1,133 @@
+import type { FormEvent } from 'react';
 import { speak } from '@wordpress/a11y';
 import { FormFileUpload } from '@wordpress/components';
 import { useId, useRef, useState } from '@wordpress/element';
 import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
+import { importPattern, useSnackbars } from './file-picker-snackbars';
+import styles from './file-picker.module.css';
 
 export function FilePickerButton() {
 	const [ file, setFile ] = useState< File >();
 	const [ error, setError ] = useState( '' );
+	const [ isImporting, setIsImporting ] = useState( false );
 	const chooseRef = useRef< HTMLButtonElement >( null );
 	const errorId = useId();
+	const snackbars = useSnackbars();
+
+	async function onSubmit( event: FormEvent ) {
+		event.preventDefault();
+		if ( ! file ) {
+			setError( 'Choose a pattern file to import.' );
+			chooseRef.current?.focus();
+			return;
+		}
+		setIsImporting( true );
+		setError( '' );
+		try {
+			const title = await importPattern( file );
+			snackbars.show( `Imported “${ title }” from JSON.` );
+			setFile( undefined );
+		} catch {
+			snackbars.hide();
+			setError(
+				`Couldn’t import ${ file.name }. Choose a pattern exported as JSON.`
+			);
+		} finally {
+			setIsImporting( false );
+		}
+	}
 
 	return (
-		<Fieldset.Root>
-			<Fieldset.Legend>Pattern file</Fieldset.Legend>
-			<Stack direction="column" gap="sm">
-				<FormFileUpload
-					accept=".json,application/json"
-					onChange={ ( { currentTarget } ) => {
-						const chosen = currentTarget.files?.[ 0 ];
-						// Clear the input, so choosing the same file again
-						// fires another change.
-						currentTarget.value = '';
-						if ( ! chosen ) {
-							return;
-						}
-						// `accept` only filters the picker, so check the file.
-						if (
-							getExtension( chosen.name ).toLowerCase() !==
-							'.json'
-						) {
-							setError(
-								`Couldn’t use ${ chosen.name }. Choose a JSON file.`
-							);
-							return;
-						}
-						setFile( chosen );
-						setError( '' );
-						speak( `${ chosen.name } selected.` );
-					} }
-					render={ ( { openFileDialog } ) => (
-						<Button
-							ref={ chooseRef }
-							variant="outline"
-							tone="neutral"
-							aria-describedby={ error ? errorId : undefined }
-							onClick={ openFileDialog }
-						>
-							Choose file…
-						</Button>
-					) }
-				/>
-				{ file && (
-					<SelectedFile
-						file={ file }
-						onRemove={ () => {
-							speak( `${ file.name } removed.` );
-							setFile( undefined );
-							setError( '' );
-							chooseRef.current?.focus();
-						} }
-					/>
-				) }
+		<form
+			onSubmit={ onSubmit }
+			noValidate
+			className={ styles[ 'with-snackbars' ] }
+		>
+			<Stack direction="column" gap="lg">
+				<Fieldset.Root>
+					<Fieldset.Legend>
+						Pattern file{ ' ' }
+						<span className={ styles.marker }>(Required)</span>
+					</Fieldset.Legend>
+					<Stack direction="column" gap="sm">
+						<FormFileUpload
+							accept=".json,application/json"
+							onChange={ ( { currentTarget } ) => {
+								const chosen = currentTarget.files?.[ 0 ];
+								// Clear the input, so choosing the same file
+								// again fires another change.
+								currentTarget.value = '';
+								if ( ! chosen ) {
+									return;
+								}
+								// `accept` only filters the picker, so check
+								// the file.
+								if (
+									getExtension(
+										chosen.name
+									).toLowerCase() !== '.json'
+								) {
+									setError(
+										`Couldn’t use ${ chosen.name }. Choose a JSON file.`
+									);
+									return;
+								}
+								setFile( chosen );
+								setError( '' );
+								speak( `${ chosen.name } selected.` );
+							} }
+							render={ ( { openFileDialog } ) => (
+								<Button
+									ref={ chooseRef }
+									variant="outline"
+									tone="neutral"
+									disabled={ isImporting }
+									aria-describedby={
+										error ? errorId : undefined
+									}
+									onClick={ openFileDialog }
+								>
+									Choose file…
+								</Button>
+							) }
+						/>
+						{ file && (
+							<SelectedFile
+								file={ file }
+								onRemove={ () => {
+									speak( `${ file.name } removed.` );
+									setFile( undefined );
+									setError( '' );
+									chooseRef.current?.focus();
+								} }
+							/>
+						) }
+					</Stack>
+					<Fieldset.Description>
+						A JSON file exported from another site.
+					</Fieldset.Description>
+					<div aria-live="polite">
+						{ error && (
+							<ValidityIndicator
+								id={ errorId }
+								type="invalid"
+								message={ error }
+							/>
+						) }
+					</div>
+				</Fieldset.Root>
+				<Stack direction="row">
+					<Button
+						type="submit"
+						loading={ isImporting }
+						loadingAnnouncement="Importing pattern"
+					>
+						Import
+					</Button>
+				</Stack>
 			</Stack>
-			<Fieldset.Description>
-				A JSON file exported from another site.
-			</Fieldset.Description>
-			<div aria-live="polite">
-				{ error && (
-					<ValidityIndicator
-						id={ errorId }
-						type="invalid"
-						message={ error }
-					/>
-				) }
-			</div>
-		</Fieldset.Root>
+			{ snackbars.list }
+		</form>
 	);
 }
