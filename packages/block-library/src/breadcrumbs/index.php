@@ -44,7 +44,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	if ( $is_home ) {
 		// These checks are explicitly nested in order not to execute the `else` branch.
 		if ( $page_for_posts ) {
-			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged() ) + array( 'allow_html' => true );
+			$breadcrumb_items[] = block_core_breadcrumbs_create_item( block_core_breadcrumbs_get_post_title( $page_for_posts ), block_core_breadcrumbs_is_paged(), true );
 		}
 		if ( block_core_breadcrumbs_is_paged() ) {
 			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item();
@@ -266,13 +266,17 @@ function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) 
  *
  * @since 7.0.0
  *
- * @param string $text     The text content.
- * @param bool   $is_paged Whether we're on a paginated view.
+ * @param string $text       The text content.
+ * @param bool   $is_paged   Whether we're on a paginated view.
+ * @param bool   $allow_html Optional. Whether to allow HTML in the label. Default false.
  *
  * @return array The breadcrumb item data.
  */
-function block_core_breadcrumbs_create_item( $text, $is_paged = false ) {
-	$item = array( 'label' => $text );
+function block_core_breadcrumbs_create_item( $text, $is_paged = false, $allow_html = false ) {
+	$item = array(
+		'label'      => $text,
+		'allow_html' => $allow_html,
+	);
 	if ( $is_paged ) {
 		$item['url'] = get_pagenum_link( 1 );
 	}
