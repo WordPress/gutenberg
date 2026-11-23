@@ -13,6 +13,11 @@
 -   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null` or a string, instead of showing a fatal error or PHP warnings on the front end and crashing the block in the editor ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Table: Keep the selected cell state intact on column insertion to prevent an unhandled `TypeError` when subsequent row operations are performed ([#87068](https://github.com/WordPress/gutenberg/pull/87068)).
 
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+-   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
+
 ## 12.2.0 (2026-11-18)
 
 ### Enhancements

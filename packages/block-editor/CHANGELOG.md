@@ -16,6 +16,10 @@
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 
+### Internal
+
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
