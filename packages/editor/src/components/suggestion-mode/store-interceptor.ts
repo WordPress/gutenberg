@@ -1160,9 +1160,7 @@ export default function SuggestionStoreInterceptor() {
 	const onClearStructuralCapture = useEvent( clearStructuralCapture );
 	const onConsumeInterceptorBypass = useEvent( consumeInterceptorBypass );
 	const onConsumeUndoRedoAdoption = useEvent( consumeUndoRedoAdoption );
-
-	const requestContentSuggestionRef = useRef( requestContentSuggestion );
-	requestContentSuggestionRef.current = requestContentSuggestion;
+	const onRequestContentSuggestion = useEvent( requestContentSuggestion );
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -1987,7 +1985,7 @@ export default function SuggestionStoreInterceptor() {
 				 * the marker exactly as it did before this branch existed.
 				 */
 				if ( markerPlan ) {
-					const handed = requestContentSuggestionRef.current?.( {
+					const handed = onRequestContentSuggestion( {
 						clientId,
 						blockName: block?.name ?? '',
 						prevContent: previous?.content,
@@ -2651,6 +2649,7 @@ export default function SuggestionStoreInterceptor() {
 		onClearStructuralCapture,
 		onConsumeInterceptorBypass,
 		onConsumeUndoRedoAdoption,
+		onRequestContentSuggestion,
 	] );
 
 	return null;
