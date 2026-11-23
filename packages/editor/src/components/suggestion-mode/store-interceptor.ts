@@ -77,6 +77,7 @@ import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import {
+	blockExcerpt,
 	parseSuggestionPayload,
 	planStructuralReject,
 	structuralOpFromMarker,
@@ -1755,7 +1756,9 @@ export default function SuggestionStoreInterceptor() {
 							? ( blockEditor.getBlockName?.( parentClientId ) ??
 								null )
 							: null,
-						block: insertedBlock,
+						// The block's text for the summary; the payload is
+						// too small for the block itself.
+						...blockExcerpt( insertedBlock ),
 					};
 					onRecordStructuralCapture( clientId, block.name, insertOp );
 					insertionsThisFire.push( {
@@ -2219,7 +2222,7 @@ export default function SuggestionStoreInterceptor() {
 						blockName: block.name,
 						anchorClientId: move.toAnchorClientId,
 						parentClientId: move.toParentClientId,
-						block,
+						...blockExcerpt( block ),
 						...( groupId ? { groupId } : {} ),
 					} );
 					continue;
@@ -2544,7 +2547,7 @@ export default function SuggestionStoreInterceptor() {
 								)?.name ?? null )
 							: null,
 						...( groupId ? { groupId } : {} ),
-						block,
+						...blockExcerpt( block ),
 					} );
 				}
 

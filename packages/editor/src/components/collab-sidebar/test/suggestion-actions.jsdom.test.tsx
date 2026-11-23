@@ -359,3 +359,77 @@ describe( 'SuggestionActions states', () => {
 		expect( onReopen ).toHaveBeenCalled();
 	} );
 } );
+
+describe( 'SuggestionActions summary of a removed block', () => {
+	/*
+	 * A removal that was applied and saved: the note is final and its block
+	 * is no longer in the post.
+	 */
+	async function setupRemoved( operation: Record< string, unknown > ) {
+		const registry = createRegistry();
+		registry.register( coreStore );
+		registry.register( preferencesStore );
+		registry.register( blockEditorStore );
+		registry.register( editorStore );
+		( registry.dispatch( coreStore ) as any ).receiveCurrentUser( {
+			id: 1,
+		} );
+		registry
+			.dispatch( blockEditorStore )
+			.resetBlocks( [
+				createBlock( BLOCK, { content: 'Another block' } ),
+			] );
+		const thread = {
+			id: NOTE_ID,
+			parent: 0,
+			author: 2,
+			status: 'approved',
+			meta: {
+				_wp_suggestion: JSON.stringify( {
+					schemaVersion: 2,
+					blockName: BLOCK,
+					operations: [
+						{
+							type: 'block-remove',
+							clientId: 'gone',
+							blockName: BLOCK,
+							...operation,
+						},
+					],
+				} ),
+				_wp_suggestion_status: 'applied',
+			},
+		};
+		render(
+			<RegistryProvider value={ registry }>
+				<Harness thread={ thread } onReopen={ vi.fn() } />
+			</RegistryProvider>
+		);
+		await waitFor( () =>
+			expect(
+				( registry.select( coreStore ) as any ).getCurrentUser()?.id
+			).toBe( 1 )
+		);
+	}
+
+	it( 'shows the excerpt the payload carries', async () => {
+		await setupRemoved( { excerpt: 'The paragraph that was removed' } );
+		expect(
+			screen.getByText( /“The paragraph that was removed”/ )
+		).toBeVisible();
+	} );
+
+	it( 'still reads the block an older payload carries', async () => {
+		await setupRemoved( {
+			block: {
+				clientId: 'gone',
+				name: BLOCK,
+				attributes: { content: 'Text from the <em>old</em> snapshot' },
+				innerBlocks: [],
+			},
+		} );
+		expect(
+			screen.getByText( /“Text from the old snapshot”/ )
+		).toBeVisible();
+	} );
+} );
