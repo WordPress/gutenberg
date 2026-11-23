@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Publish date: Show now in the picker of a post that publishes immediately, rather than the time it was last saved ([#87261](https://github.com/WordPress/gutenberg/pull/87261)).
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
 
 ### Documentation
