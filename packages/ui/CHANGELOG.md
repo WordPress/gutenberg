@@ -14,7 +14,7 @@
 
 ### Bug Fixes
 
--   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#87256](https://github.com/WordPress/gutenberg/pull/87256)).
 
 ## 0.27.0 (2026-11-18)
 
