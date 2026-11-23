@@ -67,7 +67,6 @@ export function FilePickerDropZone( { disabled = false } ) {
 
 	return (
 		<Fieldset.Root
-			className={ styles.field }
 			disabled={ disabled }
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }

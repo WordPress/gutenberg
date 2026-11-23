@@ -10,7 +10,7 @@ export function FilePickerMenu() {
 	const [ file, setFile ] = useState< File >();
 
 	return (
-		<Fieldset.Root className={ styles.field }>
+		<Fieldset.Root>
 			<Fieldset.Legend>Logo</Fieldset.Legend>
 			{ /*
 			 * Wrap the whole menu, not the item: the item unmounts when the

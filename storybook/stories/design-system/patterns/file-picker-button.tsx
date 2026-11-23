@@ -3,14 +3,13 @@ import { FormFileUpload } from '@wordpress/components';
 import { useRef, useState } from '@wordpress/element';
 import { Button, Fieldset, Stack } from '@wordpress/ui';
 import { SelectedFile } from './selected-file';
-import styles from './file-picker.module.css';
 
 export function FilePickerButton() {
 	const [ file, setFile ] = useState< File >();
 	const chooseRef = useRef< HTMLButtonElement >( null );
 
 	return (
-		<Fieldset.Root className={ styles.field }>
+		<Fieldset.Root>
 			<Fieldset.Legend>Pattern file</Fieldset.Legend>
 			<Stack direction="column" gap="sm">
 				<FormFileUpload

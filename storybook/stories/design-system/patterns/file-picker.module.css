@@ -1,8 +1,3 @@
-/* A fieldset is as wide as its content by default, which stops truncation. */
-.field {
-	min-inline-size: 0;
-}
-
 /*
  * The drop area and the selected-file rows share one surface, so a field
  * keeps its size and shape when a file is chosen.
