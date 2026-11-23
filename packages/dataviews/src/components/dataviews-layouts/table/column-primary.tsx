@@ -43,6 +43,14 @@ function ColumnPrimary< Item >( {
 			Math.round( ( 32 * ratioWidth ) / ratioHeight )
 		) }px`;
 	}
+	// The title next to the media leads to the same place, so keep the media
+	// out of the tab order and the accessibility tree. Otherwise keyboard and
+	// screen reader users meet the same control twice, and the cell is read
+	// with the title repeated.
+	const isMediaRedundant =
+		isItemClickable( item ) &&
+		( !! onClickItem || !! renderItemLink ) &&
+		!! titleField;
 	return (
 		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
 			{ mediaField && (
@@ -52,13 +60,10 @@ function ColumnPrimary< Item >( {
 					onClickItem={ onClickItem }
 					renderItemLink={ renderItemLink }
 					className="dataviews-view-table__cell-content-wrapper dataviews-column-primary__media"
-					aria-label={
-						isItemClickable( item ) &&
-						( !! onClickItem || !! renderItemLink ) &&
-						!! titleField
-							? titleField.getValue?.( { item } )
-							: undefined
-					}
+					{ ...( isMediaRedundant && {
+						tabIndex: -1,
+						'aria-hidden': true,
+					} ) }
 				>
 					<mediaField.render
 						item={ item }
