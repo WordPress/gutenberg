@@ -12,18 +12,82 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useState, useCallback } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { createBlock } from '@wordpress/blocks';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
-function DetailsEdit( { attributes, setAttributes, clientId } ) {
+const DEFAULT_BLOCK = {
+	name: 'core/paragraph',
+	attributes: {
+		placeholder: __( 'Type / to add a hidden block' ),
+	},
+};
+
+function DetailsEdit( { attributes, setAttributes, clientId, onReplace } ) {
 	const { name, showContent, summary, allowedBlocks, placeholder } =
 		attributes;
 	const blockProps = useBlockProps();
+
+	const hasInnerBlocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlockCount( clientId ) > 0,
+		[ clientId ]
+	);
+	const { insertBlock } = useDispatch( blockEditorStore );
+
+	const DetailsAppender = useCallback(
+		() => (
+			<div
+				data-root-client-id={ clientId }
+				className="block-editor-default-block-appender"
+			>
+				<p
+					tabIndex={ 0 }
+					// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+					role="button"
+					aria-label={ __( 'Add default block' ) }
+					className="block-editor-default-block-appender__content"
+					style={ { display: 'block' } }
+					onClick={ () => {
+						insertBlock(
+							createBlock( 'core/paragraph', {
+								placeholder: __(
+									'Type / to add a hidden block'
+								),
+							} ),
+							undefined,
+							clientId
+						);
+					} }
+					onKeyDown={ ( event ) => {
+						if ( event.key === 'Enter' || event.key === ' ' ) {
+							event.preventDefault();
+							insertBlock(
+								createBlock( 'core/paragraph', {
+									placeholder: __(
+										'Type / to add a hidden block'
+									),
+								} ),
+								undefined,
+								clientId
+							);
+						}
+					} }
+				>
+					{ __( 'Type / to add a hidden block' ) }
+				</p>
+			</div>
+		),
+		[ clientId, insertBlock ]
+	);
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		__experimentalCaptureToolbars: true,
 		allowedBlocks,
+		defaultBlock: DEFAULT_BLOCK,
+		directInsert: true,
+		renderAppender: hasInnerBlocks ? undefined : DetailsAppender,
 	} );
 	const [ isOpen, setIsOpen ] = useState( showContent );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -34,6 +98,14 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 			select( blockEditorStore ).hasSelectedInnerBlock( clientId, true ),
 		[ clientId ]
 	);
+
+	const handleSummaryClick = ( event ) => {
+		// Prevent native <details> toggle when clicking or selecting text inside RichText,
+		// still allow clicking the <summary> disclosure marker itself to toggle.
+		if ( event.target !== event.currentTarget ) {
+			event.preventDefault();
+		}
+	};
 
 	const handleSummaryKeyDown = ( event ) => {
 		if ( event.key === 'Enter' && ! event.shiftKey ) {
@@ -102,6 +174,7 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 				name={ name || '' }
 			>
 				<summary
+					onClick={ handleSummaryClick }
 					onKeyDown={ withIgnoreIMEEvents( handleSummaryKeyDown ) }
 					onKeyUp={ handleSummaryKeyUp }
 				>
@@ -115,6 +188,9 @@ function DetailsEdit( { attributes, setAttributes, clientId } ) {
 						value={ summary }
 						onChange={ ( newSummary ) =>
 							setAttributes( { summary: newSummary } )
+						}
+						onRemove={
+							onReplace ? () => onReplace( [] ) : undefined
 						}
 					/>
 				</summary>

@@ -199,10 +199,13 @@ export const privateRemoveBlocks =
 		// A wrapper that only exists as a slot of a larger block (a column
 		// in columns) keeps its place: emptying it must not reshape the
 		// parent layout.
+		const rootBlockName =
+			rootClientId && select.getBlockName( rootClientId );
 		if (
 			rootClientId &&
-			! getBlockType( select.getBlockName( rootClientId )! )?.parent
-				?.length
+			rootBlockName &&
+			rootBlockName !== 'core/details' &&
+			! getBlockType( rootBlockName )?.parent?.length
 		) {
 			const blockOrder = select.getBlockOrder( rootClientId );
 			removeRoot =

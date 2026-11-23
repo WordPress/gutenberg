@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { __ } from '@wordpress/i18n';
 import { memo, useContext, useMemo } from '@wordpress/element';
 import {
 	getBlockType,
@@ -412,11 +413,38 @@ function mapDispatchToProps(
 			) {
 				// The wrapper block exists, with a registered type.
 				const wrapperBlockName = getBlockName( _clientId ) as string;
+				const blockOrder = getBlockOrder( _clientId );
+				const [ firstClientId ] = blockOrder;
+
+				if ( wrapperBlockName === 'core/details' ) {
+					if (
+						firstClientId &&
+						isUnmodifiedBlock(
+							getBlock( firstClientId ) as TreeBlock,
+							'content'
+						)
+					) {
+						if ( blockOrder.length === 1 ) {
+							replaceBlocks(
+								[ firstClientId ],
+								[
+									createBlock( 'core/paragraph', {
+										placeholder: __(
+											'Type / to add a hidden block'
+										),
+									} ),
+								]
+							);
+						} else {
+							removeBlock( firstClientId );
+						}
+					}
+					return;
+				}
+
 				const wrapperBlockType = getBlockType( wrapperBlockName )!;
 				const isTextualWrapper = wrapperBlockType.category === 'text';
 				const targetRootClientId = getBlockRootClientId( _clientId );
-				const blockOrder = getBlockOrder( _clientId );
-				const [ firstClientId ] = blockOrder;
 
 				if (
 					blockOrder.length === 1 &&
