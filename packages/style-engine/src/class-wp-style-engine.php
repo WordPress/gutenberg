@@ -748,8 +748,7 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					if ( str_contains( $value, 'var:' ) && ! $should_skip_css_vars && ! empty( $individual_property_definition['css_vars'] ) ) {
 						$value = static::get_css_var_value( $value, $individual_property_definition['css_vars'] );
 
-						// Skip a preset that does not match one of the CSS var patterns.
-						if ( '' === $value ) {
+						if ( ! static::is_valid_style_value( $value ) ) {
 							continue;
 						}
 					}
