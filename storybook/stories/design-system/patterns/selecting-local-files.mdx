@@ -41,7 +41,7 @@ Lay the field out like other form fields: the label, then the drop area, then th
 - **Keep the last valid file when a new one is rejected.** Show the error below the description, in a live region, and link it to the button with `aria-describedby`.
 - **Show what was chosen.** The drop area shows a thumbnail and the filename. Other files show a file icon in place of the thumbnail.
 - **Say that dropping works.** The drop area names the action, such as "Add an image", and the description says a file can be dropped there. A dashed border alone doesn't tell people that.
-- **Put the remove button beside the drop area, not inside it.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the drop area after a removal.
+- **Put the remove button beside the drop area, not inside it.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the drop area after a removal. Removing a file only clears the selection. It doesn't delete a file that was already uploaded.
 - **Name the drop area after its action.** When it shows a file, its accessible name is "Replace cover.png".
 
 A `Fieldset` groups the drop area and the remove button under one legend. Disable the fieldset to disable the button, the remove button, and the hidden input together. Remove the `DropZone` and stop a dropped file from opening in the browser tab.

@@ -18,16 +18,22 @@
 	border-style: solid;
 	border-color: var(--wpds-color-stroke-surface-neutral);
 	background: var(--wpds-color-background-surface-neutral-strong);
-	padding-block: var(--wpds-dimension-padding-md);
-	padding-inline: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm);
+	padding-block: var(--wpds-dimension-padding-sm);
+	padding-inline: var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-sm);
 }
 
-/* The button fills the surface, so the whole drop area opens the picker. */
+/*
+ * The button fills the surface, so the whole drop area opens the picker.
+ * With the 32px thumbnail and the border, the drop area is as tall as a
+ * text input, and it uses the same inline padding.
+ */
 .choose {
 	flex: 1;
 	min-inline-size: 0;
-	padding-block: var(--wpds-dimension-padding-md);
-	padding-inline: var(--wpds-dimension-padding-lg);
+	padding-block:
+		calc((var(--wpds-dimension-size-lg) - var(--wpds-dimension-size-md)) / 2 -
+		var(--wpds-border-width-xs));
+	padding-inline: var(--wpds-dimension-padding-md);
 	border-radius: inherit;
 	color: inherit;
 	text-align: start;
