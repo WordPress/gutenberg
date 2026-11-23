@@ -259,7 +259,7 @@ sequenceDiagram
     Note over API: Save pass: the anchor is gone, so the Note becomes<br/>approved with _wp_suggestion_status = applied
 ```
 
-Reject is the mirror image: drop an `add` with its text, unwrap a `del`, drop a `format` marker and recompute the run from the formatting changes still pending, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker keeps a proposal that rode on it as its own `pending-attributes` marker. Decisions are kept out of undo history (`history: 'ignore'`).
+Reject is the mirror image: drop an `add` with its text, unwrap a `del`, drop a `format` marker and recompute the run from the formatting changes still pending, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker drops a proposal that rode on it, since one note carried both. Decisions are kept out of undo history (`history: 'ignore'`).
 
 ## Persistence and the front end
 
