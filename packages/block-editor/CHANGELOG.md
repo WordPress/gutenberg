@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   Background: Don't add `has-background` to the wrapper of a block that skips background gradient serialization when migrating a legacy gradient.
+-   Background: Don't add `has-background` to the wrapper of a block that skips background gradient serialization when migrating a legacy gradient. ([#87225](https://github.com/WordPress/gutenberg/pull/87225))
 
 ## 20.1.0 (2026-11-18)
 
