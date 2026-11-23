@@ -1767,6 +1767,172 @@ describe( 'withdrawn suggestions and failed applies', () => {
 	} );
 } );
 
+describe( 'suggester writes to a note named by content', () => {
+	const PARAGRAPH = 'core/test-owned-note-paragraph';
+	const ME = 3;
+	const SOMEONE_ELSE = 8;
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Owned Note Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * A marker's note id is whatever the content says. `note` is what
+	 * core-data holds for it, or null when it holds nothing.
+	 */
+	function setup( note: Record< string, any > | null ) {
+		const saved: any[] = [];
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord:
+						( _kind: string, _name: string, record: any ) =>
+						async () => {
+							saved.push( record );
+							return record;
+						},
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => note,
+					getCurrentUser: () => ( { id: ME } ),
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			metadata: { noteId: [ 7 ] },
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function Capture() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<Capture />
+				</SuggestionSessionProvider>
+			</RegistryProvider>
+		);
+
+		return { registry, block, saved, getProvider: () => providerHandle };
+	}
+
+	const update = ( provider: ReturnType< typeof useSuggestionsProvider > ) =>
+		provider.updateSuggestion( {
+			commentId: 7,
+			blockName: PARAGRAPH,
+			operations: [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+				},
+			],
+		} );
+
+	it( 'updates the current user’s own note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: ME,
+		} );
+
+		await act( async () => {
+			await update( getProvider() );
+		} );
+
+		expect( saved ).toHaveLength( 1 );
+		expect( saved[ 0 ].id ).toBe( 7 );
+	} );
+
+	it( 'refuses to rewrite another user’s note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: SOMEONE_ELSE,
+		} );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses to trash another user’s note, and leaves its link', async () => {
+		const { registry, block, saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: SOMEONE_ELSE,
+		} );
+
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( {
+					commentId: 7,
+					clientId: block.clientId,
+				} )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+		expect( attributesOf( registry, block.clientId )?.metadata ).toEqual( {
+			noteId: [ 7 ],
+		} );
+	} );
+
+	it( 'refuses a note core-data does not hold', async () => {
+		const { saved, getProvider } = setup( null );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses a comment that is not a note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'comment',
+			author: ME,
+		} );
+
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( { commentId: 7 } )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+} );
+
 describe( 'decisions record a provisional status first', () => {
 	const BLOCK = 'core/test-order-paragraph';
 

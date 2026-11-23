@@ -6,7 +6,7 @@
  * history), and reports failures with a notice.
  */
 import { useCallback } from '@wordpress/element';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
 	store as blockEditorStore,
@@ -52,6 +52,7 @@ export function useSuggestionSubmission() {
 	}, [] );
 
 	const store = useSuggestionStore();
+	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const {
 		updateBlockAttributes,
@@ -59,6 +60,53 @@ export function useSuggestionSubmission() {
 	} = useDispatch( blockEditorStore );
 	const { getBlockAttributes: selectBlockAttributes } =
 		useSelect( blockEditorStore );
+	const { getCurrentUser } = useSelect( coreStore ) as any;
+
+	/**
+	 * Refuse to rewrite or trash a note that is not the current user's own.
+	 *
+	 * The id usually comes from a marker, and a marker sits in content that
+	 * anyone who can edit the post can write, author attribute included. So
+	 * the note itself decides: it must be a note, on this post, that the
+	 * current user wrote. A note core-data does not hold yet is fetched, and
+	 * one that cannot be read is refused. While the current user is
+	 * unresolved there is nobody to compare with, and the write goes ahead.
+	 *
+	 * @param commentId Comment id named by the caller.
+	 */
+	const assertOwnNote = useCallback(
+		async ( commentId: number | string ) => {
+			const currentUserId = getCurrentUser?.()?.id ?? null;
+			if ( currentUserId === null ) {
+				return;
+			}
+			let note = store.getNote( commentId );
+			if ( ! note ) {
+				try {
+					note = await (
+						registry.resolveSelect( coreStore ) as any
+					 ).getEntityRecord( 'root', 'comment', commentId );
+				} catch {
+					note = null;
+				}
+			}
+			if (
+				! note ||
+				note.type !== 'note' ||
+				Number( note.author ) !== Number( currentUserId ) ||
+				( postId &&
+					note.post !== undefined &&
+					Number( note.post ) !== Number( postId ) )
+			) {
+				throw new Error(
+					__(
+						'This suggestion belongs to someone else, so it was left unchanged.'
+					)
+				);
+			}
+		},
+		[ getCurrentUser, store, registry, postId ]
+	);
 
 	const createSuggestion = useCallback(
 		async ( {
@@ -168,6 +216,7 @@ export function useSuggestionSubmission() {
 			} );
 
 			try {
+				await assertOwnNote( commentId );
 				return await store.updateNote( commentId, payload );
 			} catch ( error: any ) {
 				createNotice(
@@ -178,7 +227,7 @@ export function useSuggestionSubmission() {
 				throw error;
 			}
 		},
-		[ postModified, store, createNotice ]
+		[ postModified, store, createNotice, assertOwnNote ]
 	);
 
 	/**
@@ -204,6 +253,7 @@ export function useSuggestionSubmission() {
 				return;
 			}
 			try {
+				await assertOwnNote( commentId );
 				await store.trashNote( commentId );
 
 				const metadata = clientId
@@ -242,6 +292,7 @@ export function useSuggestionSubmission() {
 			selectBlockAttributes,
 			updateBlockAttributes,
 			markNextChangeAsNotPersistent,
+			assertOwnNote,
 		]
 	);
 
