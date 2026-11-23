@@ -458,6 +458,51 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					)
 				);
 
+		test( 'shows no appender inside a Page List, whose items cannot be edited', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const parentPage = await requestUtils.createPage( {
+				title: 'Parent Page',
+				status: 'publish',
+			} );
+			const childPage = await requestUtils.createPage( {
+				title: 'Child Page',
+				status: 'publish',
+				parent: parentPage.id,
+			} );
+
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Page List Menu',
+					content:
+						'<!-- wp:page-list /-->' +
+						'<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+				}
+			);
+			await expect(
+				listView.getByRole( 'gridcell', { name: 'Child Page' } )
+			).toBeVisible();
+
+			// The Page List shows the site's pages and saves nothing added
+			// to it, so only the menu's own appender is offered.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 1 ] );
+
+			await Promise.all(
+				[ childPage, parentPage ].map( ( { id } ) =>
+					requestUtils.rest( {
+						method: 'DELETE',
+						path: `/wp/v2/pages/${ id }`,
+						params: { force: true },
+					} )
+				)
+			);
+		} );
+
 		test( 'shows an appender for every expanded submenu', async ( {
 			admin,
 			page,

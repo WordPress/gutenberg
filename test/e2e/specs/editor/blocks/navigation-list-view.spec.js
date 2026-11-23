@@ -934,6 +934,43 @@ test.describe( 'Navigation block - List view editing', () => {
 		).toBeVisible();
 	} );
 
+	test( 'moves past a submenu with the arrow keys when the menu is locked against inserting', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Locked Menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"Top Level Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} -->' +
+				'<!-- wp:navigation-link {"label":"Submenu Item","type":"custom","url":"https://wordpress.org/sub","kind":"custom"} /-->' +
+				'<!-- /wp:navigation-submenu -->' +
+				'<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+		} );
+
+		await editor.setContent(
+			`<!-- wp:navigation {"ref":${ menu.id },"templateLock":"insert"} /-->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// Nothing can be added to the submenu, so it ends with no appender
+		// row that would stop the arrow keys.
+		await listView.getByRole( 'link', { name: 'Submenu Item' } ).focus();
+		await page.keyboard.press( 'ArrowDown' );
+		await expect(
+			listView.getByRole( 'link', { name: 'Top Level Item 2' } )
+		).toBeFocused();
+	} );
+
 	test( 'edits a Button from the List View popover in a contentOnly locked section', async ( {
 		editor,
 		page,

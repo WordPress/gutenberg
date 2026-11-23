@@ -5,6 +5,7 @@ import {
 } from '@wordpress/components';
 import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import type { SelectFunction } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
 import { useInsertedBlockClientId, useListViewTreeState } from './context';
@@ -19,11 +20,38 @@ import type { ClientIdsTreeNode } from '../../store/types';
 import type { ListViewBranchProps, ListViewExpansionState } from './types';
 
 /**
+ * Whether the List View offers an appender for the inner blocks of a block,
+ * as the end of its expanded list or as the first item of an empty one. The
+ * block must hold inner blocks, show an appender for them on the canvas, and
+ * allow inserting. Otherwise the row would hold nothing to focus, and the
+ * arrow keys would stop at it.
+ *
+ * @param select   The registry's select function.
+ * @param clientId The block.
+ */
+function canAppendInListView(
+	select: SelectFunction,
+	clientId: string
+): boolean {
+	const { getBlockListSettings, getTemplateLock, isZoomOut } = unlock(
+		select( blockEditorStore )
+	);
+	const listSettings = getBlockListSettings( clientId );
+	if ( ! listSettings || listSettings.hidesAppender ) {
+		return false;
+	}
+	// Should be kept in sync with the appender's own check.
+	const templateLock = getTemplateLock( clientId );
+	return ! (
+		( !! templateLock && templateLock !== 'contentOnly' ) ||
+		isZoomOut()
+	);
+}
+
+/**
  * The appender row for an empty container, one level in from its block, so
- * the first item can be added where it will appear. A block counts as a
- * container when it holds inner blocks and shows an appender for them on the
- * canvas; a block that hides its appender there, like a link that could hold
- * a submenu, gets no row.
+ * the first item can be added where it will appear. A block that hides its
+ * appender on the canvas, like a link that could hold a submenu, gets no row.
  *
  * @param props
  * @param props.clientId The empty block.
@@ -37,11 +65,7 @@ function ListViewEmptyContainerAppender( {
 	level: number;
 } ) {
 	const isContainer = useSelect(
-		( select ) => {
-			const listSettings =
-				select( blockEditorStore ).getBlockListSettings( clientId );
-			return !! listSettings && ! listSettings.hidesAppender;
-		},
+		( select ) => canAppendInListView( select, clientId ),
 		[ clientId ]
 	);
 
@@ -128,6 +152,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		parentId,
 		isSyncedBranch = false,
 		showAppender: showAppenderProp = true,
+		showNestedAppenders = false,
 		appenderLabel,
 	} = props;
 
@@ -135,10 +160,14 @@ function ListViewBranch( props: ListViewBranchProps ) {
 	// keeps the label that names what it adds.
 	const isTopLevel = level === 1;
 
-	const { canParentExpand, isParentSynced } = useSelect(
+	const { canParentExpand, isParentSynced, canParentAppend } = useSelect(
 		( select ) => {
 			if ( ! parentId ) {
-				return { canParentExpand: true, isParentSynced: false };
+				return {
+					canParentExpand: true,
+					isParentSynced: false,
+					canParentAppend: false,
+				};
 			}
 			const { canEditBlock, isSyncedBlock } = unlock(
 				select( blockEditorStore )
@@ -146,9 +175,13 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			return {
 				canParentExpand: canEditBlock( parentId ),
 				isParentSynced: isSyncedBlock( parentId ),
+				canParentAppend:
+					! isTopLevel &&
+					showNestedAppenders &&
+					canAppendInListView( select, parentId ),
 			};
 		},
-		[ parentId ]
+		[ parentId, isTopLevel, showNestedAppenders ]
 	);
 
 	const syncedBranch = isSyncedBranch || isParentSynced;
@@ -168,9 +201,13 @@ function ListViewBranch( props: ListViewBranchProps ) {
 	}
 
 	const filteredBlocks = blocks.filter( Boolean );
-	// Every rendered list ends with an appender. A collapsed list renders no
-	// branch, so expanding a block is what shows the appender for its items.
-	const showAppender = showAppenderProp;
+	// With nested appenders, every rendered list ends with an appender. A
+	// collapsed list renders no branch, so expanding a block is what shows the
+	// appender for its items.
+	const showAppender = isTopLevel ? showAppenderProp : canParentAppend;
+	// A block that offers no appender offers none for anything inside it
+	// either, such as the pages a Page List shows.
+	const showInnerAppenders = isTopLevel ? showNestedAppenders : showAppender;
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -306,7 +343,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						isNesting={ isNesting }
 					/>
 				) }
-				{ showAppenderProp &&
+				{ showInnerAppenders &&
 					showBlock &&
 					! hasNestedBlocks &&
 					! isDragged && (
@@ -329,7 +366,7 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
-						showAppender={ showAppenderProp }
+						showNestedAppenders={ showInnerAppenders }
 					/>
 				) }
 			</AsyncModeProvider>

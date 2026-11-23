@@ -3207,4 +3207,43 @@ test.describe( 'List (@firefox)', () => {
 			},
 		] );
 	} );
+
+	test( 'shows only the top-level appender in the List View tab of the block inspector', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			`<!-- wp:list --><ul class="wp-block-list">` +
+				`<!-- wp:list-item --><li>One` +
+				`<!-- wp:list --><ul class="wp-block-list"><!-- wp:list-item --><li>Nested</li><!-- /wp:list-item --></ul><!-- /wp:list -->` +
+				`</li><!-- /wp:list-item -->` +
+				`<!-- wp:list-item --><li>Two</li><!-- /wp:list-item -->` +
+				`</ul><!-- /wp:list -->`
+		);
+		await editor.selectBlocks(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: List' } )
+				.first()
+		);
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+		await expect(
+			listView.getByRole( 'gridcell', { name: 'Nested' } )
+		).toBeVisible();
+
+		// Nested appenders belong to the Navigation block's List Views. Here
+		// the list ends with its own appender, and nested lists get none.
+		await expect(
+			listView.getByRole( 'button', { name: /^Add / } )
+		).toHaveCount( 1 );
+		await expect(
+			listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'button', { name: /^Add / } ),
+			} )
+		).toHaveAttribute( 'aria-level', '1' );
+	} );
 } );

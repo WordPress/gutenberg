@@ -78,6 +78,7 @@ const MainContent = ( {
 				isExpanded
 				description={ description }
 				showAppender
+				showNestedAppenders
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }

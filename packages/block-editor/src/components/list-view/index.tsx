@@ -86,6 +86,7 @@ const expansion = (
  * @param props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
  * @param props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
  * @param props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
+ * @param props.showNestedAppenders    Flag to also end every expanded nested list with an appender. Defaults to `false`.
  * @param props.appenderLabel          Label of the appender at the end of the top-level list.
  * @param props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
  * @param props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
@@ -104,6 +105,7 @@ function ListViewComponent(
 		showBlockMovers = false,
 		isExpanded = false,
 		showAppender = false,
+		showNestedAppenders = false,
 		appenderLabel,
 		focusOnMount = false,
 		blockSettingsMenu: BlockSettingsMenu = BlockSettingsDropdown,
@@ -415,6 +417,9 @@ function ListViewComponent(
 								selectedClientIds={ selectedClientIds }
 								isExpanded={ isExpanded }
 								showAppender={ showAppender }
+								showNestedAppenders={
+									showAppender && showNestedAppenders
+								}
 								appenderLabel={ appenderLabel }
 							/>
 						</ListViewTreeStateContext.Provider>
@@ -440,6 +445,7 @@ export default forwardRef< HTMLElement, ListViewProps >( ( props, ref ) => {
 			ref={ ref }
 			{ ...props }
 			showAppender={ false }
+			showNestedAppenders={ false }
 			rootClientId={ null }
 			onSelect={ null }
 			additionalBlockContent={ null }
