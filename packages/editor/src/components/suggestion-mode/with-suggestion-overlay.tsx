@@ -29,6 +29,10 @@ import {
 } from './marker';
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import {
+	createPostOwnershipCheck,
+	notifyForeignEditRefused,
+} from './block-ownership';
 import { getAvatarBorderColor } from '../collab-sidebar/utils/display';
 import SuggestionMoveGhost from './suggestion-move-ghost';
 import useMoveGhosts from './use-move-ghosts';
@@ -283,6 +287,55 @@ function ProposedBlockEdit( {
 }
 
 /**
+ * Suggest-intent half of the HOC for a block the current post does not own
+ * (see `block-ownership.ts`): its attributes are saved in another entity,
+ * where a proposal would never be reviewed, so an edit is declined instead
+ * of captured or written through.
+ *
+ * @param args           Arguments.
+ * @param args.BlockEdit Wrapped edit component.
+ * @param args.props     Props to forward to `BlockEdit`.
+ */
+function ForeignBlockEdit( {
+	BlockEdit,
+	props,
+}: {
+	BlockEdit: any;
+	props: any;
+} ) {
+	const registry = useRegistry();
+	const attributesRef = useRef( props.attributes );
+	useEffect( () => {
+		attributesRef.current = props.attributes;
+	}, [ props.attributes ] );
+	const refuseSetAttributes = useCallback(
+		(
+			nextAttributes:
+				| Record< string, any >
+				| ( (
+						current: Record< string, any >
+				  ) => Record< string, any > )
+		) => {
+			const current = attributesRef.current ?? {};
+			const updates =
+				typeof nextAttributes === 'function'
+					? nextAttributes( current )
+					: nextAttributes;
+			// A write that changes nothing (a block re-asserting a value on
+			// mount) is not an edit to decline.
+			const changes = Object.keys( updates ?? {} ).some(
+				( key ) => updates[ key ] !== current[ key ]
+			);
+			if ( changes ) {
+				notifyForeignEditRefused( registry );
+			}
+		},
+		[ registry ]
+	);
+	return <BlockEdit { ...props } setAttributes={ refuseSetAttributes } />;
+}
+
+/**
  * HOC that diverts block edits into the block's proposal marker when the
  * editor is in the `suggest` intent, and renders a pending proposal merged
  * over the live attributes in every intent. The block's live attributes are
@@ -296,37 +349,45 @@ const withSuggestionOverlay = createHigherOrderComponent(
 	( BlockEdit ) =>
 		function BlockEditWithSuggestionOverlay( props ) {
 			const { clientId } = props;
-			const { isSuggestMode, isPendingInsert, hasProposal } = useSelect(
-				( select ) => {
-					// `getEditorIntent` is private while Suggest mode is
-					// experimental.
-					const suggesting =
-						unlock( select( STORE_NAME ) ).getEditorIntent() ===
-						EDITOR_INTENT_SUGGEST;
-					const blockEditor: any = select( blockEditorStore );
-					return {
-						isSuggestMode: suggesting,
-						// Only Suggest intent acts on it; skip the lookup
-						// for every block in the other intents. Another
-						// author's suggested block takes suggestions.
-						isPendingInsert:
-							suggesting &&
-							isPartOfPendingInsertionCached(
-								blockEditor,
-								clientId,
-								(
-									select( coreStore ) as any
-								 )?.getCurrentUser?.()?.id ?? null
+			const { isSuggestMode, isForeign, isPendingInsert, hasProposal } =
+				useSelect(
+					( select ) => {
+						// `getEditorIntent` is private while Suggest mode is
+						// experimental.
+						const suggesting =
+							unlock( select( STORE_NAME ) ).getEditorIntent() ===
+							EDITOR_INTENT_SUGGEST;
+						const blockEditor: any = select( blockEditorStore );
+						return {
+							isSuggestMode: suggesting,
+							isForeign:
+								suggesting &&
+								! createPostOwnershipCheck( { select } ).owns(
+									clientId
+								),
+							// Only Suggest intent acts on it; skip the lookup
+							// for every block in the other intents. Another
+							// author's suggested block takes suggestions.
+							isPendingInsert:
+								suggesting &&
+								isPartOfPendingInsertionCached(
+									blockEditor,
+									clientId,
+									(
+										select( coreStore ) as any
+									 )?.getCurrentUser?.()?.id ?? null
+								),
+							hasProposal: !! displayedProposal(
+								readSuggestionMarker(
+									blockEditor?.getBlockAttributes?.(
+										clientId
+									)
+								)
 							),
-						hasProposal: !! displayedProposal(
-							readSuggestionMarker(
-								blockEditor?.getBlockAttributes?.( clientId )
-							)
-						),
-					};
-				},
-				[ clientId ]
-			);
+						};
+					},
+					[ clientId ]
+				);
 
 			// A pending-insert block has no "before" state to preserve: the
 			// block itself is the suggestion. Edits to it (and to blocks
@@ -334,6 +395,11 @@ const withSuggestionOverlay = createHigherOrderComponent(
 			// part of the Group's insertion) write through to the real
 			// attributes so the content syncs via CRDT and renders on the
 			// reviewer's canvas as part of the preview.
+			if ( isForeign ) {
+				return (
+					<ForeignBlockEdit BlockEdit={ BlockEdit } props={ props } />
+				);
+			}
 			if ( isSuggestMode && ! isPendingInsert ) {
 				return (
 					<SuggestingBlockEdit

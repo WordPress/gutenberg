@@ -323,6 +323,49 @@ describe( 'withSuggestionOverlay', () => {
 		} );
 	} );
 
+	it( 'declines an edit to a block another entity owns', () => {
+		// The children of a block with controlled inner blocks (a synced
+		// pattern, a navigation menu) are saved in that entity, where a
+		// proposal would never be reviewed.
+		const setAttributes = vi.fn();
+		const container = createBlock( HOC_BLOCK );
+		const block = createBlock( HOC_BLOCK, { content: 'Hello', level: 2 } );
+		const { registry } = renderWithProviders(
+			<Connected
+				clientId={ block.clientId }
+				setAttributes={ setAttributes }
+			/>,
+			{ intent: 'suggest', blocks: [ container ] }
+		);
+		const dispatch: any = registry.dispatch( blockEditorStore );
+		act( () => {
+			dispatch.setHasControlledInnerBlocks( container.clientId, true );
+			dispatch.replaceInnerBlocks( container.clientId, [ block ] );
+		} );
+		const refusal = () =>
+			registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) =>
+					notice.content.includes( 'saved outside this post' )
+				);
+
+		// Re-asserting the current value is not an edit.
+		fireEvent.click(
+			screen.getByRole( 'button', { name: 'reset level' } )
+		);
+		expect( refusal() ).toBeUndefined();
+
+		fireEvent.click( screen.getByRole( 'button', { name: 'edit level' } ) );
+
+		expect( setAttributes ).not.toHaveBeenCalled();
+		expect( attributesOf( registry, block.clientId ) ).toEqual( {
+			content: 'Hello',
+			level: 2,
+		} );
+		expect( refusal()?.status ).toBe( 'warning' );
+	} );
+
 	it( 'writes setAttributes through (no proposal) for a pending-insert block in Suggest intent', () => {
 		// A pending-insert block has no "before" worth preserving: the block
 		// itself is the suggestion. Diverting edits into a proposal would
