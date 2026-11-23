@@ -1635,23 +1635,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'post_status' => 'draft',
 			)
 		);
-		$payload = wp_json_encode(
-			array(
-				'operations' => array(
-					array(
-						'type'      => 'attribute-set',
-						'attribute' => 'content',
-						'after'     => str_repeat( '&', (int) ( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES / 2 ) ),
-					),
-				),
-			)
-		);
+		$payload = '{"operations":[{"type":"attribute-set","attribute":"content","after":"' . str_repeat( '&', (int) ( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES / 2 ) ) . '"}]}';
 		$this->assertLessThan( GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES, strlen( $payload ) );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
 		$request->add_header( 'Content-Type', 'application/json' );
 		$request->set_body(
-			wp_json_encode(
+			(string) wp_json_encode(
 				array(
 					'post'   => $post_id,
 					'type'   => 'note',
@@ -1670,6 +1660,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				'comment_type'    => 'note',
 			)
 		);
+		$this->assertIsInt( $comment_id );
 		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
 		$this->assertSame( '', get_comment_meta( $comment_id, '_wp_suggestion', true ), 'The same payload is not stored outside REST either.' );
 	}
@@ -1688,6 +1679,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 		$payload    = '{"operations":[{"type":"attribute-set","attribute":"content","after":"' . str_repeat( 'я', 15000 ) . ' a/b"}]}';
+		$this->assertIsInt( $comment_id );
 
 		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
 

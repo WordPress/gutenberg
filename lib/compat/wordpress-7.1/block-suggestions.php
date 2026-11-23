@@ -422,10 +422,13 @@ function gutenberg_get_server_only_suggestion_meta_keys(): array {
  */
 function gutenberg_suggestion_server_write( ?bool $open = null ): bool {
 	static $depth = 0;
+
+	$current = is_int( $depth ) ? $depth : 0;
 	if ( null !== $open ) {
-		$depth = max( 0, $depth + ( $open ? 1 : -1 ) );
+		$current = max( 0, $current + ( $open ? 1 : -1 ) );
+		$depth   = $current;
 	}
-	return $depth > 0;
+	return $current > 0;
 }
 
 /**
@@ -453,6 +456,9 @@ function gutenberg_update_suggestion_server_meta( int $note_id, string $meta_key
  * @return bool Whether the meta was deleted.
  */
 function gutenberg_delete_suggestion_server_meta( int $note_id, string $meta_key ): bool {
+	if ( $note_id < 1 ) {
+		return false;
+	}
 	gutenberg_suggestion_server_write( true );
 	try {
 		return delete_comment_meta( $note_id, $meta_key );
@@ -517,11 +523,10 @@ add_filter( 'wxr_export_skip_postmeta', 'gutenberg_skip_suggestion_content_in_ex
  * reviewer's save checks the reviewer's own capabilities again, as any post
  * save does.
  *
- * @param array<string, mixed> $payload Decoded `_wp_suggestion` payload.
- * @param WP_Post|null         $post    The post the note belongs to.
- * @return array<string, mixed>|WP_Error The payload with its values sanitized,
- *                                       or an error for an invalid post-level
- *                                       operation.
+ * @param array<mixed> $payload Decoded `_wp_suggestion` payload.
+ * @param WP_Post|null $post    The post the note belongs to.
+ * @return array<mixed>|WP_Error The payload with its values sanitized, or an
+ *                               error for an invalid post-level operation.
  */
 function gutenberg_sanitize_suggestion_post_operations( array $payload, ?WP_Post $post ) {
 	if ( ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
@@ -594,10 +599,10 @@ function gutenberg_sanitize_suggestion_post_operations( array $payload, ?WP_Post
  * updating a comment, so the request is refused with a 400 before anything
  * is stored.
  *
- * @param array|WP_Error  $prepared_comment The prepared comment data.
- * @param WP_REST_Request $request          The REST request.
- * @return array|WP_Error The prepared comment, or an error for an invalid
- *                        post-level operation.
+ * @param array<string, mixed>|WP_Error $prepared_comment The prepared comment data.
+ * @param WP_REST_Request                $request          The REST request.
+ * @return array<string, mixed>|WP_Error The prepared comment, or an error for
+ *                                       an invalid post-level operation.
  */
 function gutenberg_validate_suggestion_post_operations( $prepared_comment, $request ) {
 	if ( is_wp_error( $prepared_comment ) ) {
@@ -612,9 +617,9 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		return $prepared_comment;
 	}
 
-	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? (int) $prepared_comment['comment_post_ID'] : 0;
+	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? absint( $prepared_comment['comment_post_ID'] ) : 0;
 	if ( ! $post_id && isset( $request['id'] ) ) {
-		$comment = get_comment( (int) $request['id'] );
+		$comment = get_comment( absint( $request['id'] ) );
 		$post_id = $comment ? (int) $comment->comment_post_ID : 0;
 	}
 
