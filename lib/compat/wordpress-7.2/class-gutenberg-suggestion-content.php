@@ -111,6 +111,30 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
+		 * Drops what content proposes, for content no note can belong to: a
+		 * new post, or a post type without notes.
+		 *
+		 * Every marker is treated as naming no note of the post, one with no
+		 * note id yet included: additions and suggested blocks go with their
+		 * text, and attribute proposals are removed. Deletions keep their
+		 * text, and anything `extract()` would leave alone stays as it is.
+		 *
+		 * @param string $content Serialized content, as kses left it.
+		 * @return string Content.
+		 */
+		public static function strip( $content ) {
+			if ( ! is_string( $content ) || ! self::may_carry_proposals( $content ) ) {
+				return $content;
+			}
+			$items    = array();
+			$next_run = static function () {
+				return 0;
+			};
+			$content  = self::extract_blocks( $content, array(), array(), $next_run, $items, true );
+			return self::extract_inline( $content, array(), array(), array(), array(), $next_run, $items );
+		}
+
+		/**
 		 * Puts stored proposals back into anchored content.
 		 *
 		 * @param string             $content Anchored content.
@@ -327,9 +351,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * @param array<int, true>   $exclude  Note ids to leave in full form.
 		 * @param callable           $next_run Run allocator.
 		 * @param array<int, array[]> $items   Items per note id, added to.
+		 * @param bool               $unowned  Whether a marker naming no note yet is treated as naming one that is not on the post.
 		 * @return string Content.
 		 */
-		private static function extract_blocks( $content, $notes, $exclude, $next_run, &$items ) {
+		private static function extract_blocks( $content, $notes, $exclude, $next_run, &$items, $unowned = false ) {
 			if ( false === strpos( $content, '"suggestion":' ) ) {
 				return $content;
 			}
@@ -348,7 +373,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( ! $marker ) {
 					continue;
 				}
-				$owner    = self::block_owner( $block, $notes );
+				$owner = self::block_owner( $block, $notes );
+				if ( 0 === $owner && $unowned ) {
+					$owner = -1;
+				}
 				$is_owned = 0 !== $owner && ! isset( $exclude[ $owner ] );
 
 				if ( $is_owned && 'pending-insert' === $marker['type'] ) {
@@ -383,6 +411,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 						continue;
 					}
 					$entry_owner = self::nested_owner( $entry, $notes );
+					if ( 0 === $entry_owner && $unowned ) {
+						$entry_owner = -1;
+					}
 					if ( 0 !== $entry_owner && ! isset( $exclude[ $entry_owner ] ) ) {
 						$proposals[] = array( $index, $entry_owner, $entry['after'] );
 					}
