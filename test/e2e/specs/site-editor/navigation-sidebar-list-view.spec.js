@@ -783,11 +783,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			// Between "Nested Item" and "Top Level Item 2" are the appenders
 			// of the nested submenu and of its parent. They hold no block, so
 			// moving onto them keeps only the block the selection started
-			// from. A selection across levels then takes in the top-level
-			// blocks on both ends.
-			for ( const [ from, key ] of [
-				[ 'Nested Item', 'Shift+ArrowDown' ],
-				[ 'Top Level Item 2', 'Shift+ArrowUp' ],
+			// from, also when going back. A selection across levels then takes
+			// in the top-level blocks on both ends.
+			for ( const [ from, key, backKey ] of [
+				[ 'Nested Item', 'Shift+ArrowDown', 'Shift+ArrowUp' ],
+				[ 'Top Level Item 2', 'Shift+ArrowUp', 'Shift+ArrowDown' ],
 			] ) {
 				const listView = await openSidebarListView(
 					{ admin, page, requestUtils },
@@ -813,6 +813,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					.getByRole( 'gridcell', { name: from, exact: true } )
 					.getByRole( 'link' )
 					.focus();
+
+				await page.keyboard.press( key );
+				await expect.poll( selectedItems ).toEqual( [ from ] );
+				await page.keyboard.press( backKey );
+				await expect.poll( selectedItems ).toEqual( [ from ] );
 
 				await page.keyboard.press( key );
 				await expect.poll( selectedItems ).toEqual( [ from ] );

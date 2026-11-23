@@ -15,7 +15,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { HOME, UP } from '@wordpress/keycodes';
 import ListViewBranch from './branch';
 import {
 	ListViewContext,
@@ -134,7 +133,7 @@ function ListViewComponent(
 		useListViewClientIds( { blocks, rootClientId } );
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
-	const { getBlock, getSelectedBlockClientIds } =
+	const { getBlock, getBlockSelectionEnd, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
 
 	const { updateBlockSelection } = useBlockSelection();
@@ -260,27 +259,21 @@ function ListViewComponent(
 			endRow: HTMLElement
 		) => {
 			if ( event.shiftKey ) {
-				// An appender row holds no block, so a selection moving off
-				// one goes on from the block it came from.
-				const isMovingUp =
-					event.keyCode === UP || event.keyCode === HOME;
-				let blockRow: HTMLElement | null = startRow;
-				while ( blockRow && ! blockRow.dataset.block ) {
-					blockRow = (
-						isMovingUp
-							? blockRow.nextElementSibling
-							: blockRow.previousElementSibling
-					) as HTMLElement | null;
-				}
+				// Tree grid rows carry `data-block`, except appender rows. A
+				// selection moving off an appender row goes on from where it
+				// ended, or starts at the row it moves to.
+				const clientId =
+					startRow?.dataset?.block ??
+					getBlockSelectionEnd() ??
+					endRow?.dataset?.block;
 				updateBlockSelection(
 					event,
-					// Tree grid rows carry `data-block`.
-					blockRow?.dataset?.block as string,
+					clientId as string,
 					endRow?.dataset?.block
 				);
 			}
 		},
-		[ updateBlockSelection ]
+		[ getBlockSelectionEnd, updateBlockSelection ]
 	);
 
 	useListViewCollapseItems( { updateExpansion } );

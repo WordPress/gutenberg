@@ -44,7 +44,10 @@ export default function PageListItemEdit( { context, attributes } ) {
 		className: 'wp-block-pages-list__item',
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps );
+	// The Page List generates its items, so nothing can be added to them.
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		renderAppender: false,
+	} );
 
 	return (
 		<li
