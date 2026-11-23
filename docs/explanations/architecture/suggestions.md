@@ -129,6 +129,22 @@ Notes are linked by comment id, which an import renumbers. A WXR export therefor
 | Note reads and writes | `packages/editor/src/components/suggestion-mode/suggestion-store.ts` |
 | Tests that pin the stored bytes | `phpunit/tests/suggestion-content-round-trip-test.php`, `suggestion-content-save-test.php`, `suggestion-reconciliation-test.php` |
 
+Each module of the editor code is listed in the [`suggestion-mode` README](https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/components/suggestion-mode/README.md).
+
+### PHP files
+
+The REST and PHP surface lives in `lib/compat/wordpress-7.1/` and `lib/compat/wordpress-7.2/` (marked 7.2 below). Notes themselves (the `note` comment type, `_wp_note_status` and `editor.notes` post-type support) are core since WordPress 6.9.
+
+| File | Role |
+|------|------|
+| `suggestion-status.php` (7.2) | Provisional and final status lists, `_wp_suggestion_decided_by` stamping, and the REST refusal of final statuses. |
+| `class-gutenberg-suggestion-reconciler.php`, `suggestion-reconciliation.php` (7.2) | The save pass, the edit-context re-inflation, `gutenberg_can_read_suggestions()`, the `core/suggestion-placeholder` block, and `gutenberg_get_suggestion_anchor_index()`, the one place that reads suggestion anchors from serialized content. |
+| `class-gutenberg-suggestion-content.php` (7.2) | `Gutenberg_Suggestion_Content`: extraction of proposals into anchors plus items, and its exact inverse, re-inflation. |
+| `class-gutenberg-suggestion-block-scanner.php`, `class-gutenberg-suggestion-marker-processor.php` (7.2) | Block delimiters with byte offsets (driving `WP_Block_Parser::next_token()`), and the Tag Processor that exposes token spans to the marker walk. |
+| `block-suggestions.php` | `gutenberg_register_suggestion_meta` registers `_wp_suggestion` (sanitized, 64 KB cap, KSES on serialized block snapshots) and `_wp_suggestion_status`, each with an `edit_post`-on-parent `auth_callback`, plus the read-only provenance meta and the private storage of the save pass (`_wp_suggestion_content`, `_wp_suggestion_snapshot`, both kept out of WXR exports). Also the render side: `gutenberg_strip_inline_suggestion_markers`, the kind-aware `render_block` strip for inline markers (`del` keeps text, `add` drops text, `format` reverts per character to the recorded original), which reads markers through `gutenberg_get_suggestion_marker_kind()`, and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
+| `block-suggestions.php` (validation) | `gutenberg_validate_suggestion_post_operations` (on `rest_preprocess_comment`) refuses, with a 400, a note whose `post-attribute-set` op targets anything but the title, excerpt, featured image, slug, one of the post type's REST taxonomies, or a meta key registered with `show_in_rest` that the suggester could edit (`gutenberg_can_suggest_post_meta`, `edit_post_meta`). |
+| `class-gutenberg-rest-comment-controller-7-1.php` | Thin subclass of the comments controller (it extends `Gutenberg_REST_Comment_Controller_7_2`, which keeps note reactions working). Permissions stay core's. It adds only storage rules: `prepare_item_for_database` rejects an oversized `_wp_suggestion` with 413 and an invalid JSON payload with 400, and `check_is_comment_content_allowed` lets a note carrying a suggestion payload have empty content. |
+
 ## End-to-end lifecycle
 
 A suggestion has two halves: a reviewer's edit becomes a note, and later the post author decides on it. The first diagram follows a block attribute suggestion, where the marker is written first and its note follows. An inline suggestion runs in the other order: the note is created on the first keystroke and the mark is written once the comment id is known (see [Inline suggestion markers](#inline-suggestion-markers)).
@@ -402,18 +418,9 @@ Each step only drops ids from characters or removes characters, so decisions com
 
 Every peer computes the same correction from the same merged value, and a correction that serializes to the same bytes is not written. One peer writes it: the author of the newest marker it touches. A correction that only deletes markup is identical on every peer and merges to one, so every peer may write that kind. The corrections bypass the interceptor and stay off the undo stack.
 
-A seeded Vitest fuzz (`inline-suggestions/test/marker-convergence.jsdom.test.ts`) interleaves concurrent marker writes and decisions across in-process peers through a model of the HTML-string merge (`test/fixtures/html-string-merge.ts`), applies the guard, and checks that the peers converge on one serialization. `OVERLAP_CONVERGENCE_RUNS=10000` runs more interleavings, `OVERLAP_CONVERGENCE_SEED=<n>` replays one, and `OVERLAP_CONVERGENCE_REPORT=1` / `OVERLAP_CONVERGENCE_TRACE=1` print the outcome counts and each round. `collaboration-suggestion-mode-overlap.spec.ts` has two pages suggest deleting overlapping words at the same time and checks both deletions land and the peers settle on one value.
+A seeded Vitest fuzz interleaves concurrent marker writes and decisions across in-process peers through a model of the HTML-string merge, applies the guard, and checks that the peers converge on one serialization. An end-to-end spec has two pages suggest deleting overlapping words at the same time and checks that both deletions land and the peers settle on one value.
 
-**Testing overlaps.** One set of JSON fixtures drives every layer, so a combination is written once and checked everywhere:
-
-- `inline-suggestions/test/fixtures/overlaps/*.json` describe a base text, the users, and each suggestion (`kind`, `text` and `at`, or `range`, `added` / `removed`, `inside`), with the two preview views (`all-accepted`, `all-rejected`) pinned. Every other expectation is computed.
-- `test/fixtures/overlap-oracle.ts` expands a fixture into per-character id lists and deltas and derives the published text for any set of decisions, the outdated set, and the accept/reject orders to check: every order up to four suggestions, 200 seeded samples above.
-- Vitest checks the oracle against itself (`overlap-model.ts`), replays every order through the real operations (`overlap-oracle.jsdom.test.ts`), and fuzzes random fixtures with a printed, replayable seed (`fixtures/overlap-fuzz.ts`).
-- `overlap-fixtures-generated.ts` writes `fixtures/overlaps/generated/*.json` (the paragraph HTML, each note's payload, the views, and every order up to three suggestions or 24 seeded samples above) and fails when they are stale. Regenerate with `UPDATE_OVERLAP_FIXTURES=1 npm run test:unit -- packages/editor/src/components/inline-suggestions/test/overlap-fixtures-generated.ts`.
-- PHPUnit (`phpunit/tests/suggestion-overlap-fixtures-test.php`) renders each generated state through `gutenberg_strip_inline_suggestion_markers` and `gutenberg_get_inline_suggestion_view()` and compares it with the oracle.
-- Playwright seeds a fixture through REST with one user per author (`suggestion-mode-overlap-utils.ts`), performs each gesture of the matrix as another author (`suggestion-mode-overlap.spec.ts`), and drives stored orders through the sidebar (`suggestion-mode-overlap-orders.spec.ts`; `OVERLAP_FIXTURE=four-same-kind` runs one fixture, `OVERLAP_ORDERS=all` every stored order).
-
-Each fixture names the delivery phase it belongs to. `LANDED_PHASES` in `fixtures/overlap-phases.ts`, `suggestion-mode-overlap-utils.ts` and the PHPUnit test lists the phases that run; `OVERLAP_PHASES=C` forces a phase on for one run.
+**Testing overlaps.** One set of JSON fixtures drives every layer, so a combination is written once and checked everywhere. A fixture describes a base text, the users and each suggestion. An oracle derives from it the published text for any set of decisions, the suggestions those decisions outdate, and the accept and reject orders to check. Vitest replays the orders through the real operations, PHPUnit renders each generated state through the render strip and compares it with the oracle, and Playwright seeds a fixture over REST and drives the orders through the sidebar. How to run, replay and regenerate them is in the [test README](https://github.com/WordPress/gutenberg/blob/trunk/packages/editor/src/components/inline-suggestions/test/README.md).
 
 **Block-level overlaps.** A block has one `metadata.suggestion` marker, the outermost suggestion on it. Other authors' suggestions on the same block sit in its `nested` list, one entry per author, each a `pending-attributes` or `pending-remove` marker with its own `commentId`, `authorId` and `after` (`marker.ts`). They are entries rather than a map keyed by note id because a new proposal has no note id until auto-save opens its note. What the block shows is every proposal's `after` merged in note id order (`displayedProposal()`), unsaved ones last, so where two proposals set one attribute the later one wins.
 
@@ -424,77 +431,6 @@ Each fixture names the delivery phase it belongs to. `LANDED_PHASES` in `fixture
 | Moves the block | only where A's block is proposed changes; A's note follows it | the move takes the outer place and A's proposal nests under it | declined: "Someone else has already suggested moving this block." (see Known Limitations) |
 
 Each nested suggestion is decided on its own. Accepting a nested removal removes the block; accepting a nested proposal lands it and leaves the block's other suggestions pending; rejecting one drops only that entry. Deciding the block's own marker lifts the first nested entry into its place (`withoutMarkerEntry()`). A proposal a decision left with nothing to change (every key now equals the live value) is dropped from the block (`withoutOutdatedProposals()`); its note becomes `outdated` on save, or is collected when it is the current user's. The sidebar shows who else suggested what on the block ("Anne also suggested removing this block", "Bob also suggested changes to this block", "Anne suggested adding this block"), and on a suggested block that rejecting it also outdates what others suggested on it. On the server, the save pass moves each nested entry's `after` onto its own note and the anchor index anchors each entry by its own note, falling back to the block's `metadata.noteId` links for an entry saved before it had one. Post field proposals keep one note per field per author; when an accepted one is saved, the save pass marks `outdated` every other author's pending proposal whose values the post now already holds, and leaves one that still changes the field pending.
-
-### Implementation files
-
-The Suggestion mode subsystem lives in `packages/editor/src/components/suggestion-mode/`:
-
-| File | Role |
-|------|------|
-| `index.ts`                  | Barrel that re-exports the subsystem's public surface. |
-| `gate.ts`                   | `isSuggestionModeEnabled()` / `useCanSuggest`: the single feature-gating predicate for the Suggestion mode experiment. |
-| `suggestion-session.tsx`    | `SuggestionSessionProvider`, `useSuggestionSession`. Session coordination only: bypass tokens, handler slots, write queue, deferred insertions, undo adoption, structural capture records. |
-| `marker.ts`                 | The `metadata.suggestion` marker: `readSuggestionMarker`, `proposedAttributes`, `withProposedAttributes` (fold an edit into a proposal), `withoutProposedAttributes`, `mergeProposedAttributes` (merge for render). |
-| `suggestion-write-queue.ts` | Per-block serial queue shared by the format keyboard and the content reconciler, so their note-then-marker flights can't interleave on one block. |
-| `with-suggestion-overlay.tsx`| `editor.BlockEdit` HOC that detects format-only / reconcilable content edits and hands them to the marker singletons, diverting everything else into the block's marker proposal (marker-stripped) and merging a proposal for render in every intent; plus the `editor.BlockListBlock` filter for pending-state classes and move ghosts. |
-| `store-interceptor.ts`      | Snapshot/diff/revert subscriber for store-level mutations (attribute and structural); multi-peer accept logic; revert-echo identity tokens. |
-| `plan-store-content-edit.ts`| Plans a content change that reached the store directly (outside `setAttributes`) as inline markers where it can. |
-| `block-tree-version.ts`     | A cheap "has any block changed?" signal from the identity of the store's block tree. |
-| `provider.ts`               | `useSuggestionsProvider`: the `createSuggestion` / `updateSuggestion` / `deleteSuggestion` / `applySuggestion` / `rejectSuggestion` API, a thin composition of the two hooks below. |
-| `suggestion-store.ts`       | `SuggestionStore`: every read and write of a suggestion note (the comment, `_wp_suggestion`, `_wp_suggestion_status`). The swap point for another storage backend. |
-| `use-suggestion-submission.ts` | Create, update and delete: builds the payload, saves the note through the store, and links the block to it. |
-| `use-suggestion-decisions.ts` | Accept and Reject: the provisional status write, the conflict check, the content change, and the rollback when either half fails. |
-| `decision-state.ts`         | Per-registry record of the decisions made this session, read by the interceptor and the undo guard. |
-| `operations/`               | Pure functions over payloads and attributes: `payload.ts` (`SCHEMA_VERSION`, `PAYLOAD_MAX_BYTES`, `parseSuggestionPayload`), `attributes.ts` (`operationsFromMarker`, `applyOperations`, `hasAttributeConflict`, the wrapper-aware equality check), `locate.ts`, `plan.ts`, `structural-apply.ts`, `structural-reject.ts`. |
-| `auto-save.ts`              | Debounced persistence of marked blocks as note comments. |
-| `operations/structural-from-marker.ts` | `structuralOpFromMarker`: the structural op a marker stands for, derived from the marker and the live tree when no capture was recorded this session. |
-| `suggestion-summary.tsx`    | Compact sidebar summary ("Add: …", "Delete: …", "Add formatting: …", "Remove formatting: …") used in thread lists, the sole suggestion renderer in the sidebar. Inline format changes carry their direction, since adding and removing a format are opposite proposals. |
-| `word-diff.ts`              | `wordDiff`: the word-level LCS behind the summary, bounded by `MAX_DIFF_LENGTH` (characters, applied by callers) and `MAX_DIFF_TOKENS` (tokens, applied internally). |
-| `suggestion-deletion-keyboard.ts` | `beforeinput`/`cut`-capture handler turning selection, collapsed-cursor, word/line deletes and cut into `del` markers. |
-| `suggestion-addition-keyboard.ts` | `beforeinput`/`paste`-capture handler turning typing, type-over, and single-line paste into `add` markers (and the `del` half of a type-over). |
-| `suggestion-format-keyboard.ts` | Singleton owning the write side of `format` markers: opens the note (with `delta`, `beforeHTML` and `afterHTML`) and writes the reformatted run wrapped in one marker, or writes the change straight into the author's own addition. |
-| `suggestion-content-reconciler.ts` | Singleton executing marker plans for `onChange`-only text edits (IME commit, autocorrect, drag-drop). |
-| `keyboard-target.ts`        | Shared DOM-target guards (`isEventTargetSelectedRichText`, `getCandidateDocuments`) keeping the capture keyboards off sidebar/plugin editables. |
-| `grapheme-boundaries.ts`    | Grapheme-safe range stepping for collapsed deletes (surrogate pairs, ZWJ sequences, combining marks). |
-| `run-anchor.ts`             | `rebaseRunAnchor`: maps a keyboard run's offsets, read when its first keystroke opened the note, onto the attribute's text when the note id resolves, so the deferred write lands by content rather than at the caret. |
-| `refuse-edit.ts`            | The one place Suggestion mode declines an edit outright (a block split inside someone's suggestion, an edit that would hide a marker under a whole-attribute proposal), with its notice. |
-| `use-abandoned-note-cleanup.ts` | Trashes the notes opened for a gesture that was abandoned before its marker was written, and drops their ids from the block's note linkage. |
-| `suggestion-note-gc.ts`     | `SuggestionNoteGC`: trashes the current user's own pending note whose anchor disappeared (undo, deleting the marked text while Editing), after reading the note fresh from the server, restores it when the anchor comes back, and spares notes with replies. Reopens a note this session decided when undo brings its marker back, and decides it again (provisionally) when redo lands the decision again. |
-| `anchor-index.ts`           | Where each suggestion note is anchored in the loaded content, shared by the note collector and the sidebar (`useSuggestionAnchorPresent`). |
-| `suggestion-status.ts`      | `_wp_suggestion_status` values and predicates (`getSuggestionStatus`, `isProvisionalStatus`, `getDecision`). |
-| `suggestion-undo-guard.ts`  | Suggestion-aware undo/redo: undoing right after a suggestion withdraws it rather than capturing the undo as a new suggestion. Records every redo, in any intent, so the note collector can tell a redone decision from a withdrawal. |
-| `clipboard-strip.ts`        | Keeps suggestion state off the clipboard: inline markers, `metadata.suggestion` and note links are stripped from copied and cut content. |
-| `multi-block-format-notice.ts` | Explains why a format shortcut does nothing across a multi-block selection in Suggestion mode. |
-| `move-ghost-index.ts`       | Pure builder of the anchor-to-ghost index from moved-block descriptors. |
-| `use-move-ghosts.tsx`       | `MoveGhostsProvider`: computes the document-wide pending-move ghost index once and shares it over context; per-block `useMoveGhosts()` is a plain context read. |
-| `suggestion-move-ghost.tsx` | Renders the non-interactive ghost at a pending move's origin. |
-| `annotate-suggestions.ts`   | `SuggestionAnnotations`: re-derives each pending marker's range and decorates it via the annotations API (runtime-only). |
-| `suggestion-author-colors.ts` | `SuggestionAuthorColors`: injects per-author `--suggestion-author-color` rules keyed on the marker's `data-author`. |
-| `reveal-selected-suggestion.ts` | Thickens the selected suggestion's in-content marker rule, like a selected note's. |
-| `post-field-labels.ts`      | Names a post field suggestion's target ("Post title", "Excerpt", "Post meta: key") and its summary label. |
-| `use-locked-post-field.ts`  | Read-only treatment for the post settings that cannot be proposed while suggesting. |
-| `use-suggest-post-edit-guard.ts` | Installs the `editEntityRecord` guard for the editor's lifetime, before its children first render. |
-| `style.scss`                | Sidebar and editor-chrome styles for suggestions (in-canvas treatments live in `block-editor`'s `content-suggestion.scss`). |
-
-The shared inline-marker primitive and the suggestion format live alongside, consumed by both Notes and Suggestions:
-
-| Directory | Role |
-|-----------|------|
-| `inline-markers/`    | Format-agnostic primitive: `findMarkerRange` (sole offset resolver / CRDT swap point), `wrapInlineMarker`, `readInlineSelection`, `readInlineCaret`, `reconcileMarkerRemoval`, `useAnnotateRanges`. |
-| `inline-suggestions/`| The marker formats, one per kind, and their kind helpers and canonical order (`format.ts`), formatting deltas (`format-delta.ts`), and everything that plans or executes marker changes: accept/reject/insert/grow operations (`operations.ts`), the overlap matrix (`overlap.ts`), what a decision does to other suggestions (`resolution.ts`), how a suggestion sits among others (`relations.ts`), the RTC guard's rule (`marker-integrity.ts`), `delete-range.ts` (word/line delete ranges), `reconcile-edit.ts` (`planEditMarkers`/`applyEditPlan`), `reconcile-format.ts` (`planFormatMarkers`/`applyFormatPlan`), and `strip-markers.ts` (marker stripping for attribute proposals). |
-| `attribute-suggestions/` | `revert-guard.ts` — identity tokens the store interceptor uses to recognize its own revert echoes (bounded FIFO queue per block). |
-
-The REST and PHP surface lives in `lib/compat/wordpress-7.1/` and `lib/compat/wordpress-7.2/` (marked 7.2 below). Notes themselves (the `note` comment type, `_wp_note_status` and `editor.notes` post-type support) are core since WordPress 6.9.
-
-| File | Role |
-|------|------|
-| `suggestion-status.php` (7.2) | Provisional and final status lists, `_wp_suggestion_decided_by` stamping, and the REST refusal of final statuses. |
-| `class-gutenberg-suggestion-reconciler.php`, `suggestion-reconciliation.php` (7.2) | The save pass, the edit-context re-inflation, `gutenberg_can_read_suggestions()`, the `core/suggestion-placeholder` block, and `gutenberg_get_suggestion_anchor_index()`, the one place that reads suggestion anchors from serialized content. |
-| `class-gutenberg-suggestion-content.php` (7.2) | `Gutenberg_Suggestion_Content`: extraction of proposals into anchors plus items, and its exact inverse, re-inflation. |
-| `class-gutenberg-suggestion-block-scanner.php`, `class-gutenberg-suggestion-marker-processor.php` (7.2) | Block delimiters with byte offsets (driving `WP_Block_Parser::next_token()`), and the Tag Processor that exposes token spans to the marker walk. |
-| `block-suggestions.php` | `gutenberg_register_suggestion_meta` registers `_wp_suggestion` (sanitized, 64 KB cap, KSES on serialized block snapshots) and `_wp_suggestion_status`, each with an `edit_post`-on-parent `auth_callback`, plus the read-only provenance meta and the private storage of the save pass (`_wp_suggestion_content`, `_wp_suggestion_snapshot`, both kept out of WXR exports). Also the render side: `gutenberg_strip_inline_suggestion_markers`, the kind-aware `render_block` strip for inline markers (`del` keeps text, `add` drops text, `format` reverts per character to the recorded original), which reads markers through `gutenberg_get_suggestion_marker_kind()`, and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
-| `block-suggestions.php` (validation) | `gutenberg_validate_suggestion_post_operations` (on `rest_preprocess_comment`) refuses, with a 400, a note whose `post-attribute-set` op targets anything but the title, excerpt, featured image, slug, one of the post type's REST taxonomies, or a meta key registered with `show_in_rest` that the suggester could edit (`gutenberg_can_suggest_post_meta`, `edit_post_meta`). |
-| `class-gutenberg-rest-comment-controller-7-1.php` | Thin subclass of the comments controller (it extends `Gutenberg_REST_Comment_Controller_7_2`, which keeps note reactions working). Permissions stay core's. It adds only storage rules: `prepare_item_for_database` rejects an oversized `_wp_suggestion` with 413 and an invalid JSON payload with 400, and `check_is_comment_content_allowed` lets a note carrying a suggestion payload have empty content. |
 
 ## Suggestion Payload (v2)
 
