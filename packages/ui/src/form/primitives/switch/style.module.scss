@@ -1,5 +1,4 @@
 @use "../../../utils/css/mixins";
-@use "@wordpress/base-styles/variables";
 
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
@@ -76,7 +75,7 @@
 			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 999px;
 			background-color: var(--wpds-color-background-thumb-neutral);
-			box-shadow: variables.$elevation-x-small;
+			box-shadow: var(--wpds-elevation-xs);
 
 			@media not (prefers-reduced-motion) {
 				transition:

@@ -41,6 +41,7 @@ Other token families use shorter forms when a segment would be redundant:
 | Typography              | `--wpds-typography-<property>-<role-or-size>`                    | `--wpds-typography-font-size-md`                          |
 | Motion                  | `--wpds-motion-<property>-<scale-or-intent>`                     | `--wpds-motion-easing-balanced`                           |
 | Cursor                  | `--wpds-cursor-<target>`                                         | `--wpds-cursor-control`                                   |
+| Elevation               | `--wpds-elevation-<size>`                                        | `--wpds-elevation-md`                                     |
 
 ### Type
 
@@ -52,6 +53,7 @@ Indicates what kind of value the token represents, usually mapping to a [Design 
 | `dimension`  | Spacing, sizing, and other measurable lengths (e.g., padding, margins, widths) |
 | `border`     | Border properties like radius and width                                        |
 | `cursor`     | Cursor values for interactive affordances                                      |
+| `elevation`  | Box shadows that raise a surface above the content beneath it                  |
 | `motion`     | Animation durations and easing curves                                          |
 | `typography` | Typography properties like font family, font size, and line-height             |
 
@@ -346,6 +348,15 @@ The semantic token set is role-based, not a complete matrix of every property, t
 | `--wpds-dimension-surface-width-lg`  | Large surface width                                                      |
 | `--wpds-dimension-surface-width-xl`  | Extra large surface width                                                |
 | `--wpds-dimension-surface-width-2xl` | 2x extra large surface width                                             |
+
+### Elevation
+
+| Variable name         | Description                                                                               |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| `--wpds-elevation-xs` | Elevation for small controls raised slightly above their surface, such as a switch thumb. |
+| `--wpds-elevation-sm` | Elevation for small transient surfaces close to their trigger, such as tooltips.          |
+| `--wpds-elevation-md` | Elevation for floating surfaces anchored to a trigger, such as popovers and menus.        |
+| `--wpds-elevation-lg` | Elevation for surfaces that sit above the whole page, such as dialogs and drawers.        |
 
 ### Motion
 
