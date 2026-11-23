@@ -1,44 +1,103 @@
-import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Markdown, Meta, Source } from '@storybook/addon-docs/blocks';
 import * as FilePickerButtonStories from './file-picker-button.story';
 import * as FilePickerMenuStories from './file-picker-menu.story';
 import * as FilePickerDropZoneStories from './file-picker-drop-zone.story';
+import * as FilePickerMultipleStories from './file-picker-multiple.story';
 import FilePickerButtonSource from './file-picker-button.tsx?raw';
 import FilePickerMenuSource from './file-picker-menu.tsx?raw';
 import FilePickerDropZoneSource from './file-picker-drop-zone.tsx?raw';
+import FilePickerMultipleSource from './file-picker-multiple.tsx?raw';
+import SelectedFileSource from './selected-file.tsx?raw';
+import FilePickerStylesSource from './file-picker.module.css?raw';
 
 <Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
 
 # Selecting local files
 
-Use `FormFileUpload` from `@wordpress/components` to open the native file picker. It provides a button and a hidden file input, and handles browser-specific picker hints such as `accept="audio/*"`.
+Use `FormFileUpload` from `@wordpress/components` to open the native file picker. Its `render` prop receives `openFileDialog`, so any control can open the picker, while the file input stays hidden. It also handles browser quirks, such as `accept="audio/*"` on iOS.
 
-## From a button
+These patterns cover choosing files before a form uses them. Uploading, progress, and the Media Library belong to the screen that sends the files.
 
-Read the selected `File` from `event.currentTarget.files`. Keep the result visible beside the button. Once you have the file, clear the input so choosing the same file again triggers another change. Leave the previous result in place when the picker closes without a selection. If a form has a separate submit button, keep the selected `File` in state and pass it to the submit handler.
+<Markdown>{ `
+| Pattern | Use it when |
+| --- | --- |
+| [Drop area](#drop-area) | A form field takes one file, such as a cover image. |
+| [Drop area for several files](#drop-area-for-several-files) | A form field collects a list of files, such as receipts and photos. |
+| [Button](#button) | There is no room for a drop area, or dropping files would be unusual. |
+| [Menu item](#menu-item) | Choosing a file is one of several actions, such as in a Replace menu. |
+` }</Markdown>
 
-<Canvas
-	of={ FilePickerButtonStories.ChooseFile }
-	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
-/>
+## Drop area
 
-## From a menu item
-
-Wrap the whole menu in `FormFileUpload`. Its `render` prop supplies `openFileDialog` to the menu item. The item closes the popup when activated. Both the input and the selection feedback stay mounted.
-
-<Canvas
-	of={ FilePickerMenuStories.ChooseFile }
-	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
-/>
-
-## From a drop area
-
-Pair `DropZone` with a button so people can choose a file with a keyboard or a single click. Position the drop area’s container so the overlay covers that area. Send picked and dropped files through the same handler. Here the picker suggests PNG files, and the handler checks the number of files and their filename extension. Show the error beside the control and keep the last accepted file visible.
+Lay the field out like other form fields: the label, then the drop area, then the description. The whole drop area is a `Button` with `variant="unstyled"`, so a click, Enter, or Space opens the picker. Dropping a file is an extra way to choose one, not the only way.
 
 <Canvas
 	of={ FilePickerDropZoneStories.ChooseFile }
 	source={ { code: FilePickerDropZoneSource, language: 'tsx', type: 'code' } }
 />
 
-Disable the fieldset to disable the native file input as well as the button. Remove the active drop target and prevent a dropped file from navigating away from the page.
+- **Place `DropZone` inside the drop area.** Its overlay covers the nearest positioned ancestor, so the drop area needs `position: relative`.
+- **Send chosen and dropped files through one handler.** Both paths then follow the same rules. `accept` only filters the picker, and people can still choose or drop any file, so check every file in the handler.
+- **Keep the last valid file when a new one is rejected.** Show the error below the description, in a live region, and link it to the button with `aria-describedby`.
+- **Show what was chosen.** A selected image shows a thumbnail. Other files show a file icon. Both show the filename, the file type, and the size.
+- **Put the remove button beside the drop area, not inside it.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the drop area after a removal.
+- **Name the drop area after its action.** When it shows a file, its accessible name is "Replace cover.png".
+
+A `Fieldset` groups the drop area and the remove button under one legend. Disable the fieldset to disable the button, the remove button, and the hidden input together. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
 
 <Canvas of={ FilePickerDropZoneStories.Disabled } sourceState="none" />
+
+## Drop area for several files
+
+Set `multiple` on `FormFileUpload` and show each file in its own row, above the drop area. The drop target covers the rows as well, so a large area accepts files.
+
+<Canvas
+	of={ FilePickerMultipleStories.ChooseFiles }
+	source={ { code: FilePickerMultipleSource, language: 'tsx', type: 'code' } }
+/>
+
+- **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can be told apart.
+- **Move focus after a removal.** Focus the next row's remove button, or the drop area when the list is empty.
+- **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others.
+- **Truncate the middle of long filenames.** Keep the extension visible, so people can tell `report.pdf` from `report.png`.
+- **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
+
+## Button
+
+Use an outline, neutral `Button` when a drop area doesn't fit. Show the chosen file below the button with the same row as the drop area.
+
+<Canvas
+	of={ FilePickerButtonStories.ChooseFile }
+	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
+/>
+
+End the label with an ellipsis, because the button opens another interface. Read the file from `event.currentTarget.files`, then clear the input, so choosing the same file again fires another change. When the picker closes without a selection, keep the previous file.
+
+## Menu item
+
+Wrap the whole menu in `FormFileUpload`, not only the item. The menu closes when the item is activated and unmounts its content, so an input inside the item would be gone before the selection arrives.
+
+<Canvas
+	of={ FilePickerMenuStories.ChooseFile }
+	source={ { code: FilePickerMenuSource, language: 'tsx', type: 'code' } }
+/>
+
+After the menu closes, focus returns to the trigger. The chosen file appears beside the trigger, and `speak()` announces it. A remove action can live in the menu here, because the menu is already where the file's actions are.
+
+## Shared parts
+
+The examples use one component for a chosen file. It renders only `span` elements, so it can also be the content of a button.
+
+<Source code={ SelectedFileSource } language="tsx" />
+
+The drop area uses surface tokens for its background and dashed border. The text and icon, not the border, show that the area is a control.
+
+<Source code={ FilePickerStylesSource } language="css" />
+
+## Checklist
+
+- **Keep a click target.** Dropping files never replaces a button that people can reach with a keyboard or a single tap.
+- **Check every file.** Validate type and count in the handler, for files from the picker and from a drop.
+- **Clear the input after reading it.** Otherwise choosing the same file again does nothing.
+- **Announce changes.** Use `speak()` when a file is added or removed, and put errors in a live region beside the field.
+- **Keep the `File` for later.** If a separate button submits the form, keep the chosen `File` in state and pass it to the submit handler.

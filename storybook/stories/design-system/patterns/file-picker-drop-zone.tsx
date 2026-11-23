@@ -1,8 +1,26 @@
 import type { DragEvent } from 'react';
+import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { Button, Stack } from '@wordpress/ui';
+import { useId, useRef, useState } from '@wordpress/element';
+import { closeSmall, upload } from '@wordpress/icons';
+import {
+	Button,
+	Fieldset,
+	Icon,
+	IconButton,
+	Stack,
+	Text,
+	ValidityIndicator,
+} from '@wordpress/ui';
+import { FileSummary, getExtension } from './selected-file';
+import styles from './file-picker.module.css';
 
+/**
+ * Stops a file dropped beside the drop area, or on a disabled field, from
+ * opening in the browser tab.
+ *
+ * @param event The drag event.
+ */
 function preventFileNavigation( event: DragEvent< HTMLFieldSetElement > ) {
 	if ( event.dataTransfer.types.includes( 'Files' ) ) {
 		event.preventDefault();
@@ -13,80 +31,127 @@ function preventFileNavigation( event: DragEvent< HTMLFieldSetElement > ) {
 }
 
 export function FilePickerDropZone( { disabled = false } ) {
-	const [ fileName, setFileName ] = useState( '' );
+	const [ file, setFile ] = useState< File >();
 	const [ error, setError ] = useState( '' );
+	const chooseRef = useRef< HTMLButtonElement >( null );
+	const errorId = useId();
 
-	function selectFiles( files: File[] ) {
+	function chooseFiles( files: File[] ) {
 		if ( disabled || ! files.length ) {
 			return;
 		}
 		if ( files.length > 1 ) {
-			setError( 'Choose one PNG file at a time.' );
+			setError( 'Choose one PNG image.' );
 			return;
 		}
-		const [ file ] = files;
-		if ( ! file.name.toLowerCase().endsWith( '.png' ) ) {
-			setError( `Choose a PNG image instead of ${ file.name }.` );
+		const [ chosen ] = files;
+		if ( getExtension( chosen.name ).toLowerCase() !== '.png' ) {
+			setError( `Couldn’t use ${ chosen.name }. Choose a PNG image.` );
 			return;
 		}
-
-		setFileName( file.name );
+		setFile( chosen );
 		setError( '' );
+		speak( `${ chosen.name } selected.` );
+	}
+
+	function removeFile() {
+		if ( ! file ) {
+			return;
+		}
+		speak( `${ file.name } removed.` );
+		setFile( undefined );
+		setError( '' );
+		// The remove button is gone, so move focus back to the drop area.
+		chooseRef.current?.focus();
 	}
 
 	return (
-		<fieldset
+		<Fieldset.Root
+			className={ styles.field }
 			disabled={ disabled }
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }
-			style={ {
-				position: 'relative',
-				minInlineSize: 0,
-				padding: 'var(--wpds-dimension-padding-lg)',
-				border: 'var(--wpds-border-width-xs) dashed var(--wpds-color-stroke-surface-neutral)',
-				borderRadius: 'var(--wpds-border-radius-md)',
-			} }
 		>
-			<legend>Cover image</legend>
-			<Stack direction="column" gap="sm" align="center">
-				<span>
-					{ disabled
-						? 'File selection is disabled.'
-						: 'Drop one PNG image here, or choose a file.' }
-				</span>
-				<FormFileUpload
-					accept=".png"
-					onChange={ ( { currentTarget } ) => {
-						selectFiles( Array.from( currentTarget.files ?? [] ) );
-						currentTarget.value = '';
-					} }
-					render={ ( { openFileDialog } ) => (
+			<Fieldset.Legend>Cover image</Fieldset.Legend>
+			<FormFileUpload
+				accept=".png,image/png"
+				onChange={ ( { currentTarget } ) => {
+					chooseFiles( Array.from( currentTarget.files ?? [] ) );
+					// Clear the input, so choosing the same file again fires
+					// another change.
+					currentTarget.value = '';
+				} }
+				render={ ( { openFileDialog } ) => (
+					<Stack
+						direction="row"
+						align="center"
+						gap="sm"
+						className={ styles.surface }
+					>
 						<Button
-							variant="outline"
-							tone="neutral"
+							ref={ chooseRef }
+							variant="unstyled"
+							className={ styles.choose }
 							disabled={ disabled }
+							aria-label={
+								file ? `Replace ${ file.name }` : undefined
+							}
+							aria-describedby={ error ? errorId : undefined }
 							onClick={ openFileDialog }
 						>
-							Choose file…
+							{ file ? (
+								<FileSummary file={ file } />
+							) : (
+								<Stack
+									render={ <span /> }
+									direction="row"
+									align="center"
+									gap="md"
+								>
+									<span className={ styles.thumbnail }>
+										<Icon icon={ upload } />
+									</span>
+									<Text>
+										Choose image{ ' ' }
+										<span className={ styles.weak }>
+											or drag and drop here
+										</span>
+									</Text>
+								</Stack>
+							) }
 						</Button>
-					) }
-				/>
-				<output style={ { overflowWrap: 'anywhere' } }>
-					{ fileName && (
-						<>
-							Selected: { fileName }
-							<br />
-						</>
-					) }
-					{ error }
-				</output>
-			</Stack>
-			{ ! disabled && (
-				<DropZone
-					label="Drop cover image"
-					onFilesDrop={ selectFiles }
-				/>
-			) }
-		</fieldset>
+						{ file && (
+							<IconButton
+								className={ styles.remove }
+								icon={ closeSmall }
+								label={ `Remove ${ file.name }` }
+								variant="minimal"
+								tone="neutral"
+								size="compact"
+								onClick={ removeFile }
+							/>
+						) }
+						{ ! disabled && (
+							<DropZone
+								label="Drop to use as the cover image"
+								onFilesDrop={ chooseFiles }
+							/>
+						) }
+					</Stack>
+				) }
+			/>
+			<Fieldset.Description>
+				PNG only. It appears above the post title.
+			</Fieldset.Description>
+			<div aria-live="polite">
+				{ error && (
+					<ValidityIndicator
+						id={ errorId }
+						type="invalid"
+						message={ error }
+					/>
+				) }
+			</div>
+		</Fieldset.Root>
 	);
 }

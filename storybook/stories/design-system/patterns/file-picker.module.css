@@ -1,0 +1,112 @@
+/* A fieldset is as wide as its content by default, which stops truncation. */
+.field {
+	min-inline-size: 0;
+}
+
+/*
+ * The drop area and the selected-file rows share one surface, so a field
+ * keeps its size and shape when a file is chosen.
+ */
+.surface {
+	position: relative;
+	min-inline-size: 0;
+	border:
+		var(--wpds-border-width-xs) dashed
+		var(--wpds-color-stroke-surface-neutral-strong);
+	border-radius: var(--wpds-border-radius-md);
+	background: var(--wpds-color-background-surface-neutral-weak);
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
+/* A row shows a file that is already chosen, so it isn't a drop target. */
+.row {
+	border-style: solid;
+	border-color: var(--wpds-color-stroke-surface-neutral);
+	padding: var(--wpds-dimension-padding-lg);
+	padding-inline-end: var(--wpds-dimension-padding-sm);
+}
+
+/* The button fills the surface, so the whole drop area opens the picker. */
+.choose {
+	flex: 1;
+	min-inline-size: 0;
+	padding: var(--wpds-dimension-padding-lg);
+	border-radius: inherit;
+	color: inherit;
+	text-align: start;
+
+	&:not([data-disabled]) {
+		cursor: var(--wpds-cursor-control);
+	}
+
+	&[data-disabled] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+}
+
+/* Leave room for a remove button beside the picker button. */
+.surface:has(> .remove) {
+	padding-inline-end: var(--wpds-dimension-padding-sm);
+}
+
+.surface:has(> .choose:not([data-disabled]):hover) {
+	background: var(--wpds-color-background-surface-neutral);
+}
+
+.thumbnail {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	inline-size: var(--wpds-dimension-size-md);
+	block-size: var(--wpds-dimension-size-md);
+	overflow: hidden;
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+
+	& img {
+		inline-size: 100%;
+		block-size: 100%;
+		object-fit: cover;
+	}
+}
+
+.details {
+	min-inline-size: 0;
+}
+
+/*
+ * Truncate the start of the name and keep the extension, so
+ * "proof-of-shipping-from-carrier.pdf" becomes "proof-of-shipp….pdf".
+ */
+.name {
+	display: flex;
+	min-inline-size: 0;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	white-space: nowrap;
+}
+
+.name-start {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.name-end {
+	flex: none;
+}
+
+.weak {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* Covers the rows and the drop area of a field that accepts several files. */
+.drop-target {
+	position: relative;
+}
