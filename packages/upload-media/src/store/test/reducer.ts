@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import reducer from '../reducer';
 import {
 	ItemStatus,
+	type Operation,
 	OperationType,
 	type QueueItem,
 	type State,
@@ -52,6 +53,7 @@ describe( 'reducer', () => {
 					{
 						id: '2',
 						status: ItemStatus.Processing,
+						progress: 0,
 					},
 				],
 			} );
@@ -357,6 +359,7 @@ describe( 'reducer', () => {
 						status: ItemStatus.Processing,
 						currentOperation: undefined,
 						operations: [],
+						progress: 100,
 					},
 				],
 			} );
@@ -770,6 +773,272 @@ describe( 'reducer', () => {
 				progress: 50,
 			} );
 
+			expect( state.queue[ 0 ].progress ).toBe( 50 );
+		} );
+	} );
+
+	describe( 'progress', () => {
+		const initialState: State = {
+			queueStatus: 'active',
+			failureCount: 0,
+			blobUrls: {},
+			settings: {
+				mediaUpload: vi.fn(),
+				maxConcurrentUploads: 5,
+				maxConcurrentImageProcessing: 2,
+			},
+			queue: [],
+		};
+
+		it( 'advances as operations finish', () => {
+			let state = reducer( initialState, {
+				type: Type.Add,
+				item: {
+					id: '1',
+					status: ItemStatus.Processing,
+					operations: [
+						OperationType.Prepare,
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize,
+					],
+				} as QueueItem,
+			} );
+			expect( state.queue[ 0 ].progress ).toBe( 0 );
+
+			state = reducer( state, {
+				type: Type.OperationFinish,
+				id: '1',
+				item: {},
+			} );
+			expect( state.queue[ 0 ].progress ).toBe( 25 );
+		} );
+
+		it( 'counts sub-size operations towards the parent', () => {
+			let state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Finalize ],
+							progress: 50,
+						} as QueueItem,
+					],
+				},
+				{
+					type: Type.Add,
+					item: {
+						id: '2',
+						parentId: '1',
+						status: ItemStatus.Processing,
+						operations: [
+							OperationType.ResizeCrop,
+							OperationType.Upload,
+						],
+					} as QueueItem,
+				}
+			);
+			// Queuing a sub-size does not move progress backwards.
+			expect( state.queue[ 0 ].progress ).toBe( 50 );
+			expect( state.queue[ 1 ].progress ).toBeUndefined();
+
+			state = reducer( state, {
+				type: Type.OperationFinish,
+				id: '2',
+				item: {},
+			} );
+			state = reducer( state, {
+				type: Type.OperationFinish,
+				id: '2',
+				item: {},
+			} );
+			// The remaining half is spread over the three operations left.
+			expect( state.queue[ 0 ].progress ).toBe( 84 );
+		} );
+
+		it( 'drops a removed sub-size from the total', () => {
+			const state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Finalize ],
+							progress: 50,
+						} as QueueItem,
+						{
+							id: '2',
+							parentId: '1',
+							status: ItemStatus.Processing,
+							operations: [
+								OperationType.ResizeCrop,
+								OperationType.Upload,
+							],
+						} as QueueItem,
+					],
+				},
+				{
+					type: Type.Remove,
+					id: '2',
+				}
+			);
+			// Two of the three operations left went with the failed sub-size.
+			expect( state.queue[ 0 ].progress ).toBe( 83 );
+		} );
+		it( 'keeps advancing while sub-sizes upload', () => {
+			let state = reducer( initialState, {
+				type: Type.Add,
+				item: {
+					id: '1',
+					status: ItemStatus.Processing,
+					operations: [
+						OperationType.Prepare,
+						OperationType.Upload,
+						OperationType.ThumbnailGeneration,
+						OperationType.Finalize,
+					],
+				} as QueueItem,
+			} );
+			const finish = ( id: string ) => {
+				state = reducer( state, {
+					type: Type.OperationFinish,
+					id,
+					item: {},
+				} );
+				return state.queue[ 0 ].progress as number;
+			};
+
+			finish( '1' );
+			expect( finish( '1' ) ).toBe( 50 );
+
+			// Thumbnail generation queues ten sub-sizes before it finishes.
+			for ( let i = 0; i < 10; i++ ) {
+				state = reducer( state, {
+					type: Type.Add,
+					item: {
+						id: `child-${ i }`,
+						parentId: '1',
+						status: ItemStatus.Processing,
+						operations: [
+							OperationType.ResizeCrop,
+							OperationType.Upload,
+						],
+					} as QueueItem,
+				} );
+			}
+
+			let previous = finish( '1' );
+			expect( previous ).toBeGreaterThan( 50 );
+			for ( let i = 0; i < 10; i++ ) {
+				for ( let j = 0; j < 2; j++ ) {
+					const progress = finish( `child-${ i }` );
+					expect( progress ).toBeGreaterThan( previous );
+					previous = progress;
+				}
+			}
+			expect( previous ).toBeLessThan( 100 );
+			expect( finish( '1' ) ).toBe( 100 );
+		} );
+
+		it( 'continues from an explicitly set progress', () => {
+			let state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [
+								OperationType.Upload,
+								OperationType.Finalize,
+							],
+							progress: 90,
+						} as QueueItem,
+					],
+				},
+				{ type: Type.UpdateProgress, id: '1', progress: 10 }
+			);
+			state = reducer( state, {
+				type: Type.OperationFinish,
+				id: '1',
+				item: {},
+			} );
+			expect( state.queue[ 0 ].progress ).toBe( 55 );
+		} );
+
+		it( 'does not advance when an item without operations finishes', () => {
+			const state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Finalize ],
+							progress: 50,
+						} as QueueItem,
+						{
+							id: '2',
+							parentId: '1',
+							status: ItemStatus.Processing,
+							operations: [] as Operation[],
+						} as QueueItem,
+					],
+				},
+				{ type: Type.OperationFinish, id: '2', item: {} }
+			);
+			expect( state.queue[ 0 ].progress ).toBe( 50 );
+		} );
+
+		it( 'counts nested sub-size operations towards the top-level item', () => {
+			const state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Finalize ],
+							progress: 50,
+						} as QueueItem,
+						{
+							id: '2',
+							parentId: '1',
+							status: ItemStatus.Processing,
+							operations: [] as Operation[],
+						} as QueueItem,
+						{
+							id: '3',
+							parentId: '2',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Upload ],
+						} as QueueItem,
+					],
+				},
+				{ type: Type.OperationFinish, id: '3', item: {} }
+			);
+			expect( state.queue[ 0 ].progress ).toBe( 75 );
+			expect( state.queue[ 1 ].progress ).toBeUndefined();
+		} );
+
+		it( 'ignores an operation finishing for an unknown item', () => {
+			const state = reducer(
+				{
+					...initialState,
+					queue: [
+						{
+							id: '1',
+							status: ItemStatus.Processing,
+							operations: [ OperationType.Finalize ],
+							progress: 50,
+						} as QueueItem,
+					],
+				},
+				{ type: Type.OperationFinish, id: 'gone', item: {} }
+			);
 			expect( state.queue[ 0 ].progress ).toBe( 50 );
 		} );
 	} );

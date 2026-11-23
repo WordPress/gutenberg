@@ -10,6 +10,7 @@ import {
 	type PauseItemAction,
 	type PauseQueueAction,
 	type QueueItem,
+	type QueueItemId,
 	type RemoveAction,
 	type ResumeItemAction,
 	type ResumeQueueAction,
@@ -29,6 +30,65 @@ import {
 } from './constants';
 
 const noop = () => {};
+
+/**
+ * Advances the progress of the top-level item that an item counts towards.
+ *
+ * Moves progress by the share of remaining operations, the item's own and
+ * those of its sub-size items, that just finished or were dropped. Sub-sizes
+ * are only queued once the original has uploaded, so the total grows over
+ * time. Spreading what is left of the bar over what is left of the work keeps
+ * progress moving with every operation.
+ *
+ * @param queue Upload queue, before the operations are taken off.
+ * @param id    ID of the item whose operations finished or were dropped.
+ * @param count Number of operations that finished or were dropped.
+ *
+ * @return Updated queue.
+ */
+function advanceProgress(
+	queue: QueueItem[],
+	id: QueueItemId,
+	count: number
+): QueueItem[] {
+	let root = queue.find( ( item ) => item.id === id );
+	while ( root?.parentId ) {
+		const { parentId } = root;
+		root = queue.find( ( item ) => item.id === parentId );
+	}
+	if ( ! root || ! count ) {
+		return queue;
+	}
+
+	// Sub-size items are always queued after their parent.
+	const ids = new Set( [ root.id ] );
+	let remaining = 0;
+	for ( const item of queue ) {
+		if ( item.parentId && ids.has( item.parentId ) ) {
+			ids.add( item.id );
+		}
+		if ( ids.has( item.id ) ) {
+			remaining += item.operations?.length ?? 0;
+		}
+	}
+	if ( ! remaining ) {
+		return queue;
+	}
+
+	const current = root.progress ?? 0;
+	const progress = Math.round(
+		current +
+			( ( 100 - current ) * Math.min( count, remaining ) ) / remaining
+	);
+	if ( progress === root.progress ) {
+		return queue;
+	}
+
+	const target = root;
+	return queue.map( ( item ) =>
+		item === target ? { ...item, progress } : item
+	);
+}
 
 const DEFAULT_STATE: State = {
 	queue: [],
@@ -66,7 +126,7 @@ type Action =
 function reducer(
 	state = DEFAULT_STATE,
 	action: Action = { type: Type.Unknown }
-) {
+): State {
 	switch ( action.type ) {
 		case Type.PauseQueue: {
 			return {
@@ -111,7 +171,12 @@ function reducer(
 		case Type.Add:
 			return {
 				...state,
-				queue: [ ...state.queue, action.item ],
+				queue: [
+					...state.queue,
+					action.item.parentId || action.item.progress !== undefined
+						? action.item
+						: { ...action.item, progress: 0 },
+				],
 			};
 
 		case Type.Cancel: {
@@ -184,11 +249,23 @@ function reducer(
 				),
 			};
 
-		case Type.Remove:
+		case Type.Remove: {
+			// A dropped sub-size's operations no longer hold its parent back.
+			const removed = state.queue.find(
+				( item ) => item.id === action.id
+			);
+			const queue = removed?.parentId
+				? advanceProgress(
+						state.queue,
+						action.id,
+						removed.operations?.length ?? 0
+					)
+				: state.queue;
 			return {
 				...state,
-				queue: state.queue.filter( ( item ) => item.id !== action.id ),
+				queue: queue.filter( ( item ) => item.id !== action.id ),
 			};
+		}
 
 		case Type.OperationStart: {
 			return {
@@ -222,10 +299,20 @@ function reducer(
 				} ),
 			};
 
-		case Type.OperationFinish:
+		case Type.OperationFinish: {
+			// Sub-size operations count towards their parent's progress.
+			const finished = state.queue.find(
+				( item ) => item.id === action.id
+			);
+			const queue = advanceProgress(
+				state.queue,
+				action.id,
+				finished?.operations?.length ? 1 : 0
+			);
+
 			return {
 				...state,
-				queue: state.queue.map( ( item ): QueueItem => {
+				queue: queue.map( ( item ): QueueItem => {
 					if ( item.id !== action.id ) {
 						return item;
 					}
@@ -256,6 +343,7 @@ function reducer(
 					};
 				} ),
 			};
+		}
 
 		case Type.CacheBlobUrl: {
 			const blobUrls = state.blobUrls[ action.id ] || [];
