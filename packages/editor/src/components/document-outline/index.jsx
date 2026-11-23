@@ -7,6 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { Path, SVG, Line, Rect } from '@wordpress/components';
 import DocumentOutlineItem from './item';
 import { store as editorStore } from '../../store';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 
 /**
  * Module constants
@@ -103,15 +104,23 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { title, isTitleSupported } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
-		const { getPostType } = select( coreStore );
-		const postType = getPostType( getEditedPostAttribute( 'type' ) );
-		return {
-			title: getEditedPostAttribute( 'title' ),
-			isTitleSupported: postType?.supports?.title ?? false,
-		};
-	} );
+	const { title, isTitleSupported, isTitleRendered } = useSelect(
+		( select ) => {
+			const { getEditedPostAttribute, getRenderingMode } =
+				select( editorStore );
+			const { getPostType } = select( coreStore );
+			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const postType = getPostType( postTypeSlug );
+			return {
+				title: getEditedPostAttribute( 'title' ),
+				isTitleSupported: postType?.supports?.title ?? false,
+				isTitleRendered:
+					getRenderingMode() === 'post-only' &&
+					! DESIGN_POST_TYPES.includes( postTypeSlug ),
+			};
+		},
+		[]
+	);
 	const blocks = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants, getBlock } =
 			select( blockEditorStore );
@@ -158,9 +167,7 @@ export default function DocumentOutline( {
 		);
 	}
 
-	// Not great but it's the simplest way to locate the title right now.
-	const titleNode = document.querySelector( '.editor-post-title__input' );
-	const hasTitle = isTitleSupported && title && titleNode;
+	const hasTitle = isTitleSupported && !! title && isTitleRendered;
 	const countByLevel = headings.reduce(
 		( acc, heading ) => ( {
 			...acc,
@@ -184,7 +191,7 @@ export default function DocumentOutline( {
 						level={ __( 'Title' ) }
 						isValid
 						onSelect={ onSelect }
-						href={ `#${ titleNode.id }` }
+						href="#"
 						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }
