@@ -64,10 +64,11 @@ export function addFiles( filenames: string[] ) {
 /**
  * Advances the tracker by a number of successfully uploaded files.
  *
- * @param count Number of files that finished since the last call.
+ * @param count    Number of files that finished since the last call.
+ * @param filename Optional filename of the finished file to remove from pending.
  */
-export function advance( count: number ) {
-	finish( count, 0 );
+export function advance( count: number, filename?: string ) {
+	finish( count, 0, filename );
 }
 
 /**
@@ -77,25 +78,39 @@ export function advance( count: number ) {
  * but they are also tallied so consumers can tell an empty queue that uploaded
  * everything from one that uploaded nothing.
  *
- * @param count Number of files that failed since the last call.
+ * @param count    Number of files that failed since the last call.
+ * @param filename Optional filename of the failed file to remove from pending.
  */
-export function advanceFailed( count = 1 ) {
-	finish( count, count );
+export function advanceFailed( count = 1, filename?: string ) {
+	finish( count, count, filename );
 }
 
 /**
  * Advances the tracker by a number of finished files.
  *
- * @param count  Number of files that finished since the last call.
- * @param failed How many of those files failed.
+ * @param count    Number of files that finished since the last call.
+ * @param failed   How many of those files failed.
+ * @param filename Optional filename of the finished file to remove from pending.
  */
-function finish( count: number, failed: number ) {
+function finish( count: number, failed: number, filename?: string ) {
 	if ( ! state || count <= 0 ) {
 		return;
 	}
 	cumulativeFailures += failed;
 	const completed = Math.min( state.total, state.completed + count );
-	const pending = state.pending.slice( count );
+	let pending: string[];
+	if ( filename !== undefined && count === 1 ) {
+		const index = state.pending.indexOf( filename );
+		pending =
+			index !== -1
+				? [
+						...state.pending.slice( 0, index ),
+						...state.pending.slice( index + 1 ),
+					]
+				: state.pending.slice( 1 );
+	} else {
+		pending = state.pending.slice( count );
+	}
 	if ( completed >= state.total ) {
 		state = null;
 	} else {

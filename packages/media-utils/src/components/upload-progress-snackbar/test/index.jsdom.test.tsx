@@ -349,4 +349,17 @@ describe( 'UploadProgressSnackbar', () => {
 		unmountSecond();
 		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
 	} );
+
+	it( 'does not duplicate notices when multiple instances mount in the same render while an upload is already in flight', () => {
+		mockQueue( [ makeItem( '1', 'photo.jpg' ) ] );
+		render(
+			<>
+				<UploadProgressSnackbar />
+				<UploadProgressSnackbar />
+			</>
+		);
+
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+	} );
 } );

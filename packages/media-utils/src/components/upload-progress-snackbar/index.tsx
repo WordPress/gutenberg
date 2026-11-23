@@ -140,7 +140,6 @@ export default function UploadProgressSnackbar() {
 		getLeaderId,
 		getLeaderId
 	);
-	const isLeader = leaderId === undefined || leaderId === instanceId;
 
 	const { items, csmFailureCount } = useSelect( ( select ) => {
 		const storeSelect = select( uploadStore ) as
@@ -193,11 +192,7 @@ export default function UploadProgressSnackbar() {
 	// instance unmounts. If another instance is still mounted, hand leadership
 	// over to it so an active upload notice continues uninterrupted.
 	useEffect( () => {
-		const wasLeader = mountedInstances.size === 0;
 		mountedInstances.add( instanceId );
-		if ( wasLeader ) {
-			notifyLeaderChange();
-		}
 
 		return () => {
 			const wasCurrentLeader = getLeaderId() === instanceId;
@@ -205,14 +200,15 @@ export default function UploadProgressSnackbar() {
 			if ( mountedInstances.size === 0 ) {
 				resetSharedController();
 				removeNotice( NOTICE_ID );
-			} else if ( wasCurrentLeader ) {
+			}
+			if ( wasCurrentLeader ) {
 				notifyLeaderChange();
 			}
 		};
 	}, [ instanceId, removeNotice ] );
 
 	useEffect( () => {
-		if ( ! isLeader ) {
+		if ( getLeaderId() !== instanceId ) {
 			return;
 		}
 
@@ -341,7 +337,8 @@ export default function UploadProgressSnackbar() {
 			},
 		} );
 	}, [
-		isLeader,
+		instanceId,
+		leaderId,
 		remaining,
 		sessionTotal,
 		csmOriginals,

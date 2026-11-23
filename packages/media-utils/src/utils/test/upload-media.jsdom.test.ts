@@ -329,4 +329,26 @@ describe( 'uploadMedia', () => {
 
 		expect( getState() ).toBeNull();
 	} );
+
+	it( 'removes the failed file from pending when a later file in the batch fails validation while an earlier file is uploading', () => {
+		( uploadToServer as Mock ).mockImplementation(
+			() => new Promise( () => {} )
+		);
+
+		uploadMedia( {
+			filesList: [ imageFile, xmlFile ],
+			allowedTypes: [ 'image' ],
+			wpAllowedMimeTypes: {
+				jpeg: 'image/jpeg',
+				xml: 'application/xml',
+			},
+		} );
+
+		expect( getState() ).toEqual( {
+			total: 2,
+			completed: 1,
+			pending: [ 'test.jpeg' ],
+		} );
+		expect( getFailureCount() ).toBe( 1 );
+	} );
 } );

@@ -106,13 +106,14 @@ export function uploadMedia( {
 	};
 
 	for ( const mediaFile of filesList ) {
+		const fileName = mediaFile?.name || '';
 		// Verify if user is allowed to upload this mime type.
 		// Defer to the server when type not detected.
 		try {
 			validateMimeTypeForUser( mediaFile, wpAllowedMimeTypes );
 		} catch ( error: unknown ) {
 			if ( ! isTransportOnly ) {
-				trackFailure( 1 );
+				trackFailure( 1, fileName );
 			}
 			onError?.( error as Error );
 			continue;
@@ -124,7 +125,7 @@ export function uploadMedia( {
 			validateMimeType( mediaFile, allowedTypes );
 		} catch ( error: unknown ) {
 			if ( ! isTransportOnly ) {
-				trackFailure( 1 );
+				trackFailure( 1, fileName );
 			}
 			onError?.( error as Error );
 			continue;
@@ -135,7 +136,7 @@ export function uploadMedia( {
 			validateFileSize( mediaFile, maxUploadFileSize );
 		} catch ( error: unknown ) {
 			if ( ! isTransportOnly ) {
-				trackFailure( 1 );
+				trackFailure( 1, fileName );
 			}
 			onError?.( error as Error );
 			continue;
@@ -153,6 +154,7 @@ export function uploadMedia( {
 	}
 
 	validFiles.map( async ( file, index ) => {
+		const fileName = file?.name || '';
 		try {
 			const attachment = await uploadToServer(
 				file,
@@ -161,13 +163,13 @@ export function uploadMedia( {
 			);
 			setAndUpdateFiles( index, attachment );
 			if ( ! isTransportOnly ) {
-				trackAdvance( 1 );
+				trackAdvance( 1, fileName );
 			}
 		} catch ( error ) {
 			// Reset to empty on failure.
 			setAndUpdateFiles( index, null );
 			if ( ! isTransportOnly ) {
-				trackFailure( 1 );
+				trackFailure( 1, fileName );
 			}
 
 			onError?.(

@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `uploadMedia` / `MediaEdit`: Track media upload progress in `uploadMedia` and mount `UploadProgressSnackbar` inside `MediaEditControl` so upload progress snackbars display on screens outside the editor. ([#87121](https://github.com/WordPress/gutenberg/issues/87121))
+-   `uploadMedia` / `MediaEdit`: Track media upload progress in `uploadMedia` and mount `UploadProgressSnackbar` inside `MediaEditControl` so upload progress snackbars display on screens outside the editor. ([#87121](https://github.com/WordPress/gutenberg/pull/87121))
 
 ## 6.2.0 (2026-11-18)
 
