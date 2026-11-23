@@ -57,7 +57,8 @@
  * structural op is written to the overlay so auto-save persists it.
  */
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -76,6 +77,7 @@ import type { SuggestionMarker } from './marker';
 export type { SuggestionMarker };
 import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import {
+	blockExcerpt,
 	parseSuggestionPayload,
 	planStructuralReject,
 	structuralOpFromMarker,
@@ -86,6 +88,7 @@ import { getNoteIdsFromMetadata } from '../collab-sidebar/utils/metadata';
 import { createRevertGuard } from '../attribute-suggestions/revert-guard';
 import { unlock } from '../../lock-unlock';
 import { getBlockTreeVersion } from './block-tree-version';
+import { createPostOwnershipCheck } from './block-ownership';
 import { APPLIED, getDecision, getSuggestionStatus } from './suggestion-status';
 
 const BLOCK_EDITOR_STORE_NAME = 'core/block-editor';
@@ -498,11 +501,13 @@ function captureTreeSnapshot( blockEditor: any ) {
 
 /**
  * Whether a marker is a pending insertion the author may edit as part of it:
- * theirs, or one with no recorded author. Another author's suggested block
- * is suggested content like any other, so edits to it are suggestions.
+ * theirs, or one with no recorded author while the author is unresolved.
+ * Any other suggested block is suggested content like any other, so edits
+ * to it are suggestions.
  *
  * @param suggestion `metadata.suggestion` value.
- * @param authorId   Current author; omitted, any insertion counts.
+ * @param authorId   Current author, or null while unresolved; omitted, any
+ *                   insertion counts.
  * @return Whether it counts.
  */
 function isAuthorsInsertion(
@@ -512,10 +517,12 @@ function isAuthorsInsertion(
 	return (
 		suggestion?.type === 'pending-insert' &&
 		( authorId === undefined ||
-			authorId === null ||
-			suggestion.authorId === undefined ||
-			suggestion.authorId === null ||
-			String( suggestion.authorId ) === String( authorId ) )
+			( authorId === null
+				? suggestion.authorId === undefined ||
+					suggestion.authorId === null
+				: suggestion.authorId !== undefined &&
+					suggestion.authorId !== null &&
+					String( suggestion.authorId ) === String( authorId ) ) )
 	);
 }
 
@@ -1112,22 +1119,23 @@ export default function SuggestionStoreInterceptor() {
 		[]
 	);
 
-	// Mutable references read from inside the subscribe callback. Using refs
-	// avoids resubscribing when the session value changes.
-	const recordStructuralCaptureRef = useRef( recordStructuralCapture );
-	recordStructuralCaptureRef.current = recordStructuralCapture;
+	// Stored on every marker written, to attribute it and to tint the canvas
+	// preview with the suggester's avatar color. A marker with no author is
+	// nobody's and is never saved, so a session that started before the user
+	// resolved starts over once the id is known.
+	const currentUserId = useSelect(
+		( select ) =>
+			( select( coreStore ) as any )?.getCurrentUser?.()?.id ?? null,
+		[]
+	);
 
-	const getStructuralCapturesRef = useRef( getStructuralCaptures );
-	getStructuralCapturesRef.current = getStructuralCaptures;
-
-	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
-	clearStructuralCaptureRef.current = clearStructuralCapture;
-
-	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
-	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
-
-	const consumeUndoRedoAdoptionRef = useRef( consumeUndoRedoAdoption );
-	consumeUndoRedoAdoptionRef.current = consumeUndoRedoAdoption;
+	// Read from inside the subscribe callback, which must always call the
+	// latest session value without resubscribing when it changes.
+	const onRecordStructuralCapture = useEvent( recordStructuralCapture );
+	const onGetStructuralCaptures = useEvent( getStructuralCaptures );
+	const onClearStructuralCapture = useEvent( clearStructuralCapture );
+	const onConsumeInterceptorBypass = useEvent( consumeInterceptorBypass );
+	const onConsumeUndoRedoAdoption = useEvent( consumeUndoRedoAdoption );
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -1150,13 +1158,6 @@ export default function SuggestionStoreInterceptor() {
 		// `coreStore` may be unregistered in unit tests; the helper that
 		// reads suggestion comments handles a `null` selector defensively.
 		const coreSelect = registry.select( coreStore );
-
-		// Captured once at session start. Stored on every marker we write
-		// so the rendering layer can tint the canvas preview with the
-		// suggester's avatar color, the same way live cursors are tinted
-		// for collaborator presence. `null` for anonymous / unresolved
-		// users falls back to the suggestion-green default in CSS.
-		const currentUserId = coreSelect?.getCurrentUser?.()?.id ?? null;
 
 		// A block deferred in a previous Suggest session is seeded into the
 		// snapshot below like any other pre-existing block, so stale entries
@@ -1249,7 +1250,7 @@ export default function SuggestionStoreInterceptor() {
 			for ( const clientId of [ ...snapshot.keys() ] ) {
 				if ( ! live.has( clientId ) ) {
 					snapshot.delete( clientId );
-					clearStructuralCaptureRef.current( clientId );
+					onClearStructuralCapture( clientId );
 				}
 			}
 			for ( const clientId of liveClientIds ) {
@@ -1288,9 +1289,9 @@ export default function SuggestionStoreInterceptor() {
 		 * dispatches it: in the post editor it is reached only from
 		 * `useBlockSync`, which calls it when the controlling entity hands
 		 * down a new value (and with `[]` on unmount), plus `synchronizeTemplate`,
-		 * which is a template resync rather than a content edit. Wrapping the
-		 * store's action object is the same interception `SuggestionUndoGuard`
-		 * uses for undo/redo; the original is restored on cleanup.
+		 * which is a template resync rather than a content edit. The wrap is
+		 * on this editor's own block-editor store, which no other editor
+		 * shares; the original is restored on cleanup.
 		 *
 		 * Subscribers fire synchronously from within the dispatch, so the flag
 		 * is read by the very fire the reset triggers and needs no token
@@ -1396,7 +1397,7 @@ export default function SuggestionStoreInterceptor() {
 				 * not an undo have no token armed, so this is a no-op for
 				 * them.
 				 */
-				consumeUndoRedoAdoptionRef.current?.();
+				onConsumeUndoRedoAdoption();
 				adoptLiveTreeAsBaseline();
 				return;
 			}
@@ -1418,10 +1419,7 @@ export default function SuggestionStoreInterceptor() {
 			 * checked first so unrelated fires (selection changes) don't
 			 * consume the token before the entity → block sync arrives.
 			 */
-			if (
-				hasBaselineDrift() &&
-				consumeUndoRedoAdoptionRef.current?.()
-			) {
+			if ( hasBaselineDrift() && onConsumeUndoRedoAdoption() ) {
 				adoptLiveTreeAsBaseline();
 				return;
 			}
@@ -1429,6 +1427,25 @@ export default function SuggestionStoreInterceptor() {
 			const liveClientIds =
 				blockEditor.getClientIdsWithDescendants?.() ?? [];
 			const live = new Set( liveClientIds );
+
+			/*
+			 * Only the post's own blocks are captured. A block another entity
+			 * owns (the children of a synced pattern, a template part or a
+			 * navigation menu, or the template around Post Content) is saved
+			 * outside the post, where a marker would never be processed, and
+			 * its controlling block replaces it wholesale whenever that entity
+			 * changes. Such a block is adopted as it is.
+			 */
+			const ownership = createPostOwnershipCheck( registry );
+			// A parent that has just left the tree is judged by its nearest
+			// surviving ancestor.
+			const ownsChildrenOf = ( parentClientId: string | null ) => {
+				let parent = parentClientId;
+				while ( parent && ! live.has( parent ) ) {
+					parent = tree.parentByClientId.get( parent ) ?? null;
+				}
+				return ownership.ownsChildrenOf( parent );
+			};
 
 			/*
 			 * Insertions captured during this fire. A `replaceBlocks` shows up
@@ -1508,7 +1525,12 @@ export default function SuggestionStoreInterceptor() {
 				// out of interception so the applied attributes land on the
 				// live block. Adopt `current` as the new baseline so the
 				// next user edit diffs against the post-apply state.
-				if ( consumeInterceptorBypassRef.current?.( clientId ) ) {
+				if ( onConsumeInterceptorBypass( clientId ) ) {
+					snapshot.set( clientId, current );
+					continue;
+				}
+
+				if ( ! ownership.owns( clientId ) ) {
 					snapshot.set( clientId, current );
 					continue;
 				}
@@ -1680,13 +1702,11 @@ export default function SuggestionStoreInterceptor() {
 							? ( blockEditor.getBlockName?.( parentClientId ) ??
 								null )
 							: null,
-						block: insertedBlock,
+						// The block's text for the summary; the payload is
+						// too small for the block itself.
+						...blockExcerpt( insertedBlock ),
 					};
-					recordStructuralCaptureRef.current(
-						clientId,
-						block.name,
-						insertOp
-					);
+					onRecordStructuralCapture( clientId, block.name, insertOp );
 					insertionsThisFire.push( {
 						clientId,
 						blockName: block.name,
@@ -1841,7 +1861,15 @@ export default function SuggestionStoreInterceptor() {
 			// and capture the from/to anchors for the structural op.
 			// Apply leaves the block where it is; Reject dispatches
 			// `moveBlockToPosition` with the from-position.
-			const moves = detectMovedBlocks( liveClientIds, tree, blockEditor );
+			const moves = detectMovedBlocks(
+				liveClientIds,
+				tree,
+				blockEditor
+			).filter(
+				( move ) =>
+					ownsChildrenOf( move.fromParentClientId ) &&
+					ownsChildrenOf( move.toParentClientId )
+			);
 
 			/*
 			 * Containers emptied by this fire's moves (an outdent's nested
@@ -1895,7 +1923,7 @@ export default function SuggestionStoreInterceptor() {
 				) {
 					// The capture is resolved with the marker; a stale one
 					// must not be replayed by auto-save.
-					clearStructuralCaptureRef.current( move.clientId );
+					onClearStructuralCapture( move.clientId );
 					continue;
 				}
 				const block = blockEditor.getBlock?.( move.clientId );
@@ -2043,19 +2071,15 @@ export default function SuggestionStoreInterceptor() {
 						ownMarker === 'pending-insert'
 							? currentAttrs.metadata?.suggestion?.groupId
 							: undefined;
-					recordStructuralCaptureRef.current(
-						move.clientId,
-						block.name,
-						{
-							type: 'block-insert-after',
-							clientId: move.clientId,
-							blockName: block.name,
-							anchorClientId: move.toAnchorClientId,
-							parentClientId: move.toParentClientId,
-							block,
-							...( groupId ? { groupId } : {} ),
-						}
-					);
+					onRecordStructuralCapture( move.clientId, block.name, {
+						type: 'block-insert-after',
+						clientId: move.clientId,
+						blockName: block.name,
+						anchorClientId: move.toAnchorClientId,
+						parentClientId: move.toParentClientId,
+						...blockExcerpt( block ),
+						...( groupId ? { groupId } : {} ),
+					} );
 					continue;
 				}
 				/*
@@ -2069,9 +2093,8 @@ export default function SuggestionStoreInterceptor() {
 				const existingMarker = currentAttrs.metadata?.suggestion;
 				const fromParentBlock =
 					existingMarker?.type === 'pending-move'
-						? getStructuralCapturesRef
-								.current()
-								.get( move.clientId )?.op?.fromParentBlock
+						? onGetStructuralCaptures().get( move.clientId )?.op
+								?.fromParentBlock
 						: dissolvedParentRecord( move.fromParentClientId );
 				const from =
 					existingMarker?.type === 'pending-move'
@@ -2117,7 +2140,7 @@ export default function SuggestionStoreInterceptor() {
 				} finally {
 					isDispatchingOwnWrite = false;
 				}
-				recordStructuralCaptureRef.current( move.clientId, block.name, {
+				onRecordStructuralCapture( move.clientId, block.name, {
 					type: 'block-move',
 					clientId: move.clientId,
 					blockName: block.name,
@@ -2145,6 +2168,18 @@ export default function SuggestionStoreInterceptor() {
 					// paragraph must not propose removing it. Forget it.
 					if ( isDeferredInsertion( clientId ) ) {
 						unmarkDeferredInsertion( clientId );
+						continue;
+					}
+					// A block another entity owned is not the post's to
+					// propose removing, and putting it back would fight the
+					// controlling block's own sync.
+					if (
+						! ownsChildrenOf(
+							tree.parentByClientId.get( clientId ) ?? null
+						)
+					) {
+						snapshot.delete( clientId );
+						onClearStructuralCapture( clientId );
 						continue;
 					}
 					// "Apply / reject landing": when another client
@@ -2194,7 +2229,7 @@ export default function SuggestionStoreInterceptor() {
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );
-						clearStructuralCaptureRef.current( clientId );
+						onClearStructuralCapture( clientId );
 						continue;
 					}
 					removedIds.push( clientId );
@@ -2357,22 +2392,18 @@ export default function SuggestionStoreInterceptor() {
 					// so "Remove block: paragraph" says which paragraph.
 					const removedParentClientId =
 						tree.parentByClientId.get( clientId ) ?? null;
-					recordStructuralCaptureRef.current(
+					onRecordStructuralCapture( clientId, block?.name ?? '', {
+						type: 'block-remove',
 						clientId,
-						block?.name ?? '',
-						{
-							type: 'block-remove',
-							clientId,
-							blockName: block?.name ?? '',
-							parentBlockName: removedParentClientId
-								? ( tree.blocksByClientId.get(
-										removedParentClientId
-									)?.name ?? null )
-								: null,
-							...( groupId ? { groupId } : {} ),
-							block,
-						}
-					);
+						blockName: block?.name ?? '',
+						parentBlockName: removedParentClientId
+							? ( tree.blocksByClientId.get(
+									removedParentClientId
+								)?.name ?? null )
+							: null,
+						...( groupId ? { groupId } : {} ),
+						...blockExcerpt( block ),
+					} );
 				}
 
 				/*
@@ -2414,7 +2445,7 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
-					recordStructuralCaptureRef.current(
+					onRecordStructuralCapture(
 						insertion.clientId,
 						insertion.blockName,
 						{ ...insertion.op, groupId }
@@ -2460,6 +2491,7 @@ export default function SuggestionStoreInterceptor() {
 		};
 	}, [
 		isSuggestMode,
+		currentUserId,
 		registry,
 		markDeferredInsertion,
 		unmarkDeferredInsertion,
@@ -2467,6 +2499,11 @@ export default function SuggestionStoreInterceptor() {
 		clearDeferredInsertions,
 		hasInterceptorBypass,
 		noteHistoryCapture,
+		onRecordStructuralCapture,
+		onGetStructuralCaptures,
+		onClearStructuralCapture,
+		onConsumeInterceptorBypass,
+		onConsumeUndoRedoAdoption,
 	] );
 
 	return null;

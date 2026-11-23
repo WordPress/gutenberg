@@ -259,7 +259,12 @@ describe( 'getCodeEditorUnavailableReason', () => {
 
 	it( 'returns a reason in the suggest intent', () => {
 		expect(
-			getCodeEditorUnavailableReason( { editorIntent: 'suggest' } )
+			getCodeEditorUnavailableReason( {
+				editorIntent: 'suggest',
+				editorIntentPost: { postType: 'post', postId: 1 },
+				postType: 'post',
+				postId: 1,
+			} )
 		).toBe(
 			'Raw HTML edits cannot be captured as suggestions. Switch to Editing to use the code editor.'
 		);

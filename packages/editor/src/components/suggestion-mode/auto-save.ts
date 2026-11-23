@@ -30,7 +30,9 @@
  *     mid-session (their accept/reject flips its `status`). Before each
  *     update the comment is re-read via core-data; if the linkage is stale
  *     the next save creates a fresh note. A marker another author wrote
- *     (`authorId` differs from the current user) is theirs to save.
+ *     (`authorId` differs from the current user) is theirs to save, and one
+ *     that records no author is nobody's. Nothing is saved until the
+ *     current user is known.
  *
  * Refs are used heavily because the provider callbacks are recreated
  * whenever `postModified` changes but in-flight saves always need the latest
@@ -40,6 +42,7 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import { useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
@@ -69,6 +72,14 @@ import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 const AUTOSAVE_DEBOUNCE_MS = 1500;
+
+/*
+ * A save that fails is retried a bounded number of times. Without a retry a
+ * transient REST failure leaves the marker in content with no note until the
+ * user happens to edit that block again.
+ */
+const AUTOSAVE_RETRY_MS = 5000;
+const AUTOSAVE_MAX_ATTEMPTS = 3;
 
 /** Queue key for the post title, which is not a block. */
 export const POST_TITLE_CLIENT_ID = '__post_title__';
@@ -162,6 +173,8 @@ export function operationsForBlock(
 interface Tracked {
 	commentId: number | null;
 	syncedOpsKey: string | null;
+	/** Consecutive failed saves of the current operations. */
+	failures: number;
 }
 
 /**
@@ -174,7 +187,8 @@ interface Tracked {
  *
  * @param note          The core-data comment record, if resolved.
  * @param postId        The current post id.
- * @param currentUserId The current user id, or null while unresolved.
+ * @param currentUserId The current user id, or null while unresolved, when
+ *                      nobody's note is actionable.
  * @return Whether auto-save may update or trash the note.
  */
 function isActionableNote(
@@ -188,7 +202,8 @@ function isActionableNote(
 		isPendingStatus( getSuggestionStatus( note ) ) &&
 		note.type === 'note' &&
 		Number( note.post ) === Number( postId ) &&
-		( currentUserId === null || Number( note.author ) === currentUserId )
+		currentUserId !== null &&
+		Number( note.author ) === currentUserId
 	);
 }
 
@@ -261,17 +276,12 @@ export default function SuggestionAutoSave() {
 		[]
 	);
 
-	// Provider callbacks are captured in refs: they change reference
-	// whenever `postModified` updates, but the in-flight queue should always
-	// call the latest version.
-	const createRef = useRef( createSuggestion );
-	createRef.current = createSuggestion;
-	const updateRef = useRef( updateSuggestion );
-	updateRef.current = updateSuggestion;
-	const deleteRef = useRef( deleteSuggestion );
-	deleteRef.current = deleteSuggestion;
-	const proposalsRef = useRef( proposals );
-	proposalsRef.current = proposals;
+	// Provider callbacks change reference whenever `postModified` updates,
+	// but the in-flight queue should always call the latest version.
+	const onCreate = useEvent( createSuggestion );
+	const onUpdate = useEvent( updateSuggestion );
+	const onDelete = useEvent( deleteSuggestion );
+	const getProposals = useEvent( () => proposals );
 
 	// Per-clientId debounce timer.
 	const timersRef = useRef(
@@ -290,7 +300,7 @@ export default function SuggestionAutoSave() {
 	const track = useCallback( ( clientId: string ): Tracked => {
 		let tracked = trackedRef.current.get( clientId );
 		if ( ! tracked ) {
-			tracked = { commentId: null, syncedOpsKey: null };
+			tracked = { commentId: null, syncedOpsKey: null, failures: 0 };
 			trackedRef.current.set( clientId, tracked );
 		}
 		return tracked;
@@ -341,6 +351,11 @@ export default function SuggestionAutoSave() {
 		[ registry, readBlock, track ]
 	);
 
+	// `schedule` is built on `syncOnce`, which retries through it.
+	const scheduleRef = useRef< ( clientId: string, delay?: number ) => void >(
+		() => {}
+	);
+
 	const syncOnce = useCallback(
 		async ( clientId: string ) => {
 			let operations: SuggestionOperation[];
@@ -351,7 +366,7 @@ export default function SuggestionAutoSave() {
 			let proposalNoteId: number | undefined;
 			const proposalId = proposalIdFromClientId( clientId );
 			if ( proposalId !== null ) {
-				const proposal = proposalsRef.current?.[ proposalId ];
+				const proposal = getProposals()?.[ proposalId ];
 				operations = postOperationsFromProposal( proposal );
 				proposalNoteId = proposal?.commentId;
 			} else {
@@ -372,18 +387,23 @@ export default function SuggestionAutoSave() {
 					block.blockEditor
 				);
 			}
+			const coreSelect: any = registry.select( coreStore );
+			const userId: number | null =
+				coreSelect.getCurrentUser?.()?.id ?? null;
+			if ( userId === null ) {
+				// Nothing is anyone's until the current user is known; the
+				// pass that follows their resolving schedules it again.
+				return;
+			}
 			const tracked = track( clientId );
 			const fingerprint = fingerprintOperations( operations );
 			if ( fingerprint === tracked.syncedOpsKey ) {
 				return;
 			}
 
-			const coreSelect: any = registry.select( coreStore );
 			const postId: number | undefined = (
 				registry.select( STORE_NAME ) as any
 			 ).getCurrentPostId?.();
-			const userId: number | null =
-				coreSelect.getCurrentUser?.()?.id ?? null;
 			let commentId: number | null = tracked.commentId;
 			if ( ! commentId && ( marker || proposalNoteId ) ) {
 				/*
@@ -483,7 +503,7 @@ export default function SuggestionAutoSave() {
 			try {
 				if ( operations.length === 0 ) {
 					if ( commentId ) {
-						await deleteRef.current( {
+						await onDelete( {
 							commentId,
 							clientId:
 								proposalId !== null ? undefined : clientId,
@@ -491,14 +511,14 @@ export default function SuggestionAutoSave() {
 						writeCommentId( clientId, null );
 					}
 				} else if ( commentId ) {
-					await updateRef.current( {
+					await onUpdate( {
 						commentId,
 						blockName,
 						operations,
 					} );
 					tracked.commentId = commentId;
 				} else {
-					const saved = await createRef.current( {
+					const saved = await onCreate( {
 						clientId: proposalId !== null ? undefined : clientId,
 						blockName,
 						operations,
@@ -508,12 +528,27 @@ export default function SuggestionAutoSave() {
 					}
 				}
 				tracked.syncedOpsKey = fingerprint;
+				tracked.failures = 0;
 			} catch {
-				// The provider surfaced the notice; the next marker change
-				// re-enqueues a sync, so transient failures recover.
+				// The provider surfaced the notice. A marker change
+				// re-enqueues a sync; until then, try again a few times.
+				tracked.failures++;
+				if ( tracked.failures < AUTOSAVE_MAX_ATTEMPTS ) {
+					scheduleRef.current( clientId, AUTOSAVE_RETRY_MS );
+				}
 			}
 		},
-		[ registry, readBlock, writeCommentId, getStructuralCaptures, track ]
+		[
+			registry,
+			readBlock,
+			writeCommentId,
+			getStructuralCaptures,
+			track,
+			getProposals,
+			onCreate,
+			onUpdate,
+			onDelete,
+		]
 	);
 
 	const enqueueSync = useCallback(
@@ -534,7 +569,7 @@ export default function SuggestionAutoSave() {
 	);
 
 	const schedule = useCallback(
-		( clientId: string ) => {
+		( clientId: string, delay = AUTOSAVE_DEBOUNCE_MS ) => {
 			const timers = timersRef.current;
 			if ( timers.has( clientId ) ) {
 				clearTimeout( timers.get( clientId ) );
@@ -545,11 +580,14 @@ export default function SuggestionAutoSave() {
 				setTimeout( () => {
 					timers.delete( clientId );
 					enqueueSync( clientId );
-				}, AUTOSAVE_DEBOUNCE_MS )
+				}, delay )
 			);
 		},
 		[ enqueueSync ]
 	);
+	useEffect( () => {
+		scheduleRef.current = schedule;
+	}, [ schedule ] );
 
 	// Blocks: one pass per tree change; only a block whose marker identity
 	// changed restarts its own timer, so steady editing in one block never
@@ -575,6 +613,15 @@ export default function SuggestionAutoSave() {
 			return;
 		}
 
+		/*
+		 * Until the current user resolves no marker can be told to be theirs,
+		 * and saving one would open a note in their name: every marker waits,
+		 * and the pass re-runs once the user is known.
+		 */
+		if ( currentUserId === null ) {
+			return;
+		}
+
 		const blockEditor: any = registry.select( blockEditorStore );
 		const seen = new Set< string >();
 		for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
@@ -583,18 +630,11 @@ export default function SuggestionAutoSave() {
 			if ( ! attributes?.metadata?.suggestion ) {
 				continue;
 			}
-			// A suggestion another user wrote (it reached us through sync)
-			// is theirs to save; saving it here would open a note in our
-			// name. On a block with several authors' suggestions, ours is
-			// the one nested or outer entry we wrote. Until the current user
-			// resolves, every authored marker waits; the pass re-runs once
-			// it does.
-			if ( currentUserId === null ) {
-				const outer = attributes.metadata.suggestion;
-				if ( outer.authorId !== null && outer.authorId !== undefined ) {
-					continue;
-				}
-			}
+			// A suggestion another user wrote (it reached us through sync),
+			// or one that records no author, is not ours to save; saving it
+			// here would open a note in our name. On a block with several
+			// authors' suggestions, ours is the one nested or outer entry we
+			// wrote.
 			const marker = authorMarker( attributes, currentUserId );
 			if ( ! marker ) {
 				continue;
@@ -638,6 +678,10 @@ export default function SuggestionAutoSave() {
 			scheduledProposalsRef.current = {};
 			return;
 		}
+		// As for blocks: nothing is saved until the current user is known.
+		if ( currentUserId === null ) {
+			return;
+		}
 		const previous = scheduledProposalsRef.current;
 		for ( const [ id, proposal ] of Object.entries( proposals ?? {} ) ) {
 			if ( previous[ id ] !== proposal ) {
@@ -650,22 +694,41 @@ export default function SuggestionAutoSave() {
 			}
 		}
 		scheduledProposalsRef.current = proposals ?? {};
-	}, [ isSuggestMode, proposals, schedule ] );
+	}, [ isSuggestMode, proposals, schedule, currentUserId ] );
 
-	// Save anything still waiting out its debounce on unmount (the
-	// experiment toggled off, the editor closed) rather than dropping it.
+	// Save anything still waiting out its debounce when the page is hidden
+	// or on unmount (the experiment toggled off, the editor closed) rather
+	// than dropping it.
 	const enqueueSyncRef = useRef( enqueueSync );
 	useEffect( () => {
 		enqueueSyncRef.current = enqueueSync;
 	}, [ enqueueSync ] );
 	useEffect( () => {
 		const timers = timersRef.current;
-		return () => {
+		const flush = () => {
 			for ( const [ clientId, timer ] of timers ) {
 				clearTimeout( timer );
 				enqueueSyncRef.current( clientId );
 			}
 			timers.clear();
+		};
+		/*
+		 * A tab that is closed, reloaded or navigated away never unmounts
+		 * the editor. Hiding the page is the last moment the browser lets a
+		 * request start reliably, and it also covers a tab left in the
+		 * background with a save still waiting.
+		 */
+		const flushWhenHidden = () => {
+			if ( document.visibilityState === 'hidden' ) {
+				flush();
+			}
+		};
+		document.addEventListener( 'visibilitychange', flushWhenHidden );
+		window.addEventListener( 'pagehide', flush );
+		return () => {
+			document.removeEventListener( 'visibilitychange', flushWhenHidden );
+			window.removeEventListener( 'pagehide', flush );
+			flush();
 		};
 	}, [] );
 

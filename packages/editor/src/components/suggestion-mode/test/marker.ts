@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
 	PENDING_ATTRIBUTES,
+	markerForNote,
 	mergeProposedAttributes,
 	proposedAttributes,
 	readSuggestionMarker,
@@ -126,6 +127,7 @@ describe( 'withProposedAttributes', () => {
 		const metadata = {
 			suggestion: {
 				type: 'pending-move',
+				authorId: 5,
 				fromIndex: 0,
 				after: { level: 3 },
 			},
@@ -138,6 +140,7 @@ describe( 'withProposedAttributes', () => {
 		} );
 		expect( next.metadata.suggestion ).toEqual( {
 			type: 'pending-move',
+			authorId: 5,
 			fromIndex: 0,
 		} );
 	} );
@@ -272,5 +275,46 @@ describe( 'mergeProposedAttributes', () => {
 			mergeProposedAttributes( live, { metadata: { name: 'N' } } )
 				.metadata
 		).toEqual( { noteId: [ 1 ], name: 'N' } );
+	} );
+} );
+
+describe( 'markerForNote', () => {
+	const bob = { type: 'pending-attributes', commentId: 15, after: { a: 1 } };
+	const anne = { type: 'pending-move', commentId: 12, nested: [ bob ] };
+
+	it( 'finds the marker or nested entry that names the note', () => {
+		const attributes = { metadata: { suggestion: anne } };
+		expect( markerForNote( attributes, 12 )?.type ).toBe( 'pending-move' );
+		expect( markerForNote( attributes, '15' ) ).toBe( bob );
+		expect( markerForNote( attributes, 99 ) ).toBeNull();
+	} );
+
+	it( 'takes the only unlinked marker for a note the block links', () => {
+		const unlinked = { type: 'pending-attributes', after: { a: 1 } };
+		expect(
+			markerForNote(
+				{ metadata: { noteId: [ 7 ], suggestion: unlinked } },
+				7
+			)
+		).toBe( unlinked );
+		// Not linked from the block.
+		expect(
+			markerForNote( { metadata: { suggestion: unlinked } }, 7 )
+		).toBeNull();
+		// Two unlinked markers: no telling which is the note's.
+		expect(
+			markerForNote(
+				{
+					metadata: {
+						noteId: [ 7, 8 ],
+						suggestion: {
+							type: 'pending-move',
+							nested: [ unlinked ],
+						},
+					},
+				},
+				7
+			)
+		).toBeNull();
 	} );
 } );
