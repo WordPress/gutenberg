@@ -8,6 +8,7 @@ import {
 } from '@wordpress/global-styles-engine';
 import { getVariationClassName } from './utils';
 import { unlock } from './lock-unlock';
+import useStickyPreviewScrollPadding from './use-sticky-preview-scroll-padding';
 
 const { getViewportBreakpoints, getViewportBreakpointValueInPixels } = unlock(
 	globalStylesEnginePrivateApis
@@ -79,6 +80,7 @@ const BlockPreviewPanel = ( {
 	stateStyles,
 	viewportSettings,
 }: BlockPreviewPanelProps ) => {
+	const stickyPreviewRef = useStickyPreviewScrollPadding();
 	const blockExample = getBlockType( name )?.example;
 	const blocks = useMemo( () => {
 		if ( ! blockExample ) {
@@ -130,6 +132,7 @@ const BlockPreviewPanel = ( {
 
 	return (
 		<Spacer
+			ref={ stickyPreviewRef }
 			className="global-styles-ui__sticky-preview"
 			marginX={ 4 }
 			marginBottom={ 4 }

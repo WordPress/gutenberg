@@ -35,6 +35,23 @@
 	min-height: 0;
 }
 
+// The complementary area scrolls the sidebar as a whole. The navigator and its
+// screens have `overflow-x: auto`, which makes them the containing block of
+// `position: sticky` elements, such as the block preview, without them being
+// the scroller, so the preview would scroll away. Let the overflow bubble up,
+// and stick below the sticky sidebar header. The revisions screen is excluded
+// as it needs a bounded height.
+.editor-global-styles-sidebar:not(:has(.global-styles-ui-screen-revisions)) {
+	.global-styles-ui-sidebar__navigator-provider,
+	.global-styles-ui-sidebar__navigator-screen {
+		overflow: visible;
+	}
+
+	.global-styles-ui__sticky-preview {
+		top: $panel-header-height;
+	}
+}
+
 // The navigator also renders on the Styles page, so keep this to the sidebar.
 .editor-global-styles-sidebar .global-styles-ui-sidebar__navigator-provider:has(.global-styles-ui-screen-revisions) {
 	flex: 1;

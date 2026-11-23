@@ -193,6 +193,12 @@
 	background: colors.$white;
 	padding-top: variables.$grid-unit-10;
 	padding-bottom: variables.$grid-unit-10;
+
+	// On a short viewport, such as a phone in landscape, the preview would
+	// cover most of what is visible. Let it scroll with the controls instead.
+	@media (max-height: 480px) {
+		position: static;
+	}
 }
 
 .global-styles-ui__block-preview-panel {
