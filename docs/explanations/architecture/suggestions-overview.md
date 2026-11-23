@@ -1,14 +1,14 @@
-# Suggestion mode: Architecture Overview for Reviewers
+# Suggestion mode overview
 
-This page is the map. It explains how Suggestion mode fits together across the whole ten-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
+This page is the map. It explains how Suggestion mode fits together: what a suggestion is, where its state lives, and how an edit travels from the keyboard to an accepted change. The detailed reference, with every payload field, rule and known limitation, is the [Suggestion mode architecture guide](/docs/explanations/architecture/suggestions.md).
 
-Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). Try it: [Playground for the combined branch #78994](https://playground.wordpress.net/gutenberg.html?pr=78994).
+Suggestion mode is an experiment. Its tracking issue is [#73411](https://github.com/WordPress/gutenberg/issues/73411).
 
 ## Short version
 
 **A suggestion is a pending change marked in the content, linked to a Note that carries its review thread.** A reviewer switches the editor to **Suggesting** (Suggestion mode), edits normally, and every edit is captured as a suggestion instead of being applied. The post author **Accepts** or **Rejects** each one from the Notes sidebar.
 
-**There are three kinds of suggestion, captured three ways but marked in only two shapes.** Inline changes are marks in the block's content. Structural and attribute changes are a marker in the block's `metadata.suggestion`. Either way the editor's content carries the pending state and the Note carries the review thread. When the post is saved, the server moves whatever a suggestion proposes to add out of the stored `post_content` and onto its Note, leaving a small anchor, and puts it back when the post is loaded for editing. That split is the most important thing to understand before reading the code, and [Storage at a glance](./suggestions.md#storage-at-a-glance) lays out every stored key and shape on one page.
+**There are three kinds of suggestion, captured three ways but marked in only two shapes.** Inline changes are marks in the block's content. Structural and attribute changes are a marker in the block's `metadata.suggestion`. Either way the editor's content carries the pending state and the Note carries the review thread. When the post is saved, the server moves whatever a suggestion proposes to add out of the stored `post_content` and onto its Note, leaving a small anchor, and puts it back when the post is loaded for editing. That split is the most important thing to understand before reading the code, and [Storage at a glance](/docs/explanations/architecture/suggestions.md#storage-at-a-glance) lays out every stored key and shape on one page.
 
 | | Inline text and formatting | Structural (insert, remove, move) | Block attributes (alignment, heading level, color) |
 | --- | --- | --- | --- |
@@ -22,7 +22,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 
 **Glossary**
 
-- **Mode** (the `editorIntent` in code): Editing or Suggesting, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing.
+- **Mode** (the `editorIntent` in code): Editing or Suggesting, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing. A third, read-only **Viewing** mode (possibly still allowing notes) is [out of scope for the first iteration](/docs/explanations/architecture/suggestions.md#out-of-scope-viewing) and tracked in [#85770](https://github.com/WordPress/gutenberg/issues/85770).
 - **Note**: a `note`-type comment (the Notes feature, GA in WordPress 6.9). A suggestion is a Note with a JSON payload in `_wp_suggestion` comment meta and a lifecycle in `_wp_suggestion_status`.
 - **Marker**: the in-content record of a pending suggestion. Inline markers are rich-text formats. Block markers live in `metadata.suggestion` and are typed `pending-insert`, `pending-remove`, `pending-move` or `pending-attributes`. Both kinds carry the Note's comment id.
 - **Anchor**: what the save leaves in stored `post_content` where a proposal was: an emptied mark, a marker with `after` replaced by a run number, or a `core/suggestion-placeholder` block. Each carries the Note's comment id.
@@ -80,44 +80,7 @@ flowchart TB
     Post --> Strip
 ```
 
-Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the swap point for a future Yjs backend), and are linked back to the block through `metadata.noteId` and the marker's id.
-
-## The PR stack
-
-Ten PRs, each based on the one below it. Review bottom up, and comment on the PR that owns the code. If time is short, [#80429](https://github.com/WordPress/gutenberg/pull/80429) and [#80431](https://github.com/WordPress/gutenberg/pull/80431) hold most of the logic.
-
-```mermaid
-flowchart BT
-    T["trunk"]
-    P1["1/10 #80427<br/>Editor mode + experiment gate"]
-    P2["2/10 #80428<br/>Storage, REST, provider"]
-    P3["3/10 #80429<br/>Block-level capture"]
-    P4["4/10 #80430<br/>Inline marker primitive"]
-    P5["5/10 #80431<br/>Inline suggestion operations"]
-    P6["6/10 #80432<br/>Review UI"]
-    P7["7/10 #80433<br/>Inline live wiring"]
-    P8["8/10 #86206<br/>Overlapping suggestions"]
-    P9["9/10 #82047<br/>Architecture docs"]
-    P10["10/10 #82048<br/>End-to-end tests"]
-    T --> P1 --> P2 --> P3 --> P4 --> P5 --> P6 --> P7 --> P8 --> P9 --> P10
-```
-
-| Layer | PR | What it owns | Where to look |
-| --- | --- | --- | --- |
-| 1 | [#80427](https://github.com/WordPress/gutenberg/pull/80427) Editor mode (intent) | Session-scoped `editorIntent` in `core/editor` (private `setEditorIntent` / `getEditorIntent`), the Editing / Suggesting switcher in the Options menu, Google Docs shortcuts (Shift+Alt+Cmd+Z/X), the experiment gate `isSuggestionModeEnabled` / `useCanSuggest` | `editor/src/store/*`, `intent-switcher/`, `suggestion-mode/gate.ts` |
-| 2 | [#80428](https://github.com/WordPress/gutenberg/pull/80428) Storage, REST, provider | The storage design. `_wp_suggestion` and `_wp_suggestion_status` meta (64 KB cap, KSES on block snapshots) and the 7.1 REST comment controller subclass. The block marker, with proposals in `metadata.suggestion.after`. The payload, its schema version and the pure operations over it. `SuggestionStore`, the one place that reads and writes a suggestion's Note. The submission and decision hooks behind `useSuggestionsProvider`, for attribute, structural and post field suggestions; a decision writes a provisional status, which the save pass in #80433 makes final. The session and the auto-save loop that walks markers. No capture yet | `lib/compat/wordpress-7.1/block-suggestions.php`, `suggestion-mode/marker.ts`, `operations/`, `suggestion-store.ts`, `suggestion-status.ts`, `use-suggestion-*.ts`, `suggestion-session.tsx`, `auto-save.ts` |
-| 3 | [#80429](https://github.com/WordPress/gutenberg/pull/80429) Block-level capture | Capture onto the marker. The `setAttributes` HOC, which writes an edit into the block's proposal and renders the proposal merged over the live attributes. The store interceptor (attribute drift and structural insert / remove / move, list indent and outdent). Pending treatments and move ghosts, revert and undo guards, PHP structural strip and move-order restore | `suggestion-mode/with-suggestion-overlay.tsx`, `store-interceptor.ts`, `suggestion-undo-guard.ts`, `block-list/content-suggestion.scss` |
-| 4 | [#80430](https://github.com/WordPress/gutenberg/pull/80430) Inline marker primitive | Format-agnostic rich-text utilities shared with Notes: wrap a range, find a marker by id (the only offset resolver), read caret and selection, reconcile after edits, decorate via annotations | `editor/src/components/inline-markers/` |
-| 5 | [#80431](https://github.com/WordPress/gutenberg/pull/80431) Inline operations | Pure functions: one marker format per kind (`core/suggestion-add`, `-del`, `-format`) in a canonical nesting order, create / accept / reject for each kind, the overlap matrix and what a decision does to nested suggestions, edit and format planners, word and line delete ranges, marker stripping | `editor/src/components/inline-suggestions/` |
-| 6 | [#80432](https://github.com/WordPress/gutenberg/pull/80432) Review UI | Accept / Reject in the note header, the Docs-style summary ("Add: ...", "Delete: ...", "Change: heading level 2 to 3") with a bounded word diff | `collab-sidebar/suggestion-actions.tsx`, `suggestion-mode/suggestion-summary.tsx` |
-| 7 | [#80433](https://github.com/WordPress/gutenberg/pull/80433) Inline live wiring | The addition, deletion and format keyboards, the content reconciler, author colors and marker reveal, Note garbage collection, post title suggestions, clipboard strip, refusals (post status, publish), List View labels, PHP inline strip, a `core-data` CRDT serializer fix. The save pass: moving proposals out of stored `post_content` onto their Notes and back, provisional and final decision statuses, `outdated`, and revision snapshots. Also the inline hand-offs in the HOC and the interceptor, the inline branches of the decision hook, and restoring post field proposals after a reload | `suggestion-mode/suggestion-*-keyboard.ts`, `suggestion-content-reconciler.ts`, `suggestion-note-gc.ts`, `refuse-edit.ts`, `plan-store-content-edit.ts`, `post-field-proposal-hydration.ts`, `lib/compat/wordpress-7.2/` |
-| 8 | [#86206](https://github.com/WordPress/gutenberg/pull/86206) Overlapping suggestions | Suggestions of one kind stack on the same text (one marker per suggestion, nested oldest outermost), formatting changes recorded as per-suggestion deltas, the refusals for typing, deleting and formatting inside or across someone's suggestion lifted, other authors' block suggestions nested on a block's marker, a real-time collaboration guard that converges merged markers with one elected writer, the server's per-character format revert and published view, and the shared overlap fixtures with the oracle that checks every accept/reject order at the Vitest, PHPUnit and Playwright layers | `inline-suggestions/format.ts`, `format-delta.ts`, `overlap.ts`, `resolution.ts`, `inline-suggestions/test/fixtures/overlaps/`, `suggestion-mode/marker.ts`, `block-suggestions.php`, `suggestion-mode-overlap*.spec.ts` |
-| 9 | [#82047](https://github.com/WordPress/gutenberg/pull/82047) Docs | This page and [suggestions.md](./suggestions.md) | `docs/explanations/architecture/` |
-| 10 | [#82048](https://github.com/WordPress/gutenberg/pull/82048) E2E | 28 Playwright specs covering every path above, including the overlaps and two real-time collaboration specs, plus perf harness changes. No production code | `test/e2e/specs/editor/various/suggestion-mode*.spec.ts`, `test/e2e/specs/editor/collaboration/collaboration-suggestion-mode*.spec.ts`, `test/e2e/specs/site-editor/suggestion-mode-intent-shortcuts.spec.ts` |
-
-Some files are deliberately split across layers: `with-suggestion-overlay.tsx` and `store-interceptor.ts` start in #80429 and gain inline hand-offs in #80433; `use-suggestion-decisions.ts` starts in #80428 with attribute, structural and post field decisions and gains the inline ones in #80433; `block-suggestions.php` gains meta in #80428, the structural strip in #80429 and the inline strip in #80433, which also adds the save pass in `lib/compat/wordpress-7.2/`. Until that save pass arrives, a decision stays provisional: the layers below #80433 are not meant to ship on their own.
-
-About 30 focused fix PRs (F-01 to F-34, for example [#81661](https://github.com/WordPress/gutenberg/pull/81661), [#81669](https://github.com/WordPress/gutenberg/pull/81669), [#81656](https://github.com/WordPress/gutenberg/pull/81656)) were reviewed on their own and then folded into the layer that owns the code. They are listed in [#73411](https://github.com/WordPress/gutenberg/issues/73411).
+Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend would replace), and are linked back to the block through `metadata.noteId` and the marker's id.
 
 ## Data model
 
@@ -160,11 +123,11 @@ erDiagram
     }
 ```
 
-The diagram shows the content as the editor holds it. [Storage at a glance](./suggestions.md#storage-at-a-glance) lists what each piece becomes in the database.
+The diagram shows the content as the editor holds it. [Storage at a glance](/docs/explanations/architecture/suggestions.md#storage-at-a-glance) lists what each piece becomes in the database.
 
 Four rules hold the model together:
 
-1. **Offsets are never stored.** An inline marker is found by id on every read (`findMarkerRange`), so unrelated edits elsewhere in the block do not break it. This is also the planned swap point for Yjs attribution.
+1. **Offsets are never stored.** An inline marker is found by id on every read (`findMarkerRange`), so unrelated edits elsewhere in the block do not break it. It is also where a CRDT-backed range lookup would plug in.
 2. **Operations describe intent, not diffs.** A payload is a list of declarative ops (`attribute-set`, `block-insert-after`, `block-remove`, `block-move`, `inline-suggestion`, `post-attribute-set`). Accept replays them against the current block, and conflicts are checked per attribute.
 3. **Two status axes.** The comment status (open or resolved discussion) and `_wp_suggestion_status` are independent, so a decided suggestion can keep its thread open.
 4. **A decision is final only once it is saved.** Accept and Reject write a provisional status (`applied-unsaved`, `rejected-unsaved`) and change the content in the editor. The save pass writes `applied` or `rejected` when a saved post no longer carries the suggestion, and `outdated` when someone else's save removed it undecided. A client cannot write a final status.
@@ -175,7 +138,9 @@ The inline marker serializes as one class per kind:
 <mark class="wp-suggestion-add" data-suggestion-id="42" data-suggestion-type="add" data-author="7">new words</mark>
 ```
 
-Markers of different kinds nest, so another author can suggest deleting or reformatting words inside a pending addition; rejecting the addition takes those suggestions with it, accepting it leaves them pending. Markers of one kind stack too, the Google Docs model: text typed inside someone's addition carries both additions, two people can suggest deleting the same words, and two formatting changes on the same words each keep their own delta. A character is published when every addition on it is accepted and no deletion on it is, so any order of the same decisions ends at the same text. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
+Markers of different kinds nest, so another author can suggest deleting or reformatting words inside a pending addition; rejecting the addition takes those suggestions with it, accepting it leaves them pending. Markers of one kind stack too, the Google Docs model: text typed inside someone's addition carries both additions, two people can suggest deleting the same words, and two formatting changes on the same words each keep their own delta. A character is published when every addition on it is accepted and no deletion on it is, so any order of the same decisions ends at the same text. See [Overlapping suggestions](/docs/explanations/architecture/suggestions.md#overlapping-suggestions).
+
+Several authors can suggest on one block: the block's marker is the first suggestion, and every other author's removal or attribute proposal nests on it with its own Note, decided on its own.
 
 ## Data flow: an inline text suggestion
 
@@ -328,9 +293,9 @@ Extraction and inflation are exact inverses and edit the content by byte range, 
 
 The same save pass settles decisions. Accept and Reject only write a provisional status; when a saved post no longer carries a suggestion's anchor, the pass makes the decision final, and it marks another author's suggestion `outdated` when a save removed it undecided.
 
-The render filters from the earlier layers stay as defense in depth, for anything the save pass leaves in full form (an oversized proposal, a move it cannot restore, unbalanced markup): `render_block` drops a pending insert and `add` text, unwraps `del`, and reverts `format`, and `the_content` restores a pending move's order.
+The render filters stay as defense in depth, for anything the save pass leaves in full form (an oversized proposal, a move it cannot restore, unbalanced markup): `render_block` drops a pending insert and `add` text, unwraps `del`, and reverts `format`, and `the_content` restores a pending move's order.
 
-The meta registration and render filters live in `lib/compat/wordpress-7.1/block-suggestions.php`; the save pass, extraction and status rules live in `lib/compat/wordpress-7.2/`. Permissions are core's: any user who can `edit_post` on the parent can decide a suggestion. The REST controller subclass only adds payload validation (413 for oversize, 400 for invalid JSON) and allows empty note content. The full reference is [Storage at a glance](./suggestions.md#storage-at-a-glance) and [Save-time extraction](./suggestions.md#save-time-extraction).
+The meta registration and render filters live in `lib/compat/wordpress-7.1/block-suggestions.php`; the save pass, extraction and status rules live in `lib/compat/wordpress-7.2/`. Permissions are core's: any user who can `edit_post` on the parent can decide a suggestion. The REST controller subclass only adds payload validation (413 for oversize, 400 for invalid JSON) and allows empty note content. The full reference is [Storage at a glance](/docs/explanations/architecture/suggestions.md#storage-at-a-glance) and [Save-time extraction](/docs/explanations/architecture/suggestions.md#save-time-extraction).
 
 ## Collaboration and undo
 
@@ -338,40 +303,9 @@ The meta registration and render filters live in `lib/compat/wordpress-7.1/block
 - **Undo.** Undoing a suggestion edit removes its marker. `SuggestionNoteGC` notices the anchor is gone and trashes the Note. On redo an inline marker gets its Note restored; a redone attribute proposal is saved as a new Note (see above). Notes with replies are spared. `suggestion-undo-guard.ts` handles adoption so undo and redo do not get captured as fresh suggestions.
 - **Concurrency.** Each block has a serial write queue, so the format keyboard and content reconciler cannot interleave their note-then-marker writes. A run whose surrounding text changed during the Note request is abandoned and its Note trashed.
 
-## Open findings
-
-An architecture review on 2026-10-04 found the data model sound and the cost concentrated in the mechanism. Two of its changes are in the stack, in the layers that own the code (#80428 and #80429): attribute suggestions live on the block marker (A2), and the provider is split behind a `SuggestionStore` boundary (A5). The rest are recorded but not scheduled:
-
-- **A1.** The interceptor is effectively a second reducer outside the store. A private block-editor action interceptor would be cleaner.
-- **A3.** Marker ids are server comment ids, so the first keystroke waits on a REST round trip. Client-generated ids would remove the buffering.
-- **A4.** Input is captured at the DOM `beforeinput` level. A private `transformChange` hook on `useRichText` would sit at the right altitude, and depends on A3.
-
-Several authors can suggest on one block: the block's marker is the first suggestion, and every other author's removal or attribute proposal nests on it with its own Note, decided on its own. See [Overlapping suggestions](./suggestions.md#overlapping-suggestions).
-
-## Questions for reviewers
-
-Storage first, since whatever ships has to stay readable:
-
-1. Is the split right: a Note that holds the thread, the payload and the proposal, and stored content that holds the baseline plus an anchor? Or should the proposal sit closer to the post?
-2. Anchors point at Notes by comment id, which an import renumbers, so an export carries the baseline and leaves the proposals out. Should the id be generated by the client and adopted by the Note instead (A3)? That would also remove the REST round trip before the first keystroke lands.
-3. The payload has a `schemaVersion` and the stored proposals have `v`, but inline marks and `metadata.suggestion` carry no version. Is a version needed in the content itself?
-4. `core/suggestion-placeholder`, `data-suggestion-run`, the `wp-suggestion-*` classes and the `_wp_suggestion*` meta keys end up in the database for good. Are those the names to commit to?
-5. Is `metadata.suggestion` the right home for a block's marker, and is a `nested` list, one entry per author, the right shape for several authors' suggestions on one block, or should proposals be a map keyed by note id once notes can be opened before auto-save?
-6. Structural payloads carry session-local client ids (`anchorClientId`, `fromParentClientId`) and a serialized block snapshot. Should either be part of a stored format?
-7. With Gutenberg deactivated the anchors render nothing, but rich text drops an emptied mark on the next save, so that proposal is lost. Is that acceptable?
-
-Then the mechanism:
-
-1. Is a data-registry subscriber the right capture point for structural changes, or should block-editor grow a private action-interceptor API (A1)?
-2. Should suggestions be tied to a post revision?
-3. Should the `core-data` CRDT serializer fix and the perf harness change land on trunk ahead of the stack?
-4. The PHP is split between `lib/compat/wordpress-7.1/` and `lib/compat/wordpress-7.2/`. Which release should it target now?
-
 ## Further reading
 
-- [Storage at a glance](./suggestions.md#storage-at-a-glance): every stored key and shape on one page.
-- [Suggestions Architecture](./suggestions.md): the full reference (module tables, payload schema, every known limitation).
-- [#73411](https://github.com/WordPress/gutenberg/issues/73411): tracking issue, testing walkthrough and fix PR list.
-- [#78994](https://github.com/WordPress/gutenberg/pull/78994): combined branch for Playground testing.
-- [#77005](https://github.com/WordPress/gutenberg/pull/77005): Yjs v14 and `AttributionManager`, the future storage backend.
+- [Storage at a glance](/docs/explanations/architecture/suggestions.md#storage-at-a-glance): every stored key and shape on one page.
+- [Suggestion mode architecture guide](/docs/explanations/architecture/suggestions.md): the full reference (payload schema, decision lifecycle, every known limitation).
+- [#73411](https://github.com/WordPress/gutenberg/issues/73411): tracking issue and testing walkthrough.
 - [#78218](https://github.com/WordPress/gutenberg/pull/78218): the Notes inline anchor the marker primitive grew from.
