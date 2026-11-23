@@ -208,8 +208,7 @@ const WithControlsComponent = () => {
 	// The base cardinal angle (nearest 90° step) and the fine offset.
 	// `setRotation` is a raw state setter (absolute-angle assignment), so
 	// sliders need to flip the offset sign when a single flip is active to
-	// stay visually consistent. `snapRotate90` and the pipeline `rotate`
-	// op already handle this internally.
+	// stay visually consistent. `snapRotate90` already handles this.
 	const baseAngle = Math.round( state.rotation / 90 ) * 90;
 	const singleFlip = state.flip.horizontal !== state.flip.vertical;
 	const visualDir = singleFlip ? -1 : 1;

@@ -6,18 +6,26 @@ import { PlaylistContext } from '../../playlist/context';
 import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
+// The sidebar's track image control is a `MediaReplaceFlow` too, which
+// `MediaControl` renders with a class name of its own.
+let mockTrackImageMediaReplaceFlowProps;
 
 vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
 		await import( '../../../../block-editor/src/components/plain-text' );
 
 	return {
+		store: {},
 		BlockControls: ( { children } ) => <div>{ children }</div>,
 		BlockIcon: () => <span />,
 		InspectorControls: ( { children } ) => <div>{ children }</div>,
 		MediaPlaceholder: () => <div />,
 		MediaReplaceFlow: ( props ) => {
-			mockMediaReplaceFlowProps = props;
+			if ( props.className ) {
+				mockTrackImageMediaReplaceFlowProps = props;
+			} else {
+				mockMediaReplaceFlowProps = props;
+			}
 			const { name, onSelect } = props;
 			return <button onClick={ () => onSelect( {} ) }>{ name }</button>;
 		},
@@ -32,11 +40,20 @@ vi.mock( import( '@wordpress/block-editor' ), async () => {
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	const data = await importOriginal();
 	const mockUseDispatch = vi.fn();
+	// `MediaControl` reads the block editor settings straight from the store;
+	// everything else keeps the real `useSelect`.
+	const mockUseSelect = ( mapSelect, ...rest ) =>
+		typeof mapSelect === 'function'
+			? data.useSelect( mapSelect, ...rest )
+			: { getSettings: () => ( {} ) };
 
 	return new Proxy( data, {
 		get( target, property ) {
 			if ( property === 'useDispatch' ) {
 				return mockUseDispatch;
+			}
+			if ( property === 'useSelect' ) {
+				return mockUseSelect;
 			}
 
 			return target[ property ];
@@ -72,7 +89,7 @@ function renderEdit( props = {} ) {
 	const setCurrentTrackClientId = props.setCurrentTrackClientId || vi.fn();
 	const removeTrack = props.removeTrack || vi.fn();
 
-	render(
+	const view = render(
 		<PlaylistContext.Provider
 			value={ {
 				currentTrackClientId: props.currentTrackClientId ?? null,
@@ -97,12 +114,18 @@ function renderEdit( props = {} ) {
 		</PlaylistContext.Provider>
 	);
 
-	return { setAttributes, setCurrentTrackClientId, removeTrack };
+	return {
+		setAttributes,
+		setCurrentTrackClientId,
+		removeTrack,
+		container: view.container,
+	};
 }
 
 describe( 'PlaylistTrackEdit', () => {
 	beforeEach( () => {
 		mockMediaReplaceFlowProps = undefined;
+		mockTrackImageMediaReplaceFlowProps = undefined;
 		useDispatch.mockReturnValue( {
 			createErrorNotice: vi.fn(),
 		} );
@@ -181,6 +204,99 @@ describe( 'PlaylistTrackEdit', () => {
 		expect(
 			screen.queryByLabelText( 'Alternative text' )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the track image as a media control in the sidebar', () => {
+		renderEdit( { isSelected: true } );
+
+		expect( mockTrackImageMediaReplaceFlowProps ).toEqual(
+			expect.objectContaining( {
+				allowedTypes: [ 'image' ],
+				mediaURL: 'https://example.com/cover.jpg',
+			} )
+		);
+		// MediaControl shows the filename; the old full-size preview <img> is gone.
+		expect(
+			screen.getByRole( 'button', { name: /cover\.jpg/ } )
+		).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'img', { name: 'Preview of the track image' } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'sets the track image from the sidebar media control', () => {
+		const { setAttributes } = renderEdit( {
+			attributes: { image: undefined, imageAlt: undefined },
+			isSelected: true,
+		} );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onSelect( {
+				url: 'https://example.com/new-cover.jpg',
+				alt: 'A new cover',
+			} );
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			image: 'https://example.com/new-cover.jpg',
+			imageAlt: 'A new cover',
+		} );
+	} );
+
+	it( 'does not persist blob URLs while a track image is uploading', () => {
+		const { setAttributes } = renderEdit( {
+			attributes: { image: undefined, imageAlt: undefined },
+			isSelected: true,
+		} );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onSelect( {
+				url: 'blob:https://example.com/45e33d48-3988-4796-a642-99aa95f91feb',
+				alt: 'Uploading',
+			} );
+		} );
+
+		expect( setAttributes ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps the existing track image when a replace upload fails', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onSelect( undefined );
+		} );
+
+		expect( setAttributes ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows a dismissible error notice when a track image upload fails', () => {
+		const createErrorNotice = vi.fn();
+		useDispatch.mockReturnValue( { createErrorNotice } );
+		renderEdit( { isSelected: true } );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onError(
+				'<p>Server said no.</p>'
+			);
+		} );
+
+		expect( createErrorNotice ).toHaveBeenCalledWith( 'Server said no.', {
+			type: 'snackbar',
+			explicitDismiss: true,
+		} );
+	} );
+
+	it( 'removes the track image and its alternative text from the sidebar media control', () => {
+		const { setAttributes } = renderEdit( { isSelected: true } );
+
+		act( () => {
+			mockTrackImageMediaReplaceFlowProps.onReset();
+		} );
+
+		expect( setAttributes ).toHaveBeenCalledWith( {
+			image: undefined,
+			imageAlt: undefined,
+		} );
 	} );
 
 	it( 'sets the selected track as the current track', () => {
