@@ -9,7 +9,7 @@ There are two complementary mechanisms, by change type:
 - **Inline text and formatting changes** (typing, deleting, type-over, paste, bold/italic/link toggles, and the residual `onChange` seams — IME commits, autocorrect, drag-drop) live as anchored `<mark>` markers **in block content** (Option B), one rich-text format per kind (`core/suggestion-add`, `-del`, `-format`), re-resolved on read — edit-resilient and per-author. Markers of different kinds nest, so a deletion or formatting change can sit inside someone else's addition. See [Inline suggestion markers](#inline-suggestion-markers).
 - **Non-text attribute changes** (alignment, heading level, color) and **structural changes** (insert / remove / move blocks) are recorded on the block's `metadata.suggestion` **marker** in `post_content` (a `pending-attributes` marker carries the proposed values in `after`; structural markers tag what happened to the block) and captured as versioned operation payloads on a note comment, auto-saved in the background after a short idle window. Nothing pending lives only in memory except post field proposals (the title, excerpt, featured image, slug, terms and meta), which are held in the editor store and saved as notes.
 
-The feature is designed around a swappable provider interface so the storage backend can evolve from comment-meta (today) to Yjs `AttributionManager` (future) without changing the UI or accept/reject logic.
+Storage sits behind a provider interface, so the comment-meta backend could later be replaced by a CRDT-native one without changing the UI or the accept and reject logic (see [Moving storage to Yjs attribution](#moving-storage-to-yjs-attribution)).
 
 ## Storage at a glance
 
@@ -96,7 +96,7 @@ Text and blocks proposed for removal stay in the content because they are real u
 
 ### Life of the stored data
 
-1. **Create.** The editor creates the note over REST (`POST /wp/v2/comments`) with `_wp_suggestion`, then writes the marker into the content with the new comment id. The id of the marker is the id of the note.
+1. **Create.** An inline suggestion creates the note first (`POST /wp/v2/comments` with `_wp_suggestion`) and then writes the mark into the content with the new comment id. A block-level suggestion writes the `metadata.suggestion` marker first; auto-save creates the note after about 1.5 s of idle time and writes its id back onto the marker as `commentId`. Either way, the id on the marker is the id of the note.
 2. **Save.** `Gutenberg_Suggestion_Reconciler` runs on every post write: it moves proposals out of the incoming content after KSES (`wp_insert_post_data`), stores them on their notes, and compares the anchors before and after the write (`wp_insert_post`).
 3. **Load.** `rest_prepare_{post_type}`, `rest_prepare_autosave` and `rest_prepare_revision` put the proposals back into `content.raw` for a user who passes `gutenberg_can_read_suggestions()`.
 4. **Render.** The stored content is already the baseline. The `render_block` and `the_content` filters stay as defense in depth for anything the save pass left in full form.
@@ -131,7 +131,7 @@ Notes are linked by comment id, which an import renumbers. A WXR export therefor
 
 ## End-to-end lifecycle
 
-A suggestion has two halves: a reviewer's edit becomes a note, and later the post author decides on it.
+A suggestion has two halves: a reviewer's edit becomes a note, and later the post author decides on it. The first diagram follows a block attribute suggestion, where the marker is written first and its note follows. An inline suggestion runs in the other order: the note is created on the first keystroke and the mark is written once the comment id is known (see [Inline suggestion markers](#inline-suggestion-markers)).
 
 ### 1. Capture: an edit becomes a note
 
@@ -153,7 +153,7 @@ sequenceDiagram
     AS->>P: createSuggestion / updateSuggestion
     P->>R: POST or PUT note
     R-->>P: Saved comment
-    P->>B: Set metadata.noteId
+    P->>B: Link the block to the note
 ```
 
 1. The reviewer switches to Suggestion mode and edits a block.
@@ -162,7 +162,7 @@ sequenceDiagram
 4. Auto-save calls `createSuggestion` for a new marker, `updateSuggestion` for one that already has a note.
 5. The provider writes the note and its `_wp_suggestion` meta to `/wp/v2/comments`.
 6. REST returns the saved comment.
-7. On create, `updateBlockAttributes` stores the comment id as `metadata.noteId`, which ties the marker to its note.
+7. On create, the comment id is written in two places: into the block's `metadata.noteId` list and onto the marker as `commentId` (see [Auto-save](#auto-save)).
 
 ### 2. Decide: the author accepts or rejects
 
@@ -204,7 +204,7 @@ The intent lives in the `core/editor` store's reducer (not the preferences store
 
 ### Out of scope: Viewing
 
-Google Docs has a third mode, **Viewing**: a read-only editor in which the content cannot be changed. It is deliberately left out of the first iteration so the work can focus on Suggestion mode, and is tracked as a follow-up. There is no `view` intent, no third menu item and no shortcut for it.
+Google Docs has a third mode, **Viewing**: a read-only editor in which the content cannot be changed. It is deliberately left out of the first iteration so the work can focus on Suggestion mode, and is tracked as a follow-up in [#85770](https://github.com/WordPress/gutenberg/issues/85770). There is no `view` intent, no third menu item and no shortcut for it.
 
 Viewing is a separate feature and not a variant of suggesting. It needs its own read-only guards (on the canvas, `editPost`, undo and redo, and the code editor), and it has an open design question of its own: whether a viewer can still leave notes, which would make it a comment-only mode and not a strictly read-only one. Nothing in the suggestion storage or capture design depends on the answer. The intent is a plain string in the `core/editor` store, so a third value can be added later without changing the two that exist.
 
@@ -235,6 +235,8 @@ See [Inline suggestion markers](#inline-suggestion-markers) below for the full m
 ### Auto-save
 
 There is no manual "Submit" step: `SuggestionAutoSave` watches the blocks that carry a `metadata.suggestion` marker and, after ~1.5 s of idle time on a given block, persists the operations derived from the marker and the live tree as a note comment (`operationsFromMarker` for the proposal, the interceptor's recorded capture or `structuralOpFromMarker` for the structural op). The note id is written back onto the marker as `commentId`, and the hook keeps a fingerprint of the last synced operations per block, so subsequent edits update the same note rather than creating new ones. A marker left proposing nothing trashes the note; a marker that disappears is the note collector's business. Ids read from content are only hints: auto-save updates or trashes a note on their account only when core-data shows it as a pending note on this post.
+
+A block is linked to a suggestion's note twice. `metadata.noteId` is the Notes link, shared with ordinary notes: the list of every note on the block, kept in step by the submission hook outside undo history. The marker's `commentId` says which of those notes the marker belongs to, since one block can carry several notes and several nested markers. The `commentId` write-back is best-effort, so a marker without one (the write was lost, or the editor was reloaded first) is matched through `metadata.noteId` to the block's pending note of the same shape, and a second note is never opened.
 
 ### Store interceptor
 
@@ -311,7 +313,7 @@ with one class token, and one rich-text format, per kind:
 | `del` | `core/suggestion-del` | `wp-suggestion-del` | existing text proposed for removal |
 | `format` | `core/suggestion-format` | `wp-suggestion-format` | existing text whose formatting change is proposed: the run carries the proposed formatting, the note's `delta` records what it adds and removes and its `beforeHTML` the run below it |
 
-`data-suggestion-id` is the linked note's comment id and `data-author` tags the suggester. The class is authoritative; `data-suggestion-type` is written alongside it for styling and the screen-reader decoration. Every check of a marker's kind goes through the helpers in `inline-suggestions/format.ts` (`isSuggestionFormat`, `suggestionKindOf`, `suggestionMarkersAt`), the store keeps its own copy of the class tokens (`SUGGESTION_MARKER_CLASSES`), and PHP reads markers through `gutenberg_get_suggestion_marker_kind()`. The single `core/suggestion` format and its `wp-suggestion` class are gone; content still carrying them is not migrated (the feature is an experiment) and they parse as plain `<mark>`s. **Offsets are never stored** — `findMarkerRange` re-scans the rich-text `formats` array for the marker by id on every read, so a marker survives unrelated edits elsewhere in the same attribute. This is the single offset-resolution chokepoint and the intended Yjs `AttributionManager` swap point.
+`data-suggestion-id` is the linked note's comment id and `data-author` tags the suggester. The class is authoritative; `data-suggestion-type` is written alongside it for styling and the screen-reader decoration. Every check of a marker's kind goes through the helpers in `inline-suggestions/format.ts` (`isSuggestionFormat`, `suggestionKindOf`, `suggestionMarkersAt`), the store keeps its own copy of the class tokens (`SUGGESTION_MARKER_CLASSES`), and PHP reads markers through `gutenberg_get_suggestion_marker_kind()`. The single `core/suggestion` format and its `wp-suggestion` class are gone; content still carrying them is not migrated (the feature is an experiment) and they parse as plain `<mark>`s. **Offsets are never stored** — `findMarkerRange` re-scans the rich-text `formats` array for the marker by id on every read, so a marker survives unrelated edits elsewhere in the same attribute. This is the only place offsets are resolved, and where a CRDT-backed range lookup would plug in.
 
 **Edit-driven creation.** In Suggestion mode every edit is a suggestion, so there are no toolbar buttons — the act of editing produces the marker. Two `beforeinput`-capture keyboards own the input-event paths (plus `paste`/`cut`-capture handlers), cancelling the native edit and writing the marker instead; two singleton `onChange`-side components (the format keyboard and the content reconciler) own edits that surface only as a fresh `content` value. All of them key the marker to a freshly created `note` comment and bypass the store interceptor so the marker lands in content:
 
@@ -401,6 +403,7 @@ Each step only drops ids from characters or removes characters, so decisions com
 Every peer computes the same correction from the same merged value, and a correction that serializes to the same bytes is not written. One peer writes it: the author of the newest marker it touches. A correction that only deletes markup is identical on every peer and merges to one, so every peer may write that kind. The corrections bypass the interceptor and stay off the undo stack.
 
 A seeded Vitest fuzz (`inline-suggestions/test/marker-convergence.jsdom.test.ts`) interleaves concurrent marker writes and decisions across in-process peers through a model of the HTML-string merge (`test/fixtures/html-string-merge.ts`), applies the guard, and checks that the peers converge on one serialization. `OVERLAP_CONVERGENCE_RUNS=10000` runs more interleavings, `OVERLAP_CONVERGENCE_SEED=<n>` replays one, and `OVERLAP_CONVERGENCE_REPORT=1` / `OVERLAP_CONVERGENCE_TRACE=1` print the outcome counts and each round. `collaboration-suggestion-mode-overlap.spec.ts` has two pages suggest deleting overlapping words at the same time and checks both deletions land and the peers settle on one value.
+
 **Testing overlaps.** One set of JSON fixtures drives every layer, so a combination is written once and checked everywhere:
 
 - `inline-suggestions/test/fixtures/overlaps/*.json` describe a base text, the users, and each suggestion (`kind`, `text` and `at`, or `range`, `added` / `removed`, `inside`), with the two preview views (`all-accepted`, `all-rejected`) pinned. Every other expectation is computed.
@@ -421,7 +424,6 @@ Each fixture names the delivery phase it belongs to. `LANDED_PHASES` in `fixture
 | Moves the block | only where A's block is proposed changes; A's note follows it | the move takes the outer place and A's proposal nests under it | declined: "Someone else has already suggested moving this block." (see Known Limitations) |
 
 Each nested suggestion is decided on its own. Accepting a nested removal removes the block; accepting a nested proposal lands it and leaves the block's other suggestions pending; rejecting one drops only that entry. Deciding the block's own marker lifts the first nested entry into its place (`withoutMarkerEntry()`). A proposal a decision left with nothing to change (every key now equals the live value) is dropped from the block (`withoutOutdatedProposals()`); its note becomes `outdated` on save, or is collected when it is the current user's. The sidebar shows who else suggested what on the block ("Anne also suggested removing this block", "Bob also suggested changes to this block", "Anne suggested adding this block"), and on a suggested block that rejecting it also outdates what others suggested on it. On the server, the save pass moves each nested entry's `after` onto its own note and the anchor index anchors each entry by its own note, falling back to the block's `metadata.noteId` links for an entry saved before it had one. Post field proposals keep one note per field per author; when an accepted one is saved, the save pass marks `outdated` every other author's pending proposal whose values the post now already holds, and leaves one that still changes the field pending.
-
 
 ### Implementation files
 
@@ -492,7 +494,7 @@ The REST and PHP surface lives in `lib/compat/wordpress-7.1/` and `lib/compat/wo
 | `class-gutenberg-suggestion-block-scanner.php`, `class-gutenberg-suggestion-marker-processor.php` (7.2) | Block delimiters with byte offsets (driving `WP_Block_Parser::next_token()`), and the Tag Processor that exposes token spans to the marker walk. |
 | `block-suggestions.php` | `gutenberg_register_suggestion_meta` registers `_wp_suggestion` (sanitized, 64 KB cap, KSES on serialized block snapshots) and `_wp_suggestion_status`, each with an `edit_post`-on-parent `auth_callback`, plus the read-only provenance meta and the private storage of the save pass (`_wp_suggestion_content`, `_wp_suggestion_snapshot`, both kept out of WXR exports). Also the render side: `gutenberg_strip_inline_suggestion_markers`, the kind-aware `render_block` strip for inline markers (`del` keeps text, `add` drops text, `format` reverts per character to the recorded original), which reads markers through `gutenberg_get_suggestion_marker_kind()`, and `gutenberg_strip_pending_structural_suggestions`, its structural counterpart (`pending-insert` blocks dropped, `pending-remove`/`pending-move` blocks kept). `gutenberg_restore_pending_move_order` runs earlier, on `the_content` ahead of `do_blocks()`, and restores the pre-move sibling order of any list holding a single pending move, so an un-accepted move does not change published output. |
 | `block-suggestions.php` (validation) | `gutenberg_validate_suggestion_post_operations` (on `rest_preprocess_comment`) refuses, with a 400, a note whose `post-attribute-set` op targets anything but the title, excerpt, featured image, slug, one of the post type's REST taxonomies, or a meta key registered with `show_in_rest` that the suggester could edit (`gutenberg_can_suggest_post_meta`, `edit_post_meta`). |
-| `class-gutenberg-rest-comment-controller-7-1.php` | Thin subclass of the core comments controller. Permissions stay core's. It adds only storage rules: `prepare_item_for_database` rejects an oversized `_wp_suggestion` with 413 and an invalid JSON payload with 400, and `check_is_comment_content_allowed` lets a note carrying a suggestion payload have empty content. |
+| `class-gutenberg-rest-comment-controller-7-1.php` | Thin subclass of the comments controller (it extends `Gutenberg_REST_Comment_Controller_7_2`, which keeps note reactions working). Permissions stay core's. It adds only storage rules: `prepare_item_for_database` rejects an oversized `_wp_suggestion` with 413 and an invalid JSON payload with 400, and `check_is_comment_content_allowed` lets a note carrying a suggestion payload have empty content. |
 
 ## Suggestion Payload (v2)
 
@@ -519,11 +521,11 @@ Stored as a JSON string in the `_wp_suggestion` comment meta on a `note` comment
 | `schemaVersion` | Allows future schema evolution without breaking old payloads. |
 | `blockName` | Safety check — apply is refused if the block type has changed. |
 | `baseRevision` | `post_modified_gmt` at capture time, kept for provenance only. Accept-time conflicts are detected per attribute; see **Conflict detection** below. |
-| `operations` | Declarative transforms on the block tree. v1 emitted `attribute-set` only; v2 adds the structural variants (`block-insert-after`, `block-remove`, `block-move`), tracked in [#77434](https://github.com/WordPress/gutenberg/issues/77434). |
+| `operations` | Declarative transforms on the block tree or the post. v1 emitted `attribute-set` only; v2 adds the structural variants (`block-insert-after`, `block-remove`, `block-move`, tracked in [#77434](https://github.com/WordPress/gutenberg/issues/77434)), `inline-suggestion` and `post-attribute-set`. |
 
 Operations are **declarative transforms**, not HTML diffs. This makes them compatible with Yjs attribution semantics and resilient to concurrent edits on unrelated attributes.
 
-A payload carries at most one structural op. An inline note carries a single `inline-suggestion` op that names the attribute and marker kind; the range is never stored (the auto-save loop persists each structural mutation as its own note); `attribute-set` ops may ride along but the structural op leads. The op types and their distinguishing fields:
+A payload carries at most one structural op, because the auto-save loop persists each structural mutation as its own note; `attribute-set` ops may ride along, but the structural op leads. An inline note carries a single `inline-suggestion` op that names the attribute and the marker kind; the range is never stored. The op types and their distinguishing fields:
 
 | `type` | Fields beyond `type` / `blockName` | Apply dispatches |
 |--------|------------------------------------|------------------|
@@ -594,7 +596,7 @@ useSuggestionsProvider() → {
 }
 ```
 
-The current implementation keeps every note read and write in `SuggestionStore` (`suggestion-store.ts`), which uses comment meta. A future Yjs-backed implementation would replace that store, reading from `AttributionManager` and writing changes through the CRDT document, with the same methods on top.
+The current implementation keeps every note read and write in `SuggestionStore` (`suggestion-store.ts`), which uses comment meta. A CRDT-backed implementation would replace that store with the same methods on top (see [Moving storage to Yjs attribution](#moving-storage-to-yjs-attribution)).
 
 ## Accept / Reject
 
@@ -717,7 +719,7 @@ flowchart LR
 
 In the notes sidebar, a suggestion thread renders:
 
-- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Change: …" summary derived from the operations. Inline formatting reads "Formatting: bold" and block attributes read "Change: heading level 3 → 4" (a scalar value names both sides; an object value such as `style` keeps the bare name), so the two families of suggestion stay tellable apart in a mixed list. Structural lines quote the block's text when it has some ("Insert block: paragraph “Brand new text”"); the sidebar reads it from the live block, falling back to the snapshot on the op, and a block without text keeps the bare label. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.ts`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar. Quoted text is cut short so a card stays compact; when anything was cut, a "Show more" toggle (the same one a long note body uses) swaps in the full wording from `summarizeOperations( operations, { truncate: false } )`.
+- **`SuggestionSummary`** — a Docs-style "Add: …", "Delete: …", "Change: …" summary derived from the operations. Inline formatting reads "Add formatting: bold" or "Remove formatting: bold" (a link reads "Link: …" or "Change link: …") and block attributes read "Change: heading level 3 → 4" (a scalar value names both sides; an object value such as `style` keeps the bare name), so the two families of suggestion stay tellable apart in a mixed list. Structural lines quote the block's text when it has some ("Insert block: paragraph “Brand new text”"); the sidebar reads it from the live block, falling back to the snapshot on the op, and a block without text keeps the bare label. It is the sidebar's sole suggestion renderer; its `wordDiff` engine lives in `word-diff.ts`, capped by `MAX_DIFF_LENGTH`/`MAX_DIFF_TOKENS` so a large payload can't freeze the sidebar. Quoted text is cut short so a card stays compact; when anything was cut, a "Show more" toggle (the same one a long note body uses) swaps in the full wording from `summarizeOperations( operations, { truncate: false } )`.
 - **Accept / Reject icon buttons** — checkmark and close icons that trigger the provider's apply/reject flows.
 - **Status** - read from `_wp_suggestion_status` together with whether the loaded content still carries the note's anchor (`useSuggestionAnchorPresent` in `anchor-index.ts`):
 
@@ -762,16 +764,16 @@ There is no dedicated API for creating a suggestion yet. A plugin that writes on
 
     A provisional decision (`applied-unsaved`, `rejected-unsaved`) fires nothing; see [Decision lifecycle](#decision-lifecycle).
 
-## Yjs v2 Migration Path
+## Moving storage to Yjs attribution
 
-When PR [#77005](https://github.com/WordPress/gutenberg/pull/77005) (Yjs v14 / `AttributionManager`) stabilizes:
+Suggestions are stored in comment meta. The design keeps two boundaries so that a CRDT-native backend, in which a pending change is an attributed change in the Yjs document, could replace that storage without changing the review UI or the accept and reject logic. This is not scheduled: it depends on Yjs attribution (`AttributionManager`), which the Yjs version the editor uses does not provide.
 
-1. Add a Yjs-backed `SuggestionStore` beside the comment-meta one in `suggestion-store.ts`; `useSuggestionsProvider` keeps its interface.
-2. `createSuggestion` → write attributed changes to the Yjs doc instead of comment meta.
-3. `applySuggestion` / `rejectSuggestion` → accept/reject attributed changes in the Yjs doc, then persist the resolution to comment meta for non-RTC users.
-4. The proposal and diff UI remain unchanged - they consume operations, not storage details.
+Each boundary swaps one thing:
 
-Server-side persistence (comment meta) is still needed for users without RTC, so the comment-meta provider won't be fully retired — it becomes the fallback for non-collaborative sessions.
+- **`SuggestionStore`** (`suggestion-store.ts`) is every read and write of a suggestion's note. A Yjs-backed store would sit beside the comment-meta one, and `useSuggestionsProvider` would keep its interface: create writes attributed changes to the document, and accept and reject resolve them there, then record the outcome in comment meta.
+- **`findMarkerRange`** (`inline-markers/`) is the only place an inline marker's offsets are resolved. With attribution, the range would come from the document and not from a scan for the marker's id.
+
+The review UI consumes operations, not storage details, so it would not change. Comment meta would stay too: a session without real-time collaboration still needs server-side persistence, so the comment-meta store becomes the fallback and is not retired.
 
 ## Implementation wrinkles worth knowing
 

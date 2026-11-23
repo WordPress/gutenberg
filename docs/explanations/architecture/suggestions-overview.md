@@ -22,7 +22,7 @@ Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). T
 
 **Glossary**
 
-- **Mode** (the `editorIntent` in code): Editing or Suggesting, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing. A third, read-only **Viewing** mode (possibly still allowing notes) is [out of scope for the first iteration](./suggestions.md#out-of-scope-viewing).
+- **Mode** (the `editorIntent` in code): Editing or Suggesting, as in Google Docs. A session-only editor state, separate from the visual/code editor mode. Reloading always returns to Editing. A third, read-only **Viewing** mode (possibly still allowing notes) is [out of scope for the first iteration](./suggestions.md#out-of-scope-viewing) and tracked in [#85770](https://github.com/WordPress/gutenberg/issues/85770).
 - **Note**: a `note`-type comment (the Notes feature, GA in WordPress 6.9). A suggestion is a Note with a JSON payload in `_wp_suggestion` comment meta and a lifecycle in `_wp_suggestion_status`.
 - **Marker**: the in-content record of a pending suggestion. Inline markers are rich-text formats. Block markers live in `metadata.suggestion` and are typed `pending-insert`, `pending-remove`, `pending-move` or `pending-attributes`. Both kinds carry the Note's comment id.
 - **Anchor**: what the save leaves in stored `post_content` where a proposal was: an emptied mark, a marker with `after` replaced by a run number, or a `core/suggestion-placeholder` block. Each carries the Note's comment id.
@@ -80,7 +80,7 @@ flowchart TB
     Post --> Strip
 ```
 
-Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the swap point for a future Yjs backend), and are linked back to the block through `metadata.noteId` and the marker's id.
+Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend would replace), and are linked back to the block through `metadata.noteId` and the marker's id.
 
 ## The PR stack
 
@@ -164,7 +164,7 @@ The diagram shows the content as the editor holds it. [Storage at a glance](./su
 
 Four rules hold the model together:
 
-1. **Offsets are never stored.** An inline marker is found by id on every read (`findMarkerRange`), so unrelated edits elsewhere in the block do not break it. This is also the planned swap point for Yjs attribution.
+1. **Offsets are never stored.** An inline marker is found by id on every read (`findMarkerRange`), so unrelated edits elsewhere in the block do not break it. It is also where a CRDT-backed range lookup would plug in.
 2. **Operations describe intent, not diffs.** A payload is a list of declarative ops (`attribute-set`, `block-insert-after`, `block-remove`, `block-move`, `inline-suggestion`, `post-attribute-set`). Accept replays them against the current block, and conflicts are checked per attribute.
 3. **Two status axes.** The comment status (open or resolved discussion) and `_wp_suggestion_status` are independent, so a decided suggestion can keep its thread open.
 4. **A decision is final only once it is saved.** Accept and Reject write a provisional status (`applied-unsaved`, `rejected-unsaved`) and change the content in the editor. The save pass writes `applied` or `rejected` when a saved post no longer carries the suggestion, and `outdated` when someone else's save removed it undecided. A client cannot write a final status.
@@ -373,5 +373,4 @@ Then the mechanism:
 - [Suggestions Architecture](./suggestions.md): the full reference (module tables, payload schema, every known limitation).
 - [#73411](https://github.com/WordPress/gutenberg/issues/73411): tracking issue, testing walkthrough and fix PR list.
 - [#78994](https://github.com/WordPress/gutenberg/pull/78994): combined branch for Playground testing.
-- [#77005](https://github.com/WordPress/gutenberg/pull/77005): Yjs v14 and `AttributionManager`, the future storage backend.
 - [#78218](https://github.com/WordPress/gutenberg/pull/78218): the Notes inline anchor the marker primitive grew from.
