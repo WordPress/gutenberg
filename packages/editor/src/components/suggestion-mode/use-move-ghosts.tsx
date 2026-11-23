@@ -1,18 +1,18 @@
 /**
- * Move-ghost index for Suggest mode, sourced from the live block tree.
+ * Move-ghost index for Suggestion mode, sourced from the live block tree.
  *
  * A structural "move" suggestion is stored on the moved block itself as
  * `metadata.suggestion.type === 'pending-move'` (with the block's old
- * position recorded alongside it), never in the in-memory overlay. The
- * provider below scans the tree for those markers ONCE per store change and
+ * position recorded alongside it). The provider below scans the tree for
+ * those markers ONCE per store change and
  * publishes the anchor → ghost index over context; the per-block rendering
  * HOC reads its own clientId's slice from that shared index. Without the
  * hoist every block ran the scan inside its own `useSelect` — N blocks ×
  * O(N) per store change, quadratic in document size during suggest sessions.
  *
- * It deliberately depends only on the block-editor store, not on the Suggest
- * overlay context: move suggestions live on the real block and must keep
- * rendering once the overlay is retired. See #73411.
+ * It deliberately depends only on the block-editor store, not on the
+ * suggestion session: move suggestions live on the real block and must keep
+ * rendering in every intent. See #73411.
  */
 import type { ReactNode } from 'react';
 import { useRegistry, useSelect } from '@wordpress/data';

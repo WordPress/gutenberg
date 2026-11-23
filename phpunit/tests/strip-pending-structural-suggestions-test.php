@@ -32,6 +32,39 @@ class Tests_Strip_Pending_Structural_Suggestions extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'Nested content', $rendered );
 	}
 
+	public function test_pending_insert_block_and_its_subtree_are_never_rendered(): void {
+		$calls = 0;
+		register_block_type(
+			'tests/suggestion-render-probe',
+			array(
+				'render_callback' => static function () use ( &$calls ): string {
+					++$calls;
+					return '<p>Probe</p>';
+				},
+			)
+		);
+		$insert = '{"metadata":{"suggestion":{"type":"pending-insert","authorId":2}}}';
+		// A pending insertion at the top level, one nested in a block that
+		// renders, and a plain block nested in a pending insertion.
+		$content = '<!-- wp:tests/suggestion-render-probe ' . $insert . ' /-->'
+			. '<!-- wp:group --><div class="wp-block-group"><!-- wp:tests/suggestion-render-probe ' . $insert . ' /--></div><!-- /wp:group -->'
+			. '<!-- wp:group ' . $insert . ' --><div class="wp-block-group"><!-- wp:tests/suggestion-render-probe /--></div><!-- /wp:group -->';
+
+		$rendered = do_blocks( $content );
+		unregister_block_type( 'tests/suggestion-render-probe' );
+
+		$this->assertSame( 0, $calls, 'A pending insertion runs no render callback.' );
+		$this->assertStringNotContainsString( 'Probe', $rendered );
+		$this->assertStringContainsString( 'wp-block-group', $rendered, 'The block around a pending insertion still renders.' );
+	}
+
+	public function test_pending_insert_block_rendered_directly_is_dropped(): void {
+		// A block rendered without `render_block()` skips `pre_render_block`.
+		$blocks = parse_blocks( '<!-- wp:paragraph {"metadata":{"suggestion":{"type":"pending-insert"}}} --><p>Proposed</p><!-- /wp:paragraph -->' );
+
+		$this->assertSame( '', ( new WP_Block( $blocks[0] ) )->render() );
+	}
+
 	public function test_pending_remove_block_still_renders() {
 		$content  = '<!-- wp:paragraph {"metadata":{"suggestion":{"type":"pending-remove","authorId":2},"noteId":[7]}} --><p>Still real content</p><!-- /wp:paragraph -->';
 		$rendered = $this->render( $content );
