@@ -49,6 +49,40 @@ function gutenberg_suggestions_enabled( $post ): bool {
 }
 
 /**
+ * Refuses a REST write of suggestion data where Suggestion mode is not
+ * available.
+ *
+ * Without the experiment the editor offers no way to make or decide a
+ * suggestion and the save pass does not run, so a suggestion written by
+ * another client would have nothing to reconcile it. Clearing the payload
+ * stays possible.
+ *
+ * @param array<string, mixed>|WP_Error $prepared_comment Comment data about to be written.
+ * @param WP_REST_Request               $request          Request.
+ * @return array<string, mixed>|WP_Error The comment data, or an error for a suggestion write.
+ */
+function gutenberg_refuse_suggestion_write_when_unavailable( $prepared_comment, $request ) {
+	if ( is_wp_error( $prepared_comment ) || ! is_array( $request['meta'] ) ) {
+		return $prepared_comment;
+	}
+	$meta = $request['meta'];
+	if ( empty( $meta['_wp_suggestion'] ) && empty( $meta['_wp_suggestion_status'] ) ) {
+		return $prepared_comment;
+	}
+	$comment = isset( $request['id'] ) ? get_comment( absint( $request['id'] ) ) : null;
+	$post_id = $comment ? (int) $comment->comment_post_ID : absint( $request['post'] );
+	if ( $post_id > 0 && gutenberg_suggestions_enabled( $post_id ) ) {
+		return $prepared_comment;
+	}
+	return new WP_Error(
+		'rest_suggestions_unavailable',
+		__( 'Suggestions are not available for this post.', 'gutenberg' ),
+		array( 'status' => 403 )
+	);
+}
+add_filter( 'rest_preprocess_comment', 'gutenberg_refuse_suggestion_write_when_unavailable', 5, 2 );
+
+/**
  * Records who made a provisional decision, and forgets it on reopen.
  *
  * Stamped here rather than sent by the client, so the name the sidebar shows

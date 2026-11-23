@@ -80,6 +80,19 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		}
 
 		/**
+		 * Whether the pass runs: only with the Suggestion mode experiment on.
+		 *
+		 * With it off nothing is extracted, finalized or put back, so the
+		 * editor loads and saves the stored content as it is. The render
+		 * filters still hide any proposal that content carries.
+		 *
+		 * @return bool
+		 */
+		private static function is_enabled(): bool {
+			return gutenberg_is_experiment_enabled( 'gutenberg-suggestion-mode' );
+		}
+
+		/**
 		 * Whether a post type supports notes (`editor` support with `notes`).
 		 *
 		 * @param string $post_type Post type.
@@ -112,7 +125,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @return array Post data, its content anchored.
 		 */
 		public static function transform( $data, $postarr, $unsanitized_postarr = array(), $update = false ) {
-			if ( ! isset( $data['post_type'] ) ) {
+			if ( ! self::is_enabled() || ! isset( $data['post_type'] ) ) {
 				return $data;
 			}
 			$incoming = isset( $data['post_content'] ) ? wp_unslash( $data['post_content'] ) : '';
@@ -303,7 +316,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param WP_Post $post    Post.
 		 */
 		public static function finalize_post_fields( $post_id, $post ) {
-			if ( ! $post instanceof WP_Post || 'revision' === $post->post_type || ! self::post_type_supports_notes( $post->post_type ) ) {
+			if ( ! self::is_enabled() || ! $post instanceof WP_Post || 'revision' === $post->post_type || ! self::post_type_supports_notes( $post->post_type ) ) {
 				return;
 			}
 			if ( ! self::saver_can_change_notes( $post_id ) || ! self::has_provisional_notes( $post_id ) ) {
@@ -390,6 +403,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param int $revision_id Revision ID.
 		 */
 		public static function reseed_from_revision( $post_id, $revision_id ) {
+			if ( ! self::is_enabled() ) {
+				return;
+			}
 			$snapshot = self::read_snapshot( $revision_id );
 			$post     = get_post( $post_id );
 			if ( ! $snapshot || ! $post ) {
@@ -452,7 +468,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @return WP_REST_Response Response.
 		 */
 		public static function inflate_response( $response, $post, $request ) {
-			if ( ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post ) {
+			if ( ! self::is_enabled() || ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post ) {
 				return $response;
 			}
 			if ( 'edit' !== ( isset( $request['context'] ) ? $request['context'] : 'view' ) ) {
