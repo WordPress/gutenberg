@@ -57,7 +57,7 @@
  * structural op is written to the overlay so auto-save persists it.
  */
 import { useRegistry, useSelect } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useEvent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
