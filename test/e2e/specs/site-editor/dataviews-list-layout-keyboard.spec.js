@@ -143,10 +143,14 @@ test.describe( 'Dataviews List Layout', () => {
 
 		// Use arrow up/down to move through the list.
 		await page.keyboard.press( 'ArrowDown' );
-		await expect( page.getByLabel( 'Page Two' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'button', { name: 'Page Two', exact: true } )
+		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowUp' );
-		await expect( page.getByLabel( 'Page One' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'button', { name: 'Page One', exact: true } )
+		).toBeFocused();
 	} );
 
 	test( 'Actions are reachable via RIGHT/LEFT arrow keys', async ( {
@@ -166,7 +170,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page One ${ primaryActionLabel } Actions`,
+					name: 'Page One',
+					exact: true,
 				} )
 				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
@@ -175,7 +180,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page One ${ primaryActionLabel } Actions`,
+					name: 'Page One',
+					exact: true,
 				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
@@ -184,13 +190,16 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page One ${ primaryActionLabel } Actions`,
+					name: 'Page One',
+					exact: true,
 				} )
 				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
 
 		await page.keyboard.press( 'ArrowLeft' );
-		await expect( page.getByLabel( 'Page One' ) ).toBeFocused();
+		await expect(
+			page.getByRole( 'button', { name: 'Page One', exact: true } )
+		).toBeFocused();
 	} );
 
 	test( 'Search input retains focus while typing', async ( { page } ) => {
@@ -237,7 +246,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page Two ${ primaryActionLabel } Actions`,
+					name: 'Page Two',
+					exact: true,
 				} )
 				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
@@ -246,7 +256,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page One ${ primaryActionLabel } Actions`,
+					name: 'Page One',
+					exact: true,
 				} )
 				.getByRole( 'button', { name: primaryActionLabel } )
 		).toBeFocused();
@@ -257,7 +268,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page Two ${ primaryActionLabel } Actions`,
+					name: 'Page Two',
+					exact: true,
 				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();
@@ -266,7 +278,8 @@ test.describe( 'Dataviews List Layout', () => {
 		await expect(
 			page
 				.getByRole( 'row', {
-					name: `Page One ${ primaryActionLabel } Actions`,
+					name: 'Page One',
+					exact: true,
 				} )
 				.getByLabel( 'Actions' )
 		).toBeFocused();

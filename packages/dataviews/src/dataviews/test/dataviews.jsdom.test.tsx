@@ -1611,6 +1611,60 @@ describe( 'DataViews component', () => {
 			}
 		} );
 
+		it( 'names each item by its title and describes it by its fields', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'list',
+						titleField: 'title',
+						fields: [ 'author' ],
+					} }
+					actions={ actions }
+				/>
+			);
+			expect(
+				await screen.findByRole( 'row', { name: 'Hello World' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Hello World' } )
+			).toHaveAccessibleDescription( /Author\s*Jane/ );
+		} );
+
+		it( 'keeps the description field in the description of an item', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'list',
+						titleField: 'title',
+						descriptionField: 'order',
+						fields: [ 'author' ],
+					} }
+				/>
+			);
+			expect(
+				await screen.findByRole( 'row', { name: 'Hello World' } )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Hello World' } )
+			).toHaveAccessibleDescription( /^1\s+Author\s*Jane$/ );
+		} );
+
+		it( 'names an item by its content when the title is not shown', async () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: 'list',
+						titleField: 'title',
+						showTitle: false,
+						fields: [ 'author' ],
+					} }
+				/>
+			);
+			expect(
+				await screen.findByRole( 'row', { name: /Jane/ } )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should render actions dropdown if actions are supported and passed in for each list item', async () => {
 			render(
 				<DataViewWrapper
