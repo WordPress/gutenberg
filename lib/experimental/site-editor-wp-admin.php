@@ -33,16 +33,17 @@ function gutenberg_get_site_editor_wp_admin_url( $path = '/' ) {
 /**
  * Returns the site editor sections listed in the admin menu.
  *
- * Pages is left out because the top-level Pages menu already covers it.
+ * Home is left out because the page's own Editor item opens it, and Pages is
+ * left out because the top-level Pages menu already covers it.
  *
- * @return array[] List of sections, each with `id`, `label` and `to` keys.
+ * @return array[] List of sections, see gutenberg_get_site_editor_sections().
  */
 function gutenberg_get_site_editor_wp_admin_sections() {
 	return array_values(
 		array_filter(
 			gutenberg_get_site_editor_sections(),
 			static function ( $section ) {
-				return 'pages' !== $section['id'];
+				return ! in_array( $section['id'], array( 'home', 'pages' ), true );
 			}
 		)
 	);
@@ -95,9 +96,6 @@ function gutenberg_register_site_editor_wp_admin_menu() {
 	$editor_item = array_pop( $submenu['themes.php'] );
 	$new_items   = array( $editor_item );
 	foreach ( gutenberg_get_site_editor_wp_admin_sections() as $section ) {
-		if ( '/' === $section['to'] ) {
-			continue;
-		}
 		$new_items[] = array(
 			$section['label'],
 			'edit_theme_options',
@@ -121,47 +119,48 @@ function gutenberg_register_site_editor_wp_admin_menu() {
 add_action( 'admin_menu', 'gutenberg_register_site_editor_wp_admin_menu', 100 );
 
 /**
- * Returns the menu slug of the section matching a route path, using the
- * longest section path that the route path starts with.
+ * Returns the admin menu section matching a route path.
+ *
+ * Uses the longest of the section's `to` path and its `match_prefixes` that
+ * the route path equals or starts with, followed by a `/`.
  *
  * @param string $path Route path, as in the `p` query arg.
- * @return string The menu slug.
+ * @return array|null The section, or null when none matches.
  */
-function gutenberg_get_site_editor_wp_admin_submenu_file( $path ) {
+function gutenberg_get_site_editor_wp_admin_section_for_path( $path ) {
 	$path     = '/' . trim( explode( '?', $path )[0], '/' );
-	$best     = '/';
+	$best     = null;
 	$best_len = 0;
 
 	foreach ( gutenberg_get_site_editor_wp_admin_sections() as $section ) {
-		$to = $section['to'];
-		if ( '/' === $to ) {
-			continue;
-		}
-		$matches = $path === $to || str_starts_with( $path, $to . '/' );
-		if ( $matches && strlen( $to ) > $best_len ) {
-			$best     = $to;
-			$best_len = strlen( $to );
+		$prefixes = array_merge( array( $section['to'] ), $section['match_prefixes'] ?? array() );
+		foreach ( $prefixes as $prefix ) {
+			$matches = $path === $prefix || str_starts_with( $path, $prefix . '/' );
+			if ( $matches && strlen( $prefix ) > $best_len ) {
+				$best     = $section;
+				$best_len = strlen( $prefix );
+			}
 		}
 	}
 
-	if ( '/' === $best ) {
-		return 'site-editor-v2-wp-admin';
-	}
-	return gutenberg_get_site_editor_wp_admin_url( $best );
+	return $best;
 }
 
 /**
- * Prepares the admin menu highlight and the data the page needs before
- * wp-admin/admin-header.php renders.
+ * Sets the highlighted menu item before wp-admin/admin-header.php renders.
+ * Routes that don't belong to a section highlight Editor.
  */
 function gutenberg_site_editor_wp_admin_prepare_screen() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only picks the highlighted menu item.
-	$path = isset( $_GET['p'] ) && is_string( $_GET['p'] ) ? sanitize_text_field( wp_unslash( $_GET['p'] ) ) : '/';
+	$path    = isset( $_GET['p'] ) && is_string( $_GET['p'] ) ? sanitize_text_field( wp_unslash( $_GET['p'] ) ) : '/';
+	$section = gutenberg_get_site_editor_wp_admin_section_for_path( $path );
 
 	add_filter(
 		'submenu_file',
-		static function () use ( $path ) {
-			return gutenberg_get_site_editor_wp_admin_submenu_file( $path );
+		static function () use ( $section ) {
+			return $section
+				? gutenberg_get_site_editor_wp_admin_url( $section['to'] )
+				: 'site-editor-v2-wp-admin';
 		}
 	);
 }

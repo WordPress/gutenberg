@@ -23,7 +23,11 @@ add_action( 'admin_menu', 'gutenberg_register_site_editor_admin_page' );
 /**
  * Returns the site editor sections available for the current theme.
  *
- * @return array[] List of sections, each with `id`, `label` and `to` keys.
+ * Each section has `id`, `label` and `to` keys. A section can also list
+ * `match_prefixes`: route paths, besides `to`, that belong to the section, such
+ * as the editor routes of its post type.
+ *
+ * @return array[] List of sections.
  */
 function gutenberg_get_site_editor_sections() {
 	$sections = array(
@@ -65,9 +69,10 @@ function gutenberg_get_site_editor_sections() {
 	// `add_theme_support( 'block-templates' )`.
 	if ( current_theme_supports( 'block-templates' ) ) {
 		$sections[] = array(
-			'id'    => 'templates',
-			'label' => __( 'Templates', 'gutenberg' ),
-			'to'    => '/templates',
+			'id'             => 'templates',
+			'label'          => __( 'Templates', 'gutenberg' ),
+			'to'             => '/templates',
+			'match_prefixes' => array( '/types/wp_template' ),
 		);
 	}
 
@@ -75,16 +80,18 @@ function gutenberg_get_site_editor_sections() {
 	// as the Template Part block itself allows.
 	if ( current_theme_supports( 'block-templates' ) || current_theme_supports( 'block-template-parts' ) ) {
 		$sections[] = array(
-			'id'    => 'templateParts',
-			'label' => __( 'Template Parts', 'gutenberg' ),
-			'to'    => '/template-parts',
+			'id'             => 'templateParts',
+			'label'          => __( 'Template Parts', 'gutenberg' ),
+			'to'             => '/template-parts',
+			'match_prefixes' => array( '/types/wp_template_part' ),
 		);
 	}
 
 	$sections[] = array(
-		'id'    => 'patterns',
-		'label' => __( 'Patterns', 'gutenberg' ),
-		'to'    => '/patterns',
+		'id'             => 'patterns',
+		'label'          => __( 'Patterns', 'gutenberg' ),
+		'to'             => '/patterns',
+		'match_prefixes' => array( '/types/wp_block' ),
 	);
 
 	return $sections;
