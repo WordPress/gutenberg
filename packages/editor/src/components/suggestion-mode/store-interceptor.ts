@@ -1315,9 +1315,9 @@ export default function SuggestionStoreInterceptor() {
 		 * dispatches it: in the post editor it is reached only from
 		 * `useBlockSync`, which calls it when the controlling entity hands
 		 * down a new value (and with `[]` on unmount), plus `synchronizeTemplate`,
-		 * which is a template resync rather than a content edit. Wrapping the
-		 * store's action object is the same interception `SuggestionUndoGuard`
-		 * uses for undo/redo; the original is restored on cleanup.
+		 * which is a template resync rather than a content edit. The wrap is
+		 * on this editor's own block-editor store, which no other editor
+		 * shares; the original is restored on cleanup.
 		 *
 		 * Subscribers fire synchronously from within the dispatch, so the flag
 		 * is read by the very fire the reset triggers and needs no token
