@@ -398,7 +398,8 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 				)
 			);
 			update_comment_meta( $note_id, '_wp_suggestion', $operations );
-			gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_status', $status );
+			$this->assertIsInt( $note_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 			$ids[] = $note_id;
 		}
 		$marks = '';

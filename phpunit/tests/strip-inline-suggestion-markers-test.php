@@ -352,7 +352,8 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		);
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
 		if ( $status ) {
-			gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_status', $status );
+			$this->assertIsInt( $note_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 		}
 		return $note_id;
 	}
