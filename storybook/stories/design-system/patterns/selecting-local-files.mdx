@@ -13,13 +13,13 @@ import FilePickerDropZoneSource from './file-picker-drop-zone.tsx?raw';
 import FilePickerMultipleSource from './file-picker-multiple.tsx?raw';
 import FilePickerUploadSource from './file-picker-upload.tsx?raw';
 import FilePickerPanelSource from './file-picker-panel.tsx?raw';
-import FilePickerSnackbarsSource from './file-picker-snackbars.tsx?raw';
+import FilePickerPreviewSource from './file-picker-preview.tsx?raw';
 import SelectedFileSource from './selected-file.tsx?raw';
 import FilePickerStylesSource from './file-picker.module.css?raw';
 
 <Meta title="Design System/Patterns/Selecting Local Files" tags={ [ 'manifest' ] } />
 
-# Selecting local files
+# Selecting Local Files
 
 Let people choose files from their device with a drop area, a button, or a menu, and show what they chose. Use `FormFileUpload` from `@wordpress/components` to open the native file picker. Its `render` prop receives `openFileDialog`, so any control can open the picker, while the file input stays hidden. It also handles browser quirks, such as `accept="audio/*"` on iOS.
 
@@ -53,7 +53,7 @@ Lay the field out like other form fields: the label, then the drop area, then th
 - **Name the drop area after its action.** When it shows a file, its accessible name is "Replace cover.png".
 - **Mark the field the way the rest of the form does.** Add "(Required)" to required fields, or "(Optional)" when the form marks optional fields instead, in the legend's own style.
 
-A `Fieldset` groups the drop area and the remove button under one legend. Disable the fieldset to disable the button, the remove button, and the hidden input together. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
+A `Fieldset` groups the drop area and the remove button under one legend. A disabled fieldset disables the buttons and the hidden input natively, but each `Button` also needs its own `disabled` prop to look disabled. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
 
 <Canvas of={ FilePickerDropZoneStories.Disabled } sourceState="none" />
 
@@ -111,7 +111,9 @@ When choosing a file is the whole task, start the work as soon as the picker clo
 
 A snackbar confirms the import, as on the Patterns screen. An error stays below the button until the next try, because a snackbar can disappear before people read it.
 
-<Source code={ FilePickerSnackbarsSource } language="tsx" />
+The preview keeps its own snackbar list and a stand-in for the import request. A WordPress screen uses its existing snackbar region and its real request.
+
+<Source code={ FilePickerPreviewSource } language="tsx" />
 
 ## Choose, then submit
 

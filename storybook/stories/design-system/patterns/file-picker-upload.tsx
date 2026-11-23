@@ -84,7 +84,9 @@ export function FilePickerUpload() {
 			if ( fails && progress >= 60 ) {
 				stop( id );
 				update( id, { status: 'failed' } );
-				announce( `Couldn’t upload ${ file.name }.` );
+				announce(
+					`Couldn’t upload ${ file.name }. Select “Retry” to try again.`
+				);
 			} else if ( progress >= 100 ) {
 				stop( id );
 				update( id, { status: 'uploaded', progress } );

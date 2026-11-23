@@ -108,6 +108,7 @@ export function FilePickerMenu() {
 								onRemove={ () => {
 									speak( `${ file.name } removed.` );
 									setFile( undefined );
+									setError( '' );
 									triggerRef.current?.focus();
 								} }
 							/>

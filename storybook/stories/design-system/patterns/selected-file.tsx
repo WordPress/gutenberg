@@ -9,9 +9,13 @@ import styles from './file-picker.module.css';
  * @param bytes The size of the file.
  */
 export function formatFileSize( bytes: number ) {
+	// Sizes that would round up to "1,000 kB" are shown in megabytes.
 	const [ value, unit ] =
-		bytes < 1_000_000
-			? [ Math.max( 1, Math.round( bytes / 1_000 ) ), 'kilobyte' ]
+		bytes < 999_500
+			? [
+					bytes && Math.max( 1, Math.round( bytes / 1_000 ) ),
+					'kilobyte',
+				]
 			: [ bytes / 1_000_000, 'megabyte' ];
 	return new Intl.NumberFormat( undefined, {
 		style: 'unit',
@@ -127,9 +131,11 @@ export const SelectedFile = forwardRef<
 		footer?: React.ReactNode;
 		/** Buttons before the remove button, such as "Retry". */
 		actions?: React.ReactNode;
+		/** Whether the remove button is disabled. */
+		disabled?: boolean;
 	}
 >( function UnforwardedSelectedFile(
-	{ file, onRemove, removeLabel, status, footer, actions },
+	{ file, onRemove, removeLabel, status, footer, actions, disabled },
 	ref
 ) {
 	return (
@@ -152,6 +158,7 @@ export const SelectedFile = forwardRef<
 				variant="minimal"
 				tone="neutral"
 				size="compact"
+				disabled={ disabled }
 				onClick={ onRemove }
 			/>
 		</Stack>

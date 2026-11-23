@@ -2,6 +2,11 @@ import { SnackbarList } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import previewStyles from './file-picker-preview.module.css';
 
+/*
+ * Helpers for the preview only: a snackbar list and a stand-in for the
+ * request that imports a pattern.
+ */
+
 /**
  * A local snackbar list, so the preview is self-contained. In a WordPress
  * screen, create the notice with `core/notices` and `type: 'snackbar'`, and

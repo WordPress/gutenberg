@@ -4,7 +4,7 @@ import { FormFileUpload } from '@wordpress/components';
 import { useId, useRef, useState } from '@wordpress/element';
 import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
-import { importPattern, useSnackbars } from './file-picker-snackbars';
+import { importPattern, useSnackbars } from './file-picker-preview';
 import styles from './file-picker.module.css';
 import previewStyles from './file-picker-preview.module.css';
 
@@ -93,6 +93,7 @@ export function FilePickerButton() {
 						{ file && (
 							<SelectedFile
 								file={ file }
+								disabled={ isImporting }
 								onRemove={ () => {
 									speak( `${ file.name } removed.` );
 									setFile( undefined );

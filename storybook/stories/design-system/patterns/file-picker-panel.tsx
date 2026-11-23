@@ -7,6 +7,7 @@ import {
 	Card,
 	EmptyState,
 	Stack,
+	Text,
 	ValidityIndicator,
 } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
@@ -54,6 +55,7 @@ export function FilePickerPanel() {
 		const index = entries.indexOf( entry );
 		const remaining = entries.filter( ( item ) => item !== entry );
 		setEntries( remaining );
+		setError( '' );
 		speak( `${ entry.file.name } removed.` );
 		const next = remaining[ index ] ?? remaining[ index - 1 ];
 		( next
@@ -127,6 +129,11 @@ export function FilePickerPanel() {
 								</li>
 							) ) }
 						</Stack>
+					) : null }
+					{ entries.length > 0 ? (
+						<Text variant="body-sm" className={ styles.weak }>
+							Drop more font files anywhere in this panel.
+						</Text>
 					) : (
 						<EmptyState.Root>
 							<EmptyState.Icon icon={ upload } />

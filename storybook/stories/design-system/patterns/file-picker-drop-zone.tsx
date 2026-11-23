@@ -128,6 +128,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 								variant="minimal"
 								tone="neutral"
 								size="compact"
+								disabled={ disabled }
 								onClick={ removeFile }
 							/>
 						) }

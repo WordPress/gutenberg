@@ -1,7 +1,7 @@
 import { FormFileUpload } from '@wordpress/components';
 import { useId, useState } from '@wordpress/element';
 import { Button, Stack, ValidityIndicator } from '@wordpress/ui';
-import { importPattern, useSnackbars } from './file-picker-snackbars';
+import { importPattern, useSnackbars } from './file-picker-preview';
 import previewStyles from './file-picker-preview.module.css';
 
 export function FilePickerImport() {
