@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   List View: Show an appender at the end of every expanded nested list, so items can be added to a submenu or a Buttons block from the List View. An empty container, such as an empty Social Icons block, gets an appender too, unless it shows no appender on the canvas. A nested appender is a plain + that turns blue while hovered or focused. `PrivateListView` can name the top-level one with `appenderLabel` ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
+-   List View: In a `PrivateListView` with `showAppender`, which only the Navigation block's List Views set, show an appender at the end of every expanded nested list, so items can be added to a submenu or a Buttons block from the List View. An empty container, such as an empty Social Icons block, gets an appender too, unless it shows no appender on the canvas. A nested appender is a plain + that turns blue while hovered or focused. `PrivateListView` can name the top-level one with `appenderLabel` ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
 
 ### Bug Fixes
 
