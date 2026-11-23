@@ -6,13 +6,11 @@ import { getElevationOpacity, getHighlightOpacity } from '../elevation';
 const LEVELS = [
 	{ token: '--wpds-elevation-xs', usage: 'Switch thumb' },
 	{ token: '--wpds-elevation-sm', usage: 'Tooltip' },
-	{ token: '--wpds-elevation-md', usage: 'Popover, menu', stroke: true },
+	{ token: '--wpds-elevation-md', usage: 'Popover, menu' },
 	{ token: '--wpds-elevation-lg', usage: 'Dialog, drawer' },
 ];
 
-type Strokes = 'as used' | 'none' | 'all';
-
-type Args = { background: string; strokes: Strokes };
+type Args = { background: string; strokes: boolean };
 
 const text: CSSProperties = {
 	color: 'var(--wpds-color-foreground-content-neutral)',
@@ -30,7 +28,7 @@ const Levels = ( {
 	strokes,
 }: {
 	title: ReactNode;
-	strokes: Strokes;
+	strokes: boolean;
 } ) => (
 	<div
 		style={ {
@@ -49,7 +47,7 @@ const Levels = ( {
 				gap: '2rem',
 			} }
 		>
-			{ LEVELS.map( ( { token, usage, stroke } ) => (
+			{ LEVELS.map( ( { token, usage } ) => (
 				<div
 					key={ token }
 					style={ {
@@ -57,9 +55,7 @@ const Levels = ( {
 						backgroundColor:
 							'var(--wpds-color-background-surface-neutral-strong)',
 						borderRadius: 'var(--wpds-border-radius-md)',
-						border: (
-							strokes === 'as used' ? stroke : strokes === 'all'
-						)
+						border: strokes
 							? 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral)'
 							: undefined,
 						boxShadow: `var(${ token })`,
@@ -89,15 +85,14 @@ const meta: Meta< Args > = {
 	title: 'Design System/Theme/Elevation',
 	args: {
 		background: '#fcfcfc',
-		strokes: 'as used',
+		strokes: false,
 	},
 	argTypes: {
 		background: { control: 'color' },
 		strokes: {
-			control: 'inline-radio',
-			options: [ 'as used', 'none', 'all' ],
+			control: 'boolean',
 			description:
-				'Which cards get a stroke. "as used" matches the components: only popovers and menus have one.',
+				'Add a stroke to every card. Popovers and menus have no stroke, so the shadow alone separates them from the page.',
 		},
 	},
 	parameters: {

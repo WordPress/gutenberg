@@ -15,9 +15,19 @@
 			min-width: var(--anchor-width);
 			max-width: min(var(--available-width), var(--_wp-ui-item-popup-max-width, var(--available-width)));
 			border-radius: var(--wpds-border-radius-md);
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border: var(--wpds-border-width-xs) solid transparent;
 			box-shadow: var(--wpds-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
+
+			/*
+			 * The border is transparent so the shadow alone separates the
+			 * surface from what's beneath it. Forced-colors mode strips
+			 * `box-shadow` and doesn't substitute `transparent`, so paint the
+			 * border there to keep the boundary.
+			 */
+			@media ( forced-colors: active ) {
+				border-color: CanvasText;
+			}
 		}
 
 		.is-width-anchor {

@@ -5,7 +5,6 @@
 
 $arrow-triangle-base-size: 14px;
 
-$shadow-popover-border-default: 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
 $shadow-popover-border-top-only: 0 calc(var(--wpds-border-width-xs) * -1) 0 0 var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
@@ -26,8 +25,9 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__content {
 	background: var(--wpds-color-background-surface-neutral-strong);
-	// The stroke stays on the box-shadow, since consumers override it there.
-	box-shadow: $shadow-popover-border-default, var(--wpds-elevation-md);
+	// No stroke: the elevation shadow alone separates the popover from what's
+	// beneath it. Forced colors still gets an outline (see below).
+	box-shadow: var(--wpds-elevation-md);
 	border-radius: var(--wpds-border-radius-md);
 	box-sizing: border-box;
 	width: min-content;
@@ -143,10 +143,11 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 }
 
 .components-popover__triangle-border {
-	// Stroke colors are the same as the .components-popover__content's outline
+	// The default popover has no stroke, so neither does its arrow. The
+	// alternate and forced-colors treatments below still draw one.
 	fill: transparent;
 	stroke-width: var(--wpds-border-width-xs);
-	stroke: var(--wpds-color-stroke-surface-neutral);
+	stroke: transparent;
 
 	.is-alternate & {
 		stroke: $gray-900;

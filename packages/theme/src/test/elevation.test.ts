@@ -41,9 +41,9 @@ describe( 'elevation', () => {
 	} );
 
 	it( 'increases shadow opacity as the background gets darker', () => {
-		expect( getElevationOpacity( '#ffffff' ) ).toBe( 0.05 );
-		expect( getElevationOpacity( '#777777' ) ).toBe( 0.193 );
-		expect( getElevationOpacity( '#1e1e1e' ) ).toBe( 0.272 );
+		expect( getElevationOpacity( '#ffffff' ) ).toBe( 0.08 );
+		expect( getElevationOpacity( '#777777' ) ).toBe( 0.206 );
+		expect( getElevationOpacity( '#1e1e1e' ) ).toBe( 0.275 );
 		expect( getElevationOpacity( '#000000' ) ).toBe( 0.3 );
 	} );
 } );

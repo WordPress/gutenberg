@@ -29,7 +29,9 @@
 
 	background-color: $components-color-background;
 	border-radius: $radius-medium;
-	box-shadow: 0 0 0 $border-width $components-color-gray-300, var(--wpds-elevation-md);
+	// No stroke: the elevation shadow alone separates the menu from what's
+	// beneath it. Forced colors gets the `.menu` outline instead.
+	box-shadow: var(--wpds-elevation-md);
 
 	&:where(.is-toolbar) {
 		box-shadow: 0 0 0 $border-width $components-color-foreground;

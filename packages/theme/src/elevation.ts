@@ -4,7 +4,7 @@ import { ColorSpace, getLuminance, sRGB } from 'colorjs.io/fn';
  * Shadow opacity range. The lightest background (white) gets `min`, the
  * darkest (black) gets `max`.
  */
-const ELEVATION_OPACITY = { min: 0.05, max: 0.3 };
+const ELEVATION_OPACITY = { min: 0.08, max: 0.3 };
 
 /**
  * Top-edge highlight opacity range. White gets `min` (no highlight), black

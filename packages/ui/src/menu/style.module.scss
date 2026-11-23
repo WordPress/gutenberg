@@ -30,10 +30,20 @@
 			padding: var(--wp-ui-menu-popup-padding);
 			scroll-padding: var(--wp-ui-menu-popup-padding);
 			border-radius: var(--wpds-border-radius-md);
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border: var(--wpds-border-width-xs) solid transparent;
 			box-shadow: var(--wpds-elevation-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 			outline: none;
+
+			/*
+			 * The border is transparent so the shadow alone separates the
+			 * surface from what's beneath it. Forced-colors mode strips
+			 * `box-shadow` and doesn't substitute `transparent`, so paint the
+			 * border there to keep the boundary.
+			 */
+			@media ( forced-colors: active ) {
+				border-color: CanvasText;
+			}
 
 			/* The indicator already sets labels in, so tighten the start edge. */
 			&:has(.item-selection-indicator) {

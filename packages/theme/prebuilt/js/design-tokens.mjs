@@ -2660,7 +2660,7 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'shadow',
 		group: 'elevation',
 		fallback:
-			'0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+			'0px 1px 1px #00000015, 0px 1px 3px #00000015, inset 0px 1px #fff0',
 		modes: {
 			default: {
 				$value: [
@@ -2668,7 +2668,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2692,7 +2692,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2737,7 +2737,7 @@ export const tokens = /** @type {const} */ ( {
 						inset: true,
 					},
 				],
-				css: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+				css: '0px 1px 1px #00000015, 0px 1px 3px #00000015, inset 0px 1px #fff0',
 			},
 		},
 	},
@@ -2747,7 +2747,7 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'shadow',
 		group: 'elevation',
 		fallback:
-			'0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+			'0px 1px 2px #00000015, 0px 3px 8px #00000015, inset 0px 1px #fff0',
 		modes: {
 			default: {
 				$value: [
@@ -2755,7 +2755,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2779,7 +2779,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2824,7 +2824,7 @@ export const tokens = /** @type {const} */ ( {
 						inset: true,
 					},
 				],
-				css: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+				css: '0px 1px 2px #00000015, 0px 3px 8px #00000015, inset 0px 1px #fff0',
 			},
 		},
 	},
@@ -2834,7 +2834,7 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'shadow',
 		group: 'elevation',
 		fallback:
-			'0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+			'0px 2px 4px #00000015, 0px 8px 20px #00000015, inset 0px 1px #fff0',
 		modes: {
 			default: {
 				$value: [
@@ -2842,7 +2842,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2866,7 +2866,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2911,7 +2911,7 @@ export const tokens = /** @type {const} */ ( {
 						inset: true,
 					},
 				],
-				css: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+				css: '0px 2px 4px #00000015, 0px 8px 20px #00000015, inset 0px 1px #fff0',
 			},
 		},
 	},
@@ -2921,7 +2921,7 @@ export const tokens = /** @type {const} */ ( {
 		$type: 'shadow',
 		group: 'elevation',
 		fallback:
-			'0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+			'0px 4px 10px #00000015, 0px 20px 48px #00000015, inset 0px 1px #fff0',
 		modes: {
 			default: {
 				$value: [
@@ -2929,7 +2929,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2953,7 +2953,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.083,
 						},
 						offsetX: {
 							value: 0,
@@ -2998,7 +2998,7 @@ export const tokens = /** @type {const} */ ( {
 						inset: true,
 					},
 				],
-				css: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+				css: '0px 4px 10px #00000015, 0px 20px 48px #00000015, inset 0px 1px #fff0',
 			},
 		},
 	},
