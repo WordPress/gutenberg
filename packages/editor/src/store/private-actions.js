@@ -1105,12 +1105,14 @@ export function selectNote( noteId, options = { focus: false } ) {
 }
 
 /**
- * Requests focus on the post title.
+ * Requests focus on the post title, or clears the request.
  *
+ * @param {boolean} [isRequested] Whether to focus the post title. Default true.
  * @return {Object} Action object.
  */
-export function focusPostTitle() {
+export function requestPostTitleFocus( isRequested = true ) {
 	return {
 		type: 'REQUEST_POST_TITLE_FOCUS',
+		isRequested,
 	};
 }

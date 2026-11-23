@@ -1,5 +1,5 @@
 import { useEffect, useImperativeHandle, useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -13,13 +13,14 @@ import { unlock } from '../../lock-unlock';
 export default function usePostTitleFocus( forwardedRef ) {
 	const ref = useRef();
 
-	const { isCleanNewPost, focusRequest } = useSelect( ( select ) => {
-		const { isCleanNewPost: _isCleanNewPost, getPostTitleFocusRequest } =
+	const { requestPostTitleFocus } = unlock( useDispatch( editorStore ) );
+	const { isCleanNewPost, isFocusRequested } = useSelect( ( select ) => {
+		const { isCleanNewPost: _isCleanNewPost, isPostTitleFocusRequested } =
 			unlock( select( editorStore ) );
 
 		return {
 			isCleanNewPost: _isCleanNewPost(),
-			focusRequest: getPostTitleFocusRequest(),
+			isFocusRequested: isPostTitleFocusRequested(),
 		};
 	}, [] );
 
@@ -49,15 +50,14 @@ export default function usePostTitleFocus( forwardedRef ) {
 		}
 	}, [ isCleanNewPost ] );
 
-	// Focus on `focusPostTitle` requests made after mount, so a remount doesn't steal focus.
-	const lastFocusRequestRef = useRef( focusRequest );
 	useEffect( () => {
-		if ( focusRequest === lastFocusRequestRef.current ) {
+		if ( ! isFocusRequested || ! ref.current ) {
 			return;
 		}
-		lastFocusRequestRef.current = focusRequest;
-		ref.current?.focus();
-	}, [ focusRequest ] );
+		ref.current.focus();
+		// Clear the request so the focus happens once.
+		requestPostTitleFocus( false );
+	}, [ isFocusRequested, requestPostTitleFocus ] );
 
 	return { ref };
 }

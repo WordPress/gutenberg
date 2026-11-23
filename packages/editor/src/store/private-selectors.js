@@ -553,14 +553,14 @@ export function isNoteFocused( state ) {
 }
 
 /**
- * Returns the post title focus request count.
+ * Returns whether the post title should be focused.
  *
  * @param {Object} state Global application state.
  *
- * @return {number} The post title focus request count.
+ * @return {boolean} Whether the post title should be focused.
  */
-export function getPostTitleFocusRequest( state ) {
-	return state.postTitleFocusRequest;
+export function isPostTitleFocusRequested( state ) {
+	return state.isPostTitleFocusRequested;
 }
 
 /**

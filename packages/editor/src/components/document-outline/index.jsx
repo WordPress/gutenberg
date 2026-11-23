@@ -105,7 +105,7 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const { focusPostTitle } = unlock( useDispatch( editorStore ) );
+	const { requestPostTitleFocus } = unlock( useDispatch( editorStore ) );
 	const { title, isTitleSupported, isTitleRendered } = useSelect(
 		( select ) => {
 			const { getEditedPostAttribute, getRenderingMode } =
@@ -196,7 +196,7 @@ export default function DocumentOutline( {
 						onSelect={ ( event ) => {
 							// The title may be in the canvas iframe, so an anchor can't reach it.
 							event.preventDefault();
-							focusPostTitle();
+							requestPostTitleFocus();
 							onSelect?.();
 						} }
 						isDisabled={ hasOutlineItemsDisabled }

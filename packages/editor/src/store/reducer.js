@@ -527,16 +527,16 @@ export function selectedNote( state = {}, action ) {
 }
 
 /**
- * Reducer counting post title focus requests, so repeated requests are detected.
+ * Reducer returning whether the post title should be focused.
  *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
- * @return {number} Updated state.
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ * @return {boolean} Updated state.
  */
-export function postTitleFocusRequest( state = 0, action ) {
+export function isPostTitleFocusRequested( state = false, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_TITLE_FOCUS':
-			return state + 1;
+			return action.isRequested;
 	}
 	return state;
 }
@@ -569,6 +569,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
-	postTitleFocusRequest,
+	isPostTitleFocusRequested,
 	dataviews: dataviewsReducer,
 } );
