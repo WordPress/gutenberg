@@ -2095,7 +2095,9 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
  *   formatting, so each character gets back the formatting recorded on the
  *   note (see `gutenberg_revert_inline_format_suggestions()` and
  *   `gutenberg_get_pending_format_suggestion_html()`). Where that cannot be
- *   done, the whole span is replaced with the original run. The note
+ *   done, the whole span is replaced with the original run, provided both
+ *   still hold the same text: a run edited since unwraps, so readers get the
+ *   current text with the proposed formatting, never the old text. The note
  *   is resolved against the post whose content is being rendered (see
  *   `gutenberg_push_suggestion_content_owner()`, and
  *   `gutenberg_push_suggestion_block_owner()` for blocks rendered from
@@ -2206,6 +2208,41 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	}
 
 	/*
+	 * An original is only swapped in for a run that still reads as it did
+	 * when the note recorded it. A run edited since keeps its own text, so
+	 * its marker is unwrapped like one whose original cannot be resolved. The
+	 * fragments of a split marker are read together.
+	 */
+	$run_texts = array();
+	$run_ends  = array();
+	foreach ( $markers as $marker ) {
+		if ( 'format' !== $marker['mode'] || ! $marker['balanced'] || null === $marker['closer'] ) {
+			continue;
+		}
+		$id = $marker['id'];
+		// A fragment nested inside another of the same id is already read.
+		if ( $marker['start'] < ( $run_ends[ $id ] ?? 0 ) ) {
+			continue;
+		}
+		$inner_start      = $marker['start'] + $marker['length'];
+		$run_texts[ $id ] = ( $run_texts[ $id ] ?? '' ) . gutenberg_get_inline_suggestion_text( substr( $block_content, $inner_start, $marker['closer'][0] - $inner_start ) );
+		$run_ends[ $id ]  = (int) $marker['end'];
+	}
+	$stale = array();
+	foreach ( $markers as $index => $marker ) {
+		if ( 'format' !== $marker['mode'] || ! isset( $marker['original'], $run_texts[ $marker['id'] ] ) ) {
+			continue;
+		}
+		$id = $marker['id'];
+		if ( ! isset( $stale[ $id ] ) ) {
+			$stale[ $id ] = gutenberg_get_inline_suggestion_text( $marker['original'] ) !== $run_texts[ $id ];
+		}
+		if ( $stale[ $id ] ) {
+			$markers[ $index ]['mode'] = 'unresolved-format';
+		}
+	}
+
+	/*
 	 * Turns each marker into edits. Only a balanced marker has a run a browser
 	 * and the walk agree on. Otherwise (no closer, a closer that a browser
 	 * ignores or reaches through an enclosing element, an implicit end):
@@ -2219,7 +2256,8 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 *   end of the block ends with it.
 	 *
 	 * A balanced format change is replaced with its original; a balanced one
-	 * whose original cannot be resolved unwraps like a deletion.
+	 * whose original cannot be resolved, or no longer has the run's text,
+	 * unwraps like a deletion.
 	 */
 	$length = strlen( $block_content );
 	$edits  = array();
@@ -2349,6 +2387,27 @@ function gutenberg_get_inline_suggestion_view( string $html, array $accepted, ar
 	}
 
 	return gutenberg_apply_suggestion_splices( $html, $edits );
+}
+
+/**
+ * Returns the text inline suggestion markup publishes, without its markup.
+ *
+ * Pending additions are left out and deletions kept, as in
+ * `gutenberg_get_inline_suggestion_view()`. Character references are decoded,
+ * so two runs compare equal whenever a reader sees the same text.
+ *
+ * @param string $html HTML fragment.
+ * @return string Decoded text.
+ */
+function gutenberg_get_inline_suggestion_text( string $html ): string {
+	$processor = new WP_HTML_Tag_Processor( gutenberg_get_inline_suggestion_view( $html, array() ) );
+	$text      = '';
+	while ( $processor->next_token() ) {
+		if ( '#text' === $processor->get_token_type() ) {
+			$text .= $processor->get_modifiable_text();
+		}
+	}
+	return $text;
 }
 
 /**

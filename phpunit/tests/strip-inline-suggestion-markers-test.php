@@ -412,13 +412,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	/**
 	 * Creates a published post whose paragraph holds a pending format change
-	 * recorded with the original `SECRET`.
+	 * from an emphasised `world` to a bold one. An original is only restored
+	 * over a run with the same text, so the `<em>` is what tells it apart.
 	 *
 	 * @return int[] Post ID and note ID.
 	 */
 	private function create_post_with_format_change() {
 		$post_id = self::factory()->post->create();
-		$note_id = $this->create_format_note( $post_id, 'SECRET' );
+		$note_id = $this->create_format_note( $post_id, '<em>world</em>' );
 		$this->set_post_content( $post_id, '<!-- wp:paragraph --><p>Hello ' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p><!-- /wp:paragraph -->' );
 		return array( $post_id, $note_id );
 	}
@@ -441,13 +442,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		list( , $note_id ) = $this->create_post_with_format_change();
 
 		$rendered = $this->render_page_with_query_loop(
-			'<!-- wp:paragraph --><p>' . $this->format_marker( $note_id, '<strong>planted</strong>' ) . '</p><!-- /wp:paragraph -->'
+			'<!-- wp:paragraph --><p>' . $this->format_marker( $note_id, '<strong>world</strong>' ) . '</p><!-- /wp:paragraph -->'
 		);
 
 		// The paragraph belongs to the page, so the queried post's note is
 		// not consulted and the marker unwraps.
-		$this->assertStringNotContainsString( 'SECRET', $rendered );
-		$this->assertStringContainsString( '<p><strong>planted</strong></p>', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
+		$this->assertStringContainsString( '<p><strong>world</strong></p>', $rendered );
 	}
 
 	public function test_query_loop_post_content_restores_each_posts_own_original() {
@@ -455,14 +456,14 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 		$rendered = $this->render_page_with_query_loop( '<!-- wp:post-content /-->' );
 
-		$this->assertStringContainsString( '<p>Hello SECRET</p>', $rendered );
+		$this->assertStringContainsString( '<p>Hello <em>world</em></p>', $rendered );
 	}
 
 	public function test_post_content_restores_its_own_original() {
 		list( $post_id ) = $this->create_post_with_format_change();
 		$GLOBALS['post'] = get_post( $post_id );
 
-		$this->assertStringContainsString( '<p>Hello SECRET</p>', $this->without_paragraph_class( apply_filters( 'the_content', get_post( $post_id )->post_content ) ) );
+		$this->assertStringContainsString( '<p>Hello <em>world</em></p>', $this->without_paragraph_class( apply_filters( 'the_content', get_post( $post_id )->post_content ) ) );
 	}
 
 	public function test_marker_outside_post_content_is_not_resolved() {
@@ -540,7 +541,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		// (possibly private) text onto this page.
 		$other_id = self::factory()->post->create( array( 'post_status' => 'private' ) );
 		$post_id  = self::factory()->post->create();
-		$note_id  = $this->create_format_note( $other_id, 'secret' );
+		$note_id  = $this->create_format_note( $other_id, '<em>world</em>' );
 		$html     = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>world</strong></mark></p>';
 
 		$this->assertSame( '<p><strong>world</strong></p>', $this->strip_in_post( $post_id, $html ) );
@@ -597,16 +598,16 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_markers_nested_inside_a_restored_format_run_are_replaced_with_it() {
 		$post_id = self::factory()->post->create();
-		$note_id = $this->create_format_note( $post_id, 'orig' );
+		$note_id = $this->create_format_note( $post_id, '<em>ac</em>' );
 		$html    = '<p>x<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>a<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">b</mark><mark class="wp-suggestion-del" data-suggestion-id="3" data-suggestion-type="del">c</mark></strong></mark>y</p>';
 
-		$this->assertSame( '<p>xorigy</p>', $this->strip_in_post( $post_id, $html ) );
+		$this->assertSame( '<p>x<em>ac</em>y</p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_restored_format_run_has_its_own_markers_and_sentinels_stripped() {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, '<span data-wp-suggestion-strip="add">o</span><mark class="wp-suggestion-add" data-suggestion-id="5" data-suggestion-type="add">new</mark>' );
-		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>b</strong></mark></p>';
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>o</strong></mark></p>';
 
 		$this->assertSame( '<p><span>o</span></p>', $this->normalize_tag_whitespace( $this->strip_in_post( $post_id, $html ) ) );
 	}
@@ -640,12 +641,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	public function test_restored_format_run_has_its_note_markers_stripped() {
 		// The note-marker strip has already run on the block by the time the
-		// original is swapped in, so the original needs its own pass.
+		// original is swapped in, so the original needs its own pass. The
+		// `<cite>` keeps the run out of the character-level revert.
 		$post_id = self::factory()->post->create();
-		$note_id = $this->create_format_note( $post_id, 'a<mark class="wp-note" data-note-id="4">orig</mark>b' );
-		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>x</strong></mark></p>';
+		$note_id = $this->create_format_note( $post_id, 'a<mark class="wp-note" data-note-id="4">orig</mark><cite>b</cite>' );
+		$html    = '<p><mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format"><strong>aorigb</strong></mark></p>';
 
-		$this->assertSame( '<p>aorigb</p>', $this->strip_in_post( $post_id, $html ) );
+		$this->assertSame( '<p>aorig<cite>b</cite></p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	/**
@@ -702,16 +704,17 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 
 	/**
 	 * Markers of different kinds nested in both orders. `%f` is replaced
-	 * with the id of a pending format note whose original run is `orig`.
+	 * with the id of a pending format note recording the given original.
 	 *
 	 * @dataProvider data_nested_kinds
 	 *
 	 * @param string $html     Block HTML.
+	 * @param string $original Original run the format note records.
 	 * @param string $expected Rendered HTML.
 	 */
-	public function test_nested_marker_kinds( $html, $expected ) {
+	public function test_nested_marker_kinds( $html, $original, $expected ) {
 		$post_id = self::factory()->post->create();
-		$note_id = $this->create_format_note( $post_id, 'orig' );
+		$note_id = $this->create_format_note( $post_id, $original );
 		$html    = str_replace( '%f', (string) $note_id, $html );
 
 		$this->assertSame( $expected, $this->strip_in_post( $post_id, $html ) );
@@ -725,13 +728,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$del = '<mark class="wp-suggestion-del" data-suggestion-id="2" data-suggestion-type="del">';
 		$fmt = '<mark class="wp-suggestion-format" data-suggestion-id="%f" data-suggestion-type="format">';
 		return array(
-			'del inside add'    => array( "<p>x{$add}a{$del}b</mark>c</mark>y</p>", '<p>xy</p>' ),
-			'add inside del'    => array( "<p>x{$del}a{$add}b</mark>c</mark>y</p>", '<p>xacy</p>' ),
-			'format inside add' => array( "<p>x{$add}a{$fmt}<strong>b</strong></mark></mark>y</p>", '<p>xy</p>' ),
-			'add inside format' => array( "<p>x{$fmt}<strong>a{$add}b</mark></strong></mark>y</p>", '<p>xorigy</p>' ),
-			'del inside format' => array( "<p>x{$fmt}<strong>a{$del}b</mark></strong></mark>y</p>", '<p>xorigy</p>' ),
-			'format inside del' => array( "<p>x{$del}a{$fmt}<strong>b</strong></mark>c</mark>y</p>", '<p>xaorigcy</p>' ),
-			'all three'         => array( "<p>x{$add}a{$fmt}<strong>b{$del}c</mark></strong></mark>{$del}d</mark></mark>y</p>", '<p>xy</p>' ),
+			'del inside add'    => array( "<p>x{$add}a{$del}b</mark>c</mark>y</p>", 'b', '<p>xy</p>' ),
+			'add inside del'    => array( "<p>x{$del}a{$add}b</mark>c</mark>y</p>", 'b', '<p>xacy</p>' ),
+			'format inside add' => array( "<p>x{$add}a{$fmt}<strong>b</strong></mark></mark>y</p>", '<em>b</em>', '<p>xy</p>' ),
+			'add inside format' => array( "<p>x{$fmt}<strong>a{$add}b</mark></strong></mark>y</p>", '<em>a</em>', '<p>x<em>a</em>y</p>' ),
+			'del inside format' => array( "<p>x{$fmt}<strong>a{$del}b</mark></strong></mark>y</p>", '<em>ab</em>', '<p>x<em>a</em><em>b</em>y</p>' ),
+			'format inside del' => array( "<p>x{$del}a{$fmt}<strong>b</strong></mark>c</mark>y</p>", '<em>b</em>', '<p>xa<em>b</em>cy</p>' ),
+			'all three'         => array( "<p>x{$add}a{$fmt}<strong>b{$del}c</mark></strong></mark>{$del}d</mark></mark>y</p>", '<em>bc</em>', '<p>xy</p>' ),
 		);
 	}
 
@@ -746,6 +749,55 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		$html    = "<p>x{$fmt}<strong>a</strong></mark>{$del}{$fmt}<strong>b</strong></mark>c</mark>y</p>";
 
 		$this->assertSame( '<p>xabcy</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_fragments_outside_the_character_revert_restore_the_original_once(): void {
+		// The `<cite>` keeps the run out of the character-level revert, so
+		// each fragment is handled on its own: together they still read as
+		// the original, which the first one restores.
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$note_id = $this->create_format_note( $post_id, '<cite>ab</cite>' );
+		$fmt     = '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">';
+		$del     = '<mark class="wp-suggestion-del" data-suggestion-id="6" data-suggestion-type="del">';
+		$html    = "<p>x{$fmt}<strong>a</strong></mark>{$del}{$fmt}<strong>b</strong></mark>c</mark>y</p>";
+
+		$this->assertSame( '<p>x<cite>ab</cite>cy</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_run_edited_since_keeps_its_own_text(): void {
+		// The run was edited after the note recorded it: readers get the
+		// text the post holds now, not the recorded one.
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$note_id = $this->create_format_note( $post_id, '10 dollars' );
+		$html    = '<p>Price is ' . $this->format_marker( $note_id, '<strong>20 dollars (corrected)</strong>' ) . '.</p>';
+
+		$this->assertSame( '<p>Price is <strong>20 dollars (corrected)</strong>.</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_fragments_edited_since_keep_their_own_text(): void {
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$note_id = $this->create_format_note( $post_id, '<cite>ab</cite>' );
+		$fmt     = '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">';
+		$del     = '<mark class="wp-suggestion-del" data-suggestion-id="6" data-suggestion-type="del">';
+		$html    = "<p>x{$fmt}<strong>a</strong></mark>{$del}{$fmt}<strong>B</strong></mark>c</mark>y</p>";
+
+		$this->assertSame( '<p>x<strong>a</strong><strong>B</strong>cy</p>', $this->strip_in_post( $post_id, $html ) );
+	}
+
+	public function test_format_run_text_is_compared_decoded_and_without_pending_additions(): void {
+		// Same text, written with different character references, around a
+		// pending addition that is not part of the published run.
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$note_id = $this->create_format_note( $post_id, '<cite>a &#38; b</cite>' );
+		$add     = '<mark class="wp-suggestion-add" data-suggestion-id="2" data-suggestion-type="add">new</mark>';
+		$html    = '<p>' . $this->format_marker( $note_id, "<strong>a &amp; {$add}b</strong>" ) . '</p>';
+
+		// The content filters rewrite the reference on the way out.
+		$this->assertSame( '<p><cite>a &amp; b</cite></p>', $this->strip_in_post( $post_id, $html ) );
 	}
 
 	public function test_format_fragments_are_counted_per_render() {
