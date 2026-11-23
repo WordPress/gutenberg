@@ -18,7 +18,7 @@ import {
 	isInSameBlock,
 } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
-import { setContentEditableWrapper } from './utils';
+import { isSelectionOfBlocks, setContentEditableWrapper } from './utils';
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -190,6 +190,7 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
+		getMultiSelectedBlockClientIds,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getNextBlockClientId,
@@ -270,8 +271,9 @@ export default function useArrowNav() {
 			if ( hasMultiSelection() ) {
 				if ( shiftKey ) {
 					// A fully selected multi-selection has no native
-					// selection to extend (use-multi-selection cleared it),
-					// so grow or shrink it by one block at the focus end.
+					// selection to extend (only the blocks as a whole, from
+					// use-multi-selection), so grow or shrink it by one
+					// block at the focus end.
 					// Only without a usable native selection: a selection
 					// that is fully selected because it resolves to a
 					// nesting ancestor keeps its native selection, which
@@ -281,7 +283,11 @@ export default function useArrowNav() {
 					const selection = defaultView!.getSelection()!;
 					if (
 						__unstableIsFullySelected() &&
-						( ! selection.rangeCount || selection.isCollapsed )
+						isSelectionOfBlocks(
+							node.ownerDocument,
+							selection,
+							getMultiSelectedBlockClientIds()
+						)
 					) {
 						const anchorClientId =
 							getMultiSelectedBlocksStartClientId();

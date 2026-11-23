@@ -43,13 +43,6 @@ export default function useMultiSelection() {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
-			// Allow initialPosition to bypass focus behavior. This is useful
-			// for the list view or other areas where we don't want to transfer
-			// focus to the editor canvas.
-			if ( initialPosition === undefined || initialPosition === null ) {
-				return;
-			}
-
 			if ( ! hasMultiSelection || isMultiSelecting ) {
 				return;
 			}
@@ -60,11 +53,20 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			// Allow initialPosition to bypass focus behavior. This is useful
+			// for the list view or other areas where we don't want to transfer
+			// focus to the editor canvas.
+			const keepsFocus =
+				initialPosition === undefined || initialPosition === null;
+
 			// A text selection across blocks needs the wrapper as the editing
 			// host, also when it is set from the store, as after undo. The
 			// fields at either end put the native selection in place.
 			if ( ! isFullSelection ) {
-				if ( node.contains( ownerDocument.activeElement ) ) {
+				if (
+					! keepsFocus &&
+					node.contains( ownerDocument.activeElement )
+				) {
 					setContentEditableWrapper( node, true );
 				}
 				return;
@@ -76,10 +78,32 @@ export default function useMultiSelection() {
 			// able to select across instances immediately.
 			// For some browsers, like Safari, it is important that focus
 			// happens BEFORE selection removal.
-			setContentEditableWrapper( node, true );
+			if ( ! keepsFocus ) {
+				setContentEditableWrapper( node, true );
+			}
 
 			// A mounted element's window has a selection.
-			defaultView!.getSelection()!.removeAllRanges();
+			const selection = defaultView!.getSelection()!;
+			selection.removeAllRanges();
+
+			// Select the blocks natively too, so that the browser treats a
+			// press on them (e.g. to open the context menu) as one within
+			// the selection, and keeps it.
+			const first = ownerDocument.getElementById(
+				`block-${ multiSelectedBlockClientIds[ 0 ] }`
+			);
+			const last = ownerDocument.getElementById(
+				`block-${ multiSelectedBlockClientIds[ length - 1 ] }`
+			);
+
+			// The blocks may not be rendered yet, e.g. when dragged into
+			// another block.
+			if ( first && last ) {
+				const range = ownerDocument.createRange();
+				range.setStart( first, 0 );
+				range.setEnd( last, last.childNodes.length );
+				selection.addRange( range );
+			}
 		},
 		[
 			hasMultiSelection,

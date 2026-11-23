@@ -139,6 +139,50 @@ function toPlainText( html: string ): string {
 }
 
 /**
+ * Checks whether the native selection spans the whole content of the given
+ * blocks, from the start of the first to the end of the last. Browsers may
+ * move the boundaries into the text (e.g. Safari), so no text may lie between
+ * a boundary and the block's edge.
+ *
+ * @param ownerDocument The document of the blocks.
+ * @param selection     The native selection.
+ * @param clientIds     The block client IDs, in order.
+ *
+ * @return Whether the selection spans the blocks.
+ */
+export function isSelectionOfBlocks(
+	ownerDocument: Document,
+	selection: Selection,
+	clientIds: string[]
+): boolean {
+	const first = ownerDocument.getElementById( `block-${ clientIds[ 0 ] }` );
+	const last = ownerDocument.getElementById(
+		`block-${ clientIds[ clientIds.length - 1 ] }`
+	);
+
+	if ( ! selection.rangeCount || ! first || ! last ) {
+		return false;
+	}
+
+	const range = selection.getRangeAt( 0 );
+
+	if (
+		! first.contains( range.startContainer ) ||
+		! last.contains( range.endContainer )
+	) {
+		return false;
+	}
+
+	const before = ownerDocument.createRange();
+	before.setStart( first, 0 );
+	before.setEnd( range.startContainer, range.startOffset );
+	const after = ownerDocument.createRange();
+	after.setStart( range.endContainer, range.endOffset );
+	after.setEnd( last, last.childNodes.length );
+	return ! before.toString() && ! after.toString();
+}
+
+/**
  * Makes the wrapper element an editing host, or stops it from being one. The
  * ARIA attributes travel with the editability: while the wrapper is the
  * active editing host it must present as a named multiline textbox, per the
