@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `transform.rotate` setting, and render `transform` styles such as `rotate` ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
+### Bug Fixes
+
+-   Type Definitions: Add `customFontSize` and `lineHeight` to `TypographySettings`, `gradient` to `GlobalStylesStyles[ 'color' ]`, and `':hover'` state to `GlobalStylesStyles[ 'blocks' ]` ([#87122](https://github.com/WordPress/gutenberg/pull/87122)).
+
+## 2.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Put the text clip resets of a state or block style variation on the block's `color` and `background` feature selectors, so a text colour over a text gradient shows on blocks like Search ([#86246](https://github.com/WordPress/gutenberg/pull/86246)).
