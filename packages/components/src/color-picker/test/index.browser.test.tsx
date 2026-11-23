@@ -1031,7 +1031,7 @@ describe( 'ColorPicker', () => {
 				position: pointAt( colorSlider, 0.5, 0 ),
 			} );
 
-			expect( onChange ).toHaveBeenLastCalledWith( '#80d4ff' );
+			expect( onChange ).toHaveBeenLastCalledWith( '#80d5ff' );
 		} );
 
 		it( 'uses the HSL hue when leaving a mid-gray through the visual surface', async () => {

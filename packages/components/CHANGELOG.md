@@ -30,6 +30,7 @@
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update `highlight-words-core` dependency to 1.2.3 ([#87244](https://github.com/WordPress/gutenberg/pull/87244)).
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
+-   Update `colord` dependency to 2.14.0 ([#87252](https://github.com/WordPress/gutenberg/pull/87252)).
 -   Update `timezone-mock` development dependency to 1.4.3 ([#87250](https://github.com/WordPress/gutenberg/pull/87250)).
 -   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
 -   Update `@types/highlight-words-core` dependency to 1.2.3 ([#87249](https://github.com/WordPress/gutenberg/pull/87249)).
