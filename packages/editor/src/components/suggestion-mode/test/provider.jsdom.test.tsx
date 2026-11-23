@@ -1299,6 +1299,144 @@ describe( 'rejectSuggestion (inline marker)', () => {
 	} );
 } );
 
+describe( 'inline decisions find the marker by its id', () => {
+	const PARAGRAPH = 'core/test-located-paragraph';
+	const MARKED =
+		'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>';
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'rich-text', source: 'rich-text' },
+				citation: { type: 'rich-text', source: 'rich-text' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Located Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup( blocks: any[] ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	const rich = ( html: string ) => RichTextData.fromHTMLString( html );
+	const payload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'applies a suggestion whose block has no link to the note', async () => {
+		// A transform drops `metadata.noteId` and keeps the marked text.
+		const block = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( { commentId: 9, payload } );
+		} );
+
+		expect(
+			attributesOf( registry, block.clientId ).content.toHTMLString()
+		).toBe( 'Hello world' );
+	} );
+
+	it( 'rejects a suggestion whose marker moved into another block', async () => {
+		// The link stays on one block while a merge carries the marked
+		// text into another.
+		const holder = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const linked = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ holder, linked ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: linked.clientId,
+				payload,
+			} );
+		} );
+
+		expect(
+			attributesOf( registry, holder.clientId ).content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			attributesOf( registry, linked.clientId ).content.toHTMLString()
+		).toBe( 'Plain' );
+	} );
+
+	it( 'applies a suggestion whose marker is in another attribute', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			citation: rich( MARKED ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload,
+			} );
+		} );
+
+		const attributes = attributesOf( registry, block.clientId );
+		expect( attributes.citation.toHTMLString() ).toBe( 'Hello world' );
+		expect( attributes.content.toHTMLString() ).toBe( 'Plain' );
+	} );
+} );
+
 describe( 'decision failures leave the block tree untouched', () => {
 	const PARAGRAPH = 'core/test-failure-paragraph';
 
