@@ -59,8 +59,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * is what the front end showed of them), and an attribute proposal is
 		 * removed from its opener. A structural marker with no id yet (its note
 		 * is still being created) is left as it is, as is anything already in
-		 * anchor form, any marker the pairing walk sees as unbalanced, and the
-		 * markers of `$exclude`d notes.
+		 * anchor form, any marker the pairing walk sees as unbalanced, any
+		 * inline marker whose run holds a block delimiter, and the markers of
+		 * `$exclude`d notes.
 		 *
 		 * An addition takes every marker inside it verbatim, so suggestions
 		 * nested in another addition (more additions, deletions) are stored on
@@ -407,6 +408,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'del' === $marker['kind'] ) {
 					continue;
 				}
+				if ( self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
+					continue;
+				}
 				$note_id = (int) $marker['id'];
 				if ( isset( $exclude[ $note_id ] ) ) {
 					continue;
@@ -742,6 +746,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 					continue;
 				}
 				$span = substr( $content, $marker['start'], $marker['end'] - $marker['start'] );
+				if ( self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
+					continue;
+				}
 				$item = $lookup[ $marker['id'] ][ 'inline:' . (int) $marker['run'] ] ?? null;
 				if ( $item && $span === $item['anchor'] ) {
 					$edits[] = array( $marker['start'], $marker['end'], $item['original'] );
@@ -802,6 +809,23 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				return 0;
 			}
 			return isset( $notes[ (int) $entry['commentId'] ] ) ? (int) $entry['commentId'] : -1;
+		}
+
+		/**
+		 * Whether a byte range of serialized content holds a block delimiter.
+		 *
+		 * Inline markers are paired across the whole content, but a marker's
+		 * run never leaves its block. A span that does is markup one block
+		 * opens and another closes, and replacing it would take the blocks in
+		 * between with it.
+		 *
+		 * @param string $content Serialized content.
+		 * @param int    $start   Start of the range.
+		 * @param int    $end     Offset just past the range.
+		 * @return bool
+		 */
+		private static function spans_block_delimiter( string $content, int $start, int $end ): bool {
+			return 1 === preg_match( '/<!--\s+\/?wp:/', substr( $content, $start, $end - $start ) );
 		}
 
 		/**

@@ -352,6 +352,37 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 		$this->assertSame( array(), $extracted['items'] );
 	}
 
+	/**
+	 * A span a marker opens in one block and closes in another is not one
+	 * marker's run: taking it out would take the blocks between them too.
+	 *
+	 * @dataProvider data_spans_across_blocks
+	 *
+	 * @param string $attributes Attributes of the opening marker.
+	 */
+	public function test_an_inline_span_across_block_delimiters_is_left_alone( string $attributes ): void {
+		$content = "<!-- wp:html -->\n<mark {$attributes}>\n<!-- /wp:html -->\n\n<!-- wp:paragraph -->\n<p>A real paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:html -->\n</mark>\n<!-- /wp:html -->";
+
+		$extracted = Gutenberg_Suggestion_Content::extract( $content, $this->notes(), array(), array( 101 => 'A real paragraph' ) );
+
+		$this->assertSame( $content, $extracted['content'] );
+		$this->assertSame( array(), $extracted['items'] );
+		$this->assertSame( $content, Gutenberg_Suggestion_Content::inflate( $content, array() ) );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_spans_across_blocks(): array {
+		return array(
+			'an addition for a note of the post' => array( 'data-suggestion-id="101" class="wp-suggestion-add"' ),
+			'an addition for no note'            => array( 'data-suggestion-id="9" class="wp-suggestion-add"' ),
+			'a formatting change'                => array( 'data-suggestion-id="101" class="wp-suggestion-format"' ),
+			'an addition anchor'                 => array( 'data-suggestion-run="0" data-suggestion-id="101" class="wp-suggestion-add"' ),
+			'a formatting anchor'                => array( 'data-suggestion-run="0" data-suggestion-id="101" class="wp-suggestion-format"' ),
+		);
+	}
+
 	public function test_unbalanced_block_delimiters_are_left_alone() {
 		$content = $this->fill( "<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"commentId\":%1}}} -->\n<p>Unclosed</p>" );
 
