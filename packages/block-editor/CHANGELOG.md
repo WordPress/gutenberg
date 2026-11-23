@@ -9,6 +9,8 @@
 
 ### Bug Fixes
 
+-   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 -   `BlockEditorProvider`: Keep Redo when the last change is marked persistent, for example by saving, right after an undo or redo ([#87119](https://github.com/WordPress/gutenberg/pull/87119)).
 
 ## 20.1.0 (2026-11-18)
@@ -21,6 +23,7 @@
 -   Layout and dimension controls offer container query length units (`cqw`, `cqh`, `cqi`, `cqb`, `cqmin`, `cqmax`) when a theme lists them in `settings.spacing.units` ([#86241](https://github.com/WordPress/gutenberg/pull/86241)).
 -   Block crash warning: Add a "Copy error" button that copies the error's stack trace to the clipboard ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
 -   `Warning`: Center the message and its actions vertically instead of aligning them on the text baseline, so actions with an icon line up with the message ([#85575](https://github.com/WordPress/gutenberg/pull/85575)).
+-   Export the `BlockStyle`, `BlockStyleState`, `MediaUploadFunction` and `MediaUploadOptions` types ([#87018](https://github.com/WordPress/gutenberg/pull/87018)).
 
 ### Bug Fixes
 
