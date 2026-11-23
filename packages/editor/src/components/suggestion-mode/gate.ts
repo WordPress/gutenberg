@@ -44,7 +44,7 @@ export function isSuggestionModeEnabled(): boolean {
  * @param select Registry select function.
  * @return True when notes are supported.
  */
-function hasNotesSupport(
+export function hasNotesSupport(
 	select: ( store: string | typeof coreStore ) => any
 ): boolean {
 	const editor = select( STORE_NAME );

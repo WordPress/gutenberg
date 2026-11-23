@@ -19,11 +19,17 @@
  *                      so a reject can restore the pre-suggestion formatting.
  *   - `afterHTML`      Proposed run HTML for a `format` suggestion, used to
  *                      summarize which formats changed.
+ *   - `decidedText` /
+ *     `decidedDeletedText` The marker's text when the suggestion was decided
+ *                      (`inline-suggestion`), for the summary once the
+ *                      marker is gone. The second is a replacement's
+ *                      replaced text.
  *   - `before`/`after` The baseline and proposed values (`attribute-set`).
  *   - `excerpt`        The start of the block's text, plain and at most
  *                      `BLOCK_EXCERPT_MAX_CHARS` long (`block-remove`,
  *                      `block-insert-after`), for the summary once the block
- *                      is gone. Payloads written before it carry the whole
+ *                      is gone. An insertion's is refreshed when it is
+ *                      decided. Payloads written before it carry the whole
  *                      block in `block`, which is only read for its text.
  */
 export interface SuggestionOperation {

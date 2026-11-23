@@ -15,6 +15,7 @@ export {
 	findInlineOp,
 	findPostAttributeOps,
 	findBlockByNoteId,
+	findGroupId,
 } from './locate';
 export {
 	isAttributeEqual,

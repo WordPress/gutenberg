@@ -55,11 +55,14 @@ export interface SuggestionStore {
 	 *
 	 * @param commentId Comment id.
 	 * @param decision  The decision.
+	 * @param payload   The payload to keep with the decision, when it
+	 *                  records what the suggestion said.
 	 * @return The saved comment record.
 	 */
 	setProvisionalDecision: (
 		commentId: number | string,
-		decision: SuggestionDecision
+		decision: SuggestionDecision,
+		payload?: SuggestionPayload | null
 	) => Promise< any >;
 	/**
 	 * Put a note back to awaiting a decision.
@@ -134,12 +137,19 @@ export function createCommentMetaSuggestionStore(
 			await save( { id: commentId, status: 'trash' } );
 		},
 
-		async setProvisionalDecision( commentId, decision ) {
+		async setProvisionalDecision( commentId, decision, payload ) {
+			// The record is a convenience: one too large to store is left out
+			// and the decision still lands.
+			const keepsPayload =
+				!! payload && payloadByteLength( payload ) <= PAYLOAD_MAX_BYTES;
 			return await save( {
 				id: commentId,
 				status: 'hold',
 				meta: {
 					_wp_suggestion_status: getProvisionalStatus( decision ),
+					...( keepsPayload && {
+						_wp_suggestion: JSON.stringify( payload ),
+					} ),
 				},
 			} );
 		},

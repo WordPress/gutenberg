@@ -44,6 +44,7 @@ export {
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	payloadByteLength,
+	findGroupId,
 	findStructuralOp,
 	findPostAttributeOps,
 	postOperationsFromTitle,
