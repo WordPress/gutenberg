@@ -116,11 +116,7 @@ export const BlockBindingsPanel = ( {
 export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
-	hasSupport( name: string ) {
-		return ! [
-			'core/post-date',
-			'core/navigation-link',
-			'core/navigation-submenu',
-		].includes( name );
+	hasSupport() {
+		return true;
 	},
 };

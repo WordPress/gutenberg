@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Social Icon: Update the Dribbble icon to the current logo ([#87518](https://github.com/WordPress/gutenberg/pull/87518)).
+-   Date, Navigation Link, Navigation Submenu: Use the `datetime` and `url` attribute types, so the Attributes panel only offers fields of the same type.
 
 ### Bug Fixes
 

@@ -30,7 +30,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 | `rel` | `string` | — | — |
 | `id` | `number` | — | — |
 | `opensInNewTab` | `boolean` | `false` | — |
-| `url` | `string` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
+| `url` | `url` | — | [Role](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/#role): `content` |
 | `title` | `string` | — | — |
 | `kind` | `string` | — | — |
 | `isTopLevelLink` | `boolean` | — | — |

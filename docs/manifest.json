@@ -3054,6 +3054,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "Block attribute types",
+		"slug": "block-attribute-types",
+		"markdown_source": "../docs/explanations/architecture/block-attribute-types.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Entities and Undo/Redo",
 		"slug": "entities",
 		"markdown_source": "../docs/explanations/architecture/entities.md",

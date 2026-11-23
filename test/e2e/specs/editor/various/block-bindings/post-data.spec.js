@@ -51,7 +51,7 @@ test.describe( 'Post Data source', () => {
 			// Check the fields registered by other sources are there.
 		} );
 
-		test( 'should not render Attributes panel for date blocks', async ( {
+		test( 'should only include date fields in UI to connect the date block', async ( {
 			editor,
 			page,
 		} ) => {
@@ -68,9 +68,45 @@ test.describe( 'Post Data source', () => {
 					},
 				},
 			} );
+			await page
+				.getByRole( 'button', {
+					name: 'datetime',
+				} )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Post Data' } ).click();
 			await expect(
-				page.getByLabel( 'Attributes options' )
+				page.getByRole( 'menuitemcheckbox', { name: 'Post Date' } )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', {
+					name: 'Post Modified Date',
+				} )
+			).toBeVisible();
+			await expect(
+				page.getByRole( 'menuitemcheckbox', { name: 'Post Link' } )
 			).toBeHidden();
+		} );
+
+		test( 'should render the post date on the frontend', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/post-date',
+				attributes: {
+					metadata: {
+						bindings: {
+							datetime: {
+								source: 'core/post-data',
+								args: { field: 'date' },
+							},
+						},
+					},
+				},
+			} );
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '.wp-block-post-date time' )
+			).toHaveAttribute( 'datetime', /^\d{4}-\d{2}-\d{2}T/ );
 		} );
 	} );
 } );

@@ -1,0 +1,11 @@
+{
+	"$schema": "../../../../schemas/json/block.json",
+	"apiVersion": 3,
+	"name": "my-plugin/invalid-attribute-type",
+	"title": "Invalid attribute type",
+	"attributes": {
+		"publishDate": {
+			"type": [ "datetime", "null" ]
+		}
+	}
+}
