@@ -203,6 +203,8 @@ test.describe( 'Transform block support', () => {
 		};
 
 		await setView( 'Mobile' );
+		// The state inspector remounts its panels, so optional controls start hidden.
+		await showTransformControl( page, /Offset/ );
 		await expect( yOffset ).toHaveAttribute( 'placeholder', '35' );
 		await xOffset.fill( '21' );
 		await setView( 'Desktop' );
