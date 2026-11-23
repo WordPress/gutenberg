@@ -79,44 +79,21 @@ describe( 'vipsEnsureJxlSupport', () => {
 		} ) );
 	} );
 
-	it( 'downloads the chunk once and sends it to the worker', async () => {
+	it( 'downloads the chunk and sends it to the worker once', async () => {
 		const { vipsEnsureJxlSupport } = await loadWorkerModule();
 
+		await Promise.all( [ vipsEnsureJxlSupport(), vipsEnsureJxlSupport() ] );
 		await vipsEnsureJxlSupport();
 
 		expect( mockJxlImport ).toHaveBeenCalledTimes( 1 );
 		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 1 );
 
-		// The RPC layer only treats a bare ArrayBuffer as transferable; a typed
-		// array is walked key by key, which for ~3 MB means millions of
-		// main-thread allocations per call.
+		// The RPC layer only treats a bare ArrayBuffer as transferable.
 		const [ sent ] = mockSetJxlWasm.mock.calls[ 0 ] as unknown as [
 			unknown,
 		];
 		expect( sent ).toBeInstanceOf( ArrayBuffer );
 		expect( ( sent as ArrayBuffer ).byteLength ).toBe( 4 );
-	} );
-
-	it( 'skips the RPC when the same worker already has the bytes', async () => {
-		const { vipsEnsureJxlSupport } = await loadWorkerModule();
-
-		await vipsEnsureJxlSupport();
-		await vipsEnsureJxlSupport();
-
-		expect( mockJxlImport ).toHaveBeenCalledTimes( 1 );
-		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'sends the bytes once to concurrent callers', async () => {
-		const { vipsEnsureJxlSupport } = await loadWorkerModule();
-
-		await Promise.all( [
-			vipsEnsureJxlSupport(),
-			vipsEnsureJxlSupport(),
-			vipsEnsureJxlSupport(),
-		] );
-
-		expect( mockSetJxlWasm ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'retries a failed hand-off to the worker', async () => {
@@ -132,13 +109,8 @@ describe( 'vipsEnsureJxlSupport', () => {
 	} );
 
 	it( 're-sends the bytes after the worker is recycled', async () => {
-		/*
-		 * Regression test: the cached download used to be cleared on terminate
-		 * and the RPC treated as a one-time cost. The upload queue recycles the
-		 * vips worker every 50 operations, and an item can sit in prepareItem
-		 * while that happens - so a JXL could reach a worker that had never
-		 * been told about the JXL library, and fail to decode.
-		 */
+		// The upload queue recycles the vips worker every 50 operations, and
+		// JXL support does not survive that.
 		const { vipsEnsureJxlSupport, terminateVipsWorker } =
 			await loadWorkerModule();
 
@@ -162,11 +134,6 @@ describe( 'vipsEnsureJxlSupport', () => {
 	} );
 
 	it( 'retries after a failed download instead of caching the failure', async () => {
-		/*
-		 * Regression test: the download promise was assigned unconditionally
-		 * and never cleared, so a single transient network error fetching the
-		 * ~3 MB chunk disabled JXL for the rest of the session.
-		 */
 		const { vipsEnsureJxlSupport } = await loadWorkerModule();
 
 		mockJxlImport.mockImplementationOnce( () => {

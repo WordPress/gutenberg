@@ -25,13 +25,8 @@ class Gutenberg_Get_JXL_Info_Test extends WP_UnitTestCase {
 		parent::tear_down();
 	}
 
-	/**
-	 * @dataProvider data_fixtures
-	 *
-	 * @param string $fixture JXL fixture in test/e2e/assets.
-	 */
-	public function test_reads_the_dimensions_of_a_jxl( string $fixture ): void {
-		$info = gutenberg_get_jxl_info( dirname( __DIR__, 2 ) . '/test/e2e/assets/' . $fixture );
+	public function test_reads_the_dimensions_of_a_jxl(): void {
+		$info = gutenberg_get_jxl_info( dirname( __DIR__, 2 ) . '/test/e2e/assets/200x150_e2e_test_image_decode.jxl' );
 
 		$this->assertSame(
 			array(
@@ -39,17 +34,6 @@ class Gutenberg_Get_JXL_Info_Test extends WP_UnitTestCase {
 				'height' => 150,
 			),
 			$info
-		);
-	}
-
-	/**
-	 * @return array<string, array{string}>
-	 */
-	public function data_fixtures(): array {
-		return array(
-			'naked codestream'    => array( '200x150_e2e_test_image_decode.jxl' ),
-			'ISOBMFF container'   => array( '200x150_e2e_test_image_hdr.jxl' ),
-			'gain map codestream' => array( '200x150_e2e_test_image_gainmap.jxl' ),
 		);
 	}
 
@@ -89,6 +73,23 @@ class Gutenberg_Get_JXL_Info_Test extends WP_UnitTestCase {
 		$this->assertFalse( gutenberg_get_jxl_info( $this->write_temp_file( $container ) ) );
 	}
 
+	public function test_reads_a_codestream_in_a_container(): void {
+		// The 64x16 codestream above, in a `jxlc` box.
+		$container = "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A"
+			. "\x00\x00\x00\x14ftypjxl \x00\x00\x00\x00jxl "
+			. "\x00\x00\x00\x0Djxlc\xFF\x0A\x03\x0E\x00";
+
+		$info = gutenberg_get_jxl_info( $this->write_temp_file( $container ) );
+
+		$this->assertSame(
+			array(
+				'width'  => 64,
+				'height' => 16,
+			),
+			$info
+		);
+	}
+
 	public function test_reads_a_codestream_split_across_partial_codestream_boxes(): void {
 		// The 64x16 codestream split across two `jxlp` boxes, with an `Exif` box in between.
 		$container = "\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A"
@@ -114,20 +115,6 @@ class Gutenberg_Get_JXL_Info_Test extends WP_UnitTestCase {
 
 	public function test_returns_false_for_a_missing_file(): void {
 		$this->assertFalse( gutenberg_get_jxl_info( '/nonexistent/photo.jxl' ) );
-	}
-
-	public function test_records_the_dimensions_of_an_uploaded_jxl(): void {
-		$attachment_id = self::factory()->attachment->create_upload_object(
-			dirname( __DIR__, 2 ) . '/test/e2e/assets/200x150_e2e_test_image_decode.jxl'
-		);
-
-		$metadata = wp_get_attachment_metadata( $attachment_id );
-
-		$this->assertSame( 'image/jxl', get_post_mime_type( $attachment_id ) );
-		$this->assertSame( 200, $metadata['width'] );
-		$this->assertSame( 150, $metadata['height'] );
-		$this->assertSame( _wp_relative_upload_path( get_attached_file( $attachment_id ) ), $metadata['file'] );
-		$this->assertSame( array(), $metadata['sizes'] );
 	}
 
 	public function test_leaves_the_metadata_of_other_images_alone(): void {

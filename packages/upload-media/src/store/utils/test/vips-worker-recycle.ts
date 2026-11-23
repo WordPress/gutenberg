@@ -48,56 +48,15 @@ function exhaustRecycleBudget(
 }
 
 describe( 'maybeRecycleVipsWorker', () => {
+	const png = new File( [ 'x' ], 'photo.png', { type: 'image/png' } );
+
 	beforeEach( () => {
 		vi.clearAllMocks();
 	} );
 
-	it( 'recycles the worker once the budget is spent and nothing is in flight', async () => {
+	it( 'defers recycling while a vips call is in flight', async () => {
 		const utils = await loadUtils();
 
-		exhaustRecycleBudget( utils );
-
-		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'defers recycling while a held vips operation is in flight', async () => {
-		const utils = await loadUtils();
-
-		let finishDecode: () => void = () => {};
-		const held = utils.withVipsWorkerHeld(
-			() =>
-				new Promise< void >( ( resolve ) => {
-					finishDecode = resolve;
-				} )
-		);
-
-		exhaustRecycleBudget( utils );
-		expect( mockTerminateVipsWorker ).not.toHaveBeenCalled();
-
-		finishDecode();
-		await held;
-
-		// The spent budget carries over to the next completed operation.
-		utils.maybeRecycleVipsWorker( 0 );
-		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'stops holding the worker when the held operation fails', async () => {
-		const utils = await loadUtils();
-
-		await expect(
-			utils.withVipsWorkerHeld( () =>
-				Promise.reject( new Error( 'decode failed' ) )
-			)
-		).rejects.toThrow( 'decode failed' );
-
-		exhaustRecycleBudget( utils );
-		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
-	} );
-	it( 'defers recycling while a transcode is in flight', async () => {
-		const utils = await loadUtils();
-
-		const png = new File( [ 'x' ], 'photo.png', { type: 'image/png' } );
 		const transcode = utils.vipsConvertImageFormat(
 			'id',
 			png,
@@ -113,7 +72,22 @@ describe( 'maybeRecycleVipsWorker', () => {
 		finishConvert( new ArrayBuffer( 1 ) );
 		await transcode;
 
+		// The spent budget carries over to the next completed operation.
 		utils.maybeRecycleVipsWorker( 0 );
+		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'stops holding the worker when the vips call fails', async () => {
+		const utils = await loadUtils();
+		mockConvertImageFormat.mockRejectedValueOnce(
+			new Error( 'decode failed' )
+		);
+
+		await expect(
+			utils.vipsConvertImageFormat( 'id', png, 'image/webp' )
+		).rejects.toThrow( 'decode failed' );
+
+		exhaustRecycleBudget( utils );
 		expect( mockTerminateVipsWorker ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

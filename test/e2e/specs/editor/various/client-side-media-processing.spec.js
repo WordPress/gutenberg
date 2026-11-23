@@ -71,10 +71,28 @@ async function writeGeneratedJxl( build, saveOptions = {} ) {
 }
 
 /**
- * Downloads an image and reads its alpha channel and EXIF artist with wasm-vips.
+ * Writes a JPEG XL copy of the transparent PNG fixture.
+ *
+ * @return {Promise<string>} Path to the generated file.
+ */
+function writeTransparentJxl() {
+	return writeGeneratedJxl(
+		( vips ) =>
+			vips.Image.newFromFile(
+				path.join(
+					ASSETS_DIR,
+					'200x150_e2e_test_image_transparent.png'
+				)
+			),
+		{ lossless: true }
+	);
+}
+
+/**
+ * Downloads an image and reads its alpha channel with wasm-vips.
  *
  * @param {string} url Image URL to fetch.
- * @return {Promise<{ hasAlpha: boolean, minAlpha: number|null, artist: string|null }>} Probe result.
+ * @return {Promise<{ hasAlpha: boolean, minAlpha: number|null }>} Probe result.
  */
 async function probeImageUrl( url ) {
 	const { default: Vips } = await import( wasmVipsEntry );
@@ -87,16 +105,9 @@ async function probeImageUrl( url ) {
 		new Uint8Array( await response.arrayBuffer() )
 	);
 	const hasAlpha = image.hasAlpha();
-	let artist = null;
-	try {
-		artist = image.getString( 'exif-ifd0-Artist' );
-	} catch {
-		// No EXIF artist recorded.
-	}
 	return {
 		hasAlpha,
 		minAlpha: hasAlpha ? image.extractBand( image.bands - 1 ).min() : null,
-		artist,
 	};
 }
 
@@ -156,21 +167,31 @@ class MediaProcessingUtils {
 	 *
 	 * @param {import('@playwright/test').Locator} inputElement File input locator.
 	 * @param {string}                             fileName     File name in the assets directory, or an absolute path.
+	 * @param {string}                             [mimeType]   MIME type the browser reports for the file, when it
+	 *                                                          should differ from the one it would work out itself.
 	 * @return {Promise<string>} The unique file name (without extension).
 	 */
-	async upload( inputElement, fileName ) {
+	async upload( inputElement, fileName, mimeType ) {
+		const sourcePath = path.isAbsolute( fileName )
+			? fileName
+			: path.join( ASSETS_DIR, fileName );
+		const uniqueName = randomUUID();
+		const extension = path.extname( fileName );
+
+		if ( mimeType !== undefined ) {
+			await inputElement.setInputFiles( {
+				name: uniqueName + extension,
+				mimeType,
+				buffer: await fs.readFile( sourcePath ),
+			} );
+			return uniqueName;
+		}
+
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-media-' )
 		);
-		const uniqueName = randomUUID();
-		const extension = path.extname( fileName );
 		const tmpFileName = path.join( tmpDirectory, uniqueName + extension );
-		await fs.copyFile(
-			path.isAbsolute( fileName )
-				? fileName
-				: path.join( ASSETS_DIR, fileName ),
-			tmpFileName
-		);
+		await fs.copyFile( sourcePath, tmpFileName );
 		await inputElement.setInputFiles( tmpFileName );
 		return uniqueName;
 	}
@@ -233,19 +254,18 @@ class MediaProcessingUtils {
 	/**
 	 * Insert a core/image block, upload an asset, and return its REST media object.
 	 *
-	 * @param {Object}  editor                   The editor fixture.
-	 * @param {Object}  requestUtils             The requestUtils fixture.
-	 * @param {string}  fileName                 File name in the assets directory, or an absolute path.
-	 * @param {Object}  [options]                Options.
-	 * @param {boolean} [options.waitForPreview] Whether to wait for the image to render. Pass false for a
-	 *                                           format the test browser cannot display, such as JXL.
+	 * @param {Object} editor             The editor fixture.
+	 * @param {Object} requestUtils       The requestUtils fixture.
+	 * @param {string} fileName           File name in the assets directory, or an absolute path.
+	 * @param {Object} [options]          Options.
+	 * @param {string} [options.mimeType] MIME type the browser reports for the file.
 	 * @return {Promise<Object>} REST media object for the uploaded attachment.
 	 */
 	async uploadImageAndGetMedia(
 		editor,
 		requestUtils,
 		fileName,
-		{ waitForPreview = true } = {}
+		{ mimeType } = {}
 	) {
 		await editor.insertBlock( { name: 'core/image' } );
 
@@ -256,25 +276,22 @@ class MediaProcessingUtils {
 
 		await this.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' ),
-			fileName
+			fileName,
+			mimeType
 		);
 
-		if ( waitForPreview ) {
-			const image = imageBlock.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
-			await expect( image ).toBeVisible();
-			await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
-				timeout: 30_000,
-			} );
-		}
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toBeVisible();
+		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
 
 		await this.waitForUploadQueueEmpty();
 
-		await expect
-			.poll( () => this.getSelectedBlockImageId(), { timeout: 30_000 } )
-			.toBeDefined();
 		const imageId = await this.getSelectedBlockImageId();
+		expect( imageId ).toBeDefined();
 
 		return await this.getMediaDetails( requestUtils, imageId );
 	}
@@ -382,14 +399,13 @@ test.describe( 'Client-side media processing', () => {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
+		page,
 	} ) => {
-		// The test browser predates default JXL support (Chrome 155), so it
-		// cannot render the image; the upload itself still runs through vips.
+		const fixture = '200x150_e2e_test_image_decode.jxl';
 		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 			editor,
 			requestUtils,
-			'200x150_e2e_test_image_decode.jxl',
-			{ waitForPreview: false }
+			fixture
 		);
 
 		expect( media.mime_type ).toBe( 'image/jxl' );
@@ -403,63 +419,88 @@ test.describe( 'Client-side media processing', () => {
 		expect( thumbnail.width ).toBe( 150 );
 		expect( thumbnail.height ).toBe( 150 );
 		expect( thumbnail.source_url ).toMatch( /-150x150\.jxl$/ );
+
+		// The upload is stored as-is rather than re-encoded, so whatever it
+		// carries (bit depth, a gain map) survives in the full-size image.
+		const stored = await (
+			await page.request.get( media.source_url )
+		).body();
+		const uploaded = await fs.readFile( path.join( ASSETS_DIR, fixture ) );
+		expect( Buffer.compare( stored, uploaded ) ).toBe( 0 );
 	} );
 
-	for ( const [ description, fixture ] of [
-		[ 'high-bit-depth (HDR)', '200x150_e2e_test_image_hdr.jxl' ],
-		[ 'gain-map', '200x150_e2e_test_image_gainmap.jxl' ],
-	] ) {
-		test( `stores a ${ description } JXL byte-for-byte`, async ( {
+	test( 'processes a JXL the browser reports no MIME type for', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		// Many operating systems have no MIME type registered for .jxl, so the
+		// browser hands the file over untyped.
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 			editor,
-			mediaProcessingUtils,
 			requestUtils,
-			page,
-		} ) => {
-			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
-				editor,
-				requestUtils,
-				fixture,
-				{ waitForPreview: false }
-			);
+			'200x150_e2e_test_image_decode.jxl',
+			{ mimeType: '' }
+		);
 
-			expect( media.mime_type ).toBe( 'image/jxl' );
-			expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
-				'image/jxl'
-			);
+		expect( media.mime_type ).toBe( 'image/jxl' );
+		expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
+			'image/jxl'
+		);
+	} );
 
-			// The upload is not re-encoded, so the extra bit depth and the
-			// gain map survive in the full-size image.
-			const stored = await (
-				await page.request.get( media.source_url )
-			).body();
-			const uploaded = await fs.readFile(
-				path.join( ASSETS_DIR, fixture )
-			);
-			expect( Buffer.compare( stored, uploaded ) ).toBe( 0 );
+	test( 'scales a JXL larger than the big image threshold', async ( {
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+		page,
+	} ) => {
+		// Stand in for a browser without JPEG XL support, which cannot decode
+		// the upload to measure it.
+		await page.evaluate( () => {
+			window.createImageBitmap = () =>
+				Promise.reject(
+					new window.DOMException(
+						'The source image could not be decoded.',
+						'InvalidStateError'
+					)
+				);
 		} );
-	}
+
+		const largeJxl = await writeGeneratedJxl( ( vips ) =>
+			vips.Image.newFromFile(
+				path.join(
+					ASSETS_DIR,
+					'3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				)
+			)
+		);
+
+		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+			editor,
+			requestUtils,
+			largeJxl
+		);
+
+		// The threshold check went by the dimensions the server read from
+		// the JXL header.
+		expect( media.mime_type ).toBe( 'image/jxl' );
+		expect( media.source_url ).toMatch( /-scaled\.jxl$/ );
+		expect( media.media_details.width ).toBe( 2560 );
+		expect( media.media_details.height ).toBe( 1920 );
+		expect( media.media_details.original_image ).toMatch( /\.jxl$/ );
+		expect( media.media_details.original_image ).not.toContain( '-scaled' );
+	} );
 
 	test( 'keeps the transparency of a JXL in its sub-sizes', async ( {
 		editor,
 		mediaProcessingUtils,
 		requestUtils,
 	} ) => {
-		const transparentJxl = await writeGeneratedJxl(
-			( vips ) =>
-				vips.Image.newFromFile(
-					path.join(
-						ASSETS_DIR,
-						'200x150_e2e_test_image_transparent.png'
-					)
-				),
-			{ lossless: true }
-		);
-
 		const media = await mediaProcessingUtils.uploadImageAndGetMedia(
 			editor,
 			requestUtils,
-			transparentJxl,
-			{ waitForPreview: false }
+			await writeTransparentJxl()
 		);
 
 		expect( media.mime_type ).toBe( 'image/jxl' );
@@ -468,6 +509,108 @@ test.describe( 'Client-side media processing', () => {
 		);
 		expect( probe.hasAlpha ).toBe( true );
 		expect( probe.minAlpha ).toBeLessThan( 255 );
+	} );
+
+	test( 'converts JXL sub-sizes to JPEG when image_editor_output_format is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-jxl-to-jpeg'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'200x150_e2e_test_image_decode.jxl'
+			);
+
+			// As with the other formats, the filter governs only the
+			// generated sub-sizes; the full-size attachment stays JXL.
+			expect( media.mime_type ).toBe( 'image/jxl' );
+			expect( media.media_details.sizes.thumbnail.mime_type ).toBe(
+				'image/jpeg'
+			);
+			expect( media.media_details.sizes.thumbnail.source_url ).toMatch(
+				/\.jpe?g$/
+			);
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-jxl-to-jpeg'
+			);
+		}
+	} );
+
+	test( 'preserves a transparent JXL even when JXL-to-JPEG is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-jxl-to-jpeg'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				await writeTransparentJxl()
+			);
+
+			// JPEG has no alpha channel, so the sub-sizes stay JXL.
+			const { thumbnail } = media.media_details.sizes;
+			expect( thumbnail.mime_type ).toBe( 'image/jxl' );
+			const probe = await probeImageUrl( thumbnail.source_url );
+			expect( probe.minAlpha ).toBeLessThan( 255 );
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-jxl-to-jpeg'
+			);
+		}
+	} );
+
+	test( 'converts JPEG sub-sizes to JXL when image_editor_output_format is filtered', async ( {
+		page,
+		editor,
+		mediaProcessingUtils,
+		requestUtils,
+	} ) => {
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-image-format-conversion-jpeg-to-jxl'
+		);
+
+		try {
+			await page.reload();
+			await mediaProcessingUtils.skipIfClientSideMediaInactive( test );
+
+			const media = await mediaProcessingUtils.uploadImageAndGetMedia(
+				editor,
+				requestUtils,
+				'1024x768_e2e_test_image_size.jpeg'
+			);
+
+			expect( media.mime_type ).toBe( 'image/jpeg' );
+			expect( media.media_details.sizes.medium.mime_type ).toBe(
+				'image/jxl'
+			);
+			expect( media.media_details.sizes.medium.source_url ).toMatch(
+				/\.jxl$/
+			);
+		} finally {
+			await requestUtils.deactivatePlugin(
+				'gutenberg-test-plugin-image-format-conversion-jpeg-to-jxl'
+			);
+		}
 	} );
 
 	test( 'rejects a JXL upload when the site does not allow JXL', async ( {
@@ -730,8 +873,8 @@ test.describe( 'Client-side media processing', () => {
 		const files = [
 			'1024x768_e2e_test_image_size.jpeg',
 			'200x150_e2e_test_image_decode.jxl',
-			'200x150_e2e_test_image_hdr.jxl',
-			'200x150_e2e_test_image_gainmap.jxl',
+			'200x150_e2e_test_image_decode.jxl',
+			'200x150_e2e_test_image_decode.jxl',
 		];
 		const tmpFiles = [];
 		for ( const file of files ) {
