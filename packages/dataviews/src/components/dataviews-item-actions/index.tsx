@@ -1,7 +1,7 @@
 import type { MouseEventHandler } from 'react';
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
@@ -13,6 +13,7 @@ import {
 import { kebabCase } from '@wordpress/kebab-case';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 import getActionLabel from '../../utils/get-action-label';
+import DataViewsContext from '../dataviews-context';
 
 export interface ActionTriggerProps< Item > {
 	action: Action< Item >;
@@ -122,6 +123,7 @@ export function ActionsMenuGroup< Item >( {
 	registry,
 	setActiveModalAction,
 }: ActionsMenuGroupProps< Item > ) {
+	const { requestFocusAfterAction } = useContext( DataViewsContext );
 	const { primaryActions, regularActions } = useMemo( () => {
 		return actions.reduce(
 			( acc, action ) => {
@@ -144,6 +146,7 @@ export function ActionsMenuGroup< Item >( {
 				key={ action.id }
 				action={ action }
 				onClick={ () => {
+					requestFocusAfterAction?.();
 					if ( 'RenderModal' in action ) {
 						setActiveModalAction( action );
 						return;
@@ -275,6 +278,7 @@ export function PrimaryActions< Item >( {
 	registry,
 	buttonVariant,
 }: PrimaryActionsProps< Item > ) {
+	const { requestFocusAfterAction } = useContext( DataViewsContext );
 	const [ activeModalAction, setActiveModalAction ] = useState( null as any );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
@@ -292,6 +296,7 @@ export function PrimaryActions< Item >( {
 					key={ action.id }
 					action={ action }
 					onClick={ () => {
+						requestFocusAfterAction?.();
 						if ( 'RenderModal' in action ) {
 							setActiveModalAction( action );
 							return;

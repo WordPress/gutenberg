@@ -27,6 +27,7 @@ import DataViewsViewConfig, {
 import normalizeFields from '../field-types';
 import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
+import useFocusAfterAction from '../hooks/use-focus-after-action';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
 import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
@@ -213,6 +214,14 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
+	const { ref: wrapperRef, request: requestFocusAfterAction } =
+		useFocusAfterAction( {
+			layoutRef: containerRef,
+			data: displayData,
+			getItemId,
+			isLoading,
+		} );
+
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
 	}
@@ -248,9 +257,10 @@ function DataViews< Item >( {
 				hasInitiallyLoaded,
 				onReset,
 				intersectionObserver,
+				requestFocusAfterAction,
 			} }
 		>
-			<div className="dataviews-wrapper">
+			<div className="dataviews-wrapper" ref={ wrapperRef }>
 				{ children ?? (
 					<DefaultUI
 						header={ header }
