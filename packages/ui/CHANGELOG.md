@@ -14,7 +14,7 @@
 
 ### Bug Fixes
 
--   `SearchableChipSelect`: Use a single translatable string for the chips toolbar label instead of a singular and plural pair without a number ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Name the chips toolbar "Selected items" for any number of chips, so it translates correctly in languages with more than two plural forms ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
 
 ## 0.27.0 (2026-11-18)
 
