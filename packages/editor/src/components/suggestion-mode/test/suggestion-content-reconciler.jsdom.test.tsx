@@ -186,6 +186,28 @@ describe( 'SuggestionContentReconciler', () => {
 		expect( getContent() ).toContain( ' world' );
 	} );
 
+	it( 'does not take a request for a block another entity owns', async () => {
+		const { registry, clientId } = setup();
+		const inner = createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
+		const dispatch: any = registry.dispatch( blockEditorStore );
+		dispatch.setHasControlledInnerBlocks( clientId, true );
+		dispatch.replaceInnerBlocks( clientId, [ inner ] );
+
+		let accepted;
+		act( () => {
+			accepted = overlayRef.current.requestContentSuggestion( {
+				clientId: inner.clientId,
+				blockName: TEST_BLOCK_NAME,
+				prevContent: RichTextData.fromHTMLString( 'Hello' ),
+				plan: insertPlan(),
+			} );
+		} );
+		await flushPromises();
+
+		expect( accepted ).toBe( false );
+		expect( createSuggestion ).not.toHaveBeenCalled();
+	} );
+
 	it( 'grows an existing marker without opening a note', async () => {
 		const marked =
 			'Hi <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">new</mark>';
