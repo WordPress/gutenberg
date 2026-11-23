@@ -2177,6 +2177,32 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				after: { content: 'Bob' },
 			} );
 		} );
+
+		it( 'turns an edit inside a suggested block with no author into a proposal', async () => {
+			const blocks = twoBlocks( { type: 'pending-insert' } );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( clientId, { content: 'Bob' } );
+			} );
+			await flushSubscribers();
+
+			expect( attributesOf( registry, clientId ).content ).toBe(
+				'First'
+			);
+			expect(
+				markerOf( registry, clientId )?.nested?.[ 0 ]
+			).toMatchObject( {
+				type: 'pending-attributes',
+				authorId: bob,
+				after: { content: 'Bob' },
+			} );
+		} );
 	} );
 } );
 

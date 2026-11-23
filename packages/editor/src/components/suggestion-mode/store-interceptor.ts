@@ -523,11 +523,13 @@ function captureTreeSnapshot( blockEditor: any ) {
 
 /**
  * Whether a marker is a pending insertion the author may edit as part of it:
- * theirs, or one with no recorded author. Another author's suggested block
- * is suggested content like any other, so edits to it are suggestions.
+ * theirs, or one with no recorded author while the author is unresolved.
+ * Any other suggested block is suggested content like any other, so edits
+ * to it are suggestions.
  *
  * @param suggestion `metadata.suggestion` value.
- * @param authorId   Current author; omitted, any insertion counts.
+ * @param authorId   Current author, or null while unresolved; omitted, any
+ *                   insertion counts.
  * @return Whether it counts.
  */
 function isAuthorsInsertion(
@@ -537,10 +539,12 @@ function isAuthorsInsertion(
 	return (
 		suggestion?.type === 'pending-insert' &&
 		( authorId === undefined ||
-			authorId === null ||
-			suggestion.authorId === undefined ||
-			suggestion.authorId === null ||
-			String( suggestion.authorId ) === String( authorId ) )
+			( authorId === null
+				? suggestion.authorId === undefined ||
+					suggestion.authorId === null
+				: suggestion.authorId !== undefined &&
+					suggestion.authorId !== null &&
+					String( suggestion.authorId ) === String( authorId ) ) )
 	);
 }
 
@@ -1138,10 +1142,6 @@ export default function SuggestionStoreInterceptor() {
 		[]
 	);
 
-	// Read from inside the subscribe callback, which must always call the
-	// latest session value without resubscribing when it changes.
-	const onRecordStructuralCapture = useEvent( recordStructuralCapture );
-	const onGetStructuralCaptures = useEvent( getStructuralCaptures );
 	// Stored on every marker written, to attribute it and to tint the canvas
 	// preview with the suggester's avatar color. A marker with no author is
 	// nobody's and is never saved, so a session that started before the user
@@ -1152,6 +1152,10 @@ export default function SuggestionStoreInterceptor() {
 		[]
 	);
 
+	// Read from inside the subscribe callback, which must always call the
+	// latest session value without resubscribing when it changes.
+	const onRecordStructuralCapture = useEvent( recordStructuralCapture );
+	const onGetStructuralCaptures = useEvent( getStructuralCaptures );
 	const onClearStructuralCapture = useEvent( clearStructuralCapture );
 	const onConsumeInterceptorBypass = useEvent( consumeInterceptorBypass );
 	const onConsumeUndoRedoAdoption = useEvent( consumeUndoRedoAdoption );
@@ -2629,11 +2633,11 @@ export default function SuggestionStoreInterceptor() {
 		};
 	}, [
 		isSuggestMode,
+		currentUserId,
 		registry,
 		markDeferredInsertion,
 		unmarkDeferredInsertion,
 		isDeferredInsertion,
-		currentUserId,
 		clearDeferredInsertions,
 		hasInterceptorBypass,
 		noteHistoryCapture,
