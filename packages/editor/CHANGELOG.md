@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
--   `DocumentOutline`: Show the post title when the editor canvas is rendered in an iframe, and focus the title when its outline item is clicked.
+-   `DocumentOutline`: Show the post title when the editor canvas is rendered in an iframe, and focus the title when its outline item is clicked ([#87243](https://github.com/WordPress/gutenberg/pull/87243)).
 
 ### Documentation
 
