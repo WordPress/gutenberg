@@ -15,6 +15,7 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { DEFAULT_CLASSNAMES, REGEXP_NEWLINES } from './constants';
 import usePostTitleFocus from './use-post-title-focus';
 import usePostTitle from './use-post-title';
+import { setPostTitleElement } from './title-element';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -100,6 +101,11 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	// events and does not carry the input type. Handled on beforeinput rather
 	// than keydown: moving focus to the new block while the keydown is still
 	// being handled leaves the iOS keyboard's auto-capitalization stale.
+	const elementRef = useRefEffect( ( element ) => {
+		setPostTitleElement( element );
+		return () => setPostTitleElement( null );
+	}, [] );
+
 	const enterRef = useRefEffect( ( element ) => {
 		function onBeforeInput( event ) {
 			if (
@@ -185,7 +191,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	return (
 		/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 		<h1
-			ref={ useMergeRefs( [ richTextRef, focusRef, enterRef ] ) }
+			ref={ useMergeRefs( [
+				richTextRef,
+				focusRef,
+				enterRef,
+				elementRef,
+			] ) }
 			contentEditable={ ! isEditingContentOnlySection && ! isPreview }
 			className={ className }
 			aria-label={ decodedPlaceholder }
