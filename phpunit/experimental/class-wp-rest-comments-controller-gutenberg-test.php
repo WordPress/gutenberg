@@ -281,6 +281,104 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertSame( 'note', $new_comment->comment_type );
 	}
 
+	/**
+	 * A new suggestion note is undecided, so it is stored unresolved unless
+	 * the request sets a status itself.
+	 *
+	 * @dataProvider data_create_note_default_status
+	 *
+	 * @param array<string, mixed> $params   Request params added to the note's.
+	 * @param bool                 $is_reply Whether the note replies to another.
+	 * @param string               $expected Expected `comment_approved`.
+	 */
+	public function test_create_note_default_status( array $params, bool $is_reply, string $expected ): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$params += array(
+			'post'    => $post_id,
+			'content' => 'A note',
+			'author'  => self::$author_id,
+			'type'    => 'note',
+		);
+		if ( $is_reply ) {
+			$params['parent'] = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => '0',
+					'user_id'          => self::$author_id,
+				)
+			);
+		}
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( (string) wp_json_encode( $params ) );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data = $response->get_data();
+		$this->assertIsArray( $data );
+		$this->assertIsInt( $data['id'] );
+		$note = get_comment( $data['id'] );
+		$this->assertInstanceOf( WP_Comment::class, $note );
+		$this->assertSame( $expected, $note->comment_approved );
+		$this->assertSame( '1' === $expected ? 'approved' : 'hold', $data['status'] );
+	}
+
+	/**
+	 * @return array<string, array{0: array<string, mixed>, 1: bool, 2: string}>
+	 */
+	public function data_create_note_default_status(): array {
+		$suggestion = array(
+			'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+		);
+		return array(
+			'a suggestion with no status'       => array( array( 'meta' => $suggestion ), false, '0' ),
+			'a suggestion sent as hold'         => array(
+				array(
+					'meta'   => $suggestion,
+					'status' => 'hold',
+				),
+				false,
+				'0',
+			),
+			'a note with no suggestion'         => array( array(), false, '1' ),
+			'a note with an empty suggestion'   => array( array( 'meta' => array( '_wp_suggestion' => '' ) ), false, '1' ),
+			'a reply that carries a suggestion' => array( array( 'meta' => $suggestion ), true, '1' ),
+		);
+	}
+
+	/**
+	 * A status the request sets is validated as before: an undecided
+	 * suggestion cannot be created resolved.
+	 */
+	public function test_create_suggestion_note_with_explicit_resolved_status_is_refused(): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'author'  => self::$author_id,
+					'type'    => 'note',
+					'status'  => 'approved',
+					'meta'    => array(
+						'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+					),
+				)
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_suggestion_pending', rest_get_server()->dispatch( $request ), 409 );
+	}
+
 	public function test_cannot_create_with_non_valid_comment_type() {
 		wp_set_current_user( self::$admin_id );
 		$post_id = self::factory()->post->create();
