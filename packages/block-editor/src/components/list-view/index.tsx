@@ -141,18 +141,20 @@ function ListViewComponent(
 			return draggedClientIds;
 		}
 		const uniqueIds = new Set( draggedClientIds );
-		const visible: string[] = [];
-		const collectVisibleClientIds = ( nodes: ClientIdsTreeNode[] ) => {
+		const getVisibleClientIds = (
+			nodes: ClientIdsTreeNode[]
+		): string[] => {
+			const visible: string[] = [];
 			for ( const block of nodes ) {
 				if ( uniqueIds.has( block.clientId ) ) {
 					visible.push( block.clientId );
 				} else if ( expansionState[ block.clientId ] ?? isExpanded ) {
-					collectVisibleClientIds( block.innerBlocks );
+					visible.push( ...getVisibleClientIds( block.innerBlocks ) );
 				}
 			}
+			return visible;
 		};
-		collectVisibleClientIds( clientIdsTree );
-		return visible;
+		return getVisibleClientIds( clientIdsTree );
 	}, [ draggedClientIds, clientIdsTree, expansionState, isExpanded ] );
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
