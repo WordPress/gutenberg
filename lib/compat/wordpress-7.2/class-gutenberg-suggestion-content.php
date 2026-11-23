@@ -79,8 +79,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * @param array<int, true>      $notes     Suggestion note ids of the post.
 		 * @param array<int, true>      $exclude   Note ids whose markers to leave in full form.
 		 * @param array<int, string>    $originals Original run of each formatting suggestion.
-		 * @param array<int, array[]>   $deltas    Delta of each formatting suggestion that recorded one.
-		 * @return array{content: string, items: array<int, array[]>} The
+		 * @param array<int, array<mixed>> $deltas Delta of each formatting suggestion that recorded one.
+		 * @return array{content: string, items: array<int, array<array<mixed>>>} The
 		 *         anchored content and, per note, the extracted items.
 		 */
 		public static function extract( $content, $notes, $exclude = array(), $originals = array(), $deltas = array() ) {
@@ -234,8 +234,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 
 			foreach ( (array) Gutenberg_Suggestion_Block_Scanner::scan( $content ) as $block ) {
 				if ( self::PLACEHOLDER === $block['name'] ) {
-					if ( isset( $block['attrs']['id'] ) && is_numeric( $block['attrs']['id'] ) && (int) $block['attrs']['id'] > 0 ) {
-						$ids[ (int) $block['attrs']['id'] ] = true;
+					$id = is_array( $block['attrs'] ) && isset( $block['attrs']['id'] ) ? $block['attrs']['id'] : null;
+					if ( is_numeric( $id ) && (int) $id > 0 ) {
+						$ids[ (int) $id ] = true;
 					}
 					continue;
 				}
@@ -321,8 +322,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * unchanged by this. An attribute proposal's opener is only rewritten
 		 * when one of its values changed, so its bytes stay exact otherwise.
 		 *
-		 * @param array<string, mixed> $item Item.
-		 * @return array<string, mixed> Item.
+		 * @param array<mixed> $item Item.
+		 * @return array<mixed> Item.
 		 */
 		public static function kses_item( array $item ): array {
 			if ( ! isset( $item['kind'], $item['original'] ) || ! is_string( $item['original'] ) ) {
@@ -339,11 +340,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			}
 
 			if ( isset( $item['after'] ) ) {
-				$item['after'] = filter_block_kses_value( $item['after'], 'post' );
+				$item['after'] = self::kses_value( $item['after'] );
 			}
 			$attrs  = Gutenberg_Suggestion_Block_Scanner::opener_attributes( $item['original'] );
 			$values = $attrs ? json_decode( (string) wp_json_encode( $attrs ), true ) : null;
-			$clean  = is_array( $values ) ? filter_block_kses_value( $values, 'post' ) : null;
+			$clean  = is_array( $values ) ? self::kses_value( $values ) : null;
 			if ( null === $clean ) {
 				// Not an opener that can be read: put nothing back.
 				$item['original'] = isset( $item['anchor'] ) && is_string( $item['anchor'] ) ? $item['anchor'] : '';
@@ -352,6 +353,27 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				$item['original'] = null === $opener && isset( $item['anchor'] ) && is_string( $item['anchor'] ) ? $item['anchor'] : (string) $opener;
 			}
 			return $item;
+		}
+
+		/**
+		 * Filters every string of a value, keys included, as
+		 * `filter_block_kses_value()` does for the `post` context.
+		 *
+		 * @param mixed $value Value.
+		 * @return mixed Filtered value.
+		 */
+		private static function kses_value( $value ) {
+			if ( is_string( $value ) ) {
+				return wp_kses( $value, 'post' );
+			}
+			if ( ! is_array( $value ) ) {
+				return $value;
+			}
+			$clean = array();
+			foreach ( $value as $key => $inner ) {
+				$clean[ is_string( $key ) ? wp_kses( $key, 'post' ) : $key ] = self::kses_value( $inner );
+			}
+			return $clean;
 		}
 
 		/**
@@ -416,7 +438,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * @param array<int, true>   $notes    Suggestion note ids of the post.
 		 * @param array<int, true>   $exclude  Note ids to leave in full form.
 		 * @param callable           $next_run Run allocator.
-		 * @param array<int, array[]> $items   Items per note id, added to.
+		 * @param array<int, array<array<mixed>>> $items Items per note id, added to.
 		 * @param bool               $unowned  Whether a marker naming no note yet is treated as naming one that is not on the post.
 		 * @return string Content.
 		 */
@@ -532,9 +554,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * @param array<int, true>   $notes     Suggestion note ids of the post.
 		 * @param array<int, true>   $exclude   Note ids to leave in full form.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
-		 * @param array<int, array[]> $deltas   Delta of each formatting suggestion that recorded one.
+		 * @param array<int, array<mixed>> $deltas Delta of each formatting suggestion that recorded one.
 		 * @param callable           $next_run  Run allocator.
-		 * @param array<int, array[]> $items   Items per note id, added to.
+		 * @param array<int, array<array<mixed>>> $items Items per note id, added to.
 		 * @return string Content.
 		 */
 		private static function extract_inline( $content, $notes, $exclude, $originals, $deltas, $next_run, &$items ) {
@@ -556,7 +578,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'del' === $marker['kind'] ) {
 					continue;
 				}
-				if ( null === $marker['end'] || self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
+				// A balanced marker has both; the checks tell static analysis so.
+				if ( null === $marker['end'] || null === $marker['closer'] || self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
 					continue;
 				}
 				$note_id = (int) $marker['id'];
@@ -999,22 +1022,6 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			if ( null === $before || null === $now || count( $before ) !== count( $now ) ) {
 				return false;
 			}
-			/**
-			 * The elements formatting a character, tag name by opener.
-			 *
-			 * @param list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}> $stack Open elements.
-			 * @return array<string, string>
-			 */
-			$formatting = static function ( array $stack ): array {
-				$elements = array();
-				foreach ( $stack as $element ) {
-					// Markers and note highlights are not the text's formatting.
-					if ( null === $element['kind'] && ! $element['note'] ) {
-						$elements[ $element['opener'] ] = $element['tag'];
-					}
-				}
-				return $elements;
-			};
 
 			// A delta counts UTF-16 code units, as the editor's rich text does.
 			$offset = 0;
@@ -1022,8 +1029,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $character['html'] !== $before[ $index ]['html'] ) {
 					return false;
 				}
-				$was     = $formatting( $before[ $index ]['stack'] );
-				$is      = $formatting( $character['stack'] );
+				$was     = self::formatting_of( $before[ $index ]['stack'] );
+				$is      = self::formatting_of( $character['stack'] );
 				$added   = array_diff_key( $is, $was );
 				$removed = array_diff_key( $was, $is );
 				if ( $added || $removed ) {
@@ -1049,6 +1056,23 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				$offset   += $is_astral ? 2 : 1;
 			}
 			return true;
+		}
+
+		/**
+		 * The elements formatting a character, tag name by opener. Markers
+		 * and note highlights are not the text's formatting.
+		 *
+		 * @param list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}> $stack Elements open around the character.
+		 * @return array<string, string>
+		 */
+		private static function formatting_of( array $stack ): array {
+			$elements = array();
+			foreach ( $stack as $element ) {
+				if ( null === $element['kind'] && ! $element['note'] ) {
+					$elements[ $element['opener'] ] = $element['tag'];
+				}
+			}
+			return $elements;
 		}
 
 		/**
