@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, `Select`, `Switch`, and `Tooltip`: Use the `--wpds-elevation-*` tokens for their shadows, which get stronger on darker `ThemeProvider` backgrounds.
+-   `Autocomplete`, `Combobox`, `Dialog`, `Drawer`, `Menu`, `Popover`, `Select`, `Switch`, and `Tooltip`: Use the `--wpds-elevation-*` tokens for their shadows, which get stronger on darker `ThemeProvider` backgrounds ([#87287](https://github.com/WordPress/gutenberg/pull/87287)).
 -   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
