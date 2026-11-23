@@ -138,7 +138,15 @@ function InputField(
 
 	const dragGestureProps = useDrag< PointerEvent< HTMLInputElement > >(
 		( dragProps ) => {
-			const { distance, dragging, event, target } = dragProps;
+			const { cancel, distance, dragging, event, target } = dragProps;
+
+			if ( ( target as HTMLInputElement ).matches( ':disabled' ) ) {
+				cancel();
+				if ( isDragging ) {
+					dragEnd( dragProps );
+				}
+				return;
+			}
 
 			// The drag gesture is not offered for touch input, where there is
 			// no cursor affordance for it, and where it's easy to accidentally
