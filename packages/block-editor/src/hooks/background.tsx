@@ -5,7 +5,7 @@ import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InspectorControls from '../components/inspector-controls';
-import { cleanEmptyObject } from './utils';
+import { cleanEmptyObject, shouldSkipSerialization } from './utils';
 import { extractPresetSlug } from '../utils/color-values';
 import { store as blockEditorStore } from '../store';
 import useBlockColorContrastWarning from './contrast-checker';
@@ -398,12 +398,22 @@ export function BackgroundImagePanel( {
 		// When migrating from color.gradient to background.gradient, preserve
 		// the has-background class so existing styles relying on it (e.g.
 		// theme padding) are not silently broken. Only add the class when a
-		// gradient value is being set — not when it is being cleared/reset.
+		// gradient value is being set (not cleared) and serializes onto the
+		// wrapper; a block that skips serialization paints it elsewhere.
 		// Conversely, if the gradient is cleared and has-background was added
 		// during a previous migration, remove it so it does not linger.
 		const hasNewGradient = !! newGradientSlug || !! newGradientValue;
 		const isTextGradient = 'text' === newStyle?.background?.backgroundClip;
-		if ( isMigrating && hasNewGradient && ! isTextGradient ) {
+		if (
+			isMigrating &&
+			hasNewGradient &&
+			! isTextGradient &&
+			! shouldSkipSerialization(
+				name,
+				BACKGROUND_SUPPORT_KEY,
+				'gradient'
+			)
+		) {
 			newAttributes.className = clsx( className, 'has-background' );
 		} else if (
 			! hasNewGradient &&
