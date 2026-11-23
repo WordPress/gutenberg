@@ -1765,9 +1765,24 @@ describe( 'private selectors', () => {
 				expect( isLayoutLockedBlock( state, 'container' ) ).toBe(
 					true
 				);
-				expect( isLockedBlock( state, 'container' ) ).toBe( true );
 			}
 		);
+
+		it( 'counts a locked layout as a lock only with the lock menu experiment', () => {
+			const state = createState( { templateLock: 'all' } );
+			const globals = globalThis as {
+				window?: { __experimentalBlockLockMenu?: boolean };
+			};
+			const originalWindow = globals.window;
+			try {
+				globals.window = {};
+				expect( isLockedBlock( state, 'container' ) ).toBe( false );
+				globals.window = { __experimentalBlockLockMenu: true };
+				expect( isLockedBlock( state, 'container' ) ).toBe( true );
+			} finally {
+				globals.window = originalWindow;
+			}
+		} );
 
 		it( 'does not lock the layout for an "insert" template lock', () => {
 			const state = createState( { templateLock: 'insert' } );

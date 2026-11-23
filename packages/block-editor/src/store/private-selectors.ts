@@ -1307,7 +1307,20 @@ export function isLockedBlock( state: State, clientId: string ) {
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
 		isRemoveLockedBlock( state, clientId ) ||
-		isLayoutLockedBlock( state, clientId )
+		// The layout lock is part of the lock menu, so it only counts with
+		// that experiment, leaving the lock icons as they are without it.
+		( isBlockLockMenuEnabled() && isLayoutLockedBlock( state, clientId ) )
+	);
+}
+
+/**
+ * Returns whether the block lock menu experiment is enabled.
+ *
+ * @return Whether the experiment is enabled.
+ */
+function isBlockLockMenuEnabled() {
+	return (
+		typeof window !== 'undefined' && !! window.__experimentalBlockLockMenu
 	);
 }
 
