@@ -133,7 +133,7 @@ function ListViewComponent(
 		useListViewClientIds( { blocks, rootClientId } );
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
-	const { getBlock, getBlockSelectionEnd, getSelectedBlockClientIds } =
+	const { getBlock, getSelectedBlockClientIds } =
 		useSelect( blockEditorStore );
 
 	const { updateBlockSelection } = useBlockSelection();
@@ -252,28 +252,23 @@ function ListViewComponent(
 			updateExpansion( { type: 'collapse', clientIds: [ clientId ] } );
 		}
 	}, [] );
+	// Tree grid rows carry `data-block`, except appender rows. A move off an
+	// appender row goes on from the block row that focus last left.
+	const lastBlockRowRef = useRef< string | undefined >( undefined );
 	const focusRow = useCallback(
 		(
 			event: KeyboardEvent,
 			startRow: HTMLElement,
 			endRow: HTMLElement
 		) => {
-			if ( event.shiftKey ) {
-				// Tree grid rows carry `data-block`, except appender rows. A
-				// selection moving off an appender row goes on from where it
-				// ended, or starts at the row it moves to.
-				const clientId =
-					startRow?.dataset?.block ??
-					getBlockSelectionEnd() ??
-					endRow?.dataset?.block;
-				updateBlockSelection(
-					event,
-					clientId as string,
-					endRow?.dataset?.block
-				);
+			const clientId =
+				startRow?.dataset?.block ?? lastBlockRowRef.current;
+			lastBlockRowRef.current = clientId;
+			if ( event.shiftKey && clientId ) {
+				updateBlockSelection( event, clientId, endRow?.dataset?.block );
 			}
 		},
-		[ getBlockSelectionEnd, updateBlockSelection ]
+		[ updateBlockSelection ]
 	);
 
 	useListViewCollapseItems( { updateExpansion } );

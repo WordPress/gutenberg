@@ -830,6 +830,46 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			}
 		} );
 
+		test( 'starts a new selection from an appender away from the selected block', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const selectedItems = () =>
+				listView
+					.locator(
+						'.block-editor-list-view-block__contents-cell[aria-selected="true"]'
+					)
+					.evaluateAll( ( cells ) =>
+						cells.map(
+							( cell ) => cell.innerText.split( '\n' )[ 0 ]
+						)
+					);
+			const link = ( name ) =>
+				listView
+					.getByRole( 'gridcell', { name, exact: true } )
+					.getByRole( 'link' );
+
+			// Focus the rows without clicking them, since a click opens the
+			// Settings popover, which takes focus from the row.
+			await link( 'Top Level Item 2' ).focus();
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( selectedItems )
+				.toEqual( [ 'Top Level Item 2' ] );
+
+			// Moving onto the nested submenu's appender and back with Shift
+			// starts from "Nested Item", as it would from its own row.
+			await link( 'Nested Item' ).focus();
+			await page.keyboard.press( 'ArrowDown' );
+			await page.keyboard.press( 'Shift+ArrowUp' );
+			await expect.poll( selectedItems ).toEqual( [ 'Nested Item' ] );
+		} );
+
 		test( 'renders every row in view while scrolling a long menu', async ( {
 			admin,
 			page,

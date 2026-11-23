@@ -124,8 +124,6 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		appenderLabel,
 	} = props;
 
-	// Only the top-level appender takes the given label. A nested appender
-	// keeps the label that names what it adds.
 	const isTopLevel = level === 1;
 
 	const { canParentExpand, isParentSynced, canParentAppend } = useSelect(
@@ -383,7 +381,9 @@ function ListViewBranch( props: ListViewBranchProps ) {
 								clientId={ parentId }
 								nestingLevel={ level }
 								blockCount={ blockCount }
-								label={ isTopLevel ? appenderLabel : undefined }
+								// Nested branches get no label, so a nested
+								// appender names what it adds.
+								label={ appenderLabel }
 								{ ...treeGridCellProps }
 							/>
 						) }
