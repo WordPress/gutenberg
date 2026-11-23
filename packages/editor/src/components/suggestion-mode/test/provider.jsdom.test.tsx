@@ -620,6 +620,17 @@ function createStubInterfaceStore() {
 	} );
 }
 
+// The post being edited, as far as the provider needs to know it.
+function createStubPostStore( postId: number ) {
+	return createReduxStore( 'core/editor', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getCurrentPostId: () => postId,
+			getCurrentPostType: () => 'post',
+		},
+	} );
+}
+
 describe( 'rejectSuggestion (block-move)', () => {
 	const PARAGRAPH = 'core/test-move-paragraph';
 	const GROUP = 'core/test-move-group';
@@ -1989,11 +2000,18 @@ describe( 'withdrawn suggestions and failed applies', () => {
 				},
 				selectors: {
 					getEditedEntityRecord: () => null,
-					getEntityRecord: () => null,
-					getCurrentUser: () => null,
+					// The withdrawn note is the current user's own.
+					getEntityRecord: () => ( {
+						id: 7,
+						type: 'note',
+						author: 1,
+						post: 5,
+					} ),
+					getCurrentUser: () => ( { id: 1 } ),
 				},
 			} )
 		);
+		registry.register( createStubPostStore( 5 ) );
 		registry.register( createStubInterfaceStore() );
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
@@ -2103,6 +2121,7 @@ describe( 'suggester writes to a note named by content', () => {
 	const PARAGRAPH = 'core/test-owned-note-paragraph';
 	const ME = 3;
 	const SOMEONE_ELSE = 8;
+	const POST = 5;
 
 	beforeAll( () => {
 		registerBlockType( PARAGRAPH, {
@@ -2127,7 +2146,10 @@ describe( 'suggester writes to a note named by content', () => {
 	 * A marker's note id is whatever the content says. `note` is what
 	 * core-data holds for it, or null when it holds nothing.
 	 */
-	function setup( note: Record< string, any > | null ) {
+	function setup(
+		note: Record< string, any > | null,
+		currentUser: { id: number } | null = { id: ME }
+	) {
 		const saved: any[] = [];
 		const registry = createRegistry();
 		registry.register( noticesStore );
@@ -2146,10 +2168,11 @@ describe( 'suggester writes to a note named by content', () => {
 				selectors: {
 					getEditedEntityRecord: () => null,
 					getEntityRecord: () => note,
-					getCurrentUser: () => ( { id: ME } ),
+					getCurrentUser: () => currentUser,
 				},
 			} )
 		);
+		registry.register( createStubPostStore( POST ) );
 		registry.register( createStubInterfaceStore() );
 		const block = createBlock( PARAGRAPH, {
 			content: 'Hello',
@@ -2192,6 +2215,7 @@ describe( 'suggester writes to a note named by content', () => {
 			id: 7,
 			type: 'note',
 			author: ME,
+			post: POST,
 		} );
 
 		await act( async () => {
@@ -2207,6 +2231,7 @@ describe( 'suggester writes to a note named by content', () => {
 			id: 7,
 			type: 'note',
 			author: SOMEONE_ELSE,
+			post: POST,
 		} );
 
 		await act( async () => {
@@ -2221,6 +2246,7 @@ describe( 'suggester writes to a note named by content', () => {
 			id: 7,
 			type: 'note',
 			author: SOMEONE_ELSE,
+			post: POST,
 		} );
 
 		await act( async () => {
@@ -2248,11 +2274,48 @@ describe( 'suggester writes to a note named by content', () => {
 		expect( saved ).toEqual( [] );
 	} );
 
+	it.each( [
+		[ 'on another post', { post: 123 } ],
+		[ 'with no post recorded', {} ],
+	] )( 'refuses a note %s', async ( _label, where ) => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: ME,
+			...where,
+		} );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses while the current user cannot be resolved', async () => {
+		const { saved, getProvider } = setup(
+			{ id: 7, type: 'note', author: ME, post: POST },
+			null
+		);
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( { commentId: 7 } )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
 	it( 'refuses a comment that is not a note', async () => {
 		const { saved, getProvider } = setup( {
 			id: 7,
 			type: 'comment',
 			author: ME,
+			post: POST,
 		} );
 
 		await act( async () => {
