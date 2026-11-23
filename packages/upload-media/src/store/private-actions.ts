@@ -45,7 +45,6 @@ import {
 	terminateVideoConversionWorker,
 } from './utils/video-conversion';
 import type {
-	AccumulateFailedSubSizeAction,
 	AccumulateSubSizeAction,
 	AddAction,
 	AdditionalData,
@@ -58,7 +57,6 @@ import type {
 	OnChangeHandler,
 	OnErrorHandler,
 	OnSuccessHandler,
-	OnWarningHandler,
 	Operation,
 	OperationArgs,
 	OperationFinishAction,
@@ -137,7 +135,6 @@ interface AddItemArgs {
 	onChange?: OnChangeHandler;
 	onSuccess?: OnSuccessHandler;
 	onError?: OnErrorHandler;
-	onWarning?: OnWarningHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
 	additionalData?: AdditionalData;
 	sourceUrl?: string;
@@ -156,7 +153,6 @@ interface AddItemArgs {
  * @param [$0.onSuccess]          Function called after the file is uploaded.
  * @param [$0.onBatchSuccess]     Function called after a batch of files is uploaded.
  * @param [$0.onError]            Function called when an error happens.
- * @param [$0.onWarning]          Function called when the upload succeeds with a caveat.
  * @param [$0.additionalData]     Additional data to include in the request.
  * @param [$0.sourceUrl]          Source URL. Used when importing a file from a URL or optimizing an existing file.
  * @param [$0.sourceAttachmentId] Source attachment ID. Used when optimizing an existing file for example.
@@ -170,7 +166,6 @@ export function addItem( {
 	onSuccess,
 	onBatchSuccess,
 	onError,
-	onWarning,
 	additionalData = {} as AdditionalData,
 	sourceUrl,
 	sourceAttachmentId,
@@ -215,7 +210,6 @@ export function addItem( {
 				onSuccess,
 				onBatchSuccess,
 				onError,
-				onWarning,
 				sourceUrl,
 				sourceAttachmentId,
 				abortController: abortController || new AbortController(),
@@ -283,53 +277,6 @@ export function addSideloadItem( {
 
 		dispatch.processItem( itemId );
 	};
-}
-
-/**
- * Tells the user about sub-sizes that were skipped, once the parent item
- * finishes. Calling this only where the parent is about to leave the queue
- * keeps the message from repeating on every later pass.
- *
- * @param item Parent queue item.
- */
-function flushSubSizeWarnings( item: QueueItem ) {
-	if ( ! item.failedSubSizes?.length ) {
-		return;
-	}
-
-	item.onWarning?.(
-		item.failedSubSizes
-			.map( ( failure ) => failure.error.message )
-			.join( '\n' )
-	);
-}
-
-/**
- * Builds a readable label for the size names a sideload is registered under.
- *
- * @param imageSize Size name, or a list of names sharing the same dimensions.
- */
-function getSubSizeLabel( imageSize: string | string[] | undefined ) {
-	return Array.isArray( imageSize )
-		? imageSize.join( ', ' )
-		: ( imageSize ?? 'unknown' );
-}
-
-/**
- * Builds the warning shown when a generated sub-size is too large to upload.
- *
- * @param sizeName Name(s) of the size that could not be created.
- * @param fileName Original file name, as uploaded by the user.
- */
-function getSubSizeTooLargeMessage( sizeName: string, fileName: string ) {
-	return sprintf(
-		// translators: %1$s: image size, %2$s: original file name.
-		__(
-			"The %1$s size of %2$s wasn't created because it's larger than the maximum upload size."
-		),
-		sizeName,
-		fileName
-	);
 }
 
 /**
@@ -449,8 +396,6 @@ export function processItem( id: QueueItemId ) {
 				parentId ||
 				( ! parentId && ! select.hasPendingItemsByParentId( id ) )
 			) {
-				flushSubSizeWarnings( item );
-
 				if ( attachment ) {
 					onSuccess?.( [ attachment ] );
 				}
@@ -478,8 +423,6 @@ export function processItem( id: QueueItemId ) {
 					dispatch.processItem( parentId );
 					return;
 				}
-
-				flushSubSizeWarnings( parentItem );
 
 				if ( attachment ) {
 					parentItem.onSuccess?.( [ attachment ] );
@@ -1198,39 +1141,20 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
-		// If the resized file exceeds maxUploadFileSize, skip it and tell the
-		// user once the upload finishes.
+		// If the resized file exceeds maxUploadFileSize, cancel with a user-facing error
 		const maxUploadFileSize = select.getSettings().maxUploadFileSize;
 		if ( maxUploadFileSize && item.file.size > maxUploadFileSize ) {
-			const sizeName = getSubSizeLabel( additionalData.image_size );
-			const fileName = item.parentId
-				? ( select.getItem( item.parentId )?.file.name ??
-					item.file.name )
-				: item.file.name;
-
-			if ( item.parentId ) {
-				dispatch< AccumulateFailedSubSizeAction >( {
-					type: Type.AccumulateFailedSubSize,
-					id: item.parentId,
-					failure: {
-						image_size: additionalData.image_size ?? 'unknown',
-						error: new UploadError( {
-							code: ErrorCode.SIZE_ABOVE_LIMIT,
-							message: getSubSizeTooLargeMessage(
-								sizeName,
-								fileName
-							),
-							file: item.file,
-						} ),
-					},
-				} );
-			}
-
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
 					code: ErrorCode.SIZE_ABOVE_LIMIT,
-					message: getSubSizeTooLargeMessage( sizeName, fileName ),
+					message: sprintf(
+						// translators: %s: file name.
+						__(
+							'%s: This file exceeds the maximum upload size for this site.'
+						),
+						item.file.name
+					),
 					file: item.file,
 				} )
 			);

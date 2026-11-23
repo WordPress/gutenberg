@@ -1,5 +1,4 @@
 import {
-	type AccumulateFailedSubSizeAction,
 	type AccumulateSubSizeAction,
 	type AddAction,
 	type AddOperationsAction,
@@ -46,7 +45,6 @@ const DEFAULT_STATE: State = {
 
 type Action =
 	| AccumulateSubSizeAction
-	| AccumulateFailedSubSizeAction
 	| AddAction
 	| RemoveAction
 	| CancelAction
@@ -303,22 +301,6 @@ function reducer(
 								subSizes: [
 									...( item.subSizes || [] ),
 									action.subSize,
-								],
-							}
-						: item
-				),
-			};
-
-		case Type.AccumulateFailedSubSize:
-			return {
-				...state,
-				queue: state.queue.map( ( item ): QueueItem =>
-					item.id === action.id
-						? {
-								...item,
-								failedSubSizes: [
-									...( item.failedSubSizes || [] ),
-									action.failure,
 								],
 							}
 						: item

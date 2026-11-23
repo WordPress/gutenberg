@@ -9,7 +9,6 @@ import type {
 	OnChangeHandler,
 	OnErrorHandler,
 	OnSuccessHandler,
-	OnWarningHandler,
 	QueueItemId,
 	RetryItemAction,
 	ScheduleRetryAction,
@@ -70,7 +69,6 @@ interface AddItemsArgs {
 	onSuccess?: OnSuccessHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
 	onError?: OnErrorHandler;
-	onWarning?: OnWarningHandler;
 	additionalData?: AdditionalData;
 	allowedTypes?: string[];
 }
@@ -84,7 +82,6 @@ interface AddItemsArgs {
  * @param [$0.onSuccess]      Function called after the file is uploaded.
  * @param [$0.onBatchSuccess] Function called after a batch of files is uploaded.
  * @param [$0.onError]        Function called when an error happens.
- * @param [$0.onWarning]      Function called when the upload succeeds with a caveat.
  * @param [$0.additionalData] Additional data to include in the request.
  * @param [$0.allowedTypes]   Array with the types of media that can be uploaded, if unset all types are allowed.
  */
@@ -93,7 +90,6 @@ export function addItems( {
 	onChange,
 	onSuccess,
 	onError,
-	onWarning,
 	onBatchSuccess,
 	additionalData,
 	allowedTypes,
@@ -134,7 +130,6 @@ export function addItems( {
 				onSuccess,
 				onBatchSuccess,
 				onError,
-				onWarning,
 				additionalData,
 			} );
 		}
