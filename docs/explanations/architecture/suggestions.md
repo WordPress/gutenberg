@@ -131,36 +131,65 @@ Notes are linked by comment id, which an import renumbers. A WXR export therefor
 
 ## End-to-end lifecycle
 
+A suggestion has two halves: a reviewer's edit becomes a note, and later the post author decides on it.
+
+### 1. Capture: an edit becomes a note
+
 ```mermaid
+%%{init: {"sequence": {"mirrorActors": false}}}%%
 sequenceDiagram
     autonumber
-    participant U as Reviewer
+    actor U as Reviewer
     participant B as Block
-    participant M as Block metadata
-    participant AS as AutoSave (debounced)
+    participant AS as AutoSave
     participant P as SuggestionsProvider
-    participant R as REST (/wp/v2/comments)
-    participant A as Post author
+    participant R as REST
 
-    U->>B: Switch to Suggestion mode, edit block
-    B->>M: setAttributes → metadata.suggestion.after (live attributes stay at baseline)
-    Note right of M: Proposals live in metadata.suggestion.after<br/>(inline edits land as marks, structural edits as pending markers)
-    M->>AS: Marker changed (debounce ~1.5s)
-    AS->>P: createSuggestion or updateSuggestion
-    P->>R: POST / PUT note + _wp_suggestion meta
+    U->>B: Edit in Suggestion mode
+    B->>B: Write metadata.suggestion.after
+    Note over U,B: Live attributes stay at baseline
+    B->>AS: Marker changed
+    Note over B,AS: Debounced ~1.5s
+    AS->>P: createSuggestion / updateSuggestion
+    P->>R: POST or PUT note
     R-->>P: Saved comment
-    P->>B: updateBlockAttributes(metadata.noteId) (on create)
-
-    A->>A: Open notes sidebar
-    A->>P: Accept (or Reject)
-    alt targeted attribute changed since capture
-        P-->>A: Confirm dialog ("Apply anyway?")
-    end
-    P->>R: PUT status=hold + _wp_suggestion_status=applied-unsaved
-    P->>B: updateBlockAttributes(applyOperations(...))
-    A->>R: Save the post
-    Note right of R: Save pass: the anchor is gone,<br/>so the decision becomes final<br/>(status=approved, applied)
+    P->>B: Set metadata.noteId
 ```
+
+1. The reviewer switches to Suggestion mode and edits a block.
+2. `setAttributes` is redirected: the proposal lands in `metadata.suggestion.after` and the live attributes stay at the baseline. Inline edits land as marks in the content, structural edits as pending markers.
+3. The marker change schedules the debounced auto-save.
+4. Auto-save calls `createSuggestion` for a new marker, `updateSuggestion` for one that already has a note.
+5. The provider writes the note and its `_wp_suggestion` meta to `/wp/v2/comments`.
+6. REST returns the saved comment.
+7. On create, `updateBlockAttributes` stores the comment id as `metadata.noteId`, which ties the marker to its note.
+
+### 2. Decide: the author accepts or rejects
+
+```mermaid
+%%{init: {"sequence": {"mirrorActors": false}}}%%
+sequenceDiagram
+    autonumber 8
+    actor A as Post author
+    participant P as SuggestionsProvider
+    participant B as Block
+    participant R as REST
+
+    A->>P: Accept or Reject in the notes sidebar
+    opt Attribute changed since capture
+        P-->>A: Confirm "Apply anyway?"
+    end
+    P->>R: PUT provisional status
+    P->>B: Apply the operations
+    A->>R: Save the post
+    Note over B,R: Save pass makes the decision final
+```
+
+8. The post author opens the notes sidebar and chooses Accept or Reject.
+9. If the targeted attribute changed since the suggestion was captured, a confirm dialog asks whether to apply it anyway.
+10. The provider keeps the note on `hold` and sets `_wp_suggestion_status` to `applied-unsaved` (or `rejected-unsaved`).
+11. `updateBlockAttributes( applyOperations( ... ) )` changes the block and removes the marker.
+12. The author saves the post. The save pass sees that the anchor is gone and makes the decision final: comment status `approved`, `_wp_suggestion_status` `applied` (or `rejected`). See [Decision lifecycle](#decision-lifecycle).
 
 ## Editor Intent
 
