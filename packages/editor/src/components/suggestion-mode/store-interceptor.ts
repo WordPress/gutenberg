@@ -1142,6 +1142,16 @@ export default function SuggestionStoreInterceptor() {
 	// latest session value without resubscribing when it changes.
 	const onRecordStructuralCapture = useEvent( recordStructuralCapture );
 	const onGetStructuralCaptures = useEvent( getStructuralCaptures );
+	// Stored on every marker written, to attribute it and to tint the canvas
+	// preview with the suggester's avatar color. A marker with no author is
+	// nobody's and is never saved, so a session that started before the user
+	// resolved starts over once the id is known.
+	const currentUserId = useSelect(
+		( select ) =>
+			( select( coreStore ) as any )?.getCurrentUser?.()?.id ?? null,
+		[]
+	);
+
 	const onClearStructuralCapture = useEvent( clearStructuralCapture );
 	const onConsumeInterceptorBypass = useEvent( consumeInterceptorBypass );
 	const onConsumeUndoRedoAdoption = useEvent( consumeUndoRedoAdoption );
@@ -1168,13 +1178,6 @@ export default function SuggestionStoreInterceptor() {
 		// `coreStore` may be unregistered in unit tests; the helper that
 		// reads suggestion comments handles a `null` selector defensively.
 		const coreSelect = registry.select( coreStore );
-
-		// Captured once at session start. Stored on every marker we write
-		// so the rendering layer can tint the canvas preview with the
-		// suggester's avatar color, the same way live cursors are tinted
-		// for collaborator presence. `null` for anonymous / unresolved
-		// users falls back to the suggestion-green default in CSS.
-		const currentUserId = coreSelect?.getCurrentUser?.()?.id ?? null;
 
 		// A block deferred in a previous Suggest session is seeded into the
 		// snapshot below like any other pre-existing block, so stale entries
@@ -2630,6 +2633,7 @@ export default function SuggestionStoreInterceptor() {
 		markDeferredInsertion,
 		unmarkDeferredInsertion,
 		isDeferredInsertion,
+		currentUserId,
 		clearDeferredInsertions,
 		hasInterceptorBypass,
 		noteHistoryCapture,

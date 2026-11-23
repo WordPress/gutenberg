@@ -190,10 +190,19 @@ function createStubCoreStore(
 	currentUserId?: number
 ) {
 	return createReduxStore( 'core', {
-		reducer: ( state = {} ) => state,
+		reducer: ( state: any = { userId: currentUserId }, action: any ) =>
+			action.type === 'RECEIVE_CURRENT_USER'
+				? { userId: action.id }
+				: state,
+		actions: {
+			receiveCurrentUser: ( id: number ) => ( {
+				type: 'RECEIVE_CURRENT_USER',
+				id,
+			} ),
+		},
 		selectors: {
-			getCurrentUser: () =>
-				currentUserId === undefined ? undefined : { id: currentUserId },
+			getCurrentUser: ( state: any ) =>
+				state.userId === undefined ? undefined : { id: state.userId },
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
 			getEntityRecord: (
@@ -308,6 +317,25 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			await Promise.resolve();
 		} );
 	}
+
+	it( 'stamps the author on a marker when the user resolves after the session starts', async () => {
+		const { registry, clientId } = setup();
+		await act( async () => {
+			( registry.dispatch( 'core' ) as any ).receiveCurrentUser( 7 );
+		} );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Changed' } );
+		} );
+		await flushSubscribers();
+
+		expect( markerOf( registry, clientId ) ).toMatchObject( {
+			type: 'pending-attributes',
+			authorId: 7,
+		} );
+	} );
 
 	function appliedRemovalNote( id: number, clientId: string ) {
 		return {
