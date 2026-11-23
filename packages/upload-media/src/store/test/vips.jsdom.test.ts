@@ -154,6 +154,7 @@ describe( 'vips utilities', () => {
 			originalFetch = window.fetch;
 			mockFetch = vi.fn().mockResolvedValue( {
 				ok: true,
+				headers: new Headers( { 'Content-Type': 'image/png' } ),
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
 			window.fetch = mockFetch;

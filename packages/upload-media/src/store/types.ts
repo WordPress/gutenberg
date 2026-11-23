@@ -276,6 +276,11 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
+	media_details?: {
+		width?: number;
+		height?: number;
+		[ k: string ]: unknown;
+	};
 	poster?: string;
 	meta?:
 		| []
@@ -428,7 +433,7 @@ export interface SideloadAdditionalData extends AdditionalData {
 	image_size: string | string[];
 }
 
-export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif';
+export type ImageFormat = 'jpeg' | 'webp' | 'avif' | 'png' | 'gif' | 'jxl';
 
 /**
  * Configuration for automatic retry behavior on upload failures.
