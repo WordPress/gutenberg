@@ -3,9 +3,9 @@ import { startOfMinute } from 'date-fns';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { date as formatDate } from '@wordpress/date';
+import { SelectControl, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import BaseControl from '../../base-control';
 import { VisuallyHidden } from '../../visually-hidden';
-import SelectControl from '../../select-control';
 import TimeZone from './timezone';
 import type { TimeInputValue, TimePickerProps } from '../types';
 import NumberControl from '../../number-control';
@@ -52,6 +52,8 @@ export function TimePicker( {
 	dateOrder: dateOrderProp,
 	hideLabelFromVision = false,
 }: TimePickerProps ) {
+	useEnableWpCompatOverlaySlot();
+
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
 		startOfMinute( inputToDate( currentTime ?? new Date() ) )
@@ -76,15 +78,12 @@ export function TimePicker( {
 		{ value: '10', label: __( 'October' ) },
 		{ value: '11', label: __( 'November' ) },
 		{ value: '12', label: __( 'December' ) },
-	] as const;
+	];
 
 	const { day, month, year, minutes, hours } = useMemo(
 		() => ( {
 			day: formatDate( 'd', date ),
-			month: formatDate(
-				'm',
-				date
-			) as ( typeof monthOptions )[ number ][ 'value' ],
+			month: formatDate( 'm', date ),
 			year: formatDate( 'Y', date ),
 			minutes: formatDate( 'i', date ),
 			hours: formatDate( 'H', date ),
@@ -154,13 +153,20 @@ export function TimePicker( {
 				className="components-datetime__time-field components-datetime__time-field-month" // Unused, for backwards compatibility.
 				label={ __( 'Month' ) }
 				hideLabelFromVision
-				value={ month }
-				options={ monthOptions }
-				onChange={ ( value ) => {
+				items={ monthOptions }
+				value={
+					monthOptions.find( ( item ) => item.value === month ) ??
+					null
+				}
+				onValueChange={ ( item ) => {
+					if ( ! item?.value || item.value === month ) {
+						return;
+					}
+
 					// Internal date is UTC-normalized, but the field should be updated
 					// as if in the configured timezone.
 					const newDate = setInConfiguredTimezone( date, {
-						month: Number( value ) - 1,
+						month: Number( item.value ) - 1,
 					} );
 					setDate( newDate );
 					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );

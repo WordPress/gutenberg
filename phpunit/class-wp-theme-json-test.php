@@ -392,6 +392,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'margin'   => true,
 				'padding'  => true,
 			),
+			'transform'  => array(
+				'rotate' => true,
+			),
 			'typography' => array(
 				'lineHeight'  => true,
 				'textColumns' => true,
@@ -435,6 +438,9 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blockGap' => false,
 						'margin'   => true,
 						'padding'  => true,
+					),
+					'transform'  => array(
+						'rotate' => true,
 					),
 					'typography' => array(
 						'lineHeight'  => false,
@@ -3239,6 +3245,169 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS(
 			'@media (width <= 480px){:root :where(.wp-block-button:hover){writing-mode: vertical-rl;}}',
 			$css
+		);
+	}
+
+	/**
+	 * Tests that block transforms output the individual `rotate` property, under
+	 * feature selectors, for block styles, block states and block style variations.
+	 */
+	public function test_get_stylesheet_outputs_rotate_for_block_styles_states_and_variations() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group'  => array(
+							'transform'  => array( 'rotate' => '0.25turn' ),
+							'@mobile'    => array(
+								'transform' => array( 'rotate' => '0' ),
+							),
+							'variations' => array(
+								'tilted' => array(
+									'transform' => array( 'rotate' => '-5deg' ),
+								),
+							),
+						),
+						'core/button' => array(
+							':hover'  => array(
+								'transform' => array( 'rotate' => '3deg' ),
+							),
+							'@mobile' => array(
+								':hover' => array(
+									'transform' => array( 'rotate' => '6deg' ),
+								),
+							),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$css = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+		unregister_block_style( 'core/group', 'tilted' );
+
+		$this->assertStringContainsString( ':root :where(.wp-block-group){rotate: 0.25turn;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-group){rotate: 0;}}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-group.is-style-tilted){rotate: -5deg;}', $css );
+		$this->assertStringContainsString( ':root :where(.wp-block-button .wp-block-button__link:hover){rotate: 3deg;}', $css );
+		$this->assertStringContainsString( '@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){rotate: 6deg;}}', $css );
+		$this->assertStringNotContainsString( 'transform', $css );
+	}
+
+	/**
+	 * Tests that a rotation that is not a single angle is not output.
+	 *
+	 * @dataProvider data_invalid_rotate_values
+	 *
+	 * @param mixed $rotate Rotation value.
+	 */
+	public function test_get_stylesheet_skips_invalid_rotate_values( $rotate ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/group' => array(
+							'transform' => array( 'rotate' => $rotate ),
+						),
+					),
+				),
+			),
+			'default'
+		);
+
+		$this->assertStringNotContainsString( 'rotate', $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_invalid_rotate_values() {
+		return array(
+			'bare number' => array( '45' ),
+			'calc()'      => array( 'calc(10deg + 5deg)' ),
+			'var()'       => array( 'var(--angle)' ),
+			'axis list'   => array( 'x 45deg' ),
+			'number type' => array( 45 ),
+		);
+	}
+
+	/**
+	 * Tests that transform styles are kept for blocks and block style variations
+	 * only, and that the transform setting is kept at every level.
+	 */
+	public function test_sanitize_keeps_transform_styles_for_blocks_and_variations_only() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'tilted',
+				'label' => 'Tilted',
+			)
+		);
+		$rotate     = array( 'rotate' => '15deg' );
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'rotate' => false ),
+					'blocks'    => array(
+						'core/group' => array(
+							'transform' => array( 'rotate' => true ),
+						),
+					),
+				),
+				'styles'   => array(
+					'transform' => $rotate,
+					'elements'  => array(
+						'link' => array( 'transform' => $rotate ),
+					),
+					'blocks'    => array(
+						'core/group' => array(
+							'transform'  => $rotate,
+							'variations' => array(
+								'tilted' => array( 'transform' => $rotate ),
+							),
+						),
+					),
+				),
+			)
+		);
+		unregister_block_style( 'core/group', 'tilted' );
+
+		$this->assertEqualSetsWithIndex(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'transform' => array( 'rotate' => false ),
+					'blocks'    => array(
+						'core/group' => array(
+							'transform' => array( 'rotate' => true ),
+						),
+					),
+				),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'transform'  => $rotate,
+							'variations' => array(
+								'tilted' => array( 'transform' => $rotate ),
+							),
+						),
+					),
+				),
+			),
+			$theme_json->get_raw_data()
 		);
 	}
 
@@ -8677,48 +8846,48 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$styles = $theme_json::resolve_variables( $theme_json )->get_raw_data()['styles'];
 
-		$this->assertEquals( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
-		$this->assertEquals( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
+		$this->assertSame( $primary_color, $styles['color']['background'], 'Top level: Assert values are converted' );
+		$this->assertSame( $raw_color_value, $styles['color']['text'], 'Top level: Assert raw values stay intact' );
 
-		$this->assertEquals( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
-		$this->assertEquals( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
+		$this->assertSame( $contrast_color, $styles['elements']['button']['color']['text'], 'Elements: color' );
+		$this->assertSame( $small_font, $styles['elements']['button']['typography']['fontSize'], 'Elements: font-size' );
 
-		$this->assertEquals( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
-		$this->assertEquals( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
-		$this->assertEquals( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
-		$this->assertEquals(
+		$this->assertSame( $large_font, $styles['blocks']['core/quote']['typography']['fontSize'], 'Blocks: font-size' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/quote']['color']['background'], 'Blocks: color' );
+		$this->assertSame( $raw_color_value, $styles['blocks']['core/post-terms']['color']['background'], 'Blocks: Raw color value stays intact' );
+		$this->assertSame( $small_font, $styles['blocks']['core/post-terms']['typography']['fontSize'], 'Block core/post-terms: font-size' );
+		$this->assertSame(
 			"linear-gradient(90deg, $primary_color 0%, $secondary_color 35%, var(--wp--undefined--color--secondary) 100%)",
 			$styles['blocks']['core/more']['color']['background'],
 			'Blocks: multiple colors and undefined color'
 		);
-		$this->assertEquals( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
-		$this->assertEquals( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
-		$this->assertEquals( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
-		$this->assertEquals( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
-		$this->assertEquals( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
+		$this->assertSame( 'var(--undefined--font-size--small)', $styles['blocks']['core/more']['typography']['fontSize'], 'Blocks: undefined font-size ' );
+		$this->assertSame( "calc($small_font + 20px)", $styles['blocks']['core/comment-content']['typography']['fontSize'], 'Blocks: font-size in random place' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/comment-content']['color']['text'], 'Blocks: text color with fallback' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/comment-content']['color']['background'], 'Blocks: background color with var as fallback' );
+		$this->assertSame( $primary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['background'], 'Block element: background color' );
+		$this->assertSame( $secondary_color, $styles['blocks']['core/navigation']['elements']['link']['color']['text'], 'Block element: text color' );
+		$this->assertSame( $large_font, $styles['blocks']['core/navigation']['elements']['link']['typography']['fontSize'], 'Block element: font-size' );
 
-		$this->assertEquals(
+		$this->assertSame(
 			"var(--undefined--color--primary, $small_font)",
 			$styles['blocks']['core/comments']['color']['text'],
 			'Blocks: text color with undefined var and fallback'
 		);
-		$this->assertEquals(
+		$this->assertSame(
 			$primary_color,
 			$styles['blocks']['core/comments']['color']['background'],
 			'Blocks: background color with variable and undefined fallback'
 		);
 
-		$this->assertEquals( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
-		$this->assertEquals( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
+		$this->assertSame( $small_font, $styles['blocks']['core/quote']['variations']['plain']['typography']['fontSize'], 'Block variations: font-size' );
+		$this->assertSame( $secondary_color, $styles['blocks']['core/quote']['variations']['plain']['color']['background'], 'Block variations: color' );
 		/*
 		 * WP_Theme_JSON_Gutenberg::resolve_variables may be called with merged data from WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()
 		 * WP_Theme_JSON_Resolver_Gutenberg::get_block_data() sets blockGap for supported blocks to `null` if the value is not defined.
 		 */
 		$this->assertNull( $styles['blocks']['core/post-template']['spacing']['blockGap'], 'core/post-template block: blockGap' );
-		$this->assertEquals( $spacing, $styles['blocks']['core/columns']['spacing']['blockGap'], 'core/columns block: blockGap' );
+		$this->assertSame( $spacing, $styles['blocks']['core/columns']['spacing']['blockGap'], 'core/columns block: blockGap' );
 	}
 
 	/**
@@ -8740,7 +8909,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$actual = $func->invoke( null, 'custom', $selector );
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -8857,7 +9026,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $actual );
+		$this->assertSame( $expected, $actual );
 	}
 
 	/**
@@ -8894,7 +9063,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$block_nodes       = $func->invoke( null, $theme_json, $selectors );
 		$button_variations = $block_nodes[0]['variations'] ?? array();
 
-		$this->assertEquals( array(), $button_variations );
+		$this->assertSame( array(), $button_variations );
 	}
 
 	/**
@@ -8939,7 +9108,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEquals( $expected, $button_variations );
+		$this->assertSame( $expected, $button_variations );
 	}
 
 	/**
