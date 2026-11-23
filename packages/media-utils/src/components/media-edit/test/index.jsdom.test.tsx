@@ -219,4 +219,34 @@ describe( 'MediaEdit', () => {
 			screen.getByRole( 'img', { name: 'Forty-two' } )
 		).toHaveAttribute( 'src', 'https://example.com/42' );
 	} );
+
+	it( 'trusts a non-image MIME type over media_type', () => {
+		render(
+			<RegistryProvider
+				value={ createTestRegistry( {
+					attachments: [
+						{
+							id: 42,
+							media_type: 'image',
+							mime_type: 'application/pdf',
+							alt_text: 'Forty-two',
+							title: { rendered: '42' },
+							source_url: 'https://example.com/42.pdf',
+							media_details: {},
+						},
+					],
+				} ) }
+			>
+				<MediaEditControl
+					data={ { featured_media: 42 } }
+					field={ field }
+					onChange={ () => {} }
+					isExpanded
+				/>
+			</RegistryProvider>
+		);
+		expect(
+			screen.queryByRole( 'img', { name: 'Forty-two' } )
+		).not.toBeInTheDocument();
+	} );
 } );

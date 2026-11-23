@@ -278,10 +278,10 @@ function MoveButtons( {
 }
 
 function isImage( attachment: MediaEditAttachment ) {
-	return (
-		!! attachment.mime_type?.startsWith( 'image' ) ||
-		( 'media_type' in attachment && attachment.media_type === 'image' )
-	);
+	if ( attachment.mime_type ) {
+		return attachment.mime_type.startsWith( 'image' );
+	}
+	return 'media_type' in attachment && attachment.media_type === 'image';
 }
 
 function MediaPreview( {
