@@ -448,28 +448,6 @@ export function __unstableCreateTemplate() {
 
 let metaBoxesInitialized = false;
 
-const META_BOX_SORTABLES = '.edit-post-meta-boxes-area .meta-box-sortables';
-
-/**
- * Scrolls the other meta box areas into view when a meta box drag starts. A drop
- * zone that is scrolled out of view, e.g. at the bottom of the sidebar, can't
- * be reached while dragging.
- *
- * `postboxes` adds the `is-dragging-metaboxes` class, which gives empty areas a
- * height, and refreshes the cached drop zone positions only after this handler
- * runs. The class is added here so that the enlarged drop zones are scrolled to.
- *
- * @param {Event} event The jQuery UI `sortstart` event.
- */
-function revealMetaBoxDropZones( event ) {
-	document.body.classList.add( 'is-dragging-metaboxes' );
-	document.querySelectorAll( META_BOX_SORTABLES ).forEach( ( sortables ) => {
-		if ( sortables !== event.currentTarget ) {
-			sortables.scrollIntoView( { block: 'nearest' } );
-		}
-	} );
-}
-
 /**
  * Initializes WordPress `postboxes` script and the logic for saving meta boxes.
  */
@@ -492,19 +470,7 @@ export const initializeMetaBoxes =
 			window.postboxes.add_postbox_toggles( postType );
 		}
 
-		// Keep the drag helper out of the meta box scroll containers, so it
-		// doesn't stretch or get clipped by them.
-		// Not limited to `META_BOX_SORTABLES`: an area that isn't rendered yet,
-		// e.g. the sidebar one while the sidebar is closed, is outside it.
-		window
-			.jQuery( '.meta-box-sortables' )
-			.sortable?.( 'option', 'appendTo', document.body );
-
 		metaBoxesInitialized = true;
-
-		window
-			.jQuery( document )
-			.on( 'sortstart', META_BOX_SORTABLES, revealMetaBoxDropZones );
 
 		// Save metaboxes on save completion, except for autosaves.
 		addAction(
