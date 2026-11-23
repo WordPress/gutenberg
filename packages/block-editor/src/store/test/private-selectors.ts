@@ -30,6 +30,7 @@ import {
 	isLockedBlock,
 	isLayoutLockedBlock,
 	canLayoutLockBlock,
+	canStylesLockBlock,
 	getBlockLockType,
 	hasOwnBlockLock,
 	isBlockHiddenAnywhere,
@@ -1874,6 +1875,39 @@ describe( 'private selectors', () => {
 					'leaf'
 				)
 			).toBe( 'partial' );
+		} );
+
+		it( 'leaves the styles out of the lock of a synced pattern or a template part', () => {
+			const createStateOf = (
+				name: string,
+				attributes: BlockAttributes
+			) =>
+				partial< State >( {
+					blocks: {
+						byClientId: new Map( [
+							[ 'block', { clientId: 'block', name } ],
+						] ),
+						attributes: new Map( [ [ 'block', attributes ] ] ),
+						parents: new Map( [ [ 'block', '' ] ] ),
+						order: new Map( [
+							[ '', [ 'block' ] ],
+							[ 'block', [] ],
+						] ),
+					},
+					settings: {},
+					blockListSettings: new Map(),
+				} );
+
+			for ( const name of [ 'core/block', 'core/template-part' ] ) {
+				const state = createStateOf( name, {
+					lock: { move: true, remove: true },
+				} );
+				expect( canStylesLockBlock( state, 'block' ) ).toBe( false );
+				expect( getBlockLockType( state, 'block' ) ).toBe( 'full' );
+			}
+			expect(
+				canStylesLockBlock( createStateOf( 'core/group', {} ), 'block' )
+			).toBe( true );
 		} );
 	} );
 

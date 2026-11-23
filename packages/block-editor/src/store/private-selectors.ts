@@ -37,7 +37,10 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
-import { LAYOUT_TEMPLATE_LOCKS } from '../components/block-lock/constants';
+import {
+	LAYOUT_TEMPLATE_LOCKS,
+	STYLES_LOCK_EXCLUDED_BLOCKS,
+} from '../components/block-lock/constants';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -1383,9 +1386,24 @@ export function canLayoutLockBlock( state: State, clientId: string ) {
 }
 
 /**
+ * Returns whether the styles of a block can be locked. A synced pattern and a
+ * template part keep their styles in the pattern or the template part itself,
+ * so their styles can't be locked from the lock menu.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the styles of the block can be locked.
+ */
+export function canStylesLockBlock( state: State, clientId: string ) {
+	const blockName = getBlockName( state, clientId );
+	return !! blockName && ! STYLES_LOCK_EXCLUDED_BLOCKS.includes( blockName );
+}
+
+/**
  * Returns how much of a block is locked. A block has up to four lock
- * properties: movement, deletion, styles (editing its content and styles)
- * and, where it can be locked, layout.
+ * properties: movement, deletion and, where they can be locked, styles (its
+ * style controls) and layout.
  *
  * - `full`: every property the block supports is locked.
  * - `partial`: some, but not all, of them are locked.
@@ -1403,8 +1421,10 @@ export function getBlockLockType(
 	const locks = [
 		isMoveLockedBlock( state, clientId ),
 		isRemoveLockedBlock( state, clientId ),
-		isStylesLockedBlock( state, clientId ),
 	];
+	if ( canStylesLockBlock( state, clientId ) ) {
+		locks.push( isStylesLockedBlock( state, clientId ) );
+	}
 	if ( canLayoutLockBlock( state, clientId ) ) {
 		locks.push( isLayoutLockedBlock( state, clientId ) );
 	}

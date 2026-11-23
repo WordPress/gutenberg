@@ -26,6 +26,7 @@ export default function BlockLockMenuItems( {
 		isRemoveLocked,
 		isLayoutLocked,
 		isStylesLocked,
+		canStylesLock,
 		canLayoutLock,
 		canChangeLayoutLock,
 		isEverySyncedPattern,
@@ -36,11 +37,14 @@ export default function BlockLockMenuItems( {
 				isRemoveLockedBlock,
 				isLayoutLockedBlock,
 				isStylesLockedBlock,
+				canStylesLockBlock,
 				canLayoutLockBlock,
 				isPatternLockedBlock,
 				getBlockName,
 			} = unlock( select( blockEditorStore ) );
 			const layoutLockableIds = clientIds.filter( canLayoutLockBlock );
+			// A synced pattern or a template part keeps its styles in itself.
+			const stylesLockableIds = clientIds.filter( canStylesLockBlock );
 			// A pattern's layout is the pattern's own, so it stays as it is.
 			const layoutChangeableIds = layoutLockableIds.filter(
 				( clientId ) => ! isPatternLockedBlock( clientId )
@@ -52,7 +56,10 @@ export default function BlockLockMenuItems( {
 				isLayoutLocked:
 					layoutLockableIds.length > 0 &&
 					layoutLockableIds.every( isLayoutLockedBlock ),
-				isStylesLocked: clientIds.every( isStylesLockedBlock ),
+				isStylesLocked:
+					stylesLockableIds.length > 0 &&
+					stylesLockableIds.every( isStylesLockedBlock ),
+				canStylesLock: stylesLockableIds.length > 0,
 				canLayoutLock: layoutLockableIds.length > 0,
 				canChangeLayoutLock: layoutChangeableIds.length > 0,
 				isEverySyncedPattern:
@@ -80,7 +87,7 @@ export default function BlockLockMenuItems( {
 		isMoveLocked &&
 		isRemoveLocked &&
 		( ! canLayoutLock || isLayoutLocked ) &&
-		isStylesLocked;
+		( ! canStylesLock || isStylesLocked );
 
 	return (
 		<>
@@ -99,15 +106,18 @@ export default function BlockLockMenuItems( {
 				<Menu.ItemLabel>{ __( 'All properties' ) }</Menu.ItemLabel>
 			</Menu.CheckboxItem>
 			<Menu.Separator />
-			<Menu.CheckboxItem
-				checked={ isStylesLocked }
-				closeOnClick={ false }
-				onCheckedChange={ ( styles ) =>
-					setBlocksLock( clientIds, { styles } )
-				}
-			>
-				<Menu.ItemLabel>{ __( 'Styles' ) }</Menu.ItemLabel>
-			</Menu.CheckboxItem>
+			{ /* A synced pattern or a template part keeps its styles in itself. */ }
+			{ canStylesLock && (
+				<Menu.CheckboxItem
+					checked={ isStylesLocked }
+					closeOnClick={ false }
+					onCheckedChange={ ( styles ) =>
+						setBlocksLock( clientIds, { styles } )
+					}
+				>
+					<Menu.ItemLabel>{ __( 'Styles' ) }</Menu.ItemLabel>
+				</Menu.CheckboxItem>
+			) }
 			{ hasLayoutOption && (
 				<Menu.CheckboxItem
 					checked={ isLayoutLocked }

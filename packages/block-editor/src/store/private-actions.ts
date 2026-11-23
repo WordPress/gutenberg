@@ -953,8 +953,9 @@ export const setBlocksLock =
 			if ( changes.remove !== undefined ) {
 				lock.remove = changes.remove;
 			}
-			// Nothing passes a styles lock down, so an unlock removes it.
-			if ( changes.styles ) {
+			// Nothing passes a styles lock down, so an unlock removes it. A
+			// synced pattern or a template part keeps its styles in itself.
+			if ( changes.styles && select.canStylesLockBlock( clientId ) ) {
 				lock.styles = true;
 			} else if ( changes.styles === false ) {
 				delete lock.styles;

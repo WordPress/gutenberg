@@ -397,6 +397,7 @@ describe( 'private actions', () => {
 					names[ id ] === 'core/group',
 				isPatternLockedBlock: ( id: string ) =>
 					patternLocked.includes( id ),
+				canStylesLockBlock: () => true,
 				isStylesLockedBlock: ( id: string ) =>
 					!! attributes[ id ]?.lock?.styles,
 				getBlockParents: ( id: string ) => {
@@ -686,6 +687,7 @@ describe( 'private actions', () => {
 				getTemplateLock,
 				canLayoutLockBlock: ( id: string ) => id !== 'heading',
 				isPatternLockedBlock: () => false,
+				canStylesLockBlock: () => true,
 				isStylesLockedBlock: ( id: string ) =>
 					!! attributes[ id ]?.lock?.styles,
 				getBlockParents: ( id: string ) => {

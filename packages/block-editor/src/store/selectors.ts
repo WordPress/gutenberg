@@ -33,6 +33,7 @@ import {
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
+import isFullyLockedBlock from '../components/block-lock/is-fully-locked-block';
 import {
 	getContentLockingParent,
 	getEditedContentOnlySection,
@@ -1833,11 +1834,15 @@ const canInsertBlockTypeUnmemoized = (
 
 	// With the block lock menu, a fully locked block takes no new inner
 	// blocks, also when it has no layout to lock, like Social Icons.
-	if ( window.__experimentalBlockLockMenu && rootClientId ) {
-		const rootLock = getBlockAttributes( state, rootClientId )?.lock;
-		if ( rootLock?.styles && rootLock?.move && rootLock?.remove ) {
-			return false;
-		}
+	if (
+		window.__experimentalBlockLockMenu &&
+		rootClientId &&
+		isFullyLockedBlock(
+			getBlockName( state, rootClientId ),
+			getBlockAttributes( state, rootClientId )?.lock
+		)
+	) {
+		return false;
 	}
 
 	// No insertion within static inner content: the inner blocks are fixed

@@ -28,6 +28,7 @@ import {
 } from '../block-edit/context';
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
+import isFullyLockedBlock from '../block-lock/is-fully-locked-block';
 import { deviceTypeKey } from '../../store/private-keys';
 import { CanvasWindowContext } from '../iframe/canvas-window-context';
 import { useCurrentViewport } from '../block-visibility/use-block-visibility';
@@ -206,24 +207,6 @@ export default function BlockList( settings: BlockListProps ) {
 const EMPTY_ARRAY: string[] = [];
 const EMPTY_SET = new Set< string >();
 
-/**
- * Returns whether a lock covers the styles, movement and deletion of a block.
- *
- * @param lock        The `lock` attribute of the block.
- * @param lock.styles Whether the styles are locked.
- * @param lock.move   Whether the block is locked in place.
- * @param lock.remove Whether the block is protected from deletion.
- *
- * @return Whether the block is fully locked.
- */
-function isFullyLocked( lock?: {
-	styles?: boolean;
-	move?: boolean;
-	remove?: boolean;
-} ) {
-	return !! ( lock?.styles && lock?.move && lock?.remove );
-}
-
 function Items( {
 	placeholder,
 	rootClientId,
@@ -321,7 +304,10 @@ function Items( {
 				! (
 					window.__experimentalBlockLockMenu &&
 					rootClientId &&
-					isFullyLocked( getBlockAttributes( rootClientId )?.lock )
+					isFullyLockedBlock(
+						getBlockName( rootClientId ),
+						getBlockAttributes( rootClientId )?.lock
+					)
 				) &&
 				hasAppender &&
 				! _isZoomOut();
