@@ -28,6 +28,14 @@ import { useSuggestionStore } from './suggestion-store';
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
+ * Fixed notice id for a suggestion that could not be saved, so a failure
+ * repeated per keystroke (typing offline) replaces the snackbar instead of
+ * stacking one each time.
+ */
+export const SUGGESTION_SAVE_FAILED_NOTICE_ID =
+	'editor/suggestion-mode/save-failed';
+
+/**
  * Create/update/delete callbacks for the current editor.
  *
  * @return The submission callbacks.
@@ -170,7 +178,11 @@ export function useSuggestionSubmission() {
 				createNotice(
 					'error',
 					error?.message || __( 'Unable to submit suggestion.' ),
-					{ type: 'snackbar', isDismissible: true }
+					{
+						id: SUGGESTION_SAVE_FAILED_NOTICE_ID,
+						type: 'snackbar',
+						isDismissible: true,
+					}
 				);
 				throw error;
 			}

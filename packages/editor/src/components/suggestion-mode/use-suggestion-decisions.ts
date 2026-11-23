@@ -45,6 +45,7 @@ import {
 	applyOperations,
 	applyPostOperations,
 	findBlockByNoteId,
+	findGroupId,
 	findInlineOp,
 	findPostAttributeOps,
 	findStructuralOp,
@@ -54,8 +55,13 @@ import {
 } from './operations';
 import type { BlockPlan, PlanStep, SuggestionPayload } from './operations';
 import { withDecisionInFlight } from './decision-state';
+import { snapshotDecidedPayload } from './decision-snapshot';
 import { useSuggestionStore } from './suggestion-store';
-import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
+import {
+	getSuggestionStatus,
+	isFinalStatus,
+	isPendingStatus,
+} from './suggestion-status';
 import type { SuggestionDecision } from './suggestion-status';
 
 /**
@@ -304,7 +310,22 @@ export function useSuggestionDecisions() {
 				return false;
 			};
 			try {
-				await store.setProvisionalDecision( commentId, decision );
+				// The server keeps the payload of a note with a final
+				// status as it is, so deciding one again records nothing.
+				const note = store.getNote( commentId );
+				await store.setProvisionalDecision(
+					commentId,
+					decision,
+					isFinalStatus( getSuggestionStatus( note ) )
+						? null
+						: snapshotDecidedPayload(
+								registry.select( blockEditorStore ),
+								commentId,
+								parseSuggestionPayload(
+									note?.meta?._wp_suggestion
+								)
+							)
+				);
 			} catch ( error: any ) {
 				return fail( error );
 			}
@@ -322,7 +343,7 @@ export function useSuggestionDecisions() {
 			}
 			return true;
 		},
-		[ store, createNotice ]
+		[ store, createNotice, registry ]
 	);
 
 	/**
@@ -993,7 +1014,8 @@ export function useSuggestionDecisions() {
 	 * A `replaceBlocks` — the block switcher's transform, "Group", a paste
 	 * over a selection — is captured as a removal plus an insertion, and the
 	 * interceptor stamps both halves with a shared `metadata.suggestion
-	 * .groupId`. They are one logical change: accepting the insertion alone
+	 * .groupId`. A deletion across blocks is grouped the same way: the
+	 * rewritten first block and the removed ones. They are one logical change: accepting the insertion alone
 	 * leaves the original block behind as a duplicate, and rejecting it alone
 	 * leaves a hole where the original used to be. The group is resolved from
 	 * the live tree rather than from the payload so it survives a reload,
@@ -1014,7 +1036,7 @@ export function useSuggestionDecisions() {
 			commentId: number | string;
 			payload?: SuggestionPayload | null;
 		} ) => {
-			const groupId = findStructuralOp( payload?.operations )?.groupId;
+			const groupId = findGroupId( payload?.operations );
 			if ( ! groupId ) {
 				return [];
 			}
@@ -1046,8 +1068,7 @@ export function useSuggestionDecisions() {
 						comment?.meta?._wp_suggestion
 					);
 					if (
-						findStructuralOp( partnerPayload?.operations )
-							?.groupId !== groupId
+						findGroupId( partnerPayload?.operations ) !== groupId
 					) {
 						continue;
 					}

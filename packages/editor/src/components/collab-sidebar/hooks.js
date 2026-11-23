@@ -22,6 +22,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { hasNotesSupport } from '../suggestion-mode/gate';
 import { createBoardStore } from './board-store';
 import {
 	getNoteIdsFromMetadata,
@@ -74,12 +75,15 @@ export function getNoteThreadsQuery( postId ) {
 
 export function useNoteThreads( postId ) {
 	const queryArgs = getNoteThreadsQuery( postId );
+	// The request is refused for a post type without notes, such as a
+	// synced pattern opened from a post.
+	const supportsNotes = useSelect( hasNotesSupport, [] );
 
 	const { records: threads } = useEntityRecords(
 		'root',
 		'comment',
 		queryArgs,
-		{ enabled: !! postId && typeof postId === 'number' }
+		{ enabled: supportsNotes && !! postId && typeof postId === 'number' }
 	);
 
 	const { getBlockAttributes } = useSelect( blockEditorStore );

@@ -95,6 +95,8 @@ export function Note( {
 		hasSuggestionPayload ? note : null
 	);
 	const canResolve = note.parent === 0 && ! hasSuggestionPayload;
+	const isReviewableSuggestion =
+		note.parent === 0 && hasSuggestionPayload && isSuggestionModeEnabled();
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -120,18 +122,19 @@ export function Note( {
 			// Reject replace Resolve, but not Reopen. Only with the
 			// experiment on, like every other decision on a suggestion.
 			isEligible: ( { status } ) =>
-				( canResolve ||
-					( note.parent === 0 &&
-						hasSuggestionPayload &&
-						isSuggestionModeEnabled() ) ) &&
+				( canResolve || isReviewableSuggestion ) &&
 				hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
 			title: __( 'Delete' ),
+			// A suggestion is closed with Accept or Reject, which take its
+			// marker out of the content: deleting the note would strand it.
 			isEligible: ( { status } ) =>
-				canResolve || ( ! isResolutionNote && ! hasResolved( status ) ),
+				! isReviewableSuggestion &&
+				( canResolve ||
+					( ! isResolutionNote && ! hasResolved( status ) ) ),
 			onClick: () => setActionState( 'delete' ),
 		},
 	];
