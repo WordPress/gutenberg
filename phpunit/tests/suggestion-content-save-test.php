@@ -348,6 +348,45 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertSame( '', get_comment_meta( $foreign, '_wp_suggestion_content', true ) );
 	}
 
+	/**
+	 * A new post has no notes, so a copy of another post's editor content
+	 * (a duplicated post, a pattern made from marked blocks) proposes nothing.
+	 *
+	 * @dataProvider data_copy_post_types
+	 *
+	 * @param string $post_type Post type of the copy.
+	 */
+	public function test_a_new_post_does_not_store_another_posts_proposals( string $post_type ): void {
+		list( $post_id, $content ) = $this->suggested_post();
+		$this->assertSame( $content, $this->edit_view( $post_id ) );
+
+		$copy_id = wp_insert_post(
+			array(
+				'post_type'    => $post_type,
+				'post_title'   => 'Copy',
+				'post_status'  => 'draft',
+				'post_content' => wp_slash( $content ),
+			)
+		);
+
+		$stored = $this->stored( $copy_id );
+		$this->assertStringNotContainsString( 'zanzibarian', $stored );
+		$this->assertStringNotContainsString( 'Quixotic', $stored );
+		$this->assertStringNotContainsString( '"after"', $stored );
+		$this->assertStringContainsString( '<p>Hello</p>', $stored );
+		$this->assertStringContainsString( 'My Heading', $stored );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_copy_post_types(): array {
+		return array(
+			'a duplicated post' => array( 'post' ),
+			'a new pattern'     => array( 'wp_block' ),
+		);
+	}
+
 	public function test_a_structural_marker_without_a_note_yet_is_left_in_place() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$content = $this->paragraph( 'Hello' ) . "\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1}}} -->\n<p>Not yet linked</p>\n<!-- /wp:paragraph -->";
