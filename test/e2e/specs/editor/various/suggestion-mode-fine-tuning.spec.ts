@@ -64,6 +64,22 @@ async function decideSuggestion( page: any, action: 'Accept' | 'Reject' ) {
 	return sidebar;
 }
 
+// Saves the post and returns the content the save request stored.
+async function saveAndReadContent( page: any ) {
+	const [ response ] = await Promise.all( [
+		page.waitForResponse(
+			( candidate: any ) =>
+				/\/wp\/v2\/posts\/\d+/.test( candidate.url() ) &&
+				candidate.request().method() === 'POST'
+		),
+		page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save draft' } )
+			.click(),
+	] );
+	return ( await response.json() ).content.raw as string;
+}
+
 function firstParagraph( editor: any ) {
 	return editor.canvas
 		.getByRole( 'document', { name: 'Block: Paragraph' } )
@@ -371,5 +387,81 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toHaveText( 'In the pattern' );
 		expect( noteRequests ).toEqual( [] );
+	} );
+
+	test( 'an empty block added while suggesting is not saved into the post (F-51)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		await editor.saveDraft();
+		await switchIntent( page, 'Suggesting' );
+
+		// The selected block's toolbar covers its neighbour.
+		const clearSelection = () =>
+			page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock()
+			);
+		await clearSelection();
+		await firstParagraph( editor ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: /Empty block|Block: Paragraph/,
+			} )
+		).toHaveCount( 3 );
+		await clearSelection();
+		await editor.canvas.getByText( 'Second paragraph' ).click();
+
+		// Nothing was typed, so there is no suggestion and no note.
+		await expect(
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'All notes', exact: true } )
+		).toBeHidden();
+
+		const saved = await saveAndReadContent( page );
+		expect( saved ).toContain( 'First paragraph' );
+		expect( saved ).not.toContain( '<p></p>' );
+
+		await page.reload();
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} )
+		).toHaveCount( 2 );
+	} );
+
+	test( 'a block typed into while suggesting is still saved as a suggestion (F-51)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.saveDraft();
+		await switchIntent( page, 'Suggesting' );
+
+		await firstParagraph( editor ).click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'Enter' );
+		const saved = suggestionSavedPromise( page );
+		await page.keyboard.type( 'Typed block' );
+		await saved;
+
+		const content = await saveAndReadContent( page );
+		expect( content ).toContain( 'Typed block' );
+		expect( content ).toContain( '"type":"pending-insert"' );
 	} );
 } );
