@@ -15,6 +15,8 @@ Files leave both sources the same way whether they uploaded or failed, so each s
 -   Some of it uploaded — "Uploaded 3 of 5", without the checkmark.
 -   Nothing uploaded — no completion snackbar at all. The per-file errors already say what happened, so the progress notice is removed rather than replaced.
 
+An image can also upload without all of its image sizes, for example when a multisite network's storage limit rejects some of them. That still counts as an upload, so the snackbar above reports it as complete. The upload-media store lists those uploads in `getWarnings`, and the component shows one warning snackbar for them: it names the file when there is one, and gives a count when there are several. It stays until dismissed, and uploads that come up short after that start a new snackbar and a new count.
+
 The component renders nothing itself — it is a controller that manages a notice. It removes the notice when it unmounts, so a host that unmounts it during an upload doesn't leave the notice stuck. Uploads carry on, and the snackbar shows them again once it is mounted again.
 
 ## Usage
