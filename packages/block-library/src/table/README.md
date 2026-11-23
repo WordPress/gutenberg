@@ -54,8 +54,12 @@ _Defined via the [`styles`](https://developer.wordpress.org/block-editor/referen
 
 _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
 
-- **root**: `.wp-block-table > table`
-- **spacing**: `.wp-block-table`
+- **root**: `.wp-block-table`
+- **css**: `.wp-block-table > table`
+- **background**: `.wp-block-table > table`
+- **color**: `.wp-block-table > table`
+- **typography**: `.wp-block-table > table`
+- **border**: `.wp-block-table > table`
 
 ## Block Markup
 
