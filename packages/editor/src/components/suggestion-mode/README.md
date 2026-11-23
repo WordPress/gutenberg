@@ -19,7 +19,7 @@ The feature is an experiment, and nothing here is a public API.
 | `block-tree-version.ts`     | A cheap "has any block changed?" signal from the identity of the store's block tree. |
 | `block-ownership.ts`        | Which blocks in the canvas the current post owns, and the notice for a declined edit to one it does not: the children of a synced pattern, template part or navigation menu, and the template around Post Content. |
 | `provider.ts`               | `useSuggestionsProvider`: the `createSuggestion` / `updateSuggestion` / `deleteSuggestion` / `applySuggestion` / `rejectSuggestion` API, a thin composition of the two hooks below. |
-| `suggestion-store.ts`       | `SuggestionStore`: every read and write of a suggestion note (the comment, `_wp_suggestion`, `_wp_suggestion_status`). The swap point for another storage backend. |
+| `suggestion-store.ts`       | `SuggestionStore`: the note writes of the submission and decision hooks (the comment, `_wp_suggestion`, `_wp_suggestion_status`). Meant as the swap point for another storage backend; the note collector and many readers still use the comment entity directly. |
 | `use-suggestion-submission.ts` | Create, update and delete: builds the payload, saves the note through the store, and links the block to it. |
 | `use-suggestion-decisions.ts` | Accept and Reject: the provisional status write, the conflict check, the content change, and the rollback when either half fails. |
 | `apply-refusal.ts` | `getAttributeApplyRefusal` and `getPostApplyRefusal`: why an accept is refused before anything is decided (the proposal left the block or differs from the note, another block type, a value the block type does not declare or that is unsafe to save, a post field that cannot be suggested). |

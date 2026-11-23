@@ -65,6 +65,8 @@ vi.mock( import( '../provider' ), async ( importOriginal ) => {
 
 const TEST_BLOCK = 'core/test-autosave-heading';
 const POST_ID = 7;
+// The signed-in user: auto-save saves nothing until one is known.
+const ME = 3;
 
 beforeAll( () => {
 	// The real core-data store resolves selectors over REST, and jsdom has no
@@ -97,7 +99,11 @@ afterEach( () => {
 	vi.useRealTimers();
 } );
 
-function createTestRegistry( intent: string, blocks: any[] ) {
+function createTestRegistry(
+	intent: string,
+	blocks: any[],
+	currentUserId: number | null = ME
+) {
 	const registry = createRegistry();
 	registry.register( noticesStore );
 	registry.register( coreStore );
@@ -108,12 +114,21 @@ function createTestRegistry( intent: string, blocks: any[] ) {
 	registry.register( editorStore );
 	registry.dispatch( blockEditorStore ).resetBlocks( blocks );
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
+	if ( currentUserId !== null ) {
+		( registry.dispatch( coreStore ) as any ).receiveCurrentUser( {
+			id: currentUserId,
+		} );
+	}
 	unlock( registry.dispatch( editorStore ) ).setEditorIntent( intent );
 	return registry;
 }
 
-function renderWith( intent: string, blocks: any[] ) {
-	const registry = createTestRegistry( intent, blocks );
+function renderWith(
+	intent: string,
+	blocks: any[],
+	currentUserId: number | null = ME
+) {
+	const registry = createTestRegistry( intent, blocks, currentUserId );
 	const wrapper = ( { children }: { children?: React.ReactNode } ) => (
 		<RegistryProvider value={ registry }>
 			<SuggestionSessionProvider>{ children }</SuggestionSessionProvider>
@@ -161,7 +176,7 @@ function propose(
 				...attributes.metadata,
 				suggestion: {
 					type: 'pending-attributes',
-					authorId: null,
+					authorId: ME,
 					...attributes.metadata?.suggestion,
 					...marker,
 					after,
@@ -223,7 +238,7 @@ describe( 'SuggestionAutoSave', () => {
 		} );
 		expect( markerOf( registry, block.clientId ) ).toEqual( {
 			type: 'pending-attributes',
-			authorId: null,
+			authorId: ME,
 			after: { level: 3 },
 			commentId: 42,
 		} );
@@ -390,7 +405,7 @@ describe( 'SuggestionAutoSave', () => {
 
 		setMarker( {
 			type: 'pending-move',
-			authorId: null,
+			authorId: ME,
 			fromIndex: 0,
 			fromParentClientId: null,
 			fromAnchorClientId: null,
@@ -414,7 +429,7 @@ describe( 'SuggestionAutoSave', () => {
 			},
 		} );
 
-		setMarker( { type: 'pending-remove', authorId: null } );
+		setMarker( { type: 'pending-remove', authorId: ME } );
 		await pastDebounce();
 
 		expect( updateSuggestion ).not.toHaveBeenCalled();
@@ -482,7 +497,11 @@ describe( 'SuggestionAutoSave', () => {
 		const block = heading( 'Hi', {
 			metadata: {
 				noteId: [ 42 ],
-				suggestion: { type: 'pending-attributes', after: { level: 3 } },
+				suggestion: {
+					type: 'pending-attributes',
+					authorId: ME,
+					after: { level: 3 },
+				},
 			},
 		} );
 		const { registry } = renderWith( 'suggest', [ block ] );
@@ -491,6 +510,7 @@ describe( 'SuggestionAutoSave', () => {
 			status: 'hold',
 			type: 'note',
 			post: POST_ID,
+			author: ME,
 			meta: {
 				_wp_suggestion_status: 'pending',
 				_wp_suggestion: JSON.stringify( {
@@ -574,12 +594,60 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
 
+	it( 'never saves a marker with no recorded author as the current user’s', async () => {
+		// Anyone who can edit the post can plant a marker in its content.
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		await pastDebounce();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ) ).toEqual( {
+			type: 'pending-attributes',
+			after: { level: 3 },
+		} );
+	} );
+
+	it( 'saves nothing until the current user is known', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ], null );
+
+		// Neither a marker with no author nor one naming the user is
+		// saved while nobody can be told to be its author.
+		propose( registry, block.clientId, { level: 3 }, { authorId: null } );
+		await pastDebounce();
+		propose( registry, block.clientId, { level: 4 }, { authorId: ME } );
+		await pastDebounce();
+		expect( createSuggestion ).not.toHaveBeenCalled();
+
+		act( () => {
+			registry
+				.dispatch( coreStore )
+				.receiveCurrentUser( { id: ME } as any );
+		} );
+		await pastDebounce();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect( markerOf( registry, block.clientId ).commentId ).toBe( 42 );
+	} );
+
 	it( 'ignores a hinted note that belongs to another user', async () => {
 		createSuggestion.mockResolvedValue( { id: 43 } );
 		const block = heading( 'Hi', {
 			metadata: {
 				suggestion: {
 					type: 'pending-attributes',
+					authorId: 3,
 					after: { level: 3 },
 					commentId: 99,
 				},
@@ -613,6 +681,7 @@ describe( 'SuggestionAutoSave', () => {
 				noteId: [ 42 ],
 				suggestion: {
 					type: 'pending-attributes',
+					authorId: ME,
 					after: { level: 3 },
 					commentId: 42,
 				},
@@ -624,6 +693,7 @@ describe( 'SuggestionAutoSave', () => {
 			status: 'hold',
 			type: 'note',
 			post: POST_ID,
+			author: ME,
 			meta: {
 				_wp_suggestion_status: 'pending',
 				_wp_suggestion: JSON.stringify( {
@@ -841,6 +911,67 @@ describe( 'SuggestionAutoSave', () => {
 		await flushPromises();
 
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'saves a pending suggestion when the page is hidden', async () => {
+		createSuggestion.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		const visibility = vi
+			.spyOn( document, 'visibilityState', 'get' )
+			.mockReturnValue( 'hidden' );
+		act( () => {
+			document.dispatchEvent( new Event( 'visibilitychange' ) );
+		} );
+		visibility.mockRestore();
+		await flushPromises();
+
+		// No debounce elapsed: closing the tab would have dropped it.
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'retries a save that failed without waiting for another edit', async () => {
+		createSuggestion
+			.mockRejectedValueOnce( new Error( 'Network error' ) )
+			.mockResolvedValue( { id: 42 } );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
+		expect(
+			markerOf( registry, block.clientId ).commentId
+		).toBeUndefined();
+
+		await act( async () => {
+			vi.advanceTimersByTime( 5000 );
+		} );
+		await flushPromises();
+		await flushPromises();
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 2 );
+		expect( markerOf( registry, block.clientId ).commentId ).toBe( 42 );
+	} );
+
+	it( 'gives up on a save that keeps failing', async () => {
+		createSuggestion.mockRejectedValue( new Error( 'Too large' ) );
+		const block = heading();
+		const { registry } = renderWith( 'suggest', [ block ] );
+
+		propose( registry, block.clientId, { level: 3 } );
+		await pastDebounce();
+		for ( let round = 0; round < 6; round++ ) {
+			await act( async () => {
+				vi.advanceTimersByTime( 5000 );
+			} );
+			await flushPromises();
+			await flushPromises();
+		}
+
+		expect( createSuggestion ).toHaveBeenCalledTimes( 3 );
 	} );
 
 	it( 'saves the post title proposal with no block to link', async () => {

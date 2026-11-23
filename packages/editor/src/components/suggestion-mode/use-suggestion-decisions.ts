@@ -17,6 +17,7 @@ import { STORE_NAME } from '../../store/constants';
 import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
+import { findInlineMarker } from './anchor-index';
 import { createProposedTerms } from './create-proposed-terms';
 import { getAttributeApplyRefusal, getPostApplyRefusal } from './apply-refusal';
 import {
@@ -236,6 +237,40 @@ export function useSuggestionDecisions() {
 				commentId
 			),
 		[ selectClientIdsWithDescendants, selectBlockAttributes ]
+	);
+
+	/**
+	 * Where an inline suggestion's marker is. The marker is found by its id
+	 * wherever it sits: a merge or a transform leaves it in a block that
+	 * `metadata.noteId` does not link, or under another attribute name. The
+	 * linked block and the payload's attribute are tried first, and are the
+	 * answer when the content holds no marker for the note.
+	 *
+	 * @param clientId  Block client id, if the caller resolved one.
+	 * @param commentId Comment id.
+	 * @param attribute Attribute the payload names.
+	 * @return The block and attribute to decide on, or undefined.
+	 */
+	const resolveInlineTarget = useCallback(
+		(
+			clientId: string | undefined,
+			commentId: number | string,
+			attribute: string
+		) => {
+			const linked = resolveTarget( clientId, commentId );
+			return (
+				findInlineMarker(
+					{
+						getClientIdsWithDescendants:
+							selectClientIdsWithDescendants,
+						getBlockAttributes: selectBlockAttributes,
+					},
+					commentId,
+					{ clientId: linked, attribute }
+				) ?? ( linked ? { clientId: linked, attribute } : undefined )
+			);
+		},
+		[ resolveTarget, selectClientIdsWithDescendants, selectBlockAttributes ]
 	);
 
 	/**
@@ -570,7 +605,12 @@ export function useSuggestionDecisions() {
 				);
 			}
 
-			const targetClientId = resolveTarget( clientId, commentId );
+			const inlineOp = findInlineOp( payload.operations );
+			const inlineTarget = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
+				: undefined;
+			const targetClientId =
+				inlineTarget?.clientId ?? resolveTarget( clientId, commentId );
 
 			if ( ! targetClientId ) {
 				createNotice(
@@ -621,9 +661,8 @@ export function useSuggestionDecisions() {
 			// proposed text becomes permanent. The write bypasses the
 			// Suggestion mode interceptor so it lands on the live block
 			// instead of being reverted into the overlay.
-			const inlineOp = findInlineOp( payload.operations );
-			if ( inlineOp ) {
-				const attributeKey = inlineOp.attribute;
+			if ( inlineOp && inlineTarget ) {
+				const attributeKey = inlineTarget.attribute;
 				/*
 				 * Accepting a deletion removes its characters, which can
 				 * shrink or empty other suggestions nested with it; the
@@ -764,6 +803,7 @@ export function useSuggestionDecisions() {
 			updateBlockAttributes,
 			selectBlockAttributes,
 			resolveTarget,
+			resolveInlineTarget,
 			runPlan,
 			createNotice,
 			requestInterceptorBypass,
@@ -823,11 +863,12 @@ export function useSuggestionDecisions() {
 			// may be absent on a fresh load) and bypass the interceptor so the
 			// change lands on the live block.
 			const inlineOp = findInlineOp( payload?.operations );
-			const inlineTarget = inlineOp
-				? resolveTarget( clientId, commentId )
+			const located = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
 				: undefined;
-			if ( inlineOp && inlineTarget ) {
-				const attributeKey = inlineOp.attribute;
+			if ( inlineOp && located ) {
+				const inlineTarget = located.clientId;
+				const attributeKey = located.attribute;
 				/*
 				 * Rejecting an addition removes its text, and with it every
 				 * suggestion nested in it. Rejecting a formatting change
@@ -941,7 +982,7 @@ export function useSuggestionDecisions() {
 		[
 			decide,
 			selectBlockAttributes,
-			resolveTarget,
+			resolveInlineTarget,
 			runPlan,
 			updateBlockAttributes,
 			markNextChangeAsNotPersistent,

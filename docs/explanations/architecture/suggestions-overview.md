@@ -80,7 +80,7 @@ flowchart TB
     Post --> Strip
 ```
 
-Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend would replace), and are linked back to the block through `metadata.noteId` and the marker's id.
+Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend is meant to replace, once the remaining direct reads of the comment entity move behind it), and are linked back to the block through `metadata.noteId` and the marker's id.
 
 ## Data model
 

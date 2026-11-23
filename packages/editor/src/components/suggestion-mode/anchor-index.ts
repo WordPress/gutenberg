@@ -47,7 +47,8 @@ export type SuggestionAnchor =
 	| { kind: 'inline'; attribute: string };
 
 export interface AnchorIndex {
-	inline: Map< string, Set< string > >;
+	/** Note ids with an inline marker in any attribute of any block. */
+	inline: Set< string >;
 	structural: Set< string >;
 }
 
@@ -116,24 +117,102 @@ function richTextMarkerIds( value: RichTextData ): string[] {
 }
 
 /**
+ * The note ids of the inline markers in one attribute value.
+ *
+ * @param value Attribute value.
+ * @return Marker ids; empty for anything that is not marked rich text.
+ */
+function attributeMarkerIds( value: unknown ): string[] {
+	if ( value instanceof RichTextData ) {
+		return richTextMarkerIds( value );
+	}
+	if (
+		typeof value === 'string' &&
+		value.includes( SUGGESTION_CLASS_PROBE )
+	) {
+		return Array.from(
+			value.matchAll( SUGGESTION_ID_PATTERN ),
+			( match ) => match[ 1 ]
+		);
+	}
+	return [];
+}
+
+/**
+ * Where a note's inline marker is, found by the marker's id.
+ *
+ * The marker travels with the text, so it is the anchor. The attribute a
+ * payload names and the block a `metadata.noteId` links are only where the
+ * marker was written: merging two blocks moves it under a block that never
+ * had the link, and a transform can rename the attribute and drops the link.
+ * Both are tried first, as hints.
+ *
+ * @param blockEditor    Block-editor selectors.
+ * @param noteId         Note id the marker carries.
+ * @param hint           Where the marker was last known to be.
+ * @param hint.clientId  Block client id.
+ * @param hint.attribute Attribute name.
+ * @return The block and attribute holding the marker, or null.
+ */
+export function findInlineMarker(
+	blockEditor: any,
+	noteId: number | string,
+	hint: { clientId?: string; attribute?: string } = {}
+): { clientId: string; attribute: string } | null {
+	const idKey = String( noteId );
+	const inBlock = ( clientId: string ) => {
+		const attributes = blockEditor.getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			return null;
+		}
+		const names = Object.keys( attributes );
+		if ( hint.attribute && names.includes( hint.attribute ) ) {
+			names.splice( names.indexOf( hint.attribute ), 1 );
+			names.unshift( hint.attribute );
+		}
+		for ( const attribute of names ) {
+			if (
+				attributeMarkerIds( attributes[ attribute ] ).includes( idKey )
+			) {
+				return { clientId, attribute };
+			}
+		}
+		return null;
+	};
+	const hinted = hint.clientId ? inBlock( hint.clientId ) : null;
+	if ( hinted ) {
+		return hinted;
+	}
+	for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
+		[] ) {
+		const found = clientId === hint.clientId ? null : inBlock( clientId );
+		if ( found ) {
+			return found;
+		}
+	}
+	return null;
+}
+
+/**
  * The anchors present in the editor, indexed in one pass over the blocks.
  *
  * Structural anchors are the `metadata.suggestion` markers, keyed by pending
- * type and note id. Inline anchors are the marker ids found in each block's
- * rich-text attributes, keyed by attribute: the marker travels with content,
+ * type and note id. Inline anchors are the marker ids found in the blocks'
+ * rich text, whichever attribute holds them: the marker travels with content,
  * so the content is what is scanned rather than a (possibly undone) metadata
- * linkage. Building the index once and testing every note against it keeps a
- * store update at one serialization per block instead of one per note.
+ * linkage or the attribute the note was written for, as the server does.
+ * Building the index once and testing every note against it keeps a store
+ * update at one pass over the blocks instead of one per note.
  *
- * @param blockEditor      Block-editor selectors.
- * @param inlineAttributes Attribute names any tracked inline note anchors to.
+ * @param blockEditor Block-editor selectors.
+ * @param scanInline  Whether any tracked note has an inline anchor.
  * @return The index.
  */
 export function buildAnchorIndex(
 	blockEditor: any,
-	inlineAttributes: Set< string >
+	scanInline: boolean
 ): AnchorIndex {
-	const inline = new Map< string, Set< string > >();
+	const inline = new Set< string >();
 	const structural = new Set< string >();
 	for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
 		[] ) {
@@ -146,25 +225,12 @@ export function buildAnchorIndex(
 		) ) {
 			structural.add( `${ kind }:${ noteId }` );
 		}
-		for ( const attribute of inlineAttributes ) {
-			const value = attributes[ attribute ];
-			const addId = ( id: unknown ) => {
-				let ids = inline.get( attribute );
-				if ( ! ids ) {
-					ids = new Set();
-					inline.set( attribute, ids );
-				}
-				ids.add( String( id ) );
-			};
-			if ( value instanceof RichTextData ) {
-				richTextMarkerIds( value ).forEach( addId );
-			} else if (
-				typeof value === 'string' &&
-				value.includes( SUGGESTION_CLASS_PROBE )
-			) {
-				for ( const match of value.matchAll( SUGGESTION_ID_PATTERN ) ) {
-					addId( match[ 1 ] );
-				}
+		if ( ! scanInline ) {
+			continue;
+		}
+		for ( const value of Object.values( attributes ) ) {
+			for ( const id of attributeMarkerIds( value ) ) {
+				inline.add( String( id ) );
 			}
 		}
 	}
@@ -179,51 +245,50 @@ export function buildAnchorIndex(
  */
 const anchorIndexCache = new WeakMap<
 	object,
-	{ key: string; index: AnchorIndex }
+	{ scanInline: boolean; index: AnchorIndex }
 >();
 
 /**
- * `buildAnchorIndex`, cached per block tree and attribute set.
+ * `buildAnchorIndex`, cached per block tree.
  *
- * @param blockEditor      Block-editor selectors.
- * @param inlineAttributes Attribute names any tracked inline note anchors to.
+ * @param blockEditor Block-editor selectors.
+ * @param scanInline  Whether any tracked note has an inline anchor.
  * @return The index.
  */
 export function getAnchorIndex(
 	blockEditor: any,
-	inlineAttributes: Set< string >
+	scanInline: boolean
 ): AnchorIndex {
 	const version = getBlockTreeVersion( blockEditor );
-	const key = [ ...inlineAttributes ].sort().join( '|' );
 	const cached = version ? anchorIndexCache.get( version ) : undefined;
-	if ( cached && cached.key === key ) {
+	// An index that scanned inline markers answers either question.
+	if ( cached && ( cached.scanInline || ! scanInline ) ) {
 		return cached.index;
 	}
-	const index = buildAnchorIndex( blockEditor, inlineAttributes );
+	const index = buildAnchorIndex( blockEditor, scanInline );
 	if ( version ) {
-		anchorIndexCache.set( version, { key, index } );
+		anchorIndexCache.set( version, { scanInline, index } );
 	}
 	return index;
 }
 
 /**
- * The rich-text attributes the given notes' inline anchors live in.
+ * Whether any of the given notes is anchored by an inline marker.
  *
  * @param lists Lists of tracked notes with their anchors.
- * @return Attribute names.
+ * @return True when the blocks' rich text has to be scanned.
  */
-export function inlineAttributesOf(
+export function hasInlineAnchor(
 	...lists: Array< Iterable< { anchor: SuggestionAnchor } > >
-): Set< string > {
-	const attributes = new Set< string >();
+): boolean {
 	for ( const list of lists ) {
 		for ( const { anchor } of list ) {
 			if ( anchor.kind === 'inline' ) {
-				attributes.add( anchor.attribute );
+				return true;
 			}
 		}
 	}
-	return attributes;
+	return false;
 }
 
 /**
@@ -243,7 +308,7 @@ export function isAnchorPresent(
 	if ( anchor.kind === 'structural' ) {
 		return index.structural.has( `${ anchor.pendingType }:${ idKey }` );
 	}
-	return index.inline.get( anchor.attribute )?.has( idKey ) ?? false;
+	return index.inline.has( idKey );
 }
 
 /**
@@ -271,7 +336,7 @@ export function useSuggestionAnchorPresent( note: any ): boolean | null {
 			}
 			const index = getAnchorIndex(
 				blockEditor,
-				inlineAttributesOf( [ { anchor } ] )
+				hasInlineAnchor( [ { anchor } ] )
 			);
 			return isAnchorPresent( note, anchor, index );
 		},

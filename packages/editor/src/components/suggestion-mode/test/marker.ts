@@ -127,6 +127,7 @@ describe( 'withProposedAttributes', () => {
 		const metadata = {
 			suggestion: {
 				type: 'pending-move',
+				authorId: 5,
 				fromIndex: 0,
 				after: { level: 3 },
 			},
@@ -139,6 +140,7 @@ describe( 'withProposedAttributes', () => {
 		} );
 		expect( next.metadata.suggestion ).toEqual( {
 			type: 'pending-move',
+			authorId: 5,
 			fromIndex: 0,
 		} );
 	} );
