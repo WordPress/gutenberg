@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Templates: Clear the selection after deleting the selected template in the list layout, so the preview no longer shows "You attempted to edit an item that doesn't exist".
+-   Templates: Clear the selection after deleting the selected template in the list layout, so the preview no longer shows "You attempted to edit an item that doesn't exist" ([#87286](https://github.com/WordPress/gutenberg/pull/87286)).
 
 ## 8.2.0 (2026-11-18)
 
