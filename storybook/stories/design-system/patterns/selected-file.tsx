@@ -3,6 +3,18 @@ import { closeSmall, file as fileIcon } from '@wordpress/icons';
 import { Icon, IconButton, Stack, Text } from '@wordpress/ui';
 import styles from './file-picker.module.css';
 
+let lastId = 0;
+
+/**
+ * Returns a key for a new row. The same file can be chosen twice, so the key
+ * can't come from the file. Unlike `crypto.randomUUID()`, this works on sites
+ * served over plain HTTP.
+ */
+export function createId() {
+	lastId += 1;
+	return String( lastId );
+}
+
 /**
  * Formats a size in bytes, such as "812 kB" or "1.4 MB".
  *

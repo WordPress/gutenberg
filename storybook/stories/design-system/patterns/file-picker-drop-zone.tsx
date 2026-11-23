@@ -41,7 +41,9 @@ export function FilePickerDropZone( { disabled = false } ) {
 			return;
 		}
 		if ( files.length > 1 ) {
-			setError( 'Choose one PNG image.' );
+			setError(
+				`Couldn’t use ${ files.length } files. Choose one PNG image.`
+			);
 			return;
 		}
 		const [ chosen ] = files;

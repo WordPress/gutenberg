@@ -149,7 +149,7 @@ export function FilePickerMenu() {
 								<li key={ item.name }>
 									<Button
 										variant="unstyled"
-										className={ `${ styles.surface } ${ styles.choose } ${ previewStyles.option }` }
+										className={ `${ styles.choose } ${ previewStyles.option }` }
 										onClick={ () => {
 											choose( item );
 											setIsLibraryOpen( false );

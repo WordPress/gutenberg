@@ -11,7 +11,7 @@ import {
 	Text,
 	ValidityIndicator,
 } from '@wordpress/ui';
-import { getExtension, SelectedFile } from './selected-file';
+import { createId, getExtension, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 
 type Upload = {
@@ -34,12 +34,16 @@ export function FilePickerUpload() {
 	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const chooseRef = useRef< HTMLButtonElement >( null );
 	const announcements = useRef< string[] >( [] );
+	const announceTimerRef = useRef< number >( undefined );
 	const [ error, setError ] = useState( '' );
 	const errorId = useId();
 
 	useEffect( () => {
 		const current = timers.current;
-		return () => current.forEach( ( timer ) => clearInterval( timer ) );
+		return () => {
+			current.forEach( ( timer ) => clearInterval( timer ) );
+			clearTimeout( announceTimerRef.current );
+		};
 	}, [] );
 
 	/*
@@ -50,14 +54,9 @@ export function FilePickerUpload() {
 	function announce( message: string ) {
 		announcements.current.push( message );
 		if ( announcements.current.length === 1 ) {
-			// Kept with the upload timers, so unmounting clears it too.
-			timers.current.set(
-				'announce',
-				window.setTimeout(
-					() =>
-						speak( announcements.current.splice( 0 ).join( ' ' ) ),
-					100
-				)
+			announceTimerRef.current = window.setTimeout(
+				() => speak( announcements.current.splice( 0 ).join( ' ' ) ),
+				100
 			);
 		}
 	}
@@ -112,7 +111,7 @@ export function FilePickerUpload() {
 				: ''
 		);
 		const added = files.filter( isAccepted ).map( ( file ) => ( {
-			id: crypto.randomUUID(),
+			id: createId(),
 			file,
 			status: 'uploading' as const,
 			progress: 0,
@@ -130,8 +129,10 @@ export function FilePickerUpload() {
 		} );
 		start( upload.id, upload.file, upload.attempt + 1 );
 		// The "Retry" button is about to go, so move focus to the row's
-		// remove button, which now cancels the upload.
+		// remove button, which now cancels the upload. Its new name may not
+		// be read while it has focus, so say what happens.
 		removeRefs.current.get( upload.id )?.focus();
+		speak( `Uploading ${ upload.file.name } again.` );
 	}
 
 	function remove( upload: Upload ) {

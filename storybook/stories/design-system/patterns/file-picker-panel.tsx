@@ -10,7 +10,7 @@ import {
 	Text,
 	ValidityIndicator,
 } from '@wordpress/ui';
-import { getExtension, SelectedFile } from './selected-file';
+import { createId, getExtension, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 
 const FONT_EXTENSIONS = [ '.ttf', '.otf', '.woff', '.woff2' ];
@@ -31,7 +31,7 @@ export function FilePickerPanel() {
 		const rejected = files.filter( ( file ) => ! isFont( file ) );
 		setEntries( ( current ) => [
 			...current,
-			...fonts.map( ( file ) => ( { id: crypto.randomUUID(), file } ) ),
+			...fonts.map( ( file ) => ( { id: createId(), file } ) ),
 		] );
 		setError(
 			rejected.length
@@ -102,38 +102,40 @@ export function FilePickerPanel() {
 			<Card.Content>
 				<Stack direction="column" gap="md">
 					{ entries.length > 0 ? (
-						<Stack
-							render={ <ul /> }
-							direction="column"
-							gap="sm"
-							className={ styles.list }
-						>
-							{ entries.map( ( entry ) => (
-								<li key={ entry.id }>
-									<SelectedFile
-										ref={ ( element ) => {
-											if ( element ) {
-												removeRefs.current.set(
-													entry.id,
-													element
-												);
-											} else {
-												removeRefs.current.delete(
-													entry.id
-												);
+						<>
+							<Stack
+								render={ <ul /> }
+								direction="column"
+								gap="sm"
+								className={ styles.list }
+							>
+								{ entries.map( ( entry ) => (
+									<li key={ entry.id }>
+										<SelectedFile
+											ref={ ( element ) => {
+												if ( element ) {
+													removeRefs.current.set(
+														entry.id,
+														element
+													);
+												} else {
+													removeRefs.current.delete(
+														entry.id
+													);
+												}
+											} }
+											file={ entry.file }
+											onRemove={ () =>
+												removeEntry( entry )
 											}
-										} }
-										file={ entry.file }
-										onRemove={ () => removeEntry( entry ) }
-									/>
-								</li>
-							) ) }
-						</Stack>
-					) : null }
-					{ entries.length > 0 ? (
-						<Text variant="body-sm" className={ styles.weak }>
-							Drop more font files anywhere in this panel.
-						</Text>
+										/>
+									</li>
+								) ) }
+							</Stack>
+							<Text variant="body-sm" className={ styles.weak }>
+								Drop more font files anywhere in this panel.
+							</Text>
+						</>
 					) : (
 						<EmptyState.Root>
 							<EmptyState.Icon icon={ upload } />

@@ -67,7 +67,7 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 />
 
 - **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can be told apart.
-- **Move focus after a removal.** Focus the next row's remove button, or the drop area when the list is empty.
+- **Move focus after a removal.** Focus the next row's remove button, the previous one when the last row was removed, or the drop area when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
 - **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". A file dropped on a full field gets the limit message.
 - **Show the file type next to the name.** Long filenames are cut at the end, so the details line shows the type, and people can tell `report.pdf` from `report.png`.

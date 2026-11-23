@@ -10,7 +10,7 @@ import {
 	Text,
 	ValidityIndicator,
 } from '@wordpress/ui';
-import { getExtension, SelectedFile } from './selected-file';
+import { createId, getExtension, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 
 const ACCEPTED_EXTENSIONS = [ '.pdf', '.jpg', '.jpeg', '.png' ];
@@ -61,10 +61,10 @@ export function FilePickerMultiple() {
 
 		// A file can be chosen twice, so give each entry its own key.
 		const newEntries = accepted.map( ( file ) => ( {
-			id: crypto.randomUUID(),
+			id: createId(),
 			file,
 		} ) );
-		setEntries( ( current ) => [ ...current, ...newEntries ] );
+		setEntries( [ ...entries, ...newEntries ] );
 		const names = ( files: File[] ) =>
 			files.map( ( file ) => file.name ).join( ', ' );
 		const messages = [];

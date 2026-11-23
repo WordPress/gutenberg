@@ -27,8 +27,11 @@
 .option {
 	display: flex;
 	inline-size: 100%;
-	border-style: solid;
-	border-color: var(--wpds-color-stroke-surface-neutral);
+	border:
+		var(--wpds-border-width-xs) solid
+		var(--wpds-color-stroke-surface-neutral);
+	border-radius: var(--wpds-border-radius-md);
+	background: var(--wpds-color-background-surface-neutral);
 
 	&:hover {
 		background: var(--wpds-color-background-surface-neutral-weak);

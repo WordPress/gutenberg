@@ -1,5 +1,6 @@
 import { SnackbarList } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { createId } from './selected-file';
 import previewStyles from './file-picker-preview.module.css';
 
 /*
@@ -18,7 +19,7 @@ export function useSnackbars() {
 	>( [] );
 	function show( content: string ) {
 		// A new id makes the list show the snackbar again for a repeat.
-		setNotices( [ { id: crypto.randomUUID(), content } ] );
+		setNotices( [ { id: createId(), content } ] );
 	}
 
 	const list = (
