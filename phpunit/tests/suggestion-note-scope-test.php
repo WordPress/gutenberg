@@ -55,11 +55,12 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	/**
 	 * Creates a pending format suggestion note.
 	 *
-	 * @param int    $post_id     Post the note belongs to.
-	 * @param string $before_html Original run recorded on the note.
+	 * @param int|WP_Error $post_id     Post the note belongs to, as the factory returned it.
+	 * @param string       $before_html Original run recorded on the note.
 	 * @return int Note ID.
 	 */
-	private function create_format_note( $post_id, $before_html ) {
+	private function create_format_note( $post_id, string $before_html ): int {
+		$this->assertIsInt( $post_id );
 		$note_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID'  => $post_id,
@@ -78,25 +79,40 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 				),
 			),
 		);
+		$this->assertIsInt( $note_id );
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
 		return $note_id;
 	}
 
-	private function format_marker( $note_id, $inner ) {
+	/**
+	 * Builds a format marker.
+	 *
+	 * @param int    $note_id Note ID.
+	 * @param string $inner   Marked run.
+	 * @return string Marker HTML.
+	 */
+	private function format_marker( int $note_id, string $inner ): string {
 		return '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
 	}
 
-	private function paragraph( $html ) {
+	/**
+	 * Builds a paragraph block.
+	 *
+	 * @param string $html Paragraph content.
+	 * @return string Serialized block.
+	 */
+	private function paragraph( string $html ): string {
 		return '<!-- wp:paragraph --><p>' . $html . '</p><!-- /wp:paragraph -->';
 	}
 
 	/**
 	 * Stores post content without content filters, so markers survive.
 	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $content Post content.
+	 * @param int|WP_Error $post_id Post ID, as the factory returned it.
+	 * @param string       $content Post content.
 	 */
-	private function set_post_content( $post_id, $content ) {
+	private function set_post_content( $post_id, string $content ): void {
+		$this->assertIsInt( $post_id );
 		global $wpdb;
 		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
 		clean_post_cache( $post_id );
@@ -254,11 +270,12 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	 * private original (its marker sits inside a pending addition, which never
 	 * renders), followed by the given blocks.
 	 *
-	 * @param callable $blocks Returns the blocks to render after the page's
-	 *                         own, given the page's note ID.
+	 * @param callable(int): string $blocks Returns the blocks to render after
+	 *                                      the page's own, given the page's
+	 *                                      note ID.
 	 * @return string Rendered content.
 	 */
-	private function render_page_with_private_original( $blocks ) {
+	private function render_page_with_private_original( callable $blocks ) {
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$note_id = $this->create_format_note( $page_id, '<em>run</em>' );
 		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'run' ) . '</mark>' )
