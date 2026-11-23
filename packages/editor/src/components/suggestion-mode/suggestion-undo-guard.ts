@@ -54,6 +54,7 @@
  */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { nextCaptureSeq, useSuggestionSession } from './suggestion-session';
@@ -301,11 +302,8 @@ export default function SuggestionUndoGuard() {
 		isSuggestModeRef.current = isSuggestMode;
 	}, [ isSuggestMode ] );
 
-	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
-	clearStructuralCaptureRef.current = clearStructuralCapture;
-
-	const requestInterceptorBypassRef = useRef( requestInterceptorBypass );
-	requestInterceptorBypassRef.current = requestInterceptorBypass;
+	const onClearStructuralCapture = useEvent( clearStructuralCapture );
+	const onRequestInterceptorBypass = useEvent( requestInterceptorBypass );
 
 	/*
 	 * Tell the Undo button when there is a suggestion to withdraw. A
@@ -385,7 +383,7 @@ export default function SuggestionUndoGuard() {
 				readSuggestionMarker( attributes )?.commentId ?? null
 			);
 
-			requestInterceptorBypassRef.current( clientId );
+			onRequestInterceptorBypass( clientId );
 			if ( op.type === 'block-insert-after' ) {
 				markIgnored( { history: 'ignore' } );
 				removeBlock( clientId, false );
@@ -407,7 +405,7 @@ export default function SuggestionUndoGuard() {
 					);
 				} );
 			}
-			clearStructuralCaptureRef.current( clientId );
+			onClearStructuralCapture( clientId );
 		};
 
 		/*
@@ -505,6 +503,8 @@ export default function SuggestionUndoGuard() {
 		getLastContentCaptureSeq,
 		getStructuralCaptures,
 		armUndoRedoAdoption,
+		onClearStructuralCapture,
+		onRequestInterceptorBypass,
 	] );
 
 	return null;
