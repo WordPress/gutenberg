@@ -30,19 +30,60 @@ export type SpaceObject = {
 };
 
 /**
- * Returns an SVG data URI that draws a sphere with a hue derived from `name`,
- * so the stories show distinct thumbnails without requesting an image.
+ * The lit and shaded colors of each space object, sampled from the photos the
+ * stories showed before they drew the thumbnails.
+ */
+const SPACE_COLORS = {
+	amalthea: [ '#d7d7d7', '#4b4b4b' ],
+	ariel: [ '#8f8f8f', '#353535' ],
+	callisto: [ '#6c553e', '#3b2e21' ],
+	ceres: [ '#b0ada9', '#423d3a' ],
+	charon: [ '#979796', '#535150' ],
+	deimos: [ '#e2ded3', '#524f4a' ],
+	dione: [ '#d4d4d4', '#5d5d5d' ],
+	earth: [ '#b4cdf0', '#2b3f78' ],
+	enceladus: [ '#e4e4e4', '#4a4a4a' ],
+	europa: [ '#cbbfb4', '#36393b' ],
+	ganymede: [ '#d4c1a8', '#413931' ],
+	haumea: [ '#f9f9f9', '#2f2f2f' ],
+	himalia: [ '#bababa', '#2f2f2f' ],
+	iapetus: [ '#d2d2d2', '#4c4a48' ],
+	io: [ '#e1ea94', '#827e40' ],
+	jupiter: [ '#e2d4c9', '#524524' ],
+	makemake: [ '#b7b7b7', '#2e2e2e' ],
+	mars: [ '#e3c7ab', '#726251' ],
+	mercury: [ '#a2a2a2', '#3a3a3a' ],
+	mimas: [ '#b6b6b6', '#434343' ],
+	miranda: [ '#c6c6ca', '#595a5c' ],
+	moon: [ '#b8b8b8', '#414141' ],
+	neptune: [ '#47a4f9', '#295789' ],
+	nereid: [ '#a6a6a6', '#313131' ],
+	oberon: [ '#c6c2bc', '#4f4c48' ],
+	phobos: [ '#b3a69d', '#5d514a' ],
+	pluto: [ '#e9decd', '#483c2f' ],
+	proteus: [ '#8f93a0', '#313338' ],
+	rhea: [ '#d1d1d1', '#5b5b5b' ],
+	roguePlanet: [ '#b1d1ee', '#51595f' ],
+	saturn: [ '#f2d392', '#7d4e2c' ],
+	sun: [ '#f78f2c', '#dc4407' ],
+	tethys: [ '#b2b2b2', '#464646' ],
+	titan: [ '#efd983', '#6c6347' ],
+	titania: [ '#bbbbbb', '#3a3a3a' ],
+	triton: [ '#b1bca6', '#414337' ],
+	umbriel: [ '#747474', '#383838' ],
+	uranus: [ '#c0c0ba', '#313236' ],
+	venus: [ '#b6b7b7', '#283242' ],
+} as const;
+
+/**
+ * Returns an SVG data URI that draws a sphere in the colors of the space
+ * object, so the stories show thumbnails without requesting an image.
  *
  * @param name Name of the space object.
  */
-export function spaceImage( name: string ) {
-	let hash = 0;
-	for ( const character of name ) {
-		hash = ( hash * 31 + character.charCodeAt( 0 ) ) % 2147483647;
-	}
-	// Multiplying by the golden angle spreads similar names around the wheel.
-	const hue = Math.round( ( hash * 137.508 ) % 360 );
-	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320"><defs><radialGradient id="sphere" cx="35%" cy="35%"><stop offset="0" stop-color="hsl(${ hue } 80% 75%)"/><stop offset="1" stop-color="hsl(${ hue } 60% 25%)"/></radialGradient></defs><rect width="320" height="320" fill="hsl(${ hue } 30% 10%)"/><circle cx="160" cy="160" r="110" fill="url(#sphere)"/></svg>`;
+export function spaceImage( name: keyof typeof SPACE_COLORS ) {
+	const [ lit, shaded ] = SPACE_COLORS[ name ];
+	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320"><defs><radialGradient id="sphere" cx="35%" cy="35%"><stop offset="0" stop-color="${ lit }"/><stop offset="1" stop-color="${ shaded }"/></radialGradient></defs><rect width="320" height="320" fill="#050505"/><circle cx="160" cy="160" r="110" fill="url(#sphere)"/></svg>`;
 	return `data:image/svg+xml,${ encodeURIComponent( svg ) }`;
 }
 
