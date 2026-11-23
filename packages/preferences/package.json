@@ -46,7 +46,9 @@
 	"wpScriptExtraDependencies": [
 		"wp-preferences-persistence"
 	],
-	"sideEffects": false,
+	"sideEffects": [
+		"build-style/**"
+	],
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/base-styles": "file:../base-styles",
