@@ -3,6 +3,14 @@
 	box-sizing: border-box;
 }
 
+// Opt-in, so nested blocks follow the border radius.
+.wp-block-group.has-clipped-content {
+	// `overflow: hidden` is the fallback for browsers without `overflow: clip`.
+	overflow: hidden;
+	// `clip` keeps sticky position working on child elements.
+	overflow: clip;
+}
+
 // We need this so groups with negative margins overlap as expected.
 :where(.wp-block-group.wp-block-group-is-layout-constrained) {
 	position: relative;

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Group: Add an opt-in "Clip content to rounded corners" setting, so nested blocks follow the border radius ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ### Bug Fixes
 
 -   Avatar: Show the selected user in the User field even when they aren't among the loaded authors ([#87137](https://github.com/WordPress/gutenberg/pull/87137)).
