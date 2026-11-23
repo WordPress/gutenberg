@@ -58,6 +58,7 @@
  */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -1113,22 +1114,13 @@ export default function SuggestionStoreInterceptor() {
 		[]
 	);
 
-	// Mutable references read from inside the subscribe callback. Using refs
-	// avoids resubscribing when the session value changes.
-	const recordStructuralCaptureRef = useRef( recordStructuralCapture );
-	recordStructuralCaptureRef.current = recordStructuralCapture;
-
-	const getStructuralCapturesRef = useRef( getStructuralCaptures );
-	getStructuralCapturesRef.current = getStructuralCaptures;
-
-	const clearStructuralCaptureRef = useRef( clearStructuralCapture );
-	clearStructuralCaptureRef.current = clearStructuralCapture;
-
-	const consumeInterceptorBypassRef = useRef( consumeInterceptorBypass );
-	consumeInterceptorBypassRef.current = consumeInterceptorBypass;
-
-	const consumeUndoRedoAdoptionRef = useRef( consumeUndoRedoAdoption );
-	consumeUndoRedoAdoptionRef.current = consumeUndoRedoAdoption;
+	// Read from inside the subscribe callback, which must always call the
+	// latest session value without resubscribing when it changes.
+	const onRecordStructuralCapture = useEvent( recordStructuralCapture );
+	const onGetStructuralCaptures = useEvent( getStructuralCaptures );
+	const onClearStructuralCapture = useEvent( clearStructuralCapture );
+	const onConsumeInterceptorBypass = useEvent( consumeInterceptorBypass );
+	const onConsumeUndoRedoAdoption = useEvent( consumeUndoRedoAdoption );
 
 	// The deferred-insertion callbacks are identity-stable (`useCallback`
 	// with no dependencies in the overlay provider), so unlike the values
@@ -1250,7 +1242,7 @@ export default function SuggestionStoreInterceptor() {
 			for ( const clientId of [ ...snapshot.keys() ] ) {
 				if ( ! live.has( clientId ) ) {
 					snapshot.delete( clientId );
-					clearStructuralCaptureRef.current( clientId );
+					onClearStructuralCapture( clientId );
 				}
 			}
 			for ( const clientId of liveClientIds ) {
@@ -1397,7 +1389,7 @@ export default function SuggestionStoreInterceptor() {
 				 * not an undo have no token armed, so this is a no-op for
 				 * them.
 				 */
-				consumeUndoRedoAdoptionRef.current?.();
+				onConsumeUndoRedoAdoption();
 				adoptLiveTreeAsBaseline();
 				return;
 			}
@@ -1419,10 +1411,7 @@ export default function SuggestionStoreInterceptor() {
 			 * checked first so unrelated fires (selection changes) don't
 			 * consume the token before the entity → block sync arrives.
 			 */
-			if (
-				hasBaselineDrift() &&
-				consumeUndoRedoAdoptionRef.current?.()
-			) {
+			if ( hasBaselineDrift() && onConsumeUndoRedoAdoption() ) {
 				adoptLiveTreeAsBaseline();
 				return;
 			}
@@ -1528,7 +1517,7 @@ export default function SuggestionStoreInterceptor() {
 				// out of interception so the applied attributes land on the
 				// live block. Adopt `current` as the new baseline so the
 				// next user edit diffs against the post-apply state.
-				if ( consumeInterceptorBypassRef.current?.( clientId ) ) {
+				if ( onConsumeInterceptorBypass( clientId ) ) {
 					snapshot.set( clientId, current );
 					continue;
 				}
@@ -1707,11 +1696,7 @@ export default function SuggestionStoreInterceptor() {
 							: null,
 						block: insertedBlock,
 					};
-					recordStructuralCaptureRef.current(
-						clientId,
-						block.name,
-						insertOp
-					);
+					onRecordStructuralCapture( clientId, block.name, insertOp );
 					insertionsThisFire.push( {
 						clientId,
 						blockName: block.name,
@@ -1928,7 +1913,7 @@ export default function SuggestionStoreInterceptor() {
 				) {
 					// The capture is resolved with the marker; a stale one
 					// must not be replayed by auto-save.
-					clearStructuralCaptureRef.current( move.clientId );
+					onClearStructuralCapture( move.clientId );
 					continue;
 				}
 				const block = blockEditor.getBlock?.( move.clientId );
@@ -2076,19 +2061,15 @@ export default function SuggestionStoreInterceptor() {
 						ownMarker === 'pending-insert'
 							? currentAttrs.metadata?.suggestion?.groupId
 							: undefined;
-					recordStructuralCaptureRef.current(
-						move.clientId,
-						block.name,
-						{
-							type: 'block-insert-after',
-							clientId: move.clientId,
-							blockName: block.name,
-							anchorClientId: move.toAnchorClientId,
-							parentClientId: move.toParentClientId,
-							block,
-							...( groupId ? { groupId } : {} ),
-						}
-					);
+					onRecordStructuralCapture( move.clientId, block.name, {
+						type: 'block-insert-after',
+						clientId: move.clientId,
+						blockName: block.name,
+						anchorClientId: move.toAnchorClientId,
+						parentClientId: move.toParentClientId,
+						block,
+						...( groupId ? { groupId } : {} ),
+					} );
 					continue;
 				}
 				/*
@@ -2102,9 +2083,8 @@ export default function SuggestionStoreInterceptor() {
 				const existingMarker = currentAttrs.metadata?.suggestion;
 				const fromParentBlock =
 					existingMarker?.type === 'pending-move'
-						? getStructuralCapturesRef
-								.current()
-								.get( move.clientId )?.op?.fromParentBlock
+						? onGetStructuralCaptures().get( move.clientId )?.op
+								?.fromParentBlock
 						: dissolvedParentRecord( move.fromParentClientId );
 				const from =
 					existingMarker?.type === 'pending-move'
@@ -2150,7 +2130,7 @@ export default function SuggestionStoreInterceptor() {
 				} finally {
 					isDispatchingOwnWrite = false;
 				}
-				recordStructuralCaptureRef.current( move.clientId, block.name, {
+				onRecordStructuralCapture( move.clientId, block.name, {
 					type: 'block-move',
 					clientId: move.clientId,
 					blockName: block.name,
@@ -2239,7 +2219,7 @@ export default function SuggestionStoreInterceptor() {
 						isAppliedRemoval( coreSelect, trackedAttributes )
 					) {
 						snapshot.delete( clientId );
-						clearStructuralCaptureRef.current( clientId );
+						onClearStructuralCapture( clientId );
 						continue;
 					}
 					removedIds.push( clientId );
@@ -2402,22 +2382,18 @@ export default function SuggestionStoreInterceptor() {
 					// so "Remove block: paragraph" says which paragraph.
 					const removedParentClientId =
 						tree.parentByClientId.get( clientId ) ?? null;
-					recordStructuralCaptureRef.current(
+					onRecordStructuralCapture( clientId, block?.name ?? '', {
+						type: 'block-remove',
 						clientId,
-						block?.name ?? '',
-						{
-							type: 'block-remove',
-							clientId,
-							blockName: block?.name ?? '',
-							parentBlockName: removedParentClientId
-								? ( tree.blocksByClientId.get(
-										removedParentClientId
-									)?.name ?? null )
-								: null,
-							...( groupId ? { groupId } : {} ),
-							block,
-						}
-					);
+						blockName: block?.name ?? '',
+						parentBlockName: removedParentClientId
+							? ( tree.blocksByClientId.get(
+									removedParentClientId
+								)?.name ?? null )
+							: null,
+						...( groupId ? { groupId } : {} ),
+						block,
+					} );
 				}
 
 				/*
@@ -2459,7 +2435,7 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
-					recordStructuralCaptureRef.current(
+					onRecordStructuralCapture(
 						insertion.clientId,
 						insertion.blockName,
 						{ ...insertion.op, groupId }
@@ -2512,6 +2488,11 @@ export default function SuggestionStoreInterceptor() {
 		clearDeferredInsertions,
 		hasInterceptorBypass,
 		noteHistoryCapture,
+		onRecordStructuralCapture,
+		onGetStructuralCaptures,
+		onClearStructuralCapture,
+		onConsumeInterceptorBypass,
+		onConsumeUndoRedoAdoption,
 	] );
 
 	return null;

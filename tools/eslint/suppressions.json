@@ -10819,16 +10819,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/suggestion-mode/store-interceptor.ts": {
-		"react-hooks/refs": {
-			"count": 5
-		}
-	},
-	"packages/editor/src/components/suggestion-mode/suggestion-undo-guard.ts": {
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
 	"packages/editor/src/components/sync-connection-error-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
