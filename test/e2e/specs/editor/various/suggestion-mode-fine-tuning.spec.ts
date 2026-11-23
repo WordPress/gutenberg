@@ -348,12 +348,12 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		// Requests, not responses: a request is on record as soon as it is
 		// sent, so nothing has to wait for the refusal.
 		const noteRequests: string[] = [];
-		const { id } = await requestUtils.createBlock( {
+		const { id } = ( await requestUtils.createBlock( {
 			title: 'Synced pattern',
 			status: 'publish',
 			content:
 				'<!-- wp:paragraph --><p>In the pattern</p><!-- /wp:paragraph -->',
-		} );
+		} ) ) as { id: number };
 		await editor.insertBlock( {
 			name: 'core/block',
 			attributes: { ref: id },
