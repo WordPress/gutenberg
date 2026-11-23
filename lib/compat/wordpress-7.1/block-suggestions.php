@@ -1542,6 +1542,17 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
 	return null;
 }
 
+if ( ! defined( 'GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT' ) ) {
+	/**
+	 * Most inline suggestion markers a fragment may hold to be rendered.
+	 *
+	 * Each marker costs memory on every view of the block, so a fragment
+	 * holding more is not rendered at all. The save pass pairs a whole post
+	 * at once and is not limited.
+	 */
+	define( 'GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT', 5000 );
+}
+
 /**
  * Pairs the inline suggestion markers of an HTML fragment with their ends.
  *
@@ -1583,12 +1594,19 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * - `balanced`: whether both readings agree, see above.
  * - `inner_markers`: how many other markers open inside its run.
  *
- * @param string $html HTML fragment.
+ * The walk takes time and memory in proportion to the fragment: a closer finds
+ * its match without scanning the open elements. `$limit` bounds the memory the
+ * result takes for a caller that renders untrusted content on every view.
+ *
+ * @param string $html  HTML fragment.
+ * @param int    $limit Optional. Most markers the fragment may hold. Default
+ *                      no limit.
  * @return list<array{kind: string, legacy: bool, id: int, run: string|null, start: int, length: int, end: int|null, closer: array{int, int}|null, lexical_end: int|null, lexical_closer: array{int, int}|null, balanced: bool, inner_markers: int}>|null
  *         Markers in document order, or null when the walk could not tell
- *         where a token is (callers fail closed).
+ *         where a token is or the fragment holds more than `$limit` markers
+ *         (callers fail closed).
  */
-function gutenberg_pair_inline_suggestion_markers( $html ) {
+function gutenberg_pair_inline_suggestion_markers( $html, $limit = PHP_INT_MAX ) {
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
 	$markers   = array();
 
@@ -1614,10 +1632,20 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 	 * cut at, so it cannot be the only source of truth for a strip that must
 	 * not leak.
 	 */
-	$special        = array( 'ADDRESS', 'APPLET', 'AREA', 'ARTICLE', 'ASIDE', 'BASE', 'BASEFONT', 'BGSOUND', 'BLOCKQUOTE', 'BODY', 'BR', 'BUTTON', 'CAPTION', 'CENTER', 'COL', 'COLGROUP', 'DD', 'DETAILS', 'DIR', 'DIV', 'DL', 'DT', 'EMBED', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'FRAME', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEAD', 'HEADER', 'HGROUP', 'HR', 'HTML', 'IFRAME', 'IMG', 'INPUT', 'KEYGEN', 'LI', 'LINK', 'LISTING', 'MAIN', 'MARQUEE', 'MENU', 'META', 'NAV', 'NOEMBED', 'NOFRAMES', 'NOSCRIPT', 'OBJECT', 'OL', 'P', 'PARAM', 'PLAINTEXT', 'PRE', 'SCRIPT', 'SEARCH', 'SECTION', 'SELECT', 'SOURCE', 'STYLE', 'SUMMARY', 'TABLE', 'TBODY', 'TD', 'TEMPLATE', 'TEXTAREA', 'TFOOT', 'TH', 'THEAD', 'TITLE', 'TR', 'TRACK', 'UL', 'WBR', 'XMP' );
-	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
-	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
+	$special        = array_fill_keys( array( 'ADDRESS', 'APPLET', 'AREA', 'ARTICLE', 'ASIDE', 'BASE', 'BASEFONT', 'BGSOUND', 'BLOCKQUOTE', 'BODY', 'BR', 'BUTTON', 'CAPTION', 'CENTER', 'COL', 'COLGROUP', 'DD', 'DETAILS', 'DIR', 'DIV', 'DL', 'DT', 'EMBED', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'FRAME', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEAD', 'HEADER', 'HGROUP', 'HR', 'HTML', 'IFRAME', 'IMG', 'INPUT', 'KEYGEN', 'LI', 'LINK', 'LISTING', 'MAIN', 'MARQUEE', 'MENU', 'META', 'NAV', 'NOEMBED', 'NOFRAMES', 'NOSCRIPT', 'OBJECT', 'OL', 'P', 'PARAM', 'PLAINTEXT', 'PRE', 'SCRIPT', 'SEARCH', 'SECTION', 'SELECT', 'SOURCE', 'STYLE', 'SUMMARY', 'TABLE', 'TBODY', 'TD', 'TEMPLATE', 'TEXTAREA', 'TFOOT', 'TH', 'THEAD', 'TITLE', 'TR', 'TRACK', 'UL', 'WBR', 'XMP' ), true );
+	$scope_boundary = array_fill_keys( array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' ), true );
+	$void_elements  = array_fill_keys( array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' ), true );
 	$open_elements  = array();
+	/*
+	 * Where to find a closer's match without scanning the stack: the depths
+	 * each tag name is open at, and the depths of the open special elements
+	 * and scope boundaries, deepest last. A hostile fragment can hold
+	 * thousands of closers that match nothing, each of which would otherwise
+	 * walk the whole stack.
+	 */
+	$open_tags       = array();
+	$open_special    = array();
+	$open_boundaries = array();
 	// Where the tree walk ends each marker, and its own closer if that ends it.
 	$ends    = array();
 	$closers = array();
@@ -1643,33 +1671,36 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 				}
 			}
 
-			$stop_at = in_array( $tag, $special, true ) ? $scope_boundary : $special;
-			$match   = null;
-			for ( $i = count( $open_elements ) - 1; $i >= 0; $i-- ) {
-				if ( $tag === $open_elements[ $i ][0] ) {
-					$match = $i;
-					break;
-				}
-				if ( in_array( $open_elements[ $i ][0], $stop_at, true ) ) {
-					break;
-				}
-			}
-			if ( null === $match ) {
+			/*
+			 * The match is the deepest open element of this name, unless an
+			 * element the closer cannot reach past sits above it.
+			 */
+			$match   = empty( $open_tags[ $tag ] ) ? null : end( $open_tags[ $tag ] );
+			$blocked = isset( $special[ $tag ] ) ? end( $open_boundaries ) : end( $open_special );
+			if ( null === $match || ( false !== $blocked && $blocked > $match ) ) {
 				continue;
 			}
 			while ( count( $open_elements ) > $match ) {
 				$element = array_pop( $open_elements );
+				$depth   = count( $open_elements );
+				array_pop( $open_tags[ $element[0] ] );
+				if ( end( $open_special ) === $depth ) {
+					array_pop( $open_special );
+				}
+				if ( end( $open_boundaries ) === $depth ) {
+					array_pop( $open_boundaries );
+				}
 				if ( null === $element[1] ) {
 					continue;
 				}
-				$is_own                 = count( $open_elements ) === $match;
+				$is_own                 = $depth === $match;
 				$ends[ $element[1] ]    = $is_own ? $span[0] + $span[1] : $span[0];
 				$closers[ $element[1] ] = $is_own ? $span : null;
 			}
 			continue;
 		}
 
-		if ( in_array( $tag, $void_elements, true ) ) {
+		if ( isset( $void_elements[ $tag ] ) ) {
 			continue;
 		}
 		$kind   = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
@@ -1678,6 +1709,16 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			$legacy = true;
 			$kind   = 'add' === $processor->get_attribute( 'data-suggestion-type' ) ? 'add' : 'del';
 		}
+
+		$depth               = count( $open_elements );
+		$open_tags[ $tag ][] = $depth;
+		if ( isset( $special[ $tag ] ) ) {
+			$open_special[] = $depth;
+		}
+		if ( isset( $scope_boundary[ $tag ] ) ) {
+			$open_boundaries[] = $depth;
+		}
+
 		if ( null === $kind ) {
 			$open_elements[] = array( $tag, null );
 			if ( 'MARK' === $tag ) {
@@ -1686,6 +1727,9 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			continue;
 		}
 
+		if ( count( $markers ) >= $limit ) {
+			return null;
+		}
 		$run             = $processor->get_attribute( 'data-suggestion-run' );
 		$id              = $processor->get_attribute( 'data-suggestion-id' );
 		$markers[]       = array(
@@ -1701,6 +1745,7 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 	}
 
 	$count  = count( $markers );
+	$starts = array_column( $markers, 'start' );
 	$paired = array();
 	foreach ( $markers as $index => $marker ) {
 		$end            = $ends[ $index ] ?? null;
@@ -1708,10 +1753,18 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		$lexical_closer = $lexical_closers[ $index ] ?? null;
 		$lexical_end    = null === $lexical_closer ? null : $lexical_closer[0] + $lexical_closer[1];
 		$reach          = null === $end ? strlen( $html ) : max( $end, (int) $lexical_end );
-		$inner          = 0;
-		for ( $next = $index + 1; $next < $count && $markers[ $next ]['start'] < $reach; $next++ ) {
-			++$inner;
+		// Openers are in document order: search for the first one past the run.
+		$low  = $index + 1;
+		$high = $count;
+		while ( $low < $high ) {
+			$middle = ( $low + $high ) >> 1;
+			if ( $starts[ $middle ] < $reach ) {
+				$low = $middle + 1;
+			} else {
+				$high = $middle;
+			}
 		}
+		$inner    = $low - $index - 1;
 		$paired[] = $marker + array(
 			'end'            => $end,
 			'closer'         => $closer,
@@ -2072,7 +2125,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 
 	$post_id = $restoring ? 0 : gutenberg_get_suggestion_content_owner();
 
-	$markers = gutenberg_pair_inline_suggestion_markers( $block_content );
+	$markers = gutenberg_pair_inline_suggestion_markers( $block_content, GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT );
 	if ( null === $markers ) {
 		return '';
 	}
@@ -2224,12 +2277,19 @@ function gutenberg_get_inline_suggestion_view( string $html, array $accepted, ar
 	if ( false === strpos( $html, 'wp-suggestion' ) ) {
 		return $html;
 	}
-	if ( $originals ) {
-		$html = gutenberg_revert_inline_format_suggestions( $html, $originals, $accepted ) ?? $html;
-	}
-	$markers = gutenberg_pair_inline_suggestion_markers( $html );
+	$markers = gutenberg_pair_inline_suggestion_markers( $html, GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT );
 	if ( null === $markers ) {
 		return '';
+	}
+	if ( $originals ) {
+		$reverted = gutenberg_revert_inline_format_suggestions( $html, $originals, $accepted );
+		if ( null !== $reverted && $reverted !== $html ) {
+			$html    = $reverted;
+			$markers = gutenberg_pair_inline_suggestion_markers( $html );
+			if ( null === $markers ) {
+				return '';
+			}
+		}
 	}
 
 	$accepted = array_fill_keys( array_map( 'intval', $accepted ), true );
