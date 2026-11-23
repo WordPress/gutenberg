@@ -11,7 +11,7 @@
  * The existing auto-register payload contains only block names, while
  * pattern-backed blocks also need their markup.
  */
-function gutenberg_enqueue_auto_register_pattern_blocks() {
+function gutenberg_enqueue_auto_register_pattern_blocks(): void {
 	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-pattern-blocks' ) ) {
 		return;
 	}
@@ -42,13 +42,15 @@ add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_auto_register_patt
 /**
  * Sets up server rendering for blocks that register a pattern.
  *
- * @param array  $args       Arguments passed to `register_block_type()`.
- * @param string $block_name Block type name.
- * @return array Filtered arguments.
+ * @param array<string, mixed> $args       Arguments passed to `register_block_type()`.
+ * @param string               $block_name Block type name.
+ * @return array<string, mixed> Filtered arguments.
  */
-function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
+function gutenberg_apply_pattern_block_rendering( array $args, string $block_name ): array {
+	$supports = $args['supports'] ?? array();
 	if (
-		empty( $args['supports']['autoRegister'] ) ||
+		! is_array( $supports ) ||
+		empty( $supports['autoRegister'] ) ||
 		empty( $args['pattern'] ) ||
 		! is_string( $args['pattern'] )
 	) {
@@ -75,34 +77,50 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 
 	// Overrides live in `content` and reach bound blocks through context. Force the
 	// schema so PHP and JS validate them consistently.
-	$args['attributes']['content'] = array( 'type' => 'object' );
-	if ( ! isset( $args['provides_context'] ) ) {
-		$args['provides_context'] = array();
-	}
-	$args['provides_context']['pattern/overrides'] = 'content';
+	$block_attributes            = isset( $args['attributes'] ) && is_array( $args['attributes'] ) ? $args['attributes'] : array();
+	$block_attributes['content'] = array( 'type' => 'object' );
+	$args['attributes']          = $block_attributes;
+
+	$provides_context                      = isset( $args['provides_context'] ) && is_array( $args['provides_context'] ) ? $args['provides_context'] : array();
+	$provides_context['pattern/overrides'] = 'content';
+	$args['provides_context']              = $provides_context;
 
 	// The pattern is not saved in the block content, so HTML editing is disabled
 	// unless the block explicitly opts in.
-	if ( ! isset( $args['supports']['html'] ) ) {
-		$args['supports']['html'] = false;
+	if ( ! isset( $supports['html'] ) ) {
+		$supports['html'] = false;
+		$args['supports'] = $supports;
 	}
 
 	$args['skip_inner_blocks'] = true;
 
-	$args['render_callback'] = static function ( $attributes, $content, $block ) {
+	/**
+	 * Renders the registered pattern with this instance's overrides.
+	 *
+	 * @param array<string, mixed> $attributes Block attributes.
+	 * @param string               $content    Block content.
+	 * @param WP_Block             $block      Block instance.
+	 * @return string Rendered block.
+	 */
+	$args['render_callback'] = static function ( array $attributes, string $content, WP_Block $block ): string {
 		// A pattern can contain another instance of the same block. Render that nested
-		// instance as empty, matching `core/block`, to avoid infinite recursion.
-		static $rendering = array();
-		if ( isset( $rendering[ $block->name ] ) ) {
-			return '';
-		}
-		$rendering[ $block->name ] = true;
+		// instance as empty, matching `core/block`, to avoid infinite recursion. Each
+		// block type gets its own callback, so one flag covers it.
+		static $is_rendering = false;
 
 		// A later registration filter may replace the pattern, so read the current
-		// value here. The pattern enters the content after the embed filters have run,
-		// so handle embeds before parsing it.
+		// value here.
+		$pattern = $block->block_type->pattern ?? null;
+		if ( true === $is_rendering || ! is_string( $pattern ) ) {
+			return '';
+		}
+		$is_rendering = true;
+
+		// The pattern enters the content after the embed filters have run, so handle
+		// embeds before parsing it.
+		/** @var WP_Embed $wp_embed */
 		global $wp_embed;
-		$pattern = $wp_embed->run_shortcode( $block->block_type->pattern );
+		$pattern = $wp_embed->run_shortcode( $pattern );
 		$pattern = $wp_embed->autoembed( $pattern );
 
 		// Rebuilding the children also passes this block's override context to them.
@@ -114,7 +132,13 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 		// would run the host and its `render_block` filters twice.
 		$output = '';
 		foreach ( $block->inner_blocks as $inner_block ) {
-			/** This filter is documented in wp-includes/blocks.php */
+			/**
+			 * Filters the content of a block before it renders. Documented in wp-includes/blocks.php.
+			 *
+			 * @param string|null   $pre_render   The pre-rendered content. Default null.
+			 * @param array         $parsed_block The block being rendered.
+			 * @param WP_Block|null $parent_block The parent block, if any.
+			 */
 			$pre_render = apply_filters( 'pre_render_block', null, $inner_block->parsed_block, $block );
 			if ( null !== $pre_render ) {
 				$output .= $pre_render;
@@ -124,10 +148,22 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 			$source_block        = $inner_block->parsed_block;
 			$inner_block_context = $inner_block->context;
 
-			/** This filter is documented in wp-includes/blocks.php */
+			/**
+			 * Filters the block being rendered. Documented in wp-includes/blocks.php.
+			 *
+			 * @param array         $parsed_block The block being rendered.
+			 * @param array         $source_block The block before any filter changed it.
+			 * @param WP_Block|null $parent_block The parent block, if any.
+			 */
 			$inner_block->parsed_block = apply_filters( 'render_block_data', $inner_block->parsed_block, $source_block, $block );
 
-			/** This filter is documented in wp-includes/blocks.php */
+			/**
+			 * Filters the context provided to the block. Documented in wp-includes/blocks.php.
+			 *
+			 * @param array         $context      Default context.
+			 * @param array         $parsed_block The block being rendered.
+			 * @param WP_Block|null $parent_block The parent block, if any.
+			 */
 			$inner_block->context = apply_filters( 'render_block_context', $inner_block->context, $inner_block->parsed_block, $block );
 
 			if ( $inner_block->context !== $inner_block_context ) {
@@ -139,7 +175,7 @@ function gutenberg_apply_pattern_block_rendering( $args, $block_name ) {
 			$output .= $inner_block->render();
 		}
 
-		unset( $rendering[ $block->name ] );
+		$is_rendering = false;
 
 		// Use the same wrapper as the editor so block classes and support attributes
 		// are available on both sides.
