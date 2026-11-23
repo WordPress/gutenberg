@@ -2654,6 +2654,354 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
+	'--wpds-elevation-xs': {
+		$description:
+			'Elevation for small controls raised slightly above their surface, such as a switch thumb.',
+		$type: 'shadow',
+		group: 'elevation',
+		fallback:
+			'0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 1,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 3,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 1, 1, 1 ],
+							alpha: 0,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 0,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: true,
+					},
+				],
+				css: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+			},
+		},
+	},
+	'--wpds-elevation-sm': {
+		$description:
+			'Elevation for small transient surfaces close to their trigger, such as tooltips.',
+		$type: 'shadow',
+		group: 'elevation',
+		fallback:
+			'0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 2,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 3,
+							unit: 'px',
+						},
+						blur: {
+							value: 8,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 1, 1, 1 ],
+							alpha: 0,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 0,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: true,
+					},
+				],
+				css: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+			},
+		},
+	},
+	'--wpds-elevation-md': {
+		$description:
+			'Elevation for floating surfaces anchored to a trigger, such as popovers and menus.',
+		$type: 'shadow',
+		group: 'elevation',
+		fallback:
+			'0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 2,
+							unit: 'px',
+						},
+						blur: {
+							value: 4,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 8,
+							unit: 'px',
+						},
+						blur: {
+							value: 20,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 1, 1, 1 ],
+							alpha: 0,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 0,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: true,
+					},
+				],
+				css: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+			},
+		},
+	},
+	'--wpds-elevation-lg': {
+		$description:
+			'Elevation for surfaces that sit above the whole page, such as dialogs and drawers.',
+		$type: 'shadow',
+		group: 'elevation',
+		fallback:
+			'0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+		modes: {
+			default: {
+				$value: [
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 4,
+							unit: 'px',
+						},
+						blur: {
+							value: 10,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 0, 0, 0 ],
+							alpha: 0.053,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 20,
+							unit: 'px',
+						},
+						blur: {
+							value: 48,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: false,
+					},
+					{
+						color: {
+							colorSpace: 'srgb',
+							components: [ 1, 1, 1 ],
+							alpha: 0,
+						},
+						offsetX: {
+							value: 0,
+							unit: 'px',
+						},
+						offsetY: {
+							value: 1,
+							unit: 'px',
+						},
+						blur: {
+							value: 0,
+							unit: 'px',
+						},
+						spread: {
+							value: 0,
+							unit: 'px',
+						},
+						inset: true,
+					},
+				],
+				css: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+			},
+		},
+	},
 	'--wpds-motion-duration-xs': {
 		$description: 'Micro-delays and transition offsets',
 		$type: 'duration',
@@ -3306,6 +3654,15 @@ export const groups = /** @type {const} */ ( {
 					'Widths for surfaces such as popovers, dialogs, and panels.',
 			},
 		},
+	},
+	elevation: {
+		tokens: [
+			'--wpds-elevation-xs',
+			'--wpds-elevation-sm',
+			'--wpds-elevation-md',
+			'--wpds-elevation-lg',
+		],
+		groups: {},
 	},
 	motion: {
 		tokens: [],

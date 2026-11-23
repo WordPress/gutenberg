@@ -229,6 +229,8 @@ The `cornerRadius` prop sets the overall roundness preset for the theme subtree.
 
 `ThemeProvider` has no light or dark mode. It accepts color seeds and turns them into semantic design tokens. Consumers define light and dark themes by choosing those seeds: a light background seed makes the generated color ramp favor darker contrasting colors, while a dark background seed makes it favor lighter contrasting colors. The primary seed controls the accent color rather than the overall light or dark appearance.
 
+The background seed also sets the strength of the `--wpds-elevation-*` shadows. Black shadows show less against a dark background, so their opacity increases as the background gets darker, from 5% on white to 30% on black. Each level also has a 1px white highlight inset along its top edge, which follows the same curve: invisible on white, up to 10% on black.
+
 ### Nesting Providers
 
 The provider can be used recursively to override or modify the theme for a specific subtree.
