@@ -84,6 +84,96 @@ describe( 'withProposedAttributes', () => {
 			},
 		} );
 	} );
+	it( 'keeps what is proposed when an edit echoes stored values', () => {
+		// A block support panel reads the stored attributes and writes
+		// every attribute it manages.
+		const link = { color: { text: 'var:preset|color|accent' } };
+		const metadata = {
+			suggestion: {
+				type: PENDING_ATTRIBUTES,
+				authorId: 5,
+				after: { textColor: 'accent', style: { elements: { link } } },
+			},
+		};
+		const sized = withProposedAttributes( {
+			metadata,
+			liveAttributes: { content: 'x', metadata },
+			changes: {
+				style: undefined,
+				textColor: undefined,
+				fontFamily: undefined,
+				fontSize: 'large',
+			},
+			authorId: 5,
+		} );
+		expect( sized.metadata.suggestion.after ).toEqual( {
+			textColor: 'accent',
+			style: { elements: { link } },
+			fontSize: 'large',
+		} );
+		// Its change to `style` lands on the proposed value.
+		const custom = withProposedAttributes( {
+			metadata,
+			liveAttributes: { content: 'x', metadata },
+			changes: {
+				style: { typography: { fontSize: '20px' } },
+				textColor: undefined,
+				fontSize: undefined,
+			},
+			authorId: 5,
+		} );
+		expect( custom.metadata.suggestion.after ).toEqual( {
+			textColor: 'accent',
+			style: {
+				elements: { link },
+				typography: { fontSize: '20px' },
+			},
+		} );
+	} );
+	it( 'withdraws a proposal an edit sets back to the stored value', () => {
+		const metadata = {
+			suggestion: {
+				type: PENDING_ATTRIBUTES,
+				authorId: 5,
+				after: {
+					fontSize: 'large',
+					style: { typography: { textAlign: 'center' } },
+				},
+			},
+		};
+		// The block's own control, built from what the block is shown.
+		const next = withProposedAttributes( {
+			metadata,
+			liveAttributes: { content: 'x', metadata },
+			changes: { style: undefined },
+			authorId: 5,
+		} );
+		expect( next.metadata.suggestion.after ).toEqual( {
+			fontSize: 'large',
+		} );
+		// One setting of several inside `style`.
+		const both = {
+			suggestion: {
+				type: PENDING_ATTRIBUTES,
+				authorId: 5,
+				after: {
+					style: {
+						typography: { textAlign: 'center' },
+						color: { text: '#f00' },
+					},
+				},
+			},
+		};
+		const uncentered = withProposedAttributes( {
+			metadata: both,
+			liveAttributes: { content: 'x', metadata: both },
+			changes: { style: { color: { text: '#f00' } } },
+			authorId: 5,
+		} );
+		expect( uncentered.metadata.suggestion.after ).toEqual( {
+			style: { color: { text: '#f00' } },
+		} );
+	} );
 	it( 'accumulates onto an existing after and keeps the marker type', () => {
 		const metadata = {
 			suggestion: {

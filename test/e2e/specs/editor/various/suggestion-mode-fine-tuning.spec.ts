@@ -86,6 +86,70 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
+	test( 'a color and a font size suggestion on one block are both kept (F-41)', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Style me' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await editor.selectBlocks( paragraph );
+		await editor.openDocumentSettingsSidebar();
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		let saved = suggestionSavedPromise( page );
+		await settings
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.first()
+			.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid orange' } )
+			.click();
+		await saved;
+		await page.keyboard.press( 'Escape' );
+
+		saved = suggestionSavedPromise( page );
+		await settings
+			.getByRole( 'radio', { name: 'Large', exact: true } )
+			.click();
+		await saved;
+
+		// Both proposals preview on the block, and neither is committed.
+		await expect( paragraph ).toHaveClass( /has-large-font-size/ );
+		await expect( paragraph ).toHaveClass(
+			/has-luminous-vivid-orange-color/
+		);
+		const serialized = await editor.getEditedPostContent();
+		expect( serialized ).not.toContain( 'has-large-font-size"' );
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator( SUMMARY );
+		await expect( summary ).toHaveCount( 1 );
+		await expect( summary ).toContainText(
+			'text color default → luminous-vivid-orange'
+		);
+		await expect( summary ).toContainText( 'font size default → large' );
+
+		// The reverse order, on top: a second color keeps the font size.
+		await editor.openDocumentSettingsSidebar();
+		await editor.selectBlocks( paragraph );
+		saved = suggestionSavedPromise( page );
+		await settings
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.first()
+			.click();
+		await page.getByRole( 'option', { name: 'Vivid purple' } ).click();
+		await saved;
+		await expect( paragraph ).toHaveClass( /has-large-font-size/ );
+		await expect( paragraph ).toHaveClass( /has-vivid-purple-color/ );
+	} );
+
 	test( 'a text alignment suggestion is named in its summary (F-53)', async ( {
 		editor,
 		page,

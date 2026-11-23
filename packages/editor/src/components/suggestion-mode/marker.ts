@@ -205,6 +205,159 @@ function sanitizeProposedMetadata( value: unknown ) {
 }
 
 /**
+ * How many values differ between two attribute values, counting inside
+ * plain objects (`style` holds one value per setting).
+ *
+ * @param a First value.
+ * @param b Second value.
+ * @return The number of differing values.
+ */
+function countDifferences( a: unknown, b: unknown ): number {
+	if ( isPlainObject( a ) || isPlainObject( b ) ) {
+		const left = isPlainObject( a ) ? a : {};
+		const right = isPlainObject( b ) ? b : {};
+		if ( ( a ?? null ) !== null && ! isPlainObject( a ) ) {
+			return 1;
+		}
+		if ( ( b ?? null ) !== null && ! isPlainObject( b ) ) {
+			return 1;
+		}
+		let count = 0;
+		for ( const key of new Set( [
+			...Object.keys( left ),
+			...Object.keys( right ),
+		] ) ) {
+			count += countDifferences( left[ key ], right[ key ] );
+		}
+		return count;
+	}
+	return isAttributeEqual( a ?? null, b ?? null ) ? 0 : 1;
+}
+
+/**
+ * Make the changes that turn one value into another on a third.
+ *
+ * @param base Value to change.
+ * @param from Value the changes start from.
+ * @param to   Value the changes arrive at.
+ * @return `base` with the changes made.
+ */
+function withChangesApplied(
+	base: unknown,
+	from: unknown,
+	to: unknown
+): unknown {
+	if ( ! isPlainObject( to ) && ! isPlainObject( from ) ) {
+		return isAttributeEqual( from ?? null, to ?? null ) ? base : to;
+	}
+	if (
+		( ( to ?? null ) !== null && ! isPlainObject( to ) ) ||
+		( ( from ?? null ) !== null && ! isPlainObject( from ) ) ||
+		( ( base ?? null ) !== null && ! isPlainObject( base ) )
+	) {
+		return to;
+	}
+	const start: Record< string, any > = isPlainObject( from ) ? from : {};
+	const end: Record< string, any > = isPlainObject( to ) ? to : {};
+	const result: Record< string, any > = {
+		...( isPlainObject( base ) ? base : {} ),
+	};
+	for ( const key of new Set( [
+		...Object.keys( start ),
+		...Object.keys( end ),
+	] ) ) {
+		const value = withChangesApplied(
+			result[ key ],
+			start[ key ],
+			end[ key ]
+		);
+		if ( value === undefined ) {
+			delete result[ key ];
+		} else {
+			result[ key ] = value;
+		}
+	}
+	return Object.keys( result ).length > 0 ? result : undefined;
+}
+
+/**
+ * An edit as its author meant it, on a block that already carries their
+ * proposal.
+ *
+ * A block's own controls build an edit from the attributes the block is
+ * shown, the proposal included. The block support panels build theirs from
+ * the stored attributes and write every attribute they manage, so the ones
+ * the author left alone arrive at their stored value, which reads as
+ * withdrawing what is proposed for them. An edit closer to the stored
+ * attributes than to the shown ones was built from the stored: the values
+ * it leaves as stored are dropped, and its change to an object value
+ * (`style`) is made to the proposed value.
+ *
+ * An edit that sets nothing but stored values is a withdrawal and is kept.
+ *
+ * @param args                 Arguments.
+ * @param args.changes         The edit.
+ * @param args.liveAttributes  The block's stored attributes.
+ * @param args.shownAttributes The attributes with every proposal merged in.
+ * @param args.proposed        The author's proposal.
+ * @return The edit to fold into the proposal.
+ */
+export function rebaseEditOntoProposal( {
+	changes,
+	liveAttributes,
+	shownAttributes,
+	proposed,
+}: {
+	changes: Record< string, unknown >;
+	liveAttributes: Record< string, any >;
+	shownAttributes: Record< string, any >;
+	proposed: Record< string, unknown > | null | undefined;
+} ): Record< string, unknown > {
+	if ( ! proposed || Object.keys( proposed ).length === 0 ) {
+		return changes;
+	}
+	const keys = Object.keys( changes ).filter(
+		( key ) => ! DEEP_MERGE_KEYS.has( key )
+	);
+	let fromLive = 0;
+	let fromShown = 0;
+	for ( const key of keys ) {
+		const value = toJsonSafeAttributeValue( changes[ key ] );
+		fromLive += countDifferences(
+			toJsonSafeAttributeValue( liveAttributes[ key ] ),
+			value
+		);
+		fromShown += countDifferences(
+			toJsonSafeAttributeValue( shownAttributes[ key ] ),
+			value
+		);
+	}
+	if ( fromLive === 0 || fromLive >= fromShown ) {
+		return changes;
+	}
+	const rebased: Record< string, unknown > = {};
+	for ( const [ key, value ] of Object.entries( changes ) ) {
+		if ( DEEP_MERGE_KEYS.has( key ) ) {
+			rebased[ key ] = value;
+		} else if (
+			countDifferences(
+				toJsonSafeAttributeValue( liveAttributes[ key ] ),
+				toJsonSafeAttributeValue( value )
+			) > 0
+		) {
+			rebased[ key ] = isPlainObject( proposed[ key ] )
+				? withChangesApplied(
+						proposed[ key ],
+						liveAttributes[ key ],
+						value
+					)
+				: value;
+		}
+	}
+	return rebased;
+}
+
+/**
  * Fold a user edit into the author's proposal on the block. Keys whose
  * proposed value equals what the author saw (the live value with every
  * other suggestion's proposal merged in) are not a suggestion and are
@@ -247,7 +400,13 @@ export function withProposedAttributes( {
 		}
 	}
 	const after: Record< string, unknown > = { ...( existing?.after ?? {} ) };
-	for ( const [ key, raw ] of Object.entries( changes ) ) {
+	const intended = rebaseEditOntoProposal( {
+		changes,
+		liveAttributes,
+		shownAttributes: mergeProposedAttributes( seen, existing?.after ),
+		proposed: existing?.after,
+	} );
+	for ( const [ key, raw ] of Object.entries( intended ) ) {
 		let value = key === 'metadata' ? sanitizeProposedMetadata( raw ) : raw;
 		if ( DEEP_MERGE_KEYS.has( key ) && isPlainObject( value ) ) {
 			value = {
