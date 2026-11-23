@@ -202,6 +202,12 @@ A session-scoped `editorIntent` state (orthogonal to the visual/code `editorMode
 
 The intent lives in the `core/editor` store's reducer (not the preferences store), so reloading the editor always returns to `edit`. It is surfaced as an **Editing / Suggesting** menu (the Google Docs names) in the editor's "Options" kebab, gated behind the `editor.notes` post-type support flag; the `setEditorIntent` / `getEditorIntent` store APIs are private while Suggestion mode is experimental.
 
+### Out of scope: Viewing
+
+Google Docs has a third mode, **Viewing**: a read-only editor in which the content cannot be changed. It is deliberately left out of the first iteration so the work can focus on Suggestion mode, and is tracked as a follow-up. There is no `view` intent, no third menu item and no shortcut for it.
+
+Viewing is a separate feature and not a variant of suggesting. It needs its own read-only guards (on the canvas, `editPost`, undo and redo, and the code editor), and it has an open design question of its own: whether a viewer can still leave notes, which would make it a comment-only mode and not a strictly read-only one. Nothing in the suggestion storage or capture design depends on the answer. The intent is a plain string in the `core/editor` store, so a third value can be added later without changing the two that exist.
+
 ## Pending attribute markers
 
 When the intent is `suggest`, an `editor.BlockEdit` filter (`withSuggestionOverlay`) wraps every block's `Edit` component:
