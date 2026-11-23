@@ -195,6 +195,19 @@ describe( 'accepting an attribute suggestion', () => {
 		expect( successes() ).toHaveLength( 0 );
 	} );
 
+	it( 'refuses a suggestion made for another block type', async () => {
+		const metadata = proposing( { anchor: 'intro' } );
+		const { accept, attributes, saves, errors } = setup( { metadata } );
+		await accept(
+			payloadOf( [ set( 'anchor', 'intro' ) ], 'core/test-apply-other' )
+		);
+		expect( attributes() ).toEqual( { tagName: 'div', metadata } );
+		expect( saves ).toEqual( [] );
+		expect( errors() ).toEqual( [
+			'This block changed type after the suggestion was made. Reject it to close the note.',
+		] );
+	} );
+
 	it( 'refuses an unsafe value that rides on a suggested insertion', async () => {
 		const metadata = {
 			noteId: [ NOTE ],

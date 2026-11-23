@@ -26,6 +26,21 @@ export function getAttributeApplyRefusal( {
 	attributes: Record< string, any > | null | undefined;
 	payload: SuggestionPayload;
 } ): string | null {
+	if ( ! payload.operations.some( ( op ) => op?.type === 'attribute-set' ) ) {
+		return null;
+	}
+	/*
+	 * The values were proposed for the block type the payload names. On
+	 * another type the same attribute name can mean something else.
+	 */
+	if (
+		typeof payload.blockName === 'string' &&
+		payload.blockName !== blockName
+	) {
+		return __(
+			'This block changed type after the suggestion was made. Reject it to close the note.'
+		);
+	}
 	const problem = findAttributeOperationProblem(
 		blockName,
 		payload.operations,
