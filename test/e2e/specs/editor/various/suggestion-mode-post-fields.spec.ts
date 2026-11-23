@@ -1497,6 +1497,60 @@ test.describe( 'Suggestion mode: post fields', () => {
 				).toBe( 'Latest news' );
 			} );
 
+			test( 'returning from the template to the post is Suggesting again', async ( {
+				editor,
+				page,
+			} ) => {
+				await editor.setPreferences( 'core/edit-post', {
+					welcomeGuideTemplate: false,
+				} );
+				await switchIntent( page, 'Suggesting' );
+				await page.evaluate( () =>
+					( window as any ).wp.data
+						.select( 'core/editor' )
+						.getEditorSettings()
+						.onNavigateToEntityRecord( {
+							postId: 'emptytheme//index',
+							postType: 'wp_template',
+						} )
+				);
+				const currentPostType = () =>
+					page.evaluate( () =>
+						( window as any ).wp.data
+							.select( 'core/editor' )
+							.getCurrentPostType()
+					);
+				await expect.poll( currentPostType ).toBe( 'wp_template' );
+
+				// Back to the post, the way the document bar does.
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Back', exact: true } )
+					.click();
+				await expect.poll( currentPostType ).toBe( 'post' );
+
+				// The choice made on the post still holds on it.
+				await page
+					.getByRole( 'region', { name: 'Editor top bar' } )
+					.getByRole( 'button', { name: 'Options' } )
+					.click();
+				await expect(
+					page.getByRole( 'menuitemradio', { name: /^Suggesting/ } )
+				).toHaveAttribute( 'aria-checked', 'true' );
+				await page.keyboard.press( 'Escape' );
+
+				// So typing is captured as a suggestion, not a direct edit.
+				const paragraph = editor.canvas
+					.getByRole( 'document', { name: 'Block: Paragraph' } )
+					.first();
+				await paragraph.click();
+				await page.keyboard.press( 'End' );
+				await page.keyboard.type( ' more' );
+				await expect(
+					paragraph.locator( 'mark.wp-suggestion-add' )
+				).toContainText( 'more' );
+			} );
+
 			test( 'the DataForm summary lets the site settings be edited once the template is open', async ( {
 				admin,
 				editor,
