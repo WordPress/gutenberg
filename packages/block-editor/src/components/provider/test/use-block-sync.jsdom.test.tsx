@@ -691,64 +691,75 @@ describe( 'useBlockSync hook', () => {
 		expect( replacedBlocks[ 0 ].clientId ).not.toBe( originalClientId );
 	} );
 
-	it( 'maps every selected client ID when cloning controlled blocks and resetting incoming values', () => {
-		const registry = createRegistry();
-		registry.register( blockEditorStore );
-		const parent = createBlock( 'test/test-block' );
-		registry.dispatch( blockEditorStore ).resetBlocks( [ parent ] );
-		const external = Array.from( { length: 3 }, () =>
-			createBlock( 'test/test-block' )
-		);
-		let savedSelection: BlockSelectionState | undefined;
-		const onChangeSelection = vi.fn( ( selection: BlockSelectionState ) => {
-			savedSelection = selection;
-		} );
-		const context = {
-			getSelection: () => savedSelection,
-			onChangeSelection,
-		};
-		const view = ( value: Block[] ) => (
-			<RegistryProvider value={ registry }>
-				<SelectionContext.Provider value={ context }>
-					<TestWrapper
-						useSubRegistry={ false }
-						clientId={ parent.clientId }
-						value={ value }
-						onChange={ vi.fn() }
-						onInput={ vi.fn() }
-					/>
-				</SelectionContext.Provider>
-			</RegistryProvider>
-		);
-		const { rerender } = render( view( external ) );
-		const internal = registry
-			.select( blockEditorStore )
-			.getBlockOrder( parent.clientId );
-		act( () => {
-			registry
-				.dispatch( blockEditorStore )
-				.multiSelectSet( [ internal[ 0 ], internal[ 2 ] ], null );
-		} );
-		expect( savedSelection ).toMatchObject( {
-			setSelectionClientIds: [
-				external[ 0 ].clientId,
-				external[ 2 ].clientId,
-			],
-		} );
-		rerender(
-			view(
-				external.map( ( block ) => ( {
-					...block,
-					attributes: { foo: 2 },
-				} ) )
-			)
-		);
-		const refreshed = registry
-			.select( blockEditorStore )
-			.getBlockOrder( parent.clientId );
-		expect( refreshed[ 0 ] ).not.toBe( internal[ 0 ] );
-		expect(
-			registry.select( blockEditorStore ).getSelectedBlockClientIds()
-		).toEqual( [ refreshed[ 0 ], refreshed[ 2 ] ] );
-	} );
+	it.each( [ 'updated', 'selection start removed' ] )(
+		'restores surviving selected controlled blocks after incoming values are %s',
+		( change ) => {
+			const registry = createRegistry();
+			registry.register( blockEditorStore );
+			const parent = createBlock( 'test/test-block' );
+			registry.dispatch( blockEditorStore ).resetBlocks( [ parent ] );
+			const external = Array.from( { length: 3 }, () =>
+				createBlock( 'test/test-block' )
+			);
+			let savedSelection: BlockSelectionState | undefined;
+			const onChangeSelection = vi.fn(
+				( selection: BlockSelectionState ) => {
+					savedSelection = selection;
+				}
+			);
+			const context = {
+				getSelection: () => savedSelection,
+				onChangeSelection,
+			};
+			const view = ( value: Block[] ) => (
+				<RegistryProvider value={ registry }>
+					<SelectionContext.Provider value={ context }>
+						<TestWrapper
+							useSubRegistry={ false }
+							clientId={ parent.clientId }
+							value={ value }
+							onChange={ vi.fn() }
+							onInput={ vi.fn() }
+						/>
+					</SelectionContext.Provider>
+				</RegistryProvider>
+			);
+			const { rerender } = render( view( external ) );
+			const internal = registry
+				.select( blockEditorStore )
+				.getBlockOrder( parent.clientId );
+			act( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.multiSelectSet( [ internal[ 0 ], internal[ 2 ] ], null );
+			} );
+			expect( savedSelection ).toMatchObject( {
+				setSelectionClientIds: [
+					external[ 0 ].clientId,
+					external[ 2 ].clientId,
+				],
+			} );
+			const incoming =
+				change === 'updated' ? external : external.slice( 1 );
+			rerender(
+				view(
+					incoming.map( ( block ) => ( {
+						...block,
+						attributes: { foo: 2 },
+					} ) )
+				)
+			);
+			const refreshed = registry
+				.select( blockEditorStore )
+				.getBlockOrder( parent.clientId );
+			expect( refreshed[ 0 ] ).not.toBe( internal[ 0 ] );
+			const expected =
+				change === 'updated'
+					? [ refreshed[ 0 ], refreshed[ 2 ] ]
+					: [ refreshed[ 1 ] ];
+			expect(
+				registry.select( blockEditorStore ).getSelectedBlockClientIds()
+			).toEqual( expected );
+		}
+	);
 } );

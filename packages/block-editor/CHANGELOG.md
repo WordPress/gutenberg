@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Selection: Restore surviving selected controlled blocks when a remote change deletes the selection start block.
 -   Selection: Preserve form-control activation when modifier-clicking associated labels or their contents.
 -   Drag and drop: Calculate insertion-only moves using document indices and the destination's horizontal, vertical, or RTL layout.
 -   Block actions: Check Add before and Add after against their own insertion destinations, including configured default blocks.

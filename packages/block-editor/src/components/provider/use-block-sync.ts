@@ -199,22 +199,40 @@ export default function useBlockSync( {
 	const restoreSelection = () => {
 		const selection = getSelection();
 		if (
-			! selection?.selectionStart?.clientId ||
+			( ! selection?.selectionStart?.clientId &&
+				! selection?.setSelectionClientIds?.length ) ||
 			selection === appliedSelectionRef.current
 		) {
 			return;
 		}
 
-		const startClientId = selection.selectionStart.clientId;
+		const startClientId = selection.selectionStart?.clientId;
+		// Re-cloning replaces all internal IDs. Restore the selected blocks that
+		// still map to this controller even when the original selection start was deleted.
+		const setSelectionClientIds = selection.setSelectionClientIds?.flatMap(
+			( id ) => {
+				if ( clientId ) {
+					const mappedId =
+						idMappingRef.current.externalToInternal.get( id );
+					return mappedId ? [ mappedId ] : [];
+				}
+				return getBlockName( id ) ? [ id ] : [];
+			}
+		);
 
 		// Check if this selection belongs to this controller.
 		// Inner block controllers (clientId is set) own the block if
 		// the external ID appears in their clone mapping.
 		// The root controller (no clientId) owns it if the block
 		// exists directly in the store.
-		const isOurs = clientId
-			? idMappingRef.current.externalToInternal.has( startClientId )
-			: !! getBlockName( startClientId );
+		const isOurs = setSelectionClientIds
+			? setSelectionClientIds.length > 0
+			: !! startClientId &&
+				( clientId
+					? idMappingRef.current.externalToInternal.has(
+							startClientId
+						)
+					: !! getBlockName( startClientId ) );
 
 		if ( isOurs ) {
 			appliedSelectionRef.current = selection;
@@ -237,18 +255,14 @@ export default function useBlockSync( {
 			// selection change back to the entity (which would cause
 			// an infinite update loop).
 			isRestoringSelectionRef.current = true;
-			// The check above found the selection start.
+			// Set normalization replaces missing selection start/end IDs with the
+			// first/last remaining selected blocks; range restoration stays unchanged.
 			resetSelection(
-				convert( selection.selectionStart )!,
+				convert( selection.selectionStart ) ?? {},
 				// The store accepts an unset selection end.
-				convert( selection.selectionEnd ) as BlockSelection,
+				convert( selection.selectionEnd ) ?? {},
 				selection.initialPosition,
-				selection.setSelectionClientIds?.map( ( id ) =>
-					clientId
-						? ( idMappingRef.current.externalToInternal.get( id ) ??
-							id )
-						: id
-				)
+				setSelectionClientIds
 			);
 			isRestoringSelectionRef.current = false;
 		}
