@@ -33,6 +33,7 @@ import {
 	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
+import { isSuggestionModeEnabled } from '../components/suggestion-mode/gate';
 import { unlock } from '../lock-unlock';
 
 const EMPTY_INSERTION_POINT = {
@@ -773,8 +774,10 @@ export function getCodeEditorUnavailableReason(
 		);
 	}
 
+	// Only with the experiment on: without it nothing can resolve them.
 	if (
 		checkPendingSuggestions &&
+		isSuggestionModeEnabled() &&
 		hasPendingSuggestionMarkers( getEditedPostContent( state ) )
 	) {
 		return __(
