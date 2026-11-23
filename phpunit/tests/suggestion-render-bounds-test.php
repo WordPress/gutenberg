@@ -1,7 +1,8 @@
 <?php
 /**
  * Tests that the render-side marker code stays bounded on hostile input: the
- * pairing walk is linear, and a fragment with too many markers fails closed.
+ * pairing walk is linear, a fragment with too many markers fails closed, and
+ * the character-level formatting revert gives up on a run too long to split.
  *
  * Time limits here are far above what a linear walk needs and far below what
  * a quadratic one takes, so they do not depend on the machine.
@@ -108,5 +109,112 @@ class Tests_Suggestion_Render_Bounds extends WP_UnitTestCase {
 		$html = str_repeat( '<mark class="wp-suggestion-add">PENDING</mark>', GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT + 1 );
 
 		$this->assertCount( GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT + 1, (array) gutenberg_pair_inline_suggestion_markers( $html ) );
+	}
+
+	/**
+	 * Builds a formatting marker.
+	 *
+	 * @param int    $id    Suggestion id.
+	 * @param string $inner Marked run.
+	 * @return string Marker HTML.
+	 */
+	private static function format_marker( int $id, string $inner ): string {
+		return '<mark class="wp-suggestion-format" data-suggestion-id="' . $id . '">' . $inner . '</mark>';
+	}
+
+	public function test_characters_are_split_up_to_the_limit(): void {
+		$this->assertCount( 5, (array) gutenberg_get_inline_suggestion_characters( '<em>ab</em>c<br>d', 5 ) );
+		$this->assertNull( gutenberg_get_inline_suggestion_characters( '<em>ab</em>c<br>d', 4 ) );
+		$this->assertNull( gutenberg_get_inline_suggestion_characters( '<em>abcd</em><br>', 4 ) );
+		// Multibyte text counts in characters, not bytes.
+		$this->assertCount( 4, (array) gutenberg_get_inline_suggestion_characters( "\u{1F600}\u{1F600}\u{1F600}\u{1F600}", 4 ) );
+		$this->assertNull( gutenberg_get_inline_suggestion_characters( "\u{1F600}\u{1F600}\u{1F600}\u{1F600}\u{1F600}", 4 ) );
+	}
+
+	public function test_format_revert_handles_a_run_at_the_character_limit(): void {
+		$filler = str_repeat( 'x', GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT - 4 );
+		$html   = '<p>' . self::format_marker( 1, '<strong>ab</strong>' ) . $filler . self::format_marker( 2, '<strong>cd</strong>' ) . '</p>';
+
+		$this->assertSame(
+			'<p>ab' . $filler . 'cd</p>',
+			gutenberg_revert_inline_format_suggestions(
+				$html,
+				array(
+					1 => 'ab',
+					2 => 'cd',
+				)
+			)
+		);
+	}
+
+	public function test_format_revert_gives_up_on_a_run_over_the_character_limit(): void {
+		$filler = str_repeat( 'x', GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT - 3 );
+		$html   = '<p>' . self::format_marker( 1, '<strong>ab</strong>' ) . $filler . self::format_marker( 2, '<strong>cd</strong>' ) . '</p>';
+
+		$this->assertNull(
+			gutenberg_revert_inline_format_suggestions(
+				$html,
+				array(
+					1 => 'ab',
+					2 => 'cd',
+				)
+			)
+		);
+	}
+
+	public function test_format_revert_gives_up_when_the_originals_are_over_the_character_limit(): void {
+		// Three stacked changes on one run: each original is as long as the
+		// run, and together they are over the limit.
+		$run  = str_repeat( 'x', (int) ( GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT / 2 ) );
+		$html = '<p>' . self::format_marker( 1, self::format_marker( 2, self::format_marker( 3, '<strong>' . $run . '</strong>' ) ) ) . '</p>';
+
+		$this->assertSame(
+			'<p>' . $run . '</p>',
+			gutenberg_revert_inline_format_suggestions( $html, array( 1 => $run ) + array_fill( 2, 2, '<em>' . $run . '</em>' ) )
+		);
+		$this->assertNull(
+			gutenberg_revert_inline_format_suggestions( $html, array_fill( 1, 3, $run ), array( 3 ) )
+		);
+	}
+
+	public function test_a_run_over_the_character_limit_is_reverted_marker_by_marker(): void {
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$notes = array();
+		foreach ( array( 'ab', 'cd' ) as $text ) {
+			$note_id = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => $post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => '0',
+				)
+			);
+			$this->assertIsInt( $note_id );
+			$payload = array(
+				'operations' => array(
+					array(
+						'type'           => 'inline-suggestion',
+						'attribute'      => 'content',
+						'suggestionType' => 'format',
+						'beforeHTML'     => '<em>' . $text . '</em>',
+					),
+				),
+			);
+			update_comment_meta( $note_id, '_wp_suggestion', wp_slash( (string) wp_json_encode( $payload ) ) );
+			$notes[ $text ] = $note_id;
+		}
+		$filler  = str_repeat( 'x', GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT );
+		$html    = '<p>' . self::format_marker( $notes['ab'], '<strong>ab</strong>' ) . $filler . self::format_marker( $notes['cd'], '<strong>cd</strong>' ) . '</p>';
+		$content = '<!-- wp:paragraph -->' . $html . '<!-- /wp:paragraph -->';
+		/** @var wpdb $wpdb */
+		global $wpdb;
+		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
+		clean_post_cache( $post_id );
+		$GLOBALS['post'] = get_post( $post_id );
+
+		$rendered = apply_filters( 'the_content', $content );
+		$this->assertIsString( $rendered );
+
+		$this->assertSame( '<p><em>ab</em>' . $filler . '<em>cd</em></p>', str_replace( ' class="wp-block-paragraph"', '', trim( $rendered ) ) );
 	}
 }
