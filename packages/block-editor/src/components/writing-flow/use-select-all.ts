@@ -11,7 +11,7 @@ import {
 } from '../../utils/dom';
 
 export default function useSelectAll() {
-	const { getBlockOrder, getSelectedBlockClientIds, getBlockRootClientId } =
+	const { getBlockOrder, getSelectedBlockClientIds, getBlockParents } =
 		useSelect( blockEditorStore );
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
@@ -84,12 +84,27 @@ export default function useSelectAll() {
 				return;
 			}
 
-			const rootClientId = getBlockRootClientId( firstSelectedClientId );
+			// Support non-contiguous block selections when selecting all, expand
+			// the selection in all block lists that have a selection.
+			const parents = selectedClientIds.map( ( id ) =>
+				getBlockParents( id, true )
+			);
+			const rootClientId =
+				parents[ 0 ]?.find( ( parent ) =>
+					parents.every( ( blockParents ) =>
+						blockParents.includes( parent )
+					)
+				) ?? '';
 			const blockClientIds = getBlockOrder( rootClientId );
 
 			// If we have selected all sibling nested blocks, try selecting up a
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
-			if ( selectedClientIds.length === blockClientIds.length ) {
+			if (
+				selectedClientIds.length === blockClientIds.length &&
+				blockClientIds.every( ( id ) =>
+					selectedClientIds.includes( id )
+				)
+			) {
 				if ( rootClientId ) {
 					node.ownerDocument
 						.defaultView!.getSelection()!
