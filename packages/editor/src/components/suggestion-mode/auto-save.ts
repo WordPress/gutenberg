@@ -73,6 +73,14 @@ import { unlock } from '../../lock-unlock';
 
 const AUTOSAVE_DEBOUNCE_MS = 1500;
 
+/*
+ * A save that fails is retried a bounded number of times. Without a retry a
+ * transient REST failure leaves the marker in content with no note until the
+ * user happens to edit that block again.
+ */
+const AUTOSAVE_RETRY_MS = 5000;
+const AUTOSAVE_MAX_ATTEMPTS = 3;
+
 /** Queue key for the post title, which is not a block. */
 export const POST_TITLE_CLIENT_ID = '__post_title__';
 
@@ -165,6 +173,8 @@ export function operationsForBlock(
 interface Tracked {
 	commentId: number | null;
 	syncedOpsKey: string | null;
+	/** Consecutive failed saves of the current operations. */
+	failures: number;
 }
 
 /**
@@ -297,7 +307,7 @@ export default function SuggestionAutoSave() {
 	const track = useCallback( ( clientId: string ): Tracked => {
 		let tracked = trackedRef.current.get( clientId );
 		if ( ! tracked ) {
-			tracked = { commentId: null, syncedOpsKey: null };
+			tracked = { commentId: null, syncedOpsKey: null, failures: 0 };
 			trackedRef.current.set( clientId, tracked );
 		}
 		return tracked;
@@ -346,6 +356,11 @@ export default function SuggestionAutoSave() {
 			dispatch.updateBlockAttributes( clientId, { metadata } );
 		},
 		[ registry, readBlock, track ]
+	);
+
+	// `schedule` is built on `syncOnce`, which retries through it.
+	const scheduleRef = useRef< ( clientId: string, delay?: number ) => void >(
+		() => {}
 	);
 
 	const syncOnce = useCallback(
@@ -520,9 +535,14 @@ export default function SuggestionAutoSave() {
 					}
 				}
 				tracked.syncedOpsKey = fingerprint;
+				tracked.failures = 0;
 			} catch {
-				// The provider surfaced the notice; the next marker change
-				// re-enqueues a sync, so transient failures recover.
+				// The provider surfaced the notice. A marker change
+				// re-enqueues a sync; until then, try again a few times.
+				tracked.failures++;
+				if ( tracked.failures < AUTOSAVE_MAX_ATTEMPTS ) {
+					scheduleRef.current( clientId, AUTOSAVE_RETRY_MS );
+				}
 			}
 		},
 		[ registry, readBlock, writeCommentId, getStructuralCaptures, track ]
@@ -546,7 +566,7 @@ export default function SuggestionAutoSave() {
 	);
 
 	const schedule = useCallback(
-		( clientId: string ) => {
+		( clientId: string, delay = AUTOSAVE_DEBOUNCE_MS ) => {
 			const timers = timersRef.current;
 			if ( timers.has( clientId ) ) {
 				clearTimeout( timers.get( clientId ) );
@@ -557,11 +577,14 @@ export default function SuggestionAutoSave() {
 				setTimeout( () => {
 					timers.delete( clientId );
 					enqueueSync( clientId );
-				}, AUTOSAVE_DEBOUNCE_MS )
+				}, delay )
 			);
 		},
 		[ enqueueSync ]
 	);
+	useEffect( () => {
+		scheduleRef.current = schedule;
+	}, [ schedule ] );
 
 	// Blocks: one pass per tree change; only a block whose marker identity
 	// changed restarts its own timer, so steady editing in one block never
@@ -670,20 +693,39 @@ export default function SuggestionAutoSave() {
 		scheduledProposalsRef.current = proposals ?? {};
 	}, [ isSuggestMode, proposals, schedule, currentUserId ] );
 
-	// Save anything still waiting out its debounce on unmount (the
-	// experiment toggled off, the editor closed) rather than dropping it.
+	// Save anything still waiting out its debounce when the page is hidden
+	// or on unmount (the experiment toggled off, the editor closed) rather
+	// than dropping it.
 	const enqueueSyncRef = useRef( enqueueSync );
 	useEffect( () => {
 		enqueueSyncRef.current = enqueueSync;
 	}, [ enqueueSync ] );
 	useEffect( () => {
 		const timers = timersRef.current;
-		return () => {
+		const flush = () => {
 			for ( const [ clientId, timer ] of timers ) {
 				clearTimeout( timer );
 				enqueueSyncRef.current( clientId );
 			}
 			timers.clear();
+		};
+		/*
+		 * A tab that is closed, reloaded or navigated away never unmounts
+		 * the editor. Hiding the page is the last moment the browser lets a
+		 * request start reliably, and it also covers a tab left in the
+		 * background with a save still waiting.
+		 */
+		const flushWhenHidden = () => {
+			if ( document.visibilityState === 'hidden' ) {
+				flush();
+			}
+		};
+		document.addEventListener( 'visibilitychange', flushWhenHidden );
+		window.addEventListener( 'pagehide', flush );
+		return () => {
+			document.removeEventListener( 'visibilitychange', flushWhenHidden );
+			window.removeEventListener( 'pagehide', flush );
+			flush();
 		};
 	}, [] );
 
