@@ -10,6 +10,8 @@
 ### Bug Fixes
 
 -   Writing flow: Keep the editor header and block toolbar on screen when the on-screen keyboard opens on iOS, by moving the page's slide into the canvas's scroll ([#87192](https://github.com/WordPress/gutenberg/pull/87192)).
+-   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 
 ## 20.1.0 (2026-11-18)
 
