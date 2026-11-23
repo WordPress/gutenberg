@@ -3,6 +3,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
+import { Tooltip } from '@wordpress/ui';
 import { BaseControl } from '../base-control';
 import BoxInputControl from './box-input-control';
 import LinkedButton from './linked-button';
@@ -135,64 +136,66 @@ function BoxControl( {
 	}
 
 	return (
-		<Grid
-			id={ id }
-			columns={ 3 }
-			templateColumns="1fr min-content min-content"
-			role="group"
-			aria-labelledby={ headingId }
-		>
-			<BaseControl.VisualLabel id={ headingId }>
-				{ label }
-			</BaseControl.VisualLabel>
-			{ isLinked && (
-				<HStack className={ styles[ 'input-wrapper' ] }>
-					<BoxInputControl side="all" { ...inputControlProps } />
-				</HStack>
-			) }
-			{ ! hasOneSide && (
-				<div className={ styles[ 'linked-button-wrapper' ] }>
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				</div>
-			) }
+		<Tooltip.Provider>
+			<Grid
+				id={ id }
+				columns={ 3 }
+				templateColumns="1fr min-content min-content"
+				role="group"
+				aria-labelledby={ headingId }
+			>
+				<BaseControl.VisualLabel id={ headingId }>
+					{ label }
+				</BaseControl.VisualLabel>
+				{ isLinked && (
+					<HStack className={ styles[ 'input-wrapper' ] }>
+						<BoxInputControl side="all" { ...inputControlProps } />
+					</HStack>
+				) }
+				{ ! hasOneSide && (
+					<div className={ styles[ 'linked-button-wrapper' ] }>
+						<LinkedButton
+							onClick={ toggleLinked }
+							isLinked={ isLinked }
+						/>
+					</div>
+				) }
 
-			{ ! isLinked &&
-				splitOnAxis &&
-				[ 'vertical', 'horizontal' ].map( ( axis ) => (
-					<BoxInputControl
-						key={ axis }
-						side={ axis as 'horizontal' | 'vertical' }
-						{ ...inputControlProps }
-					/>
-				) ) }
-			{ ! isLinked &&
-				! splitOnAxis &&
-				Array.from( sidesToRender ).map( ( axis ) => (
-					<BoxInputControl
-						key={ axis }
-						side={ axis }
-						{ ...inputControlProps }
-					/>
-				) ) }
-			{ allowReset && (
-				<Button
-					className={ clsx(
-						styles[ 'reset-button' ],
-						'component-box-control__reset-button'
-					) }
-					variant="secondary"
-					size="small"
-					onClick={ handleOnReset }
-					disabled={ ! isDirty }
-					accessibleWhenDisabled
-				>
-					{ __( 'Reset' ) }
-				</Button>
-			) }
-		</Grid>
+				{ ! isLinked &&
+					splitOnAxis &&
+					[ 'vertical', 'horizontal' ].map( ( axis ) => (
+						<BoxInputControl
+							key={ axis }
+							side={ axis as 'horizontal' | 'vertical' }
+							{ ...inputControlProps }
+						/>
+					) ) }
+				{ ! isLinked &&
+					! splitOnAxis &&
+					Array.from( sidesToRender ).map( ( axis ) => (
+						<BoxInputControl
+							key={ axis }
+							side={ axis }
+							{ ...inputControlProps }
+						/>
+					) ) }
+				{ allowReset && (
+					<Button
+						className={ clsx(
+							styles[ 'reset-button' ],
+							'component-box-control__reset-button'
+						) }
+						variant="secondary"
+						size="small"
+						onClick={ handleOnReset }
+						disabled={ ! isDirty }
+						accessibleWhenDisabled
+					>
+						{ __( 'Reset' ) }
+					</Button>
+				) }
+			</Grid>
+		</Tooltip.Provider>
 	);
 }
 
