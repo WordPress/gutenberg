@@ -185,6 +185,56 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
+		 * Lists the notes content names: on inline markers and anchors, on
+		 * structural markers (their own id, the block's `noteId`s and the
+		 * suggestions nested on them) and on placeholders.
+		 *
+		 * @param string $content Content.
+		 * @return array<int, true> Set of note ids.
+		 */
+		public static function note_ids( $content ) {
+			$ids = array();
+			if ( ! is_string( $content ) || ! self::may_carry_proposals( $content ) ) {
+				return $ids;
+			}
+
+			if ( false !== strpos( $content, 'wp-suggestion' ) ) {
+				$processor = new WP_HTML_Tag_Processor( $content );
+				while ( $processor->next_tag( 'MARK' ) ) {
+					$id = $processor->get_attribute( 'data-suggestion-id' );
+					if ( is_string( $id ) && (int) $id > 0 ) {
+						$ids[ (int) $id ] = true;
+					}
+				}
+			}
+
+			foreach ( (array) Gutenberg_Suggestion_Block_Scanner::scan( $content ) as $block ) {
+				if ( self::PLACEHOLDER === $block['name'] ) {
+					if ( isset( $block['attrs']['id'] ) && is_numeric( $block['attrs']['id'] ) && (int) $block['attrs']['id'] > 0 ) {
+						$ids[ (int) $block['attrs']['id'] ] = true;
+					}
+					continue;
+				}
+				$marker = Gutenberg_Suggestion_Block_Scanner::marker( $block );
+				if ( ! $marker ) {
+					continue;
+				}
+				list( $comment_id, $note_ids ) = Gutenberg_Suggestion_Block_Scanner::marker_note_ids( $block );
+				if ( null !== $comment_id ) {
+					$note_ids[] = $comment_id;
+				}
+				foreach ( isset( $marker['nested'] ) && is_array( $marker['nested'] ) ? $marker['nested'] : array() as $entry ) {
+					if ( is_array( $entry ) && isset( $entry['commentId'] ) && is_numeric( $entry['commentId'] ) && (int) $entry['commentId'] > 0 ) {
+						$note_ids[] = (int) $entry['commentId'];
+					}
+				}
+				$ids += array_fill_keys( $note_ids, true );
+			}
+
+			return $ids;
+		}
+
+		/**
 		 * Keeps the items whose anchors are in content.
 		 *
 		 * @param array<int, array[]> $items   Items per note id.
