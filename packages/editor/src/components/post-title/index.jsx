@@ -20,6 +20,11 @@ import { unlock } from '../../lock-unlock';
 
 const { useRichText } = unlock( richTextPrivateApis );
 
+// Format handlers only run when given a context. The title is not a block, so
+// the context is empty and only the format that does not read it is allowed.
+const ALLOWED_FORMATS = [ 'core/non-breaking-space' ];
+const FORMAT_TYPE_HANDLER_CONTEXT = {};
+
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
 		( select ) => {
@@ -76,6 +81,8 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			} );
 		},
 		__unstableDisableFormats: false,
+		allowedFormats: ALLOWED_FORMATS,
+		__unstableFormatTypeHandlerContext: FORMAT_TYPE_HANDLER_CONTEXT,
 	} );
 
 	function onInsertBlockAfter( blocks ) {

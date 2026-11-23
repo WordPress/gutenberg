@@ -160,6 +160,47 @@ test.describe( 'Post title', () => {
 			await expect( pageTitleField.locator( 'css=a' ) ).toBeHidden();
 		} );
 
+		test( 'should mark pasted non-breaking spaces without adding the marker to the title', async ( {
+			editor,
+			admin,
+			page,
+			pageUtils,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			await expect( pageTitleField ).toBeFocused();
+
+			pageUtils.setClipboardData( {
+				plainText: 'My&nbsp;Post&nbsp;Title',
+			} );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect(
+				pageTitleField.locator( 'css=.non-breaking-space' )
+			).toHaveCount( 2 );
+
+			// Typing parses the marker back from the DOM.
+			await page.keyboard.type( '!' );
+
+			await expect(
+				pageTitleField.locator( 'css=.non-breaking-space' )
+			).toHaveCount( 2 );
+
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data
+							.select( 'core/editor' )
+							.getEditedPostAttribute( 'title' )
+					)
+				)
+				.toBe( 'My\u00a0Post\u00a0Title!' );
+		} );
+
 		// Reinstate once the PR to fix paste events is merged:
 		// https://github.com/WordPress/gutenberg/pull/55030.
 		// eslint-disable-next-line playwright/no-skipped-test
