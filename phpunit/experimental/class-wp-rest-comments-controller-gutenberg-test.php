@@ -361,6 +361,34 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		);
 	}
 
+	/**
+	 * A status the request sets is validated as before: an undecided
+	 * suggestion cannot be created resolved.
+	 */
+	public function test_create_suggestion_note_with_explicit_resolved_status_is_refused(): void {
+		wp_set_current_user( self::$author_id );
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$author_id ) );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			(string) wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'content' => '',
+					'author'  => self::$author_id,
+					'type'    => 'note',
+					'status'  => 'approved',
+					'meta'    => array(
+						'_wp_suggestion' => '{"schemaVersion":2,"blockName":"core/heading","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}',
+					),
+				)
+			)
+		);
+
+		$this->assertErrorResponse( 'rest_suggestion_pending', rest_get_server()->dispatch( $request ), 409 );
+	}
+
 	public function test_cannot_create_with_non_valid_comment_type() {
 		wp_set_current_user( self::$admin_id );
 		$post_id = self::factory()->post->create();
