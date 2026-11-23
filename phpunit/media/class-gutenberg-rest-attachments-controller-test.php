@@ -169,19 +169,23 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
-	 * Verifies that still HEIC/HEIF uploads bypass the image editor support
-	 * check even when generate_sub_sizes is not false.
+	 * Verifies that HEIC/HEIF uploads bypass the image editor support check
+	 * even when generate_sub_sizes is not false.
 	 *
-	 * The browser's canvas fallback can always decode still HEIC/HEIF, so the
-	 * upload is allowed even when the server has no editor that supports it.
+	 * The browser's canvas fallback can decode HEIC/HEIF, so the upload is
+	 * allowed even when the server has no editor that supports it. The
+	 * multi-frame '-sequence' variants are included: a browser that can decode
+	 * them uploads a still frame instead and never reaches this check, and one
+	 * that cannot is better served by WordPress collapsing the sequence to its
+	 * first frame than by a rejected upload.
 	 *
 	 * @covers ::create_item_permissions_check
 	 *
-	 * @dataProvider data_still_heic_mime_types
+	 * @dataProvider data_heic_mime_types
 	 *
-	 * @param string $mime_type Still HEIC/HEIF mime type.
+	 * @param string $mime_type HEIC/HEIF mime type.
 	 */
-	public function test_create_item_still_heic_bypasses_unsupported_image_type_check( $mime_type ) {
+	public function test_create_item_heic_bypasses_unsupported_image_type_check( $mime_type ) {
 		wp_set_current_user( self::$admin_id );
 
 		// Remove all image editors so wp_image_editor_supports() returns false.
@@ -209,65 +213,14 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
-	 * Data provider for still HEIC/HEIF mime types.
+	 * Data provider for HEIC/HEIF mime types, still and sequence alike.
 	 *
 	 * @return array[]
 	 */
-	public function data_still_heic_mime_types() {
+	public function data_heic_mime_types() {
 		return array(
-			'heic' => array( 'image/heic' ),
-			'heif' => array( 'image/heif' ),
-		);
-	}
-
-	/**
-	 * Verifies that HEIC/HEIF sequence uploads do not bypass the editor support check.
-	 *
-	 * The multi-frame '-sequence' variants (Live Photos) cannot be processed by
-	 * the server or decoded by the browser fallback, so they should fall through
-	 * to the standard unsupported mime-type error rather than be stored.
-	 *
-	 * @covers ::create_item_permissions_check
-	 *
-	 * @dataProvider data_heic_sequence_mime_types
-	 *
-	 * @param string $mime_type HEIC/HEIF sequence mime type.
-	 */
-	public function test_create_item_heic_sequence_is_not_bypassed( $mime_type ) {
-		wp_set_current_user( self::$admin_id );
-
-		// Remove all image editors so wp_image_editor_supports() returns false.
-		add_filter( 'wp_image_editors', '__return_empty_array' );
-
-		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
-		$request->set_file_params(
-			array(
-				'file' => array(
-					'name'     => 'live-photo.heic',
-					'type'     => $mime_type,
-					'tmp_name' => DIR_TESTDATA . '/images/canola.jpg',
-					'error'    => 0,
-					'size'     => filesize( DIR_TESTDATA . '/images/canola.jpg' ),
-				),
-			)
-		);
-		$request->set_param( 'generate_sub_sizes', true );
-
-		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
-		$result     = $controller->create_item_permissions_check( $request );
-
-		// Should fail: sequences are unsupported by both the server and the fallback.
-		$this->assertWPError( $result );
-		$this->assertSame( 'rest_upload_image_type_not_supported', $result->get_error_code() );
-	}
-
-	/**
-	 * Data provider for HEIC/HEIF sequence mime types.
-	 *
-	 * @return array[]
-	 */
-	public function data_heic_sequence_mime_types() {
-		return array(
+			'heic'          => array( 'image/heic' ),
+			'heif'          => array( 'image/heif' ),
 			'heic-sequence' => array( 'image/heic-sequence' ),
 			'heif-sequence' => array( 'image/heif-sequence' ),
 		);
@@ -2067,6 +2020,52 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( 640, $metadata['width'] );
 		$this->assertSame( 480, $metadata['height'] );
 		$this->assertStringEndsWith( 'rotated-photo-original.jpg', $metadata['file'] );
+	}
+
+	/**
+	 * Verifies that still frames picked for a Live photo accumulate in the
+	 * attachment metadata, since each block showing the attachment can rest
+	 * on its own frame.
+	 *
+	 * @covers ::sideload_item
+	 * @covers ::finalize_item
+	 * @covers ::validate_image_dimensions
+	 */
+	public function test_finalize_appends_live_photo_stills() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=live-photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		$response      = rest_get_server()->dispatch( $request );
+		$attachment_id = $response->get_data()['id'];
+
+		$files = array();
+		foreach ( array( 'live-photo-still-1.jpg', 'live-photo-still-2.jpg' ) as $name ) {
+			$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/sideload" );
+			$request->set_header( 'Content-Type', 'image/jpeg' );
+			$request->set_header( 'Content-Disposition', "attachment; filename=$name" );
+			$request->set_param( 'image_size', Gutenberg_REST_Attachments_Controller::IMAGE_SIZE_LIVE_PHOTO_STILL );
+			$request->set_param( 'convert_format', false );
+			$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 200, $response->get_status() );
+			$still = $response->get_data();
+
+			$request = new WP_REST_Request( 'POST', "/wp/v2/media/$attachment_id/finalize" );
+			$request->set_param( 'sub_sizes', array( $still ) );
+			$this->assertSame( 200, rest_get_server()->dispatch( $request )->get_status() );
+
+			$files[] = $still['file'];
+		}
+
+		$metadata = wp_get_attachment_metadata( $attachment_id, true );
+		$this->assertSame( $files, $metadata['live_photo_stills'], 'Each picked still should be kept, in order.' );
+		$this->assertSame( 'live-photo.jpg', wp_basename( $metadata['file'] ), 'A picked still must not replace the main file.' );
 	}
 
 	/**
