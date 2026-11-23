@@ -29,6 +29,13 @@ class Tests_Suggestion_Status_Guard extends WP_UnitTestCase {
 
 	public function set_up(): void {
 		parent::set_up();
+		// Suggestion writes over REST need the experiment.
+		add_filter(
+			'pre_option_gutenberg-experiments',
+			static function () {
+				return array( 'gutenberg-suggestion-mode' => true );
+			}
+		);
 		gutenberg_register_suggestion_meta();
 		wp_set_current_user( self::$contributor_id );
 	}
