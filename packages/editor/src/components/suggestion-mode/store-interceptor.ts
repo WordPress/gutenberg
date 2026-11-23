@@ -2169,7 +2169,7 @@ export default function SuggestionStoreInterceptor() {
 						)
 					) {
 						snapshot.delete( clientId );
-						clearStructuralCaptureRef.current( clientId );
+						onClearStructuralCapture( clientId );
 						continue;
 					}
 					// "Apply / reject landing": when another client
