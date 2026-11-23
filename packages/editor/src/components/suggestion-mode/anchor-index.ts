@@ -139,6 +139,61 @@ function attributeMarkerIds( value: unknown ): string[] {
 }
 
 /**
+ * Where a note's inline marker is, found by the marker's id.
+ *
+ * The marker travels with the text, so it is the anchor. The attribute a
+ * payload names and the block a `metadata.noteId` links are only where the
+ * marker was written: merging two blocks moves it under a block that never
+ * had the link, and a transform can rename the attribute and drops the link.
+ * Both are tried first, as hints.
+ *
+ * @param blockEditor    Block-editor selectors.
+ * @param noteId         Note id the marker carries.
+ * @param hint           Where the marker was last known to be.
+ * @param hint.clientId  Block client id.
+ * @param hint.attribute Attribute name.
+ * @return The block and attribute holding the marker, or null.
+ */
+export function findInlineMarker(
+	blockEditor: any,
+	noteId: number | string,
+	hint: { clientId?: string; attribute?: string } = {}
+): { clientId: string; attribute: string } | null {
+	const idKey = String( noteId );
+	const inBlock = ( clientId: string ) => {
+		const attributes = blockEditor.getBlockAttributes( clientId );
+		if ( ! attributes ) {
+			return null;
+		}
+		const names = Object.keys( attributes );
+		if ( hint.attribute && names.includes( hint.attribute ) ) {
+			names.splice( names.indexOf( hint.attribute ), 1 );
+			names.unshift( hint.attribute );
+		}
+		for ( const attribute of names ) {
+			if (
+				attributeMarkerIds( attributes[ attribute ] ).includes( idKey )
+			) {
+				return { clientId, attribute };
+			}
+		}
+		return null;
+	};
+	const hinted = hint.clientId ? inBlock( hint.clientId ) : null;
+	if ( hinted ) {
+		return hinted;
+	}
+	for ( const clientId of blockEditor.getClientIdsWithDescendants?.() ??
+		[] ) {
+		const found = clientId === hint.clientId ? null : inBlock( clientId );
+		if ( found ) {
+			return found;
+		}
+	}
+	return null;
+}
+
+/**
  * The anchors present in the editor, indexed in one pass over the blocks.
  *
  * Structural anchors are the `metadata.suggestion` markers, keyed by pending
