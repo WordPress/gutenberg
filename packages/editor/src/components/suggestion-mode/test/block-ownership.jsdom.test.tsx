@@ -125,6 +125,9 @@ function setupTree( {
 const attributesOf = ( registry: any, clientId: string ): any =>
 	registry.select( blockEditorStore ).getBlockAttributes( clientId );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'createPostOwnershipCheck', () => {
 	it( 'owns root blocks, and a controlled container itself, but not what the container holds', () => {
 		const tree = setupTree();
