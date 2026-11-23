@@ -314,6 +314,72 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
+		 * Filters a stored item to what kses lets an author without
+		 * `unfiltered_html` publish.
+		 *
+		 * An item the save pass extracted from that author's own save is
+		 * unchanged by this. An attribute proposal's opener is only rewritten
+		 * when one of its values changed, so its bytes stay exact otherwise.
+		 *
+		 * @param array<string, mixed> $item Item.
+		 * @return array<string, mixed> Item.
+		 */
+		public static function kses_item( array $item ): array {
+			if ( ! isset( $item['kind'], $item['original'] ) || ! is_string( $item['original'] ) ) {
+				return $item;
+			}
+			if ( 'after' !== $item['kind'] ) {
+				// Kses also reorders and re-encodes what it keeps. The exact
+				// bytes stay unless it took something out.
+				$clean = wp_kses_post( $item['original'] );
+				if ( self::markup_signature( $clean ) !== self::markup_signature( $item['original'] ) ) {
+					$item['original'] = $clean;
+				}
+				return $item;
+			}
+
+			if ( isset( $item['after'] ) ) {
+				$item['after'] = filter_block_kses_value( $item['after'], 'post' );
+			}
+			$attrs  = Gutenberg_Suggestion_Block_Scanner::opener_attributes( $item['original'] );
+			$values = $attrs ? json_decode( (string) wp_json_encode( $attrs ), true ) : null;
+			$clean  = is_array( $values ) ? filter_block_kses_value( $values, 'post' ) : null;
+			if ( null === $clean ) {
+				// Not an opener that can be read: put nothing back.
+				$item['original'] = isset( $item['anchor'] ) && is_string( $item['anchor'] ) ? $item['anchor'] : '';
+			} elseif ( $clean !== $values ) {
+				$opener           = Gutenberg_Suggestion_Block_Scanner::rewrite_opener( $item['original'], $clean );
+				$item['original'] = null === $opener ? (string) $item['anchor'] : $opener;
+			}
+			return $item;
+		}
+
+		/**
+		 * Reduces HTML to its tags, their attributes in name order, and its
+		 * decoded text, so two spellings of the same markup compare equal.
+		 *
+		 * @param string $html HTML.
+		 * @return string Signature.
+		 */
+		private static function markup_signature( string $html ): string {
+			$processor = new WP_HTML_Tag_Processor( $html );
+			$tokens    = array();
+			while ( $processor->next_token() ) {
+				if ( '#tag' !== $processor->get_token_type() ) {
+					$tokens[] = array( $processor->get_token_type(), $processor->get_modifiable_text() );
+					continue;
+				}
+				$attributes = array();
+				foreach ( (array) $processor->get_attribute_names_with_prefix( '' ) as $name ) {
+					$attributes[ $name ] = $processor->get_attribute( $name );
+				}
+				ksort( $attributes );
+				$tokens[] = array( $processor->get_tag(), $processor->is_tag_closer(), $attributes, $processor->get_modifiable_text() );
+			}
+			return md5( serialize( $tokens ) );
+		}
+
+		/**
 		 * Cheap probe for content that may hold markers or anchors.
 		 *
 		 * @param string $content Content.
