@@ -299,6 +299,27 @@ describe( 'hasAttributeConflict', () => {
 		).toBe( true );
 	} );
 
+	it( 'compares a metadata proposal by the keys it changes', () => {
+		const rename = {
+			type: 'attribute-set',
+			attribute: 'metadata',
+			before: null,
+			after: { name: 'Hero' },
+		};
+		// The marker and the note link are not part of the proposal.
+		expect(
+			hasAttributeConflict(
+				{ metadata: { noteId: [ 1 ], suggestion: {} } },
+				[ rename ]
+			)
+		).toBe( false );
+		expect(
+			hasAttributeConflict( { metadata: { name: 'Renamed since' } }, [
+				rename,
+			] )
+		).toBe( true );
+	} );
+
 	it( 'ignores unrelated attribute changes on the block', () => {
 		// Post modified bumps often because an unrelated attribute (or another
 		// block entirely) changed — those should never count as a conflict

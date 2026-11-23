@@ -208,6 +208,83 @@ describe( 'accepting an attribute suggestion', () => {
 		] );
 	} );
 
+	describe( 'a metadata proposal', () => {
+		const rename = { metadata: { name: 'Hero', bindings: { a: 1 } } };
+
+		it( 'lands on the block beside the metadata it does not name', async () => {
+			const { accept, attributes, errors } = setup( {
+				metadata: { ...proposing( rename ), categories: [ 'x' ] },
+			} );
+			await accept( payloadOf( [ set( 'metadata', rename.metadata ) ] ) );
+			expect( errors() ).toEqual( [] );
+			expect( attributes().metadata ).toEqual( {
+				noteId: [ NOTE ],
+				categories: [ 'x' ],
+				name: 'Hero',
+				bindings: { a: 1 },
+			} );
+		} );
+
+		it( 'lands when it rides on a suggested insertion', async () => {
+			const { accept, attributes, errors } = setup( {
+				metadata: {
+					noteId: [ NOTE ],
+					suggestion: {
+						type: 'pending-insert',
+						authorId: 3,
+						commentId: NOTE,
+						after: rename,
+					},
+				},
+			} );
+			await accept(
+				payloadOf( [
+					{ type: 'block-insert-after', blockName: GROUP },
+					set( 'metadata', rename.metadata ),
+				] )
+			);
+			expect( errors() ).toEqual( [] );
+			expect( attributes().metadata ).toEqual( {
+				noteId: [ NOTE ],
+				name: 'Hero',
+				bindings: { a: 1 },
+			} );
+		} );
+
+		it( 'lands when nested, leaving the outer suggestion pending', async () => {
+			const outer = {
+				type: 'pending-attributes',
+				authorId: 4,
+				commentId: 5,
+				after: { anchor: 'top' },
+			};
+			const { accept, attributes, errors } = setup( {
+				metadata: {
+					noteId: [ 5, NOTE ],
+					suggestion: {
+						...outer,
+						nested: [
+							{
+								type: 'pending-attributes',
+								authorId: 3,
+								commentId: NOTE,
+								after: rename,
+							},
+						],
+					},
+				},
+			} );
+			await accept( payloadOf( [ set( 'metadata', rename.metadata ) ] ) );
+			expect( errors() ).toEqual( [] );
+			expect( attributes().metadata ).toEqual( {
+				noteId: [ 5, NOTE ],
+				name: 'Hero',
+				bindings: { a: 1 },
+				suggestion: outer,
+			} );
+		} );
+	} );
+
 	describe( 'when the note and the content disagree', () => {
 		const CHANGED =
 			'This suggestion no longer matches the post. Reload and try again, or reject it.';
