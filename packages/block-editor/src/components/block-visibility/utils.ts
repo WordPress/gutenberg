@@ -145,6 +145,47 @@ export function getHideEverywhereCheckboxState(
 }
 
 /**
+ * Gets a block's new visibility from the block visibility modal's checkboxes.
+ *
+ * A checkbox left indeterminate (`null`) keeps the block's own setting, so
+ * selected blocks with different settings keep them.
+ *
+ * @param block                          The block to update.
+ * @param checkboxStates                 The modal's checkbox states.
+ * @param checkboxStates.hideEverywhere  The "Omit from published content" checkbox.
+ * @param checkboxStates.viewportChecked The viewport checkboxes, by viewport.
+ * @return The block's new visibility. `false` hides it everywhere.
+ */
+export function getUpdatedBlockVisibility(
+	block: BlockWithVisibility | null | undefined,
+	{
+		hideEverywhere,
+		viewportChecked,
+	}: {
+		hideEverywhere: boolean | null;
+		viewportChecked: Record< string, boolean | null >;
+	}
+): Exclude< BlockVisibility, true > {
+	const isHiddenEverywhere =
+		hideEverywhere ??
+		block?.attributes?.metadata?.blockVisibility === false;
+	if ( isHiddenEverywhere ) {
+		return false;
+	}
+
+	const viewport: ViewportVisibility[ 'viewport' ] = {};
+	Object.entries( viewportChecked ).forEach( ( [ key, checked ] ) => {
+		// Values are inverted: a checked checkbox hides the block on that
+		// viewport, so it's saved as `false`.
+		if ( checked ?? isBlockHiddenForViewport( block, key ) ) {
+			viewport[ key as BlockVisibilityViewport ] = false;
+		}
+	} );
+
+	return { viewport };
+}
+
+/**
  * Get a human-readable label describing which viewports a block is hidden on.
  *
  * @param blockVisibility  The block's visibility metadata.

@@ -262,4 +262,57 @@ test.describe( 'Block Hiding', () => {
 				} )
 		).toBeVisible();
 	} );
+
+	test( 'keeps the visibility settings that differ between selected blocks', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Hidden on mobile',
+				metadata: { blockVisibility: { viewport: { mobile: false } } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Visible' },
+		} );
+
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+		await editor.clickBlockOptionsMenuItem( 'Hide' );
+
+		const dialog = page.getByRole( 'dialog', { name: 'Hide blocks' } );
+		await expect(
+			dialog.getByRole( 'checkbox', { name: 'Hide on Mobile' } )
+		).toBeChecked( { indeterminate: true } );
+
+		// Hide both blocks on desktop, leaving the mixed mobile setting alone.
+		await dialog
+			.getByRole( 'checkbox', { name: 'Hide on Desktop' } )
+			.check();
+		await dialog.getByRole( 'button', { name: 'Apply' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				attributes: {
+					metadata: {
+						blockVisibility: {
+							viewport: { desktop: false, mobile: false },
+						},
+					},
+				},
+			},
+			{
+				attributes: {
+					metadata: {
+						blockVisibility: { viewport: { desktop: false } },
+					},
+				},
+			},
+		] );
+	} );
 } );

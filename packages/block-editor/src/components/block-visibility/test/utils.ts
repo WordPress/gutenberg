@@ -3,6 +3,7 @@ import {
 	getBlockVisibilityViewportEntries,
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
+	getUpdatedBlockVisibility,
 } from '../utils';
 
 describe( 'block-visibility utils', () => {
@@ -286,6 +287,87 @@ describe( 'block-visibility utils', () => {
 				},
 			];
 			expect( getHideEverywhereCheckboxState( blocks ) ).toBe( false );
+		} );
+	} );
+	describe( 'getUpdatedBlockVisibility', () => {
+		const withVisibility = ( blockVisibility?: any ) => ( {
+			attributes: { metadata: { blockVisibility } },
+		} );
+
+		it( 'hides the block on the checked viewports', () => {
+			expect(
+				getUpdatedBlockVisibility(
+					withVisibility( { viewport: { mobile: false } } ),
+					{
+						hideEverywhere: false,
+						viewportChecked: {
+							desktop: true,
+							tablet: false,
+							mobile: false,
+						},
+					}
+				)
+			).toEqual( { viewport: { desktop: false } } );
+		} );
+
+		it( 'keeps the block setting for an indeterminate viewport', () => {
+			const viewportChecked = {
+				desktop: true,
+				tablet: false,
+				mobile: null,
+			};
+			expect(
+				getUpdatedBlockVisibility(
+					withVisibility( { viewport: { mobile: false } } ),
+					{ hideEverywhere: false, viewportChecked }
+				)
+			).toEqual( { viewport: { desktop: false, mobile: false } } );
+			expect(
+				getUpdatedBlockVisibility( withVisibility(), {
+					hideEverywhere: false,
+					viewportChecked,
+				} )
+			).toEqual( { viewport: { desktop: false } } );
+		} );
+
+		it( 'hides the block everywhere when "hide everywhere" is checked', () => {
+			expect(
+				getUpdatedBlockVisibility(
+					withVisibility( { viewport: { mobile: false } } ),
+					{
+						hideEverywhere: true,
+						viewportChecked: { desktop: true },
+					}
+				)
+			).toBe( false );
+		} );
+
+		it( 'keeps the block setting when "hide everywhere" is indeterminate', () => {
+			const checkboxStates = {
+				hideEverywhere: null,
+				viewportChecked: { desktop: true, tablet: false, mobile: null },
+			};
+			expect(
+				getUpdatedBlockVisibility(
+					withVisibility( false ),
+					checkboxStates
+				)
+			).toBe( false );
+			expect(
+				getUpdatedBlockVisibility(
+					withVisibility( { viewport: { tablet: false } } ),
+					checkboxStates
+				)
+			).toEqual( { viewport: { desktop: false } } );
+		} );
+
+		it( 'shows a block that was hidden everywhere when "hide everywhere" is unchecked', () => {
+			expect(
+				getUpdatedBlockVisibility( withVisibility( false ), {
+					hideEverywhere: false,
+					viewportChecked: { desktop: false, mobile: null },
+				} )
+			).toEqual( { viewport: {} } );
 		} );
 	} );
 } );
