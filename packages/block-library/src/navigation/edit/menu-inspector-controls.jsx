@@ -79,6 +79,7 @@ const MainContent = ( {
 				description={ description }
 				showAppender
 				showInnerBlockAppenders
+				appenderLabel={ __( 'Add menu item' ) }
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ NavigationLinkUI }
 				onSelect={ openListViewContentPanel }

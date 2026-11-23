@@ -52,53 +52,6 @@ function canAppendInListView(
 }
 
 /**
- * The appender row for an empty container, one level in from its block, so
- * the first item can be added where it will appear. A block that hides its
- * appender on the canvas, like a link that could hold a submenu, gets no row.
- *
- * @param props
- * @param props.clientId The empty block.
- * @param props.level    The block's nesting level.
- */
-function ListViewEmptyContainerAppender( {
-	clientId,
-	level,
-}: {
-	clientId: string;
-	level: number;
-} ) {
-	const isContainer = useSelect(
-		( select ) => canAppendInListView( select, clientId ),
-		[ clientId ]
-	);
-
-	if ( ! isContainer ) {
-		return null;
-	}
-
-	return (
-		<TreeGridRow
-			className="block-editor-list-view-appender-row"
-			level={ level + 1 }
-			setSize={ 1 }
-			positionInSet={ 1 }
-			isExpanded
-		>
-			<TreeGridCell>
-				{ ( treeGridCellProps ) => (
-					<Appender
-						clientId={ clientId }
-						nestingLevel={ level + 1 }
-						blockCount={ 0 }
-						{ ...treeGridCellProps }
-					/>
-				) }
-			</TreeGridCell>
-		</TreeGridRow>
-	);
-}
-
-/**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
  * the list position of a block.
  *
@@ -337,11 +290,14 @@ function ListViewBranch( props: ListViewBranchProps ) {
 			index === 0 ||
 			index === blockCount - 1;
 
-		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
+		// An empty block that takes items gets a branch that holds only its
+		// appender, which then stays put as the first item is added.
+		const showNestedBlocks =
+			! isDragged &&
+			( hasNestedBlocks ? shouldExpand : blockRowCount > 1 );
 
 		if ( ! showBlock ) {
-			// An empty block's appender row is left out with it.
-			placeholderRows += hasNestedBlocks ? 1 : blockRowCount;
+			placeholderRows += 1;
 			placeholderKey ??= clientId;
 
 			// Inner blocks of an off-window block may still be in view.
@@ -388,15 +344,6 @@ function ListViewBranch( props: ListViewBranchProps ) {
 						isNesting={ isNesting }
 					/>
 				) }
-				{ showDescendantAppenders &&
-					showBlock &&
-					! hasNestedBlocks &&
-					! isDragged && (
-						<ListViewEmptyContainerAppender
-							clientId={ clientId }
-							level={ level }
-						/>
-					) }
 				{ showNestedBlocks && (
 					<ListViewBranch
 						parentId={ clientId }
@@ -429,7 +376,6 @@ function ListViewBranch( props: ListViewBranchProps ) {
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
-					isExpanded
 				>
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (

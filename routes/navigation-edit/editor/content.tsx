@@ -100,7 +100,10 @@ export default function NavigationMenuContent( {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					showInnerBlockAppenders
+					// The pages of a Page List take no items.
+					showInnerBlockAppenders={
+						listViewRootClientId === rootClientId
+					}
 					appenderLabel={ __( 'Add menu item' ) }
 					additionalBlockContent={ NavigationLinkUI }
 					showContentPopover

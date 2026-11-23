@@ -422,7 +422,8 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 		const openSidebarListView = async (
 			{ admin, page, requestUtils },
-			fixture
+			fixture,
+			visibleItem = 'Top Level Item 2'
 		) => {
 			const menu = await requestUtils.createNavigationMenu( fixture );
 			await admin.visitSiteEditor( {
@@ -434,7 +435,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			} );
 			await expect(
 				listView.getByRole( 'gridcell', {
-					name: 'Top Level Item 2',
+					name: visibleItem,
 					exact: true,
 				} )
 			).toBeVisible();
@@ -473,24 +474,27 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				parent: parentPage.id,
 			} );
 
-			const listView = await openSidebarListView(
-				{ admin, page, requestUtils },
-				{
-					title: 'Page List Menu',
-					content:
-						'<!-- wp:page-list /-->' +
+			// The Page List shows the site's pages and saves nothing added to
+			// it, so only the menu's own appender is offered. A menu that is
+			// only a Page List lists the pages at the top level, and offers
+			// no appender at all.
+			for ( const [ content, levels ] of [
+				[
+					'<!-- wp:page-list /-->' +
 						'<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
-				}
-			);
-			await expect(
-				listView.getByRole( 'gridcell', { name: 'Child Page' } )
-			).toBeVisible();
-
-			// The Page List shows the site's pages and saves nothing added
-			// to it, so only the menu's own appender is offered.
-			await expect
-				.poll( () => appenderLevels( listView ) )
-				.toEqual( [ 1 ] );
+					[ 1 ],
+				],
+				[ '<!-- wp:page-list /-->', [] ],
+			] ) {
+				const listView = await openSidebarListView(
+					{ admin, page, requestUtils },
+					{ title: 'Page List Menu', content },
+					'Child Page'
+				);
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( levels );
+			}
 
 			await Promise.all(
 				[ childPage, parentPage ].map( ( { id } ) =>
@@ -706,10 +710,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				.poll( () => appenderLevels( listView ) )
 				.toEqual( [ 2, 1 ] );
 
-			await listView
+			const appender = listView
 				.getByRole( 'row', { level: 2 } )
-				.getByRole( 'button', { name: /^Add / } )
-				.click();
+				.getByRole( 'button', { name: /^Add / } );
+			await appender.focus();
+			await page.keyboard.press( 'Enter' );
 			await page.getByRole( 'option', { name: 'WordPress' } ).click();
 
 			await expect(
@@ -719,6 +724,34 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 						hasText: 'Block 1 of 1, Level 2.',
 					} )
 			).toBeVisible();
+			// The appender stays where it was, now below the new icon, and
+			// keeps focus for the next one.
+			await expect( appender ).toBeFocused();
+		} );
+
+		test( 'moves from a nested appender to its parent with the Left arrow key', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+
+			await listView
+				.getByRole( 'row', { level: 3 } )
+				.getByRole( 'button', { name: /^Add / } )
+				.focus();
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect(
+				listView
+					.getByRole( 'gridcell', {
+						name: 'Nested Submenu',
+						exact: true,
+					} )
+					.getByRole( 'link' )
+			).toBeFocused();
 		} );
 
 		test( 'shows no appender in an empty Social Icons block locked against editing', async ( {
@@ -747,46 +780,49 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			page,
 			requestUtils,
 		} ) => {
-			const listView = await openSidebarListView(
-				{ admin, page, requestUtils },
-				nestedMenuFixture
-			);
-			const selectedItems = () =>
-				listView
-					.locator(
-						'.block-editor-list-view-block__contents-cell[aria-selected="true"]'
-					)
-					.evaluateAll( ( cells ) =>
-						cells.map(
-							( cell ) => cell.innerText.split( '\n' )[ 0 ]
+			// Between "Nested Item" and "Top Level Item 2" are the appenders
+			// of the nested submenu and of its parent. They hold no block, so
+			// moving onto them keeps only the block the selection started
+			// from. A selection across levels then takes in the top-level
+			// blocks on both ends.
+			for ( const [ from, key ] of [
+				[ 'Nested Item', 'Shift+ArrowDown' ],
+				[ 'Top Level Item 2', 'Shift+ArrowUp' ],
+			] ) {
+				const listView = await openSidebarListView(
+					{ admin, page, requestUtils },
+					nestedMenuFixture
+				);
+				const selectedItems = () =>
+					listView
+						.locator(
+							'.block-editor-list-view-block__contents-cell[aria-selected="true"]'
 						)
-					);
+						.evaluateAll( ( cells ) =>
+							cells.map(
+								( cell ) => cell.innerText.split( '\n' )[ 0 ]
+							)
+						);
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 3, 2, 1 ] );
 
-			await expect
-				.poll( () => appenderLevels( listView ) )
-				.toEqual( [ 3, 2, 1 ] );
+				// Focus the row without clicking it, since a click opens the
+				// Settings popover, which takes focus from the row.
+				await listView
+					.getByRole( 'gridcell', { name: from, exact: true } )
+					.getByRole( 'link' )
+					.focus();
 
-			// Focus the row without clicking it, since a click opens the
-			// Settings popover, which takes focus from the row.
-			await listView
-				.getByRole( 'gridcell', { name: 'Nested Item', exact: true } )
-				.getByRole( 'link' )
-				.focus();
-
-			// The next two rows are the appenders of the nested submenu and of
-			// its parent. They hold no block, so moving onto them selects only
-			// the block the selection started from.
-			await page.keyboard.press( 'Shift+ArrowDown' );
-			await expect.poll( selectedItems ).toEqual( [ 'Nested Item' ] );
-			await page.keyboard.press( 'Shift+ArrowDown' );
-			await expect.poll( selectedItems ).toEqual( [ 'Nested Item' ] );
-
-			// A selection across levels takes in the top-level blocks on both
-			// ends.
-			await page.keyboard.press( 'Shift+ArrowDown' );
-			await expect
-				.poll( selectedItems )
-				.toEqual( [ 'Top Level Item 1', 'Top Level Item 2' ] );
+				await page.keyboard.press( key );
+				await expect.poll( selectedItems ).toEqual( [ from ] );
+				await page.keyboard.press( key );
+				await expect.poll( selectedItems ).toEqual( [ from ] );
+				await page.keyboard.press( key );
+				await expect
+					.poll( selectedItems )
+					.toEqual( [ 'Top Level Item 1', 'Top Level Item 2' ] );
+			}
 		} );
 
 		test( 'renders every row in view while scrolling a long menu', async ( {

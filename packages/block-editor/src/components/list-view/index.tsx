@@ -15,6 +15,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { HOME, UP } from '@wordpress/keycodes';
 import ListViewBranch from './branch';
 import {
 	ListViewContext,
@@ -260,11 +261,16 @@ function ListViewComponent(
 		) => {
 			if ( event.shiftKey ) {
 				// An appender row holds no block, so a selection moving off
-				// one goes on from the block above it.
+				// one goes on from the block it came from.
+				const isMovingUp =
+					event.keyCode === UP || event.keyCode === HOME;
 				let blockRow: HTMLElement | null = startRow;
 				while ( blockRow && ! blockRow.dataset.block ) {
-					blockRow =
-						blockRow.previousElementSibling as HTMLElement | null;
+					blockRow = (
+						isMovingUp
+							? blockRow.nextElementSibling
+							: blockRow.previousElementSibling
+					) as HTMLElement | null;
 				}
 				updateBlockSelection(
 					event,

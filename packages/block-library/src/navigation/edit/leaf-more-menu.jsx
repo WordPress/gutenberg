@@ -29,11 +29,11 @@ const BLOCKS_THAT_CAN_BE_CONVERTED_TO_SUBMENU = [
  * The menu item that adds a link inside a Navigation item, turning a link into
  * a submenu first. It is disabled for blocks that cannot become a submenu.
  *
- * @param {Object}   props
- * @param {string}   props.clientId                 The item's block.
- * @param {Function} props.onClose                  Closes the menu.
- * @param {Function} props.updateExpansion          Expands or collapses List View rows.
- * @param {Function} props.setInsertedBlockClientId Marks the new link as just inserted, which opens its Link UI.
+ * @param {Object}                       props
+ * @param {string}                       props.clientId                 The item's block.
+ * @param {() => void}                   props.onClose                  Closes the menu.
+ * @param {( action: Object ) => void}   props.updateExpansion          Expands or collapses List View rows.
+ * @param {( clientId: string ) => void} props.setInsertedBlockClientId Marks the new link as just inserted, which opens its Link UI.
  */
 export function AddSubmenuItem( {
 	clientId,
