@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
+
+### Documentation
+
+-   `getPostEdits`: Document that the returned object includes the transient `blocks` and `selection` edits, which remain after a save, and point to `isEditedPostDirty` and `getEntityRecordNonTransientEdits` for checking unsaved changes ([#87077](https://github.com/WordPress/gutenberg/pull/87077)).
+
 ## 16.2.0 (2026-11-18)
 
 ### New Features
@@ -17,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Editor canvas: Keep the canvas in place while scrolling a selected or inserted block into view ([#87007](https://github.com/WordPress/gutenberg/pull/87007)).
 -   Use matching theme-aware colors for pressed document-tool buttons ([#86684](https://github.com/WordPress/gutenberg/pull/86684)).
 -   Notes: Include an Embed block in a note that spans text on both sides of it ([#86669](https://github.com/WordPress/gutenberg/pull/86669)).
 -   Notes: Add a block-level note for text bound to a source, like post meta or pattern overrides ([#85416](https://github.com/WordPress/gutenberg/pull/85416)).
