@@ -45,6 +45,7 @@ import {
 } from '../suggestion-mode/operations';
 import { getPostFieldName } from '../suggestion-mode/post-field-labels';
 import { useTaxonomyNames } from '../suggestion-mode/use-taxonomy-names';
+import { usePostTitleElement } from '../post-title/title-element';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -120,6 +121,24 @@ export function NoteThread( {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { getSelectedNote } = unlock( useSelect( editorStore ) );
 	const relatedBlockElement = useBlockElement( note.blockClientId );
+	// A post field suggestion lines up with the post title, or with the top
+	// of the content when the canvas shows no title.
+	const titleElement = usePostTitleElement();
+	const firstBlockElement = useBlockElement(
+		useSelect(
+			( select ) =>
+				isPostSuggestion
+					? select( blockEditorStore ).getBlockOrder()[ 0 ]
+					: undefined,
+			[ isPostSuggestion ]
+		)
+	);
+	const postFieldAnchorElement = isPostSuggestion
+		? ( titleElement ??
+			firstBlockElement?.closest( '.is-root-container' ) ??
+			null )
+		: null;
+	const anchorElement = relatedBlockElement ?? postFieldAnchorElement;
 	const setBlockHighlight = useEvent( ( isHighlighted ) =>
 		toggleBlockHighlight( note.blockClientId, isHighlighted )
 	);
@@ -137,10 +156,10 @@ export function NoteThread( {
 	useEffect( () => {
 		const floatingEl = floatingRef.current;
 		if ( floatingEl && registerThread ) {
-			registerThread( note.id, relatedBlockElement, floatingEl );
+			registerThread( note.id, anchorElement, floatingEl );
 		}
 		return () => unregisterThread?.( note.id );
-	}, [ relatedBlockElement, note.id, registerThread, unregisterThread ] );
+	}, [ anchorElement, note.id, registerThread, unregisterThread ] );
 
 	// Scroll the thread into view when it becomes selected, and re-scroll
 	// when its floating position or height settles after `useFloatingBoard`

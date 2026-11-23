@@ -74,7 +74,8 @@ export function Notes( {
 			blockClientId: selectedBlockClientId,
 			content: { rendered: '' },
 		};
-		const out = [];
+		// Post field suggestions have no block; they stay ahead of the rest.
+		const out = notes.filter( ( t ) => ! t.blockClientId );
 		orderedBlockIds.forEach( ( blockId ) => {
 			// Blocks can carry multiple notes — surface them all.
 			const threadsForBlock = notes.filter(

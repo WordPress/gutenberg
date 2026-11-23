@@ -131,6 +131,34 @@ test.describe( 'Suggestion mode: post title', () => {
 		await expect( thread ).not.toContainText( 'Original block deleted.' );
 	} );
 
+	test( 'a title suggestion floats beside the title while the notes sidebar is closed', async ( {
+		editor,
+		page,
+	} ) => {
+		const title = await suggestTitleChange( editor, page );
+		await switchIntent( page, 'Editing' );
+
+		// No block anchors the note, so it lines up with the title.
+		const thread = page
+			.getByRole( 'region', { name: 'Notes' } )
+			.getByRole( 'treeitem', { name: /^Post title note:/ } );
+		await expect( thread ).toBeVisible();
+		await expect( thread ).toHaveCSS( 'opacity', '1' );
+		const titleBox = await title.boundingBox();
+		const threadBox = await thread.boundingBox();
+		expect( Math.abs( threadBox!.y - titleBox!.y ) ).toBeLessThan( 40 );
+
+		// A narrow margin minimizes the card; selecting it shows the actions.
+		await thread.click();
+		await thread
+			.getByRole( 'button', { name: 'Accept suggestion' } )
+			.click();
+		await expect
+			.poll( () => getEditedTitle( page ) )
+			.toBe( 'Original title revised' );
+		await expect( thread ).toBeHidden();
+	} );
+
 	test( 'accepting a title suggestion applies the new title', async ( {
 		editor,
 		page,
