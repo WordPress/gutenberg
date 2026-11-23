@@ -24,6 +24,8 @@ import {
 	useMemo,
 	useRef,
 } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
+import { getDeferredInsertions } from '../../store/utils/suggestion-deferred-insertions';
 import { createSuggestionWriteQueue } from './suggestion-write-queue';
 import type { SuggestionWriteQueue } from './suggestion-write-queue';
 import type { SuggestionOperation } from './operations';
@@ -317,33 +319,44 @@ export function SuggestionSessionProvider( {
 	// consult this set so the first edit inside such a block falls through to
 	// the real attributes, letting the interceptor register the whole block as
 	// a single `block-insert-after` suggestion, instead of opening a separate
-	// inline or attribute suggestion next to the insertion. A ref-set for the
-	// same reason as the bypass set above: it is written from inside
+	// inline or attribute suggestion next to the insertion. A plain set for
+	// the same reason as the bypass set above: it is written from inside
 	// `registry.subscribe` and read synchronously during event handling,
-	// neither of which can wait on React state.
-	const deferredInsertionsRef = useRef( new Set< string >() );
+	// neither of which can wait on React state. It is shared with the save
+	// action, which leaves these blocks out of what a Suggesting save writes.
+	const registry = useRegistry();
+	const deferredInsertions = useMemo(
+		() => getDeferredInsertions( registry ),
+		[ registry ]
+	);
 
-	const markDeferredInsertion = useCallback( ( clientId: string ) => {
-		if ( clientId ) {
-			deferredInsertionsRef.current.add( clientId );
-		}
-	}, [] );
+	const markDeferredInsertion = useCallback(
+		( clientId: string ) => {
+			if ( clientId ) {
+				deferredInsertions.add( clientId );
+			}
+		},
+		[ deferredInsertions ]
+	);
 
-	const unmarkDeferredInsertion = useCallback( ( clientId: string ) => {
-		deferredInsertionsRef.current.delete( clientId );
-	}, [] );
+	const unmarkDeferredInsertion = useCallback(
+		( clientId: string ) => {
+			deferredInsertions.delete( clientId );
+		},
+		[ deferredInsertions ]
+	);
 
 	const isDeferredInsertion = useCallback(
-		( clientId: string ) => deferredInsertionsRef.current.has( clientId ),
-		[]
+		( clientId: string ) => deferredInsertions.has( clientId ),
+		[ deferredInsertions ]
 	);
 
 	// Reset when a Suggest session starts: a block deferred in a previous
 	// session is seeded into the interceptor's snapshot like any other
 	// pre-existing block, so a stale entry would wrongly write edits through.
 	const clearDeferredInsertions = useCallback( () => {
-		deferredInsertionsRef.current.clear();
-	}, [] );
+		deferredInsertions.clear();
+	}, [ deferredInsertions ] );
 
 	/*
 	 * Undo/redo adoption tokens. The undo guard arms one token per undo/redo
