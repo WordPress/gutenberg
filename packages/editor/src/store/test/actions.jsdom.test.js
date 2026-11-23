@@ -41,6 +41,7 @@ const postTypeConfig = {
 const postTypeEntity = {
 	slug: 'post',
 	rest_base: 'posts',
+	supports: { editor: [ { notes: true } ] },
 	labels: {
 		item_updated: 'Updated Post',
 		item_published: 'Post published',
@@ -90,6 +91,11 @@ const unknownPath = ( method, path ) => {
 		message: `Unknown path: ${ method } ${ path }`,
 	};
 };
+
+// Suggesting is only offered with the Suggestion mode experiment on.
+beforeEach( () => {
+	window.__experimentalSuggestionMode = true;
+} );
 
 describe( 'Post actions', () => {
 	describe( 'setCanvasWidth', () => {
@@ -2205,6 +2211,51 @@ describe( 'Editor actions', () => {
 		beforeEach( () => {
 			registry = createRegistryWithStores();
 			speak.mockClear();
+		} );
+
+		it( 'refuses the suggest intent when the experiment is off', () => {
+			delete window.__experimentalSuggestionMode;
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'refuses the suggest intent on a post type without notes support', () => {
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', [
+					{ slug: 'wp_template', supports: { editor: true } },
+				] );
+			registry.dispatch( editorStore ).setEditedPost( 'wp_template', 7 );
+
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
+		} );
+
+		it( 'returns to edit when another post is edited', () => {
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'suggest' );
+
+			registry.dispatch( editorStore ).setEditedPost( 'wp_template', 7 );
+
+			expect(
+				unlock( registry.select( editorStore ) ).getEditorIntent()
+			).toEqual( 'edit' );
 		} );
 
 		it( 'defaults to edit', () => {
