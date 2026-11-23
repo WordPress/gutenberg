@@ -28,6 +28,9 @@
 class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	protected static $admin_id;
 	protected static $editor_id;
+	/**
+	 * @var int
+	 */
 	protected static $contributor_id;
 	protected static $subscriber_id;
 	protected static $author_id;
@@ -46,21 +49,23 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 
-		self::$admin_id       = $factory->user->create(
+		self::$admin_id  = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$editor_id      = $factory->user->create(
+		self::$editor_id = $factory->user->create(
 			array(
 				'role' => 'editor',
 			)
 		);
-		self::$contributor_id = $factory->user->create(
+		$contributor_id  = $factory->user->create(
 			array(
 				'role' => 'contributor',
 			)
 		);
+		self::assertIsInt( $contributor_id );
+		self::$contributor_id = $contributor_id;
 		self::$subscriber_id  = $factory->user->create(
 			array(
 				'role' => 'subscriber',
