@@ -114,11 +114,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Block_Scanner' ) ) {
 			$parser->offset   = 0;
 			while ( true ) {
 				list( $type, $name, $attrs, $start, $length ) = $parser->next_token();
-				if ( 'no-more-tokens' === $type ) {
+				if ( 'no-more-tokens' === $type || ! is_string( $type ) || ! is_string( $name ) || ! is_int( $start ) || ! is_int( $length ) ) {
 					break;
 				}
 				$parser->offset = $start + $length;
-				$delimiters[]   = array( $type, (string) $name, is_array( $attrs ) ? $attrs : null, $start, $length );
+				$delimiters[]   = array( $type, $name, is_array( $attrs ) ? $attrs : null, $start, $length );
 			}
 			return $delimiters;
 		}
