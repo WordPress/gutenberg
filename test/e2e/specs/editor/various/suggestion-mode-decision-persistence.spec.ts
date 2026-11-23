@@ -600,6 +600,37 @@ test.describe( 'Suggestion mode decisions are provisional until the post is save
 		} );
 	} );
 
+	test.describe( 'rejected heading level', () => {
+		// Rejecting changes only the marker, and has to leave the post
+		// dirty for the save that makes the decision final.
+		test( 'decide and save: final', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const postId = await suggestHeadingLevel( { editor, page } );
+			await decideAndReopen( {
+				page,
+				editor,
+				action: 'Reject',
+				save: true,
+			} );
+
+			const state = await readServerState( {
+				page,
+				requestUtils,
+				postId,
+			} );
+			expect( state.note.status ).toBe( 'approved' );
+			expect( state.note.meta._wp_suggestion_status ).toBe( 'rejected' );
+			expect( state.rawPostContent ).not.toContain( '"level":3' );
+			expect( state.rawPostContent ).not.toContain(
+				'pending-attributes'
+			);
+			expect( state.frontEnd ).toContain( '<h2' );
+		} );
+	} );
+
 	test.describe( 'a note left final with its marker still in the post', () => {
 		/**
 		 * Seeds the state an editor from before the save pass left behind:
