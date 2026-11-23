@@ -202,13 +202,6 @@ function gutenberg_register_suggestion_meta() {
 				return strlen( $value ) > $max_suggestion_payload_bytes ? '' : $value;
 			},
 			'auth_callback'     => function ( $allowed, $meta_key, $object_id ) {
-				// During comment creation the comment does not yet exist, so
-				// `object_id` is 0. Defer to the comment controller's own
-				// create permission — if the request can create the
-				// comment at all, it can set the suggestion meta on it.
-				if ( ! $object_id ) {
-					return current_user_can( 'edit_posts' );
-				}
 				$comment = get_comment( $object_id );
 				if ( $comment && 'note' === $comment->comment_type ) {
 					return current_user_can( 'edit_post', $comment->comment_post_ID );
