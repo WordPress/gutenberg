@@ -347,12 +347,13 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	/**
 	 * Creates a pending format suggestion note on a post.
 	 *
-	 * @param int    $post_id     Post the note belongs to.
-	 * @param string $before_html Original run recorded on the note.
-	 * @param string $status      Suggestion lifecycle status, if any.
+	 * @param int|WP_Error $post_id     Post the note belongs to, as the factory returned it.
+	 * @param string       $before_html Original run recorded on the note.
+	 * @param string       $status      Suggestion lifecycle status, if any.
 	 * @return int Note comment ID.
 	 */
-	private function create_format_note( $post_id, $before_html, $status = '' ) {
+	private function create_format_note( $post_id, string $before_html, string $status = '' ): int {
+		$this->assertIsInt( $post_id );
 		$note_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID'  => $post_id,
@@ -371,9 +372,9 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 				),
 			),
 		);
+		$this->assertIsInt( $note_id );
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
 		if ( $status ) {
-			$this->assertIsInt( $note_id );
 			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 		}
 		return $note_id;
@@ -395,19 +396,22 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	/**
 	 * Renders a paragraph block as the content of the given post.
 	 *
-	 * @param int    $post_id Post being rendered.
-	 * @param string $html    Paragraph HTML.
-	 * @param bool   $store   Whether to store the paragraph as the post's
-	 *                        content first.
+	 * @param int|WP_Error $post_id Post being rendered, as the factory returned it.
+	 * @param string       $html    Paragraph HTML.
+	 * @param bool         $store   Whether to store the paragraph as the post's
+	 *                              content first.
 	 * @return string Rendered content.
 	 */
-	private function strip_in_post( $post_id, $html, $store = true ) {
+	private function strip_in_post( $post_id, string $html, bool $store = true ): string {
+		$this->assertIsInt( $post_id );
 		$content = '<!-- wp:paragraph -->' . $html . '<!-- /wp:paragraph -->';
 		if ( $store ) {
 			$this->set_post_content( $post_id, $content );
 		}
 		$GLOBALS['post'] = get_post( $post_id );
-		return $this->without_paragraph_class( trim( apply_filters( 'the_content', $content ) ) );
+		$rendered        = apply_filters( 'the_content', $content );
+		$this->assertIsString( $rendered );
+		return $this->without_paragraph_class( trim( $rendered ) );
 	}
 
 	/**
@@ -416,7 +420,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	 * @param string $html Rendered HTML.
 	 * @return string HTML without the paragraph block class.
 	 */
-	private function without_paragraph_class( $html ) {
+	private function without_paragraph_class( string $html ): string {
 		return str_replace( ' class="wp-block-paragraph"', '', $html );
 	}
 
@@ -484,7 +488,12 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 		list( $post_id ) = $this->create_post_with_format_change();
 		$GLOBALS['post'] = get_post( $post_id );
 
-		$this->assertStringContainsString( '<p>Hello <em>world</em></p>', $this->without_paragraph_class( apply_filters( 'the_content', get_post( $post_id )->post_content ) ) );
+		$post = get_post( $post_id );
+		$this->assertInstanceOf( WP_Post::class, $post );
+		$rendered = apply_filters( 'the_content', $post->post_content );
+		$this->assertIsString( $rendered );
+
+		$this->assertStringContainsString( '<p>Hello <em>world</em></p>', $this->without_paragraph_class( $rendered ) );
 	}
 
 	public function test_marker_outside_post_content_is_not_resolved() {
@@ -768,7 +777,7 @@ class Tests_Strip_Inline_Suggestion_Markers extends WP_UnitTestCase {
 	 * @param string $original Original run the format note records.
 	 * @param string $expected Rendered HTML.
 	 */
-	public function test_nested_marker_kinds( $html, $original, $expected ) {
+	public function test_nested_marker_kinds( string $html, string $original, string $expected ): void {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_format_note( $post_id, $original );
 		$html    = str_replace( '%f', (string) $note_id, $html );
