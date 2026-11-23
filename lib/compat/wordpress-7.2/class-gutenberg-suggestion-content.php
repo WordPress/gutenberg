@@ -68,22 +68,22 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * the outermost addition's note, and the anchor index finds them in the
 		 * re-inflated content.
 		 *
-		 * @param string             $content Serialized content, as kses left it.
-		 * @param array<int, true>   $notes   Suggestion note ids of the post.
 		 * A formatting change is only moved out when its note recorded the
-		 * original run (`$originals`, the payload's `beforeHTML`), that run has
-		 * the same text as the marked one, and no other marker sits inside it.
-		 * Otherwise it stays in full form and the render strip swaps in the
-		 * original, so a stale original can never publish the wrong text.
+		 * original run (`$originals`, the payload's `beforeHTML`), the marked
+		 * run is that original plus what the suggestion changed (see
+		 * `is_original_of()`), and no other marker sits inside it. Otherwise it
+		 * stays in full form for the render strip, so a stale original never
+		 * replaces text or markup that was edited since.
 		 *
 		 * @param string                $content   Serialized content, as kses left it.
 		 * @param array<int, true>      $notes     Suggestion note ids of the post.
 		 * @param array<int, true>      $exclude   Note ids whose markers to leave in full form.
 		 * @param array<int, string>    $originals Original run of each formatting suggestion.
+		 * @param array<int, array[]>   $deltas    Delta of each formatting suggestion that recorded one.
 		 * @return array{content: string, items: array<int, array[]>} The
 		 *         anchored content and, per note, the extracted items.
 		 */
-		public static function extract( $content, $notes, $exclude = array(), $originals = array() ) {
+		public static function extract( $content, $notes, $exclude = array(), $originals = array(), $deltas = array() ) {
 			$result = array(
 				'content' => $content,
 				'items'   => array(),
@@ -103,7 +103,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			};
 
 			$content = self::extract_blocks( $content, $notes, $exclude, $next_run, $result['items'] );
-			$content = self::extract_inline( $content, $notes, $exclude, $originals, $next_run, $result['items'] );
+			$content = self::extract_inline( $content, $notes, $exclude, $originals, $deltas, $next_run, $result['items'] );
 			$content = self::extract_moves( $content, $notes, $exclude, $next_run, $result['items'] );
 
 			$result['content'] = $content;
@@ -385,11 +385,12 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		 * @param array<int, true>   $notes     Suggestion note ids of the post.
 		 * @param array<int, true>   $exclude   Note ids to leave in full form.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
+		 * @param array<int, array[]> $deltas   Delta of each formatting suggestion that recorded one.
 		 * @param callable           $next_run  Run allocator.
 		 * @param array<int, array[]> $items   Items per note id, added to.
 		 * @return string Content.
 		 */
-		private static function extract_inline( $content, $notes, $exclude, $originals, $next_run, &$items ) {
+		private static function extract_inline( $content, $notes, $exclude, $originals, $deltas, $next_run, &$items ) {
 			if ( false === strpos( $content, 'wp-suggestion-' ) ) {
 				return $content;
 			}
@@ -422,7 +423,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 						! isset( $notes[ $note_id ], $originals[ $note_id ] ) ||
 						! is_string( $originals[ $note_id ] ) ||
 						$marker['inner_markers'] > 0 ||
-						self::text_of( $originals[ $note_id ] ) !== self::text_of( substr( $content, $inner_start, $marker['closer'][0] - $inner_start ) )
+						! self::is_original_of( $originals[ $note_id ], substr( $content, $inner_start, $marker['closer'][0] - $inner_start ), $deltas[ $note_id ] ?? null )
 					) {
 						continue;
 					}
@@ -829,20 +830,72 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 		}
 
 		/**
-		 * The text of an HTML fragment, entities decoded.
+		 * Whether a formatting suggestion's recorded original is the marked
+		 * run without the suggestion.
 		 *
-		 * @param string $html HTML.
-		 * @return string Text.
+		 * Both must hold the same characters, and each character's formatting
+		 * may differ only by what the suggestion changed there: as many
+		 * elements more and fewer as the delta adds and removes at that
+		 * offset. Without a delta, a character must not swap an element for
+		 * the same element with other attributes (a link whose address
+		 * changed), which is an edit to the text's own markup. Anything the
+		 * character split does not understand counts as a mismatch.
+		 *
+		 * @param string $original Recorded original (`beforeHTML`).
+		 * @param string $run      Marked run, with the proposed formatting.
+		 * @param mixed  $delta    The suggestion's delta, or null when it recorded none.
+		 * @return bool
 		 */
-		private static function text_of( $html ) {
-			$processor = new WP_HTML_Tag_Processor( $html );
-			$text      = '';
-			while ( $processor->next_token() ) {
-				if ( '#text' === $processor->get_token_type() ) {
-					$text .= $processor->get_modifiable_text();
-				}
+		private static function is_original_of( string $original, string $run, $delta ): bool {
+			$before = gutenberg_get_inline_suggestion_characters( $original );
+			$now    = gutenberg_get_inline_suggestion_characters( $run );
+			if ( null === $before || null === $now || count( $before ) !== count( $now ) ) {
+				return false;
 			}
-			return $text;
+			$formatting = static function ( array $stack ): array {
+				$elements = array();
+				foreach ( $stack as $element ) {
+					// Markers and note highlights are not the text's formatting.
+					if ( null === $element['kind'] && ! $element['note'] ) {
+						$elements[ $element['opener'] ] = $element['tag'];
+					}
+				}
+				return $elements;
+			};
+
+			// A delta counts UTF-16 code units, as the editor's rich text does.
+			$offset = 0;
+			foreach ( $now as $index => $character ) {
+				if ( $character['html'] !== $before[ $index ]['html'] ) {
+					return false;
+				}
+				$was     = $formatting( $before[ $index ]['stack'] );
+				$is      = $formatting( $character['stack'] );
+				$added   = array_diff_key( $is, $was );
+				$removed = array_diff_key( $was, $is );
+				if ( $added || $removed ) {
+					if ( ! is_array( $delta ) ) {
+						if ( array_intersect( $added, $removed ) ) {
+							return false;
+						}
+					} else {
+						$may_add    = 0;
+						$may_remove = 0;
+						foreach ( $delta as $entry ) {
+							if ( is_array( $entry ) && isset( $entry['offset'], $entry['length'] ) && $entry['offset'] <= $offset && $offset < $entry['offset'] + $entry['length'] ) {
+								$may_add    += isset( $entry['added'] ) && is_array( $entry['added'] ) ? count( $entry['added'] ) : 0;
+								$may_remove += isset( $entry['removed'] ) && is_array( $entry['removed'] ) ? count( $entry['removed'] ) : 0;
+							}
+						}
+						if ( count( $added ) > $may_add || count( $removed ) > $may_remove ) {
+							return false;
+						}
+					}
+				}
+				$is_astral = 4 === strlen( $character['html'] ) && ord( $character['html'] ) >= 0xF0;
+				$offset   += $is_astral ? 2 : 1;
+			}
+			return true;
 		}
 
 		/**

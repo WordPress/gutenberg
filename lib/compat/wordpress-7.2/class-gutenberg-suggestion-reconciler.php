@@ -124,7 +124,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					return $data;
 				}
 				$state     = self::stored_state( $parent_id );
-				$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
+				$extracted = self::extract( $incoming, $state['notes'], $state['originals'], $state['deltas'] );
 
 				self::$revisions[ $parent_id ][] = self::merge_items( $state['items'], $extracted['items'] );
 				$data['post_content']            = wp_slash( $extracted['content'] );
@@ -156,7 +156,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			}
 
 			$state     = self::stored_state( $post_id );
-			$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
+			$extracted = self::extract( $incoming, $state['notes'], $state['originals'], $state['deltas'] );
 
 			self::$previous[ $post_id ][] = array(
 				'previous'      => $previous,
@@ -530,12 +530,13 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param string             $content   Content.
 		 * @param array<int, mixed>  $notes     Suggestion notes of the post, by note ID.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
+		 * @param array<int, array[]> $deltas   Delta of each formatting suggestion that recorded one.
 		 * @return array{content: string, items: array<int, array[]>, skipped: array<int, true>}
 		 */
-		private static function extract( $content, $notes, $originals ) {
+		private static function extract( $content, $notes, $originals, $deltas ) {
 			$exclude = array();
 			while ( true ) {
-				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals );
+				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals, $deltas );
 				$over   = array();
 				foreach ( $result['items'] as $note_id => $items ) {
 					if ( strlen( Gutenberg_Suggestion_Content::encode( $items ) ) > GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES ) {
@@ -556,15 +557,19 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * outer write's proposals as stored).
 		 *
 		 * @param int $post_id Post ID.
-		 * @return array{notes: array<int, string>, items: array<int, array[]>, originals: array<int, string>}
+		 * @return array{notes: array<int, string>, items: array<int, array[]>, originals: array<int, string>, deltas: array<int, array[]>}
 		 */
 		private static function stored_state( $post_id ) {
 			$notes     = self::suggestion_notes( $post_id );
 			$originals = array();
+			$deltas    = array();
 			foreach ( array_keys( $notes ) as $note_id ) {
-				$original = self::format_original( $note_id );
-				if ( null !== $original ) {
-					$originals[ $note_id ] = $original;
+				$operation = self::format_operation( $note_id );
+				if ( null !== $operation ) {
+					$originals[ $note_id ] = $operation['beforeHTML'];
+					if ( isset( $operation['delta'] ) && is_array( $operation['delta'] ) ) {
+						$deltas[ $note_id ] = $operation['delta'];
+					}
 				}
 			}
 			if ( ! empty( self::$previous[ $post_id ] ) ) {
@@ -577,23 +582,25 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				'notes'     => $notes,
 				'items'     => $items,
 				'originals' => $originals,
+				'deltas'    => $deltas,
 			);
 		}
 
 		/**
-		 * The original run a formatting suggestion recorded (`beforeHTML`).
+		 * The operation of a formatting suggestion that recorded its original
+		 * run (`beforeHTML`).
 		 *
 		 * @param int $note_id Note ID.
-		 * @return string|null The run, or null for any other suggestion.
+		 * @return array<string, mixed>|null The operation, or null for any other suggestion.
 		 */
-		private static function format_original( $note_id ) {
+		private static function format_operation( $note_id ) {
 			$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
 			if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
 				return null;
 			}
 			foreach ( $payload['operations'] as $operation ) {
 				if ( is_array( $operation ) && isset( $operation['suggestionType'], $operation['beforeHTML'] ) && 'format' === $operation['suggestionType'] && is_string( $operation['beforeHTML'] ) ) {
-					return $operation['beforeHTML'];
+					return $operation;
 				}
 			}
 			return null;
