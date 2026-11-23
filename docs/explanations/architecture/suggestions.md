@@ -407,9 +407,15 @@ The server validates every `post-attribute-set` op before a note is stored (see 
 
 ### Auto-save
 
-There is no manual "Submit" step: `SuggestionAutoSave` watches the blocks that carry a `metadata.suggestion` marker and, after ~1.5 s of idle time on a given block, persists the operations derived from the marker and the live tree as a note comment (`operationsFromMarker` for the proposal, the interceptor's recorded capture or `structuralOpFromMarker` for the structural op). The note id is written back onto the marker as `commentId`, and the hook keeps a fingerprint of the last synced operations per block, so subsequent edits update the same note rather than creating new ones. A marker left proposing nothing trashes the note; a marker that disappears is the note collector's business. Ids read from content are only hints: auto-save updates or trashes a note on their account only when core-data shows it as a pending note on this post.
+There is no manual "Submit" step: `SuggestionAutoSave` watches the blocks that carry a `metadata.suggestion` marker and, after ~1.5 s of idle time on a given block, persists the operations derived from the marker and the live tree as a note comment (`operationsFromMarker` for the proposal, the interceptor's recorded capture or `structuralOpFromMarker` for the structural op). The note id is written back onto the marker as `commentId`, and the hook keeps a fingerprint of the last synced operations per block, so subsequent edits update the same note rather than creating new ones. A marker left proposing nothing trashes the note; a marker that disappears is the note collector's business. Ids read from content are only hints: auto-save updates or trashes a note on their account only when core-data shows it as a pending note on this post that the current user wrote. Authorship read from content is a hint too. Auto-save saves only a marker whose `authorId` is the current user's, so a marker with no `authorId` is nobody's and is never saved as a note, and nothing is saved until the current user has resolved. The submission hook checks the same thing before it rewrites or trashes any note for the suggester: the note must be a `note` on this post written by the current user, whatever a marker's `data-author` or `authorId` claims.
+
+A save that fails is retried up to three times, five seconds apart, and a marker change schedules a fresh save. Saves still waiting out their debounce are sent when the page is hidden (`visibilitychange`, `pagehide`), when Suggestion mode is left and on unmount, so closing the tab inside the idle window does not leave a marker without a note. That is best effort: a browser may drop a request started while the page unloads.
 
 A block is linked to a suggestion's note twice. `metadata.noteId` is the Notes link, shared with ordinary notes: the list of every note on the block, kept in step by the submission hook outside undo history. The marker's `commentId` says which of those notes the marker belongs to, since one block can carry several notes and several nested markers. The `commentId` write-back is best-effort, so a marker without one (the write was lost, or the editor was reloaded first) is matched through `metadata.noteId` to the block's pending note of the same shape, and a second note is never opened.
+
+An inline suggestion is found by neither link. Its `<mark>` travels with the text, so Accept and Reject locate it by the marker's id across the block tree (`findInlineMarker()` in `anchor-index.ts`), trying the linked block and the attribute the payload names first. A merge that carries the marked text into another block, or a transform that drops `metadata.noteId` or renames the attribute, leaves the suggestion decidable. The anchor index reads inline anchors the same way, from every rich-text attribute of every block, as the server does.
+
+The inline keyboards only handle a rich-text field whose key is one of the block type's attributes. A field with any other identifier, such as a table cell (`body.0.cells.0.content`), is left to the block's own `onChange`, and the edit becomes an attribute suggestion on the block.
 
 ## Inline suggestion markers
 
@@ -521,7 +527,7 @@ One set of JSON fixtures drives every layer, so a combination is written once an
 
 ### Block-level overlaps
 
-A block has one `metadata.suggestion` marker, the outermost suggestion on it. Other authors' suggestions on the same block sit in its `nested` list, one entry per author, each a `pending-attributes` or `pending-remove` marker with its own `commentId`, `authorId` and `after` (`marker.ts`). They are entries rather than a map keyed by note id because a new proposal has no note id until auto-save opens its note. What the block shows is every proposal's `after` merged in note id order (`displayedProposal()`), unsaved ones last, so where two proposals set one attribute the later one wins.
+A block has one `metadata.suggestion` marker, the outermost suggestion on it. Other authors' suggestions on the same block sit in its `nested` list, one entry per author, each a `pending-attributes` or `pending-remove` marker with its own `commentId`, `authorId` and `after` (`marker.ts`). A marker belongs to the user its `authorId` names. One with no `authorId` belongs to no known user: another user's edit nests beside it and does not fold into it. They are entries rather than a map keyed by note id because a new proposal has no note id until auto-save opens its note. What the block shows is every proposal's `after` merged in note id order (`displayedProposal()`), unsaved ones last, so where two proposals set one attribute the later one wins.
 
 | Another author… | On A's `pending-insert` block | On A's `pending-attributes` | On A's `pending-move` |
 | --- | --- | --- | --- |
@@ -599,7 +605,7 @@ useSuggestionsProvider() → {
 }
 ```
 
-The current implementation keeps every note read and write in `SuggestionStore` (`suggestion-store.ts`), which uses comment meta. A CRDT-backed implementation would replace that store with the same methods on top (see [Moving storage to Yjs attribution](#moving-storage-to-yjs-attribution)).
+The current implementation keeps the note writes of the submission and decision hooks in `SuggestionStore` (`suggestion-store.ts`), which uses comment meta. It is not yet the only way to a note: the note collector, the format keyboard and the marker guard write the comment entity directly, and about thirty reads of `_wp_suggestion` across the editor package take the comment record as it is. A CRDT-backed implementation would have to move those behind the store before it could replace it (see [Moving storage to Yjs attribution](#moving-storage-to-yjs-attribution)).
 
 ## Accept / Reject
 
@@ -861,7 +867,7 @@ Suggestions are stored in comment meta. The design keeps two boundaries so that 
 
 Each boundary swaps one thing:
 
-- **`SuggestionStore`** (`suggestion-store.ts`) is every read and write of a suggestion's note. A Yjs-backed store would sit beside the comment-meta one, and `useSuggestionsProvider` would keep its interface: create writes attributed changes to the document, and accept and reject resolve them there, then record the outcome in comment meta.
+- **`SuggestionStore`** (`suggestion-store.ts`) is the note writes of the submission and decision hooks. The remaining direct reads and writes of the comment entity (see [Provider Interface](#provider-interface)) have to move behind it first. A Yjs-backed store would then sit beside the comment-meta one, and `useSuggestionsProvider` would keep its interface: create writes attributed changes to the document, and accept and reject resolve them there, then record the outcome in comment meta.
 - **`findMarkerRange`** (`inline-markers/`) is the only place an inline marker's offsets are resolved. With attribution, the range would come from the document and not from a scan for the marker's id.
 
 The review UI consumes operations, not storage details, so it would not change. Comment meta would stay too: a session without real-time collaboration still needs server-side persistence, so the comment-meta store becomes the fallback and is not retired.
@@ -905,6 +911,6 @@ These are non-obvious details worth knowing when reading the code:
 
     A decision is undone and redone with its note: undo reopens the note when the decided marker comes back, and a redo that takes the marker away again gives the note its earlier decision back (provisional, until the post is saved) instead of trashing it; a note opened for a keystroke that never wrote its marker (the text around the run's anchor changed or the intent changed during the note round trip) is trashed by the keyboard that opened it.
 
-    The collector never trashes an anchor it has not observed, so a note stranded by a closed editor stays pending, and never trashes another author's note: removing someone else's suggestion and saving marks their note `outdated` instead. An own anchor removed outside Gutenberg (the classic editor, a plugin's `wp_update_post()`) leaves the note pending, since the save pass leaves the saver's own notes to the collector.
+    The collector never trashes an anchor it has not observed, so a note stranded by a closed editor stays pending. What it observed belongs to one post: when the editor is handed another post, scheduled collections are dropped. It cannot tell why an anchor left, so a collaborator deleting the suggested text makes the owner's open editor trash the note before a save can mark it `outdated`. It never trashes another author's note: removing someone else's suggestion and saving marks their note `outdated` instead. An own anchor removed outside Gutenberg (the classic editor, a plugin's `wp_update_post()`) leaves the note pending, since the save pass leaves the saver's own notes to the collector.
 
     Copying whole blocks (from the keyboard or the block menu) strips markers and note links, and cut unwraps them from the clipboard HTML, but the browser's native copy of a partial rich-text selection still duplicates the `data-suggestion-id`, so two markers can point at one note.
