@@ -76,7 +76,7 @@
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/theme": "file:../theme",
 		"storybook": "^10.6.6",
-		"vitest": "^5.1.0",
+		"vitest": "^5.1.1",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {
