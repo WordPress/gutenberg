@@ -23,8 +23,9 @@ import type { ListViewBranchProps, ListViewExpansionState } from './types';
  * Whether the List View offers an appender for the inner blocks of a block,
  * as the end of its expanded list or as the first item of an empty one. The
  * block must hold inner blocks, show an appender for them on the canvas, and
- * allow inserting. Otherwise the row would hold nothing to focus, and the
- * arrow keys would stop at it.
+ * allow editing and inserting. Otherwise the row would hold nothing to focus,
+ * and the arrow keys would stop at it, or it would add blocks the List View
+ * hides.
  *
  * @param select   The registry's select function.
  * @param clientId The block.
@@ -33,9 +34,11 @@ function canAppendInListView(
 	select: SelectFunction,
 	clientId: string
 ): boolean {
-	const { getBlockListSettings, getTemplateLock, isZoomOut } = unlock(
-		select( blockEditorStore )
-	);
+	const { canEditBlock, getBlockListSettings, getTemplateLock, isZoomOut } =
+		unlock( select( blockEditorStore ) );
+	if ( ! canEditBlock( clientId ) ) {
+		return false;
+	}
 	const listSettings = getBlockListSettings( clientId );
 	if ( ! listSettings || listSettings.hidesAppender ) {
 		return false;
@@ -102,21 +105,31 @@ function ListViewEmptyContainerAppender( {
  * When a block is collapsed, we do not count their children as part of that total. In the current drag
  * implementation dragged blocks and their children are not counted.
  *
+ * With nested appenders, the appender row of a block's inner blocks counts
+ * too, so the positions match the rows on screen.
+ *
  * @param block               block tree
  * @param expansionState      state that notes which branches are collapsed
  * @param draggedClientIds    a list of dragged client ids
  * @param isExpandedByDefault flag to determine the default fallback expanded state.
+ * @param canAppend           whether a block gets an appender row, when nested appenders are shown.
  * @return block count
  */
 function countBlocks(
 	block: ClientIdsTreeNode,
 	expansionState: ListViewExpansionState,
 	draggedClientIds: string[] | undefined,
-	isExpandedByDefault: boolean | undefined
+	isExpandedByDefault: boolean | undefined,
+	canAppend?: ( clientId: string ) => boolean
 ): number {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {
 		return 0;
+	}
+	const appenderRows = canAppend?.( block.clientId ) ? 1 : 0;
+	// An empty block shows its appender row whether or not it is expanded.
+	if ( ! block.innerBlocks.length ) {
+		return 1 + appenderRows;
 	}
 	const isExpanded = expansionState[ block.clientId ] ?? isExpandedByDefault;
 	if ( ! isExpanded ) {
@@ -129,9 +142,11 @@ function countBlocks(
 				innerBlock,
 				expansionState,
 				draggedClientIds,
-				isExpandedByDefault
+				isExpandedByDefault,
+				// A block without an appender row offers none inside it.
+				appenderRows ? canAppend : undefined
 			),
-		1
+		1 + appenderRows
 	);
 }
 
@@ -186,6 +201,16 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 	const syncedBranch = isSyncedBranch || isParentSynced;
 
+	// With nested appenders, every rendered list ends with an appender. A
+	// collapsed list renders no branch, so expanding a block is what shows the
+	// appender for its items.
+	const showAppender = isTopLevel ? showAppenderProp : canParentAppend;
+	// A block that offers no appender offers none for anything inside it
+	// either, such as the pages a Page List shows.
+	const showDescendantAppenders = isTopLevel
+		? showInnerBlockAppenders
+		: showAppender;
+
 	const {
 		blockDropPosition,
 		blockDropTargetIndex,
@@ -196,20 +221,39 @@ function ListViewBranch( props: ListViewBranchProps ) {
 	} = useListViewTreeState();
 	const insertedBlockClientId = useInsertedBlockClientId();
 
+	// The rows each block takes, appender rows included. Which blocks get an
+	// appender row depends on the store, so it is only worked out when nested
+	// appenders are shown.
+	const rowCountsWithAppenders = useSelect(
+		( select ) =>
+			showDescendantAppenders
+				? blocks
+						.filter( Boolean )
+						.map( ( block ) =>
+							countBlocks(
+								block,
+								expansionState,
+								draggedClientIds,
+								isExpanded,
+								( clientId ) =>
+									canAppendInListView( select, clientId )
+							)
+						)
+				: undefined,
+		[
+			blocks,
+			expansionState,
+			draggedClientIds,
+			isExpanded,
+			showDescendantAppenders,
+		]
+	);
+
 	if ( ! canParentExpand ) {
 		return null;
 	}
 
 	const filteredBlocks = blocks.filter( Boolean );
-	// With nested appenders, every rendered list ends with an appender. A
-	// collapsed list renders no branch, so expanding a block is what shows the
-	// appender for its items.
-	const showAppender = isTopLevel ? showAppenderProp : canParentAppend;
-	// A block that offers no appender offers none for anything inside it
-	// either, such as the pages a Page List shows.
-	const showDescendantAppenders = isTopLevel
-		? showInnerBlockAppenders
-		: showAppender;
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -247,12 +291,10 @@ function ListViewBranch( props: ListViewBranchProps ) {
 
 		// The next sibling is offset by this block's subtree.
 		const blockListPosition = nextPosition;
-		nextPosition += countBlocks(
-			block,
-			expansionState,
-			draggedClientIds,
-			isExpanded
-		);
+		const blockRowCount =
+			rowCountsWithAppenders?.[ index ] ??
+			countBlocks( block, expansionState, draggedClientIds, isExpanded );
+		nextPosition += blockRowCount;
 
 		const isDragged = !! draggedClientIds?.includes( clientId );
 
@@ -298,7 +340,8 @@ function ListViewBranch( props: ListViewBranchProps ) {
 		const showNestedBlocks = hasNestedBlocks && shouldExpand && ! isDragged;
 
 		if ( ! showBlock ) {
-			placeholderRows += 1;
+			// An empty block's appender row is left out with it.
+			placeholderRows += hasNestedBlocks ? 1 : blockRowCount;
 			placeholderKey ??= clientId;
 
 			// Inner blocks of an off-window block may still be in view.

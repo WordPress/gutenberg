@@ -259,10 +259,17 @@ function ListViewComponent(
 			endRow: HTMLElement
 		) => {
 			if ( event.shiftKey ) {
+				// An appender row holds no block, so a selection moving off
+				// one goes on from the block above it.
+				let blockRow: HTMLElement | null = startRow;
+				while ( blockRow && ! blockRow.dataset.block ) {
+					blockRow =
+						blockRow.previousElementSibling as HTMLElement | null;
+				}
 				updateBlockSelection(
 					event,
 					// Tree grid rows carry `data-block`.
-					startRow?.dataset?.block as string,
+					blockRow?.dataset?.block as string,
 					endRow?.dataset?.block
 				);
 			}

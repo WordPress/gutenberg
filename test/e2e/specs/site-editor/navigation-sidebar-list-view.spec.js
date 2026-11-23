@@ -721,6 +721,159 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 
+		test( 'shows no appender in an empty Social Icons block locked against editing', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Locked Social Icons Menu',
+					content: `<!-- wp:social-links {"lock":{"edit":true}} --><ul class="wp-block-social-links"></ul><!-- /wp:social-links -->
+<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+				}
+			);
+
+			// The List View hides the inner blocks of a block locked against
+			// editing, so an icon added to it could not be shown.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 1 ] );
+		} );
+
+		test( 'extends the selection past an appender with Shift and the arrow keys', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const selectedItems = () =>
+				listView
+					.locator(
+						'.block-editor-list-view-block__contents-cell[aria-selected="true"]'
+					)
+					.evaluateAll( ( cells ) =>
+						cells.map(
+							( cell ) => cell.innerText.split( '\n' )[ 0 ]
+						)
+					);
+
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 3, 2, 1 ] );
+
+			// Focus the row without clicking it, since a click opens the
+			// Settings popover, which takes focus from the row.
+			await listView
+				.getByRole( 'gridcell', { name: 'Nested Item', exact: true } )
+				.getByRole( 'link' )
+				.focus();
+
+			// The next two rows are the appenders of the nested submenu and of
+			// its parent. They hold no block, so moving onto them selects only
+			// the block the selection started from.
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect.poll( selectedItems ).toEqual( [ 'Nested Item' ] );
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect.poll( selectedItems ).toEqual( [ 'Nested Item' ] );
+
+			// A selection across levels takes in the top-level blocks on both
+			// ends.
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( selectedItems )
+				.toEqual( [ 'Top Level Item 1', 'Top Level Item 2' ] );
+		} );
+
+		test( 'renders every row in view while scrolling a long menu', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			// Each submenu adds an appender row, so a long menu has many rows
+			// that are not blocks.
+			const submenus = Array.from(
+				{ length: 70 },
+				( _, index ) =>
+					`<!-- wp:navigation-submenu {"label":"Submenu ${
+						index + 1
+					}","type":"custom","url":"https://wordpress.org/${
+						index + 1
+					}","kind":"custom"} --><!-- wp:navigation-link {"label":"Item ${
+						index + 1
+					}","type":"custom","url":"https://wordpress.org/${
+						index + 1
+					}/item","kind":"custom"} /--><!-- /wp:navigation-submenu -->`
+			).join( '' );
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				{
+					title: 'Long Menu',
+					content:
+						submenus +
+						'<!-- wp:navigation-link {"label":"Top Level Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->',
+				}
+			);
+
+			// Scrolls the list a screen at a time, and returns, for each
+			// stop, how many pixels in view are covered by placeholders
+			// instead of rows.
+			const blankHeights = () =>
+				listView.evaluate( async ( grid ) => {
+					let scroller = grid.parentElement;
+					while (
+						scroller &&
+						! (
+							/auto|scroll/.test(
+								scroller.ownerDocument.defaultView.getComputedStyle(
+									scroller
+								).overflowY
+							) && scroller.scrollHeight > scroller.clientHeight
+						)
+					) {
+						scroller = scroller.parentElement;
+					}
+					const { defaultView } = grid.ownerDocument;
+					const nextFrame = () =>
+						new Promise( ( resolve ) =>
+							defaultView.requestAnimationFrame( () =>
+								defaultView.requestAnimationFrame( resolve )
+							)
+						);
+					const maxTop =
+						scroller.scrollHeight - scroller.clientHeight;
+					const heights = [];
+					for ( let top = 0; ; top += scroller.clientHeight ) {
+						scroller.scrollTop = Math.min( top, maxTop );
+						await nextFrame();
+						const view = scroller.getBoundingClientRect();
+						let blank = 0;
+						for ( const cell of grid.querySelectorAll(
+							'.block-editor-list-view-placeholder'
+						) ) {
+							const rect = cell.getBoundingClientRect();
+							blank += Math.max(
+								0,
+								Math.min( rect.bottom, view.bottom ) -
+									Math.max( rect.top, view.top )
+							);
+						}
+						heights.push( Math.round( blank ) );
+						if ( top >= maxTop ) {
+							return heights;
+						}
+					}
+				} );
+
+			await expect
+				.poll( async () => Math.max( ...( await blankHeights() ) ) )
+				.toBe( 0 );
+		} );
+
 		test( 'turns a link into a submenu from its Options menu', async ( {
 			admin,
 			page,
@@ -754,6 +907,54 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					} )
 					.filter( { hasText: 'Block 1 of 1, Level 2.' } )
 			).toBeVisible();
+		} );
+
+		test( 'turns the new submenu back into a link when no page is picked', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const listView = await openSidebarListView(
+				{ admin, page, requestUtils },
+				nestedMenuFixture
+			);
+			const linkRow = listView.getByRole( 'row' ).filter( {
+				has: page.getByRole( 'link', {
+					name: 'Top Level Item 2',
+					exact: true,
+				} ),
+			} );
+
+			await linkRow.getByRole( 'gridcell' ).first().hover();
+			await linkRow.getByRole( 'button', { name: 'Options' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Add submenu link' } )
+				.click();
+
+			// The new submenu ends with its own appender while its new link
+			// waits for a page.
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 3, 2, 2, 1 ] );
+
+			// Closing the page search removes the new link, and the submenu
+			// it leaves empty turns back into a link.
+			await page.keyboard.press( 'Escape' );
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 3, 2, 1 ] );
+
+			// An empty submenu would show an appender while selected, and a
+			// link never does.
+			await listView
+				.getByRole( 'gridcell', {
+					name: 'Top Level Item 2',
+					exact: true,
+				} )
+				.click();
+			await expect
+				.poll( () => appenderLevels( listView ) )
+				.toEqual( [ 3, 2, 1 ] );
 		} );
 	} );
 } );
