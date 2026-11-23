@@ -128,7 +128,7 @@ function gutenberg_client_final_suggestion_status_allowed( ?bool $allowed = null
 	if ( null !== $allowed ) {
 		$is_allowed = $allowed;
 	}
-	return $is_allowed;
+	return true === $is_allowed;
 }
 
 /**

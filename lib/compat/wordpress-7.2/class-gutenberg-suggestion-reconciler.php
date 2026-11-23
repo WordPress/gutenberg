@@ -186,20 +186,20 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$stored = (string) get_comment_meta( $note_id, '_wp_suggestion_content', true );
 				if ( empty( $effective[ $note_id ] ) ) {
 					if ( '' !== $stored ) {
-						gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_content' );
+						gutenberg_delete_suggestion_server_meta( (int) $note_id, '_wp_suggestion_content' );
 					}
 					continue;
 				}
 				$encoded = Gutenberg_Suggestion_Content::encode( $effective[ $note_id ] );
 				if ( $encoded !== $stored ) {
-					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
+					gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
 				}
 			}
 			foreach ( array_keys( $entry['notes'] ) as $note_id ) {
 				if ( isset( $entry['skipped'][ $note_id ] ) ) {
-					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped', true );
+					gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_extraction_skipped', true );
 				} elseif ( '' !== (string) get_comment_meta( $note_id, '_wp_suggestion_extraction_skipped', true ) ) {
-					gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped' );
+					gutenberg_delete_suggestion_server_meta( (int) $note_id, '_wp_suggestion_extraction_skipped' );
 				}
 			}
 

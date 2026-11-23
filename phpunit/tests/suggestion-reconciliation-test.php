@@ -58,7 +58,8 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		);
 		update_comment_meta( $note_id, '_wp_suggestion', wp_json_encode( array( 'operations' => $operations ) ) );
 		if ( '' !== $status ) {
-			gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_status', $status );
+			$this->assertIsInt( $note_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 		}
 		return $note_id;
 	}
