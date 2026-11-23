@@ -976,6 +976,47 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
 }
 
 /**
+ * Whether an HTML fragment may hold inline suggestion markers.
+ *
+ * A cheap test that keeps the pairing walk off content with no markers. The
+ * walk reads class names decoded, so a marker class written with a character
+ * reference (`wp&#45;suggestion-add`) must not slip past: a fragment holding a
+ * `<mark` and any `&` is walked even without the literal class.
+ *
+ * @param string $html HTML fragment.
+ * @return bool False when the fragment holds no marker.
+ */
+function gutenberg_may_hold_inline_suggestion_markers( string $html ): bool {
+	if ( false === stripos( $html, '<mark' ) ) {
+		return false;
+	}
+	return false !== strpos( $html, 'wp-suggestion' ) || false !== strpos( $html, '&' );
+}
+
+if ( ! defined( 'GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT' ) ) {
+	/**
+	 * Most characters a formatting revert may split up at once.
+	 *
+	 * The character-level revert keeps a record for every character between a
+	 * block's first and last formatting marker, and again for the recorded
+	 * originals. Past this it is not attempted, and each formatting marker is
+	 * handled on its own.
+	 */
+	define( 'GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT', 10000 );
+}
+
+if ( ! defined( 'GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT' ) ) {
+	/**
+	 * Most inline suggestion markers a fragment may hold to be rendered.
+	 *
+	 * Each marker costs memory on every view of the block, so a fragment
+	 * holding more is not rendered at all. The save pass pairs a whole post
+	 * at once and is not limited.
+	 */
+	define( 'GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT', 5000 );
+}
+
+/**
  * Pairs the inline suggestion markers of an HTML fragment with their ends.
  *
  * The single classifier behind every consumer of inline markers: the render
@@ -994,7 +1035,8 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  * lexical `<mark>`...`</mark>` span can differ from the run a reader sees. The
  * walk therefore tracks open elements to approximate the browser's tree as
  * well, and a marker is balanced only when its own `</mark>` ends it in the
- * tree walk and that is also its lexical closer.
+ * tree walk, that is also its lexical closer, and every special element
+ * opened inside it (a `<div>`, a `<td>`, ...) was closed by its own closer.
  *
  * Each marker is an array:
  *
@@ -1015,20 +1057,33 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
  *   pairing gives it, and that closer's span, or null when there is none.
  * - `balanced`: whether both readings agree, see above.
  * - `inner_markers`: how many other markers open inside its run.
+ * - `enclosing_closers`: for the first unbalanced addition and the first
+ *   unbalanced formatting change, the closing tags of the elements around
+ *   the marker that the fragment goes on to close, innermost first; null for
+ *   every other marker. A caller that removes everything from such a marker
+ *   to the end of the fragment writes these back, so the elements around it
+ *   stay closed.
  *
- * @param string $html HTML fragment.
- * @return list<array{kind: string, legacy: bool, id: int, run: string|null, start: int, length: int, end: int|null, closer: array{int, int}|null, lexical_end: int|null, lexical_closer: array{int, int}|null, balanced: bool, inner_markers: int}>|null
+ * The walk takes time and memory in proportion to the fragment: a closer finds
+ * its match without scanning the open elements. `$limit` bounds the memory the
+ * result takes for a caller that renders untrusted content on every view.
+ *
+ * @param string $html  HTML fragment.
+ * @param int    $limit Optional. Most markers the fragment may hold. Default
+ *                      no limit.
+ * @return list<array{kind: string, legacy: bool, id: int, run: string|null, start: int, length: int, end: int|null, closer: array{int, int}|null, lexical_end: int|null, lexical_closer: array{int, int}|null, balanced: bool, inner_markers: int, enclosing_closers: string|null}>|null
  *         Markers in document order, or null when the walk could not tell
- *         where a token is (callers fail closed).
+ *         where a token is or the fragment holds more than `$limit` markers
+ *         (callers fail closed).
  */
-function gutenberg_pair_inline_suggestion_markers( $html ) {
+function gutenberg_pair_inline_suggestion_markers( $html, $limit = PHP_INT_MAX ) {
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
 	$markers   = array();
 
 	/*
 	 * The tree walk keeps a stack of open elements, each `[ tag name, marker
-	 * index or null ]`, approximating how a browser (and so the editor's rich
-	 * text parse) builds the tree:
+	 * index or null, element number ]`, approximating how a browser (and so
+	 * the editor's rich text parse) builds the tree:
 	 *
 	 * - A closer ends every element opened after its match, the way a `</p>`
 	 *   ends a `<mark>` left open inside the paragraph.
@@ -1038,19 +1093,52 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 	 *   not reach past a special element. A closer that finds no match is
 	 *   ignored, as a browser ignores it.
 	 * - Start tags that implicitly close an open element (a `<div>` inside a
-	 *   `<p>`), the reconstruction of formatting elements and foster parenting
-	 *   are not modelled. In each of those cases a browser ends the marker
-	 *   earlier than this walk does, never later.
+	 *   `<p>`), the narrower scopes of `</li>` and `</p>`, table parts outside
+	 *   a table, the reconstruction of formatting elements and foster
+	 *   parenting are not modelled. A browser can then ignore a closer this
+	 *   walk matches (the `</li>` in `<li><ul><mark></li>`, the `</dd>` in
+	 *   `<dd><dt><mark></dd>`) and keep the marker open past it, or keep a
+	 *   special element open that this walk closed with another element's
+	 *   closer, which then keeps a `</mark>` from reaching the marker. So
+	 *   only a balanced marker has a reliable end: callers that must not
+	 *   leak treat any other as running to the end of the fragment.
 	 *
 	 * `WP_HTML_Processor` implements those rules fully, but it bails out on
 	 * markup it does not support and its implied closers have no byte span to
 	 * cut at, so it cannot be the only source of truth for a strip that must
 	 * not leak.
 	 */
-	$special        = array( 'ADDRESS', 'APPLET', 'AREA', 'ARTICLE', 'ASIDE', 'BASE', 'BASEFONT', 'BGSOUND', 'BLOCKQUOTE', 'BODY', 'BR', 'BUTTON', 'CAPTION', 'CENTER', 'COL', 'COLGROUP', 'DD', 'DETAILS', 'DIR', 'DIV', 'DL', 'DT', 'EMBED', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'FRAME', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEAD', 'HEADER', 'HGROUP', 'HR', 'HTML', 'IFRAME', 'IMG', 'INPUT', 'KEYGEN', 'LI', 'LINK', 'LISTING', 'MAIN', 'MARQUEE', 'MENU', 'META', 'NAV', 'NOEMBED', 'NOFRAMES', 'NOSCRIPT', 'OBJECT', 'OL', 'P', 'PARAM', 'PLAINTEXT', 'PRE', 'SCRIPT', 'SEARCH', 'SECTION', 'SELECT', 'SOURCE', 'STYLE', 'SUMMARY', 'TABLE', 'TBODY', 'TD', 'TEMPLATE', 'TEXTAREA', 'TFOOT', 'TH', 'THEAD', 'TITLE', 'TR', 'TRACK', 'UL', 'WBR', 'XMP' );
-	$scope_boundary = array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' );
-	$void_elements  = array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' );
+	$special        = array_fill_keys( array( 'ADDRESS', 'APPLET', 'AREA', 'ARTICLE', 'ASIDE', 'BASE', 'BASEFONT', 'BGSOUND', 'BLOCKQUOTE', 'BODY', 'BR', 'BUTTON', 'CAPTION', 'CENTER', 'COL', 'COLGROUP', 'DD', 'DETAILS', 'DIR', 'DIV', 'DL', 'DT', 'EMBED', 'FIELDSET', 'FIGCAPTION', 'FIGURE', 'FOOTER', 'FORM', 'FRAME', 'FRAMESET', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'HEAD', 'HEADER', 'HGROUP', 'HR', 'HTML', 'IFRAME', 'IMG', 'INPUT', 'KEYGEN', 'LI', 'LINK', 'LISTING', 'MAIN', 'MARQUEE', 'MENU', 'META', 'NAV', 'NOEMBED', 'NOFRAMES', 'NOSCRIPT', 'OBJECT', 'OL', 'P', 'PARAM', 'PLAINTEXT', 'PRE', 'SCRIPT', 'SEARCH', 'SECTION', 'SELECT', 'SOURCE', 'STYLE', 'SUMMARY', 'TABLE', 'TBODY', 'TD', 'TEMPLATE', 'TEXTAREA', 'TFOOT', 'TH', 'THEAD', 'TITLE', 'TR', 'TRACK', 'UL', 'WBR', 'XMP' ), true );
+	$scope_boundary = array_fill_keys( array( 'APPLET', 'CAPTION', 'HTML', 'MARQUEE', 'OBJECT', 'TABLE', 'TD', 'TEMPLATE', 'TH' ), true );
+	$void_elements  = array_fill_keys( array( 'AREA', 'BASE', 'BASEFONT', 'BGSOUND', 'BR', 'COL', 'EMBED', 'FRAME', 'HR', 'IMG', 'INPUT', 'KEYGEN', 'LINK', 'META', 'PARAM', 'SOURCE', 'TRACK', 'WBR' ), true );
 	$open_elements  = array();
+	/*
+	 * Where to find a closer's match without scanning the stack: the depths
+	 * each tag name is open at, and the depths of the open special elements
+	 * and scope boundaries, deepest last. A hostile fragment can hold
+	 * thousands of closers that match nothing, each of which would otherwise
+	 * walk the whole stack.
+	 */
+	$open_tags       = array();
+	$open_special    = array();
+	$open_boundaries = array();
+	/*
+	 * Every element opened, numbered in document order, with its tag name and
+	 * the number of the element it opened in (-1 at the top), so the elements
+	 * around a marker can be listed once the walk is over.
+	 */
+	$element_tags    = array();
+	$element_parents = array();
+	// The element number of each marker.
+	$marker_elements = array();
+	/*
+	 * How many special elements another element's closer has ended so far,
+	 * and the count when each marker opened: a marker whose own closer finds
+	 * a higher count had such an element inside its run.
+	 */
+	$forced_ends        = 0;
+	$marker_forced_ends = array();
+	$disordered         = array();
 	// Where the tree walk ends each marker, and its own closer if that ends it.
 	$ends    = array();
 	$closers = array();
@@ -1076,33 +1164,42 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 				}
 			}
 
-			$stop_at = in_array( $tag, $special, true ) ? $scope_boundary : $special;
-			$match   = null;
-			for ( $i = count( $open_elements ) - 1; $i >= 0; $i-- ) {
-				if ( $tag === $open_elements[ $i ][0] ) {
-					$match = $i;
-					break;
-				}
-				if ( in_array( $open_elements[ $i ][0], $stop_at, true ) ) {
-					break;
-				}
-			}
-			if ( null === $match ) {
+			/*
+			 * The match is the deepest open element of this name, unless an
+			 * element the closer cannot reach past sits above it.
+			 */
+			$match   = empty( $open_tags[ $tag ] ) ? null : end( $open_tags[ $tag ] );
+			$blocked = isset( $special[ $tag ] ) ? end( $open_boundaries ) : end( $open_special );
+			if ( null === $match || ( false !== $blocked && $blocked > $match ) ) {
 				continue;
 			}
 			while ( count( $open_elements ) > $match ) {
 				$element = array_pop( $open_elements );
+				$depth   = count( $open_elements );
+				array_pop( $open_tags[ $element[0] ] );
+				if ( end( $open_special ) === $depth ) {
+					array_pop( $open_special );
+				}
+				if ( end( $open_boundaries ) === $depth ) {
+					array_pop( $open_boundaries );
+				}
+				$is_own = $depth === $match;
+				if ( ! $is_own && isset( $special[ $element[0] ] ) ) {
+					++$forced_ends;
+				}
 				if ( null === $element[1] ) {
 					continue;
 				}
-				$is_own                 = count( $open_elements ) === $match;
 				$ends[ $element[1] ]    = $is_own ? $span[0] + $span[1] : $span[0];
 				$closers[ $element[1] ] = $is_own ? $span : null;
+				if ( $is_own && $forced_ends > $marker_forced_ends[ $element[1] ] ) {
+					$disordered[ $element[1] ] = true;
+				}
 			}
 			continue;
 		}
 
-		if ( in_array( $tag, $void_elements, true ) ) {
+		if ( isset( $void_elements[ $tag ] ) ) {
 			continue;
 		}
 		$kind   = 'MARK' === $tag ? gutenberg_get_suggestion_marker_kind( $processor ) : null;
@@ -1111,17 +1208,33 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			$legacy = true;
 			$kind   = 'add' === $processor->get_attribute( 'data-suggestion-type' ) ? 'add' : 'del';
 		}
+
+		$depth               = count( $open_elements );
+		$element             = count( $element_tags );
+		$element_tags[]      = (string) $tag;
+		$element_parents[]   = $depth > 0 ? $open_elements[ $depth - 1 ][2] : -1;
+		$open_tags[ $tag ][] = $depth;
+		if ( isset( $special[ $tag ] ) ) {
+			$open_special[] = $depth;
+		}
+		if ( isset( $scope_boundary[ $tag ] ) ) {
+			$open_boundaries[] = $depth;
+		}
+
 		if ( null === $kind ) {
-			$open_elements[] = array( $tag, null );
+			$open_elements[] = array( $tag, null, $element );
 			if ( 'MARK' === $tag ) {
 				$lexical_marks[] = null;
 			}
 			continue;
 		}
 
-		$run             = $processor->get_attribute( 'data-suggestion-run' );
-		$id              = $processor->get_attribute( 'data-suggestion-id' );
-		$markers[]       = array(
+		if ( count( $markers ) >= $limit ) {
+			return null;
+		}
+		$run                  = $processor->get_attribute( 'data-suggestion-run' );
+		$id                   = $processor->get_attribute( 'data-suggestion-id' );
+		$markers[]            = array(
 			'kind'   => $kind,
 			'legacy' => $legacy,
 			'id'     => is_string( $id ) ? (int) $id : 0,
@@ -1129,11 +1242,14 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 			'start'  => $span[0],
 			'length' => $span[1],
 		);
-		$open_elements[] = array( $tag, count( $markers ) - 1 );
-		$lexical_marks[] = count( $markers ) - 1;
+		$open_elements[]      = array( $tag, count( $markers ) - 1, $element );
+		$lexical_marks[]      = count( $markers ) - 1;
+		$marker_elements[]    = $element;
+		$marker_forced_ends[] = $forced_ends;
 	}
 
 	$count  = count( $markers );
+	$starts = array_column( $markers, 'start' );
 	$paired = array();
 	foreach ( $markers as $index => $marker ) {
 		$end            = $ends[ $index ] ?? null;
@@ -1141,18 +1257,51 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
 		$lexical_closer = $lexical_closers[ $index ] ?? null;
 		$lexical_end    = null === $lexical_closer ? null : $lexical_closer[0] + $lexical_closer[1];
 		$reach          = null === $end ? strlen( $html ) : max( $end, (int) $lexical_end );
-		$inner          = 0;
-		for ( $next = $index + 1; $next < $count && $markers[ $next ]['start'] < $reach; $next++ ) {
-			++$inner;
+		// Openers are in document order: search for the first one past the run.
+		$low  = $index + 1;
+		$high = $count;
+		while ( $low < $high ) {
+			$middle = ( $low + $high ) >> 1;
+			if ( $starts[ $middle ] < $reach ) {
+				$low = $middle + 1;
+			} else {
+				$high = $middle;
+			}
 		}
+		$inner    = $low - $index - 1;
 		$paired[] = $marker + array(
-			'end'            => $end,
-			'closer'         => $closer,
-			'lexical_end'    => $lexical_end,
-			'lexical_closer' => $lexical_closer,
-			'balanced'       => null !== $closer && $lexical_end === $end,
-			'inner_markers'  => $inner,
+			'end'               => $end,
+			'closer'            => $closer,
+			'lexical_end'       => $lexical_end,
+			'lexical_closer'    => $lexical_closer,
+			'balanced'          => null !== $closer && $lexical_end === $end && ! isset( $disordered[ $index ] ),
+			'inner_markers'     => $inner,
+			'enclosing_closers' => null,
 		);
+	}
+
+	/*
+	 * The closing tags to write back for the first unbalanced addition and
+	 * the first unbalanced formatting change: those of the elements around
+	 * the marker that are closed by the end of the fragment.
+	 * Other markers around it are left out, since callers take their tags out.
+	 */
+	$still_open = array_fill_keys( array_column( $open_elements, 2 ), true );
+	$is_marker  = array_fill_keys( $marker_elements, true );
+	$listed     = array();
+	foreach ( $paired as $index => $marker ) {
+		$kind = $marker['kind'];
+		if ( $marker['balanced'] || 'del' === $kind || isset( $listed[ $kind ] ) || ( 'format' === $kind && null !== $marker['run'] ) ) {
+			continue;
+		}
+		$listed[ $kind ] = true;
+		$tags            = '';
+		for ( $element = $element_parents[ $marker_elements[ $index ] ]; $element >= 0; $element = $element_parents[ $element ] ) {
+			if ( ! isset( $still_open[ $element ] ) && ! isset( $is_marker[ $element ] ) ) {
+				$tags .= '</' . strtolower( $element_tags[ $element ] ) . '>';
+			}
+		}
+		$paired[ $index ]['enclosing_closers'] = $tags;
 	}
 
 	return $paired;
@@ -1167,12 +1316,13 @@ function gutenberg_pair_inline_suggestion_markers( $html ) {
  * can fail closed. Text is decoded and split into code points; a line break
  * or image counts as one character.
  *
- * @param string $html Inline HTML.
+ * @param string $html  Inline HTML.
+ * @param int    $limit Optional. Most characters to split. Default no limit.
  * @return list<array{html: string, stack: list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}>}>|null
  *         Characters in order, or null when the HTML is not plain inline
- *         markup.
+ *         markup or holds more than `$limit` characters.
  */
-function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
+function gutenberg_get_inline_suggestion_characters( string $html, int $limit = PHP_INT_MAX ): ?array {
 	$inline    = array( 'A', 'ABBR', 'B', 'BDI', 'BDO', 'CODE', 'EM', 'I', 'KBD', 'MARK', 'S', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'U' );
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
 	$stack     = array();
@@ -1180,8 +1330,14 @@ function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
 	while ( $processor->next_token() ) {
 		$type = $processor->get_token_type();
 		if ( '#text' === $type ) {
-			$characters = preg_split( '//u', $processor->get_modifiable_text(), -1, PREG_SPLIT_NO_EMPTY );
-			if ( false === $characters ) {
+			$text = $processor->get_modifiable_text();
+			// A code point takes at most four bytes, so this text alone is
+			// over the limit: do not split it to find out.
+			if ( strlen( $text ) / 4 > $limit - count( $chars ) ) {
+				return null;
+			}
+			$characters = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
+			if ( false === $characters || count( $characters ) > $limit - count( $chars ) ) {
 				return null;
 			}
 			foreach ( $characters as $character ) {
@@ -1199,7 +1355,7 @@ function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
 		}
 		$bytes = substr( $html, $span[0], $span[1] );
 		if ( 'BR' === $tag || 'IMG' === $tag ) {
-			if ( $processor->is_tag_closer() ) {
+			if ( $processor->is_tag_closer() || count( $chars ) >= $limit ) {
 				return null;
 			}
 			$chars[] = array(
@@ -1285,8 +1441,9 @@ function gutenberg_serialize_inline_suggestion_characters( array $chars ): strin
  *
  * The run between the first and last formatting marker is rebuilt from its
  * characters. Null is returned, so the caller can fall back, when that run is
- * not plain inline markup, or an original is missing or no longer has the
- * same text.
+ * not plain inline markup, an original is missing or no longer has the
+ * same text, or the run or the originals hold more characters than
+ * `GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT`.
  *
  * @param string             $html      HTML fragment.
  * @param array<int, string> $originals Recorded original (`beforeHTML`) of each formatting suggestion.
@@ -1294,7 +1451,7 @@ function gutenberg_serialize_inline_suggestion_characters( array $chars ): strin
  * @return string|null The fragment without formatting suggestions, or null.
  */
 function gutenberg_revert_inline_format_suggestions( string $html, array $originals, array $accepted = array() ): ?string {
-	if ( ! str_contains( $html, 'wp-suggestion-format' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $html ) ) {
 		return $html;
 	}
 	$markers = gutenberg_pair_inline_suggestion_markers( $html );
@@ -1331,15 +1488,18 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 		}
 	} while ( $grown );
 
-	$chars = gutenberg_get_inline_suggestion_characters( substr( $html, $start, $end - $start ) );
+	$chars = gutenberg_get_inline_suggestion_characters( substr( $html, $start, $end - $start ), GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT );
 	if ( null === $chars ) {
 		return null;
 	}
+	// Characters the originals may still take between them.
+	$budget = GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT;
 
 	$accepted  = array_fill_keys( array_map( 'intval', $accepted ), true );
 	$positions = array();
 	$parsed    = array();
-	foreach ( $chars as $index => $char ) {
+	// By reference: a copy of every character would double the memory held.
+	foreach ( $chars as &$char ) {
 		$ids = array();
 		foreach ( $char['stack'] as $element ) {
 			if ( 'format' === $element['kind'] && ! $element['run'] ) {
@@ -1381,7 +1541,11 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 					if ( ! isset( $originals[ $id ] ) ) {
 						return null;
 					}
-					$parsed[ $id ] = gutenberg_get_inline_suggestion_characters( $originals[ $id ] );
+					$parsed[ $id ] = gutenberg_get_inline_suggestion_characters( $originals[ $id ], $budget );
+					if ( null === $parsed[ $id ] ) {
+						return null;
+					}
+					$budget -= count( $parsed[ $id ] );
 				}
 				$original = $parsed[ $id ][ $offsets[ $id ] ] ?? null;
 				// A formatting change never changes text.
@@ -1418,8 +1582,9 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 			}
 			array_push( $kept, ...array_values( $formatting ) );
 		}
-		$chars[ $index ]['stack'] = $kept;
+		$char['stack'] = $kept;
 	}
+	unset( $char );
 	foreach ( $positions as $id => $count ) {
 		if ( isset( $parsed[ $id ] ) && count( (array) $parsed[ $id ] ) !== $count ) {
 			return null;
@@ -1447,7 +1612,9 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
  *   formatting, so each character gets back the formatting recorded on the
  *   note (see `gutenberg_revert_inline_format_suggestions()` and
  *   `gutenberg_get_pending_format_suggestion_html()`). Where that cannot be
- *   done, the whole span is replaced with the original run. The note
+ *   done, the whole span is replaced with the original run, provided both
+ *   still hold the same text: a run edited since unwraps, so readers get the
+ *   current text with the proposed formatting, never the old text. The note
  *   is resolved against the post whose content is being rendered (see
  *   `gutenberg_push_suggestion_content_owner()`, and
  *   `gutenberg_push_suggestion_block_owner()` for blocks rendered from
@@ -1481,8 +1648,8 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
  * readings disagree (or that has no closer) is unbalanced. Only a deletion
  * fails open: its marker tags are removed and its text kept. An unbalanced
  * addition or format change fails closed: everything from its opener through
- * the later of its possible ends is removed, so pending content and its
- * metadata never render. When markers nest, the outer replacement wins.
+ * the end of the block is removed, so pending content and its metadata never
+ * render. When markers nest, the outer replacement wins.
  *
  * The block's `postId` context is deliberately not consulted: inside a Query
  * Loop it names each queried post, not the owner of the content being
@@ -1499,16 +1666,29 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	static $restoring = false;
 
-	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $block_content ) && false === strpos( $block_content, 'data-wp-suggestion-strip' ) ) {
 		return $block_content;
 	}
 
 	$post_id = $restoring ? 0 : gutenberg_get_suggestion_content_owner();
 
-	$markers = gutenberg_pair_inline_suggestion_markers( $block_content );
+	$markers = gutenberg_pair_inline_suggestion_markers( $block_content, GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT );
 	if ( null === $markers ) {
 		return '';
 	}
+
+	/*
+	 * Each note is read once per block, and only so many of them: a marker
+	 * can name any id, and every id that is not a note costs a query. Past
+	 * that a format marker counts as one whose original cannot be resolved.
+	 */
+	$resolved = array();
+	$resolve  = static function ( int $note_id ) use ( &$resolved, $post_id ): ?string {
+		if ( ! array_key_exists( $note_id, $resolved ) ) {
+			$resolved[ $note_id ] = count( $resolved ) < 100 ? gutenberg_get_pending_format_suggestion_html( $note_id, $post_id ) : null;
+		}
+		return $resolved[ $note_id ];
+	};
 
 	/*
 	 * Formatting suggestions come out character by character first, so
@@ -1516,11 +1696,11 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 * original. When that cannot be done, each format marker is handled
 	 * below on its own.
 	 */
-	if ( ! $restoring && str_contains( $block_content, 'wp-suggestion-format' ) ) {
+	if ( ! $restoring && in_array( 'format', array_column( $markers, 'kind' ), true ) ) {
 		$originals = array();
 		foreach ( $markers as $marker ) {
 			if ( 'format' === $marker['kind'] && null === $marker['run'] && ! isset( $originals[ $marker['id'] ] ) ) {
-				$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
+				$original = $resolve( $marker['id'] );
 				if ( null === $original ) {
 					$originals = null;
 					break;
@@ -1546,7 +1726,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 			 * an unresolved format change below, never as an addition, so a
 			 * marker does not silently drop content it is not sure about.
 			 */
-			$original = gutenberg_get_pending_format_suggestion_html( $marker['id'], $post_id );
+			$original = $resolve( $marker['id'] );
 			if ( null !== $original ) {
 				$mode                          = 'format';
 				$markers[ $index ]['original'] = $original;
@@ -1558,20 +1738,57 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	}
 
 	/*
+	 * An original is only swapped in for a run that still reads as it did
+	 * when the note recorded it. A run edited since keeps its own text, so
+	 * its marker is unwrapped like one whose original cannot be resolved. The
+	 * fragments of a split marker are read together.
+	 */
+	$run_texts = array();
+	$run_ends  = array();
+	foreach ( $markers as $marker ) {
+		if ( 'format' !== $marker['mode'] || ! $marker['balanced'] || null === $marker['closer'] ) {
+			continue;
+		}
+		$id = $marker['id'];
+		// A fragment nested inside another of the same id is already read.
+		if ( $marker['start'] < ( $run_ends[ $id ] ?? 0 ) ) {
+			continue;
+		}
+		$inner_start      = $marker['start'] + $marker['length'];
+		$run_texts[ $id ] = ( $run_texts[ $id ] ?? '' ) . gutenberg_get_inline_suggestion_text( substr( $block_content, $inner_start, $marker['closer'][0] - $inner_start ) );
+		$run_ends[ $id ]  = (int) $marker['end'];
+	}
+	$stale = array();
+	foreach ( $markers as $index => $marker ) {
+		if ( 'format' !== $marker['mode'] || ! isset( $marker['original'], $run_texts[ $marker['id'] ] ) ) {
+			continue;
+		}
+		$id = $marker['id'];
+		if ( ! isset( $stale[ $id ] ) ) {
+			$stale[ $id ] = gutenberg_get_inline_suggestion_text( $marker['original'] ) !== $run_texts[ $id ];
+		}
+		if ( $stale[ $id ] ) {
+			$markers[ $index ]['mode'] = 'unresolved-format';
+		}
+	}
+
+	/*
 	 * Turns each marker into edits. Only a balanced marker has a run a browser
 	 * and the walk agree on. Otherwise (no closer, a closer that a browser
 	 * ignores or reaches through an enclosing element, an implicit end):
 	 *
 	 * - A deletion fails open: its text is real content, so only its opener
 	 *   and any closer paired with it are removed.
-	 * - An addition or format change fails closed: everything from its opener
-	 *   through the later of its two ends is removed, so no pending text or
-	 *   marker metadata renders whichever way the markup is read, at the cost
-	 *   of hiding real text the run wrongly spans. Content still open at the
-	 *   end of the block ends with it.
+	 * - An addition or format change fails closed. A browser may keep it open
+	 *   further than the walk can tell, so everything from its opener to the
+	 *   end of the block is removed, at the cost of hiding real text, and
+	 *   the elements around it that the block closed after it are closed
+	 *   again. No pending text or marker metadata renders whichever way the
+	 *   markup is read.
 	 *
 	 * A balanced format change is replaced with its original; a balanced one
-	 * whose original cannot be resolved unwraps like a deletion.
+	 * whose original cannot be resolved, or no longer has the run's text,
+	 * unwraps like a deletion.
 	 */
 	$length = strlen( $block_content );
 	$edits  = array();
@@ -1605,7 +1822,11 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 				$text = gutenberg_strip_inline_note_markers( $text );
 			}
 		}
-		$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), $text );
+		if ( ! $balanced ) {
+			$edits[] = array( $marker['start'], $length, (string) $marker['enclosing_closers'] );
+			continue;
+		}
+		$edits[] = array( $marker['start'], $end, $text );
 	}
 
 	$html = gutenberg_apply_suggestion_splices( $block_content, $edits );
@@ -1642,7 +1863,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
  * that is not accepted takes its characters back to their recorded original
  * when `$originals` holds it (see
  * `gutenberg_revert_inline_format_suggestions()`), and is otherwise left as it
- * is. An unbalanced addition is removed through the later of its possible ends,
+ * is. An unbalanced addition is removed through the end of the fragment,
  * accepted or not, and an unbalanced deletion keeps its text, as in the render
  * strip.
  *
@@ -1654,15 +1875,22 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
  *                be paired.
  */
 function gutenberg_get_inline_suggestion_view( string $html, array $accepted, array $originals = array() ): string {
-	if ( false === strpos( $html, 'wp-suggestion' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $html ) ) {
 		return $html;
 	}
-	if ( $originals ) {
-		$html = gutenberg_revert_inline_format_suggestions( $html, $originals, $accepted ) ?? $html;
-	}
-	$markers = gutenberg_pair_inline_suggestion_markers( $html );
+	$markers = gutenberg_pair_inline_suggestion_markers( $html, GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT );
 	if ( null === $markers ) {
 		return '';
+	}
+	if ( $originals ) {
+		$reverted = gutenberg_revert_inline_format_suggestions( $html, $originals, $accepted );
+		if ( null !== $reverted && $reverted !== $html ) {
+			$html    = $reverted;
+			$markers = gutenberg_pair_inline_suggestion_markers( $html );
+			if ( null === $markers ) {
+				return '';
+			}
+		}
 	}
 
 	$accepted = array_fill_keys( array_map( 'intval', $accepted ), true );
@@ -1675,8 +1903,12 @@ function gutenberg_get_inline_suggestion_view( string $html, array $accepted, ar
 		if ( 'format' === $marker['kind'] && ! $is_accepted ) {
 			continue;
 		}
-		if ( 'add' === $marker['kind'] && ( ! $is_accepted || ! $marker['balanced'] ) ) {
-			$edits[] = array( $marker['start'], max( $end, (int) $marker['lexical_end'] ), '' );
+		if ( 'add' === $marker['kind'] && ! $marker['balanced'] ) {
+			$edits[] = array( $marker['start'], $length, (string) $marker['enclosing_closers'] );
+			continue;
+		}
+		if ( 'add' === $marker['kind'] && ! $is_accepted ) {
+			$edits[] = array( $marker['start'], $end, '' );
 			continue;
 		}
 		if ( 'del' === $marker['kind'] && $is_accepted && $marker['balanced'] ) {
@@ -1694,6 +1926,27 @@ function gutenberg_get_inline_suggestion_view( string $html, array $accepted, ar
 	}
 
 	return gutenberg_apply_suggestion_splices( $html, $edits );
+}
+
+/**
+ * Returns the text inline suggestion markup publishes, without its markup.
+ *
+ * Pending additions are left out and deletions kept, as in
+ * `gutenberg_get_inline_suggestion_view()`. Character references are decoded,
+ * so two runs compare equal whenever a reader sees the same text.
+ *
+ * @param string $html HTML fragment.
+ * @return string Decoded text.
+ */
+function gutenberg_get_inline_suggestion_text( string $html ): string {
+	$processor = new WP_HTML_Tag_Processor( gutenberg_get_inline_suggestion_view( $html, array() ) );
+	$text      = '';
+	while ( $processor->next_token() ) {
+		if ( '#text' === $processor->get_token_type() ) {
+			$text .= $processor->get_modifiable_text();
+		}
+	}
+	return $text;
 }
 
 /**
@@ -1865,6 +2118,35 @@ function gutenberg_strip_pending_structural_suggestions( $block_content, $block 
 	return $block_content;
 }
 add_filter( 'render_block', 'gutenberg_strip_pending_structural_suggestions', 10, 2 );
+
+/**
+ * Keeps a pending insertion from rendering at all.
+ *
+ * `gutenberg_strip_pending_structural_suggestions()` drops the block's output
+ * once it has rendered, by which time its render callback and those of its
+ * inner blocks have run and enqueued their assets for a block no reader sees.
+ * Short-circuiting the render skips all of that. The `render_block` filter
+ * stays for a block rendered without `render_block()`, which this filter does
+ * not see.
+ *
+ * Hooked last: core's own `pre_render_block` callbacks return null whatever
+ * they are given, which would undo the short-circuit.
+ *
+ * @param string|null         $pre_render   Output to use in place of rendering, or null.
+ * @param array<string,mixed> $parsed_block The block about to render.
+ * @return string|null An empty string for a pending insertion, otherwise the
+ *                     value passed in.
+ */
+function gutenberg_skip_pending_insert_block_render( $pre_render, $parsed_block ) {
+	$attrs      = isset( $parsed_block['attrs'] ) && is_array( $parsed_block['attrs'] ) ? $parsed_block['attrs'] : array();
+	$metadata   = isset( $attrs['metadata'] ) && is_array( $attrs['metadata'] ) ? $attrs['metadata'] : array();
+	$suggestion = isset( $metadata['suggestion'] ) && is_array( $metadata['suggestion'] ) ? $metadata['suggestion'] : array();
+	if ( isset( $suggestion['type'] ) && 'pending-insert' === $suggestion['type'] ) {
+		return '';
+	}
+	return $pre_render;
+}
+add_filter( 'pre_render_block', 'gutenberg_skip_pending_insert_block_render', PHP_INT_MAX, 2 );
 
 /**
  * Puts moved blocks back into their original slots and closes the gaps.
