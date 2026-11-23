@@ -845,8 +845,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * Writes a final status and resolves the note.
 		 *
 		 * The note keeps its thread; its comment status goes `approved`, the same
-		 * resolved state a reviewer's manual resolve gives it. A decided note's
-		 * stored proposal is dropped: it is now real content, or gone.
+		 * resolved state a reviewer's manual resolve gives it, and nobody is
+		 * emailed about it. A decided note's stored proposal is dropped: it is
+		 * now real content, or gone.
 		 *
 		 * @param int    $note_id Note ID.
 		 * @param string $status  Final status.
@@ -859,7 +860,23 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				delete_comment_meta( $note_id, '_wp_suggestion_content' );
 				delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
 			}
+
+			/*
+			 * Approving a comment emails the post author about it as a new
+			 * comment, and leaves that notification hooked for every later
+			 * status change in the request. A decided suggestion is not a new
+			 * note.
+			 */
+			$was_hooked = has_action( 'wp_set_comment_status', 'wp_new_comment_notify_postauthor' );
+			$silence    = static function ( $notify, $comment_id ) use ( $note_id ) {
+				return (int) $comment_id === (int) $note_id ? false : $notify;
+			};
+			add_filter( 'notify_post_author', $silence, PHP_INT_MAX, 2 );
 			wp_set_comment_status( $note_id, 'approve' );
+			remove_filter( 'notify_post_author', $silence, PHP_INT_MAX );
+			if ( false === $was_hooked ) {
+				remove_action( 'wp_set_comment_status', 'wp_new_comment_notify_postauthor' );
+			}
 
 			$note = get_comment( $note_id );
 			/**
