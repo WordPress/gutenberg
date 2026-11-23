@@ -1174,6 +1174,31 @@ describe( 'ColorPicker', () => {
 				expect( alphaInput ).toHaveValue( 75 );
 			} );
 		} );
+
+		it( `should keep the typed alpha value in ${ formatLabel } format`, async () => {
+			const user = userEvent.setup();
+
+			await render(
+				<ControlledColorPicker enableAlpha initialColor="#503aa8" />
+			);
+
+			await user.click(
+				screen.getByRole( 'combobox', { name: 'Color format' } )
+			);
+			await user.click(
+				screen.getByRole( 'option', { name: formatLabel } )
+			);
+
+			const alphaInput = screen.getByRole( 'spinbutton', {
+				name: `Alpha (${ formatLabel } A value)`,
+			} );
+
+			await user.clear( alphaInput );
+			await user.type( alphaInput, '29' );
+			await user.tab();
+
+			await waitFor( () => expect( alphaInput ).toHaveValue( 29 ) );
+		} );
 	} );
 
 	describe( 'copy button', () => {
