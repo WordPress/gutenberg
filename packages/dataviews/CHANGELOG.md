@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Add a ring around the selection checkbox in the `grid` and `pickerGrid` layouts, so it stays visible on any preview ([#87223](https://github.com/WordPress/gutenberg/pull/87223)).
 
 ### Internal
 
