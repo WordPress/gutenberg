@@ -12,6 +12,10 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 
+### Bug Fixes
+
+-   `SearchableChipSelect`: Use a single translatable string for the chips toolbar label instead of a singular and plural pair without a number ([#87219](https://github.com/WordPress/gutenberg/pull/87219)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes
