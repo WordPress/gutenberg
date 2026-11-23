@@ -13,6 +13,7 @@
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 -   `Tabs`: Make the hover, pressed, and focus background of horizontal tabs 32px tall, and draw the focus ring inside it. Default tabs give the background the same clearance on every side ([#86913](https://github.com/WordPress/gutenberg/pull/86913)).
 -   `Tabs`: Give the interaction background and keyboard focus ring of minimal horizontal tabs the same corners as default tabs ([#87348](https://github.com/WordPress/gutenberg/pull/87348)).
+-   `Input`, `InputControl`, and the controls built on them: Reduce the space between a prefix and the value by one step.
 
 ### Bug Fixes
 

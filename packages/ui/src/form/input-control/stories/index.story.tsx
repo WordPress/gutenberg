@@ -1,7 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import { plus, reset, seen, unseen } from '@wordpress/icons';
+import {
+	envelope,
+	link,
+	lock,
+	mobile,
+	plus,
+	reset,
+	search,
+	seen,
+	unseen,
+} from '@wordpress/icons';
 import { InputControl } from '../';
+import { Icon } from '../../../icon';
 import { IconButton } from '../../../icon-button';
 import { InputLayout } from '../../primitives/input-layout';
 import { Stack } from '../../../stack';
@@ -89,6 +100,11 @@ export const Password: Story = {
 			<InputControl
 				{ ...args }
 				type={ show ? 'text' : 'password' }
+				prefix={
+					<InputLayout.Slot padding="minimal">
+						<Icon icon={ lock } />
+					</InputLayout.Slot>
+				}
 				suffix={
 					<InputLayout.Slot padding="minimal">
 						<IconButton
@@ -105,6 +121,10 @@ export const Password: Story = {
 	},
 	args: {
 		...Default.args,
+		label: 'Password',
+		description: undefined,
+		placeholder: undefined,
+		autoComplete: 'current-password',
 		defaultValue: 'password',
 	},
 };
@@ -159,6 +179,76 @@ export const NumberWithSteppers: Story = {
 	args: {
 		...Number.args,
 		type: 'number',
+	},
+};
+
+/**
+ * Common field types like this one can show an icon in the prefix. The icon
+ * is decorative: the label already names the field, so `Icon` is hidden from
+ * assistive technologies. Pair the `type` with a matching `autoComplete`
+ * value where one exists.
+ */
+export const Email: Story = {
+	args: {
+		...Default.args,
+		label: 'Email',
+		description: undefined,
+		placeholder: 'name@example.com',
+		type: 'email',
+		autoComplete: 'email',
+		prefix: (
+			<InputLayout.Slot padding="minimal">
+				<Icon icon={ envelope } />
+			</InputLayout.Slot>
+		),
+	},
+};
+
+export const Tel: Story = {
+	args: {
+		...Default.args,
+		label: 'Phone number',
+		description: undefined,
+		placeholder: '+1 555 0100',
+		type: 'tel',
+		autoComplete: 'tel',
+		prefix: (
+			<InputLayout.Slot padding="minimal">
+				<Icon icon={ mobile } />
+			</InputLayout.Slot>
+		),
+	},
+};
+
+export const Url: Story = {
+	args: {
+		...Default.args,
+		label: 'Website',
+		description: undefined,
+		placeholder: 'https://example.com',
+		type: 'url',
+		autoComplete: 'url',
+		prefix: (
+			<InputLayout.Slot padding="minimal">
+				<Icon icon={ link } />
+			</InputLayout.Slot>
+		),
+	},
+};
+
+export const Search: Story = {
+	args: {
+		...Default.args,
+		label: 'Search',
+		hideLabelFromVision: true,
+		description: undefined,
+		placeholder: 'Search',
+		type: 'search',
+		prefix: (
+			<InputLayout.Slot padding="minimal">
+				<Icon icon={ search } />
+			</InputLayout.Slot>
+		),
 	},
 };
 

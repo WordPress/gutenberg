@@ -3,13 +3,30 @@
 
 	@layer components {
 		.input {
+			--_gcd-input-padding-start: var(--wp-ui-input-layout-padding-inline, 0px);
+			--_gcd-input-padding-end: var(--wp-ui-input-layout-padding-inline, 0px);
 			--_gcd-input-padding:
 				var(--wp-ui-input-padding-block, 0px)
-				var(--wp-ui-input-layout-padding-inline, 0px);
+				var(--_gcd-input-padding-end)
+				var(--wp-ui-input-padding-block, 0px)
+				var(--_gcd-input-padding-start);
 			--_gcd-input-font-size: max(var(--wpds-typography-font-size-md), 16px); /* avoid mobile zoom */
 
 			padding-block: var(--wp-ui-input-padding-block, 0);
-			padding-inline: var(--wp-ui-input-layout-padding-inline, 0);
+			padding-inline: var(--_gcd-input-padding-start) var(--_gcd-input-padding-end);
+
+			/* The defense `padding` shorthand is physical, so swap sides in RTL. */
+			&:dir(rtl) {
+				--_gcd-input-padding:
+					var(--wp-ui-input-padding-block, 0px)
+					var(--_gcd-input-padding-start)
+					var(--wp-ui-input-padding-block, 0px)
+					var(--_gcd-input-padding-end);
+			}
+
+			[data-slot-type="prefix"] + & {
+				--_gcd-input-padding-start: var(--wp-ui-input-layout-prefix-gap, var(--wp-ui-input-layout-padding-inline, 0px));
+			}
 			width: 100%;
 			background: transparent;
 			border: none;
