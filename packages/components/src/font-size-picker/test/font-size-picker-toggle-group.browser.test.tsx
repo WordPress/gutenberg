@@ -117,6 +117,56 @@ describe( 'FontSizePickerToggleGroup', () => {
 			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
 			expect( onChange ).toHaveBeenCalledWith( '12px', fontSizes[ 0 ] );
 		} );
+
+		it( 'should call onChange when clicking the already selected option', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					value="large"
+					valueMode="slug"
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Large' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( '20px', fontSizes[ 2 ] );
+		} );
+
+		it( 'should call onChange when activating the already selected option with the keyboard', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					value="20px"
+					onChange={ onChange }
+				/>
+			);
+			await user.tab();
+			expect(
+				screen.getByRole( 'radio', { name: 'Large' } )
+			).toHaveFocus();
+			await user.keyboard( '[Space]' );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( '20px', fontSizes[ 2 ] );
+		} );
+
+		it( 'should call onChange only once when selecting a different option', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			await render(
+				<FontSizePickerToggleGroup
+					fontSizes={ fontSizes }
+					value="medium"
+					valueMode="slug"
+					onChange={ onChange }
+				/>
+			);
+			await user.click( screen.getByRole( 'radio', { name: 'Small' } ) );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'edge cases', () => {
