@@ -1756,7 +1756,7 @@ test.describe( 'List View', () => {
 			await listViewUtils.expectNoBlankRows();
 		} );
 
-		test( 'moves to both ends of a nested list with End and Home @firefox @webkit', async ( {
+		test( 'moves to both ends of a nested list with End and Home', async ( {
 			editor,
 			page,
 			listViewUtils,
@@ -1800,6 +1800,41 @@ test.describe( 'List View', () => {
 			await page.keyboard.press( 'End' );
 			await expect( listViewUtils.getRow( '100.4' ) ).toBeFocused();
 			await expect( listViewUtils.getRow( '100.4' ) ).toBeInViewport();
+		} );
+
+		test( 'moves to a parent far above with Arrow Left', async ( {
+			editor,
+			page,
+			listViewUtils,
+		} ) => {
+			await editor.setContent(
+				`<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p></p><!-- /wp:paragraph --><!-- wp:group {"metadata":{"name":"Inner"}} --><div class="wp-block-group">${ Array.from(
+					{ length: 60 },
+					( _, index ) =>
+						`<!-- wp:paragraph {"metadata":{"name":"Paragraph ${
+							index + 1
+						}"}} --><p></p><!-- /wp:paragraph -->`
+				).join(
+					''
+				) }</div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph --></div><!-- /wp:group --><!-- wp:paragraph --><p></p><!-- /wp:paragraph -->`
+			);
+			await page.evaluate( () => {
+				const [ outer ] = window.wp.data
+					.select( 'core/block-editor' )
+					.getBlocks();
+				window.wp.data
+					.dispatch( 'core/block-editor' )
+					.selectBlock(
+						outer.innerBlocks[ 1 ].innerBlocks[ 49 ].clientId
+					);
+			} );
+			const listView = await listViewUtils.openListView();
+			await expect( listViewUtils.getRow( 50 ) ).toBeFocused();
+
+			await page.keyboard.press( 'ArrowLeft' );
+			await expect(
+				listView.getByRole( 'link', { name: 'Inner', exact: true } )
+			).toBeFocused();
 		} );
 	} );
 } );
