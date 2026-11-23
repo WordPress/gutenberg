@@ -166,11 +166,16 @@ export function useBlockHighlighting(
 				// filter above, but TypeScript cannot infer that after .flatMap.
 				const selection = userState.editorState?.selection as any;
 				if (
-					selection.type === SelectionType.None &&
-					Array.isArray( selection.setSelection )
+					selection.type === SelectionType.WholeBlock ||
+					( selection.type === SelectionType.None &&
+						Array.isArray( selection.setSelection ) )
 				) {
 					const collaborator = describeCollaborator( userState );
-					return selection.setSelection.flatMap(
+					const blockSelections =
+						selection.type === SelectionType.WholeBlock
+							? [ selection ]
+							: selection.setSelection;
+					return blockSelections.flatMap(
 						( blockSelection: unknown ) => {
 							if (
 								! blockSelection ||
@@ -184,15 +189,38 @@ export function useBlockHighlighting(
 								const { localClientId } = resolveSelection(
 									blockSelection as SelectionEndpoint
 								);
-								return localClientId
-									? [
-											{
-												blockId: localClientId,
-												...collaborator,
-												alwaysOutline: true,
-											},
-										]
-									: [];
+								if ( ! localClientId ) {
+									return [];
+								}
+								// Whole-block selections share the collapsed-content fallback,
+								// so selecting several hidden blocks still shows a visible presence.
+								let blockId = localClientId;
+								const blockElement = getBlockElementById(
+									blockEditorDocument,
+									localClientId
+								);
+								if (
+									blockElement &&
+									! isElementVisible( blockElement )
+								) {
+									const container =
+										getNearestVisibleBlockAncestor(
+											blockElement
+										);
+									const containerId =
+										container?.getAttribute( 'data-block' );
+									if ( ! containerId ) {
+										return [];
+									}
+									blockId = containerId;
+								}
+								return [
+									{
+										blockId,
+										...collaborator,
+										alwaysOutline: true,
+									},
+								];
 							} catch {
 								// Ignore deleted blocks and invalid selection data rather
 								// than highlighting unselected blocks between selections.
@@ -200,49 +228,6 @@ export function useBlockHighlighting(
 							}
 						}
 					);
-				}
-
-				if ( selection.type === SelectionType.WholeBlock ) {
-					let localClientId: string | null;
-					try {
-						( { localClientId } = resolveSelection( selection ) );
-					} catch {
-						return [];
-					}
-					if ( ! localClientId ) {
-						return [];
-					}
-
-					// The selected block may be hidden inside collapsed
-					// content (e.g. a closed core/details or an inactive
-					// core/accordion panel). Fall back to outlining the
-					// nearest *visible* ancestor instead, same as the
-					// Cursor/SelectionInOneBlock case below, so the
-					// collaborator still has a findable presence indicator
-					// rather than silently getting no highlight at all.
-					let blockId = localClientId;
-					const blockElement = getBlockElementById(
-						blockEditorDocument,
-						localClientId
-					);
-					if ( blockElement && ! isElementVisible( blockElement ) ) {
-						const container =
-							getNearestVisibleBlockAncestor( blockElement );
-						const containerId =
-							container?.getAttribute( 'data-block' );
-						if ( ! containerId ) {
-							return [];
-						}
-						blockId = containerId;
-					}
-
-					return [
-						{
-							blockId,
-							...describeCollaborator( userState ),
-							alwaysOutline: true,
-						},
-					];
 				}
 
 				if (
