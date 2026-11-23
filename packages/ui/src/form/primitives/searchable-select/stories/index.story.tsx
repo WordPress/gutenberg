@@ -123,6 +123,7 @@ export const WithCustomItems: Story = {
  * props and content independently of the popup items.
  */
 export const WithCustomTrigger: Story = {
+	tags: [ 'external-requests' ],
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 0 ],
