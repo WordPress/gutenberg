@@ -731,7 +731,7 @@ function isValidImageFormat( format: string ): format is ImageFormat {
 /**
  * Determines if an image should be transcoded to a different format.
  *
- * Handles PNG to JPEG conversion carefully by checking for transparency
+ * Handles PNG and JXL to JPEG conversion carefully by checking for transparency
  * to preserve the alpha channel when needed.
  *
  * @param file           The image file.
@@ -752,9 +752,12 @@ export async function getTranscodeImageOperation(
 	  ]
 	| null
 > {
-	// For PNG -> JPEG conversion, check if the image has transparency.
+	// For PNG or JXL -> JPEG conversion, check if the image has transparency.
 	// If it does, skip transcoding to preserve the alpha channel.
-	if ( file.type === 'image/png' && outputMimeType === 'image/jpeg' ) {
+	if (
+		( file.type === 'image/png' || file.type === 'image/jxl' ) &&
+		outputMimeType === 'image/jpeg'
+	) {
 		const blobUrl = createBlobURL( file );
 		try {
 			const hasAlpha = await vipsHasTransparency( blobUrl );

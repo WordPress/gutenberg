@@ -242,7 +242,9 @@ export async function vipsHasTransparency( url: string ) {
 		throw new Error( `Failed to fetch image: ${ response.status }` );
 	}
 	const buffer = await response.arrayBuffer();
-	return runVipsCall( [], () => hasTransparency( buffer ) );
+	return runVipsCall( [ response.headers.get( 'Content-Type' ) ?? '' ], () =>
+		hasTransparency( buffer )
+	);
 }
 
 /**
