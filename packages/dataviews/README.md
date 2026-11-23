@@ -1177,6 +1177,14 @@ Function that performs the required action.
 }
 ```
 
+### `opensDialog`
+
+Whether the `callback` opens a dialog, such as a modal. The trigger then has `aria-haspopup="dialog"`, as the triggers of `RenderModal` actions do.
+
+-   Type: `boolean`
+-   Optional
+-   Default: `false`
+
 ### `RenderModal`
 
 Component to render UI in a modal for the action.

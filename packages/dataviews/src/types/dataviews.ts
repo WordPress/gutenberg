@@ -752,6 +752,12 @@ export interface ActionButton< Item > extends ActionBase< Item > {
 			onActionPerformed?: ( items: Item[] ) => void;
 		}
 	) => void;
+
+	/**
+	 * Whether the callback opens a dialog, such as a modal, so the trigger
+	 * can tell assistive technologies.
+	 */
+	opensDialog?: boolean;
 }
 
 export type Action< Item > = ActionModal< Item > | ActionButton< Item >;
