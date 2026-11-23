@@ -31,6 +31,14 @@
 	}
 }
 
+// The screen scrolls here and has top padding, and a sticky element is inset
+// from the content edge of its scroller. Offset the padding so the preview
+// sticks flush with the top and no scrolling content shows in a gap above it.
+// Kept at the lowest specificity so the mobile rule below overrides it.
+.edit-site-styles .global-styles-ui__sticky-preview {
+	top: -$grid-unit-15;
+}
+
 // On mobile the sidebar scrolls as a whole (`.edit-site-sidebar__screen-wrapper`)
 // instead of the navigator inside it. Any ancestor with its own overflow would
 // become the containing block of `position: sticky` elements, such as the block

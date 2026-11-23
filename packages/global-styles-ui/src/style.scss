@@ -184,9 +184,9 @@
 // controls, so changes can be seen as they are made.
 .global-styles-ui__sticky-preview {
 	position: sticky;
-	// Offset the top padding of the scrolling screen, so the preview sticks
-	// flush with the top edge and no controls show above it.
-	top: calc(-1 * #{variables.$grid-unit-15});
+	// The inset is measured from the scrollport, not from the padded content
+	// edge of the scrolling screen, so no offset is needed to stick flush.
+	top: 0;
 	// Above the controls, e.g. the thumb of a range control (z-index: 3).
 	z-index: 4;
 	// Cover the controls scrolling underneath the preview.
