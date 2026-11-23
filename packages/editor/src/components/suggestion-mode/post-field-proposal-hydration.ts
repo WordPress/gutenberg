@@ -15,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { STORE_NAME } from '../../store/constants';
 import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
+import { hasNotesSupport } from './gate';
 import { getNoteThreadsQuery } from '../collab-sidebar/hooks';
 import { findPostAttributeOps, parseSuggestionPayload } from './operations';
 import type { PostFieldProposal } from './operations';
@@ -94,9 +95,10 @@ export function useHydratePostFieldProposals( currentUserId: number | null ) {
 		const _postId = ( select( STORE_NAME ) as any ).getCurrentPostId();
 		return {
 			postId: _postId,
-			// A template's id is a string; only posts carry notes.
+			// A template's id is a string, and a post type without notes
+			// (a synced pattern) refuses the request.
 			notes:
-				typeof _postId === 'number'
+				typeof _postId === 'number' && hasNotesSupport( select )
 					? ( select( coreStore ) as any ).getEntityRecords(
 							'root',
 							'comment',

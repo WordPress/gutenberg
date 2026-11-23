@@ -185,6 +185,13 @@ function setup( {
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockReset();
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockImplementation(
 		async ( { path }: any ) => {
+			// Notes are only read for a post type that supports them.
+			if ( path.startsWith( '/wp/v2/types/post' ) ) {
+				return {
+					slug: 'post',
+					supports: { editor: [ { notes: true } ] },
+				};
+			}
 			if ( path.startsWith( `/wp/v2/comments/${ NOTE_ID }?` ) ) {
 				return serverNote;
 			}
@@ -209,6 +216,11 @@ function setup( {
 	}
 
 	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
+	( registry.dispatch( coreStore ) as any ).receiveEntityRecords(
+		'root',
+		'postType',
+		[ { slug: 'post', supports: { editor: [ { notes: true } ] } } ]
+	);
 	if ( currentUserId !== null ) {
 		( registry.dispatch( coreStore ) as any ).receiveCurrentUser( {
 			id: currentUserId,
