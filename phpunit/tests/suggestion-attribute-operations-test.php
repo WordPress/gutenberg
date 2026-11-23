@@ -143,10 +143,35 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 	 * @param string               $block_name Block name.
 	 * @param array<string, mixed> $after      Proposed values by attribute.
 	 * @param array<string, mixed> $before     Baseline values by attribute.
+	 * @param int|null             $post_id    The note's post. Defaults to the shared draft.
 	 * @return string|null The problem, or null.
 	 */
-	private function problem( string $block_name, array $after, array $before = array() ): ?string {
-		return gutenberg_find_suggestion_attribute_operation_problem( $this->payload( $block_name, $after, $before ) );
+	private function problem( string $block_name, array $after, array $before = array(), ?int $post_id = null ): ?string {
+		return gutenberg_find_suggestion_attribute_operation_problem( $this->payload( $block_name, $after, $before ), get_post( $post_id ?? self::$post_id ) );
+	}
+
+	/**
+	 * Creates a draft of the contributor's whose content is a test group
+	 * block with custom CSS, as a user with `edit_css` saved it.
+	 *
+	 * @param string $css The block's custom CSS.
+	 * @return int Post ID.
+	 */
+	private function create_post_with_custom_css( string $css ): int {
+		// Custom CSS is stripped from what a user without `edit_css` saves.
+		$suggester = get_current_user_id();
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$contributor_id,
+				'post_status'  => 'draft',
+				'post_content' => '<!-- wp:' . substr( self::GROUP, 5 ) . ' ' . wp_json_encode( array( 'style' => array( 'css' => $css ) ) ) . ' /-->',
+			)
+		);
+		wp_set_current_user( $suggester );
+		self::assertIsInt( $post_id );
+		self::assertStringContainsString( '"css"', (string) get_post_field( 'post_content', $post_id ) );
+		return $post_id;
 	}
 
 	/**
@@ -172,15 +197,16 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 	 *
 	 * @param string   $payload The payload JSON.
 	 * @param int|null $note_id Note to update, or null to create one.
+	 * @param int|null $post_id Post a new note is for. Defaults to the shared draft.
 	 * @return WP_REST_Response The response.
 	 */
-	private function send( string $payload, ?int $note_id = null ): WP_REST_Response {
+	private function send( string $payload, ?int $note_id = null, ?int $post_id = null ): WP_REST_Response {
 		$request = new WP_REST_Request( $note_id ? 'PUT' : 'POST', '/wp/v2/comments' . ( $note_id ? '/' . $note_id : '' ) );
 		$request->add_header( 'Content-Type', 'application/json' );
 		$params = array( 'meta' => array( '_wp_suggestion' => $payload ) );
 		if ( ! $note_id ) {
 			$params += array(
-				'post'    => self::$post_id,
+				'post'    => $post_id ?? self::$post_id,
 				'content' => '',
 				'type'    => 'note',
 				'status'  => 'hold',
@@ -460,6 +486,45 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 		);
 	}
 
+	/**
+	 * A URL in a style is written inside a quoted `url()`, which a quote, an
+	 * escape or a line break ends.
+	 *
+	 * @dataProvider data_style_url_breakouts
+	 *
+	 * @param string $url Proposed URL.
+	 */
+	public function test_refuses_a_style_url_that_leaves_its_declaration( string $url ): void {
+		$this->assertSame(
+			'unsafe-value',
+			$this->problem( self::GROUP, array( 'style' => array( 'background' => array( 'backgroundImage' => array( 'url' => $url ) ) ) ) )
+		);
+	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function data_style_url_breakouts(): array {
+		return array(
+			'a closing quote'      => array( "https://example.org/a.png');color:red;background:url('x" ),
+			'a double quote'       => array( 'https://example.org/a.png"' ),
+			'a second declaration' => array( 'https://example.org/a.png;color:red' ),
+			'a rule'               => array( 'https://example.org/a.png}body{color:red' ),
+			'an escape'            => array( 'https://example.org/a\\27 .png' ),
+			'a line break'         => array( "https://example.org/a.png\ncolor:red" ),
+			'markup'               => array( 'https://example.org/a.png</style>' ),
+		);
+	}
+
+	public function test_accepts_ordinary_style_urls(): void {
+		foreach ( array( 'https://example.org/a.png?w=1&h=2', '/wp-content/uploads/a b (1).png', 'https://example.org/wiki/File:A_(b).png#c' ) as $url ) {
+			$this->assertNull(
+				$this->problem( self::GROUP, array( 'style' => array( 'background' => array( 'backgroundImage' => array( 'url' => $url ) ) ) ) ),
+				$url
+			);
+		}
+	}
+
 	public function test_accepts_ordinary_style_values(): void {
 		$this->assertNull(
 			$this->problem(
@@ -480,23 +545,36 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 		);
 	}
 
+	/**
+	 * The whole `style` is proposed, so a block that has custom CSS sends it
+	 * along with any other style change. The CSS the saved post holds is the
+	 * only CSS a suggester without `edit_css` may send.
+	 */
 	public function test_refuses_custom_css_from_a_suggester_without_edit_css(): void {
 		$this->assertFalse( current_user_can( 'edit_css' ) );
-		$style = array(
+		$post_id = $this->create_post_with_custom_css( 'color: red;' );
+		$style   = array(
 			'css'   => 'color: red;',
 			'color' => array( 'text' => '#000' ),
 		);
-		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => $style ) ) );
-		$this->assertSame(
-			'unsafe-value',
-			$this->problem( self::GROUP, array( 'style' => array( ':hover' => array( 'css' => 'color: red;' ) ) ), array( 'style' => array( 'css' => 'color: red;' ) ) )
-		);
-		$this->assertSame(
-			'unsafe-value',
-			$this->problem( self::GROUP, array( 'style' => $style ), array( 'style' => array( 'css' => 'color: blue;' ) ) )
-		);
+
 		// Carried along unchanged with another style edit.
-		$this->assertNull( $this->problem( self::GROUP, array( 'style' => $style ), array( 'style' => array( 'css' => 'color: red;' ) ) ) );
+		$this->assertNull( $this->problem( self::GROUP, array( 'style' => $style ), array(), $post_id ) );
+
+		// Changed, at the top or under a state.
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( 'css' => 'color: blue;' ) ), array(), $post_id ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( ':hover' => array( 'css' => 'color: blue;' ) ) ), array(), $post_id ) );
+		// Another block type's custom CSS is not this block's.
+		$this->assertSame( 'unsafe-value', $this->problem( 'core/group', array( 'style' => $style ), array(), $post_id ) );
+	}
+
+	/**
+	 * The baseline in the payload is the suggester's own claim.
+	 */
+	public function test_does_not_take_the_baseline_custom_css_from_the_payload(): void {
+		$style = array( 'css' => 'color: red;' );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => $style ), array( 'style' => $style ) ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => $style ), array( 'style' => $style ), $this->create_post_with_custom_css( 'color: blue;' ) ) );
 	}
 
 	public function test_accepts_custom_css_from_a_suggester_with_edit_css(): void {
@@ -574,6 +652,7 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 	public function test_rest_stores_a_valid_payload_that_kses_encodes(): void {
 		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
 		$css      = '& > a { color: red; }';
+		$post_id  = $this->create_post_with_custom_css( $css );
 		$response = $this->send(
 			$this->payload(
 				self::GROUP,
@@ -584,7 +663,9 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 					),
 				),
 				array( 'style' => array( 'css' => $css ) )
-			)
+			),
+			null,
+			$post_id
 		);
 		$this->assertSame( 201, $response->get_status() );
 
@@ -621,5 +702,55 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 		);
 		$this->assertIsInt( $note_id );
 		$this->assertSame( array(), get_comment_meta( $note_id, '_wp_suggestion' ) );
+	}
+
+	/**
+	 * Filtering a payload for storage removes markup and null bytes, which
+	 * can leave a value the rules refuse where the one sent passed them.
+	 *
+	 * @return array<string, array{0: string, 1: array<string, mixed>}>
+	 */
+	public function data_values_unsafe_once_filtered(): array {
+		return array(
+			'a protocol split by markup' => array( self::BUTTON, array( 'url' => 'java<x-y>script:alert(1)' ) ),
+			'a nested protocol'          => array( self::GROUP, array( 'images' => array( array( 'href' => 'java<x-y>script:alert(1)' ) ) ) ),
+			'a url() split by a null'    => array( self::GROUP, array( 'style' => array( 'color' => array( 'background' => "ur\0l(https://example.org/track)" ) ) ) ),
+			'an import split by a null'  => array( self::GROUP, array( 'style' => array( 'typography' => array( 'fontFamily' => "@imp\0ort x" ) ) ) ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_values_unsafe_once_filtered
+	 *
+	 * @param string               $block_name Block name.
+	 * @param array<string, mixed> $after      Proposed values by attribute.
+	 */
+	public function test_rest_refuses_a_value_that_is_unsafe_once_filtered( string $block_name, array $after ): void {
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $this->send( $this->payload( $block_name, $after ) ), 400 );
+	}
+
+	/**
+	 * @dataProvider data_values_unsafe_once_filtered
+	 *
+	 * @param string               $block_name Block name.
+	 * @param array<string, mixed> $after      Proposed values by attribute.
+	 */
+	public function test_meta_update_outside_rest_refuses_a_value_that_is_unsafe_once_filtered( string $block_name, array $after ): void {
+		$note_id = $this->create_note();
+		$this->assertFalse( update_comment_meta( $note_id, '_wp_suggestion', wp_slash( $this->payload( $block_name, $after ) ) ) );
+		$this->assertSame( array(), get_comment_meta( $note_id, '_wp_suggestion' ) );
+	}
+
+	/**
+	 * A user with `unfiltered_html` stores the payload as sent, so the value
+	 * sent is the only one to judge.
+	 */
+	public function test_stores_a_value_only_filtering_would_make_unsafe_for_an_unfiltered_user(): void {
+		wp_set_current_user( self::$editor_id );
+		$this->assertTrue( current_user_can( 'unfiltered_html' ) );
+		$post_id = self::factory()->post->create();
+		$this->assertIsInt( $post_id );
+		$this->assertSame( 201, $this->send( $this->payload( self::BUTTON, array( 'url' => 'java<x-y>script:alert(1)' ) ), null, $post_id )->get_status() );
 	}
 }
