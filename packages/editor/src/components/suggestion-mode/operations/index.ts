@@ -35,3 +35,9 @@ export type { OperationProblem } from './validate';
 export { planStructuralApply } from './structural-apply';
 export { planStructuralReject } from './structural-reject';
 export { structuralOpFromMarker } from './structural-from-marker';
+export {
+	BLOCK_EXCERPT_MAX_CHARS,
+	readBlockText,
+	blockExcerpt,
+	structuralOperationText,
+} from './block-excerpt';
