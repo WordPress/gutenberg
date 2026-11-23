@@ -144,8 +144,7 @@ jobs:
                     --sequence.seed="$GITHUB_RUN_NUMBER" \
                     --project=node \
                     --project=jsdom \
-                    --shard="$SHARD" \
-                    --passWithNoTests
+                    --shard="$SHARD"
 
     unit-js-browser:
         name: JavaScript Browser (Chromium, Node.js 24) - shard ${{ matrix.shard }}
