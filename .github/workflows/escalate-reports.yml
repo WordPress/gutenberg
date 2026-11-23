@@ -7,7 +7,8 @@ name: Escalate reports
 on:
     issues:
         types: [opened]
-    # A pull request from a fork gets a read-only token and cannot be labelled.
+    # Escalated reporters can push to this repository, so their pull requests come from branches here.
+    # Adding a reporter without push access will require reworking this workflow, as fork pull requests get a read-only token.
     pull_request:
         types: [opened]
 
@@ -16,7 +17,12 @@ permissions: {}
 jobs:
     escalate:
         name: Escalate the issue or pull request
-        if: ${{ github.repository == 'WordPress/gutenberg' && contains( fromJSON( '["bazza"]' ), github.event.issue.user.login || github.event.pull_request.user.login ) }}
+        if: |
+            github.repository == 'WordPress/gutenberg' &&
+            contains(
+                fromJSON( '["bazza"]' ),
+                github.event.issue.user.login || github.event.pull_request.user.login
+            )
         runs-on: 'ubuntu-slim'
         permissions:
             issues: write
