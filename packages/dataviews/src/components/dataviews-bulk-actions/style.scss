@@ -14,6 +14,9 @@
 	flex-shrink: 0;
 }
 
+// Like the actions, keep it on one line rather than letting it wrap and grow
+// taller than the toolbar.
 .dataviews-bulk-actions__clear {
-	margin-inline-start: auto;
+	flex-shrink: 0;
+	white-space: nowrap;
 }

@@ -228,25 +228,41 @@ function renderBulkActionsContent< Item >(
 	onChangeSelection: SetSelection,
 	totalItems: number,
 	isMobile: boolean,
+	showClearSelectionText: boolean,
 	selectionCheckboxRef?: React.Ref< HTMLSpanElement >,
 	onClearSelection?: () => void
 ) {
-	const clearSelection = selectedItems.length > 0 && (
-		<IconButton
-			className="dataviews-bulk-actions__clear"
-			variant="minimal"
-			tone="neutral"
-			size="compact"
-			icon={ closeSmall }
-			label={ __( 'Cancel' ) }
-			disabled={ !! actionInProgress }
-			focusableWhenDisabled={ false }
-			onClick={ () => {
-				onClearSelection?.();
-				onChangeSelection( EMPTY_ARRAY );
-			} }
-		/>
-	);
+	// Named for what it does, so it can't be read as closing the whole view.
+	// A text button next to the actions on large screens, which also keeps it
+	// in sight for screen magnifier users. Below that, a compact icon: with a
+	// sidebar next to the view, the text no longer fits in the toolbar next
+	// to longer actions like "Permanently delete".
+	const clearSelectionProps = {
+		className: 'dataviews-bulk-actions__clear',
+		variant: 'minimal',
+		tone: 'neutral',
+		size: 'compact',
+		disabled: !! actionInProgress,
+		focusableWhenDisabled: false,
+		onClick: () => {
+			onClearSelection?.();
+			onChangeSelection( EMPTY_ARRAY );
+		},
+	} as const;
+	let clearSelection = null;
+	if ( selectedItems.length > 0 ) {
+		clearSelection = showClearSelectionText ? (
+			<Button { ...clearSelectionProps }>
+				{ __( 'Clear selection' ) }
+			</Button>
+		) : (
+			<IconButton
+				{ ...clearSelectionProps }
+				icon={ closeSmall }
+				label={ __( 'Clear selection' ) }
+			/>
+		);
+	}
 	const renderActions = ( isMenuItem = false ) =>
 		actionsToShow.map( ( action ) => (
 			<ActionButton
@@ -366,6 +382,7 @@ function BulkActionsContent< Item >( {
 		}
 	};
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const showClearSelectionText = useViewportMatch( 'large' );
 
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
@@ -414,6 +431,7 @@ function BulkActionsContent< Item >( {
 			onChangeSelection,
 			paginationInfo.totalItems,
 			isMobile,
+			showClearSelectionText,
 			selectionCheckboxRef,
 			onClearSelection
 		);

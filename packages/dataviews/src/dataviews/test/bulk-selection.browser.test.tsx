@@ -60,6 +60,23 @@ function SelectableTable( { isLoading = false } = {} ) {
 	);
 }
 
+it( 'shows "Clear selection" as text on large screens and as an icon below', async () => {
+	const user = userEvent.setup();
+	await render( <SelectableTable /> );
+	await user.click(
+		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+	);
+	const clear = page.getByRole( 'button', {
+		name: 'Clear selection',
+		exact: true,
+	} );
+	await expect.element( clear ).toHaveTextContent( 'Clear selection' );
+
+	await page.viewport( 800, 900 );
+	await expect.element( clear ).toHaveTextContent( '' );
+	await expect.element( clear ).toBeVisible();
+} );
+
 it( 'keeps column names and sorting accessible during selection, skips covered controls, and restores sorting after deselection', async () => {
 	const user = userEvent.setup();
 	await render( <SelectableTable /> );
@@ -95,10 +112,12 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.toHaveFocus();
 	await user.keyboard( '{Tab}' );
 	await expect
-		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.element(
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
+		)
 		.toHaveFocus();
 	await user.click(
-		page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 	);
 
 	await expect
@@ -147,7 +166,9 @@ it( 'does not move focus when the selection is cleared without an interaction', 
 	const { rerender } = await render( renderTable( [ '1', '2' ] ) );
 	const { ownerDocument } = page.getByRole( 'table' ).element();
 	await expect
-		.element( page.getByRole( 'button', { name: 'Cancel', exact: true } ) )
+		.element(
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
+		)
 		.toBeVisible();
 	( ownerDocument.activeElement as HTMLElement | null )?.blur();
 
@@ -168,7 +189,7 @@ it( 'blocks focus on bulk actions and covers column headings while loading', asy
 		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
 	);
 	const cancel = page
-		.getByRole( 'button', { name: 'Cancel', exact: true } )
+		.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		.element();
 	const table = page.getByRole( 'table' ).element();
 	const toolbar = document.querySelector( '.dataviews-bulk-actions' )!;
@@ -278,7 +299,10 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			).toBeLessThanOrEqual( 0.5 );
 			await expect
 				.element(
-					page.getByRole( 'button', { name: 'Cancel', exact: true } )
+					page.getByRole( 'button', {
+						name: 'Clear selection',
+						exact: true,
+					} )
 				)
 				.toBeInViewport();
 		}
@@ -289,7 +313,7 @@ it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
 			.poll( () => toolbar.getBoundingClientRect().height )
 			.toBe( 96 );
 		await user.click(
-			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+			page.getByRole( 'button', { name: 'Clear selection', exact: true } )
 		);
 		await expect
 			.element(
