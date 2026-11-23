@@ -301,8 +301,8 @@ function gutenberg_register_suggestion_meta() {
 				// (the suggester) on create/update.
 				$raw   = $value;
 				$value = gutenberg_sanitize_suggestion_payload( $value );
-				// Judged before filtering, for the write guard that runs next.
-				gutenberg_suggestion_attribute_operation_verdict( $value, $raw );
+				// The write guard that runs next judges the payload as sent too.
+				gutenberg_suggestion_payload_as_sent( $value, $raw );
 				// KSES encodes some characters, so the limit is checked again
 				// on what is stored.
 				return strlen( $value ) > $max_suggestion_payload_bytes ? '' : $value;
@@ -754,17 +754,18 @@ function gutenberg_suggested_url_has_disallowed_protocol( string $value ): bool 
  * Whether any string under a URL-bearing key of a proposed value names a
  * disallowed protocol.
  *
- * @param mixed $value  Proposed value, or a part of it.
- * @param bool  $is_url Whether a string found here is a URL.
+ * @param mixed $value       Proposed value, or a part of it.
+ * @param bool  $is_url      Whether a string found here is a URL.
+ * @param bool  $is_filtered Whether the value was filtered for storage, which encodes entities.
  * @return bool Whether one does.
  */
-function gutenberg_suggested_value_has_unsafe_url( $value, bool $is_url ): bool {
+function gutenberg_suggested_value_has_unsafe_url( $value, bool $is_url, bool $is_filtered = false ): bool {
 	if ( is_string( $value ) ) {
-		return $is_url && gutenberg_suggested_url_has_disallowed_protocol( $value );
+		return $is_url && gutenberg_suggested_url_has_disallowed_protocol( $is_filtered ? html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) : $value );
 	}
 	if ( is_array( $value ) ) {
 		foreach ( $value as $entry ) {
-			if ( gutenberg_suggested_value_has_unsafe_url( $entry, $is_url ) ) {
+			if ( gutenberg_suggested_value_has_unsafe_url( $entry, $is_url, $is_filtered ) ) {
 				return true;
 			}
 		}
@@ -772,7 +773,7 @@ function gutenberg_suggested_value_has_unsafe_url( $value, bool $is_url ): bool 
 	}
 	if ( $value instanceof stdClass ) {
 		foreach ( get_object_vars( $value ) as $key => $entry ) {
-			if ( gutenberg_suggested_value_has_unsafe_url( $entry, (bool) preg_match( GUTENBERG_SUGGESTION_URL_KEY_PATTERN, (string) $key ) ) ) {
+			if ( gutenberg_suggested_value_has_unsafe_url( $entry, (bool) preg_match( GUTENBERG_SUGGESTION_URL_KEY_PATTERN, (string) $key ), $is_filtered ) ) {
 				return true;
 			}
 		}
@@ -781,26 +782,79 @@ function gutenberg_suggested_value_has_unsafe_url( $value, bool $is_url ): bool 
 }
 
 /**
+ * Collects the custom CSS of a post's blocks of one type, as the saved
+ * content holds it.
+ *
+ * Custom CSS is stripped from the content a user without `edit_css` saves,
+ * so what the post holds was written by a user allowed to.
+ *
+ * @param WP_Post|null $post       The post.
+ * @param string       $block_name Block name.
+ * @return list<string> Every `css` value in the `style` of those blocks.
+ */
+function gutenberg_get_suggestion_post_block_custom_css( ?WP_Post $post, string $block_name ): array {
+	$css = array();
+	if ( ! $post || '' === $block_name || ! has_blocks( $post->post_content ) ) {
+		return $css;
+	}
+	$collect = static function ( $style ) use ( &$collect, &$css ): void {
+		if ( ! is_array( $style ) ) {
+			return;
+		}
+		foreach ( $style as $key => $value ) {
+			if ( 'css' === $key && is_string( $value ) ) {
+				$css[] = $value;
+			} else {
+				$collect( $value );
+			}
+		}
+	};
+	$walk    = static function ( array $blocks ) use ( &$walk, $collect, $block_name ): void {
+		foreach ( $blocks as $block ) {
+			if ( ! is_array( $block ) ) {
+				continue;
+			}
+			if ( isset( $block['blockName'], $block['attrs'] ) && $block_name === $block['blockName'] && is_array( $block['attrs'] ) && isset( $block['attrs']['style'] ) ) {
+				$collect( $block['attrs']['style'] );
+			}
+			if ( isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+				$walk( $block['innerBlocks'] );
+			}
+		}
+	};
+	$walk( parse_blocks( $post->post_content ) );
+	return $css;
+}
+
+/**
  * Whether a proposed `style` carries CSS its suggester may not write.
  *
  * Custom CSS (`css`, at any depth) needs `edit_css`: without it a proposal
- * may only carry along the custom CSS its baseline already has. Every other
- * string is one declaration's value and may not leave that declaration.
+ * may only carry along custom CSS the block already has. Every other string
+ * is one declaration's value and may not leave that declaration.
  *
- * @param mixed  $value        Proposed style, or a part of it.
- * @param mixed  $before       The operation's baseline at the same path.
- * @param string $key          The key the value sits under.
- * @param bool   $can_edit_css Whether the suggester may write custom CSS.
+ * @param mixed             $value       Proposed style, or a part of it.
+ * @param string            $key         The key the value sits under.
+ * @param list<string>|null $allowed_css The custom CSS the proposal may carry, or null for any.
+ * @param bool              $is_filtered Whether the value was filtered for storage, which encodes entities.
  * @return bool Whether it does.
  */
-function gutenberg_suggested_style_is_unsafe( $value, $before, string $key, bool $can_edit_css ): bool {
+function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allowed_css, bool $is_filtered = false ): bool {
 	if ( is_string( $value ) ) {
 		if ( 'css' === $key ) {
-			return ! $can_edit_css && $value !== $before;
+			return null !== $allowed_css && ! in_array( $value, $allowed_css, true );
 		}
-		// A URL is checked by scheme, as it is under any other attribute.
+		if ( $is_filtered ) {
+			$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		}
+		/*
+		 * A URL is checked by scheme, as it is under any other attribute. It
+		 * is written inside a quoted `url()`, which a quote, an escape or a
+		 * control character ends; the rest is what a filter that splits a
+		 * style into declarations and rules would cut it at.
+		 */
 		if ( preg_match( GUTENBERG_SUGGESTION_URL_KEY_PATTERN, $key ) ) {
-			return false;
+			return 0 !== preg_match( '/[;{}<>\\\\\'"\x00-\x1f\x7f]/', $value );
 		}
 		/*
 		 * What lets a value leave the declaration it is written into: a
@@ -811,17 +865,16 @@ function gutenberg_suggested_style_is_unsafe( $value, $before, string $key, bool
 		return 0 !== preg_match( '~[;{}<>\\\\]|/\*|url' . $space . '*\(|expression' . $space . '*\(|@import~iu', $value );
 	}
 	if ( is_array( $value ) ) {
-		foreach ( $value as $index => $entry ) {
-			if ( gutenberg_suggested_style_is_unsafe( $entry, is_array( $before ) ? ( $before[ $index ] ?? null ) : null, $key, $can_edit_css ) ) {
+		foreach ( $value as $entry ) {
+			if ( gutenberg_suggested_style_is_unsafe( $entry, $key, $allowed_css, $is_filtered ) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	if ( $value instanceof stdClass ) {
-		$before = $before instanceof stdClass ? get_object_vars( $before ) : array();
 		foreach ( get_object_vars( $value ) as $child_key => $entry ) {
-			if ( gutenberg_suggested_style_is_unsafe( $entry, $before[ $child_key ] ?? null, (string) $child_key, $can_edit_css ) ) {
+			if ( gutenberg_suggested_style_is_unsafe( $entry, (string) $child_key, $allowed_css, $is_filtered ) ) {
 				return true;
 			}
 		}
@@ -841,8 +894,11 @@ function gutenberg_suggested_style_is_unsafe( $value, $before, string $key, bool
  *
  *   - A URL (by attribute or key name, or read from a URL-bearing HTML
  *     attribute) must not name a protocol outside `wp_allowed_protocols()`.
- *   - A `style` string must stay inside its declaration, and custom CSS may
- *     only be changed by a suggester with `edit_css`.
+ *   - A `style` string, or a URL in one, must stay inside its declaration.
+ *     Custom CSS needs `edit_css`; without it a proposal may only carry along
+ *     custom CSS the saved post already holds for a block of that type, since
+ *     the whole `style` is proposed. The baseline in the payload is the
+ *     suggester's own claim and is not read.
  *   - A `metadata` proposal must not name the keys the system owns.
  *   - For an attribute the block type declares on the server: the value must
  *     match the declared `type` and `enum`, and a tag name with no `enum`
@@ -854,11 +910,20 @@ function gutenberg_suggested_style_is_unsafe( $value, $before, string $key, bool
  * operation refuses the payload, so the note never describes a change other
  * than the one that would be applied.
  *
- * @param string $payload The `_wp_suggestion` JSON, as the suggester sent it.
+ * Filtering the payload for storage can change a value: removing markup or
+ * a null byte can join the two halves of a protocol or of `url(`. So the
+ * payload is judged twice, as sent and as stored (`$is_filtered`). The
+ * stored one has its entities decoded first, and skips the rules filtering
+ * cannot affect or only blurs: the `type` and `enum` (re-encoding loses the
+ * difference between an empty object and an empty list) and the custom CSS.
+ *
+ * @param string       $payload     The `_wp_suggestion` JSON.
+ * @param WP_Post|null $post        The post the note belongs to.
+ * @param bool         $is_filtered Whether the payload is the one filtered for storage.
  * @return string|null `unknown-attribute`, `invalid-value` or `unsafe-value`,
  *                     or null when every operation can be stored.
  */
-function gutenberg_find_suggestion_attribute_operation_problem( string $payload ): ?string {
+function gutenberg_find_suggestion_attribute_operation_problem( string $payload, ?WP_Post $post = null, bool $is_filtered = false ): ?string {
 	// Objects stay objects, so an attribute's `object` and `array` types can be told apart.
 	$payload = json_decode( $payload );
 	$payload = $payload instanceof stdClass ? get_object_vars( $payload ) : array();
@@ -870,8 +935,10 @@ function gutenberg_find_suggestion_attribute_operation_problem( string $payload 
 		? WP_Block_Type_Registry::get_instance()->get_registered( $payload['blockName'] )
 		: null;
 	// Includes the attributes block supports register (`style`, `className`, `anchor`...).
-	$declared     = $block_type ? $block_type->get_attributes() : array();
-	$can_edit_css = current_user_can( 'edit_css' );
+	$declared = $block_type ? $block_type->get_attributes() : array();
+	// Read from the post only once a proposal carries a `style`.
+	$allowed_css  = null;
+	$may_send_css = $is_filtered || current_user_can( 'edit_css' );
 
 	/*
 	 * Elements a block may be asked to render as when its tag name attribute
@@ -897,7 +964,7 @@ function gutenberg_find_suggestion_attribute_operation_problem( string $payload 
 		}
 
 		$schema = isset( $declared[ $name ] ) && is_array( $declared[ $name ] ) ? $declared[ $name ] : null;
-		if ( null !== $schema ) {
+		if ( null !== $schema && ! $is_filtered ) {
 			if ( isset( $schema['type'] ) && ! gutenberg_is_suggested_value_of_type( $proposed, $schema['type'] ) ) {
 				return 'invalid-value';
 			}
@@ -938,12 +1005,17 @@ function gutenberg_find_suggestion_attribute_operation_problem( string $payload 
 
 		$is_url = preg_match( GUTENBERG_SUGGESTION_URL_KEY_PATTERN, $name ) ||
 			( null !== $schema && isset( $schema['source'], $schema['attribute'] ) && 'attribute' === $schema['source'] && in_array( $schema['attribute'], $url_html_attributes, true ) );
-		if ( gutenberg_suggested_value_has_unsafe_url( $proposed, (bool) $is_url ) ) {
+		if ( gutenberg_suggested_value_has_unsafe_url( $proposed, (bool) $is_url, $is_filtered ) ) {
 			return 'unsafe-value';
 		}
 
-		if ( 'style' === $name && gutenberg_suggested_style_is_unsafe( $proposed, $operation->before ?? null, '', $can_edit_css ) ) {
-			return 'unsafe-value';
+		if ( 'style' === $name ) {
+			if ( ! $may_send_css && null === $allowed_css ) {
+				$allowed_css = gutenberg_get_suggestion_post_block_custom_css( $post, isset( $payload['blockName'] ) && is_string( $payload['blockName'] ) ? $payload['blockName'] : '' );
+			}
+			if ( gutenberg_suggested_style_is_unsafe( $proposed, '', $allowed_css, $is_filtered ) ) {
+				return 'unsafe-value';
+			}
 		}
 	}
 
@@ -951,34 +1023,48 @@ function gutenberg_find_suggestion_attribute_operation_problem( string $payload 
 }
 
 /**
- * Reads, or records, what the attribute rules make of a payload about to be
- * stored.
+ * Finds the first reason a payload's `attribute-set` operations cannot be
+ * stored, judging it both as sent and as it will be stored.
  *
- * The rules judge the payload as the suggester sent it, but the write guard
- * only sees it after `gutenberg_sanitize_suggestion_payload()`, whose entity
- * encoding would read as a changed or unsafe value. The meta's
- * `sanitize_callback` records the verdict on the raw payload here, keyed by
- * the value it returns, for the guard that runs next.
- *
- * @param string      $stored The payload as it would be stored.
- * @param string|null $raw    The payload before sanitizing, to record its verdict.
+ * @param string       $sent   The payload as the suggester sent it.
+ * @param string       $stored The payload after `gutenberg_sanitize_suggestion_payload()`.
+ * @param WP_Post|null $post   The post the note belongs to.
  * @return string|null The problem (see `gutenberg_find_suggestion_attribute_operation_problem()`), or null.
  */
-function gutenberg_suggestion_attribute_operation_verdict( string $stored, ?string $raw = null ): ?string {
-	/** @var array<string, string|null> $verdicts */
-	static $verdicts = array();
-	$key             = md5( $stored );
-	if ( null !== $raw ) {
-		$raw_key = md5( $raw );
-		// A payload filtered twice (the callback can be registered more than once) keeps its first verdict.
-		$verdict = array_key_exists( $raw_key, $verdicts ) ? $verdicts[ $raw_key ] : gutenberg_find_suggestion_attribute_operation_problem( $raw );
-		// Only the write in progress needs its verdict.
-		$verdicts = array(
-			$raw_key => $verdict,
-			$key     => $verdict,
+function gutenberg_find_suggestion_attribute_write_problem( string $sent, string $stored, ?WP_Post $post ): ?string {
+	$problem = gutenberg_find_suggestion_attribute_operation_problem( $sent, $post );
+	if ( null === $problem && $stored !== $sent ) {
+		$problem = gutenberg_find_suggestion_attribute_operation_problem( $stored, $post, true );
+	}
+	return $problem;
+}
+
+/**
+ * Reads, or records, the payload a stored `_wp_suggestion` was sent as.
+ *
+ * The write guard is only handed the payload after it was filtered for
+ * storage, and the rules need the one sent too. The meta's
+ * `sanitize_callback` records it here, keyed by the value it returns, for
+ * the guard that runs next.
+ *
+ * @param string      $stored The payload as it would be stored.
+ * @param string|null $sent   The payload before sanitizing, to record it.
+ * @return string The payload as sent, or the stored one when none was recorded.
+ */
+function gutenberg_suggestion_payload_as_sent( string $stored, ?string $sent = null ): string {
+	/** @var array<string, string> $sent_by_stored */
+	static $sent_by_stored = array();
+	$key                   = md5( $stored );
+	if ( null !== $sent ) {
+		// A payload sanitized twice (the callback can be registered more than once) keeps the first one sent.
+		$sent = $sent_by_stored[ md5( $sent ) ] ?? $sent;
+		// Only the write in progress needs it.
+		$sent_by_stored = array(
+			md5( $sent ) => $sent,
+			$key         => $sent,
 		);
 	}
-	return array_key_exists( $key, $verdicts ) ? $verdicts[ $key ] : gutenberg_find_suggestion_attribute_operation_problem( $stored );
+	return $sent_by_stored[ $key ] ?? $stored;
 }
 
 /**
@@ -1001,7 +1087,18 @@ function gutenberg_validate_suggestion_attribute_operations( $prepared_comment, 
 	if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) || ! is_string( $meta['_wp_suggestion'] ) ) {
 		return $prepared_comment;
 	}
-	$problem = gutenberg_find_suggestion_attribute_operation_problem( $meta['_wp_suggestion'] );
+
+	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? absint( $prepared_comment['comment_post_ID'] ) : 0;
+	if ( ! $post_id && isset( $request['id'] ) ) {
+		$comment = get_comment( absint( $request['id'] ) );
+		$post_id = $comment ? (int) $comment->comment_post_ID : 0;
+	}
+
+	$problem = gutenberg_find_suggestion_attribute_write_problem(
+		$meta['_wp_suggestion'],
+		gutenberg_sanitize_suggestion_payload( $meta['_wp_suggestion'] ),
+		$post_id ? get_post( $post_id ) : null
+	);
 	if ( null === $problem ) {
 		return $prepared_comment;
 	}
@@ -1029,7 +1126,13 @@ function gutenberg_guard_suggestion_attribute_operations_meta( $check, $note_id,
 	if ( null !== $check || '_wp_suggestion' !== $meta_key || ! is_string( $meta_value ) ) {
 		return $check;
 	}
-	return null === gutenberg_suggestion_attribute_operation_verdict( $meta_value ) ? $check : false;
+	$note    = get_comment( $note_id );
+	$problem = gutenberg_find_suggestion_attribute_write_problem(
+		gutenberg_suggestion_payload_as_sent( $meta_value ),
+		$meta_value,
+		$note ? get_post( (int) $note->comment_post_ID ) : null
+	);
+	return null === $problem ? $check : false;
 }
 add_filter( 'add_comment_metadata', 'gutenberg_guard_suggestion_attribute_operations_meta', 10, 4 );
 add_filter( 'update_comment_metadata', 'gutenberg_guard_suggestion_attribute_operations_meta', 10, 4 );
