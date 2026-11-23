@@ -1542,6 +1542,24 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
 	return null;
 }
 
+/**
+ * Whether an HTML fragment may hold inline suggestion markers.
+ *
+ * A cheap test that keeps the pairing walk off content with no markers. The
+ * walk reads class names decoded, so a marker class written with a character
+ * reference (`wp&#45;suggestion-add`) must not slip past: a fragment holding a
+ * `<mark` and any `&` is walked even without the literal class.
+ *
+ * @param string $html HTML fragment.
+ * @return bool False when the fragment holds no marker.
+ */
+function gutenberg_may_hold_inline_suggestion_markers( string $html ): bool {
+	if ( false === stripos( $html, '<mark' ) ) {
+		return false;
+	}
+	return false !== strpos( $html, 'wp-suggestion' ) || false !== strpos( $html, '&' );
+}
+
 if ( ! defined( 'GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT' ) ) {
 	/**
 	 * Most characters a formatting revert may split up at once.
@@ -2000,7 +2018,7 @@ function gutenberg_serialize_inline_suggestion_characters( array $chars ): strin
  * @return string|null The fragment without formatting suggestions, or null.
  */
 function gutenberg_revert_inline_format_suggestions( string $html, array $originals, array $accepted = array() ): ?string {
-	if ( ! str_contains( $html, 'wp-suggestion-format' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $html ) ) {
 		return $html;
 	}
 	$markers = gutenberg_pair_inline_suggestion_markers( $html );
@@ -2215,7 +2233,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 */
 	static $restoring = false;
 
-	if ( false === strpos( $block_content, 'wp-suggestion' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $block_content ) && false === strpos( $block_content, 'data-wp-suggestion-strip' ) ) {
 		return $block_content;
 	}
 
@@ -2232,7 +2250,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
 	 * original. When that cannot be done, each format marker is handled
 	 * below on its own.
 	 */
-	if ( ! $restoring && str_contains( $block_content, 'wp-suggestion-format' ) ) {
+	if ( ! $restoring && in_array( 'format', array_column( $markers, 'kind' ), true ) ) {
 		$originals = array();
 		foreach ( $markers as $marker ) {
 			if ( 'format' === $marker['kind'] && null === $marker['run'] && ! isset( $originals[ $marker['id'] ] ) ) {
@@ -2411,7 +2429,7 @@ function gutenberg_strip_inline_suggestion_markers( $block_content ) {
  *                be paired.
  */
 function gutenberg_get_inline_suggestion_view( string $html, array $accepted, array $originals = array() ): string {
-	if ( false === strpos( $html, 'wp-suggestion' ) ) {
+	if ( ! gutenberg_may_hold_inline_suggestion_markers( $html ) ) {
 		return $html;
 	}
 	$markers = gutenberg_pair_inline_suggestion_markers( $html, GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT );
