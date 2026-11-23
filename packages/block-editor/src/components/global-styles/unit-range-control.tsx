@@ -7,7 +7,9 @@ import {
 import { useState } from '@wordpress/element';
 import { Fieldset, Stack } from '@wordpress/ui';
 
-type Units = NonNullable< ComponentProps< typeof UnitControl >[ 'units' ] >;
+type UnitControlProps = ComponentProps< typeof UnitControl >;
+type Units = NonNullable< UnitControlProps[ 'units' ] >;
+type StateReducer = NonNullable< UnitControlProps[ '__unstableStateReducer' ] >;
 
 export type UnitRangeSettings = Record<
 	string,
@@ -67,6 +69,21 @@ export default function UnitRangeControl( {
 		parsedUnit ?? pickedUnit ?? placeholderUnit ?? units[ 0 ]?.value ?? '';
 	const range = unitSettings[ selectedUnit ];
 
+	// An arrow key in an empty field spins from 0, so the spun value is the step.
+	// Add it to the placeholder instead, so the value doesn't jump.
+	const stepFromPlaceholder: StateReducer = ( state, action ) => {
+		if (
+			quantity !== undefined ||
+			placeholderQuantity === undefined ||
+			selectedUnit !== placeholderUnit ||
+			( action.type !== 'PRESS_UP' && action.type !== 'PRESS_DOWN' )
+		) {
+			return state;
+		}
+		const next = placeholderQuantity + Number( state.value );
+		return { ...state, value: `${ parseFloat( next.toPrecision( 12 ) ) }` };
+	};
+
 	const handleChange = ( nextValue?: string ) => {
 		const [ nextQuantity ] = parseQuantityAndUnitFromRawValue( nextValue );
 		onChange( nextQuantity === undefined ? undefined : nextValue );
@@ -86,6 +103,7 @@ export default function UnitRangeControl( {
 					units={ units }
 					onChange={ handleChange }
 					onUnitChange={ setPickedUnit }
+					__unstableStateReducer={ stepFromPlaceholder }
 				/>
 				<RangeControl
 					className="block-editor-global-styles-unit-range-control__slider"

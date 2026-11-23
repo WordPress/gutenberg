@@ -354,6 +354,91 @@ describe( 'TransformPanel offsets', () => {
 		} );
 	} );
 
+	it.each( [
+		[ 'ArrowUp', '{ArrowUp}', '36px' ],
+		[ 'ArrowDown', '{ArrowDown}', '34px' ],
+		[ 'Shift+ArrowUp', '{Shift>}{ArrowUp}{/Shift}', '45px' ],
+	] )(
+		'steps %s from the inherited offset and saves only that axis',
+		async ( _key, keys, expected ) => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			render(
+				<TransformPanel
+					value={ { transform: { translate: { x: '21px' } } } }
+					inheritedValue={ {
+						transform: { translate: { x: '66px', y: '35px' } },
+					} }
+					settings={ translateSettings }
+					onChange={ onChange }
+				/>
+			);
+
+			await user.click(
+				screen.getByRole( 'spinbutton', { name: 'Y offset' } )
+			);
+			await user.keyboard( keys );
+
+			expect( onChange ).toHaveBeenLastCalledWith( {
+				transform: { translate: { x: '21px', y: expected } },
+			} );
+		}
+	);
+
+	it( 'steps from the Default state offset in a selected state', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ { transform: { translate: { x: '21px' } } } }
+				inheritedValue={ {
+					transform: { translate: { x: '21px' } },
+				} }
+				baseValue={ {
+					transform: { translate: { x: '66px', y: '35px' } },
+				} }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		const yOffset = screen.getByRole( 'spinbutton', { name: 'Y offset' } );
+		expect( yOffset ).toHaveAttribute( 'placeholder', '35' );
+
+		await user.click( yOffset );
+		await user.keyboard( '{ArrowUp}' );
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			transform: { translate: { x: '21px', y: '36px' } },
+		} );
+	} );
+
+	it( 'saves nothing for an inherited offset that is not edited', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<TransformPanel
+				value={ {} }
+				inheritedValue={ {
+					transform: { translate: { x: '66px', y: '35px' } },
+				} }
+				settings={ translateSettings }
+				onChange={ onChange }
+			/>
+		);
+
+		await user.click(
+			screen.getByRole( 'spinbutton', { name: 'X offset' } )
+		);
+		await user.tab();
+		await user.click(
+			screen.getByRole( 'spinbutton', { name: 'Y offset' } )
+		);
+		await user.tab();
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
 	it( 'clears both axes and the rotation on reset all', async () => {
 		const user = userEvent.setup();
 		const onChange = vi.fn();

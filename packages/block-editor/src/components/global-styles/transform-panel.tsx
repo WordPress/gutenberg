@@ -104,6 +104,7 @@ export default function TransformPanel( {
 	value,
 	onChange,
 	inheritedValue = value,
+	baseValue,
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
@@ -132,8 +133,10 @@ export default function TransformPanel( {
 	// An axis without its own value shows the inherited one as a placeholder.
 	const getTranslate = ( axis: 'x' | 'y' ) =>
 		value?.transform?.translate?.[ axis ];
+	// A selected Global Styles state falls back to the Default state per axis.
 	const getInheritedTranslate = ( axis: 'x' | 'y' ) =>
-		inheritedValue?.transform?.translate?.[ axis ];
+		inheritedValue?.transform?.translate?.[ axis ] ??
+		baseValue?.transform?.translate?.[ axis ];
 	// Each axis is saved on its own. The other axis comes from the styles below.
 	const setTranslate = ( axis: 'x' | 'y', newValue: string | undefined ) => {
 		onChange(

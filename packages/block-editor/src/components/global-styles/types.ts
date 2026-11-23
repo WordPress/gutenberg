@@ -519,6 +519,8 @@ export interface TransformPanelProps {
 	onChange: ( value: PanelStyle ) => void;
 	/** The styles inherited from global styles. */
 	inheritedValue?: PanelStyle;
+	/** The default state styles, set only while another state is selected. */
+	baseValue?: PanelStyle;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
 	/** ID of the panel. */
