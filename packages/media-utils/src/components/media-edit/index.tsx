@@ -44,6 +44,7 @@ import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import MediaUpload from '../media-upload';
 import { MediaUploadModal } from '../media-upload-modal';
+import UploadProgressSnackbar from '../upload-progress-snackbar';
 import { uploadMedia } from '../../utils/upload-media';
 import type { MediaEditProps } from './types';
 import useMovingAnimation from './use-moving-animation';
@@ -1082,6 +1083,7 @@ export function MediaEditControl< Item >( {
 					message={ customValidity.message }
 				/>
 			) }
+			<UploadProgressSnackbar />
 		</Stack>
 	);
 }

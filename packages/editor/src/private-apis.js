@@ -1,5 +1,6 @@
 import * as interfaceApis from '@wordpress/interface';
-import { lock } from './lock-unlock';
+import { privateApis as mediaUtilsPrivateApis } from '@wordpress/media-utils';
+import { lock, unlock } from './lock-unlock';
 import BackButton from './components/header/back-button';
 import Editor from './components/editor';
 import PluginPostExcerpt from './components/post-excerpt/plugin';
@@ -17,7 +18,8 @@ import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
-import UploadProgressSnackbar from './components/upload-progress-snackbar';
+
+const { UploadProgressSnackbar } = unlock( mediaUtilsPrivateApis );
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 

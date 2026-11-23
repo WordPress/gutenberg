@@ -1,5 +1,10 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useMemo,
+	useState,
+	useSyncExternalStore,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { store as uploadStore } from '@wordpress/upload-media';
@@ -21,14 +26,66 @@ const COMPLETION_DISPLAY_MS = 3000;
 // UUID-style names some sources produce) would otherwise stretch the snackbar.
 const MAX_FILENAME_LENGTH = 40;
 
+interface QueueItem {
+	id: string;
+	parentId?: string;
+	sourceFile?: { name?: string };
+}
+
+const EMPTY_ITEMS: QueueItem[] = [];
+
+/**
+ * Module-level controller coordination so multiple `<UploadProgressSnackbar />`
+ * instances can be mounted simultaneously (for example, when a page mounts
+ * several `MediaEdit` fields or mounts `MediaEdit` alongside an editor canvas)
+ * without duplicate notices or duplicate `wp.a11y.speak()` announcements, and
+ * with seamless ownership handoff when one instance unmounts while another
+ * remains mounted.
+ */
+const mountedInstances = new Set< symbol >();
+const leaderListeners = new Set< () => void >();
+const sharedController = {
+	peak: 0,
+	dismissed: false,
+	wasUploading: false,
+	failuresAtStart: 0,
+	completionTimeout: null as ReturnType< typeof setTimeout > | null,
+};
+
+function resetSharedController() {
+	if ( sharedController.completionTimeout ) {
+		clearTimeout( sharedController.completionTimeout );
+		sharedController.completionTimeout = null;
+	}
+	sharedController.peak = 0;
+	sharedController.dismissed = false;
+	sharedController.wasUploading = false;
+	sharedController.failuresAtStart = 0;
+}
+
+function getLeaderId(): symbol | undefined {
+	return mountedInstances.values().next().value;
+}
+
+function subscribeLeader( listener: () => void ) {
+	leaderListeners.add( listener );
+	return () => {
+		leaderListeners.delete( listener );
+	};
+}
+
+function notifyLeaderChange() {
+	leaderListeners.forEach( ( listener ) => listener() );
+}
+
 /**
  * Middle-truncates a filename that exceeds `MAX_FILENAME_LENGTH`, keeping the
  * start and the end (so the file extension stays visible).
  *
- * @param {string} filename The filename to truncate.
- * @return {string} The original or middle-truncated filename.
+ * @param filename The filename to truncate.
+ * @return The original or middle-truncated filename.
  */
-function truncateFilename( filename ) {
+function truncateFilename( filename: string ): string {
 	if ( filename.length <= MAX_FILENAME_LENGTH ) {
 		return filename;
 	}
@@ -63,25 +120,45 @@ export const UPLOAD_DONE = (
 /**
  * Manages a snackbar notice that shows media upload progress while uploads are
  * in progress. It creates/updates a notice via the notices store so that it
- * positions and stacks with every other snackbar in the editor.
+ * positions and stacks with every other snackbar on the screen.
  *
  * Reads from two sources to cover both upload paths:
  *  - `@wordpress/upload-media` store (client-side media processing path).
- *  - An editor-local tracker populated by the traditional `mediaUpload`
- *    wrapper (non-CSM path — e.g. Safari, or when a filter disables CSM).
+ *  - An in-memory tracker populated by `uploadMedia()` in `@wordpress/media-utils`
+ *    (traditional / non-CSM path — e.g. Safari, or when a filter disables CSM).
  *
  * Only counts original user-uploaded files (items without a `parentId`),
  * ignoring generated subsizes/thumbnails.
  *
- * @return {null} This component renders nothing — it only manages a notice.
+ * @return This component renders nothing — it only manages a notice.
  */
 export default function UploadProgressSnackbar() {
+	const [ instanceId ] = useState( () => Symbol( 'UploadProgressSnackbar' ) );
+
+	const leaderId = useSyncExternalStore(
+		subscribeLeader,
+		getLeaderId,
+		getLeaderId
+	);
+	const isLeader = leaderId === undefined || leaderId === instanceId;
+
 	const { items, csmFailureCount } = useSelect( ( select ) => {
-		const { getItems } = select( uploadStore );
-		const { getFailureCount } = unlock( select( uploadStore ) );
+		const storeSelect = select( uploadStore ) as
+			{ getItems?: () => QueueItem[] } | undefined;
+		if ( ! storeSelect || typeof storeSelect.getItems !== 'function' ) {
+			return {
+				items: EMPTY_ITEMS,
+				csmFailureCount: 0,
+			};
+		}
+		const unlocked = unlock( storeSelect ) as
+			{ getFailureCount?: () => number } | undefined;
 		return {
-			items: getItems(),
-			csmFailureCount: getFailureCount(),
+			items: storeSelect.getItems(),
+			csmFailureCount:
+				typeof unlocked?.getFailureCount === 'function'
+					? unlocked.getFailureCount()
+					: 0,
 		};
 	}, [] );
 	const tracker = useTracker();
@@ -95,75 +172,74 @@ export default function UploadProgressSnackbar() {
 	);
 	const csmRemaining = csmOriginals.length;
 
-	// Non-CSM path: files tracked by the editor's mediaUpload wrapper.
+	// Non-CSM path: files tracked by `uploadMedia()`.
 	const trackedRemaining = tracker ? tracker.total - tracker.completed : 0;
 
 	const remaining = csmRemaining + trackedRemaining;
 
 	// Track peak total across sources during a session. The CSM queue removes
 	// items on completion, and the tracker tops out at its recorded total, so
-	// `total` has to be tracked as the high-water mark. Held in a ref (updated
-	// inside the effect below) because it never drives rendering - setting
-	// state during render here discarded the in-progress render pass, which
-	// corrupted `useSyncExternalStore`'s snapshot bookkeeping and made it drop
-	// the tracker's completion notification, leaving the snackbar stuck in its
-	// uploading state (see gutenberg#80343).
+	// `total` has to be tracked as the high-water mark. Held outside React state
+	// (updated inside the effect below) because it never drives rendering -
+	// setting state during render here discarded the in-progress render pass,
+	// which corrupted `useSyncExternalStore`'s snapshot bookkeeping and made it
+	// drop the tracker's completion notification, leaving the snackbar stuck in
+	// its uploading state (see gutenberg#80343).
 	const sessionTotal = csmRemaining + ( tracker ? tracker.total : 0 );
-	const peakRef = useRef( 0 );
 
 	const { createNotice, removeNotice } = useDispatch( noticesStore );
 
-	// Track whether the user has dismissed the notice. If so, don't re-create
-	// it until the current batch finishes and a new one starts.
-	const dismissedRef = useRef( false );
-	const wasUploadingRef = useRef( false );
-
-	// Both failure tallies only ever grow, so the failures belonging to the
-	// current batch are whatever has accrued since it started. Recorded when
-	// the batch begins, read back when the queue drains.
-	const failuresAtStartRef = useRef( 0 );
-
-	// Timeout that removes the completion-state (checkmark) notice after a
-	// brief display. Held so a new upload can cancel it.
-	const completionTimeoutRef = useRef( null );
-
-	// Remove the notice on unmount. Nothing would update it after that, so an
-	// in-progress notice would be left showing the spinner. Uploads keep
-	// running, and a remount picks them up again.
+	// Register this instance and remove the notice only when the last mounted
+	// instance unmounts. If another instance is still mounted, hand leadership
+	// over to it so an active upload notice continues uninterrupted.
 	useEffect( () => {
+		const wasLeader = mountedInstances.size === 0;
+		mountedInstances.add( instanceId );
+		if ( wasLeader ) {
+			notifyLeaderChange();
+		}
+
 		return () => {
-			if ( completionTimeoutRef.current ) {
-				clearTimeout( completionTimeoutRef.current );
+			const wasCurrentLeader = getLeaderId() === instanceId;
+			mountedInstances.delete( instanceId );
+			if ( mountedInstances.size === 0 ) {
+				resetSharedController();
+				removeNotice( NOTICE_ID );
+			} else if ( wasCurrentLeader ) {
+				notifyLeaderChange();
 			}
-			removeNotice( NOTICE_ID );
 		};
-	}, [ removeNotice ] );
+	}, [ instanceId, removeNotice ] );
 
 	useEffect( () => {
+		if ( ! isLeader ) {
+			return;
+		}
+
 		const isUploading = remaining > 0;
 		const failures = csmFailureCount + getTrackedFailureCount();
 
-		if ( isUploading && ! wasUploadingRef.current ) {
-			dismissedRef.current = false;
-			failuresAtStartRef.current = failures;
+		if ( isUploading && ! sharedController.wasUploading ) {
+			sharedController.dismissed = false;
+			sharedController.failuresAtStart = failures;
 			speak( __( 'Media upload started' ), 'polite' );
 			// A new batch started during the completion display: cancel the
 			// pending dismissal so the snackbar transitions straight back
 			// into the uploading state, and reset the peak so the new batch
 			// counts from `1 of N` rather than resuming the previous total.
-			if ( completionTimeoutRef.current ) {
-				clearTimeout( completionTimeoutRef.current );
-				completionTimeoutRef.current = null;
-				peakRef.current = 0;
+			if ( sharedController.completionTimeout ) {
+				clearTimeout( sharedController.completionTimeout );
+				sharedController.completionTimeout = null;
+				sharedController.peak = 0;
 			}
-		} else if ( ! isUploading && wasUploadingRef.current ) {
+		} else if ( ! isUploading && sharedController.wasUploading ) {
 			// The queue drains the same way whether an item uploaded or
 			// failed, so the batch is only "complete" for the files that
 			// actually made it (see gutenberg#81132).
-			const total = peakRef.current;
+			const total = sharedController.peak;
 			const failed = Math.min(
 				total,
-				failures - failuresAtStartRef.current
+				failures - sharedController.failuresAtStart
 			);
 			const uploaded = total - failed;
 
@@ -173,7 +249,7 @@ export default function UploadProgressSnackbar() {
 				// down the progress notice rather than replacing it.
 				speak( __( 'Media upload failed' ), 'polite' );
 				removeNotice( NOTICE_ID );
-				peakRef.current = 0;
+				sharedController.peak = 0;
 			} else {
 				const isFullSuccess = failed === 0;
 				const content = isFullSuccess
@@ -190,7 +266,7 @@ export default function UploadProgressSnackbar() {
 					'polite'
 				);
 
-				if ( ! dismissedRef.current ) {
+				if ( ! sharedController.dismissed ) {
 					createNotice( 'info', content, {
 						id: NOTICE_ID,
 						type: 'snackbar',
@@ -198,34 +274,36 @@ export default function UploadProgressSnackbar() {
 						explicitDismiss: false,
 						speak: false,
 						// No checkmark on a partial batch — some of it failed.
-						icon: isFullSuccess ? UPLOAD_DONE : undefined,
+						icon: ( isFullSuccess
+							? UPLOAD_DONE
+							: undefined ) as unknown as string | undefined,
 						onDismiss: () => {
-							dismissedRef.current = true;
+							sharedController.dismissed = true;
 						},
 					} );
 
-					completionTimeoutRef.current = setTimeout( () => {
+					sharedController.completionTimeout = setTimeout( () => {
 						removeNotice( NOTICE_ID );
-						completionTimeoutRef.current = null;
-						peakRef.current = 0;
+						sharedController.completionTimeout = null;
+						sharedController.peak = 0;
 					}, COMPLETION_DISPLAY_MS );
 				} else {
-					peakRef.current = 0;
+					sharedController.peak = 0;
 				}
 			}
 		}
 
-		wasUploadingRef.current = isUploading;
+		sharedController.wasUploading = isUploading;
 
-		if ( ! isUploading || dismissedRef.current ) {
+		if ( ! isUploading || sharedController.dismissed ) {
 			return;
 		}
 
-		if ( sessionTotal > peakRef.current ) {
-			peakRef.current = sessionTotal;
+		if ( sessionTotal > sharedController.peak ) {
+			sharedController.peak = sessionTotal;
 		}
 
-		const total = peakRef.current;
+		const total = sharedController.peak;
 		const current = total - remaining + 1;
 
 		// Prefer the CSM queue's first original filename, then fall back to
@@ -257,12 +335,13 @@ export default function UploadProgressSnackbar() {
 			isDismissible: false,
 			explicitDismiss: true,
 			speak: false,
-			icon: UPLOAD_SPINNER,
+			icon: UPLOAD_SPINNER as unknown as string,
 			onDismiss: () => {
-				dismissedRef.current = true;
+				sharedController.dismissed = true;
 			},
 		} );
 	}, [
+		isLeader,
 		remaining,
 		sessionTotal,
 		csmOriginals,

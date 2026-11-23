@@ -12,6 +12,11 @@ import { validateMimeTypeForUser } from './validate-mime-type-for-user';
 import { validateFileSize } from './validate-file-size';
 import { UploadError } from './upload-error';
 import { getUploadErrorMessage } from './get-upload-error-message';
+import {
+	addFiles as trackStart,
+	advance as trackAdvance,
+	advanceFailed as trackFailure,
+} from '../components/upload-progress-snackbar/tracker';
 
 declare global {
 	interface Window {
@@ -38,6 +43,9 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 	// Whether to allow multiple files to be uploaded.
 	multiple?: boolean;
+	// Whether the caller owns the upload lifecycle UX (e.g. `@wordpress/upload-media`
+	// queue) and uses this function only as its server transport.
+	isTransportOnly?: boolean;
 }
 
 /**
@@ -54,6 +62,7 @@ interface UploadMediaArgs {
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  * @param $0.signal             Abort signal.
  * @param $0.multiple           Whether to allow multiple files to be uploaded.
+ * @param $0.isTransportOnly    Whether the caller owns the upload progress tracking and uses this function only as its server transport.
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
@@ -65,10 +74,19 @@ export function uploadMedia( {
 	onFileChange,
 	signal,
 	multiple = true,
+	isTransportOnly = false,
 }: UploadMediaArgs ) {
 	if ( ! multiple && filesList.length > 1 ) {
 		onError?.( new Error( __( 'Only one file can be used here.' ) ) );
 		return;
+	}
+
+	// Track this batch for the upload progress snackbar. Skipped for
+	// transport calls from the `@wordpress/upload-media` queue — its items
+	// are already counted by the snackbar, so registering them here would
+	// double-count them (see gutenberg#80369).
+	if ( ! isTransportOnly && filesList.length > 0 ) {
+		trackStart( Array.from( filesList ).map( ( f ) => f?.name || '' ) );
 	}
 
 	const validFiles = [];
@@ -93,6 +111,9 @@ export function uploadMedia( {
 		try {
 			validateMimeTypeForUser( mediaFile, wpAllowedMimeTypes );
 		} catch ( error: unknown ) {
+			if ( ! isTransportOnly ) {
+				trackFailure( 1 );
+			}
 			onError?.( error as Error );
 			continue;
 		}
@@ -102,6 +123,9 @@ export function uploadMedia( {
 		try {
 			validateMimeType( mediaFile, allowedTypes );
 		} catch ( error: unknown ) {
+			if ( ! isTransportOnly ) {
+				trackFailure( 1 );
+			}
 			onError?.( error as Error );
 			continue;
 		}
@@ -110,6 +134,9 @@ export function uploadMedia( {
 		try {
 			validateFileSize( mediaFile, maxUploadFileSize );
 		} catch ( error: unknown ) {
+			if ( ! isTransportOnly ) {
+				trackFailure( 1 );
+			}
 			onError?.( error as Error );
 			continue;
 		}
@@ -133,9 +160,15 @@ export function uploadMedia( {
 				signal
 			);
 			setAndUpdateFiles( index, attachment );
+			if ( ! isTransportOnly ) {
+				trackAdvance( 1 );
+			}
 		} catch ( error ) {
 			// Reset to empty on failure.
 			setAndUpdateFiles( index, null );
+			if ( ! isTransportOnly ) {
+				trackFailure( 1 );
+			}
 
 			onError?.(
 				new UploadError( {

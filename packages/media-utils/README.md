@@ -61,6 +61,7 @@ _Parameters_
 - _$0.wpAllowedMimeTypes_ `UploadMediaArgs[ 'wpAllowedMimeTypes' ]`: List of allowed mime types and file extensions.
 - _$0.signal_ `UploadMediaArgs[ 'signal' ]`: Abort signal.
 - _$0.multiple_ `UploadMediaArgs[ 'multiple' ]`: Whether to allow multiple files to be uploaded.
+- _$0.isTransportOnly_ `UploadMediaArgs[ 'isTransportOnly' ]`: Whether the caller owns the upload progress tracking and uses this function only as its server transport.
 
 ### validateFileSize
 

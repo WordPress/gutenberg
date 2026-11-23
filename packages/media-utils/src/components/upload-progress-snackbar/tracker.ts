@@ -3,7 +3,7 @@ import { useSyncExternalStore } from '@wordpress/element';
 /**
  * A minimal in-memory tracker for in-flight media uploads that happen outside
  * the `@wordpress/upload-media` store (i.e. the traditional / non-CSM upload
- * path). The editor's `mediaUpload` wrapper writes to it; the
+ * path). `uploadMedia()` in `@wordpress/media-utils` writes to it; the
  * `UploadProgressSnackbar` reads from it.
  *
  * State shape: { total, completed, pending: string[] }
@@ -18,20 +18,24 @@ import { useSyncExternalStore } from '@wordpress/element';
  * discarded once the session ends. See `getFailureCount`.
  */
 
-let state = null;
+export interface TrackerState {
+	total: number;
+	completed: number;
+	pending: string[];
+}
+
+let state: TrackerState | null = null;
 
 /**
- * Running tally of files that finished by failing, counted since the editor
+ * Running tally of files that finished by failing, counted since the page
  * loaded rather than per session. Deliberately not a sibling of `total`,
  * `completed` and `pending` inside `state`: `state` is cleared the moment a
  * session finishes, which is exactly when a consumer needs to know whether
  * anything actually uploaded. It only ever grows; see `getFailureCount`.
- *
- * @type {number}
  */
 let cumulativeFailures = 0;
 
-const listeners = new Set();
+const listeners = new Set< () => void >();
 
 function notify() {
 	listeners.forEach( ( listener ) => listener() );
@@ -40,9 +44,9 @@ function notify() {
 /**
  * Registers a new batch of files that have started uploading.
  *
- * @param {string[]} filenames Filenames in submission order.
+ * @param filenames Filenames in submission order.
  */
-export function addFiles( filenames ) {
+export function addFiles( filenames: string[] ) {
 	if ( ! filenames.length ) {
 		return;
 	}
@@ -60,9 +64,9 @@ export function addFiles( filenames ) {
 /**
  * Advances the tracker by a number of successfully uploaded files.
  *
- * @param {number} count Number of files that finished since the last call.
+ * @param count Number of files that finished since the last call.
  */
-export function advance( count ) {
+export function advance( count: number ) {
 	finish( count, 0 );
 }
 
@@ -73,7 +77,7 @@ export function advance( count ) {
  * but they are also tallied so consumers can tell an empty queue that uploaded
  * everything from one that uploaded nothing.
  *
- * @param {number} [count] Number of files that failed since the last call.
+ * @param count Number of files that failed since the last call.
  */
 export function advanceFailed( count = 1 ) {
 	finish( count, count );
@@ -82,10 +86,10 @@ export function advanceFailed( count = 1 ) {
 /**
  * Advances the tracker by a number of finished files.
  *
- * @param {number} count  Number of files that finished since the last call.
- * @param {number} failed How many of those files failed.
+ * @param count  Number of files that finished since the last call.
+ * @param failed How many of those files failed.
  */
-function finish( count, failed ) {
+function finish( count: number, failed: number ) {
 	if ( ! state || count <= 0 ) {
 		return;
 	}
@@ -124,22 +128,22 @@ export function reset() {
  * to learn how many files failed within one session, read it when the session
  * starts and subtract that from its later value.
  *
- * @return {number} Number of failed uploads since the editor loaded.
+ * @return Number of failed uploads since the page loaded.
  */
-export function getFailureCount() {
+export function getFailureCount(): number {
 	return cumulativeFailures;
 }
 
 /**
  * Returns the current tracker state, or `null` when idle.
  *
- * @return {?{total: number, completed: number, pending: string[]}} Tracker state.
+ * @return Tracker state.
  */
-export function getState() {
+export function getState(): TrackerState | null {
 	return state;
 }
 
-function subscribe( listener ) {
+function subscribe( listener: () => void ) {
 	listeners.add( listener );
 	return () => {
 		listeners.delete( listener );
@@ -149,8 +153,8 @@ function subscribe( listener ) {
 /**
  * React hook that subscribes to the tracker.
  *
- * @return {?{total: number, completed: number, pending: string[]}} Tracker state.
+ * @return Tracker state.
  */
-export function useTracker() {
+export function useTracker(): TrackerState | null {
 	return useSyncExternalStore( subscribe, getState, getState );
 }

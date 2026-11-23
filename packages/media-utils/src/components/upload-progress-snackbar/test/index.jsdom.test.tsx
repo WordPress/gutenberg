@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { render, act } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
@@ -15,7 +15,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 		useDispatch: vi.fn( () => ( {
 			createNotice: mockCreateNotice,
 			removeNotice: mockRemoveNotice,
-		} ) ),
+		} ) ) as unknown as ( typeof import( '@wordpress/data' ) )[ 'useDispatch' ],
 		useDispatchWithMap: vi.fn(),
 		useSelect: vi.fn(),
 	};
@@ -25,7 +25,7 @@ vi.mock( import( '@wordpress/a11y' ), () => ( {
 	speak: vi.fn(),
 } ) );
 
-function mockQueue( items, failureCount = 0 ) {
+function mockQueue( items: unknown[], failureCount = 0 ) {
 	const storeSelect = {
 		getItems: () => items,
 		isUploading: () => items.length > 0,
@@ -33,12 +33,17 @@ function mockQueue( items, failureCount = 0 ) {
 	// `getFailureCount` is a private selector, so the component reads it
 	// through `unlock`.
 	lock( storeSelect, { getFailureCount: () => failureCount } );
-	useSelect.mockImplementation( ( mapSelect ) =>
-		mapSelect( () => storeSelect )
+	( useSelect as unknown as Mock ).mockImplementation(
+		( mapSelect: ( select: () => typeof storeSelect ) => unknown ) =>
+			mapSelect( () => storeSelect )
 	);
 }
 
-function makeItem( id, name, { parentId } = {} ) {
+function makeItem(
+	id: string,
+	name: string,
+	{ parentId }: { parentId?: string } = {}
+) {
 	return {
 		id,
 		sourceFile: { name },
@@ -97,7 +102,7 @@ describe( 'UploadProgressSnackbar', () => {
 		);
 	} );
 
-	it( 'shows non-CSM uploads tracked by the editor mediaUpload wrapper', () => {
+	it( 'shows non-CSM uploads tracked by uploadMedia', () => {
 		mockQueue( [] );
 		act( () => {
 			addFiles( [ 'traditional.jpg' ] );
@@ -163,7 +168,7 @@ describe( 'UploadProgressSnackbar', () => {
 			addFiles( [ 'a.jpg' ] );
 		} );
 		render( <UploadProgressSnackbar /> );
-		speak.mockClear();
+		( speak as Mock ).mockClear();
 
 		act( () => {
 			advance( 1 );
@@ -304,6 +309,44 @@ describe( 'UploadProgressSnackbar', () => {
 
 		unmount();
 
+		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
+	} );
+
+	it( 'coordinates multiple mounted instances without duplicating notices or dropping on partial unmount', () => {
+		mockQueue( [] );
+		const { unmount: unmountFirst } = render( <UploadProgressSnackbar /> );
+		const { unmount: unmountSecond } = render( <UploadProgressSnackbar /> );
+
+		act( () => {
+			addFiles( [ 'a.jpg', 'b.jpg' ] );
+		} );
+
+		// Only the active leader instance announces and creates the notice.
+		expect( speak ).toHaveBeenCalledTimes( 1 );
+		expect( speak ).toHaveBeenCalledWith(
+			'Media upload started',
+			'polite'
+		);
+		expect( mockCreateNotice ).toHaveBeenCalledTimes( 1 );
+		mockCreateNotice.mockClear();
+
+		// Unmounting the first instance while the second remains mounted keeps
+		// the notice alive and hands over leadership to the surviving instance.
+		unmountFirst();
+		expect( mockRemoveNotice ).not.toHaveBeenCalled();
+
+		act( () => {
+			advance( 2 );
+		} );
+
+		expect( mockCreateNotice ).toHaveBeenCalledWith(
+			'info',
+			'Upload complete',
+			expect.objectContaining( { id: 'upload-progress' } )
+		);
+
+		// Unmounting the last remaining instance removes the notice.
+		unmountSecond();
 		expect( mockRemoveNotice ).toHaveBeenCalledWith( 'upload-progress' );
 	} );
 } );

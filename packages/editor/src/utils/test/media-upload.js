@@ -1,9 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { uploadMedia } from '@wordpress/media-utils';
 import mediaUpload from '../media-upload';
-import {
-	getState,
-	reset,
-} from '../../components/upload-progress-snackbar/tracker';
 
 vi.mock( import( '@wordpress/media-utils' ), () => ( {
 	uploadMedia: vi.fn(),
@@ -39,30 +36,30 @@ vi.mock( import( '@wordpress/data' ), () => ( {
 
 describe( 'mediaUpload', () => {
 	beforeEach( () => {
-		reset();
 		vi.clearAllMocks();
 	} );
 
-	it( 'registers files with the upload progress tracker and locks saving', () => {
+	it( 'forwards files to uploadMedia and locks saving', () => {
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
 		} );
 
 		mediaUpload( { filesList: [ file ] } );
 
-		expect( getState() ).toEqual( {
-			total: 1,
-			completed: 0,
-			pending: [ 'photo.jpg' ],
-		} );
+		expect( uploadMedia ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				filesList: [ file ],
+				isTransportOnly: false,
+			} )
+		);
 		expect( mockLockPostSaving ).toHaveBeenCalled();
 		expect( mockLockPostAutosaving ).toHaveBeenCalled();
 	} );
 
-	it( 'skips tracking and save locking for transport-only calls', () => {
+	it( 'forwards isTransportOnly and skips save locking for transport-only calls', () => {
 		// The upload-media queue calls this wrapper as its server transport;
 		// it already counts its own queue items for the progress snackbar
-		// (registering the same file here would double-count it, see
+		// (registering the same file in uploadMedia would double-count it, see
 		// gutenberg#80369) and locks saving via useUploadSaveLock.
 		const file = new File( [ 'content' ], 'photo.jpg', {
 			type: 'image/jpeg',
@@ -70,7 +67,12 @@ describe( 'mediaUpload', () => {
 
 		mediaUpload( { filesList: [ file ], isTransportOnly: true } );
 
-		expect( getState() ).toBeNull();
+		expect( uploadMedia ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				filesList: [ file ],
+				isTransportOnly: true,
+			} )
+		);
 		expect( mockLockPostSaving ).not.toHaveBeenCalled();
 		expect( mockLockPostAutosaving ).not.toHaveBeenCalled();
 	} );

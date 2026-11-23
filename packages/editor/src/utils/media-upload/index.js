@@ -4,11 +4,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { uploadMedia } from '@wordpress/media-utils';
 import { __ } from '@wordpress/i18n';
 import { store as editorStore } from '../../store';
-import {
-	addFiles as trackStart,
-	advance as trackAdvance,
-	advanceFailed as trackFailure,
-} from '../../components/upload-progress-snackbar/tracker';
 
 const noop = () => {};
 
@@ -41,12 +36,6 @@ export default function mediaUpload( {
 	multiple = true,
 	isTransportOnly = false,
 } ) {
-	// A caller that takes a single file refuses a multi-file batch outright.
-	// `uploadMedia()` makes the same check, but reports the refusal as one
-	// error for the whole batch, which would leave every other file in it
-	// counted as still in flight by the progress tracker below - and the
-	// tracker folds every later upload into that stuck session
-	// (see gutenberg#82041). Refusing here keeps the batch out of it.
 	if ( ! multiple && filesList.length > 1 ) {
 		onError( __( 'Only one file can be used here.' ) );
 		return;
@@ -86,18 +75,6 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 
-	// Track this batch for the upload progress snackbar. Skipped for
-	// transport calls from the `@wordpress/upload-media` queue — its items
-	// are already counted by the snackbar, so registering them here would
-	// double-count them (see gutenberg#80369).
-	if ( ! isTransportOnly ) {
-		const trackingFiles = Array.from( filesList ).map(
-			( f ) => f?.name || ''
-		);
-		trackStart( trackingFiles );
-	}
-	let lastCompletedCount = 0;
-
 	uploadMedia( {
 		allowedTypes,
 		filesList,
@@ -123,15 +100,6 @@ export default function mediaUpload( {
 			if ( ! isTransportOnly && entityFiles.length === files.length ) {
 				clearSaveLock();
 			}
-
-			// Advance the snackbar tracker for newly-completed files.
-			if ( ! isTransportOnly ) {
-				const completedCount = entityFiles.length;
-				if ( completedCount > lastCompletedCount ) {
-					trackAdvance( completedCount - lastCompletedCount );
-					lastCompletedCount = completedCount;
-				}
-			}
 		},
 		onSuccess,
 		additionalData: {
@@ -142,14 +110,11 @@ export default function mediaUpload( {
 		onError: ( { message } ) => {
 			if ( ! isTransportOnly ) {
 				clearSaveLock();
-				// Failed files still count as "done" for the snackbar, but are
-				// tallied so it doesn't report a batch that failed outright as
-				// an upload that completed.
-				trackFailure( 1 );
 			}
 			onError( message );
 		},
 		wpAllowedMimeTypes,
 		multiple,
+		isTransportOnly,
 	} );
 }

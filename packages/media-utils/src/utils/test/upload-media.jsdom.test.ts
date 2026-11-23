@@ -1,7 +1,20 @@
-import { afterEach, describe, expect, it, vi, type Mock } from 'vitest';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
 import { uploadMedia } from '../upload-media';
 import { UploadError } from '../upload-error';
 import { uploadToServer } from '../upload-to-server';
+import {
+	getFailureCount,
+	getState,
+	reset,
+} from '../../components/upload-progress-snackbar/tracker';
 
 vi.mock( import( '../upload-to-server' ), () => ( {
 	uploadToServer: vi.fn(),
@@ -24,6 +37,10 @@ const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', {
 } );
 
 describe( 'uploadMedia', () => {
+	beforeEach( () => {
+		reset();
+	} );
+
 	afterEach( () => {
 		vi.clearAllMocks();
 	} );
@@ -261,5 +278,55 @@ describe( 'uploadMedia', () => {
 				file: imageFile,
 			} )
 		);
+	} );
+
+	it( 'tracks in-flight files and clears the tracker when uploads complete', async () => {
+		let resolveUpload: ( value: unknown ) => void;
+		( uploadToServer as Mock ).mockImplementation(
+			() =>
+				new Promise( ( resolve ) => {
+					resolveUpload = resolve;
+				} )
+		);
+
+		uploadMedia( {
+			filesList: [ imageFile ],
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
+		} );
+
+		expect( getState() ).toEqual( {
+			total: 1,
+			completed: 0,
+			pending: [ 'test.jpeg' ],
+		} );
+
+		resolveUpload!( { id: 1, url: 'https://example.com/test.jpeg' } );
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+		expect( getState() ).toBeNull();
+		expect( getFailureCount() ).toBe( 0 );
+	} );
+
+	it( 'keeps a refused multi-file batch out of the upload progress tracker', () => {
+		uploadMedia( {
+			filesList: [ imageFile, xmlFile ],
+			multiple: false,
+		} );
+
+		expect( getState() ).toBeNull();
+	} );
+
+	it( 'skips upload progress tracking when isTransportOnly is true', () => {
+		( uploadToServer as Mock ).mockImplementation(
+			() => new Promise( () => {} )
+		);
+
+		uploadMedia( {
+			filesList: [ imageFile ],
+			wpAllowedMimeTypes: { jpeg: 'image/jpeg' },
+			isTransportOnly: true,
+		} );
+
+		expect( getState() ).toBeNull();
 	} );
 } );
