@@ -260,9 +260,7 @@ describe( 'SearchableChipSelect', () => {
 			expect.anything()
 		);
 		await expect
-			.element(
-				screen.getByRole( 'toolbar', { name: 'Selected items' } )
-			)
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
 			.toBeVisible();
 	} );
 
@@ -283,9 +281,7 @@ describe( 'SearchableChipSelect', () => {
 		);
 
 		await expect
-			.element(
-				screen.getByRole( 'toolbar', { name: 'Selected items' } )
-			)
+			.element( screen.getByRole( 'toolbar', { name: 'Selected item' } ) )
 			.toBeVisible();
 		expect( screen.getByRole( 'combobox', { name: 'Fruit' } ) ).toBe(
 			input

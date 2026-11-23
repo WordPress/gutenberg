@@ -16,7 +16,7 @@ function getChipsToolbarLabel( selectedCount: number ): string | undefined {
 	if ( selectedCount === 0 ) {
 		return undefined;
 	}
-	return __( 'Selected items' );
+	return selectedCount === 1 ? __( 'Selected item' ) : __( 'Selected items' );
 }
 
 function getInputSelectionHint( selectedCount: number ): string | undefined {
