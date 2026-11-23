@@ -170,9 +170,9 @@ The edit replaces the current one. It is not merged with it. Every part is optio
 
 So `{ rotation: 90 }` on a cropped image gives a rotated image with no crop. To keep a part, pass it again. The crop is measured on the image after the flip and rotation, so the same crop numbers frame a different part of the image once either changes.
 
-From `state`, only the image and the locked ratio are kept. The pan and zoom are worked out again: the crop is centred and zoomed in, as after a resize.
+From `state`, only the image and the locked ratio are kept. The pan and zoom are worked out again: the crop is centered and zoomed in, as after a resize.
 
-The image always covers the crop. A crop it does not cover is fitted the way the editor fits one: it shrinks about its centre only as far as its shape needs, then moves the shortest way inside. Under a locked ratio, the crop keeps its centre and width and takes the height the ratio needs.
+The image always covers the crop. A crop it does not cover is fitted the way the editor fits one: it shrinks around its center, keeping its shape, until the image can cover it, then moves the shortest way inside. Under a locked ratio, the crop keeps its center and width and takes the height the ratio needs.
 
 It returns `{ rejected }` instead when it cannot apply the edit at all:
 

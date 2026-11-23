@@ -285,10 +285,11 @@ describe( 'getImageEdit ↔ Export-camera parity', () => {
 } );
 
 describe( 'applyImageEdit ↔ Export-camera parity', () => {
-	// Hand-written, so only the exporter can agree with them.
+	// Written by hand rather than read from a state, so the exporter is an
+	// independent check.
 	const edits: [ string, ImageEdit ][] = [
 		[
-			'a flip, a quarter turn and an off-centre crop',
+			'a flip, a quarter turn and an off-center crop',
 			{
 				flip: { horizontal: true, vertical: false },
 				rotation: 90,
@@ -328,8 +329,9 @@ describe( 'applyImageEdit ↔ Export-camera parity', () => {
 	}
 
 	it( 'never applies a hand-built state as a different edit', () => {
-		// Hand-built, so some frame regions the editor forbids. In strict
-		// mode each must come back unchanged or be rejected.
+		// Built by hand, so some frame a part of the image the editor would
+		// not allow. In strict mode each must come back unchanged or be
+		// rejected.
 		const states = buildRows()
 			.filter( ( { probeLabel } ) => probeLabel === 'center' )
 			.map( ( { state } ) => state );

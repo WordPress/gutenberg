@@ -156,7 +156,7 @@ describe( 'applyImageEdit', () => {
 	} );
 
 	it( 'keeps the width of a crop under a locked ratio when there is room', () => {
-		// 800 by 400 pixels centred 425 down, so an 800 pixel square.
+		// 800 by 400 pixels centered 425 down, so an 800 pixel square.
 		const state = apply( square, {
 			crop: { x: 0.25, y: 0.25, width: 0.5, height: 4 / 9 },
 		} );

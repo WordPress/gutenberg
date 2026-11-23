@@ -375,9 +375,9 @@ describe( 'invariants across a run of edits', () => {
 					);
 				}
 
-				// Applied to a clean state, so the old view cannot carry
-				// the edit. A crop under a pixel cannot be exported, so it
-				// is rejected.
+				// Applied to a clean state, so nothing of the old view can
+				// carry over. A crop under a pixel cannot be exported, so
+				// it is rejected.
 				if ( edit ) {
 					const clean = imageEditorReducer( state, {
 						type: 'RESET',

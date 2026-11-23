@@ -9,11 +9,14 @@ import { imageEditorReducer, withBaseValues } from './core/state';
 import { CROP_TOLERANCE, getImageEdit, type ImageEdit } from './get-image-edit';
 
 /**
- * Why an edit was rejected. `no-image` means no image with a usable size
- * has loaded. `invalid` is a non-finite number or a crop under one pixel
- * wide or high. In strict mode only, `locked-ratio` is a crop that fits
- * the image but not the locked ratio, and `outside-image` is a crop
- * reaching outside the image.
+ * Why an edit was rejected.
+ *
+ * - `no-image`: no image with a usable size has loaded.
+ * - `invalid`: a number is not finite, or the crop is under one pixel
+ *   wide or high.
+ * - `locked-ratio`: strict mode only. The crop fits the image but not the
+ *   locked ratio.
+ * - `outside-image`: strict mode only. The crop reaches outside the image.
  */
 export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
@@ -31,8 +34,9 @@ export type ApplyImageEditResult =
 
 const WHOLE_IMAGE: NormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 
-// Whether `state` reads back as `edit`. A missing part means none, so a
-// near-full crop that `getImageEdit` omits still matches.
+// Does `getImageEdit( state )` give back `edit`? A part left out of either
+// counts as none, and a crop left out counts as the whole image. So a
+// near-full crop, which `getImageEdit` leaves out, matches a whole crop.
 function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 	const held = getImageEdit( state );
 	if ( ! held ) {
@@ -54,16 +58,17 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 }
 
 /**
- * The reverse of `getImageEdit`. The edit replaces the current one: a
- * missing flip or rotation means none, and a missing crop means the crop
- * the editor picks, as when the image is rotated by hand. Only the image
- * and locked ratio are kept from `state`.
+ * The reverse of `getImageEdit`: it turns an edit into an editor state.
+ * The edit replaces the current one. Only the image and the locked ratio
+ * are kept from `state`. A flip or rotation the edit leaves out is none.
+ * A crop it leaves out is the one the editor picks when the image is
+ * rotated by hand.
  *
- * A crop the image does not cover is fitted as the editor fits one: it
- * shrinks about its centre only as far as its shape needs, then moves the
- * shortest way inside. Under a locked ratio it keeps its centre and width.
- * The pan and zoom are replaced: the crop is centred and zoomed in, as
- * after a resize.
+ * A crop the image does not cover is fitted the way the editor fits one:
+ * it shrinks around its center, keeping its shape, until the image can
+ * cover it, then moves the shortest way inside. Under a locked ratio it
+ * keeps its center and width. The pan and zoom are replaced: the crop is
+ * centered and zoomed in, as after a resize.
  *
  * @param state          Only its image and locked ratio are used.
  * @param edit           The edit to apply, replacing the current one.
@@ -107,16 +112,16 @@ export function applyImageEdit(
 			payload,
 		} );
 
-	// The reset starts from the full view, and containment zooms it in as
-	// the rotate control does.
+	// With no crop, the reset frames the whole image. Under a fine rotation,
+	// containment then zooms in, as the rotate control does.
 	if ( ! crop ) {
 		return {
 			state: reset( { rotation, flip, aspectRatio: state.aspectRatio } ),
 		};
 	}
 
-	// The crop is in the rotated image's bounds. The view is the bounds at
-	// the nearest quarter turn, on the same centre.
+	// The crop is a fraction of the rotated image's bounding box. The view
+	// is the bounding box at the nearest quarter turn, with the same center.
 	const rotated = getRotatedBBox(
 		image.naturalWidth,
 		image.naturalHeight,
@@ -125,7 +130,7 @@ export function applyImageEdit(
 	if ( crop.width * rotated.width < 1 || crop.height * rotated.height < 1 ) {
 		return { rejected: 'invalid' };
 	}
-	// Keep the crop's centre and width under a locked ratio, as the crop
+	// Under a locked ratio, keep the crop's center and width, as the crop
 	// setter does. Containment then fits it if it has no room. Strict skips
 	// this, so the lock check below judges the crop as passed.
 	const ratio = state.aspectRatio;
@@ -170,7 +175,7 @@ export function applyImageEdit(
 	if ( ! strict || holdsEdit( next, edit ) ) {
 		return { state: next };
 	}
-	// If the edit holds without the lock, the lock rejected it.
+	// If the edit applies without the lock, the lock is what rejected it.
 	if ( state.aspectRatio && holdsEdit( reset( candidate ), edit ) ) {
 		return { rejected: 'locked-ratio' };
 	}
