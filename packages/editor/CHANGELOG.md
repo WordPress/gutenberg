@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).
