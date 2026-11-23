@@ -1408,6 +1408,74 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Test that the text an inline operation records when it is decided is
+	 * stored as bounded text, as given, for a user without `unfiltered_html`.
+	 */
+	public function test_suggestion_payload_decided_text_is_bounded(): void {
+		$author_id = self::$author_id;
+		$this->assertIsInt( $author_id );
+		wp_set_current_user( $author_id );
+		$post_id    = self::factory()->post->create( array( 'post_author' => $author_id ) );
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+			)
+		);
+		$this->assertIsInt( $comment_id );
+
+		$operation = array(
+			'type'           => 'inline-suggestion',
+			'attribute'      => 'content',
+			'suggestionType' => 'replace',
+		);
+		$payload   = (string) wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'blockName'     => 'core/paragraph',
+				'baseRevision'  => null,
+				'operations'    => array(
+					array_merge(
+						$operation,
+						array(
+							'decidedText'        => ' a < b',
+							'decidedDeletedText' => str_repeat( 'é', 1500 ),
+						)
+					),
+					array_merge(
+						$operation,
+						array(
+							'decidedText'        => array( 'not text' ),
+							'decidedDeletedText' => '',
+						)
+					),
+				),
+			)
+		);
+
+		update_comment_meta( $comment_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$stored = get_comment_meta( $comment_id, '_wp_suggestion', true );
+		$this->assertIsString( $stored );
+		$decoded = json_decode( $stored, true );
+		$this->assertIsArray( $decoded );
+		$this->assertSame(
+			array(
+				array_merge(
+					$operation,
+					array(
+						'decidedText'        => ' a < b',
+						'decidedDeletedText' => str_repeat( 'é', 1000 ),
+					)
+				),
+				$operation,
+			),
+			$decoded['operations'],
+			'Decided text is kept as typed, cut to its limit, and dropped when it is not text.'
+		);
+	}
+
+	/**
 	 * Test that a user WITH `unfiltered_html` keeps their markup verbatim —
 	 * the same freedom they have in post content.
 	 */
