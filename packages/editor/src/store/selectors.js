@@ -24,6 +24,8 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
+import { getEffectiveEditorIntent } from './utils/editor-intent';
+import { isSuggestionModeEnabled } from '../components/suggestion-mode/gate';
 import { unlock } from '../lock-unlock';
 import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
@@ -366,7 +368,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 	// this selector shows what the suggester proposed. The post itself keeps
 	// its value until a reviewer accepts. See issue #73411.
 	const proposals =
-		state.editorIntent === EDITOR_INTENT_SUGGEST
+		getEffectiveEditorIntent( state ) === EDITOR_INTENT_SUGGEST
 			? state.postFieldProposals
 			: undefined;
 	if ( proposals && attributeName !== 'meta' && proposals[ attributeName ] ) {
@@ -1510,12 +1512,11 @@ export const getEditorMode = createRegistrySelector( ( select ) => {
 		 * untouched so returning to the `edit` intent returns the user to the
 		 * code editor.
 		 *
-		 * The intent is read off state rather than through the private
+		 * The intent is read through the helper rather than the private
 		 * `getEditorIntent` selector because private-selectors.js imports
-		 * from this module, so importing it back would close a cycle. The
-		 * reducer always holds a value, so there is nothing to fall back to.
+		 * from this module, so importing it back would close a cycle.
 		 */
-		if ( state.editorIntent === EDITOR_INTENT_SUGGEST ) {
+		if ( getEffectiveEditorIntent( state ) === EDITOR_INTENT_SUGGEST ) {
 			return 'visual';
 		}
 
@@ -1536,8 +1537,15 @@ export const getEditorMode = createRegistrySelector( ( select ) => {
 		 * the preference actually being `text`: a visual-editor session -
 		 * every session by default - never pays for it, and a code-editor
 		 * session is not re-serializing per keystroke the way the canvas is.
+		 *
+		 * Without the experiment nothing can resolve the markers, so the
+		 * mask would withhold the code editor on such a post for good.
 		 */
-		if ( mode === 'text' && hasPendingSuggestionMarkersInPost( state ) ) {
+		if (
+			mode === 'text' &&
+			isSuggestionModeEnabled() &&
+			hasPendingSuggestionMarkersInPost( state )
+		) {
 			return 'visual';
 		}
 

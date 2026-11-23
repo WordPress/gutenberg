@@ -7,8 +7,6 @@ import {
 import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { getBlockType } from '@wordpress/blocks';
-import { RichTextData } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
@@ -20,7 +18,11 @@ import {
 	useSuggestionsProvider,
 } from '../suggestion-mode';
 import SuggestionSummary from '../suggestion-mode/suggestion-summary';
-import { isAttributeEqual } from '../suggestion-mode/operations';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
+import {
+	isAttributeEqual,
+	structuralOperationText,
+} from '../suggestion-mode/operations';
 import { readSuggestionMarkers } from '../suggestion-mode/marker';
 import { unlock } from '../../lock-unlock';
 import {
@@ -41,7 +43,6 @@ import {
 	SUGGESTION_TYPE_DELETION,
 	SUGGESTION_TYPE_REPLACEMENT,
 	findSuggestionText,
-	stripSuggestionMarkers,
 	suggestionRelations,
 	suggestionsEmptiedBy,
 } from '../inline-suggestions';
@@ -87,48 +88,6 @@ function isPostFieldStillProposed( op: any, value: unknown ): boolean {
 		);
 	}
 	return ! isAttributeEqual( op.after ?? null, value );
-}
-
-/**
- * Plain visible text of a block, read from its first non-empty rich-text
- * attribute with suggestion markers unwrapped. Lets a structural summary say
- * which block it means. Returns null for a block with no text (an image
- * without a caption, a container, an empty paragraph).
- *
- * @param blockName  Block name.
- * @param attributes Block attributes.
- * @return The block's text, or null.
- */
-function readBlockText(
-	blockName: string | undefined,
-	attributes: Record< string, any > | null | undefined
-): string | null {
-	if ( ! blockName || ! attributes ) {
-		return null;
-	}
-	const definitions: Record< string, any > =
-		getBlockType( blockName )?.attributes ?? {};
-	for ( const [ key, definition ] of Object.entries( definitions ) ) {
-		if (
-			definition?.type !== 'rich-text' &&
-			definition?.source !== 'rich-text'
-		) {
-			continue;
-		}
-		const value = stripSuggestionMarkers( attributes[ key ] );
-		let text = '';
-		if ( value instanceof RichTextData ) {
-			text = value.text;
-		} else if ( typeof value === 'string' ) {
-			text = RichTextData.fromHTMLString( value ).text;
-		}
-		// Drop the object replacement character inline images leave behind.
-		text = text.replace( /\uFFFC/g, '' ).trim();
-		if ( text ) {
-			return text;
-		}
-	}
-	return null;
 }
 
 /**
@@ -469,7 +428,9 @@ export function SuggestionActionButtons( {
 }: {
 	decision: SuggestionDecision | null;
 } ) {
-	if ( ! decision || decision.isResolved ) {
+	// Without the experiment the capture and the save pass that a decision
+	// relies on do not run, so there is nothing to decide with.
+	if ( ! decision || decision.isResolved || ! isSuggestionModeEnabled() ) {
 		return null;
 	}
 
@@ -599,9 +560,9 @@ function ResolvedSuggestionSummary( {
 		[ operations, thread?.blockClientId, thread?.id ]
 	);
 	/*
-	 * A structural op carries no text of its own, so read it from the block:
-	 * the live one first, which tracks typing into an inserted block, then
-	 * the snapshot the interceptor records on the op.
+	 * A structural op is named by its block's text: the live block's first,
+	 * which tracks typing into an inserted block, then the excerpt the
+	 * payload carries for when the block is gone.
 	 */
 	const blockTexts = useSelect(
 		( select ) => {
@@ -624,10 +585,7 @@ function ResolvedSuggestionSummary( {
 					( thread?.blockClientId &&
 						getBlockAttributes( thread.blockClientId ) ) ||
 					null;
-				return readBlockText(
-					op.blockName,
-					liveAttributes ?? op.block?.attributes
-				);
+				return structuralOperationText( op, liveAttributes );
 			} );
 		},
 		[ operations, thread?.blockClientId ]
@@ -759,7 +717,9 @@ export default function SuggestionActions( {
 		status = outdatedLabel( decision.anchorKind );
 	}
 
+	const canDecide = isSuggestionModeEnabled();
 	const canReopen =
+		canDecide &&
 		!! onReopen &&
 		( presentation === 'stuck' || presentation === 'outdated' );
 
@@ -809,7 +769,17 @@ export default function SuggestionActions( {
 					{ hint }
 				</Text>
 			) }
-			{ ! isResolved && applyDisabledReason && (
+			{ ! canDecide && ! isResolved && (
+				<Text
+					variant="body-sm"
+					className="editor-collab-sidebar-panel__suggestion-status"
+				>
+					{ __(
+						'Turn on the Suggestion Mode experiment to accept or reject this suggestion.'
+					) }
+				</Text>
+			) }
+			{ canDecide && ! isResolved && applyDisabledReason && (
 				<Text
 					variant="body-sm"
 					className="editor-collab-sidebar-panel__suggestion-status"
@@ -817,7 +787,7 @@ export default function SuggestionActions( {
 					{ applyDisabledReason }
 				</Text>
 			) }
-			{ ( presentation === 'stuck' || canReopen ) && (
+			{ canDecide && ( presentation === 'stuck' || canReopen ) && (
 				<Stack
 					direction="row"
 					gap="sm"

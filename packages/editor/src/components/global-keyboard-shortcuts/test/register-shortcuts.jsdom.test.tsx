@@ -111,11 +111,17 @@ describe( 'EditorKeyboardShortcutsRegister', () => {
 		expect( registeredIntentShortcuts( registry ) ).toEqual(
 			INTENT_SHORTCUTS
 		);
+		// Named after the Mode menu's items.
+		expect(
+			registry
+				.select( keyboardShortcutsStore )
+				.getShortcutDescription( 'core/editor/intent-edit' )
+		).toBe( 'Switch to Editing.' );
 		expect(
 			registry
 				.select( keyboardShortcutsStore )
 				.getShortcutDescription( 'core/editor/intent-suggest' )
-		).toBe( 'Switch to Suggest mode.' );
+		).toBe( 'Switch to Suggesting.' );
 	} );
 
 	it( 'leaves the intent shortcuts unregistered when the post type has no notes support', () => {

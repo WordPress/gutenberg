@@ -1,4 +1,9 @@
+import { getBlockType } from '@wordpress/blocks';
 import { create } from '@wordpress/rich-text';
+import {
+	isBlockOwnedByCurrentPost,
+	notifyForeignEditRefused,
+} from './block-ownership';
 
 /**
  * Shared DOM-target helpers for the suggest-mode keyboard interceptors
@@ -68,8 +73,9 @@ function resolveEventElement( event: any ): any {
  * note reply and write it into the previously selected block as a suggestion
  * marker. Only intercept when the edit lands inside the selected block's
  * element AND inside a block rich-text editable whose attribute key (when
- * exposed) matches the selection's. The affected element is resolved from the
- * event's range rather than `event.target` (see `resolveEventElement`).
+ * exposed) matches the selection's, and names one of the block's attributes.
+ * The affected element is resolved from the event's range rather than
+ * `event.target` (see `resolveEventElement`).
  *
  * @param event          Input/clipboard event.
  * @param selectionStart Block-editor `getSelectionStart()` value.
@@ -116,6 +122,55 @@ export function isEventTargetSelectedRichText(
 	) {
 		return false;
 	}
+	/*
+	 * The keyboards read and write the field as `attributes[ attributeKey ]`.
+	 * A field's key is whatever identifier the block gave its `RichText`,
+	 * and need not be an attribute: a table cell's is a path into `body`.
+	 * Such a field is left to the block's own `onChange`, which the overlay
+	 * turns into an attribute suggestion.
+	 */
+	const attributes = getBlockType(
+		blockElement.getAttribute( 'data-type' ) ?? ''
+	)?.attributes;
+	if (
+		attributes &&
+		selectionStart.attributeKey &&
+		! Object.hasOwn( attributes, selectionStart.attributeKey )
+	) {
+		return false;
+	}
+	return true;
+}
+
+/**
+ * Decline an input, clipboard or key event aimed at the rich text of a block
+ * the current post does not own (see `block-ownership.ts`), before the
+ * browser or the editor applies it. The event is stopped as well as
+ * cancelled, so no later listener writes a marker or edits the block for it.
+ *
+ * An event that cannot be cancelled (a composition) is left alone; the
+ * overlay HOC declines the value it commits.
+ *
+ * @param event          Input, clipboard or keyboard event.
+ * @param registry       Data registry.
+ * @param selectionStart Block-editor `getSelectionStart()` value.
+ * @return True when the event was declined.
+ */
+export function refuseForeignBlockInput(
+	event: any,
+	registry: any,
+	selectionStart: any
+): boolean {
+	if (
+		event?.cancelable === false ||
+		! isEventTargetSelectedRichText( event, selectionStart ) ||
+		isBlockOwnedByCurrentPost( registry, selectionStart.clientId )
+	) {
+		return false;
+	}
+	event.preventDefault();
+	event.stopImmediatePropagation?.();
+	notifyForeignEditRefused( registry );
 	return true;
 }
 

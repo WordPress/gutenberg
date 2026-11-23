@@ -66,12 +66,10 @@ export const DESIGN_POST_TYPES = [
  *     `EDITOR_INTENT_EDIT` when no value is set, so consumers can rely on
  *     a non-null result.
  *
- * Suggest Mode context:
- * Phase 1 of the Suggest Mode feature only wires the intent state and the
- * UI surface (menu + keyboard shortcuts). Subsequent phases use the
- * `suggest` intent to capture edits as in-memory overlays, render them as
- * suggestions, and let other users apply or reject them. Adding a new
- * intent here also requires updates to:
+ * Suggestion mode context:
+ * The `suggest` intent captures edits as suggestion markers in the
+ * content, saves each as a note, and lets other users apply or reject
+ * them. Adding a new intent here also requires updates to:
  *   - packages/editor/src/components/intent-switcher/index.tsx (UI choices)
  *   - packages/editor/src/components/global-keyboard-shortcuts/* (shortcut
  *     registration and dispatch)

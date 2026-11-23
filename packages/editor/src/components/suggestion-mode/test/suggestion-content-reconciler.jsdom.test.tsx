@@ -164,6 +164,9 @@ const insertPlan = ( at = 5, text = ' world' ) => ( {
 	actions: [ { type: 'insert-add', text, at, newNote: true } ],
 } );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionContentReconciler', () => {
 	it( 'writes the planned markers when the content is unchanged (happy path)', async () => {
 		const { clientId, getContent } = setup();
@@ -184,6 +187,28 @@ describe( 'SuggestionContentReconciler', () => {
 		expect( createSuggestion ).toHaveBeenCalledTimes( 1 );
 		expect( getContent() ).toContain( 'data-suggestion-id="5"' );
 		expect( getContent() ).toContain( ' world' );
+	} );
+
+	it( 'does not take a request for a block another entity owns', async () => {
+		const { registry, clientId } = setup();
+		const inner = createBlock( TEST_BLOCK_NAME, { content: 'Hello' } );
+		const dispatch: any = registry.dispatch( blockEditorStore );
+		dispatch.setHasControlledInnerBlocks( clientId, true );
+		dispatch.replaceInnerBlocks( clientId, [ inner ] );
+
+		let accepted;
+		act( () => {
+			accepted = overlayRef.current.requestContentSuggestion( {
+				clientId: inner.clientId,
+				blockName: TEST_BLOCK_NAME,
+				prevContent: RichTextData.fromHTMLString( 'Hello' ),
+				plan: insertPlan(),
+			} );
+		} );
+		await flushPromises();
+
+		expect( accepted ).toBe( false );
+		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
 
 	it( 'grows an existing marker without opening a note', async () => {

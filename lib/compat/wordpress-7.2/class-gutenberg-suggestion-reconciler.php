@@ -17,7 +17,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 	 * - `wp_insert_post_data` (late, after kses) moves what the suggestions
 	 *   propose out of the incoming content (see `Gutenberg_Suggestion_Content`)
 	 *   so the stored `post_content` holds the public baseline plus anchors,
-	 *   and records the content the post had before this write.
+	 *   and records the content the post had before this write. A new post
+	 *   has no notes, and a post type without notes never has any, so what
+	 *   their content proposes is dropped.
 	 * - `wp_insert_post` (early, after the row is written and before a REST
 	 *   response is prepared) stores the extracted proposals on their notes,
 	 *   then compares the anchors of the previous and the saved content and
@@ -52,7 +54,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * suggestion notes of the post (`notes`) and the notes whose proposals
 		 * were too large to extract (`skipped`).
 		 *
-		 * @var array<int, array[]>
+		 * @var array<int, list<array{previous: string, previous_full: string, stored: array<int, array<array<mixed>>>, candidates: array<int, array<array<mixed>>>, notes: array<int, string>, skipped: array<int, true>}>>
 		 */
 		private static $previous = array();
 
@@ -64,12 +66,20 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		private static $revisions = array();
 
 		/**
+		 * Posts whose pending write found no provisional decision, so the
+		 * post-field phase of that write need not ask again.
+		 *
+		 * @var array<int, true>
+		 */
+		private static $undecided = array();
+
+		/**
 		 * Hooks the pass.
 		 */
 		public static function register() {
 			add_filter( 'wp_insert_post_data', array( __CLASS__, 'transform' ), 999, 4 );
 			add_action( 'wp_insert_post', array( __CLASS__, 'commit' ), 1 );
-			add_action( 'wp_after_insert_post', array( __CLASS__, 'finalize_post_fields' ), 10, 2 );
+			add_action( 'wp_after_insert_post', array( __CLASS__, 'finalize_post_fields' ), 10, 3 );
 			add_action( 'wp_restore_post_revision', array( __CLASS__, 'reseed_from_revision' ), 10, 2 );
 			add_action( 'registered_post_type', array( __CLASS__, 'register_rest_filter' ) );
 			foreach ( get_post_types() as $post_type ) {
@@ -77,6 +87,19 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			}
 			add_filter( 'rest_prepare_autosave', array( __CLASS__, 'inflate_response' ), 10, 3 );
 			add_filter( 'rest_prepare_revision', array( __CLASS__, 'inflate_response' ), 10, 3 );
+		}
+
+		/**
+		 * Whether the pass runs: only with the Suggestion mode experiment on.
+		 *
+		 * With it off nothing is extracted, finalized or put back, so the
+		 * editor loads and saves the stored content as it is. The render
+		 * filters still hide any proposal that content carries.
+		 *
+		 * @return bool
+		 */
+		private static function is_enabled(): bool {
+			return gutenberg_is_experiment_enabled( 'gutenberg-suggestion-mode' );
 		}
 
 		/**
@@ -112,35 +135,54 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @return array Post data, its content anchored.
 		 */
 		public static function transform( $data, $postarr, $unsanitized_postarr = array(), $update = false ) {
-			if ( ! isset( $data['post_type'] ) ) {
+			if ( ! self::is_enabled() || ! isset( $data['post_type'] ) ) {
 				return $data;
 			}
-			$incoming = isset( $data['post_content'] ) ? wp_unslash( $data['post_content'] ) : '';
+			if ( ! is_string( $data['post_type'] ) ) {
+				return $data;
+			}
+			$incoming = isset( $data['post_content'] ) && is_string( $data['post_content'] ) ? wp_unslash( $data['post_content'] ) : '';
 
 			if ( 'revision' === $data['post_type'] ) {
 				$parent_id = isset( $data['post_parent'] ) ? (int) $data['post_parent'] : 0;
 				if ( $parent_id <= 0 || ! self::post_type_supports_notes( (string) get_post_type( $parent_id ) ) || ! Gutenberg_Suggestion_Content::may_carry_proposals( $incoming ) ) {
 					return $data;
 				}
-				$state     = self::stored_state( $parent_id );
-				$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
+				$state     = self::stored_state( $parent_id, Gutenberg_Suggestion_Content::note_ids( $incoming ) );
+				$extracted = self::extract( $incoming, $state['notes'], $state['originals'], $state['deltas'] );
 
 				self::$revisions[ $parent_id ][] = self::merge_items( $state['items'], $extracted['items'] );
 				$data['post_content']            = wp_slash( $extracted['content'] );
 				return $data;
 			}
 
-			$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
-			if ( ! $update || $post_id <= 0 || ! self::post_type_supports_notes( $data['post_type'] ) ) {
-				return $data;
-			}
-			$previous = (string) get_post_field( 'post_content', $post_id, 'raw' );
-			if ( ! Gutenberg_Suggestion_Content::may_carry_proposals( $previous ) && ! Gutenberg_Suggestion_Content::may_carry_proposals( $incoming ) && ! self::has_provisional_notes( $post_id ) ) {
+			/*
+			 * A new post has no notes, and a post type without notes never
+			 * has any: proposals in its content were copied from another post
+			 * (a duplicated post, a pattern or template part made from marked
+			 * blocks) or captured where nobody can decide them.
+			 */
+			if ( ! $update || ! self::post_type_supports_notes( $data['post_type'] ) ) {
+				$stripped = Gutenberg_Suggestion_Content::strip( $incoming );
+				if ( $stripped !== $incoming ) {
+					$data['post_content'] = wp_slash( $stripped );
+				}
 				return $data;
 			}
 
-			$state     = self::stored_state( $post_id );
-			$extracted = self::extract( $incoming, $state['notes'], $state['originals'] );
+			$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
+			if ( $post_id <= 0 ) {
+				return $data;
+			}
+			unset( self::$undecided[ $post_id ] );
+			$previous = (string) get_post_field( 'post_content', $post_id, 'raw' );
+			if ( ! Gutenberg_Suggestion_Content::may_carry_proposals( $previous ) && ! Gutenberg_Suggestion_Content::may_carry_proposals( $incoming ) && ! self::has_provisional_notes( $post_id ) ) {
+				self::$undecided[ $post_id ] = true;
+				return $data;
+			}
+
+			$state     = self::stored_state( $post_id, Gutenberg_Suggestion_Content::note_ids( $previous ) + Gutenberg_Suggestion_Content::note_ids( $incoming ) );
+			$extracted = self::extract( $incoming, $state['notes'], $state['originals'], $state['deltas'] );
 
 			self::$previous[ $post_id ][] = array(
 				'previous'      => $previous,
@@ -186,20 +228,20 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$stored = (string) get_comment_meta( $note_id, '_wp_suggestion_content', true );
 				if ( empty( $effective[ $note_id ] ) ) {
 					if ( '' !== $stored ) {
-						delete_comment_meta( $note_id, '_wp_suggestion_content' );
+						gutenberg_delete_suggestion_server_meta( (int) $note_id, '_wp_suggestion_content' );
 					}
 					continue;
 				}
 				$encoded = Gutenberg_Suggestion_Content::encode( $effective[ $note_id ] );
 				if ( $encoded !== $stored ) {
-					update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
+					gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
 				}
 			}
 			foreach ( array_keys( $entry['notes'] ) as $note_id ) {
 				if ( isset( $entry['skipped'][ $note_id ] ) ) {
-					update_comment_meta( $note_id, '_wp_suggestion_extraction_skipped', true );
+					gutenberg_update_suggestion_server_meta( (int) $note_id, '_wp_suggestion_extraction_skipped', true );
 				} elseif ( '' !== (string) get_comment_meta( $note_id, '_wp_suggestion_extraction_skipped', true ) ) {
-					delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
+					gutenberg_delete_suggestion_server_meta( (int) $note_id, '_wp_suggestion_extraction_skipped' );
 				}
 			}
 
@@ -240,35 +282,70 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param array<int, array[]> $items         Proposals stored for the saved content.
 		 */
 		public static function reconcile( $post, $previous, $previous_full = null, $items = array() ) {
-			$notes = get_comments(
-				array(
-					'post_id'      => $post->ID,
-					'type'         => 'note',
-					'parent'       => 0,
-					'status'       => 'all',
-					'meta_key'     => '_wp_suggestion', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_key
-					'meta_compare' => 'EXISTS',
-					'number'       => 0,
-				)
-			);
-			if ( empty( $notes ) ) {
-				return;
-			}
-
-			$before  = self::merge_indexes(
+			$before = self::merge_indexes(
 				gutenberg_get_suggestion_anchor_index( $previous ),
 				gutenberg_get_suggestion_anchor_index( null === $previous_full ? $previous : $previous_full )
 			);
-			$after   = self::merge_indexes(
+			$after  = self::merge_indexes(
 				gutenberg_get_suggestion_anchor_index( $post->post_content ),
 				gutenberg_get_suggestion_anchor_index( Gutenberg_Suggestion_Content::inflate( $post->post_content, $items ) )
 			);
+
+			/*
+			 * Only two kinds of note can change: one with a provisional
+			 * decision, and one that lost an anchor in this write. Decided
+			 * notes and notes whose anchors are all still there are not
+			 * loaded.
+			 */
+			$query = array(
+				'post_id' => $post->ID,
+				'type'    => 'note',
+				'parent'  => 0,
+				'status'  => 'all',
+				'number'  => 0,
+			);
+			$lost  = array();
+			foreach ( $before as $note_id => $kinds ) {
+				$kept = $after[ $note_id ] ?? array();
+				if ( is_array( $kinds ) && is_array( $kept ) && array_diff_key( $kinds, $kept ) ) {
+					$lost[] = $note_id;
+				}
+			}
+			$notes = get_comments(
+				$query + array(
+					'meta_query' => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_query
+						array(
+							'key'     => '_wp_suggestion_status',
+							'value'   => gutenberg_get_provisional_suggestion_statuses(),
+							'compare' => 'IN',
+						),
+					),
+				)
+			);
+			if ( $lost ) {
+				$notes = array_merge(
+					$notes,
+					get_comments(
+						$query + array(
+							'comment__in'  => $lost,
+							'meta_key'     => '_wp_suggestion', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_query_meta_key
+							'meta_compare' => 'EXISTS',
+						)
+					)
+				);
+			}
 			$user_id = get_current_user_id();
+			$seen    = array();
 
 			foreach ( $notes as $note ) {
 				$note_id = (int) $note->comment_ID;
-				$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
-				$kind    = self::anchor_kind( $payload );
+				if ( isset( $seen[ $note_id ] ) ) {
+					continue;
+				}
+				$seen[ $note_id ] = true;
+				$raw              = get_comment_meta( $note_id, '_wp_suggestion', true );
+				$payload          = json_decode( is_string( $raw ) ? $raw : '', true );
+				$kind             = self::anchor_kind( $payload );
 				// Post-field suggestions have no anchor; see `finalize_post_fields()`.
 				if ( null === $kind || 'post' === $kind ) {
 					continue;
@@ -301,9 +378,15 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 *
 		 * @param int     $post_id Post ID.
 		 * @param WP_Post $post    Post.
+		 * @param bool    $update  Whether this is an update. A new post has no notes.
 		 */
-		public static function finalize_post_fields( $post_id, $post ) {
-			if ( ! $post instanceof WP_Post || 'revision' === $post->post_type || ! self::post_type_supports_notes( $post->post_type ) ) {
+		public static function finalize_post_fields( $post_id, $post, $update = true ): void {
+			$undecided = isset( self::$undecided[ $post_id ] );
+			unset( self::$undecided[ $post_id ] );
+			if ( ! $update || $undecided ) {
+				return;
+			}
+			if ( ! self::is_enabled() || ! $post instanceof WP_Post || 'revision' === $post->post_type || ! self::post_type_supports_notes( $post->post_type ) ) {
 				return;
 			}
 			if ( ! self::saver_can_change_notes( $post_id ) || ! self::has_provisional_notes( $post_id ) ) {
@@ -390,12 +473,15 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param int $revision_id Revision ID.
 		 */
 		public static function reseed_from_revision( $post_id, $revision_id ) {
+			if ( ! self::is_enabled() ) {
+				return;
+			}
 			$snapshot = self::read_snapshot( $revision_id );
 			$post     = get_post( $post_id );
 			if ( ! $snapshot || ! $post ) {
 				return;
 			}
-			$notes   = self::suggestion_notes( $post_id );
+			$notes   = self::suggestion_notes( $post_id, array_fill_keys( array_keys( $snapshot ), true ) );
 			$present = Gutenberg_Suggestion_Content::anchor_runs( $post->post_content );
 			foreach ( $snapshot as $note_id => $items ) {
 				if ( ! isset( $notes[ $note_id ] ) ) {
@@ -416,7 +502,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					}
 				}
 				if ( $changed ) {
-					update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $stored ) ) );
+					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $stored ) ) );
 				}
 			}
 		}
@@ -444,7 +530,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * back to what the notes store. Only notes that pass
 		 * `gutenberg_can_render_suggestion_note()` are inflated, so proposals
 		 * of trashed or spam notes, or of notes trashed with the post, stay
-		 * out until the note is restored.
+		 * out until the note is restored. The proposals of an author without
+		 * `unfiltered_html` go through kses again on the way in.
 		 *
 		 * @param WP_REST_Response $response Response.
 		 * @param WP_Post          $post     Post, autosave or revision.
@@ -452,7 +539,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @return WP_REST_Response Response.
 		 */
 		public static function inflate_response( $response, $post, $request ) {
-			if ( ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post ) {
+			if ( ! self::is_enabled() || ! $response instanceof WP_REST_Response || ! $post instanceof WP_Post ) {
 				return $response;
 			}
 			if ( 'edit' !== ( isset( $request['context'] ) ? $request['context'] : 'view' ) ) {
@@ -468,7 +555,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				return $response;
 			}
 
-			$notes = self::suggestion_notes( $parent_id );
+			$notes = self::suggestion_notes( $parent_id, Gutenberg_Suggestion_Content::note_ids( $data['content']['raw'] ) );
 			$items = $is_revision ? self::read_snapshot( $post->ID ) : null;
 			if ( ! $items ) {
 				$items = self::load_items( $notes );
@@ -476,6 +563,23 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			foreach ( array_keys( $items ) as $note_id ) {
 				if ( ! isset( $notes[ $note_id ] ) || ! gutenberg_can_render_suggestion_note( $note_id, $parent_id ) ) {
 					unset( $items[ $note_id ] );
+				}
+			}
+
+			/*
+			 * A stored proposal is held to what its author may publish: a
+			 * reviewer with `unfiltered_html` saves the content they load
+			 * without kses, whoever proposed it.
+			 */
+			foreach ( $items as $note_id => $list ) {
+				$note = get_comment( $note_id );
+				if ( $note && (int) $note->user_id > 0 && user_can( (int) $note->user_id, 'unfiltered_html' ) ) {
+					continue;
+				}
+				foreach ( $list as $index => $item ) {
+					if ( is_array( $item ) ) {
+						$items[ $note_id ][ $index ] = Gutenberg_Suggestion_Content::kses_item( $item );
+					}
 				}
 			}
 
@@ -514,12 +618,14 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param string             $content   Content.
 		 * @param array<int, mixed>  $notes     Suggestion notes of the post, by note ID.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
-		 * @return array{content: string, items: array<int, array[]>, skipped: array<int, true>}
+		 * @param array<int, array<mixed>> $deltas Delta of each formatting suggestion that recorded one.
+		 * @return array{content: string, items: array<int, array<array<mixed>>>, skipped: array<int, true>}
 		 */
-		private static function extract( $content, $notes, $originals ) {
+		private static function extract( $content, $notes, $originals, $deltas ) {
+			$notes   = array_fill_keys( array_keys( $notes ), true );
 			$exclude = array();
 			while ( true ) {
-				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals );
+				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals, $deltas );
 				$over   = array();
 				foreach ( $result['items'] as $note_id => $items ) {
 					if ( strlen( Gutenberg_Suggestion_Content::encode( $items ) ) > GUTENBERG_SUGGESTION_CONTENT_MAX_BYTES ) {
@@ -535,20 +641,25 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		}
 
 		/**
-		 * The suggestion notes of a post and what they store, preferring the
-		 * items of a write still being committed (a nested write sees the
-		 * outer write's proposals as stored).
+		 * The suggestion notes of a post that content names and what they
+		 * store, preferring the items of a write still being committed (a
+		 * nested write sees the outer write's proposals as stored).
 		 *
-		 * @param int $post_id Post ID.
-		 * @return array{notes: array<int, string>, items: array<int, array[]>, originals: array<int, string>}
+		 * @param int              $post_id Post ID.
+		 * @param array<int, true> $ids     Note ids the content names.
+		 * @return array{notes: array<int, string>, items: array<int, array<array<mixed>>>, originals: array<int, string>, deltas: array<int, array<mixed>>}
 		 */
-		private static function stored_state( $post_id ) {
-			$notes     = self::suggestion_notes( $post_id );
+		private static function stored_state( $post_id, $ids ) {
+			$notes     = self::suggestion_notes( $post_id, $ids );
 			$originals = array();
+			$deltas    = array();
 			foreach ( array_keys( $notes ) as $note_id ) {
-				$original = self::format_original( $note_id );
-				if ( null !== $original ) {
-					$originals[ $note_id ] = $original;
+				$operation = self::format_operation( $note_id );
+				if ( null !== $operation ) {
+					$originals[ $note_id ] = $operation['beforeHTML'];
+					if ( null !== $operation['delta'] ) {
+						$deltas[ $note_id ] = $operation['delta'];
+					}
 				}
 			}
 			if ( ! empty( self::$previous[ $post_id ] ) ) {
@@ -561,39 +672,51 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				'notes'     => $notes,
 				'items'     => $items,
 				'originals' => $originals,
+				'deltas'    => $deltas,
 			);
 		}
 
 		/**
-		 * The original run a formatting suggestion recorded (`beforeHTML`).
+		 * The operation of a formatting suggestion that recorded its original
+		 * run (`beforeHTML`).
 		 *
 		 * @param int $note_id Note ID.
-		 * @return string|null The run, or null for any other suggestion.
+		 * @return array{beforeHTML: string, delta: array<mixed>|null}|null The original run and the delta, if one was recorded, or null for any other suggestion.
 		 */
-		private static function format_original( $note_id ) {
+		private static function format_operation( $note_id ) {
 			$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
 			if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
 				return null;
 			}
 			foreach ( $payload['operations'] as $operation ) {
 				if ( is_array( $operation ) && isset( $operation['suggestionType'], $operation['beforeHTML'] ) && 'format' === $operation['suggestionType'] && is_string( $operation['beforeHTML'] ) ) {
-					return $operation['beforeHTML'];
+					return array(
+						'beforeHTML' => $operation['beforeHTML'],
+						'delta'      => isset( $operation['delta'] ) && is_array( $operation['delta'] ) ? $operation['delta'] : null,
+					);
 				}
 			}
 			return null;
 		}
 
 		/**
-		 * Root suggestion notes of a post, in any status.
+		 * The root suggestion notes of a post among a set of ids, in any
+		 * status. Only the notes content names are asked for, so a post's
+		 * decided suggestions and their meta are not loaded on every write.
 		 *
-		 * @param int $post_id Post ID.
+		 * @param int              $post_id Post ID.
+		 * @param array<int, true> $ids     Note ids to look for.
 		 * @return array<int, string> Note ID => comment status, as
 		 *                            `wp_get_comment_status()` names it.
 		 */
-		private static function suggestion_notes( $post_id ) {
+		private static function suggestion_notes( $post_id, $ids ) {
+			if ( ! $ids ) {
+				return array();
+			}
 			$comments = get_comments(
 				array(
 					'post_id'      => $post_id,
+					'comment__in'  => array_keys( $ids ),
 					'type'         => 'note',
 					'parent'       => 0,
 					'status'       => 'any',
@@ -845,21 +968,38 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * Writes a final status and resolves the note.
 		 *
 		 * The note keeps its thread; its comment status goes `approved`, the same
-		 * resolved state a reviewer's manual resolve gives it. A decided note's
-		 * stored proposal is dropped: it is now real content, or gone.
+		 * resolved state a reviewer's manual resolve gives it, and nobody is
+		 * emailed about it. A decided note's stored proposal is dropped: it is
+		 * now real content, or gone.
 		 *
 		 * @param int    $note_id Note ID.
 		 * @param string $status  Final status.
 		 * @param int    $user_id User whose write resolved it.
 		 */
 		private static function resolve( $note_id, $status, $user_id ) {
-			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
-			update_comment_meta( $note_id, '_wp_suggestion_resolved_by', $user_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_resolved_by', $user_id );
 			if ( 'outdated' !== $status ) {
-				delete_comment_meta( $note_id, '_wp_suggestion_content' );
-				delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
+				gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_content' );
+				gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped' );
 			}
+
+			/*
+			 * Approving a comment emails the post author about it as a new
+			 * comment, and leaves that notification hooked for every later
+			 * status change in the request. A decided suggestion is not a new
+			 * note.
+			 */
+			$was_hooked = has_action( 'wp_set_comment_status', 'wp_new_comment_notify_postauthor' );
+			$silence    = static function ( $notify, $comment_id ) use ( $note_id ) {
+				return is_numeric( $comment_id ) && (int) $comment_id === (int) $note_id ? false : $notify;
+			};
+			add_filter( 'notify_post_author', $silence, PHP_INT_MAX, 2 );
 			wp_set_comment_status( $note_id, 'approve' );
+			remove_filter( 'notify_post_author', $silence, PHP_INT_MAX );
+			if ( false === $was_hooked ) {
+				remove_action( 'wp_set_comment_status', 'wp_new_comment_notify_postauthor' );
+			}
 
 			$note = get_comment( $note_id );
 			/**

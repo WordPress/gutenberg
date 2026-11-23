@@ -39,6 +39,9 @@ vi.hoisted( () => {
 const captures = ( entries: Record< string, any > ) =>
 	new Map( Object.entries( entries ) );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'findNewestPendingSuggestion', () => {
 	it( 'returns null when nothing is pending', () => {
 		expect( findNewestPendingSuggestion( new Map(), null ) ).toBeNull();
@@ -206,14 +209,14 @@ describe( 'SuggestionUndoGuard', () => {
 				)
 			)
 		);
-		return { registry, overlay };
+		return { registry, overlay, undo, redo };
 	}
 
 	it( 'does not arm an adoption when there is nothing to undo or redo', () => {
 		const { registry, overlay } = setup();
-		const core: any = registry.dispatch( 'core' );
-		core.undo();
-		core.redo();
+		const editor = registry.dispatch( editorStore );
+		editor.undo();
+		editor.redo();
 		// A stray token would let the next block edit skip capture.
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
 	} );
@@ -223,9 +226,9 @@ describe( 'SuggestionUndoGuard', () => {
 			hasUndo: true,
 			hasRedo: true,
 		} );
-		const core: any = registry.dispatch( 'core' );
-		core.undo();
-		core.redo();
+		const editor = registry.dispatch( editorStore );
+		editor.undo();
+		editor.redo();
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( false );
@@ -239,7 +242,7 @@ describe( 'SuggestionUndoGuard', () => {
 			intent: 'edit',
 		} );
 		expect( isRecentRedo( registry ) ).toBe( false );
-		( registry.dispatch( 'core' ) as any ).redo();
+		registry.dispatch( editorStore ).redo();
 		expect( isRecentRedo( registry ) ).toBe( true );
 		// Adoption tokens are for the interceptor, which only runs while
 		// suggesting.
@@ -277,7 +280,9 @@ describe( 'SuggestionUndoGuard', () => {
 				},
 			},
 		} );
-		const { registry, overlay } = setup( { blocks: [ anchor, block ] } );
+		const { registry, overlay, undo } = setup( {
+			blocks: [ anchor, block ],
+		} );
 		const editor = unlock( registry.select( editorStore ) );
 		expect( editor.hasSuggestionUndo() ).toBe( false );
 
@@ -301,7 +306,7 @@ describe( 'SuggestionUndoGuard', () => {
 		expect( editor.hasSuggestionUndo() ).toBe( true );
 
 		act( () => {
-			( registry.dispatch( 'core' ) as any ).undo();
+			registry.dispatch( editorStore ).undo();
 		} );
 		// Withdrawn the way Reject does it: marker gone, block back at its
 		// origin, capture dropped, real undo untouched.
@@ -317,9 +322,7 @@ describe( 'SuggestionUndoGuard', () => {
 		expect(
 			overlay.current.getStructuralCaptures().has( block.clientId )
 		).toBe( false );
-		expect( ( registry.dispatch( 'core' ) as any ).undo ).not.toBe(
-			undefined
-		);
+		expect( undo ).not.toHaveBeenCalled();
 		expect( editor.hasSuggestionUndo() ).toBe( false );
 	} );
 
@@ -357,7 +360,7 @@ describe( 'SuggestionUndoGuard', () => {
 				.updateBlockAttributes( block.clientId, { level: 2 } );
 		} );
 		act( () => {
-			( registry.dispatch( 'core' ) as any ).undo();
+			registry.dispatch( editorStore ).undo();
 		} );
 		expect(
 			registry
@@ -380,7 +383,7 @@ describe( 'SuggestionUndoGuard', () => {
 			hasUndo: true,
 			blocks: [ block ],
 		} );
-		const core: any = registry.dispatch( 'core' );
+		const editor = registry.dispatch( editorStore );
 
 		act( () => {
 			overlay.current.recordStructuralCapture(
@@ -393,7 +396,7 @@ describe( 'SuggestionUndoGuard', () => {
 		} );
 
 		act( () => {
-			core.undo();
+			editor.undo();
 		} );
 		// The real undo ran (and armed an adoption); the move stays pending.
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
@@ -404,5 +407,111 @@ describe( 'SuggestionUndoGuard', () => {
 					.getBlockAttributes( block.clientId )
 			)?.type
 		).toBe( 'pending-move' );
+	} );
+} );
+
+describe( 'SuggestionUndoGuard with two editors', () => {
+	/**
+	 * Two editors in sub-registries over one core-data store, each with its
+	 * own guard and session.
+	 *
+	 * @return The shared core-data registry and the two editors.
+	 */
+	function setupTwoEditors() {
+		const parent = createRegistry();
+		parent.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					undo: () => ( { type: 'UNDO' } ),
+					redo: () => ( { type: 'REDO' } ),
+				},
+				selectors: {
+					hasUndo: () => true,
+					hasRedo: () => true,
+					getRawEntityRecord: () => undefined,
+					getEntityRecordEdits: () => undefined,
+				},
+			} )
+		);
+		parent.register( noticesStore );
+		parent.register( preferencesStore );
+		// Read before either guard mounts.
+		const { undo, redo }: any = parent.dispatch( 'core' );
+		const coreActions = { undo, redo };
+
+		const mountEditor = () => {
+			const registry = createRegistry( {}, parent );
+			registry.register( blockEditorStore );
+			registry.register( editorStore );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			const session: { current: any } = { current: null };
+			function Probe() {
+				session.current = useSuggestionSession();
+				return null;
+			}
+			const { unmount } = render(
+				createElement(
+					RegistryProvider,
+					{ value: registry },
+					createElement(
+						SuggestionSessionProvider,
+						null,
+						createElement( SuggestionUndoGuard ),
+						createElement( Probe )
+					)
+				)
+			);
+			return { registry, session, unmount };
+		};
+
+		return {
+			parent,
+			coreActions,
+			first: mountEditor(),
+			second: mountEditor(),
+		};
+	}
+
+	it( 'leaves the core-data actions the editors share as they are', () => {
+		const { parent, coreActions, first, second } = setupTwoEditors();
+		const core: any = parent.dispatch( 'core' );
+		expect( core.undo ).toBe( coreActions.undo );
+		expect( core.redo ).toBe( coreActions.redo );
+
+		// Unmounted in the order they mounted, not the reverse.
+		first.unmount();
+		second.unmount();
+		expect( core.undo ).toBe( coreActions.undo );
+		expect( core.redo ).toBe( coreActions.redo );
+	} );
+
+	it( 'runs only the guard of the editor that undoes', () => {
+		const { first, second } = setupTwoEditors();
+
+		act( () => {
+			first.registry.dispatch( editorStore ).undo();
+		} );
+
+		expect( first.session.current.consumeUndoRedoAdoption() ).toBe( true );
+		expect( second.session.current.consumeUndoRedoAdoption() ).toBe(
+			false
+		);
+		first.unmount();
+		second.unmount();
+	} );
+
+	it( 'keeps the guard of an editor that outlives an earlier one', () => {
+		const { first, second } = setupTwoEditors();
+		first.unmount();
+
+		act( () => {
+			second.registry.dispatch( editorStore ).undo();
+		} );
+
+		expect( second.session.current.consumeUndoRedoAdoption() ).toBe( true );
+		second.unmount();
 	} );
 } );

@@ -27,7 +27,7 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { RichTextData, create, removeFormat } from '@wordpress/rich-text';
-import { stripSuggestionMarkersFromAttributes } from '../inline-suggestions';
+import { stripSuggestionMarkers } from '../inline-suggestions';
 
 /*
  * The inline note format and the class it serializes to, as registered by
@@ -63,23 +63,43 @@ function stripNoteMarkers( value: any ): any {
 }
 
 /**
- * Unwrap inline note markers from every string-like attribute value.
+ * Unwrap inline suggestion and note markers from every string-like value in
+ * an attribute value, however deep. A block can keep rich text inside an
+ * array or object attribute, as a table does with its cells.
  *
- * @param attributes Block attributes.
- * @return Attributes without note markers, by reference when there were none.
+ * @param value Attribute value, or the attributes object itself.
+ * @return The value without markers, by reference when there were none.
  */
-function stripNoteMarkersFromAttributes(
-	attributes: Record< string, any > | undefined
-): Record< string, any > | undefined {
-	if ( ! attributes || typeof attributes !== 'object' ) {
-		return attributes;
+function stripMarkersDeep( value: any ): any {
+	if ( typeof value === 'string' || value instanceof RichTextData ) {
+		return stripNoteMarkers( stripSuggestionMarkers( value ) );
 	}
-	let next = attributes;
-	for ( const [ key, value ] of Object.entries( attributes ) ) {
-		const stripped = stripNoteMarkers( value );
-		if ( stripped !== value ) {
-			if ( next === attributes ) {
-				next = { ...attributes };
+	if ( Array.isArray( value ) ) {
+		let next = value;
+		value.forEach( ( item, index ) => {
+			const stripped = stripMarkersDeep( item );
+			if ( stripped !== item ) {
+				if ( next === value ) {
+					next = [ ...value ];
+				}
+				next[ index ] = stripped;
+			}
+		} );
+		return next;
+	}
+	if (
+		! value ||
+		typeof value !== 'object' ||
+		Object.getPrototypeOf( value ) !== Object.prototype
+	) {
+		return value;
+	}
+	let next = value;
+	for ( const [ key, item ] of Object.entries( value ) ) {
+		const stripped = stripMarkersDeep( item );
+		if ( stripped !== item ) {
+			if ( next === value ) {
+				next = { ...value };
 			}
 			next[ key ] = stripped;
 		}
@@ -135,9 +155,7 @@ export function stripSuggestionDataFromBlock( block: any ): any {
 		return block;
 	}
 	const attributes = stripSuggestionMetadata(
-		stripNoteMarkersFromAttributes(
-			stripSuggestionMarkersFromAttributes( block.attributes )
-		)
+		stripMarkersDeep( block.attributes )
 	);
 	const innerBlocks = stripSuggestionDataFromBlocks( block.innerBlocks );
 	if (

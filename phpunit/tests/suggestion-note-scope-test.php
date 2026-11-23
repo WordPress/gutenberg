@@ -5,6 +5,9 @@
  * post whose content holds it, and the save pass only acts for a user who
  * could change the notes directly.
  *
+ * An original is only restored over a run with the same text, so the fixtures
+ * record the run's text in an `<em>` and look for that element.
+ *
  * @group suggestions
  */
 class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
@@ -32,6 +35,13 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 
 	public function set_up() {
 		parent::set_up();
+		// Suggestion writes and the save pass need the experiment.
+		add_filter(
+			'pre_option_gutenberg-experiments',
+			static function () {
+				return array( 'gutenberg-suggestion-mode' => true );
+			}
+		);
 		// The test case unregisters every meta key after each test.
 		gutenberg_register_suggestion_meta();
 	}
@@ -45,11 +55,12 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	/**
 	 * Creates a pending format suggestion note.
 	 *
-	 * @param int    $post_id     Post the note belongs to.
-	 * @param string $before_html Original run recorded on the note.
+	 * @param int|WP_Error $post_id     Post the note belongs to, as the factory returned it.
+	 * @param string       $before_html Original run recorded on the note.
 	 * @return int Note ID.
 	 */
-	private function create_format_note( $post_id, $before_html ) {
+	private function create_format_note( $post_id, string $before_html ): int {
+		$this->assertIsInt( $post_id );
 		$note_id = self::factory()->comment->create(
 			array(
 				'comment_post_ID'  => $post_id,
@@ -68,38 +79,77 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 				),
 			),
 		);
+		$this->assertIsInt( $note_id );
 		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( wp_json_encode( $payload ) ) );
 		return $note_id;
 	}
 
-	private function format_marker( $note_id, $inner ) {
+	/**
+	 * Builds a format marker.
+	 *
+	 * @param int    $note_id Note ID.
+	 * @param string $inner   Marked run.
+	 * @return string Marker HTML.
+	 */
+	private function format_marker( int $note_id, string $inner ): string {
 		return '<mark class="wp-suggestion-format" data-suggestion-id="' . $note_id . '" data-suggestion-type="format">' . $inner . '</mark>';
 	}
 
-	private function paragraph( $html ) {
+	/**
+	 * Builds a paragraph block.
+	 *
+	 * @param string $html Paragraph content.
+	 * @return string Serialized block.
+	 */
+	private function paragraph( string $html ): string {
 		return '<!-- wp:paragraph --><p>' . $html . '</p><!-- /wp:paragraph -->';
 	}
 
 	/**
 	 * Stores post content without content filters, so markers survive.
 	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $content Post content.
+	 * @param int|WP_Error $post_id Post ID, as the factory returned it.
+	 * @param string       $content Post content.
 	 */
-	private function set_post_content( $post_id, $content ) {
+	private function set_post_content( $post_id, string $content ): void {
+		$this->assertIsInt( $post_id );
 		global $wpdb;
 		$wpdb->update( $wpdb->posts, array( 'post_content' => $content ), array( 'ID' => $post_id ) );
 		clean_post_cache( $post_id );
+	}
+
+	/**
+	 * Generates a post's excerpt and returns the blocks rendered for it.
+	 *
+	 * An excerpt has no tags left to tell an original from the proposed run,
+	 * so the tests read the rendered blocks it is trimmed from.
+	 *
+	 * @param int|WP_Error $post_id Post whose excerpt is generated.
+	 * @return string Rendered blocks, concatenated.
+	 */
+	private function render_excerpt_blocks( $post_id ): string {
+		$this->assertIsInt( $post_id );
+		$rendered = '';
+		$capture  = static function ( string $block_content ) use ( &$rendered ): string {
+			$rendered .= $block_content;
+			return $block_content;
+		};
+		add_filter( 'render_block', $capture, 100 );
+		gutenberg_push_suggestion_content_owner( '' );
+		get_the_excerpt( $post_id );
+		gutenberg_pop_suggestion_content_owner( '' );
+		remove_filter( 'render_block', $capture, 100 );
+		return $rendered;
 	}
 
 	public function test_excerpt_of_another_post_does_not_resolve_the_outer_posts_note() {
 		// A page with a pending format change whose original is not public:
 		// its marker sits inside a pending addition, which never renders.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$note_id = $this->create_format_note( $page_id, 'HIDDEN ORIGINAL' );
+		$note_id = $this->create_format_note( $page_id, '<em>run</em>' );
 		$this->set_post_content(
 			$page_id,
-			$this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'x' ) . '</mark>' )
+			$this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'run' ) . '</mark>' )
 		);
 
 		// Another author's post copies the page's marker.
@@ -114,26 +164,22 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 		// The page's content lists that post's excerpt, as a Latest Posts or
 		// Post Excerpt block does.
 		$GLOBALS['post'] = get_post( $page_id );
-		gutenberg_push_suggestion_content_owner( '' );
-		$excerpt = get_the_excerpt( $post_id );
-		gutenberg_pop_suggestion_content_owner( '' );
+		$rendered        = $this->render_excerpt_blocks( $post_id );
 
-		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $excerpt );
-		$this->assertStringContainsString( 'Copied run', $excerpt );
+		$this->assertStringNotContainsString( '<em>', $rendered );
+		$this->assertStringContainsString( 'Copied run', $rendered );
 	}
 
 	public function test_excerpt_still_resolves_its_own_posts_note() {
 		$post_id = self::factory()->post->create( array( 'post_excerpt' => '' ) );
-		$note_id = $this->create_format_note( $post_id, 'original' );
-		$this->set_post_content( $post_id, $this->paragraph( 'Hello ' . $this->format_marker( $note_id, 'proposed' ) ) );
+		$note_id = $this->create_format_note( $post_id, '<em>run</em>' );
+		$this->set_post_content( $post_id, $this->paragraph( 'Hello ' . $this->format_marker( $note_id, '<strong>run</strong>' ) ) );
 
 		$page_id         = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$GLOBALS['post'] = get_post( $page_id );
-		gutenberg_push_suggestion_content_owner( '' );
-		$excerpt = get_the_excerpt( $post_id );
-		gutenberg_pop_suggestion_content_owner( '' );
+		$rendered        = $this->render_excerpt_blocks( $post_id );
 
-		$this->assertSame( 'Hello original', trim( $excerpt ) );
+		$this->assertStringContainsString( 'Hello <em>run</em>', $rendered );
 		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
 	}
 
@@ -171,14 +217,14 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 
 	public function test_synced_pattern_resolves_its_own_note() {
 		$pattern_id = $this->create_synced_pattern( self::$editor_id );
-		$note_id    = $this->create_format_note( $pattern_id, 'original' );
-		$this->set_post_content( $pattern_id, $this->paragraph( 'Hello ' . $this->format_marker( $note_id, '<strong>proposed</strong>' ) ) );
+		$note_id    = $this->create_format_note( $pattern_id, '<em>run</em>' );
+		$this->set_post_content( $pattern_id, $this->paragraph( 'Hello ' . $this->format_marker( $note_id, '<strong>run</strong>' ) ) );
 
 		$page_id  = self::factory()->post->create( array( 'post_type' => 'page' ) );
 		$rendered = $this->render_as( $page_id, '<!-- wp:block {"ref":' . $pattern_id . '} /-->' );
 
-		$this->assertStringContainsString( 'Hello original', $rendered );
-		$this->assertStringNotContainsString( 'proposed', $rendered );
+		$this->assertStringContainsString( 'Hello <em>run</em>', $rendered );
+		$this->assertStringNotContainsString( '<strong>', $rendered );
 		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
 	}
 
@@ -200,22 +246,22 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 		// A page with a pending format change whose original is not public:
 		// its marker sits inside a pending addition, which never renders.
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$note_id = $this->create_format_note( $page_id, 'HIDDEN ORIGINAL' );
+		$note_id = $this->create_format_note( $page_id, '<em>run</em>' );
 
 		// Another author's synced pattern copies the page's marker.
 		$pattern_id = $this->create_synced_pattern( self::$author_id );
 		$this->set_post_content( $pattern_id, $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
 
-		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'x' ) . '</mark>' )
+		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'run' ) . '</mark>' )
 			. '<!-- wp:block {"ref":' . $pattern_id . '} /-->'
-			. $this->paragraph( 'After ' . $this->format_marker( $note_id, 'y' ) );
+			. $this->paragraph( 'After ' . $this->format_marker( $note_id, 'run' ) );
 		$this->set_post_content( $page_id, $content );
 
 		$rendered = $this->render_as( $page_id, $content );
 
-		$this->assertSame( 1, substr_count( $rendered, 'HIDDEN ORIGINAL' ), 'Only the page\'s own marker after the pattern restores its original.' );
+		$this->assertSame( 1, substr_count( $rendered, '<em>run</em>' ), 'Only the page\'s own marker after the pattern restores its original.' );
 		$this->assertStringContainsString( 'Copied run', $rendered );
-		$this->assertStringContainsString( 'After HIDDEN ORIGINAL', $rendered, 'The page is the owner again after the pattern.' );
+		$this->assertStringContainsString( 'After <em>run</em>', $rendered, 'The page is the owner again after the pattern.' );
 		$this->assertEmpty( $GLOBALS['gutenberg_suggestion_content_owners'], 'The owner stack is balanced.' );
 	}
 
@@ -224,14 +270,15 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	 * private original (its marker sits inside a pending addition, which never
 	 * renders), followed by the given blocks.
 	 *
-	 * @param callable $blocks Returns the blocks to render after the page's
-	 *                         own, given the page's note ID.
+	 * @param callable(int): string $blocks Returns the blocks to render after
+	 *                                      the page's own, given the page's
+	 *                                      note ID.
 	 * @return string Rendered content.
 	 */
-	private function render_page_with_private_original( $blocks ) {
+	private function render_page_with_private_original( callable $blocks ) {
 		$page_id = self::factory()->post->create( array( 'post_type' => 'page' ) );
-		$note_id = $this->create_format_note( $page_id, 'HIDDEN ORIGINAL' );
-		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'x' ) . '</mark>' )
+		$note_id = $this->create_format_note( $page_id, '<em>run</em>' );
+		$content = $this->paragraph( '<mark class="wp-suggestion-add" data-suggestion-id="' . ( $note_id + 1000 ) . '" data-suggestion-type="add">' . $this->format_marker( $note_id, 'run' ) . '</mark>' )
 			. $blocks( $note_id );
 		$this->set_post_content( $page_id, $content );
 		$rendered = $this->render_as( $page_id, $content );
@@ -254,7 +301,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
 		$this->assertStringContainsString( 'Copied run', $rendered );
 	}
 
@@ -274,7 +321,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
 		$this->assertStringContainsString( 'Copied run', $rendered );
 	}
 
@@ -297,16 +344,16 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 			}
 		);
 
-		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
 		$this->assertStringContainsString( 'Copied run', $rendered );
 	}
 
 	public function test_blocks_rendered_with_no_post_context_restore_nothing() {
-		$note_id = $this->create_format_note( self::factory()->post->create(), 'HIDDEN ORIGINAL' );
+		$note_id = $this->create_format_note( self::factory()->post->create(), '<em>run</em>' );
 
 		$rendered = do_blocks( $this->paragraph( 'Copied ' . $this->format_marker( $note_id, 'run' ) ) );
 
-		$this->assertStringNotContainsString( 'HIDDEN ORIGINAL', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
 		$this->assertStringContainsString( 'Copied run', $rendered );
 	}
 
@@ -333,7 +380,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 	 */
 	private function create_post_with_marker_only_in_an_autosave() {
 		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id = $this->create_format_note( $post_id, 'UNSAVED ORIGINAL' );
+		$note_id = $this->create_format_note( $post_id, '<em>run</em>' );
 		$this->set_post_content( $post_id, $this->paragraph( 'Saved' ) );
 		wp_set_current_user( self::$editor_id );
 		_wp_put_post_revision(
@@ -355,7 +402,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 
 		$rendered = $this->render_preview( $post_id, $this->paragraph( 'Draft ' . $this->format_marker( $note_id, 'run' ) ) );
 
-		$this->assertStringNotContainsString( 'UNSAVED ORIGINAL', $rendered );
+		$this->assertStringNotContainsString( '<em>', $rendered );
 		$this->assertStringContainsString( 'Draft run', $rendered );
 	}
 
@@ -365,7 +412,7 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 
 		$rendered = $this->render_preview( $post_id, $this->paragraph( 'Draft ' . $this->format_marker( $note_id, 'run' ) ) );
 
-		$this->assertStringContainsString( 'Draft UNSAVED ORIGINAL', $rendered );
+		$this->assertStringContainsString( 'Draft <em>run</em>', $rendered );
 	}
 
 	/**
@@ -398,7 +445,8 @@ class Tests_Suggestion_Note_Scope extends WP_UnitTestCase {
 				)
 			);
 			update_comment_meta( $note_id, '_wp_suggestion', $operations );
-			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
+			$this->assertIsInt( $note_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 			$ids[] = $note_id;
 		}
 		$marks = '';

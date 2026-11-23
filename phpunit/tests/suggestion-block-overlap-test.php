@@ -32,6 +32,13 @@ class Tests_Suggestion_Block_Overlap extends WP_UnitTestCase {
 
 	public function set_up(): void {
 		parent::set_up();
+		// Suggestion writes and the save pass need the experiment.
+		add_filter(
+			'pre_option_gutenberg-experiments',
+			static function () {
+				return array( 'gutenberg-suggestion-mode' => true );
+			}
+		);
 		gutenberg_register_suggestion_meta();
 		wp_set_current_user( self::$editor_id );
 	}
@@ -55,7 +62,8 @@ class Tests_Suggestion_Block_Overlap extends WP_UnitTestCase {
 		);
 		update_comment_meta( $note_id, '_wp_suggestion', wp_json_encode( array( 'operations' => $operations ) ) );
 		if ( '' !== $status ) {
-			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
+			$this->assertIsInt( $note_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
 		}
 		return (int) $note_id;
 	}

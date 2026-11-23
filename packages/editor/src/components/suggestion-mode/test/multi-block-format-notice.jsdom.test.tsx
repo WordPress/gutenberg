@@ -109,6 +109,9 @@ function setup( { intent = 'suggest', multiSelect = true } = {} ) {
 	};
 }
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionMultiBlockFormatNotice', () => {
 	afterEach( () => {
 		document.body.replaceChildren();

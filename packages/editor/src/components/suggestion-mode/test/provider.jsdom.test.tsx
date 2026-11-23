@@ -304,6 +304,27 @@ describe( 'hasAttributeConflict', () => {
 		).toBe( true );
 	} );
 
+	it( 'compares a metadata proposal by the keys it changes', () => {
+		const rename = {
+			type: 'attribute-set',
+			attribute: 'metadata',
+			before: null,
+			after: { name: 'Hero' },
+		};
+		// The marker and the note link are not part of the proposal.
+		expect(
+			hasAttributeConflict(
+				{ metadata: { noteId: [ 1 ], suggestion: {} } },
+				[ rename ]
+			)
+		).toBe( false );
+		expect(
+			hasAttributeConflict( { metadata: { name: 'Renamed since' } }, [
+				rename,
+			] )
+		).toBe( true );
+	} );
+
 	it( 'ignores unrelated attribute changes on the block', () => {
 		// Post modified bumps often because an unrelated attribute (or another
 		// block entirely) changed — those should never count as a conflict
@@ -616,6 +637,17 @@ function createStubInterfaceStore() {
 		},
 		selectors: {
 			getActiveComplementaryArea: ( state: any ) => state.activeArea,
+		},
+	} );
+}
+
+// The post being edited, as far as the provider needs to know it.
+function createStubPostStore( postId: number ) {
+	return createReduxStore( 'core/editor', {
+		reducer: ( state = {} ) => state,
+		selectors: {
+			getCurrentPostId: () => postId,
+			getCurrentPostType: () => 'post',
 		},
 	} );
 }
@@ -957,6 +989,70 @@ describe( 'attribute proposals on the block marker', () => {
 		).toBe( true );
 	} );
 
+	it( 'reject drops the proposal as a persistent change, so it is an undo level', async () => {
+		const block = proposedLevel();
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 42,
+				clientId: block.clientId,
+				payload: levelPayload(),
+			} );
+		} );
+
+		expect(
+			attrs( registry, block.clientId ).metadata.suggestion
+		).toBeUndefined();
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'reject drops a nested proposal as a persistent change too', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			level: 2,
+			metadata: {
+				noteId: [ 42, 43 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 42,
+					authorId: 2,
+					after: { level: 3 },
+					nested: [
+						{
+							type: 'pending-attributes',
+							commentId: 43,
+							authorId: 3,
+							after: { level: 4 },
+						},
+					],
+				},
+			},
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 43,
+				clientId: block.clientId,
+				payload: levelPayload(),
+			} );
+		} );
+
+		const marker = attrs( registry, block.clientId ).metadata.suggestion;
+		expect( marker.commentId ).toBe( 42 );
+		expect( marker.nested ).toBeUndefined();
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
 	it( 'an inline decision leaves a co-resident attribute proposal in place', async () => {
 		const block = createBlock( PARAGRAPH, {
 			level: 2,
@@ -1200,6 +1296,144 @@ describe( 'rejectSuggestion (inline marker)', () => {
 		expect( notices.some( ( notice ) => notice.status === 'error' ) ).toBe(
 			true
 		);
+	} );
+} );
+
+describe( 'inline decisions find the marker by its id', () => {
+	const PARAGRAPH = 'core/test-located-paragraph';
+	const MARKED =
+		'Hello <mark class="wp-suggestion-add" data-suggestion-id="9" data-suggestion-type="add">world</mark>';
+
+	beforeAll( () => {
+		registerSuggestionFormat();
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'rich-text', source: 'rich-text' },
+				citation: { type: 'rich-text', source: 'rich-text' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Located Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterSuggestionFormats();
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	function setup( blocks: any[] ) {
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord: () => async () => ( { id: 9 } ),
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => null,
+					getCurrentUser: () => null,
+				},
+			} )
+		);
+		registry.register( createStubInterfaceStore() );
+		registry.dispatch( blockEditorStore ).resetBlocks( blocks );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function CaptureProvider() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<CaptureProvider />
+			</RegistryProvider>
+		);
+
+		return { registry, getProvider: () => providerHandle };
+	}
+
+	const rich = ( html: string ) => RichTextData.fromHTMLString( html );
+	const payload = {
+		schemaVersion: 2,
+		blockName: PARAGRAPH,
+		baseRevision: null,
+		operations: [
+			{
+				type: 'inline-suggestion',
+				attribute: 'content',
+				suggestionType: 'add',
+			},
+		],
+	};
+
+	it( 'applies a suggestion whose block has no link to the note', async () => {
+		// A transform drops `metadata.noteId` and keeps the marked text.
+		const block = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( { commentId: 9, payload } );
+		} );
+
+		expect(
+			attributesOf( registry, block.clientId ).content.toHTMLString()
+		).toBe( 'Hello world' );
+	} );
+
+	it( 'rejects a suggestion whose marker moved into another block', async () => {
+		// The link stays on one block while a merge carries the marked
+		// text into another.
+		const holder = createBlock( PARAGRAPH, { content: rich( MARKED ) } );
+		const linked = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ holder, linked ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 9,
+				clientId: linked.clientId,
+				payload,
+			} );
+		} );
+
+		expect(
+			attributesOf( registry, holder.clientId ).content.toHTMLString()
+		).toBe( 'Hello ' );
+		expect(
+			attributesOf( registry, linked.clientId ).content.toHTMLString()
+		).toBe( 'Plain' );
+	} );
+
+	it( 'applies a suggestion whose marker is in another attribute', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: rich( 'Plain' ),
+			citation: rich( MARKED ),
+			metadata: { noteId: [ 9 ] },
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().applySuggestion( {
+				commentId: 9,
+				clientId: block.clientId,
+				payload,
+			} );
+		} );
+
+		const attributes = attributesOf( registry, block.clientId );
+		expect( attributes.citation.toHTMLString() ).toBe( 'Hello world' );
+		expect( attributes.content.toHTMLString() ).toBe( 'Plain' );
 	} );
 } );
 
@@ -1989,11 +2223,18 @@ describe( 'withdrawn suggestions and failed applies', () => {
 				},
 				selectors: {
 					getEditedEntityRecord: () => null,
-					getEntityRecord: () => null,
-					getCurrentUser: () => null,
+					// The withdrawn note is the current user's own.
+					getEntityRecord: () => ( {
+						id: 7,
+						type: 'note',
+						author: 1,
+						post: 5,
+					} ),
+					getCurrentUser: () => ( { id: 1 } ),
 				},
 			} )
 		);
+		registry.register( createStubPostStore( 5 ) );
 		registry.register( createStubInterfaceStore() );
 		registry.dispatch( blockEditorStore ).resetBlocks( initialBlocks );
 
@@ -2096,6 +2337,217 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		expect( blockMarkerOf( attributes )?.after ).toEqual( {
 			align: 'center',
 		} );
+	} );
+} );
+
+describe( 'suggester writes to a note named by content', () => {
+	const PARAGRAPH = 'core/test-owned-note-paragraph';
+	const ME = 3;
+	const SOMEONE_ELSE = 8;
+	const POST = 5;
+
+	beforeAll( () => {
+		registerBlockType( PARAGRAPH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'string', default: '' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Owned Note Paragraph',
+		} );
+	} );
+
+	afterAll( () => {
+		getBlockTypes().forEach( ( block ) =>
+			unregisterBlockType( block.name )
+		);
+	} );
+
+	/*
+	 * A marker's note id is whatever the content says. `note` is what
+	 * core-data holds for it, or null when it holds nothing.
+	 */
+	function setup(
+		note: Record< string, any > | null,
+		currentUser: { id: number } | null = { id: ME }
+	) {
+		const saved: any[] = [];
+		const registry = createRegistry();
+		registry.register( noticesStore );
+		registry.register( blockEditorStore );
+		registry.register(
+			createReduxStore( 'core', {
+				reducer: ( state = {} ) => state,
+				actions: {
+					saveEntityRecord:
+						( _kind: string, _name: string, record: any ) =>
+						async () => {
+							saved.push( record );
+							return record;
+						},
+				},
+				selectors: {
+					getEditedEntityRecord: () => null,
+					getEntityRecord: () => note,
+					getCurrentUser: () => currentUser,
+				},
+			} )
+		);
+		registry.register( createStubPostStore( POST ) );
+		registry.register( createStubInterfaceStore() );
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			metadata: { noteId: [ 7 ] },
+		} );
+		registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+
+		let providerHandle: ReturnType< typeof useSuggestionsProvider >;
+		function Capture() {
+			providerHandle = useSuggestionsProvider();
+			return null;
+		}
+
+		render(
+			<RegistryProvider value={ registry }>
+				<SuggestionSessionProvider>
+					<Capture />
+				</SuggestionSessionProvider>
+			</RegistryProvider>
+		);
+
+		return { registry, block, saved, getProvider: () => providerHandle };
+	}
+
+	const update = ( provider: ReturnType< typeof useSuggestionsProvider > ) =>
+		provider.updateSuggestion( {
+			commentId: 7,
+			blockName: PARAGRAPH,
+			operations: [
+				{
+					type: 'inline-suggestion',
+					attribute: 'content',
+					suggestionType: 'replace',
+				},
+			],
+		} );
+
+	it( 'updates the current user’s own note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: ME,
+			post: POST,
+		} );
+
+		await act( async () => {
+			await update( getProvider() );
+		} );
+
+		expect( saved ).toHaveLength( 1 );
+		expect( saved[ 0 ].id ).toBe( 7 );
+	} );
+
+	it( 'refuses to rewrite another user’s note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: SOMEONE_ELSE,
+			post: POST,
+		} );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses to trash another user’s note, and leaves its link', async () => {
+		const { registry, block, saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: SOMEONE_ELSE,
+			post: POST,
+		} );
+
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( {
+					commentId: 7,
+					clientId: block.clientId,
+				} )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+		expect( attributesOf( registry, block.clientId )?.metadata ).toEqual( {
+			noteId: [ 7 ],
+		} );
+	} );
+
+	it( 'refuses a note core-data does not hold', async () => {
+		const { saved, getProvider } = setup( null );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it.each( [
+		[ 'on another post', { post: 123 } ],
+		[ 'with no post recorded', {} ],
+	] )( 'refuses a note %s', async ( _label, where ) => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'note',
+			author: ME,
+			...where,
+		} );
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses while the current user cannot be resolved', async () => {
+		const { saved, getProvider } = setup(
+			{ id: 7, type: 'note', author: ME, post: POST },
+			null
+		);
+
+		await act( async () => {
+			await expect( update( getProvider() ) ).rejects.toThrow();
+		} );
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( { commentId: 7 } )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
+	} );
+
+	it( 'refuses a comment that is not a note', async () => {
+		const { saved, getProvider } = setup( {
+			id: 7,
+			type: 'comment',
+			author: ME,
+			post: POST,
+		} );
+
+		await act( async () => {
+			await expect(
+				getProvider().deleteSuggestion( { commentId: 7 } )
+			).rejects.toThrow();
+		} );
+
+		expect( saved ).toEqual( [] );
 	} );
 } );
 
