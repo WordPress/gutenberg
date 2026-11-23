@@ -22,14 +22,23 @@ function useFullLock( isLocked: boolean ) {
 
 	return useCallback(
 		( clientIds: string[] ) => {
-			const { getBlockAttributes, getClientIdsOfDescendants } = unlock(
-				registry.select( blockEditorStore )
-			);
+			const {
+				getBlockAttributes,
+				getBlockParents,
+				getClientIdsOfDescendants,
+			} = unlock( registry.select( blockEditorStore ) );
 
-			// Keep the lock attributes of every affected block, to undo.
+			// Keep the lock attributes of every affected block, to undo: the
+			// blocks, every block inside them, and the blocks above them, whose
+			// locks an unlock can also change.
 			const affectedIds = [
-				...clientIds,
-				...getClientIdsOfDescendants( clientIds ),
+				...new Set( [
+					...clientIds.flatMap( ( clientId ) =>
+						getBlockParents( clientId )
+					),
+					...clientIds,
+					...getClientIdsOfDescendants( clientIds ),
+				] ),
 			];
 			const previousAttributes: Record<
 				string,
