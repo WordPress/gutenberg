@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import * as Select from '../';
-import { Avatar } from '../../../../avatar';
 import {
 	longLabelPopupItems,
 	narrowContainerDecorator,
@@ -405,10 +404,13 @@ export const WithCustomTriggerAndItem: Story = {
 							gap: 8,
 						} }
 					>
-						<Avatar
-							name={ item.value }
-							size="xs"
-							aria-hidden="true"
+						<img
+							src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
+							alt=""
+							width="20"
+							style={ {
+								borderRadius: '50%',
+							} }
 						/>
 
 						{ item.label }

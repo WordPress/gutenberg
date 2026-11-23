@@ -6,6 +6,9 @@ const storybookDir = path.resolve( import.meta.dirname, '..' );
 const storybookUrl = 'http://127.0.0.1:50240';
 const maxConcurrentStories = 4;
 const storyTimeout = 15_000;
+// Stories may show Gravatar images, as WordPress does for avatars. The smoke
+// test still blocks these requests, but they do not fail the story.
+const ignoredExternalHosts = [ 'gravatar.com', 'secure.gravatar.com' ];
 /** @type {import('playwright').Browser | undefined} */
 let browser;
 let server;
@@ -97,7 +100,7 @@ try {
 /**
  * Renders a story with requests to other hosts blocked, so a third-party
  * outage or rate limit cannot fail the smoke test. A story fails when it makes
- * such a request.
+ * such a request, unless the host is in `ignoredExternalHosts`.
  *
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
@@ -123,9 +126,10 @@ async function renderStory( context, storyId ) {
 			[ 'http:', 'https:' ].includes( url.protocol ) &&
 			url.origin !== storybookUrl,
 		( route ) => {
-			failedResponses.push(
-				`External request: ${ route.request().url() }`
-			);
+			const url = new URL( route.request().url() );
+			if ( ! ignoredExternalHosts.includes( url.hostname ) ) {
+				failedResponses.push( `External request: ${ url.href }` );
+			}
 			return route.abort( 'blockedbyclient' );
 		}
 	);

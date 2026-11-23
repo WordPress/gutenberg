@@ -11,11 +11,6 @@ import { Text } from '../../text';
 import { Heading } from '../../heading';
 import Button from '../../button';
 
-// A landscape drawn in code, so the story requests no image.
-const MEDIA_URL = `data:image/svg+xml,${ encodeURIComponent(
-	'<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><rect width="1200" height="600" fill="#bfe0f5"/><circle cx="900" cy="170" r="80" fill="#f6c343"/><path d="M0 460 300 220 560 420 800 280 1200 500V600H0z" fill="#5a7d5a"/></svg>'
-) }`;
-
 const meta: Meta< typeof Card > = {
 	component: Card,
 	subcomponents: { CardHeader, CardBody, CardDivider, CardMedia, CardFooter },
@@ -62,7 +57,13 @@ export const Default: StoryObj< typeof Card > = {
 					<Text>CardBody (after CardDivider)</Text>
 				</CardBody>
 				<CardMedia>
-					<img alt="Card Media" src={ MEDIA_URL } />
+					<div
+						style={ {
+							height: 180,
+							background:
+								'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+						} }
+					/>
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>

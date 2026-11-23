@@ -38,4 +38,4 @@ npm run storybook:manifest-snapshot
 
 ## External requests
 
-The static smoke test (`npm run --workspace @wordpress/storybook test:smoke:build`) blocks every request to a host other than the Storybook server, so a third-party outage or rate limit cannot fail it. A story that makes such a request fails the test. Serve story assets from Storybook, or generate them in code, such as an SVG data URI.
+The static smoke test (`npm run --workspace @wordpress/storybook test:smoke:build`) blocks every request to a host other than the Storybook server, so a third-party outage or rate limit cannot fail it. A story that makes such a request fails the test. Serve story assets from Storybook, or generate them in code, such as an SVG data URI. The only exception is Gravatar (`gravatar.com` and `secure.gravatar.com`), because WordPress shows avatars from Gravatar: the test blocks these requests, but they do not fail the story.

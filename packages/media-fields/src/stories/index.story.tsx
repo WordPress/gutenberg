@@ -26,17 +26,6 @@ export default {
 // Served from `storybook/static`.
 const IMAGE_URL = 'image-editor-demo.jpeg';
 
-// A generic profile image, drawn in code so the stories request no image.
-const AVATAR_URL = `data:image/svg+xml,${ encodeURIComponent(
-	'<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" fill="#dcdcde"/><circle cx="48" cy="38" r="18" fill="#a7aaad"/><path d="M14 96a34 34 0 0 1 68 0z" fill="#a7aaad"/></svg>'
-) }`;
-
-const avatarUrls = {
-	'24': AVATAR_URL,
-	'48': AVATAR_URL,
-	'96': AVATAR_URL,
-};
-
 // Sample data for media fields
 const sampleMediaItem: MediaItem = {
 	id: 123,
@@ -124,7 +113,11 @@ const sampleMediaItem: MediaItem = {
 			{
 				id: 1,
 				name: 'John Doe',
-				avatar_urls: avatarUrls,
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
 			},
 		],
 	},
@@ -221,7 +214,11 @@ const sampleMediaItemZip: MediaItem = {
 			{
 				id: 1,
 				name: 'Jane Smith',
-				avatar_urls: avatarUrls,
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
 			},
 		],
 	},
@@ -284,7 +281,11 @@ const sampleMediaItemBrokenImage: MediaItem = {
 			{
 				id: 1,
 				name: 'Admin User',
-				avatar_urls: avatarUrls,
+				avatar_urls: {
+					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
+					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
+					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
+				},
 			},
 		],
 	},
