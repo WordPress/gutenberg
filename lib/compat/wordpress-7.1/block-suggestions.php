@@ -427,34 +427,16 @@ add_filter( 'wxr_export_skip_postmeta', 'gutenberg_skip_suggestion_content_in_ex
  * reviewer's save checks the reviewer's own capabilities again, as any post
  * save does.
  *
- * Hooked to `rest_preprocess_comment`, which runs for both creating and
- * updating a comment, so the request is refused with a 400 before anything
- * is stored.
- *
- * @param array|WP_Error  $prepared_comment The prepared comment data.
- * @param WP_REST_Request $request          The REST request.
- * @return array|WP_Error The prepared comment, or an error for an invalid
- *                        post-level operation.
+ * @param array<string, mixed> $payload Decoded `_wp_suggestion` payload.
+ * @param WP_Post|null         $post    The post the note belongs to.
+ * @return array<string, mixed>|WP_Error The payload with its values sanitized,
+ *                                       or an error for an invalid post-level
+ *                                       operation.
  */
-function gutenberg_validate_suggestion_post_operations( $prepared_comment, $request ) {
-	if ( is_wp_error( $prepared_comment ) ) {
-		return $prepared_comment;
+function gutenberg_sanitize_suggestion_post_operations( array $payload, ?WP_Post $post ) {
+	if ( ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
+		return $payload;
 	}
-	$meta = $request['meta'];
-	if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) || ! is_string( $meta['_wp_suggestion'] ) ) {
-		return $prepared_comment;
-	}
-	$payload = json_decode( $meta['_wp_suggestion'], true );
-	if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
-		return $prepared_comment;
-	}
-
-	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? (int) $prepared_comment['comment_post_ID'] : 0;
-	if ( ! $post_id && isset( $request['id'] ) ) {
-		$comment = get_comment( (int) $request['id'] );
-		$post_id = $comment ? (int) $comment->comment_post_ID : 0;
-	}
-	$post = get_post( $post_id );
 
 	$error = new WP_Error(
 		'rest_invalid_suggestion',
@@ -462,7 +444,6 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		array( 'status' => 400 )
 	);
 
-	$sanitized = false;
 	foreach ( $payload['operations'] as $index => $operation ) {
 		if ( ! is_array( $operation ) || ! isset( $operation['type'] ) || 'post-attribute-set' !== $operation['type'] ) {
 			continue;
@@ -482,7 +463,6 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 				}
 				if ( $value !== $operation[ $key ] ) {
 					$payload['operations'][ $index ][ $key ] = $value;
-					$sanitized                               = true;
 				}
 			}
 			continue;
@@ -511,18 +491,98 @@ function gutenberg_validate_suggestion_post_operations( $prepared_comment, $requ
 		}
 		if ( $terms !== $after ) {
 			$payload['operations'][ $index ]['after'] = $terms;
-			$sanitized                                = true;
 		}
 	}
 
+	return $payload;
+}
+
+/**
+ * Validates the post-level operations of a suggestion a REST request carries.
+ *
+ * Hooked to `rest_preprocess_comment`, which runs for both creating and
+ * updating a comment, so the request is refused with a 400 before anything
+ * is stored.
+ *
+ * @param array|WP_Error  $prepared_comment The prepared comment data.
+ * @param WP_REST_Request $request          The REST request.
+ * @return array|WP_Error The prepared comment, or an error for an invalid
+ *                        post-level operation.
+ */
+function gutenberg_validate_suggestion_post_operations( $prepared_comment, $request ) {
+	if ( is_wp_error( $prepared_comment ) ) {
+		return $prepared_comment;
+	}
+	$meta = $request['meta'];
+	if ( ! is_array( $meta ) || ! isset( $meta['_wp_suggestion'] ) || ! is_string( $meta['_wp_suggestion'] ) ) {
+		return $prepared_comment;
+	}
+	$payload = json_decode( $meta['_wp_suggestion'], true );
+	if ( ! is_array( $payload ) ) {
+		return $prepared_comment;
+	}
+
+	$post_id = isset( $prepared_comment['comment_post_ID'] ) ? (int) $prepared_comment['comment_post_ID'] : 0;
+	if ( ! $post_id && isset( $request['id'] ) ) {
+		$comment = get_comment( (int) $request['id'] );
+		$post_id = $comment ? (int) $comment->comment_post_ID : 0;
+	}
+
+	$sanitized = gutenberg_sanitize_suggestion_post_operations( $payload, get_post( $post_id ) );
+	if ( is_wp_error( $sanitized ) ) {
+		return $sanitized;
+	}
+
 	// Store the sanitized values, not the ones sent.
-	if ( $sanitized ) {
-		$meta['_wp_suggestion'] = wp_json_encode( $payload );
+	if ( $sanitized !== $payload ) {
+		$meta['_wp_suggestion'] = wp_json_encode( $sanitized );
 		$request->set_param( 'meta', $meta );
 	}
 
 	return $prepared_comment;
 }
+
+/**
+ * Holds a `_wp_suggestion` written outside REST to the post-level operation
+ * rules.
+ *
+ * The meta's `sanitize_callback` is not told which note it sanitizes for, so
+ * the rules, which depend on the note's post, are applied where the meta is
+ * written: an invalid payload is refused, and one whose values needed
+ * sanitizing is stored sanitized.
+ *
+ * @param bool|null $check      Whether to short-circuit the write. Null lets it proceed.
+ * @param int       $note_id    Comment ID.
+ * @param string    $meta_key   Meta key.
+ * @param mixed     $meta_value Meta value.
+ * @return bool|null Whether the write was handled here, or the incoming value.
+ */
+function gutenberg_guard_suggestion_post_operations_meta( $check, $note_id, $meta_key, $meta_value ) {
+	static $is_storing = false;
+	if ( null !== $check || '_wp_suggestion' !== $meta_key || $is_storing || ! is_string( $meta_value ) ) {
+		return $check;
+	}
+	$payload = json_decode( $meta_value, true );
+	if ( ! is_array( $payload ) ) {
+		return $check;
+	}
+	$note      = get_comment( $note_id );
+	$sanitized = gutenberg_sanitize_suggestion_post_operations( $payload, $note ? get_post( (int) $note->comment_post_ID ) : null );
+	if ( is_wp_error( $sanitized ) ) {
+		return false;
+	}
+	if ( $sanitized === $payload ) {
+		return $check;
+	}
+	$is_storing = true;
+	try {
+		return (bool) update_comment_meta( $note_id, $meta_key, wp_slash( (string) wp_json_encode( $sanitized ) ) );
+	} finally {
+		$is_storing = false;
+	}
+}
+add_filter( 'add_comment_metadata', 'gutenberg_guard_suggestion_post_operations_meta', 10, 4 );
+add_filter( 'update_comment_metadata', 'gutenberg_guard_suggestion_post_operations_meta', 10, 4 );
 
 /**
  * Sanitizes a proposed value of the title, excerpt, slug or featured image.

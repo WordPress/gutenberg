@@ -142,4 +142,72 @@ class Tests_Suggestion_Server_Meta extends WP_UnitTestCase {
 
 		$this->assertSame( 'value', get_comment_meta( $note_id, 'some_plugin_key', true ) );
 	}
+
+	/**
+	 * @param array<string, mixed> $operation A post-level operation.
+	 */
+	private function post_field_payload( array $operation ): string {
+		return (string) wp_json_encode(
+			array(
+				'schemaVersion' => 2,
+				'operations'    => array( array_merge( array( 'type' => 'post-attribute-set' ), $operation ) ),
+			)
+		);
+	}
+
+	public function test_comment_update_cannot_suggest_a_post_field_rest_refuses(): void {
+		$note_id = $this->create_note();
+
+		wp_update_comment(
+			wp_slash(
+				array(
+					'comment_ID'   => $note_id,
+					'comment_meta' => array(
+						'_wp_suggestion' => $this->post_field_payload(
+							array(
+								'attribute' => 'status',
+								'before'    => 'draft',
+								'after'     => 'publish',
+							)
+						),
+					),
+				)
+			)
+		);
+
+		$this->assertSame( array(), get_comment_meta( $note_id, '_wp_suggestion' ) );
+	}
+
+	public function test_comment_update_stores_a_suggested_post_field_sanitized(): void {
+		$note_id = $this->create_note();
+
+		wp_update_comment(
+			wp_slash(
+				array(
+					'comment_ID'   => $note_id,
+					'comment_meta' => array(
+						'_wp_suggestion' => $this->post_field_payload(
+							array(
+								'attribute' => 'slug',
+								'before'    => 'old',
+								'after'     => 'New Slug!',
+							)
+						),
+					),
+				)
+			)
+		);
+
+		$payload = json_decode( get_comment_meta( $note_id, '_wp_suggestion', true ), true );
+		$this->assertSame( 'new-slug', $payload['operations'][0]['after'] );
+	}
+
+	public function test_a_block_suggestion_is_stored_outside_rest(): void {
+		$note_id = $this->create_note();
+		$payload = '{"schemaVersion":2,"operations":[{"type":"attribute-set","attribute":"level","before":2,"after":3}]}';
+
+		update_comment_meta( $note_id, '_wp_suggestion', wp_slash( $payload ) );
+
+		$this->assertSame( json_decode( $payload, true ), json_decode( get_comment_meta( $note_id, '_wp_suggestion', true ), true ) );
+	}
 }
