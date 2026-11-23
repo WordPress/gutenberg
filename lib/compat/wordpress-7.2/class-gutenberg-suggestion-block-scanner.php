@@ -12,8 +12,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Block_Scanner' ) ) {
 	 *
 	 * The save pass edits post content by byte range so it never re-encodes a
 	 * region it does not change, and `parse_blocks()` does not report offsets.
-	 * This drives `WP_Block_Parser::next_token()`, the tokenizer `parse_blocks()`
-	 * itself uses, so both agree on what a delimiter is.
+	 * This drives the tokenizer `parse_blocks()` itself uses, so both agree on
+	 * what a delimiter is: `WP_Block_Processor` from WordPress 7.2, and
+	 * `WP_Block_Parser::next_token()`, which 7.2 deprecates, before it.
 	 */
 	class Gutenberg_Suggestion_Block_Scanner {
 
@@ -39,19 +40,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Block_Scanner' ) ) {
 		 *                      callers leave the content alone.
 		 */
 		public static function scan( $content ) {
-			$parser           = new WP_Block_Parser();
-			$parser->document = $content;
-			$parser->offset   = 0;
-
 			$blocks = array();
 			$stack  = array();
-			while ( true ) {
-				list( $type, $name, $attrs, $start, $length ) = $parser->next_token();
-				if ( 'no-more-tokens' === $type ) {
-					break;
-				}
-				$parser->offset = $start + $length;
-				$parent         = $stack ? end( $stack ) : null;
+			foreach ( self::delimiters( $content ) as $delimiter ) {
+				list( $type, $name, $attrs, $start, $length ) = $delimiter;
+				$parent                                       = $stack ? end( $stack ) : null;
 
 				if ( 'block-closer' === $type ) {
 					if ( null === $parent || $blocks[ $parent ]['name'] !== $name ) {
@@ -85,6 +78,49 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Block_Scanner' ) ) {
 			}
 
 			return $stack ? null : $blocks;
+		}
+
+		/**
+		 * Lists the block delimiters of serialized content.
+		 *
+		 * @param string $content Serialized blocks.
+		 * @return list<array{0: string, 1: string, 2: array<mixed>|null, 3: int, 4: int}>
+		 *         Each delimiter's type (`block-opener`, `block-closer` or
+		 *         `void-block`), block name, attributes, offset and length.
+		 */
+		private static function delimiters( string $content ): array {
+			$delimiters = array();
+
+			if ( is_wp_version_compatible( '7.2' ) ) {
+				$types     = array(
+					WP_Block_Processor::OPENER => 'block-opener',
+					WP_Block_Processor::CLOSER => 'block-closer',
+					WP_Block_Processor::VOID   => 'void-block',
+				);
+				$processor = new WP_Block_Processor( $content );
+				while ( $processor->next_delimiter() ) {
+					$span = $processor->get_span();
+					$type = $types[ (string) $processor->get_delimiter_type() ] ?? null;
+					if ( null === $span || null === $type ) {
+						continue;
+					}
+					$delimiters[] = array( $type, (string) $processor->get_block_type(), $processor->allocate_and_return_parsed_attributes(), $span->start, $span->length );
+				}
+				return $delimiters;
+			}
+
+			$parser           = new WP_Block_Parser();
+			$parser->document = $content;
+			$parser->offset   = 0;
+			while ( true ) {
+				list( $type, $name, $attrs, $start, $length ) = $parser->next_token();
+				if ( 'no-more-tokens' === $type || ! is_string( $type ) || ! is_string( $name ) || ! is_int( $start ) || ! is_int( $length ) ) {
+					break;
+				}
+				$parser->offset = $start + $length;
+				$delimiters[]   = array( $type, $name, is_array( $attrs ) ? $attrs : null, $start, $length );
+			}
+			return $delimiters;
 		}
 
 		/**

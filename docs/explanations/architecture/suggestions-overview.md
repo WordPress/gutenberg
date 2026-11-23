@@ -80,7 +80,7 @@ flowchart TB
     Post --> Strip
 ```
 
-Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend would replace), and are linked back to the block through `metadata.noteId` and the marker's id.
+Every marker is content in the editor, so it syncs over RTC and replays through undo like any other edit, and the save pass decides what of it the stored post keeps. Notes are created through the submission hook, which writes them through `SuggestionStore` (the boundary a different storage backend is meant to replace, once the remaining direct reads of the comment entity move behind it), and are linked back to the block through `metadata.noteId` and the marker's id.
 
 ## Data model
 
@@ -259,7 +259,7 @@ sequenceDiagram
     Note over API: Save pass: the anchor is gone, so the Note becomes<br/>approved with _wp_suggestion_status = applied
 ```
 
-Reject is the mirror image: drop an `add` with its text, unwrap a `del`, drop a `format` marker and recompute the run from the formatting changes still pending, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker keeps a proposal that rode on it as its own `pending-attributes` marker. Decisions are kept out of undo history (`history: 'ignore'`).
+Reject is the mirror image: drop an `add` with its text, unwrap a `del`, drop a `format` marker and recompute the run from the formatting changes still pending, undo a pending insert or move, clear a `pending-remove` marker, or drop an attribute proposal. Clearing a structural marker drops a proposal that rode on it, since one note carried both. Every accept and reject of a suggestion in block content is an ordinary undo level, so undo brings the marker back and reopens the note, and redo decides it again.
 
 ## Persistence and the front end
 

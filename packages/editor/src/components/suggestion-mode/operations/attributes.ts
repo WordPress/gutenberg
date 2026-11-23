@@ -215,9 +215,16 @@ export function clearSuggestionMarkerAttributes(
 	return { metadata: rest };
 }
 
+/** Metadata keys the system owns; a proposal never sets them. */
+const SYSTEM_METADATA_KEYS = [ 'noteId', 'suggestion' ];
+
 /**
  * Apply a suggestion payload's operations to a block's current attributes
  * to produce the new attributes. Pure function — no side effects.
+ *
+ * A `metadata` proposal holds only the keys it changes (a new block name,
+ * say), so it is merged into the block's metadata, which also carries the
+ * note links and the markers. Every other attribute is replaced.
  *
  * @param currentAttributes Block's current attributes.
  * @param operations        Operations from the payload.
@@ -229,11 +236,69 @@ export function applyOperations(
 ): Record< string, any > {
 	const result: Record< string, any > = { ...currentAttributes };
 	for ( const op of operations ) {
-		if ( op.type === 'attribute-set' ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		if ( op.attribute !== 'metadata' ) {
 			result[ op.attribute ] = op.after;
+			continue;
+		}
+		if (
+			op.after &&
+			typeof op.after === 'object' &&
+			! Array.isArray( op.after )
+		) {
+			const proposed = { ...op.after };
+			for ( const key of SYSTEM_METADATA_KEYS ) {
+				delete proposed[ key ];
+			}
+			result.metadata = { ...result.metadata, ...proposed };
 		}
 	}
 	return result;
+}
+
+/**
+ * Whether a payload's `attribute-set` operations propose what the block's
+ * marker proposes. The marker is what the canvas shows and the payload is
+ * what accept applies; the two are written by separate requests, so one can
+ * be ahead of the other. A value on one side only still matches when the
+ * block already holds it, since applying it changes nothing.
+ *
+ * @param liveAttributes The block's current attributes.
+ * @param proposal       The marker's proposed attributes, if any.
+ * @param operations     Operations from the payload.
+ * @return True when both describe the same change.
+ */
+export function proposalMatchesOperations(
+	liveAttributes: Record< string, any > | null | undefined,
+	proposal: Record< string, unknown > | null | undefined,
+	operations: SuggestionOperation[]
+): boolean {
+	const proposed = proposal ?? {};
+	const has = ( key: string ) =>
+		Object.prototype.hasOwnProperty.call( proposed, key );
+	const covered = new Set< string >();
+	for ( const op of operations ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		covered.add( op.attribute );
+		const shown = has( op.attribute )
+			? proposed[ op.attribute ]
+			: liveAttributes?.[ op.attribute ];
+		if ( ! isAttributeEqual( op.after ?? null, shown ?? null ) ) {
+			return false;
+		}
+	}
+	return Object.keys( proposed ).every(
+		( key ) =>
+			covered.has( key ) ||
+			isAttributeEqual(
+				proposed[ key ] ?? null,
+				liveAttributes?.[ key ] ?? null
+			)
+	);
 }
 
 /**
@@ -326,6 +391,30 @@ export function hasAttributeConflict(
 			op.type !== 'attribute-set' &&
 			op.type !== POST_ATTRIBUTE_OP_TYPE
 		) {
+			continue;
+		}
+		/*
+		 * A metadata proposal holds only the keys it changes, while the
+		 * block's metadata also carries note links and markers: compare
+		 * key by key.
+		 */
+		if (
+			op.type === 'attribute-set' &&
+			op.attribute === 'metadata' &&
+			op.after &&
+			typeof op.after === 'object'
+		) {
+			if (
+				Object.keys( op.after ).some(
+					( key ) =>
+						! isAttributeEqual(
+							op.before?.[ key ] ?? null,
+							currentAttributes?.metadata?.[ key ] ?? null
+						)
+				)
+			) {
+				return true;
+			}
 			continue;
 		}
 		if (

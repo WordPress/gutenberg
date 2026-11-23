@@ -9,6 +9,7 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -16,7 +17,9 @@ import { STORE_NAME } from '../../store/constants';
 import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
+import { findInlineMarker } from './anchor-index';
 import { createProposedTerms } from './create-proposed-terms';
+import { getAttributeApplyRefusal, getPostApplyRefusal } from './apply-refusal';
 import {
 	nestedMarkerFor,
 	withoutMarkerEntry,
@@ -128,7 +131,6 @@ export function useSuggestionDecisions() {
 		removeBlock,
 		insertBlock,
 		moveBlockToPosition,
-		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent: markLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
 	const {
@@ -234,6 +236,40 @@ export function useSuggestionDecisions() {
 				commentId
 			),
 		[ selectClientIdsWithDescendants, selectBlockAttributes ]
+	);
+
+	/**
+	 * Where an inline suggestion's marker is. The marker is found by its id
+	 * wherever it sits: a merge or a transform leaves it in a block that
+	 * `metadata.noteId` does not link, or under another attribute name. The
+	 * linked block and the payload's attribute are tried first, and are the
+	 * answer when the content holds no marker for the note.
+	 *
+	 * @param clientId  Block client id, if the caller resolved one.
+	 * @param commentId Comment id.
+	 * @param attribute Attribute the payload names.
+	 * @return The block and attribute to decide on, or undefined.
+	 */
+	const resolveInlineTarget = useCallback(
+		(
+			clientId: string | undefined,
+			commentId: number | string,
+			attribute: string
+		) => {
+			const linked = resolveTarget( clientId, commentId );
+			return (
+				findInlineMarker(
+					{
+						getClientIdsWithDescendants:
+							selectClientIdsWithDescendants,
+						getBlockAttributes: selectBlockAttributes,
+					},
+					commentId,
+					{ clientId: linked, attribute }
+				) ?? ( linked ? { clientId: linked, attribute } : undefined )
+			);
+		},
+		[ resolveTarget, selectClientIdsWithDescendants, selectBlockAttributes ]
 	);
 
 	/**
@@ -508,6 +544,30 @@ export function useSuggestionDecisions() {
 			const postOps = findPostAttributeOps( payload.operations );
 			if ( postOps.length > 0 ) {
 				/*
+				 * Accept edits the post with the reviewer's capabilities, so
+				 * it takes only the fields a suggestion can propose. The
+				 * taxonomies are among them and may not be loaded yet.
+				 */
+				try {
+					await registry
+						.resolveSelect( coreStore )
+						.getTaxonomies( { per_page: -1 } );
+				} catch {
+					// Unloaded, a terms suggestion is refused below.
+				}
+				const postRefusal = getPostApplyRefusal(
+					postOps,
+					unlock( registry.select( STORE_NAME ) )
+						.isProposablePostField
+				);
+				if ( postRefusal ) {
+					createNotice( 'error', postRefusal, {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+					return false;
+				}
+				/*
 				 * New terms are created only now, as the reviewer, and before
 				 * the decision is recorded. When one cannot be created nothing
 				 * is decided and the note stays pending.
@@ -544,7 +604,12 @@ export function useSuggestionDecisions() {
 				);
 			}
 
-			const targetClientId = resolveTarget( clientId, commentId );
+			const inlineOp = findInlineOp( payload.operations );
+			const inlineTarget = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
+				: undefined;
+			const targetClientId =
+				inlineTarget?.clientId ?? resolveTarget( clientId, commentId );
 
 			if ( ! targetClientId ) {
 				createNotice(
@@ -557,6 +622,35 @@ export function useSuggestionDecisions() {
 				return false;
 			}
 
+			/*
+			 * The attribute values a payload proposes are another author's,
+			 * and the reviewer's save writes them. They are checked before
+			 * anything is decided, and again as they land.
+			 */
+			const findRefusal = () =>
+				getAttributeApplyRefusal( {
+					blockName: registry
+						.select( blockEditorStore )
+						.getBlockName( targetClientId ),
+					attributes: selectBlockAttributes( targetClientId ),
+					commentId,
+					payload,
+				} );
+			const refusal = findRefusal();
+			if ( refusal ) {
+				createNotice( 'error', refusal, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				return false;
+			}
+			const assertApplicable = () => {
+				const late = findRefusal();
+				if ( late ) {
+					throw new Error( late );
+				}
+			};
+
 			const failureMessage = __( 'Failed to save suggestion status.' );
 
 			// Inline suggestions live as a suggestion marker in a
@@ -566,9 +660,8 @@ export function useSuggestionDecisions() {
 			// proposed text becomes permanent. The write bypasses the
 			// Suggestion mode interceptor so it lands on the live block
 			// instead of being reverted into the overlay.
-			const inlineOp = findInlineOp( payload.operations );
-			if ( inlineOp ) {
-				const attributeKey = inlineOp.attribute;
+			if ( inlineOp && inlineTarget ) {
+				const attributeKey = inlineTarget.attribute;
 				/*
 				 * Accepting a deletion removes its characters, which can
 				 * shrink or empty other suggestions nested with it; the
@@ -630,6 +723,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const currentAttributes =
 							selectBlockAttributes( targetClientId );
 						const applied = applyOperations(
@@ -641,7 +735,7 @@ export function useSuggestionDecisions() {
 							...applied,
 							metadata: withoutOutdatedProposals(
 								withoutMarkerEntry(
-									currentAttributes?.metadata,
+									applied.metadata,
 									commentId
 								),
 								applied
@@ -656,6 +750,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const plan = planStructuralApply(
 							structuralOp,
 							payload.operations,
@@ -674,20 +769,19 @@ export function useSuggestionDecisions() {
 				commentId,
 				'applied',
 				() => {
+					assertApplicable();
 					const currentAttributes =
 						selectBlockAttributes( targetClientId );
 					// One update lands the proposed values and drops the
 					// proposal, with any other author's proposal it left
 					// with nothing to change.
-					const clearedProposal =
-						clearProposedAttributes( currentAttributes );
 					const applied = applyOperations(
 						currentAttributes,
 						payload.operations
 					);
 					const metadata = withoutOutdatedProposals(
-						clearedProposal?.metadata ??
-							currentAttributes?.metadata,
+						clearProposedAttributes( applied )?.metadata ??
+							applied.metadata,
 						applied
 					);
 					// Bypass the Suggestion mode interceptor for this dispatch
@@ -708,6 +802,7 @@ export function useSuggestionDecisions() {
 			updateBlockAttributes,
 			selectBlockAttributes,
 			resolveTarget,
+			resolveInlineTarget,
 			runPlan,
 			createNotice,
 			requestInterceptorBypass,
@@ -767,11 +862,12 @@ export function useSuggestionDecisions() {
 			// may be absent on a fresh load) and bypass the interceptor so the
 			// change lands on the live block.
 			const inlineOp = findInlineOp( payload?.operations );
-			const inlineTarget = inlineOp
-				? resolveTarget( clientId, commentId )
+			const located = inlineOp
+				? resolveInlineTarget( clientId, commentId, inlineOp.attribute )
 				: undefined;
-			if ( inlineOp && inlineTarget ) {
-				const attributeKey = inlineOp.attribute;
+			if ( inlineOp && located ) {
+				const inlineTarget = located.clientId;
+				const attributeKey = located.attribute;
 				/*
 				 * Rejecting an addition removes its text, and with it every
 				 * suggestion nested in it. Rejecting a formatting change
@@ -844,9 +940,6 @@ export function useSuggestionDecisions() {
 							: null;
 					if ( clientId && remaining ) {
 						requestInterceptorBypass( clientId );
-						markNextChangeAsNotPersistent?.( {
-							history: 'ignore',
-						} );
 						updateBlockAttributes( clientId, {
 							metadata: remaining,
 						} );
@@ -864,17 +957,13 @@ export function useSuggestionDecisions() {
 						 * marker's proposal: the live block never took the
 						 * proposed value, so there is nothing to roll back,
 						 * but the proposal must go or it keeps rendering the
-						 * rejected value. Dropping it is a decision, not an
-						 * edit, so it stays off the undo stack.
+						 * rejected value.
 						 */
 						const clear = clearProposedAttributes(
 							selectBlockAttributes( clientId )
 						);
 						if ( clear ) {
 							requestInterceptorBypass( clientId );
-							markNextChangeAsNotPersistent?.( {
-								history: 'ignore',
-							} );
 							updateBlockAttributes( clientId, clear );
 						}
 					}
@@ -885,10 +974,9 @@ export function useSuggestionDecisions() {
 		[
 			decide,
 			selectBlockAttributes,
-			resolveTarget,
+			resolveInlineTarget,
 			runPlan,
 			updateBlockAttributes,
-			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
 			clearPostFieldProposals,
 			registry,

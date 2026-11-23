@@ -1169,4 +1169,64 @@ test.describe( 'Suggestion mode undo', () => {
 			sidebar.getByText( 'Applied', { exact: true } )
 		).toBeVisible();
 	} );
+
+	test( 'undo after rejecting an attribute suggestion takes back the reject alone', async ( {
+		editor,
+		page,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: { content: 'My Heading', level: 2 },
+		} );
+
+		await switchIntent( page, 'Suggesting' );
+
+		const heading = editor.canvas
+			.getByRole( 'document', { name: 'Block: Heading' } )
+			.first();
+		await heading.click();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: /^Heading 2$/ } )
+			.click();
+		const suggestionSaved = suggestionSavedPromise( page );
+		await page.getByRole( 'menuitem', { name: /^Heading 3/ } ).click();
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		const { id: noteId } = await ( await suggestionSaved ).json();
+
+		// An edit made before the decision, in a block of its own.
+		await switchIntent( page, 'Editing' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Added while reviewing' },
+		} );
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Added while reviewing' } );
+
+		const sidebar = await decideSuggestion( page, 'Reject' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+
+		// The reject is its own undo level: the earlier edit stays, and the
+		// proposal comes back with its note awaiting a decision.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( heading ).toHaveClass( /is-suggestion-pending/ );
+		await expect( paragraph ).toBeVisible();
+		await expect(
+			sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect( heading ).not.toHaveClass( /is-suggestion-pending/ );
+		await expect( heading ).toHaveJSProperty( 'tagName', 'H2' );
+
+		const note = await settledNote( requestUtils, noteId );
+		expect( note.status ).toBe( 'hold' );
+		expect( note.meta._wp_suggestion_status ).toBe( 'rejected-unsaved' );
+		await expect(
+			sidebar.getByText( 'Rejected', { exact: true } )
+		).toBeVisible();
+	} );
 } );

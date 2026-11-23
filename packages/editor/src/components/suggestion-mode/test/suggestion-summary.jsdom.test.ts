@@ -561,7 +561,7 @@ describe( 'summarizeOperations', () => {
 		] );
 	} );
 
-	it( 'falls back to a settings label for a metadata write that is not a rename', () => {
+	it( 'names the settings a metadata write that is not a rename changes', () => {
 		// Bindings and pattern overrides also live in `metadata`; only a name
 		// change should claim the rename line.
 		const lines = summarizeOperations( [
@@ -573,7 +573,43 @@ describe( 'summarizeOperations', () => {
 			},
 		] );
 		expect( lines ).toEqual( [
-			{ label: 'Change:', value: 'block settings' },
+			{ label: 'Change:', value: 'block settings (bindings)' },
+		] );
+	} );
+
+	it( 'does not let a rename stand for the other settings a proposal changes', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'metadata',
+				before: null,
+				after: {
+					name: 'Intro paragraph',
+					bindings: { content: { source: 'core/post-meta' } },
+					blockVisibility: false,
+				},
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Rename block:', value: '“Intro paragraph”' },
+			{
+				label: 'Change:',
+				value: 'block settings (bindings, block visibility)',
+			},
+		] );
+	} );
+
+	it( 'leaves out the settings a metadata proposal repeats unchanged', () => {
+		const lines = summarizeOperations( [
+			{
+				type: 'attribute-set',
+				attribute: 'metadata',
+				before: { name: 'Intro', categories: [ 'text' ] },
+				after: { name: 'Lead', categories: [ 'text' ] },
+			},
+		] );
+		expect( lines ).toEqual( [
+			{ label: 'Rename block:', value: '“Lead”' },
 		] );
 	} );
 
