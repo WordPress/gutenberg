@@ -954,6 +954,21 @@ test.describe( 'Suggestion mode undo', () => {
 		await expect(
 			sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
 		).toBeVisible();
+		// Accept shows as soon as the marker is back, before the note is
+		// reopened. The second undo is only past a reopened suggestion once
+		// that write has landed.
+		await expect
+			.poll(
+				async () =>
+					(
+						await requestUtils.rest( {
+							path: `/wp/v2/comments/${ noteId }`,
+							params: { context: 'edit' },
+						} )
+					).meta?._wp_suggestion_status,
+				{ timeout: 10000 }
+			)
+			.toBe( 'pending' );
 
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect( paragraph ).toHaveText( 'Hello' );
