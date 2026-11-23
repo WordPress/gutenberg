@@ -610,4 +610,60 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 			expect( serialized ).not.toContain( '"suggestion"' );
 		} );
 	} );
+
+	test( 'text typed while offline is kept and suggested on reconnect (F-44)', async ( {
+		editor,
+		page,
+		context,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await switchIntent( page, 'Suggesting' );
+
+		const paragraph = firstParagraph( editor );
+		await paragraph.click();
+		await page.keyboard.press( 'End' );
+
+		let failedRequests = 0;
+		page.on( 'requestfailed', ( request: any ) => {
+			if ( /\/wp\/v2\/comments/.test( request.url() ) ) {
+				failedRequests++;
+			}
+		} );
+
+		await context.setOffline( true );
+		try {
+			await page.keyboard.type( ' OFFLINE', { delay: 50 } );
+
+			// One notice, however many keys were pressed.
+			const notices = page.locator( '.components-snackbar' ).filter( {
+				hasText: /offline|Unable to connect/i,
+			} );
+			await expect( notices ).toHaveCount( 1 );
+			await expect( notices ).toContainText(
+				'Your suggestion will be added when you reconnect.'
+			);
+			// And one request, not one per keystroke.
+			expect( failedRequests ).toBe( 1 );
+		} finally {
+			await context.setOffline( false );
+		}
+
+		// The whole run arrives as one suggestion once the note can be saved.
+		const marker = paragraph.locator( 'mark.wp-suggestion-add' );
+		await expect( marker ).toHaveText( ' OFFLINE', { timeout: 15000 } );
+		await expect( paragraph ).toHaveText( 'First paragraph OFFLINE' );
+		await expect(
+			page.locator( '.components-snackbar' ).filter( {
+				hasText: 'Your suggestion will be added',
+			} )
+		).toBeHidden();
+
+		const sidebar = await openNotesSidebar( page );
+		const summary = sidebar.locator( SUMMARY );
+		await expect( summary ).toHaveCount( 1 );
+		await expect( summary ).toContainText( 'Add: “ OFFLINE”' );
+	} );
 } );
