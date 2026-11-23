@@ -19,7 +19,10 @@ export type ImageEditRejection =
 	'no-image' | 'invalid' | 'locked-ratio' | 'outside-image';
 
 export interface ApplyImageEditOptions {
-	/** Reject an edit that needs fitting, instead of fitting it. */
+	/**
+	 * Reject a crop that needs fitting, instead of fitting it. A missing
+	 * crop is left to the editor.
+	 */
 	strict?: boolean;
 }
 

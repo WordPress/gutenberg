@@ -243,6 +243,7 @@ const result = applyImageEdit(
 	{ rotation: 90, crop: { x: 0, y: 0, width: 1, height: 0.5 } }
 );
 
+// Without strict, only `no-image` or `invalid` can reject.
 if ( 'rejected' in result ) {
 	throw new Error( `The edit was rejected: ${ result.rejected }` );
 }

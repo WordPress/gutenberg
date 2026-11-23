@@ -179,7 +179,7 @@ It returns `{ rejected }` instead when it cannot apply the edit at all:
 -   `'no-image'`: no image with a usable size has loaded.
 -   `'invalid'`: a number is not finite, or the crop is under one pixel wide or high.
 
-Pass `{ strict: true }` to reject an edit that needs fitting, rather than fit it. Two more reasons are then possible:
+Pass `{ strict: true }` to reject a crop that needs fitting, rather than fit it. A missing crop is still the editor's choice, so `{ rotation: 5 }` applies either way. Two more reasons are then possible:
 
 -   `'locked-ratio'`: the crop is not the shape of the locked ratio. Without the lock, the edit would apply.
 -   `'outside-image'`: the crop reaches outside the image.
