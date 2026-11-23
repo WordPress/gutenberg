@@ -163,13 +163,13 @@ export function FilePickerUpload() {
 	};
 
 	return (
-		<Fieldset.Root className={ styles.field }>
+		<Fieldset.Root
+			// The drop target covers the whole field, so a file dropped on the
+			// legend or description doesn't open in the browser tab.
+			className={ `${ styles.field } ${ styles[ 'drop-target' ] }` }
+		>
 			<Fieldset.Legend>Photos of the damage</Fieldset.Legend>
-			<Stack
-				direction="column"
-				gap="sm"
-				className={ styles[ 'drop-target' ] }
-			>
+			<Stack direction="column" gap="sm">
 				{ uploads.length > 0 && (
 					<Stack
 						render={ <ul /> }

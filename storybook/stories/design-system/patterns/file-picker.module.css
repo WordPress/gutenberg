@@ -30,9 +30,9 @@
 }
 
 /*
- * The button fills the surface, so the whole drop area opens the picker.
- * The padding is the same on every side, so the thumbnail sits in an even
- * frame.
+ * The picker button fills the drop area, apart from the space the remove
+ * button takes. The padding is the same on every side, so the thumbnail sits
+ * in an even frame.
  */
 .choose {
 	flex: 1;

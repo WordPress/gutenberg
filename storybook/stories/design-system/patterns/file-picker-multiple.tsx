@@ -10,7 +10,12 @@ import {
 	Text,
 	ValidityIndicator,
 } from '@wordpress/ui';
-import { createId, getExtension, SelectedFile } from './selected-file';
+import {
+	createId,
+	formatFileSize,
+	getExtension,
+	SelectedFile,
+} from './selected-file';
 import styles from './file-picker.module.css';
 
 const ACCEPTED_EXTENSIONS = [ '.pdf', '.jpg', '.jpeg', '.png' ];
@@ -75,7 +80,7 @@ export function FilePickerMultiple() {
 		}
 		if ( tooLarge.length ) {
 			messages.push(
-				`Couldn’t add ${ names( tooLarge ) }. Each file can be up to 2 MB.`
+				`Couldn’t add ${ names( tooLarge ) }. Each file can be up to ${ formatFileSize( MAX_FILE_SIZE ) }.`
 			);
 		}
 		if ( overLimit.length ) {
@@ -109,13 +114,13 @@ export function FilePickerMultiple() {
 	}
 
 	return (
-		<Fieldset.Root className={ styles.field }>
+		<Fieldset.Root
+			// The drop target covers the whole field, so a file dropped on the
+			// legend or description doesn't open in the browser tab.
+			className={ `${ styles.field } ${ styles[ 'drop-target' ] }` }
+		>
 			<Fieldset.Legend>Supporting documents</Fieldset.Legend>
-			<Stack
-				direction="column"
-				gap="sm"
-				className={ styles[ 'drop-target' ] }
-			>
+			<Stack direction="column" gap="sm">
 				{ entries.length > 0 && (
 					<Stack
 						render={ <ul /> }
@@ -182,8 +187,7 @@ export function FilePickerMultiple() {
 				<DropZone label="Drop to add files" onFilesDrop={ addFiles } />
 			</Stack>
 			<Fieldset.Description>
-				Drop up to 5 PDF, JPEG, or PNG files here, or choose them. Each
-				file can be up to 2 MB.
+				{ `Drop up to ${ MAX_FILES } PDF, JPEG, or PNG files here, or choose them. Each file can be up to ${ formatFileSize( MAX_FILE_SIZE ) }.` }
 			</Fieldset.Description>
 			<div aria-live="polite">
 				{ error && (

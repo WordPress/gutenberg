@@ -42,7 +42,6 @@ export function FilePickerButton() {
 	return (
 		<form
 			onSubmit={ onSubmit }
-			noValidate
 			className={ previewStyles[ 'with-snackbars' ] }
 		>
 			<Stack direction="column" gap="lg">
