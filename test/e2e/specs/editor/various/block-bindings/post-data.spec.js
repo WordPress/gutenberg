@@ -1,5 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const getDatetimeType = ( page ) =>
+	page.evaluate(
+		() =>
+			window.wp.blocks.getBlockType( 'core/post-date' ).attributes
+				.datetime.type
+	);
+
 test.describe( 'Post Data source', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
@@ -51,10 +58,42 @@ test.describe( 'Post Data source', () => {
 			// Check the fields registered by other sources are there.
 		} );
 
+		test( 'should not render Attributes panel for date blocks before WordPress 7.3', async ( {
+			editor,
+			page,
+		} ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				( await getDatetimeType( page ) ) !== 'string',
+				'WordPress 7.3 validates the datetime type.'
+			);
+			await editor.insertBlock( {
+				name: 'core/post-date',
+				attributes: {
+					metadata: {
+						bindings: {
+							datetime: {
+								source: 'core/post-data',
+								args: { field: 'date' },
+							},
+						},
+					},
+				},
+			} );
+			await expect(
+				page.getByLabel( 'Attributes options' )
+			).toBeHidden();
+		} );
+
 		test( 'should only include date fields in UI to connect the date block', async ( {
 			editor,
 			page,
 		} ) => {
+			// eslint-disable-next-line playwright/no-skipped-test
+			test.skip(
+				( await getDatetimeType( page ) ) === 'string',
+				'Needs WordPress 7.3 to validate the datetime type.'
+			);
 			await editor.insertBlock( {
 				name: 'core/post-date',
 				attributes: {
