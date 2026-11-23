@@ -155,6 +155,18 @@ describe( 'Navigation', () => {
 			expect( overviewLink ).toHaveAttribute( 'href', '' );
 			expect( overviewLink ).toHaveAttribute( 'aria-current', 'page' );
 		} );
+
+		it( 'should give each link a focus key from its `href`', () => {
+			render(
+				<Navigation
+					items={ [ { label: 'Overview', href: '/overview' } ] }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'link', { name: 'Overview' } )
+			).toHaveAttribute( 'data-focus-key', 'navigation:/overview' );
+		} );
 	} );
 
 	describe( 'linkComponent', () => {

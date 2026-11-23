@@ -67,6 +67,9 @@ export const Navigation = ( {
 							render={
 								<Link
 									variant="unstyled"
+									// Lets an app that replaces the page on navigation, such as
+									// `@wordpress/boot`, keep focus on the same link.
+									data-focus-key={ `navigation:${ item.href }` }
 									aria-current={
 										item.href === currentHref
 											? 'page'
