@@ -54,6 +54,7 @@ import {
 } from './operations';
 import type { BlockPlan, PlanStep, SuggestionPayload } from './operations';
 import { withDecisionInFlight } from './decision-state';
+import { snapshotDecidedPayload } from './decision-snapshot';
 import { useSuggestionStore } from './suggestion-store';
 import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import type { SuggestionDecision } from './suggestion-status';
@@ -304,7 +305,17 @@ export function useSuggestionDecisions() {
 				return false;
 			};
 			try {
-				await store.setProvisionalDecision( commentId, decision );
+				await store.setProvisionalDecision(
+					commentId,
+					decision,
+					snapshotDecidedPayload(
+						registry.select( blockEditorStore ),
+						commentId,
+						parseSuggestionPayload(
+							store.getNote( commentId )?.meta?._wp_suggestion
+						)
+					)
+				);
 			} catch ( error: any ) {
 				return fail( error );
 			}
@@ -322,7 +333,7 @@ export function useSuggestionDecisions() {
 			}
 			return true;
 		},
-		[ store, createNotice ]
+		[ store, createNotice, registry ]
 	);
 
 	/**

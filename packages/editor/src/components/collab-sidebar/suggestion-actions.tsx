@@ -593,9 +593,15 @@ function ResolvedSuggestionSummary( {
 	const resolvedOperations = useMemo(
 		() =>
 			operations.map( ( op: any, index: number ) => {
+				// A decided suggestion has no marker left; the payload
+				// recorded what it said.
 				const text =
-					markerTexts[ index * 2 ] ?? blockTexts[ index ] ?? null;
-				const deletedText = markerTexts[ index * 2 + 1 ];
+					markerTexts[ index * 2 ] ||
+					blockTexts[ index ] ||
+					op.decidedText ||
+					null;
+				const deletedText =
+					markerTexts[ index * 2 + 1 ] || op.decidedDeletedText;
 				if ( ! text && ! deletedText ) {
 					return op;
 				}
