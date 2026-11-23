@@ -57,7 +57,6 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
-                                                alt=""
 						alt=""
 						src={ imageUrl }
 					/>

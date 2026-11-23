@@ -51,7 +51,7 @@ export default function AuthorView( {
 					<img
 						ref={ imgRef }
 						onLoad={ handleLoad }
-                                                alt=""
+						alt=""
 						src={ imageUrl }
 					/>
 				</div>
