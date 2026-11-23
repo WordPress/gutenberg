@@ -229,6 +229,7 @@ export default function BoxInputControl( {
 										styles[ 'unit-control' ],
 										'component-box-control__unit-control'
 									) }
+									id={ inputId }
 									isPressEnterToChange
 									disableUnits={ isMixed || isMixedUnit }
 									value={ usedValue }

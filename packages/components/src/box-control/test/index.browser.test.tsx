@@ -32,6 +32,25 @@ describe( 'BoxControl', () => {
 			await expect.element( getTooltip() ).toBeVisible();
 		} );
 
+		it( 'should show the tooltip when `inputProps` includes an `id`', async () => {
+			await render(
+				<BoxControl
+					inputProps={ { id: 'custom-side' } }
+					onChange={ () => {} }
+				/>
+			);
+
+			await userEvent.tab();
+
+			await expect.element( getTooltip() ).toBeVisible();
+			const input = page
+				.getByRole( 'textbox', { name: 'All sides' } )
+				.element();
+			await expect
+				.element( page.getByRole( 'slider', { name: 'All sides' } ) )
+				.toHaveAttribute( 'aria-controls', input.id );
+		} );
+
 		it( 'should not show the tooltip when the unit select receives focus', async () => {
 			await render( <BoxControl onChange={ () => {} } /> );
 
