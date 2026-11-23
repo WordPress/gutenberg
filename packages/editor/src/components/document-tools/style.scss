@@ -96,6 +96,6 @@
 	}
 }
 
-.show-icon-labels .editor-document-tools__left > * + * {
+.show-icon-labels .editor-document-tools__left > :where(:not(:first-child)) {
 	margin-left: $grid-unit-10;
 }

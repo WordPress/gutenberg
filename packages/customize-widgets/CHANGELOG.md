@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.2.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Use `Highlight` and `HighlightText` for the pressed header buttons in forced colors mode, so they follow the active contrast theme in Chromium ([#87010](https://github.com/WordPress/gutenberg/pull/87010)).
