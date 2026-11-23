@@ -6,6 +6,7 @@ type ImageStore = {
 	actions: {
 		handleKeydown: ( event: Partial< KeyboardEvent > ) => void;
 		handleDocumentKeydown: ( event: Partial< KeyboardEvent > ) => void;
+		hideLightbox: () => void;
 	};
 };
 
@@ -223,7 +224,11 @@ describe( 'Image view script: lightbox focus trap', () => {
 } );
 
 describe( 'Image view script: closing the lightbox with Escape', () => {
-	beforeEach( loadViewScript );
+	beforeEach( async () => {
+		// Closing the lightbox starts a cleanup timer.
+		vi.useFakeTimers();
+		await loadViewScript();
+	} );
 
 	afterEach( () => {
 		vi.clearAllTimers();
@@ -231,14 +236,47 @@ describe( 'Image view script: closing the lightbox with Escape', () => {
 		document.body.innerHTML = '';
 	} );
 
+	/**
+	 * Presses a key on the passed element, as seen by the document listener.
+	 *
+	 * @param key                      The key.
+	 * @param target                   The focused element.
+	 * @param options                  Options.
+	 * @param options.defaultPrevented Whether another handler already called
+	 *                                 `preventDefault()`.
+	 * @return The keydown event passed to the handler.
+	 */
+	function pressKeyOnDocument(
+		key: string,
+		target: Element,
+		{ defaultPrevented = false }: { defaultPrevented?: boolean } = {}
+	) {
+		const event = {
+			key,
+			target,
+			defaultPrevented,
+			preventDefault: vi.fn(),
+			stopPropagation: vi.fn(),
+		};
+		mockRegisteredStore.actions.handleDocumentKeydown( event );
+		return event;
+	}
+
 	it( 'closes the overlay when Escape is pressed with the focus outside of it', () => {
-		vi.useFakeTimers();
 		createOverlay( { hasNavigation: false } );
 
-		mockRegisteredStore.actions.handleDocumentKeydown( {
-			key: 'Escape',
-			target: document.body,
-		} );
+		pressKeyOnDocument( 'Escape', document.body );
+
+		expect( mockRegisteredStore.state.overlayEnabled ).toBe( false );
+	} );
+
+	it( 'closes the overlay when Escape is pressed with the focus inside of it', () => {
+		const overlay = createOverlay( { hasNavigation: false } );
+
+		pressKeyOnDocument(
+			'Escape',
+			getControl( overlay, '.wp-lightbox-close-button' )
+		);
 
 		expect( mockRegisteredStore.state.overlayEnabled ).toBe( false );
 	} );
@@ -246,11 +284,48 @@ describe( 'Image view script: closing the lightbox with Escape', () => {
 	it( 'ignores other keys', () => {
 		createOverlay( { hasNavigation: false } );
 
-		mockRegisteredStore.actions.handleDocumentKeydown( {
-			key: 'Enter',
-			target: document.body,
+		pressKeyOnDocument( 'Enter', document.body );
+
+		expect( mockRegisteredStore.state.overlayEnabled ).toBe( true );
+	} );
+
+	it( 'does nothing when the overlay is closed', () => {
+		createOverlay( { hasNavigation: false } );
+		mockRegisteredStore.state.overlayEnabled = false;
+		const hideLightbox = vi.spyOn(
+			mockRegisteredStore.actions,
+			'hideLightbox'
+		);
+
+		const event = pressKeyOnDocument( 'Escape', document.body );
+
+		expect( hideLightbox ).not.toHaveBeenCalled();
+		expect( event.preventDefault ).not.toHaveBeenCalled();
+		expect( event.stopPropagation ).not.toHaveBeenCalled();
+	} );
+
+	it( 'leaves an Escape that was already handled outside of the overlay', () => {
+		createOverlay( { hasNavigation: false } );
+		// For example, a dialog added to the page after the overlay opened.
+		const otherDialog = document.createElement( 'div' );
+		document.body.appendChild( otherDialog );
+
+		pressKeyOnDocument( 'Escape', otherDialog, {
+			defaultPrevented: true,
 		} );
 
 		expect( mockRegisteredStore.state.overlayEnabled ).toBe( true );
+	} );
+
+	it( 'closes the overlay when an Escape from inside of it was already handled', () => {
+		const overlay = createOverlay( { hasNavigation: false } );
+
+		pressKeyOnDocument(
+			'Escape',
+			getControl( overlay, '.wp-lightbox-close-button' ),
+			{ defaultPrevented: true }
+		);
+
+		expect( mockRegisteredStore.state.overlayEnabled ).toBe( false );
 	} );
 } );

@@ -438,9 +438,23 @@ const { state, actions, callbacks } = store(
 			handleDocumentKeydown( event ) {
 				// Listens on the document rather than the overlay, so Escape
 				// closes the overlay even if the focus has left it.
-				if ( state.overlayEnabled && event.key === 'Escape' ) {
-					actions.hideLightbox();
+				if ( ! state.overlayEnabled || event.key !== 'Escape' ) {
+					return;
 				}
+
+				// Leaves an Escape that was already handled outside of the
+				// overlay to whatever handled it, like a dialog added to the
+				// page after the overlay opened. An Escape from inside the
+				// overlay always closes it.
+				const { ref: overlay } = getElement();
+				if (
+					event.defaultPrevented &&
+					! overlay.contains( event.target )
+				) {
+					return;
+				}
+
+				actions.hideLightbox();
 			},
 			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
