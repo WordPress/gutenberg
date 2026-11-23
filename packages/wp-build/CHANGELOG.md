@@ -10,6 +10,10 @@
 
 -   Registration templates: fall back to the minified assets when `SCRIPT_DEBUG` is enabled but the unminified files were not built, instead of registering URLs that 404 ([#75396](https://github.com/WordPress/gutenberg/pull/75396)).
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 0.28.0 (2026-11-18)
 
 ### Enhancements
