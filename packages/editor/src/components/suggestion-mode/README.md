@@ -18,7 +18,7 @@ The feature is an experiment, and nothing here is a public API.
 | `plan-store-content-edit.ts`| Plans a content change that reached the store directly (outside `setAttributes`) as inline markers where it can. |
 | `block-tree-version.ts`     | A cheap "has any block changed?" signal from the identity of the store's block tree. |
 | `provider.ts`               | `useSuggestionsProvider`: the `createSuggestion` / `updateSuggestion` / `deleteSuggestion` / `applySuggestion` / `rejectSuggestion` API, a thin composition of the two hooks below. |
-| `suggestion-store.ts`       | `SuggestionStore`: every read and write of a suggestion note (the comment, `_wp_suggestion`, `_wp_suggestion_status`). The swap point for another storage backend. |
+| `suggestion-store.ts`       | `SuggestionStore`: the note writes of the submission and decision hooks (the comment, `_wp_suggestion`, `_wp_suggestion_status`). Meant as the swap point for another storage backend; the note collector and many readers still use the comment entity directly. |
 | `use-suggestion-submission.ts` | Create, update and delete: builds the payload, saves the note through the store, and links the block to it. |
 | `use-suggestion-decisions.ts` | Accept and Reject: the provisional status write, the conflict check, the content change, and the rollback when either half fails. |
 | `decision-state.ts`         | Per-registry record of the decisions made this session, read by the interceptor and the undo guard. |
