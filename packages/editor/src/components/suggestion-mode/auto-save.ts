@@ -40,6 +40,7 @@ import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useEvent } from '@wordpress/compose';
 import { getSuggestionStatus, isPendingStatus } from './suggestion-status';
 import { useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';
@@ -262,17 +263,12 @@ export default function SuggestionAutoSave() {
 		[]
 	);
 
-	// Provider callbacks are captured in refs: they change reference
-	// whenever `postModified` updates, but the in-flight queue should always
-	// call the latest version.
-	const createRef = useRef( createSuggestion );
-	createRef.current = createSuggestion;
-	const updateRef = useRef( updateSuggestion );
-	updateRef.current = updateSuggestion;
-	const deleteRef = useRef( deleteSuggestion );
-	deleteRef.current = deleteSuggestion;
-	const proposalsRef = useRef( proposals );
-	proposalsRef.current = proposals;
+	// Provider callbacks change reference whenever `postModified` updates,
+	// but the in-flight queue should always call the latest version.
+	const onCreate = useEvent( createSuggestion );
+	const onUpdate = useEvent( updateSuggestion );
+	const onDelete = useEvent( deleteSuggestion );
+	const getProposals = useEvent( () => proposals );
 
 	useHydratePostFieldProposals( currentUserId );
 
@@ -354,7 +350,7 @@ export default function SuggestionAutoSave() {
 			let proposalNoteId: number | undefined;
 			const proposalId = proposalIdFromClientId( clientId );
 			if ( proposalId !== null ) {
-				const proposal = proposalsRef.current?.[ proposalId ];
+				const proposal = getProposals()?.[ proposalId ];
 				operations = postOperationsFromProposal( proposal );
 				proposalNoteId = proposal?.commentId;
 			} else {
@@ -486,7 +482,7 @@ export default function SuggestionAutoSave() {
 			try {
 				if ( operations.length === 0 ) {
 					if ( commentId ) {
-						await deleteRef.current( {
+						await onDelete( {
 							commentId,
 							clientId:
 								proposalId !== null ? undefined : clientId,
@@ -494,14 +490,14 @@ export default function SuggestionAutoSave() {
 						writeCommentId( clientId, null );
 					}
 				} else if ( commentId ) {
-					await updateRef.current( {
+					await onUpdate( {
 						commentId,
 						blockName,
 						operations,
 					} );
 					tracked.commentId = commentId;
 				} else {
-					const saved = await createRef.current( {
+					const saved = await onCreate( {
 						clientId: proposalId !== null ? undefined : clientId,
 						blockName,
 						operations,
@@ -516,7 +512,17 @@ export default function SuggestionAutoSave() {
 				// re-enqueues a sync, so transient failures recover.
 			}
 		},
-		[ registry, readBlock, writeCommentId, getStructuralCaptures, track ]
+		[
+			registry,
+			readBlock,
+			writeCommentId,
+			getStructuralCaptures,
+			track,
+			getProposals,
+			onCreate,
+			onUpdate,
+			onDelete,
+		]
 	);
 
 	const enqueueSync = useCallback(

@@ -57,7 +57,7 @@ export function contentKey( value: any ): string | null {
  * Plans that would retire a note, or that the diff can't resolve, are left to
  * the overlay path.
  *
- * Writes are serialized per block through the overlay context's shared write
+ * Writes are serialized per block through the suggestion session's shared write
  * queue (shared with `SuggestionFormatKeyboard`), and every write re-validates
  * the block's live content against the snapshot its plan was computed from —
  * the note POST is an async gap during which typing markers, collaborators, or
@@ -227,7 +227,7 @@ export default function SuggestionContentReconciler() {
 		[ enqueueSuggestionWrite, registry, runContentEdit ]
 	);
 
-	// Register the handler with the overlay context so the per-block HOC can
+	// Register the handler with the suggestion session so the per-block HOC can
 	// hand content edits off to it. Re-registers whenever the handler identity
 	// changes (e.g. `createSuggestion` rebinds on post modification).
 	useEffect(
