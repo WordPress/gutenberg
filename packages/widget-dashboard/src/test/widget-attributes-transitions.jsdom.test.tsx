@@ -141,6 +141,62 @@ describe( 'header fit budget', () => {
 		mockObserved.clear();
 	} );
 
+	it.each( [ 'integer', 'fractional' ] )(
+		'reserves the full title width as the identity clips and expands (%s measurements)',
+		async ( measurement ) => {
+			render( <Harness /> );
+			await screen.findByTestId( 'metric' );
+
+			/* eslint-disable testing-library/no-node-access */
+			const header = document.querySelector( '.style-widget-header' )!;
+			const identity = document.querySelector( '.style-identity' )!;
+			const inline = document.querySelector( '.style-inline-controls' )!;
+			/* eslint-enable testing-library/no-node-access */
+			const title = screen.getByRole( 'heading', { name: 'Snapshot' } );
+			const clientWidth = vi.spyOn( title, 'clientWidth', 'get' );
+			clientWidth.mockReturnValue( 160 );
+			vi.spyOn( title, 'scrollWidth', 'get' ).mockReturnValue( 160 );
+			const titleRect = vi.spyOn( title, 'getBoundingClientRect' );
+			titleRect.mockReturnValue( { width: 160.25 } as DOMRect );
+			if ( measurement === 'fractional' ) {
+				const range = document.createRange();
+				range.getBoundingClientRect = () =>
+					( { width: 160.25 } ) as DOMRect;
+				vi.spyOn( document, 'createRange' ).mockReturnValue( range );
+			}
+
+			notifyResize( identity, 200 );
+			notifyResize( inline, 226 );
+			notifyResize( header, 442 );
+			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
+
+			// The fractional clip is invisible to scrollWidth/clientWidth.
+			clientWidth.mockReturnValue(
+				measurement === 'fractional' ? 160 : 120
+			);
+			titleRect.mockReturnValue( { width: 159.75 } as DOMRect );
+			notifyResize(
+				identity,
+				measurement === 'fractional' ? 199.5 : 160
+			);
+			notifyResize( header, measurement === 'fractional' ? 425.5 : 410 );
+			expect(
+				screen.getByRole( 'button', { name: 'Widget controls' } )
+			).toBeInTheDocument();
+
+			// Collapsing restores the identity's full width, but not its budget.
+			clientWidth.mockReturnValue( 160 );
+			titleRect.mockReturnValue( { width: 160.25 } as DOMRect );
+			notifyResize( identity, 200 );
+			notifyResize( header, 425 );
+			expect(
+				screen.getByRole( 'button', { name: 'Widget controls' } )
+			).toBeInTheDocument();
+			notifyResize( header, 442 );
+			expect( screen.getByRole( 'combobox' ) ).toBeInTheDocument();
+		}
+	);
+
 	it( "counts the toolbar chip's own padding and border", async () => {
 		render( <Harness /> );
 		await screen.findByTestId( 'metric' );

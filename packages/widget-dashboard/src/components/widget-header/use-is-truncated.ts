@@ -1,24 +1,12 @@
 import { useResizeObserver } from '@wordpress/compose';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { measureTextOverflow } from './measure-text-overflow';
 
 // Adapted from the private hook behind `Breadcrumb.CurrentItem` in
 // packages/ui/src/breadcrumb/use-is-truncated.ts.
 
 // Sub-pixel noise; a real clip is at least a glyph.
 const FIT_TOLERANCE = 0.05;
-
-// `scrollWidth`/`clientWidth` are integers and miss a clip under 1px that
-// the browser already ellipsizes. jsdom has no `Range` geometry.
-function measure( element: HTMLElement, slack: number ) {
-	const range = document.createRange();
-	range.selectNodeContents( element );
-	const overflow =
-		typeof range.getBoundingClientRect === 'function'
-			? range.getBoundingClientRect().width -
-				element.getBoundingClientRect().width
-			: element.scrollWidth - element.clientWidth;
-	return overflow > slack + FIT_TOLERANCE;
-}
 
 /**
  * Whether a single-line element clips its text: the ref to observe, then the
@@ -38,10 +26,8 @@ export function useIsTruncated< T extends HTMLElement >(
 	const reclaimRef = useRef( reclaim );
 
 	const update = useCallback( ( target: HTMLElement ) => {
-		const next = measure(
-			target,
-			isTruncatedRef.current ? reclaimRef.current : 0
-		);
+		const slack = isTruncatedRef.current ? reclaimRef.current : 0;
+		const next = measureTextOverflow( target ) > slack + FIT_TOLERANCE;
 		isTruncatedRef.current = next;
 		setIsTruncated( next );
 	}, [] );
