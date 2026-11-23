@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
+import { Avatar } from '../../../../avatar';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
@@ -382,7 +383,6 @@ export const AsyncItems: Story = {
  * In this example, some extra information is added to each list item as an ARIA description.
  */
 export const WithCustomTriggerAndItem: Story = {
-	tags: [ 'external-requests' ],
 	args: {
 		items: ITEMS,
 		defaultValue: ITEMS[ 0 ],
@@ -396,13 +396,10 @@ export const WithCustomTriggerAndItem: Story = {
 							gap: 8,
 						} }
 					>
-						<img
-							src={ `https://gravatar.com/avatar/?d=initials&name=${ item.value }` }
-							alt=""
-							width="20"
-							style={ {
-								borderRadius: '50%',
-							} }
+						<Avatar
+							name={ item.label }
+							size="xs"
+							aria-hidden="true"
 						/>
 
 						{ item.label }

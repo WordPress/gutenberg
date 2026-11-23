@@ -2,6 +2,7 @@ import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import { SelectControl } from '../';
+import { Avatar } from '../../../avatar';
 import { Stack } from '../../../stack';
 import { Text } from '../../../text';
 import {
@@ -147,16 +148,7 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
 			gap: 8,
 		} }
 	>
-		<img
-			src={ `https://gravatar.com/avatar/?d=initials&name=${
-				user.value ?? 'null'
-			}` }
-			alt=""
-			width="20"
-			style={ {
-				borderRadius: '50%',
-			} }
-		/>
+		<Avatar name={ user.value ?? 'null' } size="xs" aria-hidden="true" />
 
 		{ user.label }
 	</span>
@@ -169,7 +161,6 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
  * selected item. The popup keeps the standard item rendering.
  */
 export const WithCustomTrigger: Story = {
-	tags: [ 'external-requests' ],
 	args: {
 		...Default.args,
 		items: userOptions,

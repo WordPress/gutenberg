@@ -12,6 +12,11 @@ import Page from '..';
 import Breadcrumbs from '../../breadcrumbs';
 import { withRouter } from '../../stories/with-router';
 
+// A generic profile image, drawn in code so the story requests no image.
+const AVATAR_URL = `data:image/svg+xml,${ encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" fill="#dcdcde"/><circle cx="48" cy="38" r="18" fill="#a7aaad"/><path d="M14 96a34 34 0 0 1 68 0z" fill="#a7aaad"/></svg>'
+) }`;
+
 const meta: Meta< typeof Page > = {
 	component: Page,
 	id: 'admin-ui-page',
@@ -104,15 +109,9 @@ export const WithVisualAndBreadcrumbs: Story = {
  * technologies and the page title carries the accessible name.
  */
 export const WithImageVisual: Story = {
-	tags: [ 'external-requests' ],
 	args: {
 		title: 'Page title',
-		visual: (
-			<img
-				src="https://secure.gravatar.com/avatar/c0ccdd53794779bcc07fcae7b79c4d80?s=48&r=g&d=mm"
-				alt=""
-			/>
-		),
+		visual: <img src={ AVATAR_URL } alt="" />,
 		showSidebarToggle: false,
 		hasPadding: true,
 		children: <Text>Page content here</Text>,

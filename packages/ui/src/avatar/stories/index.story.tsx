@@ -5,10 +5,15 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 import * as Tooltip from '../../tooltip';
 
-// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
-// Used under the Unsplash License: https://unsplash.com/license
-const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
+// A profile illustration, drawn in code so the stories request no image.
+const IMAGE_SRC = `data:image/svg+xml,${ encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128"><rect width="128" height="128" fill="#f2d392"/><circle cx="64" cy="52" r="24" fill="#7d4e2c"/><path d="M20 128a44 44 0 0 1 88 0z" fill="#3858e9"/></svg>'
+) }`;
+
+// The WordPress logo, drawn in code so the stories request no image.
+const WORDPRESS_LOGO_URL = `data:image/svg+xml,${ encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="#1e1e1e" d="M 22 12 C 22 6.49 17.51 2 12 2 C 6.48 2 2 6.49 2 12 C 2 17.52 6.48 22 12 22 C 17.51 22 22 17.52 22 12 M 9.78 17.37 L 6.37 8.22 C 6.92 8.2 7.54 8.14 7.54 8.14 C 8.04 8.08 7.98 7.01 7.48 7.03 C 7.48 7.03 6.03 7.14 5.11 7.14 C 4.93 7.14 4.74 7.14 4.53 7.13 C 6.12 4.69 8.87 3.11 12 3.11 C 14.33 3.11 16.45 3.98 18.05 5.45 C 17.37 5.34 16.4 5.84 16.4 7.03 C 16.4 7.77 16.85 8.39 17.3 9.13 C 17.65 9.74 17.85 10.49 17.85 11.59 C 17.85 13.08 16.45 16.59 16.45 16.59 L 13.42 8.22 C 13.96 8.2 14.24 8.05 14.24 8.05 C 14.74 8 14.68 6.8 14.18 6.83 C 14.18 6.83 12.74 6.95 11.8 6.95 C 10.93 6.95 9.47 6.83 9.47 6.83 C 8.97 6.8 8.91 8.03 9.41 8.05 L 10.33 8.13 L 11.59 11.54 L 9.78 17.37 M 19.41 12 C 19.65 11.36 20.15 10.13 19.84 7.75 C 20.54 9.04 20.89 10.46 20.89 12 C 20.89 15.29 19.16 18.24 16.49 19.78 C 17.46 17.19 18.43 14.58 19.41 12 M 8.1 20.09 C 5.12 18.65 3.11 15.53 3.11 12 C 3.11 10.7 3.34 9.52 3.83 8.41 C 5.25 12.3 6.67 16.2 8.1 20.09 M 12.13 13.46 L 14.71 20.44 C 13.85 20.73 12.95 20.89 12 20.89 C 11.21 20.89 10.43 20.78 9.71 20.56 C 10.52 18.18 11.33 15.82 12.13 13.46 L 12.13 13.46"/></svg>'
+) }`;
 
 const meta: Meta< typeof Avatar > = {
 	title: 'Components/@wordpress-ui/Avatar',
@@ -28,13 +33,11 @@ export default meta;
 type Story = StoryObj< typeof Avatar >;
 
 export const Default: Story = {
-	tags: [ 'external-requests' ],
 	args: { src: IMAGE_SRC },
 };
 
 /** The assigned color sets the activity ring; the initials fill adapts to contrast with it. */
 export const WithColor: Story = {
-	tags: [ 'external-requests' ],
 	args: { color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
@@ -47,7 +50,6 @@ export const WithColor: Story = {
 
 /** Activity changes the ring without changing the avatar's footprint. */
 export const Activity: Story = {
-	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } active={ false } />
@@ -89,14 +91,13 @@ export const Sizes: Story = {
 
 /** Use a circle for a person's portrait and a square to preserve the corners of a site logo. */
 export const Shapes: Story = {
-	tags: [ 'external-requests' ],
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar { ...args } src={ IMAGE_SRC } shape="circle" />
 			<Avatar
 				{ ...args }
 				name="WordPress"
-				src="https://s.w.org/style/images/about/WordPress-logotype-wmark.png"
+				src={ WORDPRESS_LOGO_URL }
 				shape="square"
 			/>
 		</Stack>

@@ -23,14 +23,28 @@ export default {
 	component: DataForm,
 };
 
+// Served from `storybook/static`.
+const IMAGE_URL = 'image-editor-demo.jpeg';
+
+// A generic profile image, drawn in code so the stories request no image.
+const AVATAR_URL = `data:image/svg+xml,${ encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><rect width="96" height="96" fill="#dcdcde"/><circle cx="48" cy="38" r="18" fill="#a7aaad"/><path d="M14 96a34 34 0 0 1 68 0z" fill="#a7aaad"/></svg>'
+) }`;
+
+const avatarUrls = {
+	'24': AVATAR_URL,
+	'48': AVATAR_URL,
+	'96': AVATAR_URL,
+};
+
 // Sample data for media fields
 const sampleMediaItem: MediaItem = {
 	id: 123,
 	date: '2024-01-15T10:30:00',
 	date_gmt: '2024-01-15T10:30:00',
 	guid: {
-		raw: 'https://cldup.com/cXyG__fTLN.jpg',
-		rendered: 'https://cldup.com/cXyG__fTLN.jpg',
+		raw: IMAGE_URL,
+		rendered: IMAGE_URL,
 	},
 	modified: '2024-01-15T10:30:00',
 	modified_gmt: '2024-01-15T10:30:00',
@@ -65,7 +79,7 @@ const sampleMediaItem: MediaItem = {
 	mime_type: 'image/jpeg',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+	source_url: IMAGE_URL,
 	media_details: {
 		file: 'sample-image.jpg',
 		width: 1920,
@@ -92,7 +106,7 @@ const sampleMediaItem: MediaItem = {
 				height: 150,
 				filesize: 8192,
 				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+				source_url: IMAGE_URL,
 			},
 			medium: {
 				file: 'sample-image-300x169.jpg',
@@ -100,7 +114,7 @@ const sampleMediaItem: MediaItem = {
 				height: 169,
 				filesize: 24576,
 				mime_type: 'image/jpeg',
-				source_url: 'https://cldup.com/cXyG__fTLN.jpg',
+				source_url: IMAGE_URL,
 			},
 		},
 	},
@@ -110,11 +124,7 @@ const sampleMediaItem: MediaItem = {
 			{
 				id: 1,
 				name: 'John Doe',
-				avatar_urls: {
-					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
-					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
-					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
-				},
+				avatar_urls: avatarUrls,
 			},
 		],
 	},
@@ -211,11 +221,7 @@ const sampleMediaItemZip: MediaItem = {
 			{
 				id: 1,
 				name: 'Jane Smith',
-				avatar_urls: {
-					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
-					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
-					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
-				},
+				avatar_urls: avatarUrls,
 			},
 		],
 	},
@@ -262,7 +268,9 @@ const sampleMediaItemBrokenImage: MediaItem = {
 	mime_type: 'image/jpeg',
 	media_type: 'image',
 	post: null,
-	source_url: 'https://example.com/this-image-does-not-exist.jpg',
+	// Data that is not an image fails to load without a request. The data ends
+	// with a file name for the file name field.
+	source_url: 'data:image/jpeg,/this-image-does-not-exist.jpg',
 	media_details: {
 		file: 'broken-image.jpg',
 		width: 1920,
@@ -276,11 +284,7 @@ const sampleMediaItemBrokenImage: MediaItem = {
 			{
 				id: 1,
 				name: 'Admin User',
-				avatar_urls: {
-					'24': 'https://gravatar.com/avatar/?s=24&d=mm&r=g',
-					'48': 'https://gravatar.com/avatar/?s=48&d=mm&r=g',
-					'96': 'https://gravatar.com/avatar/?s=96&d=mm&r=g',
-				},
+				avatar_urls: avatarUrls,
 			},
 		],
 	},
@@ -349,7 +353,6 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 };
 
 export const DataFormsPreview = {
-	tags: [ 'external-requests' ],
 	render: DataFormsComponent,
 	argTypes: {
 		type: {
@@ -403,7 +406,6 @@ export const DataViewsPreview = () => {
 	);
 };
 
-DataViewsPreview.tags = [ 'external-requests' ];
 DataViewsPreview.parameters = {
 	// FIXME: Preview table has an empty column header (empty-table-header).
 	// See: https://github.com/WordPress/gutenberg/issues/81596

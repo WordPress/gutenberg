@@ -6,8 +6,6 @@ const storybookDir = path.resolve( import.meta.dirname, '..' );
 const storybookUrl = 'http://127.0.0.1:50240';
 const maxConcurrentStories = 4;
 const storyTimeout = 15_000;
-// Stories with this tag may request other hosts until they stop doing so.
-const externalRequestsTag = 'external-requests';
 /** @type {import('playwright').Browser | undefined} */
 let browser;
 let server;
@@ -56,11 +54,7 @@ try {
 					const story = stories[ nextStoryIndex++ ];
 
 					try {
-						await renderStory(
-							context,
-							story.id,
-							!! story.tags?.includes( externalRequestsTag )
-						);
+						await renderStory( context, story.id );
 					} catch ( error ) {
 						failures.push(
 							`${ story.id }: ${
@@ -103,13 +97,12 @@ try {
 /**
  * Renders a story with requests to other hosts blocked, so a third-party
  * outage or rate limit cannot fail the smoke test. A story fails when it makes
- * such a request, unless `allowExternalRequests` is set.
+ * such a request.
  *
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
- * @param {boolean}                             allowExternalRequests
  */
-async function renderStory( context, storyId, allowExternalRequests ) {
+async function renderStory( context, storyId ) {
 	const page = await context.newPage();
 	/** @type {string[]} */
 	const failedResponses = [];
@@ -130,11 +123,9 @@ async function renderStory( context, storyId, allowExternalRequests ) {
 			[ 'http:', 'https:' ].includes( url.protocol ) &&
 			url.origin !== storybookUrl,
 		( route ) => {
-			if ( ! allowExternalRequests ) {
-				failedResponses.push(
-					`External request: ${ route.request().url() }`
-				);
-			}
+			failedResponses.push(
+				`External request: ${ route.request().url() }`
+			);
 			return route.abort( 'blockedbyclient' );
 		}
 	);
