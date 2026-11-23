@@ -1,8 +1,6 @@
-import { useSelect } from '@wordpress/data';
 import { Disabled } from '@wordpress/components';
 import type { ReactNode } from 'react';
-import { store as blockEditorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import useIsStylesLocked from './use-is-styles-locked';
 
 interface DisabledWhenStylesLockedProps {
 	/**
@@ -24,15 +22,7 @@ export default function DisabledWhenStylesLocked( {
 	clientId,
 	children,
 }: DisabledWhenStylesLockedProps ) {
-	const isStylesLocked = useSelect(
-		( select ) =>
-			!! window.__experimentalBlockLockMenu &&
-			!! clientId &&
-			unlock( select( blockEditorStore ) ).isStylesLockedBlock(
-				clientId
-			),
-		[ clientId ]
-	);
+	const isStylesLocked = useIsStylesLocked( clientId );
 
 	return (
 		<Disabled

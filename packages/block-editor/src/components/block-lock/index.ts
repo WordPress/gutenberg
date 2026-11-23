@@ -10,3 +10,4 @@ export {
 	default as BlockLockContextMenu,
 	getContextMenuAnchorRect,
 } from './context-menu';
+export { default as useIsStylesLocked } from './use-is-styles-locked';

@@ -9,6 +9,7 @@ import {
 } from '@wordpress/blocks';
 import type { BlockType } from '@wordpress/blocks';
 import { BlockControls, BlockAlignmentControl } from '../components';
+import useIsStylesLocked from '../components/block-lock/use-is-styles-locked';
 import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
@@ -200,13 +201,18 @@ function BlockEditAlignmentToolbarControlsPure( {
 
 	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
+	// A styles lock keeps the alignment, a style, from being changed.
+	const isStylesLocked = useIsStylesLocked( clientId );
 	/*
 	 * Only render when some alignment actually works. Many blocks — Paragraph,
 	 * Heading, List, Group among them — support nothing but wide and full, so
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
 	 */
-	const isRendered = enabled.length > 0 && blockEditingMode === 'default';
+	const isRendered =
+		enabled.length > 0 &&
+		blockEditingMode === 'default' &&
+		! isStylesLocked;
 	const constraint = useAlignmentConstraint(
 		clientId,
 		isRendered && unavailable.length > 0
