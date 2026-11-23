@@ -7,10 +7,7 @@ import persistencePlugin, {
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
-import type { DataPlugin, DataRegistry } from '../../../types';
-
-// Tests always pass options, which the plugin requires.
-const plugin = persistencePlugin as DataPlugin;
+import type { DataRegistry } from '../../../types';
 
 type PersistStoreConfig = Parameters< DataRegistry[ 'registerStore' ] >[ 1 ] & {
 	persist?: boolean | string[];
@@ -32,7 +29,7 @@ describe( 'persistence', () => {
 		vi.mocked( objectStorage.setItem ).mockClear();
 
 		// TODO: Remove the `use` function in favor of `registerGenericStore`
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: objectStorage,
 		} ) as PersistedRegistry;
 	} );
@@ -44,8 +41,14 @@ describe( 'persistence', () => {
 		} ).not.toThrow( /object is not extensible/ );
 	} );
 
+	it( 'should not throw when initialized without options', () => {
+		expect( () => {
+			createRegistry().use( persistencePlugin );
+		} ).not.toThrow();
+	} );
+
 	it( 'should load a persisted value as initialState', () => {
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () => JSON.stringify( { test: { a: 1 } } ),
 				setItem() {},
@@ -66,7 +69,7 @@ describe( 'persistence', () => {
 	it( 'should load a persisted subset value as initialState', () => {
 		const DEFAULT_STATE = { a: null, b: null };
 
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () => JSON.stringify( { test: { a: 1 } } ),
 				setItem() {},
@@ -92,7 +95,7 @@ describe( 'persistence', () => {
 			preferences: { useFoo: true, useBar: true },
 		} );
 
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () =>
 					JSON.stringify( {
@@ -123,7 +126,7 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should defer to persisted state if mismatch of object-like (persisted object-like)', () => {
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () => JSON.stringify( { test: { persisted: true } } ),
 				setItem() {},
@@ -144,7 +147,7 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should defer to persisted state if mismatch of object-like (initial object-like)', () => {
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () => JSON.stringify( { test: null } ),
 				setItem() {},
@@ -163,7 +166,7 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {
-		registry = createRegistry().use( plugin, {
+		registry = createRegistry().use( persistencePlugin, {
 			storage: {
 				getItem: () =>
 					JSON.stringify( {
@@ -330,6 +333,10 @@ describe( 'persistence', () => {
 				storage,
 				storageKey,
 			} ) );
+		} );
+
+		it( 'creates interface without options', () => {
+			expect( createPersistenceInterface().get() ).toEqual( {} );
 		} );
 
 		describe( 'get', () => {
