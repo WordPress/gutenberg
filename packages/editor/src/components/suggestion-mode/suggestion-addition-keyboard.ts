@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { pasteHandler } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { create, concat, toHTMLString } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { unlock } from '../../lock-unlock';
@@ -10,6 +12,7 @@ import { STORE_NAME, EDITOR_INTENT_SUGGEST } from '../../store/constants';
 import { INLINE_OP_TYPE } from './operations';
 import { useSuggestionsProvider } from './provider';
 import { useSuggestionSession } from './suggestion-session';
+import { SUGGESTION_SAVE_FAILED_NOTICE_ID } from './use-suggestion-submission';
 import useAbandonedNoteCleanup from './use-abandoned-note-cleanup';
 import { readInlineCaret } from '../inline-markers';
 import {
@@ -36,6 +39,41 @@ import {
 import { isPartOfPendingInsertion } from './store-interceptor';
 import { notifyEditRefused } from './refuse-edit';
 import { readValueText, rebaseRunAnchor } from './run-anchor';
+
+/**
+ * How long to wait before asking again for a note the server could not be
+ * reached for, unless the browser reports the connection back sooner.
+ */
+const NOTE_RETRY_DELAY_MS = 5000;
+
+/**
+ * Whether a failed request never reached the server, so the same request can
+ * succeed later. One the server answered with an error would be answered the
+ * same way again.
+ *
+ * @param error The rejection.
+ * @return True for a connection failure.
+ */
+function isConnectionError( error: any ): boolean {
+	return error?.code === 'offline_error' || error?.code === 'fetch_error';
+}
+
+/**
+ * Wait for the connection to come back, or for the retry delay.
+ *
+ * @return Resolves when it is worth asking again.
+ */
+function untilWorthRetrying(): Promise< void > {
+	return new Promise( ( resolve ) => {
+		const done = () => {
+			clearTimeout( timer );
+			window.removeEventListener( 'online', done );
+			resolve();
+		};
+		const timer = setTimeout( done, NOTE_RETRY_DELAY_MS );
+		window.addEventListener( 'online', done );
+	} );
+}
 
 type RunSegment = {
 	/** Plain text of the segment. */
@@ -237,6 +275,15 @@ export default function SuggestionAdditionKeyboard() {
 	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes, selectionChange, replaceBlocks } =
 		useDispatch( blockEditorStore );
+	const { createNotice, removeNotice } = useDispatch( noticesStore );
+	// Stops a note retry from outliving the editor.
+	const isMountedRef = useRef( true );
+	useEffect( () => {
+		isMountedRef.current = true;
+		return () => {
+			isMountedRef.current = false;
+		};
+	}, [] );
 	const { createSuggestion, updateSuggestion } = useSuggestionsProvider();
 	const { getBlockName } = useSelect( blockEditorStore );
 	const { requestInterceptorBypass, isDeferredInsertion } =
@@ -447,6 +494,71 @@ export default function SuggestionAdditionKeyboard() {
 				}
 				cleanupAbandonedNotes( clientId, ids );
 			};
+			/*
+			 * Whether the run can still be written where it was opened: the
+			 * editor is suggesting and the text around the spot is intact.
+			 */
+			const placeRun = () => {
+				const stillSuggesting =
+					unlock(
+						registry.select( STORE_NAME )
+					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
+				const attributes = getBlockAttributes( clientId );
+				return stillSuggesting && attributes && run.anchor
+					? rebaseRunAnchor(
+							run.anchor,
+							run.anchor.text,
+							readValueText( attributes[ attributeKey ] )
+						)
+					: null;
+			};
+			/*
+			 * Open the run's note. Every keystroke of the run was cancelled
+			 * and buffered, so when the server cannot be reached the text
+			 * exists nowhere else: the run is kept, with whatever is typed
+			 * into it meanwhile, and the note asked for again until the
+			 * connection is back (#87283). One notice says so, where each
+			 * keystroke used to fail on its own and raise another.
+			 */
+			const openNote = async () => {
+				let retried = false;
+				for (;;) {
+					try {
+						const noteId = await openInlineNote(
+							clientId,
+							attributeKey,
+							isTypeOver
+								? SUGGESTION_TYPE_REPLACEMENT
+								: SUGGESTION_TYPE_ADDITION
+						);
+						if ( retried ) {
+							removeNotice( SUGGESTION_SAVE_FAILED_NOTICE_ID );
+						}
+						return noteId;
+					} catch ( error ) {
+						if ( ! isConnectionError( error ) || ! placeRun() ) {
+							throw error;
+						}
+						retried = true;
+						createNotice(
+							'warning',
+							__(
+								'You’re offline. Your suggestion will be added when you reconnect.'
+							),
+							{
+								id: SUGGESTION_SAVE_FAILED_NOTICE_ID,
+								type: 'snackbar',
+								explicitDismiss: true,
+							}
+						);
+						await untilWorthRetrying();
+						if ( ! isMountedRef.current || ! placeRun() ) {
+							removeNotice( SUGGESTION_SAVE_FAILED_NOTICE_ID );
+							throw error;
+						}
+					}
+				}
+			};
 			let id: any = null;
 			try {
 				/*
@@ -454,13 +566,7 @@ export default function SuggestionAdditionKeyboard() {
 				 * carry the same note id, so the sidebar shows a single
 				 * "Replace" note and accept/reject resolve both halves.
 				 */
-				id = await openInlineNote(
-					clientId,
-					attributeKey,
-					isTypeOver
-						? SUGGESTION_TYPE_REPLACEMENT
-						: SUGGESTION_TYPE_ADDITION
-				);
+				id = await openNote();
 				/*
 				 * Every keystroke of the run was cancelled, so the buffered
 				 * text belongs where the run was opened, wherever the caret
@@ -470,19 +576,8 @@ export default function SuggestionAdditionKeyboard() {
 				 * at an offset that now means something else; otherwise, or
 				 * when Suggest mode was left, the gesture is dropped.
 				 */
-				const stillSuggesting =
-					unlock(
-						registry.select( STORE_NAME )
-					).getEditorIntent() === EDITOR_INTENT_SUGGEST;
 				const attributes = getBlockAttributes( clientId );
-				const anchor =
-					id && stillSuggesting && attributes && run.anchor
-						? rebaseRunAnchor(
-								run.anchor,
-								run.anchor.text,
-								readValueText( attributes[ attributeKey ] )
-							)
-						: null;
+				const anchor = id ? placeRun() : null;
 				if ( ! anchor ) {
 					abandon( id );
 					return;
@@ -561,6 +656,8 @@ export default function SuggestionAdditionKeyboard() {
 			cleanupAbandonedNotes,
 			registry,
 			authorId,
+			createNotice,
+			removeNotice,
 		]
 	);
 

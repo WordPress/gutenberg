@@ -275,29 +275,145 @@ function attributeLabel( key: any ): string {
 }
 
 /**
- * Describe a non-text attribute change. "Change: heading level" left the
- * reviewer to guess which level was proposed; a scalar value is short enough
- * to state both sides of ("heading level 3 → 4"). Object values have no short
- * form and keep the bare name.
+ * Names for the settings the `style` attribute holds, by path. A path with
+ * no entry is named by its humanized last key.
+ */
+const STYLE_SETTING_LABELS: Record< string, string > = {
+	'typography.textAlign': __( 'text alignment' ),
+	'typography.fontSize': __( 'font size' ),
+	'typography.fontFamily': __( 'font family' ),
+	'typography.fontStyle': __( 'font style' ),
+	'typography.fontWeight': __( 'font weight' ),
+	'typography.lineHeight': __( 'line height' ),
+	'typography.letterSpacing': __( 'letter spacing' ),
+	'typography.textDecoration': __( 'text decoration' ),
+	'typography.textTransform': __( 'letter case' ),
+	'color.text': __( 'text color' ),
+	'color.background': __( 'background color' ),
+	'color.gradient': __( 'gradient' ),
+	'elements.link.color.text': __( 'link color' ),
+	'elements.link.:hover.color.text': __( 'link hover color' ),
+};
+
+/** Most `style` settings one summary names before falling back to "style". */
+const MAX_STYLE_SETTINGS = 4;
+
+/**
+ * Collect the scalar settings that differ between two `style` values, by
+ * dotted path.
  *
- * @param op `attribute-set` operation.
+ * @param before Current value.
+ * @param after  Proposed value.
+ * @param path   Path of the values compared.
+ * @param out    Collected changes.
+ */
+function collectStyleChanges(
+	before: any,
+	after: any,
+	path: string[],
+	out: Array< { path: string[]; before: any; after: any } >
+) {
+	const isBranch = ( value: any ) =>
+		value !== null && typeof value === 'object' && ! Array.isArray( value );
+	if ( isBranch( before ) || isBranch( after ) ) {
+		const keys = new Set( [
+			...Object.keys( isBranch( before ) ? before : {} ),
+			...Object.keys( isBranch( after ) ? after : {} ),
+		] );
+		for ( const key of keys ) {
+			collectStyleChanges(
+				isBranch( before ) ? before[ key ] : undefined,
+				isBranch( after ) ? after[ key ] : undefined,
+				[ ...path, key ],
+				out
+			);
+		}
+		return;
+	}
+	if ( ( before ?? null ) !== ( after ?? null ) ) {
+		out.push( { path, before, after } );
+	}
+}
+
+/**
+ * Present one side of a `style` setting. A preset is stored as a reference
+ * (`var:preset|color|accent-1`); its slug is the readable part.
+ *
+ * @param value Setting value.
  * @return Display text.
  */
-function describeAttributeChange( op: any ): string {
+function presentStyleValue( value: any ): string {
+	if ( typeof value === 'string' && value.startsWith( 'var:preset|' ) ) {
+		return presentAttributeValue( value.split( '|' ).pop() );
+	}
+	return presentAttributeValue( value );
+}
+
+/**
+ * Describe a change to the `style` attribute by the settings it changes
+ * ("text alignment default → center"). The attribute holds every block
+ * support's custom value, so its own name says nothing about the change.
+ *
+ * @param op `attribute-set` operation on `style`.
+ * @return One description per setting, or null when the change has no short
+ * form.
+ */
+function describeStyleChange( op: any ): string[] | null {
+	const changes: Array< { path: string[]; before: any; after: any } > = [];
+	collectStyleChanges( op.before, op.after, [], changes );
+	if (
+		changes.length === 0 ||
+		changes.length > MAX_STYLE_SETTINGS ||
+		changes.some(
+			( change ) =>
+				! isScalarAttributeValue( change.before ) ||
+				! isScalarAttributeValue( change.after )
+		)
+	) {
+		return null;
+	}
+	return changes.map( ( change ) =>
+		sprintf(
+			/* translators: 1: setting name, e.g. "heading level". 2: current value. 3: proposed value. */
+			__( '%1$s %2$s → %3$s' ),
+			STYLE_SETTING_LABELS[ change.path.join( '.' ) ] ??
+				humanizeAttributeName( change.path[ change.path.length - 1 ] ),
+			presentStyleValue( change.before ),
+			presentStyleValue( change.after )
+		)
+	);
+}
+
+/**
+ * Describe a non-text attribute change. "Change: heading level" left the
+ * reviewer to guess which level was proposed; a scalar value is short enough
+ * to state both sides of ("heading level 3 → 4"). `style` is described by
+ * the settings inside it. Other object values have no short form and keep
+ * the bare name.
+ *
+ * @param op `attribute-set` operation.
+ * @return Display text, one entry per setting.
+ */
+function describeAttributeChange( op: any ): string[] {
 	const name = attributeLabel( op.attribute );
+	if ( op.attribute === 'style' ) {
+		return describeStyleChange( op ) ?? [ name ];
+	}
 	if (
 		! isScalarAttributeValue( op.before ) ||
 		! isScalarAttributeValue( op.after )
 	) {
-		return name;
+		return [ name ];
 	}
-	return sprintf(
-		/* translators: 1: setting name, e.g. "heading level". 2: current value. 3: proposed value. */
-		__( '%1$s %2$s → %3$s' ),
-		name,
-		presentAttributeValue( op.before ),
-		presentAttributeValue( op.after )
-	);
+	return [
+		sprintf(
+			/* translators: 1: setting name, e.g. "heading level". 2: current value. 3: proposed value. */
+			__( '%1$s %2$s → %3$s' ),
+			name,
+			presentAttributeValue( op.before ),
+			presentAttributeValue( op.after )
+		),
+	];
 }
 
 /**
@@ -1046,9 +1162,9 @@ export function summarizeOperations(
 
 		if ( ! canTextDiff ) {
 			attributeLabels.push(
-				isContent
-					? attributeLabel( op.attribute )
-					: describeAttributeChange( op )
+				...( isContent
+					? [ attributeLabel( op.attribute ) ]
+					: describeAttributeChange( op ) )
 			);
 			continue;
 		}

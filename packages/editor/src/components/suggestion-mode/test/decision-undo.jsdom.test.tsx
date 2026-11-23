@@ -103,6 +103,13 @@ function setup( suggestion: Record< string, unknown > ) {
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockReset();
 	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockImplementation(
 		async ( { path, method, data }: any ) => {
+			// Notes are only read for a post type that supports them.
+			if ( path?.startsWith( '/wp/v2/types/post' ) ) {
+				return {
+					slug: 'post',
+					supports: { editor: [ { notes: true } ] },
+				};
+			}
 			const single = /^\/wp\/v2\/comments\/(\d+)/.exec( path ?? '' );
 			if ( single && method && method !== 'GET' ) {
 				const id = Number( single[ 1 ] );
@@ -147,6 +154,9 @@ function setup( suggestion: Record< string, unknown > ) {
 			mergedEdits: { meta: true },
 			rawAttributes: [ 'title', 'excerpt', 'content' ],
 		},
+	] );
+	core.receiveEntityRecords( 'root', 'postType', [
+		{ slug: 'post', supports: { editor: [ { notes: true } ] } },
 	] );
 	core.receiveEntityRecords( 'postType', 'post', [
 		{

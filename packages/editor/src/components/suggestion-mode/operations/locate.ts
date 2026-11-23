@@ -42,6 +42,28 @@ export function findStructuralOp(
 }
 
 /**
+ * The id a payload shares with the other suggestions of one gesture: the two
+ * halves of a block replacement, or the rewritten block and the removed ones
+ * of a deletion across blocks.
+ *
+ * @param operations Payload operations.
+ * @return The group id, or null when the suggestion stands alone.
+ */
+export function findGroupId(
+	operations: SuggestionOperation[] | null | undefined
+): string | null {
+	if ( ! Array.isArray( operations ) ) {
+		return null;
+	}
+	for ( const op of operations ) {
+		if ( typeof op?.groupId === 'string' && op.groupId ) {
+			return op.groupId;
+		}
+	}
+	return null;
+}
+
+/**
  * Operation type for an inline suggestion: a suggestion marker anchored
  * in a single rich-text attribute. The marked range is never stored — it is
  * re-derived from the in-content marker by id (the comment id) on read — so the
