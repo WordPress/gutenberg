@@ -254,6 +254,25 @@ html :where(.is-position-sticky) {
 	}
 }
 
+// A sticky block can only stick within its parent. A header (such as a header template
+// part, or a Group block using the header element) whose only child is a sticky block is
+// exactly as tall as that block, so the block scrolls away with it. Make the header stick
+// instead. The selector has no specificity, so a theme's own sticky header styles still win.
+// These rules are kept separate from the ones above so that browsers without `:has()`
+// support only drop these.
+html :where(header:has(> .is-position-sticky:only-child:not(.is-position-fixed))) {
+	--wp-admin--admin-bar--position-offset: var(--wp-admin--admin-bar--height, 0px);
+	position: sticky;
+	top: var(--wp-admin--admin-bar--position-offset);
+	z-index: 10;
+}
+
+@media screen and (max-width: 600px) {
+	html :where(header:has(> .is-position-sticky:only-child:not(.is-position-fixed))) {
+		--wp-admin--admin-bar--position-offset: 0px;
+	}
+}
+
 // Polyfill for two parts of MathML that MathML Core leaves out and that
 // converted LaTeX relies on: the `columnalign` attribute on table cells,
 // which `aligned` and `cases` need, and the `menclose` lines that `\overline`
