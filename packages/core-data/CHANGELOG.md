@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Request the `video_keep_original` field on the base site entity so the editor receives the video transcoding keep-original setting ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 

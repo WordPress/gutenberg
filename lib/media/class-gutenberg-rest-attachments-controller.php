@@ -64,6 +64,24 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	const IMAGE_SIZE_ANIMATED_VIDEO_POSTER = 'animated_video_poster';
 
 	/**
+	 * Image size token for the web-safe transcode of an uploaded video,
+	 * sideloaded as a companion of the original video attachment.
+	 *
+	 * Paired with META_KEY_OPTIMIZED_VIDEO: used both in the `/sideload` route
+	 * and when writing the sideloaded file to its metadata key.
+	 *
+	 * @var string
+	 */
+	const IMAGE_SIZE_OPTIMIZED_VIDEO = 'optimized_video';
+
+	/**
+	 * Metadata key holding the basename of the web-safe transcoded video.
+	 *
+	 * @var string
+	 */
+	const META_KEY_OPTIMIZED_VIDEO = 'optimized_video';
+
+	/**
 	 * Metadata key holding the basename of the converted animated-GIF video.
 	 *
 	 * @var string
@@ -904,6 +922,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Converted-video companions for an animated GIF (the MP4/WebM and its poster).
 			self::IMAGE_SIZE_ANIMATED_VIDEO,
 			self::IMAGE_SIZE_ANIMATED_VIDEO_POSTER,
+			// Web-safe transcode kept alongside the original video upload.
+			self::IMAGE_SIZE_OPTIMIZED_VIDEO,
 		);
 	}
 
@@ -918,10 +938,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return true|WP_Error True if valid, WP_Error if invalid.
 	 */
 	private function validate_image_dimensions( int $width, int $height, $image_size, int $attachment_id ) {
-		// 'animated_video' companion file: video, not an image. Skip *all*
-		// dimension checks (the caller passes (0, 0) for this case so the
-		// positive-dimension assertion below would otherwise fire).
-		if ( self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ) {
+		// 'animated_video' and 'optimized_video' companion files are videos,
+		// not images. Skip *all* dimension checks (the caller passes (0, 0)
+		// for these so the positive-dimension assertion below would otherwise
+		// fire).
+		if (
+			self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ||
+			self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size
+		) {
 			return true;
 		}
 
@@ -1063,13 +1087,27 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			return $post;
 		}
 
+		$image_size = $request['image_size'];
+
+		/*
+		 * Sideloads extend an existing attachment with a file derived from it,
+		 * which is an image or PDF sub-size in every case but one: the web-safe
+		 * transcode of a video is sideloaded as a companion of the video
+		 * attachment it was produced from, so a video parent is valid for that
+		 * size and no other.
+		 */
+		$is_optimized_video_companion =
+			self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size &&
+			wp_attachment_is( 'video', $post );
+
 		if (
 			! wp_attachment_is_image( $post ) &&
-			! wp_attachment_is( 'pdf', $post )
+			! wp_attachment_is( 'pdf', $post ) &&
+			! $is_optimized_video_companion
 		) {
 			return new WP_Error(
 				'rest_post_invalid_id',
-				__( 'Invalid post ID. Only images and PDFs can be sideloaded.', 'gutenberg' ),
+				__( 'Invalid post ID. Only images, PDFs and videos can be sideloaded.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -1163,8 +1201,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		$type = $file['type'];
 		$path = $file['file'];
 
-		$image_size = $request['image_size'];
-
 		// Read dimensions once up-front. Needed both for early-error handling
 		// (corrupted/unsupported files) and for populating the sub-size payload
 		// below. 'original' and 'scaled' both replace the main file, so their
@@ -1172,17 +1208,19 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		// validated against the stored attachment size (it must match it or be
 		// its transpose).
 		//
-		// 'animated_video' companions are video files (MP4/WebM); the image
+		// 'animated_video' and 'optimized_video' companions are video files
+		// (MP4/WebM); the image
 		// helpers can't read their dimensions and would falsely report the
 		// upload as "corrupted or unsupported". Source-format originals
 		// ('source_original', e.g. the HEIC kept next to its JPEG derivative)
 		// are exempt for the same reason: their dimensions are neither
 		// validated nor recorded, and wp_getimagesize() may not be able to
 		// read the source format at all on servers without HEIC/HEIF support.
-		// Skip the read for both cases; validate_image_dimensions() also
+		// Skip the read for those cases; validate_image_dimensions() also
 		// short-circuits them below.
 		$skip_dimension_read =
 			self::IMAGE_SIZE_ANIMATED_VIDEO === $image_size ||
+			self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size ||
 			self::IMAGE_SIZE_SOURCE_ORIGINAL === $image_size;
 
 		$size = $skip_dimension_read ? array( 0, 0 ) : wp_getimagesize( $path );
@@ -1238,6 +1276,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Static poster for the converted video. finalize_item() writes
 			// the filename to $metadata['animated_video_poster']; used as the
 			// video block's poster and deleted with the video.
+			$sub_size_data['file'] = wp_basename( $path );
+		} elseif ( self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size ) {
+			/*
+			 * Web-safe transcoded video companion. finalize_item() writes the
+			 * filename to $metadata['optimized_video']; the editor reads it to
+			 * play the optimized version, and a delete_attachment hook removes
+			 * it. See lib/media/video-transcoding.php.
+			 */
 			$sub_size_data['file'] = wp_basename( $path );
 		} elseif ( 'scaled' === $image_size || 'original' === $image_size ) {
 			// 'scaled' and 'original' both replace the attachment's main file
@@ -1450,6 +1496,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$metadata[ self::META_KEY_SOURCE_IMAGE ] ?? null,
 				$metadata['animated_video'] ?? null,
 				$metadata['animated_video_poster'] ?? null,
+				$metadata[ self::META_KEY_OPTIMIZED_VIDEO ] ?? null,
 			);
 
 			if ( ! empty( $metadata['sizes'] ) && is_array( $metadata['sizes'] ) ) {
@@ -1665,6 +1712,18 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				 * lib/media/animated-gif-to-video.php.
 				 */
 				$metadata[ self::META_KEY_ANIMATED_VIDEO_POSTER ] = $sub_size['file'];
+			} elseif ( self::IMAGE_SIZE_OPTIMIZED_VIDEO === $image_size ) {
+				if ( empty( $sub_size['file'] ) ) {
+					continue;
+				}
+
+				/*
+				 * Web-safe transcoded companion of an uploaded video. Stored
+				 * under its own key; the original video stays the attachment.
+				 * The editor reads this key to play the optimized version;
+				 * companion cleanup lives in lib/media/video-transcoding.php.
+				 */
+				$metadata[ self::META_KEY_OPTIMIZED_VIDEO ] = $sub_size['file'];
 			} else {
 				if ( empty( $sub_size['file'] ) ) {
 					continue;

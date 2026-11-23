@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Enhancements
+
+-   Pass the `videoKeepOriginal` media upload setting through to the upload pipeline, so a site can opt out of keeping the original video file alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements

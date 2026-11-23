@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Read the `video_keep_original` setting from the REST API index into the block editor settings as `videoKeepOriginal`, so the upload pipeline knows whether to keep the original video upload alongside its web-safe transcode ([#79375](https://github.com/WordPress/gutenberg/pull/79375)).
+
 ### Bug Fixes
 
 -   `PageAttributesPanel`: Hide parent controls for non-hierarchical post types ([#85679](https://github.com/WordPress/gutenberg/pull/85679)).

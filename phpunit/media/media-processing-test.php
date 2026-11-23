@@ -124,6 +124,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayNotHasKey( 'image_strip_meta', $data );
 		$this->assertArrayNotHasKey( 'image_max_bit_depth', $data );
 		$this->assertArrayNotHasKey( 'generate_animated_image_subsizes', $data );
+		$this->assertArrayNotHasKey( 'video_keep_original', $data );
 	}
 
 	/**
@@ -161,6 +162,8 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertSame( 16, $data['image_max_bit_depth'] );
 		$this->assertArrayHasKey( 'generate_animated_image_subsizes', $data );
 		$this->assertTrue( $data['generate_animated_image_subsizes'] );
+		$this->assertArrayHasKey( 'video_keep_original', $data );
+		$this->assertTrue( $data['video_keep_original'] );
 	}
 
 	/**

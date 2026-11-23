@@ -23,6 +23,7 @@ function useMediaUploadSettings( settings: Settings = {} ) {
 			imageMaxBitDepth: settings.imageMaxBitDepth,
 			generateAnimatedImageSubsizes:
 				settings.generateAnimatedImageSubsizes,
+			videoKeepOriginal: settings.videoKeepOriginal,
 		} ),
 		[ settings ]
 	);

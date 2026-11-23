@@ -11,6 +11,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
+	store as blockEditorStore,
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
@@ -20,7 +21,8 @@ import { useState } from '@wordpress/element';
 import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useRegistry } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { prependHTTPS } from '@wordpress/url';
@@ -34,6 +36,8 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
+import VideoOriginalControl from './video-original-control';
+import { companionUrl } from './companion-url';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -41,6 +45,7 @@ function VideoEdit( {
 	isSelected: isSingleSelected,
 	attributes,
 	className,
+	clientId,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -94,6 +99,37 @@ function VideoEdit( {
 		[ poster, prefersReducedMotion ]
 	);
 
+	const registry = useRegistry();
+
+	/*
+	 * A Media Library pick carries no `media_details`, so swap to the web-safe
+	 * companion once the attachment record is known, unless the block has
+	 * moved on to another video by then.
+	 */
+	function swapToCompanionWhenKnown( attachmentId ) {
+		registry
+			.resolveSelect( coreStore )
+			.getEntityRecord( 'postType', 'attachment', attachmentId, {
+				context: 'view',
+			} )
+			.then( ( record ) => {
+				const companion = record?.media_details?.optimized_video;
+				const currentId = registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )?.id;
+				if (
+					companion &&
+					record.source_url &&
+					currentId === attachmentId
+				) {
+					setAttributes( {
+						src: companionUrl( record.source_url, companion ),
+					} );
+				}
+			} )
+			.catch( () => {} );
+	}
+
 	// TODO: Whether the video was obtained from the media library or was provided by URL, obtain the `videoWidth` and `videoHeight` of the video once its metadata has loaded and persist in the block attributes.
 	function onSelectVideo( media ) {
 		if ( ! media || ! media.url ) {
@@ -109,11 +145,32 @@ function VideoEdit( {
 			return;
 		}
 
+		/*
+		 * Prefer the web-safe transcoded companion when available: the
+		 * original video stays the attachment (media.id) but the block plays
+		 * the optimized version. `media_details.optimized_video` is only set
+		 * on transcoded video attachments, so its presence is a sufficient
+		 * signal to swap the playback source. The author can switch back to
+		 * the original from the toolbar (see VideoOriginalControl).
+		 *
+		 * An upload arrives as a REST record with `media_details`; a Media
+		 * Library pick does not, so the swap waits for the attachment record.
+		 */
+		let nextSrc = media.url;
+		if ( media.media_details?.optimized_video ) {
+			nextSrc = companionUrl(
+				media.url,
+				media.media_details.optimized_video
+			);
+		} else if ( media.id && ! media.media_details ) {
+			swapToCompanionWhenKnown( media.id );
+		}
+
 		// Sets the block's attribute and updates the edit component from the
 		// selected media.
 		setAttributes( {
 			blob: undefined,
-			src: media.url,
+			src: nextSrc,
 			id: media.id,
 			poster:
 				media.image?.src !== media.icon ? media.image?.src : undefined,
@@ -226,6 +283,10 @@ function VideoEdit( {
 							variant="toolbar"
 						/>
 					</BlockControls>
+					<VideoOriginalControl
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+					/>
 				</>
 			) }
 			<InspectorControls>
