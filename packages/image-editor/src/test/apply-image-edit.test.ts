@@ -47,17 +47,26 @@ describe( 'applyImageEdit', () => {
 		} );
 	} );
 
-	it( 'reverses the angle when one axis is flipped', () => {
-		const state = apply( clean, {
+	it( 'reverses the angle when one axis is flipped, not both', () => {
+		const one = apply( clean, {
 			flip: { horizontal: true, vertical: false },
 			rotation: 270,
 		} );
+		const both = apply( clean, {
+			flip: { horizontal: true, vertical: true },
+			rotation: 270,
+		} );
 
-		expect( state.rotation ).toBe( 90 );
+		expect( one.rotation ).toBe( 90 );
+		expect( both.rotation ).toBe( 270 );
 	} );
 
-	it.each( [ 720, 810 ] )( 'accepts a rotation of %i°', ( rotation ) => {
-		expect( apply( clean, { rotation } ).rotation ).toBe( rotation % 360 );
+	it.each( [
+		[ 720, 0 ],
+		[ 810, 90 ],
+		[ -90, 270 ],
+	] )( 'accepts a rotation of %i°', ( rotation, expected ) => {
+		expect( apply( clean, { rotation } ).rotation ).toBe( expected );
 	} );
 
 	it( 'gives the same state whatever the pan and zoom were', () => {
@@ -79,13 +88,17 @@ describe( 'applyImageEdit', () => {
 		).toBe( true );
 	} );
 
-	it( 'keeps a locked ratio when the crop has that ratio', () => {
+	it( 'accepts a crop of the locked ratio as passed, even in strict mode', () => {
 		// 450 by 450 pixels.
-		const state = apply( square, {
-			crop: { x: 0.3, y: 0.25, width: 0.28125, height: 0.5 },
-		} );
+		const crop = { x: 0.3, y: 0.25, width: 0.28125, height: 0.5 };
+		const state = apply( square, { crop }, { strict: true } );
 
-		expect( state.aspectRatio ).toBe( 1 );
+		expect( getImageEdit( state )?.crop ).toEqual( {
+			x: expect.closeTo( crop.x ),
+			y: expect.closeTo( crop.y ),
+			width: expect.closeTo( crop.width ),
+			height: expect.closeTo( crop.height ),
+		} );
 	} );
 
 	it.each( [
@@ -174,6 +187,11 @@ describe( 'applyImageEdit', () => {
 			{ crop: { x: 0.5, y: 0.5, width: 0.5 / 1600, height: 0.5 } },
 		],
 		[ 'invalid', clean, { rotation: Number.NaN } ],
+		[
+			'invalid',
+			clean,
+			{ crop: { x: Number.NaN, y: 0, width: 0.5, height: 0.5 } },
+		],
 	] as [ string, ImageEditorState, ImageEdit ][] )(
 		'rejects as %s',
 		( cause, state, edit ) => {

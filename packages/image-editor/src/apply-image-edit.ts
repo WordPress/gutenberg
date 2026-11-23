@@ -65,10 +65,10 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
  * The pan and zoom are replaced: the crop is centred and zoomed in, as
  * after a resize.
  *
- * @param state
- * @param edit
+ * @param state          Only its image and locked ratio are used.
+ * @param edit           The edit to apply, replacing the current one.
  * @param options
- * @param options.strict
+ * @param options.strict Reject a crop that needs fitting, rather than fit it.
  */
 export function applyImageEdit(
 	state: ImageEditorState,
@@ -126,7 +126,8 @@ export function applyImageEdit(
 		return { rejected: 'invalid' };
 	}
 	// Keep the crop's centre and width under a locked ratio, as the crop
-	// setter does. Containment then fits it if it has no room.
+	// setter does. Containment then fits it if it has no room. Strict skips
+	// this, so the lock check below judges the crop as passed.
 	const ratio = state.aspectRatio;
 	let { y, height: cropHeight } = crop;
 	if ( ! strict && ratio && ratio > 0 ) {
