@@ -12,6 +12,10 @@
 -   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
 -   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
 
+### Bug Fixes
+
+-   `Dialog`, `Drawer`, `AlertDialog`, `Tabs.Panel`: Stop the focus ring from also showing on descendant inputs, menu items, links, and other elements when the container itself is focused ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes
