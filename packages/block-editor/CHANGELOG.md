@@ -14,6 +14,7 @@
 
 ### Bug Fixes
 
+-   Selection: Preserve form-control activation when modifier-clicking associated labels or their contents.
 -   Drag and drop: Calculate insertion-only moves using document indices and the destination's horizontal, vertical, or RTL layout.
 -   Block actions: Check Add before and Add after against their own insertion destinations, including configured default blocks.
 -   Selection: Expand Select All through the nearest common parent when selected blocks have different parents.

@@ -29,7 +29,14 @@ function Canvas( { blocks, content }: { blocks: Block[]; content?: string } ) {
 					<span>{ `Block ${ index }` }</span>
 					<button>Control { index }</button>
 					{ content && (
-						<div dangerouslySetInnerHTML={ { __html: content } } />
+						<div
+							dangerouslySetInnerHTML={ {
+								__html: content.replaceAll(
+									'{{clientId}}',
+									block.clientId
+								),
+							} }
+						/>
 					) }
 				</div>
 			) ) }
@@ -83,6 +90,41 @@ describe( 'non-contiguous canvas selection', () => {
 		afterEach( () => {
 			focus.focusable = focusable;
 		} );
+
+		it.each( [
+			[
+				'associated label',
+				'<label for="control-{{clientId}}"><span data-testid="target">Control</span></label><input id="control-{{clientId}}" type="checkbox" />',
+			],
+			[
+				'implicit label',
+				'<label><span data-testid="target">Control</span><input type="checkbox" /></label>',
+			],
+		] )(
+			'preserves native activation when modifier-clicking an %s',
+			( _, html ) => {
+				render(
+					<RegistryProvider value={ registry }>
+						<Canvas blocks={ blocks } content={ html } />
+					</RegistryProvider>
+				);
+				const target = screen.getAllByTestId( 'target' )[ 2 ];
+				const checkbox = screen.getAllByRole( 'checkbox', {
+					name: 'Control',
+				} )[ 2 ];
+				expect( checkbox ).not.toBeChecked();
+				expect( fireEvent.mouseDown( target, { metaKey: true } ) ).toBe(
+					true
+				);
+				expect( fireEvent.click( target, { metaKey: true } ) ).toBe(
+					true
+				);
+				expect( checkbox ).toBeChecked();
+				expect(
+					registry.select( store ).getSelectedBlockClientIds()
+				).toEqual( [ blocks[ 0 ].clientId ] );
+			}
+		);
 
 		it.each( [
 			[
@@ -145,6 +187,10 @@ describe( 'non-contiguous canvas selection', () => {
 		);
 
 		it.each( [
+			[
+				'unassociated label',
+				'<label><span data-testid="target">Text</span></label>',
+			],
 			[
 				'editable text',
 				'<div contenteditable="true" role="textbox"><span data-testid="target">Text</span></div>',

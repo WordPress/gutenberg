@@ -134,6 +134,10 @@ export default function useClickSelection() {
 							// Disabled form controls and non-focusable button roles
 							// retain their existing exclusion from block selection.
 							isFormElement( element ) ||
+							// Clicking a form label or its contents activates the associated control.
+							// Let that happen instead of toggling block selection.
+							( element.tagName === 'LABEL' &&
+								!! ( element as HTMLLabelElement ).control ) ||
 							element.getAttribute( 'role' ) === 'button' ||
 							// Ordinary editable text remains a block-selection target.
 							( ! element.matches(
