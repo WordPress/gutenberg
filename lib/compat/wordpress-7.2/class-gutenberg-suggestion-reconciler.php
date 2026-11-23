@@ -555,7 +555,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				if ( $note && (int) $note->user_id > 0 && user_can( (int) $note->user_id, 'unfiltered_html' ) ) {
 					continue;
 				}
-				$items[ $note_id ] = array_map( array( 'Gutenberg_Suggestion_Content', 'kses_item' ), $list );
+				foreach ( $list as $index => $item ) {
+					$items[ $note_id ][ $index ] = Gutenberg_Suggestion_Content::kses_item( $item );
+				}
 			}
 
 			$data['content']['raw'] = Gutenberg_Suggestion_Content::inflate( $data['content']['raw'], $items );

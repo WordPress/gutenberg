@@ -349,7 +349,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				$item['original'] = isset( $item['anchor'] ) && is_string( $item['anchor'] ) ? $item['anchor'] : '';
 			} elseif ( $clean !== $values ) {
 				$opener           = Gutenberg_Suggestion_Block_Scanner::rewrite_opener( $item['original'], $clean );
-				$item['original'] = null === $opener ? (string) $item['anchor'] : $opener;
+				$item['original'] = null === $opener && isset( $item['anchor'] ) && is_string( $item['anchor'] ) ? $item['anchor'] : (string) $opener;
 			}
 			return $item;
 		}
@@ -556,7 +556,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 				if ( $marker['legacy'] || null !== $marker['run'] || ! $marker['balanced'] || 'del' === $marker['kind'] ) {
 					continue;
 				}
-				if ( self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
+				if ( null === $marker['end'] || self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
 					continue;
 				}
 				$note_id = (int) $marker['id'];
@@ -894,7 +894,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 					continue;
 				}
 				$span = substr( $content, $marker['start'], $marker['end'] - $marker['start'] );
-				if ( self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
+				if ( null === $marker['end'] || self::spans_block_delimiter( $content, $marker['start'], $marker['end'] ) ) {
 					continue;
 				}
 				$item = $lookup[ $marker['id'] ][ 'inline:' . (int) $marker['run'] ] ?? null;
@@ -999,6 +999,12 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 			if ( null === $before || null === $now || count( $before ) !== count( $now ) ) {
 				return false;
 			}
+			/**
+			 * The elements formatting a character, tag name by opener.
+			 *
+			 * @param list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}> $stack Open elements.
+			 * @return array<string, string>
+			 */
 			$formatting = static function ( array $stack ): array {
 				$elements = array();
 				foreach ( $stack as $element ) {
@@ -1029,7 +1035,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Content' ) ) {
 						$may_add    = 0;
 						$may_remove = 0;
 						foreach ( $delta as $entry ) {
-							if ( is_array( $entry ) && isset( $entry['offset'], $entry['length'] ) && $entry['offset'] <= $offset && $offset < $entry['offset'] + $entry['length'] ) {
+							if ( is_array( $entry ) && isset( $entry['offset'], $entry['length'] ) && is_int( $entry['offset'] ) && is_int( $entry['length'] ) && $entry['offset'] <= $offset && $offset < $entry['offset'] + $entry['length'] ) {
 								$may_add    += isset( $entry['added'] ) && is_array( $entry['added'] ) ? count( $entry['added'] ) : 0;
 								$may_remove += isset( $entry['removed'] ) && is_array( $entry['removed'] ) ? count( $entry['removed'] ) : 0;
 							}
