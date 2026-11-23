@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Widget frame: keep the card padding below a framed body when a footer follows, so the widget's last line no longer sits on the footer divider ([#87236](https://github.com/WordPress/gutenberg/issues/87236)).
+
 ## 0.12.0 (2026-11-18)
 
 ### Bug Fixes
