@@ -2292,6 +2292,61 @@ describe( 'Editor actions', () => {
 			).toEqual( 'edit' );
 		} );
 
+		it( 'is suggesting again when the editor returns to the post it was chosen on', () => {
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'root', 'postType', [
+					{ slug: 'wp_template', supports: { editor: true } },
+				] );
+			const intent = () =>
+				unlock( registry.select( editorStore ) ).getEditorIntent();
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			// "Edit template", then the editor between the two entities.
+			registry.dispatch( editorStore ).setEditedPost( null, null );
+			registry.dispatch( editorStore ).setEditedPost( 'wp_template', 7 );
+			expect( intent() ).toEqual( 'edit' );
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'visual'
+			);
+
+			// "Back".
+			registry.dispatch( editorStore ).setEditedPost( null, null );
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			expect( intent() ).toEqual( 'suggest' );
+		} );
+
+		it( 'does not carry the suggest intent to another post', () => {
+			const intent = () =>
+				unlock( registry.select( editorStore ) ).getEditorIntent();
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+
+			registry.dispatch( editorStore ).setEditedPost( 'post', 45 );
+			expect( intent() ).toEqual( 'edit' );
+		} );
+
+		it( 'forgets the post once Editing is chosen elsewhere', () => {
+			const intent = () =>
+				unlock( registry.select( editorStore ) ).getEditorIntent();
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'suggest'
+			);
+			registry.dispatch( editorStore ).setEditedPost( 'post', 45 );
+			unlock( registry.dispatch( editorStore ) ).setEditorIntent(
+				'edit'
+			);
+
+			registry.dispatch( editorStore ).setEditedPost( 'post', postId );
+			expect( intent() ).toEqual( 'edit' );
+		} );
+
 		it( 'defaults to edit', () => {
 			expect(
 				unlock( registry.select( editorStore ) ).getEditorIntent()
