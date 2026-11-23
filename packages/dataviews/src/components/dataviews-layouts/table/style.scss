@@ -446,6 +446,12 @@ $scroll-fade-ramp: var(--wpds-dimension-padding-2xl);
 	}
 }
 
+// A number is as wide as its value and header: the floor would only hold
+// room that a narrow table needs for its other columns.
+.dataviews-view-table__cell-content-wrapper.dataviews-view-table__cell-numeric {
+	min-width: 0;
+}
+
 .dataviews-view-table__group-header-row {
 	.dataviews-view-table__group-header-cell {
 		font-weight: var(--wpds-typography-font-weight-emphasis);
