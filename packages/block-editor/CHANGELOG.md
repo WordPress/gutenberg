@@ -29,6 +29,7 @@
 
 ### Enhancements
 
+-   Movement: Ignore descendant client IDs when an ancestor's ID is also supplied to movement selectors or actions.
 -   `moveBlocksToPosition`: Support moving non-contiguous blocks and blocks from different parents together in document order.
 -   `canMoveBlocks`: Check movement permission for non-contiguous and cross-parent blocks independently of mover restrictions.
 -   Drag and drop: Move non-contiguous selected blocks together at the destination in the canvas and List View, preserving block IDs and supporting one-step undo across source parents.

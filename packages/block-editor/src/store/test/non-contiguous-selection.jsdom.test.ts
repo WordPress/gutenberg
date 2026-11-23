@@ -1,5 +1,16 @@
-import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { createRegistry } from '@wordpress/data';
+import {
+	afterAll,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import {
 	createBlock,
 	registerBlockType,
@@ -12,6 +23,7 @@ import type { Block } from '@wordpress/blocks';
 import { store } from '..';
 import { unlock } from '../../lock-unlock';
 import { setClipboardBlocks } from '../../components/writing-flow/utils';
+import useOnBlockDrop from '../../components/use-on-block-drop';
 
 describe( 'block selection with multiSelectSet', () => {
 	let registry: ReturnType< typeof createRegistry >;
@@ -429,13 +441,355 @@ describe( 'block selection with multiSelectSet', () => {
 		);
 	} );
 
-	it.each( [
-		'missing',
-		'duplicate',
-		'disabled',
-		'locked',
-		'parent and child',
-	] )(
+	it.each( [ false, true ] )(
+		'allows a parent and its descendants as move targets (child first: %s)',
+		( childFirst ) => {
+			const child = createBlock( 'core/test-selection', {}, [
+				blocks[ 0 ],
+			] );
+			const parent = createBlock( 'core/test-selection', {}, [ child ] );
+			registry.dispatch( store ).resetBlocks( [ parent, blocks[ 2 ] ] );
+			const ids = [
+				parent.clientId,
+				child.clientId,
+				blocks[ 0 ].clientId,
+			];
+			if ( childFirst ) {
+				ids.reverse();
+			}
+			expect( registry.select( store ).canMoveBlocks( ids ) ).toBe(
+				true
+			);
+			expect(
+				unlock( registry.select( store ) ).canMoveBlocksToPosition(
+					ids,
+					''
+				)
+			).toBe( true );
+		}
+	);
+
+	it.each( [ 'disabled', 'move-locked', 'remove-locked' ] )(
+		'ignores child movement restrictions when moving their parent (%s)',
+		( restriction ) => {
+			const parent = createBlock( 'core/test-selection', {}, [
+				blocks[ 0 ],
+			] );
+			const destination = createBlock( 'core/test-selection', {}, [
+				blocks[ 2 ],
+			] );
+			registry.dispatch( store ).resetBlocks( [ parent, destination ] );
+			registry
+				.dispatch( store )
+				.updateBlockListSettings( destination.clientId, {} );
+			if ( restriction === 'disabled' ) {
+				registry
+					.dispatch( store )
+					.setBlockEditingMode( blocks[ 0 ].clientId, 'disabled' );
+			} else {
+				registry
+					.dispatch( store )
+					.updateBlockAttributes( blocks[ 0 ].clientId, {
+						lock: {
+							[ restriction === 'move-locked'
+								? 'move'
+								: 'remove' ]: true,
+						},
+					} );
+			}
+			const ids = [ blocks[ 0 ].clientId, parent.clientId ];
+			expect( registry.select( store ).canMoveBlocks( ids ) ).toBe(
+				true
+			);
+			expect(
+				unlock( registry.select( store ) ).canMoveBlocksToPosition(
+					ids,
+					destination.clientId
+				)
+			).toBe( true );
+			registry
+				.dispatch( store )
+				.moveBlocksToPosition(
+					ids,
+					parent.clientId,
+					destination.clientId,
+					1
+				);
+			expect(
+				registry.select( store ).getBlockOrder( destination.clientId )
+			).toEqual( [ blocks[ 2 ].clientId, parent.clientId ] );
+			expect(
+				registry
+					.select( store )
+					.getBlockRootClientId( blocks[ 0 ].clientId )
+			).toBe( parent.clientId );
+		}
+	);
+
+	it( 'moves a parent once without detaching its descendants', () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 0, 2 )
+		);
+		registry
+			.dispatch( store )
+			.resetBlocks( [ parent, blocks[ 2 ], blocks[ 3 ] ] );
+		const ids = [ blocks[ 0 ].clientId, parent.clientId ];
+		registry
+			.dispatch( store )
+			.moveBlocksToPosition( ids, parent.clientId, '', 1 );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			blocks[ 2 ].clientId,
+			parent.clientId,
+			blocks[ 3 ].clientId,
+		] );
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( blocks.slice( 0, 2 ).map( ( block ) => block.clientId ) );
+		expect(
+			registry
+				.select( store )
+				.getBlockRootClientId( blocks[ 0 ].clientId )
+		).toBe( parent.clientId );
+		expect( ids ).toEqual( [ blocks[ 0 ].clientId, parent.clientId ] );
+	} );
+
+	it( 'moves parents from different origins without detaching their children', () => {
+		const first = createBlock( 'core/test-selection', {}, [ blocks[ 0 ] ] );
+		const second = createBlock( 'core/test-selection', {}, [
+			blocks[ 1 ],
+		] );
+		const origins = [
+			createBlock( 'core/test-selection', {}, [ first ] ),
+			createBlock( 'core/test-selection', {}, [ second ] ),
+		];
+		const destination = createBlock( 'core/test-selection', {}, [
+			blocks[ 2 ],
+		] );
+		registry.dispatch( store ).resetBlocks( [ ...origins, destination ] );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( destination.clientId, {} );
+		registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				[
+					blocks[ 1 ].clientId,
+					second.clientId,
+					blocks[ 0 ].clientId,
+					first.clientId,
+				],
+				second.clientId,
+				destination.clientId,
+				1
+			);
+		expect(
+			registry.select( store ).getBlockOrder( origins[ 0 ].clientId )
+		).toEqual( [] );
+		expect(
+			registry.select( store ).getBlockOrder( origins[ 1 ].clientId )
+		).toEqual( [] );
+		expect(
+			registry.select( store ).getBlockOrder( destination.clientId )
+		).toEqual( [ blocks[ 2 ].clientId, first.clientId, second.clientId ] );
+		expect(
+			registry
+				.select( store )
+				.getBlockRootClientId( blocks[ 0 ].clientId )
+		).toBe( first.clientId );
+		expect(
+			registry
+				.select( store )
+				.getBlockRootClientId( blocks[ 1 ].clientId )
+		).toBe( second.clientId );
+	} );
+
+	it.each( [ 'up', 'down' ] )(
+		'moves a parent up or down when descendant IDs are also supplied (%s)',
+		( direction ) => {
+			const first = createBlock( 'core/test-selection', {}, [
+				blocks[ 0 ],
+			] );
+			const second = createBlock( 'core/test-selection', {}, [
+				blocks[ 1 ],
+			] );
+			const container = createBlock( 'core/test-selection', {}, [
+				blocks[ 2 ],
+				first,
+				second,
+				blocks[ 3 ],
+			] );
+			registry.dispatch( store ).resetBlocks( [ container ] );
+			const ids = [
+				blocks[ 1 ].clientId,
+				second.clientId,
+				blocks[ 0 ].clientId,
+				first.clientId,
+			];
+			if ( direction === 'up' ) {
+				registry.dispatch( store ).moveBlocksUp( ids, second.clientId );
+			} else {
+				registry
+					.dispatch( store )
+					.moveBlocksDown( ids, second.clientId );
+			}
+			expect(
+				registry.select( store ).getBlockOrder( container.clientId )
+			).toEqual(
+				direction === 'up'
+					? [
+							first.clientId,
+							second.clientId,
+							blocks[ 2 ].clientId,
+							blocks[ 3 ].clientId,
+						]
+					: [
+							blocks[ 2 ].clientId,
+							blocks[ 3 ].clientId,
+							first.clientId,
+							second.clientId,
+						]
+			);
+			expect(
+				registry
+					.select( store )
+					.getBlockRootClientId( blocks[ 0 ].clientId )
+			).toBe( first.clientId );
+			expect(
+				registry
+					.select( store )
+					.getBlockRootClientId( blocks[ 1 ].clientId )
+			).toBe( second.clientId );
+		}
+	);
+
+	it( 'rejects moving a parent into itself or a descendant', () => {
+		const child = createBlock( 'core/test-selection', {}, [ blocks[ 0 ] ] );
+		const parent = createBlock( 'core/test-selection', {}, [ child ] );
+		registry.dispatch( store ).resetBlocks( [ parent, blocks[ 2 ] ] );
+		const ids = [ blocks[ 0 ].clientId, child.clientId, parent.clientId ];
+		const before = registry.select( store ).getBlocks();
+		for ( const destination of [
+			parent.clientId,
+			child.clientId,
+			blocks[ 0 ].clientId,
+		] ) {
+			expect(
+				unlock( registry.select( store ) ).canMoveBlocksToPosition(
+					ids,
+					destination
+				)
+			).toBe( false );
+			registry
+				.dispatch( store )
+				.moveBlocksToPosition( ids, child.clientId, destination, 0 );
+			expect( registry.select( store ).getBlocks() ).toBe( before );
+		}
+	} );
+
+	it( 'checks entity boundaries using the parent rather than separately supplied controlled children', () => {
+		const parent = createBlock( 'core/test-selection' );
+		const destination = createBlock( 'core/test-selection', {}, [
+			blocks[ 2 ],
+		] );
+		registry.dispatch( store ).resetBlocks( [ parent, destination ] );
+		registry
+			.dispatch( store )
+			.setHasControlledInnerBlocks( parent.clientId, true );
+		registry
+			.dispatch( store )
+			.replaceInnerBlocks( parent.clientId, blocks.slice( 0, 2 ), false );
+		registry
+			.dispatch( store )
+			.updateBlockListSettings( destination.clientId, {} );
+		const ids = [ blocks[ 0 ].clientId, parent.clientId ];
+		expect( registry.select( store ).canMoveBlocks( ids ) ).toBe( true );
+		expect(
+			unlock( registry.select( store ) ).canMoveBlocksToPosition(
+				ids,
+				destination.clientId
+			)
+		).toBe( true );
+		registry
+			.dispatch( store )
+			.moveBlocksToPosition(
+				ids,
+				parent.clientId,
+				destination.clientId,
+				1
+			);
+		expect(
+			registry.select( store ).getBlockOrder( destination.clientId )
+		).toEqual( [ blocks[ 2 ].clientId, parent.clientId ] );
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( blocks.slice( 0, 2 ).map( ( block ) => block.clientId ) );
+		expect(
+			registry
+				.select( store )
+				.getBlockRootClientId( blocks[ 0 ].clientId )
+		).toBe( parent.clientId );
+		expect(
+			registry.select( store ).areInnerBlocksControlled( parent.clientId )
+		).toBe( true );
+	} );
+
+	it( 'drops a parent once when descendant IDs are also supplied', () => {
+		const parent = createBlock(
+			'core/test-selection',
+			{},
+			blocks.slice( 0, 2 )
+		);
+		registry
+			.dispatch( store )
+			.resetBlocks( [ parent, blocks[ 2 ], blocks[ 3 ] ] );
+		const onBlocksDrop = vi.fn();
+		const { result } = renderHook(
+			() => useOnBlockDrop( '', 3, { onBlocksDrop } ),
+			{
+				wrapper: ( { children }: { children: ReactNode } ) =>
+					createElement( RegistryProvider, {
+						value: registry,
+						children,
+					} ),
+			}
+		);
+		act( () => {
+			result.current( {
+				dataTransfer: {
+					files: [],
+					items: [],
+					getData: ( type: string ) =>
+						type === 'wp-blocks'
+							? JSON.stringify( {
+									type: 'block',
+									srcRootClientId: parent.clientId,
+									srcClientIds: [
+										blocks[ 0 ].clientId,
+										parent.clientId,
+									],
+								} )
+							: '',
+				},
+			} as unknown as DragEvent );
+		} );
+		expect( registry.select( store ).getBlockOrder() ).toEqual( [
+			blocks[ 2 ].clientId,
+			blocks[ 3 ].clientId,
+			parent.clientId,
+		] );
+		expect(
+			registry.select( store ).getBlockOrder( parent.clientId )
+		).toEqual( blocks.slice( 0, 2 ).map( ( block ) => block.clientId ) );
+		expect( registry.select( store ).getSelectedBlockClientIds() ).toEqual(
+			[ parent.clientId ]
+		);
+		expect( onBlocksDrop ).toHaveBeenCalledTimes( 1 );
+		expect( onBlocksDrop ).toHaveBeenCalledWith( [ parent.clientId ], '' );
+	} );
+
+	it.each( [ 'missing', 'duplicate', 'disabled', 'locked' ] )(
 		'rejects invalid block lists before moving them (%s)',
 		async ( reason ) => {
 			const ids = [ blocks[ 0 ].clientId, blocks[ 2 ].clientId ];
@@ -451,14 +805,6 @@ describe( 'block selection with multiSelectSet', () => {
 				registry.dispatch( store ).updateBlockAttributes( ids[ 0 ], {
 					lock: { move: true },
 				} );
-			} else {
-				const parent = createBlock( 'core/test-selection', {}, [
-					blocks[ 0 ],
-				] );
-				registry
-					.dispatch( store )
-					.resetBlocks( [ parent, blocks[ 2 ] ] );
-				ids.push( parent.clientId );
 			}
 			const before = registry.select( store ).getBlocks();
 			const selection = registry

@@ -31,6 +31,7 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
+import { filterOutChildClientIds } from './utils';
 import { unlock } from '../lock-unlock';
 import type {
 	BlockEditingMode,
@@ -562,15 +563,32 @@ const createOnMove =
 	( type: string ) =>
 	( clientIds: string[], rootClientId?: string | null ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		// Up/down movers require contiguous blocks with the same parent.
-		if (
-			! select.canMoveBlocks( clientIds ) ||
-			! select.areBlocksContiguous( clientIds )
-		) {
+		if ( ! select.canMoveBlocks( clientIds ) ) {
 			return;
 		}
 
-		dispatch( { type, clientIds: castArray( clientIds ), rootClientId } );
+		const moveClientIds = filterOutChildClientIds(
+			castArray( clientIds ),
+			select.getBlockParents
+		);
+		// Reject non-contiguous blocks after filtering: the up/down reducer moves
+		// one consecutive sibling range and would otherwise move unselected blocks.
+		if ( ! select.areBlocksContiguous( moveClientIds ) ) {
+			return;
+		}
+		// Sort client IDs into document order so the reducer starts at the correct
+		// block and checks the bottom boundary using the last ID.
+		const orderedIds = [ ...moveClientIds ].sort(
+			( a, b ) => select.getBlockIndex( a ) - select.getBlockIndex( b )
+		);
+		dispatch( {
+			type,
+			clientIds: orderedIds,
+			rootClientId:
+				select.getBlockRootClientId( orderedIds[ 0 ] ) ??
+				rootClientId ??
+				'',
+		} );
 	};
 
 export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
@@ -579,11 +597,13 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 /**
  * Action that moves given blocks to a new position.
  *
- * Does not select the moved blocks. Non-contiguous blocks are moved together in
- * document order, using their current parents rather than fromRootClientId.
+ * Does not select the moved blocks. Blocks are moved in document order, using
+ * their current parents.
+ * When both an ancestor and its descendant are supplied in `clientIds`, only
+ * the ancestor moves, because its descendants move with it.
  *
  * @param {string[]} clientIds        The client IDs of the blocks.
- * @param {?string}  fromRootClientId Source parent for contiguous siblings. Inferred for non-contiguous blocks.
+ * @param {?string}  fromRootClientId Source parent fallback when the current parent is unavailable.
  * @param {?string}  toRootClientId   Root client ID destination.
  * @param {number}   index            Destination index after removing moved blocks. Omit to append.
  */
@@ -599,51 +619,95 @@ export const moveBlocksToPosition =
 			return;
 		}
 
-		if ( select.areBlocksContiguous( clientIds ) ) {
-			// If moving inside the same root block the move is always possible.
-			if ( fromRootClientId !== toRootClientId ) {
-				const canRemoveBlocks = select.canRemoveBlocks( clientIds );
+		// Reject negative or fractional indices: the index must identify a position
+		// in the destination block list after removing the moved blocks.
+		if (
+			index !== undefined &&
+			( ! Number.isInteger( index ) || index < 0 )
+		) {
+			return;
+		}
 
-				// If we're moving to another block, it means we're deleting blocks from
-				// the original block, so we need to check if removing is possible.
-				if ( ! canRemoveBlocks ) {
+		const destinationRootClientId = toRootClientId ?? '';
+		// Reject a missing destination parent, since blocks cannot be inserted into it.
+		// Skip this lookup for an empty ID, which targets the top-level block list.
+		if (
+			destinationRootClientId &&
+			! select.getBlock( destinationRootClientId )
+		) {
+			return;
+		}
+		const moveClientIds = filterOutChildClientIds(
+			castArray( clientIds ),
+			select.getBlockParents
+		);
+		// Check the destination and its ancestors against the moved IDs to prevent
+		// placing a block inside itself or its descendants, which would create a cycle.
+		const destinationParents = destinationRootClientId
+			? [
+					destinationRootClientId,
+					...select.getBlockParents( destinationRootClientId ),
+				]
+			: [];
+		if (
+			destinationParents.some( ( id ) => moveClientIds.includes( id ) )
+		) {
+			return;
+		}
+
+		if ( select.areBlocksContiguous( moveClientIds ) ) {
+			// Sort siblings into document order: the same-parent reducer moves a range
+			// starting at the first ID, so reversed IDs would move the wrong blocks.
+			const orderedIds = [ ...moveClientIds ].sort(
+				( a, b ) =>
+					select.getBlockIndex( a ) - select.getBlockIndex( b )
+			);
+			// Read the source parent from the block being moved: a child-first request
+			// may supply the child's parent rather than the ancestor's parent.
+			const sourceRootClientId =
+				select.getBlockRootClientId( orderedIds[ 0 ] ) ??
+				fromRootClientId ??
+				'';
+			// Check removal and insertion permissions only when changing parents;
+			// reordering within one parent does not add or remove blocks from its list.
+			if ( sourceRootClientId !== destinationRootClientId ) {
+				if ( ! select.canRemoveBlocks( orderedIds ) ) {
 					return;
 				}
-
-				const canInsertBlocks = select.canInsertBlocks(
-					clientIds,
-					toRootClientId
-				);
-
-				// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-				if ( ! canInsertBlocks ) {
+				if (
+					! select.canInsertBlocks(
+						orderedIds,
+						destinationRootClientId
+					)
+				) {
 					return;
 				}
 			}
 
 			dispatch( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
-				fromRootClientId,
-				toRootClientId,
-				clientIds,
+				fromRootClientId: sourceRootClientId,
+				toRootClientId: destinationRootClientId,
+				clientIds: orderedIds,
 				index,
 			} );
 			return;
 		}
 
-		const destinationRootClientId = toRootClientId ?? '';
+		// Reject non-contiguous moves between separately saved entities: this action
+		// updates one entity's block tree and cannot coordinate saves for both.
 		if (
 			! select.canMoveBlocksToPosition(
-				clientIds,
+				moveClientIds,
 				destinationRootClientId
-			) ||
-			( index !== undefined &&
-				( ! Number.isInteger( index ) || index < 0 ) )
+			)
 		) {
 			return;
 		}
-		// Use document order even when the IDs were selected in another order.
-		const uniqueIds = new Set( clientIds );
+
+		// Order moved IDs by document position so blocks from different parents
+		// keep their relative order when inserted together at the destination.
+		const uniqueIds = new Set( moveClientIds );
 		const orderedIds = select
 			.getClientIdsWithDescendants()
 			.filter( ( id ) => uniqueIds.has( id ) );
@@ -655,7 +719,8 @@ export const moveBlocksToPosition =
 			index ?? remainingCount,
 			remainingCount
 		);
-		// Every source parent must remove the moved blocks in the same update.
+		// Pass every source parent to the reducer so it removes the blocks from all
+		// their original lists and inserts them at the destination in one update.
 		const sourceParents = [
 			...new Set(
 				orderedIds.map( ( id ) => select.getBlockRootClientId( id )! )

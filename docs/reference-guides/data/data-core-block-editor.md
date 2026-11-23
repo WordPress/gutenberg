@@ -1401,12 +1401,12 @@ Undocumented declaration.
 
 Action that moves given blocks to a new position.
 
-Does not select the moved blocks. Non-contiguous blocks are moved together in document order, using their current parents rather than fromRootClientId.
+Does not select the moved blocks. Blocks are moved in document order, using their current parents. When both an ancestor and its descendant are supplied in `clientIds`, only the ancestor moves, because its descendants move with it.
 
 _Parameters_
 
 - _clientIds_ `string[]`: The client IDs of the blocks.
-- _fromRootClientId_ `?string`: Source parent for contiguous siblings. Inferred for non-contiguous blocks.
+- _fromRootClientId_ `?string`: Source parent fallback when the current parent is unavailable.
 - _toRootClientId_ `?string`: Root client ID destination.
 - _index_ `number`: Destination index after removing moved blocks. Omit to append.
 

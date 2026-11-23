@@ -30,6 +30,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	filterOutChildClientIds,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -141,11 +142,17 @@ export function canMoveBlocksToPosition(
 	) {
 		return false;
 	}
-	// A block cannot be dropped into itself or one of its descendants.
+	// Exclude supplied descendants because they move inside their ancestor,
+	// not independently with their own removal, insertion, or entity checks.
+	const moveClientIds = filterOutChildClientIds( clientIds, ( id ) =>
+		getBlockParents( state, id )
+	);
+	// Check the destination and its ancestors against the moved IDs to prevent
+	// placing a block inside itself or its descendants, which would create a cycle.
 	const destinationParents = rootClientId
 		? [ rootClientId, ...getBlockParents( state, rootClientId, true ) ]
 		: [];
-	if ( destinationParents.some( ( id ) => clientIds.includes( id ) ) ) {
+	if ( destinationParents.some( ( id ) => moveClientIds.includes( id ) ) ) {
 		return false;
 	}
 	// The nearest controlled parent owns the contents as a separate entity.
@@ -154,7 +161,7 @@ export function canMoveBlocksToPosition(
 		destinationParents.find( ( id ) =>
 			areInnerBlocksControlled( state, id )
 		) ?? '';
-	return clientIds.every( ( id ) => {
+	return moveClientIds.every( ( id ) => {
 		const controlledSourceParent =
 			getBlockParents( state, id, true ).find( ( parent ) =>
 				areInnerBlocksControlled( state, parent )

@@ -29,6 +29,7 @@ import {
 	getGrammar,
 	mapUserPattern,
 	getFallbackInsertionRoots,
+	filterOutChildClientIds,
 } from './utils';
 import { orderBy } from '../utils/sorting';
 import { STORE_NAME } from './constants';
@@ -2272,16 +2273,12 @@ export function canMoveBlocks( state: State, clientIds: string[] ) {
 	return (
 		clientIds.length > 0 &&
 		uniqueIds.size === clientIds.length &&
-		clientIds.every(
-			( id ) =>
-				// Check the blocks themselves before considering a destination.
-				!! getBlock( state, id ) &&
-				canMoveBlock( state, id ) &&
-				// Moving a parent already moves its children; do not move them twice.
-				! getBlockParents( state, id ).some( ( parent ) =>
-					uniqueIds.has( parent )
-				)
-		)
+		// Validate all supplied IDs before filtering, so a request containing a
+		// missing block is rejected as a whole.
+		clientIds.every( ( id ) => !! getBlock( state, id ) ) &&
+		filterOutChildClientIds( clientIds, ( id ) =>
+			getBlockParents( state, id )
+		).every( ( id ) => canMoveBlock( state, id ) )
 	);
 }
 

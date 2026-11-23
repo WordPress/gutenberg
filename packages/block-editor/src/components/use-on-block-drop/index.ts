@@ -15,6 +15,7 @@ import type { DragEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import type { BlockEditorThunkArgs, Settings } from '../../store/types';
+import { filterOutChildClientIds } from '../../store/utils';
 import type {
 	BlockDropData,
 	BlockDropOperation,
@@ -310,6 +311,7 @@ export default function useOnBlockDrop(
 		getSettings,
 		getBlock,
 		getBlockRootClientId,
+		getBlockParents,
 		getClientIdsWithDescendants,
 		areBlocksContiguous,
 		canMoveBlocksToPosition,
@@ -476,11 +478,20 @@ export default function useOnBlockDrop(
 		operation,
 		getBlock,
 		onBlocksDrop,
-		( sourceIds, sourceRootClientId ) => {
-			if ( sourceIds.some( ( id ) => ! getBlock( id ) ) ) {
+		( clientIds, sourceRootClientId ) => {
+			if ( clientIds.some( ( id ) => ! getBlock( id ) ) ) {
 				return true;
 			}
+			const sourceIds = filterOutChildClientIds(
+				clientIds,
+				getBlockParents
+			);
+			// Delegate contiguous drops to onBlockDrop only if filterOutChildClientIds
+			// leaves the IDs unchanged and the drag data's source parent matches the
+			// blocks' current parent. onBlockDrop receives the original drag data, so
+			// otherwise it would count children separately or use the wrong parent.
 			if (
+				sourceIds.length === clientIds.length &&
 				areBlocksContiguous( sourceIds ) &&
 				getBlockRootClientId( sourceIds[ 0 ] ) === sourceRootClientId
 			) {
@@ -489,12 +500,13 @@ export default function useOnBlockDrop(
 			if (
 				operation === 'group' ||
 				operation === 'replace' ||
-				! canMoveBlocksToPosition( sourceIds, targetRootClientId ?? '' )
+				! canMoveBlocksToPosition( clientIds, targetRootClientId ?? '' )
 			) {
 				return true;
 			}
 			registry.batch( () => {
-				// Grid and other custom behavior must see each block's actual origin.
+				// Call custom drop behavior separately for each source parent so grid
+				// positioning and other adjustments use the blocks' original containers.
 				if ( onBlocksDrop ) {
 					const byParent = new Map< string, string[] >();
 					for ( const id of sourceIds ) {
@@ -507,7 +519,8 @@ export default function useOnBlockDrop(
 						onBlocksDrop( ids, parent );
 					}
 				}
-				// Custom drop behavior may have changed the blocks or their parents.
+				// Recheck movement permissions after custom drop callbacks because they
+				// may have changed the blocks or their parents.
 				const destinationRootClientId = targetRootClientId ?? '';
 				if (
 					! canMoveBlocksToPosition(
@@ -528,8 +541,8 @@ export default function useOnBlockDrop(
 					targetBlockIndex,
 					targetOrder.length
 				);
-				// The pointer index is before removal; the move action expects an
-				// index after removing selected siblings from the destination.
+				// Subtract moved siblings before the pointer's insertion position because
+				// the move action expects a destination index after their removal.
 				const insertionIndex =
 					targetIndex -
 					targetOrder
@@ -548,7 +561,8 @@ export default function useOnBlockDrop(
 					destinationRootClientId,
 					insertionIndex
 				);
-				// Selection is part of the drop interaction, not the move action.
+				// Select the moved blocks here to keep them selected after the drop;
+				// the general move action leaves selection unchanged for other callers.
 				multiSelect(
 					orderedIds[ 0 ],
 					orderedIds[ orderedIds.length - 1 ],
