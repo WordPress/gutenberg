@@ -18,7 +18,6 @@ import {
 	Tabs,
 	Text,
 } from '@wordpress/ui';
-import { withRouter } from '../../decorators/with-router';
 import { getDesignSystemThemeSettings } from '../../decorators/with-design-system-theme';
 
 const SIDEBAR_THEME_PRESETS = [
@@ -316,7 +315,7 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 								breadcrumbs={ [
 									{
 										label: 'Root breadcrumb',
-										href: '/connectors',
+										href: '#',
 									},
 									{ label: 'Level 1 breadcrumb' },
 								] }
@@ -503,7 +502,6 @@ export const ExampleApplication: StoryObj< typeof meta > = {
 			</div>
 		);
 	},
-	decorators: [ withRouter ],
 	parameters: {
 		controls: { disable: true },
 	},
