@@ -330,6 +330,133 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( 'image_meta', $data['media_details'] );
 	}
 
+	/**
+	 * Uploads an image through the REST API, optionally as an edit of another attachment.
+	 *
+	 * @param int|null $parent_image Attachment the upload was edited from.
+	 * @return WP_REST_Response Response.
+	 */
+	private function create_edited_image_response( $parent_image = null ) {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola-edited.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+		if ( null !== $parent_image ) {
+			$request->set_param( 'parent_image', $parent_image );
+		}
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * A client-side edit records its source attachment like the edit endpoint does.
+	 *
+	 * @covers ::create_item
+	 * @covers ::record_parent_image
+	 */
+	public function test_create_item_records_parent_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$parent_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+
+		$parent_metadata                              = wp_get_attachment_metadata( $parent_id );
+		$parent_metadata['image_meta']['credit']      = 'Photographer';
+		$parent_metadata['image_meta']['orientation'] = 6;
+		wp_update_attachment_metadata( $parent_id, $parent_metadata );
+
+		$response = $this->create_edited_image_response( $parent_id );
+		$this->assertSame( 201, $response->get_status() );
+
+		$data     = $response->get_data();
+		$metadata = wp_get_attachment_metadata( $data['id'] );
+		$expected = array(
+			'attachment_id' => $parent_id,
+			'file'          => _wp_relative_upload_path( wp_get_original_image_path( $parent_id ) ),
+		);
+
+		$this->assertSame( $expected, $metadata['parent_image'], 'The metadata records the source attachment.' );
+		$this->assertSame( $expected, $data['media_details']['parent_image'], 'The response reflects the source attachment.' );
+		$this->assertSame( 'Photographer', $metadata['image_meta']['credit'], 'EXIF fields the new file lacks are copied from the source.' );
+		$this->assertSame( 1, $metadata['image_meta']['orientation'], 'The edited pixels are upright.' );
+	}
+
+	/**
+	 * The metadata passes through the filter the edit endpoint fires for its new attachment.
+	 *
+	 * @covers ::record_parent_image
+	 */
+	public function test_create_item_filters_the_edited_image_metadata() {
+		wp_set_current_user( self::$admin_id );
+
+		$parent_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+		$received  = array();
+
+		add_filter(
+			'wp_edited_image_metadata',
+			static function ( $new_image_meta, $new_attachment_id, $attachment_id ) use ( &$received ) {
+				$received                        = compact( 'new_image_meta', 'new_attachment_id', 'attachment_id' );
+				$new_image_meta['original_root'] = $attachment_id;
+				return $new_image_meta;
+			},
+			10,
+			3
+		);
+
+		$response = $this->create_edited_image_response( $parent_id );
+		$this->assertSame( 201, $response->get_status() );
+
+		$new_id = $response->get_data()['id'];
+
+		$this->assertSame( $new_id, $received['new_attachment_id'], 'The filter receives the new attachment.' );
+		$this->assertSame( $parent_id, $received['attachment_id'], 'The filter receives the source attachment.' );
+		$this->assertSame( $parent_id, $received['new_image_meta']['parent_image']['attachment_id'], 'The filter sees the recorded source.' );
+		$this->assertSame( $parent_id, wp_get_attachment_metadata( $new_id )['original_root'], 'The filtered metadata is what gets saved.' );
+	}
+
+	/**
+	 * @covers ::create_item
+	 */
+	public function test_create_item_without_parent_image_records_nothing() {
+		wp_set_current_user( self::$admin_id );
+
+		$response = $this->create_edited_image_response();
+		$this->assertSame( 201, $response->get_status() );
+
+		$metadata = wp_get_attachment_metadata( $response->get_data()['id'] );
+		$this->assertArrayNotHasKey( 'parent_image', $metadata );
+	}
+
+	/**
+	 * @covers ::get_endpoint_args_for_item_schema
+	 */
+	public function test_create_item_rejects_a_parent_image_that_is_not_an_image() {
+		wp_set_current_user( self::$admin_id );
+
+		$post_id  = self::factory()->post->create();
+		$response = $this->create_edited_image_response( $post_id );
+
+		$this->assertSame( 400, $response->get_status() );
+		$this->assertSame( 'rest_invalid_param', $response->get_data()['code'] );
+	}
+
+	/**
+	 * @covers ::create_item_permissions_check
+	 */
+	public function test_create_item_requires_permission_to_edit_the_parent_image() {
+		wp_set_current_user( self::$admin_id );
+		$parent_id = self::factory()->attachment->create_upload_object( DIR_TESTDATA . '/images/canola.jpg' );
+
+		// Authors can upload, but cannot edit another user's attachment.
+		$author_id = self::factory()->user->create( array( 'role' => 'author' ) );
+		wp_set_current_user( $author_id );
+
+		$response = $this->create_edited_image_response( $parent_id );
+
+		$this->assertSame( 403, $response->get_status() );
+		$this->assertSame( 'rest_cannot_edit_image', $response->get_data()['code'] );
+	}
+
 	public function test_prepare_item() {
 		$this->markTestSkipped( 'No need to implement' );
 	}

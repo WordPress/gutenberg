@@ -121,8 +121,8 @@ export function getPendingUploads( state: State ): QueueItem[] {
 /**
  * Returns the number of items currently performing image processing operations.
  *
- * This counts items whose current operation is ResizeCrop or Rotate,
- * used to enforce the image processing concurrency limit.
+ * This counts items whose current operation is ResizeCrop, Rotate or
+ * EditImage, used to enforce the image processing concurrency limit.
  *
  * @param state Upload state.
  *
@@ -132,7 +132,8 @@ export function getActiveImageProcessingCount( state: State ): number {
 	return state.queue.filter(
 		( item ) =>
 			item.currentOperation === OperationType.ResizeCrop ||
-			item.currentOperation === OperationType.Rotate
+			item.currentOperation === OperationType.Rotate ||
+			item.currentOperation === OperationType.EditImage
 	).length;
 }
 
@@ -153,8 +154,8 @@ export function getActiveVideoProcessingCount( state: State ): number {
 }
 
 /**
- * Returns items waiting for image processing (next operation is ResizeCrop
- * or Rotate but not yet started).
+ * Returns items waiting for image processing (next operation is ResizeCrop,
+ * Rotate or EditImage but not yet started).
  *
  * @param state Upload state.
  *
@@ -167,9 +168,11 @@ export function getPendingImageProcessing( state: State ): QueueItem[] {
 			: item.operations?.[ 0 ];
 		return (
 			( nextOperation === OperationType.ResizeCrop ||
-				nextOperation === OperationType.Rotate ) &&
+				nextOperation === OperationType.Rotate ||
+				nextOperation === OperationType.EditImage ) &&
 			item.currentOperation !== OperationType.ResizeCrop &&
-			item.currentOperation !== OperationType.Rotate
+			item.currentOperation !== OperationType.Rotate &&
+			item.currentOperation !== OperationType.EditImage
 		);
 	} );
 }

@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Mock, MockInstance } from 'vitest';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
+	editImageItem,
 	generateThumbnails,
 	getTranscodeImageOperation,
 	finalizeItem,
@@ -16,7 +17,9 @@ import {
 import type { ThunkArgs } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
+import { ImageFile } from '../../image-file';
 import {
+	vipsEditImage,
 	vipsHasTransparency,
 	vipsGetUltraHdrInfo,
 	vipsRotateImage,
@@ -37,6 +40,7 @@ vi.mock( import( '@wordpress/blob' ), () => ( {
 // Mock vips utilities. The isAnimatedGif() that prepareItem needs, and the
 // file helpers, come from `src/utils`, which is not mocked.
 vi.mock( import( '../utils' ), () => ( {
+	vipsEditImage: vi.fn(),
 	vipsHasTransparency: vi.fn(),
 	vipsGetUltraHdrInfo: vi.fn(),
 	vipsRotateImage: vi.fn(),
@@ -1631,6 +1635,135 @@ describe( 'private actions', () => {
 			expect(
 				sideloadedSize( addSideloadItem, 'thumbnail' )
 			).toBeDefined();
+		} );
+	} );
+
+	describe( 'editImageItem', () => {
+		const modifiers = [ { type: 'rotate' as const, args: { angle: 90 } } ];
+		const file = new File( [ 'content' ], 'photo.jpg', {
+			type: 'image/jpeg',
+		} );
+
+		function createDispatch() {
+			return Object.assign( vi.fn(), {
+				finishOperation: vi.fn(),
+				cancelItem: vi.fn(),
+			} );
+		}
+
+		beforeEach( () => {
+			vi.clearAllMocks();
+		} );
+
+		it( 'replaces the item file and source file with the edited one', async () => {
+			const edited = new ImageFile(
+				new File( [ 'edited' ], 'photo-edited.jpg', {
+					type: 'image/jpeg',
+				} ),
+				200,
+				300
+			);
+			vi.mocked( vipsEditImage ).mockResolvedValue( edited );
+			const abortController = new AbortController();
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file, abortController } ),
+					getSettings: () => ( { imageQuality: 0.9 } ),
+				},
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( vipsEditImage ).toHaveBeenCalledWith(
+				'item-1',
+				file,
+				modifiers,
+				{ quality: 0.9, signal: abortController.signal }
+			);
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
+				file: edited,
+				sourceFile: edited,
+				attachment: { url: 'blob:mock-url' },
+			} );
+			expect( dispatch.cancelItem ).not.toHaveBeenCalled();
+		} );
+
+		it( 'passes the file through when there is nothing to apply', async () => {
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers: [] } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( vipsEditImage ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).toHaveBeenCalledWith( 'item-1', {
+				file,
+			} );
+		} );
+
+		it( 'cancels the item with an edit error when the image is too large for the browser', async () => {
+			// A 20000x20000 progressive JPEG header: well past the wasm-vips
+			// memory budget, so the edit must never reach the worker.
+			const hugeFile = new File(
+				[
+					new Uint8Array( [
+						0xff, 0xd8, 0xff, 0xc2, 0x00, 0x11, 0x08, 0x4e, 0x20,
+						0x4e, 0x20, 0x03,
+					] ),
+				],
+				'huge.jpg',
+				{ type: 'image/jpeg' }
+			);
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file: hugeFile } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( vipsEditImage ).not.toHaveBeenCalled();
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'item-1',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					file: hugeFile,
+				} )
+			);
+		} );
+
+		it( 'cancels the item with an edit error when vips fails', async () => {
+			// Nothing has reached the server at this point, so the error
+			// code lets a caller fall back to the REST `/edit` endpoint.
+			vi.mocked( vipsEditImage ).mockRejectedValue(
+				new Error( 'unsupported' )
+			);
+			const dispatch = createDispatch();
+
+			await editImageItem( 'item-1', { modifiers } )( {
+				select: {
+					getItem: () => ( { id: 'item-1', file } ),
+					getSettings: () => ( {} ),
+				},
+				dispatch,
+			} as unknown as ThunkArgs );
+
+			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
+			expect( dispatch.cancelItem ).toHaveBeenCalledWith(
+				'item-1',
+				expect.objectContaining( {
+					code: ErrorCode.IMAGE_EDIT_ERROR,
+					file,
+				} )
+			);
 		} );
 	} );
 
