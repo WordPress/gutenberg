@@ -982,6 +982,70 @@ describe( 'attribute proposals on the block marker', () => {
 		).toBe( true );
 	} );
 
+	it( 'reject drops the proposal as a persistent change, so it is an undo level', async () => {
+		const block = proposedLevel();
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 42,
+				clientId: block.clientId,
+				payload: levelPayload(),
+			} );
+		} );
+
+		expect(
+			attrs( registry, block.clientId ).metadata.suggestion
+		).toBeUndefined();
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
+	it( 'reject drops a nested proposal as a persistent change too', async () => {
+		const block = createBlock( PARAGRAPH, {
+			content: 'Hello',
+			level: 2,
+			metadata: {
+				noteId: [ 42, 43 ],
+				suggestion: {
+					type: 'pending-attributes',
+					commentId: 42,
+					authorId: 2,
+					after: { level: 3 },
+					nested: [
+						{
+							type: 'pending-attributes',
+							commentId: 43,
+							authorId: 3,
+							after: { level: 4 },
+						},
+					],
+				},
+			},
+		} );
+		const { registry, getProvider } = setup( [ block ] );
+
+		await act( async () => {
+			await getProvider().rejectSuggestion( {
+				commentId: 43,
+				clientId: block.clientId,
+				payload: levelPayload(),
+			} );
+		} );
+
+		const marker = attrs( registry, block.clientId ).metadata.suggestion;
+		expect( marker.commentId ).toBe( 42 );
+		expect( marker.nested ).toBeUndefined();
+		expect(
+			registry
+				.select( blockEditorStore )
+				.__unstableGetLastBlockChangeHistoryMode()
+		).toBe( 'persistent' );
+	} );
+
 	it( 'rejecting a move also drops the proposal that rode on it, since the note carried both', async () => {
 		const a = createBlock( PARAGRAPH, { content: 'A' } );
 		const moved = createBlock( PARAGRAPH, {
