@@ -1,10 +1,8 @@
 import { execFileSync } from 'node:child_process';
 import { cpSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { readNpmPackResult } from './read-npm-pack-result.mjs';
 
 type PackageManifest = {
-	name: string;
 	version: string;
 	dependencies?: Record< string, string >;
 	devDependencies?: Record< string, string >;
@@ -63,18 +61,23 @@ export function packWorkspacePackage(
 		path.join( staging, 'package.json' ),
 		JSON.stringify( manifest )
 	);
-	const stdout = execFileSync(
+	const filename = execFileSync(
 		'npm',
-		[ 'pack', '--json', '--ignore-scripts', '--pack-destination', '..' ],
+		[
+			'pack',
+			'--no-json',
+			'--loglevel=error',
+			'--ignore-scripts',
+			'--pack-destination',
+			'..',
+		],
 		{
 			cwd: staging,
 			env,
 			encoding: 'utf8',
 			timeout: 300_000,
-			maxBuffer: 20 * 1024 * 1024,
 			shell: process.platform === 'win32',
 		}
 	);
-	const packed = readNpmPackResult( stdout, manifest.name );
-	return path.join( directory, packed.filename );
+	return path.join( directory, filename.trim() );
 }

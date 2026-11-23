@@ -4,7 +4,7 @@
  * @param {string} stdout      The `npm pack --json` stdout.
  * @param {string} packageName Package name for error messages.
  *
- * @return {{filename: string, files: unknown[]}} The pack result for the package.
+ * @return {Object} The pack result for the package.
  */
 export function readNpmPackResult( stdout, packageName ) {
 	let output;

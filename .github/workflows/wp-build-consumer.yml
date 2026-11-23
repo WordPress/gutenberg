@@ -9,8 +9,7 @@ on:
             - 'packages/theme-build-tools/package.json'
             - 'tools/validation/fixtures/wp-build-consumer/**'
             - 'tools/validation/pack-workspace-package.ts'
-            - 'tools/validation/read-npm-pack-result.mjs'
-            - 'tools/validation/test-wp-build-consumer.ts'
+            - 'tools/validation/test-wp-build-consumer.sh'
             - '.github/workflows/wp-build-consumer.yml'
     workflow_dispatch:
 
@@ -40,4 +39,4 @@ jobs:
                   node-version: ${{ steps.minimum.outputs.version || matrix.node }}
                   package-manager-cache: false
             - name: Build with the packed CLI
-              run: node --experimental-strip-types tools/validation/test-wp-build-consumer.ts
+              run: tools/validation/test-wp-build-consumer.sh

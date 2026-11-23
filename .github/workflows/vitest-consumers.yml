@@ -9,7 +9,6 @@ on:
             - 'packages/eslint-plugin/**'
             - 'tools/validation/test-vitest-consumers.mjs'
             - 'tools/validation/pack-workspace-package.ts'
-            - 'tools/validation/read-npm-pack-result.mjs'
             - 'tools/validation/fixtures/vitest-consumer/**'
             - 'package.json'
             - 'package-lock.json'
