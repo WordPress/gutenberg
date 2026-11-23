@@ -186,20 +186,20 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$stored = (string) get_comment_meta( $note_id, '_wp_suggestion_content', true );
 				if ( empty( $effective[ $note_id ] ) ) {
 					if ( '' !== $stored ) {
-						delete_comment_meta( $note_id, '_wp_suggestion_content' );
+						gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_content' );
 					}
 					continue;
 				}
 				$encoded = Gutenberg_Suggestion_Content::encode( $effective[ $note_id ] );
 				if ( $encoded !== $stored ) {
-					update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
+					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_content', wp_slash( $encoded ) );
 				}
 			}
 			foreach ( array_keys( $entry['notes'] ) as $note_id ) {
 				if ( isset( $entry['skipped'][ $note_id ] ) ) {
-					update_comment_meta( $note_id, '_wp_suggestion_extraction_skipped', true );
+					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped', true );
 				} elseif ( '' !== (string) get_comment_meta( $note_id, '_wp_suggestion_extraction_skipped', true ) ) {
-					delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
+					gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped' );
 				}
 			}
 
@@ -416,7 +416,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					}
 				}
 				if ( $changed ) {
-					update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $stored ) ) );
+					gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $stored ) ) );
 				}
 			}
 		}
@@ -853,11 +853,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param int    $user_id User whose write resolved it.
 		 */
 		private static function resolve( $note_id, $status, $user_id ) {
-			update_comment_meta( $note_id, '_wp_suggestion_status', $status );
-			update_comment_meta( $note_id, '_wp_suggestion_resolved_by', $user_id );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_status', $status );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_resolved_by', $user_id );
 			if ( 'outdated' !== $status ) {
-				delete_comment_meta( $note_id, '_wp_suggestion_content' );
-				delete_comment_meta( $note_id, '_wp_suggestion_extraction_skipped' );
+				gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_content' );
+				gutenberg_delete_suggestion_server_meta( $note_id, '_wp_suggestion_extraction_skipped' );
 			}
 			wp_set_comment_status( $note_id, 'approve' );
 

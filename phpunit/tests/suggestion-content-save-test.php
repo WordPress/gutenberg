@@ -264,7 +264,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 	public function test_an_anchor_with_nothing_stored_fails_closed() {
 		list( $post_id, , $notes ) = $this->suggested_post();
 		foreach ( $notes as $note_id ) {
-			delete_comment_meta( $note_id, '_wp_suggestion_content' );
+			gutenberg_delete_suggestion_server_meta( (int) $note_id, '_wp_suggestion_content' );
 		}
 
 		$view = $this->edit_view( $post_id );
