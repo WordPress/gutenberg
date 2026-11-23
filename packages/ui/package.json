@@ -57,7 +57,7 @@
 		"@wordpress/warning": "file:../warning",
 		"clsx": "^2.1.1",
 		"date-fns": "^4.4.0",
-		"tabbable": "^6.4.0"
+		"tabbable": "^6.5.2"
 	},
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.6.8",
