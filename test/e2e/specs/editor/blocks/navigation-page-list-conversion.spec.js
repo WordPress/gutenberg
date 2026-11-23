@@ -90,6 +90,58 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 			.toBe( 'core/page-list' );
 	} );
 
+	test( 'a Page List that cannot be converted stays a Page List', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPage( { title: 'Alpha', status: 'publish' } );
+		// Locked against removal, so it can't be replaced by links.
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Locked menu',
+			content: '<!-- wp:page-list {"lock":{"remove":true}} /-->',
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+
+		const pageList = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		await expect( pageList.getByText( 'Alpha' ) ).toBeVisible( {
+			timeout: 10000,
+		} );
+		await expect(
+			pageList.getByRole( 'document', { name: 'Block: Page Link' } )
+		).toHaveCount( 0 );
+	} );
+
+	test( 'a Page List in a Navigation block without a menu stays a Page List', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPage( { title: 'Alpha', status: 'publish' } );
+		await admin.createNewPost();
+		// No menu to switch "Auto add new pages" on for.
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			innerBlocks: [ { name: 'core/page-list' } ],
+		} );
+
+		const pageList = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		await expect( pageList.getByText( 'Alpha' ) ).toBeVisible( {
+			timeout: 10000,
+		} );
+		await expect(
+			pageList.getByRole( 'document', { name: 'Block: Page Link' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'moving a link within the list converts it', async ( {
 		editor,
 		pageListMenu,

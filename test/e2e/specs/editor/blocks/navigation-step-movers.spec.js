@@ -130,6 +130,29 @@ test.describe( 'Navigation: moving one step', () => {
 				} );
 		} );
 
+		test( 'an item that is not a link moves past the first page too', async ( {
+			editor,
+			menuUtils,
+		} ) => {
+			const menu = await menuUtils.setUpPageListMenu(
+				'<!-- wp:home-link {"label":"Home"} /--><!-- wp:page-list /-->'
+			);
+
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Home Link',
+				} )
+			);
+			await editor.clickBlockToolbarButton( 'Move right' );
+
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( {
+					pageLists: 0,
+					tree: [ 'Alpha', 'Home', 'Charlie', 'Bravo(Bravo Team)' ],
+				} );
+		} );
+
 		test( 'one undo brings the Page List back', async ( {
 			editor,
 			page,
@@ -438,10 +461,9 @@ class MenuUtils {
 								? 'Page List'
 								: blockEditor.getBlockAttributes( clientId )
 										.label;
-						return name === 'core/navigation-link' &&
-							! children.length
-							? label
-							: `${ label }(${ tree( children ).join( ',' ) })`;
+						return name === 'core/page-list' || children.length
+							? `${ label }(${ tree( children ).join( ',' ) })`
+							: label;
 					} );
 				return {
 					pageLists:

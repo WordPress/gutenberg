@@ -122,6 +122,26 @@ describe( 'getBlockMoveDestination', () => {
 		} );
 	} );
 
+	it( 'passes a transparent block whole when it is shown collapsed', () => {
+		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+
+		expect(
+			t.destination( t.ids.a, 'down', { isExpanded: () => false } )
+		).toEqual( { rootClientId: '', index: 1 } );
+	} );
+
+	it( 'keeps a block that cannot be removed in its parent', () => {
+		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		t.dispatch.updateBlockAttributes( t.ids.a, {
+			lock: { remove: true },
+		} );
+
+		expect( t.destination( t.ids.a, 'down' ) ).toEqual( {
+			rootClientId: '',
+			index: 1,
+		} );
+	} );
+
 	it( 'enters an expanded container with children, but not an empty one', () => {
 		const isExpanded = () => true;
 

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	BlockControls,
@@ -42,10 +42,6 @@ import { unlock } from '../lock-unlock';
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
 const AUTO_ADD_PAGES_META_KEY = 'wp_navigation_auto_add_pages';
-const NAVIGATION_LINK_BLOCKS = [
-	'core/navigation-link',
-	'core/navigation-submenu',
-];
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
@@ -283,6 +279,7 @@ export default function PageListEdit( {
 		hasDraggedChild,
 		isChildOfNavigation,
 		parentOrientation,
+		canConvert,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -291,6 +288,9 @@ export default function PageListEdit( {
 				hasDraggedInnerBlock,
 				getBlockRootClientId,
 				getBlockListSettings,
+				getBlockAttributes,
+				canRemoveBlock,
+				canInsertBlockType,
 			} = select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
@@ -305,6 +305,15 @@ export default function PageListEdit( {
 				parentOrientation: getBlockListSettings(
 					getBlockRootClientId( clientId )
 				)?.orientation,
+				// Converting needs a menu to switch "Auto add new pages" on
+				// for, and must be allowed to replace the list with links.
+				canConvert:
+					!! getBlockAttributes( navigationBlockParents[ 0 ] )?.ref &&
+					canRemoveBlock( clientId ) &&
+					canInsertBlockType(
+						'core/navigation-link',
+						getBlockRootClientId( clientId )
+					),
 			};
 		},
 		[ clientId ]
@@ -326,6 +335,7 @@ export default function PageListEdit( {
 	// longer list would drop the pages past the first MAX_PAGE_COUNT.
 	const isLinkMode =
 		isChildOfNavigation &&
+		canConvert &&
 		allowConvertToLinks &&
 		totalItems !== null &&
 		totalItems <= MAX_PAGE_COUNT;
@@ -439,8 +449,12 @@ export default function PageListEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: ! isLinkMode,
 		templateLock: isChildOfNavigation ? false : 'all',
+		// The links count as the menu's own items, so anything the menu
+		// takes can go among them.
 		allowedBlocks: isLinkMode
-			? NAVIGATION_LINK_BLOCKS
+			? getBlockType( 'core/navigation' )?.allowedBlocks?.filter(
+					( name ) => name !== 'core/page-list'
+				)
 			: [ 'core/page-list-item' ],
 		// The same container settings as a Navigation Submenu, so the links
 		// get the same block actions (such as "Add before" and "Add after").

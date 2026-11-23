@@ -19,6 +19,7 @@ import {
 	getBlockRootClientId,
 	getBlockAttributes,
 	canInsertBlocks,
+	canRemoveBlocks,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -1501,7 +1502,8 @@ export type BlockMoveDestination = {
 export type BlockMoveOptions = {
 	/**
 	 * Whether a container shows its children, so that a neighbor moving
-	 * toward it goes in. In the canvas no container does.
+	 * toward it goes in. Without it (in the canvas) no container does, and
+	 * transparent blocks always count as open.
 	 */
 	isExpanded?: ( clientId: string ) => boolean;
 	/**
@@ -1532,7 +1534,7 @@ export function getBlockMoveDestination(
 	state: State,
 	clientIds: string[],
 	direction: 'up' | 'down',
-	{ isExpanded = () => false, canStepOut }: BlockMoveOptions = {}
+	{ isExpanded, canStepOut }: BlockMoveOptions = {}
 ): BlockMoveDestination | null {
 	if ( ! clientIds.length ) {
 		return null;
@@ -1540,8 +1542,13 @@ export function getBlockMoveDestination(
 	const isDown = direction === 'down';
 	const isTransparent = ( clientId: string ) =>
 		isBlockMoveTransparent( state, clientId );
+	// Blocks that can't be removed stay in their parent and step past whole
+	// blocks only.
+	const canLeave = canRemoveBlocks( state, clientIds );
 	const canEnter = ( clientId: string ) =>
-		canInsertBlocks( state, clientIds, clientId );
+		canLeave && canInsertBlocks( state, clientIds, clientId );
+	const isOpen = ( clientId: string ) =>
+		isExpanded ? isExpanded( clientId ) : isTransparent( clientId );
 	const sourceRoot = getBlockRootClientId( state, clientIds[ 0 ] ) ?? '';
 	const sourceOrder = getBlockOrder( state, sourceRoot );
 	const sourceIndex = sourceOrder.indexOf( clientIds[ 0 ] );
@@ -1561,7 +1568,11 @@ export function getBlockMoveDestination(
 		rootClientId: string,
 		neighbor: string
 	): BlockMoveDestination => {
-		if ( isTransparent( neighbor ) && canEnter( neighbor ) ) {
+		if (
+			isTransparent( neighbor ) &&
+			isOpen( neighbor ) &&
+			canEnter( neighbor )
+		) {
 			const children = getBlockOrder( state, neighbor );
 			const nearest = isDown
 				? children[ 0 ]
@@ -1570,7 +1581,7 @@ export function getBlockMoveDestination(
 				return pass( neighbor, nearest );
 			}
 		} else if (
-			isExpanded( neighbor ) &&
+			isOpen( neighbor ) &&
 			// A block with no children has nothing expanded to step into.
 			getBlockOrder( state, neighbor ).length &&
 			canEnter( neighbor )
@@ -1600,7 +1611,7 @@ export function getBlockMoveDestination(
 		return null;
 	}
 	const parentRoot = getBlockRootClientId( state, sourceRoot ) ?? '';
-	if ( ! canInsertBlocks( state, clientIds, parentRoot ) ) {
+	if ( ! canEnter( parentRoot ) ) {
 		return null;
 	}
 	const parentOrder = getBlockOrder( state, parentRoot );
