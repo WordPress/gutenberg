@@ -181,7 +181,25 @@ async function waitForImage( img ) {
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
 	'.wp-lightbox-navigation-button',
-];
+].join( ',' );
+
+/**
+ * Returns the lightbox controls that can currently take focus: the ones inside
+ * the passed overlay that are not hidden. The Previous and Next buttons are
+ * always rendered but stay hidden when there are no other images to navigate
+ * to, so they must not be part of the focus trap.
+ *
+ * @param {HTMLElement} overlay The lightbox overlay element.
+ * @return {HTMLElement[]} The focusable controls, in document order.
+ */
+function getFocusableElements( overlay ) {
+	return Array.from( overlay.querySelectorAll( focusableSelectors ) ).filter(
+		( element ) =>
+			! element.hidden &&
+			! element.disabled &&
+			( element.checkVisibility?.() ?? true )
+	);
+}
 
 /**
  * Returns the appropriate src URL for an image.
@@ -426,22 +444,37 @@ const { state, actions, callbacks } = store(
 					} else if ( event.key === 'ArrowRight' ) {
 						actions.showNextImage( event );
 					} else if ( event.key === 'Tab' ) {
-						// Traps focus within the overlay.
-						const focusableElements = Array.from(
-							document.querySelectorAll( focusableSelectors )
-						);
+						// Traps focus within the overlay, cycling only through
+						// the controls that can currently take focus.
+						const { ref: overlay } = getElement();
+						const focusableElements =
+							getFocusableElements( overlay );
+
+						if ( ! focusableElements.length ) {
+							// Keeps the focus on the overlay itself.
+							event.preventDefault();
+							return;
+						}
+
 						const firstFocusableElement = focusableElements[ 0 ];
 						const lastFocusableElement =
 							focusableElements[ focusableElements.length - 1 ];
+						// The overlay itself is focused when it opens, so the
+						// focus can be on an element that is not a control.
+						const isFocusOnControl = focusableElements.includes(
+							event.target
+						);
 						if (
 							event.shiftKey &&
-							event.target === firstFocusableElement
+							( event.target === firstFocusableElement ||
+								! isFocusOnControl )
 						) {
 							event.preventDefault();
 							lastFocusableElement.focus();
 						} else if (
 							! event.shiftKey &&
-							event.target === lastFocusableElement
+							( event.target === lastFocusableElement ||
+								! isFocusOnControl )
 						) {
 							event.preventDefault();
 							firstFocusableElement.focus();

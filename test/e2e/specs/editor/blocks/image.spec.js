@@ -1371,6 +1371,47 @@ test.describe( 'Image - lightbox', () => {
 			} );
 		} );
 
+		// Regression test for https://github.com/WordPress/gutenberg/issues/87229.
+		test( 'should keep the focus inside the overlay of a single image', async ( {
+			editor,
+			page,
+		} ) => {
+			const imageBlock = `<!-- wp:image {"id":${ uploadedMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+			<figure class="wp-block-image size-full"><img src="${ uploadedMedia.source_url }" alt="" class="wp-image-${ uploadedMedia.id }"/></figure>
+			<!-- /wp:image -->`;
+			await editor.setContent( `${ imageBlock }\n${ imageBlock }` );
+
+			const postId = await editor.publishPost();
+			await page.goto( `/?p=${ postId }` );
+
+			const overlay = page.locator( '.wp-lightbox-overlay' );
+			const closeButton = overlay.getByRole( 'button', {
+				name: 'Close',
+			} );
+
+			await page
+				.getByRole( 'button', { name: 'Enlarge', exact: true } )
+				.first()
+				.click();
+			await expect( overlay ).toHaveClass( /active/ );
+			await expect( overlay ).toBeFocused();
+
+			// Shift+Tab as the first key moves the focus to the last control.
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( closeButton ).toBeFocused();
+
+			// The Previous and Next buttons are hidden, so the Close button is
+			// the only control to cycle through.
+			await page.keyboard.press( 'Tab' );
+			await expect( closeButton ).toBeFocused();
+			await page.keyboard.press( 'Shift+Tab' );
+			await expect( closeButton ).toBeFocused();
+
+			// Escape closes the overlay because the focus never left it.
+			await page.keyboard.press( 'Escape' );
+			await expect( overlay ).not.toHaveClass( /active/ );
+		} );
+
 		test( 'should keep the overlay intact when reopened before the close cleanup runs', async ( {
 			editor,
 			page,
