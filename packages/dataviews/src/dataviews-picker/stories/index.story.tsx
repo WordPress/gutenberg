@@ -235,7 +235,6 @@ export const Default = ( {
 	/>
 );
 
-Default.tags = [ 'local-images' ];
 Default.args = storyArgs;
 Default.argTypes = storyArgTypes;
 Default.parameters = {

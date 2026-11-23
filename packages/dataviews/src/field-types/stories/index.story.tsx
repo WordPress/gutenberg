@@ -4,7 +4,7 @@ import { starFilled } from '@wordpress/icons';
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
-import { spaceImages } from '../../stories/space-images';
+import { spaceImage } from '../../dataviews/stories/fixtures';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
@@ -154,8 +154,8 @@ const data: DataType[] = [
 		urlWithElements: 'https://example.com',
 		password: 'secretpassword123',
 		passwordWithElements: 'secretpassword123',
-		media: spaceImages.moon,
-		mediaWithElements: spaceImages.moon,
+		media: spaceImage( 'moon' ),
+		mediaWithElements: spaceImage( 'moon' ),
 		array: [ 'item1', 'item2', 'item3' ],
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
@@ -478,15 +478,15 @@ const fields: Field< DataType >[] = [
 		description: 'Help for media with elements.',
 		elements: [
 			{
-				value: spaceImages.moon,
+				value: spaceImage( 'moon' ),
 				label: 'Moon',
 			},
 			{
-				value: spaceImages.mars,
+				value: spaceImage( 'mars' ),
 				label: 'Mars',
 			},
 			{
-				value: spaceImages.earth,
+				value: spaceImage( 'earth' ),
 				label: 'Earth',
 			},
 		],
@@ -1375,7 +1375,6 @@ export const MediaComponent = ( {
 		/>
 	);
 };
-MediaComponent.tags = [ 'local-images' ];
 MediaComponent.storyName = 'media';
 
 export const ArrayComponent = ( {

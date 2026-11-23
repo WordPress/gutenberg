@@ -93,7 +93,6 @@ export const LayoutTable = {
 };
 
 export const LayoutGrid = {
-	tags: [ 'local-images' ],
 	parameters: {
 		// FIXME: Grid media buttons lack names (button-name).
 		// See: https://github.com/WordPress/gutenberg/issues/81596
