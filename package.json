@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.4.0",
+	"version": "24.5.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -220,8 +220,11 @@
 		"pretypecheck": "npm run --workspace @wordpress/build-scripts generate-worker-placeholders --",
 		"typecheck": "npm run --workspace @wordpress/build-scripts typecheck --",
 		"typecheck:php": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan --",
+		"typecheck:php:default": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:default --",
+		"typecheck:php:strict": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:strict --",
 		"typecheck:php:baselines": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:baselines --",
 		"typecheck:php:fix": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix --",
+		"typecheck:php:fix:strict": "wp-env run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script phpstan:fix:strict --",
 		"wp-env": "wp-env",
 		"wp-env-test": "wp-env --config .wp-env.test.json",
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
