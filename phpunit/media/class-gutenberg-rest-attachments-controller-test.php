@@ -2453,6 +2453,39 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	}
 
 	/**
+	 * Verifies that a client side upload does not take the name of an existing
+	 * file in the output format, so the converted main file can be sideloaded
+	 * under the same base name.
+	 *
+	 * @covers ::create_item
+	 */
+	public function test_create_item_reserves_converted_file_name_when_not_generating_sub_sizes() {
+		wp_set_current_user( self::$admin_id );
+
+		copy( DIR_TESTDATA . '/images/test-image.webp', wp_upload_dir()['path'] . '/photo.webp' );
+
+		$filter = function ( $formats ) {
+			$formats['image/jpeg'] = 'image/webp';
+			return $formats;
+		};
+		add_filter( 'image_editor_output_format', $filter );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=photo.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'image_editor_output_format', $filter );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( 'photo-1.jpg', wp_basename( get_attached_file( $data['id'] ) ) );
+	}
+
+	/**
 	 * Verifies that the main file is NOT converted when the client explicitly
 	 * opts out with convert_format=false, and that image_output_format is still
 	 * recomputed accurately in the response so the client can transcode sub-sizes.

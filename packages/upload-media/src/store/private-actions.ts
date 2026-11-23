@@ -1875,10 +1875,15 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 
 			// Create and sideload the scaled version if it exceeds the threshold.
+			// When the server generated the sub-sizes, it also handled the main file.
 			let needsScaling = false;
 			{
 				const { bigImageSizeThreshold } = settings;
-				if ( bigImageSizeThreshold && attachment.id ) {
+				if (
+					bigImageSizeThreshold &&
+					attachment.id &&
+					! item.additionalData.generate_sub_sizes
+				) {
 					// Check if the image actually exceeds the threshold.
 					// Only create a scaled version for images larger than the threshold,
 					// matching WordPress core's wp_create_image_subsizes() behavior.
@@ -1952,7 +1957,11 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 
 			// Otherwise sideload the converted or rotated main file.
-			if ( ! needsScaling && attachment.id ) {
+			if (
+				! needsScaling &&
+				attachment.id &&
+				! item.additionalData.generate_sub_sizes
+			) {
 				if ( thumbnailTranscodeOperation ) {
 					const source = rotatedSource ?? thumbnailSource;
 					dispatch.addSideloadItem( {

@@ -391,7 +391,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		// The client sideloads the converted main file.
+		// The client sideloads the converted main file. This is added after the upload is
+		// stored, so wp_unique_filename() still reserves the converted file names.
 		$disable_main_file_conversion = static function () {
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		};
