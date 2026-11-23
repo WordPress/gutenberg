@@ -442,6 +442,112 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'lorem', apply_filters( 'the_content', $stored ) );
 	}
 
+	/**
+	 * Runs a callback and returns the ids of the notes its comment queries
+	 * loaded, and how many comment queries it ran.
+	 *
+	 * @param callable $callback Callback.
+	 * @return array{0: int[], 1: int} Loaded note ids, query count.
+	 */
+	private function notes_loaded_by( callable $callback ): array {
+		$loaded  = array();
+		$queries = 0;
+		$count   = static function () use ( &$queries ): void {
+			++$queries;
+		};
+		$record  = static function ( $comments ) use ( &$loaded ) {
+			foreach ( is_array( $comments ) ? $comments : array() as $comment ) {
+				$loaded[] = $comment instanceof WP_Comment ? (int) $comment->comment_ID : (int) $comment;
+			}
+			return $comments;
+		};
+		add_action( 'pre_get_comments', $count );
+		add_filter( 'the_comments', $record );
+		$callback();
+		remove_filter( 'the_comments', $record );
+		remove_action( 'pre_get_comments', $count );
+		return array( array_values( array_unique( $loaded ) ), $queries );
+	}
+
+	public function test_a_save_loads_only_the_notes_its_content_names(): void {
+		list( $post_id, $content, $notes ) = $this->suggested_post();
+		$decided                           = $this->create_note( $post_id );
+		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+		wp_set_comment_status( $decided, 'approve' );
+
+		list( $loaded ) = $this->notes_loaded_by(
+			function () use ( $post_id, $content ) {
+				$this->save( $post_id, $content . "\n\n" . $this->paragraph( 'More' ) );
+			}
+		);
+
+		$this->assertNotContains( $decided, $loaded );
+		$this->assertEqualSets( $notes, $loaded );
+		$this->assertSame( $content . "\n\n" . $this->paragraph( 'More' ), $this->edit_view( $post_id ) );
+	}
+
+	public function test_an_edit_context_response_loads_only_the_notes_its_content_names(): void {
+		list( $post_id, $content, $notes ) = $this->suggested_post();
+		$decided                           = $this->create_note( $post_id );
+		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+
+		list( $loaded ) = $this->notes_loaded_by(
+			function () use ( $post_id, $content ) {
+				$this->assertSame( $content, $this->edit_view( $post_id ) );
+			}
+		);
+
+		$this->assertEqualSets( $notes, $loaded );
+	}
+
+	public function test_a_save_of_a_post_without_suggestions_asks_for_its_notes_once(): void {
+		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
+
+		list( , $queries ) = $this->notes_loaded_by(
+			function () use ( $post_id ) {
+				$this->save( $post_id, $this->paragraph( 'Hello again' ) );
+			}
+		);
+
+		$this->assertSame( 1, $queries );
+	}
+
+	public function test_a_new_post_asks_for_no_notes(): void {
+		list( , $queries ) = $this->notes_loaded_by(
+			function () {
+				$this->create_post( $this->paragraph( 'Hello' ) );
+			}
+		);
+
+		$this->assertSame( 0, $queries );
+	}
+
+	public function test_a_post_field_decision_made_after_a_save_still_finalizes(): void {
+		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
+		$this->save( $post_id, $this->paragraph( 'Hello again' ) );
+		$note_id = $this->create_note(
+			$post_id,
+			array(
+				array(
+					'type'      => 'post-attribute-set',
+					'attribute' => 'title',
+					'before'    => 'Old',
+					'after'     => 'New title',
+				),
+			)
+		);
+		update_comment_meta( $note_id, '_wp_suggestion_status', 'applied-unsaved' );
+
+		wp_update_post(
+			array(
+				'ID'         => $post_id,
+				'post_title' => 'New title',
+			)
+		);
+
+		$this->assertSame( 'applied', get_comment_meta( $note_id, '_wp_suggestion_status', true ) );
+	}
+
 	public function test_accepting_and_saving_drops_the_stored_proposal() {
 		list( $post_id, , $notes ) = $this->suggested_post();
 		update_comment_meta( $notes[0], '_wp_suggestion_status', 'applied-unsaved' );
