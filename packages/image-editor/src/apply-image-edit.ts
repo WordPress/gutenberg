@@ -34,9 +34,11 @@ export type ApplyImageEditResult =
 
 const WHOLE_IMAGE: NormalizedRect = { x: 0, y: 0, width: 1, height: 1 };
 
-// Does `getImageEdit( state )` give back `edit`? A part left out of either
-// counts as none, and a crop left out counts as the whole image. So a
-// near-full crop, which `getImageEdit` leaves out, matches a whole crop.
+// Compares the edit `state` holds, read back with `getImageEdit`, with
+// `edit`: the same flip, rotation and crop, within tolerance. On both
+// sides a missing flip is no flip, a missing rotation is 0 degrees, and a
+// missing crop is the whole image, which is how `getImageEdit` describes a
+// crop that covers nearly all of it.
 function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 	const held = getImageEdit( state );
 	if ( ! held ) {
@@ -58,17 +60,20 @@ function holdsEdit( state: ImageEditorState, edit: ImageEdit ): boolean {
 }
 
 /**
- * The reverse of `getImageEdit`: it turns an edit into an editor state.
- * The edit replaces the current one. Only the image and the locked ratio
- * are kept from `state`. A flip or rotation the edit leaves out is none.
- * A crop it leaves out is the one the editor picks when the image is
- * rotated by hand.
+ * Builds the editor state that shows `edit`: the reverse of `getImageEdit`.
  *
- * A crop the image does not cover is fitted the way the editor fits one:
- * it shrinks around its center, keeping its shape, until the image can
- * cover it, then moves the shortest way inside. Under a locked ratio it
- * keeps its center and width. The pan and zoom are replaced: the crop is
- * centered and zoomed in, as after a resize.
+ * The result holds only the flip, rotation and crop in `edit`. Whatever
+ * `state` was showing is dropped, except its image and its locked ratio.
+ * Leave out `flip` for no flip, `rotation` for no rotation, and `crop` for
+ * the crop the editor would pick itself: the whole image, unless a fine
+ * rotation or a locked ratio shrinks it.
+ *
+ * The image must cover the crop. If it does not, the crop is fitted the
+ * same way the editor fits one: it shrinks toward its center, keeping its
+ * shape, until the image can cover it, then moves the shortest way inside.
+ * A locked ratio changes the crop's height to match and keeps its center
+ * and width. The pan and zoom are worked out again so the crop sits
+ * centered and fills the view, as after a resize.
  *
  * @param state          Only its image and locked ratio are used.
  * @param edit           The edit to apply, replacing the current one.
