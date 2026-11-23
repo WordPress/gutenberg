@@ -24,7 +24,14 @@ function render_block_core_template_part( $attributes ) {
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 	$theme            = $attributes['theme'] ?? get_stylesheet();
 
-	if ( isset( $attributes['slug'] ) && get_stylesheet() === $theme ) {
+	/*
+	 * Resolve the template part the same way the editor does: a published customized
+	 * template part saved under `$theme` is used whatever that theme's state, and
+	 * otherwise the file version, which comes from the active theme or from a plugin
+	 * that provides it through the block template filters, using its own namespace in
+	 * place of a theme (for example, `woocommerce/woocommerce`).
+	 */
+	if ( isset( $attributes['slug'] ) && is_string( $attributes['slug'] ) && is_string( $theme ) ) {
 		$template_part_id    = $theme . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
@@ -78,22 +85,27 @@ function render_block_core_template_part( $attributes ) {
 			do_action( 'render_block_core_template_part_post', $template_part_id, $attributes, $template_part_post, $content );
 		} else {
 			$template_part_file_path = '';
-			// Else, if the template part was provided by the active theme,
+			// Else, if the template part was provided by the active theme or a plugin,
 			// render the corresponding file content.
 			if ( 0 === validate_file( $attributes['slug'] ) ) {
 				$block_template = get_block_file_template( $template_part_id, 'wp_template_part' );
 
-				if ( isset( $block_template->content ) ) {
+				// `get_block_file_template()` can fall back to a registered template (`wp_template`)
+				// with the same slug, which must not be rendered as a template part.
+				if ( $block_template instanceof WP_Block_Template && 'wp_template_part' === $block_template->type ) {
 					$content = $block_template->content;
-				}
-				if ( isset( $block_template->area ) ) {
-					$area = $block_template->area;
+					if ( isset( $block_template->area ) ) {
+						$area = $block_template->area;
+					}
 				}
 
 				// Needed for the `render_block_core_template_part_file` and `render_block_core_template_part_none` actions below.
-				$block_template_file = _get_block_template_file( 'wp_template_part', $attributes['slug'] );
-				if ( $block_template_file ) {
-					$template_part_file_path = $block_template_file['path'];
+				// Only the active theme's files are read, so only its file path applies.
+				if ( get_stylesheet() === $theme ) {
+					$block_template_file = _get_block_template_file( 'wp_template_part', $attributes['slug'] );
+					if ( $block_template_file ) {
+						$template_part_file_path = $block_template_file['path'];
+					}
 				}
 			}
 

@@ -15,6 +15,12 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	// Slug that has no theme file.
 	const NO_FILE_SLUG = 'test-no-file';
 
+	// Namespace of a plugin that provides template parts through the block template filters.
+	const PLUGIN_NAMESPACE = 'test-plugin';
+
+	// A theme that isn't active (installed or deleted, the block renders the same way).
+	const OTHER_THEME = 'test-other-theme';
+
 	/**
 	 * The `get_the_terms` filter added by a test, if any.
 	 *
@@ -25,7 +31,8 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		// Stand in for the theme's `parts/` files so the tests don't depend on the active theme.
+		// Stand in for the active theme's `parts/` files, so the tests don't depend on the
+		// active theme, and for a plugin that provides template parts through this filter.
 		add_filter( 'pre_get_block_file_template', array( $this, 'filter_pre_get_block_file_template' ), 10, 3 );
 	}
 
@@ -44,7 +51,13 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	}
 
 	public function filter_pre_get_block_file_template( $block_template, $id, $template_type ) {
-		if ( 'wp_template_part' !== $template_type || get_stylesheet() . '//' . self::NO_FILE_SLUG === $id ) {
+		list( $namespace ) = explode( '//', $id, 2 );
+
+		if (
+			'wp_template_part' !== $template_type ||
+			! in_array( $namespace, array( get_stylesheet(), self::PLUGIN_NAMESPACE ), true ) ||
+			str_ends_with( $id, '//' . self::NO_FILE_SLUG )
+		) {
 			return $block_template;
 		}
 
@@ -59,16 +72,19 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Creates a customized template part post for the active theme.
+	 * Creates a customized template part post.
 	 *
-	 * @param string $slug The template part slug.
+	 * @param string      $slug   The template part slug.
+	 * @param string|null $theme  The theme (or plugin namespace) the template part belongs to.
+	 *                            Defaults to the active theme.
+	 * @param string      $status The post status.
 	 * @return int The template part post ID.
 	 */
-	private function create_template_part( $slug ) {
+	private function create_template_part( $slug, $theme = null, $status = 'publish' ) {
 		$template_part_id = wp_insert_post(
 			array(
 				'post_type'    => 'wp_template_part',
-				'post_status'  => 'publish',
+				'post_status'  => $status,
 				'post_title'   => 'Test Template Part',
 				'post_name'    => $slug,
 				'post_content' => self::POST_CONTENT,
@@ -77,9 +93,37 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $template_part_id );
 
-		wp_set_post_terms( $template_part_id, array( get_stylesheet() ), 'wp_theme' );
+		wp_set_post_terms( $template_part_id, array( $theme ?? get_stylesheet() ), 'wp_theme' );
 
 		return $template_part_id;
+	}
+
+	/**
+	 * Returns the markup of a template part block.
+	 *
+	 * @param string $slug  The template part slug.
+	 * @param mixed  $theme The `theme` attribute.
+	 * @return string The block markup.
+	 */
+	private function template_part_markup( $slug, $theme ) {
+		return '<!-- wp:template-part ' . wp_json_encode(
+			array(
+				'slug'  => $slug,
+				'theme' => $theme,
+			)
+		) . ' /-->';
+	}
+
+	/**
+	 * Returns the output of the block when the template part can't be found.
+	 *
+	 * @param string $slug The template part slug.
+	 * @return string The expected output.
+	 */
+	private function unavailable_output( $slug ) {
+		return WP_DEBUG && WP_DEBUG_DISPLAY
+			? sprintf( 'Template part has been deleted or is unavailable: %s', $slug )
+			: '';
 	}
 
 	/**
@@ -198,6 +242,113 @@ class Tests_Blocks_RenderTemplatePartBlock extends WP_UnitTestCase {
 		$this->assertSame( $expected, $output );
 		$this->assertSame( 1, $none_action->get_call_count(), 'The none action should fire once.' );
 		$this->assertSame( 1, $error_action->get_call_count(), 'One error should be reported.' );
+	}
+
+	public function test_renders_template_part_provided_by_plugin() {
+		$file_action = new MockAction();
+		add_action( 'render_block_core_template_part_file', array( $file_action, 'action' ) );
+
+		$output = do_blocks( $this->template_part_markup( 'test-plugin-part', self::PLUGIN_NAMESPACE ) );
+
+		$this->assertStringContainsString( 'Theme file template part', $output );
+		$this->assertSame( 1, $file_action->get_call_count(), 'The file action should fire once.' );
+		$this->assertSame( self::PLUGIN_NAMESPACE . '//test-plugin-part', $file_action->get_args()[0][0], 'The template part ID should use the plugin namespace.' );
+	}
+
+	public function test_renders_customized_template_part_provided_by_plugin() {
+		$this->create_template_part( 'test-plugin-customized', self::PLUGIN_NAMESPACE );
+
+		$output = do_blocks( $this->template_part_markup( 'test-plugin-customized', self::PLUGIN_NAMESPACE ) );
+
+		$this->assertStringContainsString( 'Customized template part', $output );
+		$this->assertStringNotContainsString( 'Theme file template part', $output );
+	}
+
+	public function test_does_not_render_unpublished_customized_template_part_provided_by_plugin() {
+		$this->create_template_part( 'test-plugin-draft', self::PLUGIN_NAMESPACE, 'draft' );
+
+		$output = do_blocks( $this->template_part_markup( 'test-plugin-draft', self::PLUGIN_NAMESPACE ) );
+
+		$this->assertStringNotContainsString( 'Customized template part', $output );
+		$this->assertStringContainsString( 'Theme file template part', $output, 'The default version should render in place of the draft.' );
+	}
+
+	public function test_renders_nothing_when_plugin_does_not_provide_the_template_part() {
+		$output = do_blocks( $this->template_part_markup( self::NO_FILE_SLUG, self::PLUGIN_NAMESPACE ) );
+
+		$this->assertSame( $this->unavailable_output( self::NO_FILE_SLUG ), $output );
+	}
+
+	public function test_renders_customized_template_part_of_other_theme() {
+		$this->create_template_part( 'test-other-theme-customized', self::OTHER_THEME );
+
+		$output = do_blocks( $this->template_part_markup( 'test-other-theme-customized', self::OTHER_THEME ) );
+
+		$this->assertStringContainsString( 'Customized template part', $output, 'A saved template part should render, as it does in the editor.' );
+	}
+
+	public function test_does_not_render_file_template_part_of_other_theme() {
+		$file_action = new MockAction();
+		add_action( 'render_block_core_template_part_file', array( $file_action, 'action' ) );
+
+		$output = do_blocks( $this->template_part_markup( 'test-other-theme-file', self::OTHER_THEME ) );
+
+		$this->assertSame( $this->unavailable_output( 'test-other-theme-file' ), $output, 'Only the active theme\'s files can be read.' );
+		$this->assertSame( 0, $file_action->get_call_count(), 'The file action should not fire.' );
+	}
+
+	public function test_does_not_render_registered_template_with_the_same_slug() {
+		register_block_template(
+			self::PLUGIN_NAMESPACE . '//test-registered-template',
+			array(
+				'title'   => 'Test registered template',
+				'content' => '<!-- wp:paragraph --><p>Registered template</p><!-- /wp:paragraph -->',
+			)
+		);
+
+		$output = do_blocks( $this->template_part_markup( 'test-registered-template', self::OTHER_THEME ) );
+
+		unregister_block_template( self::PLUGIN_NAMESPACE . '//test-registered-template' );
+
+		$this->assertSame( $this->unavailable_output( 'test-registered-template' ), $output, 'A template must not render as a template part.' );
+	}
+
+	/**
+	 * The render callback can be called directly with attributes that were not validated
+	 * against the block's schema, as `do_blocks()` does. A `theme` that isn't a string
+	 * must not be used.
+	 *
+	 * @dataProvider data_non_string_theme_attribute
+	 *
+	 * @param mixed $theme The `theme` attribute.
+	 */
+	public function test_render_callback_renders_nothing_for_non_string_theme( $theme ) {
+		$output = gutenberg_render_block_core_template_part(
+			array(
+				'slug'  => 'test-invalid-theme',
+				'theme' => $theme,
+			)
+		);
+
+		$this->assertSame( $this->unavailable_output( 'test-invalid-theme' ), $output );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_non_string_theme_attribute() {
+		return array(
+			'array'  => array( array( 'test-plugin' ) ),
+			'number' => array( 42 ),
+		);
+	}
+
+	public function test_renders_nothing_for_path_like_theme() {
+		$output = do_blocks( $this->template_part_markup( 'test-invalid-theme', '../test-plugin' ) );
+
+		$this->assertSame( $this->unavailable_output( 'test-invalid-theme' ), $output );
 	}
 
 	/**
