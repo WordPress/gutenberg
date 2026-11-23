@@ -47,11 +47,15 @@ function setupTwoEditors() {
 	parent.register( noticesStore );
 	parent.register( preferencesStore );
 	parent.dispatch( coreStore ).addEntities( [ postTypeConfig ] );
-	parent
-		.dispatch( coreStore )
-		.receiveEntityRecords( 'root', 'postType', [
-			{ slug: 'post', rest_base: 'posts', labels: {} },
-		] );
+	parent.dispatch( coreStore ).receiveEntityRecords( 'root', 'postType', [
+		{
+			slug: 'post',
+			rest_base: 'posts',
+			labels: {},
+			// Suggesting needs a post type that supports notes.
+			supports: { editor: [ { notes: true } ] },
+		},
+	] );
 
 	const makeEditor = ( id: number ) => {
 		const registry: any = createRegistry( {}, parent );
@@ -92,6 +96,9 @@ function directWriteLands( parent: any, id: number ): boolean {
 		value
 	);
 }
+
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
 
 describe( 'installSuggestPostEditGuard with two editors', () => {
 	beforeEach( () => {
