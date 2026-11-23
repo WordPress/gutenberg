@@ -1,6 +1,7 @@
 import { useEffect, useImperativeHandle, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Custom hook that manages the focus behavior of the post title input field.
@@ -12,11 +13,13 @@ import { store as editorStore } from '../../store';
 export default function usePostTitleFocus( forwardedRef ) {
 	const ref = useRef();
 
-	const { isCleanNewPost } = useSelect( ( select ) => {
-		const { isCleanNewPost: _isCleanNewPost } = select( editorStore );
+	const { isCleanNewPost, focusRequest } = useSelect( ( select ) => {
+		const { isCleanNewPost: _isCleanNewPost, getPostTitleFocusRequest } =
+			unlock( select( editorStore ) );
 
 		return {
 			isCleanNewPost: _isCleanNewPost(),
+			focusRequest: getPostTitleFocusRequest(),
 		};
 	}, [] );
 
@@ -45,6 +48,16 @@ export default function usePostTitleFocus( forwardedRef ) {
 			ref.current.focus();
 		}
 	}, [ isCleanNewPost ] );
+
+	// Focus on `focusPostTitle` requests made after mount, so a remount doesn't steal focus.
+	const lastFocusRequestRef = useRef( focusRequest );
+	useEffect( () => {
+		if ( focusRequest === lastFocusRequestRef.current ) {
+			return;
+		}
+		lastFocusRequestRef.current = focusRequest;
+		ref.current?.focus();
+	}, [ focusRequest ] );
 
 	return { ref };
 }

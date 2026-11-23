@@ -13,7 +13,7 @@ const TableOfContentsItem = ( {
 			event.preventDefault();
 			return;
 		}
-		onSelect();
+		onSelect( event );
 	}
 
 	return (

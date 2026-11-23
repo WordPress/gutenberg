@@ -1103,3 +1103,14 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
+
+/**
+ * Requests focus on the post title.
+ *
+ * @return {Object} Action object.
+ */
+export function focusPostTitle() {
+	return {
+		type: 'REQUEST_POST_TITLE_FOCUS',
+	};
+}

@@ -553,6 +553,17 @@ export function isNoteFocused( state ) {
 }
 
 /**
+ * Returns the post title focus request count.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The post title focus request count.
+ */
+export function getPostTitleFocusRequest( state ) {
+	return state.postTitleFocusRequest;
+}
+
+/**
  * Returns the previous revision (the one before the current revision).
  * Used for diffing between revisions.
  *

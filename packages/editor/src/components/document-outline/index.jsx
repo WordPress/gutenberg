@@ -8,6 +8,7 @@ import { Path, SVG, Line, Rect } from '@wordpress/components';
 import DocumentOutlineItem from './item';
 import { store as editorStore } from '../../store';
 import { DESIGN_POST_TYPES } from '../../store/constants';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Module constants
@@ -104,6 +105,7 @@ export default function DocumentOutline( {
 	hasOutlineItemsDisabled,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
+	const { focusPostTitle } = unlock( useDispatch( editorStore ) );
 	const { title, isTitleSupported, isTitleRendered } = useSelect(
 		( select ) => {
 			const { getEditedPostAttribute, getRenderingMode } =
@@ -190,8 +192,13 @@ export default function DocumentOutline( {
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onSelect={ onSelect }
 						href="#"
+						onSelect={ ( event ) => {
+							// The title may be in the canvas iframe, so an anchor can't reach it.
+							event.preventDefault();
+							focusPostTitle();
+							onSelect?.();
+						} }
 						isDisabled={ hasOutlineItemsDisabled }
 					>
 						{ title }

@@ -526,6 +526,21 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer counting post title focus requests, so repeated requests are detected.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function postTitleFocusRequest( state = 0, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_TITLE_FOCUS':
+			return state + 1;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	postId,
 	postType,
@@ -554,5 +569,6 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
+	postTitleFocusRequest,
 	dataviews: dataviewsReducer,
 } );
