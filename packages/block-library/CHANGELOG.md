@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Table: Let themes set the row color of the Stripes style with the `--wp--style--table-stripe-color` custom property, so it stays readable on dark backgrounds ([#87120](https://github.com/WordPress/gutenberg/pull/87120)).
+-   Table: Make the Stripes style follow the text color so it stays readable on dark backgrounds, and let themes set the row color with the `--wp--style--table-stripe-color` custom property ([#87120](https://github.com/WordPress/gutenberg/pull/87120)).
 
 ### Bug Fixes
 
