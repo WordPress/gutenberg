@@ -18,6 +18,8 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getBlock,
+	canEditBlock,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -50,6 +52,28 @@ const { isContentBlock, editableRootKey } = unlock( blocksPrivateApis );
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
 
 export { getBlockSettings } from './get-block-settings';
+
+/**
+ * Checks that every target permits visibility edits, including mixed-parent selections.
+ *
+ * @param state     Editor state.
+ * @param clientIds Blocks whose visibility would change.
+ * @return Whether all blocks support visibility and permit default-mode edits.
+ */
+export function canEditBlocksVisibility( state: State, clientIds: string[] ) {
+	return (
+		clientIds.length > 0 &&
+		clientIds.every( ( id ) => {
+			const block = getBlock( state, id );
+			return (
+				!! block &&
+				getBlockEditingMode( state, id ) === 'default' &&
+				canEditBlock( state, id ) &&
+				hasBlockSupport( block.name, 'visibility', true )
+			);
+		} )
+	);
+}
 
 function isViewportAvailable( state: State, viewport: string ) {
 	if ( viewport === BLOCK_VISIBILITY_VIEWPORTS.desktop.key ) {
