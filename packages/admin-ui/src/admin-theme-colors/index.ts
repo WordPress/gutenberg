@@ -20,7 +20,7 @@ export const ADMIN_THEME_COLORS = new Map< string, AdminThemeColors >( [
 	[ 'ocean', { primary: '#537555', background: '#5f787f' } ],
 	[ 'blue', { primary: '#3e719c', background: '#3876a8' } ],
 	[ 'ectoplasm', { primary: '#646c3e', background: '#4f386e' } ],
-	[ 'sunrise', { primary: '#a35d1c', background: '#cc4541' } ],
+	[ 'sunrise', { primary: '#9d5a1b', background: '#cc4541' } ],
 	[ 'light', { primary: '#007cba', background: '#eaeeed' } ],
 ] );
 

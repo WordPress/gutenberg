@@ -82,11 +82,12 @@ $swatch-gap: 12px;
 .block-editor-panel-color-gradient-settings__contrast-notice {
 	margin-top: $grid-unit-20;
 
-	// Holds the space of the notice while there is no warning, so the popover
-	// keeps its height. Sized for the notice's three lines of text.
+	// Reserve the space of the notice's three lines of text, whether or not a
+	// warning shows, so the popover keeps its height and doesn't jump.
+	min-height: 90px;
+
 	&.is-placeholder {
 		visibility: hidden;
-		min-height: 90px;
 	}
 }
 
