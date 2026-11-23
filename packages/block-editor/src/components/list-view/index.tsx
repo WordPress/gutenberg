@@ -9,10 +9,11 @@ import {
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
-import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useRegistry, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useReducer,
@@ -34,6 +35,7 @@ import useListViewCollapseItems from './use-list-view-collapse-items';
 import useListViewDropZone from './use-list-view-drop-zone';
 import useListViewExpandSelectedItem from './use-list-view-expand-selected-item';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dropdown';
 import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
@@ -153,6 +155,27 @@ function ListViewComponent(
 	const { updateBlockSelection } = useBlockSelection();
 
 	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
+
+	// One-step moves from a row's menu follow what this List View shows: a
+	// neighbor that is expanded here is entered, and a block can move out of
+	// any parent but the List View's root.
+	const expansionStateRef = useRef( expansionState );
+	useEffect( () => {
+		expansionStateRef.current = expansionState;
+	}, [ expansionState ] );
+	const registry = useRegistry();
+	const getMoveDestination = useCallback(
+		( clientIds: string[], direction: 'up' | 'down' ) =>
+			unlock(
+				registry.select( blockEditorStore )
+			).getBlockMoveDestination( clientIds, direction, {
+				isExpanded: ( clientId: string ) =>
+					expansionStateRef.current[ clientId ] ?? isExpanded,
+				canStepOut: ( clientId: string ) =>
+					clientId !== ( rootClientId ?? '' ),
+			} ),
+		[ registry, isExpanded, rootClientId ]
+	);
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
 		string | null
@@ -330,6 +353,7 @@ function ListViewComponent(
 		() => ( {
 			AdditionalBlockContent,
 			BlockSettingsMenu,
+			getMoveDestination,
 			listViewInstanceId: instanceId,
 			rootClientId,
 			setInsertedBlockClientId,
@@ -339,6 +363,7 @@ function ListViewComponent(
 		[
 			AdditionalBlockContent,
 			BlockSettingsMenu,
+			getMoveDestination,
 			instanceId,
 			rootClientId,
 			setInsertedBlockClientId,

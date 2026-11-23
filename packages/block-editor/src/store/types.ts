@@ -592,6 +592,7 @@ export interface State {
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
+	moveTransparentBlocks: Record< string, true >;
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
 	editedContentOnlySection: string | undefined;
@@ -744,6 +745,11 @@ export type Action =
 			mode: BlockEditingMode;
 	  }
 	| { type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW'; clientId: string | null }
+	| {
+			type: 'SET_BLOCK_MOVE_TRANSPARENT';
+			clientId: string;
+			isTransparent: boolean;
+	  }
 	| {
 			type: 'SET_BLOCK_REMOVAL_RULES';
 			rules: BlockRemovalRule[] | false;

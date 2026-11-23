@@ -2096,6 +2096,32 @@ export function expandedBlock(
 }
 
 /**
+ * Reducer returning the blocks that one-step moves treat as transparent: their
+ * children count as siblings of the blocks around them.
+ *
+ * @param state  Current state.
+ * @param action Dispatched action.
+ *
+ * @return Updated state.
+ */
+export function moveTransparentBlocks(
+	state: State[ 'moveTransparentBlocks' ] = {},
+	action: Action
+) {
+	if ( action.type !== 'SET_BLOCK_MOVE_TRANSPARENT' ) {
+		return state;
+	}
+	if ( action.isTransparent === !! state[ action.clientId ] ) {
+		return state;
+	}
+	if ( action.isTransparent ) {
+		return { ...state, [ action.clientId ]: true as const };
+	}
+	const { [ action.clientId ]: _removed, ...rest } = state;
+	return rest;
+}
+
+/**
  * Reducer returning the block insertion event list state.
  *
  * @param state  Current state.
@@ -2576,6 +2602,7 @@ const combinedReducers = combineReducers( {
 	lastBlockAttributesChange,
 	lastFocus,
 	expandedBlock,
+	moveTransparentBlocks,
 	highlightedBlock,
 	lastBlockInserted,
 	editedContentOnlySection,

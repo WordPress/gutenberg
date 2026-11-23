@@ -16,6 +16,7 @@ import {
 import type { MouseEvent } from 'react';
 import { getBlockMoverDescription } from './mover-description';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 import type {
 	BlockMoverButtonProps,
 	BlockMoverDirection,
@@ -91,7 +92,8 @@ const BlockMoverButton = forwardRef<
 					getBlockOrder,
 					getBlock,
 					getBlockListSettings,
-				} = select( blockEditorStore );
+					getBlockMoveDestination,
+				} = unlock( select( blockEditorStore ) );
 				const firstClientId = normalizedClientIds[ 0 ];
 				const blockRootClientId = getBlockRootClientId( firstClientId );
 				const firstBlockIndex = getBlockIndex( firstClientId );
@@ -109,7 +111,10 @@ const BlockMoverButton = forwardRef<
 					blockType: block ? getBlockType( block.name ) : null,
 					isDisabled:
 						! firstClientId ||
-						( direction === 'up' ? isFirstBlock : isLastBlock ),
+						! getBlockMoveDestination(
+							normalizedClientIds,
+							direction
+						),
 					rootClientId: blockRootClientId,
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,

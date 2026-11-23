@@ -2,8 +2,22 @@ import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import { unlock } from '@wordpress/routes-lock-unlock';
+
+type MoveDestination = { rootClientId: string; index: number } | null;
+
+const { useListViewMoveDestination } = unlock( blockEditorPrivateApis ) as {
+	useListViewMoveDestination: () => (
+		clientIds: string[],
+		direction: 'up' | 'down'
+	) => MoveDestination;
+};
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -16,9 +30,9 @@ export default function LeafMoreMenu( {
 }: {
 	clientId: string;
 } ) {
+	const getMoveDestination = useListViewMoveDestination();
 	const {
-		moveBlocksDown,
-		moveBlocksUp,
+		moveBlocksToPosition,
 		removeBlocks,
 		duplicateBlocks,
 		insertBeforeBlock,
@@ -32,49 +46,39 @@ export default function LeafMoreMenu( {
 		BlockTitle( { clientId, maximumLength: 25 } ) as string
 	);
 
-	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockName,
-					canInsertBlockType,
-					getDirectInsertBlock,
-					getBlockIndex,
-					getBlockCount,
-				} = select( blockEditorStore );
-				const { getDefaultBlockName } = select( blocksStore );
+	const { rootClientId, canDuplicate, canInsertBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockName,
+				canInsertBlockType,
+				getDirectInsertBlock,
+			} = select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-				const _rootClientId = getBlockRootClientId( clientId );
-				const _blockName = getBlockName( clientId );
-				const canInsertDefaultBlock = canInsertBlockType(
-					getDefaultBlockName(),
-					_rootClientId
-				);
-				const directInsertBlock = _rootClientId
-					? getDirectInsertBlock( _rootClientId )
-					: null;
+			const _rootClientId = getBlockRootClientId( clientId );
+			const _blockName = getBlockName( clientId );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
 
-				return {
-					rootClientId: _rootClientId,
-					canDuplicate:
-						// The menu is for an existing block, which has a name.
-						hasBlockSupport(
-							_blockName as string,
-							'multiple',
-							true
-						) && canInsertBlockType( _blockName, _rootClientId ),
-					canInsertBlock:
-						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
-					isFirst: getBlockIndex( clientId ) === 0,
-					isLast:
-						getBlockIndex( clientId ) ===
-						getBlockCount( _rootClientId ) - 1,
-				};
-			},
-			[ clientId ]
-		);
+			return {
+				rootClientId: _rootClientId,
+				canDuplicate:
+					// The menu is for an existing block, which has a name.
+					hasBlockSupport( _blockName as string, 'multiple', true ) &&
+					canInsertBlockType( _blockName, _rootClientId ),
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					canInsertBlockType( _blockName, _rootClientId ),
+			};
+		},
+		[ clientId ]
+	);
 
 	return (
 		<DropdownMenu
@@ -85,72 +89,83 @@ export default function LeafMoreMenu( {
 			noIcons
 			{ ...props }
 		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							disabled={ isFirst }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							disabled={ isLast }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move down' ) }
-						</MenuItem>
-						{ canDuplicate && (
+			{ ( { onClose } ) => {
+				// Read when the menu opens, so the moves follow the rows the
+				// List View shows expanded right now.
+				const moveUpTo = getMoveDestination( [ clientId ], 'up' );
+				const moveDownTo = getMoveDestination( [ clientId ], 'down' );
+				const move = ( destination: MoveDestination ) => {
+					if ( destination ) {
+						moveBlocksToPosition(
+							[ clientId ],
+							rootClientId,
+							destination.rootClientId,
+							destination.index
+						);
+					}
+					onClose();
+				};
+				return (
+					<>
+						<MenuGroup>
+							<MenuItem
+								icon={ chevronUp }
+								disabled={ ! moveUpTo }
+								onClick={ () => move( moveUpTo ) }
+							>
+								{ __( 'Move up' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ chevronDown }
+								disabled={ ! moveDownTo }
+								onClick={ () => move( moveDownTo ) }
+							>
+								{ __( 'Move down' ) }
+							</MenuItem>
+							{ canDuplicate && (
+								<MenuItem
+									onClick={ () => {
+										duplicateBlocks( [ clientId ] );
+										onClose();
+									} }
+								>
+									{ __( 'Duplicate' ) }
+								</MenuItem>
+							) }
+							{ canInsertBlock && (
+								<>
+									<MenuItem
+										onClick={ () => {
+											insertBeforeBlock( clientId );
+											onClose();
+										} }
+									>
+										{ __( 'Add before' ) }
+									</MenuItem>
+									<MenuItem
+										onClick={ () => {
+											insertAfterBlock( clientId );
+											onClose();
+										} }
+									>
+										{ __( 'Add after' ) }
+									</MenuItem>
+								</>
+							) }
+						</MenuGroup>
+						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
-									duplicateBlocks( [ clientId ] );
+									removeBlocks( [ clientId ], false );
 									onClose();
 								} }
 							>
-								{ __( 'Duplicate' ) }
+								{ removeLabel }
 							</MenuItem>
-						) }
-						{ canInsertBlock && (
-							<>
-								<MenuItem
-									onClick={ () => {
-										insertBeforeBlock( clientId );
-										onClose();
-									} }
-								>
-									{ __( 'Add before' ) }
-								</MenuItem>
-								<MenuItem
-									onClick={ () => {
-										insertAfterBlock( clientId );
-										onClose();
-									} }
-								>
-									{ __( 'Add after' ) }
-								</MenuItem>
-							</>
-						) }
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
+						</MenuGroup>
+					</>
+				);
+			} }
 		</DropdownMenu>
 	);
 }

@@ -16,6 +16,14 @@ ListViewContext.displayName = 'ListViewContext';
 export const useListViewContext = () => useContext( ListViewContext );
 
 /**
+ * Returns a function that tells where moving blocks one step up or down
+ * lands in the surrounding List View, following which rows it shows
+ * expanded. Use it from a custom row menu (`blockSettingsMenu`).
+ */
+export const useListViewMoveDestination = () =>
+	useContext( ListViewContext ).getMoveDestination;
+
+/**
  * Expansion and drag state. Only `ListViewBranch` reads it, so the frequent
  * updates during a drag stop short of the individual rows.
  */

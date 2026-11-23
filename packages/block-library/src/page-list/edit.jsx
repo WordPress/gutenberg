@@ -20,7 +20,13 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import {
@@ -29,6 +35,7 @@ import {
 } from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import { unlock } from '../lock-unlock';
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -273,12 +280,15 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		parentOrientation,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getBlockRootClientId,
+				getBlockListSettings,
 			} = select( blockEditorStore );
 			const navigationBlockParents = getBlockParentsByBlockName(
 				clientId,
@@ -290,6 +300,9 @@ export default function PageListEdit( {
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
+				parentOrientation: getBlockListSettings(
+					getBlockRootClientId( clientId )
+				)?.orientation,
 			};
 		},
 		[ clientId ]
@@ -354,8 +367,30 @@ export default function PageListEdit( {
 	);
 
 	const registry = useRegistry();
-	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+	const {
+		replaceBlock,
+		selectBlock,
+		setBlockMoveTransparent,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = unlock( useDispatch( blockEditorStore ) );
+
+	// The links sit in line with the menu's other items, so one-step moves
+	// (the block movers) pass them one at a time instead of jumping the
+	// whole list, and an edge link can move out.
+	useEffect( () => {
+		if ( ! isLinkMode ) {
+			return;
+		}
+		setBlockMoveTransparent( clientId, true );
+		return () => setBlockMoveTransparent( clientId, false );
+	}, [ isLinkMode, clientId, setBlockMoveTransparent ] );
 	const { editEntityRecord } = useDispatch( coreStore );
+
+	// The Navigation block's blocks as of the last change, to tell whether
+	// a change reached past the list (a link moved in or out). The
+	// Navigation block records such a change in its undo history before the
+	// list hears of it, while a change inside the list is the list's alone.
+	const navigationBlocksRef = useRef();
 
 	const convertOnChange = useCallback( () => {
 		const { getBlocks, getBlockAttributes } =
@@ -363,6 +398,11 @@ export default function PageListEdit( {
 		const menuId = getBlockAttributes( parentClientId )?.ref;
 		// The store's own blocks, so the selected block keeps its client ID.
 		const links = getBlocks( clientId );
+		// When the Navigation block already recorded the change, the
+		// conversion joins its undo level, so one undo reverts both.
+		if ( getBlocks( parentClientId ) !== navigationBlocksRef.current ) {
+			__unstableMarkNextChangeAsNotPersistent();
+		}
 		replaceBlock( clientId, links );
 		if ( ! menuId ) {
 			return;
@@ -380,7 +420,14 @@ export default function PageListEdit( {
 				{ isCached: true }
 			);
 		} );
-	}, [ registry, clientId, parentClientId, editEntityRecord, replaceBlock ] );
+	}, [
+		registry,
+		clientId,
+		parentClientId,
+		editEntityRecord,
+		replaceBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
@@ -393,11 +440,26 @@ export default function PageListEdit( {
 		// get the same block actions (such as "Add before" and "Add after").
 		defaultBlock: isLinkMode ? DEFAULT_BLOCK : undefined,
 		directInsert: isLinkMode,
+		// Laid out like the menu's own items, so the movers point the same way.
+		orientation: isLinkMode ? parentOrientation : undefined,
 		__experimentalCaptureToolbars: isLinkMode,
 		onInput: NOOP,
 		onChange: isLinkMode ? convertOnChange : NOOP,
 		value: isLinkMode ? ( navigationLinks ?? [] ) : blockList,
 	} );
+
+	// Subscribed after the list's own block sync (in `useInnerBlocksProps`),
+	// so the conversion still sees the value from before the change.
+	useEffect( () => {
+		if ( ! isLinkMode ) {
+			return;
+		}
+		const { getBlocks } = registry.select( blockEditorStore );
+		navigationBlocksRef.current = getBlocks( parentClientId );
+		return registry.subscribe( () => {
+			navigationBlocksRef.current = getBlocks( parentClientId );
+		}, blockEditorStore );
+	}, [ registry, isLinkMode, parentClientId ] );
 
 	useEffect( () => {
 		if ( isLinkMode ) {

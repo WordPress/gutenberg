@@ -97,7 +97,7 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		const menu = await pageListMenu.setUp();
 
 		await pageListMenu.selectLink( 'Bravo' );
-		await editor.clickBlockToolbarButton( 'Move up' );
+		await editor.clickBlockToolbarButton( 'Move left' );
 
 		await expect
 			.poll( () => pageListMenu.getState( menu.id ) )

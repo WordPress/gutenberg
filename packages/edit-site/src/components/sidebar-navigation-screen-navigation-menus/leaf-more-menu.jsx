@@ -3,7 +3,11 @@ import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	BlockTitle,
+	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
+} from '@wordpress/block-editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -12,12 +16,14 @@ const POPOVER_PROPS = {
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { useListViewMoveDestination } = unlock( blockEditorPrivateApis );
 
 export default function LeafMoreMenu( props ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const { clientId } = props;
-	const { moveBlocksDown, moveBlocksUp, removeBlocks } =
+	const getMoveDestination = useListViewMoveDestination();
+	const { moveBlocksToPosition, removeBlocks } =
 		useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
@@ -76,50 +82,63 @@ export default function LeafMoreMenu( props ) {
 			noIcons
 			{ ...props }
 		>
-			{ ( { onClose } ) => (
-				<>
-					<MenuGroup>
-						<MenuItem
-							icon={ chevronUp }
-							onClick={ () => {
-								moveBlocksUp( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move up' ) }
-						</MenuItem>
-						<MenuItem
-							icon={ chevronDown }
-							onClick={ () => {
-								moveBlocksDown( [ clientId ], rootClientId );
-								onClose();
-							} }
-						>
-							{ __( 'Move down' ) }
-						</MenuItem>
-						{ attributes?.type === 'page' && attributes?.id && (
+			{ ( { onClose } ) => {
+				// Read when the menu opens, so the moves follow the rows the
+				// List View shows expanded right now.
+				const moveUpTo = getMoveDestination( [ clientId ], 'up' );
+				const moveDownTo = getMoveDestination( [ clientId ], 'down' );
+				const move = ( destination ) => {
+					moveBlocksToPosition(
+						[ clientId ],
+						rootClientId,
+						destination.rootClientId,
+						destination.index
+					);
+					onClose();
+				};
+				return (
+					<>
+						<MenuGroup>
+							<MenuItem
+								icon={ chevronUp }
+								disabled={ ! moveUpTo }
+								accessibleWhenDisabled
+								onClick={ () => move( moveUpTo ) }
+							>
+								{ __( 'Move up' ) }
+							</MenuItem>
+							<MenuItem
+								icon={ chevronDown }
+								disabled={ ! moveDownTo }
+								accessibleWhenDisabled
+								onClick={ () => move( moveDownTo ) }
+							>
+								{ __( 'Move down' ) }
+							</MenuItem>
+							{ attributes?.type === 'page' && attributes?.id && (
+								<MenuItem
+									onClick={ () => {
+										onGoToPage();
+										onClose();
+									} }
+								>
+									{ goToLabel }
+								</MenuItem>
+							) }
+						</MenuGroup>
+						<MenuGroup>
 							<MenuItem
 								onClick={ () => {
-									onGoToPage();
+									removeBlocks( [ clientId ], false );
 									onClose();
 								} }
 							>
-								{ goToLabel }
+								{ removeLabel }
 							</MenuItem>
-						) }
-					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								removeBlocks( [ clientId ], false );
-								onClose();
-							} }
-						>
-							{ removeLabel }
-						</MenuItem>
-					</MenuGroup>
-				</>
-			) }
+						</MenuGroup>
+					</>
+				);
+			} }
 		</DropdownMenu>
 	);
 }
