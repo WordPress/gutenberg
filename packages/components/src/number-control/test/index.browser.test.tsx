@@ -16,7 +16,12 @@ function StatefulNumberControl( { disabled }: { disabled?: boolean } ) {
 	);
 }
 
-function dragInput( input: Element, pointerType: 'touch' | 'mouse' ) {
+async function dragInput(
+	input: Element,
+	pointerType: 'touch' | 'mouse',
+	yList: number[] = [ 100, 80, 40 ],
+	moveCallbacks?: Record< string, () => Promise< void > >
+) {
 	const pointer = {
 		pointerId: 1,
 		pointerType,
@@ -25,11 +30,13 @@ function dragInput( input: Element, pointerType: 'touch' | 'mouse' ) {
 		buttons: 1,
 		clientX: 50,
 	};
-
-	fireEvent.pointerDown( input, { ...pointer, clientY: 100 } );
-	fireEvent.pointerMove( window, { ...pointer, clientY: 80 } );
-	fireEvent.pointerMove( window, { ...pointer, clientY: 40 } );
-	fireEvent.pointerUp( window, { ...pointer, clientY: 40, buttons: 0 } );
+	let [ y, ...yMoves ] = yList;
+	fireEvent.pointerDown( input, { ...pointer, clientY: y } );
+	for await ( y of yMoves ) {
+		fireEvent.pointerMove( window, { ...pointer, clientY: y } );
+		await moveCallbacks?.[ y ]?.();
+	}
+	fireEvent.pointerUp( window, { ...pointer, clientY: y, buttons: 0 } );
 }
 
 describe( 'NumberControl drag to change value', () => {
@@ -60,6 +67,39 @@ describe( 'NumberControl drag to change value', () => {
 		await expect.element( input ).toHaveValue( 5 );
 	} );
 
+	it( 'does not change the value when dragged with mouse within a disabled parent', async () => {
+		const screen = await render(
+			<fieldset disabled>
+				<StatefulNumberControl />
+			</fieldset>
+		);
+		const input = screen.getByRole( 'spinbutton' );
+
+		dragInput( input.element(), 'mouse' );
+
+		await expect.element( input ).toHaveValue( 5 );
+	} );
+
+	it( 'interrupts a drag when a parent becomes disabled', async () => {
+		function Disabler( { disabled }: { disabled?: boolean } ) {
+			return (
+				<fieldset disabled={ disabled }>
+					<StatefulNumberControl />
+				</fieldset>
+			);
+		}
+		const screen = await render( <Disabler /> );
+		const renderDisabled = async () =>
+			await screen.rerender( <Disabler disabled /> );
+		const input = screen.getByRole( 'spinbutton' );
+
+		await dragInput( input.element(), 'mouse', [ 100, 80, 40 ], {
+			'80': renderDisabled,
+		} );
+
+		await expect.element( input ).toHaveValue( 15 );
+	} );
+
 	it( 'normalizes drag multiplication for fractional values with spinFactor without floating-point inaccuracies', async () => {
 		function DragFractionalControl() {
 			const [ value, setValue ] = useState< string | number | undefined >(
@@ -80,19 +120,8 @@ describe( 'NumberControl drag to change value', () => {
 		const screen = await render( <DragFractionalControl /> );
 		const input = screen.getByRole( 'spinbutton' );
 
-		const pointer = {
-			pointerId: 1,
-			pointerType: 'mouse' as const,
-			isPrimary: true,
-			button: 0,
-			buttons: 1,
-			clientX: 50,
-		};
-
 		// Drag 6px upwards (delta of -6 for north direction modifier -1 => +0.6).
-		fireEvent.pointerDown( input.element(), { ...pointer, clientY: 100 } );
-		fireEvent.pointerMove( window, { ...pointer, clientY: 94 } );
-		fireEvent.pointerUp( window, { ...pointer, clientY: 94, buttons: 0 } );
+		dragInput( input.element(), 'mouse', [ 6, 0 ] );
 
 		await expect.element( input ).toHaveValue( 0.9 );
 	} );
