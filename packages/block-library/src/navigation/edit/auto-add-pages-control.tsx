@@ -7,7 +7,34 @@ const META_KEY = 'wp_navigation_auto_add_pages';
 
 type NavigationMenuRecord = {
 	meta?: Record< string, unknown >;
+	content?: unknown;
+	blocks?: { name: string; innerBlocks: unknown[] }[];
 };
+
+type BlockLike = { name: string; innerBlocks: BlockLike[] };
+
+function hasPageList( blocks: BlockLike[] ): boolean {
+	return blocks.some(
+		( block ) =>
+			block.name === 'core/page-list' || hasPageList( block.innerBlocks )
+	);
+}
+
+/**
+ * Whether a menu holds a Page List block, which already shows every page, so
+ * the "Auto add new pages" setting does not apply to it.
+ *
+ * @param record The edited menu record.
+ */
+function menuHasPageList( record?: NavigationMenuRecord ) {
+	if ( record?.blocks ) {
+		return hasPageList( record.blocks as BlockLike[] );
+	}
+	return (
+		typeof record?.content === 'string' &&
+		record.content.includes( '<!-- wp:page-list' )
+	);
+}
 
 type Props = {
 	/** The `wp_navigation` post the block displays. */
@@ -25,7 +52,7 @@ type Props = {
  * @param props.menuId
  */
 export default function AutoAddPagesControl( { menuId }: Props ) {
-	const { canUpdate, isEnabled } = useSelect(
+	const { canUpdate, isEnabled, isBlockedByPageList } = useSelect(
 		( select ) => {
 			const { canUser, getEditedEntityRecord } = select( coreStore );
 			const record = getEditedEntityRecord(
@@ -40,13 +67,16 @@ export default function AutoAddPagesControl( { menuId }: Props ) {
 					id: menuId,
 				} ),
 				isEnabled: !! record?.meta?.[ META_KEY ],
+				isBlockedByPageList: menuHasPageList( record ),
 			};
 		},
 		[ menuId ]
 	);
 	const { editEntityRecord } = useDispatch( coreStore );
 
-	if ( ! canUpdate ) {
+	// A Page List already shows every page, so the setting has no use until
+	// the list is turned into links.
+	if ( ! canUpdate || isBlockedByPageList ) {
 		return null;
 	}
 
@@ -61,7 +91,7 @@ export default function AutoAddPagesControl( { menuId }: Props ) {
 			<SwitchControl
 				label={ __( 'Auto add new pages' ) }
 				description={ __(
-					'Pages published from now on are added to this menu. Existing pages are not.'
+					'Adds pages to this navigation when they are published.'
 				) }
 				checked={ isEnabled }
 				onCheckedChange={ setEnabled }

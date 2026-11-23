@@ -1715,8 +1715,10 @@ test.describe( 'Navigation block', () => {
 			} );
 			await expect( pageListBlock ).toBeVisible();
 
-			// Verify pages are shown in the list
-			const pageItems = pageListBlock.locator( 'li' );
+			// Verify pages are shown in the list, as Page Links.
+			const pageItems = pageListBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} );
 
 			// Wait for Page List to load pages
 			await pageItems.first().waitFor( { state: 'visible' } );

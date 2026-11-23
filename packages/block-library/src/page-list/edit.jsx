@@ -20,16 +20,25 @@ import {
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo, useState, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useConvertToNavigationLinks } from './use-convert-to-navigation-links';
+import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	convertToNavigationLinks as buildNavigationLinks,
+	useConvertToNavigationLinks,
+} from './use-convert-to-navigation-links';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { DEFAULT_BLOCK } from '../navigation/constants';
 
 // We only show the detach option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
 const MAX_PAGE_COUNT = 100;
 const NOOP = () => {};
+const AUTO_ADD_PAGES_META_KEY = 'wp_navigation_auto_add_pages';
+const NAVIGATION_LINK_BLOCKS = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
 
 // Shown from both the block toolbar and the Settings panel so the two entry
 // points explain the change identically.
@@ -133,19 +142,19 @@ export default function PageListEdit( {
 	const [ isConfirmingDetach, setIsConfirmingDetach ] = useState( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
-		'postType',
-		'page',
-		{
-			per_page: MAX_PAGE_COUNT,
-			_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
-			// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
-			// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
-			// sort.
-			orderby: 'menu_order',
-			order: 'asc',
-		}
-	);
+	const {
+		records: pages,
+		hasResolved: hasResolvedPages,
+		totalItems,
+	} = useEntityRecords( 'postType', 'page', {
+		per_page: MAX_PAGE_COUNT,
+		_fields: [ 'id', 'link', 'menu_order', 'parent', 'title', 'type' ],
+		// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+		// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+		// sort.
+		orderby: 'menu_order',
+		order: 'asc',
+	} );
 
 	const allowConvertToLinks =
 		'showSubmenuIcon' in context &&
@@ -293,23 +302,128 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
+	// Inside a Navigation block, the pages show as editable Navigation Links.
+	// The block stays a live Page List until one of them is changed (moved,
+	// removed, edited, or a block is dropped among them). Then the Page List
+	// is replaced by the links as they are after that change, and the menu's
+	// "Auto add new pages" setting is switched on so new pages keep arriving.
+	// The query stops at MAX_PAGE_COUNT, so the total decides: converting a
+	// longer list would drop the pages past the first MAX_PAGE_COUNT.
+	const isLinkMode =
+		isChildOfNavigation &&
+		allowConvertToLinks &&
+		totalItems !== null &&
+		totalItems <= MAX_PAGE_COUNT;
+
+	// The pages query hands back a new array whenever any page record is
+	// received (the links' bindings fetch each page), even with the same
+	// data. Rebuilding the links then replaces them with new client IDs and
+	// drops a selection made in between, so rebuild only on a real change.
+	const pagesKey = useMemo(
+		() =>
+			pages
+				? JSON.stringify(
+						pages.map( ( { id, parent, link, type, title } ) => [
+							id,
+							parent,
+							link,
+							type,
+							title?.rendered,
+						] )
+					)
+				: null,
+		[ pages ]
+	);
+	const navigationLinks = useMemo(
+		() =>
+			isLinkMode && hasResolvedPages && pagesKey
+				? buildNavigationLinks(
+						JSON.parse( pagesKey ).map(
+							( [ id, parent, link, type, title ] ) => ( {
+								id,
+								parent,
+								link,
+								type,
+								title: { rendered: title },
+							} )
+						),
+						parentPageID
+					)
+				: null,
+		[ isLinkMode, hasResolvedPages, pagesKey, parentPageID ]
+	);
+
+	const registry = useRegistry();
+	const { replaceBlock, selectBlock } = useDispatch( blockEditorStore );
+	const { editEntityRecord } = useDispatch( coreStore );
+
+	const convertOnChange = useCallback( () => {
+		const { getBlocks, getBlockAttributes } =
+			registry.select( blockEditorStore );
+		const menuId = getBlockAttributes( parentClientId )?.ref;
+		// The store's own blocks, so the selected block keeps its client ID.
+		const links = getBlocks( clientId );
+		replaceBlock( clientId, links );
+		if ( ! menuId ) {
+			return;
+		}
+		// This runs inside the block sync's batch, so the menu records the
+		// block change only once the batch ends. A cached edit joins the
+		// latest undo level, so make it after that level exists: then one
+		// undo reverts both the conversion and the setting.
+		Promise.resolve().then( () => {
+			editEntityRecord(
+				'postType',
+				'wp_navigation',
+				menuId,
+				{ meta: { [ AUTO_ADD_PAGES_META_KEY ]: true } },
+				{ isCached: true }
+			);
+		} );
+	}, [ registry, clientId, parentClientId, editEntityRecord, replaceBlock ] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		renderAppender: false,
-		__unstableDisableDropZone: true,
+		__unstableDisableDropZone: ! isLinkMode,
 		templateLock: isChildOfNavigation ? false : 'all',
+		allowedBlocks: isLinkMode
+			? NAVIGATION_LINK_BLOCKS
+			: [ 'core/page-list-item' ],
+		// The same container settings as a Navigation Submenu, so the links
+		// get the same block actions (such as "Add before" and "Add after").
+		defaultBlock: isLinkMode ? DEFAULT_BLOCK : undefined,
+		directInsert: isLinkMode,
+		__experimentalCaptureToolbars: isLinkMode,
 		onInput: NOOP,
-		onChange: NOOP,
-		value: blockList,
+		onChange: isLinkMode ? convertOnChange : NOOP,
+		value: isLinkMode ? ( navigationLinks ?? [] ) : blockList,
 	} );
 
-	const { selectBlock } = useDispatch( blockEditorStore );
-
 	useEffect( () => {
-		if ( hasSelectedChild || hasDraggedChild ) {
-			setIsConfirmingDetach( true );
-			selectBlock( parentClientId );
+		if ( isLinkMode ) {
+			return;
 		}
-	}, [ hasSelectedChild, hasDraggedChild, parentClientId, selectBlock ] );
+		if ( ! hasSelectedChild && ! hasDraggedChild ) {
+			return;
+		}
+		// The list has no overlay, so a click can land on one of its pages.
+		// Outside a Navigation block the pages can't be edited, so select
+		// the list itself.
+		if ( ! isChildOfNavigation ) {
+			selectBlock( clientId );
+			return;
+		}
+		setIsConfirmingDetach( true );
+		selectBlock( parentClientId );
+	}, [
+		isLinkMode,
+		isChildOfNavigation,
+		hasSelectedChild,
+		hasDraggedChild,
+		clientId,
+		parentClientId,
+		selectBlock,
+	] );
 
 	return (
 		<>

@@ -13,6 +13,8 @@ Display a list of all pages.
 
 **[Allowed](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#allowed-blocks) inner blocks:**
 - [`core/page-list-item`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-page-list-item/)
+- [`core/navigation-link`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-link/)
+- [`core/navigation-submenu`](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-navigation-submenu/)
 
 ## Attributes
 
