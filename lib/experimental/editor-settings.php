@@ -55,7 +55,7 @@ function gutenberg_enable_experiments() {
  * for one, then agrees with the editor.
  *
  * @param mixed $experiments The `gutenberg-experiments` option.
- * @return array<string, mixed> The option with Suggestion mode on.
+ * @return array<mixed> The option with Suggestion mode on.
  */
 function gutenberg_force_suggestion_mode_experiment( $experiments ): array {
 	$experiments                              = is_array( $experiments ) ? $experiments : array();
@@ -63,7 +63,11 @@ function gutenberg_force_suggestion_mode_experiment( $experiments ): array {
 	return $experiments;
 }
 add_filter( 'option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
-add_filter( 'default_option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment' );
+/*
+ * Late, so it runs after core's `filter_default_option()`: in a REST request
+ * the option is registered with an empty default, which would replace this.
+ */
+add_filter( 'default_option_gutenberg-experiments', 'gutenberg_force_suggestion_mode_experiment', 99 );
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
 add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
