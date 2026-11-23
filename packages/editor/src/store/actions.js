@@ -41,6 +41,7 @@ import {
 	announceSuggestTrashRefusal,
 	withoutSuggestPostEditGuard,
 } from './suggest-post-edit-guard';
+import { interceptUndoRedo } from './undo-redo-interceptor';
 import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
@@ -733,6 +734,9 @@ export const __unstableSaveForPreview =
 export const redo =
 	() =>
 	( { registry } ) => {
+		if ( interceptUndoRedo( registry, 'redo' ) ) {
+			return;
+		}
 		registry.dispatch( coreStore ).redo();
 	};
 
@@ -742,6 +746,9 @@ export const redo =
 export const undo =
 	() =>
 	( { registry } ) => {
+		if ( interceptUndoRedo( registry, 'undo' ) ) {
+			return;
+		}
 		registry.dispatch( coreStore ).undo();
 	};
 
