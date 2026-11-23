@@ -11,6 +11,11 @@
 
 -   List View: Show an appender at the end of every expanded nested list, so items can be added to a submenu or a Buttons block from the List View. An empty container, such as an empty Social Icons block, gets an appender too, unless it shows no appender on the canvas. A nested appender is a plain + that turns blue while hovered or focused. `PrivateListView` can name the top-level one with `appenderLabel` ([#85293](https://github.com/WordPress/gutenberg/pull/85293)).
 
+### Bug Fixes
+
+-   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+
 ## 20.1.0 (2026-11-18)
 
 ### Enhancements
