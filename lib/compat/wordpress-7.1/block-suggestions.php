@@ -55,6 +55,35 @@ if ( ! defined( 'GUTENBERG_SUGGESTION_EXCERPT_MAX_CHARS' ) ) {
 }
 
 /**
+ * Maximum length, in characters, of the text an inline suggestion operation
+ * records when it is decided (`decidedText`, `decidedDeletedText`). Mirrored
+ * on the client (`DECIDED_TEXT_MAX_CHARS` in
+ * suggestion-mode/decision-snapshot.ts).
+ */
+if ( ! defined( 'GUTENBERG_SUGGESTION_DECIDED_TEXT_MAX_CHARS' ) ) {
+	define( 'GUTENBERG_SUGGESTION_DECIDED_TEXT_MAX_CHARS', 1000 );
+}
+
+/**
+ * Sanitizes the text an inline suggestion operation records when it is
+ * decided: what its marker held, for the summary once the marker is gone.
+ *
+ * The editor shows it as text and never as markup, and it is the text of a
+ * rich-text value, where a `<` is a character the author typed. So it is
+ * stored as given, leading space included, and only bounded.
+ *
+ * @param mixed $text Text from the payload.
+ * @return string|null The text, cut to the limit, or null when there is none
+ *                     to keep.
+ */
+function gutenberg_sanitize_suggestion_decided_text( $text ): ?string {
+	if ( ! is_string( $text ) || '' === $text ) {
+		return null;
+	}
+	return mb_substr( $text, 0, GUTENBERG_SUGGESTION_DECIDED_TEXT_MAX_CHARS );
+}
+
+/**
  * Sanitizes the `excerpt` of a structural suggestion operation: the start of
  * the block's text, which the editor shows as text and never as markup.
  *
@@ -169,6 +198,17 @@ function gutenberg_sanitize_suggestion_payload( $value ) {
 					unset( $operation['excerpt'] );
 				} else {
 					$operation['excerpt'] = $excerpt;
+				}
+			}
+			foreach ( array( 'decidedText', 'decidedDeletedText' ) as $key ) {
+				if ( ! array_key_exists( $key, $operation ) ) {
+					continue;
+				}
+				$decided_text = gutenberg_sanitize_suggestion_decided_text( $operation[ $key ] );
+				if ( null === $decided_text ) {
+					unset( $operation[ $key ] );
+				} else {
+					$operation[ $key ] = $decided_text;
 				}
 			}
 			if ( array_key_exists( 'delta', $operation ) ) {
