@@ -11,6 +11,8 @@
 
 -   Suggestion mode: Paint the screen-reader announcements that bracket an inline suggestion marker, so its state reaches assistive technology rather than being carried by color and text decoration alone ([#81663](https://github.com/WordPress/gutenberg/pull/81663)).
 -   Suggestion mode: show both authors on an addition nested in another author's addition: the inner run takes its author's color as a background and drops its underline below the outer author's ([#80433](https://github.com/WordPress/gutenberg/pull/80433)).
+-   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
+-   List View: Keep focus on a row when it scrolls out of view ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
 
 ## 20.1.0 (2026-11-18)
 

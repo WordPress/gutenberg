@@ -42,7 +42,7 @@
 	"sideEffects": false,
 	"devDependencies": {
 		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser",
-		"vitest": "^5.1.0"
+		"vitest": "^5.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

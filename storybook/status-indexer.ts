@@ -15,7 +15,7 @@ import type { ComponentStatus } from './components/component-status-indicator/st
  * @param parameters The AST node of the meta's `parameters` property.
  * @return The status string, or `undefined` when there is none.
  */
-function readComponentStatus( parameters?: Node ): string | undefined {
+export function readComponentStatus( parameters?: Node ): string | undefined {
 	const componentStatus = getProperty( parameters, 'componentStatus' );
 	const status = getProperty( componentStatus, 'status' );
 	return status?.type === 'StringLiteral' ? status.value : undefined;
