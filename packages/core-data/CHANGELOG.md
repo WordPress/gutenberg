@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 -   Preserve the local selection when a deferred edit merges with a remote change, including when the edit selects another block ([#86991](https://github.com/WordPress/gutenberg/pull/86991)).
 -   Persist the collaborative document when an autosave promotes an auto-draft to a draft, so a collaborator joining a post that was never saved manually no longer replaces the live content ([#85792](https://github.com/WordPress/gutenberg/pull/85792)).
 
@@ -16,7 +17,6 @@
 -   `__experimentalFetchLinkSuggestions`: rank a result whose title is exactly the search above longer titles that begin with it ([#86327](https://github.com/WordPress/gutenberg/pull/86327)).
 -   Real-time collaboration: Re-parse blocks of persisted CRDT documents that hold missing or invalid blocks, so a block does not stay missing after its plugin is reactivated or stay invalid after its block type accepts its markup again ([#86212](https://github.com/WordPress/gutenberg/pull/86212)).
 -   Core Data: Reject unsafe entity record keys.
--   Footnotes: Skip items in the `footnotes` post meta that aren't footnotes, such as `null`, instead of throwing, which stopped the post from saving ([#86715](https://github.com/WordPress/gutenberg/pull/86715)).
 
 ## 9.1.0 (2026-11-04)
 
