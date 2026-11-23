@@ -2,7 +2,7 @@ import type { DragEvent } from 'react';
 import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
 import { useId, useRef, useState } from '@wordpress/element';
-import { closeSmall, upload } from '@wordpress/icons';
+import { closeSmall, plus } from '@wordpress/icons';
 import {
 	Button,
 	Fieldset,
@@ -99,7 +99,10 @@ export function FilePickerDropZone( { disabled = false } ) {
 							onClick={ openFileDialog }
 						>
 							{ file ? (
-								<FileSummary file={ file } />
+								<FileSummary
+									file={ file }
+									showDetails={ false }
+								/>
 							) : (
 								<Stack
 									render={ <span /> }
@@ -108,13 +111,10 @@ export function FilePickerDropZone( { disabled = false } ) {
 									gap="md"
 								>
 									<span className={ styles.thumbnail }>
-										<Icon icon={ upload } />
+										<Icon icon={ plus } />
 									</span>
-									<Text>
-										Choose image{ ' ' }
-										<span className={ styles.weak }>
-											or drag and drop here
-										</span>
+									<Text className={ styles.prompt }>
+										Add an image
 									</Text>
 								</Stack>
 							) }
@@ -140,7 +140,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 				) }
 			/>
 			<Fieldset.Description>
-				PNG only. It appears above the post title.
+				Drop one PNG here, or choose a file.
 			</Fieldset.Description>
 			<div aria-live="polite">
 				{ error && (

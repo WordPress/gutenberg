@@ -56,7 +56,14 @@ function usePreviewUrl( file: File ) {
  *
  * It renders only `span` elements, so it can be the content of a button.
  */
-export function FileSummary( { file }: { file: File } ) {
+export function FileSummary( {
+	file,
+	showDetails = true,
+}: {
+	file: File;
+	/** Whether to show the file type and size below the name. */
+	showDetails?: boolean;
+} ) {
 	const previewUrl = usePreviewUrl( file );
 	const extension = getExtension( file.name );
 
@@ -81,11 +88,13 @@ export function FileSummary( { file }: { file: File } ) {
 				className={ styles.details }
 			>
 				<Text className={ styles.name }>{ file.name }</Text>
-				<Text variant="body-sm" className={ styles.weak }>
-					{ extension.slice( 1 ).toUpperCase() || 'File' }
-					<span aria-hidden="true"> ·</span>{ ' ' }
-					{ formatFileSize( file.size ) }
-				</Text>
+				{ showDetails && (
+					<Text variant="body-sm" className={ styles.weak }>
+						{ extension.slice( 1 ).toUpperCase() || 'File' }
+						<span aria-hidden="true"> ·</span>{ ' ' }
+						{ formatFileSize( file.size ) }
+					</Text>
+				) }
 			</Stack>
 		</Stack>
 	);

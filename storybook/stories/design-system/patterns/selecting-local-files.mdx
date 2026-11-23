@@ -39,7 +39,8 @@ Lay the field out like other form fields: the label, then the drop area, then th
 - **Place `DropZone` inside the drop area.** Its overlay covers the nearest positioned ancestor, so the drop area needs `position: relative`.
 - **Send chosen and dropped files through one handler.** Both paths then follow the same rules. `accept` only filters the picker, and people can still choose or drop any file, so check every file in the handler.
 - **Keep the last valid file when a new one is rejected.** Show the error below the description, in a live region, and link it to the button with `aria-describedby`.
-- **Show what was chosen.** A selected image shows a thumbnail. Other files show a file icon. Both show the filename, the file type, and the size.
+- **Show what was chosen.** The drop area shows a thumbnail and the filename. Other files show a file icon in place of the thumbnail.
+- **Say that dropping works.** The drop area names the action, such as "Add an image", and the description says a file can be dropped there. A dashed border alone doesn't tell people that.
 - **Put the remove button beside the drop area, not inside it.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the drop area after a removal.
 - **Name the drop area after its action.** When it shows a file, its accessible name is "Replace cover.png".
 

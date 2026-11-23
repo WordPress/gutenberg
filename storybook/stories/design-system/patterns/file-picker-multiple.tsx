@@ -137,13 +137,10 @@ export function FilePickerMultiple() {
 									<span className={ styles.thumbnail }>
 										<Icon icon={ plus } />
 									</span>
-									<Text>
+									<Text className={ styles.prompt }>
 										{ entries.length
 											? 'Add more files'
-											: 'Choose files' }{ ' ' }
-										<span className={ styles.weak }>
-											or drag and drop here
-										</span>
+											: 'Add files' }
 									</Text>
 								</Stack>
 							</Button>
@@ -153,7 +150,7 @@ export function FilePickerMultiple() {
 				<DropZone label="Drop to add files" onFilesDrop={ addFiles } />
 			</Stack>
 			<Fieldset.Description>
-				PDF, JPEG, or PNG files, such as receipts and photos.
+				Drop PDF, JPEG, or PNG files here, or choose them.
 			</Fieldset.Description>
 			<div aria-live="polite">
 				{ error && (
