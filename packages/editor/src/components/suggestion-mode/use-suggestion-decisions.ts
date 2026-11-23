@@ -131,7 +131,6 @@ export function useSuggestionDecisions() {
 		removeBlock,
 		insertBlock,
 		moveBlockToPosition,
-		__unstableMarkNextChangeAsNotPersistent: markNextChangeAsNotPersistent,
 		__unstableMarkLastChangeAsPersistent: markLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
 	const {
@@ -941,9 +940,6 @@ export function useSuggestionDecisions() {
 							: null;
 					if ( clientId && remaining ) {
 						requestInterceptorBypass( clientId );
-						markNextChangeAsNotPersistent?.( {
-							history: 'ignore',
-						} );
 						updateBlockAttributes( clientId, {
 							metadata: remaining,
 						} );
@@ -961,17 +957,13 @@ export function useSuggestionDecisions() {
 						 * marker's proposal: the live block never took the
 						 * proposed value, so there is nothing to roll back,
 						 * but the proposal must go or it keeps rendering the
-						 * rejected value. Dropping it is a decision, not an
-						 * edit, so it stays off the undo stack.
+						 * rejected value.
 						 */
 						const clear = clearProposedAttributes(
 							selectBlockAttributes( clientId )
 						);
 						if ( clear ) {
 							requestInterceptorBypass( clientId );
-							markNextChangeAsNotPersistent?.( {
-								history: 'ignore',
-							} );
 							updateBlockAttributes( clientId, clear );
 						}
 					}
@@ -985,7 +977,6 @@ export function useSuggestionDecisions() {
 			resolveInlineTarget,
 			runPlan,
 			updateBlockAttributes,
-			markNextChangeAsNotPersistent,
 			requestInterceptorBypass,
 			clearPostFieldProposals,
 			registry,
