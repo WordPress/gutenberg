@@ -618,6 +618,47 @@ test.describe( 'Client-side media processing', () => {
 			);
 		} );
 
+		test( 'edits an unattached image client-side', async ( {
+			editor,
+			page,
+			mediaProcessingUtils,
+			requestUtils,
+		} ) => {
+			// Uploaded outside of any post, as from the media library, so
+			// the REST API reports its `post` as null.
+			const media = await requestUtils.uploadMedia(
+				path.join( ASSETS_DIR, '1024x768_e2e_test_image_size.jpeg' )
+			);
+			expect( media.post ).toBeNull();
+
+			await editor.insertBlock( {
+				name: 'core/image',
+				attributes: { id: media.id, url: media.source_url },
+			} );
+
+			const { edited, editRequests } = await editSelectedImage(
+				editor,
+				page,
+				requestUtils,
+				mediaProcessingUtils,
+				media.id,
+				async ( modal ) => {
+					await modal
+						.locator( 'role=button[name="Rotate 90° clockwise"i]' )
+						.click();
+				}
+			);
+
+			expect( editRequests ).toEqual( [] );
+			expect( edited.id ).not.toBe( media.id );
+			expect( edited.post ).toBeNull();
+			expect( edited.media_details.parent_image.attachment_id ).toBe(
+				media.id
+			);
+			expect( edited.media_details.width ).toBe( 768 );
+			expect( edited.media_details.height ).toBe( 1024 );
+		} );
+
 		test( 'flips an image client-side', async ( {
 			editor,
 			page,
