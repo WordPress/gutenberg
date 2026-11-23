@@ -27,6 +27,7 @@ describe( 'serializeWithoutDeferredInsertions', () => {
 			apiVersion: 3,
 			title: 'Group',
 			category: 'text',
+			attributes: {},
 			save: () => createElement( InnerBlocks.Content ),
 		} );
 	} );
