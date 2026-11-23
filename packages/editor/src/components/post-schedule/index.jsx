@@ -98,9 +98,8 @@ export function PrivatePostSchedule( {
 		[]
 	);
 
-	// The date of a floating post is the time it was last saved, which
-	// WordPress replaces with the time of publication. It is no date of the
-	// post's own, so the picker shows now, as the label reads "Immediately".
+	// A floating date is the time of the last save, no date of the post's
+	// own: the picker shows now, as the label reads "Immediately".
 	const displayedDate = isDateFloating ? null : postDate;
 
 	const { editPost } = useDispatch( editorStore );

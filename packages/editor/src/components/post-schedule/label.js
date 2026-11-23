@@ -40,8 +40,6 @@ export function getFullPostScheduleLabel(
 	dateAttribute,
 	{ isFloating = false } = {}
 ) {
-	// A floating date is the time the post was last saved, not a date of its
-	// own: there is nothing to spell out beyond the short label.
 	if ( isFloating ) {
 		return __( 'Immediately' );
 	}

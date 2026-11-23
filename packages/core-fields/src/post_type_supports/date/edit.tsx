@@ -92,10 +92,8 @@ export default function DateEdit( {
 		status: savedStatus ?? data.status,
 	} );
 
-	// The date of a floating post is the time it was last saved, which
-	// WordPress replaces with the time of publication. It is no date of the
-	// post's own, so the control shows now, as the summary reads
-	// "Immediately".
+	// A floating date is the time of the last save, no date of the post's
+	// own: the control shows now, as the summary reads "Immediately".
 	const displayedValue = isFloating ? undefined : value;
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>

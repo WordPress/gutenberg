@@ -20,14 +20,8 @@ type Post = {
 	status: string;
 };
 
-/**
- * Stands in for the editor and core stores, and records the queries the
- * calendar makes for the posts it marks.
- *
- * @param post          The edited post.
- * @param queriedMonths Collects the bounds of those queries.
- * @return The registry.
- */
+// Stands in for the editor and core stores, and records the queries the
+// calendar makes for the posts it marks.
 function createTestRegistry( post: Post, queriedMonths: MonthBounds[] = [] ) {
 	const editor = createReduxStore( 'core/editor', {
 		reducer: ( state = {} ) => state,
@@ -99,9 +93,6 @@ describe( 'PostSchedule', () => {
 		).toBeInTheDocument();
 	} );
 
-	// The date of a floating post is the time it was last saved, which
-	// WordPress replaces with the time of publication. It is no date of the
-	// post's own, so the picker shows now, as the label reads "Immediately".
 	describe( 'with a floating date', () => {
 		it( 'shows now, not the date the draft was last saved', async () => {
 			atNovember();

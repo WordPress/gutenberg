@@ -398,10 +398,6 @@ describe( 'DateEdit', () => {
 		} );
 	} );
 
-	// The date of a floating post is the time it was last saved, which
-	// WordPress replaces with the time of publication. It is no date of the
-	// post's own, so the control shows now, as the summary reads
-	// "Immediately".
 	describe( 'with a floating date', () => {
 		afterEach( () => {
 			vi.useRealTimers();
