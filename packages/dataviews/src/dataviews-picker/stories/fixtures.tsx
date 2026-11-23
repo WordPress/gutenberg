@@ -71,7 +71,7 @@ export const data: SpaceObject[] = [
 			title: 'Ganymede',
 			description: 'Largest moon of Jupiter',
 		},
-		image: 'https://live.staticflickr.com/7816/33436473218_a836235935_k.jpg',
+		image: 'ganymede.jpg',
 		type: 'Satellite',
 		isPlanet: false,
 		categories: [ 'Solar system', 'Satellite', 'Jupiter', 'Moon' ],

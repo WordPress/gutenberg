@@ -35,3 +35,7 @@ When a snapshot changes due to code changes or Storybook upgrades, a pull reques
 npm run storybook:build
 npm run storybook:manifest-snapshot
 ```
+
+## Image credits
+
+The DataViews stories use NASA/JPL's [Ganymede Color Global](https://science.nasa.gov/photojournal/ganymede-color-global/) photograph in `static/ganymede.jpg`.
