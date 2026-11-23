@@ -4,30 +4,66 @@
  * suggestion stays pending and can still be rejected.
  */
 import { __ } from '@wordpress/i18n';
-import { findAttributeOperationProblem } from './operations';
+import { markerForNote, proposedAttributes } from './marker';
+import {
+	findAttributeOperationProblem,
+	findInlineOp,
+	findStructuralOp,
+	proposalMatchesOperations,
+} from './operations';
 import type { SuggestionPayload } from './operations';
 
 /**
  * The notice for an accept that cannot go ahead, or null when it can. A
- * payload that sets no attribute has nothing to check here.
+ * suggestion that proposes no attribute value has nothing to check here.
  *
  * @param args            Arguments.
  * @param args.blockName  Name of the target block.
  * @param args.attributes The target block's current attributes.
+ * @param args.commentId  The suggestion's note.
  * @param args.payload    The suggestion payload.
  * @return The notice, or null.
  */
 export function getAttributeApplyRefusal( {
 	blockName,
 	attributes,
+	commentId,
 	payload,
 }: {
 	blockName: string | null | undefined;
 	attributes: Record< string, any > | null | undefined;
+	commentId: number | string;
 	payload: SuggestionPayload;
 } ): string | null {
-	if ( ! payload.operations.some( ( op ) => op?.type === 'attribute-set' ) ) {
+	// An inline suggestion is a marker in the text, and accepting a removal
+	// takes the block out: neither applies a value.
+	if (
+		findInlineOp( payload.operations ) ||
+		findStructuralOp( payload.operations )?.type === 'block-remove'
+	) {
 		return null;
+	}
+	const attributeOps = payload.operations.filter(
+		( op ) => op?.type === 'attribute-set'
+	);
+	const marker = markerForNote( attributes, commentId );
+	const proposal = proposedAttributes( marker );
+	if ( attributeOps.length === 0 && ! proposal ) {
+		return null;
+	}
+	if ( ! marker ) {
+		return __(
+			'This suggestion is no longer in the post. Reject it to close the note.'
+		);
+	}
+	/*
+	 * The reviewer reads the proposal off the block and the summary off the
+	 * note. When they differ there is no telling which one was accepted.
+	 */
+	if ( ! proposalMatchesOperations( attributes, proposal, attributeOps ) ) {
+		return __(
+			'This suggestion no longer matches the post. Reload and try again, or reject it.'
+		);
 	}
 	/*
 	 * The values were proposed for the block type the payload names. On
@@ -43,7 +79,7 @@ export function getAttributeApplyRefusal( {
 	}
 	const problem = findAttributeOperationProblem(
 		blockName,
-		payload.operations,
+		attributeOps,
 		attributes
 	);
 	if ( ! problem ) {

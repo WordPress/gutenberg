@@ -23,6 +23,7 @@ export {
 	postOperationsFromProposal,
 	clearSuggestionMarkerAttributes,
 	applyOperations,
+	proposalMatchesOperations,
 	rollbackAttributesFor,
 	applyPostOperations,
 	hasAttributeConflict,
