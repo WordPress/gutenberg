@@ -88,6 +88,9 @@ export default function LeafMoreMenu( props ) {
 				const moveUpTo = getMoveDestination( [ clientId ], 'up' );
 				const moveDownTo = getMoveDestination( [ clientId ], 'down' );
 				const move = ( destination ) => {
+					if ( ! destination ) {
+						return;
+					}
 					moveBlocksToPosition(
 						[ clientId ],
 						rootClientId,

@@ -1618,11 +1618,10 @@ export function getBlockMoveDestination(
 	const parentIndex = parentOrder.indexOf( sourceRoot );
 	if ( isTransparent( sourceRoot ) ) {
 		// The parent isn't a step of its own, so pass the block beyond it.
+		// With nothing beyond, stepping out would look like no move at all.
 		const outside =
 			parentOrder[ isDown ? parentIndex + 1 : parentIndex - 1 ];
-		if ( outside ) {
-			return pass( parentRoot, outside );
-		}
+		return outside ? pass( parentRoot, outside ) : null;
 	}
 	return land( parentRoot, isDown ? parentIndex + 1 : parentIndex );
 }

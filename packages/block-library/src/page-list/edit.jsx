@@ -280,6 +280,7 @@ export default function PageListEdit( {
 		isChildOfNavigation,
 		parentOrientation,
 		canConvert,
+		allowedBlocksKey,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -307,6 +308,21 @@ export default function PageListEdit( {
 				)?.orientation,
 				// Converting needs a menu to switch "Auto add new pages" on
 				// for, and must be allowed to replace the list with links.
+				// The links count as the menu's own items, so whatever the
+				// list's parent takes can go among them (as a string, to keep
+				// the value stable).
+				allowedBlocksKey: (
+					getBlockType( 'core/navigation' )?.allowedBlocks ?? []
+				)
+					.filter(
+						( name ) =>
+							name !== 'core/page-list' &&
+							canInsertBlockType(
+								name,
+								getBlockRootClientId( clientId )
+							)
+					)
+					.join( ',' ),
 				canConvert:
 					!! getBlockAttributes( navigationBlockParents[ 0 ] )?.ref &&
 					canRemoveBlock( clientId ) &&
@@ -337,6 +353,10 @@ export default function PageListEdit( {
 		isChildOfNavigation &&
 		canConvert &&
 		allowConvertToLinks &&
+		// A parent page that isn't among the fetched pages (not published)
+		// can't be shown as links.
+		( ! parentPageID ||
+			pages.some( ( page ) => page.id === parentPageID ) ) &&
 		totalItems !== null &&
 		totalItems <= MAX_PAGE_COUNT;
 
@@ -420,7 +440,11 @@ export default function PageListEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 		}
 		replaceBlock( clientId, links );
-		if ( ! menuId ) {
+		// Turn the setting on only once the list is really gone.
+		if (
+			! menuId ||
+			registry.select( blockEditorStore ).getBlockName( clientId )
+		) {
 			return;
 		}
 		// This runs inside the block sync's batch, so the menu records the
@@ -449,12 +473,8 @@ export default function PageListEdit( {
 		renderAppender: false,
 		__unstableDisableDropZone: ! isLinkMode,
 		templateLock: isChildOfNavigation ? false : 'all',
-		// The links count as the menu's own items, so anything the menu
-		// takes can go among them.
 		allowedBlocks: isLinkMode
-			? getBlockType( 'core/navigation' )?.allowedBlocks?.filter(
-					( name ) => name !== 'core/page-list'
-				)
+			? allowedBlocksKey.split( ',' )
 			: [ 'core/page-list-item' ],
 		// The same container settings as a Navigation Submenu, so the links
 		// get the same block actions (such as "Add before" and "Add after").

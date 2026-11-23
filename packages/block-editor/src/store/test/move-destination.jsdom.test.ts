@@ -122,6 +122,14 @@ describe( 'getBlockMoveDestination', () => {
 		} );
 	} );
 
+	it( 'keeps an edge child in a transparent block with nothing beyond it', () => {
+		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
+		// Make the list the last block, so nothing is beyond it.
+		t.dispatch.moveBlocksToPosition( [ t.ids.list ], '', '', 4 );
+
+		expect( t.destination( t.ids.y, 'down' ) ).toBeNull();
+	} );
+
 	it( 'passes a transparent block whole when it is shown collapsed', () => {
 		t.dispatch.setBlockMoveTransparent( t.ids.list, true );
 

@@ -142,6 +142,61 @@ test.describe( 'Navigation block: Page List converts to links on edit', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'a Page List in a submenu only takes what the submenu takes', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		await requestUtils.createPage( { title: 'Alpha', status: 'publish' } );
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Submenu menu',
+			content:
+				'<!-- wp:navigation-submenu {"label":"More","url":"https://example.com/more","kind":"custom"} --><!-- wp:page-list /--><!-- /wp:navigation-submenu -->',
+		} );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+		// The submenu's items are hidden until it opens, so wait on the store.
+		await expect
+			.poll(
+				() =>
+					page.evaluate( () => {
+						const blockEditor =
+							window.wp.data.select( 'core/block-editor' );
+						const [ pageList ] =
+							blockEditor.getBlocksByName( 'core/page-list' );
+						return pageList
+							? blockEditor
+									.getBlockOrder( pageList )
+									.map( blockEditor.getBlockName )
+							: [];
+					} ),
+				{ timeout: 10000 }
+			)
+			.toEqual( [ 'core/navigation-link' ] );
+
+		const allowed = await page.evaluate( () => {
+			const blockEditor = window.wp.data.select( 'core/block-editor' );
+			const [ pageList ] =
+				blockEditor.getBlocksByName( 'core/page-list' );
+			return {
+				link: blockEditor.canInsertBlockType(
+					'core/navigation-link',
+					pageList
+				),
+				// A submenu doesn't take a Spacer, so its Page List can't.
+				spacer: blockEditor.canInsertBlockType(
+					'core/spacer',
+					pageList
+				),
+			};
+		} );
+		expect( allowed ).toEqual( { link: true, spacer: false } );
+	} );
+
 	test( 'moving a link within the list converts it', async ( {
 		editor,
 		pageListMenu,
