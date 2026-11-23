@@ -129,6 +129,20 @@ figure.wp-block-gallery.has-nested-images:where(.is-layout-flex) {
 		position: relative;
 		margin: 0;
 
+		// Clip the overlaid caption and its scrim to the image's border radius.
+		// The caption is absolutely positioned, so this figure and the image it
+		// wraps share the same box, and the radius applied to the image by
+		// theme.json or global styles applies to this figure too.
+		//
+		// Only while the caption is overlaid: the rules further down move the
+		// caption out from over the image, at which point the figure is taller
+		// than the image and clipping it could cut off caption text.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/43586
+		&:has(figcaption):not(.is-style-rounded):not(.has-custom-border) {
+			overflow: hidden;
+		}
+
 		// Position caption and scrim at the bottom.
 		&:has(figcaption)::before,
 		figcaption {
