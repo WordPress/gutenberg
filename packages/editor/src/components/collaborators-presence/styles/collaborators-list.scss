@@ -23,9 +23,9 @@
 		padding: $grid-unit-10 $grid-unit-20;
 
 		&-title {
-			font-size: $font-size-medium;
+			font-size: var(--wpds-typography-font-size-md);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
-			line-height: $font-line-height-small;
+			line-height: var(--wpds-typography-line-height-sm);
 			display: flex;
 			gap: $grid-unit-05;
 
@@ -91,9 +91,9 @@
 		}
 
 		&-name {
-			font-size: $font-size-medium;
+			font-size: var(--wpds-typography-font-size-md);
 			font-weight: var(--wpds-typography-font-weight-emphasis);
-			line-height: $font-line-height-small;
+			line-height: var(--wpds-typography-line-height-sm);
 			color: $gray-900;
 			overflow: hidden;
 			text-overflow: ellipsis;

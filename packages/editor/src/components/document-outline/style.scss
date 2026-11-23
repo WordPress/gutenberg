@@ -75,7 +75,7 @@
 	background: $gray-300;
 	color: $gray-900;
 	border-radius: 3px;
-	font-size: $default-font-size;
+	font-size: var(--wpds-typography-font-size-md);
 	padding: 1px 6px;
 	margin-right: 4px;
 
