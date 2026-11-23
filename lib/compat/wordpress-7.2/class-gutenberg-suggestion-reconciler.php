@@ -18,7 +18,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 	 *   propose out of the incoming content (see `Gutenberg_Suggestion_Content`)
 	 *   so the stored `post_content` holds the public baseline plus anchors,
 	 *   and records the content the post had before this write. A new post
-	 *   has no notes, so what its content proposes is dropped.
+	 *   has no notes, and a post type without notes never has any, so what
+	 *   their content proposes is dropped.
 	 * - `wp_insert_post` (early, after the row is written and before a REST
 	 *   response is prepared) stores the extracted proposals on their notes,
 	 *   then compares the anchors of the previous and the saved content and
@@ -139,23 +140,22 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				return $data;
 			}
 
-			if ( ! $update ) {
-				/*
-				 * A new post has no notes, whatever its type: proposals in its
-				 * content were copied from another post (a duplicated post, a
-				 * pattern made from marked blocks) and nobody can decide them.
-				 */
-				if ( Gutenberg_Suggestion_Content::may_carry_proposals( $incoming ) ) {
-					$extracted = Gutenberg_Suggestion_Content::extract( $incoming, array() );
-					if ( $extracted['content'] !== $incoming ) {
-						$data['post_content'] = wp_slash( $extracted['content'] );
-					}
+			/*
+			 * A new post has no notes, and a post type without notes never
+			 * has any: proposals in its content were copied from another post
+			 * (a duplicated post, a pattern or template part made from marked
+			 * blocks) or captured where nobody can decide them.
+			 */
+			if ( ! $update || ! self::post_type_supports_notes( $data['post_type'] ) ) {
+				$stripped = Gutenberg_Suggestion_Content::strip( $incoming );
+				if ( $stripped !== $incoming ) {
+					$data['post_content'] = wp_slash( $stripped );
 				}
 				return $data;
 			}
 
 			$post_id = isset( $postarr['ID'] ) ? (int) $postarr['ID'] : 0;
-			if ( $post_id <= 0 || ! self::post_type_supports_notes( $data['post_type'] ) ) {
+			if ( $post_id <= 0 ) {
 				return $data;
 			}
 			unset( self::$undecided[ $post_id ] );

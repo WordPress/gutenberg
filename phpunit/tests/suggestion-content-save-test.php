@@ -386,6 +386,36 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * A post type without notes can never hold a suggestion, so nothing a
+	 * write to it proposes is stored, linked to a note or not.
+	 */
+	public function test_an_update_of_a_post_type_without_notes_stores_no_proposals(): void {
+		$pattern_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_block',
+				'post_title'   => 'Pattern',
+				'post_status'  => 'publish',
+				'post_content' => wp_slash( $this->paragraph( 'Hello' ) ),
+			)
+		);
+		$unlinked   = "<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1}}} -->\n<p>Unlinked block</p>\n<!-- /wp:paragraph -->";
+		$content    = $this->paragraph( 'Hello' . $this->mark( 77, 'add', ' zanzibarian' ) . $this->mark( 78, 'del', ' kept' ) ) . "\n\n" . $this->inserted( 79, 'Quixotic paragraph' ) . "\n\n" . $unlinked;
+
+		list( , $queries ) = $this->notes_loaded_by(
+			function () use ( $pattern_id, $content ) {
+				$this->save( $pattern_id, $content );
+			}
+		);
+
+		$stored = $this->stored( $pattern_id );
+		$this->assertStringNotContainsString( 'zanzibarian', $stored );
+		$this->assertStringNotContainsString( 'Quixotic', $stored );
+		$this->assertStringNotContainsString( 'Unlinked', $stored );
+		$this->assertStringContainsString( ' kept</mark>', $stored );
+		$this->assertSame( 0, $queries );
+	}
+
 	public function test_a_structural_marker_without_a_note_yet_is_left_in_place() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$content = $this->paragraph( 'Hello' ) . "\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1}}} -->\n<p>Not yet linked</p>\n<!-- /wp:paragraph -->";
