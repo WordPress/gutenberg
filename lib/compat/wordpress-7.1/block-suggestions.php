@@ -825,6 +825,18 @@ function gutenberg_get_suggestion_marker_kind( WP_HTML_Tag_Processor $processor 
 	return null;
 }
 
+if ( ! defined( 'GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT' ) ) {
+	/**
+	 * Most characters a formatting revert may split up at once.
+	 *
+	 * The character-level revert keeps a record for every character between a
+	 * block's first and last formatting marker, and again for the recorded
+	 * originals. Past this it is not attempted, and each formatting marker is
+	 * handled on its own.
+	 */
+	define( 'GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT', 10000 );
+}
+
 if ( ! defined( 'GUTENBERG_SUGGESTION_RENDER_MARKER_LIMIT' ) ) {
 	/**
 	 * Most inline suggestion markers a fragment may hold to be rendered.
@@ -1070,12 +1082,13 @@ function gutenberg_pair_inline_suggestion_markers( $html, $limit = PHP_INT_MAX )
  * can fail closed. Text is decoded and split into code points; a line break
  * or image counts as one character.
  *
- * @param string $html Inline HTML.
+ * @param string $html  Inline HTML.
+ * @param int    $limit Optional. Most characters to split. Default no limit.
  * @return list<array{html: string, stack: list<array{tag: string, opener: string, kind: string|null, id: int, run: bool, note: bool}>}>|null
  *         Characters in order, or null when the HTML is not plain inline
- *         markup.
+ *         markup or holds more than `$limit` characters.
  */
-function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
+function gutenberg_get_inline_suggestion_characters( string $html, int $limit = PHP_INT_MAX ): ?array {
 	$inline    = array( 'A', 'ABBR', 'B', 'BDI', 'BDO', 'CODE', 'EM', 'I', 'KBD', 'MARK', 'S', 'SMALL', 'SPAN', 'STRONG', 'SUB', 'SUP', 'U' );
 	$processor = new Gutenberg_Suggestion_Marker_Processor( $html );
 	$stack     = array();
@@ -1083,8 +1096,14 @@ function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
 	while ( $processor->next_token() ) {
 		$type = $processor->get_token_type();
 		if ( '#text' === $type ) {
-			$characters = preg_split( '//u', $processor->get_modifiable_text(), -1, PREG_SPLIT_NO_EMPTY );
-			if ( false === $characters ) {
+			$text = $processor->get_modifiable_text();
+			// A code point takes at most four bytes, so this text alone is
+			// over the limit: do not split it to find out.
+			if ( strlen( $text ) / 4 > $limit - count( $chars ) ) {
+				return null;
+			}
+			$characters = preg_split( '//u', $text, -1, PREG_SPLIT_NO_EMPTY );
+			if ( false === $characters || count( $characters ) > $limit - count( $chars ) ) {
 				return null;
 			}
 			foreach ( $characters as $character ) {
@@ -1102,7 +1121,7 @@ function gutenberg_get_inline_suggestion_characters( string $html ): ?array {
 		}
 		$bytes = substr( $html, $span[0], $span[1] );
 		if ( 'BR' === $tag || 'IMG' === $tag ) {
-			if ( $processor->is_tag_closer() ) {
+			if ( $processor->is_tag_closer() || count( $chars ) >= $limit ) {
 				return null;
 			}
 			$chars[] = array(
@@ -1188,8 +1207,9 @@ function gutenberg_serialize_inline_suggestion_characters( array $chars ): strin
  *
  * The run between the first and last formatting marker is rebuilt from its
  * characters. Null is returned, so the caller can fall back, when that run is
- * not plain inline markup, or an original is missing or no longer has the
- * same text.
+ * not plain inline markup, an original is missing or no longer has the
+ * same text, or the run or the originals hold more characters than
+ * `GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT`.
  *
  * @param string             $html      HTML fragment.
  * @param array<int, string> $originals Recorded original (`beforeHTML`) of each formatting suggestion.
@@ -1234,15 +1254,18 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 		}
 	} while ( $grown );
 
-	$chars = gutenberg_get_inline_suggestion_characters( substr( $html, $start, $end - $start ) );
+	$chars = gutenberg_get_inline_suggestion_characters( substr( $html, $start, $end - $start ), GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT );
 	if ( null === $chars ) {
 		return null;
 	}
+	// Characters the originals may still take between them.
+	$budget = GUTENBERG_SUGGESTION_FORMAT_REVERT_CHARACTER_LIMIT;
 
 	$accepted  = array_fill_keys( array_map( 'intval', $accepted ), true );
 	$positions = array();
 	$parsed    = array();
-	foreach ( $chars as $index => $char ) {
+	// By reference: a copy of every character would double the memory held.
+	foreach ( $chars as &$char ) {
 		$ids = array();
 		foreach ( $char['stack'] as $element ) {
 			if ( 'format' === $element['kind'] && ! $element['run'] ) {
@@ -1284,7 +1307,11 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 					if ( ! isset( $originals[ $id ] ) ) {
 						return null;
 					}
-					$parsed[ $id ] = gutenberg_get_inline_suggestion_characters( $originals[ $id ] );
+					$parsed[ $id ] = gutenberg_get_inline_suggestion_characters( $originals[ $id ], $budget );
+					if ( null === $parsed[ $id ] ) {
+						return null;
+					}
+					$budget -= count( $parsed[ $id ] );
 				}
 				$original = $parsed[ $id ][ $offsets[ $id ] ] ?? null;
 				// A formatting change never changes text.
@@ -1321,8 +1348,9 @@ function gutenberg_revert_inline_format_suggestions( string $html, array $origin
 			}
 			array_push( $kept, ...array_values( $formatting ) );
 		}
-		$chars[ $index ]['stack'] = $kept;
+		$char['stack'] = $kept;
 	}
+	unset( $char );
 	foreach ( $positions as $id => $count ) {
 		if ( isset( $parsed[ $id ] ) && count( (array) $parsed[ $id ] ) !== $count ) {
 			return null;
