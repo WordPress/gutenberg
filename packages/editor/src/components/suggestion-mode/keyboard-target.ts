@@ -1,3 +1,4 @@
+import { getBlockType } from '@wordpress/blocks';
 import { create } from '@wordpress/rich-text';
 import {
 	isBlockOwnedByCurrentPost,
@@ -72,8 +73,9 @@ function resolveEventElement( event: any ): any {
  * note reply and write it into the previously selected block as a suggestion
  * marker. Only intercept when the edit lands inside the selected block's
  * element AND inside a block rich-text editable whose attribute key (when
- * exposed) matches the selection's. The affected element is resolved from the
- * event's range rather than `event.target` (see `resolveEventElement`).
+ * exposed) matches the selection's, and names one of the block's attributes.
+ * The affected element is resolved from the event's range rather than
+ * `event.target` (see `resolveEventElement`).
  *
  * @param event          Input/clipboard event.
  * @param selectionStart Block-editor `getSelectionStart()` value.
@@ -117,6 +119,23 @@ export function isEventTargetSelectedRichText(
 		selectionStart.attributeKey &&
 		editableKey &&
 		editableKey !== selectionStart.attributeKey
+	) {
+		return false;
+	}
+	/*
+	 * The keyboards read and write the field as `attributes[ attributeKey ]`.
+	 * A field's key is whatever identifier the block gave its `RichText`,
+	 * and need not be an attribute: a table cell's is a path into `body`.
+	 * Such a field is left to the block's own `onChange`, which the overlay
+	 * turns into an attribute suggestion.
+	 */
+	const attributes = getBlockType(
+		blockElement.getAttribute( 'data-type' ) ?? ''
+	)?.attributes;
+	if (
+		attributes &&
+		selectionStart.attributeKey &&
+		! Object.hasOwn( attributes, selectionStart.attributeKey )
 	) {
 		return false;
 	}
