@@ -607,15 +607,24 @@ function ListViewBlock( {
 	);
 
 	let colSpan;
-	if ( hasRenderedMovers ) {
+	let lockCellColSpan;
+	if ( isLockMenuEnabled ) {
+		// With the lock menu, the tree has four columns: the contents, the
+		// movers, the lock and the options menu. Every row spans all four, so
+		// the locks and the menus line up. A row without a menu, like one
+		// outside a pattern being edited, lets its lock span the menu column,
+		// keeping the lock in its own column.
+		const hasMenuCell = canShowBlockActions && !! BlockSettingsMenu;
+		lockCellColSpan = hasLockCell && ! hasMenuCell ? 2 : undefined;
+		const otherColumns =
+			( hasRenderedMovers ? 1 : 0 ) +
+			( hasLockCell ? ( lockCellColSpan ?? 1 ) : 0 ) +
+			( hasMenuCell ? 1 : 0 );
+		colSpan = 4 - otherColumns;
+	} else if ( hasRenderedMovers ) {
 		colSpan = 2;
 	} else if ( ! canShowBlockActions ) {
 		colSpan = 3;
-	}
-	// Rows with a lock cell have one more column, so the contents of the other
-	// rows span it to keep every row the full width of the tree.
-	if ( isLockMenuEnabled && ! hasLockCell ) {
-		colSpan = ( colSpan ?? 1 ) + 1;
 	}
 
 	const classes = clsx( {
@@ -761,6 +770,7 @@ function ListViewBlock( {
 			{ hasLockCell && (
 				<TreeGridCell
 					className={ lockCellClassName }
+					colSpan={ lockCellColSpan }
 					aria-selected={ !! isSelected }
 				>
 					{ ( { ref, tabIndex, onFocus } ) => (
