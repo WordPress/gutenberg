@@ -112,6 +112,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	 */
 	public function set_up() {
 		parent::set_up();
+		// Suggestion writes and the save pass need the experiment.
+		add_filter(
+			'pre_option_gutenberg-experiments',
+			static function () {
+				return array( 'gutenberg-suggestion-mode' => true );
+			}
+		);
 		wp_create_initial_comment_meta();
 		gutenberg_register_suggestion_meta();
 	}
