@@ -604,6 +604,46 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
+
+		it( 'activating the at-rest preselected preset commits the inherited value to local', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			const inheritedValue = {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			};
+
+			await renderPanel( { inheritedValue, onChange } );
+
+			const large = screen.getByRole( 'radio', {
+				name: 'Large',
+				checked: true,
+			} );
+			await user.click( large );
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			} );
+		} );
+
+		it( 'activating a locally set preset again keeps the local value', async () => {
+			const user = userEvent;
+			const onChange = vi.fn();
+			const value = {
+				typography: { fontSize: 'var:preset|font-size|huge' },
+			};
+			const inheritedValue = {
+				typography: { fontSize: 'var:preset|font-size|large' },
+			};
+
+			await renderPanel( { value, inheritedValue, onChange } );
+
+			await user.click(
+				screen.getByRole( 'radio', { name: 'Huge', checked: true } )
+			);
+
+			expect( onChange ).toHaveBeenCalledWith( value );
+		} );
 	} );
 
 	it( 'treats local zero values as local overrides instead of inherited placeholders', async () => {

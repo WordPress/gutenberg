@@ -70,6 +70,19 @@ const FontSizePickerToggleGroup = ( props: FontSizePickerToggleGroupProps ) => {
 					label={ T_SHIRT_ABBREVIATIONS[ index ] }
 					aria-label={ fontSize.name || T_SHIRT_NAMES[ index ] }
 					showTooltip
+					// The group is a radio group, so activating the option
+					// that is already checked doesn't emit a change. Emit it
+					// anyway: consumers can use it to commit a value that is
+					// only displayed as selected (e.g. an inherited size).
+					onClick={
+						fontSize.slug === currentValue
+							? () =>
+									onChange(
+										fontSize.size as number | string,
+										fontSize
+									)
+							: undefined
+					}
 				/>
 			) ) }
 		</ToggleGroupControl>

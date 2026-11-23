@@ -82,11 +82,11 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 					</SelectControl.Trigger>
 				}
 				onValueChange={ ( item ) => {
-					// Default can represent a custom value that still needs clearing.
-					if (
-						item?.value === selectedOption.value &&
-						( item?.value !== null || value === undefined )
-					) {
+					// Re-selecting Default is a no-op unless it stands in for a
+					// custom value that still needs clearing. Re-selecting a
+					// preset emits it again, so consumers can commit a value
+					// that is only displayed as selected (e.g. an inherited size).
+					if ( item?.value === null && value === undefined ) {
 						return;
 					}
 					const matchingFontSize = fontSizes.find(
