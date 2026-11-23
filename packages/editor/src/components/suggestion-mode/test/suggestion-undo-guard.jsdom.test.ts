@@ -39,6 +39,9 @@ vi.hoisted( () => {
 const captures = ( entries: Record< string, any > ) =>
 	new Map( Object.entries( entries ) );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'findNewestPendingSuggestion', () => {
 	it( 'returns null when nothing is pending', () => {
 		expect( findNewestPendingSuggestion( new Map(), null ) ).toBeNull();

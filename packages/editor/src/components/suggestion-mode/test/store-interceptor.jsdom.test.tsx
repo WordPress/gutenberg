@@ -61,6 +61,9 @@ vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'shallowAttributeEquals', () => {
 	it( 'treats reference-equal values as equal', () => {
 		const obj = { a: 1 };
