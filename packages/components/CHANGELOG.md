@@ -16,6 +16,7 @@
 
 ### Bug Fixes
 
+-   `BoxControl`: Show the side input tooltip above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86805](https://github.com/WordPress/gutenberg/pull/86805)).
 -   `MenuItem`: Show items with `aria-disabled` in the system disabled color in forced colors mode ([#86797](https://github.com/WordPress/gutenberg/pull/86797)).
 -   `DatePicker`: Outline today's date when another date is selected ([#87172](https://github.com/WordPress/gutenberg/pull/87172)).
 -   `GradientPicker`, `CustomGradientPicker`: Restore the last committed linear angle when switching back from Radial after a background update suspends ([#86739](https://github.com/WordPress/gutenberg/pull/86739)).
@@ -49,7 +50,6 @@
 
 ### Bug Fixes
 
--   `BoxControl`: Show the side input tooltip above `@wordpress/ui` overlays such as `Dialog` and `Popover` ([#86805](https://github.com/WordPress/gutenberg/pull/86805)).
 -   `Toolbar`: Fix the width of the pressed and focus indicator on toolbar buttons ([#86855](https://github.com/WordPress/gutenberg/pull/86855)).
 -   `Modal`: Remove the dead styles for the `icon` prop container, whose selector never matched the rendered class name ([#86942](https://github.com/WordPress/gutenberg/pull/86942)).
 -   `ToggleGroupControl`: Animate the selection indicator's width along with its position, so it stays inside the control when the options have different widths ([#86830](https://github.com/WordPress/gutenberg/pull/86830)).
