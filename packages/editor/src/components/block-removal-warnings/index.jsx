@@ -1,4 +1,4 @@
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -41,11 +41,13 @@ const BLOCK_REMOVAL_RULES = [
 				TEMPLATE_BLOCKS.includes( name )
 			);
 			if ( removedTemplateBlocks.length ) {
-				return _n(
-					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
-					'Some of the deleted blocks will stop your post or page content from displaying on this template. It is not recommended.',
-					removedBlocks.length
-				);
+				return removedBlocks.length === 1
+					? __(
+							'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.'
+						)
+					: __(
+							'Some of the deleted blocks will stop your post or page content from displaying on this template. It is not recommended.'
+						);
 			}
 		},
 	},
@@ -63,11 +65,13 @@ const BLOCK_REMOVAL_RULES = [
 					)
 			);
 			if ( removedBlocksWithOverrides.length ) {
-				return _n(
-					'The deleted block allows instance overrides. Removing it may result in content not displaying where this pattern is used. Are you sure you want to proceed?',
-					'Some of the deleted blocks allow instance overrides. Removing them may result in content not displaying where this pattern is used. Are you sure you want to proceed?',
-					removedBlocks.length
-				);
+				return removedBlocks.length === 1
+					? __(
+							'The deleted block allows instance overrides. Removing it may result in content not displaying where this pattern is used. Are you sure you want to proceed?'
+						)
+					: __(
+							'Some of the deleted blocks allow instance overrides. Removing them may result in content not displaying where this pattern is used. Are you sure you want to proceed?'
+						);
 			}
 		},
 	},
