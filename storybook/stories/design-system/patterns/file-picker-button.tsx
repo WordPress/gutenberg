@@ -6,6 +6,7 @@ import { Button, Fieldset, Stack, ValidityIndicator } from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
 import { importPattern, useSnackbars } from './file-picker-snackbars';
 import styles from './file-picker.module.css';
+import previewStyles from './file-picker-preview.module.css';
 
 export function FilePickerButton() {
 	const [ file, setFile ] = useState< File >();
@@ -42,14 +43,11 @@ export function FilePickerButton() {
 		<form
 			onSubmit={ onSubmit }
 			noValidate
-			className={ styles[ 'with-snackbars' ] }
+			className={ previewStyles[ 'with-snackbars' ] }
 		>
 			<Stack direction="column" gap="lg">
-				<Fieldset.Root>
-					<Fieldset.Legend>
-						Pattern file{ ' ' }
-						<span className={ styles.marker }>(Required)</span>
-					</Fieldset.Legend>
+				<Fieldset.Root className={ styles.field }>
+					<Fieldset.Legend>Pattern file (Required)</Fieldset.Legend>
 					<Stack direction="column" gap="sm">
 						<FormFileUpload
 							accept=".json,application/json"

@@ -1,8 +1,16 @@
 import { speak } from '@wordpress/a11y';
 import { DropZone, FormFileUpload } from '@wordpress/components';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
-import { Button, Fieldset, Icon, Progress, Stack, Text } from '@wordpress/ui';
+import {
+	Button,
+	Fieldset,
+	Icon,
+	Progress,
+	Stack,
+	Text,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import { getExtension, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
 
@@ -25,11 +33,34 @@ export function FilePickerUpload() {
 	const timers = useRef( new Map< string, number >() );
 	const removeRefs = useRef( new Map< string, HTMLButtonElement >() );
 	const chooseRef = useRef< HTMLButtonElement >( null );
+	const announcements = useRef< string[] >( [] );
+	const [ error, setError ] = useState( '' );
+	const errorId = useId();
 
 	useEffect( () => {
 		const current = timers.current;
 		return () => current.forEach( ( timer ) => clearInterval( timer ) );
 	}, [] );
+
+	/*
+	 * Uploads added together finish together, and each `speak()` call
+	 * replaces the previous message. Collect the results of one moment and
+	 * announce them at once.
+	 */
+	function announce( message: string ) {
+		announcements.current.push( message );
+		if ( announcements.current.length === 1 ) {
+			// Kept with the upload timers, so unmounting clears it too.
+			timers.current.set(
+				'announce',
+				window.setTimeout(
+					() =>
+						speak( announcements.current.splice( 0 ).join( ' ' ) ),
+					100
+				)
+			);
+		}
+	}
 
 	function update( id: string, changes: Partial< Upload > ) {
 		setUploads( ( current ) =>
@@ -53,11 +84,11 @@ export function FilePickerUpload() {
 			if ( fails && progress >= 60 ) {
 				stop( id );
 				update( id, { status: 'failed' } );
-				speak( `Couldn’t upload ${ file.name }.` );
+				announce( `Couldn’t upload ${ file.name }.` );
 			} else if ( progress >= 100 ) {
 				stop( id );
 				update( id, { status: 'uploaded', progress } );
-				speak( `${ file.name } uploaded.` );
+				announce( `${ file.name } uploaded.` );
 			} else {
 				update( id, { progress } );
 			}
@@ -66,7 +97,19 @@ export function FilePickerUpload() {
 	}
 
 	function addFiles( files: File[] ) {
-		const added = files.map( ( file ) => ( {
+		// `accept` only filters the picker, so check dropped files too.
+		const isAccepted = ( file: File ) =>
+			file.type.startsWith( 'image/' ) ||
+			getExtension( file.name ).toLowerCase() === '.pdf';
+		const rejected = files.filter( ( file ) => ! isAccepted( file ) );
+		setError(
+			rejected.length
+				? `Couldn’t add ${ rejected
+						.map( ( file ) => file.name )
+						.join( ', ' ) }. Choose images or PDF files.`
+				: ''
+		);
+		const added = files.filter( isAccepted ).map( ( file ) => ( {
 			id: crypto.randomUUID(),
 			file,
 			status: 'uploading' as const,
@@ -84,13 +127,20 @@ export function FilePickerUpload() {
 			attempt: upload.attempt + 1,
 		} );
 		start( upload.id, upload.file, upload.attempt + 1 );
+		// The "Retry" button is about to go, so move focus to the row's
+		// remove button, which now cancels the upload.
+		removeRefs.current.get( upload.id )?.focus();
 	}
 
 	function remove( upload: Upload ) {
 		stop( upload.id );
 		const index = uploads.indexOf( upload );
 		const remaining = uploads.filter( ( item ) => item !== upload );
-		setUploads( remaining );
+		// A timer may have updated the list since this render, so filter the
+		// latest state.
+		setUploads( ( current ) =>
+			current.filter( ( item ) => item.id !== upload.id )
+		);
 		speak(
 			upload.status === 'uploading'
 				? `Upload of ${ upload.file.name } canceled.`
@@ -110,7 +160,7 @@ export function FilePickerUpload() {
 	};
 
 	return (
-		<Fieldset.Root>
+		<Fieldset.Root className={ styles.field }>
 			<Fieldset.Legend>Photos of the damage</Fieldset.Legend>
 			<Stack
 				direction="column"
@@ -193,6 +243,7 @@ export function FilePickerUpload() {
 								ref={ chooseRef }
 								variant="unstyled"
 								className={ styles.choose }
+								aria-describedby={ error ? errorId : undefined }
 								onClick={ openFileDialog }
 							>
 								<Stack
@@ -220,6 +271,15 @@ export function FilePickerUpload() {
 				Drop photos or PDFs here, or choose them. Each file uploads as
 				soon as you add it.
 			</Fieldset.Description>
+			<div aria-live="polite">
+				{ error && (
+					<ValidityIndicator
+						id={ errorId }
+						type="invalid"
+						message={ error }
+					/>
+				) }
+			</div>
 		</Fieldset.Root>
 	);
 }

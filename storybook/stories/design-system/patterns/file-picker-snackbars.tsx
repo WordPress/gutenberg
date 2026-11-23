@@ -1,6 +1,6 @@
 import { SnackbarList } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import styles from './file-picker.module.css';
+import previewStyles from './file-picker-preview.module.css';
 
 /**
  * A local snackbar list, so the preview is self-contained. In a WordPress
@@ -18,7 +18,7 @@ export function useSnackbars() {
 
 	const list = (
 		<SnackbarList
-			className={ styles.snackbars }
+			className={ previewStyles.snackbars }
 			notices={ notices }
 			onRemove={ ( id ) =>
 				setNotices( ( current ) =>
@@ -54,7 +54,7 @@ export async function importPattern( file: File ) {
 		new Promise( ( resolve ) => setTimeout( resolve, 1500 ) ),
 	] );
 	if ( typeof data?.title !== 'string' ) {
-		throw new Error( `${ file.name } isn’t a pattern file.` );
+		throw new Error( 'Not a pattern file.' );
 	}
 	return data.title as string;
 }

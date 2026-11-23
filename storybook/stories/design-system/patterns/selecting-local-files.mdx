@@ -21,7 +21,7 @@ import FilePickerStylesSource from './file-picker.module.css?raw';
 
 # Selecting local files
 
-Use `FormFileUpload` from `@wordpress/components` to open the native file picker. Its `render` prop receives `openFileDialog`, so any control can open the picker, while the file input stays hidden. It also handles browser quirks, such as `accept="audio/*"` on iOS.
+Let people choose files from their device with a drop area, a button, or a menu, and show what they chose. Use `FormFileUpload` from `@wordpress/components` to open the native file picker. Its `render` prop receives `openFileDialog`, so any control can open the picker, while the file input stays hidden. It also handles browser quirks, such as `accept="audio/*"` on iOS.
 
 <Markdown>{ `
 | Pattern | Use it when |
@@ -51,7 +51,7 @@ Lay the field out like other form fields: the label, then the drop area, then th
 - **Say that dropping works.** The drop area names the action, such as "Add an image", and the description says a file can be dropped there. A dashed border alone doesn't tell people that.
 - **Put the remove button beside the drop area, not inside it.** A button can't contain another button. Name it after the file, such as "Remove cover.png", and move focus back to the drop area after a removal. Removing a file only clears the selection. It doesn't delete a file that was already uploaded.
 - **Name the drop area after its action.** When it shows a file, its accessible name is "Replace cover.png".
-- **Mark required and optional fields.** Add "(Required)" or "(Optional)" after the legend, as other form fields do.
+- **Mark the field the way the rest of the form does.** Add "(Required)" to required fields, or "(Optional)" when the form marks optional fields instead, in the legend's own style.
 
 A `Fieldset` groups the drop area and the remove button under one legend. Disable the fieldset to disable the button, the remove button, and the hidden input together. Remove the `DropZone` and stop a dropped file from opening in the browser tab.
 
@@ -69,7 +69,7 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 - **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can be told apart.
 - **Move focus after a removal.** Focus the next row's remove button, or the drop area when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others. Say why each file was rejected: its type, its size, or the limit on the number of files.
-- **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the drop area and say so in its label, such as "5 of 5 files added".
+- **State the limits up front.** Put the number of files and the size limit in the description. When the field is full, disable the button and say so in its label, such as "5 of 5 files added". A file dropped on a full field gets the limit message.
 - **Show the file type next to the name.** Long filenames are cut at the end, so the details line shows the type, and people can tell `report.pdf` from `report.png`.
 - **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
 
@@ -85,19 +85,20 @@ When each file uploads as soon as it's added, show the upload's status in its ro
 The upload here is simulated, and the first try for each PDF fails, so you can try "Retry".
 
 - **Keep each row's actions visible.** While a file uploads, its remove button cancels the upload, so its name says so: "Cancel upload of photo.jpg".
-- **Announce the result, not the progress.** Call `speak()` when a file finishes or fails. The `Progress` bar exposes its value to assistive technology, so don't announce each step.
+- **Keep focus in the row after "Retry".** The button goes away when the upload restarts, so move focus to the row's remove button.
+- **Announce the result, not the progress.** Call `speak()` when a file finishes or fails. The `Progress` bar exposes its value to assistive technology, so don't announce each step. Each `speak()` call replaces the previous message, so combine results that arrive together into one announcement.
 - **Use color and text together.** "Uploaded" and "Couldn't upload" use the success and error colors, and the words carry the meaning without them.
 
 ## Panel drop target
 
-When a whole panel or dialog accepts files, put the `DropZone` in the panel's container, so a file dropped anywhere in it is added. The Font Library and the media dialog work this way. An `EmptyState` explains what to drop and offers a button that opens the picker.
+When a whole panel or dialog accepts files, put the `DropZone` in the panel's container, so a file dropped anywhere in it is added. The Font Library and the media dialog work this way. An `EmptyState` explains what to drop, and a button in the panel's header opens the picker.
 
 <Canvas
 	of={ FilePickerPanelStories.PanelDropTarget }
 	source={ { code: FilePickerPanelSource, language: 'tsx', type: 'code' } }
 />
 
-Once there are files, the button moves to the panel's header. Wrap the whole panel in `FormFileUpload`, so the input stays mounted when the button moves.
+Keep the button in the same place when files arrive. If it moved from the empty state to the header, it would lose focus as soon as the first file was added.
 
 ## Import on choose
 
@@ -114,7 +115,7 @@ A snackbar confirms the import, as on the Patterns screen. An error stays below 
 
 ## Choose, then submit
 
-When the file is one part of a form, keep the chosen `File` in state and pass it to the submit handler. Show it below the button with the same row as the drop area.
+When the file is one part of a form, keep the chosen `File` in state and pass it to the submit handler. Show it below the button with the same row as a list of several files.
 
 <Canvas
 	of={ FilePickerButtonStories.ChooseFile }
@@ -142,7 +143,7 @@ In this preview, a dialog with three sample images stands in for the Media Libra
 
 ## Shared parts
 
-The examples use one component for a chosen file. It renders only `span` elements, so it can also be the content of a button.
+The examples share the parts that show a chosen file. `FileSummary` renders only phrasing content, so it can also be the content of a button. `SelectedFile` adds the row and its remove button.
 
 <Source code={ SelectedFileSource } language="tsx" />
 

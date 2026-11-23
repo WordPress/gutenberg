@@ -37,7 +37,7 @@ export function FilePickerDropZone( { disabled = false } ) {
 	const errorId = useId();
 
 	function chooseFiles( files: File[] ) {
-		if ( disabled || ! files.length ) {
+		if ( ! files.length ) {
 			return;
 		}
 		if ( files.length > 1 ) {
@@ -67,13 +67,12 @@ export function FilePickerDropZone( { disabled = false } ) {
 
 	return (
 		<Fieldset.Root
+			className={ styles.field }
 			disabled={ disabled }
 			onDragOver={ preventFileNavigation }
 			onDrop={ preventFileNavigation }
 		>
-			<Fieldset.Legend>
-				Cover image <span className={ styles.marker }>(Optional)</span>
-			</Fieldset.Legend>
+			<Fieldset.Legend>Cover image (Optional)</Fieldset.Legend>
 			<FormFileUpload
 				accept=".png,image/png"
 				onChange={ ( { currentTarget } ) => {

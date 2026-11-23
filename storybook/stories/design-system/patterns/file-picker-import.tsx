@@ -2,7 +2,7 @@ import { FormFileUpload } from '@wordpress/components';
 import { useId, useState } from '@wordpress/element';
 import { Button, Stack, ValidityIndicator } from '@wordpress/ui';
 import { importPattern, useSnackbars } from './file-picker-snackbars';
-import styles from './file-picker.module.css';
+import previewStyles from './file-picker-preview.module.css';
 
 export function FilePickerImport() {
 	const [ isImporting, setIsImporting ] = useState( false );
@@ -31,7 +31,7 @@ export function FilePickerImport() {
 			direction="column"
 			align="flex-start"
 			gap="sm"
-			className={ styles[ 'with-snackbars' ] }
+			className={ previewStyles[ 'with-snackbars' ] }
 		>
 			<FormFileUpload
 				accept=".json,application/json"

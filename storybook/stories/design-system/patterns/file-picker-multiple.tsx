@@ -109,7 +109,7 @@ export function FilePickerMultiple() {
 	}
 
 	return (
-		<Fieldset.Root>
+		<Fieldset.Root className={ styles.field }>
 			<Fieldset.Legend>Supporting documents</Fieldset.Legend>
 			<Stack
 				direction="column"

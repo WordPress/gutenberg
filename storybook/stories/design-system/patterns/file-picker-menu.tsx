@@ -1,10 +1,19 @@
 import { speak } from '@wordpress/a11y';
 import { FormFileUpload } from '@wordpress/components';
-import { useRef, useState } from '@wordpress/element';
+import { useId, useRef, useState } from '@wordpress/element';
 import { chevronDown, media, upload } from '@wordpress/icons';
-import { Button, Dialog, Fieldset, Icon, Menu, Stack } from '@wordpress/ui';
+import {
+	Button,
+	Dialog,
+	Fieldset,
+	Icon,
+	Menu,
+	Stack,
+	ValidityIndicator,
+} from '@wordpress/ui';
 import { FileSummary, SelectedFile } from './selected-file';
 import styles from './file-picker.module.css';
+import previewStyles from './file-picker-preview.module.css';
 
 function sampleImage( name: string, from: string, to: string ) {
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${ from }"/><stop offset="1" stop-color="${ to }"/></linearGradient></defs><rect width="64" height="64" fill="url(#g)"/></svg>`;
@@ -22,14 +31,22 @@ export function FilePickerMenu() {
 	const [ file, setFile ] = useState< File >();
 	const [ isLibraryOpen, setIsLibraryOpen ] = useState( false );
 	const triggerRef = useRef< HTMLButtonElement >( null );
+	const [ error, setError ] = useState( '' );
+	const errorId = useId();
 
 	function choose( chosen: File ) {
+		// `accept` only filters the picker, so check the file.
+		if ( ! chosen.type.startsWith( 'image/' ) ) {
+			setError( `Couldn’t use ${ chosen.name }. Choose an image.` );
+			return;
+		}
 		setFile( chosen );
+		setError( '' );
 		speak( `${ chosen.name } selected.` );
 	}
 
 	return (
-		<Fieldset.Root>
+		<Fieldset.Root className={ styles.field }>
 			<Fieldset.Legend>Featured image</Fieldset.Legend>
 			{ /*
 			 * Wrap the whole menu, not the item: the item unmounts when the
@@ -55,6 +72,9 @@ export function FilePickerMenu() {
 										variant="outline"
 										tone="neutral"
 										className={ styles.select }
+										aria-describedby={
+											error ? errorId : undefined
+										}
 									/>
 								}
 							>
@@ -98,6 +118,15 @@ export function FilePickerMenu() {
 			<Fieldset.Description>
 				Choose an image from the Media Library, or upload one.
 			</Fieldset.Description>
+			<div aria-live="polite">
+				{ error && (
+					<ValidityIndicator
+						id={ errorId }
+						type="invalid"
+						message={ error }
+					/>
+				) }
+			</div>
 			<Dialog.Root
 				open={ isLibraryOpen }
 				onOpenChange={ setIsLibraryOpen }
@@ -119,7 +148,7 @@ export function FilePickerMenu() {
 								<li key={ item.name }>
 									<Button
 										variant="unstyled"
-										className={ `${ styles.surface } ${ styles.choose } ${ styles.option }` }
+										className={ `${ styles.surface } ${ styles.choose } ${ previewStyles.option }` }
 										onClick={ () => {
 											choose( item );
 											setIsLibraryOpen( false );
