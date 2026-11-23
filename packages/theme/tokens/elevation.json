@@ -48,30 +48,6 @@
 						"value": 0,
 						"unit": "px"
 					}
-				},
-				{
-					"color": {
-						"colorSpace": "srgb",
-						"components": [ 1, 1, 1 ],
-						"alpha": 0
-					},
-					"offsetX": {
-						"value": 0,
-						"unit": "px"
-					},
-					"offsetY": {
-						"value": 1,
-						"unit": "px"
-					},
-					"blur": {
-						"value": 0,
-						"unit": "px"
-					},
-					"spread": {
-						"value": 0,
-						"unit": "px"
-					},
-					"inset": true
 				}
 			],
 			"$description": "Elevation for small controls raised slightly above their surface, such as a switch thumb."
@@ -123,30 +99,6 @@
 						"value": 0,
 						"unit": "px"
 					}
-				},
-				{
-					"color": {
-						"colorSpace": "srgb",
-						"components": [ 1, 1, 1 ],
-						"alpha": 0
-					},
-					"offsetX": {
-						"value": 0,
-						"unit": "px"
-					},
-					"offsetY": {
-						"value": 1,
-						"unit": "px"
-					},
-					"blur": {
-						"value": 0,
-						"unit": "px"
-					},
-					"spread": {
-						"value": 0,
-						"unit": "px"
-					},
-					"inset": true
 				}
 			],
 			"$description": "Elevation for small transient surfaces close to their trigger, such as tooltips."
@@ -198,30 +150,6 @@
 						"value": 0,
 						"unit": "px"
 					}
-				},
-				{
-					"color": {
-						"colorSpace": "srgb",
-						"components": [ 1, 1, 1 ],
-						"alpha": 0
-					},
-					"offsetX": {
-						"value": 0,
-						"unit": "px"
-					},
-					"offsetY": {
-						"value": 1,
-						"unit": "px"
-					},
-					"blur": {
-						"value": 0,
-						"unit": "px"
-					},
-					"spread": {
-						"value": 0,
-						"unit": "px"
-					},
-					"inset": true
 				}
 			],
 			"$description": "Elevation for floating surfaces anchored to a trigger, such as popovers and menus."
@@ -273,30 +201,6 @@
 						"value": 0,
 						"unit": "px"
 					}
-				},
-				{
-					"color": {
-						"colorSpace": "srgb",
-						"components": [ 1, 1, 1 ],
-						"alpha": 0
-					},
-					"offsetX": {
-						"value": 0,
-						"unit": "px"
-					},
-					"offsetY": {
-						"value": 1,
-						"unit": "px"
-					},
-					"blur": {
-						"value": 0,
-						"unit": "px"
-					},
-					"spread": {
-						"value": 0,
-						"unit": "px"
-					},
-					"inset": true
 				}
 			],
 			"$description": "Elevation for surfaces that sit above the whole page, such as dialogs and drawers."

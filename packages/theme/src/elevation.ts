@@ -6,20 +6,13 @@ import { ColorSpace, getLuminance, sRGB } from 'colorjs.io/fn';
  */
 const ELEVATION_OPACITY = { min: 0.05, max: 0.3 };
 
-/**
- * Top-edge highlight opacity range. White gets `min` (no highlight), black
- * gets `max`.
- */
-const HIGHLIGHT_OPACITY = { min: 0, max: 0.1 };
-
 type ShadowLayer = { offsetY: number; blur: number };
 
 /**
  * Each elevation level is two black shadows: a tight key shadow that defines
  * the edge, and a soft ambient shadow that conveys height. Both share the same
- * opacity. Every level also ends with the same 1px inset white highlight along
- * the top edge, which catches the light on darker backgrounds. Keep in sync with `tokens/elevation.json`, which holds the default
- * values (tested in `test/elevation.ts`).
+ * opacity. Keep in sync with `tokens/elevation.json`, which holds the default
+ * values (tested in `test/elevation.test.ts`).
  */
 export const ELEVATION_LEVELS: Record<
 	'xs' | 'sm' | 'md' | 'lg',
@@ -58,18 +51,6 @@ export function getElevationOpacity( background: string ): number {
 	return opacityForBackground( background, ELEVATION_OPACITY );
 }
 
-/**
- * Get the top-edge highlight opacity for a background color. It follows the
- * same curve as the shadows, so the highlight gets brighter as the background
- * gets darker, and is invisible on white.
- *
- * @param background An sRGB-parseable background color.
- * @return Highlight opacity, rounded to three decimals.
- */
-export function getHighlightOpacity( background: string ): number {
-	return opacityForBackground( background, HIGHLIGHT_OPACITY );
-}
-
 function opacityForBackground(
 	background: string,
 	{ min, max }: { min: number; max: number }
@@ -94,20 +75,14 @@ const toHexAlpha = ( opacity: number ) =>
  */
 export function elevationTokensCSS( background: string ): [ string, string ][] {
 	const color = `#000000${ toHexAlpha( getElevationOpacity( background ) ) }`;
-	// Always emitted, even when fully transparent, so every level has the same
-	// number of layers and shadow transitions interpolate cleanly.
-	const highlight = `inset 0px 1px #ffffff${ toHexAlpha(
-		getHighlightOpacity( background )
-	) }`;
 
 	return Object.entries( ELEVATION_LEVELS ).map( ( [ level, layers ] ) => [
 		`--wpds-elevation-${ level }`,
-		[
-			...layers.map(
+		layers
+			.map(
 				( { offsetY, blur } ) =>
 					`0px ${ offsetY }px ${ blur }px ${ color }`
-			),
-			highlight,
-		].join( ', ' ),
+			)
+			.join( ', ' ),
 	] );
 }

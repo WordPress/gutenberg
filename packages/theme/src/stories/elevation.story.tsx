@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';
-import { getElevationOpacity, getHighlightOpacity } from '../elevation';
+import { getElevationOpacity } from '../elevation';
 
 const LEVELS = [
 	{ token: '--wpds-elevation-xs', usage: 'Switch thumb' },
@@ -81,8 +81,6 @@ const Levels = ( {
 const describeSeed = ( background: string ) =>
 	`${ background } · shadow opacity ${ (
 		getElevationOpacity( background ) * 100
-	).toFixed( 1 ) }% · highlight opacity ${ (
-		getHighlightOpacity( background ) * 100
 	).toFixed( 1 ) }%`;
 
 const meta: Meta< Args > = {
@@ -107,8 +105,7 @@ const meta: Meta< Args > = {
 export default meta;
 
 /**
- * The `--wpds-elevation-*` tokens are two black shadows per level, plus a
- * 1px inset white highlight along the top edge. Their opacity follows the
+ * The `--wpds-elevation-*` tokens are two black shadows per level. Their opacity follows the
  * `ThemeProvider` background seed, increasing as the background gets darker
  * so elevated surfaces stay distinct in dark themes.
  */

@@ -1,11 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import fallbacks from '../../prebuilt/js/design-token-fallbacks.mjs';
 import { DEFAULT_SEED_COLORS } from '../color-ramps';
-import {
-	elevationTokensCSS,
-	getElevationOpacity,
-	getHighlightOpacity,
-} from '../elevation';
+import { elevationTokensCSS, getElevationOpacity } from '../elevation';
 
 /**
  * The token build shortens hex colors where it can (`#ffffff00` → `#fff0`),
@@ -31,13 +27,6 @@ describe( 'elevation', () => {
 				elevationTokensCSS( DEFAULT_SEED_COLORS.background )
 			)
 		).toEqual( Object.fromEntries( staticElevationTokens ) );
-	} );
-
-	it( 'increases highlight opacity as the background gets darker', () => {
-		expect( getHighlightOpacity( '#ffffff' ) ).toBe( 0 );
-		expect( getHighlightOpacity( '#777777' ) ).toBe( 0.057 );
-		expect( getHighlightOpacity( '#1e1e1e' ) ).toBe( 0.089 );
-		expect( getHighlightOpacity( '#000000' ) ).toBe( 0.1 );
 	} );
 
 	it( 'increases shadow opacity as the background gets darker', () => {

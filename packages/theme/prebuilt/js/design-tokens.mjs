@@ -2659,8 +2659,7 @@ export const tokens = /** @type {const} */ ( {
 			'Elevation for small controls raised slightly above their surface, such as a switch thumb.',
 		$type: 'shadow',
 		group: 'elevation',
-		fallback:
-			'0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+		fallback: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e',
 		modes: {
 			default: {
 				$value: [
@@ -2712,32 +2711,8 @@ export const tokens = /** @type {const} */ ( {
 						},
 						inset: false,
 					},
-					{
-						color: {
-							colorSpace: 'srgb',
-							components: [ 1, 1, 1 ],
-							alpha: 0,
-						},
-						offsetX: {
-							value: 0,
-							unit: 'px',
-						},
-						offsetY: {
-							value: 1,
-							unit: 'px',
-						},
-						blur: {
-							value: 0,
-							unit: 'px',
-						},
-						spread: {
-							value: 0,
-							unit: 'px',
-						},
-						inset: true,
-					},
 				],
-				css: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+				css: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e',
 			},
 		},
 	},
@@ -2746,8 +2721,7 @@ export const tokens = /** @type {const} */ ( {
 			'Elevation for small transient surfaces close to their trigger, such as tooltips.',
 		$type: 'shadow',
 		group: 'elevation',
-		fallback:
-			'0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+		fallback: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e',
 		modes: {
 			default: {
 				$value: [
@@ -2799,32 +2773,8 @@ export const tokens = /** @type {const} */ ( {
 						},
 						inset: false,
 					},
-					{
-						color: {
-							colorSpace: 'srgb',
-							components: [ 1, 1, 1 ],
-							alpha: 0,
-						},
-						offsetX: {
-							value: 0,
-							unit: 'px',
-						},
-						offsetY: {
-							value: 1,
-							unit: 'px',
-						},
-						blur: {
-							value: 0,
-							unit: 'px',
-						},
-						spread: {
-							value: 0,
-							unit: 'px',
-						},
-						inset: true,
-					},
 				],
-				css: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
+				css: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e',
 			},
 		},
 	},
@@ -2833,8 +2783,7 @@ export const tokens = /** @type {const} */ ( {
 			'Elevation for floating surfaces anchored to a trigger, such as popovers and menus.',
 		$type: 'shadow',
 		group: 'elevation',
-		fallback:
-			'0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+		fallback: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e',
 		modes: {
 			default: {
 				$value: [
@@ -2886,32 +2835,8 @@ export const tokens = /** @type {const} */ ( {
 						},
 						inset: false,
 					},
-					{
-						color: {
-							colorSpace: 'srgb',
-							components: [ 1, 1, 1 ],
-							alpha: 0,
-						},
-						offsetX: {
-							value: 0,
-							unit: 'px',
-						},
-						offsetY: {
-							value: 1,
-							unit: 'px',
-						},
-						blur: {
-							value: 0,
-							unit: 'px',
-						},
-						spread: {
-							value: 0,
-							unit: 'px',
-						},
-						inset: true,
-					},
 				],
-				css: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
+				css: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e',
 			},
 		},
 	},
@@ -2920,8 +2845,7 @@ export const tokens = /** @type {const} */ ( {
 			'Elevation for surfaces that sit above the whole page, such as dialogs and drawers.',
 		$type: 'shadow',
 		group: 'elevation',
-		fallback:
-			'0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+		fallback: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e',
 		modes: {
 			default: {
 				$value: [
@@ -2973,32 +2897,8 @@ export const tokens = /** @type {const} */ ( {
 						},
 						inset: false,
 					},
-					{
-						color: {
-							colorSpace: 'srgb',
-							components: [ 1, 1, 1 ],
-							alpha: 0,
-						},
-						offsetX: {
-							value: 0,
-							unit: 'px',
-						},
-						offsetY: {
-							value: 1,
-							unit: 'px',
-						},
-						blur: {
-							value: 0,
-							unit: 'px',
-						},
-						spread: {
-							value: 0,
-							unit: 'px',
-						},
-						inset: true,
-					},
 				],
-				css: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
+				css: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e',
 			},
 		},
 	},

@@ -170,14 +170,10 @@ export default {
 	'--wpds-dimension-surface-width-sm': '320px',
 	'--wpds-dimension-surface-width-xl': '720px',
 	'--wpds-dimension-surface-width-xs': '240px',
-	'--wpds-elevation-lg':
-		'0px 4px 10px #0000000e, 0px 20px 48px #0000000e, inset 0px 1px #fff0',
-	'--wpds-elevation-md':
-		'0px 2px 4px #0000000e, 0px 8px 20px #0000000e, inset 0px 1px #fff0',
-	'--wpds-elevation-sm':
-		'0px 1px 2px #0000000e, 0px 3px 8px #0000000e, inset 0px 1px #fff0',
-	'--wpds-elevation-xs':
-		'0px 1px 1px #0000000e, 0px 1px 3px #0000000e, inset 0px 1px #fff0',
+	'--wpds-elevation-lg': '0px 4px 10px #0000000e, 0px 20px 48px #0000000e',
+	'--wpds-elevation-md': '0px 2px 4px #0000000e, 0px 8px 20px #0000000e',
+	'--wpds-elevation-sm': '0px 1px 2px #0000000e, 0px 3px 8px #0000000e',
+	'--wpds-elevation-xs': '0px 1px 1px #0000000e, 0px 1px 3px #0000000e',
 	'--wpds-motion-duration-lg': '300ms',
 	'--wpds-motion-duration-md': '200ms',
 	'--wpds-motion-duration-sm': '100ms',
