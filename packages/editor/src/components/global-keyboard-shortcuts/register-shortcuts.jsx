@@ -172,7 +172,7 @@ function EditorKeyboardShortcutsRegister() {
 	 * the shortcut handlers: the Suggestion Mode experiment AND `editor.notes`
 	 * support on the current post type. Registration is what lists a shortcut
 	 * in the Keyboard Shortcuts help modal, so gating registration on the
-	 * experiment flag alone advertised "Switch to Suggest mode." on screens
+	 * experiment flag alone advertised "Switch to Suggesting." on screens
 	 * that can never act on it. The Site Editor listed it for `wp_template`,
 	 * which has no notes support, renders no Mode menu, and does nothing when
 	 * the combination is pressed.
@@ -193,7 +193,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/intent-edit',
 			category: 'global',
-			description: __( 'Switch to Edit mode.' ),
+			description: __( 'Switch to Editing.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'z',
@@ -203,7 +203,7 @@ function EditorKeyboardShortcutsRegister() {
 		registerShortcut( {
 			name: 'core/editor/intent-suggest',
 			category: 'global',
-			description: __( 'Switch to Suggest mode.' ),
+			description: __( 'Switch to Suggesting.' ),
 			keyCombination: {
 				modifier: 'secondary',
 				character: 'x',

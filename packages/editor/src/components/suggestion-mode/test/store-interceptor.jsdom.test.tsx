@@ -42,6 +42,11 @@ import {
 	useSuggestionSession,
 } from '../suggestion-session';
 import { takeWithdrawnAnchor } from '../decision-state';
+import {
+	PAYLOAD_MAX_BYTES,
+	buildSuggestionPayload,
+	payloadByteLength,
+} from '../operations';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -60,6 +65,9 @@ function blockMarkerOf( attributes: any ): Record< string, any > | undefined {
 vi.hoisted( () => {
 	globalThis.wpVitest.mockMatchMedia();
 } );
+
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
 
 describe( 'shallowAttributeEquals', () => {
 	it( 'treats reference-equal values as equal', () => {
@@ -187,10 +195,19 @@ function createStubCoreStore(
 	currentUserId?: number
 ) {
 	return createReduxStore( 'core', {
-		reducer: ( state = {} ) => state,
+		reducer: ( state: any = { userId: currentUserId }, action: any ) =>
+			action.type === 'RECEIVE_CURRENT_USER'
+				? { userId: action.id }
+				: state,
+		actions: {
+			receiveCurrentUser: ( id: number ) => ( {
+				type: 'RECEIVE_CURRENT_USER',
+				id,
+			} ),
+		},
 		selectors: {
-			getCurrentUser: () =>
-				currentUserId === undefined ? undefined : { id: currentUserId },
+			getCurrentUser: ( state: any ) =>
+				state.userId === undefined ? undefined : { id: state.userId },
 			getRawEntityRecord: () => undefined,
 			getEntityRecordEdits: () => undefined,
 			getEntityRecord: (
@@ -305,6 +322,25 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			await Promise.resolve();
 		} );
 	}
+
+	it( 'stamps the author on a marker when the user resolves after the session starts', async () => {
+		const { registry, clientId } = setup();
+		await act( async () => {
+			( registry.dispatch( 'core' ) as any ).receiveCurrentUser( 7 );
+		} );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, { content: 'Changed' } );
+		} );
+		await flushSubscribers();
+
+		expect( markerOf( registry, clientId ) ).toMatchObject( {
+			type: 'pending-attributes',
+			authorId: 7,
+		} );
+	} );
 
 	function appliedRemovalNote( id: number, clientId: string ) {
 		return {
@@ -608,6 +644,61 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			clientId,
 			blockName: TEST_BLOCK_NAME,
 		} );
+	} );
+
+	it( 'records a removal or insertion of a large block as a capture that fits a payload', async () => {
+		const RICH = 'core/test-suggestion-rich-block';
+		registerBlockType( RICH, {
+			apiVersion: 3,
+			attributes: {
+				content: { type: 'rich-text', source: 'rich-text' },
+				metadata: { type: 'object' },
+			},
+			save: () => null,
+			category: 'text',
+			title: 'Test Suggestion Rich Block',
+		} );
+		const text = 'Lorem ipsum dolor sit amet. '.repeat( 4000 );
+		const removed = createBlock( RICH, { content: text } );
+		const kept = createBlock( TEST_BLOCK_NAME, { content: 'Kept' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ kept, removed ],
+		} );
+		expect( text.length ).toBeGreaterThan( PAYLOAD_MAX_BYTES );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.removeBlock( removed.clientId );
+		} );
+		await flushSubscribers();
+		const inserted = createBlock( RICH, { content: text } );
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.insertBlock( inserted, 2, undefined, false );
+		} );
+		await flushSubscribers();
+
+		for ( const [ clientId, type ] of [
+			[ removed.clientId, 'block-remove' ],
+			[ inserted.clientId, 'block-insert-after' ],
+		] ) {
+			const op = captureOf( getOverlay, clientId );
+			expect( op ).toMatchObject( { type, blockName: RICH } );
+			// The block's text, cut short, and not the block.
+			expect( op ).not.toHaveProperty( 'block' );
+			expect( op.excerpt.startsWith( 'Lorem ipsum' ) ).toBe( true );
+			expect(
+				payloadByteLength(
+					buildSuggestionPayload( {
+						blockName: RICH,
+						baseRevision: null,
+						operations: [ op ],
+					} )
+				)
+			).toBeLessThan( 2048 );
+		}
 	} );
 
 	it( 'keeps the pending-remove marker after a follow-up dispatch fires the subscribe loop again', async () => {
@@ -2123,6 +2214,32 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 				authorId: anne,
 				commentId: 12,
 			} );
+			const { registry } = setup( {
+				initialBlocks: blocks,
+				currentUserId: bob,
+			} );
+			const { clientId } = blocks[ 0 ];
+			await act( async () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( clientId, { content: 'Bob' } );
+			} );
+			await flushSubscribers();
+
+			expect( attributesOf( registry, clientId ).content ).toBe(
+				'First'
+			);
+			expect(
+				markerOf( registry, clientId )?.nested?.[ 0 ]
+			).toMatchObject( {
+				type: 'pending-attributes',
+				authorId: bob,
+				after: { content: 'Bob' },
+			} );
+		} );
+
+		it( 'turns an edit inside a suggested block with no author into a proposal', async () => {
+			const blocks = twoBlocks( { type: 'pending-insert' } );
 			const { registry } = setup( {
 				initialBlocks: blocks,
 				currentUserId: bob,

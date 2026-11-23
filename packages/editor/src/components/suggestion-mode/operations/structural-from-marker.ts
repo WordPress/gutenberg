@@ -8,6 +8,7 @@
 import type { SuggestionMarker } from '../marker';
 import type { SuggestionOperation } from './payload';
 import type { BlockTreeReader } from './plan';
+import { blockExcerpt } from './block-excerpt';
 
 /**
  * @param clientId The marked block.
@@ -42,7 +43,7 @@ export function structuralOpFromMarker(
 				blockName: block.name,
 				parentBlockName,
 				...groupId,
-				block,
+				...blockExcerpt( block ),
 			};
 		case 'pending-insert':
 			return {
@@ -52,7 +53,7 @@ export function structuralOpFromMarker(
 				anchorClientId,
 				parentClientId,
 				parentBlockName,
-				block,
+				...blockExcerpt( block ),
 				...groupId,
 			};
 		case 'pending-move':
