@@ -509,7 +509,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * back to what the notes store. Only notes that pass
 		 * `gutenberg_can_render_suggestion_note()` are inflated, so proposals
 		 * of trashed or spam notes, or of notes trashed with the post, stay
-		 * out until the note is restored.
+		 * out until the note is restored. The proposals of an author without
+		 * `unfiltered_html` go through kses again on the way in.
 		 *
 		 * @param WP_REST_Response $response Response.
 		 * @param WP_Post          $post     Post, autosave or revision.
@@ -542,6 +543,19 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				if ( ! isset( $notes[ $note_id ] ) || ! gutenberg_can_render_suggestion_note( $note_id, $parent_id ) ) {
 					unset( $items[ $note_id ] );
 				}
+			}
+
+			/*
+			 * A stored proposal is held to what its author may publish: a
+			 * reviewer with `unfiltered_html` saves the content they load
+			 * without kses, whoever proposed it.
+			 */
+			foreach ( $items as $note_id => $list ) {
+				$note = get_comment( $note_id );
+				if ( $note && (int) $note->user_id > 0 && user_can( (int) $note->user_id, 'unfiltered_html' ) ) {
+					continue;
+				}
+				$items[ $note_id ] = array_map( array( 'Gutenberg_Suggestion_Content', 'kses_item' ), $list );
 			}
 
 			$data['content']['raw'] = Gutenberg_Suggestion_Content::inflate( $data['content']['raw'], $items );

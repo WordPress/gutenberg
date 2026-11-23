@@ -454,6 +454,59 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertSame( $marker, $this->items_of( $note_id )[0]['original'] );
 	}
 
+	/**
+	 * Replaces what a post's notes store with markup kses would not let
+	 * their author publish, as a write that bypassed the save pass could.
+	 *
+	 * @param int[] $notes Note ids: an addition, a suggested block, an attribute proposal.
+	 */
+	private function forge_stored_proposals( array $notes ): void {
+		$payload = '<img src="x" onerror="alert(1)"><script>alert(2)</script>';
+		foreach ( $notes as $note_id ) {
+			$items = $this->items_of( $note_id );
+			foreach ( $items as $index => $item ) {
+				if ( 'after' === $item['kind'] ) {
+					$items[ $index ]['after']    = array( 'content' => $payload );
+					$items[ $index ]['original'] = str_replace( '"after":{"level":3}', '"after":{"content":' . wp_json_encode( $payload ) . '}', $item['original'] );
+				} else {
+					$items[ $index ]['original'] = str_replace( array( ' zanzibarian', 'Quixotic paragraph' ), array( ' zanzibarian' . $payload, 'Quixotic paragraph' . $payload ), $item['original'] );
+				}
+			}
+			update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $items ) ) );
+		}
+	}
+
+	public function test_a_stored_proposal_is_inflated_as_what_its_author_may_publish(): void {
+		list( $post_id, , $notes ) = $this->suggested_post();
+		$this->forge_stored_proposals( $notes );
+
+		$view = $this->edit_view( $post_id );
+
+		$this->assertStringNotContainsString( 'onerror', $view );
+		$this->assertStringNotContainsString( '<script', $view );
+		$this->assertStringContainsString( ' zanzibarian', $view );
+		$this->assertStringContainsString( 'Quixotic paragraph', $view );
+		$this->assertStringContainsString( '"after":{"content":', $view );
+	}
+
+	public function test_a_stored_proposal_of_an_unfiltered_html_author_is_inflated_exactly(): void {
+		list( $post_id, , $notes ) = $this->suggested_post();
+		foreach ( $notes as $note_id ) {
+			wp_update_comment(
+				array(
+					'comment_ID' => $note_id,
+					'user_id'    => self::$editor_id,
+				)
+			);
+		}
+		$this->forge_stored_proposals( $notes );
+
+		$view = $this->edit_view( $post_id );
+
+		$this->assertStringContainsString( ' zanzibarian<img src="x" onerror="alert(1)"><script>alert(2)</script>', $view );
+		$this->assertStringContainsString( 'Quixotic paragraph<img src="x" onerror="alert(1)"><script>alert(2)</script>', $view );
+	}
+
 	public function test_an_oversized_proposal_stays_in_the_content_and_is_flagged() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$big     = $this->create_note( $post_id );
