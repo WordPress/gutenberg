@@ -753,4 +753,156 @@ class Tests_Suggestion_Attribute_Operations extends WP_Test_REST_TestCase {
 		$this->assertIsInt( $post_id );
 		$this->assertSame( 201, $this->send( $this->payload( self::BUTTON, array( 'url' => 'java<x-y>script:alert(1)' ) ), null, $post_id )->get_status() );
 	}
+
+	/**
+	 * Only the positions custom CSS is stripped from, for a user without
+	 * `edit_css`, hold CSS someone allowed to write it saved. A `css` key
+	 * anywhere else in a saved `style` is the saver's own.
+	 */
+	public function test_does_not_take_custom_css_from_a_position_the_post_filter_leaves(): void {
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$contributor_id,
+				'post_status'  => 'draft',
+				'post_content' => '<!-- wp:test-validate-group {"style":{"color":{"css":"body{display:none}"},"list":[{"css":"body{display:none}"}]}} /-->',
+			)
+		);
+		$this->assertIsInt( $post_id );
+		$this->assertStringContainsString( 'body{display:none}', (string) get_post_field( 'post_content', $post_id ), 'The contributor could save it.' );
+
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( 'css' => 'body{display:none}' ) ), array(), $post_id ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( ':hover' => array( 'css' => 'body{display:none}' ) ) ), array(), $post_id ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( 'color' => array( 'css' => 'body{display:none}' ) ) ), array(), $post_id ) );
+	}
+
+	/**
+	 * Custom CSS is carried along where the block has it, not moved.
+	 */
+	public function test_takes_custom_css_from_the_same_position_only(): void {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author'  => self::$contributor_id,
+				'post_status'  => 'draft',
+				'post_content' => '<!-- wp:test-validate-group {"style":{"css":"color: red;",":hover":{"css":"color: blue;","@mobile":{"css":"color: green;"}}}} /-->',
+			)
+		);
+		wp_set_current_user( self::$contributor_id );
+		$this->assertIsInt( $post_id );
+		$this->assertStringContainsString( 'color: green;', (string) get_post_field( 'post_content', $post_id ) );
+
+		$this->assertNull(
+			$this->problem(
+				self::GROUP,
+				array(
+					'style' => array(
+						'css'    => 'color: red;',
+						':hover' => array(
+							'css'     => 'color: blue;',
+							'@mobile' => array( 'css' => 'color: green;' ),
+						),
+					),
+				),
+				array(),
+				$post_id
+			)
+		);
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( 'css' => 'color: blue;' ) ), array(), $post_id ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( ':hover' => array( 'css' => 'color: red;' ) ) ), array(), $post_id ) );
+		$this->assertSame( 'unsafe-value', $this->problem( self::GROUP, array( 'style' => array( ':focus' => array( 'css' => 'color: blue;' ) ) ), array(), $post_id ) );
+	}
+
+	/**
+	 * Filtering a payload for storage filters the keys of a proposed value
+	 * too, decoding entities in them, so a key can become `css`, or a URL
+	 * key, only once stored.
+	 *
+	 * @return array<string, array{0: string}>
+	 */
+	public function data_keys_that_change_once_filtered(): array {
+		$op = static function ( string $after ): string {
+			return '{"schemaVersion":2,"blockName":"' . self::GROUP . '","baseRevision":null,"operations":[{"type":"attribute-set","attribute":"style","before":null,"after":' . $after . '}]}';
+		};
+		return array(
+			'markup in a css key'        => array( $op( '{"c<x-y>ss":"color:red"}' ) ),
+			'markup in a nested css key' => array( $op( '{":hover":{"c<x-y>ss":"color:red"}}' ) ),
+			'a null after a css key'     => array( $op( '{"css\u0000":"color:red"}' ) ),
+			'a null before a css key'    => array( $op( '{"\u0000css":"color:red"}' ) ),
+			'a null in a nested css key' => array( $op( '{"@mobile":{"c\u0000ss":"color:red"}}' ) ),
+			'an ampersand in a key'      => array( $op( '{"a&b":"x"}' ) ),
+			'markup in a URL key'        => array( $op( '{"background":{"backgroundImage":{"u<x-y>rl":"javascript:alert(1)"}}}' ) ),
+			'a null in a URL key'        => array( $op( '{"background":{"backgroundImage":{"ur\u0000l":"a.png\');color:red;x:url(\'"}}}' ) ),
+			'two keys that become one'   => array( $op( '{"css":null,"c<x-y>ss":"color:red"}' ) ),
+			'an entity in a css key'     => array( $op( '{"c&#115;s":"color:red"}' ) ),
+			'a hex entity in a css key'  => array( $op( '{":hover":{"c&#x73;s":"color:red"}}' ) ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_keys_that_change_once_filtered
+	 *
+	 * @param string $payload Payload JSON.
+	 */
+	public function test_rest_refuses_a_key_that_changes_once_filtered( string $payload ): void {
+		$this->assertFalse( current_user_can( 'unfiltered_html' ) );
+		$this->assertErrorResponse( 'rest_invalid_suggestion', $this->send( $payload ), 400 );
+	}
+
+	/**
+	 * @dataProvider data_keys_that_change_once_filtered
+	 *
+	 * @param string $payload Payload JSON.
+	 */
+	public function test_meta_update_outside_rest_refuses_a_key_that_changes_once_filtered( string $payload ): void {
+		$note_id = $this->create_note();
+		$this->assertFalse( update_comment_meta( $note_id, '_wp_suggestion', wp_slash( $payload ) ) );
+		$this->assertSame( array(), get_comment_meta( $note_id, '_wp_suggestion' ) );
+	}
+
+	/**
+	 * A property name PHP cannot hold on an object must not leave the whole
+	 * payload unread.
+	 *
+	 * @dataProvider data_users
+	 *
+	 * @param string $role Role of the user writing the note.
+	 */
+	public function test_refuses_a_payload_it_cannot_read( string $role ): void {
+		wp_set_current_user( 'editor' === $role ? self::$editor_id : self::$contributor_id );
+		$post_id = self::factory()->post->create(
+			array(
+				'post_author' => get_current_user_id(),
+				'post_status' => 'draft',
+			)
+		);
+		$this->assertIsInt( $post_id );
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'note',
+				'user_id'         => get_current_user_id(),
+			)
+		);
+		$this->assertIsInt( $note_id );
+
+		foreach ( array(
+			'{"\u0000x":1,"blockName":"' . self::BUTTON . '","operations":[{"type":"attribute-set","attribute":"url","after":"javascript:alert(1)"}]}',
+			'{"blockName":"' . self::BUTTON . '","operations":[{"type":"attribute-set","attribute":"url","after":"javascript:alert(1)","\u0000x":1}]}',
+			'{"blockName":"' . self::GROUP . '","operations":[{"type":"attribute-set","attribute":"style","after":{"\u0000x":1,"color":{"text":"red;top:0"}}}]}',
+		) as $payload ) {
+			$this->assertErrorResponse( 'rest_invalid_suggestion', $this->send( $payload, null, $post_id ), 400 );
+			$this->assertFalse( update_comment_meta( $note_id, '_wp_suggestion', wp_slash( $payload ) ) );
+		}
+		$this->assertSame( array(), get_comment_meta( $note_id, '_wp_suggestion' ) );
+	}
+
+	/**
+	 * @return array<string, array{0: string}>
+	 */
+	public function data_users(): array {
+		return array(
+			'filtered'   => array( 'contributor' ),
+			'unfiltered' => array( 'editor' ),
+		);
+	}
 }
