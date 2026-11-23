@@ -32,11 +32,20 @@ export function usePostScheduleLabel( { full = false } = {} ) {
 	);
 
 	return full
-		? getFullPostScheduleLabel( date )
+		? getFullPostScheduleLabel( date, { isFloating } )
 		: getPostScheduleLabel( date, { isFloating } );
 }
 
-export function getFullPostScheduleLabel( dateAttribute ) {
+export function getFullPostScheduleLabel(
+	dateAttribute,
+	{ isFloating = false } = {}
+) {
+	// A floating date is the time the post was last saved, not a date of its
+	// own: there is nothing to spell out beyond the short label.
+	if ( isFloating ) {
+		return __( 'Immediately' );
+	}
+
 	const date = getDate( dateAttribute );
 
 	const timezoneAbbreviation = getTimezoneAbbreviation();

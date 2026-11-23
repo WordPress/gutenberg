@@ -98,6 +98,11 @@ export function PrivatePostSchedule( {
 		[]
 	);
 
+	// The date of a floating post is the time it was last saved, which
+	// WordPress replaces with the time of publication. It is no date of the
+	// post's own, so the picker shows now, as the label reads "Immediately".
+	const displayedDate = isDateFloating ? null : postDate;
+
 	const { editPost } = useDispatch( editorStore );
 	const onUpdateDate = ( date ) => {
 		editPost( { date } );
@@ -114,16 +119,19 @@ export function PrivatePostSchedule( {
 	};
 
 	const [ previewedMonth, setPreviewedMonth ] = useState( () =>
-		postDate ? new Date( postDate ) : getSiteMonth()
+		displayedDate ? new Date( displayedDate ) : getSiteMonth()
 	);
 
 	// The calendar moves to the month of a new date, from the Month and Year
 	// inputs or a reset, without calling `onMonthPreviewed`. Follow it, so the
 	// markers come from the month on screen.
-	const [ prevPostDate, setPrevPostDate ] = useState( postDate );
-	if ( postDate !== prevPostDate ) {
-		setPrevPostDate( postDate );
-		setPreviewedMonth( postDate ? new Date( postDate ) : getSiteMonth() );
+	const [ prevDisplayedDate, setPrevDisplayedDate ] =
+		useState( displayedDate );
+	if ( displayedDate !== prevDisplayedDate ) {
+		setPrevDisplayedDate( displayedDate );
+		setPreviewedMonth(
+			displayedDate ? new Date( displayedDate ) : getSiteMonth()
+		);
 	}
 
 	// Pick up published and scheduled site posts.
@@ -162,7 +170,7 @@ export function PrivatePostSchedule( {
 
 	const picker = (
 		<PrivatePublishDateTimePicker
-			currentDate={ postDate }
+			currentDate={ displayedDate }
 			onChange={ onUpdateDate }
 			is12Hour={ is12HourTime }
 			dateOrder={

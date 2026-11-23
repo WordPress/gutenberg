@@ -41,6 +41,13 @@ describe( 'getFullPostScheduleLabel', () => {
 
 		expect( label ).toBe( 'April 28, 2022 3:30\xa0pm UTC+10' );
 	} );
+
+	it( 'should show the post will be published immediately if it has a floating date', () => {
+		const label = getFullPostScheduleLabel( '2022-04-28T15:30:00', {
+			isFloating: true,
+		} );
+		expect( label ).toBe( 'Immediately' );
+	} );
 } );
 
 describe( 'getPostScheduleLabel', () => {
