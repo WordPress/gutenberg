@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   Skip uploading a generated sub-size that is larger than the site's upload limit, instead of sending a request the server rejects ([#86496](https://github.com/WordPress/gutenberg/pull/86496)).
+## 0.45.0 (2026-11-18)
 
 ### New Features
 

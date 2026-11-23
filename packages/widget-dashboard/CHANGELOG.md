@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 0.12.0 (2026-11-18)
+
 ### Bug Fixes
 
 -   Widget inserter: show the "View options" popover above the Add widget dialog ([#86599](https://github.com/WordPress/gutenberg/pull/86599)).

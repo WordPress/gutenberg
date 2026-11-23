@@ -41,6 +41,7 @@ final class WpBuildTemplateParser implements Parser {
 		'{{CAPABILITY}}'             => 'manage_options',
 		'{{VERSION}}'                => '1.0.0',
 		'{{BASE_URL}}'               => 'plugin_dir_url( __FILE__ )',
+		'{{HAS_DEBUG_ASSETS}}'       => 'true',
 		'{{INIT_MODULES_JSON}}'      => '["@wordpress/example-init-module"]',
 		'{{INIT_MODULES_PHP_ARRAY}}' => "\t\t\t\$boot_dependencies[] = array( 'import' => 'static', 'id' => '@wordpress/example-init-module' );",
 		'{{PAGE_INCLUDES}}'          => "foreach ( [ __DIR__ . '/pages/example-page/page.php', __DIR__ . '/pages/example-page/page-wp-admin.php', ] as \$file ) { if ( file_exists( \$file ) ) { require_once \$file; } }",
