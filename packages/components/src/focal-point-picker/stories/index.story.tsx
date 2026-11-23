@@ -3,6 +3,11 @@ import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import FocalPointPicker from '..';
 
+// A landscape drawn in code, so the story requests no image.
+const IMAGE_URL = `data:image/svg+xml,${ encodeURIComponent(
+	'<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="600" viewBox="0 0 1200 600"><rect width="1200" height="600" fill="#bfe0f5"/><circle cx="900" cy="170" r="80" fill="#f6c343"/><path d="M0 460 300 220 560 420 800 280 1200 500V600H0z" fill="#5a7d5a"/></svg>'
+) }`;
+
 const meta: Meta< typeof FocalPointPicker > = {
 	id: 'components-focalpointpicker',
 	title: 'Components/@wordpress-components/FocalPointPicker',
@@ -59,8 +64,7 @@ Default.args = {};
 
 export const Image = Template.bind( {} );
 Image.args = {
-	// Served from `storybook/static`.
-	url: 'image-editor-demo.jpeg',
+	url: IMAGE_URL,
 };
 
 export const Video = Template.bind( {} );
