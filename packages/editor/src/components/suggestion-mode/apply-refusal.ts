@@ -4,6 +4,11 @@
  * suggestion stays pending and can still be rejected.
  */
 import { __ } from '@wordpress/i18n';
+import {
+	SUGGEST_CONTENT_META_KEYS,
+	SUGGEST_PROPOSABLE_POST_FIELDS,
+} from '../../store/constants';
+import { isProposedNewTerm } from './create-proposed-terms';
 import { markerForNote, proposedAttributes } from './marker';
 import {
 	findAttributeOperationProblem,
@@ -11,7 +16,7 @@ import {
 	findStructuralOp,
 	proposalMatchesOperations,
 } from './operations';
-import type { SuggestionPayload } from './operations';
+import type { SuggestionOperation, SuggestionPayload } from './operations';
 
 /**
  * The notice for an accept that cannot go ahead, or null when it can. A
@@ -91,5 +96,82 @@ export function getAttributeApplyRefusal( {
 			)
 		: __(
 				'This suggestion proposes a change this block does not support. Reject it to close the note.'
+			);
+}
+
+function isId( value: unknown ): boolean {
+	return Number.isInteger( value ) && ( value as number ) >= 0;
+}
+
+/**
+ * Whether a post-level operation names a field that can be suggested and
+ * proposes a value of that field's shape.
+ *
+ * @param op           A `post-attribute-set` operation.
+ * @param isProposable Whether a field (or meta key) can be suggested.
+ * @return True when accept may apply it.
+ */
+function isApplicablePostOperation(
+	op: SuggestionOperation,
+	isProposable: ( attribute: string, key?: string ) => boolean
+): boolean {
+	const { attribute, key, after } = op;
+	if ( typeof attribute !== 'string' ) {
+		return false;
+	}
+	if ( attribute === 'meta' ) {
+		return (
+			typeof key === 'string' &&
+			key !== '' &&
+			// Written by the block sync, never proposed.
+			! ( SUGGEST_CONTENT_META_KEYS as readonly string[] ).includes(
+				key
+			) &&
+			isProposable( 'meta', key )
+		);
+	}
+	if ( ! isProposable( attribute ) ) {
+		return false;
+	}
+	if ( after === null || after === undefined ) {
+		return true;
+	}
+	if ( attribute === 'featured_media' ) {
+		return isId( after );
+	}
+	if (
+		( SUGGEST_PROPOSABLE_POST_FIELDS as readonly string[] ).includes(
+			attribute
+		)
+	) {
+		return typeof after === 'string';
+	}
+	// A taxonomy: term ids, and terms to create on accept.
+	return (
+		Array.isArray( after ) &&
+		after.every( ( term ) => isId( term ) || isProposedNewTerm( term ) )
+	);
+}
+
+/**
+ * The notice for a post-level accept that cannot go ahead, or null when it
+ * can. The server holds a note's post-level operations to the same list when
+ * the note is written over REST; this is the check on the side that edits
+ * the post, whatever wrote the note.
+ *
+ * @param postOps      The payload's `post-attribute-set` operations.
+ * @param isProposable Whether a field (or meta key) can be suggested.
+ * @return The notice, or null.
+ */
+export function getPostApplyRefusal(
+	postOps: SuggestionOperation[],
+	isProposable: ( attribute: string, key?: string ) => boolean
+): string | null {
+	return postOps.every( ( op ) =>
+		isApplicablePostOperation( op, isProposable )
+	)
+		? null
+		: __(
+				'This suggestion changes a post setting that cannot be suggested. Reject it to close the note.'
 			);
 }

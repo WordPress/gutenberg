@@ -9,6 +9,7 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { STORE_NAME } from '../../store/constants';
@@ -16,7 +17,7 @@ import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
-import { getAttributeApplyRefusal } from './apply-refusal';
+import { getAttributeApplyRefusal, getPostApplyRefusal } from './apply-refusal';
 import {
 	nestedMarkerFor,
 	withoutMarkerEntry,
@@ -269,6 +270,30 @@ export function useSuggestionDecisions() {
 			 */
 			const postOps = findPostAttributeOps( payload.operations );
 			if ( postOps.length > 0 ) {
+				/*
+				 * Accept edits the post with the reviewer's capabilities, so
+				 * it takes only the fields a suggestion can propose. The
+				 * taxonomies are among them and may not be loaded yet.
+				 */
+				try {
+					await registry
+						.resolveSelect( coreStore )
+						.getTaxonomies( { per_page: -1 } );
+				} catch {
+					// Unloaded, a terms suggestion is refused below.
+				}
+				const postRefusal = getPostApplyRefusal(
+					postOps,
+					unlock( registry.select( STORE_NAME ) )
+						.isProposablePostField
+				);
+				if ( postRefusal ) {
+					createNotice( 'error', postRefusal, {
+						type: 'snackbar',
+						isDismissible: true,
+					} );
+					return false;
+				}
 				/*
 				 * New terms are created only now, as the reviewer, and before
 				 * the decision is recorded. When one cannot be created nothing
