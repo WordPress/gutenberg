@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { privateApis as routePrivateApis } from '@wordpress/route';
+import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -11,7 +12,6 @@ import {
 import { menu } from '@wordpress/icons';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
-import { UnsavedChangesWarning } from '@wordpress/editor';
 import { Page, getAdminThemeColors } from '@wordpress/admin-ui';
 import { Tooltip } from '@wordpress/ui';
 import { ThemeProvider } from '@wordpress/theme';
@@ -21,12 +21,14 @@ import CanvasRenderer from '../canvas-renderer';
 import ErrorBoundary from '../error-boundary';
 import PluginArea from '../plugin-area';
 import useRouteTitle from '../app/use-route-title';
+import useRouteFocus from '../app/use-route-focus';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import useSyncBodyBackground from './use-sync-body-background';
 import styles from './style.module.scss';
 
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
+const { UnsavedChangesWarning } = unlock( coreDataPrivateApis );
 
 export default function Root() {
 	const matches = useMatches();
@@ -52,6 +54,7 @@ export default function Root() {
 	const themeColors = useMemo( getAdminThemeColors, [] );
 
 	const layoutRef = useSyncBodyBackground();
+	useRouteFocus( layoutRef );
 
 	return (
 		<SlotFillProvider>
