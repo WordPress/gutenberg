@@ -80,17 +80,7 @@ export function FileSummary( { file }: { file: File } ) {
 				direction="column"
 				className={ styles.details }
 			>
-				<Text className={ styles.name }>
-					<span className={ styles[ 'name-start' ] }>
-						{ file.name.slice(
-							0,
-							file.name.length - extension.length
-						) }
-					</span>
-					<span className={ styles[ 'name-end' ] }>
-						{ extension }
-					</span>
-				</Text>
+				<Text className={ styles.name }>{ file.name }</Text>
 				<Text variant="body-sm" className={ styles.weak }>
 					{ extension.slice( 1 ).toUpperCase() || 'File' }
 					<span aria-hidden="true"> ·</span>{ ' ' }

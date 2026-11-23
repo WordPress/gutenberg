@@ -59,7 +59,7 @@ Set `multiple` on `FormFileUpload` and show each file in its own row, above the 
 - **Keep the remove button visible in every row.** Don't show it only on hover. Each name includes the filename, so a list of "Remove" buttons can be told apart.
 - **Move focus after a removal.** Focus the next row's remove button, or the drop area when the list is empty.
 - **Add the valid files and list the rejected ones.** One wrong file shouldn't block the others.
-- **Truncate the middle of long filenames.** Keep the extension visible, so people can tell `report.pdf` from `report.png`.
+- **Show the file type next to the name.** Long filenames are cut at the end, so the details line shows the type, and people can tell `report.pdf` from `report.png`.
 - **Give each row its own key.** The same file can be chosen twice, so don't derive the key from the filename.
 
 ## Button
@@ -71,7 +71,7 @@ Use an outline, neutral `Button` when a drop area doesn't fit. Show the chosen f
 	source={ { code: FilePickerButtonSource, language: 'tsx', type: 'code' } }
 />
 
-End the label with an ellipsis, because the button opens another interface. Read the file from `event.currentTarget.files`, then clear the input, so choosing the same file again fires another change. When the picker closes without a selection, keep the previous file.
+End the label with an ellipsis, because the button opens another interface. Read the file from `event.currentTarget.files`, then clear the input, so choosing the same file again fires another change. When the picker closes without a selection, keep the previous file. Check the file type too: `accept` only filters the picker, so people can still choose a PDF here.
 
 ## Menu item
 
