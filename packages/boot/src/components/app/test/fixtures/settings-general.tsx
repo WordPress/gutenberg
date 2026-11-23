@@ -1,17 +1,21 @@
-import { Breadcrumbs, Page } from '@wordpress/admin-ui';
+import type { ComponentPropsWithoutRef } from 'react';
+import { Page } from '@wordpress/admin-ui';
 import { Link } from '@wordpress/route';
+
+function RouterLink( {
+	href,
+	...props
+}: ComponentPropsWithoutRef< 'a' > & { href: string } ) {
+	return <Link to={ href } { ...props } />;
+}
 
 export const stage = () => (
 	<Page
-		ariaLabel="General"
-		breadcrumbs={
-			<Breadcrumbs
-				items={ [
-					{ label: 'Settings', to: '/settings' },
-					{ label: 'General' },
-				] }
-			/>
-		}
+		breadcrumbs={ [
+			{ label: 'Settings', href: '/settings' },
+			{ label: 'General' },
+		] }
+		components={ { link: RouterLink } }
 	>
 		<Link to="/settings/general" search={ { tab: 'advanced' } }>
 			Advanced
