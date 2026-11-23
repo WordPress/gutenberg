@@ -1,6 +1,6 @@
 # Suggestion mode: Architecture Overview for Reviewers
 
-This page is the map. It explains how Suggestion mode fits together across the whole ten-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is [Suggestions Architecture](./suggestions.md).
+This page is the map. It explains how Suggestion mode fits together across the whole ten-PR stack, which PR owns which part, and where the design is still moving. The detailed reference, with every module, payload field and known limitation, is the [Suggestion mode architecture guide](./suggestions.md).
 
 Tracking issue: [#73411](https://github.com/WordPress/gutenberg/issues/73411). Try it: [Playground for the combined branch #78994](https://playground.wordpress.net/gutenberg.html?pr=78994).
 
@@ -370,7 +370,7 @@ Then the mechanism:
 ## Further reading
 
 - [Storage at a glance](./suggestions.md#storage-at-a-glance): every stored key and shape on one page.
-- [Suggestions Architecture](./suggestions.md): the full reference (module tables, payload schema, every known limitation).
+- [Suggestion mode architecture guide](./suggestions.md): the full reference (module tables, payload schema, every known limitation).
 - [#73411](https://github.com/WordPress/gutenberg/issues/73411): tracking issue, testing walkthrough and fix PR list.
 - [#78994](https://github.com/WordPress/gutenberg/pull/78994): combined branch for Playground testing.
 - [#78218](https://github.com/WordPress/gutenberg/pull/78218): the Notes inline anchor the marker primitive grew from.

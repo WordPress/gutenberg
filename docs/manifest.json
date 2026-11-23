@@ -3102,7 +3102,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "Suggestions Architecture",
+		"title": "Suggestion mode",
 		"slug": "suggestions",
 		"markdown_source": "../docs/explanations/architecture/suggestions.md",
 		"parent": "architecture"
