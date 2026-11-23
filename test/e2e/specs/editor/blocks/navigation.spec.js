@@ -292,6 +292,70 @@ test.describe( 'Navigation block', () => {
 		await expect( warningMessage ).toBeVisible();
 	} );
 
+	test.describe( 'Draft menus', () => {
+		test.afterEach( async ( { requestUtils } ) => {
+			await Promise.all( [
+				requestUtils.deleteAllPosts(),
+				requestUtils.deleteAllMenus(),
+			] );
+		} );
+
+		test( 'publishes a draft menu chosen from the menu selector along with the post', async ( {
+			admin,
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			await requestUtils.createNavigationMenu( {
+				title: 'Published Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"Published Item","type":"custom","url":"http://localhost:8889/#published-item","kind":"custom"} /-->',
+			} );
+			const draftMenu = await requestUtils.createNavigationMenu( {
+				title: 'Draft Menu',
+				status: 'draft',
+				content:
+					'<!-- wp:navigation-link {"label":"Draft Item","type":"custom","url":"http://localhost:8889/#draft-item","kind":"custom"} /-->',
+			} );
+
+			await admin.createNewPost();
+			await editor.insertBlock( { name: 'core/navigation' } );
+			await editor.openDocumentSettingsSidebar();
+
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'button', { name: 'Published Menu' } )
+				.click();
+			await page
+				.getByRole( 'menuitemradio', { name: 'Draft Menu (draft)' } )
+				.click();
+
+			await expect(
+				editor.canvas.getByRole( 'textbox', {
+					name: 'Navigation link text',
+				} )
+			).toHaveText( 'Draft Item' );
+
+			const postId = await editor.publishPost();
+
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/navigation',
+					attributes: { ref: draftMenu.id },
+				},
+			] );
+
+			// The post's front end only renders published menus.
+			await page.goto( `/?p=${ postId }` );
+
+			await expect(
+				page
+					.getByRole( 'navigation' )
+					.getByRole( 'link', { name: 'Draft Item' } )
+			).toBeVisible();
+		} );
+	} );
+
 	test.describe( 'Focus management', () => {
 		let catPage, dogPage;
 
