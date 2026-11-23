@@ -11,8 +11,8 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
 import {
+	findGroupId,
 	findPostAttributeOps,
-	findStructuralOp,
 	hasAttributeConflict,
 	parseSuggestionPayload,
 	useSuggestionsProvider,
@@ -319,10 +319,11 @@ export function useSuggestionDecision( thread: any ) {
 		presentation !== 'pending' && presentation !== 'pending-again';
 
 	// A block-switcher transform (any `replaceBlocks`) is captured as a
-	// removal plus an insertion, stamped with a shared group id. Either
-	// decision resolves both halves, so say so — a reviewer who accepts one
-	// card and watches the other resolve on its own is owed the explanation.
-	const isGrouped = !! findStructuralOp( payload.operations )?.groupId;
+	// removal plus an insertion, and a deletion across blocks as a rewrite
+	// plus removals, stamped with a shared group id. Either decision
+	// resolves them all, so say so — a reviewer who accepts one card and
+	// watches the others resolve on their own is owed the explanation.
+	const isGrouped = !! findGroupId( payload.operations );
 
 	const runApply = async () => {
 		setBusy( true );
@@ -755,7 +756,7 @@ export default function SuggestionActions( {
 					className="editor-collab-sidebar-panel__suggestion-status editor-collab-sidebar-panel__suggestion-group-hint"
 				>
 					{ __(
-						'Part of one block change. Both halves resolve together.'
+						'Part of one block change. Its suggestions resolve together.'
 					) }
 				</Text>
 			) }

@@ -464,4 +464,150 @@ test.describe( 'Suggestion mode fine tuning (#87283)', () => {
 		expect( content ).toContain( 'Typed block' );
 		expect( content ).toContain( '"type":"pending-insert"' );
 	} );
+
+	test.describe( 'a deletion across blocks (F-52)', () => {
+		// Deletes from inside the first paragraph to inside the third.
+		async function deleteAcrossBlocks( {
+			editor,
+			page,
+			pageUtils,
+		}: {
+			editor: any;
+			page: any;
+			pageUtils: any;
+		} ) {
+			for ( const content of [
+				'First block text',
+				'Second block text',
+				'Third block text',
+			] ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content },
+				} );
+			}
+			await switchIntent( page, 'Suggesting' );
+			await page.evaluate( () =>
+				( window as any ).wp.data
+					.dispatch( 'core/block-editor' )
+					.clearSelectedBlock()
+			);
+			await firstParagraph( editor ).click();
+			await page.keyboard.press( 'Home' );
+			await pageUtils.pressKeys( 'ArrowRight', { times: 5 } );
+			await pageUtils.pressKeys( 'shift+ArrowDown', { times: 2 } );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							( window as any ).wp.data
+								.select( 'core/block-editor' )
+								.getMultiSelectedBlockClientIds().length
+					)
+				)
+				.toBe( 3 );
+			await page.keyboard.press( 'Backspace' );
+
+			// One note per block: the rewritten first, the two removed.
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect
+				.poll( async () => {
+					await openNotesSidebar( page );
+					return sidebar.locator( SUMMARY ).count();
+				} )
+				.toBe( 3 );
+			await expect(
+				sidebar.locator( SUMMARY ).filter( { hasText: 'Replace:' } )
+			).toHaveCount( 1 );
+			await expect(
+				sidebar
+					.locator( SUMMARY )
+					.filter( { hasText: 'Remove block:' } )
+			).toHaveCount( 2 );
+			return sidebar;
+		}
+
+		test( 'is one change to review', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const sidebar = await deleteAcrossBlocks( {
+				editor,
+				page,
+				pageUtils,
+			} );
+			await expect(
+				sidebar.getByText( 'Its suggestions resolve together.', {
+					exact: false,
+				} )
+			).toHaveCount( 3 );
+		} );
+
+		test( 'accepting one part accepts them all', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const sidebar = await deleteAcrossBlocks( {
+				editor,
+				page,
+				pageUtils,
+			} );
+			await switchIntent( page, 'Editing' );
+			// A removal, not the rewrite: taken alone it would drop the
+			// end of the last paragraph.
+			await sidebar
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.filter( { hasText: 'Remove block:' } )
+				.first()
+				.getByRole( 'button', { name: 'Accept suggestion' } )
+				.click();
+
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Accept suggestion' } )
+			).toHaveCount( 0 );
+			const paragraphs = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphs ).toHaveCount( 1 );
+			await expect( paragraphs ).toHaveText( /^First.*block text$/ );
+			await expect( paragraphs ).not.toHaveClass(
+				/is-suggestion-pending/
+			);
+		} );
+
+		test( 'rejecting one part rejects them all', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const sidebar = await deleteAcrossBlocks( {
+				editor,
+				page,
+				pageUtils,
+			} );
+			await switchIntent( page, 'Editing' );
+			await sidebar
+				.locator( '.editor-collab-sidebar-panel__thread' )
+				.filter( { hasText: 'Replace:' } )
+				.getByRole( 'button', { name: 'Reject suggestion' } )
+				.click();
+
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Reject suggestion' } )
+			).toHaveCount( 0 );
+			await expect
+				.poll( () => editor.getBlocks() )
+				.toMatchObject( [
+					{ attributes: { content: 'First block text' } },
+					{ attributes: { content: 'Second block text' } },
+					{ attributes: { content: 'Third block text' } },
+				] );
+			const serialized = await editor.getEditedPostContent();
+			expect( serialized ).not.toContain( '"suggestion"' );
+		} );
+	} );
 } );

@@ -1079,6 +1079,70 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 	} );
 
+	it( 'groups the rewritten block of a deletion across blocks with the removed ones', async () => {
+		// Deleting from inside one block to inside a later one rewrites
+		// the first with the end of the last and removes the rest, in one
+		// store update. Accepting the removals alone would lose that end.
+		const first = createBlock( TEST_BLOCK_NAME, { content: 'First one' } );
+		const second = createBlock( TEST_BLOCK_NAME, { content: 'Second' } );
+		const third = createBlock( TEST_BLOCK_NAME, { content: 'Third one' } );
+		const { registry, getOverlay } = setup( {
+			initialBlocks: [ first, second, third ],
+		} );
+
+		await act( async () => {
+			registry.batch( () => {
+				registry
+					.dispatch( blockEditorStore )
+					.updateBlockAttributes( first.clientId, {
+						content: 'First one, then some',
+					} );
+				registry
+					.dispatch( blockEditorStore )
+					.removeBlocks( [ second.clientId, third.clientId ], false );
+			} );
+		} );
+		await flushSubscribers();
+
+		const rewritten = blockMarkerOf(
+			attributesOf( registry, first.clientId )
+		);
+		expect( rewritten?.type ).toBe( 'pending-attributes' );
+		expect( rewritten?.groupId ).toEqual( expect.any( String ) );
+		for ( const removed of [ second, third ] ) {
+			expect(
+				blockMarkerOf( attributesOf( registry, removed.clientId ) )
+			).toMatchObject( {
+				type: 'pending-remove',
+				groupId: rewritten?.groupId,
+			} );
+			expect( captureOf( getOverlay, removed.clientId ) ).toMatchObject( {
+				type: 'block-remove',
+				groupId: rewritten?.groupId,
+			} );
+		}
+	} );
+
+	it( 'leaves a proposal with no removal beside it ungrouped', async () => {
+		const first = createBlock( TEST_BLOCK_NAME, { content: 'First one' } );
+		const { registry } = setup( { initialBlocks: [ first ] } );
+
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( first.clientId, {
+					content: 'First one, then some',
+				} );
+		} );
+		await flushSubscribers();
+
+		const marker = blockMarkerOf(
+			attributesOf( registry, first.clientId )
+		);
+		expect( marker?.type ).toBe( 'pending-attributes' );
+		expect( marker?.groupId ).toBeUndefined();
+	} );
+
 	it( 'leaves a plain insertion ungrouped', async () => {
 		// Only a fire that holds BOTH halves is a replacement. Inserting a
 		// block on its own must stay a standalone suggestion, or an

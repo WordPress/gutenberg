@@ -45,6 +45,7 @@ import {
 	applyOperations,
 	applyPostOperations,
 	findBlockByNoteId,
+	findGroupId,
 	findInlineOp,
 	findPostAttributeOps,
 	findStructuralOp,
@@ -1004,7 +1005,8 @@ export function useSuggestionDecisions() {
 	 * A `replaceBlocks` — the block switcher's transform, "Group", a paste
 	 * over a selection — is captured as a removal plus an insertion, and the
 	 * interceptor stamps both halves with a shared `metadata.suggestion
-	 * .groupId`. They are one logical change: accepting the insertion alone
+	 * .groupId`. A deletion across blocks is grouped the same way: the
+	 * rewritten first block and the removed ones. They are one logical change: accepting the insertion alone
 	 * leaves the original block behind as a duplicate, and rejecting it alone
 	 * leaves a hole where the original used to be. The group is resolved from
 	 * the live tree rather than from the payload so it survives a reload,
@@ -1025,7 +1027,7 @@ export function useSuggestionDecisions() {
 			commentId: number | string;
 			payload?: SuggestionPayload | null;
 		} ) => {
-			const groupId = findStructuralOp( payload?.operations )?.groupId;
+			const groupId = findGroupId( payload?.operations );
 			if ( ! groupId ) {
 				return [];
 			}
@@ -1057,8 +1059,7 @@ export function useSuggestionDecisions() {
 						comment?.meta?._wp_suggestion
 					);
 					if (
-						findStructuralOp( partnerPayload?.operations )
-							?.groupId !== groupId
+						findGroupId( partnerPayload?.operations ) !== groupId
 					) {
 						continue;
 					}
