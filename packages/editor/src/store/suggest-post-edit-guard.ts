@@ -119,10 +119,24 @@ export function withoutSuggestPostEditGuard< T >( callback: () => T ): T {
 	}
 }
 
-/** The core-data actions the guard wraps, with their originals. */
+/** Core-data actions by name. */
 type WrappedActions = Record< string, ( ...args: any[] ) => any >;
 
-const installed = new WeakMap< object, WrappedActions >();
+/** The guard's state for one core-data actions object. */
+interface Installation {
+	/** The actions as they were before the guard wrapped them. */
+	originals: WrappedActions;
+	/** The guard's wraps, to tell them from a wrap added later. */
+	wrappers: WrappedActions;
+	/** The registries of the mounted editors. */
+	registries: Set< any >;
+}
+
+/*
+ * Keyed by the actions object, which editors in sub-registries share: each
+ * has its own `core/editor`, and all of them resolve the parent's core-data.
+ */
+const installed = new WeakMap< object, Installation >();
 
 /**
  * Whether the editor is suggesting.
@@ -131,8 +145,10 @@ const installed = new WeakMap< object, WrappedActions >();
  * @return Whether the intent is Suggesting.
  */
 function isSuggesting( registry: any ): boolean {
+	// An editor store registered from the plain store config has no private
+	// selectors, and so no intent.
 	return (
-		unlock( registry.select( STORE_NAME ) ).getEditorIntent() ===
+		unlock( registry.select( STORE_NAME ) ).getEditorIntent?.() ===
 		EDITOR_INTENT_SUGGEST
 	);
 }
@@ -213,27 +229,58 @@ function isSiteSettingsRecord(
  * editor's lifetime and checks the intent on every call, rather than
  * installing on entry to Suggesting: a component destructures the action
  * when it renders, and one that rendered before the intent changed would
- * otherwise keep the unguarded original. Installing twice is a no-op.
+ * otherwise keep the unguarded original.
+ *
+ * Editors in sub-registries share the actions object, and a call does not
+ * say which editor made it. So the object is wrapped once, every mounted
+ * editor is asked on each call, and the originals come back when the last
+ * one leaves: a post is guarded while its own editor is suggesting, and the
+ * site settings while any editor is. Installing twice for one registry is a
+ * no-op.
  *
  * @param registry The data registry.
- * @return Restores the original actions.
+ * @return Removes this editor from the guard.
  */
 export function installSuggestPostEditGuard( registry: any ): () => void {
 	const coreActions = registry.dispatch( coreStore );
 	if ( ! coreActions?.editEntityRecord ) {
 		return () => {};
 	}
-	if ( ! installed.has( coreActions ) ) {
+	let installation = installed.get( coreActions );
+	if ( ! installation ) {
 		const originals: WrappedActions = {
 			editEntityRecord: coreActions.editEntityRecord,
 			saveEntityRecord: coreActions.saveEntityRecord,
 			saveEditedEntityRecord: coreActions.saveEditedEntityRecord,
 			deleteEntityRecord: coreActions.deleteEntityRecord,
 		};
-		installed.set( coreActions, originals );
-		const isGuarded = () => bypassDepth === 0 && isSuggesting( registry );
+		const wrappers: WrappedActions = {};
+		const registries = new Set< any >();
+		installation = { originals, wrappers, registries };
+		installed.set( coreActions, installation );
 
-		coreActions.editEntityRecord = (
+		/*
+		 * The first suggesting editor a record matches, if the guard is not
+		 * bypassed.
+		 */
+		const findSuggestingEditor = (
+			matches: ( editorRegistry: any ) => boolean
+		) => {
+			if ( bypassDepth > 0 ) {
+				return undefined;
+			}
+			for ( const editorRegistry of registries ) {
+				if (
+					isSuggesting( editorRegistry ) &&
+					matches( editorRegistry )
+				) {
+					return editorRegistry;
+				}
+			}
+			return undefined;
+		};
+
+		wrappers.editEntityRecord = (
 			kind: string,
 			name: string,
 			recordId: any,
@@ -241,17 +288,23 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			options?: Record< string, any >
 		) => {
 			const original = originals.editEntityRecord;
-			if ( ! isGuarded() ) {
-				return original( kind, name, recordId, edits, options );
-			}
-			if ( isSiteSettingsRecord( registry, kind, name, recordId ) ) {
-				announceSuggestRefusal( registry, Object.keys( edits ?? {} ) );
+			const siteEditor = findSuggestingEditor( ( editorRegistry ) =>
+				isSiteSettingsRecord( editorRegistry, kind, name, recordId )
+			);
+			if ( siteEditor ) {
+				announceSuggestRefusal(
+					siteEditor,
+					Object.keys( edits ?? {} )
+				);
 				return Promise.resolve();
 			}
-			if ( ! isCurrentPost( registry, kind, name, recordId ) ) {
+			const postEditor = findSuggestingEditor( ( editorRegistry ) =>
+				isCurrentPost( editorRegistry, kind, name, recordId )
+			);
+			if ( ! postEditor ) {
 				return original( kind, name, recordId, edits, options );
 			}
-			const record = registry
+			const record = postEditor
 				.select( coreStore )
 				.getEditedEntityRecord( kind, name, recordId );
 			const { passthrough, refused } = classifySuggestedPostEdits(
@@ -259,7 +312,7 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 				{ getCurrentValue: ( attribute ) => record?.[ attribute ] }
 			);
 			if ( refused.length ) {
-				announceSuggestRefusal( registry, refused );
+				announceSuggestRefusal( postEditor, refused );
 			}
 			if ( ! Object.keys( passthrough ).length ) {
 				return Promise.resolve();
@@ -274,7 +327,7 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 			if ( ! originals[ action ] ) {
 				continue;
 			}
-			coreActions[ action ] = (
+			wrappers[ action ] = (
 				kind: string,
 				name: string,
 				...args: any[]
@@ -283,11 +336,11 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 				// its id; the site entity has no id either way.
 				const recordId =
 					action === 'saveEntityRecord' ? args[ 0 ]?.id : args[ 0 ];
-				if (
-					isGuarded() &&
-					isSiteSettingsRecord( registry, kind, name, recordId )
-				) {
-					announceSuggestRefusal( registry, [ name ] );
+				const siteEditor = findSuggestingEditor( ( editorRegistry ) =>
+					isSiteSettingsRecord( editorRegistry, kind, name, recordId )
+				);
+				if ( siteEditor ) {
+					announceSuggestRefusal( siteEditor, [ name ] );
 					return Promise.resolve();
 				}
 				return originals[ action ]( kind, name, ...args );
@@ -295,17 +348,17 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 		}
 
 		if ( originals.deleteEntityRecord ) {
-			coreActions.deleteEntityRecord = (
+			wrappers.deleteEntityRecord = (
 				kind: string,
 				name: string,
 				recordId: any,
 				...args: any[]
 			) => {
-				if (
-					isGuarded() &&
-					isCurrentPost( registry, kind, name, recordId )
-				) {
-					announceSuggestTrashRefusal( registry );
+				const postEditor = findSuggestingEditor( ( editorRegistry ) =>
+					isCurrentPost( editorRegistry, kind, name, recordId )
+				);
+				if ( postEditor ) {
+					announceSuggestTrashRefusal( postEditor );
 					return Promise.resolve();
 				}
 				return originals.deleteEntityRecord(
@@ -316,16 +369,30 @@ export function installSuggestPostEditGuard( registry: any ): () => void {
 				);
 			};
 		}
+
+		Object.assign( coreActions, wrappers );
 	}
+
+	const { originals, wrappers, registries } = installation;
+	registries.add( registry );
 	return () => {
-		const originals = installed.get( coreActions );
-		if ( originals ) {
-			for ( const [ action, original ] of Object.entries( originals ) ) {
-				if ( original ) {
-					coreActions[ action ] = original;
-				}
-			}
-			installed.delete( coreActions );
+		registries.delete( registry );
+		if (
+			registries.size ||
+			installed.get( coreActions ) !== installation
+		) {
+			return;
 		}
+		/*
+		 * Put back only what is still the guard's own wrap. One wrapped again
+		 * since stays: restoring over it would drop the later wrap, and with
+		 * no editor left the guard inside it passes every call through.
+		 */
+		for ( const [ action, wrapper ] of Object.entries( wrappers ) ) {
+			if ( coreActions[ action ] === wrapper ) {
+				coreActions[ action ] = originals[ action ];
+			}
+		}
+		installed.delete( coreActions );
 	};
 }

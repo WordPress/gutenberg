@@ -527,7 +527,9 @@ export function selectedNote( state = {}, action ) {
 }
 
 /**
- * Reducer returning the current editor intent (`edit`, `suggest`).
+ * Reducer returning the editor intent the user last chose (`edit`,
+ * `suggest`). What the editor is in on the current entity is derived from it
+ * by `getEffectiveEditorIntent`.
  * The intent is intentionally session-scoped: it lives in the editor
  * store, not in the preferences store, so reloading the editor always
  * returns to the default `edit` intent. Persisting suggest across
@@ -542,6 +544,29 @@ export function editorIntent( state = 'edit', action ) {
 	switch ( action.type ) {
 		case 'SET_EDITOR_INTENT':
 			return action.intent;
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the post the suggest intent was chosen on, or null while
+ * editing. Suggesting belongs to that post: on any other entity (a template
+ * opened from it, another post) the editor is editing, and suggesting again
+ * once it returns. See `getEffectiveEditorIntent`.
+ *
+ * @param {?{postType: ?string, postId: ?(string|number)}} state  Current state.
+ * @param {Object}                                         action Dispatched action.
+ * @return {?{postType: ?string, postId: ?(string|number)}} Updated state.
+ */
+export function editorIntentPost( state = null, action ) {
+	switch ( action.type ) {
+		case 'SET_EDITOR_INTENT':
+			return action.intent === 'suggest'
+				? {
+						postType: action.postType ?? null,
+						postId: action.postId ?? null,
+					}
+				: null;
 	}
 	return state;
 }
@@ -603,6 +628,7 @@ export default combineReducers( {
 	showRevisionDiff,
 	selectedNote,
 	editorIntent,
+	editorIntentPost,
 	postFieldProposals,
 	dataviews: dataviewsReducer,
 } );

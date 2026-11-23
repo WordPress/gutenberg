@@ -18,7 +18,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { STORE_NAME } from '../../store/constants';
-import { checkSupport } from '../post-type-support-check';
+import { checkSupport } from '../post-type-support-check/check-support';
 
 declare global {
 	interface Window {
@@ -56,6 +56,30 @@ function hasNotesSupport(
 		return false;
 	}
 	return checkSupport( postType.supports, 'editor.notes' );
+}
+
+/**
+ * Whether the editor may hold the Suggest intent, for code outside React.
+ *
+ * Refuses without the experiment, and on a post type known to lack notes
+ * support, such as a template opened from a post. A post type that has not
+ * resolved yet is not refused: the menu and the shortcuts are only offered
+ * once it has, through `useCanSuggest()`.
+ *
+ * @param select Registry select function.
+ * @return False when the Suggest intent must be refused.
+ */
+export function isSuggestIntentAvailable(
+	select: ( store: string | typeof coreStore ) => any
+): boolean {
+	if ( ! isSuggestionModeEnabled() ) {
+		return false;
+	}
+	const postTypeSlug = select( STORE_NAME ).getCurrentPostType();
+	const postType = postTypeSlug
+		? select( coreStore ).getPostType( postTypeSlug )
+		: null;
+	return ! postType || checkSupport( postType.supports, 'editor.notes' );
 }
 
 /**
