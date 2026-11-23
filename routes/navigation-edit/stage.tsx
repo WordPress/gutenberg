@@ -4,7 +4,9 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { EditorHistoryRedo, EditorHistoryUndo } from '@wordpress/editor';
 import NavigationMenuEditor from './editor';
+import useHistoryShortcuts from './use-history-shortcuts';
 import styles from './style.module.scss';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
@@ -26,6 +28,7 @@ function NavigationEditStage() {
 		},
 		[ navigationId ]
 	);
+	useHistoryShortcuts();
 
 	if ( ! navigationMenu ) {
 		return;
@@ -50,6 +53,12 @@ function NavigationEditStage() {
 						},
 					] }
 				/>
+			}
+			actions={
+				<>
+					<EditorHistoryUndo size="compact" />
+					<EditorHistoryRedo size="compact" />
+				</>
 			}
 		>
 			<div className={ styles.content }>

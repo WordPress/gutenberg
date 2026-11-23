@@ -4,12 +4,12 @@ import {
 	InnerBlocks,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import PlaceholderPreview from './placeholder/placeholder-preview';
 import { DEFAULT_BLOCK, PRIORITIZED_INSERTER_BLOCKS } from '../constants';
 
-export default function NavigationInnerBlocks( {
+function NavigationInnerBlocks( {
 	clientId,
 	hasCustomPlaceholder,
 	orientation,
@@ -101,4 +101,27 @@ export default function NavigationInnerBlocks( {
 	);
 
 	return <div { ...innerBlocksProps } />;
+}
+
+/**
+ * Renders the menu items, kept in step with the menu entity.
+ *
+ * A block outside the viewport renders in async mode, where its updates wait
+ * for an idle callback. If an edit is undone before that callback runs, the
+ * entity's blocks look unchanged when this component reads them again, so it
+ * never re-renders and the block editor keeps the undone edit. That happens
+ * when the block is hidden, as on the navigation screen of the site editor,
+ * which edits the menu in a List View. Rendering this part synchronously
+ * avoids it. The menu items below it keep their own async rendering.
+ *
+ * @param {Object} props Props of `NavigationInnerBlocks`.
+ *
+ * @return {React.JSX.Element} The menu items.
+ */
+export default function SyncedNavigationInnerBlocks( props ) {
+	return (
+		<AsyncModeProvider value={ false }>
+			<NavigationInnerBlocks { ...props } />
+		</AsyncModeProvider>
+	);
 }

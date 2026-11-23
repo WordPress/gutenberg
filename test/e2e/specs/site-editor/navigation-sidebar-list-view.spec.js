@@ -1,5 +1,9 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2), whose navigation
+// menu screen has its own undo and redo.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Navigation sidebar - list view editing', () => {
 	const navMenuFixture = {
 		title: 'Test Navigation Menu',
@@ -175,6 +179,12 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		// Select an item, then add a new one from the appender. The edit is
 		// what carries the sidebar's selection over to the entity.
 		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
+		// The item's settings open in a popover that takes focus once it
+		// renders. Wait for it, so it doesn't take focus from the link UI
+		// and close it.
+		await expect(
+			page.getByRole( 'button', { name: 'Settings options' } )
+		).toBeFocused();
 		await listView.getByRole( 'button', { name: 'Add page' } ).click();
 		await linkControl.useLinkControlSearch( 'Test Page 2' );
 		await expect(
@@ -398,6 +408,136 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			listView.getByRole( 'row', { name: 'Test Page 2' } )
 		).toBeVisible();
+	} );
+
+	test.describe( 'undo and redo', () => {
+		// The classic site editor shows the menu in its sidebar, which has no
+		// undo.
+		test.skip(
+			! isSiteEditorV2,
+			'Only the extensible site editor offers undo on this screen.'
+		);
+
+		const twoItemMenuFixture = {
+			title: 'Test Navigation Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"First Item","type":"custom","url":"http://www.wordpress.org/first/","kind":"custom"} /-->' +
+				'<!-- wp:navigation-link {"label":"Second Item","type":"custom","url":"http://www.wordpress.org/second/","kind":"custom"} /-->',
+		};
+
+		test( 'can undo and redo changes from the header', async ( {
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const createdMenu =
+				await requestUtils.createNavigationMenu( twoItemMenuFixture );
+
+			await admin.visitSiteEditor( {
+				postId: createdMenu?.id,
+				postType: 'wp_navigation',
+			} );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			const firstItem = listView.getByRole( 'link', {
+				name: 'First Item',
+			} );
+			const undoButton = page.getByRole( 'button', { name: 'Undo' } );
+			const redoButton = page.getByRole( 'button', { name: 'Redo' } );
+
+			await expect( firstItem ).toBeVisible();
+
+			// Nothing to undo or redo before the first change.
+			await expect( undoButton ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+			await expect( redoButton ).toHaveAttribute(
+				'aria-disabled',
+				'true'
+			);
+
+			await listView
+				.getByRole( 'row', { name: 'First Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page
+				.getByRole( 'menuitem', { name: 'Remove First Item' } )
+				.click();
+			await expect( firstItem ).toBeHidden();
+
+			await undoButton.click();
+			await expect( firstItem ).toBeVisible();
+			await expect( redoButton ).toHaveAttribute(
+				'aria-disabled',
+				'false'
+			);
+
+			await redoButton.click();
+			await expect( firstItem ).toBeHidden();
+			await expect(
+				listView.getByRole( 'link', { name: 'Second Item' } )
+			).toBeVisible();
+		} );
+
+		test( 'can undo and redo changes with keyboard shortcuts', async ( {
+			admin,
+			page,
+			pageUtils,
+			requestUtils,
+			linkControl,
+		} ) => {
+			const createdMenu =
+				await requestUtils.createNavigationMenu( twoItemMenuFixture );
+
+			await admin.visitSiteEditor( {
+				postId: createdMenu?.id,
+				postType: 'wp_navigation',
+			} );
+
+			const listView = page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} );
+			const items = listView.getByRole( 'link', { name: /Item$/ } );
+
+			await expect( items ).toHaveText( [ 'First Item', 'Second Item' ] );
+
+			await listView
+				.getByRole( 'row', { name: 'First Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Move down' } ).click();
+			await expect( items ).toHaveText( [ 'Second Item', 'First Item' ] );
+
+			await pageUtils.pressKeys( 'primary+z' );
+			await expect( items ).toHaveText( [ 'First Item', 'Second Item' ] );
+
+			await pageUtils.pressKeys( 'primaryShift+z' );
+			await expect( items ).toHaveText( [ 'Second Item', 'First Item' ] );
+
+			await test.step( 'leaves undo in the link search to the browser', async () => {
+				await listView
+					.getByRole( 'button', { name: 'Add page' } )
+					.click();
+				await expect(
+					linkControl.getLinkControlSearch()
+				).toBeFocused();
+				await page.keyboard.type( 'Test' );
+				await pageUtils.pressKeys( 'primary+z' );
+
+				// Neither the item the appender inserted, whose link UI stays
+				// open, nor the move is undone.
+				await expect(
+					linkControl.getLinkControlSearch()
+				).toBeFocused();
+				await expect( items ).toHaveText( [
+					'Second Item',
+					'First Item',
+				] );
+			} );
+		} );
 	} );
 } );
 
