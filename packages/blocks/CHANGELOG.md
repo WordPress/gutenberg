@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add the `rotate` style property, for the `transform.rotate` block support ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
+
+## 17.2.0 (2026-11-18)
+
 ### Enhancements
 
 -   `BlockEditProps`: Add the optional `insertBlocksAfter`, `mergeBlocks`, `onReplace` and `onRemove` props that the block editor passes to a block's `edit` component ([#86993](https://github.com/WordPress/gutenberg/pull/86993)).

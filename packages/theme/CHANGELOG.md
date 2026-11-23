@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 5.0.0 (2026-11-18)
+
 ### Breaking Changes
 
 -   `--wpds-color-background-thumb-neutral` and `--wpds-color-background-thumb-brand` are now only for the movable handle of a control, such as a slider handle or scrollbar thumb. For the filled portion of a progressbar or meter, use `--wpds-color-background-indicator-neutral` and `--wpds-color-background-indicator-brand` instead ([#86584](https://github.com/WordPress/gutenberg/pull/86584)).

@@ -4,6 +4,22 @@
 
 ### Breaking Changes
 
+-   `Avatar`: Replace the compound API with a single component requiring `name`. Pass the image URL in `src` and its optional CORS setting in `crossOrigin`. Initials are the only fallback. The default avatar has the image role. Custom `render` elements keep their own role. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
+
+### Enhancements
+
+-   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, derive a contrasting fallback fill from the ring color, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
+-   `Menu.CheckboxItem` uses a larger, centered 20px checkmark ([#86974](https://github.com/WordPress/gutenberg/pull/86974)).
+-   `Select`, `Combobox`, and the controls built on them: Use a larger, centered 20px checkmark for selected items ([#87021](https://github.com/WordPress/gutenberg/pull/87021)).
+
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
+## 0.27.0 (2026-11-18)
+
+### Breaking Changes
+
 -   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).
 -   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 
