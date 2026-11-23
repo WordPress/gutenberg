@@ -363,10 +363,14 @@ const withSuggestionOverlay = createHigherOrderComponent(
 					( select ) => {
 						// `getEditorIntent` is private while Suggest mode is
 						// experimental.
+						const blockEditor: any = select( blockEditorStore );
+						// A block preview (the Template panel, a pattern
+						// list) is its own block editor and holds nothing
+						// of the post's to suggest on.
 						const suggesting =
 							unlock( select( STORE_NAME ) ).getEditorIntent() ===
-							EDITOR_INTENT_SUGGEST;
-						const blockEditor: any = select( blockEditorStore );
+								EDITOR_INTENT_SUGGEST &&
+							! blockEditor?.getSettings?.()?.isPreviewMode;
 						return {
 							isSuggestMode: suggesting,
 							isForeign:

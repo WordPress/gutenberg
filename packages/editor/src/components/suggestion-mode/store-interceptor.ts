@@ -1456,6 +1456,14 @@ export default function SuggestionStoreInterceptor() {
 			 */
 			const insertionsThisFire = [];
 
+			/*
+			 * Blocks that took an attribute proposal during this fire. A
+			 * deletion across blocks rewrites the first block and removes the
+			 * ones after it in one update; the removals are only known
+			 * further down, where the proposal is grouped with them.
+			 */
+			const proposalsThisFire: string[] = [];
+
 			const settleInsertedBlock = (
 				clientId: string,
 				attributes: Record< string, any >,
@@ -1814,6 +1822,7 @@ export default function SuggestionStoreInterceptor() {
 					} finally {
 						isDispatchingOwnWrite = false;
 					}
+					proposalsThisFire.push( clientId );
 				};
 
 				// Record what this revert will make true, so its echo can be
@@ -2254,6 +2263,62 @@ export default function SuggestionStoreInterceptor() {
 					tops,
 					tree.parentByClientId
 				);
+
+				/*
+				 * So are a proposal and the removals beside it: deleting
+				 * from inside one block to inside a later one leaves the
+				 * first holding the end of the last, and removes the rest.
+				 * Accepting the removals without the proposal would lose
+				 * that text.
+				 */
+				for ( const clientId of proposalsThisFire ) {
+					const attributes =
+						blockEditor.getBlockAttributes?.( clientId );
+					const marker = readSuggestionMarker( attributes );
+					// Partners are found by the block's own marker.
+					if (
+						marker?.type !== 'pending-attributes' ||
+						marker !== authorMarker( attributes, currentUserId )
+					) {
+						continue;
+					}
+					const parent =
+						blockEditor.getBlockRootClientId?.( clientId ) || null;
+					const removedSiblings = tops.filter(
+						( top ) =>
+							( tree.parentByClientId.get( top ) ?? null ) ===
+							parent
+					);
+					if ( removedSiblings.length === 0 ) {
+						continue;
+					}
+					const groupId =
+						removedSiblings
+							.map( ( top ) => groupIds.get( top ) )
+							.find( Boolean ) ??
+						marker.groupId ??
+						nextSuggestionGroupId();
+					for ( const top of removedSiblings ) {
+						if ( ! groupIds.has( top ) ) {
+							groupIds.set( top, groupId );
+						}
+					}
+					if ( marker.groupId === groupId ) {
+						continue;
+					}
+					isDispatchingOwnWrite = true;
+					try {
+						blockEditorDispatch.__unstableMarkNextChangeAsNotPersistent();
+						blockEditorDispatch.updateBlockAttributes( clientId, {
+							metadata: withSuggestionMarker(
+								attributes?.metadata,
+								{ ...marker, groupId }
+							),
+						} );
+					} finally {
+						isDispatchingOwnWrite = false;
+					}
+				}
 
 				// Phase 1: re-insert each top-level removed subtree at its
 				// previous position. Done synchronously inside `isReverting`
