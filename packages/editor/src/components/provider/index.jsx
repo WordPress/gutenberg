@@ -96,7 +96,7 @@ registerSuggestionFormat( SuggestionFormatEdit );
 registerClipboardSuggestionStrip();
 
 /*
- * With the experiment off the overlay context (and its block-tree
+ * With the experiment off the suggestion session (and its block-tree
  * subscriptions) never mounts; consumers fall back to the context default,
  * which is inert.
  */
