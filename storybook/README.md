@@ -36,6 +36,6 @@ npm run storybook:build
 npm run storybook:manifest-snapshot
 ```
 
-## Image credits
+## Story images
 
-The DataViews stories use NASA/JPL's [Ganymede Color Global](https://science.nasa.gov/photojournal/ganymede-color-global/) photograph in `static/ganymede.jpg`.
+The static smoke test blocks external image requests and checks that images decode in stories tagged `local-images`. The [DataViews image credits](./static/dataviews/README.md) list the source for each solar system thumbnail.

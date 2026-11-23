@@ -4,6 +4,7 @@ import { starFilled } from '@wordpress/icons';
 import DataViews from '../../dataviews/index';
 import DataForm from '../../dataform/index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
+import { spaceImages } from '../../stories/space-images';
 import type { View, Form, Field } from '../../types';
 
 const meta = {
@@ -153,9 +154,8 @@ const data: DataType[] = [
 		urlWithElements: 'https://example.com',
 		password: 'secretpassword123',
 		passwordWithElements: 'secretpassword123',
-		media: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
-		mediaWithElements:
-			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+		media: spaceImages.moon,
+		mediaWithElements: spaceImages.moon,
 		array: [ 'item1', 'item2', 'item3' ],
 		arrayWithElements: [ 'item1', 'item2', 'item3' ],
 		notype: 'No type',
@@ -478,15 +478,15 @@ const fields: Field< DataType >[] = [
 		description: 'Help for media with elements.',
 		elements: [
 			{
-				value: 'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
+				value: spaceImages.moon,
 				label: 'Moon',
 			},
 			{
-				value: 'https://live.staticflickr.com/8151/7651156426_e047f4d219_z.jpg',
+				value: spaceImages.mars,
 				label: 'Mars',
 			},
 			{
-				value: 'https://live.staticflickr.com/3762/9460163562_964fe6af07_z.jpg',
+				value: spaceImages.earth,
 				label: 'Earth',
 			},
 		],
@@ -1375,6 +1375,7 @@ export const MediaComponent = ( {
 		/>
 	);
 };
+MediaComponent.tags = [ 'local-images' ];
 MediaComponent.storyName = 'media';
 
 export const ArrayComponent = ( {

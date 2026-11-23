@@ -57,7 +57,11 @@ try {
 					const storyId = storyIds[ nextStoryIndex++ ];
 
 					try {
-						await renderStory( context, storyId );
+						await renderStory(
+							context,
+							storyId,
+							entries[ storyId ].tags?.includes( 'local-images' )
+						);
 					} catch ( error ) {
 						failures.push(
 							`${ storyId }: ${
@@ -100,8 +104,9 @@ try {
 /**
  * @param {import('playwright').BrowserContext} context
  * @param {string}                              storyId
+ * @param {boolean}                             [localImages]
  */
-async function renderStory( context, storyId ) {
+async function renderStory( context, storyId, localImages ) {
 	const page = await context.newPage();
 	/** @type {string[]} */
 	const failedResponses = [];
@@ -118,6 +123,23 @@ async function renderStory( context, storyId ) {
 	} );
 
 	try {
+		if ( localImages ) {
+			await page.route(
+				( url ) =>
+					[ 'http:', 'https:' ].includes( url.protocol ) &&
+					url.origin !== storybookUrl,
+				( route ) => {
+					if ( route.request().resourceType() === 'image' ) {
+						failedResponses.push(
+							`External image: ${ route.request().url() }`
+						);
+						return route.abort();
+					}
+					return route.continue();
+				}
+			);
+		}
+
 		const response = await page.goto(
 			`${ storybookUrl }/iframe.html?id=${ encodeURIComponent(
 				storyId
@@ -154,6 +176,13 @@ async function renderStory( context, storyId ) {
 
 		if ( status !== 'success' ) {
 			throw new Error( 'Storybook reported a test failure.' );
+		}
+		if ( localImages && ! failedResponses.length ) {
+			await page.evaluate( () =>
+				Promise.all(
+					Array.from( document.images, ( image ) => image.decode() )
+				)
+			);
 		}
 		if ( failedResponses.length || pageErrors.length ) {
 			throw new Error(

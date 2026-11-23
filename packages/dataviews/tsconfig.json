@@ -11,7 +11,11 @@
 		]
 	},
 	// The `filterSortAndPaginate` tests reuse the story data and fields.
-	"files": [ "global.d.ts", "src/dataviews/stories/fixtures.tsx" ],
+	"files": [
+		"global.d.ts",
+		"src/dataviews/stories/fixtures.tsx",
+		"src/stories/space-images.ts"
+	],
 	"include": [
 		"src/**/test/**/*.ts",
 		"src/**/test/**/*.tsx",
