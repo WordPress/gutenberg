@@ -38,7 +38,7 @@ export default function Edit( {
 	const blockProps = useBlockProps();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	let [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
+	const [ date ] = useEntityProp( 'root', 'comment', 'date', commentId );
 	const [ siteFormat = getDateSettings().formats.date ] = useEntityProp(
 		'root',
 		'site',
@@ -88,20 +88,18 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	if ( ! commentId || ! date ) {
-		date = _x( 'Comment Date', 'block title' );
-	}
+	const hasValidDate =
+		!! commentId && !! date && ! Number.isNaN( new Date( date ).getTime() );
 
-	let commentDate =
-		date instanceof Date ? (
-			<time dateTime={ dateI18n( 'c', date ) }>
-				{ format === 'human-diff'
-					? humanTimeDiff( date )
-					: dateI18n( format || siteFormat, date ) }
-			</time>
-		) : (
-			<time>{ date }</time>
-		);
+	let commentDate = hasValidDate ? (
+		<time dateTime={ dateI18n( 'c', date ) }>
+			{ format === 'human-diff'
+				? humanTimeDiff( date )
+				: dateI18n( format || siteFormat, date ) }
+		</time>
+	) : (
+		<time>{ _x( 'Comment Date', 'block title' ) }</time>
+	);
 
 	if ( isLink ) {
 		commentDate = (
