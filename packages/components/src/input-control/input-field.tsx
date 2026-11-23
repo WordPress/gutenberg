@@ -200,13 +200,11 @@ function InputField(
 		}
 	);
 
-	const dragProps = isDragEnabled ? dragGestureProps() : {};
-
 	return (
 		<PolymorphicElement
 			as="input"
 			{ ...props }
-			{ ...dragProps }
+			{ ...dragGestureProps() }
 			className={ clsx( 'components-input-control__input', styles.input, {
 				[ styles[ 'is-small' ] ]: size === 'small',
 				[ styles[ 'is-compact' ] ]: size === 'compact',
