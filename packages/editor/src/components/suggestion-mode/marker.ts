@@ -32,7 +32,8 @@ const DEEP_MERGE_KEYS = new Set( [ 'metadata' ] );
  * linking the halves of a single replacement (a block-switcher transform is a
  * removal plus an insertion); `commentId` is filled in by auto-save once a
  * note comment exists for the marker; `authorId` is the ID of the user who
- * proposed the suggestion (`null` when the current user can't be resolved);
+ * proposed the suggestion (`null` when the current user can't be resolved,
+ * and then the marker is no known user's);
  * `crossedParents` (`pending-move` only) is true when the move changed
  * parents, which makes `fromIndex` meaningless to any consumer that only
  * sees the block's current sibling list.
@@ -351,24 +352,26 @@ export function readSuggestionMarkers(
 }
 
 /**
- * Whether a marker is the author's: theirs, or one with no recorded author
- * (written before authors were recorded, or while the user was unresolved).
+ * Whether a marker is the author's. Markers sit in content, which anyone who
+ * can edit the post can write, so one with no recorded author belongs to no
+ * known user: counting it as everyone's would let a planted marker be saved
+ * as a note in the viewer's name. A user who has not resolved yet owns only
+ * the markers written in that state, which carry no author either.
  *
  * @param marker   Marker.
- * @param authorId Author.
+ * @param authorId Author, or null while the current user is unresolved.
  * @return Whether the author owns it.
  */
 function isAuthorOf(
 	marker: SuggestionMarker,
 	authorId: number | string | null | undefined
 ): boolean {
-	return (
-		marker.authorId === null ||
-		marker.authorId === undefined ||
-		authorId === null ||
-		authorId === undefined ||
-		String( marker.authorId ) === String( authorId )
-	);
+	const hasMarkerAuthor =
+		marker.authorId !== null && marker.authorId !== undefined;
+	if ( authorId === null || authorId === undefined ) {
+		return ! hasMarkerAuthor;
+	}
+	return hasMarkerAuthor && String( marker.authorId ) === String( authorId );
 }
 
 /**
@@ -391,12 +394,8 @@ export function authorMarker(
 		return marker;
 	}
 	return (
-		nestedOf( marker ).find(
-			( entry ) =>
-				entry.authorId !== null &&
-				entry.authorId !== undefined &&
-				String( entry.authorId ) === String( authorId )
-		) ?? null
+		nestedOf( marker ).find( ( entry ) => isAuthorOf( entry, authorId ) ) ??
+		null
 	);
 }
 

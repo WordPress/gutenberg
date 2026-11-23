@@ -571,12 +571,41 @@ describe( 'SuggestionAutoSave', () => {
 		expect( createSuggestion ).not.toHaveBeenCalled();
 	} );
 
+	it( 'never saves a marker with no recorded author as the current user’s', async () => {
+		// Anyone who can edit the post can plant a marker in its content.
+		const block = heading( 'Hi', {
+			metadata: {
+				suggestion: {
+					type: 'pending-attributes',
+					after: { level: 3 },
+				},
+			},
+		} );
+		const { registry } = renderWith( 'suggest', [ block ] );
+		act( () => {
+			registry
+				.dispatch( coreStore )
+				.receiveCurrentUser( { id: 3 } as any );
+		} );
+
+		await pastDebounce();
+
+		expect( createSuggestion ).not.toHaveBeenCalled();
+		expect( updateSuggestion ).not.toHaveBeenCalled();
+		expect( deleteSuggestion ).not.toHaveBeenCalled();
+		expect( markerOf( registry, block.clientId ) ).toEqual( {
+			type: 'pending-attributes',
+			after: { level: 3 },
+		} );
+	} );
+
 	it( 'ignores a hinted note that belongs to another user', async () => {
 		createSuggestion.mockResolvedValue( { id: 43 } );
 		const block = heading( 'Hi', {
 			metadata: {
 				suggestion: {
 					type: 'pending-attributes',
+					authorId: 3,
 					after: { level: 3 },
 					commentId: 99,
 				},
