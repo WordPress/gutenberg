@@ -17,6 +17,7 @@ import { getPostFieldProposalId } from '../../store/suggest-post-edits';
 import { unlock } from '../../lock-unlock';
 import { useSuggestionSession } from './suggestion-session';
 import { createProposedTerms } from './create-proposed-terms';
+import { getAttributeApplyRefusal } from './apply-refusal';
 import {
 	nestedMarkerFor,
 	withoutMarkerEntry,
@@ -557,6 +558,34 @@ export function useSuggestionDecisions() {
 				return false;
 			}
 
+			/*
+			 * The attribute values a payload proposes are another author's,
+			 * and the reviewer's save writes them. They are checked before
+			 * anything is decided, and again as they land.
+			 */
+			const findRefusal = () =>
+				getAttributeApplyRefusal( {
+					blockName: registry
+						.select( blockEditorStore )
+						.getBlockName( targetClientId ),
+					attributes: selectBlockAttributes( targetClientId ),
+					payload,
+				} );
+			const refusal = findRefusal();
+			if ( refusal ) {
+				createNotice( 'error', refusal, {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+				return false;
+			}
+			const assertApplicable = () => {
+				const late = findRefusal();
+				if ( late ) {
+					throw new Error( late );
+				}
+			};
+
 			const failureMessage = __( 'Failed to save suggestion status.' );
 
 			// Inline suggestions live as a suggestion marker in a
@@ -630,6 +659,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const currentAttributes =
 							selectBlockAttributes( targetClientId );
 						const applied = applyOperations(
@@ -656,6 +686,7 @@ export function useSuggestionDecisions() {
 					commentId,
 					'applied',
 					() => {
+						assertApplicable();
 						const plan = planStructuralApply(
 							structuralOp,
 							payload.operations,
@@ -674,6 +705,7 @@ export function useSuggestionDecisions() {
 				commentId,
 				'applied',
 				() => {
+					assertApplicable();
 					const currentAttributes =
 						selectBlockAttributes( targetClientId );
 					// One update lands the proposed values and drops the
