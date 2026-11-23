@@ -136,7 +136,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// Add parent post title if applicable.
-		if ( $parent_post ) {
+		if ( $parent_post && is_post_type_viewable( $parent_post->post_type ) ) {
 			$breadcrumb_items[] = array(
 				'label'      => block_core_breadcrumbs_get_post_title( $parent_post ),
 				'url'        => get_permalink( $parent_post ),
