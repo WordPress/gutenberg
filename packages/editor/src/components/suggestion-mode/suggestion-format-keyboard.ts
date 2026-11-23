@@ -46,7 +46,7 @@ import { store as editorStore } from '../../store';
  * The text is shown once, carrying the proposed formatting (the Google Docs
  * model), never duplicated.
  *
- * Writes are serialized per block through the overlay context's shared write
+ * Writes are serialized per block through the suggestion session's shared write
  * queue (shared with `SuggestionContentReconciler`), and every write
  * re-validates the block's live content against the snapshot the plan was
  * diffed from — the note POST is an async gap during which typing markers,
@@ -459,7 +459,7 @@ export default function SuggestionFormatKeyboard() {
 		[ enqueueSuggestionWrite, runFormatEdit ]
 	);
 
-	// Register the handler with the overlay context so the per-block HOC can
+	// Register the handler with the suggestion session so the per-block HOC can
 	// hand format edits off to it. Re-registers whenever the handler identity
 	// changes (e.g. `createSuggestion` rebinds on post modification).
 	useEffect(
