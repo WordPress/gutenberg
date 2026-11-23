@@ -12,6 +12,7 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function FileBlockInspector( {
 	hrefs,
+	isPdf,
 	openInNewWindow,
 	showDownloadButton,
 	changeLinkDestinationOption,
@@ -36,7 +37,7 @@ export default function FileBlockInspector( {
 	return (
 		<>
 			<InspectorControls>
-				{ href.endsWith( '.pdf' ) && (
+				{ isPdf && (
 					<ToolsPanel
 						label={ __( 'PDF settings' ) }
 						resetAll={ () => {
