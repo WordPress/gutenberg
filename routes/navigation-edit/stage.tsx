@@ -55,9 +55,23 @@ function NavigationEditStage() {
 			}
 		>
 			<div className={ styles.content }>
-				<Stack direction="column" gap="lg" align="stretch">
-					<NavigationMenuEditor id={ navigationId } />
-					<AutoAddPagesToggle id={ navigationId } />
+				{ /*
+				 * The setting sits at the bottom of the screen, and below the
+				 * list once the list is taller than the screen.
+				 */ }
+				<Stack
+					direction="column"
+					justify="space-between"
+					align="stretch"
+					className={ styles.layout }
+				>
+					<div className={ styles.menu }>
+						<NavigationMenuEditor id={ navigationId } />
+					</div>
+					<AutoAddPagesToggle
+						id={ navigationId }
+						className={ styles.footer }
+					/>
 				</Stack>
 			</div>
 		</Page>
