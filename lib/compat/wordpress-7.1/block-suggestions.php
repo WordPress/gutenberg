@@ -90,8 +90,9 @@ function gutenberg_kses_suggestion_block_snapshot( $block ) {
  * false staleness warnings whenever the real content contains markup that
  * KSES would strip.
  *
- * Note: apply-time sanitization scope is still under discussion; this
- * write-time capability-matched filter is the baseline.
+ * KSES removes markup. A value that only becomes markup once a block
+ * serializes it (a tag name, a URL, a CSS string) passes this filter and is
+ * checked in the editor when a reviewer accepts.
  *
  * @param string $value Raw JSON payload.
  * @return string Sanitized JSON payload, or '' when the payload is invalid.

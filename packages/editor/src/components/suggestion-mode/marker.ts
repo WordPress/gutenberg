@@ -515,6 +515,38 @@ export function nestedMarkerFor(
 }
 
 /**
+ * The suggestion a note holds on a block: the marker or nested entry that
+ * names the note. A marker is linked to its note a moment after it is
+ * written, so a block's only unlinked marker stands for a note the block's
+ * `metadata.noteId` links.
+ *
+ * @param attributes Block attributes.
+ * @param commentId  Note id.
+ * @return The marker, or null.
+ */
+export function markerForNote(
+	attributes: Record< string, any > | null | undefined,
+	commentId: number | string
+): SuggestionMarker | null {
+	const markers = readSuggestionMarkers( attributes );
+	const key = String( commentId );
+	const own = markers.find(
+		( entry ) =>
+			entry.commentId !== undefined && String( entry.commentId ) === key
+	);
+	if ( own ) {
+		return own;
+	}
+	const unlinked = markers.filter(
+		( entry ) => ! ( Number( entry.commentId ) > 0 )
+	);
+	const isLinked = getNoteIdsFromMetadata( attributes?.metadata ).some(
+		( id: number | string ) => String( id ) === key
+	);
+	return isLinked && unlinked.length === 1 ? unlinked[ 0 ] : null;
+}
+
+/**
  * Sort key for display order: saved suggestions by note id, unsaved ones
  * (no note yet, so the newest) after them in list order.
  *

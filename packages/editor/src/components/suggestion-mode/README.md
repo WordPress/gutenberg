@@ -22,6 +22,7 @@ The feature is an experiment, and nothing here is a public API.
 | `suggestion-store.ts`       | `SuggestionStore`: every read and write of a suggestion note (the comment, `_wp_suggestion`, `_wp_suggestion_status`). The swap point for another storage backend. |
 | `use-suggestion-submission.ts` | Create, update and delete: builds the payload, saves the note through the store, and links the block to it. |
 | `use-suggestion-decisions.ts` | Accept and Reject: the provisional status write, the conflict check, the content change, and the rollback when either half fails. |
+| `apply-refusal.ts` | `getAttributeApplyRefusal` and `getPostApplyRefusal`: why an accept is refused before anything is decided (the proposal left the block or differs from the note, another block type, a value the block type does not declare or that is unsafe to save, a post field that cannot be suggested). |
 | `decision-state.ts`         | Per-registry record of the decisions made this session, read by the interceptor and the undo guard. |
 | `operations/`               | Pure functions over payloads and attributes: `payload.ts` (`SCHEMA_VERSION`, `PAYLOAD_MAX_BYTES`, `parseSuggestionPayload`), `attributes.ts` (`operationsFromMarker`, `applyOperations`, `hasAttributeConflict`, the wrapper-aware equality check), `locate.ts`, `plan.ts`, `structural-apply.ts`, `structural-reject.ts`. |
 | `auto-save.ts`              | Debounced persistence of marked blocks as note comments. |
