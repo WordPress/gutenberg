@@ -408,6 +408,33 @@ export function getEntityActionsConfig(
 }
 
 /**
+ * Returns how many times a complete entity record was received directly, and
+ * not read by a record resolver, without resolving it. A `_fields` response
+ * does not count.
+ *
+ * @param state    Data state.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record's key, or `undefined` for a keyless entity.
+ * @param context  REST context the record was received in.
+ *
+ * @return The number of direct receipts.
+ */
+export function getDirectReceiptCount(
+	state: State,
+	kind: string,
+	name: string,
+	recordId: EntityRecordKey | undefined,
+	context: string = 'default'
+): number {
+	return (
+		state.entities.records?.[ kind ]?.[ name ]?.directReceipts?.[
+			context
+		]?.[ recordId as EntityRecordKey ] ?? 0
+	);
+}
+
+/**
  * Returns the current sync connection status across all entities. Prioritizes
  * disconnected states, then connecting, then connected.
  *
