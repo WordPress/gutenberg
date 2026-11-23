@@ -2119,6 +2119,40 @@ describe( 'Editor actions', () => {
 			).toEqual( 'text' );
 		} );
 
+		it( 'leaves the code editor alone on a post with markers when the experiment is off', () => {
+			delete window.__experimentalSuggestionMode;
+			registry
+				.dispatch( preferencesStore )
+				.set( 'core', 'editorMode', 'text' );
+
+			const post = {
+				id: postId,
+				type: 'post',
+				status: 'draft',
+				title: 'bar',
+				content:
+					'<!-- wp:paragraph --><p>Hello <mark class="wp-suggestion-add" data-suggestion-id="7" data-suggestion-type="add">there</mark></p><!-- /wp:paragraph -->',
+				excerpt: '',
+			};
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post );
+
+			// Nothing can resolve the markers without the experiment, so
+			// masking the preference would withhold the code editor for good.
+			expect( registry.select( editorStore ).getEditorMode() ).toEqual(
+				'text'
+			);
+			expect(
+				unlock(
+					registry.select( editorStore )
+				).getCodeEditorUnavailableReason( {
+					checkPendingSuggestions: true,
+				} )
+			).toBeNull();
+		} );
+
 		it( 'keeps the code editor masked when leaving Suggesting with markers pending', () => {
 			const post = {
 				id: postId,

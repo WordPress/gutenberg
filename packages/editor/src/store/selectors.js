@@ -24,6 +24,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
+import { isSuggestionModeEnabled } from '../components/suggestion-mode/gate';
 import { unlock } from '../lock-unlock';
 import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
@@ -1536,8 +1537,15 @@ export const getEditorMode = createRegistrySelector( ( select ) => {
 		 * the preference actually being `text`: a visual-editor session -
 		 * every session by default - never pays for it, and a code-editor
 		 * session is not re-serializing per keystroke the way the canvas is.
+		 *
+		 * Without the experiment nothing can resolve the markers, so the
+		 * mask would withhold the code editor on such a post for good.
 		 */
-		if ( mode === 'text' && hasPendingSuggestionMarkersInPost( state ) ) {
+		if (
+			mode === 'text' &&
+			isSuggestionModeEnabled() &&
+			hasPendingSuggestionMarkersInPost( state )
+		) {
 			return 'visual';
 		}
 
