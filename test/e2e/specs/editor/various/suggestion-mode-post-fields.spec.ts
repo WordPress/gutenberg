@@ -1440,7 +1440,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 				await requestUtils.activateTheme( 'twentytwentyone' );
 			} );
 
-			test( 'the site settings rows are read-only while suggesting', async ( {
+			test( 'opening the template leaves Suggesting, so its site settings rows can be edited', async ( {
 				editor,
 				page,
 			} ) => {
@@ -1449,7 +1449,8 @@ test.describe( 'Suggestion mode: post fields', () => {
 				} );
 				await switchIntent( page, 'Suggesting' );
 				// The template panel is locked while suggesting, so open the
-				// template the way its "Edit template" item does.
+				// template the way its "Edit template" item does. A template
+				// cannot hold suggestions, so the editor goes back to Editing.
 				await page.evaluate( () =>
 					( window as any ).wp.data
 						.select( 'core/editor' )
@@ -1463,11 +1464,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 				const settings = page.getByRole( 'region', {
 					name: 'Editor settings',
 				} );
-				// The rows show their values, without the buttons that open
-				// their editors.
-				await expect(
-					settings.getByText( 'Posts per page', { exact: true } )
-				).toBeVisible();
+				// The rows have the buttons that open their editors again.
 				for ( const name of [
 					'Edit Blog title',
 					'Edit Posts per page',
@@ -1475,10 +1472,10 @@ test.describe( 'Suggestion mode: post fields', () => {
 				] ) {
 					await expect(
 						settings.getByRole( 'button', { name } )
-					).toHaveCount( 0 );
+					).toBeVisible();
 				}
 
-				// The blog title is the posts page's title, also refused.
+				// The blog title is the posts page's title, editable too.
 				await page.evaluate(
 					( id ) =>
 						( window as any ).wp.data
@@ -1488,11 +1485,6 @@ test.describe( 'Suggestion mode: post fields', () => {
 							} ),
 					blogPage.id
 				);
-				await expect(
-					page
-						.locator( '.components-snackbar-list' )
-						.getByText( REFUSED_FIELD_MESSAGE )
-				).toBeVisible();
 				expect(
 					await page.evaluate(
 						( id ) =>
@@ -1502,10 +1494,10 @@ test.describe( 'Suggestion mode: post fields', () => {
 								.title,
 						blogPage.id
 					)
-				).toBe( 'Blog' );
+				).toBe( 'Latest news' );
 			} );
 
-			test( 'the DataForm summary shows the site settings read-only while suggesting', async ( {
+			test( 'the DataForm summary lets the site settings be edited once the template is open', async ( {
 				admin,
 				editor,
 				page,
@@ -1535,13 +1527,10 @@ test.describe( 'Suggestion mode: post fields', () => {
 						name: 'Editor settings',
 					} );
 					await expect(
-						settings.getByText( 'Posts per page', { exact: true } )
-					).toBeVisible();
-					await expect(
 						settings.getByRole( 'button', {
-							name: /^Edit (Blog title|Posts per page|Discussion)$/,
+							name: 'Edit Posts per page',
 						} )
-					).toHaveCount( 0 );
+					).toBeVisible();
 				} finally {
 					await requestUtils.setGutenbergExperiments( [
 						'gutenberg-suggestion-mode',
