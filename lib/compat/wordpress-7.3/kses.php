@@ -184,7 +184,7 @@ function gutenberg_allow_translate_lengths_only( $allow_css, $css_test_string ) 
 	}
 
 	$axes = preg_split( '/\s+/', trim( $parts[1] ) );
-	if ( count( $axes ) > 2 ) {
+	if ( false === $axes || count( $axes ) > 2 ) {
 		return false;
 	}
 
