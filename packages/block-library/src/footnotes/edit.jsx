@@ -4,6 +4,9 @@ import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
 import { formatListNumbered as icon } from '@wordpress/icons';
 
+const isFootnote = ( footnote ) =>
+	typeof footnote?.id === 'string' && footnote.id !== '';
+
 export default function FootnotesEdit( { context: { postType, postId } } ) {
 	const [ meta, updateMeta ] = useEntityProp(
 		'postType',
@@ -24,7 +27,7 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 	}
 	// Skip items that aren't footnotes, such as `null` or a string.
 	const footnotes = Array.isArray( parsed )
-		? parsed.filter( ( footnote ) => typeof footnote?.id === 'string' )
+		? parsed.filter( isFootnote )
 		: [];
 	const blockProps = useBlockProps();
 

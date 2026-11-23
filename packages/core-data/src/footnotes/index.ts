@@ -11,14 +11,11 @@ let oldFootnotes: Record< string, Footnote > = {};
  * footnote.
  *
  * @param value An item of the parsed footnotes meta.
- * @return Whether the item is an object with a string `id`.
+ * @return Whether the item has a non-empty string `id`.
  */
 function isFootnote( value: unknown ): value is Footnote {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		typeof ( value as { id?: unknown } ).id === 'string'
-	);
+	const id = ( value as { id?: unknown } | null )?.id;
+	return typeof id === 'string' && id !== '';
 }
 
 export function updateFootnotesFromMeta(

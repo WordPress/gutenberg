@@ -46,7 +46,7 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 	foreach ( $footnotes as $footnote ) {
 		// The meta is a string that something else may have written, so an
 		// item can be something other than a footnote. Skip it.
-		if ( ! is_array( $footnote ) || empty( $footnote['id'] ) || ! is_string( $footnote['id'] ) ) {
+		if ( ! is_array( $footnote ) || ! is_string( $footnote['id'] ?? null ) || '' === $footnote['id'] ) {
 			continue;
 		}
 

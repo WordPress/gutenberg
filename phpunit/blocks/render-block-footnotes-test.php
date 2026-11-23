@@ -54,10 +54,12 @@ class Tests_Blocks_Render_Footnotes extends WP_UnitTestCase {
 	 */
 	public function data_items_that_are_not_footnotes() {
 		return array(
-			'a string'                 => array( '["text"]' ),
-			'null'                     => array( '[null]' ),
-			'a number'                 => array( '[1]' ),
-			'a footnote without an id' => array( '[{"content":"No id"}]' ),
+			'a string'                   => array( '["text"]' ),
+			'null'                       => array( '[null]' ),
+			'a number'                   => array( '[1]' ),
+			'a footnote without an id'   => array( '[{"content":"No id"}]' ),
+			'an id that is not a string' => array( '[{"id":["x"],"content":"x"}]' ),
+			'an empty id'                => array( '[{"id":"","content":"x"}]' ),
 		);
 	}
 
