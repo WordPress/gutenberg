@@ -1076,6 +1076,31 @@ describe( 'operationsForBlock', () => {
 		] );
 	} );
 
+	it( 'names the group a grouped proposal belongs to', () => {
+		const marker = {
+			type: 'pending-attributes' as const,
+			after: { level: 3 },
+			groupId: 'sg-1',
+		};
+		expect(
+			operationsForBlock(
+				'a',
+				{ level: 2, metadata: { suggestion: marker } },
+				marker,
+				undefined,
+				treeStub
+			)
+		).toEqual( [
+			{
+				type: 'attribute-set',
+				attribute: 'level',
+				before: 2,
+				after: 3,
+				groupId: 'sg-1',
+			},
+		] );
+	} );
+
 	it( 'emits the recorded structural op first, then attribute ops', () => {
 		const op = { type: 'block-move', clientId: 'a', fromIndex: 1 };
 		expect(
