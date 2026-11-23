@@ -1,5 +1,5 @@
 {
-	"wpds-elevation": {
+	"wpds-shadow": {
 		"$type": "shadow",
 		"xs": {
 			"$value": [
@@ -7,7 +7,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -30,7 +30,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -50,7 +50,7 @@
 					}
 				}
 			],
-			"$description": "Elevation for small controls raised slightly above their surface, such as a switch thumb."
+			"$description": "Shadow for small controls raised slightly above their surface, such as a switch thumb."
 		},
 		"sm": {
 			"$value": [
@@ -58,7 +58,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -81,7 +81,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -101,7 +101,7 @@
 					}
 				}
 			],
-			"$description": "Elevation for small transient surfaces close to their trigger, such as tooltips."
+			"$description": "Shadow for small transient surfaces close to their trigger, such as tooltips."
 		},
 		"md": {
 			"$value": [
@@ -109,7 +109,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -132,7 +132,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -152,7 +152,7 @@
 					}
 				}
 			],
-			"$description": "Elevation for floating surfaces anchored to a trigger, such as popovers and menus."
+			"$description": "Shadow for floating surfaces anchored to a trigger, such as popovers and menus."
 		},
 		"lg": {
 			"$value": [
@@ -160,7 +160,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -183,7 +183,7 @@
 					"color": {
 						"colorSpace": "srgb",
 						"components": [ 0, 0, 0 ],
-						"alpha": 0.053
+						"alpha": 0.05
 					},
 					"offsetX": {
 						"value": 0,
@@ -203,7 +203,7 @@
 					}
 				}
 			],
-			"$description": "Elevation for surfaces that sit above the whole page, such as dialogs and drawers."
+			"$description": "Shadow for surfaces that sit above the whole page, such as dialogs and drawers."
 		}
 	}
 }

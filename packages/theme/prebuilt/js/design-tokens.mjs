@@ -2654,12 +2654,12 @@ export const tokens = /** @type {const} */ ( {
 			},
 		},
 	},
-	'--wpds-elevation-xs': {
+	'--wpds-shadow-xs': {
 		$description:
-			'Elevation for small controls raised slightly above their surface, such as a switch thumb.',
+			'Shadow for small controls raised slightly above their surface, such as a switch thumb.',
 		$type: 'shadow',
-		group: 'elevation',
-		fallback: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e',
+		group: 'shadow',
+		fallback: '0px 1px 1px #0000000d, 0px 1px 3px #0000000d',
 		modes: {
 			default: {
 				$value: [
@@ -2667,7 +2667,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2691,7 +2691,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2712,16 +2712,16 @@ export const tokens = /** @type {const} */ ( {
 						inset: false,
 					},
 				],
-				css: '0px 1px 1px #0000000e, 0px 1px 3px #0000000e',
+				css: '0px 1px 1px #0000000d, 0px 1px 3px #0000000d',
 			},
 		},
 	},
-	'--wpds-elevation-sm': {
+	'--wpds-shadow-sm': {
 		$description:
-			'Elevation for small transient surfaces close to their trigger, such as tooltips.',
+			'Shadow for small transient surfaces close to their trigger, such as tooltips.',
 		$type: 'shadow',
-		group: 'elevation',
-		fallback: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e',
+		group: 'shadow',
+		fallback: '0px 1px 2px #0000000d, 0px 3px 8px #0000000d',
 		modes: {
 			default: {
 				$value: [
@@ -2729,7 +2729,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2753,7 +2753,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2774,16 +2774,16 @@ export const tokens = /** @type {const} */ ( {
 						inset: false,
 					},
 				],
-				css: '0px 1px 2px #0000000e, 0px 3px 8px #0000000e',
+				css: '0px 1px 2px #0000000d, 0px 3px 8px #0000000d',
 			},
 		},
 	},
-	'--wpds-elevation-md': {
+	'--wpds-shadow-md': {
 		$description:
-			'Elevation for floating surfaces anchored to a trigger, such as popovers and menus.',
+			'Shadow for floating surfaces anchored to a trigger, such as popovers and menus.',
 		$type: 'shadow',
-		group: 'elevation',
-		fallback: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e',
+		group: 'shadow',
+		fallback: '0px 2px 4px #0000000d, 0px 8px 20px #0000000d',
 		modes: {
 			default: {
 				$value: [
@@ -2791,7 +2791,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2815,7 +2815,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2836,16 +2836,16 @@ export const tokens = /** @type {const} */ ( {
 						inset: false,
 					},
 				],
-				css: '0px 2px 4px #0000000e, 0px 8px 20px #0000000e',
+				css: '0px 2px 4px #0000000d, 0px 8px 20px #0000000d',
 			},
 		},
 	},
-	'--wpds-elevation-lg': {
+	'--wpds-shadow-lg': {
 		$description:
-			'Elevation for surfaces that sit above the whole page, such as dialogs and drawers.',
+			'Shadow for surfaces that sit above the whole page, such as dialogs and drawers.',
 		$type: 'shadow',
-		group: 'elevation',
-		fallback: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e',
+		group: 'shadow',
+		fallback: '0px 4px 10px #0000000d, 0px 20px 48px #0000000d',
 		modes: {
 			default: {
 				$value: [
@@ -2853,7 +2853,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2877,7 +2877,7 @@ export const tokens = /** @type {const} */ ( {
 						color: {
 							colorSpace: 'srgb',
 							components: [ 0, 0, 0 ],
-							alpha: 0.053,
+							alpha: 0.05,
 						},
 						offsetX: {
 							value: 0,
@@ -2898,7 +2898,7 @@ export const tokens = /** @type {const} */ ( {
 						inset: false,
 					},
 				],
-				css: '0px 4px 10px #0000000e, 0px 20px 48px #0000000e',
+				css: '0px 4px 10px #0000000d, 0px 20px 48px #0000000d',
 			},
 		},
 	},
@@ -3555,12 +3555,12 @@ export const groups = /** @type {const} */ ( {
 			},
 		},
 	},
-	elevation: {
+	shadow: {
 		tokens: [
-			'--wpds-elevation-xs',
-			'--wpds-elevation-sm',
-			'--wpds-elevation-md',
-			'--wpds-elevation-lg',
+			'--wpds-shadow-xs',
+			'--wpds-shadow-sm',
+			'--wpds-shadow-md',
+			'--wpds-shadow-lg',
 		],
 		groups: {},
 	},

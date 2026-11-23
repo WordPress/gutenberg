@@ -16,7 +16,7 @@
 			max-width: min(var(--available-width), var(--_wp-ui-item-popup-max-width, var(--available-width)));
 			border-radius: var(--wpds-border-radius-md);
 			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			box-shadow: var(--wpds-elevation-md);
+			box-shadow: var(--wpds-shadow-md);
 			background-color: var(--wpds-color-background-surface-neutral-strong);
 		}
 

@@ -311,14 +311,6 @@
 	--wpds-dimension-surface-width-xl: 720px;
 	/* Extra small surface width */
 	--wpds-dimension-surface-width-xs: 240px;
-	/* Elevation for surfaces that sit above the whole page, such as dialogs and drawers. */
-	--wpds-elevation-lg: 0px 4px 10px #0000000e, 0px 20px 48px #0000000e;
-	/* Elevation for floating surfaces anchored to a trigger, such as popovers and menus. */
-	--wpds-elevation-md: 0px 2px 4px #0000000e, 0px 8px 20px #0000000e;
-	/* Elevation for small transient surfaces close to their trigger, such as tooltips. */
-	--wpds-elevation-sm: 0px 1px 2px #0000000e, 0px 3px 8px #0000000e;
-	/* Elevation for small controls raised slightly above their surface, such as a switch thumb. */
-	--wpds-elevation-xs: 0px 1px 1px #0000000e, 0px 1px 3px #0000000e;
 	/* Deliberate animations like slides and reveals */
 	--wpds-motion-duration-lg: 300ms;
 	/* Standard transitions like menus and popovers */
@@ -335,6 +327,14 @@
 	--wpds-motion-easing-expressive: cubic-bezier(0.25, 0, 0, 1);
 	/* Nearly imperceptible easing for hover, color, and background transitions */
 	--wpds-motion-easing-subtle: cubic-bezier(0.15, 0, 0.15, 1);
+	/* Shadow for surfaces that sit above the whole page, such as dialogs and drawers. */
+	--wpds-shadow-lg: 0px 4px 10px #0000000d, 0px 20px 48px #0000000d;
+	/* Shadow for floating surfaces anchored to a trigger, such as popovers and menus. */
+	--wpds-shadow-md: 0px 2px 4px #0000000d, 0px 8px 20px #0000000d;
+	/* Shadow for small transient surfaces close to their trigger, such as tooltips. */
+	--wpds-shadow-sm: 0px 1px 2px #0000000d, 0px 3px 8px #0000000d;
+	/* Shadow for small controls raised slightly above their surface, such as a switch thumb. */
+	--wpds-shadow-xs: 0px 1px 1px #0000000d, 0px 1px 3px #0000000d;
 	/* Body font family */
 	--wpds-typography-font-family-body:
 		-apple-system, system-ui, "Segoe UI", "Roboto", "Oxygen-Sans", "Ubuntu",

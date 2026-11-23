@@ -75,7 +75,7 @@
 			border: var(--_wp-ui-switch-border-width) solid var(--wpds-color-stroke-interactive-neutral);
 			border-radius: 999px;
 			background-color: var(--wpds-color-background-thumb-neutral);
-			box-shadow: var(--wpds-elevation-xs);
+			box-shadow: var(--wpds-shadow-xs);
 
 			@media not (prefers-reduced-motion) {
 				transition:

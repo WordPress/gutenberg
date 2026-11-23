@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `--wpds-elevation-xs`, `--wpds-elevation-sm`, `--wpds-elevation-md`, and `--wpds-elevation-lg` shadow tokens. Each level is two black shadows. `ThemeProvider` strengthens them as the background seed gets darker, from 5% opacity on white to 30% on black ([#87287](https://github.com/WordPress/gutenberg/pull/87287)).
+-   Add `--wpds-shadow-xs`, `--wpds-shadow-sm`, `--wpds-shadow-md`, and `--wpds-shadow-lg` tokens. Each level is two black shadows. `ThemeProvider` sets their opacity from the background seed so they look about equally strong on any background, from 5% on white up to 25% on the darkest backgrounds ([#87287](https://github.com/WordPress/gutenberg/pull/87287)).
 
 ### Enhancements
 

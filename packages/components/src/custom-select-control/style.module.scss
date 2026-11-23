@@ -76,7 +76,7 @@ $sizes: (default, 40px, 12px), (small, 24px, 8px);
 	background-color: $components-color-background;
 	border-radius: $radius-small;
 	border: 1px solid $components-color-foreground;
-	box-shadow: var(--wpds-elevation-md);
+	box-shadow: var(--wpds-shadow-md);
 	/* z-index(".components-popover") */
 	z-index: 1000000;
 	max-height: min(var(--popover-available-height, 400px), 400px);

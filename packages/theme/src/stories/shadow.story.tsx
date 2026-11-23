@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties, ReactNode } from 'react';
 import { ThemeProvider } from '../theme-provider';
-import { getElevationOpacity } from '../elevation';
+import { getShadowOpacity } from '../shadow';
 
 const LEVELS = [
-	{ token: '--wpds-elevation-xs', usage: 'Switch thumb' },
-	{ token: '--wpds-elevation-sm', usage: 'Tooltip' },
-	{ token: '--wpds-elevation-md', usage: 'Popover, menu', stroke: true },
-	{ token: '--wpds-elevation-lg', usage: 'Dialog, drawer' },
+	{ token: '--wpds-shadow-xs', usage: 'Switch thumb' },
+	{ token: '--wpds-shadow-sm', usage: 'Tooltip' },
+	{ token: '--wpds-shadow-md', usage: 'Popover, menu', stroke: true },
+	{ token: '--wpds-shadow-lg', usage: 'Dialog, drawer' },
 ];
 
 type Strokes = 'as used' | 'none' | 'all';
@@ -80,11 +80,11 @@ const Levels = ( {
 
 const describeSeed = ( background: string ) =>
 	`${ background } · shadow opacity ${ (
-		getElevationOpacity( background ) * 100
+		getShadowOpacity( background ) * 100
 	).toFixed( 1 ) }%`;
 
 const meta: Meta< Args > = {
-	title: 'Design System/Theme/Elevation',
+	title: 'Design System/Theme/Shadow',
 	args: {
 		background: '#fcfcfc',
 		strokes: 'as used',
@@ -105,9 +105,9 @@ const meta: Meta< Args > = {
 export default meta;
 
 /**
- * The `--wpds-elevation-*` tokens are two black shadows per level. Their opacity follows the
- * `ThemeProvider` background seed, increasing as the background gets darker
- * so elevated surfaces stay distinct in dark themes.
+ * The `--wpds-shadow-*` tokens are two black shadows per level. Their
+ * opacity follows the `ThemeProvider` background seed, so the shadow darkens
+ * every background by about the same perceived amount.
  */
 export const Default: StoryObj< Args > = {
 	render: ( { background, strokes } ) => (
