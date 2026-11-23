@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1.
+
+
 ## 5.2.0 (2026-11-18)
 
 ### Internal
