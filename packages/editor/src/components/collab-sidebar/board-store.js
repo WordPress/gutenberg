@@ -138,8 +138,13 @@ export function createBoardStore() {
 	// canvas.
 	function syncRoot() {
 		const blockEl = [ ...blockRefs.values() ].find( Boolean );
+		// An anchor outside the block list (the post title) still shares
+		// its document.
 		const nextRootEl =
-			blockEl?.closest( '.is-root-container' ) ?? blockEl ?? null;
+			blockEl?.closest( '.is-root-container' ) ??
+			blockEl?.ownerDocument.querySelector( '.is-root-container' ) ??
+			blockEl ??
+			null;
 		if ( nextRootEl === rootEl ) {
 			return;
 		}
