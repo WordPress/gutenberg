@@ -714,7 +714,7 @@ flowchart LR
 - Restoring a revision re-seeds, from the revision's snapshot, the proposals of anchors in the restored content that their note no longer stores. Nothing is overwritten and no status changes.
 - Deactivating Gutenberg leaves anchors only: emptied marks and void placeholders render nothing, so nothing leaks. Rich text drops an empty mark on the next save, so that proposal is lost rather than leaked, and a placeholder shows as an unsupported block. Turning the experiment off changes nothing here: the pass and the re-inflation run whenever Gutenberg is active.
 
-**Residuals.** The edit-context `content.raw` carries the proposals by design. With real-time collaboration the persisted Yjs document (`_crdt_document` post meta, edit context only) holds full markers. Text a lower-capability collaborator types into a shared document is filtered under the capabilities of whoever saves. The RTC autosave controller compares incoming full content with the stored baseline, so while proposals exist it never sees an autosave as redundant and overwrites the user's own autosave once per tick.
+**Residuals.** The edit-context `content.raw` carries the proposals by design. With real-time collaboration the persisted Yjs document (`_crdt_document` post meta, edit context only) holds full markers, and it is not left out of WXR exports, so an export of such a post carries the proposals. Text a lower-capability collaborator types into a shared document is filtered under the capabilities of whoever saves. The RTC autosave controller compares incoming full content with the stored baseline, so while proposals exist it never sees an autosave as redundant and overwrites the user's own autosave once per tick.
 
 ## Front-end rendering
 
