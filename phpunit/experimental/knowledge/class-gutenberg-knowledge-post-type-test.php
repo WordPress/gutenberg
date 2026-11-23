@@ -51,7 +51,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_taxonomy_registered_without_default_term() {
 		$taxonomy = get_taxonomy( Gutenberg_Knowledge_Post_Type::TAXONOMY );
 
-		$this->assertNotFalse( $taxonomy );
+		$this->assertInstanceOf( WP_Taxonomy::class, $taxonomy );
 		$this->assertEmpty( $taxonomy->default_term );
 	}
 
@@ -65,7 +65,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_post_type_uses_knowledge_prefixed_capabilities() {
 		$post_type = get_post_type_object( Gutenberg_Knowledge_Post_Type::POST_TYPE );
 
-		$this->assertNotFalse( $post_type );
+		$this->assertInstanceOf( WP_Post_Type::class, $post_type );
 		$this->assertSame( 'read_knowledge_items', $post_type->cap->read );
 		$this->assertSame( 'edit_knowledge_items', $post_type->cap->create_posts );
 		$this->assertSame( 'edit_knowledge_items', $post_type->cap->edit_posts );
@@ -90,7 +90,7 @@ class Gutenberg_Knowledge_Post_Type_Test extends WP_UnitTestCase {
 	public function test_post_type_meta_caps_do_not_collide_with_primitives() {
 		$post_type = get_post_type_object( Gutenberg_Knowledge_Post_Type::POST_TYPE );
 
-		$this->assertNotFalse( $post_type );
+		$this->assertInstanceOf( WP_Post_Type::class, $post_type );
 		$this->assertSame( 'edit_knowledge_item', $post_type->cap->edit_post );
 		$this->assertSame( 'read_knowledge_item', $post_type->cap->read_post );
 		$this->assertSame( 'delete_knowledge_item', $post_type->cap->delete_post );
