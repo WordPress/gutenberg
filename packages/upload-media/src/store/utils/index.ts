@@ -102,8 +102,13 @@ function loadVipsModule(): Promise<
 }
 
 /**
+ * Number of calls into the vips worker in flight.
+ */
+let heldVipsOperations = 0;
+
+/**
  * Runs a call into the vips worker, holding the worker so a recycle cannot
- * drop it mid-call.
+ * drop it mid-call. Every vips wrapper in this file runs through it.
  *
  * Loads JPEG XL support first when an input or output is JXL.
  *
@@ -111,16 +116,19 @@ function loadVipsModule(): Promise<
  * @param callback Vips call to run.
  * @return The callback's result.
  */
-function runVipsCall< T >(
+async function runVipsCall< T >(
 	types: string[],
 	callback: () => Promise< T >
 ): Promise< T > {
-	return withVipsWorkerHeld( async () => {
+	heldVipsOperations++;
+	try {
 		if ( types.includes( 'image/jxl' ) ) {
 			await vipsEnsureJxlSupport();
 		}
-		return callback();
-	} );
+		return await callback();
+	} finally {
+		heldVipsOperations--;
+	}
 }
 
 /**
@@ -438,32 +446,6 @@ export async function vipsEnsureJxlSupport(): Promise< void > {
 export function terminateVipsWorker(): void {
 	if ( vipsModule ) {
 		vipsModule.terminateVipsWorker();
-	}
-}
-
-/**
- * Number of calls into the vips worker in flight.
- */
-let heldVipsOperations = 0;
-
-/**
- * Runs vips work that the worker must not be recycled during.
- *
- * Every vips wrapper in this file runs through it. Recycling mid-call would
- * drop the in-flight request, and drop worker-side state such as JXL support
- * that a later call in the same callback relies on.
- *
- * @param callback Vips work to run.
- * @return The callback's result.
- */
-export async function withVipsWorkerHeld< T >(
-	callback: () => Promise< T >
-): Promise< T > {
-	heldVipsOperations++;
-	try {
-		return await callback();
-	} finally {
-		heldVipsOperations--;
 	}
 }
 
