@@ -54,7 +54,11 @@ if ( class_exists( 'Gutenberg_REST_Comment_Controller_7_2' ) && ! class_exists( 
 			if ( ! is_string( $value ) ) {
 				return true;
 			}
-			if ( strlen( $value ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES ) {
+			// Measured raw and as stored: filtering can grow the payload.
+			if (
+				strlen( $value ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES ||
+				strlen( gutenberg_sanitize_suggestion_payload( $value ) ) > GUTENBERG_SUGGESTION_PAYLOAD_MAX_BYTES
+			) {
 				return new WP_Error(
 					'rest_suggestion_too_large',
 					sprintf(
