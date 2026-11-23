@@ -7,6 +7,10 @@
 -   Add the Transform panel and its `transform` inspector controls group, for the new transform block support. Rotation is its first control ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 -   Add `getTransformClassesAndStyles()`, for blocks that apply transform styles to an inner element ([#86240](https://github.com/WordPress/gutenberg/pull/86240)).
 
+### Enhancements
+
+-   Block lock: Add a lock menu to the block settings menu, behind the block lock menu experiment. It locks styles, layout, movement and deletion for one or several blocks and every block inside them. The lock buttons of List View rows and the block toolbar lock or unlock a block in one click, and right-clicking them opens the lock menu ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
+
 ### Bug Fixes
 
 -   List View: Show every row in view inside panels that change height, and stop Home, End, Page Up and Page Down in other fields from scrolling the list ([#87065](https://github.com/WordPress/gutenberg/pull/87065)).
@@ -16,7 +20,6 @@
 
 ### Enhancements
 
--   Block lock: Add a lock menu to the block settings menu, behind the block lock menu experiment. It locks styles, layout, movement and deletion for one or several blocks and every block inside them. The lock buttons of List View rows and the block toolbar lock or unlock a block in one click, and right-clicking them opens the lock menu ([#86970](https://github.com/WordPress/gutenberg/pull/86970)).
 -   Grid: Move blocks in an auto grid in four directions and allow explicitly placing children in empty cells ([#86017](https://github.com/WordPress/gutenberg/pull/86017)).
 -   Grid: Use square cells in manual placement mode and automatically adjust block spans and add rows to fit blocks of varying sizes as their content grows, behind the grid interactivity experiment ([#85811](https://github.com/WordPress/gutenberg/pull/85811)).
 -   Grid: Show the toolbars of blocks in a manual placement grid over the grid, behind the grid interactivity experiment. ([#85868](https://github.com/WordPress/gutenberg/pull/85868)).
