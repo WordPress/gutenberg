@@ -133,7 +133,6 @@ export function MediaPlaceholder( {
 	disableDropZone,
 	disableMediaButtons,
 	onError,
-	onWarning,
 	onSelect,
 	onCancel,
 	onSelectURL,
@@ -254,7 +253,6 @@ export function MediaPlaceholder( {
 				attachments: Array< Record< string, unknown > >
 			) => void,
 			onError,
-			onWarning,
 			// `add` allows multiple files like `true`.
 			multiple: multiple as boolean,
 		} );

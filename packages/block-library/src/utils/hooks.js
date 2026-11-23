@@ -48,7 +48,6 @@ export function usePostCommentsCount( postId ) {
  * @param {?Array}   args.allowedTypes Array of allowed media types.
  * @param {Function} args.onChange     Function called when the media is uploaded.
  * @param {Function} args.onError      Function called when an error happens.
- * @param {Function} args.onWarning    Function called when the upload succeeds with a caveat.
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const hasUploadStartedRef = useRef( false );
@@ -56,7 +55,6 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 	// The upload ends renders later, so call the latest callbacks.
 	const onChange = useEvent( args.onChange );
 	const onError = useEvent( args.onError );
-	const onWarning = useEvent( args.onWarning );
 
 	const startUpload = useEvent( () => {
 		// Uploading is a special effect that can't be canceled via the cleanup method.
@@ -99,7 +97,6 @@ export function useUploadMediaFromBlobURL( args = {} ) {
 				onError( message );
 				hasUploadStartedRef.current = false;
 			},
-			onWarning,
 		} );
 	} );
 
