@@ -16,6 +16,10 @@
 
 -   `Badge`: Stop the underline of a surrounding link from reaching the label, including when the badge is a flex or grid item ([#87074](https://github.com/WordPress/gutenberg/pull/87074)).
 
+### Internal
+
+-   Update `vitest` development dependency to 5.1.1 ([#87254](https://github.com/WordPress/gutenberg/pull/87254)).
+
 ## 0.27.0 (2026-11-18)
 
 ### Breaking Changes
