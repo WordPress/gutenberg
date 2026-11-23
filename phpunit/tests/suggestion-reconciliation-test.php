@@ -549,6 +549,26 @@ class Tests_Suggestion_Reconciliation extends WP_UnitTestCase {
 		$this->assertSame( 0, $sent );
 	}
 
+	public function test_finalizing_sends_no_mail_when_the_saver_is_not_the_post_author(): void {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$other_editor_id ) );
+		$note_id = $this->create_note( $post_id, $this->inline_op(), 'applied-unsaved' );
+		$other   = $this->create_note( $post_id, $this->inline_op() );
+		$this->set_content( $post_id, $this->paragraph( $this->mark( $note_id, 'add', 'a' ) . $this->mark( $other, 'add', 'b' ) ) );
+
+		$sent    = 0;
+		$counter = function () use ( &$sent ): bool {
+			++$sent;
+			return true;
+		};
+		add_filter( 'pre_wp_mail', $counter );
+		$this->set_content( $post_id, $this->paragraph( 'Plain' ) );
+		remove_filter( 'pre_wp_mail', $counter );
+
+		$this->assertSame( 'applied', $this->status_of( $note_id ) );
+		$this->assertSame( 'outdated', $this->status_of( $other ) );
+		$this->assertSame( 0, $sent );
+	}
+
 	public function test_anchor_index_reads_inline_and_structural_markers() {
 		$content = $this->paragraph( $this->mark( 4, 'add', 'a' ) . '<mark class="has-inline-color">x</mark>' . $this->mark( 5, 'format', 'b' ) )
 			. '<!-- wp:heading {"metadata":{"noteId":[6,7],"suggestion":{"type":"pending-move","commentId":8,"after":{"level":3}}}} --><h2>H</h2><!-- /wp:heading -->'

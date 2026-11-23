@@ -348,6 +348,75 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertSame( '', get_comment_meta( $foreign, '_wp_suggestion_content', true ) );
 	}
 
+	/**
+	 * A new post has no notes, so a copy of another post's editor content
+	 * (a duplicated post, a pattern made from marked blocks) proposes nothing.
+	 *
+	 * @dataProvider data_copy_post_types
+	 *
+	 * @param string $post_type Post type of the copy.
+	 */
+	public function test_a_new_post_does_not_store_another_posts_proposals( string $post_type ): void {
+		list( $post_id, $content ) = $this->suggested_post();
+		$this->assertSame( $content, $this->edit_view( $post_id ) );
+
+		$copy_id = wp_insert_post(
+			array(
+				'post_type'    => $post_type,
+				'post_title'   => 'Copy',
+				'post_status'  => 'draft',
+				'post_content' => wp_slash( $content ),
+			)
+		);
+
+		$stored = $this->stored( $copy_id );
+		$this->assertStringNotContainsString( 'zanzibarian', $stored );
+		$this->assertStringNotContainsString( 'Quixotic', $stored );
+		$this->assertStringNotContainsString( '"after"', $stored );
+		$this->assertStringContainsString( '<p>Hello</p>', $stored );
+		$this->assertStringContainsString( 'My Heading', $stored );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_copy_post_types(): array {
+		return array(
+			'a duplicated post' => array( 'post' ),
+			'a new pattern'     => array( 'wp_block' ),
+		);
+	}
+
+	/**
+	 * A post type without notes can never hold a suggestion, so nothing a
+	 * write to it proposes is stored, linked to a note or not.
+	 */
+	public function test_an_update_of_a_post_type_without_notes_stores_no_proposals(): void {
+		$pattern_id = wp_insert_post(
+			array(
+				'post_type'    => 'wp_block',
+				'post_title'   => 'Pattern',
+				'post_status'  => 'publish',
+				'post_content' => wp_slash( $this->paragraph( 'Hello' ) ),
+			)
+		);
+		$unlinked   = "<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1}}} -->\n<p>Unlinked block</p>\n<!-- /wp:paragraph -->";
+		$content    = $this->paragraph( 'Hello' . $this->mark( 77, 'add', ' zanzibarian' ) . $this->mark( 78, 'del', ' kept' ) ) . "\n\n" . $this->inserted( 79, 'Quixotic paragraph' ) . "\n\n" . $unlinked;
+
+		list( , $queries ) = $this->notes_loaded_by(
+			function () use ( $pattern_id, $content ) {
+				$this->save( $pattern_id, $content );
+			}
+		);
+
+		$stored = $this->stored( $pattern_id );
+		$this->assertStringNotContainsString( 'zanzibarian', $stored );
+		$this->assertStringNotContainsString( 'Quixotic', $stored );
+		$this->assertStringNotContainsString( 'Unlinked', $stored );
+		$this->assertStringContainsString( ' kept</mark>', $stored );
+		$this->assertSame( 0, $queries );
+	}
+
 	public function test_a_structural_marker_without_a_note_yet_is_left_in_place() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$content = $this->paragraph( 'Hello' ) . "\n\n<!-- wp:paragraph {\"metadata\":{\"suggestion\":{\"type\":\"pending-insert\",\"authorId\":1}}} -->\n<p>Not yet linked</p>\n<!-- /wp:paragraph -->";
@@ -386,6 +455,59 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertSame( $marker, $this->items_of( $note_id )[0]['original'] );
 	}
 
+	/**
+	 * Replaces what a post's notes store with markup kses would not let
+	 * their author publish, as a write that bypassed the save pass could.
+	 *
+	 * @param int[] $notes Note ids: an addition, a suggested block, an attribute proposal.
+	 */
+	private function forge_stored_proposals( array $notes ): void {
+		$payload = '<img src="x" onerror="alert(1)"><script>alert(2)</script>';
+		foreach ( $notes as $note_id ) {
+			$items = $this->items_of( $note_id );
+			foreach ( $items as $index => $item ) {
+				if ( 'after' === $item['kind'] ) {
+					$items[ $index ]['after']    = array( 'content' => $payload );
+					$items[ $index ]['original'] = str_replace( '"after":{"level":3}', '"after":{"content":' . wp_json_encode( $payload ) . '}', $item['original'] );
+				} else {
+					$items[ $index ]['original'] = str_replace( array( ' zanzibarian', 'Quixotic paragraph' ), array( ' zanzibarian' . $payload, 'Quixotic paragraph' . $payload ), $item['original'] );
+				}
+			}
+			update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $items ) ) );
+		}
+	}
+
+	public function test_a_stored_proposal_is_inflated_as_what_its_author_may_publish(): void {
+		list( $post_id, , $notes ) = $this->suggested_post();
+		$this->forge_stored_proposals( $notes );
+
+		$view = $this->edit_view( $post_id );
+
+		$this->assertStringNotContainsString( 'onerror', $view );
+		$this->assertStringNotContainsString( '<script', $view );
+		$this->assertStringContainsString( ' zanzibarian', $view );
+		$this->assertStringContainsString( 'Quixotic paragraph', $view );
+		$this->assertStringContainsString( '"after":{"content":', $view );
+	}
+
+	public function test_a_stored_proposal_of_an_unfiltered_html_author_is_inflated_exactly(): void {
+		list( $post_id, , $notes ) = $this->suggested_post();
+		foreach ( $notes as $note_id ) {
+			wp_update_comment(
+				array(
+					'comment_ID' => $note_id,
+					'user_id'    => self::$editor_id,
+				)
+			);
+		}
+		$this->forge_stored_proposals( $notes );
+
+		$view = $this->edit_view( $post_id );
+
+		$this->assertStringContainsString( ' zanzibarian<img src="x" onerror="alert(1)"><script>alert(2)</script>', $view );
+		$this->assertStringContainsString( 'Quixotic paragraph<img src="x" onerror="alert(1)"><script>alert(2)</script>', $view );
+	}
+
 	public function test_an_oversized_proposal_stays_in_the_content_and_is_flagged() {
 		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
 		$big     = $this->create_note( $post_id );
@@ -401,6 +523,112 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 		$this->assertTrue( (bool) get_comment_meta( $big, '_wp_suggestion_extraction_skipped', true ) );
 		$this->assertSame( '', get_comment_meta( $small, '_wp_suggestion_extraction_skipped', true ) );
 		$this->assertStringNotContainsString( 'lorem', apply_filters( 'the_content', $stored ) );
+	}
+
+	/**
+	 * Runs a callback and returns the ids of the notes its comment queries
+	 * loaded, and how many comment queries it ran.
+	 *
+	 * @param callable $callback Callback.
+	 * @return array{0: int[], 1: int} Loaded note ids, query count.
+	 */
+	private function notes_loaded_by( callable $callback ): array {
+		$loaded  = array();
+		$queries = 0;
+		$count   = static function () use ( &$queries ): void {
+			++$queries;
+		};
+		$record  = static function ( $comments ) use ( &$loaded ) {
+			foreach ( is_array( $comments ) ? $comments : array() as $comment ) {
+				$loaded[] = $comment instanceof WP_Comment ? (int) $comment->comment_ID : (int) $comment;
+			}
+			return $comments;
+		};
+		add_action( 'pre_get_comments', $count );
+		add_filter( 'the_comments', $record );
+		$callback();
+		remove_filter( 'the_comments', $record );
+		remove_action( 'pre_get_comments', $count );
+		return array( array_values( array_unique( $loaded ) ), $queries );
+	}
+
+	public function test_a_save_loads_only_the_notes_its_content_names(): void {
+		list( $post_id, $content, $notes ) = $this->suggested_post();
+		$decided                           = $this->create_note( $post_id );
+		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+		wp_set_comment_status( $decided, 'approve' );
+
+		list( $loaded ) = $this->notes_loaded_by(
+			function () use ( $post_id, $content ) {
+				$this->save( $post_id, $content . "\n\n" . $this->paragraph( 'More' ) );
+			}
+		);
+
+		$this->assertNotContains( $decided, $loaded );
+		$this->assertEqualSets( $notes, $loaded );
+		$this->assertSame( $content . "\n\n" . $this->paragraph( 'More' ), $this->edit_view( $post_id ) );
+	}
+
+	public function test_an_edit_context_response_loads_only_the_notes_its_content_names(): void {
+		list( $post_id, $content, $notes ) = $this->suggested_post();
+		$decided                           = $this->create_note( $post_id );
+		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+
+		list( $loaded ) = $this->notes_loaded_by(
+			function () use ( $post_id, $content ) {
+				$this->assertSame( $content, $this->edit_view( $post_id ) );
+			}
+		);
+
+		$this->assertEqualSets( $notes, $loaded );
+	}
+
+	public function test_a_save_of_a_post_without_suggestions_asks_for_its_notes_once(): void {
+		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
+
+		list( , $queries ) = $this->notes_loaded_by(
+			function () use ( $post_id ) {
+				$this->save( $post_id, $this->paragraph( 'Hello again' ) );
+			}
+		);
+
+		$this->assertSame( 1, $queries );
+	}
+
+	public function test_a_new_post_asks_for_no_notes(): void {
+		list( , $queries ) = $this->notes_loaded_by(
+			function () {
+				$this->create_post( $this->paragraph( 'Hello' ) );
+			}
+		);
+
+		$this->assertSame( 0, $queries );
+	}
+
+	public function test_a_post_field_decision_made_after_a_save_still_finalizes(): void {
+		$post_id = $this->create_post( $this->paragraph( 'Hello' ) );
+		$this->save( $post_id, $this->paragraph( 'Hello again' ) );
+		$note_id = $this->create_note(
+			$post_id,
+			array(
+				array(
+					'type'      => 'post-attribute-set',
+					'attribute' => 'title',
+					'before'    => 'Old',
+					'after'     => 'New title',
+				),
+			)
+		);
+		update_comment_meta( $note_id, '_wp_suggestion_status', 'applied-unsaved' );
+
+		wp_update_post(
+			array(
+				'ID'         => $post_id,
+				'post_title' => 'New title',
+			)
+		);
+
+		$this->assertSame( 'applied', get_comment_meta( $note_id, '_wp_suggestion_status', true ) );
 	}
 
 	public function test_accepting_and_saving_drops_the_stored_proposal() {

@@ -337,6 +337,79 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 		$this->assertSame( array(), $nested['items'] );
 	}
 
+	/**
+	 * The recorded original only replaces a marked run that differs from it
+	 * by what the suggestion changed. Markup edited directly since (a link's
+	 * address) must not be overwritten by the older copy.
+	 *
+	 * @dataProvider data_formatting_runs
+	 *
+	 * @param string     $run       Marked run.
+	 * @param string     $original  Recorded original.
+	 * @param array|null $delta     Recorded delta, if any.
+	 * @param bool       $extracted Whether the run is moved out.
+	 */
+	public function test_a_formatting_original_only_replaces_the_run_it_was_recorded_for( string $run, string $original, ?array $delta, bool $extracted ): void {
+		$content = '<p>See <mark data-suggestion-id="101" data-suggestion-type="format" class="wp-suggestion-format">' . $run . '</mark>.</p>';
+
+		$result = Gutenberg_Suggestion_Content::extract( $content, $this->notes(), array(), array( 101 => $original ), null === $delta ? array() : array( 101 => $delta ) );
+
+		if ( $extracted ) {
+			$this->assertSame( '<p>See <mark data-suggestion-run="0" data-suggestion-id="101" data-suggestion-type="format" class="wp-suggestion-format">' . $original . '</mark>.</p>', $result['content'] );
+			$this->assertSame( $content, Gutenberg_Suggestion_Content::inflate( $result['content'], $result['items'] ) );
+		} else {
+			$this->assertSame( $content, $result['content'] );
+			$this->assertSame( array(), $result['items'] );
+		}
+	}
+
+	/**
+	 * @return array<string, array{string, string, array|null, bool}>
+	 */
+	public function data_formatting_runs(): array {
+		$bold   = array(
+			array(
+				'offset'  => 0,
+				'length'  => 4,
+				'added'   => array( array( 'type' => 'core/bold' ) ),
+				'removed' => array(),
+			),
+		);
+		$relink = array(
+			array(
+				'offset'  => 0,
+				'length'  => 4,
+				'added'   => array(
+					array(
+						'type'       => 'core/link',
+						'attributes' => array( 'url' => 'https://new.example/' ),
+					),
+				),
+				'removed' => array(
+					array(
+						'type'       => 'core/link',
+						'attributes' => array( 'url' => 'https://old.example/' ),
+					),
+				),
+			),
+		);
+		$late   = array( array_merge( $bold[0], array( 'offset' => 2 ) ) );
+		$short  = array( array_merge( $bold[0], array( 'length' => 2 ) ) );
+		$old    = '<a href="https://old.example/">link</a>';
+		$new    = '<a href="https://new.example/">link</a>';
+		return array(
+			'bold on a link'                              => array( "<strong>{$old}</strong>", $old, $bold, true ),
+			'bold on a link, no delta'                    => array( "<strong>{$old}</strong>", $old, null, true ),
+			'bold on a link whose address was edited'     => array( "<strong>{$new}</strong>", $old, $bold, false ),
+			'the same, no delta'                          => array( "<strong>{$new}</strong>", $old, null, false ),
+			'a suggested address'                         => array( $new, $old, $relink, true ),
+			'bold on text italicized directly'            => array( '<strong><em>link</em></strong>', 'link', $bold, false ),
+			'bold after an astral character'              => array( "\u{1F600}<strong>ink</strong>", "\u{1F600}ink", $late, true ),
+			'a delta that does not cover the change'      => array( '<strong>link</strong>', 'link', $short, false ),
+			'markup the character split does not support' => array( '<strong><cite>link</cite></strong>', '<cite>link</cite>', $bold, false ),
+		);
+	}
+
 	public function test_the_render_strip_unwraps_a_formatting_anchor() {
 		$html = '<p>Hello <mark data-suggestion-run="0" data-suggestion-id="101" data-suggestion-type="format" class="wp-suggestion-format">world</mark></p>';
 
@@ -350,6 +423,37 @@ class Tests_Suggestion_Content_Round_Trip extends WP_UnitTestCase {
 
 		$this->assertSame( $content, $extracted['content'] );
 		$this->assertSame( array(), $extracted['items'] );
+	}
+
+	/**
+	 * A span a marker opens in one block and closes in another is not one
+	 * marker's run: taking it out would take the blocks between them too.
+	 *
+	 * @dataProvider data_spans_across_blocks
+	 *
+	 * @param string $attributes Attributes of the opening marker.
+	 */
+	public function test_an_inline_span_across_block_delimiters_is_left_alone( string $attributes ): void {
+		$content = "<!-- wp:html -->\n<mark {$attributes}>\n<!-- /wp:html -->\n\n<!-- wp:paragraph -->\n<p>A real paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:html -->\n</mark>\n<!-- /wp:html -->";
+
+		$extracted = Gutenberg_Suggestion_Content::extract( $content, $this->notes(), array(), array( 101 => 'A real paragraph' ) );
+
+		$this->assertSame( $content, $extracted['content'] );
+		$this->assertSame( array(), $extracted['items'] );
+		$this->assertSame( $content, Gutenberg_Suggestion_Content::inflate( $content, array() ) );
+	}
+
+	/**
+	 * @return array<string, array{string}>
+	 */
+	public function data_spans_across_blocks(): array {
+		return array(
+			'an addition for a note of the post' => array( 'data-suggestion-id="101" class="wp-suggestion-add"' ),
+			'an addition for no note'            => array( 'data-suggestion-id="9" class="wp-suggestion-add"' ),
+			'a formatting change'                => array( 'data-suggestion-id="101" class="wp-suggestion-format"' ),
+			'an addition anchor'                 => array( 'data-suggestion-run="0" data-suggestion-id="101" class="wp-suggestion-add"' ),
+			'a formatting anchor'                => array( 'data-suggestion-run="0" data-suggestion-id="101" class="wp-suggestion-format"' ),
+		);
 	}
 
 	public function test_unbalanced_block_delimiters_are_left_alone() {
