@@ -39,7 +39,16 @@ export interface BlockAttributes {
 		bindings?: Bindings;
 		blockVisibility?: BlockVisibility;
 	};
-	lock?: { move?: boolean; remove?: boolean; edit?: boolean };
+	lock?: {
+		move?: boolean;
+		remove?: boolean;
+		edit?: boolean;
+		/**
+		 * Whether the controls of the Styles tab are locked, with the block
+		 * lock menu experiment.
+		 */
+		styles?: boolean;
+	};
 	[ key: string ]: unknown;
 }
 

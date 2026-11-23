@@ -397,8 +397,8 @@ describe( 'private actions', () => {
 					names[ id ] === 'core/group',
 				isPatternLockedBlock: ( id: string ) =>
 					patternLocked.includes( id ),
-				isEditLockedBlock: ( id: string ) =>
-					!! attributes[ id ]?.lock?.edit,
+				isStylesLockedBlock: ( id: string ) =>
+					!! attributes[ id ]?.lock?.styles,
 				getBlockParents: ( id: string ) => {
 					const ancestors: string[] = [];
 					let parentId = parents[ id ];
@@ -434,17 +434,17 @@ describe( 'private actions', () => {
 			);
 		} );
 
-		it( 'locks the styles of every block, not only those with their own edit lock', () => {
+		it( 'locks the styles of every block', () => {
 			const dispatch = { updateBlockAttributes: vi.fn() };
-			setBlocksLock( [ 'group' ], { edit: true } )(
+			setBlocksLock( [ 'group' ], { styles: true } )(
 				thunkArgs( { select: createSelect( {} ), dispatch } )
 			);
 
 			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(
 				[ 'group', 'paragraph' ],
 				{
-					group: { lock: { edit: true } },
-					paragraph: { lock: { edit: true } },
+					group: { lock: { styles: true } },
+					paragraph: { lock: { styles: true } },
 				},
 				{ uniqueByBlock: true }
 			);
@@ -554,12 +554,12 @@ describe( 'private actions', () => {
 
 		it( 'unlocks the styles of the blocks above when a block inside unlocks its styles', () => {
 			const dispatch = { updateBlockAttributes: vi.fn() };
-			setBlocksLock( [ 'paragraph' ], { edit: false } )(
+			setBlocksLock( [ 'paragraph' ], { styles: false } )(
 				thunkArgs( {
 					select: createSelect( {
-						root: { lock: { edit: true } },
-						group: { lock: { move: true, edit: true } },
-						paragraph: { lock: { edit: true } },
+						root: { lock: { styles: true } },
+						group: { lock: { move: true, styles: true } },
+						paragraph: { lock: { styles: true } },
 					} ),
 					dispatch,
 				} )
@@ -653,7 +653,7 @@ describe( 'private actions', () => {
 				column: [ 'heading' ],
 				heading: [],
 			};
-			const fullLock = { move: true, remove: true, edit: true };
+			const fullLock = { move: true, remove: true, styles: true };
 			const attributes: Record< string, Record< string, any > > = {
 				group: { lock: fullLock, templateLock: 'all' },
 				columns: { lock: fullLock, templateLock: 'all' },
@@ -686,8 +686,8 @@ describe( 'private actions', () => {
 				getTemplateLock,
 				canLayoutLockBlock: ( id: string ) => id !== 'heading',
 				isPatternLockedBlock: () => false,
-				isEditLockedBlock: ( id: string ) =>
-					!! attributes[ id ]?.lock?.edit,
+				isStylesLockedBlock: ( id: string ) =>
+					!! attributes[ id ]?.lock?.styles,
 				getBlockParents: ( id: string ) => {
 					const ancestors: string[] = [];
 					let parentId = parents[ id ];
@@ -704,7 +704,7 @@ describe( 'private actions', () => {
 				move: false,
 				remove: false,
 				layout: false,
-				edit: false,
+				styles: false,
 			} )( thunkArgs( { select, dispatch } ) );
 
 			expect( dispatch.updateBlockAttributes ).toHaveBeenCalledWith(

@@ -1226,6 +1226,19 @@ export function isEditLockedBlock( state: State, clientId: string ) {
 }
 
 /**
+ * Returns whether the styles of a block are locked, which keeps the controls
+ * of its Styles tab from being changed. The rest of the block stays editable.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the styles of the block are locked.
+ */
+export function isStylesLockedBlock( state: State, clientId: string ) {
+	return !! getBlockAttributes( state, clientId )?.lock?.styles;
+}
+
+/**
  * Returns whether a block is locked to prevent moving.
  *
  * This selector only reasons about templateLock and block lock, not associated features
@@ -1307,9 +1320,12 @@ export function isLockedBlock( state: State, clientId: string ) {
 		isEditLockedBlock( state, clientId ) ||
 		isMoveLockedBlock( state, clientId ) ||
 		isRemoveLockedBlock( state, clientId ) ||
-		// The layout lock is part of the lock menu, so it only counts with
-		// that experiment, leaving the lock icons as they are without it.
-		( isBlockLockMenuEnabled() && isLayoutLockedBlock( state, clientId ) )
+		// The styles and layout locks are part of the lock menu, so they only
+		// count with that experiment, leaving the lock icons as they are
+		// without it.
+		( isBlockLockMenuEnabled() &&
+			( isStylesLockedBlock( state, clientId ) ||
+				isLayoutLockedBlock( state, clientId ) ) )
 	);
 }
 
@@ -1399,7 +1415,7 @@ export function getBlockLockType(
 	const locks = [
 		isMoveLockedBlock( state, clientId ),
 		isRemoveLockedBlock( state, clientId ),
-		isEditLockedBlock( state, clientId ),
+		isStylesLockedBlock( state, clientId ),
 	];
 	if ( canLayoutLockBlock( state, clientId ) ) {
 		locks.push( isLayoutLockedBlock( state, clientId ) );
@@ -1429,7 +1445,7 @@ export function hasOwnBlockLock( state: State, clientId: string ): boolean {
 	return (
 		isMoveLockedBlock( state, clientId ) ||
 		isRemoveLockedBlock( state, clientId ) ||
-		isEditLockedBlock( state, clientId ) ||
+		isStylesLockedBlock( state, clientId ) ||
 		( isLayoutLockedBlock( state, clientId ) &&
 			! isPatternLockedBlock( state, clientId ) )
 	);

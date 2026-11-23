@@ -207,6 +207,24 @@ export default function BlockList( settings: BlockListProps ) {
 const EMPTY_ARRAY: string[] = [];
 const EMPTY_SET = new Set< string >();
 
+/**
+ * Returns whether a lock covers the styles, movement and deletion of a block.
+ *
+ * @param lock        The `lock` attribute of the block.
+ * @param lock.styles Whether the styles are locked.
+ * @param lock.move   Whether the block is locked in place.
+ * @param lock.remove Whether the block is protected from deletion.
+ *
+ * @return Whether the block is fully locked.
+ */
+function isFullyLocked( lock?: {
+	styles?: boolean;
+	move?: boolean;
+	remove?: boolean;
+} ) {
+	return !! ( lock?.styles && lock?.move && lock?.remove );
+}
+
 function Items( {
 	placeholder,
 	rootClientId,
@@ -299,12 +317,12 @@ function Items( {
 					) ) &&
 				getBlockEditingMode( rootClientId ) !== 'disabled' &&
 				( ! templateLock || templateLock === 'contentOnly' ) &&
-				// With the block lock menu, a block whose styles are locked
-				// takes no new inner blocks.
+				// With the block lock menu, a fully locked block takes no new
+				// inner blocks.
 				! (
 					window.__experimentalBlockLockMenu &&
 					rootClientId &&
-					getBlockAttributes( rootClientId )?.lock?.edit
+					isFullyLocked( getBlockAttributes( rootClientId )?.lock )
 				) &&
 				hasAppender &&
 				! _isZoomOut();

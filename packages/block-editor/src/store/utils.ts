@@ -176,8 +176,8 @@ export const getInsertBlockTypeDependants: (
 		return [
 			state.blockListSettings.get( rootClientId! ),
 			state.blocks.byClientId.get( rootClientId! ),
-			// The lock of the root, as a block whose styles are locked takes
-			// no new inner blocks.
+			// The lock of the root, as a fully locked block takes no new
+			// inner blocks.
 			state.blocks.attributes.get( rootClientId! )?.lock,
 			state.blocks.order.get( rootClientId || '' ),
 			state.settings.allowedBlockTypes,

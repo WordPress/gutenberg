@@ -12,6 +12,11 @@ export interface SelectedStyleState {
 }
 
 export interface StyleInspectorSlotsProps {
+	/**
+	 * The client ID of the block, whose style controls are disabled while its
+	 * styles are locked.
+	 */
+	clientId?: string;
 	showAdvancedControls?: boolean;
 	showPositionControls?: boolean;
 	showBindingsControls?: boolean;

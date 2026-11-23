@@ -1799,7 +1799,7 @@ describe( 'private selectors', () => {
 			expect(
 				getBlockLockType(
 					createState( {
-						lock: { move: true, remove: true, edit: true },
+						lock: { move: true, remove: true, styles: true },
 						templateLock: 'all',
 					} ),
 					'container'
@@ -1836,7 +1836,7 @@ describe( 'private selectors', () => {
 				getBlockLockType(
 					createState(
 						{},
-						{ lock: { move: true, remove: true, edit: true } }
+						{ lock: { move: true, remove: true, styles: true } }
 					),
 					'leaf'
 				)
@@ -1870,7 +1870,7 @@ describe( 'private selectors', () => {
 		it( 'returns a partial lock when only the styles are locked', () => {
 			expect(
 				getBlockLockType(
-					createState( {}, { lock: { edit: true } } ),
+					createState( {}, { lock: { styles: true } } ),
 					'leaf'
 				)
 			).toBe( 'partial' );

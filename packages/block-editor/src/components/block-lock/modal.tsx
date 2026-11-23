@@ -15,8 +15,10 @@ import { getBlockType } from '@wordpress/blocks';
 import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
-import { ALLOWS_EDIT_LOCKING } from './constants';
 import type { BlockLock, BlockLockModalProps } from './types';
+
+// Entity based blocks which allow edit locking
+const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
 
 function getTemplateLockValue( lock: BlockLock ) {
 	// Prevents all operations.

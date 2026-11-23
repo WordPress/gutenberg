@@ -711,10 +711,10 @@ export interface BlockLockChanges {
 	 */
 	layout?: boolean;
 	/**
-	 * Whether the styles are locked: the content and styles of the block can't
-	 * be edited.
+	 * Whether the styles are locked: the controls of the Styles tab can't be
+	 * changed. Stored as `lock.styles`.
 	 */
-	edit?: boolean;
+	styles?: boolean;
 }
 
 /**
@@ -806,18 +806,18 @@ export const setBlocksLock =
 			return ancestorAttributes.get( ancestorId )!;
 		};
 		for ( const clientId of clientIds ) {
-			if ( changes.edit === false ) {
+			if ( changes.styles === false ) {
 				for ( const ancestorId of select.getBlockParents( clientId ) ) {
 					if (
 						targetIdSet.has( ancestorId ) ||
-						! select.isEditLockedBlock( ancestorId )
+						! select.isStylesLockedBlock( ancestorId )
 					) {
 						continue;
 					}
 					const ancestorLock = {
 						...select.getBlockAttributes( ancestorId )?.lock,
 					};
-					delete ancestorLock.edit;
+					delete ancestorLock.styles;
 					getAncestorAttributes( ancestorId ).lock = Object.keys(
 						ancestorLock
 					).length
@@ -953,8 +953,11 @@ export const setBlocksLock =
 			if ( changes.remove !== undefined ) {
 				lock.remove = changes.remove;
 			}
-			if ( changes.edit !== undefined ) {
-				lock.edit = changes.edit;
+			// Nothing passes a styles lock down, so an unlock removes it.
+			if ( changes.styles ) {
+				lock.styles = true;
+			} else if ( changes.styles === false ) {
+				delete lock.styles;
 			}
 
 			const rootClientId = select.getBlockRootClientId( clientId );

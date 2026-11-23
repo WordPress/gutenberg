@@ -3070,8 +3070,8 @@ describe( 'selectors', () => {
 			).toBe( true );
 		} );
 
-		it( 'should deny blocks from being inserted into a block whose styles are locked, with the block lock menu', () => {
-			const createState = ( blockLock?: { edit: boolean } ) =>
+		it( 'should deny blocks from being inserted into a fully locked block, with the block lock menu', () => {
+			const createState = ( blockLock?: Record< string, boolean > ) =>
 				partial< State >( {
 					blocks: {
 						byClientId: new Map(
@@ -3101,14 +3101,18 @@ describe( 'selectors', () => {
 			try {
 				expect(
 					canInsertBlockType(
-						createState( { edit: true } ),
+						createState( {
+							styles: true,
+							move: true,
+							remove: true,
+						} ),
 						'core/test-block-c',
 						'block1'
 					)
 				).toBe( false );
 				expect(
 					canInsertBlockType(
-						createState( { edit: false } ),
+						createState( { styles: true } ),
 						'core/test-block-c',
 						'block1'
 					)

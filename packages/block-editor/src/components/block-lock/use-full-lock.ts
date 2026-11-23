@@ -54,7 +54,7 @@ function useFullLock( isLocked: boolean ) {
 				move: isLocked,
 				remove: isLocked,
 				layout: isLocked,
-				edit: isLocked,
+				styles: isLocked,
 			} );
 
 			let message: string;

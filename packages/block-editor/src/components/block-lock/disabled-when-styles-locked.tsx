@@ -16,9 +16,9 @@ interface DisabledWhenStylesLockedProps {
 }
 
 /**
- * Renders the controls of a block disabled while its styles are locked, so its
- * content and styles can't be changed but the controls stay visible. Only
- * applies with the block lock menu experiment.
+ * Renders the style controls of a block disabled while its styles are locked,
+ * so they can't be changed but stay visible. Only applies with the block lock
+ * menu experiment.
  */
 export default function DisabledWhenStylesLocked( {
 	clientId,
@@ -28,7 +28,9 @@ export default function DisabledWhenStylesLocked( {
 		( select ) =>
 			!! window.__experimentalBlockLockMenu &&
 			!! clientId &&
-			unlock( select( blockEditorStore ) ).isEditLockedBlock( clientId ),
+			unlock( select( blockEditorStore ) ).isStylesLockedBlock(
+				clientId
+			),
 		[ clientId ]
 	);
 

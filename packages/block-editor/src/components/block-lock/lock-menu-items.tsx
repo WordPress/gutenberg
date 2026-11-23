@@ -10,7 +10,7 @@ import type { BlockLockMenuProps } from './types';
 
 /**
  * Renders the checkbox items of the lock menu: all properties, then
- * styles, which locks editing the content and styles of the blocks, layout,
+ * styles, which locks the controls of the Styles tab, layout,
  * where the blocks have one, movement and deletion. Each change applies right away to the blocks
  * and every block inside them, and the menu stays open so several properties
  * can be toggled in one pass.
@@ -25,7 +25,7 @@ export default function BlockLockMenuItems( {
 		isMoveLocked,
 		isRemoveLocked,
 		isLayoutLocked,
-		isEditLocked,
+		isStylesLocked,
 		canLayoutLock,
 		canChangeLayoutLock,
 		isEverySyncedPattern,
@@ -35,7 +35,7 @@ export default function BlockLockMenuItems( {
 				isMoveLockedBlock,
 				isRemoveLockedBlock,
 				isLayoutLockedBlock,
-				isEditLockedBlock,
+				isStylesLockedBlock,
 				canLayoutLockBlock,
 				isPatternLockedBlock,
 				getBlockName,
@@ -52,7 +52,7 @@ export default function BlockLockMenuItems( {
 				isLayoutLocked:
 					layoutLockableIds.length > 0 &&
 					layoutLockableIds.every( isLayoutLockedBlock ),
-				isEditLocked: clientIds.every( isEditLockedBlock ),
+				isStylesLocked: clientIds.every( isStylesLockedBlock ),
 				canLayoutLock: layoutLockableIds.length > 0,
 				canChangeLayoutLock: layoutChangeableIds.length > 0,
 				isEverySyncedPattern:
@@ -80,7 +80,7 @@ export default function BlockLockMenuItems( {
 		isMoveLocked &&
 		isRemoveLocked &&
 		( ! canLayoutLock || isLayoutLocked ) &&
-		isEditLocked;
+		isStylesLocked;
 
 	return (
 		<>
@@ -92,7 +92,7 @@ export default function BlockLockMenuItems( {
 						move: checked,
 						remove: checked,
 						layout: checked,
-						edit: checked,
+						styles: checked,
 					} )
 				}
 			>
@@ -100,10 +100,10 @@ export default function BlockLockMenuItems( {
 			</Menu.CheckboxItem>
 			<Menu.Separator />
 			<Menu.CheckboxItem
-				checked={ isEditLocked }
+				checked={ isStylesLocked }
 				closeOnClick={ false }
-				onCheckedChange={ ( edit ) =>
-					setBlocksLock( clientIds, { edit } )
+				onCheckedChange={ ( styles ) =>
+					setBlocksLock( clientIds, { styles } )
 				}
 			>
 				<Menu.ItemLabel>{ __( 'Styles' ) }</Menu.ItemLabel>

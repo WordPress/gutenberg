@@ -14,6 +14,10 @@ declare global {
  */
 export interface BlockLockStatus {
 	isEditLocked: boolean;
+	/**
+	 * Whether the controls of the Styles tab are locked.
+	 */
+	isStylesLocked: boolean;
 	isMoveLocked: boolean;
 	isRemoveLocked: boolean;
 	/**

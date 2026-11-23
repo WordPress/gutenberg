@@ -184,14 +184,12 @@ export default function InspectorControlsTabs( {
 					) }
 				</WCTabs.TabList>
 				<WCTabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<DisabledWhenStylesLocked clientId={ clientId }>
-						<ContentTab
-							contentClientIds={ contentClientIds }
-							onSwitchToListView={ switchToListView }
-							hasListViewTab={ hasListViewTab }
-						/>
-						<InspectorControls.Slot group="content" />
-					</DisabledWhenStylesLocked>
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
+					<InspectorControls.Slot group="content" />
 				</WCTabs.TabPanel>
 				<WCTabs.TabPanel
 					tabId={ TAB_LIST_VIEW.name }
@@ -204,11 +202,10 @@ export default function InspectorControlsTabs( {
 					tabId={ TAB_SETTINGS.name }
 					focusable={ false }
 				>
-					<DisabledWhenStylesLocked clientId={ clientId }>
-						<SettingsTab showAdvancedControls={ !! blockName } />
-					</DisabledWhenStylesLocked>
+					<SettingsTab showAdvancedControls={ !! blockName } />
 				</WCTabs.TabPanel>
 				<WCTabs.TabPanel tabId={ TAB_STYLES.name } focusable={ false }>
+					{ /* A styles lock locks the controls of this tab only. */ }
 					<DisabledWhenStylesLocked clientId={ clientId }>
 						<StylesTab
 							blockName={ blockName }

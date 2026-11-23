@@ -1831,14 +1831,13 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	// With the block lock menu, a block whose styles are locked takes no new
-	// inner blocks, as adding one would change its content.
-	if (
-		window.__experimentalBlockLockMenu &&
-		rootClientId &&
-		getBlockAttributes( state, rootClientId )?.lock?.edit
-	) {
-		return false;
+	// With the block lock menu, a fully locked block takes no new inner
+	// blocks, also when it has no layout to lock, like Social Icons.
+	if ( window.__experimentalBlockLockMenu && rootClientId ) {
+		const rootLock = getBlockAttributes( state, rootClientId )?.lock;
+		if ( rootLock?.styles && rootLock?.move && rootLock?.remove ) {
+			return false;
+		}
 	}
 
 	// No insertion within static inner content: the inner blocks are fixed
@@ -3561,17 +3560,8 @@ export function __unstableHasActiveBlockOverlayActive(
 	}
 
 	// If the block editing is locked, the block overlay is always active.
-	// With the block lock menu, the inner blocks of a block whose styles are
-	// locked can still be selected in the canvas: each one is locked on its
-	// own. Blocks whose inner blocks come from elsewhere, like Navigation or a
-	// synced pattern, keep them out of reach.
 	if ( ! canEditBlock( state, clientId ) ) {
-		return ! (
-			window.__experimentalBlockLockMenu &&
-			! state.settings.isPreviewMode &&
-			getBlockOrder( state, clientId ).length > 0 &&
-			! areInnerBlocksControlled( state, clientId )
-		);
+		return true;
 	}
 
 	// In zoom-out mode, the block overlay is always active for section level blocks.

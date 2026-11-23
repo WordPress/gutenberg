@@ -17,6 +17,7 @@ export default function useBlockLock( clientId: string ): BlockLockStatus {
 				canLockBlockType,
 				getBlockName,
 				isEditLockedBlock,
+				isStylesLockedBlock,
 				isMoveLockedBlock,
 				isRemoveLockedBlock,
 				isLayoutLockedBlock,
@@ -30,6 +31,7 @@ export default function useBlockLock( clientId: string ): BlockLockStatus {
 
 			return {
 				isEditLocked: isEditLockedBlock( clientId ),
+				isStylesLocked: isStylesLockedBlock( clientId ),
 				isMoveLocked: isMoveLockedBlock( clientId ),
 				isRemoveLocked: isRemoveLockedBlock( clientId ),
 				isLayoutLocked: isLayoutLockedBlock( clientId ),
