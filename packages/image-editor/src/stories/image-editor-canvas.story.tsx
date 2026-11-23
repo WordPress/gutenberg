@@ -537,6 +537,12 @@ const ApplyAnEditComponent = () => {
 			setMessage( 'Not valid JSON.' );
 			return;
 		}
+		if ( ! edit || typeof edit !== 'object' || Array.isArray( edit ) ) {
+			setMessage(
+				'The edit must be a JSON object, such as { "rotation": 90 }.'
+			);
+			return;
+		}
 		const result = applyImageEdit( state, edit, { strict } );
 		if ( 'rejected' in result ) {
 			setMessage(
