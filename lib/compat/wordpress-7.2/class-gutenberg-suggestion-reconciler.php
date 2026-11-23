@@ -54,7 +54,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * suggestion notes of the post (`notes`) and the notes whose proposals
 		 * were too large to extract (`skipped`).
 		 *
-		 * @var array<int, array[]>
+		 * @var array<int, list<array{previous: string, previous_full: string, stored: array<int, array<array<mixed>>>, candidates: array<int, array<array<mixed>>>, notes: array<int, string>, skipped: array<int, true>}>>
 		 */
 		private static $previous = array();
 
@@ -138,7 +138,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			if ( ! self::is_enabled() || ! isset( $data['post_type'] ) ) {
 				return $data;
 			}
-			$incoming = isset( $data['post_content'] ) ? wp_unslash( $data['post_content'] ) : '';
+			if ( ! is_string( $data['post_type'] ) ) {
+				return $data;
+			}
+			$incoming = isset( $data['post_content'] ) && is_string( $data['post_content'] ) ? wp_unslash( $data['post_content'] ) : '';
 
 			if ( 'revision' === $data['post_type'] ) {
 				$parent_id = isset( $data['post_parent'] ) ? (int) $data['post_parent'] : 0;
@@ -303,7 +306,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			);
 			$lost  = array();
 			foreach ( $before as $note_id => $kinds ) {
-				if ( array_diff_key( $kinds, $after[ $note_id ] ?? array() ) ) {
+				$kept = $after[ $note_id ] ?? array();
+				if ( is_array( $kinds ) && is_array( $kept ) && array_diff_key( $kinds, $kept ) ) {
 					$lost[] = $note_id;
 				}
 			}
@@ -339,7 +343,8 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					continue;
 				}
 				$seen[ $note_id ] = true;
-				$payload          = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
+				$raw              = get_comment_meta( $note_id, '_wp_suggestion', true );
+				$payload          = json_decode( is_string( $raw ) ? $raw : '', true );
 				$kind             = self::anchor_kind( $payload );
 				// Post-field suggestions have no anchor; see `finalize_post_fields()`.
 				if ( null === $kind || 'post' === $kind ) {
@@ -375,7 +380,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param WP_Post $post    Post.
 		 * @param bool    $update  Whether this is an update. A new post has no notes.
 		 */
-		public static function finalize_post_fields( $post_id, $post, $update = true ) {
+		public static function finalize_post_fields( $post_id, $post, $update = true ): void {
 			$undecided = isset( self::$undecided[ $post_id ] );
 			unset( self::$undecided[ $post_id ] );
 			if ( ! $update || $undecided ) {
@@ -572,7 +577,9 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 					continue;
 				}
 				foreach ( $list as $index => $item ) {
-					$items[ $note_id ][ $index ] = Gutenberg_Suggestion_Content::kses_item( $item );
+					if ( is_array( $item ) ) {
+						$items[ $note_id ][ $index ] = Gutenberg_Suggestion_Content::kses_item( $item );
+					}
 				}
 			}
 
@@ -611,10 +618,11 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * @param string             $content   Content.
 		 * @param array<int, mixed>  $notes     Suggestion notes of the post, by note ID.
 		 * @param array<int, string> $originals Original run of each formatting suggestion.
-		 * @param array<int, array[]> $deltas   Delta of each formatting suggestion that recorded one.
-		 * @return array{content: string, items: array<int, array[]>, skipped: array<int, true>}
+		 * @param array<int, array<mixed>> $deltas Delta of each formatting suggestion that recorded one.
+		 * @return array{content: string, items: array<int, array<array<mixed>>>, skipped: array<int, true>}
 		 */
 		private static function extract( $content, $notes, $originals, $deltas ) {
+			$notes   = array_fill_keys( array_keys( $notes ), true );
 			$exclude = array();
 			while ( true ) {
 				$result = Gutenberg_Suggestion_Content::extract( $content, $notes, $exclude, $originals, $deltas );
@@ -639,7 +647,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 *
 		 * @param int              $post_id Post ID.
 		 * @param array<int, true> $ids     Note ids the content names.
-		 * @return array{notes: array<int, string>, items: array<int, array[]>, originals: array<int, string>, deltas: array<int, array[]>}
+		 * @return array{notes: array<int, string>, items: array<int, array<array<mixed>>>, originals: array<int, string>, deltas: array<int, array<mixed>>}
 		 */
 		private static function stored_state( $post_id, $ids ) {
 			$notes     = self::suggestion_notes( $post_id, $ids );
@@ -649,7 +657,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 				$operation = self::format_operation( $note_id );
 				if ( null !== $operation ) {
 					$originals[ $note_id ] = $operation['beforeHTML'];
-					if ( isset( $operation['delta'] ) && is_array( $operation['delta'] ) ) {
+					if ( null !== $operation['delta'] ) {
 						$deltas[ $note_id ] = $operation['delta'];
 					}
 				}
@@ -673,7 +681,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 		 * run (`beforeHTML`).
 		 *
 		 * @param int $note_id Note ID.
-		 * @return array<string, mixed>|null The operation, or null for any other suggestion.
+		 * @return array{beforeHTML: string, delta: array<mixed>|null}|null The original run and the delta, if one was recorded, or null for any other suggestion.
 		 */
 		private static function format_operation( $note_id ) {
 			$payload = json_decode( (string) get_comment_meta( $note_id, '_wp_suggestion', true ), true );
@@ -682,7 +690,10 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			}
 			foreach ( $payload['operations'] as $operation ) {
 				if ( is_array( $operation ) && isset( $operation['suggestionType'], $operation['beforeHTML'] ) && 'format' === $operation['suggestionType'] && is_string( $operation['beforeHTML'] ) ) {
-					return $operation;
+					return array(
+						'beforeHTML' => $operation['beforeHTML'],
+						'delta'      => isset( $operation['delta'] ) && is_array( $operation['delta'] ) ? $operation['delta'] : null,
+					);
 				}
 			}
 			return null;
@@ -981,7 +992,7 @@ if ( ! class_exists( 'Gutenberg_Suggestion_Reconciler' ) ) {
 			 */
 			$was_hooked = has_action( 'wp_set_comment_status', 'wp_new_comment_notify_postauthor' );
 			$silence    = static function ( $notify, $comment_id ) use ( $note_id ) {
-				return (int) $comment_id === (int) $note_id ? false : $notify;
+				return is_numeric( $comment_id ) && (int) $comment_id === (int) $note_id ? false : $notify;
 			};
 			add_filter( 'notify_post_author', $silence, PHP_INT_MAX, 2 );
 			wp_set_comment_status( $note_id, 'approve' );
