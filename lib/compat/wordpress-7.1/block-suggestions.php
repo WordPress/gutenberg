@@ -782,30 +782,48 @@ function gutenberg_suggested_value_has_unsafe_url( $value, bool $is_url, bool $i
 }
 
 /**
+ * Whether a path of keys into a block's `style` is a place custom CSS sits:
+ * the top of the style, or under pseudo-state (`:hover`) and viewport-state
+ * (`@mobile`) keys. The places `gutenberg_strip_custom_css_from_style_array()`
+ * strips a `css` key from.
+ *
+ * @param array<int, int|string> $path Keys from the style down to the holder of a `css` key.
+ * @return bool Whether it is.
+ */
+function gutenberg_is_suggestion_custom_css_position( array $path ): bool {
+	foreach ( $path as $key ) {
+		if ( ! is_string( $key ) || ( ! str_starts_with( $key, ':' ) && ! str_starts_with( $key, '@' ) ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/**
  * Collects the custom CSS of a post's blocks of one type, as the saved
- * content holds it.
+ * content holds it, by position in the `style`.
  *
  * Custom CSS is stripped from the content a user without `edit_css` saves,
- * so what the post holds was written by a user allowed to.
+ * so what the post holds in the stripped positions was written by a user
+ * allowed to. A `css` key anywhere else in a `style` is not read.
  *
  * @param WP_Post|null $post       The post.
  * @param string       $block_name Block name.
- * @return list<string> Every `css` value in the `style` of those blocks.
+ * @return array<string, list<string>> The `css` values of those blocks, keyed
+ *                                     by the JSON of their path of state keys.
  */
 function gutenberg_get_suggestion_post_block_custom_css( ?WP_Post $post, string $block_name ): array {
 	$css = array();
 	if ( ! $post || '' === $block_name || ! has_blocks( $post->post_content ) ) {
 		return $css;
 	}
-	$collect = static function ( $style ) use ( &$collect, &$css ): void {
-		if ( ! is_array( $style ) ) {
-			return;
+	$collect = static function ( array $style, array $path ) use ( &$collect, &$css ): void {
+		if ( isset( $style['css'] ) && is_string( $style['css'] ) ) {
+			$css[ (string) wp_json_encode( $path ) ][] = $style['css'];
 		}
 		foreach ( $style as $key => $value ) {
-			if ( 'css' === $key && is_string( $value ) ) {
-				$css[] = $value;
-			} else {
-				$collect( $value );
+			if ( is_array( $value ) && gutenberg_is_suggestion_custom_css_position( array( $key ) ) ) {
+				$collect( $value, array_merge( $path, array( $key ) ) );
 			}
 		}
 	};
@@ -814,8 +832,8 @@ function gutenberg_get_suggestion_post_block_custom_css( ?WP_Post $post, string 
 			if ( ! is_array( $block ) ) {
 				continue;
 			}
-			if ( isset( $block['blockName'], $block['attrs'] ) && $block_name === $block['blockName'] && is_array( $block['attrs'] ) && isset( $block['attrs']['style'] ) ) {
-				$collect( $block['attrs']['style'] );
+			if ( isset( $block['blockName'], $block['attrs'] ) && $block_name === $block['blockName'] && is_array( $block['attrs'] ) && isset( $block['attrs']['style'] ) && is_array( $block['attrs']['style'] ) ) {
+				$collect( $block['attrs']['style'], array() );
 			}
 			if ( isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
 				$walk( $block['innerBlocks'] );
@@ -830,19 +848,26 @@ function gutenberg_get_suggestion_post_block_custom_css( ?WP_Post $post, string 
  * Whether a proposed `style` carries CSS its suggester may not write.
  *
  * Custom CSS (`css`, at any depth) needs `edit_css`: without it a proposal
- * may only carry along custom CSS the block already has. Every other string
- * is one declaration's value and may not leave that declaration.
+ * may only carry along custom CSS the block already has, where it has it.
+ * Every other string is one declaration's value and may not leave that
+ * declaration.
  *
- * @param mixed             $value       Proposed style, or a part of it.
- * @param string            $key         The key the value sits under.
- * @param list<string>|null $allowed_css The custom CSS the proposal may carry, or null for any.
- * @param bool              $is_filtered Whether the value was filtered for storage, which encodes entities.
+ * @param mixed                            $value       Proposed style, or a part of it.
+ * @param string                           $key         The key the value sits under.
+ * @param array<string, list<string>>|null $allowed_css The custom CSS the proposal may carry, by position
+ *                                                      (see `gutenberg_get_suggestion_post_block_custom_css()`),
+ *                                                      or null for any.
+ * @param bool                             $is_filtered Whether the value was filtered for storage, which encodes entities.
+ * @param array<int, int|string>           $path        Keys from the style down to the holder of `$key`.
  * @return bool Whether it does.
  */
-function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allowed_css, bool $is_filtered = false ): bool {
+function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allowed_css, bool $is_filtered = false, array $path = array() ): bool {
 	if ( is_string( $value ) ) {
 		if ( 'css' === $key ) {
-			return null !== $allowed_css && ! in_array( $value, $allowed_css, true );
+			return null !== $allowed_css && (
+				! gutenberg_is_suggestion_custom_css_position( $path ) ||
+				! in_array( $value, $allowed_css[ (string) wp_json_encode( $path ) ] ?? array(), true )
+			);
 		}
 		if ( $is_filtered ) {
 			$value = html_entity_decode( $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
@@ -865,16 +890,19 @@ function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allow
 		return 0 !== preg_match( '~[;{}<>\\\\]|/\*|url' . $space . '*\(|expression' . $space . '*\(|@import~iu', $value );
 	}
 	if ( is_array( $value ) ) {
-		foreach ( $value as $entry ) {
-			if ( gutenberg_suggested_style_is_unsafe( $entry, $key, $allowed_css, $is_filtered ) ) {
+		foreach ( $value as $index => $entry ) {
+			// A list is not a place custom CSS sits, which its index in the path records.
+			if ( gutenberg_suggested_style_is_unsafe( $entry, $key, $allowed_css, $is_filtered, array_merge( $path, array( (int) $index ) ) ) ) {
 				return true;
 			}
 		}
 		return false;
 	}
 	if ( $value instanceof stdClass ) {
+		// The style itself sits under no key.
+		$child_path = '' === $key && array() === $path ? $path : array_merge( $path, array( $key ) );
 		foreach ( get_object_vars( $value ) as $child_key => $entry ) {
-			if ( gutenberg_suggested_style_is_unsafe( $entry, (string) $child_key, $allowed_css, $is_filtered ) ) {
+			if ( gutenberg_suggested_style_is_unsafe( $entry, (string) $child_key, $allowed_css, $is_filtered, $child_path ) ) {
 				return true;
 			}
 		}
@@ -916,6 +944,8 @@ function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allow
  * stored one has its entities decoded first, and skips the rules filtering
  * cannot affect or only blurs: the `type` and `enum` (re-encoding loses the
  * difference between an empty object and an empty list) and the custom CSS.
+ * Its keys are the ones judged as sent: a payload whose keys filtering
+ * changes is refused (`gutenberg_find_suggestion_attribute_write_problem()`).
  *
  * @param string       $payload     The `_wp_suggestion` JSON.
  * @param WP_Post|null $post        The post the note belongs to.
@@ -926,6 +956,10 @@ function gutenberg_suggested_style_is_unsafe( $value, string $key, ?array $allow
 function gutenberg_find_suggestion_attribute_operation_problem( string $payload, ?WP_Post $post = null, bool $is_filtered = false ): ?string {
 	// Objects stay objects, so an attribute's `object` and `array` types can be told apart.
 	$payload = json_decode( $payload );
+	// A property name an object cannot hold: valid JSON the rules cannot read.
+	if ( null === $payload && JSON_ERROR_INVALID_PROPERTY_NAME === json_last_error() ) {
+		return 'invalid-value';
+	}
 	$payload = $payload instanceof stdClass ? get_object_vars( $payload ) : array();
 	if ( ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
 		return null;
@@ -1033,10 +1067,50 @@ function gutenberg_find_suggestion_attribute_operation_problem( string $payload,
  */
 function gutenberg_find_suggestion_attribute_write_problem( string $sent, string $stored, ?WP_Post $post ): ?string {
 	$problem = gutenberg_find_suggestion_attribute_operation_problem( $sent, $post );
-	if ( null === $problem && $stored !== $sent ) {
-		$problem = gutenberg_find_suggestion_attribute_operation_problem( $stored, $post, true );
+	if ( null !== $problem || $stored === $sent ) {
+		return $problem;
 	}
-	return $problem;
+	/*
+	 * Filtering filters the keys of a proposed value too. The rules read a
+	 * value by its keys (`css`, a URL key), so a key that only reads as one
+	 * once stored would have been judged as something else.
+	 */
+	if ( gutenberg_get_suggestion_attribute_key_paths( $sent ) !== gutenberg_get_suggestion_attribute_key_paths( $stored ) ) {
+		return 'unsafe-value';
+	}
+	return gutenberg_find_suggestion_attribute_operation_problem( $stored, $post, true );
+}
+
+/**
+ * Lists the key paths of the values a payload's `attribute-set` operations
+ * propose.
+ *
+ * @param string $payload The `_wp_suggestion` JSON.
+ * @return list<string> The JSON of each path, from the operation's index down.
+ */
+function gutenberg_get_suggestion_attribute_key_paths( string $payload ): array {
+	$payload = json_decode( $payload, true );
+	$paths   = array();
+	if ( ! is_array( $payload ) || ! isset( $payload['operations'] ) || ! is_array( $payload['operations'] ) ) {
+		return $paths;
+	}
+	$collect = static function ( $value, array $path ) use ( &$collect, &$paths ): void {
+		if ( ! is_array( $value ) ) {
+			return;
+		}
+		foreach ( $value as $key => $entry ) {
+			$child   = array_merge( $path, array( $key ) );
+			$paths[] = (string) wp_json_encode( $child );
+			$collect( $entry, $child );
+		}
+	};
+	foreach ( $payload['operations'] as $index => $operation ) {
+		if ( is_array( $operation ) && isset( $operation['type'], $operation['after'] ) && 'attribute-set' === $operation['type'] ) {
+			$collect( $operation['after'], array( $index ) );
+		}
+	}
+	sort( $paths );
+	return $paths;
 }
 
 /**
