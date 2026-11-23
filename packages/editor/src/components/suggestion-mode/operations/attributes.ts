@@ -215,9 +215,16 @@ export function clearSuggestionMarkerAttributes(
 	return { metadata: rest };
 }
 
+/** Metadata keys the system owns; a proposal never sets them. */
+const SYSTEM_METADATA_KEYS = [ 'noteId', 'suggestion' ];
+
 /**
  * Apply a suggestion payload's operations to a block's current attributes
  * to produce the new attributes. Pure function — no side effects.
+ *
+ * A `metadata` proposal holds only the keys it changes (a new block name,
+ * say), so it is merged into the block's metadata, which also carries the
+ * note links and the markers. Every other attribute is replaced.
  *
  * @param currentAttributes Block's current attributes.
  * @param operations        Operations from the payload.
@@ -229,8 +236,23 @@ export function applyOperations(
 ): Record< string, any > {
 	const result: Record< string, any > = { ...currentAttributes };
 	for ( const op of operations ) {
-		if ( op.type === 'attribute-set' ) {
+		if ( op.type !== 'attribute-set' ) {
+			continue;
+		}
+		if ( op.attribute !== 'metadata' ) {
 			result[ op.attribute ] = op.after;
+			continue;
+		}
+		if (
+			op.after &&
+			typeof op.after === 'object' &&
+			! Array.isArray( op.after )
+		) {
+			const proposed = { ...op.after };
+			for ( const key of SYSTEM_METADATA_KEYS ) {
+				delete proposed[ key ];
+			}
+			result.metadata = { ...result.metadata, ...proposed };
 		}
 	}
 	return result;
@@ -369,6 +391,30 @@ export function hasAttributeConflict(
 			op.type !== 'attribute-set' &&
 			op.type !== POST_ATTRIBUTE_OP_TYPE
 		) {
+			continue;
+		}
+		/*
+		 * A metadata proposal holds only the keys it changes, while the
+		 * block's metadata also carries note links and markers: compare
+		 * key by key.
+		 */
+		if (
+			op.type === 'attribute-set' &&
+			op.attribute === 'metadata' &&
+			op.after &&
+			typeof op.after === 'object'
+		) {
+			if (
+				Object.keys( op.after ).some(
+					( key ) =>
+						! isAttributeEqual(
+							op.before?.[ key ] ?? null,
+							currentAttributes?.metadata?.[ key ] ?? null
+						)
+				)
+			) {
+				return true;
+			}
 			continue;
 		}
 		if (

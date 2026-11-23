@@ -672,7 +672,7 @@ export function useSuggestionDecisions() {
 							...applied,
 							metadata: withoutOutdatedProposals(
 								withoutMarkerEntry(
-									currentAttributes?.metadata,
+									applied.metadata,
 									commentId
 								),
 								applied
@@ -712,15 +712,13 @@ export function useSuggestionDecisions() {
 					// One update lands the proposed values and drops the
 					// proposal, with any other author's proposal it left
 					// with nothing to change.
-					const clearedProposal =
-						clearProposedAttributes( currentAttributes );
 					const applied = applyOperations(
 						currentAttributes,
 						payload.operations
 					);
 					const metadata = withoutOutdatedProposals(
-						clearedProposal?.metadata ??
-							currentAttributes?.metadata,
+						clearProposedAttributes( applied )?.metadata ??
+							applied.metadata,
 						applied
 					);
 					// Bypass the Suggestion mode interceptor for this dispatch
