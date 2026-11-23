@@ -26,6 +26,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` development dependency to 14.6.13 ([#87240](https://github.com/WordPress/gutenberg/pull/87240)).
 -   Update `uuid` dependency to 14.0.3 ([#87242](https://github.com/WordPress/gutenberg/pull/87242)).
 -   Update Storybook development dependencies to 10.6.8 ([#87255](https://github.com/WordPress/gutenberg/pull/87255)).
 -   Update `timezone-mock` development dependency to 1.4.3 ([#87250](https://github.com/WordPress/gutenberg/pull/87250)).
