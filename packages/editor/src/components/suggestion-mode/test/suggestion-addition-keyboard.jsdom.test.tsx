@@ -145,6 +145,9 @@ async function type( editable: HTMLElement, data: string ) {
 	return event;
 }
 
+// Suggesting is only offered with the Suggestion mode experiment on.
+window.__experimentalSuggestionMode = true;
+
 describe( 'SuggestionAdditionKeyboard', () => {
 	it( 'marks text typed into a block attribute', async () => {
 		const block = createBlock( 'core/paragraph', {
