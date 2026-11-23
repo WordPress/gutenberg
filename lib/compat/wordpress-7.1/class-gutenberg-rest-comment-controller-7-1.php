@@ -21,6 +21,8 @@
  *     suggestion payload to the content-allowed check below.
  *   - `check_is_comment_content_allowed`: a note may have empty
  *     `comment_content` when it carries only a proposed edit.
+ *   - `create_item`: a new top-level suggestion note is stored as `hold`
+ *     unless the request sets a status.
  *
  * @package gutenberg
  * @since   7.1.0
@@ -82,6 +84,39 @@ if ( class_exists( 'Gutenberg_REST_Comment_Controller_7_2' ) && ! class_exists( 
 				}
 			}
 			return true;
+		}
+
+		/**
+		 * Creates a comment, storing a new suggestion note unresolved.
+		 *
+		 * A note is created resolved unless the request sets a status. A
+		 * suggestion is undecided until a reviewer accepts or rejects it, so
+		 * a top-level note that carries one is held instead.
+		 *
+		 * @param WP_REST_Request $request Full details about the request.
+		 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
+		 */
+		public function create_item( $request ) {
+			$hold_suggestion = static function ( $prepared_comment ) use ( $request ) {
+				$meta = is_array( $prepared_comment ) && isset( $prepared_comment['meta'] ) ? $prepared_comment['meta'] : null;
+				if (
+					is_array( $meta ) &&
+					! empty( $meta['_wp_suggestion'] ) &&
+					! isset( $request['status'] ) &&
+					'note' === ( $prepared_comment['comment_type'] ?? '' ) &&
+					empty( $prepared_comment['comment_parent'] )
+				) {
+					$prepared_comment['comment_approved'] = '0';
+				}
+				return $prepared_comment;
+			};
+
+			add_filter( 'rest_pre_insert_comment', $hold_suggestion );
+			try {
+				return parent::create_item( $request );
+			} finally {
+				remove_filter( 'rest_pre_insert_comment', $hold_suggestion );
+			}
 		}
 
 		/**
