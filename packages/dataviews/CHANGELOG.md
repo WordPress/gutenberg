@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Move focus between the bulk selection checkboxes only when an interaction with the selection asks for it, so that DataViews no longer competes for focus that an app router recovers after a navigation ([#86932](https://github.com/WordPress/gutenberg/pull/86932)).
+-   Drop the `15ch` minimum width on the table columns of `integer` and `number` fields, so that a narrow table no longer scrolls sideways to make room that a number does not need ([#87228](https://github.com/WordPress/gutenberg/pull/87228)).
 
 ## 22.1.0 (2026-11-18)
 
