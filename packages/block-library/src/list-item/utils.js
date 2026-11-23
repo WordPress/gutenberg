@@ -1,5 +1,6 @@
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { cloneBlock } from '@wordpress/blocks';
+import { unlock } from '../lock-unlock';
 
 /**
  * The previous sibling to nest a list item under when indenting, or undefined
@@ -108,6 +109,14 @@ export function indentListItems( registry, clientId ) {
 	const clientIds = _hasMultiSelection
 		? getMultiSelectedBlockClientIds()
 		: getSelectedBlockClientIds();
+	// Indentation moves one sibling range under its previous item. Reject other
+	// selections before removing blocks or changing their nesting.
+	if (
+		! clientIds.length ||
+		! unlock( select ).areBlocksContiguous( clientIds )
+	) {
+		return false;
+	}
 
 	if ( clientId === undefined ) {
 		clientId = clientIds[ 0 ];
@@ -181,7 +190,12 @@ export function outdentListItems( registry, clientIds ) {
 		clientIds = [ clientIds ];
 	}
 
-	if ( ! clientIds.length ) {
+	// Outdent uses the first and last items to split one source list. A selection
+	// across lists could otherwise include its own destination in that split.
+	if (
+		! clientIds.length ||
+		! unlock( select ).areBlocksContiguous( clientIds )
+	) {
 		return false;
 	}
 
