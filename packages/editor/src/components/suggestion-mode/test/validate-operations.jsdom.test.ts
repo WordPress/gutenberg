@@ -226,6 +226,42 @@ describe( 'findAttributeOperationProblem', () => {
 		).toBe( 'unsafe-value' );
 	} );
 
+	it.each( [
+		"https://example.org/a.png');color:red;background:url('x",
+		'https://example.org/a.png"',
+		'https://example.org/a.png;color:red',
+		'https://example.org/a.png}body{color:red',
+		'https://example.org/a\\27 .png',
+		'https://example.org/a.png\ncolor:red',
+		'https://example.org/a.png</style>',
+	] )( 'refuses the style URL %s, which leaves its declaration', ( url ) => {
+		expect(
+			findAttributeOperationProblem(
+				GROUP,
+				set( 'style', {
+					background: { backgroundImage: { url } },
+				} )
+			)
+		).toBe( 'unsafe-value' );
+	} );
+
+	it( 'accepts ordinary style URLs', () => {
+		for ( const url of [
+			'https://example.org/a.png?w=1&h=2',
+			'/wp-content/uploads/a b (1).png',
+			'https://example.org/wiki/File:A_(b).png#c',
+		] ) {
+			expect(
+				findAttributeOperationProblem(
+					GROUP,
+					set( 'style', {
+						background: { backgroundImage: { url } },
+					} )
+				)
+			).toBeNull();
+		}
+	} );
+
 	it( 'accepts ordinary style values', () => {
 		expect(
 			findAttributeOperationProblem(

@@ -81,6 +81,13 @@ const URL_HTML_ATTRIBUTES = new Set( [
  */
 const CSS_BREAKOUT = /[;{}<>\\]|\/\*|url\s*\(|expression\s*\(|@import/i;
 
+/**
+ * What lets a URL in a `style` leave the quoted `url()` it is written into (a
+ * quote, an escape, a control character), and what a filter that splits a
+ * style into declarations and rules would cut it at.
+ */
+const CSS_URL_BREAKOUT = /[;{}<>\\'"\u0000-\u001f\u007f]/;
+
 /** Metadata keys the system owns; never part of a proposal. */
 const SYSTEM_METADATA_KEYS = [ 'noteId', 'suggestion' ];
 
@@ -144,7 +151,8 @@ function hasUnsafeUrl( value: unknown, isUrl: boolean ): boolean {
 /**
  * Whether a proposed `style` carries CSS the suggester may not be allowed to
  * write. Custom CSS (`css`, at any depth) needs `edit_css`, so a proposal may
- * not add or change it; every other string is one declaration's value.
+ * not add or change it; every other string is one declaration's value, or a
+ * URL inside one.
  *
  * @param value Proposed style, or a part of it.
  * @param live  The block's live value at the same path.
@@ -156,8 +164,10 @@ function hasUnsafeStyle( value: unknown, live: unknown, key = '' ): boolean {
 		if ( key === 'css' ) {
 			return value !== live;
 		}
-		// A URL is checked by scheme, as it is under any other attribute.
-		return ! URL_KEY.test( key ) && CSS_BREAKOUT.test( value );
+		// A URL is also checked by scheme, as it is under any other attribute.
+		return ( URL_KEY.test( key ) ? CSS_URL_BREAKOUT : CSS_BREAKOUT ).test(
+			value
+		);
 	}
 	if ( Array.isArray( value ) ) {
 		return value.some( ( entry, index ) =>
