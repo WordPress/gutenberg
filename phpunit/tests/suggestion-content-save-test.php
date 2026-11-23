@@ -480,7 +480,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 					$items[ $index ]['original'] = str_replace( array( ' zanzibarian', 'Quixotic paragraph' ), array( ' zanzibarian' . $payload, 'Quixotic paragraph' . $payload ), $item['original'] );
 				}
 			}
-			update_comment_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $items ) ) );
+			gutenberg_update_suggestion_server_meta( $note_id, '_wp_suggestion_content', wp_slash( Gutenberg_Suggestion_Content::encode( $items ) ) );
 		}
 	}
 
@@ -562,7 +562,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 	public function test_a_save_loads_only_the_notes_its_content_names(): void {
 		list( $post_id, $content, $notes ) = $this->suggested_post();
 		$decided                           = $this->create_note( $post_id );
-		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+		gutenberg_update_suggestion_server_meta( $decided, '_wp_suggestion_status', 'applied' );
 		wp_set_comment_status( $decided, 'approve' );
 
 		list( $loaded ) = $this->notes_loaded_by(
@@ -579,7 +579,7 @@ class Tests_Suggestion_Content_Save extends WP_UnitTestCase {
 	public function test_an_edit_context_response_loads_only_the_notes_its_content_names(): void {
 		list( $post_id, $content, $notes ) = $this->suggested_post();
 		$decided                           = $this->create_note( $post_id );
-		update_comment_meta( $decided, '_wp_suggestion_status', 'applied' );
+		gutenberg_update_suggestion_server_meta( $decided, '_wp_suggestion_status', 'applied' );
 
 		list( $loaded ) = $this->notes_loaded_by(
 			function () use ( $post_id, $content ) {
