@@ -9,6 +9,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { SelectControl } from '@wordpress/ui';
 import { MIN_PREVIEW_HEIGHT, MAX_PREVIEW_HEIGHT } from './edit';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { isPdfUrl } from './utils/is-pdf-url';
 
 export default function FileBlockInspector( {
 	hrefs,
@@ -33,10 +34,14 @@ export default function FileBlockInspector( {
 		];
 	}
 
+	// A PDF selected from the media library is recognized by its mime type and
+	// gets a `displayPreview` value, even when its URL doesn't end in `.pdf`.
+	const isPdf = displayPreview !== undefined || isPdfUrl( href );
+
 	return (
 		<>
 			<InspectorControls>
-				{ href.endsWith( '.pdf' ) && (
+				{ isPdf && (
 					<ToolsPanel
 						label={ __( 'PDF settings' ) }
 						resetAll={ () => {
