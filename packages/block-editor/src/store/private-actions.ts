@@ -382,11 +382,6 @@ export function stopDragging() {
 }
 
 /**
- * @param clientId The block's clientId, or `null` to clear.
- *
- * @return  Action object.
- */
-/**
  * Makes one-step moves (the block movers and their keyboard shortcuts) treat a
  * block as transparent: its children count as siblings of the blocks around
  * it, so a neighbor moves past one child at a time instead of past the whole
@@ -408,6 +403,11 @@ export function setBlockMoveTransparent(
 	};
 }
 
+/**
+ * @param clientId The block's clientId, or `null` to clear.
+ *
+ * @return  Action object.
+ */
 export function expandBlock( clientId: string | null ) {
 	return {
 		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',

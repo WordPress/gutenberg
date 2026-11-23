@@ -160,6 +160,46 @@ test.describe( 'Navigation: moving one step', () => {
 					],
 				} );
 		} );
+
+		test( 'one undo still brings the Page List back after a page is saved', async ( {
+			editor,
+			page,
+			menuUtils,
+		} ) => {
+			const menu = await menuUtils.setUpPageListMenu( CONTENT );
+			// Saving a page refetches the list's pages, as creating a page
+			// from the link UI does.
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core' )
+					.saveEntityRecord( 'postType', 'page', {
+						title: 'Delta',
+						status: 'draft',
+					} )
+			);
+
+			await menuUtils.selectInCanvas( 'Home' );
+			await editor.clickBlockToolbarButton( 'Move right' );
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( { pageLists: 0 } );
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Undo', exact: true } )
+				.click();
+
+			await expect
+				.poll( () => menuUtils.getState( menu.id ) )
+				.toMatchObject( {
+					pageLists: 1,
+					tree: [
+						'Home',
+						'Page List(Alpha,Charlie,Bravo(Bravo Team))',
+						'Contact',
+					],
+				} );
+		} );
 	} );
 
 	test.describe( 'List View movers', () => {

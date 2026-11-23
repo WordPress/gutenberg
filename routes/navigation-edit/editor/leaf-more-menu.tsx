@@ -111,6 +111,7 @@ export default function LeafMoreMenu( {
 							<MenuItem
 								icon={ chevronUp }
 								disabled={ ! moveUpTo }
+								accessibleWhenDisabled
 								onClick={ () => move( moveUpTo ) }
 							>
 								{ __( 'Move up' ) }
@@ -118,6 +119,7 @@ export default function LeafMoreMenu( {
 							<MenuItem
 								icon={ chevronDown }
 								disabled={ ! moveDownTo }
+								accessibleWhenDisabled
 								onClick={ () => move( moveDownTo ) }
 							>
 								{ __( 'Move down' ) }

@@ -76,7 +76,9 @@ function BlockContent( {
 	pages,
 	parentPageID,
 } ) {
-	if ( ! hasResolvedPages ) {
+	// Only before the first result: a refetch (after a page is saved) keeps
+	// showing the pages, so the inner blocks and their sync stay mounted.
+	if ( ! hasResolvedPages && ! pages ) {
 		return (
 			<div { ...blockProps }>
 				<div className="wp-block-page-list__loading-indicator-container">
@@ -349,7 +351,7 @@ export default function PageListEdit( {
 	);
 	const navigationLinks = useMemo(
 		() =>
-			isLinkMode && hasResolvedPages && pagesKey
+			isLinkMode && pagesKey
 				? buildNavigationLinks(
 						JSON.parse( pagesKey ).map(
 							( [ id, parent, link, type, title ] ) => ( {
@@ -363,8 +365,12 @@ export default function PageListEdit( {
 						parentPageID
 					)
 				: null,
-		[ isLinkMode, hasResolvedPages, pagesKey, parentPageID ]
+		[ isLinkMode, pagesKey, parentPageID ]
 	);
+
+	// In link mode, editing a page already turns the list into links, with
+	// "Auto add new pages" on, so there is no separate Detach.
+	const canDetach = allowConvertToLinks && ! isLinkMode;
 
 	const registry = useRegistry();
 	const {
@@ -489,7 +495,7 @@ export default function PageListEdit( {
 
 	return (
 		<>
-			{ ( pagesTree.length > 0 || allowConvertToLinks ) && (
+			{ ( pagesTree.length > 0 || canDetach ) && (
 				<InspectorControls>
 					<ToolsPanel
 						label={ __( 'Settings' ) }
@@ -524,7 +530,7 @@ export default function PageListEdit( {
 							</ToolsPanelItem>
 						) }
 
-						{ allowConvertToLinks && (
+						{ canDetach && (
 							<Button
 								__next40pxDefaultSize
 								variant="secondary"
@@ -544,7 +550,7 @@ export default function PageListEdit( {
 					</ToolsPanel>
 				</InspectorControls>
 			) }
-			{ allowConvertToLinks && (
+			{ canDetach && (
 				<>
 					<BlockControls group="other">
 						<ToolbarButton
