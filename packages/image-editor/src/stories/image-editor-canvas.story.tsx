@@ -30,7 +30,7 @@ import {
 	getImageEdit,
 	getOutputSize,
 	useImageEditor,
-	type ApplyImageEditResult,
+	type ImageEditRejection,
 	type ImageEditorState,
 } from '..';
 // The debug story shows the editor's internals, so it uses them directly.
@@ -501,10 +501,7 @@ export const WithControls: Story = {
 };
 
 // What each rejection means, from the `ImageEditRejection` docs.
-const REJECTIONS: Record<
-	Extract< ApplyImageEditResult, { rejected: unknown } >[ 'rejected' ],
-	string
-> = {
+const REJECTIONS: Record< ImageEditRejection, string > = {
 	'no-image': 'No image has loaded yet.',
 	invalid: 'A number is not finite, or the crop is under one pixel.',
 	'locked-ratio': 'The crop is not the shape of the locked ratio.',
@@ -530,6 +527,7 @@ const ApplyAnEditComponent = () => {
 		'{ "rotation": 90, "crop": { "x": 0, "y": 0, "width": 0.5, "height": 1 } }'
 	);
 	const [ message, setMessage ] = useState( '' );
+	const [ strict, setStrict ] = useState( false );
 
 	const apply = () => {
 		let edit;
@@ -539,7 +537,7 @@ const ApplyAnEditComponent = () => {
 			setMessage( 'Not valid JSON.' );
 			return;
 		}
-		const result = applyImageEdit( state, edit );
+		const result = applyImageEdit( state, edit, { strict } );
 		if ( 'rejected' in result ) {
 			setMessage(
 				`Rejected: ${ result.rejected }. ${ REJECTIONS[ result.rejected ] }`
@@ -589,6 +587,11 @@ const ApplyAnEditComponent = () => {
 								isLocked ? 1 : undefined
 							)
 						}
+					/>
+					<SwitchControl
+						label="Reject edits that need fitting"
+						checked={ strict }
+						onCheckedChange={ setStrict }
 					/>
 				</Stack>
 				{ message && <p>{ message }</p> }
